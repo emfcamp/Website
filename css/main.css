@@ -1,0 +1,35 @@
+body {
+        font-family: Helvetica, Arial, Verdana, sans-serif;
+            margin: 0; padding:0; padding-top:5px;
+        }
+
+#hd {
+    padding-bottom:20px;
+    text-align: center
+}
+
+#hd h1 {
+    font-weight: bold;
+    font-size: 5em
+}
+
+h2 {
+    font-weight:bold;
+    font-size: 2em;
+    margin-top:15px;
+    margin-bottom:5px;
+}
+
+p, ul {padding-bottom: 5px;}
+
+#google-form { margin-top:5px; margin-bottom: 5px; position:relative; left: 237px; border: 1px solid #aaa; padding:5px;}
+
+#ft {
+    font-size: 0.75em;
+    padding-top:20px;
+}
+
+li {
+    padding-left:5px;
+    list-style:circle inside;
+}
