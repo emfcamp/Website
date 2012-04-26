@@ -13,6 +13,11 @@ body {
     font-size: 5em
 }
 
+h1 a {
+    text-decoration:none;
+    color:inherit;
+}
+
 h2 {
     font-weight:bold;
     font-size: 2em;
