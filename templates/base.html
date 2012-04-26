@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Electromagnetic Field</title>
+        <link rel="stylesheet" href="http://yui.yahooapis.com/2.8.0r4/build/reset-fonts-grids/reset-fonts-grids.css" type="text/css">
+        <link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
+    </head>
+<body class="yui-skin-sam">
+<div id="doc" class="yui-t7">
+    <div id="hd">
+        <h1>Electromagnetic Field</h1>
+        <p>(a planned 3-day UK hacker camp in summer 2012)</p>
+    </div>
+    <div id="bd">
+        <div class="yui-g">
+            {% block body %}{% endblock %}
+        </div>
+    </div>
+    <div id="ft">
+        Electromagnetic Field Ltd. 2012. <a href="{{url_for('company')}}">Company details</a>.
+    </div>
+</div>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-28044531-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+</body>
+</html>
