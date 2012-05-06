@@ -1,5 +1,10 @@
 from flask import Flask, render_template
+from flaskext.login import LoginManager
+
 app = Flask(__name__)
+app.secret_key = 'test'
+login_manager = LoginManager()
+login_manager.setup_app(app)
 
 @app.route("/")
 def main():
