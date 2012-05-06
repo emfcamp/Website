@@ -1,20 +1,26 @@
 from main import app
-from flask import render_template, redirect, request
+from models.user import User
+from flask import render_template, redirect, request, flash, url_for
 from flaskext.login import login_user, login_required, logout_user
-from flaskext.wtf import Form, TextField, PasswordField, Required
+from flaskext.wtf import Form, TextField, PasswordField, Required, Email
 
 @app.route("/")
 def main():
     return render_template('main.html')
 
 class LoginForm(Form):
-    username = TextField('User Name', [Required()])
+    email = TextField('Email', [Email()])
     password = PasswordField('Password', [Required()])
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user is None or not user.check_password(form.password.data):
+            flash("Invalid login details!")
+            return redirect(url_for('login'))
+        login_user(user)
         return redirect('/')
     return render_template("login.html", form=form)
 

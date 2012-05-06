@@ -2,8 +2,9 @@
 {% extends "base.html" %}
 {% block body %}
 <form method=post>
+    {{form.hidden_tag()}}
 <dl>
-    {{ render_field(form.username) }}
+    {{ render_field(form.email) }}
     {{ render_field(form.password) }}
 </dl>
     <input type=submit name="Login"/>
