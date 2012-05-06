@@ -2,7 +2,7 @@ from main import app, db
 from models.user import User
 from flask import render_template, redirect, request, flash, url_for
 from flaskext.login import login_user, login_required, logout_user
-from flaskext.wtf import Form, TextField, PasswordField, Required, Email
+from flaskext.wtf import Form, TextField, PasswordField, Required, Email, EqualTo
 from sqlalchemy.exc import IntegrityError
 
 @app.route("/")
@@ -28,7 +28,8 @@ def login():
 class SignupForm(Form):
     name = TextField('Name', [Required()])
     email = TextField('Email', [Email(), Required()])
-    password = PasswordField('Password', [Required()])
+    password = PasswordField('Password', [Required(), EqualTo('confirm', message='Passwords do not match')])
+    confirm = PasswordField('Confirm password', [Required()])
 
 @app.route("/signup", methods=['GET', 'POST'])
 def signup():
