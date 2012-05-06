@@ -1,5 +1,6 @@
-from main import app, db
+from main import app, db, gocardless
 from models.user import User
+from models.payment import Payment
 from flask import render_template, redirect, request, flash, url_for
 from flaskext.login import login_user, login_required, logout_user
 from flaskext.wtf import Form, TextField, PasswordField, Required, Email, EqualTo
@@ -66,3 +67,22 @@ def sponsors():
 @app.route("/about/company")
 def company():
     return render_template('company.html')
+
+@app.route("/pay/gocardless-start")
+def gocardless_start():
+    bill_url = gocardless.client.new_bill_url(40.00, name="Electromagnetic Field Ticket Deposit")
+    return render_template('gocardless-start.html', bill_url=bill_url)
+
+@app.route("/pay/gocardless-complete")
+def gocardless_complete():
+    try:
+        gocardless.client.confirm_resource(request.args)
+    except gocardless.exceptions.ClientError:
+        app.logger.exception("Gocardless-complete exception")
+        flash("An error occurred with your payment, please contact info@emfcamp.org")
+        return redirect(url_for('main'))
+    return render_template('gocardless-complete.html')
+
+@app.route("/pay/gocardless-cancel")
+def gocardless_cancel():
+    return render_template('gocardless-cancel.html')
