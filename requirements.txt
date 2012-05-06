@@ -2,3 +2,5 @@ Flask==0.8
 Flask-Login==0.1.1
 sqlalchemy==0.7.7
 Flask-SQLAlchemy==0.16
+WTForms==1.0.1
+Flask-WTF==0.6
