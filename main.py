@@ -16,5 +16,9 @@ from views import *
 
 db.create_all()
 
+@login_manager.user_loader
+def load_user(userid):
+    return User.query.filter_by(id=userid).first()
+
 if __name__ == "__main__":
     app.run(debug=True)
