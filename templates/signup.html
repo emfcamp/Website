@@ -1,0 +1,16 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block body %}
+<h2>Sign up</h2>
+<p>We need an email address and password before we can accept payment.</p>
+<form method=post>
+  <dl>
+    {{ form.hidden_tag() }}
+    {{ render_field(form.name) }}
+    {{ render_field(form.email) }}
+    {{ render_field(form.password) }}
+    {{ render_field(form.confirm) }}
+  </dl>
+  <input type=submit name="Create"/>
+</form>
+{% endblock %}
