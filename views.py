@@ -73,12 +73,12 @@ def forgot_password():
             msg.body = render_template("password_reset.txt", user=form._user, reset=reset)
             mail.send(msg)
 
-        return redirect(url_for('reset_password'))
+        return redirect(url_for('reset_password', email=form.email.data))
     return render_template("forgot_password.html", form=form)
 
 class ResetPasswordForm(Form):
     email = TextField('Email', [Email(), Required()])
-    token = TextField('Token', [])
+    token = TextField('Token', [Required()])
     password = PasswordField('New password', [Required(), EqualTo('confirm', message='Passwords do not match')])
     confirm = PasswordField('Confirm password', [Required()])
 
@@ -94,7 +94,7 @@ class ResetPasswordForm(Form):
 @app.route("/reset-password", methods=['GET', 'POST'])
 def reset_password():
     form = ResetPasswordForm(request.form, email=request.args.get('email'), token=request.args.get('token'))
-    if request.method == 'POST' and form.validate() and form.token.data:
+    if request.method == 'POST' and form.validate():
         user = User.query.filter_by(email=form.email.data).first()
         db.session.delete(form._reset)
         user.set_password(form.password.data)
