@@ -1,5 +1,6 @@
 from flask import Flask
 from flaskext.login import LoginManager
+from flaskext.mail import Mail
 from flask.ext.sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -9,6 +10,8 @@ login_manager = LoginManager()
 login_manager.setup_app(app)
 
 db = SQLAlchemy(app)
+
+mail = Mail(app)
 
 import gocardless
 
