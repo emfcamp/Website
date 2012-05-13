@@ -159,3 +159,7 @@ def gocardless_cancel():
 @app.route("/pay/transfer-start")
 def transfer_start():
     return render_template('transfer-start.html')
+
+@app.route("/pay/terms")
+def ticket_terms():
+    return render_template('terms.html')
