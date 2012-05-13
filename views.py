@@ -1,11 +1,19 @@
 from main import app, db, gocardless, mail
 from models.user import User, PasswordReset
 from models.payment import Payment
-from flask import render_template, redirect, request, flash, url_for
+from flask import render_template, redirect, request, flash, url_for, abort
 from flaskext.login import login_user, login_required, logout_user
 from flaskext.mail import Message
 from flaskext.wtf import Form, TextField, PasswordField, Required, Email, EqualTo, ValidationError
 from sqlalchemy.exc import IntegrityError
+from decorator import decorator
+
+def feature_flag(flag):
+    def call(f, *args, **kw):
+        if app.config.get(flag, False) == True:
+            return f(*args, **kw)
+        return abort(404)
+    return decorator(call)
 
 @app.route("/")
 def main():
@@ -16,6 +24,7 @@ class LoginForm(Form):
     password = PasswordField('Password', [Required()])
 
 @app.route("/login", methods=['GET', 'POST'])
+@feature_flag('PAYMENTS')
 def login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -34,6 +43,7 @@ class SignupForm(Form):
     confirm = PasswordField('Confirm password', [Required()])
 
 @app.route("/signup", methods=['GET', 'POST'])
+@feature_flag('PAYMENTS')
 def signup():
     form = SignupForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -59,6 +69,7 @@ class ForgotPasswordForm(Form):
         form._user = user
 
 @app.route("/forgot-password", methods=['GET', 'POST'])
+@feature_flag('PAYMENTS')
 def forgot_password():
     form = ForgotPasswordForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -91,6 +102,7 @@ class ResetPasswordForm(Form):
         form._reset = reset
 
 @app.route("/reset-password", methods=['GET', 'POST'])
+@feature_flag('PAYMENTS')
 def reset_password():
     form = ResetPasswordForm(request.form, email=request.args.get('email'), token=request.args.get('token'))
     if request.method == 'POST' and form.validate():
@@ -123,11 +135,13 @@ def company():
     return render_template('company.html')
 
 @app.route("/pay/gocardless-start")
+@feature_flag('PAYMENTS')
 def gocardless_start():
     bill_url = gocardless.client.new_bill_url(40.00, name="Electromagnetic Field Ticket Deposit")
     return render_template('gocardless-start.html', bill_url=bill_url)
 
 @app.route("/pay/gocardless-complete")
+@feature_flag('PAYMENTS')
 def gocardless_complete():
     try:
         gocardless.client.confirm_resource(request.args)
@@ -138,6 +152,7 @@ def gocardless_complete():
     return render_template('gocardless-complete.html')
 
 @app.route("/pay/gocardless-cancel")
+@feature_flag('PAYMENTS')
 def gocardless_cancel():
     return render_template('gocardless-cancel.html')
 
