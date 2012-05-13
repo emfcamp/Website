@@ -83,13 +83,12 @@ class ResetPasswordForm(Form):
     confirm = PasswordField('Confirm password', [Required()])
 
     def validate_token(form, field):
-        if field.data:
-            reset = PasswordReset.query.filter_by(email=form.email.data, token=field.data).first()
-            if not reset:
-                raise ValidationError('Token not found')
-            if reset.expired():
-                raise ValidationError('Token has expired')
-            form._reset = reset
+        reset = PasswordReset.query.filter_by(email=form.email.data, token=field.data).first()
+        if not reset:
+            raise ValidationError('Token not found')
+        if reset.expired():
+            raise ValidationError('Token has expired')
+        form._reset = reset
 
 @app.route("/reset-password", methods=['GET', 'POST'])
 def reset_password():
