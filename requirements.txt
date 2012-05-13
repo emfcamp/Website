@@ -8,3 +8,4 @@ py-bcrypt==0.2
 gocardless==0.1.1
 Flask-Mail==0.6.1
 decorator==3.3.3
+Flask-Assets==0.7

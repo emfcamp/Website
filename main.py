@@ -2,6 +2,7 @@ from flask import Flask
 from flaskext.login import LoginManager
 from flaskext.mail import Mail
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.assets import Environment, Bundle
 
 app = Flask(__name__)
 app.config.from_envvar('SETTINGS_FILE')
@@ -12,6 +13,10 @@ login_manager.setup_app(app)
 db = SQLAlchemy(app)
 
 mail = Mail(app)
+
+assets = Environment(app)
+css = Bundle('css/main.css', output='gen/packed.css')
+assets.register('css_all', css)
 
 import gocardless
 

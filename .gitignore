@@ -7,3 +7,5 @@
 
 env
 var/*.db
+static/.webassets-cache/
+static/gen

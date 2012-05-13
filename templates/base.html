@@ -4,7 +4,9 @@
         <meta charset="UTF-8">
         <title>Electromagnetic Field</title>
         <link rel="stylesheet" href="http://yui.yahooapis.com/2.8.0r4/build/reset-fonts-grids/reset-fonts-grids.css" type="text/css">
-        <link rel="stylesheet" href="{{url_for('static', filename='css/main.css')}}">
+        {% assets "css_all" %}
+        <link rel="stylesheet" href="{{ ASSET_URL }}">
+        {% endassets %}
     </head>
 <body class="yui-skin-sam">
 <div id="doc" class="yui-t7">
