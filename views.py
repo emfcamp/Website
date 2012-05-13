@@ -70,11 +70,11 @@ def forgot_password():
             msg = Message("EMF Camp password reset",
                 sender=("EMF Camp 2012", "contact@emfcamp.org.uk"),
                 recipients=[form.email.data])
-            msg.body = render_template("password_reset.txt", user=form._user, reset=reset)
+            msg.body = render_template("reset-password-email.txt", user=form._user, reset=reset)
             mail.send(msg)
 
         return redirect(url_for('reset_password', email=form.email.data))
-    return render_template("forgot_password.html", form=form)
+    return render_template("forgot-password.html", form=form)
 
 class ResetPasswordForm(Form):
     email = TextField('Email', [Email(), Required()])
@@ -100,7 +100,7 @@ def reset_password():
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('pay'))
-    return render_template("reset_password.html", form=form)
+    return render_template("reset-password.html", form=form)
 
 @app.route("/logout")
 @login_required
