@@ -12,13 +12,16 @@
     </ul>
 
 <p>Taking credit card payments for a small event like us is really expensive, so the only
-payment methods we accept are by bank transfer. If this is really a problem for you, please
+payment methods we accept are bank-to-bank. If this is really a problem for you, please
 <a href="mailto:tickets@emfcamp.org">let us know</a>.
 </p>
 <h2>Paying in Pounds</h2>
 <p>
 
-<a href="url_for('gocardless')">Pay by GoCardless</a>.
+<ul>
+    <li><a href="{{ url_for('gocardless_start') }}">Pay by GoCardless (direct debit)</a></li>
+    <li><a href="{{ url_for('transfer_start') }}">Pay by bank transfer</a></li>
+</ul>
 
 <h2>Paying in Euros</h2>
 <p>If you want to pay in Euros, we're working on it. Email tickets@emfcamp.org and we'll let
