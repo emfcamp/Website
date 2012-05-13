@@ -25,7 +25,11 @@ h2 {
     margin-bottom:5px;
 }
 
-p, ul {padding-bottom: 5px;}
+p, ul {padding-bottom: 10px;}
+
+p.summary {
+    font-size: 130%
+}
 
 #google-form { margin-top:5px; margin-bottom: 5px; position:relative; left: 237px; border: 1px solid #aaa; padding:5px;}
 
