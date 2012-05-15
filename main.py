@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.config.from_envvar('SETTINGS_FILE')
 
 login_manager = LoginManager()
-login_manager.setup_app(app)
+login_manager.setup_app(app, add_context_processor=True)
 
 db = SQLAlchemy(app)
 

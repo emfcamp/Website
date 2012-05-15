@@ -51,3 +51,6 @@ ol li {
     list-style: decimal outside;
 }
 
+#ft .logout {
+    float: right;
+}

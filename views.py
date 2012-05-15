@@ -33,7 +33,7 @@ def login():
             flash("Invalid login details!")
             return redirect(url_for('login'))
         login_user(user)
-        return redirect('/')
+        return redirect(url_for('pay'))
     return render_template("login.html", form=form)
 
 class SignupForm(Form):
