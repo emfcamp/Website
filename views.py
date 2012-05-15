@@ -157,6 +157,7 @@ def gocardless_cancel():
     return render_template('gocardless-cancel.html')
 
 @app.route("/pay/transfer-start")
+@feature_flag('PAYMENTS')
 def transfer_start():
     return render_template('transfer-start.html')
 
