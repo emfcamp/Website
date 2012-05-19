@@ -1,0 +1,8 @@
+
+import default ticket_type data if it dosn't exist
+a page template to list the tickets generated from the ticket types
+
+
+migrations?
+
+http://docs.sqlalchemy.org/en/rel_0_7/core/schema.html#altering-schemas-through-migrations
