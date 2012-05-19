@@ -7,7 +7,7 @@ class TicketType(db.Model):
     capacity = db.Column(db.Integer, nullable=False)
     cost = db.Column(db.Numeric, nullable=False)
 
-    def __init__(name, capacity, cost):
+    def __init__(self, name, capacity, cost):
         self.name = name
         self.capacity = capacity
         self.cost = cost
