@@ -54,3 +54,21 @@ ol li {
 #ft .logout {
     float: right;
 }
+
+table.buyform {
+	padding: 2px 2px 2px 2px;
+}
+
+table.buyform td,th {
+	padding: 5px 5px 5px 5px;
+}
+
+tr.buyformtdeven {
+	background-color: #ddd;
+	padding: 2px 2px 2px 2px;
+}
+
+tr.buyformtdodd {
+	background-color: #eee;
+	padding: 2px 2px 2px 2px;
+}

@@ -1,6 +1,11 @@
 
 insert default ticket_type data if it dosn't exist [done]
-a page template to list the tickets generated from the ticket types
+a page template to list the tickets generated from the ticket types [done]
+validate the form data
+
+wishlist:
+
+flaskext.wtf.html5.DecimalField ?
 
 migrations?
 

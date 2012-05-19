@@ -30,7 +30,6 @@ from views import *
 from models import *
 db.create_all()
 
-print "TicketType"
 if TicketType.query.count() == 0:
     # no ticket types setup, so set some up
     # the - 20 here is from the budget

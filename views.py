@@ -1,12 +1,16 @@
 from main import app, db, gocardless, mail
 from models.user import User, PasswordReset
 from models.payment import Payment
+from models.ticket import TicketType, Ticket
 from flask import render_template, redirect, request, flash, url_for, abort
 from flaskext.login import login_user, login_required, logout_user
 from flaskext.mail import Message
-from flaskext.wtf import Form, TextField, PasswordField, Required, Email, EqualTo, ValidationError
+from flaskext.wtf import Form, TextField, PasswordField, IntegerField, Required, Email, EqualTo, ValidationError
 from sqlalchemy.exc import IntegrityError
 from decorator import decorator
+from wtforms.fields.core import UnboundField
+
+import code
 
 def feature_flag(flag):
     def call(f, *args, **kw):
@@ -164,3 +168,50 @@ def transfer_start():
 @app.route("/pay/terms")
 def ticket_terms():
     return render_template('terms.html')
+
+class BuyTicketForm(Form):
+    def __init__(self, *args, **kwargs):
+        # clear the form out and recreate it if already created.
+        if len(self._unbound_fields) > 1:
+            tmp = self._unbound_fields[0]
+            self._unbound_fields = [tmp,]
+
+        #
+        # doing this everytime is probably bad for performance?
+        # is there an sql query caching layer?            
+        ticket_types = TicketType.query.all()
+        for i, tt in enumerate(ticket_types):
+            # why can't simple things be simple?
+            #
+            # cant work out how to pass in cost as well so shove it in description.
+            #
+            self._unbound_fields.append(('tt_%s' % tt.id, UnboundField(IntegerField, default = 0, label = tt.name, description = "%2.02f" % (tt.cost)) ))
+
+        super(BuyTicketForm, self).__init__(*args, **kwargs)
+
+@app.route("/buy/tickets", methods=['GET', 'POST'])
+@feature_flag('PAYMENTS')
+@login_required
+def buy_tickets():
+    form = BuyTicketForm(request.form)
+    if request.method == 'POST' and form.validate():
+        """do the form"""
+        total_cost = 0
+        
+        id2tt = {}
+        tts = TicketType.query.all()
+        for t in tts:
+            id2tt[t.id] = t
+
+        for i in form:
+            if i.id.startswith("tt_") and i.data > 0:
+                id = int(i.id[3:])
+                tt = id2tt[id]
+                print tt.name, tt.cost, i.data
+                total_cost += tt.cost * i.data
+                
+#        code.interact(local=locals())
+        print "total cost: %.02f" % (total_cost)
+
+    return render_template("buy-tickets.html", form=form)
+
