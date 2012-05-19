@@ -11,6 +11,9 @@ class TicketType(db.Model):
         self.name = name
         self.capacity = capacity
         self.cost = cost
+        
+    def __repr__(self):
+        return "<TicketType: %s>" % (self.name)
 
 class Ticket(db.Model):
     __tablename__ = 'ticket'

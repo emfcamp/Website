@@ -30,6 +30,20 @@ from views import *
 from models import *
 db.create_all()
 
+print "TicketType"
+if TicketType.query.count() == 0:
+    # no ticket types setup, so set some up
+    # the - 20 here is from the budget
+    camp = TicketType("Camp Ticket", 499 - 20, 99.42)
+    # onsite parking i guess?
+    parking = TicketType("Car Parking", 25, 25.00)
+    # onsite i guess?
+    camper = TicketType("Caravan/Campervan", 25, 25.00)
+    db.session.add(camp)
+    db.session.add(parking)
+    db.session.add(camper)
+    db.session.commit()
+
 @login_manager.user_loader
 def load_user(userid):
     return User.query.filter_by(id=userid).first()
