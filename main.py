@@ -2,6 +2,7 @@ from flask import Flask
 from flaskext.login import LoginManager
 from flaskext.mail import Mail
 from flask.ext.sqlalchemy import SQLAlchemy
+from sqlalchemy.orm.exc import NoResultFound
 from flask.ext.assets import Environment, Bundle
 
 app = Flask(__name__)
@@ -29,6 +30,13 @@ gocardless.set_details(app_id=app.config['GOCARDLESS_APP_ID'],
 from views import *
 from models import *
 db.create_all()
+
+try:
+    Prepay = TicketType.query.filter_by(name='Prepay Camp Ticket').one()
+except NoResultFound, e:
+    Prepay = TicketType('Prepay Camp Ticket', 250, 4, 30.00)
+    db.session.add(Prepay)
+    db.session.commit()
 
 @login_manager.user_loader
 def load_user(userid):

@@ -1,27 +1,36 @@
 from main import db
+from decimal import Decimal
 
 class TicketType(db.Model):
     __tablename__ = 'ticket_type'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     capacity = db.Column(db.Integer, nullable=False)
-    cost = db.Column(db.Numeric, nullable=False)
+    limit = db.Column(db.Integer, nullable=False)
+    cost_pence = db.Column(db.Integer, nullable=False)
+    tickets = db.relationship("Ticket", backref="type")
 
-    def __init__(name, capacity, cost):
+    def __init__(self, name, capacity, limit, cost):
         self.name = name
         self.capacity = capacity
+        self.limit = limit
         self.cost = cost
+
+    @property
+    def cost(self):
+        return Decimal(self.cost / 100)
+
+    @cost.setter
+    def cost(self, val):
+        self.cost_pence = int(val * 100)
 
 class Ticket(db.Model):
     __tablename__ = 'ticket'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    user = db.relationship("User", backref="tickets")
     type_id = db.Column(db.Integer, db.ForeignKey('ticket_type.id'), nullable=False)
-    type = db.relationship("TicketType")
     paid = db.Column(db.Boolean, default=False, nullable=False)
 
-    def __init__(self, user, type, paid=False):
-        self.user = user
+    def __init__(self, type, paid=False):
         self.type = type
         self.paid = paid
