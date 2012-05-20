@@ -18,7 +18,7 @@ class TicketType(db.Model):
 
     @property
     def cost(self):
-        return Decimal(self.cost_pence / 100)
+        return Decimal(self.cost_pence) / 100
 
     @cost.setter
     def cost(self, val):
