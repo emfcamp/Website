@@ -2,7 +2,7 @@ from main import app, db, gocardless, mail
 from models.user import User, PasswordReset
 from models.payment import Payment
 from models.ticket import TicketType, Ticket
-from flask import render_template, redirect, request, flash, url_for, abort
+from flask import render_template, redirect, request, flash, url_for, abort, session
 from flaskext.login import login_user, login_required, logout_user
 from flaskext.mail import Message
 from flaskext.wtf import Form, TextField, PasswordField, IntegerField, Required, Email, EqualTo, ValidationError
@@ -37,7 +37,7 @@ def login():
             flash("Invalid login details!")
             return redirect(url_for('login'))
         login_user(user)
-        return redirect(url_for('pay'))
+        return redirect(url_for('buy_tickets'))
     return render_template("login.html", form=form)
 
 class SignupForm(Form):
@@ -59,7 +59,7 @@ def signup():
         except IntegrityError, e:
             raise
         login_user(user)
-        return redirect(url_for('pay'))
+        return redirect(url_for('buy_tickets'))
 
     return render_template("signup.html", form=form)
 
@@ -115,13 +115,14 @@ def reset_password():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        return redirect(url_for('pay'))
+        return redirect(url_for('buy_tickets'))
     return render_template("reset-password.html", form=form)
 
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
+    flash("goodbye!")
     return redirect('/')
 
 @app.route("/pay")
@@ -203,15 +204,21 @@ def buy_tickets():
         for t in tts:
             id2tt[t.id] = t
 
+        # ticket type: quantity
+        basket = {}
+
         for i in form:
             if i.id.startswith("tt_") and i.data > 0:
                 id = int(i.id[3:])
                 tt = id2tt[id]
                 print tt.name, tt.cost, i.data
                 total_cost += tt.cost * i.data
-                
-#        code.interact(local=locals())
-        print "total cost: %.02f" % (total_cost)
+                basket[id] = i.data
+        
+        if len(basket) > 0:
+            session["basket"] = basket
+            flash("tickets added to basket, total cost: %.02f" % (total_cost))
+            return redirect(url_for('pay'))
 
     return render_template("buy-tickets.html", form=form)
 
