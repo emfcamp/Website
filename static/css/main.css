@@ -25,6 +25,13 @@ h2 {
     margin-bottom:5px;
 }
 
+h3 {
+    font-weight: bold;
+    font-size: 1.4em;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
 p, ul, ol {padding-bottom: 10px;}
 
 p.summary {
@@ -53,4 +60,10 @@ ol li {
 
 #ft .logout {
     float: right;
+}
+
+.choose-prepay-tickets dl,
+.choose-prepay-tickets dt,
+.choose-prepay-tickets dd {
+    display: inline;
 }

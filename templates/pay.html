@@ -12,21 +12,21 @@
         administration fee if you want a refund of your deposit.</li>
 </ul>
 
-<form method=post>
+<form method=post class="choose-prepay-tickets">
     {{form.hidden_tag()}}
-    <p>I'd like to put down the deposit on the following tickets for a total of £{{ total }}.
-    I understand that if the event is cancelled I might not receive a full refund.</p>
+    <h2>Tickets</h2>
 <dl>
     {{ render_field(form.count) }}
 </dl>
-    <input type=submit name="Update"/>
+    <input type=submit value="Update"/>
+    <p>Total amount for deposit: £{{ total }}.</p>
 </form>
 
 <p>Taking credit card payments for a small event like us is really expensive, so the only
 payment methods we accept are bank-to-bank. If this is really a problem for you, please
 <a href="mailto:tickets@emfcamp.org">let us know</a>.
 </p>
-<h2>Paying in Pounds</h2>
+<h3>Paying in Pounds</h3>
 <p>
 
 <ul>
@@ -34,7 +34,7 @@ payment methods we accept are bank-to-bank. If this is really a problem for you,
     <li><a href="{{ url_for('transfer_start') }}">Pay by bank transfer</a></li>
 </ul>
 
-<h2>Paying in Euros</h2>
+<h3>Paying in Euros</h3>
 <p>If you want to pay in Euros, we're working on it. Email tickets@emfcamp.org and we'll let
 you know when our Euro bank account is ready.</p>
 {% endblock %}
