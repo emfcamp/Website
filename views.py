@@ -127,7 +127,7 @@ def logout():
     return redirect('/')
 
 class ChoosePrepayTicketsForm(Form):
-    count = SelectField('Count', [Required()], choices = choice_range(1, Prepay.limit + 1))
+    count = SelectField('Number of tickets', [Required()], choices = choice_range(1, Prepay.limit + 1))
 
 @app.route("/pay", methods=['GET', 'POST'])
 @login_required
@@ -163,6 +163,7 @@ def pay():
 
         db.session.add(current_user)
         db.session.commit()
+        return redirect(url_for('pay'))
 
     return render_template("pay.html", form=form, count=count, total=count * Prepay.cost)
 
