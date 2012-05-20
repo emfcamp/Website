@@ -1,0 +1,16 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block body %}
+
+<h2></h2>
+<p>We will use the reference to identify the payment as yours, so please ensure it's included in full.</p>
+
+<dl>
+<dt>Bank</dt><dd>Barclays</dd>
+<dt>Payee</dt><dd>Electromagnetic Field Ltd</dd>
+<dt>Sort code</dt><dd></dd>
+<dt>Account number</dt><dd></dd>
+<dt>Reference</dt><dd>{{ current_user.bankref }}</dd>
+</dl>
+
+{% endblock %}
