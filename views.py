@@ -133,12 +133,15 @@ class ChoosePrepayTicketsForm(Form):
 @login_required
 def pay():
     prepays = current_user.tickets.filter_by(type=Prepay)
-    if not prepays.count():
-        current_user.tickets.append(Ticket(type=Prepay))
+
+    count = prepays.count()
+    if not count:
+        current_user.tickets.append(Ticket(type_id=Prepay.id))
         db.session.add(current_user)
         db.session.commit()
+        count = 1
 
-    form = ChoosePrepayTicketsForm(request.form)
+    form = ChoosePrepayTicketsForm(request.form, count=count)
 
     if request.method == 'POST' and form.validate():
 
@@ -153,17 +156,15 @@ def pay():
 
         if count > prepays.count():
             for i in range(prepays.count(), count):
-                print 'Added'
                 current_user.tickets.append(Ticket(type_id=Prepay.id))
         elif count < prepays.count():
             for i in range(prepays.count(), count):
-                print 'Deleted'
                 db.session.delete(current_user.tickets[i])
 
         db.session.add(current_user)
         db.session.commit()
 
-    return render_template("pay.html", form=form, total=count * Prepay.cost)
+    return render_template("pay.html", form=form, count=count, total=count * Prepay.cost)
 
 
 @app.route("/sponsors")
