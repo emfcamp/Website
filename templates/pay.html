@@ -14,7 +14,7 @@
 
 <form method=post>
     {{form.hidden_tag()}}
-    <p>I'd like to pre-pay for {{ form.count }} tickets at £30 each.
+    <p>I'd like to pre-pay for {{ form.count.data }} tickets for a total of £{{ total }}.
     I understand that if the event is cancelled I might not receive a full refund.</p>
 <dl>
     {{ render_field(form.count) }}

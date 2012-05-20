@@ -1,4 +1,4 @@
-from main import app, db, gocardless, mail
+from main import app, db, gocardless, mail, Prepay
 from models.user import User, PasswordReset
 from models.payment import Payment
 from models.ticket import TicketType, Ticket
@@ -17,6 +17,9 @@ def feature_flag(flag):
             return f(*args, **kw)
         return abort(404)
     return decorator(call)
+
+def choice_range(min, max):
+  return [(str(i), str(i)) for i in range(min, max)]
 
 @app.route("/")
 def main():
@@ -124,13 +127,11 @@ def logout():
     return redirect('/')
 
 class ChoosePrepayTicketsForm(Form):
-    count = SelectField('Count', [Required()], choices=zip(range(4), range(4)))
+    count = SelectField('Count', [Required()], choices = choice_range(1, Prepay.limit + 1))
 
 @app.route("/pay", methods=['GET', 'POST'])
 @login_required
 def pay():
-    Prepay = TicketType.query.filter_by(name='Prepay Camp Ticket').one()
-
     prepays = current_user.tickets.filter_by(type=Prepay)
     if not prepays.count():
         current_user.tickets.append(Ticket(type=Prepay))
@@ -142,20 +143,27 @@ def pay():
     if request.method == 'POST' and form.validate():
 
         paid = prepays.filter_by(paid=True).count()
-        if form.count < paid:
+        count = int(form.count.data)
+        if count < paid:
             raise ValidationError('You already have paid for %d tickets' % paid)
-        elif form.count > prepay.limit:
-            raise ValidationError('You cannot order more than %s tickets' % prepay.limit)
+        elif count > Prepay.limit:
+            raise ValidationError('You cannot order more than %s tickets' % Prepay.limit)
 
-        if form.count > prepays.count:
-            current_user.tickets += [Ticket(type=Prepay) for i in range(prepays.count(), form.count)]
-        else:
-            current_user.tickets = current_user.tickets[:form.count]
+        print 'From: %s To: %s' % (prepays.count(), count)
+
+        if count > prepays.count():
+            for i in range(prepays.count(), count):
+                print 'Added'
+                current_user.tickets.append(Ticket(type_id=Prepay.id))
+        elif count < prepays.count():
+            for i in range(prepays.count(), count):
+                print 'Deleted'
+                db.session.delete(current_user.tickets[i])
 
         db.session.add(current_user)
         db.session.commit()
 
-    return render_template("pay.html", form=form)
+    return render_template("pay.html", form=form, total=count * Prepay.cost)
 
 
 @app.route("/sponsors")

@@ -18,7 +18,7 @@ class TicketType(db.Model):
 
     @property
     def cost(self):
-        return Decimal(self.cost / 100)
+        return Decimal(self.cost_pence / 100)
 
     @cost.setter
     def cost(self, val):
@@ -31,6 +31,12 @@ class Ticket(db.Model):
     type_id = db.Column(db.Integer, db.ForeignKey('ticket_type.id'), nullable=False)
     paid = db.Column(db.Boolean, default=False, nullable=False)
 
-    def __init__(self, type, paid=False):
-        self.type = type
+    def __init__(self, type=None, type_id=None, paid=False):
+        if type:
+            self.type = type
+        elif type_id is not None:
+            self.type_id = type_id
+        else:
+            raise ValueError('Type must be specified')
+
         self.paid = paid
