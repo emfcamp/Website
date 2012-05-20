@@ -1,9 +1,14 @@
 Hi, {{ user.name }},
 
-This is to confirm thats you've bought {{ basket.count }} prepay tickets
+{% if basket.count == 1 -%}
+This is to confirm that you've bought a prepay ticket
 for £ {{ basket.cost }} for EMFCamp 2012!
+{%- else -%}
+This is to confirm that you've bought {{ basket.count }} prepay tickets
+for £ {{ basket.cost }} for EMFCamp 2012!
+{%- endif %}
 
-Your transaction reference is {{ basket.reference }}, please keep a note of
+Your transaction id is {{ basket.reference }}, please keep a note of
 it in case there are any problems with payment.
 
 Your tickets will be held in your name for 10 days, so please remember to

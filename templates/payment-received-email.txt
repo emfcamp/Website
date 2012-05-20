@@ -1,7 +1,6 @@
 Hi, {{ user.name }},
 
-This is confirm that we've received £ {{ basket.cost }} for reference
-{{ basket.reference }} from you as payment for {{ basket.count }}
-prepay tickets for EMFCamp 2012.
+This is confirm that we've received £ {{ basket.cost }} for transaction
+{{ basket.reference }} from you as payment for {% if basket.count > 1 %}{{ basket.count }} prepay tickets{% else %}a prepay ticket{% endif %} for EMFCamp 2012.
 
 Thank you for helping us get the camp running by buying a prepay ticket!
