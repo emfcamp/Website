@@ -11,6 +11,16 @@ app.config.from_envvar('SETTINGS_FILE')
 login_manager = LoginManager()
 login_manager.setup_app(app, add_context_processor=True)
 
+@app.context_processor
+def utility_processor():
+    def format_price(amount, currency=u'\xa3', after=False):
+        amount = u'{0:.2f}'.format(amount)
+        if after:
+            return amount + currency
+        return currency + amount
+    return dict(format_price=format_price)
+
+
 db = SQLAlchemy(app)
 
 mail = Mail(app)

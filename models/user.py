@@ -15,7 +15,7 @@ class User(db.Model, flaskext.login.UserMixin):
     name = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
     bankref = db.Column(db.String, nullable=False, unique=True)
-    tickets = db.relationship('Ticket', lazy='dynamic', backref='user')
+    tickets = db.relationship('Ticket', lazy='dynamic', backref='user', cascade='all, delete, delete-orphan')
 
     def __init__(self, email, name):
         self.email = email

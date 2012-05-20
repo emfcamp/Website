@@ -67,3 +67,20 @@ ol li {
 .choose-prepay-tickets dd {
     display: inline;
 }
+
+dl.bank-details {
+  float: left;
+  width: 100%;
+  margin-bottom: 2ex;
+}
+.bank-details dt,
+.bank-details dd {
+  float: left;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  min-width: 10em;
+}
+.bank-details dt {
+  clear: left;
+  font-weight: bold;
+}

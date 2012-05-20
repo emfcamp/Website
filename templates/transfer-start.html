@@ -2,15 +2,23 @@
 {% extends "base.html" %}
 {% block body %}
 
-<h2></h2>
+<h2>Pay by bank transfer</h2>
 <p>We will use the reference to identify the payment as yours, so please ensure it's included in full.</p>
 
-<dl>
+<dl class="bank-details">
 <dt>Bank</dt><dd>Barclays</dd>
 <dt>Payee</dt><dd>Electromagnetic Field Ltd</dd>
-<dt>Sort code</dt><dd></dd>
-<dt>Account number</dt><dd></dd>
+<dt>Sort code</dt><dd>20-71-64</dd>
+<dt>Account number</dt><dd>73590526</dd>
+<dt>Amount</dt><dd>{{ format_price(amount) }}</dd>
 <dt>Reference</dt><dd>{{ current_user.bankref }}</dd>
 </dl>
+
+<h3>International transfers</h3>
+<p>You can pay directly into our GBP bank account</p>
+<ul>
+<li><b>SWIFT BARCGB22</b></li>
+<li><b>IBAN GB39 BARC 2071 6473 5905 26</b></li>
+</ul>
 
 {% endblock %}

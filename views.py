@@ -158,14 +158,14 @@ def pay():
             for i in range(prepays.count(), count):
                 current_user.tickets.append(Ticket(type_id=Prepay.id))
         elif count < prepays.count():
-            for i in range(prepays.count(), count):
+            for i in range(count, prepays.count()):
                 db.session.delete(current_user.tickets[i])
 
         db.session.add(current_user)
         db.session.commit()
         return redirect(url_for('pay'))
 
-    return render_template("pay.html", form=form, count=count, total=count * Prepay.cost)
+    return render_template("pay.html", form=form, total=count * Prepay.cost)
 
 
 @app.route("/sponsors")
@@ -179,7 +179,9 @@ def company():
 @app.route("/pay/gocardless-start")
 @feature_flag('PAYMENTS')
 def gocardless_start():
-    bill_url = gocardless.client.new_bill_url(40.00, name="Electromagnetic Field Ticket Deposit")
+    unpaid = current_user.tickets.filter_by(paid=False)
+    amount = sum(t.type.cost for t in unpaid.all())
+    bill_url = gocardless.client.new_bill_url(amount, name="Electromagnetic Field Ticket Deposit")
     return render_template('gocardless-start.html', bill_url=bill_url)
 
 @app.route("/pay/gocardless-complete")
@@ -201,7 +203,9 @@ def gocardless_cancel():
 @app.route("/pay/transfer-start")
 @feature_flag('PAYMENTS')
 def transfer_start():
-    return render_template('transfer-start.html')
+    unpaid = current_user.tickets.filter_by(paid=False)
+    amount = sum(t.type.cost for t in unpaid.all())
+    return render_template('transfer-start.html', amount=amount)
 
 @app.route("/pay/terms")
 def ticket_terms():
