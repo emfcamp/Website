@@ -1,10 +1,13 @@
 from main import app, db, gocardless, mail
 from models.user import User, PasswordReset
 from models.payment import Payment
+from models.ticket import TicketType, Ticket
 from flask import render_template, redirect, request, flash, url_for, abort
-from flaskext.login import login_user, login_required, logout_user
+from flaskext.login import login_user, login_required, logout_user, current_user
 from flaskext.mail import Message
-from flaskext.wtf import Form, TextField, PasswordField, Required, Email, EqualTo, ValidationError
+from flaskext.wtf import \
+    Form, Required, Email, EqualTo, ValidationError, \
+    TextField, PasswordField, SelectField
 from sqlalchemy.exc import IntegrityError
 from decorator import decorator
 
@@ -120,10 +123,39 @@ def logout():
     logout_user()
     return redirect('/')
 
-@app.route("/pay")
+class ChoosePrepayTicketsForm(Form):
+    count = SelectField('Count', [Required()], choices=zip(range(4), range(4)))
+
+@app.route("/pay", methods=['GET', 'POST'])
 @login_required
 def pay():
-    return render_template("pay.html")
+    Prepay = TicketType.query.filter_by(name='Prepay Camp Ticket').one()
+
+    prepays = current_user.tickets.filter_by(type=Prepay)
+    if not prepays.count():
+        current_user.tickets.append(Ticket(type=Prepay))
+        db.session.add(current_user)
+        db.session.commit()
+
+    form = ChoosePrepayTicketsForm(request.form)
+
+    if request.method == 'POST' and form.validate():
+
+        paid = prepays.filter_by(paid=True).count()
+        if form.count < paid:
+            raise ValidationError('You already have paid for %d tickets' % paid)
+        elif form.count > prepay.limit:
+            raise ValidationError('You cannot order more than %s tickets' % prepay.limit)
+
+        if form.count > prepays.count:
+            current_user.tickets += [Ticket(type=Prepay) for i in range(prepays.count(), form.count)]
+        else:
+            current_user.tickets = current_user.tickets[:form.count]
+
+        db.session.add(current_user)
+        db.session.commit()
+
+    return render_template("pay.html", form=form)
 
 
 @app.route("/sponsors")

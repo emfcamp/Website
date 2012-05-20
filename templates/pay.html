@@ -1,7 +1,8 @@
+{% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block body %}
 <p>We don't have a final budget yet, so we're currently only letting people
-    put a deposit down for their ticket.</p>
+   put a deposit down for their tickets.</p>
 
 <ul>
     <li>Deposit pre-sales cost <strong>£30</strong> per ticket.</li>
@@ -9,7 +10,17 @@
     <li>We anticipate the full ticket price to be between £75 to £95.
         If the final ticket price is within this range, you'll have to pay a £10
         administration fee if you want a refund of your deposit.</li>
-    </ul>
+</ul>
+
+<form method=post>
+    {{form.hidden_tag()}}
+    <p>I'd like to pre-pay for {{ form.count }} tickets at £30 each.
+    I understand that if the event is cancelled I might not receive a full refund.</p>
+<dl>
+    {{ render_field(form.count) }}
+</dl>
+    <input type=submit name="Update"/>
+</form>
 
 <p>Taking credit card payments for a small event like us is really expensive, so the only
 payment methods we accept are bank-to-bank. If this is really a problem for you, please
