@@ -1,0 +1,18 @@
+Hi, {{ user.name }},
+
+This is to confirm thats you've bought {{ basket.count }} prepay tickets
+for £ {{ basket.cost }} for EMFCamp 2012!
+
+Your transaction reference is {{ basket.reference }}, please keep a note of
+it in case there are any problems with payment.
+
+Your tickets will be held in your name for 10 days, so please remember to
+pay promptly.
+
+We will send another email when we've received your payment.
+
+See you soon,
+
+Love,
+
+all at the EMFCamp Team.
