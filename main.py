@@ -10,6 +10,7 @@ app.config.from_envvar('SETTINGS_FILE')
 
 login_manager = LoginManager()
 login_manager.setup_app(app, add_context_processor=True)
+app.login_manager.login_view = 'login'
 
 @app.context_processor
 def utility_processor():

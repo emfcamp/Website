@@ -178,6 +178,7 @@ def company():
 
 @app.route("/pay/gocardless-start")
 @feature_flag('PAYMENTS')
+@login_required
 def gocardless_start():
     unpaid = current_user.tickets.filter_by(paid=False)
     amount = sum(t.type.cost for t in unpaid.all())
@@ -186,6 +187,7 @@ def gocardless_start():
 
 @app.route("/pay/gocardless-complete")
 @feature_flag('PAYMENTS')
+@login_required
 def gocardless_complete():
     try:
         gocardless.client.confirm_resource(request.args)
@@ -197,11 +199,13 @@ def gocardless_complete():
 
 @app.route("/pay/gocardless-cancel")
 @feature_flag('PAYMENTS')
+@login_required
 def gocardless_cancel():
     return render_template('gocardless-cancel.html')
 
 @app.route("/pay/transfer-start")
 @feature_flag('PAYMENTS')
+@login_required
 def transfer_start():
     unpaid = current_user.tickets.filter_by(paid=False)
     amount = sum(t.type.cost for t in unpaid.all())
