@@ -18,8 +18,15 @@ def feature_flag(flag):
         return abort(404)
     return decorator(call)
 
-def choice_range(min, max):
-  return [(str(i), str(i)) for i in range(min, max)]
+class IntegerSelectField(SelectField):
+    def __init__(self, *args, **kwargs):
+        kwargs['coerce'] = int
+        fmt = kwargs.pop('fmt', str)
+        min = kwargs.pop('min', 1)
+        max = kwargs.pop('max')
+        kwargs['choices'] = [(i, fmt(i)) for i in range(min, max + 1)]
+        SelectField.__init__(self, *args, **kwargs)
+
 
 @app.route("/")
 def main():
@@ -35,11 +42,11 @@ def login():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
         user = User.query.filter_by(email=form.email.data).first()
-        if user is None or not user.check_password(form.password.data):
+        if user and user.check_password(form.password.data):
+            login_user(user)
+            return redirect(request.args.get('next') or url_for('pay'))
+        else:
             flash("Invalid login details!")
-            return redirect(url_for('login'))
-        login_user(user)
-        return redirect(url_for('pay'))
     return render_template("login.html", form=form)
 
 class SignupForm(Form):
@@ -127,7 +134,12 @@ def logout():
     return redirect('/')
 
 class ChoosePrepayTicketsForm(Form):
-    count = SelectField('Number of tickets', [Required()], choices = choice_range(1, Prepay.limit + 1))
+    count = IntegerSelectField('Number of tickets', [Required()], max=Prepay.limit)
+
+    def validate_count(form, field):
+        paid = current_user.tickets.filter_by(type=Prepay, paid=True).count()
+        if field.data < paid:
+            raise ValidationError('You already have paid for %d tickets' % paid)
 
 @app.route("/pay", methods=['GET', 'POST'])
 @login_required
@@ -144,16 +156,7 @@ def pay():
     form = ChoosePrepayTicketsForm(request.form, count=count)
 
     if request.method == 'POST' and form.validate():
-
-        paid = prepays.filter_by(paid=True).count()
-        count = int(form.count.data)
-        if count < paid:
-            raise ValidationError('You already have paid for %d tickets' % paid)
-        elif count > Prepay.limit:
-            raise ValidationError('You cannot order more than %s tickets' % Prepay.limit)
-
-        print 'From: %s To: %s' % (prepays.count(), count)
-
+        count = form.count.data
         if count > prepays.count():
             for i in range(prepays.count(), count):
                 current_user.tickets.append(Ticket(type_id=Prepay.id))
