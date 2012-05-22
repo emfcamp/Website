@@ -1,5 +1,7 @@
 from main import db
 from decimal import Decimal
+from datetime import datetime, timedelta
+
 
 class TicketType(db.Model):
     __tablename__ = 'ticket_type'
@@ -30,6 +32,8 @@ class Ticket(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     type_id = db.Column(db.Integer, db.ForeignKey('ticket_type.id'), nullable=False)
     paid = db.Column(db.Boolean, default=False, nullable=False)
+    expires = db.Column(db.DateTime, nullable=False)
+
 
     def __init__(self, type=None, type_id=None, paid=False):
         if type:
@@ -40,3 +44,7 @@ class Ticket(db.Model):
             raise ValueError('Type must be specified')
 
         self.paid = paid
+        self.expires = datetime.utcnow() + timedelta(days=10)
+
+    def expired(self):
+        return self.expires < datetime.utcnow()
