@@ -203,9 +203,17 @@ def gocardless_complete():
         app.logger.exception("Gocardless-complete exception")
         flash("An error occurred with your payment, please contact info@emfcamp.org")
         return redirect(url_for('main'))
-
+        
     state = request.args["state"]
     state = int(state[4:])
+    return render_template('gocardless-complete.html', paid=state)
+
+def notyet():
+    """
+        to be used (or something like it) with the gocardless Bill callback:
+        https://gocardless.com/docs/web_hooks_guide#response
+    """
+
     unpaid = current_user.tickets.filter_by(paid=False).all()
     if len(unpaid) == state:
         for t in unpaid:
@@ -218,7 +226,7 @@ def gocardless_complete():
         # really need proper transactions, anyone
         # that buys a ticket and then buys another can have problems.
         pass
-    return render_template('gocardless-complete.html', paid=state)
+
 
 @app.route("/pay/gocardless-cancel")
 @feature_flag('PAYMENTS')

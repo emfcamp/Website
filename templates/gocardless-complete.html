@@ -2,5 +2,10 @@
 {% extends "base.html" %}
 {% block body %}
 <p>Thank You!</p>
-<p>Your payment for {% if paid > 1 %}{{paid}} tickets{% else %}a ticket{% endif %} has been accepted, see you at <a href="http://www.emfcamp.org/">EMFCamp2012</a>!</p>
+
+<p>Your Direct Debit payment for {% if paid > 1 %}{{paid}} tickets{% else %}a ticket{% endif %} has been
+setup, we will email you when the transaction has been completed.</p>
+
+<p>See you at <a href="http://www.emfcamp.org/">EMFCamp2012</a>!</p>
+
 {% endblock %}
