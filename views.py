@@ -190,7 +190,7 @@ def company():
 def gocardless_start():
     unpaid = current_user.tickets.filter_by(paid=False)
     amount = sum(t.type.cost for t in unpaid.all())
-    bill_url = gocardless.client.new_bill_url(amount, name="Electromagnetic Field Ticket Deposit")
+    bill_url = gocardless.client.new_bill_url(amount, name="Electromagnetic Field Ticket Deposit", state="ppc_" + str(unpaid.count()))
     return render_template('gocardless-start.html', bill_url=bill_url)
 
 @app.route("/pay/gocardless-complete")
@@ -203,7 +203,22 @@ def gocardless_complete():
         app.logger.exception("Gocardless-complete exception")
         flash("An error occurred with your payment, please contact info@emfcamp.org")
         return redirect(url_for('main'))
-    return render_template('gocardless-complete.html')
+
+    state = request.args["state"]
+    state = int(state[4:])
+    unpaid = current_user.tickets.filter_by(paid=False).all()
+    if len(unpaid) == state:
+        for t in unpaid:
+            t.paid = True
+            print t
+            db.session.add(t)
+        db.session.commit()
+    else:
+        # XXX TODO error checking
+        # really need proper transactions, anyone
+        # that buys a ticket and then buys another can have problems.
+        pass
+    return render_template('gocardless-complete.html', paid=state)
 
 @app.route("/pay/gocardless-cancel")
 @feature_flag('PAYMENTS')
