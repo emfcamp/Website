@@ -47,4 +47,10 @@ class Ticket(db.Model):
         self.expires = datetime.utcnow() + timedelta(days=10)
 
     def expired(self):
+        # can't be expired if it's been paid!
+        if self.paid:
+            return False
         return self.expires < datetime.utcnow()
+    
+    def __repr__(self):
+        return "<Ticket: %d, type: %d, paid? %d, expired: %s>" % (self.id, self.type_id, self.paid, str(self.expired()))

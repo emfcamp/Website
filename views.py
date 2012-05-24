@@ -168,7 +168,12 @@ def pay():
         db.session.commit()
         return redirect(url_for('pay'))
 
-    return render_template("pay.html", form=form, total=count * Prepay.cost)
+    tickets = {}
+    ts = current_user.tickets.all()
+    for t in ts:
+        tickets[t.id] = {"expired": t.expired(), "paid": t.paid}
+
+    return render_template("pay.html", form=form, total=count * Prepay.cost, tickets=tickets)
 
 
 @app.route("/sponsors")

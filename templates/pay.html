@@ -1,6 +1,38 @@
 {% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block body %}
+
+{% if tickets|count > 0 %}
+<p>Your current tickets:</p>
+
+<table class=buyform>
+<tr><th>Id</th><th>Paid</th><th>Expired</th></tr>
+{% for t in tickets %}
+
+<tr class="{{ loop.cycle('buyformtdodd', 'buyformtdeven') }}">
+<td>{{ t }}</td><td>
+{% if tickets[t].paid %}
+<font class=good>Yes!</font>
+{% else %}
+not yet
+{% endif %}
+</td><td>
+{% if not tickets[t].paid %}
+	{% if tickets[t].expired %}
+	<font class=bad>Yes :(</font>
+	{% else %}
+	not yet, pay soon!
+	{% endif %}
+{% endif %}
+</td>
+</tr>
+
+{% endfor %}
+</table>
+<br/>
+
+{% endif %}
+
 <p>We don't have a final budget yet, so we're currently only letting people
    put a deposit down for their tickets.</p>
 
