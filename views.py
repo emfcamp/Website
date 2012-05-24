@@ -10,6 +10,7 @@ from flaskext.wtf import \
     TextField, PasswordField, SelectField
 from sqlalchemy.exc import IntegrityError
 from decorator import decorator
+import simplejson
 
 def feature_flag(flag):
     def call(f, *args, **kw):
@@ -144,6 +145,10 @@ class ChoosePrepayTicketsForm(Form):
 @app.route("/pay", methods=['GET', 'POST'])
 @login_required
 def pay():
+    #
+    # this list all tickets, even ones that have been paid
+    # we might be better off with ", paid=False" on the end to avoid confusion.
+    # 
     prepays = current_user.tickets.filter_by(type=Prepay)
 
     count = prepays.count()
@@ -208,26 +213,28 @@ def gocardless_complete():
     state = int(state[4:])
     return render_template('gocardless-complete.html', paid=state)
 
-def notyet():
-    """
-        to be used (or something like it) with the gocardless Bill callback:
+@app.route("/gocardless-webhook", methods=['POST'])
+@feature_flag('PAYMENTS')
+def gocardless_webhook():
+        """
+        handle the gocardless webhook / callback callback:
         https://gocardless.com/docs/web_hooks_guide#response
+        
+        we mostly want 'bill'
+
+        XXX TODO logging        
     """
-
-    unpaid = current_user.tickets.filter_by(paid=False).all()
-    if len(unpaid) == state:
-        for t in unpaid:
-            t.paid = True
-            print t
-            db.session.add(t)
-        db.session.commit()
-    else:
-        # XXX TODO error checking
-        # really need proper transactions, anyone
-        # that buys a ticket and then buys another can have problems.
-        pass
-
-
+    ret = ("", 403)
+    json_data = simplejson.loads(request.data)
+    if gocardless.client.validate_webhook(json_data['payload']):
+        data = json_data['payload']
+        if data['resource_type'] == 'bill' and data['action'] == 'paid':
+            for bill in data['bills']:
+                # process the bill
+                pass
+        ret = ("", 200)
+    return ret
+    
 @app.route("/pay/gocardless-cancel")
 @feature_flag('PAYMENTS')
 @login_required
