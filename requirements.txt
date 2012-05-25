@@ -5,7 +5,7 @@ Flask-SQLAlchemy==0.16
 WTForms==1.0.1
 Flask-WTF==0.6
 py-bcrypt==0.2
-gocardless==0.1.1
+gocardless==0.1.2
 Flask-Mail==0.6.1
 decorator==3.3.3
 Flask-Assets==0.7
