@@ -1,4 +1,4 @@
-from main import app, db, gocardless, mail, Prepay
+from main import app, db, gocardless, mail
 from models.user import User, PasswordReset
 from models.payment import Payment
 from models.ticket import TicketType, Ticket
@@ -135,9 +135,11 @@ def logout():
     return redirect('/')
 
 class ChoosePrepayTicketsForm(Form):
+    Prepay = TicketType.query.filter_by(name='Prepay Camp Ticket').one()
     count = IntegerSelectField('Number of tickets', [Required()], max=Prepay.limit)
 
     def validate_count(form, field):
+        Prepay = TicketType.query.filter_by(name='Prepay Camp Ticket').one()
         paid = current_user.tickets.filter_by(type=Prepay, paid=True).count()
         if field.data < paid:
             raise ValidationError('You already have paid for %d tickets' % paid)
@@ -148,7 +150,8 @@ def pay():
     #
     # this list all tickets, even ones that have been paid
     # we might be better off with ", paid=False" on the end to avoid confusion.
-    # 
+    #
+    Prepay = TicketType.query.filter_by(name='Prepay Camp Ticket').one()
     prepays = current_user.tickets.filter_by(type=Prepay)
 
     count = prepays.count()
