@@ -2,7 +2,7 @@ from main import app, db, gocardless, mail
 from models.user import User, PasswordReset
 from models.payment import Payment
 from models.ticket import TicketType, Ticket
-from flask import render_template, redirect, request, flash, url_for, abort
+from flask import render_template, redirect, request, flash, url_for, abort, send_from_directory
 from flaskext.login import login_user, login_required, logout_user, current_user
 from flaskext.mail import Message
 from flaskext.wtf import \
@@ -10,7 +10,7 @@ from flaskext.wtf import \
     TextField, PasswordField, SelectField
 from sqlalchemy.exc import IntegrityError
 from decorator import decorator
-import simplejson
+import simplejson, os
 
 def feature_flag(flag):
     def call(f, *args, **kw):
@@ -32,6 +32,11 @@ class IntegerSelectField(SelectField):
 @app.route("/")
 def main():
     return render_template('main.html')
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static/images'),
+                                   'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 class LoginForm(Form):
     email = TextField('Email', [Email(), Required()])
