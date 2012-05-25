@@ -10,3 +10,5 @@ Flask-Mail==0.6.1
 decorator==3.3.3
 Flask-Assets==0.7
 simplejson
+ofxparse
+Flask-Script

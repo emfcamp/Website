@@ -6,3 +6,6 @@ update:
 
 init:
 	virtualenv ./env
+
+reconcile:
+	SETTINGS_FILE=./config/development.cfg ./env/bin/python ./reconcile.py reconcile -f tests/account.ofx
