@@ -14,6 +14,7 @@ from decimal import Decimal
 
 from main import app
 from models import User
+from models.payment import Payment, find_payment
 
 #app = Flask(__name__)
 #app.config.from_envvar('SETTINGS_FILE')
@@ -48,17 +49,18 @@ class Reconcile(Command):
 
   def reconcile(self, ref, amount, t):
     if t.type == 'other':
-      user = User.query.filter_by(bankref=ref).all()
-      if len(user) == 1:
-        user = user[0]
-        print u"user %s paid £%d with ref %s" % (user.name, amount, ref)
+      payment = find_payment(ref)
+      if payment:
+        user = payment.user
+        print u"user %s paid %d with ref %s" % (user.name, amount, ref)
         #
         # so now we have the ref and an amount
         #
-        unpaid = user.tickets.filter_by(paid=False).all()
+        unpaid = payment.tickets.all()
         total = Decimal(0)
         for t in unpaid:
-          total += Decimal(str(t.type.cost_pence / 100.0))
+          if t.paid == False:
+            total += Decimal(str(t.type.cost_pence / 100.0))
 
         if total == 0:
           # nothing owed, so an old payment...
@@ -68,20 +70,19 @@ class Reconcile(Command):
           print "tried to reconcile payment %s for %s, but amount paid (%d) didn't match amount owed (%d)" % (ref, user.name, amount, total)
         else:
           # all paid up.
+          if not self.quiet:
+            print "user %s paid for %d tickets (%s)" % (user.name, len(unpaid), ref)
           if self.doit:
-            if not self.quiet:
-              print "user %s paid for %d tickets" % (user.name, len(unpaid))
             # not sure why we have to do this, or why the object is already in a session.
-            s = db.object_session(unpaid[0])            
+            s = db.object_session(unpaid[0])
             for t in unpaid:
               t.paid = True
+            payment.state = "paid"
             s.commit()
 
-      elif len(user) == 0:
+      else:
         if not self.quiet:
           print "unmatched ref %s paid %d" % (ref, amount)
-      else:
-        print "too many users"
     else:
       if not self.quiet:
         print t, t.type, t.payee

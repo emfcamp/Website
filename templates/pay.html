@@ -6,11 +6,13 @@
 <p>Your current tickets:</p>
 
 <table class=buyform>
-<tr><th>Id</th><th>Paid</th><th>Expired</th></tr>
+<tr><th>Id</th><th>Payment Reference</th><th>Paid</th><th>Expired</th></tr>
 {% for t in tickets %}
 
 <tr class="{{ loop.cycle('buyformtdodd', 'buyformtdeven') }}">
-<td>{{ t }}</td><td>
+<td>{{ t }}</td>
+<td>{{ tickets[t].payment.reference }}</td>
+<td>
 {% if tickets[t].paid %}
 <font class=good>Yes!</font>
 {% else %}
@@ -50,7 +52,7 @@ not yet
 <dl>
     {{ render_field(form.count) }}
 </dl>
-    <input type=submit value="Update"/>
+    <input type=submit value="Confirm"/>
     <p>Total amount for deposit: {{ format_price(total) }}.</p>
 </form>
 
@@ -58,15 +60,19 @@ not yet
 payment methods we accept are bank-to-bank. If this is really a problem for you, please
 <a href="mailto:tickets@emfcamp.org">let us know</a>.
 </p>
+{% if bought %}
+
 <h3>Paying in Pounds</h3>
 <p>
 
 <ul>
-    <li><a href="{{ url_for('gocardless_start') }}">Pay by GoCardless (direct debit)</a></li>
-    <li><a href="{{ url_for('transfer_start') }}">Pay by bank transfer</a></li>
+    <li><a href="{{ url_for('gocardless_start') }}">Checkout &amp; Pay by GoCardless (direct debit)</a></li>
+    <li><a href="{{ url_for('transfer_start') }}">Checkout &amp; Pay by bank transfer</a></li>
 </ul>
+{% endif %}
 
 <h3>Paying in Euros</h3>
 <p>If you want to pay in Euros, we're working on it. Email tickets@emfcamp.org and we'll let
 you know when our Euro bank account is ready.</p>
+
 {% endblock %}

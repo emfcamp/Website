@@ -83,6 +83,7 @@ dl.bank-details {
 .bank-details dt {
   clear: left;
   font-weight: bold;
+  padding-right: 3px;
 }
 
 .good {
