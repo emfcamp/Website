@@ -62,10 +62,18 @@ ol li {
     float: right;
 }
 
+.flash {
+  margin-bottom: 1ex;
+}
+
 .choose-prepay-tickets dl,
 .choose-prepay-tickets dt,
 .choose-prepay-tickets dd {
     display: inline;
+}
+
+.choose-prepay-tickets dl {
+  margin-bottom: 1ex;
 }
 
 dl.bank-details {
