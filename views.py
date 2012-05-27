@@ -11,7 +11,6 @@ from flaskext.wtf import \
 from sqlalchemy.exc import IntegrityError
 from decorator import decorator
 import simplejson, os
-from base24 import fromb24
 
 def feature_flag(flag):
     def call(f, *args, **kw):
