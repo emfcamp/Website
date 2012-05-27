@@ -1,6 +1,6 @@
 from main import app, db, gocardless, mail
 from models.user import User, PasswordReset
-from models.payment import Payment, find_payment
+from models.payment import Payment
 from models.ticket import TicketType, Ticket
 from flask import render_template, redirect, request, flash, url_for, abort, send_from_directory, session
 from flaskext.login import login_user, login_required, logout_user, current_user
@@ -192,7 +192,7 @@ def buy_some_tickets(provider, count):
         db.session.add(current_user)
         db.session.commit()
 
-    return p.reference
+    return p
 
 @app.route("/sponsors")
 def sponsors():
@@ -208,10 +208,10 @@ def company():
 def gocardless_start():
     unpaid = session["count"]
     Prepay = TicketType.query.filter_by(name='Prepay Camp Ticket').one()
-    ref = buy_some_tickets("GoCardless", unpaid)
+    payment = buy_some_tickets("GoCardless", unpaid)
     amount = Prepay.cost * unpaid
 
-    bill_url = gocardless.client.new_bill_url(amount, name="Electromagnetic Field Ticket Deposit", state=ref)
+    bill_url = gocardless.client.new_bill_url(amount, name="Electromagnetic Field Ticket Deposit", state=payment.id)
 
     return redirect(bill_url)
 
@@ -237,15 +237,16 @@ def gocardless_complete():
     session.pop("count", None)
     session.pop("bought", None)
 
-    ref = request.args["state"]
+    payment_id = request.args["state"]
     gcid = request.args["resource_id"]
     # TODO send an email with the details.
     # should we send the resource_uri in the bill email?
-    app.logger.info("user %d started gocardless payment for %s, gc reference %s" % (current_user.id, ref, gcid))
+    app.logger.info("user %d started gocardless payment for %s, gc reference %s" % (current_user.id, payment_id, gcid))
 
-    payment = find_payment(ref)
-    if not payment:
-        app.logger.error("couldn't find gocardless payment for ref %s" % (ref))
+    try:
+        payment = Payment.query.filter_by(id=payment_id).one()
+    except Exception, e:
+        app.logger.error("Exception getting gocardless payment %s: %s" % (payment_id, e))
         flash("An error occurred with your payment, please contact info@emfcamp.org")
         return redirect(url_for('main'))
 
@@ -255,7 +256,7 @@ def gocardless_complete():
     db.session.add(payment)
     db.session.commit()
 
-    return render_template('gocardless-complete.html', paid=state, ref=ref, gcref=gcid)
+    return render_template('gocardless-complete.html', paid=state, gcref=gcid)
 
 #
 # it's just a link? see ticket #17
@@ -284,11 +285,11 @@ def gocardless_cancel():
     session.pop("count", None)
     session.pop("bought", None)
 
-    ref = request.args["state"]
+    payment_id = request.args["state"]
     # TODO send an email with the details.
     # should we send the resource_uri in the bill email?
-    app.logger.info("user %d canceled gocardless payment for %s" % (current_user.id, ref))
-    payment = find_payment(ref)
+    app.logger.info("user %d canceled gocardless payment for %s" % (current_user.id, payment_id))
+    payment = Payment.query.filter_by(id=payment_id).one()
     tc = 0
     for t in payment.tickets:
         db.session.delete(t)
@@ -297,7 +298,7 @@ def gocardless_cancel():
     db.session.delete(p)
     db.session.commit()
 
-    return render_template('gocardless-cancel.html', ref=ref, paid=tc)
+    return render_template('gocardless-cancel.html', paid=tc)
 
 @app.route("/gocardless-webhook", methods=['POST'])
 @feature_flag('PAYMENTS')
@@ -371,15 +372,15 @@ def gocardless_webhook():
 def transfer_start():
     unpaid = session["count"]
     Prepay = TicketType.query.filter_by(name='Prepay Camp Ticket').one()
-    ref = buy_some_tickets("BankTransfer", unpaid)
+    payment = buy_some_tickets("BankTransfer", unpaid)
     amount = Prepay.cost * unpaid
     
     # XXX TODO send an email with the details.
-    app.logger.info("user %d started BankTransfer payment for %s" % (current_user.id, ref))
+    app.logger.info("user %d started BankTransfer payment for %s" % (current_user.id, payment.bankref))
 
     session.pop("count", None)
     session.pop("bought", None)
-    return render_template('transfer-start.html', amount=amount, ref=ref)
+    return render_template('transfer-start.html', amount=amount, bankref=payment.bankref)
 
 @app.route("/pay/terms")
 def ticket_terms():

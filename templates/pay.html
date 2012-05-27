@@ -6,12 +6,11 @@
 <p>Your current tickets:</p>
 
 <table class=buyform>
-<tr><th>Id</th><th>Payment Reference</th><th>Paid</th><th>Expired</th></tr>
+<tr><th>Id</th><th>Paid</th><th>Expired</th></tr>
 {% for t in tickets %}
 
 <tr class="{{ loop.cycle('buyformtdodd', 'buyformtdeven') }}">
 <td>{{ t }}</td>
-<td>{{ tickets[t].payment.reference }}</td>
 <td>
 {% if tickets[t].paid %}
 <font class=good>Yes!</font>

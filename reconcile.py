@@ -9,12 +9,14 @@ from flaskext.script import Command, Manager, Option
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 from flaskext.mail import Mail
+from sqlalchemy.orm.exc import NoResultFound
 
 from decimal import Decimal
+import re
 
 from main import app
 from models import User
-from models.payment import Payment, find_payment
+from models.payment import Payment, safechars
 
 #app = Flask(__name__)
 #app.config.from_envvar('SETTINGS_FILE')
@@ -47,10 +49,26 @@ class Reconcile(Command):
       # DTPOSTED	: date   
       self.reconcile(t.payee, Decimal(t.amount), t)
 
+  def find_payment(self, name):
+    name = name.upper()
+    found = re.findall('[%s]{4}-?[%s]{4}' % (safechars, safechars), name)
+    for f in found:
+      bankref = f.replace('-', '')
+      try:
+        return Payment.query.filter_by(bankref=bankref).one()
+      except NoResultFound:
+        continue
+    else:
+      raise ValueError('No matches found')
+
   def reconcile(self, ref, amount, t):
     if t.type == 'other':
-      payment = find_payment(ref)
-      if payment:
+      try:
+        payment = self.find_payment(ref)
+      except Exception, e:
+        if not self.quiet:
+          print "Exception matching ref %s paid %d: %s" % (repr(ref), amount, e)
+      else:
         user = payment.user
         print u"user %s paid %d with ref %s" % (user.name, amount, ref)
         #
@@ -80,9 +98,6 @@ class Reconcile(Command):
             payment.state = "paid"
             s.commit()
 
-      else:
-        if not self.quiet:
-          print "unmatched ref %s paid %d" % (ref, amount)
     else:
       if not self.quiet:
         print t, t.type, t.payee

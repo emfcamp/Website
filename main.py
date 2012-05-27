@@ -19,7 +19,14 @@ def utility_processor():
         if after:
             return amount + currency
         return currency + amount
-    return dict(format_price=format_price)
+
+    def format_bankref(bankref):
+        return '%s-%s' % (bankref[:4], bankref[4:])
+
+    return dict(
+        format_price=format_price,
+        format_bankref=format_bankref,
+    )
 
 
 db = SQLAlchemy(app)
