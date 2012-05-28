@@ -1,0 +1,79 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block body %}
+
+{% if tickets %}
+<p>Your current tickets:</p>
+
+<table class="tickets">
+<tr><th>Type</th><th>Status</th></tr>
+
+{% for t in tickets %}
+
+<tr class="
+{{ loop.cycle('odd', 'even') }}
+{% if t.paid %}paid{% endif%}
+{% if t.expired() %}expired{% endif %}
+">
+<td>{{ t.type.name }}</td>
+<td>
+    {% if t.paid %}
+    Paid
+    {% elif t.expired() %}
+    Expired
+    {% else %}
+    Pending
+    {% endif %}
+</td>
+</tr>
+
+{% endfor %}
+
+</table>
+<br/>
+
+{% endif %}
+
+{% if payments %}
+Your payments:
+
+<table>
+<tr><th>Type</th><th>Amount</th><th>Progress</th><th></th></tr>
+{% for p in payments %}
+<tr>
+
+<td>{{ p.name }}</td>
+<td>{{ format_price(p.amount) }}</td>
+<td>{{ p.state }}</td>
+<td><a href="">Cancel</a></td>
+
+</tr>
+{%endfor%}
+</table>
+
+{% endif %}
+
+{% include 'ticket-blurb.html' %}
+
+<form method=post class="choose-prepay-tickets">
+    {{form.hidden_tag()}}
+    <h2>Reserve tickets</h2>
+<dl>
+    {{ render_field(form.count) }}
+</dl>
+    <p>Total amount for deposit: {{ format_price(total) }}.</p>
+    {% if form.provider.data %}
+        {{form.hidden_tag('provider')}}
+        {% if form.provider.data == 'gocardless' %}
+        <input type=submit name=pay value="Reserve and pay with GoCardless"/>
+        {% else %}
+        <input type=submit name=pay value="Reserve and pay by bank"/>
+        {% endif %}
+    <input type=submit name=choose value="Reserve and choose another provider"/>
+    {% else %}
+    <input type=submit name=choose value="Reserve and pay"/>
+    {% endif %}
+
+</form>
+
+{% endblock %}

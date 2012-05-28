@@ -33,7 +33,7 @@ class BankPayment(Payment):
     name = 'Bank transfer'
 
     __mapper_args__ = {'polymorphic_identity': 'banktransfer'}
-    bankref = db.Column(db.String, nullable=False, unique=True)
+    bankref = db.Column(db.String, unique=True)
 
     def __init__(self, amount):
         Payment.__init__(self, amount)
@@ -45,9 +45,9 @@ class GoCardlessPayment(Payment):
     name = 'GoCardless payment'
 
     __mapper_args__ = {'polymorphic_identity': 'gocardless'}
-    object_id = db.Column(db.String, nullable=True, unique=True)
+    gcid = db.Column(db.String, unique=True)
 
-    def bill_url(name):
+    def bill_url(self, name):
         return gocardless.client.new_bill_url(self.amount, name=name, state=self.id)
 
 

@@ -1,6 +1,8 @@
 from main import db
 from decimal import Decimal
 from datetime import datetime, timedelta
+from sqlalchemy.orm import attributes, Session
+from sqlalchemy import event, or_
 
 class ConstTicketType(object):
     def __init__(self, name):
@@ -57,7 +59,7 @@ class Ticket(db.Model):
         else:
             raise ValueError('Type must be specified')
 
-        self.expires = datetime.utcnow() + timedelta(days=10)
+        self.expires = datetime.utcnow() + timedelta(hours=2)
 
     def expired(self):
         if self.paid:
@@ -66,3 +68,24 @@ class Ticket(db.Model):
     
     def __repr__(self):
         return "<Ticket: %s, type: %s, paid? %s, expired: %s>" % (self.id, self.type_id, self.paid, str(self.expired()))
+
+@event.listens_for(Session, 'before_flush')
+def check_capacity(session, flush_context, instances):
+    totals = {}
+
+    for obj in session.new:
+        if not isinstance(obj, Ticket):
+            continue
+
+        if obj.type not in totals:
+            totals[obj.type] = Ticket.query.filter_by(type=obj.type). \
+                filter(or_(Ticket.expires >= datetime.utcnow(), Ticket.paid)). \
+                count()
+
+        totals[obj.type] += 1
+
+    for type, count in totals.items():
+
+        if count > obj.type.capacity:
+            raise TicketError('No more tickets of type %s available') % obj.type.name
+

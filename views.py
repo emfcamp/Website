@@ -11,12 +11,13 @@ from flaskext.login import \
 from flaskext.mail import Message
 from flaskext.wtf import \
     Form, Required, Email, EqualTo, ValidationError, \
-    TextField, PasswordField, SelectField
+    TextField, PasswordField, SelectField, SubmitField
 
 from sqlalchemy.exc import IntegrityError
 
 from decorator import decorator
 import simplejson, os
+from datetime import datetime, timedelta
 
 def feature_flag(flag):
     def call(f, *args, **kw):
@@ -44,6 +45,16 @@ def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static/images'),
                                    'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
+@app.route("/sponsors")
+def sponsors():
+    return render_template('sponsors.html')
+
+
+@app.route("/about/company")
+def company():
+    return render_template('company.html')
+
+
 class LoginForm(Form):
     email = TextField('Email', [Email(), Required()])
     password = PasswordField('Password', [Required()])
@@ -56,7 +67,7 @@ def login():
         user = User.query.filter_by(email=form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user)
-            return redirect(request.args.get('next') or url_for('pay'))
+            return redirect(request.args.get('next') or url_for('tickets'))
         else:
             flash("Invalid login details!")
     return render_template("login.html", form=form)
@@ -80,7 +91,7 @@ def signup():
         except IntegrityError, e:
             raise
         login_user(user)
-        return redirect(url_for('pay'))
+        return redirect(request.args.get('next') or url_for('tickets'))
 
     return render_template("signup.html", form=form)
 
@@ -136,10 +147,11 @@ def reset_password():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        return redirect(url_for('pay'))
+        return redirect(url_for('tickets'))
     return render_template("reset-password.html", form=form)
 
 @app.route("/logout")
+@feature_flag('PAYMENTS')
 @login_required
 def logout():
     logout_user()
@@ -148,68 +160,97 @@ def logout():
 
 class ChoosePrepayTicketsForm(Form):
     count = IntegerSelectField('Number of tickets', [Required()], max=TicketType.Prepay.limit)
+    provider = TextField('Provider')
+    pay = SubmitField('Pay')
+    choose = SubmitField('Choose')
+
+    def validate_provider(form, field):
+        if not field.data:
+            return None
+        if field.data not in ('gocardless', 'banktransfer'):
+            raise ValidationError('Unknown provider %s' % field.data)
 
     def validate_count(form, field):
-        paid = current_user.tickets.filter_by(type=TicketType.Prepay, paid=True).count()
-        if field.data < paid:
-            raise ValidationError('You already have paid for %d tickets' % paid)
+        paid = current_user.tickets.filter_by(type=TicketType.Prepay).count()
+        if field.data + paid > TicketType.Prepay.limit:
+            raise ValidationError('You can only buy %s tickets' % TicketType.Prepay.limit)
 
-@app.route("/pay", methods=['GET', 'POST'])
+@app.route("/tickets", methods=['GET', 'POST'])
+@feature_flag('PAYMENTS')
 @login_required
-def pay():
-    # have they bought something?
-    if "bought" not in session:
-        session["bought"] = False
-
-    if "count" not in session:
-        session["count"] = 1
-
-    form = ChoosePrepayTicketsForm(request.form, count=session["count"])
+def tickets():
+    form = ChoosePrepayTicketsForm(request.form, provider=request.args.get('provider'))
 
     if request.method == 'POST' and form.validate():
-        count = form.count.data
-        if count != session["count"]:
-            session["count"] = count
+        for i in range(form.count.data):
+            t = Ticket(type_id=TicketType.Prepay.id)
+            current_user.tickets.append(t)
 
-        if session["count"] > 0:
-            session["bought"] = True
+        db.session.add(current_user)
+        db.session.commit()
 
-        return redirect(url_for('pay'))
+        if form.pay.data:
+            return redirect(url_for('pay_choose', provider=form.provider.data))
+
+        return redirect(url_for('pay_choose'))
+
 
     tickets = current_user.tickets.all()
     payments = current_user.payments.all()
 
-    return render_template("pay.html",
+    return render_template("tickets.html",
         form=form,
-        total=session["count"] * TicketType.Prepay.cost,
         tickets=tickets,
         payments=payments,
-        bought=session["bought"])
+        amount=1,
+        total=TicketType.Prepay.cost,
+    )
 
 def buy_prepay_tickets(count, paymenttype):
 
-    tickets = [Ticket(type_id=TicketType.Prepay.id) for i in range(count)]
+    tickets = current_user.tickets.filter_by(payment_id=None)
     amount = sum(t.type.cost for t in tickets)
+
+    if not amount:
+        raise Exception('There are no tickets without payments')
 
     payment = paymenttype(amount)
     current_user.payments.append(payment)
 
     for t in tickets:
         t.payment = payment
-        current_user.tickets.append(t)
+        t.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
 
     db.session.add(current_user)
     db.session.commit()
 
     return payment
 
-@app.route("/sponsors")
-def sponsors():
-    return render_template('sponsors.html')
 
-@app.route("/about/company")
-def company():
-    return render_template('company.html')
+@app.route("/pay")
+@feature_flag('PAYMENTS')
+def pay():
+    if current_user.is_authenticated():
+        return redirect(url_for('pay_choose'))
+
+    return render_template('payment-choose.html', next='tickets')
+
+@app.route("/pay/choose")
+@feature_flag('PAYMENTS')
+def pay_choose():
+    provider = request.args.get('provider')
+    if provider == 'gocardless':
+        return redirect(url_for('gocardless_start'))
+    elif provider == 'banktransfer':
+        return redirect(url_for('transfer_start'))
+
+    return render_template('payment-choose.html', next='pay_choose')
+
+@app.route("/pay/terms")
+@feature_flag('PAYMENTS')
+def ticket_terms():
+    return render_template('terms.html')
+
 
 @app.route("/pay/gocardless-start")
 @feature_flag('PAYMENTS')
@@ -219,7 +260,7 @@ def gocardless_start():
 
     bill_url = payment.bill_url("Electromagnetic Field Ticket Deposit")
 
-    return redirect(payment. bill_url)
+    return redirect(bill_url)
 
 @app.route("/pay/gocardless-complete")
 @feature_flag('PAYMENTS')
@@ -239,30 +280,34 @@ def gocardless_complete():
         except:
             pass
         
-    state = session["count"]
-    session.pop("count", None)
-    session.pop("bought", None)
-
-    payment_id = request.args["state"]
+    payment_id = int(request.args["state"])
     gcid = request.args["resource_id"]
     # TODO send an email with the details.
     # should we send the resource_uri in the bill email?
-    app.logger.info("user %d started gocardless payment for %s, gc reference %s" % (current_user.id, payment_id, gcid))
+    app.logger.info("user %d started gocardless payment for %s, gcid %s" % (current_user.id, payment_id, gcid))
 
     try:
-        payment = Payment.query.filter_by(id=payment_id).one()
+        payment = current_user.payments.filter_by(id=payment_id).one()
     except Exception, e:
         app.logger.error("Exception getting gocardless payment %s: %s" % (payment_id, e))
-        flash("An error occurred with your payment, please contact info@emfcamp.org")
+        flash("An error occurred with your payment, please contact tickets@emfcamp.org")
         return redirect(url_for('main'))
 
     # keep the gocardless reference so we can find the payment when we get called by the webhook
-    payment.extra = gcid
+    payment.gcid = gcid
     payment.state = "inprogress"
     db.session.add(payment)
     db.session.commit()
 
-    return render_template('gocardless-complete.html', paid=state, gcref=gcid)
+    return redirect(url_for('gocardless_waiting', payment=payment_id))
+
+@app.route('/pay/gocardless-waiting')
+@feature_flag('PAYMENTS')
+@login_required
+def gocardless_waiting():
+    payment_id = int(request.args.get('payment'))
+    payment = current_user.payments.filter_by(id=payment_id).one()
+    return render_template('gocardless-waiting.html', payment=payment, days=app.config.get('EXPIRY_DAYS'))
 
 #
 # it's just a link? see ticket #17
@@ -287,15 +332,11 @@ def gocardless_cancel():
         except:
             pass
 
-    state = session["count"]
-    session.pop("count", None)
-    session.pop("bought", None)
-
-    payment_id = request.args["state"]
+    payment_id = int(request.args["state"])
     # TODO send an email with the details.
     # should we send the resource_uri in the bill email?
     app.logger.info("user %d canceled gocardless payment for %s" % (current_user.id, payment_id))
-    payment = Payment.query.filter_by(id=payment_id).one()
+    payment = current_user.payments.filter_by(id=payment_id).one()
     tc = 0
     for t in payment.tickets:
         db.session.delete(t)
@@ -304,7 +345,7 @@ def gocardless_cancel():
     db.session.delete(p)
     db.session.commit()
 
-    return render_template('gocardless-cancel.html', paid=tc)
+    return render_template('gocardless-cancel.html', payment=payment)
 
 @app.route("/gocardless-webhook", methods=['POST'])
 @feature_flag('PAYMENTS')
@@ -335,14 +376,14 @@ def gocardless_webhook():
 
                 # this is the same as the resource_id
                 # we get from the gocardless-complete redirect
-                id = bill['id']
-                payment = Payment.query.filter_by(extra=id).one()
+                gcid = bill['id']
+                payment = current_user.payments.filter_by(gcid=gcid).one()
                 ts = payment.tickets.all()
 
-                app.logger.info("GoCardless payment for user %d has been paid. gcref %s, our ref %s, %d tickets" % (payment.user.id, id, payment.reference, len(ts)))
+                app.logger.info("GoCardless payment for user %d has been paid. gcref %s, our ref %s, %d tickets" % (payment.user.id, gcid, payment.id, len(ts)))
                 
                 if payment.state != "inprogress":
-                    app.logger.warning("GoCardless bill payment %s, payment state was %s, we expected 'inprogress'" % (id, payment.state) )
+                    app.logger.warning("GoCardless bill payment %s, payment state was %s, we expected 'inprogress'" % (gcid, payment.state) )
 
                 for t in ts:
                     t.paid=True
@@ -358,16 +399,16 @@ def gocardless_webhook():
         elif data['resource_type'] == 'bill' and data['action'] == 'withdrawn':
             for bill in data['bills']:
                 print bill
-                id = bill['id']
-                payment = Payment.query.filter_by(extra=id).one()
-                app.logger.info("GoCardless payment for user %d has been withdrawn. gcref %s, our ref %s" % (payment.user.id, id, payment.reference))
+                gcid = bill['id']
+                payment = current_user.payments.filter_by(gcid=gcid).one()
+                app.logger.info("GoCardless payment for user %d has been withdrawn. gcref %s, our ref %s" % (payment.user.id, id, payment.id))
             return ("", 200)
         elif data['resource_type'] == 'bill' and data['action'] == 'failed':
             for bill in data['bills']:
                 print bill
-                id = bill['id']
-                payment = Payment.query.filter_by(extra=id).one()
-                app.logger.info("GoCardless payment for user %d has failed. gcref %s, our ref %s" % (payment.user.id, id, payment.reference))
+                gcid = bill['id']
+                payment = current_user.payments.filter_by(gcid=gcid).one()
+                app.logger.info("GoCardless payment for user %d has failed. gcref %s, our ref %s" % (payment.user.id, gcid, payment.id))
             return ("", 200)
 
     return ret
@@ -380,12 +421,20 @@ def transfer_start():
     payment = buy_prepay_tickets(session['count'], BankPayment)
 
     # XXX TODO send an email with the details.
+
     app.logger.info("user %d started BankTransfer payment for %s" % (current_user.id, payment.bankref))
 
-    session.pop("count", None)
-    session.pop("bought", None)
-    return render_template('transfer-start.html', payment=payment)
+    payment.state = "inprogress"
+    db.session.add(payment)
+    db.session.commit()
 
-@app.route("/pay/terms")
-def ticket_terms():
-    return render_template('terms.html')
+    return redirect(url_for('transfer_waiting', payment=payment.id))
+
+@app.route("/pay/transfer-waiting")
+@feature_flag('PAYMENTS')
+@login_required
+def transfer_waiting():
+    payment_id = int(request.args.get('payment'))
+    payment = current_user.payments.filter_by(id=payment_id, user=current_user).one()
+    return render_template('transfer-waiting.html', payment=payment, days=app.config.get('EXPIRY_DAYS'))
+

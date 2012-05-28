@@ -2,8 +2,8 @@
 {% block body %}
 <p>Oh Well!</p>
 
-<p>Your GoCardless Direct Debit payment for {% if paid > 1 %}{{paid}} tickets{% else %}a ticket{% endif %} has been
-canceled.</p>
+<p>Your GoCardless Direct Debit payment for {{ payment.amount }} has been
+   canceled.</p>
 
 <p>We still hope to see you at <a href="http://www.emfcamp.org/">EMFCamp2012</a>, but you'll need to buy a ticket if you change your mind!</p>
 
