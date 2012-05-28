@@ -2,6 +2,15 @@ from main import db
 from decimal import Decimal
 from datetime import datetime, timedelta
 
+class ConstTicketType(object):
+    def __init__(self, name):
+        self.name = name
+        self.val = None
+
+    def __get__(self, obj, objtype):
+        if not self.val:
+            self.val = objtype.query.filter_by(name=self.name).one()
+        return self.val
 
 class TicketType(db.Model):
     __tablename__ = 'ticket_type'
@@ -25,6 +34,9 @@ class TicketType(db.Model):
     @cost.setter
     def cost(self, val):
         self.cost_pence = int(val * 100)
+
+    Prepay = ConstTicketType('Prepay Camp Ticket')
+
 
 class Ticket(db.Model):
     __tablename__ = 'ticket'

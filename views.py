@@ -2,13 +2,19 @@ from main import app, db, gocardless, mail
 from models.user import User, PasswordReset
 from models.payment import Payment
 from models.ticket import TicketType, Ticket
-from flask import render_template, redirect, request, flash, url_for, abort, send_from_directory, session
-from flaskext.login import login_user, login_required, logout_user, current_user
+
+from flask import \
+    render_template, redirect, request, flash, \
+    url_for, abort, send_from_directory, session
+from flaskext.login import \
+    login_user, login_required, logout_user, current_user
 from flaskext.mail import Message
 from flaskext.wtf import \
     Form, Required, Email, EqualTo, ValidationError, \
     TextField, PasswordField, SelectField
+
 from sqlalchemy.exc import IntegrityError
+
 from decorator import decorator
 import simplejson, os
 
@@ -140,20 +146,16 @@ def logout():
     return redirect('/')
 
 class ChoosePrepayTicketsForm(Form):
-    Prepay = TicketType.query.filter_by(name='Prepay Camp Ticket').one()
-    count = IntegerSelectField('Number of tickets', [Required()], max=Prepay.limit)
+    count = IntegerSelectField('Number of tickets', [Required()], max=TicketType.Prepay.limit)
 
     def validate_count(form, field):
-        Prepay = TicketType.query.filter_by(name='Prepay Camp Ticket').one()
-        paid = current_user.tickets.filter_by(type=Prepay, paid=True).count()
+        paid = current_user.tickets.filter_by(type=TicketType.Prepay, paid=True).count()
         if field.data < paid:
             raise ValidationError('You already have paid for %d tickets' % paid)
 
 @app.route("/pay", methods=['GET', 'POST'])
 @login_required
 def pay():
-    Prepay = TicketType.query.filter_by(name='Prepay Camp Ticket').one()
-    
     # have they bought something?
     if "bought" not in session:
         session["bought"] = False
@@ -178,16 +180,15 @@ def pay():
     for t in ts:
         tickets[t.id] = {"expired": t.expired(), "paid": t.paid, "payment" : t.payment}
 
-    return render_template("pay.html", form=form, total=session["count"] * Prepay.cost, tickets=tickets, bought=session["bought"])
+    return render_template("pay.html", form=form, total=session["count"] * TicketType.Prepay.cost, tickets=tickets, bought=session["bought"])
 
 def buy_some_tickets(provider, count):
-    Prepay = TicketType.query.filter_by(name='Prepay Camp Ticket').one()
     p = Payment(provider, current_user)
     db.session.add(p)
     db.session.commit()
 
     for i in range(0, count):
-        current_user.tickets.append(Ticket(type_id=Prepay.id, payment=p))
+        current_user.tickets.append(Ticket(type_id=TicketType.Prepay.id, payment=p))
         db.session.add(current_user)
         db.session.commit()
 
@@ -206,9 +207,8 @@ def company():
 @login_required
 def gocardless_start():
     unpaid = session["count"]
-    Prepay = TicketType.query.filter_by(name='Prepay Camp Ticket').one()
     payment = buy_some_tickets("GoCardless", unpaid)
-    amount = Prepay.cost * unpaid
+    amount = TicketType.Prepay.cost * unpaid
 
     bill_url = gocardless.client.new_bill_url(amount, name="Electromagnetic Field Ticket Deposit", state=payment.id)
 
@@ -370,9 +370,8 @@ def gocardless_webhook():
 @login_required
 def transfer_start():
     unpaid = session["count"]
-    Prepay = TicketType.query.filter_by(name='Prepay Camp Ticket').one()
     payment = buy_some_tickets("BankTransfer", unpaid)
-    amount = Prepay.cost * unpaid
+    amount = TicketType.Prepay.cost * unpaid
     
     # XXX TODO send an email with the details.
     app.logger.info("user %d started BankTransfer payment for %s" % (current_user.id, payment.bankref))
