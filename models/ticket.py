@@ -45,25 +45,21 @@ class Ticket(db.Model):
     type_id = db.Column(db.Integer, db.ForeignKey('ticket_type.id'), nullable=False)
     paid = db.Column(db.Boolean, default=False, nullable=False)
     expires = db.Column(db.DateTime, nullable=False)
-    payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'), nullable=False)
+    payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
 
-    def __init__(self, type=None, type_id=None, paid=False, payment=None):
+    def __init__(self, type=None, type_id=None):
         if type:
             self.type = type
+            self.type_id = type.type_id
         elif type_id is not None:
             self.type_id = type_id
+            self.type = TicketType.query.filter_by(id=TicketType.Prepay.id).one()
         else:
             raise ValueError('Type must be specified')
 
-        if payment is None:
-            raise ValueError('Payment must be specified')
-
-        self.paid = paid
         self.expires = datetime.utcnow() + timedelta(days=10)
-        self.payment = payment
 
     def expired(self):
-        # can't be expired if it's been paid!
         if self.paid:
             return False
         return self.expires < datetime.utcnow()

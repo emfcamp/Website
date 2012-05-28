@@ -2,35 +2,54 @@
 {% extends "base.html" %}
 {% block body %}
 
-{% if tickets|count > 0 %}
+{% if tickets %}
 <p>Your current tickets:</p>
 
-<table class=buyform>
-<tr><th>Id</th><th>Paid</th><th>Expired</th></tr>
+<table class="tickets">
+<tr><th>Type</th><th>Status</th></tr>
+
 {% for t in tickets %}
 
-<tr class="{{ loop.cycle('buyformtdodd', 'buyformtdeven') }}">
-<td>{{ t }}</td>
+<tr class="
+{{ loop.cycle('odd', 'even') }}
+{% if t.paid %}paid{% endif%}
+{% if t.expired() %}expired{% endif %}
+">
+<td>{{ t.type.name }}</td>
 <td>
-{% if tickets[t].paid %}
-<font class=good>Yes!</font>
-{% else %}
-not yet
-{% endif %}
-</td><td>
-{% if not tickets[t].paid %}
-	{% if tickets[t].expired %}
-	<font class=bad>Yes :(</font>
-	{% else %}
-	not yet, pay soon!
-	{% endif %}
-{% endif %}
+    {% if t.paid %}
+    Paid
+    {% elif t.expired() %}
+    Expired
+    {% else %}
+    Pending
+    {% endif %}
 </td>
 </tr>
 
 {% endfor %}
+
 </table>
 <br/>
+
+{% endif %}
+
+{% if payments %}
+Your payments:
+
+<table>
+<tr><th>Type</th><th>Amount</th><th>Progress</th><th></th></tr>
+{% for p in payments %}
+<tr>
+
+<td>{{ p.name }}</td>
+<td>{{ format_price(p.amount) }}</td>
+<td>{{ p.state }}</td>
+<td><a href="">Cancel</a></td>
+
+</tr>
+{%endfor%}
+</table>
 
 {% endif %}
 

@@ -1,6 +1,6 @@
 from main import app, db, gocardless, mail
 from models.user import User, PasswordReset
-from models.payment import Payment
+from models.payment import Payment, BankPayment, GoCardlessPayment
 from models.ticket import TicketType, Ticket
 
 from flask import \
@@ -145,6 +145,7 @@ def logout():
     logout_user()
     return redirect('/')
 
+
 class ChoosePrepayTicketsForm(Form):
     count = IntegerSelectField('Number of tickets', [Required()], max=TicketType.Prepay.limit)
 
@@ -175,24 +176,32 @@ def pay():
 
         return redirect(url_for('pay'))
 
-    tickets = {}
-    ts = current_user.tickets.all()
-    for t in ts:
-        tickets[t.id] = {"expired": t.expired(), "paid": t.paid, "payment" : t.payment}
+    tickets = current_user.tickets.all()
+    payments = current_user.payments.all()
 
-    return render_template("pay.html", form=form, total=session["count"] * TicketType.Prepay.cost, tickets=tickets, bought=session["bought"])
+    return render_template("pay.html",
+        form=form,
+        total=session["count"] * TicketType.Prepay.cost,
+        tickets=tickets,
+        payments=payments,
+        bought=session["bought"])
 
-def buy_some_tickets(provider, count):
-    p = Payment(provider, current_user)
-    db.session.add(p)
+def buy_prepay_tickets(count, paymenttype):
+
+    tickets = [Ticket(type_id=TicketType.Prepay.id) for i in range(count)]
+    amount = sum(t.type.cost for t in tickets)
+
+    payment = paymenttype(amount)
+    current_user.payments.append(payment)
+
+    for t in tickets:
+        t.payment = payment
+        current_user.tickets.append(t)
+
+    db.session.add(current_user)
     db.session.commit()
 
-    for i in range(0, count):
-        current_user.tickets.append(Ticket(type_id=TicketType.Prepay.id, payment=p))
-        db.session.add(current_user)
-        db.session.commit()
-
-    return p
+    return payment
 
 @app.route("/sponsors")
 def sponsors():
@@ -206,13 +215,11 @@ def company():
 @feature_flag('PAYMENTS')
 @login_required
 def gocardless_start():
-    unpaid = session["count"]
-    payment = buy_some_tickets("GoCardless", unpaid)
-    amount = TicketType.Prepay.cost * unpaid
+    payment = buy_prepay_tickets(session['count'], GoCardlessPayment)
 
-    bill_url = gocardless.client.new_bill_url(amount, name="Electromagnetic Field Ticket Deposit", state=payment.id)
+    bill_url = payment.bill_url("Electromagnetic Field Ticket Deposit")
 
-    return redirect(bill_url)
+    return redirect(payment. bill_url)
 
 @app.route("/pay/gocardless-complete")
 @feature_flag('PAYMENTS')
@@ -365,20 +372,19 @@ def gocardless_webhook():
 
     return ret
 
+
 @app.route("/pay/transfer-start")
 @feature_flag('PAYMENTS')
 @login_required
 def transfer_start():
-    unpaid = session["count"]
-    payment = buy_some_tickets("BankTransfer", unpaid)
-    amount = TicketType.Prepay.cost * unpaid
-    
+    payment = buy_prepay_tickets(session['count'], BankPayment)
+
     # XXX TODO send an email with the details.
     app.logger.info("user %d started BankTransfer payment for %s" % (current_user.id, payment.bankref))
 
     session.pop("count", None)
     session.pop("bought", None)
-    return render_template('transfer-start.html', amount=amount, bankref=payment.bankref)
+    return render_template('transfer-start.html', payment=payment)
 
 @app.route("/pay/terms")
 def ticket_terms():

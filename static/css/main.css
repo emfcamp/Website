@@ -38,6 +38,27 @@ p.summary {
     font-size: 130%
 }
 
+table {
+    margin: 1ex 0.5em;
+}
+
+td, th {
+    padding: 1ex 0.5em;
+}
+
+th {
+    font-weight: bold;
+}
+
+tr.even {
+    background-color: #ddd;
+}
+
+tr.odd {
+    background-color: #eee;
+}
+
+
 #google-form { margin-top:5px; margin-bottom: 5px; position:relative; left: 237px; border: 1px solid #aaa; padding:5px;}
 
 #ft {
@@ -94,35 +115,11 @@ dl.bank-details {
   padding-right: 3px;
 }
 
-.good {
-	font-weight: bold;
-	color: #0f0;
+
+table.tickets tr.paid {
+  color: #0f0;
 }
 
-.bad {
-	font-weight: bold;
-	color: #f00;
-}
-
-table.buyform {
-	padding: 2px 2px 2px 2px;
-}
-
-table.buyform td {
-	padding: 5px 5px 5px 5px;
-}
-
-table.buyform th {
-	padding: 5px 5px 5px 5px;
-	font-weight: bold;
-}
-
-tr.buyformtdeven {
-	background-color: #ddd;
-	padding: 2px 2px 2px 2px;
-}
-
-tr.buyformtdodd {
-	background-color: #eee;
-	padding: 2px 2px 2px 2px;
+table.tickets tr.expired {
+  color: #f00;
 }
