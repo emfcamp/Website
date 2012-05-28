@@ -6,10 +6,11 @@
 
 import ofxparse, sys
 from flaskext.script import Command, Manager, Option
-from flask import Flask
+from flask import Flask, render_template
 from flask.ext.sqlalchemy import SQLAlchemy
 from flaskext.mail import Mail
 from sqlalchemy.orm.exc import NoResultFound
+from jinja2 import Environment, FileSystemLoader
 
 from decimal import Decimal
 import re
@@ -102,6 +103,34 @@ class Reconcile(Command):
       if not self.quiet:
         print t, t.type, t.payee
 
+class TestEmails(Command):
+  """
+    Test our email templates
+  """
+
+  def run(self):
+    for num in (1,2):
+      for t in ("tickets-purchased-email-gocardless.txt", "tickets-paid-email-gocardless.txt"):
+        self.test(t, num, "012SDJADG")
+        print
+        print "*" * 42
+        print
+
+    for num in (1,2):
+      for t in ("tickets-purchased-email-banktransfer.txt", "tickets-paid-email-banktransfer.txt"):
+        self.test(t, num, "A23FBJA4")
+        print
+        print "*" * 42
+        print
+
+  def test(self, template, count, ref):
+#    template = env.get_template(template)
+    cost = 30.00 * count
+    basket = { "cost" : cost, "count" : count, "reference" : ref }
+    output = render_template(template, basket=basket, user = {"name" : "J R Hartley"}, payment={"amount" : cost, "bankref": ref})
+    print output
+
 if __name__ == "__main__":
   manager.add_command('reconcile', Reconcile())
+  manager.add_command('testemails', TestEmails())
   manager.run()

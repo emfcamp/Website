@@ -1,0 +1,43 @@
+Hi, {{ user.name }},
+
+{% if basket.count == 1 -%}
+This is to confirm that you've bought a prepay ticket
+for {{ format_price(payment.amount) }} for EMFCamp 2012!
+{%- else -%}
+This is to confirm that you've bought {{ basket.count }} prepay tickets
+for {{ format_price(payment.amount) }} for EMFCamp 2012!
+{%- endif %}
+
+Pay by bank transfer
+--------------------
+
+You can pay by CHAPS/Faster Payments, or by cash at your bank.
+
+We will use the reference to identify the payment as yours, so please
+ensure it's included in full.
+
+Bank:           Barclays
+Payee:          Electromagnetic Field Ltd
+Sort code:      20-71-64
+Account number: 73590526
+Amount:         {{ format_price(payment.amount) }}
+Reference:      {{ format_bankref(payment.bankref) }}
+
+International transfers
+-----------------------
+
+You can pay directly into our GBP bank account:
+
+SWIFT BARCGB22
+IBAN GB39 BARC 2071 6473 5905 26
+
+Your tickets will be held in your name for 10 days, so please remember to
+pay promptly.
+
+We will send another email when we've received your payment.
+
+See you soon,
+
+Love,
+
+all at the EMFCamp Team.

@@ -1,0 +1,10 @@
+Hi, {{ user.name }},
+
+We've just received confirmation from GoCardless that your payment for
+{% if basket.count > 1 %}{{ basket.count }} EMFCamp prepay tickets{% else %}your EMFCamp prepay ticket{% endif %} has cleared.
+
+Thank you for helping us get the camp running by buying a prepay ticket!
+
+Love,
+
+everyone at the EMFCamp Team.
