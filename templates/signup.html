@@ -4,8 +4,9 @@
 <h2>Sign up</h2>
 <p>We need an email address and password before we can accept payment.</p>
 <form method=post>
+  {{ form.hidden_tag() }}
+  {{ form.hidden_tag('next') }}
   <dl>
-    {{ form.hidden_tag() }}
     {{ render_field(form.name) }}
     {{ render_field(form.email) }}
     {{ render_field(form.password) }}

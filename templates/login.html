@@ -3,6 +3,7 @@
 {% block body %}
 <form method=post>
     {{form.hidden_tag()}}
+    {{form.hidden_tag('next')}}
 <dl>
     {{ render_field(form.email) }}
     {{ render_field(form.password) }}
@@ -10,5 +11,5 @@
     <input type=submit name="Login"/>
 </form>
 <a href="{{ url_for('forgot_password') }}">Forgot password</a>
-<a href="{{ url_for('signup') }}">Sign up</a>
+<a href="{{ url_for('signup', next=form.next.data) }}">Sign up</a>
 {% endblock %}

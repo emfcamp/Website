@@ -16,7 +16,7 @@ from flaskext.wtf import \
 from sqlalchemy.exc import IntegrityError
 
 from decorator import decorator
-import simplejson, os
+import simplejson, os, re
 from datetime import datetime, timedelta
 
 def feature_flag(flag):
@@ -55,19 +55,29 @@ def company():
     return render_template('company.html')
 
 
+class NextURLField(TextField):
+    def _value(self):
+        # Cheap way of ensuring we don't get absolute URLs
+        if not self.data or '//' in self.data:
+            return ''
+        if not re.match('^[-a-z/?=&]+$', self.data):
+            return ''
+        return self.data
+
 class LoginForm(Form):
     email = TextField('Email', [Email(), Required()])
     password = PasswordField('Password', [Required()])
+    next = NextURLField('Next')
 
 @app.route("/login", methods=['GET', 'POST'])
 @feature_flag('PAYMENTS')
 def login():
-    form = LoginForm(request.form)
+    form = LoginForm(request.form, next=request.args.get('next'))
     if request.method == 'POST' and form.validate():
         user = User.query.filter_by(email=form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user)
-            return redirect(request.args.get('next') or url_for('tickets'))
+            return redirect(form.next.data or url_for('tickets'))
         else:
             flash("Invalid login details!")
     return render_template("login.html", form=form)
@@ -77,11 +87,13 @@ class SignupForm(Form):
     email = TextField('Email', [Email(), Required()])
     password = PasswordField('Password', [Required(), EqualTo('confirm', message='Passwords do not match')])
     confirm = PasswordField('Confirm password', [Required()])
+    next = NextURLField('Next')
 
 @app.route("/signup", methods=['GET', 'POST'])
 @feature_flag('PAYMENTS')
 def signup():
-    form = SignupForm(request.form)
+    form = SignupForm(request.form, next=request.args.get('next'))
+
     if request.method == 'POST' and form.validate():
         user = User(form.email.data, form.name.data)
         user.set_password(form.password.data)
@@ -91,7 +103,7 @@ def signup():
         except IntegrityError, e:
             raise
         login_user(user)
-        return redirect(request.args.get('next') or url_for('tickets'))
+        return redirect(form.next.data or url_for('tickets'))
 
     return render_template("signup.html", form=form)
 
