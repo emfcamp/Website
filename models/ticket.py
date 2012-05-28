@@ -69,4 +69,4 @@ class Ticket(db.Model):
         return self.expires < datetime.utcnow()
     
     def __repr__(self):
-        return "<Ticket: %d, type: %d, paid? %d, expired: %s>" % (self.id, self.type_id, self.paid, str(self.expired()))
+        return "<Ticket: %s, type: %s, paid? %s, expired: %s>" % (self.id, self.type_id, self.paid, str(self.expired()))
