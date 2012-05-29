@@ -8,16 +8,16 @@ import ofxparse, sys
 from flaskext.script import Command, Manager, Option
 from flask import Flask, render_template
 from flask.ext.sqlalchemy import SQLAlchemy
-from flaskext.mail import Mail
+from flaskext.mail import Mail, Message
 from sqlalchemy.orm.exc import NoResultFound
 from jinja2 import Environment, FileSystemLoader
 
 from decimal import Decimal
 import re
 
-from main import app
+from main import app, mail
 from models import User, TicketType
-from models.payment import Payment, safechars
+from models.payment import Payment, BankPayment, safechars
 
 #app = Flask(__name__)
 #app.config.from_envvar('SETTINGS_FILE')
@@ -56,7 +56,7 @@ class Reconcile(Command):
     for f in found:
       bankref = f.replace('-', '')
       try:
-        return Payment.query.filter_by(bankref=bankref).one()
+        return BankPayment.query.filter_by(bankref=bankref).one()
       except NoResultFound:
         continue
     else:
@@ -80,6 +80,8 @@ class Reconcile(Command):
         for t in unpaid:
           if t.paid == False:
             total += Decimal(str(t.type.cost_pence / 100.0))
+          else:
+            print "attempt to pay for ticket twice: %d" % (t.id)
 
         if total == 0:
           # nothing owed, so an old payment...
@@ -98,6 +100,17 @@ class Reconcile(Command):
               t.paid = True
             payment.state = "paid"
             s.commit()
+            # send email
+            # tickets-paid-email-banktransfer.txt
+            msg = Message("EMFCamp 2012 ticket purchase update.", \
+                          sender=("EMF Camp 2012", app.config.get('EMAIL')), \
+                          recipients=[payment.user.email]
+                         )
+            msg.body = render_template("tickets-paid-email-banktransfer.txt", \
+                          basket={"count" : len(payment.tickets.all()), "reference" : payment.bankref}, \
+                          user = payment.user, payment=payment
+                         )
+            mail.send(msg)
 
     else:
       if not self.quiet:
@@ -111,6 +124,8 @@ class TestEmails(Command):
   def run(self):
     for num in (1,2):
       for t in ("tickets-purchased-email-gocardless.txt", "tickets-paid-email-gocardless.txt"):
+        print "template:", t
+        print
         self.test(t, num, "012SDJADG")
         print
         print "*" * 42
@@ -118,15 +133,16 @@ class TestEmails(Command):
 
     for num in (1,2):
       for t in ("tickets-purchased-email-banktransfer.txt", "tickets-paid-email-banktransfer.txt"):
+        print "template:", t
+        print
         self.test(t, num, "A23FBJA4")
         print
         print "*" * 42
         print
 
   def test(self, template, count, ref):
-#    template = env.get_template(template)
     cost = 30.00 * count
-    basket = { "cost" : cost, "count" : count, "reference" : ref }
+    basket = { "count" : count, "reference" : ref }
     output = render_template(template, basket=basket, user = {"name" : "J R Hartley"}, payment={"amount" : cost, "bankref": ref})
     print output
 

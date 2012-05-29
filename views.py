@@ -321,8 +321,15 @@ def gocardless_complete():
 
     app.logger.info("Payment completed OK")
 
-    # TODO send an email with the details.
     # should we send the resource_uri in the bill email?
+    msg = Message("EMFCamp 2012 ticket purchase.", \
+        sender=("EMF Camp 2012", app.config.get('EMAIL')),
+        recipients=[user.email]
+    )
+    msg.body = render_template("tickets-purchased-email-gocardless.txt", \
+        basket={"count" : len(payment.tickets.all()), "reference" : gcid}, \
+        user = user, payment=payment)
+    mail.send(msg)
 
     return redirect(url_for('gocardless_waiting', payment=payment_id))
 
@@ -356,9 +363,6 @@ def gocardless_cancel():
 
     db.session.add(current_user)
     db.session.commit()
-
-    # TODO send an email with the details.
-    # should we send the resource_uri in the bill email?
 
     app.logger.info("Payment completed OK")
 
@@ -421,7 +425,14 @@ def gocardless_webhook():
             db.session.add(payment)
             db.session.commit()
 
-            # TODO email the user
+            msg = Message("EMFCamp 2012: your ticket payment has been confirmed", \
+                sender=("EMF Camp 2012", app.config.get('EMAIL')),
+                recipients=[payment.user.email]
+            )
+            msg.body = render_template("tickets-paid-email-gocardless.txt", \
+                basket={"count" : len(payment.tickets.all()), "reference" : gcid}, \
+                user = payment.user, payment=payment)
+            mail.send(msg)
 
         else:
             app.logger.debug('Payment: %s', bill)
@@ -435,13 +446,20 @@ def gocardless_webhook():
 def transfer_start():
     payment = buy_prepay_tickets(BankPayment)
 
-    # XXX TODO send an email with the details.
-
     app.logger.info("User %s created bank payment %s (%s)", current_user.id, payment.id, payment.bankref)
 
     payment.state = "inprogress"
     db.session.add(payment)
     db.session.commit()
+
+    msg = Message("EMFCamp 2012 ticket purchase.", \
+        sender=("EMF Camp 2012", app.config.get('EMAIL')), \
+        recipients=[current_user.email]
+    )
+    msg.body = render_template("tickets-purchased-email-banktransfer.txt", \
+        basket={"count" : len(payment.tickets.all()), "reference" : payment.bankref}, \
+        user = current_user, payment=payment)
+    mail.send(msg)
 
     return redirect(url_for('transfer_waiting', payment=payment.id))
 
