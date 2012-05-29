@@ -214,12 +214,19 @@ def tickets():
     form.count.values = range(1, TicketType.Prepay.limit + 1)
 
     if request.method == 'POST' and form.validate():
+        if "inprogress" in session:
+            # don't let people buy more tickets without
+            # having paid for existing ones.
+            return redirect(url_for('pay_choose'))
+
         for i in range(form.count.data):
             t = Ticket(type_id=TicketType.Prepay.id)
             current_user.tickets.append(t)
 
         db.session.add(current_user)
         db.session.commit()
+
+        session["inprogress"] = True
 
         if form.pay.data:
             return redirect(url_for('pay_choose', provider=form.provider.data))
@@ -275,8 +282,10 @@ def pay():
 def pay_choose():
     provider = request.args.get('provider')
     if provider == 'gocardless':
+        session.pop('inprogress', None)
         return redirect(url_for('gocardless_start'))
     elif provider == 'banktransfer':
+        session.pop('inprogress', None)
         return redirect(url_for('transfer_start'))
 
     return render_template('payment-choose.html', next='pay_choose')
