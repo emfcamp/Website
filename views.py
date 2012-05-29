@@ -100,6 +100,8 @@ class SignupForm(Form):
 @app.route("/signup", methods=['GET', 'POST'])
 @feature_flag('PAYMENTS')
 def signup():
+    if current_user.is_authenticated():
+        return redirect(url_for('tickets'))
     form = SignupForm(request.form, next=request.args.get('next'))
 
     if request.method == 'POST' and form.validate():
