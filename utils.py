@@ -139,6 +139,12 @@ class TestEmails(Command):
         print
         print "*" * 42
         print
+    
+    t = "welcome-email.txt"
+    print  "template:", t
+    print
+    output = render_template(t, user = {"name" : "J R Hartley", "email": "jrh@flyfishing.net"})
+    print output
 
   def test(self, template, count, ref):
     cost = 30.00 * count
