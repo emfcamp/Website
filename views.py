@@ -14,6 +14,7 @@ from flaskext.wtf import \
     TextField, PasswordField, SelectField, SubmitField
 
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import NoResultFound
 
 from decorator import decorator
 import simplejson, os, re
