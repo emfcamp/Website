@@ -111,8 +111,17 @@ def signup():
         try:
             db.session.commit()
         except IntegrityError, e:
-            raise
+            flash("Email address %s is already in use, please use another or reset your password" % (form.email.data))
+            return redirect(url_for('signup'))
         login_user(user)
+
+        # send a welcome email.
+        msg = Message("Welcome to EMF Camp",
+                sender=("EMF Camp 2012", app.config.get('EMAIL')),
+                recipients=[user.email])
+        msg.body = render_template("welcome-email.txt", user=user)
+        mail.send(msg)
+
         return redirect(form.next.data or url_for('tickets'))
 
     return render_template("signup.html", form=form)
