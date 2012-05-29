@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 {% block body %}
+
+{% if config.get('PAYMENTS') %}
+<center><h3><a href="{{ url_for('signup') }}">Buy pre-sale tickets now</a></h3></center>
+{% endif %}
+
 <h2>What?</h2>
 
 <p class="summary">Electromagnetic Field is a three-day camping festival for people with an inquisitive mind and an interest in science, engineering, technology, DIY, and computer security.</p>
@@ -20,10 +25,18 @@
     <li>Read <a href="http://wiki.emfcamp.org">our wiki</a></li>
     <li>Subscribe to <a href="http://blog.emfcamp.org">our blog</a></li>
 </ul>
+
 <h2>Count Me In!</h2>
+{% if config.get('PAYMENTS') %}
+<p>Presales are now open</p>
+<a href="{{ url_for('signup') }}">Buy your ticket now</a>
+
+{% else %}
 <p>To help us get an idea of numbers, we'd appreciate it if you filled in this quick form to give us an
     idea of interest. There's no obligation to come and we'll only use your email address to contact
     you about the camp.</p>
 <iframe src="https://docs.google.com/spreadsheet/embeddedform?formkey=dFdQUlA2dkY3dXREaTlHbHIyZXFpc1E6MQ" id="google-form"
     width="270" height="600" frameborder="0" marginheight="0" marginwidth="0" scrolling="no">Loading...</iframe>
+{% endif %}
+
 {% endblock %}
