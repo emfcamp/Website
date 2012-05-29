@@ -335,11 +335,11 @@ def gocardless_complete():
     # should we send the resource_uri in the bill email?
     msg = Message("EMFCamp 2012 ticket purchase.", \
         sender=("EMF Camp 2012", app.config.get('EMAIL')),
-        recipients=[user.email]
+        recipients=[payment.user.email]
     )
     msg.body = render_template("tickets-purchased-email-gocardless.txt", \
         basket={"count" : len(payment.tickets.all()), "reference" : gcid}, \
-        user = user, payment=payment)
+        user = payment.user, payment=payment)
     mail.send(msg)
 
     return redirect(url_for('gocardless_waiting', payment=payment_id))
