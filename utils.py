@@ -16,7 +16,7 @@ from decimal import Decimal
 import re
 
 from main import app
-from models import User
+from models import User, TicketType
 from models.payment import Payment, safechars
 
 #app = Flask(__name__)
@@ -130,7 +130,20 @@ class TestEmails(Command):
     output = render_template(template, basket=basket, user = {"name" : "J R Hartley"}, payment={"amount" : cost, "bankref": ref})
     print output
 
+class CreateTickets(Command):
+    def run(self):
+        try:
+            prepay = TicketType.query.filter_by(name='Prepay Camp Ticket').one()
+        except NoResultFound, e:
+            prepay = TicketType('Prepay Camp Ticket', 250, 4, 30.00)
+            db.session.add(prepay)
+            db.session.commit()
+
+        print 'Tickets created'
+
+
 if __name__ == "__main__":
   manager.add_command('reconcile', Reconcile())
   manager.add_command('testemails', TestEmails())
+  manager.add_command('createtickets', CreateTickets())
   manager.run()

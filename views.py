@@ -29,11 +29,18 @@ def feature_flag(flag):
 class IntegerSelectField(SelectField):
     def __init__(self, *args, **kwargs):
         kwargs['coerce'] = int
-        fmt = kwargs.pop('fmt', str)
-        min = kwargs.pop('min', 1)
-        max = kwargs.pop('max')
-        kwargs['choices'] = [(i, fmt(i)) for i in range(min, max + 1)]
+        self.fmt = kwargs.pop('fmt', str)
+        self.values = kwargs.pop('values', [])
         SelectField.__init__(self, *args, **kwargs)
+
+    @property
+    def values(self):
+        return self._values
+
+    @values.setter
+    def values(self, vals):
+        self._values = vals
+        self.choices = [(i, self.fmt(i)) for i in vals]
 
 
 @app.route("/")
@@ -171,7 +178,7 @@ def logout():
 
 
 class ChoosePrepayTicketsForm(Form):
-    count = IntegerSelectField('Number of tickets', [Required()], max=TicketType.Prepay.limit)
+    count = IntegerSelectField('Number of tickets', [Required()])
     provider = TextField('Provider')
     pay = SubmitField('Pay')
     choose = SubmitField('Choose')
@@ -192,6 +199,7 @@ class ChoosePrepayTicketsForm(Form):
 @login_required
 def tickets():
     form = ChoosePrepayTicketsForm(request.form, provider=request.args.get('provider'))
+    form.count.values = range(1, TicketType.Prepay.limit + 1)
 
     if request.method == 'POST' and form.validate():
         for i in range(form.count.data):

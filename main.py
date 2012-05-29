@@ -49,13 +49,6 @@ from views import *
 from models import *
 db.create_all()
 
-try:
-    Prepay = TicketType.query.filter_by(name='Prepay Camp Ticket').one()
-except NoResultFound, e:
-    Prepay = TicketType('Prepay Camp Ticket', 250, 4, 30.00)
-    db.session.add(Prepay)
-    db.session.commit()
-
 @login_manager.user_loader
 def load_user(userid):
     return User.query.filter_by(id=userid).first()
