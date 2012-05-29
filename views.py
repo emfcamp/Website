@@ -395,6 +395,7 @@ def gocardless_webhook():
     data = json_data['payload']
 
     if not gocardless.client.validate_webhook(data):
+        app.logger.error("unable to validate gocardless webhook")
         return ('', 403)
 
     app.logger.info("gocardless-webhook: %s %s", data.get('resource_type'), data.get('action'))
