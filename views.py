@@ -400,7 +400,11 @@ def gocardless_webhook():
 
     for bill in data['bills']:
         gcid = bill['id']
-        payment = GoCardlessPayment.query.filter_by(gcid=gcid).one()
+        try:
+            payment = GoCardlessPayment.query.filter_by(gcid=gcid).one()
+        except NoResultFound:
+            app.logger.warn('Payment %s not found, ignoring', gcid)
+            continue
 
         app.logger.info("Processing payment %s (%s) for user %s",
             payment.id, gcid, payment.user.id)
