@@ -40,12 +40,15 @@ Your payments:
 <table>
 <tr><th>Type</th><th>Amount</th><th>Progress</th><th></th></tr>
 {% for p in payments %}
-<tr>
+<tr class="
+{{ loop.cycle('odd', 'even') }}
+">
 
 <td>{{ p.name }}</td>
 <td>{{ format_price(p.amount) }}</td>
 <td>{{ p.state }}</td>
-<td><a href="">Cancel</a></td>
+<!-- <td>{% if p.state != "paid" %}<a href="">Cancel</a>{% endif %} -->
+</td>
 
 </tr>
 {%endfor%}
