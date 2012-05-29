@@ -375,7 +375,7 @@ def gocardless_cancel():
     db.session.add(current_user)
     db.session.commit()
 
-    app.logger.info("Payment completed OK")
+    app.logger.info("Payment cancelation completed OK")
 
     return render_template('gocardless-cancel.html', payment=payment)
 
