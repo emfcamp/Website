@@ -1,4 +1,6 @@
 from main import db, gocardless
+from flask import url_for
+
 import random
 import re
 from decimal import Decimal
@@ -48,7 +50,9 @@ class GoCardlessPayment(Payment):
     gcid = db.Column(db.String, unique=True)
 
     def bill_url(self, name):
-        return gocardless.client.new_bill_url(self.amount, name=name, state=self.id)
+        return gocardless.client.new_bill_url(self.amount, name=name,
+            redirect_uri=url_for('gocardless_complete', payment=self.id, _external=True),
+            cancel_uri=url_for('gocardless_cancel', payment=self.id, _external=True))
 
 
 class PaymentChange(db.Model):

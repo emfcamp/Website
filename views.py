@@ -127,7 +127,7 @@ def forgot_password():
             db.session.add(reset)
             db.session.commit()
             msg = Message("EMF Camp password reset",
-                sender=("EMF Camp 2012", "contact@emfcamp.org.uk"),
+                sender=("EMF Camp 2012", app.config.get('EMAIL')),
                 recipients=[form.email.data])
             msg.body = render_template("reset-password-email.txt", user=form._user, reset=reset)
             mail.send(msg)
@@ -218,7 +218,10 @@ def tickets():
         total=TicketType.Prepay.cost,
     )
 
-def buy_prepay_tickets(count, paymenttype):
+def buy_prepay_tickets(paymenttype):
+    """
+    Temporary procedure to create a payment for all outstanding tickets
+    """
 
     tickets = current_user.tickets.filter_by(payment_id=None)
     amount = sum(t.type.cost for t in tickets)
@@ -268,48 +271,49 @@ def ticket_terms():
 @feature_flag('PAYMENTS')
 @login_required
 def gocardless_start():
-    payment = buy_prepay_tickets(session['count'], GoCardlessPayment)
+    payment = buy_prepay_tickets(GoCardlessPayment)
+
+    app.logger.info("User %s created GoCardless payment %s", current_user.id, payment.id)
 
     bill_url = payment.bill_url("Electromagnetic Field Ticket Deposit")
 
     return redirect(bill_url)
 
+
 @app.route("/pay/gocardless-complete")
 @feature_flag('PAYMENTS')
 @login_required
 def gocardless_complete():
+    payment_id = int(request.args.get('payment'))
+
+    app.logger.info("gocardless-complete: userid %s, payment_id %s, gcid %s",
+        current_user.id, payment_id, request.args.get('resource_id'))
+
     try:
         gocardless.client.confirm_resource(request.args)
-    except (gocardless.exceptions.ClientError, gocardless.exceptions.SignatureError) as e:
-        app.logger.exception("userid: %d: Gocardless-complete exception %s" % (current_user.id, e))
-        flash("An error occurred with your payment, please contact info@emfcamp.org")
-        return redirect(url_for('main'))
 
-    if request.args["resource_type"] != "bill":
-        app.logger.error("Gocardless-complete didn't get a bill!" % (str(request.args)))
-        try:
-            app.logger.error("Gocardless-complete: userid %d" % (current_user.id))
-        except:
-            pass
-        
-    payment_id = int(request.args["state"])
-    gcid = request.args["resource_id"]
-    # TODO send an email with the details.
-    # should we send the resource_uri in the bill email?
-    app.logger.info("user %d started gocardless payment for %s, gcid %s" % (current_user.id, payment_id, gcid))
+        if request.args["resource_type"] != "bill":
+            raise ValueError("GoCardless resource type %s, not bill" % request.args['resource_type'])
 
-    try:
+        gcid = request.args["resource_id"]
+
         payment = current_user.payments.filter_by(id=payment_id).one()
+
     except Exception, e:
-        app.logger.error("Exception getting gocardless payment %s: %s" % (payment_id, e))
-        flash("An error occurred with your payment, please contact tickets@emfcamp.org")
-        return redirect(url_for('main'))
+        app.logger.error("gocardless-complete exception: %s", e)
+        flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL'))
+        return redirect(url_for('tickets'))
 
     # keep the gocardless reference so we can find the payment when we get called by the webhook
     payment.gcid = gcid
     payment.state = "inprogress"
     db.session.add(payment)
     db.session.commit()
+
+    app.logger.info("Payment completed OK")
+
+    # TODO send an email with the details.
+    # should we send the resource_uri in the bill email?
 
     return redirect(url_for('gocardless_waiting', payment=payment_id))
 
@@ -321,41 +325,33 @@ def gocardless_waiting():
     payment = current_user.payments.filter_by(id=payment_id).one()
     return render_template('gocardless-waiting.html', payment=payment, days=app.config.get('EXPIRY_DAYS'))
 
-#
-# it's just a link? see ticket #17
-#
 @app.route("/pay/gocardless-cancel")
 @feature_flag('PAYMENTS')
 @login_required
 def gocardless_cancel():
-    print request.args
-    print request
+    payment_id = int(request.args.get('payment'))
+
+    app.logger.info("gocardless-cancel: userid %s, payment_id %s",
+        current_user.id, payment_id)
+
     try:
-        gocardless.client.confirm_resource(request.args)
-    except (gocardless.exceptions.ClientError, gocardless.exceptions.SignatureError) as e:
-        app.logger.exception("userid: %d: Gocardless-cancel exception %s" % (current_user.id, e))
-        flash("An error occurred with your payment, please contact info@emfcamp.org")
-        return redirect(url_for('main'))
+        payment = current_user.payments.filter_by(id=payment_id).one()
 
-    if request.args["resource_type"] != "bill":
-        app.logger.error("Gocardless-cancel didn't get a bill!" % (str(request.args)))
-        try:
-            app.logger.error("Gocardless-cancel: userid %d" % (current_user.id))
-        except:
-            pass
+    except Exception, e:
+        app.logger.error("gocardless-cancel exception: %s", e)
+        flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL'))
+        return redirect(url_for('tickets'))
 
-    payment_id = int(request.args["state"])
+    for t in payment.tickets:
+        t.payment = None
+
+    db.session.add(current_user)
+    db.session.commit()
+
     # TODO send an email with the details.
     # should we send the resource_uri in the bill email?
-    app.logger.info("user %d canceled gocardless payment for %s" % (current_user.id, payment_id))
-    payment = current_user.payments.filter_by(id=payment_id).one()
-    tc = 0
-    for t in payment.tickets:
-        db.session.delete(t)
-        tc += 1
 
-    db.session.delete(p)
-    db.session.commit()
+    app.logger.info("Payment completed OK")
 
     return render_template('gocardless-cancel.html', payment=payment)
 
@@ -371,70 +367,64 @@ def gocardless_webhook():
         GoCardless limits the webhook to 5 secs. this should run async...
 
     """
-    ret = ("", 403)
     json_data = simplejson.loads(request.data)
+    data = json_data['payload']
 
-    if gocardless.client.validate_webhook(json_data['payload']):
-        data = json_data['payload']
-        # action can be:
-        #
-        # paid -> money taken from the customers account, at this point we concider the ticket paid.
-        # created -> for subscriptions
-        # failed -> customer is broke
-        # withdrawn -> we actually get the money
-        if data['resource_type'] == 'bill' and data['action'] == 'paid':
-            for bill in data['bills']:
-                # process each bill record
+    if not gocardless.client.validate_webhook(data):
+        return ('', 403)
 
-                # this is the same as the resource_id
-                # we get from the gocardless-complete redirect
-                gcid = bill['id']
-                payment = current_user.payments.filter_by(gcid=gcid).one()
-                ts = payment.tickets.all()
+    app.logger.info("gocardless-webhook: %s %s", data.get('resource_type'), data.get('action'))
 
-                app.logger.info("GoCardless payment for user %d has been paid. gcref %s, our ref %s, %d tickets" % (payment.user.id, gcid, payment.id, len(ts)))
-                
-                if payment.state != "inprogress":
-                    app.logger.warning("GoCardless bill payment %s, payment state was %s, we expected 'inprogress'" % (gcid, payment.state) )
+    if data['resource_type'] != 'bill':
+        app.logger.warn('Resource type is not bill')
+        return ('', 501)
 
-                for t in ts:
-                    t.paid=True
-                    db.session.add(t)
-                
-                payment.state = "paid"
-                db.session.add(payment)
-                db.session.commit()
-                
-                # TODO email the user
+    if data['action'] not in ['paid', 'withdrawn', 'failed', 'created']:
+        app.logger.warn('Unknown action')
+        return ('', 501)
 
-            return ("", 200)
-        elif data['resource_type'] == 'bill' and data['action'] == 'withdrawn':
-            for bill in data['bills']:
-                print bill
-                gcid = bill['id']
-                payment = current_user.payments.filter_by(gcid=gcid).one()
-                app.logger.info("GoCardless payment for user %d has been withdrawn. gcref %s, our ref %s" % (payment.user.id, id, payment.id))
-            return ("", 200)
-        elif data['resource_type'] == 'bill' and data['action'] == 'failed':
-            for bill in data['bills']:
-                print bill
-                gcid = bill['id']
-                payment = current_user.payments.filter_by(gcid=gcid).one()
-                app.logger.info("GoCardless payment for user %d has failed. gcref %s, our ref %s" % (payment.user.id, gcid, payment.id))
-            return ("", 200)
+    # action can be:
+    #
+    # paid -> money taken from the customers account, at this point we concider the ticket paid.
+    # created -> for subscriptions
+    # failed -> customer is broke
+    # withdrawn -> we actually get the money
 
-    return ret
+    for bill in data['bills']:
+        gcid = bill['id']
+        payment = GoCardlessPayment.query.filter_by(gcid=gcid).one()
+
+        app.logger.info("Processing payment %s (%s) for user %s",
+            payment.id, gcid, payment.user.id)
+
+        if data['action'] == 'paid':
+            if payment.state != "inprogress":
+                app.logger.warning("Old payment state was %s, not 'inprogress'", payment.state)
+
+            for t in payment.tickets.all():
+                t.paid = True
+
+            payment.state = "paid"
+            db.session.add(payment)
+            db.session.commit()
+
+            # TODO email the user
+
+        else:
+            app.logger.debug('Payment: %s', bill)
+
+    return ('', 200)
 
 
 @app.route("/pay/transfer-start")
 @feature_flag('PAYMENTS')
 @login_required
 def transfer_start():
-    payment = buy_prepay_tickets(session['count'], BankPayment)
+    payment = buy_prepay_tickets(BankPayment)
 
     # XXX TODO send an email with the details.
 
-    app.logger.info("user %d started BankTransfer payment for %s" % (current_user.id, payment.bankref))
+    app.logger.info("User %s created bank payment %s (%s)", current_user.id, payment.id, payment.bankref)
 
     payment.state = "inprogress"
     db.session.add(payment)
