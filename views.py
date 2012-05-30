@@ -117,8 +117,8 @@ def signup():
         login_user(user)
 
         # send a welcome email.
-        msg = Message("Welcome to EMF Camp",
-                sender=("EMF Camp 2012", app.config.get('EMAIL')),
+        msg = Message("Welcome to Electromagnetic Field",
+                sender=app.config.get('TICKETS_EMAIL'),
                 recipients=[user.email])
         msg.body = render_template("welcome-email.txt", user=user)
         mail.send(msg)
@@ -146,8 +146,8 @@ def forgot_password():
             reset.new_token()
             db.session.add(reset)
             db.session.commit()
-            msg = Message("EMF Camp password reset",
-                sender=("EMF Camp 2012", app.config.get('EMAIL')),
+            msg = Message("EMF password reset",
+                sender=app.config.get('TICKETS_EMAIL'),
                 recipients=[form.email.data])
             msg.body = render_template("reset-password-email.txt", user=form._user, reset=reset)
             mail.send(msg)
@@ -337,7 +337,7 @@ def gocardless_complete():
 
     except Exception, e:
         app.logger.error("gocardless-complete exception: %s", e)
-        flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL'))
+        flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
         return redirect(url_for('tickets'))
 
     # keep the gocardless reference so we can find the payment when we get called by the webhook
@@ -349,8 +349,8 @@ def gocardless_complete():
     app.logger.info("Payment completed OK")
 
     # should we send the resource_uri in the bill email?
-    msg = Message("EMFCamp 2012 ticket purchase.", \
-        sender=("EMF Camp 2012", app.config.get('EMAIL')),
+    msg = Message("Your EMF ticket purchase", \
+        sender=app.config.get('TICKETS_EMAIL'),
         recipients=[payment.user.email]
     )
     msg.body = render_template("tickets-purchased-email-gocardless.txt", \
@@ -382,7 +382,7 @@ def gocardless_cancel():
 
     except Exception, e:
         app.logger.error("gocardless-cancel exception: %s", e)
-        flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL'))
+        flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
         return redirect(url_for('tickets'))
 
     for t in payment.tickets:
@@ -453,8 +453,8 @@ def gocardless_webhook():
             db.session.add(payment)
             db.session.commit()
 
-            msg = Message("EMFCamp 2012: your ticket payment has been confirmed", \
-                sender=("EMF Camp 2012", app.config.get('EMAIL')),
+            msg = Message("Your EMF ticket payment has been confirmed", \
+                sender=app.config.get('TICKETS_EMAIL'),
                 recipients=[payment.user.email]
             )
             msg.body = render_template("tickets-paid-email-gocardless.txt", \
@@ -480,8 +480,8 @@ def transfer_start():
     db.session.add(payment)
     db.session.commit()
 
-    msg = Message("EMFCamp 2012 ticket purchase.", \
-        sender=("EMF Camp 2012", app.config.get('EMAIL')), \
+    msg = Message("Your EMF ticket purchase", \
+        sender=app.config.get('TICKETS_EMAIL'), \
         recipients=[current_user.email]
     )
     msg.body = render_template("tickets-purchased-email-banktransfer.txt", \

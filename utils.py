@@ -102,8 +102,8 @@ class Reconcile(Command):
             s.commit()
             # send email
             # tickets-paid-email-banktransfer.txt
-            msg = Message("EMFCamp 2012 ticket purchase update.", \
-                          sender=("EMF Camp 2012", app.config.get('EMAIL')), \
+            msg = Message("Your ticket purchase update", \
+                          sender=app.config.get('TICKETS_EMAIL'), \
                           recipients=[payment.user.email]
                          )
             msg.body = render_template("tickets-paid-email-banktransfer.txt", \

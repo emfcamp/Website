@@ -6,12 +6,11 @@
 {% endif %}
 
 <p>Taking credit card payments for a small event like us is really expensive, so the only
-payment methods we accept are bank-to-bank. If this is really a problem for you, please
-<a href="mailto:tickets@emfcamp.org">let us know</a>.
+   payment methods we accept are bank-to-bank. If this is really a problem for you, please
+   <a href="mailto:{{ config.get('TICKETS_EMAIL')[1] }}">let us know</a>
 </p>
 
 <p>You have selected 
-
 {% if count == 1 -%}
 a prepay ticket
 for <b>{{ format_price(amount) }}</b>
@@ -19,7 +18,7 @@ for <b>{{ format_price(amount) }}</b>
 {{ count }} prepay tickets
 for <b>{{ format_price(amount) }}</b>
 {%- endif %}
-for EMFCamp 2012, choose a payment method below to buy your tickets</p>
+for EMF.  Please choose a payment method below to buy your tickets</p>
 
 <h3>Paying in Pounds</h3>
 <p>
@@ -30,7 +29,8 @@ for EMFCamp 2012, choose a payment method below to buy your tickets</p>
 </ul>
 
 <h3>Paying in Euros</h3>
-<p>If you want to pay in Euros, we're working on it. Email tickets@emfcamp.org and we'll let
-you know when our Euro bank account is ready.</p>
+<p>If you want to pay in Euros, we're working on it.
+   <a href="mailto:{{ config.get('TICKETS_EMAIL')[1] }}">Email us</a>
+   and we'll let you know when our Euro bank account is ready.</p>
 
 {% endblock %}

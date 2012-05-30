@@ -2,14 +2,14 @@ Hi, {{ user.name }},
 
 {% if basket.count == 1 -%}
 This is to confirm that you've bought a prepay ticket
-for {{ format_price(payment.amount) }} for EMFCamp 2012!
+for {{ format_price(payment.amount) }} for Electromagnetic Field 2012!
 {%- else -%}
 This is to confirm that you've bought {{ basket.count }} prepay tickets
-for {{ format_price(payment.amount) }} for EMFCamp 2012!
+for {{ format_price(payment.amount) }} for Electromagnetic Field 2012!
 {%- endif %}
 
-Your transaction id from GoCardless was {{ basket.reference }}, please keep a note of
-it in case there are any problems with payment.
+Your bill id from GoCardless was {{ basket.reference }}.  You can view this
+by logging into http://www.gocardless.com.
 
 We expect to receive payment from GoCardless whithin 6 days or so. We will
 send you an email when we do.
@@ -18,4 +18,4 @@ See you soon,
 
 Love,
 
-all at the EMFCamp Team.
+All the EMF team
