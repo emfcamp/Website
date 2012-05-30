@@ -9,9 +9,9 @@ At the moment you can purchase prepay tickets for the camp.
 
 You can keep track of your ticket purchases here:
 
-{{ 'http://%s%s' % (config['SERVER_NAME'] or 'localhost:5000', url_for('tickets')) }}
+{{ url_for('tickets', _external=True) }}
 
 If you forget your password you can reset it here:
 
-{{ 'http://%s%s' % (config['SERVER_NAME'] or 'localhost:5000', url_for('forgot_password')) }}
+{{ url_for('forgot_password', _external=True) }}
 
