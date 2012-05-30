@@ -10,6 +10,17 @@ payment methods we accept are bank-to-bank. If this is really a problem for you,
 <a href="mailto:tickets@emfcamp.org">let us know</a>.
 </p>
 
+<p>You have selected 
+
+{% if count == 1 -%}
+a prepay ticket
+for <b>{{ format_price(amount) }}</b>
+{%- else -%}
+{{ count }} prepay tickets
+for <b>{{ format_price(amount) }}</b>
+{%- endif %}
+for EMFCamp 2012, choose a payment method below to buy your tickets</p>
+
 <h3>Paying in Pounds</h3>
 <p>
 

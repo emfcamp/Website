@@ -214,34 +214,25 @@ def tickets():
     form.count.values = range(1, TicketType.Prepay.limit + 1)
 
     if request.method == 'POST' and form.validate():
-        if "inprogress" in session:
-            # don't let people buy more tickets without
-            # having paid for existing ones.
-            return redirect(url_for('pay_choose'))
-
-        for i in range(form.count.data):
-            t = Ticket(type_id=TicketType.Prepay.id)
-            current_user.tickets.append(t)
-
-        db.session.add(current_user)
-        db.session.commit()
-
-        session["inprogress"] = True
+        session["count"] = form.count.data
 
         if form.pay.data:
             return redirect(url_for('pay_choose', provider=form.provider.data))
 
         return redirect(url_for('pay_choose'))
 
-
     tickets = current_user.tickets.all()
     payments = current_user.payments.all()
+
+    count = 1
+    if "count" in session:
+        count = session["count"]
 
     return render_template("tickets.html",
         form=form,
         tickets=tickets,
         payments=payments,
-        amount=1,
+        amount=count,
         total=TicketType.Prepay.cost,
     )
 
@@ -279,16 +270,31 @@ def pay():
 
 @app.route("/pay/choose")
 @feature_flag('PAYMENTS')
+@login_required
 def pay_choose():
     provider = request.args.get('provider')
+
+    # use session here so bad people can't
+    # <img src="/pay/choose?count=4&provider=banktransfer">
+    if "count" not in session:
+        return redirect(url_for('tickets'))
+
+    if provider == 'gocardless' or provider == 'banktransfer':
+        # user has choosen a payment method, so now buy the tickets
+        for i in range(session["count"]):
+            t = Ticket(type_id=TicketType.Prepay.id)
+            current_user.tickets.append(t)
+
+        db.session.add(current_user)
+        db.session.commit()
+        session.pop('count', None)
+
     if provider == 'gocardless':
-        session.pop('inprogress', None)
         return redirect(url_for('gocardless_start'))
     elif provider == 'banktransfer':
-        session.pop('inprogress', None)
         return redirect(url_for('transfer_start'))
 
-    return render_template('payment-choose.html', next='pay_choose')
+    return render_template('payment-choose.html', next='pay_choose', count=session["count"], amount=TicketType.Prepay.cost * session["count"])
 
 @app.route("/pay/terms")
 @feature_flag('PAYMENTS')
