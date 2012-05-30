@@ -98,13 +98,13 @@ $(function() {
 
   function format_price(amount, currency, after) {
     if (!currency) currency = '\xa3';
-    amount = parseFloat(amount).toFixed(2);
+    var amount = parseFloat(amount).toFixed(2);
     if (after)
       return amount + currency;
     return currency + amount;
   }
 
-  price = $('#prepay').data('price');
+  var price = $('#prepay').data('price');
 
   $('#count').on('change', function() {
       var count = parseInt($(this).val(), 10);
