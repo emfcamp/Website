@@ -14,8 +14,12 @@
     <div id="hd">
         <h1><a href="/">Electromagnetic Field</a></h1>
         <p>(a three-day UK hacker camp in summer 2012)</p>
-         {% if not current_user.is_authenticated() %}
-		<a href="{{ url_for('login') }}">Log in</a>  ||  <a href="{{ url_for('signup') }}">sign Up</a>
+        {% if config.get('PAYMENTS') %}
+          {% if not current_user.is_authenticated() %}
+      		<a href="{{ url_for('login') }}">Log in</a>
+          ||
+          <a href="{{ url_for('signup') }}">Sign up</a>
+          {% endif %}
         {% endif %}
         
     </div>
