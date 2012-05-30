@@ -507,5 +507,5 @@ def stats():
         count()
     prepays_bought = TicketType.Prepay.query.filter(Ticket.paid == True).count()
 
-    return ' '.join('%s: %s' % i for i in locals().items())
+    return ' '.join('%s:%s' % i for i in locals().items())
 
