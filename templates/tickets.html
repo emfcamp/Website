@@ -74,18 +74,7 @@ Your payments:
     <span>Price per ticket: {{ format_price(price) }}</span>
     <span style="display: none">Total amount for deposit: <span id="total"></span></span>
     </p>
-    {% if form.provider.data %}
-        {{form.hidden_tag('provider')}}
-        {% if form.provider.data == 'gocardless' %}
-        <input type=submit name=pay value="Reserve and pay with GoCardless"/>
-        {% else %}
-        <input type=submit name=pay value="Reserve and pay by bank"/>
-        {% endif %}
-    <input type=submit name=choose value="Reserve and choose another provider"/>
-    {% else %}
-    <input type=submit name=choose value="Reserve and pay"/>
-    {% endif %}
-
+    <input type=submit value="Go to reservation"/>
 </form>
 {% else %}
 <p>You've already bought 4 tickets, thanks for helping EMF by

@@ -192,34 +192,21 @@ def logout():
 
 class ChoosePrepayTicketsForm(Form):
     count = IntegerSelectField('Number of tickets', [Required()])
-    provider = TextField('Provider')
-    pay = SubmitField('Pay')
-    choose = SubmitField('Choose')
-
-    def validate_provider(form, field):
-        if not field.data:
-            return None
-        if field.data not in ('gocardless', 'banktransfer'):
-            raise ValidationError('Unknown provider %s' % field.data)
 
     def validate_count(form, field):
         paid = current_user.tickets.filter_by(type=TicketType.Prepay).count()
         if field.data + paid > TicketType.Prepay.limit:
-            raise ValidationError('You can only buy %s tickets' % TicketType.Prepay.limit)
+            raise ValidationError('You can only buy %s tickets in total' % TicketType.Prepay.limit)
 
 @app.route("/tickets", methods=['GET', 'POST'])
 @feature_flag('PAYMENTS')
 @login_required
 def tickets():
-    form = ChoosePrepayTicketsForm(request.form, provider=request.args.get('provider'))
+    form = ChoosePrepayTicketsForm(request.form)
     form.count.values = range(1, TicketType.Prepay.limit + 1)
 
     if request.method == 'POST' and form.validate():
         session["count"] = form.count.data
-
-        if form.pay.data:
-            return redirect(url_for('pay_choose', provider=form.provider.data))
-
         return redirect(url_for('pay_choose'))
 
     tickets = current_user.tickets.all()
@@ -237,10 +224,16 @@ def tickets():
         price=TicketType.Prepay.cost,
     )
 
-def buy_prepay_tickets(paymenttype):
+def buy_prepay_tickets(paymenttype, count):
     """
-    Temporary procedure to create a payment for all outstanding tickets
+    Temporary procedure to create a payment from session data
     """
+    for i in range(count):
+        t = Ticket(type_id=TicketType.Prepay.id)
+        current_user.tickets.append(t)
+
+    db.session.add(current_user)
+    db.session.commit()
 
     tickets = current_user.tickets.filter_by(payment_id=None)
     amount = sum(t.type.cost for t in tickets)
@@ -267,35 +260,7 @@ def pay():
     if current_user.is_authenticated():
         return redirect(url_for('pay_choose'))
 
-    return render_template('payment-choose.html', next='tickets')
-
-@app.route("/pay/choose")
-@feature_flag('PAYMENTS')
-@login_required
-def pay_choose():
-    provider = request.args.get('provider')
-
-    # use session here so bad people can't
-    # <img src="/pay/choose?count=4&provider=banktransfer">
-    if "count" not in session:
-        return redirect(url_for('tickets'))
-
-    if provider == 'gocardless' or provider == 'banktransfer':
-        # user has choosen a payment method, so now buy the tickets
-        for i in range(session["count"]):
-            t = Ticket(type_id=TicketType.Prepay.id)
-            current_user.tickets.append(t)
-
-        db.session.add(current_user)
-        db.session.commit()
-        session.pop('count', None)
-
-    if provider == 'gocardless':
-        return redirect(url_for('gocardless_start'))
-    elif provider == 'banktransfer':
-        return redirect(url_for('transfer_start'))
-
-    return render_template('payment-choose.html', next='pay_choose', count=session["count"], amount=TicketType.Prepay.cost * session["count"])
+    return render_template('payment-options.html')
 
 @app.route("/pay/terms")
 @feature_flag('PAYMENTS')
@@ -303,11 +268,28 @@ def ticket_terms():
     return render_template('terms.html')
 
 
-@app.route("/pay/gocardless-start")
+@app.route("/pay/choose")
+@feature_flag('PAYMENTS')
+@login_required
+def pay_choose():
+    count = session.get('count')
+    if not count:
+        return redirect(url_for('tickets'))
+
+    amount = TicketType.Prepay.cost * count
+
+    return render_template('payment-choose.html', count=count, amount=amount)
+
+@app.route("/pay/gocardless-start", methods=['POST'])
 @feature_flag('PAYMENTS')
 @login_required
 def gocardless_start():
-    payment = buy_prepay_tickets(GoCardlessPayment)
+    count = session.pop('count', None)
+    if not count:
+        flash('Your session information has been lost. Please try ordering again.')
+        return redirect(url_for('tickets'))
+
+    payment = buy_prepay_tickets(GoCardlessPayment, count)
 
     app.logger.info("User %s created GoCardless payment %s", current_user.id, payment.id)
 
@@ -468,11 +450,16 @@ def gocardless_webhook():
     return ('', 200)
 
 
-@app.route("/pay/transfer-start")
+@app.route("/pay/transfer-start", methods=['POST'])
 @feature_flag('PAYMENTS')
 @login_required
 def transfer_start():
-    payment = buy_prepay_tickets(BankPayment)
+    count = session.pop('count', None)
+    if not count:
+        flash('Your session information has been lost. Please try ordering again.')
+        return redirect(url_for('tickets'))
+
+    payment = buy_prepay_tickets(BankPayment, count)
 
     app.logger.info("User %s created bank payment %s (%s)", current_user.id, payment.id, payment.bankref)
 
