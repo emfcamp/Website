@@ -13,6 +13,7 @@ from flaskext.wtf import \
     Form, Required, Email, EqualTo, ValidationError, \
     TextField, PasswordField, SelectField, SubmitField
 
+from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -497,4 +498,14 @@ def transfer_waiting():
     payment_id = int(request.args.get('payment'))
     payment = current_user.payments.filter_by(id=payment_id, user=current_user).one()
     return render_template('transfer-waiting.html', payment=payment, days=app.config.get('EXPIRY_DAYS'))
+
+@app.route("/stats")
+def stats():
+    users = User.query.count()
+    prepays = TicketType.Prepay.query. \
+        filter(Ticket.expires >= datetime.utcnow()). \
+        count()
+    prepays_bought = TicketType.Prepay.query.filter(Ticket.paid == True).count()
+
+    return ' '.join('%s: %s' % i for i in locals().items())
 
