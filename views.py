@@ -233,7 +233,7 @@ def tickets():
         tickets=tickets,
         payments=payments,
         amount=count,
-        total=TicketType.Prepay.cost,
+        price=TicketType.Prepay.cost,
     )
 
 def buy_prepay_tickets(paymenttype):

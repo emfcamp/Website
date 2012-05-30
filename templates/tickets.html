@@ -1,5 +1,9 @@
 {% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
+{% block head %}
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+{% endblock %}
+
 {% block body %}
 
 {% if tickets %}
@@ -63,10 +67,13 @@ Your payments:
 <form method=post class="choose-prepay-tickets">
     {{form.hidden_tag()}}
     <h2>Reserve tickets</h2>
-<dl>
+<dl id="prepay" data-price="{{ price }}">
     {{ render_field(form.count) }}
 </dl>
-    <p>Total amount for deposit: {{ format_price(total) }}.</p>
+    <p id="summary">
+    <span>Price per ticket: {{ format_price(price) }}</span>
+    <span style="display: none">Total amount for deposit: <span id="total"></span></span>
+    </p>
     {% if form.provider.data %}
         {{form.hidden_tag('provider')}}
         {% if form.provider.data == 'gocardless' %}
@@ -85,4 +92,25 @@ Your payments:
 buying a prepay ticket!</p>
 {% endif %}
 
+<script type="text/javascript">
+$(function() {
+  $('#summary').children().toggle();
+
+  function format_price(amount, currency, after) {
+    if (!currency) currency = '\xa3';
+    amount = parseFloat(amount).toFixed(2);
+    if (after)
+      return amount + currency;
+    return currency + amount;
+  }
+
+  price = $('#prepay').data('price');
+
+  $('#count').on('change', function() {
+      var count = parseInt($(this).val(), 10);
+      $('#total').text(format_price(count * price));
+  }).change();
+
+});
+</script>
 {% endblock %}
