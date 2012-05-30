@@ -8,10 +8,10 @@ This is to confirm that you've bought {{ basket.count }} prepay tickets
 for {{ format_price(payment.amount) }} for Electromagnetic Field 2012!
 {%- endif %}
 
-Your bill id from GoCardless was {{ basket.reference }}.  You can view this
-by logging into http://www.gocardless.com.
+Your bill ID from GoCardless was {{ basket.reference }}.  You can view this
+by logging into do your account at http://www.gocardless.com/.
 
-We expect to receive payment from GoCardless whithin 6 days or so. We will
+We expect to receive payment from GoCardless within 6 days or so. We will
 send you an email when we do.
 
 See you soon,
