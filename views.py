@@ -92,7 +92,7 @@ def login():
     return render_template("login.html", form=form)
 
 class SignupForm(Form):
-    name = TextField('Name', [Required()])
+    name = TextField('Full name', [Required()])
     email = TextField('Email', [Email(), Required()])
     password = PasswordField('Password', [Required(), EqualTo('confirm', message='Passwords do not match')])
     confirm = PasswordField('Confirm password', [Required()])
