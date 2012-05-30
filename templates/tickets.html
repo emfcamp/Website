@@ -58,6 +58,8 @@ Your payments:
 
 {% include 'ticket-blurb.html' %}
 
+{% if tickets|count < 4 %}
+
 <form method=post class="choose-prepay-tickets">
     {{form.hidden_tag()}}
     <h2>Reserve tickets</h2>
@@ -78,5 +80,9 @@ Your payments:
     {% endif %}
 
 </form>
+{% else %}
+<p>You've already bought 4 tickets, thanks for helping EMFCamp 2012 by
+buying a prepay ticket!</p>
+{% endif %}
 
 {% endblock %}
