@@ -7,7 +7,6 @@
     {{ render_field(form.email) }}
     {{ render_field(form.password) }}
 </dl>
-    {{form.hidden_tag('next')}}
     <input type=submit name="Login"/>
 </form>
 <a href="{{ url_for('forgot_password') }}">Forgot password</a>

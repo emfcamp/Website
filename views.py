@@ -11,7 +11,7 @@ from flaskext.login import \
 from flaskext.mail import Message
 from flaskext.wtf import \
     Form, Required, Email, EqualTo, ValidationError, \
-    TextField, PasswordField, SelectField, SubmitField
+    TextField, PasswordField, SelectField, HiddenField
 
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
@@ -64,7 +64,7 @@ def company():
     return render_template('company.html')
 
 
-class NextURLField(TextField):
+class NextURLField(HiddenField):
     def _value(self):
         # Cheap way of ensuring we don't get absolute URLs
         if not self.data or '//' in self.data:
