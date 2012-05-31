@@ -348,8 +348,19 @@ def gocardless_complete():
 @feature_flag('PAYMENTS')
 @login_required
 def gocardless_waiting():
-    payment_id = int(request.args.get('payment'))
-    payment = current_user.payments.filter_by(id=payment_id).one()
+    try:
+        payment_id = int(request.args.get('payment'))
+    except TypeError:
+        app.logger.error("gocardless-waiting called without a payment")
+        return redirect(url_for('main'))
+
+    try: 
+        payment = current_user.payments.filter_by(id=payment_id).one()
+    except NoResultFound:
+        app.logger.error("someone tried to get payment %d, not logged in?" % (payment_id))
+        flash("No matching payment found for you, sorry!")
+        return redirect(url_for('main'))
+
     return render_template('gocardless-waiting.html', payment=payment, days=app.config.get('EXPIRY_DAYS'))
 
 @app.route("/pay/gocardless-cancel")
