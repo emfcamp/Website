@@ -28,8 +28,7 @@
 
 <h2>Count Me In!</h2>
 {% if config.get('PAYMENTS') %}
-<p>Presales are now open</p>
-<a href="{{ url_for('signup') }}">Pre-order your ticket now</a>
+<p>Presales are now open: <a href="{{ url_for('signup') }}">pre-order your ticket</a>.
 
 {% else %}
 <p>To help us get an idea of numbers, we'd appreciate it if you filled in this quick form to give us an
