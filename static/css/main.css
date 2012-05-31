@@ -123,3 +123,9 @@ table.tickets tr.paid {
 table.tickets tr.expired {
   color: #f00;
 }
+
+.errors {
+  color: #933;
+  font-weight: bold;
+}
+
