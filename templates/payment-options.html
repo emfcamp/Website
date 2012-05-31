@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block body %}
+
+{% include 'ticket-blurb.html' %}
+
+<p>Taking credit card payments for a small event like us is really expensive, so the only
+   payment methods we accept are bank-to-bank. If this is really a problem for you, please
+   <a href="mailto:{{ config.get('TICKETS_EMAIL')[1] }}">let us know</a>
+</p>
+
+<h3>Paying in Pounds</h3>
+<p>
+
+<ul>
+    <li>GoCardless (direct debit)</li>
+    <li>Pay by bank transfer</li>
+</ul>
+
+Log in or sign up to <a href="{{ url_for('tickets') }}">order your tickets now</a>.
+
+<h3>Paying in Euros</h3>
+<p>If you want to pay in Euros, we're working on it.
+   <a href="mailto:{{ config.get('TICKETS_EMAIL')[1] }}">Email us</a>
+   and we'll let you know when our Euro bank account is ready.</p>
+
+{% endblock %}

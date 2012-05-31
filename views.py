@@ -11,8 +11,9 @@ from flaskext.login import \
 from flaskext.mail import Message
 from flaskext.wtf import \
     Form, Required, Email, EqualTo, ValidationError, \
-    TextField, PasswordField, SelectField, SubmitField
+    TextField, PasswordField, SelectField, HiddenField
 
+from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -63,7 +64,7 @@ def company():
     return render_template('company.html')
 
 
-class NextURLField(TextField):
+class NextURLField(HiddenField):
     def _value(self):
         # Cheap way of ensuring we don't get absolute URLs
         if not self.data or '//' in self.data:
@@ -91,7 +92,7 @@ def login():
     return render_template("login.html", form=form)
 
 class SignupForm(Form):
-    name = TextField('Name', [Required()])
+    name = TextField('Full name', [Required()])
     email = TextField('Email', [Email(), Required()])
     password = PasswordField('Password', [Required(), EqualTo('confirm', message='Passwords do not match')])
     confirm = PasswordField('Confirm password', [Required()])
@@ -116,8 +117,8 @@ def signup():
         login_user(user)
 
         # send a welcome email.
-        msg = Message("Welcome to EMF Camp",
-                sender=("EMF Camp 2012", app.config.get('EMAIL')),
+        msg = Message("Welcome to Electromagnetic Field",
+                sender=app.config.get('TICKETS_EMAIL'),
                 recipients=[user.email])
         msg.body = render_template("welcome-email.txt", user=user)
         mail.send(msg)
@@ -145,8 +146,8 @@ def forgot_password():
             reset.new_token()
             db.session.add(reset)
             db.session.commit()
-            msg = Message("EMF Camp password reset",
-                sender=("EMF Camp 2012", app.config.get('EMAIL')),
+            msg = Message("EMF password reset",
+                sender=app.config.get('TICKETS_EMAIL'),
                 recipients=[form.email.data])
             msg.body = render_template("reset-password-email.txt", user=form._user, reset=reset)
             mail.send(msg)
@@ -191,34 +192,24 @@ def logout():
 
 class ChoosePrepayTicketsForm(Form):
     count = IntegerSelectField('Number of tickets', [Required()])
-    provider = TextField('Provider')
-    pay = SubmitField('Pay')
-    choose = SubmitField('Choose')
-
-    def validate_provider(form, field):
-        if not field.data:
-            return None
-        if field.data not in ('gocardless', 'banktransfer'):
-            raise ValidationError('Unknown provider %s' % field.data)
 
     def validate_count(form, field):
-        paid = current_user.tickets.filter_by(type=TicketType.Prepay).count()
-        if field.data + paid > TicketType.Prepay.limit:
-            raise ValidationError('You can only buy %s tickets' % TicketType.Prepay.limit)
+        prepays = current_user.tickets. \
+            filter_by(type=TicketType.Prepay).\
+            filter(Ticket.expires >= datetime.utcnow()). \
+            count()
+        if field.data + prepays > TicketType.Prepay.limit:
+            raise ValidationError('You can only buy %s tickets in total' % TicketType.Prepay.limit)
 
 @app.route("/tickets", methods=['GET', 'POST'])
 @feature_flag('PAYMENTS')
 @login_required
 def tickets():
-    form = ChoosePrepayTicketsForm(request.form, provider=request.args.get('provider'))
+    form = ChoosePrepayTicketsForm(request.form)
     form.count.values = range(1, TicketType.Prepay.limit + 1)
 
     if request.method == 'POST' and form.validate():
         session["count"] = form.count.data
-
-        if form.pay.data:
-            return redirect(url_for('pay_choose', provider=form.provider.data))
-
         return redirect(url_for('pay_choose'))
 
     tickets = current_user.tickets.all()
@@ -236,21 +227,26 @@ def tickets():
         price=TicketType.Prepay.cost,
     )
 
-def buy_prepay_tickets(paymenttype):
+def buy_prepay_tickets(paymenttype, count):
     """
-    Temporary procedure to create a payment for all outstanding tickets
+    Temporary procedure to create a payment from session data
     """
+    prepays = current_user.tickets. \
+        filter_by(type=TicketType.Prepay).\
+        filter(Ticket.expires >= datetime.utcnow()). \
+        count()
+    if prepays + count > TicketType.Prepay.limit:
+        raise Exception('You can only buy %s tickets in total' % TicketType.Prepay.limit)
 
-    tickets = current_user.tickets.filter_by(payment_id=None)
+    tickets = [Ticket(type_id=TicketType.Prepay.id) for i in range(count)]
+
     amount = sum(t.type.cost for t in tickets)
-
-    if not amount:
-        raise Exception('There are no tickets without payments')
 
     payment = paymenttype(amount)
     current_user.payments.append(payment)
 
     for t in tickets:
+        current_user.tickets.append(t)
         t.payment = payment
         t.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
 
@@ -266,35 +262,7 @@ def pay():
     if current_user.is_authenticated():
         return redirect(url_for('pay_choose'))
 
-    return render_template('payment-choose.html', next='tickets')
-
-@app.route("/pay/choose")
-@feature_flag('PAYMENTS')
-@login_required
-def pay_choose():
-    provider = request.args.get('provider')
-
-    # use session here so bad people can't
-    # <img src="/pay/choose?count=4&provider=banktransfer">
-    if "count" not in session:
-        return redirect(url_for('tickets'))
-
-    if provider == 'gocardless' or provider == 'banktransfer':
-        # user has choosen a payment method, so now buy the tickets
-        for i in range(session["count"]):
-            t = Ticket(type_id=TicketType.Prepay.id)
-            current_user.tickets.append(t)
-
-        db.session.add(current_user)
-        db.session.commit()
-        session.pop('count', None)
-
-    if provider == 'gocardless':
-        return redirect(url_for('gocardless_start'))
-    elif provider == 'banktransfer':
-        return redirect(url_for('transfer_start'))
-
-    return render_template('payment-choose.html', next='pay_choose', count=session["count"], amount=TicketType.Prepay.cost * session["count"])
+    return render_template('payment-options.html')
 
 @app.route("/pay/terms")
 @feature_flag('PAYMENTS')
@@ -302,11 +270,28 @@ def ticket_terms():
     return render_template('terms.html')
 
 
-@app.route("/pay/gocardless-start")
+@app.route("/pay/choose")
+@feature_flag('PAYMENTS')
+@login_required
+def pay_choose():
+    count = session.get('count')
+    if not count:
+        return redirect(url_for('tickets'))
+
+    amount = TicketType.Prepay.cost * count
+
+    return render_template('payment-choose.html', count=count, amount=amount)
+
+@app.route("/pay/gocardless-start", methods=['POST'])
 @feature_flag('PAYMENTS')
 @login_required
 def gocardless_start():
-    payment = buy_prepay_tickets(GoCardlessPayment)
+    count = session.pop('count', None)
+    if not count:
+        flash('Your session information has been lost. Please try ordering again.')
+        return redirect(url_for('tickets'))
+
+    payment = buy_prepay_tickets(GoCardlessPayment, count)
 
     app.logger.info("User %s created GoCardless payment %s", current_user.id, payment.id)
 
@@ -336,7 +321,7 @@ def gocardless_complete():
 
     except Exception, e:
         app.logger.error("gocardless-complete exception: %s", e)
-        flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL'))
+        flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
         return redirect(url_for('tickets'))
 
     # keep the gocardless reference so we can find the payment when we get called by the webhook
@@ -348,8 +333,8 @@ def gocardless_complete():
     app.logger.info("Payment completed OK")
 
     # should we send the resource_uri in the bill email?
-    msg = Message("EMFCamp 2012 ticket purchase.", \
-        sender=("EMF Camp 2012", app.config.get('EMAIL')),
+    msg = Message("Your EMF ticket purchase", \
+        sender=app.config.get('TICKETS_EMAIL'),
         recipients=[payment.user.email]
     )
     msg.body = render_template("tickets-purchased-email-gocardless.txt", \
@@ -363,8 +348,19 @@ def gocardless_complete():
 @feature_flag('PAYMENTS')
 @login_required
 def gocardless_waiting():
-    payment_id = int(request.args.get('payment'))
-    payment = current_user.payments.filter_by(id=payment_id).one()
+    try:
+        payment_id = int(request.args.get('payment'))
+    except TypeError:
+        app.logger.error("gocardless-waiting called without a payment")
+        return redirect(url_for('main'))
+
+    try: 
+        payment = current_user.payments.filter_by(id=payment_id).one()
+    except NoResultFound:
+        app.logger.error("someone tried to get payment %d, not logged in?" % (payment_id))
+        flash("No matching payment found for you, sorry!")
+        return redirect(url_for('main'))
+
     return render_template('gocardless-waiting.html', payment=payment, days=app.config.get('EXPIRY_DAYS'))
 
 @app.route("/pay/gocardless-cancel")
@@ -381,7 +377,7 @@ def gocardless_cancel():
 
     except Exception, e:
         app.logger.error("gocardless-cancel exception: %s", e)
-        flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL'))
+        flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
         return redirect(url_for('tickets'))
 
     for t in payment.tickets:
@@ -452,8 +448,8 @@ def gocardless_webhook():
             db.session.add(payment)
             db.session.commit()
 
-            msg = Message("EMFCamp 2012: your ticket payment has been confirmed", \
-                sender=("EMF Camp 2012", app.config.get('EMAIL')),
+            msg = Message("Your EMF ticket payment has been confirmed", \
+                sender=app.config.get('TICKETS_EMAIL'),
                 recipients=[payment.user.email]
             )
             msg.body = render_template("tickets-paid-email-gocardless.txt", \
@@ -467,11 +463,16 @@ def gocardless_webhook():
     return ('', 200)
 
 
-@app.route("/pay/transfer-start")
+@app.route("/pay/transfer-start", methods=['POST'])
 @feature_flag('PAYMENTS')
 @login_required
 def transfer_start():
-    payment = buy_prepay_tickets(BankPayment)
+    count = session.pop('count', None)
+    if not count:
+        flash('Your session information has been lost. Please try ordering again.')
+        return redirect(url_for('tickets'))
+
+    payment = buy_prepay_tickets(BankPayment, count)
 
     app.logger.info("User %s created bank payment %s (%s)", current_user.id, payment.id, payment.bankref)
 
@@ -479,8 +480,8 @@ def transfer_start():
     db.session.add(payment)
     db.session.commit()
 
-    msg = Message("EMFCamp 2012 ticket purchase.", \
-        sender=("EMF Camp 2012", app.config.get('EMAIL')), \
+    msg = Message("Your EMF ticket purchase", \
+        sender=app.config.get('TICKETS_EMAIL'), \
         recipients=[current_user.email]
     )
     msg.body = render_template("tickets-purchased-email-banktransfer.txt", \
@@ -497,4 +498,14 @@ def transfer_waiting():
     payment_id = int(request.args.get('payment'))
     payment = current_user.payments.filter_by(id=payment_id, user=current_user).one()
     return render_template('transfer-waiting.html', payment=payment, days=app.config.get('EXPIRY_DAYS'))
+
+@app.route("/stats")
+def stats():
+    users = User.query.count()
+    prepays = TicketType.Prepay.query. \
+        filter(Ticket.expires >= datetime.utcnow()). \
+        count()
+    prepays_bought = TicketType.Prepay.query.filter(Ticket.paid == True).count()
+
+    return ' '.join('%s:%s' % i for i in locals().items())
 

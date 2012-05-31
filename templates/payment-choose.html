@@ -1,36 +1,33 @@
 {% extends "base.html" %}
 {% block body %}
 
-{% if next == 'tickets' %}
-{% include 'ticket-blurb.html' %}
-{% endif %}
-
 <p>Taking credit card payments for a small event like us is really expensive, so the only
-payment methods we accept are bank-to-bank. If this is really a problem for you, please
-<a href="mailto:tickets@emfcamp.org">let us know</a>.
+   payment methods we accept are bank-to-bank. If this is really a problem for you, please
+   <a href="mailto:{{ config.get('TICKETS_EMAIL')[1] }}">let us know</a>
 </p>
 
 <p>You have selected 
-
-{% if count == 1 -%}
-a prepay ticket
-for <b>{{ format_price(amount) }}</b>
-{%- else -%}
-{{ count }} prepay tickets
-for <b>{{ format_price(amount) }}</b>
-{%- endif %}
-for EMFCamp 2012, choose a payment method below to buy your tickets</p>
+    {% if count == 1 -%}
+    a prepay ticket
+    for <b>{{ format_price(amount) }}</b>.
+    {%- else -%}
+    {{ count }} prepay tickets
+    for <b>{{ format_price(amount) }}</b>.
+    {%- endif %}
+Your tickets aren't quite reserved yet!  Please choose a payment method below to buy your tickets.</p>
 
 <h3>Paying in Pounds</h3>
-<p>
-
-<ul>
-    <li><a href="{{ url_for(next, provider='gocardless') }}">Pay by GoCardless (direct debit)</a></li>
-    <li><a href="{{ url_for(next, provider='banktransfer') }}">Pay by bank transfer</a></li>
-</ul>
+<p>The best way is to ask your bank to send it to us directly (this works online, or with cash in branch). Alternatively, choose GoCardless to create a one-off direct debit from your account.</p>
+<form method="post" action="{{ url_for('transfer_start') }}">
+<p><input type=submit name=banktransfer value="Pay by bank transfer"/></p>
+</form>
+<form method="post" action="{{ url_for('gocardless_start') }}">
+<p><input type=submit name=gocardless value="Pay with GoCardless"/></p>
+</form>
 
 <h3>Paying in Euros</h3>
-<p>If you want to pay in Euros, we're working on it. Email tickets@emfcamp.org and we'll let
-you know when our Euro bank account is ready.</p>
+<p>If you want to pay in Euros, we're working on it.
+   <a href="mailto:{{ config.get('TICKETS_EMAIL')[1] }}">Email us</a>
+   and we'll let you know when our Euro bank account is ready.</p>
 
 {% endblock %}

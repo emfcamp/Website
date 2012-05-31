@@ -4,15 +4,15 @@
 <h2>Thank You!</h2>
 
 <p>Your GoCardless Direct Debit payment for {{ format_price(payment.amount) }}
-   has been set up and your tickets will be reserved for {{ days }} days.
+   has been set up and your tickets will be reserved for {{ days }} days
+   to allow for your payment to arrive.
    We will email you when the transaction has been completed.</p>
 
-<dl class="bank-details">
-<dt>GoCardless Ref</dt><dd>{{ payment.gcid }}</dd>
-</dl>
+Your bill ID from GoCardless was {{ basket.gcid }}.  You can view this
+by logging into <a href="http://www.gocardless.com/">your GoCardless account</a>.
 
 
-<p>See you at <a href="http://www.emfcamp.org/">EMFCamp2012</a>!</p>
+<p>See you at <a href="http://www.emfcamp.org/">Electromagnetic Field</a>!</p>
 
 <a href="{{ url_for('tickets') }}">Show my tickets</a>
 {% endblock %}

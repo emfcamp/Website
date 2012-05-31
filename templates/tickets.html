@@ -67,6 +67,11 @@ Your payments:
 <form method=post class="choose-prepay-tickets">
     {{form.hidden_tag()}}
     <h2>Reserve tickets</h2>
+
+<p>Electromagnetic Field is an <b>18 and over event</b>, please see
+<A HREF="http://wiki.emfcamp.org/wiki/FAQ#Why_is_there_an_age_limit.3F">our FAQ</a> for
+details.</p>
+
 <dl id="prepay" data-price="{{ price }}">
     {{ render_field(form.count) }}
 </dl>
@@ -74,21 +79,10 @@ Your payments:
     <span>Price per ticket: {{ format_price(price) }}</span>
     <span style="display: none">Total amount for deposit: <span id="total"></span></span>
     </p>
-    {% if form.provider.data %}
-        {{form.hidden_tag('provider')}}
-        {% if form.provider.data == 'gocardless' %}
-        <input type=submit name=pay value="Reserve and pay with GoCardless"/>
-        {% else %}
-        <input type=submit name=pay value="Reserve and pay by bank"/>
-        {% endif %}
-    <input type=submit name=choose value="Reserve and choose another provider"/>
-    {% else %}
-    <input type=submit name=choose value="Reserve and pay"/>
-    {% endif %}
-
+    <input type=submit value="Go to reservation"/>
 </form>
 {% else %}
-<p>You've already bought 4 tickets, thanks for helping EMFCamp 2012 by
+<p>You've already bought 4 tickets, thanks for helping EMF by
 buying a prepay ticket!</p>
 {% endif %}
 

@@ -1,6 +1,6 @@
 Hi {{ user.name }},
 
-Welcome to the EMFCamp 2012 website!
+Welcome to the Electromagnetic Field website!
 
 You signed up with name: {{ user.name }}
 and email: {{ user.email }}

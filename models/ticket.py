@@ -86,6 +86,6 @@ def check_capacity(session, flush_context, instances):
 
     for type, count in totals.items():
 
-        if count > obj.type.capacity:
-            raise TicketError('No more tickets of type %s available') % obj.type.name
+        if count > type.capacity:
+            raise TicketError('No more tickets of type %s available') % type.name
 

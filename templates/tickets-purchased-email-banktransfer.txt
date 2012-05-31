@@ -2,10 +2,10 @@ Hi, {{ user.name }},
 
 {% if basket.count == 1 -%}
 This is to confirm that you've bought a prepay ticket
-for {{ format_price(payment.amount) }} for EMFCamp 2012!
+for {{ format_price(payment.amount) }} for Electromagnetic Field 2012!
 {%- else -%}
 This is to confirm that you've bought {{ basket.count }} prepay tickets
-for {{ format_price(payment.amount) }} for EMFCamp 2012!
+for {{ format_price(payment.amount) }} for Electromagnetic Field 2012!
 {%- endif %}
 
 Pay by bank transfer
@@ -28,8 +28,8 @@ International transfers
 
 You can pay directly into our GBP bank account:
 
-SWIFT BARCGB22
-IBAN GB39 BARC 2071 6473 5905 26
+SWIFT: BARCGB22
+IBAN:  GB39 BARC 2071 6473 5905 26
 
 Your tickets will be held in your name for 10 days, so please remember to
 pay promptly.
@@ -40,4 +40,4 @@ See you soon,
 
 Love,
 
-all at the EMFCamp Team.
+All the EMF team

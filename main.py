@@ -5,6 +5,10 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy.orm.exc import NoResultFound
 from flask.ext.assets import Environment, Bundle
 
+import logging
+
+logging.basicConfig(level=logging.NOTSET)
+
 app = Flask(__name__)
 app.config.from_envvar('SETTINGS_FILE')
 

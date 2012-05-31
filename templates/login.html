@@ -3,7 +3,6 @@
 {% block body %}
 <form method=post>
     {{form.hidden_tag()}}
-    {{form.hidden_tag('next')}}
 <dl>
     {{ render_field(form.email) }}
     {{ render_field(form.password) }}
