@@ -194,8 +194,11 @@ class ChoosePrepayTicketsForm(Form):
     count = IntegerSelectField('Number of tickets', [Required()])
 
     def validate_count(form, field):
-        paid = current_user.tickets.filter_by(type=TicketType.Prepay).count()
-        if field.data + paid > TicketType.Prepay.limit:
+        prepays = current_user.tickets. \
+            filter_by(type=TicketType.Prepay).\
+            filter(Ticket.expires >= datetime.utcnow()). \
+            count()
+        if field.data + prepays > TicketType.Prepay.limit:
             raise ValidationError('You can only buy %s tickets in total' % TicketType.Prepay.limit)
 
 @app.route("/tickets", methods=['GET', 'POST'])
@@ -228,23 +231,22 @@ def buy_prepay_tickets(paymenttype, count):
     """
     Temporary procedure to create a payment from session data
     """
-    for i in range(count):
-        t = Ticket(type_id=TicketType.Prepay.id)
-        current_user.tickets.append(t)
+    prepays = current_user.tickets. \
+        filter_by(type=TicketType.Prepay).\
+        filter(Ticket.expires >= datetime.utcnow()). \
+        count()
+    if prepays + count > TicketType.Prepay.limit:
+        raise Exception('You can only buy %s tickets in total' % TicketType.Prepay.limit)
 
-    db.session.add(current_user)
-    db.session.commit()
+    tickets = [Ticket(type_id=TicketType.Prepay.id) for i in range(count)]
 
-    tickets = current_user.tickets.filter_by(payment_id=None)
     amount = sum(t.type.cost for t in tickets)
-
-    if not amount:
-        raise Exception('There are no tickets without payments')
 
     payment = paymenttype(amount)
     current_user.payments.append(payment)
 
     for t in tickets:
+        current_user.tickets.append(t)
         t.payment = payment
         t.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
 
