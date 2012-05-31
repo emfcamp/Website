@@ -67,6 +67,11 @@ Your payments:
 <form method=post class="choose-prepay-tickets">
     {{form.hidden_tag()}}
     <h2>Reserve tickets</h2>
+
+<p>Electromagnetic Field is an <b>18 and over event</b>, please see
+<A HREF="http://wiki.emfcamp.org/wiki/FAQ#Why_is_there_an_age_limit.3F">our FAQ</a> for
+details.</p>
+
 <dl id="prepay" data-price="{{ price }}">
     {{ render_field(form.count) }}
 </dl>
