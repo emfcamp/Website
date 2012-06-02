@@ -350,8 +350,8 @@ def gocardless_complete():
 def gocardless_waiting():
     try:
         payment_id = int(request.args.get('payment'))
-    except TypeError:
-        app.logger.error("gocardless-waiting called without a payment")
+    except (TypeError, ValueError):
+        app.logger.error("gocardless-waiting called without a payment or with a bogus payment: %s" % (str(request.args)))
         return redirect(url_for('main'))
 
     try: 
