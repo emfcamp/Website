@@ -381,6 +381,8 @@ def gocardless_cancel():
         return redirect(url_for('tickets'))
 
     for t in payment.tickets:
+        app.logger.info("gocardless-cancel: userid %s, payment_id %s canceled ticket %d",
+            current_user.id, payment.id, ticket.id)
         t.payment = None
 
     db.session.add(current_user)
