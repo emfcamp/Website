@@ -16,6 +16,7 @@ from flaskext.wtf import \
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.sql import text
 
 from decorator import decorator
 import simplejson, os, re
@@ -503,11 +504,13 @@ def transfer_waiting():
 
 @app.route("/stats")
 def stats():
-    users = User.query.count()
-    prepays = TicketType.Prepay.query. \
-        filter(Ticket.expires >= datetime.utcnow()). \
-        count()
-    prepays_bought = TicketType.Prepay.query.filter(Ticket.paid == True).count()
+    ret = {}
+    conn = db.session.connection()
+    result = conn.execute(text("""SELECT count(t.id) as tickets from payment p, ticket t, ticket_type tt where
+                                p.state='inprogress' or p.state='paid' and t.payment_id = p.id and t.expires >= date('now') and t.type_id = tt.id and tt.name = 'Prepay Camp Ticket'""")).fetchall()
+    ret["prepays"] = result[0][0]
+    ret["users"] = User.query.count()
+    ret["prepays_bought"] = TicketType.Prepay.query.filter(Ticket.paid == True).count()
 
-    return ' '.join('%s:%s' % i for i in locals().items())
+    return ' '.join('%s:%s' % i for i in ret.items())
 
