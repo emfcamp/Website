@@ -11,7 +11,8 @@ from flaskext.login import \
 from flaskext.mail import Message
 from flaskext.wtf import \
     Form, Required, Email, EqualTo, ValidationError, \
-    TextField, PasswordField, SelectField, HiddenField
+    TextField, PasswordField, SelectField, HiddenField, \
+    SubmitField
 
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
@@ -215,6 +216,28 @@ def tickets():
     tickets = current_user.tickets.all()
     payments = current_user.payments.all()
 
+    #
+    # go through existing payments
+    # and make cancel and/or pay buttons as needed.
+    #
+    # We don't allow canceling of inprogress gocardless payments cos there is
+    # money in the system and then we have to sort out refunds etc.
+    #
+    # With canceled Bank Transfers we mark the payment as canceled in
+    # case it does turn up for some reason and we need to do something with
+    # it.
+    #
+    gc_try_again_forms = {}
+    btcancel_forms = {}
+    for p in payments:
+        if p.provider == "gocardless" and p.state == "new":
+            gc_try_again_forms[p.id] = GoCardlessTryAgainForm(payment=p.id)
+        elif p.provider == "banktransfer" and p.state == "inprogress":
+            btcancel_forms[p.id] = BankTransferCancelForm(payment=p.id)
+        # the rest are inprogress or complete gocardless payments
+        # or complete banktransfers,
+        # or canceled payments of either provider.
+
     count = 1
     if "count" in session:
         count = session["count"]
@@ -225,6 +248,8 @@ def tickets():
         payments=payments,
         amount=count,
         price=TicketType.Prepay.cost,
+        tryagain_forms=gc_try_again_forms,
+        btcancel_forms=btcancel_forms
     )
 
 def buy_prepay_tickets(paymenttype, count):
@@ -299,6 +324,78 @@ def gocardless_start():
 
     return redirect(bill_url)
 
+class GoCardlessTryAgainForm(Form):
+    payment = HiddenField('payment_id', [Required()])
+    pay = SubmitField('Pay')
+    cancel = SubmitField('Cancel & Discard tickets')
+
+    def validate_payment(form, field):
+        payment = None
+        try:
+            payment = current_user.payments.filter_by(id=int(field.data), provider="gocardless", state="new").one()
+        except Exception, e:
+            app.logger.error("GCTryAgainForm got bogus payment: %s" % (form.data))
+
+        if not payment:
+            raise ValidationError('Sorry, that dosn\'t look like a valid payment')
+
+class BankTransferCancelForm(Form):
+    payment = HiddenField('payment_id', [Required()])
+    cancel = SubmitField('Cancel & Discard tickets')
+
+    def validate_payment(form, field):
+        payment = None
+        try:
+            payment = current_user.payments.filter_by(id=int(field.data), provider="banktransfer", state="inprogress").one()
+        except Exception, e:
+            app.logger.error("BankTransferCancelForm got bogus payment: %s" % (form.data))
+
+        if not payment:
+            raise ValidationError('Sorry, that dosn\'t look like a valid payment')
+
+@app.route("/pay/gocardless-tryagain", methods=['POST'])
+@feature_flag('PAYMENTS')
+@login_required
+def gocardless_tryagain():
+    """
+        If for some reason the gocardless payment didn't start properly this gives the user
+        a chance to go again or to cancel the payment.
+    """
+    form = GoCardlessTryAgainForm(request.form)
+    payment_id = None
+
+    if request.method == 'POST' and form.validate():
+        if form.payment:
+            payment_id = int(form.payment.data)
+
+    if not payment_id:
+        flash('Unable to validate form, the webadmin\'s have been notified.')
+        app.logger.error("gocardless-tryagain: unable to get payment_id")
+        return redirect(url_for('tickets'))
+
+    try:
+        payment = current_user.payments.filter_by(id=payment_id, user=current_user, state='new').one()
+    except Exception, e:
+        app.logger.error("gocardless-tryagain: exception: %s for payment %d", e, payment.id)
+        flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
+        return redirect(url_for('tickets'))
+
+    if form.pay.data == True:
+        app.logger.info("User %d trying to pay again with GoCardless payment %d", current_user.id, payment.id)
+        bill_url = payment.bill_url("Electromagnetic Field Ticket Deposit")
+        return redirect(bill_url)
+
+    if form.cancel.data == True:
+        app.logger.info("User %d canceled new GoCardless payment %d", current_user.id, payment.id)
+        for t in payment.tickets.all():
+            db.session.delete(t)
+            app.logger.info("Canceling Gocardless ticket %d (u:%d p:%d)", t.id, current_user.id, payment.id)
+        app.logger.info("Canceling Gocardless payment %d (u:%d)", payment.id, current_user.id)
+        payment.state = "canceled"
+        db.session.add(payment)
+        db.session.commit()
+
+    return redirect(url_for('tickets'))
 
 @app.route("/pay/gocardless-complete")
 @feature_flag('PAYMENTS')
@@ -500,6 +597,46 @@ def transfer_waiting():
     payment_id = int(request.args.get('payment'))
     payment = current_user.payments.filter_by(id=payment_id, user=current_user).one()
     return render_template('transfer-waiting.html', payment=payment, days=app.config.get('EXPIRY_DAYS'))
+
+@app.route("/pay/transfer-cancel", methods=['POST'])
+@feature_flag('PAYMENTS')
+@login_required
+def transfer_cancel():
+    """
+        Cancel an existing bank transfer
+    """
+    form = BankTransferCancelForm(request.form)
+    payment_id = None
+
+    if request.method == 'POST' and form.validate():
+        if form.payment:
+            payment_id = int(form.payment.data)
+
+    if not payment_id:
+        flash('Unable to validate form, the webadmin\'s have been notified.')
+        app.logger.error("transfer_cancel: unable to get payment_id")
+        return redirect(url_for('tickets'))
+
+    try:
+        payment = current_user.payments.filter_by(id=payment_id, user=current_user, state='inprogress', provider='banktransfer').one()
+    except Exception, e:
+        app.logger.error("transfer_cancel: exception: %s for payment %d", e, payment.id)
+        flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
+        return redirect(url_for('tickets'))
+
+    if form.cancel.data == True:
+        app.logger.info("User %d canceled inprogress bank transfer %d", current_user.id, payment.id)
+        for t in payment.tickets.all():
+            db.session.delete(t)
+            app.logger.info("Canceling bank transfer ticket %d (u:%d p:%d)", t.id, current_user.id, payment.id)
+        app.logger.info("Canceling bank transfer payment %d (u:%d)", payment.id, current_user.id)
+        payment.state = "canceled"
+        db.session.add(payment)
+        db.session.commit()
+    else:
+        app.logger.error("transfer-cancel called without cancel bring pressed?")
+
+    return redirect(url_for('tickets'))
 
 @app.route("/stats")
 def stats():
