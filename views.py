@@ -507,7 +507,7 @@ def stats():
     ret = {}
     conn = db.session.connection()
     result = conn.execute(text("""SELECT count(t.id) as tickets from payment p, ticket t, ticket_type tt where
-                                p.state='inprogress' or p.state='paid' and t.payment_id = p.id and t.expires >= date('now') and t.type_id = tt.id and tt.name = 'Prepay Camp Ticket'""")).fetchall()
+                                p.state='inprogress' and t.payment_id = p.id and t.expires >= date('now') and t.type_id = tt.id and tt.name = 'Prepay Camp Ticket'""")).fetchall()
     ret["prepays"] = result[0][0]
     ret["users"] = User.query.count()
     ret["prepays_bought"] = TicketType.Prepay.query.filter(Ticket.paid == True).count()
