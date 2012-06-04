@@ -231,9 +231,9 @@ def tickets():
     btcancel_forms = {}
     for p in payments:
         if p.provider == "gocardless" and p.state == "new":
-            gc_try_again_forms[p.id] = GoCardlessTryAgainForm(payment=p.id)
+            gc_try_again_forms[p.id] = GoCardlessTryAgainForm(payment=p.id, yesno='no')
         elif p.provider == "banktransfer" and p.state == "inprogress":
-            btcancel_forms[p.id] = BankTransferCancelForm(payment=p.id)
+            btcancel_forms[p.id] = BankTransferCancelForm(payment=p.id, yesno='no')
         # the rest are inprogress or complete gocardless payments
         # or complete banktransfers,
         # or canceled payments of either provider.
@@ -328,6 +328,9 @@ class GoCardlessTryAgainForm(Form):
     payment = HiddenField('payment_id', [Required()])
     pay = SubmitField('Pay')
     cancel = SubmitField('Cancel & Discard tickets')
+    yesno = HiddenField('yesno', [Required()], default="no")
+    yes = SubmitField('Yes')
+    no = SubmitField('No')
 
     def validate_payment(form, field):
         payment = None
@@ -342,6 +345,9 @@ class GoCardlessTryAgainForm(Form):
 class BankTransferCancelForm(Form):
     payment = HiddenField('payment_id', [Required()])
     cancel = SubmitField('Cancel & Discard tickets')
+    yesno = HiddenField('yesno', [Required()], default='no')
+    yes = SubmitField('Yes')
+    no = SubmitField('No')
 
     def validate_payment(form, field):
         payment = None
@@ -386,6 +392,11 @@ def gocardless_tryagain():
         return redirect(bill_url)
 
     if form.cancel.data == True:
+        # I cannot work out why, but yesno does not get set to 'yes' here!
+        ynform = GoCardlessTryAgainForm(payment = payment.id, yesno = "yes")
+        return render_template('gocardless-discard-yesno.html', payment=payment, form=ynform)
+
+    if form.yes.data == True:
         app.logger.info("User %d canceled new GoCardless payment %d", current_user.id, payment.id)
         for t in payment.tickets.all():
             db.session.delete(t)
@@ -394,6 +405,7 @@ def gocardless_tryagain():
         payment.state = "canceled"
         db.session.add(payment)
         db.session.commit()
+        flash("Your gocardless payment has been canceled")
 
     return redirect(url_for('tickets'))
 
@@ -624,7 +636,14 @@ def transfer_cancel():
         flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
         return redirect(url_for('tickets'))
 
-    if form.cancel.data == True:
+    if form.yesno.data == "no" and form.cancel.data == True:
+        # yesno stays as 'no' here.
+        ynform = BankTransferCancelForm(payment=payment.id, yesno='yes')
+        return render_template('transfer-cancel-yesno.html', payment=payment, form=ynform)
+
+    if form.no.data == True:
+        return redirect(url_for('tickets'))
+    elif form.yes.data == True:
         app.logger.info("User %d canceled inprogress bank transfer %d", current_user.id, payment.id)
         for t in payment.tickets.all():
             db.session.delete(t)
@@ -633,8 +652,7 @@ def transfer_cancel():
         payment.state = "canceled"
         db.session.add(payment)
         db.session.commit()
-    else:
-        app.logger.error("transfer-cancel called without cancel bring pressed?")
+        flash('payment canceled')
 
     return redirect(url_for('tickets'))
 
