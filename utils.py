@@ -150,7 +150,7 @@ class TestEmails(Command):
     cost = 30.00 * count
     basket = { "count" : count, "reference" : ref }
     output = render_template(template, basket=basket, user = {"name" : "J R Hartley"}, payment={"amount" : cost, "bankref": ref})
-    print output
+    print output.encode("utf-8")
 
 class CreateTickets(Command):
     def run(self):
