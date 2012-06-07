@@ -13,7 +13,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from jinja2 import Environment, FileSystemLoader
 
 from decimal import Decimal
-import re
+import re, os
 
 from main import app, mail
 from models import User, TicketType
@@ -35,24 +35,50 @@ class Reconcile(Command):
                  Option('-q', '--quiet', action='store_true', help="don't be verbose"),
                 )
 
+  badrefs = []
+  alreadypaid = 0
+  paid = 0
+  tickets_paid = 0
+  ref_fixups = {}
+
   def run(self, filename, doit, quiet):
     self.doit = doit
     self.quiet = quiet
+    
+    if os.path.exists("/etc/emf/reffixups.py"):
+      sys.path.append("/etc/emf")
+      import reffixups
+      self.ref_fixups = reffixups.fixups
+
     data = ofxparse.OfxParser.parse(file(filename))
+
     for t in data.account.statement.transactions:
       # field mappings:
       # 
       # NAME 		: payee  <-- the ref we want
-      # TRNTYPE 	: type   <-- other (?)
+      # TRNTYPE 	: type   <-- OTHER or DIRECTDEP
       # MEMO		: memo   <-- ?
       # FITID		: id     <-- also ?
       # TRNAMT		: amount <-- this is important...
       # DTPOSTED	: date   
       self.reconcile(t.payee, Decimal(t.amount), t)
+    
+    if len(self.badrefs) > 0:
+      print
+      print "unmatched references:"
+      for r in self.badrefs:
+        print r
+    print
+    print "already paid: %d, payments paid this run: %d, tickets: %d" % (self.alreadypaid, self.paid, self.tickets_paid)
 
   def find_payment(self, name):
-    name = name.upper()
-    found = re.findall('[%s]{4}-?[%s]{4}' % (safechars, safechars), name)
+    ref = name.upper()
+    # looks like this is:
+    # NAME REF XXX
+    # where name may contain multiple chars, and XXX is a 3 letter code
+    # originating bank(?)
+    #
+    found = re.findall('[%s]{4}-?[%s]{4}' % (safechars, safechars), ref)
     for f in found:
       bankref = f.replace('-', '')
       try:
@@ -60,28 +86,40 @@ class Reconcile(Command):
       except NoResultFound:
         continue
     else:
-      raise ValueError('No matches found')
+      #
+      # some refs are missed typed so we have a list
+      # of fixes to make them match
+      #
+      if name in self.ref_fixups:
+        return BankPayment.query.filter_by(bankref=self.ref_fixups[name]).one()
+      raise ValueError('No matches found ', name)
 
   def reconcile(self, ref, amount, t):
-    if t.type == 'other':
+    if t.type.lower() == 'other' or t.type.upper() == "DIRECTDEP":
       try:
         payment = self.find_payment(ref)
       except Exception, e:
         if not self.quiet:
           print "Exception matching ref %s paid %d: %s" % (repr(ref), amount, e)
+        self.badrefs.append([repr(ref), amount])
       else:
         user = payment.user
-        print u"user %s paid %d with ref %s" % (user.name, amount, ref)
         #
         # so now we have the ref and an amount
         #
+
+        if payment.state == "paid" and (Decimal(payment.amount_pence) / 100) == amount:
+          # all paid up, great lets ignore this one.
+          self.alreadypaid += 1
+          return
+
         unpaid = payment.tickets.all()
         total = Decimal(0)
         for t in unpaid:
           if t.paid == False:
             total += Decimal(str(t.type.cost_pence / 100.0))
-          else:
-            print "attempt to pay for ticket twice: %d" % (t.id)
+          elif not self.quiet:
+            print "attempt to pay for paid ticket: %d" % (t.id)
 
         if total == 0:
           # nothing owed, so an old payment...
@@ -92,7 +130,10 @@ class Reconcile(Command):
         else:
           # all paid up.
           if not self.quiet:
-            print "user %s paid for %d tickets (%s)" % (user.name, len(unpaid), ref)
+            print "user %s paid for %d (%d) tickets with ref: %s" % (user.name, len(unpaid), amount, ref)
+          
+          self.paid += 1
+          self.tickets_paid += len(unpaid)
           if self.doit:
             # not sure why we have to do this, or why the object is already in a session.
             s = db.object_session(unpaid[0])
@@ -102,7 +143,7 @@ class Reconcile(Command):
             s.commit()
             # send email
             # tickets-paid-email-banktransfer.txt
-            msg = Message("Your ticket purchase update", \
+            msg = Message("Electromagnetic Field ticket purchase update", \
                           sender=app.config.get('TICKETS_EMAIL'), \
                           recipients=[payment.user.email]
                          )
@@ -115,6 +156,7 @@ class Reconcile(Command):
     else:
       if not self.quiet:
         print t, t.type, t.payee
+    
 
 class TestEmails(Command):
   """
