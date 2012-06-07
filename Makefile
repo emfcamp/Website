@@ -4,6 +4,7 @@
 # and use the right settings file.
 hostname=$(shell hostname)
 SETTINGS=./config/development.cfg
+OFX=tests/account.ofx
 
 #
 # jasper is using postgres on his server
@@ -18,6 +19,8 @@ endif
 #
 ifeq ($(hostname),gauss)
 SETTINGS=/etc/emf-site.cfg
+# live reconcile data
+OFX=~russ/data.ofx
 endif
 
 run:
@@ -32,8 +35,11 @@ update:
 init:
 	virtualenv ./env
 
-reconcile:
-	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py reconcile -f tests/account.ofx
+checkreconcile:
+	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py reconcile -f $(OFX)
+
+reallyreconcile:
+	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py reconcile -d -f $(OFX)
 
 shell:
 	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py shell
