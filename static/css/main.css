@@ -115,9 +115,8 @@ dl.bank-details {
   padding-right: 3px;
 }
 
-
 table.tickets tr.paid {
-  color: #0f0;
+  font-weight: bold;
 }
 
 table.tickets tr.expired {
