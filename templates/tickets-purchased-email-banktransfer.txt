@@ -23,6 +23,8 @@ Account number: 73590526
 Amount:         {{ format_price(payment.amount) }}
 Reference:      {{ format_bankref(payment.bankref) }}
 
+(Don't worry if the payee name doesn't quite fit)
+
 International transfers
 -----------------------
 
