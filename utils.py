@@ -40,6 +40,7 @@ class Reconcile(Command):
   paid = 0
   tickets_paid = 0
   ref_fixups = {}
+  overpays = {}
 
   def run(self, filename, doit, quiet):
     self.doit = doit
@@ -49,6 +50,7 @@ class Reconcile(Command):
       sys.path.append("/etc/emf")
       import reffixups
       self.ref_fixups = reffixups.fixups
+      self.overpays = reffixups.overpays
 
     data = ofxparse.OfxParser.parse(file(filename))
 
@@ -125,12 +127,12 @@ class Reconcile(Command):
           # nothing owed, so an old payment...
           return
           
-        if total != amount:
-          print "tried to reconcile payment %s for %s, but amount paid (%d) didn't match amount owed (%d)" % (ref, user.name, amount, total)
+        if total != amount and payment.id not in self.overpays:
+          print "tried to reconcile payment %s for %s, but amount paid (%.2f) didn't match amount owed (%.2f)" % (ref, user.name, amount, total)
         else:
           # all paid up.
           if not self.quiet:
-            print "user %s paid for %d (%d) tickets with ref: %s" % (user.name, len(unpaid), amount, ref)
+            print "user %s paid for %d (%.2f) tickets with ref: %s" % (user.name, len(unpaid), amount, ref)
           
           self.paid += 1
           self.tickets_paid += len(unpaid)
