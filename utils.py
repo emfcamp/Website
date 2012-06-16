@@ -121,7 +121,8 @@ class Reconcile(Command):
           if t.paid == False:
             total += Decimal(str(t.type.cost_pence / 100.0))
           elif not self.quiet:
-            print "attempt to pay for paid ticket: %d" % (t.id)
+            if payment.id not in self.overpays:
+              print "attempt to pay for paid ticket: %d, user: %s, payment id: %d" % (t.id, payment.user.name, payment.id)
 
         if total == 0:
           # nothing owed, so an old payment...
