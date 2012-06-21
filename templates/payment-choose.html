@@ -16,12 +16,16 @@
     {%- endif %}
 Your tickets aren't quite reserved yet!  Please choose a payment method below to buy your tickets.</p>
 
-<h3>Paying in Pounds</h3>
+<h3>Paying in Pounds or Euros</h3>
+
 <p>The best way is to ask your bank to send it to us directly (this works online, or with cash in
 branch).</p>
+
 <form method="post" action="{{ url_for('transfer_start') }}">
 <p><input type=submit name=banktransfer value="Pay by bank transfer"/></p>
 </form>
+
+<h3>Paying by Direct Debit</h3>
 
 <p>Alternatively, choose GoCardless to create a one-off direct debit from your account.
 GoCardless payments are protected by the 
@@ -31,10 +35,5 @@ Guarantee</a>.</p>
 <form method="post" action="{{ url_for('gocardless_start') }}">
 <p><input type=submit name=gocardless value="Pay with GoCardless"/></p>
 </form>
-
-<h3>Paying in Euros</h3>
-<p>If you want to pay in Euros, we're working on it.
-   <a href="mailto:{{ config.get('TICKETS_EMAIL')[1] }}">Email us</a>
-   and we'll let you know when our Euro bank account is ready.</p>
 
 {% endblock %}
