@@ -232,9 +232,9 @@ def tickets():
     btcancel_forms = {}
     for p in payments:
         if p.provider == "gocardless" and p.state == "new":
-            gc_try_again_forms[p.id] = GoCardlessTryAgainForm(payment=p.id, yesno='no')
+            gc_try_again_forms[p.id] = GoCardlessTryAgainForm(formdata=None, payment=p.id, yesno='no')
         elif p.provider == "banktransfer" and p.state == "inprogress":
-            btcancel_forms[p.id] = BankTransferCancelForm(payment=p.id, yesno='no')
+            btcancel_forms[p.id] = BankTransferCancelForm(formdata=None, payment=p.id, yesno='no')
         # the rest are inprogress or complete gocardless payments
         # or complete banktransfers,
         # or canceled payments of either provider.
@@ -393,8 +393,7 @@ def gocardless_tryagain():
         return redirect(bill_url)
 
     if form.cancel.data == True:
-        # I cannot work out why, but yesno does not get set to 'yes' here!
-        ynform = GoCardlessTryAgainForm(payment = payment.id, yesno = "yes")
+        ynform = GoCardlessTryAgainForm(payment = payment.id, yesno = "yes", formdata=None)
         return render_template('gocardless-discard-yesno.html', payment=payment, form=ynform)
 
     if form.yes.data == True:
@@ -638,8 +637,7 @@ def transfer_cancel():
         return redirect(url_for('tickets'))
 
     if form.yesno.data == "no" and form.cancel.data == True:
-        # yesno stays as 'no' here.
-        ynform = BankTransferCancelForm(payment=payment.id, yesno='yes')
+        ynform = BankTransferCancelForm(payment=payment.id, yesno='yes', formdata=None)
         return render_template('transfer-cancel-yesno.html', payment=payment, form=ynform)
 
     if form.no.data == True:
