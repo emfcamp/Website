@@ -679,6 +679,8 @@ def admin():
 class ManualReconcileForm(Form):
     payment = HiddenField('payment_id', [Required()])
     reconcile = SubmitField('Reconcile')
+    yes = SubmitField('Yes')
+    no = SubmitField('No')
 
 @app.route("/admin/manual_reconcile", methods=['GET', 'POST'])
 @login_required
@@ -687,28 +689,37 @@ def manual_reconcile():
         if request.method == "POST":
             form = ManualReconcileForm()
             if form.validate():
-                payment = BankPayment.query.get(int(form.payment.data))
-                app.logger.info("%s Manually reconciled payment %d (%s)", current_user.name, payment.id, payment.bankref)
-                for t in payment.tickets:
-                    t.paid = True
-                    db.session.add(t)
-                    app.logger.info("ticket %d (%s, for %s) paid", t.id, t.type.name, payment.user.name)
-                payment.state = "paid"
-                db.session.add(payment)
-                db.session.commit()
+                if form.yes.data == True:
+                    payment = BankPayment.query.get(int(form.payment.data))
+                    app.logger.info("%s Manually reconciled payment %d (%s)", current_user.name, payment.id, payment.bankref)
+                    for t in payment.tickets:
+                        t.paid = True
+                        db.session.add(t)
+                        app.logger.info("ticket %d (%s, for %s) paid", t.id, t.type.name, payment.user.name)
+                    payment.state = "paid"
+                    db.session.add(payment)
+                    db.session.commit()
                 
-                # send email.
-                msg = Message("Electromagnetic Field ticket purchase update", \
+                    # send email.
+                    msg = Message("Electromagnetic Field ticket purchase update", \
                               sender=app.config.get('TICKETS_EMAIL'), \
                               recipients=[payment.user.email]
                              )
-                msg.body = render_template("tickets-paid-email-banktransfer.txt", \
+                    msg.body = render_template("tickets-paid-email-banktransfer.txt", \
                               basket={"count" : len(payment.tickets.all()), "reference" : payment.bankref}, \
                               user = payment.user, payment=payment
                              )
-                mail.send(msg)
+                    mail.send(msg)
                 
-                return redirect(url_for('manual_reconcile'))
+                    flash("Payment ID %d now marked as paid" % (payment.id))
+                    return redirect(url_for('manual_reconcile'))
+                elif form.no.data == True:
+                    return redirect(url_for('manual_reconcile'))
+                elif form.reconcile.data == True:
+                    payment = BankPayment.query.get(int(form.payment.data))
+                    ynform = ManualReconcileForm(payment=payment.id, formdata=None)
+                    return render_template('admin_manual_reconcile_yesno.html', ynform=ynform, payment=payment)
+
         payments = BankPayment.query.filter(BankPayment.state == "inprogress").order_by(BankPayment.bankref).all()
         paymentforms = {}
         for p in payments:
