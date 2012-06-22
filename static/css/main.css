@@ -34,6 +34,8 @@ h3 {
 
 p, ul, ol {padding-bottom: 10px;}
 
+strong { font-weight: bold; }
+
 p.summary {
     font-size: 130%
 }
