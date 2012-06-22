@@ -46,8 +46,6 @@ Your payments:
 <table>
 <tr><th>Type</th><th>Amount</th><th>Progress</th><th></th></tr>
 {% for p in payments %}
-
-{% if p.state != "canceled" %}
 <tr class="
 {{ loop.cycle('odd', 'even') }}
 ">
@@ -72,7 +70,6 @@ Your payments:
 </td>
 
 </tr>
-{% endif %}
 {%endfor%}
 </table>
 

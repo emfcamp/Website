@@ -215,7 +215,7 @@ def tickets():
         return redirect(url_for('pay_choose'))
 
     tickets = current_user.tickets.all()
-    payments = current_user.payments.all()
+    payments = current_user.payments.filter(Payment.state != "canceled", Payment.state != "expired").all()
 
     #
     # go through existing payments
