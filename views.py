@@ -608,7 +608,14 @@ def transfer_start():
 @login_required
 def transfer_waiting():
     payment_id = int(request.args.get('payment'))
-    payment = current_user.payments.filter_by(id=payment_id, user=current_user).one()
+    try:
+        payment = current_user.payments.filter_by(id=payment_id, user=current_user).one()
+    except NoResultFound:
+        if current_user:
+            app.logger.error("Attempt to get an inaccessible payment (%d) by user %d (%s)" % (payment_id, current_user.id, current_user.name))
+        else:
+            app.logger.error("Attempt to get an inaccessible payment (%d)" % (payment_id))
+        return redirect(url_for('tickets'))
     return render_template('transfer-waiting.html', payment=payment, days=app.config.get('EXPIRY_DAYS'))
 
 @app.route("/pay/transfer-cancel", methods=['POST'])
