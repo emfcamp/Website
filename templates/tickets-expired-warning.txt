@@ -6,7 +6,7 @@ reserved for Electromagnetic Field 2012.
 The tickets will expire in a few days if not payed for.
 
 If you don't want the tickets you can ignore this email. {% if payment.provider == "gocardless" -%} Otherwise,
-if you wish to pay for the tickets, you can go to the EMFCamp website:
+if you wish to pay for the tickets, you can go to the EMF website:
 
 https://www.emfcamp.org{{ url_for('tickets') }}
 
@@ -43,4 +43,4 @@ Total: {{ format_price(payment.amount) }}
 
 Love,
 
-All the EMF Camp team
+All the EMF team
