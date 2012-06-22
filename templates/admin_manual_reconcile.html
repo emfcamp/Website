@@ -1,0 +1,49 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block body %}
+<H1>Manually reconcile a payment:</H1>
+
+<table class=tickets>
+<tr>
+<th>username</th>
+<th>email</th>
+<th>bankref</th>
+<th>tickets</th>
+<th>total amount</th>
+</tr>
+
+{% for p in payments %}
+<tr class="
+{{ loop.cycle('odd', 'even') }}
+">
+<td>{{p.user.name}}</td>
+<td>{{p.user.email}}</td>
+<td><b>{{p.bankref}}</b></td>
+<td>
+<table border=1>
+{% for t in p.tickets %}
+<tr>
+<td>{{ t.id }}</td>
+<td>{{ t.type.name }}</td>
+<td>{{ format_price(t.type.cost) }}</td>
+<td>{{ t.expired() }}</td>
+<td>{{ t.paid }}</td>
+</tr>
+{% endfor %}
+</table>
+</td>
+<td><b>{{ format_price(p.amount) }}</b></td>
+<td>
+<form method=post action="{{ url_for('manual_reconcile') }}">
+{{ paymentforms[p.id].hidden_tag() }}
+{{ paymentforms[p.id].reconcile() }}
+</form>
+</td>
+</tr>
+{% endfor %}
+
+</table>
+
+<p>Back to <a href="{{ url_for('admin') }}">admin things</a>.</p>
+
+{% endblock %}

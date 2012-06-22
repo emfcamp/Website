@@ -43,6 +43,9 @@ class BankPayment(Payment):
         # not cryptographic
         self.bankref = ''.join(random.sample(safechars, 8))
 
+    def __repr__(self):
+        return "<BankPayment: %s %s>" % (self.state, self.bankref)
+
 class GoCardlessPayment(Payment):
     name = 'GoCardless payment'
 

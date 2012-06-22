@@ -1,0 +1,11 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block body %}
+<H1>Admin things:</H1>
+
+<ul>
+<li><a href="{{ url_for('manual_reconcile') }}">Manualy reconcile a payment</a>.</li>
+<li><a href="{{ url_for('make_admin') }}">Make someone an admin</a></li>
+</ul>
+
+{% endblock %}
