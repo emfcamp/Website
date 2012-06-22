@@ -12,7 +12,8 @@ from flaskext.mail import Message
 from flaskext.wtf import \
     Form, Required, Email, EqualTo, ValidationError, \
     TextField, PasswordField, SelectField, HiddenField, \
-    SubmitField, BooleanField, IntegerField, HiddenInput
+    SubmitField, BooleanField, IntegerField, HiddenInput, \
+    DecimalField
 
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
@@ -749,5 +750,30 @@ def make_admin():
                 return redirect(url_for('make_admin'))
         adminform = MakeAdminForm(formdata=None)
         return render_template('admin_make_admin.html', users=users, adminform = adminform)
+    else:
+        return(('', 404))
+
+class NewTicketTypeForm(Form):
+    name = TextField('Name', [Required()])
+    capacity = IntegerField('Capacity', [Required()])
+    limit = IntegerField('Limit', [Required()])
+    cost = DecimalField('Cost', [Required()])
+
+@app.route("/admin/ticket_types", methods=['GET', 'POST'])
+@login_required
+def ticket_types():
+    if current_user.admin:
+        if request.method == 'POST':
+            form = NewTicketTypeForm()
+            if form.validate():
+                tt = TicketType(form.name.data, form.capacity.data, form.limit.data, form.cost.data)
+                db.session.add(tt)
+                db.session.commit()
+                print tt
+            return redirect(url_for('ticket_types'))
+
+        types = TicketType.query.all()
+        form = NewTicketTypeForm(formdata=None)
+        return render_template('admin_ticket_types.html', types=types, form=form)
     else:
         return(('', 404))
