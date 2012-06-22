@@ -69,11 +69,10 @@ tr.odd {
 }
 
 ul li {
-    padding-left:5px;
-    list-style:circle inside;
+    list-style: circle outside;
 }
 
-ol {
+ul, ol {
    padding-left: 25px;
 
 }
