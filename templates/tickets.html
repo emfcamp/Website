@@ -6,6 +6,11 @@
 
 {% block body %}
 
+{% if current_user.admin %}
+<p>You are an admin, click <a href="/admin">here</a> to go to the admin
+pages.</p>
+{% endif %}
+
 {% if tickets %}
 <p>Your current tickets:</p>
 
