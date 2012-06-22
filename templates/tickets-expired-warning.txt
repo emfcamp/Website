@@ -1,0 +1,46 @@
+Hi {{ payment.user.name }},
+
+Just to warn you that we have not yet received payment for the tickets you
+reserved for Electromagnetic Field 2012.
+
+The tickets will expire in a few days if not payed for.
+
+If you don't want the tickets you can ignore this email. {% if payment.provider == "gocardless" -%} Otherwise,
+if you wish to pay for the tickets, you can go to the EMFCamp website:
+
+https://www.emfcamp.org{{ url_for('tickets') }}
+
+and complete the payment process.
+
+{%- endif -%}
+{% if payment.provider == "banktransfer" %}
+
+You can pay by CHAPS/Faster Payments, or by cash at your bank.
+
+We will use the reference to identify the payment as yours, so please
+ensure it's included in full.
+
+Bank:           Barclays
+Payee:          Electromagnetic Field Ltd
+Sort code:      20-71-64
+Account number: 73590526
+Amount:         {{ format_price(payment.amount) }}
+Reference:      {{ format_bankref(payment.bankref) }}
+
+(Don't worry if the payee name doesn't quite fit)
+
+{%- endif %}
+
+The Tickets are:
+
+Type			Cost
+----			----
+{% for t in payment.tickets -%}
+{{ t.type.name }} 	{{ format_price(t.type.cost) }}
+{% endfor %}
+
+Total: {{ format_price(payment.amount) }}
+
+Love,
+
+All the EMF Camp team

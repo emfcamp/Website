@@ -14,6 +14,8 @@
 
 {% for t in tickets %}
 
+{# only display tickets that have a payment #}
+{% if t.payment %}
 <tr class="
 {{ loop.cycle('odd', 'even') }}
 {% if t.paid %}paid{% endif%}
@@ -30,7 +32,7 @@
     {% endif %}
 </td>
 </tr>
-
+{% endif %}
 {% endfor %}
 
 </table>
