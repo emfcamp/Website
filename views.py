@@ -779,17 +779,18 @@ class NewTicketTypeForm(Form):
 @login_required
 def ticket_types():
     if current_user.admin:
+        form = None
         if request.method == 'POST':
             form = NewTicketTypeForm()
             if form.validate():
                 tt = TicketType(form.name.data, form.capacity.data, form.limit.data, form.cost.data)
                 db.session.add(tt)
                 db.session.commit()
-                print tt
-            return redirect(url_for('ticket_types'))
+                return redirect(url_for('ticket_types'))
 
         types = TicketType.query.all()
-        form = NewTicketTypeForm(formdata=None)
+        if not form:
+            form = NewTicketTypeForm(formdata=None)
         return render_template('admin_ticket_types.html', types=types, form=form)
     else:
         return(('', 404))

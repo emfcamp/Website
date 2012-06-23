@@ -10,3 +10,15 @@
   {% endif %}
   </dd>
 {% endmacro %}
+
+{% macro render_field_bs(field) %}
+  {{ field.label }}
+  {{ field(**kwargs)|safe }}
+  {% if field.errors %}
+    {% for error in field.errors %}
+     <div class="alert alert-error">
+      {{ error }}
+     </div>
+    {% endfor %}
+  {% endif %}
+{% endmacro %}
