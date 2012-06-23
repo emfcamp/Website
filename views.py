@@ -438,9 +438,17 @@ def gocardless_complete():
     payment.gcid = gcid
     payment.state = "inprogress"
     db.session.add(payment)
+
+    for t in payment.tickets:
+        # We need to make sure of a 5 working days grace
+        # for gocardless payments, so push the ticket expirey forwards
+        t.expires = datetime.utcnow() + timedelta(10)
+        app.logger.info("ticket %d (payment %d): expirey reset.", t.id, payment.id)
+        db.session.add(t)
+
     db.session.commit()
 
-    app.logger.info("Payment completed OK")
+    app.logger.info("Payment %d completed OK", payment.id)
 
     # should we send the resource_uri in the bill email?
     msg = Message("Your EMF ticket purchase", \
