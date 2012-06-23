@@ -15,3 +15,5 @@ Running
 make update
 make
 ```
+
+If you want the site to be accessible by the rest of the world then change app.run() at the end of main.py to app.run(host="0.0.0.0")
