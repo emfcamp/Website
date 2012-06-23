@@ -4,14 +4,14 @@
 <h2>Cancel Your banktransfer payment</h2>
 <p>Are you sure you want to cancel your payment?</p>
 
-<form method=post action="/pay/transfer-cancel">
+<form method="post" action="/pay/transfer-cancel" class="form-inline">
 {{form.hidden_tag()}}
 {{form.yes()}}
 {{form.no()}}
 </form>
 
 <p>If you have paid and want to get a refund please
-<a href="mailto:{{config.get('TICKETS_EMAIL')[1] }}">Email us</a> with your payment reference.</p>
+<a href="mailto:{{config.get('TICKETS_EMAIL')[1] }}">email us</a> with your payment reference.</p>
 
 <a href="{{ url_for('tickets') }}">Show my tickets</a>
 {% endblock %}

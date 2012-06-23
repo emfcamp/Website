@@ -84,7 +84,7 @@ Your payments:
 
 {% if tickets|count < 4 %}
 
-<form method=post class="choose-prepay-tickets">
+<form method=post class="form-horizontal choose-prepay-tickets">
     {{form.hidden_tag()}}
     <h2>Reserve tickets</h2>
 
@@ -92,14 +92,16 @@ Your payments:
 <A HREF="http://wiki.emfcamp.org/wiki/FAQ#Why_is_there_currently_an_age_limit.3F">our FAQ</a> for
 details.</p>
 
-<dl id="prepay" data-price="{{ price }}">
+<div id="prepay" data-price="{{ price }}">
     {{ render_field(form.count) }}
-</dl>
-    <p id="summary">
-    <span>Price per ticket: {{ format_price(price) }}</span>
-    <span style="display: none">Total amount for deposit: <span id="total"></span></span>
-    </p>
-    <input type=submit value="Go to reservation"/>
+</div>
+    <div id="summary" class="control-group">
+        <span>Price per ticket: {{ format_price(price) }}</span>
+        <span style="display: none">Total amount for deposit: <span id="total"></span></span>
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Go to reservation</button>
+    </div>
 </form>
 {% else %}
 <p>You've already bought 4 tickets, thanks for helping EMF by

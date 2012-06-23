@@ -1,14 +1,15 @@
 {% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block body %}
-<form method=post>
+<h2>Log In</h2>
+<form method="post" class="form-horizontal">
     {{form.hidden_tag()}}
-<dl>
     {{ render_field(form.email) }}
     {{ render_field(form.password) }}
-</dl>
-    <input type=submit name="Login"/>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Log in</button>
+    </div>
 </form>
-<a href="{{ url_for('forgot_password') }}">Forgot password</a>
+<a href="{{ url_for('forgot_password') }}">Forgot password</a> | 
 <a href="{{ url_for('signup', next=form.next.data) }}">Sign up</a>
 {% endblock %}
