@@ -34,7 +34,7 @@
 </td>
 <td><b>{{ format_price(p.amount) }}</b></td>
 <td>
-<form method=post action="{{ url_for('manual_reconcile') }}">
+<form method=post action="{{ url_for('manual_reconcile') }}" class="shrink">
 {{ paymentforms[p.id].hidden_tag() }}
 {{ paymentforms[p.id].reconcile() }}
 </form>
