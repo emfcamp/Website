@@ -41,6 +41,10 @@ assets = Environment(app)
 css = Bundle('css/bootstrap.css', 'css/main.css', output='gen/packed.css')
 assets.register('css_all', css)
 
+js = Bundle('js/jquery-1.7.2.js', 'js/bootstrap.js', output='gen/packed.js')
+assets.register('js_all', js)
+
+
 import gocardless
 
 gocardless.environment = app.config['GOCARDLESS_ENVIRONMENT']
