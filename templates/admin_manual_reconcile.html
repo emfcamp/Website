@@ -3,24 +3,26 @@
 {% block body %}
 <H1>Manually reconcile a payment:</H1>
 
-<table class=tickets>
+<table class="table table-condensed table-striped">
+<thead>
 <tr>
-<th>username</th>
-<th>email</th>
+<th><i class="icon-user"></i> username</th>
+<th><i class="icon-envelope"></i> email</th>
 <th>bankref</th>
-<th>tickets</th>
+<th><i class="icon-shopping-cart"></i> tickets</th>
 <th>total amount</th>
+<th></th>
 </tr>
-
+</thead>
+<tbody>
 {% for p in payments %}
-<tr class="
-{{ loop.cycle('odd', 'even') }}
-">
+<tr>
 <td>{{p.user.name}}</td>
 <td>{{p.user.email}}</td>
 <td><b>{{p.bankref}}</b></td>
 <td>
-<table border=1>
+<table class="table table-condensed table-bordered">
+<tbody>
 {% for t in p.tickets %}
 <tr>
 <td>{{ t.id }}</td>
@@ -30,18 +32,19 @@
 <td>{{ t.paid }}</td>
 </tr>
 {% endfor %}
+</tbody>
 </table>
 </td>
 <td><b>{{ format_price(p.amount) }}</b></td>
 <td>
 <form method=post action="{{ url_for('manual_reconcile') }}" class="shrink">
 {{ paymentforms[p.id].hidden_tag() }}
-{{ paymentforms[p.id].reconcile() }}
+{{ paymentforms[p.id].reconcile(class_="btn btn-success") }}
 </form>
 </td>
 </tr>
 {% endfor %}
-
+</tbody>
 </table>
 
 <p>Back to <a href="{{ url_for('admin') }}">admin things</a>.</p>

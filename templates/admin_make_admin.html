@@ -6,8 +6,9 @@
 <form method=post action="{{ url_for('make_admin') }}">
 {{ adminform.hidden_tag() }}
 {{ adminform.keys }}
-<table class="tickets">
-<tr><th>Name</th><th>email</th></tr>
+
+<table class="table table-condensed">
+<tr><th><i class="icon-user"></i> Name</th><th><i class="icon-envelope"></i> email</th><th></th></tr>
 {% for u in users %}
 <tr class="
 {{ loop.cycle('odd', 'even') }}
@@ -18,7 +19,7 @@
 </tr>
 {% endfor %}
 </table>
-{{ adminform.change() }}
+{{ adminform.change(class_="btn btn-success") }}
 </form>
 
 <p>Back to <a href="{{ url_for('admin') }}">admin things</a>.</p>

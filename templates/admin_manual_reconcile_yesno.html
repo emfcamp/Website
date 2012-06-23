@@ -13,8 +13,8 @@
 
 <form method=post action="{{ url_for('manual_reconcile') }}">
 {{ ynform.hidden_tag() }}
-{{ ynform.yes() }}
-{{ ynform.no() }}
+{{ ynform.yes(class_="btn btn-warning") }}
+{{ ynform.no(class_="btn btn-success") }}
 </form>
 
 <p>Back to <a href="{{ url_for('admin') }}">admin things</a>.</p>
