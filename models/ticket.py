@@ -58,7 +58,7 @@ class Ticket(db.Model):
             self.type_id = type.type_id
         elif type_id is not None:
             self.type_id = type_id
-            self.type = TicketType.query.filter_by(id=TicketType.Prepay.id).one()
+            self.type = TicketType.query.filter_by(id=type_id).one()
         else:
             raise ValueError('Type must be specified')
 
