@@ -19,6 +19,8 @@ pages.</p>
 
 {% for t in tickets %}
 
+{# only display tickets that have a payment #}
+{% if t.payment %}
 <tr class="
 {{ loop.cycle('odd', 'even') }}
 {% if t.paid %}paid{% endif%}
@@ -35,7 +37,7 @@ pages.</p>
     {% endif %}
 </td>
 </tr>
-
+{% endif %}
 {% endfor %}
 
 </table>
@@ -49,8 +51,6 @@ Your payments:
 <table>
 <tr><th>Type</th><th>Amount</th><th>Progress</th><th></th></tr>
 {% for p in payments %}
-
-{% if p.state != "canceled" %}
 <tr class="
 {{ loop.cycle('odd', 'even') }}
 ">
@@ -75,7 +75,6 @@ Your payments:
 </td>
 
 </tr>
-{% endif %}
 {%endfor%}
 </table>
 

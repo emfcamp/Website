@@ -41,6 +41,12 @@ checkreconcile:
 reallyreconcile:
 	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py reconcile -d -f $(OFX)
 
+warnexpire:
+	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py warnexpire
+
+expire:
+	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py expire
+
 shell:
 	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py shell
 
