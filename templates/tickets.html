@@ -12,9 +12,9 @@ pages.</p>
 {% endif %}
 
 {% if tickets %}
-<p>Your current tickets:</p>
+<h2>Your current tickets</h2>
 
-<table class="tickets">
+<table class="table">
 <tr><th>Type</th><th>Status</th></tr>
 
 {% for t in tickets %}
@@ -46,9 +46,9 @@ pages.</p>
 {% endif %}
 
 {% if payments %}
-Your payments:
+<h2>Your payments</h2>
 
-<table>
+<table class="table">
 <tr><th>Type</th><th>Amount</th><th>Progress</th><th></th></tr>
 {% for p in payments %}
 <tr class="
@@ -80,26 +80,25 @@ Your payments:
 
 {% endif %}
 
-{% include 'ticket-blurb.html' %}
 
 {% if tickets|count < 4 %}
 
-<form method=post class="choose-prepay-tickets">
+<form method=post class="form-horizontal choose-prepay-tickets">
     {{form.hidden_tag()}}
     <h2>Reserve tickets</h2>
 
-<p>We're currently only selling tickets for people aged <b>18 and over</b>. See
-<A HREF="http://wiki.emfcamp.org/wiki/FAQ#Why_is_there_currently_an_age_limit.3F">our FAQ</a> for
-details.</p>
+{% include 'ticket-blurb.html' %}
 
-<dl id="prepay" data-price="{{ price }}">
+<div id="prepay" data-price="{{ price }}">
     {{ render_field(form.count) }}
-</dl>
-    <p id="summary">
-    <span>Price per ticket: {{ format_price(price) }}</span>
-    <span style="display: none">Total amount for deposit: <span id="total"></span></span>
-    </p>
-    <input type=submit value="Go to reservation"/>
+</div>
+    <div id="summary" class="control-group">
+        <span>Price per ticket: {{ format_price(price) }}</span>
+        <span style="display: none">Total amount for deposit: <span id="total"></span></span>
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Go to reservation</button>
+    </div>
 </form>
 {% else %}
 <p>You've already bought 4 tickets, thanks for helping EMF by

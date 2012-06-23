@@ -68,7 +68,6 @@ def sponsors():
 def company():
     return render_template('company.html')
 
-
 class NextURLField(HiddenField):
     def _value(self):
         # Cheap way of ensuring we don't get absolute URLs
@@ -84,8 +83,9 @@ class LoginForm(Form):
     next = NextURLField('Next')
 
 @app.route("/login", methods=['GET', 'POST'])
-@feature_flag('PAYMENTS')
 def login():
+    if current_user.is_authenticated():
+        return redirect(url_for('tickets'))
     form = LoginForm(request.form, next=request.args.get('next'))
     if request.method == 'POST' and form.validate():
         user = User.query.filter_by(email=form.email.data).first()
@@ -106,7 +106,6 @@ class SignupForm(Form):
     next = NextURLField('Next')
 
 @app.route("/signup", methods=['GET', 'POST'])
-@feature_flag('PAYMENTS')
 def signup():
     if current_user.is_authenticated():
         return redirect(url_for('tickets'))
@@ -145,7 +144,6 @@ class ForgotPasswordForm(Form):
         form._user = user
 
 @app.route("/forgot-password", methods=['GET', 'POST'])
-@feature_flag('PAYMENTS')
 def forgot_password():
     form = ForgotPasswordForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -178,7 +176,6 @@ class ResetPasswordForm(Form):
         form._reset = reset
 
 @app.route("/reset-password", methods=['GET', 'POST'])
-@feature_flag('PAYMENTS')
 def reset_password():
     form = ResetPasswordForm(request.form, email=request.args.get('email'), token=request.args.get('token'))
     if request.method == 'POST' and form.validate():
@@ -192,7 +189,6 @@ def reset_password():
     return render_template("reset-password.html", form=form)
 
 @app.route("/logout")
-@feature_flag('PAYMENTS')
 @login_required
 def logout():
     logout_user()
@@ -203,27 +199,25 @@ def logout():
 class ChoosePrepayTicketsForm(Form):
     count = IntegerSelectField('Number of tickets', [Required()])
 
-    def validate_count(form, field):
-        prepays = current_user.tickets. \
-            filter_by(type=TicketType.Prepay).\
-            filter(Ticket.expires >= datetime.utcnow()). \
-            count()
-        if field.data + prepays > TicketType.Prepay.limit:
-            raise ValidationError('You can only buy %s tickets in total' % TicketType.Prepay.limit)
 
 @app.route("/tickets", methods=['GET', 'POST'])
-@feature_flag('PAYMENTS')
-@login_required
 def tickets():
     form = ChoosePrepayTicketsForm(request.form)
     form.count.values = range(1, TicketType.Prepay.limit + 1)
 
     if request.method == 'POST' and form.validate():
         session["count"] = form.count.data
-        return redirect(url_for('pay_choose'))
+        if current_user.is_authenticated():
+            return redirect(url_for('pay_choose'))
+        else:
+            return redirect(url_for('signup', next=url_for('pay_choose')))
 
-    tickets = current_user.tickets.all()
-    payments = current_user.payments.filter(Payment.state != "canceled", Payment.state != "expired").all()
+    if current_user.is_authenticated():
+        tickets = current_user.tickets.all()
+        payments = current_user.payments.filter(Payment.state != "canceled", Payment.state != "expired").all()
+    else:
+        tickets = []
+        payments = []
 
     print [t.type.name for t in tickets]
 
@@ -307,7 +301,6 @@ def make_payment_and_tickets(paymenttype, basket):
 
 
 @app.route("/pay")
-@feature_flag('PAYMENTS')
 def pay():
     if current_user.is_authenticated():
         return redirect(url_for('pay_choose'))
@@ -315,17 +308,15 @@ def pay():
     return render_template('payment-options.html')
 
 @app.route("/pay/terms")
-@feature_flag('PAYMENTS')
 def ticket_terms():
     return render_template('terms.html')
 
 @app.route("/pay/choose")
-@feature_flag('PAYMENTS')
 @login_required
 def pay_choose():
     count = session.pop('count', None)
     if not count:
-        basket = session.get('basket')
+        basket = session.pop('basket', None)
         if basket:
             if len(basket) > 0:
                 basket_out = {}
@@ -344,11 +335,20 @@ def pay_choose():
     else:
         amount = TicketType.Prepay.cost * count
         basket = { TicketType.Prepay.id : count }
+        return redirect(url_for('tickets'))
 
+#    prepays = current_user.tickets. \
+#        filter_by(type=TicketType.Prepay).\
+#        filter(Ticket.expires >= datetime.utcnow()). \
+#        count()
+#    if count + prepays > TicketType.Prepay.limit:
+#        flash("You can only buy up to 4 tickets per person.")
+#        return redirect(url_for('tickets'))
+
+    amount = TicketType.Prepay.cost * count
     return render_template('payment-choose.html', basket=basket_out, amount=amount)
 
 @app.route("/pay/gocardless-start", methods=['POST'])
-@feature_flag('PAYMENTS')
 @login_required
 def gocardless_start():
     basket = session.pop('basket', None)
@@ -400,7 +400,6 @@ class BankTransferCancelForm(Form):
             raise ValidationError('Sorry, that dosn\'t look like a valid payment')
 
 @app.route("/pay/gocardless-tryagain", methods=['POST'])
-@feature_flag('PAYMENTS')
 @login_required
 def gocardless_tryagain():
     """
@@ -449,7 +448,6 @@ def gocardless_tryagain():
     return redirect(url_for('tickets'))
 
 @app.route("/pay/gocardless-complete")
-@feature_flag('PAYMENTS')
 @login_required
 def gocardless_complete():
     payment_id = int(request.args.get('payment'))
@@ -501,7 +499,6 @@ def gocardless_complete():
     return redirect(url_for('gocardless_waiting', payment=payment_id))
 
 @app.route('/pay/gocardless-waiting')
-@feature_flag('PAYMENTS')
 @login_required
 def gocardless_waiting():
     try:
@@ -520,7 +517,6 @@ def gocardless_waiting():
     return render_template('gocardless-waiting.html', payment=payment, days=app.config.get('EXPIRY_DAYS'))
 
 @app.route("/pay/gocardless-cancel")
-@feature_flag('PAYMENTS')
 @login_required
 def gocardless_cancel():
     payment_id = int(request.args.get('payment'))
@@ -549,7 +545,6 @@ def gocardless_cancel():
     return render_template('gocardless-cancel.html', payment=payment)
 
 @app.route("/gocardless-webhook", methods=['POST'])
-@feature_flag('PAYMENTS')
 def gocardless_webhook():
     """
         handle the gocardless webhook / callback callback:
@@ -622,7 +617,6 @@ def gocardless_webhook():
 
 
 @app.route("/pay/transfer-start", methods=['POST'])
-@feature_flag('PAYMENTS')
 @login_required
 def transfer_start():
     basket = session.pop('basket', None)
@@ -653,7 +647,7 @@ class BuyTicketForm(Form):
     #
     # TODO:
     #
-    # this should be a dynamicly created form inside the /buy/tickets function
+    # this should be a dynamicly created form inside the /tickets function
     # like the /admin/make_admin form
     #
     def __init__(self, *args, **kwargs):
@@ -679,6 +673,9 @@ class BuyTicketForm(Form):
 @feature_flag('PAYMENTS')
 @login_required
 def buy_tickets():
+    """
+        This needs to go into /tickets
+    """
     form = BuyTicketForm(request.form)
     if request.method == 'POST' and form.validate():
         """get the bits for the ticket purchase form"""
@@ -708,7 +705,6 @@ def buy_tickets():
     return render_template("buy-tickets.html", form=form)
 
 @app.route("/pay/transfer-waiting")
-@feature_flag('PAYMENTS')
 @login_required
 def transfer_waiting():
     payment_id = int(request.args.get('payment'))
@@ -723,7 +719,6 @@ def transfer_waiting():
     return render_template('transfer-waiting.html', payment=payment, days=app.config.get('EXPIRY_DAYS'))
 
 @app.route("/pay/transfer-cancel", methods=['POST'])
-@feature_flag('PAYMENTS')
 @login_required
 def transfer_cancel():
     """
@@ -763,7 +758,7 @@ def transfer_cancel():
         payment.state = "canceled"
         db.session.add(payment)
         db.session.commit()
-        flash('payment canceled')
+        flash('Payment cancelled')
 
     return redirect(url_for('tickets'))
 
@@ -883,17 +878,18 @@ class NewTicketTypeForm(Form):
 @login_required
 def ticket_types():
     if current_user.admin:
+        form = None
         if request.method == 'POST':
             form = NewTicketTypeForm()
             if form.validate():
                 tt = TicketType(form.name.data, form.capacity.data, form.limit.data, form.cost.data)
                 db.session.add(tt)
                 db.session.commit()
-                print tt
-            return redirect(url_for('ticket_types'))
+                return redirect(url_for('ticket_types'))
 
         types = TicketType.query.all()
-        form = NewTicketTypeForm(formdata=None)
+        if not form:
+            form = NewTicketTypeForm(formdata=None)
         return render_template('admin_ticket_types.html', types=types, form=form)
     else:
         return(('', 404))

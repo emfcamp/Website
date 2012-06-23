@@ -12,3 +12,4 @@ Flask-Assets==0.7
 simplejson
 ofxparse
 Flask-Script
+cssmin

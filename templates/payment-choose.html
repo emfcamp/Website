@@ -37,7 +37,7 @@
 branch).</p>
 
 <form method="post" action="{{ url_for('transfer_start') }}">
-<p><input type=submit name=banktransfer value="Pay by bank transfer"/></p>
+    <p><button type="submit" name="banktransfer" class="btn btn-primary">Pay by bank transfer</button></p>
 </form>
 
 <h3>Paying by Direct Debit</h3>
@@ -48,7 +48,7 @@ GoCardless payments are protected by the
 Guarantee</a>.</p>
 
 <form method="post" action="{{ url_for('gocardless_start') }}">
-<p><input type=submit name=gocardless value="Pay with GoCardless"/></p>
+    <p><button type="submit" name="gocardless" class="btn btn-primary">Pay with GoCardless</button></p>
 </form>
 
 {% endblock %}
