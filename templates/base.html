@@ -4,11 +4,10 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Electromagnetic Field</title>
-        {% assets "css_all" %}
+        {% assets "css_all" -%}
         <link rel="stylesheet" href="{{ ASSET_URL }}">
-        {% endassets %}
-        {% block head %}{% endblock %}
-
+        {% endassets -%}
+        {% block head -%}{% endblock -%}
         <!--[if lt IE 9]>
             <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
@@ -22,10 +21,10 @@
     </div>
     <div id="bd">
         <div>
-            {% for message in get_flashed_messages() %}
+            {% for message in get_flashed_messages() -%}
             <div class="flash">{{ message }}</div>
-            {% endfor %}
-            {% block body %}{% endblock %}
+            {% endfor -%}
+            {% block body -%}{% endblock -%}
         </div>
     </div>
     <footer class="footer">
@@ -35,11 +34,9 @@
         {% endif %}
     </footer>
 </div>
-
-{% assets "js_all" %}
-<script type="text/javascript" src="{{ ASSET_URL }}" />
-{% endassets %}
-
+{% assets "js_all" -%}
+<script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets -%}
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
