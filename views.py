@@ -192,26 +192,25 @@ def logout():
 class ChoosePrepayTicketsForm(Form):
     count = IntegerSelectField('Number of tickets', [Required()])
 
-    def validate_count(form, field):
-        prepays = current_user.tickets. \
-            filter_by(type=TicketType.Prepay).\
-            filter(Ticket.expires >= datetime.utcnow()). \
-            count()
-        if field.data + prepays > TicketType.Prepay.limit:
-            raise ValidationError('You can only buy %s tickets in total' % TicketType.Prepay.limit)
 
 @app.route("/tickets", methods=['GET', 'POST'])
-@login_required
 def tickets():
     form = ChoosePrepayTicketsForm(request.form)
     form.count.values = range(1, TicketType.Prepay.limit + 1)
 
     if request.method == 'POST' and form.validate():
         session["count"] = form.count.data
-        return redirect(url_for('pay_choose'))
+        if current_user.is_authenticated():
+            return redirect(url_for('pay_choose'))
+        else:
+            return redirect(url_for('signup', next=url_for('pay_choose')))
 
-    tickets = current_user.tickets.all()
-    payments = current_user.payments.filter(Payment.state != "canceled", Payment.state != "expired").all()
+    if current_user.is_authenticated():
+        tickets = current_user.tickets.all()
+        payments = current_user.payments.filter(Payment.state != "canceled", Payment.state != "expired").all()
+    else:
+        tickets = []
+        payments = []
 
     #
     # go through existing payments
@@ -289,12 +288,19 @@ def pay():
 def ticket_terms():
     return render_template('terms.html')
 
-
 @app.route("/pay/choose")
 @login_required
 def pay_choose():
     count = session.get('count')
     if not count:
+        return redirect(url_for('tickets'))
+
+    prepays = current_user.tickets. \
+        filter_by(type=TicketType.Prepay).\
+        filter(Ticket.expires >= datetime.utcnow()). \
+        count()
+    if count + prepays > TicketType.Prepay.limit:
+        flash("You can only buy up to 4 tickets per person.")
         return redirect(url_for('tickets'))
 
     amount = TicketType.Prepay.cost * count
