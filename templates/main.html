@@ -1,21 +1,22 @@
 {% extends "base.html" %}
 {% block body %}
 
-{% if config.get('PAYMENTS') %}
-<center><h3><a href="{{ url_for('signup') }}">Buy pre-sale tickets now</a></h3></center>
-{% endif %}
-
 <h2>What?</h2>
 
 <p class="summary">Electromagnetic Field is a three-day camping festival for people with an inquisitive mind and an interest in science, engineering, technology, DIY, and computer security.</p>
 <p class="summary">A cross between a tech conference and a music festival, with talks and workshops on a wide range of subjects.</p>
 <p class="summary">A great opportunity to meet like-minded people, to learn, to teach, to play, and have a drink with someone new who shares your interests.</p>
-<p>A festival for anyone interested in 3D printing, DIYBio, knitting, electronics, Internet culture, space, lockpicking, homebrewing, robots, UAVs, mind hacking, radio, or pretty much anything else you can think of. EMF is a volunteer effort by a non-profit group, loosely inspired by European and US hacker camps like <a href="http://en.wikipedia.org/wiki/Chaos_Communication_Camp">CCC</a>, <a href="http://en.wikipedia.org/wiki/Hacking_at_Random">HAR</a>, and <a href="http://www.toorcamp.org/">toorcamp</a>.</p>
+<p>A festival for anyone interested in 3D printing, DIYBio, knitting, electronics, Internet culture, space, lockpicking, homebrewing, robots, UAVs, mind hacking, radio, or pretty much anything else you can think of. EMF is a volunteer effort by a non-profit group, inspired by European and US hacker camps like <a href="http://en.wikipedia.org/wiki/Chaos_Communication_Camp">CCC</a>, <a href="http://en.wikipedia.org/wiki/Hacking_at_Random">HAR</a>, and <a href="http://www.toorcamp.org/">toorcamp</a>.</p>
 <h2>When?</h2>
 <p>Friday 31st August - Sunday 2nd September 2012</p>
 <h2>Where?</h2>
 <p><a href="http://www.openstreetmap.org/?lat=52.0616018772125&lon=-0.710721015930176&zoom=16">Pineham Park</a>, Milton Keynes, UK</p>
-<h2>Get Involved</h2>
+<h2>Count me in!</h2>
+<div class="presale"><a href="{{ url_for('signup') }}">Buy pre-sale tickets now</a></div>
+
+<p>If you've already signed up, <a href="{{url_for('login')}}">log in</a> to view your ticket status.</p>
+
+<h2>Help us out</h2>
 <p>EMF is a volunteer-run effort. If you want to help out:</p>
 <ul>
     <li>Answer the <a href="http://blog.emfcamp.org/post/23117482682/emf-2012-call-for-participation">Call for Participation</a></li>
@@ -26,16 +27,5 @@
     <li>Subscribe to <a href="http://blog.emfcamp.org">our blog</a></li>
 </ul>
 
-<h2>Count Me In!</h2>
-{% if config.get('PAYMENTS') %}
-<p>Presales are now open: <a href="{{ url_for('signup') }}">pre-order your ticket</a>.
-
-{% else %}
-<p>To help us get an idea of numbers, we'd appreciate it if you filled in this quick form to give us an
-    idea of interest. There's no obligation to come and we'll only use your email address to contact
-    you about the camp.</p>
-<iframe src="https://docs.google.com/spreadsheet/embeddedform?formkey=dFdQUlA2dkY3dXREaTlHbHIyZXFpc1E6MQ" id="google-form"
-    width="270" height="600" frameborder="0" marginheight="0" marginwidth="0" scrolling="no">Loading...</iframe>
-{% endif %}
 
 {% endblock %}
