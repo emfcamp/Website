@@ -2,9 +2,9 @@
 {% block body %}
 <h2>Terms and Conditions of Ticket Purchase</h2>
 <ol>
-<li>Tickets cannot be transferred or re-sold. They will not be refunded unless the event is canceled.</li>
+<li>Tickets cannot be transferred or re-sold. They will not be refunded unless the event is cancelled.</li>
 <li>Your ticket is tied to your registered e-mail address. Please make sure this is correct as tickets may not be transferred between addresses.</li>
-<li>Unfortunately this year we are not selling children's tickets. Anyone aged under 18 will not be permitted on site.</li>
+<li>At this point, all tickets are for over-18s only. We hope to have tickets available for under-18s soon.</li>
 <li>Proof of age may be requested at the point of entry and at the bars.</li>
 <li>The event schedule may be changed or amended at any time.</li>
 <li>The gates will be open from 10:00 on Friday 31st August, until 16:00 on Monday 3rd September.</li>
@@ -23,5 +23,5 @@
 <li>These rules may be amended before we receive our final license. We'll email you if they are.</li>
 </ol>
 
-<p>For larger orders and ticket enquiries, please contact us on tickets@emfcamp.org</p>
+<p>For larger orders and ticket enquiries, please contact us on {{ config.get('TICKETS_EMAIL')[1] }}</p>
 {% endblock %}

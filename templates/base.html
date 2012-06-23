@@ -1,21 +1,23 @@
 <!doctype html>
-<html>
+<html lang="en">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Electromagnetic Field</title>
-        <link rel="stylesheet" href="http://yui.yahooapis.com/2.8.0r4/build/reset-fonts-grids/reset-fonts-grids.css" type="text/css">
         {% assets "css_all" %}
         <link rel="stylesheet" href="{{ ASSET_URL }}">
         {% endassets %}
+        {% block head %}{% endblock %}
+        <link rel="shortcut icon" href="/favicon.ico">
     </head>
-<body class="yui-skin-sam">
-<div id="doc" class="yui-t7">
+<body>
+<div class="container">
     <div id="hd">
         <h1><a href="/">Electromagnetic Field</a></h1>
         <p>(a three-day UK hacker camp in summer 2012)</p>
     </div>
     <div id="bd">
-        <div class="yui-g">
+        <div>
             {% for message in get_flashed_messages() %}
                 <div class=flash>{{ message }}</div>
             {% endfor %}
@@ -23,7 +25,7 @@
         </div>
     </div>
     <div id="ft">
-        Electromagnetic Field Ltd. 2012. <a href="{{url_for('company')}}">Company details</a>. Kindly hosted by <a href="http://bitfolk.com/">Bitfolk</a>.
+        Electromagnetic Field Ltd. 2012. <i class="icon-info-sign"></i> <a href="{{url_for('company')}}">Company details</a>. Kindly hosted by <a href="http://bitfolk.com/">Bitfolk</a>.
         {% if current_user.is_authenticated() %}
         <a class="logout" href="{{ url_for('logout') }}">Log out</a>
         {% endif %}

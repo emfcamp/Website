@@ -1,19 +1,25 @@
 body {
         font-family: Helvetica, Arial, Verdana, sans-serif;
-            margin: 0; padding:0; padding-top:5px;
+            margin: 0; padding:0; padding-top:1em;
         }
 
 #hd {
-    padding-bottom:20px;
-    text-align: center
+    text-align: center;
 }
 
 #hd h1 {
     font-weight: bold;
-    font-size: 5em
+    font-size: 5em;
+    padding-bottom:20px;
 }
 
-h1 a {
+.flash {
+    font-weight:bold;
+    color: red;
+    font-size: 140%
+}
+
+h1 a, h1 a:hover {
     text-decoration:none;
     color:inherit;
 }
@@ -25,11 +31,51 @@ h2 {
     margin-bottom:5px;
 }
 
-p, ul, ol {padding-bottom: 10px;}
+h3 {
+    font-weight: bold;
+    font-size: 1.4em;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+p {
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+div.presale {
+    text-align:center;
+    font-size:2em;
+    font-weight:bold;
+    padding-bottom:1em
+}
+
+p, ul, ol {padding-bottom: 5px;}
 
 p.summary {
     font-size: 130%
 }
+
+table {
+    margin: 1ex 0.5em;
+}
+
+td, th {
+    padding: 1ex 0.5em;
+}
+
+th {
+    font-weight: bold;
+}
+
+tr.even {
+    background-color: #ddd;
+}
+
+tr.odd {
+    background-color: #eee;
+}
+
 
 #google-form { margin-top:5px; margin-bottom: 5px; position:relative; left: 237px; border: 1px solid #aaa; padding:5px;}
 
@@ -71,4 +117,57 @@ tr.buyformtdeven {
 tr.buyformtdodd {
 	background-color: #eee;
 	padding: 2px 2px 2px 2px;
+}
+
+.flash {
+  margin-bottom: 1ex;
+}
+
+.choose-prepay-tickets dl,
+.choose-prepay-tickets dt,
+.choose-prepay-tickets dd {
+    display: inline;
+}
+
+.choose-prepay-tickets dl {
+  margin-bottom: 1ex;
+}
+
+dl.bank-details {
+  float: left;
+  width: 100%;
+  margin-bottom: 2ex;
+}
+.bank-details dt,
+.bank-details dd {
+  float: left;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  min-width: 10em;
+}
+.bank-details dt {
+  clear: left;
+  font-weight: bold;
+  padding-right: 3px;
+}
+
+table.tickets tr.paid {
+  font-weight: bold;
+}
+
+table.tickets tr.expired {
+  color: #f00;
+}
+
+.errors {
+  color: #933;
+  font-weight: bold;
+}
+
+form.shrink {
+	margin: 0;
+}
+
+.main-footer {
+  padding-bottom: 2ex;
 }

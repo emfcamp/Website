@@ -1,0 +1,98 @@
+
+In these lists if it starts with * then it's know to fail and needs to be
+fixed or implemented.
+
+1)
+
+signup
+
+hit the Confirm button on
+
+click on the gocardless link
+
+pay
+
+note gocardless ref when you are back to the emfcamp gocardless-complete page
+
+* You should get an email from emfcamp with details in it
+
+You'll also get an email from gocardless
+
+03DJ9GZPK6
+
+go to /pay, ticket should be there and unpaid ("Not Yet")
+
+on gocardless sandbox site go to Test web Hooks (use a different web browser
+or an incognito session)
+
+object type -> bill
+object id -> the gocardless ref from the gocardless-complete page
+Action -> paid
+
+hit Fire Webhook
+you should get a 200 Ok in the response.
+
+on the emfcamp /pay page the ticket should be Paid -> "Yes!"
+
+* you should get an email from emfcamp thanking you for paying and
+  confirming that you now have your ticket(s)
+
+2) as 1 but select 2 tickets on the /pay page, result -> both should be
+paid.
+
+3) as 1, but hit Direct Debit link
+
+make a note of the DD Reference (EMF-something)
+
+* You should get an email from emfcamp with the ref, amount and number of
+  ticket(s) and a mention of the 10 day expiry
+
+edit tests/accounts.ofx
+
+look for a <STMTTRN></STMTTRN> with TRNTYPE == OTHER
+
+change TRNAMT to 30 (or more if you bought more than one ticket)
+
+change NAME to the EMF-something reference
+
+run ./reconcile.sh -f tests/account.ofx
+
+you should see your name and how much you paid
+
+run ./reconcile.sh -d -f tests/account.ofx
+
+to actually reconcile the account
+
+on /pay you're tickets should now be Paid -> "Yes!"
+
+* You should get an email from emfcamp thanking you for paying and
+  confirming that you now have your ticket(s)
+
+4) go to /pay
+
+choose 2 tickets
+
+hit Confirm
+
+choose 1 ticket
+
+hit Confirm
+
+buy however you like, you should get 1 ticket
+
+5) go to /pay
+
+choose 1 ticket
+
+hit Confirm
+
+choose 4 tickets
+
+hit Confirm
+
+buy however you like, you should get 4 tickets
+
+6) attempt to get more than 4 tickets
+
+* you shouldn't be able to.
+

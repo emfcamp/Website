@@ -1,0 +1,18 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block body %}
+<h2>Thank You!</h2>
+
+<p>Your GoCardless Direct Debit payment for {{ format_price(payment.amount) }}
+   has been set up and your tickets will be reserved for {{ days }} days
+   to allow for your payment to arrive.
+   We will email you when the transaction has been completed.</p>
+
+Your bill ID from GoCardless was {{ payment.gcid }}.  You can view this
+by logging into <a href="http://www.gocardless.com/">your GoCardless account</a>.
+
+
+<p>See you at <a href="http://www.emfcamp.org/">Electromagnetic Field</a>!</p>
+
+<a href="{{ url_for('tickets') }}">Show my tickets</a>
+{% endblock %}

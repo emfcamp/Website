@@ -1,0 +1,49 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block body %}
+
+<h2>Thank you!</h2>
+<p>Your tickets have been reserved for {{ days }} days and we will email you when
+   we receive your payment.</p>
+
+<h2>Pay by bank transfer</h2>
+
+<p>You can pay by CHAPS/Faster Payments, or by cash at your bank.</p>
+<p>We will use the reference to identify the payment as yours, so please ensure it's included in full.</p>
+
+<dl class="bank-details">
+<dt>Bank</dt><dd>Barclays</dd>
+<dt>Payee</dt><dd>Electromagnetic Field Ltd</dd>
+<dt>Sort code</dt><dd>20-71-64</dd>
+<dt>Account number</dt><dd>73590526</dd>
+<dt>Amount</dt><dd>{{ format_price(payment.amount) }}</dd>
+<dt>Reference</dt><dd>{{ format_bankref(payment.bankref) }}</dd>
+</dl>
+
+<p>(Don't worry if the payee name doesn't quite fit)</p>
+
+<h3>International transfers</h3>
+
+<p>You can pay directly into our GBP bank account</p>
+<ul>
+<li><b>SWIFT: BARCGB22</b></li>
+<li><b>IBAN: GB39 BARC 2071 6473 5905 26</b></li>
+</ul>
+
+<h3>Euro International Payments</h3>
+
+<p>You can pay in Euro's by transfering to our Euro account:</p>
+
+<ul>
+<li><b>SWIFT: BARCGB22</b></li>
+<li><b>IBAN: GB21 BARC 2071 6472 9544 33</b></li>
+</ul>
+
+<p>For each £30 ticket please play €40. Please also <a href="mailto:{{ config.get('TICKETS_EMAIL')[1] }}">email us</a>
+your reference as we have to reconcile Euro payments manually.</p>
+</p>
+
+<p>See you at <a href="http://www.emfcamp.org/">Electromagnetic Field</a>!</p>
+
+<a href="{{ url_for('tickets') }}">Show my tickets</a>
+{% endblock %}

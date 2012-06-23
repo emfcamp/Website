@@ -1,0 +1,130 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+{% endblock %}
+
+{% block body %}
+
+{% if current_user.admin %}
+<p>You are an admin, click <a href="/admin">here</a> to go to the admin
+pages.</p>
+{% endif %}
+
+{% if tickets %}
+<p>Your current tickets:</p>
+
+<table class="tickets">
+<tr><th>Type</th><th>Status</th></tr>
+
+{% for t in tickets %}
+
+{# only display tickets that have a payment #}
+{% if t.payment %}
+<tr class="
+{{ loop.cycle('odd', 'even') }}
+{% if t.paid %}paid{% endif%}
+{% if t.expired() %}expired{% endif %}
+">
+<td>{{ t.type.name }}</td>
+<td>
+    {% if t.paid %}
+    Paid
+    {% elif t.expired() %}
+    Expired
+    {% else %}
+    Pending
+    {% endif %}
+</td>
+</tr>
+{% endif %}
+{% endfor %}
+
+</table>
+<br/>
+
+{% endif %}
+
+{% if payments %}
+Your payments:
+
+<table>
+<tr><th>Type</th><th>Amount</th><th>Progress</th><th></th></tr>
+{% for p in payments %}
+<tr class="
+{{ loop.cycle('odd', 'even') }}
+">
+
+<td>{{ p.name }}</td>
+<td>{{ format_price(p.amount) }}</td>
+<td>{{ p.state }} {%-  if p.provider == "banktransfer" %}, reference: {{ format_bankref(p.bankref) }} {% endif %}</td>
+<td>{% if p.state == "new" and p.provider == "gocardless" %}
+<form method=post action="/pay/gocardless-tryagain" class="shrink">
+{{ tryagain_forms[p.id].hidden_tag() }}
+{{ tryagain_forms[p.id].pay() }}
+{{ tryagain_forms[p.id].cancel() }}
+</form>
+{% endif %}
+
+{% if p.state == "inprogress" and p.provider == "banktransfer" %}
+<form method=post action="/pay/transfer-cancel" class="shrink">
+{{ btcancel_forms[p.id].hidden_tag() }}
+{{ btcancel_forms[p.id].cancel() }}
+</form>
+{% endif %}
+</td>
+
+</tr>
+{%endfor%}
+</table>
+
+{% endif %}
+
+{% include 'ticket-blurb.html' %}
+
+{% if tickets|count < 4 %}
+
+<form method=post class="choose-prepay-tickets">
+    {{form.hidden_tag()}}
+    <h2>Reserve tickets</h2>
+
+<p>We're currently only selling tickets for people aged <b>18 and over</b>. See
+<A HREF="http://wiki.emfcamp.org/wiki/FAQ#Why_is_there_currently_an_age_limit.3F">our FAQ</a> for
+details.</p>
+
+<dl id="prepay" data-price="{{ price }}">
+    {{ render_field(form.count) }}
+</dl>
+    <p id="summary">
+    <span>Price per ticket: {{ format_price(price) }}</span>
+    <span style="display: none">Total amount for deposit: <span id="total"></span></span>
+    </p>
+    <input type=submit value="Go to reservation"/>
+</form>
+{% else %}
+<p>You've already bought 4 tickets, thanks for helping EMF by
+buying a prepay ticket!</p>
+{% endif %}
+
+<script type="text/javascript">
+$(function() {
+  $('#summary').children().toggle();
+
+  function format_price(amount, currency, after) {
+    if (!currency) currency = '\xa3';
+    var amount = parseFloat(amount).toFixed(2);
+    if (after)
+      return amount + currency;
+    return currency + amount;
+  }
+
+  var price = $('#prepay').data('price');
+
+  $('#count').on('change', function() {
+      var count = parseInt($(this).val(), 10);
+      $('#total').text(format_price(count * price));
+  }).change();
+
+});
+</script>
+{% endblock %}

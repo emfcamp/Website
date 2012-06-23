@@ -1,0 +1,62 @@
+Hi {{ payment.user.name }},
+
+Just to warn you that we have not yet received payment for the tickets you
+reserved for Electromagnetic Field 2012.
+
+The tickets will expire in a few days if not paid for.
+
+If you don't want the tickets you can ignore this email. {% if payment.provider == "gocardless" -%} Otherwise,
+if you wish to pay for the tickets, you can go to the EMF website:
+
+https://www.emfcamp.org{{ url_for('tickets') }}
+
+and complete the payment process.
+
+{%- endif -%}
+{% if payment.provider == "banktransfer" %}
+
+You can pay by CHAPS/Faster Payments, or by cash at your bank.
+
+We will use the reference to identify the payment as yours, so please
+ensure it's included in full.
+
+Bank:           Barclays
+Payee:          Electromagnetic Field Ltd
+Sort code:      20-71-64
+Account number: 73590526
+Amount:         {{ format_price(payment.amount) }}
+Reference:      {{ format_bankref(payment.bankref) }}
+
+(Don't worry if the payee name doesn't quite fit)
+
+International transfers:
+
+You can pay directly into our GBP bank account:
+
+SWIFT: BARCGB22
+IBAN:  GB39 BARC 2071 6473 5905 26
+
+Or you can pay into our Euro bank account:
+
+SWIFT: BARCGB22
+IBAN:  GB21 BARC 2071 6472 9544 33
+
+Please pay €40 for each £30 prepay ticket. Additionally please email
+tickets@emfcamp.org when you do the transfer with your details as we have to
+reconcile our euro account manually.
+
+{%- endif %}
+
+The Tickets are:
+
+Type			Cost
+----			----
+{% for t in payment.tickets -%}
+{{ t.type.name }} 	{{ format_price(t.type.cost) }}
+{% endfor %}
+
+Total: {{ format_price(payment.amount) }}
+
+Love,
+
+All the EMF team

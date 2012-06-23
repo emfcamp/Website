@@ -2,20 +2,43 @@ from flask import Flask
 from flaskext.login import LoginManager
 from flaskext.mail import Mail
 from flask.ext.sqlalchemy import SQLAlchemy
+from sqlalchemy.orm.exc import NoResultFound
 from flask.ext.assets import Environment, Bundle
+
+import logging
+
+logging.basicConfig(level=logging.NOTSET)
 
 app = Flask(__name__)
 app.config.from_envvar('SETTINGS_FILE')
 
 login_manager = LoginManager()
 login_manager.setup_app(app, add_context_processor=True)
+app.login_manager.login_view = 'login'
+
+@app.context_processor
+def utility_processor():
+    def format_price(amount, currency=u'\xa3', after=False):
+        amount = u'{0:.2f}'.format(amount)
+        if after:
+            return amount + currency
+        return currency + amount
+
+    def format_bankref(bankref):
+        return '%s-%s' % (bankref[:4], bankref[4:])
+
+    return dict(
+        format_price=format_price,
+        format_bankref=format_bankref,
+    )
+
 
 db = SQLAlchemy(app)
 
 mail = Mail(app)
 
 assets = Environment(app)
-css = Bundle('css/main.css', output='gen/packed.css')
+css = Bundle('css/bootstrap.css', 'css/main.css', output='gen/packed.css')
 assets.register('css_all', css)
 
 import gocardless

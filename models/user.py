@@ -1,12 +1,9 @@
 from main import db
-import random
 import bcrypt
 import flaskext
 import os
 import base64
 from datetime import datetime, timedelta
-
-safechars = '2346789BCDFGHJKMPQRTVWXY'
 
 class User(db.Model, flaskext.login.UserMixin):
     __tablename__ = 'user'
@@ -14,20 +11,19 @@ class User(db.Model, flaskext.login.UserMixin):
     email = db.Column(db.String, unique=True)
     name = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
-    bankref = db.Column(db.String, nullable=False, unique=True)
+    admin = db.Column(db.Boolean, default=False, nullable=False)
+    tickets = db.relationship('Ticket', lazy='dynamic', backref='user', cascade='all, delete, delete-orphan')
+    payments = db.relationship('Payment', lazy='dynamic', backref='user', cascade='all')
 
     def __init__(self, email, name):
         self.email = email
         self.name = name
-        # not cryptographic
-        bankref = ''.join(random.sample(safechars, 8))
-        self.bankref = '%s-%s' % (bankref[:4], bankref[4:])
 
     def set_password(self, password):
-        self.password = bcrypt.hashpw(password, bcrypt.gensalt())
+        self.password = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
 
     def check_password(self, password):
-        return bcrypt.hashpw(password, self.password) == self.password
+        return bcrypt.hashpw(password.encode('utf8'), self.password) == self.password
 
 class PasswordReset(db.Model):
     __tablename__ = 'password_reset'

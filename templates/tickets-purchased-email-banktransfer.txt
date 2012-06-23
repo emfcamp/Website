@@ -1,0 +1,62 @@
+Hi, {{ user.name }},
+
+{% if basket.count == 1 -%}
+This is to confirm that you've bought a prepay ticket
+for {{ format_price(payment.amount) }} for Electromagnetic Field 2012!
+{%- else -%}
+This is to confirm that you've bought {{ basket.count }} prepay tickets
+for {{ format_price(payment.amount) }} for Electromagnetic Field 2012!
+{%- endif %}
+
+Pay by bank transfer
+--------------------
+
+You can pay by CHAPS/Faster Payments, or by cash at your bank.
+
+We will use the reference to identify the payment as yours, so please
+ensure it's included in full.
+
+Bank:           Barclays
+Payee:          Electromagnetic Field Ltd
+Sort code:      20-71-64
+Account number: 73590526
+Amount:         {{ format_price(payment.amount) }}
+Reference:      {{ format_bankref(payment.bankref) }}
+
+(Don't worry if the payee name doesn't quite fit)
+
+International transfers
+-----------------------
+
+You can pay directly into our GBP bank account:
+
+SWIFT: BARCGB22
+IBAN:  GB39 BARC 2071 6473 5905 26
+
+Or you can pay into our Euro Bank Account:
+
+SWIFT: BARCGB22
+IBAN:  GB21 BARC 2071 6472 9544 33
+
+Please pay €40 for each £30 prepay ticket. Additionally please email
+tickets@emfcamp.org when you do the transfer with your details as we have to
+reconcile our euro account manually.
+
+Company Details
+---------------
+
+Electromagnetic Field Ltd. is a company limited by guarantee,
+registered in England and Wales with company number 07788466.
+
+Registered office: 2 Ockendon Mews, London N1 3JL
+
+Your tickets will be held in your name for 10 days, so please remember to
+pay promptly.
+
+We will send another email when we've received your payment.
+
+See you soon,
+
+Love,
+
+All the EMF team

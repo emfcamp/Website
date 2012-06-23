@@ -1,0 +1,17 @@
+Hi {{ user.name }},
+
+Welcome to the Electromagnetic Field website!
+
+You signed up with name: {{ user.name }}
+and email: {{ user.email }}
+
+At the moment you can purchase prepay tickets for the camp.
+
+You can keep track of your ticket purchases here:
+
+{{ url_for('tickets', _external=True) }}
+
+If you forget your password you can reset it here:
+
+{{ url_for('forgot_password', _external=True) }}
+
