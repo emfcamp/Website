@@ -20,14 +20,15 @@
 
 <H2>Add new ticket type:</H2>
 
-<form method=post class="well span4">
+<form method=post class="form-horizontal">
 {{ form.hidden_tag() }}
 {{ render_field(form.name) }}
 {{ render_field(form.capacity) }}
 {{ render_field(form.limit) }}
 {{ render_field(form.cost) }}
-<br/>
-<input type=submit name="Create" value="Create" class="btn btn-primary"/>
+<div class="form-actions">
+    <input type=submit name="Create" value="Create" class="btn btn-primary"/>
+</div>
 </form>
 
 <p>Back to <a href="{{ url_for('admin') }}">admin things</a>.</p>
