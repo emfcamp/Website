@@ -12,9 +12,9 @@ pages.</p>
 {% endif %}
 
 {% if tickets %}
-<p>Your current tickets:</p>
+<h2>Your current tickets</h2>
 
-<table class="tickets">
+<table class="table">
 <tr><th>Type</th><th>Status</th></tr>
 
 {% for t in tickets %}
@@ -46,9 +46,9 @@ pages.</p>
 {% endif %}
 
 {% if payments %}
-Your payments:
+<h2>Your payments</h2>
 
-<table>
+<table class="table">
 <tr><th>Type</th><th>Amount</th><th>Progress</th><th></th></tr>
 {% for p in payments %}
 <tr class="
@@ -80,7 +80,6 @@ Your payments:
 
 {% endif %}
 
-{% include 'ticket-blurb.html' %}
 
 {% if tickets|count < 4 %}
 
@@ -88,9 +87,7 @@ Your payments:
     {{form.hidden_tag()}}
     <h2>Reserve tickets</h2>
 
-<p>We're currently only selling tickets for people aged <b>18 and over</b>. See
-<A HREF="http://wiki.emfcamp.org/wiki/FAQ#Why_is_there_currently_an_age_limit.3F">our FAQ</a> for
-details.</p>
+{% include 'ticket-blurb.html' %}
 
 <div id="prepay" data-price="{{ price }}">
     {{ render_field(form.count) }}

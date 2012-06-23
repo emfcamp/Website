@@ -66,7 +66,6 @@ def sponsors():
 def company():
     return render_template('company.html')
 
-
 class NextURLField(HiddenField):
     def _value(self):
         # Cheap way of ensuring we don't get absolute URLs
@@ -84,6 +83,8 @@ class LoginForm(Form):
 @app.route("/login", methods=['GET', 'POST'])
 @feature_flag('PAYMENTS')
 def login():
+    if current_user.is_authenticated():
+        return redirect(url_for('tickets'))
     form = LoginForm(request.form, next=request.args.get('next'))
     if request.method == 'POST' and form.validate():
         user = User.query.filter_by(email=form.email.data).first()
@@ -667,7 +668,7 @@ def transfer_cancel():
         payment.state = "canceled"
         db.session.add(payment)
         db.session.commit()
-        flash('payment canceled')
+        flash('Payment cancelled')
 
     return redirect(url_for('tickets'))
 
