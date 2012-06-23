@@ -4,10 +4,13 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Electromagnetic Field</title>
-        {% assets "css_all" %}
+        {% assets "css_all" -%}
         <link rel="stylesheet" href="{{ ASSET_URL }}">
-        {% endassets %}
-        {% block head %}{% endblock %}
+        {% endassets -%}
+        {% block head -%}{% endblock -%}
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
         <link rel="shortcut icon" href="/favicon.ico">
     </head>
 <body>
@@ -18,20 +21,22 @@
     </div>
     <div id="bd">
         <div>
-            {% for message in get_flashed_messages() %}
-                <div class=flash>{{ message }}</div>
-            {% endfor %}
-            {% block body %}{% endblock %}
+            {% for message in get_flashed_messages() -%}
+            <div class="flash">{{ message }}</div>
+            {% endfor -%}
+            {% block body -%}{% endblock -%}
         </div>
     </div>
-    <div id="ft">
-        Electromagnetic Field Ltd. 2012. <i class="icon-info-sign"></i> <a href="{{url_for('company')}}">Company details</a>. Kindly hosted by <a href="http://bitfolk.com/">Bitfolk</a>.
+    <footer class="footer">
+        Electromagnetic Field Ltd. 2012. <a href="{{url_for('company')}}">Company details</a>. Kindly hosted by <a href="http://bitfolk.com/">Bitfolk</a>.
         {% if current_user.is_authenticated() %}
         <a class="logout" href="{{ url_for('logout') }}">Log out</a>
         {% endif %}
-    </div>
+    </footer>
 </div>
-
+{% assets "js_all" -%}
+<script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets -%}
 <script type="text/javascript">
 
   var _gaq = _gaq || [];

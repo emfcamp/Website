@@ -66,7 +66,6 @@ def sponsors():
 def company():
     return render_template('company.html')
 
-
 class NextURLField(HiddenField):
     def _value(self):
         # Cheap way of ensuring we don't get absolute URLs
@@ -82,8 +81,9 @@ class LoginForm(Form):
     next = NextURLField('Next')
 
 @app.route("/login", methods=['GET', 'POST'])
-@feature_flag('PAYMENTS')
 def login():
+    if current_user.is_authenticated():
+        return redirect(url_for('tickets'))
     form = LoginForm(request.form, next=request.args.get('next'))
     if request.method == 'POST' and form.validate():
         user = User.query.filter_by(email=form.email.data).first()
@@ -102,7 +102,6 @@ class SignupForm(Form):
     next = NextURLField('Next')
 
 @app.route("/signup", methods=['GET', 'POST'])
-@feature_flag('PAYMENTS')
 def signup():
     if current_user.is_authenticated():
         return redirect(url_for('tickets'))
@@ -140,7 +139,6 @@ class ForgotPasswordForm(Form):
         form._user = user
 
 @app.route("/forgot-password", methods=['GET', 'POST'])
-@feature_flag('PAYMENTS')
 def forgot_password():
     form = ForgotPasswordForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -173,7 +171,6 @@ class ResetPasswordForm(Form):
         form._reset = reset
 
 @app.route("/reset-password", methods=['GET', 'POST'])
-@feature_flag('PAYMENTS')
 def reset_password():
     form = ResetPasswordForm(request.form, email=request.args.get('email'), token=request.args.get('token'))
     if request.method == 'POST' and form.validate():
@@ -186,7 +183,6 @@ def reset_password():
     return render_template("reset-password.html", form=form)
 
 @app.route("/logout")
-@feature_flag('PAYMENTS')
 @login_required
 def logout():
     logout_user()
@@ -196,27 +192,25 @@ def logout():
 class ChoosePrepayTicketsForm(Form):
     count = IntegerSelectField('Number of tickets', [Required()])
 
-    def validate_count(form, field):
-        prepays = current_user.tickets. \
-            filter_by(type=TicketType.Prepay).\
-            filter(Ticket.expires >= datetime.utcnow()). \
-            count()
-        if field.data + prepays > TicketType.Prepay.limit:
-            raise ValidationError('You can only buy %s tickets in total' % TicketType.Prepay.limit)
 
 @app.route("/tickets", methods=['GET', 'POST'])
-@feature_flag('PAYMENTS')
-@login_required
 def tickets():
     form = ChoosePrepayTicketsForm(request.form)
     form.count.values = range(1, TicketType.Prepay.limit + 1)
 
     if request.method == 'POST' and form.validate():
         session["count"] = form.count.data
-        return redirect(url_for('pay_choose'))
+        if current_user.is_authenticated():
+            return redirect(url_for('pay_choose'))
+        else:
+            return redirect(url_for('signup', next=url_for('pay_choose')))
 
-    tickets = current_user.tickets.all()
-    payments = current_user.payments.all()
+    if current_user.is_authenticated():
+        tickets = current_user.tickets.all()
+        payments = current_user.payments.filter(Payment.state != "canceled", Payment.state != "expired").all()
+    else:
+        tickets = []
+        payments = []
 
     #
     # go through existing payments
@@ -284,7 +278,6 @@ def buy_prepay_tickets(paymenttype, count):
 
 
 @app.route("/pay")
-@feature_flag('PAYMENTS')
 def pay():
     if current_user.is_authenticated():
         return redirect(url_for('pay_choose'))
@@ -292,17 +285,22 @@ def pay():
     return render_template('payment-options.html')
 
 @app.route("/pay/terms")
-@feature_flag('PAYMENTS')
 def ticket_terms():
     return render_template('terms.html')
 
-
 @app.route("/pay/choose")
-@feature_flag('PAYMENTS')
 @login_required
 def pay_choose():
     count = session.get('count')
     if not count:
+        return redirect(url_for('tickets'))
+
+    prepays = current_user.tickets. \
+        filter_by(type=TicketType.Prepay).\
+        filter(Ticket.expires >= datetime.utcnow()). \
+        count()
+    if count + prepays > TicketType.Prepay.limit:
+        flash("You can only buy up to 4 tickets per person.")
         return redirect(url_for('tickets'))
 
     amount = TicketType.Prepay.cost * count
@@ -310,7 +308,6 @@ def pay_choose():
     return render_template('payment-choose.html', count=count, amount=amount)
 
 @app.route("/pay/gocardless-start", methods=['POST'])
-@feature_flag('PAYMENTS')
 @login_required
 def gocardless_start():
     count = session.pop('count', None)
@@ -362,7 +359,6 @@ class BankTransferCancelForm(Form):
             raise ValidationError('Sorry, that dosn\'t look like a valid payment')
 
 @app.route("/pay/gocardless-tryagain", methods=['POST'])
-@feature_flag('PAYMENTS')
 @login_required
 def gocardless_tryagain():
     """
@@ -411,7 +407,6 @@ def gocardless_tryagain():
     return redirect(url_for('tickets'))
 
 @app.route("/pay/gocardless-complete")
-@feature_flag('PAYMENTS')
 @login_required
 def gocardless_complete():
     payment_id = int(request.args.get('payment'))
@@ -438,9 +433,17 @@ def gocardless_complete():
     payment.gcid = gcid
     payment.state = "inprogress"
     db.session.add(payment)
+
+    for t in payment.tickets:
+        # We need to make sure of a 5 working days grace
+        # for gocardless payments, so push the ticket expirey forwards
+        t.expires = datetime.utcnow() + timedelta(10)
+        app.logger.info("ticket %d (payment %d): expirey reset.", t.id, payment.id)
+        db.session.add(t)
+
     db.session.commit()
 
-    app.logger.info("Payment completed OK")
+    app.logger.info("Payment %d completed OK", payment.id)
 
     # should we send the resource_uri in the bill email?
     msg = Message("Your EMF ticket purchase", \
@@ -455,7 +458,6 @@ def gocardless_complete():
     return redirect(url_for('gocardless_waiting', payment=payment_id))
 
 @app.route('/pay/gocardless-waiting')
-@feature_flag('PAYMENTS')
 @login_required
 def gocardless_waiting():
     try:
@@ -474,7 +476,6 @@ def gocardless_waiting():
     return render_template('gocardless-waiting.html', payment=payment, days=app.config.get('EXPIRY_DAYS'))
 
 @app.route("/pay/gocardless-cancel")
-@feature_flag('PAYMENTS')
 @login_required
 def gocardless_cancel():
     payment_id = int(request.args.get('payment'))
@@ -503,7 +504,6 @@ def gocardless_cancel():
     return render_template('gocardless-cancel.html', payment=payment)
 
 @app.route("/gocardless-webhook", methods=['POST'])
-@feature_flag('PAYMENTS')
 def gocardless_webhook():
     """
         handle the gocardless webhook / callback callback:
@@ -576,7 +576,6 @@ def gocardless_webhook():
 
 
 @app.route("/pay/transfer-start", methods=['POST'])
-@feature_flag('PAYMENTS')
 @login_required
 def transfer_start():
     count = session.pop('count', None)
@@ -604,7 +603,6 @@ def transfer_start():
     return redirect(url_for('transfer_waiting', payment=payment.id))
 
 @app.route("/pay/transfer-waiting")
-@feature_flag('PAYMENTS')
 @login_required
 def transfer_waiting():
     payment_id = int(request.args.get('payment'))
@@ -619,7 +617,6 @@ def transfer_waiting():
     return render_template('transfer-waiting.html', payment=payment, days=app.config.get('EXPIRY_DAYS'))
 
 @app.route("/pay/transfer-cancel", methods=['POST'])
-@feature_flag('PAYMENTS')
 @login_required
 def transfer_cancel():
     """
@@ -659,7 +656,7 @@ def transfer_cancel():
         payment.state = "canceled"
         db.session.add(payment)
         db.session.commit()
-        flash('payment canceled')
+        flash('Payment cancelled')
 
     return redirect(url_for('tickets'))
 
