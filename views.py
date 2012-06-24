@@ -436,9 +436,9 @@ def gocardless_complete():
 
     for t in payment.tickets:
         # We need to make sure of a 5 working days grace
-        # for gocardless payments, so push the ticket expirey forwards
+        # for gocardless payments, so push the ticket expiry forwards
         t.expires = datetime.utcnow() + timedelta(10)
-        app.logger.info("ticket %d (payment %d): expirey reset.", t.id, payment.id)
+        app.logger.info("ticket %d (payment %d): expiry reset.", t.id, payment.id)
         db.session.add(t)
 
     db.session.commit()
