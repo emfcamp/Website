@@ -14,6 +14,7 @@ from flaskext.wtf import \
     DecimalField
 
 from datetime import datetime, timedelta
+import re
 
 class NextURLField(HiddenField):
     def _value(self):
