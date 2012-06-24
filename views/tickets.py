@@ -223,7 +223,7 @@ def gocardless_tryagain():
             payment_id = int(form.payment.data)
 
     if not payment_id:
-        flash('Unable to validate form, the webadmin\'s have been notified.')
+        flash('Unable to validate form. The web team have been notified.')
         app.logger.error("gocardless-tryagain: unable to get payment_id")
         return redirect(url_for('tickets'))
 
@@ -252,7 +252,7 @@ def gocardless_tryagain():
         payment.state = "canceled"
         db.session.add(payment)
         db.session.commit()
-        flash("Your gocardless payment has been canceled")
+        flash("Your gocardless payment has been cancelled")
 
     return redirect(url_for('tickets'))
 
@@ -480,7 +480,7 @@ def transfer_cancel():
             payment_id = int(form.payment.data)
 
     if not payment_id:
-        flash('Unable to validate form, the webadmin\'s have been notified.')
+        flash('Unable to validate form. The web team have been notified.')
         app.logger.error("transfer_cancel: unable to get payment_id")
         return redirect(url_for('tickets'))
 
