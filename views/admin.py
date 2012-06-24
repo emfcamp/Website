@@ -41,7 +41,7 @@ def stats():
 @login_required
 def admin():
     if current_user.admin:
-        return render_template('admin.html')
+        return render_template('admin/admin.html')
     else:
         return(('', 404))
 
@@ -87,13 +87,13 @@ def manual_reconcile():
                 elif form.reconcile.data == True:
                     payment = BankPayment.query.get(int(form.payment.data))
                     ynform = ManualReconcileForm(payment=payment.id, formdata=None)
-                    return render_template('admin_manual_reconcile_yesno.html', ynform=ynform, payment=payment)
+                    return render_template('admin/admin_manual_reconcile_yesno.html', ynform=ynform, payment=payment)
 
         payments = BankPayment.query.filter(BankPayment.state == "inprogress").order_by(BankPayment.bankref).all()
         paymentforms = {}
         for p in payments:
             paymentforms[p.id] = ManualReconcileForm(payment=p.id, formdata=None)
-        return render_template('admin_manual_reconcile.html', payments=payments, paymentforms=paymentforms)
+        return render_template('admin/admin_manual_reconcile.html', payments=payments, paymentforms=paymentforms)
     else:
         return(('', 404))
 
@@ -127,7 +127,7 @@ def make_admin():
                             db.session.commit()
                 return redirect(url_for('make_admin'))
         adminform = MakeAdminForm(formdata=None)
-        return render_template('admin_make_admin.html', users=users, adminform = adminform)
+        return render_template('admin/admin_make_admin.html', users=users, adminform = adminform)
     else:
         return(('', 404))
 
@@ -153,6 +153,6 @@ def ticket_types():
         types = TicketType.query.all()
         if not form:
             form = NewTicketTypeForm(formdata=None)
-        return render_template('admin_ticket_types.html', types=types, form=form)
+        return render_template('admin/admin_ticket_types.html', types=types, form=form)
     else:
         return(('', 404))
