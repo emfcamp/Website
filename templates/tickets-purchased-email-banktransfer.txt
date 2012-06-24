@@ -1,17 +1,25 @@
 Hi, {{ user.name }},
 
 {% if basket.count == 1 -%}
-This is to confirm that you've bought a prepay ticket
+This is to confirm that you've reserved a prepay ticket
 for {{ format_price(payment.amount) }} for Electromagnetic Field 2012!
+
+This ticket will be reserved for you for 10 days while you send the money
+by bank transfer. We'll let you know by email when your payment has been
+received.
 {%- else -%}
-This is to confirm that you've bought {{ basket.count }} prepay tickets
+This is to confirm that you've reserved {{ basket.count }} prepay tickets
 for {{ format_price(payment.amount) }} for Electromagnetic Field 2012!
+
+These tickets will be reserved for you for 10 days while you send the money
+by bank transfer. We'll let you know by email when your payment has been
+received.
 {%- endif %}
 
-Pay by bank transfer
---------------------
+How to Pay
+----------
 
-You can pay by CHAPS/Faster Payments, or by cash at your bank.
+You can pay by bank transfer, or by paying cash into our account.
 
 We will use the reference to identify the payment as yours, so please
 ensure it's included in full.
@@ -23,17 +31,12 @@ Account number: 73590526
 Amount:         {{ format_price(payment.amount) }}
 Reference:      {{ format_bankref(payment.bankref) }}
 
-(Don't worry if the payee name doesn't quite fit)
+(Don't worry if the payee name doesn't quite fit.)
 
-International transfers
+Euro Payments
 -----------------------
 
-You can pay directly into our GBP bank account:
-
-SWIFT: BARCGB22
-IBAN:  GB39 BARC 2071 6473 5905 26
-
-Or you can pay into our Euro Bank Account:
+You can pay into our Euro Bank Account:
 
 SWIFT: BARCGB22
 IBAN:  GB21 BARC 2071 6472 9544 33
