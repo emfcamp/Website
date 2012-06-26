@@ -82,3 +82,8 @@ form.shrink {
 .main-footer {
   padding-bottom: 2ex;
 }
+
+img.padit {
+	padding: 24px;
+}
+
