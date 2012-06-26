@@ -49,7 +49,7 @@
     <div id="bd">
         <div>
             {% for message in get_flashed_messages() -%}
-            <div class="span6 alert">{{ message }}</div>
+            <div class="span6 alert alert-error">{{ message }}</div>
             {% endfor -%}
             {% block body -%}{% endblock -%}
         </div>
