@@ -18,6 +18,29 @@
     <div id="hd">
         <h1><a href="/">Electromagnetic Field</a></h1>
         <p>(a three-day UK hacker camp in summer 2012)</p>
+		<ul class="nav nav-tabs">                                                 
+		<li {% if request.path==url_for('main') %}class="active"{% endif %}>                  
+			<a href="{{url_for('main')}}">Home</a>                                          
+		</li>		
+		<li {% if request.path==url_for('about') %}class="active"{% endif %}>                  
+			<a href="{{url_for('about')}}">About us</a>                                          
+		</li>		
+		<li {% if request.path==url_for('contact') %}class="active"{% endif %}>                  
+			<a href="{{url_for('contact')}}">Contact us</a>                                          
+		</li>		
+		<li {% if request.path==url_for('location') %}class="active"{% endif %}>                  
+			<a href="{{url_for('location')}}">Location</a>                                          
+		</li>		
+		<li {% if request.path==url_for('sponsors') %}class="active"{% endif %}>                  
+			<a href="{{url_for('sponsors')}}">Sponsors</a>                                          
+		</li>		
+		<li {% if request.path==url_for('participating') %}class="active"{% endif %}>                  
+			<a href="{{url_for('participating')}}">Participating orgs</a>                                          
+		</li>		
+		<li>                  
+			<a href="http://wiki.emfcamp.org">Wiki</a>                                          
+		</li>
+		</ul>
     </div>
     <div id="bd">
         <div>
