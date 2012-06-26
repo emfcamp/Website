@@ -32,6 +32,7 @@ N.B. the version might be wrong for some of these, check against requirements.tx
 ## Templates
 
 * [Jinja2](http://jinja.pocoo.org/docs/)
+* [Bootstrap](http://twitter.github.com/bootstrap/)
 
 ## Forms
 
