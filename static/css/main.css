@@ -9,13 +9,6 @@
     padding-bottom:30px;
 }
 
-.flash {
-    font-weight:bold;
-    color: red;
-    font-size: 140%;
-    margin-bottom: 1ex;
-}
-
 h1 a, h1 a:hover {
     text-decoration:none;
     color:inherit;
