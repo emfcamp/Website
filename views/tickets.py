@@ -13,7 +13,7 @@ from flaskext.wtf import \
     Form, Required, Email, EqualTo, ValidationError, \
     TextField, PasswordField, SelectField, HiddenField, \
     SubmitField, BooleanField, IntegerField, HiddenInput, \
-    DecimalField
+    DecimalField, FieldList, FormField, Optional
 
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
@@ -45,6 +45,12 @@ class IntegerSelectField(SelectField):
 class ChoosePrepayTicketsForm(Form):
     count = IntegerSelectField('Number of tickets', [Required()])
 
+
+class UpdateTicketForm(Form):
+    pass
+
+class UpdateTicketsForm(Form):
+    tickets = FieldList(FormField(UpdateTicketForm))
 
 @app.route("/tickets", methods=['GET', 'POST'])
 def tickets():
@@ -489,65 +495,70 @@ def transfer_start():
 
     return redirect(url_for('transfer_waiting', payment=payment.id))
 
-class BuyTicketForm(Form):
-    #
-    # TODO:
-    #
-    # this should be a dynamicly created form inside the /tickets function
-    # like the /admin/make_admin form
-    #
-    def __init__(self, *args, **kwargs):
-        # clear the form out and recreate it if already created.
-        if len(self._unbound_fields) > 1:
-            tmp = self._unbound_fields[0]
-            self._unbound_fields = [tmp,]
+class HiddenIntegerField(HiddenField, IntegerField):
+    """
+    widget=HiddenInput() doesn't work with WTF-Flask's hidden_tag()
+    """
 
-        #
-        # doing this everytime is probably bad for performance?
-        # is there an sql query caching layer?            
-        ticket_types = TicketType.query.all()
-        for i, tt in enumerate(ticket_types):
-            # why can't simple things be simple?
-            #
-            # cant work out how to pass in cost as well so shove it in description.
-            #
-            self._unbound_fields.append(('tt_%s' % tt.id, UnboundField(IntegerField, default = 0, label = tt.name, description = "%2.02f" % (tt.cost)) ))
+class TicketAmountForm(Form):
+    amount = IntegerSelectField('Number of tickets', [Optional()])
+    typeid = HiddenIntegerField('Ticket Type', [Required()])
 
-        super(BuyTicketForm, self).__init__(*args, **kwargs)
+class TicketAmountsForm(Form):
+    types = FieldList(FormField(TicketAmountForm))
+    choose = SubmitField('Buy Tickets')
 
-@app.route("/buy/tickets", methods=['GET', 'POST'])
+@app.route("/tickets/choose", methods=['GET', 'POST'])
 @login_required
-def buy_tickets():
-    """
-        This needs to go into /tickets
-    """
-    form = BuyTicketForm(request.form)
+def tickets_choose():
+    form = TicketAmountsForm(request.form)
+
+    if not form.types:
+        for tt in TicketType.query.all():
+            form.types.append_entry()
+            form.types[-1].typeid.data = tt.id
+
+    prepays = current_user.tickets. \
+        filter_by(type=TicketType.Prepay, paid=True). \
+        count()
+
+    for f in form.types:
+        tt = TicketType.query.get(f.typeid.data)
+        f._type = tt
+
+        limit = tt.user_limit(current_user)
+
+        values = range(limit + 1)
+        if tt.id == TicketType.Prepay.id:
+            values = []
+        elif tt.id == TicketType.FullPrepay.id:
+            assert prepays <= limit
+            values = [prepays]
+        elif tt.id == TicketType.Full.id and not prepays:
+            values = range(1, limit + 1)
+
+        f.amount.values = values
+        f._any = any(values)
+
+
     if request.method == 'POST' and form.validate():
-        """get the bits for the ticket purchase form"""
+
         total_cost = 0
-        
-        id2tt = {}
-        tts = TicketType.query.all()
-        for t in tts:
-            id2tt[t.id] = t
-
-        # ticket type: quantity
         basket = {}
+        for f in form.types:
+            if f.amount.data:
+                tt = f._type
+                print tt.name, tt.cost, f.amount.data
+                total_cost += tt.cost * f.amount.data
+                basket[tt.id] = f.amount.data
 
-        for i in form:
-            if i.id.startswith("tt_") and i.data > 0:
-                id = int(i.id[3:])
-                tt = id2tt[id]
-                print tt.name, tt.cost, i.data
-                total_cost += tt.cost * i.data
-                basket[id] = i.data
-        
+        # FIXME: don't use session[], reserve them for 2h so the user doesn't get upset
         if len(basket) > 0:
             session["basket"] = basket
-            flash("tickets added to basket, total cost: %.02f" % (total_cost))
+            flash("Tickets added to basket, total cost: %.02f" % (total_cost))
             return redirect(url_for('pay_choose'))
 
-    return render_template("buy-tickets.html", form=form)
+    return render_template("tickets-choose.html", form=form)
 
 @app.route("/pay/transfer-waiting")
 @login_required

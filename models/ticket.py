@@ -18,17 +18,19 @@ class TicketType(db.Model):
     __tablename__ = 'ticket_type'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
+    notice = db.Column(db.String)
     capacity = db.Column(db.Integer, nullable=False)
     limit = db.Column(db.Integer, nullable=False)
     cost_pence = db.Column(db.Integer, nullable=False)
     tickets = db.relationship("Ticket", backref="type")
 
-    def __init__(self, name, capacity, limit, cost):
+    def __init__(self, name, capacity, limit, cost, notice=None):
         self.name = name
         self.capacity = capacity
         self.limit = limit
         self.cost = cost
-        
+        self.notice = notice
+
     def __repr__(self):
         return "<TicketType: %s>" % (self.name)
 
@@ -40,7 +42,20 @@ class TicketType(db.Model):
     def cost(self, val):
         self.cost_pence = int(val * 100)
 
+    def user_limit(self, user):
+        user_count = user.tickets. \
+            filter_by(type=self). \
+            filter(or_(Ticket.expires >= datetime.utcnow(), Ticket.paid)). \
+            count()
+        count = Ticket.query.filter_by(type=self). \
+            filter(or_(Ticket.expires >= datetime.utcnow(), Ticket.paid)). \
+            count()
+
+        return min(self.limit - user_count, self.capacity - count)
+
     Prepay = ConstTicketType('Prepay Camp Ticket')
+    FullPrepay = ConstTicketType('Full Camp Ticket (prepay)')
+    Full = ConstTicketType('Full Camp Ticket')
 
 
 class Ticket(db.Model):

@@ -51,7 +51,7 @@ class ManualReconcileForm(Form):
     yes = SubmitField('Yes')
     no = SubmitField('No')
 
-@app.route("/admin/manual_reconcile", methods=['GET', 'POST'])
+@app.route("/admin/manual-reconcile", methods=['GET', 'POST'])
 @login_required
 def manual_reconcile():
     if current_user.admin:
@@ -97,7 +97,7 @@ def manual_reconcile():
     else:
         return(('', 404))
 
-@app.route("/admin/make_admin", methods=['GET', 'POST'])
+@app.route("/admin/make-admin", methods=['GET', 'POST'])
 @login_required
 def make_admin():
     # TODO : paginate?
@@ -137,7 +137,7 @@ class NewTicketTypeForm(Form):
     limit = IntegerField('Limit', [Required()])
     cost = DecimalField('Cost', [Required()])
 
-@app.route("/admin/ticket_types", methods=['GET', 'POST'])
+@app.route("/admin/ticket-types", methods=['GET', 'POST'])
 @login_required
 def ticket_types():
     if current_user.admin:

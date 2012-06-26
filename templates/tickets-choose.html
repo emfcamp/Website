@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block head %}
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+{% endblock %}
+
+{% block body %}
+<form method="post" class="choose-tickets-form">
+{{form.hidden_tag()}}
+<table class="table">
+
+<thead>
+<tr>
+    <th>Ticket Type</th>
+    <th>Cost</th>
+    <th>Amount</th>
+</tr>
+</thead>
+
+<tbody>
+{% for f in form.types %}
+{% if f._any %}
+<tr data-price="{{ f._type.cost }}" class="control-group{%if f.amount.errors%} error{%endif%} {{ loop.cycle('buyformtdodd', 'buyformtdeven') }}" >
+    <td>
+        {{ f.hidden_tag() }}
+        <label for="{{ f.amount.id }}"><b>{{ f._type.name }}</b></label>
+        {% if f._type.notice %}<p>{{ f._type.notice }}</p>{% endif %}
+    </td>
+    <td>
+        <span>{{ format_price(f._type.cost) }}</span>
+    </td>
+    <td>
+        <div class="controls">{{ f.amount(class_="amount span1")|safe }}
+        {% if f.amount.errors %}
+            {% for error in f.amount.errors %}
+            <div class="help-block">{{ error }}</div>
+            {% endfor %}
+        {% endif %}
+        </div>
+    </td>
+</tr>
+{% endif %}
+{% endfor %}
+</tbody>
+<tfoot>
+<tr>
+    <td colspan="3">
+    <div id="summary" class="control-group">
+        <div>Total will be shown on the next page</div>
+        <div style="display: none" class="control-group">
+            <label>Total:
+            <strong id="total" style="text-align: right">{{ format_price(0) }}</strong>
+            </label>
+        </div>
+    </div>
+    </td>
+</tfoor>
+</table>
+
+<div class="form-actions">
+    <button type="submit" class="btn btn-primary btn-large">Buy tickets</button>
+</div>
+
+</form>
+
+<script type="text/javascript">
+$(function() {
+  $('#summary').children().toggle();
+
+  function format_price(amount, currency, after) {
+    if (!currency) currency = '\xa3';
+    var amount = parseFloat(amount).toFixed(2);
+    if (after)
+      return amount + currency;
+    return currency + amount;
+  }
+
+  var price = $('#prepay').data('price');
+
+  $('.amount').on('change', function() {
+    var total = 0;
+    $('.amount').each(function() {
+        var count = parseInt($(this).val(), 10);
+        var price = $(this).closest('tr').data('price');
+        total += count * price;
+    });
+    $('#total').text(format_price(total));
+  }).change();
+
+});
+</script>
+{% endblock %}

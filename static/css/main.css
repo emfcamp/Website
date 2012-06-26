@@ -82,3 +82,14 @@ form.shrink {
 .main-footer {
   padding-bottom: 2ex;
 }
+
+.choose-tickets-form .btn-primary,
+.choose-tickets-form #summary
+{
+  float: right;
+}
+
+.choose-tickets-form #summary
+{
+  text-align: right;
+}
