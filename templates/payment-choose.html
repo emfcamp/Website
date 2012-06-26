@@ -6,15 +6,30 @@
    <a href="mailto:{{ config.get('TICKETS_EMAIL')[1] }}">let us know</a>.
 </p>
 
-<p>You have selected 
-    {% if count == 1 -%}
-    a prepay ticket
-    for <b>{{ format_price(amount) }}</b>.
-    {%- else -%}
-    {{ count }} prepay tickets
-    for <b>{{ format_price(amount) }}</b>.
-    {%- endif %}
-Your tickets aren't quite reserved yet!  Please choose a payment method below to buy your tickets.</p>
+<table class="table table-condensed">
+<thead>
+<tr><th>Ticket Type</th><th>amount</th><th>Price each</th></tr>
+</thead>
+<tbody>
+{% for tt in basket %}
+<tr>
+<td>
+{{ tt.name }}
+</td>
+<td>
+{{ basket[tt] }}
+</td>
+<td>
+{{ format_price(tt.cost) }}
+</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+<p>Total <b>{{ format_price(amount) }}</b></p>
+
+<p>Your tickets aren't quite reserved yet!  Please choose a payment method below to buy your tickets.</p>
 
 <h3>Paying in Pounds or Euros</h3>
 

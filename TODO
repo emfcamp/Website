@@ -1,0 +1,21 @@
+
+insert default ticket_type data if it dosn't exist [done]
+a page template to list the tickets generated from the ticket types [done]
+validate the form data
+
+wishlist:
+
+flaskext.wtf.html5.DecimalField ?
+
+migrations?
+
+http://docs.sqlalchemy.org/en/rel_0_7/core/schema.html#altering-schemas-through-migrations
+
+problems?
+
+Website/env/lib/python2.6/site-packages/sqlalchemy/types.py:215: SAWarning:
+Dialect sqlite+pysqlite does *not* support Decimal objects natively, and
+SQLAlchemy must convert from floating point - rounding errors and other
+issues may occur. Please consider storing Decimal numbers as strings or
+integers on this platform for lossless storage.
+

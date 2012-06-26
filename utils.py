@@ -200,12 +200,25 @@ class TestEmails(Command):
 
 class CreateTickets(Command):
     def run(self):
-        try:
-            prepay = TicketType.query.filter_by(name='Prepay Camp Ticket').one()
-        except NoResultFound, e:
-            prepay = TicketType('Prepay Camp Ticket', 250, 4, 30.00)
-            db.session.add(prepay)
-            db.session.commit()
+        types = [
+            TicketType('Prepay Camp Ticket', 250, 4, 30.00),
+            TicketType('Full Camp Ticket (prepay)', 250, 4, 90.00 - 5.00),
+            TicketType('Full Camp Ticket', 499 - 20, 4, 90.00),
+            TicketType('Child Camp Ticket', 30, 4, 45.00,
+                "All children must be accompanied by an adult."),
+            TicketType('Parking Ticket', 25, 4, 10.00,
+                "We're trying to keep cars on-site to a minimum. "
+                "Please use the nearby carpark or find someone to share with if possible."),
+            TicketType('Campervan Ticket', 5, 1, 30.00,
+                "Space for campervans is extremely limited. We'll email you for details of your requirements."),
+        ]
+
+        for tt in types:
+            try:
+                TicketType.query.filter_by(name=tt.name).one()
+            except NoResultFound, e:
+                db.session.add(tt)
+                db.session.commit()
 
         print 'Tickets created'
 

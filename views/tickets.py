@@ -13,7 +13,7 @@ from flaskext.wtf import \
     Form, Required, Email, EqualTo, ValidationError, \
     TextField, PasswordField, SelectField, HiddenField, \
     SubmitField, BooleanField, IntegerField, HiddenInput, \
-    DecimalField
+    DecimalField, FieldList, FormField, Optional
 
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
@@ -21,6 +21,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import text
 
 from decorator import decorator
+from wtforms.fields.core import UnboundField
+
 import simplejson, os, re
 from datetime import datetime, timedelta
 
@@ -43,6 +45,13 @@ class IntegerSelectField(SelectField):
 class ChoosePrepayTicketsForm(Form):
     count = IntegerSelectField('Number of tickets', [Required()])
 
+
+class UpdateTicketForm(Form):
+    pass
+
+class UpdateTicketsForm(Form):
+    tickets = FieldList(FormField(UpdateTicketForm))
+
 @app.route("/tickets", methods=['GET', 'POST'])
 def tickets():
     form = ChoosePrepayTicketsForm(request.form)
@@ -61,6 +70,8 @@ def tickets():
     else:
         tickets = []
         payments = []
+
+    print [t.type.name for t in tickets]
 
     #
     # go through existing payments
@@ -98,18 +109,29 @@ def tickets():
         btcancel_forms=btcancel_forms
     )
 
-def buy_prepay_tickets(paymenttype, count):
+def make_payment_and_tickets(paymenttype, basket):
     """
-    Temporary procedure to create a payment from session data
+    create a payment and tickets from session data
     """
-    prepays = current_user.tickets. \
-        filter_by(type=TicketType.Prepay).\
-        filter(Ticket.expires >= datetime.utcnow()). \
-        count()
-    if prepays + count > TicketType.Prepay.limit:
-        raise Exception('You can only buy %s tickets in total' % TicketType.Prepay.limit)
 
-    tickets = [Ticket(type_id=TicketType.Prepay.id) for i in range(count)]
+#    count = 0
+#    for type in basket:
+#        if type == TicketType.Prepay.id:
+#            count += 1
+
+    # XXX
+#    prepays = current_user.tickets. \
+#        filter_by(type=TicketType.Prepay).\
+#        filter(Ticket.expires >= datetime.utcnow()). \
+#        count()
+#    if prepays + count > TicketType.Prepay.limit:
+#        raise Exception('You can only buy %s tickets in total' % TicketType.Prepay.limit)
+
+    tickets = []
+    for type in basket:
+        print type
+        print TicketType.query.get(type)
+        tickets.extend([Ticket(type_id=TicketType.query.get(type).id) for i in range(basket[type])])
 
     amount = sum(t.type.cost for t in tickets)
 
@@ -120,6 +142,9 @@ def buy_prepay_tickets(paymenttype, count):
         current_user.tickets.append(t)
         t.payment = payment
         t.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
+
+    print tickets
+    print amount
 
     db.session.add(current_user)
     db.session.commit()
@@ -141,35 +166,53 @@ def ticket_terms():
 @app.route("/pay/choose")
 @login_required
 def pay_choose():
-    count = session.get('count')
+    count = session.pop('count', None)
     if not count:
+        basket = session.pop('basket', None)
+        if basket:
+            if len(basket) > 0:
+                basket_out = {}
+                amount = 0
+                for type in basket.keys():
+                    tt = TicketType.query.get(type)
+                    basket_out[tt] = basket[type]
+                    amount += tt.cost * basket[type]
+                    print "Bought %d of type %d : %s" % (basket[type], type, tt.name)
+                print "total: %.2f" % (amount)
+                
+                # should display basket contents and payment method choice and
+                # checkout
+        else:
+            return redirect(url_for('tickets'))
+    else:
+        amount = TicketType.Prepay.cost * count
+        basket = { TicketType.Prepay.id : count }
         return redirect(url_for('tickets'))
 
-    prepays = current_user.tickets. \
-        filter_by(type=TicketType.Prepay).\
-        filter(Ticket.expires >= datetime.utcnow()). \
-        count()
-    if count + prepays > TicketType.Prepay.limit:
-        flash("You can only buy up to 4 tickets per person.")
-        return redirect(url_for('tickets'))
+#    prepays = current_user.tickets. \
+#        filter_by(type=TicketType.Prepay).\
+#        filter(Ticket.expires >= datetime.utcnow()). \
+#        count()
+#    if count + prepays > TicketType.Prepay.limit:
+#        flash("You can only buy up to 4 tickets per person.")
+#        return redirect(url_for('tickets'))
 
     amount = TicketType.Prepay.cost * count
-
-    return render_template('payment-choose.html', count=count, amount=amount)
+    return render_template('payment-choose.html', basket=basket_out, amount=amount)
 
 @app.route("/pay/gocardless-start", methods=['POST'])
 @login_required
 def gocardless_start():
-    count = session.pop('count', None)
-    if not count:
+    basket = session.pop('basket', None)
+    if not basket:
         flash('Your session information has been lost. Please try ordering again.')
         return redirect(url_for('tickets'))
 
-    payment = buy_prepay_tickets(GoCardlessPayment, count)
+    payment = make_payment_and_tickets(GoCardlessPayment, count)
 
     app.logger.info("User %s created GoCardless payment %s", current_user.id, payment.id)
 
-    bill_url = payment.bill_url("Electromagnetic Field Ticket Deposit")
+    bill_url = payment.bill_url("Electromagnetic Field Tickets")
 
     return redirect(bill_url)
 
@@ -428,12 +471,12 @@ def gocardless_webhook():
 @app.route("/pay/transfer-start", methods=['POST'])
 @login_required
 def transfer_start():
-    count = session.pop('count', None)
-    if not count:
+    basket = session.pop('basket', None)
+    if not basket:
         flash('Your session information has been lost. Please try ordering again.')
         return redirect(url_for('tickets'))
 
-    payment = buy_prepay_tickets(BankPayment, count)
+    payment = make_payment_and_tickets(BankPayment, basket)
 
     app.logger.info("User %s created bank payment %s (%s)", current_user.id, payment.id, payment.bankref)
 
@@ -451,6 +494,71 @@ def transfer_start():
     mail.send(msg)
 
     return redirect(url_for('transfer_waiting', payment=payment.id))
+
+class HiddenIntegerField(HiddenField, IntegerField):
+    """
+    widget=HiddenInput() doesn't work with WTF-Flask's hidden_tag()
+    """
+
+class TicketAmountForm(Form):
+    amount = IntegerSelectField('Number of tickets', [Optional()])
+    typeid = HiddenIntegerField('Ticket Type', [Required()])
+
+class TicketAmountsForm(Form):
+    types = FieldList(FormField(TicketAmountForm))
+    choose = SubmitField('Buy Tickets')
+
+@app.route("/tickets/choose", methods=['GET', 'POST'])
+@login_required
+def tickets_choose():
+    form = TicketAmountsForm(request.form)
+
+    if not form.types:
+        for tt in TicketType.query.all():
+            form.types.append_entry()
+            form.types[-1].typeid.data = tt.id
+
+    prepays = current_user.tickets. \
+        filter_by(type=TicketType.Prepay, paid=True). \
+        count()
+
+    for f in form.types:
+        tt = TicketType.query.get(f.typeid.data)
+        f._type = tt
+
+        limit = tt.user_limit(current_user)
+
+        values = range(limit + 1)
+        if tt.id == TicketType.Prepay.id:
+            values = []
+        elif tt.id == TicketType.FullPrepay.id:
+            assert prepays <= limit
+            values = [prepays]
+        elif tt.id == TicketType.Full.id and not prepays:
+            values = range(1, limit + 1)
+
+        f.amount.values = values
+        f._any = any(values)
+
+
+    if request.method == 'POST' and form.validate():
+
+        total_cost = 0
+        basket = {}
+        for f in form.types:
+            if f.amount.data:
+                tt = f._type
+                print tt.name, tt.cost, f.amount.data
+                total_cost += tt.cost * f.amount.data
+                basket[tt.id] = f.amount.data
+
+        # FIXME: don't use session[], reserve them for 2h so the user doesn't get upset
+        if len(basket) > 0:
+            session["basket"] = basket
+            flash("Tickets added to basket, total cost: %.02f" % (total_cost))
+            return redirect(url_for('pay_choose'))
+
+    return render_template("tickets-choose.html", form=form)
 
 @app.route("/pay/transfer-waiting")
 @login_required
