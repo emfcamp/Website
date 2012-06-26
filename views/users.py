@@ -1,6 +1,8 @@
 from main import app, db, gocardless, mail
 from models.user import User, PasswordReset
 
+from sqlalchemy.exc import IntegrityError
+
 from flask import \
     render_template, redirect, request, flash, \
     url_for, abort, send_from_directory, session
