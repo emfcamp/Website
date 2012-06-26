@@ -4,14 +4,16 @@
 <h2>Sign up</h2>
 <p>If you've already signed up, you might want to <a href="/login">log in</a>.</p>
 <p>We need an email address and password before we can accept payment.</p>
-<form method=post>
+<form method="post" class="form-horizontal">
+  <fieldset>
   {{ form.hidden_tag() }}
-  <dl>
     {{ render_field(form.name) }}
     {{ render_field(form.email) }}
     {{ render_field(form.password) }}
     {{ render_field(form.confirm) }}
-  </dl>
-  <input type=submit name="Create" value="Register Now"/>
+  <div class="form-actions">
+      <button type="submit" name="Create" class="btn btn-primary">Register Now</button>
+  </div>
+  </fieldset>
 </form>
 {% endblock %}

@@ -14,9 +14,10 @@ from jinja2 import Environment, FileSystemLoader
 
 from decimal import Decimal
 import re, os
+from datetime import datetime
 
 from main import app, mail
-from models import User, TicketType
+from models import User, TicketType, Ticket
 from models.payment import Payment, BankPayment, safechars
 
 #app = Flask(__name__)
@@ -40,6 +41,7 @@ class Reconcile(Command):
   paid = 0
   tickets_paid = 0
   ref_fixups = {}
+  overpays = {}
 
   def run(self, filename, doit, quiet):
     self.doit = doit
@@ -49,6 +51,7 @@ class Reconcile(Command):
       sys.path.append("/etc/emf")
       import reffixups
       self.ref_fixups = reffixups.fixups
+      self.overpays = reffixups.overpays
 
     data = ofxparse.OfxParser.parse(file(filename))
 
@@ -119,18 +122,19 @@ class Reconcile(Command):
           if t.paid == False:
             total += Decimal(str(t.type.cost_pence / 100.0))
           elif not self.quiet:
-            print "attempt to pay for paid ticket: %d" % (t.id)
+            if payment.id not in self.overpays:
+              print "attempt to pay for paid ticket: %d, user: %s, payment id: %d" % (t.id, payment.user.name, payment.id)
 
         if total == 0:
           # nothing owed, so an old payment...
           return
           
-        if total != amount:
-          print "tried to reconcile payment %s for %s, but amount paid (%d) didn't match amount owed (%d)" % (ref, user.name, amount, total)
+        if total != amount and payment.id not in self.overpays:
+          print "tried to reconcile payment %s for %s, but amount paid (%.2f) didn't match amount owed (%.2f)" % (ref, user.name, amount, total)
         else:
           # all paid up.
           if not self.quiet:
-            print "user %s paid for %d (%d) tickets with ref: %s" % (user.name, len(unpaid), amount, ref)
+            print "user %s paid for %d (%.2f) tickets with ref: %s" % (user.name, len(unpaid), amount, ref)
           
           self.paid += 1
           self.tickets_paid += len(unpaid)
@@ -205,9 +209,68 @@ class CreateTickets(Command):
 
         print 'Tickets created'
 
+class WarnExpire(Command):
+  """
+    Warn about Expired tickets
+  """
+  def run(self):
+    print "warning about expired Tickets"
+    seen = {}
+    expired = Ticket.query.filter(Ticket.expires <= datetime.utcnow(), Ticket.paid == False).all()
+    for t in expired:
+      # test that the ticket has a payment... not all do.
+      if t.payment:
+        if t.payment.id not in seen:
+          seen[t.payment.id] = True
+
+    for p in seen:
+      p = Payment.query.get(p)
+      print "emailing %s <%s> about payment %d" % (p.user.name, p.user.email, p.id)
+      # race condition, not all ticket may of expired, but if any of
+      # them have we will warn about all of them.
+      # not really a problem tho.
+      
+      msg = Message("Electromagnetic Field ticket purchase update", \
+                      sender=app.config.get('TICKETS_EMAIL'), \
+                      recipients=[p.user.email]
+                  )
+      msg.body = render_template("tickets-expired-warning.txt", payment=p)
+      mail.send(msg)
+
+class Expire(Command):
+  """
+    Expire Expired Tickets.
+  """
+  def run(self):
+    print "expiring expired tickets"
+    print
+    seen = {}
+    s = None
+    expired = Ticket.query.filter(Ticket.expires <= datetime.utcnow(), Ticket.paid == False).all()
+    for t in expired:
+      # test that the ticket has a payment... not all do.
+      if t.payment:
+        if t.payment.id not in seen:
+          seen[t.payment.id] = True
+
+    for p in seen:
+      p = Payment.query.get(p)
+      print "expiring %s payment %d" % (p.provider, p.id)
+      p.state = "expired"
+      if not s:
+        s = db.object_session(p)
+
+      for t in p.tickets:
+        print "deleting expired %s ticket %d" % (t.type.name, t.id)
+        s.delete(t)
+
+    if s:
+      s.commit()
 
 if __name__ == "__main__":
   manager.add_command('reconcile', Reconcile())
+  manager.add_command('warnexpire', WarnExpire())
+  manager.add_command('expire', Expire())
   manager.add_command('testemails', TestEmails())
   manager.add_command('createtickets', CreateTickets())
   manager.run()

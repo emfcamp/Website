@@ -1,5 +1,5 @@
 from main import app, db, gocardless, mail
-from models.user import User, PasswordReset
+from models.user import User
 from models.payment import Payment, BankPayment, GoCardlessPayment
 from models.ticket import TicketType, Ticket
 
@@ -12,7 +12,8 @@ from flaskext.mail import Message
 from flaskext.wtf import \
     Form, Required, Email, EqualTo, ValidationError, \
     TextField, PasswordField, SelectField, HiddenField, \
-    SubmitField
+    SubmitField, BooleanField, IntegerField, HiddenInput, \
+    DecimalField
 
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
@@ -22,13 +23,6 @@ from sqlalchemy.sql import text
 from decorator import decorator
 import simplejson, os, re
 from datetime import datetime, timedelta
-
-def feature_flag(flag):
-    def call(f, *args, **kw):
-        if app.config.get(flag, False) == True:
-            return f(*args, **kw)
-        return abort(404)
-    return decorator(call)
 
 class IntegerSelectField(SelectField):
     def __init__(self, *args, **kwargs):
@@ -46,176 +40,27 @@ class IntegerSelectField(SelectField):
         self._values = vals
         self.choices = [(i, self.fmt(i)) for i in vals]
 
-
-@app.route("/")
-def main():
-    return render_template('main.html')
-
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static/images'),
-                                   'favicon.ico', mimetype='image/vnd.microsoft.icon')
-
-@app.route("/sponsors")
-def sponsors():
-    return render_template('sponsors.html')
-
-
-@app.route("/about/company")
-def company():
-    return render_template('company.html')
-
-
-class NextURLField(HiddenField):
-    def _value(self):
-        # Cheap way of ensuring we don't get absolute URLs
-        if not self.data or '//' in self.data:
-            return ''
-        if not re.match('^[-a-z/?=&]+$', self.data):
-            return ''
-        return self.data
-
-class LoginForm(Form):
-    email = TextField('Email', [Email(), Required()])
-    password = PasswordField('Password', [Required()])
-    next = NextURLField('Next')
-
-@app.route("/login", methods=['GET', 'POST'])
-@feature_flag('PAYMENTS')
-def login():
-    form = LoginForm(request.form, next=request.args.get('next'))
-    if request.method == 'POST' and form.validate():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user and user.check_password(form.password.data):
-            login_user(user)
-            return redirect(form.next.data or url_for('tickets'))
-        else:
-            flash("Invalid login details!")
-    return render_template("login.html", form=form)
-
-class SignupForm(Form):
-    name = TextField('Full name', [Required()])
-    email = TextField('Email', [Email(), Required()])
-    password = PasswordField('Password', [Required(), EqualTo('confirm', message='Passwords do not match')])
-    confirm = PasswordField('Confirm password', [Required()])
-    next = NextURLField('Next')
-
-@app.route("/signup", methods=['GET', 'POST'])
-@feature_flag('PAYMENTS')
-def signup():
-    if current_user.is_authenticated():
-        return redirect(url_for('tickets'))
-    form = SignupForm(request.form, next=request.args.get('next'))
-
-    if request.method == 'POST' and form.validate():
-        user = User(form.email.data, form.name.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        try:
-            db.session.commit()
-        except IntegrityError, e:
-            flash("Email address %s is already in use, please use another or reset your password" % (form.email.data))
-            return redirect(url_for('signup'))
-        login_user(user)
-
-        # send a welcome email.
-        msg = Message("Welcome to Electromagnetic Field",
-                sender=app.config.get('TICKETS_EMAIL'),
-                recipients=[user.email])
-        msg.body = render_template("welcome-email.txt", user=user)
-        mail.send(msg)
-
-        return redirect(form.next.data or url_for('tickets'))
-
-    return render_template("signup.html", form=form)
-
-class ForgotPasswordForm(Form):
-    email = TextField('Email', [Email(), Required()])
-
-    def validate_email(form, field):
-        user = User.query.filter_by(email=form.email.data).first()
-        if not user:
-            raise ValidationError('Email address not found')
-        form._user = user
-
-@app.route("/forgot-password", methods=['GET', 'POST'])
-@feature_flag('PAYMENTS')
-def forgot_password():
-    form = ForgotPasswordForm(request.form)
-    if request.method == 'POST' and form.validate():
-        if form._user:
-            reset = PasswordReset(form.email.data)
-            reset.new_token()
-            db.session.add(reset)
-            db.session.commit()
-            msg = Message("EMF password reset",
-                sender=app.config.get('TICKETS_EMAIL'),
-                recipients=[form.email.data])
-            msg.body = render_template("reset-password-email.txt", user=form._user, reset=reset)
-            mail.send(msg)
-
-        return redirect(url_for('reset_password', email=form.email.data))
-    return render_template("forgot-password.html", form=form)
-
-class ResetPasswordForm(Form):
-    email = TextField('Email', [Email(), Required()])
-    token = TextField('Token', [Required()])
-    password = PasswordField('New password', [Required(), EqualTo('confirm', message='Passwords do not match')])
-    confirm = PasswordField('Confirm password', [Required()])
-
-    def validate_token(form, field):
-        reset = PasswordReset.query.filter_by(email=form.email.data, token=field.data).first()
-        if not reset:
-            raise ValidationError('Token not found')
-        if reset.expired():
-            raise ValidationError('Token has expired')
-        form._reset = reset
-
-@app.route("/reset-password", methods=['GET', 'POST'])
-@feature_flag('PAYMENTS')
-def reset_password():
-    form = ResetPasswordForm(request.form, email=request.args.get('email'), token=request.args.get('token'))
-    if request.method == 'POST' and form.validate():
-        user = User.query.filter_by(email=form.email.data).first()
-        db.session.delete(form._reset)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        return redirect(url_for('tickets'))
-    return render_template("reset-password.html", form=form)
-
-@app.route("/logout")
-@feature_flag('PAYMENTS')
-@login_required
-def logout():
-    logout_user()
-    return redirect('/')
-
-
 class ChoosePrepayTicketsForm(Form):
     count = IntegerSelectField('Number of tickets', [Required()])
 
-    def validate_count(form, field):
-        prepays = current_user.tickets. \
-            filter_by(type=TicketType.Prepay).\
-            filter(Ticket.expires >= datetime.utcnow()). \
-            count()
-        if field.data + prepays > TicketType.Prepay.limit:
-            raise ValidationError('You can only buy %s tickets in total' % TicketType.Prepay.limit)
-
 @app.route("/tickets", methods=['GET', 'POST'])
-@feature_flag('PAYMENTS')
-@login_required
 def tickets():
     form = ChoosePrepayTicketsForm(request.form)
     form.count.values = range(1, TicketType.Prepay.limit + 1)
 
     if request.method == 'POST' and form.validate():
         session["count"] = form.count.data
-        return redirect(url_for('pay_choose'))
+        if current_user.is_authenticated():
+            return redirect(url_for('pay_choose'))
+        else:
+            return redirect(url_for('signup', next=url_for('pay_choose')))
 
-    tickets = current_user.tickets.all()
-    payments = current_user.payments.all()
+    if current_user.is_authenticated():
+        tickets = current_user.tickets.all()
+        payments = current_user.payments.filter(Payment.state != "canceled", Payment.state != "expired").all()
+    else:
+        tickets = []
+        payments = []
 
     #
     # go through existing payments
@@ -232,9 +77,9 @@ def tickets():
     btcancel_forms = {}
     for p in payments:
         if p.provider == "gocardless" and p.state == "new":
-            gc_try_again_forms[p.id] = GoCardlessTryAgainForm(payment=p.id, yesno='no')
+            gc_try_again_forms[p.id] = GoCardlessTryAgainForm(formdata=None, payment=p.id, yesno='no')
         elif p.provider == "banktransfer" and p.state == "inprogress":
-            btcancel_forms[p.id] = BankTransferCancelForm(payment=p.id, yesno='no')
+            btcancel_forms[p.id] = BankTransferCancelForm(formdata=None, payment=p.id, yesno='no')
         # the rest are inprogress or complete gocardless payments
         # or complete banktransfers,
         # or canceled payments of either provider.
@@ -283,7 +128,6 @@ def buy_prepay_tickets(paymenttype, count):
 
 
 @app.route("/pay")
-@feature_flag('PAYMENTS')
 def pay():
     if current_user.is_authenticated():
         return redirect(url_for('pay_choose'))
@@ -291,17 +135,22 @@ def pay():
     return render_template('payment-options.html')
 
 @app.route("/pay/terms")
-@feature_flag('PAYMENTS')
 def ticket_terms():
     return render_template('terms.html')
 
-
 @app.route("/pay/choose")
-@feature_flag('PAYMENTS')
 @login_required
 def pay_choose():
     count = session.get('count')
     if not count:
+        return redirect(url_for('tickets'))
+
+    prepays = current_user.tickets. \
+        filter_by(type=TicketType.Prepay).\
+        filter(Ticket.expires >= datetime.utcnow()). \
+        count()
+    if count + prepays > TicketType.Prepay.limit:
+        flash("You can only buy up to 4 tickets per person.")
         return redirect(url_for('tickets'))
 
     amount = TicketType.Prepay.cost * count
@@ -309,7 +158,6 @@ def pay_choose():
     return render_template('payment-choose.html', count=count, amount=amount)
 
 @app.route("/pay/gocardless-start", methods=['POST'])
-@feature_flag('PAYMENTS')
 @login_required
 def gocardless_start():
     count = session.pop('count', None)
@@ -361,7 +209,6 @@ class BankTransferCancelForm(Form):
             raise ValidationError('Sorry, that dosn\'t look like a valid payment')
 
 @app.route("/pay/gocardless-tryagain", methods=['POST'])
-@feature_flag('PAYMENTS')
 @login_required
 def gocardless_tryagain():
     """
@@ -376,7 +223,7 @@ def gocardless_tryagain():
             payment_id = int(form.payment.data)
 
     if not payment_id:
-        flash('Unable to validate form, the webadmin\'s have been notified.')
+        flash('Unable to validate form. The web team have been notified.')
         app.logger.error("gocardless-tryagain: unable to get payment_id")
         return redirect(url_for('tickets'))
 
@@ -393,8 +240,7 @@ def gocardless_tryagain():
         return redirect(bill_url)
 
     if form.cancel.data == True:
-        # I cannot work out why, but yesno does not get set to 'yes' here!
-        ynform = GoCardlessTryAgainForm(payment = payment.id, yesno = "yes")
+        ynform = GoCardlessTryAgainForm(payment = payment.id, yesno = "yes", formdata=None)
         return render_template('gocardless-discard-yesno.html', payment=payment, form=ynform)
 
     if form.yes.data == True:
@@ -406,12 +252,11 @@ def gocardless_tryagain():
         payment.state = "canceled"
         db.session.add(payment)
         db.session.commit()
-        flash("Your gocardless payment has been canceled")
+        flash("Your gocardless payment has been cancelled")
 
     return redirect(url_for('tickets'))
 
 @app.route("/pay/gocardless-complete")
-@feature_flag('PAYMENTS')
 @login_required
 def gocardless_complete():
     payment_id = int(request.args.get('payment'))
@@ -438,9 +283,17 @@ def gocardless_complete():
     payment.gcid = gcid
     payment.state = "inprogress"
     db.session.add(payment)
+
+    for t in payment.tickets:
+        # We need to make sure of a 5 working days grace
+        # for gocardless payments, so push the ticket expiry forwards
+        t.expires = datetime.utcnow() + timedelta(10)
+        app.logger.info("ticket %d (payment %d): expiry reset.", t.id, payment.id)
+        db.session.add(t)
+
     db.session.commit()
 
-    app.logger.info("Payment completed OK")
+    app.logger.info("Payment %d completed OK", payment.id)
 
     # should we send the resource_uri in the bill email?
     msg = Message("Your EMF ticket purchase", \
@@ -455,7 +308,6 @@ def gocardless_complete():
     return redirect(url_for('gocardless_waiting', payment=payment_id))
 
 @app.route('/pay/gocardless-waiting')
-@feature_flag('PAYMENTS')
 @login_required
 def gocardless_waiting():
     try:
@@ -474,7 +326,6 @@ def gocardless_waiting():
     return render_template('gocardless-waiting.html', payment=payment, days=app.config.get('EXPIRY_DAYS'))
 
 @app.route("/pay/gocardless-cancel")
-@feature_flag('PAYMENTS')
 @login_required
 def gocardless_cancel():
     payment_id = int(request.args.get('payment'))
@@ -490,10 +341,10 @@ def gocardless_cancel():
         flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
         return redirect(url_for('tickets'))
 
-    for t in payment.tickets:
+    for ticket in payment.tickets:
         app.logger.info("gocardless-cancel: userid %s, payment_id %s canceled ticket %d",
             current_user.id, payment.id, ticket.id)
-        t.payment = None
+        ticket.payment = None
 
     db.session.add(current_user)
     db.session.commit()
@@ -503,7 +354,6 @@ def gocardless_cancel():
     return render_template('gocardless-cancel.html', payment=payment)
 
 @app.route("/gocardless-webhook", methods=['POST'])
-@feature_flag('PAYMENTS')
 def gocardless_webhook():
     """
         handle the gocardless webhook / callback callback:
@@ -576,7 +426,6 @@ def gocardless_webhook():
 
 
 @app.route("/pay/transfer-start", methods=['POST'])
-@feature_flag('PAYMENTS')
 @login_required
 def transfer_start():
     count = session.pop('count', None)
@@ -604,15 +453,20 @@ def transfer_start():
     return redirect(url_for('transfer_waiting', payment=payment.id))
 
 @app.route("/pay/transfer-waiting")
-@feature_flag('PAYMENTS')
 @login_required
 def transfer_waiting():
     payment_id = int(request.args.get('payment'))
-    payment = current_user.payments.filter_by(id=payment_id, user=current_user).one()
+    try:
+        payment = current_user.payments.filter_by(id=payment_id, user=current_user).one()
+    except NoResultFound:
+        if current_user:
+            app.logger.error("Attempt to get an inaccessible payment (%d) by user %d (%s)" % (payment_id, current_user.id, current_user.name))
+        else:
+            app.logger.error("Attempt to get an inaccessible payment (%d)" % (payment_id))
+        return redirect(url_for('tickets'))
     return render_template('transfer-waiting.html', payment=payment, days=app.config.get('EXPIRY_DAYS'))
 
 @app.route("/pay/transfer-cancel", methods=['POST'])
-@feature_flag('PAYMENTS')
 @login_required
 def transfer_cancel():
     """
@@ -626,7 +480,7 @@ def transfer_cancel():
             payment_id = int(form.payment.data)
 
     if not payment_id:
-        flash('Unable to validate form, the webadmin\'s have been notified.')
+        flash('Unable to validate form. The web team have been notified.')
         app.logger.error("transfer_cancel: unable to get payment_id")
         return redirect(url_for('tickets'))
 
@@ -638,8 +492,7 @@ def transfer_cancel():
         return redirect(url_for('tickets'))
 
     if form.yesno.data == "no" and form.cancel.data == True:
-        # yesno stays as 'no' here.
-        ynform = BankTransferCancelForm(payment=payment.id, yesno='yes')
+        ynform = BankTransferCancelForm(payment=payment.id, yesno='yes', formdata=None)
         return render_template('transfer-cancel-yesno.html', payment=payment, form=ynform)
 
     if form.no.data == True:
@@ -653,19 +506,6 @@ def transfer_cancel():
         payment.state = "canceled"
         db.session.add(payment)
         db.session.commit()
-        flash('payment canceled')
+        flash('Payment cancelled')
 
     return redirect(url_for('tickets'))
-
-@app.route("/stats")
-def stats():
-    ret = {}
-    conn = db.session.connection()
-    result = conn.execute(text("""SELECT count(t.id) as tickets from payment p, ticket t, ticket_type tt where
-                                p.state='inprogress' and t.payment_id = p.id and t.expires >= date('now') and t.type_id = tt.id and tt.name = 'Prepay Camp Ticket'""")).fetchall()
-    ret["prepays"] = result[0][0]
-    ret["users"] = User.query.count()
-    ret["prepays_bought"] = TicketType.Prepay.query.filter(Ticket.paid == True).count()
-
-    return ' '.join('%s:%s' % i for i in ret.items())
-

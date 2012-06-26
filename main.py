@@ -38,8 +38,14 @@ db = SQLAlchemy(app)
 mail = Mail(app)
 
 assets = Environment(app)
-css = Bundle('css/reset-fonts-grids.css', 'css/main.css', output='gen/packed.css')
+css = Bundle('css/bootstrap.css', 'css/bootstrap-responsive.css', 'css/main.css',
+                output='gen/packed.css', filters='cssmin')
 assets.register('css_all', css)
+
+js = Bundle('js/jquery-1.7.2.js', 'js/bootstrap.js', output='gen/packed.js', 
+                filters='rjsmin')
+assets.register('js_all', js)
+
 
 import gocardless
 

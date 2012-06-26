@@ -1,44 +1,42 @@
 <!doctype html>
-<html>
+<html lang="en">
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Electromagnetic Field</title>
-        {% assets "css_all" %}
+        {% assets "css_all" -%}
         <link rel="stylesheet" href="{{ ASSET_URL }}">
-        {% endassets %}
-        {% block head %}{% endblock %}
+        {% endassets -%}
+        {% block head -%}{% endblock -%}
+        <!--[if lt IE 9]>
+            <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
         <link rel="shortcut icon" href="/favicon.ico">
     </head>
-<body class="yui-skin-sam">
-<div id="doc" class="yui-t7">
+<body>
+<div class="container">
     <div id="hd">
         <h1><a href="/">Electromagnetic Field</a></h1>
         <p>(a three-day UK hacker camp in summer 2012)</p>
-        {% if config.get('PAYMENTS') %}
-          {% if not current_user.is_authenticated() %}
-      		<a href="{{ url_for('login') }}">Log in</a>
-          ||
-          <a href="{{ url_for('signup') }}">Sign up</a>
-          {% endif %}
-        {% endif %}
-        
     </div>
     <div id="bd">
-        <div class="yui-g">
-            {% for message in get_flashed_messages() %}
-                <div class=flash>{{ message }}</div>
-            {% endfor %}
-            {% block body %}{% endblock %}
+        <div>
+            {% for message in get_flashed_messages() -%}
+            <div class="flash">{{ message }}</div>
+            {% endfor -%}
+            {% block body -%}{% endblock -%}
         </div>
     </div>
-    <div id="ft">
+    <footer class="footer">
         Electromagnetic Field Ltd. 2012. <a href="{{url_for('company')}}">Company details</a>. Kindly hosted by <a href="http://bitfolk.com/">Bitfolk</a>.
         {% if current_user.is_authenticated() %}
         <a class="logout" href="{{ url_for('logout') }}">Log out</a>
         {% endif %}
-    </div>
+    </footer>
 </div>
-
+{% assets "js_all" -%}
+<script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets -%}
 <script type="text/javascript">
 
   var _gaq = _gaq || [];

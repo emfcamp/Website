@@ -1,21 +1,34 @@
 {% extends "base.html" %}
 {% block body %}
 
-{% if config.get('PAYMENTS') %}
-<center><h3><a href="{{ url_for('signup') }}">Buy pre-sale tickets now</a></h3></center>
-{% endif %}
-
 <h2>What?</h2>
 
-<p class="summary">Electromagnetic Field is a three-day camping festival for people with an inquisitive mind and an interest in science, engineering, technology, DIY, and computer security.</p>
-<p class="summary">A cross between a tech conference and a music festival, with talks and workshops on a wide range of subjects.</p>
-<p class="summary">A great opportunity to meet like-minded people, to learn, to teach, to play, and have a drink with someone new who shares your interests.</p>
-<p>A festival for anyone interested in 3D printing, DIYBio, knitting, electronics, Internet culture, space, lockpicking, homebrewing, robots, UAVs, mind hacking, radio, or pretty much anything else you can think of. EMF is a volunteer effort by a non-profit group, loosely inspired by European and US hacker camps like <a href="http://en.wikipedia.org/wiki/Chaos_Communication_Camp">CCC</a>, <a href="http://en.wikipedia.org/wiki/Hacking_at_Random">HAR</a>, and <a href="http://www.toorcamp.org/">toorcamp</a>.</p>
+<p class="summary">
+Electromagnetic Field is a three-day camping festival for people with an inquisitive mind or an interest in making things: hackers, geeks, scientists, engineers, artists, and craftspeople.
+</p>
+<p class="summary">
+A great gathering of specialists, enthusiasts, and newcomers from many disciplines, with talks and workshops on a wide range of subjects, and many opportunities to collaborate or have a drink with someone new.
+</p>
+<p>
+A festival for anyone interested in 3D printing, DIYBio, knitting, electronics, Internet culture, space, lockpicking, homebrewing, robots, UAVs, mind hacking, radio, or pretty much anything else you can think of. EMF is a volunteer effort by a non-profit group, inspired by European and US hacker camps like <a href="http://en.wikipedia.org/wiki/Chaos_Communication_Camp">CCC</a>, <a href="http://en.wikipedia.org/wiki/Hacking_at_Random">HAR</a>, and <a href="http://www.toorcamp.org/">toorcamp</a>.
+</p>
+
 <h2>When?</h2>
-<p>Friday 31st August - Sunday 2nd September 2012</p>
+<p>Friday 31st August - Sunday 2nd September 2012.</p>
+
+<p>Events and activities will run throughout the day and into the evening, everything else (chats, debates, impromptu circus performances) will run as long as your collective energy lasts.</p>
+
 <h2>Where?</h2>
-<p><a href="http://www.openstreetmap.org/?lat=52.0616018772125&lon=-0.710721015930176&zoom=16">Pineham Park</a>, Milton Keynes, UK</p>
-<h2>Get Involved</h2>
+<p><a href="http://www.openstreetmap.org/?lat=52.061&amp;lon=-0.710&amp;zoom=16">Pineham Park</a>, Milton Keynes, UK.</p>
+
+<p>Milton Keynes has great transport links to the rest of the UK and Europe. It's only 40 minutes on the train from London, and the site is easily accessible from the M1 motorway.</p>
+<h2>Count me in!</h2>
+<p>We're currently pre-selling tickets for a £30 deposit. These let you reserve a place, and give you a £5 discount off the final ticket price.</p>
+<p><a class="btn btn-primary" href="{{ url_for('tickets') }}">Buy pre-sale tickets now</a></p>
+
+<p>If you've already signed up, <a href="{{url_for('login')}}">log in</a> to view your ticket status.</p>
+
+<h2>Help us out</h2>
 <p>EMF is a volunteer-run effort. If you want to help out:</p>
 <ul>
     <li>Answer the <a href="http://blog.emfcamp.org/post/23117482682/emf-2012-call-for-participation">Call for Participation</a></li>
@@ -26,16 +39,5 @@
     <li>Subscribe to <a href="http://blog.emfcamp.org">our blog</a></li>
 </ul>
 
-<h2>Count Me In!</h2>
-{% if config.get('PAYMENTS') %}
-<p>Presales are now open: <a href="{{ url_for('signup') }}">pre-order your ticket</a>.
-
-{% else %}
-<p>To help us get an idea of numbers, we'd appreciate it if you filled in this quick form to give us an
-    idea of interest. There's no obligation to come and we'll only use your email address to contact
-    you about the camp.</p>
-<iframe src="https://docs.google.com/spreadsheet/embeddedform?formkey=dFdQUlA2dkY3dXREaTlHbHIyZXFpc1E6MQ" id="google-form"
-    width="270" height="600" frameborder="0" marginheight="0" marginwidth="0" scrolling="no">Loading...</iframe>
-{% endif %}
-
+<div class="main-footer"></div>
 {% endblock %}

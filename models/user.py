@@ -20,10 +20,10 @@ class User(db.Model, flaskext.login.UserMixin):
         self.name = name
 
     def set_password(self, password):
-        self.password = bcrypt.hashpw(password, bcrypt.gensalt())
+        self.password = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
 
     def check_password(self, password):
-        return bcrypt.hashpw(password, self.password) == self.password
+        return bcrypt.hashpw(password.encode('utf8'), self.password) == self.password
 
 class PasswordReset(db.Model):
     __tablename__ = 'password_reset'

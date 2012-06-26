@@ -1,0 +1,36 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block body %}
+<H1>Add to Ticket Types</H1>
+
+<table class="table table-condensed table-striped">
+<tr><th>Name</th><th>Capacity</th><th>limit</th><th>cost</th><th>Allocated</th></tr>
+{% for t in types %}
+<tr class="
+{{ loop.cycle('odd', 'even') }}
+">
+<td>{{ t.name }}</td>
+<td>{{ t.capacity }}</td>
+<td>{{ t.limit }}</td>
+<td>{{ format_price(t.cost) }}</td>
+<td>{{ t.tickets | length }}</td>
+</tr>
+{% endfor %}
+</table>
+
+<H2>Add new ticket type:</H2>
+
+<form method=post class="form-horizontal">
+{{ form.hidden_tag() }}
+{{ render_field(form.name) }}
+{{ render_field(form.capacity) }}
+{{ render_field(form.limit) }}
+{{ render_field(form.cost) }}
+<div class="form-actions">
+    <input type=submit name="Create" value="Create" class="btn btn-primary"/>
+</div>
+</form>
+
+<p>Back to <a href="{{ url_for('admin') }}">admin things</a>.</p>
+
+{% endblock %}
