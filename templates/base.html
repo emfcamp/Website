@@ -22,6 +22,9 @@
 		<li {% if request.path==url_for('main') %}class="active"{% endif %}>                  
 			<a href="{{url_for('main')}}">Home</a>                                          
 		</li>		
+		<li {% if request.path==url_for('tickets') %}class="active"{% endif %}>                  
+			<a href="{{url_for('tickets')}}">Tickets</a>                                          
+		</li>		
 		<li {% if request.path==url_for('about') %}class="active"{% endif %}>                  
 			<a href="{{url_for('about')}}">About us</a>                                          
 		</li>		
@@ -36,7 +39,12 @@
 		</li>		
 		<li {% if request.path==url_for('participating') %}class="active"{% endif %}>                  
 			<a href="{{url_for('participating')}}">Participating orgs</a>                                          
-		</li>		
+		</li>
+		{% if current_user.admin %}		
+			<li {% if request.path==url_for('admin') %}class="active"{% endif %}>                  
+				<a href="{{url_for('admin')}}">Admin</a>                                          
+			</li>
+		{% endif %}		
 		<li>                  
 			<a href="http://wiki.emfcamp.org">Wiki</a>                                          
 		</li>
