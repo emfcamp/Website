@@ -83,6 +83,11 @@ form.shrink {
   padding-bottom: 2ex;
 }
 
+
+img.padit {
+	padding: 24px;
+}
+
 .choose-tickets-form .btn-primary,
 .choose-tickets-form #summary
 {

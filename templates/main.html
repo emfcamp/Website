@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block body %}
 
+<div class="span8">
 <h2>What?</h2>
-
 <p class="summary">
 Electromagnetic Field is a three-day camping festival for people with an inquisitive mind or an interest in making things: hackers, geeks, scientists, engineers, artists, and craftspeople.
 </p>
@@ -22,22 +22,15 @@ A festival for anyone interested in 3D printing, DIYBio, knitting, electronics, 
 <p><a href="http://www.openstreetmap.org/?lat=52.061&amp;lon=-0.710&amp;zoom=16">Pineham Park</a>, Milton Keynes, UK.</p>
 
 <p>Milton Keynes has great transport links to the rest of the UK and Europe. It's only 40 minutes on the train from London, and the site is easily accessible from the M1 motorway.</p>
+<h2>Help us out</h2>
+<p>EMF is run entirely by volunteers like you. If you want to help us out
+(whether with admin, setup, stewarding, working at the bar, or whatever else) please <a href="/contact">get in touch</a>.</p>
+</div>
+<div class="hero-unit span4">
 <h2>Count me in!</h2>
-<p>We're currently pre-selling tickets for a £30 deposit. These let you reserve a place, and give you a £5 discount off the final ticket price.</p>
+<p>We're currently pre-selling tickets for a £30 deposit. These let you reserve your place at EMF, and get a £5 discount off the final ticket price.</p>
 <p><a class="btn btn-primary" href="{{ url_for('tickets') }}">Buy pre-sale tickets now</a></p>
 
-<p>If you've already signed up, <a href="{{url_for('login')}}">log in</a> to view your ticket status.</p>
-
-<h2>Help us out</h2>
-<p>EMF is a volunteer-run effort. If you want to help out:</p>
-<ul>
-    <li>Answer the <a href="http://blog.emfcamp.org/post/23117482682/emf-2012-call-for-participation">Call for Participation</a></li>
-    <li>Follow us <a href="http://twitter.com/emfcamp">on Twitter</a></li>
-    <li>Sign up to the <a href="http://groups.google.com/group/uk-hack-camp">mailing list</a></li>
-    <li>Join us on <a href="http://webchat.freenode.net/?channels=ukhackcamp">irc.freenode.net #ukhackcamp</a></li>
-    <li>Read <a href="http://wiki.emfcamp.org">our wiki</a></li>
-    <li>Subscribe to <a href="http://blog.emfcamp.org">our blog</a></li>
-</ul>
-
-<div class="main-footer"></div>
+<p><small>If you've already signed up, <a href="{{url_for('login')}}">log in</a> to view your ticket status.</small></p>
+</div>
 {% endblock %}

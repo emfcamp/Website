@@ -14,20 +14,47 @@
         <link rel="shortcut icon" href="/favicon.ico">
     </head>
 <body>
-<div class="container">
+<div class="container-fluid">
     <div id="hd">
         <h1><a href="/">Electromagnetic Field</a></h1>
-        <p>(a three-day UK hacker camp in summer 2012)</p>
+		<ul class="nav nav-tabs">                                                 
+		<li {% if request.path==url_for('main') %}class="active"{% endif %}>                  
+			<a href="{{url_for('main')}}">About</a>                                          
+		</li>		
+        {#		<li {% if request.path==url_for('location') %}class="active"{% endif %}>                  
+			<a href="{{url_for('location')}}">Location</a>                                          
+		</li> #}		
+		<li {% if request.path==url_for('participating') %}class="active"{% endif %}>                  
+        <a href="{{url_for('participating')}}">Who's Coming</a>                                          
+        </li>
+		<li {% if request.path==url_for('sponsors') %}class="active"{% endif %}>                  
+			<a href="{{url_for('sponsors')}}">Sponsors</a>                                          
+		</li>		
+		<li {% if request.path==url_for('tickets') %}class="active"{% endif %}>                  
+			<a href="{{url_for('tickets')}}">Tickets</a>                                          
+        </li>		
+		<li {% if request.path==url_for('contact') %}class="active"{% endif %}>                  
+			<a href="{{url_for('contact')}}">Get Involved</a>                                          
+		</li>		
+		{% if current_user.admin %}		
+			<li {% if request.path==url_for('admin') %}class="active"{% endif %}>                  
+				<a href="{{url_for('admin')}}">Admin</a>                                          
+			</li>
+		{% endif %}		
+		<li>                  
+			<a href="http://wiki.emfcamp.org">Wiki</a>                                          
+		</li>
+		</ul>
     </div>
     <div id="bd">
         <div>
             {% for message in get_flashed_messages() -%}
-            <div class="flash">{{ message }}</div>
+            <div class="span6 alert alert-error">{{ message }}</div>
             {% endfor -%}
             {% block body -%}{% endblock -%}
         </div>
     </div>
-    <footer class="footer">
+    <footer class="footer span12">
         Electromagnetic Field Ltd. 2012. <a href="{{url_for('company')}}">Company details</a>. Kindly hosted by <a href="http://bitfolk.com/">Bitfolk</a>.
         {% if current_user.is_authenticated() %}
         <a class="logout" href="{{ url_for('logout') }}">Log out</a>

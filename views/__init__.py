@@ -27,9 +27,24 @@ def favicon():
 def sponsors():
     return render_template('sponsors.html')
 
-
 @app.route("/about/company")
 def company():
     return render_template('company.html')
+
+@app.route("/about")
+def about():
+    return render_template('about.html')
+    
+@app.route("/contact")
+def contact():
+    return render_template('contact.html')    
+
+@app.route("/location")
+def location():
+    return render_template('location.html')
+    
+@app.route("/participating")
+def participating():
+    return render_template('participating.html')
 
 import users, admin, tickets
