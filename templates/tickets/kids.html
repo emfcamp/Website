@@ -1,0 +1,24 @@
+{{ ticket.form.hidden_tag() }}
+
+{% set volunteer = ticket.form.volunteer %}
+{% set disabled = ticket.form.disabled %}
+
+<div class="control-group no-margin{%if form.errors%} error{%endif%}">
+  <label class="control-label">{{ disabled.label }}</label>
+  <div class="controls">
+    <label class="checkbox">
+        {{ disabled()|safe }}
+        If you have an accessibility requirements please tick here.
+    </label>
+    {% for error in disabled.errors %}
+        <span class="help-inline">{{ error }}</span>
+    {% endfor %}
+    <p>We want to be sure we have all our attendees needs covered, so we will contact you for more information.</p>
+  </div>
+
+  <div>
+    Sorry, all our volunteers must be over 18.
+    Don't worry, there will be plenty of activities to get involved with in the villages.
+  </div>
+
+</div>
