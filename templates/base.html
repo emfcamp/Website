@@ -34,7 +34,10 @@
 			<a href="{{url_for('tickets')}}">Tickets</a>                                          
         </li>		
 		<li {% if request.path==url_for('contact') %}class="active"{% endif %}>                  
-			<a href="{{url_for('contact')}}">Get Involved</a>                                          
+			<a href="{{url_for('contact')}}">Contact Us</a>                                          
+		</li>		
+		<li {% if request.path==url_for('get_involved') %}class="active"{% endif %}>                  
+			<a href="{{url_for('get_involved')}}">Get Involved</a>                                          
 		</li>		
 		{% if current_user.admin %}		
 			<li {% if request.path==url_for('admin') %}class="active"{% endif %}>                  

@@ -47,4 +47,8 @@ def location():
 def participating():
     return render_template('participating.html')
 
+@app.route("/get_involved")
+def get_involved():
+    return render_template('get_involved.html')
+    
 import users, admin, tickets
