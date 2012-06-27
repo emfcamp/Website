@@ -42,8 +42,32 @@ class IntegerSelectField(SelectField):
         self._values = vals
         self.choices = [(i, self.fmt(i)) for i in vals]
 
-class ChoosePrepayTicketsForm(Form):
-    count = IntegerSelectField('Number of tickets', [Required()])
+
+class HiddenIntegerField(HiddenField, IntegerField):
+    """
+    widget=HiddenInput() doesn't work with WTF-Flask's hidden_tag()
+    """
+
+
+class TicketForm(Form):
+    ticket_id = HiddenIntegerField('Ticket Type', [Required()])
+
+class FullTicketForm(TicketForm):
+    template= 'tickets/full.html'
+    volunteer = BooleanField('Volunteering')
+    disabled = BooleanField('Disabled')
+
+class KidsTicketForm(TicketForm):
+    template= 'tickets/kids.html'
+    disabled = BooleanField('Disabled')
+
+class CarparkTicketForm(TicketForm):
+    template= 'tickets/carpark.html'
+    carshare = BooleanField('Car share')
+
+class DonationTicketForm(TicketForm):
+    template= 'tickets/donation.html'
+    amount = DecimalField('Donation amount')
 
 
 class UpdateTicketForm(Form):
@@ -51,6 +75,9 @@ class UpdateTicketForm(Form):
 
 class UpdateTicketsForm(Form):
     tickets = FieldList(FormField(UpdateTicketForm))
+
+class ChoosePrepayTicketsForm(Form):
+    count = IntegerSelectField('Number of tickets', [Required()])
 
 @app.route("/tickets", methods=['GET', 'POST'])
 def tickets():
@@ -109,7 +136,7 @@ def tickets():
         btcancel_forms=btcancel_forms
     )
 
-def make_payment_and_tickets(paymenttype, basket):
+def make_payment_and_tickets(paymenttype, basket, total):
     """
     create a payment and tickets from session data
     """
@@ -127,24 +154,16 @@ def make_payment_and_tickets(paymenttype, basket):
 #    if prepays + count > TicketType.Prepay.limit:
 #        raise Exception('You can only buy %s tickets in total' % TicketType.Prepay.limit)
 
-    tickets = []
-    for type in basket:
-        print type
-        print TicketType.query.get(type)
-        tickets.extend([Ticket(type_id=TicketType.query.get(type).id) for i in range(basket[type])])
-
-    amount = sum(t.type.cost for t in tickets)
-
-    payment = paymenttype(amount)
+    payment = paymenttype(total)
     current_user.payments.append(payment)
 
-    for t in tickets:
+    for t in basket:
         current_user.tickets.append(t)
         t.payment = payment
         t.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
 
-    print tickets
-    print amount
+    print basket
+    print total
 
     db.session.add(current_user)
     db.session.commit()
@@ -166,49 +185,23 @@ def ticket_terms():
 @app.route("/pay/choose")
 @login_required
 def pay_choose():
-    count = session.pop('count', None)
-    if not count:
-        basket = session.pop('basket', None)
-        if basket:
-            if len(basket) > 0:
-                basket_out = {}
-                amount = 0
-                for type in basket.keys():
-                    tt = TicketType.query.get(type)
-                    basket_out[tt] = basket[type]
-                    amount += tt.cost * basket[type]
-                    print "Bought %d of type %d : %s" % (basket[type], type, tt.name)
-                print "total: %.2f" % (amount)
-                
-                # should display basket contents and payment method choice and
-                # checkout
-        else:
-            return redirect(url_for('tickets'))
-    else:
-        amount = TicketType.Prepay.cost * count
-        basket = { TicketType.Prepay.id : count }
-        return redirect(url_for('tickets'))
+    basket, total = get_basket()
 
-#    prepays = current_user.tickets. \
-#        filter_by(type=TicketType.Prepay).\
-#        filter(Ticket.expires >= datetime.utcnow()). \
-#        count()
-#    if count + prepays > TicketType.Prepay.limit:
-#        flash("You can only buy up to 4 tickets per person.")
-#        return redirect(url_for('tickets'))
+    if not basket:
+        redirect(url_for('tickets'))
 
-    amount = TicketType.Prepay.cost * count
-    return render_template('payment-choose.html', basket=basket_out, amount=amount)
+    return render_template('payment-choose.html', basket=basket, total=total)
 
 @app.route("/pay/gocardless-start", methods=['POST'])
 @login_required
 def gocardless_start():
-    basket = session.pop('basket', None)
+    basket, total = get_basket()
     if not basket:
         flash('Your session information has been lost. Please try ordering again.')
         return redirect(url_for('tickets'))
 
-    payment = make_payment_and_tickets(GoCardlessPayment, count)
+    payment = make_payment_and_tickets(GoCardlessPayment, basket, total)
+    del session['basket']
 
     app.logger.info("User %s created GoCardless payment %s", current_user.id, payment.id)
 
@@ -471,12 +464,13 @@ def gocardless_webhook():
 @app.route("/pay/transfer-start", methods=['POST'])
 @login_required
 def transfer_start():
-    basket = session.pop('basket', None)
+    basket, total = get_basket()
     if not basket:
         flash('Your session information has been lost. Please try ordering again.')
         return redirect(url_for('tickets'))
 
-    payment = make_payment_and_tickets(BankPayment, basket)
+    payment = make_payment_and_tickets(BankPayment, basket, total)
+    del session['basket']
 
     app.logger.info("User %s created bank payment %s (%s)", current_user.id, payment.id, payment.bankref)
 
@@ -495,14 +489,9 @@ def transfer_start():
 
     return redirect(url_for('transfer_waiting', payment=payment.id))
 
-class HiddenIntegerField(HiddenField, IntegerField):
-    """
-    widget=HiddenInput() doesn't work with WTF-Flask's hidden_tag()
-    """
-
 class TicketAmountForm(Form):
     amount = IntegerSelectField('Number of tickets', [Optional()])
-    typeid = HiddenIntegerField('Ticket Type', [Required()])
+    type_id = HiddenIntegerField('Ticket Type', [Required()])
 
 class TicketAmountsForm(Form):
     types = FieldList(FormField(TicketAmountForm))
@@ -516,14 +505,14 @@ def tickets_choose():
     if not form.types:
         for tt in TicketType.query.all():
             form.types.append_entry()
-            form.types[-1].typeid.data = tt.id
+            form.types[-1].type_id.data = tt.id
 
     prepays = current_user.tickets. \
         filter_by(type=TicketType.Prepay, paid=True). \
         count()
 
     for f in form.types:
-        tt = TicketType.query.get(f.typeid.data)
+        tt = TicketType.query.get(f.type_id.data)
         f._type = tt
 
         limit = tt.user_limit(current_user)
@@ -543,22 +532,87 @@ def tickets_choose():
 
     if request.method == 'POST' and form.validate():
 
-        total_cost = 0
-        basket = {}
+        basket = []
         for f in form.types:
             if f.amount.data:
                 tt = f._type
                 print tt.name, tt.cost, f.amount.data
-                total_cost += tt.cost * f.amount.data
-                basket[tt.id] = f.amount.data
+                for i in range(f.amount.data):
+                    basket.append(tt.id)
 
-        # FIXME: don't use session[], reserve them for 2h so the user doesn't get upset
-        if len(basket) > 0:
-            session["basket"] = basket
-            flash("Tickets added to basket, total cost: %.02f" % (total_cost))
-            return redirect(url_for('pay_choose'))
+        if basket:
+            session['basket'] = basket
+            return redirect(url_for('tickets_info'))
 
     return render_template("tickets-choose.html", form=form)
+
+class TicketInfoForm(Form):
+    full = FieldList(FormField(FullTicketForm))
+    kids = FieldList(FormField(KidsTicketForm))
+    carpark = FieldList(FormField(CarparkTicketForm))
+    donation = FieldList(FormField(DonationTicketForm))
+    submit = SubmitField('Continue to Check-out')
+    back = SubmitField('Change tickets')
+
+def get_basket():
+    basket = []
+    for type_id in session['basket']:
+        basket.append(Ticket(type_id=type_id))
+
+    total = sum(t.type.cost for t in basket)
+
+    return basket, total
+
+@app.route("/tickets/info", methods=['GET', 'POST'])
+@login_required
+def tickets_info():
+    basket, total = get_basket()
+
+    if not basket:
+        redirect(url_for('tickets'))
+
+    form = TicketInfoForm(request.form)
+
+    ticket_forms = {
+        'Full Camp Ticket': form.full,
+        'Full Camp Ticket (prepay)': form.full,
+        'Under-18 Camp Ticket': form.kids,
+        'Parking Ticket': form.carpark,
+    }
+
+    formlists = [form.full, form.kids, form.carpark]
+
+    if not any(formlists):
+
+        for i, ticket in enumerate(basket):
+            try:
+                f = ticket_forms[ticket.type.name]
+            except KeyError:
+                continue
+
+            f.append_entry()
+            ticket.form = f[-1]
+            ticket.form.ticket_id.data = i
+
+        if not any(formlists):
+            return redirect(url_for('pay_choose'))
+
+    else:
+        # FIXME: plays badly with multiple tabs
+        entries = sum([f.entries for f in formlists], [])
+        for ticket, subform in zip(basket, entries):
+            ticket.form = subform
+
+    if request.method == 'POST' and form.validate():
+        if form.back.data:
+            return redirect(url_for('tickets_choose'))
+
+        # TODO: update the cookie
+
+        return redirect(url_for('pay_choose'))
+
+    return render_template('tickets-info.html', form=form, basket=basket, total=total)
+
 
 @app.route("/pay/transfer-waiting")
 @login_required

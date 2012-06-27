@@ -93,3 +93,13 @@ form.shrink {
 {
   text-align: right;
 }
+
+.ticket-info.form-horizontal .control-group {
+  margin-top: 2ex;
+  margin-bottom: 0;
+}
+
+.payment-choose {
+  width: 724px;
+  margin: auto;
+}

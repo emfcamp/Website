@@ -1,44 +1,14 @@
 {% extends "base.html" %}
 {% block body %}
 
+<div class="payment-choose">
+
 <p>Taking credit card payments for a small event like us is really expensive, so the only
    payment methods we accept are bank-to-bank. If this is really a problem for you, please
    <a href="mailto:{{ config.get('TICKETS_EMAIL')[1] }}">let us know</a>.
 </p>
 
-<table class="table table-condensed">
-<thead>
-<tr><th>Ticket Type</th><th>amount</th><th>Price each</th></tr>
-</thead>
-<tbody>
-{% for tt in basket %}
-<tr>
-<td>
-{{ tt.name }}
-</td>
-<td>
-{{ basket[tt] }}
-</td>
-<td>
-{{ format_price(tt.cost) }}
-</td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
-
-<p>Total <b>{{ format_price(amount) }}</b></p>
-
 <p>Your tickets aren't quite reserved yet!  Please choose a payment method below to buy your tickets.</p>
-
-<h3>Paying in Pounds or Euros</h3>
-
-<p>The best way is to ask your bank to send it to us directly (this works online, or with cash in
-branch).</p>
-
-<form method="post" action="{{ url_for('transfer_start') }}">
-    <p><button type="submit" name="banktransfer" class="btn btn-primary">Pay by bank transfer</button></p>
-</form>
 
 <h3>Paying by Direct Debit</h3>
 
@@ -48,7 +18,18 @@ GoCardless payments are protected by the
 Guarantee</a>.</p>
 
 <form method="post" action="{{ url_for('gocardless_start') }}">
-    <p><button type="submit" name="gocardless" class="btn btn-primary">Pay with GoCardless</button></p>
+    <p><button type="submit" name="gocardless" class="btn btn-large btn-info">Pay with GoCardless</button></p>
 </form>
+
+<h3>Paying in Pounds or Euros</h3>
+
+<p>The best way is to ask your bank to send it to us directly (this works online, or with cash in
+branch).</p>
+
+<form method="post" action="{{ url_for('transfer_start') }}">
+    <p><button type="submit" name="banktransfer" class="btn btn-large btn-info">Pay by bank transfer</button></p>
+</form>
+
+</div>
 
 {% endblock %}

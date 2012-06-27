@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block body %}
+
+<h3>
+Ticket Information
+</h3>
+
+{# <div class="countdown">45:00</div> #}
+
+<p>You've requested {{ count }} tickets for a total of <b>{{ format_price(total) }}</b></p>
+<p>We just need a little more information about these tickets.
+If you're unsure about anything, please check out our <a href="http://wiki.emfcamp.org/wiki/FAQ#Ticket_Sales">FAQ</a>
+or drop us an <a href="mailto:{{ config.get('TICKETS_EMAIL')[1] }}">email</a>.</p>
+
+<form method="post" class="form-horizontal ticket-info">
+{{ form.hidden_tag() }}
+<fieldset>
+
+<div>
+
+{% for ticket in basket %}
+{% if ticket.form.template %}
+
+    <div class="well">
+
+    <h4>{{ ticket.type.name }}</h4>
+    {% include ticket.form.template %}
+
+    </div>
+
+{% endif %}
+{% endfor %}
+
+</div>
+
+{{ form.back(class_="btn") }}
+{{ form.submit(class_="btn btn-success") }}
+
+</fieldset>
+</form>
+
+{% endblock %}
