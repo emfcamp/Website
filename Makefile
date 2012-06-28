@@ -52,3 +52,6 @@ shell:
 
 test:
 	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py testemails
+
+admin:
+	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py makeadmin
