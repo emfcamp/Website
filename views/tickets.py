@@ -1,7 +1,7 @@
 from main import app, db, gocardless, mail
 from models.user import User
 from models.payment import Payment, BankPayment, GoCardlessPayment
-from models.ticket import TicketType, Ticket
+from models.ticket import TicketType, Ticket, TicketAttrib
 
 from flask import \
     render_template, redirect, request, flash, \
@@ -136,37 +136,51 @@ def tickets():
         btcancel_forms=btcancel_forms
     )
 
-def make_payment_and_tickets(paymenttype, basket, total):
+ticket_forms = {
+    'Full Camp Ticket': 'full',
+    'Full Camp Ticket (prepay)': 'full',
+    'Under-18 Camp Ticket': 'kids',
+    'Parking Ticket': 'carpark',
+}
+
+def add_payment_and_tickets(paymenttype):
     """
-    create a payment and tickets from session data
+    Insert payment and tickets from session data into DB
     """
 
-#    count = 0
-#    for type in basket:
-#        if type == TicketType.Prepay.id:
-#            count += 1
+    infodata = session.get('ticketinfo')
+    basket, total = get_basket()
 
-    # XXX
-#    prepays = current_user.tickets. \
-#        filter_by(type=TicketType.Prepay).\
-#        filter(Ticket.expires >= datetime.utcnow()). \
-#        count()
-#    if prepays + count > TicketType.Prepay.limit:
-#        raise Exception('You can only buy %s tickets in total' % TicketType.Prepay.limit)
+    if not (basket and total and infodata):
+        return None
+
+    app.logger.info("Creating tickets:")
+    app.logger.info(basket)
+    app.logger.info("Payment: %s for total %s", paymenttype.name, total)
+    app.logger.info("Ticket info: %s", infodata)
+
+    infotypes = set(ticket_forms.values())
+    infolists = sum([infodata[i] for i in infotypes], [])
+    for info in infolists:
+        ticket_id = int(info.pop('ticket_id'))
+        ticket = basket[ticket_id]
+        for k, v in info.items():
+            attrib = TicketAttrib(k, v)
+            ticket.attribs.append(attrib)
 
     payment = paymenttype(total)
     current_user.payments.append(payment)
 
-    for t in basket:
-        current_user.tickets.append(t)
-        t.payment = payment
-        t.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
-
-    print basket
-    print total
+    for ticket in basket:
+        current_user.tickets.append(ticket)
+        ticket.payment = payment
+        ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
 
     db.session.add(current_user)
     db.session.commit()
+
+    del session['basket']
+    del session['ticketinfo']
 
     return payment
 
@@ -195,13 +209,10 @@ def pay_choose():
 @app.route("/pay/gocardless-start", methods=['POST'])
 @login_required
 def gocardless_start():
-    basket, total = get_basket()
-    if not basket:
+    payment = add_payment_and_tickets(GoCardlessPayment)
+    if not payment:
         flash('Your session information has been lost. Please try ordering again.')
         return redirect(url_for('tickets'))
-
-    payment = make_payment_and_tickets(GoCardlessPayment, basket, total)
-    del session['basket']
 
     app.logger.info("User %s created GoCardless payment %s", current_user.id, payment.id)
 
@@ -464,13 +475,10 @@ def gocardless_webhook():
 @app.route("/pay/transfer-start", methods=['POST'])
 @login_required
 def transfer_start():
-    basket, total = get_basket()
-    if not basket:
+    payment = add_payment_and_tickets(BankPayment)
+    if not payment:
         flash('Your session information has been lost. Please try ordering again.')
         return redirect(url_for('tickets'))
-
-    payment = make_payment_and_tickets(BankPayment, basket, total)
-    del session['basket']
 
     app.logger.info("User %s created bank payment %s (%s)", current_user.id, payment.id, payment.bankref)
 
@@ -563,6 +571,40 @@ def get_basket():
 
     return basket, total
 
+def build_info_form(formdata):
+    basket, total = get_basket()
+
+    if not basket:
+        return None
+
+    form = TicketInfoForm(formdata)
+
+    forms = [getattr(form, f) for f in ticket_forms.values()]
+
+    if not any(forms):
+
+        for i, ticket in enumerate(basket):
+            try:
+                f = ticket_forms[ticket.type.name]
+            except KeyError:
+                continue
+
+            f = getattr(form, f)
+            f.append_entry()
+            ticket.form = f[-1]
+            ticket.form.ticket_id.data = i
+
+        if not any(forms):
+            return None
+
+    else:
+        # FIXME: plays badly with multiple tabs
+        entries = sum([f.entries for f in formlists], [])
+        for ticket, subform in zip(basket, entries):
+            ticket.form = subform
+
+    return form, basket, total
+
 @app.route("/tickets/info", methods=['GET', 'POST'])
 @login_required
 def tickets_info():
@@ -571,43 +613,15 @@ def tickets_info():
     if not basket:
         redirect(url_for('tickets'))
 
-    form = TicketInfoForm(request.form)
-
-    ticket_forms = {
-        'Full Camp Ticket': form.full,
-        'Full Camp Ticket (prepay)': form.full,
-        'Under-18 Camp Ticket': form.kids,
-        'Parking Ticket': form.carpark,
-    }
-
-    formlists = [form.full, form.kids, form.carpark]
-
-    if not any(formlists):
-
-        for i, ticket in enumerate(basket):
-            try:
-                f = ticket_forms[ticket.type.name]
-            except KeyError:
-                continue
-
-            f.append_entry()
-            ticket.form = f[-1]
-            ticket.form.ticket_id.data = i
-
-        if not any(formlists):
-            return redirect(url_for('pay_choose'))
-
-    else:
-        # FIXME: plays badly with multiple tabs
-        entries = sum([f.entries for f in formlists], [])
-        for ticket, subform in zip(basket, entries):
-            ticket.form = subform
+    form, basket, total = build_info_form(request.form)
+    if not form:
+        return redirect(url_for('pay_choose'))
 
     if request.method == 'POST' and form.validate():
         if form.back.data:
             return redirect(url_for('tickets_choose'))
 
-        # TODO: update the cookie
+        session['ticketinfo'] = form.data
 
         return redirect(url_for('pay_choose'))
 

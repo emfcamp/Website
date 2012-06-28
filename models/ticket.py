@@ -66,6 +66,7 @@ class Ticket(db.Model):
     paid = db.Column(db.Boolean, default=False, nullable=False)
     expires = db.Column(db.DateTime, nullable=False)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
+    attribs = db.relationship("TicketAttrib", backref="ticket")
 
     def __init__(self, type=None, type_id=None):
         if type:
@@ -86,6 +87,17 @@ class Ticket(db.Model):
     
     def __repr__(self):
         return "<Ticket: %s, type: %s, paid? %s, expired: %s>" % (self.id, self.type_id, self.paid, str(self.expired()))
+
+class TicketAttrib(db.Model):
+    __tablename__ = 'ticketattrib'
+    id = db.Column(db.Integer, primary_key=True)
+    ticket_id = db.Column(db.Integer, db.ForeignKey('ticket.id'), nullable=False)
+    name = db.Column(db.String, nullable=False)
+    value = db.Column(db.String)
+
+    def __init__(self, name, value=None):
+        self.name = name
+        self.value = value
 
 @event.listens_for(Session, 'before_flush')
 def check_capacity(session, flush_context, instances):
