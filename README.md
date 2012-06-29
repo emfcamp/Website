@@ -21,11 +21,27 @@ Running
 =======
 ```
 make update
+make tickets
 make
 ```
 
-If you want the site to be accessible by the rest of the world then change app.run() at the end of main.py to app.run(host="0.0.0.0")
+Now create a user ("signup") and then run:
 
+```
+make admin
+```
+
+This will make your user an administrator.
+
+If you want to clean out the database and start again then:
+
+```
+rm var/test.db
+make update
+make tickets
+```
+
+If you want the site to be accessible by the rest of the world then change app.run() at the end of main.py to app.run(host="0.0.0.0")
 
 Links to Documentation
 ======================

@@ -281,10 +281,26 @@ class Expire(Command):
     if s:
       s.commit()
 
+class MakeAdmin(Command):
+  """
+    Make userid one an admin for testing purposes.
+  """
+  option_list = (Option('-u', '--userid', dest='userid', help="The userid to make an admin (defaults to 1)"),)
+  def run(self, userid):
+    if not userid:
+      userid = 1
+    user = User.query.get(userid)
+    user.admin = True
+    s = db.object_session(user)
+    s.commit()
+
+    print 'userid 1 (%s) is now an admin' % (user.name)
+
 if __name__ == "__main__":
   manager.add_command('reconcile', Reconcile())
   manager.add_command('warnexpire', WarnExpire())
   manager.add_command('expire', Expire())
   manager.add_command('testemails', TestEmails())
   manager.add_command('createtickets', CreateTickets())
+  manager.add_command('makeadmin', MakeAdmin())
   manager.run()

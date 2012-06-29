@@ -1,0 +1,32 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block body %}
+<H1>Confirm Ticket Expirey Reset:</H1>
+
+<ul>
+<li>Id: {{ payment.id }}</li>
+{% if payment.provider == "banktransfer" %}
+<li>Bankref: {{ payment.bankref }}</li>
+{% else %}
+<li>Provider: {{ payment.provider }}</li>
+{% endif %}
+<li>Username: {{ payment.user.name }}</li>
+<li>Email: {{ payment.user.email }}</li>
+<li>Price: {{ format_price(payment.amount) }}</li>
+<li>Tickets:</li>
+<ul>
+{% for t in payment.tickets %}
+<li>{{t.id}}, {{t.type.name}}, {{t.expires}}</li>
+{% endfor %}
+</ul>
+</ul>
+
+<form method=post action="{{ url_for('expire_reset') }}">
+{{ ynform.hidden_tag() }}
+{{ ynform.yes(class_="btn btn-warning") }}
+{{ ynform.no(class_="btn btn-success") }}
+</form>
+
+<p>Back to <a href="{{ url_for('admin') }}">admin things</a>.</p>
+
+{% endblock %}

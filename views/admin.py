@@ -21,7 +21,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import text
 
 from decorator import decorator
-import simplejson, os, re
+import simplejson, os, re, ofxparse, sys
+from decimal import Decimal
 from datetime import datetime, timedelta
 
 @app.route("/stats")
@@ -154,5 +155,50 @@ def ticket_types():
         if not form:
             form = NewTicketTypeForm(formdata=None)
         return render_template('admin/admin_ticket_types.html', types=types, form=form)
+    else:
+        return(('', 404))
+
+class ExpireResetForm(Form):
+    payment = HiddenField('payment_id', [Required()])
+    reset = SubmitField('Reset')
+    yes = SubmitField('Yes')
+    no = SubmitField('No')
+
+@app.route("/admin/reset-expirey", methods=['GET', 'POST'])
+@login_required
+def expire_reset():
+    if current_user.admin:
+        if request.method == "POST":
+            form = ExpireResetForm()
+            if form.validate():
+                if form.yes.data == True:
+                    payment = Payment.query.get(int(form.payment.data))
+                    app.logger.info("%s Manually reset expirey for tickets for payment %d", current_user.name, payment.id)
+                    for t in payment.tickets:
+                        t.expires = datetime.utcnow() + timedelta(10)
+                        db.session.add(t)
+                        app.logger.info("ticket %d (%s, for %s) expirey reset", t.id, t.type.name, payment.user.name)
+                    db.session.commit()
+
+                    return redirect(url_for('expire_reset'))
+                elif form.no.data == True:
+                    return redirect(url_for('expire_reset'))
+                elif form.payment.data:
+                    payment = Payment.query.get(int(form.payment.data))
+                    ynform = ExpireResetForm(payment=payment.id, formdata=None)
+                    return render_template('admin/admin_reset_expirey_yesno.html', ynform=ynform, payment=payment)
+
+        # >= datetime.utcnow()(Ticket.expires >= datetime.utcnow()
+        unpaid = Ticket.query.filter(Ticket.paid == False).order_by(Ticket.expires).all()
+        payments = {}
+        for t in unpaid:
+            if t.payment.id not in payments:
+                payments[t.payment.id] = t.payment
+        resetforms = {}
+        opayments = []
+        for p in payments:
+            resetforms[p] = ExpireResetForm(payment=p, formdata=None)
+            opayments.append(payments[p])
+        return render_template('admin/admin_reset_expirey.html', payments=opayments, resetforms=resetforms)
     else:
         return(('', 404))
