@@ -1,4 +1,5 @@
 from main import app, db, gocardless, mail
+from views import feature_flag
 from models.user import User
 from models.payment import Payment, BankPayment, GoCardlessPayment
 from models.ticket import TicketType, Ticket, TicketAttrib
@@ -81,15 +82,21 @@ class ChoosePrepayTicketsForm(Form):
 
 @app.route("/tickets", methods=['GET', 'POST'])
 def tickets():
+
+    if app.config.get('FULL_TICKETS', False) and not current_user.is_authenticated():
+        return redirect(url_for('tickets_choose'))
+
     form = ChoosePrepayTicketsForm(request.form)
     form.count.values = range(1, TicketType.Prepay.limit + 1)
 
     if request.method == 'POST' and form.validate():
-        session["count"] = form.count.data
+        session['basket'] = [TicketType.Prepay.id] * form.count.data
+
         if current_user.is_authenticated():
             return redirect(url_for('pay_choose'))
         else:
             return redirect(url_for('signup', next=url_for('pay_choose')))
+
 
     if current_user.is_authenticated():
         tickets = current_user.tickets.all()
@@ -122,15 +129,10 @@ def tickets():
         # or complete banktransfers,
         # or canceled payments of either provider.
 
-    count = 1
-    if "count" in session:
-        count = session["count"]
-
     return render_template("tickets.html",
         form=form,
         tickets=tickets,
         payments=payments,
-        amount=count,
         price=TicketType.Prepay.cost,
         tryagain_forms=gc_try_again_forms,
         btcancel_forms=btcancel_forms
@@ -151,7 +153,7 @@ def add_payment_and_tickets(paymenttype):
     infodata = session.get('ticketinfo')
     basket, total = get_basket()
 
-    if not (basket and total and infodata):
+    if not (basket and total):
         return None
 
     app.logger.info("Creating tickets:")
@@ -159,19 +161,25 @@ def add_payment_and_tickets(paymenttype):
     app.logger.info("Payment: %s for total %s", paymenttype.name, total)
     app.logger.info("Ticket info: %s", infodata)
 
-    infotypes = set(ticket_forms.values())
-    infolists = sum([infodata[i] for i in infotypes], [])
-    for info in infolists:
-        ticket_id = int(info.pop('ticket_id'))
-        ticket = basket[ticket_id]
-        for k, v in info.items():
-            attrib = TicketAttrib(k, v)
-            ticket.attribs.append(attrib)
+    if infodata:
+        infotypes = set(ticket_forms.values())
+        infolists = sum([infodata[i] for i in infotypes], [])
+        for info in infolists:
+            ticket_id = int(info.pop('ticket_id'))
+            ticket = basket[ticket_id]
+            for k, v in info.items():
+                attrib = TicketAttrib(k, v)
+                ticket.attribs.append(attrib)
 
     payment = paymenttype(total)
     current_user.payments.append(payment)
 
     for ticket in basket:
+        if ticket.type.name in ticket_forms:
+            if not ticket.attribs:
+                app.logging.error('Ticket %s has no attribs', ticket)
+                return None
+
         current_user.tickets.append(ticket)
         ticket.payment = payment
         ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
@@ -179,8 +187,8 @@ def add_payment_and_tickets(paymenttype):
     db.session.add(current_user)
     db.session.commit()
 
-    del session['basket']
-    del session['ticketinfo']
+    session.pop('basket', None)
+    session.pop('ticketinfo', None)
 
     return payment
 
@@ -506,7 +514,7 @@ class TicketAmountsForm(Form):
     choose = SubmitField('Buy Tickets')
 
 @app.route("/tickets/choose", methods=['GET', 'POST'])
-@login_required
+@feature_flag('FULL_TICKETS')
 def tickets_choose():
     form = TicketAmountsForm(request.form)
 
@@ -515,9 +523,17 @@ def tickets_choose():
             form.types.append_entry()
             form.types[-1].type_id.data = tt.id
 
-    prepays = current_user.tickets. \
-        filter_by(type=TicketType.Prepay, paid=True). \
-        count()
+    if current_user.is_authenticated():
+        prepays = current_user.tickets. \
+            filter_by(type=TicketType.Prepay, paid=True). \
+            count()
+        fulls = current_user.tickets.filter(or_(
+            Ticket.type == TicketType.Full,
+            Ticket.type == TicketType.FullPrepay,
+        )).count()
+    else:
+        prepays = 0
+        fulls = 0
 
     for f in form.types:
         tt = TicketType.query.get(f.type_id.data)
@@ -531,7 +547,7 @@ def tickets_choose():
         elif tt.id == TicketType.FullPrepay.id:
             assert prepays <= limit
             values = [prepays]
-        elif tt.id == TicketType.Full.id and not prepays:
+        elif tt.id == TicketType.Full.id and not (prepays or fulls):
             values = range(1, limit + 1)
 
         f.amount.values = values
@@ -544,13 +560,16 @@ def tickets_choose():
         for f in form.types:
             if f.amount.data:
                 tt = f._type
-                print tt.name, tt.cost, f.amount.data
-                for i in range(f.amount.data):
-                    basket.append(tt.id)
+                app.logger.info('Adding %s %s tickets to basket', f.amount.data, tt.name)
+                basket += [tt.id] * f.amount.data
 
         if basket:
             session['basket'] = basket
-            return redirect(url_for('tickets_info'))
+
+            if current_user.is_authenticated():
+                return redirect(url_for('tickets_info'))
+            else:
+                return redirect(url_for('signup', next=url_for('tickets_info')))
 
     return render_template("tickets-choose.html", form=form)
 
@@ -564,7 +583,7 @@ class TicketInfoForm(Form):
 
 def get_basket():
     basket = []
-    for type_id in session['basket']:
+    for type_id in session.get('basket', []):
         basket.append(Ticket(type_id=type_id))
 
     total = sum(t.type.cost for t in basket)
@@ -575,7 +594,7 @@ def build_info_form(formdata):
     basket, total = get_basket()
 
     if not basket:
-        return None
+        return None, basket, total
 
     form = TicketInfoForm(formdata)
 
@@ -595,17 +614,18 @@ def build_info_form(formdata):
             ticket.form.ticket_id.data = i
 
         if not any(forms):
-            return None
+            return None, basket, total
 
     else:
         # FIXME: plays badly with multiple tabs
-        entries = sum([f.entries for f in formlists], [])
+        entries = sum([f.entries for f in forms], [])
         for ticket, subform in zip(basket, entries):
             ticket.form = subform
 
     return form, basket, total
 
 @app.route("/tickets/info", methods=['GET', 'POST'])
+@feature_flag('FULL_TICKETS')
 @login_required
 def tickets_info():
     basket, total = get_basket()

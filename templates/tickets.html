@@ -75,29 +75,38 @@
 
 {% endif %}
 
+{% if config.get('FULL_TICKETS', False) %}
+    <form method=post action="{{ url_for('tickets_choose') }}" class="form-horizontal add-tickets">
+        {{form.hidden_tag()}}
 
-{% if tickets|count < 4 %}
-
-<form method=post class="form-horizontal choose-prepay-tickets">
-    {{form.hidden_tag()}}
-    <h2>Reserve tickets</h2>
-
-{% include 'ticket-blurb.html' %}
-
-<div id="prepay" data-price="{{ price }}">
-    {{ render_field(form.count) }}
-</div>
-    <div id="summary" class="control-group">
-        <span>Price per ticket: {{ format_price(price) }}</span>
-        <span style="display: none">Total amount for deposit: <span id="total"></span></span>
-    </div>
-    <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Go to reservation</button>
-    </div>
-</form>
+        <div class="control-group">
+            <button type="submit" class="btn btn-large btn-primary">Add more tickets</button>
+        </div>
+    </form>
 {% else %}
-<p>You've already bought 4 tickets, thanks for helping EMF by
-buying a prepay ticket!</p>
+    {% if tickets|count < 4 %}
+
+    <form method=post class="form-horizontal choose-prepay-tickets">
+        {{form.hidden_tag()}}
+        <h2>Reserve tickets</h2>
+
+    {% include 'ticket-blurb.html' %}
+
+    <div id="prepay" data-price="{{ price }}">
+        {{ render_field(form.count) }}
+    </div>
+        <div id="summary" class="control-group">
+            <span>Price per ticket: {{ format_price(price) }}</span>
+            <span style="display: none">Total amount for deposit: <span id="total"></span></span>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Go to reservation</button>
+        </div>
+    </form>
+    {% else %}
+    <p>You've already bought 4 tickets, thanks for helping EMF by
+    buying a prepay ticket!</p>
+    {% endif %}
 {% endif %}
 
 <script type="text/javascript">

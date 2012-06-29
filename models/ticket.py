@@ -43,10 +43,14 @@ class TicketType(db.Model):
         self.cost_pence = int(val * 100)
 
     def user_limit(self, user):
-        user_count = user.tickets. \
-            filter_by(type=self). \
-            filter(or_(Ticket.expires >= datetime.utcnow(), Ticket.paid)). \
-            count()
+        if user.is_authenticated():
+            user_count = user.tickets. \
+                filter_by(type=self). \
+                filter(or_(Ticket.expires >= datetime.utcnow(), Ticket.paid)). \
+                count()
+        else:
+            user_count = 0
+
         count = Ticket.query.filter_by(type=self). \
             filter(or_(Ticket.expires >= datetime.utcnow(), Ticket.paid)). \
             count()
@@ -66,7 +70,7 @@ class Ticket(db.Model):
     paid = db.Column(db.Boolean, default=False, nullable=False)
     expires = db.Column(db.DateTime, nullable=False)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
-    attribs = db.relationship("TicketAttrib", backref="ticket")
+    attribs = db.relationship("TicketAttrib", backref="ticket", cascade='all')
 
     def __init__(self, type=None, type_id=None):
         if type:
