@@ -176,7 +176,7 @@ def gocardless_start():
 class GoCardlessTryAgainForm(Form):
     payment = HiddenField('payment_id', [Required()])
     pay = SubmitField('Pay')
-    cancel = SubmitField('Cancel & Discard tickets')
+    cancel = SubmitField('Cancel')
     yesno = HiddenField('yesno', [Required()], default="no")
     yes = SubmitField('Yes')
     no = SubmitField('No')
@@ -193,7 +193,7 @@ class GoCardlessTryAgainForm(Form):
 
 class BankTransferCancelForm(Form):
     payment = HiddenField('payment_id', [Required()])
-    cancel = SubmitField('Cancel & Discard tickets')
+    cancel = SubmitField('Cancel')
     yesno = HiddenField('yesno', [Required()], default='no')
     yes = SubmitField('Yes')
     no = SubmitField('No')
