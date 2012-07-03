@@ -7,6 +7,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from flask.ext.assets import Environment, Bundle
 
 import logging
+import time
 
 logging.basicConfig(level=logging.NOTSET)
 
@@ -53,10 +54,14 @@ def utility_processor():
     def format_bankref(bankref):
         return '%s-%s' % (bankref[:4], bankref[4:])
 
+    def isoformat_utc(dt, sep='T'):
+        return time.strftime('%Y-%m-%d' + sep + '%H:%M:%SZ', dt.utctimetuple())
+        
     return dict(
         format_price=format_price,
         format_ticket_price=format_ticket_price,
         format_bankref=format_bankref,
+        isoformat_utc=isoformat_utc,
     )
 
 @app.context_processor

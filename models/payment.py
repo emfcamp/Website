@@ -57,6 +57,11 @@ class GoCardlessPayment(Payment):
             redirect_uri=url_for('gocardless_complete', payment=self.id, _external=True),
             cancel_uri=url_for('gocardless_cancel', payment=self.id, _external=True))
 
+class GoogleCheckoutPayment(Payment):
+    name = 'Google Checkout payment'
+
+    __mapper_args__ = {'polymorphic_identity': 'googlecheckout'}
+
 
 class PaymentChange(db.Model):
     __tablename__ = 'payment_change'

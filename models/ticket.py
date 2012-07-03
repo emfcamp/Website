@@ -20,7 +20,7 @@ class TicketType(db.Model):
     notice = db.Column(db.String)
     capacity = db.Column(db.Integer, nullable=False)
     limit = db.Column(db.Integer, nullable=False)
-    tickets = db.relationship("Ticket", backref="type")
+    tickets = db.relationship("Ticket", backref="type", cascade_backrefs=False)
 
     def __init__(self, name, capacity, limit, notice=None):
         self.name = name
