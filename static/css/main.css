@@ -116,3 +116,8 @@ img.padit {
 #select_currency {
   width: 4em
 }
+
+.google-checkout-button {
+  margin-left: -4px;
+  margin-top: 2px;
+}

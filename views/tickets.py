@@ -1,7 +1,8 @@
 from main import app, db, gocardless, mail
 from views import feature_flag
 from models.user import User
-from models.payment import Payment, BankPayment, GoCardlessPayment
+from models.payment import Payment, \
+    BankPayment, GoCardlessPayment, GoogleCheckoutPayment
 from models.ticket import TicketType, Ticket, TicketAttrib
 
 from flask import \
@@ -26,6 +27,8 @@ from wtforms.fields.core import UnboundField
 
 import simplejson, os, re
 from datetime import datetime, timedelta
+import requests
+from xml.etree import cElementTree as etree
 
 class IntegerSelectField(SelectField):
     def __init__(self, *args, **kwargs):
@@ -705,4 +708,35 @@ def transfer_cancel():
 
     return redirect(url_for('tickets'))
 
+@app.route("/pay/google-checkout-start", methods=['POST'])
+@login_required
+def googlecheckout_start():
+  url = ''.join((
+    app.config.get('GOOGLE_CHECKOUT_BASE'),
+    '/api/checkout/v2/merchantCheckout/Merchant/',
+    app.config.get('GOOGLE_MERCHANT_ID'),
+  ))
 
+  basket, total = get_basket()
+  payment = add_payment_and_tickets(GoogleCheckoutPayment)
+  if not payment:
+      flash('Your session information has been lost. Please try ordering again.')
+      return redirect(url_for('tickets'))
+
+  app.logger.info("User %s created GoCardless payment %s", current_user.id, 1234)
+
+  data = render_template('google-checkout/cart.xml', basket=basket, total=total, payment=payment)
+  app.logger.debug('Sending to checkout: %s', data)
+
+  mime = 'application/xml;charset=UTF-8'
+  headers = {'Content-Type': mime, 'Accept': mime}
+  auth = app.config.get('GOOGLE_MERCHANT_ID'), app.config.get('GOOGLE_MERCHANT_KEY')
+  r = requests.post(url, auth=auth, headers=headers, data=data)
+
+  app.logger.debug('Response from checkout: %s', r.text)
+
+  root = etree.fromstring(r.text)
+  url = root.find('{http://checkout.google.com/schema/2}redirect-url')
+  app.logger.info('Redirect URL: %s', url.text)
+
+  return redirect(url.text)
