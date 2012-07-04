@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 
 {% block body %}
-{% if not current_user.is_authenticated() %}
+
+<div class="span12">
 <p>New blurb about tickets</p>
+{% if not current_user.is_authenticated() %}
 <p>If you've already signed up, <a href="{{url_for('login')}}">log in</a> to view your ticket status.</p>
 {% endif %}
 
@@ -63,6 +65,7 @@
 </div>
 
 </form>
+</div>
 {% endblock %}
 
 {% block foot %}
