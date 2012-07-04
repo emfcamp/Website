@@ -1,9 +1,9 @@
 {{ ticket.form.hidden_tag() }}
 
 {% set volunteer = ticket.form.volunteer %}
-{% set disabled = ticket.form.disabled %}
+{% set accessible = ticket.form.accessible %}
 
-<div class="control-group no-margin{%if volunteer.errors or disabled.errors%} error{%endif%}">
+<div class="control-group no-margin{%if volunteer.errors or accessible.errors%} error{%endif%}">
   <label class="control-label">{{ volunteer.label }}</label>
   <div class="controls">
     <label class="checkbox">
@@ -16,13 +16,13 @@
     <p>We need an army volunteers giving a few hours each to ensure everything runs smoothly</p>
   </div>
 
-  <label class="control-label">{{ disabled.label }}</label>
+  <label class="control-label">{{ accessible.label }}</label>
   <div class="controls">
     <label class="checkbox">
-        {{ disabled()|safe }}
+        {{ accessible()|safe }}
         If you have an accessibility requirements please tick here.
     </label>
-    {% for error in disabled.errors %}
+    {% for error in accessible.errors %}
         <span class="help-inline">{{ error }}</span>
     {% endfor %}
     <p>We want to be sure we have all our attendees needs covered, so we will contact you for more information.</p>

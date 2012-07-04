@@ -56,11 +56,11 @@ class TicketForm(Form):
 class FullTicketForm(TicketForm):
     template= 'tickets/full.html'
     volunteer = BooleanField('Volunteering')
-    disabled = BooleanField('Disabled')
+    accessible = BooleanField('Accessibility')
 
 class KidsTicketForm(TicketForm):
     template= 'tickets/kids.html'
-    disabled = BooleanField('Disabled')
+    accessible = BooleanField('Accessibility')
 
 class CarparkTicketForm(TicketForm):
     template= 'tickets/carpark.html'
