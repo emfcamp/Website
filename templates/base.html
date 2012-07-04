@@ -30,7 +30,7 @@
 		<li {% if request.path==url_for('sponsors') %}class="active"{% endif %}>                  
 			<a href="{{url_for('sponsors')}}">Sponsors</a>                                          
 		</li>		
-		<li {% if request.path in [url_for('tickets'), url_for('tickets_choose')] %}class="active"{% endif %}>
+		<li {% if '/pay' in request.path or '/tickets' in request.path %}class="active"{% endif %}>
 			<a href="{{url_for('tickets')}}">Tickets</a>                                          
         </li>		
 		<li {% if request.path==url_for('contact') %}class="active"{% endif %}>                  
