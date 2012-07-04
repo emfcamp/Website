@@ -13,14 +13,15 @@
     {% for error in volunteer.errors %}
         <span class="help-inline">{{ error }}</span>
     {% endfor %}
-    <p>We need an army volunteers giving a few hours each to ensure everything runs smoothly</p>
+    <p>EMF is a volunteer-run effort. We'd really appreciate it if you contributed as 
+        little as three hours of your time at the camp to keep things running smoothly.</p>
   </div>
 
   <label class="control-label">{{ accessible.label }}</label>
   <div class="controls">
     <label class="checkbox">
         {{ accessible()|safe }}
-        If you have an accessibility requirements please tick here.
+        If you have accessibility requirements please tick here.
     </label>
     {% for error in accessible.errors %}
         <span class="help-inline">{{ error }}</span>
