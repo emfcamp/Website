@@ -15,7 +15,7 @@
     </head>
 <body>
 <div class="container-fluid">
-    <div id="hd">
+    <header>
         <h1><a href="/">Electromagnetic Field</a></h1>
 		<ul class="nav nav-tabs">                                                 
 		<li {% if request.path==url_for('main') %}class="active"{% endif %}>                  
@@ -51,7 +51,7 @@
 			<a href="http://blog.emfcamp.org/">Blog</a>                                          
 		</li>
 		</ul>
-    </div>
+    </header>
     <div id="bd">
         <div>
             {% for message in get_flashed_messages() -%}

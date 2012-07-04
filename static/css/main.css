@@ -1,9 +1,9 @@
-#hd {
+header {
     text-align: center;
     padding-top:1em;
 }
 
-#hd h1 {
+header h1 {
     font-weight: bold;
     font-size: 5em;
     padding-bottom:20px;
