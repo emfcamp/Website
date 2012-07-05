@@ -30,7 +30,7 @@ tickets:
 	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py createtickets
 
 update:
-	./env/bin/pip install -r ./requirements.txt
+	./env/bin/python ./env/bin/pip install -r ./requirements.txt
 
 init:
 	virtualenv ./env
