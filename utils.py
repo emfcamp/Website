@@ -152,7 +152,6 @@ class Reconcile(Command):
                           recipients=[payment.user.email]
                          )
             msg.body = render_template("tickets-paid-email-banktransfer.txt", \
-                          basket={"count" : len(payment.tickets.all()), "reference" : payment.bankref}, \
                           user = payment.user, payment=payment
                          )
             mail.send(msg)

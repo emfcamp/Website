@@ -42,9 +42,7 @@ You can pay into our Euro Bank Account:
 SWIFT: BARCGB22
 IBAN:  GB21 BARC 2071 6472 9544 33
 
-If you have already bought a prepay ticket then please pay €75 for each
-ticket. if you have not already bought a prepay ticket, then the
-tickets are €120 each.
+{% include "tickets-euro-amounts.txt" %}
 
 Additionally please email tickets@emfcamp.org when you do the transfer
 with your details as we have to reconcile our euro account manually.

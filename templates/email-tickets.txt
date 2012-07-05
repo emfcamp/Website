@@ -1,9 +1,11 @@
 
-
+ 
 Your tickets are:
 
-{% for t in payment.tickets.all() %}
-{{- t.type.name }} {{ format_price(t.type.cost) }}
+Type			Cost
+----			----
+{% for t in payment.tickets -%}
+{{ t.type.name }} 	{{ format_price(t.type.cost) }}
 {% endfor %}
-Price total: {{ format_price(payment.amount) }}
 
+Total: {{ format_price(payment.amount) }}
