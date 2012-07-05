@@ -262,8 +262,8 @@ class CreateTickets(Command):
         #
         types = [
             TicketType('Prepay Camp Ticket', 250, 4, 30.00),
-            TicketType('Full Camp Ticket (prepay)', 250, 4, 90.00 - 30.00 - 5.00),
-            TicketType('Full Camp Ticket', 499 - 20, 4, 90.00),
+            TicketType('Full Camp Ticket (prepay)', 250, 4, 95.00 - 30.00 - 5.00),
+            TicketType('Full Camp Ticket', 499 - 20, 4, 95.00),
             # XXX the number of Camp Tickets (of the different types) shoudnt excede 499 - 20 ( issue #85, sort of. )
 #            TicketType('Full Camp Ticket (latecomer)', 499 - 20, 4, 100.00),
             TicketType('Under-18 Camp Ticket', 30, 4, 45.00,
