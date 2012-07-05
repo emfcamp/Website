@@ -60,6 +60,7 @@ class TicketType(db.Model):
     Prepay = ConstTicketType('Prepay Camp Ticket')
     FullPrepay = ConstTicketType('Full Camp Ticket (prepay)')
     Full = ConstTicketType('Full Camp Ticket')
+    Under18 = ConstTicketType('Under-18 Camp Ticket')
 
 
 class Ticket(db.Model):
@@ -117,6 +118,13 @@ def check_capacity(session, flush_context, instances):
                 count()
 
         totals[obj.type] += 1
+
+    # Any admission tickets count towards the full ticket total
+    AdmissionTypes = [TicketType.FullPrepay, TicketType.Full, TicketType.Under18]
+    people = sum((totals.get(type, 0) for type in AdmissionTypes))
+
+    if people > TicketType.Full.capacity:
+        raise TicketError('No more admission tickets available')
 
     for type, count in totals.items():
 
