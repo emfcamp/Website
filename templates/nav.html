@@ -1,36 +1,38 @@
 <div class="span2"><div class="well sidebar-nav">
-    <ul class="nav nav-list">                                                 
-    <li {% if request.path==url_for('main') %}class="active"{% endif %}>                  
-        <a href="{{url_for('main')}}">About</a>                                          
-    </li>		
-    {#		<li {% if request.path==url_for('location') %}class="active"{% endif %}>                  
-        <a href="{{url_for('location')}}">Location</a>                                          
-    </li> #}		
-    <li {% if request.path==url_for('participating') %}class="active"{% endif %}>                  
-    <a href="{{url_for('participating')}}">Who's Coming</a>                                          
+    <ul class="nav nav-list">
+    <li {% if request.path==url_for('main') %}class="active"{% endif %}>
+        <a href="{{url_for('main')}}">About</a>
     </li>
-    <li {% if request.path==url_for('sponsors') %}class="active"{% endif %}>                  
-        <a href="{{url_for('sponsors')}}">Sponsors</a>                                          
-    </li>		
     <li {% if '/pay' in request.path or '/tickets' in request.path %}class="active"{% endif %}>
-        <a href="{{url_for('tickets')}}">Tickets</a>                                          
-    </li>		
-    <li {% if request.path==url_for('contact') %}class="active"{% endif %}>                  
-        <a href="{{url_for('contact')}}">Contact Us</a>                                          
-    </li>		
-    <li {% if request.path==url_for('get_involved') %}class="active"{% endif %}>                  
-        <a href="{{url_for('get_involved')}}">Get Involved</a>                                          
-    </li>		
-    {% if current_user.admin %}		
-        <li {% if request.path==url_for('admin') %}class="active"{% endif %}>                  
-            <a href="{{url_for('admin')}}">Admin</a>                                          
-        </li>
-    {% endif %}		
-    <li>                  
-        <a href="http://wiki.emfcamp.org">Wiki</a>                                          
+    <a href="{{url_for('tickets')}}"><strong>Buy Tickets</strong></a>
     </li>
-    <li>                  
-        <a href="http://blog.emfcamp.org/">Blog</a>                                          
+
+    {#		<li {% if request.path==url_for('location') %}class="active"{% endif %}>
+        <a href="{{url_for('location')}}">Location</a>
+    </li> #}
+    <li {% if request.path==url_for('participating') %}class="active"{% endif %}>
+    <a href="{{url_for('participating')}}">Who's Coming</a>
+    </li>
+    <li {% if request.path==url_for('sponsors') %}class="active"{% endif %}>
+        <a href="{{url_for('sponsors')}}">Sponsors</a>
+    </li>
+    <li {% if request.path==url_for('contact') %}class="active"{% endif %}>
+        <a href="{{url_for('contact')}}">Contact Us</a>
+    </li>
+    <li {% if request.path==url_for('get_involved') %}class="active"{% endif %}>
+        <a href="{{url_for('get_involved')}}">Get Involved</a>
+    </li>
+    {% if current_user.admin %}
+        <li {% if request.path==url_for('admin') %}class="active"{% endif %}>
+            <a href="{{url_for('admin')}}">Admin</a>
+        </li>
+        {% endif %}
+    <li class="nav-header">See Also</li>
+    <li>
+        <a href="http://wiki.emfcamp.org">Wiki</a>
+    </li>
+    <li>
+        <a href="http://blog.emfcamp.org/">Blog</a>
     </li>
     </ul>
 </div></div>
