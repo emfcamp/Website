@@ -142,7 +142,8 @@ ticket_forms = {
     'Full Camp Ticket': 'full',
     'Full Camp Ticket (prepay)': 'full',
     'Under-18 Camp Ticket': 'kids',
-    'Parking Ticket': 'carpark',
+#    'Parking Ticket': 'carpark',
+#    'Campervan Ticket',
 }
 
 def add_payment_and_tickets(paymenttype):

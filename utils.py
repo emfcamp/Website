@@ -200,15 +200,20 @@ class TestEmails(Command):
 
 class CreateTickets(Command):
     def run(self):
+        #
+        # if you change these, change ticket_forms in views/tickets.py as well.
+        #
         types = [
             TicketType('Prepay Camp Ticket', 250, 4, 30.00),
-            TicketType('Full Camp Ticket (prepay)', 250, 4, 90.00 - 5.00),
+            TicketType('Full Camp Ticket (prepay)', 250, 4, 90.00 - 30.00 - 5.00),
             TicketType('Full Camp Ticket', 499 - 20, 4, 90.00),
+            # XXX the number of Camp Tickets (of the different types) shoudnt excede 499 - 20
+#            TicketType('Full Camp Ticket (latecomer)', 499 - 20, 4, 100.00),
             TicketType('Under-18 Camp Ticket', 30, 4, 45.00,
                 "All children must be accompanied by an adult."),
-            TicketType('Parking Ticket', 25, 4, 10.00,
-                "We're trying to keep cars on-site to a minimum. "
-                "Please use the nearby carpark or find someone to share with if possible."),
+#            TicketType('Parking Ticket', 25, 4, 10.00,
+#                "We're trying to keep cars on-site to a minimum. "
+#                "Please use the nearby carpark or find someone to share with if possible."),
             TicketType('Campervan Ticket', 5, 1, 30.00,
                 "Space for campervans is extremely limited. We'll email you for details of your requirements."),
             #TicketType('Donation'),
