@@ -363,7 +363,6 @@ def gocardless_complete():
         recipients=[payment.user.email]
     )
     msg.body = render_template("tickets-purchased-email-gocardless.txt", \
-        basket={"count" : len(payment.tickets.all()), "reference" : gcid}, \
         user = payment.user, payment=payment)
     mail.send(msg)
 
@@ -477,7 +476,6 @@ def gocardless_webhook():
                 recipients=[payment.user.email]
             )
             msg.body = render_template("tickets-paid-email-gocardless.txt", \
-                basket={"count" : len(payment.tickets.all()), "reference" : gcid}, \
                 user = payment.user, payment=payment)
             mail.send(msg)
 
@@ -506,7 +504,6 @@ def transfer_start():
         recipients=[current_user.email]
     )
     msg.body = render_template("tickets-purchased-email-banktransfer.txt", \
-        basket={"count" : len(payment.tickets.all()), "reference" : payment.bankref}, \
         user = current_user, payment=payment)
     mail.send(msg)
 
