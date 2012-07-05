@@ -1,20 +1,22 @@
 Hi, {{ user.name }},
 
-{% if basket.count == 1 -%}
-This is to confirm that you've reserved a prepay ticket
+{% if payment.tickets.all() |count == 1 -%}
+This is to confirm that you've reserved a ticket
 for {{ format_price(payment.amount) }} for Electromagnetic Field 2012!
 
 This ticket will be reserved for you for 10 days while you send the money
 by bank transfer. We'll let you know by email when your payment has been
 received.
 {%- else -%}
-This is to confirm that you've reserved {{ basket.count }} prepay tickets
-for {{ format_price(payment.amount) }} for Electromagnetic Field 2012!
+This is to confirm that you've reserved {{ payment.tickets.all() |count }} tickets for {{ format_price(payment.amount) }}
+for Electromagnetic Field 2012!
 
 These tickets will be reserved for you for 10 days while you send the money
 by bank transfer. We'll let you know by email when your payment has been
 received.
 {%- endif %}
+
+{% include "email-tickets.txt" %}
 
 How to Pay
 ----------

@@ -18,7 +18,7 @@ from datetime import datetime
 
 from main import app, mail
 from models import User, TicketType, Ticket
-from models.payment import Payment, BankPayment, safechars
+from models.payment import Payment, BankPayment, GoCardlessPayment, safechars
 
 #app = Flask(__name__)
 #app.config.from_envvar('SETTINGS_FILE')
@@ -168,34 +168,91 @@ class TestEmails(Command):
   """
 
   def run(self):
-    for num in (1,2):
-      for t in ("tickets-purchased-email-gocardless.txt", "tickets-paid-email-gocardless.txt"):
-        print "template:", t
-        print
-        self.test(t, num, "012SDJADG")
-        print
-        print "*" * 42
-        print
+    self.make_test_user()
+    for t in ("tickets-purchased-email-gocardless.txt", "tickets-paid-email-gocardless.txt"):
+      print "template:", t
+      print
+      self.test(t, self.gcpayment)
+      print
+      print "*" * 42
+      print
 
-    for num in (1,2):
-      for t in ("tickets-purchased-email-banktransfer.txt", "tickets-paid-email-banktransfer.txt"):
-        print "template:", t
-        print
-        self.test(t, num, "A23FBJA4")
-        print
-        print "*" * 42
-        print
+    for t in ("tickets-purchased-email-banktransfer.txt", "tickets-paid-email-banktransfer.txt"):
+      print "template:", t
+      print
+      self.test(t, self.bankpayment)
+      print
+      print "*" * 42
+      print
     
     t = "welcome-email.txt"
     print  "template:", t
     print
-    output = render_template(t, user = {"name" : "J R Hartley", "email": "jrh@flyfishing.net"})
+    output = render_template(t, user = self.user)
     print output
 
-  def test(self, template, count, ref):
-    cost = 30.00 * count
-    basket = { "count" : count, "reference" : ref }
-    output = render_template(template, basket=basket, user = {"name" : "J R Hartley"}, payment={"amount" : cost, "bankref": ref})
+  def make_test_user(self):
+    try:
+      user = User.query.filter(User.email == "test@example.com").one()
+    except NoResultFound:
+      user = User('test@example.com', 'testuser')
+      user.set_password('happycamper')
+      #
+      # hack around sqlalchamey session stuff
+      #
+      foo = TicketType.query.filter(TicketType.name == 'Prepay Camp Ticket').one()
+      sess = db.object_session(foo)
+
+      #
+      # TODO: needs to cover:
+      #
+      # single full ticket, no prepay
+      # single full ticket with prepay
+      # multiple full tickets, no prepay
+      # multiple full tickets, no prepay
+      # multiple full tickets, some prepay
+      #
+      # kids & campervans?
+      #
+      sess.add(user)
+      bankpayment = BankPayment(30 + 90.00 - 30.00 - 5.00)
+      bankpayment.state = "inprogress"
+      sess.add(bankpayment)
+
+      for tt in ('Prepay Camp Ticket', 'Full Camp Ticket (prepay)'):
+        t = Ticket(type_id = TicketType.query.filter(TicketType.name == tt).one().id)
+        t.payment = bankpayment
+        user.tickets.append(t)
+      user.payments.append(bankpayment)
+      
+      gcpayment = GoCardlessPayment(30 + 90.00 - 30.00 - 5.00)
+      gcpayment.state = "inprogress"
+      gcpayment.reference = "012SDJADG"
+      sess.add(gcpayment)
+      for tt in ('Prepay Camp Ticket', 'Full Camp Ticket (prepay)'):
+        t = Ticket(type_id = TicketType.query.filter(TicketType.name == tt).one().id)
+        t.payment = gcpayment
+        user.tickets.append(t)
+      user.payments.append(gcpayment)
+      
+      sess.commit()
+          
+    self.user = user
+    print user.name
+    for p in user.payments.all():
+      if p.provider == "gocardless":
+        self.gcpayment = p
+      elif p.provider == "banktransfer":
+        self.bankpayment = p
+
+    print self.user.name, self.gcpayment, self.bankpayment
+    print self.gcpayment.tickets.all(), self.gcpayment.amount
+    print self.bankpayment.tickets.all(), self.bankpayment.amount
+
+  def test(self, template, payment):
+    output = render_template(template, user = self.user, payment=payment)
+    print "To: \"%s\" <%s>" % (self.user.name, self.user.email)
+    print
     print output.encode("utf-8")
 
 class CreateTickets(Command):

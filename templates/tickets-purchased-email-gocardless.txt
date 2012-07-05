@@ -1,14 +1,12 @@
 Hi, {{ user.name }},
 
-{% if basket.count == 1 -%}
-This is to confirm that you've bought a prepay ticket
-for {{ format_price(payment.amount) }} for Electromagnetic Field 2012!
-{%- else -%}
-This is to confirm that you've bought {{ basket.count }} prepay tickets
-for {{ format_price(payment.amount) }} for Electromagnetic Field 2012!
-{%- endif %}
+This is to confirm that you've bought
+{%- if payment.tickets.all() | count == 1 -%}
+ a ticket {%- else %} {{ payment.tickets.all() |count }} tickets
+{%- endif %} for Electromagnetic Field 2012.
 
-Your bill ID from GoCardless was {{ basket.reference }}.  You can view this
+{% include "email-tickets.txt" %}
+Your bill ID from GoCardless was {{ payment.reference }}.  You can view this
 by logging into your account at http://www.gocardless.com/.
 
 We expect to receive payment from GoCardless within 6 days or so. We will

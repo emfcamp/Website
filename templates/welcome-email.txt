@@ -5,7 +5,7 @@ Welcome to the Electromagnetic Field website!
 You signed up with name: {{ user.name }}
 and email: {{ user.email }}
 
-At the moment you can purchase prepay tickets for the camp.
+You can now buy full tickets for the camp, please yours soon!
 
 You can keep track of your ticket purchases here:
 
@@ -15,3 +15,8 @@ If you forget your password you can reset it here:
 
 {{ url_for('forgot_password', _external=True) }}
 
+See you soon at Electromagnetic Field 2012! 
+
+Love,
+
+All the EMF team

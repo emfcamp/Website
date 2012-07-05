@@ -1,9 +1,9 @@
 Hi, {{ user.name }},
 
 We've just received confirmation from GoCardless that your payment for
-{% if basket.count > 1 %}{{ basket.count }} EMF prepay tickets{% else %}your EMF prepay ticket{% endif %} has cleared.
+{{ format_price(payment.amount) }} has cleared.
 
-Thank you for helping us get the camp running by buying a prepay ticket!
+See you soon at Electromagnetic Field 2012!
 
 Love,
 
