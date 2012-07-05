@@ -92,6 +92,9 @@ def tickets():
     if app.config.get('FULL_TICKETS', False) and not current_user.is_authenticated():
         return redirect(url_for('tickets_choose'))
 
+    if current_user.is_authenticated() and not current_user.tickets.count():
+        return redirect(url_for('tickets_choose'))
+
     form = ChoosePrepayTicketsForm(request.form)
     form.count.values = range(1, TicketType.Prepay.limit + 1)
 
@@ -199,13 +202,6 @@ def add_payment_and_tickets(paymenttype):
 
     return payment
 
-
-@app.route("/pay")
-def pay():
-    if current_user.is_authenticated():
-        return redirect(url_for('pay_choose'))
-
-    return render_template('payment-options.html')
 
 @app.route("/pay/terms")
 def ticket_terms():

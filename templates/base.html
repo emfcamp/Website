@@ -18,11 +18,11 @@
     <header>
         <h1><a href="/">Electromagnetic Field</a></h1>
     </header>
-    {% for message in get_flashed_messages() -%}
-        <div class="span6 alert alert-error">{{ message }}</div>
-    {% endfor -%}
     <div class="row-fluid">
         {% include "nav.html" %}
+        {% for message in get_flashed_messages() -%}
+            <div class="span10 alert alert-error">{{ message }}</div>
+        {% endfor -%}
         {% block body -%}{% endblock -%}
     </div>
     <footer>

@@ -3,7 +3,7 @@
 {% block body %}
 
 <div class="span10">
-<p>New blurb about tickets</p>
+{% include 'ticket-blurb.html' %}
 {% if not current_user.is_authenticated() %}
 <p>If you've already signed up, <a href="{{url_for('login')}}">log in</a> to view your ticket status.</p>
 {% endif %}

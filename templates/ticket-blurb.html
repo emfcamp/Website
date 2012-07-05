@@ -1,3 +1,6 @@
+{% if config.get('FULL_TICKETS', False) %}
+<p></p>
+{% else %}
 <p>We don't have a final budget yet, so we're currently only letting people
    put a deposit down for their tickets.</p>
 
@@ -11,5 +14,6 @@
         details.</li>
 </ul>
 
+{% endif %}
 <p>Please make sure you're familiar with our <a href="{{url_for('ticket_terms')}}">Terms and Conditions</a> and
     the <a href="http://wiki.emfcamp.org/wiki/FAQ">FAQ</a> before buying your ticket.</p>

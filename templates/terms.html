@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 {% block body %}
+
+<div class="span10">
+
 <h2>Terms and Conditions of Ticket Purchase</h2>
 <ol>
 <li>Tickets cannot be transferred or re-sold. They will not be refunded unless the event is cancelled.</li>
@@ -24,4 +27,5 @@
 </ol>
 
 <p>For larger orders and ticket enquiries, please contact us on {{ config.get('TICKETS_EMAIL')[1] }}</p>
+</div>
 {% endblock %}

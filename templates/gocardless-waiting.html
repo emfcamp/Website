@@ -1,6 +1,9 @@
 {% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block body %}
+
+<div class="span10">
+
 <h2>Thank You!</h2>
 
 <p>Your GoCardless Direct Debit payment for {{ format_price(payment.amount) }}
@@ -15,4 +18,6 @@ by logging into <a href="http://www.gocardless.com/">your GoCardless account</a>
 <p>See you at <a href="http://www.emfcamp.org/">Electromagnetic Field</a>!</p>
 
 <a class="btn btn-info" href="{{ url_for('tickets') }}">Show my tickets</a>
+
+</div>
 {% endblock %}
