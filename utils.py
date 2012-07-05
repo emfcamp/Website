@@ -13,7 +13,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from jinja2 import Environment, FileSystemLoader
 
 from decimal import Decimal
-import re, os
+import re, os, random
 from datetime import datetime
 
 from main import app, mail
@@ -169,21 +169,23 @@ class TestEmails(Command):
 
   def run(self):
     self.make_test_user()
-    for t in ("tickets-purchased-email-gocardless.txt", "tickets-paid-email-gocardless.txt"):
-      print "template:", t
-      print
-      self.test(t, self.gcpayment)
-      print
-      print "*" * 42
-      print
-
-    for t in ("tickets-purchased-email-banktransfer.txt", "tickets-paid-email-banktransfer.txt"):
-      print "template:", t
-      print
-      self.test(t, self.bankpayment)
-      print
-      print "*" * 42
-      print
+    for p in self.user.payments.all():
+      if p.provider == "gocardless":
+        for t in ("tickets-purchased-email-gocardless.txt", "tickets-paid-email-gocardless.txt"):
+          print "template:", t
+          print
+          self.test(t, p)
+          print
+          print "*" * 42
+          print
+      elif p.provider == "banktransfer":
+        for t in ("tickets-purchased-email-banktransfer.txt", "tickets-paid-email-banktransfer.txt"):
+          print "template:", t
+          print
+          self.test(t, p)
+          print
+          print "*" * 42
+          print
     
     t = "welcome-email.txt"
     print  "template:", t
@@ -202,53 +204,56 @@ class TestEmails(Command):
       #
       foo = TicketType.query.filter(TicketType.name == 'Prepay Camp Ticket').one()
       sess = db.object_session(foo)
+      sess.add(user)
 
+      amounts = {
+        "prepayfull" : TicketType.query.filter(TicketType.name == 'Full Camp Ticket (prepay)').one().cost,
+        "full" : TicketType.query.filter(TicketType.name == 'Full Camp Ticket').one().cost
+      }
       #
       # TODO: needs to cover:
       #
       # single full ticket, no prepay
       # single full ticket with prepay
       # multiple full tickets, no prepay
-      # multiple full tickets, no prepay
+      # multiple full tickets, with prepay
       # multiple full tickets, some prepay
       #
       # kids & campervans?
       #
-      sess.add(user)
-      bankpayment = BankPayment(30 + 90.00 - 30.00 - 5.00)
-      bankpayment.state = "inprogress"
-      sess.add(bankpayment)
-
-      for tt in ('Prepay Camp Ticket', 'Full Camp Ticket (prepay)'):
-        t = Ticket(type_id = TicketType.query.filter(TicketType.name == tt).one().id)
-        t.payment = bankpayment
-        user.tickets.append(t)
-      user.payments.append(bankpayment)
       
-      gcpayment = GoCardlessPayment(30 + 90.00 - 30.00 - 5.00)
-      gcpayment.state = "inprogress"
-      gcpayment.reference = "012SDJADG"
-      sess.add(gcpayment)
-      for tt in ('Prepay Camp Ticket', 'Full Camp Ticket (prepay)'):
-        t = Ticket(type_id = TicketType.query.filter(TicketType.name == tt).one().id)
-        t.payment = gcpayment
-        user.tickets.append(t)
-      user.payments.append(gcpayment)
-      
-      sess.commit()
+      # full, prepay
+      for full, pp in ((1,0), (0,1), (3,0), (0,3), (2,1)):
+        for pt in (BankPayment, GoCardlessPayment):
+          total = (full * amounts['full']) + (pp * amounts['prepayfull'])
+          payment = pt(total)
+          payment.state = "inprogress"
+          if payment.provider == "gocardless":
+            payment.gcid = "%3dSDJADG" % (int(random.random() * 1000 ))
+          sess.add(payment)
           
+          tt = 'Full Camp Ticket'
+          for i in range(full):
+            t = Ticket(type_id = TicketType.query.filter(TicketType.name == tt).one().id)
+            t.payment = payment
+            user.tickets.append(t)
+            
+          tt = 'Full Camp Ticket (prepay)'
+          for i in range(pp):
+            t = Ticket(type_id = TicketType.query.filter(TicketType.name == tt).one().id)
+            t.payment = payment
+            user.tickets.append(t)
+
+          user.payments.append(payment)
+
+      sess.commit()
+
     self.user = user
     print user.name
     for p in user.payments.all():
-      if p.provider == "gocardless":
-        self.gcpayment = p
-      elif p.provider == "banktransfer":
-        self.bankpayment = p
-
-    print self.user.name, self.gcpayment, self.bankpayment
-    print self.gcpayment.tickets.all(), self.gcpayment.amount
-    print self.bankpayment.tickets.all(), self.bankpayment.amount
-
+      print p.provider, p.amount
+      print p.tickets.all()
+      
   def test(self, template, payment):
     output = render_template(template, user = self.user, payment=payment)
     print "To: \"%s\" <%s>" % (self.user.name, self.user.email)

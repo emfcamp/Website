@@ -5,14 +5,5 @@ Your tickets are:
 {% for t in payment.tickets.all() %}
 {{- t.type.name }} {{ format_price(t.type.cost) }}
 {% endfor %}
-
 Price total: {{ format_price(payment.amount) }}
 
-{# {% if payment.tickets.count == 1 -%}
-This is to confirm that you've bought a prepay ticket
-for {{ format_price(payment.amount) }} for Electromagnetic Field 2012!
-{%- else -%}
-This is to confirm that you've bought {{ basket.count }} prepay tickets
-for {{ format_price(payment.amount) }} for Electromagnetic Field 2012!
-{%- endif %}
-#}
