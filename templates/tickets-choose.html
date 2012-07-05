@@ -2,7 +2,7 @@
 
 {% block body %}
 
-<div class="span12">
+<div class="span10">
 <p>New blurb about tickets</p>
 {% if not current_user.is_authenticated() %}
 <p>If you've already signed up, <a href="{{url_for('login')}}">log in</a> to view your ticket status.</p>
@@ -33,7 +33,7 @@
         <span>{{ format_price(f._type.cost) }}</span>
     </td>
     <td>
-        <div class="controls">{{ f.amount(class_="amount span1")|safe }}
+        <div class="controls">{{ f.amount(class_="amount")|safe }}
         {% if f.amount.errors %}
             {% for error in f.amount.errors %}
             <div class="help-block">{{ error }}</div>

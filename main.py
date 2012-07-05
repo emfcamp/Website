@@ -39,7 +39,7 @@ mail = Mail(app)
 
 assets = Environment(app)
 css = Bundle('css/bootstrap.css',
-               # 'css/bootstrap-responsive.css', 
+                'css/bootstrap-responsive.css', 
                 'css/main.css',
                 output='gen/packed.css', filters='cssmin')
 assets.register('css_all', css)

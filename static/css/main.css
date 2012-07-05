@@ -6,7 +6,7 @@ header {
 header h1 {
     font-weight: bold;
     font-size: 5em;
-    padding-bottom:20px;
+    padding-bottom:0.5em;
 }
 
 .flash {
