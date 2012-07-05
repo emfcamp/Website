@@ -66,6 +66,12 @@ class CarparkTicketForm(TicketForm):
     template= 'tickets/carpark.html'
     carshare = BooleanField('Car share')
 
+class CampervanTicketForm(TicketForm):
+    pass
+    # XXX do we need a template for these?
+    # maybe info on where to go?
+#    template= 'tickets/campervan.html'
+
 class DonationTicketForm(TicketForm):
     template= 'tickets/donation.html'
     amount = DecimalField('Donation amount')
@@ -143,7 +149,7 @@ ticket_forms = {
     'Full Camp Ticket (prepay)': 'full',
     'Under-18 Camp Ticket': 'kids',
 #    'Parking Ticket': 'carpark',
-#    'Campervan Ticket',
+    'Campervan Ticket': 'campervan'
 }
 
 def add_payment_and_tickets(paymenttype):
@@ -178,8 +184,8 @@ def add_payment_and_tickets(paymenttype):
     for ticket in basket:
         if ticket.type.name in ticket_forms:
             if not ticket.attribs:
-                app.logging.error('Ticket %s has no attribs', ticket)
-                return None
+                # Camper van tickets don't have attribs
+                app.logger.info('Ticket %s has no attribs', ticket)
 
         current_user.tickets.append(ticket)
         ticket.payment = payment
@@ -578,6 +584,7 @@ class TicketInfoForm(Form):
     full = FieldList(FormField(FullTicketForm))
     kids = FieldList(FormField(KidsTicketForm))
     carpark = FieldList(FormField(CarparkTicketForm))
+    campervan = FieldList(FormField(CampervanTicketForm))
     donation = FieldList(FormField(DonationTicketForm))
     submit = SubmitField('Continue to Check-out')
     back = SubmitField('Change tickets')
