@@ -538,6 +538,8 @@ def tickets_choose():
             Ticket.type == TicketType.Full,
             Ticket.type == TicketType.FullPrepay,
         )).count()
+        if fulls >= prepays:
+            prepays = 0
     else:
         prepays = 0
         fulls = 0
