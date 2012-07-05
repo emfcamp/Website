@@ -2,10 +2,8 @@
  
 Your tickets are:
 
-Type			Cost
-----			----
-{% for t in payment.tickets -%}
-{{ t.type.name }} 	{{ format_price(t.type.cost) }}
+{% for type, tickets in payment.tickets|groupby('type') -%}
+{{ type.name }}: {{ tickets|length }} at {{ format_price(type.cost) }}
 {% endfor %}
 
 Total: {{ format_price(payment.amount) }}
