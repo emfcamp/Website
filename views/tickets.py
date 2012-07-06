@@ -89,11 +89,9 @@ class ChoosePrepayTicketsForm(Form):
 @app.route("/tickets", methods=['GET', 'POST'])
 def tickets():
 
-    if app.config.get('FULL_TICKETS', False) and not current_user.is_authenticated():
-        return redirect(url_for('tickets_choose'))
-
-    if current_user.is_authenticated() and not current_user.tickets.count():
-        return redirect(url_for('tickets_choose'))
+    if app.config.get('FULL_TICKETS', False):
+        if not (current_user.is_authenticated() and current_user.tickets.count()):
+            return redirect(url_for('tickets_choose'))
 
     form = ChoosePrepayTicketsForm(request.form)
     form.count.values = range(1, TicketType.Prepay.limit + 1)
