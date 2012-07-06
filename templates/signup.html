@@ -3,7 +3,7 @@
 {% block body %}
 <div class="span10">
 <h2>Sign up</h2>
-<p>If you've already signed up, you might want to <a href="/login">log in</a>.</p>
+<p>If you've already signed up, you might want to <a href="{{ url_for('login') }}">log in</a>.</p>
 <p>We need an email address and password before we can accept payment.</p>
 <form method="post" class="form-horizontal">
   <fieldset>

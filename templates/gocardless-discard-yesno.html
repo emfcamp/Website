@@ -7,7 +7,7 @@
 
 <p>Are you sure you want to cancel your payment?</p>
 
-<form method=post action="/pay/gocardless-tryagain">
+<form method=post action="{{ url_for('gocardless_tryagain') }}">
 {{form.hidden_tag()}}
 {{form.yes()}}
 {{form.no()}}
