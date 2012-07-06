@@ -397,6 +397,7 @@ def gocardless_cancel():
         flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
         return redirect(url_for('tickets'))
 
+    payment.state = 'canceled'
     for ticket in payment.tickets:
         app.logger.info("gocardless-cancel: userid %s, payment_id %s canceled ticket %d",
             current_user.id, payment.id, ticket.id)
