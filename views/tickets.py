@@ -166,10 +166,11 @@ def add_payment_and_tickets(paymenttype):
     if not (basket and total):
         return None
 
-    app.logger.info("Creating tickets:")
-    app.logger.info(basket)
-    app.logger.info("Payment: %s for total %s", paymenttype.name, total)
-    app.logger.info("Ticket info: %s", infodata)
+    app.logger.info('''Creating tickets
+      Basket: %s
+      Payment: %s for total %s
+      Ticket info: %s
+    ''', basket, paymenttype.name, total, infodata)
 
     if infodata:
         infotypes = set(ticket_forms.values())
