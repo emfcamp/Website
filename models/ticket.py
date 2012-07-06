@@ -10,9 +10,7 @@ class ConstTicketType(object):
         self.val = None
 
     def __get__(self, obj, objtype):
-        if not self.val:
-            self.val = objtype.query.filter_by(name=self.name).one()
-        return self.val
+        return objtype.query.filter_by(name=self.name).one()
 
 class TicketType(db.Model):
     __tablename__ = 'ticket_type'
