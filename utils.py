@@ -235,12 +235,14 @@ class TestEmails(Command):
           for i in range(full):
             t = Ticket(type_id = TicketType.query.filter(TicketType.name == tt).one().id)
             t.payment = payment
+            t.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
             user.tickets.append(t)
             
           tt = 'Full Camp Ticket (prepay)'
           for i in range(pp):
             t = Ticket(type_id = TicketType.query.filter(TicketType.name == tt).one().id)
             t.payment = payment
+            t.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
             user.tickets.append(t)
 
           user.payments.append(payment)
