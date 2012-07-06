@@ -4,7 +4,7 @@
         <a href="{{url_for('main')}}">About</a>
     </li>
     <li {% if '/pay' in request.path or '/tickets' in request.path %}class="active"{% endif %}>
-    <a href="{{url_for('tickets', _secure=current_user.is_authenticated())}}"><strong>Buy Tickets</strong></a>
+    <a href="{{url_for('tickets')}}"><strong>Buy Tickets</strong></a>
     </li>
 
     {#		<li {% if request.path==url_for('location') %}class="active"{% endif %}>
