@@ -1,3 +1,5 @@
+import patch_url_for
+
 from flask import Flask
 from flaskext.login import LoginManager
 from flaskext.mail import Mail

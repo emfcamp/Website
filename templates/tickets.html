@@ -89,7 +89,7 @@
 {% else %}
     {% if tickets|count < 4 %}
 
-    <form method=post class="form-horizontal choose-prepay-tickets">
+    <form method=post class="form-horizontal choose-prepay-tickets" action="{{ url_for('tickets', _secure=True) }}">
         {{form.hidden_tag()}}
         <h2>Reserve tickets</h2>
 
