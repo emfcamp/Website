@@ -7,7 +7,7 @@
 <h2>Your current tickets</h2>
 
 <table class="table">
-<tr><th>Type</th><th>Status</th></tr>
+<tr><th>Type</th><th>Volunteer?</th><th>Accessibility?</th><th>Status</th></tr>
 
 {% for t in tickets %}
 
@@ -19,6 +19,24 @@
 {% if t.expired() %}expired{% endif %}
 ">
 <td>{{ t.type.name }}</td>
+<td>
+	{% if t.type.name=="Under-18 Camp Ticket" or t.type.name=="Campervan Ticket" %}
+		N/A
+	{% else %}
+		{% for attrib in t.attribs if attrib.name=="volunteer" %}
+			{% if attrib.value=="1" %} Yes {% else %} No {% endif %}
+		{% endfor %}
+	{% endif %}
+</td>
+<td>
+	{% if t.type.name=="Campervan Ticket" %}
+		N/A
+	{% else %}	
+		{% for attrib in t.attribs if attrib.name=="accessible" %}
+			{% if attrib.value=="1" %} Yes {% else %} No {% endif %}
+		{% endfor %}
+	{% endif %}
+</td>
 <td>
     {% if t.paid %}
     Paid
