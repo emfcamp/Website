@@ -2,6 +2,7 @@ from main import db
 from decimal import Decimal
 from datetime import datetime, timedelta
 from sqlalchemy.orm import attributes, Session
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import event, or_
 
 class ConstTicketType(object):
@@ -116,6 +117,10 @@ def check_capacity(session, flush_context, instances):
                 count()
 
         totals[obj.type] += 1
+
+    if len(totals) == 0:
+        # hack for empty database when creating tickets
+        return
 
     # Any admission tickets count towards the full ticket total
     AdmissionTypes = [TicketType.FullPrepay, TicketType.Full, TicketType.Under18]
