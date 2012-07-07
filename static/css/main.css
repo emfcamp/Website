@@ -75,6 +75,11 @@ table.tickets tr.expired {
   font-weight: bold;
 }
 
+.hero-unit p.small {
+    line-height: 14px;
+    font-weight: normal;
+}
+
 form.shrink {
     margin: 0;
 }
