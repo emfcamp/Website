@@ -34,7 +34,7 @@ def stats():
                                 t.type_id = tt.id and tt.name = 'Prepay Camp Ticket'""")).fetchall()
     ret["prepays"] = result[0][0]
     ret["users"] = User.query.count()
-    ret["prepays_bought"] = TicketType.Prepay.query.filter(Ticket.paid == True).count()
+    ret["prepays_bought"] = Ticket.query.filter(Ticket.type_id == TicketType.Prepay.id).filter(Ticket.paid == True).count()
 
     return ' '.join('%s:%s' % i for i in ret.items())
 
