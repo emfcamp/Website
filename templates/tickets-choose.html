@@ -8,6 +8,15 @@
 <p>If you've already signed up, <a href="{{url_for('login')}}">log in</a> to view your ticket status.</p>
 {% endif %}
 
+<form method="post" action="{{url_for('set_currency')}}">
+    <label for="select_currency">Select currency:</label>
+    <select name="currency" id="select_currency">
+        <option value="GBP" {% if user_currency == 'GBP' %}selected="selected"{%endif%}>£</option>
+        <option value="EUR" {% if user_currency == 'EUR' %}selected="selected"{%endif%}>€</option>
+    </select>
+    <button type="submit">Go</button>
+</form>
+
 <form method="post" class="choose-tickets-form">
 {{form.hidden_tag()}}
 <table class="table">
@@ -23,14 +32,14 @@
 <tbody>
 {% for f in form.types %}
 {% if f._any %}
-<tr data-price="{{ f._type.cost }}" class="control-group{%if f.amount.errors%} error{%endif%} {{ loop.cycle('buyformtdodd', 'buyformtdeven') }}" >
+<tr data-price="{{ f._type.get_price(user_currency) }}" class="control-group{%if f.amount.errors%} error{%endif%} {{ loop.cycle('buyformtdodd', 'buyformtdeven') }}" >
     <td>
         {{ f.hidden_tag() }}
         <label for="{{ f.amount.id }}"><b>{{ f._type.name }}</b></label>
         {% if f._type.notice %}<p>{{ f._type.notice }}</p>{% endif %}
     </td>
     <td>
-        <span>{{ format_price(f._type.cost) }}</span>
+        <span>{{ format_ticket_price(f._type) }}</span>
     </td>
     <td>
         <div class="controls">{{ f.amount(class_="amount")|safe }}
@@ -74,7 +83,7 @@ $(function() {
   $('#summary').children().toggle();
 
   function format_price(amount, currency, after) {
-    if (!currency) currency = '\xa3';
+    if (!currency) currency = '{{user_currency_symbol}}';
     var amount = parseFloat(amount).toFixed(2);
     if (after)
       return amount + currency;

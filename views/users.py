@@ -139,3 +139,11 @@ def reset_password():
 def logout():
     logout_user()
     return redirect('/')
+
+@app.route("/set-currency", methods=['POST'])
+def set_currency():
+    if request.form['currency'] not in ('GBP', 'EUR'):
+        abort(400)
+
+    session['currency'] = request.form['currency']
+    return redirect(url_for('tickets_choose'))

@@ -708,3 +708,5 @@ def transfer_cancel():
         flash('Payment cancelled')
 
     return redirect(url_for('tickets'))
+
+

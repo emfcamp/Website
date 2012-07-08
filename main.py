@@ -1,4 +1,5 @@
-from flask import Flask
+# encoding=utf-8
+from flask import Flask, session
 from flaskext.login import LoginManager
 from flaskext.mail import Mail
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -16,22 +17,39 @@ login_manager = LoginManager()
 login_manager.setup_app(app, add_context_processor=True)
 app.login_manager.login_view = 'login'
 
+CURRENCY_SYMBOLS = {'GBP': u'£', 'EUR': u'€'}
+
 @app.context_processor
 def utility_processor():
-    def format_price(amount, currency=u'\xa3', after=False):
+    def format_price(amount, currency=None, after=False):
+        if currency is None:
+            currency = CURRENCY_SYMBOLS[session.get('currency', 'GBP')]
+
         amount = u'{0:.2f}'.format(amount)
         if after:
             return amount + currency
         return currency + amount
+
+    def format_ticket_price(ticket_type):
+        currency = session.get('currency', 'GBP')
+        ticket_price = ticket_type.get_price(currency)
+        symbol = CURRENCY_SYMBOLS[currency]
+        return format_price(ticket_price, symbol)
 
     def format_bankref(bankref):
         return '%s-%s' % (bankref[:4], bankref[4:])
 
     return dict(
         format_price=format_price,
+        format_ticket_price=format_ticket_price,
         format_bankref=format_bankref,
     )
 
+@app.context_processor
+def currency_processor():
+    currency = session.get('currency', 'GBP')
+    return {'user_currency': currency,
+            'user_currency_symbol': CURRENCY_SYMBOLS[currency]}
 
 db = SQLAlchemy(app)
 
