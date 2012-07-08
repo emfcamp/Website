@@ -3,7 +3,7 @@ This is the www.emfcamp.org web site
 Starting
 ========
 ```
-sudo apt-get install python-dev python-virtualenv
+sudo apt-get install python-dev python-virtualenv # if needed - python-psycopg2
 make init
 make update
 make tickets
