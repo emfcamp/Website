@@ -138,7 +138,7 @@ def reset_password():
 @login_required
 def logout():
     logout_user()
-    return redirect('/')
+    return redirect(url_for('main'))
 
 @app.route("/set-currency", methods=['POST'])
 def set_currency():
