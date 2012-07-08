@@ -24,7 +24,7 @@
 		N/A
 	{% else %}
 		{% for attrib in t.attribs if attrib.name=="volunteer" %}
-			{% if attrib.value=="1" %} Yes {% else %} No {% endif %}
+			{% if attrib.value in ("1", "true") %} Yes {% else %} No {% endif %}
 		{% endfor %}
 	{% endif %}
 </td>
@@ -33,7 +33,7 @@
 		N/A
 	{% else %}	
 		{% for attrib in t.attribs if attrib.name=="accessible" %}
-			{% if attrib.value=="1" %} Yes {% else %} No {% endif %}
+			{% if attrib.value in ("1", "true") %} Yes {% else %} No {% endif %}
 		{% endfor %}
 	{% endif %}
 </td>
