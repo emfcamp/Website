@@ -108,3 +108,11 @@ img.padit {
   margin-top: 2ex;
   margin-bottom: 0;
 }
+
+.currency_form {
+    float:right    
+}
+
+#select_currency {
+  width: 4em
+}

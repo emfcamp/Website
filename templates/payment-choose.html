@@ -12,6 +12,7 @@
 If you're unsure about anything, please check out our <a href="http://wiki.emfcamp.org/wiki/FAQ#Ticket_Sales">FAQ</a>
 or drop us an <a href="mailto:{{ config.get('TICKETS_EMAIL')[1] }}">email</a>.</p>
 
+{% if user_currency == 'GBP' %}
 <h3>Paying by Direct Debit</h3>
 
 <p>Alternatively, choose GoCardless to create a one-off direct debit from your account.
@@ -22,11 +23,10 @@ Guarantee</a>.</p>
 <form method="post" action="{{ url_for('gocardless_start') }}">
     <p><button type="submit" name="gocardless" class="btn btn-large btn-info">Pay with GoCardless</button></p>
 </form>
+{% endif %}
+<h3>Paying By Bank Transfer</h3>
 
-<h3>Paying in Pounds or Euros</h3>
-
-<p>The best way is to ask your bank to send it to us directly (this works online, or with cash in
-branch).</p>
+<p>Ask your bank to send it to us directly (this works online, or with cash in branch).</p>
 
 <form method="post" action="{{ url_for('transfer_start') }}">
     <p><button type="submit" name="banktransfer" class="btn btn-large btn-info">Pay by bank transfer</button></p>

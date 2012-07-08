@@ -3,7 +3,7 @@
 Your tickets are:
 
 {% for type, tickets in payment.tickets|groupby('type') -%}
-{{ type.name }}: {{ tickets|length }} at {{ format_price(type.cost) }}
+{{ type.name }}: {{ tickets|length }} at {{ format_price(type.get_price(user_currency)) }}
 {% endfor %}
 
 Total: {{ format_price(payment.amount) }}

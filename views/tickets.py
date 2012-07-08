@@ -589,7 +589,7 @@ def get_basket():
     for type_id in session.get('basket', []):
         basket.append(Ticket(type_id=type_id))
 
-    total = sum(t.type.cost for t in basket)
+    total = sum(t.type.get_price(session.get('currency', 'GBP')) for t in basket)
 
     return basket, total
 

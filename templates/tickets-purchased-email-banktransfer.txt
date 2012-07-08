@@ -27,25 +27,17 @@ ensure it's included in full.
 
 Bank:           Barclays
 Payee:          Electromagnetic Field Ltd
+{% if user_currency == 'GBP' %}
 Sort code:      20-71-64
 Account number: 73590526
+{% elif user_currency == 'EUR' %}
+SWIFT:          BARCGB22
+IBAN:           GB21 BARC 2071 6472 9544 33
+{% endif %}
 Amount:         {{ format_price(payment.amount) }}
 Reference:      {{ format_bankref(payment.bankref) }}
 
 (Don't worry if the payee name doesn't quite fit.)
-
-Euro Payments
------------------------
-
-You can pay into our Euro Bank Account:
-
-SWIFT: BARCGB22
-IBAN:  GB21 BARC 2071 6472 9544 33
-
-{% include "tickets-euro-amounts.txt" %}
-
-Additionally please email tickets@emfcamp.org when you do the transfer
-with your details as we have to reconcile our euro account manually.
 
 Company Details
 ---------------

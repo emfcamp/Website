@@ -8,14 +8,18 @@
 <p>If you've already signed up, <a href="{{url_for('login')}}">log in</a> to view your ticket status.</p>
 {% endif %}
 
-<form method="post" action="{{url_for('set_currency')}}">
+<div class="currency_form">
+<form method="post" action="{{url_for('set_currency')}}" class="form-inline" id="currency_form">
     <label for="select_currency">Select currency:</label>
-    <select name="currency" id="select_currency">
+    <select name="currency" id="select_currency" onchange="$('#currency_form').submit()">
         <option value="GBP" {% if user_currency == 'GBP' %}selected="selected"{%endif%}>£</option>
         <option value="EUR" {% if user_currency == 'EUR' %}selected="selected"{%endif%}>€</option>
     </select>
-    <button type="submit">Go</button>
+    <noscript>
+        <button type="submit">Go</button>
+    </noscript>
 </form>
+</div>
 
 <form method="post" class="choose-tickets-form">
 {{form.hidden_tag()}}
