@@ -20,26 +20,25 @@ class TicketType(db.Model):
     notice = db.Column(db.String)
     capacity = db.Column(db.Integer, nullable=False)
     limit = db.Column(db.Integer, nullable=False)
-    cost_pence = db.Column(db.Integer, nullable=False)
     tickets = db.relationship("Ticket", backref="type")
 
-    def __init__(self, name, capacity, limit, cost, notice=None):
+    def __init__(self, name, capacity, limit, notice=None):
         self.name = name
         self.capacity = capacity
         self.limit = limit
-        self.cost = cost
         self.notice = notice
 
     def __repr__(self):
         return "<TicketType: %s>" % (self.name)
 
+    def get_price(self, currency):
+        for price in self.prices:
+            if price.currency == currency:
+                return price.value
+
     @property
     def cost(self):
-        return Decimal(self.cost_pence) / 100
-
-    @cost.setter
-    def cost(self, val):
-        self.cost_pence = int(val * 100)
+        return self.get_price('GBP')
 
     def user_limit(self, user):
         if user.is_authenticated():
@@ -60,6 +59,28 @@ class TicketType(db.Model):
     FullPrepay = ConstTicketType('Full Camp Ticket (prepay)')
     Full = ConstTicketType('Full Camp Ticket')
     Under18 = ConstTicketType('Under-18 Camp Ticket')
+
+
+class TicketPrice(db.Model):
+    __tablename__ = 'ticket_price'
+    id = db.Column(db.Integer, primary_key=True)
+    ticket_type_id = db.Column(db.Integer, db.ForeignKey('ticket_type.id'), nullable=False)
+    currency = db.Column(db.String, nullable=False)
+    ticket_type = db.relationship(TicketType, backref="prices")
+    price_value = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, ticket_type, currency, price):
+        self.ticket_type = ticket_type
+        self.currency = currency
+        self.value = price
+
+    @property
+    def value(self):
+        return Decimal(self.price_value) / 100
+
+    @value.setter
+    def value(self, val):
+        self.price_value = int(val * 100)
 
 
 class Ticket(db.Model):
@@ -88,7 +109,7 @@ class Ticket(db.Model):
         if self.paid:
             return False
         return self.expires < datetime.utcnow()
-    
+
     def __repr__(self):
         return "<Ticket: %s, type: %s, paid? %s, expired: %s>" % (self.id, self.type_id, self.paid, str(self.expired()))
 

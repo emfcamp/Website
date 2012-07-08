@@ -17,7 +17,7 @@ import re, os, random
 from datetime import datetime
 
 from main import app, mail
-from models import User, TicketType, Ticket
+from models import User, TicketType, Ticket, TicketPrice
 from models.payment import Payment, BankPayment, GoCardlessPayment, safechars
 
 #app = Flask(__name__)
@@ -266,21 +266,29 @@ class CreateTickets(Command):
         #
         # if you change these, change ticket_forms in views/tickets.py as well.
         #
-        types = [
-            TicketType('Prepay Camp Ticket', 250, 4, 30.00),
-            TicketType('Full Camp Ticket (prepay)', 250, 4, 95.00 - 30.00 - 5.00),
-            TicketType('Full Camp Ticket', 499 - 20, 4, 95.00),
+
+        data = [
+            #(name, capacity, max per person, GBP, EUR, Description)
+            ('Prepay Camp Ticket', 250, 4, 30.00, 40.00, None),
+            ('Full Camp Ticket (prepay)', 250, 4, 60.00, 75.00, None),
+            ('Full Camp Ticket', 499 - 20, 4, 95.00, 120.00, None),
             # XXX the number of Camp Tickets (of the different types) shoudnt excede 499 - 20 ( issue #85, sort of. )
-#            TicketType('Full Camp Ticket (latecomer)', 499 - 20, 4, 100.00),
-            TicketType('Under-18 Camp Ticket', 30, 4, 45.00,
+#            ('Full Camp Ticket (latecomer)', 499 - 20, 4, 100.00),
+            ('Under-18 Camp Ticket', 30, 4, 47.50, 60.00,
                 "All children must be accompanied by an adult."),
-#            TicketType('Parking Ticket', 25, 4, 10.00,
+#            ('Parking Ticket', 25, 4, 10.00,
 #                "We're trying to keep cars on-site to a minimum. "
 #                "Please use the nearby carpark or find someone to share with if possible."),
-            TicketType('Campervan Ticket', 5, 1, 30.00,
+            ('Campervan Ticket', 5, 1, 30.00, 40.00,
                 "Space for campervans is extremely limited. We'll email you for details of your requirements."),
-            #TicketType('Donation'),
+            #('Donation'),
         ]
+
+        types = []
+        for row in data:
+            tt = TicketType(*row[0:3], notice=row[5])
+            tt.prices = [TicketPrice(tt, 'GBP', row[3]), TicketPrice(tt, 'EUR', row[4])]
+            types.append(tt)
 
         for tt in types:
             try:
