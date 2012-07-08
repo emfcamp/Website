@@ -27,13 +27,13 @@ ensure it's included in full.
 
 Bank:           Barclays
 Payee:          Electromagnetic Field Ltd
-{% if user_currency == 'GBP' %}
+{% if user_currency == 'GBP' -%}
 Sort code:      20-71-64
 Account number: 73590526
-{% elif user_currency == 'EUR' %}
+{% elif user_currency == 'EUR' -%}
 SWIFT:          BARCGB22
 IBAN:           GB21 BARC 2071 6472 9544 33
-{% endif %}
+{% endif -%}
 Amount:         {{ format_price(payment.amount) }}
 Reference:      {{ format_bankref(payment.bankref) }}
 
