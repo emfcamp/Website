@@ -22,7 +22,11 @@ CURRENCY_SYMBOLS = {'GBP': u'£', 'EUR': u'€'}
 class ContextFormatter(logging.Formatter):
     def format(self, record):
         ctx = _request_ctx_stack.top
-        record.user = ctx.user.email if ctx else 'None'
+        record.user = 'None'
+        if ctx:
+            if hasattr(ctx.user, 'email'):
+                record.user = ctx.user.email
+#        record.user = ctx.user.email if ctx else 'None'
         return logging.Formatter.format(self, record)
 
 fmt = ContextFormatter('%(levelname)s:%(user)s:%(name)s:%(message)s')
