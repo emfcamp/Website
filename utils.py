@@ -274,7 +274,7 @@ class CreateTickets(Command):
             ('Full Camp Ticket', 499 - 20, 4, 95.00, 120.00, None),
             # XXX the number of Camp Tickets (of the different types) shoudnt excede 499 - 20 ( issue #85, sort of. )
 #            ('Full Camp Ticket (latecomer)', 499 - 20, 4, 100.00),
-            ('Under-18 Camp Ticket', 30, 4, 47.50, 60.00,
+            ('Under-14 Camp Ticket', 30, 4, 47.50, 60.00,
                 "All children must be accompanied by an adult."),
 #            ('Parking Ticket', 25, 4, 10.00,
 #                "We're trying to keep cars on-site to a minimum. "

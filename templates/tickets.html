@@ -20,7 +20,7 @@
 ">
 <td>{{ t.type.name }}</td>
 <td>
-	{% if t.type.name=="Under-18 Camp Ticket" or t.type.name=="Campervan Ticket" %}
+	{% if t.type.name=="Under-14 Camp Ticket" or t.type.name=="Campervan Ticket" %}
 		N/A
 	{% else %}
 		{% for attrib in t.attribs if attrib.name=="volunteer" %}

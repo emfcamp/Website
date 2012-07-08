@@ -146,7 +146,7 @@ def tickets():
 ticket_forms = {
     'Full Camp Ticket': 'full',
     'Full Camp Ticket (prepay)': 'full',
-    'Under-18 Camp Ticket': 'kids',
+    'Under-14 Camp Ticket': 'kids',
 #    'Parking Ticket': 'carpark',
     'Campervan Ticket': 'campervan'
 }
