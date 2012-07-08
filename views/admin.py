@@ -61,11 +61,11 @@ def manual_reconcile():
             if form.validate():
                 if form.yes.data == True:
                     payment = BankPayment.query.get(int(form.payment.data))
-                    app.logger.info("%s Manually reconciled payment %d (%s)", current_user.name, payment.id, payment.bankref)
+                    app.logger.info("%s Manually reconciled payment %s (%s)", current_user.name, payment.id, payment.bankref)
                     for t in payment.tickets:
                         t.paid = True
                         db.session.add(t)
-                        app.logger.info("ticket %d (%s, for %s) paid", t.id, t.type.name, payment.user.name)
+                        app.logger.info("ticket %s (%s, for %s) paid", t.id, t.type.name, payment.user.name)
                     payment.state = "paid"
                     db.session.add(payment)
                     db.session.commit()
@@ -80,7 +80,7 @@ def manual_reconcile():
                              )
                     mail.send(msg)
                 
-                    flash("Payment ID %d now marked as paid" % (payment.id))
+                    flash("Payment ID %s now marked as paid" % (payment.id))
                     return redirect(url_for('manual_reconcile'))
                 elif form.no.data == True:
                     return redirect(url_for('manual_reconcile'))
@@ -121,7 +121,7 @@ def make_admin():
                         id = int(field.name.split("_")[0])
                         user = User.query.get(id)
                         if user.admin != field.data:
-                            app.logger.info("user %s (%d) admin: %s -> %s" % (user.name, user.id, user.admin, field.data))
+                            app.logger.info("user %s (%s) admin: %s -> %s", user.name, user.id, user.admin, field.data)
                             user.admin = field.data
                             db.session.add(user)
                             db.session.commit()
@@ -172,11 +172,11 @@ def expire_reset():
             if form.validate():
                 if form.yes.data == True:
                     payment = Payment.query.get(int(form.payment.data))
-                    app.logger.info("%s Manually reset expirey for tickets for payment %d", current_user.name, payment.id)
+                    app.logger.info("%s Manually reset expiry for tickets for payment %s", current_user.name, payment.id)
                     for t in payment.tickets:
                         t.expires = datetime.utcnow() + timedelta(10)
                         db.session.add(t)
-                        app.logger.info("ticket %d (%s, for %s) expirey reset", t.id, t.type.name, payment.user.name)
+                        app.logger.info("ticket %s (%s, for %s) expirey reset", t.id, t.type.name, payment.user.name)
                     db.session.commit()
 
                     return redirect(url_for('expire_reset'))

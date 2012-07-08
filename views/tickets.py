@@ -112,8 +112,6 @@ def tickets():
         tickets = []
         payments = []
 
-    print [t.type.name for t in tickets]
-
     #
     # go through existing payments
     # and make cancel and/or pay buttons as needed.
@@ -164,11 +162,9 @@ def add_payment_and_tickets(paymenttype):
     if not (basket and total):
         return None
 
-    app.logger.info('''Creating tickets
-      Basket: %s
-      Payment: %s for total %s
-      Ticket info: %s
-    ''', basket, paymenttype.name, total, infodata)
+    app.logger.info('Creating tickets for basket %s', basket)
+    app.logger.info('Payment: %s for total %s', paymenttype.name, total)
+    app.logger.info('Ticket info: %s', infodata)
 
     if infodata:
         infotypes = set(ticket_forms.values())
@@ -243,7 +239,7 @@ class GoCardlessTryAgainForm(Form):
         try:
             payment = current_user.payments.filter_by(id=int(field.data), provider="gocardless", state="new").one()
         except Exception, e:
-            app.logger.error("GCTryAgainForm got bogus payment: %s" % (form.data))
+            app.logger.error("GCTryAgainForm got bogus payment: %s", form.data)
 
         if not payment:
             raise ValidationError('Sorry, that dosn\'t look like a valid payment')
@@ -260,7 +256,7 @@ class BankTransferCancelForm(Form):
         try:
             payment = current_user.payments.filter_by(id=int(field.data), provider="banktransfer", state="inprogress").one()
         except Exception, e:
-            app.logger.error("BankTransferCancelForm got bogus payment: %s" % (form.data))
+            app.logger.error("BankTransferCancelForm got bogus payment: %s", form.data)
 
         if not payment:
             raise ValidationError('Sorry, that dosn\'t look like a valid payment')
@@ -287,12 +283,12 @@ def gocardless_tryagain():
     try:
         payment = current_user.payments.filter_by(id=payment_id, user=current_user, state='new').one()
     except Exception, e:
-        app.logger.error("gocardless-tryagain: exception: %s for payment %d", e, payment.id)
+        app.logger.error("gocardless-tryagain: exception: %s for payment %s", e, payment.id)
         flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
         return redirect(url_for('tickets'))
 
     if form.pay.data == True:
-        app.logger.info("User %d trying to pay again with GoCardless payment %d", current_user.id, payment.id)
+        app.logger.info("User %s trying to pay again with GoCardless payment %s", current_user.id, payment.id)
         bill_url = payment.bill_url("Electromagnetic Field Ticket Deposit")
         return redirect(bill_url)
 
@@ -301,11 +297,11 @@ def gocardless_tryagain():
         return render_template('gocardless-discard-yesno.html', payment=payment, form=ynform)
 
     if form.yes.data == True:
-        app.logger.info("User %d canceled new GoCardless payment %d", current_user.id, payment.id)
+        app.logger.info("User %s canceled new GoCardless payment %s", current_user.id, payment.id)
         for t in payment.tickets.all():
             db.session.delete(t)
-            app.logger.info("Canceling Gocardless ticket %d (u:%d p:%d)", t.id, current_user.id, payment.id)
-        app.logger.info("Canceling Gocardless payment %d (u:%d)", payment.id, current_user.id)
+            app.logger.info("Canceling Gocardless ticket %s (u:%s p:%s)", t.id, current_user.id, payment.id)
+        app.logger.info("Canceling Gocardless payment %s (u:%s)", payment.id, current_user.id)
         payment.state = "canceled"
         db.session.add(payment)
         db.session.commit()
@@ -345,12 +341,12 @@ def gocardless_complete():
         # We need to make sure of a 5 working days grace
         # for gocardless payments, so push the ticket expiry forwards
         t.expires = datetime.utcnow() + timedelta(10)
-        app.logger.info("ticket %d (payment %d): expiry reset.", t.id, payment.id)
+        app.logger.info("ticket %s (payment %s): expiry reset.", t.id, payment.id)
         db.session.add(t)
 
     db.session.commit()
 
-    app.logger.info("Payment %d completed OK", payment.id)
+    app.logger.info("Payment %s completed OK", payment.id)
 
     # should we send the resource_uri in the bill email?
     msg = Message("Your EMF ticket purchase", \
@@ -369,13 +365,13 @@ def gocardless_waiting():
     try:
         payment_id = int(request.args.get('payment'))
     except (TypeError, ValueError):
-        app.logger.error("gocardless-waiting called without a payment or with a bogus payment: %s" % (str(request.args)))
+        app.logger.error("gocardless-waiting called without a payment or with a bogus payment: %s", request.args)
         return redirect(url_for('main'))
 
     try: 
         payment = current_user.payments.filter_by(id=payment_id).one()
     except NoResultFound:
-        app.logger.error("someone tried to get payment %d, not logged in?" % (payment_id))
+        app.logger.error("someone tried to get payment %s, not logged in?", payment_id)
         flash("No matching payment found for you, sorry!")
         return redirect(url_for('main'))
 
@@ -399,7 +395,7 @@ def gocardless_cancel():
 
     payment.state = 'canceled'
     for ticket in payment.tickets:
-        app.logger.info("gocardless-cancel: userid %s, payment_id %s canceled ticket %d",
+        app.logger.info("gocardless-cancel: userid %s, payment_id %s canceled ticket %s",
             current_user.id, payment.id, ticket.id)
         ticket.payment = None
 
@@ -659,9 +655,9 @@ def transfer_waiting():
         payment = current_user.payments.filter_by(id=payment_id, user=current_user).one()
     except NoResultFound:
         if current_user:
-            app.logger.error("Attempt to get an inaccessible payment (%d) by user %d (%s)" % (payment_id, current_user.id, current_user.name))
+            app.logger.error("Attempt to get an inaccessible payment (%s) by user %s", payment_id, current_user.id)
         else:
-            app.logger.error("Attempt to get an inaccessible payment (%d)" % (payment_id))
+            app.logger.error("Attempt to get an inaccessible payment (%s)", payment_id)
         return redirect(url_for('tickets'))
     return render_template('transfer-waiting.html', payment=payment, days=app.config.get('EXPIRY_DAYS'))
 
@@ -686,7 +682,7 @@ def transfer_cancel():
     try:
         payment = current_user.payments.filter_by(id=payment_id, user=current_user, state='inprogress', provider='banktransfer').one()
     except Exception, e:
-        app.logger.error("transfer_cancel: exception: %s for payment %d", e, payment.id)
+        app.logger.error("transfer_cancel: exception: %s for payment %s", e, payment.id)
         flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
         return redirect(url_for('tickets'))
 
@@ -697,11 +693,11 @@ def transfer_cancel():
     if form.no.data == True:
         return redirect(url_for('tickets'))
     elif form.yes.data == True:
-        app.logger.info("User %d canceled inprogress bank transfer %d", current_user.id, payment.id)
+        app.logger.info("User %s canceled inprogress bank transfer %s", current_user.id, payment.id)
         for t in payment.tickets.all():
             db.session.delete(t)
-            app.logger.info("Canceling bank transfer ticket %d (u:%d p:%d)", t.id, current_user.id, payment.id)
-        app.logger.info("Canceling bank transfer payment %d (u:%d)", payment.id, current_user.id)
+            app.logger.info("Canceling bank transfer ticket %s (u:%s p:%s)", t.id, current_user.id, payment.id)
+        app.logger.info("Canceling bank transfer payment %s (u:%s)", payment.id, current_user.id)
         payment.state = "canceled"
         db.session.add(payment)
         db.session.commit()
