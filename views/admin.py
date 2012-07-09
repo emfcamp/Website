@@ -15,8 +15,9 @@ from flaskext.wtf import \
     SubmitField, BooleanField, IntegerField, HiddenInput, \
     DecimalField
 
-from sqlalchemy import or_
+from sqlalchemy import and_, or_, func, case
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import join
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import text
 
@@ -27,16 +28,41 @@ from datetime import datetime, timedelta
 
 @app.route("/stats")
 def stats():
-    ret = {}
-    conn = db.session.connection()
-    result = conn.execute(text("""SELECT count(t.id) as tickets from payment p, ticket t, ticket_type tt where
-                                p.state='inprogress' and t.payment_id = p.id and t.expires >= date('now') and
-                                t.type_id = tt.id and tt.name = 'Prepay Camp Ticket'""")).fetchall()
-    ret["prepays"] = result[0][0]
-    ret["users"] = User.query.count()
-    ret["prepays_bought"] = Ticket.query.filter(Ticket.type_id == TicketType.Prepay.id).filter(Ticket.paid == True).count()
+    AdmissionTypes = [TicketType.FullPrepay, TicketType.Full, TicketType.Under14]
+    admission_type_ids = [tt.id for tt in AdmissionTypes]
 
-    return ' '.join('%s:%s' % i for i in ret.items())
+    outstanding = Ticket.query.join(Payment).filter(
+        Payment.state == 'inprogress',
+        Ticket.expires >= func.now(),
+        Ticket.paid == False,
+    )
+    paid = Ticket.query.filter(Ticket.paid == True)
+
+    stats = {
+        'prepays': outstanding.filter(Ticket.type == TicketType.Prepay).count(),
+        'prepays_bought_all': paid.filter(Ticket.type == TicketType.Prepay).count(),
+        'full': outstanding.filter(Ticket.type_id.in_(admission_type_ids)).count(),
+        'full_bought': paid.filter(Ticket.type_id.in_(admission_type_ids)).count(),
+        'users': User.query.count(),
+    }
+
+    # A pending or purchased full ticket cancels out a purchased prepay
+    user_prepays = db.session.query(
+        Ticket.user_id,
+        func.sum(case([
+            (and_(Ticket.type == TicketType.Prepay, Ticket.paid == True), 1),
+            (Ticket.type == TicketType.Full, -1),
+            (Ticket.type == TicketType.FullPrepay, -1),
+        ], else_=0)).label('outstanding')
+    ).group_by(Ticket.user_id).subquery()
+
+    prepays = db.session.query(func.sum(case([
+        (user_prepays.c.outstanding < 0, 0)
+    ], else_=user_prepays.c.outstanding))).one()
+
+    stats['prepays_bought'] = prepays[0]
+
+    return ' '.join('%s:%s' % i for i in stats.items())
 
 @app.route("/admin")
 @login_required
