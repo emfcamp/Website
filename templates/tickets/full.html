@@ -1,40 +1,45 @@
 {{ ticket.form.hidden_tag() }}
-
 {% set volunteer = ticket.form.volunteer %}
 {% set accessible = ticket.form.accessible %}
 
-<div class="control-group no-margin{%if volunteer.errors or accessible.errors%} error{%endif%}">
-  <label class="control-label">{{ volunteer.label }}</label>
-  <div class="controls">
-    <label class="checkbox">
-        {{ volunteer()|safe }}
-        Interested in volunteering?
-    </label>
-    {% for error in volunteer.errors %}
-        <span class="help-inline">{{ error }}</span>
-    {% endfor %}
-    <p>EMF is a volunteer-run effort. We'd really appreciate it if you contributed as 
-        little as three hours of your time at the camp to keep things running smoothly.</p>
-  </div>
-
-  <label class="control-label">{{ accessible.label }}</label>
-  <div class="controls">
-    <label class="checkbox">
-        {{ accessible()|safe }}
-        If you have accessibility requirements please tick here.
-    </label>
-    {% for error in accessible.errors %}
-        <span class="help-inline">{{ error }}</span>
-    {% endfor %}
-    <p>We want to be sure we have all our attendees needs covered, so we will contact you for more information.</p>
-  </div>
-
+<!-- <div class="control-group no-margin{%if volunteer.errors or accessible.errors%} error{%endif%}"> -->
+<div class="{%if volunteer.errors or accessible.errors%} error{%endif%}">
+	<div class="controls">
+		<label class="checkbox">
+			{{ volunteer()|safe }}	
+			I'm interested in volunteering <a data-toggle="collapse" href="#v-blurb{{ i }}">[?]</a>
+		</label>
+		{% for error in volunteer.errors %}
+		<span class="help-inline">{{ error }}</span>
+		{% endfor %}
+		<!-- use 'i' to mangle the namespace, if it's the first ticket display the blurb -->
+		<div id="v-blurb{{ i }}" class="collapse {% if i==1 %}in{% endif %}">
+			<blockquote><p>EMF is a volunteer-run effort. We'd really appreciate it if you contributed as little as three hours of your time at the camp to keep things running smoothly. </p>
+			<p>If you have a current Extended Criminal Records Bureau check (ECRB) or a valid First Aid certificate we're particularly keen to hear from you. If you don't, don't worry we still need people run the bar, man the info desk, and many other jobs.</p></blockquote>
+		</div>
+	</div>
+	<div class="controls">
+		<label class="checkbox">
+			{{ accessible()|safe }}
+			I have accessibility requirements <a data-toggle="collapse" href="#a-blurb{{ i }}">[?]</a>
+		</label>
+		{% for error in accessible.errors %}
+		<span class="help-inline">{{ error }}</span>
+		{% endfor %}
+		<div id="a-blurb{{ i }}" class="collapse {% if i==1 %}in{% endif %}">
+			<blockquote><p>We want to make EMF as inclusive as possible, if you have any specific requirements please let us know and we'll be in touch for more information.</p></blockquote>
+		</div>
+	</div>
 </div>
 
-{#
-(1) How do you anticipate travelling to EMFcamp?
+<!-- Script that hides the explanatory help text -->
+<script type="text/javascript">$("collapse").collapse()</script>
 
-public transport - train, coach, other
-private transport - car, motorcycle, bicycle, van, truck, bus, motorhome, other
-would you be interested in car sharing?
-#}
+
+{#
+	(1) How do you anticipate travelling to EMFcamp?
+
+	public transport - train, coach, other
+	private transport - car, motorcycle, bicycle, van, truck, bus, motorhome, other
+	would you be interested in car sharing?
+	#}
