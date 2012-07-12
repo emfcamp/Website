@@ -22,11 +22,11 @@ or drop us an <a href="mailto:{{ config.get('TICKETS_EMAIL')[1] }}">email</a>.</
 
 {% for ticket in basket %}
 {% if ticket.form.template %}
-
     <div class="well">
 
-    <h4>{{ ticket.type.name }}</h4>
-    {% include ticket.form.template %}
+    <h4>{{ ticket.type.name }} </h4>
+	{% set i=loop.index %} {# number each ticket so the expandable boxes work #}
+    {% include ticket.form.template with context %}
 
     </div>
 
