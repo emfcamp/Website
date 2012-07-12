@@ -103,7 +103,7 @@ class Reconcile(Command):
         payment = self.find_payment(ref)
       except Exception, e:
         if not self.quiet:
-          print "Exception matching ref %s paid %d: %s" % (repr(ref), amount, e)
+          print "Exception matching ref %s paid %.2f: %s" % (repr(ref), amount, e)
         self.badrefs.append([repr(ref), amount])
       else:
         user = payment.user
@@ -120,7 +120,7 @@ class Reconcile(Command):
         total = Decimal(0)
         for t in unpaid:
           if t.paid == False:
-            total += Decimal(str(t.type.cost_pence / 100.0))
+            total += Decimal(str(t.type.cost))
           elif not self.quiet:
             if payment.id not in self.overpays:
               print "attempt to pay for paid ticket: %d, user: %s, payment id: %d" % (t.id, payment.user.name, payment.id)
