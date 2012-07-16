@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<checkout-shopping-cart xmlns="http://checkout.google.com/schema/2">
+  <shopping-cart>
+    <items>
+      {% for type, tickets in basket|groupby('type') -%}
+      <item>
+        <item-name>{{ type.name }}</item-name>
+        <item-description></item-description>
+        <unit-price currency="GBP">{{ type.cost }}</unit-price>
+        <quantity>{{ tickets|length }}</quantity>
+      </item>
+      {% endfor -%}
+      <item>
+        <item-name>Credit Card Premium</item-name>
+        <item-description>5% transaction charge</item-description>
+        <unit-price currency="GBP">{{ total / 100 * 5 }}</unit-price>
+        <quantity>1</quantity>
+      </item>
+    </items>
+    <cart-expiration>
+      <good-until-date>{{ isoformat_utc(basket[0].expires) }}</good-until-date>
+    </cart-expiration>
+    <merchant-private-data>
+      <payment-id>{{ payment.id }}</payment-id>
+    </merchant-private-data>
+  </shopping-cart>
+  <checkout-flow-support>
+    <merchant-checkout-flow-support>
+      <edit-cart-url>{{ url_for('tickets_choose', _external=True) }}</edit-cart-url>
+      <continue-shopping-url>{{ url_for('tickets', _external=True) }}</continue-shopping-url>
+    </merchant-checkout-flow-support>
+  </checkout-flow-support>
+</checkout-shopping-cart>

@@ -61,6 +61,11 @@ class GoogleCheckoutPayment(Payment):
     name = 'Google Checkout payment'
 
     __mapper_args__ = {'polymorphic_identity': 'googlecheckout'}
+    finance_state = db.Column(db.String)
+    fulfill_state = db.Column(db.String)
+    order_no = db.Column(db.String)
+    buyer_id = db.Column(db.String)
+    email_allowed = db.Column(db.Boolean, default=False)
 
 
 class PaymentChange(db.Model):

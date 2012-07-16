@@ -28,7 +28,9 @@ from wtforms.fields.core import UnboundField
 import simplejson, os, re
 from datetime import datetime, timedelta
 import requests
-from xml.etree import cElementTree as etree
+from lxml import objectify
+from base64 import b64encode
+from decimal import Decimal, ROUND_UP
 
 class IntegerSelectField(SelectField):
     def __init__(self, *args, **kwargs):
@@ -78,6 +80,33 @@ class CampervanTicketForm(TicketForm):
 class DonationTicketForm(TicketForm):
     template= 'tickets/donation.html'
     amount = DecimalField('Donation amount')
+
+class GoogleCheckout(object):
+    schema = '{http://checkout.google.com/schema/2}'
+    api = 'api/checkout/v2'
+    mime = 'application/xml; charset=UTF-8'
+    base = app.config.get('GOOGLE_CHECKOUT_BASE')
+    merchant_id = app.config.get('GOOGLE_MERCHANT_ID')
+    merchant_key = app.config.get('GOOGLE_MERCHANT_KEY')
+
+    def api_url(self, feature):
+        return '/'.join([
+            self.base, self.api, feature,
+            'Merchant', self.merchant_id,
+        ])
+
+    def api_request(self, feature, data):
+      auth = self.merchant_id, self.merchant_key
+      headers = {'Content-Type': self.mime, 'Accept': self.mime}
+      url = self.api_url(feature)
+      return requests.post(url, auth=auth, headers=headers, data=data)
+
+    def check_auth(self, request):
+      auth = self.merchant_id, self.merchant_key
+      header = 'Basic %s' % b64encode(':'.join(auth))
+      return request.headers['Authorization'] == header
+
+GCO = GoogleCheckout()
 
 
 class UpdateTicketForm(Form):
@@ -165,6 +194,10 @@ def add_payment_and_tickets(paymenttype):
     if not (basket and total):
         return None
 
+    if paymenttype == GoogleCheckoutPayment:
+        total *= Decimal('1.05')
+        total = total.quantize(Decimal('0.01'), rounding=ROUND_UP)
+
     app.logger.info('Creating tickets for basket %s', basket)
     app.logger.info('Payment: %s for total %s', paymenttype.name, total)
     app.logger.info('Ticket info: %s', infodata)
@@ -213,7 +246,7 @@ def pay_choose():
     if not basket:
         redirect(url_for('tickets'))
 
-    return render_template('payment-choose.html', basket=basket, total=total)
+    return render_template('payment-choose.html', basket=basket, total=total, GCO=GCO)
 
 @app.route("/pay/gocardless-start", methods=['POST'])
 @login_required
@@ -711,32 +744,158 @@ def transfer_cancel():
 @app.route("/pay/google-checkout-start", methods=['POST'])
 @login_required
 def googlecheckout_start():
-  url = ''.join((
-    app.config.get('GOOGLE_CHECKOUT_BASE'),
-    '/api/checkout/v2/merchantCheckout/Merchant/',
-    app.config.get('GOOGLE_MERCHANT_ID'),
-  ))
+    basket, total = get_basket()
+    payment = add_payment_and_tickets(GoogleCheckoutPayment)
+    if not payment:
+        flash('Your session information has been lost. Please try ordering again.')
+        return redirect(url_for('tickets'))
 
-  basket, total = get_basket()
-  payment = add_payment_and_tickets(GoogleCheckoutPayment)
-  if not payment:
-      flash('Your session information has been lost. Please try ordering again.')
-      return redirect(url_for('tickets'))
+    app.logger.info("User %s created GoCardless payment %s", current_user.id, payment.id)
 
-  app.logger.info("User %s created GoCardless payment %s", current_user.id, 1234)
+    data = render_template('google-checkout/cart.xml', basket=basket, total=total, payment=payment, GCO=GCO)
+    data = data.encode('utf-8')
+    app.logger.debug('Sending to checkout: %s', data)
 
-  data = render_template('google-checkout/cart.xml', basket=basket, total=total, payment=payment)
-  app.logger.debug('Sending to checkout: %s', data)
+    r = GCO.api_request('merchantCheckout', data)
+    data = r.text.encode('utf-8')
+    app.logger.debug('Response from checkout: %s', data)
 
-  mime = 'application/xml;charset=UTF-8'
-  headers = {'Content-Type': mime, 'Accept': mime}
-  auth = app.config.get('GOOGLE_MERCHANT_ID'), app.config.get('GOOGLE_MERCHANT_KEY')
-  r = requests.post(url, auth=auth, headers=headers, data=data)
+    root = objectify.fromstring(data)
+    if root.tag == GCO.schema + 'error':
+        app.logger.error('Error creating order: %s', root['error-message'])
+        flash('An error was returned from Google Checkout.')
+        return redirect(url_for('tickets'))
 
-  app.logger.debug('Response from checkout: %s', r.text)
+    if root.tag != GCO.schema + 'checkout-redirect':
+        flash('An invalid response was received from Google Checkout.')
+        return redirect(url_for('tickets'))
 
-  root = etree.fromstring(r.text)
-  url = root.find('{http://checkout.google.com/schema/2}redirect-url')
-  app.logger.info('Redirect URL: %s', url.text)
+    url = root['redirect-url']
+    app.logger.info('Redirect URL: %s', url)
 
-  return redirect(url.text)
+    return redirect(str(url))
+
+
+@app.route("/pay/google-checkout-notify", methods=['POST'])
+def googlecheckout_notify():
+    if not GCO.check_auth(request):
+        return ('', 401)
+
+    if request.headers['content-type'] != GCO.mime:
+        return ('', 400)
+
+    app.logger.debug('Google Checkout notification: %s', request.data)
+    root = objectify.fromstring(request.data)
+
+    serial = root.get('serial-number')
+    app.logger.info('Google checkout notification: %s', serial)
+
+    if root.tag == GCO.schema + 'new-order-notification':
+        payment_id = root['shopping-cart']['merchant-private-data']['payment-id']
+        adjustment_total = root['order-adjustment']['adjustment-total']
+        order_total = root['order-total']
+
+        total = Decimal(str(order_total))
+        total_currency = order_total.get('currency')
+        adjustment = Decimal(str(adjustment_total))
+        app.logger.info('Payment is for %s %s (adjustment %s)', total, total_currency, adjustment)
+
+        p = GoogleCheckoutPayment.query.filter_by(id=int(payment_id)).one()
+        if total != p.amount or total_currency != 'GBP':
+            app.logger.error('Invalid payment amount (expected %s)', p.amount)
+            raise Exception('Invalid payment amount')
+
+        order_no = root['google-order-number']
+        buyer_id = root['buyer-id']
+        finance_state = root['financial-order-state']
+        fulfill_state = root['fulfillment-order-state']
+        email_allowed = root['buyer-marketing-preferences']['email-allowed']
+
+        p.finance_state = str(finance_state)
+        p.fulfill_state = str(fulfill_state)
+        p.order_no = str(order_no)
+        p.buyer_id = str(buyer_id)
+        p.email_allowed = email_allowed.text == 'true'
+        db.session.commit()
+
+        app.logger.info('Identified order %s from %s as %s, finance %s fulfill %s',
+            p.order_no, p.buyer_id, p.id, finance_state, fulfill_state)
+
+    elif root.tag == GCO.schema + 'order-state-change-notification':
+        order_no = root['google-order-number']
+        p = GoogleCheckoutPayment.query.filter_by(order_no=str(order_no)).one()
+
+        finance_state = root['new-financial-order-state']
+        fulfill_state = root['new-fulfillment-order-state']
+        app.logger.info('State change for payment %s: finance %s->%s fulfill %s->%s',
+            p.id, p.finance_state, finance_state, p.fulfill_state, fulfill_state)
+
+        if p.state == 'new' and finance_state == 'CHARGEABLE' and p.finance_state == 'REVIEWING':
+            # We've got the necessary info from Google, so let's actually charge the user
+
+            p.state = 'charging'
+            db.session.commit()
+
+            data = render_template('google-checkout/charge-and-ship-order.xml', order_no=p.order_no)
+            data = data.encode('utf-8')
+            app.logger.debug('Sending to checkout: %s', data)
+
+            r = GCO.api_request('request', data)
+            data = r.text.encode('utf-8')
+            app.logger.debug('Response from checkout: %s', data)
+
+            root = objectify.fromstring(data)
+            if root.tag == GCO.schema + 'error':
+                app.logger.error('Error charging order: %s', root['error-message'])
+                return ('', 500)
+
+            elif root.tag != GCO.schema + 'request-received':
+                app.logger.error('Unexpected response charging order: %s', root.tag)
+                return ('', 500)
+
+            # root will contain a charge-amount-notification, but we'll get called back, too
+
+            p.state = 'charged'
+
+        elif finance_state == 'CHARGED' and p.finance_state != 'CHARGED':
+            # TODO: archive?
+            p.state = 'paid'
+            for ticket in p.tickets:
+                ticket.paid = True
+
+        p.finance_state = str(finance_state)
+        p.fulfill_state = str(fulfill_state)
+        db.session.commit()
+
+    elif root.tag == GCO.schema + 'risk-information-notification':
+        order_no = root['google-order-number']
+        p = GoogleCheckoutPayment.query.filter_by(order_no=str(order_no)).one()
+
+        risk = root['risk-information']
+        ip = risk['ip-address']
+        avs = risk['avs-response']
+        cvn = risk['cvn-response']
+        age = risk['buyer-account-age']
+        # See https://developers.google.com/checkout/developer/Google_Checkout_XML_API_Notification_API for meanings
+        app.logger.info('Risk info for payment %s: avs %s cvn %s ip %s age %s',
+            p.id, avs, cvn, ip, age)
+
+    elif root.tag == GCO.schema + 'charge-amount-notification':
+        order_no = root['google-order-number']
+        p = GoogleCheckoutPayment.query.filter_by(order_no=str(order_no)).one()
+
+        amount = root['latest-charge-amount']
+        pct = root['latest-charge-fee']['percentage']
+        flat = root['latest-charge-fee']['flat']
+
+        app.logger.error('Payment %s charged: %s %s (fee %s%% + %s %s)',
+            p.id, amount, amount.get('currency'), pct, flat, flat.get('currency'))
+
+        if p.state == 'new':
+            # It was charged automatically or manually through the console (so don't ship it)
+            p.state = 'charged'
+            db.session.commit()
+
+
+    return render_template('google-checkout/notification-acknowledgment.xml', serial=serial)
+

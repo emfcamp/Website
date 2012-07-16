@@ -37,7 +37,7 @@ Guarantee</a>.</p>
 <p>Google Checkout will accept Visa or Mastercard, but we add 5% to cover the transaction fees.</p>
 <form method="post" action="{{ url_for('googlecheckout_start') }}">
     <input type="image" name="Google Checkout" alt="Fast checkout through Google"
-      src="{{ config.get('GOOGLE_CHECKOUT_BASE') }}/buttons/checkout.gif?w=180&h=46&style=trans&variant=text&loc=en_GB&merchant_id={{ config.get('GOOGLE_MERCHANT_ID') }}"
+      src="{{ GCO.base }}/buttons/checkout.gif?w=180&h=46&style=trans&variant=text&loc=en_GB&merchant_id={{ GCO.merchant_id }}"
       class="google-checkout-button" height="46" width="180">
 </form>
 
