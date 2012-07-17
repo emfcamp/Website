@@ -272,16 +272,24 @@ class CreateTickets(Command):
             ('Prepay Camp Ticket', 250, 4, 30.00, 40.00, None),
             ('Full Camp Ticket (prepay)', 250, 4, 60.00, 75.00, None),
             ('Full Camp Ticket', 499 - 20, 4, 95.00, 120.00, None),
-            # XXX the number of Camp Tickets (of the different types) shoudnt excede 499 - 20 ( issue #85, sort of. )
-#            ('Full Camp Ticket (latecomer)', 499 - 20, 4, 100.00),
             ('Under-14 Camp Ticket', 30, 4, 47.50, 60.00,
                 "All children must be accompanied by an adult."),
-#            ('Parking Ticket', 25, 4, 10.00,
-#                "We're trying to keep cars on-site to a minimum. "
-#                "Please use the nearby carpark or find someone to share with if possible."),
             ('Campervan Ticket', 5, 1, 30.00, 40.00,
                 "Space for campervans is extremely limited. We'll email you for details of your requirements."),
+            ('Friday Ticket', 30, 4, 40.00, 50.00,
+                "This ticket does not include camping"),
+            ('Saturday Ticket', 30, 4, 40.00, 50.00,
+                "This ticket does not include camping"),
+            ('Sunday Ticket', 30, 4, 40.00, 50.00,
+                "This ticket does not include camping"),
+            ('Full Camp Ticket (UCL)', 25, 4, 85.00, 110.00,
+                "Discounted ticket"),
+            # Until we have ticket codes, please add at the end so we can rebuild the table
+            #('Full Camp Ticket (latecomer)', 499 - 20, 4, 100.00),
             #('Donation'),
+            #('Parking Ticket', 25, 4, 10.00,
+            #    "We're trying to keep cars on-site to a minimum. "
+            #    "Please use the nearby carpark or find someone to share with if possible."),
         ]
 
         types = []
