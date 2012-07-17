@@ -199,7 +199,7 @@ def add_payment_and_tickets(paymenttype):
         total = total.quantize(Decimal('0.01'), rounding=ROUND_UP)
 
     app.logger.info('Creating tickets for basket %s', basket)
-    app.logger.info('Payment: %s for total %s', paymenttype.name, total)
+    app.logger.info('Payment: %s for total %s GBP', paymenttype.name, total)
     app.logger.info('Ticket info: %s', infodata)
 
     if infodata:
@@ -251,6 +251,8 @@ def pay_choose():
 @app.route("/pay/gocardless-start", methods=['POST'])
 @login_required
 def gocardless_start():
+    session['currency'] = 'GBP'
+
     payment = add_payment_and_tickets(GoCardlessPayment)
     if not payment:
         flash('Your session information has been lost. Please try ordering again.')
@@ -744,6 +746,8 @@ def transfer_cancel():
 @app.route("/pay/google-checkout-start", methods=['POST'])
 @login_required
 def googlecheckout_start():
+    session['currency'] = 'GBP'
+
     basket, total = get_basket()
     payment = add_payment_and_tickets(GoogleCheckoutPayment)
     if not payment:
