@@ -284,6 +284,8 @@ class CreateTickets(Command):
                 "This ticket does not include camping"),
             ('Full Camp Ticket (UCL)', 25, 4, 85.00, 110.00,
                 "Discounted ticket"),
+            ('Full Camp Ticket (Hackspace)', 25, 4, 90.00, 115.00,
+                "Discounted ticket"),
             # Until we have ticket codes, please add at the end so we can rebuild the table
             #('Full Camp Ticket (latecomer)', 499 - 20, 4, 100.00),
             #('Donation'),
