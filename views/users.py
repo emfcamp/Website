@@ -35,7 +35,7 @@ class LoginForm(Form):
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated():
-        return redirect(url_for('tickets'))
+        return redirect(request.args.get('next', url_for('tickets')))
     form = LoginForm(request.form, next=request.args.get('next'))
     if request.method == 'POST' and form.validate():
         user = User.query.filter_by(email=form.email.data).first()
