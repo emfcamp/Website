@@ -395,15 +395,15 @@ class SendPrepayReminder(Command):
                             ticket_type.name = 'Full Camp Ticket (prepay)')""")
 
         for row in db.engine.execute(query):
-            user = User.query.filter_by(id=row[0])
+            user = User.query.filter_by(id=row[0]).one()
             msg = Message("Electromagnetic Field Ticket Update",
                           sender=app.config.get('TICKETS_EMAIL'),
                           recipients=[user.email]
                          )
             msg.body = render_template("tickets-prepay-reminder.txt",
-                            user = user)
-            #mail.send(msg)
-            print msg
+                            user = user, tickets=user.tickets)
+            print "Sending to", user.email, "..."
+            mail.send(msg)
 
 if __name__ == "__main__":
   manager.add_command('reconcile', Reconcile())
