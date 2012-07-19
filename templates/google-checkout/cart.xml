@@ -2,7 +2,7 @@
 <checkout-shopping-cart xmlns="http://checkout.google.com/schema/2">
   <shopping-cart>
     <items>
-      {% for type, tickets in basket|groupby('type') -%}
+      {% for type, tickets in payment.tickets|groupby('type') -%}
       <item>
         <item-name>{{ type.name }}</item-name>
         <item-description></item-description>
@@ -18,7 +18,7 @@
       </item>
     </items>
     <cart-expiration>
-      <good-until-date>{{ isoformat_utc(basket[0].expires) }}</good-until-date>
+      <good-until-date>{{ isoformat_utc(payment.tickets[0].expires) }}</good-until-date>
     </cart-expiration>
     <merchant-private-data>
       <payment-id>{{ payment.id }}</payment-id>

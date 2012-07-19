@@ -32,7 +32,7 @@ Guarantee</a>.</p>
     <p><button type="submit" name="banktransfer" class="btn btn-large btn-primary">Pay by bank transfer</button></p>
 </form>
 
-{% if user_currency == 'GBP' %}
+{% if user_currency == 'GBP' and config.get('GOOGLE_CHECKOUT') %}
 <h3>Paying with Google Checkout</h3>
 
 <p>Google Checkout will accept Visa or Mastercard, but we add 5% to cover the transaction fees.</p>

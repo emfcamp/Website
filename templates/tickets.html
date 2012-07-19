@@ -73,21 +73,31 @@
 <td>
 {% if p.state == "new" and p.provider == "gocardless" %}
     <form method=post action="{{ url_for('gocardless_tryagain') }}" class="shrink">
-    {{ tryagain_forms[p.id].hidden_tag() }}
-    {{ tryagain_forms[p.id].pay(class_='btn btn-success') }}
+    {{ retrycancel_forms[p.id].hidden_tag() }}
+    {{ retrycancel_forms[p.id].pay(class_='btn btn-success') }}
+    </form>
+{% elif p.state == "new" and p.provider == "googlecheckout" %}
+    <form method=post action="{{ url_for('googlecheckout_tryagain') }}" class="shrink">
+    {{ retrycancel_forms[p.id].hidden_tag() }}
+    {{ retrycancel_forms[p.id].pay(class_='btn btn-success') }}
     </form>
 {% endif %}
 </td>
 <td>
 {% if p.state == "new" and p.provider == "gocardless" %}
     <form method=post action="{{ url_for('gocardless_tryagain') }}" class="shrink">
-    {{ tryagain_forms[p.id].hidden_tag() }}
-    {{ tryagain_forms[p.id].cancel(class_='btn btn-warning') }}
+    {{ retrycancel_forms[p.id].hidden_tag() }}
+    {{ retrycancel_forms[p.id].cancel(class_='btn btn-warning') }}
+    </form>
+{% elif p.state == "new" and p.provider == "googlecheckout" %}
+    <form method=post action="{{ url_for('googlecheckout_tryagain') }}" class="shrink">
+    {{ retrycancel_forms[p.id].hidden_tag() }}
+    {{ retrycancel_forms[p.id].cancel(class_='btn btn-warning') }}
     </form>
 {% elif p.state == "inprogress" and p.provider == "banktransfer" %}
     <form method=post action="{{ url_for('transfer_cancel') }}" class="shrink">
-    {{ btcancel_forms[p.id].hidden_tag() }}
-    {{ btcancel_forms[p.id].cancel(class_='btn btn-warning') }}
+    {{ retrycancel_forms[p.id].hidden_tag() }}
+    {{ retrycancel_forms[p.id].cancel(class_='btn btn-warning') }}
     </form>
 {% endif %}
 </td>

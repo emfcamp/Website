@@ -155,13 +155,14 @@ def tickets():
     # case it does turn up for some reason and we need to do something with
     # it.
     #
-    gc_try_again_forms = {}
-    btcancel_forms = {}
+    retrycancel_forms = {}
     for p in payments:
         if p.provider == "gocardless" and p.state == "new":
-            gc_try_again_forms[p.id] = GoCardlessTryAgainForm(formdata=None, payment=p.id, yesno='no')
+            retrycancel_forms[p.id] = GoCardlessTryAgainForm(formdata=None, payment=p.id, yesno='no')
+        if p.provider == "googlecheckout" and p.state == "new":
+            retrycancel_forms[p.id] = GoogleCheckoutTryAgainForm(formdata=None, payment=p.id, yesno='no')
         elif p.provider == "banktransfer" and p.state == "inprogress":
-            btcancel_forms[p.id] = BankTransferCancelForm(formdata=None, payment=p.id, yesno='no')
+            retrycancel_forms[p.id] = BankTransferCancelForm(formdata=None, payment=p.id, yesno='no')
         # the rest are inprogress or complete gocardless payments
         # or complete banktransfers,
         # or canceled payments of either provider.
@@ -171,8 +172,7 @@ def tickets():
         tickets=tickets,
         payments=payments,
         price=TicketType.Prepay.cost,
-        tryagain_forms=gc_try_again_forms,
-        btcancel_forms=btcancel_forms
+        retrycancel_forms=retrycancel_forms,
     )
 
 ticket_forms = {
@@ -744,6 +744,7 @@ def transfer_cancel():
     return redirect(url_for('tickets'))
 
 @app.route("/pay/google-checkout-start", methods=['POST'])
+@feature_flag('GOOGLE_CHECKOUT')
 @login_required
 def googlecheckout_start():
     session['currency'] = 'GBP'
@@ -755,8 +756,10 @@ def googlecheckout_start():
         return redirect(url_for('tickets'))
 
     app.logger.info("User %s created GoCardless payment %s", current_user.id, payment.id)
+    return googlecheckout_send(payment, total)
 
-    data = render_template('google-checkout/cart.xml', basket=basket, total=total, payment=payment, GCO=GCO)
+def googlecheckout_send(payment, total):
+    data = render_template('google-checkout/cart.xml', payment=payment, total=total, GCO=GCO)
     data = data.encode('utf-8')
     app.logger.debug('Sending to checkout: %s', data)
 
@@ -780,7 +783,73 @@ def googlecheckout_start():
     return redirect(str(url))
 
 
+class GoogleCheckoutTryAgainForm(Form):
+    payment = HiddenField('payment_id', [Required()])
+    pay = SubmitField('Pay')
+    cancel = SubmitField('Cancel')
+    yesno = HiddenField('yesno', [Required()], default="no")
+    yes = SubmitField('Yes')
+    no = SubmitField('No')
+
+    def validate_payment(form, field):
+        payment = None
+        try:
+            payment = current_user.payments.filter_by(id=int(field.data), provider="googlecheckout", state="new").one()
+        except Exception, e:
+            app.logger.error("GCOTryAgainForm got bogus payment: %s", form.data)
+
+        if not payment:
+            raise ValidationError('Sorry, that dosn\'t look like a valid payment')
+
+
+@app.route("/pay/google-checkout-tryagain", methods=['POST'])
+@feature_flag('GOOGLE_CHECKOUT')
+@login_required
+def googlecheckout_tryagain():
+    form = GoogleCheckoutTryAgainForm(request.form)
+    payment_id = None
+
+    if request.method == 'POST' and form.validate():
+        if form.payment:
+            payment_id = int(form.payment.data)
+
+    if not payment_id:
+        flash('Unable to validate form. The web team have been notified.')
+        app.logger.error("google-checkout-tryagain: unable to get payment_id")
+        return redirect(url_for('tickets'))
+
+    try:
+        payment = current_user.payments.filter_by(id=payment_id, user=current_user, state='new').one()
+    except Exception, e:
+        app.logger.error("google-checkout-tryagain: exception: %s for payment %s", e, payment.id)
+        flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
+        return redirect(url_for('tickets'))
+
+    if form.pay.data == True:
+        app.logger.info("User %s trying to pay again with Google Checkout payment %s", current_user.id, payment.id)
+        total = sum(t.type.get_price(session.get('currency', 'GBP')) for t in payment.tickets)
+        return googlecheckout_send(payment, total)
+
+    if form.cancel.data == True:
+        ynform = GoogleCheckoutTryAgainForm(payment=payment.id, yesno="yes", formdata=None)
+        return render_template('google-checkout-discard-yesno.html', payment=payment, form=ynform)
+
+    if form.yes.data == True:
+        app.logger.info("User %s canceled new Google Checkout payment %s", current_user.id, payment.id)
+        for t in payment.tickets.all():
+            db.session.delete(t)
+            app.logger.info("Cancelling Google Checkout ticket %s (u:%s p:%s)", t.id, current_user.id, payment.id)
+        app.logger.info("Cancelling Google Checkout payment %s (u:%s)", payment.id, current_user.id)
+        payment.state = "canceled"
+        db.session.add(payment)
+        db.session.commit()
+        flash("Your Google Checkout payment has been cancelled")
+
+    return redirect(url_for('tickets'))
+
+
 @app.route("/pay/google-checkout-notify", methods=['POST'])
+@feature_flag('GOOGLE_CHECKOUT')
 def googlecheckout_notify():
     if not GCO.check_auth(request):
         return ('', 401)
@@ -820,6 +889,7 @@ def googlecheckout_notify():
         p.order_no = str(order_no)
         p.buyer_id = str(buyer_id)
         p.email_allowed = email_allowed.text == 'true'
+        p.state = 'reviewing'
         db.session.commit()
 
         app.logger.info('Identified order %s from %s as %s, finance %s fulfill %s',
@@ -834,7 +904,7 @@ def googlecheckout_notify():
         app.logger.info('State change for payment %s: finance %s->%s fulfill %s->%s',
             p.id, p.finance_state, finance_state, p.fulfill_state, fulfill_state)
 
-        if p.state == 'new' and finance_state == 'CHARGEABLE' and p.finance_state == 'REVIEWING':
+        if p.state in ('new', 'reviewing') and finance_state == 'CHARGEABLE' and p.finance_state == 'REVIEWING':
             # We've got the necessary info from Google, so let's actually charge the user
 
             p.state = 'charging'
@@ -862,7 +932,6 @@ def googlecheckout_notify():
             p.state = 'charged'
 
         elif finance_state == 'CHARGED' and p.finance_state != 'CHARGED':
-            # TODO: archive?
             p.state = 'paid'
             for ticket in p.tickets:
                 ticket.paid = True
@@ -895,11 +964,12 @@ def googlecheckout_notify():
         app.logger.error('Payment %s charged: %s %s (fee %s%% + %s %s)',
             p.id, amount, amount.get('currency'), pct, flat, flat.get('currency'))
 
-        if p.state == 'new':
+        if p.state in ('new', 'reviewing'):
             # It was charged automatically or manually through the console (so don't ship it)
             p.state = 'charged'
             db.session.commit()
 
 
     return render_template('google-checkout/notification-acknowledgment.xml', serial=serial)
+
 
