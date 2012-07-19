@@ -1,0 +1,26 @@
+Hi {{ user.name }},
+
+A while back you paid a deposit for {% if payment.tickets.all() | count > 1 %}{{ payment.tickets.all() |count }} tickets{% else %}a ticket{% endif %}
+to Electromagnetic Field 2012. We're now able to accept taking the remaining payment.
+
+The remainder you need to pay is £60 per ticket, for a total ticket price of £90.
+To pay, please visit our site and buy a "Full Camp Ticket (prepay)" for each ticket you need:
+
+{{ url_for('login', next='/tickets/choose') }}
+
+We'd really appreciate it if you paid promptly, as it'll help us with our cashflow. If you haven't paid by
+Friday August 10th, we will reallocate your ticket.
+
+We've still got quite a few tickets to sell, so please spread the word,
+and follow us on Twitter and Facebook:
+
+https://twitter.com/emfcamp
+https://www.facebook.com/emfcamp
+
+In the unlikely event you want to cancel your prepaid ticket, please email tickets@emfcamp.org and we'll refund you, minus a £10 admin fee.
+
+See you soon at EMF 2012! 
+
+Love,
+
+All the EMF team

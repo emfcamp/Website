@@ -10,15 +10,15 @@ from flask import Flask, render_template
 from flask.ext.sqlalchemy import SQLAlchemy
 from flaskext.mail import Mail, Message
 from sqlalchemy.orm.exc import NoResultFound
-from jinja2 import Environment, FileSystemLoader
 
 from decimal import Decimal
 import re, os, random
 from datetime import datetime
 
-from main import app, mail
+from main import app
 from models import User, TicketType, Ticket, TicketPrice
 from models.payment import Payment, BankPayment, GoCardlessPayment, safechars
+from sqlalchemy import text
 
 #app = Flask(__name__)
 #app.config.from_envvar('SETTINGS_FILE')
@@ -382,6 +382,29 @@ class MakeAdmin(Command):
 
     print 'userid 1 (%s) is now an admin' % (user.name)
 
+class SendPrepayReminder(Command):
+
+    def run(self):
+        query = text("""select id from "user" where exists 
+                        (select 1 from ticket, ticket_type where ticket.user_id = "user".id 
+                            and ticket.type_id = ticket_type.id and 
+                            ticket_type.name = 'Prepay Camp Ticket' and ticket.paid = true)
+                    and not exists 
+                        (select 1 from ticket, ticket_type where ticket.user_id = "user".id
+                            and ticket.type_id = ticket_type.id and
+                            ticket_type.name = 'Full Camp Ticket (prepay)')""")
+
+        for row in db.engine.execute(query):
+            user = User.query.filter_by(id=row[0])
+            msg = Message("Electromagnetic Field Ticket Update",
+                          sender=app.config.get('TICKETS_EMAIL'),
+                          recipients=[user.email]
+                         )
+            msg.body = render_template("tickets-prepay-reminder.txt",
+                            user = user)
+            #mail.send(msg)
+            print msg
+
 if __name__ == "__main__":
   manager.add_command('reconcile', Reconcile())
   manager.add_command('warnexpire', WarnExpire())
@@ -389,4 +412,5 @@ if __name__ == "__main__":
   manager.add_command('testemails', TestEmails())
   manager.add_command('createtickets', CreateTickets())
   manager.add_command('makeadmin', MakeAdmin())
+  manager.add_command('prepayreminder', SendPrepayReminder())
   manager.run()
