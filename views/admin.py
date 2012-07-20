@@ -217,8 +217,9 @@ def expire_reset():
         unpaid = Ticket.query.filter(Ticket.paid == False).order_by(Ticket.expires).all()
         payments = {}
         for t in unpaid:
-            if t.payment.id not in payments:
-                payments[t.payment.id] = t.payment
+            if t.payment != None:
+                if t.payment.id not in payments:
+                    payments[t.payment.id] = t.payment
         resetforms = {}
         opayments = []
         for p in payments:
