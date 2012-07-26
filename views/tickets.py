@@ -678,8 +678,9 @@ def build_info_form(formdata):
 
     else:
         # FIXME: plays badly with multiple tabs
+        form_tickets = [t for t in basket if get_form_name(t.type)]
         entries = sum([f.entries for f in forms], [])
-        for ticket, subform in zip(basket, entries):
+        for ticket, subform in zip(form_tickets, entries):
             ticket.form = subform
 
     return form, basket, total

@@ -21,7 +21,7 @@ or drop us an <a href="mailto:{{ config.get('TICKETS_EMAIL')[1] }}">email</a>.</
 <div>
 
 {% for ticket in basket %}
-{% if ticket.form.template %}
+{% if ticket.form %}
     <div class="well">
 
     <h4>{{ ticket.type.name }} </h4>
