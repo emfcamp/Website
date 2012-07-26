@@ -3,7 +3,7 @@ from views import feature_flag
 from models.user import User
 from models.payment import Payment, \
     BankPayment, GoCardlessPayment, GoogleCheckoutPayment
-from models.ticket import TicketType, Ticket, TicketAttrib
+from models.ticket import TicketType, Ticket, TicketAttrib, TicketToken
 
 from flask import \
     render_template, redirect, request, flash, \
@@ -80,6 +80,14 @@ class CampervanTicketForm(TicketForm):
 class DonationTicketForm(TicketForm):
     template= 'tickets/donation.html'
     amount = DecimalField('Donation amount')
+
+ticket_forms = ['full', 'kids']
+
+def get_form_name(ticket_type):
+    code, _, subcode = ticket_type.code.partition('_')
+    if code not in ticket_forms:
+        return None
+    return code
 
 class GoogleCheckout(object):
     schema = '{http://checkout.google.com/schema/2}'
@@ -175,13 +183,6 @@ def tickets():
         retrycancel_forms=retrycancel_forms,
     )
 
-ticket_forms = {
-    'Full Camp Ticket': 'full',
-    'Full Camp Ticket (prepay)': 'full',
-    'Under-14 Camp Ticket': 'kids',
-#    'Parking Ticket': 'carpark',
-#    'Campervan Ticket': 'campervan'
-}
 
 def add_payment_and_tickets(paymenttype):
     """
@@ -203,8 +204,7 @@ def add_payment_and_tickets(paymenttype):
     app.logger.info('Ticket info: %s', infodata)
 
     if infodata:
-        infotypes = set(ticket_forms.values())
-        infolists = sum([infodata[i] for i in infotypes], [])
+        infolists = sum([infodata[i] for i in ticket_forms], [])
         for info in infolists:
             ticket_id = int(info.pop('ticket_id'))
             ticket = basket[ticket_id]
@@ -216,10 +216,10 @@ def add_payment_and_tickets(paymenttype):
     current_user.payments.append(payment)
 
     for ticket in basket:
-        if ticket.type.name in ticket_forms:
-            if not ticket.attribs:
-                # Camper van tickets don't have attribs
-                app.logger.info('Ticket %s has no attribs', ticket)
+        name = get_form_name(ticket.type)
+        if name and not ticket.attribs:
+            app.logger.error('Ticket %s has no attribs', ticket)
+            return None
 
         current_user.tickets.append(ticket)
         ticket.payment = payment
@@ -539,6 +539,17 @@ def transfer_start():
 
     return redirect(url_for('transfer_waiting', payment=payment.id))
 
+@app.route("/tickets/token")
+def tickets_token():
+    token = request.args.get('token')
+    if TicketToken.types(token):
+        session['ticket_token'] = token
+    else:
+        flash('Ticket token was invalid')
+
+    return redirect(url_for('tickets_choose'))
+
+
 class TicketAmountForm(Form):
     amount = IntegerSelectField('Number of tickets', [Optional()])
     type_id = HiddenIntegerField('Ticket Type', [Required()])
@@ -553,23 +564,24 @@ def tickets_choose():
     form = TicketAmountsForm(request.form)
 
     if not form.types:
-        for tt in TicketType.query.all():
+        for tt in TicketType.query.order_by(TicketType.order).all():
             form.types.append_entry()
             form.types[-1].type_id.data = tt.id
 
     if current_user.is_authenticated():
         prepays = current_user.tickets. \
-            filter_by(type=TicketType.Prepay, paid=True). \
+            filter_by(type=TicketType.bycode('prepay'), paid=True). \
             count()
-        fulls = current_user.tickets.filter(or_(
-            Ticket.type == TicketType.Full,
-            Ticket.type == TicketType.FullPrepay,
-        )).count()
+        fulls = current_user.tickets.join(TicketType). \
+            filter(TicketType.code.like('full%')). \
+            count()
         if fulls >= prepays:
             prepays = 0
     else:
         prepays = 0
         fulls = 0
+
+    token_tts = TicketToken.types(session.get('ticket_token'))
 
     for f in form.types:
         tt = TicketType.query.get(f.type_id.data)
@@ -578,13 +590,18 @@ def tickets_choose():
         limit = tt.user_limit(current_user)
 
         values = range(limit + 1)
-        if tt.id == TicketType.Prepay.id:
+        if tt.code == 'prepay':
             values = []
-        elif tt.id == TicketType.FullPrepay.id:
+        elif tt.code == 'full_prepay':
             assert prepays <= limit
             values = [prepays]
-        elif tt.id == TicketType.Full.id and not (prepays or fulls):
-            values = range(1, limit + 1)
+        elif tt.code in ['full_ucl', 'full_hs'] and tt not in token_tts:
+            values = []
+        elif tt.code == 'full':
+            if not (prepays or fulls):
+                values = range(1, limit + 1)
+            if token_tts:
+                values = []
 
         f.amount.values = values
         f._any = any(values)
@@ -596,6 +613,12 @@ def tickets_choose():
         for f in form.types:
             if f.amount.data:
                 tt = f._type
+
+                if tt.token_only and tt not in token_tts:
+                    if f.amount.data:
+                        flash('Ticket type %s is not currently available')
+                    return redirect(url_for('tickets_choose'))
+
                 app.logger.info('Adding %s %s tickets to basket', f.amount.data, tt.name)
                 basket += [tt.id] * f.amount.data
 
@@ -635,17 +658,16 @@ def build_info_form(formdata):
 
     form = TicketInfoForm(formdata)
 
-    forms = [getattr(form, f) for f in ticket_forms.values()]
+    forms = [getattr(form, f) for f in ticket_forms]
 
     if not any(forms):
 
         for i, ticket in enumerate(basket):
-            try:
-                f = ticket_forms[ticket.type.name]
-            except KeyError:
+            name = get_form_name(ticket.type)
+            if not name:
                 continue
 
-            f = getattr(form, f)
+            f = getattr(form, name)
             f.append_entry()
             ticket.form = f[-1]
             ticket.form.ticket_id.data = i

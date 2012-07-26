@@ -13,17 +13,12 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from decimal import Decimal
 import re, os, random
-from datetime import datetime
+from datetime import datetime, timedelta
 
-from main import app
-from models import User, TicketType, Ticket, TicketPrice
+from main import app, mail, db
+from models import User, TicketType, Ticket, TicketPrice, TicketToken
 from models.payment import Payment, BankPayment, GoCardlessPayment, safechars
 from sqlalchemy import text
-
-#app = Flask(__name__)
-#app.config.from_envvar('SETTINGS_FILE')
-db = SQLAlchemy(app)
-mail = Mail(app)
 
 manager = Manager(app)
 
@@ -139,12 +134,10 @@ class Reconcile(Command):
           self.paid += 1
           self.tickets_paid += len(unpaid)
           if self.doit:
-            # not sure why we have to do this, or why the object is already in a session.
-            s = db.object_session(unpaid[0])
             for t in unpaid:
               t.paid = True
             payment.state = "paid"
-            s.commit()
+            db.session.commit()
             # send email
             # tickets-paid-email-banktransfer.txt
             msg = Message("Electromagnetic Field ticket purchase update", \
@@ -198,12 +191,7 @@ class TestEmails(Command):
     except NoResultFound:
       user = User('test@example.com', 'testuser')
       user.set_password('happycamper')
-      #
-      # hack around sqlalchamey session stuff
-      #
-      foo = TicketType.query.filter(TicketType.name == 'Prepay Camp Ticket').one()
-      sess = db.object_session(foo)
-      sess.add(user)
+      db.session.add(user)
 
       amounts = {
         "prepayfull" : TicketType.query.filter(TicketType.name == 'Full Camp Ticket (prepay)').one().cost,
@@ -247,7 +235,7 @@ class TestEmails(Command):
 
           user.payments.append(payment)
 
-      sess.commit()
+      db.session.commit()
 
     self.user = user
     print user.name
@@ -268,23 +256,23 @@ class CreateTickets(Command):
         #
 
         data = [
-            #(name, capacity, max per person, GBP, EUR, Description)
-            ('Prepay Camp Ticket', 250, 4, 30.00, 40.00, None),
-            ('Full Camp Ticket (prepay)', 250, 4, 60.00, 75.00, None),
-            ('Full Camp Ticket', 499 - 20, 4, 95.00, 120.00, None),
-            ('Under-14 Camp Ticket', 30, 4, 47.50, 60.00,
+            #(order, code, name, capacity, max per person, GBP, EUR, Description)
+            (0, 'prepay', 'Prepay Camp Ticket', 250, 4, 30.00, 40.00, None),
+            (1, 'full_prepay', 'Full Camp Ticket (prepay)', 250, 4, 60.00, 75.00, None),
+            (2, 'full', 'Full Camp Ticket', 499 - 20, 4, 95.00, 120.00, None),
+            (10, 'kids', 'Under-14 Camp Ticket', 30, 4, 47.50, 60.00,
                 "All children must be accompanied by an adult."),
-            ('Campervan Ticket', 5, 1, 30.00, 40.00,
+            (30, 'campervan', 'Campervan Ticket', 5, 1, 30.00, 40.00,
                 "Space for campervans is extremely limited. We'll email you for details of your requirements."),
-            ('Friday Ticket', 30, 4, 40.00, 50.00,
+            (20, 'day_friday', 'Friday Ticket', 30, 4, 40.00, 50.00,
                 "This ticket does not include camping"),
-            ('Saturday Ticket', 30, 4, 40.00, 50.00,
+            (21, 'day_saturday', 'Saturday Ticket', 30, 4, 40.00, 50.00,
                 "This ticket does not include camping"),
-            ('Sunday Ticket', 30, 4, 40.00, 50.00,
+            (22, 'day_sunday', 'Sunday Ticket', 30, 4, 40.00, 50.00,
                 "This ticket does not include camping"),
-            ('Full Camp Ticket (UCL)', 25, 4, 85.00, 110.00,
+            (3, 'full_ucl', 'Full Camp Ticket (UCL)', 25, 4, 85.00, 110.00,
                 "Discounted ticket"),
-            ('Full Camp Ticket (Hackspace)', 25, 4, 90.00, 115.00,
+            (4, 'full_hs', 'Full Camp Ticket (Hackspace)', 25, 4, 90.00, 115.00,
                 "Discounted ticket"),
             # Until we have ticket codes, please add at the end so we can rebuild the table
             #('Full Camp Ticket (latecomer)', 499 - 20, 4, 100.00),
@@ -296,8 +284,8 @@ class CreateTickets(Command):
 
         types = []
         for row in data:
-            tt = TicketType(*row[0:3], notice=row[5])
-            tt.prices = [TicketPrice(tt, 'GBP', row[3]), TicketPrice(tt, 'EUR', row[4])]
+            tt = TicketType(*row[1:5], order=row[0], notice=row[7])
+            tt.prices = [TicketPrice(tt, 'GBP', row[5]), TicketPrice(tt, 'EUR', row[6])]
             types.append(tt)
 
         for tt in types:
@@ -308,6 +296,26 @@ class CreateTickets(Command):
                 db.session.commit()
 
         print 'Tickets created'
+
+class CreateTicketTokens(Command):
+    def run(self):
+        tokens = [
+          ('full_ucl', 'ucl1'),
+          ('full_ucl', 'ucl2'),
+          ('full_ucl', 'ucl3'),
+          ('full_hs', 'hs1'),
+          ('full_hs', 'hs2'),
+          ('full_hs', 'hs3'),
+        ]
+
+        for code, token in tokens:
+            tt = TicketToken(
+                TicketType.bycode(code), token,
+                datetime.utcnow() + timedelta(days=7))
+            db.session.add(tt)
+            db.session.commit()
+
+        print 'Tokens added'
 
 class WarnExpire(Command):
   """
@@ -413,4 +421,5 @@ if __name__ == "__main__":
   manager.add_command('createtickets', CreateTickets())
   manager.add_command('makeadmin', MakeAdmin())
   manager.add_command('prepayreminder', SendPrepayReminder())
+  manager.add_command('addtokens', CreateTicketTokens())
   manager.run()

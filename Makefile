@@ -29,6 +29,9 @@ run:
 tickets:
 	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py createtickets
 
+tokens:
+	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py addtokens
+
 update:
 	./env/bin/python ./env/bin/pip install -r ./requirements.txt
 

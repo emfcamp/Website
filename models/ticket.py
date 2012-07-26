@@ -16,16 +16,21 @@ class ConstTicketType(object):
 class TicketType(db.Model):
     __tablename__ = 'ticket_type'
     id = db.Column(db.Integer, primary_key=True)
+    code = db.Column(db.String, index=True, unique=True, nullable=False)
     name = db.Column(db.String, nullable=False)
     notice = db.Column(db.String)
     capacity = db.Column(db.Integer, nullable=False)
     limit = db.Column(db.Integer, nullable=False)
+    order = db.Column(db.Integer, nullable=False)
     tickets = db.relationship("Ticket", backref="type", cascade_backrefs=False)
+    tokens = db.relationship("TicketToken", backref="type", cascade_backrefs=False)
 
-    def __init__(self, name, capacity, limit, notice=None):
+    def __init__(self, code, name, capacity, limit, order, notice=None):
+        self.code = code
         self.name = name
         self.capacity = capacity
         self.limit = limit
+        self.order = order
         self.notice = notice
 
     def __repr__(self):
@@ -55,11 +60,15 @@ class TicketType(db.Model):
 
         return min(self.limit - user_count, self.capacity - count)
 
+    @classmethod
+    def bycode(cls, code):
+        return TicketType.query.filter_by(code=code).one()
+
+    # Deprecated
     Prepay = ConstTicketType('Prepay Camp Ticket')
     FullPrepay = ConstTicketType('Full Camp Ticket (prepay)')
     Full = ConstTicketType('Full Camp Ticket')
     Under14 = ConstTicketType('Under-14 Camp Ticket')
-
 
 class TicketPrice(db.Model):
     __tablename__ = 'ticket_price'
@@ -82,6 +91,27 @@ class TicketPrice(db.Model):
     def value(self, val):
         self.price_value = int(val * 100)
 
+
+class TicketToken(db.Model):
+    __tablename__ = 'ticket_token'
+    id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String, nullable=False, index=True)
+    expires = db.Column(db.DateTime, nullable=False)
+    type_id = db.Column(db.Integer, db.ForeignKey('ticket_type.id'), nullable=False)
+
+    def __init__(self, ticket_type, token, expires):
+        self.type = ticket_type
+        self.token = token
+        self.expires = expires
+
+    @classmethod
+    def types(cls, token):
+        if not token:
+            return []
+        tokens = TicketToken.query.filter_by(token=token). \
+            filter(TicketToken.expires > datetime.utcnow())
+        ticket_types = [t.type for t in tokens.all()]
+        return ticket_types
 
 class Ticket(db.Model):
     __tablename__ = 'ticket'
