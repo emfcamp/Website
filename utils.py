@@ -170,6 +170,14 @@ class TestEmails(Command):
           print
           print "*" * 42
           print
+      elif p.provider == "googlecheckout":
+        for t in ("tickets-paid-email-googlecheckout.txt",):
+          print "template:", t
+          print
+          self.test(t, p)
+          print
+          print "*" * 42
+          print
       elif p.provider == "banktransfer":
         for t in ("tickets-purchased-email-banktransfer.txt", "tickets-paid-email-banktransfer.txt"):
           print "template:", t
@@ -211,7 +219,7 @@ class TestEmails(Command):
       
       # full, prepay
       for full, pp in ((1,0), (0,1), (3,0), (0,3), (2,1)):
-        for pt in (BankPayment, GoCardlessPayment):
+        for pt in (BankPayment, GoCardlessPayment, GoogleCheckoutPayment):
           total = (full * amounts['full']) + (pp * amounts['prepayfull'])
           payment = pt(total)
           payment.state = "inprogress"

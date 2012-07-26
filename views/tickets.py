@@ -914,6 +914,8 @@ def googlecheckout_notify():
         p.state = 'reviewing'
         db.session.commit()
 
+        # Don't spam the user - they've already received an email from Google, and clearance should be soon
+
         app.logger.info('Identified order %s from %s as %s, finance %s fulfill %s',
             p.order_no, p.buyer_id, p.id, finance_state, fulfill_state)
 
@@ -957,6 +959,14 @@ def googlecheckout_notify():
             p.state = 'paid'
             for ticket in p.tickets:
                 ticket.paid = True
+
+            msg = Message("Your EMF ticket payment has been confirmed",
+                sender=app.config.get('TICKETS_EMAIL'),
+                recipients=[p.user.email]
+            )
+            msg.body = render_template("tickets-paid-email-googlecheckout.txt",
+                user = p.user, payment=p)
+            mail.send(msg)
 
         p.finance_state = str(finance_state)
         p.fulfill_state = str(fulfill_state)
