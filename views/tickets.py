@@ -582,6 +582,7 @@ def tickets_choose():
         fulls = 0
 
     token_tts = TicketToken.types(session.get('ticket_token'))
+    token_only = ['full_ucl', 'full_hs']
 
     for f in form.types:
         tt = TicketType.query.get(f.type_id.data)
@@ -595,7 +596,7 @@ def tickets_choose():
         elif tt.code == 'full_prepay':
             assert prepays <= limit
             values = [prepays]
-        elif tt.code in ['full_ucl', 'full_hs'] and tt not in token_tts:
+        elif tt.code in token_only and tt not in token_tts:
             values = []
         elif tt.code == 'full':
             if not (prepays or fulls):
@@ -614,7 +615,7 @@ def tickets_choose():
             if f.amount.data:
                 tt = f._type
 
-                if tt.token_only and tt not in token_tts:
+                if tt.code in token_only and tt not in token_tts:
                     if f.amount.data:
                         flash('Ticket type %s is not currently available')
                     return redirect(url_for('tickets_choose'))
