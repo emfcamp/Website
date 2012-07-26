@@ -37,7 +37,7 @@ IBAN:           GB21 BARC 2071 6472 9544 33
 Amount:         {{ format_price(payment.amount) }}
 Reference:      {{ format_bankref(payment.bankref) }}
 
-(Don't worry if the payee name doesn't quite fit.)
+(Don't worry about the hyphen, or if the payee name doesn't quite fit.)
 
 Company Details
 ---------------

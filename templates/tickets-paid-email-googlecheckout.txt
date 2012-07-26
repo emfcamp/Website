@@ -1,0 +1,11 @@
+Hi, {{ user.name }},
+
+We've just received confirmation from Google Checkout that your payment for
+{{ format_price(payment.amount) }} has cleared.  We've marked the order as
+delivered, but don't watch the post: we will check your details on the day.
+
+See you soon at Electromagnetic Field 2012!
+
+Love,
+
+All the EMF team
