@@ -46,6 +46,7 @@
 <script type="text/javascript" src="{{ ASSET_URL }}"></script>
 {% endassets -%}
 {% block foot -%}{% endblock -%}
+{% if request.headers.get('dnt') != '1' %}
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
@@ -59,5 +60,6 @@
   })();
 
 </script>
+{% endif %}
 </body>
 </html>
