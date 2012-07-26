@@ -539,9 +539,8 @@ def transfer_start():
 
     return redirect(url_for('transfer_waiting', payment=payment.id))
 
-@app.route("/tickets/token")
-def tickets_token():
-    token = request.args.get('token')
+@app.route("/tickets/token/<token>")
+def tickets_token(token):
     if TicketToken.types(token):
         session['ticket_token'] = token
     else:
