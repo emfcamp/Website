@@ -94,6 +94,9 @@ class Reconcile(Command):
 
   def reconcile(self, ref, amount, t):
     if t.type.lower() == 'other' or t.type.upper() == "DIRECTDEP":
+      if str(ref).startswith("GOCARDLESS LTD "):
+        # ignore gocardless payments
+        return
       try:
         payment = self.find_payment(ref)
       except Exception, e:
@@ -118,7 +121,7 @@ class Reconcile(Command):
             total += Decimal(str(t.type.cost))
           elif not self.quiet:
             if payment.id not in self.overpays:
-              print "attempt to pay for paid ticket: %d, user: %s, payment id: %d, paid: %.2f" % (t.id, payment.user.name, payment.id, amount)
+              print "attempt to pay for paid ticket: %d, user: %s, payment id: %d, paid: %.2f, ref %s" % (t.id, payment.user.name, payment.id, amount, ref)
 
         if total == 0:
           # nothing owed, so an old payment...
