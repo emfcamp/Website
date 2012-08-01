@@ -174,8 +174,9 @@ def check_capacity(session, flush_context, instances):
         return
 
     # Any admission tickets count towards the full ticket total
-    AdmissionTypes = [TicketType.FullPrepay, TicketType.Full, TicketType.Under14]
-    people = sum((totals.get(type, 0) for type in AdmissionTypes))
+    fulls = TicketType.query.filter(TicketType.code.like('full%')).all()
+    admission_types = fulls + [TicketType.Under14]
+    people = sum((totals.get(type, 0) for type in admission_types))
 
     if people > TicketType.Full.capacity:
         raise TicketError('No more admission tickets available')
