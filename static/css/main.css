@@ -16,6 +16,14 @@ header h1 {
     margin-bottom: 1ex;
 }
 
+.logo {
+    vertical-align: -21px;
+    display: inline-block;
+    width: 55px;
+    height: 80px;
+    background: url('../images/emf_logo_55x80.png') no-repeat left center;
+}
+
 h1 a, h1 a:hover {
     text-decoration:none;
     color:inherit;
