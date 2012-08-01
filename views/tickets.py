@@ -223,7 +223,10 @@ def add_payment_and_tickets(paymenttype):
 
         current_user.tickets.append(ticket)
         ticket.payment = payment
-        ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
+        if session.get('currency', 'GBP') == 'GBP':
+            ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
+        else:
+            ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS_EURO'))
 
     db.session.add(current_user)
     db.session.commit()
