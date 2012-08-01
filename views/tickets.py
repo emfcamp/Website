@@ -581,7 +581,7 @@ def tickets_choose():
         fulls = 0
 
     token_tts = TicketToken.types(session.get('ticket_token'))
-    token_only = ['full_ucl', 'full_hs']
+    token_only = ['full_ucl', 'full_hs', 'full_make', 'full_adafruit', 'full_hackaday', 'full_boingboing']
 
     for f in form.types:
         tt = TicketType.query.get(f.type_id.data)
