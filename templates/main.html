@@ -39,6 +39,6 @@ Electromagnetic Field is a three-day camping festival for people with an inquisi
 <p class="small"><small>If you've already signed up, <a href="{{url_for('login')}}">log in</a> to view your ticket status.</small></p>
 </div>
 <div class="span4">
-<img src="/static/site_picture.jpg">
+<img src="{{ url_for('static', filename='images/site_picture.jpg') }}" alt="Green grass and trees"/>
 </div>
 {% endblock %}
