@@ -27,6 +27,10 @@ def favicon():
 def sponsors():
     return render_template('sponsors.html')
 
+@app.route("/talks")
+def sponsors():
+    return render_template('talks.html')
+
 @app.route("/about/company")
 def company():
     return render_template('company.html')
