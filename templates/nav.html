@@ -10,6 +10,9 @@
     {#		<li {% if request.path==url_for('location') %}class="active"{% endif %}>
         <a href="{{url_for('location')}}">Location</a>
     </li> #}
+    <li {% if request.path==url_for('talks') %}class="active"{% endif %}>
+    <a href="{{url_for('talks')}}">Talks & Workshops</a>
+    </li>
     <li {% if request.path==url_for('participating') %}class="active"{% endif %}>
     <a href="{{url_for('participating')}}">Who's Coming</a>
     </li>

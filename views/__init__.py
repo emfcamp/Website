@@ -28,7 +28,7 @@ def sponsors():
     return render_template('sponsors.html')
 
 @app.route("/talks")
-def sponsors():
+def talks():
     return render_template('talks.html')
 
 @app.route("/about/company")
