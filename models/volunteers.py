@@ -5,19 +5,19 @@ import os
 import base64
 from datetime import datetime, timedelta
 
-class ShiftRole(db.Model):
-    __tablename__ = 'shift_roles'
+class Role(db.Model):
+    __tablename__ = 'role'
     id         = db.Column(db.Integer, primary_key=True)
     name       = db.Column(db.String,  nullable=False)
     wiki_link  = db.Column(db.String,  nullable=False)
     
 
 class Shift(db.Model):
-    __tablename__ = 'shifts'
+    __tablename__ = 'shift'
     id = db.Column(db.Integer, primary_key=True)
     start_time = db.Column(db.DateTime, nullable=False)
     end_time   = db.Column(db.DateTime, nullable=False)
-    role_id    = db.relationship("shift_roles", backref="ticket", cascade='all')
+    role_id    = db.relationship("role", backref="ticket", cascade='all')
 
     def __init__(self, email, name):
         self.email = email
