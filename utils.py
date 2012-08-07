@@ -276,11 +276,12 @@ class CreateTickets(Command):
             (30, 'campervan', 'Campervan Ticket', 5, 1, 30.00, 40.00,
                 "Space for campervans is extremely limited. We'll email you for details of your requirements."),
             (20, 'day_friday', 'Friday Ticket', 50, 4, 30.00, 40.00,
-                "This ticket does not include camping"),
+                "This ticket does not entitle you to a badge, or allow you to stay overnight"),
             (21, 'day_saturday', 'Saturday Ticket', 50, 4, 30.00, 40.00,
-                "This ticket does not include camping"),
+                "This ticket does not entitle you to a badge, or allow you to stay overnight"),
             (22, 'day_sunday', 'Sunday Ticket', 50, 4, 30.00, 40.00,
-                "This ticket does not include camping"),
+                "This ticket does not entitle you to a badge, or allow you to stay overnight"),
+
             (3, 'full_ucl', 'Full Camp Ticket (UCL)', 30, 4, 85.00, 110.00,
                 "Discounted ticket"),
             (3, 'full_hs', 'Full Camp Ticket (Hackspace)', 30, 4, 90.00, 115.00,
@@ -293,6 +294,7 @@ class CreateTickets(Command):
                 "Discounted ticket"),
             (3, 'full_boingboing', 'Full Camp Ticket (Boing Boing)', 30, 4, 90.00, 115.00,
                 "Discounted ticket"),
+
             (30, 'parking', 'Parking Ticket', 25, 4, 15.00, 20.00,
                 "We're trying to keep cars on-site to a minimum. "
                 "Please use the nearby Park & Ride or find someone to share with if possible."),
