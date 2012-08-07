@@ -293,7 +293,7 @@ class CreateTickets(Command):
                 "Discounted ticket"),
             (3, 'full_boingboing', 'Full Camp Ticket (Boing Boing)', 30, 4, 90.00, 115.00,
                 "Discounted ticket"),
-            (30, 'parking', 'Parking Ticket', 25, 4, 10.00, 15.00,
+            (30, 'parking', 'Parking Ticket', 25, 4, 15.00, 20.00,
                 "We're trying to keep cars on-site to a minimum. "
                 "Please use the nearby Park & Ride or find someone to share with if possible."),
             (10, 'kids_u5', 'Under-5 Camp Ticket', 30, 4, 0, 0,
