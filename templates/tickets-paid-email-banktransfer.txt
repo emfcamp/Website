@@ -1,7 +1,7 @@
 Hi, {{ user.name }},
 
 This is to confirm that we've received {{ format_price(payment.amount) }} for transaction {{ format_bankref(payment.bankref) }} from
-you as payment for {% if payment.tickets.all() | count > 1 %}{{ payment.tickets.all() |count }} prepay tickets{% else %}a prepay ticket{% endif %} for Electromagnetic Field.
+you as payment for {% if payment.tickets.all() | count > 1 %}{{ payment.tickets.all() |count }} tickets{% else %}a ticket{% endif %} for Electromagnetic Field.
 
 See you soon at Electromagnetic Field 2012! 
 
