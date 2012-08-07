@@ -1,0 +1,12 @@
+Shifts
+	time
+		start & end time (3 hour shifts)
+	role
+		shift 'name' 
+		minimum number in shift (e.g. at least 2 stewards)
+	id
+	log
+
+many to many people to shift mapping
+	attendance
+	
