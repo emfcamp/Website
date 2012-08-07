@@ -1,12 +1,63 @@
 Shifts
 	time
-		start & end time (3 hour shifts)
+		start (3 hour shifts)
+		end (start+3)
 	role
-		shift 'name' 
-		minimum number in shift (e.g. at least 2 stewards)
+		shift 'name'
+	count 
+	minimum
 	id
+	user_list
 	log
 
 many to many people to shift mapping
 	attendance
 	
+	
+============================================================================== 
+	Requirements:Minimum:
+
+	   * [ ]Users must be able to sign up for shifts
+
+	   * [ ]Admin should be able to see a rota of who's doing which shifts
+
+	Desired (high priority):
+
+
+	   * [ ]Users should be able to view which shifts they've signed up for
+	   * [ ]Users should be able to modify their shifts
+
+	   * [ ]Auto invite users to the google group
+	Desired
+
+
+
+	   * [ ]Reminders to users for shifts they've signed up to
+
+	   * [ ]Reports to admin flagging shifts that are understaffed
+
+	   * [ ]Interface to mark attendance 
+
+	   * [ ]Reports to flag to admin which users get perks
+
+	   * [ ]Admin able to attach notes to shifts
+
+
+	      * e.g. which radio went out, incidents etc.
+	   * [ ]Some sort of achievements?
+
+
+	      * e.g. HOORAY! you've done the most shifts; Sam will buy you a drink
+	      * Prizes?
+
+	         * Drink voucher? (6 shifts or more)
+	         * Free merch (spare badges?)
+	         * Night of passion with Jonty
+	         * ?
+
+
+	Layout idea?
+	Shift 1 (8-12)Shift 2 (12-16)Shift 3 (16-20)Shift 4Shift 5Shift 6Shift 7<list roles> (help)Alt shift 1 (11-15)Alt shift 2 (15-18)........Bar work
+
+	Shift 1 is normal pattern (i.e. 8-12, 12-16....)
+	alt shift is bar shifts (i.e. 11-15, 15-18...)
