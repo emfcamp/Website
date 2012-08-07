@@ -28,21 +28,25 @@ from datetime import datetime, timedelta
 
 @app.route("/stats")
 def stats():
-    AdmissionTypes = [TicketType.FullPrepay, TicketType.Full, TicketType.Under14]
-    admission_type_ids = [tt.id for tt in AdmissionTypes]
-
     outstanding = Ticket.query.join(Payment).filter(
         Payment.state == 'inprogress',
         Ticket.expires >= func.now(),
         Ticket.paid == False,
     )
     paid = Ticket.query.filter(Ticket.paid == True)
+    full = db.engine.execute(text("""select count(*) from ticket_type, ticket where
+                                        ticket.type_id = ticket_type.id and
+                                        ticket.paid = true and ticket.expires > now()
+                                        and ticket_type.code LIKE 'full%'""")).scalar()
 
+    full_bought = db.engine.execute(text("""select count(*) from ticket_type, ticket where
+                                        ticket.type_id = ticket_type.id and
+                                        ticket.paid = true and ticket_type.code LIKE 'full%'""")).scalar()
     stats = {
         'prepays': outstanding.filter(Ticket.type == TicketType.Prepay).count(),
         'prepays_bought_all': paid.filter(Ticket.type == TicketType.Prepay).count(),
-        'full': outstanding.filter(Ticket.type_id.in_(admission_type_ids)).count(),
-        'full_bought': paid.filter(Ticket.type_id.in_(admission_type_ids)).count(),
+        'full': full,
+        'full_bought': full_bought,
         'users': User.query.count(),
     }
 
