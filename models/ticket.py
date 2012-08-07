@@ -175,7 +175,8 @@ def check_capacity(session, flush_context, instances):
 
     # Any admission tickets count towards the full ticket total
     fulls = TicketType.query.filter(TicketType.code.like('full%')).all()
-    admission_types = fulls + [TicketType.Under14]
+    kids = TicketType.query.filter(TicketType.code.like('kids%')).all()
+    admission_types = fulls + kids
     people = sum((totals.get(type, 0) for type in admission_types))
 
     if people > TicketType.Full.capacity:

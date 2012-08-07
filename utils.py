@@ -271,16 +271,17 @@ class CreateTickets(Command):
             (0, 'prepay', 'Prepay Camp Ticket', 250, 4, 30.00, 40.00, None),
             (1, 'full_prepay', 'Full Camp Ticket (prepay)', 250, 4, 60.00, 75.00, None),
             (2, 'full', 'Full Camp Ticket', 499 - 20, 4, 95.00, 120.00, None),
-            (10, 'kids', 'Under-14 Camp Ticket', 30, 4, 47.50, 60.00,
+            (10, 'kids_u14', 'Under-14 Camp Ticket', 30, 4, 47.50, 60.00,
                 "All children must be accompanied by an adult."),
             (30, 'campervan', 'Campervan Ticket', 5, 1, 30.00, 40.00,
                 "Space for campervans is extremely limited. We'll email you for details of your requirements."),
-            (20, 'day_friday', 'Friday Ticket', 30, 4, 40.00, 50.00,
-                "This ticket does not include camping"),
-            (21, 'day_saturday', 'Saturday Ticket', 30, 4, 40.00, 50.00,
-                "This ticket does not include camping"),
-            (22, 'day_sunday', 'Sunday Ticket', 30, 4, 40.00, 50.00,
-                "This ticket does not include camping"),
+            (20, 'day_friday', 'Friday Ticket', 50, 4, 30.00, 40.00,
+                "This ticket does not entitle you to a badge, or allow you to stay overnight"),
+            (21, 'day_saturday', 'Saturday Ticket', 50, 4, 30.00, 40.00,
+                "This ticket does not entitle you to a badge, or allow you to stay overnight"),
+            (22, 'day_sunday', 'Sunday Ticket', 50, 4, 30.00, 40.00,
+                "This ticket does not entitle you to a badge, or allow you to stay overnight"),
+
             (3, 'full_ucl', 'Full Camp Ticket (UCL)', 30, 4, 85.00, 110.00,
                 "Discounted ticket"),
             (3, 'full_hs', 'Full Camp Ticket (Hackspace)', 30, 4, 90.00, 115.00,
@@ -293,12 +294,15 @@ class CreateTickets(Command):
                 "Discounted ticket"),
             (3, 'full_boingboing', 'Full Camp Ticket (Boing Boing)', 30, 4, 90.00, 115.00,
                 "Discounted ticket"),
+
+            (30, 'parking', 'Parking Ticket', 25, 4, 15.00, 20.00,
+                "We're trying to keep cars on-site to a minimum. "
+                "Please use the nearby Park & Ride or find someone to share with if possible."),
+            (10, 'kids_u5', 'Under-5 Camp Ticket', 30, 4, 0, 0,
+                "All children must be accompanied by an adult."),
             # Until we have ticket codes, please add at the end so we can rebuild the table
             #('Full Camp Ticket (latecomer)', 499 - 20, 4, 100.00),
             #('Donation'),
-            #('Parking Ticket', 25, 4, 10.00,
-            #    "We're trying to keep cars on-site to a minimum. "
-            #    "Please use the nearby carpark or find someone to share with if possible."),
         ]
 
         types = []
