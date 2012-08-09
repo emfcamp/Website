@@ -36,7 +36,7 @@ def stats():
     paid = Ticket.query.filter(Ticket.paid == True)
     full = db.engine.execute(text("""select count(*) from ticket_type, ticket where
                                         ticket.type_id = ticket_type.id and
-                                        ticket.paid = true and ticket.expires > now()
+                                        ticket.paid = false and ticket.expires > now()
                                         and ticket_type.code LIKE 'full%'""")).scalar()
 
     full_bought = db.engine.execute(text("""select count(*) from ticket_type, ticket where
