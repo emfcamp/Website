@@ -47,3 +47,4 @@ class Shift(db.Model):
     @classmethod
     def byrole(cls, role):
         return Shift.query.filter_by(role=role).one()
+

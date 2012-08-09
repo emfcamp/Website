@@ -61,3 +61,4 @@ many to many people to shift mapping
 
 	Shift 1 is normal pattern (i.e. 8-12, 12-16....)
 	alt shift is bar shifts (i.e. 11-15, 15-18...)
+
