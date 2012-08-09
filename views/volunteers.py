@@ -22,3 +22,30 @@ def volunteer_login():
         # else:
         #     flash("Invalid login details!")
     return render_template('volunteer-login.html', form=form)
+
+
+@app.route("/volunteer/shifts", methods=['GET'])
+def list_shifts():
+    #
+    # list all shifts
+    # 	a user can pick shifts here
+    # 	an admin can see who is on which shift
+    #	understaffed shifts are highlighted
+    #	immenient underdtaffed shifts are highlighted more.
+    #
+    if not urrent_user.is_authenticated():
+        return redirect(url_for('main'))
+    shifts = []
+    return render_template('volunteers/list_shifts.html')
+
+@app.route("/volunteer/myshifts", methods=['GET'])
+def my_shifts():
+    #
+    # list a users shifts and let them modify the shifts
+    #
+    if not urrent_user.is_authenticated():
+        return redirect(url_for('main'))
+    # select this users shifts
+    shifts = []
+    return render_template('volunteers/my_shifts.html')
+
