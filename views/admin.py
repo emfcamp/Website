@@ -42,11 +42,52 @@ def stats():
     full_bought = db.engine.execute(text("""select count(*) from ticket_type, ticket where
                                         ticket.type_id = ticket_type.id and
                                         ticket.paid = true and ticket_type.code LIKE 'full%'""")).scalar()
+
+    kids_bought = db.engine.execute(text("""select count(*) from ticket_type, ticket where
+                                        ticket.type_id = ticket_type.id and
+                                        ticket.paid = true and ticket_type.code LIKE 'kids%'""")).scalar()
+
+    full_confident = db.engine.execute(text("""
+      select count(*)
+      from
+          ticket_type tt,
+          ticket t,
+          payment p
+      where
+          tt.id = t.type_id
+          and p.id = t.payment_id
+          and tt.code like 'full%'
+          and (
+            p.provider = 'gocardless' and p.state = 'inprogress' and t.expires > now()
+            or t.paid = true
+          )
+    """)).scalar()
+
+    full_unconfident = db.engine.execute(text("""
+      select count(*)
+      from
+          ticket_type tt,
+          ticket t,
+          payment p
+      where
+          tt.id = t.type_id
+          and p.id = t.payment_id
+          and tt.code like 'full%'
+          and (
+            p.provider = 'banktransfer' and p.state = 'inprogress'
+            or p.provider = 'googlecheckout' and p.state = 'new'
+          )
+          and t.expires > now()
+    """)).scalar()
+
     stats = {
         'prepays': outstanding.filter(Ticket.type == TicketType.Prepay).count(),
         'prepays_bought_all': paid.filter(Ticket.type == TicketType.Prepay).count(),
         'full': full,
         'full_bought': full_bought,
+        'kids_bought': kids_bought,
+        'full_confident': full_confident,
+        'full_unconfident': full_unconfident,
         'users': User.query.count(),
     }
 
