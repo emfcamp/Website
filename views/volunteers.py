@@ -1,24 +1,50 @@
 from main import app
+from models.volunteers import ShiftSlot
 from flask import render_template, request, redirect, url_for
 from flaskext.login import current_user
-from flaskext.wtf import Form, TextField, Email, Required, IntegerField
-from users import NextURLField
+from flaskext.wtf import Form, SelectField, StringField, Required, HiddenField
+# from users import NextURLField
 
-class VolunteerLogin(Form):
-    email = TextField('Email', [Email(), Required()])
-    phone_number = IntegerField('Number', [Required()])
-    next = NextURLField('Next')
+# class HiddenStringField(HiddenField, StringField):
+#     """String version of HiddenIntegerField"""
+# 
+# class StringSelectField(SelectField):
+#     def __init__(seld, *args, **kwargs):
+#         kwargs['coerce'] = str
+#         self.fmt = kwargs.pop('fmt', str)
+#         self.values = kwargs.pop('values', [])
+#         SelectField.__init__(self, *args, **kwargs)
+# 
+#     @property
+#     def values(self):
+#         return self._values
+# 
+#     @values.setter
+#     def values(self, vals):
+#         self._values = vals
+#         self.choices = [(i, self.fmt(i)) for i in vals]
+#     
+#     
+# 
+# 
+# class ShiftSelectField(Form):
+#     role_id = HiddenStringField('role type', [Required()])
+#     
+#     # role = 
+#     
+#     
+@app.route("/volunteers/shifts", methods=['GET', 'POST'])
+def volunteers_shifts():
     
-@app.route("/volunteer_login", methods=['GET', 'POST'])
-def volunteer_login():
-    if not current_user.is_authenticated():
-        return redirect(request.args.get('next', url_for('login')))
-    form = VolunteerLogin(request.form, next=request.args.get('next'))
-    # if request.method == 'POST' and form.validate():
-        # user = User.query.filter_by(email=form.email.data).first()
-        # if user and user.check_password(form.password.data):
-        #     login_user(user)
-        #     return redirect(form.next.data or url_for('tickets'))
-        # else:
-        #     flash("Invalid login details!")
-    return render_template('volunteer-login.html', form=form)
+    slots = {31:{}, 1:{}, 2:{}}
+    # slots = []
+    for ss in ShiftSlot.query.order_by(ShiftSlot.start_time).all():
+        
+        if not ss.role.name in slots[ss.start_time.day]:
+            slots[ss.start_time.day][ss.role.name] = [ss.start_time.hour,]
+        else:
+            slots[ss.start_time.day][ss.role.name].append(ss.start_time.hour)
+        
+        # slots[ss.start_time.day].append((ss.start_time.hour, ss.role.name))
+        # slots.append(ss)
+    return render_template('volunteer_shifts.html', slots=slots)

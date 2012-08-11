@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="span10">
+	<div class="tabbable"> <!-- Only required for left/right tabs -->
+	  <ul class="nav nav-tabs">
+	    <li class="active"><a href="#31" data-toggle="tab">Friday 31st</a></li>
+	    <li><a href="#1" data-toggle="tab">Saturday 2nd</a></li>
+	    <li><a href="#2" data-toggle="tab">Sunday 3rd</a></li>
+	  </ul>
+	  <div class="tab-content">
+		{% for day, data in slots.items() %}
+		    <div class="tab-pane active" id={{ day }} >				
+				{% for role, slots in data.items() %}
+					<p>
+						{% for slot in slots %}
+							{{ slot }}
+						{% endfor %}							
+					</p>
+				{% endfor %}
+		    </div>
+		{% endfor %}
+	  </div>
+	</div>
+</div>
+{% endblock %}
