@@ -16,7 +16,7 @@ import re, os, random
 from datetime import datetime, timedelta
 
 from main import app, mail, db
-from models import User, TicketType, Ticket, TicketPrice, TicketToken, Role, Shift
+from models import User, TicketType, Ticket, TicketPrice, TicketToken, Role, Shift, ShiftSlot
 from models.payment import Payment, BankPayment, GoCardlessPayment, safechars
 from sqlalchemy import text
 
@@ -390,8 +390,7 @@ class CreateShifts(Command):
                         # last shift is 11->14 Monday
                         continue
                     start_time = datetime(2012, date['m'], date['d'], start)
-                    stop_time  = start_time + shift_length
-                    s = Shift(start_time, stop_time, min, max, role)
+                    s = ShiftSlot(start_time, min, max, role)
                     shifts.append(s)
         
         for shift in shifts:
