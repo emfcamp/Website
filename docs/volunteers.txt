@@ -1,7 +1,39 @@
+Role
+	id
+	code
+	name
+	wiki_link
+
+Shift
+	id
+	time_slot_id
+	user_id
+	
+Time_slot
+	id
+	code
+	role_id
+	start/stop_time
+	min/max
+	log
+
+	
+
+
+==============================================================================
+many to one shift users-> shift (a user may sign up for multiple shifts)
+for shifts where we have no real upper limit set it reasonably high (e.g. max = 10)
+
+Each shift has: a role, a time slot, id, user_id
+
+Each role has: name, wiki link
+
+Each time slot has: day, start & end, log, relation to which users are in it
+
+==============================================================================
+
 Shifts
-	time
-		start (3 hour shifts)
-		end (start+3)
+	time_id
 	role
 		shift 'name'
 	count 
@@ -9,6 +41,10 @@ Shifts
 	id
 	user_list
 	log
+
+TimeSlots
+	start_datetime
+	end_datetime
 
 many to many people to shift mapping
 	attendance
