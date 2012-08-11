@@ -23,10 +23,10 @@ SETTINGS=/etc/emf-site.cfg
 OFX=~russ/data.ofx
 endif
 
-db: tickets tokens shifts
-
 run:
 	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./main.py
+
+db: tickets tokens shifts
 
 tickets:
 	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py createtickets
