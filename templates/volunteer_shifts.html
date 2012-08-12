@@ -3,20 +3,35 @@
 <div class="span10">
 	<div class="tabbable"> <!-- Only required for left/right tabs -->
 	  <ul class="nav nav-tabs">
-	    <li class="active"><a href="#31" data-toggle="tab">Friday 31st</a></li>
-	    <li><a href="#1" data-toggle="tab">Saturday 2nd</a></li>
-	    <li><a href="#2" data-toggle="tab">Sunday 3rd</a></li>
+		<!-- bar':{}, 'steward':{}, 'stage':{}, 'parking':{}} -->
+	    <li class="active"><a href="#steward" data-toggle="tab">Stewarding</a></li>
+	    <li><a href="#bar" data-toggle="tab">Bar work</a></li>
+	    <li><a href="#stage" data-toggle="tab">Stage work</a></li>
+	    <li><a href="#parking" data-toggle="tab">Car parking</a></li>
 	  </ul>
 	  <div class="tab-content">
-		{% for day, data in slots.items() %}
-		    <div class="tab-pane active" id={{ day }} >				
-				{% for role, slots in data.items() %}
-					<p>
-						{% for slot in slots %}
-							{{ slot }}
-						{% endfor %}							
-					</p>
-				{% endfor %}
+		{% for role, data in slots.items() %}
+		    <div class="tab-pane active" id={{ role }} >
+				<table>			
+					{% for date, slots in data.items() %}
+						<tr>
+							<td colspan="{{ slots|length }}">
+								{% if date == 31 %}
+									<b>Friday 31st August</b>
+								{% elif date == 1 %}
+									<b>Saturday 1st September</b>	
+								{% else %}
+									<b>Sunday 2nd September</b>
+								{% endif %}
+							</td>
+						</tr>
+						<tr>
+							{% for slot in slots %}
+								<td>{{ slot }}</td>
+							{% endfor %}
+						</tr>
+					{% endfor %}
+				</table>
 		    </div>
 		{% endfor %}
 	  </div>

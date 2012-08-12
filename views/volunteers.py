@@ -6,17 +6,21 @@ from flaskext.wtf import Form, SelectField, StringField, Required, HiddenField
 
 @app.route("/volunteers/shifts", methods=['GET', 'POST'])
 def volunteers_shifts():
-    slots = {31:{}, 1:{}, 2:{}}
+    slots = {'bar':{}, 'steward':{}, 'stage':{}, 'parking':{}}
     #
     # This currently shows the static information of the shifts
     # available and the roles needed
     # 
     for ss in ShiftSlot.query.order_by(ShiftSlot.start_time).all():
         
-        if not ss.role.name in slots[ss.start_time.day]:
-            slots[ss.start_time.day][ss.role.name] = [ss.start_time.hour,]
+        if not ss.start_time.day in slots[ss.role.code]:
+            slots[ss.role.code][ss.start_time.day] = [ss.start_time.hour,]
         else:
-            slots[ss.start_time.day][ss.role.name].append(ss.start_time.hour)
+            slots[ss.role.code][ss.start_time.day].append(ss.start_time.hour)
+        # if not ss.role.name in slots[ss.start_time.day]:
+        #     slots[ss.start_time.day][ss.role.name] = [ss.start_time.hour,]
+        # else:
+        #     slots[ss.start_time.day][ss.role.name].append(ss.start_time.hour)
         
     return render_template('volunteer_shifts.html', slots=slots)
 
