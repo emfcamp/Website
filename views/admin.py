@@ -47,7 +47,7 @@ def stats():
                                         ticket.type_id = ticket_type.id and
                                         ticket.paid = true and ticket_type.code LIKE 'kids%'""")).scalar()
 
-    full_confident = db.engine.execute(text("""
+    confident_query = text("""
       select count(*)
       from
           ticket_type tt,
@@ -56,12 +56,15 @@ def stats():
       where
           tt.id = t.type_id
           and p.id = t.payment_id
-          and tt.code like 'full%'
+          and tt.code like :code
           and (
             p.provider = 'gocardless' and p.state = 'inprogress' and t.expires > now()
             or t.paid = true
           )
-    """)).scalar()
+    """)
+
+    full_confident = db.engine.execute(confident_query, code='full%').scalar()
+    day_confident = db.engine.execute(confident_query, code='day%').scalar()
 
     full_unconfident = db.engine.execute(text("""
       select count(*)
@@ -80,6 +83,7 @@ def stats():
           and t.expires > now()
     """)).scalar()
 
+
     stats = {
         'prepays': outstanding.filter(Ticket.type == TicketType.Prepay).count(),
         'prepays_bought_all': paid.filter(Ticket.type == TicketType.Prepay).count(),
@@ -89,6 +93,7 @@ def stats():
         'full_confident': full_confident,
         'full_unconfident': full_unconfident,
         'users': User.query.count(),
+        'day_confident': day_confident
     }
 
     # A pending or purchased full ticket cancels out a purchased prepay
