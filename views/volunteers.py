@@ -1,5 +1,5 @@
 from main import app
-from models.volunteers import ShiftSlot
+from models.volunteers import ShiftSlot, Shift
 from flask import render_template, request, redirect, url_for
 from flaskext.login import current_user
 from flaskext.wtf import Form, SelectField, StringField, Required, HiddenField
@@ -24,7 +24,7 @@ def volunteers_shifts():
         
     return render_template('volunteer_shifts.html', slots=slots)
 
-@app.route("/volunteer/shifts", methods=['GET'])
+@app.route("/volunteers/shifts_xx", methods=['GET'])
 def list_shifts():
     #
     # list all shifts
@@ -33,18 +33,20 @@ def list_shifts():
     #	understaffed shifts are highlighted
     #	immenient underdtaffed shifts are highlighted more.
     #
-    if not urrent_user.is_authenticated():
+    if not current_user.is_authenticated():
         return redirect(url_for('main'))
     shifts = []
     return render_template('volunteers/list_shifts.html')
 
-@app.route("/volunteer/myshifts", methods=['GET'])
+@app.route("/volunteers/myshifts", methods=['GET'])
 def my_shifts():
     #
     # list a users shifts and let them modify the shifts
     #
-    if not urrent_user.is_authenticated():
+    if not current_user.is_authenticated():
         return redirect(url_for('main'))
     # select this users shifts
-    shifts = []
+    shifts = Shift.query.filter(Shift.user_id==current_user.id).all()
+    print shifts
     return render_template('volunteers/my_shifts.html')
+

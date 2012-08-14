@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="span10">
+{% if shifts %}
+<h2>Your current shifts</h2>
+
+<table class="table">
+<tr><th>Id</th><th>shift_slot_id</th></tr>
+
+{% for s in shifts %}
+
+<tr class="
+{{ loop.cycle('odd', 'even') }}
+">
+<td>{{ s.id }}</td>
+<td>{{ s.shift_slot_id }}</td>
+</tr>
+{% endfor %}
+
+</table>
+
+{% else %}
+
+<P>If you want to sign up to a Volunteer shift please <a href="{{ url_for('main')}}">go here</a>.</P>
+
+{% endif %}
+
+{% endblock %}
