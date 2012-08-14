@@ -19,9 +19,8 @@ class ShiftForm(Form):
 class ShiftsForm(Form):
     shifts = FieldList(FormField(ShiftForm))
     submit = SubmitField('Update shifts')
-    reset  = SubmitField('Reset')
 
-@app.route("/volunteer/shifts", methods=['GET', 'POST'])
+@app.route("/volunteers/shifts", methods=['GET', 'POST'])
 def list_shifts():
     #
     # list all shifts
@@ -36,17 +35,28 @@ def list_shifts():
     form = ShiftsForm(request.form)
     
     if not form.shifts:
-        for ss in ShiftSlot.query.order_by(ShiftSlot.start_time).all():
+        for ss in ShiftSlot.query.order_by(ShiftSlot.role_id, ShiftSlot.start_time).all():
             form.shifts.append_entry()
             form.shifts[-1].shift_id.data = ss.id
+            form.shifts[-1]._type = ss
             
-    # TODO pre load check boxes with user's shifts
-    if request.method == "POST" and form.validate():
+    else:
         for shift in form.shifts:
-            if shift.work_shift:
-                app.logger.info('adding shift %i', shift.shift_id)
-                current_user.shifts.append()
+            print shift.shift_id.data
+            # shift._type = ShiftSlot.query.filter_by(id=shift.shift_id.data).one()
+                # shift.work_shift:
+        return redirect(url_for('main'))
+            
     
+    # # TODO pre load check boxes with user's shifts
+    # if request.method == "POST" and form.validate() and False:
+    #       for shift in form.shifts:
+    #           if shift.work_shift:
+    #               app.logger.info('adding shift %i', shift.shift_id)
+    #               current_user.shifts.append()
+    #               current_user.shifts[-1].shift_slot_id = shift.shift_id
+    #               db.session.add()
+                
     
     return render_template('volunteer_shifts.html', form=form)
 

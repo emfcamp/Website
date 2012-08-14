@@ -1,50 +1,36 @@
+{% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block body %}
 <div class="span10">
-	<div class="tabbable"> <!-- Only required for left/right tabs -->
-	  <ul class="nav nav-tabs">
-		<!-- bar':{}, 'steward':{}, 'stage':{}, 'parking':{}} -->
-	    <li class="active"><a href="#steward" data-toggle="tab">Stewarding</a></li>
-	    <li><a href="#bar" data-toggle="tab">Bar work</a></li>
-	    <li><a href="#stage" data-toggle="tab">Stage work</a></li>
-	    <li><a href="#parking" data-toggle="tab">Car parking</a></li>
-	  </ul>
-	  <div class="tab-content">
-		{% for role, data in form.items() %}
-		<!-- { for role, data in slots.items() %} -->
-		    <div class="tab-pane active" id={{ role }} >
-				<table>			
-					{% for date in data %}
-					<!-- { for date, slots in data.items() %} -->
-						<tr>
-							<td colspan="{{ data[date]|length }}">
-							<!-- <td colspan="{ slots|length }}"> -->
-								{% if date == 31 %}
-									<b>Friday 31st August</b>
-								{% elif date == 1 %}
-									<b>Saturday 1st September</b>	
-								{% else %}
-									<b>Sunday 2nd September</b>
-								{% endif %}
-							</td>
-						</tr>
-						<tr>
-							{% for slot in data[date] %}
-							<!-- { for slot in slots %} -->
-								<td>
-									<div class="controls">
-										<label class="checkbox">
-											{{ slot }}
-										</label>							
-									</div>
-								</td>
-							{% endfor %}
-						</tr>
-					{% endfor %}
-				</table>
-		    </div>
-		{% endfor %}
-	  </div>
-	</div>
+	<form method="POST">
+		<div class="tabbable"> <!-- Only required for left/right tabs -->
+			<ul class="nav nav-tabs">
+				<!-- bar':{}, 'steward':{}, 'stage':{}, 'parking':{}} -->
+				<li class="active"><a href="#steward" data-toggle="tab">Stewarding</a></li>
+				<li><a href="#bar" data-toggle="tab">Bar work</a></li>
+				<li><a href="#stage" data-toggle="tab">Stage work</a></li>
+				<li><a href="#parking" data-toggle="tab">Car parking</a></li>
+			</ul>
+		
+			<div class="tab-content">
+				{% for role in ("steward", "bar", "steward", "parking") %}
+					<div class="tab-pane" id="{{ role }}">
+						{% for day in (31, 1, 2) %}
+							<p>
+								{% for shift in form.shifts if shift._type.role.code == role and shift._type.start_time.day == day %}
+									{{ shift._type.start_time.hour }}
+									{{ shift.work_shift() | safe }}
+									<!-- {{ render_field(shift.work_shift)}} -->
+								{% endfor %}		
+							</p>
+						{% endfor %}
+					</div>		
+				{% endfor %}	
+			</div>
+		</div>
+		<div class="form-actions">
+		    <button type="submit" class="btn btn-primary btn-large">Update shifts</button>
+		</div>
+	</form>
 </div>
 {% endblock %}
