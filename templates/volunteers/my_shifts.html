@@ -6,7 +6,7 @@
 <h2>Your current shifts</h2>
 
 <table class="table">
-<tr><th>Id</th><th>shift_slot_id</th></tr>
+<tr><th>Id</th><th>Start</th><th>End</th><th>code</th><th>name</th></tr>
 
 {% for s in shifts %}
 
@@ -14,7 +14,10 @@
 {{ loop.cycle('odd', 'even') }}
 ">
 <td>{{ s.id }}</td>
-<td>{{ s.shift_slot_id }}</td>
+<td>{{ s.shiftslot.start_time }}</td>
+<td>{{ s.shiftslot.end_time }}</td>
+<td>{{ s.shiftslot.role.code }}</td>
+<td>{{ s.shiftslot.role.name }}, <a href="{{s.shiftslot.role.wiki_link}}">details</a>.</td>
 </tr>
 {% endfor %}
 

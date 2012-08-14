@@ -50,7 +50,7 @@ def list_shifts():
     
     return render_template('volunteer_shifts.html', form=form)
 
-@app.route("/volunteers/myshifts", methods=['GET'])
+@app.route("/volunteer/myshifts", methods=['GET'])
 def my_shifts():
     #
     # list a users shifts and let them modify the shifts
@@ -59,6 +59,5 @@ def my_shifts():
         return redirect(url_for('main'))
     # select this users shifts
     shifts = Shift.query.filter(Shift.user_id==current_user.id).all()
-    print shifts
-    return render_template('volunteers/my_shifts.html')
+    return render_template('volunteers/my_shifts.html', shifts=shifts)
 

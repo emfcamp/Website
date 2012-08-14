@@ -25,8 +25,8 @@
     <li {% if request.path==url_for('get_involved') %}class="active"{% endif %}>
         <a href="{{url_for('get_involved')}}">Get Involved</a>
     </li>
-    <li {% if request.path==url_for('volunteers_shifts') %}class="active"{% endif %}>
-        <a href="{{url_for('volunteers_shifts')}}">Volunteer Shifts</a>
+    <li {% if request.path==url_for('list_shifts') %}class="active"{% endif %}>
+        <a href="{{url_for('list_shifts')}}">Volunteer Shifts</a>
     </li>
     {% if current_user.admin %}
         <li {% if request.path==url_for('admin') %}class="active"{% endif %}>
