@@ -60,7 +60,7 @@ def list_shifts():
     
     return render_template('volunteer_shifts.html', form=form)
 
-@app.route("/volunteer/myshifts", methods=['GET'])
+@app.route("/volunteers/myshifts", methods=['GET'])
 def my_shifts():
     #
     # list a users shifts and let them modify the shifts
