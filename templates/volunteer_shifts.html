@@ -10,12 +10,15 @@
 	    <li><a href="#parking" data-toggle="tab">Car parking</a></li>
 	  </ul>
 	  <div class="tab-content">
-		{% for role, data in slots.items() %}
+		{% for role, data in form.items() %}
+		<!-- { for role, data in slots.items() %} -->
 		    <div class="tab-pane active" id={{ role }} >
 				<table>			
-					{% for date, slots in data.items() %}
+					{% for date in data %}
+					<!-- { for date, slots in data.items() %} -->
 						<tr>
-							<td colspan="{{ slots|length }}">
+							<td colspan="{{ data[date]|length }}">
+							<!-- <td colspan="{ slots|length }}"> -->
 								{% if date == 31 %}
 									<b>Friday 31st August</b>
 								{% elif date == 1 %}
@@ -26,8 +29,15 @@
 							</td>
 						</tr>
 						<tr>
-							{% for slot in slots %}
-								<td>{{ slot }}</td>
+							{% for slot in data[date] %}
+							<!-- { for slot in slots %} -->
+								<td>
+									<div class="controls">
+										<label class="checkbox">
+											{{ slot }}
+										</label>							
+									</div>
+								</td>
 							{% endfor %}
 						</tr>
 					{% endfor %}
