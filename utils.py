@@ -354,7 +354,7 @@ class CreateShifts(Command):
         dailyshifts = {'steward':
                                 {'starts':(2, 5, 8, 11, 14, 17, 20, 23), 
                                  'mins'  :(2, 2, 3,  3,  3,  3,  3,  2),
-                                 'maxs'  :() # no maximums
+                                 'maxs'  :(2, 2, 4,  6,  6,  4,  4,  2)
                                  },
                        'bar':
                                 {'starts':(12, 15, 18, 21), 

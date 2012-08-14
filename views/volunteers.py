@@ -1,30 +1,27 @@
 from main import app
 from models.volunteers import ShiftSlot, Shift
 from flask import render_template, request, redirect, url_for
-from flaskext.login import current_user
-from flaskext.wtf import Form, SelectField, StringField, Required, HiddenField
+from flaskext.login import \
+    login_user, login_required, logout_user, current_user
+from flaskext.wtf import Form, Required, \
+     SelectField, IntegerField, HiddenField, BooleanField, SubmitField, \
+     FieldList, FormField
+     
+class HiddenIntegerField(HiddenField, IntegerField):
+    """
+    widget=HiddenInput() doesn't work with WTF-Flask's hidden_tag()
+    """
 
-@app.route("/volunteers/shifts", methods=['GET', 'POST'])
-def volunteers_shifts():
-    slots = {'bar':{}, 'steward':{}, 'stage':{}, 'parking':{}}
-    #
-    # This currently shows the static information of the shifts
-    # available and the roles needed
-    # 
-    for ss in ShiftSlot.query.order_by(ShiftSlot.start_time).all():
-        
-        if not ss.start_time.day in slots[ss.role.code]:
-            slots[ss.role.code][ss.start_time.day] = [ss.start_time.hour,]
-        else:
-            slots[ss.role.code][ss.start_time.day].append(ss.start_time.hour)
-        # if not ss.role.name in slots[ss.start_time.day]:
-        #     slots[ss.start_time.day][ss.role.name] = [ss.start_time.hour,]
-        # else:
-        #     slots[ss.start_time.day][ss.role.name].append(ss.start_time.hour)
-        
-    return render_template('volunteer_shifts.html', slots=slots)
+class ShiftForm(Form):
+    shift_id   = HiddenIntegerField('Ticket Type', [Required()])
+    work_shift = BooleanField('work_shift')
+    
+class ShiftsForm(Form):
+    shifts = FieldList(FormField(ShiftForm))
+    submit = SubmitField('Update shifts')
+    reset  = SubmitField('Reset')
 
-@app.route("/volunteers/shifts_xx", methods=['GET'])
+@app.route("/volunteer/shifts", methods=['GET', 'POST'])
 def list_shifts():
     #
     # list all shifts
@@ -35,8 +32,23 @@ def list_shifts():
     #
     if not current_user.is_authenticated():
         return redirect(url_for('main'))
-    shifts = []
-    return render_template('volunteers/list_shifts.html')
+    
+    form = ShiftsForm(request.form)
+    
+    if not form.shifts:
+        for ss in ShiftSlot.query.order_by(ShiftSlot.start_time).all():
+            form.shifts.append_entry()
+            form.shifts[-1].shift_id.data = ss.id
+            
+    # TODO pre load check boxes with user's shifts
+    if request.method == "POST" and form.validate():
+        for shift in form.shifts:
+            if shift.work_shift:
+                app.logger.info('adding shift %i', shift.shift_id)
+                current_user.shifts.append()
+    
+    
+    return render_template('volunteer_shifts.html', form=form)
 
 @app.route("/volunteers/myshifts", methods=['GET'])
 def my_shifts():
