@@ -601,8 +601,6 @@ def tickets_choose():
         elif tt.code in token_only and tt not in token_tts:
             values = []
         elif tt.code == 'full':
-            if not (prepays or fulls):
-                values = range(1, limit + 1)
             if token_tts:
                 values = []
 
