@@ -849,7 +849,7 @@ def googlecheckout_tryagain():
         return redirect(url_for('tickets'))
 
     if form.pay.data == True:
-        if not config.get('GOOGLE_CHECKOUT'):
+        if not app.config.get('GOOGLE_CHECKOUT'):
             app.logger.error('Unable to retry payment as Google Checkout is disabled')
             flash('Google Checkout is currently unavailable. Please try again later.')
             return redirect(url_for('tickets'))
