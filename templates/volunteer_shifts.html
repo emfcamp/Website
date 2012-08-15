@@ -18,6 +18,7 @@
 						{% for day in (31, 1, 2) %}
 							<p>
 								{% for shift in form.shifts if shift._type.role.code == role and shift._type.start_time.day == day %}
+									{{ shift.hidden_tag() | safe }}
 									{{ shift._type.start_time.hour }}
 									{{ shift.work_shift() | safe }}
 									<!-- {{ render_field(shift.work_shift)}} -->
