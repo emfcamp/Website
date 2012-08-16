@@ -1,4 +1,4 @@
-from main import app
+from main import db, app
 from models.volunteers import ShiftSlot, Shift
 from flask import render_template, request, redirect, url_for
 from flaskext.login import \
@@ -41,17 +41,25 @@ def list_shifts():
             form.shifts[-1]._type = ss
     
     else:
+        # for ss in ShiftSlot.query.order_by(ShiftSlot.role_id, ShiftSlot.start_time).all():
+        #     
+        #     form.shifts.append_entry()
+        #     form.shifts[-1].shift_id.data = ss.id
+        #     form.shifts[-1]._type = ss
+        
         for shift in form.shifts:
-            if shift.work_shift.data:
-                shift._type = ShiftSlot.query.filter_by(id=shift.shift_id.data).one()
+            # if shift.work_shift.data:
+            shift._type = ShiftSlot.query.filter_by(id=shift.shift_id.data).one()
+                
     
     # # TODO pre load check boxes with user's shifts
-    if request.method == "POST" and form.validate():
+    if request.method == "POST": # and form.validate():
         for shift in form.shifts:
             if shift.work_shift.data:
                 app.logger.info('adding shift %i', shift.shift_id)
-                current_user.shifts.append()
-                current_user.shifts[-1].shift_slot_id = shift.shift_id
+                # current_user.shifts.append(shift._type)
+                current_user.shifts.append(Shift(shift.shift_id.data, current_user.id))
+                # current_user.shifts[-1].shift_slot_id = shift.shift_id
                 db.session.add(current_user)
         db.session.commit()
         return redirect(url_for('main'))

@@ -220,7 +220,7 @@ def add_payment_and_tickets(paymenttype):
         if name and not ticket.attribs:
             app.logger.error('Ticket %s has no attribs', ticket)
             return None
-
+            
         current_user.tickets.append(ticket)
         ticket.payment = payment
         if session.get('currency', 'GBP') == 'GBP':

@@ -49,7 +49,7 @@ class Shift(db.Model):
     shift_slot_id = db.Column(db.Integer, db.ForeignKey('shift_slot.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
-    
-    def __init__(self, shift_slot_id):
+    def __init__(self, shift_slot_id, user_id):
         self.shift_slot_id = shift_slot_id
+        self.user_id = user_id
         
