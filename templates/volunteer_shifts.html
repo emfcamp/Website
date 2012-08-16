@@ -1,7 +1,11 @@
 {% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block body %}
-<div class="span10">
+<div class="span6">
+	<p>	
+		For more information on the various roles please see our <a href="http://wiki.emfcamp.org/wiki/Team/Volunteers#Staff">wiki</a>
+		The numbers indicate the start time for each shift, shifts are 3 hours long and if you complete 3 shifts over the weekend you get a special EMF volunteer's t-shirt. 
+	</p>	
 	<form method="POST">
 		<div class="tabbable"> <!-- Only required for left/right tabs -->
 			<ul class="nav nav-tabs">
@@ -13,16 +17,34 @@
 			</ul>
 			
 			<div class="tab-content">
-				<!-- <div class="tab-pane" id="{{ role }}"> -->
-					<p>
-						{% for shift in form.shifts %}
-							{{ shift.hidden_tag() | safe }}
-							{{ shift._type.start_time.hour }}
-							{{ shift.work_shift() | safe }}
-							{{ shift.prev_state() | safe }}
+				{% for role in ("steward", "parking", "bar", "stage") %}
+					{% if role=="steward" %}
+						<div class="tab-pane active" id="{{ role }}">
+					{% else %}
+						<div class="tab-pane" id="{{ role }}">
+					{% endif %}
+					{% include 'volunteers/'+role+'_info.html' %}
+						{% for day in (31, 2, 1, 3) %}
+							{% if day == 31 %}
+								<b>Friday 31st</b>
+							{% elif day == 1 %}
+								<b>Saturday 1st</b>
+							{% elif day == 2 %}
+								<b>Sunday 2nd</b>
+							{% elif day == 3 and (role == 'parking' or role == 'steward') %}
+								<b>Monday 3rd</b>
+							{% endif %}
+							<p>
+								{% for shift in form.shifts if shift._type.role.code==role and shift._type.start_time.day == day %}
+									{{ shift.hidden_tag() | safe }}
+									{{ shift._type.start_time.hour }}
+									{{ shift.work_shift() | safe }}
+									{{ shift.prev_state() | safe }}
+								{% endfor %}
+							</p>
 						{% endfor %}
-					</p>
-				<!-- </div> -->
+					</div>
+				{% endfor %}
 			</div>
 		</div>
 		<div class="form-actions">

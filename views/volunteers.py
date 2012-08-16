@@ -62,7 +62,10 @@ def list_shifts():
             form.shifts[-1].shift_id.data = ss.id
             form.shifts[-1]._type = ss
             
-            if Shift.query.filter_by(user_id=current_user.id, shift_slot_id=ss.id, state='pending').count():
+            if Shift.query.filter_by( \
+                    user_id=current_user.id, \
+                    shift_slot_id=ss.id, \
+                    state='pending').count():
                  form.shifts[-1].prev_state.data = True
                  form.shifts[-1].work_shift.data = True
             else:
@@ -74,19 +77,33 @@ def list_shifts():
             shift._type = ShiftSlot.query.filter_by(id=shift.shift_id.data).one()
     
     # # TODO Make sure validate() works
-    if request.method == "POST": # and form.validate():
+    if request.method == "POST":
         for shift in form.shifts:
             prev    = bool_cast(shift.prev_state.data)
             current = bool_cast(shift.work_shift.data)
+            
             if (prev != current) and (prev == False):
-                app.logger.info('Adding shift %s', shift.shift_id.data)
-                new_shift = Shift(shift.shift_id.data, current_user.id)
-                current_user.shifts.append(new_shift)
-                db.session.add(current_user)
+                if Shift.query.filter_by( \
+                        user_id=current_user.id, \
+                        shift_slot_id=shift.shift_id.data, \
+                        state='cancelled').count():
+                    app.logger.info('Updating shift %s', shift.shift_id.data)
+                    mod_shift = current_user.shifts.filter_by( \
+                        shift_slot_id=shift.shift_id.data, \
+                        user_id=current_user.id).one()
+                    mod_shift.state='pending'
+                    db.session.add(mod_shift)
+                else:
+                    app.logger.info('Adding new shift %s', shift.shift_id.data)
+                    new_shift = Shift(shift.shift_id.data, current_user.id)
+                    current_user.shifts.append(new_shift)
+                    db.session.add(current_user)
                 
             elif (prev != current) and (prev == True):
-                app.logger.info('Deleting shift %s', shift.shift_id.data)
-                mod_shift = current_user.shifts.filter_by(shift_slot_id=shift.shift_id.data, user_id=current_user.id, state='pending').one()
+                app.logger.info('Cancelling shift %s', shift.shift_id.data)
+                mod_shift = current_user.shifts.filter_by( \
+                    shift_slot_id=shift.shift_id.data, \
+                    user_id=current_user.id, state='pending').one()
                 mod_shift.state='cancelled'
                 db.session.add(mod_shift)
                 

@@ -377,7 +377,7 @@ class CreateShifts(Command):
         shift_length = timedelta(hours=3)
         for day,date in days.items():
             for role, data in dailyshifts.items():
-                if day=="Monday" and (role != "steward" or role != "parking"):
+                if day=="Monday" and not (role == "steward" or role == "parking"):
                     # only parking attendants & stewards needed on Monday
                     continue
                 # transform from human readable to python friendly
