@@ -827,7 +827,6 @@ class GoogleCheckoutTryAgainForm(Form):
 
 
 @app.route("/pay/google-checkout-tryagain", methods=['POST'])
-@feature_flag('GOOGLE_CHECKOUT')
 @login_required
 def googlecheckout_tryagain():
     form = GoogleCheckoutTryAgainForm(request.form)
@@ -850,6 +849,11 @@ def googlecheckout_tryagain():
         return redirect(url_for('tickets'))
 
     if form.pay.data == True:
+        if not app.config.get('GOOGLE_CHECKOUT'):
+            app.logger.error('Unable to retry payment as Google Checkout is disabled')
+            flash('Google Checkout is currently unavailable. Please try again later.')
+            return redirect(url_for('tickets'))
+
         app.logger.info("User %s trying to pay again with Google Checkout payment %s", current_user.id, payment.id)
         total = sum(t.type.get_price(session.get('currency', 'GBP')) for t in payment.tickets)
         return googlecheckout_send(payment, total)
@@ -873,7 +877,6 @@ def googlecheckout_tryagain():
 
 
 @app.route("/pay/google-checkout-notify", methods=['POST'])
-@feature_flag('GOOGLE_CHECKOUT')
 def googlecheckout_notify():
     if not GCO.check_auth(request):
         return ('', 401)
