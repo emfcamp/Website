@@ -48,6 +48,8 @@ class Shift(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     shift_slot_id = db.Column(db.Integer, db.ForeignKey('shift_slot.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    # states = pending, cancelled, show, no-show
+    state = db.Column(db.String, nullable=False, default='pending')
     
     def __init__(self, shift_slot_id, user_id):
         self.shift_slot_id = shift_slot_id
