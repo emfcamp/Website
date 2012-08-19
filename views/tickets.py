@@ -1,4 +1,5 @@
 from main import app, db, gocardless, mail
+from main import get_user_currency, set_user_currency
 from views import feature_flag
 from models.user import User
 from models.payment import Payment, \
@@ -223,7 +224,7 @@ def add_payment_and_tickets(paymenttype):
 
         current_user.tickets.append(ticket)
         ticket.payment = payment
-        if session.get('currency', 'GBP') == 'GBP':
+        if get_user_currency() == 'GBP':
             ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
         else:
             ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS_EURO'))
@@ -254,7 +255,7 @@ def pay_choose():
 @app.route("/pay/gocardless-start", methods=['POST'])
 @login_required
 def gocardless_start():
-    session['currency'] = 'GBP'
+    set_user_currency('GBP')
 
     payment = add_payment_and_tickets(GoCardlessPayment)
     if not payment:
@@ -647,7 +648,7 @@ def get_basket():
     for type_id in session.get('basket', []):
         basket.append(Ticket(type_id=type_id))
 
-    total = sum(t.type.get_price(session.get('currency', 'GBP')) for t in basket)
+    total = sum(t.type.get_price(get_user_currency()) for t in basket)
 
     return basket, total
 
@@ -771,7 +772,7 @@ def transfer_cancel():
 @feature_flag('GOOGLE_CHECKOUT')
 @login_required
 def googlecheckout_start():
-    session['currency'] = 'GBP'
+    set_user_currency('GBP')
 
     basket, total = get_basket()
     payment = add_payment_and_tickets(GoogleCheckoutPayment)
@@ -855,7 +856,7 @@ def googlecheckout_tryagain():
             return redirect(url_for('tickets'))
 
         app.logger.info("User %s trying to pay again with Google Checkout payment %s", current_user.id, payment.id)
-        total = sum(t.type.get_price(session.get('currency', 'GBP')) for t in payment.tickets)
+        total = sum(t.type.get_price(get_user_currency()) for t in payment.tickets)
         return googlecheckout_send(payment, total)
 
     if form.cancel.data == True:

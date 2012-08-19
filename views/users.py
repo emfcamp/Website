@@ -1,4 +1,5 @@
 from main import app, db, gocardless, mail
+from main import set_user_currency
 from models.user import User, PasswordReset
 
 from sqlalchemy.exc import IntegrityError
@@ -145,5 +146,5 @@ def set_currency():
     if request.form['currency'] not in ('GBP', 'EUR'):
         abort(400)
 
-    session['currency'] = request.form['currency']
+    set_user_currency(request.form['currency'])
     return redirect(url_for('tickets_choose'))

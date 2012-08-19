@@ -34,11 +34,19 @@ hdlr.setFormatter(fmt)
 app.logger.addHandler(hdlr)
 app.logger.propagate = False
 
+def get_user_currency(default='GBP'):
+    if not app.config.get('ENABLE_EURO'):
+        return default
+    return session.get('currency', default)
+
+def set_user_currency(currency):
+    session['currency'] = currency
+
 @app.context_processor
 def utility_processor():
     def format_price(amount, currency=None, after=False):
         if currency is None:
-            currency = CURRENCY_SYMBOLS[session.get('currency', 'GBP')]
+            currency = CURRENCY_SYMBOLS[get_user_currency()]
 
         amount = u'{0:.2f}'.format(amount)
         if after:
@@ -46,7 +54,7 @@ def utility_processor():
         return currency + amount
 
     def format_ticket_price(ticket_type):
-        currency = session.get('currency', 'GBP')
+        currency = get_user_currency()
         ticket_price = ticket_type.get_price(currency)
         symbol = CURRENCY_SYMBOLS[currency]
         return format_price(ticket_price, symbol)
@@ -66,7 +74,7 @@ def utility_processor():
 
 @app.context_processor
 def currency_processor():
-    currency = session.get('currency', 'GBP')
+    currency = get_user_currency()
     return {'user_currency': currency,
             'user_currency_symbol': CURRENCY_SYMBOLS[currency]}
 
