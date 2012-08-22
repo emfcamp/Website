@@ -1,6 +1,6 @@
 from main import db, app
 from models.volunteers import ShiftSlot, Shift
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, flash
 from flaskext.login import \
 login_user, login_required, logout_user, current_user
 from flaskext.wtf import Form, Required, \
@@ -112,6 +112,7 @@ def list_shifts():
             # 
 
         db.session.commit()
+        return redirect(url_for('my_shifts'))
     
     return render_template('volunteer_shifts.html', form=form)
 
@@ -122,8 +123,15 @@ def my_shifts():
     # list a users shifts and let them modify the shifts
     #
     if not current_user.is_authenticated():
-        return redirect(url_for('main'))
+        flash("You need to be logged in to sign up for volunteer shifts.")
+        return redirect(url_for('login', next=url_for('my_shifts')))
         # select this users shifts
-        shifts = Shift.query.filter(Shift.user_id==current_user.id).all()
+    all_shifts = Shift.query.filter_by(user_id=current_user.id).all()
+    shifts = []
+    
+    for shift in all_shifts:
+        shift_slot = ShiftSlot.query.filter_by(id=shift.shift_slot_id).one()
+        shifts.append((shift, shift_slot))
+        
     return render_template('volunteers/my_shifts.html', shifts=shifts)
 

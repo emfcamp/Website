@@ -6,26 +6,28 @@
 <h2>Your current shifts</h2>
 
 <table class="table">
-<tr><th>Id</th><th>Start</th><th>End</th><th>code</th><th>name</th></tr>
+<tr><th>Id</th><th>Start</th><th>End</th><th>Role</th><th>Name</th></tr>
 
-{% for s in shifts %}
+{% for shift, shift_slot in shifts if shift.state != "cancelled" %}
 
 <tr class="
 {{ loop.cycle('odd', 'even') }}
 ">
-<td>{{ s.id }}</td>
-<td>{{ s.shiftslot.start_time }}</td>
-<td>{{ s.shiftslot.end_time }}</td>
-<td>{{ s.shiftslot.role.code }}</td>
-<td>{{ s.shiftslot.role.name }}, <a href="{{s.shiftslot.role.wiki_link}}">details</a>.</td>
+<td>{{ shift.id }}</td>
+<td>{{ shift_slot.start_time }}</td>
+<td>{{ shift_slot.end_time }}</td>
+<td>{{ shift_slot.role.code }}</td>
+<td>{{ shift_slot.role.name }}, <a href="{{shift_slot.role.wiki_link}}">details</a>.</td>
 </tr>
 {% endfor %}
 
 </table>
 
+<p>If you'd like to change your shifts please <a href="{{ url_for('list_shifts') }}">go here</a></p>
+
 {% else %}
 
-<P>If you want to sign up to a Volunteer shift please <a href="{{ url_for('main')}}">go here</a>.</P>
+<p>If you want to sign up to a Volunteer shift please <a href="{{ url_for('list_shifts')}}">go here</a>.</p>
 
 {% endif %}
 
