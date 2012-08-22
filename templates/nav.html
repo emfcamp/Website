@@ -22,22 +22,17 @@
     <li {% if request.path==url_for('contact') %}class="active"{% endif %}>
         <a href="{{url_for('contact')}}">Contact Us</a>
     </li>
-    <!-- <li {% if request.path==url_for('get_involved') %}class="active"{% endif %}>
-        <a href="{{url_for('get_involved')}}">Get Involved</a> -->
+    <li {% if request.path==url_for('get_involved') %}class="active"{% endif %}>
+        <a href="{{url_for('get_involved')}}">Get Involved</a>
     </li>
-	{% if current_user.is_authenticated() %}
-	    <!-- <li {% if request.path==url_for('list_shifts') %}class="active"{% endif %}>
-	        <a href="{{url_for('list_shifts')}}">Change Volunteer Shifts</a>
-	    </li> -->
-	    <li {% if request.path==url_for('my_shifts') %}class="active"{% endif %}>
-	        <a href="{{url_for('my_shifts')}}">Volunteer Shifts</a>
-	    </li>
-	{% endif %}
+    <li {% if request.path==url_for('list_shifts') %}class="active"{% endif %}>
+        <a href="{{url_for('list_shifts')}}">Volunteer Shifts</a>
+    </li>
     {% if current_user.admin %}
         <li {% if request.path==url_for('admin') %}class="active"{% endif %}>
             <a href="{{url_for('admin')}}">Admin</a>
         </li>
-    {% endif %}
+        {% endif %}
     <li class="nav-header">See Also</li>
     <li>
         <a href="http://wiki.emfcamp.org">Wiki</a>
