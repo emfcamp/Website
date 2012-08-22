@@ -5,32 +5,35 @@
 	<div class="tabbable"> <!-- Only required for left/right tabs -->
 		<ul class="nav nav-tabs">
 			<!-- {bar':{}, 'steward':{}, 'stage':{}, 'parking':{}} -->
-			<li class="active"><a href="#steward" data-toggle="tab">Stewarding</a></li>
+			
+			<li class="active dropdown" data-toggle="dropdown" href="#steward">
+				<a href="#steward" data-toggle="tab">Stewarding</a>
+			</li>
 			<li><a href="#bar" data-toggle="tab">Bar work</a></li>
 			<li><a href="#stage" data-toggle="tab">Stage work</a></li>
 		</ul>
 	</div>
-	<div class="tab-content">
-		{% for role in ("steward", "bar", "stage") %}			
+	<div class="tab-content">			
+		{% for role in shift_data %}			
 			<div class="tab-pane {% if role=='steward' %} active {% endif %}" id="{{ role }}">
-				{% for day in (31, 2, 1, 3) %}
+				{% for day in shift_data[role] %}
 					{% if day == 31 %}
-						<b>Friday 31st</b>
+						<a name="{{ role }}{{ day }}"></a><b>Friday 31st</b>
 					{% elif day == 1 %}
-						<b>Saturday 1st</b>
+						<a name="{{ role }}{{ day }}"></a><b>Saturday 1st</b>
 					{% elif day == 2 %}
-						<b>Sunday 2nd</b>
+						<a name="{{ role }}{{ day }}"></a><b>Sunday 2nd</b>
 					{% elif day == 3 and (role == 'parking' or role == 'steward') %}
-						<b>Monday 3rd</b>
+						<a name="{{ role }}{{ day }}"></a><b>Monday 3rd</b>
 					{% endif %}
 					<br>
-					{% for shift_slot in all_shifts if shift_slot._role==role and shift_slot.start_time.day == day %}
-						{{ shift_slot.start_time.hour }}:00
-						{% for signup in shift_slot._signups %}
-							{% for u in signup %}
-								{{ u }}; 
-							{% endfor %}
+					{% for hour in shift_data[role][day] %}
+						{{ hour }}:00
+						<ul>
+						{% for signup in shift_data[role][day][hour] %}
+							<li>{{ signup }} </li>
 						{% endfor %}
+						</ul>
 						<br>
 					{% endfor %}
 					<br>
@@ -38,6 +41,5 @@
 			</div>
 		{% endfor %}
 	</div>
-		
 </div>
 {% endblock %}

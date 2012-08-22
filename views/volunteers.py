@@ -126,7 +126,7 @@ def list_shifts():
     if current_user.phone:
         form.phone.data = current_user.phone
     
-    return render_template('volunteers/list_shifts.html', form=form)
+    return render_template('volunteers/choose_shifts.html', form=form)
 
 @app.route("/volunteers/myshifts", methods=['GET'])
 def my_shifts():
@@ -151,18 +151,48 @@ def my_shifts():
 def all_shifts():
     if not current_user.admin:
         return(('', 404))
-    all_shifts = ShiftSlot.query.filter_by().all()
+    all_shifts = ShiftSlot.query.filter_by().order_by(ShiftSlot.role_id, ShiftSlot.start_time).all()
+    shift_data = {}
     
     for shift_slot in all_shifts:
-        signups = shift_slot.shifts.all()
-        filled_shift_info = []
+        filled_shift_info = [] # stores all the volunteers for that shift
+        
         # add the useful user infomation 
-        for shift in signups:
+        for shift in shift_slot.shifts.all():
             if shift.state != 'cancelled':
                 user = User.query.filter_by(id=shift.user_id).one()
                 filled_shift_info.append( (user.name, user.phone) )
-                print (user.name, user.phone)
-        shift_slot._signups=filled_shift_info
-        shift_slot._role = Role.query.filter_by(id=shift_slot.role_id).one().code
+                
+        role = Role.query.filter_by(id=shift_slot.role_id).one().code
+        day  = shift_slot.start_time.day
+        hour = shift_slot.start_time.hour
+        # shift_slot._role = Role.query.filter_by(id=shift_slot.role_id).one().code
         
-    return render_template('volunteers/full_list.html', all_shifts=all_shifts)
+        if role not in shift_data:
+            shift_data[role] = {}
+        
+        if day not in shift_data[role]:
+            shift_data[role][day] = {}
+        
+        shift_data[role][day][hour] = filled_shift_info
+    for i in shift_data:
+        print i
+        for j in shift_data[i]:
+            print "\t", j
+            for k in shift_data[i][j]:
+                print "\t\t", k
+    return render_template('volunteers/full_list.html', shift_data=shift_data)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
