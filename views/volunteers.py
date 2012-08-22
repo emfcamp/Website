@@ -5,7 +5,7 @@ from flaskext.login import \
 login_user, login_required, logout_user, current_user
 from flaskext.wtf import Form, Required, \
 SelectField, IntegerField, HiddenField, BooleanField, SubmitField, \
-FieldList, FormField
+FieldList, FormField, StringField
 
 def bool_cast(value):
     if type(value) == bool:
@@ -39,6 +39,7 @@ class ShiftForm(Form):
     work_shift = BooleanField('work_shift')
 
 class ShiftsForm(Form):
+    phone  = StringField('phone_no')
     shifts = FieldList(FormField(ShiftForm))
     submit = SubmitField('Update shifts')
 
@@ -109,13 +110,19 @@ def list_shifts():
                 
             # update state info
             shift.prev_state.data = current
-            # 
-
+        
+        if current_user.phone != form.phone.data:
+            current_user.phone = form.phone.data
+            db.session.add(current_user)
         db.session.commit()
+        
         return redirect(url_for('my_shifts'))
+        
+    # This has to go last otherwise it never updates
+    if current_user.phone:
+        form.phone.data = current_user.phone
     
-    return render_template('volunteer_shifts.html', form=form)
-
+    return render_template('volunteers/list_shifts.html', form=form)
 
 @app.route("/volunteers/myshifts", methods=['GET'])
 def my_shifts():
@@ -128,6 +135,8 @@ def my_shifts():
         # select this users shifts
     all_shifts = Shift.query.filter_by(user_id=current_user.id).all()
     shifts = []
+    
+    
     
     for shift in all_shifts:
         shift_slot = ShiftSlot.query.filter_by(id=shift.shift_slot_id).one()

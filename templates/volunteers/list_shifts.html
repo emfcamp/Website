@@ -7,6 +7,9 @@
 		The numbers indicate the start time for each shift, shifts are 3 hours long and if you complete 3 shifts over the weekend you get a special EMF volunteer's t-shirt. 
 	</p>	
 	<form method="POST">
+		<p>
+			To contact you during the event please provide a phone number: {{ form.phone() | safe }}
+		</p>
 		<div class="tabbable"> <!-- Only required for left/right tabs -->
 			<ul class="nav nav-tabs">
 				<!-- {bar':{}, 'steward':{}, 'stage':{}, 'parking':{}} -->
@@ -46,8 +49,9 @@
 				{% endfor %}
 			</div>
 		</div>
-		<div class="form-actions">
-		    <button type="submit" class="btn btn-primary btn-large">Update shifts</button>
+		<div class="form-actions btn-group">
+		    <button type="submit" class="btn btn-primary">Update shifts</button>
+	        <a class="btn" href="{{ url_for('my_shifts') }}">My shifts</a>
 		</div>
 	</form>
 </div>
