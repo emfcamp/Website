@@ -13,11 +13,10 @@
 				<li class="active"><a href="#steward" data-toggle="tab">Stewarding</a></li>
 				<li><a href="#bar" data-toggle="tab">Bar work</a></li>
 				<li><a href="#stage" data-toggle="tab">Stage work</a></li>
-				<li><a href="#parking" data-toggle="tab">Car parking</a></li>
 			</ul>
 			
 			<div class="tab-content">
-				{% for role in ("steward", "parking", "bar", "stage") %}
+				{% for role in ("steward", "bar", "stage") %}
 					{% if role=="steward" %}
 						<div class="tab-pane active" id="{{ role }}">
 					{% else %}

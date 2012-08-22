@@ -325,8 +325,7 @@ class CreateRoles(Command):
         roles = [
             ('bar', 'Barstaff', 'http://wiki.emfcamp.org/wiki/Team/Volunteers/Bar'),
             ('steward', 'Stewarding', 'http://wiki.emfcamp.org/wiki/Team/Volunteers/Stewards'),
-            ('stage', 'Stage helper', 'http://wiki.emfcamp.org/wiki/Team/Volunteers/Stage_Helpers'),
-            ('parking', 'Car parking attendant', 'http://wiki.emfcamp.org/wiki/Team/Volunteers/Car_Park'),
+            ('stage', 'Stage helper', 'http://wiki.emfcamp.org/wiki/Team/Volunteers/Stage_Helpers')
             ]
             
         for role in roles:
@@ -365,11 +364,6 @@ class CreateShifts(Command):
                                 {'starts':(10, 13, 16, 19), 
                                  'mins'  :(1,  1,  1,  1),
                                  'maxs'  :(2,  2,  2,  2) 
-                                 },
-                       'parking':
-                                {'starts':(10, 13), 
-                                 'mins'  :(1,  1),
-                                 'maxs'  :(2,  2)
                                  },
                         }
         
