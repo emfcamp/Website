@@ -19,12 +19,8 @@
 			</ul>
 			
 			<div class="tab-content">
-				{% for role in ("steward", "bar", "stage") %}
-					{% if role=="steward" %}
-						<div class="tab-pane active" id="{{ role }}">
-					{% else %}
-						<div class="tab-pane" id="{{ role }}">
-					{% endif %}
+				{% for role in ("steward", "bar", "stage") %}			
+					<div class="tab-pane {% if role=='steward' %} active {% endif %}" id="{{ role }}">
 					{% include 'volunteers/'+role+'_info.html' %}
 						{% for day in (31, 2, 1, 3) %}
 							{% if day == 31 %}

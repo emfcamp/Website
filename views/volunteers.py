@@ -1,11 +1,14 @@
 from main import db, app
-from models.volunteers import ShiftSlot, Shift
+
+from models.volunteers import ShiftSlot, Shift, Role
+from models.user import User
+
 from flask import render_template, request, redirect, url_for, flash
 from flaskext.login import \
-login_user, login_required, logout_user, current_user
+    login_user, login_required, logout_user, current_user
 from flaskext.wtf import Form, Required, \
-SelectField, IntegerField, HiddenField, BooleanField, SubmitField, \
-FieldList, FormField, StringField
+    SelectField, IntegerField, HiddenField, BooleanField, SubmitField, \
+    FieldList, FormField, StringField
 
 def bool_cast(value):
     if type(value) == bool:
@@ -44,6 +47,7 @@ class ShiftsForm(Form):
     submit = SubmitField('Update shifts')
 
 @app.route("/volunteers/shifts", methods=['GET', 'POST'])
+@login_required
 def list_shifts():
     #
     # list all shifts
@@ -52,8 +56,8 @@ def list_shifts():
     #	understaffed shifts are highlighted
     #	immenient understaffed shifts are highlighted more.
     #
-    if not current_user.is_authenticated():
-        return redirect(url_for('signup', next=url_for('tickets_choose')))
+    # if not current_user.is_authenticated():
+    #     return redirect(url_for('signup', next=url_for('tickets_choose')))
 
     form = ShiftsForm(request.form)
 
@@ -136,11 +140,29 @@ def my_shifts():
     all_shifts = Shift.query.filter_by(user_id=current_user.id).all()
     shifts = []
     
-    
-    
     for shift in all_shifts:
         shift_slot = ShiftSlot.query.filter_by(id=shift.shift_slot_id).one()
         shifts.append((shift, shift_slot))
         
     return render_template('volunteers/my_shifts.html', shifts=shifts)
 
+@app.route("/volunteers/all_shifts", methods=['GET'])
+@login_required
+def all_shifts():
+    if not current_user.admin:
+        return(('', 404))
+    all_shifts = ShiftSlot.query.filter_by().all()
+    
+    for shift_slot in all_shifts:
+        signups = shift_slot.shifts.all()
+        filled_shift_info = []
+        # add the useful user infomation 
+        for shift in signups:
+            if shift.state != 'cancelled':
+                user = User.query.filter_by(id=shift.user_id).one()
+                filled_shift_info.append( (user.name, user.phone) )
+                print (user.name, user.phone)
+        shift_slot._signups=filled_shift_info
+        shift_slot._role = Role.query.filter_by(id=shift_slot.role_id).one().code
+        
+    return render_template('volunteers/full_list.html', all_shifts=all_shifts)
