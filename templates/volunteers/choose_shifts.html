@@ -35,8 +35,10 @@
 							<p>
 								{% for shift in form.shifts if shift._type.role.code==role and shift._type.start_time.day == day %}
 									{{ shift.hidden_tag() | safe }}
-									{{ shift._type.start_time.hour }}
+									<label class="checkbox">
+									{{ format_shift_short(shift._type.start_time, shift._type.end_time) }}
 									{{ shift.work_shift() | safe }}
+									</label>
 									{{ shift.prev_state() | safe }}
 								{% endfor %}
 							</p>
