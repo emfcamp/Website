@@ -38,6 +38,9 @@
 									<label class="checkbox">
 									{{ format_shift_short(shift._type.start_time, shift._type.end_time) }}
 									{{ shift.work_shift() | safe }}
+									{% if shift.errors %}
+										<span class="label label-important">Error</span>
+									{% endif %}
 									</label>
 									{{ shift.prev_state() | safe }}
 								{% endfor %}

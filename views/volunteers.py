@@ -48,13 +48,15 @@ class ShiftForm(Form):
         if bool_cast(field.data) == False: return
         
         in_shift_id = form.shift_id.data
-        shift_slot = ShiftSlot.query.filter(ShiftSlot.id==in_shift_id).one()
-        in_shift_start = shift_slot.start_time
+        in_shift_slot = ShiftSlot.query.filter(ShiftSlot.id==in_shift_id).one()
+        in_shift_start = in_shift_slot.start_time
         
-        if Shift.query.filter(Shift.shift_slot_id == in_shift_id).count() > shift_slot.maximum:
-            msg="New shift starting at %s:00 already has enough volunteers, sorry"%(in_shift_start.hour)
-            app.logger.error(msg)
+        if Shift.query.filter(Shift.shift_slot_id == in_shift_id).count() > in_shift_slot.maximum:
+            role = Role.query.filter_by(id=in_shift_slot.role_id).one().code
+            msg="New %s shift starting at %s:00 on %s already has enough volunteers, sorry"\
+                %(role, in_shift_start.hour, in_shift_slot.start_time.strftime('%A'))
             flash(msg)
+            app.logger.error(msg)
             raise ValidationError(msg)
             
         user_shifts = ShiftSlot.query.join(Shift).filter(\
@@ -66,8 +68,11 @@ class ShiftForm(Form):
             if bool_cast(field.data) != bool_cast(form.prev_state.data): 
                 # check if the shift to be added overlaps with any over shift
                 if abs (u_shift.start_time - in_shift_start) < timedelta(hours=3):
-                    msg="New shift starting at %s:00 clashes with a previous shift starting at %s:00"\
-                        %(in_shift_start.hour, u_shift.start_time.hour)
+                    role = Role.query.filter_by(id=in_shift_slot.role_id).one().code
+                    msg="New %s shift starting at %s:00 on %s clashes with another of your shifts\
+                        please un-select it. If you would like to swap: un-select the clashing shift\
+                        then re-select this one."\
+                        %(role, in_shift_start.hour, in_shift_slot.start_time.strftime('%A'))
                     app.logger.error(msg)
                     flash(msg)
                     raise ValidationError(msg)
