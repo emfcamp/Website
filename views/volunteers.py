@@ -113,7 +113,6 @@ def list_shifts():
             # if shift.work_shift.data:
             shift._type = ShiftSlot.query.filter_by(id=shift.shift_id.data).one()
     
-    for i in form: print i.errors
     if request.method == "POST" and form.validate():
         for shift in form.shifts:
             prev    = bool_cast(shift.prev_state.data)
