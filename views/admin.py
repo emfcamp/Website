@@ -36,18 +36,64 @@ def stats():
     paid = Ticket.query.filter(Ticket.paid == True)
     full = db.engine.execute(text("""select count(*) from ticket_type, ticket where
                                         ticket.type_id = ticket_type.id and
-                                        ticket.paid = true and ticket.expires > now()
+                                        ticket.paid = false and ticket.expires > now()
                                         and ticket_type.code LIKE 'full%'""")).scalar()
 
     full_bought = db.engine.execute(text("""select count(*) from ticket_type, ticket where
                                         ticket.type_id = ticket_type.id and
                                         ticket.paid = true and ticket_type.code LIKE 'full%'""")).scalar()
+
+    kids_bought = db.engine.execute(text("""select count(*) from ticket_type, ticket where
+                                        ticket.type_id = ticket_type.id and
+                                        ticket.paid = true and ticket_type.code LIKE 'kids%'""")).scalar()
+
+    confident_query = text("""
+      select count(*)
+      from
+          ticket_type tt,
+          ticket t,
+          payment p
+      where
+          tt.id = t.type_id
+          and p.id = t.payment_id
+          and tt.code like :code
+          and (
+            p.provider = 'gocardless' and p.state = 'inprogress' and t.expires > now()
+            or t.paid = true
+          )
+    """)
+
+    full_confident = db.engine.execute(confident_query, code='full%').scalar()
+    day_confident = db.engine.execute(confident_query, code='day%').scalar()
+
+    full_unconfident = db.engine.execute(text("""
+      select count(*)
+      from
+          ticket_type tt,
+          ticket t,
+          payment p
+      where
+          tt.id = t.type_id
+          and p.id = t.payment_id
+          and tt.code like 'full%'
+          and (
+            p.provider = 'banktransfer' and p.state = 'inprogress'
+            or p.provider = 'googlecheckout' and p.state = 'new'
+          )
+          and t.expires > now()
+    """)).scalar()
+
+
     stats = {
         'prepays': outstanding.filter(Ticket.type == TicketType.Prepay).count(),
         'prepays_bought_all': paid.filter(Ticket.type == TicketType.Prepay).count(),
         'full': full,
         'full_bought': full_bought,
+        'kids_bought': kids_bought,
+        'full_confident': full_confident,
+        'full_unconfident': full_unconfident,
         'users': User.query.count(),
+        'day_confident': day_confident
     }
 
     # A pending or purchased full ticket cancels out a purchased prepay

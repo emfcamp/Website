@@ -8,6 +8,7 @@
 <p>If you've already signed up, <a href="{{url_for('login')}}">log in</a> to view your ticket status.</p>
 {% endif %}
 
+{% if config.get('ENABLE_EURO') %}
 <div class="currency_form">
 <form method="post" action="{{url_for('set_currency')}}" class="form-inline" id="currency_form">
     <label for="select_currency">Select currency:</label>
@@ -20,6 +21,7 @@
     </noscript>
 </form>
 </div>
+{% endif %}
 
 <form method="post" class="choose-tickets-form">
 {{form.hidden_tag()}}
