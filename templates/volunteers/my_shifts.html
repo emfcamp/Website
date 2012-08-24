@@ -2,42 +2,46 @@
 
 {% block body %}
 <div class="span10">
-{% if shifts %}
+
+{% if not shifts %}
+
+<h2>Helping out at EMF</h2>
+
+<p>
+       Electromagnetic Field is entirely run by volunteers, and we need people
+	   like you during the event to help with stewarding, serve at the bar
+	   and look after the stages.  Please click below to sign up for shifts.
+</p>
+<p>
+       If you would like more information have a look at the 
+       <a href="wiki.emfcamp.org/wiki/Team/Volunteers">wiki</a> or come talk to us
+       at the infodesk!
+</p>
+
+<a class="btn btn-primary" href="{{ url_for('choose_shifts') }}">Sign up</a>
+
+{% else %}
+
 <h2>Your current shifts</h2>
 
 <table class="table">
-<tr><th>Id</th><th>Start</th><th>End</th><th>Role</th><th>Name</th></tr>
+<tr><th>Id</th><th>Start</th><th>End</th><th>Role</th></tr>
 
 {% for shift, shift_slot in shifts if shift.state != "cancelled" %}
 
 <tr class="{{ loop.cycle('odd', 'even') }}">
 <td>{{ shift.id }}</td>
-<td>{{ shift_slot.start_time }}</td>
-<td>{{ shift_slot.end_time }}</td>
-<td>{{ shift_slot.role.code }}</td>
-<td>{{ shift_slot.role.name }}, <a href="{{shift_slot.role.wiki_link}}">details</a>.</td>
+<td>{{ format_shift_dt(shift_slot.start_time) }}</td>
+<td>{{ format_shift_dt(shift_slot.end_time) }}</td>
+<td>{{ shift_slot.role.name }} - <a href="{{shift_slot.role.wiki_link}}">details</a></td>
 </tr>
 {% endfor %}
 
 </table>
 
-<a class="btn btn-primary" href="{{ url_for('list_shifts') }}">Change shifts</a>
-
-{% else %}
-
-<!-- <h4><p>If you want to sign up to do a volunteer shift please <a href="{{ url_for('list_shifts')}}">go here</a>.</p></h4> -->
-
-<p>
-	EMF is volunteer run and we're currently looking for people to steward the event, run the bar 
-	and help run the stages. 
-</p>
-<p>
-	If you would like more information have a look at the 
-	<a href="wiki.emfcamp.org/wiki/Team/Volunteers">wiki</a> or come talk to us
-	at the infodesk!
-</p>
-        <a class="btn btn-primary" href="{{ url_for('list_shifts') }}">Sign up</a>
+<a class="btn btn-primary" href="{{ url_for('choose_shifts') }}">Change shifts</a>
 
 {% endif %}
+
 </div>
 {% endblock %}

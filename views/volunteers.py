@@ -80,7 +80,7 @@ class ShiftsForm(Form):
 
 @app.route("/volunteers/shifts", methods=['GET', 'POST'])
 @login_required
-def list_shifts():
+def choose_shifts():
     #
     # list all shifts
     # 	a user can pick shifts here
@@ -174,7 +174,8 @@ def my_shifts():
     
     for shift in all_shifts:
         shift_slot = ShiftSlot.query.filter_by(id=shift.shift_slot_id).one()
-        shifts.append((shift, shift_slot))
+        if shift.state != 'cancelled':
+			shifts.append((shift, shift_slot))
         
     return render_template('volunteers/my_shifts.html', shifts=shifts)
 
