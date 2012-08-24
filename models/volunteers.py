@@ -55,3 +55,5 @@ class Shift(db.Model):
         self.shift_slot_id = shift_slot_id
         self.user_id = user_id
         
+        
+        

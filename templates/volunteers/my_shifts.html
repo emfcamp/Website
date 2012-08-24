@@ -26,7 +26,7 @@
 {% else %}
 
 <!-- <h4><p>If you want to sign up to do a volunteer shift please <a href="{{ url_for('list_shifts')}}">go here</a>.</p></h4> -->
-        <a class="btn btn-primary" href="{{ url_for('list_shifts') }}">Sign up</a>
+
 <p>
 	EMF is volunteer run and we're currently looking for people to steward the event, run the bar 
 	and help run the stages. 
@@ -36,7 +36,8 @@
 	<a href="wiki.emfcamp.org/wiki/Team/Volunteers">wiki</a> or come talk to us
 	at the infodesk!
 </p>
+        <a class="btn btn-primary" href="{{ url_for('list_shifts') }}">Sign up</a>
 
 {% endif %}
-
+</div>
 {% endblock %}

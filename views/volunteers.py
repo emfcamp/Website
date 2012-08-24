@@ -3,12 +3,14 @@ from main import db, app
 from models.volunteers import ShiftSlot, Shift, Role
 from models.user import User
 
+from datetime import timedelta
+
 from flask import render_template, request, redirect, url_for, flash
 from flaskext.login import \
     login_user, login_required, logout_user, current_user
 from flaskext.wtf import Form, Required, \
     SelectField, IntegerField, HiddenField, BooleanField, SubmitField, \
-    FieldList, FormField, StringField
+    FieldList, FormField, StringField, ValidationError
 
 def bool_cast(value):
     if type(value) == bool:
@@ -35,12 +37,42 @@ class HiddenBooleanField(HiddenField, BooleanField):
     widget=HiddenInput() doesn't work with WTF-Flask's hidden_tag()
     """
 
+
 class ShiftForm(Form):
     shift_id   = HiddenIntegerField('Ticket Type', [Required()])
     # use the previous state to add/remove entries
     prev_state = HiddenBooleanField('Previous State', [Required()])
     work_shift = BooleanField('work_shift')
-
+    
+    def validate_work_shift(form, field):
+        if bool_cast(field.data) == False: return
+        
+        in_shift_id = form.shift_id.data
+        shift_slot = ShiftSlot.query.filter(ShiftSlot.id==in_shift_id).one()
+        in_shift_start = shift_slot.start_time
+        
+        if Shift.query.filter(Shift.shift_slot_id == in_shift_id).count() > shift_slot.maximum:
+            msg="New shift starting at %s:00 already has enough volunteers, sorry"%(in_shift_start.hour)
+            app.logger.error(msg)
+            flash(msg)
+            raise ValidationError(msg)
+            
+        user_shifts = ShiftSlot.query.join(Shift).filter(\
+                Shift.user_id==current_user.id, \
+                Shift.state!="cancelled").order_by(ShiftSlot.start_time)
+        
+        for u_shift in user_shifts:
+            # check the field has actually been updated
+            if bool_cast(field.data) != bool_cast(form.prev_state.data): 
+                # check if the shift to be added overlaps with any over shift
+                if abs (u_shift.start_time - in_shift_start) < timedelta(hours=3):
+                    msg="New shift starting at %s:00 clashes with a previous shift starting at %s:00"\
+                        %(in_shift_start.hour, u_shift.start_time.hour)
+                    app.logger.error(msg)
+                    flash(msg)
+                    raise ValidationError(msg)
+                
+    
 class ShiftsForm(Form):
     phone  = StringField('phone_no')
     shifts = FieldList(FormField(ShiftForm))
@@ -67,10 +99,10 @@ def list_shifts():
             form.shifts[-1].shift_id.data = ss.id
             form.shifts[-1]._type = ss
             
-            if Shift.query.filter_by( \
-                    user_id=current_user.id, \
-                    shift_slot_id=ss.id, \
-                    state='pending').count():
+            if Shift.query.filter( \
+                    Shift.user_id==current_user.id, \
+                    Shift.shift_slot_id==ss.id, \
+                    Shift.state!='cancelled').count():
                  form.shifts[-1].prev_state.data = True
                  form.shifts[-1].work_shift.data = True
             else:
@@ -81,8 +113,8 @@ def list_shifts():
             # if shift.work_shift.data:
             shift._type = ShiftSlot.query.filter_by(id=shift.shift_id.data).one()
     
-    # # TODO Make sure validate() works
-    if request.method == "POST":
+    for i in form: print i.errors
+    if request.method == "POST" and form.validate():
         for shift in form.shifts:
             prev    = bool_cast(shift.prev_state.data)
             current = bool_cast(shift.work_shift.data)
@@ -119,8 +151,9 @@ def list_shifts():
             current_user.phone = form.phone.data
             db.session.add(current_user)
         db.session.commit()
-        
+        flash("Thank you!")
         return redirect(url_for('my_shifts'))
+    
         
     # This has to go last otherwise it never updates
     if current_user.phone:
@@ -161,6 +194,7 @@ def all_shifts():
         for shift in shift_slot.shifts.all():
             if shift.state != 'cancelled':
                 user = User.query.filter_by(id=shift.user_id).one()
+                
                 filled_shift_info.append( (user.name, user.phone) )
                 
         role = Role.query.filter_by(id=shift_slot.role_id).one().code
@@ -174,13 +208,14 @@ def all_shifts():
         if day not in shift_data[role]:
             shift_data[role][day] = {}
         
-        shift_data[role][day][hour] = filled_shift_info
-    for i in shift_data:
-        print i
-        for j in shift_data[i]:
-            print "\t", j
-            for k in shift_data[i][j]:
-                print "\t\t", k
+        status = "not_full"
+        if shift_slot.minimum > len(filled_shift_info):
+            status = "under"
+        elif shift_slot.maximum <= len(filled_shift_info):
+            status = "full"
+        
+        shift_data[role][day][hour] = {'status': status, 'min': shift_slot.minimum, 'people':filled_shift_info}
+    
     return render_template('volunteers/full_list.html', shift_data=shift_data)
     
     

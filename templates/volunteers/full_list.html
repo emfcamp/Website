@@ -13,10 +13,11 @@
 			<li><a href="#stage" data-toggle="tab">Stage work</a></li>
 		</ul>
 	</div>
-	<div class="tab-content">			
-		{% for role in shift_data %}			
+	<div class="tab-content">
+		{% for role in shift_data %}
 			<div class="tab-pane {% if role=='steward' %} active {% endif %}" id="{{ role }}">
-				{% for day in shift_data[role] %}
+				{# for day in shift_data[role] #}
+				{% for day in (31, 1, 2, 3) %}
 					{% if day == 31 %}
 						<a name="{{ role }}{{ day }}"></a><b>Friday 31st</b>
 					{% elif day == 1 %}
@@ -27,16 +28,49 @@
 						<a name="{{ role }}{{ day }}"></a><b>Monday 3rd</b>
 					{% endif %}
 					<br>
-					{% for hour in shift_data[role][day] %}
-						{{ hour }}:00
-						<ul>
-						{% for signup in shift_data[role][day][hour] %}
-							<li>{{ signup }} </li>
-						{% endfor %}
-						</ul>
-						<br>
-					{% endfor %}
-					<br>
+					{% if shift_data[role][day] %}
+						<table class="table table-condensed table-hover">
+							<thead>	
+								<tr>
+									<th>Start</th>
+									<th>Required</th>
+									<th>Status</th>
+									<th>Name</th>
+									<th>Phone number</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for hour in shift_data[role][day] %}
+									{% for person in shift_data[role][day][hour]['people'] %}
+										<tr>
+											{% if loop.first %}
+												<td>{{ hour }}:00</td>
+												<td>{{ shift_data[role][day][hour]['min'] }}</td>
+												{% if shift_data[role][day][hour]['status'] == 'not_full' %}
+													<td><span class="label label-info">Ok</span></td>
+												{% elif shift_data[role][day][hour]['status'] == 'full' %}
+													<td><span class="label label-success">Full</span></td>									
+												{% elif shift_data[role][day][hour]['status'] == 'under' %}
+													<td><span class="label label-warning">Below</span></td>
+												{% endif %}
+											{% else %}
+												<td></td><td></td><td></td>	
+											{% endif %}
+											<td>{{ person[0] }}</td>
+											<td>{{ person[1] }}</td>
+										</tr>
+									{% else %}
+										<tr>
+											<td>{{ hour }}:00</td>
+											<td>{{ shift_data[role][day][hour]['min'] }}</td>
+											<td><span class="label label-important">Empty</span></td>
+											<td></td><td></td>
+										</tr>
+									{% endfor %}
+								{% endfor %}
+							</tbody>	
+						</table>
+					{% endif %}
 				{% endfor %}
 			</div>
 		{% endfor %}
