@@ -6,7 +6,7 @@ Starting
 sudo apt-get install python-dev python-virtualenv libxml2-dev libxslt-dev # if needed - python-psycopg2
 make init
 make update
-make tickets
+make db
 ```
 
 Alt method using 'easy\_install'
@@ -21,7 +21,7 @@ Running
 =======
 ```
 make update
-make tickets
+make db
 make
 ```
 
@@ -38,7 +38,7 @@ If you want to clean out the database and start again then:
 ```
 rm var/test.db
 make update
-make tickets
+make db
 ```
 
 If you want the site to be accessible by the rest of the world then change app.run() at the end of main.py to app.run(host="0.0.0.0")

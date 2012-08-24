@@ -1,0 +1,64 @@
+notes on tickets_choose
+	creates TicketAmountsForm which has
+		sub forms:
+			amount (int select)
+			type id (hidden)
+		submit button 
+	if the form.types doesn't exist:
+		create a new empty entry (append_entry)
+		set the type id for the type sub-form 
+	if user auth
+		check number of prepay tickets
+		check number of full tickets
+		if full tickets >= prepays prepays = 0 (all prepays bought)
+	else prepays= fulls = 0
+	get any tokens for the session
+	for all the sub forms  
+		set _type to the ticket type 
+		set limit
+		for each ticket type
+			set values to the maximum number of that type perchasable
+			(use '[]' to disable that ticket type e.g. prepays)
+			set subform's "amount" to display in dropdown box
+	if "POST" and valid
+		set basket to empty
+		for all subforms
+			if the subform has a value for "amount" (i.e. it's not "[]")
+				check validity of tokens
+				append amount number of the ticket id to the basket
+		set session['basket'] to basket
+		if authorised user:
+			go to ticket_info
+		else
+			go to signup (next=ticket_info)
+	render the template with form = form
+	
+Notes on tickets_info
+	get basket & total 
+	redirect to tickets if no basket
+	build_info_form()
+		get_basket
+		if no basket return None, basket, total 
+		form = subforms for the different ticket types (camper, kids etc.)
+		forms = forms from form that match either ['full', 'kids']
+		if forms is empty
+			for each ticket in basket:
+ 				append the ticket_id from form to ticket.form
+			if still no forms return None, basket, total
+		else
+			form_tickets = list of codes ('full' or 'kids') for t in basket
+			create a list of entries from FormLists 
+				(sum will add items to a list)
+			set each ticket's form to be the appropriate subform
+		return form, basket, total
+	if no form redirect to choose
+	if 'POST' and valid
+		if form.back has been set (data) go back to choose
+		set session[info] to be form.data
+		go back to choose
+	render with form, basket and total
+
+				
+			
+			
+			

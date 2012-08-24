@@ -12,8 +12,10 @@ class User(db.Model, flaskext.login.UserMixin):
     name = db.Column(db.String, nullable=False)
     password = db.Column(db.String, nullable=False)
     admin = db.Column(db.Boolean, default=False, nullable=False)
+    phone = db.Column(db.String, nullable=True)
     tickets = db.relationship('Ticket', lazy='dynamic', backref='user', cascade='all, delete, delete-orphan')
     payments = db.relationship('Payment', lazy='dynamic', backref='user', cascade='all')
+    shifts = db.relationship('Shift', lazy='dynamic', backref='user')
 
     def __init__(self, email, name):
         self.email = email

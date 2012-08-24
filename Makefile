@@ -26,11 +26,17 @@ endif
 run:
 	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./main.py
 
+db: tickets tokens shifts
+
 tickets:
 	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py createtickets
 
 tokens:
 	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py addtokens
+
+shifts:
+	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py createroles
+	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py createshifts
 
 update:
 	./env/bin/python ./env/bin/pip install -r ./requirements.txt

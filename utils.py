@@ -16,7 +16,7 @@ import re, os, random
 from datetime import datetime, timedelta
 
 from main import app, mail, db
-from models import User, TicketType, Ticket, TicketPrice, TicketToken
+from models import User, TicketType, Ticket, TicketPrice, TicketToken, Role, Shift, ShiftSlot
 from models.payment import Payment, BankPayment, GoCardlessPayment, safechars
 from sqlalchemy import text
 
@@ -321,6 +321,81 @@ class CreateTickets(Command):
                 db.session.commit()
 
         print 'Tickets created'
+        
+class CreateRoles(Command):
+    def run(self):
+        roles = [
+            ('bar', 'Barstaff', 'http://wiki.emfcamp.org/wiki/Team/Volunteers/Bar'),
+            ('steward', 'Stewarding', 'http://wiki.emfcamp.org/wiki/Team/Volunteers/Stewards'),
+            ('stage', 'Stage helper', 'http://wiki.emfcamp.org/wiki/Team/Volunteers/Stage_Helpers')
+            ]
+            
+        for role in roles:
+            try:
+                Role.query.filter_by(code=role[0]).one()
+            except NoResultFound, e:
+                db.session.add(Role(*role))
+                db.session.commit()    
+
+class CreateShifts(Command):
+    # datetimes are apparently stored in the following format:
+    # %04d-%02d-%02d %02d:%02d:%02d.%06d" % (value.year, 
+    #                         value.month, value.day,
+    #                         value.hour, value.minute, 
+    #                         value.second, value.microsecond )
+    # only need worry about year, month, day & hour (sod minutes & seconds etc)
+    def run(self):
+        fmt = "%04d-%02d-%02d %02d:%02d:%02d.%06d"
+                        
+        days ={"Friday"  :{'m':8, 'd':31},  
+               "Saturday":{'m':9, 'd':1 },  
+               "Sunday"  :{'m':9, 'd':2 },  
+               "Monday"  :{'m':9, 'd':3 }}
+        
+        dailyshifts = {'steward':
+                                {'starts':(2, 5, 8, 11, 14, 17, 20, 23), 
+                                 'mins'  :(2, 2, 3,  3,  3,  3,  3,  2),
+                                 'maxs'  :(2, 2, 4,  6,  6,  4,  4,  2)
+                                 },
+                       'bar':
+                                {'starts':(12, 15, 18, 21), 
+                                 'mins'  :(1,  1,  1,  1),
+                                 'maxs'  :(2,  2,  2,  2) 
+                                 },
+                       'stage':
+                                {'starts':(10, 13, 16, 19), 
+                                 'mins'  :(1,  1,  1,  1),
+                                 'maxs'  :(2,  2,  2,  2) 
+                                 },
+                        }
+        
+        shifts = []
+        shift_length = timedelta(hours=3)
+        for day,date in days.items():
+            for role, data in dailyshifts.items():
+                if day=="Monday" and not (role == "steward" or role == "parking"):
+                    # only parking attendants & stewards needed on Monday
+                    continue
+                # transform from human readable to python friendly
+                data = map(None, *data.values())
+                for start, min, max in data:
+                    if day=="Friday" and start < 8: 
+                        # gates open at 8am Friday
+                        continue
+                    elif day=="Monday" and start > 11:
+                        # last shift is 11->14 Monday
+                        continue
+                    start_time = datetime(2012, date['m'], date['d'], start)
+                    s = ShiftSlot(start_time, min, max, role)
+                    shifts.append(s)
+        
+        for shift in shifts:
+            try:
+                Shift.query.filter_by(id=shift.id).one()
+            except NoResultFound, e:
+                db.session.add(shift)
+                db.session.commit()    
+                    
 
 class CreateTicketTokens(Command):
     def run(self):
@@ -447,4 +522,6 @@ if __name__ == "__main__":
   manager.add_command('makeadmin', MakeAdmin())
   manager.add_command('prepayreminder', SendPrepayReminder())
   manager.add_command('addtokens', CreateTicketTokens())
+  manager.add_command('createroles', CreateRoles())
+  manager.add_command('createshifts', CreateShifts())
   manager.run()
