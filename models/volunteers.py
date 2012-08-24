@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 class Role(db.Model):
     __tablename__ = 'role'
     id          = db.Column(db.Integer, primary_key=True)
-    code        = db.Column(db.Integer, nullable=False, index=True, unique=True)
+    code        = db.Column(db.String, nullable=False, index=True, unique=True)
     name        = db.Column(db.String,  nullable=False)
     wiki_link   = db.Column(db.String,  nullable=False)
     shift_slots = db.relationship('ShiftSlot', lazy='dynamic', backref='role')
