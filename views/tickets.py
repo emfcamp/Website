@@ -253,6 +253,7 @@ def pay_choose():
     return render_template('payment-choose.html', basket=basket, total=total, GCO=GCO)
 
 @app.route("/pay/gocardless-start", methods=['POST'])
+@feature_flag('GOCARDLESS')
 @login_required
 def gocardless_start():
     set_user_currency('GBP')
@@ -330,6 +331,11 @@ def gocardless_tryagain():
         return redirect(url_for('tickets'))
 
     if form.pay.data == True:
+        if not config.get('GOCARDLESS'):
+            app.logger.error('Unable to retry payment as GoCardless is disabled')
+            flash('GoCardless is currently unavailable. Please try again later')
+            return redirect(url_for('tickets'))
+
         app.logger.info("User %s trying to pay again with GoCardless payment %s", current_user.id, payment.id)
         bill_url = payment.bill_url("Electromagnetic Field Ticket Deposit")
         return redirect(bill_url)
@@ -339,15 +345,13 @@ def gocardless_tryagain():
         return render_template('gocardless-discard-yesno.html', payment=payment, form=ynform)
 
     if form.yes.data == True:
-        app.logger.info("User %s canceled new GoCardless payment %s", current_user.id, payment.id)
         for t in payment.tickets.all():
             db.session.delete(t)
-            app.logger.info("Canceling Gocardless ticket %s (u:%s p:%s)", t.id, current_user.id, payment.id)
-        app.logger.info("Canceling Gocardless payment %s (u:%s)", payment.id, current_user.id)
+            app.logger.info("Cancelling GoCardless ticket %s", t.id)
+        app.logger.info("Cancelled GoCardless payment %s for user %s", payment.id, current_user.id)
         payment.state = "canceled"
-        db.session.add(payment)
         db.session.commit()
-        flash("Your gocardless payment has been cancelled")
+        flash("Your GoCardless payment has been cancelled")
 
     return redirect(url_for('tickets'))
 
@@ -372,6 +376,11 @@ def gocardless_complete():
     except Exception, e:
         app.logger.error("gocardless-complete exception: %s", e)
         flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
+        return redirect(url_for('tickets'))
+
+    if payment.state != 'new':
+        app.logger.error('Payment state is not new: %s', payment.state)
+        flash('Your payment has already been confirmed, please contact %s' % app.config.get('TICKET_EMAIL')[1])
         return redirect(url_for('tickets'))
 
     # keep the gocardless reference so we can find the payment when we get called by the webhook
