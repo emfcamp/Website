@@ -529,6 +529,7 @@ def gocardless_webhook():
 
 
 @app.route("/pay/transfer-start", methods=['POST'])
+@feature_flag('BANK_TRANSFER')
 @login_required
 def transfer_start():
     payment = add_payment_and_tickets(BankPayment)
