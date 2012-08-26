@@ -1,0 +1,40 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+
+{% block body %}
+<div class="span10">
+<h2>Your tickets</h2>
+
+<img src="{{ url_for('tickets_receipt_qr', receipt=user.receipt) }}"</img>
+
+<div>{{ user.full_name }}</div>
+<div>{{ user.email }}</div>
+
+<table class="table">
+{% for t in tickets %}
+
+{% if t.payment %}
+<tr class="{{ loop.cycle('odd', 'even') }}">
+<div>{{ t.type.name }}</div>
+<div>{{ t.receipt }}</div>
+<div>
+    <img src="{{ url_for('tickets_receipt_qr', receipt=t.receipt) }}"</img>
+    {% if t.type.code.startswith('full') or t.type.code.startswith('kids') %}
+    {% for attrib in t.attribs|sort %}
+      {% if attrib.value in ('1', 'true') %}
+        {% if attrib.name == "accessible" %} Accessible
+        {% elif attrib.name == "volunteer" %} Volunteer
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+    {% endif %}
+    <hr/>
+</div>
+</tr>
+
+{% endif %}
+{% endfor %}
+
+</table>
+
+{% endblock %}
