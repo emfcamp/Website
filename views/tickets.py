@@ -8,7 +8,8 @@ from models.ticket import TicketType, Ticket, TicketAttrib, TicketToken
 
 from flask import \
     render_template, redirect, request, flash, \
-    url_for, abort, send_from_directory, session
+    url_for, abort, send_from_directory, session, \
+    send_file
 from flaskext.login import \
     login_user, login_required, logout_user, current_user
 from flaskext.mail import Message
@@ -32,6 +33,8 @@ import requests
 from lxml import objectify
 from base64 import b64encode
 from decimal import Decimal, ROUND_UP
+from StringIO import StringIO
+import qrcode
 
 class IntegerSelectField(SelectField):
     def __init__(self, *args, **kwargs):
@@ -1020,5 +1023,47 @@ def googlecheckout_notify():
 
 
     return render_template('google-checkout/notification-acknowledgment.xml', serial=serial)
+
+
+@app.route("/tickets/receipt")
+@login_required
+def tickets_all_receipts():
+
+    if current_user.receipt is None:
+        current_user.create_receipt()
+
+    for ticket in current_user.tickets:
+        if ticket.receipt is None:
+            ticket.create_receipt()
+
+    return render_template('tickets-receipt.htm', user=current_user, tickets=current_user.tickets)
+
+@app.route("/receipt/<receipt>")
+@login_required
+def tickets_receipt(receipt):
+    try:
+        user = User.filter_by(receipt=receipt).one()
+        tickets = user.tickets
+    except Exception, e:
+        try:
+            ticket = Ticket.filter_by(receipt=receipt).one()
+            user = ticket.user
+        except Exception, e:
+            return ('', 404)
+
+    # TODO: check user == current_user or current_user.admin
+    # If admin, redirect to admin's "tick off ticket" page
+
+    return render_template('tickets-receipt.htm', user=user, tickets=tickets)
+
+@app.route("/receipt/<receipt>/qr")
+@login_required
+def tickets_receipt_qr(receipt):
+
+    qrfile = StringIO()
+    qr = qrcode.make(url_for('tickets_receipt', receipt=receipt, _external=True), box_size=2)
+    qr.save(qrfile, 'PNG')
+    qrfile.seek(0)
+    return send_file(qrfile, mimetype='image/png')
 
 

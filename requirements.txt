@@ -15,3 +15,5 @@ Flask-Script
 cssmin
 requests==0.13.2
 lxml
+qrcode
+pil
