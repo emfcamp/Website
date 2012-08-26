@@ -1,4 +1,4 @@
-from main import app, db, gocardless, mail
+from main import app, db, gocardless, mail, ticket_cutoff
 from main import get_user_currency, set_user_currency
 from views import feature_flag
 from models.user import User
@@ -574,6 +574,8 @@ class TicketAmountsForm(Form):
 @app.route("/tickets/choose", methods=['GET', 'POST'])
 @feature_flag('FULL_TICKETS')
 def tickets_choose():
+    if ticket_cutoff():
+        return render_template("tickets-cutoff.html")
     form = TicketAmountsForm(request.form)
 
     if not form.types:

@@ -3,9 +3,10 @@ from flask import Flask, session, _request_ctx_stack
 from flaskext.login import LoginManager
 from flaskext.mail import Mail
 from flask.ext.sqlalchemy import SQLAlchemy
-from sqlalchemy.orm.exc import NoResultFound
 from flask.ext.assets import Environment, Bundle
 
+from datetime import datetime
+import iso8601
 import logging
 import time
 
@@ -41,6 +42,10 @@ def get_user_currency(default='GBP'):
 
 def set_user_currency(currency):
     session['currency'] = currency
+
+def ticket_cutoff():
+    return datetime.utcnow() > iso8601.parse_date(app.config['TICKET_CUTOFF']).replace(tzinfo=None)
+
 
 @app.context_processor
 def utility_processor():
@@ -87,6 +92,7 @@ def utility_processor():
         isoformat_utc=isoformat_utc,
         format_shift_short=format_shift_short,
         format_shift_dt=format_shift_dt,
+        ticket_cutoff=ticket_cutoff
     )
 
 @app.context_processor

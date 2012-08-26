@@ -34,13 +34,16 @@ Electromagnetic Field is a three-day UK camping festival for people with an inqu
 <p>EMF is run entirely by volunteers like you. If you want to help us out
 (whether with admin, setup, stewarding, working at the bar, or whatever else) please <a href="{{ url_for('contact') }}">get in touch</a>.</p>
 </div>
+
+{% if not ticket_cutoff() %}
 <div class="hero-unit span4">
 <h2>Count me in!</h2>
 <p>Get your ticket to EMF now! Tickets cost £95.</p>
 <p><a class="btn btn-primary" href="{{ url_for('tickets') }}">Buy tickets now</a></p>
-
 <p class="small"><small>If you've already signed up, <a href="{{url_for('login')}}">log in</a> to view your ticket status.</small></p>
 </div>
+{%endif %}
+
 <div class="span4">
 <img src="{{ url_for('static', filename='images/site_picture.jpg') }}" alt="Green grass and trees"/>
 </div>
