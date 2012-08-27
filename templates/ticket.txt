@@ -1,0 +1,19 @@
+Hi, {{ user.name }},
+
+Email: {{user.email}}
+Verification: {{user.receipt}}
+
+This is your ticket for Electromagnetic Field 2012. You will either need to
+show us this email at the gate (on your phone is fine), or provide photo ID, in
+order to gain entrance to the site.
+
+In the mean time, please check out our information on how to get to the EMF
+site:
+http://wiki.emfcamp.org/wiki/Getting_Here
+
+And also a copy of the camp guide you'll get when you arrive:
+https://www.emfcamp.org/static/guide.pdf
+
+See you on the weekend!
+
+The EMF Crew.

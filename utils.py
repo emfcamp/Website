@@ -513,6 +513,23 @@ class SendPrepayReminder(Command):
             print "Sending to", user.email, "..."
             mail.send(msg)
 
+class SendTickets(Command):
+
+    def run(self):
+        query = text("""select distinct id from "user", ticket 
+                        where ticket.user_id = "user".id and ticket.paid = true""")
+
+        for row in db.engine.execute(query):
+            user = User.query.filter_by(id=row[0]).one()
+            msg = Message("Your Electromagnetic Field Ticket",
+                          sender=app.config.get('TICKETS_EMAIL'),
+                          recipients=[user.email]
+                         )
+            msg.body = render_template("ticket.txt", user = user)
+            print "Sending to", user.email, "..."
+            print msg
+
+
 if __name__ == "__main__":
   manager.add_command('reconcile', Reconcile())
   manager.add_command('warnexpire', WarnExpire())
@@ -524,4 +541,5 @@ if __name__ == "__main__":
   manager.add_command('addtokens', CreateTicketTokens())
   manager.add_command('createroles', CreateRoles())
   manager.add_command('createshifts', CreateShifts())
+  manager.add_command('sendtickets', SendTickets())
   manager.run()

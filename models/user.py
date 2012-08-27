@@ -1,6 +1,6 @@
 from main import db
-import bcrypt
 import flaskext
+import bcrypt
 import os
 import base64
 import random
@@ -33,6 +33,8 @@ class User(db.Model, flaskext.login.UserMixin):
         return bcrypt.hashpw(password.encode('utf8'), self.password) == self.password
 
     def create_receipt(self):
+        if self.receipt is None:
+            return
         while True:
             random.seed()
             self.receipt = ''.join(random.sample(safechars_lower, 7))
