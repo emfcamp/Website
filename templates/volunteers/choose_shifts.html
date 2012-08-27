@@ -37,11 +37,20 @@
                                 {% for shift in form.shifts if shift._type.role.code==role and shift._type.start_time.day == day %}
                                     {{ shift.hidden_tag() }}
                                     <label class="checkbox">
-                                    {{ format_shift_short(shift._type.start_time, shift._type.end_time) }}
-                                    {{ shift.work_shift() }}
-                                    {% if shift.errors %}
-                                        <span class="label label-important">Error</span>
-                                    {% endif %}
+										{% if shift._type.count == 0 %}
+	                                        <span class="label label-important">Empty, please staff!</span>
+	                                    {% elif shift._type.count < shift._type.minimum %}
+	                                        <span class="label label-warning">Under staffed</span>
+	                                    {% elif shift._type.count >= shift._type.maximum %}
+	                                        <span class="label label-success">Full</span>                                  
+	                                    {% else %}
+	                                        <span class="label label-info">Okey</span>
+	                                    {% endif %}
+	                                    {{ format_shift_short(shift._type.start_time, shift._type.end_time) }}
+	                                    {{ shift.work_shift() }}
+	                                    {% if shift.errors %}
+	                                        <span class="label label-important">Error</span>
+	                                    {% endif %}
                                     </label>
                                     {{ shift.prev_state() }}
                                 {% endfor %}

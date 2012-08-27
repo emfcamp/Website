@@ -51,7 +51,7 @@ class ShiftForm(Form):
         in_shift_slot = ShiftSlot.query.filter(ShiftSlot.id==in_shift_id).one()
         in_shift_start = in_shift_slot.start_time
         
-        if Shift.query.filter(Shift.shift_slot_id == in_shift_id).count() > in_shift_slot.maximum:
+        if Shift.query.filter(Shift.shift_slot_id == in_shift_id).count() >= in_shift_slot.maximum:
             role = Role.query.filter_by(id=in_shift_slot.role_id).one().code
             msg="New %s shift starting at %s:00 on %s already has enough volunteers, sorry"\
                 %(role, in_shift_start.hour, in_shift_slot.start_time.strftime('%A'))
@@ -102,6 +102,7 @@ def choose_shifts():
         for ss in ShiftSlot.query.order_by(ShiftSlot.role_id, ShiftSlot.start_time).all():
             form.shifts.append_entry()
             form.shifts[-1].shift_id.data = ss.id
+            ss.count = Shift.query.filter_by(shift_slot_id=ss.id).count()
             form.shifts[-1]._type = ss
             
             if Shift.query.filter( \
@@ -117,6 +118,7 @@ def choose_shifts():
         for shift in form.shifts:
             # if shift.work_shift.data:
             shift._type = ShiftSlot.query.filter_by(id=shift.shift_id.data).one()
+            shift._type.count = Shift.query.filter_by(shift_slot_id=shift._type.id).count()
     
     if request.method == "POST" and form.validate():
         for shift in form.shifts:
