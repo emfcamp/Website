@@ -1,9 +1,14 @@
 from main import db
 from decimal import Decimal
 from datetime import datetime, timedelta
+import random
+
 from sqlalchemy.orm import attributes, Session
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import event, or_
+from sqlalchemy.exc import IntegrityError
+
+safechars_lower = "2346789bcdfghjkmpqrtvwxy"
 
 class ConstTicketType(object):
     def __init__(self, name):
@@ -120,6 +125,7 @@ class Ticket(db.Model):
     type_id = db.Column(db.Integer, db.ForeignKey('ticket_type.id'), nullable=False)
     paid = db.Column(db.Boolean, default=False, nullable=False)
     expires = db.Column(db.DateTime, nullable=False)
+    receipt = db.Column(db.String, unique=True)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
     attribs = db.relationship("TicketAttrib", backref="ticket", cascade='all')
 
@@ -139,6 +145,16 @@ class Ticket(db.Model):
         if self.paid:
             return False
         return self.expires < datetime.utcnow()
+
+    def create_receipt(self):
+        while True:
+            random.seed()
+            self.receipt = ''.join(random.sample(safechars_lower, 6))
+            try:
+                db.session.commit()
+                break
+            except IntegrityError, e:
+                db.session.rollback()
 
     def __repr__(self):
         return "<Ticket: %s, type: %s, paid? %s, expired: %s>" % (self.id, self.type_id, self.paid, str(self.expired()))
