@@ -40,7 +40,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for hour in shift_data[role][day] %}
+                                {% for hour in shift_data[role][day] | sort() %}
                                     {% for person in shift_data[role][day][hour]['people'] %}
                                         <tr>
                                             {% if loop.first %}

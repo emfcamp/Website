@@ -102,7 +102,8 @@ def choose_shifts():
         for ss in ShiftSlot.query.order_by(ShiftSlot.role_id, ShiftSlot.start_time).all():
             form.shifts.append_entry()
             form.shifts[-1].shift_id.data = ss.id
-            ss.count = Shift.query.filter_by(shift_slot_id=ss.id).count()
+            ss.count = Shift.query.filter(Shift.shift_slot_id==ss.id, \
+                                          Shift.state!="cancelled").count()
             form.shifts[-1]._type = ss
             
             if Shift.query.filter( \
@@ -220,8 +221,8 @@ def all_shifts():
             status = "under"
         elif shift_slot.maximum <= len(filled_shift_info):
             status = "full"
-        
-        shift_data[role][day][hour] = {'status': status, 'min': shift_slot.minimum, 'people':filled_shift_info}
+        dat = {'status': status, 'min': shift_slot.minimum, 'people':filled_shift_info}
+        shift_data[role][day][hour] = dat
     return render_template('volunteers/full_list.html', shift_data=shift_data)
     
     
