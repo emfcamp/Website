@@ -5,6 +5,7 @@
 #
 
 import ofxparse, sys
+import urllib2, urllib
 from flaskext.script import Command, Manager, Option
 from flask import Flask, render_template
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -513,6 +514,37 @@ class SendPrepayReminder(Command):
             print "Sending to", user.email, "..."
             mail.send(msg)
 
+
+class TextVolunteers(Command):
+  """
+    Send a text to all the volunteers for a specific time slot
+    note: I'm doing this by month, date and hour but if there's a standard way of referring to slots, please change the code as necessary
+  """
+  option_list = (Option('-t', '--text', dest='text', help="The contents of the text to send. %r replaced with role title, %n with name."),
+                 Option('-m', '--month', dest='month', help="The month of the time slot"),
+                 Option('-d', '--date', dest='date', help="The date (of the month) of the time slot"),
+                 Option('-H', '--hour', dest='hour', help="The hour of the time slot"),
+                )
+                
+  def run(self, text, month, date, hour):
+    slot = datetime(datetime.utcnow().year, int(month), int(date), int(hour), 0, 0)
+    q = Shift.query.join(ShiftSlot).join(User).filter(ShiftSlot.start_time == slot)
+    q = q.all()
+    for row in q:
+      user = User.query.filter_by(id=row.user_id).one()
+      shift_slot = ShiftSlot.query.filter_by(id=row.shift_slot_id).one()
+      role = Role.query.filter_by(id=shift_slot.role_id).one()
+      text = text.replace("%r", role.name).replace("%n", user.name)
+      print "Texting", user.name, "on", user.phone, ":", text
+      url = "https://gw.aql.com/sms/sms_gw.php"
+      params = urllib.urlencode({'username': app.config.get('AQL_USERNAME'),
+                               'password': app.config.get('AQL_PASSWORD'),
+                               'originator': app.config.get('AQL_ORIGINATOR'),
+                               'destination': user.phone,
+                               'message': text})
+      req = urllib2.Request(url, params)
+      response = urllib2.urlopen(req)
+
 if __name__ == "__main__":
   manager.add_command('reconcile', Reconcile())
   manager.add_command('warnexpire', WarnExpire())
@@ -524,4 +556,5 @@ if __name__ == "__main__":
   manager.add_command('addtokens', CreateTicketTokens())
   manager.add_command('createroles', CreateRoles())
   manager.add_command('createshifts', CreateShifts())
+  manager.add_command('textvolunteers', TextVolunteers())
   manager.run()
