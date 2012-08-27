@@ -1032,27 +1032,32 @@ def tickets_all_receipts():
     if current_user.receipt is None:
         current_user.create_receipt()
 
-    for ticket in current_user.tickets:
+    tickets = current_user.tickets.filter_by(paid=True).all()
+    for ticket in tickets:
         if ticket.receipt is None:
             ticket.create_receipt()
 
-    return render_template('tickets-receipt.htm', user=current_user, tickets=current_user.tickets)
+    return render_template('tickets-receipt.htm', user=current_user, tickets=tickets)
 
 @app.route("/receipt/<receipt>")
 @login_required
 def tickets_receipt(receipt):
+    if current_user.admin:
+        return redirect(url_for('admin_receipt', receipt=receipt))
+
     try:
         user = User.filter_by(receipt=receipt).one()
-        tickets = user.tickets
-    except Exception, e:
+        tickets = list(user.tickets)
+    except NoResultFound, e:
         try:
             ticket = Ticket.filter_by(receipt=receipt).one()
+            tickets = [ticket]
             user = ticket.user
-        except Exception, e:
+        except NoResultFound, e:
             return ('', 404)
 
-    # TODO: check user == current_user or current_user.admin
-    # If admin, redirect to admin's "tick off ticket" page
+    if current_user != user:
+        return ('', 404)
 
     return render_template('tickets-receipt.htm', user=user, tickets=tickets)
 

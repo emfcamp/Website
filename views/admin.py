@@ -278,3 +278,22 @@ def expire_reset():
         return render_template('admin/admin_reset_expirey.html', payments=opayments, resetforms=resetforms)
     else:
         return(('', 404))
+
+@app.route('/admin/receipt/<receipt>')
+@login_required
+def admin_receipt(receipt):
+    if not current_user.admin:
+        return ('', 404)
+
+    try:
+        user = User.query.filter_by(receipt=receipt).one()
+        tickets = list(user.tickets)
+    except NoResultFound, e:
+        try:
+            ticket = Ticket.query.filter_by(receipt=receipt).one()
+            tickets = [ticket]
+            user = ticket.user
+        except NoResultFound, e:
+            raise ValueError('Cannot find receipt')
+
+    return render_template('admin/admin_receipt.htm', user=user, tickets=tickets)
