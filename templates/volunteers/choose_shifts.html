@@ -2,12 +2,16 @@
 {% block body %}
 <div class="span7">
     <p> 
-        For more information on the various roles please see our <a href="http://wiki.emfcamp.org/wiki/Team/Volunteers#Staff">wiki</a>.
-        All shifts are 3 hours long: if you complete 3 shifts over the weekend you get a special "EMF volunteer" t-shirt. Shifts are allocated as you select them, so please only choose those you're sure you can do.
+        <b>Please only sign up to shifts that you will turn up for. </b><br>
+		All shifts are 3 hours long and if you complete 3 shifts you'll get a
+		special EMF volunteer's t-shirt!
     </p>
     <form method="POST" class="form-horizontal">
         {{ form.hidden_tag() }}
-        <label>So we can contact you during the event, please provide a phone number:</label>
+        <label>
+			In order to contact you during the event please provide a mobile 
+			phone number:
+		</label>
         {{ form.phone() }}
         <p></p>
 
@@ -22,7 +26,11 @@
             <div class="tab-content">
                 {% for role in ("steward", "bar", "stage") %}           
                     <div class="tab-pane {% if role=='steward' %} active {% endif %}" id="{{ role }}">
-                    {% include 'volunteers/'+role+'_info.html' %}
+					More info <a data-toggle="collapse" href="#{{ role }}blurb">[+]</a>
+					<div id="{{ role }}blurb" class="collapse">
+	                    {% include 'volunteers/'+role+'_info.html' %}
+					</div>
+					<br>
                         {% for day in (31, 1, 2, 3) %}
                             {% if day == 31 %}
                                 <b>Friday 31st</b>
@@ -36,7 +44,7 @@
                             <p>
                                 {% for shift in form.shifts if shift._type.role.code==role and shift._type.start_time.day == day %}
                                     {{ shift.hidden_tag() }}
-                                    <label class="checkbox">
+                                    <label {% if shift._type.count < shift._type.maximum %}class="checkbox" {% endif %}>
 										{% if shift._type.count == 0 %}
 	                                        <span class="label label-important">Empty, please staff!</span>
 	                                    {% elif shift._type.count < shift._type.minimum %}
@@ -44,10 +52,10 @@
 	                                    {% elif shift._type.count >= shift._type.maximum %}
 	                                        <span class="label label-success">Full</span>                                  
 	                                    {% else %}
-	                                        <span class="label label-info">Okey</span>
+	                                        <span class="label label-info">Okay</span>
 	                                    {% endif %}
 	                                    {{ format_shift_short(shift._type.start_time, shift._type.end_time) }}
-	                                    {{ shift.work_shift() }}
+	                                    {% if shift._type.count < shift._type.maximum %}{{ shift.work_shift() }}{% endif %}
 	                                    {% if shift.errors %}
 	                                        <span class="label label-important">Error</span>
 	                                    {% endif %}

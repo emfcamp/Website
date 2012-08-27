@@ -1,44 +1,61 @@
 {% extends "base.html" %}
 
 {% block body %}
-<div class="span10">
+<div class="span7">
 
 {% if not shifts %}
 
 <h2>Helping out at EMF</h2>
 
 <p>
-       Electromagnetic Field is entirely run by volunteers, and we need people
-       like you during the event to help with stewarding, serve at the bar
-       and look after the stages.  Please click below to sign up for shifts.
+	Electromagnetic Field is entirely run by volunteers, and we need people
+	like you during the event to help with stewarding, serve at the bar
+	and look after the stages.  Please click below to sign up for shifts, 
+	we ask for a phone number for contact reasons only.
 </p>
 <p>
-       If you would like more information have a look at the 
-       <a href="http://wiki.emfcamp.org/wiki/Team/Volunteers">wiki</a> or come talk to us
-       at the infodesk!
+	If you would like more information have a look at the 
+	<a href="http://wiki.emfcamp.org/wiki/Team/Volunteers">wiki</a> or come talk to us
+	at the infodesk!
 </p>
-
+<p>
+	<strong>Please only sign up to shifts you intent to turn up for.</strong>
+	This is not intended as a "I'm free for this shift" it's for "I will do this
+	shift" (sorry if this hasn't previously been clear).
+</p>
 <a class="btn btn-primary" href="{{ url_for('choose_shifts') }}">Sign up</a>
 
 {% else %}
 
 <h2>Your current shifts</h2>
-
+<p>
+	<strong>Please only sign up to shifts you intent to turn up for.</strong><br>
+	This is not intended as a "I'm free for this shift" it's for "I will do this
+	shift" (sorry if this hasn't previously been clear).
+</p>
 <table class="table">
-<tr><th>Id</th><th>Start</th><th>End</th><th>Role</th></tr>
-
-{% for shift, shift_slot in shifts if shift.state != "cancelled" %}
-
-<tr class="{{ loop.cycle('odd', 'even') }}">
-<td>{{ shift.id }}</td>
-<td>{{ format_shift_dt(shift_slot.start_time) }}</td>
-<td>{{ format_shift_dt(shift_slot.end_time) }}</td>
-<td>{{ shift_slot.role.name }} - <a href="{{shift_slot.role.wiki_link}}">details</a></td>
-</tr>
-{% endfor %}
-
+	<tr><th>Id</th><th>Start</th><th>End</th><th>Role</th></tr>
+	{% for shift, shift_slot in shifts if shift.state != "cancelled" %}
+		<tr class="{{ loop.cycle('odd', 'even') }}">
+			<td>{{ shift.id }}</td>
+			<td>{{ format_shift_dt(shift_slot.start_time) }}</td>
+			<td>{{ format_shift_dt(shift_slot.end_time) }}</td>
+			<td>{{ shift_slot.role.name }} - <a href="{{shift_slot.role.wiki_link}}">details</a></td>
+		</tr>
+	{% endfor %}
 </table>
-
+<p>
+	{% if phone %}
+		You've currently set <b>{{ phone }}</b> as your number. This can be updated 
+		by clicking below
+	{% else %}
+		<div class="alert">
+		  <button type="button" class="close" data-dismiss="alert">×</button>
+		  	You've not provided us with a mobile phone number. Doing so will allow
+		 	us to contact you during your shifts.
+		</div>
+	{% endif %}
+</p>
 <a class="btn btn-primary" href="{{ url_for('choose_shifts') }}">Change shifts</a>
 
 {% endif %}

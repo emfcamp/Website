@@ -183,8 +183,8 @@ def my_shifts():
         shift_slot = ShiftSlot.query.filter_by(id=shift.shift_slot_id).one()
         if shift.state != 'cancelled':
 			shifts.append((shift, shift_slot))
-        
-    return render_template('volunteers/my_shifts.html', shifts=shifts)
+	    
+    return render_template('volunteers/my_shifts.html', shifts=shifts, phone=current_user.phone)
 
 @app.route("/volunteers/all_shifts", methods=['GET'])
 @login_required
@@ -222,7 +222,6 @@ def all_shifts():
             status = "full"
         
         shift_data[role][day][hour] = {'status': status, 'min': shift_slot.minimum, 'people':filled_shift_info}
-    
     return render_template('volunteers/full_list.html', shift_data=shift_data)
     
     
