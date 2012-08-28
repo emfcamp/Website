@@ -3,12 +3,13 @@ Hi, {{ user.name }},
 Email: {{user.email}}
 Verification: {{user.receipt}}
 
-This is your ticket for Electromagnetic Field 2012. You will either need to
-show us this email at the gate (on your phone is fine), or provide photo ID, in
-order to gain entrance to the site.
+This is your ticket for Electromagnetic Field 2012. You will either
+need toshow us this email at the gate (on your phone is fine), or
+provide photo ID, in order to gain entrance to the site.
 
-In the mean time, please check out our information on how to get to the EMF
-site:
+You can arrive on site from 08:00 on Friday 31st of August, and you
+should be off site by 14:00 on Monday 3rd of September. Please check
+out our information on how to get to the EMF site:
 http://wiki.emfcamp.org/wiki/Getting_Here
 
 And also a copy of the camp guide you'll get when you arrive:

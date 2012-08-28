@@ -516,7 +516,7 @@ class SendPrepayReminder(Command):
 class SendTickets(Command):
 
     def run(self):
-        query = text("""select distinct id from "user", ticket 
+        query = text("""select distinct "user".id from "user", ticket 
                         where ticket.user_id = "user".id and ticket.paid = true""")
 
         for row in db.engine.execute(query):
@@ -525,9 +525,10 @@ class SendTickets(Command):
                           sender=app.config.get('TICKETS_EMAIL'),
                           recipients=[user.email]
                          )
+            user.create_receipt()
             msg.body = render_template("ticket.txt", user = user)
             print "Sending to", user.email, "..."
-            print msg
+            print msg.body
 
 
 if __name__ == "__main__":

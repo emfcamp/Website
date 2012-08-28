@@ -33,7 +33,7 @@ class User(db.Model, flaskext.login.UserMixin):
         return bcrypt.hashpw(password.encode('utf8'), self.password) == self.password
 
     def create_receipt(self):
-        if self.receipt is None:
+        if self.receipt is not None:
             return
         while True:
             random.seed()
