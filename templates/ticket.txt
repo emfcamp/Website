@@ -1,10 +1,10 @@
-Hi, {{ user.name }},
+Hi {{ user.name }},
 
 Email: {{user.email}}
 Verification: {{user.receipt}}
 
 This is your ticket for Electromagnetic Field 2012. You will either
-need toshow us this email at the gate (on your phone is fine), or
+need to show us this email at the gate (on your phone is fine), or
 provide photo ID, in order to gain entrance to the site.
 
 You can arrive on site from 08:00 on Friday 31st of August, and you
