@@ -989,6 +989,12 @@ def googlecheckout_notify():
             msg.body = render_template("tickets-paid-email-googlecheckout.txt",
                 user = p.user, payment=p)
             mail.send(msg)
+            msg = Message("Your Electromagnetic Field Ticket",
+                            sender=app.config.get('TICKETS_EMAIL'),
+                            recipients=[p.user.email])
+            p.user.create_receipt()
+            msg.body = render_template("ticket.txt", user = p.user)
+
 
         p.finance_state = str(finance_state)
         p.fulfill_state = str(fulfill_state)
