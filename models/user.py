@@ -1,9 +1,13 @@
 from main import db
-import bcrypt
 import flaskext
+import bcrypt
 import os
 import base64
+import random
 from datetime import datetime, timedelta
+from sqlalchemy.exc import IntegrityError
+
+safechars_lower = "2346789bcdfghjkmpqrtvwxy"
 
 class User(db.Model, flaskext.login.UserMixin):
     __tablename__ = 'user'
@@ -13,6 +17,7 @@ class User(db.Model, flaskext.login.UserMixin):
     password = db.Column(db.String, nullable=False)
     admin = db.Column(db.Boolean, default=False, nullable=False)
     phone = db.Column(db.String, nullable=True)
+    receipt = db.Column(db.String, unique=True)
     tickets = db.relationship('Ticket', lazy='dynamic', backref='user', cascade='all, delete, delete-orphan')
     payments = db.relationship('Payment', lazy='dynamic', backref='user', cascade='all')
     shifts = db.relationship('Shift', lazy='dynamic', backref='user')
@@ -26,6 +31,19 @@ class User(db.Model, flaskext.login.UserMixin):
 
     def check_password(self, password):
         return bcrypt.hashpw(password.encode('utf8'), self.password) == self.password
+
+    def create_receipt(self):
+        if self.receipt is not None:
+            return
+        while True:
+            random.seed()
+            self.receipt = ''.join(random.sample(safechars_lower, 7))
+            try:
+                db.session.commit()
+                break
+            except IntegrityError, e:
+                db.session.rollback()
+
 
 class PasswordReset(db.Model):
     __tablename__ = 'password_reset'

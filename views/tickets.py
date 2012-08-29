@@ -8,7 +8,8 @@ from models.ticket import TicketType, Ticket, TicketAttrib, TicketToken
 
 from flask import \
     render_template, redirect, request, flash, \
-    url_for, abort, send_from_directory, session
+    url_for, abort, send_from_directory, session, \
+    send_file
 from flaskext.login import \
     login_user, login_required, logout_user, current_user
 from flaskext.mail import Message
@@ -32,6 +33,8 @@ import requests
 from lxml import objectify
 from base64 import b64encode
 from decimal import Decimal, ROUND_UP
+from StringIO import StringIO
+import qrcode
 
 class IntegerSelectField(SelectField):
     def __init__(self, *args, **kwargs):
@@ -986,6 +989,12 @@ def googlecheckout_notify():
             msg.body = render_template("tickets-paid-email-googlecheckout.txt",
                 user = p.user, payment=p)
             mail.send(msg)
+            msg = Message("Your Electromagnetic Field Ticket",
+                            sender=app.config.get('TICKETS_EMAIL'),
+                            recipients=[p.user.email])
+            p.user.create_receipt()
+            msg.body = render_template("ticket.txt", user = p.user)
+
 
         p.finance_state = str(finance_state)
         p.fulfill_state = str(fulfill_state)
@@ -1022,5 +1031,52 @@ def googlecheckout_notify():
 
 
     return render_template('google-checkout/notification-acknowledgment.xml', serial=serial)
+
+
+@app.route("/tickets/receipt")
+@login_required
+def tickets_all_receipts():
+
+    if current_user.receipt is None:
+        current_user.create_receipt()
+
+    tickets = current_user.tickets.filter_by(paid=True).all()
+    for ticket in tickets:
+        if ticket.receipt is None:
+            ticket.create_receipt()
+
+    return render_template('tickets-receipt.htm', user=current_user, tickets=tickets)
+
+@app.route("/receipt/<receipt>")
+@login_required
+def tickets_receipt(receipt):
+    if current_user.admin:
+        return redirect(url_for('admin_receipt', receipt=receipt))
+
+    try:
+        user = User.filter_by(receipt=receipt).one()
+        tickets = list(user.tickets)
+    except NoResultFound, e:
+        try:
+            ticket = Ticket.filter_by(receipt=receipt).one()
+            tickets = [ticket]
+            user = ticket.user
+        except NoResultFound, e:
+            return ('', 404)
+
+    if current_user != user:
+        return ('', 404)
+
+    return render_template('tickets-receipt.htm', user=user, tickets=tickets)
+
+@app.route("/receipt/<receipt>/qr")
+@login_required
+def tickets_receipt_qr(receipt):
+
+    qrfile = StringIO()
+    qr = qrcode.make(url_for('tickets_receipt', receipt=receipt, _external=True), box_size=2)
+    qr.save(qrfile, 'PNG')
+    qrfile.seek(0)
+    return send_file(qrfile, mimetype='image/png')
 
 
