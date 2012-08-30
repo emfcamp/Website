@@ -61,8 +61,8 @@ class ShiftForm(Form):
             raise ValidationError(msg)
             
         user_shifts = ShiftSlot.query.join(Shift).filter(\
-                Shift.user_id==current_user.id, \
-                Shift.state!="cancelled").order_by(ShiftSlot.start_time)
+                        Shift.user_id==current_user.id, \
+                        Shift.state!="cancelled").order_by(ShiftSlot.start_time)
         
         for u_shift in user_shifts:
             # check the field has actually been updated

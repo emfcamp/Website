@@ -47,10 +47,10 @@
                                     <label {% if shift._type.count < shift._type.maximum %}class="checkbox" {% endif %}>
 										{% if shift._type.count == 0 %}
 	                                        <span class="label label-important">Empty, please staff!</span>
-	                                    {% elif shift._type.count < shift._type.minimum %}
-	                                        <span class="label label-warning">Under staffed</span>
 	                                    {% elif shift._type.count >= shift._type.maximum %}
-	                                        <span class="label label-success">Full</span>                                  
+	                                        <span class="label label-success">Full</span>
+	                                    {% elif shift._type.count < shift._type.minimum %}
+	                                        <span class="label label-warning">Under staffed</span>                         
 	                                    {% else %}
 	                                        <span class="label label-info">Okay</span>
 	                                    {% endif %}
