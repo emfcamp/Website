@@ -33,6 +33,9 @@
 		<a href="{{url_for('admin')}}">Admin</a>
 	</li>
 	{% endif %}
+    <li {% if request.path==url_for('radio') %}class="active"{% endif %}>
+        <a href="{{url_for('radio')}}">Radio</a>
+    </li>
     <li class="nav-header">See Also</li>
     <li>
         <a href="http://wiki.emfcamp.org">Wiki</a>

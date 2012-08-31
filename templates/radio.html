@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="span10">
+
+  <h2>EMFM</h2>
+
+  <p>The EMF radio will be broadcasting online throughout the event.
+  We will be streaming and archiving audio and video of all the talks, as well as keeping you up-to-date on happening around camp.</p>
+
+  <p>If you'd like your own slot, <a href="http://wiki.emfcamp.org/wiki/EMFM_Radio_Schedule">sign up</a> on the wiki.
+  Otherwise, tune in below.</p>
+
+  <div class="player barblock">
+    <audio controls autobuffer loop>
+      <source src="http://streaming.emfcamp.org:8000/emfm.ogg"/>
+      <source src="http://streaming.emfcamp.org:8000/emfm.mp3"/>
+    </audio>
+    <p><a href="http://streaming.emfcamp.org:8000/emfm.ogg.m3u">Open in your own player here</a></p>
+  </div>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/jwplayer.js') }}"></script>
+
+</div>
+{% endblock %}
