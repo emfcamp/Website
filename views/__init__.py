@@ -5,7 +5,7 @@ from flask import \
     url_for, abort, send_from_directory, session
 
 from decorator import decorator
-import os
+import os, csv
 
 def feature_flag(flag):
     def call(f, *args, **kw):
@@ -29,7 +29,18 @@ def sponsors():
 
 @app.route("/talks")
 def talks():
-    return render_template('talks.html')
+    
+    days = {}
+    for day in ('friday', 'saturday', 'sunday'):
+        reader = csv.reader(open('talks/%s.csv' % day, 'r'))
+        
+        rows = []
+        for row in reader:
+            rows.append([unicode(cell, 'utf-8') for cell in row])
+        
+        days[day] = rows
+
+    return render_template('talks.html', **days)
 
 @app.route("/about/company")
 def company():
