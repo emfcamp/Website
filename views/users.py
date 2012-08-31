@@ -24,7 +24,8 @@ class NextURLField(HiddenField):
         # Cheap way of ensuring we don't get absolute URLs
         if not self.data or '//' in self.data:
             return ''
-        if not re.match('^[-a-z/?=&]+$', self.data):
+        if not re.match('^[-_0-9a-zA-Z/?=&]+$', self.data):
+	    app.logger.error('Dropping next URL %s', repr(self.data))
             return ''
         return self.data
 

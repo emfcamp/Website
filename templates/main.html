@@ -26,7 +26,7 @@ Electromagnetic Field is a three-day UK camping festival for people with an inqu
 <p>Events and activities will run throughout the day and into the evening, everything else (chats, debates, impromptu circus performances, orbital laser launches) will run as long as your collective energy lasts.</p>
 
 <h2>Where?</h2>
-<p><a href="http://www.openstreetmap.org/?lat=52.061&amp;lon=-0.710&amp;zoom=16">Pineham Park</a>, Milton Keynes, UK.</p>
+<p><a href="http://www.openstreetmap.org/?lat=52.061&amp;lon=-0.710&amp;zoom=16">Pineham Park</a>, Milton Keynes, MK15 9LZ, UK.</p>
 
 <p>Milton Keynes has great transport links to the rest of the UK and Europe. It's only 40 minutes on the train from London, and the site is easily accessible from the M1 motorway.</p>
 <h2>Help us out</h2>
@@ -34,13 +34,16 @@ Electromagnetic Field is a three-day UK camping festival for people with an inqu
 <p>EMF is run entirely by volunteers like you. If you want to help us out
 (whether with admin, setup, stewarding, working at the bar, or whatever else) please <a href="{{ url_for('contact') }}">get in touch</a>.</p>
 </div>
+
+{% if not ticket_cutoff() %}
 <div class="hero-unit span4">
 <h2>Count me in!</h2>
 <p>Get your ticket to EMF now! Tickets cost £95.</p>
 <p><a class="btn btn-primary" href="{{ url_for('tickets') }}">Buy tickets now</a></p>
-
 <p class="small"><small>If you've already signed up, <a href="{{url_for('login')}}">log in</a> to view your ticket status.</small></p>
 </div>
+{%endif %}
+
 <div class="span4">
 <img src="{{ url_for('static', filename='images/site_picture.jpg') }}" alt="Green grass and trees"/>
 </div>

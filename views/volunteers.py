@@ -51,7 +51,8 @@ class ShiftForm(Form):
         in_shift_slot = ShiftSlot.query.filter(ShiftSlot.id==in_shift_id).one()
         in_shift_start = in_shift_slot.start_time
         
-        if Shift.query.filter(Shift.shift_slot_id == in_shift_id).count() > in_shift_slot.maximum:
+        if Shift.query.filter(Shift.shift_slot_id == in_shift_id,\
+                              Shift.state != "cancelled").count() >= in_shift_slot.maximum:
             role = Role.query.filter_by(id=in_shift_slot.role_id).one().code
             msg="New %s shift starting at %s:00 on %s already has enough volunteers, sorry"\
                 %(role, in_shift_start.hour, in_shift_slot.start_time.strftime('%A'))
@@ -60,8 +61,8 @@ class ShiftForm(Form):
             raise ValidationError(msg)
             
         user_shifts = ShiftSlot.query.join(Shift).filter(\
-                Shift.user_id==current_user.id, \
-                Shift.state!="cancelled").order_by(ShiftSlot.start_time)
+                        Shift.user_id==current_user.id, \
+                        Shift.state!="cancelled").order_by(ShiftSlot.start_time)
         
         for u_shift in user_shifts:
             # check the field has actually been updated
@@ -102,6 +103,8 @@ def choose_shifts():
         for ss in ShiftSlot.query.order_by(ShiftSlot.role_id, ShiftSlot.start_time).all():
             form.shifts.append_entry()
             form.shifts[-1].shift_id.data = ss.id
+            ss.count = Shift.query.filter(Shift.shift_slot_id==ss.id, \
+                                          Shift.state!="cancelled").count()
             form.shifts[-1]._type = ss
             
             if Shift.query.filter( \
@@ -117,6 +120,8 @@ def choose_shifts():
         for shift in form.shifts:
             # if shift.work_shift.data:
             shift._type = ShiftSlot.query.filter_by(id=shift.shift_id.data).one()
+            shift._type.count = Shift.query.filter(Shift.shift_slot_id==shift._type.id,\
+                                                   Shift.state!="cancelled").count()
     
     if request.method == "POST" and form.validate():
         for shift in form.shifts:
@@ -181,8 +186,8 @@ def my_shifts():
         shift_slot = ShiftSlot.query.filter_by(id=shift.shift_slot_id).one()
         if shift.state != 'cancelled':
 			shifts.append((shift, shift_slot))
-        
-    return render_template('volunteers/my_shifts.html', shifts=shifts)
+	    
+    return render_template('volunteers/my_shifts.html', shifts=shifts, phone=current_user.phone)
 
 @app.route("/volunteers/all_shifts", methods=['GET'])
 @login_required
@@ -218,9 +223,8 @@ def all_shifts():
             status = "under"
         elif shift_slot.maximum <= len(filled_shift_info):
             status = "full"
-        
-        shift_data[role][day][hour] = {'status': status, 'min': shift_slot.minimum, 'people':filled_shift_info}
-    
+        dat = {'status': status, 'min': shift_slot.minimum, 'people':filled_shift_info}
+        shift_data[role][day][hour] = dat
     return render_template('volunteers/full_list.html', shift_data=shift_data)
     
     

@@ -1,59 +1,77 @@
 {% extends "base.html" %}
 {% block body %}
 <div class="span7">
-	<p>	
-		For more information on the various roles please see our <a href="http://wiki.emfcamp.org/wiki/Team/Volunteers#Staff">wiki</a>
-		The numbers indicate the start time for each shift, shifts are 3 hours long and if you complete 3 shifts over the weekend you get a special EMF volunteer's t-shirt. 
-	</p>	
-	<form method="POST">
-		{{ form.hidden_tag() }}
-		<p>
-			To contact you during the event please provide a phone number: {{ form.phone() | safe }}
-		</p>
-		<div class="tabbable"> <!-- Only required for left/right tabs -->
-			<ul class="nav nav-tabs">
-				<!-- {bar':{}, 'steward':{}, 'stage':{}, 'parking':{}} -->
-				<li class="active"><a href="#steward" data-toggle="tab">Stewarding</a></li>
-				<li><a href="#bar" data-toggle="tab">Bar work</a></li>
-				<li><a href="#stage" data-toggle="tab">Stage work</a></li>
-			</ul>
-			
-			<div class="tab-content">
-				{% for role in ("steward", "bar", "stage") %}			
-					<div class="tab-pane {% if role=='steward' %} active {% endif %}" id="{{ role }}">
-					{% include 'volunteers/'+role+'_info.html' %}
-						{% for day in (31, 1, 2, 3) %}
-							{% if day == 31 %}
-								<b>Friday 31st</b>
-							{% elif day == 1 %}
-								<b>Saturday 1st</b>
-							{% elif day == 2 %}
-								<b>Sunday 2nd</b>
-							{% elif day == 3 and (role == 'parking' or role == 'steward') %}
-								<b>Monday 3rd</b>
-							{% endif %}
-							<p>
-								{% for shift in form.shifts if shift._type.role.code==role and shift._type.start_time.day == day %}
-									{{ shift.hidden_tag() | safe }}
-									<label class="checkbox">
-									{{ format_shift_short(shift._type.start_time, shift._type.end_time) }}
-									{{ shift.work_shift() | safe }}
-									{% if shift.errors %}
-										<span class="label label-important">Error</span>
-									{% endif %}
-									</label>
-									{{ shift.prev_state() | safe }}
-								{% endfor %}
-							</p>
-						{% endfor %}
+    <p> 
+        <b>Please only sign up to shifts that you will turn up for. </b><br>
+		All shifts are 3 hours long and if you complete 3 shifts you'll get a
+		special EMF volunteer's t-shirt!
+    </p>
+    <form method="POST" class="form-horizontal">
+        {{ form.hidden_tag() }}
+        <label>
+			In order to contact you during the event please provide a mobile 
+			phone number:
+		</label>
+        {{ form.phone() }}
+        <p></p>
+
+        <div class="tabbable"> <!-- Only required for left/right tabs -->
+            <ul class="nav nav-tabs">
+                <!-- {bar':{}, 'steward':{}, 'stage':{}, 'parking':{}} -->
+                <li class="active"><a href="#steward" data-toggle="tab">Stewarding</a></li>
+                <li><a href="#bar" data-toggle="tab">Bar work</a></li>
+                <li><a href="#stage" data-toggle="tab">Stage work</a></li>
+            </ul>
+            
+            <div class="tab-content">
+                {% for role in ("steward", "bar", "stage") %}           
+                    <div class="tab-pane {% if role=='steward' %} active {% endif %}" id="{{ role }}">
+					More info <a data-toggle="collapse" href="#{{ role }}blurb">[+]</a>
+					<div id="{{ role }}blurb" class="collapse">
+	                    {% include 'volunteers/'+role+'_info.html' %}
 					</div>
-				{% endfor %}
-			</div>
-		</div>
-		<div class="form-actions btn-group">
-		    <button type="submit" class="btn btn-primary">Update shifts</button>
-	        <a class="btn" href="{{ url_for('my_shifts') }}">My shifts</a>
-		</div>
-	</form>
+					<br>
+                        {% for day in (31, 1, 2, 3) %}
+                            {% if day == 31 %}
+                                <b>Friday 31st</b>
+                            {% elif day == 1 %}
+                                <b>Saturday 1st</b>
+                            {% elif day == 2 %}
+                                <b>Sunday 2nd</b>
+                            {% elif day == 3 and (role == 'parking' or role == 'steward') %}
+                                <b>Monday 3rd</b>
+                            {% endif %}
+                            <p>
+                                {% for shift in form.shifts if shift._type.role.code==role and shift._type.start_time.day == day %}
+                                    {{ shift.hidden_tag() }}
+                                    <label {% if shift._type.count < shift._type.maximum %}class="checkbox" {% endif %}>
+										{% if shift._type.count == 0 %}
+	                                        <span class="label label-important">Empty, please staff!</span>
+	                                    {% elif shift._type.count >= shift._type.maximum %}
+	                                        <span class="label label-success">Full</span>
+	                                    {% elif shift._type.count < shift._type.minimum %}
+	                                        <span class="label label-warning">Under staffed</span>                         
+	                                    {% else %}
+	                                        <span class="label label-info">Okay</span>
+	                                    {% endif %}
+	                                    {{ format_shift_short(shift._type.start_time, shift._type.end_time) }}
+	                                    {% if shift._type.count < shift._type.maximum %}{{ shift.work_shift() }}{% endif %}
+	                                    {% if shift.errors %}
+	                                        <span class="label label-important">Error</span>
+	                                    {% endif %}
+                                    </label>
+                                    {{ shift.prev_state() }}
+                                {% endfor %}
+                            </p>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="form-actions btn-group">
+            <button type="submit" class="btn btn-primary">Update shifts</button>
+            <a class="btn" href="{{ url_for('my_shifts') }}">My shifts</a>
+        </div>
+    </form>
 </div>
 {% endblock %}
