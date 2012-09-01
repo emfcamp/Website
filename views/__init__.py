@@ -66,5 +66,8 @@ def participating():
 def get_involved():
     return render_template('get_involved.html')
 
-    
-import users, admin, tickets, volunteers
+@app.route('/badge')
+def badge():
+  return redirect('http://wiki.emfcamp.org/wiki/TiLDA')
+
+import users, admin, tickets, volunteers, radio

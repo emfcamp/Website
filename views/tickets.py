@@ -996,6 +996,11 @@ def googlecheckout_notify():
             msg.body = render_template("ticket.txt", user = p.user)
 
 
+        elif finance_state == 'CANCELLED':
+            p.state = 'canceled'
+            for ticket in p.tickets:
+                ticket.expires = datetime.now()
+
         p.finance_state = str(finance_state)
         p.fulfill_state = str(fulfill_state)
         db.session.commit()
