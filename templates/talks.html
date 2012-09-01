@@ -54,3 +54,33 @@
 </ul>
 </div>
 {% endblock %}
+
+<script>
+    (function(){
+    var tables = document.getElementsByTagName('table');
+	for(var day = 0; day < tables.length; day++){
+		var table = tables[day];
+		for(var time = 1; time < table.rows.length; time++){
+			var row = table.rows[time];
+			for(var stage = 1; stage < row.cells.length; stage++){
+				var cell = row.cells[stage];
+				var id = 'cf-'+day+'-'+time+'-'+stage;
+				cell.onclick = (function(cell, id) {
+					function update() {
+						cell.style.backgroundColor = localStorage.getItem(id) === 'true' ? 'yellow' : 'white';
+					}
+					update();
+					return function(){
+						var toggle = localStorage.getItem(id) ? '' : 'true';
+						console.log(id, toggle);
+						localStorage.setItem(id, toggle);
+						update();
+						return false;
+					};
+				})(cell, id);
+			}
+		}
+	}
+})();
+
+</script>
