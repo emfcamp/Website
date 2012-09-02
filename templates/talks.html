@@ -46,7 +46,7 @@
 <th>Time</th><th>Stage Alpha</th><th>Stage Beta</th><th>Workshop</th>
 {% for row in sunday %}
 <tr>
-    <td><strong>{{ row.0 }}</strong></td><td width="33%">{{ row.1 }}</td><td width="33%">{{ row.2 }}</td><td width="33%">{{ row.3 }}</td>
+    <td><strong>{{ row.0 }}</strong></td><td width="33%">{{ row.1 }}</td><td width="33%">{{ row.2 }}</td><td width="33%">{{ row.3 | safe() }}</td>
 </tr>
 {% endfor %}
 </table>
