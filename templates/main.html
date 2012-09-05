@@ -1,10 +1,27 @@
 {% extends "base.html" %}
 {% block body %}
 
-<div class="span6">
+<div class="span10">
+<div class="well well-large">
+  <h2>Thank You.</h2>
+  <p class="summary">Electromagnetic Field 2012 is now finished. We'd like to extend massive thanks to our dedicated organising team,
+  everyone who volunteered during the event, and indeed everyone who came. On Saturday we sold out our entire 499 capacity.</p>
+
+  <p>We'd also like to thank everyone for their patience in dealing with the teething troubles we experienced when
+    running our first event. We're taking all <a href="http://wiki.emfcamp.org/wiki/Feedback">your feedback</a>
+    on board for our next event.</p>
+
+  <p>Videos and audio from our talks will be published soon, so watch this space.</p>
+
+  <p>EMF will return, bigger and better, in summer 2014. We run this event in our spare time as volunteers &mdash;
+  we all have day jobs &mdash; so for the sake of our blood pressure we can't run the event every year.
+  Many of our organising team will also be helping out with the next of the four-yearly Dutch hacker camps,
+  <a href="https://ohm2013.org">OHM 2013</a>, and we hope to have a village there. We'd love it if you joined us.</p>
+</div>
+
 <h2>What?</h2>
 
-<p class="summary">
+<p>
 Electromagnetic Field is a three-day UK camping festival for people with an inquisitive mind or an interest in making things: hackers, geeks, scientists, engineers, artists, and crafters.</p>
 
 <p>There will be people <a href="/talks">talking about everything</a> from <b>genetic modification</b> to <b>electronics</b>, <b>blacksmithing</b> to <b>high-energy physics</b>, <b>reverse engineering</b> to <b>lock picking</b>, <b>crocheting</b> to <b>carpentry</b>, and <b>quadcopters</b> to <b>beer brewing</b>. If you want to talk, there'll be <a href="http://wiki.emfcamp.org/wiki/Talks">space for you to do so</a>, and plenty of people who will want to listen.</p>
@@ -44,7 +61,4 @@ Electromagnetic Field is a three-day UK camping festival for people with an inqu
 </div>
 {%endif %}
 
-<div class="span4">
-<img src="{{ url_for('static', filename='images/site_picture.jpg') }}" alt="Green grass and trees"/>
-</div>
 {% endblock %}
