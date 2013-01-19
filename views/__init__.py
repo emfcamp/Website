@@ -68,6 +68,6 @@ def get_involved():
 
 @app.route('/badge')
 def badge():
-  return redirect('http://wiki.emfcamp.org/wiki/TiLDA')
+  return redirect('http://wiki-archive.emfcamp.org/2012/wiki/TiLDA')
 
 import users, admin, tickets, volunteers, radio
