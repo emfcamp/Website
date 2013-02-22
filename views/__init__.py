@@ -1,8 +1,10 @@
-from main import app
+from main import app, db
 
 from flask import \
     render_template, redirect, request, flash, \
     url_for, abort, send_from_directory, session
+
+from sqlalchemy.sql import text
 
 from decorator import decorator
 import os, csv
@@ -19,8 +21,14 @@ def main():
     return render_template('main.html')
 
 @app.route("/wave")
-def main():
+def wave():
     return render_template('wave.html')
+
+@app.route("/wave", methods=['POST'])
+def wave_interest():
+    db.engine.execute(text('INSERT INTO interest(email) VALUES (:email)'), email=request.form['email'])
+    flash("Thanks for your interest, we'll be in touch.")
+    return redirect(url_for("wave"))
 
 @app.route('/favicon.ico')
 def favicon():
