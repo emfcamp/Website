@@ -16,13 +16,22 @@ header h1 {
     margin-bottom: 1ex;
 }
 
-.logo {
+.logo, .emw_logo {
     vertical-align: -21px;
     display: inline-block;
     width: 55px;
     height: 80px;
+}
+
+.logo {
     background: url('../images/emf_logo_55x80.png') no-repeat left center;
 }
+
+.emw_logo {
+    background: url('../images/emw_logo_55.png') no-repeat left center;
+    padding-right:5px;
+}
+
 
 h1 a, h1 a:hover {
     text-decoration:none;
