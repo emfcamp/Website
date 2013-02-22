@@ -139,3 +139,12 @@ img.padit {
   .sidebar-nav { display: none }
   .logout { display: none }
 }
+
+div.micro img {
+  display: block;
+  margin-left:auto;
+  margin-right:auto;
+  padding: 2px;
+  border: #ccc solid 1px;
+  margin-bottom: 10px;
+}
