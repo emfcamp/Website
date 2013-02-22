@@ -20,6 +20,7 @@
         <link rel="shortcut icon" href="/favicon.ico">
     </head>
 <body>
+{% block document %}
 <div class="container-fluid">
     <header>
         <h1>
@@ -45,6 +46,7 @@
         </p>
     </footer>
 </div>
+{% endblock %}
 {% assets "js_all" -%}
 <script type="text/javascript" src="{{ ASSET_URL }}"></script>
 {% endassets -%}

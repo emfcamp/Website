@@ -18,6 +18,10 @@ def feature_flag(flag):
 def main():
     return render_template('main.html')
 
+@app.route("/wave")
+def main():
+    return render_template('wave.html')
+
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static/images'),
