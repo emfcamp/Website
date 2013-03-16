@@ -157,3 +157,7 @@ div.micro img {
   border: #ccc solid 1px;
   margin-bottom: 10px;
 }
+
+form.wave-cfp input, form.wave-cfp textarea {
+  width:250px;
+}

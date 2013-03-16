@@ -1,4 +1,5 @@
 from main import app, db
+from models.cfp import Proposal
 
 from flask import \
     render_template, redirect, request, flash, \
@@ -24,10 +25,14 @@ def main():
 def wave():
     return render_template('wave.html')
 
-@app.route("/wave", methods=['POST'])
-def wave_interest():
-    db.engine.execute(text('INSERT INTO interest(email) VALUES (:email)'), email=request.form['email'])
-    flash("Thanks for your interest, we'll be in touch.")
+@app.route("/wave/cfp", methods=['POST'])
+def wave_cfp():
+    prop = Proposal()
+    for field in ('email', 'name', 'title', 'description', 'length'):
+        setattr(prop, field, request.form.get(field))
+    db.session.add(prop)
+    db.session.commit()
+    flash("Thanks for your submission, we'll be in touch by email.")
     return redirect(url_for("wave"))
 
 @app.route('/favicon.ico')
