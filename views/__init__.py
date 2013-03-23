@@ -19,7 +19,8 @@ def feature_flag(flag):
 
 @app.route("/")
 def main():
-    return render_template('main.html')
+    return render_template('splashmain.html')
+    #return render_template('main.html')
 
 @app.route("/wave")
 def wave():
@@ -69,7 +70,8 @@ def about():
     
 @app.route("/contact")
 def contact():
-    return render_template('contact.html')    
+    return render_template('splashcontact.html')
+    #return render_template('contact.html')    
 
 @app.route("/location")
 def location():

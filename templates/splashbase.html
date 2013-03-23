@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>EMF Camp</title>
+<meta http-equiv="Content-Type" content="text/html/css; charset=iso-8859-1" />
+<head>
+{% assets "css/splash.css" %}
+<link href="{{ ASSET_URL }}" rel="stylesheet" type="text/css">
+{% endassets %}
+</head>
+<body>
+
+<div id="container">
+	<div id="left">
+
+	<img id="logo" src="/static/images/splash/EMFlogo.png">
+	<div id="ltext">
+		<p class="lhead">
+		Thank You.
+		</p>
+		<p class="lintro">
+		Electromagnetic Field 2012 is now finished. We'd like to extend massive thanks to our dedicated organising team, everyone who volunteered during the event, and indeed everyone who came. On Saturday we unexpectedly sold out our entire 499 capacity.
+		</p>
+		<p class="body">
+		We'd also like to thank everyone for their patience in dealing with the teething troubles we experienced when running our first event. We're taking all your feedback on board for our next event.<br>
+		<br>
+		Videos for alpha stage are now online! The recordings from beta will be up soon. There's also a wiki page dedicated to collecting as much documentation of the event as possible. If you have your own photos, videos, recordings, interactive flash games: add them!<br>
+		<br>
+		EMF will return, bigger and better, in summer 2014. We run this event in our spare time as volunteers - we all have day jobs - so for the sake of our blood pressure we can't run the event every year. Many of our organising team will also be helping out with the next of the four-yearly Dutch hacker camps, OHM 2013, and we hope to have a village there. We'd love it if you joined us.<br><br>
+		</p>
+		<p class="lhead">
+		<a href="{{ url_for('contact') }}">Contact Us</a><br>
+		<a href="http://wiki.emfcamp.org/wiki/Electromagnetic_Field_2014">Wiki</a><br>
+		<a href="http://blog.emfcamp.org">Blog</a><br>
+		<a href="http://wiki-archive.emfcamp.org/2012/articles/b/a/d/Badge.html">Badge</a><br>
+		<br>
+		<a href="http://twitter.com/emfcamp"><img src="/static/images/splash/twitter.png">@emfcamp</a><br>
+		</p>
+	</div>
+	</div>
+
+	<div id="middle">
+	<div id="mtext">
+        {% block body -%}{% endblock %}
+	</div>
+	</div>
+<div id="right">
+	<div id="righttitle"><p class="mhead">Pictures from EMF Camp 2012</p></div>
+	<div id="gallery">
+	<a href="http://www.flickr.com/photos/nottinghack/7928952496/in/set-72157631351042916">
+	<img src="//farm9.staticflickr.com/8445/7928952496_caa48eeff4_s.jpg"></a>
+	<a href="http://www.flickr.com/photos/nottinghack/7929131026/in/set-72157631351042916">
+	<img src="//farm9.staticflickr.com/8447/7929131026_2d230740f3_s.jpg"></a>
+	<a href="http://www.flickr.com/photos/nottinghack/7929589134/in/set-72157631351042916">
+	<img src="//farm9.staticflickr.com/8178/7929589134_3db9022fbc_s.jpg"></a>
+	<a href="http://www.flickr.com/photos/nottinghack/7929628688/in/set-72157631351042916">
+	<img src="//farm9.staticflickr.com/8041/7929628688_1d2c0b709d_s.jpg"></a>
+	<a href="http://www.flickr.com/photos/nottinghack/7929632902/in/set-72157631351042916">
+	<img src="//farm9.staticflickr.com/8454/7929632902_beffa63217_s.jpg"></a>
+	<a href="http://www.flickr.com/photos/nottinghack/7929647354/in/set-72157631351042916">
+	<img src="//farm9.staticflickr.com/8302/7929647354_a7a5aa03df_s.jpg"></a>
+	<a href="http://www.flickr.com/photos/nottinghack/7929696704/in/set-72157631351042916">
+	<img src="//farm9.staticflickr.com/8445/7929696704_f60dabc1ec_s.jpg"></a>
+	<a href="http://www.flickr.com/photos/nottinghack/7929709988/in/set-72157631351042916">
+	<img src="//farm9.staticflickr.com/8436/7929709988_a105a6ba0c_s.jpg"></a>
+	<a href="http://www.flickr.com/photos/nottinghack/7929581420/in/set-72157631351042916">
+	<img src="//farm9.staticflickr.com/8029/7929581420_a5503257d0_s.jpg"></a>
+	<a href="http://www.flickr.com/photos/nottinghack/7929974920/in/set-72157631351042916">
+	<img src="//farm9.staticflickr.com/8317/7929974920_31cca58fa1_s.jpg"></a>
+	<a href="http://www.flickr.com/photos/nottinghack/7929972532/in/set-72157631351042916/">
+	<img src="//farm9.staticflickr.com/8321/7929972532_75cfbcbc41_s.jpg"></a>
+	<a href="http://www.flickr.com/photos/nottinghack/7929994736/in/set-72157631351042916">
+	<img src="//farm9.staticflickr.com/8313/7929994736_dc9722bacc_s.jpg"></a>
+	<a href="http://www.flickr.com/photos/nottinghack/7930068564/in/set-72157631351042916">
+	<img src="//farm9.staticflickr.com/8041/7930068564_061cf33cb9_s.jpg"></a>
+	<a href="http://www.flickr.com/photos/nottinghack/7930082986/in/set-72157631351042916">
+	<img src="//farm9.staticflickr.com/8440/7930082986_6a7593f69b_s.jpg"></a>
+	<a href="http://www.flickr.com/photos/nottinghack/7930098102/in/set-72157631351042916">
+	<img src="//farm9.staticflickr.com/8457/7930098102_19185248ae_s.jpg"></a>
+	<a href="http://www.flickr.com/photos/nottinghack/7930103084/in/set-72157631351042916/">
+	<img src="//farm9.staticflickr.com/8445/7930103084_d03c12524b_s.jpg"></a>
+	<a href="http://www.flickr.com/photos/nottinghack/7966668712/in/set-72157631351042916">
+	<img src="//farm9.staticflickr.com/8031/7966668712_748789e6fe_s.jpg"></a>
+	<a href="http://www.flickr.com/photos/nottinghack/7966693312/in/set-72157631351042916">
+	<img src="//farm9.staticflickr.com/8459/7966693312_e874b601a8_s.jpg"></a>
+	<a href="http://www.flickr.com/photos/nottinghack/7966704076/in/set-72157631351042916">
+	<img src="//farm9.staticflickr.com/8311/7966704076_229dcdce1c_s.jpg"></a>
+	<a href="http://www.flickr.com/photos/nottinghack/7930669864/in/set-72157631351042916">
+	<img src="//farm9.staticflickr.com/8459/7930669864_6f49d65abc_s.jpg"></a>
+</div>
+	<div id="rightcontent"><p class="mhead">Video Tour of EMF Camp 2012</p></div>
+	<div id="video"><iframe width="312" height="176" src="https://www.youtube.com/embed/uQMogMHvMGw?rel=0" frameborder="0" allowfullscreen></iframe></div>
+</div>
+</body>
+</div>
+</html>
