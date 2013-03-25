@@ -48,8 +48,9 @@ def sponsors():
 def talks():
     
     days = {}
+    talk_path = os.path.abspath(os.path.join(__file__, '..', '..', 'talks'))
     for day in ('friday', 'saturday', 'sunday'):
-        reader = csv.reader(open('talks/%s.csv' % day, 'r'))
+        reader = csv.reader(open(os.path.join(talk_path, '%s.csv' % day), 'r'))
         
         rows = []
         for row in reader:
