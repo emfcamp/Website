@@ -60,6 +60,10 @@ def talks():
 
     return render_template('talks.html', **days)
 
+@app.route("/wave-talks")
+def wave_talks():
+    return render_template('wave-talks.html')
+
 @app.route("/about/company")
 def company():
     return render_template('company.html')

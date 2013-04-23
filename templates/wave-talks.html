@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Electromagnetic Wave - Talks &amp; Workshops{% endblock %}
+{% block document %}
+<div class="container-fluid">
+  <header>
+       <h1><a href='/wave'><span class="emw_logo"></span>Electromagnetic Wave</a></h1>
+  </header>
+                {% for message in get_flashed_messages() -%}
+                            <div class="span10 alert alert-error">{{ message }}</div>
+                                    {% endfor -%}
+
+    <div class="row-fluid">
+      <div class="span3"></div>
+      <div class="span6 micro">
+
+<p><a href='/wave'>&#171; Sail back to the main site</a></p>
+
+<h2>Talks & Workshops</h2>
+        
+<p class="summary">
+    We're slowly announcing talks and workshops as <a href='/wave'>Electromagnetic Wave</a> approaches, with the schedule being revealed a few days before the event itself. Below you can find the talks we've announced so far.
+</p>
+<p class="summary">
+    While we're no longer accepting full talk submissions, there will be multiple lightning talk sessions you can take part in and we may have shorter talk slots available. Fill in the <a href='#get-involved'>Get Involved</a> form and we'll be in touch!
+</p>
+
+
+<h2 id="talks">Talks</h2>
+<p>We're announcing talks every few days, this is the current list.</p>
+
+<ul>
+    <li>
+        <p class="summary"><b>Neutrinos and the Birth of the Universe</b> - Dr Ben Still</p>
+        <p>Where did all the matter that makes up the visible Universe come from? Ghostly Neutrino particles might hold the answer. They are the most common of all of Natures building blocks yet Neutrinos are still to be fully understood. Ben will explain how particle physicists are experimenting with neutrinos and the secrets they might hold.</p>
+    </li>
+    <li>
+        <p class="summary"><b>When Zeppelins Ruled The Earth</b> - Simon Willison</p>
+        <p>Experience the birth of the mighty Zeppelin, its role in early arctic exploration, its first epic voyage around the world and its rise and subsequent fall as the darling of the US navy! Discover ambitious British plans for an Imperial Airship Scheme to dominate the colonies! Stories, photographs and tales of daring Zeppelin/biplane exploits!</p>
+    </li>
+    <li>
+        <p class="summary"><b>Getting to the Moon and Back</b> - Wasim Juned</p>
+        <p>A not-too-heavy talk about getting to the moon and (hopefully!) back, going over some practical problems, existing solutions and alternatives, and what the future holds.</p>
+    </li>
+    <li>
+        <p class="summary"><b>Catching Bugs with Code: Adventures in Bacterial Genomics</b> - Jane Charlesworth</p>
+        <p>Genome sequencing is now cheap enough that labs and hospitals can sequence hundreds of bacterial genomes in virtually real time. This will detail some of the neat advances in sequencing technology, give examples of where we are using genomic data to track down the origins of outbreaks of bacterial disease, map transmission and track bacterial evolution in real time and outline some of the computational problems involved in bioinformatics.</p>
+    </li>
+    <li>
+        <p class="summary"><b>The Kraken Ocean Drifter</b> - Daniel Saul &amp; Priyesh Patel</p>
+        <p>A student-run project that designed, built and deployed an ocean buoy into the North Sea, then publicly tracked it via satellite live on the internet.</p>
+    </li>
+    <li>
+        <p class="summary"><b>The Craftivism Movement</b> - Sarah Corbett</p>
+        <p>Craftivism enables people who previously may never have had their views heard to contribute to discussions in a way they can access. Sarah talks through the Craftivist Collectives projects and how they have spread across the globe.</p>
+    </li>
+</ul>
+
+<h2 id="workshops">Workshops</h2>
+<p>We've not announced workshops yet, check back soon!</p>
+
+<h2 id="get-involved">Get Involved</h2>
+<p>We're still looking for people to talk at EMF, as well as for people to run workshops, installations, or simply show off things they've made on the ship or ashore. If you're interested in doing any of this, please fill in this form and we'll get back to you:</p>
+<form method="post" action="/wave/cfp" class="form-horizontal wave-cfp">
+    <div class="control-group">
+      <label class="control-label" for="inputName">Name</label>
+      <div class="controls">
+        <input type="text" name="name" id="inputName" placeholder="Name">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="inputEmail">Email</label>
+      <div class="controls">
+        <input type="text" name="email" id="inputEmail" placeholder="Email">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="inputTitle">Talk Title</label>
+      <div class="controls">
+        <input type="text" name="title" id="inputTitle" placeholder="Title">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="inputDescription">Description</label>
+      <div class="controls">
+        <textarea rows="4" name="description" id="inputDescription" 
+            placeholder="Description (Less than 200 words)"></textarea>
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="inputLength">Talk Length</label>
+      <div class="controls">
+        <input type="text" name="length" id="inputLength" placeholder="Length">
+      </div>
+    </div>
+     <div class="control-group">
+       <div class="controls">
+         <button type="submit" class="btn">Submit proposal</button>
+       </div>
+     </div>
+</form>
+
+<p>Electromagnetic Wave is run entirely by volunteers like you. If you want to help us out (whether with admin, setup, stewarding, working at the bar, or whatever else) please <a href="mailto:contact@emfcamp.org">get in touch</a>.</p>
+</div>
+      <div class="span3"></div>
+    </div>
+</div>
+{% endblock %}
