@@ -93,4 +93,8 @@ def get_involved():
 def badge():
   return redirect('http://wiki-archive.emfcamp.org/2012/wiki/TiLDA')
 
+@app.route('/sine')
+def sine():
+    return redirect('http://wiki.emfcamp.org/wiki/SiNE')
+
 import users, admin, tickets, volunteers, radio
