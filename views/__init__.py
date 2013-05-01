@@ -94,6 +94,8 @@ def badge():
   return redirect('http://wiki-archive.emfcamp.org/2012/wiki/TiLDA')
 
 @app.route('/sine')
+@app.route('/wave/sine')
+@app.route('/wave/SiNE')
 def sine():
     return redirect('http://wiki.emfcamp.org/wiki/SiNE')
 
