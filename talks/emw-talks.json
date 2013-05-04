@@ -1,0 +1,267 @@
+{
+	"title": "Electromagnetic Wave 2013",
+	"shortTitle": "EMW 2013",
+	"hashtag": "#EMW2013",
+	"location": "Stubnitz, Canary Wharf, London",
+	"latE6": 51502320,
+	"lngE6": -14592,
+	"stages": [
+		{
+			"name": "Stage Alpha",
+			"location": null,
+			"latE6": 51502320,
+			"lngE6": -14592,
+			"events": [
+				{
+					"type": "talk",
+					"title": "Through-the-Wall Sensing Using Passive WiFi Radar",
+					"start": "2013-05-05 13:00:00",
+					"end": "2013-05-05 13:30:00",
+					"speaker": "Kevin Chetty",
+					"description": "WiFi is a ubiquitous and pervasive technology. This presentation will focus on my research a University College London to exploit wireless signals in our environments for detection and tracking applications using a passive radar system. This technology can be used to detect moving people in everyday scenarios, including through walls."
+				},
+				{
+					"type": "talk",
+					"title": "How the Large Hadron Collider Cures Cancer",
+					"start": "2013-05-05 13:40:00",
+					"end": "2013-05-05 14:10:00",
+					"speaker": "Simon Jolly",
+					"description": "The Large Hadron Collider is probably the largest scientific apparatus that has ever existed. But did you know that the same technology that was used to discover the Higgs Boson is also used for cancer treatment? This talk will give a whistle stop tour of cancer treatment using proton therapy."
+				},
+				{
+					"type": "talk",
+					"title": "Craftivism: A spoonful of craft helps the activism go down?",
+					"start": "2013-05-05 14:20:00",
+					"end": "2013-05-05 14:50:00",
+					"speaker": "Sarah Corbett",
+					"description": "Craftivism enables people who previously may never have had their views heard to contribute to discussions in a way they can access. Sarah talks through the Craftivist Collectives projects and how they have spread across the globe."
+				},
+				{
+					"type": "talk",
+					"title": "WebGL & Interactive Storytelling",
+					"start": "2013-05-05 15:00:00",
+					"end": "2013-05-05 15:30:00",
+					"speaker": "Benjamin Blundell",
+					"description": "A short talk about working as a freelance programmer with WebGL and the challenges faced when working with artists, directors and cutting edge technology when trying to tell a short story.",
+					"url": "http://www.thecarpandtheseagull.com"
+				},
+				{
+					"type": "lightning",
+					"title": "Lightning Talks",
+					"start": "2013-05-05 15:40:00",
+					"end": "2013-05-05 16:10:00",
+					"description": "A session of impromptu ten minute talks. If you'd like to take part, please register at the information desk"
+				},
+				{
+					"type": "talk",
+					"title": "Engineering Ethics",
+					"start": "2013-05-05 16:20:00",
+					"end": "2013-05-05 16:50:00",
+					"speaker": "Georgina Voss",
+					"description": "With great power comes great responsibility? An enthusiastic rattle through the ethical issues around technology and engineering, both in the process of design and making (for example) your giant laser-eyed robot and what happens after it gets set free into the world. Featuring Immanuel Kant, Tony Stark and some considerable hand-waving about Google Glass."
+				},
+				{
+					"type": "talk",
+					"title": "Catching Bugs with Code: Adventures in Bacterial Genomics",
+					"start": "2013-05-05 17:00:00",
+					"end": "2013-05-05 17:30:00",
+					"speaker": "Jane Charlesworth",
+					"description": "Genome sequencing is now cheap enough that labs and hospitals can sequence hundreds of bacterial genomes in virtually real time. This will detail some of the advances in sequencing technology, give examples of where we are using genomic data to track down the origins of outbreaks of bacterial disease, map transmission and track bacterial evolution in real time and outline some of the computational problems involved in bioinformatics."
+				},
+				{
+					"type": "talk",
+					"title": "For Amusement Only",
+					"start": "2013-05-05 17:40:00",
+					"end": "2013-05-05 18:10:00",
+					"speaker": "Tim Hunkin",
+					"description": "Tim Hunkin, who runs his own ‘Under the Pier Show’ arcade, talks about kinetoscope parlours, one armed bandits, pinball, pachinko, pong and much much more. Including bizarre machines like crying babies, model execution scenes, and Bung-ga, bunga-ga."
+				},
+				{
+					"type": "talk",
+					"title": "I Will Explain Some Jokes That Are In The Form of Games",
+					"start": "2013-05-05 18:20:00",
+					"end": "2013-05-05 18:50:00",
+					"speaker": "George Buckenham",
+					"description": "George really likes games that are made purely to tell a joke. In this talk, he will proceed to over-explain these jokes, in the hopes of killing any humour they may once have contained."
+				},
+				{
+					"type": "talk",
+					"title": "When Zeppelins Ruled the World",
+					"start": "2013-05-05 19:00:00",
+					"end": "2013-05-05 19:30:00",
+					"speaker": "Simon Willison",
+					"description": "Experience the birth of the mighty Zeppelin, its role in early arctic exploration, its first epic voyage around the world and its rise and subsequent fall as the darling of the US navy! Discover ambitious British plans for an Imperial Airship Scheme to dominate the colonies! Stories, photographs and tales of daring Zeppelin/biplane exploits!"
+				},
+				{
+					"type": "talk",
+					"title": "Physical Security is an Illusion",
+					"start": "2013-05-05 19:40:00",
+					"end": "2013-05-05 20:10:00",
+					"speaker": "Warren Rockley",
+					"description": "All locked doors can be opened by a determined attacker with the right skill-set, Warren Rockley has those skills. In this brief talk he sets out how security is compromised in everything from your home to bank vaults and everything in between. Audience participation is actively encouraged, tools of the master thief will be passed around, and there will be Q&A where time permits."
+				},
+				{
+					"type": "talk",
+					"title": "Indie Games Begin",
+					"start": "2013-05-05 20:30:00",
+					"end": "2013-05-05 23:30:00",
+					"speaker": "Everyone",
+					"description": "A selection of multiplayer indie games will be deployed throughout the boat. We'll have Mega-GIRP in the hold, Johann Sebastian Joust on the deck, 0Space in the bar, Punch The Custard hiding in the bowels of the ship, and Giant Cyber Operation lying on a table somewhere."
+				}
+			]
+		},
+		{
+			"name": "Stage Beta",
+			"location": "Smaller marquee near BMX track",
+			"location": null,
+			"latE6": 51502320,
+			"lngE6": -14592,
+			"events": [
+				{
+					"type": "talk",
+					"title": "The Makers of Things",
+					"start": "2013-05-05 13:00:00",
+					"end": "2013-05-05 13:30:00",
+					"speaker": "Anne Hollowday",
+					"description": "Anne has created a four-part film series about members of SMEE - The Society for Model and Experimental Engineers. She'll be talking about and subsequently showing each three-minute film exploring different aspects of the art of making, from experimental and model engineering to woodworking."
+				},
+				{
+					"type": "talk",
+					"title": "Art of Spinning",
+					"start": "2013-05-05 13:40:00",
+					"end": "2013-05-05 14:10:00",
+					"speaker": "Mazz Mosley",
+					"description": "Through the medium of dance (well, not quite dance, spinning some poi), Mazz explores what tech culture can learn from two balls whizzing around on a piece of string. Its more than you think."
+				},
+				{
+					"type": "talk",
+					"title": "Designing the Open Source Vacuum Cleaner",
+					"start": "2013-05-05 14:20:00",
+					"end": "2013-05-05 14:50:00",
+					"speaker": "Tom Lynch",
+					"description": "Our modern lives are dependent on proprietary technology which few of us could explain. A growing number of people are reacting to this by building their own devices, so-called Open Source Hardware. This project explores the application of OSHW to the design of everyday objects, taking the ubiquitous vacuum cleaner as it's subject."
+				},
+				{
+					"type": "talk",
+					"title": "/dev/fort: You Can Build It In A Week (Even If You Get Caught in a Blizzard)",
+					"start": "2013-05-05 15:00:00",
+					"end": "2013-05-05 15:30:00",
+					"speaker": "James Aylett",
+					"description": "Imagine a place with no distractions – no IM, no Twitter, in fact no internet access at all. Within, a dozen or more developers, designers, thinkers and doers. And a lot of a food. Now imagine that place is a fort. James will be talking about why anyone would want to go on holiday to do their day job, the bits of the internet we had to rebuild to work without the internet, and some tips you can use even when you don't have a fort."
+				},
+				{
+					"type": "talk",
+					"title": "The Hexayurt Project: From Sheds to Designing a Sustainable World",
+					"start": "2013-05-05 15:40:00",
+					"end": "2013-05-05 16:10:00",
+					"speaker": "Vinay Gupta",
+					"description": "Vinay will discuss the Hexayurt Project, the world's most successful Free Hardware housing project, with around 750 built at Burning Man last year. We'll discuss the practicalities of building hexayurts, and how markets probably can't get us to sustainability without Free design because of perverse incentives to waste materials and energy."
+				},
+				{
+					"type": "talk",
+					"title": "Mobile Opportunistic Networks",
+					"start": "2013-05-05 16:20:00",
+					"end": "2013-05-05 16:50:00",
+					"speaker": "GMC",
+					"description": "A brief introduction to an increasingly relevant topic: the re-introduction of the sneakernet. Transmitting data in networks where nodes only briefly interact before physically moving on."
+				},
+				{
+					"type": "lightning",
+					"title": "Lightning Talks",
+					"start": "2013-05-05 17:00:00",
+					"end": "2013-05-05 17:30:00",
+					"description": "A session of impromptu ten minute talks. If you'd like to take part, please register at the information desk"
+				},
+				{
+					"type": "talk",
+					"title": "Hacking on Raspberry Pi",
+					"start": "2013-05-05 17:40:00",
+					"end": "2013-05-05 18:10:00",
+					"speaker": "Rob Bishop",
+					"description": "Rob is an engineer & evangelist working for the Raspberry Pi foundation. He will be talking about how the Raspberry Pi helps people make cool things."
+				},
+				{
+					"type": "talk",
+					"title": "The Kraken Ocean Drifter",
+					"start": "2013-05-05 18:20:00",
+					"end": "2013-05-05 18:50:00",
+					"speaker": "Daniel Saul & Priyesh Patel",
+					"description": "A student-run project that designed, built and deployed an ocean buoy into the North Sea, then publicly tracked it via satellite live on the internet."
+				},
+				{
+					"type": "talk",
+					"title": "What's in Your Android?",
+					"start": "2013-05-05 19:00:00",
+					"end": "2013-05-05 19:30:00",
+					"speaker": "Rob Miller",
+					"description": "Android malware and it's security model is making the news and affects every Android users - knowing how Android security works can help us to stay safe. I'll be talking about how the Android security model works, how malware bypasses it and demonstrate tools to find vulnerabilities in it."
+				},
+				{
+					"type": "talk",
+					"title": "Building an Ad-Hoc Cell Network at Burning Man",
+					"start": "2013-05-05 19:40:00",
+					"end": "2013-05-05 20:10:00",
+					"speaker": "Tim Panton",
+					"description": "Every year The Papa Legba crew go out to Nevada and build a cell network as an art project at the Burning Man festival. They use open source software, software defined radio and try to craft a network that meets the needs of burners."
+				},
+				{
+					"type": "talk",
+					"title": "Indie Games Begin",
+					"start": "2013-05-05 20:30:00",
+					"end": "2013-05-05 23:30:00",
+					"speaker": "Everyone",
+					"description": "A selection of multiplayer indie games will be deployed throughout the boat. We'll have Mega-GIRP in the hold, Johann Sebastian Joust on the deck, 0Space in the bar, Punch The Custard hiding in the bowels of the ship, and Giant Cyber Operation lying on a table somewhere."
+				}
+			]
+		},
+		{
+			"name": "Workshop",
+			"location": null,
+			"latE6": 51502320,
+			"lngE6": -14592,
+			"events": [
+				{
+					"type": "workshop",
+					"title": "An introduction to the game of Go",
+					"start": "2013-05-05 13:00:00",
+					"end": "2013-05-05 13:55:00",
+					"speaker": "Steve Gravell",
+					"description": "I'll be teaching the basics of the ancient game of Go, then following it up with open play sessions in the bar for the rest of the day."
+				},
+				{
+					"type": "workshop",
+					"title": "Introduction to Lockpicking",
+					"start": "2013-05-05 14:00:00",
+					"end": "2013-05-05 14:55:00",
+					"speaker": "Locksport International",
+					"description": "An introduction to basic lockpicking, with a tour through the world of locksport. By the end of the session you'll (hopefully) have opened your first lock without a key!"
+				},
+				{
+					"type": "workshop",
+					"title": "Scratch Programming for Beginners",
+					"start": "2013-05-05 15:00:00",
+					"end": "2013-05-05 15:55:00",
+					"speaker": "Codasign",
+					"description": "An introduction to programming in the Scratch programming language, suitable for absolute beginners over the age of 6! Please bring your own laptop if you have one, we have a limited number available.",
+                    "url": "http://codasign.com"
+				},
+				{
+					"type": "workshop",
+					"title": "Learn to Solder",
+					"start": "2013-05-05 16:00:00",
+					"end": "2013-05-05 17:55:00",
+					"speaker": "Mitch Altman",
+					"description": "Mitch will teach you to the technique for basic soldering, and by the end of the session you'll have something that blinks to take home! (Additional cost for a kit to solder)"
+				},
+				{
+					"type": "workshop",
+					"title": "Introduction to Lockpicking",
+					"start": "2013-05-05 18:00:00",
+					"end": "2013-05-05 18:55:00",
+					"speaker": "Locksport International",
+					"description": "An introduction to basic lockpicking, with a tour through the world of locksport. By the end of the session you'll (hopefully) have opened your first lock without a key!"
+				}
+			]
+		}
+	]
+}
