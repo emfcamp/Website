@@ -15,8 +15,18 @@
 
 <p><a href='/wave'>&#171; Sail back to the main site</a></p>
 
+<h3>Schedule</h3>
+<p>
+<ul>
+    <li><a href='#ongoing'>Ongoing Events</a></li>
+    <li><a href='#talks'>Talks</a></li>
+    <li><a href='#workshops'>Workshops</a></li>
+    <li><a href='#hackers'>For Hackers</a></li>
+</ul>
+</p>
 
-<h3>Ongoing Events</h3>
+
+<h3 id='ongoing'>Ongoing Events</h3>
 <p>
 These events run all day long in a specific location.
 <ul>
@@ -25,12 +35,7 @@ These events run all day long in a specific location.
 </ul>
 </p>
 
-<h3>Talk and Workshop schedule</h3>
-<p>
-    You can find the full list of talks and workshops happening at <abbr title="Electromagnetic Wave">EMW</abbr> below. 
-</p>
-
-<h4>Talks</h4>
+<h3 id='talks'>Talks</h4>
 <table class="table table-bordered" width="100%">
 <th>Time</th><th>Stage A</th><th>Stage B</th>
 {% for stage_a, stage_b in main_stages %}
@@ -50,7 +55,7 @@ These events run all day long in a specific location.
 {% endfor %}
 </table>
 
-<h4>Workshops</h4>
+<h3 id='workshops'>Workshops</h4>
 <table class="table table-bordered" width="100%">
 <th>Time</th><th>Workshop</th>
 {% for workshop in workshops %}
