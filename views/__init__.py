@@ -8,7 +8,8 @@ from flask import \
 from sqlalchemy.sql import text
 
 from decorator import decorator
-import os, csv
+import os, csv, time
+from datetime import datetime
 
 def feature_flag(flag):
     def call(f, *args, **kw):
@@ -49,8 +50,9 @@ def sponsors():
 def talks():
     
     days = {}
+    talk_path = os.path.abspath(os.path.join(__file__, '..', '..', 'talks'))
     for day in ('friday', 'saturday', 'sunday'):
-        reader = csv.reader(open('talks/%s.csv' % day, 'r'))
+        reader = csv.reader(open(os.path.join(talk_path, '%s.csv' % day), 'r'))
         
         rows = []
         for row in reader:
@@ -59,6 +61,31 @@ def talks():
         days[day] = rows
 
     return render_template('talks.html', **days)
+
+@app.route("/wave-talks")
+@app.route("/wave/talks")
+def wave_talks():
+    import json
+    
+    talk_path = os.path.abspath(os.path.join(__file__, '..', '..', 'talks'))
+    raw_json = open(os.path.join(talk_path, 'emw-talks.json'), 'r').read()
+
+    json_data = json.loads(raw_json)
+
+    stages = {}
+    for stage in json_data['stages']:
+        events = []
+        for event in stage['events']:
+            # OH GOD WHAT I HAVE STOPPED CARING
+            event['start'] = datetime.fromtimestamp(time.mktime(time.strptime(event['start'], '%Y-%m-%d %H:%M:%S')))
+            events.append(event)
+
+        stages[stage['name']] = stage['events']
+
+    main_stages = zip(stages['Stage Alpha'], stages['Stage Beta'])
+    workshops = stages['Workshop']
+
+    return render_template('wave-talks.html', main_stages=main_stages, workshops=workshops)
 
 @app.route("/about/company")
 def company():
@@ -88,5 +115,11 @@ def get_involved():
 @app.route('/badge')
 def badge():
   return redirect('http://wiki-archive.emfcamp.org/2012/wiki/TiLDA')
+
+@app.route('/sine')
+@app.route('/wave/sine')
+@app.route('/wave/SiNE')
+def sine():
+    return redirect('http://wiki.emfcamp.org/wiki/SiNE')
 
 import users, admin, tickets, volunteers, radio

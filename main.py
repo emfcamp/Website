@@ -1,7 +1,7 @@
 # encoding=utf-8
 from flask import Flask, session, _request_ctx_stack
-from flaskext.login import LoginManager
 from flaskext.mail import Mail
+from flask.ext.login import LoginManager
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.assets import Environment, Bundle
 

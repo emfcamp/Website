@@ -6,7 +6,7 @@ from models.user import User
 from datetime import timedelta
 
 from flask import render_template, request, redirect, url_for, flash
-from flaskext.login import \
+from flask.ext.login import \
     login_user, login_required, logout_user, current_user
 from flaskext.wtf import Form, Required, \
     SelectField, IntegerField, HiddenField, BooleanField, SubmitField, \

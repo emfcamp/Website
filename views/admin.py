@@ -6,7 +6,7 @@ from models.ticket import TicketType, Ticket
 from flask import \
     render_template, redirect, request, flash, \
     url_for, abort, send_from_directory, session
-from flaskext.login import \
+from flask.ext.login import \
     login_user, login_required, logout_user, current_user
 from flaskext.mail import Message
 from flaskext.wtf import \

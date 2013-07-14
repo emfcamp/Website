@@ -1,5 +1,5 @@
 from main import db
-import flaskext
+from flask.ext.login import UserMixin
 import bcrypt
 import os
 import base64
@@ -9,7 +9,7 @@ from sqlalchemy.exc import IntegrityError
 
 safechars_lower = "2346789bcdfghjkmpqrtvwxy"
 
-class User(db.Model, flaskext.login.UserMixin):
+class User(db.Model, UserMixin):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, unique=True)
