@@ -1,19 +1,81 @@
-{% extends "splashbase.html" %}
-{% block body %}
-		<p class="mhead">What Next?</p>
-		<p class="mintro">
-		Electromagnetic Wave is a day filled with talks and workshops for those with an inquisitive mind or an interest in making things, held on a converted East German fishing vessel moored in London. Brought to you by the non-profit group behind last year's Electromagnetic Field festival, this is a maritime-themed taste of what's to come at the next EMF in 2014.</p>
-		<img id="boat" src="/static/images/splash/stubnitz.jpg">
-		<p class="mhead">When?</p>
-		<p class="body">
-		Sunday May 5th (a bank holiday weekend). Talks will run from midday until early evening, and we're planning entertainment aboard the Stubnitz late into the night. Impromptu side-events are likely to occur all weekend.
-		</p>
-		<p class="mhead">Where?</p>
-		<p class="body">MS Stubnitz, Wood Wharf, Canary Wharf, London, E14 9SB (<a href="http://goo.gl/maps/2uaIV">Google map</a>).
-		The Stubnitz is five minutes' walk from Canary Wharf station (Jubilee Line or DLR), and parking is available nearby.
-		<p class="mhead">Keep Informed</p>
-		<p class="body">To keep up to date, you can follow Electromagnetic Wave on <a href="https://twitter.com/emw">Twitter</a> or <a href="http://lanyrd.com/2013/emw/">Lanyrd</a></p>
-		<p class="mhead">Count me in!</p>
-		<p class="body">Tickets are now on sale through <a href="https://www.emfcamp.org/wave">Eventbrite.</a></p>
-		
-{% endblock %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Electromagnetic Field</title>
+<head>
+{% assets "css/splash.css" %}
+<link href="{{ ASSET_URL }}" rel="stylesheet" type="text/css">
+{% endassets %}
+</head>
+<body>
+  {% for message in get_flashed_messages() -%}
+     <div class="flash">{{ message }}</div>
+  {% endfor -%}
+  <div id="container">
+
+	<div class="col" id="left">
+    <div class="inner">
+      <img id="logo" src="/static/images/splash/EMFlogo.png">
+      <p class="lhead">
+      Electromagnetic Field (EMF) is a non-profit UK camping festival for those with an inquisitive mind or an
+      interest in making things: hackers, geeks, scientists, engineers, artists, and crafters.</p>
+
+      <p class="body">
+      In the summer of 2012 we gathered hundreds of people in a field outside Milton Keynes for three days of
+      talks and workshops covering everything from <b>genetic modification</b> to <b>electronics</b>, <b>blacksmithing</b>
+      to <b>high-energy physics</b>, <b>reverse engineering</b> to <b>lock picking</b>, <b>computer security</b> to
+      <b>crocheting</b>, and <b>quadcopters</b> to <b>beer brewing</b>.
+      </p>
+      <p class="body">
+      To help matters along, we arranged a 380-megabit internet connection, reliable WiFi, and a bar stocked with real ale.
+      </p>
+      <p class="follow">
+      <a href="http://twitter.com/emfcamp">@emfcamp</a> | 
+      <a href="https://www.facebook.com/emfcamp">facebook</a>
+      </p>
+    </div>
+	</div>
+
+  <div class="col" id="middle">
+    <div class="inner">
+      <h4>What's Next?</h4>
+      <p class="body">
+        Planning for the next EMF in summer 2014 is now well underway. If you're interested in attending, please follow us on <a href="http://www.twitter.com/emfcamp">Twitter</a> or join our mailing list below:
+        </p>
+        <form method="post">
+          <input type="text" name="email"/>
+          <button>Join</button>
+        </form>
+        <p class="body">
+        <small>(We'll only use your email address to contact you about future EMF events.)</small>
+        </p>
+        <h4>Help Out</h4>
+          <p class="body">
+          EMF is entirely organised and run by a dedicated team of volunteers.
+          We're looking for people to help with everything from power and networking to driving vans and
+          running the bar.
+          </p>
+          <p class="body">
+          If you're interested in helping make EMF happen, you can 
+          visit <a href="http://wiki.emfcamp.org">our wiki</a> or
+          <a href="http://lists.emfcamp.org/listinfo/general">join the organisation mailing list</a>.
+          </p>
+
+	  </div>
+	</div>
+  <div class="col" id="right">
+    <div class="inner">
+      <div id="gallery">
+        <a href="http://www.flickr.com/photos/russss/7909185964/in/set-72157631357117362"><img src="/static/images/splash/img1.jpg"></a>
+        <a href="http://www.flickr.com/photos/russss/7909193016/in/set-72157631357117362"><img src="/static/images/splash/img2.jpg"></a>
+        <a href="http://www.flickr.com/photos/nottinghack/7929647354/in/set-72157631351042916"><img src="/static/images/splash/img3.jpg"></a>
+      </div>
+      <p class="body">
+      <a href="https://www.youtube.com/watch?v=uQMogMHvMGw">Video Tour</a> | 
+      <a href="http://www.bbc.co.uk/news/technology-19441861">BBC News Article</a><br>
+      </p>
+</div>
+</div>
+</body>
+</div>
+</html>

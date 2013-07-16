@@ -1,6 +1,9 @@
 from main import app, db
 from models.cfp import Proposal
 
+from mailsnake import MailSnake
+from mailsnake.exceptions import *
+
 from flask import \
     render_template, redirect, request, flash, \
     url_for, abort, send_from_directory, session
@@ -21,7 +24,18 @@ def feature_flag(flag):
 @app.route("/")
 def main():
     return render_template('splashmain.html')
-    #return render_template('main.html')
+
+@app.route("/", methods=['POST'])
+def main_post():
+    ms = MailSnake('6451c3d1ddf1f5cb769eb75c8f5e1fe2-us5')
+    try:
+        email = request.form.get('email')
+        ms.listSubscribe(id='d1798f7c80', email_address=email)
+        flash('Thanks for subscribing! You will receive a confirmation email shortly.')
+    except MailSnakeException, e:
+        print e
+        flash('Sorry, an error occurred.')
+    return redirect(url_for('main'))
 
 @app.route("/wave")
 def wave():
