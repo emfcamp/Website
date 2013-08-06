@@ -19,3 +19,4 @@ iso8601
 qrcode
 pil
 mailsnake
+gunicorn
