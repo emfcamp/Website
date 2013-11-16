@@ -5,7 +5,7 @@
 #
 
 import ofxparse, sys
-from flaskext.script import Command, Manager, Option
+from flask.ext.script import Command, Manager, Option
 from flask import Flask, render_template
 from flask.ext.sqlalchemy import SQLAlchemy
 from flaskext.mail import Mail, Message
