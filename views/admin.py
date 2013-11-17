@@ -78,7 +78,6 @@ def stats():
           and tt.code like 'full%'
           and (
             p.provider = 'banktransfer' and p.state = 'inprogress'
-            or p.provider = 'googlecheckout' and p.state = 'new'
           )
           and t.expires > now()
     """)).scalar()

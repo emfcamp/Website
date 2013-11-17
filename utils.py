@@ -5,7 +5,7 @@
 #
 
 import ofxparse, sys
-from flaskext.script import Command, Manager, Option
+from flask.ext.script import Command, Manager, Option
 from flask import Flask, render_template
 from flask.ext.sqlalchemy import SQLAlchemy
 from flaskext.mail import Mail, Message
@@ -173,14 +173,6 @@ class TestEmails(Command):
           print
           print "*" * 42
           print
-      elif p.provider == "googlecheckout":
-        for t in ("tickets-paid-email-googlecheckout.txt",):
-          print "template:", t
-          print
-          self.test(t, p)
-          print
-          print "*" * 42
-          print
       elif p.provider == "banktransfer":
         for t in ("tickets-purchased-email-banktransfer.txt", "tickets-paid-email-banktransfer.txt"):
           print "template:", t
@@ -222,7 +214,7 @@ class TestEmails(Command):
       
       # full, prepay
       for full, pp in ((1,0), (0,1), (3,0), (0,3), (2,1)):
-        for pt in (BankPayment, GoCardlessPayment, GoogleCheckoutPayment):
+        for pt in (BankPayment, GoCardlessPayment):
           total = (full * amounts['full']) + (pp * amounts['prepayfull'])
           payment = pt(total)
           payment.state = "inprogress"
