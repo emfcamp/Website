@@ -528,7 +528,7 @@ class SendTickets(Command):
             user.create_receipt()
             msg.body = render_template("ticket.txt", user = user)
             print "Sending to", user.email, "..."
-            print msg.body
+            mail.send(msg)
 
 
 if __name__ == "__main__":

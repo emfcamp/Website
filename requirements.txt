@@ -20,3 +20,6 @@ qrcode
 pil
 mailsnake
 gunicorn
+psycopg2
+eventlet
+
