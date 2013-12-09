@@ -20,3 +20,4 @@ qrcode
 pil
 mailsnake
 gunicorn
+psycopg2
