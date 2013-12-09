@@ -70,8 +70,6 @@ class TicketType(db.Model):
         return TicketType.query.filter_by(code=code).one()
 
     # Deprecated
-    Prepay = ConstTicketType('Prepay Camp Ticket')
-    FullPrepay = ConstTicketType('Full Camp Ticket (prepay)')
     Full = ConstTicketType('Full Camp Ticket')
     Under14 = ConstTicketType('Under-14 Camp Ticket')
 

@@ -84,8 +84,6 @@ def stats():
 
 
     stats = {
-        'prepays': outstanding.filter(Ticket.type == TicketType.Prepay).count(),
-        'prepays_bought_all': paid.filter(Ticket.type == TicketType.Prepay).count(),
         'full': full,
         'full_bought': full_bought,
         'kids_bought': kids_bought,
@@ -94,22 +92,6 @@ def stats():
         'users': User.query.count(),
         'day_confident': day_confident
     }
-
-    # A pending or purchased full ticket cancels out a purchased prepay
-    user_prepays = db.session.query(
-        Ticket.user_id,
-        func.sum(case([
-            (and_(Ticket.type == TicketType.Prepay, Ticket.paid == True), 1),
-            (Ticket.type == TicketType.Full, -1),
-            (Ticket.type == TicketType.FullPrepay, -1),
-        ], else_=0)).label('outstanding')
-    ).group_by(Ticket.user_id).subquery()
-
-    prepays = db.session.query(func.sum(case([
-        (user_prepays.c.outstanding < 0, 0)
-    ], else_=user_prepays.c.outstanding))).one()
-
-    stats['prepays_bought'] = prepays[0]
 
     return ' '.join('%s:%s' % i for i in stats.items())
 

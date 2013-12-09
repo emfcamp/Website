@@ -99,64 +99,9 @@ class UpdateTicketForm(Form):
 class UpdateTicketsForm(Form):
     tickets = FieldList(FormField(UpdateTicketForm))
 
-class ChoosePrepayTicketsForm(Form):
-    count = IntegerSelectField('Number of tickets', [Required()])
-
 @app.route("/tickets", methods=['GET', 'POST'])
 def tickets():
-
-    if app.config.get('FULL_TICKETS', False):
-        if not (current_user.is_authenticated() and current_user.tickets.count()):
-            return redirect(url_for('tickets_choose'))
-
-    form = ChoosePrepayTicketsForm(request.form)
-    form.count.values = range(1, TicketType.Prepay.limit + 1)
-
-    if request.method == 'POST' and form.validate():
-        session['basket'] = [TicketType.Prepay.id] * form.count.data
-
-        if current_user.is_authenticated():
-            return redirect(url_for('pay_choose'))
-        else:
-            return redirect(url_for('signup', next=url_for('pay_choose')))
-
-
-    if current_user.is_authenticated():
-        tickets = current_user.tickets.all()
-        payments = current_user.payments.filter(Payment.state != "canceled", Payment.state != "expired").all()
-    else:
-        tickets = []
-        payments = []
-
-    #
-    # go through existing payments
-    # and make cancel and/or pay buttons as needed.
-    #
-    # We don't allow canceling of inprogress gocardless payments cos there is
-    # money in the system and then we have to sort out refunds etc.
-    #
-    # With canceled Bank Transfers we mark the payment as canceled in
-    # case it does turn up for some reason and we need to do something with
-    # it.
-    #
-    retrycancel_forms = {}
-    for p in payments:
-        if p.provider == "gocardless" and p.state == "new":
-            retrycancel_forms[p.id] = GoCardlessTryAgainForm(formdata=None, payment=p.id, yesno='no')
-        elif p.provider == "banktransfer" and p.state == "inprogress":
-            retrycancel_forms[p.id] = BankTransferCancelForm(formdata=None, payment=p.id, yesno='no')
-        # the rest are inprogress or complete gocardless payments
-        # or complete banktransfers,
-        # or canceled payments of either provider.
-
-    return render_template("tickets.html",
-        form=form,
-        tickets=tickets,
-        payments=payments,
-        price=TicketType.Prepay.cost,
-        retrycancel_forms=retrycancel_forms,
-    )
-
+    return redirect(url_for('tickets_choose'))
 
 def add_payment_and_tickets(paymenttype):
     """
@@ -541,7 +486,6 @@ class TicketAmountsForm(Form):
     choose = SubmitField('Buy Tickets')
 
 @app.route("/tickets/choose", methods=['GET', 'POST'])
-@feature_flag('FULL_TICKETS')
 def tickets_choose():
     if ticket_cutoff():
         return render_template("tickets-cutoff.html")
@@ -553,16 +497,10 @@ def tickets_choose():
             form.types[-1].type_id.data = tt.id
 
     if current_user.is_authenticated():
-        prepays = current_user.tickets. \
-            filter_by(type=TicketType.bycode('prepay'), paid=True). \
-            count()
         fulls = current_user.tickets.join(TicketType). \
             filter(TicketType.code.like('full%')). \
             count()
-        if fulls >= prepays:
-            prepays = 0
     else:
-        prepays = 0
         fulls = 0
 
     token_tts = TicketToken.types(session.get('ticket_token'))
@@ -576,12 +514,7 @@ def tickets_choose():
         limit = tt.user_limit(current_user)
 
         values = range(limit + 1)
-        if tt.code == 'prepay':
-            values = []
-        elif tt.code == 'full_prepay':
-            assert prepays <= limit
-            values = [prepays]
-        elif tt.code in token_only and tt not in token_tts:
+        if tt.code in token_only and tt not in token_tts:
             values = []
         elif tt.code == 'full':
             if token_tts:
@@ -592,7 +525,6 @@ def tickets_choose():
 
 
     if request.method == 'POST' and form.validate():
-
         basket = []
         for f in form.types:
             if f.amount.data:

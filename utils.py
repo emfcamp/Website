@@ -197,25 +197,21 @@ class TestEmails(Command):
       db.session.add(user)
 
       amounts = {
-        "prepayfull" : TicketType.query.filter(TicketType.name == 'Full Camp Ticket (prepay)').one().cost,
         "full" : TicketType.query.filter(TicketType.name == 'Full Camp Ticket').one().cost
       }
       #
       # TODO: needs to cover:
       #
-      # single full ticket, no prepay
-      # single full ticket with prepay
-      # multiple full tickets, no prepay
-      # multiple full tickets, with prepay
-      # multiple full tickets, some prepay
+      # single full ticket
+      # multiple full tickets
       #
       # kids & campervans?
       #
       
-      # full, prepay
-      for full, pp in ((1,0), (0,1), (3,0), (0,3), (2,1)):
+      # full
+      for full in ((1,), (0,), (3,), (0,), (2,)):
         for pt in (BankPayment, GoCardlessPayment):
-          total = (full * amounts['full']) + (pp * amounts['prepayfull'])
+          total = (full * amounts['full'])
           payment = pt(total)
           payment.state = "inprogress"
           if payment.provider == "gocardless":
@@ -229,13 +225,6 @@ class TestEmails(Command):
             t.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
             user.tickets.append(t)
             
-          tt = 'Full Camp Ticket (prepay)'
-          for i in range(pp):
-            t = Ticket(type_id = TicketType.query.filter(TicketType.name == tt).one().id)
-            t.payment = payment
-            t.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
-            user.tickets.append(t)
-
           user.payments.append(payment)
 
       db.session.commit()
@@ -260,8 +249,6 @@ class CreateTickets(Command):
 
         data = [
             #(order, code, name, capacity, max per person, GBP, EUR, Description)
-            (0, 'prepay', 'Prepay Camp Ticket', 250, 4, 30.00, 40.00, None),
-            (1, 'full_prepay', 'Full Camp Ticket (prepay)', 250, 4, 60.00, 75.00, None),
             (2, 'full', 'Full Camp Ticket', 499 - 20, 4, 95.00, 120.00, None),
             (10, 'kids_u14', 'Under-14 Camp Ticket', 30, 4, 47.50, 60.00,
                 "All children must be accompanied by an adult."),
@@ -482,29 +469,6 @@ class MakeAdmin(Command):
 
     print 'userid 1 (%s) is now an admin' % (user.name)
 
-class SendPrepayReminder(Command):
-
-    def run(self):
-        query = text("""select id from "user" where exists 
-                        (select 1 from ticket, ticket_type where ticket.user_id = "user".id 
-                            and ticket.type_id = ticket_type.id and 
-                            ticket_type.name = 'Prepay Camp Ticket' and ticket.paid = true)
-                    and not exists 
-                        (select 1 from ticket, ticket_type where ticket.user_id = "user".id
-                            and ticket.type_id = ticket_type.id and
-                            ticket_type.name = 'Full Camp Ticket (prepay)')""")
-
-        for row in db.engine.execute(query):
-            user = User.query.filter_by(id=row[0]).one()
-            msg = Message("Electromagnetic Field Ticket Update",
-                          sender=app.config.get('TICKETS_EMAIL'),
-                          recipients=[user.email]
-                         )
-            msg.body = render_template("tickets-prepay-reminder.txt",
-                            user = user, tickets=user.tickets)
-            print "Sending to", user.email, "..."
-            mail.send(msg)
-
 class SendTickets(Command):
 
     def run(self):
@@ -530,7 +494,6 @@ if __name__ == "__main__":
   manager.add_command('testemails', TestEmails())
   manager.add_command('createtickets', CreateTickets())
   manager.add_command('makeadmin', MakeAdmin())
-  manager.add_command('prepayreminder', SendPrepayReminder())
   manager.add_command('addtokens', CreateTicketTokens())
   manager.add_command('createroles', CreateRoles())
   manager.add_command('createshifts', CreateShifts())

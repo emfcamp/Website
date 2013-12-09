@@ -65,5 +65,3 @@ test:
 admin:
 	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py makeadmin
 
-prepayreminder:
-	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py prepayreminder
