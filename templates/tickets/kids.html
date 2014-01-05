@@ -3,7 +3,7 @@
 {% set volunteer = ticket.form.volunteer %}
 {% set accessible = ticket.form.accessible %}
 
-<div class="control-group no-margin{%if form.errors%} error{%endif%}">
+<div class="form-group no-margin{%if form.errors%} error{%endif%}">
  	<div class="controls">
 		<label class="checkbox">
 			{{ accessible()|safe }}

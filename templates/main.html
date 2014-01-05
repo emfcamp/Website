@@ -1,29 +1,7 @@
 {% extends "base.html" %}
 {% block body %}
 
-<div class="span10">
-  <div class="well well-large">
-    <h2>Electromagnetic Wave</h2>
-    <p>If you can't wait for EMF 2014, the team are running a one-day event in London on May 5th called <a href="/wave">Electromagnetic Wave</a>.</p>
-  </div>
-
-<div class="well well-large">
-  <h2>Thank You.</h2>
-  <p class="summary">Electromagnetic Field 2012 is now finished. We'd like to extend massive thanks to our dedicated organising team,
-  everyone who volunteered during the event, and indeed everyone who came. On Saturday we unexpectedly sold out our entire 499 capacity.</p>
-
-  <p>We'd also like to thank everyone for their patience in dealing with the teething troubles we experienced when
-    running our first event. We're taking all <a href="http://wiki-archive.emfcamp.org/2012/wiki/Feedback">your feedback</a>
-    on board for our next event.</p>
-
-  <p><b><a href="http://wiki-archive.emfcamp.org/2012/wiki/EMF2012_Video">Videos</a> for alpha stage are now online!</b> The recordings from beta will be up soon. There's also a <a href="http://wiki-archive.emfcamp.org/2012/wiki/Documentation">wiki page</a> dedicated to collecting as much documentation of the event as possible. If you have your own photos, videos, recordings, interactive flash games: add them!</p>
-
-  <p>EMF will return, bigger and better, in summer 2014. We run this event in our spare time as volunteers &mdash;
-  we all have day jobs &mdash; so for the sake of our blood pressure we can't run the event every year.
-  Many of our organising team will also be helping out with the next of the four-yearly Dutch hacker camps,
-  <a href="https://ohm2013.org">OHM 2013</a>, and we hope to have a village there. We'd love it if you joined us.</p>
-</div>
-
+<div class="col-md-10">
 <h2>What?</h2>
 
 <p>
@@ -58,7 +36,7 @@ Electromagnetic Field is a three-day UK camping festival for people with an inqu
 </div>
 
 {% if not ticket_cutoff() %}
-<div class="hero-unit span4">
+<div class="jumbotron col-md-4">
 <h2>Count me in!</h2>
 <p>Get your ticket to EMF now! Tickets cost £95.</p>
 <p><a class="btn btn-primary" href="{{ url_for('tickets') }}">Buy tickets now</a></p>

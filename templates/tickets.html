@@ -2,7 +2,7 @@
 {% extends "base.html" %}
 
 {% block body %}
-<div class="span10">
+<div class="col-md-10">
 {% if tickets %}
 <h2>Your current tickets</h2>
 
@@ -52,7 +52,7 @@
 
 </table>
 
-<div id="span10"><a href="{{url_for('ticket_terms')}}">Ticket Terms and Conditions</a></div>
+<div id="col-md-10"><a href="{{url_for('ticket_terms')}}">Ticket Terms and Conditions</a></div>
 <br/>
 
 {% endif %}
@@ -102,7 +102,7 @@
     <form method=post action="{{ url_for('tickets_choose') }}" class="form-horizontal add-tickets">
         {{form.hidden_tag()}}
 
-        <div class="control-group">
+        <div class="form-group">
             <button type="submit" class="btn btn-large btn-primary">Add more tickets</button>
         </div>
     </form>
@@ -118,7 +118,7 @@
     <div id="prepay" data-price="{{ price }}">
         {{ render_field(form.count) }}
     </div>
-        <div id="summary" class="control-group">
+        <div id="summary" class="form-group">
             <span>Price per ticket: {{ format_price(price) }}</span>
             <span style="display: none">Total amount for deposit: <span id="total"></span></span>
         </div>

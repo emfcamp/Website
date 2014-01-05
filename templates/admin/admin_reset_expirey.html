@@ -9,8 +9,8 @@
 <table class="table table-condensed table-striped">
 <thead>
 <tr>
-<th><i class="icon-user"></i> username</th>
-<th><i class="icon-envelope"></i> email</th>
+<th><i class="glyphicon glyphicon-user"></i> username</th>
+<th><i class="glyphicon glyphicon-envelope"></i> email</th>
 <th>tickets</th>
 <th></th>
 </tr>
@@ -32,7 +32,7 @@
 <td>{{t.type.name}}</td>
 <td>
 {% if t.expired() %}
-<b><i class="icon-warning-sign"></i> {{t.expires }}</b>
+<b><i class="glyphicon glyphicon-warning-sign"></i> {{t.expires }}</b>
 {% else %}
 {{t.expires}}
 {% endif %}
