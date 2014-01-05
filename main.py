@@ -4,6 +4,7 @@ from flaskext.mail import Mail
 from flask.ext.login import LoginManager
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.assets import Environment, Bundle
+from flask_wtf import CsrfProtect
 
 from datetime import datetime
 import iso8601
@@ -13,6 +14,7 @@ import time
 logging.basicConfig(level=logging.NOTSET)
 
 app = Flask(__name__)
+CsrfProtect(app)
 app.config.from_envvar('SETTINGS_FILE')
 
 login_manager = LoginManager()

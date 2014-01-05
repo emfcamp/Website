@@ -21,9 +21,10 @@ from sqlalchemy.sql import text
 
 from decorator import decorator
 
+from flask_wtf import Form
 from wtforms.validators import Required, Email, EqualTo, ValidationError, Optional
 from wtforms.widgets import HiddenInput
-from wtforms import Form, TextField, PasswordField, SelectField, HiddenField, \
+from wtforms import TextField, PasswordField, SelectField, HiddenField, \
     SubmitField, BooleanField, IntegerField, \
     DecimalField, FieldList, FormField
 from wtforms.fields.core import UnboundField

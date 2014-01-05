@@ -9,8 +9,9 @@ from flask import render_template, request, redirect, url_for, flash
 from flask.ext.login import \
     login_user, login_required, logout_user, current_user
 
+from flask_wtf import Form
 from wtforms.validators import Required, Email, EqualTo
-from wtforms import Form, SelectField, IntegerField, HiddenField, BooleanField, SubmitField, \
+from wtforms import SelectField, IntegerField, HiddenField, BooleanField, SubmitField, \
                     FieldList, FormField, StringField
 
 def bool_cast(value):
