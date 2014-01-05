@@ -13,11 +13,6 @@ from flask import \
 from flask.ext.login import \
     login_user, login_required, logout_user, current_user
 from flaskext.mail import Message
-from flaskext.wtf import \
-    Form, Required, Email, EqualTo, ValidationError, \
-    TextField, PasswordField, SelectField, HiddenField, \
-    SubmitField, BooleanField, IntegerField, HiddenInput, \
-    DecimalField, FieldList, FormField, Optional
 
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
@@ -25,6 +20,12 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import text
 
 from decorator import decorator
+
+from wtforms.validators import Required, Email, EqualTo, ValidationError, Optional
+from wtforms.widgets import HiddenInput
+from wtforms import Form, TextField, PasswordField, SelectField, HiddenField, \
+    SubmitField, BooleanField, IntegerField, \
+    DecimalField, FieldList, FormField
 from wtforms.fields.core import UnboundField
 
 import simplejson, os, re

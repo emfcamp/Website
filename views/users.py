@@ -10,11 +10,11 @@ from flask import \
 from flask.ext.login import \
     login_user, login_required, logout_user, current_user
 from flaskext.mail import Message
-from flaskext.wtf import \
-    Form, Required, Email, EqualTo, ValidationError, \
-    TextField, PasswordField, SelectField, HiddenField, \
-    SubmitField, BooleanField, IntegerField, HiddenInput, \
-    DecimalField
+
+from wtforms.validators import Required, Email, EqualTo, ValidationError
+from wtforms.widgets import HiddenInput
+from wtforms import Form, TextField, PasswordField, SelectField, HiddenField, \
+                    SubmitField, BooleanField, IntegerField, DecimalField
 
 from datetime import datetime, timedelta
 import re
@@ -25,7 +25,7 @@ class NextURLField(HiddenField):
         if not self.data or '//' in self.data:
             return ''
         if not re.match('^[-_0-9a-zA-Z/?=&]+$', self.data):
-	    app.logger.error('Dropping next URL %s', repr(self.data))
+            app.logger.error('Dropping next URL %s', repr(self.data))
             return ''
         return self.data
 
