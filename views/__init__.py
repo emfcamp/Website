@@ -23,7 +23,10 @@ def feature_flag(flag):
 
 @app.route("/")
 def main():
-    return render_template('splashmain.html')
+    if app.config.get('SPLASH', True) == True:
+        return render_template('splashmain.html')
+    else:
+        return render_template('main.html')
 
 @app.route("/", methods=['POST'])
 def main_post():
