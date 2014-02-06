@@ -45,6 +45,7 @@
         If you're interested in attending, please follow us on <a href="http://www.twitter.com/emfcamp">Twitter</a> or join our mailing list below:
         </p>
         <form method="post">
+          <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
           <input type="text" name="email"/>
           <button>Join</button>
         </form>
