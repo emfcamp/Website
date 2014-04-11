@@ -2,7 +2,7 @@
 
 {% block body %}
 
-<div class="span10">
+<div class="col-md-10">
 {% include 'ticket-blurb.html' %}
 {% if not current_user.is_authenticated() %}
 <p>If you've already signed up, <a href="{{url_for('login')}}">log in</a> to view your ticket status.</p>
@@ -38,7 +38,7 @@
 <tbody>
 {% for f in form.types %}
 {% if f._any %}
-<tr data-price="{{ f._type.get_price(user_currency) }}" class="control-group{%if f.amount.errors%} error{%endif%} {{ loop.cycle('buyformtdodd', 'buyformtdeven') }}" >
+<tr data-price="{{ f._type.get_price(user_currency) }}" class="form-group{%if f.amount.errors%} has-error{%endif%} {{ loop.cycle('buyformtdodd', 'buyformtdeven') }}" >
     <td>
         {{ f.hidden_tag() }}
         <label for="{{ f.amount.id }}"><b>{{ f._type.name }}</b></label>
@@ -63,9 +63,9 @@
 <tfoot>
 <tr>
     <td colspan="3">
-    <div id="summary" class="control-group">
+    <div id="summary" class="form-group">
         <div>Total will be shown on the next page</div>
-        <div style="display: none" class="control-group">
+        <div style="display: none" class="form-group">
             <label>Total:
             <strong id="total" style="text-align: right">{{ format_price(0) }}</strong>
             </label>

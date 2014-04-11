@@ -2,23 +2,23 @@
 {% extends "base.html" %}
 
 {% block body %}
-<div class="span10">
+<div class="col-md-10">
   <h2>Tickets for {{ user.name }}</h2>
-  <div class="span6">
+  <div class="col-md-6">
     <p>{{ user.email }}</p>
     <p>{{ tickets|length }} ticket{{ tickets|length != 1 and 's' or '' }}</p>
   </div>
-  <div class="span4">
+  <div class="col-md-4">
     <img class="receipt-qr" src="{{ url_for('tickets_receipt_qr', receipt=user.receipt) }}" />
     {{ user.receipt }}
   </div>
-  <div class="span10"></div>
-  <div class="span10"></div>
+  <div class="col-md-10"></div>
+  <div class="col-md-10"></div>
 
   {% for t in tickets %}
 
   {% if t.payment %}
-  <div class="span6">
+  <div class="col-md-6">
     <b>{{ t.type.name }}</b>
     <ul>
         {% if t.type.code.startswith('full') or t.type.code.startswith('kids') %}
@@ -32,7 +32,7 @@
         {% endif %}
     </ul>
   </div>
-  <div class="span4">
+  <div class="col-md-4">
     <img class="receipt-qr" src="{{ url_for('tickets_receipt_qr', receipt=t.receipt) }}" />
     {{ t.receipt }}
   </div>

@@ -23,7 +23,10 @@ def feature_flag(flag):
 
 @app.route("/")
 def main():
-    return render_template('main.html')
+    if app.config.get('SPLASH', True) == True:
+        return render_template('splashmain.html')
+    else:
+        return render_template('main.html')
 
 @app.route("/", methods=['POST'])
 def main_post():
@@ -36,20 +39,6 @@ def main_post():
         print e
         flash('Sorry, an error occurred.')
     return redirect(url_for('main'))
-
-@app.route("/wave")
-def wave():
-    return render_template('wave.html')
-
-@app.route("/wave/cfp", methods=['POST'])
-def wave_cfp():
-    prop = Proposal()
-    for field in ('email', 'name', 'title', 'description', 'length'):
-        setattr(prop, field, request.form.get(field))
-    db.session.add(prop)
-    db.session.commit()
-    flash("Thanks for your submission, we'll be in touch by email.")
-    return redirect(url_for("wave"))
 
 @app.route('/favicon.ico')
 def favicon():
@@ -75,31 +64,6 @@ def talks():
         days[day] = rows
 
     return render_template('talks.html', **days)
-
-@app.route("/wave-talks")
-@app.route("/wave/talks")
-def wave_talks():
-    import json
-    
-    talk_path = os.path.abspath(os.path.join(__file__, '..', '..', 'talks'))
-    raw_json = open(os.path.join(talk_path, 'emw-talks.json'), 'r').read()
-
-    json_data = json.loads(raw_json)
-
-    stages = {}
-    for stage in json_data['stages']:
-        events = []
-        for event in stage['events']:
-            # OH GOD WHAT I HAVE STOPPED CARING
-            event['start'] = datetime.fromtimestamp(time.mktime(time.strptime(event['start'], '%Y-%m-%d %H:%M:%S')))
-            events.append(event)
-
-        stages[stage['name']] = stage['events']
-
-    main_stages = zip(stages['Stage Alpha'], stages['Stage Beta'])
-    workshops = stages['Workshop']
-
-    return render_template('wave-talks.html', main_stages=main_stages, workshops=workshops)
 
 @app.route("/about/company")
 def company():
@@ -129,6 +93,17 @@ def get_involved():
 @app.route('/badge')
 def badge():
   return redirect('http://wiki-archive.emfcamp.org/2012/wiki/TiLDA')
+
+
+# WAAAAAAAAAAAAAAAAAAAAAAAAAAVE
+@app.route("/wave")
+def wave():
+    return redirect('https://web.archive.org/web/20130627201413/https://www.emfcamp.org/wave')
+
+@app.route("/wave-talks")
+@app.route("/wave/talks")
+def wave_talks():
+    return redirect('https://web.archive.org/web/20130627201413/https://www.emfcamp.org/wave/talks')
 
 @app.route('/sine')
 @app.route('/wave/sine')

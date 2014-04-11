@@ -2,16 +2,16 @@
 {% extends "base.html" %}
 
 {% block body %}
-<div class="span10">
+<div class="col-md-10">
   <h2>Tickets for {{ user.name }}</h2>
   <p>{{ user.email }}</p>
   <p>{{ tickets|length }} ticket{{ tickets|length != 1 and 's' or '' }}</p>
-  <div class="span10"></div>
+  <div class="col-md-10"></div>
 
   {% for t in tickets %}
 
   {% if t.payment %}
-  <div class="span10">
+  <div class="col-md-10">
     <b>{{ t.type.name }}</b>
     <ul>
         {% if t.type.code.startswith('full') or t.type.code.startswith('kids') %}

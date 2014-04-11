@@ -8,9 +8,11 @@ from datetime import timedelta
 from flask import render_template, request, redirect, url_for, flash
 from flask.ext.login import \
     login_user, login_required, logout_user, current_user
-from flaskext.wtf import Form, Required, \
-    SelectField, IntegerField, HiddenField, BooleanField, SubmitField, \
-    FieldList, FormField, StringField, ValidationError
+
+from flask_wtf import Form
+from wtforms.validators import Required, Email, EqualTo
+from wtforms import SelectField, IntegerField, HiddenField, BooleanField, SubmitField, \
+                    FieldList, FormField, StringField
 
 def bool_cast(value):
     if type(value) == bool:

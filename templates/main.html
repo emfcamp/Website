@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block body %}
 
-<div class="span10">
+<div class="col-md-10">
 
 <h2>What?</h2>
 
@@ -37,7 +37,7 @@
 </div>
 
 {% if not ticket_cutoff() %}
-<div class="hero-unit span4">
+<div class="jumbotron col-md-4">
 <h2>Count me in!</h2>
 <p>Get your ticket to EMF now! Tickets cost £95.</p>
 <p><a class="btn btn-primary" href="{{ url_for('tickets') }}">Buy tickets now</a></p>
