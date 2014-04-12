@@ -20,6 +20,7 @@ GoCardless payments are protected by the
 Guarantee</a>.</p>
 
 <form method="post" action="{{ url_for('gocardless_start') }}">
+<input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
     <p><button type="submit" name="gocardless" class="btn btn-large btn-primary">Pay with GoCardless</button></p>
 </form>
 {% endif %}
@@ -30,6 +31,7 @@ Guarantee</a>.</p>
 <p>Ask your bank to send it to us directly (this works online, or with cash in a branch).</p>
 
 <form method="post" action="{{ url_for('transfer_start') }}">
+<input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
     <p><button type="submit" name="banktransfer" class="btn btn-large btn-primary">Pay by bank transfer</button></p>
 </form>
 {% endif %}
