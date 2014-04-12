@@ -11,6 +11,7 @@
 {% if config.get('ENABLE_EURO') %}
 <div class="currency_form">
 <form method="post" action="{{url_for('set_currency')}}" class="form-inline" id="currency_form">
+    <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
     <label for="select_currency">Select currency:</label>
     <select name="currency" id="select_currency" onchange="$('#currency_form').submit()">
         <option value="GBP" {% if user_currency == 'GBP' %}selected="selected"{%endif%}>£</option>
