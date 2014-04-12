@@ -603,7 +603,6 @@ def build_info_form(formdata):
     return form, basket, total
 
 @app.route("/tickets/info", methods=['GET', 'POST'])
-@feature_flag('FULL_TICKETS')
 @login_required
 def tickets_info():
     basket, total = get_basket()
