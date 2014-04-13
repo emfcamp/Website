@@ -9,3 +9,4 @@ env
 var/*.db
 static/.webassets-cache/
 static/gen
+config/live.cfg*
