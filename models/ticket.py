@@ -18,9 +18,6 @@ class TicketType(db.Model):
     capacity = db.Column(db.Integer, nullable=False)
     limit = db.Column(db.Integer, nullable=False)
     order = db.Column(db.Integer, nullable=False)
-    #tickets = db.relationship("Ticket", backref="type", cascade_backrefs=False)
-    #tokens = db.relationship("TicketToken", backref="type", cascade_backrefs=False)
-    #prices = ...
 
     def __init__(self, code, name, capacity, limit, order, notice=None):
         self.code = code
