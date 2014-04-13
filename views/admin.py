@@ -121,7 +121,6 @@ def manual_reconcile():
                     db.session.add(payment)
                     db.session.commit()
                 
-                    # send email.
                     msg = Message("Electromagnetic Field ticket purchase update", \
                               sender=app.config.get('TICKETS_EMAIL'), \
                               recipients=[payment.user.email]
@@ -151,8 +150,6 @@ def manual_reconcile():
 @app.route("/admin/make-admin", methods=['GET', 'POST'])
 @login_required
 def make_admin():
-    # TODO : paginate?
-
     if current_user.admin:
         
         class MakeAdminForm(Form):
@@ -214,7 +211,7 @@ class ExpireResetForm(Form):
     yes = SubmitField('Yes')
     no = SubmitField('No')
 
-@app.route("/admin/reset-expirey", methods=['GET', 'POST'])
+@app.route("/admin/reset-expiry", methods=['GET', 'POST'])
 @login_required
 def expire_reset():
     if current_user.admin:
@@ -227,7 +224,7 @@ def expire_reset():
                     for t in payment.tickets:
                         t.expires = datetime.utcnow() + timedelta(10)
                         db.session.add(t)
-                        app.logger.info("ticket %s (%s, for %s) expirey reset", t.id, t.type.name, payment.user.name)
+                        app.logger.info("ticket %s (%s, for %s) expiry reset", t.id, t.type.name, payment.user.name)
                     db.session.commit()
 
                     return redirect(url_for('expire_reset'))
@@ -236,7 +233,7 @@ def expire_reset():
                 elif form.payment.data:
                     payment = Payment.query.get(int(form.payment.data))
                     ynform = ExpireResetForm(payment=payment.id, formdata=None)
-                    return render_template('admin/admin_reset_expirey_yesno.html', ynform=ynform, payment=payment)
+                    return render_template('admin/admin_reset_expiry_yesno.html', ynform=ynform, payment=payment)
 
         # >= datetime.utcnow()(Ticket.expires >= datetime.utcnow()
         unpaid = Ticket.query.filter(Ticket.paid == False).order_by(Ticket.expires).all()
@@ -250,7 +247,7 @@ def expire_reset():
         for p in payments:
             resetforms[p] = ExpireResetForm(payment=p, formdata=None)
             opayments.append(payments[p])
-        return render_template('admin/admin_reset_expirey.html', payments=opayments, resetforms=resetforms)
+        return render_template('admin/admin_reset_expiry.html', payments=opayments, resetforms=resetforms)
     else:
         return(('', 404))
 
