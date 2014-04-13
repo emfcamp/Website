@@ -139,7 +139,7 @@ class Ticket(db.Model):
         return "<Ticket: %s, type: %s, paid? %s, expired: %s>" % (self.id, self.code, self.paid, str(self.expired()))
 
 class TicketAttrib(db.Model):
-    __tablename__ = 'ticketattrib'
+    __tablename__ = 'ticket_attrib'
     id = db.Column(db.Integer, primary_key=True)
     ticket_id = db.Column(db.Integer, db.ForeignKey('ticket.id'), nullable=False)
     name = db.Column(db.String, nullable=False)
