@@ -69,8 +69,8 @@ def signup():
         try:
             db.session.commit()
         except IntegrityError, e:
-            flash("Email address %s is already in use, please use another or reset your password" % (form.email.data))
-            return redirect(url_for('signup'))
+            flash("This email address %s is already in use. Please log in, or reset your password if you've forgotten it." % (form.email.data))
+            return redirect(url_for('login'))
         login_user(user)
 
         # send a welcome email.

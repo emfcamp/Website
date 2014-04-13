@@ -9,6 +9,8 @@
     {{ render_field(form.password) }}
     <div class="form-actions btn-group">
         <button type="submit" class="btn btn-primary">Log in</button>
+    </div>
+    <div class="form-actions btn-group">
         <a class="btn" href="{{ url_for('forgot_password') }}">Forgot password</a>
         <a class="btn" href="{{ url_for('signup', next=form.next.data) }}">Sign up</a>
     </div>
