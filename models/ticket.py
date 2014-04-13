@@ -165,8 +165,8 @@ def check_capacity(session, flush_context, instances):
 
         totals[obj.type] += 1
 
-    if len(totals) == 0:
-        # hack for empty database when creating tickets
+    if not totals:
+        # Don't block unrelated updates
         return
 
     # Any admission tickets count towards the full ticket total
