@@ -197,7 +197,7 @@ class TestEmails(Command):
       db.session.add(user)
 
       amounts = {
-        "full" : TicketType.query.filter(TicketType.name == 'Full Camp Ticket').one().cost
+        "full" : TicketType.query.get('full').cost
       }
       #
       # TODO: needs to cover:
@@ -218,9 +218,8 @@ class TestEmails(Command):
             payment.gcid = "%3dSDJADG" % (int(random.random() * 1000 ))
           sess.add(payment)
           
-          tt = 'Full Camp Ticket'
           for i in range(full):
-            t = Ticket(type_id = TicketType.query.filter(TicketType.name == tt).one().id)
+            t = Ticket(code='full')
             t.payment = payment
             t.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
             user.tickets.append(t)
@@ -249,41 +248,19 @@ class CreateTickets(Command):
 
         data = [
             #(order, code, name, capacity, max per person, GBP, EUR, Description)
-            (2, 'full', 'Full Camp Ticket', 499 - 20, 4, 95.00, 120.00, None),
-            (10, 'kids_u14', 'Under-14 Camp Ticket', 30, 4, 47.50, 60.00,
+            (2, 'full', 'Full Camp Ticket', 1000, 10, 95.00, 120.00, None),
+
+            (10, 'kids_u15', 'Under-15 Camp Ticket', 500, 10, 47.50, 60.00,
                 "All children must be accompanied by an adult."),
+            (10, 'kids_u5', 'Under-5 Camp Ticket', 50, 4, 0, 0,
+                "All children must be accompanied by an adult."),
+
             (30, 'campervan', 'Campervan Ticket', 5, 1, 30.00, 40.00,
                 "Space for campervans is extremely limited. We'll email you for details of your requirements."),
-            (20, 'day_friday', 'Friday Ticket', 50, 4, 30.00, 40.00,
-                "This ticket does not entitle you to a badge, or allow you to stay overnight"),
-            (21, 'day_saturday', 'Saturday Ticket', 50, 4, 30.00, 40.00,
-                "This ticket does not entitle you to a badge, or allow you to stay overnight"),
-            (22, 'day_sunday', 'Sunday Ticket', 50, 4, 30.00, 40.00,
-                "This ticket does not entitle you to a badge, or allow you to stay overnight"),
-
-            (3, 'full_ucl', 'Full Camp Ticket (UCL)', 30, 4, 85.00, 110.00,
-                "Discounted ticket"),
-            (3, 'full_hs', 'Full Camp Ticket (Hackspace)', 30, 4, 90.00, 115.00,
-                "Discounted ticket"),
-            (3, 'full_make', 'Full Camp Ticket (Make)', 30, 4, 90.00, 115.00,
-                "Discounted ticket"),
-            (3, 'full_adafruit', 'Full Camp Ticket (Adafruit)', 30, 4, 90.00, 115.00,
-                "Discounted ticket"),
-            (3, 'full_hackaday', 'Full Camp Ticket (Hackaday)', 30, 4, 90.00, 115.00,
-                "Discounted ticket"),
-            (3, 'full_boingboing', 'Full Camp Ticket (Boing Boing)', 30, 4, 90.00, 115.00,
-                "Discounted ticket"),
-            (3, 'full_dp', 'Full Camp Ticket (Dangerous Prototypes)', 30, 4, 90.00, 115.00,
-                "Discounted ticket"),
 
             (30, 'parking', 'Parking Ticket', 25, 4, 15.00, 20.00,
                 "We're trying to keep cars on-site to a minimum. "
                 "Please use the nearby Park & Ride or find someone to share with if possible."),
-            (10, 'kids_u5', 'Under-5 Camp Ticket', 30, 4, 0, 0,
-                "All children must be accompanied by an adult."),
-            # Until we have ticket codes, please add at the end so we can rebuild the table
-            #('Full Camp Ticket (latecomer)', 499 - 20, 4, 100.00),
-            #('Donation'),
         ]
 
         types = []
@@ -293,9 +270,7 @@ class CreateTickets(Command):
             types.append(tt)
 
         for tt in types:
-            try:
-                TicketType.query.filter_by(name=tt.name).one()
-            except NoResultFound, e:
+            if not TicketType.query.get(tt.code):
                 db.session.add(tt)
                 db.session.commit()
 
@@ -389,7 +364,7 @@ class CreateTicketTokens(Command):
 
         for code, token in tokens:
             tt = TicketToken(
-                TicketType.bycode(code), token,
+                TicketType.query.get(code), token,
                 datetime.utcnow() + timedelta(days=7))
             db.session.add(tt)
             db.session.commit()

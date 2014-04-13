@@ -35,29 +35,24 @@ def stats():
         Ticket.paid == False,
     )
     paid = Ticket.query.filter(Ticket.paid == True)
-    full = db.engine.execute(text("""select count(*) from ticket_type, ticket where
-                                        ticket.type_id = ticket_type.id and
+    full = db.engine.execute(text("""select count(*) from ticket where
                                         ticket.paid = false and ticket.expires > now()
-                                        and ticket_type.code LIKE 'full%'""")).scalar()
+                                        and ticket.code LIKE 'full%'""")).scalar()
 
-    full_bought = db.engine.execute(text("""select count(*) from ticket_type, ticket where
-                                        ticket.type_id = ticket_type.id and
-                                        ticket.paid = true and ticket_type.code LIKE 'full%'""")).scalar()
+    full_bought = db.engine.execute(text("""select count(*) from ticket where
+                                        ticket.paid = true and ticket.code LIKE 'full%'""")).scalar()
 
-    kids_bought = db.engine.execute(text("""select count(*) from ticket_type, ticket where
-                                        ticket.type_id = ticket_type.id and
-                                        ticket.paid = true and ticket_type.code LIKE 'kids%'""")).scalar()
+    kids_bought = db.engine.execute(text("""select count(*) from ticket where
+                                        ticket.code LIKE 'kids%'""")).scalar()
 
     confident_query = text("""
       select count(*)
       from
-          ticket_type tt,
           ticket t,
           payment p
       where
-          tt.id = t.type_id
           and p.id = t.payment_id
-          and tt.code like :code
+          and t.code like :code
           and (
             p.provider = 'gocardless' and p.state = 'inprogress' and t.expires > now()
             or t.paid = true
@@ -70,13 +65,11 @@ def stats():
     full_unconfident = db.engine.execute(text("""
       select count(*)
       from
-          ticket_type tt,
           ticket t,
           payment p
       where
-          tt.id = t.type_id
           and p.id = t.payment_id
-          and tt.code like 'full%'
+          and t.code like 'full%'
           and (
             p.provider = 'banktransfer' and p.state = 'inprogress'
           )

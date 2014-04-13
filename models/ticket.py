@@ -10,25 +10,17 @@ from sqlalchemy.exc import IntegrityError
 
 safechars_lower = "2346789bcdfghjkmpqrtvwxy"
 
-class ConstTicketType(object):
-    def __init__(self, name):
-        self.name = name
-        self.val = None
-
-    def __get__(self, obj, objtype):
-        return objtype.query.filter_by(name=self.name).one()
-
 class TicketType(db.Model):
     __tablename__ = 'ticket_type'
-    id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String, index=True, unique=True, nullable=False)
+    code = db.Column(db.String, primary_key=True)
     name = db.Column(db.String, nullable=False)
     notice = db.Column(db.String)
     capacity = db.Column(db.Integer, nullable=False)
     limit = db.Column(db.Integer, nullable=False)
     order = db.Column(db.Integer, nullable=False)
-    tickets = db.relationship("Ticket", backref="type", cascade_backrefs=False)
-    tokens = db.relationship("TicketToken", backref="type", cascade_backrefs=False)
+    #tickets = db.relationship("Ticket", backref="type", cascade_backrefs=False)
+    #tokens = db.relationship("TicketToken", backref="type", cascade_backrefs=False)
+    #prices = ...
 
     def __init__(self, code, name, capacity, limit, order, notice=None):
         self.code = code
@@ -46,10 +38,6 @@ class TicketType(db.Model):
             if price.currency == currency:
                 return price.value
 
-    @property
-    def cost(self):
-        return self.get_price('GBP')
-
     def user_limit(self, user):
         if user.is_authenticated():
             user_count = user.tickets. \
@@ -65,24 +53,17 @@ class TicketType(db.Model):
 
         return min(self.limit - user_count, self.capacity - count)
 
-    @classmethod
-    def bycode(cls, code):
-        return TicketType.query.filter_by(code=code).one()
-
-    # Deprecated
-    Full = ConstTicketType('Full Camp Ticket')
-    Under14 = ConstTicketType('Under-14 Camp Ticket')
 
 class TicketPrice(db.Model):
     __tablename__ = 'ticket_price'
     id = db.Column(db.Integer, primary_key=True)
-    ticket_type_id = db.Column(db.Integer, db.ForeignKey('ticket_type.id'), nullable=False)
+    code = db.Column(db.Integer, db.ForeignKey('ticket_type.code'), nullable=False)
     currency = db.Column(db.String, nullable=False)
-    ticket_type = db.relationship(TicketType, backref="prices")
     price_value = db.Column(db.Integer, nullable=False)
+    type = db.relationship(TicketType, backref="prices")
 
     def __init__(self, ticket_type, currency, price):
-        self.ticket_type = ticket_type
+        self.type = ticket_type
         self.currency = currency
         self.value = price
 
@@ -100,7 +81,8 @@ class TicketToken(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     token = db.Column(db.String, nullable=False, index=True)
     expires = db.Column(db.DateTime, nullable=False)
-    type_id = db.Column(db.Integer, db.ForeignKey('ticket_type.id'), nullable=False)
+    code = db.Column(db.Integer, db.ForeignKey('ticket_type.code'), nullable=False)
+    type = db.relationship(TicketType, backref="tokens")
 
     def __init__(self, ticket_type, token, expires):
         self.type = ticket_type
@@ -116,24 +98,26 @@ class TicketToken(db.Model):
         ticket_types = [t.type for t in tokens.all()]
         return ticket_types
 
+
 class Ticket(db.Model):
     __tablename__ = 'ticket'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    type_id = db.Column(db.Integer, db.ForeignKey('ticket_type.id'), nullable=False)
+    code = db.Column(db.Integer, db.ForeignKey('ticket_type.code'), nullable=False, index=True)
     paid = db.Column(db.Boolean, default=False, nullable=False)
     expires = db.Column(db.DateTime, nullable=False)
     receipt = db.Column(db.String, unique=True)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
     attribs = db.relationship("TicketAttrib", backref="ticket", cascade='all')
+    type = db.relationship(TicketType, backref="tickets")
 
-    def __init__(self, type=None, type_id=None):
+    def __init__(self, type=None, code=None):
         if type:
             self.type = type
-            self.type_id = type.id
-        elif type_id is not None:
-            self.type_id = type_id
-            self.type = TicketType.query.get(type_id)
+            self.code = type.code
+        elif code is not None:
+            self.code = code
+            self.type = TicketType.query.get(code)
         else:
             raise ValueError('Type must be specified')
 
@@ -155,7 +139,7 @@ class Ticket(db.Model):
                 db.session.rollback()
 
     def __repr__(self):
-        return "<Ticket: %s, type: %s, paid? %s, expired: %s>" % (self.id, self.type_id, self.paid, str(self.expired()))
+        return "<Ticket: %s, type: %s, paid? %s, expired: %s>" % (self.id, self.code, self.paid, str(self.expired()))
 
 class TicketAttrib(db.Model):
     __tablename__ = 'ticketattrib'
@@ -167,6 +151,7 @@ class TicketAttrib(db.Model):
     def __init__(self, name, value=None):
         self.name = name
         self.value = value
+
 
 @event.listens_for(Session, 'before_flush')
 def check_capacity(session, flush_context, instances):
@@ -193,7 +178,7 @@ def check_capacity(session, flush_context, instances):
     admission_types = fulls + kids
     people = sum((totals.get(type, 0) for type in admission_types))
 
-    if people > TicketType.Full.capacity:
+    if people > TicketType.query.get('full').capacity:
         raise TicketError('No more admission tickets available')
 
     for type, count in totals.items():

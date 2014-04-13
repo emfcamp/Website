@@ -481,7 +481,7 @@ def tickets_token(token):
 
 class TicketAmountForm(Form):
     amount = IntegerSelectField('Number of tickets', [Optional()])
-    type_id = HiddenIntegerField('Ticket Type', [Required()])
+    code = HiddenIntegerField('Ticket Type', [Required()])
 
 class TicketAmountsForm(Form):
     types = FieldList(FormField(TicketAmountForm))
@@ -496,7 +496,7 @@ def tickets_choose():
     if not form.types:
         for tt in TicketType.query.order_by(TicketType.order).all():
             form.types.append_entry()
-            form.types[-1].type_id.data = tt.id
+            form.types[-1].code.data = tt.code
 
     if current_user.is_authenticated():
         fulls = current_user.tickets.join(TicketType). \
@@ -510,7 +510,7 @@ def tickets_choose():
                     'full_hackaday', 'full_boingboing', 'full_dp']
 
     for f in form.types:
-        tt = TicketType.query.get(f.type_id.data)
+        tt = TicketType.query.get(f.code.data)
         f._type = tt
 
         limit = tt.user_limit(current_user)
@@ -538,7 +538,7 @@ def tickets_choose():
                     return redirect(url_for('tickets_choose'))
 
                 app.logger.info('Adding %s %s tickets to basket', f.amount.data, tt.name)
-                basket += [tt.id] * f.amount.data
+                basket += [tt.code] * f.amount.data
 
         if basket:
             session['basket'] = basket
@@ -561,8 +561,8 @@ class TicketInfoForm(Form):
 
 def get_basket():
     basket = []
-    for type_id in session.get('basket', []):
-        basket.append(Ticket(type_id=type_id))
+    for code in session.get('basket', []):
+        basket.append(Ticket(code=code))
 
     total = sum(t.type.get_price(get_user_currency()) for t in basket)
 
