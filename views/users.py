@@ -132,7 +132,6 @@ def reset_password():
         user = User.query.filter_by(email=form.email.data).first()
         db.session.delete(form._reset)
         user.set_password(form.password.data)
-        db.session.add(user)
         db.session.commit()
         return redirect(url_for('tickets'))
     return render_template("reset-password.html", form=form)

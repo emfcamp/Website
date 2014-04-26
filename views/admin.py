@@ -115,10 +115,8 @@ def manual_reconcile():
                     app.logger.info("%s Manually reconciled payment %s (%s)", current_user.name, payment.id, payment.bankref)
                     for t in payment.tickets:
                         t.paid = True
-                        db.session.add(t)
                         app.logger.info("ticket %s (%s, for %s) paid", t.id, t.type.name, payment.user.name)
                     payment.state = "paid"
-                    db.session.add(payment)
                     db.session.commit()
                 
                     msg = Message("Electromagnetic Field ticket purchase update", \
@@ -171,7 +169,6 @@ def make_admin():
                         if user.admin != field.data:
                             app.logger.info("user %s (%s) admin: %s -> %s", user.name, user.id, user.admin, field.data)
                             user.admin = field.data
-                            db.session.add(user)
                             db.session.commit()
                 return redirect(url_for('make_admin'))
         adminform = MakeAdminForm(formdata=None)
@@ -223,7 +220,6 @@ def expire_reset():
                     app.logger.info("%s Manually reset expiry for tickets for payment %s", current_user.name, payment.id)
                     for t in payment.tickets:
                         t.expires = datetime.utcnow() + timedelta(10)
-                        db.session.add(t)
                         app.logger.info("ticket %s (%s, for %s) expiry reset", t.id, t.type.name, payment.user.name)
                     db.session.commit()
 

@@ -140,12 +140,10 @@ def choose_shifts():
                         shift_slot_id=shift.shift_id.data, \
                         user_id=current_user.id).one()
                     mod_shift.state='pending'
-                    db.session.add(mod_shift)
                 else:
                     app.logger.info('Adding new shift %s', shift.shift_id.data)
                     new_shift = Shift(shift.shift_id.data, current_user.id)
                     current_user.shifts.append(new_shift)
-                    db.session.add(current_user)
                 
             elif (prev != current) and (prev == True):
                 app.logger.info('Cancelling shift %s', shift.shift_id.data)
@@ -153,14 +151,12 @@ def choose_shifts():
                     shift_slot_id=shift.shift_id.data, \
                     user_id=current_user.id, state='pending').one()
                 mod_shift.state='cancelled'
-                db.session.add(mod_shift)
                 
             # update state info
             shift.prev_state.data = current
         
         if current_user.phone != form.phone.data:
             current_user.phone = form.phone.data
-            db.session.add(current_user)
         db.session.commit()
         flash("Thank you!")
         return redirect(url_for('my_shifts'))
