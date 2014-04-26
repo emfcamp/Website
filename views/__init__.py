@@ -112,3 +112,4 @@ def sine():
     return redirect('http://wiki.emfcamp.org/wiki/SiNE')
 
 import users, admin, tickets, volunteers, radio
+from payment import *
