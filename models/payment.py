@@ -1,9 +1,13 @@
 from main import db, gocardless
 from flask import url_for
+from sqlalchemy import event
+from sqlalchemy.orm import attributes, Session
+from sqlalchemy.orm.attributes import get_history
 
 import random
 import re
 from decimal import Decimal
+from datetime import datetime
 
 safechars = "2346789BCDFGHJKMPQRTVWXY"
 
@@ -15,7 +19,7 @@ class Payment(db.Model):
     provider = db.Column(db.String, nullable=False)
     amount_pence = db.Column(db.Integer, nullable=False)
     state = db.Column(db.String, nullable=False, default='new')
-    changes = db.relationship('PaymentChange', lazy='dynamic', backref='payment')
+    changes = db.relationship('PaymentChange', backref='payment')
     tickets = db.relationship('Ticket', lazy='dynamic', backref='payment', cascade='all')
     __mapper_args__ = {'polymorphic_on': provider}
 
@@ -57,12 +61,31 @@ class GoCardlessPayment(Payment):
             redirect_uri=url_for('gocardless_complete', payment=self.id, _external=True),
             cancel_uri=url_for('gocardless_cancel', payment=self.id, _external=True))
 
+
 class PaymentChange(db.Model):
     __tablename__ = 'payment_change'
     id = db.Column(db.Integer, primary_key=True)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'), nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     state = db.Column(db.String, nullable=False)
 
-    def __init__(self, state):
+    def __init__(self, payment, state):
+        self.payment = payment
         self.state = state
+
+
+@event.listens_for(Session, 'after_flush')
+def payment_change(session, flush_context):
+    for obj in session.new:
+        if isinstance(obj, Payment):
+            change = PaymentChange(obj, obj.state)
+
+    for obj in session.dirty:
+        if isinstance(obj, Payment):
+            state = get_history(obj, 'state').added[0]
+            change = PaymentChange(obj, state)
+
+    for obj in session.deleted:
+        if isinstance(obj, Payment):
+            raise Exception('Payments cannot be deleted');
+
