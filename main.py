@@ -38,8 +38,6 @@ app.logger.addHandler(hdlr)
 app.logger.propagate = False
 
 def get_user_currency(default='GBP'):
-    if not app.config.get('ENABLE_EURO'):
-        return default
     return session.get('currency', default)
 
 def set_user_currency(currency):
