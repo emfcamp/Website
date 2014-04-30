@@ -1,5 +1,5 @@
 # encoding=utf-8
-from flask import Flask, session, _request_ctx_stack
+from flask import Flask, session
 from flaskext.mail import Mail
 from flask.ext.login import LoginManager
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -9,6 +9,7 @@ from flask_wtf import CsrfProtect
 from datetime import datetime
 import iso8601
 import logging
+import logger
 import time
 
 logging.basicConfig(level=logging.NOTSET)
@@ -23,19 +24,7 @@ app.login_manager.login_view = 'login'
 
 CURRENCY_SYMBOLS = {'GBP': u'£', 'EUR': u'€'}
 
-class ContextFormatter(logging.Formatter):
-    def format(self, record):
-        try:
-            record.user = _request_ctx_stack.top.user.email
-        except AttributeError:
-            record.user = 'None'
-        return logging.Formatter.format(self, record)
-
-fmt = ContextFormatter('%(levelname)s:%(user)s:%(name)s:%(message)s')
-hdlr = logging.StreamHandler()
-hdlr.setFormatter(fmt)
-app.logger.addHandler(hdlr)
-app.logger.propagate = False
+logger.setup_logging(app)
 
 def get_user_currency(default='GBP'):
     return session.get('currency', default)
