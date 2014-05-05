@@ -22,6 +22,11 @@ from sqlalchemy import text
 
 manager = Manager(app)
 
+class CreateDB(Command):
+    def run(self):
+        from main import db
+        db.create_all()
+
 class Reconcile(Command):
   """
     Reconcile transactions in a .ofx file against the emfcamp db
@@ -463,6 +468,7 @@ class SendTickets(Command):
 
 
 if __name__ == "__main__":
+  manager.add_command('createdb', CreateDB())
   manager.add_command('reconcile', Reconcile())
   manager.add_command('warnexpire', WarnExpire())
   manager.add_command('expire', Expire())

@@ -17,8 +17,10 @@ clean:
 	rm -rf .env
 
 
+db:
+	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py createdb
 
-db: tickets tokens shifts
+data: tickets tokens shifts
 
 tickets:
 	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py createtickets
