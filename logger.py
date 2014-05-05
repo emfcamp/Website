@@ -46,10 +46,12 @@ class ColorizingStreamHandler(logging.StreamHandler):
                     
         return message
 
+
+
 class ContextFormatter(logging.Formatter):
     def format(self, record):
         try:
-            record.user = _request_ctx_stack.top.user.email
+            record.user = _request_ctx_stack.top.user_email
         except AttributeError:
             record.user = 'Anon'
         except Exception, e:

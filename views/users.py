@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 
 from flask import (
     render_template, redirect, request, flash,
-    url_for, abort,
+    url_for, abort, _request_ctx_stack
 )
 from flask.ext.login import (
     login_user, login_required, logout_user, current_user,
@@ -24,7 +24,9 @@ app.login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(userid):
-    return User.query.filter_by(id=userid).first()
+    user = User.query.filter_by(id=userid).first()
+    _request_ctx_stack.top.user_email = user.email
+    return user
 
 
 class NextURLField(HiddenField):
