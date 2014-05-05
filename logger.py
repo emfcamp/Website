@@ -59,7 +59,7 @@ class ContextFormatter(logging.Formatter):
 
 
 def setup_logging(app):
-    fmt = '%(asctime)-15s %(levelname)s %(name)s %(user)s %(message)s'
+    fmt = '%(asctime)-15s %(levelname)s %(user)s %(name)s %(message)s'
     if app.config.get('LOG_COLOR'):
         Handler = ColorizingStreamHandler
     else:
