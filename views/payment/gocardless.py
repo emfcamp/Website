@@ -1,4 +1,4 @@
-from main import app, db, gocardless, mail
+from main import app, db, gocardless, mail, csrf
 from models.payment import GoCardlessPayment
 from views import feature_flag, set_user_currency
 from views.tickets import add_payment_and_tickets
@@ -202,6 +202,7 @@ def gocardless_cancel():
 
     return render_template('gocardless-cancel.html', payment=payment)
 
+@csrf.exempt
 @app.route("/gocardless-webhook", methods=['POST'])
 def gocardless_webhook():
     """

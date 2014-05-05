@@ -13,7 +13,7 @@ import logger
 logging.basicConfig(level=logging.NOTSET)
 
 app = Flask(__name__)
-CsrfProtect(app)
+csrf = CsrfProtect(app)
 app.config.from_envvar('SETTINGS_FILE')
 
 logger.setup_logging(app)
