@@ -1,6 +1,4 @@
-from main import (
-    app, db, mail,
-)
+from main import app, db, mail
 from models.payment import BankPayment
 from views import feature_flag
 from views.tickets import add_payment_and_tickets
@@ -17,6 +15,9 @@ from wtforms.validators import Required, ValidationError
 from wtforms.widgets import HiddenInput
 from wtforms import SubmitField, HiddenField
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class BankTransferCancelForm(Form):
     payment = HiddenField('payment_id', [Required()])
@@ -30,7 +31,7 @@ class BankTransferCancelForm(Form):
         try:
             payment = current_user.payments.filter_by(id=int(field.data), provider="banktransfer", state="inprogress").one()
         except Exception, e:
-            app.logger.error("BankTransferCancelForm got bogus payment: %s", form.data)
+            logger.error('Exception %r getting payment for %s', e, form.data)
 
         if not payment:
             raise ValidationError('Sorry, that dosn\'t look like a valid payment')
@@ -45,7 +46,7 @@ def transfer_start():
         flash('Your session information has been lost. Please try ordering again.')
         return redirect(url_for('tickets'))
 
-    app.logger.info("User %s created bank payment %s (%s)", current_user.id, payment.id, payment.bankref)
+    logger.info("Creating bank payment %s (%s)", payment.id, payment.bankref)
 
     payment.state = "inprogress"
     db.session.commit()
@@ -67,19 +68,13 @@ def transfer_waiting():
     try:
         payment = current_user.payments.filter_by(id=payment_id, user=current_user).one()
     except NoResultFound:
-        if current_user:
-            app.logger.error("Attempt to get an inaccessible payment (%s) by user %s", payment_id, current_user.id)
-        else:
-            app.logger.error("Attempt to get an inaccessible payment (%s)", payment_id)
+        logger.error("Attempt to get an inaccessible payment %s", payment_id)
         return redirect(url_for('tickets'))
     return render_template('transfer-waiting.html', payment=payment, days=app.config.get('EXPIRY_DAYS'))
 
 @app.route("/pay/transfer-cancel", methods=['POST'])
 @login_required
 def transfer_cancel():
-    """
-        Cancel an existing bank transfer
-    """
     form = BankTransferCancelForm(request.form)
     payment_id = None
 
@@ -89,13 +84,13 @@ def transfer_cancel():
 
     if not payment_id:
         flash('Unable to validate form. The web team have been notified.')
-        app.logger.error("transfer_cancel: unable to get payment_id")
+        logger.error("Unable to get payment_id")
         return redirect(url_for('tickets'))
 
     try:
         payment = current_user.payments.filter_by(id=payment_id, user=current_user, state='inprogress', provider='banktransfer').one()
     except Exception, e:
-        app.logger.error("transfer_cancel: exception: %s for payment %s", e, payment.id)
+        logger.error("Exception %r getting payment", e)
         flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
         return redirect(url_for('tickets'))
 
@@ -106,11 +101,11 @@ def transfer_cancel():
     if form.no.data == True:
         return redirect(url_for('tickets'))
     elif form.yes.data == True:
-        app.logger.info("User %s cancelled inprogress bank transfer %s", current_user.id, payment.id)
+        logger.info("Cancelled inprogress bank transfer %s", payment.id)
         for t in payment.tickets.all():
             db.session.delete(t)
-            app.logger.info("Cancelling bank transfer ticket %s (u:%s p:%s)", t.id, current_user.id, payment.id)
-        app.logger.info("Cancelling bank transfer payment %s (u:%s)", payment.id, current_user.id)
+            logger.info("Cancelling bank transfer ticket %s for payment %s", t.id, payment.id)
+        logger.info("Cancelling bank transfer payment %s", payment.id)
         payment.state = "cancelled"
         db.session.commit()
         flash('Payment cancelled')

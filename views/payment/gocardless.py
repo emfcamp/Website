@@ -1,6 +1,4 @@
-from main import (
-    app, db, gocardless, mail,
-)
+from main import app, db, gocardless, mail
 from models.payment import GoCardlessPayment
 from views import feature_flag, set_user_currency
 from views.tickets import add_payment_and_tickets
@@ -18,7 +16,10 @@ from wtforms.widgets import HiddenInput
 from wtforms import SubmitField, HiddenField
 
 import simplejson
+import logging
 from datetime import datetime, timedelta
+
+logger = logging.getLogger(__name__)
 
 class GoCardlessTryAgainForm(Form):
     payment = HiddenField('payment_id', [Required()])
@@ -33,11 +34,10 @@ class GoCardlessTryAgainForm(Form):
         try:
             payment = current_user.payments.filter_by(id=int(field.data), provider="gocardless", state="new").one()
         except Exception, e:
-            app.logger.error("GCTryAgainForm got bogus payment: %s", form.data)
+            logger.error("Exception %r getting payment for %s", e, form.data)
 
         if not payment:
             raise ValidationError('Sorry, that dosn\'t look like a valid payment')
-
 
 
 @app.route("/pay/gocardless-start", methods=['POST'])
@@ -51,7 +51,7 @@ def gocardless_start():
         flash('Your session information has been lost. Please try ordering again.')
         return redirect(url_for('tickets'))
 
-    app.logger.info("User %s created GoCardless payment %s", current_user.id, payment.id)
+    logger.info("New payment %s", payment.id)
 
     bill_url = payment.bill_url("Electromagnetic Field Tickets")
 
@@ -60,10 +60,6 @@ def gocardless_start():
 @app.route("/pay/gocardless-tryagain", methods=['POST'])
 @login_required
 def gocardless_tryagain():
-    """
-        If for some reason the gocardless payment didn't start properly this gives the user
-        a chance to go again or to cancel the payment.
-    """
     form = GoCardlessTryAgainForm(request.form)
     payment_id = None
 
@@ -73,23 +69,25 @@ def gocardless_tryagain():
 
     if not payment_id:
         flash('Unable to validate form. The web team have been notified.')
-        app.logger.error("gocardless-tryagain: unable to get payment_id")
+        logger.error('Invalid payment %s', payment_id)
         return redirect(url_for('tickets'))
+
+    logging.info('Request to retry payment %s', payment_id)
 
     try:
         payment = current_user.payments.filter_by(id=payment_id, user=current_user, state='new').one()
     except Exception, e:
-        app.logger.error("gocardless-tryagain: exception: %s for payment %s", e, payment.id)
+        logger.error("Exception %r getting payment", e)
         flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
         return redirect(url_for('tickets'))
 
     if form.pay.data == True:
         if not config.get('GOCARDLESS'):
-            app.logger.error('Unable to retry payment as GoCardless is disabled')
+            logger.error('Unable to retry payment as GoCardless is disabled')
             flash('GoCardless is currently unavailable. Please try again later')
             return redirect(url_for('tickets'))
 
-        app.logger.info("User %s trying to pay again with GoCardless payment %s", current_user.id, payment.id)
+        logger.info("Trying payment %s again", payment.id)
         bill_url = payment.bill_url("Electromagnetic Field Ticket Deposit")
         return redirect(bill_url)
 
@@ -100,8 +98,8 @@ def gocardless_tryagain():
     if form.yes.data == True:
         for t in payment.tickets.all():
             db.session.delete(t)
-            app.logger.info("Cancelling GoCardless ticket %s", t.id)
-        app.logger.info("Cancelled GoCardless payment %s for user %s", payment.id, current_user.id)
+            logger.info("Cancelling ticket %s", t.id)
+        logger.info("Cancelled payment %s", payment.id)
         payment.state = "cancelled"
         db.session.commit()
         flash("Your GoCardless payment has been cancelled")
@@ -113,8 +111,7 @@ def gocardless_tryagain():
 def gocardless_complete():
     payment_id = int(request.args.get('payment'))
 
-    app.logger.info("gocardless-complete: userid %s, payment_id %s, gcid %s",
-        current_user.id, payment_id, request.args.get('resource_id'))
+    logger.info("Completing payment %s, gcid %s", payment_id, request.args.get('resource_id'))
 
     try:
         gocardless.client.confirm_resource(request.args)
@@ -127,12 +124,12 @@ def gocardless_complete():
         payment = current_user.payments.filter_by(id=payment_id).one()
 
     except Exception, e:
-        app.logger.error("gocardless-complete exception: %s", e)
+        logger.error("Exception %r confirming payment", e)
         flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
         return redirect(url_for('tickets'))
 
     if payment.state != 'new':
-        app.logger.error('Payment state is not new: %s', payment.state)
+        logger.error('Payment state is not new: %s', payment.state)
         flash('Your payment has already been confirmed, please contact %s' % app.config.get('TICKET_EMAIL')[1])
         return redirect(url_for('tickets'))
 
@@ -144,11 +141,11 @@ def gocardless_complete():
         # We need to make sure of a 5 working days grace
         # for gocardless payments, so push the ticket expiry forwards
         t.expires = datetime.utcnow() + timedelta(10)
-        app.logger.info("ticket %s (payment %s): expiry reset.", t.id, payment.id)
+        logger.info("Reset expiry for ticket %s", t.id)
 
     db.session.commit()
 
-    app.logger.info("Payment %s completed OK", payment.id)
+    logger.info("Payment %s completed OK", payment.id)
 
     # should we send the resource_uri in the bill email?
     msg = Message("Your EMF ticket purchase", \
@@ -167,13 +164,13 @@ def gocardless_waiting():
     try:
         payment_id = int(request.args.get('payment'))
     except (TypeError, ValueError):
-        app.logger.error("gocardless-waiting called without a payment or with a bogus payment: %s", request.args)
+        logger.error("Error getting payment with args %s", request.args)
         return redirect(url_for('main'))
 
     try: 
         payment = current_user.payments.filter_by(id=payment_id).one()
     except NoResultFound:
-        app.logger.error("someone tried to get payment %s, not logged in?", payment_id)
+        logger.error("Could not retrieve payment %s, not logged in?", payment_id)
         flash("No matching payment found for you, sorry!")
         return redirect(url_for('main'))
 
@@ -184,26 +181,24 @@ def gocardless_waiting():
 def gocardless_cancel():
     payment_id = int(request.args.get('payment'))
 
-    app.logger.info("gocardless-cancel: userid %s, payment_id %s",
-        current_user.id, payment_id)
+    logger.info("Request to cancel payment %s", payment_id)
 
     try:
         payment = current_user.payments.filter_by(id=payment_id).one()
 
     except Exception, e:
-        app.logger.error("gocardless-cancel exception: %s", e)
+        logger.error("Exception %r getting payment", e)
         flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
         return redirect(url_for('tickets'))
 
     payment.state = 'cancelled'
     for ticket in payment.tickets:
-        app.logger.info("gocardless-cancel: userid %s, payment_id %s cancelled ticket %s",
-            current_user.id, payment.id, ticket.id)
+        logger.info("Cancelling ticket %s", ticket.id)
         ticket.payment = None
 
     db.session.commit()
 
-    app.logger.info("Payment cancellation completed OK")
+    logger.info("Payment cancellation completed OK")
 
     return render_template('gocardless-cancel.html', payment=payment)
 
@@ -222,17 +217,17 @@ def gocardless_webhook():
     data = json_data['payload']
 
     if not gocardless.client.validate_webhook(data):
-        app.logger.error("unable to validate gocardless webhook")
+        logger.error("Unable to validate gocardless webhook")
         return ('', 403)
 
-    app.logger.info("gocardless-webhook: %s %s", data.get('resource_type'), data.get('action'))
+    logger.info("Webhook resource type %s action %s", data.get('resource_type'), data.get('action'))
 
     if data['resource_type'] != 'bill':
-        app.logger.warn('Resource type is not bill')
+        logger.warn('Resource type is not bill')
         return ('', 501)
 
     if data['action'] not in ['paid', 'withdrawn', 'failed', 'created']:
-        app.logger.warn('Unknown action')
+        logger.warn('Unknown action')
         return ('', 501)
 
     # action can be:
@@ -247,15 +242,15 @@ def gocardless_webhook():
         try:
             payment = GoCardlessPayment.query.filter_by(gcid=gcid).one()
         except NoResultFound:
-            app.logger.warn('Payment %s not found, ignoring', gcid)
+            logger.warn('Payment %s not found, ignoring', gcid)
             continue
 
-        app.logger.info("Processing payment %s (%s) for user %s",
+        logger.info("Processing payment %s (%s) for user %s",
             payment.id, gcid, payment.user.id)
 
         if data['action'] == 'paid':
             if payment.state != "inprogress":
-                app.logger.warning("Old payment state was %s, not 'inprogress'", payment.state)
+                logger.warning("Old payment state was %s, not 'inprogress'", payment.state)
 
             for t in payment.tickets.all():
                 t.paid = True
@@ -272,7 +267,7 @@ def gocardless_webhook():
             mail.send(msg)
 
         else:
-            app.logger.debug('Payment: %s', bill)
+            logger.debug('Payment: %s', bill)
 
     return ('', 200)
 
