@@ -17,3 +17,4 @@ def pay_choose():
 
     return render_template('payment-choose.html', basket=basket, total=total)
 
+import banktransfer, gocardless

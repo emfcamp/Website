@@ -1,18 +1,11 @@
-from main import app, db
-from models.cfp import Proposal
-
-from mailsnake import MailSnake
-from mailsnake.exceptions import *
-
-from flask import \
-    render_template, redirect, request, flash, \
-    url_for, abort, send_from_directory, session
-
-from sqlalchemy.sql import text
+# encoding=utf-8
+from main import app
+from flask import session
 
 from decorator import decorator
-import os, csv, time
+import time
 from datetime import datetime
+import iso8601
 
 def feature_flag(flag):
     def call(f, *args, **kw):
@@ -21,95 +14,71 @@ def feature_flag(flag):
         return abort(404)
     return decorator(call)
 
-@app.route("/")
-def main():
-    if app.config.get('SPLASH', True) == True:
-        return render_template('splashmain.html')
-    else:
-        return render_template('main.html')
+@app.context_processor
+def utility_processor():
+    def format_price(amount, currency=None, after=False):
+        if currency is None:
+            currency = CURRENCY_SYMBOLS[get_user_currency()]
 
-@app.route("/", methods=['POST'])
-def main_post():
-    ms = MailSnake(app.config.get('MAILCHIMP_KEY'))
-    try:
-        email = request.form.get('email')
-        ms.listSubscribe(id='d1798f7c80', email_address=email)
-        flash('Thanks for subscribing! You will receive a confirmation email shortly.')
-    except MailSnakeException, e:
-        print e
-        flash('Sorry, an error occurred.')
-    return redirect(url_for('main'))
+        amount = u'{0:.2f}'.format(amount)
+        if after:
+            return amount + currency
+        return currency + amount
 
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static/images'),
-                                   'favicon.ico', mimetype='image/vnd.microsoft.icon')
+    def format_ticket_price(ticket_type):
+        currency = get_user_currency()
+        ticket_price = ticket_type.get_price(currency)
+        symbol = CURRENCY_SYMBOLS[currency]
+        return format_price(ticket_price, symbol)
 
-@app.route("/sponsors")
-def sponsors():
-    return render_template('sponsors.html')
+    def format_bankref(bankref):
+        return '%s-%s' % (bankref[:4], bankref[4:])
 
-@app.route("/talks")
-def talks():
-    
-    days = {}
-    talk_path = os.path.abspath(os.path.join(__file__, '..', '..', 'talks'))
-    for day in ('friday', 'saturday', 'sunday'):
-        reader = csv.reader(open(os.path.join(talk_path, '%s.csv' % day), 'r'))
-        
-        rows = []
-        for row in reader:
-            rows.append([unicode(cell, 'utf-8') for cell in row])
-        
-        days[day] = rows
+    def isoformat_utc(dt, sep='T'):
+        return time.strftime('%Y-%m-%d' + sep + '%H:%M:%SZ', dt.utctimetuple())
 
-    return render_template('talks.html', **days)
+    def format_shift_short(start, end):
+        start_p, start_h = start.strftime('%p').lower(), int(start.strftime('%I'))
+        end_p, end_h = end.strftime('%p').lower(), int(end.strftime('%I'))
+        if start_p != end_p:
+            return '%s %s-%s %s' % (start_h, start_p, end_h, end_p)
+        return '%s-%s %s' % (start_h, end_h, end_p)
 
-@app.route("/about/company")
-def company():
-    return render_template('company.html')
+    def format_shift_dt(dt):
+        def date_suffix(day):
+            if 4 <= day <= 20 or 24 <= day <= 30:
+                return '%dth' % day
+            else:
+                return '%d%s' % (day, ['st', 'nd', 'rd'][day % 10 - 1])
+        return dt.strftime('%A %%s %H:%M') % date_suffix(dt.day)
 
-@app.route("/about")
-def about():
-    return render_template('about.html')
-    
-@app.route("/contact")
-def contact():
-    return render_template('splashcontact.html')
-    #return render_template('contact.html')    
+    return dict(
+        format_price=format_price,
+        format_ticket_price=format_ticket_price,
+        format_bankref=format_bankref,
+        isoformat_utc=isoformat_utc,
+        format_shift_short=format_shift_short,
+        format_shift_dt=format_shift_dt,
+        TICKET_CUTOFF=TICKET_CUTOFF
+    )
 
-@app.route("/location")
-def location():
-    return render_template('location.html')
-    
-@app.route("/participating")
-def participating():
-    return render_template('participating.html')
+CURRENCY_SYMBOLS = {'GBP': u'£', 'EUR': u'€'}
 
-@app.route("/get_involved")
-def get_involved():
-    return render_template('get_involved.html')
+@app.context_processor
+def currency_processor():
+    currency = get_user_currency()
+    return {'user_currency': currency,
+            'user_currency_symbol': CURRENCY_SYMBOLS[currency]}
 
-@app.route('/badge')
-def badge():
-  return redirect('http://wiki-archive.emfcamp.org/2012/wiki/TiLDA')
+def get_user_currency(default='GBP'):
+    return session.get('currency', default)
 
+def set_user_currency(currency):
+    session['currency'] = currency
 
-# WAAAAAAAAAAAAAAAAAAAAAAAAAAVE
-@app.route("/wave")
-def wave():
-    return redirect('https://web.archive.org/web/20130627201413/https://www.emfcamp.org/wave')
+def ticket_cutoff():
+    return datetime.utcnow() > iso8601.parse_date(app.config['TICKET_CUTOFF']).replace(tzinfo=None)
 
-@app.route("/wave-talks")
-@app.route("/wave/talks")
-def wave_talks():
-    return redirect('https://web.archive.org/web/20130627201413/https://www.emfcamp.org/wave/talks')
+TICKET_CUTOFF = ticket_cutoff()
 
-@app.route('/sine')
-@app.route('/wave/sine')
-@app.route('/wave/SiNE')
-def sine():
-    return redirect('http://wiki.emfcamp.org/wiki/SiNE')
-
-import users, admin, tickets, volunteers, radio
-from payment import *
+import basic, users, admin, tickets, volunteers, radio, payment

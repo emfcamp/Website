@@ -1,5 +1,5 @@
-from main import app, db, mail, ticket_cutoff
-from main import get_user_currency, set_user_currency
+from main import app, db
+from views import get_user_currency, TICKET_CUTOFF
 from models.user import User
 from models.ticket import TicketType, Ticket, TicketAttrib, TicketToken
 
@@ -14,9 +14,9 @@ from sqlalchemy.orm.exc import NoResultFound
 from flask_wtf import Form
 from wtforms.validators import Required, Optional
 from wtforms import (
-    SelectField, HiddenField, \
-    SubmitField, BooleanField, IntegerField, \
-    DecimalField, FieldList, FormField
+    SelectField, HiddenField,
+    SubmitField, BooleanField, IntegerField,
+    DecimalField, FieldList, FormField,
 )
 from datetime import datetime, timedelta
 from StringIO import StringIO
@@ -158,7 +158,7 @@ class TicketAmountsForm(Form):
 
 @app.route("/tickets/choose", methods=['GET', 'POST'])
 def tickets_choose():
-    if ticket_cutoff():
+    if TICKET_CUTOFF:
         return render_template("tickets-cutoff.html")
     form = TicketAmountsForm(request.form)
 

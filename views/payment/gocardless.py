@@ -1,8 +1,8 @@
 from main import (
     app, db, gocardless, mail,
-    feature_flag, set_user_currency,
 )
-from models.payment import GocardlessPayment
+from models.payment import GoCardlessPayment
+from views import feature_flag, set_user_currency
 from views.tickets import add_payment_and_tickets
 
 from flask import (
@@ -15,11 +15,10 @@ from flaskext.mail import Message
 from flask_wtf import Form
 from wtforms.validators import Required, ValidationError
 from wtforms.widgets import HiddenInput
-from wtforms import SubmitField
+from wtforms import SubmitField, HiddenField
 
 import simplejson
 from datetime import datetime, timedelta
-
 
 class GoCardlessTryAgainForm(Form):
     payment = HiddenField('payment_id', [Required()])

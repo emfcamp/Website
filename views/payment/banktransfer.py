@@ -1,8 +1,8 @@
 from main import (
     app, db, mail,
-    feature_flag,
 )
 from models.payment import BankPayment
+from views import feature_flag
 from views.tickets import add_payment_and_tickets
 
 from flask import (
@@ -15,7 +15,7 @@ from flaskext.mail import Message
 from flask_wtf import Form
 from wtforms.validators import Required, ValidationError
 from wtforms.widgets import HiddenInput
-from wtforms import SubmitField
+from wtforms import SubmitField, HiddenField
 
 
 class BankTransferCancelForm(Form):

@@ -1,24 +1,31 @@
-from main import app, db, gocardless, mail
-from main import set_user_currency
+from main import app, db, gocardless, mail, login_manager
+from views import set_user_currency
 from models.user import User, PasswordReset
 
 from sqlalchemy.exc import IntegrityError
 
-from flask import \
-    render_template, redirect, request, flash, \
-    url_for, abort, send_from_directory, session
-from flask.ext.login import \
-    login_user, login_required, logout_user, current_user
+from flask import (
+    render_template, redirect, request, flash,
+    url_for, abort,
+)
+from flask.ext.login import (
+    login_user, login_required, logout_user, current_user,
+)
 from flaskext.mail import Message
 
 from flask_wtf import Form
 from wtforms.validators import Required, Email, EqualTo, ValidationError
-from wtforms.widgets import HiddenInput
-from wtforms import TextField, PasswordField, SelectField, HiddenField, \
-                    SubmitField, BooleanField, IntegerField, DecimalField
+from wtforms import TextField, PasswordField, HiddenField
 
-from datetime import datetime, timedelta
 import re
+
+login_manager.setup_app(app, add_context_processor=True)
+app.login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(userid):
+    return User.query.filter_by(id=userid).first()
+
 
 class NextURLField(HiddenField):
     def _value(self):

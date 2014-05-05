@@ -1,4 +1,5 @@
 from main import db, app
+from views import feature_flag
 
 from models.volunteers import ShiftSlot, Shift, Role
 from models.user import User
@@ -86,6 +87,7 @@ class ShiftsForm(Form):
     shifts = FieldList(FormField(ShiftForm))
     submit = SubmitField('Update shifts')
 
+@feature_flag('VOLUNTEERS')
 @app.route("/volunteers/shifts", methods=['GET', 'POST'])
 @login_required
 def choose_shifts():
@@ -168,6 +170,7 @@ def choose_shifts():
     
     return render_template('volunteers/choose_shifts.html', form=form)
 
+@feature_flag('VOLUNTEERS')
 @app.route("/volunteers/myshifts", methods=['GET'])
 def my_shifts():
     #
@@ -187,6 +190,7 @@ def my_shifts():
 	    
     return render_template('volunteers/my_shifts.html', shifts=shifts, phone=current_user.phone)
 
+@feature_flag('VOLUNTEERS')
 @app.route("/volunteers/all_shifts", methods=['GET'])
 @login_required
 def all_shifts():
