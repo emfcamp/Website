@@ -86,8 +86,11 @@ def setup_logging(app):
         if app.config.get('LOG_COLOR'):
             # Flask has already overridden its logger to change getEffectiveLevel
             # It's also cleared out any handlers, so we might as well do the same again
-            hdlr = set_handler(app.logger, app.debug_log_format)
-            hdlr.setLevel(logging.DEBUG)
+            if app.config.get('EXTRA_DEBUG_HANDLER'):
+                hdlr = set_handler(app.logger, app.debug_log_format)
+                hdlr.setLevel(logging.DEBUG)
+            else:
+                del app.logger.handlers[:]
 
         logger = logging.getLogger('sqlalchemy.engine.base.Engine')
         logger.setLevel(logging.INFO)
