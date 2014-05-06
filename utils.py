@@ -148,11 +148,11 @@ class Reconcile(Command):
             db.session.commit()
             # send email
             # tickets-paid-email-banktransfer.txt
-            msg = Message("Electromagnetic Field ticket purchase update", \
-                          sender=app.config.get('TICKETS_EMAIL'), \
+            msg = Message("Electromagnetic Field ticket purchase update",
+                          sender=app.config['TICKETS_EMAIL'],
                           recipients=[payment.user.email]
                          )
-            msg.body = render_template("tickets-paid-email-banktransfer.txt", \
+            msg.body = render_template("tickets-paid-email-banktransfer.txt",
                           user = payment.user, payment=payment
                          )
             mail.send(msg)
@@ -226,7 +226,7 @@ class TestEmails(Command):
           for i in range(full):
             t = Ticket(code='full')
             t.payment = payment
-            t.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
+            t.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS'])
             user.tickets.append(t)
             
           user.payments.append(payment)
@@ -397,8 +397,8 @@ class WarnExpire(Command):
       # them have we will warn about all of them.
       # not really a problem tho.
       
-      msg = Message("Electromagnetic Field ticket purchase update", \
-                      sender=app.config.get('TICKETS_EMAIL'), \
+      msg = Message("Electromagnetic Field ticket purchase update",
+                      sender=app.config['TICKETS_EMAIL'],
                       recipients=[p.user.email]
                   )
       msg.body = render_template("tickets-expired-warning.txt", payment=p)
@@ -458,7 +458,7 @@ class SendTickets(Command):
         for row in db.engine.execute(query):
             user = User.query.filter_by(id=row[0]).one()
             msg = Message("Your Electromagnetic Field Ticket",
-                          sender=app.config.get('TICKETS_EMAIL'),
+                          sender=app.config['TICKETS_EMAIL'],
                           recipients=[user.email]
                          )
             user.create_receipt()

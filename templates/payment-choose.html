@@ -5,11 +5,11 @@
 
 <p>Taking credit card payments for a small event like us is really expensive, so the only
    payment methods we accept are bank-to-bank. If this is really a problem for you, please
-   <a href="mailto:{{ config.get('TICKETS_EMAIL')[1] }}">let us know</a>.</p>
+   <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">let us know</a>.</p>
 
 <p>Your tickets aren't quite reserved yet!  Please choose a payment method below to buy your tickets.<br/>
 If you're unsure about anything, please check out our <a href="http://wiki.emfcamp.org/wiki/FAQ#Ticket_Sales">FAQ</a>
-or drop us an <a href="mailto:{{ config.get('TICKETS_EMAIL')[1] }}">email</a>.</p>
+or drop us an <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email</a>.</p>
 
 {% if config.get('GOCARDLESS') and user_currency == 'GBP' %}
 <h3>Paying by Direct Debit</h3>

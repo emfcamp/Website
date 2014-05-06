@@ -20,7 +20,7 @@ def main():
 
 @app.route("/", methods=['POST'])
 def main_post():
-    ms = MailSnake(app.config.get('MAILCHIMP_KEY'))
+    ms = MailSnake(app.config['MAILCHIMP_KEY'])
     try:
         email = request.form.get('email')
         ms.listSubscribe(id='d1798f7c80', email_address=email)

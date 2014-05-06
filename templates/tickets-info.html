@@ -12,7 +12,7 @@ Ticket Information
 <p>You've requested {{ basket|count }} ticket{%if basket|count > 1%}s{%endif%} for a total price of <b>{{ format_price(total) }}</b>.</p>
 <p>We just need a little more information about these tickets.
 If you're unsure about anything, please check out our <a href="http://wiki.emfcamp.org/wiki/FAQ#Ticket_Sales">FAQ</a>
-or drop us an <a href="mailto:{{ config.get('TICKETS_EMAIL')[1] }}">email</a>.</p>
+or drop us an <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email</a>.</p>
 
 <form method="post" class="form-horizontal ticket-info">
 {{ form.hidden_tag() }}

@@ -78,7 +78,7 @@ def gocardless_tryagain():
         payment = current_user.payments.filter_by(id=payment_id, user=current_user, state='new').one()
     except Exception, e:
         logger.error("Exception %r getting payment", e)
-        flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
+        flash("An error occurred with your payment, please contact %s" % app.config['TICKETS_EMAIL'][1])
         return redirect(url_for('tickets'))
 
     if form.pay.data == True:
@@ -125,12 +125,12 @@ def gocardless_complete():
 
     except Exception, e:
         logger.error("Exception %r confirming payment", e)
-        flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
+        flash("An error occurred with your payment, please contact %s" % app.config['TICKETS_EMAIL'][1])
         return redirect(url_for('tickets'))
 
     if payment.state != 'new':
         logger.error('Payment state is not new: %s', payment.state)
-        flash('Your payment has already been confirmed, please contact %s' % app.config.get('TICKET_EMAIL')[1])
+        flash('Your payment has already been confirmed, please contact %s' % app.config['TICKET_EMAIL'][1])
         return redirect(url_for('tickets'))
 
     # keep the gocardless reference so we can find the payment when we get called by the webhook
@@ -148,11 +148,11 @@ def gocardless_complete():
     logger.info("Payment %s completed OK", payment.id)
 
     # should we send the resource_uri in the bill email?
-    msg = Message("Your EMF ticket purchase", \
-        sender=app.config.get('TICKETS_EMAIL'),
+    msg = Message("Your EMF ticket purchase",
+        sender=app.config['TICKETS_EMAIL'],
         recipients=[payment.user.email]
     )
-    msg.body = render_template("tickets-purchased-email-gocardless.txt", \
+    msg.body = render_template("tickets-purchased-email-gocardless.txt",
         user = payment.user, payment=payment)
     mail.send(msg)
 
@@ -174,7 +174,7 @@ def gocardless_waiting():
         flash("No matching payment found for you, sorry!")
         return redirect(url_for('main'))
 
-    return render_template('gocardless-waiting.html', payment=payment, days=app.config.get('EXPIRY_DAYS'))
+    return render_template('gocardless-waiting.html', payment=payment, days=app.config['EXPIRY_DAYS'])
 
 @app.route("/pay/gocardless-cancel")
 @login_required
@@ -188,7 +188,7 @@ def gocardless_cancel():
 
     except Exception, e:
         logger.error("Exception %r getting payment", e)
-        flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
+        flash("An error occurred with your payment, please contact %s" % app.config['TICKETS_EMAIL'][1])
         return redirect(url_for('tickets'))
 
     payment.state = 'cancelled'
@@ -259,11 +259,11 @@ def gocardless_webhook():
             payment.state = "paid"
             db.session.commit()
 
-            msg = Message("Your EMF ticket payment has been confirmed", \
-                sender=app.config.get('TICKETS_EMAIL'),
+            msg = Message("Your EMF ticket payment has been confirmed",
+                sender=app.config['TICKETS_EMAIL'],
                 recipients=[payment.user.email]
             )
-            msg.body = render_template("tickets-paid-email-gocardless.txt", \
+            msg.body = render_template("tickets-paid-email-gocardless.txt",
                 user = payment.user, payment=payment)
             mail.send(msg)
 

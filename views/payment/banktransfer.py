@@ -51,12 +51,12 @@ def transfer_start():
     payment.state = "inprogress"
     db.session.commit()
 
-    msg = Message("Your EMF ticket purchase", \
-        sender=app.config.get('TICKETS_EMAIL'), \
+    msg = Message("Your EMF ticket purchase",
+        sender=app.config['TICKETS_EMAIL'],
         recipients=[current_user.email]
     )
-    msg.body = render_template("tickets-purchased-email-banktransfer.txt", \
-        user = current_user, payment=payment)
+    msg.body = render_template("tickets-purchased-email-banktransfer.txt",
+        user=current_user, payment=payment)
     mail.send(msg)
 
     return redirect(url_for('transfer_waiting', payment=payment.id))
@@ -70,7 +70,7 @@ def transfer_waiting():
     except NoResultFound:
         logger.error("Attempt to get an inaccessible payment %s", payment_id)
         return redirect(url_for('tickets'))
-    return render_template('transfer-waiting.html', payment=payment, days=app.config.get('EXPIRY_DAYS'))
+    return render_template('transfer-waiting.html', payment=payment, days=app.config['EXPIRY_DAYS'])
 
 @app.route("/pay/transfer-cancel", methods=['POST'])
 @login_required
@@ -91,7 +91,7 @@ def transfer_cancel():
         payment = current_user.payments.filter_by(id=payment_id, user=current_user, state='inprogress', provider='banktransfer').one()
     except Exception, e:
         logger.error("Exception %r getting payment", e)
-        flash("An error occurred with your payment, please contact %s" % app.config.get('TICKETS_EMAIL')[1])
+        flash("An error occurred with your payment, please contact %s" % app.config['TICKETS_EMAIL'][1])
         return redirect(url_for('tickets'))
 
     if form.yesno.data == "no" and form.cancel.data == True:
