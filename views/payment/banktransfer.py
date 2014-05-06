@@ -1,9 +1,8 @@
 from main import app, db, mail
 from models.payment import BankPayment
-from views import (
-    feature_flag, HiddenIntegerField,
-    add_payment_and_tickets,
-)
+from views import feature_flag
+from views.payment import get_user_payment_or_abort
+from views.tickets import add_payment_and_tickets
 
 from flask import (
     render_template, redirect, request, flash,
@@ -13,31 +12,12 @@ from flask.ext.login import login_required, current_user
 from flaskext.mail import Message
 
 from flask_wtf import Form
-from wtforms.validators import Required, ValidationError
-from wtforms.widgets import HiddenInput
-from wtforms import SubmitField, HiddenField
+from wtforms import SubmitField
 
 import logging
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
-
-class BankTransferCancelForm(Form):
-    payment = HiddenIntegerField('payment_id', [Required()])
-    cancel = SubmitField('Cancel')
-    yesno = HiddenField('yesno', [Required()], default='no')
-    yes = SubmitField('Yes')
-    no = SubmitField('No')
-
-    def validate_payment(form, field):
-        payment = None
-        try:
-            payment = current_user.payments.filter_by(id=int(field.data), provider="banktransfer", state="inprogress").one()
-        except Exception, e:
-            logger.error('Exception %r getting payment for %s', e, form.data)
-
-        if not payment:
-            raise ValidationError('Sorry, that dosn\'t look like a valid payment')
-
 
 @app.route("/pay/transfer-start", methods=['POST'])
 @feature_flag('BANK_TRANSFER')
@@ -45,10 +25,11 @@ class BankTransferCancelForm(Form):
 def transfer_start():
     payment = add_payment_and_tickets(BankPayment)
     if not payment:
+        logging.warn('Unable to add payment and tickets to database')
         flash('Your session information has been lost. Please try ordering again.')
         return redirect(url_for('tickets'))
 
-    logger.info("Creating bank payment %s (%s)", payment.id, payment.bankref)
+    logger.info("Created bank payment %s (%s)", payment.id, payment.bankref)
 
     payment.state = "inprogress"
     db.session.commit()
@@ -61,57 +42,42 @@ def transfer_start():
         user=current_user, payment=payment)
     mail.send(msg)
 
-    return redirect(url_for('transfer_waiting', payment=payment.id))
+    return redirect(url_for('transfer_waiting', payment_id=payment.id))
 
-@app.route("/pay/transfer-waiting")
+@app.route("/pay/transfer/<int:payment_id>/waiting")
 @login_required
-def transfer_waiting():
-    payment_id = int(request.args.get('payment'))
-    try:
-        payment = current_user.payments.filter_by(id=payment_id, user=current_user).one()
-    except NoResultFound:
-        logger.error("Attempt to get an inaccessible payment %s", payment_id)
-        return redirect(url_for('tickets'))
+def transfer_waiting(payment_id):
+    payment = get_user_payment_or_abort(
+        payment_id, 'banktransfer',
+        valid_states=['inprogress'],
+    )
     return render_template('transfer-waiting.html', payment=payment, days=app.config['EXPIRY_DAYS'])
 
-@app.route("/pay/transfer-cancel", methods=['POST'])
+
+class TransferCancelForm(Form):
+    yes = SubmitField('Cancel transfer')
+
+@app.route("/pay/transfer/<int:payment_id>/cancel", methods=['GET', 'POST'])
 @login_required
-def transfer_cancel():
-    form = BankTransferCancelForm(request.form)
-    payment_id = None
+def transfer_cancel(payment_id):
+    payment = get_user_payment_or_abort(
+        payment_id, 'banktransfer',
+        valid_states=['new', 'inprogress'],
+    )
 
-    if request.method == 'POST' and form.validate():
-        if form.payment:
-            payment_id = int(form.payment.data)
+    form = TransferCancelForm(request.form)
+    if form.validate_on_submit():
+        if form.yes.data:
+            logger.info('Cancelling bank transfer %s', payment.id)
+            for t in payment.tickets.all():
+                t.expiry = datetime.now()
+            payment.state = 'cancelled'
+            db.session.commit()
 
-    if not payment_id:
-        flash('Unable to validate form. The web team have been notified.')
-        logger.error("Unable to get payment_id")
+            logging.info('Payment %s cancelled', payment.id)
+            flash('Payment cancelled')
+
         return redirect(url_for('tickets'))
 
-    try:
-        payment = current_user.payments.filter_by(id=payment_id, user=current_user, state='inprogress', provider='banktransfer').one()
-    except Exception, e:
-        logger.error("Exception %r getting payment", e)
-        flash("An error occurred with your payment, please contact %s" % app.config['TICKETS_EMAIL'][1])
-        return redirect(url_for('tickets'))
-
-    if form.yesno.data == "no" and form.cancel.data == True:
-        ynform = BankTransferCancelForm(payment=payment.id, yesno='yes', formdata=None)
-        return render_template('transfer-cancel-yesno.html', payment=payment, form=ynform)
-
-    if form.no.data == True:
-        return redirect(url_for('tickets'))
-    elif form.yes.data == True:
-        logger.info("Cancelled inprogress bank transfer %s", payment.id)
-        for t in payment.tickets.all():
-            db.session.delete(t)
-            logger.info("Cancelling bank transfer ticket %s for payment %s", t.id, payment.id)
-        logger.info("Cancelling bank transfer payment %s", payment.id)
-        payment.state = "cancelled"
-        db.session.commit()
-        flash('Payment cancelled')
-
-    return redirect(url_for('tickets'))
-
+    return render_template('transfer-cancel.html', payment=payment, form=form)
 

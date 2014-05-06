@@ -1,7 +1,25 @@
 from main import app
-from flask import render_template, redirect, url_for
+from flask import render_template, redirect, url_for, abort
 from views import get_basket
-from flask.ext.login import login_required
+from flask.ext.login import login_required, current_user
+
+def get_user_payment_or_abort(payment_id, provider=None, valid_states=None):
+    try:
+        payment = current_user.payments.filter_by(id=payment_id).one()
+    except Exception, e:
+        app.logger.warning('Exception %r getting payment %s', e, payment_id)
+        abort(404)
+
+    if provider and payment.provider != provider:
+        app.logger.warning('Payment %s is of type %s, not %s', payment.provider, provider)
+        abort(404)
+
+    if valid_states and payment.state not in valid_states:
+        app.logger.warning("Payment %s is %s, not one of %s", payment.state, payment_id, states)
+        abort(404)
+
+    return payment
+
 
 @app.route("/pay/terms")
 def ticket_terms():

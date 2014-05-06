@@ -240,7 +240,7 @@ class TestEmails(Command):
       print p.tickets.all()
       
   def test(self, template, payment):
-    output = render_template(template, user = self.user, payment=payment)
+    output = render_template(template, user=self.user, payment=payment)
     print "To: \"%s\" <%s>" % (self.user.name, self.user.email)
     print
     print output.encode("utf-8")
@@ -462,7 +462,7 @@ class SendTickets(Command):
                           recipients=[user.email]
                          )
             user.create_receipt()
-            msg.body = render_template("ticket.txt", user = user)
+            msg.body = render_template("ticket.txt", user=user)
             print "Sending to", user.email, "..."
             mail.send(msg)
 

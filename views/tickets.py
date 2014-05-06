@@ -3,8 +3,6 @@ from views import (
     get_user_currency, get_basket, TICKET_CUTOFF,
     IntegerSelectField, HiddenIntegerField,
 )
-from views.payment.banktransfer import BankTransferCancelForm
-from views.payment.gocardless import GoCardlessTryAgainForm
 
 from models.user import User
 from models.ticket import TicketType, Ticket, TicketAttrib, TicketToken
@@ -69,6 +67,55 @@ class UpdateTicketsForm(Form):
     tickets = FieldList(FormField(UpdateTicketForm))
 
 
+def add_payment_and_tickets(paymenttype):
+    """
+    Insert payment and tickets from session data into DB
+    """
+
+    infodata = session.get('ticketinfo')
+    basket, total = get_basket()
+
+    if not (basket and total):
+        return None
+
+    app.logger.info('Creating tickets for basket %s', basket)
+    app.logger.info('Payment: %s for total %s GBP', paymenttype.name, total)
+    app.logger.info('Ticket info: %s', infodata)
+
+    if infodata:
+        infolists = sum([infodata[i] for i in ticket_forms], [])
+        for info in infolists:
+            ticket_id = int(info.pop('ticket_id'))
+            ticket = basket[ticket_id]
+            for k, v in info.items():
+                attrib = TicketAttrib(k, v)
+                ticket.attribs.append(attrib)
+
+    payment = paymenttype(total)
+    current_user.payments.append(payment)
+
+    for ticket in basket:
+        name = get_form_name(ticket.type)
+        if name and not ticket.attribs:
+            app.logger.error('Ticket %s has no attribs', ticket)
+            return None
+
+        current_user.tickets.append(ticket)
+        ticket.payment = payment
+        if get_user_currency() == 'GBP':
+            ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
+        else:
+            ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS_EURO'))
+
+    db.session.commit()
+
+    session.pop('basket', None)
+    session.pop('ticketinfo', None)
+
+    return payment
+
+
+
 @app.route("/tickets", methods=['GET', 'POST'])
 def tickets():
     if current_user.is_authenticated():
@@ -78,33 +125,10 @@ def tickets():
         tickets = []
         payments = []
 
-    #
-    # go through existing payments
-    # and make cancel and/or pay buttons as needed.
-    #
-    # We don't allow canceling of inprogress gocardless payments cos there is
-    # money in the system and then we have to sort out refunds etc.
-    #
-    # With canceled Bank Transfers we mark the payment as canceled in
-    # case it does turn up for some reason and we need to do something with
-    # it.
-    #
-    retrycancel_forms = {}
-    for p in payments:
-        if p.provider == "gocardless" and p.state == "new":
-            retrycancel_forms[p.id] = GoCardlessTryAgainForm(formdata=None, payment=p.id, yesno='no')
-        elif p.provider == "banktransfer" and p.state == "inprogress":
-            retrycancel_forms[p.id] = BankTransferCancelForm(formdata=None, payment=p.id, yesno='no')
-        # the rest are inprogress or complete gocardless payments
-        # or complete banktransfers,
-        # or canceled payments of either provider.
-
     return render_template("tickets.html",
         tickets=tickets,
         payments=payments,
-        retrycancel_forms=retrycancel_forms,
     )
-
 
 @app.route("/tickets/token/<token>")
 def tickets_token(token):
@@ -128,6 +152,7 @@ class TicketAmountsForm(Form):
 def tickets_choose():
     if TICKET_CUTOFF:
         return render_template("tickets-cutoff.html")
+
     form = TicketAmountsForm(request.form)
 
     if not form.types:
@@ -163,7 +188,7 @@ def tickets_choose():
         f._any = any(values)
 
 
-    if request.method == 'POST' and form.validate():
+    if form.validate_on_submit():
         basket = []
         for f in form.types:
             if f.amount.data:
@@ -242,7 +267,7 @@ def tickets_info():
     if not form:
         return redirect(url_for('pay_choose'))
 
-    if request.method == 'POST' and form.validate():
+    if form.validate_on_submit():
         if form.back.data:
             return redirect(url_for('tickets_choose'))
 

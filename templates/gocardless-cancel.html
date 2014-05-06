@@ -3,12 +3,19 @@
 
 <div class="col-md-10">
 
-<h2>Oh Well!</h2>
+<h2>Cancel your GoCardless payment</h2>
 
-<p>Your GoCardless Direct Debit payment for {{ payment.amount }} has been
-   cancelled.</p>
+<p>Are you sure you want to cancel your payment?</p>
 
-<p>We still hope to see you at Electromagnetic Field, but you'll need to buy a ticket if you change your mind!</p>
+<form method="post" action="{{ url_for('gocardless_cancel', payment_id=payment.id) }}">
+{{ form.hidden_tag() }}
+{{ form.yes(class_="btn btn-danger") }}
+<a class="btn btn-info" href="{{ url_for('tickets') }}">Go back to my tickets</a>
+</form>
+
+<h3></h3>
+<p>If you have paid and want to get a refund please
+<a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email us</a> with your payment reference.</p>
 
 </div>
 {% endblock %}

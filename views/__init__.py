@@ -2,9 +2,14 @@
 from main import app
 from flask import session
 
+from models.ticket import Ticket
+
+from flask_wtf import Form
 from wtforms import (
-    IntegerField, SelectField, HiddenField
+    IntegerField, SelectField, HiddenField,
 )
+from wtforms.validators import Required, ValidationError
+from wtforms.widgets import HiddenInput
 
 from decorator import decorator
 import time
@@ -110,58 +115,8 @@ def get_basket():
 
     total = sum(t.type.get_price(get_user_currency()) for t in basket)
 
+    app.logger.debug('Got basket %s with total %s', basket, total)
     return basket, total
-
-def add_payment_and_tickets(paymenttype):
-    """
-    Insert payment and tickets from session data into DB
-    """
-
-    infodata = session.get('ticketinfo')
-    basket, total = get_basket()
-
-    if not (basket and total):
-        return None
-
-    app.logger.info('Creating tickets for basket %s', basket)
-    app.logger.info('Payment: %s for total %s GBP', paymenttype.name, total)
-    app.logger.info('Ticket info: %s', infodata)
-
-    if infodata:
-        infolists = sum([infodata[i] for i in ticket_forms], [])
-        for info in infolists:
-            # FIXME: is this needed?
-            ticket_id = int(info.pop('ticket_id'))
-            ticket = basket[ticket_id]
-            for k, v in info.items():
-                attrib = TicketAttrib(k, v)
-                ticket.attribs.append(attrib)
-
-    payment = paymenttype(total)
-    current_user.payments.append(payment)
-
-    for ticket in basket:
-        name = get_form_name(ticket.type)
-        if name and not ticket.attribs:
-            app.logger.error('Ticket %s has no attribs', ticket)
-            return None
-
-        current_user.tickets.append(ticket)
-        ticket.payment = payment
-        if get_user_currency() == 'GBP':
-            ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
-        else:
-            ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS_EURO'))
-
-    db.session.commit()
-
-    session.pop('basket', None)
-    session.pop('ticketinfo', None)
-
-    return payment
-
-
-
 
 def ticket_cutoff():
     return datetime.utcnow() > iso8601.parse_date(app.config['TICKET_CUTOFF']).replace(tzinfo=None)

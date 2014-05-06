@@ -3,18 +3,22 @@ from models.user import User
 from models.payment import Payment, BankPayment, GoCardlessPayment
 from models.ticket import TicketType, Ticket
 
-from flask import \
-    render_template, redirect, request, flash, \
-    url_for, abort, send_from_directory, session
-from flask.ext.login import \
-    login_user, login_required, logout_user, current_user
+from flask import (
+    render_template, redirect, request, flash,
+    url_for, abort, send_from_directory, session,
+)
+from flask.ext.login import (
+    login_user, login_required, logout_user, current_user,
+)
 from flaskext.mail import Message
 
 from flask_wtf import Form
 from wtforms.validators import Required, Email, EqualTo, ValidationError
 from wtforms.widgets import HiddenInput
-from wtforms import TextField, PasswordField, SelectField, HiddenField, \
-                    SubmitField, BooleanField, IntegerField, DecimalField
+from wtforms import (
+    TextField, PasswordField, SelectField, HiddenField,
+    SubmitField, BooleanField, IntegerField, DecimalField,
+)
 
 from sqlalchemy import and_, or_, func, case
 from sqlalchemy.exc import IntegrityError

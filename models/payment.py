@@ -58,8 +58,8 @@ class GoCardlessPayment(Payment):
 
     def bill_url(self, name):
         return gocardless.client.new_bill_url(self.amount, name=name,
-            redirect_uri=url_for('gocardless_complete', payment=self.id, _external=True),
-            cancel_uri=url_for('gocardless_cancel', payment=self.id, _external=True))
+            redirect_uri=url_for('gocardless_complete', payment_id=self.id, _external=True),
+            cancel_uri=url_for('gocardless_cancel', payment_id=self.id, _external=True))
 
 
 class PaymentChange(db.Model):
