@@ -1,6 +1,6 @@
 from main import app
 from flask import render_template, redirect, url_for
-from views.tickets import get_basket
+from views import get_basket
 from flask.ext.login import login_required
 
 @app.route("/pay/terms")

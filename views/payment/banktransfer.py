@@ -1,7 +1,9 @@
 from main import app, db, mail
 from models.payment import BankPayment
-from views import feature_flag
-from views.tickets import add_payment_and_tickets
+from views import (
+    feature_flag, HiddenIntegerField,
+    add_payment_and_tickets,
+)
 
 from flask import (
     render_template, redirect, request, flash,
@@ -20,7 +22,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class BankTransferCancelForm(Form):
-    payment = HiddenField('payment_id', [Required()])
+    payment = HiddenIntegerField('payment_id', [Required()])
     cancel = SubmitField('Cancel')
     yesno = HiddenField('yesno', [Required()], default='no')
     yes = SubmitField('Yes')

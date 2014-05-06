@@ -1,7 +1,14 @@
 from main import app, db
-from views import get_user_currency, TICKET_CUTOFF
+from views import (
+    get_user_currency, get_basket, TICKET_CUTOFF,
+    IntegerSelectField, HiddenIntegerField,
+)
+from views.payment.banktransfer import BankTransferCancelForm
+from views.payment.gocardless import GoCardlessTryAgainForm
+
 from models.user import User
 from models.ticket import TicketType, Ticket, TicketAttrib, TicketToken
+from models.payment import Payment
 
 from flask import (
     render_template, redirect, request, flash,
@@ -14,36 +21,12 @@ from sqlalchemy.orm.exc import NoResultFound
 from flask_wtf import Form
 from wtforms.validators import Required, Optional
 from wtforms import (
-    SelectField, HiddenField,
-    SubmitField, BooleanField, IntegerField,
+    SubmitField, BooleanField,
     DecimalField, FieldList, FormField,
 )
 from datetime import datetime, timedelta
 from StringIO import StringIO
 import qrcode
-
-class IntegerSelectField(SelectField):
-    def __init__(self, *args, **kwargs):
-        kwargs['coerce'] = int
-        self.fmt = kwargs.pop('fmt', str)
-        self.values = kwargs.pop('values', [])
-        SelectField.__init__(self, *args, **kwargs)
-
-    @property
-    def values(self):
-        return self._values
-
-    @values.setter
-    def values(self, vals):
-        self._values = vals
-        self.choices = [(i, self.fmt(i)) for i in vals]
-
-
-class HiddenIntegerField(HiddenField, IntegerField):
-    """
-    widget=HiddenInput() doesn't work with WTF-Flask's hidden_tag()
-    """
-
 
 class TicketForm(Form):
     ticket_id = HiddenIntegerField('Ticket Type', [Required()])
@@ -88,54 +71,39 @@ class UpdateTicketsForm(Form):
 
 @app.route("/tickets", methods=['GET', 'POST'])
 def tickets():
-    return redirect(url_for('tickets_choose'))
+    if current_user.is_authenticated():
+        tickets = current_user.tickets.all()
+        payments = current_user.payments.filter(Payment.state != "canceled", Payment.state != "expired").all()
+    else:
+        tickets = []
+        payments = []
 
-def add_payment_and_tickets(paymenttype):
-    """
-    Insert payment and tickets from session data into DB
-    """
+    #
+    # go through existing payments
+    # and make cancel and/or pay buttons as needed.
+    #
+    # We don't allow canceling of inprogress gocardless payments cos there is
+    # money in the system and then we have to sort out refunds etc.
+    #
+    # With canceled Bank Transfers we mark the payment as canceled in
+    # case it does turn up for some reason and we need to do something with
+    # it.
+    #
+    retrycancel_forms = {}
+    for p in payments:
+        if p.provider == "gocardless" and p.state == "new":
+            retrycancel_forms[p.id] = GoCardlessTryAgainForm(formdata=None, payment=p.id, yesno='no')
+        elif p.provider == "banktransfer" and p.state == "inprogress":
+            retrycancel_forms[p.id] = BankTransferCancelForm(formdata=None, payment=p.id, yesno='no')
+        # the rest are inprogress or complete gocardless payments
+        # or complete banktransfers,
+        # or canceled payments of either provider.
 
-    infodata = session.get('ticketinfo')
-    basket, total = get_basket()
-
-    if not (basket and total):
-        return None
-
-    app.logger.info('Creating tickets for basket %s', basket)
-    app.logger.info('Payment: %s for total %s GBP', paymenttype.name, total)
-    app.logger.info('Ticket info: %s', infodata)
-
-    if infodata:
-        infolists = sum([infodata[i] for i in ticket_forms], [])
-        for info in infolists:
-            ticket_id = int(info.pop('ticket_id'))
-            ticket = basket[ticket_id]
-            for k, v in info.items():
-                attrib = TicketAttrib(k, v)
-                ticket.attribs.append(attrib)
-
-    payment = paymenttype(total)
-    current_user.payments.append(payment)
-
-    for ticket in basket:
-        name = get_form_name(ticket.type)
-        if name and not ticket.attribs:
-            app.logger.error('Ticket %s has no attribs', ticket)
-            return None
-            
-        current_user.tickets.append(ticket)
-        ticket.payment = payment
-        if get_user_currency() == 'GBP':
-            ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
-        else:
-            ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS_EURO'))
-
-    db.session.commit()
-
-    session.pop('basket', None)
-    session.pop('ticketinfo', None)
-
-    return payment
+    return render_template("tickets.html",
+        tickets=tickets,
+        payments=payments,
+        retrycancel_forms=retrycancel_forms,
+    )
 
 
 @app.route("/tickets/token/<token>")
@@ -227,15 +195,6 @@ class TicketInfoForm(Form):
     donation = FieldList(FormField(DonationTicketForm))
     submit = SubmitField('Continue to Check-out')
     back = SubmitField('Change tickets')
-
-def get_basket():
-    basket = []
-    for code in session.get('basket', []):
-        basket.append(Ticket(code=code))
-
-    total = sum(t.type.get_price(get_user_currency()) for t in basket)
-
-    return basket, total
 
 def build_info_form(formdata):
     basket, total = get_basket()

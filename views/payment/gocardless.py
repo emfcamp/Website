@@ -1,7 +1,9 @@
 from main import app, db, gocardless, mail, csrf
 from models.payment import GoCardlessPayment
-from views import feature_flag, set_user_currency
-from views.tickets import add_payment_and_tickets
+from views import (
+    feature_flag, set_user_currency,
+    add_payment_and_tickets,
+)
 
 from flask import (
     render_template, redirect, request, flash,
