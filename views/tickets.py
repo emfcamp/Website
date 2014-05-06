@@ -49,16 +49,16 @@ class TicketForm(Form):
     ticket_id = HiddenIntegerField('Ticket Type', [Required()])
 
 class FullTicketForm(TicketForm):
-    template= 'tickets/full.html'
+    template = 'tickets/full.html'
     volunteer = BooleanField('Volunteering')
     accessible = BooleanField('Accessibility')
 
 class KidsTicketForm(TicketForm):
-    template= 'tickets/kids.html'
+    template = 'tickets/kids.html'
     accessible = BooleanField('Accessibility')
 
 class CarparkTicketForm(TicketForm):
-    template= 'tickets/carpark.html'
+    template = 'tickets/carpark.html'
     carshare = BooleanField('Car share')
 
 class CampervanTicketForm(TicketForm):
@@ -68,7 +68,7 @@ class CampervanTicketForm(TicketForm):
 #    template= 'tickets/campervan.html'
 
 class DonationTicketForm(TicketForm):
-    template= 'tickets/donation.html'
+    template = 'tickets/donation.html'
     amount = DecimalField('Donation amount')
 
 ticket_forms = ['full', 'kids']

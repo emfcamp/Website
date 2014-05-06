@@ -81,4 +81,10 @@ def ticket_cutoff():
 
 TICKET_CUTOFF = ticket_cutoff()
 
-import basic, users, admin, tickets, volunteers, radio, payment
+import basic
+import users
+import admin
+import tickets
+import radio
+import payment
+
