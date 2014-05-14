@@ -1,5 +1,5 @@
 from main import app, db, gocardless, mail, login_manager
-from views import set_user_currency
+from views import set_user_currency, Form
 from models.user import User, PasswordReset
 
 from sqlalchemy.exc import IntegrityError
@@ -13,7 +13,6 @@ from flask.ext.login import (
 )
 from flaskext.mail import Message
 
-from flask_wtf import Form
 from wtforms.validators import Required, Email, EqualTo, ValidationError
 from wtforms import TextField, PasswordField, HiddenField
 

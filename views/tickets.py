@@ -1,7 +1,7 @@
 from main import app, db
 from views import (
     get_user_currency, get_basket, TICKET_CUTOFF,
-    IntegerSelectField, HiddenIntegerField,
+    IntegerSelectField, HiddenIntegerField, Form,
 )
 
 from models.user import User
@@ -16,7 +16,6 @@ from flask.ext.login import login_required, current_user
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from flask_wtf import Form
 from wtforms.validators import Required, Optional
 from wtforms import (
     SubmitField, BooleanField,

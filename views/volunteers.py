@@ -1,5 +1,5 @@
 from main import db, app
-from views import feature_flag
+from views import feature_flag, Form
 
 from models.volunteers import ShiftSlot, Shift, Role
 from models.user import User
@@ -10,7 +10,6 @@ from flask import render_template, request, redirect, url_for, flash
 from flask.ext.login import \
     login_user, login_required, logout_user, current_user
 
-from flask_wtf import Form
 from wtforms.validators import Required, Email, EqualTo
 from wtforms import SelectField, IntegerField, HiddenField, BooleanField, SubmitField, \
                     FieldList, FormField, StringField

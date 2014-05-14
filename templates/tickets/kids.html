@@ -1,4 +1,4 @@
-{{ ticket.form.hidden_tag() }}
+{{ ticket.form.hidden_tag_without('csrf_token') }}
 
 {% set volunteer = ticket.form.volunteer %}
 {% set accessible = ticket.form.accessible %}

@@ -1,6 +1,6 @@
 from main import app, db, mail
 from models.payment import BankPayment
-from views import feature_flag
+from views import feature_flag, Form
 from views.payment import get_user_payment_or_abort
 from views.tickets import add_payment_and_tickets
 
@@ -11,7 +11,6 @@ from flask import (
 from flask.ext.login import login_required, current_user
 from flaskext.mail import Message
 
-from flask_wtf import Form
 from wtforms import SubmitField
 
 import logging

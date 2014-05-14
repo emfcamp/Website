@@ -2,6 +2,7 @@ from main import app, db, gocardless, mail
 from models.user import User
 from models.payment import Payment, BankPayment, GoCardlessPayment
 from models.ticket import TicketType, Ticket
+from views import Form
 
 from flask import (
     render_template, redirect, request, flash,
@@ -12,7 +13,6 @@ from flask.ext.login import (
 )
 from flaskext.mail import Message
 
-from flask_wtf import Form
 from wtforms.validators import Required, Email, EqualTo, ValidationError
 from wtforms.widgets import HiddenInput
 from wtforms import (

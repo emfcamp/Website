@@ -4,12 +4,13 @@ from flask import session
 
 from models.ticket import Ticket
 
-from flask_wtf import Form
+from flask_wtf import Form as BaseForm
+from flask_wtf.form import _is_hidden
 from wtforms import (
     IntegerField, SelectField, HiddenField,
 )
 from wtforms.validators import Required, ValidationError
-from wtforms.widgets import HiddenInput
+from wtforms.compat import string_types
 
 from decorator import decorator
 import time
@@ -37,6 +38,12 @@ class HiddenIntegerField(HiddenField, IntegerField):
     """
     widget=HiddenInput() doesn't work with WTF-Flask's hidden_tag()
     """
+
+class Form(BaseForm):
+    def hidden_tag_without(self, *fields):
+        fields = [isinstance(f, string_types) and getattr(self, f) or f for f in fields]
+        keep_fields = [f for f in self if _is_hidden(f) and f not in fields]
+        return BaseForm.hidden_tag(self, *keep_fields)
 
 
 def feature_flag(flag):
