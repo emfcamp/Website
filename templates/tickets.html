@@ -20,16 +20,16 @@
 ">
 <td>{{ t.type.name }}</td>
 <td>
-	{%- if t.type.name=="Under-14 Camp Ticket" or t.type.name=="Campervan Ticket" -%}
+	{%- if t.type.code == "kids_u15" or t.type.code == "campervan" -%}
 		N/A
 	{%- else %}
-		{%- for attrib in t.attribs if attrib.name=="volunteer" %}
+		{%- for attrib in t.attribs if attrib.name == "volunteer" %}
 			{%- if attrib.value in ("1", "true") -%} Yes {%- else -%} No {%- endif -%}
 		{% endfor -%}
 	{% endif -%}
 </td>
 <td>
-	{%- if t.type.name=="Campervan Ticket" -%}
+	{%- if t.type.code == "campervan" -%}
 		N/A
 	{%- else %}
 		{%- for attrib in t.attribs if attrib.name=="accessible" %}
