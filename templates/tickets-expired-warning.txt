@@ -1,7 +1,7 @@
 Hi {{ payment.user.name }},
 
 Just to warn you that we have not yet received payment for the tickets you
-reserved for Electromagnetic Field 2012.
+reserved for Electromagnetic Field 2014.
 
 The tickets will expire in a few days if not paid for.
 

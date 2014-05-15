@@ -2,8 +2,7 @@
 {% set volunteer = ticket.form.volunteer %}
 {% set accessible = ticket.form.accessible %}
 
-<!-- <div class="form-group no-margin{%if volunteer.errors or accessible.errors%} error{%endif%}"> -->
-<div class="{%if volunteer.errors or accessible.errors%} error{%endif%}">
+<div class="{% if volunteer.errors or accessible.errors -%} error {%- endif %}">
 	<div class="controls">
 		<label class="checkbox">
 			{{ volunteer()|safe }}	
@@ -32,10 +31,6 @@
 	</div>
 </div>
 
-<!-- Script that hides the explanatory help text -->
-<script type="text/javascript">$("collapse").collapse()</script>
-
-
 {#
 	(1) How do you anticipate travelling to EMFcamp?
 
@@ -43,3 +38,4 @@
 	private transport - car, motorcycle, bicycle, van, truck, bus, motorhome, other
 	would you be interested in car sharing?
 	#}
+

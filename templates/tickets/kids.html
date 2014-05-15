@@ -3,7 +3,7 @@
 {% set volunteer = ticket.form.volunteer %}
 {% set accessible = ticket.form.accessible %}
 
-<div class="form-group no-margin{%if form.errors%} error{%endif%}">
+<div class="{% if form.errors -%} error {%- endif %}">
  	<div class="controls">
 		<label class="checkbox">
 			{{ accessible()|safe }}
@@ -23,6 +23,3 @@
   </div>
 
 </div>
-
-<!-- Script that hides the explanatory help text -->
-<script type="text/javascript">$("collapse").collapse()</script>
