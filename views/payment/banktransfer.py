@@ -50,7 +50,7 @@ def transfer_waiting(payment_id):
         payment_id, 'banktransfer',
         valid_states=['inprogress'],
     )
-    return render_template('transfer-waiting.html', payment=payment, days=app.config['EXPIRY_DAYS'])
+    return render_template('transfer-waiting.html', payment=payment, days=app.config['EXPIRY_DAYS_TRANSFER'])
 
 
 class TransferCancelForm(Form):

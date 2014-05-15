@@ -1,7 +1,7 @@
 Hi, {{ user.name }},
 
 We've just received confirmation from GoCardless that your payment for
-{{ format_price(payment.amount) }} has cleared.
+{{ payment.amount | price(payment.currency) }} has cleared.
 
 See you soon at Electromagnetic Field 2012!
 

@@ -12,7 +12,7 @@
 {% endif %}
 <li>Username: {{ payment.user.name }}</li>
 <li>Email: {{ payment.user.email }}</li>
-<li>Price: {{ format_price(payment.amount) }}</li>
+<li>Price: {{ payment.amount | price(payment.currency) }}</li>
 <li>Tickets:</li>
 <ul>
 {% for t in payment.tickets %}

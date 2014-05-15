@@ -8,22 +8,20 @@
 <p>If you've already signed up, <a href="{{url_for('login')}}">log in</a> to view your ticket status.</p>
 {% endif %}
 
-<div class="currency_form">
-<form method="post" action="{{url_for('set_currency')}}" class="form-inline" id="currency_form">
-    <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
-    <label for="select_currency">Select currency:</label>
-    <select name="currency" id="select_currency" onchange="$('#currency_form').submit()">
-        <option value="GBP" {% if user_currency == 'GBP' %}selected="selected"{%endif%}>£</option>
-        <option value="EUR" {% if user_currency == 'EUR' %}selected="selected"{%endif%}>€</option>
+<form method="post" class="choose-tickets-form" id="choose_tickets">
+{{form.hidden_tag()}}
+<div>
+    <label for="select_currency">Currency:</label>
+    <select name="currency" id="select_currency">
+        {% for c in CURRENCIES %}
+        <option value="{{ c.code }}" {% if user_currency == c.code -%} selected="selected" {%- endif %}>{{ c.symbol }}</option>
+        {% endfor %}
     </select>
     <noscript>
-        <button type="submit">Go</button>
+        {{ form.update_currency(class_="btn") }}
     </noscript>
-</form>
 </div>
 
-<form method="post" class="choose-tickets-form">
-{{form.hidden_tag()}}
 <table class="table">
 
 <thead>
@@ -37,14 +35,20 @@
 <tbody>
 {% for f in form.types %}
 {% if f._any %}
-<tr data-price="{{ f._type.get_price(user_currency) }}" class="form-group{%if f.amount.errors%} has-error{%endif%} {{ loop.cycle('buyformtdodd', 'buyformtdeven') }}" >
+<tr data-price="{{ f._type.get_price(user_currency) }}"
+    {% for price in f._type.prices -%}
+        data-price-{{ price.currency }}="{{ price.value }}"
+    {% endfor -%}
+    class="ticket-type form-group
+        {% if f.amount.errors %} has-error {%- endif %}
+        {{ loop.cycle('odd', 'even') }}">
     <td>
         {{ f.hidden_tag_without('csrf_token') }}
         <label for="{{ f.amount.id }}"><b>{{ f._type.name }}</b></label>
         {% if f._type.notice %}<p>{{ f._type.notice }}</p>{% endif %}
     </td>
     <td>
-        <span>{{ format_ticket_price(f._type) }}</span>
+        <span class="price">{{ f._type.get_price(user_currency) | price(user_currency) }}</span>
     </td>
     <td>
         <div class="controls">{{ f.amount(class_="amount")|safe }}
@@ -66,7 +70,7 @@
         <div>Total will be shown on the next page</div>
         <div style="display: none" class="form-group">
             <label>Total:
-            <strong id="total" style="text-align: right">{{ format_price(0) }}</strong>
+            <strong id="total" style="text-align: right">{{ 0 | price(user_currency) }}</strong>
             </label>
         </div>
     </div>
@@ -75,7 +79,7 @@
 </table>
 
 <div class="form-actions">
-    <button type="submit" class="btn btn-primary btn-large">Buy tickets</button>
+    {{ form.submit(class_="btn btn-primary btn-large") }}
 </div>
 
 </form>
@@ -84,27 +88,49 @@
 
 {% block foot %}
 <script type="text/javascript">
-$(function() {
-  $('#summary').children().toggle();
+if (typeof(EMF) != 'object') var EMF = Object();
 
-  function format_price(amount, currency, after) {
-    if (!currency) currency = '{{user_currency_symbol}}';
-    var amount = parseFloat(amount).toFixed(2);
-    if (after)
-      return amount + currency;
-    return currency + amount;
-  }
+EMF.CURRENCY_SYMBOLS = {{ CURRENCY_SYMBOLS|tojson }};
+EMF.user_currency = {{ user_currency|tojson }};
 
-  $('.amount').on('change', function() {
+EMF.format_price = function(amount, currency, after) {
+  var amount = parseFloat(amount).toFixed(2);
+  var symbol = EMF.CURRENCY_SYMBOLS[currency];
+  if (symbol === undefined) throw 'Unknown currency ' + currency;
+  if (after)
+    return amount + symbol;
+  return symbol + amount;
+};
+EMF.update_currency = function() {
+  EMF.user_currency = $('#select_currency').val();
+  //var form = $('#choose_tickets');
+  //$.post({{ url_for('tickets_choose', _ajax='')|tojson }}, form.serialize());
+  $('.ticket-type').each(function() {
+    var t = $(this);
+    var price = t.data('price-' + EMF.user_currency.toLowerCase());
+    t.data('price', price);
+    t.find('.price').text(EMF.format_price(price, EMF.user_currency));
+  });
+};
+EMF.update_total = function() {
     var total = 0;
     $('.amount').each(function() {
         var count = parseInt($(this).val(), 10);
         var price = $(this).closest('tr').data('price');
         total += count * price;
     });
-    $('#total').text(format_price(total));
-  }).change();
+    $('#total').text(EMF.format_price(total, EMF.user_currency));
+};
 
+$(function() {
+  $('#summary').children().toggle();
+
+  $('.amount').on('change', EMF.update_totals).change();
+  $('#select_currency').on('change', function(event) {
+      EMF.update_currency();
+      EMF.update_total();
+      event.preventDefault()
+  });
 });
 </script>
 {% endblock %}

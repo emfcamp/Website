@@ -16,15 +16,15 @@
 <dl class="dl-horizontal">
 <dt>Bank</dt><dd>Barclays</dd>
 <dt>Payee</dt><dd>Electromagnetic Field Ltd</dd>
-{% if user_currency == 'GBP' %}
+{% if payment.currency == 'GBP' %}
 <dt>Sort code</dt><dd>20-71-64</dd>
 <dt>Account number</dt><dd>73590526</dd>
-{% elif user_currency == 'EUR' %}
+{% elif payment.currency == 'EUR' %}
 <dt>SWIFT</dt> <dd>BARCGB22</dd>
 <dt>IBAN</dt> <dd>GB21 BARC 2071 6472 9544 33</dd>
 {% endif %}
-<dt>Amount</dt><dd>{{ format_price(payment.amount) }}</dd>
-<dt>Reference</dt><dd>{{ format_bankref(payment.bankref) }}</dd>
+<dt>Amount</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
+<dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
 </dl>
 
 <p>(Don't worry about the hyphen, or if the payee name doesn't quite fit.)</p>

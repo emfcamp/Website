@@ -43,7 +43,7 @@ def gocardless_waiting(payment_id):
         payment_id, 'gocardless',
         valid_states=['new', 'inprogress'],
     )
-    return render_template('gocardless-waiting.html', payment=payment, days=app.config['EXPIRY_DAYS'])
+    return render_template('gocardless-waiting.html', payment=payment, days=app.config['EXPIRY_DAYS_GOCARDLESS'])
 
 @app.route('/pay/gocardless/<int:payment_id>/tryagain')
 @login_required

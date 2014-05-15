@@ -56,21 +56,20 @@ class TicketPrice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.Integer, db.ForeignKey('ticket_type.code'), nullable=False)
     currency = db.Column(db.String, nullable=False)
-    price_value = db.Column(db.Integer, nullable=False)
+    price_int = db.Column(db.Integer, nullable=False)
     type = db.relationship(TicketType, backref="prices")
 
-    def __init__(self, ticket_type, currency, price):
-        self.type = ticket_type
+    def __init__(self, currency, price):
         self.currency = currency
         self.value = price
 
     @property
     def value(self):
-        return Decimal(self.price_value) / 100
+        return Decimal(self.price_int) / 100
 
     @value.setter
     def value(self, val):
-        self.price_value = int(val * 100)
+        self.price_int = int(val * 100)
 
 
 class TicketToken(db.Model):
@@ -81,8 +80,7 @@ class TicketToken(db.Model):
     code = db.Column(db.Integer, db.ForeignKey('ticket_type.code'), nullable=False)
     type = db.relationship(TicketType, backref="tokens")
 
-    def __init__(self, ticket_type, token, expires):
-        self.type = ticket_type
+    def __init__(self, token, expires):
         self.token = token
         self.expires = expires
 

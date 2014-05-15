@@ -17,22 +17,24 @@ class Payment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     provider = db.Column(db.String, nullable=False)
-    amount_pence = db.Column(db.Integer, nullable=False)
+    currency = db.Column(db.String, nullable=False)
+    amount_int = db.Column(db.Integer, nullable=False)
     state = db.Column(db.String, nullable=False, default='new')
     changes = db.relationship('PaymentChange', backref='payment')
     tickets = db.relationship('Ticket', lazy='dynamic', backref='payment', cascade='all')
     __mapper_args__ = {'polymorphic_on': provider}
 
-    def __init__(self, amount):
+    def __init__(self, currency, amount):
+        self.currency = currency
         self.amount = amount
 
     @property
     def amount(self):
-        return Decimal(self.amount_pence) / 100
+        return Decimal(self.amount_int) / 100
 
     @amount.setter
     def amount(self, val):
-        self.amount_pence = int(val * 100)
+        self.amount_int = int(val * 100)
 
 
 class BankPayment(Payment):
@@ -41,8 +43,8 @@ class BankPayment(Payment):
     __mapper_args__ = {'polymorphic_identity': 'banktransfer'}
     bankref = db.Column(db.String, unique=True)
 
-    def __init__(self, amount):
-        Payment.__init__(self, amount)
+    def __init__(self, currency, amount):
+        Payment.__init__(self, currency, amount)
 
         # not cryptographic
         self.bankref = ''.join(random.sample(safechars, 8))

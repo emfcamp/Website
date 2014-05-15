@@ -1,6 +1,7 @@
 from main import app, db
 from views import (
-    get_user_currency, get_basket, TICKET_CUTOFF,
+    get_user_currency, set_user_currency, get_basket, TICKET_CUTOFF,
+    CURRENCY_SYMBOLS,
     IntegerSelectField, HiddenIntegerField, Form,
 )
 
@@ -18,7 +19,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from wtforms.validators import Required, Optional
 from wtforms import (
-    SubmitField, BooleanField,
+    SubmitField, BooleanField, TextField,
     DecimalField, FieldList, FormField,
 )
 from datetime import datetime, timedelta
@@ -73,12 +74,13 @@ def add_payment_and_tickets(paymenttype):
 
     infodata = session.get('ticketinfo')
     basket, total = get_basket()
+    currency = get_user_currency()
 
     if not (basket and total):
         return None
 
     app.logger.info('Creating tickets for basket %s', basket)
-    app.logger.info('Payment: %s for total %s GBP', paymenttype.name, total)
+    app.logger.info('Payment: %s for total %s %s', paymenttype.name, total, currency)
     app.logger.info('Ticket info: %s', infodata)
 
     if infodata:
@@ -90,7 +92,7 @@ def add_payment_and_tickets(paymenttype):
                 attrib = TicketAttrib(k, v)
                 ticket.attribs.append(attrib)
 
-    payment = paymenttype(total)
+    payment = paymenttype(currency, total)
     current_user.payments.append(payment)
 
     for ticket in basket:
@@ -101,10 +103,10 @@ def add_payment_and_tickets(paymenttype):
 
         current_user.tickets.append(ticket)
         ticket.payment = payment
-        if get_user_currency() == 'GBP':
-            ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS'))
-        else:
-            ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS_EURO'))
+        if currency == 'GBP':
+            ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS_TRANSFER'))
+        elif currency == 'EUR':
+            ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS_TRANSFER_EURO'))
 
     db.session.commit()
 
@@ -138,14 +140,19 @@ def tickets_token(token):
 
     return redirect(url_for('tickets_choose'))
 
-
 class TicketAmountForm(Form):
     amount = IntegerSelectField('Number of tickets', [Optional()])
     code = HiddenIntegerField('Ticket Type', [Required()])
 
 class TicketAmountsForm(Form):
     types = FieldList(FormField(TicketAmountForm))
-    choose = SubmitField('Buy Tickets')
+    currency = TextField('Currency', [Required()])
+    submit = SubmitField('Buy Tickets', [Optional()])
+    update_currency = SubmitField('Go', [Optional()])
+
+    def validate_currency(form, field):
+        if field.data not in CURRENCY_SYMBOLS:
+            raise ValidationError('Invalid currency %s' % currency)
 
 @app.route("/tickets/choose", methods=['GET', 'POST'])
 def tickets_choose():
@@ -186,8 +193,12 @@ def tickets_choose():
         f.amount.values = values
         f._any = any(values)
 
+    if form.currency.data in ('GBP', 'EUR'):
+        set_user_currency(form.currency.data)
+    else:
+        app.logger.warn('Invalid currency %s', form.currency.data)
 
-    if form.validate_on_submit():
+    if form.validate_on_submit() and form.submit.data:
         basket = []
         for f in form.types:
             if f.amount.data:
@@ -208,6 +219,9 @@ def tickets_choose():
                 return redirect(url_for('tickets_info'))
             else:
                 return redirect(url_for('signup', next=url_for('tickets_info')))
+
+    if request.method == 'POST' and form.update_currency.data:
+        app.logger.info('User running without Javascript: updated currency only')
 
     return render_template("tickets-choose.html", form=form)
 

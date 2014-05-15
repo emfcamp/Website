@@ -53,29 +53,32 @@ def feature_flag(flag):
         return abort(404)
     return decorator(call)
 
+class Currency(object):
+    def __init__(self, code, symbol):
+        self.code = code
+        self.symbol = symbol
+
+CURRENCIES = [
+    Currency('GBP', u'£'),
+    Currency('EUR', u'€'),
+]
+CURRENCY_SYMBOLS = dict((c.code, c.symbol) for c in CURRENCIES)
+
+@app.template_filter('price')
+def format_price(amount, currency, after=False):
+    amount = u'{0:.2f}'.format(amount)
+    symbol = CURRENCY_SYMBOLS[currency]
+    if after:
+        return amount + symbol
+    return symbol + amount
+
+@app.template_filter('bankref')
+def format_bankref(bankref):
+    return '%s-%s' % (bankref[:4], bankref[4:])
+
+
 @app.context_processor
 def utility_processor():
-    def format_price(amount, currency=None, after=False):
-        if currency is None:
-            currency = CURRENCY_SYMBOLS[get_user_currency()]
-
-        amount = u'{0:.2f}'.format(amount)
-        if after:
-            return amount + currency
-        return currency + amount
-
-    def format_ticket_price(ticket_type):
-        currency = get_user_currency()
-        ticket_price = ticket_type.get_price(currency)
-        symbol = CURRENCY_SYMBOLS[currency]
-        return format_price(ticket_price, symbol)
-
-    def format_bankref(bankref):
-        return '%s-%s' % (bankref[:4], bankref[4:])
-
-    def isoformat_utc(dt, sep='T'):
-        return time.strftime('%Y-%m-%d' + sep + '%H:%M:%SZ', dt.utctimetuple())
-
     def format_shift_short(start, end):
         start_p, start_h = start.strftime('%p').lower(), int(start.strftime('%I'))
         end_p, end_h = end.strftime('%p').lower(), int(end.strftime('%I'))
@@ -92,22 +95,17 @@ def utility_processor():
         return dt.strftime('%A %%s %H:%M') % date_suffix(dt.day)
 
     return dict(
-        format_price=format_price,
-        format_ticket_price=format_ticket_price,
-        format_bankref=format_bankref,
-        isoformat_utc=isoformat_utc,
         format_shift_short=format_shift_short,
         format_shift_dt=format_shift_dt,
-        TICKET_CUTOFF=TICKET_CUTOFF
+        TICKET_CUTOFF=TICKET_CUTOFF,
+        CURRENCIES=CURRENCIES,
+        CURRENCY_SYMBOLS=CURRENCY_SYMBOLS,
     )
-
-CURRENCY_SYMBOLS = {'GBP': u'£', 'EUR': u'€'}
 
 @app.context_processor
 def currency_processor():
     currency = get_user_currency()
-    return {'user_currency': currency,
-            'user_currency_symbol': CURRENCY_SYMBOLS[currency]}
+    return {'user_currency': currency}
 
 def get_user_currency(default='GBP'):
     return session.get('currency', default)

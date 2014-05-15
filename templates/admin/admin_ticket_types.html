@@ -4,7 +4,7 @@
 <H1>Add to Ticket Types</H1>
 
 <table class="table table-condensed table-striped">
-<tr><th>Name</th><th>Capacity</th><th>limit</th><th>cost</th><th>Allocated</th></tr>
+<tr><th>Name</th><th>Capacity</th><th>limit</th><th>GBP</th><th>EUR</th><th>Allocated</th></tr>
 {% for t in types %}
 <tr class="
 {{ loop.cycle('odd', 'even') }}
@@ -12,7 +12,8 @@
 <td>{{ t.name }}</td>
 <td>{{ t.capacity }}</td>
 <td>{{ t.limit }}</td>
-<td>{{ format_price(t.cost) }}</td>
+<td>{{ t.get_price('GBP') | price('GBP') }}</td>
+<td>{{ t.get_price('EUR') | price('EUR') }}</td>
 <td>{{ t.tickets | length }}</td>
 </tr>
 {% endfor %}
@@ -25,7 +26,8 @@
 {{ render_field(form.name) }}
 {{ render_field(form.capacity) }}
 {{ render_field(form.limit) }}
-{{ render_field(form.cost) }}
+{{ render_field(form.price_gbp) }}
+{{ render_field(form.price_eur) }}
 <div class="form-actions">
     <input type=submit name="Create" value="Create" class="btn btn-primary"/>
 </div>

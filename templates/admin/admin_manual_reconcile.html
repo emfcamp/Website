@@ -27,7 +27,7 @@
 <tr>
 <td>{{ t.id }}</td>
 <td>{{ t.type.name }}</td>
-<td>{{ format_price(t.type.cost) }}</td>
+<td>{{ t.type.get_price(p.currency) | price(p.currency) }}</td>
 <td>{{ t.expired() }}</td>
 <td>{{ t.paid }}</td>
 </tr>
@@ -35,7 +35,7 @@
 </tbody>
 </table>
 </td>
-<td><b>{{ format_price(p.amount) }}</b></td>
+<td><b>{{ p.amount | price(p.currency) }}</b></td>
 <td>
 <form method=post action="{{ url_for('manual_reconcile') }}" class="shrink">
 {{ paymentforms[p.id].hidden_tag() }}

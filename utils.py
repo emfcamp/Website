@@ -123,7 +123,7 @@ class Reconcile(Command):
         total = Decimal(0)
         for t in unpaid:
           if t.paid == False:
-            total += Decimal(str(t.type.cost))
+            total += Decimal(str(t.type.get_price(payment.currency)))
           elif not self.quiet:
             if payment.id not in self.overpays:
               print "attempt to pay for paid ticket: %d, user: %s, payment id: %d, paid: %.2f, ref %s" % (t.id, payment.user.name, payment.id, amount, ref)
@@ -201,9 +201,11 @@ class TestEmails(Command):
       user.set_password('happycamper')
       db.session.add(user)
 
-      amounts = {
-        "full" : TicketType.query.get('full').cost
+      types = {
+        "full" : TicketType.query.get('full')
       }
+      #
+      # FIXME: this is a complete mess
       #
       # TODO: needs to cover:
       #
@@ -214,22 +216,26 @@ class TestEmails(Command):
       #
       
       # full
-      for full in ((1,), (0,), (3,), (0,), (2,)):
+      for full in ([1], [0], [3], [0], [2]):
         for pt in (BankPayment, GoCardlessPayment):
-          total = (full * amounts['full'])
-          payment = pt(total)
-          payment.state = "inprogress"
-          if payment.provider == "gocardless":
-            payment.gcid = "%3dSDJADG" % (int(random.random() * 1000 ))
-          sess.add(payment)
-          
-          for i in range(full):
-            t = Ticket(code='full')
-            t.payment = payment
-            t.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS'])
-            user.tickets.append(t)
+          for curr in ['GBP', 'EUR']:
+            total = (full * amounts['full'].get_price(curr))
+            payment = pt(curr, total)
+            payment.state = "inprogress"
+            if payment.provider == "gocardless":
+              payment.gcid = "%3dSDJADG" % (int(random.random() * 1000 ))
+            sess.add(payment)
             
-          user.payments.append(payment)
+            for i in range(full):
+              t = Ticket(code='full')
+              t.payment = payment
+              if payment.currency == 'GBP':
+                  t.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS_TRANSFER'])
+              elif payment.currency == 'EUR':
+                  t.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS_TRANSFER_EURO'])
+              user.tickets.append(t)
+
+            user.payments.append(payment)
 
       db.session.commit()
 
@@ -271,7 +277,7 @@ class CreateTickets(Command):
         types = []
         for row in data:
             tt = TicketType(*row[1:5], order=row[0], notice=row[7])
-            tt.prices = [TicketPrice(tt, 'GBP', row[5]), TicketPrice(tt, 'EUR', row[6])]
+            tt.prices = [TicketPrice('GBP', row[5]), TicketPrice('EUR', row[6])]
             types.append(tt)
 
         for tt in types:
@@ -368,10 +374,8 @@ class CreateTicketTokens(Command):
         ]
 
         for code, token in tokens:
-            tt = TicketToken(
-                TicketType.query.get(code), token,
-                datetime.utcnow() + timedelta(days=7))
-            db.session.add(tt)
+            tt = TicketToken(token, datetime.utcnow() + timedelta(days=7))
+            tt.type = TicketType.query.get(code)
             db.session.commit()
 
         print 'Tokens added'

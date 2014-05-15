@@ -184,7 +184,8 @@ class NewTicketTypeForm(Form):
     name = TextField('Name', [Required()])
     capacity = IntegerField('Capacity', [Required()])
     limit = IntegerField('Limit', [Required()])
-    cost = DecimalField('Cost', [Required()])
+    price_gbp = DecimalField('Price in GBP', [Required()])
+    price_eur = DecimalField('Price in EUR', [Required()])
 
 @app.route("/admin/ticket-types", methods=['GET', 'POST'])
 @login_required
@@ -194,7 +195,8 @@ def ticket_types():
         if request.method == 'POST':
             form = NewTicketTypeForm()
             if form.validate():
-                tt = TicketType(form.name.data, form.capacity.data, form.limit.data, form.cost.data)
+                tt = TicketType(form.name.data, form.capacity.data, form.limit.data)
+                tt.prices = [TicketPrice('GBP', form.price_gbp), TicketPrice('EUR', form.price_eur)]
                 db.session.add(tt)
                 db.session.commit()
                 return redirect(url_for('ticket_types'))
