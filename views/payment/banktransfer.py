@@ -61,15 +61,20 @@ class TransferCancelForm(Form):
 def transfer_cancel(payment_id):
     payment = get_user_payment_or_abort(
         payment_id, 'banktransfer',
-        valid_states=['new', 'inprogress'],
+        valid_states=['new', 'inprogress', 'cancelled'],
     )
+
+    if payment.state == 'cancelled':
+        logger.info('Payment %s has already been cancelled', payment.id)
+        flash('Payment has already been cancelled')
+        return redirect(url_for('tickets'))
 
     form = TransferCancelForm(request.form)
     if form.validate_on_submit():
         if form.yes.data:
             logger.info('Cancelling bank transfer %s', payment.id)
             for t in payment.tickets.all():
-                t.expiry = datetime.now()
+                t.expires = datetime.utcnow()
             payment.state = 'cancelled'
             db.session.commit()
 

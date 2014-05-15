@@ -71,6 +71,14 @@ tr.odd {
     background-color: #eee;
 }
 
+.choose-tickets-form tr.even {
+    background-color: #fafafa;
+}
+
+.choose-tickets-form tr.odd {
+    background-color: #f2f2f2;
+}
+
 footer {
     font-size: 0.75em;
     padding-top:20px;
@@ -124,10 +132,6 @@ img.padit {
 .ticket-info.form-horizontal .control-group {
   margin-top: 2ex;
   margin-bottom: 0;
-}
-
-.currency_form {
-/*    float:right;*/
 }
 
 #select_currency {

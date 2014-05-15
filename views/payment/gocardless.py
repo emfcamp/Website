@@ -118,15 +118,20 @@ class GoCardlessCancelForm(Form):
 def gocardless_cancel(payment_id):
     payment = get_user_payment_or_abort(
         payment_id, 'gocardless',
-        valid_states=['new'], # once it's inprogress, there's potentially money moving around
+        valid_states=['new', 'cancelled'], # once it's inprogress, there's potentially money moving around
     )
+
+    if payment.state == 'cancelled':
+        logger.info('Payment %s has already been cancelled', payment.id)
+        flash('Payment has already been cancelled')
+        return redirect(url_for('tickets'))
 
     form = GoCardlessCancelForm(request.form)
     if form.validate_on_submit():
         if form.yes.data:
             logger.info('Cancelling GoCardless payment %s', payment.id)
             for t in payment.tickets.all():
-                t.expiry = datetime.now()
+                t.expires = datetime.utcnow()
             payment.state = 'cancelled'
             db.session.commit()
 

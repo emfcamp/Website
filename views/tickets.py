@@ -60,12 +60,6 @@ def get_form_name(ticket_type):
         return None
     return code
 
-class UpdateTicketForm(Form):
-    pass
-
-class UpdateTicketsForm(Form):
-    tickets = FieldList(FormField(UpdateTicketForm))
-
 
 def add_payment_and_tickets(paymenttype):
     """
@@ -121,7 +115,7 @@ def add_payment_and_tickets(paymenttype):
 def tickets():
     if current_user.is_authenticated():
         tickets = current_user.tickets.all()
-        payments = current_user.payments.filter(Payment.state != "canceled", Payment.state != "expired").all()
+        payments = current_user.payments.filter(Payment.state != "cancelled", Payment.state != "expired").all()
     else:
         tickets = []
         payments = []
