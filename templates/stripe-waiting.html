@@ -1,0 +1,22 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block body %}
+
+<div class="col-md-10">
+
+<h2>Thank You!</h2>
+
+<p>Your Stripe payment for {{ payment.amount | price(payment.currency) }}
+   has been set up and your tickets will be reserved for {{ days }} days
+   to allow for your payment to arrive.
+   We will email you when the transaction has been completed.</p>
+
+<p>Your charge ID from Stripe was {{ payment.chargeid }}.</p>
+
+
+<p>See you at Electromagnetic Field!</p>
+
+<a class="btn btn-info" href="{{ url_for('tickets') }}">Show my tickets</a>
+
+</div>
+{% endblock %}

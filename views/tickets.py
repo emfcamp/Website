@@ -73,8 +73,12 @@ def add_payment_and_tickets(paymenttype):
     if not (basket and total):
         return None
 
+    payment = paymenttype(currency, total)
+    payment.amount += paymenttype.premium(currency, total)
+    current_user.payments.append(payment)
+
     app.logger.info('Creating tickets for basket %s', basket)
-    app.logger.info('Payment: %s for total %s %s', paymenttype.name, total, currency)
+    app.logger.info('Payment: %s for %s %s (was %s)', paymenttype.name, payment.amount, currency, total)
     app.logger.info('Ticket info: %s', infodata)
 
     if infodata:
@@ -85,9 +89,6 @@ def add_payment_and_tickets(paymenttype):
             for k, v in info.items():
                 attrib = TicketAttrib(k, v)
                 ticket.attribs.append(attrib)
-
-    payment = paymenttype(currency, total)
-    current_user.payments.append(payment)
 
     for ticket in basket:
         name = get_form_name(ticket.type)

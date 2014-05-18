@@ -6,6 +6,7 @@ from flask.ext.assets import Environment, Bundle
 from flask_wtf import CsrfProtect
 
 import gocardless
+import stripe
 
 import logging
 import logger
@@ -32,6 +33,8 @@ gocardless.set_details(app_id=app.config['GOCARDLESS_APP_ID'],
                         app_secret=app.config['GOCARDLESS_APP_SECRET'],
                         access_token=app.config['GOCARDLESS_ACCESS_TOKEN'],
                         merchant_id=app.config['GOCARDLESS_MERCHANT_ID'])
+
+stripe.api_key = app.config['STRIPE_SECRET_KEY']
 
 if __name__ == "__main__":
     from views import *

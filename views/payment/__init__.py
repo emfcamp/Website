@@ -1,5 +1,6 @@
 from main import app
 from flask import render_template, redirect, url_for, abort
+from models import StripePayment
 from views import get_basket
 from flask.ext.login import login_required, current_user
 
@@ -33,8 +34,9 @@ def pay_choose():
     if not basket:
         redirect(url_for('tickets'))
 
-    return render_template('payment-choose.html', basket=basket, total=total)
+    return render_template('payment-choose.html', basket=basket, total=total, StripePayment=StripePayment)
 
 import banktransfer
 import gocardless
+import stripe
 

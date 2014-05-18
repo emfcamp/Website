@@ -1,0 +1,87 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block body %}
+
+<div class="col-md-10">
+
+<h2>Stripe payment</h2>
+
+<p>This page will authorise your payment for {{ payment.amount | price(payment.currency) }}.</p>
+
+<noscript><div class="alert alert-info">
+  <p>You must have Javascript enabled to use Stripe. If you don't see anything,
+  please enable it and click below to reload the page.</p>
+
+  <a class="btn btn-primary" href="{{ url_for('stripe_tryagain', payment_id=payment.id) }}">Reload page</a>
+</div></noscript>
+
+<div class="hidden alert alert-info" id="popups-warning">
+  <p>You may need popups or frames enabled to use Stripe. If you don't see anything,
+  please click below to continue.</p>
+
+  <a class="checkout-button btn btn-primary" href="#">Open Stripe</a>
+</div>
+
+<div class="hidden alert alert-danger" id="failed-warning">
+  <p>We didn't receive any details from Stripe. Please click below try again.</p>
+
+  <a class="checkout-button btn btn-primary" href="#">Open Stripe</a>
+  <a class="btn btn-success" href="{{ url_for('tickets') }}">Back to tickets</a>
+</div>
+
+<form method="post" action="{{ url_for('stripe_capture', payment_id=payment.id) }}" id="stripe_capture" class="hidden">
+{{ form.hidden_tag() }}
+{{ form.forward(class_='btn btn-success') }}
+</form>
+
+</div>
+{% endblock %}
+{% block foot -%}
+<script src="https://checkout.stripe.com/checkout.js"></script>
+
+<script type="text/javascript">
+// Apparently the "popup" can be blocked
+// https://stripe.com/docs/checkout#integration-more-runloop
+if (typeof(EMF) != 'object') var EMF = Object();
+
+EMF.stripe_handler = StripeCheckout.configure({
+  key: {{ config['STRIPE_PUBLIC_KEY']|tojson }},
+  token: function(token, args) {
+    clearTimeout(EMF.stripe_token_timer);
+    EMF.token = token;
+    $('#token').val(token.id);
+    $('#stripe_capture').submit();
+  },
+  opened: function() {
+    $('#popups-warning').hide();
+    $('#failed-warning').hide();
+  },
+  closed: function() {
+    EMF.stripe_token_timer = setTimeout(function() {
+      $('#failed-warning').removeClass('hidden').show();
+    }, 1000);
+  }
+});
+EMF.stripe_checkout = function() {
+  EMF.stripe_handler.open({
+    image: {{ url_for('static', filename='images/site_picture.jpg')|tojson }},
+    name: 'Electromagnetic Field',
+    description: {{ payment.description|tojson }},
+    // email: {{ current_user.email|tojson }},
+    allowRememberMe: false,
+    amount: {{ payment.amount_int|tojson }},
+    currency: {{ payment.currency.lower()|tojson }},
+    panelLabel: 'Pay {{amount}}',
+    notrack: {{ request.headers.get('dnt') == '1' and 'true' or 'false' }}
+  });
+};
+
+$(function() {
+  setTimeout(function() {
+      $('#popups-warning').removeClass('hidden');
+  }, 3000);
+  $('.checkout-button').on('click', EMF.stripe_checkout);
+  EMF.stripe_checkout();
+});
+</script>
+{% endblock -%}

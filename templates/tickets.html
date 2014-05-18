@@ -73,6 +73,10 @@
 <td>
 {%- if p.state == "new" and p.provider == "gocardless" %}
     <a href="{{ url_for('gocardless_tryagain', payment_id=p.id) }}" class="btn btn-success">Pay</a>
+{%- elif p.state == "new" and p.provider == "stripe" %}
+    <a href="{{ url_for('stripe_tryagain', payment_id=p.id) }}" class="btn btn-success">Pay</a>
+{%- elif p.state == "captured" and p.provider == "stripe" %}
+    <a href="{{ url_for('stripe_tryagain', payment_id=p.id) }}" class="btn btn-success">Charge</a>
 {% endif -%}
 </td>
 <td>
@@ -80,6 +84,8 @@
     <a href="{{ url_for('gocardless_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
 {%- elif p.state in ["new", "inprogress"] and p.provider == "banktransfer" %}
     <a href="{{ url_for('transfer_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
+{%- elif p.state in ["new", "captured"] and p.provider == "stripe" %}
+    <a href="{{ url_for('stripe_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
 {% endif -%}
 </td>
 

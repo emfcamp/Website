@@ -1,0 +1,16 @@
+Hi, {{ user.name }},
+
+This is to confirm that you've bought
+{%- if payment.tickets.all() | count == 1 %} a ticket {%- else %} {{ payment.tickets.all() | count }} tickets
+{%- endif %} for Electromagnetic Field 2014.
+{% include "email-tickets.txt" %}
+Your charge ID from Stripe was {{ payment.chargeid }}.
+
+We expect to receive confirmation from Stripe shortly. We will
+send you an email when we do.
+
+See you soon,
+
+Love,
+
+All the EMF team

@@ -45,3 +45,5 @@ simplejson==3.3.1
 six==1.5.1
 webassets==0.7
 wsgiref==0.1.2
+-i https://code.stripe.com
+stripe==1.14.0

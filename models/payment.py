@@ -6,7 +6,7 @@ from sqlalchemy.orm.attributes import get_history
 
 import random
 import re
-from decimal import Decimal
+from decimal import Decimal, ROUND_UP
 from datetime import datetime
 
 safechars = "2346789BCDFGHJKMPQRTVWXY"
@@ -36,6 +36,16 @@ class Payment(db.Model):
     def amount(self, val):
         self.amount_int = int(val * 100)
 
+    @classmethod
+    def premium(cls, currency, amount):
+        if not hasattr(cls, 'premium_percent'):
+            return Decimal(0)
+
+        amount_int = int(amount * 100)
+        premium = Decimal(cls.premium_percent) / 100 * amount_int
+        premium = premium.quantize(Decimal(1), ROUND_UP)
+        return premium / 100
+
 
 class BankPayment(Payment):
     name = 'Bank transfer'
@@ -62,6 +72,18 @@ class GoCardlessPayment(Payment):
         return gocardless.client.new_bill_url(self.amount, name=name,
             redirect_uri=url_for('gocardless_complete', payment_id=self.id, _external=True),
             cancel_uri=url_for('gocardless_cancel', payment_id=self.id, _external=True))
+
+class StripePayment(Payment):
+    name = 'Stripe payment'
+    premium_percent = 5
+
+    __mapper_args__ = {'polymorphic_identity': 'stripe'}
+    chargeid = db.Column(db.String, unique=True)
+    token = db.Column(db.String)
+
+    @property
+    def description(self):
+        return 'EMF 2014 tickets'
 
 
 class PaymentChange(db.Model):
