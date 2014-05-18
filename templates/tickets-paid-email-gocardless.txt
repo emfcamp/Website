@@ -1,4 +1,4 @@
-Hi, {{ user.name }},
+Hi {{ user.name }},
 
 We've just received confirmation from GoCardless that your payment for
 {{ payment.amount | price(payment.currency) }} has cleared.

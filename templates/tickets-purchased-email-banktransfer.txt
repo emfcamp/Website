@@ -1,4 +1,4 @@
-Hi, {{ user.name }},
+Hi {{ user.name }},
 
 {% if payment.tickets.all() |count == 1 -%}
 This is to confirm that you've reserved a ticket for {{ payment.amount | price(payment.currency) }} for 

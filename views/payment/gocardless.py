@@ -13,6 +13,8 @@ from flaskext.mail import Message
 
 from wtforms import SubmitField
 
+from sqlalchemy.orm.exc import NoResultFound
+
 import simplejson
 import logging
 from datetime import datetime, timedelta
@@ -34,6 +36,7 @@ def gocardless_start():
     db.session.commit()
 
     bill_url = payment.bill_url("Electromagnetic Field Tickets")
+    logger.debug('Bill URL for GoCardless: %s', bill_url)
     return redirect(bill_url)
 
 @app.route('/pay/gocardless/<int:payment_id>/waiting')
@@ -41,7 +44,7 @@ def gocardless_start():
 def gocardless_waiting(payment_id):
     payment = get_user_payment_or_abort(
         payment_id, 'gocardless',
-        valid_states=['new', 'inprogress'],
+        valid_states=['new', 'inprogress', 'paid'],
     )
     return render_template('gocardless-waiting.html', payment=payment, days=app.config['EXPIRY_DAYS_GOCARDLESS'])
 
@@ -60,6 +63,7 @@ def gocardless_tryagain(payment_id):
 
     logger.info("Trying payment %s again", payment.id)
     bill_url = payment.bill_url("Electromagnetic Field Ticket Deposit")
+    logger.debug('Bill URL for GoCardless: %s', bill_url)
     return redirect(bill_url)
 
 @app.route("/pay/gocardless/<int:payment_id>/complete")
@@ -91,7 +95,7 @@ def gocardless_complete(payment_id):
     for t in payment.tickets:
         # We need to make sure of a 5 working days grace
         # for gocardless payments, so push the ticket expiry forwards
-        t.expires = datetime.utcnow() + timedelta(days=10)
+        t.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS_GOCARDLESS'])
         logger.info("Reset expiry for ticket %s", t.id)
 
     db.session.commit()
@@ -183,7 +187,7 @@ def gocardless_webhook():
         gcid = bill['id']
         try:
             payment = GoCardlessPayment.query.filter_by(gcid=gcid).one()
-        except NoResultFound:
+        except NoResultFound, e:
             logger.warn('Payment %s not found, ignoring', gcid)
             continue
 

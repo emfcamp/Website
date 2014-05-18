@@ -79,7 +79,7 @@
 </table>
 
 <div class="form-actions">
-    {{ form.submit(class_="btn btn-primary btn-large") }}
+    {{ form.buy(class_="btn btn-primary btn-large") }}
 </div>
 
 </form>
@@ -125,11 +125,11 @@ EMF.update_total = function() {
 $(function() {
   $('#summary').children().toggle();
 
-  $('.amount').on('change', EMF.update_totals).change();
+  $('.amount').on('change', EMF.update_total).change();
   $('#select_currency').on('change', function(event) {
       EMF.update_currency();
       EMF.update_total();
-      event.preventDefault()
+      event.preventDefault();
   });
 });
 </script>

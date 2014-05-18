@@ -114,7 +114,7 @@ class Reconcile(Command):
         # so now we have the ref and an amount
         #
 
-        if payment.state == "paid" and (Decimal(payment.amount_pence) / 100) == amount:
+        if payment.state == "paid" and (Decimal(payment.amount_int) / 100) == amount:
           # all paid up, great lets ignore this one.
           self.alreadypaid += 1
           return

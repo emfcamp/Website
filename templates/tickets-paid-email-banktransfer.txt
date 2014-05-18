@@ -1,4 +1,4 @@
-Hi, {{ user.name }},
+Hi {{ user.name }},
 
 This is to confirm that we've received {{ payment.amount | price(payment.currency) }} for transaction {{ payment.bankref | bankref }} from
 you as payment for {% if payment.tickets.all() | count > 1 %}{{ payment.tickets.all() |count }} tickets{% else %}a ticket{% endif %} for Electromagnetic Field.

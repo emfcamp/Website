@@ -142,7 +142,7 @@ class TicketAmountForm(Form):
 class TicketAmountsForm(Form):
     types = FieldList(FormField(TicketAmountForm))
     currency = TextField('Currency', [Required()])
-    submit = SubmitField('Buy Tickets', [Optional()])
+    buy = SubmitField('Buy Tickets', [Optional()])
     update_currency = SubmitField('Go', [Optional()])
 
     def validate_currency(form, field):
@@ -193,7 +193,7 @@ def tickets_choose():
     else:
         app.logger.warn('Invalid currency %s', form.currency.data)
 
-    if form.validate_on_submit() and form.submit.data:
+    if form.validate_on_submit() and form.buy.data:
         basket = []
         for f in form.types:
             if f.amount.data:
@@ -226,7 +226,7 @@ class TicketInfoForm(Form):
     carpark = FieldList(FormField(CarparkTicketForm))
     campervan = FieldList(FormField(CampervanTicketForm))
     donation = FieldList(FormField(DonationTicketForm))
-    submit = SubmitField('Continue to Check-out')
+    forward = SubmitField('Continue to Check-out')
     back = SubmitField('Change tickets')
 
 def build_info_form(formdata):
@@ -266,14 +266,9 @@ def build_info_form(formdata):
 @app.route("/tickets/info", methods=['GET', 'POST'])
 @login_required
 def tickets_info():
-    basket, total = get_basket()
-
-    if not basket:
-        redirect(url_for('tickets'))
-
     form, basket, total = build_info_form(request.form)
     if not form:
-        return redirect(url_for('pay_choose'))
+        return redirect(url_for('tickets'))
 
     if form.validate_on_submit():
         if form.back.data:

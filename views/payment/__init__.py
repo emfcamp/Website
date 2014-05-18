@@ -16,7 +16,7 @@ def get_user_payment_or_abort(payment_id, provider=None, valid_states=None):
         abort(404)
 
     if valid_states and payment.state not in valid_states:
-        app.logger.warning("Payment %s is %s, not one of %s", payment.state, payment_id, valid_states)
+        app.logger.warning("Payment %s is %s, not one of %s", payment_id, payment.state, valid_states)
         abort(404)
 
     return payment

@@ -1,11 +1,11 @@
-Hi, {{ user.name }},
+Hi {{ user.name }},
 
 This is to confirm that you've bought
 {%- if payment.tickets.all() | count == 1 %} a ticket {%- else %} {{ payment.tickets.all() |count }} tickets
 {%- endif %} for Electromagnetic Field 2014.
 {% include "email-tickets.txt" %}
 Your bill ID from GoCardless was {{ payment.gcid }}.  You can view this
-by logging into your account at http://www.gocardless.com/.
+by logging into your account at http://www.gocardless.com/
 
 We expect to receive payment from GoCardless within 6 days or so. We will
 send you an email when we do.
