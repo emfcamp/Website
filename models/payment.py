@@ -69,9 +69,16 @@ class GoCardlessPayment(Payment):
     gcid = db.Column(db.String, unique=True)
 
     def bill_url(self, name):
-        return gocardless.client.new_bill_url(self.amount, name=name,
+        # TODO: check country
+        bill_url = gocardless.client.new_bill_url(
+            amount=self.amount,
+            name=name,
             redirect_uri=url_for('gocardless_complete', payment_id=self.id, _external=True),
-            cancel_uri=url_for('gocardless_cancel', payment_id=self.id, _external=True))
+            cancel_uri=url_for('gocardless_cancel', payment_id=self.id, _external=True),
+            currency=self.currency,
+        )
+
+        return bill_url
 
 class StripePayment(Payment):
     name = 'Stripe payment'
