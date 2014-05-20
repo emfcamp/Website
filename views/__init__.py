@@ -6,7 +6,8 @@ from mailsnake.exceptions import *
 
 from flask import \
     render_template, redirect, request, flash, \
-    url_for, abort, send_from_directory, session
+    url_for, abort, send_from_directory, session, \
+    Markup
 
 from sqlalchemy.sql import text
 
@@ -35,8 +36,11 @@ def main_post():
         email = request.form.get('email')
         ms.listSubscribe(id='d1798f7c80', email_address=email)
         flash('Thanks for subscribing! You will receive a confirmation email shortly.')
+    except ListAlreadySubscribedException, e:
+        app.logger.error('User already subscribed: %s', email)
+        flash(Markup(e))
     except MailSnakeException, e:
-        print e
+        app.logger.error('Error subscribing: %r', e)
         flash('Sorry, an error occurred.')
     return redirect(url_for('main'))
 
