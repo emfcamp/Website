@@ -1,3 +1,10 @@
+@import url(http://fonts.googleapis.com/css?family=Raleway:700);
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Raleway","Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-weight: 700;
+}
+
 header {
     text-align: center;
     padding-top:1em;
@@ -163,6 +170,11 @@ form.wave-cfp input, form.wave-cfp textarea {
 
 #splash {
   margin-top: 50px;
+  font-size: 110%;
+}
+
+#splash h3 {
+  color: #009ee2;
 }
 
 .splash-column .inner {
@@ -172,7 +184,7 @@ form.wave-cfp input, form.wave-cfp textarea {
 
 @media screen and (min-width: 990px) {
   .splash-column .inner {
-    height:725px;
+    height:775px;
   }
 }
 
@@ -191,8 +203,8 @@ form.wave-cfp input, form.wave-cfp textarea {
 }
 
 #splash p.lhead {
-    font-size: 1.2em;
-    line-height: 1.2em;
+    font-size: 1.3em;
+    line-height: 1.3em;
 }
 
 #splash #email-field {
@@ -204,3 +216,5 @@ form.wave-cfp input, form.wave-cfp textarea {
     margin-bottom: 5px;
     border: 1px solid #888;
 }
+
+

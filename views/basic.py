@@ -13,7 +13,7 @@ import os, csv
 
 @app.route("/")
 def main():
-    return render_template('main.html')
+    return render_template('main.html', ticket_sales=app.config.get('TICKET_SALES', False))
 
 @app.route("/", methods=['POST'])
 def main_post():

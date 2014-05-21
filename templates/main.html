@@ -4,18 +4,20 @@
   <div class="row">
     <div class="col-md-4 splash-column alt">
       <div class="inner">
-        <img id="logo" src="/static/images/splash/EMFlogo.png" width="127" height="103">
+        <img id="logo" src="/static/images/splash/EMFlogo.png" width="127" height="103" alt="EMF">
         <p class="lhead">
-        Electromagnetic Field (EMF) is a non-profit UK camping festival for those with an inquisitive mind or an
-        interest in making things: hackers, geeks, scientists, engineers, artists, and crafters.</p>
+        Electromagnetic Field is a non-profit UK camping festival for those with an inquisitive mind or an
+        interest in making things: hackers, artists, geeks, crafters, scientists, and engineers.</p>
         <p class="body">
-        In the summer of 2012 we gathered hundreds of people in a field outside Milton Keynes for three days of
-        talks and workshops covering everything from <b>genetic modification</b> to <b>electronics</b>, <b>blacksmithing</b>
+        This summer we're gathering over a thousand people in a field for a weekend of
+        talks, workshops, and much more.</p>
+
+        <p>At previous events we've heard about everything from <b>genetic modification</b> to <b>electronics</b>, <b>blacksmithing</b>
         to <b>high-energy physics</b>, <b>reverse engineering</b> to <b>lock picking</b>, <b>computer security</b> to
         <b>crocheting</b>, and <b>quadcopters</b> to <b>beer brewing</b>.
         </p>
         <p class="body">
-        To help matters along, we arranged a 380-megabit internet connection, reliable WiFi, and a bar stocked with real ale.
+        To help matters along, we're arranging a very fast internet connection, reliable WiFi, and a bar stocked with good local beer.
         </p>
         <p class="follow">
         <a href="http://twitter.com/emfcamp">@emfcamp</a> | 
@@ -25,9 +27,16 @@
     </div>
     <div class="col-md-4 splash-column">
       <div class="inner">
-        <h4>What's Next?</h4>
+        <h3>Count me in!</h3>
         <p class="body">
-        The next EMF will happen on <strong>August 29th-31st 2014</strong> at a site just south of Milton Keynes, Buckinghamshire.</p>
+        EMF 2014 will happen on <strong>August 29<sup>th</sup> &mdash; 31<sup>st</sup></strong> near <strong>Bletchley, Buckinghamshire</strong>.</p>
+
+        {% if ticket_sales %}
+        <div class="jumbotron">
+          <p>Tickets for EMF 2014 are now on sale for £95 each.</p>
+          <a href="/tickets/choose" class="btn btn-primary btn-lg" role="button">Buy Tickets Now</a>
+        </div>
+        {% else %}
         <p class="body">
           If you're interested in attending, please follow us on <a href="http://www.twitter.com/emfcamp">Twitter</a> or join our mailing list below:
           </p>
@@ -41,7 +50,8 @@
           <p class="body">
           <small>(We'll only use your email address to contact you about future EMF events.)</small>
           </p>
-          <h4>Help Out</h4>
+        {% endif %}
+          <h3>Help Out</h3>
             <p class="body">
             EMF is entirely organised and run by a dedicated team of volunteers.
             We're looking for people to help with everything from power and networking to driving vans and
@@ -58,11 +68,11 @@
         <div class="inner">
           <div id="gallery">
             <a href="http://www.flickr.com/photos/russss/7909185964/in/set-72157631357117362">
-              <img class="img-responsive" src="/static/images/splash/img1.jpg"></a>
+              <img class="img-responsive" src="/static/images/splash/img1.jpg" alt="Image of EMF 2012"></a>
               <a href="http://www.flickr.com/photos/russss/7909193016/in/set-72157631357117362">
-                <img class="img-responsive" src="/static/images/splash/img2.jpg"></a>
+                <img class="img-responsive" src="/static/images/splash/img2.jpg" alt="Image of EMF 2012"></a>
               <a href="http://www.flickr.com/photos/nottinghack/7929647354/in/set-72157631351042916">
-                <img class="img-responsive" src="/static/images/splash/img3.jpg"></a>
+                <img class="img-responsive" src="/static/images/splash/img3.jpg" alt="Image of EMF 2012"></a>
           </div>
       </div>
     </div>
