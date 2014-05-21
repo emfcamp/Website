@@ -11,13 +11,12 @@ from wtforms import (
 )
 from wtforms.widgets import Input
 from wtforms.fields import StringField
-from wtforms.validators import Required, ValidationError
 from wtforms.compat import string_types
 
 from decorator import decorator
-import time
 from datetime import datetime
 import iso8601
+
 
 class IntegerSelectField(SelectField):
     def __init__(self, *args, **kwargs):
@@ -41,11 +40,14 @@ class HiddenIntegerField(HiddenField, IntegerField):
     widget=HiddenInput() doesn't work with WTF-Flask's hidden_tag()
     """
 
+
 class TelInput(Input):
     input_type = 'tel'
 
+
 class TelField(StringField):
     widget = TelInput()
+
 
 class Form(BaseForm):
     def hidden_tag_without(self, *fields):
@@ -61,6 +63,7 @@ def feature_flag(flag):
         return abort(404)
     return decorator(call)
 
+
 class Currency(object):
     def __init__(self, code, symbol):
         self.code = code
@@ -72,6 +75,7 @@ CURRENCIES = [
 ]
 CURRENCY_SYMBOLS = dict((c.code, c.symbol) for c in CURRENCIES)
 
+
 @app.template_filter('price')
 def format_price(amount, currency, after=False):
     amount = u'{0:.2f}'.format(amount)
@@ -80,15 +84,18 @@ def format_price(amount, currency, after=False):
         return amount + symbol
     return symbol + amount
 
+
 @app.template_filter('bankref')
 def format_bankref(bankref):
     return '%s-%s' % (bankref[:4], bankref[4:])
+
 
 @app.template_filter('gcid')
 def format_gcid(gcid):
     if len(gcid) > 12:
         return 'ending %s' % gcid[-12:]
     return gcid
+
 
 @app.context_processor
 def utility_processor():
@@ -115,16 +122,20 @@ def utility_processor():
         CURRENCY_SYMBOLS=CURRENCY_SYMBOLS,
     )
 
+
 @app.context_processor
 def currency_processor():
     currency = get_user_currency()
     return {'user_currency': currency}
 
+
 def get_user_currency(default='GBP'):
     return session.get('currency', default)
 
+
 def set_user_currency(currency):
     session['currency'] = currency
+
 
 def get_basket():
     basket = []
@@ -135,6 +146,7 @@ def get_basket():
 
     app.logger.debug('Got basket %s with total %s', basket, total)
     return basket, total
+
 
 def ticket_cutoff():
     return datetime.utcnow() > iso8601.parse_date(app.config['TICKET_CUTOFF']).replace(tzinfo=None)
@@ -147,4 +159,3 @@ import admin
 import tickets
 import radio
 import payment
-

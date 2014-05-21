@@ -1,3 +1,5 @@
+import os
+import csv
 from main import app
 
 from mailsnake import MailSnake
@@ -8,12 +10,11 @@ from flask import (
     url_for, send_from_directory,
 )
 
-import os, csv
-
 
 @app.route("/")
 def main():
     return render_template('main.html', ticket_sales=app.config.get('TICKET_SALES', False))
+
 
 @app.route("/", methods=['POST'])
 def main_post():
@@ -27,14 +28,17 @@ def main_post():
         flash('Sorry, an error occurred.')
     return redirect(url_for('main'))
 
+
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static/images'),
                                    'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
+
 @app.route("/sponsors")
 def sponsors():
     return render_template('sponsors.html')
+
 
 @app.route("/talks")
 def talks():
@@ -51,6 +55,7 @@ def talks():
 
     return render_template('talks.html', **days)
 
+
 @app.route("/about/company")
 def company():
     return render_template('company.html')
@@ -64,36 +69,39 @@ def contact():
     return render_template('splashcontact.html')
     #return render_template('contact.html')
 
+
 @app.route("/location")
 def location():
     return render_template('location.html')
+
 
 @app.route("/participating")
 def participating():
     return render_template('participating.html')
 
+
 @app.route("/get_involved")
 def get_involved():
     return render_template('get_involved.html')
 
+
 @app.route('/badge')
 def badge():
-  return redirect('http://wiki-archive.emfcamp.org/2012/wiki/TiLDA')
+    return redirect('http://wiki-archive.emfcamp.org/2012/wiki/TiLDA')
 
-
-# WAAAAAAAAAAAAAAAAAAAAAAAAAAVE
 @app.route("/wave")
 def wave():
     return redirect('https://web.archive.org/web/20130627201413/https://www.emfcamp.org/wave')
+
 
 @app.route("/wave-talks")
 @app.route("/wave/talks")
 def wave_talks():
     return redirect('https://web.archive.org/web/20130627201413/https://www.emfcamp.org/wave/talks')
 
+
 @app.route('/sine')
 @app.route('/wave/sine')
 @app.route('/wave/SiNE')
 def sine():
     return redirect('http://wiki.emfcamp.org/wiki/SiNE')
-
