@@ -157,7 +157,7 @@ class TicketAmountsForm(Form):
 
     def validate_currency(form, field):
         if field.data not in CURRENCY_SYMBOLS:
-            raise ValidationError('Invalid currency %s' % currency)
+            raise ValidationError('Invalid currency %s' % field.data)
 
 
 @app.route("/tickets/choose", methods=['GET', 'POST'])
@@ -321,7 +321,7 @@ def tickets_receipt(receipt):
             ticket = Ticket.filter_by(receipt=receipt).one()
             tickets = [ticket]
             user = ticket.user
-        except NoResultFound, e:
+        except NoResultFound:
             return ('', 404)
 
     if current_user != user:

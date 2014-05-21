@@ -1,4 +1,4 @@
-from main import app, db, stripe, mail, csrf, stripe
+from main import app, db, stripe, mail, csrf
 from models.payment import StripePayment
 from views import feature_flag, set_user_currency, Form
 from views.payment import get_user_payment_or_abort

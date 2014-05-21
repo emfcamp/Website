@@ -77,6 +77,7 @@ def signup():
         try:
             db.session.commit()
         except IntegrityError, e:
+            app.logger.warn('Adding user raised %r, assuming duplicate email', e)
             flash("This email address %s is already in use. Please log in, or reset your password if you've forgotten it." % (form.email.data))
             return redirect(url_for('login'))
         login_user(user)

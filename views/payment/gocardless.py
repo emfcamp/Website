@@ -187,7 +187,7 @@ def gocardless_webhook():
         gcid = bill['id']
         try:
             payment = GoCardlessPayment.query.filter_by(gcid=gcid).one()
-        except NoResultFound, e:
+        except NoResultFound:
             logger.warn('Payment %s not found, ignoring', gcid)
             continue
 
