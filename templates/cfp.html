@@ -1,0 +1,25 @@
+{% from "_formhelpers.html" import render_field %}
+
+{% extends "base.html" %}
+{% block body %}
+<div class="col-md-10">
+<h2>Call for Participation</h2>
+{% if not current_user.is_authenticated() %}
+<p>If you've already signed up, you might want to <a href="{{ url_for('login') }}">log in</a>.</p>
+{% endif %}
+<p>(Talk blurb goes here)</p>
+<form method="post" class="form-horizontal">
+  <fieldset>
+    {{ form.hidden_tag() }}
+    {{ render_field(form.name) }}
+    {{ render_field(form.email) }}
+    {{ render_field(form.title, placeholder='A summary for the schedule') }}
+    {{ render_field(form.description, placeholder='Description (less than 200 words)') }}
+    {{ render_field(form.length, placeholder='Your best guess, whether in minutes or days') }}
+    <div class="form-actions">
+      <button type="submit" name="Create" class="btn btn-primary">Submit proposal</button>
+    </div>
+  </fieldset>
+</form>
+</div>
+{% endblock %}
