@@ -11,7 +11,7 @@ init:
 	virtualenv ./env
 
 update:
-	./env/bin/python ./env/bin/pip install -r ./requirements.txt
+	./env/bin/python ./env/bin/pip install -r ./requirements.txt --use-mirrors
 
 clean:
 	rm -rf .env

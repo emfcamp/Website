@@ -9,7 +9,6 @@ Flask-Script==0.6.6
 Flask-WTF==0.9.3
 Jinja2==2.7.1
 MarkupSafe==0.18
-PIL==1.1.7
 SQLAlchemy==0.9.0
 WTForms==1.0.5
 Werkzeug==0.9.4
@@ -21,7 +20,7 @@ chardet==2.2.1
 cssmin==0.2.0
 decorator==3.3.3
 eventlet==0.14.0
-greenlet==0.4.1
+greenlet==0.4.2
 gunicorn==18.0
 iso8601==0.1.8
 itsdangerous==0.23
@@ -34,7 +33,7 @@ nose==1.3.0
 oauthlib==0.1.3
 ofxparse==0.14
 psycopg2==2.5.1
-py-bcrypt==0.2
+py-bcrypt==0.4
 pyasn1==0.1.3
 python-daemon==1.6
 python-modargs==1.7
@@ -46,5 +45,4 @@ six==1.5.1
 webassets==0.7
 wsgiref==0.1.2
 git+https://github.com/gocardless/gocardless-python@add-currency#egg=gocardless
--i https://code.stripe.com
-stripe==1.14.0
+https://code.stripe.com/stripe/stripe-1.14.1.tar.gz
