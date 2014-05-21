@@ -114,12 +114,11 @@ def add_payment_and_tickets(paymenttype):
 
 @app.route("/tickets", methods=['GET', 'POST'])
 def tickets():
-    if current_user.is_authenticated():
-        tickets = current_user.tickets.all()
-        payments = current_user.payments.filter(Payment.state != "cancelled", Payment.state != "expired").all()
-    else:
-        tickets = []
-        payments = []
+    if not current_user.is_authenticated():
+        return redirect(url_for('tickets_choose'))
+
+    tickets = current_user.tickets.all()
+    payments = current_user.payments.filter(Payment.state != "cancelled", Payment.state != "expired").all()
 
     return render_template("tickets.html",
         tickets=tickets,
