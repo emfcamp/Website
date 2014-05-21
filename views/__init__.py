@@ -1,6 +1,6 @@
 # encoding=utf-8
 from main import app
-from flask import session
+from flask import session, abort
 
 from models.ticket import Ticket
 

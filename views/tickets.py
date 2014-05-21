@@ -2,7 +2,7 @@ from main import app, db
 from views import (
     get_user_currency, set_user_currency, get_basket, TICKET_CUTOFF,
     CURRENCY_SYMBOLS,
-    IntegerSelectField, HiddenIntegerField, TelField, Form,
+    IntegerSelectField, HiddenIntegerField, TelField, Form, feature_flag
 )
 
 from models.user import User
@@ -150,6 +150,7 @@ class TicketAmountsForm(Form):
             raise ValidationError('Invalid currency %s' % currency)
 
 @app.route("/tickets/choose", methods=['GET', 'POST'])
+@feature_flag('TICKET_SALES')
 def tickets_choose():
     if TICKET_CUTOFF:
         return render_template("tickets-cutoff.html")
