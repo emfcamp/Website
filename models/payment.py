@@ -1,15 +1,15 @@
 from main import db, gocardless
 from flask import url_for
 from sqlalchemy import event
-from sqlalchemy.orm import attributes, Session
+from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import get_history
 
 import random
-import re
 from decimal import Decimal, ROUND_UP
 from datetime import datetime
 
 safechars = "2346789BCDFGHJKMPQRTVWXY"
+
 
 class Payment(db.Model):
 
@@ -61,6 +61,7 @@ class BankPayment(Payment):
 
     def __repr__(self):
         return "<BankPayment: %s %s>" % (self.state, self.bankref)
+
 
 class GoCardlessPayment(Payment):
     name = 'GoCardless payment'
@@ -118,5 +119,4 @@ def payment_change(session, flush_context):
 
     for obj in session.deleted:
         if isinstance(obj, Payment):
-            raise Exception('Payments cannot be deleted');
-
+            raise Exception('Payments cannot be deleted')

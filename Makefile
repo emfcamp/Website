@@ -56,3 +56,6 @@ testemails:
 admin:
 	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py makeadmin
 
+test:
+	SETTINGS_FILE=./config/test.cfg ./env/bin/python ./env/bin/flake8 ./models ./views --ignore=E501,F403,E302
+	SETTINGS_FILE=./config/test.cfg ./env/bin/python ./env/bin/nosetests ./models ./views

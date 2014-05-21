@@ -1,11 +1,5 @@
 from main import db
-import flaskext
-import bcrypt
-import os
-import base64
-import random
-from datetime import datetime, timedelta
-from sqlalchemy.exc import IntegrityError
+
 
 class Proposal(db.Model):
     __tablename__ = 'proposal'

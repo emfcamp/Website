@@ -58,7 +58,7 @@ class Form(BaseForm):
 
 def feature_flag(flag):
     def call(f, *args, **kw):
-        if app.config.get(flag, False) == True:
+        if app.config.get(flag, False) is True:
             return f(*args, **kw)
         return abort(404)
     return decorator(call)
@@ -153,9 +153,9 @@ def ticket_cutoff():
 
 TICKET_CUTOFF = ticket_cutoff()
 
-import basic
-import users
-import admin
-import tickets
-import radio
-import payment
+import basic  # noqa
+import users  # noqa
+import admin  # noqa
+import tickets  # noqa
+import radio  # noqa
+import payment  # noqa

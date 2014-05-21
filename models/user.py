@@ -9,6 +9,7 @@ from sqlalchemy.exc import IntegrityError
 
 safechars_lower = "2346789bcdfghjkmpqrtvwxy"
 
+
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
@@ -41,7 +42,7 @@ class User(db.Model, UserMixin):
             try:
                 db.session.commit()
                 break
-            except IntegrityError, e:
+            except IntegrityError:
                 db.session.rollback()
 
 
@@ -57,8 +58,7 @@ class PasswordReset(db.Model):
         self.expires = datetime.utcnow() + timedelta(days=1)
 
     def new_token(self):
-        self.token = base64.urlsafe_b64encode(os.urandom(5*3))
+        self.token = base64.urlsafe_b64encode(os.urandom(5 * 3))
 
     def expired(self):
         return self.expires < datetime.utcnow()
-

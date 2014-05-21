@@ -1,9 +1,7 @@
+# flake8: noqa (Lots of whitespace errors - we should fix this if we use this code again)
 from main import db
-import bcrypt
-import flaskext
-import os
-import base64
-from datetime import datetime, timedelta
+from datetime import timedelta
+
 
 class Role(db.Model):
     __tablename__ = 'role'
@@ -12,12 +10,12 @@ class Role(db.Model):
     name        = db.Column(db.String,  nullable=False)
     wiki_link   = db.Column(db.String,  nullable=False)
     shift_slots = db.relationship('ShiftSlot', lazy='dynamic', backref='role')
-    
+
     def __init__(self, code, name, wiki_link=''):
         self.code = code
         self.name = name
         self.wiki_link = wiki_link
-    
+
 
 class ShiftSlot(db.Model):
     __tablename__ = 'shift_slot'
@@ -29,7 +27,7 @@ class ShiftSlot(db.Model):
     log        = db.Column(db.String)
     role_id    = db.Column(db.Integer, db.ForeignKey('role.id'), nullable=False)
     shifts     = db.relationship('Shift', lazy='dynamic', backref='shiftslot')
-    
+
     def __init__(self, start_time, minimum, maximum, role_code, log=''):
         if minimum > maximum and maximum != None:
             raise ValueError("minimum %i should be less than maximum %i"%(minimum, maximum))
@@ -41,7 +39,7 @@ class ShiftSlot(db.Model):
         # print role_code
         # print Role.query.filter_by(code=role_code).one().id
         self.role_id    =  Role.query.filter_by(code=role_code).one().id
-    
+
 
 class Shift(db.Model):
     __tablename__ = "shift"
@@ -50,10 +48,7 @@ class Shift(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     # states = pending, cancelled, show, no-show
     state = db.Column(db.String, nullable=False, default='pending')
-    
+
     def __init__(self, shift_slot_id, user_id):
         self.shift_slot_id = shift_slot_id
         self.user_id = user_id
-        
-        
-        

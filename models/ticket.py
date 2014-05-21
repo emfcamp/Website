@@ -3,12 +3,16 @@ from decimal import Decimal
 from datetime import datetime, timedelta
 import random
 
-from sqlalchemy.orm import attributes, Session
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm import Session
 from sqlalchemy import event, or_
 from sqlalchemy.exc import IntegrityError
 
 safechars_lower = "2346789bcdfghjkmpqrtvwxy"
+
+
+class TicketError(Exception):
+    pass
+
 
 class TicketType(db.Model):
     __tablename__ = 'ticket_type'
@@ -130,7 +134,7 @@ class Ticket(db.Model):
             try:
                 db.session.commit()
                 break
-            except IntegrityError, e:
+            except IntegrityError:
                 db.session.rollback()
 
     def __repr__(self):
@@ -180,4 +184,3 @@ def check_capacity(session, flush_context, instances):
 
         if count > type.capacity:
             raise TicketError('No more tickets of type %s available') % type.name
-
