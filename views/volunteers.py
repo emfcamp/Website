@@ -1,3 +1,4 @@
+# flake8: noqa (Lots of errors - we should fix this if we use this code again)
 from main import db, app
 from views import feature_flag, Form
 

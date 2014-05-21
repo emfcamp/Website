@@ -17,7 +17,7 @@ from flask.ext.login import login_required, current_user
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from wtforms.validators import Required, Optional
+from wtforms.validators import Required, Optional, ValidationError
 from wtforms import (
     SubmitField, BooleanField, TextField,
     DecimalField, FieldList, FormField,
@@ -26,8 +26,10 @@ from datetime import datetime, timedelta
 from StringIO import StringIO
 import qrcode
 
+
 class TicketForm(Form):
     ticket_id = HiddenIntegerField('Ticket Type', [Required()])
+
 
 class FullTicketForm(TicketForm):
     template = 'tickets/full.html'
@@ -35,13 +37,16 @@ class FullTicketForm(TicketForm):
     accessible = BooleanField('Accessibility')
     phone = TelField('Phone')
 
+
 class KidsTicketForm(TicketForm):
     template = 'tickets/kids.html'
     accessible = BooleanField('Accessibility')
 
+
 class CarparkTicketForm(TicketForm):
     template = 'tickets/carpark.html'
     carshare = BooleanField('Car share')
+
 
 class CampervanTicketForm(TicketForm):
     pass
@@ -49,11 +54,13 @@ class CampervanTicketForm(TicketForm):
     # maybe info on where to go?
 #    template= 'tickets/campervan.html'
 
+
 class DonationTicketForm(TicketForm):
     template = 'tickets/donation.html'
     amount = DecimalField('Donation amount')
 
 ticket_forms = ['full', 'kids']
+
 
 def get_form_name(ticket_type):
     code, _, subcode = ticket_type.code.partition('_')
@@ -126,6 +133,7 @@ def tickets():
         payments=payments,
     )
 
+
 @app.route("/tickets/token/<token>")
 def tickets_token(token):
     if TicketToken.types(token):
@@ -135,9 +143,11 @@ def tickets_token(token):
 
     return redirect(url_for('tickets_choose'))
 
+
 class TicketAmountForm(Form):
     amount = IntegerSelectField('Number of tickets', [Optional()])
     code = HiddenIntegerField('Ticket Type', [Required()])
+
 
 class TicketAmountsForm(Form):
     types = FieldList(FormField(TicketAmountForm))
@@ -148,6 +158,7 @@ class TicketAmountsForm(Form):
     def validate_currency(form, field):
         if field.data not in CURRENCY_SYMBOLS:
             raise ValidationError('Invalid currency %s' % currency)
+
 
 @app.route("/tickets/choose", methods=['GET', 'POST'])
 @feature_flag('TICKET_SALES')
