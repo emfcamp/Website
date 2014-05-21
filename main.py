@@ -36,10 +36,10 @@ gocardless.set_details(app_id=app.config['GOCARDLESS_APP_ID'],
 
 stripe.api_key = app.config['STRIPE_SECRET_KEY']
 
-if __name__ == "__main__":
-    from views import *
-    from models import *
+from views import *
+from models import *
 
+if __name__ == "__main__":
     if app.config.get('DEBUG'):
         db.create_all()
 
