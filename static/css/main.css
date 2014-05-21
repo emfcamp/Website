@@ -160,3 +160,47 @@ div.micro img {
 form.wave-cfp input, form.wave-cfp textarea {
   width:250px;
 }
+
+#splash {
+  margin-top: 50px;
+}
+
+.splash-column .inner {
+  padding: 20px;
+  background-color: #f2f2f2;
+}
+
+@media screen and (min-width: 990px) {
+  .splash-column .inner {
+    height:725px;
+  }
+}
+
+#splash .alt .inner {
+  background-color: #009ee2;
+  color: white;
+}
+
+#splash .alt a {
+  color: white;
+  text-decoration: underline;
+}
+
+#splash #logo {
+  margin-bottom: 10px;
+}
+
+#splash p.lhead {
+    font-size: 1.2em;
+    line-height: 1.2em;
+}
+
+#splash #email-field {
+  display: inline;
+  width: 75%;
+}
+
+#splash #gallery img {
+    margin-bottom: 5px;
+    border: 1px solid #888;
+}

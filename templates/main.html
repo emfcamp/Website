@@ -1,50 +1,71 @@
 {% extends "base.html" %}
-{% block body %}
-
-<div class="col-md-10">
-
-<h2>What?</h2>
-
-<p>Electromagnetic Field is a three-day UK camping festival for people with an inquisitive mind or an interest in making things: hackers, geeks, scientists, engineers, artists, and crafters.</p>
-
-<p>There will be people <a href="/talks">talking about everything</a> from <b>genetic modification</b> to <b>electronics</b>, <b>blacksmithing</b> to <b>high-energy physics</b>, <b>reverse engineering</b> to <b>lock picking</b>, <b>crocheting</b> to <b>carpentry</b>, and <b>quadcopters</b> to <b>beer brewing</b>. If you want to talk, there'll be <a href="http://wiki-archive.emfcamp.org/2012/wiki/Talks">space for you to do so</a>, and plenty of people who will want to listen.</p>
-
-<h2>Tell me more!</h2>
-
-<p>Aside from the <a href="/talks">organised talks and workshops</a>, attendees are forming <a href="http://wiki-archive.emfcamp.org/2012/wiki/Villages">villages</a> and planning events of their own, day and night. Wander between tents and you might come across someone teaching safecracking, or accidentally stumble into a late-night jam session using instruments constructed from circuit boards and glowing wire. If you decide to come with friends, maybe you should <a href="http://wiki-archive.emfcamp.org/2012/wiki/Villages">host something of your own</a>!</p>
-
-<p>The camp will be littered with interesting things to play with and explore; extraordinary vehicles and glowing objects can be found in every corner. No matter what your skill level is, there will always be something to do and someone to talk to at the bar.</p>
-
-<p>As well as the usual camp facilities like hot showers and running water, we're also providing power to every tent, and <a href="http://blog.emfcamp.org/post/27143646219/emf-camp-the-site-and-networking">very fast internet access</a>, both wired and wireless.</p>
-
-<p>EMF is a volunteer effort by a non-profit group, inspired by European and US hacker camps like <a href="http://en.wikipedia.org/wiki/Chaos_Communication_Camp">CCC</a>, <a href="http://en.wikipedia.org/wiki/Hacking_at_Random">HAR</a>, and <a href="http://www.toorcamp.org/">toorcamp</a>.
-</p>
-
-<h2>When?</h2>
-
-<p>08:00 Friday 29th August – 17:00 Monday 1st September 2014</p>
-
-<p>Events and activities will run throughout the day and into the evening, everything else (chats, debates, impromptu circus performances, orbital laser launches) will run as long as your collective energy lasts.</p>
-
-<h2>Where?</h2>
-
-<p>In <a href="http://www.openstreetmap.org/?mlat=51.96708&mlon=-0.79427#map=18/51.96708/-0.79427">Newton Longville</a> near Bletchley, Buckinghamshire.</p>
-
-<h2>Help us out</h2>
-
-<p><a href="http://wiki.emfcamp.org/2012/wiki/Talks">Talk and workshop submissions</a> will be open right up to the event, and even during it.</p>
-
-<p>EMF is run entirely by volunteers like you. If you want to help us out
-(whether with admin, setup, stewarding, working at the bar, or whatever else) please <a href="{{ url_for('contact') }}">get in touch</a>.</p>
+{% block document %}
+<div class="container" id="splash">
+  <div class="row">
+    <div class="col-md-4 splash-column alt">
+      <div class="inner">
+        <img id="logo" src="/static/images/splash/EMFlogo.png" width="127" height="103">
+        <p class="lhead">
+        Electromagnetic Field (EMF) is a non-profit UK camping festival for those with an inquisitive mind or an
+        interest in making things: hackers, geeks, scientists, engineers, artists, and crafters.</p>
+        <p class="body">
+        In the summer of 2012 we gathered hundreds of people in a field outside Milton Keynes for three days of
+        talks and workshops covering everything from <b>genetic modification</b> to <b>electronics</b>, <b>blacksmithing</b>
+        to <b>high-energy physics</b>, <b>reverse engineering</b> to <b>lock picking</b>, <b>computer security</b> to
+        <b>crocheting</b>, and <b>quadcopters</b> to <b>beer brewing</b>.
+        </p>
+        <p class="body">
+        To help matters along, we arranged a 380-megabit internet connection, reliable WiFi, and a bar stocked with real ale.
+        </p>
+        <p class="follow">
+        <a href="http://twitter.com/emfcamp">@emfcamp</a> | 
+        <a href="https://www.facebook.com/emfcamp">facebook</a>
+        </p>
+      </div>
+    </div>
+    <div class="col-md-4 splash-column">
+      <div class="inner">
+        <h4>What's Next?</h4>
+        <p class="body">
+        The next EMF will happen on <strong>August 29th-31st 2014</strong> at a site just south of Milton Keynes, Buckinghamshire.</p>
+        <p class="body">
+          If you're interested in attending, please follow us on <a href="http://www.twitter.com/emfcamp">Twitter</a> or join our mailing list below:
+          </p>
+          <form method="post" class="form-inline" role="form">
+            <div class="form-group">
+              <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
+              <input id="email-field" type="text" class="form-control" placeholder="Enter email address" name="email"/>
+              <button type="submit" class="btn btn-default">Join</button>
+            </div>
+          </form>
+          <p class="body">
+          <small>(We'll only use your email address to contact you about future EMF events.)</small>
+          </p>
+          <h4>Help Out</h4>
+            <p class="body">
+            EMF is entirely organised and run by a dedicated team of volunteers.
+            We're looking for people to help with everything from power and networking to driving vans and
+            running the bar.
+            </p>
+            <p class="body">
+            If you're interested in helping make EMF happen, you can.
+            visit <a href="http://wiki.emfcamp.org">our wiki</a> or
+            <a href="http://lists.emfcamp.org/listinfo/general">join the organisation mailing list</a>.
+            </p>
+      </div>
+    </div>
+    <div class="col-md-4 splash-column alt">
+        <div class="inner">
+          <div id="gallery">
+            <a href="http://www.flickr.com/photos/russss/7909185964/in/set-72157631357117362">
+              <img class="img-responsive" src="/static/images/splash/img1.jpg"></a>
+              <a href="http://www.flickr.com/photos/russss/7909193016/in/set-72157631357117362">
+                <img class="img-responsive" src="/static/images/splash/img2.jpg"></a>
+              <a href="http://www.flickr.com/photos/nottinghack/7929647354/in/set-72157631351042916">
+                <img class="img-responsive" src="/static/images/splash/img3.jpg"></a>
+          </div>
+      </div>
+    </div>
+    </div>
 </div>
-
-{% if not TICKET_CUTOFF %}
-<div class="jumbotron col-md-4">
-<h2>Count me in!</h2>
-<p>Get your ticket to EMF now! Tickets cost £95.</p>
-<p><a class="btn btn-primary" href="{{ url_for('tickets') }}">Buy tickets now</a></p>
-<p class="small"><small>If you've already signed up, <a href="{{url_for('login')}}">log in</a> to view your ticket status.</small></p>
-</div>
-{% endif %}
-
 {% endblock %}
