@@ -1,7 +1,7 @@
 {% macro render_field(field) %}
 <div class="form-group{% if field.errors %} error{% endif %}">
   <label class="control-label">{{ field.label }}</label>
-  <div class="controls">{{ field(**kwargs)|safe }}
+  <div class="controls">{{ field(class_='form-control', **kwargs)|safe }}
     {% if field.errors %}
         {% for error in field.errors %}
           <span class="help-inline">{{ error }}</span>
