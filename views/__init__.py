@@ -76,6 +76,11 @@ def format_price(amount, currency, after=False):
 def format_bankref(bankref):
     return '%s-%s' % (bankref[:4], bankref[4:])
 
+@app.template_filter('gcid')
+def format_gcid(gcid):
+    if len(gcid) > 12:
+        return 'ending %s' % gcid[-12:]
+    return gcid
 
 @app.context_processor
 def utility_processor():
