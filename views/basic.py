@@ -60,9 +60,11 @@ def talks():
 def company():
     return render_template('company.html')
 
+
 @app.route("/about")
 def about():
     return render_template('about.html')
+
 
 @app.route("/contact")
 def contact():
@@ -88,6 +90,17 @@ def get_involved():
 @app.route('/badge')
 def badge():
     return redirect('http://wiki-archive.emfcamp.org/2012/wiki/TiLDA')
+
+
+@app.route("/code-of-conduct")
+def code_of_conduct():
+    return render_template('code-of-conduct.html')
+
+
+@app.route("/diversity")
+def diversity():
+    return render_template('diversity.html')
+
 
 @app.route("/wave")
 def wave():
