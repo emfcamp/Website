@@ -1,0 +1,12 @@
+  <div class="controls">
+    <label class="checkbox">
+      {{ accessible()|safe }}
+      I have accessibility requirements <a data-toggle="collapse" href="#a-blurb{{ i }}">[?]</a>
+    </label>
+    {% for error in accessible.errors %}
+    <span class="help-inline">{{ error }}</span>
+    {% endfor %}
+    <div id="a-blurb{{ i }}" class="collapse {% if i==1 %}in{% endif %}">
+      <p>We want to make EMF as inclusive as possible, if you have any specific requirements please let us know and we'll be in touch for more information.</p>
+    </div>
+  </div>

@@ -2,7 +2,7 @@ from main import app, db
 from views import (
     get_user_currency, set_user_currency, get_basket, TICKET_CUTOFF,
     CURRENCY_SYMBOLS,
-    IntegerSelectField, HiddenIntegerField, Form,
+    IntegerSelectField, HiddenIntegerField, TelField, Form,
 )
 
 from models.user import User
@@ -31,8 +31,9 @@ class TicketForm(Form):
 
 class FullTicketForm(TicketForm):
     template = 'tickets/full.html'
-    volunteer = BooleanField('Volunteering')
+    volunteer = BooleanField('Volunteering', default='on')
     accessible = BooleanField('Accessibility')
+    phone = TelField('Phone')
 
 class KidsTicketForm(TicketForm):
     template = 'tickets/kids.html'

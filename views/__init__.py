@@ -9,6 +9,8 @@ from flask_wtf.form import _is_hidden
 from wtforms import (
     IntegerField, SelectField, HiddenField,
 )
+from wtforms.widgets import Input
+from wtforms.fields import StringField
 from wtforms.validators import Required, ValidationError
 from wtforms.compat import string_types
 
@@ -38,6 +40,12 @@ class HiddenIntegerField(HiddenField, IntegerField):
     """
     widget=HiddenInput() doesn't work with WTF-Flask's hidden_tag()
     """
+
+class TelInput(Input):
+    input_type = 'tel'
+
+class TelField(StringField):
+    widget = TelInput()
 
 class Form(BaseForm):
     def hidden_tag_without(self, *fields):

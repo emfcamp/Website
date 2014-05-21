@@ -4,20 +4,10 @@
 {% set accessible = ticket.form.accessible %}
 
 <div class="{% if form.errors -%} error {%- endif %}">
- 	<div class="controls">
-		<label class="checkbox">
-			{{ accessible()|safe }}
-			<!-- <a href="#" id="popover" data-original-title="Accessibility" data-content="We want to be sure we have all our attendees needs covered, so we will contact you for more information.">If you have accessibility requirements please tick here.</a> -->
-			I have accessibility requirements <a data-toggle="collapse" href="#a-blurb{{ i }}">[?]</a>
-		</label>
-		{% for error in accessible.errors %}
-		<span class="help-inline">{{ error }}</span>
-		{% endfor %}
-		<div id="a-blurb{{ i }}" class="collapse {% if i==1 %}in{% endif %}"><blockquote>We want to be sure we have all our attendees needs covered, so we will contact you for more information.</blockquote></div>
-	</div>
 
+{% include 'tickets/accessible.html' %}
 
-  <div>
+  <div style="margin-top: 10px">
     Sorry, all our volunteers must be over 18.
     Don't worry, there will be plenty of activities to get involved with in the villages.
   </div>
