@@ -13,10 +13,7 @@ import os, csv
 
 @app.route("/")
 def main():
-    if app.config.get('SPLASH', True) == True:
-        return render_template('splashmain.html')
-    else:
-        return render_template('main.html')
+    return render_template('main.html')
 
 @app.route("/", methods=['POST'])
 def main_post():
