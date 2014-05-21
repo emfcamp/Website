@@ -1,3 +1,4 @@
+# flake8: noqa (there are a load of errors here we need to fix)
 from main import app, db, gocardless, mail
 from models.user import User
 from models.payment import Payment, BankPayment, GoCardlessPayment

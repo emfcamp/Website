@@ -110,12 +110,12 @@ class PaymentChange(db.Model):
 def payment_change(session, flush_context):
     for obj in session.new:
         if isinstance(obj, Payment):
-            change = PaymentChange(obj, obj.state)
+            PaymentChange(obj, obj.state)
 
     for obj in session.dirty:
         if isinstance(obj, Payment):
             state = get_history(obj, 'state').added[0]
-            change = PaymentChange(obj, state)
+            PaymentChange(obj, state)
 
     for obj in session.deleted:
         if isinstance(obj, Payment):

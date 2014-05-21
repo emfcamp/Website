@@ -173,12 +173,12 @@ def tickets_choose():
             form.types.append_entry()
             form.types[-1].code.data = tt.code
 
-    if current_user.is_authenticated():
-        fulls = current_user.tickets.join(TicketType). \
-            filter(TicketType.code.like('full%')). \
-            count()
-    else:
-        fulls = 0
+    #if current_user.is_authenticated():
+    #    fulls = current_user.tickets.join(TicketType). \
+    #        filter(TicketType.code.like('full%')). \
+    #        count()
+    #else:
+    #    fulls = 0
 
     token_tts = TicketToken.types(session.get('ticket_token'))
     token_only = ['full_ucl', 'full_hs', 'full_make', 'full_adafruit',
@@ -316,7 +316,7 @@ def tickets_receipt(receipt):
     try:
         user = User.filter_by(receipt=receipt).one()
         tickets = list(user.tickets)
-    except NoResultFound, e:
+    except NoResultFound:
         try:
             ticket = Ticket.filter_by(receipt=receipt).one()
             tickets = [ticket]
