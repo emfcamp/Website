@@ -126,6 +126,9 @@ def tickets():
         return redirect(url_for('tickets_choose'))
 
     tickets = current_user.tickets.all()
+    if not tickets:
+        return redirect(url_for('tickets_choose'))
+
     payments = current_user.payments.filter(Payment.state != "cancelled", Payment.state != "expired").all()
 
     return render_template("tickets.html",
