@@ -87,8 +87,8 @@ class ShiftsForm(Form):
     shifts = FieldList(FormField(ShiftForm))
     submit = SubmitField('Update shifts')
 
-@feature_flag('VOLUNTEERS')
 @app.route("/volunteers/shifts", methods=['GET', 'POST'])
+@feature_flag('VOLUNTEERS')
 @login_required
 def choose_shifts():
     #
@@ -170,8 +170,8 @@ def choose_shifts():
     
     return render_template('volunteers/choose_shifts.html', form=form)
 
-@feature_flag('VOLUNTEERS')
 @app.route("/volunteers/myshifts", methods=['GET'])
+@feature_flag('VOLUNTEERS')
 def my_shifts():
     #
     # list a users shifts and let them modify the shifts
@@ -190,8 +190,8 @@ def my_shifts():
 	    
     return render_template('volunteers/my_shifts.html', shifts=shifts, phone=current_user.phone)
 
-@feature_flag('VOLUNTEERS')
 @app.route("/volunteers/all_shifts", methods=['GET'])
+@feature_flag('VOLUNTEERS')
 @login_required
 def all_shifts():
     if not current_user.admin:

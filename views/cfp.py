@@ -27,8 +27,8 @@ class ProposalForm(Form):
     length = TextField('Duration', [Required()])
     propose = TextField('Submit')
 
-@feature_flag('CFP')
 @app.route('/cfp', methods=['GET', 'POST'])
+@feature_flag('CFP')
 def cfp():
     form = ProposalForm()
     if form.validate_on_submit():
@@ -48,8 +48,8 @@ def cfp():
 
     return render_template('cfp.html', form=form)
 
-@feature_flag('CFP')
 @app.route('/cfp/complete')
+@feature_flag('CFP')
 def cfp_complete():
     return render_template('cfp_complete.html')
 
