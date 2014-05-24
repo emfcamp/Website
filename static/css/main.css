@@ -217,4 +217,6 @@ form.wave-cfp input, form.wave-cfp textarea {
     border: 1px solid #888;
 }
 
-
+#splash .jumbotron {
+    background-color: inherit;
+}
