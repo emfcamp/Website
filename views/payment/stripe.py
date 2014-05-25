@@ -118,7 +118,7 @@ def stripe_capture(payment_id):
 
         return charge_stripe(payment)
 
-    logger.info("Trying to checkout payment %s again", payment.id)
+    logger.info("Trying to check out payment %s", payment.id)
     return render_template('stripe-checkout.html', payment=payment, form=form)
 
 class StripeChargeAgainForm(Form):
