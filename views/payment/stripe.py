@@ -211,7 +211,7 @@ def stripe_webhook():
         except KeyError, e:
             handler = webhook_handlers[None]
 
-        return handler(obj_data)
+        return handler(type, obj_data)
 
     except Exception, e:
         logger.error('Unexcepted exception during webhook: %r', e)
@@ -258,6 +258,7 @@ def stripe_charge_updated(type, charge_data):
         logger.error('Current payment state is %s (should be charged)', payment.state)
         abort(409)
 
+    logger.info('Setting payment %s to paid', payment.id)
     for t in payment.tickets.all():
         t.paid = True
 
