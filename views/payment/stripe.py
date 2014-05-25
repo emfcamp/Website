@@ -1,6 +1,6 @@
 from main import app, db, stripe, mail, csrf
 from models.payment import StripePayment
-from views import feature_flag, set_user_currency, Form
+from views import feature_flag, Form
 from views.payment import get_user_payment_or_abort
 from views.tickets import add_payment_and_tickets
 
@@ -8,11 +8,9 @@ from flask import (
     render_template, redirect, request, flash,
     url_for, abort,
 )
-from flask.ext.login import login_required, current_user
+from flask.ext.login import login_required
 from flaskext.mail import Message
 
-from wtforms.validators import Required, ValidationError
-from wtforms.widgets import HiddenInput
 from wtforms import SubmitField, HiddenField
 
 from sqlalchemy.orm.exc import NoResultFound
@@ -80,10 +78,9 @@ def charge_stripe(payment):
 
     msg = Message("Your EMF ticket purchase",
         sender=app.config.get('TICKETS_EMAIL'),
-        recipients=[payment.user.email]
-    )
+        recipients=[payment.user.email])
     msg.body = render_template("tickets-purchased-email-stripe.txt",
-        user = payment.user, payment=payment)
+        user=payment.user, payment=payment)
     mail.send(msg)
 
     return redirect(url_for('stripe_waiting', payment_id=payment.id))
@@ -231,26 +228,26 @@ def stripe_default(type, obj_data):
 def stripe_ping(type, ping_data):
     return ('', 200)
 
-def get_payment_or_abort(charge_data):
+def get_payment_or_abort(charge_id):
     try:
-        return StripePayment.query.filter_by(chargeid=charge_data['id']).one()
+        return StripePayment.query.filter_by(chargeid=charge_id).one()
     except NoResultFound:
-        logger.error('Payment %s not found, ignoring', charge_data['id'])
+        logger.error('Payment for charge %s not found', charge_id)
         abort(409)
 
 @webhook('charge.succeeded')
 def stripe_charge_updated(type, charge_data):
-    payment = get_payment_or_abort(charge_data)
+    payment = get_payment_or_abort(charge_data['id'])
 
-    logging.info('Received %s message for payment %s', type, payment.id)
+    logging.info('Received %s message for charge %s, payment %s', type, charge_data['id'], payment.id)
 
     charge = stripe.Charge.retrieve(charge_data['id'])
     if not charge.paid:
-        logger.error('Charge payment %s is not paid')
+        logger.error('Charge object is not paid')
         abort(501)
 
     if charge.refunded:
-        logger.error('Charge payment %s has been refunded')
+        logger.error('Charge object has been refunded')
         abort(501)
 
     if payment.state == 'paid':
@@ -269,8 +266,7 @@ def stripe_charge_updated(type, charge_data):
 
     msg = Message('Your EMF ticket payment has been confirmed',
         sender=app.config.get('TICKETS_EMAIL'),
-        recipients=[payment.user.email],
-    )
+        recipients=[payment.user.email])
     msg.body = render_template('tickets-paid-email-stripe.txt',
         user=payment.user, payment=payment)
     mail.send(msg)
@@ -281,7 +277,7 @@ def stripe_charge_updated(type, charge_data):
 @webhook('charge.failed')
 @webhook('charge.updated')
 def stripe_charge_update(type, charge_data):
-    payment = get_payment_or_abort(charge_data)
+    payment = get_payment_or_abort(charge_data['id'])
     # If we need to deal with these, they should be rolled into stripe_charge_updated
     logging.critical('Unexpected charge event %s for payment %s: %s', type, payment.id, charge_data)
 
@@ -292,7 +288,7 @@ def stripe_charge_update(type, charge_data):
 @webhook('charge.dispute.updated')
 @webhook('charge.dispute.closed')
 def stripe_dispute_update(type, dispute_data):
-    payment = get_payment_or_abort(dispute_data)
+    payment = get_payment_or_abort(dispute_data['charge'])
     logging.critical('Unexpected charge dispute event %s for payment %s: %s', type, payment.id, dispute_data)
 
     # Don't block other events
