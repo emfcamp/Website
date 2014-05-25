@@ -4,57 +4,62 @@ else
 	SETTINGS=./config/live.cfg
 endif
 
+ifeq ("$(VIRTUAL_ENV)", "")
+  ENV=. env/bin/activate;
+endif
+
 run:
-	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./main.py
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./main.py
 
 init:
 	virtualenv ./env
 
 update:
-	./env/bin/python ./env/bin/pip install -r ./requirements.txt --use-mirrors
+	$(ENV) pip install -r ./requirements.txt --use-mirrors
 
 clean:
-	rm -rf .env
+	rm -rf ./env
 
 
 db:
-	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py createdb
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createdb
 
 data: tickets tokens shifts
 
 tickets:
-	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py createtickets
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createtickets
 
 tokens:
-	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py addtokens
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py addtokens
 
 shifts:
-	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py createroles
-	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py createshifts
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createroles
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createshifts
 
 
 checkreconcile:
-	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py reconcile
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py reconcile
 
 reallyreconcile:
-	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py reconcile -d
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py reconcile -d
 
 
 warnexpire:
-	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py warnexpire
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py warnexpire
 
 expire:
-	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py expire
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py expire
 
 
 shell:
-	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py shell
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py shell
 
 testemails:
-	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py testemails
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py testemails
 
 admin:
-	SETTINGS_FILE=$(SETTINGS) ./env/bin/python ./utils.py makeadmin
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py makeadmin
 
 test:
-	SETTINGS_FILE=./config/test.cfg flake8 ./models ./views --ignore=E501,F403,E302,F401,E128,W293,W391,E251,E303,E502,E111,E225,E221,W291,E124,W191,E101,E201,E202,E261,E127,E265,E231
+	$(ENV) SETTINGS_FILE=./config/test.cfg flake8 ./models ./views --ignore=E501,F403,E302,F401,E128,W293,W391,E251,E303,E502,E111,E225,E221,W291,E124,W191,E101,E201,E202,E261,E127,E265,E231
+
