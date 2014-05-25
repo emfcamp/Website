@@ -23,6 +23,13 @@ from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
+webhook_handlers = {}
+def webhook(type=None):
+    def inner(f):
+        webhook_handlers[type] = f
+        return f
+    return inner
+
 @app.route("/pay/stripe-start", methods=['POST'])
 @feature_flag('STRIPE')
 @login_required
@@ -183,68 +190,111 @@ def stripe_waiting(payment_id):
     )
     return render_template('stripe-waiting.html', payment=payment, days=app.config['EXPIRY_DAYS_STRIPE'])
 
+
 @csrf.exempt
 @app.route("/stripe-webhook", methods=['POST'])
 def stripe_webhook():
+    logger.debug('Stripe webhook called with %s', request.data)
     json_data = simplejson.loads(request.data)
-    logger.debug(json_data)
 
     try:
-        type = json_data['type']
-        if type != 'charge.succeeded' or json_data['object'] != 'event':
-            logger.warning('Unrecognised callback: %s %s', type, json_data['object'])
-            return abort(501)
+        if json_data['object'] != 'event':
+            logger.warning('Unrecognised callback object: %s', json_data['object'])
+            abort(501)
 
         livemode = not app.config.get('DEBUG')
         if json_data['livemode'] != livemode:
             logger.error('Unexpected livemode status %s, failing', json_data['livemode'])
-            return abort(409)
+            abort(409)
 
-        event = json_data['data']['object']
+        obj_data = json_data['data']['object']
+        type = json_data['type']
         try:
-            payment = StripePayment.query.filter_by(chargeid=event['id']).one()
-        except NoResultFound, e:
-            logger.error('Payment %s not found, ignoring', event['id'])
-            return abort(409)
+            handler = webhook_handlers[type]
+        except KeyError, e:
+            handler = webhook_handlers[None]
 
-        if event['currency'] != payment.currency.lower():
-            logging.error('Currency mismatch %s (should be %s)', event['currency'], payment.currency.lower())
-            abort(409)
-
-        if event['amount'] != payment.amount_int:
-            logging.error('Payment total mismatch %s (should be %s)', event['amount'], payment.amount_int)
-            abort(409)
-
-        if not event['paid']:
-            logging.error('Payment not paid')
-            abort(501)
-
-        if payment.state not in ['charged', 'paid']:
-            logger.error('Current payment state is %s (should be charged)', payment.state)
-            abort(409)
-
-        if payment.state == 'paid':
-            logger.warn('Payment is already paid, ignoring')
-            return ('', 200)
-
-        for t in payment.tickets.all():
-            t.paid = True
-
-        payment.state = 'paid'
-        db.session.commit()
-
-        msg = Message('Your EMF ticket payment has been confirmed',
-            sender=app.config.get('TICKETS_EMAIL'),
-            recipients=[payment.user.email],
-        )
-        msg.body = render_template('tickets-paid-email-stripe.txt',
-            user=payment.user, payment=payment)
-        mail.send(msg)
-
-        return ('', 200)
+        return handler(obj_data)
 
     except Exception, e:
         logger.error('Unexcepted exception during webhook: %r', e)
-        return abort(500)
+        abort(500)
 
+
+@webhook()
+def stripe_default(type, obj_data):
+    # We can fetch events with Event.all for 30 days
+    logger.warn('Default handler called for %s: %s', type, obj_data)
+    return ('', 200)
+
+@webhook('ping')
+def stripe_ping(type, ping_data):
+    return ('', 200)
+
+def get_payment_or_abort(charge_data):
+    try:
+        return StripePayment.query.filter_by(chargeid=charge_data['id']).one()
+    except NoResultFound:
+        logger.error('Payment %s not found, ignoring', charge_data['id'])
+        abort(409)
+
+@webhook('charge.succeeded')
+def stripe_charge_updated(type, charge_data):
+    payment = get_payment_or_abort(charge_data)
+
+    logging.info('Received %s message for payment %s', type, payment.id)
+
+    charge = stripe.Charge.retrieve(charge_data['id'])
+    if not charge.paid:
+        logger.error('Charge payment %s is not paid')
+        abort(501)
+
+    if charge.refunded:
+        logger.error('Charge payment %s has been refunded')
+        abort(501)
+
+    if payment.state == 'paid':
+        logger.warn('Payment is already paid, ignoring')
+        return ('', 200)
+
+    if payment.state != 'charged':
+        logger.error('Current payment state is %s (should be charged)', payment.state)
+        abort(409)
+
+    for t in payment.tickets.all():
+        t.paid = True
+
+    payment.state = 'paid'
+    db.session.commit()
+
+    msg = Message('Your EMF ticket payment has been confirmed',
+        sender=app.config.get('TICKETS_EMAIL'),
+        recipients=[payment.user.email],
+    )
+    msg.body = render_template('tickets-paid-email-stripe.txt',
+        user=payment.user, payment=payment)
+    mail.send(msg)
+
+    return ('', 200)
+
+@webhook('charge.refunded')
+@webhook('charge.failed')
+@webhook('charge.updated')
+def stripe_charge_update(type, charge_data):
+    payment = get_payment_or_abort(charge_data)
+    # If we need to deal with these, they should be rolled into stripe_charge_updated
+    logging.critical('Unexpected charge event %s for payment %s: %s', type, payment.id, charge_data)
+
+    # Don't block other events
+    return ('', 200)
+
+@webhook('charge.dispute.created')
+@webhook('charge.dispute.updated')
+@webhook('charge.dispute.closed')
+def stripe_dispute_update(type, dispute_data):
+    payment = get_payment_or_abort(dispute_data)
+    logging.critical('Unexpected charge dispute event %s for payment %s: %s', type, payment.id, dispute_data)
+
+    # Don't block other events
+    return ('', 200)
 
