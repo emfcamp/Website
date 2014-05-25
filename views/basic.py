@@ -68,8 +68,7 @@ def about():
 
 @app.route("/contact")
 def contact():
-    return render_template('splashcontact.html')
-    #return render_template('contact.html')
+    return redirect(url_for('main'))
 
 
 @app.route("/location")
