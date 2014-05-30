@@ -259,19 +259,17 @@ class CreateTickets(Command):
 
         data = [
             #(order, code, name, capacity, max per person, GBP, EUR, Description)
-            (2, 'full', 'Full Camp Ticket', 1000, 10, 95.00, 120.00, None),
-
-            (10, 'kids_u15', 'Under-15 Camp Ticket', 500, 10, 47.50, 60.00,
-                "All children must be accompanied by an adult."),
+            (2, 'full', 'Full Camp Ticket', 200, 10, 90.00, 115.00, None),
+            (10, 'kids_u16', 'Under-16 Camp Ticket', 500, 10, 40.00, 50.00,
+                "For visitors born after August 28th, 1998. "
+                "All under-16s  must be accompanied by an adult."),
             (10, 'kids_u5', 'Under-5 Camp Ticket', 50, 4, 0, 0,
+                "For children born after August 28th, 2009. "
                 "All children must be accompanied by an adult."),
-
-            (30, 'campervan', 'Campervan Ticket', 5, 1, 30.00, 40.00,
-                "Space for campervans is extremely limited. We'll email you for details of your requirements."),
-
+            (30, 'campervan', 'Camper Van Ticket', 5, 1, 30.00, 40.00, None),
             (30, 'parking', 'Parking Ticket', 25, 4, 15.00, 20.00,
                 "We're trying to keep cars on-site to a minimum. "
-                "Please use the nearby Park & Ride or find someone to share with if possible."),
+                "Please take public transport or find someone to share with if possible."),
         ]
 
         types = []
