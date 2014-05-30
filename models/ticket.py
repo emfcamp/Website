@@ -58,7 +58,7 @@ class TicketType(db.Model):
 class TicketPrice(db.Model):
     __tablename__ = 'ticket_price'
     id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.Integer, db.ForeignKey('ticket_type.code'), nullable=False)
+    code = db.Column(db.String, db.ForeignKey('ticket_type.code'), nullable=False)
     currency = db.Column(db.String, nullable=False)
     price_int = db.Column(db.Integer, nullable=False)
     type = db.relationship(TicketType, backref="prices")
@@ -81,7 +81,7 @@ class TicketToken(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     token = db.Column(db.String, nullable=False, index=True)
     expires = db.Column(db.DateTime, nullable=False)
-    code = db.Column(db.Integer, db.ForeignKey('ticket_type.code'), nullable=False)
+    code = db.Column(db.String, db.ForeignKey('ticket_type.code'), nullable=False)
     type = db.relationship(TicketType, backref="tokens")
 
     def __init__(self, token, expires):
@@ -102,7 +102,7 @@ class Ticket(db.Model):
     __tablename__ = 'ticket'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    code = db.Column(db.Integer, db.ForeignKey('ticket_type.code'), nullable=False, index=True)
+    code = db.Column(db.String, db.ForeignKey('ticket_type.code'), nullable=False, index=True)
     paid = db.Column(db.Boolean, default=False, nullable=False)
     expires = db.Column(db.DateTime, nullable=False)
     receipt = db.Column(db.String, unique=True)
