@@ -1,4 +1,4 @@
-from main import db, gocardless
+from main import db, gocardless, external_url
 from flask import url_for
 from sqlalchemy import event
 from sqlalchemy.orm import Session
@@ -74,8 +74,8 @@ class GoCardlessPayment(Payment):
         bill_url = gocardless.client.new_bill_url(
             amount=self.amount,
             name=name,
-            redirect_uri=url_for('gocardless_complete', payment_id=self.id, _external=True),
-            cancel_uri=url_for('gocardless_cancel', payment_id=self.id, _external=True),
+            redirect_uri=external_url('gocardless_complete', payment_id=self.id),
+            cancel_uri=external_url('gocardless_cancel', payment_id=self.id),
             currency=self.currency,
         )
 

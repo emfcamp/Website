@@ -1,4 +1,4 @@
-from main import app, db
+from main import app, db, external_url
 from views import (
     get_user_currency, set_user_currency, get_basket, TICKET_CUTOFF,
     CURRENCY_SYMBOLS,
@@ -337,7 +337,7 @@ def tickets_receipt(receipt):
 def tickets_receipt_qr(receipt):
 
     qrfile = StringIO()
-    qr = qrcode.make(url_for('tickets_receipt', receipt=receipt, _external=True), box_size=2)
+    qr = qrcode.make(external_url('tickets_receipt', receipt=receipt), box_size=2)
     qr.save(qrfile, 'PNG')
     qrfile.seek(0)
     return send_file(qrfile, mimetype='image/png')

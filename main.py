@@ -36,6 +36,12 @@ gocardless.set_details(app_id=app.config['GOCARDLESS_APP_ID'],
 
 stripe.api_key = app.config['STRIPE_SECRET_KEY']
 
+
+def external_url(endpoint, **values):
+    """ Generate an absolute external URL. url_for(_external=True) doesn't seem to work
+        if we're behind a proxy as in production """
+    return app.config.get('BASE_URL', 'https://www.emfcamp.org') + url_for(endpoint, **values)
+
 from views import *
 from models import *
 
