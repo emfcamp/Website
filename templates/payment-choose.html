@@ -18,7 +18,7 @@ If you're unsure about anything, please check out our <a href="http://wiki.emfca
 or drop us an <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email</a>.</p>
 
 {% if config.get('GOCARDLESS') %}
-<h3>Paying by Direct Debit</h3>
+<h3>Pay by Direct Debit</h3>
 
 <p>You can use GoCardless to create a one-off direct debit from your account.
 GoCardless payments are protected by the 
@@ -32,7 +32,7 @@ Guarantee</a>.</p>
 {% endif %}
 
 {% if config.get('BANK_TRANSFER') %}
-<h3>Paying By Bank Transfer</h3>
+<h3>Pay By Bank Transfer</h3>
 
 <p>Ask your bank to send it to us directly (this works online, or with cash in a branch).</p>
 
@@ -43,14 +43,14 @@ Guarantee</a>.</p>
 {% endif %}
 
 {% if config.get('STRIPE') %}
-<h3>Paying by Stripe</h3>
+<h3>Pay by Credit Card</h3>
 
 <p>Stripe will accept Visa, Mastercard or American Express, but we add 5% to cover the transaction fees.</p>
 <p>This will amount to {{ StripePayment.premium(user_currency, total) | price(user_currency) }}.</p>
 
 <form method="post" action="{{ url_for('stripe_start') }}">
 <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
-    <p><button type="submit" name="stripe" class="btn btn-large btn-primary">Pay by Stripe</button></p>
+    <p><button type="submit" name="stripe" class="btn btn-large btn-primary">Pay by credit card</button></p>
 </form>
 {% endif %}
 
