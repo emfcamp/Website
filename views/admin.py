@@ -56,7 +56,7 @@ def stats():
           ticket t,
           payment p
       where
-          and p.id = t.payment_id
+          p.id = t.payment_id
           and t.code like :code
           and (
             p.provider = 'gocardless' and p.state = 'inprogress' and t.expires > now()
@@ -73,7 +73,7 @@ def stats():
           ticket t,
           payment p
       where
-          and p.id = t.payment_id
+          p.id = t.payment_id
           and t.code like 'full%'
           and (
             p.provider = 'banktransfer' and p.state = 'inprogress'
