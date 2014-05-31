@@ -9,11 +9,11 @@ You can now buy full tickets for the camp, please reserve yours soon!
 
 You can keep track of your ticket purchases here:
 
-{{ url_for('tickets', _external=True) }}
+{{ external_url('tickets') }}
 
 If you forget your password you can reset it here:
 
-{{ url_for('forgot_password', _external=True) }}
+{{ external_url('forgot_password') }}
 
 See you soon at Electromagnetic Field 2014!
 

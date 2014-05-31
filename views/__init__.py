@@ -1,5 +1,5 @@
 # encoding=utf-8
-from main import app
+from main import app, external_url
 from flask import session, abort
 
 from models.ticket import Ticket
@@ -120,6 +120,7 @@ def utility_processor():
         TICKET_CUTOFF=TICKET_CUTOFF,
         CURRENCIES=CURRENCIES,
         CURRENCY_SYMBOLS=CURRENCY_SYMBOLS,
+        external_url=external_url
     )
 
 
