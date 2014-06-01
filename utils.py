@@ -267,7 +267,7 @@ class CreateTickets(Command):
                 "For children born after August 28th, 2009. "
                 "All children must be accompanied by an adult."),
             (30, 'campervan', 'Caravan/Campervan Ticket', 5, 1, 30.00, 40.00,
-                "You won't need a parking ticket for the towing car"),
+                "If you bring a caravan, you won't need a separate parking ticket for the towing car."),
             (30, 'parking', 'Parking Ticket', 25, 4, 15.00, 20.00,
                 "We're trying to keep cars on-site to a minimum. "
                 "Please take public transport or find someone to share with if possible."),
