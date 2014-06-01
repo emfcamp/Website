@@ -49,11 +49,4 @@ if __name__ == "__main__":
     if app.config.get('DEBUG'):
         db.create_all()
 
-    if app.config.get('FIX_URL_SCHEME'):
-        from flask import request, _request_ctx_stack
-        @app.before_request
-        def fix_url_scheme():
-            request.environ['wsgi.url_scheme'] = 'https'
-            _request_ctx_stack.top.url_adapter.url_scheme = 'https'
-
     app.run()
