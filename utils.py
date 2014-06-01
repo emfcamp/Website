@@ -280,9 +280,20 @@ class CreateTickets(Command):
             types.append(tt)
 
         for tt in types:
-            if not TicketType.query.get(tt.code):
+            existing_tt = TicketType.query.get(tt.code)
+            if existing_tt:
+                print 'Refreshing TicketType %s' % tt.code
+                for f in ['name', 'capacity', 'limit', 'order', 'notice']:
+                    cur_val = getattr(existing_tt, f)
+                    new_val = getattr(tt, f)
+                    if cur_val != new_val:
+                        print ' %10s: %r -> %r' % (f, cur_val, new_val)
+                        setattr(existing_tt, f, new_val)
+            else:
+                print 'Adding TicketType %s' % tt.code
                 db.session.add(tt)
-                db.session.commit()
+
+            db.session.commit()
 
         print 'Tickets created'
         
