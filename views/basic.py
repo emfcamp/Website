@@ -35,11 +35,6 @@ def favicon():
                                    'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
-@app.route("/sponsors")
-def sponsors():
-    return render_template('sponsors.html')
-
-
 @app.route("/talks")
 def talks():
 
@@ -61,29 +56,14 @@ def company():
     return render_template('company.html')
 
 
-@app.route("/about")
-def about():
-    return render_template('about.html')
-
-
-@app.route("/contact")
-def contact():
-    return redirect(url_for('main'))
-
-
-@app.route("/location")
-def location():
-    return render_template('location.html')
-
-
 @app.route("/participating")
-def participating():
-    return render_template('participating.html')
-
-
 @app.route("/get_involved")
-def get_involved():
-    return render_template('get_involved.html')
+@app.route("/contact")
+@app.route("/location")
+@app.route("/about")
+@app.route("/sponsors")
+def old_urls_2012():
+    return redirect(url_for('main'))
 
 
 @app.route('/badge')
