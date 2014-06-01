@@ -30,7 +30,17 @@
       <span class="help-inline">{{ error }}</span>
       {% endfor %}
       <p>But to save time later, feel free to add your mobile/phone number now:</p>
-      <p><i class="glyphicon glyphicon-earphone"></i> {{ phone() }}</p>
+      <div class="form-group{% if phone.errors %} error{% endif %}">
+        <label class="control-label sr-only">{{ phone.label }}</label>
+        <i class="glyphicon glyphicon-earphone control-label col-xs-1"></i>
+        <div class="controls col-xs-4">{{ phone(class_='form-control')|safe }}
+          {% if phone.errors %}
+              {% for error in phone.errors %}
+                <span class="help-inline">{{ error }}</span>
+              {% endfor %}
+          {% endif %}
+        </div>
+      </div>
     </div>
   </div>
 </div>
