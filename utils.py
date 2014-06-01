@@ -266,7 +266,8 @@ class CreateTickets(Command):
             (10, 'kids_u5', 'Under-5 Camp Ticket', 50, 4, 0, 0,
                 "For children born after August 28th, 2009. "
                 "All children must be accompanied by an adult."),
-            (30, 'campervan', 'Camper Van Ticket', 5, 1, 30.00, 40.00, None),
+            (30, 'campervan', 'Caravan/campervan Ticket', 5, 1, 30.00, 40.00,
+                "You won't need a parking ticket for the towing car"),
             (30, 'parking', 'Parking Ticket', 25, 4, 15.00, 20.00,
                 "We're trying to keep cars on-site to a minimum. "
                 "Please take public transport or find someone to share with if possible."),
