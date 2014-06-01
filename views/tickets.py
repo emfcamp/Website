@@ -203,32 +203,30 @@ def tickets_choose():
         f.amount.values = values
         f._any = any(values)
 
-    if form.currency.data in ('GBP', 'EUR'):
+    if form.validate_on_submit():
         set_user_currency(form.currency.data)
-    else:
-        app.logger.warn('Invalid currency %s', form.currency.data)
 
-    if form.validate_on_submit() and form.buy.data:
-        basket = []
-        for f in form.types:
-            if f.amount.data:
-                tt = f._type
+        if form.buy.data:
+            basket = []
+            for f in form.types:
+                if f.amount.data:
+                    tt = f._type
 
-                if tt.code in token_only and tt not in token_tts:
-                    if f.amount.data:
-                        flash('Ticket type %s is not currently available')
-                    return redirect(url_for('tickets_choose'))
+                    if tt.code in token_only and tt not in token_tts:
+                        if f.amount.data:
+                            flash('Ticket type %s is not currently available')
+                        return redirect(url_for('tickets_choose'))
 
-                app.logger.info('Adding %s %s tickets to basket', f.amount.data, tt.name)
-                basket += [tt.code] * f.amount.data
+                    app.logger.info('Adding %s %s tickets to basket', f.amount.data, tt.name)
+                    basket += [tt.code] * f.amount.data
 
-        if basket:
-            session['basket'] = basket
+            if basket:
+                session['basket'] = basket
 
-            if current_user.is_authenticated():
-                return redirect(url_for('tickets_info'))
-            else:
-                return redirect(url_for('signup', next=url_for('tickets_info')))
+                if current_user.is_authenticated():
+                    return redirect(url_for('tickets_info'))
+                else:
+                    return redirect(url_for('signup', next=url_for('tickets_info')))
 
     if request.method == 'POST' and form.update_currency.data:
         app.logger.info('User running without Javascript: updated currency only')
