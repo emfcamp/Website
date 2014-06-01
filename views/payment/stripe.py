@@ -66,15 +66,21 @@ def charge_stripe(payment):
         return redirect(url_for('stripe_tryagain', payment_id=payment.id))
 
     payment.chargeid = charge.id
-    payment.state = "charged"
+    if charge.paid:
+        payment.state = 'paid'
 
-    for t in payment.tickets:
-        t.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS_STRIPE'])
-        logger.info("Reset expiry for ticket %s", t.id)
+        for t in payment.tickets:
+            t.paid = True
+    else:
+        payment.state = 'charged'
+
+        for t in payment.tickets:
+            t.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS_STRIPE'])
+            logger.info("Set expiry for ticket %s", t.id)
 
     db.session.commit()
 
-    logger.info("Payment %s completed OK", payment.id)
+    logger.info('Payment %s completed OK (state %s)', payment.id, payment.state)
 
     msg = Message("Your EMF ticket purchase",
         sender=app.config.get('TICKETS_EMAIL'),

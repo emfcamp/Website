@@ -6,8 +6,10 @@ This is to confirm that you've bought
 {% include "email-tickets.txt" %}
 Your charge ID from Stripe was {{ payment.chargeid }}.
 
+{% if payment.state == 'charged' %}
 We expect to receive confirmation from Stripe shortly. We will
 send you an email when we do.
+{% endif %}
 
 See you soon,
 
