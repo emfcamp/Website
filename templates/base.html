@@ -47,7 +47,7 @@
 <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
 {% block foot -%}{% endblock -%}
-{% if request.headers.get('dnt') != '1' %}
+{% if not config.get('DEBUG') and request.headers.get('dnt') != '1' %}
 <script type="text/javascript">
 
   var _gaq = _gaq || [];
