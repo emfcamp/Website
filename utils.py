@@ -269,7 +269,7 @@ class CreateTickets(Command):
             (30, 'parking', 'Parking Ticket', 200, 4, 15.00, 20.00,
                 "We're trying to keep cars on-site to a minimum. "
                 "Please take public transport or find someone to share with if possible."),
-            (35, 'campervan', 'Caravan/Campervan Ticket', 50, 1, 30.00, 40.00,
+            (35, 'campervan', 'Caravan/Campervan Ticket', 30, 1, 30.00, 40.00,
                 "If you bring a caravan, you won't need a separate parking ticket for the towing car."),
         ]
 
