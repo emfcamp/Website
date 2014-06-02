@@ -260,6 +260,9 @@ class CreateTickets(Command):
         data = [
             #(order, code, name, capacity, max per person, GBP, EUR, Description)
             (5, 'full', 'Full Camp Ticket', 200, 10, 90.00, 115.00, None),
+            (6, 'full_supporter', 'Full Camp Ticket (Supporter)', 200, 10, 150.00, 190.00,
+                "Support this non-profit event by paying a little more. "
+                "All money will go towards making EMF more awesome."),
             (10, 'kids_u16', 'Under-16 Camp Ticket', 500, 10, 40.00, 50.00,
                 "For visitors born after August 28th, 1998. "
                 "All under-16s  must be accompanied by an adult."),
