@@ -5,7 +5,7 @@
 <div class="col-md-10">
 <h2>Call for Participation</h2>
 {% if not current_user.is_authenticated() %}
-<p>If you've already signed up, you might want to <a href="{{ url_for('login') }}">log in</a>.</p>
+<p>If you've already signed up this year, you might want to <a href="{{ url_for('login') }}">log in</a>.</p>
 {% endif %}
 <p>(Talk blurb goes here)</p>
 <form method="post" class="form-horizontal">
