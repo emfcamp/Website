@@ -257,7 +257,7 @@ def stripe_charge_updated(type, charge_data):
         abort(501)
 
     if payment.state == 'paid':
-        logger.warn('Payment is already paid, ignoring')
+        logger.info('Payment is already paid, ignoring')
         return ('', 200)
 
     if payment.state != 'charged':
