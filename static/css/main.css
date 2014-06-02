@@ -220,3 +220,11 @@ form.wave-cfp input, form.wave-cfp textarea {
 #splash .jumbotron {
     background-color: inherit;
 }
+
+.tickets-table label {
+  font-size: 110%;
+}
+
+.tickets-table p.description {
+  font-size: 90%;
+}
