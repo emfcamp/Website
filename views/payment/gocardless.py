@@ -62,7 +62,7 @@ def gocardless_tryagain(payment_id):
         return redirect(url_for('tickets'))
 
     logger.info("Trying payment %s again", payment.id)
-    bill_url = payment.bill_url("Electromagnetic Field Ticket Deposit")
+    bill_url = payment.bill_url("Electromagnetic Field Tickets")
     logger.debug('Bill URL for GoCardless: %s', bill_url)
     return redirect(bill_url)
 
