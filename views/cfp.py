@@ -44,6 +44,7 @@ def cfp():
         return redirect(url_for('cfp_complete'))
 
     if current_user.is_authenticated():
+        form.name.data = current_user.name
         form.email.data = current_user.email
 
     return render_template('cfp.html', form=form)

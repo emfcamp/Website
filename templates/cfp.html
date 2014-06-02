@@ -11,7 +11,7 @@
 <form method="post" class="form-horizontal">
   <fieldset>
     {{ form.hidden_tag() }}
-    {{ render_field(form.name) }}
+    {{ render_field(form.name, placeholder='Your name') }}
     {{ render_field(form.email) }}
     {{ render_field(form.title, placeholder='A summary for the schedule') }}
     {{ render_field(form.description, placeholder='Description (less than 200 words)') }}
