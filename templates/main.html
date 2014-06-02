@@ -33,8 +33,14 @@
 
         {% if ticket_sales %}
         <div class="jumbotron">
+          {% if full_price == 90 %}
+          <p>Early bird tickets are now on sale for £90.</p>
+          {% elif full_price == 95 %}
           <p>Early bird tickets are sold out!</p>
           <p>Tickets are now on sale for £95.</p>
+          {% else %}
+          <p>Tickets are now on sale for £{{ full_price }}.</p>
+          {% endif %}
           <a href="/tickets/choose" class="btn btn-primary btn-lg" role="button">Buy Tickets Now</a>
         </div>
         {% else %}
