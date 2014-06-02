@@ -144,7 +144,7 @@ def stripe_tryagain(payment_id):
         return redirect(url_for('tickets'))
 
     if payment.state == 'new':
-        return redirect('stripe_capture', payment_id=payment.id)
+        return redirect(url_for('stripe_capture', payment_id=payment.id))
 
     form = StripeChargeAgainForm()
     if form.validate_on_submit():
