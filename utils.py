@@ -64,7 +64,8 @@ class Reconcile(Command):
       # FITID		: id     <-- also ?
       # TRNAMT		: amount <-- this is important...
       # DTPOSTED	: date   
-      self.reconcile(t.payee, Decimal(t.amount), t)
+      if t.date > datetime(2014, 1, 1):
+        self.reconcile(t.payee, Decimal(t.amount), t)
     
     if len(self.badrefs) > 0:
       print

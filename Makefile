@@ -38,10 +38,12 @@ shifts:
 
 
 checkreconcile:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py reconcile
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py reconcile -f var/data.ofx
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py reconcile -f var/data-eur.ofx
 
 reallyreconcile:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py reconcile -d
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py reconcile -f var/data.ofx -d
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py reconcile -f var/data-eur.ofx -d
 
 
 warnexpire:
