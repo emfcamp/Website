@@ -248,33 +248,38 @@ def build_info_form(formdata):
     if not basket:
         return None, basket, total
 
-    form = TicketInfoForm(formdata)
+    parent_form = TicketInfoForm(formdata)
 
-    forms = [getattr(form, f) for f in ticket_forms]
+    # First, filter to the currently exposed forms
+    forms = [getattr(parent_form, f) for f in ticket_forms]
 
     if not any(forms):
-
+        # Nothing submitted, so create forms for the basket
         for i, ticket in enumerate(basket):
             name = get_form_name(ticket.type)
             if not name:
                 continue
 
-            f = getattr(form, name)
+            f = getattr(parent_form, name)
             f.append_entry()
             ticket.form = f[-1]
             ticket.form.ticket_id.data = i
 
         if not any(forms):
+            # No forms to fill
             return None, basket, total
 
     else:
-        # FIXME: plays badly with multiple tabs
+        # If we have some details, match them to the basket
+        # FIXME: doesn't play well with multiple browser tabs
         form_tickets = [t for t in basket if get_form_name(t.type)]
         entries = sum([f.entries for f in forms], [])
         for ticket, subform in zip(form_tickets, entries):
             ticket.form = subform
 
-    return form, basket, total
+    # FIXME: check that there aren't any surplus submitted forms
+
+    return parent_form, basket, total
 
 @app.route("/tickets/info", methods=['GET', 'POST'])
 @login_required
