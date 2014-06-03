@@ -286,7 +286,7 @@ def build_info_form(formdata):
 def tickets_info():
     form, basket, total = build_info_form(request.form)
     if not form:
-        return redirect(url_for('tickets'))
+        return redirect(url_for('pay_choose'))
 
     if form.validate_on_submit():
         if form.back.data:
