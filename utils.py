@@ -55,7 +55,7 @@ class Reconcile(Command):
 
     data = ofxparse.OfxParser.parse(file(filename))
 
-    for t in data.account.statement.transactions:
+    for txn in data.account.statement.transactions:
       # field mappings:
       # 
       # NAME 		: payee  <-- the ref we want
@@ -64,8 +64,8 @@ class Reconcile(Command):
       # FITID		: id     <-- also ?
       # TRNAMT		: amount <-- this is important...
       # DTPOSTED	: date   
-      if t.date > datetime(2014, 1, 1) and t.amount > 0:
-        self.reconcile(t.payee, Decimal(t.amount), t)
+      if txn.date > datetime(2014, 1, 1) and txn.amount > 0:
+        self.reconcile(txn)
     
     if len(self.badrefs) > 0:
       print
@@ -82,86 +82,66 @@ class Reconcile(Command):
     # where name may contain multiple chars, and XXX is a 3 letter code
     # originating bank(?)
     #
-    found = re.findall('[%s]{4}-?[%s]{4}' % (safechars, safechars), ref)
+    found = re.findall('[%s]{4}[- ]?[%s]{4}' % (safechars, safechars), ref)
     for f in found:
-      bankref = f.replace('-', '')
+      bankref = f.replace('-', '').replace(' ', '')
       try:
         return BankPayment.query.filter_by(bankref=bankref).one()
       except NoResultFound:
         continue
     else:
       #
-      # some refs are missed typed so we have a list
+      # some refs are mistyped so we have a list
       # of fixes to make them match
       #
       if name in self.ref_fixups:
         return BankPayment.query.filter_by(bankref=self.ref_fixups[name]).one()
       raise ValueError('No matches found ', name)
 
-  def reconcile(self, ref, amount, t):
-    if t.type.lower() == 'other' or t.type.upper() == "DIRECTDEP":
-      if str(ref).startswith("GOCARDLESS LTD "):
-        # ignore gocardless payments
-        return
-      try:
-        payment = self.find_payment(ref)
-      except Exception, e:
-        if not self.quiet:
-          print "Exception matching ref %s paid %.2f: %s" % (repr(ref), amount, e)
-        self.badrefs.append([repr(ref), amount])
-      else:
-        user = payment.user
-        #
-        # so now we have the ref and an amount
-        #
-
-        if payment.state == "paid" and (Decimal(payment.amount_int) / 100) == amount:
-          # all paid up, great lets ignore this one.
-          self.alreadypaid += 1
-          return
-
-        unpaid = payment.tickets.all()
-        total = Decimal(0)
-        for t in unpaid:
-          if t.paid == False:
-            total += Decimal(str(t.type.get_price(payment.currency)))
-          elif not self.quiet:
-            if payment.id not in self.overpays:
-              print "attempt to pay for paid ticket: %d, user: %s, payment id: %d, paid: %.2f, ref %s" % (t.id, payment.user.name, payment.id, amount, ref)
-
-        if total == 0:
-          # nothing owed, so an old payment...
-          return
-          
-        if total != amount and payment.id not in self.overpays:
-          print "tried to reconcile payment %s for %s, but amount paid (%.2f) didn't match amount owed (%.2f)" % (ref, user.name, amount, total)
-        else:
-          # all paid up.
-          if not self.quiet:
-            print "user %s paid for %d (%.2f) tickets with ref: %s" % (user.name, len(unpaid), amount, ref)
-          
-          self.paid += 1
-          self.tickets_paid += len(unpaid)
-          if self.doit:
-            for t in unpaid:
-              t.paid = True
-            payment.state = "paid"
-            db.session.commit()
-            # send email
-            # tickets-paid-email-banktransfer.txt
-            msg = Message("Electromagnetic Field ticket purchase update",
-                          sender=app.config['TICKETS_EMAIL'],
-                          recipients=[payment.user.email]
-                         )
-            msg.body = render_template("tickets-paid-email-banktransfer.txt",
-                          user = payment.user, payment=payment
-                         )
-            mail.send(msg)
-
-    else:
+  def reconcile(self, txn):
+    if txn.type.lower() not in ('other', 'directdep'):
       if not self.quiet:
-        print t, t.type, t.payee
+        print 'Ignoring "%s" transaction from %s' % (txn.type, txn.payee)
+      return
+
+    if txn.payee.startswith("GOCARDLESS LTD "):
+      # silently ignore gocardless payments
+      return
+
+    try:
+      payment = self.find_payment(txn.payee)
+    except Exception, e:
+      if not self.quiet:
+        print "Exception matching %s: %s" % (txn.payee, e)
+      self.badrefs.append((txn.payee, txn.amount))
+      return
+
+    amount = Decimal(txn.amount)
+    if payment.amount != amount:
+       print "Tried to reconcile payment %s for %s, but amount paid (%.2f) didn't match amount owed (%.2f)" % (txn.payee, payment.user.name, amount, payment.amount)
+
+    if payment.state == 'paid':
+      self.alreadypaid += 1
+      return
+
+    if not self.quiet:
+      print "User %s paid for payment %s with ref: %s" % (payment.user.name, payment.id, txn.payee)
     
+    self.paid += 1
+    self.tickets_paid += len(payment.tickets.all())
+    if self.doit:
+      for t in payment.tickets:
+        t.paid = True
+      payment.state = "paid"
+      db.session.commit()
+
+      msg = Message("Electromagnetic Field ticket purchase update",
+                    sender=app.config['TICKETS_EMAIL'],
+                    recipients=[payment.user.email])
+      msg.body = render_template("tickets-paid-email-banktransfer.txt",
+                    user=payment.user, payment=payment)
+      mail.send(msg)
+
 
 class TestEmails(Command):
   """
