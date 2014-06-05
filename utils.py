@@ -40,19 +40,11 @@ class Reconcile(Command):
   alreadypaid = 0
   paid = 0
   tickets_paid = 0
-  ref_fixups = {}
-  overpays = {}
 
   def run(self, filename, doit, quiet):
     self.doit = doit
     self.quiet = quiet
     
-    if os.path.exists("/etc/emf/reffixups.py"):
-      sys.path.append("/etc/emf")
-      import reffixups
-      self.ref_fixups = reffixups.fixups
-      self.overpays = reffixups.overpays
-
     data = ofxparse.OfxParser.parse(file(filename))
 
     for txn in data.account.statement.transactions:
@@ -90,12 +82,6 @@ class Reconcile(Command):
       except NoResultFound:
         continue
     else:
-      #
-      # some refs are mistyped so we have a list
-      # of fixes to make them match
-      #
-      if name in self.ref_fixups:
-        return BankPayment.query.filter_by(bankref=self.ref_fixups[name]).one()
       raise ValueError('No matches found ', name)
 
   def reconcile(self, txn):
