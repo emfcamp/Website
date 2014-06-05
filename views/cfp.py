@@ -1,5 +1,5 @@
 from main import app, db
-from views import TelField, Form, feature_flag
+from views import Form, feature_flag
 from models.cfp import Proposal
 
 from flask import (
@@ -14,7 +14,7 @@ from wtforms.validators import Required, Email
 from wtforms import (
     SubmitField, BooleanField, TextField,
     DecimalField, FieldList, FormField,
-    TextAreaField,
+    TextAreaField, SelectField
 )
 
 from datetime import datetime, timedelta
@@ -25,6 +25,16 @@ class ProposalForm(Form):
     title = TextField('Title', [Required()])
     description = TextAreaField('Description', [Required()])
     length = TextField('Duration', [Required()])
+    experience = SelectField('Have you given a talk/workshop before?',
+                             choices=[(1, "It's my first time"),
+                                      (2, "I've talked before"),
+                                      (3, "I've given this talk before")
+                                      ])
+    age = TextField('Age')
+    gender = TextField('Gender')
+    race = TextField('Race')
+    background = TextField('Background')
+
     propose = TextField('Submit')
 
 @app.route('/cfp', methods=['GET', 'POST'])

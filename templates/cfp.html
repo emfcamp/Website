@@ -2,93 +2,58 @@
 
 {% extends "base.html" %}
 {% block body %}
-<div class="col-md-10">
+<div class="col-md-2"></div>
+<div class="col-md-8">
 <h2>Call for Participation</h2>
+<p>Electromagnetic Field is a UK camping festival for those with an inquisitive mind or an interest in making things: hackers, artists, geeks, crafters, scientists, and engineers. It's happening near Bletchley, Buckinghamshire on August 29th &mdash; 31st, and tickets are <a href="/">on sale now</a> for about £95. Our last festival in 2012 had 600 attendees, this year we'll have over 1,200.</p>
+
+<p>We're looking for people to talk, share, and demonstrate the things they love. We're especially keen to hear from people with <a href="/diversity">different backgrounds</a> than you'd expect find at a technology conference. We're not just looking for talks: we also want installations, workshops, and games.</p>
+
+<p>At previous events we've heard about everything from <b>genetic modification</b> to <b>electronics</b>, <b>blacksmithing</b> to <b>high-energy physics</b>, <b>reverse engineering</b> to <b>lock picking</b>, <b>computer security</b> to <b>crocheting</b>, and <b>quadcopters</b> to <b>beer brewing</b>.
+</p>
+
+<p>If you're enthusiastic about it, we are too! You don't need to be a professional or an expert to present: <strong>impostors are welcome</strong>.</p>
+
+<h3>Selection</h3>
+
+<p>After you submit a proposal, it will be considered anonymously by a diverse selection panel. We may take into account other factors later on in the process to see where we can support you.</p>
+
+<p>EMF is a non-profit event run by unpaid volunteers. 100% of the ticket cost goes towards making
+this festival a great place to be for a weekend, and everyone who attends helps to make the festival
+a success.</p>
+
+<p>We have a limited amount of money set aside to help those who wouldn't be able to afford coming.</p>
+
+
+
+<h3>Submit a proposal</h3>
+<p>We need a rough idea of what you want to present at EMF, what sort of resources you'll need, and how long you'll expect it to last. If you need some help writing your proposal, <a href="mailto:content@emfcamp.org">we're happy to help</a>. If you're not confident talking we'll help you out however we can.</p>
+
+
 {% if not current_user.is_authenticated() %}
-<p>If you've already signed up this year, you might want to <a href="{{ url_for('login') }}">log in</a>.</p>
+<p>If you've already bought a ticket for this year, please <a href="{{ url_for('login') }}">log in</a>.</p>
 {% endif %}
-<p>If you'd like to give a talk or workshop at EMF, we need some simple information from you.</p>
-
-
-Electromagnetic Field is a UK camping festival for those with an inquisitive mind or an interest in making things: hackers, artists, geeks, crafters, scientists, and engineers. It's happening in Milton Keynes on August 29th - 31st, and tickets are on sale now for about 95 GBP. In 2012 we had over 500 people, this year we'll have over 1,250.
-
-We're looking for people to talk, share, and demonstrate the things they love. We're especially interested to hear from people from different backgrounds, races, genders, and ages. 
-
-We've had talks on everything from computer security to crocheting, genetic modification to electronics, blacksmithing to high-energy physics, reverse engineering to lock picking, quadcopters to beer brewing, bees to the space shuttle, scientific cooking to zombie makeup, and everything in between. We want to show things people can make, explore, and play with, rather than things people can buy, consume, or subscribe to. 
-
-If you're enthusiastic about it, we are too! You don't need to be a professional or an expert to present: Impostors are welcome. 
-
-We're looking for talks about 30 minutes long, but we can give your more or less time if you want. We also want art installations, workshops, and games too.
-
-When you submit a proposal a diverse panel will select talks based on your proposal without knowing who you are. We may take into account other factors later on in the process to see where we can support you. We have some money set aside to help those who wouldn't be able to afford coming: Get in touch if you need it.
-
-We need a rough idea of what you intend to present at EMF, what sort of resources, props, or equipment you'll need, and how long you'll expect it to last. If you need some help writing your proposal, Ask. If you're not confident talking we'll provide training and support before your slot. From you we'll need the following things:
-
-    A one sentence summary (it should fit in a tweet):
-
-    Longer, but not too rambling explanation:
-
-    What format:
-        talk | workshop | installation | other 
-
-    How long do you need:
-        5 | 15 | 30 | 45 | A few hours | One day | Two days | All weekend
-
-    Have you given a talk/workshop before:
-        It's my first time! | I've talked before | I've given this talk before
-
-    What sort of equipment will you need to run this?
-
-    Will the audience require anything in advance?
-
-If you're comfortable telling us a little bit about yourself, we'd appreciate it. We won't be using this to select talks but we want to know how well we're doing with outreach.
-
-    Background information (this will not be seen by the selection panel, and is entirely optional): 
-        Age, Gender, Race, Background [[ These should be text fields! ]]
-
-Don't worry if you can't think of anything yet, we love improvisation. There will be lightning talks, ad-hoc workshops, and other unplanned events happening throughout the weekend.  If talks or workshops aren't your thing but you still want to help out, ask us. We're all volunteers too, and any time or effort you can donate would be fantastic.
-
-
-* Selection process
-** Blind selection, with three talks per day being actively recruited by the team
-
-* Information we're gathering (and how public it is)
-** None of this information will be public, we'll ask you for final information before the event
-
-* Installation/shiny budget
-
-* What's expected of speakers
-** Arrive at the green room/media tent 15mins before the talk
-** Abide by the CoC
-** No Q&A. Hang around the green room/media tent for 30mins after the talk for questions
-
-* You have to buy your own ticket...but
-* If you can't attend EMF for the full event, we can offer you a free day ticket so that you may speak
-
-* Length of talk, how it should run
-** Talks can either be lightning talks and have a ten minute slot, a 30 minute slot, or a 
-
-* Talks with props and equipment
-* Equipment provided
-* Workshops, and how they work
-
-* Imposters welcome
-** We've had talks on everything from computer security to crocheting, genetic modification to electronics, blacksmithing to high-energy physics, reverse engineering to lock picking, quadcopters to beer brewing, bees to the space shuttle, scientific cooking to zombie makeup, and everything in between.
-** We love people organising impromptu events - organise a geocache, give a talk in the middle of hay bales. Perform shakespeare.
-** 
-
-* Are you attending for the full event? If you don't know, say so.
-
-
-
-<form method="post" class="form-horizontal">
+<form method="post">
   <fieldset>
     {{ form.hidden_tag() }}
     {{ render_field(form.name, placeholder='Your name') }}
     {{ render_field(form.email) }}
-    {{ render_field(form.title, placeholder='A summary for the schedule') }}
-    {{ render_field(form.description, placeholder='Description (less than 200 words)') }}
+    {{ render_field(form.title, placeholder='A one-sentence summary (it should fit in a tweet)') }}
+    {{ render_field(form.description, placeholder='Description and any requirements') }}
     {{ render_field(form.length, placeholder='Your best guess, whether in minutes or days') }}
+    {{ render_field(form.experience) }}
+  </fieldset>
+  <fieldset>
+    <p>If you're comfortable telling us a little bit about yourself, we'd appreciate it.
+       This information won't be available to the selection panel - we'll only use it to help find out
+       how well we're doing with outreach:</p>
+    {{ render_field(form.age) }}
+    {{ render_field(form.gender) }}
+    {{ render_field(form.race) }}
+    {{ render_field(form.background) }}
+  </fieldset>
+
+  <fieldset>
     <div class="form-actions">
       <button type="submit" name="Create" class="btn btn-primary">Submit proposal</button>
     </div>
