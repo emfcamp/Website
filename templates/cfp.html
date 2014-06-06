@@ -70,8 +70,8 @@ can.</p>
 
   <fieldset>
     {{ form.hidden_tag() }}
-    {{ render_field(form.name, placeholder='Your name') }}
-    {{ render_field(form.email) }}
+    {{ render_field(form.name, placeholder='The name you want to appear in the schedule') }}
+    {{ render_field(form.email, placeholder='Email address we can contact you on') }}
     {{ render_field(form.title, placeholder='A one-sentence summary (it should fit in a tweet)') }}
     {{ render_field(form.description, placeholder='Description and any requirements') }}
     {{ render_field(form.length, placeholder='Your best guess, whether in minutes or days') }}
@@ -84,7 +84,6 @@ can.</p>
     {{ render_field(form.age) }}
     {{ render_field(form.gender) }}
     {{ render_field(form.race) }}
-    {{ render_field(form.background) }}
   </fieldset>
 
   <fieldset>
