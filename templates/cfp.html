@@ -55,7 +55,7 @@ can.</p>
 <p>If you've already bought a ticket for this year, please <a href="{{ url_for('login') }}">log in</a>.</p>
 {% endif %}
 
-<form method="post">
+<form method="post" class="form-horizontal" role="form">
   <ul class="nav nav-tabs cfp-types">
     {% for cfp_type in cfp_types %}
       {% if cfp_type.code == active_cfp_type %}
@@ -68,29 +68,23 @@ can.</p>
     {% endfor %}
   </ul>
 
-  <fieldset>
     {{ form.hidden_tag() }}
-    {{ render_field(form.name, placeholder='The name you want to appear in the schedule') }}
-    {{ render_field(form.email, placeholder='Email address we can contact you on') }}
-    {{ render_field(form.title, placeholder='A one-sentence summary (it should fit in a tweet)') }}
-    {{ render_field(form.description, placeholder='Description and any requirements') }}
-    {{ render_field(form.length, placeholder='Your best guess, whether in minutes or days') }}
-    {{ render_field(form.experience) }}
-  </fieldset>
-  <fieldset>
+    {{ render_field(form.name, True, placeholder='The name you want to appear in the schedule') }}
+    {{ render_field(form.email, True, placeholder='Email address we can contact you on') }}
+    {{ render_field(form.title, True, placeholder='A one-sentence summary (it should fit in a tweet)') }}
+    {{ render_field(form.description, True, placeholder='Description and any requirements') }}
+    {{ render_field(form.length, True, placeholder='Your best guess, whether in minutes or days') }}
+    {{ render_field(form.experience, True) }}
     <p>If you're comfortable telling us a little bit about yourself, we'd appreciate it.
        This information won't be available to the selection panel - we'll only use it to help find out
        how well we're doing with outreach:</p>
-    {{ render_field(form.age) }}
-    {{ render_field(form.gender) }}
-    {{ render_field(form.race) }}
-  </fieldset>
+    {{ render_field(form.age, True) }}
+    {{ render_field(form.gender, True) }}
+    {{ render_field(form.race, True) }}
 
-  <fieldset>
     <div class="form-actions">
       <button type="submit" name="Create" class="btn btn-primary">Submit proposal</button>
     </div>
-  </fieldset>
 </form>
 </div>
 {% endblock %}

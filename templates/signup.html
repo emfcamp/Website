@@ -10,11 +10,11 @@
 <form method="post" role="form" class="form-horizontal">
   <fieldset>
   {{ form.hidden_tag() }}
-    {{ render_field(form.name) }}
-    {{ render_field(form.email) }}
-    {{ render_field(form.password) }}
-    {{ render_field(form.confirm) }}
-  <div class="form-actions">
+    {{ render_field(form.name, True) }}
+    {{ render_field(form.email, True) }}
+    {{ render_field(form.password, True) }}
+    {{ render_field(form.confirm, True) }}
+  <div class="form-actions col-sm-offset-3 col-sm-9">
       <button type="submit" name="Create" class="btn btn-primary">Register Now</button>
   </div>
   </fieldset>
