@@ -1,13 +1,16 @@
-{% macro render_field(field, horizontal=False) %}
-<div class="form-group{% if field.errors %} error{% endif %}">
-  <label for="{{field.name}}" class="{%if horizontal %}col-sm-3 {% endif %}control-label">{{ field.label.text }}</label>
-  <div class="{%if horizontal %}col-sm-9 {% endif %}controls">
+{% macro render_field(field, horizontal=False, glyphicon=None) %}
+<div class="form-group {%- if field.errors %} error {%- endif %}{%- if glyphicon %} has-feedback {%- endif %}">
+  <label for="{{ field.name }}" class="{% if horizontal -%} col-sm-3 {% endif -%} control-label">{{ field.label.text }}</label>
+  <div class="{% if horizontal -%} col-sm-9 {% endif -%} controls">
     {{ field(class_='form-control', **kwargs)|safe }}
+    {%- if glyphicon %}
+    <span class="glyphicon glyphicon-{{ glyphicon }} form-control-feedback"></span>
+    {%- endif %}
     {% if field.errors %}
         {% for error in field.errors %}
           <span class="help-inline">{{ error }}</span>
         {% endfor %}
-    {% endif %}
+    {% endif -%}
   </div>
 </div>
 {% endmacro %}
