@@ -54,7 +54,20 @@ can.</p>
 {% if not current_user.is_authenticated() %}
 <p>If you've already bought a ticket for this year, please <a href="{{ url_for('login') }}">log in</a>.</p>
 {% endif %}
+
 <form method="post">
+  <ul class="nav nav-tabs cfp-types">
+    {% for cfp_type in cfp_types %}
+      {% if cfp_type.code == active_cfp_type %}
+
+      {% else %}
+        <li><a href="{{ url_for('cfp', cfp_type=cfp_type.code) }}" data-toggle="{{ cfp_type.code }}">
+        {{ cfp_type.name }}
+        </a></li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+
   <fieldset>
     {{ form.hidden_tag() }}
     {{ render_field(form.name, placeholder='Your name') }}
@@ -81,4 +94,13 @@ can.</p>
   </fieldset>
 </form>
 </div>
+{% endblock %}
+
+{% block foot %}
+<script type="text/javascript">
+$('.cfp-types a').click(function(e) {
+  e.preventDefault();
+  $(this).tab('show');
+});
+</script>
 {% endblock %}
