@@ -59,15 +59,11 @@
      so we can link the submission to your account.</p>
   {% endif %}
 
-  <div class="alert alert-info row">
+  <div class="alert alert-info">
   Fields marked <span class="glyphicon glyphicon-globe"></span> will be displayed in the schedule &mdash;
   you'll be able to change them later.
   </div>
 
-  </div>
-</div>
-<div class="row">
-  <div class="col-md-8 col-md-offset-2">
 
   <ul class="nav nav-tabs cfp-types" role="navigation">
     {% for form in forms %}
@@ -89,19 +85,12 @@
     {% endfor %}
   </ul>
 
-  </div>
-</div>
-
-<div class="row">
-  <div class="tab-content col-md-8 col-md-offset-2">
+  <div class="tab-content">
     {% for form in forms %}
 
     <div class="tab-pane {%- if form.type == active_cfp_type %} active {%- endif %}" id="{{ 'tab_' + form.type }}">
-    <form action={{ url_for('cfp', cfp_type=form.type) }} method="post" class="form-horizontal" role="form">
-
-      <p></p>
-
-      <div class="row">
+    <form action={{ url_for('cfp', cfp_type=form.type) }} method="post" class="form-horizontal cfp-form" role="form">
+      <fieldset>
       {{ form.hidden_tag() }}
       {{ render_field(form.name, True, glyphicon='globe', placeholder="Your name to include in the schedule") }}
 
@@ -117,11 +106,9 @@
       <div class="text-right help-block hidden show-remaining" data-for="title" data-max="140">
         Characters remaining: <span class="remaining"></span><span class="too-long"> (but don't worry)</span>
       </div>
-      </div>
+      </fieldset>
 
-      <p></p>
-
-      <div class="row">
+      <fieldset>
       {{ render_field(form.description, True, placeholder="Description and any requirements.") }}
 
       {% if form.type == 'talk' %}
@@ -137,9 +124,9 @@
       {#
       {{ render_field(form.days, True, placeholder="I can only come on these days") }}
       #}
-      </div>
+      </fieldset>
+      <fieldset>
 
-      <div class="row">
         <div class="col-md-9 col-sm-offset-3">
           <label class="checkbox">
             {{ form.need_finance() }}
@@ -149,10 +136,8 @@
           <span class="help-inline">{{ error }}</span>
           {% endfor %}
         </div>
-      </div>
 
       {% if form.type in ['talk', 'workshop'] %}
-      <div class="row">
         <div class="col-md-9 col-sm-offset-3">
           <label class="checkbox">
             {{ form.one_day() }}
@@ -162,12 +147,11 @@
           <span class="help-inline">{{ error }}</span>
           {% endfor %}
         </div>
-      </div>
       {% endif %}
-
+      </fieldset>
       <p></p>
 
-      <div class="row">
+      <fieldset>
         <div class="col-md-11 col-md-offset-1">
         <div class="panel panel-warning">
           <div class="panel-heading">
@@ -185,9 +169,9 @@
           </div>
         </div>
         </div>
-      </div>
+      </fieldset>
 
-      <div class="form-actions row">
+      <div class="form-actions">
         <button type="submit" name="Create" class="btn btn-primary pull-right">Submit proposal</button>
       </div>
 

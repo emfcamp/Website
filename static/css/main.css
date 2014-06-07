@@ -228,3 +228,7 @@ form.wave-cfp input, form.wave-cfp textarea {
 .tickets-table p.description {
   font-size: 90%;
 }
+
+.cfp-form fieldset{
+  padding-top: 1em;
+}
