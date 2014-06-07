@@ -66,7 +66,13 @@
 {{- loop.cycle('odd', 'even') -}}
 ">
 
-<td>{{ p.name }}</td>
+<td>
+{%- if p.state == "inprogress" and p.provider == "banktransfer" %}
+    <a href="{{ url_for('transfer_waiting', payment_id=p.id) }}">{{ p.name }}</a>
+{%- else -%}
+    {{ p.name }}
+{% endif -%}
+</td>
 <td>{{ p.amount | price(p.currency) }}</td>
 <td>{{ p.state }} {%-  if p.provider == "banktransfer" %}, reference: {{ p.bankref | bankref }} {% endif %}</td>
 <td>
