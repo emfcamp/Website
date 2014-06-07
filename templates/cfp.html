@@ -2,98 +2,239 @@
 
 {% extends "base.html" %}
 {% block body %}
-<div class="col-md-2"></div>
-<div class="col-md-8">
-<h2>Call for Participation</h2>
-<p>Electromagnetic Field is a UK camping festival for those with an inquisitive
-mind or an interest in making things: hackers, artists, geeks, crafters,
-scientists, and engineers. It's happening near Bletchley, Buckinghamshire on
-August 29th &mdash; 31st, and tickets are <a href="/">on sale now</a> for about
-£95. Our last festival in 2012 had 600 attendees; this year we'll have over
-1,200.</p>
+<div class="row">
+  <div class="col-md-8 col-md-offset-2">
 
-<p>We're looking for people to talk, share, and demonstrate the things they
-love. We're especially keen to hear from people with <a
-href="/diversity">different backgrounds</a> than you'd expect find at a
-technology conference. We're not just looking for talks: we also want
-installations, workshops, and games.</p>
+  <h2>Call for Participation</h2>
+  <p>Electromagnetic Field is a UK camping festival for those with an inquisitive
+  mind or an interest in making things: hackers, artists, geeks, crafters,
+  scientists, and engineers. It's happening near
+  <a href="http://wiki.emfcamp.org/wiki/Getting_Here">Bletchley, Buckinghamshire</a> on
+  August 29th &mdash; 31st, and tickets are <a href="/">on sale now</a> for about
+  £{{ full_price }}. Our last festival in 2012 had 600 attendees; this year we'll have over
+  1,200.</p>
 
-<p>At previous events we've heard about everything from <b>genetic
-  modification</b> to <b>electronics</b>, <b>blacksmithing</b> to
-<b>high-energy physics</b>, <b>reverse engineering</b> to <b>lock picking</b>,
-<b>computer security</b> to <b>crocheting</b>, and <b>quadcopters</b> to
-<b>beer brewing</b>.  </p>
+  <p>We're looking for people to talk, share, and demonstrate the things they
+  love. We're especially keen to hear from people with <a
+  href="{{ url_for('diversity') }}">different backgrounds</a> than you'd expect to find at a
+  technology conference. We're not just looking for talks: we also want
+  installations, workshops, and games.</p>
 
-<p>If you're enthusiastic about it, we are too! You don't need to be a
-professional or an expert to present: <strong>impostors are
-welcome</strong>.</p>
+  <p>At previous events we've heard about everything from <b>genetic
+    modification</b> to <b>electronics</b>, <b>blacksmithing</b> to
+  <b>high-energy physics</b>, <b>reverse engineering</b> to <b>lock picking</b>,
+  <b>computer security</b> to <b>crocheting</b>, and <b>quadcopters</b> to
+  <b>beer brewing</b>.  </p>
 
-<h3>Selection</h3>
+  <p>If you're enthusiastic about it, we are too! You don't need to be a
+  professional or an expert to present: <strong>impostors are
+  welcome</strong>.</p>
 
-<p>After you submit a proposal, it will be considered anonymously by a diverse
-selection panel. We may take into account other factors later on in the process
-to see where we can support you.</p>
+  <h3>Selection</h3>
 
-<p>EMF is a non-profit event run by unpaid volunteers. All of the ticket price
-goes towards making the festival a great place to be for a weekend, and
-everyone who attends contributes to make it a success.</p>
+  <p>After you submit a proposal, it will be considered anonymously by a diverse
+  selection panel. We may take into account other factors later on in the process
+  to see where we can support you.</p>
 
-<p>Because of this, we'd like everyone who participates to buy a ticket, and we
-don't have the budget to pay speakers. We have a limited amount of money set aside
-to help those who otherwise wouldn't be able to afford to come, or who can only
-attend for the day of their talk. Please let us know if that's the case.</p>
+  <p>EMF is a non-profit event run by unpaid volunteers. All of the ticket price
+  goes towards making the festival a great place to be for a weekend, and
+  everyone who attends contributes to make it a success.</p>
 
-<h3>Submit a proposal</h3>
-<p>We need a rough idea of what you want to present at EMF, what sort of
-resources you'll need, and how long you'll expect it to last. If you need some
-help writing your proposal, <a href="mailto:content@emfcamp.org">we're happy to
-help</a>. If you're not confident talking we'll help you out however we
-can.</p>
+  <p>Because of this, we'd like everyone who participates to buy a ticket, and we
+  don't have the budget to pay speakers. We have a limited amount of money set aside
+  to help those who otherwise wouldn't be able to afford to come, or who can only
+  attend for the day of their talk. Please let us know if that's the case.</p>
+
+  <h3>Submit a proposal</h3>
+  <p>We need a rough idea of what you want to present at EMF, what sort of
+  resources you'll need, and how long you'll expect it to last. If you need some
+  help writing your proposal, <a href="mailto:content@emfcamp.org">we're happy to
+  help</a>. If you're not confident talking we'll help you out however we
+  can.</p>
 
 
-{% if not current_user.is_authenticated() %}
-<p>If you've already bought a ticket for this year, please <a href="{{ url_for('login') }}">log in</a>.</p>
-{% endif %}
+  {% if not current_user.is_authenticated() %}
+  <p>If you've already bought a ticket for this year, please <a href="{{ url_for('login') }}">log in</a>.</p>
+  {% endif %}
 
-<form method="post" class="form-horizontal" role="form">
-  <ul class="nav nav-tabs cfp-types">
-    {% for cfp_type in cfp_types %}
-      {% if cfp_type.code == active_cfp_type %}
+  <div class="alert alert-info row">
+  Fields marked <span class="glyphicon glyphicon-globe"></span> will be used in the schedule as you've written them.
+  </div>
 
-      {% else %}
-        <li><a href="{{ url_for('cfp', cfp_type=cfp_type.code) }}" data-toggle="{{ cfp_type.code }}">
-        {{ cfp_type.name }}
-        </a></li>
-      {% endif %}
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-8 col-md-offset-2">
+
+  <ul class="nav nav-tabs cfp-types" role="navigation">
+    {% for form in forms %}
+      <li {% if form.type == active_cfp_type -%} class="active" {%- endif %}>
+        <a href="{{ url_for('cfp', cfp_type=form.type) }}" data-target="#{{ 'tab_' + form.type }}" data-toggle="tab">
+          {% if form.type == 'talk' %}
+            <h4>Talk</h4>
+            <p>Held on one of our stages</p>
+          {% elif form.type == 'workshop' %}
+            <h4>Workshop</h4>
+            <p>Demonstration or performance</p>
+          {% elif form.type == 'installation' %}
+            <h4>Installation</h4>
+            <p>Creation around the site</p>
+          {% endif %}
+        </a>
+        </button>
+      </li>
     {% endfor %}
   </ul>
 
-    {{ form.hidden_tag() }}
-    {{ render_field(form.name, True, placeholder='The name you want to appear in the schedule') }}
-    {{ render_field(form.email, True, placeholder='Email address we can contact you on') }}
-    {{ render_field(form.title, True, placeholder='A one-sentence summary (it should fit in a tweet)') }}
-    {{ render_field(form.description, True, placeholder='Description and any requirements') }}
-    {{ render_field(form.length, True, placeholder='Your best guess, whether in minutes or days') }}
-    {{ render_field(form.experience, True) }}
-    <p>If you're comfortable telling us a little bit about yourself, we'd appreciate it.
-       This information won't be available to the selection panel - we'll only use it to help find out
-       how well we're doing with outreach:</p>
-    {{ render_field(form.age, True) }}
-    {{ render_field(form.gender, True) }}
-    {{ render_field(form.race, True) }}
+  </div>
+</div>
 
-    <div class="form-actions">
-      <button type="submit" name="Create" class="btn btn-primary">Submit proposal</button>
+<div class="row">
+  <div class="tab-content col-md-8 col-md-offset-2">
+    {% for form in forms %}
+
+    <div class="tab-pane {%- if form.type == active_cfp_type %} active {%- endif %}" id="{{ 'tab_' + form.type }}">
+    <form action={{ url_for('cfp', cfp_type=form.type) }} method="post" class="form-horizontal" role="form">
+
+      <p></p>
+
+      <div class="row">
+      {{ form.hidden_tag() }}
+      {{ render_field(form.name, True, glyphicon='globe', placeholder="Your name to include in the schedule") }}
+
+      {% if form.type == 'talk' %}
+        {{ render_field(form.email, True, placeholder="We'll only use this to contact you about the talk") }}
+      {% elif form.type == 'workshop' %}
+        {{ render_field(form.email, True, placeholder="We'll only use this to contact you about the workshop") }}
+      {% elif form.type == 'installation' %}
+        {{ render_field(form.email, True, placeholder="We'll only use this to contact you about the installation") }}
+      {% endif %}
+
+      {{ render_field(form.title, True, glyphicon='globe', placeholder="A one-sentence summary (it should fit in a tweet)") }}
+      <div class="text-right help-block hidden show-remaining" data-for="title" data-max="140">
+        Characters remaining: <span class="remaining"></span><span class="too-long"> (but don't worry)</span>
+      </div>
+      </div>
+
+      <p></p>
+
+      <div class="row">
+      {{ render_field(form.description, True, placeholder="Description and any requirements. You will be able to change this later.") }}
+
+      {% if form.type == 'talk' %}
+        {{ render_field(form.length, True) }}
+        {{ render_field(form.experience, True) }}
+      {% elif form.type == 'workshop' %}
+        {{ render_field(form.length, True, placeholder="Your best guess, whether in minutes or days") }}
+        {{ render_field(form.attendees, True, placeholder="The number of people you can accommodate in your workshop") }}
+      {% elif form.type == 'installation' %}
+        {{ render_field(form.size, True, placeholder="We need to know how much space to reserve") }}
+      {% endif %}
+
+      {#
+      {{ render_field(form.days, True, placeholder="I can only come on these days") }}
+      #}
+      </div>
+
+      <div class="row">
+        <div class="col-md-9 col-sm-offset-3">
+          <label class="checkbox">
+            {{ form.need_finance() }}
+            {{ form.need_finance.label.text }}
+          </label>
+          {% for error in form.need_finance.errors %}
+          <span class="help-inline">{{ error }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% if form.type in ['talk', 'workshop'] %}
+      <div class="row">
+        <div class="col-md-9 col-sm-offset-3">
+          <label class="checkbox">
+            {{ form.one_day() }}
+            {{ form.one_day.label.text }}
+          </label>
+          {% for error in form.one_day.errors %}
+          <span class="help-inline">{{ error }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <p></p>
+
+      <div class="row">
+        <div class="col-md-11 col-md-offset-1">
+        <div class="panel panel-warning">
+          <div class="panel-heading">
+            If you're comfortable telling us a little bit about yourself, we'd appreciate it.
+            This information won't be available to the selection panel &ndash; we'll only use it to help find out
+            how well we're doing with outreach.
+          </div>
+          <div class="row">
+          <div id="diversity" class="col-md-11">
+            <p></p>
+            {{ render_field(form.diversity.age, True) }}
+            {{ render_field(form.diversity.gender, True) }}
+            {{ render_field(form.diversity.ethnicity, True) }}
+          </div>
+          </div>
+        </div>
+        </div>
+      </div>
+
+      <div class="form-actions row">
+        <button type="submit" name="Create" class="btn btn-primary pull-right">Submit proposal</button>
+      </div>
+
+    </form>
     </div>
-</form>
+
+    {% endfor %}
+
+  </div>
+
+  </div>
 </div>
 {% endblock %}
 
 {% block foot %}
 <script type="text/javascript">
-$('.cfp-types a').click(function(e) {
-  e.preventDefault();
-  $(this).tab('show');
+$(function() {
+
+  $('.cfp-types a').on('show.bs.tab', function(e) {
+    var prev = $(e.relatedTarget);
+    var curr = $(this);
+    var prev_tab = $(prev.data('target'));
+    var curr_tab = $(curr.data('target'));
+    $.each(['name', 'email', 'title', 'description', 'need_finance'], function(i, f) {
+      var curr_f = curr_tab.find('[name=' + f + ']');
+      var prev_f = prev_tab.find('[name=' + f + ']');
+      if (curr_f.attr('type') == 'checkbox') {
+          curr_f.prop('checked', prev_f.prop('checked'));
+      } else {
+          curr_f.val(prev_f.val());
+      }
+    });
+
+    return true;
+  });
+
+  $('#title-length').removeClass('hidden');
+  $('.show-remaining').each(function() {
+    var t = $(this);
+    var field_sel = t.data('for');
+    var field = t.closest('form').find('[name=' + field_sel + ']');
+    var max_length = t.data('max');
+    field.on('change keydown keyup', function() {
+      var length = this.value.length;
+      var remaining = max_length - length;
+      $('.remaining', t).text(remaining);
+      $('.too-long', t).toggle(remaining < 0);
+    }).change();
+    t.removeClass('hidden');
+  });
 });
 </script>
 {% endblock %}

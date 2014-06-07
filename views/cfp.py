@@ -1,54 +1,106 @@
 from main import app, db
 from views import Form, feature_flag
-from models.cfp import Proposal
+from models.ticket import TicketType
+from models.cfp import (
+    TalkProposal, WorkshopProposal,
+    InstallationProposal, ProposalDiversity,
+)
 
 from flask import (
-    render_template, redirect, request, flash,
-    url_for, session,
+    render_template, redirect,
+    url_for, abort,
 )
 from flask.ext.login import current_user
 
-from sqlalchemy.orm.exc import NoResultFound
-
 from wtforms.validators import Required, Email
 from wtforms import (
-    SubmitField, BooleanField, TextField,
-    DecimalField, FieldList, FormField,
-    TextAreaField, SelectField
+    BooleanField, TextField,
+    FormField, TextAreaField, SelectField,
 )
 
-from datetime import datetime, timedelta
-
-class ProposalForm(Form):
-    email = TextField('Email', [Email(), Required()])
-    name = TextField('Name', [Required()])
-    title = TextField('Title', [Required()])
-    description = TextAreaField('Description', [Required()])
-    length = TextField('Duration', [Required()])
-    experience = SelectField('Have you given a talk/workshop before?',
-                             choices=[(1, "It's my first time"),
-                                      (2, "I've talked before"),
-                                      (3, "I've given this talk before")
-                                      ])
+class DiversityForm(Form):
     age = TextField('Age')
     gender = TextField('Gender')
-    race = TextField('Race')
-    background = TextField('Background')
+    ethnicity = TextField('Ethnicity')
 
-    propose = TextField('Submit')
+class ProposalForm(Form):
+    name = TextField("Name", [Required()])
+    email = TextField("Email", [Email(), Required()])
+    title = TextField("Title", [Required()])
+    description = TextAreaField("Description", [Required()])
+    # days = SelectMultipleField("I can only attend on some days",
+    #                            choices=[('fri', 'Friday'),
+    #                                     ('sat', 'Saturday'),
+    #                                     ('sun', 'Sunday'),
+    #                                     ])
+    need_finance = BooleanField("I won't be able to buy a ticket without financial support")
 
-@app.route('/cfp', methods=['GET', 'POST'])
+    diversity = FormField(DiversityForm)
+
+class TalkProposalForm(ProposalForm):
+    type = 'talk'
+    length = SelectField("Duration", default='30',
+                         choices=[('< 10 mins', "Shorter than 10 minutes"),
+                                  ('10 mins', "10 minutes"),
+                                  ('30 mins', "30 minutes"),
+                                  ('45 mins', "45 minutes"),
+                                  ('> 45 mins', "Longer than 45 minutes"),
+                                  ])
+    experience = SelectField("Have you given a talk before?",
+                             choices=[('none', "It's my first time"),
+                                      ('some', "I've talked before"),
+                                      ('repeat', "I've given this talk before"),
+                                      ])
+    one_day = BooleanField("I can only attend for the day I give my talk")
+
+class WorkshopProposalForm(ProposalForm):
+    type = 'workshop'
+    length = TextField("Duration", [Required()])
+    attendees = TextField("Attendees", [Required()])
+    one_day = BooleanField("I can only attend for the day I give my workshop")
+
+class InstallationProposalForm(ProposalForm):
+    type = 'installation'
+    size = TextField("Physical size", [Required()])
+
+
+@app.route('/cfp')
+@app.route('/cfp/<string:cfp_type>', methods=['GET', 'POST'])
 @feature_flag('CFP')
-def cfp():
-    form = ProposalForm()
-    if form.validate_on_submit():
-        prop = Proposal()
-        prop.title = form.title.data
-        prop.email = form.email.data
-        prop.description = form.description.data
-        prop.length = form.length.data
+def cfp(cfp_type='talk'):
+    if cfp_type not in ['talk', 'workshop', 'installation']:
+        abort(404)
 
-        db.session.add(prop)
+    forms = [TalkProposalForm(), WorkshopProposalForm(), InstallationProposalForm()]
+    (form,) = [f for f in forms if f.type == cfp_type]
+
+    if form.validate_on_submit():
+        if cfp_type == 'talk':
+            cfp = TalkProposal()
+            cfp.length = form.length.data
+            cfp.experience = form.experience.data
+            cfp.one_day = form.one_day.data
+        elif cfp_type == 'workshop':
+            cfp = WorkshopProposal()
+            cfp.length = form.length.data
+            cfp.attendees = form.attendees.data
+            cfp.one_day = form.one_day.data
+        elif cfp_type == 'installation':
+            cfp = InstallationProposal()
+            cfp.size = form.size.data
+
+        cfp.name = form.name.data
+        cfp.email = form.email.data
+        cfp.title = form.title.data
+        cfp.description = form.description.data
+        cfp.need_finance = form.need_finance.data
+
+        cfp.diversity = ProposalDiversity()
+        cfp.diversity.age = form.diversity.age.data
+        cfp.diversity.gender = form.diversity.gender.data
+        cfp.diversity.ethnicity = form.diversity.ethnicity.data
+
+        db.session.add(cfp)
         db.session.commit()
 
         return redirect(url_for('cfp_complete'))
@@ -57,7 +109,10 @@ def cfp():
         form.name.data = current_user.name
         form.email.data = current_user.email
 
-    return render_template('cfp.html', form=form)
+    full_price = TicketType.query.get('full').get_price('GBP')
+
+    return render_template('cfp.html', full_price=full_price,
+        forms=forms, active_cfp_type=cfp_type)
 
 @app.route('/cfp/complete')
 @feature_flag('CFP')

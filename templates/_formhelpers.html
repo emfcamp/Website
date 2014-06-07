@@ -1,14 +1,18 @@
 {% macro render_field(field, horizontal=False, glyphicon=None) %}
-<div class="form-group {%- if field.errors %} error {%- endif %}{%- if glyphicon %} has-feedback {%- endif %}">
+<div class="form-group {%- if field.errors %} has-error {%- endif %}">
   <label for="{{ field.name }}" class="{% if horizontal -%} col-sm-3 {% endif -%} control-label">{{ field.label.text }}</label>
   <div class="{% if horizontal -%} col-sm-9 {% endif -%} controls">
+    {%- if glyphicon %}
+    <div class="input-group">
+    {%- endif %}
     {{ field(class_='form-control', **kwargs)|safe }}
     {%- if glyphicon %}
-    <span class="glyphicon glyphicon-{{ glyphicon }} form-control-feedback"></span>
+    <span class="glyphicon glyphicon-{{ glyphicon }} input-group-addon"></span>
+    </div>
     {%- endif %}
     {% if field.errors %}
         {% for error in field.errors %}
-          <span class="help-inline">{{ error }}</span>
+          <span class="help-block">{{ error }}</span>
         {% endfor %}
     {% endif -%}
   </div>
