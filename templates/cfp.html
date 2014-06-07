@@ -1,6 +1,6 @@
 {% from "_formhelpers.html" import render_field %}
-
 {% extends "base.html" %}
+{% block title %}Call for Participation - Electromagnetic Field{% endblock %}
 {% block body %}
 <div class="row">
   <div class="col-md-8 col-md-offset-2">
@@ -36,29 +36,33 @@
   selection panel. We may take into account other factors later on in the process
   to see where we can support you.</p>
 
-  <p>EMF is a non-profit event run by unpaid volunteers. All of the ticket price
-  goes towards making the festival a great place to be for a weekend, and
-  everyone who attends contributes to make it a success.</p>
+  <h3>Money</h3>
 
-  <p>Because of this, we'd like everyone who participates to buy a ticket, and we
-  don't have the budget to pay speakers. We have a limited amount of money set aside
-  to help those who otherwise wouldn't be able to afford to come, or who can only
-  attend for the day of their talk. Please let us know if that's the case.</p>
+  <p>EMF is a non-profit community event, entirely run by unpaid volunteers. All of
+  the ticket price  goes towards making the festival a great place to be for a weekend, and
+  everyone who attends contributes to making it a success.</p>
+
+  <p>Because of this, we'd like everyone who participates to buy a ticket and stick around for
+  the whole event. We don't have the budget to pay speakers, although we have a
+  limited amount of money set aside to help those who otherwise wouldn't be able
+  to afford to come, or who can only attend for the day of their talk. Please let
+  us know if that's the case.</p>
 
   <h3>Submit a proposal</h3>
   <p>We need a rough idea of what you want to present at EMF, what sort of
   resources you'll need, and how long you'll expect it to last. If you need some
   help writing your proposal, <a href="mailto:content@emfcamp.org">we're happy to
-  help</a>. If you're not confident talking we'll help you out however we
+  help</a>. If you're not confident speaking, we'll help you out however we
   can.</p>
 
-
   {% if not current_user.is_authenticated() %}
-  <p>If you've already bought a ticket for this year, please <a href="{{ url_for('login') }}">log in</a>.</p>
+  <p>If you've already bought a ticket for this year, please <a href="{{ url_for('login') }}">log in</a>
+     so we can link the submission to your account.</p>
   {% endif %}
 
   <div class="alert alert-info row">
-  Fields marked <span class="glyphicon glyphicon-globe"></span> will be used in the schedule as you've written them.
+  Fields marked <span class="glyphicon glyphicon-globe"></span> will be displayed in the schedule &mdash;
+  you'll be able to change them later.
   </div>
 
   </div>
@@ -119,7 +123,7 @@
       <p></p>
 
       <div class="row">
-      {{ render_field(form.description, True, placeholder="Description and any requirements. You will be able to change this later.") }}
+      {{ render_field(form.description, True, placeholder="Description and any requirements.") }}
 
       {% if form.type == 'talk' %}
         {{ render_field(form.length, True) }}

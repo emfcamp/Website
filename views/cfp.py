@@ -33,7 +33,7 @@ class ProposalForm(Form):
     #                                     ('sat', 'Saturday'),
     #                                     ('sun', 'Sunday'),
     #                                     ])
-    need_finance = BooleanField("I won't be able to buy a ticket without financial support")
+    need_finance = BooleanField("I can't afford to buy a ticket without financial support")
 
     diversity = FormField(DiversityForm)
 
