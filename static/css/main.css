@@ -229,6 +229,10 @@ form.wave-cfp input, form.wave-cfp textarea {
   font-size: 90%;
 }
 
-.cfp-form fieldset{
+.cfp-form fieldset {
   padding-top: 1em;
+}
+
+.cfp-form .input-group-addon {
+  top: 0px;
 }
