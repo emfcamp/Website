@@ -1,98 +1,57 @@
 # flake8: noqa (there are a load of errors here we need to fix)
-from main import app, db, gocardless, mail
+from main import app, db, mail
 from models.user import User
-from models.payment import Payment, BankPayment, GoCardlessPayment
+from models.payment import Payment, BankPayment
 from models.ticket import TicketType, Ticket
+from models.cfp import Proposal
 from views import Form
 
 from flask import (
     render_template, redirect, request, flash,
-    url_for, abort, send_from_directory, session,
+    url_for,
 )
-from flask.ext.login import (
-    login_user, login_required, logout_user, current_user,
-)
+from flask.ext.login import login_required, current_user
 from flaskext.mail import Message
 
-from wtforms.validators import Required, Email, EqualTo, ValidationError
-from wtforms.widgets import HiddenInput
+from wtforms.validators import Required
 from wtforms import (
-    TextField, PasswordField, SelectField, HiddenField,
+    TextField, HiddenField,
     SubmitField, BooleanField, IntegerField, DecimalField,
 )
 
-from sqlalchemy import and_, or_, func, case
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import join
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.sql import text
 
-from decorator import decorator
-import simplejson, os, re, ofxparse, sys
-from decimal import Decimal
 from datetime import datetime, timedelta
 
 @app.route("/stats")
 def stats():
-    outstanding = Ticket.query.join(Payment).filter(
-        Payment.state == 'inprogress',
-        Ticket.expires >= func.now(),
-        Ticket.paid == False,
-    )
-    paid = Ticket.query.filter(Ticket.paid == True)
-    full = db.engine.execute(text("""select count(*) from ticket where
-                                        ticket.paid = false and ticket.expires > now()
-                                        and ticket.code LIKE 'full%'""")).scalar()
+    full = Ticket.query.filter( Ticket.code.startswith('full') )
+    kids = Ticket.query.filter( Ticket.code.startswith('kids') )
 
-    full_bought = db.engine.execute(text("""select count(*) from ticket where
-                                        ticket.paid = true and ticket.code LIKE 'full%'""")).scalar()
+    full_unpaid = full.filter( Ticket.expires >= datetime.utcnow(), Ticket.paid is False )
+    kids_unpaid = kids.filter( Ticket.expires >= datetime.utcnow(), Ticket.paid is False )
 
-    kids_bought = db.engine.execute(text("""select count(*) from ticket where
-                                        ticket.code LIKE 'kids%'""")).scalar()
+    full_bought = full.filter( Ticket.paid is True )
+    kids_bought = kids.filter( Ticket.paid is True )
 
-    confident_query = text("""
-      select count(*)
-      from
-          ticket t,
-          payment p
-      where
-          p.id = t.payment_id
-          and t.code like :code
-          and (
-            p.provider = 'gocardless' and p.state = 'inprogress' and t.expires > now()
-            or t.paid = true
-          )
-    """)
+    full_gocardless_unpaid = full_unpaid.filter(Payment.provider == 'gocardless', Payment.state == 'inprogress')
+    full_banktransfer_unpaid = full_unpaid.filter(Payment.provider == 'banktransfer', Payment.state == 'inprogress')
 
-    full_confident = db.engine.execute(confident_query, code='full%').scalar()
-    day_confident = db.engine.execute(confident_query, code='day%').scalar()
+    users = User.query
 
-    full_unconfident = db.engine.execute(text("""
-      select count(*)
-      from
-          ticket t,
-          payment p
-      where
-          p.id = t.payment_id
-          and t.code like 'full%'
-          and (
-            p.provider = 'banktransfer' and p.state = 'inprogress'
-          )
-          and t.expires > now()
-    """)).scalar()
+    proposals = Proposal.query
 
+    queries = [
+        'full', 'kids',
+        'full_bought', 'kids_bought',
+        'full_unpaid', 'kids_unpaid',
+        'full_gocardless_unpaid', 'full_banktransfer_unpaid',
+        'users',
+        'proposals',
+    ]
 
-    stats = {
-        'full': full,
-        'full_bought': full_bought,
-        'kids_bought': kids_bought,
-        'full_confident': full_confident,
-        'full_unconfident': full_unconfident,
-        'users': User.query.count(),
-        'day_confident': day_confident
-    }
-
-    return ' '.join('%s:%s' % i for i in stats.items())
+    stats = ['%s:%s' % (q, locals()[q].count()) for q in queries]
+    return ' '.join(stats)
 
 @app.route("/admin")
 @login_required
