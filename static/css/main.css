@@ -233,6 +233,6 @@ form.wave-cfp input, form.wave-cfp textarea {
   padding-top: 1em;
 }
 
-.cfp-form .input-group-addon {
+.glyphicon.input-group-addon {
   top: 0px;
 }
