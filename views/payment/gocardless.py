@@ -197,7 +197,7 @@ def gocardless_webhook():
 @webhook('bill', 'failed')
 def gocardless_bill(resource, action, data):
     # Bills are all available on the website
-    logger.warn('Default handler called for: %s', resource, action, data)
+    logger.warn('Default handler called for %s', data)
     try:
         for bill in data['bills']:
             try:
