@@ -28,11 +28,11 @@ def stats():
     full = Ticket.query.filter( Ticket.code.startswith('full') )
     kids = Ticket.query.filter( Ticket.code.startswith('kids') )
 
-    full_unpaid = full.filter( Ticket.expires >= datetime.utcnow(), Ticket.paid is False )
-    kids_unpaid = kids.filter( Ticket.expires >= datetime.utcnow(), Ticket.paid is False )
+    full_unpaid = full.filter( Ticket.expires >= datetime.utcnow(), Ticket.paid == False )
+    kids_unpaid = kids.filter( Ticket.expires >= datetime.utcnow(), Ticket.paid == False )
 
-    full_bought = full.filter( Ticket.paid is True )
-    kids_bought = kids.filter( Ticket.paid is True )
+    full_bought = full.filter( Ticket.paid == True )
+    kids_bought = kids.filter( Ticket.paid == True )
 
     full_gocardless_unpaid = full_unpaid.filter(Payment.provider == 'gocardless', Payment.state == 'inprogress')
     full_banktransfer_unpaid = full_unpaid.filter(Payment.provider == 'banktransfer', Payment.state == 'inprogress')
