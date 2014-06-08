@@ -1,12 +1,12 @@
 from main import app, db, gocardless, mail, csrf
 from models.payment import GoCardlessPayment
-from views import feature_flag, set_user_currency, Form
+from views import feature_flag, Form
 from views.payment import get_user_payment_or_abort
 from views.tickets import add_payment_and_tickets
 
 from flask import (
     render_template, redirect, request, flash,
-    url_for,
+    url_for, abort,
 )
 from flask.ext.login import login_required
 from flaskext.mail import Message
@@ -21,6 +21,12 @@ from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
+webhook_handlers = {}
+def webhook(resource=None, action=None):
+    def inner(f):
+        webhook_handlers[(resource, action)] = f
+        return f
+    return inner
 
 @app.route("/pay/gocardless-start", methods=['POST'])
 @feature_flag('GOCARDLESS')
@@ -105,10 +111,9 @@ def gocardless_complete(payment_id):
     # should we send the resource_uri in the bill email?
     msg = Message("Your EMF ticket purchase",
         sender=app.config['TICKETS_EMAIL'],
-        recipients=[payment.user.email]
-    )
+        recipients=[payment.user.email])
     msg.body = render_template("tickets-purchased-email-gocardless.txt",
-        user = payment.user, payment=payment)
+        user=payment.user, payment=payment)
     mail.send(msg)
 
     return redirect(url_for('gocardless_waiting', payment_id=payment.id))
@@ -150,70 +155,106 @@ def gocardless_cancel(payment_id):
 @csrf.exempt
 @app.route("/gocardless-webhook", methods=['POST'])
 def gocardless_webhook():
-    """
-        handle the gocardless webhook / callback callback:
-        https://gocardless.com/docs/web_hooks_guide#response
-        
-        we mostly want 'bill'
-        
-        GoCardless limits the webhook to 5 secs. this should run async...
+    # Documentation: https://developer.gocardless.com/#webhook-overview
 
-    """
+    logger.debug(request.data)
     json_data = simplejson.loads(request.data)
-    data = json_data['payload']
 
-    if not gocardless.client.validate_webhook(data):
-        logger.error("Unable to validate gocardless webhook")
-        return ('', 403)
+    try:
+        data = json_data['payload']
 
-    logger.info("Webhook resource type %s action %s", data.get('resource_type'), data.get('action'))
+        if not gocardless.client.validate_webhook(data):
+            logger.error("Unable to validate GoCardless webhook")
+            abort(403)
 
-    if data['resource_type'] != 'bill':
-        logger.warn('Resource type is not bill')
-        return ('', 501)
+        resource = data['resource_type']
+        action = data['action']
+        logger.info("Webhook resource type %s action %s", resource, action)
 
-    if data['action'] not in ['paid', 'withdrawn', 'failed', 'created']:
-        logger.warn('Unknown action')
-        return ('', 501)
+        try:
+            handler = webhook_handlers[(resource, action)]
+        except KeyError, e:
+            try:
+                handler = webhook_handlers[resource, None]
+            except KeyError, e:
+                handler = webhook_handlers[(None, None)]
 
-    # action can be:
-    #
-    # paid -> money taken from the customers account, at this point we concider the ticket paid.
-    # created -> for subscriptions
-    # failed -> customer is broke
-    # withdrawn -> we actually get the money
+        return handler(resource, action, data)
+
+        if data['resource_type'] != 'bill':
+            logger.warn('Resource type is not bill')
+            abort(501)
+
+        return gocardless_bill(data)
+
+    except Exception, e:
+        logger.error('Unexcepted exception during webhook: %r', e)
+        abort(500)
+
+@webhook('bill')
+@webhook('bill', 'created')
+@webhook('bill', 'withdrawn')
+@webhook('bill', 'failed')
+def gocardless_bill(resource, action, data):
+    # Bills are all available on the website
+    logger.warn('Default handler called for %s action %s: %s', resource, action, data)
+    try:
+        for bill in data['bills']:
+            try:
+                gcid = bill['id']
+                payment = GoCardlessPayment.query.filter_by(gcid=gcid).one()
+            except NoResultFound:
+                logger.warn("Payment for bill %s not found, skipping", gcid)
+                continue
+
+            logging.info('Received %s action for gcid %s, payment %s',
+                         action, payment.id, gcid)
+
+    except Exception, e:
+        logger.error('Unexcepted exception during webhook: %r', e)
+        abort(501)
+
+    return ('', 200)
+
+@webhook('bill', 'paid')
+def gocardless_bill_paid(resource, action, data):
 
     for bill in data['bills']:
         gcid = bill['id']
         try:
             payment = GoCardlessPayment.query.filter_by(gcid=gcid).one()
         except NoResultFound:
-            logger.warn('Payment %s not found, ignoring', gcid)
+            logger.warn("Payment for bill %s not found, skipping", gcid)
             continue
 
-        logger.info("Processing payment %s (%s) for user %s",
-            payment.id, gcid, payment.user.id)
+        logger.info("Received paid action for gcid %s, payment %s",
+                    gcid, payment.id)
 
-        if data['action'] == 'paid':
-            if payment.state != "inprogress":
-                logger.warning("Old payment state was %s, not 'inprogress'", payment.state)
+        if bill['status'] != 'paid':
+            logger.warn("Bill status is %s (should be paid), failing", bill['status'])
+            abort(409)
 
-            for t in payment.tickets.all():
-                t.paid = True
+        if payment.state == 'paid':
+            logger.info('Payment is already paid, skipping')
+            continue
 
-            payment.state = "paid"
-            db.session.commit()
+        if payment.state != 'inprogress':
+            logger.warning("Current payment state is %s (should be inprogress), failing", payment.state)
+            abort(409)
 
-            msg = Message("Your EMF ticket payment has been confirmed",
-                sender=app.config['TICKETS_EMAIL'],
-                recipients=[payment.user.email]
-            )
-            msg.body = render_template("tickets-paid-email-gocardless.txt",
-                user = payment.user, payment=payment)
-            mail.send(msg)
+        logger.info("Setting payment %s to paid", payment.id)
+        for t in payment.tickets.all():
+            t.paid = True
 
-        else:
-            logger.debug('Payment: %s', bill)
+        payment.state = 'paid'
+        db.session.commit()
+
+        msg = Message("Your EMF ticket payment has been confirmed",
+            sender=app.config['TICKETS_EMAIL'],
+            recipients=[payment.user.email])
+        msg.body = render_template("tickets-paid-email-gocardless.txt",
+            user=payment.user, payment=payment)
+        mail.send(msg)
 
     return ('', 200)
 
