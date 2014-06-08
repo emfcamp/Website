@@ -197,7 +197,7 @@ def gocardless_webhook():
 @webhook('bill', 'failed')
 def gocardless_bill(resource, action, data):
     # Bills are all available on the website
-    logger.warn('Default handler called for %s action %s: %s', resource, action, data)
+    logger.warn('Default handler called for: %s', resource, action, data)
     try:
         for bill in data['bills']:
             try:
@@ -208,7 +208,7 @@ def gocardless_bill(resource, action, data):
                 continue
 
             logging.info('Received %s action for gcid %s, payment %s',
-                         action, payment.id, gcid)
+                         action, gcid, payment.id)
 
     except Exception, e:
         logger.error('Unexcepted exception during webhook: %r', e)
