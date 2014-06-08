@@ -56,7 +56,8 @@ def charge_stripe(payment):
         )
 
     except stripe.CardError, e:
-        logger.warn('Card payment failed with exception %r', e)
+        logger.warn('Card payment failed with exception "%s"', e)
+        # Don't save the charge_id - they can try again
         flash('An error occurred with your payment, please try again')
         return redirect(url_for('stripe_tryagain', payment_id=payment.id))
 
@@ -280,8 +281,30 @@ def stripe_charge_updated(type, charge_data):
 
     return ('', 200)
 
-@webhook('charge.refunded')
 @webhook('charge.failed')
+def stripe_charge_failed(type, charge_data):
+    # Test with 4000 0000 0000 0341
+    try:
+        payment = StripePayment.query.filter_by(chargeid=charge_data['id']).one()
+    except NoResultFound:
+        logger.warn('Payment for failed charge %s not found, ignoring', charge_data['id'])
+        return ('', 200)
+
+    logging.info('Received failed message for charge %s, payment %s', charge_data['id'], payment.id)
+
+    charge = stripe.Charge.retrieve(charge_data['id'])
+    if not charge.failed:
+        logger.error('Charge object is not failed')
+        abort(501)
+
+    if charge.paid:
+        logger.error('Charge object has already been paid')
+        abort(501)
+
+    # Payment can still be retried with a new charge - nothing to do
+    return ('', 200)
+
+@webhook('charge.refunded')
 @webhook('charge.updated')
 def stripe_charge_update(type, charge_data):
     payment = get_payment_or_abort(charge_data['id'])
