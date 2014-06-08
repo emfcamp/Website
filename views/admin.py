@@ -34,8 +34,8 @@ def stats():
     full_bought = full.filter( Ticket.paid == True )
     kids_bought = kids.filter( Ticket.paid == True )
 
-    full_gocardless_unpaid = full_unpaid.filter(Payment.provider == 'gocardless', Payment.state == 'inprogress')
-    full_banktransfer_unpaid = full_unpaid.filter(Payment.provider == 'banktransfer', Payment.state == 'inprogress')
+    full_gocardless_unpaid = full_unpaid.join(Payment).filter(Payment.provider == 'gocardless', Payment.state == 'inprogress')
+    full_banktransfer_unpaid = full_unpaid.join(Payment).filter(Payment.provider == 'banktransfer', Payment.state == 'inprogress')
 
     users = User.query
 
