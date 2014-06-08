@@ -50,6 +50,9 @@ class TelField(StringField):
 
 
 class Form(BaseForm):
+    # CsrfProtect limit
+    TIME_LIMIT = 3600 * 24
+
     def hidden_tag_without(self, *fields):
         fields = [isinstance(f, string_types) and getattr(self, f) or f for f in fields]
         keep_fields = [f for f in self if _is_hidden(f) and f not in fields]
