@@ -181,12 +181,6 @@ def gocardless_webhook():
 
         return handler(resource, action, data)
 
-        if data['resource_type'] != 'bill':
-            logger.warn('Resource type is not bill')
-            abort(501)
-
-        return gocardless_bill(data)
-
     except Exception, e:
         logger.error('Unexcepted exception during webhook: %r', e)
         abort(500)
