@@ -131,9 +131,17 @@ class Reconcile(Command):
                 raise ValueError('Unexpected transaction type for %s: %s', txn.id, txn.type)
 
             if txn.payee.startswith("GOCARDLESS LTD "):
+                app.logger.info('Suppressing GoCardless transfer %s', txn.id)
+                if doit:
+                    txn.suppressed = True
+                    db.session.commit()
                 continue
 
             if txn.payee.startswith("STRIPE PAYMENTS EU "):
+                app.logger.info('Suppressing Stripe transfer %s', txn.id)
+                if doit:
+                    txn.suppressed = True
+                    db.session.commit()
                 continue
 
             app.logger.info("Processing txn %s: %s", txn.id, txn.payee)
