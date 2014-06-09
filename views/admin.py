@@ -95,7 +95,7 @@ def admin_txn_suppress(txn_id):
     if form.validate_on_submit():
         if form.suppress.data:
             txn.suppressed = True
-            app.logger.info('Transaction suppressed')
+            app.logger.info('Transaction %s suppressed', txn.id)
             db.session.commit()
 
     return redirect(url_for('admin_txns'))
@@ -177,7 +177,7 @@ def admin_txn_reconcile(txn_id):
         form = ManualReconcileForm(payment_id=payment.id, formdata=None)
         payments_forms.append((payment, form))
 
-    app.logger.info('Proposing %s payments ')
+    app.logger.info('Suggesting %s payments for txn %s', len(payments_forms), txn.id)
     return render_template('admin/txn_reconcile.html', txn=txn, payments_forms=payments_forms,
                            suppress_form=suppress_form)
 
