@@ -216,8 +216,9 @@ def payment_change(session, flush_context):
 
     for obj in session.dirty:
         if isinstance(obj, Payment):
-            state = get_history(obj, 'state').added[0]
-            PaymentChange(obj, state)
+            added = get_history(obj, 'state').added
+            if added:
+                PaymentChange(obj, added[0])
 
     for obj in session.deleted:
         if isinstance(obj, Payment):
