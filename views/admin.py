@@ -169,7 +169,7 @@ def admin_txn_reconcile(txn_id):
 
     payments = BankPayment.query.filter_by(state='inprogress').order_by(BankPayment.bankref).all()
     scores = [score_reconciliation(txn, p) for p in payments]
-    scores_payments = reversed(sorted(zip(scores, payments))[:-20])
+    scores_payments = reversed(sorted(zip(scores, payments))[-20:])
 
     suppress_form = TransactionSuppressForm(formdata=None)
     payments_forms = []
