@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import url_for
 from flaskext.mail import Mail
 from flask.ext.login import LoginManager
 from flask.ext.sqlalchemy import SQLAlchemy
