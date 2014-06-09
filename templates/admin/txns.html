@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block body %}
+<h1>Outstanding transactions</h1>
+
+<table class="table table-condensed table-striped">
+<thead><tr>
+  <th>Date</th>
+  <th>Type</th>
+  <th>Payee</th>
+  <th>Amount</th>
+  <th>FIT</th>
+  <th></th>
+  <th></th>
+</tr></thead>
+<tbody>
+{% for txn in txns %}
+<tr>
+  <td>{{ txn.date }}</td>
+  <td>{{ txn.type }}</td>
+  <td><b>{{ txn.payee }}</b></td>
+  <td><b>{{ txn.amount | price(txn.account.currency) }}</b></td>
+  <td>{{ txn.fit_id }}</td>
+  <td>
+    <a class="btn btn-primary" href="{{ url_for('admin_txn_reconcile', txn_id=txn.id) }}">Reconcile</a>
+  </td>
+  <td>
+    <form action="{{ url_for('admin_txn_suppress', txn_id=txn.id) }}" method="post">
+      {{ suppress_form.hidden_tag() }}
+      {{ suppress_form.suppress(class_="btn btn-danger") }}
+    </form>
+  </td>
+</tr>
+{% endfor %}
+</tbody></table>
+
+<a class="btn btn-default" href="{{ url_for('admin') }}">Back</a>
+{% endblock %}

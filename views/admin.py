@@ -1,14 +1,14 @@
 # flake8: noqa (there are a load of errors here we need to fix)
 from main import app, db, mail
 from models.user import User
-from models.payment import Payment, BankPayment
+from models.payment import Payment, BankPayment, BankTransaction
 from models.ticket import TicketType, Ticket
 from models.cfp import Proposal
-from views import Form
+from views import Form, HiddenIntegerField
 
 from flask import (
     render_template, redirect, request, flash,
-    url_for,
+    url_for, abort,
 )
 from flask.ext.login import login_required, current_user
 from flaskext.mail import Message
@@ -21,7 +21,19 @@ from wtforms import (
 
 from sqlalchemy.orm.exc import NoResultFound
 
+from Levenshtein import ratio, jaro
+
 from datetime import datetime, timedelta
+from functools import wraps
+
+def admin_required(f):
+    @wraps(f)
+    def wrapped(*args, **kwargs):
+        if not current_user.admin:
+            return app.login_manager.unauthorized()
+        return f(*args, **kwargs)
+    return wrapped
+
 
 @app.route("/stats")
 def stats():
@@ -53,61 +65,121 @@ def stats():
     stats = ['%s:%s' % (q, locals()[q].count()) for q in queries]
     return ' '.join(stats)
 
-@app.route("/admin")
-@login_required
+@app.route('/admin')
+@admin_required
 def admin():
-    if current_user.admin:
-        return render_template('admin/admin.html')
-    else:
-        return(('', 404))
+    unreconciled_count = BankTransaction.query.filter_by(payment_id=None, suppressed=False).count()
+    return render_template('admin/admin.html',
+                           unreconciled_count=unreconciled_count)
+
+
+class TransactionSuppressForm(Form):
+    suppress = SubmitField("Suppress")
+
+@app.route('/admin/transactions')
+@admin_required
+def admin_txns():
+    txns = BankTransaction.query.filter_by(payment_id=None, suppressed=False)
+    suppress_form = TransactionSuppressForm(formdata=None)
+    return render_template('admin/txns.html', txns=txns, suppress_form=suppress_form)
+
+@app.route('/admin/transaction/<int:txn_id>/suppress', methods=['POST'])
+@admin_required
+def admin_txn_suppress(txn_id):
+    try:
+        txn = BankTransaction.query.get(txn_id)
+    except NoResultFound:
+        abort(404)
+
+    form = TransactionSuppressForm()
+    if form.validate_on_submit():
+        if form.suppress.data:
+            txn.suppressed = True
+            app.logger.info('Transaction suppressed')
+            db.session.commit()
+
+    return redirect(url_for('admin_txns'))
+
+def score_reconciliation(txn, payment):
+    words = txn.payee.replace('-', ' ').split(' ')
+
+    bankref_distances = [ratio(w, payment.bankref) for w in words]
+    # Get the two best matches, for the two parts of the bankref
+    bankref_score = sum(sorted(bankref_distances)[-2:])
+    name_score = jaro(txn.payee, payment.user.name)
+
+    other_score = 0.0
+
+    if txn.amount == payment.amount:
+        other_score += 0.4
+
+    if txn.account.currency == payment.currency:
+        other_score += 0.6
+
+    # check date against expiry?
+
+    app.logger.debug('Scores for txn %s payment %s: %s %s %s',
+                     txn.id, payment.id, bankref_score, name_score, other_score)
+    return bankref_score + name_score + other_score
 
 class ManualReconcileForm(Form):
-    payment = HiddenField('payment_id', [Required()])
-    reconcile = SubmitField('Reconcile')
-    yes = SubmitField('Yes')
-    no = SubmitField('No')
+    payment_id = HiddenIntegerField("Payment ID")
+    reconcile = SubmitField("Reconcile")
 
-@app.route("/admin/manual-reconcile", methods=['GET', 'POST'])
-@login_required
-def manual_reconcile():
-    if current_user.admin:
-        if request.method == "POST":
-            form = ManualReconcileForm()
-            if form.validate():
-                if form.yes.data == True:
-                    payment = BankPayment.query.get(int(form.payment.data))
-                    app.logger.info("%s Manually reconciled payment %s (%s)", current_user.name, payment.id, payment.bankref)
-                    for t in payment.tickets:
-                        t.paid = True
-                        app.logger.info("ticket %s (%s, for %s) paid", t.id, t.type.name, payment.user.name)
-                    payment.state = "paid"
-                    db.session.commit()
-                
-                    msg = Message("Electromagnetic Field ticket purchase update",
-                              sender=app.config['TICKETS_EMAIL'],
-                              recipients=[payment.user.email]
-                             )
-                    msg.body = render_template("tickets-paid-email-banktransfer.txt",
-                              user = payment.user, payment=payment
-                             )
-                    mail.send(msg)
-                
-                    flash("Payment ID %s now marked as paid" % (payment.id))
-                    return redirect(url_for('manual_reconcile'))
-                elif form.no.data == True:
-                    return redirect(url_for('manual_reconcile'))
-                elif form.reconcile.data == True:
-                    payment = BankPayment.query.get(int(form.payment.data))
-                    ynform = ManualReconcileForm(payment=payment.id, formdata=None)
-                    return render_template('admin/admin_manual_reconcile_yesno.html', ynform=ynform, payment=payment)
+@app.route('/admin/transaction/<int:txn_id>/reconcile', methods=['GET', 'POST'])
+@admin_required
+def admin_txn_reconcile(txn_id):
+    try:
+        txn = BankTransaction.query.get(txn_id)
+    except NoResultFound:
+        abort(404)
 
-        payments = BankPayment.query.filter(BankPayment.state == "inprogress").order_by(BankPayment.bankref).all()
-        paymentforms = {}
-        for p in payments:
-            paymentforms[p.id] = ManualReconcileForm(payment=p.id, formdata=None)
-        return render_template('admin/admin_manual_reconcile.html', payments=payments, paymentforms=paymentforms)
-    else:
-        return(('', 404))
+    form = ManualReconcileForm()
+    if form.validate_on_submit():
+        app.logger.info('Processing transaction %s (%s)', txn.id, txn.payee)
+
+        if form.reconcile.data:
+            payment = BankPayment.query.get(form.payment_id.data)
+            app.logger.info("%s manually reconciling against payment %s (%s) by %s",
+                            current_user.name, payment.id, payment.bankref, payment.user.email)
+
+            if txn.payment:
+                app.logger.error("Transaction already reconciled")
+                return redirect(url_for('admin_txns'))
+
+            if payment.state == 'paid':
+                app.logger.error("Payment has already been paid")
+                return redirect(url_for('admin_txns'))
+
+            txn.payment = payment
+            for t in payment.tickets:
+                t.paid = True
+            payment.state = 'paid'
+            db.session.commit()
+
+            msg = Message("Electromagnetic Field ticket purchase update",
+                          sender=app.config['TICKETS_EMAIL'],
+                          recipients=[payment.user.email])
+            msg.body = render_template("tickets-paid-email-banktransfer.txt",
+                          user=payment.user, payment=payment)
+            mail.send(msg)
+
+            flash("Payment ID %s marked as paid" % payment.id)
+            return redirect(url_for('admin_txns'))
+
+    payments = BankPayment.query.filter_by(state='inprogress').order_by(BankPayment.bankref).all()
+    scores = [score_reconciliation(txn, p) for p in payments]
+    scores_payments = reversed(sorted(zip(scores, payments))[:20])
+
+    suppress_form = TransactionSuppressForm(formdata=None)
+    payments_forms = []
+    for score, payment in scores_payments:
+        form = ManualReconcileForm(payment_id=payment.id, formdata=None)
+        payments_forms.append((payment, form))
+
+    app.logger.info('Proposing %s payments ')
+    return render_template('admin/txn_reconcile.html', txn=txn, payments_forms=payments_forms,
+                           suppress_form=suppress_form)
 
 @app.route("/admin/make-admin", methods=['GET', 'POST'])
 @login_required

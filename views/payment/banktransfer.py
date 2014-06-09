@@ -35,8 +35,7 @@ def transfer_start():
 
     msg = Message("Your EMF ticket purchase",
         sender=app.config['TICKETS_EMAIL'],
-        recipients=[current_user.email]
-    )
+        recipients=[current_user.email])
     msg.body = render_template("tickets-purchased-email-banktransfer.txt",
         user=current_user, payment=payment)
     mail.send(msg)
