@@ -24,7 +24,7 @@ clean:
 db:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createdb
 
-data: tickets tokens shifts
+data: tickets tokens shifts bankaccounts
 
 tickets:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createtickets
@@ -36,14 +36,18 @@ shifts:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createroles
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createshifts
 
+bankaccounts:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createbankaccounts
+
+loadofx:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py loadofx -f var/data.ofx
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py loadofx -f var/data-eur.ofx
 
 checkreconcile:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py reconcile -f var/data.ofx
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py reconcile -f var/data-eur.ofx
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py reconcile
 
 reallyreconcile:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py reconcile -f var/data.ofx -d
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py reconcile -f var/data-eur.ofx -d
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py reconcile -d
 
 
 warnexpire:

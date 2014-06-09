@@ -17,7 +17,10 @@ from datetime import datetime, timedelta
 
 from main import app, mail, db
 from models import User, TicketType, Ticket, TicketPrice, TicketToken, Role, Shift, ShiftSlot
-from models.payment import Payment, BankPayment, GoCardlessPayment, safechars
+from models.payment import (
+    Payment, GoCardlessPayment,
+    BankPayment, BankAccount, BankTransaction,
+)
 from sqlalchemy import text
 
 manager = Manager(app)
@@ -27,106 +30,158 @@ class CreateDB(Command):
         from main import db
         db.create_all()
 
-class Reconcile(Command):
-  """
-    Reconcile transactions in a .ofx file against the emfcamp db
-  """
-  option_list = (Option('-f', '--file', dest='filename', help="The .ofx file to load"),
-                 Option('-d', '--doit', action='store_true', help="set this to actually change the db"),
-                 Option('-q', '--quiet', action='store_true', help="don't be verbose"),
+class CreateBankAccounts(Command):
+    def run(self):
+        gbp = BankAccount('492900', '20716473590526', 'GBP')
+        eur = BankAccount('492900', '20716472954433', 'EUR')
+        for acct in [gbp, eur]:
+            try:
+                BankAccount.query.filter_by(acct_id=acct.acct_id, sort_code=acct.sort_code).one()
+            except NoResultFound:
+                app.logger.info('Adding %s account %s %s', acct.currency, acct.sort_code, acct.acct_id)
+                db.session.add(acct)
+
+        db.session.commit()
+
+class LoadOfx(Command):
+    option_list = [Option('-f', '--file', dest='filename', help="The .ofx file to load")]
+
+    def run(self, filename):
+        ofx = ofxparse.OfxParser.parse(file(filename))
+
+        acct_id = ofx.account.account_id
+        sort_code = ofx.account.routing_number
+        account = BankAccount.get(sort_code, acct_id)
+        if ofx.account.statement.currency.lower() != account.currency.lower():
+            app.logger.error("Currency %s doesn't match account currency %s",
+                             ofx.account.statement.currency, account.currency)
+            return
+
+        added = 0
+        duplicate = 0
+        dubious = 0
+
+        for txn in ofx.account.statement.transactions:
+            if txn.date < datetime(2014, 1, 1):
+                app.logger.debug('Ignoring historic transaction from %s', txn.date)
+                continue
+            if txn.amount <= 0:
+                app.logger.info('Ignoring non-credit transaction for %s', txn.amount)
+                continue
+
+            dbtxn = BankTransaction(
+                account_id=account.id,
+                date=txn.date,
+                type=txn.type,
+                amount=txn.amount,
+                payee=txn.payee,
+                fit_id=txn.id,
                 )
 
-  badrefs = []
-  alreadypaid = 0
-  paid = 0
-  tickets_paid = 0
+            matches = dbtxn.get_matching()
 
-  def run(self, filename, doit, quiet):
-    self.doit = doit
-    self.quiet = quiet
-    
-    data = ofxparse.OfxParser.parse(file(filename))
+            different_fit_ids = matches.filter( BankTransaction.fit_id != dbtxn.fit_id )
+            if different_fit_ids.count():
+                app.logger.warn('Matching transactions with different fit_ids: %s', different_fit_ids.count())
+                # fit_id may have been changed, so add it anyway
+                db.session.add(dbtxn)
+                added += 1
+                dubious += 1
+                continue
 
-    for txn in data.account.statement.transactions:
-      # field mappings:
-      # 
-      # NAME 		: payee  <-- the ref we want
-      # TRNTYPE 	: type   <-- OTHER or DIRECTDEP
-      # MEMO		: memo   <-- ?
-      # FITID		: id     <-- also ?
-      # TRNAMT		: amount <-- this is important...
-      # DTPOSTED	: date   
-      if txn.date > datetime(2014, 1, 1) and txn.amount > 0:
-        self.reconcile(txn)
-    
-    if len(self.badrefs) > 0:
-      print
-      print "unmatched references:"
-      for r in self.badrefs:
-        print r
-    print
-    print "already paid: %d, payments paid this run: %d, tickets: %d" % (self.alreadypaid, self.paid, self.tickets_paid)
+            if txn.id == '00000000':
+                # There seems to be a serial in the payee field. Assume that's enough.
+                if matches.count():
+                    app.logger.debug('Ignoring duplicate transaction from %s', dbtxn.payee)
+                    duplicate += 1
+                else:
+                    db.session.add(dbtxn)
+                    added += 1
+                    continue
 
-  def find_payment(self, name):
-    ref = name.upper()
-    # looks like this is:
-    # NAME REF XXX
-    # where name may contain multiple chars, and XXX is a 3 letter code
-    # originating bank(?)
-    #
-    found = re.findall('[%s]{4}[- ]?[%s]{4}' % (safechars, safechars), ref)
-    for f in found:
-      bankref = f.replace('-', '').replace(' ', '')
-      try:
-        return BankPayment.query.filter_by(bankref=bankref).one()
-      except NoResultFound:
-        continue
-    else:
-      raise ValueError('No matches found ', name)
+            else:
+                if matches.filter_by(fit_id=dbtxn.fit_id).count():
+                    app.logger.debug('Ignoring duplicate transaction %s', dbtxn.fit_id)
+                    duplicate += 1
+                elif BankTransaction.query.filter_by(fit_id=dbtxn.fit_id).count():
+                    app.logger.error('Non-matching transactions with same fit_id %s', dbtxn.fit_id)
+                    dubious += 1
+                else:
+                    db.session.add(dbtxn)
+                    added += 1
+                    continue
 
-  def reconcile(self, txn):
-    if txn.type.lower() not in ('other', 'directdep'):
-      if not self.quiet:
-        print 'Ignoring "%s" transaction from %s' % (txn.type, txn.payee)
-      return
+        db.session.commit()
+        app.logger.info('Import complete: %s new, %s duplicate, %s dubious',
+                        added, duplicate, dubious)
 
-    if txn.payee.startswith("GOCARDLESS LTD "):
-      # silently ignore gocardless payments
-      return
 
-    try:
-      payment = self.find_payment(txn.payee)
-    except Exception, e:
-      if not self.quiet:
-        print "Exception matching %s: %s" % (txn.payee, e)
-      self.badrefs.append((txn.payee, txn.amount))
-      return
+class Reconcile(Command):
 
-    amount = Decimal(txn.amount)
-    if payment.amount != amount:
-       print "Tried to reconcile payment %s for %s, but amount paid (%.2f) didn't match amount owed (%.2f)" % (txn.payee, payment.user.name, amount, payment.amount)
+    option_list = [Option('-d', '--doit', action='store_true', help="set this to actually change the db")]
 
-    if payment.state == 'paid':
-      self.alreadypaid += 1
-      return
+    def run(self, doit):
+        txns = BankTransaction.query.filter_by(payment_id=None)
 
-    if not self.quiet:
-      print "User %s paid for payment %s with ref: %s" % (payment.user.name, payment.id, txn.payee)
-    
-    self.paid += 1
-    self.tickets_paid += len(payment.tickets.all())
-    if self.doit:
-      for t in payment.tickets:
-        t.paid = True
-      payment.state = "paid"
-      db.session.commit()
+        paid = 0
+        failed = 0
 
-      msg = Message("Electromagnetic Field ticket purchase update",
-                    sender=app.config['TICKETS_EMAIL'],
-                    recipients=[payment.user.email])
-      msg.body = render_template("tickets-paid-email-banktransfer.txt",
-                    user=payment.user, payment=payment)
-      mail.send(msg)
+        for txn in txns:
+            if txn.type.lower() not in ('other', 'directdep'):
+                raise ValueError('Unexpected transaction type for %s: %s', txn.id, txn.type)
+
+            if txn.payee.startswith("GOCARDLESS LTD "):
+                continue
+
+            if txn.payee.startswith("STRIPE PAYMENTS EU "):
+                continue
+
+            app.logger.info("Processing txn %s: %s", txn.id, txn.payee)
+
+            payment = txn.match_payment()
+            if not payment:
+                app.logger.warn("Could not match payee, skipping")
+                failed += 1
+                continue
+
+            app.logger.info("Matched to payment %s by %s for %s %s",
+                payment.id, payment.user.name, payment.amount, payment.currency)
+
+            if txn.amount != payment.amount:
+                app.logger.warn("Transaction amount %s doesn't match %s, skipping",
+                                txn.amount, payment.amount)
+                failed += 1
+                continue
+
+            if txn.account.currency != payment.currency:
+                app.logger.warn("Transaction currency %s doesn't match %s, skipping",
+                                txn.account.currency, payment.currency)
+                failed += 1
+                continue
+
+            if payment.state == 'paid':
+                app.logger.error("Payment %s has already been paid", payment.id)
+                failed += 1
+                continue
+
+            if doit:
+                txn.payment = payment
+                for t in payment.tickets:
+                    t.paid = True
+                payment.state = 'paid'
+                db.session.commit()
+
+                msg = Message("Electromagnetic Field ticket purchase update",
+                              sender=app.config['TICKETS_EMAIL'],
+                              recipients=[payment.user.email])
+                msg.body = render_template("tickets-paid-email-banktransfer.txt",
+                              user=payment.user, payment=payment)
+                mail.send(msg)
+
+            app.logger.info("Payment reconciled")
+            paid += 1
+
+        app.logger.info('Reconciliation complete: %s paid, %s failed', paid, failed)
 
 
 class TestEmails(Command):
@@ -453,6 +508,8 @@ class SendTickets(Command):
 
 if __name__ == "__main__":
   manager.add_command('createdb', CreateDB())
+  manager.add_command('createbankaccounts', CreateBankAccounts())
+  manager.add_command('loadofx', LoadOfx())
   manager.add_command('reconcile', Reconcile())
   manager.add_command('warnexpire', WarnExpire())
   manager.add_command('expire', Expire())

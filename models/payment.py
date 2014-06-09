@@ -1,10 +1,11 @@
 from main import db, gocardless, external_url
-from flask import url_for
 from sqlalchemy import event
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import get_history
+from sqlalchemy.orm.exc import NoResultFound
 
 import random
+import re
 from decimal import Decimal, ROUND_UP
 from datetime import datetime
 
@@ -62,6 +63,107 @@ class BankPayment(Payment):
     def __repr__(self):
         return "<BankPayment: %s %s>" % (self.state, self.bankref)
 
+
+class BankAccount(db.Model):
+    __tablename__ = 'bank_account'
+    id = db.Column(db.Integer, primary_key=True)
+    sort_code = db.Column(db.String, nullable=False)
+    acct_id = db.Column(db.String, nullable=False)
+    currency = db.Column(db.String, nullable=False)
+
+    def __init__(self, sort_code, acct_id, currency='GBP'):
+        self.sort_code = sort_code
+        self.acct_id = acct_id
+        self.currency = currency
+
+    @classmethod
+    def get(cls, sort_code, acct_id):
+        return cls.query.filter_by(acct_id=acct_id, sort_code=sort_code).one()
+
+db.Index('ix_bank_account_sort_code_acct_id', BankAccount.sort_code, BankAccount.acct_id, unique=True)
+
+class BankTransaction(db.Model):
+    __tablename__ = 'bank_transaction'
+
+    id = db.Column(db.Integer, primary_key=True)
+    account_id = db.Column(db.Integer, db.ForeignKey(BankAccount.id), nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
+    type = db.Column(db.String, nullable=False)
+    amount_int = db.Column(db.Integer, nullable=False)
+    fit_id = db.Column(db.String, index=True)  # allegedly unique, but don't trust it
+    payee = db.Column(db.String, nullable=False)
+    payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
+    suppressed = db.Column(db.Boolean, nullable=False, default=False)
+    account = db.relationship(BankAccount, backref='transactions')
+    payment = db.relationship(BankPayment, backref='transactions')
+
+    def __init__(self, account_id, type, date, amount, payee, fit_id=None):
+        self.account_id = account_id
+        self.date = date
+        self.type = type
+        self.amount = amount
+        self.payee = payee
+        self.fit_id = fit_id
+
+    def __repr__(self):
+        return "<BankTransaction: %s, %s>" % (self.amount, self.payee)
+
+    @property
+    def amount(self):
+        return Decimal(self.amount_int) / 100
+
+    @amount.setter
+    def amount(self, val):
+        self.amount_int = int(val * 100)
+
+    def get_matching(self):
+        # fit_ids can change, and payments can be reposted
+        matching = self.query.filter_by(
+            account_id=self.account_id,
+            date=self.date,
+            type=self.type,
+            amount_int=self.amount_int,
+            payee=self.payee,
+        )
+        return matching
+
+    def match_payment(self):
+        """
+        For GBP transactions, we tend to see:
+
+          name ref type
+
+        where type is BGC or BBP.
+
+        For EUR, it's:
+
+          name*serial*ref
+
+        where serial is a 6-digit number, and ref is often the payee
+        name again, or REFERENCE, and always truncated to 8 chars.
+        """
+
+        ref = self.payee.upper()
+
+        found = re.findall('[%s]{4}[- ]?[%s]{4}' % (safechars, safechars), ref)
+        for f in found:
+            bankref = f.replace('-', '').replace(' ', '')
+            try:
+                return BankPayment.query.filter_by(bankref=bankref).one()
+            except NoResultFound:
+                continue
+
+        return None
+
+
+db.Index('ix_bank_transaction_u1',
+         BankTransaction.account_id,
+         BankTransaction.date,
+         BankTransaction.type,
+         BankTransaction.amount_int,
+         BankTransaction.payee,
+         BankTransaction.fit_id,
+         unique=True)
 
 class GoCardlessPayment(Payment):
     name = 'GoCardless payment'
