@@ -129,6 +129,17 @@ class BankTransaction(db.Model):
 
     def match_payment(self):
         """
+        We need to deal with human error and character deletion without colliding.
+        Unless we use some sort of coding, the minimum length of a bankref should
+        be 8, although 7 is workable. For reference:
+
+                    Transactions
+        Keyspace    10^2  10^3  10^4
+        24^8 ~2^36  2^24  2^18  2^11
+        24^7 ~2^32  2^20  2^13  2^7
+        24^6 ~2^28  2^15  2^9   2^2
+        24^5 ~2^23  2^11  2^4   2^-3
+
         For GBP transactions, we tend to see:
 
           name ref type
@@ -150,6 +161,15 @@ class BankTransaction(db.Model):
             bankref = f.replace('-', '').replace(' ', '')
             try:
                 return BankPayment.query.filter_by(bankref=bankref).one()
+            except NoResultFound:
+                continue
+
+        # It's pretty safe to match against the last character being lost
+        found = re.findall('[%s]{4}[- ]?[%s]{3}' % (safechars, safechars), ref)
+        for f in found:
+            bankref = f.replace('-', '').replace(' ', '')
+            try:
+                return BankPayment.query.filter( BankPayment.bankref.startswith(bankref) ).one()
             except NoResultFound:
                 continue
 
