@@ -36,10 +36,10 @@ No suitable payments were found.
 <tbody>
 {% for payment, form in payments_forms %}
 <tr>
-  <td>{{ payment.user.name }}</td>
+  <td><b>{{ payment.user.name }}</b></td>
   <td>{{ payment.user.email }}</td>
   <td><b>{{ payment.amount | price(payment.currency) }}</b></td>
-  <td>{{ payment.bankref }}</td>
+  <td>{{ payment.bankref | bankref }}</td>
   <td>
     <form action="{{ url_for('admin_txn_reconcile', txn_id=txn.id) }}" method="post">
       {{ form.hidden_tag() }}
