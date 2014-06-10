@@ -7,6 +7,8 @@
 
 env
 var/*.db
+var/*.ofx
+var/*.log
 static/.webassets-cache/
 static/gen
 config/live.cfg*
