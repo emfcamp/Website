@@ -121,7 +121,7 @@ class Reconcile(Command):
     option_list = [Option('-d', '--doit', action='store_true', help="set this to actually change the db")]
 
     def run(self, doit):
-        txns = BankTransaction.query.filter_by(payment_id=None)
+        txns = BankTransaction.query.filter_by(payment_id=None, suppressed=False)
 
         paid = 0
         failed = 0
