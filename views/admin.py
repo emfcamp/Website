@@ -40,8 +40,9 @@ def stats():
     full = Ticket.query.filter( Ticket.code.startswith('full') )
     kids = Ticket.query.filter( Ticket.code.startswith('kids') )
 
-    full_unpaid = full.filter( Ticket.expires >= datetime.utcnow(), Ticket.paid == False )
-    kids_unpaid = kids.filter( Ticket.expires >= datetime.utcnow(), Ticket.paid == False )
+    # cancelled tickets get their expiry set to the cancellation time
+    full_unpaid = full.filter( Ticket.expires >= datetime.utcnow(), Ticket.paid == False, Payment.state != 'new' )
+    kids_unpaid = kids.filter( Ticket.expires >= datetime.utcnow(), Ticket.paid == False, Payment.state != 'new' )
 
     full_bought = full.filter( Ticket.paid == True )
     kids_bought = kids.filter( Ticket.paid == True )
