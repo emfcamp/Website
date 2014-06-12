@@ -130,7 +130,7 @@ class Reconcile(Command):
             if txn.type.lower() not in ('other', 'directdep'):
                 raise ValueError('Unexpected transaction type for %s: %s', txn.id, txn.type)
 
-            if txn.payee.startswith("GOCARDLESS LTD "):
+            if txn.payee.startswith("GOCARDLESS "):
                 app.logger.info('Suppressing GoCardless transfer %s', txn.id)
                 if doit:
                     txn.suppressed = True
