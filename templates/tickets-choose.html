@@ -10,16 +10,15 @@
 
 <form method="post" class="choose-tickets-form" id="choose_tickets">
 {{form.hidden_tag()}}
-<div>
-    <label for="select_currency">Currency:</label>
-    <select name="currency" id="select_currency">
+<div class="pull-right">
+    <label class="sr-only">Currency:</label>
+    <div class="btn-group">
         {% for c in CURRENCIES %}
-        <option value="{{ c.code }}" {% if user_currency == c.code -%} selected="selected" {%- endif %}>{{ c.symbol }}</option>
+        <!-- IE8+ -->
+        <button type="submit" class="btn btn-primary {% if user_currency == c.code -%} active {%- endif %}" name="set_currency" value="{{ c.code }}" data-toggle="button">{{ c.symbol }}</button>
         {% endfor %}
-    </select>
-    <noscript>
-        {{ form.update_currency(class_="btn") }}
-    </noscript>
+    </div>
+    <p></p>
 </div>
 
 <table class="table tickets-table">
@@ -66,7 +65,7 @@
 <tfoot>
 <tr>
     <td colspan="3">
-    <div id="summary" class="form-group">
+    <div id="summary" class="form-group pull-right">
         <div>Total will be shown on the next page</div>
         <div style="display: none" class="form-group">
             <label>Total:
@@ -78,7 +77,7 @@
 </tfoor>
 </table>
 
-<div class="form-actions">
+<div class="form-actions pull-right">
     {{ form.buy(class_="btn btn-primary btn-large") }}
 </div>
 
@@ -102,9 +101,7 @@ EMF.format_price = function(amount, currency, after) {
   return symbol + amount;
 };
 EMF.update_currency = function() {
-  EMF.user_currency = $('#select_currency').val();
-  //var form = $('#choose_tickets');
-  //$.post({{ url_for('tickets_choose', _ajax='')|tojson }}, form.serialize());
+  EMF.user_currency = $('#currency_code').val();
   $('.ticket-type').each(function() {
     var t = $(this);
     var price = t.data('price-' + EMF.user_currency.toLowerCase());
@@ -126,7 +123,9 @@ $(function() {
   $('#summary').children().toggle();
 
   $('.amount').on('change', EMF.update_total).change();
-  $('#select_currency').on('change', function(event) {
+  $('[name=set_currency]').on('click', function(event) {
+      $(this).closest('.btn-group').find('.btn').not(this).removeClass('active');
+      $('#currency_code').val($(this).attr('value'));
       EMF.update_currency();
       EMF.update_total();
       event.preventDefault();

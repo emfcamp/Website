@@ -125,17 +125,6 @@ img.padit {
 	padding: 24px;
 }
 
-.choose-tickets-form .btn-primary,
-.choose-tickets-form #summary
-{
-  float: right;
-}
-
-.choose-tickets-form #summary
-{
-  text-align: right;
-}
-
 .ticket-info.form-horizontal .control-group {
   margin-top: 2ex;
   margin-bottom: 0;

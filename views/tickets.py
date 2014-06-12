@@ -1,7 +1,7 @@
 from main import app, db, external_url
 from views import (
     get_user_currency, set_user_currency, get_basket, TICKET_CUTOFF,
-    CURRENCY_SYMBOLS,
+    CURRENCIES, CURRENCY_SYMBOLS,
     IntegerSelectField, HiddenIntegerField, TelField, Form, feature_flag
 )
 
@@ -20,7 +20,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from wtforms.validators import Required, Optional, ValidationError
 from wtforms import (
     SubmitField, BooleanField, TextField,
-    DecimalField, FieldList, FormField,
+    DecimalField, FieldList, FormField, HiddenField,
 )
 from datetime import datetime, timedelta
 from StringIO import StringIO
@@ -154,14 +154,13 @@ class TicketAmountForm(Form):
 
 class TicketAmountsForm(Form):
     types = FieldList(FormField(TicketAmountForm))
-    currency = TextField('Currency', [Required()])
-    buy = SubmitField('Buy Tickets', [Optional()])
-    update_currency = SubmitField('Go', [Optional()])
+    buy = SubmitField('Buy Tickets')
+    currency_code = HiddenField('Currency')
+    set_currency = TextField('Set Currency', [Optional()])
 
-    def validate_currency(form, field):
+    def validate_set_currency(form, field):
         if field.data not in CURRENCY_SYMBOLS:
             raise ValidationError('Invalid currency %s' % field.data)
-
 
 @app.route("/tickets/choose", methods=['GET', 'POST'])
 @feature_flag('TICKET_SALES')
@@ -169,7 +168,7 @@ def tickets_choose():
     if TICKET_CUTOFF:
         return render_template("tickets-cutoff.html")
 
-    form = TicketAmountsForm(request.form)
+    form = TicketAmountsForm()
 
     if not form.types:
         for tt in TicketType.query.order_by(TicketType.order).all():
@@ -204,9 +203,9 @@ def tickets_choose():
         f._any = any(values)
 
     if form.validate_on_submit():
-        set_user_currency(form.currency.data)
-
         if form.buy.data:
+            set_user_currency(form.currency_code.data)
+
             basket = []
             for f in form.types:
                 if f.amount.data:
@@ -228,8 +227,15 @@ def tickets_choose():
                 else:
                     return redirect(url_for('signup', next=url_for('tickets_info')))
 
-    if request.method == 'POST' and form.update_currency.data:
-        app.logger.info('User running without Javascript: updated currency only')
+    if request.method == 'POST' and form.set_currency.data:
+        if form.set_currency.validate(form):
+            app.logger.info("Updating currency to %s only", form.set_currency.data)
+            set_user_currency(form.set_currency.data)
+
+            for field in form:
+                field.errors = []
+
+    form.currency_code.data = get_user_currency()
 
     return render_template("tickets-choose.html", form=form)
 
