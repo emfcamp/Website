@@ -86,7 +86,7 @@ def add_payment_and_tickets(paymenttype):
     current_user.payments.append(payment)
 
     app.logger.info('Creating tickets for basket %s', basket)
-    app.logger.info('Payment: %s for %s %s (was %s)', paymenttype.name, payment.amount, currency, total)
+    app.logger.info('Payment: %s for %s %s (ticket total %s)', paymenttype.name, payment.amount, currency, total)
     app.logger.info('Ticket info: %s', infodata)
 
     if infodata:
