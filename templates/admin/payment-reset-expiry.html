@@ -25,7 +25,7 @@
 {% for t in payment.tickets %}
 <tr>
   <td>{{ t.type.name }}</td>
-  <td>{{ t.expires }}</td>
+  <td>{{ t.expires.strftime('%Y-%m-%d %H:%M:%S') }}</td>
 </tr>
 {% endfor %}
 </tbody>
