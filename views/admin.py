@@ -20,6 +20,7 @@ from wtforms import (
 )
 
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.sql.functions import func
 
 from Levenshtein import ratio, jaro
 
@@ -33,6 +34,21 @@ def admin_required(f):
             return f(*args, **kwargs)
         return app.login_manager.unauthorized()
     return wrapped
+
+@app.context_processor
+def admin_counts():
+    if not request.path.startswith('/admin'):
+        return {}
+
+    unreconciled_count = BankTransaction.query.filter_by(payment_id=None, suppressed=False).count()
+
+    expiring_count = BankPayment.query.join(Ticket).filter(
+        BankPayment.state == 'inprogress',
+        Ticket.expires < datetime.utcnow() + timedelta(days=3),
+    ).group_by(BankPayment.id).count()
+
+    return {'unreconciled_count': unreconciled_count,
+            'expiring_count': expiring_count}
 
 
 @app.route("/stats")
@@ -69,9 +85,7 @@ def stats():
 @app.route('/admin')
 @admin_required
 def admin():
-    unreconciled_count = BankTransaction.query.filter_by(payment_id=None, suppressed=False).count()
-    return render_template('admin/admin.html',
-                           unreconciled_count=unreconciled_count)
+    return render_template('admin/admin.html')
 
 
 class TransactionSuppressForm(Form):
@@ -97,7 +111,9 @@ def admin_txn_suppress(txn_id):
         if form.suppress.data:
             txn.suppressed = True
             app.logger.info('Transaction %s suppressed', txn.id)
+
             db.session.commit()
+            flash("Transaction %s suppressed" % txn.id)
 
     return redirect(url_for('admin_txns'))
 
@@ -130,10 +146,7 @@ class ManualReconcileForm(Form):
 @app.route('/admin/transaction/<int:txn_id>/reconcile', methods=['GET', 'POST'])
 @admin_required
 def admin_txn_reconcile(txn_id):
-    try:
-        txn = BankTransaction.query.get(txn_id)
-    except NoResultFound:
-        abort(404)
+    txn = BankTransaction.query.get_or_404(txn_id)
 
     form = ManualReconcileForm()
     if form.validate_on_submit():
@@ -179,7 +192,7 @@ def admin_txn_reconcile(txn_id):
         payments_forms.append((payment, form))
 
     app.logger.info('Suggesting %s payments for txn %s', len(payments_forms), txn.id)
-    return render_template('admin/txn_reconcile.html', txn=txn, payments_forms=payments_forms,
+    return render_template('admin/txn-reconcile.html', txn=txn, payments_forms=payments_forms,
                            suppress_form=suppress_form)
 
 @app.route("/admin/make-admin", methods=['GET', 'POST'])
@@ -209,7 +222,7 @@ def make_admin():
                             db.session.commit()
                 return redirect(url_for('make_admin'))
         adminform = MakeAdminForm(formdata=None)
-        return render_template('admin/admin_make_admin.html', users=users, adminform = adminform)
+        return render_template('admin/users-make-admin.html', users=users, adminform = adminform)
     else:
         return(('', 404))
 
@@ -241,50 +254,45 @@ def ticket_types():
     else:
         return(('', 404))
 
-class ExpireResetForm(Form):
-    payment = HiddenField('payment_id', [Required()])
-    reset = SubmitField('Reset')
-    yes = SubmitField('Yes')
-    no = SubmitField('No')
+@app.route('/admin/payment/expiring')
+@admin_required
+def admin_expiring():
+    expiring = BankPayment.query.join(Ticket).filter(
+        BankPayment.state == 'inprogress',
+        Ticket.expires < datetime.utcnow() + timedelta(days=3),
+    ).with_entities(
+        BankPayment,
+        func.min(Ticket.expires).label('first_expires'),
+        func.count(Ticket.id).label('ticket_count'),
+    ).group_by(BankPayment).order_by('first_expires').all()
 
-@app.route("/admin/reset-expiry", methods=['GET', 'POST'])
-@login_required
-def expire_reset():
-    if current_user.admin:
-        if request.method == "POST":
-            form = ExpireResetForm()
-            if form.validate():
-                if form.yes.data == True:
-                    payment = Payment.query.get(int(form.payment.data))
-                    app.logger.info("%s Manually reset expiry for tickets for payment %s", current_user.name, payment.id)
-                    for t in payment.tickets:
-                        t.expires = datetime.utcnow() + timedelta(10)
-                        app.logger.info("ticket %s (%s, for %s) expiry reset", t.id, t.type.name, payment.user.name)
-                    db.session.commit()
+    return render_template('admin/payments-expiring.html', expiring=expiring)
 
-                    return redirect(url_for('expire_reset'))
-                elif form.no.data == True:
-                    return redirect(url_for('expire_reset'))
-                elif form.payment.data:
-                    payment = Payment.query.get(int(form.payment.data))
-                    ynform = ExpireResetForm(payment=payment.id, formdata=None)
-                    return render_template('admin/admin_reset_expiry_yesno.html', ynform=ynform, payment=payment)
+class ResetExpiryForm(Form):
+    reset = SubmitField("Reset")
 
-        # >= datetime.utcnow()(Ticket.expires >= datetime.utcnow()
-        unpaid = Ticket.query.filter(Ticket.paid == False).order_by(Ticket.expires).all()
-        payments = {}
-        for t in unpaid:
-            if t.payment != None:
-                if t.payment.id not in payments:
-                    payments[t.payment.id] = t.payment
-        resetforms = {}
-        opayments = []
-        for p in payments:
-            resetforms[p] = ExpireResetForm(payment=p, formdata=None)
-            opayments.append(payments[p])
-        return render_template('admin/admin_reset_expiry.html', payments=opayments, resetforms=resetforms)
-    else:
-        return(('', 404))
+@app.route('/admin/payment/<int:payment_id>/reset-expiry', methods=['GET', 'POST'])
+@admin_required
+def admin_reset_expiry(payment_id):
+    payment = Payment.query.get_or_404(payment_id)
+
+    form = ResetExpiryForm()
+    if form.validate_on_submit():
+        if form.reset.data:
+            app.logger.info("%s manually extending expiry for payment %s", current_user.name, payment.id)
+            for t in payment.tickets:
+                if payment.currency == 'GBP':
+                    t.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS_TRANSFER'))
+                elif payment.currency == 'EUR':
+                    t.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS_TRANSFER_EURO'))
+                app.logger.info("Reset expiry for ticket %s", t.id)
+
+            db.session.commit()
+
+            flash("Expiry reset for payment %s" % payment.id)
+            return redirect(url_for('admin_expiring'))
+
+    return render_template('admin/payment-reset-expiry.html', payment=payment, form=form)
 
 @app.route('/admin/receipt/<receipt>')
 @login_required

@@ -1,0 +1,31 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'admin_expiring' %}
+{% block body %}
+<h2>Expiring tickets</h2>
+
+<table class="table table-condensed table-striped">
+<thead><tr>
+  <th>Name</th>
+  <th>Email</th>
+  <th>Tickets</th>
+  <th>Amount</th>
+  <th>Expires</th>
+  <th></th>
+</tr></thead>
+<tbody>
+{% for payment, first_expires, ticket_count in expiring %}
+<tr>
+  <td>{{ payment.user.name }}</td>
+  <td>{{ payment.user.email }}</td>
+  <td>{{ ticket_count }}</td>
+  <td><b>{{ payment.amount | price(payment.currency) }}</b></td>
+  <td>{{ first_expires.strftime('%Y-%m-%d') }}</td>
+  <td>
+    <a class="btn btn-primary" href="{{ url_for('admin_reset_expiry', payment_id=payment.id) }}">Reset expiry</a>
+  </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+{% endblock %}

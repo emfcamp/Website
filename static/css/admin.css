@@ -1,0 +1,14 @@
+header h1 {
+  text-align: left;
+  font-size: 12pt;
+  margin: 0.2ex 0;
+}
+header h1 .logo {
+  width: 22px;
+  height: 32px;
+  background-size: contain;
+  vertical-align: -11px;
+}
+header h1 > * {
+  font-size: 12pt;
+}

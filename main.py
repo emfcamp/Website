@@ -25,9 +25,12 @@ mail = Mail(app)
 login_manager = LoginManager()
 
 assets = Environment(app)
-css = Bundle('css/main.css',
-                output='gen/packed.css', filters='cssmin')
-assets.register('css_all', css)
+css_all = Bundle('css/main.css',
+                  output='gen/packed.css', filters='cssmin')
+css_admin = Bundle('css/admin.css',
+                   output='gen/admin-packed.css', filters='cssmin')
+assets.register('css_all', css_all)
+assets.register('css_admin', css_admin)
 
 gocardless.environment = app.config['GOCARDLESS_ENVIRONMENT']
 gocardless.set_details(app_id=app.config['GOCARDLESS_APP_ID'],

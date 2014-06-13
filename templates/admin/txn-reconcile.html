@@ -1,6 +1,7 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
+{% set nav_active = 'admin_txns' %}
 {% block body %}
-<h1>Reconcile transaction</h1>
+<h2>Reconcile transaction</h2>
 
 <table class="table table-condensed table-striped">
 <thead><tr>
@@ -58,5 +59,4 @@ No suitable payments were found.
 </form>
 </div>
 
-<a class="btn btn-default" href="{{ url_for('admin') }}">Back</a>
 {% endblock %}

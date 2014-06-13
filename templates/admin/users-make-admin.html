@@ -1,6 +1,7 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
+{% set nav_active = 'make_admin' %}
 {% block body %}
-<H1>List of admins</H1>
+<h2>List of admins</h2>
 
 <form method=post action="{{ url_for('make_admin') }}">
 {{ adminform.hidden_tag() }}
@@ -18,9 +19,7 @@
 </tr>
 {% endfor %}
 </table>
-{{ adminform.change(class_="btn btn-success") }}
+{{ adminform.change(class_="btn btn-success pull-right") }}
 </form>
-
-<p>Back to <a href="{{ url_for('admin') }}">admin things</a>.</p>
 
 {% endblock %}

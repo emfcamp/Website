@@ -1,6 +1,7 @@
-{% extends "base.html" %}
+{% extends "admin/base.html" %}
+{% set nav_active = 'admin_txns' %}
 {% block body %}
-<h1>Outstanding transactions</h1>
+<h2>Outstanding transactions</h2>
 
 <table class="table table-condensed table-striped">
 <thead><tr>
@@ -18,7 +19,7 @@
   <td>{{ txn.date.strftime('%Y-%m-%d') }}</td>
   <td>{{ txn.type }}</td>
   <td><b>{{ txn.payee }}</b></td>
-  <td><b>{{ txn.amount | price(txn.account.currency) }}</b></td>
+  <td>{{ txn.amount | price(txn.account.currency) }}</td>
   <!--<td>{{ txn.fit_id }}</td>-->
   <td>
     <a class="btn btn-primary" href="{{ url_for('admin_txn_reconcile', txn_id=txn.id) }}">Reconcile</a>
@@ -33,5 +34,4 @@
 {% endfor %}
 </tbody></table>
 
-<a class="btn btn-default" href="{{ url_for('admin') }}">Back</a>
 {% endblock %}

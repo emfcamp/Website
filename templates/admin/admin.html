@@ -1,15 +1,1 @@
-{% extends "base.html" %}
-{% block body %}
-<div class="col-md-10">
-<h1>Admin things</h1>
-
-<ul class="nav nav-pills nav-stacked">
-<li><a href="{{ url_for('admin_txns') }}">Bank transfers <span class="badge">{{ unreconciled_count }}</span></a></li>
-<li><a href="{{ url_for('make_admin') }}">Make someone an admin</a></li>
-{#<li><a href="{{ url_for('ticket_types') }}">Edit Ticket Types</a></li>
-<li><a href="{{ url_for('expire_reset') }}">Reset a Ticket Expirey</a></li>
-<li><a href="{{ url_for('all_shifts') }}">See all volunteer shifts</a></li>#}
-</ul>
-
-</div>
-{% endblock %}
+{% extends 'admin/base.html' %}

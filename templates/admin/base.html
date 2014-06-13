@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block head %}
+        {%- assets "css_admin" -%}
+        <link rel="stylesheet" href="{{ ASSET_URL }}">
+        {% endassets -%}
+{% endblock %}
+{% block document %}
+<div class="container admin">
+    <header>
+        <h1>
+            <span class="logo"></span>
+            <a href="{{ url_for('admin') }}">Electromagnetic Field</a>
+        </h1>
+    </header>
+    <div class="row">
+        <nav class="col-md-3">
+            <ul class="nav nav-pills nav-stacked">
+                <li {% if nav_active == 'admin_txns' -%} class="active" {%- endif %}><a href="{{ url_for('admin_txns') }}">
+                    Bank transfers <span class="badge">{{ unreconciled_count }}</span>
+                </a></li>
+                <li {% if nav_active == 'admin_expiring' -%} class="active" {%- endif %}><a href="{{ url_for('admin_expiring') }}">
+                    Expiring transfers <span class="badge">{{ expiring_count }}</span>
+                </a></li>
+                <li {% if nav_active == 'make_admin' -%} class="active" {%- endif %}><a href="{{ url_for('make_admin') }}">
+                    Make someone an admin</a></li>
+                {#<li><a href="{{ url_for('ticket_types') }}">Edit Ticket Types</a></li>
+                <li><a href="{{ url_for('all_shifts') }}">See all volunteer shifts</a></li>#}
+            </ul>
+        </nav>
+
+        <div class="col-md-9">
+        {% for message in get_flashed_messages() -%}
+            <div class="alert alert-danger">{{ message }}</div>
+        {% endfor -%}
+
+        {% block body -%}{% endblock -%}
+        </div>
+    </div>
+    <footer>
+        <p>
+        Electromagnetic Field Ltd. 2014.
+        <a href="{{url_for('company')}}">Company details</a>.
+        Kindly hosted by <a href="http://bitfolk.com/">Bitfolk</a>.
+        {% if current_user.is_authenticated() %}
+        <a class="logout" href="{{ url_for('logout') }}">Log out</a>
+        {% endif %}
+        </p>
+    </footer>
+</div>
+{% endblock %}
+
