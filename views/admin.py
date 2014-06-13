@@ -53,18 +53,18 @@ def admin_counts():
 
 @app.route("/stats")
 def stats():
-    full = Ticket.query.filter( Ticket.code.startswith('full') )
-    kids = Ticket.query.filter( Ticket.code.startswith('kids') )
+    full = Ticket.query.join(Payment).filter( Ticket.code.startswith('full'), Payment.state != 'new' )
+    kids = Ticket.query.join(Payment).filter( Ticket.code.startswith('kids'), Payment.state != 'new' )
 
     # cancelled tickets get their expiry set to the cancellation time
-    full_unpaid = full.filter( Ticket.expires >= datetime.utcnow(), Ticket.paid == False, Payment.state != 'new' )
-    kids_unpaid = kids.filter( Ticket.expires >= datetime.utcnow(), Ticket.paid == False, Payment.state != 'new' )
+    full_unpaid = full.filter( Ticket.expires >= datetime.utcnow(), Ticket.paid == False )
+    kids_unpaid = kids.filter( Ticket.expires >= datetime.utcnow(), Ticket.paid == False )
 
     full_bought = full.filter( Ticket.paid == True )
     kids_bought = kids.filter( Ticket.paid == True )
 
-    full_gocardless_unpaid = full_unpaid.join(Payment).filter(Payment.provider == 'gocardless', Payment.state == 'inprogress')
-    full_banktransfer_unpaid = full_unpaid.join(Payment).filter(Payment.provider == 'banktransfer', Payment.state == 'inprogress')
+    full_gocardless_unpaid = full_unpaid.filter(Payment.provider == 'gocardless', Payment.state == 'inprogress')
+    full_banktransfer_unpaid = full_unpaid.filter(Payment.provider == 'banktransfer', Payment.state == 'inprogress')
 
     users = User.query
 
