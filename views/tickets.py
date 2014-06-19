@@ -119,8 +119,7 @@ def add_payment_and_tickets(paymenttype):
     return payment
 
 
-
-@app.route("/tickets", methods=['GET', 'POST'])
+@app.route("/tickets/", methods=['GET', 'POST'])
 def tickets():
     if not current_user.is_authenticated():
         return redirect(url_for('tickets_choose'))
