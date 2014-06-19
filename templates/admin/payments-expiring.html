@@ -22,6 +22,7 @@
   <td>{{ first_expires.strftime('%Y-%m-%d') }}</td>
   <td>
     <a class="btn btn-primary" href="{{ url_for('admin_reset_expiry', payment_id=payment.id) }}">Reset expiry</a>
+    <a class="btn btn-danger" href="{{ url_for('admin_cancel_payment', payment_id=payment.id) }}">Cancel</a>
   </td>
 </tr>
 {% endfor %}

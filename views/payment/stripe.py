@@ -170,9 +170,7 @@ def stripe_cancel(payment_id):
     if form.validate_on_submit():
         if form.yes.data:
             logger.info('Cancelling Stripe payment %s', payment.id)
-            for t in payment.tickets.all():
-                t.expires = datetime.now()
-            payment.state = 'cancelled'
+            payment.cancel()
             db.session.commit()
 
             if payment.token:

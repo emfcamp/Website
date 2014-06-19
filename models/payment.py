@@ -11,6 +11,9 @@ from datetime import datetime
 
 safechars = "2346789BCDFGHJKMPQRTVWXY"
 
+class StateException(Exception):
+    pass
+
 
 class Payment(db.Model):
 
@@ -46,6 +49,14 @@ class Payment(db.Model):
         premium = Decimal(cls.premium_percent) / 100 * amount_int
         premium = premium.quantize(Decimal(1), ROUND_UP)
         return premium / 100
+
+    def cancel(self):
+        if self.state == 'cancelled':
+            raise StateException('Payment %s already cancelled' % self.id)
+
+        for ticket in self.tickets:
+            ticket.expires = datetime.utcnow()
+        self.state = 'cancelled'
 
 
 class BankPayment(Payment):

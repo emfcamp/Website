@@ -274,7 +274,7 @@ class ResetExpiryForm(Form):
 @app.route('/admin/payment/<int:payment_id>/reset-expiry', methods=['GET', 'POST'])
 @admin_required
 def admin_reset_expiry(payment_id):
-    payment = Payment.query.get_or_404(payment_id)
+    payment = BankPayment.query.get_or_404(payment_id)
 
     form = ResetExpiryForm()
     if form.validate_on_submit():
@@ -293,6 +293,27 @@ def admin_reset_expiry(payment_id):
             return redirect(url_for('admin_expiring'))
 
     return render_template('admin/payment-reset-expiry.html', payment=payment, form=form)
+
+class CancelPaymentForm(Form):
+    cancel = SubmitField("Cancel payment")
+
+@app.route('/admin/payment/<int:payment_id>/cancel', methods=['GET', 'POST'])
+@admin_required
+def admin_cancel_payment(payment_id):
+    payment = BankPayment.query.get_or_404(payment_id)
+
+    form = CancelPaymentForm()
+    if form.validate_on_submit():
+        if form.cancel.data:
+            app.logger.info("%s manually cancelling payment %s", current_user.name, payment.id)
+            payment.cancel()
+            db.session.commit()
+
+            flash("Payment %s cancelled" % payment.id)
+            return redirect(url_for('admin_expiring'))
+
+    return render_template('admin/payment-cancel.html', payment=payment, form=form)
+
 
 @app.route('/admin/receipt/<receipt>')
 @login_required

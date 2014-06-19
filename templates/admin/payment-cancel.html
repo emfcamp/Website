@@ -1,9 +1,9 @@
 {% extends "admin/base.html" %}
 {% set nav_active = 'admin_expiring' %}
 {% block body %}
-<h2>Reset payment expiry</h2>
+<h2>Cancel payment</h2>
 
-<p>To reset the expiry for this payment, please click below.</p>
+<p>To manually cancel this payment, please click below.</p>
 
 <dl class="dl-horizontal">
 <dt>Name</dt><dd>{{ payment.user.name }}</dd>
@@ -27,9 +27,9 @@
 </tbody>
 </table>
 
-<form method="post" action="{{ url_for('admin_reset_expiry', payment_id=payment.id) }}" class="shrink">
+<form method="post" action="{{ url_for('admin_cancel_payment', payment_id=payment.id) }}" class="shrink">
 {{ form.hidden_tag() }}
-{{ form.reset(class_="btn btn-success pull-right") }}
+{{ form.cancel(class_="btn btn-danger pull-right") }}
 </form>
 
 {% endblock %}
