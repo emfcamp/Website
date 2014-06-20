@@ -14,7 +14,6 @@ from flaskext.mail import Message
 from wtforms import SubmitField
 
 import logging
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 

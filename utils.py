@@ -174,9 +174,7 @@ class Reconcile(Command):
 
             if doit:
                 txn.payment = payment
-                for t in payment.tickets:
-                    t.paid = True
-                payment.state = 'paid'
+                payment.paid()
                 db.session.commit()
 
                 msg = Message("Electromagnetic Field ticket purchase update",

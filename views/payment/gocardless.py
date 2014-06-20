@@ -235,10 +235,7 @@ def gocardless_bill_paid(resource, action, data):
             abort(409)
 
         logger.info("Setting payment %s to paid", payment.id)
-        for t in payment.tickets.all():
-            t.paid = True
-
-        payment.state = 'paid'
+        payment.paid()
         db.session.commit()
 
         msg = Message("Your EMF ticket payment has been confirmed",

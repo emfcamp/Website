@@ -68,10 +68,7 @@ def charge_stripe(payment):
 
     payment.chargeid = charge.id
     if charge.paid:
-        payment.state = 'paid'
-
-        for t in payment.tickets:
-            t.paid = True
+        payment.paid()
     else:
         payment.state = 'charged'
 

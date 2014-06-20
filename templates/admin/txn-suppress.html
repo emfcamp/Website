@@ -1,0 +1,21 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'admin_txns' %}
+{% block body %}
+<h2>Suppress transaction</h2>
+
+<p>To hide this transaction from the reconciliation page, please click below.</p>
+
+<dl class="dl-horizontal">
+<dt>Date</dt><dd>{{ txn.date }}</dd>
+<dt>Type</dt><dd>{{ txn.type }}</dd>
+<dt>Payee</dt><dd><b>{{ txn.payee }}</b></dd>
+<dt>Amount</dt><dd><b>{{ txn.amount | price(txn.account.currency) }}</b></dd>
+<dt>FIT</dt><dd>{{ txn.fit_id }}</dd>
+</dl>
+
+<form action="{{ url_for('admin_txn_suppress', txn_id=txn.id) }}" method="post">
+  {{ form.hidden_tag() }}
+  {{ form.suppress(class_="btn btn-danger pull-right") }}
+</form>
+
+{% endblock %}

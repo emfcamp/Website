@@ -50,6 +50,14 @@ class Payment(db.Model):
         premium = premium.quantize(Decimal(1), ROUND_UP)
         return premium / 100
 
+    def paid(self):
+        if self.state == 'paid':
+            raise StateException('Payment %s already paid' % self.id)
+
+        for ticket in self.tickets:
+            ticket.paid = True
+        self.state = 'paid'
+
     def cancel(self):
         if self.state == 'cancelled':
             raise StateException('Payment %s already cancelled' % self.id)

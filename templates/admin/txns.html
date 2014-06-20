@@ -22,13 +22,10 @@
   <td>{{ txn.amount | price(txn.account.currency) }}</td>
   <!--<td>{{ txn.fit_id }}</td>-->
   <td>
-    <a class="btn btn-primary" href="{{ url_for('admin_txn_reconcile', txn_id=txn.id) }}">Reconcile</a>
+    <a class="btn btn-primary" href="{{ url_for('admin_txn_suggest_payments', txn_id=txn.id) }}">Reconcile</a>
   </td>
   <td>
-    <form action="{{ url_for('admin_txn_suppress', txn_id=txn.id) }}" method="post">
-      {{ suppress_form.hidden_tag() }}
-      {{ suppress_form.suppress(class_="btn btn-danger") }}
-    </form>
+    <a class="btn btn-danger" href="{{ url_for('admin_txn_suppress', txn_id=txn.id) }}">Suppress</a>
   </td>
 </tr>
 {% endfor %}

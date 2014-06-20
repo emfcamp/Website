@@ -3,60 +3,41 @@
 {% block body %}
 <h2>Reconcile transaction</h2>
 
-<table class="table table-condensed table-striped">
-<thead><tr>
-  <th>Date</th>
-  <th>Type</th>
-  <th>Payee</th>
-  <th>Amount</th>
-  <!--<th>FIT</th>-->
-</tr></thead>
-<tbody>
-<tr>
-  <td>{{ txn.date }}</td>
-  <td>{{ txn.type }}</td>
-  <td><b>{{ txn.payee }}</b></td>
-  <td><b>{{ txn.amount | price(txn.account.currency) }}</b></td>
-  <!--<td>{{ txn.fit_id }}</td>-->
-</tr>
-</tbody></table>
+<p>To reconcile this transaction to this payment, please click below.</p>
 
-{% if not payments_forms %}
-<div class="alert alert-danger">
-No suitable payments were found.
-</div>
-{% else %}
+<dl class="dl-horizontal">
+<dt>Date</dt><dd>{{ txn.date }}</dd>
+<dt>Type</dt><dd>{{ txn.type }}</dd>
+<dt>Payee</dt><dd><b>{{ txn.payee }}</b></dd>
+<dt>Amount</dt><dd><b>{{ txn.amount | price(txn.account.currency) }}</b></dd>
+<dt>FIT</dt><dd>{{ txn.fit_id }}</dd>
+</dl>
+
+<dl class="dl-horizontal">
+<dt>Name</dt><dd>{{ payment.user.name }}</dd>
+<dt>Email</dt><dd>{{ payment.user.email }}</dd>
+<dt>Price</dt><dd><b>{{ payment.amount | price(payment.currency) }}</b></dd>
+<dt>Reference</dt><dd><b>{{ payment.bankref | bankref }}</b></dd>
+</dl>
+
 <table class="table table-condensed table-striped">
 <thead><tr>
-  <th>Name</th>
-  <th>Email</th>
-  <th>Amount</th>
-  <th>Bankref</th>
-  <th></th>
+  <th>Type</th>
+  <th>Expires</th>
 </tr></thead>
 <tbody>
-{% for payment, form in payments_forms %}
+{% for t in payment.tickets %}
 <tr>
-  <td><b>{{ payment.user.name }}</b></td>
-  <td>{{ payment.user.email }}</td>
-  <td><b>{{ payment.amount | price(payment.currency) }}</b></td>
-  <td>{{ payment.bankref | bankref }}</td>
-  <td>
-    <form action="{{ url_for('admin_txn_reconcile', txn_id=txn.id) }}" method="post">
-      {{ form.hidden_tag() }}
-      {{ form.reconcile(class_="btn btn-warning") }}
-    </form>
-  </td>
+  <td>{{ t.type.name }}</td>
+  <td>{{ t.expires.strftime('%Y-%m-%d %H:%M:%S') }}</td>
 </tr>
 {% endfor %}
-</tbody></table>
-{% endif %}
+</tbody>
+</table>
 
-<div class="pull-right">
-<form action="{{ url_for('admin_txn_suppress', txn_id=txn.id) }}" method="post">
-  {{ suppress_form.hidden_tag() }}
-  {{ suppress_form.suppress(class_="btn btn-danger") }}
+<form action="{{ url_for('admin_txn_reconcile', txn_id=txn.id, payment_id=payment.id) }}" method="post">
+  {{ form.hidden_tag() }}
+  {{ form.reconcile(class_="btn btn-warning pull-right") }}
 </form>
-</div>
 
 {% endblock %}

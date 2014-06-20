@@ -4,7 +4,7 @@ from models.user import User
 from models.payment import Payment, BankPayment, BankTransaction
 from models.ticket import TicketType, Ticket
 from models.cfp import Proposal
-from views import Form, HiddenIntegerField
+from views import Form
 
 from flask import (
     render_template, redirect, request, flash,
@@ -15,8 +15,8 @@ from flaskext.mail import Message
 
 from wtforms.validators import Required
 from wtforms import (
-    TextField, HiddenField,
-    SubmitField, BooleanField, IntegerField, DecimalField,
+    TextField, SubmitField,
+    BooleanField, IntegerField, DecimalField,
 )
 
 from sqlalchemy.orm.exc import NoResultFound
@@ -88,17 +88,16 @@ def admin():
     return render_template('admin/admin.html')
 
 
-class TransactionSuppressForm(Form):
-    suppress = SubmitField("Suppress")
-
 @app.route('/admin/transactions')
 @admin_required
 def admin_txns():
     txns = BankTransaction.query.filter_by(payment_id=None, suppressed=False).order_by('date desc')
-    suppress_form = TransactionSuppressForm(formdata=None)
-    return render_template('admin/txns.html', txns=txns, suppress_form=suppress_form)
+    return render_template('admin/txns.html', txns=txns)
 
-@app.route('/admin/transaction/<int:txn_id>/suppress', methods=['POST'])
+class TransactionSuppressForm(Form):
+    suppress = SubmitField("Suppress")
+
+@app.route('/admin/transaction/<int:txn_id>/suppress', methods=['GET', 'POST'])
 @admin_required
 def admin_txn_suppress(txn_id):
     try:
@@ -114,8 +113,9 @@ def admin_txn_suppress(txn_id):
 
             db.session.commit()
             flash("Transaction %s suppressed" % txn.id)
+            return redirect(url_for('admin_txns'))
 
-    return redirect(url_for('admin_txns'))
+    return render_template('admin/txn-suppress.html', txn=txn, form=form)
 
 def score_reconciliation(txn, payment):
     words = txn.payee.replace('-', ' ').split(' ')
@@ -139,36 +139,47 @@ def score_reconciliation(txn, payment):
                      txn.id, payment.id, bankref_score, name_score, other_score)
     return bankref_score + name_score + other_score
 
-class ManualReconcileForm(Form):
-    payment_id = HiddenIntegerField("Payment ID")
-    reconcile = SubmitField("Reconcile")
 
-@app.route('/admin/transaction/<int:txn_id>/reconcile', methods=['GET', 'POST'])
+@app.route('/admin/transaction/<int:txn_id>/reconcile')
 @admin_required
-def admin_txn_reconcile(txn_id):
+def admin_txn_suggest_payments(txn_id):
     txn = BankTransaction.query.get_or_404(txn_id)
 
-    form = ManualReconcileForm()
-    if form.validate_on_submit():
-        app.logger.info('Processing transaction %s (%s)', txn.id, txn.payee)
+    payments = BankPayment.query.filter_by(state='inprogress').order_by(BankPayment.bankref).all()
+    payments = sorted(payments, key=lambda p: score_reconciliation(txn, p))
+    payments = payments[-20:]
 
+    app.logger.info('Suggesting %s payments for txn %s', len(payments), txn.id)
+    return render_template('admin/txn-suggest-payments.html', txn=txn, payments=payments)
+
+
+class ManualReconcilePaymentForm(Form):
+    reconcile = SubmitField("Reconcile")
+
+@app.route('/admin/transaction/<int:txn_id>/reconcile/<int:payment_id>', methods=['GET', 'POST'])
+@admin_required
+def admin_txn_reconcile(txn_id, payment_id):
+    txn = BankTransaction.query.get_or_404(txn_id)
+    payment = BankPayment.query.get_or_404(payment_id)
+
+    form = ManualReconcilePaymentForm()
+    if form.validate_on_submit():
         if form.reconcile.data:
-            payment = BankPayment.query.get(form.payment_id.data)
             app.logger.info("%s manually reconciling against payment %s (%s) by %s",
                             current_user.name, payment.id, payment.bankref, payment.user.email)
 
             if txn.payment:
                 app.logger.error("Transaction already reconciled")
+                flash("Transaction %s already reconciled" % txn.id)
                 return redirect(url_for('admin_txns'))
 
             if payment.state == 'paid':
                 app.logger.error("Payment has already been paid")
+                flash("Payment %s already paid" % payment.id)
                 return redirect(url_for('admin_txns'))
 
             txn.payment = payment
-            for t in payment.tickets:
-                t.paid = True
-            payment.state = 'paid'
+            payment.paid()
             db.session.commit()
 
             msg = Message("Electromagnetic Field ticket purchase update",
@@ -181,34 +192,23 @@ def admin_txn_reconcile(txn_id):
             flash("Payment ID %s marked as paid" % payment.id)
             return redirect(url_for('admin_txns'))
 
-    payments = BankPayment.query.filter_by(state='inprogress').order_by(BankPayment.bankref).all()
-    scores = [score_reconciliation(txn, p) for p in payments]
-    scores_payments = reversed(sorted(zip(scores, payments))[-20:])
+    return render_template('admin/txn-reconcile.html', txn=txn, payment=payment, form=form)
 
-    suppress_form = TransactionSuppressForm(formdata=None)
-    payments_forms = []
-    for score, payment in scores_payments:
-        form = ManualReconcileForm(payment_id=payment.id, formdata=None)
-        payments_forms.append((payment, form))
-
-    app.logger.info('Suggesting %s payments for txn %s', len(payments_forms), txn.id)
-    return render_template('admin/txn-reconcile.html', txn=txn, payments_forms=payments_forms,
-                           suppress_form=suppress_form)
 
 @app.route("/admin/make-admin", methods=['GET', 'POST'])
 @login_required
 def make_admin():
     if current_user.admin:
-        
+
         class MakeAdminForm(Form):
             change = SubmitField('Change')
-            
+
         users = User.query.order_by(User.id).all()
         # The list of users can change between the
         # form being generated and it being submitted, but the id's should remain stable
         for u in users:
             setattr(MakeAdminForm, str(u.id) + "_admin", BooleanField('admin', default=u.admin))
-        
+
         if request.method == 'POST':
             form = MakeAdminForm()
             if form.validate():
