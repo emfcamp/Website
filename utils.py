@@ -421,63 +421,6 @@ class CreateTicketTokens(Command):
 
         print 'Tokens added'
 
-class WarnExpire(Command):
-  """
-    Warn about Expired tickets
-  """
-  def run(self):
-    print "warning about expired Tickets"
-    seen = {}
-    expired = Ticket.query.filter(Ticket.expires <= datetime.utcnow(), Ticket.paid == False).all()
-    for t in expired:
-      # test that the ticket has a payment... not all do.
-      if t.payment:
-        if t.payment.id not in seen:
-          seen[t.payment.id] = True
-
-    for p in seen:
-      p = Payment.query.get(p)
-      print "emailing %s <%s> about payment %d" % (p.user.name, p.user.email, p.id)
-      # race condition, not all ticket may of expired, but if any of
-      # them have we will warn about all of them.
-      # not really a problem tho.
-      
-      msg = Message("Electromagnetic Field ticket purchase update",
-                      sender=app.config['TICKETS_EMAIL'],
-                      recipients=[p.user.email]
-                  )
-      msg.body = render_template("tickets-expired-warning.txt", payment=p)
-      mail.send(msg)
-
-class Expire(Command):
-  """
-    Expire Expired Tickets.
-  """
-  def run(self):
-    print "expiring expired tickets"
-    print
-    seen = {}
-    s = None
-    expired = Ticket.query.filter(Ticket.expires <= datetime.utcnow(), Ticket.paid == False).all()
-    for t in expired:
-      # test that the ticket has a payment... not all do.
-      if t.payment:
-        if t.payment.id not in seen:
-          seen[t.payment.id] = True
-
-    for p in seen:
-      p = Payment.query.get(p)
-      print "expiring %s payment %d" % (p.provider, p.id)
-      p.state = "expired"
-      if not s:
-        s = db.object_session(p)
-
-      for t in p.tickets:
-        print "deleting expired %s ticket %d" % (t.type.name, t.id)
-        s.delete(t)
-
-    if s:
-      s.commit()
 
 class MakeAdmin(Command):
   """
@@ -517,8 +460,6 @@ if __name__ == "__main__":
   manager.add_command('createbankaccounts', CreateBankAccounts())
   manager.add_command('loadofx', LoadOfx())
   manager.add_command('reconcile', Reconcile())
-  manager.add_command('warnexpire', WarnExpire())
-  manager.add_command('expire', Expire())
   manager.add_command('testemails', TestEmails())
   manager.add_command('createtickets', CreateTickets())
   manager.add_command('makeadmin', MakeAdmin())

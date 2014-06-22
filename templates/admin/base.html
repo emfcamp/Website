@@ -19,7 +19,7 @@
                     Bank transfers <span class="badge">{{ unreconciled_count }}</span>
                 </a></li>
                 <li {% if nav_active == 'admin_expiring' -%} class="active" {%- endif %}><a href="{{ url_for('admin_expiring') }}">
-                    Expiring transfers <span class="badge">{{ expiring_count }}</span>
+                    Expiring payments <span class="badge">{{ expiring_count }}</span>
                 </a></li>
                 <li {% if nav_active == 'make_admin' -%} class="active" {%- endif %}><a href="{{ url_for('make_admin') }}">
                     Make someone an admin</a></li>

@@ -1,0 +1,36 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'admin_expiring' %}
+{% block body %}
+<h2>Payment reminder email</h2>
+
+<p>To send a reminder email for this payment, please click below.</p>
+
+<dl class="dl-horizontal">
+<dt>Name</dt><dd>{{ payment.user.name }}</dd>
+<dt>Email</dt><dd>{{ payment.user.email }}</dd>
+<dt>Price</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
+<dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
+<dt>Already bought</dt><dd>{{ payment.user.tickets.filter_by(paid=True).all() | count }}</dd>
+</dl>
+
+<table class="table table-condensed table-striped">
+<thead><tr>
+  <th>Type</th>
+  <th>Expires</th>
+</tr></thead>
+<tbody>
+{% for t in payment.tickets %}
+<tr>
+  <td>{{ t.type.name }}</td>
+  <td>{{ t.expires.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+<form method="post" action="{{ url_for('admin_send_reminder', payment_id=payment.id) }}" class="shrink">
+{{ form.hidden_tag() }}
+{{ form.remind(class_="btn btn-warning pull-right") }}
+</form>
+
+{% endblock %}

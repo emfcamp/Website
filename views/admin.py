@@ -294,6 +294,40 @@ def admin_reset_expiry(payment_id):
 
     return render_template('admin/payment-reset-expiry.html', payment=payment, form=form)
 
+class SendReminderForm(Form):
+    remind = SubmitField("Send reminder")
+
+@app.route('/admin/payment/<int:payment_id>/reminder', methods=['GET', 'POST'])
+@admin_required
+def admin_send_reminder(payment_id):
+    payment = BankPayment.query.get_or_404(payment_id)
+
+    form = SendReminderForm()
+    if form.validate_on_submit():
+        if form.remind.data:
+            app.logger.info("%s sending reminder email to %s <%s> for payment %s",
+                            current_user.name, payment.user.name, payment.user.email, payment.id)
+
+            if payment.reminder_sent:
+                app.logger.error('Reminder for payment %s already sent', payment.id)
+                flash("Cannot send duplicate reminder email for payment %s" % payment.id)
+                return redirect(url_for('admin_expiring'))
+
+            msg = Message("Electromagnetic Field ticket purchase update",
+                          sender=app.config['TICKETS_EMAIL'],
+                          recipients=[payment.user.email])
+            msg.body = render_template("tickets-reminder.txt", payment=payment)
+            mail.send(msg)
+
+            payment.reminder_sent = True
+            db.session.commit()
+
+            flash("Reminder email for payment %s sent" % payment.id)
+            return redirect(url_for('admin_expiring'))
+
+    return render_template('admin/payment-send-reminder.html', payment=payment, form=form)
+
+
 class CancelPaymentForm(Form):
     cancel = SubmitField("Cancel payment")
 

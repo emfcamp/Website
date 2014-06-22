@@ -24,6 +24,7 @@ class Payment(db.Model):
     currency = db.Column(db.String, nullable=False)
     amount_int = db.Column(db.Integer, nullable=False)
     state = db.Column(db.String, nullable=False, default='new')
+    reminder_sent = db.Column(db.Boolean, nullable=False, default=False)
     changes = db.relationship('PaymentChange', backref='payment')
     tickets = db.relationship('Ticket', lazy='dynamic', backref='payment', cascade='all')
     __mapper_args__ = {'polymorphic_on': provider}

@@ -5,15 +5,15 @@ reserved for Electromagnetic Field 2014.
 
 The tickets will expire in a few days if not paid for.
 
-If you don't want the tickets you can ignore this email. {% if payment.provider == "gocardless" -%} Otherwise,
+If you don't want the tickets you can ignore this email. {% if payment.provider in ['gocardless', 'banktransfer'] -%} Otherwise,
 if you wish to pay for the tickets, you can go to the EMF website:
 
-https://www.emfcamp.org{{ url_for('tickets') }}
+{{ external_url('tickets') }}
 
 and complete the payment process.
 
 {%- endif -%}
-{% if payment.provider == "banktransfer" %}
+{%- if payment.provider == "banktransfer" -%}
 
 {% if payment.currency == 'GBP' %}
 
@@ -38,24 +38,15 @@ You can pay into our Euro bank account:
 Payee:     Electromagnetic Field Ltd
 SWIFT:     BARCGB22
 IBAN:      GB21 BARC 2071 6472 9544 33
-Amount:    {{ payment.amount | price('GBP') }}
+Amount:    {{ payment.amount | price('EUR') }}
 Reference: {{ payment.bankref | bankref }}
 
 (Don't worry if the payee name doesn't quite fit)
 
 {% endif %}
+{%- endif -%}
 
-{%- endif %}
-
-The Tickets are:
-
-Type			Cost
-----			----
-{% for t in payment.tickets -%}
-{{ t.type.name }} 	{{ t.type.get_price(p.currency) | price(p.currency) }}
-{% endfor %}
-
-Total: {{ payment.amount | price(p.currency) }}
+{% include "email-tickets.txt" %}
 
 Love,
 
