@@ -147,7 +147,7 @@ def admin_txn_suggest_payments(txn_id):
 
     payments = BankPayment.query.filter_by(state='inprogress').order_by(BankPayment.bankref).all()
     payments = sorted(payments, key=lambda p: score_reconciliation(txn, p))
-    payments = payments[-20:]
+    payments = list(reversed(payments[-20:]))
 
     app.logger.info('Suggesting %s payments for txn %s', len(payments), txn.id)
     return render_template('admin/txn-suggest-payments.html', txn=txn, payments=payments)
