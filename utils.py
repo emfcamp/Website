@@ -82,7 +82,8 @@ class LoadOfx(Command):
 
             different_fit_ids = matches.filter( BankTransaction.fit_id != dbtxn.fit_id )
             if different_fit_ids.count():
-                app.logger.warn('Matching transactions with different fit_ids: %s', different_fit_ids.count())
+                app.logger.warn('%s matching transactions with different fit_ids for %s',
+                                different_fit_ids.count(), dbtxn.fit_id)
                 # fit_id may have been changed, so add it anyway
                 db.session.add(dbtxn)
                 added += 1
