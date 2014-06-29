@@ -91,7 +91,7 @@ def admin():
 @app.route('/admin/transactions')
 @admin_required
 def admin_txns():
-    txns = BankTransaction.query.filter_by(payment_id=None, suppressed=False).order_by('date desc')
+    txns = BankTransaction.query.filter_by(payment_id=None, suppressed=False).order_by('posted desc')
     return render_template('admin/txns.html', txns=txns)
 
 class TransactionSuppressForm(Form):
