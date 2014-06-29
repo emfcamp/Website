@@ -107,7 +107,7 @@ class BankTransaction(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     account_id = db.Column(db.Integer, db.ForeignKey(BankAccount.id), nullable=False)
-    date = db.Column(db.DateTime, nullable=False)
+    posted = db.Column(db.DateTime, nullable=False)
     type = db.Column(db.String, nullable=False)
     amount_int = db.Column(db.Integer, nullable=False)
     fit_id = db.Column(db.String, index=True)  # allegedly unique, but don't trust it
@@ -117,9 +117,9 @@ class BankTransaction(db.Model):
     account = db.relationship(BankAccount, backref='transactions')
     payment = db.relationship(BankPayment, backref='transactions')
 
-    def __init__(self, account_id, type, date, amount, payee, fit_id=None):
+    def __init__(self, account_id, posted, type, amount, payee, fit_id=None):
         self.account_id = account_id
-        self.date = date
+        self.posted = posted
         self.type = type
         self.amount = amount
         self.payee = payee
@@ -140,7 +140,7 @@ class BankTransaction(db.Model):
         # fit_ids can change, and payments can be reposted
         matching = self.query.filter_by(
             account_id=self.account_id,
-            date=self.date,
+            posted=self.posted,
             type=self.type,
             amount_int=self.amount_int,
             payee=self.payee,
@@ -198,7 +198,7 @@ class BankTransaction(db.Model):
 
 db.Index('ix_bank_transaction_u1',
          BankTransaction.account_id,
-         BankTransaction.date,
+         BankTransaction.posted,
          BankTransaction.type,
          BankTransaction.amount_int,
          BankTransaction.payee,

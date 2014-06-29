@@ -62,6 +62,7 @@ class LoadOfx(Command):
         dubious = 0
 
         for txn in ofx.account.statement.transactions:
+            # date is actually dtposted and is a datetime
             if txn.date < datetime(2014, 1, 1):
                 app.logger.debug('Ignoring historic transaction from %s', txn.date)
                 continue
@@ -71,7 +72,7 @@ class LoadOfx(Command):
 
             dbtxn = BankTransaction(
                 account_id=account.id,
-                date=txn.date,
+                posted=txn.date,
                 type=txn.type,
                 amount=txn.amount,
                 payee=txn.payee,
