@@ -1,8 +1,7 @@
-# flake8: noqa (there are a load of errors here we need to fix)
 from main import app, db, mail
 from models.user import User
 from models.payment import Payment, BankPayment, BankTransaction
-from models.ticket import TicketType, Ticket
+from models.ticket import TicketType, Ticket, TicketPrice
 from models.cfp import Proposal
 from views import Form
 
@@ -57,11 +56,13 @@ def stats():
     kids = Ticket.query.join(Payment).filter( Ticket.code.startswith('kids'), Payment.state != 'new' )
 
     # cancelled tickets get their expiry set to the cancellation time
-    full_unpaid = full.filter( Ticket.expires >= datetime.utcnow(), Ticket.paid == False )
-    kids_unpaid = kids.filter( Ticket.expires >= datetime.utcnow(), Ticket.paid == False )
+    full_unexpired = full.filter( Ticket.expires >= datetime.utcnow() )
+    kids_unexpired = kids.filter( Ticket.expires >= datetime.utcnow() )
+    full_unpaid = full_unexpired.filter_by(paid=False)
+    kids_unpaid = kids_unexpired.filter_by(paid=False)
 
-    full_bought = full.filter( Ticket.paid == True )
-    kids_bought = kids.filter( Ticket.paid == True )
+    full_bought = full.filter_by(paid=True)
+    kids_bought = kids.filter_by(paid=True)
 
     full_gocardless_unpaid = full_unpaid.filter(Payment.provider == 'gocardless', Payment.state == 'inprogress')
     full_banktransfer_unpaid = full_unpaid.filter(Payment.provider == 'banktransfer', Payment.state == 'inprogress')
@@ -233,7 +234,7 @@ class NewTicketTypeForm(Form):
     price_gbp = DecimalField('Price in GBP', [Required()])
     price_eur = DecimalField('Price in EUR', [Required()])
 
-@app.route("/admin/ticket-types", methods=['GET', 'POST'])
+#@app.route("/admin/ticket-types", methods=['GET', 'POST'])
 @login_required
 def ticket_types():
     if current_user.admin:
@@ -349,7 +350,7 @@ def admin_cancel_payment(payment_id):
     return render_template('admin/payment-cancel.html', payment=payment, form=form)
 
 
-@app.route('/admin/receipt/<receipt>')
+#@app.route('/admin/receipt/<receipt>')
 @login_required
 def admin_receipt(receipt):
     if not current_user.admin:
@@ -358,12 +359,12 @@ def admin_receipt(receipt):
     try:
         user = User.query.filter_by(receipt=receipt).one()
         tickets = list(user.tickets)
-    except NoResultFound, e:
+    except NoResultFound:
         try:
             ticket = Ticket.query.filter_by(receipt=receipt).one()
             tickets = [ticket]
             user = ticket.user
-        except NoResultFound, e:
+        except NoResultFound:
             raise ValueError('Cannot find receipt')
 
     return render_template('admin/admin_receipt.htm', user=user, tickets=tickets)
