@@ -79,39 +79,44 @@ class LoadOfx(Command):
                 fit_id=txn.id,
                 )
 
+            # Check for matching/duplicate transactions.
+            # Insert if possible - conflicts can be sorted out within the app.
             matches = dbtxn.get_matching()
 
-            different_fit_ids = matches.filter( BankTransaction.fit_id != dbtxn.fit_id )
-            if different_fit_ids.count():
-                app.logger.warn('%s matching transactions with different fit_ids for %s',
-                                different_fit_ids.count(), dbtxn.fit_id)
-                # fit_id may have been changed, so add it anyway
-                db.session.add(dbtxn)
-                added += 1
-                dubious += 1
-                continue
-
-            if txn.id == '00000000':
-                # There seems to be a serial in the payee field. Assume that's enough.
+            # Euro payments have a blank fit_id
+            if dbtxn.fit_id == '00000000':
+                # There seems to be a serial in the payee field. Assume that's enough for uniqueness.
                 if matches.count():
                     app.logger.debug('Ignoring duplicate transaction from %s', dbtxn.payee)
                     duplicate += 1
+
                 else:
                     db.session.add(dbtxn)
                     added += 1
-                    continue
 
             else:
-                if matches.filter_by(fit_id=dbtxn.fit_id).count():
+                different_fit_ids = matches.filter( BankTransaction.fit_id != dbtxn.fit_id )
+                same_fit_ids = matches.filter( BankTransaction.fit_id == dbtxn.fit_id )
+
+                if same_fit_ids.count():
                     app.logger.debug('Ignoring duplicate transaction %s', dbtxn.fit_id)
                     duplicate += 1
-                elif BankTransaction.query.filter_by(fit_id=dbtxn.fit_id).count():
+
+                elif BankTransaction.query.filter( BankTransaction.fit_id == dbtxn.fit_id ).count():
                     app.logger.error('Non-matching transactions with same fit_id %s', dbtxn.fit_id)
                     dubious += 1
+
+                elif different_fit_ids.count():
+                    app.logger.warn('%s matching transactions with different fit_ids for %s',
+                                    different_fit_ids.count(), dbtxn.fit_id)
+                    # fit_id may have been changed, so add it anyway
+                    db.session.add(dbtxn)
+                    added += 1
+                    dubious += 1
+
                 else:
                     db.session.add(dbtxn)
                     added += 1
-                    continue
 
         db.session.commit()
         app.logger.info('Import complete: %s new, %s duplicate, %s dubious',
