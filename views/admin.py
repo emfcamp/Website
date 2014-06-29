@@ -134,7 +134,7 @@ def score_reconciliation(txn, payment):
     if txn.account.currency == payment.currency:
         other_score += 0.6
 
-    # check date against expiry?
+    # check posted against expiry?
 
     app.logger.debug('Scores for txn %s payment %s: %s %s %s',
                      txn.id, payment.id, bankref_score, name_score, other_score)

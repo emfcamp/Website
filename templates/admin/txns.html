@@ -16,7 +16,7 @@
 <tbody>
 {% for txn in txns %}
 <tr>
-  <td>{{ txn.date.strftime('%Y-%m-%d') }}</td>
+  <td>{{ txn.posted.strftime('%Y-%m-%d') }}</td>
   <td>{{ txn.type }}</td>
   <td><b>{{ txn.payee }}</b></td>
   <td>{{ txn.amount | price(txn.account.currency) }}</td>
