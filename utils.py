@@ -4,21 +4,20 @@
 # reconcile an ofx file against pending payments
 #
 
-import ofxparse, sys
+import ofxparse
 from flask.ext.script import Command, Manager, Option
 from flask import Flask, render_template
 from flask.ext.sqlalchemy import SQLAlchemy
 from flaskext.mail import Mail, Message
 from sqlalchemy.orm.exc import NoResultFound
 
-from decimal import Decimal
-import re, os, random
+import random
 from datetime import datetime, timedelta
 
 from main import app, mail, db
 from models import User, TicketType, Ticket, TicketPrice, TicketToken, Role, Shift, ShiftSlot
 from models.payment import (
-    Payment, GoCardlessPayment,
+    GoCardlessPayment,
     BankPayment, BankAccount, BankTransaction,
 )
 from sqlalchemy import text
@@ -77,7 +76,7 @@ class LoadOfx(Command):
                 amount=txn.amount,
                 payee=txn.payee,
                 fit_id=txn.id,
-                )
+            )
 
             # Check for matching/duplicate transactions.
             # Insert if possible - conflicts can be sorted out within the app.
@@ -223,7 +222,7 @@ class TestEmails(Command):
           print
     
     t = "welcome-email.txt"
-    print  "template:", t
+    print "template:", t
     print
     output = render_template(t, user = self.user)
     print output
@@ -236,8 +235,8 @@ class TestEmails(Command):
       user.set_password('happycamper')
       db.session.add(user)
 
-      types = {
-        "full" : TicketType.query.get('full')
+      amounts = {
+          "full": TicketType.query.get('full')
       }
       #
       # FIXME: this is a complete mess
@@ -259,7 +258,7 @@ class TestEmails(Command):
             payment.state = "inprogress"
             if payment.provider == "gocardless":
               payment.gcid = "%3dSDJADG" % (int(random.random() * 1000 ))
-            sess.add(payment)
+            db.session.add(payment)
             
             for i in range(full):
               t = Ticket(code='full')
@@ -341,12 +340,12 @@ class CreateRoles(Command):
             ('bar', 'Barstaff', 'http://wiki.emfcamp.org/wiki/Team/Volunteers/Bar'),
             ('steward', 'Stewarding', 'http://wiki.emfcamp.org/wiki/Team/Volunteers/Stewards'),
             ('stage', 'Stage helper', 'http://wiki.emfcamp.org/wiki/Team/Volunteers/Stage_Helpers')
-            ]
+        ]
             
         for role in roles:
             try:
                 Role.query.filter_by(code=role[0]).one()
-            except NoResultFound, e:
+            except NoResultFound:
                 db.session.add(Role(*role))
                 db.session.commit()    
 
@@ -358,32 +357,27 @@ class CreateShifts(Command):
     #                         value.second, value.microsecond )
     # only need worry about year, month, day & hour (sod minutes & seconds etc)
     def run(self):
-        fmt = "%04d-%02d-%02d %02d:%02d:%02d.%06d"
-                        
-        days ={"Friday"  :{'m':8, 'd':31},  
-               "Saturday":{'m':9, 'd':1 },  
-               "Sunday"  :{'m':9, 'd':2 },  
-               "Monday"  :{'m':9, 'd':3 }}
+        days = {"Friday": {'m': 8, 'd': 31},
+                "Saturday": {'m': 9, 'd': 1},
+                "Sunday": {'m': 9, 'd': 2 },
+                "Monday": {'m': 9, 'd': 3 },
+               }
         
-        dailyshifts = {'steward':
-                                {'starts':(2, 5, 8, 11, 14, 17, 20, 23), 
-                                 'mins'  :(2, 2, 3,  3,  3,  3,  3,  2),
-                                 'maxs'  :(2, 2, 4,  6,  6,  4,  4,  2)
-                                 },
-                       'bar':
-                                {'starts':(12, 15, 18, 21), 
-                                 'mins'  :(1,  1,  1,  1),
-                                 'maxs'  :(2,  2,  2,  2) 
-                                 },
-                       'stage':
-                                {'starts':(10, 13, 16, 19), 
-                                 'mins'  :(1,  1,  1,  1),
-                                 'maxs'  :(2,  2,  2,  2) 
-                                 },
-                        }
+        dailyshifts = {'steward': {'starts': (2, 5, 8, 11, 14, 17, 20, 23),
+                                   'mins': (2, 2, 3, 3, 3, 3, 3, 2),
+                                   'maxs': (2, 2, 4, 6, 6, 4, 4, 2),
+                                  },
+                       'bar': {'starts': (12, 15, 18, 21),
+                               'mins': (1, 1, 1, 1),
+                               'maxs': (2, 2, 2, 2),
+                              },
+                       'stage': {'starts': (10, 13, 16, 19),
+                                 'mins': (1, 1, 1, 1),
+                                 'maxs': (2, 2, 2, 2),
+                                },
+                      }
         
         shifts = []
-        shift_length = timedelta(hours=3)
         for day,date in days.items():
             for role, data in dailyshifts.items():
                 if day=="Monday" and not (role == "steward" or role == "parking"):
@@ -405,7 +399,7 @@ class CreateShifts(Command):
         for shift in shifts:
             try:
                 Shift.query.filter_by(id=shift.id).one()
-            except NoResultFound, e:
+            except NoResultFound:
                 db.session.add(shift)
                 db.session.commit()    
                     
@@ -413,12 +407,12 @@ class CreateShifts(Command):
 class CreateTicketTokens(Command):
     def run(self):
         tokens = [
-          ('full_ucl', 'ucl1'),
-          ('full_ucl', 'ucl2'),
-          ('full_ucl', 'ucl3'),
-          ('full_hs', 'hs1'),
-          ('full_hs', 'hs2'),
-          ('full_hs', 'hs3'),
+            ('full_ucl', 'ucl1'),
+            ('full_ucl', 'ucl2'),
+            ('full_ucl', 'ucl3'),
+            ('full_hs', 'hs1'),
+            ('full_hs', 'hs2'),
+            ('full_hs', 'hs3'),
         ]
 
         for code, token in tokens:
@@ -434,6 +428,7 @@ class MakeAdmin(Command):
     Make userid one an admin for testing purposes.
   """
   option_list = (Option('-u', '--userid', dest='userid', help="The userid to make an admin (defaults to 1)"),)
+
   def run(self, userid):
     if not userid:
       userid = 1
