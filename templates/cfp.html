@@ -124,8 +124,10 @@
       {#
       {{ render_field(form.days, True, placeholder="I can only come on these days") }}
       #}
+
       </fieldset>
       <fieldset>
+
 
         <div class="col-md-9 col-sm-offset-3">
           <label class="checkbox">
@@ -150,6 +152,15 @@
       {% endif %}
       </fieldset>
       <p></p>
+
+      {% if form.type == 'installation' %}
+      <div class="row">
+        <div class="col-md-9 col-sm-offset-2">
+          We may be able to provide materials for your installation &ndash;
+          please <a href="mailto:shiny@emfcamp.org">get in touch</a> for details.
+        </div>
+      </div>
+      {% endif %}
 
       <fieldset>
         <div class="col-md-11 col-md-offset-1">
