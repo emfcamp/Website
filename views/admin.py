@@ -58,11 +58,11 @@ def stats():
     # cancelled tickets get their expiry set to the cancellation time
     full_unexpired = full.filter( Ticket.expires >= datetime.utcnow() )
     kids_unexpired = kids.filter( Ticket.expires >= datetime.utcnow() )
-    full_unpaid = full_unexpired.filter_by(paid=False)
-    kids_unpaid = kids_unexpired.filter_by(paid=False)
+    full_unpaid = full_unexpired.filter( Ticket.paid == False) # noqa
+    kids_unpaid = kids_unexpired.filter( Ticket.paid == False) # noqa
 
-    full_bought = full.filter_by(paid=True)
-    kids_bought = kids.filter_by(paid=True)
+    full_bought = full.filter(Ticket.paid)
+    kids_bought = kids.filter(Ticket.paid)
 
     full_gocardless_unpaid = full_unpaid.filter(Payment.provider == 'gocardless', Payment.state == 'inprogress')
     full_banktransfer_unpaid = full_unpaid.filter(Payment.provider == 'banktransfer', Payment.state == 'inprogress')
