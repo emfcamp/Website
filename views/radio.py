@@ -1,7 +1,9 @@
-from main import db, app
+from main import app
+from views import feature_flag
 
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template
 
+@feature_flag('RADIO')
 @app.route("/radio", methods=['GET'])
 def radio():
     return render_template('radio.html')
