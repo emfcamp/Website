@@ -6,9 +6,8 @@
 
 import ofxparse
 from flask.ext.script import Command, Manager, Option
-from flask import Flask, render_template
-from flask.ext.sqlalchemy import SQLAlchemy
-from flaskext.mail import Mail, Message
+from flask import render_template
+from flaskext.mail import Message
 from sqlalchemy.orm.exc import NoResultFound
 
 import random

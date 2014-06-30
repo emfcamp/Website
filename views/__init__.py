@@ -163,4 +163,4 @@ import admin  # noqa
 import tickets  # noqa
 import radio  # noqa
 import payment  # noqa
-import cfp
+import cfp  # noqa

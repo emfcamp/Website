@@ -1,7 +1,7 @@
 from main import app, db, external_url
 from views import (
     get_user_currency, set_user_currency, get_basket, TICKET_CUTOFF,
-    CURRENCIES, CURRENCY_SYMBOLS,
+    CURRENCY_SYMBOLS,
     IntegerSelectField, HiddenIntegerField, TelField, Form, feature_flag
 )
 

@@ -36,7 +36,7 @@ def pay_choose():
 
     return render_template('payment-choose.html', basket=basket, total=total, StripePayment=StripePayment)
 
-import banktransfer
-import gocardless
-import stripe
+import banktransfer  # noqa
+import gocardless  # noqa
+import stripe  # noqa
 

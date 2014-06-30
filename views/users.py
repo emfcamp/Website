@@ -1,4 +1,4 @@
-from main import app, db, gocardless, mail, login_manager
+from main import app, db, mail, login_manager
 from views import set_user_currency, Form
 from models.user import User, PasswordReset
 
