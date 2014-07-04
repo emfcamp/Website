@@ -323,6 +323,9 @@ div.micro img {
   padding-right: 15px;
 }
 
-.btn-primary {
+.btn, .btn-primary {
   border: #333 solid 1px;
+  color: white;
+  text-decoration: none;
 }
+
