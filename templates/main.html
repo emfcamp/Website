@@ -1,36 +1,34 @@
 {% extends "base.html" %}
-{% block document %}
-<div class="container" id="splash">
-  <div class="row">
-    <div class="col-md-4 splash-column alt">
-      <div class="inner">
-        <img id="logo" src="/static/images/splash/EMFlogo.png" width="127" height="103" alt="EMF">
-        <p class="lhead">
+{% block body %}
+       <div id="gallery" class="row">
+        <img class="col-md-3" src="/static/images/main_images/EMF-Website-2014-V1_03.jpg" alt="Image of EMF 2012">
+        <img class="col-md-3" src="/static/images/main_images/EMF-Website-2014-V1_05.jpg" alt="Image of EMF 2012">
+        <img class="col-md-3" src="/static/images/main_images/EMF-Website-2014-V1_07.jpg" alt="Image of EMF 2012">
+        <img class="col-md-3" src="/static/images/main_images/EMF-Website-2014-V1_09.jpg" alt="Image of EMF 2012">
+        <img class="col-md-3" src="/static/images/main_images/EMF-Website-2014-V1_15.jpg" alt="Image of EMF 2012">
+        <img class="col-md-3" src="/static/images/main_images/EMF-Website-2014-V1_16.jpg" alt="Image of EMF 2012">
+        <img class="col-md-3" src="/static/images/main_images/EMF-Website-2014-V1_17.jpg" alt="Image of EMF 2012">
+        <img class="col-md-3" src="/static/images/main_images/EMF-Website-2014-V1_18.jpg" alt="Image of EMF 2012">
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+        <p class="emphasis">
         Electromagnetic Field is a UK camping festival for those with an inquisitive mind or an
         interest in making things: hackers, artists, geeks, crafters, scientists, and engineers.</p>
-        <p class="body">
+        <p>
         This summer we're gathering over a thousand people in a field for a weekend of
         talks and workshops.</p>
 
         <p>At previous events we've heard about everything from <b>genetic modification</b> to <b>electronics</b>, <b>blacksmithing</b>
         to <b>high-energy physics</b>, <b>reverse engineering</b> to <b>lock picking</b>, <b>computer security</b> to
-        <b>crocheting</b>, and <b>quadcopters</b> to <b>beer brewing</b>.
+        <b>crocheting</b>, and <b>quadcopters</b> to <b>brewing</b>.
         </p>
-        <p class="body">
+        <p>
         To help matters along, we're arranging a very fast internet connection, reliable WiFi, a bar stocked with good, reasonably-priced drinks, and much more.
         </p>
-        <p class="follow">
-        <a href="http://twitter.com/emfcamp">@emfcamp</a> | 
-        <a href="https://www.facebook.com/emfcamp">facebook</a>
-        </p>
       </div>
-    </div>
-    <div class="col-md-4 splash-column">
-      <div class="inner">
+        <div class="col-md-6">
         <h3>Count me in!</h3>
-        <p class="body">
-        EMF 2014 will happen on <strong>August 29<sup>th</sup> &mdash; 31<sup>st</sup></strong> near <strong>Bletchley, Buckinghamshire</strong>.</p>
-
         {% if ticket_sales %}
         <div class="jumbotron">
           {% if full_price == 90 %}
@@ -58,6 +56,8 @@
           <small>(We'll only use your email address to contact you about future EMF events.)</small>
           </p>
         {% endif %}
+        </div>
+      </div>
           <h3>Help Out</h3>
             <p class="body">
             EMF is entirely organised and run by a dedicated team of volunteers.
@@ -69,20 +69,4 @@
             visit <a href="http://wiki.emfcamp.org">our wiki</a> or
             <a href="http://lists.emfcamp.org/listinfo/general">join the organisation mailing list</a>.
             </p>
-      </div>
-    </div>
-    <div class="col-md-4 splash-column alt">
-        <div class="inner">
-          <div id="gallery">
-            <a href="http://www.flickr.com/photos/russss/7909185964/in/set-72157631357117362">
-              <img class="img-responsive" src="/static/images/splash/img1.jpg" alt="Image of EMF 2012"></a>
-              <a href="http://www.flickr.com/photos/russss/7909193016/in/set-72157631357117362">
-                <img class="img-responsive" src="/static/images/splash/img2.jpg" alt="Image of EMF 2012"></a>
-              <a href="http://www.flickr.com/photos/nottinghack/7929647354/in/set-72157631351042916">
-                <img class="img-responsive" src="/static/images/splash/img3.jpg" alt="Image of EMF 2012"></a>
-          </div>
-      </div>
-    </div>
-    </div>
-</div>
 {% endblock %}

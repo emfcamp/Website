@@ -2,11 +2,8 @@
 {% extends "base.html" %}
 {% block title %}Call for Participation - Electromagnetic Field{% endblock %}
 {% block body %}
-<div class="row">
-  <div class="col-md-8 col-md-offset-2">
-
   <h2>Call for Participation</h2>
-  <p>Electromagnetic Field is a UK camping festival for those with an inquisitive
+  <p class="emphasis">Electromagnetic Field is a UK camping festival for those with an inquisitive
   mind or an interest in making things: hackers, artists, geeks, crafters,
   scientists, and engineers. It's happening near
   <a href="http://wiki.emfcamp.org/wiki/Getting_Here">Bletchley, Buckinghamshire</a> on
@@ -85,7 +82,7 @@
     {% endfor %}
   </ul>
 
-  <div class="tab-content">
+  <div class="tab-content cfp-tab">
     {% for form in forms %}
 
     <div class="tab-pane {%- if form.type == active_cfp_type %} active {%- endif %}" id="{{ 'tab_' + form.type }}">
@@ -193,8 +190,6 @@
 
   </div>
 
-  </div>
-</div>
 {% endblock %}
 
 {% block foot %}

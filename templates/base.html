@@ -20,28 +20,56 @@
 <body>
 {% block document %}
 <div class="container">
-    <header>
-        <h1>
-            <span class="logo"></span>
-            <a href="/">Electromagnetic Field</a>
-        </h1>
-    </header>
-    <div class="row">
-        {% for message in get_flashed_messages() -%}
-            <div class="col-md-10 alert alert-danger">{{ message }}</div>
-        {% endfor -%}
-        {% block body -%}{% endblock -%}
+    <div class="main-row">
+       <div class="col-md-10 col-md-offset-1 main-column">
+        <header>
+          <h1><a href="/"><div id="logo" alt="Logo"></div></a></h1>
+          <div id="header-text">August 29<sup>th</sup>&ndash;31<sup>st</sup> 2014<br/>
+               Bletchley, UK</div>
+
+          <div id="menu-container">
+            <ul class="menu">
+              <li><a href="{{ url_for('tickets_choose') }}">Buy Tickets</a>
+              <li><a>About</a>
+              <li><a>Villages</a>
+              <li><a>Sponsors</a>
+              <li><a href="{{ url_for('cfp') }}">Give a Talk</a>
+            </ul>
+          </div>
+          <div style="clear:both"></div>
+        </header>
+          <div id="main-content">
+              {% for message in get_flashed_messages() -%}
+                  <div>{{ message }}</div>
+              {% endfor -%}
+              {% block body -%}{% endblock -%}
+              <div class="push"></div>
+            </div>
+        <footer>
+          <div id="bottom-menu-container">
+            <ul class="menu">
+              <li><a href="https://wiki.emfcamp.org">Wiki</a>
+
+              <li>
+            {% if current_user.is_authenticated() %}
+            <a href="{{ url_for('logout') }}">Log out</a>
+            {% else %}
+            <a href="{{ url_for('login') }}">Log in</a>
+            {% endif %}
+            </ul>
+            <div class="share">
+              <a href="http://twitter.com/emfcamp">@emfcamp</a> |  <a href="https://www.facebook.com/emfcamp">facebook.com/emfcamp</a>
+            </div>
+            <div style="clear: both"></div>
+          </div>
+          <div id="credits">
+            <p>&copy; 2014 <a href="{{url_for('company')}}">Electromagnetic Field</a>.
+            Kindly hosted by <a href="http://bitfolk.com/">Bitfolk</a>.
+            </p>
+          </div>
+        </footer>
+      </div>
     </div>
-    <footer>
-        <p>
-        Electromagnetic Field Ltd. 2014.
-        <a href="{{url_for('company')}}">Company details</a>. 
-        Kindly hosted by <a href="http://bitfolk.com/">Bitfolk</a>.
-        {% if current_user.is_authenticated() %}
-        <a class="logout" href="{{ url_for('logout') }}">Log out</a>
-        {% endif %}
-        </p>
-    </footer>
 </div>
 {% endblock %}
 <script src="//code.jquery.com/jquery-1.10.1.min.js"></script>

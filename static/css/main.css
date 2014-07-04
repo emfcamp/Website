@@ -1,19 +1,188 @@
-@import url(https://fonts.googleapis.com/css?family=Raleway:700);
+@import url(https://fonts.googleapis.com/css?family=Raleway:700,500);
 
-h1, h2, h3, h4, h5, h6 {
+body{
+ font-size: 16px;
+ color: white;
+}
+
+a {
+  color: white;
+  text-decoration: underline;
+}
+
+a:hover {
+  color: #ddd;
+}
+
+html, body, .container, .main-row, .main-column {
+  height: 100%;
+}
+
+.well, .jumbotron, table, .cfp-tab {
+  background-color: #eee;
+  color: #333;
+}
+
+.well a, .jumbotron a {
+  color: #333;
+}
+
+header, h2, h3, h4, h5, h6 {
   font-family: "Raleway","Helvetica Neue",Helvetica,Arial,sans-serif;
   font-weight: 700;
 }
 
 header {
-    text-align: center;
-    padding-top:1em;
+  background: url('../images/header.jpg') no-repeat left top;
+  margin:-20px -15px 0px -15px;
+  padding: 20px 15px 0px 15px;
 }
 
 header h1 {
-    font-weight: bold;
-    font-size: 4em;
-    padding-bottom:0.5em;
+  display: block;
+  float: left;
+}
+
+header a:hover {
+  color: #333;
+}
+
+#logo {
+  background: url('../images/logo.png') no-repeat left top;
+  width: 472px;
+  height: 168px;
+}
+
+@media(max-width:520px){
+  #logo {
+    background: url('../images/logo-small.png') no-repeat left top;
+    width: 370px;
+    height: 132px;
+    margin-left: -10px;
+  }
+}
+
+header #header-text {
+  color: #333;
+  float: right;
+  text-align: right;
+  font-size: 1.5em;
+  margin-top: 1em;
+}
+
+@media(min-width:1200px){
+  header #header-text {
+    font-size: 2em;
+    margin-top: 0.5em;
+  }
+}
+
+header #menu-container {
+  clear: both;
+  float:right;
+}
+
+ul.menu {
+  margin-top: 0px;
+  padding-left: 0px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+ul.menu li{
+  display:inline-block;
+  padding-left: 1.5em;
+}
+
+ul.menu a {
+  text-decoration: none;
+}
+
+#menu-container a {
+  font-size: 1.5em;
+}
+
+footer {
+  clear:both;
+  position: absolute;
+  bottom: 0px;
+  right: 10px;
+  width: 100%;
+  margin-right:-10px;
+  margin-top:20px;
+}
+
+footer #credits {
+  font-size: 0.75em;
+  float: right;
+  clear: both;
+  margin-top: 5px;
+  padding-right:15px;
+}
+
+#bottom-menu-container {
+  font-family: "Raleway","Helvetica Neue",Helvetica,Arial,sans-serif;
+  background: url('../images/footer.jpg') no-repeat left top;
+  padding: 5px 15px 0px 15px;
+}
+
+#bottom-menu-container, #bottom-menu-container a {
+  color: #333;
+}
+
+#bottom-menu-container .menu {
+  float: left;
+}
+
+#bottom-menu-container ul.menu li{
+  display:inline-block;
+  padding-left: 0;
+  padding-right: 1em;
+}
+
+
+#bottom-menu-container .share {
+  float: right;
+}
+
+.main-column {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  background-color: #5E93CE;
+  margin-bottom: -130px;
+}
+
+@media(min-width:768px){
+  .main-column {
+    box-shadow: 5px -1px 15px  #bbb, -5px -1px 15px #bbb;
+  }
+
+}
+
+@media(max-width:768px) {
+  .container {
+    padding: 0 0 0 0;
+  }
+}
+
+#gallery .col-md-3 {
+  padding: 0;
+}
+
+#gallery {
+  margin-top: -15px;
+  padding-bottom: 15px;
+}
+
+#main-content {
+  height: 100%;
+  min-height: 100%;
+  padding-top: 15px;
+}
+
+.push {
+  height: 130px;
 }
 
 .flash {
@@ -23,22 +192,10 @@ header h1 {
     margin-bottom: 1ex;
 }
 
-.logo, .emw_logo {
-    vertical-align: -21px;
-    display: inline-block;
-    width: 55px;
-    height: 80px;
+p.emphasis {
+  font-size: 1.2em;
+  letter-spacing: 0.5px;
 }
-
-.logo {
-    background: url('../images/emf_logo_55x80.png') no-repeat left center;
-}
-
-.emw_logo {
-    background: url('../images/emw_logo_55.png') no-repeat left center;
-    padding-right:5px;
-}
-
 
 h1 a, h1 a:hover {
     text-decoration:none;
@@ -86,13 +243,6 @@ tr.odd {
     background-color: #f2f2f2;
 }
 
-footer {
-    font-size: 0.75em;
-    padding-top:20px;
-}
-footer .logout {
-    float: right;
-}
 
 table.tickets tr.paid {
   font-weight: bold;
@@ -153,63 +303,6 @@ div.micro img {
   margin-bottom: 10px;
 }
 
-form.wave-cfp input, form.wave-cfp textarea {
-  width:250px;
-}
-
-#splash {
-  margin-top: 50px;
-  font-size: 110%;
-}
-
-#splash h3 {
-  color: #009ee2;
-}
-
-.splash-column .inner {
-  padding: 20px;
-  background-color: #f2f2f2;
-}
-
-@media screen and (min-width: 990px) {
-  .splash-column .inner {
-    height:775px;
-  }
-}
-
-#splash .alt .inner {
-  background-color: #009ee2;
-  color: white;
-}
-
-#splash .alt a {
-  color: white;
-  text-decoration: underline;
-}
-
-#splash #logo {
-  margin-bottom: 10px;
-}
-
-#splash p.lhead {
-    font-size: 1.3em;
-    line-height: 1.3em;
-}
-
-#splash #email-field {
-  display: inline;
-  width: 75%;
-}
-
-#splash #gallery img {
-    margin-bottom: 5px;
-    border: 1px solid #888;
-}
-
-#splash .jumbotron {
-    background-color: inherit;
-}
-
 .tickets-table label {
   font-size: 110%;
 }
@@ -224,4 +317,12 @@ form.wave-cfp input, form.wave-cfp textarea {
 
 .glyphicon.input-group-addon {
   top: 0px;
+}
+
+.cfp-tab {
+  padding-right: 15px;
+}
+
+.btn-primary {
+  border: #333 solid 1px;
 }

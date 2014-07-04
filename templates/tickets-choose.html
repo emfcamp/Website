@@ -2,7 +2,6 @@
 
 {% block body %}
 
-<div class="col-md-10">
 {% include 'ticket-blurb.html' %}
 {% if not current_user.is_authenticated() %}
 <p>If you've already signed up this year, <a href="{{url_for('login')}}">log in</a> to view your ticket status.</p>
@@ -74,7 +73,7 @@
         </div>
     </div>
     </td>
-</tfoor>
+</tfoot>
 </table>
 
 <div class="form-actions pull-right">
@@ -82,7 +81,6 @@
 </div>
 
 </form>
-</div>
 {% endblock %}
 
 {% block foot %}

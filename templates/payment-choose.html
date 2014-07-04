@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block body %}
 
-<div class="col-md-10 payment-choose">
+<div class="payment-choose">
 
 {% if config.get('STRIPE') %}
 <p>Taking card payments for a small event like us is really expensive, so our
    preferred payment methods are bank-to-bank, but these are not available after 23rd August.
-   We charge <strong>5%</strong> extra for card payments through Stripe.</p>
+   We charge <strong>5%</strong> extra for card payments.</p>
 {% else %}
 <p>Taking card payments for a small event like us is really expensive, so the only
    payment methods we accept are bank-to-bank. If this is really a problem for you, please
@@ -21,7 +21,7 @@ or drop us an <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email</a>.</p>
 <h3>Pay by Direct Debit</h3>
 
 <p>You can use GoCardless to create a one-off direct debit from your account.
-GoCardless payments are protected by the 
+GoCardless payments are protected by the
 <a href="http://www.directdebit.co.uk/DirectDebitExplained/Pages/DirectDebitGuarantee.aspx">Direct Debit
 Guarantee</a>.</p>
 
@@ -45,7 +45,7 @@ Guarantee</a>.</p>
 {% if config.get('STRIPE') %}
 <h3>Pay by Card</h3>
 
-<p>Stripe will accept Visa, Visa Debit, Mastercard or American Express, but we add 5% to cover the transaction fees.</p>
+<p>Our card provider Stripe will accept Visa, Visa Debit, Mastercard or American Express, but we add 5% to cover the transaction fees.</p>
 <p>This will amount to {{ StripePayment.premium(user_currency, total) | price(user_currency) }}.</p>
 
 <form method="post" action="{{ url_for('stripe_start') }}">
