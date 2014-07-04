@@ -199,8 +199,6 @@ def tickets_choose():
                 values = []
 
         f.amount.values = values
-        if tt.code == 'full':
-            f.amount.data = 1
         f._any = any(values)
 
     if form.validate_on_submit():
