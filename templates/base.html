@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{% block title %}Electromagnetic Field{% endblock %}</title>
         <meta property="fb:admins" content="286100493"/>
-        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
         {% assets "css_all" -%}
         <link rel="stylesheet" href="{{ ASSET_URL }}">
         {% endassets -%}
@@ -29,6 +29,7 @@
 
           <div id="menu-container">
             <ul class="menu">
+              <li><a href="{{ url_for('about') }}">About</a>
               <li><a href="{{ url_for('tickets_choose') }}">Buy Tickets</a>
               <li><a href="{{ url_for('cfp') }}">Give a Talk</a>
             </ul>
@@ -71,7 +72,7 @@
 {% endblock %}
 <script src="//code.jquery.com/jquery-1.10.1.min.js"></script>
 <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 {% block foot -%}{% endblock -%}
 {% if not config.get('DEBUG') and request.headers.get('dnt') != '1' %}
 <script>

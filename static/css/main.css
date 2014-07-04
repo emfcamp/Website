@@ -329,3 +329,10 @@ div.micro img {
   text-decoration: none;
 }
 
+div#about-page {
+  font-size: 1.2em;
+}
+
+div#about-page img, .embed-responsive {
+  margin-bottom: 15px;
+}

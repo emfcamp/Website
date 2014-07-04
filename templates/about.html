@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}About - Electromagnetic Field{% endblock %}
+{% block body %}
+<div id="about-page">
+<h2>About Electromagnetic Field</h2>
+<p>Imagine a camping festival with a power grid and high-speed internet
+access; a temporary village of geeks, crafters, and technology enthusiasts
+that's lit up by night, and buzzing with activity during the day.
+Over a thousand curious people will descend on our
+<a href="https://www.emfcamp.org/code-of-conduct">friendly open space</a> to learn,
+share, and talk about what they love.</p>
+
+<div class="row">
+<img class="img-responsive md-col-12" src="static/images/about/about_1.jpg">
+</div>
+
+<p>Over a long weekend, you can expect to see a huge variety of talks across three stages,
+a slew of workshops, as well as music, games, and installations dotted around the site.</p>
+
+<p>We're inviting attendees to set up their own villages &mdash; camps within the camp &mdash;
+where like-minded people can camp together and put on their own activities. Our hard-working team
+of volunteers will supply you with power and internet to your tent.</p>
+
+<div class="row">
+<img class="img-responsive md-col-12" src="static/images/about/about_3.jpg">
+</div>
+
+<p>Our internet connection &mdash; last time it was 380 megabits, this time we're aiming for
+much more &mdash; will be beamed in from a datacenter nearby, and distributed to your tent by
+(hopefully) the most reliable conference WiFi network you'll ever use, housed in a series of
+specially repurposed high-tech portaloos.</p>
+
+<p>You'll also be able to take advantage of our well-stocked bar selling great beer, cider, and
+soft drinks at distinctly non-festival prices. (Sadly we can't get hold of the motorway
+bridge that housed the bar at our last site.) </p>
+
+<div class="row">
+<img class="img-responsive md-col-12" src="static/images/about/about_2.jpg">
+</div>
+
+<p>When you arrive, you will be issued with an attendee badge unlike any you've seen before. Our
+badge is a full-blown Arduino-powered computer with an LCD screen and wireless connectivity. During
+EMF, you'll be able to view the schedule of talks on it. After the event, instead of sitting
+in a drawer, it's fully reprogrammable to do whatever you want.
+</p>
+
+<div class="row">
+<img class="img-responsive md-col-12" src="static/images/about/about_4.jpg">
+</div>
+
+<p>What makes Electromagnetic Field unique is that everything is created by attendees like you.
+The entire event &mdash; stewarding, water, electricity, internet, stages, toilets, and the bar &mdash;
+is organised by a dedicated team of volunteers, and everyone who turns up does their part to
+make the event an amazing place to be for a weekend.</p>
+
+<p>Expect to run into
+<a href="http://jarkman.co.uk/catalog/random/emfsporks.htm">spork-making workshops</a>,
+<a href="https://www.youtube.com/watch?v=g6_wwhCvkdU">bottle rocket launches</a>,
+high altitude balloon releases,
+<a href="http://msraynsford.blogspot.co.uk/2012/09/distance-range-finder.html">ad-hoc music installations</a>
+and so much more.</p>
+
+<div class="row">
+<div class="embed-responsive embed-responsive-16by9 md-col-12">
+  <iframe src="//www.youtube.com/embed/uQMogMHvMGw" allowfullscreen></iframe>
+</div>
+</div>
+
+<p>We hope we've given you a taste of what EMF is all about, but you have to be there
+to experience it all. Tickets are <a href="{{ url_for('tickets_choose')}}">on sale now</a>
+&mdash; if you miss out on it this year, our next festival won't be until 2016.</p>
+
+<p>If you want to get involved, you can <a href="{{ url_for('cfp')}}">propose a talk, workshop, or installation</a>,
+or join our team of volunteers to help build an amazing festival.</p>
+
+</div>
+{% endblock %}
