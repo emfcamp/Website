@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block body %}
-<div class="col-md-10">
 {% if tickets %}
 <h2>Your current tickets</h2>
 
@@ -101,8 +100,6 @@
 {% endif %}
 
     <a href="{{ url_for('tickets_choose') }}" class="btn btn-large btn-primary">Add more tickets</a>
-</div>
-
 {% endblock %}
 {% block foot %}
 <script type="text/javascript">
