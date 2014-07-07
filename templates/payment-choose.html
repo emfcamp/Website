@@ -43,9 +43,9 @@ Guarantee</a>.</p>
 {% endif %}
 
 {% if config.get('STRIPE') %}
-<h3>Pay by Card</h3>
+<h3>Pay by Credit/Debit Card</h3>
 
-<p>Our card provider Stripe will accept Visa, Visa Debit, Mastercard or American Express, but we add 5% to cover the transaction fees.</p>
+<p>Our card provider Stripe will accept Visa, Visa Debit, Mastercard or American Express, but we add 5% to both credit and debit card transactions to cover the transaction fees.</p>
 <p>This will amount to {{ StripePayment.premium(user_currency, total) | price(user_currency) }}.</p>
 
 <form method="post" action="{{ url_for('stripe_start') }}">
