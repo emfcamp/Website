@@ -53,7 +53,7 @@ header a:hover {
   height: 168px;
 }
 
-@media(max-width:520px){
+@media(max-width:550px){
   #logo {
     background: url('../images/logo-small.png') no-repeat left top;
     width: 370px;
