@@ -51,6 +51,10 @@
   help</a>. If you're not confident speaking, we'll help you out however we
   can.</p>
 
+  <p>The first round of proposals closes on <strong>July 31<sup>st</sup>, 2014</strong>. Get your proposal in by then for
+    the best chance of having your talk selected. We will continue accepting proposals right up until
+    the event.</p>
+
   {% if not current_user.is_authenticated() %}
   <p>If you've already bought a ticket for this year, please <a href="{{ url_for('login') }}">log in</a>
      so we can link the submission to your account.</p>
@@ -60,7 +64,6 @@
   Fields marked <span class="glyphicon glyphicon-globe"></span> will be displayed in the schedule &mdash;
   you'll be able to change them later.
   </div>
-
 
   <ul class="nav nav-tabs cfp-types" role="navigation">
     {% for form in forms %}
