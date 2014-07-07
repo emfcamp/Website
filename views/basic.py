@@ -43,9 +43,12 @@ def favicon():
 def about():
     return render_template('about.html')
 
-
-@app.route("/talks")
+@app.route("/talks/")
 def talks():
+    return redirect(url_for('talks_2012'))
+
+@app.route("/talks/2012")
+def talks_2012():
 
     days = {}
     talk_path = os.path.abspath(os.path.join(__file__, '..', '..', 'talks'))
