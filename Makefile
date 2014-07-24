@@ -24,17 +24,10 @@ clean:
 db:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createdb
 
-data: tickets tokens shifts bankaccounts
+data: db tickets bankaccounts
 
 tickets:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createtickets
-
-tokens:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py addtokens
-
-shifts:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createroles
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createshifts
 
 bankaccounts:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createbankaccounts
