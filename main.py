@@ -29,8 +29,11 @@ css_all = Bundle('css/main.css',
                   output='gen/packed.css', filters='cssmin')
 css_admin = Bundle('css/admin.css',
                    output='gen/admin-packed.css', filters='cssmin')
+css_print = Bundle('css/print.css',
+                   output='gen/print-packed.css', filters='cssmin')
 assets.register('css_all', css_all)
 assets.register('css_admin', css_admin)
+assets.register('css_print', css_print)
 
 gocardless.environment = app.config['GOCARDLESS_ENVIRONMENT']
 gocardless.set_details(app_id=app.config['GOCARDLESS_APP_ID'],

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Electromagnetic Field{% endblock %}</title>
+        <meta property="fb:admins" content="286100493"/>
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        {% assets "css_print" -%}
+        <link rel="stylesheet" href="{{ ASSET_URL }}">
+        {% endassets -%}
+        {% block head -%}{% endblock -%}
+        <!--[if lt IE 9]>
+              <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+              <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+        <link rel="shortcut icon" href="/favicon.ico">
+    </head>
+<body>
+
+{% block document %}
+<div class="container">
+  <div class="main-row">
+    <div class="col-md-10 col-md-offset-1 main-column">
+
+      <div id="main-content">
+
+{% block body %}
+
+<h2>Invoice</h2>
+
+<div class="recipient">
+  <div>{{ payment.user.full_name }}</div>
+  <div>{{ payment.user.email }}</div>
+</div>
+
+<div class="sender">
+  <dl>
+    <dt>Invoice date</dt><dd>{{ payment.changes[0].timestamp.strftime('%d %b %Y') }}</dd>
+    <dt>Invoice number</dt><dd>{{ payment.invoice_number() }}</dd>
+    <dt>VAT number</dt><dd>188170679</dd>
+  </dl>
+  <div class="vcard">
+    <span class="fn org">Electromagnetic Field Ltd.</span>
+    <div class="adr">
+      <span class="street-address">2 Ockendon Mews</span>
+      <span class="locality">London</span>
+      <span class="postal-code">N1 3JL</span>
+      <span class="country-name">UNITED KINGDOM</span>
+    </div>
+  </div>
+</div>
+
+<table class="table">
+<thead>
+<tr>
+  <th>Ticket type</th>
+  <th>Unit price</th>
+  <th>Quantity</th>
+  <th>Amount</th>
+</tr>
+</thead>
+
+<tbody>
+{% set line_class = cycler('odd', 'even') %}
+
+{%- for tt, count in invoice_lines -%}
+<tr class="ticket {{ line_class.next() }}">
+<td>{{ tt.name }}</td>
+<td>{{ tt.get_price_ex_vat(payment.currency) | price(payment.currency) }}</td>
+<td>{{ count }}
+<td>{{ (tt.get_price_ex_vat(payment.currency) * count) | price(payment.currency) }}</td>
+</tr>
+{% endfor -%}
+
+{% if payment.provider == 'stripe' %}
+<tr class="premium {{ line_class.next() }}">
+<td>Credit Card Premium</td>
+<td>{{ premium | price(payment.currency) }}</td>
+<td>{{ 1 }}
+<td>{{ premium | price(payment.currency) }}
+</tr>
+{% endif %}
+
+</tbody>
+
+<tfoot>
+<tr class="subtotal {{ line_class.next() }}">
+<td colspan=2></td>
+<td>Subtotal</td>
+<td>{{ subtotal | price(payment.currency) }}</td>
+</tr>
+
+<tr class="vat {{ line_class.next() }}">
+<td colspan=2></td>
+<td>VAT at 20%</td>
+<td>{{ vat | price(payment.currency) }}</td>
+</tr>
+
+<tr class="total {{ line_class.next() }}">
+<td colspan=2></td>
+<td>Total</td>
+<td>{{ payment.amount | price(payment.currency) }}</td>
+</tr>
+
+</tfoot>
+
+</table>
+
+<div class="payment-terms">
+  <div class="due-date">Due Date: {{ due_date.strftime('%d %b %Y') }}</div>
+  {% if payment.provider == 'banktransfer' %}
+  <dl class="bank-info dl-horizontal">
+  <dl class="dl-horizontal">
+    <dt>Bank</dt><dd>Barclays Bank PLC, 19 Fleet Street, London EC4Y 1AA, UK</dd>
+    <dt>Payee</dt><dd>Electromagnetic Field Ltd</dd>
+    {% if payment.currency == 'GBP' %}
+    <dt>Sort code</dt><dd>20-71-64</dd>
+    <dt>Account number</dt><dd>73590526</dd>
+    <!--<dt>IBAN</dt><dd>GB39 BARC 2071 6473 5905 26</dd>-->
+    {% elif payment.currency == 'EUR' %}
+    <dt>SWIFT</dt><dd>BARCGB22</dd>
+    <dt>IBAN</dt><dd>GB21 BARC 2071 6472 9544 33</dd>
+    {% endif %}
+    <dt>Amount</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
+    <dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
+  </dl>
+  {% elif payment.provider == 'gocardless' %}
+  <div>Payment to be made online at {{ external_url('gocardless_tryagain', payment_id=payment.id) }}</div>
+  {% elif payment.provider == 'stripe' %}
+  <div>Payment to be made online at {{ external_url('stripe_tryagain', payment_id=payment.id) }}</div>
+  {% endif %}
+</div>
+
+<div>Terms and conditions at {{ external_url('ticket_terms') }}</div>
+
+{% endblock %}
+
+      </div>
+
+      <footer>
+        <dl class="company-info">
+          <dt>Company Registration No</dt><dd>07788466</dd>
+          <dt>Registered Office</dt><dd>2 Ockendon Mews, London, N1 3JL, United Kingdom</dd>
+        </div>
+      </footer>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block foot -%}{% endblock -%}
+
+{% if not config.get('DEBUG') and request.headers.get('dnt') != '1' %}
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+         })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+   ga('create', 'UA-28044531-1', 'emfcamp.org');
+   ga('send', 'pageview');
+</script>
+{% endif %}
+</body>
+</html>

@@ -25,7 +25,8 @@ class Payment(db.Model):
     amount_int = db.Column(db.Integer, nullable=False)
     state = db.Column(db.String, nullable=False, default='new')
     reminder_sent = db.Column(db.Boolean, nullable=False, default=False)
-    changes = db.relationship('PaymentChange', backref='payment')
+    changes = db.relationship('PaymentChange', backref='payment',
+                              order_by='PaymentChange.timestamp, PaymentChange.id')
     tickets = db.relationship('Ticket', lazy='dynamic', backref='payment', cascade='all')
     __mapper_args__ = {'polymorphic_on': provider}
 
@@ -66,6 +67,9 @@ class Payment(db.Model):
         for ticket in self.tickets:
             ticket.expires = datetime.utcnow()
         self.state = 'cancelled'
+
+    def invoice_number(self):
+        return 'WEB-%05d' % self.id
 
 
 class BankPayment(Payment):

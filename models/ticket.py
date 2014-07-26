@@ -39,6 +39,9 @@ class TicketType(db.Model):
             if price.currency == currency:
                 return price.value
 
+    def get_price_ex_vat(self, currency):
+        return self.get_price(currency) / Decimal('1.2')
+
     def user_limit(self, user):
         if user.is_authenticated():
             user_count = user.tickets. \
