@@ -29,9 +29,11 @@ from functools import wraps
 def admin_required(f):
     @wraps(f)
     def wrapped(*args, **kwargs):
-        if current_user.is_authenticated() and current_user.admin:
-            return f(*args, **kwargs)
-        abort(404)
+        if current_user.is_authenticated():
+            if current_user.admin:
+                return f(*args, **kwargs)
+            abort(404)
+        return app.login_manager.unauthorized()
     return wrapped
 
 @app.context_processor
