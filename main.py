@@ -42,9 +42,9 @@ stripe.api_key = app.config['STRIPE_SECRET_KEY']
 
 
 def external_url(endpoint, **values):
-    """ Generate an absolute external URL. url_for(_external=True) doesn't seem to work
-        if we're behind a proxy as in production """
-    return app.config.get('BASE_URL', 'https://www.emfcamp.org') + url_for(endpoint, **values)
+    """ Generate an absolute external URL. If you need to override this,
+        you're probably doing something wrong. """
+    return url_for(endpoint, _external=True, **values)
 
 from views import *
 from models import *
@@ -54,10 +54,14 @@ if __name__ == "__main__":
         db.create_all()
 
     if app.config.get('FIX_URL_SCHEME'):
+        # The Flask debug server doesn't process _FORWARDED_ headers,
+        # so there's no other way to set the wsgi.url_scheme.
+        # Consider using an actual WSGI host (perhaps with ProxyFix) instead.
         from flask import request, _request_ctx_stack
         @app.before_request
         def fix_url_scheme():
-            request.environ['wsgi.url_scheme'] = 'https'
-            _request_ctx_stack.top.url_adapter.url_scheme = 'https'
+            if request.environ.get('HTTP_X_FORWARDED_PROTO') == 'https':
+                request.environ['wsgi.url_scheme'] = 'https'
+                _request_ctx_stack.top.url_adapter.url_scheme = 'https'
 
     app.run()
