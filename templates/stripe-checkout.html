@@ -58,7 +58,7 @@ EMF.stripe_handler = StripeCheckout.configure({
   closed: function() {
     EMF.stripe_token_timer = setTimeout(function() {
       $('#failed-warning').removeClass('hidden').show();
-    }, 1000);
+    }, 2000);
   }
 });
 EMF.stripe_checkout = function() {
