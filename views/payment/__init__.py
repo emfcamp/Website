@@ -48,7 +48,7 @@ def payment_invoice(payment_id):
 
     invoice_lines = payment.tickets.join(TicketType). \
         with_entities(TicketType, func.count(Ticket.code)). \
-        group_by(Ticket.code).all()
+        group_by(TicketType).order_by(TicketType.order).all()
 
     ticket_sum = sum(tt.get_price_ex_vat(payment.currency) * count for tt, count in invoice_lines)
     if payment.provider == 'stripe':
