@@ -31,7 +31,7 @@ def admin_required(f):
     def wrapped(*args, **kwargs):
         if current_user.is_authenticated() and current_user.admin:
             return f(*args, **kwargs)
-        return app.login_manager.unauthorized()
+        abort(404)
     return wrapped
 
 @app.context_processor
