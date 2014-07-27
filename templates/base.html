@@ -75,6 +75,23 @@
 <script src="//code.jquery.com/jquery-1.10.1.min.js"></script>
 <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+if (typeof(EMF) != 'object') var EMF = Object();
+
+EMF.debounce_submit = function() {
+    var t = $(this);
+    setTimeout(function() {
+        t.prop('disabled', true);
+        setTimeout(function() {
+            t.prop('disabled', false);
+        }, 2000);
+    }, 0);
+};
+
+$(function() {
+    $('button[type=submit], input[type=submit]').on('click', EMF.debounce_submit);
+});
+</script>
 {% block foot -%}{% endblock -%}
 {% if not config.get('DEBUG') and request.headers.get('dnt') != '1' %}
 <script>
