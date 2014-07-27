@@ -50,6 +50,7 @@ def pay_choose():
 
 
 @app.route('/payment/<int:payment_id>/invoice')
+@login_required
 def payment_invoice(payment_id):
     payment = get_user_payment_or_abort(payment_id, allow_admin=True)
 
