@@ -48,7 +48,7 @@
         <footer>
           <div id="bottom-menu-container">
             <ul class="menu">
-              <li><a href="https://wiki.emfcamp.org">Wiki</a>
+              <li><a target="_blank" href="https://wiki.emfcamp.org">Wiki</a>
 
             {% if current_user.is_authenticated() %}
               <li><a href="{{ url_for('tickets') }}">My tickets</a></li>
@@ -58,7 +58,7 @@
             {% endif %}
             </ul>
             <div class="share">
-              <a href="http://twitter.com/emfcamp">@emfcamp</a> |  <a href="https://www.facebook.com/emfcamp">facebook.com/emfcamp</a>
+              <a target="_blank" href="http://twitter.com/emfcamp">@emfcamp</a> |  <a target="_blank" href="https://www.facebook.com/emfcamp">facebook.com/emfcamp</a>
             </div>
             <div style="clear: both"></div>
           </div>
