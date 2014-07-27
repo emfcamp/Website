@@ -46,6 +46,8 @@ Reference: {{ payment.bankref | bankref }}
 {% endif %}
 {%- endif -%}
 
+Your tickets are:
+
 {% include "email-tickets.txt" %}
 
 Love,

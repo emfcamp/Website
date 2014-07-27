@@ -15,6 +15,9 @@ These tickets will be reserved for you for 10 days while you send the money
 by bank transfer. We'll let you know by email when your payment has been
 received.
 {%- endif -%}
+
+Your tickets are:
+
 {% include "email-tickets.txt" %}
 
 How to Pay

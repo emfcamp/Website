@@ -21,6 +21,12 @@ from datetime import datetime, timedelta
 
 logger = logging.getLogger(__name__)
 
+class StripeUpdateUnexpected(Exception):
+    pass
+
+class StripeUpdateConflict(Exception):
+    pass
+
 webhook_handlers = {}
 def webhook(type=None):
     def inner(f):
@@ -171,7 +177,7 @@ def stripe_cancel(payment_id):
             db.session.commit()
 
             if payment.token:
-                logging.warn('Stripe payment has outstanding token %s', payment.token)
+                logger.warn('Stripe payment has outstanding token %s', payment.token)
 
             logger.info('Payment %s cancelled', payment.id)
             flash('Payment cancelled')
@@ -237,34 +243,28 @@ def get_payment_or_abort(charge_id):
         logger.error('Payment for charge %s not found', charge_id)
         abort(409)
 
-@webhook('charge.succeeded')
-def stripe_charge_updated(type, charge_data):
-    payment = get_payment_or_abort(charge_data['id'])
-
-    logging.info('Received %s message for charge %s, payment %s', type, charge_data['id'], payment.id)
-
-    charge = stripe.Charge.retrieve(charge_data['id'])
-    if not charge.paid:
-        logger.error('Charge object is not paid')
-        abort(501)
-
+def stripe_update_payment(payment):
+    charge = stripe.Charge.retrieve(payment.chargeid)
     if charge.refunded:
-        logger.error('Charge object has been refunded')
-        abort(501)
+        return stripe_payment_refunded(payment)
 
+    elif charge.paid:
+        return stripe_payment_paid(payment)
+
+    app.logger.error('Charge object is not paid or refunded')
+    raise StripeUpdateUnexpected()
+
+def stripe_payment_paid(payment):
     if payment.state == 'paid':
         logger.info('Payment is already paid, ignoring')
-        return ('', 200)
+        return
 
     if payment.state != 'charged':
         logger.error('Current payment state is %s (should be charged)', payment.state)
-        abort(409)
+        raise StripeUpdateConflict()
 
     logger.info('Setting payment %s to paid', payment.id)
-    for t in payment.tickets.all():
-        t.paid = True
-
-    payment.state = 'paid'
+    payment.paid()
     db.session.commit()
 
     msg = Message('Your EMF ticket payment has been confirmed',
@@ -273,6 +273,42 @@ def stripe_charge_updated(type, charge_data):
     msg.body = render_template('tickets-paid-email-stripe.txt',
         user=payment.user, payment=payment)
     mail.send(msg)
+
+def stripe_payment_refunded(payment):
+    if payment.state == 'cancelled':
+        logger.info('Payment is already cancelled, ignoring')
+        return
+
+    logger.info('Setting payment %s to cancelled', payment.id)
+    payment.cancel()
+    db.session.commit()
+
+    if not app.config.get('TICKETS_NOTICE_EMAIL'):
+        app.logger.warning('No tickets notice email configured, not sending')
+        return
+
+    msg = Message('An EMF ticket payment has been refunded',
+        sender=app.config.get('TICKETS_EMAIL'),
+        recipients=[app.config.get('TICKETS_NOTICE_EMAIL')[1]])
+    msg.body = render_template('tickets-refunded-email-stripe.txt',
+        user=payment.user, payment=payment)
+    mail.send(msg)
+
+
+@webhook('charge.succeeded')
+@webhook('charge.refunded')
+@webhook('charge.updated')
+def stripe_charge_updated(type, charge_data):
+    payment = get_payment_or_abort(charge_data['id'])
+
+    logger.info('Received %s message for charge %s, payment %s', type, charge_data['id'], payment.id)
+
+    try:
+        stripe_update_payment(payment)
+    except StripeUpdateConflict:
+        abort(409)
+    except StripeUpdateUnexpected:
+        abort(501)
 
     return ('', 200)
 
@@ -285,7 +321,7 @@ def stripe_charge_failed(type, charge_data):
         logger.warn('Payment for failed charge %s not found, ignoring', charge_data['id'])
         return ('', 200)
 
-    logging.info('Received failed message for charge %s, payment %s', charge_data['id'], payment.id)
+    logger.info('Received failed message for charge %s, payment %s', charge_data['id'], payment.id)
 
     charge = stripe.Charge.retrieve(charge_data['id'])
     if not charge.failed:
@@ -299,22 +335,12 @@ def stripe_charge_failed(type, charge_data):
     # Payment can still be retried with a new charge - nothing to do
     return ('', 200)
 
-@webhook('charge.refunded')
-@webhook('charge.updated')
-def stripe_charge_update(type, charge_data):
-    payment = get_payment_or_abort(charge_data['id'])
-    # If we need to deal with these, they should be rolled into stripe_charge_updated
-    logging.critical('Unexpected charge event %s for payment %s: %s', type, payment.id, charge_data)
-
-    # Don't block other events
-    return ('', 200)
-
 @webhook('charge.dispute.created')
 @webhook('charge.dispute.updated')
 @webhook('charge.dispute.closed')
 def stripe_dispute_update(type, dispute_data):
     payment = get_payment_or_abort(dispute_data['charge'])
-    logging.critical('Unexpected charge dispute event %s for payment %s: %s', type, payment.id, dispute_data)
+    logger.critical('Unexpected charge dispute event %s for payment %s: %s', type, payment.id, dispute_data)
 
     # Don't block other events
     return ('', 200)

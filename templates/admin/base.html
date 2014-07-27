@@ -31,6 +31,9 @@
                 <li {% if nav_active == 'admin_txns' -%} class="active" {%- endif %}><a href="{{ url_for('admin_txns') }}">
                     Bank transfers <span class="badge">{{ unreconciled_count }}</span>
                 </a></li>
+                <li {% if nav_active == 'admin_payments' -%} class="active" {%- endif %}><a href="{{ url_for('admin_payments') }}">
+                    All payments</span>
+                </a></li>
                 <li {% if nav_active == 'admin_expiring' -%} class="active" {%- endif %}><a href="{{ url_for('admin_expiring') }}">
                     Expiring payments <span class="badge">{{ expiring_count }}</span>
                 </a></li>

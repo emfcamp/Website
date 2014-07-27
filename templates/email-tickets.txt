@@ -1,7 +1,3 @@
-
- 
-Your tickets are:
-
 {% for type, tickets in payment.tickets|groupby('type') -%}
 {{ type.name }}: {{ tickets|length }} at {{ type.get_price(payment.currency) | price(payment.currency) }}
 {% endfor %}

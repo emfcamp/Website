@@ -3,7 +3,11 @@ Hi {{ user.name }},
 This is to confirm that you've bought
 {%- if payment.tickets.all() | count == 1 %} a ticket {%- else %} {{ payment.tickets.all() |count }} tickets
 {%- endif %} for Electromagnetic Field 2014.
+
+Your tickets are:
+
 {% include "email-tickets.txt" %}
+
 Your bill ID from GoCardless was {{ payment.gcid | gcid }}.  You can view this
 by logging into your account at http://www.gocardless.com/
 

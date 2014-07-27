@@ -4,6 +4,9 @@ from models.payment import Payment, BankPayment, BankTransaction
 from models.ticket import TicketType, Ticket, TicketPrice
 from models.cfp import Proposal
 from views import Form
+from views.payment.stripe import (
+    StripeUpdateUnexpected, StripeUpdateConflict, stripe_update_payment,
+)
 
 from flask import (
     render_template, redirect, request, flash,
@@ -257,7 +260,18 @@ def ticket_types():
     else:
         return(('', 404))
 
-@app.route('/admin/payment/expiring')
+@app.route('/admin/payments')
+@admin_required
+def admin_payments():
+    payments = Payment.query.join(Ticket).with_entities(
+        Payment,
+        func.min(Ticket.expires).label('first_expires'),
+        func.count(Ticket.id).label('ticket_count'),
+    ).group_by(Payment).order_by(Payment.id).all()
+
+    return render_template('admin/payments.html', payments=payments)
+
+@app.route('/admin/payments/expiring')
 @admin_required
 def admin_expiring():
     expiring = BankPayment.query.join(Ticket).filter(
@@ -329,6 +343,37 @@ def admin_send_reminder(payment_id):
             return redirect(url_for('admin_expiring'))
 
     return render_template('admin/payment-send-reminder.html', payment=payment, form=form)
+
+
+class UpdatePaymentForm(Form):
+    update = SubmitField("Update payment")
+
+@app.route('/admin/payment/<int:payment_id>/update', methods=['GET', 'POST'])
+@admin_required
+def admin_update_payment(payment_id):
+    payment = Payment.query.get_or_404(payment_id)
+
+    if payment.provider != 'stripe':
+        abort(404)
+
+    form = UpdatePaymentForm()
+    if form.validate_on_submit():
+        if form.update.data:
+            app.logger.info('Requesting updated status for %s payment %s', payment.provider, payment.id)
+
+            try:
+                stripe_update_payment(payment)
+            except StripeUpdateConflict:
+                flash('Unable to update due to a status conflict')
+                return redirect(url_for('admin_update_payment', payment_id=payment.id))
+            except StripeUpdateUnexpected:
+                flash('Unable to update due to an unexpected response from Stripe')
+                return redirect(url_for('admin_update_payment', payment_id=payment.id))
+
+            flash('Payment status updated')
+            return redirect(url_for('admin_update_payment', payment_id=payment.id))
+
+    return render_template('admin/payment-update.html', payment=payment, form=form)
 
 
 class CancelPaymentForm(Form):
