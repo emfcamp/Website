@@ -10,9 +10,6 @@ from sqlalchemy.sql.functions import func
 from decimal import Decimal
 
 def get_user_payment_or_abort(payment_id, provider=None, valid_states=None, allow_admin=False):
-    if not current_user.is_authenticated():
-        return app.login_manager.unauthorized()
-
     try:
         payment = Payment.query.get(payment_id)
     except Exception, e:
