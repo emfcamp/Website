@@ -28,7 +28,7 @@
 
 {% block body %}
 
-<h2>Invoice</h2>
+<h2>{% if payment.paid %}Copy {% endif %}Invoice</h2>
 
 <div class="sender">
   <img src="{{ url_for('static', filename='images/logo_black.png') }}" class="logo" width="90"/>
@@ -112,6 +112,9 @@
 
 </table>
 
+{% if payment.state == 'paid' %}
+<div class="paid">Payment already received - thank you!</div>
+{% else %}
 <div class="payment-terms">
   <div class="due-date">Due Date: {{ due_date.strftime('%d %b %Y') }}</div>
   {% if payment.provider == 'banktransfer' %}
@@ -136,6 +139,7 @@
   <div>Payment to be made online at {{ external_url('stripe_tryagain', payment_id=payment.id) }}</div>
   {% endif %}
 </div>
+{% endif %}
 
 <div>For terms and conditions, see {{ external_url('ticket_terms') }}</div>
 
