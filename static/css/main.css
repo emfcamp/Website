@@ -1,8 +1,8 @@
 @import url(https://fonts.googleapis.com/css?family=Raleway:700,500);
 
-body{
- font-size: 16px;
- color: white;
+body {
+  font-size: 16px;
+  color: white;
 }
 
 a {
@@ -11,19 +11,15 @@ a {
 }
 
 a:hover {
-  color: #ddd;
+  color: #d3e0f1;
 }
 
 html, body, .container, .main-row, .main-column {
   height: 100%;
 }
 
-.well, .jumbotron, table, .cfp-tab {
-  background-color: #eee;
-  color: #333;
-}
-
-.well a, .jumbotron a {
+.well, .jumbotron {
+  background-color: #d3e0f1;
   color: #333;
 }
 
@@ -123,7 +119,7 @@ footer #credits {
 #bottom-menu-container {
   font-family: "Raleway","Helvetica Neue",Helvetica,Arial,sans-serif;
   background: url('../images/footer.jpg') no-repeat left top;
-  padding: 5px 15px 0px 15px;
+  padding: 10px 15px 0px 15px;
 }
 
 #bottom-menu-container, #bottom-menu-container a {
@@ -183,6 +179,7 @@ footer #credits {
 
 .push {
   height: 130px;
+  clear: both;
 }
 
 .flash {
@@ -216,7 +213,12 @@ p.summary {
 }
 
 table {
+    color: #333;
     margin: 1ex 0.5em;
+}
+
+table a {
+    color: #333;
 }
 
 td, th {
@@ -227,20 +229,35 @@ th {
     font-weight: bold;
 }
 
+thead tr {
+    /* background-color: #82aad4; */
+    color: white;
+}
+
+.table > tbody > tr > th,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > tfoot > tr > td {
+    border-top: 1px solid transparent;
+    color: white;
+}
+
+.table > tbody > tr > td,
+.table > thead > tr > th {
+    border-top: 1px solid #7d9fcb;
+}
+
+.table > thead > tr > th {
+    /* border-bottom: 2px solid #7d9fcb; */
+    border-bottom: 2px solid transparent;
+}
+
 tr.even {
-    background-color: #ddd;
+    background-color: #d3e0f1;
 }
 
 tr.odd {
-    background-color: #eee;
-}
-
-.choose-tickets-form tr.even {
-    background-color: #fafafa;
-}
-
-.choose-tickets-form tr.odd {
-    background-color: #f2f2f2;
+    background-color: #aec6ea;
 }
 
 
@@ -280,8 +297,9 @@ img.padit {
   margin-bottom: 0;
 }
 
-#select_currency {
-  width: 4em
+#choose_tickets button[name="set_currency"] {
+  font-weight: bold;
+  font-size: 16px;
 }
 
 .receipt-qr {
@@ -319,18 +337,66 @@ div.micro img {
   top: 0px;
 }
 
-.cfp-tab {
-  padding-right: 15px;
-}
-
-.btn, .btn-primary {
-  border: #333 solid 1px;
-  color: white;
+.nav a {
   text-decoration: none;
 }
 
+.nav a:hover {
+  color: #555;
+}
+
+.cfp-tab {
+  padding-right: 15px;
+  background-color: #d3e0f1;
+  color: #333;
+}
+
+.cfp-tab a {
+  color: #333;
+}
+
+.cfp-types.nav-tabs > li.active > a,
+.cfp-types.nav-tabs > li.active > a:hover,
+.cfp-types.nav-tabs > li.active > a:focus {
+  background-color: #d3e0f1;
+}
+
+.cfp-types.nav > li > a:hover,
+.cfp-types.nav > li > a:focus {
+  background-color: #e3ecf6;
+}
+
+.cfp-tab .form-actions {
+  margin-top: 2ex;
+}
+
+/* Show the hover borders by default to avoid bleeding */
+.btn-primary {
+  border: 1px solid #285e8e;
+}
+
 .btn-default {
-  color: black;
+  border: 1px solid #adadad;
+}
+
+.btn-info {
+  border: 1px solid #269abc;
+}
+
+.btn-success {
+  border: 1px solid #398439;
+}
+
+.btn-warning {
+  border: 1px solid #d58512;
+}
+
+.btn-danger {
+  border: 1px solid #ac2925;
+}
+
+.btn {
+  text-decoration: none;
 }
 
 div#about-page {
@@ -339,4 +405,8 @@ div#about-page {
 
 div#about-page img, .embed-responsive {
   margin-bottom: 15px;
+}
+
+.ticket-info .well {
+  padding-left: 30px;
 }
