@@ -1,5 +1,5 @@
 from main import app
-from models import StripePayment, TicketType, Ticket
+from models import Payment, StripePayment, TicketType, Ticket
 from views import get_basket
 
 from flask import render_template, redirect, url_for, abort, flash
@@ -9,11 +9,15 @@ from sqlalchemy.sql.functions import func
 
 from decimal import Decimal
 
-def get_user_payment_or_abort(payment_id, provider=None, valid_states=None):
+def get_user_payment_or_abort(payment_id, provider=None, valid_states=None, allow_admin=False):
     try:
-        payment = current_user.payments.filter_by(id=payment_id).one()
+        payment = Payment.query.get(payment_id)
     except Exception, e:
         app.logger.warning('Exception %r getting payment %s', e, payment_id)
+        abort(404)
+
+    if not (payment.user == current_user or (allow_admin and current_user.admin)):
+        app.logger.warning('User not allowed to access payment %s', payment_id)
         abort(404)
 
     if provider and payment.provider != provider:
@@ -44,7 +48,7 @@ def pay_choose():
 
 @app.route('/payment/<int:payment_id>/invoice')
 def payment_invoice(payment_id):
-    payment = get_user_payment_or_abort(payment_id)
+    payment = get_user_payment_or_abort(payment_id, allow_admin=True)
 
     invoice_lines = payment.tickets.join(TicketType). \
         with_entities(TicketType, func.count(Ticket.code)). \
