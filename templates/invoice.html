@@ -24,23 +24,14 @@
   <div class="main-row">
     <div class="col-md-10 col-md-offset-1 main-column">
 
-      <div id="main-content">
+      <div id="main-content" class="invoice">
 
 {% block body %}
 
 <h2>Invoice</h2>
 
-<div class="recipient">
-  <div>{{ payment.user.full_name }}</div>
-  <div>{{ payment.user.email }}</div>
-</div>
-
 <div class="sender">
-  <dl>
-    <dt>Invoice date</dt><dd>{{ payment.changes[0].timestamp.strftime('%d %b %Y') }}</dd>
-    <dt>Invoice number</dt><dd>{{ payment.invoice_number() }}</dd>
-    <dt>VAT number</dt><dd>188170679</dd>
-  </dl>
+  <img src="{{ url_for('static', filename='images/logo_black.png') }}" class="logo" width="90"/>
   <div class="vcard">
     <span class="fn org">Electromagnetic Field Ltd.</span>
     <div class="adr">
@@ -50,6 +41,19 @@
       <span class="country-name">UNITED KINGDOM</span>
     </div>
   </div>
+</div>
+
+<div class="recipient">
+  <div>{{ payment.user.name }}</div>
+  <div>{{ payment.user.email }}</div>
+</div>
+
+<div class="invoice-details">
+  <dl class="dl-horizontal">
+    <dt>Invoice date</dt><dd>{{ payment.changes[0].timestamp.strftime('%d %b %Y') }}</dd>
+    <dt>Invoice number</dt><dd>{{ payment.invoice_number() }}</dd>
+    <dt>VAT number</dt><dd>188170679</dd>
+  </dl>
 </div>
 
 <table class="table">
@@ -133,7 +137,7 @@
   {% endif %}
 </div>
 
-<div>Terms and conditions at {{ external_url('ticket_terms') }}</div>
+<div>For terms and conditions, see {{ external_url('ticket_terms') }}</div>
 
 {% endblock %}
 

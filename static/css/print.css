@@ -1,0 +1,119 @@
+@media print {
+  .container {
+    width: auto;
+  }
+}
+
+body {
+  margin-bottom: 6ex;
+}
+
+h2 {
+  font-size: 24pt;
+  float: left;
+  position: relative;
+  top: 15px;
+}
+
+.recipient {
+  float: left;
+  clear: both;
+}
+
+.sender {
+  float: right;
+  padding-bottom: 10px;
+}
+
+.sender {
+  padding-bottom: 20px;
+}
+
+.sender img,
+.sender .vcard {
+  display: inline-block;
+  vertical-align: bottom;
+}
+
+.sender .vcard {
+  padding: 10px 10px 0px 20px;
+}
+
+.sender .vcard span {
+  display: block;
+}
+
+.sender .vcard span.locality,
+.sender .vcard span.postal-code {
+  display: inline-block;
+}
+
+.invoice-details {
+  float: right;
+  clear: right;
+}
+
+.table > thead > tr > th {
+  border-bottom: 1px solid black;
+}
+
+.table > tfoot > tr.total > td {
+  border-top: 1px solid black;
+}
+
+.invoice tr.total {
+  font-weight: bold;
+}
+
+
+.invoice td,
+.invoice th {
+  text-align: right;
+}
+
+.invoice th:first-child,
+.invoice tr.ticket td:first-child,
+.invoice tr.premium td:first-child {
+  text-align: left;
+}
+
+
+.due-date {
+  font-weight: bold;
+  padding-bottom: 2ex;
+}
+
+/* From Bootstrap, but without the media query */
+.dl-horizontal dt {
+  float: left;
+  width: 160px;
+  clear: left;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dl-horizontal dd {
+  margin-left: 180px;
+}
+
+
+dl.company-info {
+  position: fixed;
+  bottom: 0;
+  padding-top: 5ex;
+}
+
+dl.company-info dt,
+dl.company-info dd{
+  display: inline;
+  font-weight: normal;
+}
+
+dl.company-info dt:after {
+  content: ': ';
+}
+
+dl.company-info dd:after {
+  content: '.';
+}
