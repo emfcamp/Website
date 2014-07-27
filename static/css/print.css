@@ -4,6 +4,17 @@
   }
 }
 
+.container .table:before {
+  content: 'CANCELLED';
+  font-size: 50pt;
+  color: #333;
+  text-align: center;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: auto;
+}
+
 body {
   margin-bottom: 6ex;
 }

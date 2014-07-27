@@ -24,7 +24,7 @@
   <div class="main-row">
     <div class="col-md-10 col-md-offset-1 main-column">
 
-      <div id="main-content" class="invoice">
+      <div id="main-content" class="invoice {% if payment.state == 'cancelled' -%} cancelled {%- endif %}">
 
 {% block body %}
 
