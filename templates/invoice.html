@@ -28,7 +28,7 @@
 
 {% block body %}
 
-<h2>{% if payment.paid %}Copy {% endif %}Invoice</h2>
+<h2>{% if payment.paid -%} Receipt {%- else -%} Invoice {%- endif %}</h2>
 
 <div class="sender">
   <img src="{{ url_for('static', filename='images/logo_black.png') }}" class="logo" width="90"/>
