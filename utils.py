@@ -292,20 +292,34 @@ class CreateTickets(Command):
 
         data = [
             #(order, code, name, capacity, max per person, GBP, EUR, Description)
-            (5, 'full', 'Full Camp Ticket', 200, 10, 95.00, 120.00, None),
-            (6, 'full_supporter', 'Full Camp Ticket (Supporter)', 200, 10, 125.00, 160.00,
+            (2, 'full_earlybird',
+                'Full Camp Ticket', 200, 10, 90.00, 115.00, None),
+            (3, 'full_initial',
+                'Full Camp Ticket', 300, 10, 95.00, 120.00, None),
+            (5, 'full',
+                'Full Camp Ticket', 700, 10, 105.00, 135.00, None),
+            (8, 'full_supporter',
+                'Full Camp Ticket (Supporter)', 700, 10, 125.00, 160.00,
                 "Support this non-profit event by paying a little more. "
                 "All money will go towards making EMF more awesome."),
-            (10, 'kids_u16', 'Under-16 Camp Ticket', 500, 10, 40.00, 50.00,
+            (8, 'full_supporter_2',
+                'Full Camp Ticket (Supporter)', 700, 10, 150.00, 190.00,
+                "Support this non-profit event by paying a little more. "
+                "All money will go towards making EMF more awesome."),
+            (10, 'kids_u16',
+                'Under-16 Camp Ticket', 500, 10, 40.00, 50.00,
                 "For visitors born after August 28th, 1998. "
                 "All under-16s  must be accompanied by an adult."),
-            (15, 'kids_u5', 'Under-5 Camp Ticket', 200, 4, 0, 0,
+            (15, 'kids_u5',
+                'Under-5 Camp Ticket', 200, 4, 0, 0,
                 "For children born after August 28th, 2009. "
                 "All children must be accompanied by an adult."),
-            (30, 'parking', 'Parking Ticket', 200, 4, 15.00, 20.00,
+            (30, 'parking',
+                'Parking Ticket', 200, 4, 15.00, 20.00,
                 "We're trying to keep cars on-site to a minimum. "
                 "Please take public transport or find someone to share with if possible."),
-            (35, 'campervan', 'Caravan/Campervan Ticket', 30, 1, 30.00, 40.00,
+            (35, 'campervan',
+                'Caravan/Campervan Ticket', 30, 1, 30.00, 40.00,
                 "If you bring a caravan, you won't need a separate parking ticket for the towing car."),
         ]
 
