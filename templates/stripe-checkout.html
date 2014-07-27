@@ -30,7 +30,7 @@
 
 <form method="post" action="{{ url_for('stripe_capture', payment_id=payment.id) }}" id="stripe_capture" class="hidden">
 {{ form.hidden_tag() }}
-{{ form.forward(class_='btn btn-success') }}
+{{ form.forward(class_='btn btn-success debounce') }}
 </form>
 
 </div>

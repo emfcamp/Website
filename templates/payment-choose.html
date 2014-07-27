@@ -27,7 +27,7 @@ Guarantee</a>.</p>
 
 <form method="post" action="{{ url_for('gocardless_start') }}">
 <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
-    <p><button type="submit" name="gocardless" class="btn btn-lg btn-success">Pay with GoCardless</button></p>
+    <p><button type="submit" name="gocardless" class="btn btn-lg btn-success debounce">Pay with GoCardless</button></p>
 </form>
 {% endif %}
 
@@ -38,7 +38,7 @@ Guarantee</a>.</p>
 
 <form method="post" action="{{ url_for('transfer_start') }}">
 <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
-    <p><button type="submit" name="banktransfer" class="btn btn-lg btn-success">Pay by bank transfer</button></p>
+    <p><button type="submit" name="banktransfer" class="btn btn-lg btn-success debounce">Pay by bank transfer</button></p>
 </form>
 {% endif %}
 
@@ -50,7 +50,7 @@ Guarantee</a>.</p>
 
 <form method="post" action="{{ url_for('stripe_start') }}">
 <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
-    <p><button type="submit" name="stripe" class="btn btn-lg btn-success">Pay by card</button></p>
+    <p><button type="submit" name="stripe" class="btn btn-lg btn-success debounce">Pay by card</button></p>
 </form>
 {% endif %}
 

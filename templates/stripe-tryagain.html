@@ -9,7 +9,7 @@
 
 <form method="post" action="{{ url_for('stripe_tryagain', payment_id=payment.id) }}">
 {{ form.hidden_tag() }}
-{{ form.tryagain(class_="btn btn-warning") }}
+{{ form.tryagain(class_="btn btn-warning debounce") }}
 <a class="btn btn-info" href="{{ url_for('tickets') }}">Go back to my tickets</a>
 </form>
 

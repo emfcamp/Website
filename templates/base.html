@@ -89,7 +89,7 @@ EMF.debounce_submit = function() {
 };
 
 $(function() {
-    $('button[type=submit], input[type=submit]').on('click', EMF.debounce_submit);
+    $('.debounce').on('click', EMF.debounce_submit);
 });
 </script>
 {% block foot -%}{% endblock -%}

@@ -51,7 +51,7 @@
             <div class="form-group">
               <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
               <input id="email-field" type="text" class="form-control" placeholder="Enter email address" name="email"/>
-              <button type="submit" class="btn btn-default">Join</button>
+              <button type="submit" class="btn btn-default debounce">Join</button>
             </div>
           </form>
           <p class="body">
