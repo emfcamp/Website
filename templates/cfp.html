@@ -2,6 +2,10 @@
 {% extends "base.html" %}
 {% block title %}Call for Participation - Electromagnetic Field{% endblock %}
 {% block body %}
+  {% if has_errors %}
+  <div class="alert alert-danger">Could not submit your proposal. Please <a href="#cfp-errors" class="alert-link">check below</a> and try again.</div>
+  {% endif %}
+
   <h2>Call for Participation</h2>
   <p class="emphasis">Electromagnetic Field is a UK camping festival for those with an inquisitive
   mind or an interest in making things: hackers, artists, geeks, crafters,
@@ -65,7 +69,7 @@
   you'll be able to change them later.
   </div>
 
-  <ul class="nav nav-tabs cfp-types" role="navigation">
+  <ul class="nav nav-tabs cfp-types" role="navigation" id="cfp-errors">
     {% for form in forms %}
       <li {% if form.type == active_cfp_type -%} class="active" {%- endif %}>
         <a href="{{ url_for('cfp', cfp_type=form.type) }}" data-target="#{{ 'tab_' + form.type }}" data-toggle="tab">

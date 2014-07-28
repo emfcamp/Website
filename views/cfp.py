@@ -7,7 +7,7 @@ from models.cfp import (
 )
 
 from flask import (
-    render_template, redirect,
+    render_template, redirect, request,
     url_for, abort,
 )
 from flask.ext.login import current_user
@@ -74,6 +74,9 @@ def cfp(cfp_type='talk'):
     forms = [TalkProposalForm(), WorkshopProposalForm(), InstallationProposalForm()]
     (form,) = [f for f in forms if f.type == cfp_type]
 
+    if request.method == 'POST':
+        app.logger.info('Checking %s proposal for %s (%s)', cfp_type, form.name.data, form.email.data)
+
     if form.validate_on_submit():
         if cfp_type == 'talk':
             cfp = TalkProposal()
@@ -112,7 +115,7 @@ def cfp(cfp_type='talk'):
     full_price = TicketType.query.get('full').get_price('GBP')
 
     return render_template('cfp.html', full_price=full_price,
-        forms=forms, active_cfp_type=cfp_type)
+        forms=forms, active_cfp_type=cfp_type, has_errors=bool(form.errors))
 
 @app.route('/cfp/complete')
 @feature_flag('CFP')

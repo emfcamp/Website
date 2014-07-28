@@ -370,6 +370,29 @@ div.micro img {
   margin-top: 2ex;
 }
 
+/* Restore link colours */
+
+
+.alert-success a {
+  color: #3c763d;
+}
+
+.alert-info a {
+  color: #31708f;
+}
+
+.alert-warning a {
+  color: #8a6d3b;
+}
+
+.alert-danger a {
+  color: #a94442;
+}
+
+.alert-link {
+  text-decoration: none;
+}
+
 /* Show the hover borders by default to avoid bleeding */
 .btn-primary {
   border: 1px solid #285e8e;
