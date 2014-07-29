@@ -297,9 +297,9 @@ class CreateTickets(Command):
             (1, 'full_discount',
                 'Full Camp Ticket (Discount)', 5, 5, 70.00, 90.00, None),
             (2, 'full_earlybird',
-                'Full Camp Ticket', 200, 10, 90.00, 115.00, None),
+                'Full Camp Ticket', 0, 10, 90.00, 115.00, None),
             (3, 'full_initial',
-                'Full Camp Ticket', 500, 10, 95.00, 120.00, None),
+                'Full Camp Ticket', 0, 10, 95.00, 120.00, None),
             (5, 'full',
                 'Full Camp Ticket', 1000, 10, 105.00, 135.00, None),
             (8, 'full_supporter',
@@ -307,7 +307,7 @@ class CreateTickets(Command):
                 "Support this non-profit event by paying a little more. "
                 "All money will go towards making EMF more awesome."),
             (8, 'full_supporter_2',
-                'Full Camp Ticket (Supporter)', 1000, 10, 150.00, 190.00,
+                'Full Camp Ticket (Supporter)', 0, 10, 150.00, 190.00,
                 "Support this non-profit event by paying a little more. "
                 "All money will go towards making EMF more awesome."),
             (10, 'kids_u16',
