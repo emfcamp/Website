@@ -4,7 +4,7 @@
   }
 }
 
-.container .table:before {
+.cancelled .table:before {
   content: 'CANCELLED';
   font-size: 50pt;
   color: #333;
