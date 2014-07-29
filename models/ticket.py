@@ -148,7 +148,12 @@ class Ticket(db.Model):
                 db.session.rollback()
 
     def __repr__(self):
-        return "<Ticket: %s, type: %s, paid? %s, expired: %s>" % (self.id, self.code, self.paid, str(self.expired()))
+        attrs = [self.code]
+        if self.paid:
+            attrs.append('paid')
+        if self.expired():
+            attrs.append('expired')
+        return "<Ticket %s: %s>" % (self.id, ', '.join(attrs))
 
 class TicketAttrib(db.Model):
     __tablename__ = 'ticket_attrib'
@@ -161,6 +166,8 @@ class TicketAttrib(db.Model):
         self.name = name
         self.value = value
 
+    def __repr__(self):
+        return "<TicketAttrib %s: %s>" % (self.name, self.value)
 
 @event.listens_for(Session, 'before_flush')
 def check_capacity(session, flush_context, instances):
