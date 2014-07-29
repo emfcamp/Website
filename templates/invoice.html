@@ -130,7 +130,6 @@
     <dt>SWIFT</dt><dd>BARCGB22</dd>
     <dt>IBAN</dt><dd>GB21 BARC 2071 6472 9544 33</dd>
     {% endif %}
-    <dt>Amount</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
     <dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
   </dl>
   {% elif payment.provider == 'gocardless' %}
