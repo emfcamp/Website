@@ -40,7 +40,7 @@
         </header>
           <div id="main-content">
               {% for message in get_flashed_messages() -%}
-                  <div>{{ message }}</div>
+                  <div class="alert alert-warning">{{ message }}</div>
               {% endfor -%}
               {% block body -%}{% endblock -%}
               <div class="push"></div>
