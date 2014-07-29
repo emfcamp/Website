@@ -23,6 +23,8 @@ class TicketType(db.Model):
     limit = db.Column(db.Integer, nullable=False)
     order = db.Column(db.Integer, nullable=False)
 
+    token_only = ['full_free', 'full_discount']
+
     def __init__(self, code, name, capacity, limit, order, notice=None):
         self.code = code
         self.name = name
@@ -42,7 +44,12 @@ class TicketType(db.Model):
     def get_price_ex_vat(self, currency):
         return self.get_price(currency) / Decimal('1.2')
 
-    def user_limit(self, user):
+    def user_limit(self, user, token):
+        # This could do something more interesting, like allow extra tickets
+        if self.code in self.token_only:
+            if self not in TicketToken.types(token):
+                return 0
+
         if user.is_authenticated():
             user_count = user.tickets. \
                 filter_by(type=self). \

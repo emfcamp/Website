@@ -292,6 +292,10 @@ class CreateTickets(Command):
 
         data = [
             #(order, code, name, capacity, max per person, GBP, EUR, Description)
+            (0, 'full_free',
+                'Full Camp Ticket (Complimentary)', 1, 1, 0, 0, None),
+            (1, 'full_discount',
+                'Full Camp Ticket (Discount)', 5, 5, 70.00, 90.00, None),
             (2, 'full_earlybird',
                 'Full Camp Ticket', 200, 10, 90.00, 115.00, None),
             (3, 'full_initial',
@@ -420,12 +424,7 @@ class CreateShifts(Command):
 class CreateTicketTokens(Command):
     def run(self):
         tokens = [
-            ('full_ucl', 'ucl1'),
-            ('full_ucl', 'ucl2'),
-            ('full_ucl', 'ucl3'),
-            ('full_hs', 'hs1'),
-            ('full_hs', 'hs2'),
-            ('full_hs', 'hs3'),
+            ('full_discount', 'testtoken'),
         ]
 
         for code, token in tokens:
@@ -478,7 +477,7 @@ if __name__ == "__main__":
   #manager.add_command('testemails', TestEmails())
   manager.add_command('createtickets', CreateTickets())
   manager.add_command('makeadmin', MakeAdmin())
-  #manager.add_command('addtokens', CreateTicketTokens())
+  manager.add_command('createtokens', CreateTicketTokens())
   #manager.add_command('createroles', CreateRoles())
   #manager.add_command('createshifts', CreateShifts())
   #manager.add_command('sendtickets', SendTickets())

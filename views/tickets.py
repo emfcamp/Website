@@ -169,37 +169,34 @@ def tickets_choose():
 
     form = TicketAmountsForm()
 
-    if not form.types:
-        for tt in TicketType.query.order_by(TicketType.order).all():
+    tts = TicketType.query.order_by(TicketType.order).all()
+
+    token = session.get('ticket_token')
+    limits = dict((tt.code, tt.user_limit(current_user, token)) for tt in tts)
+
+    available_token_tts = [limits[code] > 0 for code in TicketType.token_only]
+    if any(available_token_tts):
+        # If the user can select token tickets, hide full tickets
+        limits['full'] = 0
+
+    if request.method != 'POST':
+        # Empty form - populate ticket types
+        for tt in tts:
             form.types.append_entry()
             form.types[-1].code.data = tt.code
+            if tt.code in TicketType.token_only or tt.code == 'full':
+                # Default to one full ticket/token ticket
+                if limits[tt.code] > 0:
+                    form.types[-1].amount.data = 1
 
-    #if current_user.is_authenticated():
-    #    fulls = current_user.tickets.join(TicketType). \
-    #        filter(TicketType.code.like('full%')). \
-    #        count()
-    #else:
-    #    fulls = 0
-
-    token_tts = TicketToken.types(session.get('ticket_token'))
-    token_only = ['full_ucl', 'full_hs', 'full_make', 'full_adafruit',
-                    'full_hackaday', 'full_boingboing', 'full_dp']
-
+    tts = dict((tt.code, tt) for tt in tts)
     for f in form.types:
-        tt = TicketType.query.get(f.code.data)
-        f._type = tt
+        f._type = tts[f.code.data]
 
-        limit = tt.user_limit(current_user)
-
-        values = range(limit + 1)
-        if tt.code in token_only and tt not in token_tts:
-            values = []
-        elif tt.code == 'full':
-            if token_tts:
-                values = []
-
+        values = range(limits[f.code.data] + 1)
         f.amount.values = values
         f._any = any(values)
+
 
     if form.validate_on_submit():
         if form.buy.data:
@@ -209,12 +206,6 @@ def tickets_choose():
             for f in form.types:
                 if f.amount.data:
                     tt = f._type
-
-                    if tt.code in token_only and tt not in token_tts:
-                        if f.amount.data:
-                            flash('Ticket type %s is not currently available')
-                        return redirect(url_for('tickets_choose'))
-
                     app.logger.info('Adding %s %s tickets to basket', f.amount.data, tt.name)
                     basket += [tt.code] * f.amount.data
 

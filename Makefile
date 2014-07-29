@@ -29,6 +29,9 @@ data: db tickets bankaccounts
 tickets:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createtickets
 
+tokens:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createtokens
+
 bankaccounts:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createbankaccounts
 
@@ -41,13 +44,6 @@ checkreconcile:
 
 reallyreconcile:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py reconcile -d
-
-
-warnexpire:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py warnexpire
-
-expire:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py expire
 
 
 shell:
