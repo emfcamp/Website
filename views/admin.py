@@ -1,7 +1,7 @@
 from main import app, db, mail
 from models.user import User
 from models.payment import Payment, BankPayment, BankTransaction
-from models.ticket import TicketType, Ticket, TicketPrice
+from models.ticket import Ticket
 from models.cfp import Proposal
 from views import Form
 from views.payment.stripe import (
@@ -15,10 +15,8 @@ from flask import (
 from flask.ext.login import login_required, current_user
 from flaskext.mail import Message
 
-from wtforms.validators import Required
 from wtforms import (
-    TextField, SubmitField,
-    BooleanField, IntegerField, DecimalField,
+    SubmitField, BooleanField,
 )
 
 from sqlalchemy.orm.exc import NoResultFound

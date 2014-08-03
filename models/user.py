@@ -21,7 +21,6 @@ class User(db.Model, UserMixin):
     receipt = db.Column(db.String, unique=True)
     tickets = db.relationship('Ticket', lazy='dynamic', backref='user', cascade='all, delete, delete-orphan')
     payments = db.relationship('Payment', lazy='dynamic', backref='user', cascade='all')
-    shifts = db.relationship('Shift', lazy='dynamic', backref='user')
 
     def __init__(self, email, name):
         self.email = email

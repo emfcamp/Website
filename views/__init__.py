@@ -102,24 +102,7 @@ def format_gcid(gcid):
 
 @app.context_processor
 def utility_processor():
-    def format_shift_short(start, end):
-        start_p, start_h = start.strftime('%p').lower(), int(start.strftime('%I'))
-        end_p, end_h = end.strftime('%p').lower(), int(end.strftime('%I'))
-        if start_p != end_p:
-            return '%s %s-%s %s' % (start_h, start_p, end_h, end_p)
-        return '%s-%s %s' % (start_h, end_h, end_p)
-
-    def format_shift_dt(dt):
-        def date_suffix(day):
-            if 4 <= day <= 20 or 24 <= day <= 30:
-                return '%dth' % day
-            else:
-                return '%d%s' % (day, ['st', 'nd', 'rd'][day % 10 - 1])
-        return dt.strftime('%A %%s %H:%M') % date_suffix(dt.day)
-
     return dict(
-        format_shift_short=format_shift_short,
-        format_shift_dt=format_shift_dt,
         TICKET_CUTOFF=TICKET_CUTOFF,
         CURRENCIES=CURRENCIES,
         CURRENCY_SYMBOLS=CURRENCY_SYMBOLS,
