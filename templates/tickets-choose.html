@@ -31,6 +31,7 @@
 </thead>
 
 <tbody>
+{% set row_class = cycler('odd', 'even') %}
 {% for f in form.types %}
 {% if f._any %}
 <tr data-price="{{ f._type.get_price(user_currency) }}"
@@ -38,8 +39,8 @@
         data-price-{{ price.currency }}="{{ price.value }}"
     {% endfor -%}
     class="ticket-type form-group
-        {% if f.amount.errors %} has-error {%- endif %}
-        {{ loop.cycle('odd', 'even') }}">
+        {% if f.amount.errors -%} has-error {%- endif %}
+        {{ row_class.next() }}">
     <td>
         {{ f.hidden_tag_without('csrf_token') }}
         <label for="{{ f.amount.id }}"><b>{{ f._type.name }}</b></label>
