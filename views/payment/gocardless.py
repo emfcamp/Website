@@ -59,7 +59,7 @@ def gocardless_waiting(payment_id):
 def gocardless_tryagain(payment_id):
     payment = get_user_payment_or_abort(
         payment_id, 'gocardless',
-        valid_states=['new', 'inprogress'],
+        valid_states=['new'],
     )
 
     if not app.config.get('GOCARDLESS'):
@@ -96,7 +96,7 @@ def gocardless_complete(payment_id):
 
     # keep the gocardless reference so we can find the payment when we get called by the webhook
     payment.gcid = gcid
-    payment.state = "inprogress"
+    payment.state = 'inprogress'
 
     for t in payment.tickets:
         # We need to make sure of a 5 working days grace
@@ -205,6 +205,38 @@ def gocardless_bill(resource, action, data):
     except Exception, e:
         logger.error('Unexcepted exception during webhook: %r', e)
         abort(501)
+
+    return ('', 200)
+
+@webhook('bill', 'cancelled')
+def gocardless_bill_cancelled(resource, action, data):
+
+    for bill in data['bills']:
+        gcid = bill['id']
+        try:
+            payment = GoCardlessPayment.query.filter_by(gcid=gcid).one()
+        except NoResultFound:
+            logger.warn("Payment for bill %s not found, skipping", gcid)
+            continue
+
+        logger.info("Received cancelled action for gcid %s, payment %s",
+                    gcid, payment.id)
+
+        if bill['status'] != 'cancelled':
+            logger.warn("Bill status is %s (should be cancelled), failing", bill['status'])
+            abort(409)
+
+        if payment.state == 'cancelled':
+            logger.info('Payment is already cancelled, skipping')
+            continue
+
+        if payment.state != 'inprogress':
+            logger.warning("Current payment state is %s (should be inprogress), failing", payment.state)
+            abort(409)
+
+        logger.info("Setting payment %s to cancelled", payment.id)
+        payment.cancel()
+        db.session.commit()
 
     return ('', 200)
 

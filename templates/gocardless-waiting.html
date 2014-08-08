@@ -11,7 +11,13 @@
    We will email you when the transaction has been completed.</p>
 
 <p>Your bill ID from GoCardless was {{ payment.gcid | gcid }}.  You can view this
-by logging into <a href="http://www.gocardless.com/">your GoCardless account</a>.</p>
+by logging into <a href="
+{%- if config.get('DEBUG') -%}
+https://customer-sandbox.gocardless.com/
+{%- else -%}
+https://gocardless.com/
+{%- endif -%}
+">your GoCardless account</a>.</p>
 
 
 <p>See you at Electromagnetic Field!</p>
