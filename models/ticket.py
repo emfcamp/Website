@@ -131,11 +131,25 @@ class Ticket(db.Model):
             raise ValueError('Type must be specified')
 
         self.expires = datetime.utcnow() + timedelta(hours=2)
+        self.ignore_capacity = False
 
     def expired(self):
         if self.paid:
             return False
         return self.expires < datetime.utcnow()
+
+    def clone(self, new_code=None, ignore_capacity=False):
+        if new_code is not None:
+            raise NotImplementedError('Changing codes not yet supported')
+
+        other = Ticket(type=self.type)
+        for attrib in self.attribs:
+            other.attribs.append(TicketAttrib(attrib.name, attrib.value))
+
+        other.expires = self.expires
+        other.ignore_capacity = ignore_capacity
+
+        return other
 
     def create_receipt(self):
         while True:
@@ -175,6 +189,9 @@ def check_capacity(session, flush_context, instances):
 
     for obj in session.new:
         if not isinstance(obj, Ticket):
+            continue
+
+        if obj.ignore_capacity:
             continue
 
         if obj.type not in totals:

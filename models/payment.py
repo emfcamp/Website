@@ -68,6 +68,19 @@ class Payment(db.Model):
             ticket.expires = datetime.utcnow()
         self.state = 'cancelled'
 
+    def clone(self, new_user=None, ignore_capacity=False):
+        if new_user is not None:
+            raise NotImplementedError('Changing users not yet supported')
+
+        other = self.__class__(self.currency, self.amount)
+        for ticket in self.tickets:
+            new_ticket = ticket.clone(ignore_capacity=ignore_capacity)
+            self.user.tickets.append(new_ticket)
+            new_ticket.payment = other
+
+        self.user.payments.append(other)
+        return other
+
     def invoice_number(self):
         return 'WEB-%05d' % self.id
 

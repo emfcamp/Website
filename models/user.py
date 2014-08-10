@@ -44,6 +44,8 @@ class User(db.Model, UserMixin):
             except IntegrityError:
                 db.session.rollback()
 
+    def __repr__(self):
+        return '<User %s>' % self.email
 
 class PasswordReset(db.Model):
     __tablename__ = 'password_reset'
