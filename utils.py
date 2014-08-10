@@ -318,7 +318,7 @@ class CreateTickets(Command):
                 "For children born after August 28th, 2009. "
                 "All children must be accompanied by an adult."),
             (30, 'parking',
-                'Parking Ticket', 200, 4, 15.00, 20.00,
+                'Parking Ticket', 300, 4, 15.00, 20.00,
                 "We're trying to keep cars on-site to a minimum. "
                 "Please take public transport or find someone to share with if possible."),
             (35, 'campervan',
