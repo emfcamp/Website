@@ -294,7 +294,7 @@ class CreateTickets(Command):
             (0, 'full_free',
                 'Full Camp Ticket (Complimentary)', 1, 1, 0, 0, None),
             (1, 'full_discount',
-                'Full Camp Ticket (Discount)', 5, 2, 70.00, 90.00, None),
+                'Full Camp Ticket (Discount)', 10, 2, 70.00, 90.00, None),
             (2, 'full_earlybird',
                 'Full Camp Ticket', 0, 10, 90.00, 115.00, None),
             (3, 'full_initial',
