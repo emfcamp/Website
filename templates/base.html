@@ -51,6 +51,7 @@
             <ul class="menu">
               <li><a target="_blank" href="http://blog.emfcamp.org">Blog</a>
               <li><a target="_blank" href="https://wiki.emfcamp.org">Wiki</a>
+              <li><a target="_blank" href="{{ url_for('code_of_conduct') }}">Code of Conduct</a>
 
             {% if current_user.is_authenticated() %}
               <li><a href="{{ url_for('tickets') }}">My tickets</a></li>
