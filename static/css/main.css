@@ -214,7 +214,7 @@ p.summary {
 
 table {
     color: #333;
-    margin: 1ex 0.5em;
+    margin: 1ex 0.5em 0 0;
 }
 
 table a {
