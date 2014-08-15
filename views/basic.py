@@ -58,7 +58,7 @@ def talks():
             else:
                 data[event['id']] = [speaker['full_public_name'], event['title']]
 
-    return render_template('talks_2014.html', talks=sorted(data.values(), key=lambda row: row[0]))
+    return render_template('talks_2014.html', talks=data.values())
 
 @app.route("/talks/2012")
 def talks_2012():
