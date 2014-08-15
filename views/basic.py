@@ -1,5 +1,6 @@
 import os
 import csv
+import requests
 from main import app
 
 from models.ticket import TicketType
@@ -45,7 +46,13 @@ def about():
 
 @app.route("/talks/")
 def talks():
-    return redirect(url_for('talks_2012'))
+    data = []
+    req = requests.get('https://frab.emfcamp.org/en/EMF2014/public/speakers.json')
+    for speaker in req.json['schedule_speakers']['speakers']:
+        for event in speaker['events']:
+            data.append((speaker['full_public_name'], event['title']))
+
+    return render_template('talks_2014.html', talks=data)
 
 @app.route("/talks/2012")
 def talks_2012():

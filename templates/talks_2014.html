@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Talks - Electromagnetic Field{% endblock %}
+{% block body %}
+<h2>Talks</h2>
+<p>We'll have an incredibly diverse set of talks and workshops occurring throughout the event.
+While we prepare the final schedule, here's a selection of events which have already been accepted
+(there are many more still to come).</p>
+
+<table class="table">
+  <thead>
+  <th>Speaker</th><th>Title</th>
+</thead>
+<tbody>
+{% for row in talks %}
+<tr class="{{- loop.cycle('odd', 'even') }}">
+    <td><strong>{{ row.0 }}</strong></td><td>{{ row.1 }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}
