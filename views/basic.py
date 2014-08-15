@@ -46,19 +46,17 @@ def about():
 
 @app.route("/talks/")
 def talks():
-    data = {}
-    req = requests.get('https://frab.emfcamp.org/en/EMF2014/public/speakers.json')
-    for speaker in req.json['schedule_speakers']['speakers']:
-        for event in speaker['events']:
-            if event['type'] not in ('lecture', 'workshop'):
-                continue
-            if event['id'] in data:
-                talk = data[event['id']]
-                talk[0] = talk[0] + ', ' + speaker['full_public_name']
-            else:
-                data[event['id']] = [speaker['full_public_name'], event['title']]
+    data = []
+    req = requests.get('https://frab.emfcamp.org/en/EMF2014/public/events.json')
+    for event in req.json['conference_events']['events']:
+        if event['type'] != 'lecture':
+            continue
+        data.append((", ".join(map(lambda speaker: speaker['full_public_name'], event['speakers'])),
+                     event['title'],
+                     event['abstract']
+                     ))
 
-    return render_template('talks_2014.html', talks=data.values())
+    return render_template('talks_2014.html', talks=data)
 
 @app.route("/talks/2012")
 def talks_2012():
