@@ -50,6 +50,8 @@ def talks():
     req = requests.get('https://frab.emfcamp.org/en/EMF2014/public/speakers.json')
     for speaker in req.json['schedule_speakers']['speakers']:
         for event in speaker['events']:
+            if event['type'] not in ('lecture', 'workshop'):
+                continue
             if event['id'] in data:
                 talk = data[event['id']]
                 talk[0] = talk[0] + ', ' + speaker['full_public_name']
