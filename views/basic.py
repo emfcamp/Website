@@ -46,13 +46,17 @@ def about():
 
 @app.route("/talks/")
 def talks():
-    data = []
+    data = {}
     req = requests.get('https://frab.emfcamp.org/en/EMF2014/public/speakers.json')
     for speaker in req.json['schedule_speakers']['speakers']:
         for event in speaker['events']:
-            data.append((speaker['full_public_name'], event['title']))
+            if event['id'] in data:
+                talk = data[event['id']]
+                talk[0] = talk[0] + ', ' + speaker['full_public_name']
+            else:
+                data[event['id']] = [speaker['full_public_name'], event['title']]
 
-    return render_template('talks_2014.html', talks=data)
+    return render_template('talks_2014.html', talks=sorted(data.values(), key=lambda row: row[0]))
 
 @app.route("/talks/2012")
 def talks_2012():
