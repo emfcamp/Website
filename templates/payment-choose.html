@@ -32,6 +32,7 @@ Guarantee</a>.</p>
 {% endif %}
 
 {% if config.get('BANK_TRANSFER') %}
+{% if user_currency != 'EUR' or config.get('BANK_TRANSFER_EURO') %}
 <h3>Pay By Bank Transfer</h3>
 
 <p>Ask your bank to send it to us directly (this works online, or with cash in a branch).</p>
@@ -40,6 +41,7 @@ Guarantee</a>.</p>
 <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
     <p><button type="submit" name="banktransfer" class="btn btn-lg btn-success debounce">Pay by bank transfer</button></p>
 </form>
+{% endif %}
 {% endif %}
 
 {% if config.get('STRIPE') %}
@@ -54,5 +56,8 @@ Guarantee</a>.</p>
 </form>
 {% endif %}
 
+{% if user_currency == 'EUR' and not config.get('BANK_TRANSFER_EURO') %}
+<p>Unfortunately, bank transfer by Euros is currently unavailable.</p>
+{% endif %}
 </div>
 {% endblock %}

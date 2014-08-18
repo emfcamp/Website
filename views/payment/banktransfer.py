@@ -1,6 +1,6 @@
 from main import app, db, mail
 from models.payment import BankPayment
-from views import feature_flag, Form
+from views import feature_flag, get_user_currency, Form
 from views.payment import get_user_payment_or_abort
 from views.tickets import add_payment_and_tickets
 
@@ -21,6 +21,9 @@ logger = logging.getLogger(__name__)
 @feature_flag('BANK_TRANSFER')
 @login_required
 def transfer_start():
+    if get_user_currency() == 'EUR' and not app.config.get('BANK_TRANSFER_EURO'):
+        return redirect(url_for('pay_choose'))
+
     payment = add_payment_and_tickets(BankPayment)
     if not payment:
         logging.warn('Unable to add payment and tickets to database')
