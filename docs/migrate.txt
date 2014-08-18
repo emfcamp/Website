@@ -1,9 +1,0 @@
-
-alter table payment rename to payment_old;
-alter table ticket_price rename to ticket_price_old;
-
-$ make db
-
-insert into payment (id, user_id, provider, currency, amount_int, state, bankref, gcid) select id, user_id, provider, 'GBP', amount_pence, state, bankref, gcid from payment_old;
-insert into ticketprice select * from ticket_price_old;
-
