@@ -4,6 +4,7 @@ import requests
 from main import app
 
 from models.ticket import TicketType
+from models.payment import StripePayment
 
 from mailsnake import MailSnake
 from mailsnake.exceptions import MailSnakeException
@@ -17,6 +18,9 @@ from flask import (
 @app.route("/")
 def main():
     full_price = TicketType.query.get('full').get_price('GBP')
+    if not (app.config.get('BANK_TRANSFER') or app.config.get('GOCARDLESS')):
+        # Only card payment left
+        full_price += StripePayment.premium('GBP', full_price)
     return render_template('main.html',
         ticket_sales=app.config.get('TICKET_SALES', False),
         full_price=full_price)
