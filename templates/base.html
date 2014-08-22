@@ -39,7 +39,7 @@
           </div>
           <div style="clear:both"></div>
         </header>
-          <div id="main-content">
+          <div id="main-content" class="{{ main_class }}">
               {% for message in get_flashed_messages() -%}
                   <div class="alert alert-warning">{{ message }}</div>
               {% endfor -%}

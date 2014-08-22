@@ -82,13 +82,19 @@ def talks_2012():
 def company():
     return render_template('company.html')
 
+@app.route('/sponsors')
+def sponsors():
+    return render_template('sponsors/sponsors.html')
+
+@app.route('/sponsors/portcullis')
+def sponsors_portcullis():
+    return render_template('sponsors/portcullis.html')
 
 @app.route("/participating")
 @app.route("/get_involved")
 @app.route("/contact")
 @app.route("/location")
 @app.route("/about")
-@app.route("/sponsors")
 def old_urls_2012():
     return redirect(url_for('main'))
 
