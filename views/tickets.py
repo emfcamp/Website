@@ -314,7 +314,7 @@ def tickets_info():
 @app.route("/tickets/<ticket_ids>/receipt")
 @login_required
 def tickets_receipt(ticket_ids=None):
-    if current_user.admin:
+    if current_user.admin and ticket_ids is not None:
         tickets = Ticket.query
     else:
         tickets = current_user.tickets
