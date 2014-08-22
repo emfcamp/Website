@@ -129,10 +129,8 @@ class ReceiptForm(Form):
     forward = SubmitField('Show e-Tickets')
 
 @app.route("/tickets/", methods=['GET', 'POST'])
+@login_required
 def tickets():
-    if not current_user.is_authenticated():
-        return redirect(url_for('tickets_choose'))
-
     form = ReceiptForm()
     if form.validate_on_submit():
         ticket_ids = map(str, request.form.getlist('ticket_id', type=int))
