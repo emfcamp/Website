@@ -453,3 +453,8 @@ td.checkbox-cell label {
     display: none
   }
 }
+
+.sponsor-portcullis img {
+  padding-top: 30px;
+  padding-bottom: 60px;
+}
