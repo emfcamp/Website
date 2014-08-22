@@ -67,11 +67,12 @@
 {% endfor -%}
 
 </table>
+
 {{ form.forward(class_="btn btn-default pull-right") }}
 </form>
 
-<div class="col-md-10"><a href="{{url_for('ticket_terms')}}">Ticket Terms and Conditions</a></div>
-<br/>
+<div class="col-md-6 col-xs-6"><a href="{{url_for('ticket_terms')}}">Ticket Terms and Conditions</a></div>
+<div class="clearfix"></div>
 
 {% endif %}
 
