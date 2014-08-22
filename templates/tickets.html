@@ -11,8 +11,8 @@
 <tr>
   <th class="checkbox-cell"></th>
   <th>Type</th>
-  <th>Volunteer?</th>
-  <th>Accessibility?</th>
+  <th class="volunteer">Volunteer</th>
+  <th class="accessible">Accessibility</th>
   <th>Status</th>
 </tr>
 
@@ -33,8 +33,8 @@
   {% endif %}
 </td>
 <td>{{ t.type.name }}</td>
-<td>
-	{%- if t.type.code == "kids_u15" or t.type.code == "campervan" -%}
+<td class="volunteer">
+	{%- if t.type.code.startswith("kids") or t.type.code in ["campervan", "parking"] -%}
 		N/A
 	{%- else %}
 		{%- for attrib in t.attribs if attrib.name == "volunteer" %}
@@ -42,8 +42,8 @@
 		{% endfor -%}
 	{% endif -%}
 </td>
-<td>
-	{%- if t.type.code == "campervan" -%}
+<td class="accessible">
+	{%- if t.type.code in ["parking", "campervan"] -%}
 		N/A
 	{%- else %}
 		{%- for attrib in t.attribs if attrib.name=="accessible" %}
@@ -91,9 +91,9 @@
 <td>{{ p.amount | price(p.currency) }}</td>
 <td>
 {%- if p.state == "inprogress" and p.provider == "banktransfer" %}
-    <a href="{{ url_for('transfer_waiting', payment_id=p.id) }}">{{ p.state -}}</a>
+    <a href="{{ url_for('transfer_waiting', payment_id=p.id) }}">Pending</a>
 {%- else -%}
-    {{ p.state -}}
+    {{ {'new': 'New', 'inprogress': 'Pending', 'paid': 'Complete'}[p.state] -}}
 {% endif -%}
 {%- if p.provider == "banktransfer" %}, reference: {{ p.bankref | bankref }} {% endif %}</td>
 <td>

@@ -447,3 +447,9 @@ td.checkbox-cell label {
   padding: 8px;
 }
 
+@media (max-width: 768px) {
+  .tickets .volunteer,
+  .tickets .accessible {
+    display: none
+  }
+}
