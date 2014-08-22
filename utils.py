@@ -390,7 +390,7 @@ class SendTickets(Command):
             tickets = all_tickets.filter_by(user_id=user.id)
             page = render_receipt(tickets, pdf=True)
             pdf = render_pdf(page, url_root=app.config.get('BASE_URL'))
-            plural = (tickets.count != 1 and 's' or '')
+            plural = (tickets.count() != 1 and 's' or '')
 
             msg = Message("Your Electromagnetic Field Ticket%s" % plural,
                           sender=app.config['TICKETS_EMAIL'],
@@ -399,13 +399,12 @@ class SendTickets(Command):
             msg.body = render_template("receipt.txt", user=user)
             msg.attach('Receipt.pdf', 'application/pdf', pdf.read())
 
-            app.logger.info('Emailing %s receipt for %s tickets', user.email, tickets.count)
+            app.logger.info('Emailing %s receipt for %s tickets', user.email, tickets.count())
             mail.send(msg)
 
             for ticket in tickets:
                 ticket.emailed = True
             db.session.commit()
-
 
 if __name__ == "__main__":
   manager.add_command('createdb', CreateDB())
