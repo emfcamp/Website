@@ -53,7 +53,7 @@ def talks():
     data = []
     req = requests.get('https://frab.emfcamp.org/en/EMF2014/public/events.json')
     for event in req.json['conference_events']['events']:
-        if event['type'] not in ('lecture', 'workshop'):
+        if event['type'] not in ('lecture', 'workshop', 'other'):
             continue
         data.append((", ".join(map(lambda speaker: speaker['full_public_name'], event['speakers'])),
                      event['title'],
