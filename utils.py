@@ -18,7 +18,7 @@ from models.payment import (
     GoCardlessPayment,
     BankPayment, BankAccount, BankTransaction,
 )
-from sqlalchemy import text
+from views.tickets import render_receipt, render_pdf
 
 manager = Manager(app)
 
@@ -335,20 +335,20 @@ class CreateTickets(Command):
         for tt in types:
             existing_tt = TicketType.query.get(tt.code)
             if existing_tt:
-                print 'Refreshing TicketType %s' % tt.code
+                app.logger.info('Refreshing TicketType %s', tt.code)
                 for f in ['name', 'capacity', 'limit', 'order', 'notice']:
                     cur_val = getattr(existing_tt, f)
                     new_val = getattr(tt, f)
                     if cur_val != new_val:
-                        print ' %10s: %r -> %r' % (f, cur_val, new_val)
+                        app.logger.info(' %10s: %r -> %r', f, cur_val, new_val)
                         setattr(existing_tt, f, new_val)
             else:
-                print 'Adding TicketType %s' % tt.code
+                app.logger.info('Adding TicketType %s', tt.code)
                 db.session.add(tt)
 
             db.session.commit()
 
-        print 'Tickets created'
+        app.logger.info('Tickets refreshed')
         
 class CreateTicketTokens(Command):
     def run(self):
@@ -383,19 +383,28 @@ class MakeAdmin(Command):
 class SendTickets(Command):
 
     def run(self):
-        query = text("""select distinct "user".id from "user", ticket 
-                        where ticket.user_id = "user".id and ticket.paid = true""")
+        all_tickets = Ticket.query.filter_by(paid=True, emailed=False)
+        users = all_tickets.join(User).group_by(User).with_entities(User).order_by(User.id)
 
-        for row in db.engine.execute(query):
-            user = User.query.filter_by(id=row[0]).one()
-            msg = Message("Your Electromagnetic Field Ticket",
+        for user in users:
+            tickets = all_tickets.filter_by(user_id=user.id)
+            page = render_receipt(tickets, pdf=True)
+            pdf = render_pdf(page, url_root=app.config.get('BASE_URL'))
+            plural = (tickets.count != 1 and 's' or '')
+
+            msg = Message("Your Electromagnetic Field Ticket%s" % plural,
                           sender=app.config['TICKETS_EMAIL'],
-                          recipients=[user.email]
-                         )
-            user.create_receipt()
-            msg.body = render_template("ticket.txt", user=user)
-            print "Sending to", user.email, "..."
+                          recipients=[user.email])
+
+            msg.body = render_template("receipt.txt", user=user)
+            msg.attach('Receipt.pdf', 'application/pdf', pdf.read())
+
+            app.logger.info('Emailing %s receipt for %s tickets', user.email, tickets.count)
             mail.send(msg)
+
+            for ticket in tickets:
+                ticket.emailed = True
+            db.session.commit()
 
 
 if __name__ == "__main__":
@@ -407,5 +416,5 @@ if __name__ == "__main__":
   manager.add_command('createtickets', CreateTickets())
   manager.add_command('makeadmin', MakeAdmin())
   manager.add_command('createtokens', CreateTicketTokens())
-  #manager.add_command('sendtickets', SendTickets())
+  manager.add_command('sendtickets', SendTickets())
   manager.run()

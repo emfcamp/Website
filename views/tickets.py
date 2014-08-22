@@ -125,10 +125,20 @@ def add_payment_and_tickets(paymenttype):
     return payment
 
 
+class ReceiptForm(Form):
+    forward = SubmitField('Show e-Tickets')
+
 @app.route("/tickets/", methods=['GET', 'POST'])
 def tickets():
     if not current_user.is_authenticated():
         return redirect(url_for('tickets_choose'))
+
+    form = ReceiptForm()
+    if form.validate_on_submit():
+        ticket_ids = map(str, request.form.getlist('ticket_id', type=int))
+        if ticket_ids:
+            return redirect(url_for('tickets_receipt', ticket_ids=','.join(ticket_ids)) + '?pdf=1')
+        return redirect(url_for('tickets_receipt') + '?pdf=1')
 
     tickets = current_user.tickets.all()
     if not tickets:
@@ -139,6 +149,7 @@ def tickets():
     return render_template("tickets.html",
         tickets=tickets,
         payments=payments,
+        form=form,
     )
 
 
@@ -304,7 +315,7 @@ def tickets_info():
 @app.route("/tickets/receipt")
 @app.route("/tickets/<ticket_ids>/receipt")
 @login_required
-def tickets_all_receipts(ticket_ids=None):
+def tickets_receipt(ticket_ids=None):
     if current_user.admin:
         tickets = Ticket.query
     else:
@@ -318,6 +329,17 @@ def tickets_all_receipts(ticket_ids=None):
     if not tickets.all():
         abort(404)
 
+    png = bool(request.args.get('png'))
+    pdf = bool(request.args.get('pdf'))
+    table = bool(request.args.get('table'))
+
+    page = render_receipt(tickets, png, table, pdf)
+    if pdf:
+        return send_file(render_pdf(page), mimetype='application/pdf')
+
+    return page
+
+def render_receipt(tickets, png=False, table=False, pdf=False):
     user = tickets[0].user
 
     for ticket in tickets:
@@ -329,35 +351,30 @@ def tickets_all_receipts(ticket_ids=None):
     entrance_tickets = tickets.filter( or_(Ticket.code.startswith('full'), Ticket.code.startswith('kids')) ).all()
     vehicle_tickets = tickets.filter( Ticket.code.in_(['parking', 'campervan']) ).all()
 
-    png = bool(request.args.get('png'))
-    pdf = bool(request.args.get('pdf'))
-    table = bool(request.args.get('table'))
-
-    page = render_template('receipt.html', user=user, format_inline_qr=format_inline_qr,
+    return render_template('receipt.html', user=user, format_inline_qr=format_inline_qr,
                            entrance_tickets=entrance_tickets, vehicle_tickets=vehicle_tickets,
                            pdf=pdf, png=png, table=table)
 
-    if pdf:
-        return render_pdf(page)
 
-    return page
-
-def render_pdf(html):
+def render_pdf(html, url_root=None):
     # This needs to fetch URLs found within the page, so if
     # you're running a dev server, use app.run(processes=2)
+    if url_root is None:
+        url_root = request.url_root
+
     def fix_link(uri, rel):
         if uri.startswith('//'):
             uri = 'https:' + uri
         if uri.startswith('https://'):
             return uri
 
-        return urljoin(request.url_root, uri)
+        return urljoin(url_root, uri)
 
     pdffile = StringIO()
     pisa.CreatePDF(html, pdffile, link_callback=fix_link)
     pdffile.seek(0)
 
-    return send_file(pdffile, mimetype='application/pdf')
+    return pdffile
 
 
 def format_inline_qr(code):

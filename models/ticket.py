@@ -122,6 +122,7 @@ class Ticket(db.Model):
     expires = db.Column(db.DateTime, nullable=False)
     receipt = db.Column(db.String, unique=True)
     qrcode = db.Column(db.String, unique=True)
+    emailed = db.Column(db.Boolean, default=False, nullable=False)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
     attribs = db.relationship("TicketAttrib", backref="ticket", cascade='all')
     type = db.relationship(TicketType, backref="tickets")

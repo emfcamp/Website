@@ -38,7 +38,7 @@
     <h3>{{ user.name }} &ndash; {{ user.email }}</h2>
     <p>{{ entrance_tickets|length }} entrance ticket{{ entrance_tickets|length != 1 and 's' or '' }}</p>
   </div>
-  
+
 {% macro render_tickets(tickets, classname) %}
 
   {% if pdf or table %}

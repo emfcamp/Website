@@ -2,7 +2,7 @@ from main import app, db, stripe, mail, csrf
 from models.payment import StripePayment
 from views import feature_flag, Form
 from views.payment import get_user_payment_or_abort
-from views.tickets import add_payment_and_tickets
+from views.tickets import add_payment_and_tickets, render_receipt, render_pdf
 
 from flask import (
     render_template, redirect, request, flash,
@@ -91,6 +91,12 @@ def charge_stripe(payment):
         recipients=[payment.user.email])
     msg.body = render_template("tickets-purchased-email-stripe.txt",
         user=payment.user, payment=payment)
+
+    if app.config.get('RECEIPTS'):
+        page = render_receipt(payment.tickets, pdf=True)
+        pdf = render_pdf(page)
+        msg.attach('Receipt.pdf', 'application/pdf', pdf.read())
+
     mail.send(msg)
 
     return redirect(url_for('stripe_waiting', payment_id=payment.id))
@@ -272,6 +278,12 @@ def stripe_payment_paid(payment):
         recipients=[payment.user.email])
     msg.body = render_template('tickets-paid-email-stripe.txt',
         user=payment.user, payment=payment)
+
+    if app.config.get('RECEIPTS'):
+        page = render_receipt(payment.tickets, pdf=True)
+        pdf = render_pdf(page)
+        msg.attach('Receipt.pdf', 'application/pdf', pdf.read())
+
     mail.send(msg)
 
 def stripe_payment_refunded(payment):

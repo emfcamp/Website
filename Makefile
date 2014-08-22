@@ -45,6 +45,9 @@ checkreconcile:
 reallyreconcile:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py reconcile -d
 
+sendtickets:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py sendtickets
+
 
 shell:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py shell

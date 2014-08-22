@@ -4,8 +4,17 @@
 {% if tickets %}
 <h2>Your current tickets</h2>
 
-<table class="table">
-<tr><th>Type</th><th>Volunteer?</th><th>Accessibility?</th><th>Status</th></tr>
+<form action="{{ url_for('tickets') }}" method="POST">
+{{ form.hidden_tag() }}
+
+<table class="table tickets">
+<tr>
+  <th class="checkbox-cell"></th>
+  <th>Type</th>
+  <th>Volunteer?</th>
+  <th>Accessibility?</th>
+  <th>Status</th>
+</tr>
 
 {%- for t in tickets -%}
 
@@ -16,6 +25,11 @@
 {%- if t.paid %} paid {%- endif -%}
 {%- if t.expired() %} expired {%- endif -%}
 ">
+<td class="checkbox-cell">
+  <label>
+    <input type="checkbox" name="ticket_id" value="{{ t.id }}">
+  </label>
+</td>
 <td>{{ t.type.name }}</td>
 <td>
 	{%- if t.type.code == "kids_u15" or t.type.code == "campervan" -%}
@@ -51,6 +65,8 @@
 {% endfor -%}
 
 </table>
+{{ form.forward(class_="btn btn-default pull-right") }}
+</form>
 
 <div class="col-md-10"><a href="{{url_for('ticket_terms')}}">Ticket Terms and Conditions</a></div>
 <br/>

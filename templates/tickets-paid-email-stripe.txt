@@ -3,6 +3,10 @@ Hi, {{ user.name }},
 We've just received confirmation from Stripe that your payment for
 {{ payment.amount | price(payment.currency) }} has cleared.
 
+{% if config.get('RECEIPTS') %}
+{% include 'receipt-blurb.txt' %}
+{% endif %}
+
 See you soon at Electromagnetic Field 2014!
 
 Love,

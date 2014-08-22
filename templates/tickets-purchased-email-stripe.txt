@@ -4,9 +4,13 @@ This is to confirm that you've bought
 {%- if payment.tickets.all() | count == 1 %} a ticket {%- else %} {{ payment.tickets.all() | count }} tickets
 {%- endif %} for Electromagnetic Field 2014.
 
+{% if payment.state == 'paid' and config.get('RECEIPTS') %}
+{% include 'receipt-blurb.txt' %}
+{% else %}
 Your tickets are:
 
 {% include "email-tickets.txt" %}
+{% endif %}
 
 Your charge ID from Stripe was {{ payment.chargeid }}.
 

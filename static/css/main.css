@@ -261,14 +261,6 @@ tr.odd {
 }
 
 
-table.tickets tr.paid {
-  font-weight: bold;
-}
-
-table.tickets tr.expired {
-  color: #f00;
-}
-
 .errors {
   color: #933;
   font-weight: bold;
@@ -321,11 +313,11 @@ div.micro img {
   margin-bottom: 10px;
 }
 
-.tickets-table label {
+.ticket-types label {
   font-size: 110%;
 }
 
-.tickets-table p.description {
+.ticket-types p.description {
   font-size: 90%;
 }
 
@@ -371,8 +363,6 @@ div.micro img {
 }
 
 /* Restore link colours */
-
-
 .alert-success a {
   color: #3c763d;
 }
@@ -391,6 +381,16 @@ div.micro img {
 
 .alert-link {
   text-decoration: none;
+}
+
+/* But not for buttons */
+.alert-danger a.btn-primary,
+.alert-danger a.btn-default,
+.alert-danger a.btn-info,
+.alert-danger a.btn-success,
+.alert-danger a.btn-warning,
+.alert-danger a.btn-danger {
+  color: #fff;
 }
 
 /* Show the hover borders by default to avoid bleeding */
@@ -433,3 +433,17 @@ div#about-page img, .embed-responsive {
 .ticket-info .well {
   padding-left: 30px;
 }
+
+th.checkbox-cell {
+  width: 30px;
+}
+td.checkbox-cell {
+  position: relative;
+}
+td.checkbox-cell label {
+  position: absolute;
+  left: 0; right: 0; top: 0; bottom: 0;
+  margin: 0;
+  padding: 8px;
+}
+
