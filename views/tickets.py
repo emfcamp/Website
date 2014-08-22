@@ -1,21 +1,23 @@
-from main import app, db, external_url
+from main import app, db
 from views import (
     get_user_currency, set_user_currency, get_basket, TICKET_CUTOFF,
     CURRENCY_SYMBOLS,
     IntegerSelectField, HiddenIntegerField, TelField, Form, feature_flag
 )
 
-from models.user import User
-from models.ticket import TicketType, Ticket, TicketAttrib, TicketToken
+from models.ticket import (
+    TicketType, Ticket, TicketAttrib, TicketToken,
+    validate_safechars,
+)
 from models.payment import Payment
 
 from flask import (
     render_template, redirect, request, flash,
-    url_for, session, send_file,
+    url_for, session, send_file, Markup, abort,
 )
 from flask.ext.login import login_required, current_user
 
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy import or_
 
 from wtforms.validators import Required, Optional, ValidationError
 from wtforms import (
@@ -24,7 +26,11 @@ from wtforms import (
 )
 from datetime import datetime, timedelta
 from StringIO import StringIO
+from xhtml2pdf import pisa
 import qrcode
+from qrcode.image.svg import SvgPathImage
+from lxml import etree
+from urlparse import urljoin
 
 
 class TicketForm(Form):
@@ -296,49 +302,100 @@ def tickets_info():
 
 
 @app.route("/tickets/receipt")
+@app.route("/tickets/<ticket_ids>/receipt")
 @login_required
-def tickets_all_receipts():
+def tickets_all_receipts(ticket_ids=None):
+    if current_user.admin:
+        tickets = Ticket.query
+    else:
+        tickets = current_user.tickets
 
-    if current_user.receipt is None:
-        current_user.create_receipt()
+    tickets = tickets.filter_by(paid=True).join(TicketType).order_by(TicketType.order)
+    if ticket_ids is not None:
+        ticket_ids = map(int, ticket_ids.split(','))
+        tickets = tickets.filter( Ticket.id.in_(ticket_ids) )
 
-    tickets = current_user.tickets.filter_by(paid=True).all()
+    if not tickets.all():
+        abort(404)
+
+    user = tickets[0].user
+
     for ticket in tickets:
         if ticket.receipt is None:
             ticket.create_receipt()
+        if ticket.qrcode is None:
+            ticket.create_qrcode()
 
-    return render_template('tickets-receipt.htm', user=current_user, tickets=tickets)
+    entrance_tickets = tickets.filter( or_(Ticket.code.startswith('full'), Ticket.code.startswith('kids')) ).all()
+    vehicle_tickets = tickets.filter( Ticket.code.in_(['parking', 'campervan']) ).all()
 
-@app.route("/receipt/<receipt>")
-@login_required
-def tickets_receipt(receipt):
-    if current_user.admin:
-        return redirect(url_for('admin_receipt', receipt=receipt))
+    png = bool(request.args.get('png'))
+    pdf = bool(request.args.get('pdf'))
+    table = bool(request.args.get('table'))
 
-    try:
-        user = User.filter_by(receipt=receipt).one()
-        tickets = list(user.tickets)
-    except NoResultFound:
-        try:
-            ticket = Ticket.filter_by(receipt=receipt).one()
-            tickets = [ticket]
-            user = ticket.user
-        except NoResultFound:
-            return ('', 404)
+    page = render_template('receipt.html', user=user, format_inline_qr=format_inline_qr,
+                           entrance_tickets=entrance_tickets, vehicle_tickets=vehicle_tickets,
+                           pdf=pdf, png=png, table=table)
 
-    if current_user != user:
-        return ('', 404)
+    if pdf:
+        return render_pdf(page)
 
-    return render_template('tickets-receipt.htm', user=user, tickets=tickets)
+    return page
 
-@app.route("/receipt/<receipt>/qr")
-@login_required
-def tickets_receipt_qr(receipt):
+def render_pdf(html):
+    # This needs to fetch URLs found within the page, so if
+    # you're running a dev server, use app.run(processes=2)
+    def fix_link(uri, rel):
+        if uri.startswith('//'):
+            uri = 'https:' + uri
+        if uri.startswith('https://'):
+            return uri
+
+        return urljoin(request.url_root, uri)
+
+    pdffile = StringIO()
+    pisa.CreatePDF(html, pdffile, link_callback=fix_link)
+    pdffile.seek(0)
+
+    return send_file(pdffile, mimetype='application/pdf')
+
+
+def format_inline_qr(code):
+    url = app.config.get('CHECKIN_BASE') + code
 
     qrfile = StringIO()
-    qr = qrcode.make(external_url('tickets_receipt', receipt=receipt), box_size=2)
-    qr.save(qrfile, 'PNG')
+    qr = qrcode.make(url, image_factory=SvgPathImage)
+    qr.save(qrfile, 'SVG')
     qrfile.seek(0)
+
+    root = etree.XML(qrfile.read())
+    # Wrap inside an element with the right default namespace
+    svgns = 'http://www.w3.org/2000/svg'
+    newroot = root.makeelement('{%s}svg' % svgns, nsmap={None: svgns})
+    newroot.append(root)
+
+    return Markup(etree.tostring(root))
+
+
+@app.route("/receipt/<code>/qr")
+def tickets_qrcode(code):
+    if len(code) > 8:
+        abort(404)
+
+    if not validate_safechars(code):
+        abort(404)
+
+    url = app.config.get('CHECKIN_BASE') + code
+
+    qrfile = make_qr_png(url, box_size=3)
     return send_file(qrfile, mimetype='image/png')
 
+def make_qr_png(*args, **kwargs):
+    qrfile = StringIO()
+
+    qr = qrcode.make(*args, **kwargs)
+    qr.save(qrfile, 'PNG')
+    qrfile.seek(0)
+
+    return qrfile
 

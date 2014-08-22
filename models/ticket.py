@@ -1,14 +1,19 @@
 from main import db
-from decimal import Decimal
-from datetime import datetime, timedelta
-import random
 
 from sqlalchemy.orm import Session
 from sqlalchemy import event, or_
 from sqlalchemy.exc import IntegrityError
 
+from decimal import Decimal
+from datetime import datetime, timedelta
+import random
+import re
+
 safechars_lower = "2346789bcdfghjkmpqrtvwxy"
 
+def validate_safechars(val):
+    match = re.match('[%s]+' % re.escape(safechars_lower), val)
+    return bool(match)
 
 class TicketError(Exception):
     pass
@@ -116,6 +121,7 @@ class Ticket(db.Model):
     paid = db.Column(db.Boolean, default=False, nullable=False)
     expires = db.Column(db.DateTime, nullable=False)
     receipt = db.Column(db.String, unique=True)
+    qrcode = db.Column(db.String, unique=True)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
     attribs = db.relationship("TicketAttrib", backref="ticket", cascade='all')
     type = db.relationship(TicketType, backref="tickets")
@@ -152,9 +158,19 @@ class Ticket(db.Model):
         return other
 
     def create_receipt(self):
+        self.create_safechars_random('receipt', 6)
+
+    def create_qrcode(self):
+        self.create_safechars_random('qrcode', 8)
+
+    def create_safechars_random(self, name, length):
+        if getattr(self, name) is not None:
+            raise Exception('Ticket already has random value for %s' % name)
+
         while True:
             random.seed()
-            self.receipt = ''.join(random.sample(safechars_lower, 6))
+            val = ''.join(random.sample(safechars_lower, length))
+            setattr(self, name, val)
             try:
                 db.session.commit()
                 break

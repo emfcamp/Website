@@ -366,22 +366,3 @@ def admin_cancel_payment(payment_id):
 
     return render_template('admin/payment-cancel.html', payment=payment, form=form)
 
-
-#@app.route('/admin/receipt/<receipt>')
-@login_required
-def admin_receipt(receipt):
-    if not current_user.admin:
-        return ('', 404)
-
-    try:
-        user = User.query.filter_by(receipt=receipt).one()
-        tickets = list(user.tickets)
-    except NoResultFound:
-        try:
-            ticket = Ticket.query.filter_by(receipt=receipt).one()
-            tickets = [ticket]
-            user = ticket.user
-        except NoResultFound:
-            raise ValueError('Cannot find receipt')
-
-    return render_template('admin/admin_receipt.htm', user=user, tickets=tickets)

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Electromagnetic Field{% endblock %}</title>
+        <meta property="fb:admins" content="286100493"/>
+{% if not pdf %}
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+{% endif %}
+        {% assets "css_print" -%}
+        <link rel="stylesheet" href="{{ ASSET_URL }}">
+        {% endassets -%}
+        {% block head -%}{% endblock -%}
+        <!--[if lt IE 9]>
+              <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+              <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+        <link rel="shortcut icon" href="/favicon.ico">
+    </head>
+<body>
+
+{% block document %}
+<div class="container">
+  <div class="main-row">
+    <div class="col-md-10 col-md-offset-1 main-column">
+
+{% block body %}
+
+<div id="main-content" class="receipt">
+
+  <h2>
+    <img src="{{ url_for('static', filename='images/logo_only_black.png') }}" class="logo" width="90"/>
+    Electromagnetic Field 2014
+  </h2>
+  <div>
+    <h3>{{ user.name }} &ndash; {{ user.email }}</h2>
+    <p>{{ entrance_tickets|length }} entrance ticket{{ entrance_tickets|length != 1 and 's' or '' }}</p>
+  </div>
+  
+{% macro render_tickets(tickets, classname) %}
+
+  {% if pdf or table %}
+  {# xhtml2pdf doesn't support loads of CSS, and cascades
+     padding, width and display weirdly. Fall back to tables. #}
+
+  <div class="{{ classname }}">
+
+  {{ caller() }}
+
+  <table>
+  {% for t in tickets %}
+  <tr class="ticket">
+    <td class="type ticket-with-blurb">
+      <b>{{ t.type.name }}</b>
+    </td>
+    <td>
+      <div class="qr">
+        <img src="{{ url_for('tickets_qrcode', code=t.qrcode) }}" />
+      </div>
+      <div class="code">
+        {{ t.receipt }}
+      </div>
+    </td>
+  </tr>
+  {% endfor %}
+  </table>
+  </div>
+
+  {% else %}
+
+  <div class="{{ classname }}">
+  {% for t in tickets %}
+
+    {% if loop.index == 1 %}
+    {# Few browsers support page-break-after: avoid #}
+    <div class="ticket-with-blurb">
+      {{ caller() }}
+    {% endif %}
+
+    <div class="ticket">
+      <div class="col-sm-5 col-sm-offset-1 type">
+        <b>{{ t.type.name }}</b>
+      </div>
+      <div class="col-sm-4">
+        <div class="qr">
+          {% if png %}
+          <img src="{{ url_for('tickets_qrcode', code=t.qrcode) }}" />
+          {% else %}
+          {{ format_inline_qr(t.qrcode) }}
+          {% endif %}
+        </div>
+        <div class="code">
+          {{ t.receipt }}
+        </div>
+      </div>
+    </div>
+
+    {% if loop.index == 1 %}
+    </div>
+    {% endif %}
+
+  {% endfor %}
+  </div>
+
+  {% endif %}
+
+{% endmacro %}
+
+
+  {% if vehicle_tickets %}
+
+  {% call render_tickets(vehicle_tickets, "vehicle-tickets") %}
+  <p>Please present the following to the volunteers at the <u>main access gate</u> on your arrival.
+     They will show you where to park and unload your stuff.</p>
+  <p>For details on getting to the site, please visit
+     <a href="https://wiki.emfcamp.org/wiki/Travel">our wiki page</a>.</p>
+  {% endcall %}
+
+  {% endif %}
+
+
+  {% if entrance_tickets %}
+
+  {% call render_tickets(entrance_tickets[:6], "entrance-tickets") %}
+  <p>Present this page to the volunteers at the <u>camp entrance gate</u> on your arrival.
+    You will receive a wristband and booklet with site map.
+  </p>
+  {% endcall %}
+
+  {% endif %}
+
+
+{#
+#}
+
+
+</div>
+{% endblock %}
+
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{%- block foot %}
+<style type="text/css">
+{% if pdf %}
+
+{# xhtml2pdf doesn't support float or child selectors #}
+.ticket div {
+  display: inline-block
+}
+{# And some resets because we don't have bootstrap #}
+.receipt h2 {
+  font-size: 30px;
+}
+.receipt h3 {
+  font-size: 24px;
+}
+.receipt h2, .receipt h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+.receipt p {
+  margin: 0 0 10px;
+}
+.receipt a {
+  color: #428bca;
+}
+
+{% else %}
+
+{# Much easier than table-cell #}
+.ticket div {
+  display: inline-block;
+  vertical-align: middle;
+  float: none;
+}
+
+{# needed for display: inline-block, and for printers, because
+   A4 is usually smaller than the 768px of bootstrap's sm size #}
+@media (max-width: 768px) {
+  .col-sm-5 { width: 260px; }
+  .col-sm-4 { width: 230px; }
+}
+{% endif %}
+</style>
+{% endblock -%}
+
+{% if not config.get('DEBUG') and request.headers.get('dnt') != '1' %}
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+         })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+   ga('create', 'UA-28044531-1', 'emfcamp.org');
+   ga('send', 'pageview');
+</script>
+{% endif %}
+</body>
+</html>

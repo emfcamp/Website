@@ -9,6 +9,7 @@ Flask-Script==0.6.6
 Flask-WTF==0.9.3
 Jinja2==2.7.1
 MarkupSafe==0.18
+Pillow==2.5.2
 SQLAlchemy==0.9.0
 WTForms==1.0.5
 Werkzeug==0.9.4
@@ -47,3 +48,4 @@ webassets==0.7
 wsgiref==0.1.2
 git+https://github.com/gocardless/gocardless-python@add-currency#egg=gocardless
 https://code.stripe.com/stripe/stripe-1.14.1.tar.gz
+git+https://github.com/davidfischer/xhtml2pdf@d4d5067#egg=xhtml2pdf

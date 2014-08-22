@@ -1,3 +1,5 @@
+@import url(https://fonts.googleapis.com/css?family=Raleway:700,500);
+
 @media print {
   .container {
     width: auto;
@@ -19,7 +21,7 @@ body {
   margin-bottom: 6ex;
 }
 
-h2 {
+.invoice h2 {
   font-size: 24pt;
   float: left;
   position: relative;
@@ -131,4 +133,62 @@ dl.company-info dt:after {
 
 dl.company-info dd:after {
   content: '.';
+}
+
+.receipt svg {
+  width: 111px;
+  height: 111px;
+}
+
+
+.receipt header, .receipt h2, .receipt h3, .receipt h4, .receipt h5, .receipt h6, .receipt {
+  font-family: "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+}
+
+.receipt {
+  font-family: "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 12pt;
+}
+
+.receipt .code {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 16pt;
+}
+
+.ticket,
+.ticket-with-blurb {
+  page-break-inside: avoid;
+}
+
+table.entrance-tickets .ticket td.type {
+  margin-left: 60px;
+}
+
+table.entrance-tickets .ticket td,
+table.vehicle-tickets .ticket td {
+  padding: 0;
+}
+
+.entrance-tickets,
+.vehicle-tickets {
+  padding-bottom: 10px;
+}
+
+.receipt p { -pdf-keep-with-next: true; }
+
+.receipt h2 {
+  vertical-align: middle;
+}
+
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+
+h2, h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
 }
