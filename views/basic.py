@@ -11,8 +11,9 @@ from mailsnake.exceptions import MailSnakeException
 
 from flask import (
     render_template, redirect, request, flash,
-    url_for, send_from_directory,
+    url_for, send_from_directory, abort,
 )
+from jinja2.exceptions import TemplateNotFound
 
 
 @app.route("/")
@@ -86,13 +87,12 @@ def company():
 def sponsors():
     return render_template('sponsors/sponsors.html')
 
-@app.route('/sponsors/portcullis')
-def sponsors_portcullis():
-    return render_template('sponsors/portcullis.html')
-
-@app.route('/sponsors/ucl')
-def sponsors_ucl():
-    return render_template('sponsors/ucl.html')
+@app.route('/sponsors/<sponsor>')
+def sponsor_page(sponsor):
+    try:
+        return render_template('sponsors/%s.html' % sponsor)
+    except TemplateNotFound:
+        abort(404)
 
 @app.route("/participating")
 @app.route("/get_involved")
