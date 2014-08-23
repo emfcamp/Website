@@ -454,13 +454,7 @@ td.checkbox-cell label {
   }
 }
 
-.sponsor-portcullis img {
-  padding-top: 30px;
-  padding-bottom: 60px;
-}
-
-.sponsor-portcullis a,
-.sponsor-ucl a {
+.sponsor a {
   text-decoration: none;
 }
 
@@ -469,8 +463,9 @@ td.checkbox-cell label {
   padding-bottom: 10px;
 }
 
-.sponsors .sponsor img {
+.sponsor img {
   padding: 15px;
   background-color: white;
   border-radius: 6px;
 }
+
