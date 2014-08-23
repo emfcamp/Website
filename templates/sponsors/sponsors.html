@@ -1,11 +1,12 @@
 {% set main_class='sponsors' %}
 {% extends "base.html" %}
+{% block title %}Sponsors - Electromagnetic Field{% endblock %}
 
 {% block body %}
 
 <h2>Sponsors</h2>
 
-<p>EMF wouldn't happen without its sponsors.</p>
+<p>EMF wouldn't be possible without the help of these lovely people.</p>
 
 {% macro sponsor(url, image) %}
 <div class="sponsor">
@@ -39,5 +40,11 @@
 {{ sponsor('http://www.flexoptix.net/', 'aruba.jpg') }}
 {{ sponsor('http://www.lonap.net/', 'lonap.jpg') }}
 {{ sponsor('http://www.colocker.com/', '')}}
+
+<h3>Special Thanks</h3>
+
+<p>Special thanks to: Aruba Networks, Bytemark, the Chaos Computer Club,
+   Flexoptix, Individual Pubs, IRCCloud, LONAP, Milton Brewery, OHM 2013
+   and the entire EMF 2014 organising team.</p>
 
 {% endblock %}
