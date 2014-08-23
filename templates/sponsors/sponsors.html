@@ -7,5 +7,37 @@
 
 <p>EMF wouldn't happen without its sponsors.</p>
 
+{% macro sponsor(url, image) %}
+<div class="sponsor">
+<a class="clearfix" href="{{ url }}">
+  <img class="img-responsive col-sm-4" src="{{ url_for('static', filename='images/sponsors/' + image) }}"/>
+</a>
+</div>
+{% endmacro %}
+
+<h3>General</h3>
+{{ sponsor(url_for('sponsors_portcullis'), 'portcullis.jpg') }}
+{{ sponsor(url_for('sponsors_ucl'), 'ucl.jpg') }}
+
+<h3>Badge</h3>
+{{ sponsor('http://ragworm.eu/', 'ragworm.jpg') }}
+{{ sponsor('http://element14.com/', 'element14.jpg') }}
+{{ sponsor('http://paypal.com/', 'paypal.jpg') }}
+{{ sponsor('http://mathworks.co.uk/', 'mathworks.jpg') }}
+{{ sponsor('http://ciseco.co.uk/', 'ciseco.jpg') }}
+{{ sponsor('http://twilio.com/', 'twilio.jpg') }}
+{{ sponsor('http://imgtec.com/', 'imgtec.jpg') }}
+{{ sponsor('http://shadow.cat/', 'shadowcat.jpg') }}
+{{ sponsor('http://www.codethink.co.uk/', 'codethink.jpg') }}
+{{ sponsor('http://comtec.com/', 'comtec.jpg') }}
+{{ sponsor('http://pimoroni.com/', 'pimoroni.jpg') }}
+{{ sponsor('http://www.lprs.co.uk/', 'lprs.jpg') }}
+
+<h3>Networking</h3>
+{{ sponsor('http://www.comtec.com/', 'comtec.jpg') }}
+{{ sponsor('http://www.flexoptix.net/', 'flexoptix.jpg') }}
+{{ sponsor('http://www.flexoptix.net/', 'aruba.jpg') }}
+{{ sponsor('http://www.lonap.net/', 'lonap.jpg') }}
+{{ sponsor('http://www.colocker.com/', '')}}
 
 {% endblock %}

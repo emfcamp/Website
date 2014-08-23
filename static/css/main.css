@@ -458,3 +458,13 @@ td.checkbox-cell label {
   padding-top: 30px;
   padding-bottom: 60px;
 }
+
+.sponsor-portcullis a,
+.sponsor-ucl a {
+  text-decoration: none;
+}
+
+.sponsors .sponsor {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}

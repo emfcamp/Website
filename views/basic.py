@@ -90,6 +90,10 @@ def sponsors():
 def sponsors_portcullis():
     return render_template('sponsors/portcullis.html')
 
+@app.route('/sponsors/ucl')
+def sponsors_ucl():
+    return render_template('sponsors/ucl.html')
+
 @app.route("/participating")
 @app.route("/get_involved")
 @app.route("/contact")
