@@ -468,3 +468,9 @@ td.checkbox-cell label {
   padding-top: 10px;
   padding-bottom: 10px;
 }
+
+.sponsors .sponsor img {
+  padding: 15px;
+  background-color: white;
+  border-radius: 6px;
+}

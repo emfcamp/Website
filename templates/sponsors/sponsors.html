@@ -11,14 +11,16 @@
 {% macro sponsor(url, image) %}
 <div class="sponsor">
 <a class="clearfix" href="{{ url }}">
-  <img class="img-responsive col-sm-4" src="{{ url_for('static', filename='images/sponsors/' + image) }}"/>
+  <img class="img-responsive col-sm-12" src="{{ url_for('static', filename='images/sponsors/' + image) }}"/>
 </a>
 </div>
 {% endmacro %}
 
+<div class="col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
+
 <h3>General</h3>
 {{ sponsor(url_for('sponsors_portcullis'), 'portcullis.jpg') }}
-{{ sponsor(url_for('sponsors_ucl'), 'ucl.jpg') }}
+{{ sponsor('http://www.engineering.ucl.ac.uk', 'ucl.jpg') }}
 
 <h3>Badge</h3>
 {{ sponsor('http://ragworm.eu/', 'ragworm.jpg') }}
@@ -39,12 +41,15 @@
 {{ sponsor('http://www.flexoptix.net/', 'flexoptix.jpg') }}
 {{ sponsor('http://www.flexoptix.net/', 'aruba.jpg') }}
 {{ sponsor('http://www.lonap.net/', 'lonap.jpg') }}
-{{ sponsor('http://www.colocker.com/', '')}}
+{# sponsor('http://www.colocker.com/', '') #}
 
+</div>
+
+<div class="clearfix col-sm-12">
 <h3>Special Thanks</h3>
 
 <p>Special thanks to: Aruba Networks, Bytemark, the Chaos Computer Club,
    Flexoptix, Individual Pubs, IRCCloud, LONAP, Milton Brewery, OHM 2013
    and the entire EMF 2014 organising team.</p>
-
+</div>
 {% endblock %}
