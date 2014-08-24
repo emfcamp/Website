@@ -66,6 +66,7 @@ class Payment(db.Model):
 
         for ticket in self.tickets:
             ticket.expires = datetime.utcnow()
+            ticket.paid = false
         self.state = 'cancelled'
 
     def clone(self, new_user=None, ignore_capacity=False):
