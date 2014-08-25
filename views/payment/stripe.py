@@ -97,6 +97,10 @@ def charge_stripe(payment):
         pdf = render_pdf(page)
         msg.attach('Receipt.pdf', 'application/pdf', pdf.read())
 
+        for t in payment.tickets:
+            t.emailed = True
+        db.session.commit()
+
     mail.send(msg)
 
     return redirect(url_for('stripe_waiting', payment_id=payment.id))
