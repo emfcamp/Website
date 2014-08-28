@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Electromagnetic Field{% endblock %}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='cache/css/bootstrap.min.css') }}"/>
+        <link rel="stylesheet" href="{{ url_for('static', filename='cache/css/jquery.dataTables.min.css') }}"/>
+        {% assets "css_arrivals" -%}
+        <link rel="stylesheet" href="{{ ASSET_URL }}">
+        {% endassets -%}
+        {% block head -%}{% endblock -%}
+        <link rel="shortcut icon" href="/favicon.ico">
+    </head>
+<body>
+{% block document %}
+<div class="container arrivals">
+    <header>
+        <h1>
+            <span class="logo"></span>
+            <a href="{{ url_for('arrivals') }}">Electromagnetic Field</a>
+        </h1>
+    </header>
+    <div class="row">
+        <div class="col-md-9">
+        {% for message in get_flashed_messages() -%}
+            <div class="alert alert-danger">{{ message }}</div>
+        {% endfor -%}
+
+        {% block body -%}{% endblock -%}
+        </div>
+    </div>
+</div>
+{% endblock %}
+<script type="text/javascript" src="{{ url_for('static', filename="cache/js/jquery-1.10.1.min.js") }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename="cache/js/jquery-migrate-1.2.1.min.js") }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename="cache/js/jquery.dataTables.min.js") }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename="cache/js/bootstrap.min.js") }}"></script>
+{% block foot -%}{% endblock -%}
+</body>
+</html>
+

@@ -378,7 +378,24 @@ class MakeAdmin(Command):
     s = db.object_session(user)
     s.commit()
 
-    print 'userid 1 (%s) is now an admin' % (user.name)
+    print '%s is now an admin' % (user.name)
+
+class MakeArrivals(Command):
+  """
+    Make userid one an arrivals operator for testing purposes.
+  """
+  option_list = (Option('-u', '--userid', dest='userid', help="The userid to make an arrivals operator (defaults to 1)"),)
+
+  def run(self, userid):
+    if not userid:
+      userid = 1
+    user = User.query.get(userid)
+    user.arrivals = True
+    s = db.object_session(user)
+    s.commit()
+
+    print '%s is now an arrivals operator' % (user.name)
+
 
 class SendTickets(Command):
 
@@ -414,6 +431,7 @@ if __name__ == "__main__":
   #manager.add_command('testemails', TestEmails())
   manager.add_command('createtickets', CreateTickets())
   manager.add_command('makeadmin', MakeAdmin())
+  manager.add_command('makearrivals', MakeArrivals())
   manager.add_command('createtokens', CreateTicketTokens())
   manager.add_command('sendtickets', SendTickets())
   manager.run()

@@ -58,6 +58,9 @@ testemails:
 admin:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py makeadmin
 
+arrivals:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py makearrivals
+
 test:
 	$(ENV) SETTINGS_FILE=./config/test.cfg flake8 ./models ./views ./utils.py --ignore=E501,F403,E302,E128,W293,W391,E251,E303,E502,E111,E225,E221,W291,E124,W191,E101,E201,E202,E261,E127,E265,E231
 

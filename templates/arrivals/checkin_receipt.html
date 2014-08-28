@@ -1,0 +1,38 @@
+{% extends "arrivals/base.html" %}
+{% block body %}
+<h2>Check in tickets</h2>
+
+<p>To check in {{ tickets.count() == 1 and 'this ticket' or 'these tickets' }}, please click below.</p>
+
+{# Please notify #}
+
+{#
+<dl class="dl-horizontal">
+<dt>Name</dt><dd>{{ payment.user.name }}</dd>
+<dt>Email</dt><dd>{{ payment.user.email }}</dd>
+<dt>Price</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
+<dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
+</dl>
+#}
+
+<table class="table table-condensed table-striped">
+<thead><tr>
+  <th>Type</th>
+  <th>Receipt</th>
+</tr></thead>
+<tbody>
+{% for ticket in tickets %}
+<tr>
+  <td>{{ ticket.type.name }}</td>
+  <td>{{ ticket.receipt }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+<form method="post" action="{{ url_for('arrivals_checkin', receipts=receipts) }}" class="shrink">
+{{ form.hidden_tag() }}
+{{ form.checkin(class_="btn btn-primary pull-right") }}
+</form>
+
+{% endblock %}

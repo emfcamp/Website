@@ -18,6 +18,8 @@ def validate_safechars(val):
 class TicketError(Exception):
     pass
 
+class CheckinStateException(Exception):
+    pass
 
 class TicketType(db.Model):
     __tablename__ = 'ticket_type'
@@ -125,6 +127,7 @@ class Ticket(db.Model):
     emailed = db.Column(db.Boolean, default=False, nullable=False)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
     attribs = db.relationship("TicketAttrib", backref="ticket", cascade='all')
+    checkin = db.relationship('TicketCheckin', uselist=False, backref='ticket', cascade='all')
     type = db.relationship(TicketType, backref="tickets")
 
     def __init__(self, type=None, code=None):
@@ -164,6 +167,15 @@ class Ticket(db.Model):
     def create_qrcode(self):
         self.create_safechars_random('qrcode', 8)
 
+    def check_in(self):
+        if not self.checkin:
+            self.checkin = TicketCheckin(self)
+        if self.checkin.checked_in:
+            raise CheckinStateException("Ticket is already checked in")
+
+        self.checkin.checked_in = True
+        db.session.commit()
+
     def create_safechars_random(self, name, length):
         if getattr(self, name) is not None:
             raise Exception('Ticket already has random value for %s' % name)
@@ -199,6 +211,16 @@ class TicketAttrib(db.Model):
 
     def __repr__(self):
         return "<TicketAttrib %s: %s>" % (self.name, self.value)
+
+class TicketCheckin(db.Model):
+    __tablename__ = 'ticket_checkin'
+    ticket_id = db.Column(db.Integer, db.ForeignKey(Ticket.id), primary_key=True)
+    checked_in = db.Column(db.Boolean, default=False, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def __init__(self, ticket):
+        self.ticket = ticket
+
 
 @event.listens_for(Session, 'before_flush')
 def check_capacity(session, flush_context, instances):

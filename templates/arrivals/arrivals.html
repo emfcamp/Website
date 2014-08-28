@@ -1,0 +1,50 @@
+{% extends "arrivals/base.html" %}
+{% block body %}
+<h2>Arrivals</h2>
+
+<form class="form-horizontal">
+<div class="input-group col-xs-12">
+<input type="text" class="form-control" id="query"/>
+</div>
+</form>
+
+
+<div class="tickets">Loading...</div>
+
+{% endblock %}
+
+{% block foot %}
+<script type="text/javascript">
+if (typeof(EMF) != 'object') var EMF = Object();
+EMF.search_url = '{{ url_for('arrivals_search') }}';
+EMF.search_arrivals = function() {
+    var query = $('#query').val();
+    var data = $.getJSON(EMF.search_url, { q: query }, EMF.search_arrivals_cb);
+
+};
+EMF.search_arrivals_cb = function(data) {
+    $('.tickets').html('<table class="tickets-data"></table');
+    $('.tickets-data').DataTable({
+        data: data.tickets,
+        columns: [
+            { data: 'name' },
+            { data: 'email' },
+            { data: 'name' },
+            { data: 'receipt' },
+            {
+                data: 'receipt_url',
+                render: function(data) {
+                    return '<a class="btn btn-success" href="{0}">Check in</a>'.replace('{0}', data);
+                }
+            }
+        ],
+        bFilter: false,
+        bLengthChange: false
+    })
+};
+$(function() {
+    $('#query').on('change keyup', EMF.search_arrivals).focus();
+});
+$(EMF.search_arrivals);
+</script>
+{% endblock %}

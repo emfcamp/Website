@@ -31,17 +31,22 @@ css_admin = Bundle('css/admin.css',
                    output='gen/admin-packed.css', filters='cssmin')
 css_print = Bundle('css/print.css',
                    output='gen/print-packed.css', filters='cssmin')
+css_arrivals = Bundle('css/arrivals.css',
+                      output='gen/arrivals-packed.css', filters='cssmin')
+
 assets.register('css_all', css_all)
 assets.register('css_admin', css_admin)
 assets.register('css_print', css_print)
+assets.register('css_arrivals', css_arrivals)
 
-gocardless.environment = app.config['GOCARDLESS_ENVIRONMENT']
-gocardless.set_details(app_id=app.config['GOCARDLESS_APP_ID'],
-                        app_secret=app.config['GOCARDLESS_APP_SECRET'],
-                        access_token=app.config['GOCARDLESS_ACCESS_TOKEN'],
-                        merchant_id=app.config['GOCARDLESS_MERCHANT_ID'])
+if app.config.get('TICKETS_SITE'):
+    gocardless.environment = app.config['GOCARDLESS_ENVIRONMENT']
+    gocardless.set_details(app_id=app.config['GOCARDLESS_APP_ID'],
+                            app_secret=app.config['GOCARDLESS_APP_SECRET'],
+                            access_token=app.config['GOCARDLESS_ACCESS_TOKEN'],
+                            merchant_id=app.config['GOCARDLESS_MERCHANT_ID'])
 
-stripe.api_key = app.config['STRIPE_SECRET_KEY']
+    stripe.api_key = app.config['STRIPE_SECRET_KEY']
 
 
 def external_url(endpoint, **values):

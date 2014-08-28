@@ -2,6 +2,7 @@ import os
 import csv
 import requests
 from main import app
+from views import feature_flag
 
 from models.ticket import TicketType
 from models.payment import StripePayment
@@ -18,6 +19,9 @@ from jinja2.exceptions import TemplateNotFound
 
 @app.route("/")
 def main():
+    if app.config.get('ARRIVALS_SITE'):
+        return redirect(url_for('arrivals'))
+
     full_price = TicketType.query.get('full').get_price('GBP')
     if not (app.config.get('BANK_TRANSFER') or app.config.get('GOCARDLESS')):
         # Only card payment left
@@ -28,6 +32,7 @@ def main():
 
 
 @app.route("/", methods=['POST'])
+@feature_flag('TICKETS_SITE')
 def main_post():
     ms = MailSnake(app.config['MAILCHIMP_KEY'])
     try:
@@ -50,6 +55,7 @@ def about():
     return render_template('about.html')
 
 @app.route("/talks/")
+@feature_flag('TICKETS_SITE')
 def talks():
     data = []
     req = requests.get('https://frab.emfcamp.org/en/EMF2014/public/events.json')
@@ -64,6 +70,7 @@ def talks():
     return render_template('talks_2014.html', talks=data)
 
 @app.route("/talks/2012")
+@feature_flag('TICKETS_SITE')
 def talks_2012():
 
     days = {}

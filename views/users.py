@@ -1,5 +1,5 @@
 from main import app, db, mail, login_manager
-from views import set_user_currency, Form
+from views import set_user_currency, Form, feature_flag
 from models.user import User, PasswordReset
 
 from sqlalchemy.exc import IntegrityError
@@ -65,6 +65,7 @@ class SignupForm(Form):
     next = NextURLField('Next')
 
 @app.route("/signup", methods=['GET', 'POST'])
+@feature_flag('TICKETS_SITE')
 def signup():
     if current_user.is_authenticated():
         return redirect(url_for('tickets'))
@@ -103,6 +104,7 @@ class ForgotPasswordForm(Form):
         form._user = user
 
 @app.route("/forgot-password", methods=['GET', 'POST'])
+@feature_flag('TICKETS_SITE')
 def forgot_password():
     form = ForgotPasswordForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -135,6 +137,7 @@ class ResetPasswordForm(Form):
         form._reset = reset
 
 @app.route("/reset-password", methods=['GET', 'POST'])
+@feature_flag('TICKETS_SITE')
 def reset_password():
     form = ResetPasswordForm(request.form, email=request.args.get('email'), token=request.args.get('token'))
     if request.method == 'POST' and form.validate():
@@ -152,6 +155,7 @@ def logout():
     return redirect(url_for('main'))
 
 @app.route("/set-currency", methods=['POST'])
+@feature_flag('TICKETS_SITE')
 def set_currency():
     if request.form['currency'] not in ('GBP', 'EUR'):
         abort(400)
