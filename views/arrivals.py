@@ -57,8 +57,8 @@ def arrivals_search(query=None):
             name_tickets = Ticket.query.join(User).order_by(User.name)
             email_tickets = Ticket.query.join(User).order_by(User.email)
             for word in filter(None, query.split(' ')):
-                name_tickets = name_tickets.filter( User.name.like('%' + word + '%') )
-                email_tickets = email_tickets.filter( User.email.like('%' + word + '%') )
+                name_tickets = name_tickets.filter( User.name.ilike('%' + word + '%') )
+                email_tickets = email_tickets.filter( User.email.ilike('%' + word + '%') )
 
             tickets = (qrcode_tickets.all() + receipt_tickets.all() +
                        name_tickets.limit(100).all() + email_tickets.limit(100).all())
