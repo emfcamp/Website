@@ -3,13 +3,22 @@
 <h2>Arrivals</h2>
 
 <form class="form-horizontal">
-<div class="input-group col-xs-12">
-<input type="text" class="form-control" id="query"/>
-</div>
+  <div class="col-sm-10">
+    <input type="text" class="form-control" id="query"/>
+  </div>
+  <div class="col-sm-2">
+    <a class="btn btn-info form-control" id="check-in-all">Check in all</a>
+  </div>
 </form>
 
+<div class="minipush"></div>
 
-<div class="tickets">Loading...</div>
+<div class="row" style="display: none" id="error">
+  <div class="col-sm-12 alert alert-danger">An error occurred fetching tickets: <span id="error-text"></span></div>
+</div>
+<div class="row">
+  <div class="col-sm-12" id="tickets">Loading...</div>
+</div>
 
 {% endblock %}
 
@@ -19,31 +28,65 @@ if (typeof(EMF) != 'object') var EMF = Object();
 EMF.search_url = '{{ url_for('arrivals_search') }}';
 EMF.search_arrivals = function() {
     var query = $('#query').val();
-    var data = $.getJSON(EMF.search_url, { q: query }, EMF.search_arrivals_cb);
+    var data = $.getJSON(EMF.search_url, { q: query })
+        .done(EMF.search_arrivals_done)
+        .fail(EMF.search_arrivals_fail);
 
 };
-EMF.search_arrivals_cb = function(data) {
-    $('.tickets').html('<table class="tickets-data"></table');
-    $('.tickets-data').DataTable({
+EMF.search_arrivals_fail = function(jqXHR) {
+    var data = jqXHR.responseJSON;
+    $('#error-text').text(data.error);
+    $('#error').show();
+    $('#tickets').hide();
+};
+EMF.search_arrivals_done = function(data) {
+    $('#tickets').html('<table id="tickets-data" class="display nowrap"></table>');
+    var allow_checkin_all = ('all_receipts' in data)
+    $('#check-in-all').toggleClass('disabled', !allow_checkin_all).prop('href', data.all_receipts);
+
+    $('#tickets-data').DataTable({
         data: data.tickets,
         columns: [
             { data: 'name' },
-            { data: 'email' },
-            { data: 'name' },
-            { data: 'receipt' },
             {
-                data: 'receipt_url',
+                data: 'email',
                 render: function(data) {
-                    return '<a class="btn btn-success" href="{0}">Check in</a>'.replace('{0}', data);
+                    return '<a class="email-link">{0}</a>'.replace('{0}', data);
+                }
+            },
+            { data: 'type' },
+            { data: 'receipt', className: 'receipt' },
+            {
+                data: 'action',
+                render: function(data) {
+                    if (data.checked_in) {
+                        return '<a class="btn btn-danger" href="{0}">Undo check-in</a>'.replace('{0}', data.url);
+                    } else {
+                        return '<a class="btn btn-success" href="{0}">Check in</a>'.replace('{0}', data.url);
+                    }
                 }
             }
         ],
         bFilter: false,
-        bLengthChange: false
-    })
+        bLengthChange: false,
+        bSort: false,
+        bPaginate: !allow_checkin_all
+    });
+    $('.email-link').on('click', EMF.select_email);
+};
+EMF.cancel_return = function(e) {
+    if (e.keyCode == 13) {
+        e.cancelBubble = true;
+        return false;
+    }
+};
+EMF.select_email = function() {
+    $('#query').val($(this).text()).trigger('change');
 };
 $(function() {
-    $('#query').on('change keyup', EMF.search_arrivals).focus();
+    $('#query').on('change keyup', EMF.search_arrivals)
+               .on('keydown', EMF.cancel_return)
+               .focus();
 });
 $(EMF.search_arrivals);
 </script>

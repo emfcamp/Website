@@ -1,10 +1,8 @@
 {% extends "arrivals/base.html" %}
 {% block body %}
-<h2>Check in tickets</h2>
+<h2>Undo ticket check-in</h2>
 
-<p>To check in {{ tickets.count() == 1 and 'this ticket' or 'these tickets' }}, please click below.</p>
-
-{# Please notify #}
+<p>To undo the check-in for {{ tickets.count() == 1 and 'this ticket' or 'these tickets' }}, please click below.</p>
 
 <dl class="dl-horizontal">
 <dt>Name</dt><dd>{{ user.name }}</dd>
@@ -46,9 +44,9 @@
 </tbody>
 </table>
 
-<form method="post" action="{{ url_for('arrivals_checkin', receipts=receipts) }}" class="shrink">
+<form method="post" action="{{ url_for('arrivals_undo_checkin', receipts=receipts) }}" class="shrink">
 {{ form.hidden_tag() }}
-{{ form.checkin(class_="btn btn-success pull-right") }}
+{{ form.undo(class_="btn btn-danger pull-right") }}
 </form>
 
 {% endblock %}

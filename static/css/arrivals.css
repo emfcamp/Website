@@ -1,0 +1,13 @@
+.email-link {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.minipush {
+  padding-top: 2ex;
+  clear: both;
+}
+
+td.receipt {
+  font-weight: bold;
+}

@@ -69,24 +69,38 @@ def arrivals_search(query=None):
         # TODO: add multiselect, and if it's a qrcode/receipt, show all the tickets for that user?
 
         tickets_data = []
-        tickets_seen = set()
+        emails_seen = set()
         for ticket in tickets:
-            if ticket in tickets_seen:
+            if ticket in emails_seen:
                 continue
-            tickets_seen.add(ticket)
+            emails_seen.add(ticket.user.email)
 
             if not ticket.receipt:
                 # unpaid tickets won't have receipts
                 ticket.create_receipt()
+
+            if ticket.checkin and ticket.checkin.checked_in:
+                checked_in = True
+                action_url = url_for('arrivals_undo_checkin', receipts=ticket.receipt)
+            else:
+                checked_in = False
+                action_url = url_for('arrivals_checkin', receipts=ticket.receipt)
 
             tickets_data.append({
                 'name': ticket.user.name,
                 'email': ticket.user.email,
                 'type': ticket.type.name,
                 'receipt': ticket.receipt,
-                'receipt_url': url_for('arrivals_checkin', receipts=ticket.receipt),
+                'action': { 'checked_in': checked_in, 'url': action_url },
             })
-        return jsonify({'tickets': tickets_data}), 200
+
+
+        data = {
+            'tickets': tickets_data,
+        };
+        if len(emails_seen) == 1:
+            data['all_receipts'] = url_for('arrivals_checkin', receipts=','.join(t.receipt for t in tickets))
+        return jsonify(data), 200;
 
     except Exception, e:
         return jsonify({'error': repr(e)}), 500
@@ -108,7 +122,7 @@ def arrivals_checkin(receipts):
     form = CheckinForm()
 
     receipts = receipts.split(',')
-    tickets = Ticket.query.filter( Ticket.receipt.in_(receipts) )
+    tickets = Ticket.query.filter( Ticket.receipt.in_(receipts) ).join(TicketType).order_by(TicketType.order)
 
     if form.validate_on_submit():
         failed = []
@@ -120,8 +134,8 @@ def arrivals_checkin(receipts):
 
         if failed:
             flash("Already checked in: \n" +
-                  ', '.join('%s at %s' % (t.receipt, t.checkin.timestamp.strftime('%H:%M %A')) for t in tickets))
-            return redirect(url_for('arrivals_checkin', receipts=','.join(t.receipt for t in tickets)))
+                  ', '.join(t.receipt for t in tickets))
+            return redirect(url_for('arrivals_undo_checkin', receipts=','.join(t.receipt for t in tickets)))
 
         if tickets.count() == 1:
             flash("1 ticket checked in")
@@ -130,6 +144,40 @@ def arrivals_checkin(receipts):
 
         return redirect(url_for('arrivals'))
 
-    return render_template('arrivals/checkin_receipt.html', tickets=tickets, form=form, receipts=','.join(t.receipt for t in tickets))
+    user = tickets[0].user
+    return render_template('arrivals/checkin_receipt.html', tickets=tickets, form=form,
+                           user=user, receipts=','.join(t.receipt for t in tickets))
+
+@app.route('/checkin/receipt/<receipts>/undo', methods=['GET', 'POST'])
+@arrivals_required
+def arrivals_undo_checkin(receipts):
+    form = CheckinForm()
+
+    receipts = receipts.split(',')
+    tickets = Ticket.query.filter( Ticket.receipt.in_(receipts) ).join(TicketType).order_by(TicketType.order)
+
+    if form.validate_on_submit():
+        failed = []
+        for t in tickets:
+            try:
+                t.undo_check_in()
+            except CheckinStateException:
+                failed.append(t)
+
+        if failed:
+            flash("Not yet checked in: \n" +
+                  ', '.join(t.receipt for t in tickets))
+            return redirect(url_for('arrivals_checkin', receipts=','.join(t.receipt for t in tickets)))
+
+        if tickets.count() == 1:
+            flash("1 ticket check-in undone")
+        else:
+            flash("%s tickets check-ins undone" % tickets.count())
+
+        return redirect(url_for('arrivals'))
+
+    user = tickets[0].user
+    return render_template('arrivals/checkin_receipt_undo.html', tickets=tickets, form=form,
+                           user=user, receipts=','.join(t.receipt for t in tickets))
 
 

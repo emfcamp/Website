@@ -176,6 +176,16 @@ class Ticket(db.Model):
         self.checkin.checked_in = True
         db.session.commit()
 
+    def undo_check_in(self):
+        if not self.checkin:
+            self.checkin = TicketCheckin(self)
+
+        if not self.checkin.checked_in:
+            raise CheckinStateException("Ticket is not yet checked in")
+
+        self.checkin.checked_in = False
+        db.session.commit()
+
     def create_safechars_random(self, name, length):
         if getattr(self, name) is not None:
             raise Exception('Ticket already has random value for %s' % name)
