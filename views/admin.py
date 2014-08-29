@@ -230,6 +230,38 @@ def make_admin():
     else:
         return(('', 404))
 
+@app.route("/admin/make-arrivals", methods=['GET', 'POST'])
+@login_required
+def make_arrivals():
+    if current_user.arrivals:
+
+        class MakeArrivalsForm(Form):
+            change = SubmitField('Change')
+
+        users = User.query.order_by(User.id).all()
+        # The list of users can change between the
+        # form being generated and it being submitted, but the id's should remain stable
+        for u in users:
+            setattr(MakeArrivalsForm, str(u.id) + "_arrivals", BooleanField('arrivals', default=u.arrivals))
+
+        if request.method == 'POST':
+            form = MakeArrivalsForm()
+            if form.validate():
+                for field in form:
+                    if field.name.endswith('_arrivals'):
+                        id = int(field.name.split("_")[0])
+                        user = User.query.get(id)
+                        if user.arrivals != field.data:
+                            app.logger.info("user %s (%s) arrivals: %s -> %s", user.name, user.id, user.arrivals, field.data)
+                            user.arrivals = field.data
+                            db.session.commit()
+                return redirect(url_for('make_arrivals'))
+        arrivalsform = MakeArrivalsForm(formdata=None)
+        return render_template('admin/users-make-arrivals.html', users=users, arrivalsform = arrivalsform)
+    else:
+        return(('', 404))
+
+
 @app.route('/admin/payments')
 @admin_required
 def admin_payments():

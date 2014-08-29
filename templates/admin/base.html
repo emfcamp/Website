@@ -28,6 +28,7 @@
     <div class="row">
         <nav class="col-md-3">
             <ul class="nav nav-pills nav-stacked">
+                {% if current_user.admin %}
                 <li {% if nav_active == 'admin_txns' -%} class="active" {%- endif %}><a href="{{ url_for('admin_txns') }}">
                     Bank transfers <span class="badge">{{ unreconciled_count }}</span>
                 </a></li>
@@ -39,6 +40,11 @@
                 </a></li>
                 <li {% if nav_active == 'make_admin' -%} class="active" {%- endif %}><a href="{{ url_for('make_admin') }}">
                     Make someone an admin</a></li>
+                {% endif %}
+                {% if current_user.arrivals %}
+                <li {% if nav_active == 'make_arrivals' -%} class="active" {%- endif %}><a href="{{ url_for('make_arrivals') }}">
+                    Make someone an arrivals operator</a></li>
+                {% endif %}
             </ul>
         </nav>
 
