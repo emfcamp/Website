@@ -186,6 +186,25 @@ class Ticket(db.Model):
         self.checkin.checked_in = False
         db.session.commit()
 
+    def badge_up(self):
+        if not self.checkin:
+            self.checkin = TicketCheckin(self)
+        if self.checkin.badged_up:
+            raise CheckinStateException("Badge is already issued")
+
+        self.checkin.badged_up = True
+        db.session.commit()
+
+    def undo_badge_up(self):
+        if not self.checkin:
+            self.checkin = TicketCheckin(self)
+
+        if not self.checkin.badged_up:
+            raise CheckinStateException("Badge is not yet issued")
+
+        self.checkin.badged_up = False
+        db.session.commit()
+
     def create_safechars_random(self, name, length):
         if getattr(self, name) is not None:
             raise Exception('Ticket already has random value for %s' % name)
@@ -227,6 +246,7 @@ class TicketCheckin(db.Model):
     ticket_id = db.Column(db.Integer, db.ForeignKey(Ticket.id), primary_key=True)
     checked_in = db.Column(db.Boolean, default=False, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    badged_up = db.Column(db.Boolean, default=False, nullable=False)
 
     def __init__(self, ticket):
         self.ticket = ticket
