@@ -96,6 +96,9 @@ def arrivals_search(query=None):
         }
         if len(emails_seen) == 1:
             data['all_receipts'] = url_for('arrivals_checkin', receipts=','.join(t.receipt for t in tickets))
+        if request.args.get('n'):
+            data['n'] = request.args.get('n')
+
         return jsonify(data), 200
 
     except Exception, e:
