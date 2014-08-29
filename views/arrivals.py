@@ -88,6 +88,7 @@ def arrivals_search(query=None):
                 'email': ticket.user.email,
                 'type': ticket.type.name,
                 'receipt': ticket.receipt,
+                'paid': ticket.paid,
                 'action': { 'checked_in': checked_in, 'url': action_url },
             })
 

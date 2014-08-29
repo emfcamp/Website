@@ -11,3 +11,16 @@
 td.receipt {
   font-weight: bold;
 }
+
+.unpaid td {
+  background-color: #ebccd1;
+  color: #a94442;
+}
+
+.unpaid td a {
+  color: #a94442;
+}
+
+.unpaid td a.btn {
+  color: #fff;
+}

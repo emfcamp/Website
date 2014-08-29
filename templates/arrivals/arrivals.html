@@ -67,6 +67,11 @@ EMF.search_arrivals_done = function(data) {
                 }
             }
         ],
+        createdRow: function(row, data, index) {
+            if (!data.paid) {
+                $(row).addClass('unpaid');
+            }
+        },
         bFilter: false,
         bLengthChange: false,
         bSort: false,
