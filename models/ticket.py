@@ -120,7 +120,7 @@ class Ticket(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     code = db.Column(db.String, db.ForeignKey('ticket_type.code'), nullable=False, index=True)
-    paid = db.Column(db.Boolean, default=False, nullable=False)
+    paid = db.Column(db.Boolean, default=False, nullable=False, index=True)
     expires = db.Column(db.DateTime, nullable=False)
     receipt = db.Column(db.String, unique=True)
     qrcode = db.Column(db.String, unique=True)

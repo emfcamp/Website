@@ -9,8 +9,8 @@ from datetime import datetime, timedelta
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String, unique=True)
-    name = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, unique=True, index=True)
+    name = db.Column(db.String, nullable=False, index=True)
     password = db.Column(db.String, nullable=False)
     admin = db.Column(db.Boolean, default=False, nullable=False)
     arrivals = db.Column(db.Boolean, default=False, nullable=False)

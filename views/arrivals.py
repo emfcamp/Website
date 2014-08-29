@@ -45,7 +45,7 @@ def arrivals_search(query=None):
 
         if not query:
             tickets = Ticket.query.filter_by(paid=True).join(User).join(TicketType) \
-                                  .order_by(User.name, TicketType.order)
+                                  .order_by(User.name, TicketType.order).limit(100)
 
         else:
             match = re.match(re.escape(app.config.get('CHECKIN_BASE')) + r'([0-9a-z]+)', query)
@@ -61,9 +61,7 @@ def arrivals_search(query=None):
                 email_tickets = email_tickets.filter( User.email.like('%' + word + '%') )
 
             tickets = (qrcode_tickets.all() + receipt_tickets.all() +
-                       name_tickets.all() + email_tickets.all())
-
-        # TODO: add multiselect, and if it's a qrcode/receipt, show all the tickets for that user?
+                       name_tickets.limit(100).all() + email_tickets.limit(100).all())
 
         tickets_data = []
         emails_seen = set()
