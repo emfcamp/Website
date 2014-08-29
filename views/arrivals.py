@@ -1,4 +1,4 @@
-from main import app, db
+from main import app
 from models.ticket import Ticket, TicketType, CheckinStateException
 from models.user import User
 from views import Form
@@ -14,9 +14,6 @@ from wtforms import (
     SubmitField,
 )
 from wtforms.validators import Optional
-
-from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.sql.functions import func
 
 from functools import wraps
 import re
@@ -97,10 +94,10 @@ def arrivals_search(query=None):
 
         data = {
             'tickets': tickets_data,
-        };
+        }
         if len(emails_seen) == 1:
             data['all_receipts'] = url_for('arrivals_checkin', receipts=','.join(t.receipt for t in tickets))
-        return jsonify(data), 200;
+        return jsonify(data), 200
 
     except Exception, e:
         return jsonify({'error': repr(e)}), 500
