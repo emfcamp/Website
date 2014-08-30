@@ -14,6 +14,7 @@ from wtforms import (
     SubmitField,
 )
 from wtforms.validators import Optional
+from sqlalchemy import or_
 
 from functools import wraps
 import re
@@ -59,6 +60,7 @@ def arrivals_search(query=None):
         if not query:
             if badge:
                 tickets = Ticket.query.filter_by(paid=True).join(User).join(TicketType) \
+                                      .filter( or_(Ticket.code.like('full%'), Ticket.code == 'kids_u16') ) \
                                       .join(TicketCheckin).filter_by(checked_in=True) \
                                       .order_by(User.name, TicketType.order).limit(100)
             else:
