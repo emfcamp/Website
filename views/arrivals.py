@@ -18,6 +18,7 @@ from sqlalchemy import or_
 
 from functools import wraps
 import re
+from collections import OrderedDict
 
 def arrivals_required(f):
     @wraps(f)
@@ -86,6 +87,7 @@ def arrivals_search(query=None):
 
             tickets = (qrcode_tickets.all() + receipt_tickets.all() +
                        name_tickets.limit(100).all() + email_tickets.limit(100).all())
+            tickets = list(OrderedDict.fromkeys(tickets))
 
         tickets_data = []
         emails_seen = set()
