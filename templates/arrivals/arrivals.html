@@ -35,6 +35,7 @@
 if (typeof(EMF) != 'object') var EMF = Object();
 EMF.search_url = '{{ url_for('arrivals_search') }}';
 EMF.search_count = 0;
+EMF.search_count_received = 0;
 EMF.search_arrivals = function() {
     var query = $('#query').val();
     EMF.search_count++;
@@ -50,7 +51,9 @@ EMF.search_arrivals_fail = function(jqXHR) {
     $('#tickets').hide();
 };
 EMF.search_arrivals_done = function(data) {
-    if (data.n < EMF.search_count) return;
+    var search_count = parseInt(data.n, 10);
+    if (search_count < EMF.search_count_received) return;
+    EMF.search_count_received = search_count;
     $('#tickets').html('<table id="tickets-data" class="display nowrap"></table>');
     var allow_checkin_all = ('all_receipts' in data)
     $('#check-in-all').toggleClass('disabled', !allow_checkin_all).prop('href', data.all_receipts);
