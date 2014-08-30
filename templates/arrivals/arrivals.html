@@ -1,6 +1,10 @@
 {% extends "arrivals/base.html" %}
 {% block body %}
+{% if badge %}
+<h2>Badges</h2>
+{% else %}
 <h2>Arrivals</h2>
+{% endif %}
 
 <form class="form-horizontal">
   <div class="col-sm-9">
