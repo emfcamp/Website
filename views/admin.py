@@ -1,7 +1,7 @@
 from main import app, db, mail
 from models.user import User
 from models.payment import Payment, BankPayment, BankTransaction
-from models.ticket import Ticket
+from models.ticket import Ticket, TicketCheckin
 from models.cfp import Proposal
 from views import Form
 from views.payment.stripe import (
