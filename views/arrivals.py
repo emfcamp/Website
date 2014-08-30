@@ -59,10 +59,8 @@ def arrivals_search(query=None):
 
         if not query:
             if badge:
-                tickets = Ticket.query.filter_by(paid=True).join(User).join(TicketType) \
-                                      .filter( or_(Ticket.code.like('full%'), Ticket.code == 'kids_u16') ) \
-                                      .join(TicketCheckin).filter_by(checked_in=True) \
-                                      .order_by(User.name, TicketType.order).limit(100)
+                tickets = []
+
             else:
                 tickets = Ticket.query.filter_by(paid=True).join(User).join(TicketType) \
                                       .order_by(User.name, TicketType.order).limit(100)
