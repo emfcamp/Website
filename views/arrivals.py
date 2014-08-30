@@ -36,7 +36,7 @@ def arrivals():
 
 @app.route('/arrivals/check-in')
 def begin_check_in():
-    del session['badge']
+    session.pop('badge', None)
     return redirect(url_for('arrivals'))
 
 @app.route('/arrivals/badge-up')

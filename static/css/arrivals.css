@@ -24,3 +24,21 @@ td.receipt {
 .unpaid td a.btn {
   color: #fff;
 }
+
+#bottom-menu-container {
+  background-color: #eee;
+  padding: 10px 15px 2px 15px;
+  margin-top: 20px;
+}
+
+#bottom-menu-container .menu {
+  background-color: #eee;
+}
+
+#bottom-menu-container ul.menu li{
+  display:inline-block;
+  padding-left: 0;
+  padding-right: 1em;
+}
+
+

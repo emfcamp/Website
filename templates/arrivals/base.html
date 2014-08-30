@@ -31,6 +31,15 @@
         {% block body -%}{% endblock -%}
         </div>
     </div>
+    <footer>
+      <div id="bottom-menu-container">
+        <ul class="menu">
+          <li><a href="{{ url_for('begin_check_in') }}">Check in</a></li>
+          <li><a href="{{ url_for('begin_badge_up') }}">Issue badges</a></li>
+        <div style="clear: both"></div>
+      </div>
+
+    </footer>
 </div>
 {% endblock %}
 <script type="text/javascript" src="{{ url_for('static', filename="cache/js/jquery-1.10.1.min.js") }}"></script>
