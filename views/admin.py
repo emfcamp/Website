@@ -70,6 +70,12 @@ def stats():
     full_gocardless_unpaid = full_unpaid.filter(Payment.provider == 'gocardless', Payment.state == 'inprogress')
     full_banktransfer_unpaid = full_unpaid.filter(Payment.provider == 'banktransfer', Payment.state == 'inprogress')
 
+    parking_bought = Ticket.query.filter_by(paid=True, code='parking')
+    campervan_bought = Ticket.query.filter_by(paid=True, code='campervan')
+
+    checked_in = TicketCheckin.query.filter_by(checked_in=True)
+    badged_up = TicketCheckin.query.filter_by(badged_up=True)
+
     users = User.query
 
     proposals = Proposal.query
@@ -79,6 +85,8 @@ def stats():
         'full_bought', 'kids_bought',
         'full_unpaid', 'kids_unpaid',
         'full_gocardless_unpaid', 'full_banktransfer_unpaid',
+        'parking_bought', 'campervan_bought',
+        'checked_in', 'badged_up',
         'users',
         'proposals',
     ]
