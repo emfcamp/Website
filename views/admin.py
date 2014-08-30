@@ -19,6 +19,7 @@ from wtforms import (
     SubmitField, BooleanField,
 )
 
+from sqlalchemy import or_
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.functions import func
 
@@ -73,7 +74,8 @@ def stats():
     parking_bought = Ticket.query.filter_by(paid=True, code='parking')
     campervan_bought = Ticket.query.filter_by(paid=True, code='campervan')
 
-    checked_in = TicketCheckin.query.filter_by(checked_in=True)
+    checked_in = Ticket.query.filter( or_(Ticket.code.startswith('full'), Ticket.code.startswith('kids')) ) \
+                             .join(TicketCheckin).filter_by(checked_in=True)
     badged_up = TicketCheckin.query.filter_by(badged_up=True)
 
     users = User.query
