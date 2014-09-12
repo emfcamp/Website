@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block body %}
+<div id="gallery" class="row">
+    <img class="img-responsive col-md-12" src="/static/images/splash_image.jpg" alt="Image of EMF 2012">
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <p class="emphasis">
+          Electromagnetic Field is a non-profit UK camping festival for those with an inquisitive mind or an
+          interest in making things: hackers, artists, geeks, crafters, scientists, and engineers.
+        </p>
+        <p>In August 2014 over a thousand people descended on an internet-connected field for
+        three days of talks, performances,
+        and workshops covering everything from <strong>blacksmithing</strong> to <strong>biometrics</strong>,
+        <strong>chiptunes</strong> to <strong>computer security</strong>,
+        <strong>high altitude ballooning</strong> to <strong>lockpicking</strong>,
+        <strong>origami</strong> to <strong>democracy</strong>,
+        and <strong>online privacy</strong> to <strong>knitting</strong>.
+        </p>
+        <p>We also equipped the field with <strong>fast internet</strong>,
+           <strong>power to the tent</strong>, <strong>good beer</strong>, and
+          <strong>amazing installations</strong>.
+        </p>
+    </div>
+    <div class="col-md-6">
+        <p class="emphasis">
+           We're immensely grateful to everyone who came and helped make EMF such a great event,
+           and especially to those volunteers
+           who devoted their time to making our non-profit event a success.</p>
+        <p>If you want to re-live EMF 2014, you can find photos, videos, and more on our
+           <a href="https://wiki.emfcamp.org/wiki/Memories">memories</a> page.</p>
+        <p>The next Electromagnetic Field will be held in <strong>Summer 2016</strong>.</p>
+       <div class="well">
+          <p>If you're interested in updates about future events, please follow us on
+          <a href="http://www.twitter.com/emfcamp">Twitter</a> or join our mailing list:</p>
+          <form method="post" class="form-inline" role="form">
+            <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
+            <div class="input-group">
+              <input id="email-field" type="text" class="form-control" placeholder="Enter email address" name="email"/>
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-default debounce">Join</button>
+              </span>
+            </div>
+          </form>
+          <p><small>(We'll only use your details to contact you about future events)</small></p>
+    </div>
+</div>
+{% endblock %}

@@ -23,6 +23,10 @@ html, body, .container, .main-row, .main-column {
   color: #333;
 }
 
+.well a {
+  color: #5E93CE;
+}
+
 header, h2, h3, h4, h5, h6 {
   font-family: "Raleway","Helvetica Neue",Helvetica,Arial,sans-serif;
   font-weight: 700;
@@ -162,7 +166,7 @@ footer #credits {
   }
 }
 
-#gallery .col-md-3 {
+#gallery .col-md-3, #gallery .col-md-12 {
   padding: 0;
 }
 
