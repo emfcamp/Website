@@ -7,7 +7,6 @@ from flask import render_template
 from flaskext.mail import Message
 from sqlalchemy.orm.exc import NoResultFound
 
-import random
 from datetime import datetime, timedelta
 
 from main import app, mail, db
@@ -15,8 +14,7 @@ from models import (
     User, TicketType, Ticket, TicketPrice, TicketToken,
 )
 from models.payment import (
-    GoCardlessPayment,
-    BankPayment, BankAccount, BankTransaction,
+    BankAccount, BankTransaction,
 )
 from views.tickets import render_receipt, render_pdf
 
@@ -194,95 +192,6 @@ class Reconcile(Command):
         app.logger.info('Reconciliation complete: %s paid, %s failed', paid, failed)
 
 
-class TestEmails(Command):
-  """
-    Test our email templates
-  """
-
-  def run(self):
-    self.make_test_user()
-    for p in self.user.payments.all():
-      if p.provider == "gocardless":
-        for t in ("tickets-purchased-email-gocardless.txt", "tickets-paid-email-gocardless.txt"):
-          print "template:", t
-          print
-          self.test(t, p)
-          print
-          print "*" * 42
-          print
-      elif p.provider == "banktransfer":
-        for t in ("tickets-purchased-email-banktransfer.txt", "tickets-paid-email-banktransfer.txt"):
-          print "template:", t
-          print
-          self.test(t, p)
-          print
-          print "*" * 42
-          print
-    
-    t = "welcome-email.txt"
-    print "template:", t
-    print
-    output = render_template(t, user = self.user)
-    print output
-
-  def make_test_user(self):
-    try:
-      user = User.query.filter(User.email == "test@example.com").one()
-    except NoResultFound:
-      user = User('test@example.com', 'testuser')
-      user.set_password('happycamper')
-      db.session.add(user)
-
-      amounts = {
-          "full": TicketType.query.get('full')
-      }
-      #
-      # FIXME: this is a complete mess
-      #
-      # TODO: needs to cover:
-      #
-      # single full ticket
-      # multiple full tickets
-      #
-      # kids & campervans?
-      #
-      
-      # full
-      for full in ([1], [0], [3], [0], [2]):
-        for pt in (BankPayment, GoCardlessPayment):
-          for curr in ['GBP', 'EUR']:
-            total = (full * amounts['full'].get_price(curr))
-            payment = pt(curr, total)
-            payment.state = "inprogress"
-            if payment.provider == "gocardless":
-              payment.gcid = "%3dSDJADG" % (int(random.random() * 1000 ))
-            db.session.add(payment)
-            
-            for i in range(full):
-              t = Ticket(code='full')
-              t.payment = payment
-              if payment.currency == 'GBP':
-                  t.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS_TRANSFER'])
-              elif payment.currency == 'EUR':
-                  t.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS_TRANSFER_EURO'])
-              user.tickets.append(t)
-
-            user.payments.append(payment)
-
-      db.session.commit()
-
-    self.user = user
-    print user.name
-    for p in user.payments.all():
-      print p.provider, p.amount
-      print p.tickets.all()
-      
-  def test(self, template, payment):
-    output = render_template(template, user=self.user, payment=payment)
-    print "To: \"%s\" <%s>" % (self.user.name, self.user.email)
-    print
-    print output.encode("utf-8")
-
 class CreateTickets(Command):
     def run(self):
         #
@@ -424,14 +333,13 @@ class SendTickets(Command):
             db.session.commit()
 
 if __name__ == "__main__":
-  manager.add_command('createdb', CreateDB())
-  manager.add_command('createbankaccounts', CreateBankAccounts())
-  manager.add_command('loadofx', LoadOfx())
-  manager.add_command('reconcile', Reconcile())
-  #manager.add_command('testemails', TestEmails())
-  manager.add_command('createtickets', CreateTickets())
-  manager.add_command('makeadmin', MakeAdmin())
-  manager.add_command('makearrivals', MakeArrivals())
-  manager.add_command('createtokens', CreateTicketTokens())
-  manager.add_command('sendtickets', SendTickets())
-  manager.run()
+    manager.add_command('createdb', CreateDB())
+    manager.add_command('createbankaccounts', CreateBankAccounts())
+    manager.add_command('loadofx', LoadOfx())
+    manager.add_command('reconcile', Reconcile())
+    manager.add_command('createtickets', CreateTickets())
+    manager.add_command('makeadmin', MakeAdmin())
+    manager.add_command('makearrivals', MakeArrivals())
+    manager.add_command('createtokens', CreateTicketTokens())
+    manager.add_command('sendtickets', SendTickets())
+    manager.run()
