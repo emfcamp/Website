@@ -40,7 +40,7 @@ def main_post():
         ms.listSubscribe(id='d1798f7c80', email_address=email)
         flash('Thanks for subscribing! You will receive a confirmation email shortly.')
     except MailSnakeException, e:
-        print e
+        app.logger.error('Error subscribing: %s', e)
         flash('Sorry, an error occurred.')
     return redirect(url_for('main'))
 
