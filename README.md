@@ -1,5 +1,14 @@
 This is the www.emfcamp.org web site
 
+Requirements
+=======
+
+* [Python 2.7](https://www.python.org/downloads/)
+* [Pip](https://pip.pypa.io/en/latest/installing.html)
+* [VirtualEnv](https://virtualenv.pypa.io/en/latest/installation.html)
+* [SQLite3](https://www.sqlite.org/download.html)
+
+
 Starting
 ========
 ```
@@ -25,7 +34,7 @@ make data
 make
 ```
 
-Now create a user ("signup") and then run:
+Now create a user (go to [http://localhost:5000/signup](http://localhost:5000/signup)) and then run:
 
 ```
 make admin
@@ -41,7 +50,22 @@ make update
 make data
 ```
 
-If you want the site to be accessible by the rest of the world then change app.run() at the end of main.py to app.run(host="0.0.0.0")
+Viewing
+=======
+The site will run on [http://localhost:5000](http://localhost:5000).
+
+If you would like to change the port that the site uses you can set this in main.py (last line):
+
+```python
+    app.run(processes=2, port=8888)
+```
+
+You can also use this to make the site accessible outside of your computer:
+
+```python
+    app.run(processes=2, host="0.0.0.0")
+```
+
 
 Links to Documentation
 ======================
