@@ -102,3 +102,5 @@ def setup_logging(app):
         logger.propagate = False
 
 
+def mail_logging(message, app):
+    app.logger.info('Send mail: ' + message.subject)
