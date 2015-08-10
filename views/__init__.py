@@ -2,7 +2,7 @@
 from main import app, external_url
 from flask import session, abort
 
-from models.ticket import Ticket
+from models.ticket import Ticket, TicketType
 
 from flask_wtf import Form as BaseForm
 from flask_wtf.form import _is_hidden
@@ -125,11 +125,13 @@ def set_user_currency(currency):
 
 
 def get_basket():
-    basket = []
-    for code in session.get('basket', []):
-        basket.append(Ticket(code=code))
+    types = [TicketType.query.get(code) for code in session.get('basket', [])]
 
-    total = sum(t.type.get_price(get_user_currency()) for t in basket)
+    total = sum(tt.get_price(get_user_currency()) for tt in types)
+
+    basket = []
+    for tt in types:
+        basket.append(Ticket(type=tt))
 
     app.logger.debug('Got basket %s with total %s', basket, total)
     return basket, total
