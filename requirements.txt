@@ -1,51 +1,85 @@
-flake8==2.1.0
-BeautifulSoup==3.2.1
-Flask==0.10
-Flask-Assets==0.7
-Flask-Login==0.2.9
-Flask-Mail==0.6.1
-Flask-SQLAlchemy==0.16
-Flask-Script==0.6.6
-Flask-WTF==0.9.3
-Jinja2==2.7.1
-MarkupSafe==0.18
-Pillow==2.5.2
-SQLAlchemy==0.9.0
-WTForms==1.0.5
-Werkzeug==0.9.4
-argparse==1.2.1
-beautifulsoup4==4.3.2
-blinker==1.3
-certifi==0.0.8
-chardet==2.2.1
-cssmin==0.2.0
-decorator==3.3.3
-eventlet==0.14.0
-greenlet==0.4.2
-gunicorn==18.0
-iso8601==0.1.8
-itsdangerous==0.23
-lamson==1.3.4
-lockfile==0.9.1
-lxml==3.3.0beta3
-mailsnake==1.6.2
-mock==1.0.1
-nose==1.3.0
-oauthlib==0.1.3
-ofxparse==0.14
-psycopg2==2.5.1
-py-bcrypt==0.4
-pyasn1==0.1.3
-python-Levenshtein==0.11.2
-python-daemon==1.6
-python-modargs==1.7
-qrcode==4.0.4
-requests==0.13.2
-rsa==3.0.1
-simplejson==3.3.1
-six==1.5.1
-webassets==0.7
-wsgiref==0.1.2
-git+https://github.com/gocardless/gocardless-python@add-currency#egg=gocardless
-https://code.stripe.com/stripe/stripe-1.14.1.tar.gz
+# Jinja
+Jinja2==2.8
+
+# Flask
+Flask==0.10.1
+Flask-Assets==0.10
+Flask-Login==0.2.11
+Flask-Mail==0.9.1
+Flask-Script==2.0.5
+Flask-SQLAlchemy==2.0
+Flask-WTF==0.12
+
+# Ticket PDFs
+qrcode==5.1
 git+https://github.com/davidfischer/xhtml2pdf@d4d5067#egg=xhtml2pdf
+
+# Mailchimp
+mailsnake==1.6.3
+
+# Payments
+gocardless==0.5.3
+stripe==1.24.1
+ofxparse==0.14
+
+# Database
+SQLAlchemy==1.0.8
+psycopg2==2.6.1
+py-bcrypt==0.4
+
+# utils
+cssmin==0.2.0
+decorator==4.0.2
+
+# Secondary requirements
+# Flask (+plugins) requirements
+itsdangerous==0.24
+Werkzeug==0.10.4
+wsgiref==0.1.2
+webassets==0.10.1
+WTForms==2.0.2
+blinker==1.4
+
+# Jinja requirements
+MarkupSafe==0.23
+
+# qrcode requirements
+six==1.9.0
+
+# xhtml2pdf requirements
+Pillow==2.9.0
+html5lib==0.999999
+PyPDF2==1.25.1
+reportlab==3.2.0
+
+# mailsnake requirements
+simplejson==3.8.0
+requests==2.7.0
+
+# Stripe and Gocardless both use six and requests
+
+# ofxparse requirements (and six)
+beautifulsoup4==4.4.0
+
+# Unknown requirements
+flake8==2.4.1
+BeautifulSoup==3.2.1
+argparse==1.3.0
+certifi==2015.04.28
+chardet==2.3.0
+eventlet==0.17.4
+greenlet==0.4.7
+gunicorn==19.3.0
+iso8601==0.1.10
+lamson==1.3.4
+lockfile==0.10.2
+lxml==3.4.4
+mock==1.3.0
+nose==1.3.7
+oauthlib==1.0.1
+pyasn1==0.1.8
+python-daemon==2.0.5
+python-Levenshtein==0.12.0
+python-modargs==1.7
+rsa==3.2
+

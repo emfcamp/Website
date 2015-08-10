@@ -11,7 +11,7 @@ from flask import (
 from flask.ext.login import (
     login_user, login_required, logout_user, current_user,
 )
-from flaskext.mail import Message
+from flask_mail import Message
 
 from wtforms.validators import Required, Email, EqualTo, ValidationError
 from wtforms import TextField, PasswordField, HiddenField
