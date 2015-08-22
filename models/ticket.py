@@ -51,6 +51,10 @@ class TicketType(db.Model):
     def get_price_ex_vat(self, currency):
         return self.get_price(currency) / Decimal('1.2')
 
+    def uses_token(self):
+        # This should probably be smarter
+        return self.code in self.token_only
+
     def user_limit(self, user, token):
         # This could do something more interesting, like allow extra tickets
         if self.code in self.token_only:
@@ -126,11 +130,12 @@ class Ticket(db.Model):
     qrcode = db.Column(db.String, unique=True)
     emailed = db.Column(db.Boolean, default=False, nullable=False)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
+    token = db.Column(db.String, db.ForeignKey('ticket_token.token'), nullable=True)
     attribs = db.relationship("TicketAttrib", backref="ticket", cascade='all')
     checkin = db.relationship('TicketCheckin', uselist=False, backref='ticket', cascade='all')
     type = db.relationship(TicketType, backref="tickets")
 
-    def __init__(self, type=None, code=None):
+    def __init__(self, type=None, code=None, token=None):
         if type:
             self.type = type
             self.code = type.code
@@ -139,6 +144,9 @@ class Ticket(db.Model):
             self.type = TicketType.query.get(code)
         else:
             raise ValueError('Type must be specified')
+
+        if token:
+            self.token = token            
 
         self.expires = datetime.utcnow() + timedelta(hours=2)
         self.ignore_capacity = False

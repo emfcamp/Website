@@ -131,7 +131,8 @@ def get_basket():
 
     basket = []
     for tt in types:
-        basket.append(Ticket(type=tt))
+        token = session.get('ticket_token') if tt.uses_token() else None
+        basket.append(Ticket(type=tt, token=token))
 
     app.logger.debug('Got basket %s with total %s', basket, total)
     return basket, total
