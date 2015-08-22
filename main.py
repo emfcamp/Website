@@ -1,6 +1,6 @@
 from flask import Flask
 from flask import url_for
-from flaskext.mail import Mail
+from flask_mail import Mail, email_dispatched
 from flask.ext.login import LoginManager
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.assets import Environment, Bundle
@@ -60,6 +60,7 @@ from models import *
 if __name__ == "__main__":
     if app.config.get('DEBUG'):
         db.create_all()
+        email_dispatched.connect(logger.mail_logging)
 
     if app.config.get('FIX_URL_SCHEME'):
         # The Flask debug server doesn't process _FORWARDED_ headers,

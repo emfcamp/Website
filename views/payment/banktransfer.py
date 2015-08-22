@@ -9,7 +9,7 @@ from flask import (
     url_for,
 )
 from flask.ext.login import login_required, current_user
-from flaskext.mail import Message
+from flask_mail import Message
 
 from wtforms import SubmitField
 

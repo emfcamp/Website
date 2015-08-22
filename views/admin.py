@@ -13,7 +13,7 @@ from flask import (
     url_for, abort,
 )
 from flask.ext.login import login_required, current_user
-from flaskext.mail import Message
+from flask_mail import Message
 
 from wtforms import (
     SubmitField, BooleanField,
