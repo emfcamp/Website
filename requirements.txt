@@ -12,7 +12,7 @@ Flask-WTF==0.12
 
 # Ticket PDFs
 qrcode==5.1
-git+https://github.com/davidfischer/xhtml2pdf@d4d5067#egg=xhtml2pdf
+git+https://github.com/emfcamp/xhtml2pdf#egg=xhtml2pdf
 
 # Mailchimp
 mailsnake==1.6.3
