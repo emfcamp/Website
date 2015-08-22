@@ -105,7 +105,7 @@ def arrivals_search(query=None):
                 'email': ticket.user.email,
                 'type': ticket.type.name,
                 'receipt': ticket.receipt,
-                'paid': ticket.paid,
+                'state': ticket.payment.state,
                 'action': {},
             }
             if badge:
