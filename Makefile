@@ -13,9 +13,10 @@ run:
 
 init:
 	virtualenv ./env
+	$(ENV) pip install -U pip wheel setuptools
 
 update:
-	$(ENV) pip install -r ./requirements.txt --use-mirrors
+	$(ENV) pip install -r ./requirements.txt
 
 clean:
 	rm -rf ./env
