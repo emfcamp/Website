@@ -60,7 +60,8 @@ If you would like to change the port that the site uses you can set this in main
     app.run(processes=2, port=8888)
 ```
 
-You can also use this to make the site accessible outside of your computer:
+You can also use this to make the site accessible outside of your computer.
+Only do this if you're sure you know what you're doing.
 
 ```python
     app.run(processes=2, host="0.0.0.0")
