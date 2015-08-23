@@ -1,6 +1,6 @@
 import os
 import csv
-import requests
+import json
 from main import app
 from views import feature_flag
 
@@ -57,24 +57,30 @@ def about():
 @app.route("/talks/")
 @feature_flag('TICKETS_SITE')
 def talks():
-    data = []
-    req = requests.get('https://frab.emfcamp.org/en/EMF2014/public/events.json')
-    for event in req.json['conference_events']['events']:
+    return redirect(url_for('talks_2014'))
+
+@app.route("/talks/2014")
+@feature_flag('TICKETS_SITE')
+def talks_2014():
+    talks = []
+    talk_path = os.path.abspath(os.path.join(__file__, '..', '..', 'talks', '2014'))
+    data = json.load(open(os.path.join(talk_path, 'events.json'), 'r'))
+    for event in data['conference_events']['events']:
         if event['type'] not in ('lecture', 'workshop', 'other'):
             continue
-        data.append((", ".join(map(lambda speaker: speaker['full_public_name'], event['speakers'])),
+        talks.append((", ".join(map(lambda speaker: speaker['full_public_name'], event['speakers'])),
                      event['title'],
                      event['abstract']
                      ))
 
-    return render_template('talks_2014.html', talks=data)
+    return render_template('talks_2014.html', talks=talks)
 
 @app.route("/talks/2012")
 @feature_flag('TICKETS_SITE')
 def talks_2012():
 
     days = {}
-    talk_path = os.path.abspath(os.path.join(__file__, '..', '..', 'talks'))
+    talk_path = os.path.abspath(os.path.join(__file__, '..', '..', 'talks', '2012'))
     for day in ('friday', 'saturday', 'sunday'):
         reader = csv.reader(open(os.path.join(talk_path, '%s.csv' % day), 'r'))
         rows = []
@@ -83,7 +89,7 @@ def talks_2012():
 
         days[day] = rows
 
-    return render_template('talks.html', **days)
+    return render_template('talks_2012.html', **days)
 
 
 @app.route("/about/company")
