@@ -50,6 +50,11 @@ WTForms==2.0.2
 Flask-Script==2.0.5
 Flask-Login==0.2.11
 
+# gunicorn
+gunicorn==19.3.0
+greenlet==0.4.7
+eventlet==0.17.4
+
 # ticket PDFs
 qrcode==5.1
 git+https://github.com/emfcamp/xhtml2pdf#egg=xhtml2pdf
