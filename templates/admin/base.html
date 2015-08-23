@@ -27,7 +27,7 @@
     </header>
     <div class="row">
         <nav class="col-md-3">
-            <ul class="nav nav-pills nav-stacked">
+            <ul class="nav navbar-nav">
                 {% if current_user.admin %}
                 <li {% if nav_active == 'admin_txns' -%} class="active" {%- endif %}><a href="{{ url_for('admin_txns') }}">
                     Bank transfers <span class="badge">{{ unreconciled_count }}</span>
