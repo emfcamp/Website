@@ -1,85 +1,79 @@
-# Jinja
-Jinja2==2.8
+# from pip/setuptools/pyopenssl
+wheel==0.24.0
+cffi==1.2.1
+cryptography==1.0
+enum34==1.0.4
+idna==2.0
+ipaddress==1.0.14
+ndg-httpsclient==0.4.0
+pyasn1==0.1.8
+pycparser==2.14
+pyOpenSSL==0.15.1
+six==1.9.0
 
-# Flask
+# basic/shared dependencies
+decorator==4.0.2
+certifi==2015.4.28
+iso8601==0.1.10
+lxml==3.4.4
+python-Levenshtein==0.12.0
+simplejson==3.8.0
+requests==2.7.0
+
+# web framework
 Flask==0.10.1
-Flask-Assets==0.10
-Flask-Login==0.2.11
-Flask-Mail==0.9.1
-Flask-Script==2.0.5
+Werkzeug==0.10.4
+Jinja2==2.8
+MarkupSafe==0.23
+itsdangerous==0.24
+
+# database
 Flask-SQLAlchemy==2.0
-Flask-WTF==0.12
-
-# Ticket PDFs
-qrcode==5.1
-git+https://github.com/emfcamp/xhtml2pdf#egg=xhtml2pdf
-
-# Mailchimp
-mailsnake==1.6.3
-
-# Payments
-gocardless==0.5.3
-stripe==1.24.1
-ofxparse==0.14
-
-# Database
 SQLAlchemy==1.0.8
 psycopg2==2.6.1
 py-bcrypt==0.4
 
-# utils
+# assets
+Flask-Assets==0.11
+webassets==0.11
 cssmin==0.2.0
-decorator==4.0.2
 
-# Secondary requirements
-# Flask (+plugins) requirements
-itsdangerous==0.24
-Werkzeug==0.10.4
-wsgiref==0.1.2
-webassets==0.10.1
-WTForms==2.0.2
+# mail
+Flask-Mail==0.9.1
 blinker==1.4
 
-# Jinja requirements
-MarkupSafe==0.23
+# forms
+Flask-WTF==0.12
+WTForms==2.0.2
 
-# qrcode requirements
-six==1.9.0
+# other Flask modules
+Flask-Script==2.0.5
+Flask-Login==0.2.11
 
-# xhtml2pdf requirements
-Pillow==2.9.0
+# ticket PDFs
+qrcode==5.1
+git+https://github.com/emfcamp/xhtml2pdf#egg=xhtml2pdf
 html5lib==0.999999
 PyPDF2==1.25.1
+Pillow==2.9.0
 reportlab==3.2.0
 
-# mailsnake requirements
-simplejson==3.8.0
-requests==2.7.0
+# Mailchimp
+mailsnake==1.6.3
 
-# Stripe and Gocardless both use six and requests
-
-# ofxparse requirements (and six)
+# payments
+gocardless==0.5.3
+stripe==1.25.0
+ofxparse==0.14
 beautifulsoup4==4.4.0
 
-# Unknown requirements
+# testing
 flake8==2.4.1
-BeautifulSoup==3.2.1
-argparse==1.3.0
-certifi==2015.04.28
-chardet==2.3.0
-eventlet==0.17.4
-greenlet==0.4.7
-gunicorn==19.3.0
-iso8601==0.1.10
-lamson==1.3.4
-lockfile==0.10.2
-lxml==3.4.4
 mock==1.3.0
+mccabe==0.2.1
+pep8==1.5.7
+pyflakes==0.8.1
 nose==1.3.7
-oauthlib==1.0.1
-pyasn1==0.1.8
-python-daemon==2.0.5
-python-Levenshtein==0.12.0
-python-modargs==1.7
-rsa==3.2
+pbr==1.5.0
+funcsigs==0.4
 

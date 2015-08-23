@@ -12,11 +12,18 @@ run:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./main.py
 
 init:
-	virtualenv ./env
-	$(ENV) pip install -U pip wheel setuptools
+	virtualenv --clear ./env
 
 update:
+	$(ENV) pip install -U pip wheel setuptools
+	$(ENV) pip install ndg-httpsclient
 	$(ENV) pip install -r ./requirements.txt
+
+outdated:
+	$(ENV) pip list --outdated
+
+listdepends:
+	$(ENV) pip list|cut -d\  -f1|while read x; do echo $$x $$(pip show $$x|grep Requires); done
 
 clean:
 	rm -rf ./env

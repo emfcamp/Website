@@ -12,9 +12,9 @@ Requirements
 Starting
 ========
 ```
-sudo apt-get install python-dev python-virtualenv libxml2-dev libxslt-dev postgresql-server-dev-9.1
+sudo apt-get install python-dev python-virtualenv libxml2-dev libxslt-dev libffi-dev postgresql-server-dev-9.1
 make init
-make update
+make update # may take a few minutes if you don't have cached .whl files
 make data
 ```
 
