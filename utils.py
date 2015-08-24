@@ -199,7 +199,7 @@ class CreateTickets(Command):
         #
 
         data = [
-            #(order, code, name, capacity, max per person, GBP, EUR, Description)
+            # (order, code, name, capacity, max per person, GBP, EUR, Description)
             (0, 'full_free',
                 'Full Camp Ticket (Complimentary)', 1, 1, 0, 0, None),
             (1, 'full_discount',
@@ -258,7 +258,7 @@ class CreateTickets(Command):
             db.session.commit()
 
         app.logger.info('Tickets refreshed')
-        
+
 class CreateTicketTokens(Command):
     def run(self):
         tokens = [
@@ -274,36 +274,36 @@ class CreateTicketTokens(Command):
 
 
 class MakeAdmin(Command):
-  """
-    Make userid one an admin for testing purposes.
-  """
-  option_list = (Option('-u', '--userid', dest='userid', help="The userid to make an admin (defaults to 1)"),)
+    """
+      Make userid one an admin for testing purposes.
+    """
+    option_list = (Option('-u', '--userid', dest='userid', help="The userid to make an admin (defaults to 1)"),)
 
-  def run(self, userid):
-    if not userid:
-      userid = 1
-    user = User.query.get(userid)
-    user.admin = True
-    s = db.object_session(user)
-    s.commit()
+    def run(self, userid):
+        if not userid:
+            userid = 1
+        user = User.query.get(userid)
+        user.admin = True
+        s = db.object_session(user)
+        s.commit()
 
-    print '%s is now an admin' % (user.name)
+        print '%s is now an admin' % (user.name)
 
 class MakeArrivals(Command):
-  """
-    Make userid one an arrivals operator for testing purposes.
-  """
-  option_list = (Option('-u', '--userid', dest='userid', help="The userid to make an arrivals operator (defaults to 1)"),)
+    """
+      Make userid one an arrivals operator for testing purposes.
+    """
+    option_list = (Option('-u', '--userid', dest='userid', help="The userid to make an arrivals operator (defaults to 1)"),)
 
-  def run(self, userid):
-    if not userid:
-      userid = 1
-    user = User.query.get(userid)
-    user.arrivals = True
-    s = db.object_session(user)
-    s.commit()
+    def run(self, userid):
+        if not userid:
+            userid = 1
+        user = User.query.get(userid)
+        user.arrivals = True
+        s = db.object_session(user)
+        s.commit()
 
-    print '%s is now an arrivals operator' % (user.name)
+        print '%s is now an arrivals operator' % (user.name)
 
 
 class SendTickets(Command):

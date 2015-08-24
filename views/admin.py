@@ -236,7 +236,7 @@ def make_admin():
                             db.session.commit()
                 return redirect(url_for('make_admin'))
         adminform = MakeAdminForm(formdata=None)
-        return render_template('admin/users-make-admin.html', users=users, adminform = adminform)
+        return render_template('admin/users-make-admin.html', users=users, adminform=adminform)
     else:
         return(('', 404))
 
@@ -267,7 +267,7 @@ def make_arrivals():
                             db.session.commit()
                 return redirect(url_for('make_arrivals'))
         arrivalsform = MakeArrivalsForm(formdata=None)
-        return render_template('admin/users-make-arrivals.html', users=users, arrivalsform = arrivalsform)
+        return render_template('admin/users-make-arrivals.html', users=users, arrivalsform=arrivalsform)
     else:
         return(('', 404))
 
