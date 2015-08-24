@@ -6,7 +6,7 @@ This is to confirm that you've bought
 
 Your tickets are:
 
-{% include "email-tickets.txt" %}
+{% include "emails/email-tickets.txt" %}
 
 Your bill ID from GoCardless was {{ payment.gcid | gcid }}.  You can view this
 by logging into your account at http://www.gocardless.com/

@@ -112,7 +112,7 @@ def gocardless_complete(payment_id):
     msg = Message("Your EMF ticket purchase",
         sender=app.config['TICKETS_EMAIL'],
         recipients=[payment.user.email])
-    msg.body = render_template("tickets-purchased-email-gocardless.txt",
+    msg.body = render_template("emails/tickets-purchased-email-gocardless.txt",
         user=payment.user, payment=payment)
     mail.send(msg)
 
@@ -273,7 +273,7 @@ def gocardless_bill_paid(resource, action, data):
         msg = Message("Your EMF ticket payment has been confirmed",
             sender=app.config['TICKETS_EMAIL'],
             recipients=[payment.user.email])
-        msg.body = render_template("tickets-paid-email-gocardless.txt",
+        msg.body = render_template("emails/tickets-paid-email-gocardless.txt",
             user=payment.user, payment=payment)
         mail.send(msg)
 

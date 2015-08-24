@@ -199,7 +199,7 @@ def admin_txn_reconcile(txn_id, payment_id):
             msg = Message("Electromagnetic Field ticket purchase update",
                           sender=app.config['TICKETS_EMAIL'],
                           recipients=[payment.user.email])
-            msg.body = render_template("tickets-paid-email-banktransfer.txt",
+            msg.body = render_template("emails/tickets-paid-email-banktransfer.txt",
                           user=payment.user, payment=payment)
             mail.send(msg)
 
@@ -345,7 +345,7 @@ def admin_send_reminder(payment_id):
             msg = Message("Electromagnetic Field ticket purchase update",
                           sender=app.config['TICKETS_EMAIL'],
                           recipients=[payment.user.email])
-            msg.body = render_template("tickets-reminder.txt", payment=payment)
+            msg.body = render_template("emails/tickets-reminder.txt", payment=payment)
             mail.send(msg)
 
             payment.reminder_sent = True

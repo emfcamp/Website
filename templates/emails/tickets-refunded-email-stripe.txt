@@ -3,7 +3,7 @@ Payment {{ payment.id }} for {{ payment.amount | price(payment.currency) }} belo
 
 Ticket details:
 
-{% include "email-tickets.txt" %}
+{% include "emails/email-tickets.txt" %}
 
 Please check the Stripe console for more details.
 

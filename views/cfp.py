@@ -112,8 +112,7 @@ def cfp(cfp_type='talk'):
                      sender=app.config['CONTENT_EMAIL'],
                      recipients=[cfp.email])
 
-        msg.body = render_template('cfp-submission.txt',
-                      cfp=cfp, type=cfp_type)
+        msg.body = render_template('emails/cfp-submission.txt', cfp=cfp, type=cfp_type)
         mail.send(msg)
 
         return redirect(url_for('cfp_complete'))

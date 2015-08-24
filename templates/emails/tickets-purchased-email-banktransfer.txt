@@ -18,7 +18,7 @@ received.
 
 Your tickets are:
 
-{% include "email-tickets.txt" %}
+{% include "emails/email-tickets.txt" %}
 
 How to Pay
 ----------

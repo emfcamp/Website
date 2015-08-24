@@ -9,7 +9,7 @@ This is to confirm that you've bought
 {% else %}
 Your tickets are:
 
-{% include "email-tickets.txt" %}
+{% include "emails/email-tickets.txt" %}
 {% endif %}
 
 Your charge ID from Stripe was {{ payment.chargeid }}.
