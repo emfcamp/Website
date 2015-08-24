@@ -1,0 +1,29 @@
+Hi {{ cfp.name }},
+
+This is to confirm your submission to our call for participation. We'll try to process your submission as quickly as possible. So you know this was your submission:
+
+{{ type | capitalize }}
+Title: {{ cfp.title }}
+Description: {{ cfp.description }}
+{%- if type == 'talk' %}
+Duration: {{ cfp.length }}
+{% elif type == 'workshop' %}
+Duration: {{ cfp.length }}
+Attendees: {{ cfp.attendees }}
+{% else %}{# Installation #}
+Size: {{ cfp.size }}
+{%- endif %}
+
+{%- if cfp.one_day and cfp.need_finance %}
+You also indicated that you would only be able to attend for one day and you will need financial support to attend.
+{% elif (type == 'workshop' or type == 'talk') and cfp.one_day %}
+You also indicated that you would only be able to attend for one day.
+{% elif cfp.need_finance %}
+You also indicated that you will need financial support to attend.
+{%- endif %}
+
+Any problems please contact us.
+
+Love,
+
+All the EMF team

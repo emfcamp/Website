@@ -1,4 +1,4 @@
-from main import app, db
+from main import app, db, mail
 from views import Form, feature_flag
 from models.ticket import TicketType
 from models.cfp import (
@@ -11,6 +11,7 @@ from flask import (
     url_for, abort,
 )
 from flask.ext.login import current_user
+from flask_mail import Message
 
 from wtforms.validators import Required, Email
 from wtforms import (
@@ -105,6 +106,15 @@ def cfp(cfp_type='talk'):
 
         db.session.add(cfp)
         db.session.commit()
+
+        # Send confirmation message
+        msg = Message('Electromagnetic Field CFP Submission',
+                     sender=app.config['CONTENT_EMAIL'],
+                     recipients=[cfp.email])
+
+        msg.body = render_template('cfp-submission.txt',
+                      cfp=cfp, type=cfp_type)
+        mail.send(msg)
 
         return redirect(url_for('cfp_complete'))
 
