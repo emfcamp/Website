@@ -73,4 +73,4 @@ if __name__ == "__main__":
                 request.environ['wsgi.url_scheme'] = 'https'
                 _request_ctx_stack.top.url_adapter.url_scheme = 'https'
 
-    app.run(processes=2)
+    app.run(processes=2, host="0.0.0.0")

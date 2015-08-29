@@ -12,7 +12,7 @@ Requirements
 Starting
 ========
 ```
-sudo apt-get install python-dev python-virtualenv libxml2-dev libxslt-dev libffi-dev postgresql-server-dev-9.1
+sudo apt-get install -y python-dev python-virtualenv libxml2-dev libxslt1-dev libffi-dev postgresql-server-dev-9.4 git
 make init
 make update # may take a few minutes if you don't have cached .whl files
 make data
@@ -25,6 +25,17 @@ To set up easy\_install go [here](https://pythonhosted.org/setuptools/easy_insta
 sudo easy_install virtualenv
 make init
 ```
+
+Using vagrant
+=======
+
+```
+vagrant up
+vagrant ssh
+cd /vagrant
+```
+This is running all the necassary provisioning steps (see ```provision.sh```), only the final ```make``` and
+```make admin``` is needed. Port 5000 is forwarded.
 
 Running
 =======
