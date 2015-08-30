@@ -121,6 +121,12 @@ def badge():
     return redirect('http://wiki-archive.emfcamp.org/2012/wiki/TiLDA')
 
 
+@app.route('/radio')
+@app.route('/emfm')
+def badge():
+    return redirect('https://wiki.emfcamp.org/wiki/EMFM')
+
+
 @app.route("/code-of-conduct")
 def code_of_conduct():
     return render_template('code-of-conduct.html')
