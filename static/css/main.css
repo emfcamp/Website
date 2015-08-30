@@ -270,7 +270,7 @@ tr.odd {
   font-weight: bold;
 }
 
-.hero-unit p.small {
+.jumbotron p.small {
     line-height: 14px;
     font-weight: normal;
 }
@@ -288,7 +288,7 @@ img.padit {
 	padding: 24px;
 }
 
-.ticket-info.form-horizontal .control-group {
+.ticket-info.form-horizontal .form-group {
   margin-top: 2ex;
   margin-bottom: 0;
 }
