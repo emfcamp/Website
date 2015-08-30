@@ -88,7 +88,7 @@ def signup():
         msg = Message("Welcome to Electromagnetic Field",
                 sender=app.config['TICKETS_EMAIL'],
                 recipients=[user.email])
-        msg.body = render_template("welcome-email.txt", user=user)
+        msg.body = render_template("emails/welcome-email.txt", user=user)
         mail.send(msg)
 
         return redirect(form.next.data or url_for('tickets'))
@@ -117,7 +117,7 @@ def forgot_password():
             msg = Message("EMF password reset",
                 sender=app.config['TICKETS_EMAIL'],
                 recipients=[form.email.data])
-            msg.body = render_template("reset-password-email.txt", user=form._user, reset=reset)
+            msg.body = render_template("emails/reset-password-email.txt", user=form._user, reset=reset)
             mail.send(msg)
 
         return redirect(url_for('reset_password', email=form.email.data))

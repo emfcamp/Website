@@ -89,7 +89,7 @@ def charge_stripe(payment):
     msg = Message("Your EMF ticket purchase",
         sender=app.config.get('TICKETS_EMAIL'),
         recipients=[payment.user.email])
-    msg.body = render_template("tickets-purchased-email-stripe.txt",
+    msg.body = render_template("emails/tickets-purchased-email-stripe.txt",
         user=payment.user, payment=payment)
 
     if app.config.get('RECEIPTS'):
@@ -280,7 +280,7 @@ def stripe_payment_paid(payment):
     msg = Message('Your EMF ticket payment has been confirmed',
         sender=app.config.get('TICKETS_EMAIL'),
         recipients=[payment.user.email])
-    msg.body = render_template('tickets-paid-email-stripe.txt',
+    msg.body = render_template('emails/tickets-paid-email-stripe.txt',
         user=payment.user, payment=payment)
 
     if app.config.get('RECEIPTS'):
@@ -306,7 +306,7 @@ def stripe_payment_refunded(payment):
     msg = Message('An EMF ticket payment has been refunded',
         sender=app.config.get('TICKETS_EMAIL'),
         recipients=[app.config.get('TICKETS_NOTICE_EMAIL')[1]])
-    msg.body = render_template('tickets-refunded-email-stripe.txt',
+    msg.body = render_template('emails/tickets-refunded-email-stripe.txt',
         user=payment.user, payment=payment)
     mail.send(msg)
 

@@ -101,6 +101,14 @@ def setup_logging(app):
             hdlr.INFO = sgr(GREEN)
         logger.propagate = False
 
-
 def mail_logging(message, app):
-    app.logger.info('Send mail: ' + message.subject)
+    msg = u'''
++++++ SENDING MAIL +++++
+TO:  {0.recipients}
+FROM:  {0.sender}
+SUBJECT:  {0.subject}
+---------
+{0.body}
+++++++++++
+    '''.format(message)
+    app.logger.info(msg)
