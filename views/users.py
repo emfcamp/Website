@@ -24,7 +24,8 @@ app.login_manager.login_view = 'login'
 @login_manager.user_loader
 def load_user(userid):
     user = User.query.filter_by(id=userid).first()
-    _request_ctx_stack.top.user_email = user.email
+    if user:
+        _request_ctx_stack.top.user_email = user.email
     return user
 
 
