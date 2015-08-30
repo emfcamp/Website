@@ -1,7 +1,9 @@
-ifeq ("$(wildcard ./config/live.cfg)", "")
-	SETTINGS=./config/development.cfg
-else
-	SETTINGS=./config/live.cfg
+ifeq ("$(SETTINGS)", "")
+	ifeq ("$(wildcard ./config/live.cfg)", "")
+		SETTINGS=./config/development.cfg
+	else
+		SETTINGS=./config/live.cfg
+	endif
 endif
 
 ifeq ("$(VIRTUAL_ENV)", "")
