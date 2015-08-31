@@ -26,19 +26,17 @@ mail = Mail(app)
 login_manager = LoginManager()
 
 assets = Environment(app)
-css_all = Bundle('css/main.css',
-                  output='gen/packed.css', filters='cssmin')
-css_admin = Bundle('css/admin.css',
-                   output='gen/admin-packed.css', filters='cssmin')
-css_print = Bundle('css/print.css',
-                   output='gen/print-packed.css', filters='cssmin')
-css_arrivals = Bundle('css/arrivals.css',
-                      output='gen/arrivals-packed.css', filters='cssmin')
+assets.register('css_main', Bundle('css/main.css',
+                output='gen/main-packed.css', filters='cssmin'))
+assets.register('css_admin', Bundle('css/admin.css',
+                output='gen/admin-packed.css', filters='cssmin'))
+assets.register('css_print', Bundle('css/print.css',
+                output='gen/print-packed.css', filters='cssmin'))
+assets.register('css_arrivals', Bundle('css/arrivals.css',
+                output='gen/arrivals-packed.css', filters='cssmin'))
 
-assets.register('css_all', css_all)
-assets.register('css_admin', css_admin)
-assets.register('css_print', css_print)
-assets.register('css_arrivals', css_arrivals)
+assets.register('js_main', Bundle('js/main.js',
+                output='gen/main-packed.js', filters='jsmin'))
 
 if app.config.get('TICKETS_SITE'):
     gocardless.environment = app.config['GOCARDLESS_ENVIRONMENT']

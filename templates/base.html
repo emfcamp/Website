@@ -7,13 +7,13 @@
         <title>{% block title %}Electromagnetic Field{% endblock %}</title>
         <meta property="fb:admins" content="286100493"/>
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-        {% assets "css_all" -%}
+        {% assets "css_main" -%}
         <link rel="stylesheet" href="{{ ASSET_URL }}">
         {% endassets -%}
         {% block head -%}{% endblock -%}
         <!--[if lt IE 9]>
-              <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-              <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+            <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
         <link rel="shortcut icon" href="/favicon.ico">
     </head>
@@ -21,89 +21,73 @@
 {% block document %}
 <div class="container">
     <div class="main-row">
-       <div class="col-md-10 col-md-offset-1 main-column">
-        <header>
-          <h1><a href="/"><div id="logo" alt="Logo"></div></a></h1>
-          {#
-          <div id="header-text">August 29<sup>th</sup>&ndash;31<sup>st</sup> 2014<br/>
-               Bletchley, UK</div>
-           #}
+        <div class="col-md-10 col-md-offset-1 main-column">
+            <header>
+                <h1><a href="/"><div id="logo" alt="Logo"></div></a></h1>
+                {#
+                <div id="header-text">August 29<sup>th</sup>&ndash;31<sup>st</sup> 2014<br/>
+                     Bletchley, UK</div>
+                #}
 
-          <div id="menu-container">
-            <ul class="menu">
-              <li><a href="{{ url_for('about') }}">About</a>
-              <li><a target="_blank" href="http://blog.emfcamp.org">Blog</a>
-              <li><a href="https://frab.emfcamp.org/en/EMF2014/public/schedule/2">Programme</a>
-              <li><a href="https://www.youtube.com/user/emfcamp1/videos">Videos</a>
-              <li><a href="{{ url_for('sponsors') }}">Sponsors</a>
-            </ul>
-          </div>
-          <div style="clear:both"></div>
-        </header>
-          <div id="main-content" class="{{ main_class }}">
-              {% for message in get_flashed_messages() -%}
-                  <div class="alert alert-warning">{{ message }}</div>
-              {% endfor -%}
-              {% block body -%}{% endblock -%}
-              <div class="push"></div>
+                <div id="menu-container">
+                    <ul class="menu">
+                        <li><a href="{{ url_for('about') }}">About</a>
+                        <li><a target="_blank" href="http://blog.emfcamp.org">Blog</a>
+                        <li><a href="https://frab.emfcamp.org/en/EMF2014/public/schedule/2">Programme</a>
+                        <li><a href="https://www.youtube.com/user/emfcamp1/videos">Videos</a>
+                        <li><a href="{{ url_for('sponsors') }}">Sponsors</a>
+                    </ul>
+                </div>
+                <div style="clear:both"></div>
+            </header>
+            <div id="main-content" class="{{ main_class }}">
+                {% for message in get_flashed_messages() -%}
+                    <div class="alert alert-warning">{{ message }}</div>
+                {% endfor -%}
+                {% block body -%}{% endblock -%}
+                <div class="push"></div>
             </div>
-        <footer>
-          <div id="bottom-menu-container">
-            <ul class="menu">
-              <li><a target="_blank" href="https://wiki.emfcamp.org">Wiki</a>
-              <li><a target="_blank" href="{{ url_for('code_of_conduct') }}">Code of Conduct</a>
+            <footer>
+                <div id="bottom-menu-container">
+                    <ul class="menu">
+                        <li><a target="_blank" href="https://wiki.emfcamp.org">Wiki</a>
+                        <li><a target="_blank" href="{{ url_for('code_of_conduct') }}">Code of Conduct</a>
 
-            {% if current_user.is_authenticated() %}
-              <li><a href="{{ url_for('tickets') }}">My tickets</a></li>
-              <li><a href="{{ url_for('logout') }}">Log out</a></li>
-            {% else %}
-              <li><a href="{{ url_for('login') }}">Log in</a></li>
-            {% endif %}
-            </ul>
-            <div class="share">
-              <a target="_blank" href="http://twitter.com/emfcamp">@emfcamp</a> |  <a target="_blank" href="https://www.facebook.com/emfcamp">facebook.com/emfcamp</a>
-            </div>
-            <div style="clear: both"></div>
-          </div>
-          <div id="credits">
-            <p>&copy; 2014 <a href="{{url_for('company')}}">Electromagnetic Field</a>.
-            Kindly hosted by <a href="http://bitfolk.com/">Bitfolk</a>.
-            </p>
-          </div>
-        </footer>
-      </div>
+                      {% if current_user.is_authenticated() %}
+                        <li><a href="{{ url_for('tickets') }}">My tickets</a></li>
+                        <li><a href="{{ url_for('logout') }}">Log out</a></li>
+                      {% else %}
+                        <li><a href="{{ url_for('login') }}">Log in</a></li>
+                      {% endif %}
+                    </ul>
+                    <div class="share">
+                      <a target="_blank" href="http://twitter.com/emfcamp">@emfcamp</a> |  <a target="_blank" href="https://www.facebook.com/emfcamp">facebook.com/emfcamp</a>
+                    </div>
+                    <div style="clear: both"></div>
+                </div>
+                <div id="credits">
+                    <p>&copy; 2014 <a href="{{url_for('company')}}">Electromagnetic Field</a>.
+                        Kindly hosted by <a href="http://bitfolk.com/">Bitfolk</a>.</p>
+                </div>
+            </footer>
+        </div>
     </div>
 </div>
 {% endblock %}
 <script src="//code.jquery.com/jquery-1.10.1.min.js"></script>
-<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-<script type="text/javascript">
-if (typeof(EMF) != 'object') var EMF = Object();
-
-EMF.debounce_submit = function() {
-    var t = $(this);
-    setTimeout(function() {
-        t.prop('disabled', true);
-        setTimeout(function() {
-            t.prop('disabled', false);
-        }, 2000);
-    }, 0);
-};
-
-$(function() {
-    $('.debounce').on('click', EMF.debounce_submit);
-});
-</script>
+{% assets "js_main" -%}
+<script src="{{ ASSET_URL }}"></script>
+{% endassets -%}
 {% block foot -%}{% endblock -%}
 {% if not config.get('DEBUG') and request.headers.get('dnt') != '1' %}
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-         })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-   ga('create', 'UA-28044531-1', 'emfcamp.org');
-   ga('send', 'pageview');
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-28044531-1', 'emfcamp.org');
+    ga('send', 'pageview');
 </script>
 {% endif %}
 </body>

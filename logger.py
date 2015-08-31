@@ -101,6 +101,9 @@ def setup_logging(app):
             hdlr.INFO = sgr(GREEN)
         logger.propagate = False
 
+        logger = logging.getLogger('iso8601.iso8601')
+        logger.setLevel(logging.INFO)
+
 def mail_logging(message, app):
     msg = u'''
 +++++ SENDING MAIL +++++

@@ -79,6 +79,7 @@ Only do this if you're sure you know what you're doing.
     PORT=8888
 ```
 
+You may also like to set `LOG_COLOR=True`, which makes it easier to distinguish SQLAlchemy log lines.
 
 Links to Documentation
 ======================

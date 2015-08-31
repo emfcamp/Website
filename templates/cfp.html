@@ -203,17 +203,17 @@
 $(function() {
 
   $('.cfp-types a').on('show.bs.tab', function(e) {
-    var prev = $(e.relatedTarget);
-    var curr = $(this);
-    var prev_tab = $(prev.data('target'));
-    var curr_tab = $(curr.data('target'));
+    var $prev = $(e.relatedTarget);
+    var $curr = $(this);
+    var $prev_tab = $($prev.data('target'));
+    var $curr_tab = $($curr.data('target'));
     $.each(['name', 'email', 'title', 'description', 'need_finance'], function(i, f) {
-      var curr_f = curr_tab.find('[name=' + f + ']');
-      var prev_f = prev_tab.find('[name=' + f + ']');
-      if (curr_f.attr('type') == 'checkbox') {
-          curr_f.prop('checked', prev_f.prop('checked'));
+      var $curr_f = $curr_tab.find('[name=' + f + ']');
+      var $prev_f = $prev_tab.find('[name=' + f + ']');
+      if ($curr_f.attr('type') == 'checkbox') {
+          $curr_f.prop('checked', $prev_f.prop('checked'));
       } else {
-          curr_f.val(prev_f.val());
+          $curr_f.val($prev_f.val());
       }
     });
 
@@ -221,17 +221,17 @@ $(function() {
   });
 
   $('.show-remaining').each(function() {
-    var t = $(this);
-    var field_sel = t.data('for');
-    var field = t.closest('form').find('[name=' + field_sel + ']');
-    var max_length = t.data('max');
-    field.on('change keydown keyup', function() {
+    var $t = $(this);
+    var field_sel = $t.data('for');
+    var $field = $t.closest('form').find('[name=' + field_sel + ']');
+    var max_length = $t.data('max');
+    $field.on('change keydown keyup', function() {
       var length = this.value.length;
       var remaining = max_length - length;
-      $('.remaining', t).text(remaining);
-      $('.too-long', t).toggle(remaining < 0);
+      $('.remaining', $t).text(remaining);
+      $('.too-long', $t).toggle(remaining < 0);
     }).change();
-    t.removeClass('hidden');
+    $t.removeClass('hidden');
   });
 });
 </script>

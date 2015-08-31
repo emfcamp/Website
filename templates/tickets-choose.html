@@ -102,10 +102,10 @@ EMF.format_price = function(amount, currency, after) {
 EMF.update_currency = function() {
   EMF.user_currency = $('#currency_code').val();
   $('.ticket-type').each(function() {
-    var t = $(this);
-    var price = t.data('price-' + EMF.user_currency.toLowerCase());
-    t.data('price', price);
-    t.find('.price').text(EMF.format_price(price, EMF.user_currency));
+    var $t = $(this);
+    var price = $t.data('price-' + EMF.user_currency.toLowerCase());
+    $t.data('price', price);
+    $t.find('.price').text(EMF.format_price(price, EMF.user_currency));
   });
 };
 EMF.update_total = function() {
