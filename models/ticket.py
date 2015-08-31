@@ -71,6 +71,10 @@ class TicketType(db.Model):
 
         return min(self.limit - user_count, self.capacity - count)
 
+    @property
+    def tickets(self):
+        return Ticket.query.filter_by(code=self.code).all()
+
 
 class TicketPrice(db.Model):
     __tablename__ = 'ticket_price'
@@ -128,7 +132,7 @@ class Ticket(db.Model):
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
     attribs = db.relationship("TicketAttrib", backref="ticket", cascade='all')
     checkin = db.relationship('TicketCheckin', uselist=False, backref='ticket', cascade='all')
-    type = db.relationship(TicketType, backref="tickets")
+    type = db.relationship('TicketType')
 
     def __init__(self, type=None, code=None):
         if type:
