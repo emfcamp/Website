@@ -63,19 +63,20 @@ make data
 
 Viewing
 =======
-The site will run on [http://localhost:5000](http://localhost:5000).
+The site will run by default on [http://localhost:5000](http://localhost:5000).
 
-If you would like to change the port that the site uses you can set this in main.py (last line):
+If you would like to change the port that the site uses you can set this in development.cfg by adding:
 
 ```python
-    app.run(processes=2, port=8888)
+    PORT=8888
 ```
 
-You can also use this to make the site accessible outside of your computer.
+You can also make the site accessible outside of your computer.
 Only do this if you're sure you know what you're doing.
 
 ```python
-    app.run(processes=2, host="0.0.0.0")
+    HOST='0.0.0.0'
+    PORT=8888
 ```
 
 
