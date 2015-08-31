@@ -12,7 +12,7 @@ Requirements
 Starting
 ========
 ```
-sudo apt-get install python-dev python-virtualenv libxml2-dev libxslt-dev libffi-dev postgresql-server-dev-9.1
+sudo apt-get install -y python-dev python-virtualenv libxml2-dev libxslt1-dev libffi-dev postgresql-server-dev-9.4 git
 make init
 make update # may take a few minutes if you don't have cached .whl files
 make data
@@ -25,6 +25,17 @@ To set up easy\_install go [here](https://pythonhosted.org/setuptools/easy_insta
 sudo easy_install virtualenv
 make init
 ```
+
+Using vagrant
+=======
+
+```
+vagrant up
+vagrant ssh
+cd /vagrant
+```
+This is running all the necassary provisioning steps (see ```provision.sh```), only the final ```make``` and
+```make admin``` is needed. Port 5000 is forwarded.
 
 Running
 =======
@@ -52,19 +63,20 @@ make data
 
 Viewing
 =======
-The site will run on [http://localhost:5000](http://localhost:5000).
+The site will run by default on [http://localhost:5000](http://localhost:5000).
 
-If you would like to change the port that the site uses you can set this in main.py (last line):
+If you would like to change the port that the site uses you can set this in development.cfg by adding:
 
 ```python
-    app.run(processes=2, port=8888)
+    PORT=8888
 ```
 
-You can also use this to make the site accessible outside of your computer.
+You can also make the site accessible outside of your computer.
 Only do this if you're sure you know what you're doing.
 
 ```python
-    app.run(processes=2, host="0.0.0.0")
+    HOST='0.0.0.0'
+    PORT=8888
 ```
 
 
