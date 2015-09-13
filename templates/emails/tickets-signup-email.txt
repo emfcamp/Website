@@ -1,0 +1,20 @@
+Hi {{ user.name }},
+
+Thanks for your interest in purchasing tickets for Electromagnetic Field.
+You're ticket is not confirmed yet, but you're getting closer!
+
+To manage your ticket payment process we've created you an account. Your
+temporary password is: {{temporary_password}}
+
+You can log in on {{ external_url('login') }} and change your password if
+you want to.
+
+You can keep track of your ticket purchases here:
+
+{{ external_url('tickets') }}
+
+See you soon at Electromagnetic Field 2014!
+
+Love,
+
+All the EMF team
