@@ -54,15 +54,12 @@ def pay_choose():
         user = User(email, "NULL")
         user.generate_random_password()
         db.session.add(user)
-        print(1)
         try:
             db.session.commit()
-            print(1.1)
         except IntegrityError, e:
             app.logger.warn('Adding user raised %r, assuming duplicate email', e)
             flash("This email address %s is already in use. Please log in, or reset your password if you've forgotten it." % (email))
             return redirect(url_for('tickets_info'))
-        print(2)
         login_user(user)
 
         # send a welcome email.
@@ -71,7 +68,6 @@ def pay_choose():
                 recipients=[user.email])
         msg.body = render_template("emails/tickets-signup-email.txt", user=user)
         mail.send(msg)
-        print(3)
         app.logger.info('Created new user with email %s and id %s', email, user.id)
         current_user.id = user.id
 
