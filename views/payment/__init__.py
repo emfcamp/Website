@@ -52,7 +52,7 @@ def pay_choose():
         # ToDo: Make user.name optional. See #223
         email = session['anonymous_account_email']
         user = User(email, "NULL")
-        temporary_password = user.generate_random_password()
+        user.generate_random_password()
         db.session.add(user)
         print(1)
         try:
@@ -69,7 +69,7 @@ def pay_choose():
         msg = Message("Welcome to Electromagnetic Field",
                 sender=app.config['TICKETS_EMAIL'],
                 recipients=[user.email])
-        msg.body = render_template("emails/tickets-signup-email.txt", user=user, temporary_password=temporary_password)
+        msg.body = render_template("emails/tickets-signup-email.txt", user=user)
         mail.send(msg)
         print(3)
         app.logger.info('Created new user with email %s and id %s', email, user.id)
