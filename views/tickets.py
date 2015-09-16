@@ -6,7 +6,7 @@ from views import (
 )
 
 from models.ticket import (
-    TicketType, Ticket, TicketAttrib, TicketToken,
+    TicketType, Ticket, TicketAttrib,
     validate_safechars,
 )
 from models.payment import Payment
@@ -159,11 +159,11 @@ def tickets():
 @app.route("/tickets/token/")
 @app.route("/tickets/token/<token>")
 def tickets_token(token=None):
-    if TicketToken.types(token):
-        session['ticket_token'] = token
-    else:
-        del session['ticket_token']
-        flash('Ticket token was invalid')
+    # if TicketToken.types(token):
+    #     session['ticket_token'] = token
+    # else:
+    #     del session['ticket_token']
+    #     flash('Ticket token was invalid')
 
     return redirect(url_for('tickets_choose'))
 
