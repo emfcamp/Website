@@ -23,25 +23,40 @@ class CheckinStateException(Exception):
 
 class TicketType(db.Model):
     __tablename__ = 'ticket_type'
-    code = db.Column(db.String, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
-    notice = db.Column(db.String)
-    capacity = db.Column(db.Integer, nullable=False)
-    limit = db.Column(db.Integer, nullable=False)
     order = db.Column(db.Integer, nullable=False)
+    # NOTE limit != capacity. Maximum number of tickets (i.e. 1500) should
+    # be imposed in code, not db.
+    # Should possibly be enum
+    admits = db.Column(db.String, nullable=False)
+    type_limit = db.Column(db.Integer, nullable=False)
+    # Nullable fields
+    expires = db.Column(db.DateTime)
+    description = db.Column(db.String)
+    discount_token = db.Column(db.String)
+    personal_limit = db.Column(db.Integer)
 
-    token_only = ['full_free', 'full_discount']
+    admits_types = ('full', 'kid', 'campervan', 'car', 'other')
 
-    def __init__(self, code, name, capacity, limit, order, notice=None):
-        self.code = code
+    def __init__(self, id, order, admits, name, type_limit, expires=None,
+                 discount_token=None, description=None, personal_limit=None):
+        if admits not in self.admits_types:
+            raise Exception('unknown admission type')
+
+        self.id = id
         self.name = name
-        self.capacity = capacity
-        self.limit = limit
         self.order = order
-        self.notice = notice
+        self.admits = admits
+        self.expires = expires
+        self.type_limit = type_limit
+        self.description = description
+        self.discount_token = discount_token
+        self.personal_limit = personal_limit
 
     def __repr__(self):
-        return "<TicketType: %s>" % (self.name)
+        return "<TicketType: (Name: %s, Admits: %s, Token: %s)>" % \
+            (self.name, self.admits, self.discount_token)
 
     def get_price(self, currency):
         for price in self.prices:
@@ -51,11 +66,16 @@ class TicketType(db.Model):
     def get_price_ex_vat(self, currency):
         return self.get_price(currency) / Decimal('1.2')
 
-    def user_limit(self, user, token):
+    def is_token_valid(self, discount_token):
+        if not self.discount_token:
+            return True
+        return self.discount_token == discount_token and \
+               self.expires >= datetime.utcnow()
+
+    def user_limit(self, user, discount_token):
         # This could do something more interesting, like allow extra tickets
-        if self.code in self.token_only:
-            if self not in TicketToken.types(token):
-                return 0
+        if discount_token and not self.is_token_valid(discount_token):
+            return 0
 
         if user.is_authenticated():
             user_count = user.tickets. \
@@ -65,11 +85,11 @@ class TicketType(db.Model):
         else:
             user_count = 0
 
-        count = Ticket.query.filter_by(type=self). \
-            filter(or_(Ticket.expires >= datetime.utcnow(), Ticket.paid)). \
-            count()
+        count = Ticket.query.filter_by(type=type). \
+                filter(or_(Ticket.expires >= datetime.utcnow(), Ticket.paid)). \
+                count()
 
-        return min(self.limit - user_count, self.capacity - count)
+        return min(self.personal_limit - user_count, self.type_limit - count)
 
     @property
     def tickets(self):
@@ -79,7 +99,7 @@ class TicketType(db.Model):
 class TicketPrice(db.Model):
     __tablename__ = 'ticket_price'
     id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.String, db.ForeignKey('ticket_type.code'), nullable=False)
+    code = db.Column(db.Integer, db.ForeignKey('ticket_type.id'), nullable=False)
     currency = db.Column(db.String, nullable=False)
     price_int = db.Column(db.Integer, nullable=False)
     type = db.relationship(TicketType, backref="prices")
@@ -97,33 +117,11 @@ class TicketPrice(db.Model):
         self.price_int = int(val * 100)
 
 
-class TicketToken(db.Model):
-    __tablename__ = 'ticket_token'
-    id = db.Column(db.Integer, primary_key=True)
-    token = db.Column(db.String, nullable=False, index=True)
-    expires = db.Column(db.DateTime, nullable=False)
-    code = db.Column(db.String, db.ForeignKey('ticket_type.code'), nullable=False)
-    type = db.relationship(TicketType, backref="tokens")
-
-    def __init__(self, token, expires):
-        self.token = token
-        self.expires = expires
-
-    @classmethod
-    def types(cls, token):
-        if not token:
-            return []
-        tokens = TicketToken.query.filter_by(token=token). \
-            filter(TicketToken.expires > datetime.utcnow())
-        ticket_types = [t.type for t in tokens.all()]
-        return ticket_types
-
-
 class Ticket(db.Model):
     __tablename__ = 'ticket'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    code = db.Column(db.String, db.ForeignKey('ticket_type.code'), nullable=False, index=True)
+    type_id = db.Column(db.Integer, db.ForeignKey('ticket_type.id'), nullable=False, index=True)
     paid = db.Column(db.Boolean, default=False, nullable=False, index=True)
     expires = db.Column(db.DateTime, nullable=False)
     receipt = db.Column(db.String, unique=True)
@@ -278,16 +276,17 @@ def check_capacity(session, flush_context, instances):
         # Don't block unrelated updates
         return
 
-    # Any admission tickets count towards the full ticket total
-    fulls = TicketType.query.filter(TicketType.code.like('full%')).all()
-    kids = TicketType.query.filter(TicketType.code.like('kids%')).all()
-    admission_types = fulls + kids
-    people = sum((totals.get(type, 0) for type in admission_types))
+# TODO this bit....
+    # # Any admission tickets count towards the full ticket total
+    # fulls = TicketType.query.filter(TicketType.code.like('full%')).all()
+    # kids = TicketType.query.filter(TicketType.code.like('kids%')).all()
+    # admission_types = fulls + kids
+    # people = sum((totals.get(type, 0) for type in admission_types))
 
-    if people > TicketType.query.get('full').capacity:
-        raise TicketError('No more admission tickets available')
+    # if people > TicketType.query.get('full').capacity:
+    #     raise TicketError('No more admission tickets available')
 
-    for type, count in totals.items():
+    # for type, count in totals.items():
 
-        if count > type.capacity:
-            raise TicketError('No more tickets of type %s available' % type.name)
+    #     if count > type.capacity:
+    #         raise TicketError('No more tickets of type %s available' % type.name)
