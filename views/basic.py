@@ -8,11 +8,11 @@ from models.ticket import TicketType
 from models.payment import StripePayment
 
 from mailsnake import MailSnake
-from mailsnake.exceptions import MailSnakeException
+from mailsnake.exceptions import MailSnakeException, ListAlreadySubscribedException
 
 from flask import (
     render_template, redirect, request, flash,
-    url_for, send_from_directory, abort,
+    url_for, send_from_directory, abort, Markup,
 )
 from jinja2.exceptions import TemplateNotFound
 
@@ -39,9 +39,19 @@ def main_post():
         email = request.form.get('email')
         ms.listSubscribe(id='d1798f7c80', email_address=email)
         flash('Thanks for subscribing! You will receive a confirmation email shortly.')
+
+    except ListAlreadySubscribedException, e:
+        app.logger.info('Already subscribed: %s', email)
+        if not e.message:
+            msg = Markup(e.message)
+        else:
+            msg = "You are already subscribed to our list. Please contact %s to update your settings." % app.config['TICKETS_EMAIL'][1]
+        flash(msg)
+
     except MailSnakeException, e:
         app.logger.error('Error subscribing: %s', e)
         flash('Sorry, an error occurred.')
+
     return redirect(url_for('main'))
 
 
