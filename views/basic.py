@@ -42,7 +42,7 @@ def main_post():
 
     except ListAlreadySubscribedException, e:
         app.logger.info('Already subscribed: %s', email)
-        if not e.message:
+        if e.message:
             msg = Markup(e.message)
         else:
             msg = "You are already subscribed to our list. Please contact %s to update your settings." % app.config['TICKETS_EMAIL'][1]
