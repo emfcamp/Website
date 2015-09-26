@@ -22,10 +22,11 @@ def main():
     if app.config.get('ARRIVALS_SITE'):
         return redirect(url_for('arrivals'))
 
-    full_price = TicketType.query.get('full').get_price('GBP')
+    full_price = TicketType.get_price_cheapest_full()
     if not (app.config.get('BANK_TRANSFER') or app.config.get('GOCARDLESS')):
         # Only card payment left
         full_price += StripePayment.premium('GBP', full_price)
+
     return render_template('splash.html',
         ticket_sales=app.config.get('TICKET_SALES', False),
         full_price=full_price)

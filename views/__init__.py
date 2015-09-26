@@ -125,7 +125,7 @@ def set_user_currency(currency):
 
 
 def get_basket():
-    types = [TicketType.query.get(code) for code in session.get('basket', [])]
+    types = [TicketType.query.get(id) for id in session.get('basket', [])]
 
     total = sum(tt.get_price(get_user_currency()) for tt in types)
 

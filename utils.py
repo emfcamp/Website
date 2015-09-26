@@ -196,7 +196,7 @@ def add_ticket_types(ticket_list):
 
     for row in ticket_list:
         tt = TicketType(*row[:5],
-            personal_limit=row[5], description=row[8], discount_token=row[9])
+            personal_limit=row[5], description=row[8], discount_token=row[9], expires=row[10])
         tt.prices = [TicketPrice('GBP', row[6]), TicketPrice('EUR', row[7])]
         types.append(tt)
 
@@ -255,8 +255,8 @@ class CreateTickets(Command):
                 'Caravan/Campervan Ticket', 50, 2, 30.00, 40.00,
                 "If you bring a caravan, you won't need a separate parking ticket for the towing car."),
         ]
-        # none of these tickets have tokens so don't add them
-        type_data = [ t + (None,) for t in type_data]
+        # none of these tickets have tokens or expiry dates
+        type_data = [ t + (None, None) for t in type_data]
 
         add_ticket_types(type_data)
 
@@ -268,6 +268,9 @@ class CreateTicketTokens(Command):
             (9, 0, 'full', 'Complimentary Full Camp Ticket', 1, 1, 0.0, 0.0, None, 'super-lucky'),
             (10, 1, 'full', 'Discount Full Camp Ticket', 10, 1, 70.00, 90.00, None, 'lucky')
         ]
+
+        discount_ticket_types = [ tt + (datetime.utcnow() + timedelta(days=7), )
+            for tt in discount_ticket_types]
 
         add_ticket_types(discount_ticket_types)
 
