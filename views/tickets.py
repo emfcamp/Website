@@ -69,7 +69,7 @@ ticket_forms = ['full', 'kids']
 
 
 def get_form_name(ticket_type):
-    code, _, subcode = ticket_type.code.partition('_')
+    code = ticket_type.admits
     if code not in ticket_forms:
         return None
     return code
@@ -154,11 +154,12 @@ def tickets():
 @app.route("/tickets/token/")
 @app.route("/tickets/token/<token>")
 def tickets_token(token=None):
-    # if TicketToken.types(token):
-    #     session['ticket_token'] = token
-    # else:
-    #     del session['ticket_token']
-    #     flash('Ticket token was invalid')
+    if TicketType.get_types_for_token(token):
+        session['ticket_token'] = token
+    else:
+        if 'ticket_token' in session:
+            del session['ticket_token']
+        flash('Ticket token was invalid')
 
     return redirect(url_for('tickets_choose'))
 
@@ -189,28 +190,27 @@ def tickets_choose():
     tts = TicketType.query.order_by(TicketType.order).all()
 
     token = session.get('ticket_token')
-    limits = dict((tt.code, tt.user_limit(current_user, token)) for tt in tts)
-
-    available_token_tts = [limits[code] > 0 for code in TicketType.token_only]
-    if any(available_token_tts):
-        # If the user can select token tickets, hide full tickets
-        limits['full'] = 0
+    limits = dict([(tt.id, tt.user_limit(current_user, token)) for tt in tts])
 
     if request.method != 'POST':
         # Empty form - populate ticket types
+        first_full = False
         for tt in tts:
             form.types.append_entry()
-            form.types[-1].code.data = tt.code
-            if tt.code in TicketType.token_only or tt.code == 'full':
-                # Default to one full ticket/token ticket
-                if limits[tt.code] > 0:
-                    form.types[-1].amount.data = 1
+            # Set as unicode because that's what the browser will return
+            form.types[-1].code.data = tt.id
 
-    tts = dict((tt.code, tt) for tt in tts)
+            if (not first_full) and (tt.admits == 'full') and (limits[tt.id] > 0):
+                first_full = True
+                form.types[-1].amount.data = 1
+
+
+    tts = dict((tt.id, tt) for tt in tts)
     for f in form.types:
-        f._type = tts[f.code.data]
+        t_id = int(f.code.data) # On form return this may be a string
+        f._type = tts[t_id]
 
-        values = range(limits[f.code.data] + 1)
+        values = range(limits[t_id] + 1)
         f.amount.values = values
         f._any = any(values)
 
@@ -224,7 +224,7 @@ def tickets_choose():
                 if f.amount.data:
                     tt = f._type
                     app.logger.info('Adding %s %s tickets to basket', f.amount.data, tt.name)
-                    basket += [tt.code] * f.amount.data
+                    basket += [tt.id] * f.amount.data
 
             if basket:
                 session['basket'] = basket
@@ -351,8 +351,8 @@ def render_receipt(tickets, png=False, table=False, pdf=False):
         if ticket.qrcode is None:
             ticket.create_qrcode()
 
-    entrance_tickets = tickets.filter( or_(Ticket.code.startswith('full'), Ticket.code.startswith('kids')) ).all()
-    vehicle_tickets = tickets.filter( Ticket.code.in_(['parking', 'campervan']) ).all()
+    entrance_tickets = tickets.filter( TicketType.admits.in_(['full', 'kids']) ).all()
+    vehicle_tickets = tickets.filter( TicketType.admits.in_(['car', 'campervan']) ).all()
 
     return render_template('receipt.html', user=user, format_inline_qr=format_inline_qr,
                            entrance_tickets=entrance_tickets, vehicle_tickets=vehicle_tickets,

@@ -121,7 +121,7 @@ def cfp(cfp_type='talk'):
         form.name.data = current_user.name
         form.email.data = current_user.email
 
-    full_price = TicketType.query.get('full').get_price('GBP')
+    full_price = TicketType.get_price_cheapest_full()
 
     return render_template('cfp.html', full_price=full_price,
         forms=forms, active_cfp_type=cfp_type, has_errors=bool(form.errors))
