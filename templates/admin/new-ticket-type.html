@@ -1,20 +1,44 @@
 {% extends "admin/base.html" %}
 {% set nav_active = 'ticket_types' %}
 {% block body %}
+<h2>Add a new ticket type</h2>
 
-<form method="post">
+<form method="post" class="form-horizontal">
 {{ form.hidden_tag() }}
-{{ form.name.label }}{{ form.name }}
-{{ form.order.label }}{{ form.order }}
-{{ form.admits.label }}{{ form.admits }}
-{{ form.type_limit.label }}{{ form.type_limit }}
-{{ form.personal_limit.label }}{{ form.personal_limit }}
-{{ form.expires.label }}{{ form.expires }}
-{{ form.price_gbp.label }}{{ form.price_gbp }}
-{{ form.price_eur.label }}{{ form.price_eur }}
-{{ form.discount_token.label }}{{ form.discount_token }}
-{{ form.description.label }}{{ form.description }}
-<input type="submit" value="Create">
+
+<div class="form-group">{{ form.name.label(class="col-sm-4 control-label") }}
+  <div class="col-sm-8">{{ form.name(class="form-control") }}</div>
+</div>
+<div class="form-group">{{ form.order.label(class="col-sm-4 control-label") }}
+  <div class="col-sm-8">{{ form.order(class="form-control") }}</div>
+</div>
+<div class="form-group">{{ form.admits.label(class="col-sm-4 control-label") }}
+  <div class="col-sm-8">{{ form.admits(class="list-inline") }}</div>
+</div>
+<div class="form-group">{{ form.type_limit.label(class="col-sm-4 control-label") }}
+  <div class="col-sm-8">{{ form.type_limit(class="form-control") }}</div>
+</div>
+<div class="form-group">{{ form.personal_limit.label(class="col-sm-4 control-label") }}
+  <div class="col-sm-8">{{ form.personal_limit(class="form-control") }}</div>
+</div>
+<div class="form-group">{{ form.expires.label(class="col-sm-4 control-label") }}
+  <div class="col-sm-8">{{ form.expires(class="form-control", placeholder="YYYY-MM-DD") }}</div>
+</div>
+<div class="form-group">{{ form.price_gbp.label(class="col-sm-4 control-label") }}
+  <div class="col-sm-8">{{ form.price_gbp(class="form-control") }}</div>
+</div>
+<div class="form-group">{{ form.price_eur.label(class="col-sm-4 control-label") }}
+  <div class="col-sm-8">{{ form.price_eur(class="form-control") }}</div>
+</div>
+<div class="form-group">{{ form.discount_token.label(class="col-sm-4 control-label") }}
+  <div class="col-sm-8">{{ form.discount_token(class="form-control") }}</div>
+</div>
+<div class="form-group">{{ form.description.label(class="col-sm-4 control-label") }}
+  <div class="col-sm-8">{{ form.description(class="form-control", rows="4", cols="50") }}</div>
+</div>
+<div class="form-actions pull-right">
+    {{ form.submit(class_="btn btn-success debounce") }}
+</div>
 </form>
 
 {% endblock %}
