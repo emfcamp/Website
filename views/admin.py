@@ -1,7 +1,7 @@
 from main import app, db, mail
 from models.user import User
 from models.payment import Payment, BankPayment, BankTransaction
-from models.ticket import Ticket, TicketCheckin
+from models.ticket import Ticket, TicketCheckin, TicketType, TicketPrice
 from models.cfp import Proposal
 from views import Form
 from views.payment.stripe import (
@@ -15,8 +15,9 @@ from flask import (
 from flask.ext.login import login_required, current_user
 from flask_mail import Message
 
+from wtforms.validators import Optional, Regexp
 from wtforms import (
-    SubmitField, BooleanField,
+    SubmitField, BooleanField, TextField, RadioField, DateField, IntegerField
 )
 
 from sqlalchemy import or_
@@ -207,6 +208,70 @@ def admin_txn_reconcile(txn_id, payment_id):
             return redirect(url_for('admin_txns'))
 
     return render_template('admin/txn-reconcile.html', txn=txn, payment=payment, form=form)
+
+@app.route('/admin/ticket-types', methods=['GET', 'POST'])
+@admin_required
+def ticket_types():
+    ticket_types = TicketType.query.all()
+    return render_template('admin/ticket-types.html', ticket_types=ticket_types)
+
+@app.route('/admin/ticket-types/<int:type_id>')
+@admin_required
+def ticket_type_details(type_id):
+    ticket_type = TicketType.query.get(type_id)
+    return render_template('admin/ticket-type-details.html', ticket_type=ticket_type)
+
+class TicketTypeForm(Form):
+    name = TextField('Name')
+    order = IntegerField('Order')
+    admits = RadioField('Admits', choices=[('full', 'Adult'), ('kid', 'Under 16'),
+        ('campervan', 'Campervan'), ('other', 'Other')])
+    type_limit = IntegerField('Maximum tickets to sell')
+    personal_limit = IntegerField('Maximum tickets to sell to an individual')
+    expires = DateField('Expiry Date (Optional)', [Optional()])
+    price_gbp = IntegerField('Price (GBP)')
+    price_eur = IntegerField('Price (EUR)')
+    discount_token = TextField('Discount token', [Optional(), Regexp('^[-_0-9a-zA-Z]+$')])
+    description = TextField('Description', [Optional()])
+
+@app.route('/admin/new-ticket-type/', defaults={'copy_id': -1}, methods=['GET', 'POST'])
+@app.route('/admin/new-ticket-type/<int:copy_id>', methods=['GET', 'POST'])
+@admin_required
+def new_ticket_type(copy_id):
+    form = TicketTypeForm()
+
+    if form.validate_on_submit():
+        new_id = TicketType.query.all()[-1].id + 1
+
+        expires = form.expires.data if form.expires.data else None
+        token = form.discount_token.data if form.discount_token.data else None
+        description = form.description.data if form.description.data else None
+
+        tt = TicketType(new_id, form.order.data, form.admits.data, 
+            form.name.data, form.type_limit.data, expires=expires,
+            discount_token=token, description=description,
+            personal_limit=form.personal_limit.data)
+
+        tt.prices = [TicketPrice('GBP', form.price_gbp.data), 
+                     TicketPrice('EUR', form.price_eur.data)]
+        db.session.add(tt)
+        db.session.commit()
+        return redirect(url_for('ticket_type_details', type_id=new_id))
+
+    if copy_id != -1:
+        copy_type = TicketType.query.get(copy_id)
+        form.name.data = copy_type.name
+        form.order.data = copy_type.order
+        form.admits.data = copy_type.admits
+        form.type_limit.data = copy_type.type_limit
+        form.personal_limit.data = copy_type.personal_limit
+        form.expires.data = copy_type.expires
+        form.price_gbp.data = copy_type.get_price('GBP')
+        form.price_eur.data = copy_type.get_price('EUR')
+        form.description.data = copy_type.description
+        form.discount_token.data = copy_type.discount_token
+
+    return render_template('admin/new-ticket-type.html', form=form)
 
 
 @app.route("/admin/make-admin", methods=['GET', 'POST'])

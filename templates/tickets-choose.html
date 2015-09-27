@@ -44,7 +44,7 @@
     <td>
         {{ f.hidden_tag_without('csrf_token') }}
         <label for="{{ f.amount.id }}"><b>{{ f._type.name }}</b></label>
-        {% if f._type.notice %}<p class="description">{{ f._type.notice }}</p>{% endif %}
+        {% if f._type.description %}<p class="description">{{ f._type.description }}</p>{% endif %}
     </td>
     <td>
         <span class="price">{{ f._type.get_price(user_currency) | price(user_currency) }}</span>
