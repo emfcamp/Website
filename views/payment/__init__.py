@@ -52,7 +52,7 @@ def payment_invoice(payment_id):
     payment = get_user_payment_or_abort(payment_id, allow_admin=True)
 
     invoice_lines = payment.tickets.join(TicketType). \
-        with_entities(TicketType, func.count(Ticket.code)). \
+        with_entities(TicketType, func.count(Ticket.type_id)). \
         group_by(TicketType).order_by(TicketType.order).all()
 
     ticket_sum = sum(tt.get_price_ex_vat(payment.currency) * count for tt, count in invoice_lines)

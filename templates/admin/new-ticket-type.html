@@ -1,0 +1,20 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'ticket_types' %}
+{% block body %}
+
+<form method="post">
+{{ form.hidden_tag() }}
+{{ form.name.label }}{{ form.name }}
+{{ form.order.label }}{{ form.order }}
+{{ form.admits.label }}{{ form.admits }}
+{{ form.type_limit.label }}{{ form.type_limit }}
+{{ form.personal_limit.label }}{{ form.personal_limit }}
+{{ form.expires.label }}{{ form.expires }}
+{{ form.price_gbp.label }}{{ form.price_gbp }}
+{{ form.price_eur.label }}{{ form.price_eur }}
+{{ form.discount_token.label }}{{ form.discount_token }}
+{{ form.description.label }}{{ form.description }}
+<input type="submit" value="Create">
+</form>
+
+{% endblock %}

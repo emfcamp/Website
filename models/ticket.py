@@ -29,17 +29,17 @@ class TicketType(db.Model):
     # admits should possible be an enum
     admits = db.Column(db.String, nullable=False)
     type_limit = db.Column(db.Integer, nullable=False)
+    personal_limit = db.Column(db.Integer, nullable=False)
     # Nullable fields
     expires = db.Column(db.DateTime)
     description = db.Column(db.String)
     discount_token = db.Column(db.String)
-    personal_limit = db.Column(db.Integer)
 
     # replace with capacity table?
     admits_types = ('full', 'kid', 'campervan', 'car', 'other')
 
-    def __init__(self, id, order, admits, name, type_limit, expires=None,
-                 discount_token=None, description=None, personal_limit=None):
+    def __init__(self, id, order, admits, name, type_limit, personal_limit,
+                 expires=None, discount_token=None, description=None):
         if admits not in self.admits_types:
             raise Exception('unknown admission type')
 

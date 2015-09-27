@@ -65,7 +65,7 @@ class DonationTicketForm(TicketForm):
     template = 'tickets/donation.html'
     amount = DecimalField('Donation amount')
 
-ticket_forms = ['full', 'kids']
+ticket_forms = ['full', 'kid']
 
 
 def get_form_name(ticket_type):
