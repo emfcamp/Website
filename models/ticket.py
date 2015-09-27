@@ -1,4 +1,4 @@
-from main import db
+from main import app, db
 
 from sqlalchemy.orm import Session
 from sqlalchemy import event, or_
@@ -21,31 +21,12 @@ class TicketError(Exception):
 class CheckinStateException(Exception):
     pass
 
-# class AdmissionCapacity(db.Model):
-#     __tablename__ = 'admission_capacity'
-#     code = db.Column(db.String, primary_key=True)
-#     capacity = db.Column(db.Integer, nullable=True)
-
-#     def __init__(self, code, capacity):
-#         self.code = code
-#         self.capacity = capacity
-
-#     def check_capacity(self):
-#         count = Ticket.query.join(TicketType).\
-#             filter_by(TicketType.admits = self.code).\
-#             count()
-
-#         return self.capacity - count
-
-
 class TicketType(db.Model):
     __tablename__ = 'ticket_type'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     order = db.Column(db.Integer, nullable=False)
-    # NOTE limit != capacity. Maximum number of tickets (i.e. 1500) should
-    # be imposed in code, not db.
-    # Should possibly be enum
+    # admits should possible be an enum
     admits = db.Column(db.String, nullable=False)
     type_limit = db.Column(db.Integer, nullable=False)
     # Nullable fields
@@ -84,63 +65,50 @@ class TicketType(db.Model):
     def get_price_ex_vat(self, currency):
         return self.get_price(currency) / Decimal('1.2')
 
+    def is_in_date(self):
+        return self.expires is None or self.expires >= datetime.utcnow()
+
     def is_correct_discount_token(self, discount_token):
         if not self.discount_token:
             return True
-        return self.discount_token == discount_token and \
-               (self.expires >= datetime.utcnow() or \
-                self.expires is None)
+        return self.discount_token == discount_token and self.is_in_date()
+
+    def get_sold(self, query=None):
+        query = Ticket.query if query is None else query
+
+        return query.filter_by(type=self).\
+            filter(or_(Ticket.expires >= datetime.utcnow(), Ticket.paid)). \
+            count()
+
+    def get_remaining(self):
+        return self.type_limit - self.get_sold()
 
     def user_limit(self, user, discount_token):
-        # This could do something more interesting, like allow extra tickets
-        if not self.is_correct_discount_token(discount_token):
+        if not self.is_in_date() or not self.is_correct_discount_token(discount_token):
             return 0
 
         if user.is_authenticated():
-            user_count = user.tickets. \
-                filter_by(type=self). \
-                filter(or_(Ticket.expires >= datetime.utcnow(), Ticket.paid)). \
-                count()
+            # How many have been sold to this user
+            user_count = self.get_sold( user.tickets )
         else:
             user_count = 0
 
         return min(self.personal_limit - user_count, self.get_remaining())
 
-    def get_remaining(self):
-        sold_or_reserved = Ticket.query.filter_by(type=self).\
-            filter(or_(Ticket.expires >= datetime.utcnow(), Ticket.paid)). \
-            count()
-
-        return self.type_limit - sold_or_reserved
-
-    @property
-    def tickets(self):
-        return Ticket.query.filter_by(code=self.code).all()
-
     @classmethod
-    def get_types_for_token(cls, token):
-        return TicketType.query. \
-            filter_by(discount_token=token). \
-            filter(or_(TicketType.expires > datetime.utcnow(),
-                TicketType.expires.is_(None))). \
-            all()
+    def get_types_for_token(cls, token, query=None):
+        query = TicketType.query if query is None else query
+        return query.filter_by(discount_token=token).\
+                     filter(or_(TicketType.expires > datetime.utcnow(),
+                                TicketType.expires.is_(None))).\
+                     all()
 
     @classmethod
     def get_price_cheapest_full(cls, discount_token=None):
-        types = TicketType.query.\
-            filter_by(admits='full').\
-            filter(TicketType.discount_token.is_(discount_token),
-                or_(TicketType.expires > datetime.utcnow(),
-                    TicketType.expires.is_(None)))
+        types = cls.get_types_for_token(discount_token,
+                    TicketType.query.filter_by(admits='full') )
 
-        min_price = float('inf')
-
-        for tt in types:
-            if tt.get_remaining() > 0:
-                price = tt.get_price('GBP')
-                min_price = price if price < min_price else min_price
-
-        return min_price
+        return min([ tt.get_price('GBP') for tt in types if tt.get_remaining() > 0 ])
 
 
 class TicketPrice(db.Model):
@@ -177,7 +145,7 @@ class Ticket(db.Model):
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
     attribs = db.relationship("TicketAttrib", backref="ticket", cascade='all')
     checkin = db.relationship('TicketCheckin', uselist=False, backref='ticket', cascade='all')
-    type = db.relationship('TicketType')
+    type = db.relationship('TicketType', backref='tickets')
 
     def __init__(self, type=None, type_id=None):
         if type:
@@ -269,7 +237,7 @@ class Ticket(db.Model):
                 db.session.rollback()
 
     def __repr__(self):
-        attrs = [self.code]
+        attrs = [self.type.admits]
         if self.paid:
             attrs.append('paid')
         if self.expired():
@@ -300,10 +268,10 @@ class TicketCheckin(db.Model):
     def __init__(self, ticket):
         self.ticket = ticket
 
-
+# FIXME this should probably be somewhere else as it's not really part of the model
 @event.listens_for(Session, 'before_flush')
 def check_capacity(session, flush_context, instances):
-    totals = {}
+    tickets_in_session = {}
 
     for obj in session.new:
         if not isinstance(obj, Ticket):
@@ -312,28 +280,29 @@ def check_capacity(session, flush_context, instances):
         if obj.ignore_capacity:
             continue
 
-        if obj.type not in totals:
-            totals[obj.type] = Ticket.query.filter_by(type=obj.type). \
-                filter(or_(Ticket.expires >= datetime.utcnow(), Ticket.paid)). \
-                count()
+        tickets_in_session[obj.type] = 1 if obj.type not in tickets_in_session \
+                                         else tickets_in_session[obj.type] + 1
 
-        totals[obj.type] += 1
-
-    if not totals:
+    if not tickets_in_session:
         # Don't block unrelated updates
         return
 
-# TODO this bit....
-    # # Any admission tickets count towards the full ticket total
-    # fulls = TicketType.query.filter(TicketType.code.like('full%')).all()
-    # kids = TicketType.query.filter(TicketType.code.like('kids%')).all()
-    # admission_types = fulls + kids
-    # people = sum((totals.get(type, 0) for type in admission_types))
+    full_tickets = TicketType.query.filter_by( admits = 'full' ).all()
+    kid_tickets = TicketType.query.filter_by( admits = 'kid' ).all()
+    admissions_tickets = full_tickets + kid_tickets
 
-    # if people > TicketType.query.get('full').capacity:
-    #     raise TicketError('No more admission tickets available')
+    ticket_totals = {}
 
-    # for type, count in totals.items():
+    people = 0
+    for type in admissions_tickets:
+        sold = type.get_sold() + tickets_in_session.get(type, 0)
 
-    #     if count > type.capacity:
-    #         raise TicketError('No more tickets of type %s available' % type.name)
+        people += sold
+        ticket_totals[type] = sold
+
+    if people > app.config.get('MAXIMUM_ADMISSIONS'):
+        raise TicketError('No more admission tickets available')
+
+    for type, total in ticket_totals.items():
+        if total > type.type_limit:
+            raise TicketError('No more tickets of type %s available' % type.name)
