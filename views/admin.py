@@ -16,6 +16,7 @@ from flask.ext.login import login_required, current_user
 from flask_mail import Message
 
 from wtforms.validators import Optional, Regexp
+from wtforms.widgets import TextArea
 from wtforms import (
     SubmitField, BooleanField, TextField, RadioField, DateField, IntegerField
 )
@@ -225,14 +226,15 @@ class TicketTypeForm(Form):
     name = TextField('Name')
     order = IntegerField('Order')
     admits = RadioField('Admits', choices=[('full', 'Adult'), ('kid', 'Under 16'),
-        ('campervan', 'Campervan'), ('other', 'Other')])
+        ('campervan', 'Campervan'), ('car', 'Car'), ('other', 'Other')])
     type_limit = IntegerField('Maximum tickets to sell')
     personal_limit = IntegerField('Maximum tickets to sell to an individual')
     expires = DateField('Expiry Date (Optional)', [Optional()])
     price_gbp = IntegerField('Price (GBP)')
     price_eur = IntegerField('Price (EUR)')
     discount_token = TextField('Discount token', [Optional(), Regexp('^[-_0-9a-zA-Z]+$')])
-    description = TextField('Description', [Optional()])
+    description = TextField('Description', [Optional()], widget=TextArea())
+    submit = SubmitField('Add')
 
 @app.route('/admin/new-ticket-type/', defaults={'copy_id': -1}, methods=['GET', 'POST'])
 @app.route('/admin/new-ticket-type/<int:copy_id>', methods=['GET', 'POST'])
