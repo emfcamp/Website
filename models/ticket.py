@@ -289,8 +289,8 @@ def check_capacity(session, flush_context, instances):
         # Don't block unrelated updates
         return
 
-    full_tickets = TicketType.query.filter_by( admits = 'full' ).all()
-    kid_tickets = TicketType.query.filter_by( admits = 'kid' ).all()
+    full_tickets = TicketType.query.filter_by( admits='full' ).all()
+    kid_tickets = TicketType.query.filter_by( admits='kid' ).all()
     admissions_tickets = full_tickets + kid_tickets
 
     ticket_totals = {}

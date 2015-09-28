@@ -209,8 +209,8 @@ def add_ticket_types(ticket_list):
                 new_val = getattr(tt, f)
 
                 if cur_val != new_val:
-                     app.logger.info(' %10s: %r -> %r', f, cur_val, new_val)
-                     setattr(existing_tt, f, new_val)
+                    app.logger.info(' %10s: %r -> %r', f, cur_val, new_val)
+                    setattr(existing_tt, f, new_val)
         else:
             app.logger.info('Adding TicketType %s (id: %s)', tt.name, tt.id)
             db.session.add(tt)
