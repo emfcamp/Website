@@ -14,7 +14,6 @@ from wtforms import (
     SubmitField,
 )
 from wtforms.validators import Optional
-from sqlalchemy import or_
 
 from functools import wraps
 import re

@@ -17,8 +17,6 @@ from flask import (
 )
 from flask.ext.login import login_required, current_user
 
-from sqlalchemy import or_
-
 from wtforms.validators import Required, Optional, ValidationError
 from wtforms import (
     SubmitField, BooleanField, TextField,

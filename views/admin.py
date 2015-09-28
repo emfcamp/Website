@@ -21,7 +21,6 @@ from wtforms import (
     SubmitField, BooleanField, TextField, RadioField, DateField, IntegerField
 )
 
-from sqlalchemy import or_
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.functions import func
 
