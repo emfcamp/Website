@@ -195,8 +195,8 @@ def add_ticket_types(ticket_list):
     types = []
 
     for row in ticket_list:
-        tt = TicketType(*row[:5],
-            personal_limit=row[5], description=row[8], discount_token=row[9], expires=row[10])
+        tt = TicketType(*row[:5], personal_limit=row[5], description=row[9],
+            has_badge=row[8], discount_token=row[10], expires=row[11])
         tt.prices = [TicketPrice('GBP', row[6]), TicketPrice('EUR', row[7])]
         types.append(tt)
 
@@ -228,31 +228,31 @@ class CreateTickets(Command):
         type_data = [
             # (id, order, admits, name, type limit, personal limit, GBP, EUR, Description)
             # Leave order 0 & 1 free for discount tickets
-            (0, 2, 'full', 'Earlybird Ticket', 100, 10, 90.00, 115.00, None),
-            (1, 3, 'full', 'Full Camp Ticket', 100, 10, 95.00, 120.00, None),
-            (2, 5, 'full', 'Full Camp Ticket', 1100, 10, 105.00, 135.00, None),
-            (3, 8, 'full', 'Full Camp Ticket (Supporter)', 1100, 10, 125.00, 160.00,
+            (0, 2, 'full', 'Earlybird Ticket', 100, 10, 90.00, 115.00, True, None),
+            (1, 3, 'full', 'Full Camp Ticket', 100, 10, 95.00, 120.00, True, None),
+            (2, 5, 'full', 'Full Camp Ticket', 1100, 10, 105.00, 135.00, True, None),
+            (3, 8, 'full', 'Full Camp Ticket (Supporter)', 1100, 10, 125.00, 160.00, True,
                 "Support this non-profit event by paying a little more. "
                 "All money will go towards making EMF more awesome."),
 
-            (4, 8, 'full', 'Full Camp Ticket (Supporter)', 0, 10, 150.00, 190.00,
+            (4, 8, 'full', 'Full Camp Ticket (Supporter)', 0, 10, 150.00, 190.00, True,
                 "Support this non-profit event by paying a little more. "
                 "All money will go towards making EMF more awesome."),
 
-            (5, 10, 'kid', 'Under-16 Camp Ticket', 500, 10, 40.00, 50.00,
+            (5, 10, 'kid', 'Under-16 Camp Ticket', 500, 10, 40.00, 50.00, True,
                 "For visitors born after August 28th, 1998. "
                 "All under-16s  must be accompanied by an adult."),
 
-            (6, 15, 'kid', 'Under-5 Camp Ticket', 200, 4, 0, 0,
+            (6, 15, 'kid', 'Under-5 Camp Ticket', 200, 4, 0, 0, False,
                 "For children born after August 28th, 2009. "
                 "All children must be accompanied by an adult."),
 
-            (7, 30, 'car', 'Parking Ticket', 400, 4, 15.00, 20.00,
+            (7, 30, 'car', 'Parking Ticket', 400, 4, 15.00, 20.00, False,
                 "We're trying to keep cars on-site to a minimum. "
                 "Please take public transport or find someone to share with if possible."),
 
             (8, 35, 'campervan',
-                'Caravan/Campervan Ticket', 50, 2, 30.00, 40.00,
+                'Caravan/Campervan Ticket', 50, 2, 30.00, 40.00, False,
                 "If you bring a caravan, you won't need a separate parking ticket for the towing car."),
         ]
         # none of these tickets have tokens or expiry dates
@@ -265,8 +265,8 @@ class CreateTicketTokens(Command):
     # This is effectively the same as creating a ticket
     def run(self):
         discount_ticket_types = [
-            (9, 0, 'full', 'Complimentary Full Camp Ticket', 1, 1, 0.0, 0.0, None, 'super-lucky'),
-            (10, 1, 'full', 'Discount Full Camp Ticket', 10, 1, 70.00, 90.00, None, 'lucky')
+            (9, 0, 'full', 'Complimentary Full Camp Ticket', 1, 1, 0.0, 0.0, True, None, 'super-lucky'),
+            (10, 1, 'full', 'Discount Full Camp Ticket', 10, 1, 70.00, 90.00, True, None, 'lucky')
         ]
 
         discount_ticket_types = [ tt + (datetime.utcnow() + timedelta(days=7), )

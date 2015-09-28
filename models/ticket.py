@@ -30,6 +30,7 @@ class TicketType(db.Model):
     admits = db.Column(db.String, nullable=False)
     type_limit = db.Column(db.Integer, nullable=False)
     personal_limit = db.Column(db.Integer, nullable=False)
+    has_badge = db.Column(db.Boolean, nullable=False)
     # Nullable fields
     expires = db.Column(db.DateTime)
     description = db.Column(db.String)
@@ -39,7 +40,7 @@ class TicketType(db.Model):
     admits_types = ('full', 'kid', 'campervan', 'car', 'other')
 
     def __init__(self, id, order, admits, name, type_limit, personal_limit,
-                 expires=None, discount_token=None, description=None):
+                 expires=None, discount_token=None, description=None, has_badge=True):
         if admits not in self.admits_types:
             raise Exception('unknown admission type')
 
@@ -48,6 +49,7 @@ class TicketType(db.Model):
         self.order = order
         self.admits = admits
         self.expires = expires
+        self.has_badge = has_badge
         self.type_limit = type_limit
         self.description = description
         self.discount_token = discount_token
