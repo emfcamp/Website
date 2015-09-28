@@ -204,7 +204,7 @@ def add_ticket_types(ticket_list):
         existing_tt = TicketType.query.get(tt.id)
         if existing_tt:
             app.logger.info('Refreshing TicketType %s (id: %s)', tt.name, tt.id)
-            for f in ['name', 'type_limit', 'personal_limit', 'order', 'Description']:
+            for f in ['name', 'type_limit', 'expires', 'personal_limit', 'order', 'description']:
                 cur_val = getattr(existing_tt, f)
                 new_val = getattr(tt, f)
 

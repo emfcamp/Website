@@ -1,8 +1,8 @@
 {% extends "admin/base.html" %}
 {% set nav_active = 'ticket_types' %}
 {% block body %}
-<h2>Add a new ticket type {% if ticket_type_id != -1 %}based on {{ ticket_type_id }}{% endif %}</h2>
 
+<h2>Update ticket type: {{ ticket_type.id }}</h2>
 
 <form method="post" class="form-horizontal">
 {{ form.hidden_tag() }}
@@ -12,8 +12,8 @@
 <div class="form-group">{{ form.order.label(class_="col-sm-4 control-label") }}
   <div class="col-sm-8">{{ form.order(class_="form-control") }}</div>
 </div>
-<div class="form-group">{{ form.admits.label(class_="col-sm-4 control-label") }}
-  <div class="col-sm-8">{{ form.admits(class_="list-inline") }}</div>
+<div><div class="col-sm-4 text-right"><strong>Admits</strong></div>
+  <div class="col-sm-8">{{ ticket_type.admits }}</div>
 </div>
 <div class="form-group">{{ form.type_limit.label(class_="col-sm-4 control-label") }}
   <div class="col-sm-8">{{ form.type_limit(class_="form-control") }}</div>
@@ -24,14 +24,14 @@
 <div class="form-group">{{ form.expires.label(class_="col-sm-4 control-label") }}
   <div class="col-sm-8">{{ form.expires(class_="form-control", placeholder="YYYY-MM-DD") }}</div>
 </div>
-<div class="form-group">{{ form.price_gbp.label(class_="col-sm-4 control-label") }}
-  <div class="col-sm-8">{{ form.price_gbp(class_="form-control") }}</div>
+<div><div class="col-sm-4 text-right"><strong>Price</strong> (£)</div>
+  <div class="col-sm-8">{{ ticket_type.get_price('GBP') }}</div>
 </div>
-<div class="form-group">{{ form.price_eur.label(class_="col-sm-4 control-label") }}
-  <div class="col-sm-8">{{ form.price_eur(class_="form-control") }}</div>
+<div><div class="col-sm-4 text-right"><strong>Price</strong> (€)</div>
+  <div class="col-sm-8">{{ ticket_type.get_price('EUR') }}</div>
 </div>
-<div class="form-group">{{ form.discount_token.label(class_="col-sm-4 control-label") }}
-  <div class="col-sm-8">{{ form.discount_token(class_="form-control") }}</div>
+<div><div class="col-sm-4 text-right"><strong>Discount Token</strong></div>
+  <div class="col-sm-8">{{ ticket_type.discount_token }}</div>
 </div>
 <div class="form-group">{{ form.description.label(class_="col-sm-4 control-label") }}
   <div class="col-sm-8">{{ form.description(class_="form-control", rows="4", cols="50") }}</div>
