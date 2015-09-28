@@ -276,6 +276,7 @@ class NewTicketTypeForm(Form):
     expires = DateField('Expiry Date (Optional)', [Optional()])
     price_gbp = IntegerField('Price (GBP)')
     price_eur = IntegerField('Price (EUR)')
+    has_badge = BooleanField('Issue Badge')
     discount_token = TextField('Discount token', [Optional(), Regexp('^[-_0-9a-zA-Z]+$')])
     description = TextField('Description', [Optional()], widget=TextArea())
     submit = SubmitField('Create')
@@ -287,6 +288,7 @@ class NewTicketTypeForm(Form):
         self.type_limit.data = ticket_type.type_limit
         self.personal_limit.data = ticket_type.personal_limit
         self.expires.data = ticket_type.expires
+        self.has_badge.data = ticket_type.has_badge
         self.price_gbp.data = ticket_type.get_price('GBP')
         self.price_eur.data = ticket_type.get_price('EUR')
         self.description.data = ticket_type.description
@@ -309,7 +311,7 @@ def new_ticket_type(copy_id):
         tt = TicketType(new_id, form.order.data, form.admits.data, 
             form.name.data, form.type_limit.data, expires=expires,
             discount_token=token, description=description,
-            personal_limit=form.personal_limit.data)
+            personal_limit=form.personal_limit.data, has_badge=form.has_badge.data)
 
         tt.prices = [TicketPrice('GBP', form.price_gbp.data), 
                      TicketPrice('EUR', form.price_eur.data)]

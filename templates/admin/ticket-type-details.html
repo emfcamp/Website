@@ -11,6 +11,7 @@
   <dt>Maximum</dt><dd>{{ ticket_type.type_limit }}</dd>
   <dt>Personal Maximum</dt><dd>{{ ticket_type.personal_limit }}</dd>
   <dt>Expires</dt><dd>{% if ticket_type.expires %}{{ ticket_type.expires.strftime('%Y-%m-%d') }}{% else %}--{% endif %}</dd>
+  <dt>Issue Badge</dt><dd>{{ ticket_type.has_badge }}</dd>
   <dt>Discount Token</dt><dd>{{ ticket_type.discount_token or '--'}}</dd>
   <dt>Description</dt><dd>{{ ticket_type.description or '--' }}</dd>
 </dl>
