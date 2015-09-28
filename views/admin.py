@@ -256,8 +256,8 @@ def update_ticket_type(type_id):
             new_val = getattr(form, attr).data
 
             if cur_val != new_val:
-                 app.logger.info(' %10s: %r -> %r', attr, cur_val, new_val)
-                 setattr(ticket_type, attr, new_val)
+                app.logger.info(' %10s: %r -> %r', attr, cur_val, new_val)
+                setattr(ticket_type, attr, new_val)
 
         db.session.commit()
         return redirect(url_for('ticket_type_details', type_id=type_id))
@@ -308,12 +308,12 @@ def new_ticket_type(copy_id):
         token = form.discount_token.data if form.discount_token.data else None
         description = form.description.data if form.description.data else None
 
-        tt = TicketType(new_id, form.order.data, form.admits.data, 
+        tt = TicketType(new_id, form.order.data, form.admits.data,
             form.name.data, form.type_limit.data, expires=expires,
             discount_token=token, description=description,
             personal_limit=form.personal_limit.data, has_badge=form.has_badge.data)
 
-        tt.prices = [TicketPrice('GBP', form.price_gbp.data), 
+        tt.prices = [TicketPrice('GBP', form.price_gbp.data),
                      TicketPrice('EUR', form.price_eur.data)]
         app.logger.info('Adding new TicketType %s', tt)
         db.session.add(tt)
