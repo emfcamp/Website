@@ -24,6 +24,8 @@ from wtforms import (
     SubmitField, BooleanField, TextField,
     DecimalField, FieldList, FormField, HiddenField,
 )
+from wtforms.fields.html5 import EmailField
+
 from datetime import datetime, timedelta
 from StringIO import StringIO
 from xhtml2pdf import pisa
@@ -41,6 +43,7 @@ class FullTicketForm(TicketForm):
     template = 'tickets/full.html'
     volunteer = BooleanField('Volunteering')
     accessible = BooleanField('Accessibility')
+    email = EmailField('Email')
     phone = TelField('Phone')
 
 
@@ -129,8 +132,10 @@ class ReceiptForm(Form):
     forward = SubmitField('Show e-Tickets')
 
 @app.route("/tickets/", methods=['GET', 'POST'])
-@login_required
 def tickets():
+    if current_user.is_anonymous():
+        return redirect(url_for('tickets_choose'))
+
     form = ReceiptForm()
     if form.validate_on_submit():
         ticket_ids = map(str, request.form.getlist('ticket_id', type=int))
@@ -229,10 +234,7 @@ def tickets_choose():
             if basket:
                 session['basket'] = basket
 
-                if current_user.is_authenticated():
-                    return redirect(url_for('tickets_info'))
-                else:
-                    return redirect(url_for('signup', next=url_for('tickets_info')))
+                return redirect(url_for('tickets_info'))
 
     if request.method == 'POST' and form.set_currency.data:
         if form.set_currency.validate(form):
@@ -295,13 +297,14 @@ def build_info_form(formdata):
     return parent_form, basket, total
 
 @app.route("/tickets/info", methods=['GET', 'POST'])
-@login_required
 def tickets_info():
     form, basket, total = build_info_form(request.form)
     if not form:
         return redirect(url_for('pay_choose'))
 
     if form.validate_on_submit():
+        if current_user.is_anonymous():
+            session['anonymous_account_email'] = form.data['full'][0]['email']
         if form.back.data:
             return redirect(url_for('tickets_choose'))
 
@@ -309,7 +312,7 @@ def tickets_info():
 
         return redirect(url_for('pay_choose'))
 
-    return render_template('tickets-info.html', form=form, basket=basket, total=total)
+    return render_template('tickets-info.html', form=form, basket=basket, total=total, is_anonymous=current_user.is_anonymous())
 
 
 @app.route("/tickets/receipt")

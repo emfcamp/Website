@@ -4,7 +4,7 @@ import bcrypt
 import os
 import base64
 from datetime import datetime, timedelta
-
+from random import choice
 
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
@@ -27,6 +27,12 @@ class User(db.Model, UserMixin):
 
     def check_password(self, password):
         return bcrypt.hashpw(password.encode('utf8'), self.password) == self.password
+
+    def generate_random_password(self):
+        chars = "ABCDEFGHKLMNPRSTUVWXYZ23456789"
+        password = ''.join(choice(chars) for _ in range(10))
+        self.set_password(password)
+        return password
 
     def __repr__(self):
         return '<User %s>' % self.email
