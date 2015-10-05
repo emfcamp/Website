@@ -51,11 +51,13 @@
                         <li><a target="_blank" href="https://wiki.emfcamp.org">Wiki</a>
                         <li><a target="_blank" href="{{ url_for('code_of_conduct') }}">Code of Conduct</a>
 
+                      {% if config.get('TICKET_SALES') %}
                       {% if current_user.is_authenticated() %}
                         <li><a href="{{ url_for('tickets') }}">My tickets</a></li>
                         <li><a href="{{ url_for('logout') }}">Log out</a></li>
                       {% else %}
                         <li><a href="{{ url_for('login') }}">Log in</a></li>
+                      {% endif %}
                       {% endif %}
                     </ul>
                     <div class="share">

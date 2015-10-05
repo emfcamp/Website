@@ -45,6 +45,7 @@ class LoginForm(Form):
     next = NextURLField('Next')
 
 @app.route("/login", methods=['GET', 'POST'])
+@feature_flag('TICKET_SALES')
 def login():
     if current_user.is_authenticated():
         return redirect(request.args.get('next', url_for('tickets')))
@@ -67,6 +68,7 @@ class SignupForm(Form):
 
 @app.route("/signup", methods=['GET', 'POST'])
 @feature_flag('TICKETS_SITE')
+@feature_flag('TICKET_SALES')
 def signup():
     if current_user.is_authenticated():
         return redirect(url_for('tickets'))
@@ -106,6 +108,7 @@ class ForgotPasswordForm(Form):
 
 @app.route("/forgot-password", methods=['GET', 'POST'])
 @feature_flag('TICKETS_SITE')
+@feature_flag('TICKET_SALES')
 def forgot_password():
     form = ForgotPasswordForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -139,6 +142,7 @@ class ResetPasswordForm(Form):
 
 @app.route("/reset-password", methods=['GET', 'POST'])
 @feature_flag('TICKETS_SITE')
+@feature_flag('TICKET_SALES')
 def reset_password():
     form = ResetPasswordForm(request.form, email=request.args.get('email'), token=request.args.get('token'))
     if request.method == 'POST' and form.validate():
