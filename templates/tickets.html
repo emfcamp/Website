@@ -34,7 +34,7 @@
 </td>
 <td>{{ t.type.name }}</td>
 <td class="volunteer">
-	{%- if t.type.code.startswith("kids") or t.type.code in ["campervan", "parking"] -%}
+	{%- if t.type.admits in ["campervan", "car", "kid"] -%}
 		N/A
 	{%- else %}
 		{%- for attrib in t.attribs if attrib.name == "volunteer" %}
@@ -43,7 +43,7 @@
 	{% endif -%}
 </td>
 <td class="accessible">
-	{%- if t.type.code in ["parking", "campervan"] -%}
+	{%- if t.type.admits in ["car", "campervan"] -%}
 		N/A
 	{%- else %}
 		{%- for attrib in t.attribs if attrib.name=="accessible" %}

@@ -1,7 +1,7 @@
 from main import app, db, mail
 from models.user import User
 from models.payment import Payment, BankPayment, BankTransaction
-from models.ticket import Ticket, TicketCheckin
+from models.ticket import Ticket, TicketCheckin, TicketType, TicketPrice
 from models.cfp import Proposal
 from views import Form
 from views.payment.stripe import (
@@ -15,11 +15,12 @@ from flask import (
 from flask.ext.login import login_required, current_user
 from flask_mail import Message
 
+from wtforms.validators import Optional, Regexp
+from wtforms.widgets import TextArea
 from wtforms import (
-    SubmitField, BooleanField,
+    SubmitField, BooleanField, TextField, RadioField, DateField, IntegerField
 )
 
-from sqlalchemy import or_
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.functions import func
 
@@ -56,8 +57,8 @@ def admin_counts():
 
 @app.route("/stats")
 def stats():
-    full = Ticket.query.join(Payment).filter( Ticket.code.startswith('full'), Payment.state != 'new' )
-    kids = Ticket.query.join(Payment).filter( Ticket.code.startswith('kids'), Payment.state != 'new' )
+    full = Ticket.query.join(TicketType).filter_by(admits='full').join(Payment).filter(Payment.state != 'new')
+    kids = Ticket.query.join(TicketType).filter_by(admits='kid').join(Payment).filter(Payment.state != 'new')
 
     # cancelled tickets get their expiry set to the cancellation time
     full_unexpired = full.filter( Ticket.expires >= datetime.utcnow() )
@@ -71,10 +72,10 @@ def stats():
     full_gocardless_unpaid = full_unpaid.filter(Payment.provider == 'gocardless', Payment.state == 'inprogress')
     full_banktransfer_unpaid = full_unpaid.filter(Payment.provider == 'banktransfer', Payment.state == 'inprogress')
 
-    parking_bought = Ticket.query.filter_by(paid=True, code='parking')
-    campervan_bought = Ticket.query.filter_by(paid=True, code='campervan')
+    parking_bought = Ticket.query.filter_by(paid=True).filter(TicketType.admits.is_('parking'))
+    campervan_bought = Ticket.query.filter_by(paid=True).filter(TicketType.admits.is_('campervan'))
 
-    checked_in = Ticket.query.filter( or_(Ticket.code.startswith('full'), Ticket.code.startswith('kids')) ) \
+    checked_in = Ticket.query.filter( TicketType.admits.in_(['full', 'kid']) ) \
                              .join(TicketCheckin).filter_by(checked_in=True)
     badged_up = TicketCheckin.query.filter_by(badged_up=True)
 
@@ -207,6 +208,122 @@ def admin_txn_reconcile(txn_id, payment_id):
             return redirect(url_for('admin_txns'))
 
     return render_template('admin/txn-reconcile.html', txn=txn, payment=payment, form=form)
+
+@app.route('/admin/ticket-types', methods=['GET', 'POST'])
+@admin_required
+def ticket_types():
+    ticket_types = TicketType.query.all()
+    totals = {}
+    for tt in ticket_types:
+        sold = tt.get_sold()
+        totals[tt.admits] = totals[tt.admits] + sold if tt.admits in totals else sold
+    return render_template('admin/ticket-types.html', ticket_types=ticket_types, totals=totals)
+
+@app.route('/admin/ticket-types/<int:type_id>')
+@admin_required
+def ticket_type_details(type_id):
+    ticket_type = TicketType.query.get(type_id)
+    return render_template('admin/ticket-type-details.html', ticket_type=ticket_type)
+
+
+class UpdateTicketTypeForm(Form):
+    name = TextField('Name')
+    order = IntegerField('Order')
+    type_limit = IntegerField('Maximum tickets to sell')
+    personal_limit = IntegerField('Maximum tickets to sell to an individual')
+    expires = DateField('Expiry Date (Optional)', [Optional()])
+    description = TextField('Description', [Optional()], widget=TextArea())
+    submit = SubmitField('Update')
+
+    def init_with_ticket_type(self, ticket_type):
+        self.name.data = ticket_type.name
+        self.order.data = ticket_type.order
+        self.type_limit.data = ticket_type.type_limit
+        self.personal_limit.data = ticket_type.personal_limit
+        self.expires.data = ticket_type.expires
+        self.description.data = ticket_type.description
+
+
+@app.route('/admin/ticket-types/<int:type_id>/update', methods=['GET', 'POST'])
+@admin_required
+def update_ticket_type(type_id):
+    form = UpdateTicketTypeForm()
+
+    ticket_type = TicketType.query.get(type_id)
+    if form.validate_on_submit():
+        for attr in ['name', 'order', 'type_limit', 'personal_limit', 'expires', 'description']:
+            cur_val = getattr(ticket_type, attr)
+            new_val = getattr(form, attr).data
+
+            if cur_val != new_val:
+                app.logger.info(' %10s: %r -> %r', attr, cur_val, new_val)
+                setattr(ticket_type, attr, new_val)
+
+        db.session.commit()
+        return redirect(url_for('ticket_type_details', type_id=type_id))
+
+    form.init_with_ticket_type(ticket_type)
+    return render_template('admin/update-ticket-type.html', ticket_type=ticket_type, form=form)
+
+
+class NewTicketTypeForm(Form):
+    name = TextField('Name')
+    order = IntegerField('Order')
+    admits = RadioField('Admits', choices=[('full', 'Adult'), ('kid', 'Under 16'),
+        ('campervan', 'Campervan'), ('car', 'Car'), ('other', 'Other')])
+    type_limit = IntegerField('Maximum tickets to sell')
+    personal_limit = IntegerField('Maximum tickets to sell to an individual')
+    expires = DateField('Expiry Date (Optional)', [Optional()])
+    price_gbp = IntegerField('Price (GBP)')
+    price_eur = IntegerField('Price (EUR)')
+    has_badge = BooleanField('Issue Badge')
+    discount_token = TextField('Discount token', [Optional(), Regexp('^[-_0-9a-zA-Z]+$')])
+    description = TextField('Description', [Optional()], widget=TextArea())
+    submit = SubmitField('Create')
+
+    def init_with_ticket_type(self, ticket_type):
+        self.name.data = ticket_type.name
+        self.order.data = ticket_type.order
+        self.admits.data = ticket_type.admits
+        self.type_limit.data = ticket_type.type_limit
+        self.personal_limit.data = ticket_type.personal_limit
+        self.expires.data = ticket_type.expires
+        self.has_badge.data = ticket_type.has_badge
+        self.price_gbp.data = ticket_type.get_price('GBP')
+        self.price_eur.data = ticket_type.get_price('EUR')
+        self.description.data = ticket_type.description
+        self.discount_token.data = ticket_type.discount_token
+
+
+@app.route('/admin/new-ticket-type/', defaults={'copy_id': -1}, methods=['GET', 'POST'])
+@app.route('/admin/new-ticket-type/<int:copy_id>', methods=['GET', 'POST'])
+@admin_required
+def new_ticket_type(copy_id):
+    form = NewTicketTypeForm()
+
+    if form.validate_on_submit():
+        new_id = TicketType.query.all()[-1].id + 1
+
+        expires = form.expires.data if form.expires.data else None
+        token = form.discount_token.data if form.discount_token.data else None
+        description = form.description.data if form.description.data else None
+
+        tt = TicketType(new_id, form.order.data, form.admits.data,
+            form.name.data, form.type_limit.data, expires=expires,
+            discount_token=token, description=description,
+            personal_limit=form.personal_limit.data, has_badge=form.has_badge.data)
+
+        tt.prices = [TicketPrice('GBP', form.price_gbp.data),
+                     TicketPrice('EUR', form.price_eur.data)]
+        app.logger.info('Adding new TicketType %s', tt)
+        db.session.add(tt)
+        db.session.commit()
+        return redirect(url_for('ticket_type_details', type_id=new_id))
+
+    if copy_id != -1:
+        form.init_with_ticket_type(TicketType.query.get(copy_id))
+
+    return render_template('admin/new-ticket-type.html', ticket_type_id=copy_id, form=form)
 
 
 @app.route("/admin/make-admin", methods=['GET', 'POST'])

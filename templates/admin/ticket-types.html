@@ -1,0 +1,54 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'ticket_types' %}
+{% block body %}
+<h2>Ticket types</h2>
+
+<p>
+  Admission totals (paid or reserved only).
+</p>
+<table class="table table-condensed">
+<thead><tr><th>Full</th><th>U 16s</th><th>Campervans</th><th>Cars</th><th>Other</th></tr></thead>
+<tbody><tr>
+{% for key in ['full', 'kid', 'campervan', 'car', 'other'] %}<td>{{ totals[key] }}</td>{% endfor %}
+</tr></tbody>
+</table>
+
+<p>
+  Current ticket types
+</p>
+
+<table class="table table-condensed table-striped">
+<thead><tr>
+  <th>Name</th>
+  <th>Order</th>
+  <th>Admits</th>
+  <th>Price</th>
+  <th>Sold</th>
+  <th>Max</th>
+  <th>Expires</th>
+  <th>Discount token</th>
+  <th></th>
+</tr></thead>
+<tbody>
+{% for type in ticket_types|sort(attribute='order') %}
+<tr>
+    <td><a href="{{ url_for('ticket_type_details', type_id=type.id) }}">{{ type.name }}</a></td>
+    <td>{{ type.order }}</td>
+    <td>{{ type.admits }}</td>
+    <td>£{{ type.get_price('GBP') }}</td>
+    <td>{{ type.get_sold() }}</td>
+    <td>{{ type.type_limit }}</td>
+    <td>{% if type.expires %}{{ type.expires.strftime('%Y-%m-%d') }}{% else %}--{% endif %}</td>
+    <td>{{ type.discount_token or '--' }}</td>
+    <td>
+        <a class="btn btn-sm btn-success" href="{{ url_for('new_ticket_type', copy_id=type.id) }}">Copy</a>
+    </td>
+    <td>
+        <a class="btn btn-sm btn-warning" href="{{ url_for('update_ticket_type', type_id=type.id) }}">Update</a>
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+<a class="btn btn-success" href="{{ url_for('new_ticket_type') }}">New</a>
+{% endblock %}

@@ -14,7 +14,6 @@ from wtforms import (
     SubmitField,
 )
 from wtforms.validators import Optional
-from sqlalchemy import or_
 
 from functools import wraps
 import re
@@ -72,8 +71,9 @@ def arrivals_search(query=None):
                 query = match.group(1)
 
             if badge:
-                tickets = Ticket.query.join(TicketCheckin).filter_by(checked_in=True) \
-                                      .filter( or_(Ticket.code.like('full%'), Ticket.code == 'kids_u16') )
+                tickets = Ticket.query\
+                                .join(TicketCheckin).filter_by( checked_in=True)\
+                                .join(TicketType).filter_by( has_badge=True)
             else:
                 tickets = Ticket.query
 

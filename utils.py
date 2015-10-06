@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 
 from main import app, mail, db
 from models import (
-    User, TicketType, Ticket, TicketPrice, TicketToken,
+    User, TicketType, Ticket, TicketPrice
 )
 from models.payment import (
     BankAccount, BankTransaction,
@@ -191,6 +191,33 @@ class Reconcile(Command):
 
         app.logger.info('Reconciliation complete: %s paid, %s failed', paid, failed)
 
+def add_ticket_types(ticket_list):
+    types = []
+
+    for row in ticket_list:
+        tt = TicketType(*row[:5], personal_limit=row[5], description=row[9],
+            has_badge=row[8], discount_token=row[10], expires=row[11])
+        tt.prices = [TicketPrice('GBP', row[6]), TicketPrice('EUR', row[7])]
+        types.append(tt)
+
+    for tt in types:
+        existing_tt = TicketType.query.get(tt.id)
+        if existing_tt:
+            app.logger.info('Refreshing TicketType %s (id: %s)', tt.name, tt.id)
+            for f in ['name', 'type_limit', 'expires', 'personal_limit', 'order', 'description']:
+                cur_val = getattr(existing_tt, f)
+                new_val = getattr(tt, f)
+
+                if cur_val != new_val:
+                    app.logger.info(' %10s: %r -> %r', f, cur_val, new_val)
+                    setattr(existing_tt, f, new_val)
+        else:
+            app.logger.info('Adding TicketType %s (id: %s)', tt.name, tt.id)
+            db.session.add(tt)
+
+        db.session.commit()
+
+    app.logger.info('Tickets refreshed')
 
 class CreateTickets(Command):
     def run(self):
@@ -198,79 +225,54 @@ class CreateTickets(Command):
         # if you change these, change ticket_forms in views/tickets.py as well.
         #
 
-        data = [
-            # (order, code, name, capacity, max per person, GBP, EUR, Description)
-            (0, 'full_free',
-                'Full Camp Ticket (Complimentary)', 1, 1, 0, 0, None),
-            (1, 'full_discount',
-                'Full Camp Ticket (Discount)', 10, 2, 70.00, 90.00, None),
-            (2, 'full_earlybird',
-                'Full Camp Ticket', 0, 10, 90.00, 115.00, None),
-            (3, 'full_initial',
-                'Full Camp Ticket', 0, 10, 95.00, 120.00, None),
-            (5, 'full',
-                'Full Camp Ticket', 1100, 10, 105.00, 135.00, None),
-            (8, 'full_supporter',
-                'Full Camp Ticket (Supporter)', 1100, 10, 125.00, 160.00,
+        type_data = [
+            # (id, order, admits, name, type limit, personal limit, GBP, EUR, Description)
+            # Leave order 0 & 1 free for discount tickets
+            (0, 2, 'full', 'Earlybird Ticket', 100, 10, 90.00, 115.00, True, None),
+            (1, 3, 'full', 'Full Camp Ticket', 100, 10, 95.00, 120.00, True, None),
+            (2, 5, 'full', 'Full Camp Ticket', 1100, 10, 105.00, 135.00, True, None),
+            (3, 8, 'full', 'Full Camp Ticket (Supporter)', 1100, 10, 125.00, 160.00, True,
                 "Support this non-profit event by paying a little more. "
                 "All money will go towards making EMF more awesome."),
-            (8, 'full_supporter_2',
-                'Full Camp Ticket (Supporter)', 0, 10, 150.00, 190.00,
+
+            (4, 8, 'full', 'Full Camp Ticket (Supporter)', 0, 10, 150.00, 190.00, True,
                 "Support this non-profit event by paying a little more. "
                 "All money will go towards making EMF more awesome."),
-            (10, 'kids_u16',
-                'Under-16 Camp Ticket', 500, 10, 40.00, 50.00,
+
+            (5, 10, 'kid', 'Under-16 Camp Ticket', 500, 10, 40.00, 50.00, True,
                 "For visitors born after August 28th, 1998. "
                 "All under-16s  must be accompanied by an adult."),
-            (15, 'kids_u5',
-                'Under-5 Camp Ticket', 200, 4, 0, 0,
+
+            (6, 15, 'kid', 'Under-5 Camp Ticket', 200, 4, 0, 0, False,
                 "For children born after August 28th, 2009. "
                 "All children must be accompanied by an adult."),
-            (30, 'parking',
-                'Parking Ticket', 400, 4, 15.00, 20.00,
+
+            (7, 30, 'car', 'Parking Ticket', 400, 4, 15.00, 20.00, False,
                 "We're trying to keep cars on-site to a minimum. "
                 "Please take public transport or find someone to share with if possible."),
-            (35, 'campervan',
-                'Caravan/Campervan Ticket', 50, 2, 30.00, 40.00,
+
+            (8, 35, 'campervan',
+                'Caravan/Campervan Ticket', 50, 2, 30.00, 40.00, False,
                 "If you bring a caravan, you won't need a separate parking ticket for the towing car."),
         ]
+        # none of these tickets have tokens or expiry dates
+        type_data = [ t + (None, None) for t in type_data]
 
-        types = []
-        for row in data:
-            tt = TicketType(*row[1:5], order=row[0], notice=row[7])
-            tt.prices = [TicketPrice('GBP', row[5]), TicketPrice('EUR', row[6])]
-            types.append(tt)
+        add_ticket_types(type_data)
 
-        for tt in types:
-            existing_tt = TicketType.query.get(tt.code)
-            if existing_tt:
-                app.logger.info('Refreshing TicketType %s', tt.code)
-                for f in ['name', 'capacity', 'limit', 'order', 'notice']:
-                    cur_val = getattr(existing_tt, f)
-                    new_val = getattr(tt, f)
-                    if cur_val != new_val:
-                        app.logger.info(' %10s: %r -> %r', f, cur_val, new_val)
-                        setattr(existing_tt, f, new_val)
-            else:
-                app.logger.info('Adding TicketType %s', tt.code)
-                db.session.add(tt)
-
-            db.session.commit()
-
-        app.logger.info('Tickets refreshed')
 
 class CreateTicketTokens(Command):
+    # This is effectively the same as creating a ticket
     def run(self):
-        tokens = [
-            ('full_discount', 'testtoken'),
+        discount_ticket_types = [
+            (9, 0, 'full', 'Complimentary Full Camp Ticket', 1, 1, 0.0, 0.0, True, None, 'super-lucky'),
+            (10, 1, 'full', 'Discount Full Camp Ticket', 10, 1, 70.00, 90.00, True, None, 'lucky')
         ]
 
-        for code, token in tokens:
-            tt = TicketToken(token, datetime.utcnow() + timedelta(days=7))
-            tt.type = TicketType.query.get(code)
-            db.session.commit()
+        discount_ticket_types = [ tt + (datetime.utcnow() + timedelta(days=7), )
+            for tt in discount_ticket_types]
 
-        print 'Tokens added'
+        add_ticket_types(discount_ticket_types)
 
 
 class MakeAdmin(Command):
