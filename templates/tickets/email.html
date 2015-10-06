@@ -1,12 +1,14 @@
  <div>
   {% if i==1 and is_anonymous %}
-    <label>Your email address (required):
-       {{ email(class_='form-control')|safe }}
-    </label>
 
     {% for error in email.errors %}
     <span class="help-inline">{{ error }}</span>
     {% endfor %}
+
+    <p>
+    <label for="{{ email.id }}">Your email address:</label>
+    {{ email(class_='form-control')|safe }}
+    </p>
 
     <div id="a-blurb{{ i }}">
       <p>We need your email address to send you your tickets, please make sure it's correct. Should you decide to sign up for workshops or edit the wiki later please use this email address and we'll automatically add the tickets to your account.</p>

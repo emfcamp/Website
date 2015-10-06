@@ -43,7 +43,7 @@ class FullTicketForm(TicketForm):
     template = 'tickets/full.html'
     volunteer = BooleanField('Volunteering')
     accessible = BooleanField('Accessibility')
-    email = EmailField('Email')
+    email = EmailField('Email', [Required()])
     phone = TelField('Phone')
 
 
