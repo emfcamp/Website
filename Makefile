@@ -34,7 +34,7 @@ clean:
 db:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createdb
 
-data: db tickets bankaccounts
+data: db tickets bankaccounts tokens
 
 tickets:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createtickets
