@@ -149,7 +149,7 @@ class Ticket(db.Model):
     checkin = db.relationship('TicketCheckin', uselist=False, backref='ticket', cascade='all')
     type = db.relationship('TicketType', backref='tickets')
 
-    def __init__(self, type=None, type_id=None):
+    def __init__(self, user_id, type=None, type_id=None):
         if type:
             self.type = type
             self.type_id = type.id
@@ -159,6 +159,7 @@ class Ticket(db.Model):
         else:
             raise ValueError('Type must be specified')
 
+        self.user_id = user_id
         self.expires = datetime.utcnow() + timedelta(hours=2)
         self.ignore_capacity = False
 

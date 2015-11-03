@@ -6,6 +6,7 @@ from models.ticket import Ticket, TicketType
 
 from flask_wtf import Form as BaseForm
 from flask_wtf.form import _is_hidden
+from flask.ext.login import current_user
 from wtforms import (
     IntegerField, SelectField, HiddenField,
 )
@@ -123,19 +124,23 @@ def get_user_currency(default='GBP'):
 def set_user_currency(currency):
     session['currency'] = currency
 
-
-def get_basket():
-    types = [TicketType.query.get(id) for id in session.get('basket', [])]
-
-    total = sum(tt.get_price(get_user_currency()) for tt in types)
-
-    basket = []
-    for tt in types:
-        basket.append(Ticket(type=tt))
-
+# This avoids adding tickets to the db so should avoid a lot of auto-flush
+# problems, unless you need the tickets persisted, use this.
+def get_basket_and_total():
+    basket = [TicketType.query.get(id) for id in session.get('basket', [])]
+    total = sum(tt.get_price(get_user_currency()) for tt in basket)
     app.logger.debug('Got basket %s with total %s', basket, total)
     return basket, total
 
+# This actually adds the user's tickets to the database. This should only be used
+# just before a ticket is bought
+def process_basket():
+    user_id = current_user.id
+    items, total = get_basket_and_total()
+
+    basket = [Ticket(type=tt, user_id=user_id) for tt in items]
+    app.logger.debug('Added tickets to db for basket %s with total %s', basket, total)
+    return basket, total
 
 def ticket_cutoff():
     return datetime.utcnow() > iso8601.parse_date(app.config['TICKET_CUTOFF']).replace(tzinfo=None)

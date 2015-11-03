@@ -1,6 +1,6 @@
 from main import app, db
 from views import (
-    get_user_currency, set_user_currency, get_basket, TICKET_CUTOFF,
+    get_user_currency, set_user_currency, get_basket_and_total, process_basket, TICKET_CUTOFF,
     CURRENCY_SYMBOLS,
     IntegerSelectField, HiddenIntegerField, TelField, Form, feature_flag
 )
@@ -82,7 +82,7 @@ def add_payment_and_tickets(paymenttype):
     """
 
     infodata = session.get('ticketinfo')
-    basket, total = get_basket()
+    basket, total = process_basket()
     currency = get_user_currency()
 
     if not (basket and total):
@@ -266,7 +266,7 @@ class TicketInfoForm(Form):
 
 
 def build_info_form(formdata):
-    basket, total = get_basket()
+    basket, total = get_basket_and_total()
 
     if not basket:
         return None, basket, total
@@ -279,7 +279,7 @@ def build_info_form(formdata):
     if not any(forms):
         # Nothing submitted, so create forms for the basket
         for i, ticket in enumerate(basket):
-            name = get_form_name(ticket.type)
+            name = get_form_name(ticket)
             if not name:
                 continue
 
@@ -295,7 +295,7 @@ def build_info_form(formdata):
     else:
         # If we have some details, match them to the basket
         # FIXME: doesn't play well with multiple browser tabs
-        form_tickets = [t for t in basket if get_form_name(t.type)]
+        form_tickets = [t for t in basket if get_form_name(t)]
         entries = sum([f.entries for f in forms], [])
         for ticket, subform in zip(form_tickets, entries):
             ticket.form = subform

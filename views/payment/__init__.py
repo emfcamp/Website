@@ -1,7 +1,7 @@
 from main import app, db, mail
 from models import Payment, StripePayment, TicketType, Ticket
 from models.user import User
-from views import get_basket
+from views import get_basket_and_total
 
 from flask import (
     render_template, redirect, url_for, abort, session, flash
@@ -42,8 +42,7 @@ def ticket_terms():
 
 @app.route("/pay/choose")
 def pay_choose():
-    basket, total = get_basket()
-
+    basket, total = get_basket_and_total()
     if not basket:
         redirect(url_for('tickets'))
 
@@ -54,6 +53,7 @@ def pay_choose():
         user = User(email, "NULL")
         user.generate_random_password()
         db.session.add(user)
+
         try:
             db.session.commit()
         except IntegrityError, e:
