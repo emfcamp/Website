@@ -43,7 +43,7 @@ class FullTicketForm(TicketForm):
     template = 'tickets/full.html'
     volunteer = BooleanField('Volunteering')
     accessible = BooleanField('Accessibility')
-    email = EmailField('Email', [Required()])
+    email = EmailField('Email')
     phone = TelField('Phone')
 
 
@@ -257,6 +257,16 @@ class TicketInfoForm(Form):
     forward = SubmitField('Continue to Check-out')
     back = SubmitField('Change tickets')
 
+    # We want the first email to be set, we don't care about the others
+    def validate_full(form, field):
+        # field.data is a list of dictionaries containing the sub-form responses
+        purchaser_email = field.data[0]['email']
+
+        # Check that the email is at least plausible i.e. contains '@'
+        if current_user.is_anonymous() and '@' not in purchaser_email:
+            raise ValidationError('No user email for purchaser')
+
+
 def build_info_form(formdata):
     basket, total = get_basket()
 
@@ -311,6 +321,8 @@ def tickets_info():
         session['ticketinfo'] = form.data
 
         return redirect(url_for('pay_choose'))
+    elif request.method == 'POST' and not form.validate():
+        flash('You need to set an email for the purchaser.')
 
     return render_template('tickets-info.html', form=form, basket=basket, total=total, is_anonymous=current_user.is_anonymous())
 
