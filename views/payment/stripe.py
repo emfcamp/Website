@@ -36,7 +36,6 @@ def webhook(type=None):
 
 @app.route("/pay/stripe-start", methods=['POST'])
 @feature_flag('STRIPE')
-# @login_required
 def stripe_start():
     payment = add_payment_and_tickets(StripePayment)
     if not payment:
