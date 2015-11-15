@@ -1,10 +1,6 @@
-{{ ticket.form.hidden_tag_without('csrf_token') }}
 {% set accessible = ticket.form.accessible %}
-{% set email = ticket.form.email %}
-{% set phone = ticket.form.phone %}
 
-{% include 'tickets/email.html' %}
-
-<div class="{% if accessible.errors -%} has-error {%- endif %}">
+{{ ticket.form.hidden_tag_without('csrf_token') }}
+<div class="{% if accessible.errors -%} error {%- endif %}">
 {% include 'tickets/accessible.html' %}
 </div>

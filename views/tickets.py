@@ -2,8 +2,11 @@ from main import app, db
 from views import (
     get_user_currency, set_user_currency, get_basket_and_total, process_basket,
     CURRENCY_SYMBOLS,
-    IntegerSelectField, HiddenIntegerField, TelField, Form, feature_flag
+    IntegerSelectField, HiddenIntegerField, Form, feature_flag
 )
+
+from models.user import User
+from views.users import create_user, EmailAlreadyInUseException
 
 from models.ticket import (
     TicketType, Ticket, TicketAttrib,
@@ -41,8 +44,6 @@ class TicketForm(Form):
 class FullTicketForm(TicketForm):
     template = 'tickets/full.html'
     accessible = BooleanField('Accessibility')
-    email = EmailField('Email')
-    phone = TelField('Phone')
 
 
 class KidsTicketForm(TicketForm):
@@ -80,6 +81,14 @@ def add_payment_and_tickets(paymenttype):
     """
     Insert payment and tickets from session data into DB
     """
+    # Implicit user signup
+    if current_user.is_anonymous():
+        email = session['anonymous_account_email']
+        name = session['anonymous_account_user_name']
+        try:
+            create_user(email, name)
+        except EmailAlreadyInUseException:
+            return redirect(url_for('tickets_info'))
 
     infodata = session.get('ticketinfo')
     basket, total = process_basket()
@@ -247,21 +256,22 @@ def tickets_choose():
     return render_template("tickets-choose.html", form=form)
 
 class TicketInfoForm(Form):
+    email = EmailField('Email', [ Required() ])
+    user_name = StringField('Name', [ Required() ])
+
     full = FieldList(FormField(FullTicketForm))
     kids = FieldList(FormField(KidsTicketForm))
     carpark = FieldList(FormField(CarparkTicketForm))
     campervan = FieldList(FormField(CampervanTicketForm))
     donation = FieldList(FormField(DonationTicketForm))
+
     forward = SubmitField('Continue to Check-out')
 
-    # We want the first email to be set, we don't care about the others
-    def validate_full(form, field):
-        # field.data is a list of dictionaries containing the sub-form responses
-        purchaser_email = field.data[0]['email']
-
-        # Check that the email is at least plausible i.e. contains '@'
-        if current_user.is_anonymous() and '@' not in purchaser_email:
-            raise ValidationError('No user email for purchaser')
+    def validate_email(form, field):
+        email = field.data
+        if current_user.is_anonymous() and User.does_user_exist(email):
+            message = render_template('email_in_use_warning.html', email=email)
+            raise ValidationError(Markup(message))
 
 
 def build_info_form(formdata):
@@ -309,15 +319,18 @@ def tickets_info():
     if not form:
         return redirect(url_for('pay_choose'))
 
+    if not current_user.is_anonymous():
+        form.email.data = current_user.email
+        form.user_name.data = current_user.name
+
     if form.validate_on_submit():
         if current_user.is_anonymous():
-            session['anonymous_account_email'] = form.data['full'][0]['email']
+            session['anonymous_account_email'] = form.email.data
+            session['anonymous_account_user_name'] = form.user_name.data
 
         session['ticketinfo'] = form.data
 
         return redirect(url_for('pay_choose'))
-    elif request.method == 'POST' and not form.validate():
-        flash('You need to set an email for the purchaser.')
 
     return render_template('tickets-info.html', form=form, basket=basket, total=total, is_anonymous=current_user.is_anonymous())
 

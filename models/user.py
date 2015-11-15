@@ -37,6 +37,11 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return '<User %s>' % self.email
 
+    @classmethod
+    def does_user_exist(cls, email):
+        return any(User.query.filter_by(email=email).all())
+
+
 class PasswordReset(db.Model):
     __tablename__ = 'password_reset'
     id = db.Column(db.Integer, primary_key=True)
