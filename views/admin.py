@@ -18,7 +18,7 @@ from flask_mail import Message
 from wtforms.validators import Optional, Regexp
 from wtforms.widgets import TextArea
 from wtforms import (
-    SubmitField, BooleanField, TextField, RadioField, DateField, IntegerField
+    SubmitField, BooleanField, StringField, RadioField, DateField, IntegerField
 )
 
 from sqlalchemy.orm.exc import NoResultFound
@@ -227,12 +227,12 @@ def ticket_type_details(type_id):
 
 
 class UpdateTicketTypeForm(Form):
-    name = TextField('Name')
+    name = StringField('Name')
     order = IntegerField('Order')
     type_limit = IntegerField('Maximum tickets to sell')
     personal_limit = IntegerField('Maximum tickets to sell to an individual')
     expires = DateField('Expiry Date (Optional)', [Optional()])
-    description = TextField('Description', [Optional()], widget=TextArea())
+    description = StringField('Description', [Optional()], widget=TextArea())
     submit = SubmitField('Update')
 
     def init_with_ticket_type(self, ticket_type):
@@ -267,7 +267,7 @@ def update_ticket_type(type_id):
 
 
 class NewTicketTypeForm(Form):
-    name = TextField('Name')
+    name = StringField('Name')
     order = IntegerField('Order')
     admits = RadioField('Admits', choices=[('full', 'Adult'), ('kid', 'Under 16'),
         ('campervan', 'Campervan'), ('car', 'Car'), ('other', 'Other')])
@@ -277,8 +277,8 @@ class NewTicketTypeForm(Form):
     price_gbp = IntegerField('Price (GBP)')
     price_eur = IntegerField('Price (EUR)')
     has_badge = BooleanField('Issue Badge')
-    discount_token = TextField('Discount token', [Optional(), Regexp('^[-_0-9a-zA-Z]+$')])
-    description = TextField('Description', [Optional()], widget=TextArea())
+    discount_token = StringField('Discount token', [Optional(), Regexp('^[-_0-9a-zA-Z]+$')])
+    description = StringField('Description', [Optional()], widget=TextArea())
     submit = SubmitField('Create')
 
     def init_with_ticket_type(self, ticket_type):
