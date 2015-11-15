@@ -138,7 +138,7 @@
             {{ form.need_finance.label.text }}
           </label>
           {% for error in form.need_finance.errors %}
-          <span class="help-inline">{{ error }}</span>
+          <div class="help-block">{{ error }}</div>
           {% endfor %}
         </div>
 
@@ -149,7 +149,7 @@
             {{ form.one_day.label.text }}
           </label>
           {% for error in form.one_day.errors %}
-          <span class="help-inline">{{ error }}</span>
+          <div class="help-block">{{ error }}</div>
           {% endfor %}
         </div>
       {% endif %}

@@ -1,17 +1,19 @@
  <div>
   {% if i==1 and is_anonymous %}
+    <div class="form-group {% if email.errors %}has-error{% endif %}">
 
-    {% for error in email.errors %}
-    <span class="help-inline">{{ error }}</span>
-    {% endfor %}
+      <p>
+        <label for="{{ email.id }}">Your email address:</label>
+        {{ email(class_='form-control')|safe }}
+      </p>
 
-    <p>
-    <label for="{{ email.id }}">Your email address:</label>
-    {{ email(class_='form-control')|safe }}
-    </p>
+      {% for error in email.errors %}
+      <div class="help-block">{{ error }}</div>
+      {% endfor %}
 
-    <div id="a-blurb{{ i }}">
-      <p>We need your email address to send you your tickets, please make sure it's correct. Should you decide to sign up for workshops or edit the wiki later please use this email address and we'll automatically add the tickets to your account.</p>
+      <div id="a-blurb{{ i }}">
+        <p>We need your email address to send you your tickets, please make sure it's correct. Should you decide to sign up for workshops or edit the wiki later please use this email address and we'll automatically add the tickets to your account.</p>
+      </div>
     </div>
   {% endif %}
 
@@ -22,7 +24,7 @@
     </label>
 
     {% for error in email.errors %}
-    <span class="help-inline">{{ error }}</span>
+    <div class="help-block">{{ error }}</div>
     {% endfor %}
 
     {% if i==2 %}
