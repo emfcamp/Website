@@ -311,8 +311,6 @@ def tickets_info():
     if form.validate_on_submit():
         if current_user.is_anonymous():
             session['anonymous_account_email'] = form.data['full'][0]['email']
-        if form.back.data:
-            return redirect(url_for('tickets_choose'))
 
         session['ticketinfo'] = form.data
 
