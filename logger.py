@@ -95,6 +95,7 @@ def setup_logging(app):
                 del app.logger.handlers[:]
 
         logger = logging.getLogger('sqlalchemy.engine.base.Engine')
+        # sqlalchemy is very noisy at debug - this is plenty verbose enough
         logger.setLevel(logging.INFO)
         hdlr = set_handler(logger)
         if app.config.get('LOG_COLOR'):
