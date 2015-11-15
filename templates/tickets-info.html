@@ -21,13 +21,13 @@ or drop us an <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email</a>.</p>
 
 {% if is_anonymous %}
 <div class="well">
-    <div class="form-inline row">
-        <div class="col-md-6">{{ render_field (form.email, True) }}</div>
-        <div class="col-md-6">{{ render_field (form.user_name, True) }}</div>
-    </div>
-    <div id="a-blurb{{ i }}">
-        <p>We need your email address and name to send you your tickets, please make sure it's correct. Should you decide to sign up for workshops or edit the wiki later please use this email address and we'll automatically add the tickets to your account.</p>
-  </div>
+    <h3>Sign up</h3>
+    <div class="col-md-12">{{ render_field (form.email) }}</div>
+    <div class="col-md-12">{{ render_field (form.user_name) }}</div>
+    <p>&nbsp;</p>
+    <p>
+        We need your email address and name to send you your tickets, please make sure it's correct. Should you decide to sign up for workshops or edit the wiki later please use this email address and we'll automatically add the tickets to your account.
+    </p>
 </div>
 {% endif %}
 

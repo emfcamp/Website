@@ -267,17 +267,11 @@ class TicketInfoForm(Form):
 
     forward = SubmitField('Continue to Check-out')
 
-    def validate(self):
-        rv = Form.validate(self)
-        if not rv:
-            return False
-
-        email = self.email.data
+    def validate_email(form, field):
+        email = field.data
         if current_user.is_anonymous() and User.does_user_exist(email):
-            message = "This email address %s is already in use. Please log in, or reset your password if you've forgotten it." % (email)
-            self.email.errors.append(message)
-            return False
-        return True
+            message = render_template('email_in_use_warning.html', email=email)
+            raise ValidationError(Markup(message))
 
 
 def build_info_form(formdata):
