@@ -11,7 +11,6 @@
 <tr>
   <th class="checkbox-cell"></th>
   <th>Type</th>
-  <th class="volunteer">Volunteer</th>
   <th class="accessible">Accessibility</th>
   <th>Status</th>
 </tr>
@@ -33,15 +32,6 @@
   {% endif %}
 </td>
 <td>{{ t.type.name }}</td>
-<td class="volunteer">
-	{%- if t.type.code.startswith("kids") or t.type.code in ["campervan", "parking"] -%}
-		N/A
-	{%- else %}
-		{%- for attrib in t.attribs if attrib.name == "volunteer" %}
-			{%- if attrib.value in ("1", "true") -%} Yes {%- else -%} No {%- endif -%}
-		{% endfor -%}
-	{% endif -%}
-</td>
 <td class="accessible">
 	{%- if t.type.code in ["parking", "campervan"] -%}
 		N/A

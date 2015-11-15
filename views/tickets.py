@@ -41,7 +41,6 @@ class TicketForm(Form):
 
 class FullTicketForm(TicketForm):
     template = 'tickets/full.html'
-    volunteer = BooleanField('Volunteering')
     accessible = BooleanField('Accessibility')
     email = EmailField('Email')
     phone = TelField('Phone')
