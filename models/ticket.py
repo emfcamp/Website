@@ -117,6 +117,26 @@ class TicketType(db.Model):
         else:
             return None
 
+    @classmethod
+    def get_ticket_sales(cls):
+        """ Get the number of tickets sold, by ticket type.
+            Returns a dict of type -> count """
+        full_tickets = TicketType.query.filter_by(admits='full').all()
+        kid_tickets = TicketType.query.filter_by(admits='kid').all()
+        admissions_tickets = full_tickets + kid_tickets
+
+        ticket_totals = {}
+
+        for ticket_type in admissions_tickets:
+            ticket_totals[ticket_type] = ticket_type.get_sold()
+        return ticket_totals
+
+    @classmethod
+    def get_tickets_remaining(cls):
+        """ Get the total number of tickets remaining. """
+        people = sum(cls.get_ticket_sales().values())
+        return app.config.get('MAXIMUM_ADMISSIONS') - people
+
 
 class TicketPrice(db.Model):
     __tablename__ = 'ticket_price'

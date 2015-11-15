@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block body %}
+<div id="gallery" class="row">
+    <img class="col-md-3 col-sm-4 col-xs-6" src="/static/images/main_images/EMF-Website-2014-V1_03.jpg" alt="Image of EMF 2012">
+        <img class="col-md-3 col-sm-4 col-xs-6" src="/static/images/main_images/EMF-Website-2014-V1_05.jpg" alt="Image of EMF 2012">
+        <img class="col-md-3 col-sm-4 col-xs-6" src="/static/images/main_images/EMF-Website-2014-V1_07.jpg" alt="Image of EMF 2012">
+        <img class="col-md-3 col-xs-6 hidden-sm" src="/static/images/main_images/EMF-Website-2014-V1_09.jpg" alt="Image of EMF 2012">
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <p class="emphasis">
+          Electromagnetic Field is a non-profit UK camping festival for those with an inquisitive mind or an
+          interest in making things: hackers, artists, geeks, crafters, scientists, and engineers.
+        </p>
+        <p>A temporary town of more than a thousand like-minded people enjoying a long weekend of talks, performances,
+        and workshops on everything from <strong>blacksmithing</strong> to <strong>biometrics</strong>,
+        <strong>chiptunes</strong> to <strong>computer security</strong>,
+        <strong>high altitude ballooning</strong> to <strong>lockpicking</strong>,
+        <strong>origami</strong> to <strong>democracy</strong>,
+        and <strong>online privacy</strong> to <strong>knitting</strong>.
+        </p>
+        <p>To help matters along, we provide <strong>fast internet</strong>,
+           <strong>power to the tent</strong>, <strong>good beer</strong>, and
+          <strong>amazing installations</strong>, entirely organised by a dedicated team of volunteers.
+        </p>
+    </div>
+    <div class="col-md-6">
+        <p class="emphasis">Electromagnetic Field 2016 will be held on
+                             <strong>August 5&ndash;7 2016</strong>
+                             at <strong>Loseley Park, Guildford</strong>.</p>
+        <div class="well">
+            {% include "home/sales_block.html" %}
+        </div>
+    </div>
+</div>
+{% endblock %}

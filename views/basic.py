@@ -3,9 +3,10 @@ import csv
 import json
 from main import app
 from views import feature_flag
-
+from datetime import datetime
 from models.ticket import TicketType
 from models.payment import StripePayment
+from models.site_state import get_site_state
 
 from mailsnake import MailSnake
 from mailsnake.exceptions import MailSnakeException, ListAlreadySubscribedException
@@ -19,17 +20,17 @@ from jinja2.exceptions import TemplateNotFound
 
 @app.route("/")
 def main():
-    if app.config.get('ARRIVALS_SITE'):
-        return redirect(url_for('arrivals'))
-
     full_price = TicketType.get_price_cheapest_full()
     if not (app.config.get('BANK_TRANSFER') or app.config.get('GOCARDLESS')):
         # Only card payment left
         full_price += StripePayment.premium('GBP', full_price)
 
-    return render_template('splash.html',
-        ticket_sales=app.config.get('TICKET_SALES', False),
-        full_price=full_price)
+    state = get_site_state(datetime.now())
+    if app.config.get('DEBUG'):
+        state = request.args.get("site_state", state)
+
+    return render_template('home/%s.html' % state,
+                           full_price=full_price)
 
 
 @app.route("/", methods=['POST'])
@@ -41,7 +42,7 @@ def main_post():
         ms.listSubscribe(id='d1798f7c80', email_address=email)
         flash('Thanks for subscribing! You will receive a confirmation email shortly.')
 
-    except ListAlreadySubscribedException, e:
+    except ListAlreadySubscribedException as e:
         app.logger.info('Already subscribed: %s', email)
         if e.message:
             msg = Markup(e.message)
