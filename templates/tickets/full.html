@@ -1,9 +1,20 @@
-{{ ticket.form.hidden_tag_without('csrf_token') }}
+{% from "_formhelpers.html" import render_field %}
 {% set accessible = ticket.form.accessible %}
 {% set email = ticket.form.email %}
-{% set phone = ticket.form.phone %}
+{% set user_name = ticket.form.user_name %}
 
-{% include 'tickets/email.html' %}
+{{ ticket.form.hidden_tag_without('csrf_token') }}
+ <div>
+  {% if i==1 and is_anonymous %}
+    <div class="form-inline row">
+        <div class="col-md-6">{{ render_field (email, True) }}</div>
+        <div class="col-md-6">{{ render_field (user_name, True) }}</div>
+    </div>
+    <div id="a-blurb{{ i }}">
+        <p>We need your email address and name to send you your tickets, please make sure it's correct. Should you decide to sign up for workshops or edit the wiki later please use this email address and we'll automatically add the tickets to your account.</p>
+    </div>
+  {% endif %}
+</div>
 
 <div class="{% if accessible.errors -%} has-error {%- endif %}">
 {% include 'tickets/accessible.html' %}

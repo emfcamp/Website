@@ -42,7 +42,7 @@ class FullTicketForm(TicketForm):
     template = 'tickets/full.html'
     accessible = BooleanField('Accessibility')
     email = EmailField('Email')
-    phone = TelField('Phone')
+    user_name = TextField('Name')
 
 
 class KidsTicketForm(TicketForm):
@@ -258,10 +258,16 @@ class TicketInfoForm(Form):
     def validate_full(form, field):
         # field.data is a list of dictionaries containing the sub-form responses
         purchaser_email = field.data[0]['email']
+        purchaser_name = field.data[0]['user_name']
 
         # Check that the email is at least plausible i.e. contains '@'
-        if current_user.is_anonymous() and '@' not in purchaser_email:
-            raise ValidationError('No user email for purchaser')
+        if current_user.is_anonymous():
+
+            if '@' not in purchaser_email:
+                raise ValidationError('No user email for purchaser')
+
+            if not purchaser_name:
+                raise ValidationError('No user name for purchaser')
 
 
 def build_info_form(formdata):
