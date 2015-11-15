@@ -17,7 +17,6 @@ from wtforms.compat import string_types
 
 from decorator import decorator
 from datetime import datetime
-import iso8601
 
 
 class IntegerSelectField(SelectField):
