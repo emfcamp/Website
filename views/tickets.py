@@ -1,6 +1,6 @@
 from main import app, db
 from views import (
-    get_user_currency, set_user_currency, get_basket_and_total, process_basket, TICKET_CUTOFF,
+    get_user_currency, set_user_currency, get_basket_and_total, process_basket,
     CURRENCY_SYMBOLS,
     IntegerSelectField, HiddenIntegerField, TelField, Form, feature_flag
 )
@@ -9,6 +9,7 @@ from models.ticket import (
     TicketType, Ticket, TicketAttrib,
     validate_safechars,
 )
+from models.site_state import get_sales_state
 from models.payment import Payment
 
 from flask import (
@@ -184,7 +185,7 @@ class TicketAmountsForm(Form):
 @app.route("/tickets/choose", methods=['GET', 'POST'])
 @feature_flag('TICKET_SALES')
 def tickets_choose():
-    if TICKET_CUTOFF:
+    if get_sales_state(datetime.utcnow()) != 'available':
         return render_template("tickets-cutoff.html")
 
     form = TicketAmountsForm()

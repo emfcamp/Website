@@ -1,0 +1,11 @@
+{% if SALES_STATE == 'available' %}
+<p>Tickets for EMF are now on sale for £{{full_price}}!<p>
+<a class="btn btn-default" href="{{url_for('tickets_choose')}}">Buy your ticket now</a>
+{% elif SALES_STATE == 'unavailable' %}
+<p>Tickets are currently unavailable. Keep an eye on Twitter for
+    an update when the next batch is on sale!</p>
+{% elif SALES_STATE == 'sold-out' %}
+<p>EMF is sold out! We're sorry if you didn't manage to get a ticket.</p>
+{% elif SALES_STATE == 'sales-ended' %}
+<p>Ticket sales have now ended.</p>
+{% endif %}

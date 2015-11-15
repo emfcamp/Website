@@ -3,6 +3,7 @@ from main import app, external_url
 from flask import session, abort
 
 from models.ticket import Ticket, TicketType
+from models.site_state import get_site_state, get_sales_state
 
 from flask_wtf import Form as BaseForm
 from flask_wtf.form import _is_hidden
@@ -103,8 +104,12 @@ def format_gcid(gcid):
 
 @app.context_processor
 def utility_processor():
+    now = datetime.utcnow()
+    SALES_STATE = get_sales_state(now)
+    SITE_STATE = get_site_state(now)
     return dict(
-        TICKET_CUTOFF=TICKET_CUTOFF,
+        SALES_STATE=SALES_STATE,
+        SITE_STATE=SITE_STATE,
         CURRENCIES=CURRENCIES,
         CURRENCY_SYMBOLS=CURRENCY_SYMBOLS,
         external_url=external_url
@@ -141,11 +146,6 @@ def process_basket():
     basket = [Ticket(type=tt, user_id=user_id) for tt in items]
     app.logger.debug('Added tickets to db for basket %s with total %s', basket, total)
     return basket, total
-
-def ticket_cutoff():
-    return datetime.utcnow() > iso8601.parse_date(app.config['TICKET_CUTOFF']).replace(tzinfo=None)
-
-TICKET_CUTOFF = ticket_cutoff()
 
 import basic  # noqa
 import users  # noqa
