@@ -13,13 +13,21 @@ import os
 import logging
 import logger
 
-logging.basicConfig(level=logging.NOTSET)
+# If we have logging handlers set up here, don't touch them.
+# This is especially problematic during testing as we don't
+# want to overwrite nosetests' handlers
+if len(logging.root.handlers) == 0:
+    install_logging = True
+    logging.basicConfig(level=logging.NOTSET)
+else:
+    install_logging = False
 
 app = Flask(__name__)
 csrf = CsrfProtect(app)
 app.config.from_envvar('SETTINGS_FILE')
 
-logger.setup_logging(app)
+if install_logging:
+    logger.setup_logging(app)
 
 db = SQLAlchemy(app)
 mail = Mail(app)
