@@ -252,7 +252,6 @@ class TicketInfoForm(Form):
     campervan = FieldList(FormField(CampervanTicketForm))
     donation = FieldList(FormField(DonationTicketForm))
     forward = SubmitField('Continue to Check-out')
-    back = SubmitField('Change tickets')
 
     # We want the first email to be set, we don't care about the others
     def validate_full(form, field):

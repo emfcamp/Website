@@ -33,7 +33,7 @@ or drop us an <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email</a>.</p>
 
 </div>
 
-{{ form.back(class_="btn btn-default") }}
+<a class="btn btn-default" href="{{ url_for('tickets_choose') }}">Change tickets</a>
 {{ form.forward(class_="btn btn-success") }}
 
 </fieldset>
