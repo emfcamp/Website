@@ -13,3 +13,4 @@ static/.webassets-cache/
 static/gen
 config/live.cfg*
 .inside-vagrant
+.vagrant
