@@ -264,9 +264,7 @@ class TicketInfoForm(Form):
             return False
 
         email = self.email.data
-        existing_user = User.query.filter_by(email=email).all()
-
-        if existing_user:
+        if current_user.is_anonymous() and User.does_user_exist(email):
             message = "This email address %s is already in use. Please log in, or reset your password if you've forgotten it." % (email)
             self.email.errors.append(message)
             return False
@@ -317,6 +315,10 @@ def tickets_info():
     form, basket, total = build_info_form(request.form)
     if not form:
         return redirect(url_for('pay_choose'))
+
+    if not current_user.is_anonymous():
+        form.email.data = current_user.email
+        form.user_name.data = current_user.name
 
     if form.validate_on_submit():
         if current_user.is_anonymous():
