@@ -83,7 +83,7 @@ def signup():
         except IntegrityError, e:
             app.logger.warn('Adding user raised %r, assuming duplicate email', e)
             flash("This email address %s is already in use. Please log in, or reset your password if you've forgotten it." % (form.email.data))
-            return redirect(url_for('login'))
+            return redirect(url_for('signup', existing_email=form.email.data))
         login_user(user)
 
         # send a welcome email.
@@ -95,7 +95,7 @@ def signup():
 
         return redirect(form.next.data or url_for('tickets'))
 
-    return render_template("signup.html", form=form)
+    return render_template("signup.html", form=form, existing_email=request.args.get('existing_email'))
 
 class ForgotPasswordForm(Form):
     email = TextField('Email', [Email(), Required()])
