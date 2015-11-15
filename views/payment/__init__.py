@@ -3,7 +3,7 @@ from models import Payment, StripePayment, TicketType, Ticket
 from views import get_basket_and_total
 
 from flask import (
-    render_template, redirect, url_for, abort, session, flash
+    render_template, redirect, url_for, abort, flash
 )
 from flask.ext.login import login_required, current_user
 

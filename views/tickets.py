@@ -2,7 +2,7 @@ from main import app, db
 from views import (
     get_user_currency, set_user_currency, get_basket_and_total, process_basket,
     CURRENCY_SYMBOLS,
-    IntegerSelectField, HiddenIntegerField, TelField, Form, feature_flag
+    IntegerSelectField, HiddenIntegerField, Form, feature_flag
 )
 
 from models.user import User
