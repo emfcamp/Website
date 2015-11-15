@@ -150,7 +150,7 @@ def reset_password():
         db.session.delete(form._reset)
         user.set_password(form.password.data)
         db.session.commit()
-        return redirect(url_for('tickets'))
+        return redirect(url_for('login'))
     return render_template("reset-password.html", form=form)
 
 @app.route("/logout")
