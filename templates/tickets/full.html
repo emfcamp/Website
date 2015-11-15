@@ -5,6 +5,6 @@
 
 {% include 'tickets/email.html' %}
 
-<div class="{% if accessible.errors -%} error {%- endif %}">
+<div class="{% if accessible.errors -%} has-error {%- endif %}">
 {% include 'tickets/accessible.html' %}
 </div>
