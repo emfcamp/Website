@@ -226,14 +226,14 @@ def ticket_type_details(type_id):
     return render_template('admin/ticket-type-details.html', ticket_type=ticket_type)
 
 
-class UpdateTicketTypeForm(Form):
+class EditTicketTypeForm(Form):
     name = StringField('Name')
     order = IntegerField('Order')
     type_limit = IntegerField('Maximum tickets to sell')
     personal_limit = IntegerField('Maximum tickets to sell to an individual')
     expires = DateField('Expiry Date (Optional)', [Optional()])
     description = StringField('Description', [Optional()], widget=TextArea())
-    submit = SubmitField('Update')
+    submit = SubmitField('Save')
 
     def init_with_ticket_type(self, ticket_type):
         self.name.data = ticket_type.name
@@ -244,10 +244,10 @@ class UpdateTicketTypeForm(Form):
         self.description.data = ticket_type.description
 
 
-@app.route('/admin/ticket-types/<int:type_id>/update', methods=['GET', 'POST'])
+@app.route('/admin/ticket-types/<int:type_id>/edit', methods=['GET', 'POST'])
 @admin_required
-def update_ticket_type(type_id):
-    form = UpdateTicketTypeForm()
+def edit_ticket_type(type_id):
+    form = EditTicketTypeForm()
 
     ticket_type = TicketType.query.get(type_id)
     if form.validate_on_submit():
@@ -263,7 +263,7 @@ def update_ticket_type(type_id):
         return redirect(url_for('ticket_type_details', type_id=type_id))
 
     form.init_with_ticket_type(ticket_type)
-    return render_template('admin/update-ticket-type.html', ticket_type=ticket_type, form=form)
+    return render_template('admin/edit-ticket-type.html', ticket_type=ticket_type, form=form)
 
 
 class NewTicketTypeForm(Form):
