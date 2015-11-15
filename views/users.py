@@ -14,7 +14,7 @@ from flask.ext.login import (
 from flask_mail import Message
 
 from wtforms.validators import Required, Email, EqualTo, ValidationError
-from wtforms import TextField, PasswordField, HiddenField
+from wtforms import StringField, PasswordField, HiddenField
 
 import re
 
@@ -40,7 +40,7 @@ class NextURLField(HiddenField):
         return self.data
 
 class LoginForm(Form):
-    email = TextField('Email', [Email(), Required()])
+    email = StringField('Email', [Email(), Required()])
     password = PasswordField('Password', [Required()])
     next = NextURLField('Next')
 
@@ -60,8 +60,8 @@ def login():
     return render_template("login.html", form=form)
 
 class SignupForm(Form):
-    name = TextField('Full name', [Required()])
-    email = TextField('Email', [Email(), Required()])
+    name = StringField('Full name', [Required()])
+    email = StringField('Email', [Email(), Required()])
     password = PasswordField('Password', [Required(), EqualTo('confirm', message='Passwords do not match')])
     confirm = PasswordField('Confirm password', [Required()])
     next = NextURLField('Next')
@@ -98,7 +98,7 @@ def signup():
     return render_template("signup.html", form=form)
 
 class ForgotPasswordForm(Form):
-    email = TextField('Email', [Email(), Required()])
+    email = StringField('Email', [Email(), Required()])
 
     def validate_email(form, field):
         user = User.query.filter_by(email=form.email.data).first()
@@ -127,8 +127,8 @@ def forgot_password():
     return render_template("forgot-password.html", form=form)
 
 class ResetPasswordForm(Form):
-    email = TextField('Email', [Email(), Required()])
-    token = TextField('Token', [Required()])
+    email = StringField('Email', [Email(), Required()])
+    token = StringField('Token', [Required()])
     password = PasswordField('New password', [Required(), EqualTo('confirm', message='Passwords do not match')])
     confirm = PasswordField('Confirm password', [Required()])
 

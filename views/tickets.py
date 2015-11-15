@@ -21,7 +21,7 @@ from sqlalchemy import or_
 
 from wtforms.validators import Required, Optional, ValidationError
 from wtforms import (
-    SubmitField, BooleanField, TextField,
+    SubmitField, BooleanField, StringField,
     DecimalField, FieldList, FormField, HiddenField,
 )
 from wtforms.fields.html5 import EmailField
@@ -177,7 +177,7 @@ class TicketAmountsForm(Form):
     types = FieldList(FormField(TicketAmountForm))
     buy = SubmitField('Buy Tickets')
     currency_code = HiddenField('Currency')
-    set_currency = TextField('Set Currency', [Optional()])
+    set_currency = StringField('Set Currency', [Optional()])
 
     def validate_set_currency(form, field):
         if field.data not in CURRENCY_SYMBOLS:

@@ -15,19 +15,19 @@ from flask_mail import Message
 
 from wtforms.validators import Required, Email
 from wtforms import (
-    BooleanField, TextField,
+    BooleanField, StringField,
     FormField, TextAreaField, SelectField,
 )
 
 class DiversityForm(Form):
-    age = TextField('Age')
-    gender = TextField('Gender')
-    ethnicity = TextField('Ethnicity')
+    age = StringField('Age')
+    gender = StringField('Gender')
+    ethnicity = StringField('Ethnicity')
 
 class ProposalForm(Form):
-    name = TextField("Name", [Required()])
-    email = TextField("Email", [Email(), Required()])
-    title = TextField("Title", [Required()])
+    name = StringField("Name", [Required()])
+    email = StringField("Email", [Email(), Required()])
+    title = StringField("Title", [Required()])
     description = TextAreaField("Description", [Required()])
     # days = SelectMultipleField("I can only attend on some days",
     #                            choices=[('fri', 'Friday'),
@@ -56,13 +56,13 @@ class TalkProposalForm(ProposalForm):
 
 class WorkshopProposalForm(ProposalForm):
     type = 'workshop'
-    length = TextField("Duration", [Required()])
-    attendees = TextField("Attendees", [Required()])
+    length = StringField("Duration", [Required()])
+    attendees = StringField("Attendees", [Required()])
     one_day = BooleanField("I can only attend for the day I give my workshop")
 
 class InstallationProposalForm(ProposalForm):
     type = 'installation'
-    size = TextField("Physical size", [Required()])
+    size = StringField("Physical size", [Required()])
 
 
 @app.route('/cfp')
