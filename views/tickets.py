@@ -116,9 +116,6 @@ def add_payment_and_tickets(paymenttype):
 
     for ticket in basket:
         name = get_form_name(ticket.type)
-        if name and not ticket.attribs:
-            app.logger.error('Ticket %s has no attribs', ticket)
-            return None
 
         current_user.tickets.append(ticket)
         ticket.payment = payment
