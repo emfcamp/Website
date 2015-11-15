@@ -79,7 +79,7 @@ def signup():
         try:
             create_user(form.email.data, form.name.data, form.password.data)
         except EmailAlreadyInUseException:
-            return redirect(url_for('login'))
+            return redirect(url_for('signup', existing_email=form.email.data))
         return redirect(form.next.data or url_for('tickets'))
 
     return render_template("signup.html", form=form, existing_email=request.args.get('existing_email'))
