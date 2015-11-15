@@ -6,6 +6,7 @@ from views import (
 )
 
 from models.user import User
+from views.users import create_user, EmailAlreadyInUseException
 
 from models.ticket import (
     TicketType, Ticket, TicketAttrib,
@@ -80,6 +81,14 @@ def add_payment_and_tickets(paymenttype):
     """
     Insert payment and tickets from session data into DB
     """
+    # Implicit user signup
+    if current_user.is_anonymous():
+        email = session['anonymous_account_email']
+        name = session['anonymous_account_user_name']
+        try:
+            create_user(email, name)
+        except EmailAlreadyInUseException:
+            return redirect(url_for('tickets_info'))
 
     infodata = session.get('ticketinfo')
     basket, total = process_basket()
@@ -248,7 +257,7 @@ def tickets_choose():
 
 class TicketInfoForm(Form):
     email = EmailField('Email', [ Required() ])
-    user_name = TextField('Name', [ Required() ])
+    user_name = StringField('Name', [ Required() ])
 
     full = FieldList(FormField(FullTicketForm))
     kids = FieldList(FormField(KidsTicketForm))

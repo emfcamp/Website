@@ -1,7 +1,6 @@
 from main import app
 from models import Payment, StripePayment, TicketType, Ticket
 from views import get_basket_and_total
-from views.users import create_user, EmailAlreadyInUseException
 
 from flask import (
     render_template, redirect, url_for, abort, session, flash
@@ -43,15 +42,6 @@ def pay_choose():
     basket, total = get_basket_and_total()
     if not basket:
         redirect(url_for('tickets'))
-
-    # Implicit user signup
-    if current_user.is_anonymous():
-        email = session['anonymous_account_email']
-        name = session['anonymous_account_user_name']
-        try:
-            create_user(email, name)
-        except EmailAlreadyInUseException:
-            return redirect(url_for('tickets_info'))
 
     return render_template('payment-choose.html', basket=basket, total=total, StripePayment=StripePayment)
 

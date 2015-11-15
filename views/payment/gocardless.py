@@ -30,7 +30,7 @@ def webhook(resource=None, action=None):
 
 @app.route("/pay/gocardless-start", methods=['POST'])
 @feature_flag('GOCARDLESS')
-@login_required
+# @login_required
 def gocardless_start():
     payment = add_payment_and_tickets(GoCardlessPayment)
     if not payment:
