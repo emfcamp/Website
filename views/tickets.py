@@ -5,6 +5,8 @@ from views import (
     IntegerSelectField, HiddenIntegerField, TelField, Form, feature_flag
 )
 
+from models.user import User
+
 from models.ticket import (
     TicketType, Ticket, TicketAttrib,
     validate_safechars,
@@ -41,8 +43,6 @@ class TicketForm(Form):
 class FullTicketForm(TicketForm):
     template = 'tickets/full.html'
     accessible = BooleanField('Accessibility')
-    email = EmailField('Email')
-    user_name = TextField('Name')
 
 
 class KidsTicketForm(TicketForm):
@@ -247,27 +247,30 @@ def tickets_choose():
     return render_template("tickets-choose.html", form=form)
 
 class TicketInfoForm(Form):
+    email = EmailField('Email', [ Required() ])
+    user_name = TextField('Name', [ Required() ])
+
     full = FieldList(FormField(FullTicketForm))
     kids = FieldList(FormField(KidsTicketForm))
     carpark = FieldList(FormField(CarparkTicketForm))
     campervan = FieldList(FormField(CampervanTicketForm))
     donation = FieldList(FormField(DonationTicketForm))
+
     forward = SubmitField('Continue to Check-out')
 
-    # We want the first email to be set, we don't care about the others
-    def validate_full(form, field):
-        # field.data is a list of dictionaries containing the sub-form responses
-        purchaser_email = field.data[0]['email']
-        purchaser_name = field.data[0]['user_name']
+    def validate(self):
+        rv = Form.validate(self)
+        if not rv:
+            return False
 
-        # Check that the email is at least plausible i.e. contains '@'
-        if current_user.is_anonymous():
+        email = self.email.data
+        existing_user = User.query.filter_by(email=email).all()
 
-            if '@' not in purchaser_email:
-                raise ValidationError('No user email for purchaser')
-
-            if not purchaser_name:
-                raise ValidationError('No user name for purchaser')
+        if existing_user:
+            message = "This email address %s is already in use. Please log in, or reset your password if you've forgotten it." % (email)
+            self.email.errors.append(message)
+            return False
+        return True
 
 
 def build_info_form(formdata):
@@ -317,13 +320,14 @@ def tickets_info():
 
     if form.validate_on_submit():
         if current_user.is_anonymous():
-            session['anonymous_account_email'] = form.data['full'][0]['email']
+            session['anonymous_account_email'] = form.email.data
+            session['anonymous_account_user_name'] = form.user_name.data
+        if form.back.data:
+            return redirect(url_for('tickets_choose'))
 
         session['ticketinfo'] = form.data
 
         return redirect(url_for('pay_choose'))
-    elif request.method == 'POST' and not form.validate():
-        flash('You need to set an email for the purchaser.')
 
     return render_template('tickets-info.html', form=form, basket=basket, total=total, is_anonymous=current_user.is_anonymous())
 

@@ -1,7 +1,4 @@
-{% from "_formhelpers.html" import render_field %}
 {% set accessible = ticket.form.accessible %}
-{% set email = ticket.form.email %}
-{% set user_name = ticket.form.user_name %}
 
 {{ ticket.form.hidden_tag_without('csrf_token') }}
  <div>
@@ -16,6 +13,6 @@
   {% endif %}
 </div>
 
-<div class="{% if accessible.errors -%} has-error {%- endif %}">
+<div class="{% if accessible.errors -%} error {%- endif %}">
 {% include 'tickets/accessible.html' %}
 </div>

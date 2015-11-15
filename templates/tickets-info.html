@@ -1,3 +1,4 @@
+{% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block body %}
 
@@ -17,6 +18,18 @@ or drop us an <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email</a>.</p>
 <fieldset>
 
 <div>
+
+{% if is_anonymous %}
+<div class="well">
+    <div class="form-inline row">
+        <div class="col-md-6">{{ render_field (form.email, True) }}</div>
+        <div class="col-md-6">{{ render_field (form.user_name, True) }}</div>
+    </div>
+    <div id="a-blurb{{ i }}">
+        <p>We need your email address and name to send you your tickets, please make sure it's correct. Should you decide to sign up for workshops or edit the wiki later please use this email address and we'll automatically add the tickets to your account.</p>
+  </div>
+</div>
+{% endif %}
 
 {% for ticket in basket %}
 {% if ticket.form %}

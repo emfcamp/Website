@@ -50,7 +50,8 @@ def pay_choose():
     if current_user.is_anonymous():
         # ToDo: Make user.name optional. See #223
         email = session['anonymous_account_email']
-        user = User(email, "NULL")
+        name = session['anonymous_account_user_name']
+        user = User(email, name)
         user.generate_random_password()
         db.session.add(user)
 
