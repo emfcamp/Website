@@ -1,49 +1,10 @@
 {{ ticket.form.hidden_tag_without('csrf_token') }}
-{% set volunteer = ticket.form.volunteer %}
 {% set accessible = ticket.form.accessible %}
 {% set email = ticket.form.email %}
 {% set phone = ticket.form.phone %}
 
 {% include 'tickets/email.html' %}
 
-<div class="{% if volunteer.errors or accessible.errors -%} error {%- endif %}">
-  <div class="controls">
-    <label class="checkbox">
-      {{ volunteer()|safe }}
-      I'm interested in volunteering <a data-toggle="collapse" href="#v-blurb{{ i }}"></a>
-    </label>
-    {% for error in volunteer.errors %}
-    <div class="help-block">{{ error }}</div>
-    {% endfor %}
-    <!-- use 'i' to mangle the namespace, if it's the first ticket display the blurb -->
-    <div id="v-blurb{{ i }}" class="collapse {% if i==1 %}in{% endif %}">
-      <p>EMF is a volunteer-run effort. We'd really appreciate it if you contributed as little as three hours of your time at the camp to keep things running smoothly.</p>
-      <p>We need people to do everything from pulling pints to manning the info desk. If you have a current First Aid certificate we're particularly keen to hear from you. We need lots of help so if you'd like to get involved then check the box here and we'll be in touch.</p>
-    </div>
-  </div>
-
+<div class="{% if accessible.errors -%} error {%- endif %}">
 {% include 'tickets/accessible.html' %}
-
-  <div class="controls">
-    <div id="phone-{{ i }}" class="collapse in">
-      <label style="margin-top: 10px">
-        We'll get in touch by email about volunteering
-      </label>
-      {% for error in phone.errors %}
-      <div class="help-block">{{ error }}</div>
-      {% endfor %}
-      <p>But to save time later, feel free to add your mobile/phone number now:</p>
-      <div class="form-group{% if phone.errors %} error{% endif %}">
-        <label class="control-label sr-only">{{ phone.label }}</label>
-        <i class="glyphicon glyphicon-earphone control-label col-sm-1"></i>
-        <div class="controls col-sm-4">{{ phone(class_='form-control')|safe }}
-          {% if phone.errors %}
-              {% for error in phone.errors %}
-                <div class="help-block">{{ error }}</div>
-              {% endfor %}
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
 </div>

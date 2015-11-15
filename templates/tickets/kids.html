@@ -1,15 +1,7 @@
 {{ ticket.form.hidden_tag_without('csrf_token') }}
-
-{% set volunteer = ticket.form.volunteer %}
 {% set accessible = ticket.form.accessible %}
 
 <div class="{% if form.errors -%} error {%- endif %}">
 
 {% include 'tickets/accessible.html' %}
-
-  <div style="margin-top: 10px">
-    Sorry, all our volunteers must be over 18.
-    Don't worry, there will be plenty of activities to get involved with in the villages.
-  </div>
-
 </div>
