@@ -131,7 +131,7 @@ class ForgotPasswordForm(Form):
 @feature_flag('TICKETS_SITE')
 @feature_flag('TICKET_SALES')
 def forgot_password():
-    form = ForgotPasswordForm(request.form)
+    form = ForgotPasswordForm(request.form, email=request.args.get('email'))
     if request.method == 'POST' and form.validate():
         if form._user:
             reset = PasswordReset(form.email.data)

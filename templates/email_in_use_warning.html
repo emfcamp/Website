@@ -2,5 +2,5 @@
     This email address {{ email }} is already in use.
 </p>
 <p>
-    Please <a href="{{ url_for('login') }}">log in</a>, or <a href="{{ url_for('reset_password') }}">reset your password</a> if you've forgotten it. If you've already bought some tickets we will have created a user for you then.
+    Please <a href="{{ url_for('login') }}">log in</a>, or <a href="{{ url_for('forgot_password', email=email) }}">reset your password</a> if you've forgotten it. If you've already bought some tickets we will have created a user for you then.
 </p>
