@@ -1,17 +1,8 @@
 {% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block body %}
-{% if existing_email %}
-<div class="alert alert-info">
-  If you have used this email address to buy a ticket, we have already created an account for you.
-  Please go to <a class="alert-link" href="{{ url_for('forgot_password') }}">forgot password</a> to set your new password.
-</div>
-{% endif %}
 <div class="col-md-10">
 <h2>Sign up</h2>
-{#
-<p>If you've already signed up this year, you might want to <a href="{{ url_for('login') }}">log in</a>.</p>
-#}
 
 <p>To buy a ticket, first create an account.</p>
 <form method="post" role="form" class="form-horizontal">
@@ -19,6 +10,12 @@
   {{ form.hidden_tag() }}
     {{ render_field(form.name, True) }}
     {{ render_field(form.email, True) }}
+    {% if form.email.was_duplicate %}
+    <div class="alert alert-warning">
+      If you have used this email address to buy a ticket, we have already created an account for you.
+      Please <a class="alert-link" href="{{ url_for('forgot_password') }}">click here</a> to change your password.
+    </div>
+    {% endif %}
     {{ render_field(form.password, True) }}
     {{ render_field(form.confirm, True) }}
   <div class="form-actions col-sm-offset-3 col-sm-9">

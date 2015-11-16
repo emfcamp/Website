@@ -1,5 +1,8 @@
 from main import app, db, mail, login_manager
-from views import set_user_currency, Form, feature_flag
+from views import (
+    set_user_currency, Form, feature_flag,
+    create_current_user,
+)
 from models.user import User, PasswordReset
 
 from flask import (
@@ -14,13 +17,12 @@ from flask_mail import Message
 from wtforms.validators import Required, Email, EqualTo, ValidationError
 from wtforms import StringField, PasswordField, HiddenField
 
+from sqlalchemy.exc import IntegrityError
+
 import re
 
 login_manager.setup_app(app, add_context_processor=True)
 app.login_manager.login_view = 'login'
-
-class EmailAlreadyInUseException(Exception):
-    pass
 
 @login_manager.user_loader
 def load_user(userid):
@@ -65,7 +67,13 @@ class SignupForm(Form):
     email = StringField('Email', [Email(), Required()])
     password = PasswordField('Password', [Required(), EqualTo('confirm', message='Passwords do not match')])
     confirm = PasswordField('Confirm password', [Required()])
+
     next = NextURLField('Next')
+
+    def validate_email(form, field):
+        if current_user.is_anonymous() and User.does_user_exist(field.data):
+            field.was_duplicate = True
+            raise ValidationError('Account already exists')
 
 @app.route("/signup", methods=['GET', 'POST'])
 @feature_flag('TICKETS_SITE')
@@ -77,45 +85,15 @@ def signup():
 
     if request.method == 'POST' and form.validate():
         try:
-            create_user(form.email.data, form.name.data, form.password.data)
-        except EmailAlreadyInUseException:
-            return redirect(url_for('signup', existing_email=form.email.data))
+            create_current_user(form.email.data, form.name.data, form.password.data)
+        except IntegrityError as e:
+            app.logger.warn('Adding user raised %r, possible double-click', e)
+            flash('An error occurred adding your account. Please try again.')
+            return redirect(url_for('signup'))
+
         return redirect(form.next.data or url_for('tickets'))
 
     return render_template("signup.html", form=form, existing_email=request.args.get('existing_email'))
-
-
-def create_user(email, name, password=None):
-    if User.does_user_exist(email):
-        app.logger.warn('Attempted to create user with existing email: %s', email)
-        flash("This email address %s is already in use. Please log in, or reset your password if you've forgotten it." % email)
-        raise EmailAlreadyInUseException()
-
-    # Create the user object
-    user = User(email, name)
-    signup_template = 'emails/tickets-signup-email.txt' if password else 'emails/welcome-email.txt'
-    if password:
-        user.set_password(password)
-    else:
-        user.generate_random_password()
-
-    # Save the user to db
-    db.session.add(user)
-    db.session.commit()
-    app.logger.info('Created new user with email %s and id: %s', email, user.id)
-
-    # Login & make sure everything's set correctly
-    login_user(user)
-    current_user.id = user.id
-
-    # Send the welcome message
-    msg = Message('Welcome to Electromagnetic Field',
-            sender=app.config['TICKETS_EMAIL'],
-            recipients=[user.email])
-    msg.body = render_template(signup_template, user=user)
-    mail.send(msg)
-
-    return user
 
 
 class ForgotPasswordForm(Form):

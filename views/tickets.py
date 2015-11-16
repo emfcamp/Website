@@ -2,11 +2,11 @@ from main import app, db
 from views import (
     get_user_currency, set_user_currency, get_basket_and_total, process_basket,
     CURRENCY_SYMBOLS,
-    IntegerSelectField, HiddenIntegerField, Form, feature_flag
+    IntegerSelectField, HiddenIntegerField, Form, feature_flag,
+    create_current_user,
 )
 
 from models.user import User
-from views.users import create_user, EmailAlreadyInUseException
 
 from models.ticket import (
     TicketType, Ticket, TicketAttrib,
@@ -27,6 +27,8 @@ from wtforms import (
     DecimalField, FieldList, FormField, HiddenField,
 )
 from wtforms.fields.html5 import EmailField
+
+from sqlalchemy.exc import IntegrityError
 
 from datetime import datetime, timedelta
 from StringIO import StringIO
@@ -84,11 +86,12 @@ def add_payment_and_tickets(paymenttype):
     # Implicit user signup
     if current_user.is_anonymous():
         email = session['anonymous_account_email']
-        name = session['anonymous_account_user_name']
+        name = session['anonymous_account_name']
         try:
-            create_user(email, name)
-        except EmailAlreadyInUseException:
-            return redirect(url_for('tickets_info'))
+            create_current_user(email, name)
+        except IntegrityError as e:
+            app.logger.warn('Adding user raised %r, possible double-click', e)
+            return None
 
     infodata = session.get('ticketinfo')
     basket, total = process_basket()
@@ -253,8 +256,8 @@ def tickets_choose():
     return render_template("tickets-choose.html", form=form)
 
 class TicketInfoForm(Form):
-    email = EmailField('Email', [ Required() ])
-    user_name = StringField('Name', [ Required() ])
+    email = EmailField('Email', [Required()])
+    name = StringField('Name', [Required()])
 
     full = FieldList(FormField(FullTicketForm))
     kids = FieldList(FormField(KidsTicketForm))
@@ -265,10 +268,9 @@ class TicketInfoForm(Form):
     forward = SubmitField('Continue to Check-out')
 
     def validate_email(form, field):
-        email = field.data
-        if current_user.is_anonymous() and User.does_user_exist(email):
-            message = render_template('email_in_use_warning.html', email=email)
-            raise ValidationError(Markup(message))
+        if current_user.is_anonymous() and User.does_user_exist(field.data):
+            field.was_duplicate = True
+            raise ValidationError('Account already exists')
 
 
 def build_info_form(formdata):
@@ -318,12 +320,12 @@ def tickets_info():
 
     if not current_user.is_anonymous():
         form.email.data = current_user.email
-        form.user_name.data = current_user.name
+        form.name.data = current_user.name
 
     if form.validate_on_submit():
         if current_user.is_anonymous():
             session['anonymous_account_email'] = form.email.data
-            session['anonymous_account_user_name'] = form.user_name.data
+            session['anonymous_account_name'] = form.name.data
 
         session['ticketinfo'] = form.data
 
