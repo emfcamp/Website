@@ -27,6 +27,17 @@ mail = Mail()
 login_manager = LoginManager()
 assets = Environment()
 
+assets.register('css_main', Bundle('css/main.css',
+                output='gen/main-packed.css', filters='cssmin'))
+assets.register('css_admin', Bundle('css/admin.css',
+                output='gen/admin-packed.css', filters='cssmin'))
+assets.register('css_print', Bundle('css/print.css',
+                output='gen/print-packed.css', filters='cssmin'))
+assets.register('css_arrivals', Bundle('css/arrivals.css',
+                output='gen/arrivals-packed.css', filters='cssmin'))
+assets.register('js_main', Bundle('js/main.js',
+                output='gen/main-packed.js', filters='jsmin'))
+
 
 def create_app():
     app = Flask(__name__)
@@ -50,17 +61,6 @@ def create_app():
         if user:
             _request_ctx_stack.top.user_email = user.email
         return user
-
-    assets.register('css_main', Bundle('css/main.css',
-                    output='gen/main-packed.css', filters='cssmin'))
-    assets.register('css_admin', Bundle('css/admin.css',
-                    output='gen/admin-packed.css', filters='cssmin'))
-    assets.register('css_print', Bundle('css/print.css',
-                    output='gen/print-packed.css', filters='cssmin'))
-    assets.register('css_arrivals', Bundle('css/arrivals.css',
-                    output='gen/arrivals-packed.css', filters='cssmin'))
-    assets.register('js_main', Bundle('js/main.js',
-                    output='gen/main-packed.js', filters='jsmin'))
 
     if app.config.get('TICKETS_SITE'):
         gocardless.environment = app.config['GOCARDLESS_ENVIRONMENT']

@@ -1,29 +1,26 @@
 #!/usr/bin/env python
 # coding=utf-8
+from datetime import datetime, timedelta
 
 import ofxparse
 from flask.ext.script import Command, Manager, Option
-from flask import render_template
+from flask import render_template, current_app as app
 from flask_mail import Message
 from sqlalchemy.orm.exc import NoResultFound
-
-from datetime import datetime, timedelta
-
-from main import app, mail, db
+from main import create_app, mail, db
 from models import (
     User, TicketType, Ticket, TicketPrice
 )
 from models.payment import (
     BankAccount, BankTransaction,
 )
-from views.tickets import render_receipt, render_pdf
+from apps.tickets import render_receipt, render_pdf
 
-manager = Manager(app)
 
 class CreateDB(Command):
     def run(self):
-        from main import db
         db.create_all()
+
 
 class CreateBankAccounts(Command):
     def run(self):
@@ -37,6 +34,7 @@ class CreateBankAccounts(Command):
                 db.session.add(acct)
 
         db.session.commit()
+
 
 class LoadOfx(Command):
     option_list = [Option('-f', '--file', dest='filename', help="The .ofx file to load")]
@@ -335,6 +333,7 @@ class SendTickets(Command):
             db.session.commit()
 
 if __name__ == "__main__":
+    manager = Manager(create_app())
     manager.add_command('createdb', CreateDB())
     manager.add_command('createbankaccounts', CreateBankAccounts())
     manager.add_command('loadofx', LoadOfx())
