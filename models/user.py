@@ -1,5 +1,8 @@
 from main import db
+from models import exists
+
 from flask.ext.login import UserMixin
+
 import bcrypt
 import os
 import base64
@@ -36,6 +39,10 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return '<User %s>' % self.email
+
+    @classmethod
+    def does_user_exist(cls, email):
+        return exists(User.query.filter_by(email=email))
 
 class PasswordReset(db.Model):
     __tablename__ = 'password_reset'

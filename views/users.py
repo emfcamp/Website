@@ -1,8 +1,9 @@
 from main import app, db, mail, login_manager
-from views import set_user_currency, Form, feature_flag
+from views import (
+    set_user_currency, Form, feature_flag,
+    create_current_user,
+)
 from models.user import User, PasswordReset
-
-from sqlalchemy.exc import IntegrityError
 
 from flask import (
     render_template, redirect, request, flash,
@@ -15,6 +16,8 @@ from flask_mail import Message
 
 from wtforms.validators import Required, Email, EqualTo, ValidationError
 from wtforms import StringField, PasswordField, HiddenField
+
+from sqlalchemy.exc import IntegrityError
 
 import re
 
@@ -64,7 +67,13 @@ class SignupForm(Form):
     email = StringField('Email', [Email(), Required()])
     password = PasswordField('Password', [Required(), EqualTo('confirm', message='Passwords do not match')])
     confirm = PasswordField('Confirm password', [Required()])
+
     next = NextURLField('Next')
+
+    def validate_email(form, field):
+        if current_user.is_anonymous() and User.does_user_exist(field.data):
+            field.was_duplicate = True
+            raise ValidationError('Account already exists')
 
 @app.route("/signup", methods=['GET', 'POST'])
 @feature_flag('TICKETS_SITE')
@@ -75,27 +84,17 @@ def signup():
     form = SignupForm(request.form, next=request.args.get('next'))
 
     if request.method == 'POST' and form.validate():
-        user = User(form.email.data, form.name.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
         try:
-            db.session.commit()
-        except IntegrityError, e:
-            app.logger.warn('Adding user raised %r, assuming duplicate email', e)
-            flash("This email address %s is already in use. Please log in, or reset your password if you've forgotten it." % (form.email.data))
-            return redirect(url_for('signup', existing_email=form.email.data))
-        login_user(user)
-
-        # send a welcome email.
-        msg = Message("Welcome to Electromagnetic Field",
-                sender=app.config['TICKETS_EMAIL'],
-                recipients=[user.email])
-        msg.body = render_template("emails/welcome-email.txt", user=user)
-        mail.send(msg)
+            create_current_user(form.email.data, form.name.data, form.password.data)
+        except IntegrityError as e:
+            app.logger.warn('Adding user raised %r, possible double-click', e)
+            flash('An error occurred adding your account. Please try again.')
+            return redirect(url_for('signup'))
 
         return redirect(form.next.data or url_for('tickets'))
 
     return render_template("signup.html", form=form, existing_email=request.args.get('existing_email'))
+
 
 class ForgotPasswordForm(Form):
     email = StringField('Email', [Email(), Required()])
@@ -110,7 +109,7 @@ class ForgotPasswordForm(Form):
 @feature_flag('TICKETS_SITE')
 @feature_flag('TICKET_SALES')
 def forgot_password():
-    form = ForgotPasswordForm(request.form)
+    form = ForgotPasswordForm(request.form, email=request.args.get('email'))
     if request.method == 'POST' and form.validate():
         if form._user:
             reset = PasswordReset(form.email.data)

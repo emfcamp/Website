@@ -2,8 +2,11 @@ from main import app, db
 from views import (
     get_user_currency, set_user_currency, get_basket_and_total, process_basket,
     CURRENCY_SYMBOLS,
-    IntegerSelectField, HiddenIntegerField, TelField, Form, feature_flag
+    IntegerSelectField, HiddenIntegerField, Form, feature_flag,
+    create_current_user,
 )
+
+from models.user import User
 
 from models.ticket import (
     TicketType, Ticket, TicketAttrib,
@@ -25,6 +28,8 @@ from wtforms import (
 )
 from wtforms.fields.html5 import EmailField
 
+from sqlalchemy.exc import IntegrityError
+
 from datetime import datetime, timedelta
 from StringIO import StringIO
 from xhtml2pdf import pisa
@@ -41,8 +46,6 @@ class TicketForm(Form):
 class FullTicketForm(TicketForm):
     template = 'tickets/full.html'
     accessible = BooleanField('Accessibility')
-    email = EmailField('Email')
-    phone = TelField('Phone')
 
 
 class KidsTicketForm(TicketForm):
@@ -80,6 +83,15 @@ def add_payment_and_tickets(paymenttype):
     """
     Insert payment and tickets from session data into DB
     """
+    # Implicit user signup
+    if current_user.is_anonymous():
+        email = session['anonymous_account_email']
+        name = session['anonymous_account_name']
+        try:
+            create_current_user(email, name)
+        except IntegrityError as e:
+            app.logger.warn('Adding user raised %r, possible double-click', e)
+            return None
 
     infodata = session.get('ticketinfo')
     basket, total = process_basket()
@@ -107,9 +119,6 @@ def add_payment_and_tickets(paymenttype):
 
     for ticket in basket:
         name = get_form_name(ticket.type)
-        if name and not ticket.attribs:
-            app.logger.error('Ticket %s has no attribs', ticket)
-            return None
 
         current_user.tickets.append(ticket)
         ticket.payment = payment
@@ -247,21 +256,21 @@ def tickets_choose():
     return render_template("tickets-choose.html", form=form)
 
 class TicketInfoForm(Form):
+    email = EmailField('Email', [Required()])
+    name = StringField('Name', [Required()])
+
     full = FieldList(FormField(FullTicketForm))
     kids = FieldList(FormField(KidsTicketForm))
     carpark = FieldList(FormField(CarparkTicketForm))
     campervan = FieldList(FormField(CampervanTicketForm))
     donation = FieldList(FormField(DonationTicketForm))
+
     forward = SubmitField('Continue to Check-out')
 
-    # We want the first email to be set, we don't care about the others
-    def validate_full(form, field):
-        # field.data is a list of dictionaries containing the sub-form responses
-        purchaser_email = field.data[0]['email']
-
-        # Check that the email is at least plausible i.e. contains '@'
-        if current_user.is_anonymous() and '@' not in purchaser_email:
-            raise ValidationError('No user email for purchaser')
+    def validate_email(form, field):
+        if current_user.is_anonymous() and User.does_user_exist(field.data):
+            field.was_duplicate = True
+            raise ValidationError('Account already exists')
 
 
 def build_info_form(formdata):
@@ -309,15 +318,18 @@ def tickets_info():
     if not form:
         return redirect(url_for('pay_choose'))
 
+    if not current_user.is_anonymous():
+        form.email.data = current_user.email
+        form.name.data = current_user.name
+
     if form.validate_on_submit():
         if current_user.is_anonymous():
-            session['anonymous_account_email'] = form.data['full'][0]['email']
+            session['anonymous_account_email'] = form.email.data
+            session['anonymous_account_name'] = form.name.data
 
         session['ticketinfo'] = form.data
 
         return redirect(url_for('pay_choose'))
-    elif request.method == 'POST' and not form.validate():
-        flash('You need to set an email for the purchaser.')
 
     return render_template('tickets-info.html', form=form, basket=basket, total=total, is_anonymous=current_user.is_anonymous())
 

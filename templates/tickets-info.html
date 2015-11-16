@@ -1,3 +1,4 @@
+{% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block body %}
 
@@ -7,16 +8,42 @@ Ticket Information
 
 {# <div class="countdown">45:00</div> #}
 
-<p>You've requested {{ basket|count }} ticket{% if basket|count > 1 %}s{% endif %} for a total price of <b>{{ total | price(user_currency) }}</b>.</p>
+<p>You've requested {{ basket|count }} ticket{% if basket|count > 1 %}s{% endif %}
+   for a total price of <b>{{ total | price(user_currency) }}</b>.</p>
 <p>We just need a little more information about these tickets.
-If you're unsure about anything, please check out our <a href="http://wiki.emfcamp.org/wiki/FAQ#Ticket_Sales">FAQ</a>
-or drop us an <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email</a>.</p>
+   If you're unsure about anything, please check out our <a href="http://wiki.emfcamp.org/wiki/FAQ#Ticket_Sales">FAQ</a>
+   or drop us an <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email</a>.</p>
 
 <form method="post" class="form-horizontal ticket-info">
 {{ form.hidden_tag() }}
 <fieldset>
 
 <div>
+
+{% if is_anonymous %}
+<div class="well">
+  <div class="row">
+    <div class="col-md-12">{{ render_field(form.name, autofocus=True) }}</div>
+    <div class="col-md-12">{{ render_field(form.email) }}</div>
+    {% if form.email.was_duplicate %}
+    <div class="col-md-12">
+      <div class="alert alert-warning">
+        If you have used this email address to buy a ticket, we have already created an account for you.
+        Please <a class="alert-link" href="{{ url_for('login') }}">click here</a> to log in, or
+        or <a class="alert-link" href="{{ url_for('forgot_password') }}">reset your password</a>.
+      </div>
+    </div>
+    {% else %}
+    <div class="col-md-12">
+      <p></p>
+      <div class="aledrt aldert-info">
+        We need your email address and name to send you your tickets, so please make sure it's correct.
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
 
 {% for ticket in basket %}
 {% if ticket.form %}
@@ -38,6 +65,5 @@ or drop us an <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email</a>.</p>
 
 </fieldset>
 </form>
-
 
 {% endblock %}

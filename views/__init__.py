@@ -1,13 +1,19 @@
 # encoding=utf-8
-from main import app, external_url
-from flask import session, abort
+from main import app, db, mail, external_url
+from flask import session, abort, render_template
 
 from models.ticket import Ticket, TicketType
 from models.site_state import get_site_state, get_sales_state
+from models import User
+
+from flask_mail import Message
 
 from flask_wtf import Form as BaseForm
 from flask_wtf.form import _is_hidden
-from flask.ext.login import current_user
+from flask.ext.login import (
+    login_user, current_user,
+)
+
 from wtforms import (
     IntegerField, SelectField, HiddenField,
 )
@@ -119,6 +125,33 @@ def utility_processor():
 def currency_processor():
     currency = get_user_currency()
     return {'user_currency': currency}
+
+
+def create_current_user(email, name, password=None):
+    user = User(email, name)
+    signup_template = 'emails/tickets-signup-email.txt' if password else 'emails/welcome-email.txt'
+    if password:
+        user.set_password(password)
+    else:
+        user.generate_random_password()
+
+    db.session.add(user)
+    db.session.commit()
+    app.logger.info('Created new user with email %s and id: %s', email, user.id)
+
+    # Login & make sure everything's set correctly
+    login_user(user)
+    assert current_user.id == user.id
+    current_user.id = user.id
+
+    # Send the welcome message
+    msg = Message('Welcome to Electromagnetic Field',
+            sender=app.config['TICKETS_EMAIL'],
+            recipients=[user.email])
+    msg.body = render_template(signup_template, user=user)
+    mail.send(msg)
+
+    return user
 
 
 def get_user_currency(default='GBP'):

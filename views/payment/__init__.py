@@ -1,16 +1,13 @@
-from main import app, db, mail
+from main import app
 from models import Payment, StripePayment, TicketType, Ticket
-from models.user import User
 from views import get_basket_and_total
 
 from flask import (
-    render_template, redirect, url_for, abort, session, flash
+    render_template, redirect, url_for, abort, flash
 )
-from flask.ext.login import login_required, current_user, login_user
-from flask_mail import Message
+from flask.ext.login import login_required, current_user
 
 from sqlalchemy.sql.functions import func
-from sqlalchemy.exc import IntegrityError
 
 from decimal import Decimal
 
@@ -45,31 +42,6 @@ def pay_choose():
     basket, total = get_basket_and_total()
     if not basket:
         redirect(url_for('tickets'))
-
-    # Implicit user signup
-    if current_user.is_anonymous():
-        # ToDo: Make user.name optional. See #223
-        email = session['anonymous_account_email']
-        user = User(email, "NULL")
-        user.generate_random_password()
-        db.session.add(user)
-
-        try:
-            db.session.commit()
-        except IntegrityError, e:
-            app.logger.warn('Adding user raised %r, assuming duplicate email', e)
-            flash("This email address %s is already in use. Please log in, or reset your password if you've forgotten it." % (email))
-            return redirect(url_for('tickets_info'))
-        login_user(user)
-
-        # send a welcome email.
-        msg = Message("Welcome to Electromagnetic Field",
-                sender=app.config['TICKETS_EMAIL'],
-                recipients=[user.email])
-        msg.body = render_template("emails/tickets-signup-email.txt", user=user)
-        mail.send(msg)
-        app.logger.info('Created new user with email %s and id %s', email, user.id)
-        current_user.id = user.id
 
     return render_template('payment-choose.html', basket=basket, total=total, StripePayment=StripePayment)
 
