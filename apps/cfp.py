@@ -1,28 +1,32 @@
-from main import db, mail
-from views import Form, feature_flag
-from models.ticket import TicketType
-from models.cfp import (
-    TalkProposal, WorkshopProposal,
-    InstallationProposal, ProposalDiversity,
-)
-
 from flask import (
     render_template, redirect, request,
-    url_for, abort, current_app as app
+    url_for, abort, current_app as app, Blueprint
 )
 from flask.ext.login import current_user
 from flask_mail import Message
-
 from wtforms.validators import Required, Email
 from wtforms import (
     BooleanField, StringField,
     FormField, TextAreaField, SelectField,
 )
 
+from main import db, mail
+from models.ticket import TicketType
+from models.cfp import (
+    TalkProposal, WorkshopProposal,
+    InstallationProposal, ProposalDiversity,
+)
+from .common import feature_flag
+from .common.forms import Form
+
+cfp = Blueprint('cfp', __name__)
+
+
 class DiversityForm(Form):
     age = StringField('Age')
     gender = StringField('Gender')
     ethnicity = StringField('Ethnicity')
+
 
 class ProposalForm(Form):
     name = StringField("Name", [Required()])
@@ -37,6 +41,7 @@ class ProposalForm(Form):
     need_finance = BooleanField("I can't afford to buy a ticket without financial support")
 
     diversity = FormField(DiversityForm)
+
 
 class TalkProposalForm(ProposalForm):
     type = 'talk'
@@ -54,21 +59,23 @@ class TalkProposalForm(ProposalForm):
                                       ])
     one_day = BooleanField("I can only attend for the day I give my talk")
 
+
 class WorkshopProposalForm(ProposalForm):
     type = 'workshop'
     length = StringField("Duration", [Required()])
     attendees = StringField("Attendees", [Required()])
     one_day = BooleanField("I can only attend for the day I give my workshop")
 
+
 class InstallationProposalForm(ProposalForm):
     type = 'installation'
     size = StringField("Physical size", [Required()])
 
 
-@app.route('/cfp')
-@app.route('/cfp/<string:cfp_type>', methods=['GET', 'POST'])
+@cfp.route('/cfp')
+@cfp.route('/cfp/<string:cfp_type>', methods=['GET', 'POST'])
 @feature_flag('CFP')
-def cfp(cfp_type='talk'):
+def main(cfp_type='talk'):
     if cfp_type not in ['talk', 'workshop', 'installation']:
         abort(404)
 
@@ -109,8 +116,8 @@ def cfp(cfp_type='talk'):
 
         # Send confirmation message
         msg = Message('Electromagnetic Field CFP Submission',
-                     sender=app.config['CONTENT_EMAIL'],
-                     recipients=[cfp.email])
+                      sender=app.config['CONTENT_EMAIL'],
+                      recipients=[cfp.email])
 
         msg.body = render_template('emails/cfp-submission.txt', cfp=cfp, type=cfp_type)
         mail.send(msg)
@@ -124,10 +131,11 @@ def cfp(cfp_type='talk'):
     full_price = TicketType.get_price_cheapest_full()
 
     return render_template('cfp.html', full_price=full_price,
-        forms=forms, active_cfp_type=cfp_type, has_errors=bool(form.errors))
+                           forms=forms, active_cfp_type=cfp_type,
+                           has_errors=bool(form.errors))
 
-@app.route('/cfp/complete')
+
+@cfp.route('/cfp/complete')
 @feature_flag('CFP')
-def cfp_complete():
+def complete():
     return render_template('cfp_complete.html')
-
