@@ -9,15 +9,16 @@ class TicketTestCase(unittest.TestCase):
 
     def setUp(self):
         self.app, self.db = get_app()
+        from models.user import User
+        self.user = User('test@example.com', 'NULL')
+        self.user.generate_random_password()
+        self.db.session.add(self.user)
+        self.db.session.commit()
 
     def test_ticket_creation(self):
         from models.ticket import Ticket, TicketType
-        from models.user import User
-        user = User('test@example.com', 'NULL')
-        user.generate_random_password()
-        self.db.session.add(user)
         tt = TicketType.query.filter_by(admits='full').first()
-        ticket = Ticket(type=tt, user_id=user.id)
+        ticket = Ticket(type=tt, user_id=self.user.id)
         self.db.session.add(ticket)
         self.db.session.commit()
         assert ticket.id is not None
