@@ -11,8 +11,8 @@
         <button type="submit" class="btn btn-success debounce">Log in</button>
     </div>
     <div class="form-actions btn-group">
-        <a class="btn btn-primary" href="{{ url_for('forgot_password') }}">Forgot password</a>
-        <a class="btn btn-primary" href="{{ url_for('signup', next=form.next.data) }}">Sign up</a>
+        <a class="btn btn-primary" href="{{ url_for('users.forgot_password') }}">Forgot password</a>
+        <a class="btn btn-primary" href="{{ url_for('users.signup', next=form.next.data) }}">Sign up</a>
     </div>
 </form>
 
