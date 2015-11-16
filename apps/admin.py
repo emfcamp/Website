@@ -1,33 +1,33 @@
-from main import db, mail
-from models.user import User
-from models.payment import Payment, BankPayment, BankTransaction
-from models.ticket import Ticket, TicketCheckin, TicketType, TicketPrice
-from models.cfp import Proposal
-from views import Form
-from views.payment.stripe import (
-    StripeUpdateUnexpected, StripeUpdateConflict, stripe_update_payment,
-)
+from datetime import datetime, timedelta
+from functools import wraps
 
+from Levenshtein import ratio, jaro
 from flask import (
     render_template, redirect, request, flash,
-    url_for, abort, current_app as app
+    url_for, abort, current_app as app, Blueprint
 )
 from flask.ext.login import login_required, current_user
 from flask_mail import Message
-
 from wtforms.validators import Optional, Regexp
 from wtforms.widgets import TextArea
 from wtforms import (
     SubmitField, BooleanField, StringField, RadioField, DateField, IntegerField
 )
-
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.functions import func
 
-from Levenshtein import ratio, jaro
+from main import db, mail
+from models.user import User
+from models.payment import Payment, BankPayment, BankTransaction
+from models.ticket import Ticket, TicketCheckin, TicketType, TicketPrice
+from models.cfp import Proposal
+from .common.forms import Form
+from .payments.stripe import (
+    StripeUpdateUnexpected, StripeUpdateConflict, stripe_update_payment,
+)
 
-from datetime import datetime, timedelta
-from functools import wraps
+admin = Blueprint('admin', __name__)
+
 
 def admin_required(f):
     @wraps(f)
@@ -39,7 +39,8 @@ def admin_required(f):
         return app.login_manager.unauthorized()
     return wrapped
 
-@app.context_processor
+
+@admin.context_processor
 def admin_counts():
     if not request.path.startswith('/admin'):
         return {}
@@ -55,27 +56,29 @@ def admin_counts():
             'expiring_count': expiring_count}
 
 
-@app.route("/stats")
+@admin.route("/stats")
 def stats():
     full = Ticket.query.join(TicketType).filter_by(admits='full').join(Payment).filter(Payment.state != 'new')
     kids = Ticket.query.join(TicketType).filter_by(admits='kid').join(Payment).filter(Payment.state != 'new')
 
     # cancelled tickets get their expiry set to the cancellation time
-    full_unexpired = full.filter( Ticket.expires >= datetime.utcnow() )
-    kids_unexpired = kids.filter( Ticket.expires >= datetime.utcnow() )
-    full_unpaid = full_unexpired.filter( Ticket.paid == False) # noqa
-    kids_unpaid = kids_unexpired.filter( Ticket.paid == False) # noqa
+    full_unexpired = full.filter(Ticket.expires >= datetime.utcnow())
+    kids_unexpired = kids.filter(Ticket.expires >= datetime.utcnow())
+    full_unpaid = full_unexpired.filter(Ticket.paid == False)  # noqa
+    kids_unpaid = kids_unexpired.filter(Ticket.paid == False)  # noqa
 
     full_bought = full.filter(Ticket.paid)
     kids_bought = kids.filter(Ticket.paid)
 
-    full_gocardless_unpaid = full_unpaid.filter(Payment.provider == 'gocardless', Payment.state == 'inprogress')
-    full_banktransfer_unpaid = full_unpaid.filter(Payment.provider == 'banktransfer', Payment.state == 'inprogress')
+    full_gocardless_unpaid = full_unpaid.filter(Payment.provider == 'gocardless',
+                                                Payment.state == 'inprogress')
+    full_banktransfer_unpaid = full_unpaid.filter(Payment.provider == 'banktransfer',
+                                                  Payment.state == 'inprogress')
 
     parking_bought = Ticket.query.filter_by(paid=True).filter(TicketType.admits.is_('parking'))
     campervan_bought = Ticket.query.filter_by(paid=True).filter(TicketType.admits.is_('campervan'))
 
-    checked_in = Ticket.query.filter( TicketType.admits.in_(['full', 'kid']) ) \
+    checked_in = Ticket.query.filter(TicketType.admits.in_(['full', 'kid'])) \
                              .join(TicketCheckin).filter_by(checked_in=True)
     badged_up = TicketCheckin.query.filter_by(badged_up=True)
 
@@ -97,24 +100,27 @@ def stats():
     stats = ['%s:%s' % (q, locals()[q].count()) for q in queries]
     return ' '.join(stats)
 
-@app.route('/admin')
+
+@admin.route('/')
 @admin_required
-def admin():
+def home():
     return render_template('admin/admin.html')
 
 
-@app.route('/admin/transactions')
+@admin.route('/transactions')
 @admin_required
-def admin_txns():
+def transactions():
     txns = BankTransaction.query.filter_by(payment_id=None, suppressed=False).order_by('posted desc')
     return render_template('admin/txns.html', txns=txns)
+
 
 class TransactionSuppressForm(Form):
     suppress = SubmitField("Suppress")
 
-@app.route('/admin/transaction/<int:txn_id>/suppress', methods=['GET', 'POST'])
+
+@admin.route('/transaction/<int:txn_id>/suppress', methods=['GET', 'POST'])
 @admin_required
-def admin_txn_suppress(txn_id):
+def txn_suppress(txn_id):
     try:
         txn = BankTransaction.query.get(txn_id)
     except NoResultFound:
@@ -131,6 +137,7 @@ def admin_txn_suppress(txn_id):
             return redirect(url_for('admin_txns'))
 
     return render_template('admin/txn-suppress.html', txn=txn, form=form)
+
 
 def score_reconciliation(txn, payment):
     words = txn.payee.replace('-', ' ').split(' ')
@@ -155,9 +162,9 @@ def score_reconciliation(txn, payment):
     return bankref_score + name_score + other_score
 
 
-@app.route('/admin/transaction/<int:txn_id>/reconcile')
+@admin.route('/transaction/<int:txn_id>/reconcile')
 @admin_required
-def admin_txn_suggest_payments(txn_id):
+def txn_suggest_payments(txn_id):
     txn = BankTransaction.query.get_or_404(txn_id)
 
     payments = BankPayment.query.filter_by(state='inprogress').order_by(BankPayment.bankref).all()
@@ -171,9 +178,10 @@ def admin_txn_suggest_payments(txn_id):
 class ManualReconcilePaymentForm(Form):
     reconcile = SubmitField("Reconcile")
 
-@app.route('/admin/transaction/<int:txn_id>/reconcile/<int:payment_id>', methods=['GET', 'POST'])
+
+@admin.route('/transaction/<int:txn_id>/reconcile/<int:payment_id>', methods=['GET', 'POST'])
 @admin_required
-def admin_txn_reconcile(txn_id, payment_id):
+def txn_reconcile(txn_id, payment_id):
     txn = BankTransaction.query.get_or_404(txn_id)
     payment = BankPayment.query.get_or_404(payment_id)
 
@@ -201,7 +209,7 @@ def admin_txn_reconcile(txn_id, payment_id):
                           sender=app.config['TICKETS_EMAIL'],
                           recipients=[payment.user.email])
             msg.body = render_template("emails/tickets-paid-email-banktransfer.txt",
-                          user=payment.user, payment=payment)
+                                       user=payment.user, payment=payment)
             mail.send(msg)
 
             flash("Payment ID %s marked as paid" % payment.id)
@@ -209,7 +217,8 @@ def admin_txn_reconcile(txn_id, payment_id):
 
     return render_template('admin/txn-reconcile.html', txn=txn, payment=payment, form=form)
 
-@app.route('/admin/ticket-types', methods=['GET', 'POST'])
+
+@admin.route('/ticket-types', methods=['GET', 'POST'])
 @admin_required
 def ticket_types():
     ticket_types = TicketType.query.all()
@@ -219,7 +228,8 @@ def ticket_types():
         totals[tt.admits] = totals[tt.admits] + sold if tt.admits in totals else sold
     return render_template('admin/ticket-types.html', ticket_types=ticket_types, totals=totals)
 
-@app.route('/admin/ticket-types/<int:type_id>')
+
+@admin.route('/ticket-types/<int:type_id>')
 @admin_required
 def ticket_type_details(type_id):
     ticket_type = TicketType.query.get(type_id)
@@ -244,7 +254,7 @@ class EditTicketTypeForm(Form):
         self.description.data = ticket_type.description
 
 
-@app.route('/admin/ticket-types/<int:type_id>/edit', methods=['GET', 'POST'])
+@admin.route('/ticket-types/<int:type_id>/edit', methods=['GET', 'POST'])
 @admin_required
 def edit_ticket_type(type_id):
     form = EditTicketTypeForm()
@@ -270,7 +280,8 @@ class NewTicketTypeForm(Form):
     name = StringField('Name')
     order = IntegerField('Order')
     admits = RadioField('Admits', choices=[('full', 'Adult'), ('kid', 'Under 16'),
-        ('campervan', 'Campervan'), ('car', 'Car'), ('other', 'Other')])
+                                           ('campervan', 'Campervan'), ('car', 'Car'),
+                                           ('other', 'Other')])
     type_limit = IntegerField('Maximum tickets to sell')
     personal_limit = IntegerField('Maximum tickets to sell to an individual')
     expires = DateField('Expiry Date (Optional)', [Optional()])
@@ -295,8 +306,8 @@ class NewTicketTypeForm(Form):
         self.discount_token.data = ticket_type.discount_token
 
 
-@app.route('/admin/new-ticket-type/', defaults={'copy_id': -1}, methods=['GET', 'POST'])
-@app.route('/admin/new-ticket-type/<int:copy_id>', methods=['GET', 'POST'])
+@admin.route('/new-ticket-type/', defaults={'copy_id': -1}, methods=['GET', 'POST'])
+@admin.route('/new-ticket-type/<int:copy_id>', methods=['GET', 'POST'])
 @admin_required
 def new_ticket_type(copy_id):
     form = NewTicketTypeForm()
@@ -309,9 +320,9 @@ def new_ticket_type(copy_id):
         description = form.description.data if form.description.data else None
 
         tt = TicketType(new_id, form.order.data, form.admits.data,
-            form.name.data, form.type_limit.data, expires=expires,
-            discount_token=token, description=description,
-            personal_limit=form.personal_limit.data, has_badge=form.has_badge.data)
+                        form.name.data, form.type_limit.data, expires=expires,
+                        discount_token=token, description=description,
+                        personal_limit=form.personal_limit.data, has_badge=form.has_badge.data)
 
         tt.prices = [TicketPrice('GBP', form.price_gbp.data),
                      TicketPrice('EUR', form.price_eur.data)]
@@ -326,7 +337,7 @@ def new_ticket_type(copy_id):
     return render_template('admin/new-ticket-type.html', ticket_type_id=copy_id, form=form)
 
 
-@app.route("/admin/make-admin", methods=['GET', 'POST'])
+@admin.route("/admin/make-admin", methods=['GET', 'POST'])
 @login_required
 def make_admin():
     if current_user.admin:
@@ -348,7 +359,8 @@ def make_admin():
                         id = int(field.name.split("_")[0])
                         user = User.query.get(id)
                         if user.admin != field.data:
-                            app.logger.info("user %s (%s) admin: %s -> %s", user.name, user.id, user.admin, field.data)
+                            app.logger.info("user %s (%s) admin: %s -> %s", user.name,
+                                            user.id, user.admin, field.data)
                             user.admin = field.data
                             db.session.commit()
                 return redirect(url_for('make_admin'))
@@ -357,7 +369,8 @@ def make_admin():
     else:
         return(('', 404))
 
-@app.route("/admin/make-arrivals", methods=['GET', 'POST'])
+
+@admin.route("/admin/make-arrivals", methods=['GET', 'POST'])
 @login_required
 def make_arrivals():
     if current_user.arrivals:
@@ -379,7 +392,8 @@ def make_arrivals():
                         id = int(field.name.split("_")[0])
                         user = User.query.get(id)
                         if user.arrivals != field.data:
-                            app.logger.info("user %s (%s) arrivals: %s -> %s", user.name, user.id, user.arrivals, field.data)
+                            app.logger.info("user %s (%s) arrivals: %s -> %s", user.name,
+                                            user.id, user.arrivals, field.data)
                             user.arrivals = field.data
                             db.session.commit()
                 return redirect(url_for('make_arrivals'))
@@ -389,9 +403,9 @@ def make_arrivals():
         return(('', 404))
 
 
-@app.route('/admin/payments')
+@admin.route('/payments')
 @admin_required
-def admin_payments():
+def payments():
     payments = Payment.query.join(Ticket).with_entities(
         Payment,
         func.min(Ticket.expires).label('first_expires'),
@@ -400,9 +414,10 @@ def admin_payments():
 
     return render_template('admin/payments.html', payments=payments)
 
-@app.route('/admin/payments/expiring')
+
+@admin.route('/payments/expiring')
 @admin_required
-def admin_expiring():
+def expiring():
     expiring = BankPayment.query.join(Ticket).filter(
         BankPayment.state == 'inprogress',
         Ticket.expires < datetime.utcnow() + timedelta(days=3),
@@ -414,12 +429,14 @@ def admin_expiring():
 
     return render_template('admin/payments-expiring.html', expiring=expiring)
 
+
 class ResetExpiryForm(Form):
     reset = SubmitField("Reset")
 
-@app.route('/admin/payment/<int:payment_id>/reset-expiry', methods=['GET', 'POST'])
+
+@admin.route('/payment/<int:payment_id>/reset-expiry', methods=['GET', 'POST'])
 @admin_required
-def admin_reset_expiry(payment_id):
+def reset_expiry(payment_id):
     payment = BankPayment.query.get_or_404(payment_id)
 
     form = ResetExpiryForm()
@@ -430,7 +447,8 @@ def admin_reset_expiry(payment_id):
                 if payment.currency == 'GBP':
                     t.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS_TRANSFER'))
                 elif payment.currency == 'EUR':
-                    t.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS_TRANSFER_EURO'))
+                    t.expires = datetime.utcnow() + timedelta(
+                        days=app.config.get('EXPIRY_DAYS_TRANSFER_EURO'))
                 app.logger.info("Reset expiry for ticket %s", t.id)
 
             db.session.commit()
@@ -440,12 +458,14 @@ def admin_reset_expiry(payment_id):
 
     return render_template('admin/payment-reset-expiry.html', payment=payment, form=form)
 
+
 class SendReminderForm(Form):
     remind = SubmitField("Send reminder")
 
-@app.route('/admin/payment/<int:payment_id>/reminder', methods=['GET', 'POST'])
+
+@admin.route('/payment/<int:payment_id>/reminder', methods=['GET', 'POST'])
 @admin_required
-def admin_send_reminder(payment_id):
+def send_reminder(payment_id):
     payment = BankPayment.query.get_or_404(payment_id)
 
     form = SendReminderForm()
@@ -477,9 +497,10 @@ def admin_send_reminder(payment_id):
 class UpdatePaymentForm(Form):
     update = SubmitField("Update payment")
 
-@app.route('/admin/payment/<int:payment_id>/update', methods=['GET', 'POST'])
+
+@admin.route('/payment/<int:payment_id>/update', methods=['GET', 'POST'])
 @admin_required
-def admin_update_payment(payment_id):
+def update_payment(payment_id):
     payment = Payment.query.get_or_404(payment_id)
 
     if payment.provider != 'stripe':
@@ -508,9 +529,10 @@ def admin_update_payment(payment_id):
 class CancelPaymentForm(Form):
     cancel = SubmitField("Cancel payment")
 
-@app.route('/admin/payment/<int:payment_id>/cancel', methods=['GET', 'POST'])
+
+@admin.route('/payment/<int:payment_id>/cancel', methods=['GET', 'POST'])
 @admin_required
-def admin_cancel_payment(payment_id):
+def cancel_payment(payment_id):
     payment = BankPayment.query.get_or_404(payment_id)
 
     form = CancelPaymentForm()
@@ -524,4 +546,3 @@ def admin_cancel_payment(payment_id):
             return redirect(url_for('admin_expiring'))
 
     return render_template('admin/payment-cancel.html', payment=payment, form=form)
-

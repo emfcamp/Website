@@ -78,10 +78,12 @@ def create_app():
     from apps.users import users
     from apps.tickets import tickets
     from apps.payments import payments
+    from apps.admin import admin
     app.register_blueprint(base)
     app.register_blueprint(users)
     app.register_blueprint(tickets)
     app.register_blueprint(payments)
+    app.register_blueprint(admin, url_prefix='/admin')
 
     return app
 
