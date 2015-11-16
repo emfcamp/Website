@@ -1,5 +1,7 @@
 This is the www.emfcamp.org web site
 
+[![Build Status](https://travis-ci.org/emfcamp/Website.svg?branch=master)](https://travis-ci.org/emfcamp/Website)
+
 Requirements
 =======
 
