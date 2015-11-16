@@ -1,6 +1,4 @@
 # encoding=utf-8
-from flask import abort, current_app as app
-
 from flask_wtf import Form as BaseForm
 from flask_wtf.form import _is_hidden
 
@@ -10,8 +8,6 @@ from wtforms import (
 from wtforms.widgets import Input
 from wtforms.fields import StringField
 from wtforms.compat import string_types
-
-from decorator import decorator
 
 
 class IntegerSelectField(SelectField):
@@ -53,5 +49,3 @@ class Form(BaseForm):
         fields = [isinstance(f, string_types) and getattr(self, f) or f for f in fields]
         keep_fields = [f for f in self if _is_hidden(f) and f not in fields]
         return BaseForm.hidden_tag(self, *keep_fields)
-
-

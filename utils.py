@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 import ofxparse
 from flask.ext.script import Command, Manager, Option
-from flask import render_template
+from flask import render_template, current_app as app
 from flask_mail import Message
 from sqlalchemy.orm.exc import NoResultFound
 from main import create_app, mail, db
@@ -333,8 +333,7 @@ class SendTickets(Command):
             db.session.commit()
 
 if __name__ == "__main__":
-    app = create_app()
-    manager = Manager(app)
+    manager = Manager(create_app())
     manager.add_command('createdb', CreateDB())
     manager.add_command('createbankaccounts', CreateBankAccounts())
     manager.add_command('loadofx', LoadOfx())

@@ -7,15 +7,15 @@ from .core import get_app
 class BasicTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.app, self.db = get_app()
+        self.client, self.app, self.db = get_app()
 
     def tearDown(self):
         pass
 
     def test_root(self):
-        rv = self.app.get('/')
+        rv = self.client.get('/')
         assert 'Electromagnetic Field' in rv.data
 
     def test_tickets(self):
-        res = self.app.get('/tickets/choose')
+        res = self.client.get('/tickets/choose')
         assert "Full Camp Ticket" in res.data.decode('utf-8')
