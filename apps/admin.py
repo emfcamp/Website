@@ -1,4 +1,4 @@
-from main import app, db, mail
+from main import db, mail
 from models.user import User
 from models.payment import Payment, BankPayment, BankTransaction
 from models.ticket import Ticket, TicketCheckin, TicketType, TicketPrice
@@ -10,7 +10,7 @@ from views.payment.stripe import (
 
 from flask import (
     render_template, redirect, request, flash,
-    url_for, abort,
+    url_for, abort, current_app as app
 )
 from flask.ext.login import login_required, current_user
 from flask_mail import Message

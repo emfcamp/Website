@@ -1,24 +1,26 @@
 import os
 import csv
 import json
-from main import app
-from views import feature_flag
 from datetime import datetime
-from models.ticket import TicketType
-from models.payment import StripePayment
-from models.site_state import get_site_state
-
 from mailsnake import MailSnake
 from mailsnake.exceptions import MailSnakeException, ListAlreadySubscribedException
 
 from flask import (
-    render_template, redirect, request, flash,
-    url_for, send_from_directory, abort, Markup,
+    render_template, redirect, request, flash, Blueprint,
+    url_for, send_from_directory, abort, Markup, current_app as app
 )
 from jinja2.exceptions import TemplateNotFound
 
+from .common import feature_flag
+from models.ticket import TicketType
+from models.payment import StripePayment
+from models.site_state import get_site_state
 
-@app.route("/")
+
+base = Blueprint('base', __name__)
+
+
+@base.route("/")
 def main():
     full_price = TicketType.get_price_cheapest_full()
     if not (app.config.get('BANK_TRANSFER') or app.config.get('GOCARDLESS')):
@@ -33,7 +35,7 @@ def main():
                            full_price=full_price)
 
 
-@app.route("/", methods=['POST'])
+@base.route("/", methods=['POST'])
 @feature_flag('TICKETS_SITE')
 def main_post():
     ms = MailSnake(app.config['MAILCHIMP_KEY'])
@@ -47,31 +49,35 @@ def main_post():
         if e.message:
             msg = Markup(e.message)
         else:
-            msg = "You are already subscribed to our list. Please contact %s to update your settings." % app.config['TICKETS_EMAIL'][1]
+            msg = """You are already subscribed to our list.
+                     Please contact %s to update your settings.""" % app.config['TICKETS_EMAIL'][1]
         flash(msg)
 
-    except MailSnakeException, e:
+    except MailSnakeException as e:
         app.logger.error('Error subscribing: %s', e)
         flash('Sorry, an error occurred.')
 
     return redirect(url_for('main'))
 
 
-@app.route('/favicon.ico')
+@base.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static/images'),
-                                   'favicon.ico', mimetype='image/vnd.microsoft.icon')
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
-@app.route("/about")
+
+@base.route("/about")
 def about():
     return render_template('about.html')
 
-@app.route("/talks/")
+
+@base.route("/talks/")
 @feature_flag('TICKETS_SITE')
 def talks():
     return redirect(url_for('talks_2014'))
 
-@app.route("/talks/2014")
+
+@base.route("/talks/2014")
 @feature_flag('TICKETS_SITE')
 def talks_2014():
     talks = []
@@ -83,14 +89,14 @@ def talks_2014():
         talks.append((", ".join(map(lambda speaker: speaker['full_public_name'], event['speakers'])),
                      event['title'],
                      event['abstract']
-                     ))
+                      ))
 
     return render_template('talks_2014.html', talks=talks)
 
-@app.route("/talks/2012")
+
+@base.route("/talks/2012")
 @feature_flag('TICKETS_SITE')
 def talks_2012():
-
     days = {}
     talk_path = os.path.abspath(os.path.join(__file__, '..', '..', 'talks', '2012'))
     for day in ('friday', 'saturday', 'sunday'):
@@ -104,58 +110,67 @@ def talks_2012():
     return render_template('talks_2012.html', **days)
 
 
-@app.route("/about/company")
+@base.route("/about/company")
 def company():
     return render_template('company.html')
 
-@app.route('/sponsors')
+
+@base.route('/sponsors')
 def sponsors():
     return render_template('sponsors/sponsors.html')
 
-@app.route('/sponsors/<sponsor>')
+
+@base.route('/sponsors/<sponsor>')
 def sponsor_page(sponsor):
     try:
         return render_template('sponsors/%s.html' % sponsor)
     except TemplateNotFound:
         abort(404)
 
-@app.route("/participating")
-@app.route("/get_involved")
-@app.route("/contact")
-@app.route("/location")
-@app.route("/about")
+
+@base.route("/participating")
+@base.route("/get_involved")
+@base.route("/contact")
+@base.route("/location")
+@base.route("/about")
 def old_urls_2012():
     return redirect(url_for('main'))
 
 
-@app.route('/badge')
+@base.route('/badge')
 def badge():
     return redirect('http://wiki-archive.emfcamp.org/2012/wiki/TiLDA')
 
 
-@app.route("/code-of-conduct")
+@base.route("/code-of-conduct")
 def code_of_conduct():
     return render_template('code-of-conduct.html')
 
 
-@app.route("/diversity")
+@base.route("/diversity")
 def diversity():
     return render_template('diversity.html')
 
 
-@app.route("/wave")
+@base.route("/wave")
 def wave():
     return redirect('https://web.archive.org/web/20130627201413/https://www.emfcamp.org/wave')
 
 
-@app.route("/wave-talks")
-@app.route("/wave/talks")
+@base.route("/wave-talks")
+@base.route("/wave/talks")
 def wave_talks():
     return redirect('https://web.archive.org/web/20130627201413/https://www.emfcamp.org/wave/talks')
 
 
-@app.route('/sine')
-@app.route('/wave/sine')
-@app.route('/wave/SiNE')
+@base.route('/sine')
+@base.route('/wave/sine')
+@base.route('/wave/SiNE')
 def sine():
     return redirect('http://wiki.emfcamp.org/wiki/SiNE')
+
+
+@base.route("/radio", methods=['GET'])
+@feature_flag('RADIO')
+def radio():
+    return render_template('radio.html')
