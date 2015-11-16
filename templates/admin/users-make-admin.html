@@ -3,7 +3,7 @@
 {% block body %}
 <h2>List of admins</h2>
 
-<form method=post action="{{ url_for('make_admin') }}">
+<form method=post action="{{ url_for('.make_admin') }}">
 {{ adminform.hidden_tag() }}
 {{ adminform.keys }}
 

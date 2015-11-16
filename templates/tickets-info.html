@@ -29,8 +29,8 @@ Ticket Information
     <div class="col-md-12">
       <div class="alert alert-warning">
         If you have used this email address to buy a ticket, we have already created an account for you.
-        Please <a class="alert-link" href="{{ url_for('login') }}">click here</a> to log in, or
-        or <a class="alert-link" href="{{ url_for('forgot_password') }}">reset your password</a>.
+        Please <a class="alert-link" href="{{ url_for('users.login') }}">click here</a> to log in, or
+        or <a class="alert-link" href="{{ url_for('users.forgot_password') }}">reset your password</a>.
       </div>
     </div>
     {% else %}
@@ -60,7 +60,7 @@ Ticket Information
 
 </div>
 
-<a class="btn btn-default" href="{{ url_for('tickets_choose') }}">Change tickets</a>
+<a class="btn btn-default" href="{{ url_for('tickets.choose') }}">Change tickets</a>
 {{ form.forward(class_="btn btn-success") }}
 
 </fieldset>

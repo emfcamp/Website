@@ -122,7 +122,7 @@ def main(cfp_type='talk'):
         msg.body = render_template('emails/cfp-submission.txt', cfp=cfp, type=cfp_type)
         mail.send(msg)
 
-        return redirect(url_for('cfp_complete'))
+        return redirect(url_for('.complete'))
 
     if current_user.is_authenticated():
         form.name.data = current_user.name

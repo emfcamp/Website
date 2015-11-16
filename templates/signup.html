@@ -13,7 +13,7 @@
     {% if form.email.was_duplicate %}
     <div class="alert alert-warning">
       If you have used this email address to buy a ticket, we have already created an account for you.
-      Please <a class="alert-link" href="{{ url_for('forgot_password') }}">click here</a> to change your password.
+      Please <a class="alert-link" href="{{ url_for('users.forgot_password') }}">click here</a> to change your password.
     </div>
     {% endif %}
     {{ render_field(form.password, True) }}

@@ -3,7 +3,7 @@
 {% block body %}
 <h2>List of arrivals operators</h2>
 
-<form method=post action="{{ url_for('make_arrivals') }}">
+<form method=post action="{{ url_for('.make_arrivals') }}">
 {{ arrivalsform.hidden_tag() }}
 {{ arrivalsform.keys }}
 

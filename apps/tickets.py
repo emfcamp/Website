@@ -139,18 +139,18 @@ class ReceiptForm(Form):
 @tickets.route("/tickets/", methods=['GET', 'POST'])
 def main():
     if current_user.is_anonymous():
-        return redirect(url_for('tickets_choose'))
+        return redirect(url_for('tickets.choose'))
 
     form = ReceiptForm()
     if form.validate_on_submit():
         ticket_ids = map(str, request.form.getlist('ticket_id', type=int))
         if ticket_ids:
-            return redirect(url_for('tickets_receipt', ticket_ids=','.join(ticket_ids)) + '?pdf=1')
-        return redirect(url_for('tickets_receipt') + '?pdf=1')
+            return redirect(url_for('tickets.receipt', ticket_ids=','.join(ticket_ids)) + '?pdf=1')
+        return redirect(url_for('tickets.receipt') + '?pdf=1')
 
     tickets = current_user.tickets.all()
     if not tickets:
-        return redirect(url_for('tickets_choose'))
+        return redirect(url_for('tickets.choose'))
 
     payments = current_user.payments.filter(Payment.state != "cancelled", Payment.state != "expired").all()
 
@@ -170,7 +170,7 @@ def tickets_token(token=None):
             del session['ticket_token']
         flash('Ticket token was invalid')
 
-    return redirect(url_for('tickets_choose'))
+    return redirect(url_for('tickets.choose'))
 
 
 class TicketAmountForm(Form):
@@ -191,7 +191,7 @@ class TicketAmountsForm(Form):
 
 @tickets.route("/tickets/choose", methods=['GET', 'POST'])
 @feature_flag('TICKET_SALES')
-def tickets_choose():
+def choose():
     if get_sales_state(datetime.utcnow()) != 'available':
         return render_template("tickets-cutoff.html")
 
@@ -237,7 +237,7 @@ def tickets_choose():
             if basket:
                 session['basket'] = basket
 
-                return redirect(url_for('tickets_info'))
+                return redirect(url_for('tickets.info'))
 
     if request.method == 'POST' and form.set_currency.data:
         if form.set_currency.validate(form):
@@ -310,10 +310,10 @@ def build_info_form(formdata):
 
 
 @tickets.route("/tickets/info", methods=['GET', 'POST'])
-def tickets_info():
+def info():
     form, basket, total = build_info_form(request.form)
     if not form:
-        return redirect(url_for('pay_choose'))
+        return redirect(url_for('payments.choose'))
 
     if not current_user.is_anonymous():
         form.email.data = current_user.email
@@ -326,7 +326,7 @@ def tickets_info():
 
         session['ticketinfo'] = form.data
 
-        return redirect(url_for('pay_choose'))
+        return redirect(url_for('payments.choose'))
 
     return render_template('tickets-info.html',
                            form=form, basket=basket,
@@ -336,7 +336,7 @@ def tickets_info():
 @tickets.route("/tickets/receipt")
 @tickets.route("/tickets/<ticket_ids>/receipt")
 @login_required
-def tickets_receipt(ticket_ids=None):
+def receipt(ticket_ids=None):
     if current_user.admin and ticket_ids is not None:
         tickets = Ticket.query
     else:

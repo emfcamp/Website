@@ -22,29 +22,31 @@
     <header>
         <h1>
             <span class="logo"></span>
-            <a href="{{ url_for('admin') }}">Electromagnetic Field</a>
+            <a href="{{ url_for('admin.home') }}">Electromagnetic Field</a>
         </h1>
     </header>
     <div class="row">
         <nav class="col-md-3">
             <ul class="nav navbar-nav">
                 {% if current_user.admin %}
-                <li {% if nav_active == 'admin_txns' -%} class="active" {%- endif %}><a href="{{ url_for('admin_txns') }}">
+                <li {% if nav_active == 'admin_txns' -%} class="active" {%- endif %}>
+                    <a href="{{ url_for('.txns') }}">
                     Bank transfers <span class="badge">{{ unreconciled_count }}</span>
                 </a></li>
-                <li {% if nav_active == 'admin_payments' -%} class="active" {%- endif %}><a href="{{ url_for('admin_payments') }}">
+                <li {% if nav_active == 'admin_payments' -%} class="active" {%- endif %}>
+                    <a href="{{ url_for('.payments') }}">
                     All payments</span>
                 </a></li>
-                <li {% if nav_active == 'admin_expiring' -%} class="active" {%- endif %}><a href="{{ url_for('admin_expiring') }}">
+                <li {% if nav_active == 'admin_expiring' -%} class="active" {%- endif %}><a href="{{ url_for('.expiring') }}">
                     Expiring payments <span class="badge">{{ expiring_count }}</span>
                 </a></li>
-                <li {% if nav_active == 'ticket_types' -%} class="active" {%- endif %}><a href="{{ url_for('ticket_types') }}">
+                <li {% if nav_active == 'ticket_types' -%} class="active" {%- endif %}><a href="{{ url_for('.ticket_types') }}">
                     Ticket Types</a></li>
-                <li {% if nav_active == 'make_admin' -%} class="active" {%- endif %}><a href="{{ url_for('make_admin') }}">
+                <li {% if nav_active == 'make_admin' -%} class="active" {%- endif %}><a href="{{ url_for('.make_admin') }}">
                     Make someone an admin</a></li>
                 {% endif %}
                 {% if current_user.arrivals %}
-                <li {% if nav_active == 'make_arrivals' -%} class="active" {%- endif %}><a href="{{ url_for('make_arrivals') }}">
+                <li {% if nav_active == 'make_arrivals' -%} class="active" {%- endif %}><a href="{{ url_for('.make_arrivals') }}">
                     Make someone an arrivals operator</a></li>
                 {% endif %}
             </ul>
@@ -61,10 +63,10 @@
     <footer>
         <p>
         Electromagnetic Field Ltd. 2014.
-        <a href="{{url_for('company')}}">Company details</a>.
+        <a href="{{url_for('base.company')}}">Company details</a>.
         Kindly hosted by <a href="http://bitfolk.com/">Bitfolk</a>.
         {% if current_user.is_authenticated() %}
-        <a class="logout" href="{{ url_for('logout') }}">Log out</a>
+        <a class="logout" href="{{ url_for('users.logout') }}">Log out</a>
         {% endif %}
         </p>
     </footer>

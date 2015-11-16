@@ -33,7 +33,7 @@
 {% block foot %}
 <script type="text/javascript">
 if (typeof(EMF) != 'object') var EMF = Object();
-EMF.search_url = '{{ url_for('arrivals_search') }}';
+EMF.search_url = '{{ url_for('arrivals.search') }}';
 EMF.search_count = 0;
 EMF.search_count_received = 0;
 EMF.search_arrivals = function() {

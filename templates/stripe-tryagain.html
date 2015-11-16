@@ -7,10 +7,10 @@
 
 <p>Your payment has been authorised, but we have no record of charging your card.</p>
 
-<form method="post" action="{{ url_for('stripe_tryagain', payment_id=payment.id) }}">
+<form method="post" action="{{ url_for('payments.stripe_tryagain', payment_id=payment.id) }}">
 {{ form.hidden_tag() }}
 {{ form.tryagain(class_="btn btn-warning debounce") }}
-<a class="btn btn-info" href="{{ url_for('tickets') }}">Go back to my tickets</a>
+<a class="btn btn-info" href="{{ url_for('tickets.main') }}">Go back to my tickets</a>
 </form>
 
 <h3></h3>

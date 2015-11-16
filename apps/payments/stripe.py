@@ -47,12 +47,12 @@ def stripe_start():
     if not payment:
         logger.warn('Unable to add payment and tickets to database')
         flash('Your session information has been lost. Please try ordering again.')
-        return redirect(url_for('tickets'))
+        return redirect(url_for('tickets.main'))
 
     logger.info("Created Stripe payment %s", payment.id)
     db.session.commit()
 
-    return redirect(url_for('stripe_capture', payment_id=payment.id))
+    return redirect(url_for('.stripe_capture', payment_id=payment.id))
 
 
 def charge_stripe(payment):
@@ -69,11 +69,11 @@ def charge_stripe(payment):
         logger.warn('Card payment failed with exception "%s"', e)
         # Don't save the charge_id - they can try again
         flash('An error occurred with your payment, please try again')
-        return redirect(url_for('stripe_tryagain', payment_id=payment.id))
+        return redirect(url_for('.stripe_tryagain', payment_id=payment.id))
     except Exception as e:
         logger.warn("Exception %r confirming payment", e)
         flash('An error occurred with your payment, please try again')
-        return redirect(url_for('stripe_tryagain', payment_id=payment.id))
+        return redirect(url_for('.stripe_tryagain', payment_id=payment.id))
 
     payment.chargeid = charge.id
     if charge.paid:
@@ -106,7 +106,7 @@ def charge_stripe(payment):
 
     mail.send(msg)
 
-    return redirect(url_for('stripe_waiting', payment_id=payment.id))
+    return redirect(url_for('.stripe_waiting', payment_id=payment.id))
 
 
 class StripeAuthorizeForm(Form):
@@ -125,7 +125,7 @@ def stripe_capture(payment_id):
     if not app.config.get('STRIPE'):
         logger.warn('Unable to capture payment as Stripe is disabled')
         flash('Stripe is currently unavailable. Please try again later')
-        return redirect(url_for('tickets'))
+        return redirect(url_for('tickets.main'))
 
     form = StripeAuthorizeForm(request.form)
     if form.validate_on_submit():
@@ -137,7 +137,7 @@ def stripe_capture(payment_id):
         except Exception as e:
             logger.warn("Exception %r updating payment", e)
             flash('An error occurred with your payment, please try again')
-            return redirect(url_for('stripe_tryagain', payment_id=payment.id))
+            return redirect(url_for('.stripe_tryagain', payment_id=payment.id))
 
         return charge_stripe(payment)
 
@@ -160,10 +160,10 @@ def stripe_tryagain(payment_id):
     if not app.config.get('STRIPE'):
         logger.warn('Unable to retry payment as Stripe is disabled')
         flash('Stripe is currently unavailable. Please try again later')
-        return redirect(url_for('tickets'))
+        return redirect(url_for('tickets.main'))
 
     if payment.state == 'new':
-        return redirect(url_for('stripe_capture', payment_id=payment.id))
+        return redirect(url_for('.stripe_capture', payment_id=payment.id))
 
     form = StripeChargeAgainForm()
     if form.validate_on_submit():
@@ -198,7 +198,7 @@ def stripe_cancel(payment_id):
             logger.info('Payment %s cancelled', payment.id)
             flash('Payment cancelled')
 
-        return redirect(url_for('tickets'))
+        return redirect(url_for('tickets.main'))
 
     return render_template('stripe-cancel.html', payment=payment, form=form)
 

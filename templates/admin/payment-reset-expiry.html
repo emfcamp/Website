@@ -27,7 +27,7 @@
 </tbody>
 </table>
 
-<form method="post" action="{{ url_for('admin_reset_expiry', payment_id=payment.id) }}" class="shrink">
+<form method="post" action="{{ url_for('.reset_expiry', payment_id=payment.id) }}" class="shrink">
 {{ form.hidden_tag() }}
 {{ form.reset(class_="btn btn-success pull-right") }}
 </form>

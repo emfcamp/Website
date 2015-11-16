@@ -133,14 +133,14 @@
     <dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
   </dl>
   {% elif payment.provider == 'gocardless' %}
-  <div>Payment to be made online at {{ external_url('gocardless_tryagain', payment_id=payment.id) }}</div>
+  <div>Payment to be made online at {{ external_url('payments.gocardless_tryagain', payment_id=payment.id) }}</div>
   {% elif payment.provider == 'stripe' %}
-  <div>Payment to be made online at {{ external_url('stripe_tryagain', payment_id=payment.id) }}</div>
+  <div>Payment to be made online at {{ external_url('payments.stripe_tryagain', payment_id=payment.id) }}</div>
   {% endif %}
 </div>
 {% endif %}
 
-<div>For terms and conditions, see {{ external_url('ticket_terms') }}</div>
+<div>For terms and conditions, see {{ external_url('payments.terms') }}</div>
 
 {% endblock %}
 

@@ -11,7 +11,7 @@
   <p>You must have Javascript enabled to use Stripe. If you don't see anything,
   please enable it and click below to reload the page.</p>
 
-  <a class="btn btn-primary" href="{{ url_for('stripe_tryagain', payment_id=payment.id) }}">Reload page</a>
+  <a class="btn btn-primary" href="{{ url_for('payments.stripe_tryagain', payment_id=payment.id) }}">Reload page</a>
 </div></noscript>
 
 <div class="hidden alert alert-info" id="popups-warning">
@@ -25,10 +25,10 @@
   <p>We didn't receive any details from Stripe. Please click below try again.</p>
 
   <a class="checkout-button btn btn-primary" href="#">Open Stripe</a>
-  <a class="btn btn-success" href="{{ url_for('tickets') }}">Back to tickets</a>
+  <a class="btn btn-success" href="{{ url_for('tickets.main') }}">Back to tickets</a>
 </div>
 
-<form method="post" action="{{ url_for('stripe_capture', payment_id=payment.id) }}" id="stripe_capture" class="hidden">
+<form method="post" action="{{ url_for('payments.stripe_capture', payment_id=payment.id) }}" id="stripe_capture" class="hidden">
 {{ form.hidden_tag() }}
 {{ form.forward(class_='btn btn-success debounce') }}
 </form>

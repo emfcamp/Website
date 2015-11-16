@@ -17,7 +17,7 @@
 <tbody>
 {% for payment, first_expires, ticket_count in payments %}
 <tr>
-  <td><a href="{{ url_for('payment_invoice', payment_id=payment.id) }}">{{ payment.name }}</a></td>
+  <td><a href="{{ url_for('.payment_invoice', payment_id=payment.id) }}">{{ payment.name }}</a></td>
   <td>{{ payment.user.name }}</td>
   <td>{{ payment.user.email }}</td>
   <td>{{ payment.state }}</td>
@@ -26,9 +26,9 @@
   <td>{{ first_expires.strftime('%Y-%m-%d') }}</td>
   <td>
     {% if payment.provider == 'stripe' %}
-    <a class="btn btn-success" href="{{ url_for('admin_update_payment', payment_id=payment.id) }}">Update</a>
+    <a class="btn btn-success" href="{{ url_for('.update_payment', payment_id=payment.id) }}">Update</a>
     {% endif %}
-    <a class="btn btn-danger" href="{{ url_for('admin_cancel_payment', payment_id=payment.id) }}">Cancel</a>
+    <a class="btn btn-danger" href="{{ url_for('.cancel_payment', payment_id=payment.id) }}">Cancel</a>
   </td>
 </tr>
 {% endfor %}

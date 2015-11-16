@@ -21,13 +21,13 @@ logger = logging.getLogger(__name__)
 @feature_flag('BANK_TRANSFER')
 def transfer_start():
     if get_user_currency() == 'EUR' and not app.config.get('BANK_TRANSFER_EURO'):
-        return redirect(url_for('pay_choose'))
+        return redirect(url_for('.choose'))
 
     payment = add_payment_and_tickets(BankPayment)
     if not payment:
         logging.warn('Unable to add payment and tickets to database')
         flash('Your session information has been lost. Please try ordering again.')
-        return redirect(url_for('tickets'))
+        return redirect(url_for('tickets.main'))
 
     logger.info("Created bank payment %s (%s)", payment.id, payment.bankref)
 
@@ -41,7 +41,7 @@ def transfer_start():
                                user=current_user, payment=payment)
     mail.send(msg)
 
-    return redirect(url_for('transfer_waiting', payment_id=payment.id))
+    return redirect(url_for('.transfer_waiting', payment_id=payment.id))
 
 
 @payments.route("/pay/transfer/<int:payment_id>/waiting")
@@ -69,7 +69,7 @@ def transfer_cancel(payment_id):
     if payment.state == 'cancelled':
         logger.info('Payment %s has already been cancelled', payment.id)
         flash('Payment has already been cancelled')
-        return redirect(url_for('tickets'))
+        return redirect(url_for('tickets.main'))
 
     form = TransferCancelForm(request.form)
     if form.validate_on_submit():
@@ -81,6 +81,6 @@ def transfer_cancel(payment_id):
             logging.info('Payment %s cancelled', payment.id)
             flash('Payment cancelled')
 
-        return redirect(url_for('tickets'))
+        return redirect(url_for('tickets.main'))
 
     return render_template('transfer-cancel.html', payment=payment, form=form)

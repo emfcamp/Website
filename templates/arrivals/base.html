@@ -19,7 +19,7 @@
     <header>
         <h1>
             <span class="logo"></span>
-            <a href="{{ url_for('arrivals') }}">Electromagnetic Field</a>
+            <a href="{{ url_for('arrivals.main') }}">Electromagnetic Field</a>
         </h1>
     </header>
     <div class="row">
@@ -34,8 +34,8 @@
     <footer>
       <div id="bottom-menu-container">
         <ul class="menu">
-          <li><a href="{{ url_for('begin_check_in') }}">Check in</a></li>
-          <li><a href="{{ url_for('begin_badge_up') }}">Issue badges</a></li>
+          <li><a href="{{ url_for('arrivals.begin_check_in') }}">Check in</a></li>
+          <li><a href="{{ url_for('arrivals.begin_badge_up') }}">Issue badges</a></li>
         <div style="clear: both"></div>
       </div>
 

@@ -17,7 +17,7 @@
 
   <p>We're looking for people to talk, share, and demonstrate the things they
   love. We're especially keen to hear from people with <a
-  href="{{ url_for('diversity') }}">different backgrounds</a> than you'd expect to find at a
+  href="{{ url_for('base.diversity') }}">different backgrounds</a> than you'd expect to find at a
   technology conference. We're not just looking for talks: we also want
   installations, workshops, and games.</p>
 
@@ -59,7 +59,7 @@
      late submissions.</p>
 
   {% if not current_user.is_authenticated() %}
-  <p>If you've already bought a ticket for this year, please <a href="{{ url_for('login') }}">log in</a>
+  <p>If you've already bought a ticket for this year, please <a href="{{ url_for('users.login') }}">log in</a>
      so we can link the submission to your account.</p>
   {% endif %}
 
@@ -71,7 +71,7 @@
   <ul class="nav nav-tabs cfp-types" role="navigation" id="cfp-errors">
     {% for form in forms %}
       <li {% if form.type == active_cfp_type -%} class="active" {%- endif %}>
-        <a href="{{ url_for('cfp', cfp_type=form.type) }}" data-target="#{{ 'tab_' + form.type }}" data-toggle="tab">
+        <a href="{{ url_for('cfp.main', cfp_type=form.type) }}" data-target="#{{ 'tab_' + form.type }}" data-toggle="tab">
           {% if form.type == 'talk' %}
             <h4>Talk</h4>
             <p>Held on one of our stages</p>
@@ -92,7 +92,7 @@
     {% for form in forms %}
 
     <div class="tab-pane {%- if form.type == active_cfp_type %} active {%- endif %}" id="{{ 'tab_' + form.type }}">
-    <form action={{ url_for('cfp', cfp_type=form.type) }} method="post" class="form-horizontal cfp-form" role="form">
+    <form action={{ url_for('cfp.main', cfp_type=form.type) }} method="post" class="form-horizontal cfp-form" role="form">
       <fieldset>
       {{ form.hidden_tag() }}
       {{ render_field(form.name, True, glyphicon='globe', placeholder="Your name to include in the schedule") }}

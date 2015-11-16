@@ -6,11 +6,11 @@ You're ticket is not confirmed yet, but you're getting closer!
 To manage your ticket payment process we've created you an account. To set a
 password please visit the password reset page:
 
-{{ external_url('forgot_password') }}
+{{ external_url('users.forgot_password') }}
 
 You can keep track of your ticket purchases here:
 
-{{ external_url('tickets') }}
+{{ external_url('tickets.main') }}
 
 See you soon at Electromagnetic Field 2014!
 

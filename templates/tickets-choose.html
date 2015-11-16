@@ -4,7 +4,7 @@
 
 {% include 'ticket-blurb.html' %}
 {% if not current_user.is_authenticated() %}
-<p>If you've already signed up this year, <a href="{{url_for('login')}}">log in</a> to view your ticket status.</p>
+<p>If you've already signed up this year, <a href="{{url_for('users.login')}}">log in</a> to view your ticket status.</p>
 {% endif %}
 
 <form method="post" class="choose-tickets-form" id="choose_tickets">

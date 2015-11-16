@@ -28,7 +28,7 @@
 </tbody>
 </table>
 
-<form method="post" action="{{ url_for('admin_send_reminder', payment_id=payment.id) }}" class="shrink">
+<form method="post" action="{{ url_for('.send_reminder', payment_id=payment.id) }}" class="shrink">
 {{ form.hidden_tag() }}
 {{ form.remind(class_="btn btn-warning pull-right") }}
 </form>

@@ -25,7 +25,7 @@ GoCardless payments are protected by the
 <a href="http://www.directdebit.co.uk/DirectDebitExplained/Pages/DirectDebitGuarantee.aspx">Direct Debit
 Guarantee</a>.</p>
 
-<form method="post" action="{{ url_for('gocardless_start') }}">
+<form method="post" action="{{ url_for('payments.gocardless_start') }}">
 <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
     <p><button type="submit" name="gocardless" class="btn btn-lg btn-success debounce">Pay with GoCardless</button></p>
 </form>
@@ -37,7 +37,7 @@ Guarantee</a>.</p>
 
 <p>Ask your bank to send it to us directly (this works online, or with cash in a branch).</p>
 
-<form method="post" action="{{ url_for('transfer_start') }}">
+<form method="post" action="{{ url_for('payments.transfer_start') }}">
 <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
     <p><button type="submit" name="banktransfer" class="btn btn-lg btn-success debounce">Pay by bank transfer</button></p>
 </form>
@@ -50,7 +50,7 @@ Guarantee</a>.</p>
 <p>Our card provider Stripe will accept Visa, Visa Debit, Mastercard or American Express, but we add 5% to both credit and debit card transactions to cover the transaction fees.</p>
 <p>This will amount to {{ StripePayment.premium(user_currency, total) | price(user_currency) }}.</p>
 
-<form method="post" action="{{ url_for('stripe_start') }}">
+<form method="post" action="{{ url_for('payments.stripe_start') }}">
 <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
     <p><button type="submit" name="stripe" class="btn btn-lg btn-success debounce">Pay by card</button></p>
 </form>

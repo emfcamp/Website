@@ -27,7 +27,7 @@
 </tbody>
 </table>
 
-<form method="post" action="{{ url_for('admin_cancel_payment', payment_id=payment.id) }}" class="shrink">
+<form method="post" action="{{ url_for('.cancel_payment', payment_id=payment.id) }}" class="shrink">
 {{ form.hidden_tag() }}
 {{ form.cancel(class_="btn btn-danger pull-right") }}
 </form>

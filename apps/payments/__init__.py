@@ -32,22 +32,22 @@ def get_user_payment_or_abort(payment_id, provider=None, valid_states=None, allo
 
 
 @payments.route("/pay/terms")
-def ticket_terms():
+def terms():
     return render_template('terms.html')
 
 
 @payments.route("/pay/choose")
-def pay_choose():
+def choose():
     basket, total = get_basket_and_total()
     if not basket:
-        redirect(url_for('tickets'))
+        redirect(url_for('tickets.main'))
 
     return render_template('payment-choose.html', basket=basket, total=total, StripePayment=StripePayment)
 
 
 @payments.route('/payment/<int:payment_id>/invoice')
 @login_required
-def payment_invoice(payment_id):
+def invoice(payment_id):
     payment = get_user_payment_or_abort(payment_id, allow_admin=True)
 
     invoice_lines = payment.tickets.join(TicketType). \
@@ -69,7 +69,7 @@ def payment_invoice(payment_id):
         app.logger.error('Invoice total mismatch: %s + %s - %s = %s', subtotal, vat,
                          payment.amount, subtotal + vat - payment.amount)
         flash('Your invoice cannot currently be displayed')
-        return redirect(url_for('tickets'))
+        return redirect(url_for('tickets.main'))
 
     app.logger.debug('Invoice total: %s + %s = %s', subtotal, vat, payment.amount)
 

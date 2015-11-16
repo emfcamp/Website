@@ -40,13 +40,13 @@ class LoginForm(Form):
 @feature_flag('TICKET_SALES')
 def login():
     if current_user.is_authenticated():
-        return redirect(request.args.get('next', url_for('tickets')))
+        return redirect(request.args.get('next', url_for('tickets.main')))
     form = LoginForm(request.form, next=request.args.get('next'))
     if request.method == 'POST' and form.validate():
         user = User.query.filter_by(email=form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user)
-            return redirect(form.next.data or url_for('tickets'))
+            return redirect(form.next.data or url_for('tickets.main'))
         else:
             flash("Invalid login details!")
     return render_template("login.html", form=form)
@@ -71,7 +71,7 @@ class SignupForm(Form):
 @feature_flag('TICKET_SALES')
 def signup():
     if current_user.is_authenticated():
-        return redirect(url_for('tickets'))
+        return redirect(url_for('tickets.main'))
     form = SignupForm(request.form, next=request.args.get('next'))
 
     if request.method == 'POST' and form.validate():
@@ -80,9 +80,9 @@ def signup():
         except IntegrityError as e:
             app.logger.warn('Adding user raised %r, possible double-click', e)
             flash('An error occurred adding your account. Please try again.')
-            return redirect(url_for('signup'))
+            return redirect(url_for('users.signup'))
 
-        return redirect(form.next.data or url_for('tickets'))
+        return redirect(form.next.data or url_for('tickets.main'))
 
     return render_template("signup.html", form=form, existing_email=request.args.get('existing_email'))
 
@@ -114,7 +114,7 @@ def forgot_password():
             msg.body = render_template("emails/reset-password-email.txt", user=form._user, reset=reset)
             mail.send(msg)
 
-        return redirect(url_for('reset_password', email=form.email.data))
+        return redirect(url_for('users.reset_password', email=form.email.data))
     return render_template("forgot-password.html", form=form)
 
 
@@ -144,7 +144,7 @@ def reset_password():
         db.session.delete(form._reset)
         user.set_password(form.password.data)
         db.session.commit()
-        return redirect(url_for('login'))
+        return redirect(url_for('users.login'))
     return render_template("reset-password.html", form=form)
 
 
@@ -152,7 +152,7 @@ def reset_password():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('main'))
+    return redirect(url_for('base.main'))
 
 
 @users.route("/set-currency", methods=['POST'])
@@ -162,4 +162,4 @@ def set_currency():
         abort(400)
 
     set_user_currency(request.form['currency'])
-    return redirect(url_for('tickets_choose'))
+    return redirect(url_for('tickets.choose'))

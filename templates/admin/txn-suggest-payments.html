@@ -42,7 +42,7 @@ No suitable payments were found.
   <td><b>{{ payment.amount | price(payment.currency) }}</b></td>
   <td>{{ payment.bankref | bankref }}</td>
   <td>
-    <a class="btn btn-warning" href="{{ url_for('admin_txn_reconcile', txn_id=txn.id, payment_id=payment.id) }}">Reconcile</a>
+    <a class="btn btn-warning" href="{{ url_for('admin.txn_reconcile', txn_id=txn.id, payment_id=payment.id) }}">Reconcile</a>
   </td>
 </tr>
 {% endfor %}
@@ -50,7 +50,7 @@ No suitable payments were found.
 {% endif %}
 
 <div class="pull-right">
-<a class="btn btn-danger" href="{{ url_for('admin_txn_suppress', txn_id=txn.id) }}">Suppress transaction</a>
+<a class="btn btn-danger" href="{{ url_for('admin.txn_suppress', txn_id=txn.id) }}">Suppress transaction</a>
 </div>
 
 {% endblock %}

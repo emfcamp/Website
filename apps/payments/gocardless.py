@@ -38,7 +38,7 @@ def gocardless_start():
     if not payment:
         logging.warn('Unable to add payment and tickets to database')
         flash('Your session information has been lost. Please try ordering again.')
-        return redirect(url_for('tickets'))
+        return redirect(url_for('tickets.main'))
 
     logger.info("Created GoCardless payment %s", payment.id)
     db.session.commit()
@@ -70,7 +70,7 @@ def gocardless_tryagain(payment_id):
     if not app.config.get('GOCARDLESS'):
         logger.error('Unable to retry payment %s as GoCardless is disabled', payment.id)
         flash('GoCardless is currently unavailable. Please try again later')
-        return redirect(url_for('tickets'))
+        return redirect(url_for('tickets.main'))
 
     logger.info("Trying payment %s again", payment.id)
     bill_url = payment.bill_url("Electromagnetic Field Tickets")
@@ -98,7 +98,7 @@ def gocardless_complete(payment_id):
     except Exception as e:
         logger.error("Exception %r confirming payment", e)
         flash("An error occurred with your payment, please contact %s" % app.config['TICKETS_EMAIL'][1])
-        return redirect(url_for('tickets'))
+        return redirect(url_for('tickets.main'))
 
     # keep the gocardless reference so we can find the payment when we get called by the webhook
     payment.gcid = gcid
@@ -122,7 +122,7 @@ def gocardless_complete(payment_id):
                                user=payment.user, payment=payment)
     mail.send(msg)
 
-    return redirect(url_for('gocardless_waiting', payment_id=payment.id))
+    return redirect(url_for('.gocardless_waiting', payment_id=payment.id))
 
 
 class GoCardlessCancelForm(Form):
@@ -140,7 +140,7 @@ def gocardless_cancel(payment_id):
     if payment.state == 'cancelled':
         logger.info('Payment %s has already been cancelled', payment.id)
         flash('Payment has already been cancelled')
-        return redirect(url_for('tickets'))
+        return redirect(url_for('tickets.main'))
 
     form = GoCardlessCancelForm(request.form)
     if form.validate_on_submit():
@@ -152,7 +152,7 @@ def gocardless_cancel(payment_id):
             logger.info('Payment %s cancelled', payment.id)
             flash('Payment cancelled')
 
-        return redirect(url_for('tickets'))
+        return redirect(url_for('tickets.main'))
 
     return render_template('gocardless-cancel.html', payment=payment, form=form)
 

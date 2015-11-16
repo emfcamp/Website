@@ -134,7 +134,7 @@ def txn_suppress(txn_id):
 
             db.session.commit()
             flash("Transaction %s suppressed" % txn.id)
-            return redirect(url_for('admin_txns'))
+            return redirect(url_for('admin.txns'))
 
     return render_template('admin/txn-suppress.html', txn=txn, form=form)
 
@@ -194,12 +194,12 @@ def txn_reconcile(txn_id, payment_id):
             if txn.payment:
                 app.logger.error("Transaction already reconciled")
                 flash("Transaction %s already reconciled" % txn.id)
-                return redirect(url_for('admin_txns'))
+                return redirect(url_for('admin.txns'))
 
             if payment.state == 'paid':
                 app.logger.error("Payment has already been paid")
                 flash("Payment %s already paid" % payment.id)
-                return redirect(url_for('admin_txns'))
+                return redirect(url_for('admin.txns'))
 
             txn.payment = payment
             payment.paid()
@@ -213,7 +213,7 @@ def txn_reconcile(txn_id, payment_id):
             mail.send(msg)
 
             flash("Payment ID %s marked as paid" % payment.id)
-            return redirect(url_for('admin_txns'))
+            return redirect(url_for('admin.txns'))
 
     return render_template('admin/txn-reconcile.html', txn=txn, payment=payment, form=form)
 
@@ -270,7 +270,7 @@ def edit_ticket_type(type_id):
                 setattr(ticket_type, attr, new_val)
 
         db.session.commit()
-        return redirect(url_for('ticket_type_details', type_id=type_id))
+        return redirect(url_for('.ticket_type_details', type_id=type_id))
 
     form.init_with_ticket_type(ticket_type)
     return render_template('admin/edit-ticket-type.html', ticket_type=ticket_type, form=form)
@@ -329,7 +329,7 @@ def new_ticket_type(copy_id):
         app.logger.info('Adding new TicketType %s', tt)
         db.session.add(tt)
         db.session.commit()
-        return redirect(url_for('ticket_type_details', type_id=new_id))
+        return redirect(url_for('.ticket_type_details', type_id=new_id))
 
     if copy_id != -1:
         form.init_with_ticket_type(TicketType.query.get(copy_id))
@@ -363,7 +363,7 @@ def make_admin():
                                             user.id, user.admin, field.data)
                             user.admin = field.data
                             db.session.commit()
-                return redirect(url_for('make_admin'))
+                return redirect(url_for('.make_admin'))
         adminform = MakeAdminForm(formdata=None)
         return render_template('admin/users-make-admin.html', users=users, adminform=adminform)
     else:
@@ -396,7 +396,7 @@ def make_arrivals():
                                             user.id, user.arrivals, field.data)
                             user.arrivals = field.data
                             db.session.commit()
-                return redirect(url_for('make_arrivals'))
+                return redirect(url_for('.make_arrivals'))
         arrivalsform = MakeArrivalsForm(formdata=None)
         return render_template('admin/users-make-arrivals.html', users=users, arrivalsform=arrivalsform)
     else:
@@ -454,7 +454,7 @@ def reset_expiry(payment_id):
             db.session.commit()
 
             flash("Expiry reset for payment %s" % payment.id)
-            return redirect(url_for('admin_expiring'))
+            return redirect(url_for('admin.expiring'))
 
     return render_template('admin/payment-reset-expiry.html', payment=payment, form=form)
 
@@ -477,7 +477,7 @@ def send_reminder(payment_id):
             if payment.reminder_sent:
                 app.logger.error('Reminder for payment %s already sent', payment.id)
                 flash("Cannot send duplicate reminder email for payment %s" % payment.id)
-                return redirect(url_for('admin_expiring'))
+                return redirect(url_for('admin.expiring'))
 
             msg = Message("Electromagnetic Field ticket purchase update",
                           sender=app.config['TICKETS_EMAIL'],
@@ -489,7 +489,7 @@ def send_reminder(payment_id):
             db.session.commit()
 
             flash("Reminder email for payment %s sent" % payment.id)
-            return redirect(url_for('admin_expiring'))
+            return redirect(url_for('admin.expiring'))
 
     return render_template('admin/payment-send-reminder.html', payment=payment, form=form)
 
@@ -515,13 +515,13 @@ def update_payment(payment_id):
                 stripe_update_payment(payment)
             except StripeUpdateConflict:
                 flash('Unable to update due to a status conflict')
-                return redirect(url_for('admin_update_payment', payment_id=payment.id))
+                return redirect(url_for('admin.update_payment', payment_id=payment.id))
             except StripeUpdateUnexpected:
                 flash('Unable to update due to an unexpected response from Stripe')
-                return redirect(url_for('admin_update_payment', payment_id=payment.id))
+                return redirect(url_for('admin.update_payment', payment_id=payment.id))
 
             flash('Payment status updated')
-            return redirect(url_for('admin_update_payment', payment_id=payment.id))
+            return redirect(url_for('admin.update_payment', payment_id=payment.id))
 
     return render_template('admin/payment-update.html', payment=payment, form=form)
 
@@ -543,6 +543,6 @@ def cancel_payment(payment_id):
             db.session.commit()
 
             flash("Payment %s cancelled" % payment.id)
-            return redirect(url_for('admin_expiring'))
+            return redirect(url_for('admin.expiring'))
 
     return render_template('admin/payment-cancel.html', payment=payment, form=form)

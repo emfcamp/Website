@@ -57,7 +57,7 @@ def main_post():
         app.logger.error('Error subscribing: %s', e)
         flash('Sorry, an error occurred.')
 
-    return redirect(url_for('main'))
+    return redirect(url_for('.main'))
 
 
 @base.route('/favicon.ico')
@@ -74,7 +74,7 @@ def about():
 @base.route("/talks/")
 @feature_flag('TICKETS_SITE')
 def talks():
-    return redirect(url_for('talks_2014'))
+    return redirect(url_for('.talks_2014'))
 
 
 @base.route("/talks/2014")
@@ -134,7 +134,7 @@ def sponsor_page(sponsor):
 @base.route("/location")
 @base.route("/about")
 def old_urls_2012():
-    return redirect(url_for('main'))
+    return redirect(url_for('.main'))
 
 
 @base.route('/badge')

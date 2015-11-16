@@ -23,10 +23,10 @@
   <td>{{ payment.user.tickets.filter_by(paid=True).all() | count }}</td>
   <td>{{ first_expires.strftime('%Y-%m-%d') }}</td>
   <td>
-    <a class="btn btn-primary" href="{{ url_for('admin_reset_expiry', payment_id=payment.id) }}">Reset expiry</a>
+    <a class="btn btn-primary" href="{{ url_for('.reset_expiry', payment_id=payment.id) }}">Reset expiry</a>
     <a class="btn btn-warning {% if payment.reminder_sent -%} disabled {%- endif %}"
-        href="{{ url_for('admin_send_reminder', payment_id=payment.id) }}">Remind</a>
-    <a class="btn btn-danger" href="{{ url_for('admin_cancel_payment', payment_id=payment.id) }}">Cancel</a>
+        href="{{ url_for('.send_reminder', payment_id=payment.id) }}">Remind</a>
+    <a class="btn btn-danger" href="{{ url_for('.cancel_payment', payment_id=payment.id) }}">Cancel</a>
   </td>
 </tr>
 {% endfor %}
