@@ -1,23 +1,23 @@
-from main import app, db, mail
-from models.payment import BankPayment
-from views import feature_flag, get_user_currency, Form
-from views.payment import get_user_payment_or_abort
-from views.tickets import add_payment_and_tickets
-
+import logging
 from flask import (
     render_template, redirect, request, flash,
-    url_for,
+    url_for, current_app as app
 )
 from flask.ext.login import login_required, current_user
 from flask_mail import Message
-
 from wtforms import SubmitField
 
-import logging
+from main import db, mail
+from models.payment import BankPayment
+from ..common import feature_flag, get_user_currency
+from ..common.forms import Form
+from ..tickets import add_payment_and_tickets
+from . import get_user_payment_or_abort, payments
 
 logger = logging.getLogger(__name__)
 
-@app.route("/pay/transfer-start", methods=['POST'])
+
+@payments.route("/pay/transfer-start", methods=['POST'])
 @feature_flag('BANK_TRANSFER')
 def transfer_start():
     if get_user_currency() == 'EUR' and not app.config.get('BANK_TRANSFER_EURO'):
@@ -35,15 +35,16 @@ def transfer_start():
     db.session.commit()
 
     msg = Message("Your EMF ticket purchase",
-        sender=app.config['TICKETS_EMAIL'],
-        recipients=[current_user.email])
+                  sender=app.config['TICKETS_EMAIL'],
+                  recipients=[current_user.email])
     msg.body = render_template("emails/tickets-purchased-email-banktransfer.txt",
-        user=current_user, payment=payment)
+                               user=current_user, payment=payment)
     mail.send(msg)
 
     return redirect(url_for('transfer_waiting', payment_id=payment.id))
 
-@app.route("/pay/transfer/<int:payment_id>/waiting")
+
+@payments.route("/pay/transfer/<int:payment_id>/waiting")
 @login_required
 def transfer_waiting(payment_id):
     payment = get_user_payment_or_abort(
@@ -56,7 +57,8 @@ def transfer_waiting(payment_id):
 class TransferCancelForm(Form):
     yes = SubmitField('Cancel transfer')
 
-@app.route("/pay/transfer/<int:payment_id>/cancel", methods=['GET', 'POST'])
+
+@payments.route("/pay/transfer/<int:payment_id>/cancel", methods=['GET', 'POST'])
 @login_required
 def transfer_cancel(payment_id):
     payment = get_user_payment_or_abort(
@@ -82,4 +84,3 @@ def transfer_cancel(payment_id):
         return redirect(url_for('tickets'))
 
     return render_template('transfer-cancel.html', payment=payment, form=form)
-

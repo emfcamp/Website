@@ -1,35 +1,22 @@
-from main import app, db, mail, login_manager
-from views import (
-    set_user_currency, Form, feature_flag,
-    create_current_user,
-)
-from models.user import User, PasswordReset
-
 from flask import (
     render_template, redirect, request, flash,
-    url_for, abort, _request_ctx_stack
+    url_for, abort, Blueprint, current_app as app
 )
 from flask.ext.login import (
     login_user, login_required, logout_user, current_user,
 )
 from flask_mail import Message
-
 from wtforms.validators import Required, Email, EqualTo, ValidationError
 from wtforms import StringField, PasswordField, HiddenField
-
 from sqlalchemy.exc import IntegrityError
 
+from main import db, mail
+from common import set_user_currency, feature_flag, create_current_user
+from .common.forms import Form
+from models.user import User, PasswordReset
 import re
 
-login_manager.setup_app(app, add_context_processor=True)
-app.login_manager.login_view = 'login'
-
-@login_manager.user_loader
-def load_user(userid):
-    user = User.query.filter_by(id=userid).first()
-    if user:
-        _request_ctx_stack.top.user_email = user.email
-    return user
+users = Blueprint('users', __name__)
 
 
 class NextURLField(HiddenField):
@@ -42,12 +29,14 @@ class NextURLField(HiddenField):
             return ''
         return self.data
 
+
 class LoginForm(Form):
     email = StringField('Email', [Email(), Required()])
     password = PasswordField('Password', [Required()])
     next = NextURLField('Next')
 
-@app.route("/login", methods=['GET', 'POST'])
+
+@users.route("/login", methods=['GET', 'POST'])
 @feature_flag('TICKET_SALES')
 def login():
     if current_user.is_authenticated():
@@ -62,6 +51,7 @@ def login():
             flash("Invalid login details!")
     return render_template("login.html", form=form)
 
+
 class SignupForm(Form):
     name = StringField('Full name', [Required()])
     email = StringField('Email', [Email(), Required()])
@@ -75,7 +65,8 @@ class SignupForm(Form):
             field.was_duplicate = True
             raise ValidationError('Account already exists')
 
-@app.route("/signup", methods=['GET', 'POST'])
+
+@users.route("/signup", methods=['GET', 'POST'])
 @feature_flag('TICKETS_SITE')
 @feature_flag('TICKET_SALES')
 def signup():
@@ -105,7 +96,8 @@ class ForgotPasswordForm(Form):
             raise ValidationError('Email address not found')
         form._user = user
 
-@app.route("/forgot-password", methods=['GET', 'POST'])
+
+@users.route("/forgot-password", methods=['GET', 'POST'])
 @feature_flag('TICKETS_SITE')
 @feature_flag('TICKET_SALES')
 def forgot_password():
@@ -117,18 +109,20 @@ def forgot_password():
             db.session.add(reset)
             db.session.commit()
             msg = Message("EMF password reset",
-                sender=app.config['TICKETS_EMAIL'],
-                recipients=[form.email.data])
+                          sender=app.config['TICKETS_EMAIL'],
+                          recipients=[form.email.data])
             msg.body = render_template("emails/reset-password-email.txt", user=form._user, reset=reset)
             mail.send(msg)
 
         return redirect(url_for('reset_password', email=form.email.data))
     return render_template("forgot-password.html", form=form)
 
+
 class ResetPasswordForm(Form):
     email = StringField('Email', [Email(), Required()])
     token = StringField('Token', [Required()])
-    password = PasswordField('New password', [Required(), EqualTo('confirm', message='Passwords do not match')])
+    password = PasswordField('New password', [Required(),
+                                              EqualTo('confirm', message='Passwords do not match')])
     confirm = PasswordField('Confirm password', [Required()])
 
     def validate_token(form, field):
@@ -139,7 +133,8 @@ class ResetPasswordForm(Form):
             raise ValidationError('Token has expired')
         form._reset = reset
 
-@app.route("/reset-password", methods=['GET', 'POST'])
+
+@users.route("/reset-password", methods=['GET', 'POST'])
 @feature_flag('TICKETS_SITE')
 @feature_flag('TICKET_SALES')
 def reset_password():
@@ -152,13 +147,15 @@ def reset_password():
         return redirect(url_for('login'))
     return render_template("reset-password.html", form=form)
 
-@app.route("/logout")
+
+@users.route("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('main'))
 
-@app.route("/set-currency", methods=['POST'])
+
+@users.route("/set-currency", methods=['POST'])
 @feature_flag('TICKETS_SITE')
 def set_currency():
     if request.form['currency'] not in ('GBP', 'EUR'):

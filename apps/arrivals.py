@@ -1,11 +1,10 @@
-from main import app
 from models.ticket import Ticket, TicketType, CheckinStateException, TicketCheckin
 from models.user import User
 from views import Form
 
 from flask import (
     render_template, redirect, request, flash,
-    url_for, abort, session,
+    url_for, abort, session, current_app as app
 )
 from flask.json import jsonify
 from flask.ext.login import current_user

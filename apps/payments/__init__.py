@@ -1,20 +1,18 @@
-from main import app
-from models import Payment, StripePayment, TicketType, Ticket
-from views import get_basket_and_total
-
-from flask import (
-    render_template, redirect, url_for, abort, flash
-)
+from decimal import Decimal
+from flask import render_template, redirect, url_for, abort, flash, current_app as app, Blueprint
 from flask.ext.login import login_required, current_user
-
 from sqlalchemy.sql.functions import func
 
-from decimal import Decimal
+from models import Payment, StripePayment, TicketType, Ticket
+from ..common import get_basket_and_total
+
+payments = Blueprint('payments', __name__)
+
 
 def get_user_payment_or_abort(payment_id, provider=None, valid_states=None, allow_admin=False):
     try:
         payment = Payment.query.get(payment_id)
-    except Exception, e:
+    except Exception as e:
         app.logger.warning('Exception %r getting payment %s', e, payment_id)
         abort(404)
 
@@ -33,11 +31,12 @@ def get_user_payment_or_abort(payment_id, provider=None, valid_states=None, allo
     return payment
 
 
-@app.route("/pay/terms")
+@payments.route("/pay/terms")
 def ticket_terms():
     return render_template('terms.html')
 
-@app.route("/pay/choose")
+
+@payments.route("/pay/choose")
 def pay_choose():
     basket, total = get_basket_and_total()
     if not basket:
@@ -46,7 +45,7 @@ def pay_choose():
     return render_template('payment-choose.html', basket=basket, total=total, StripePayment=StripePayment)
 
 
-@app.route('/payment/<int:payment_id>/invoice')
+@payments.route('/payment/<int:payment_id>/invoice')
 @login_required
 def payment_invoice(payment_id):
     payment = get_user_payment_or_abort(payment_id, allow_admin=True)
@@ -67,7 +66,8 @@ def payment_invoice(payment_id):
 
     # FIXME: we should use a currency-specific quantization here (or rounder numbers)
     if subtotal + vat - payment.amount > Decimal('0.01'):
-        app.logger.error('Invoice total mismatch: %s + %s - %s = %s', subtotal, vat, payment.amount, subtotal + vat - payment.amount)
+        app.logger.error('Invoice total mismatch: %s + %s - %s = %s', subtotal, vat,
+                         payment.amount, subtotal + vat - payment.amount)
         flash('Your invoice cannot currently be displayed')
         return redirect(url_for('tickets'))
 
@@ -79,7 +79,6 @@ def payment_invoice(payment_id):
                            premium=premium, subtotal=subtotal, vat=vat, due_date=due_date)
 
 
-import banktransfer  # noqa
-import gocardless  # noqa
-import stripe  # noqa
-
+from . import banktransfer  # noqa
+from . import gocardless  # noqa
+from . import stripe  # noqa

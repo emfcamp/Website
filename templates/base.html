@@ -29,7 +29,7 @@
 
                 <div id="menu-container">
                     <ul class="menu">
-                        <li><a href="{{ url_for('about') }}">About</a>
+                        <li><a href="{{ url_for('base.about') }}">About</a>
                         {#<li><a target="_blank" href="http://blog.emfcamp.org">Blog</a>#}
                         {#<li><a href="https://frab.emfcamp.org/en/EMF2014/public/schedule/2">Programme</a>#}
                         {#<li><a href="https://www.youtube.com/user/emfcamp1/videos">Videos</a>#}
@@ -49,14 +49,14 @@
                 <div id="bottom-menu-container">
                     <ul class="menu">
                         <li><a target="_blank" href="https://wiki.emfcamp.org">Wiki</a>
-                        <li><a target="_blank" href="{{ url_for('code_of_conduct') }}">Code of Conduct</a>
+                        <li><a target="_blank" href="{{ url_for('base.code_of_conduct') }}">Code of Conduct</a>
 
                       {% if config.get('TICKET_SALES') %}
                       {% if current_user.is_authenticated() %}
-                        <li><a href="{{ url_for('tickets') }}">My tickets</a></li>
-                        <li><a href="{{ url_for('logout') }}">Log out</a></li>
+                        <li><a href="{{ url_for('tickets.main') }}">My tickets</a></li>
+                        <li><a href="{{ url_for('users.logout') }}">Log out</a></li>
                       {% else %}
-                        <li><a href="{{ url_for('login') }}">Log in</a></li>
+                        <li><a href="{{ url_for('users.login') }}">Log in</a></li>
                       {% endif %}
                       {% endif %}
                     </ul>
@@ -66,7 +66,7 @@
                     <div style="clear: both"></div>
                 </div>
                 <div id="credits">
-                    <p>&copy; 2014 <a href="{{url_for('company')}}">Electromagnetic Field</a>.
+                    <p>&copy; 2014 <a href="{{url_for('base.company')}}">Electromagnetic Field</a>.
                         Kindly hosted by <a href="http://bitfolk.com/">Bitfolk</a>.</p>
                 </div>
             </footer>
