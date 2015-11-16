@@ -1,4 +1,4 @@
-from main import db, mail
+from main import app, db, mail
 from views import Form, feature_flag
 from models.ticket import TicketType
 from models.cfp import (
@@ -8,7 +8,7 @@ from models.cfp import (
 
 from flask import (
     render_template, redirect, request,
-    url_for, abort, current_app as app
+    url_for, abort,
 )
 from flask.ext.login import current_user
 from flask_mail import Message

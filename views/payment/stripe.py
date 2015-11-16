@@ -1,46 +1,40 @@
+from main import app, db, stripe, mail, csrf
+from models.payment import StripePayment
+from views import feature_flag, Form
+from views.payment import get_user_payment_or_abort
+from views.tickets import add_payment_and_tickets, render_receipt, render_pdf
+
+from flask import (
+    render_template, redirect, request, flash,
+    url_for, abort,
+)
+from flask.ext.login import login_required
+from flask_mail import Message
+
+from wtforms import SubmitField, HiddenField
+
+from sqlalchemy.orm.exc import NoResultFound
+
 import simplejson
 import logging
 from datetime import datetime, timedelta
 
-from flask import (
-    render_template, redirect, request, flash,
-    url_for, abort, current_app as app
-)
-from flask.ext.login import login_required
-from flask_mail import Message
-from wtforms import SubmitField, HiddenField
-from sqlalchemy.orm.exc import NoResultFound
-
-from main import db, stripe, mail, csrf
-from models.payment import StripePayment
-from ..common import feature_flag
-from ..common.forms import Form
-from ..tickets import add_payment_and_tickets, render_receipt, render_pdf
-from . import get_user_payment_or_abort
-from . import payments
-
 logger = logging.getLogger(__name__)
-
 
 class StripeUpdateUnexpected(Exception):
     pass
 
-
 class StripeUpdateConflict(Exception):
     pass
 
-
 webhook_handlers = {}
-
-
 def webhook(type=None):
     def inner(f):
         webhook_handlers[type] = f
         return f
     return inner
 
-
-@payments.route("/pay/stripe-start", methods=['POST'])
+@app.route("/pay/stripe-start", methods=['POST'])
 @feature_flag('STRIPE')
 def stripe_start():
     payment = add_payment_and_tickets(StripePayment)
@@ -63,14 +57,16 @@ def charge_stripe(payment):
             currency=payment.currency.lower(),
             card=payment.token,
             description=payment.description,
-            statement_description='Tickets 2014',  # max 15 chars, appended to company name
+            statement_description='Tickets 2014', # max 15 chars, appended to company name
         )
-    except stripe.CardError as e:
+
+    except stripe.CardError, e:
         logger.warn('Card payment failed with exception "%s"', e)
         # Don't save the charge_id - they can try again
         flash('An error occurred with your payment, please try again')
         return redirect(url_for('stripe_tryagain', payment_id=payment.id))
-    except Exception as e:
+
+    except Exception, e:
         logger.warn("Exception %r confirming payment", e)
         flash('An error occurred with your payment, please try again')
         return redirect(url_for('stripe_tryagain', payment_id=payment.id))
@@ -90,10 +86,10 @@ def charge_stripe(payment):
     logger.info('Payment %s completed OK (state %s)', payment.id, payment.state)
 
     msg = Message("Your EMF ticket purchase",
-                  sender=app.config.get('TICKETS_EMAIL'),
-                  recipients=[payment.user.email])
+        sender=app.config.get('TICKETS_EMAIL'),
+        recipients=[payment.user.email])
     msg.body = render_template("emails/tickets-purchased-email-stripe.txt",
-                               user=payment.user, payment=payment)
+        user=payment.user, payment=payment)
 
     if app.config.get('RECEIPTS'):
         page = render_receipt(payment.tickets, pdf=True)
@@ -113,8 +109,7 @@ class StripeAuthorizeForm(Form):
     token = HiddenField('Stripe token')
     forward = SubmitField('Continue')
 
-
-@payments.route("/pay/stripe/<int:payment_id>/capture", methods=['GET', 'POST'])
+@app.route("/pay/stripe/<int:payment_id>/capture", methods=['GET', 'POST'])
 @login_required
 def stripe_capture(payment_id):
     payment = get_user_payment_or_abort(
@@ -134,7 +129,8 @@ def stripe_capture(payment_id):
             payment.token = form.token.data
             payment.state = 'captured'
             db.session.commit()
-        except Exception as e:
+
+        except Exception, e:
             logger.warn("Exception %r updating payment", e)
             flash('An error occurred with your payment, please try again')
             return redirect(url_for('stripe_tryagain', payment_id=payment.id))
@@ -144,17 +140,15 @@ def stripe_capture(payment_id):
     logger.info("Trying to check out payment %s", payment.id)
     return render_template('stripe-checkout.html', payment=payment, form=form)
 
-
 class StripeChargeAgainForm(Form):
     tryagain = SubmitField('Try again')
 
-
-@payments.route("/pay/stripe/<int:payment_id>/tryagain", methods=['GET', 'POST'])
+@app.route("/pay/stripe/<int:payment_id>/tryagain", methods=['GET', 'POST'])
 @login_required
 def stripe_tryagain(payment_id):
     payment = get_user_payment_or_abort(
         payment_id, 'stripe',
-        valid_states=['new', 'captured'],  # once it's charged it's too late
+        valid_states=['new', 'captured'], # once it's charged it's too late
     )
 
     if not app.config.get('STRIPE'):
@@ -176,8 +170,7 @@ def stripe_tryagain(payment_id):
 class StripeCancelForm(Form):
     yes = SubmitField('Cancel payment')
 
-
-@payments.route("/pay/stripe/<int:payment_id>/cancel", methods=['GET', 'POST'])
+@app.route("/pay/stripe/<int:payment_id>/cancel", methods=['GET', 'POST'])
 @login_required
 def stripe_cancel(payment_id):
     payment = get_user_payment_or_abort(
@@ -202,8 +195,7 @@ def stripe_cancel(payment_id):
 
     return render_template('stripe-cancel.html', payment=payment, form=form)
 
-
-@payments.route('/pay/stripe/<int:payment_id>/waiting')
+@app.route('/pay/stripe/<int:payment_id>/waiting')
 @login_required
 def stripe_waiting(payment_id):
     payment = get_user_payment_or_abort(
@@ -214,7 +206,7 @@ def stripe_waiting(payment_id):
 
 
 @csrf.exempt
-@payments.route("/stripe-webhook", methods=['POST'])
+@app.route("/stripe-webhook", methods=['POST'])
 def stripe_webhook():
     logger.debug('Stripe webhook called with %s', request.data)
     json_data = simplejson.loads(request.data)
@@ -233,11 +225,12 @@ def stripe_webhook():
         type = json_data['type']
         try:
             handler = webhook_handlers[type]
-        except KeyError as e:
+        except KeyError, e:
             handler = webhook_handlers[None]
 
         return handler(type, obj_data)
-    except Exception as e:
+
+    except Exception, e:
         logger.error('Unexcepted exception during webhook: %r', e)
         abort(500)
 
@@ -248,11 +241,9 @@ def stripe_default(type, obj_data):
     logger.warn('Default handler called for %s: %s', type, obj_data)
     return ('', 200)
 
-
 @webhook('ping')
 def stripe_ping(type, ping_data):
     return ('', 200)
-
 
 def get_payment_or_abort(charge_id):
     try:
@@ -260,7 +251,6 @@ def get_payment_or_abort(charge_id):
     except NoResultFound:
         logger.error('Payment for charge %s not found', charge_id)
         abort(409)
-
 
 def stripe_update_payment(payment):
     charge = stripe.Charge.retrieve(payment.chargeid)
@@ -272,7 +262,6 @@ def stripe_update_payment(payment):
 
     app.logger.error('Charge object is not paid or refunded')
     raise StripeUpdateUnexpected()
-
 
 def stripe_payment_paid(payment):
     if payment.state == 'paid':
@@ -288,10 +277,10 @@ def stripe_payment_paid(payment):
     db.session.commit()
 
     msg = Message('Your EMF ticket payment has been confirmed',
-                  sender=app.config.get('TICKETS_EMAIL'),
-                  recipients=[payment.user.email])
+        sender=app.config.get('TICKETS_EMAIL'),
+        recipients=[payment.user.email])
     msg.body = render_template('emails/tickets-paid-email-stripe.txt',
-                               user=payment.user, payment=payment)
+        user=payment.user, payment=payment)
 
     if app.config.get('RECEIPTS'):
         page = render_receipt(payment.tickets, pdf=True)
@@ -299,7 +288,6 @@ def stripe_payment_paid(payment):
         msg.attach('Receipt.pdf', 'application/pdf', pdf.read())
 
     mail.send(msg)
-
 
 def stripe_payment_refunded(payment):
     if payment.state == 'cancelled':
@@ -315,10 +303,10 @@ def stripe_payment_refunded(payment):
         return
 
     msg = Message('An EMF ticket payment has been refunded',
-                  sender=app.config.get('TICKETS_EMAIL'),
-                  recipients=[app.config.get('TICKETS_NOTICE_EMAIL')[1]])
+        sender=app.config.get('TICKETS_EMAIL'),
+        recipients=[app.config.get('TICKETS_NOTICE_EMAIL')[1]])
     msg.body = render_template('emails/tickets-refunded-email-stripe.txt',
-                               user=payment.user, payment=payment)
+        user=payment.user, payment=payment)
     mail.send(msg)
 
 
@@ -338,7 +326,6 @@ def stripe_charge_updated(type, charge_data):
         abort(501)
 
     return ('', 200)
-
 
 @webhook('charge.failed')
 def stripe_charge_failed(type, charge_data):
@@ -363,7 +350,6 @@ def stripe_charge_failed(type, charge_data):
     # Payment can still be retried with a new charge - nothing to do
     return ('', 200)
 
-
 @webhook('charge.dispute.created')
 @webhook('charge.dispute.updated')
 @webhook('charge.dispute.closed')
@@ -373,3 +359,4 @@ def stripe_dispute_update(type, dispute_data):
 
     # Don't block other events
     return ('', 200)
+

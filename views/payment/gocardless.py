@@ -1,37 +1,34 @@
+from main import app, db, gocardless, mail, csrf
+from models.payment import GoCardlessPayment
+from views import feature_flag, Form
+from views.payment import get_user_payment_or_abort
+from views.tickets import add_payment_and_tickets
+
+from flask import (
+    render_template, redirect, request, flash,
+    url_for, abort,
+)
+from flask.ext.login import login_required
+from flask_mail import Message
+
+from wtforms import SubmitField
+
+from sqlalchemy.orm.exc import NoResultFound
+
 import simplejson
 import logging
 from datetime import datetime, timedelta
 
-from flask import (
-    render_template, redirect, request, flash,
-    url_for, abort, current_app as app
-)
-from flask.ext.login import login_required
-from flask_mail import Message
-from wtforms import SubmitField
-from sqlalchemy.orm.exc import NoResultFound
-
-from main import db, gocardless, mail, csrf
-from models.payment import GoCardlessPayment
-from ..common import feature_flag
-from ..common.forms import Form
-from ..tickets import add_payment_and_tickets
-from . import get_user_payment_or_abort
-from . import payments
-
 logger = logging.getLogger(__name__)
 
 webhook_handlers = {}
-
-
 def webhook(resource=None, action=None):
     def inner(f):
         webhook_handlers[(resource, action)] = f
         return f
     return inner
 
-
-@payments.route("/pay/gocardless-start", methods=['POST'])
+@app.route("/pay/gocardless-start", methods=['POST'])
 @feature_flag('GOCARDLESS')
 def gocardless_start():
     payment = add_payment_and_tickets(GoCardlessPayment)
@@ -47,19 +44,16 @@ def gocardless_start():
     logger.debug('Bill URL for GoCardless: %s', bill_url)
     return redirect(bill_url)
 
-
-@payments.route('/pay/gocardless/<int:payment_id>/waiting')
+@app.route('/pay/gocardless/<int:payment_id>/waiting')
 @login_required
 def gocardless_waiting(payment_id):
     payment = get_user_payment_or_abort(
         payment_id, 'gocardless',
         valid_states=['new', 'inprogress', 'paid'],
     )
-    return render_template('gocardless-waiting.html', payment=payment,
-                           days=app.config['EXPIRY_DAYS_GOCARDLESS'])
+    return render_template('gocardless-waiting.html', payment=payment, days=app.config['EXPIRY_DAYS_GOCARDLESS'])
 
-
-@payments.route('/pay/gocardless/<int:payment_id>/tryagain')
+@app.route('/pay/gocardless/<int:payment_id>/tryagain')
 @login_required
 def gocardless_tryagain(payment_id):
     payment = get_user_payment_or_abort(
@@ -77,8 +71,7 @@ def gocardless_tryagain(payment_id):
     logger.debug('Bill URL for GoCardless: %s', bill_url)
     return redirect(bill_url)
 
-
-@payments.route("/pay/gocardless/<int:payment_id>/complete")
+@app.route("/pay/gocardless/<int:payment_id>/complete")
 @login_required
 def gocardless_complete(payment_id):
     payment = get_user_payment_or_abort(
@@ -95,7 +88,7 @@ def gocardless_complete(payment_id):
 
         gcid = request.args["resource_id"]
 
-    except Exception as e:
+    except Exception, e:
         logger.error("Exception %r confirming payment", e)
         flash("An error occurred with your payment, please contact %s" % app.config['TICKETS_EMAIL'][1])
         return redirect(url_for('tickets'))
@@ -116,10 +109,10 @@ def gocardless_complete(payment_id):
 
     # should we send the resource_uri in the bill email?
     msg = Message("Your EMF ticket purchase",
-                  sender=app.config['TICKETS_EMAIL'],
-                  recipients=[payment.user.email])
+        sender=app.config['TICKETS_EMAIL'],
+        recipients=[payment.user.email])
     msg.body = render_template("emails/tickets-purchased-email-gocardless.txt",
-                               user=payment.user, payment=payment)
+        user=payment.user, payment=payment)
     mail.send(msg)
 
     return redirect(url_for('gocardless_waiting', payment_id=payment.id))
@@ -128,13 +121,12 @@ def gocardless_complete(payment_id):
 class GoCardlessCancelForm(Form):
     yes = SubmitField('Cancel payment')
 
-
-@payments.route("/pay/gocardless/<int:payment_id>/cancel", methods=['GET', 'POST'])
+@app.route("/pay/gocardless/<int:payment_id>/cancel", methods=['GET', 'POST'])
 @login_required
 def gocardless_cancel(payment_id):
     payment = get_user_payment_or_abort(
         payment_id, 'gocardless',
-        valid_states=['new', 'cancelled'],  # once it's inprogress, there's potentially money moving around
+        valid_states=['new', 'cancelled'], # once it's inprogress, there's potentially money moving around
     )
 
     if payment.state == 'cancelled':
@@ -158,7 +150,7 @@ def gocardless_cancel(payment_id):
 
 
 @csrf.exempt
-@payments.route("/gocardless-webhook", methods=['POST'])
+@app.route("/gocardless-webhook", methods=['POST'])
 def gocardless_webhook():
     # Documentation: https://developer.gocardless.com/#webhook-overview
 
@@ -178,18 +170,17 @@ def gocardless_webhook():
 
         try:
             handler = webhook_handlers[(resource, action)]
-        except KeyError as e:
+        except KeyError, e:
             try:
                 handler = webhook_handlers[resource, None]
-            except KeyError as e:
+            except KeyError, e:
                 handler = webhook_handlers[(None, None)]
 
         return handler(resource, action, data)
 
-    except Exception as e:
+    except Exception, e:
         logger.error('Unexcepted exception during webhook: %r', e)
         abort(500)
-
 
 @webhook('bill')
 @webhook('bill', 'created')
@@ -210,12 +201,11 @@ def gocardless_bill(resource, action, data):
             logging.info('Received %s action for gcid %s, payment %s',
                          action, gcid, payment.id)
 
-    except Exception as e:
+    except Exception, e:
         logger.error('Unexcepted exception during webhook: %r', e)
         abort(501)
 
     return ('', 200)
-
 
 @webhook('bill', 'cancelled')
 def gocardless_bill_cancelled(resource, action, data):
@@ -249,7 +239,6 @@ def gocardless_bill_cancelled(resource, action, data):
 
     return ('', 200)
 
-
 @webhook('bill', 'paid')
 def gocardless_bill_paid(resource, action, data):
 
@@ -281,10 +270,12 @@ def gocardless_bill_paid(resource, action, data):
         db.session.commit()
 
         msg = Message("Your EMF ticket payment has been confirmed",
-                      sender=app.config['TICKETS_EMAIL'],
-                      recipients=[payment.user.email])
+            sender=app.config['TICKETS_EMAIL'],
+            recipients=[payment.user.email])
         msg.body = render_template("emails/tickets-paid-email-gocardless.txt",
-                                   user=payment.user, payment=payment)
+            user=payment.user, payment=payment)
         mail.send(msg)
 
     return ('', 200)
+
+

@@ -1,5 +1,4 @@
-from main import db
-from flask import current_app as app
+from main import app, db
 
 from sqlalchemy.orm import Session
 from sqlalchemy import event, or_

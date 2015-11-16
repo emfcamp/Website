@@ -1,29 +1,13 @@
-from datetime import datetime, timedelta
-from StringIO import StringIO
-from xhtml2pdf import pisa
-import qrcode
-from qrcode.image.svg import SvgPathImage
-from lxml import etree
-from urlparse import urljoin
-from flask import (
-    render_template, redirect, request, flash, Blueprint,
-    url_for, session, send_file, Markup, abort, current_app as app
-)
-from flask.ext.login import login_required, current_user
-from wtforms.validators import Required, Optional, ValidationError
-from wtforms import (
-    SubmitField, BooleanField, StringField,
-    DecimalField, FieldList, FormField, HiddenField,
-)
-from wtforms.fields.html5 import EmailField
-from sqlalchemy.exc import IntegrityError
-
-from main import db
-from .common import (
+from main import app, db
+from views import (
     get_user_currency, set_user_currency, get_basket_and_total, process_basket,
-    CURRENCY_SYMBOLS, feature_flag, create_current_user)
-from .common.forms import IntegerSelectField, HiddenIntegerField, Form
+    CURRENCY_SYMBOLS,
+    IntegerSelectField, HiddenIntegerField, Form, feature_flag,
+    create_current_user,
+)
+
 from models.user import User
+
 from models.ticket import (
     TicketType, Ticket, TicketAttrib,
     validate_safechars,
@@ -31,8 +15,28 @@ from models.ticket import (
 from models.site_state import get_sales_state
 from models.payment import Payment
 
+from flask import (
+    render_template, redirect, request, flash,
+    url_for, session, send_file, Markup, abort,
+)
+from flask.ext.login import login_required, current_user
 
-tickets = Blueprint('tickets', __name__)
+from wtforms.validators import Required, Optional, ValidationError
+from wtforms import (
+    SubmitField, BooleanField, StringField,
+    DecimalField, FieldList, FormField, HiddenField,
+)
+from wtforms.fields.html5 import EmailField
+
+from sqlalchemy.exc import IntegrityError
+
+from datetime import datetime, timedelta
+from StringIO import StringIO
+from xhtml2pdf import pisa
+import qrcode
+from qrcode.image.svg import SvgPathImage
+from lxml import etree
+from urlparse import urljoin
 
 
 class TicketForm(Form):
@@ -101,8 +105,7 @@ def add_payment_and_tickets(paymenttype):
     current_user.payments.append(payment)
 
     app.logger.info('Creating tickets for basket %s', basket)
-    app.logger.info('Payment: %s for %s %s (ticket total %s)', paymenttype.name,
-                    payment.amount, currency, total)
+    app.logger.info('Payment: %s for %s %s (ticket total %s)', paymenttype.name, payment.amount, currency, total)
     app.logger.info('Ticket info: %s', infodata)
 
     if infodata:
@@ -135,9 +138,8 @@ def add_payment_and_tickets(paymenttype):
 class ReceiptForm(Form):
     forward = SubmitField('Show e-Tickets')
 
-
-@tickets.route("/tickets/", methods=['GET', 'POST'])
-def main():
+@app.route("/tickets/", methods=['GET', 'POST'])
+def tickets():
     if current_user.is_anonymous():
         return redirect(url_for('tickets_choose'))
 
@@ -155,13 +157,14 @@ def main():
     payments = current_user.payments.filter(Payment.state != "cancelled", Payment.state != "expired").all()
 
     return render_template("tickets.html",
-                           tickets=tickets,
-                           payments=payments,
-                           form=form)
+        tickets=tickets,
+        payments=payments,
+        form=form,
+    )
 
 
-@tickets.route("/tickets/token/")
-@tickets.route("/tickets/token/<token>")
+@app.route("/tickets/token/")
+@app.route("/tickets/token/<token>")
 def tickets_token(token=None):
     if TicketType.get_types_for_token(token):
         session['ticket_token'] = token
@@ -188,8 +191,7 @@ class TicketAmountsForm(Form):
         if field.data not in CURRENCY_SYMBOLS:
             raise ValidationError('Invalid currency %s' % field.data)
 
-
-@tickets.route("/tickets/choose", methods=['GET', 'POST'])
+@app.route("/tickets/choose", methods=['GET', 'POST'])
 @feature_flag('TICKET_SALES')
 def tickets_choose():
     if get_sales_state(datetime.utcnow()) != 'available':
@@ -214,14 +216,16 @@ def tickets_choose():
                 first_full = True
                 form.types[-1].amount.data = 1
 
+
     tts = dict((tt.id, tt) for tt in tts)
     for f in form.types:
-        t_id = int(f.code.data)  # On form return this may be a string
+        t_id = int(f.code.data) # On form return this may be a string
         f._type = tts[t_id]
 
         values = range(limits[t_id] + 1)
         f.amount.values = values
         f._any = any(values)
+
 
     if form.validate_on_submit():
         if form.buy.data:
@@ -250,7 +254,6 @@ def tickets_choose():
     form.currency_code.data = get_user_currency()
 
     return render_template("tickets-choose.html", form=form)
-
 
 class TicketInfoForm(Form):
     email = EmailField('Email', [Required()])
@@ -306,10 +309,10 @@ def build_info_form(formdata):
             ticket.form = subform
 
     # FIXME: check that there aren't any surplus submitted forms
+
     return parent_form, basket, total
 
-
-@tickets.route("/tickets/info", methods=['GET', 'POST'])
+@app.route("/tickets/info", methods=['GET', 'POST'])
 def tickets_info():
     form, basket, total = build_info_form(request.form)
     if not form:
@@ -328,13 +331,11 @@ def tickets_info():
 
         return redirect(url_for('pay_choose'))
 
-    return render_template('tickets-info.html',
-                           form=form, basket=basket,
-                           total=total, is_anonymous=current_user.is_anonymous())
+    return render_template('tickets-info.html', form=form, basket=basket, total=total, is_anonymous=current_user.is_anonymous())
 
 
-@tickets.route("/tickets/receipt")
-@tickets.route("/tickets/<ticket_ids>/receipt")
+@app.route("/tickets/receipt")
+@app.route("/tickets/<ticket_ids>/receipt")
 @login_required
 def tickets_receipt(ticket_ids=None):
     if current_user.admin and ticket_ids is not None:
@@ -343,12 +344,12 @@ def tickets_receipt(ticket_ids=None):
         tickets = current_user.tickets
 
     tickets = tickets.filter_by(paid=True) \
-        .join(Payment).filter(~Payment.state.in_(['cancelled'])) \
-        .join(TicketType).order_by(TicketType.order)
+              .join(Payment).filter( ~Payment.state.in_(['cancelled']) ) \
+              .join(TicketType).order_by(TicketType.order)
 
     if ticket_ids is not None:
         ticket_ids = map(int, ticket_ids.split(','))
-        tickets = tickets.filter(Ticket.id.in_(ticket_ids))
+        tickets = tickets.filter( Ticket.id.in_(ticket_ids) )
 
     if not tickets.all():
         abort(404)
@@ -363,7 +364,6 @@ def tickets_receipt(ticket_ids=None):
 
     return page
 
-
 def render_receipt(tickets, png=False, table=False, pdf=False):
     user = tickets[0].user
 
@@ -373,8 +373,8 @@ def render_receipt(tickets, png=False, table=False, pdf=False):
         if ticket.qrcode is None:
             ticket.create_qrcode()
 
-    entrance_tickets = tickets.filter(TicketType.admits.in_(['full', 'kids'])).all()
-    vehicle_tickets = tickets.filter(TicketType.admits.in_(['car', 'campervan'])).all()
+    entrance_tickets = tickets.filter( TicketType.admits.in_(['full', 'kids']) ).all()
+    vehicle_tickets = tickets.filter( TicketType.admits.in_(['car', 'campervan']) ).all()
 
     return render_template('receipt.html', user=user, format_inline_qr=format_inline_qr,
                            entrance_tickets=entrance_tickets, vehicle_tickets=vehicle_tickets,
@@ -419,7 +419,7 @@ def format_inline_qr(code):
     return Markup(etree.tostring(root))
 
 
-@tickets.route("/receipt/<code>/qr")
+@app.route("/receipt/<code>/qr")
 def tickets_qrcode(code):
     if len(code) > 8:
         abort(404)
@@ -432,7 +432,6 @@ def tickets_qrcode(code):
     qrfile = make_qr_png(url, box_size=3)
     return send_file(qrfile, mimetype='image/png')
 
-
 def make_qr_png(*args, **kwargs):
     qrfile = StringIO()
 
@@ -441,3 +440,4 @@ def make_qr_png(*args, **kwargs):
     qrfile.seek(0)
 
     return qrfile
+
