@@ -17,7 +17,7 @@ init:
 	virtualenv --clear ./env
 
 update:
-	$(ENV) pip install -U pip wheel setuptools
+	$(ENV) pip install --upgrade pip wheel setuptools
 	$(ENV) pip install ndg-httpsclient
 	$(ENV) pip install -r ./requirements.txt
 
