@@ -17,7 +17,7 @@
 <tbody>
 {% for payment, first_expires, ticket_count in payments %}
 <tr>
-  <td><a href="{{ url_for('.payment_invoice', payment_id=payment.id) }}">{{ payment.name }}</a></td>
+  <td><a href="{{ url_for('payments.invoice', payment_id=payment.id) }}">{{ payment.name }}</a></td>
   <td>{{ payment.user.name }}</td>
   <td>{{ payment.user.email }}</td>
   <td>{{ payment.state }}</td>
