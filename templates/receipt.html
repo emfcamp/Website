@@ -57,7 +57,7 @@
     </td>
     <td>
       <div class="qr">
-        <img src="{{ url_for('tickets_qrcode', code=t.qrcode) }}" />
+        <img src="{{ url_for('tickets.tickets_qrcode', code=t.qrcode) }}" />
       </div>
       <div class="code">
         {{ t.receipt }}
@@ -86,7 +86,7 @@
       <div class="col-sm-4">
         <div class="qr">
           {% if png %}
-          <img src="{{ url_for('tickets_qrcode', code=t.qrcode) }}" />
+          <img src="{{ url_for('tickets.tickets_qrcode', code=t.qrcode) }}" />
           {% else %}
           {{ format_inline_qr(t.qrcode) }}
           {% endif %}
