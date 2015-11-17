@@ -120,7 +120,7 @@ class TransactionSuppressForm(Form):
 
 @admin.route('/transaction/<int:txn_id>/suppress', methods=['GET', 'POST'])
 @admin_required
-def txn_suppress(txn_id):
+def transaction_suppress(txn_id):
     try:
         txn = BankTransaction.query.get(txn_id)
     except NoResultFound:
@@ -134,7 +134,7 @@ def txn_suppress(txn_id):
 
             db.session.commit()
             flash("Transaction %s suppressed" % txn.id)
-            return redirect(url_for('admin.txns'))
+            return redirect(url_for('admin.transactions'))
 
     return render_template('admin/txn-suppress.html', txn=txn, form=form)
 
@@ -164,7 +164,7 @@ def score_reconciliation(txn, payment):
 
 @admin.route('/transaction/<int:txn_id>/reconcile')
 @admin_required
-def txn_suggest_payments(txn_id):
+def transaction_suggest_payments(txn_id):
     txn = BankTransaction.query.get_or_404(txn_id)
 
     payments = BankPayment.query.filter_by(state='inprogress').order_by(BankPayment.bankref).all()
@@ -181,7 +181,7 @@ class ManualReconcilePaymentForm(Form):
 
 @admin.route('/transaction/<int:txn_id>/reconcile/<int:payment_id>', methods=['GET', 'POST'])
 @admin_required
-def txn_reconcile(txn_id, payment_id):
+def transaction_reconcile(txn_id, payment_id):
     txn = BankTransaction.query.get_or_404(txn_id)
     payment = BankPayment.query.get_or_404(payment_id)
 
@@ -194,12 +194,12 @@ def txn_reconcile(txn_id, payment_id):
             if txn.payment:
                 app.logger.error("Transaction already reconciled")
                 flash("Transaction %s already reconciled" % txn.id)
-                return redirect(url_for('admin.txns'))
+                return redirect(url_for('admin.transactions'))
 
             if payment.state == 'paid':
                 app.logger.error("Payment has already been paid")
                 flash("Payment %s already paid" % payment.id)
-                return redirect(url_for('admin.txns'))
+                return redirect(url_for('admin.transactions'))
 
             txn.payment = payment
             payment.paid()
@@ -213,7 +213,7 @@ def txn_reconcile(txn_id, payment_id):
             mail.send(msg)
 
             flash("Payment ID %s marked as paid" % payment.id)
-            return redirect(url_for('admin.txns'))
+            return redirect(url_for('admin.transactions'))
 
     return render_template('admin/txn-reconcile.html', txn=txn, payment=payment, form=form)
 

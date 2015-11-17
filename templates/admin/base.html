@@ -30,7 +30,7 @@
             <ul class="nav navbar-nav">
                 {% if current_user.admin %}
                 <li {% if nav_active == 'admin_txns' -%} class="active" {%- endif %}>
-                    <a href="{{ url_for('.txns') }}">
+                    <a href="{{ url_for('.transactions') }}">
                     Bank transfers <span class="badge">{{ unreconciled_count }}</span>
                 </a></li>
                 <li {% if nav_active == 'admin_payments' -%} class="active" {%- endif %}>
