@@ -19,8 +19,10 @@ def validate_safechars(val):
 class TicketError(Exception):
     pass
 
+
 class CheckinStateException(Exception):
     pass
+
 
 class TicketType(db.Model):
     __tablename__ = 'ticket_type'
@@ -273,6 +275,7 @@ class Ticket(db.Model):
             attrs.append('expired')
         return "<Ticket %s: %s>" % (self.id, ', '.join(attrs))
 
+
 class TicketAttrib(db.Model):
     __tablename__ = 'ticket_attrib'
     id = db.Column(db.Integer, primary_key=True)
@@ -286,6 +289,7 @@ class TicketAttrib(db.Model):
 
     def __repr__(self):
         return "<TicketAttrib %s: %s>" % (self.name, self.value)
+
 
 class TicketCheckin(db.Model):
     __tablename__ = 'ticket_checkin'

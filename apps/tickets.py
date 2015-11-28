@@ -333,6 +333,51 @@ def info():
                            total=total, is_anonymous=current_user.is_anonymous())
 
 
+
+
+class TicketTransferForm(Form):
+    email = EmailField('Email', [Required()])
+    name = StringField('Name', [Required()])
+
+    transfer = SubmitField('Transfer Ticket')
+
+
+@tickets.route('/tickets/<ticket_id>/transfer', methods=['GET', 'POST'])
+@login_required
+def transfer(ticket_id):
+    ticket = current_user.tickets.filter_by(id=ticket_id).one()
+
+    if not ticket or not ticket.paid:
+        redirect('tickets.main')
+
+    form = TicketTransferForm()
+
+    if form.validate_on_submit():
+        email = form.email.data
+        from_user_id = ticket.user_id
+
+        if not User.does_user_exist(email):
+            to_user = User(email, form.name.data)
+            to_user.generate_random_password()
+            # TODO: send signup email
+            db.session.add(to_user)
+            db.session.commit()
+        else:
+            # TODO: send transfer confirmation email
+            to_user = User.query.filter_by(email=email).one()
+
+        ticket.user = to_user
+        # Make sure the ticket can't be double-used
+        ticket.emailed = False
+        ticket.create_qrcode()
+        ticket.create_receipt()
+        # Log the transfer
+        ticket.attribs.append(TicketAttrib('transfer', str(from_user_id)))
+        db.session.commit()
+
+    return render_template('ticket-transfer.html', ticket=ticket, form=form)
+
+
 @tickets.route("/tickets/receipt")
 @tickets.route("/tickets/<ticket_ids>/receipt")
 @login_required
