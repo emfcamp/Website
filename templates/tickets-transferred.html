@@ -10,6 +10,7 @@
   This will show you any tickets that you have transferred to others.
 </p>
 
+<p>
 <table>
 <tr>
   <th>Type</th>
@@ -26,5 +27,10 @@
 
 {% endfor %}
 </table>
+</p>
+
+<p>
+<a class="btn btn-default" href="{{ url_for('tickets.main') }}">Back</a>
+</p>
 
 {% endblock %}

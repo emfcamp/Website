@@ -351,7 +351,7 @@ def transfer(ticket_id):
     except NoResultFound:
         return redirect(url_for('tickets.main'))
 
-    if not ticket or not ticket.paid:
+    if not ticket or not ticket.paid or not ticket.type.is_transferable:
         return redirect(url_for('tickets.main'))
 
     form = TicketTransferForm()

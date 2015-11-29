@@ -34,6 +34,7 @@ class TicketType(db.Model):
     type_limit = db.Column(db.Integer, nullable=False)
     personal_limit = db.Column(db.Integer, nullable=False)
     has_badge = db.Column(db.Boolean, nullable=False)
+    is_transferable = db.Column(db.Boolean, default=True, nullable=False)
     # Nullable fields
     expires = db.Column(db.DateTime)
     description = db.Column(db.String)
@@ -43,7 +44,8 @@ class TicketType(db.Model):
     admits_types = ('full', 'kid', 'campervan', 'car', 'other')
 
     def __init__(self, id, order, admits, name, type_limit, personal_limit,
-                 expires=None, discount_token=None, description=None, has_badge=True):
+                 expires=None, discount_token=None, description=None,
+                 has_badge=True, is_transferable=True):
         if admits not in self.admits_types:
             raise Exception('unknown admission type')
 
@@ -57,6 +59,7 @@ class TicketType(db.Model):
         self.description = description
         self.discount_token = discount_token
         self.personal_limit = personal_limit
+        self.is_transferable = is_transferable
 
     def __repr__(self):
         return "<TicketType: (Name: %s, Admits: %s, Token: %s)>" % \
@@ -272,6 +275,8 @@ class Ticket(db.Model):
         Change the user a ticket is assigned to and remove the qrcode/receipt so
         that the old values can't be used.
         """
+        if not self.type.is_transferable:
+            raise Exception('This ticket cannot be transferred.')
         self.user = user
         self.emailed = False
         self.qrcode = None
