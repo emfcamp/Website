@@ -371,14 +371,7 @@ def transfer(ticket_id):
             to_user = User.query.filter_by(email=email).one()
             email_template = 'ticket-transfer-new-owner.txt'
 
-        # Transfer the ticket
-        ticket.user = to_user
-        # Make sure the ticket can't be double-used
-        ticket.emailed = False
-        ticket.qrcode = None
-        ticket.create_qrcode()
-        ticket.receipt = None
-        ticket.create_receipt()
+        ticket.transfer_to(to_user)
         # Log the transfer in an SQL parse-able manner (e.g. ids only)
         transfer_str = '%d -> %d' % (current_user.id, to_user.id)
         ticket.attribs.append(TicketAttrib('transfer', transfer_str))

@@ -267,6 +267,16 @@ class Ticket(db.Model):
             except IntegrityError:
                 db.session.rollback()
 
+    def transfer_to(self, user):
+        """
+        Change the user a ticket is assigned to and remove the qrcode/receipt so
+        that the old values can't be used.
+        """
+        self.user = user
+        self.emailed = False
+        self.qrcode = None
+        self.receipt = None
+
     def __repr__(self):
         attrs = [self.type.admits]
         if self.paid:
