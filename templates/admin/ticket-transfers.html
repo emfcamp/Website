@@ -1,0 +1,22 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'ticket_transfers' %}
+{% block body %}
+
+<h2>Ticket Transfers</h2>
+<table class="table table-condensed table-striped">
+  <tr>
+    <th>Ticket Type</th>
+    <th>From</th>
+    <th>To</th>
+  </tr>
+  {% for ticket, from_user, to_user in transfers %}
+  <tr>
+    <td>{{ ticket.type.name }}</td>
+    <td>{{ from_user.name }}</td>
+    <td>{{ to_user.name }}</td>
+  </tr>
+
+  {% endfor %}
+</table>
+
+{% endblock %}

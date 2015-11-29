@@ -19,7 +19,9 @@ from sqlalchemy.sql.functions import func
 from main import db, mail
 from models.user import User
 from models.payment import Payment, BankPayment, BankTransaction
-from models.ticket import Ticket, TicketCheckin, TicketType, TicketPrice
+from models.ticket import (
+    Ticket, TicketCheckin, TicketType, TicketPrice, TicketAttrib
+)
 from models.cfp import Proposal
 from .common.forms import Form
 from .payments.stripe import (
@@ -229,13 +231,6 @@ def ticket_types():
     return render_template('admin/ticket-types.html', ticket_types=ticket_types, totals=totals)
 
 
-@admin.route('/ticket-types/<int:type_id>')
-@admin_required
-def ticket_type_details(type_id):
-    ticket_type = TicketType.query.get(type_id)
-    return render_template('admin/ticket-type-details.html', ticket_type=ticket_type)
-
-
 class EditTicketTypeForm(Form):
     name = StringField('Name')
     order = IntegerField('Order')
@@ -335,6 +330,27 @@ def new_ticket_type(copy_id):
         form.init_with_ticket_type(TicketType.query.get(copy_id))
 
     return render_template('admin/new-ticket-type.html', ticket_type_id=copy_id, form=form)
+
+
+@admin.route('/ticket-types/<int:type_id>')
+@admin_required
+def ticket_type_details(type_id):
+    ticket_type = TicketType.query.get(type_id)
+    return render_template('admin/ticket-type-details.html', ticket_type=ticket_type)
+
+@admin.route('/transfers')
+@admin_required
+def ticket_transfers():
+    transfer_logs = TicketAttrib.query.filter_by(name='transfer').all()
+    transfers = []
+
+    for trans in transfer_logs:
+        from_user, to_user = trans.value.split('->')
+        to_user = User.query.get(int(to_user))
+        from_user = User.query.get(int(from_user))
+        transfers.append((trans.ticket, from_user, to_user))
+
+    return render_template('admin/ticket-transfers.html', transfers=transfers)
 
 
 @admin.route("/admin/make-admin", methods=['GET', 'POST'])

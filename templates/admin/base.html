@@ -41,9 +41,14 @@
                     Expiring payments <span class="badge">{{ expiring_count }}</span>
                 </a></li>
                 <li {% if nav_active == 'ticket_types' -%} class="active" {%- endif %}><a href="{{ url_for('.ticket_types') }}">
-                    Ticket Types</a></li>
+                    Ticket Types
+                </a></li>
+                <li {% if nav_active == 'ticket_transfers' -%} class="active" {%- endif %}><a href="{{ url_for('.ticket_transfers') }}">
+                    Ticket Transfers
+                </a></li>
                 <li {% if nav_active == 'make_admin' -%} class="active" {%- endif %}><a href="{{ url_for('.make_admin') }}">
-                    Make someone an admin</a></li>
+                    Make someone an admin
+                </a></li>
                 {% endif %}
                 {% if current_user.arrivals %}
                 <li {% if nav_active == 'make_arrivals' -%} class="active" {%- endif %}><a href="{{ url_for('.make_arrivals') }}">
