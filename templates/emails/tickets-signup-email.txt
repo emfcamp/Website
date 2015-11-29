@@ -12,7 +12,7 @@ You can keep track of your ticket purchases here:
 
 {{ external_url('tickets.main') }}
 
-See you soon at Electromagnetic Field 2014!
+See you soon at Electromagnetic Field 2016!
 
 Love,
 
