@@ -251,7 +251,7 @@ class StripePayment(Payment):
 
     @property
     def description(self):
-        return 'EMF 2014 tickets'
+        return 'EMF 2016 tickets'
 
 
 class PaymentChange(db.Model):

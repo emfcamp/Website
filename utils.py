@@ -56,7 +56,7 @@ class LoadOfx(Command):
 
         for txn in ofx.account.statement.transactions:
             # date is actually dtposted and is a datetime
-            if txn.date < datetime(2014, 1, 1):
+            if txn.date < datetime(2015, 1, 1):
                 app.logger.debug('Ignoring historic transaction from %s', txn.date)
                 continue
             if txn.amount <= 0:

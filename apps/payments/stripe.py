@@ -63,7 +63,7 @@ def charge_stripe(payment):
             currency=payment.currency.lower(),
             card=payment.token,
             description=payment.description,
-            statement_description='Tickets 2014',  # max 15 chars, appended to company name
+            statement_description='Tickets 2016',  # max 15 chars, appended to company name
         )
     except stripe.CardError as e:
         logger.warn('Card payment failed with exception "%s"', e)
