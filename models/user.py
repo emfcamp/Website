@@ -42,7 +42,8 @@ class User(db.Model, UserMixin):
 
     @classmethod
     def does_user_exist(cls, email):
-        return exists(User.query.filter_by(email=email))
+        return exists(User.query.filter_by( email=email ))
+
 
 class PasswordReset(db.Model):
     __tablename__ = 'password_reset'

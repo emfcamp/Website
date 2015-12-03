@@ -62,6 +62,11 @@ def load_utility_functions(app_obj):
         currency = get_user_currency()
         return {'user_currency': currency}
 
+def send_template_email(subject, to, sender, template, **kwargs):
+    msg = Message(subject, recipients=[to], sender=sender)
+    msg.body = render_template(template, **kwargs)
+    mail.send(msg)
+
 
 def create_current_user(email, name, password=None):
     user = User(email, name)
@@ -81,11 +86,8 @@ def create_current_user(email, name, password=None):
     current_user.id = user.id
 
     # Send the welcome message
-    msg = Message('Welcome to Electromagnetic Field',
-                  sender=app.config['TICKETS_EMAIL'],
-                  recipients=[user.email])
-    msg.body = render_template(signup_template, user=user)
-    mail.send(msg)
+    send_template_email('Welcome to Electromagnetic Field', user.email,
+                        app.config['TICKETS_EMAIL'], signup_template, user=user)
 
     return user
 

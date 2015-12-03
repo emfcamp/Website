@@ -1,0 +1,16 @@
+Hi {{ from_user.name }},
+
+We just want to confirm with you that you intended to transfer one of your
+tickets to:
+
+email: {{ to_user.email }}
+name: {{ to_user.name }}
+
+If this is correct that's excellent! You don't need to do anything. If this
+isn't correct or was done in error, don't worry! Just send us a message at:
+
+tickets@emfcamp.org
+
+Love,
+
+All the EMF team

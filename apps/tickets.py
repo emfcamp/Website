@@ -17,11 +17,12 @@ from wtforms import (
 )
 from wtforms.fields.html5 import EmailField
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import NoResultFound
 
 from main import db
 from .common import (
     get_user_currency, set_user_currency, get_basket_and_total, process_basket,
-    CURRENCY_SYMBOLS, feature_flag, create_current_user)
+    CURRENCY_SYMBOLS, feature_flag, create_current_user, send_template_email)
 from .common.forms import IntegerSelectField, HiddenIntegerField, Form
 from models.user import User
 from models.ticket import (
@@ -331,6 +332,89 @@ def info():
     return render_template('tickets-info.html',
                            form=form, basket=basket,
                            total=total, is_anonymous=current_user.is_anonymous())
+
+
+
+
+class TicketTransferForm(Form):
+    email = EmailField('Email', [Required()])
+    name = StringField('Name', [Required()])
+
+    transfer = SubmitField('Transfer Ticket')
+
+
+@tickets.route('/tickets/<ticket_id>/transfer', methods=['GET', 'POST'])
+@login_required
+def transfer(ticket_id):
+    try:
+        ticket = current_user.tickets.filter_by(id=ticket_id).one()
+    except NoResultFound:
+        return redirect(url_for('tickets.main'))
+
+    if not ticket or not ticket.paid or not ticket.type.is_transferable:
+        return redirect(url_for('tickets.main'))
+
+    form = TicketTransferForm()
+
+    if form.validate_on_submit():
+        assert ticket.user_id == current_user.id
+        email = form.email.data
+
+        if not User.does_user_exist(email):
+            # Create a new user to transfer the ticket to
+            to_user = User(email, form.name.data)
+            to_user.generate_random_password()
+            db.session.add(to_user)
+            db.session.commit()
+            email_template = 'ticket-transfer-new-owner-and-user.txt'
+        else:
+            to_user = User.query.filter_by(email=email).one()
+            email_template = 'ticket-transfer-new-owner.txt'
+
+        ticket.transfer_to(to_user)
+        # Log the transfer in an SQL parse-able manner (e.g. ids only)
+        transfer_str = '%d -> %d' % (current_user.id, to_user.id)
+        ticket.attribs.append(TicketAttrib('transfer', transfer_str))
+
+        app.logger.info('Ticket %s transferred from %s to %s', ticket,
+                        current_user, to_user)
+        # Save everything
+        db.session.commit()
+        # Alert the users via email
+        send_template_email("You've been sent a ticket to EMF 2016!",
+                            to_user.email, current_user.email,
+                            'emails/' + email_template,
+                            to_user=to_user, from_user=current_user)
+
+        send_template_email("You sent someone an EMF 2016 ticket",
+                            to_user.email, current_user.email,
+                            'emails/ticket-transfer-original-owner.txt',
+                            to_user=to_user, from_user=current_user)
+
+        return redirect(url_for('tickets.transferred'))
+
+    return render_template('ticket-transfer.html', ticket=ticket, form=form)
+
+
+@tickets.route("/tickets/transferred")
+@login_required
+def transferred():
+    # Build a 'like' query string to find transfers from this user.
+    id_str = '{0:d}%'.format(current_user.id)
+    transfer_logs = TicketAttrib.query.filter_by(name='transfer').\
+                                 filter(TicketAttrib.value.like(id_str)).all()
+
+    transferred = []
+    for ta in transfer_logs:
+        ticket = ta.ticket
+        # Because we log both ends of the transfer we can make sure we only show
+        # people the transfers they have made (and not any subsequent transfers)
+        to_user_id = int(ta.value.split('->')[1])
+        to_user = User.query.get(to_user_id)
+        transferred.append((ticket, to_user))
+
+    return render_template('tickets-transferred.html', transferred=transferred)
+
 
 
 @tickets.route("/tickets/receipt")

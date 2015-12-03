@@ -16,7 +16,6 @@ class StateException(Exception):
 
 
 class Payment(db.Model):
-
     __tablename__ = 'payment'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -240,6 +239,7 @@ class GoCardlessPayment(Payment):
         )
 
         return bill_url
+
 
 class StripePayment(Payment):
     name = 'Stripe payment'

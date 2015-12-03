@@ -52,6 +52,11 @@
     Pending
     {%- endif %}
 </td>
+<td>
+  {% if t.paid and t.type.is_transferable %}
+    <a class="btn btn-default" href="{{ url_for('.transfer', ticket_id=t.id) }}">Transfer</a>
+  {% endif %}
+</td>
 </tr>
 {% endif -%}
 {% endfor -%}
