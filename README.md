@@ -2,58 +2,20 @@ This is the www.emfcamp.org web site
 
 [![Build Status](https://travis-ci.org/emfcamp/Website.svg?branch=master)](https://travis-ci.org/emfcamp/Website)
 
-Requirements
-=======
-
-* [Python 2.7](https://www.python.org/downloads/)
-* [Pip](https://pip.pypa.io/en/latest/installing.html)
-* [VirtualEnv](https://virtualenv.pypa.io/en/latest/installation.html)
-* [SQLite3](https://www.sqlite.org/download.html)
-
-
-Starting
-========
-```
-sudo apt-get install -y python-dev python-virtualenv libxml2-dev libxslt1-dev libffi-dev postgresql-server-dev-9.4 git
-make init
-make update # may take a few minutes if you don't have cached .whl files
-make data
-```
-
-Alt method using 'easy\_install'
-=======
-To set up easy\_install go [here](https://pythonhosted.org/setuptools/easy_install.html#installing-easy-install "pythonhosted.org")
-```
-sudo easy_install virtualenv
-make init
-```
-
-Using vagrant
+Getting Started
 =======
 
 ```
 vagrant up
 vagrant ssh
-cd /vagrant
-```
-This is running all the necassary provisioning steps (see ```provision.sh```), only the final ```make``` and
-```make admin``` is needed. Port 5000 is forwarded.
-
-Running
-=======
-```
-make update
 make data
 make
 ```
+This is running all the necassary provisioning steps (see
+```provision.sh```). Port 5000 is forwarded, so you should be able to
+view your development server on http://localhost:5000.
 
-Now create a user (go to [http://localhost:5000/signup](http://localhost:5000/signup)) and then run:
-
-```
-make admin
-```
-
-This will make your user an administrator.
+Once you've created an account, you can use `make admin` to make your user an administrator.
 
 If you want to clean out the database and start again then:
 
@@ -62,26 +24,6 @@ rm var/test.db
 make update
 make data
 ```
-
-Viewing
-=======
-The site will run by default on [http://localhost:5000](http://localhost:5000).
-
-If you would like to change the port that the site uses you can set this in development.cfg by adding:
-
-```python
-    PORT=8888
-```
-
-You can also make the site accessible outside of your computer.
-Only do this if you're sure you know what you're doing.
-
-```python
-    HOST='0.0.0.0'
-    PORT=8888
-```
-
-You may also like to set `LOG_COLOR=True`, which makes it easier to distinguish SQLAlchemy log lines.
 
 Payments for tickets
 ====================
