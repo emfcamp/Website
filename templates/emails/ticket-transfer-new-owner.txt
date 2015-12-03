@@ -1,6 +1,6 @@
 Hi {{ to_user.name }},
 
-You're friend ({{ from_user.name }}) has transferred a ticket to you for
+Your friend ({{ from_user.name }}) has transferred a ticket to you for
 Electromagnetic Field 2016.
 
 You can view (and print) your tickets here:
