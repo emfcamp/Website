@@ -1,7 +1,18 @@
 {% macro render_field(field, horizontal=False, glyphicon=None) %}
+
+{% if horizontal == True %}
+    {% set horizontal = 10 %}
+{% endif %}
+
+{% if horizontal != False %}
+    {% set labelw = 12 - horizontal %}
+    {% set fieldw = horizontal %}
+{% endif %}
+
 <div class="form-group {%- if field.errors %} has-error {%- endif %}">
-  <label for="{{ field.name }}" class="{% if horizontal -%} col-sm-3 {% endif -%} control-label">{{ field.label.text }}</label>
-  <div class="{% if horizontal -%} col-sm-9 {% endif -%} controls">
+    <label for="{{ field.name }}" class="{% if horizontal -%} col-sm-{{labelw}} {% endif -%} control-label">
+        {{ field.label.text }}</label>
+    <div class="{% if horizontal -%} col-sm-{{fieldw}} {% endif -%} controls">
     {%- if glyphicon %}
     <div class="input-group">
     {%- endif %}
