@@ -3,7 +3,7 @@ Hi {{ user.name }},
 We've just received confirmation from GoCardless that your payment for
 {{ payment.amount | price(payment.currency) }} has cleared.
 
-See you soon at Electromagnetic Field 2014!
+See you soon at Electromagnetic Field 2016!
 
 Love,
 

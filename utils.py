@@ -56,7 +56,7 @@ class LoadOfx(Command):
 
         for txn in ofx.account.statement.transactions:
             # date is actually dtposted and is a datetime
-            if txn.date < datetime(2014, 1, 1):
+            if txn.date < datetime(2015, 1, 1):
                 app.logger.debug('Ignoring historic transaction from %s', txn.date)
                 continue
             if txn.amount <= 0:
@@ -238,11 +238,11 @@ class CreateTickets(Command):
                 "All money will go towards making EMF more awesome."),
 
             (5, 10, 'kid', 'Under-16 Camp Ticket', 500, 10, 40.00, 50.00, True,
-                "For visitors born after August 28th, 1998. "
+                "For visitors born after August 5th, 2000. "
                 "All under-16s  must be accompanied by an adult."),
 
             (6, 15, 'kid', 'Under-5 Camp Ticket', 200, 4, 0, 0, False,
-                "For children born after August 28th, 2009. "
+                "For children born after August 5th, 2011. "
                 "All children must be accompanied by an adult."),
 
             (7, 30, 'car', 'Parking Ticket', 400, 4, 15.00, 20.00, False,

@@ -7,7 +7,7 @@ We've just received confirmation from Stripe that your payment for
 {% include 'receipt-blurb.txt' %}
 {% endif %}
 
-See you soon at Electromagnetic Field 2014!
+See you soon at Electromagnetic Field 2016!
 
 Love,
 

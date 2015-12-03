@@ -15,7 +15,7 @@ If you forget your password you can reset it here:
 
 {{ external_url('users.forgot_password') }}
 
-See you soon at Electromagnetic Field 2014!
+See you soon at Electromagnetic Field 2016!
 
 Love,
 

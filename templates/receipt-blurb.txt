@@ -14,7 +14,7 @@ need to buy one before you arrive:
   https://www.emfcamp.org/tickets/choose
 
 If you're travelling by public transport, we will be running shuttle
-buses between Bletchley Railway Station and the festival site.
+buses between a local train station and the festival site.
 
 For more details about how to get to EMF, including shuttle bus times
 and driving directions, please see the Travel section of our wiki:
@@ -32,6 +32,4 @@ updates on EMF:
 
 And lastly, EMF is entirely volunteer-run. Please consider
 contributing a few hours of your time at the festival to help the
-event run smoothly. You can sign up to volunteer here:
-
-  https://timecounts.org/o/emcamp/forms/66
+event run smoothly.
