@@ -5,6 +5,9 @@ This is the www.emfcamp.org web site
 Getting Started
 =======
 
+Install [Vagrant](https://www.vagrantup.com/) and
+[VirtualBox](https://www.virtualbox.org/).
+
 ```
 vagrant up
 vagrant ssh
