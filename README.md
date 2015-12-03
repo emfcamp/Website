@@ -23,7 +23,7 @@ Once you've created an account, you can use `make admin` to make your user an ad
 If you want to clean out the database and start again then:
 
 ```
-rm var/test.db
+rm var/development.db
 make update
 make data
 ```
