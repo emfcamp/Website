@@ -1,5 +1,6 @@
 from flask import _request_ctx_stack
 import logging
+import os
 
 # Ansi color codes
 CSI = '\x1b['
@@ -49,6 +50,10 @@ class ColorizingStreamHandler(logging.StreamHandler):
 
 
 class ContextFormatter(logging.Formatter):
+    def __init__(self, fmt):
+        self.pid = os.getpid()
+        logging.Formatter.__init__(self, fmt)
+
     def format(self, record):
         try:
             record.user = _request_ctx_stack.top.user_email
@@ -57,11 +62,13 @@ class ContextFormatter(logging.Formatter):
         except Exception, e:
             record.user = 'Unknown'
 
+        record.pid = self.pid
+
         return logging.Formatter.format(self, record)
 
 
 def setup_logging(app):
-    fmt = '%(asctime)-15s %(levelname)s %(user)s %(name)s %(message)s'
+    fmt = '%(asctime)-15s %(pid)s %(levelname)s %(user)s %(name)s %(message)s'
     if app.config.get('LOG_COLOR'):
         Handler = ColorizingStreamHandler
     else:
