@@ -3,7 +3,13 @@
 {% block body %}
 
 <div class="well">
-    You've ordered {{ basket|count }} ticket{% if basket|count > 1 %}s{% endif %} for a total price of <b>{{ total | price(user_currency) }}</b>.
+    You've selected the following {{ basket|count }} tickets:
+    <ul>
+        {% for ticket in basket %}
+        <li>{{ticket.name}}</li>
+        {% endfor %}
+    </ul>
+    The total price is <b>{{ total | price(user_currency) }}</b>. If this isn't right, <a href="{{url_for('tickets.choose')}}">choose your tickets again</a>.
 </div>
 
 <form method="post">
