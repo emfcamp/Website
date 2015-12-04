@@ -23,7 +23,15 @@ html, body, .container, .main-row, .main-column {
   color: #333;
 }
 
-.well a {
+.panel {
+    color: #333;
+}
+
+.panel-default > .panel-heading {
+    background-color: #d3e0f1;
+}
+
+.well a, .panel a {
   color: #5E93CE;
 }
 
@@ -434,10 +442,6 @@ div#about-page img, .embed-responsive {
   margin-bottom: 15px;
 }
 
-.ticket-info .well {
-  padding-left: 30px;
-}
-
 th.checkbox-cell {
   width: 30px;
 }
@@ -473,3 +477,11 @@ td.checkbox-cell label {
   border-radius: 6px;
 }
 
+
+@media (min-width: 768px) {
+    .row-equal, .row-equal > div[class*='col-'] {
+        display: -webkit-flex;
+        display: flex;
+        flex:1 1 auto;
+    }
+}

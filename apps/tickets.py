@@ -1,19 +1,13 @@
 from datetime import datetime, timedelta
-from StringIO import StringIO
-from xhtml2pdf import pisa
-import qrcode
-from qrcode.image.svg import SvgPathImage
-from lxml import etree
-from urlparse import urljoin
 from flask import (
     render_template, redirect, request, flash, Blueprint,
-    url_for, session, send_file, Markup, abort, current_app as app
+    url_for, session, send_file, abort, current_app as app
 )
 from flask.ext.login import login_required, current_user
 from wtforms.validators import Required, Optional, ValidationError
 from wtforms import (
-    SubmitField, BooleanField, StringField,
-    DecimalField, FieldList, FormField, HiddenField,
+    SubmitField, StringField,
+    FieldList, FormField, HiddenField,
 )
 from wtforms.fields.html5 import EmailField
 from sqlalchemy.exc import IntegrityError
@@ -24,13 +18,18 @@ from .common import (
     get_user_currency, set_user_currency, get_basket_and_total, process_basket,
     CURRENCY_SYMBOLS, feature_flag, create_current_user, send_template_email)
 from .common.forms import IntegerSelectField, HiddenIntegerField, Form
+from .common.receipt import make_qr_png, render_pdf, render_receipt
 from models.user import User
 from models.ticket import (
     TicketType, Ticket, TicketAttrib,
     validate_safechars,
 )
+from models.payment import BankPayment, StripePayment, GoCardlessPayment
 from models.site_state import get_sales_state
 from models.payment import Payment
+from payments.gocardless import gocardless_start
+from payments.banktransfer import transfer_start
+from payments.stripe import stripe_start
 
 
 tickets = Blueprint('tickets', __name__)
@@ -40,55 +39,10 @@ class TicketForm(Form):
     ticket_id = HiddenIntegerField('Ticket Type', [Required()])
 
 
-class FullTicketForm(TicketForm):
-    template = 'tickets/full.html'
-    accessible = BooleanField('Accessibility')
-
-
-class KidsTicketForm(TicketForm):
-    template = 'tickets/kids.html'
-    accessible = BooleanField('Accessibility')
-
-
-class CarparkTicketForm(TicketForm):
-    template = 'tickets/carpark.html'
-    carshare = BooleanField('Car share')
-
-
-class CampervanTicketForm(TicketForm):
-    pass
-    # XXX do we need a template for these?
-    # maybe info on where to go?
-#    template= 'tickets/campervan.html'
-
-
-class DonationTicketForm(TicketForm):
-    template = 'tickets/donation.html'
-    amount = DecimalField('Donation amount')
-
-ticket_forms = ['full', 'kids']
-
-
-def get_form_name(ticket_type):
-    code = ticket_type.admits
-    if code not in ticket_forms:
-        return None
-    return code
-
-
-def add_payment_and_tickets(paymenttype):
+def create_payment(paymenttype):
     """
     Insert payment and tickets from session data into DB
     """
-    # Implicit user signup
-    if current_user.is_anonymous():
-        email = session['anonymous_account_email']
-        name = session['anonymous_account_name']
-        try:
-            create_current_user(email, name)
-        except IntegrityError as e:
-            app.logger.warn('Adding user raised %r, possible double-click', e)
-            return None
 
     infodata = session.get('ticketinfo')
     basket, total = process_basket()
@@ -106,18 +60,7 @@ def add_payment_and_tickets(paymenttype):
                     payment.amount, currency, total)
     app.logger.info('Ticket info: %s', infodata)
 
-    if infodata:
-        infolists = sum([infodata[i] for i in ticket_forms], [])
-        for info in infolists:
-            ticket_id = int(info.pop('ticket_id'))
-            ticket = basket[ticket_id]
-            for k, v in info.items():
-                attrib = TicketAttrib(k, v)
-                ticket.attribs.append(attrib)
-
     for ticket in basket:
-        name = get_form_name(ticket.type)
-
         current_user.tickets.append(ticket)
         ticket.payment = payment
         if currency == 'GBP':
@@ -238,7 +181,7 @@ def choose():
             if basket:
                 session['basket'] = basket
 
-                return redirect(url_for('tickets.info'))
+                return redirect(url_for('tickets.pay'))
 
     if request.method == 'POST' and form.set_currency.data:
         if form.set_currency.validate(form):
@@ -253,17 +196,13 @@ def choose():
     return render_template("tickets-choose.html", form=form)
 
 
-class TicketInfoForm(Form):
+class TicketPaymentForm(Form):
     email = EmailField('Email', [Required()])
     name = StringField('Name', [Required()])
 
-    full = FieldList(FormField(FullTicketForm))
-    kids = FieldList(FormField(KidsTicketForm))
-    carpark = FieldList(FormField(CarparkTicketForm))
-    campervan = FieldList(FormField(CampervanTicketForm))
-    donation = FieldList(FormField(DonationTicketForm))
-
-    forward = SubmitField('Continue to Check-out')
+    gocardless = SubmitField('Pay by Direct Debit')
+    banktransfer = SubmitField('Pay by Bank Transfer')
+    stripe = SubmitField('Pay by card')
 
     def validate_email(form, field):
         if current_user.is_anonymous() and User.does_user_exist(field.data):
@@ -271,69 +210,49 @@ class TicketInfoForm(Form):
             raise ValidationError('Account already exists')
 
 
-def build_info_form(formdata):
-    basket, total = get_basket_and_total()
-
-    if not basket:
-        return None, basket, total
-
-    parent_form = TicketInfoForm(formdata)
-
-    # First, filter to the currently exposed forms
-    forms = [getattr(parent_form, f) for f in ticket_forms]
-
-    if not any(forms):
-        # Nothing submitted, so create forms for the basket
-        for i, ticket in enumerate(basket):
-            name = get_form_name(ticket)
-            if not name:
-                continue
-
-            f = getattr(parent_form, name)
-            f.append_entry()
-            ticket.form = f[-1]
-            ticket.form.ticket_id.data = i
-
-        if not any(forms):
-            # No forms to fill
-            return None, basket, total
-
-    else:
-        # If we have some details, match them to the basket
-        # FIXME: doesn't play well with multiple browser tabs
-        form_tickets = [t for t in basket if get_form_name(t)]
-        entries = sum([f.entries for f in forms], [])
-        for ticket, subform in zip(form_tickets, entries):
-            ticket.form = subform
-
-    # FIXME: check that there aren't any surplus submitted forms
-    return parent_form, basket, total
-
-
-@tickets.route("/tickets/info", methods=['GET', 'POST'])
-def info():
-    form, basket, total = build_info_form(request.form)
-    if not form:
-        return redirect(url_for('payments.choose'))
+@tickets.route("/tickets/pay", methods=['GET', 'POST'])
+def pay():
+    form = TicketPaymentForm()
 
     if not current_user.is_anonymous():
-        form.email.data = current_user.email
-        form.name.data = current_user.name
+        del form.email
+        del form.name
+
+    basket, total = get_basket_and_total()
+    if not basket:
+        redirect(url_for('tickets.main'))
 
     if form.validate_on_submit():
         if current_user.is_anonymous():
-            session['anonymous_account_email'] = form.email.data
-            session['anonymous_account_name'] = form.name.data
+            try:
+                create_current_user(form.email.data, form.name.data)
+            except IntegrityError as e:
+                app.logger.warn('Adding user raised %r, possible double-click', e)
+                return None
 
-        session['ticketinfo'] = form.data
+        if form.gocardless.data:
+            payment_type = GoCardlessPayment
+        elif form.banktransfer.data:
+            payment_type = BankPayment
+        elif form.stripe.data:
+            payment_type = StripePayment
 
-        return redirect(url_for('payments.choose'))
+        payment = create_payment(payment_type)
+        if not payment:
+            app.logger.warn('Unable to add payment and tickets to database')
+            flash("We're sorry, your session information has been lost. Please try ordering again.")
+            return redirect(url_for('tickets.choose'))
 
-    return render_template('tickets-info.html',
-                           form=form, basket=basket,
-                           total=total, is_anonymous=current_user.is_anonymous())
+        if payment_type == GoCardlessPayment:
+            return gocardless_start(payment)
+        elif payment_type == BankPayment:
+            return transfer_start(payment)
+        elif payment_type == StripePayment:
+            return stripe_start(payment)
 
-
+    return render_template('payment-choose.html', form=form,
+                           basket=basket, total=total, StripePayment=StripePayment,
+                           is_anonymous=current_user.is_anonymous())
 
 
 class TicketTransferForm(Form):
@@ -402,7 +321,7 @@ def transferred():
     # Build a 'like' query string to find transfers from this user.
     id_str = '{0:d}%'.format(current_user.id)
     transfer_logs = TicketAttrib.query.filter_by(name='transfer').\
-                                 filter(TicketAttrib.value.like(id_str)).all()
+        filter(TicketAttrib.value.like(id_str)).all()
 
     transferred = []
     for ta in transfer_logs:
@@ -414,7 +333,6 @@ def transferred():
         transferred.append((ticket, to_user))
 
     return render_template('tickets-transferred.html', transferred=transferred)
-
 
 
 @tickets.route("/tickets/receipt")
@@ -448,61 +366,6 @@ def receipt(ticket_ids=None):
     return page
 
 
-def render_receipt(tickets, png=False, table=False, pdf=False):
-    user = tickets[0].user
-
-    for ticket in tickets:
-        if ticket.receipt is None:
-            ticket.create_receipt()
-        if ticket.qrcode is None:
-            ticket.create_qrcode()
-
-    entrance_tickets = tickets.filter(TicketType.admits.in_(['full', 'kids'])).all()
-    vehicle_tickets = tickets.filter(TicketType.admits.in_(['car', 'campervan'])).all()
-
-    return render_template('receipt.html', user=user, format_inline_qr=format_inline_qr,
-                           entrance_tickets=entrance_tickets, vehicle_tickets=vehicle_tickets,
-                           pdf=pdf, png=png, table=table)
-
-
-def render_pdf(html, url_root=None):
-    # This needs to fetch URLs found within the page, so if
-    # you're running a dev server, use app.run(processes=2)
-    if url_root is None:
-        url_root = request.url_root
-
-    def fix_link(uri, rel):
-        if uri.startswith('//'):
-            uri = 'https:' + uri
-        if uri.startswith('https://'):
-            return uri
-
-        return urljoin(url_root, uri)
-
-    pdffile = StringIO()
-    pisa.CreatePDF(html, pdffile, link_callback=fix_link)
-    pdffile.seek(0)
-
-    return pdffile
-
-
-def format_inline_qr(code):
-    url = app.config.get('CHECKIN_BASE') + code
-
-    qrfile = StringIO()
-    qr = qrcode.make(url, image_factory=SvgPathImage)
-    qr.save(qrfile, 'SVG')
-    qrfile.seek(0)
-
-    root = etree.XML(qrfile.read())
-    # Wrap inside an element with the right default namespace
-    svgns = 'http://www.w3.org/2000/svg'
-    newroot = root.makeelement('{%s}svg' % svgns, nsmap={None: svgns})
-    newroot.append(root)
-
-    return Markup(etree.tostring(root))
-
-
 @tickets.route("/receipt/<code>/qr")
 def tickets_qrcode(code):
     if len(code) > 8:
@@ -515,13 +378,3 @@ def tickets_qrcode(code):
 
     qrfile = make_qr_png(url, box_size=3)
     return send_file(qrfile, mimetype='image/png')
-
-
-def make_qr_png(*args, **kwargs):
-    qrfile = StringIO()
-
-    qr = qrcode.make(*args, **kwargs)
-    qr.save(qrfile, 'PNG')
-    qrfile.seek(0)
-
-    return qrfile

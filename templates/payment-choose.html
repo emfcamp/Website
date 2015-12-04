@@ -1,63 +1,84 @@
+{% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block body %}
 
-<div class="payment-choose">
+<div class="well">
+    You've ordered {{ basket|count }} ticket{% if basket|count > 1 %}s{% endif %} for a total price of <b>{{ total | price(user_currency) }}</b>.
+</div>
 
-{% if config.get('STRIPE') %}
-<p>Taking card payments for a small event like us is really expensive, so our
-   preferred payment methods are bank-to-bank, but these are not available after 28th July.
-   We charge <strong>5%</strong> extra for card payments.</p>
-{% else %}
-<p>Taking card payments for a small event like us is really expensive, so the only
-   payment methods we accept are bank-to-bank. If this is really a problem for you, please
-   <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">let us know</a>.</p>
+<form method="post">
+{{ form.hidden_tag() }}
+
+{% if is_anonymous %}
+<h3>Your Details</h3>
+
+{% if form.email.was_duplicate %}
+<div class="alert alert-warning">
+    This email address already exists in our system. If you have used this email address to buy a
+    ticket, we have already created an account for you.
+    Please <a class="alert-link" href="{{ url_for('users.login') }}">click here</a> to log in, or
+    or <a class="alert-link" href="{{ url_for('users.forgot_password') }}">reset your password</a>.
+</div>
 {% endif %}
 
-<p>Your tickets aren't quite reserved yet!  Please choose a payment method below to buy your tickets.<br/>
-If you're unsure about anything, please check out our <a href="http://wiki.emfcamp.org/wiki/FAQ#Ticket_Sales">FAQ</a>
-or drop us an <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email</a>.</p>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <p>We'll need your name and the email address to send your ticket to, so please make sure it's correct:</p>
+        <div class="form-group">
+            {{ render_field(form.name, horizontal=True) }}
+            {{ render_field(form.email, horizontal=True) }}
+        </div>
+    </div>
+</div>
+{% endif %}
 
+<h3>Choose a Payment Method</h3>
+<div class="row row-equal">
+<div class="col-sm-4">
 {% if config.get('GOCARDLESS') %}
-<h3>Pay by Direct Debit</h3>
+<div class="panel panel-default">
+    <div class="panel-heading"><h3 class="panel-title">Direct Debit (preferred)</h3></div>
+    <div class="panel-body">
+        <p>You can use GoCardless to create a one-off direct debit from your account.
+           This is easy for you and cheap for us.</p>
 
-<p>You can use GoCardless to create a one-off direct debit from your account.
-GoCardless payments are protected by the
-<a href="http://www.directdebit.co.uk/DirectDebitExplained/Pages/DirectDebitGuarantee.aspx">Direct Debit
-Guarantee</a>.</p>
-
-<form method="post" action="{{ url_for('payments.gocardless_start') }}">
-<input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
-    <p><button type="submit" name="gocardless" class="btn btn-lg btn-success debounce">Pay with GoCardless</button></p>
-</form>
-{% endif %}
-
-{% if config.get('BANK_TRANSFER') %}
-{% if user_currency != 'EUR' or config.get('BANK_TRANSFER_EURO') %}
-<h3>Pay By Bank Transfer</h3>
-
-<p>Ask your bank to send it to us directly (this works online, or with cash in a branch).</p>
-
-<form method="post" action="{{ url_for('payments.transfer_start') }}">
-<input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
-    <p><button type="submit" name="banktransfer" class="btn btn-lg btn-success debounce">Pay by bank transfer</button></p>
-</form>
-{% endif %}
-{% endif %}
-
-{% if config.get('STRIPE') %}
-<h3>Pay by Credit/Debit Card</h3>
-
-<p>Our card provider Stripe will accept Visa, Visa Debit, Mastercard or American Express, but we add 5% to both credit and debit card transactions to cover the transaction fees.</p>
-<p>This will amount to {{ StripePayment.premium(user_currency, total) | price(user_currency) }}.</p>
-
-<form method="post" action="{{ url_for('payments.stripe_start') }}">
-<input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
-    <p><button type="submit" name="stripe" class="btn btn-lg btn-success debounce">Pay by card</button></p>
-</form>
-{% endif %}
-
-{% if user_currency == 'EUR' and not config.get('BANK_TRANSFER_EURO') %}
-<p>Unfortunately, bank transfer by Euros is currently unavailable.</p>
+        <p>GoCardless payments are protected by the
+        <a href="http://www.directdebit.co.uk/DirectDebitExplained/Pages/DirectDebitGuarantee.aspx">Direct Debit
+            Guarantee</a>.</p>
+        <p><button type="submit" name="{{form.gocardless.name}}" value="{{form.gocardless.label.text}}" class="btn btn-lg btn-success debounce">{{form.gocardless.label.text}}</button></p>
+    </div>
+</div>
 {% endif %}
 </div>
+<div class="col-sm-4">
+{% if config.get('BANK_TRANSFER') %}
+<div class="panel panel-default">
+    <div class="panel-heading"><h3 class="panel-title">Bank Transfer</h3></div>
+    <div class="panel-body">
+        <p>Ask your bank to send the money to us directly. You can do this online, or with cash in a branch.</p>
+
+        <p><button type="submit" name="{{form.banktransfer.name}}" value="{{form.banktransfer.label.text}}" class="btn btn-lg btn-success debounce">{{form.banktransfer.label.text}}</button></p>
+    </div>
+</div>
+{% endif %}
+</div>
+<div class="col-sm-4">
+{% if config.get('STRIPE') %}
+<div class="panel panel-default">
+    <div class="panel-heading"><h3 class="panel-title">Credit/Debit Card</h3></div>
+    <div class="panel-body">
+        <p>We accept Visa, Visa Debit, Mastercard or American Express.</p>
+        <p>We add a 5% fee to credit and debit card transactions to cover transaction fees
+        and the additional risk. This will amount to
+        <strong>{{ StripePayment.premium(user_currency, total) | price(user_currency) }}</strong>.</p>
+        <p><button type="submit" name="{{form.stripe.name}}" value="{{form.stripe.label.text}}" class="btn btn-lg btn-success debounce">{{form.stripe.label.text}}</button></p>
+    </div>
+</div>
+</div>
+{% endif %}
+</div>
+</form>
+<div class="well">If you're unsure about anything, please check out our <a href="http://wiki.emfcamp.org/wiki/FAQ#Ticket_Sales">FAQ</a>
+or drop us an <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email</a>.</div>
+
 {% endblock %}

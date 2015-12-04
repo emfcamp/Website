@@ -13,9 +13,8 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from main import db, stripe, mail, csrf
 from models.payment import StripePayment
-from ..common import feature_flag
 from ..common.forms import Form
-from ..tickets import add_payment_and_tickets, render_receipt, render_pdf
+from ..common.receipt import render_receipt, render_pdf
 from . import get_user_payment_or_abort
 from . import payments
 
@@ -40,19 +39,11 @@ def webhook(type=None):
     return inner
 
 
-@payments.route("/pay/stripe-start", methods=['POST'])
-@feature_flag('STRIPE')
-def stripe_start():
-    payment = add_payment_and_tickets(StripePayment)
-    if not payment:
-        logger.warn('Unable to add payment and tickets to database')
-        flash('Your session information has been lost. Please try ordering again.')
-        return redirect(url_for('tickets.main'))
-
+def stripe_start(payment):
     logger.info("Created Stripe payment %s", payment.id)
     db.session.commit()
 
-    return redirect(url_for('.stripe_capture', payment_id=payment.id))
+    return redirect(url_for('payments.stripe_capture', payment_id=payment.id))
 
 
 def charge_stripe(payment):

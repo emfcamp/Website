@@ -3,8 +3,7 @@ from flask import render_template, redirect, url_for, abort, flash, current_app 
 from flask.ext.login import login_required, current_user
 from sqlalchemy.sql.functions import func
 
-from models import Payment, StripePayment, TicketType, Ticket
-from ..common import get_basket_and_total
+from models import Payment, TicketType, Ticket
 
 payments = Blueprint('payments', __name__)
 
@@ -34,15 +33,6 @@ def get_user_payment_or_abort(payment_id, provider=None, valid_states=None, allo
 @payments.route("/pay/terms")
 def terms():
     return render_template('terms.html')
-
-
-@payments.route("/pay/choose")
-def choose():
-    basket, total = get_basket_and_total()
-    if not basket:
-        redirect(url_for('tickets.main'))
-
-    return render_template('payment-choose.html', basket=basket, total=total, StripePayment=StripePayment)
 
 
 @payments.route('/payment/<int:payment_id>/invoice')

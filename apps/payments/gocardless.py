@@ -13,9 +13,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from main import db, gocardless, mail, csrf
 from models.payment import GoCardlessPayment
-from ..common import feature_flag
 from ..common.forms import Form
-from ..tickets import add_payment_and_tickets
 from . import get_user_payment_or_abort
 from . import payments
 
@@ -30,16 +28,7 @@ def webhook(resource=None, action=None):
         return f
     return inner
 
-
-@payments.route("/pay/gocardless-start", methods=['POST'])
-@feature_flag('GOCARDLESS')
-def gocardless_start():
-    payment = add_payment_and_tickets(GoCardlessPayment)
-    if not payment:
-        logging.warn('Unable to add payment and tickets to database')
-        flash('Your session information has been lost. Please try ordering again.')
-        return redirect(url_for('tickets.main'))
-
+def gocardless_start(payment):
     logger.info("Created GoCardless payment %s", payment.id)
     db.session.commit()
 
