@@ -494,3 +494,9 @@ td.checkbox-cell label {
         flex:1 1 auto;
     }
 }
+
+.panel-footer-center {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
