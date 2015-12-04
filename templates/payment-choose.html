@@ -45,7 +45,9 @@
         <p>GoCardless payments are protected by the
         <a href="http://www.directdebit.co.uk/DirectDebitExplained/Pages/DirectDebitGuarantee.aspx">Direct Debit
             Guarantee</a>.</p>
-        <p><button type="submit" name="{{form.gocardless.name}}" value="{{form.gocardless.label.text}}" class="btn btn-lg btn-success debounce">{{form.gocardless.label.text}}</button></p>
+    </div>
+    <div class="panel-footer panel-footer-center">
+        <button type="submit" name="{{form.gocardless.name}}" value="{{form.gocardless.label.text}}" class="btn btn-lg btn-success debounce">{{form.gocardless.label.text}}</button>
     </div>
 </div>
 {% endif %}
@@ -56,8 +58,9 @@
     <div class="panel-heading"><h3 class="panel-title">Bank Transfer</h3></div>
     <div class="panel-body">
         <p>Ask your bank to send the money to us directly. You can do this online, or with cash in a branch.</p>
-
-        <p><button type="submit" name="{{form.banktransfer.name}}" value="{{form.banktransfer.label.text}}" class="btn btn-lg btn-success debounce">{{form.banktransfer.label.text}}</button></p>
+    </div>
+    <div class="panel-footer panel-footer-center">
+        <button type="submit" name="{{form.banktransfer.name}}" value="{{form.banktransfer.label.text}}" class="btn btn-lg btn-success debounce">{{form.banktransfer.label.text}}</button>
     </div>
 </div>
 {% endif %}
@@ -71,7 +74,9 @@
         <p>We add a 5% fee to credit and debit card transactions to cover transaction fees
         and the additional risk. This will amount to
         <strong>{{ StripePayment.premium(user_currency, total) | price(user_currency) }}</strong>.</p>
-        <p><button type="submit" name="{{form.stripe.name}}" value="{{form.stripe.label.text}}" class="btn btn-lg btn-success debounce">{{form.stripe.label.text}}</button></p>
+    </div>
+    <div class="panel-footer panel-footer-center">
+        <button type="submit" name="{{form.stripe.name}}" value="{{form.stripe.label.text}}" class="btn btn-lg btn-success debounce">{{form.stripe.label.text}}</button>
     </div>
 </div>
 </div>
