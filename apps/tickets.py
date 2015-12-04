@@ -220,7 +220,7 @@ def pay():
 
     basket, total = get_basket_and_total()
     if not basket:
-        redirect(url_for('tickets.main'))
+        return redirect(url_for('tickets.main'))
 
     if form.validate_on_submit():
         if current_user.is_anonymous():
