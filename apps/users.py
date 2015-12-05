@@ -61,6 +61,10 @@ def login():
             flash("We've sent you an email with your login link")
         else:
             flash("Invalid login details!")
+
+    if request.args.get('email'):
+        form.email.data = request.args.get('email')
+
     return render_template("login.html", form=form)
 
 

@@ -22,7 +22,7 @@
 <div class="alert alert-warning">
     This email address already exists in our system, because you previously tried to buy a ticket and
     we automatically created an account for you.
-    Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('tickets.pay')) }}">click here</a> to log in.
+    Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('tickets.pay'), email=form.email.data) }}">click here</a> to log in.
 </div>
 {% endif %}
 
