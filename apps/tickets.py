@@ -92,7 +92,8 @@ def main():
             return redirect(url_for('tickets.receipt', ticket_ids=','.join(ticket_ids)) + '?pdf=1')
         return redirect(url_for('tickets.receipt') + '?pdf=1')
 
-    tickets = current_user.tickets.all()
+    tickets = current_user.tickets.join(Payment).filter(Payment.state != "cancelled",
+                                                        Payment.state != "expired").all()
     if not tickets:
         return redirect(url_for('tickets.choose'))
 

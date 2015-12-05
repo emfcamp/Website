@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-
+{% block title %}Your Tickets{% endblock %}
 {% block body %}
 {% if tickets %}
-<h2>Your current tickets</h2>
+<h2>Your Tickets</h2>
 
 <form action="{{ url_for('tickets.main') }}" method="POST">
 {{ form.hidden_tag() }}
@@ -11,7 +11,6 @@
 <tr>
   <th class="checkbox-cell"></th>
   <th>Type</th>
-  <th class="accessible">Accessibility</th>
   <th>Status</th>
 </tr>
 
@@ -32,15 +31,6 @@
   {% endif %}
 </td>
 <td>{{ t.type.name }}</td>
-<td class="accessible">
-	{%- if t.type.admits in ["car", "campervan"] -%}
-		N/A
-	{%- else %}
-		{%- for attrib in t.attribs if attrib.name=="accessible" %}
-			{%- if attrib.value in ("1", "true") -%} Yes {%- else -%} No {%- endif -%}
-		{% endfor -%}
-	{% endif -%}
-</td>
 <td>
     {% if t.payment.state == 'cancelled' %}
     Cancelled
@@ -66,7 +56,6 @@
 {{ form.forward(class_="btn btn-default pull-right") }}
 </form>
 
-<div class="col-md-6 col-xs-6"><a href="{{url_for('payments.terms')}}">Ticket Terms and Conditions</a></div>
 <div class="clearfix"></div>
 
 {% endif %}
@@ -117,7 +106,7 @@
 
 {% endif %}
 
-    <a href="{{ url_for('tickets.choose') }}" class="btn btn-lg btn-primary">Add more tickets</a>
+<a href="{{ url_for('tickets.choose') }}" class="btn btn-lg btn-primary">Buy Another Ticket</a>
 {% endblock %}
 {% block foot %}
 <script type="text/javascript">
