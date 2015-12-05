@@ -44,6 +44,10 @@ html, body, .container, .main-row, .main-column {
   color: #5E93CE;
 }
 
+.panel .btn {
+    color: white;
+}
+
 header, h2, h3, h4, h5, h6 {
   font-family: "Raleway","Helvetica Neue",Helvetica,Arial,sans-serif;
   font-weight: 700;

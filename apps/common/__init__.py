@@ -70,7 +70,6 @@ def send_template_email(subject, to, sender, template, **kwargs):
 
 def create_current_user(email, name, password=None):
     user = User(email, name)
-    signup_template = 'emails/tickets-signup-email.txt' if password else 'emails/welcome-email.txt'
     if password:
         user.set_password(password)
     else:
@@ -84,11 +83,6 @@ def create_current_user(email, name, password=None):
     login_user(user)
     assert current_user.id == user.id
     current_user.id = user.id
-
-    # Send the welcome message
-    send_template_email('Welcome to Electromagnetic Field', user.email,
-                        app.config['TICKETS_EMAIL'], signup_template, user=user)
-
     return user
 
 

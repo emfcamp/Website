@@ -2,18 +2,22 @@
 {% extends "base.html" %}
 {% block body %}
 <div class="col-md-10">
-<h2>Log In</h2>
+    <h2>Log In</h2>
+
 <form method="post" class="form-horizontal">
     {{form.hidden_tag()}}
-    {{ render_field(form.email) }}
-    {{ render_field(form.password) }}
-    <div class="form-actions btn-group">
-        <button type="submit" class="btn btn-success debounce">Log in</button>
+    <div class="panel panel-default">
+    <div class="panel-body">
+        <p>Enter your email address here and we'll email you a login link:</p>
+        {{ render_field(form.email, horizontal=True) }}
+        {# render_field(form.password, horizontal=True) #}
     </div>
-    <div class="form-actions btn-group">
-        <a class="btn btn-primary" href="{{ url_for('users.forgot_password') }}">Forgot password</a>
-        <a class="btn btn-primary" href="{{ url_for('users.signup', next=form.next.data) }}">Sign up</a>
+    <div class="panel-footer">
+        <div class="form-actions btn-group">
+            <button type="submit" class="btn btn-success debounce">Log in</button>
+        </div>
     </div>
+</div>
 </form>
 
 </div>

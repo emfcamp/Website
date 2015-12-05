@@ -11,7 +11,7 @@ from wtforms import StringField, PasswordField, HiddenField
 from sqlalchemy.exc import IntegrityError
 
 from main import db, mail
-from common import set_user_currency, feature_flag, create_current_user
+from common import set_user_currency, feature_flag, create_current_user, send_template_email
 from .common.forms import Form
 from models.user import User, PasswordReset
 import re
@@ -32,7 +32,7 @@ class NextURLField(HiddenField):
 
 class LoginForm(Form):
     email = StringField('Email', [Email(), Required()])
-    password = PasswordField('Password', [Required()])
+    #  password = PasswordField('Password', [Required()])
     next = NextURLField('Next')
 
 
@@ -41,12 +41,24 @@ class LoginForm(Form):
 def login():
     if current_user.is_authenticated():
         return redirect(request.args.get('next', url_for('tickets.main')))
+
+    if request.args.get('code'):
+        user = User.get_by_code(app.config['SECRET_KEY'], request.args.get('code'))
+        if user is not None:
+            login_user(user)
+            return redirect(request.args.get('next', url_for('tickets.main')))
+        else:
+            flash("Your login link was invalid. Please note that they expire after 6 hours.")
+
     form = LoginForm(request.form, next=request.args.get('next'))
     if request.method == 'POST' and form.validate():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user and user.check_password(form.password.data):
-            login_user(user)
-            return redirect(form.next.data or url_for('tickets.main'))
+        user = User.query.filter_by(email=form.email.data).one()
+        if user:
+            code = user.login_code(app.config['SECRET_KEY'])
+            send_template_email('Electromagnetic Field: Login details', user.email,
+                                app.config['TICKETS_EMAIL'], 'emails/login-code.txt',
+                                user=user, code=code)
+            flash("We've sent you an email with your login link")
         else:
             flash("Invalid login details!")
     return render_template("login.html", form=form)
