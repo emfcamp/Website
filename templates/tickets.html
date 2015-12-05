@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Your Tickets{% endblock %}
 {% block body %}
+{% if has_transfers %}
+<a class="btn btn-md btn-default pull-right" href="{{ url_for('.transferred') }}">View transfers</a>
+{% endif %}
 {% if tickets %}
 <h2>Your Tickets</h2>
 

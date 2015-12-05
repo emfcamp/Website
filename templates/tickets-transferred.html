@@ -1,36 +1,52 @@
 {% extends "base.html" %}
+{% block title %}Transferred Tickets{% endblock %}
 
 {% block body %}
-
-<h3>
+<h2>
   Your transferred tickets
-</h3>
+</h2>
 
-<p>
-  This will show you any tickets that you have transferred to others.
-</p>
+{% if transferred_from %}
+<p>Tickets you have given to others.</p>
+<table class="table">
+  <tr>
+    <th>Date</th>
+    <th>Type</th>
+    <th>Receiver's name</th>
+    <th>Receiver's email</th>
+  </tr>
 
-<p>
-<table>
-<tr>
-  <th>Type</th>
-  <th>Receiver's name</th>
-  <th>Receiver's email</th>
-</tr>
-
-{% for ticket, to_user in transferred %}
-<tr class="{{- loop.cycle('odd', 'even') }}">
-<td>{{ ticket.type.name }}</td>
-<td>{{ to_user.name }}</td>
-<td>{{ to_user.email }}</td>
-</tr>
-
-{% endfor %}
+  {% for trans in transferred_from %}
+  <tr class="{{- loop.cycle('odd', 'even') }}">
+    <td>{{ trans.timestamp.strftime('%d %b %Y') }}</td>
+    <td>{{ trans.ticket.type.name }}</td>
+    <td>{{ trans.to_user.name }}</td>
+    <td>{{ trans.to_user.email }}</td>
+  </tr>
+  {% endfor %}
 </table>
-</p>
+{% endif %}
 
-<p>
+{% if transferred_to %}
+<p>Tickets you have received from others.</p>
+<table class="table">
+  <tr>
+    <th>Date</th>
+    <th>Type</th>
+    <th>Sender's name</th>
+    <th>Sender's email</th>
+  </tr>
+
+  {% for trans in transferred_to %}
+  <tr class="{{- loop.cycle('odd', 'even') }}">
+    <td>{{ trans.timestamp.strftime('%d %b %Y') }}</td>
+    <td>{{ trans.ticket.type.name }}</td>
+    <td>{{ trans.from_user.name }}</td>
+    <td>{{ trans.from_user.email }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+
 <a class="btn btn-default" href="{{ url_for('tickets.main') }}">Back</a>
-</p>
-
 {% endblock %}

@@ -5,15 +5,17 @@
 <h2>Ticket Transfers</h2>
 <table class="table table-condensed table-striped">
   <tr>
+    <th>Date</th>
     <th>Ticket Type</th>
     <th>From</th>
     <th>To</th>
   </tr>
-  {% for ticket, from_user, to_user in transfers %}
+  {% for trans in transfers %}
   <tr>
-    <td>{{ ticket.type.name }}</td>
-    <td>{{ from_user.name }}</td>
-    <td>{{ to_user.name }}</td>
+    <td>{{ trans.timestamp.strftime('%d %b %Y') }}</td>
+    <td>{{ trans.ticket.type.name }}</td>
+    <td>{{ trans.from_user.name }}</td>
+    <td>{{ trans.to_user.name }}</td>
   </tr>
 
   {% endfor %}
