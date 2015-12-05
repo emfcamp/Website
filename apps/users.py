@@ -57,7 +57,7 @@ def login():
             code = user.login_code(app.config['SECRET_KEY'])
             send_template_email('Electromagnetic Field: Login details', user.email,
                                 app.config['TICKETS_EMAIL'], 'emails/login-code.txt',
-                                user=user, code=code)
+                                user=user, code=code, next_url=request.args.get('next'))
             flash("We've sent you an email with your login link")
         else:
             flash("Invalid login details!")

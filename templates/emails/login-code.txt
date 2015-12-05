@@ -3,7 +3,7 @@ Hi {{ user.name }},
 Here's your link to log into the Electromagnetic Field web site. It will
 expire in 6 hours:
 
-{{ external_url('users.login', code=code) }}
+{{ external_url('users.login', code=code, next=next_url) }}
 
 See you soon at Electromagnetic Field 2016!
 
