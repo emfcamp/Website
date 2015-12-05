@@ -202,6 +202,7 @@ def choose():
 class TicketPaymentForm(Form):
     email = EmailField('Email', [Required()])
     name = StringField('Name', [Required()])
+    basket_total = HiddenField('basket total')
 
     gocardless = SubmitField('Pay by Direct Debit')
     banktransfer = SubmitField('Pay by Bank Transfer')
@@ -227,6 +228,13 @@ def pay():
         return redirect(url_for('tickets.main'))
 
     if form.validate_on_submit():
+        if int(form.basket_total.data) != int(total):
+            # Check that the user's basket approximately matches what we told them they were paying.
+            app.logger.warn("User's basket has changed value %s -> %s", form.basket_total.data, total)
+            flash("""The tickets you selected have changed, possibly because you had two windows open.
+                  Please verify that you've selected the correct tickets.""")
+            return redirect(url_for('tickets.pay'))
+
         if current_user.is_anonymous():
             try:
                 create_current_user(form.email.data, form.name.data)
@@ -253,6 +261,8 @@ def pay():
             return transfer_start(payment)
         elif payment_type == StripePayment:
             return stripe_start(payment)
+
+    form.basket_total.data = total
 
     return render_template('payment-choose.html', form=form,
                            basket=basket, total=total, StripePayment=StripePayment,
