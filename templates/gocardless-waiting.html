@@ -5,22 +5,13 @@
 
 <h2>Thank You!</h2>
 
-<p>Your GoCardless Direct Debit payment for {{ payment.amount | price(payment.currency) }}
+<div class="well">
+   <p>Your GoCardless Direct Debit payment for {{ payment.amount | price(payment.currency) }}
    has been set up and your tickets will be reserved for {{ days }} days
    to allow for your payment to arrive.
    We will email you when the transaction has been completed.</p>
-
-<p>Your bill ID from GoCardless was {{ payment.gcid | gcid }}.  You can view this
-by logging into <a href="
-{%- if config.get('DEBUG') -%}
-https://customer-sandbox.gocardless.com/
-{%- else -%}
-https://gocardless.com/
-{%- endif -%}
-">your GoCardless account</a>.</p>
-
-
-<p>See you at Electromagnetic Field!</p>
+   <p>See you at Electromagnetic Field!</p>
+</div>
 
 <a class="btn btn-info" href="{{ url_for('tickets.main') }}">Show my tickets</a>
 
