@@ -183,6 +183,8 @@ def choose():
                 session['basket'] = basket
 
                 return redirect(url_for('tickets.pay'))
+            else:
+                flash("Please select at least one ticket to buy.")
 
     if request.method == 'POST' and form.set_currency.data:
         if form.set_currency.validate(form):
@@ -221,6 +223,7 @@ def pay():
 
     basket, total = get_basket_and_total()
     if not basket:
+        flash("Please select at least one ticket to buy.")
         return redirect(url_for('tickets.main'))
 
     if form.validate_on_submit():
