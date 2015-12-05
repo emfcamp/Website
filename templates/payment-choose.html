@@ -20,16 +20,16 @@
 
 {% if form.email.was_duplicate %}
 <div class="alert alert-warning">
-    This email address already exists in our system. If you have used this email address to buy a
-    ticket, we have already created an account for you.
-    Please <a class="alert-link" href="{{ url_for('users.login') }}">click here</a> to log in, or
-    or <a class="alert-link" href="{{ url_for('users.forgot_password') }}">reset your password</a>.
+    This email address already exists in our system, because you previously tried to buy a ticket and
+    we automatically created an account for you.
+    Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('tickets.pay'), email=form.email.data) }}">click here</a> to log in.
 </div>
 {% endif %}
 
 <div class="panel panel-default">
     <div class="panel-body">
-        <p>We'll need your name and the email address to send your ticket to, so please make sure it's correct:</p>
+        <p>We'll need your name and the email address to send your ticket to,
+            so please make sure they're correct:</p>
         <div class="form-group">
             {{ render_field(form.name, horizontal=True) }}
             {{ render_field(form.email, horizontal=True) }}

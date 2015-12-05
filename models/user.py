@@ -6,8 +6,33 @@ from flask.ext.login import UserMixin
 import bcrypt
 import os
 import base64
+import hmac
+import hashlib
 from datetime import datetime, timedelta
 from random import choice
+import time
+
+
+def generate_login_code(key, timestamp, uid):
+    msg = "%s-%s" % (int(timestamp), uid)
+    mac = hmac.new(key, msg, digestmod=hashlib.sha256)
+    # Truncate the digest to 20 base64 bytes
+    return msg + "-" + base64.urlsafe_b64encode(mac.digest())[:20]
+
+
+def verify_login_code(key, current_timestamp, code):
+    try:
+        timestamp, uid, _ = code.split("-", 2)
+    except ValueError:
+        return None
+    if hmac.compare_digest(generate_login_code(key, timestamp, uid), code):
+        age = datetime.fromtimestamp(current_timestamp) - datetime.fromtimestamp(int(timestamp))
+        if age > timedelta(hours=6):
+            return None
+        else:
+            return int(uid)
+    return None
+
 
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
@@ -24,6 +49,9 @@ class User(db.Model, UserMixin):
     def __init__(self, email, name):
         self.email = email
         self.name = name
+
+    def login_code(self, key):
+        return generate_login_code(key, int(time.time()), self.id)
 
     def set_password(self, password):
         self.password = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
@@ -42,7 +70,15 @@ class User(db.Model, UserMixin):
 
     @classmethod
     def does_user_exist(cls, email):
-        return exists(User.query.filter_by( email=email ))
+        return exists(User.query.filter_by(email=email))
+
+    @classmethod
+    def get_by_code(cls, key, code):
+        uid = verify_login_code(key, time.time(), code)
+        if uid is None:
+            return None
+
+        return User.query.filter_by(id=uid).one()
 
 
 class PasswordReset(db.Model):
