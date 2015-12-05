@@ -1,23 +1,29 @@
 {% extends "base.html" %}
+{% block title %}Credit Card Payment{% endblock %}
 {% block body %}
 
 <div class="col-md-10">
 
-<h2>Stripe payment</h2>
+<h2>Credit Card payment</h2>
 
-<p>This page will authorise your payment for {{ payment.amount | price(payment.currency) }}.</p>
+<div class="well">
+    This page will authorise your card payment for {{ payment.amount | price(payment.currency) }}.
+    Please wait.
+</div>
 
-<noscript><div class="alert alert-info">
-  <p>You must have Javascript enabled to use Stripe. If you don't see anything,
-  please enable it and click below to reload the page.</p>
-
-  <a class="btn btn-primary" href="{{ url_for('payments.stripe_tryagain', payment_id=payment.id) }}">Reload page</a>
-</div></noscript>
+<noscript>
+    <div class="alert alert-info">
+        <p>You must have Javascript enabled to use our card payment provider Stripe.
+            Please enable Javascript and click below to reload the page.</p>
+            <a class="btn btn-primary"
+                href="{{ url_for('payments.stripe_tryagain', payment_id=payment.id) }}">
+                Reload page</a>
+    </div>
+</noscript>
 
 <div class="hidden alert alert-info" id="popups-warning">
-  <p>You may need popups or frames enabled to use Stripe. If you don't see anything,
-  please click below to continue.</p>
-
+    <p>You may need popups or frames enabled to use our card payment provider,
+        Stripe. If you don't see a payment box, please click below to continue.</p>
   <a class="checkout-button btn btn-primary" href="#">Open Stripe</a>
 </div>
 
@@ -63,10 +69,10 @@ EMF.stripe_handler = StripeCheckout.configure({
 });
 EMF.stripe_checkout = function() {
   EMF.stripe_handler.open({
-    image: {{ url_for('static', filename='images/site_picture.jpg')|tojson }},
+    image: {{ url_for('static', filename='images/stripe-logo.png')|tojson }},
     name: 'Electromagnetic Field',
     description: {{ payment.description|tojson }},
-    // email: {{ current_user.email|tojson }},
+    email: {{ current_user.email|tojson }},
     allowRememberMe: false,
     amount: {{ payment.amount_int|tojson }},
     currency: {{ payment.currency.lower()|tojson }},

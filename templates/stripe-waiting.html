@@ -5,20 +5,21 @@
 
 <h2>Thank You!</h2>
 
-{% if payment.state == 'paid' %}
-<p>Your Stripe payment for {{ payment.amount | price(payment.currency) }}
-   has been confirmed.</p>
+<div class="well">
+    {% if payment.state == 'paid' %}
+    <p>Your Stripe payment for {{ payment.amount | price(payment.currency) }}
+        has been confirmed. You should receive a receipt by email to the
+        address you provided.</p>
 
-{% else %}
-<p>Your Stripe payment for {{ payment.amount | price(payment.currency) }}
-   has been set up and your tickets will be reserved for {{ days }} days
-   to allow for your payment to arrive.
-   We will email you when the transaction has been completed.</p>
-{% endif %}
+    {% else %}
+    <p>Your Stripe payment for {{ payment.amount | price(payment.currency) }}
+       has been set up and your tickets will be reserved for {{ days }} days
+       to allow for your payment to arrive.
+       We will email you when the transaction has been completed.</p>
+    {% endif %}
 
-<p>Your charge ID from Stripe was {{ payment.chargeid }}.</p>
-
-<p>See you at Electromagnetic Field!</p>
+    <p>See you at Electromagnetic Field!</p>
+</div>
 
 <a class="btn btn-info" href="{{ url_for('tickets.main') }}">Show my tickets</a>
 
