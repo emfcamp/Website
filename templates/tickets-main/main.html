@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Your Tickets{% endblock %}
+{% block body %}
+
+<a href="{{ url_for('tickets.choose') }}" class="btn btn-lg btn-primary">Buy Another Ticket</a>
+
+{% if tickets %}
+  <h2>Your Tickets</h2><a id="your-tickets"></a>
+  {% include "tickets-main/ticket-list.html" %}
+  <div class="clearfix"></div>
+{% endif %}
+
+{% if payments %}
+  <h2>Your payments</h2><a id="your-payments"></a>
+  {% include "tickets-main/payments.html" %}
+  <div class="clearfix"></div>
+{% endif %}
+
+{% if transferred_to %}
+  <h2>Tickets received</h2><a id="transfers-to"></a>
+  {% include "tickets-main/transferred-to.html" %}
+  <div class="clearfix"></div>
+{% endif %}
+
+{% if transferred_from %}
+  <h2>Tickets given</h2><a id="transfers-from"></a>
+  {% include "tickets-main/transferred-from.html" %}
+  <div class="clearfix"></div>
+{% endif %}
+
+{% endblock %}
+{% block foot %}
+<script type="text/javascript">
+$(function() {
+  $('#summary').children().toggle();
+});
+</script>
+{% endblock %}

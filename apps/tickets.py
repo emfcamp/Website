@@ -19,9 +19,8 @@ from .common import (
     CURRENCY_SYMBOLS, feature_flag, create_current_user, send_template_email)
 from .common.forms import IntegerSelectField, HiddenIntegerField, Form
 from .common.receipt import make_qr_png, render_pdf, render_receipt
-from models import exists
 from models.user import User
-from models.ticket import TicketType, Ticket, TicketTransfer, validate_safechars
+from models.ticket import TicketType, Ticket, validate_safechars
 from models.payment import BankPayment, StripePayment, GoCardlessPayment
 from models.site_state import get_sales_state
 from models.payment import Payment
@@ -96,14 +95,16 @@ def main():
         return redirect(url_for('tickets.choose'))
 
     payments = current_user.payments.filter(Payment.state != "cancelled", Payment.state != "expired").all()
-    has_transfers = exists(current_user.transfers_to) or \
-                    exists(current_user.transfers_from)
 
-    return render_template("tickets.html",
+    transferred_to = current_user.transfers_to.all()
+    transferred_from = current_user.transfers_from.all()
+
+    return render_template("tickets-main/main.html",
                            tickets=tickets,
                            payments=payments,
                            form=form,
-                           has_transfers=has_transfers)
+                           transferred_to=transferred_to,
+                           transferred_from=transferred_from)
 
 
 @tickets.route("/tickets/token/")
@@ -321,21 +322,9 @@ def transfer(ticket_id):
                             'emails/ticket-transfer-original-owner.txt',
                             to_user=to_user, from_user=current_user)
 
-        return redirect(url_for('tickets.transferred'))
+        return redirect(url_for('tickets.main'))
 
     return render_template('ticket-transfer.html', ticket=ticket, form=form)
-
-
-@tickets.route("/tickets/transferred")
-@login_required
-def transferred():
-    user_id = current_user.id
-    transferred_to = TicketTransfer.query.filter_by(to_user_id=user_id).all()
-    transferred_from = TicketTransfer.query.filter_by(from_user_id=user_id).all()
-
-    return render_template('tickets-transferred.html',
-                            transferred_to=transferred_to,
-                            transferred_from=transferred_from)
 
 
 @tickets.route("/tickets/receipt")
