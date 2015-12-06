@@ -177,6 +177,7 @@ class Ticket(db.Model):
     emailed = db.Column(db.Boolean, default=False, nullable=False)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
     attribs = db.relationship("TicketAttrib", backref="ticket", cascade='all')
+    transfers = db.relationship('TicketTransfer', backref='ticket')
     checkin = db.relationship('TicketCheckin', uselist=False, backref='ticket', cascade='all')
     type = db.relationship('TicketType', backref='tickets')
 
@@ -270,18 +271,6 @@ class Ticket(db.Model):
             except IntegrityError:
                 db.session.rollback()
 
-    def transfer_to(self, user):
-        """
-        Change the user a ticket is assigned to and remove the qrcode/receipt so
-        that the old values can't be used.
-        """
-        if not self.type.is_transferable:
-            raise Exception('This ticket cannot be transferred.')
-        self.user = user
-        self.emailed = False
-        self.qrcode = None
-        self.receipt = None
-
     def __repr__(self):
         attrs = [self.type.admits]
         if self.paid:
@@ -289,6 +278,41 @@ class Ticket(db.Model):
         if self.expired():
             attrs.append('expired')
         return "<Ticket %s: %s>" % (self.id, ', '.join(attrs))
+
+    def transfer(self, from_user, to_user):
+        """
+        Change the user a ticket is assigned to and remove the qrcode/receipt so
+        that the old values can't be used.
+        """
+        if not self.type.is_transferable:
+            raise Exception('This ticket cannot be transferred.')
+        self.user = to_user
+        self.emailed = False
+        self.qrcode = None
+        self.receipt = None
+
+        db.session.add(TicketTransfer(self, to_user, from_user))
+        db.session.commit()
+
+
+class TicketTransfer(db.Model):
+    __tablename__ = 'ticket_transfer'
+    id = db.Column(db.Integer, primary_key=True)
+    ticket_id = db.Column(db.Integer, db.ForeignKey('ticket.id'), nullable=False)
+    to_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    from_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def __init__(self, ticket, to_user, from_user):
+        if to_user.id == from_user.id:
+            raise Exception('"From" and "To" users must be different.')
+        self.ticket_id = ticket.id
+        self.to_user_id = to_user.id
+        self.from_user_id = from_user.id
+
+    def __repr__(self):
+        return "<Transfer Ticket: %d from %d to %d on %s>" % (
+            self.ticket_id, self.from_user_id, self.to_user_id, self.datetime)
 
 
 class TicketAttrib(db.Model):

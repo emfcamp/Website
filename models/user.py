@@ -46,6 +46,13 @@ class User(db.Model, UserMixin):
     tickets = db.relationship('Ticket', lazy='dynamic', backref='user', cascade='all, delete, delete-orphan')
     payments = db.relationship('Payment', lazy='dynamic', backref='user', cascade='all')
 
+    transfers_to = db.relationship('TicketTransfer',
+                                   primaryjoin='TicketTransfer.to_user_id == User.id',
+                                   backref='to_user', lazy='dynamic')
+    transfers_from = db.relationship('TicketTransfer',
+                                   primaryjoin='TicketTransfer.from_user_id == User.id',
+                                   backref='from_user', lazy='dynamic')
+
     def __init__(self, email, name):
         self.email = email
         self.name = name

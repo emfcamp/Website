@@ -20,10 +20,7 @@ from .common import (
 from .common.forms import IntegerSelectField, HiddenIntegerField, Form
 from .common.receipt import make_qr_png, render_pdf, render_receipt
 from models.user import User
-from models.ticket import (
-    TicketType, Ticket, TicketAttrib,
-    validate_safechars,
-)
+from models.ticket import TicketType, Ticket, validate_safechars
 from models.payment import BankPayment, StripePayment, GoCardlessPayment
 from models.site_state import get_sales_state
 from models.payment import Payment
@@ -94,15 +91,24 @@ def main():
 
     tickets = current_user.tickets.join(Payment).filter(Payment.state != "cancelled",
                                                         Payment.state != "expired").all()
+
+    show_receipt = any([tt for tt in tickets if tt.paid is True])
     if not tickets:
         return redirect(url_for('tickets.choose'))
 
     payments = current_user.payments.filter(Payment.state != "cancelled", Payment.state != "expired").all()
 
-    return render_template("tickets.html",
+    transferred_to = current_user.transfers_to.all()
+    transferred_from = current_user.transfers_from.all()
+
+
+    return render_template("tickets-main/main.html",
                            tickets=tickets,
                            payments=payments,
-                           form=form)
+                           form=form,
+                           show_receipt=show_receipt,
+                           transferred_to=transferred_to,
+                           transferred_from=transferred_from)
 
 
 @tickets.route("/tickets/token/")
@@ -304,15 +310,11 @@ def transfer(ticket_id):
             to_user = User.query.filter_by(email=email).one()
             email_template = 'ticket-transfer-new-owner.txt'
 
-        ticket.transfer_to(to_user)
-        # Log the transfer in an SQL parse-able manner (e.g. ids only)
-        transfer_str = '%d -> %d' % (current_user.id, to_user.id)
-        ticket.attribs.append(TicketAttrib('transfer', transfer_str))
+        ticket.transfer(from_user=current_user, to_user=to_user)
 
         app.logger.info('Ticket %s transferred from %s to %s', ticket,
                         current_user, to_user)
-        # Save everything
-        db.session.commit()
+
         # Alert the users via email
         send_template_email("You've been sent a ticket to EMF 2016!",
                             to_user.email, current_user.email,
@@ -324,29 +326,9 @@ def transfer(ticket_id):
                             'emails/ticket-transfer-original-owner.txt',
                             to_user=to_user, from_user=current_user)
 
-        return redirect(url_for('tickets.transferred'))
+        return redirect(url_for('tickets.main'))
 
     return render_template('ticket-transfer.html', ticket=ticket, form=form)
-
-
-@tickets.route("/tickets/transferred")
-@login_required
-def transferred():
-    # Build a 'like' query string to find transfers from this user.
-    id_str = '{0:d}%'.format(current_user.id)
-    transfer_logs = TicketAttrib.query.filter_by(name='transfer').\
-        filter(TicketAttrib.value.like(id_str)).all()
-
-    transferred = []
-    for ta in transfer_logs:
-        ticket = ta.ticket
-        # Because we log both ends of the transfer we can make sure we only show
-        # people the transfers they have made (and not any subsequent transfers)
-        to_user_id = int(ta.value.split('->')[1])
-        to_user = User.query.get(to_user_id)
-        transferred.append((ticket, to_user))
-
-    return render_template('tickets-transferred.html', transferred=transferred)
 
 
 @tickets.route("/tickets/receipt")

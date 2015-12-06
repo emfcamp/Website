@@ -1,0 +1,53 @@
+<form action="{{ url_for('tickets.main') }}" method="POST">
+{{ form.hidden_tag() }}
+
+<table class="table tickets">
+<tr>
+  <th class="checkbox-cell"></th>
+  <th>Type</th>
+  <th>Status</th>
+</tr>
+
+{%- for t in tickets -%}
+
+{# only display tickets that have a payment #}
+{%- if t.payment %}
+<tr class="
+{{- loop.cycle('odd', 'even') }}
+{%- if t.paid %} paid {%- endif -%}
+{%- if t.expired() %} expired {%- endif -%}
+">
+<td class="checkbox-cell">
+  {% if t.paid %}
+  <label>
+    <input type="checkbox" name="ticket_id" value="{{ t.id }}">
+  </label>
+  {% endif %}
+</td>
+<td>{{ t.type.name }}</td>
+<td>
+    {% if t.payment.state == 'cancelled' %}
+    Cancelled
+    {%- elif t.paid %}
+    Paid
+    {%- elif t.expired() %}
+    Unpaid
+    {%- else %}
+    Pending
+    {%- endif %}
+</td>
+<td>
+  {% if t.paid and t.type.is_transferable %}
+    <a class="btn btn-default" href="{{ url_for('.transfer', ticket_id=t.id) }}">Transfer</a>
+  {% endif %}
+</td>
+</tr>
+{% endif -%}
+{% endfor -%}
+
+</table>
+
+{% if show_receipt %}
+  {{ form.forward(class_="btn btn-default pull-right") }}
+{% endif %}
+</form>

@@ -11,8 +11,8 @@
     and sign-up for volunteering shifts.</p>
     <p>By filling in this form you
     will transfer ownership of the ticket. You will no longer see it in your
-    list of tickets. You will instead see it in the <a href="{{
-        url_for('.transferred') }}">transferred tickets</a> page.</p>
+    list of tickets. You will instead see it in the <a href="{{ url_for('tickets.main', _anchor='transfers-to') }}">tickets given</a> section of
+    the tickets page.</p>
 </div>
 
 <form method="post" class="form-horizontal ticket-info">
@@ -21,8 +21,8 @@
     <div class="panel panel-default">
         <div class="panel-heading"><h3 class="panel-title">Transfer ticket: {{ticket.type.name}}</h3></div>
     <div class="panel-body">
-      {{ render_field(form.email, autofocus=True, horizontal=True) }}
       {{ render_field(form.name, horizontal=True) }}
+      {{ render_field(form.email, autofocus=True, horizontal=True) }}
     </div>
   </div>
   <a class="btn btn-default" href="{{ url_for('tickets.main') }}">Back</a>

@@ -20,7 +20,7 @@ from main import db, mail
 from models.user import User
 from models.payment import Payment, BankPayment, BankTransaction
 from models.ticket import (
-    Ticket, TicketCheckin, TicketType, TicketPrice, TicketAttrib
+    Ticket, TicketCheckin, TicketType, TicketPrice, TicketTransfer
 )
 from models.cfp import Proposal
 from .common.forms import Form
@@ -345,16 +345,8 @@ def ticket_type_details(type_id):
 @admin.route('/transfers')
 @admin_required
 def ticket_transfers():
-    transfer_logs = TicketAttrib.query.filter_by(name='transfer').all()
-    transfers = []
-
-    for trans in transfer_logs:
-        from_user, to_user = trans.value.split('->')
-        to_user = User.query.get(int(to_user))
-        from_user = User.query.get(int(from_user))
-        transfers.append((trans.ticket, from_user, to_user))
-
-    return render_template('admin/ticket-transfers.html', transfers=transfers)
+    transfer_logs = TicketTransfer.query.all()
+    return render_template('admin/ticket-transfers.html', transfers=transfer_logs)
 
 
 @admin.route("/admin/make-admin", methods=['GET', 'POST'])

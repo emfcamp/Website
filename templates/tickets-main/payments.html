@@ -1,0 +1,42 @@
+<table class="table">
+  <tr>
+    <th>Type</th>
+    <th>Amount</th>
+    <th>Progress</th>
+    <th colspan="2"></th>
+  </tr>
+  {% for p in payments %}
+    <tr class="{{- loop.cycle('odd', 'even') -}}">
+      <td>
+          <a href="{{ url_for('payments.invoice', payment_id=p.id) }}">{{ p.name }}</a>
+      </td>
+      <td>{{ p.amount | price(p.currency) }}</td>
+      <td>
+        {%- if p.state == "inprogress" and p.provider == "banktransfer" %}
+          <a href="{{ url_for('payments.transfer_waiting', payment_id=p.id) }}">Pending</a>
+        {%- else -%}
+          {{ {'new': 'New', 'inprogress': 'Pending', 'paid': 'Complete'}[p.state] -}}
+        {% endif -%}
+        {%- if p.provider == "banktransfer" %}, reference: {{ p.bankref | bankref }} {% endif %}
+      </td>
+      <td>
+        {%- if p.state == "new" and p.provider == "gocardless" %}
+          <a href="{{ url_for('payments.gocardless_tryagain', payment_id=p.id) }}" class="btn btn-success">Pay</a>
+        {%- elif p.state == "new" and p.provider == "stripe" %}
+          <a href="{{ url_for('payments.stripe_tryagain', payment_id=p.id) }}" class="btn btn-success">Pay</a>
+        {%- elif p.state == "captured" and p.provider == "stripe" %}
+          <a href="{{ url_for('payments.stripe_tryagain', payment_id=p.id) }}" class="btn btn-success">Charge</a>
+        {% endif -%}
+      </td>
+      <td>
+        {%- if p.state == "new" and p.provider == "gocardless" %}
+          <a href="{{ url_for('payments.gocardless_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
+        {%- elif p.state in ["new", "inprogress"] and p.provider == "banktransfer" %}
+          <a href="{{ url_for('payments.transfer_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
+        {%- elif p.state in ["new", "captured"] and p.provider == "stripe" %}
+          <a href="{{ url_for('payments.stripe_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
+        {% endif -%}
+      </td>
+    </tr>
+  {% endfor %}
+</table>
