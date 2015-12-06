@@ -47,5 +47,7 @@
 
 </table>
 
-{{ form.forward(class_="btn btn-default pull-right") }}
+{% if show_receipt %}
+  {{ form.forward(class_="btn btn-default pull-right") }}
+{% endif %}
 </form>
