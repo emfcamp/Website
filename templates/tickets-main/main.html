@@ -5,26 +5,46 @@
 <a href="{{ url_for('tickets.choose') }}" class="btn btn-lg btn-primary">Buy Another Ticket</a>
 
 {% if tickets %}
-  <h2>Your Tickets</h2><a id="your-tickets"></a>
-  {% include "tickets-main/ticket-list.html" %}
+  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#ticket-table" aria-expanded="false" aria-controls="ticket-table">
+    <h2>Your Tickets <small class="glyphicon glyphicon-chevron-down"></small></h2>
+  </a>
+  <a id="your-tickets"></a>
+  <div class="collapse in" id="ticket-table">
+    {% include "tickets-main/ticket-list.html" %}
+  </div>
   <div class="clearfix"></div>
 {% endif %}
 
 {% if payments %}
-  <h2>Your payments</h2><a id="your-payments"></a>
-  {% include "tickets-main/payments.html" %}
+  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#payments-table" aria-expanded="false" aria-controls="payments-table">
+    <h2>Your payments <small class="glyphicon glyphicon-chevron-down"></small></h2>
+  </a>
+  <a id="your-payments"></a>
+  <div class="collapse" id="payments-table">
+    {% include "tickets-main/payments.html" %}
+  </div>
   <div class="clearfix"></div>
 {% endif %}
 
 {% if transferred_to %}
-  <h2>Tickets received</h2><a id="transfers-to"></a>
-  {% include "tickets-main/transferred-to.html" %}
+  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#transfer-to-table" aria-expanded="false" aria-controls="transfer-to-table">
+    <h2>Tickets received <small class="glyphicon glyphicon-chevron-down"></small></h2>
+  </a>
+  <a id="transfers-to"></a>
+  <div class="collapse" id="transfer-to-table">
+    {% include "tickets-main/transferred-to.html" %}
+  </div>
   <div class="clearfix"></div>
 {% endif %}
 
 {% if transferred_from %}
-  <h2>Tickets given</h2><a id="transfers-from"></a>
-  {% include "tickets-main/transferred-from.html" %}
+  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#transfer-from-table" aria-expanded="false" aria-controls="transfer-from-table">
+    <h2>Tickets given <small class="glyphicon glyphicon-chevron-down"></small></h2>
+  </a>
+  <a id="transfers-from"></a>
+  <div class="collapse" id="transfer-from-table">
+    {% include "tickets-main/transferred-from.html" %}
+  </div>
   <div class="clearfix"></div>
 {% endif %}
 

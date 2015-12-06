@@ -504,3 +504,23 @@ td.checkbox-cell label {
     flex-direction: row;
     justify-content: center;
 }
+
+/* Make sure that focused elements don't change colour etc. unless also hovered */
+a.collapse-toggle:focus,
+a.collapse-toggle:focus .glyphicon {
+  color: white;
+  text-decoration: none;
+}
+
+/*
+ * collapse toggles are normally white, grey on hover with only the text underlined
+ */
+a.collapse-toggle { text-decoration: none; }
+a.collapse-toggle .glyphicon { color: white; }
+a.collapse-toggle:hover            { text-decoration: underline; }
+a.collapse-toggle:hover .glyphicon { text-decoration: none; }
+
+a.collapse-toggle:hover,
+a.collapse-toggle:hover .glyphicon {
+  color: #d3e0f1;
+}
