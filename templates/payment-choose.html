@@ -42,7 +42,7 @@
 <div class="row row-equal">
 <div class="col-sm-4">
 {% if config.get('GOCARDLESS') %}
-<div class="panel panel-default">
+<div class="panel panel-default panel--payment">
     <div class="panel-heading"><h3 class="panel-title">Direct Debit (preferred)</h3></div>
     <div class="panel-body">
         <p>You can use GoCardless to create a one-off direct debit from your account.
@@ -60,7 +60,7 @@
 </div>
 <div class="col-sm-4">
 {% if config.get('BANK_TRANSFER') %}
-<div class="panel panel-default">
+<div class="panel panel-default panel--payment">
     <div class="panel-heading"><h3 class="panel-title">Bank Transfer</h3></div>
     <div class="panel-body">
         <p>Ask your bank to send the money to us directly. You can do this online, or with cash in a branch.</p>
@@ -73,7 +73,7 @@
 </div>
 <div class="col-sm-4">
 {% if config.get('STRIPE') %}
-<div class="panel panel-default">
+<div class="panel panel-default panel--payment">
     <div class="panel-heading"><h3 class="panel-title">Credit/Debit Card</h3></div>
     <div class="panel-body">
         <p>We accept Visa, Visa Debit, Mastercard or American Express.</p>

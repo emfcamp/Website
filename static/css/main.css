@@ -25,11 +25,7 @@ html, body, .container, .main-row, .main-column {
 
 .panel {
     color: #333;
-}
-
-.panel {
-    display: flex;
-    flex-direction: column;
+    display: block;
 }
 
 .panel-footer {
@@ -46,6 +42,27 @@ html, body, .container, .main-row, .main-column {
 
 .panel .btn {
     color: white;
+}
+
+.panel-footer-center {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+/* Set of hacks because IE doesn't can't flexbox */
+.panel--payment {
+  position: relative;
+}
+
+.panel--payment .panel-body {
+  padding-bottom: 80px;
+}
+
+.panel--payment .panel-footer-center{
+  position: absolute;
+  bottom: 0;
+  width: 100%;
 }
 
 header, h2, h3, h4, h5, h6 {
@@ -499,11 +516,6 @@ td.checkbox-cell label {
     }
 }
 
-.panel-footer-center {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-}
 
 /* Make sure that focused elements don't change colour etc. unless also hovered */
 a.collapse-toggle:focus,
