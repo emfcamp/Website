@@ -14,7 +14,7 @@ class BasicTestCase(unittest.TestCase):
 
     def test_root(self):
         rv = self.client.get('/')
-        assert 'Electromagnetic Field' in rv.data
+        assert 'Electromagnetic Field' in rv.data.decode('utf-8')
 
     def test_tickets(self):
         res = self.client.get('/tickets/choose')
