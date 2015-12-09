@@ -71,6 +71,13 @@ def create_app():
 
         stripe.api_key = app.config['STRIPE_SECRET_KEY']
 
+    if app.config.get('DEBUG'):
+        # Prevent staging site from being displayed on Google
+        @app.after_request
+        def send_noindex_header(response):
+            response.headers['X-Robots-Tag'] = 'noindex, nofollow'
+            return response
+
     @app.errorhandler(404)
     def handle_404(e):
         return render_template('errors/404.html'), 404
