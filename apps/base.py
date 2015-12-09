@@ -174,3 +174,8 @@ def sine():
 @feature_flag('RADIO')
 def radio():
     return render_template('radio.html')
+
+
+@base.route("/googlec108e6ab4f75019d.html")
+def google_verification_russ():
+    return "google-site-verification: googlec108e6ab4f75019d.html"
