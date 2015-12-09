@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block body %}
+
+<div class="col-md-10">
+
+<h2>Error 404: Page Not Found</h2>
+<p>We couldn't find the URL you requested.</p>
+<p>If you think this was an error with our website, please drop us an email at <a href="mailto:{{ config['CONTACT_EMAIL'][1] }}">{{ config['CONTACT_EMAIL'][1] }}</a></p>
+
+</div>
+{% endblock %}

@@ -2,7 +2,7 @@ import os
 import logging
 import logger
 
-from flask import Flask, request, _request_ctx_stack, url_for
+from flask import Flask, request, _request_ctx_stack, url_for, render_template
 from flask_mail import Mail, email_dispatched
 from flask.ext.login import LoginManager
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -113,6 +113,14 @@ if __name__ == "__main__":
             if request.environ.get('HTTP_X_FORWARDED_PROTO') == 'https':
                 request.environ['wsgi.url_scheme'] = 'https'
                 _request_ctx_stack.top.url_adapter.url_scheme = 'https'
+
+    @app.errorhandler(404)
+    def handle_404(e):
+        return render_template('errors/404.html'), 404
+
+    @app.errorhandler(500)
+    def handle_500(e):
+        return render_template('errors/500.html'), 500
 
     if os.path.exists('.inside-vagrant'):
         # Make it easier to access from host machine

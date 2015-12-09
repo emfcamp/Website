@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block body %}
+
+<div class="col-md-10">
+
+<h2>Error 500: Internal Server Error</h2>
+<p>Unfortunately we've experienced an error which prevented us from handling your request.</p>
+<p>If this error persists, please drop us an email
+    at <a href="mailto:{{ config['CONTACT_EMAIL'][1] }}">{{ config['CONTACT_EMAIL'][1] }}</a></p>
+
+</div>
+{% endblock %}
