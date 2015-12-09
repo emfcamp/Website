@@ -6,7 +6,7 @@ from models.ticket import TicketType
 
 def get_site_state(date):
     """ Logic to set the state of the homepage based on date. """
-    if date < datetime(2015, 12, 20):
+    if date < datetime(2015, 12, 14, 20):
         return "before-sales"
     elif date < datetime(2016, 8, 5):
         return "before-event"
