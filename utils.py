@@ -227,31 +227,28 @@ class CreateTickets(Command):
         type_data = [
             # (id, order, admits, name, type limit, personal limit, GBP, EUR, Description)
             # Leave order 0 & 1 free for discount tickets
-            (0, 2, 'full', 'Earlybird Ticket', 100, 10, 90.00, 115.00, True, None),
-            (1, 3, 'full', 'Full Camp Ticket', 100, 10, 95.00, 120.00, True, None),
-            (2, 5, 'full', 'Full Camp Ticket', 1100, 10, 105.00, 135.00, True, None),
-            (3, 8, 'full', 'Full Camp Ticket (Supporter)', 1100, 10, 125.00, 160.00, True,
-                "Support this non-profit event by paying a little more. "
+            (0, 2, 'full', 'Full Camp Ticket', 200, 10, 100.00, 140.00, True, None),
+            # (1, 3, 'full', 'Full Camp Ticket', 200, 10, 105.00, 145.00, True, None),
+            # (2, 4, 'full', 'Full Camp Ticket', 300, 10, 110.00, 155.00, True, None),
+            # (3, 5, 'full', 'Full Camp Ticket', 400, 10, 120.00, 165.00, True, None),
+            (3, 8, 'full', 'Full Camp Ticket (Supporter)', 1100, 10, 130.00, 180.00, True,
+                "Support this non-profit event by paying a bit more. "
                 "All money will go towards making EMF more awesome."),
 
-            (4, 8, 'full', 'Full Camp Ticket (Supporter)', 0, 10, 150.00, 190.00, True,
-                "Support this non-profit event by paying a little more. "
-                "All money will go towards making EMF more awesome."),
-
-            (5, 10, 'kid', 'Under-16 Camp Ticket', 500, 10, 40.00, 50.00, True,
+            (5, 10, 'kid', 'Under-16 Camp Ticket', 500, 10, 45.00, 64.00, True,
                 "For visitors born after August 5th, 2000. "
-                "All under-16s  must be accompanied by an adult."),
+                "All under-16s must be accompanied by an adult."),
 
             (6, 15, 'kid', 'Under-5 Camp Ticket', 200, 4, 0, 0, False,
                 "For children born after August 5th, 2011. "
                 "All children must be accompanied by an adult."),
 
-            (7, 30, 'car', 'Parking Ticket', 400, 4, 15.00, 20.00, False,
-                "We're trying to keep cars on-site to a minimum. "
-                "Please take public transport or find someone to share with if possible."),
+            (7, 30, 'car', 'Parking Ticket', 450, 4, 15.00, 21.00, False,
+                "We're trying to keep cars to a minimum. "
+                "Please take public transport or car-share if you can."),
 
             (8, 35, 'campervan',
-                'Caravan/Campervan Ticket', 50, 2, 30.00, 40.00, False,
+                'Caravan/Campervan Ticket', 60, 2, 30.00, 42.00, False,
                 "If you bring a caravan, you won't need a separate parking ticket for the towing car."),
         ]
         # none of these tickets have tokens or expiry dates
