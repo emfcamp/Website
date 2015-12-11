@@ -65,6 +65,13 @@ def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static/images'),
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
+@base.route('/404')
+def raise_404():
+    abort(404)
+
+@base.route('/500')
+def raise_500():
+    abort(500)
 
 @base.route("/about")
 def about():
