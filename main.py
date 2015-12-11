@@ -78,6 +78,18 @@ def create_app():
             response.headers['X-Robots-Tag'] = 'noindex, nofollow'
             return response
 
+    @app.after_request
+    def send_security_headers(response):
+        use_hsts = app.config.get('HSTS', False)
+        if use_hsts:
+            max_age = app.config.get('HSTS_MAX_AGE', 3600 * 24 * 7 * 4)
+            response.headers['Strict-Transport-Security'] = 'max-age=%s' % max_age
+
+        response.headers['X-Frame-Options'] = 'deny'
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+
+        return response
+
     @app.errorhandler(404)
     def handle_404(e):
         return render_template('errors/404.html'), 404
