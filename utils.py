@@ -235,6 +235,9 @@ class CreateTickets(Command):
                 "Support this non-profit event by paying a bit more. "
                 "All money will go towards making EMF more awesome."),
 
+            (4, 9, 'full', 'Full Camp Ticket (Gold Supporter)', 1100, 10, 150.00, 210.00, True,
+                "Pay even more, receive our undying gratitude."),
+
             (5, 10, 'kid', 'Under-16 Camp Ticket', 500, 10, 45.00, 64.00, True,
                 "For visitors born after August 5th, 2000. "
                 "All under-16s must be accompanied by an adult."),
