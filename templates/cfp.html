@@ -7,56 +7,63 @@
   {% endif %}
 
   <h2>Call for Participation</h2>
-  <p class="emphasis">Electromagnetic Field is a UK camping festival for those with an inquisitive
-  mind or an interest in making things: hackers, artists, geeks, crafters,
-  scientists, and engineers. It's happening near
-  <a href="http://wiki.emfcamp.org/wiki/Getting_Here">Guildford, Surrey</a> on
-  August 5th<sup>th</sup>&mdash;7<sup>th</sup>, and tickets are <a href="/">on sale now</a> for
-  £{{ full_price }}. Our last festival in 2014 had 1,300 attendees; this year we're aiming for
-  1,500.</p>
+  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#what" aria-expanded="false" aria-controls="payments-table">
+    <h3>What we're looking for<small class="glyphicon glyphicon-chevron-down"></small></h3>
+  </a>
+  <div class="collapse in" id="what">
+    <p class="emphasis">Electromagnetic Field is a UK camping festival for those
+      with an inquisitive mind or an interest in making things: hackers, artists,
+      geeks, crafters, scientists, and engineers. It's happening near
+      <a href="http://wiki.emfcamp.org/wiki/Getting_Here">Guildford, Surrey</a>
+      on August 5th<sup>th</sup>&mdash;7<sup>th</sup>, and tickets are
+      <a href="/">on sale now</a> for £{{ full_price }}. Our last festival in
+      2014 had 1,300 attendees; this year we're aiming for 1,500.</p>
 
-  <p>We're looking for people to talk, share, and demonstrate the things they
-  love. We're especially keen to hear from people with <a
-  href="{{ url_for('base.diversity') }}">different backgrounds</a> than you'd expect to find at a
-  technology conference. We're not just looking for talks: we also want
-  installations, workshops, and games.</p>
+    <p>We're looking for people to talk, share, and demonstrate the things they
+      love. We're especially keen to hear from people with
+      <a href="{{ url_for('base.diversity') }}">different backgrounds</a> than
+      you'd expect to find at a technology conference. We're not just looking
+      for talks: we also want installations, workshops, and games.</p>
 
-  <p>At previous events we've heard about everything from <b>genetic
-    modification</b> to <b>electronics</b>, <b>blacksmithing</b> to
-  <b>high-energy physics</b>, <b>reverse engineering</b> to <b>lock picking</b>,
-  <b>computer security</b> to <b>crocheting</b>, and <b>quadcopters</b> to
-  <b>beer brewing</b>.  </p>
+    <p>At previous events we've heard about everything from genetic modification
+      to electronics, blacksmithing to high-energy physics, reverse engineering
+      to lock picking, computer security to crocheting, and quadcopters to beer
+      brewing.  </p>
 
-  <p>If you're enthusiastic about it, we are too! You don't need to be a
-  professional or an expert to present: <strong>impostors are
-  welcome</strong>.</p>
+    <p>If you're enthusiastic about it, we are too! You don't need to be a
+      professional or an expert to present: <strong>impostors are
+      welcome</strong>.</p>
+  </div>
 
-  <h3>Selection</h3>
+  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#selection" aria-expanded="false" aria-controls="payments-table">
+    <h3>Selection<small class="glyphicon glyphicon-chevron-down"></small></h3>
+  </a>
+  <div class="collapse" id="selection">
+    <p>After you submit a proposal, it will be considered anonymously by a diverse
+      selection panel. We may take into account other factors later on in the process
+      to see where we can support you.</p>
+  </div>
 
-  <p>After you submit a proposal, it will be considered anonymously by a diverse
-  selection panel. We may take into account other factors later on in the process
-  to see where we can support you.</p>
+  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#money" aria-expanded="false" aria-controls="payments-table">
+    <h3>Money<small class="glyphicon glyphicon-chevron-down"></small></h3>
+  </a>
+  <div class="collapse" id="money">
+    <p>EMF is a non-profit community event, entirely run by unpaid volunteers. All of
+      the ticket cost goes directly towards turning a field into a habitable and amazing place
+      to spend a weekend, and everyone who attends contributes to making it a success.</p>
 
-  <h3>Money</h3>
-
-  <p>EMF is a non-profit community event, entirely run by unpaid volunteers. All of
-  the ticket cost goes directly towards turning a field into a habitable and amazing place
-  to spend a weekend, and everyone who attends contributes to making it a success.</p>
-
-  <p>Because of this, we'd like everyone who participates to buy a ticket and stick around for
-  the whole event. We don't have the budget to pay speakers, although we have a
-  limited amount of money set aside to help those who otherwise can't to afford to come, or
-  who can only attend for the day of their talk. Please let us know if that's the case.</p>
+    <p>Because of this, we'd like everyone who participates to buy a ticket and stick around for
+      the whole event. We don't have the budget to pay speakers, although we have a
+      limited amount of money set aside to help those who otherwise can't to afford to come, or
+      who can only attend for the day of their talk. Please let us know if that's the case.</p>
+  </div>
 
   <h3>Submit a proposal</h3>
   <p>We need a rough idea of what you want to present at EMF, what sort of
-  resources you'll need, and how long you'll expect it to last. If you need some
-  help writing your proposal, <a href="mailto:content@emfcamp.org">we're happy to
-  help</a>. If you're not confident speaking, we'll help you out however we
-  can.</p>
-
-  <p>The first round of proposals has now <strong>closed</strong>, but we're still accepting
-     late submissions.</p>
+    resources you'll need, and how long you'll expect it to last. If you need some
+    help writing your proposal, <a href="mailto:content@emfcamp.org">we're happy to
+   help</a>. If you're not confident speaking, we'll help you out however we
+   can.</p>
 
   {% if not current_user.is_authenticated() %}
   <p>If you've already bought a ticket for this year, please <a href="{{ url_for('users.login') }}">log in</a>
