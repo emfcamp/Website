@@ -40,6 +40,10 @@ html, body, .container, .main-row, .main-column {
   color: #5E93CE;
 }
 
+.well .btn {
+  color: white;
+}
+
 .panel .btn {
     color: white;
 }
