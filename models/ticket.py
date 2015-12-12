@@ -2,8 +2,7 @@ from main import db
 from flask import current_app as app
 
 from sqlalchemy.orm import Session
-from sqlalchemy import event, or_, and_
-from sqlalchemy.sql import func
+from sqlalchemy import event, or_
 from sqlalchemy.exc import IntegrityError
 
 from decimal import Decimal
@@ -113,23 +112,14 @@ class TicketType(db.Model):
                      all()
 
     @classmethod
-    def get_price_cheapest_full(cls):
+    def get_price_cheapest_full(cls, discount_token=None):
         """ Get the cheapest full ticket price. This may return
             None if there are no tickets (currently) available. """
-        sq = db.session.query(func.count(Ticket.id)).join(TicketType).filter(
-            or_(Ticket.expires > datetime.utcnow(),
-                Ticket.expires.is_(None))).as_scalar()
-
-        cheapest_ticket = \
-            TicketType.query.join(TicketType.prices).filter(
-                and_(TicketPrice.currency == 'GBP',
-                     TicketType.admits == 'full',
-                     TicketType.discount_token.is_(None),
-                     sq > 0)
-            ).order_by(TicketPrice.price_int).limit(1).scalar()
-
-        if cheapest_ticket:
-            return cheapest_ticket.get_price('GBP')
+        types = cls.get_types_for_token(discount_token,
+                                        TicketType.query.filter_by(admits='full'))
+        prices = [tt.get_price('GBP') for tt in types if tt.get_remaining() > 0]
+        if len(prices) > 0:
+            return min(prices)
         else:
             return None
 
