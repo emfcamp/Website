@@ -8,6 +8,7 @@ from flask.ext.login import LoginManager
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.assets import Environment, Bundle
 from flask.ext.cdn import CDN
+from flask_debugtoolbar import DebugToolbarExtension
 from flask_wtf import CsrfProtect
 import gocardless
 import stripe
@@ -28,6 +29,7 @@ mail = Mail()
 cdn = CDN()
 login_manager = LoginManager()
 assets = Environment()
+toolbar = DebugToolbarExtension()
 
 assets.register('css_main', Bundle('css/main.css',
                 output='gen/main-packed.css', filters='cssmin'))
@@ -48,11 +50,12 @@ def create_app():
     if install_logging:
         logger.setup_logging(app)
 
-    cdn.init_app(app)
+    cdn.init_app(app) # Only enabled if configured
     csrf.init_app(app)
     db.init_app(app)
     mail.init_app(app)
     assets.init_app(app)
+    toolbar.init_app(app) # Only enabled on DEBUG=True
     login_manager.setup_app(app, add_context_processor=True)
     app.login_manager.login_view = 'users.login'
 
