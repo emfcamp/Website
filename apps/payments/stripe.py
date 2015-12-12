@@ -86,7 +86,7 @@ def charge_stripe(payment):
     msg.body = render_template("emails/tickets-purchased-email-stripe.txt",
                                user=payment.user, payment=payment)
 
-    if app.config.get('RECEIPTS'):
+    if app.config.get('ISSUE_TICKETS'):
         page = render_receipt(payment.tickets, pdf=True)
         pdf = render_pdf(page)
         msg.attach('Receipt.pdf', 'application/pdf', pdf.read())
@@ -284,7 +284,7 @@ def stripe_payment_paid(payment):
     msg.body = render_template('emails/tickets-paid-email-stripe.txt',
                                user=payment.user, payment=payment)
 
-    if app.config.get('RECEIPTS'):
+    if app.config.get('ISSUE_TICKETS'):
         page = render_receipt(payment.tickets, pdf=True)
         pdf = render_pdf(page)
         msg.attach('Receipt.pdf', 'application/pdf', pdf.read())
