@@ -7,6 +7,7 @@ from flask_mail import Mail, email_dispatched
 from flask.ext.login import LoginManager
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.assets import Environment, Bundle
+from flask.ext.cdn import CDN
 from flask_wtf import CsrfProtect
 import gocardless
 import stripe
@@ -24,6 +25,7 @@ else:
 csrf = CsrfProtect()
 db = SQLAlchemy()
 mail = Mail()
+cdn = CDN()
 login_manager = LoginManager()
 assets = Environment()
 
@@ -46,6 +48,7 @@ def create_app():
     if install_logging:
         logger.setup_logging(app)
 
+    cdn.init_app(app)
     csrf.init_app(app)
     db.init_app(app)
     mail.init_app(app)
