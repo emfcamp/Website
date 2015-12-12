@@ -4,7 +4,7 @@ from flask import (
     url_for, session, send_file, abort, current_app as app
 )
 from flask.ext.login import login_required, current_user
-from wtforms.validators import Required, Optional, ValidationError
+from wtforms.validators import Required, Optional, Email, ValidationError
 from wtforms import (
     SubmitField, StringField,
     FieldList, FormField, HiddenField,
@@ -206,7 +206,7 @@ def choose():
 
 
 class TicketPaymentForm(Form):
-    email = EmailField('Email', [Required()])
+    email = EmailField('Email', [Email(), Required()])
     name = StringField('Name', [Required()])
     basket_total = HiddenField('basket total')
 
