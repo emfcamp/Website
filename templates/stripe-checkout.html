@@ -6,7 +6,7 @@
 
 <h2>Credit Card payment</h2>
 
-<div class="well">
+<div class="well" id="payment-info">
     This page will authorise your card payment for {{ payment.amount | price(payment.currency) }}.
     Please wait.
 </div>
@@ -34,6 +34,10 @@
   <a class="btn btn-success" href="{{ url_for('tickets.main') }}">Back to tickets</a>
 </div>
 
+<div class="hidden alert alert-info" id="payment-processing">
+    <p>Please wait while we process your payment. This should only take a few seconds.</p>
+</div>
+
 <form method="post" action="{{ url_for('payments.stripe_capture', payment_id=payment.id) }}" id="stripe_capture" class="hidden">
 {{ form.hidden_tag() }}
 {{ form.forward(class_='btn btn-success debounce') }}
@@ -56,15 +60,18 @@ EMF.stripe_handler = StripeCheckout.configure({
     EMF.token = token;
     $('#token').val(token.id);
     $('#stripe_capture').submit();
+    $('#payment-info').hide();
+    $('#payment-processing').removeClass('hidden').show();
   },
   opened: function() {
     $('#popups-warning').hide();
     $('#failed-warning').hide();
   },
   closed: function() {
-    EMF.stripe_token_timer = setTimeout(function() {
-      $('#failed-warning').removeClass('hidden').show();
-    }, 10000);
+    if (!EMF.token) {
+        // User closed the stripe box
+        $('#failed-warning').removeClass('hidden').show();
+    }
   }
 });
 EMF.stripe_checkout = function() {
