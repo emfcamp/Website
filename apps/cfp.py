@@ -2,7 +2,7 @@ from flask import (
     render_template, redirect, request, flash,
     url_for, abort, current_app as app, Blueprint
 )
-from flask.ext.login import current_user
+from flask.ext.login import current_user, login_required
 from flask_mail import Message
 from wtforms.validators import Required, Email, ValidationError
 from wtforms import (
@@ -157,3 +157,10 @@ def main(cfp_type='talk'):
 @feature_flag('CFP')
 def complete():
     return render_template('cfp_complete.html')
+
+
+@cfp.route('/cfp/proposals')
+@feature_flag('CFP')
+@login_required
+def proposals():
+    return render_template('cfp_proposals.html')

@@ -8,7 +8,7 @@
   <ul class="nav nav-pills">
     <li><a href="{{ url_for('tickets.main') }}">Your tickets</a></li>
     <li><a href="{{ url_for('tickets.choose') }}">Buy tickets</a></li>
-    {# <li><a href="{{ url_for('cfp.proposals') }}">Your CFP proposals</a></li> #}
+    <li><a href="{{ url_for('cfp.proposals') }}">Your CFP proposals</a></li>
     <li><a href="{{ url_for('cfp.proposals') }}">Submit a CFP proposal</a></li>
   </ul>
 </nav>
@@ -34,7 +34,7 @@
           {{ render_field(form.age, True) }}
           {{ render_field(form.gender, True) }}
           {{ render_field(form.ethnicity, True) }}
-          {{ form.forward(class_="btn btn-default pull-right") }}
+          {{ form.forward(class_="btn btn-default pull-right", style="margin-bottom: 15px;") }}
         </div>
       </div>
     </div>

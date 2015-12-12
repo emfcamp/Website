@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Your Proposals{% endblock %}
+{% block body %}
+
+<h1>Your CFP Proposals</h1>
+
+<a href="{{ url_for('cfp.main') }}" class="btn btn-lg btn-primary">Submit a CFP proposal</a>
+
+<table class="table">
+  <tr>
+    <th>Type</th>
+    <th>Length</th>
+    <th>Capacity</th>
+    <th>Size</th>
+    <th>Description</th>
+  </tr>
+  {% for sub in current_user.proposals %}
+  <tr class="{{- loop.cycle('odd', 'even') }}">
+    <td colspan="5">{{ sub.title }}</td>
+  </tr>
+  <tr class="{{- loop.cycle('odd', 'even') }}">
+    <td>{{ sub.type | title }}</td>
+    <td>{{ sub.length or 'N/A'}}</td>
+    <td>{{ sub.attendees or 'N/A'}}</td>
+    <td>{{ sub.size or 'N/A'}}</td>
+    <td>{{ sub.description }}</td>
+  </tr>
+  {% endfor %}
+
+</table>
+
+{% endblock %}
