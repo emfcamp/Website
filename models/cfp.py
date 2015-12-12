@@ -1,10 +1,13 @@
 from main import db
+from datetime import datetime
 
 
 class Proposal(db.Model):
     __tablename__ = 'proposal'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created = db.Column(db.DateTime, default=datetime.utcnow)
+    state = db.Column(db.String, nullable=False, default='new')
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String)
     length = db.Column(db.String)
