@@ -43,6 +43,7 @@ class User(db.Model, UserMixin):
     admin = db.Column(db.Boolean, default=False, nullable=False)
     arrivals = db.Column(db.Boolean, default=False, nullable=False)
     phone = db.Column(db.String, nullable=True)
+    diversity = db.relationship('UserDiversity', uselist=False, backref='user', cascade='all, delete, delete-orphan')
     proposals = db.relationship('Proposal', lazy='dynamic', backref='user', cascade='all, delete, delete-orphan')
     tickets = db.relationship('Ticket', lazy='dynamic', backref='user', cascade='all, delete, delete-orphan')
     payments = db.relationship('Payment', lazy='dynamic', backref='user', cascade='all')
@@ -87,6 +88,14 @@ class User(db.Model, UserMixin):
             return None
 
         return User.query.filter_by(id=uid).one()
+
+
+class UserDiversity(db.Model):
+    __tablename__ = 'diversity'
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, primary_key=True)
+    age = db.Column(db.String)
+    gender = db.Column(db.String)
+    ethnicity = db.Column(db.String)
 
 
 class PasswordReset(db.Model):

@@ -13,12 +13,9 @@ from wtforms import (
 from sqlalchemy.exc import IntegrityError
 
 from main import db, mail
-from models.user import User
+from models.user import User, UserDiversity
 from models.ticket import TicketType
-from models.cfp import (
-    TalkProposal, WorkshopProposal,
-    InstallationProposal, ProposalDiversity,
-)
+from models.cfp import TalkProposal, WorkshopProposal, InstallationProposal
 from .common import feature_flag, create_current_user
 from .common.forms import Form
 
@@ -125,13 +122,18 @@ def main(cfp_type='talk'):
         cfp.description = form.description.data
         cfp.need_finance = form.need_finance.data
 
-        cfp.diversity = ProposalDiversity()
-        cfp.diversity.age = form.diversity.age.data
-        cfp.diversity.gender = form.diversity.gender.data
-        cfp.diversity.ethnicity = form.diversity.ethnicity.data
-
         db.session.add(cfp)
         db.session.commit()
+
+        if not current_user.diversity and any(form.diversity.data.values()):
+            diversity = UserDiversity()
+            diversity.age = form.diversity.age.data
+            diversity.gender = form.diversity.gender.data
+            diversity.user_id = current_user.id
+            diversity.ethnicity = form.diversity.ethnicity.data
+
+            db.session.add(diversity)
+            db.session.commit()
 
         # Send confirmation message
         msg = Message('Electromagnetic Field CFP Submission',
@@ -143,10 +145,6 @@ def main(cfp_type='talk'):
         mail.send(msg)
 
         return redirect(url_for('.complete'))
-
-    if current_user.is_authenticated():
-        form.name.data = current_user.name
-        form.email.data = current_user.email
 
     full_price = TicketType.get_price_cheapest_full()
 
