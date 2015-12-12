@@ -7,13 +7,13 @@ from flask.ext.login import (
 )
 from flask_mail import Message
 from wtforms.validators import Required, Email, EqualTo, ValidationError
-from wtforms import StringField, PasswordField, HiddenField
+from wtforms import StringField, PasswordField, HiddenField, SubmitField
 from sqlalchemy.exc import IntegrityError
 
 from main import db, mail
 from common import set_user_currency, feature_flag, create_current_user, send_template_email
 from .common.forms import Form
-from models.user import User, PasswordReset
+from models.user import User, PasswordReset, UserDiversity
 import re
 
 users = Blueprint('users', __name__)
@@ -179,3 +179,35 @@ def set_currency():
 
     set_user_currency(request.form['currency'])
     return redirect(url_for('tickets.choose'))
+
+
+class DiversityForm(Form):
+    age = StringField('Age')
+    gender = StringField('Gender')
+    ethnicity = StringField('Ethnicity')
+
+    forward = SubmitField('Update')
+
+@users.route("/account", methods=['GET', 'POST'])
+@login_required
+def account():
+    form = DiversityForm()
+
+    if request.method == 'POST' and any(form.data.values()):
+        if not current_user.diversity:
+            current_user.diversity = UserDiversity()
+            current_user.diversity.user_id = current_user.id
+            db.session.add(current_user.diversity)
+
+        current_user.diversity.age = form.age.data
+        current_user.diversity.gender = form.gender.data
+        current_user.diversity.ethnicity = form.ethnicity.data
+
+        db.session.commit()
+
+    if current_user.diversity:
+        form.age.data = current_user.diversity.age
+        form.gender.data = current_user.diversity.gender
+        form.ethnicity.data = current_user.diversity.ethnicity
+
+    return render_template("account.html", form=form)

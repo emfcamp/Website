@@ -1,0 +1,43 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block title %}My Account{% endblock %}
+{% block body %}
+<h2>Account</h2>
+
+<nav>
+  <ul class="nav nav-pills">
+    <li><a href="{{ url_for('tickets.main') }}">Your tickets</a></li>
+    <li><a href="{{ url_for('tickets.choose') }}">Buy tickets</a></li>
+    {# <li><a href="{{ url_for('cfp.proposals') }}">Your CFP proposals</a></li> #}
+    <li><a href="{{ url_for('cfp.proposals') }}">Submit a CFP proposal</a></li>
+  </ul>
+</nav>
+<p>&nbsp;</p>
+<h3>Your details</h3>
+<div class="col-md-12">
+  <p><strong>Email</strong> {{ current_user.email }}</p>
+  <p><strong>Name</strong> {{ current_user.name }}</p>
+</div>
+
+<form method="post" class="form-horizontal col-md-12">
+  {{ form.hidden_tag() }}
+  <fieldset>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        If you're comfortable telling us a little bit about yourself, we'd appreciate it.
+        This information won't be available to the selection panel &ndash; we'll only use it to help find out
+        how well we're doing with outreach.
+      </div>
+      <div class="row">
+        <div id="diversity" class="col-md-11">
+          <p></p>
+          {{ render_field(form.age, True) }}
+          {{ render_field(form.gender, True) }}
+          {{ render_field(form.ethnicity, True) }}
+          {{ form.forward(class_="btn btn-default pull-right") }}
+        </div>
+      </div>
+    </div>
+  </fieldset>
+</form>
+{% endblock %}
