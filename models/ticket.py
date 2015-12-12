@@ -140,8 +140,9 @@ class TicketType(db.Model):
     @classmethod
     def get_tickets_remaining(cls):
         """ Get the total number of tickets remaining. """
-        people = sum(cls.get_ticket_sales().values())
-        return app.config.get('MAXIMUM_ADMISSIONS') - people
+        total = Ticket.query.join(Ticket.type).filter(or_(TicketType.admits == 'full',
+                                                          TicketType.admits == 'kid')).count()
+        return app.config.get('MAXIMUM_ADMISSIONS') - total
 
 
 class TicketPrice(db.Model):
