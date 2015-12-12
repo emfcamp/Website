@@ -110,7 +110,9 @@
 
       {{ render_field(form.title, True, glyphicon='globe', placeholder="A one-sentence summary (it should fit in a tweet)") }}
       <div class="text-right help-block hidden show-remaining" data-for="title" data-max="140">
-        Characters remaining: <span class="remaining"></span><span class="too-long"> (but don't worry)</span>
+        <small>
+          Characters remaining: <span class="remaining"></span><span class="too-long"> (but don't worry)</span>
+        </small>
       </div>
       </fieldset>
 
@@ -126,10 +128,6 @@
       {% elif form.type == 'installation' %}
         {{ render_field(form.size, True, placeholder="We need to know how much space to reserve") }}
       {% endif %}
-
-      {#
-      {{ render_field(form.days, True, placeholder="I can only come on these days") }}
-      #}
 
       </fieldset>
       <fieldset>
