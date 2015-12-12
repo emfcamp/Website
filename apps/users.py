@@ -181,7 +181,8 @@ def set_currency():
     return redirect(url_for('tickets.choose'))
 
 
-class DiversityForm(Form):
+class AccountForm(Form):
+    name = StringField('Name', [Required()])
     age = StringField('Age')
     gender = StringField('Gender')
     ethnicity = StringField('Ethnicity')
@@ -191,19 +192,23 @@ class DiversityForm(Form):
 @users.route("/account", methods=['GET', 'POST'])
 @login_required
 def account():
-    form = DiversityForm()
+    form = AccountForm()
 
-    if request.method == 'POST' and any(form.data.values()):
+    if form.validate_on_submit():
         if not current_user.diversity:
             current_user.diversity = UserDiversity()
             current_user.diversity.user_id = current_user.id
             db.session.add(current_user.diversity)
 
+        current_user.name = form.name.data
         current_user.diversity.age = form.age.data
         current_user.diversity.gender = form.gender.data
         current_user.diversity.ethnicity = form.ethnicity.data
 
         db.session.commit()
+
+    # This is a required field so should always be set
+    form.name.data = current_user.name
 
     if current_user.diversity:
         form.age.data = current_user.diversity.age
