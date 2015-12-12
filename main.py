@@ -1,9 +1,8 @@
-import os
 import logging
 import logger
 
-from flask import Flask, request, _request_ctx_stack, url_for, render_template
-from flask_mail import Mail, email_dispatched
+from flask import Flask,  _request_ctx_stack, url_for, render_template
+from flask_mail import Mail
 from flask.ext.login import LoginManager
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.assets import Environment, Bundle
@@ -127,35 +126,3 @@ def external_url(endpoint, **values):
     """ Generate an absolute external URL. If you need to override this,
         you're probably doing something wrong. """
     return url_for(endpoint, _external=True, **values)
-
-
-if __name__ == "__main__":
-    app = create_app()
-    if app.config.get('DEBUG'):
-        with app.app_context():
-            db.create_all()
-        email_dispatched.connect(logger.mail_logging)
-
-    if app.config.get('FIX_URL_SCHEME'):
-        # The Flask debug server doesn't process _FORWARDED_ headers,
-        # so there's no other way to set the wsgi.url_scheme.
-        # Consider using an actual WSGI host (perhaps with ProxyFix) instead.
-
-        @app.before_request
-        def fix_url_scheme():
-            if request.environ.get('HTTP_X_FORWARDED_PROTO') == 'https':
-                request.environ['wsgi.url_scheme'] = 'https'
-                _request_ctx_stack.top.url_adapter.url_scheme = 'https'
-
-    if os.path.exists('.inside-vagrant'):
-        # Make it easier to access from host machine
-        default_host = '0.0.0.0'
-        default_port = 5000
-    else:
-        # Safe defaults
-        default_host = None  # i.e. localhost
-        default_port = None  # i.e. 5000
-
-    host = app.config.get('HOST', default_host)
-    port = app.config.get('PORT', default_port)
-    app.run(processes=2, host=host, port=port)

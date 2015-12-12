@@ -11,7 +11,7 @@ ifeq ("$(VIRTUAL_ENV)", "")
 endif
 
 run:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./main.py
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./dev_server.py
 
 init:
 	virtualenv --clear ./env
