@@ -10,16 +10,15 @@
 {% endif %}
 
 <form method="post" class="choose-tickets-form" id="choose_tickets">
-{{form.hidden_tag()}}
-<div class="pull-right">
-    <label class="sr-only">Currency:</label>
+    {{form.hidden_tag()}}
+<div class="well pull-right">
+    <label>Select your currency:</label>
     <div class="btn-group">
         {% for c in CURRENCIES %}
         <!-- IE8+ -->
         <button type="submit" class="btn btn-primary {% if user_currency == c.code -%} active {%- endif %}" name="set_currency" value="{{ c.code }}" data-toggle="button">{{ c.symbol }}</button>
         {% endfor %}
     </div>
-    <p></p>
 </div>
 
 <table class="table ticket-types">
