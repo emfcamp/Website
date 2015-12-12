@@ -83,7 +83,12 @@ def main(cfp_type='talk'):
     (form,) = [f for f in forms if f.type == cfp_type]
 
     if request.method == 'POST':
-        app.logger.info('Checking %s proposal for %s (%s)', cfp_type, form.name.data, form.email.data)
+        # If the user is already logged in set their name & email for the form
+        if current_user.is_authenticated():
+            form.name.data = current_user.name
+            form.email.data = current_user.email
+        app.logger.info('Checking %s proposal for %s (%s)', cfp_type,
+                        form.name.data, form.email.data)
 
     if form.validate_on_submit():
         if cfp_type == 'talk':
@@ -102,6 +107,7 @@ def main(cfp_type='talk'):
 
         cfp.name = form.name.data
         cfp.email = form.email.data
+
         cfp.title = form.title.data
         cfp.description = form.description.data
         cfp.need_finance = form.need_finance.data

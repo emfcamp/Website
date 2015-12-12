@@ -12,7 +12,7 @@
   scientists, and engineers. It's happening near
   <a href="http://wiki.emfcamp.org/wiki/Getting_Here">Guildford, Surrey</a> on
   August 5th<sup>th</sup>&mdash;7<sup>th</sup>, and tickets are <a href="/">on sale now</a> for
-  £{{ full_price }}. Our last festival in 2014 had 1,300 attendees; this year we'll have over
+  £{{ full_price }}. Our last festival in 2014 had 1,300 attendees; this year we're aiming for
   1,500.</p>
 
   <p>We're looking for people to talk, share, and demonstrate the things they
@@ -95,14 +95,17 @@
     <form action={{ url_for('cfp.main', cfp_type=form.type) }} method="post" class="form-horizontal cfp-form" role="form">
       <fieldset>
       {{ form.hidden_tag() }}
-      {{ render_field(form.name, True, glyphicon='globe', placeholder="Your name to include in the schedule") }}
 
-      {% if form.type == 'talk' %}
-        {{ render_field(form.email, True, placeholder="We'll only use this to contact you about the talk") }}
-      {% elif form.type == 'workshop' %}
-        {{ render_field(form.email, True, placeholder="We'll only use this to contact you about the workshop") }}
-      {% elif form.type == 'installation' %}
-        {{ render_field(form.email, True, placeholder="We'll only use this to contact you about the installation") }}
+      {% if not current_user.is_authenticated() %}
+        {{ render_field(form.name, True, glyphicon='globe', placeholder="Your name to include in the schedule") }}
+
+        {% if form.type == 'talk' %}
+          {{ render_field(form.email, True, placeholder="We'll only use this to contact you about the talk") }}
+        {% elif form.type == 'workshop' %}
+          {{ render_field(form.email, True, placeholder="We'll only use this to contact you about the workshop") }}
+        {% elif form.type == 'installation' %}
+          {{ render_field(form.email, True, placeholder="We'll only use this to contact you about the installation") }}
+        {% endif %}
       {% endif %}
 
       {{ render_field(form.title, True, glyphicon='globe', placeholder="A one-sentence summary (it should fit in a tweet)") }}
