@@ -1,6 +1,7 @@
 # coding=utf-8
 from __future__ import division, absolute_import, print_function, unicode_literals
 from datetime import datetime
+from main import cache
 from models.ticket import TicketType
 
 
@@ -16,6 +17,7 @@ def get_site_state(date):
         return "after-event"
 
 
+@cache.cached(timeout=60, key_prefix='get_sales_state')
 def get_sales_state(date):
     if TicketType.get_tickets_remaining() < 1:
         return "sold-out"

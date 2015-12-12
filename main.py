@@ -13,6 +13,7 @@ from flask_wtf import CsrfProtect
 import gocardless
 import stripe
 
+
 # If we have logging handlers set up here, don't touch them.
 # This is especially problematic during testing as we don't
 # want to overwrite nosetests' handlers
