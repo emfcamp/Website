@@ -163,6 +163,7 @@ footer #credits {
 #bottom-menu-container {
   font-family: "Raleway","Helvetica Neue",Helvetica,Arial,sans-serif;
   background: url('../images/footer.jpg') no-repeat left top;
+  background-size: auto 100%;
   padding: 10px 15px 0px 15px;
 }
 
@@ -374,6 +375,10 @@ div.micro img {
   font-size: 90%;
 }
 
+.ticket-types select.amount {
+  min-width: 3em;
+}
+
 .cfp-form fieldset {
   padding-top: 1em;
 }
@@ -391,7 +396,7 @@ div.micro img {
 }
 
 .cfp-tab {
-  padding-right: 15px;
+  padding: 0 15px 0 15px;
   background-color: #d3e0f1;
   color: #333;
 }
