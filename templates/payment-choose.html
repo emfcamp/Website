@@ -100,7 +100,7 @@ or drop us an <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email</a>.</div>
 {% block foot %}
 <script type="text/javascript">
     $('form.pay-method').on('keypress', function(e) {
-        e.preventDefault();
+        if (e.which == 13) e.preventDefault();
     });
 </script>
 {% endblock %}
