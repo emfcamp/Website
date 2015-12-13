@@ -3,7 +3,7 @@ from decorator import decorator
 from datetime import datetime
 
 from main import db, mail, external_url
-from flask import session, render_template, abort, current_app as app
+from flask import session, render_template, abort, current_app as app, request
 from flask.ext.login import login_user, current_user
 
 from models.ticket import Ticket, TicketType
@@ -49,6 +49,10 @@ def load_utility_functions(app_obj):
         now = datetime.utcnow()
         SALES_STATE = get_sales_state(now)
         SITE_STATE = get_site_state(now)
+
+        if app.config.get('DEBUG'):
+            SITE_STATE = request.args.get("site_state", SITE_STATE)
+
         return dict(
             SALES_STATE=SALES_STATE,
             SITE_STATE=SITE_STATE,
