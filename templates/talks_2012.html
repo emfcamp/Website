@@ -24,7 +24,7 @@
 <table class="table" width="80%">
 <th>Time</th><th>Stage Alpha</th><th>Stage Beta</th><th>Workshop</th>
 {% for row in friday %}
-<tr class="{{ loop.cycle('odd', 'event') }}">
+<tr class="{{ loop.cycle('odd', 'even') }}">
     <td><strong>{{ row.0 }}</strong></td><td width="33%">{{ row.1 }}</td><td width="33%">{{ row.2 }}</td><td width="33%">{{ row.3 }}</td>
 </tr>
 {% endfor %}
@@ -36,7 +36,7 @@
 <table class="table" width="80%">
 <th>Time</th><th>Stage Alpha</th><th>Stage Beta</th><th>Workshop</th>
 {% for row in saturday %}
-<tr class="{{ loop.cycle('odd', 'event') }}">
+<tr class="{{ loop.cycle('odd', 'even') }}">
     <td><strong>{{ row.0 }}</strong></td><td width="33%">{{ row.1 }}</td><td width="33%">{{ row.2 }}</td><td width="33%">{{ row.3 | safe() }}</td>
 </tr>
 {% endfor %}
@@ -48,7 +48,7 @@
 <table class="table" width="80%">
 <th>Time</th><th>Stage Alpha</th><th>Stage Beta</th><th>Workshop</th>
 {% for row in sunday %}
-<tr class="{{ loop.cycle('odd', 'event') }}">
+<tr class="{{ loop.cycle('odd', 'even') }}">
     <td><strong>{{ row.0 }}</strong></td><td width="33%">{{ row.1 }}</td><td width="33%">{{ row.2 }}</td><td width="33%">{{ row.3 | safe() }}</td>
 </tr>
 {% endfor %}
