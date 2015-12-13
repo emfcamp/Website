@@ -92,15 +92,15 @@ def main():
     tickets = current_user.tickets.join(Payment).filter(Payment.state != "cancelled",
                                                         Payment.state != "expired").all()
 
-    show_receipt = any([tt for tt in tickets if tt.paid is True])
-    if not tickets:
-        return redirect(url_for('tickets.choose'))
-
     payments = current_user.payments.filter(Payment.state != "cancelled", Payment.state != "expired").all()
+
+    if not tickets and not payments:
+        return redirect(url_for('tickets.choose'))
 
     transferred_to = current_user.transfers_to.all()
     transferred_from = current_user.transfers_from.all()
 
+    show_receipt = any([tt for tt in tickets if tt.paid is True])
 
     return render_template("tickets-main/main.html",
                            tickets=tickets,
