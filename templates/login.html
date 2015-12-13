@@ -5,11 +5,15 @@
 <div class="col-md-10">
     <h2>Log In</h2>
 
+<div class="well">
+    If you've already bought a ticket to EMF, or submitted a proposal, you can log into your account here.
+</div>
+
 <form method="post" class="form-horizontal">
     {{form.hidden_tag()}}
     <div class="panel panel-default">
     <div class="panel-body">
-        <p>Enter your email address here and we'll email you a login link:</p>
+        <p>Enter your email address and we'll email you a login link:</p>
         {{ render_field(form.email, horizontal=True) }}
         {# render_field(form.password, horizontal=True) #}
     </div>
