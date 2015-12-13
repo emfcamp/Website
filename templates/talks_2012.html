@@ -9,7 +9,7 @@
 <p><a href="http://wiki-archive.emfcamp.org/2012/wiki/Documentation">Documentation</a> of the whole event is gathered <a href="http://wiki-archive.emfcamp.org/2012/wiki/Documentation">here</a>, this includes videos, photos, sound and reviews.</p>
 
 <h3>Ongoing workshops</h3>
-<p>There were several workshops that ran throughout the event on every day, please talk to the info tent if you are interested in taking part in these.</p>
+<p>There were several workshops that ran throughout the event on every day:</p>
 <ul>
 <li>Blacksmithing lessons, located in the smithing marquee near the bar</li>
 <li>Welding lessons, located near the workshop tent</li>
@@ -17,14 +17,14 @@
 
 <h3>Talk and Workshop schedule</h3>
 
-<p>The talk and workshop schedule changed throughout the event this was the last (reasonably) accurate version of the schedule.</p>
+<p>The talk and workshop schedule changed throughout the event. This was the last (reasonably) accurate version of the schedule.</p>
 
 
 <h4>Friday 31st August 2012</h4>
-<table class="table table-bordered" width="80%">
+<table class="table" width="80%">
 <th>Time</th><th>Stage Alpha</th><th>Stage Beta</th><th>Workshop</th>
 {% for row in friday %}
-<tr>
+<tr class="{{ loop.cycle('odd', 'event') }}">
     <td><strong>{{ row.0 }}</strong></td><td width="33%">{{ row.1 }}</td><td width="33%">{{ row.2 }}</td><td width="33%">{{ row.3 }}</td>
 </tr>
 {% endfor %}
@@ -33,10 +33,10 @@
 <br>
 
 <h4>Saturday 1st September 2012</h4>
-<table class="table table-bordered" width="80%">
+<table class="table" width="80%">
 <th>Time</th><th>Stage Alpha</th><th>Stage Beta</th><th>Workshop</th>
 {% for row in saturday %}
-<tr>
+<tr class="{{ loop.cycle('odd', 'event') }}">
     <td><strong>{{ row.0 }}</strong></td><td width="33%">{{ row.1 }}</td><td width="33%">{{ row.2 }}</td><td width="33%">{{ row.3 | safe() }}</td>
 </tr>
 {% endfor %}
@@ -45,10 +45,10 @@
 <br>
 
 <h4>Sunday 2nd September 2012</h4>
-<table class="table table-bordered" width="80%">
+<table class="table" width="80%">
 <th>Time</th><th>Stage Alpha</th><th>Stage Beta</th><th>Workshop</th>
 {% for row in sunday %}
-<tr>
+<tr class="{{ loop.cycle('odd', 'event') }}">
     <td><strong>{{ row.0 }}</strong></td><td width="33%">{{ row.1 }}</td><td width="33%">{{ row.2 }}</td><td width="33%">{{ row.3 | safe() }}</td>
 </tr>
 {% endfor %}
