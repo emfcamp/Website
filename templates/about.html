@@ -58,6 +58,10 @@ is organised by a dedicated team of volunteers, and everyone who turns up does t
 make the event an amazing place to be for a weekend.
 We're a non-profit organisation, so every penny you spend on your ticket goes towards making the event happen.</p>
 
+<div class="row">
+    <img class="img-responsive md-col-12" src="{{ url_for('static', filename='images/about/about_5.jpg')}}">
+</div>
+
 <p>Expect to run into
 <a href="http://jarkman.co.uk/catalog/random/emfsporks.htm">spork-making workshops</a>,
 <a href="https://www.youtube.com/watch?v=g6_wwhCvkdU">bottle rocket launches</a>,
@@ -65,9 +69,15 @@ high altitude balloon releases,
 <a href="http://msraynsford.blogspot.co.uk/2012/09/distance-range-finder.html">ad-hoc music installations</a>
 and so much more.</p>
 
-<p>Here's what <a href="http://www.bbc.co.uk/news/technology-19441861">BBC News had to say</a> when they visited EMF in 2012.</p>
+<p>Here's what <a href="http://www.bbc.co.uk/news/technology-19441861">BBC News had to say</a> when they visited EMF.</p>
 
 <p>We hope we've given you a taste of what EMF is all about, but you have to be there
-to experience it all. The next Electromagnetic Field will be in summer 2016.</p>
+to experience it all.</p>
+
+{% if SITE_STATE == 'sales' and SALES_STATE == 'available' %}
+<div class="well">
+    Tickets are now on sale for EMF 2016 - <a href="{{url_for('tickets.choose')}}">get yours now</a>!
+</div>
+{% endif %}
 </div>
 {% endblock %}
