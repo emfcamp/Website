@@ -15,7 +15,7 @@
     If this isn't right, or the currency is wrong, <a href="{{url_for('tickets.choose')}}">choose your tickets again</a>.
 </div>
 
-<form method="post">
+<form method="post" class="pay-method">
 {{ form.hidden_tag() }}
 
 {% if is_anonymous %}
@@ -56,7 +56,7 @@
             Guarantee</a>.</p>
     </div>
     <div class="panel-footer panel-footer-center">
-        <button type="submit" name="{{form.gocardless.name}}" value="{{form.gocardless.label.text}}" class="btn btn-lg btn-success debounce">{{form.gocardless.label.text}}</button>
+        <input type="submit" name="{{form.gocardless.name}}" value="{{form.gocardless.label.text}}" class="btn btn-lg btn-success debounce"/>
     </div>
 </div>
 {% endif %}
@@ -69,7 +69,7 @@
         <p>Ask your bank to send the money to us directly. You can do this online, or with cash in a branch.</p>
     </div>
     <div class="panel-footer panel-footer-center">
-        <button type="submit" name="{{form.banktransfer.name}}" value="{{form.banktransfer.label.text}}" class="btn btn-lg btn-success debounce">{{form.banktransfer.label.text}}</button>
+        <input type="submit" name="{{form.banktransfer.name}}" value="{{form.banktransfer.label.text}}" class="btn btn-lg btn-success debounce"/>
     </div>
 </div>
 {% endif %}
@@ -85,7 +85,7 @@
         <strong>{{ StripePayment.premium(user_currency, total) | price(user_currency) }}</strong>.</p>
     </div>
     <div class="panel-footer panel-footer-center">
-        <button type="submit" name="{{form.stripe.name}}" value="{{form.stripe.label.text}}" class="btn btn-lg btn-success debounce">{{form.stripe.label.text}}</button>
+        <input type="submit" name="{{form.stripe.name}}" value="{{form.stripe.label.text}}" class="btn btn-lg btn-success debounce"/>
     </div>
 </div>
 </div>
@@ -95,4 +95,12 @@
 <div class="well">If you're unsure about anything, please check out our <a href="http://wiki.emfcamp.org/wiki/FAQ#Ticket_Sales">FAQ</a>
 or drop us an <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email</a>.</div>
 
+{% endblock %}
+
+{% block foot %}
+<script type="text/javascript">
+    $('.pay-method input[type=submit]').prop('type', 'button').on('click', function() {
+        $(this).closest('form').submit();
+    });
+</script>
 {% endblock %}
