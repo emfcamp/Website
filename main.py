@@ -57,7 +57,7 @@ def create_app():
     db.init_app(app)
     mail.init_app(app)
     assets.init_app(app)
-    toolbar.init_app(app)  # Only enabled on DEBUG=True
+    toolbar.init_app(app)
     login_manager.setup_app(app, add_context_processor=True)
     app.login_manager.login_view = 'users.login'
 
