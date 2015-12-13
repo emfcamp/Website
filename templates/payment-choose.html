@@ -100,7 +100,7 @@ or drop us an <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email</a>.</div>
 {% block foot %}
 <script type="text/javascript">
     $('.pay-method input[type=submit]').prop('type', 'button').on('click', function() {
-        $(this).closest('form').submit();
+        $(this).prop('type', 'submit').closest('form').submit();
     });
 </script>
 {% endblock %}
