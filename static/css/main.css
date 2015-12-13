@@ -163,7 +163,7 @@ footer #credits {
 #bottom-menu-container {
   font-family: "Raleway","Helvetica Neue",Helvetica,Arial,sans-serif;
   background: url('../images/footer.jpg') no-repeat left top;
-  background-size: auto 100%;
+  background-size: cover;
   padding: 10px 15px 0px 15px;
 }
 
