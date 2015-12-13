@@ -2,7 +2,7 @@ from flask import (
     render_template, redirect, request, flash,
     url_for, abort, current_app as app, Blueprint
 )
-from flask.ext.login import current_user, login_required
+from flask.ext.login import current_user
 from flask_mail import Message
 from wtforms.validators import Required, Email, ValidationError
 from wtforms import (
