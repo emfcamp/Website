@@ -161,6 +161,12 @@ def complete():
 
 @cfp.route('/cfp/proposals')
 @feature_flag('CFP')
-@login_required
 def proposals():
-    return render_template('cfp_proposals.html')
+    if current_user.is_anonymous():
+        return redirect(url_for('.main'))
+
+    proposals = current_user.proposals.all()
+    if not proposals:
+        return redirect(url_for('.main'))
+
+    return render_template('cfp_proposals.html', proposals=proposals)

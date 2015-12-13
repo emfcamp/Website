@@ -59,9 +59,9 @@ def login():
     form = LoginForm(request.form, next=request.args.get('next'))
     if request.method == 'POST' and form.validate():
         code = form._user.login_code(app.config['SECRET_KEY'])
-        send_template_email('Electromagnetic Field: Login details', user.email,
+        send_template_email('Electromagnetic Field: Login details', form._user.email,
                             app.config['TICKETS_EMAIL'], 'emails/login-code.txt',
-                            user=user, code=code, next_url=request.args.get('next'))
+                            user=form._user, code=code, next_url=request.args.get('next'))
         flash("We've sent you an email with your login link")
 
     if request.args.get('email'):
