@@ -75,6 +75,10 @@
   you'll be able to change them later.
   </div>
 
+  <label class="visible-xs">
+  Select the category that most closely describes your proposal
+  </label>
+
   <ul class="nav nav-tabs cfp-types" role="navigation" id="cfp-errors">
     {% for form in forms %}
       <li {% if form.type == active_cfp_type -%} class="active" {%- endif %}>
