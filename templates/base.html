@@ -57,7 +57,7 @@
 
                       {% if config.get('TICKET_SALES') %}
                       {% if current_user.is_authenticated() %}
-                        <li><a href="{{ url_for('tickets.main') }}">My tickets</a></li>
+                        <li><a href="{{ url_for('users.account') }}">My account</a></li>
                         <li><a href="{{ url_for('users.logout') }}">Log out</a></li>
                       {% else %}
                         <li><a href="{{ url_for('users.login') }}">Log in</a></li>

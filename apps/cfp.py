@@ -1,22 +1,22 @@
 from flask import (
-    render_template, redirect, request,
+    render_template, redirect, request, flash,
     url_for, abort, current_app as app, Blueprint
 )
-from flask.ext.login import current_user
+from flask.ext.login import current_user, login_required
 from flask_mail import Message
-from wtforms.validators import Required, Email
+from wtforms.validators import Required, Email, ValidationError
 from wtforms import (
     BooleanField, StringField,
     FormField, TextAreaField, SelectField,
 )
 
+from sqlalchemy.exc import IntegrityError
+
 from main import db, mail
+from models.user import User, UserDiversity
 from models.ticket import TicketType
-from models.cfp import (
-    TalkProposal, WorkshopProposal,
-    InstallationProposal, ProposalDiversity,
-)
-from .common import feature_flag
+from models.cfp import TalkProposal, WorkshopProposal, InstallationProposal
+from .common import feature_flag, create_current_user
 from .common.forms import Form
 
 cfp = Blueprint('cfp', __name__)
@@ -33,14 +33,14 @@ class ProposalForm(Form):
     email = StringField("Email", [Email(), Required()])
     title = StringField("Title", [Required()])
     description = TextAreaField("Description", [Required()])
-    # days = SelectMultipleField("I can only attend on some days",
-    #                            choices=[('fri', 'Friday'),
-    #                                     ('sat', 'Saturday'),
-    #                                     ('sun', 'Sunday'),
-    #                                     ])
     need_finance = BooleanField("I can't afford to buy a ticket without financial support")
 
     diversity = FormField(DiversityForm)
+
+    def validate_email(form, field):
+        if current_user.is_anonymous() and User.does_user_exist(field.data):
+            field.was_duplicate = True
+            raise ValidationError('Account already exists')
 
 
 class TalkProposalForm(ProposalForm):
@@ -82,10 +82,26 @@ def main(cfp_type='talk'):
     forms = [TalkProposalForm(), WorkshopProposalForm(), InstallationProposalForm()]
     (form,) = [f for f in forms if f.type == cfp_type]
 
+    # If the user is already logged in set their name & email for the form
+    if current_user.is_authenticated():
+        form.name.data = current_user.name
+        form.email.data = current_user.email
+
     if request.method == 'POST':
-        app.logger.info('Checking %s proposal for %s (%s)', cfp_type, form.name.data, form.email.data)
+        app.logger.info('Checking %s proposal for %s (%s)', cfp_type,
+                        form.name.data, form.email.data)
 
     if form.validate_on_submit():
+        new_user = False
+        if current_user.is_anonymous():
+            try:
+                create_current_user(form.email.data, form.name.data)
+                new_user = True
+            except IntegrityError as e:
+                app.logger.warn('Adding user raised %r, possible double-click', e)
+                flash('An error occurred while creating an account for you. Please try again.')
+                return redirect(url_for('.main'))
+
         if cfp_type == 'talk':
             cfp = TalkProposal()
             cfp.length = form.length.data
@@ -100,33 +116,35 @@ def main(cfp_type='talk'):
             cfp = InstallationProposal()
             cfp.size = form.size.data
 
-        cfp.name = form.name.data
-        cfp.email = form.email.data
+        cfp.user_id = current_user.id
+
         cfp.title = form.title.data
         cfp.description = form.description.data
         cfp.need_finance = form.need_finance.data
 
-        cfp.diversity = ProposalDiversity()
-        cfp.diversity.age = form.diversity.age.data
-        cfp.diversity.gender = form.diversity.gender.data
-        cfp.diversity.ethnicity = form.diversity.ethnicity.data
-
         db.session.add(cfp)
         db.session.commit()
+
+        if not current_user.diversity and any(form.diversity.data.values()):
+            diversity = UserDiversity()
+            diversity.age = form.diversity.age.data
+            diversity.gender = form.diversity.gender.data
+            diversity.user_id = current_user.id
+            diversity.ethnicity = form.diversity.ethnicity.data
+
+            db.session.add(diversity)
+            db.session.commit()
 
         # Send confirmation message
         msg = Message('Electromagnetic Field CFP Submission',
                       sender=app.config['CONTENT_EMAIL'],
-                      recipients=[cfp.email])
+                      recipients=[current_user.email])
 
-        msg.body = render_template('emails/cfp-submission.txt', cfp=cfp, type=cfp_type)
+        msg.body = render_template('emails/cfp-submission.txt',
+                                   cfp=cfp, type=cfp_type, new_user=new_user)
         mail.send(msg)
 
         return redirect(url_for('.complete'))
-
-    if current_user.is_authenticated():
-        form.name.data = current_user.name
-        form.email.data = current_user.email
 
     full_price = TicketType.get_price_cheapest_full()
 
@@ -139,3 +157,10 @@ def main(cfp_type='talk'):
 @feature_flag('CFP')
 def complete():
     return render_template('cfp_complete.html')
+
+
+@cfp.route('/cfp/proposals')
+@feature_flag('CFP')
+@login_required
+def proposals():
+    return render_template('cfp_proposals.html')

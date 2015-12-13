@@ -1,4 +1,4 @@
-Hi {{ cfp.name }},
+Hi {{ cfp.user.name }},
 
 This is to confirm your submission to our call for participation. We'll try to process your submission as quickly as possible. So you know this was your submission:
 
@@ -20,6 +20,10 @@ You also indicated that you would only be able to attend for one day and you wil
 You also indicated that you would only be able to attend for one day.
 {% elif cfp.need_finance %}
 You also indicated that you will need financial support to attend.
+{%- endif %}
+
+{%- if new_user %}
+As you've not previously registered with us we've created an account for you that is tied to this email address.
 {%- endif %}
 
 Any problems please contact us.
