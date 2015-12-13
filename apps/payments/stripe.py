@@ -57,9 +57,10 @@ def charge_stripe(payment):
             statement_description='Tickets 2016',  # max 15 chars, appended to company name
         )
     except stripe.CardError as e:
+        error = e.json_body['error']
         logger.warn('Card payment failed with exception "%s"', e)
         # Don't save the charge_id - they can try again
-        flash('An error occurred with your payment, please try again')
+        flash('Unfortunately your card payment failed with the error: %s' % (error['message']))
         return redirect(url_for('.stripe_tryagain', payment_id=payment.id))
     except Exception as e:
         logger.warn("Exception %r confirming payment", e)
@@ -138,6 +139,7 @@ def stripe_capture(payment_id):
 
 class StripeChargeAgainForm(Form):
     tryagain = SubmitField('Try again')
+    cancel = SubmitField('Cancel')
 
 
 @payments.route("/pay/stripe/<int:payment_id>/tryagain", methods=['GET', 'POST'])
@@ -158,8 +160,14 @@ def stripe_tryagain(payment_id):
 
     form = StripeChargeAgainForm()
     if form.validate_on_submit():
-        logger.info("Trying to charge payment %s again", payment.id)
-        return charge_stripe(payment)
+        if form.tryagain.data:
+            logger.info("Trying to charge payment %s again", payment.id)
+            return charge_stripe(payment)
+        elif form.cancel.data:
+            payment.cancel()
+            db.session.commit()
+            flash("Your payment has been cancelled. Please place your order again.")
+            return redirect(url_for('tickets.choose'))
 
     return render_template('stripe-tryagain.html', payment=payment, form=form)
 

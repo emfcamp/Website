@@ -3,19 +3,23 @@
 
 <div class="col-md-10">
 
-<h2>Retry your Stripe payment</h2>
+<h2>Retry your card payment</h2>
 
-<p>Your payment has been authorised, but we have no record of charging your card.</p>
+<div class="alert alert-danger">
+    <p>We have your card details, but we were unable to charge your card.
+    You have not paid us any money.</p>
+    <p>You can try your payment again, or cancel and purchase with another card.</p>
+</div>
 
 <form method="post" action="{{ url_for('payments.stripe_tryagain', payment_id=payment.id) }}">
 {{ form.hidden_tag() }}
 {{ form.tryagain(class_="btn btn-warning debounce") }}
-<a class="btn btn-info" href="{{ url_for('tickets.main') }}">Go back to my tickets</a>
+{{ form.cancel(class_="btn debounce") }}
 </form>
 
 <h3></h3>
-<p>If you have paid and want to get a refund please
-<a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email us</a> with your payment reference.</p>
+<p>If you have any queries about your order, please
+<a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email us</a>.</p>
 
 </div>
 {% endblock %}
