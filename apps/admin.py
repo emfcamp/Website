@@ -77,8 +77,10 @@ def stats():
     full_banktransfer_unpaid = full_unpaid.filter(Payment.provider == 'banktransfer',
                                                   Payment.state == 'inprogress')
 
-    parking_bought = Ticket.query.filter_by(paid=True).filter(TicketType.admits.is_('parking'))
-    campervan_bought = Ticket.query.filter_by(paid=True).filter(TicketType.admits.is_('campervan'))
+    parking_bought = Ticket.query.filter_by(paid=True).join(TicketType).filter(
+        TicketType.admits == 'parking')
+    campervan_bought = Ticket.query.filter_by(paid=True).join(TicketType).filter(
+        TicketType.admits == 'campervan')
 
     checked_in = Ticket.query.filter(TicketType.admits.in_(['full', 'kid'])) \
                              .join(TicketCheckin).filter_by(checked_in=True)
