@@ -304,6 +304,15 @@ tr.odd {
     background-color: #aec6ea;
 }
 
+.btns-table > tbody > tr > td {
+    vertical-align: inherit;
+    padding: 11px 8px;
+}
+
+.btns-table > tbody > tr > td .btn {
+    margin: -7px 0px -6px;
+}
+
 
 .errors {
   color: #933;
