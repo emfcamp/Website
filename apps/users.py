@@ -35,6 +35,12 @@ class LoginForm(Form):
     #  password = PasswordField('Password', [Required()])
     next = NextURLField('Next')
 
+    def validate_email(form, field):
+        user = User.query.filter_by(email=form.email.data).first()
+        if not user:
+            raise ValidationError('Email address not found')
+        form._user = user
+
 
 @users.route("/login", methods=['GET', 'POST'])
 @feature_flag('TICKET_SALES')
@@ -52,15 +58,11 @@ def login():
 
     form = LoginForm(request.form, next=request.args.get('next'))
     if request.method == 'POST' and form.validate():
-        user = User.query.filter_by(email=form.email.data).one()
-        if user:
-            code = user.login_code(app.config['SECRET_KEY'])
-            send_template_email('Electromagnetic Field: Login details', user.email,
-                                app.config['TICKETS_EMAIL'], 'emails/login-code.txt',
-                                user=user, code=code, next_url=request.args.get('next'))
-            flash("We've sent you an email with your login link")
-        else:
-            flash("Invalid login details!")
+        code = form._user.login_code(app.config['SECRET_KEY'])
+        send_template_email('Electromagnetic Field: Login details', user.email,
+                            app.config['TICKETS_EMAIL'], 'emails/login-code.txt',
+                            user=user, code=code, next_url=request.args.get('next'))
+        flash("We've sent you an email with your login link")
 
     if request.args.get('email'):
         form.email.data = request.args.get('email')
