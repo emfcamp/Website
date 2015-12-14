@@ -7,7 +7,7 @@ To allow this to happen we've created an account for you.
 
 You can log in and view your tickets here:
 
-{{ external_url('tickets.main') }}
+{{ external_url('users.login', code=code) }}
 
 See you soon at Electromagnetic Field 2016!
 

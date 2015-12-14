@@ -4,7 +4,7 @@ We've just received confirmation from Stripe that your payment for
 {{ payment.amount | price(payment.currency) }} has cleared.
 
 {% if config.get('ISSUE_TICKETS') %}
-{% include 'receipt-blurb.txt' %}
+{% include 'emails/receipt-blurb.txt' %}
 {% endif %}
 
 See you soon at Electromagnetic Field 2016!

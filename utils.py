@@ -323,7 +323,7 @@ class SendTickets(Command):
                           sender=app.config['TICKETS_EMAIL'],
                           recipients=[user.email])
 
-            msg.body = render_template("receipt.txt", user=user)
+            msg.body = render_template("emails/receipt.txt", user=user)
             msg.attach('Receipt.pdf', 'application/pdf', pdf.read())
 
             app.logger.info('Emailing %s receipt for %s tickets', user.email, tickets.count())
