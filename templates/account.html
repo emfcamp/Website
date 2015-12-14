@@ -7,7 +7,9 @@
 <nav>
   <ul class="nav nav-pills">
     <li><a href="{{ url_for('tickets.main') }}">Your tickets</a></li>
-    <li><a href="{{ url_for('cfp.proposals') }}">Your proposals</a></li>
+    {% if config.get('CFP') %}
+      <li><a href="{{ url_for('cfp.proposals') }}">Your proposals</a></li>
+    {% endif %}
   </ul>
 </nav>
 <p>&nbsp;</p>
