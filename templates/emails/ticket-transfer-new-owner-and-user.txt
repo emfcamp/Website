@@ -9,6 +9,9 @@ You can log in and view your tickets here:
 
 {{ external_url('users.login', code=code) }}
 
+This login link is only valid for 6-hours if it has expired that's not a
+problem! Simply fill in the form on that page to request another.
+
 See you soon at Electromagnetic Field 2016!
 
 Love,
