@@ -5,7 +5,7 @@ and some more details about the event. The gates will open at 9am on
 Friday August 5th, and (unless you're helping out with teardown) you
 should aim to leave by midday on Monday August 8th.
 
-{% include 'receipt-blurb.txt' %}
+{% include 'emails/receipt-blurb.txt' %}
 
 Cheers and see you soon!
 
