@@ -3,14 +3,10 @@ Hi {{ to_user.name }},
 Your friend ({{ from_user.name }}) has transferred a ticket to you for
 Electromagnetic Field 2016.
 
-To allow this to happen we've created an account for you. To manage your ticket
-you'll need to set a password via the password reset page:
+To allow this to happen we've created an account for you. You can login and view
+your tickets via this link:
 
-{{ external_url('users.forgot_password') }}
-
-You can view (and print) your tickets here:
-
-{{ external_url('tickets.main') }}
+{{ external_url('users.login', code=code) }}
 
 See you soon at Electromagnetic Field 2016!
 

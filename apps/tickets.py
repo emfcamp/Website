@@ -305,9 +305,12 @@ def transfer(ticket_id):
             to_user.generate_random_password()
             db.session.add(to_user)
             db.session.commit()
+
+            code = to_user.login_code(app.config['SECRET_KEY'])
             email_template = 'ticket-transfer-new-owner-and-user.txt'
         else:
             to_user = User.query.filter_by(email=email).one()
+            code = None
             email_template = 'ticket-transfer-new-owner.txt'
 
         ticket.transfer(from_user=current_user, to_user=to_user)
@@ -319,7 +322,7 @@ def transfer(ticket_id):
         send_template_email("You've been sent a ticket to EMF 2016!",
                             to_user.email, current_user.email,
                             'emails/' + email_template,
-                            to_user=to_user, from_user=current_user)
+                            to_user=to_user, from_user=current_user, code=code)
 
         send_template_email("You sent someone an EMF 2016 ticket",
                             to_user.email, current_user.email,
