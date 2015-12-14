@@ -163,7 +163,7 @@ def choose():
 
             if (not first_full) and (tt.admits == 'full') and (limits[tt.id] > 0):
                 first_full = True
-                #form.types[0].amount.data = 1
+                # form.types[0].amount.data = 1
 
     tts = dict((tt.id, tt) for tt in tts)
     for f in form.types:
