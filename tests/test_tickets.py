@@ -13,7 +13,6 @@ class TicketTestCase(unittest.TestCase):
         self.client, self.app, self.db = get_app()
         with self.app.app_context():
             self.user = User('test@example.com', 'NULL')
-            self.user.generate_random_password()
             self.db.session.add(self.user)
             self.db.session.commit()
 

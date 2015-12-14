@@ -13,11 +13,9 @@
     {% if form.email.was_duplicate %}
     <div class="alert alert-warning">
       If you have used this email address to buy a ticket, we have already created an account for you.
-      Please <a class="alert-link" href="{{ url_for('users.forgot_password') }}">click here</a> to change your password.
+      Please <a class="alert-link" href="{{ url_for('users.login') }}">click here</a> to log in.
     </div>
     {% endif %}
-    {{ render_field(form.password, True) }}
-    {{ render_field(form.confirm, True) }}
   <div class="form-actions col-sm-offset-3 col-sm-9">
       <button type="submit" name="Create" class="btn btn-primary debounce">Register Now</button>
   </div>

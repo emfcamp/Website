@@ -5,15 +5,14 @@ from flask import (
 from flask.ext.login import (
     login_user, login_required, logout_user, current_user,
 )
-from flask_mail import Message
-from wtforms.validators import Required, Email, EqualTo, ValidationError
-from wtforms import StringField, PasswordField, HiddenField, SubmitField
+from wtforms.validators import Required, Email, ValidationError
+from wtforms import StringField, HiddenField, SubmitField
 from sqlalchemy.exc import IntegrityError
 
-from main import db, mail
+from main import db
 from common import set_user_currency, feature_flag, create_current_user, send_template_email
 from .common.forms import Form
-from models.user import User, PasswordReset, UserDiversity
+from models.user import User, UserDiversity
 import re
 
 users = Blueprint('users', __name__)
@@ -32,7 +31,6 @@ class NextURLField(HiddenField):
 
 class LoginForm(Form):
     email = StringField('Email', [Email(), Required()])
-    #  password = PasswordField('Password', [Required()])
     next = NextURLField('Next')
 
     def validate_email(form, field):
@@ -73,8 +71,6 @@ def login():
 class SignupForm(Form):
     name = StringField('Full name', [Required()])
     email = StringField('Email', [Email(), Required()])
-    password = PasswordField('Password', [Required(), EqualTo('confirm', message='Passwords do not match')])
-    confirm = PasswordField('Confirm password', [Required()])
 
     next = NextURLField('Next')
 
@@ -94,7 +90,7 @@ def signup():
 
     if request.method == 'POST' and form.validate():
         try:
-            create_current_user(form.email.data, form.name.data, form.password.data)
+            create_current_user(form.email.data, form.name.data)
         except IntegrityError as e:
             app.logger.warn('Adding user raised %r, possible double-click', e)
             flash('An error occurred adding your account. Please try again.')
@@ -103,67 +99,6 @@ def signup():
         return redirect(form.next.data or url_for('tickets.main'))
 
     return render_template("signup.html", form=form, existing_email=request.args.get('existing_email'))
-
-
-class ForgotPasswordForm(Form):
-    email = StringField('Email', [Email(), Required()])
-
-    def validate_email(form, field):
-        user = User.query.filter_by(email=form.email.data).first()
-        if not user:
-            raise ValidationError('Email address not found')
-        form._user = user
-
-
-@users.route("/forgot-password", methods=['GET', 'POST'])
-@feature_flag('TICKETS_SITE')
-@feature_flag('TICKET_SALES')
-def forgot_password():
-    form = ForgotPasswordForm(request.form, email=request.args.get('email'))
-    if request.method == 'POST' and form.validate():
-        if form._user:
-            reset = PasswordReset(form.email.data)
-            reset.new_token()
-            db.session.add(reset)
-            db.session.commit()
-            msg = Message("EMF password reset",
-                          sender=app.config['TICKETS_EMAIL'],
-                          recipients=[form.email.data])
-            msg.body = render_template("emails/reset-password-email.txt", user=form._user, reset=reset)
-            mail.send(msg)
-
-        return redirect(url_for('users.reset_password', email=form.email.data))
-    return render_template("forgot-password.html", form=form)
-
-
-class ResetPasswordForm(Form):
-    email = StringField('Email', [Email(), Required()])
-    token = StringField('Token', [Required()])
-    password = PasswordField('New password', [Required(),
-                                              EqualTo('confirm', message='Passwords do not match')])
-    confirm = PasswordField('Confirm password', [Required()])
-
-    def validate_token(form, field):
-        reset = PasswordReset.query.filter_by(email=form.email.data, token=field.data).first()
-        if not reset:
-            raise ValidationError('Token not found')
-        if reset.expired():
-            raise ValidationError('Token has expired')
-        form._reset = reset
-
-
-@users.route("/reset-password", methods=['GET', 'POST'])
-@feature_flag('TICKETS_SITE')
-@feature_flag('TICKET_SALES')
-def reset_password():
-    form = ResetPasswordForm(request.form, email=request.args.get('email'), token=request.args.get('token'))
-    if request.method == 'POST' and form.validate():
-        user = User.query.filter_by(email=form.email.data).first()
-        db.session.delete(form._reset)
-        user.set_password(form.password.data)
-        db.session.commit()
-        return redirect(url_for('users.login'))
-    return render_template("reset-password.html", form=form)
 
 
 @users.route("/logout")

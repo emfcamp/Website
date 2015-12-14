@@ -72,12 +72,8 @@ def send_template_email(subject, to, sender, template, **kwargs):
     mail.send(msg)
 
 
-def create_current_user(email, name, password=None):
+def create_current_user(email, name):
     user = User(email, name)
-    if password:
-        user.set_password(password)
-    else:
-        user.generate_random_password()
 
     db.session.add(user)
     db.session.commit()

@@ -302,7 +302,6 @@ def transfer(ticket_id):
         if not User.does_user_exist(email):
             # Create a new user to transfer the ticket to
             to_user = User(email, form.name.data)
-            to_user.generate_random_password()
             db.session.add(to_user)
             db.session.commit()
             email_template = 'ticket-transfer-new-owner-and-user.txt'

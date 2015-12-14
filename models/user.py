@@ -3,13 +3,10 @@ from models import exists
 
 from flask.ext.login import UserMixin
 
-import bcrypt
-import os
 import base64
 import hmac
 import hashlib
 from datetime import datetime, timedelta
-from random import choice
 import time
 
 
@@ -39,7 +36,6 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, unique=True, index=True)
     name = db.Column(db.String, nullable=False, index=True)
-    password = db.Column(db.String, nullable=False)
     admin = db.Column(db.Boolean, default=False, nullable=False)
     arrivals = db.Column(db.Boolean, default=False, nullable=False)
     phone = db.Column(db.String, nullable=True)
@@ -61,18 +57,6 @@ class User(db.Model, UserMixin):
 
     def login_code(self, key):
         return generate_login_code(key, int(time.time()), self.id)
-
-    def set_password(self, password):
-        self.password = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
-
-    def check_password(self, password):
-        return bcrypt.hashpw(password.encode('utf8'), self.password) == self.password
-
-    def generate_random_password(self):
-        chars = "ABCDEFGHKLMNPRSTUVWXYZ23456789"
-        password = ''.join(choice(chars) for _ in range(10))
-        self.set_password(password)
-        return password
 
     def __repr__(self):
         return '<User %s>' % self.email
@@ -98,19 +82,3 @@ class UserDiversity(db.Model):
     ethnicity = db.Column(db.String)
 
 
-class PasswordReset(db.Model):
-    __tablename__ = 'password_reset'
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String, nullable=False)
-    expires = db.Column(db.DateTime, nullable=False)
-    token = db.Column(db.String, nullable=False)
-
-    def __init__(self, email):
-        self.email = email
-        self.expires = datetime.utcnow() + timedelta(days=1)
-
-    def new_token(self):
-        self.token = base64.urlsafe_b64encode(os.urandom(5 * 3))
-
-    def expired(self):
-        return self.expires < datetime.utcnow()
