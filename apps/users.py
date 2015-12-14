@@ -144,6 +144,9 @@ def account():
 
         db.session.commit()
 
+        flash("Your details have been saved.")
+        return redirect(url_for('.account'))
+
     # This is a required field so should always be set
     form.name.data = current_user.name
 
