@@ -1,11 +1,16 @@
 Hi {{ to_user.name }},
 
-Your friend ({{ from_user.name }}) has transferred a ticket to you for
+Your friend {{ from_user.name }} has transferred a ticket to you for
 Electromagnetic Field 2016.
 
-You can view (and print) your tickets here:
+{% if new_user %}
+To allow this to happen we've created an account for you. We'll email
+you important information nearer the event.
 
-{{ external_url('tickets.main') }}
+{% endif %}
+You can log in and view your ticket here:
+
+{{ external_url('users.login', code=code) }}
 
 See you soon at Electromagnetic Field 2016!
 

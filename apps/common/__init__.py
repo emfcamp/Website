@@ -66,6 +66,7 @@ def load_utility_functions(app_obj):
         currency = get_user_currency()
         return {'user_currency': currency}
 
+
 def send_template_email(subject, to, sender, template, **kwargs):
     msg = Message(subject, recipients=[to], sender=sender)
     msg.body = render_template(template, **kwargs)

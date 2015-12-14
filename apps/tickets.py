@@ -276,11 +276,14 @@ def pay():
 
 
 class TicketTransferForm(Form):
-    email = EmailField('Email', [Required()])
     name = StringField('Name', [Required()])
+    email = EmailField('Email', [Required()])
 
     transfer = SubmitField('Transfer Ticket')
 
+    def validate_email(form, field):
+        if current_user.email == field.data:
+            raise ValidationError('You cannot transfer a ticket to yourself')
 
 @tickets.route('/tickets/<ticket_id>/transfer', methods=['GET', 'POST'])
 @login_required
@@ -300,17 +303,16 @@ def transfer(ticket_id):
         email = form.email.data
 
         if not User.does_user_exist(email):
+            new_user = True
+
             # Create a new user to transfer the ticket to
             to_user = User(email, form.name.data)
             db.session.add(to_user)
             db.session.commit()
 
-            code = to_user.login_code(app.config['SECRET_KEY'])
-            email_template = 'ticket-transfer-new-owner-and-user.txt'
         else:
+            new_user = False
             to_user = User.query.filter_by(email=email).one()
-            code = None
-            email_template = 'ticket-transfer-new-owner.txt'
 
         ticket.transfer(from_user=current_user, to_user=to_user)
 
@@ -318,16 +320,21 @@ def transfer(ticket_id):
                         current_user, to_user)
 
         # Alert the users via email
+        code = to_user.login_code(app.config['SECRET_KEY'])
         send_template_email("You've been sent a ticket to EMF 2016!",
-                            to_user.email, current_user.email,
-                            'emails/' + email_template,
-                            to_user=to_user, from_user=current_user, code=code)
+                            to=to_user.email,
+                            sender=app.config['TICKETS_EMAIL'],
+                            template='emails/ticket-transfer-new-owner.txt',
+                            to_user=to_user, from_user=current_user,
+                            new_user=new_user, code=code)
 
         send_template_email("You sent someone an EMF 2016 ticket",
-                            to_user.email, current_user.email,
-                            'emails/ticket-transfer-original-owner.txt',
+                            to=current_user.email,
+                            sender=app.config['TICKETS_EMAIL'],
+                            template='emails/ticket-transfer-original-owner.txt',
                             to_user=to_user, from_user=current_user)
 
+        flash("Your ticket was transferred.")
         return redirect(url_for('tickets.main'))
 
     return render_template('ticket-transfer.html', ticket=ticket, form=form)
