@@ -143,7 +143,11 @@ class TicketAmountsForm(Form):
 @tickets.route("/tickets/choose", methods=['GET', 'POST'])
 @feature_flag('TICKET_SALES')
 def choose():
-    if get_sales_state(datetime.utcnow()) != 'available' and not current_user.admin:
+    if get_sales_state(datetime.utcnow()) == 'available':
+        pass
+    elif not current_user.is_anonymous() and current_user.admin:
+        pass
+    else:
         return render_template("tickets-cutoff.html")
 
     form = TicketAmountsForm()
