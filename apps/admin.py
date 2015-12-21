@@ -78,7 +78,7 @@ def stats():
                                                   Payment.state == 'inprogress')
 
     parking_bought = Ticket.query.filter_by(paid=True).join(TicketType).filter(
-        TicketType.admits == 'parking')
+        TicketType.admits == 'car')
     campervan_bought = Ticket.query.filter_by(paid=True).join(TicketType).filter(
         TicketType.admits == 'campervan')
 
