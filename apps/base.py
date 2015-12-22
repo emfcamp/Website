@@ -112,7 +112,7 @@ def talks_2012():
         for row in reader:
             cells = [unicode(cell, 'utf-8') for cell in row]
             cells = ['' if c == '"' else c for c in cells]
-            app.logger.info(cells)
+            app.logger.debug(cells)
             rows.append(cells)
 
         days[day] = rows
