@@ -10,7 +10,7 @@ def get_site_state(date):
     if date < datetime(2015, 12, 14, 20):
         return "before-sales"
     elif date < datetime(2016, 8, 5):
-        return "before-event"
+        return "sales"
     elif date < datetime(2016, 8, 8, 9):
         return "event"
     else:
