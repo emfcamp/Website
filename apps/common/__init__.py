@@ -8,6 +8,7 @@ from flask.ext.login import login_user, current_user
 
 from models.ticket import Ticket, TicketType
 from models.site_state import get_site_state, get_sales_state
+from models.feature_flag import FeatureFlag
 from models import User
 
 from flask_mail import Message
@@ -116,8 +117,19 @@ def process_basket():
 
 
 def feature_flag(flag):
+    """
+    If the feature flag is present in the database use that, otherwise fall
+    back to using the config file.
+
+    If the flag isn't set 404 (or is set to False).
+    """
     def call(f, *args, **kw):
-        if app.config.get(flag, False) is True:
+        db_flag = FeatureFlag.get_flag(flag)
+        is_set_in_db = db_flag and (db_flag.enabled is True)
+        is_config_fallback = (db_flag is None) and\
+                             (app.config.get(flag, False) is True)
+
+        if is_set_in_db or is_config_fallback:
             return f(*args, **kw)
         return abort(404)
     return decorator(call)
