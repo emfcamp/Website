@@ -1,0 +1,30 @@
+{% from "_formhelpers.html" import render_field  %}
+{% extends "admin/base.html" %}
+{% set nav_active = 'feature_flags' %}
+{% block body %}
+<h2>Feature flags</h2>
+
+<form method="POST">
+{{ form.hidden_tag() }}
+<table class="table table-condensed">
+<thead><tr>
+  <th>Flag</th>
+  <th>Is Currently Enabled</th>
+</tr></thead>
+<tbody>
+{% for flg in form.flags %}
+<tr>
+  {# name is a hidden field because we don't want it to be editable #}
+  <td>{{ flg['name']() }}{{ flg['name'].data }}</td>
+  <td>{{ flg.enabled }}</td>
+</tr>
+{% endfor %}
+<tr>
+  <td>{{ form.name }}</td>
+  <td>{{ form.enabled }}</td>
+</tr>
+</tbody>
+</table>
+{{ form.update(class_="btn btn-success") }}
+</form>
+{% endblock %}

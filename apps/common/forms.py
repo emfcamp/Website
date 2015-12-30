@@ -33,6 +33,12 @@ class HiddenIntegerField(HiddenField, IntegerField):
     """
 
 
+class HiddenStringField(HiddenField, StringField):
+    """
+    Replication of HiddenIntegerField for strings.
+    """
+
+
 class TelInput(Input):
     input_type = 'tel'
 
