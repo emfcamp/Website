@@ -585,20 +585,25 @@ def feature_flags():
     flags = FeatureFlag.query.all()
 
     if form.validate_on_submit():
+        # Update existing flags
+        flag_dict = {f.name: f for f in flags}
+        for flg in form.flags:
+            flag_name = flg['name'].data
+            flag_dict[flag_name].enabled = flg.enabled.data
+        db.session.commit()
+
+        # Add new flags if required
         if len(form.name.data) > 0:
-            new_flag = FeatureFlag(name=form.name.data,
-                                   enabled=form.enabled.data)
+            new_flag = FeatureFlag(name=form.name.data, enabled=form.enabled.data)
+
             db.session.add(new_flag)
             db.session.commit()
 
-
-        flag_dict = {f.name: f for f in flags}
-
-        for flg in form.flags:
-            flag_name = flg['name'].data
-            to_update = flag_dict[flag_name]
-            to_update.enabled = flg.enabled.data
-        db.session.commit()
+            # Update the flags list
+            flags.append(new_flag)
+            # Unset previous form values
+            form.name.data = ''
+            form.enabled.data = ''
 
     if request.method != ' POST':
         # Clear the list
@@ -609,6 +614,5 @@ def feature_flags():
             form.flags.append_entry()
             form.flags[-1]['name'].data = flg.name
             form.flags[-1].enabled.data = flg.enabled
-
 
     return render_template('admin/feature-flags.html', form=form)
