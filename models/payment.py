@@ -68,10 +68,7 @@ class Payment(db.Model):
             ticket.paid = False
         self.state = 'cancelled'
 
-    def clone(self, new_user=None, ignore_capacity=False):
-        if new_user is not None:
-            raise NotImplementedError('Changing users not yet supported')
-
+    def clone(self, ignore_capacity=False):
         other = self.__class__(self.currency, self.amount)
         for ticket in self.tickets:
             new_ticket = ticket.clone(ignore_capacity=ignore_capacity)
