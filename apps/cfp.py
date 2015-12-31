@@ -15,7 +15,9 @@ from sqlalchemy.exc import IntegrityError
 from main import db, mail
 from models.user import User, UserDiversity
 from models.ticket import TicketType
-from models.cfp import TalkProposal, WorkshopProposal, InstallationProposal
+from models.cfp import (
+    TalkProposal, WorkshopProposal, InstallationProposal, TalkCategory
+)
 from .common import feature_flag, create_current_user
 from .common.forms import Form
 
@@ -58,6 +60,7 @@ class TalkProposalForm(ProposalForm):
                                       ('repeat', "I've given this talk before"),
                                       ])
     one_day = BooleanField("I can only attend for the day I give my talk")
+    category = SelectField('Category')
 
 
 class WorkshopProposalForm(ProposalForm):
@@ -79,7 +82,10 @@ def main(cfp_type='talk'):
     if cfp_type not in ['talk', 'workshop', 'installation']:
         abort(404)
 
-    forms = [TalkProposalForm(), WorkshopProposalForm(), InstallationProposalForm()]
+    talk = TalkProposalForm()
+    talk.category.choices = TalkCategory.get_categories_selection()
+
+    forms = [talk, WorkshopProposalForm(), InstallationProposalForm()]
     (form,) = [f for f in forms if f.type == cfp_type]
 
     # If the user is already logged in set their name & email for the form
@@ -107,6 +113,7 @@ def main(cfp_type='talk'):
             cfp.length = form.length.data
             cfp.experience = form.experience.data
             cfp.one_day = form.one_day.data
+            cfp.category_id = form.category.data
         elif cfp_type == 'workshop':
             cfp = WorkshopProposal()
             cfp.length = form.length.data

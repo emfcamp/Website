@@ -108,7 +108,7 @@
       {{ form.hidden_tag() }}
 
       {% if not current_user.is_authenticated() %}
-        {{ render_field(form.name, True, glyphicon='globe', placeholder="Your name to include in the schedule") }}
+        {{ render_field(form.name, True, glyphicon='globe', placeholder="Your name") }}
 
         {% if form.type == 'talk' %}
           {{ render_field(form.email, True, placeholder="We'll only use this to contact you about the talk") }}
@@ -133,6 +133,7 @@
       {% if form.type == 'talk' %}
         {{ render_field(form.length, True) }}
         {{ render_field(form.experience, True) }}
+        {{ render_field(form.category, True) }}
       {% elif form.type == 'workshop' %}
         {{ render_field(form.length, True, placeholder="Your best guess, whether in minutes or days") }}
         {{ render_field(form.attendees, True, placeholder="The number of people you can accommodate in your workshop") }}
