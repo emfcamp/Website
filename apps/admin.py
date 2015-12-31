@@ -547,11 +547,11 @@ class CancelPaymentForm(Form):
 @admin.route('/payment/<int:payment_id>/cancel', methods=['GET', 'POST'])
 @admin_required
 def cancel_payment(payment_id):
-    payment = BankPayment.query.get_or_404(payment_id)
+    payment = Payment.query.get_or_404(payment_id)
 
     form = CancelPaymentForm()
     if form.validate_on_submit():
-        if form.cancel.data:
+        if form.cancel.data and (payment.provider in ['banktransfer', 'gocardless']):
             app.logger.info("%s manually cancelling payment %s", current_user.name, payment.id)
             payment.cancel()
             db.session.commit()

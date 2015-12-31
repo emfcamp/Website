@@ -240,6 +240,15 @@ class GoCardlessPayment(Payment):
 
         return bill_url
 
+    def cancel(self):
+        try:
+            super(GoCardlessPayment, self).cancel()
+        except StateException:
+            return
+
+        bill = gocardless.client.bill(self.gcid)
+        bill.cancel()
+
 
 class StripePayment(Payment):
     name = 'Stripe payment'
