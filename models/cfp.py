@@ -15,6 +15,10 @@ class Proposal(db.Model):
     type = db.Column(db.String, nullable=False)
     assistance_required = db.Column(db.Boolean)
     required_notice = db.Column(db.String)
+    # Store the next version so we can find the most recent by looking for NULL
+    next_version_id = db.Column(db.Integer, db.ForeignKey('proposal.id'))
+    previous_version = db.relationship('Proposal')
+
     __mapper_args__ = {'polymorphic_on': type}
 
 
