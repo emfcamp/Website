@@ -38,6 +38,15 @@ class ProposalForm(Form):
     description = TextAreaField("Description", [Required()])
     requirements = StringField("Requirements")
     need_help = BooleanField('I would like help in preparing this submission or my talk.')
+    notice = SelectField('Required notice', default='1 month',
+                          choices=[('No notice', 'No notice required'),
+                                   ('1 day', '1 day'),
+                                   ('1 week', '1 week'),
+                                   ('2 weeks', '2 weeks'),
+                                   ('1 month', '1 month'),
+                                   ('2 months', '2 months'),
+                                   ('> 2 months', 'Longer than 2 months'),
+                                  ])
 
     diversity = FormField(DiversityForm)
 
@@ -123,6 +132,7 @@ def main(cfp_type='talk'):
         cfp.requirements = form.requirements.data
         cfp.description = form.description.data
         cfp.assistance_required = form.need_help.data
+        cfp.required_notice = form.notice.data
 
         db.session.add(cfp)
         db.session.commit()
