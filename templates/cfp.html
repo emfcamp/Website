@@ -129,7 +129,7 @@
 
       <fieldset>
       {{ render_field(form.description, True, placeholder="Description to be anonymised for review.") }}
-      {{ render_field(form.requirements, True, placeholder="Do you have any requirements (e.g. atari to HDMI adaptors, 3-phrase power)?") }}
+      {{ render_field(form.requirements, True, placeholder="Do you have any requirements (e.g. atari to HDMI adaptors, 3-phase power)?") }}
 
       {% if form.type == 'talk' %}
         {{ render_field(form.length, True) }}
@@ -137,6 +137,7 @@
       {% elif form.type == 'workshop' %}
         {{ render_field(form.length, True, placeholder="Your best guess, whether in minutes or days") }}
         {{ render_field(form.attendees, True, placeholder="The number of people you can accommodate in your workshop") }}
+        {{ render_field(form.cost, True, placeholder="0") }}
       {% elif form.type == 'installation' %}
         {{ render_field(form.size, True, placeholder="We need to know how much space to reserve") }}
       {% endif %}

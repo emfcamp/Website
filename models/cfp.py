@@ -27,6 +27,7 @@ class TalkProposal(Proposal):
 class WorkshopProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'workshop'}
     attendees = db.Column(db.String)
+    cost = db.Column(db.Integer)
 
 
 class InstallationProposal(Proposal):

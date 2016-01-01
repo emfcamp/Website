@@ -1,3 +1,4 @@
+# encoding=utf-8
 from flask import (
     render_template, redirect, request, flash,
     url_for, abort, current_app as app, Blueprint
@@ -6,7 +7,7 @@ from flask.ext.login import current_user
 from flask_mail import Message
 from wtforms.validators import Required, Email, ValidationError
 from wtforms import (
-    BooleanField, StringField,
+    BooleanField, StringField, IntegerField,
     FormField, TextAreaField, SelectField,
 )
 
@@ -63,6 +64,7 @@ class WorkshopProposalForm(ProposalForm):
     type = 'workshop'
     length = StringField("Duration", [Required()])
     attendees = StringField("Attendees", [Required()])
+    cost = IntegerField('Charge')
 
 
 class InstallationProposalForm(ProposalForm):
@@ -111,6 +113,7 @@ def main(cfp_type='talk'):
             cfp = WorkshopProposal()
             cfp.length = form.length.data
             cfp.attendees = form.attendees.data
+            cfp.cost = form.cost.data
         elif cfp_type == 'installation':
             cfp = InstallationProposal()
             cfp.size = form.size.data
