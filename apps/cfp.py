@@ -35,6 +35,7 @@ class ProposalForm(Form):
     email = StringField("Email", [Email(), Required()])
     title = StringField("Title", [Required()])
     description = TextAreaField("Description", [Required()])
+    requirements = StringField("Requirements")
     need_finance = BooleanField("I can't afford to buy a ticket without financial support")
 
     diversity = FormField(DiversityForm)
@@ -126,6 +127,7 @@ def main(cfp_type='talk'):
         cfp.user_id = current_user.id
 
         cfp.title = form.title.data
+        cfp.requirements = form.requirements.data
         cfp.description = form.description.data
         cfp.need_finance = form.need_finance.data
 

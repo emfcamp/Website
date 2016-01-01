@@ -128,7 +128,8 @@
       </fieldset>
 
       <fieldset>
-      {{ render_field(form.description, True, placeholder="Description and any requirements.") }}
+      {{ render_field(form.description, True, placeholder="Description to be anonymised for review.") }}
+      {{ render_field(form.requirements, True, placeholder="Do you have any requirements (e.g. atari to HDMI adaptors, 3-phrase power)?") }}
 
       {% if form.type == 'talk' %}
         {{ render_field(form.length, True) }}

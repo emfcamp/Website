@@ -10,6 +10,7 @@ class Proposal(db.Model):
     state = db.Column(db.String, nullable=False, default='new')
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String)
+    requirements = db.Column(db.String)
     length = db.Column(db.String)
     need_finance = db.Column(db.Boolean)
     one_day = db.Column(db.Boolean)
