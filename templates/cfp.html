@@ -133,7 +133,6 @@
 
       {% if form.type == 'talk' %}
         {{ render_field(form.length, True) }}
-        {{ render_field(form.experience, True) }}
         {{ render_field(form.category, True) }}
       {% elif form.type == 'workshop' %}
         {{ render_field(form.length, True, placeholder="Your best guess, whether in minutes or days") }}
@@ -156,17 +155,12 @@
           {% endfor %}
         </div>
 
-      {% if form.type in ['talk', 'workshop'] %}
         <div class="col-md-9 col-sm-offset-3">
           <label class="checkbox">
-            {{ form.one_day() }}
-            {{ form.one_day.label.text }}
           </label>
-          {% for error in form.one_day.errors %}
           <div class="help-block">{{ error }}</div>
           {% endfor %}
         </div>
-      {% endif %}
       </fieldset>
       <p></p>
 

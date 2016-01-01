@@ -13,14 +13,12 @@ class Proposal(db.Model):
     requirements = db.Column(db.String)
     length = db.Column(db.String)
     need_finance = db.Column(db.Boolean)
-    one_day = db.Column(db.Boolean)
     type = db.Column(db.String, nullable=False)
     __mapper_args__ = {'polymorphic_on': type}
 
 
 class TalkProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'talk'}
-    experience = db.Column(db.String)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     category = db.relationship('TalkCategory', backref='proposals')
 

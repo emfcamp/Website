@@ -55,12 +55,6 @@ class TalkProposalForm(ProposalForm):
                                   ('45 mins', "45 minutes"),
                                   ('> 45 mins', "Longer than 45 minutes"),
                                   ])
-    experience = SelectField("Have you given a talk before?",
-                             choices=[('none', "It's my first time"),
-                                      ('some', "I've talked before"),
-                                      ('repeat', "I've given this talk before"),
-                                      ])
-    one_day = BooleanField("I can only attend for the day I give my talk")
     category = SelectField('Category')
 
 
@@ -68,7 +62,6 @@ class WorkshopProposalForm(ProposalForm):
     type = 'workshop'
     length = StringField("Duration", [Required()])
     attendees = StringField("Attendees", [Required()])
-    one_day = BooleanField("I can only attend for the day I give my workshop")
 
 
 class InstallationProposalForm(ProposalForm):
@@ -112,14 +105,11 @@ def main(cfp_type='talk'):
         if cfp_type == 'talk':
             cfp = TalkProposal()
             cfp.length = form.length.data
-            cfp.experience = form.experience.data
-            cfp.one_day = form.one_day.data
             cfp.category_id = form.category.data
         elif cfp_type == 'workshop':
             cfp = WorkshopProposal()
             cfp.length = form.length.data
             cfp.attendees = form.attendees.data
-            cfp.one_day = form.one_day.data
         elif cfp_type == 'installation':
             cfp = InstallationProposal()
             cfp.size = form.size.data
