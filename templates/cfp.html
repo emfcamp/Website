@@ -157,15 +157,6 @@
       </fieldset>
       <p></p>
 
-      {% if form.type == 'installation' %}
-      <div class="row">
-        <div class="col-md-9 col-sm-offset-3">
-            We may be able to provide materials for your installation &ndash;
-            please <a href="mailto:shiny@emfcamp.org">get in touch</a> for details.
-        </div>
-      </div>
-      {% endif %}
-
       {% if current_user.is_anonymous() or not current_user.diversity %}
       <fieldset>
         <div class="col-md-11 col-md-offset-1">
