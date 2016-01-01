@@ -37,6 +37,7 @@ class ProposalForm(Form):
     description = TextAreaField("Description", [Required()])
     requirements = StringField("Requirements")
     need_finance = BooleanField("I can't afford to buy a ticket without financial support")
+    need_help = BooleanField('I would like help in preparing this submission or my talk.')
 
     diversity = FormField(DiversityForm)
 
@@ -120,6 +121,7 @@ def main(cfp_type='talk'):
         cfp.requirements = form.requirements.data
         cfp.description = form.description.data
         cfp.need_finance = form.need_finance.data
+        cfp.assistance_required = form.need_help.data
 
         db.session.add(cfp)
         db.session.commit()

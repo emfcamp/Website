@@ -157,7 +157,10 @@
 
         <div class="col-md-9 col-sm-offset-3">
           <label class="checkbox">
+            {{ form.need_help() }}
+            {{ form.need_help.label.text }}
           </label>
+          {% for error in form.need_help.errors %}
           <div class="help-block">{{ error }}</div>
           {% endfor %}
         </div>

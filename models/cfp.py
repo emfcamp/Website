@@ -14,6 +14,7 @@ class Proposal(db.Model):
     length = db.Column(db.String)
     need_finance = db.Column(db.Boolean)
     type = db.Column(db.String, nullable=False)
+    assistance_required = db.Column(db.Boolean)
     __mapper_args__ = {'polymorphic_on': type}
 
 
