@@ -56,7 +56,7 @@
                         <li><a target="_blank" href="https://wiki.emfcamp.org">Wiki</a>
                         <li><a target="_blank" href="{{ url_for('base.code_of_conduct') }}">Code of Conduct</a>
 
-                      {% if config.get('TICKET_SALES') %}
+                      {% if is_feature_flag_set('TICKET_SALES') %}
                       {% if current_user.is_authenticated() %}
                         <li><a href="{{ url_for('users.account') }}">My account</a></li>
                         <li><a href="{{ url_for('users.logout') }}">Log out</a></li>
