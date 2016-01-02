@@ -241,11 +241,7 @@ class GoCardlessPayment(Payment):
         return bill_url
 
     def cancel(self):
-        try:
-            super(GoCardlessPayment, self).cancel()
-        except StateException:
-            return
-
+        super(GoCardlessPayment, self).cancel()
         bill = gocardless.client.bill(self.gcid)
         bill.cancel()
 
@@ -257,6 +253,9 @@ class StripePayment(Payment):
     __mapper_args__ = {'polymorphic_identity': 'stripe'}
     chargeid = db.Column(db.String, unique=True)
     token = db.Column(db.String)
+
+    def cancel(self):
+        raise StateException('Cannot cancel stripe payments')
 
     @property
     def description(self):

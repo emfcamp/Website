@@ -18,7 +18,7 @@ from sqlalchemy.sql.functions import func
 
 from main import db, mail
 from models.user import User
-from models.payment import Payment, BankPayment, BankTransaction
+from models.payment import Payment, BankPayment, BankTransaction, StateException
 from models.ticket import (
     Ticket, TicketCheckin, TicketType, TicketPrice, TicketTransfer
 )
@@ -549,11 +549,24 @@ class CancelPaymentForm(Form):
 def cancel_payment(payment_id):
     payment = Payment.query.get_or_404(payment_id)
 
+    if payment.provider == u'stripe':
+        msg = 'Cannot cancel stripe payment (id: %s).' % payment_id
+        app.logger.warn(msg)
+        flash(msg)
+        return redirect(url_for('admin.payments'))
+
     form = CancelPaymentForm()
     if form.validate_on_submit():
         if form.cancel.data and (payment.provider in ['banktransfer', 'gocardless']):
             app.logger.info("%s manually cancelling payment %s", current_user.name, payment.id)
-            payment.cancel()
+            try:
+                payment.cancel()
+            except StateException, e:
+                msg = 'Could not cancel payment %s: %s' % (payment_id, e)
+                app.logger.warn(msg)
+                flash(msg)
+                return redirect(url_for('admin.payments'))
+
             db.session.commit()
 
             flash("Payment %s cancelled" % payment.id)
