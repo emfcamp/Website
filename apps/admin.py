@@ -11,7 +11,7 @@ from flask_mail import Message
 from wtforms.validators import Optional, Regexp, Required
 from wtforms.widgets import TextArea
 from wtforms import (
-    SubmitField, BooleanField, StringField, RadioField,
+    SubmitField, BooleanField, StringField, RadioField, HiddenField,
     DateField, IntegerField, FieldList, FormField
 )
 from sqlalchemy.orm.exc import NoResultFound
@@ -25,7 +25,7 @@ from models.ticket import (
 )
 from models.cfp import Proposal
 from models.feature_flag import FeatureFlag
-from .common.forms import Form, HiddenStringField
+from .common.forms import Form
 from .payments.stripe import (
     StripeUpdateUnexpected, StripeUpdateConflict, stripe_update_payment,
 )
@@ -566,7 +566,7 @@ def cancel_payment(payment_id):
 
 class UpdateFeatureFlagForm(Form):
     # We don't allow changing feature flag names
-    name = HiddenStringField('Name', [Required()])
+    name = HiddenField('Name', [Required()])
     enabled = BooleanField('Enabled')
 
 

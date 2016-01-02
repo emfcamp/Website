@@ -15,7 +15,7 @@
 {% for flg in form.flags %}
 <tr>
   {# name is a hidden field because we don't want it to be editable #}
-  <td>{{ flg['name']() }}{{ flg['name'].data }}</td>
+  <td>{{ flg.hidden_tag_without('csrf_token') }}{{ flg['name'].data }}</td>
   <td>{{ flg.enabled }}</td>
 </tr>
 {% endfor %}
