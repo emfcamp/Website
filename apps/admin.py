@@ -605,14 +605,14 @@ def feature_flags():
             form.name.data = ''
             form.enabled.data = ''
 
-    if request.method != ' POST':
-        # Clear the list
-        for old_field in range(len(form.flags)):
-            form.flags.pop_entry()
+    # Clear the list of flags (which may be stale)
+    for old_field in range(len(form.flags)):
+        form.flags.pop_entry()
 
-        for flg in flags:
-            form.flags.append_entry()
-            form.flags[-1]['name'].data = flg.name
-            form.flags[-1].enabled.data = flg.enabled
+    # Build the list of flags to display
+    for flg in flags:
+        form.flags.append_entry()
+        form.flags[-1]['name'].data = flg.name
+        form.flags[-1].enabled.data = flg.enabled
 
     return render_template('admin/feature-flags.html', form=form)
