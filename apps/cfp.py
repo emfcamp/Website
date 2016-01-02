@@ -38,7 +38,7 @@ class ProposalForm(Form):
     description = TextAreaField("Description", [Required()])
     requirements = StringField("Requirements")
     need_help = BooleanField('I would like help in preparing this submission or during the event.')
-    need_money = BooleanField('I will be seeking funding order to run/create this.')
+    need_money = BooleanField('I will be seeking funding in order to run/create this.')
     notice = SelectField('Required notice', default='1 month',
                           choices=[('No notice', 'No notice required'),
                                    ('1 day', '1 day'),
