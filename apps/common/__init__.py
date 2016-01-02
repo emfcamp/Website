@@ -117,8 +117,14 @@ def process_basket():
     return basket, total
 
 
-# Decorator to control routes and functions
 def feature_flag(flag):
+    """
+    Decorator for toggling features within the app.
+
+    If the feature is enabled in either the database or the config (with the
+    database overriding the config settings) call the function, otherwise
+    abort with code 404.
+    """
     def call(f, *args, **kw):
         if is_feature_flag_set(flag):
             return f(*args, **kw)
@@ -131,8 +137,6 @@ def is_feature_flag_set(flag):
     """
     If the feature flag is present in the database use that, otherwise fall
     back to using the config file.
-
-    If the flag isn't set 404 (or is set to False).
     """
     db_flag = FeatureFlag.get_flag(flag)
     is_set_in_db = db_flag and (db_flag.enabled is True)
