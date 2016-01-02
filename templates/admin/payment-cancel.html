@@ -11,6 +11,8 @@
 <dt>Price</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
 {%- if payment.provider == 'banktransfer' %}
 <dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
+{% elif payment.provider == 'gocardless' %}
+<dt>GoCardless ID</dt><dd>{{ payment.gcid }}</dd>
 {% endif -%}
 </dl>
 
