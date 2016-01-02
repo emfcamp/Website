@@ -37,7 +37,7 @@ class ProposalForm(Form):
     title = StringField("Title", [Required()])
     description = TextAreaField("Description", [Required()])
     requirements = StringField("Requirements")
-    need_help = BooleanField('I would like help in preparing this submission or my talk.')
+    need_help = BooleanField('I would like help in preparing this submission or during the event.')
     need_money = BooleanField('I will be seeking funding order to run/create this.')
     notice = SelectField('Required notice', default='1 month',
                           choices=[('No notice', 'No notice required'),
@@ -73,7 +73,7 @@ class WorkshopProposalForm(ProposalForm):
     type = 'workshop'
     length = StringField("Duration", [Required()])
     attendees = StringField("Attendees", [Required()])
-    cost = IntegerField('Charge')
+    cost = IntegerField(u'Cost per attendee (£)')
 
 
 class InstallationProposalForm(ProposalForm):
@@ -132,8 +132,8 @@ def main(cfp_type='talk'):
         cfp.title = form.title.data
         cfp.requirements = form.requirements.data
         cfp.description = form.description.data
-        cfp.assistance_required = form.need_help.data
-        cfp.required_notice = form.notice.data
+        cfp.requires_help = form.need_help.data
+        cfp.requires_notice = form.notice.data
         cfp.requires_financing = form.need_money.data
 
         db.session.add(cfp)

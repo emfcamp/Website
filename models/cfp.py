@@ -4,18 +4,24 @@ from datetime import datetime
 
 class Proposal(db.Model):
     __tablename__ = 'proposal'
+    # Admin
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created = db.Column(db.DateTime, default=datetime.utcnow)
     state = db.Column(db.String, nullable=False, default='new')
+    type = db.Column(db.String, nullable=False) # Talk, workshop or installation
+
+    # Core information
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String)
     requirements = db.Column(db.String)
     length = db.Column(db.String)
-    type = db.Column(db.String, nullable=False)
-    assistance_required = db.Column(db.Boolean)
-    required_notice = db.Column(db.String)
+
+    # Flags
+    requires_help = db.Column(db.Boolean)
+    requires_notice = db.Column(db.String)
     requires_financing = db.Column(db.Boolean)
+
     # Store the next version so we can find the most recent by looking for NULL
     next_version_id = db.Column(db.Integer, db.ForeignKey('proposal.id'))
     previous_version = db.relationship('Proposal')
