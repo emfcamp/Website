@@ -23,9 +23,9 @@ from models.payment import Payment, BankPayment, BankTransaction
 from models.ticket import (
     Ticket, TicketCheckin, TicketType, TicketPrice, TicketTransfer
 )
-from models.cfp import Proposal
+from models.cfp import Proposal, TalkCategory
 from models.feature_flag import FeatureFlag
-from .common.forms import Form
+from .common.forms import Form, HiddenIntegerField
 from .payments.stripe import (
     StripeUpdateUnexpected, StripeUpdateConflict, stripe_update_payment,
 )
@@ -617,9 +617,56 @@ def feature_flags():
         form.flags.pop_entry()
 
     # Build the list of flags to display
-    for flg in flags:
+    for flg in sorted(flags, key=lambda x: x.name):
         form.flags.append_entry()
         form.flags[-1]['name'].data = flg.name
         form.flags[-1].enabled.data = flg.enabled
 
     return render_template('admin/feature-flags.html', form=form)
+
+
+class CategoryForm(Form):
+    id = HiddenIntegerField('Category Id', [Required()])
+    name = StringField('Category Name', [Required()])
+
+class AllCategoriesForm(Form):
+    categories = FieldList(FormField(CategoryForm))
+    name = StringField('New Category Name')
+    update = SubmitField('Update flags')
+
+
+# TODO this should probably be moved into it's own blueprint
+@admin.route('/cfp-categories', methods=['GET', 'POST'])
+@admin_required
+def cfp_categories():
+    categories = {c.id: c for c in TalkCategory.query.all()}
+    # import ipdb; ipdb.set_trace()
+    counts = {c.id: len(c.proposals) for c in categories.values()}
+    form = AllCategoriesForm()
+
+    if form.validate_on_submit():
+        for cat in form.categories:
+            cat_id = int(cat['id'].data)
+            categories[cat_id].name = cat['name'].data
+        db.session.commit()
+
+        if len(form.name.data) > 0:
+            new_category = TalkCategory()
+            new_category.name = form.name.data
+
+            db.session.add(new_category)
+            db.session.commit()
+            # import ipdb; ipdb.set_trace()
+            categories[new_category.id] = new_category
+            counts[new_category.id] = 0
+            form.name.data = ''
+
+    for old_field in range(len(form.categories)):
+        form.categories.pop_entry()
+
+    for cat in sorted(categories.values(), key=lambda x: x.name):
+        form.categories.append_entry()
+        form.categories[-1]['id'].data = cat.id
+        form.categories[-1]['name'].data = cat.name
+
+    return render_template('admin/cfp-categories.html', form=form, counts=counts)

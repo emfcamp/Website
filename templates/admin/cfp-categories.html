@@ -1,0 +1,28 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'ticket_types' %}
+{% block body %}
+<h2>CFP categories</h2>
+
+<form method='POST'>
+{{ form.hidden_tag() }}
+<table class="table table-condensed">
+<thead><tr>
+  <th>Category</th>
+  <th>Entries</th>
+</tr></thead>
+<tbody>
+{% for cat in form.categories %}
+  <tr>
+    <td>{{ cat.hidden_tag_without('csrf_token') }}{{ cat['name']() }}</td>
+    <td>{{ counts[cat['id'].data] }}</td>
+  </tr>
+{% endfor %}
+<tr>
+  <td>{{ form.name }}</td>
+  <td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+{{ form.update(class_='btn btn-success') }}
+</form>
+{% endblock %}
