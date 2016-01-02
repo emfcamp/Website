@@ -640,7 +640,6 @@ class AllCategoriesForm(Form):
 @admin_required
 def cfp_categories():
     categories = {c.id: c for c in TalkCategory.query.all()}
-    # import ipdb; ipdb.set_trace()
     counts = {c.id: len(c.proposals) for c in categories.values()}
     form = AllCategoriesForm()
 

@@ -156,6 +156,16 @@
           <div class="help-block">{{ error }}</div>
           {% endfor %}
         </div>
+
+        <div class="col-md-9 col-sm-offset-3">
+          <label class="checkbox">
+            {{ form.need_money() }}
+            {{ form.need_money.label.text }}
+          </label>
+          {% for error in form.need_money.errors %}
+          <div class="help-block">{{ error }}</div>
+          {% endfor %}
+        </div>
       </fieldset>
       <p></p>
 
