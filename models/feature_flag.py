@@ -10,6 +10,6 @@ class FeatureFlag(db.Model):
         self.enabled = enabled
 
     @classmethod
-    @cache.cached(timeout=30, key_prefix='feature_flags_get')
+    @cache.memoize(timeout=30)
     def get_flag(self, name):
         return FeatureFlag.query.get(name)

@@ -17,7 +17,7 @@ from wtforms import (
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.functions import func
 
-from main import db, mail
+from main import db, mail, cache
 from models.user import User
 from models.payment import Payment, BankPayment, BankTransaction
 from models.ticket import (
@@ -589,8 +589,12 @@ def feature_flags():
         flag_dict = {f.name: f for f in flags}
         for flg in form.flags:
             flag_name = flg['name'].data
-            flag_dict[flag_name].enabled = flg.enabled.data
-        db.session.commit()
+
+            # Update the db and clear the cache if there's a change
+            if flag_dict[flag_name].enabled != flg.enabled.data:
+                flag_dict[flag_name].enabled = flg.enabled.data
+                db.session.commit()
+                cache.delete_memoized(FeatureFlag.get_flag, FeatureFlag, flag_name)
 
         # Add new flags if required
         if len(form.name.data) > 0:
@@ -598,6 +602,9 @@ def feature_flags():
 
             db.session.add(new_flag)
             db.session.commit()
+
+            # Clear the cache for which would have previously returned None
+            cache.delete_memoized(FeatureFlag.get_flag, FeatureFlag, new_flag.name)
 
             # Update the flags list
             flags.append(new_flag)
