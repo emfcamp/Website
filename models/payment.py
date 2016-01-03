@@ -243,7 +243,11 @@ class GoCardlessPayment(Payment):
     def cancel(self):
         super(GoCardlessPayment, self).cancel()
         bill = gocardless.client.bill(self.gcid)
-        bill.cancel()
+
+        if bill.can_be_cancelled:
+            bill.cancel()
+        else:
+            raise StateException('GoCardless payment %s cannot be cancelled.' % self.id)
 
 
 class StripePayment(Payment):
