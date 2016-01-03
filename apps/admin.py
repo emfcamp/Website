@@ -146,6 +146,13 @@ def transaction_suppress(txn_id):
     return render_template('admin/txn-suppress.html', txn=txn, form=form)
 
 
+@admin.route('/transactions/suppressed')
+@admin_required
+def suppressed():
+    suppressed = BankTransaction.query.filter_by(suppressed=True).all()
+    return render_template('admin/txns-suppressed.html', suppressed=suppressed)
+
+
 def score_reconciliation(txn, payment):
     words = txn.payee.replace('-', ' ').split(' ')
 

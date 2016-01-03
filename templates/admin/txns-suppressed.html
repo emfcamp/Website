@@ -1,0 +1,28 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'admin_txns' %}
+{% block body %}
+<h2>Suppressed transactions</h2>
+
+<table class="table table-condensed table-striped">
+<thead><tr>
+  <th>Date</th>
+  <th>Type</th>
+  <th>Payee</th>
+  <th>Amount</th>
+  <!--<th>FIT</th>-->
+  <th></th>
+  <th></th>
+</tr></thead>
+<tbody>
+{% for txn in suppressed %}
+<tr>
+  <td>{{ txn.posted.strftime('%Y-%m-%d') }}</td>
+  <td>{{ txn.type }}</td>
+  <td><b>{{ txn.payee }}</b></td>
+  <td>{{ txn.amount | price(txn.account.currency) }}</td>
+  <!--<td>{{ txn.fit_id }}</td>-->
+</tr>
+{% endfor %}
+</tbody></table>
+
+{% endblock %}
