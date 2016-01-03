@@ -14,7 +14,7 @@ DB_FEATURE_FLAGS = [
 ]
 
 class FeatureFlag(db.Model):
-    __tablename__ = 'feature_flags'
+    __tablename__ = 'feature_flag'
     feature = db.Column(db.String, primary_key=True)
     enabled = db.Column(db.Boolean, nullable=False)
 
