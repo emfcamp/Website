@@ -70,11 +70,6 @@
      so we can link the submission to your account.</p>
   {% endif %}
 
-  <div class="alert alert-info">
-  Fields marked <span class="glyphicon glyphicon-globe"></span> will be displayed in the schedule &mdash;
-  you'll be able to change them later.
-  </div>
-
   <label class="visible-xs">
   Select the category that most closely describes your proposal
   </label>
@@ -108,18 +103,18 @@
       {{ form.hidden_tag() }}
 
       {% if not current_user.is_authenticated() %}
-        {{ render_field(form.name, True, glyphicon='globe', placeholder="Your name") }}
-
+        {# Use col-sm-3/col-sm-9 split for labels/inputs #}
+        {{ render_field(form.name, 9, placeholder="Your name") }}
         {% if form.type == 'talk' %}
-          {{ render_field(form.email, True, placeholder="We'll only use this to contact you about the talk") }}
+          {{ render_field(form.email, 9, placeholder="We'll only use this to contact you about the talk") }}
         {% elif form.type == 'workshop' %}
-          {{ render_field(form.email, True, placeholder="We'll only use this to contact you about the workshop") }}
+          {{ render_field(form.email, 9, placeholder="We'll only use this to contact you about the workshop") }}
         {% elif form.type == 'installation' %}
-          {{ render_field(form.email, True, placeholder="We'll only use this to contact you about the installation") }}
+          {{ render_field(form.email, 9, placeholder="We'll only use this to contact you about the installation") }}
         {% endif %}
       {% endif %}
 
-      {{ render_field(form.title, True, glyphicon='globe', placeholder="A one-sentence summary (it should fit in a tweet)") }}
+      {{ render_field(form.title, 9, placeholder="A one-sentence summary (it should fit in a tweet)") }}
       <div class="text-right help-block hidden show-remaining" data-for="title" data-max="140">
         <small>
           Characters remaining: <span class="remaining"></span><span class="too-long"> (but don't worry)</span>
@@ -128,21 +123,21 @@
       </fieldset>
 
       <fieldset>
-      {{ render_field(form.description, True, placeholder="Description to be anonymised for review.") }}
-      {{ render_field(form.requirements, True, placeholder="Do you have any requirements (e.g. atari to HDMI adaptors, 3-phase power)?") }}
+      {{ render_field(form.description, 9, placeholder="Description to be anonymised for review.") }}
+      {{ render_field(form.requirements, 9, placeholder="Do you have any requirements (e.g. atari to HDMI adaptors, 3-phase power)?") }}
 
       {% if form.type == 'talk' %}
-        {{ render_field(form.length, True) }}
-        {{ render_field(form.category, True) }}
+        {{ render_field(form.length, 9) }}
+        {{ render_field(form.category, 9) }}
       {% elif form.type == 'workshop' %}
-        {{ render_field(form.length, True, placeholder="Your best guess, whether in minutes or days") }}
-        {{ render_field(form.attendees, True, placeholder="The number of people you can accommodate in your workshop") }}
-        {{ render_field(form.cost, True, placeholder="0") }}
+        {{ render_field(form.length, 9, placeholder="Your best guess, whether in minutes or days") }}
+        {{ render_field(form.attendees, 9, placeholder="The number of people you can accommodate in your workshop") }}
+        {{ render_field(form.cost, 9, placeholder="0") }}
       {% elif form.type == 'installation' %}
-        {{ render_field(form.size, True, placeholder="We need to know how much space to reserve") }}
+        {{ render_field(form.size, 9, placeholder="We need to know how much space to reserve") }}
       {% endif %}
 
-      {{ render_field(form.notice, True) }}
+      {{ render_field(form.notice, 9) }}
 
       </fieldset>
       <fieldset>
@@ -207,7 +202,6 @@
 {% block foot %}
 <script type="text/javascript">
 $(function() {
-
   $('.cfp-types a').on('show.bs.tab', function(e) {
     var $prev = $(e.relatedTarget);
     var $curr = $(this);
