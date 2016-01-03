@@ -8,21 +8,23 @@ from flask import (
 )
 from flask.ext.login import login_required, current_user
 from flask_mail import Message
-from wtforms.validators import Optional, Regexp
+from wtforms.validators import Optional, Regexp, Required
 from wtforms.widgets import TextArea
 from wtforms import (
-    SubmitField, BooleanField, StringField, RadioField, DateField, IntegerField
+    SubmitField, BooleanField, StringField, RadioField, HiddenField,
+    DateField, IntegerField, FieldList, FormField
 )
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.functions import func
 
-from main import db, mail
+from main import db, mail, cache
 from models.user import User
 from models.payment import Payment, BankPayment, BankTransaction, StateException
 from models.ticket import (
     Ticket, TicketCheckin, TicketType, TicketPrice, TicketTransfer
 )
 from models.cfp import Proposal
+from models.feature_flag import FeatureFlag
 from .common.forms import Form
 from .payments.stripe import (
     StripeUpdateUnexpected, StripeUpdateConflict, stripe_update_payment,
@@ -573,3 +575,64 @@ def cancel_payment(payment_id):
             return redirect(url_for('admin.expiring'))
 
     return render_template('admin/payment-cancel.html', payment=payment, form=form)
+
+
+class UpdateFeatureFlagForm(Form):
+    # We don't allow changing feature flag names
+    name = HiddenField('Name', [Required()])
+    enabled = BooleanField('Enabled')
+
+
+class FeatureFlagForm(Form):
+    flags = FieldList(FormField(UpdateFeatureFlagForm))
+    # Options to add new flag
+    name = StringField('Name', [Optional()])
+    enabled = BooleanField('Enabled')
+    update = SubmitField('Update flags')
+
+
+@admin.route('/feature-flags', methods=['GET', 'POST'])
+@admin_required
+def feature_flags():
+    form = FeatureFlagForm()
+    flags = FeatureFlag.query.all()
+
+    if form.validate_on_submit():
+        # Update existing flags
+        flag_dict = {f.name: f for f in flags}
+        for flg in form.flags:
+            flag_name = flg['name'].data
+
+            # Update the db and clear the cache if there's a change
+            if flag_dict[flag_name].enabled != flg.enabled.data:
+                flag_dict[flag_name].enabled = flg.enabled.data
+                db.session.commit()
+                cache.delete_memoized(FeatureFlag.get_flag, FeatureFlag, flag_name)
+
+        # Add new flags if required
+        if len(form.name.data) > 0:
+            new_flag = FeatureFlag(name=form.name.data, enabled=form.enabled.data)
+
+            db.session.add(new_flag)
+            db.session.commit()
+
+            # Clear the cache for which would have previously returned None
+            cache.delete_memoized(FeatureFlag.get_flag, FeatureFlag, new_flag.name)
+
+            # Update the flags list
+            flags.append(new_flag)
+            # Unset previous form values
+            form.name.data = ''
+            form.enabled.data = ''
+
+    # Clear the list of flags (which may be stale)
+    for old_field in range(len(form.flags)):
+        form.flags.pop_entry()
+
+    # Build the list of flags to display
+    for flg in flags:
+        form.flags.append_entry()
+        form.flags[-1]['name'].data = flg.name
+        form.flags[-1].enabled.data = flg.enabled
+
+    return render_template('admin/feature-flags.html', form=form)

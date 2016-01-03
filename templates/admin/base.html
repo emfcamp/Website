@@ -49,6 +49,9 @@
                 <li {% if nav_active == 'make_admin' -%} class="active" {%- endif %}><a href="{{ url_for('.make_admin') }}">
                     Make someone an admin
                 </a></li>
+                <li {% if nav_active == 'feature_flags' -%} class="active" {%- endif %}><a href="{{ url_for('.feature_flags') }}">
+                    Toggle feature flags
+                </a></li>
                 {% endif %}
                 {% if current_user.arrivals %}
                 <li {% if nav_active == 'make_arrivals' -%} class="active" {%- endif %}><a href="{{ url_for('.make_arrivals') }}">
