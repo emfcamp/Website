@@ -28,7 +28,7 @@
     {% if payment.provider == 'stripe' %}
     <a class="btn btn-success" href="{{ url_for('.update_payment', payment_id=payment.id) }}">Update</a>
     {% endif %}
-    {% if payment.provider in ['gocardless', 'banktransfer'] and payment.state != 'cancelled' %}
+    {% if payment.provider in ['gocardless', 'banktransfer'] and payment.state not in ['cancelled', 'paid'] %}
     <a class="btn btn-danger" href="{{ url_for('.cancel_payment', payment_id=payment.id) }}">Cancel</a>
     {% endif %}
   </td>
