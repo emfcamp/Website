@@ -10,7 +10,10 @@ from wtforms import StringField, HiddenField, SubmitField
 from sqlalchemy.exc import IntegrityError
 
 from main import db
-from common import set_user_currency, feature_flag, create_current_user, send_template_email
+from common import (
+    set_user_currency, feature_flag, site_flag,
+    create_current_user, send_template_email,
+)
 from .common.forms import Form
 from models.user import User, UserDiversity
 import re
@@ -83,7 +86,7 @@ class SignupForm(Form):
 
 
 @users.route("/signup", methods=['GET', 'POST'])
-@feature_flag('TICKETS_SITE')
+@site_flag('TICKETS_SITE')
 @feature_flag('TICKET_SALES')
 def signup():
     if current_user.is_authenticated():
@@ -111,7 +114,7 @@ def logout():
 
 
 @users.route("/set-currency", methods=['POST'])
-@feature_flag('TICKETS_SITE')
+@site_flag('TICKETS_SITE')
 def set_currency():
     if request.form['currency'] not in ('GBP', 'EUR'):
         abort(400)

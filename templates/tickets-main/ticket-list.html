@@ -18,7 +18,7 @@
 {%- if t.expired() %} expired {%- endif -%}
 ">
 <td class="checkbox-cell">
-  {% if t.paid and is_feature_flag_set('ISSUE_TICKETS') %}
+  {% if t.paid and feature_enabled('ISSUE_TICKETS') %}
   <label>
     <input type="checkbox" name="ticket_id" value="{{ t.id }}">
   </label>
@@ -47,7 +47,7 @@
 
 </table>
 
-{% if show_receipt and is_feature_flag_set('ISSUE_TICKETS') %}
+{% if show_receipt and feature_enabled('ISSUE_TICKETS') %}
 {{ form.forward(class_="btn btn-default pull-right") }}
 {% else %}
 <div class="well">

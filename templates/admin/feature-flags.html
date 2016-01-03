@@ -9,19 +9,18 @@
 <table class="table table-condensed">
 <thead><tr>
   <th>Flag</th>
-  <th>Is Currently Enabled</th>
+  <th>Feature enabled</th>
 </tr></thead>
 <tbody>
 {% for flg in form.flags %}
 <tr>
-  {# name is a hidden field because we don't want it to be editable #}
-  <td>{{ flg.hidden_tag_without('csrf_token') }}{{ flg['name'].data }}</td>
+  <td>{{ flg.hidden_tag_without('csrf_token') }}{{ flg.feature.data }}</td>
   <td>{{ flg.enabled }}</td>
 </tr>
 {% endfor %}
 <tr>
-  <td>{{ form.name }}</td>
-  <td>{{ form.enabled }}</td>
+  <td>{{ form.new_feature }}</td>
+  <td>{{ form.new_enabled }}</td>
 </tr>
 </tbody>
 </table>

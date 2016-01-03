@@ -8,7 +8,7 @@ from flask_mail import Message
 from wtforms import SubmitField
 
 from main import db, mail
-from ..common import get_user_currency
+from ..common import get_user_currency, feature_enabled
 from ..common.forms import Form
 from . import get_user_payment_or_abort, payments
 
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 def transfer_start(payment):
-    if get_user_currency() == 'EUR' and not app.config.get('BANK_TRANSFER_EURO'):
+    if get_user_currency() == 'EUR' and not feature_enabled('BANK_TRANSFER_EURO'):
         return redirect(url_for('tickets.pay'))
 
     logger.info("Created bank payment %s (%s)", payment.id, payment.bankref)

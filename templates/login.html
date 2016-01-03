@@ -6,7 +6,7 @@
     <h2>Log In</h2>
 
 <div class="well">
-    If you've already bought a ticket to EMF{% if is_feature_flag_set('CFP') %}, or submitted a proposal,{% endif %} you can log into your account here.
+    If you've already bought a ticket to EMF{% if feature_enabled('CFP') %}, or submitted a proposal,{% endif %} you can log into your account here.
 </div>
 
 <form action="{{ url_for('users.login') }}" method="post" class="form-horizontal">

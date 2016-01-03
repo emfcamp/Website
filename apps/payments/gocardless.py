@@ -13,6 +13,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from main import db, gocardless, mail, csrf
 from models.payment import GoCardlessPayment
+from ..common import feature_enabled
 from ..common.forms import Form
 from . import get_user_payment_or_abort
 from . import payments
@@ -56,7 +57,7 @@ def gocardless_tryagain(payment_id):
         valid_states=['new'],
     )
 
-    if not app.config.get('GOCARDLESS'):
+    if not feature_enabled('GOCARDLESS'):
         logger.error('Unable to retry payment %s as GoCardless is disabled', payment.id)
         flash('GoCardless is currently unavailable. Please try again later')
         return redirect(url_for('tickets.main'))
