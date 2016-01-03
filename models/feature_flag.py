@@ -1,15 +1,24 @@
-from main import db, cache
+from main import db
+
+# feature flags that can be overridden in the DB
+DB_FEATURE_FLAGS = [
+    'TICKET_SALES',
+    'BANK_TRANSFER',
+    'BANK_TRANSFER_EURO',
+    'GOCARDLESS',
+    'STRIPE',
+    'CFP',
+    'VOLUNTEERS',
+    'RADIO',
+    'ISSUE_TICKETS',
+]
 
 class FeatureFlag(db.Model):
-    __tablename__ = 'feature_flags'
-    name = db.Column(db.String, primary_key=True)
+    __tablename__ = 'feature_flag'
+    feature = db.Column(db.String, primary_key=True)
     enabled = db.Column(db.Boolean, nullable=False)
 
-    def __init__(self, name, enabled=False):
-        self.name = name
+    def __init__(self, feature, enabled=False):
+        self.feature = feature
         self.enabled = enabled
 
-    @classmethod
-    @cache.memoize(timeout=30)
-    def get_flag(self, name):
-        return FeatureFlag.query.get(name)

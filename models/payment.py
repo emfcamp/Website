@@ -68,10 +68,7 @@ class Payment(db.Model):
             ticket.paid = False
         self.state = 'cancelled'
 
-    def clone(self, new_user=None, ignore_capacity=False):
-        if new_user is not None:
-            raise NotImplementedError('Changing users not yet supported')
-
+    def clone(self, ignore_capacity=False):
         other = self.__class__(self.currency, self.amount)
         for ticket in self.tickets:
             new_ticket = ticket.clone(ignore_capacity=ignore_capacity)
@@ -243,6 +240,15 @@ class GoCardlessPayment(Payment):
 
         return bill_url
 
+    def cancel(self):
+        super(GoCardlessPayment, self).cancel()
+        bill = gocardless.client.bill(self.gcid)
+
+        if bill.can_be_cancelled:
+            bill.cancel()
+        else:
+            raise StateException('GoCardless payment %s cannot be cancelled.' % self.id)
+
 
 class StripePayment(Payment):
     name = 'Stripe payment'
@@ -251,6 +257,9 @@ class StripePayment(Payment):
     __mapper_args__ = {'polymorphic_identity': 'stripe'}
     chargeid = db.Column(db.String, unique=True)
     token = db.Column(db.String)
+
+    def cancel(self):
+        raise StateException('Cannot cancel stripe payments')
 
     @property
     def description(self):

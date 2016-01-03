@@ -13,6 +13,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from main import db, stripe, mail, csrf
 from models.payment import StripePayment
+from ..common import feature_enabled
 from ..common.forms import Form
 from ..common.receipt import render_receipt, render_pdf
 from . import get_user_payment_or_abort
@@ -87,7 +88,7 @@ def charge_stripe(payment):
     msg.body = render_template("emails/tickets-purchased-email-stripe.txt",
                                user=payment.user, payment=payment)
 
-    if app.config.get('ISSUE_TICKETS'):
+    if feature_enabled('ISSUE_TICKETS'):
         page = render_receipt(payment.tickets, pdf=True)
         pdf = render_pdf(page)
         msg.attach('Receipt.pdf', 'application/pdf', pdf.read())
@@ -114,7 +115,7 @@ def stripe_capture(payment_id):
         valid_states=['new'],
     )
 
-    if not app.config.get('STRIPE'):
+    if not feature_enabled('STRIPE'):
         logger.warn('Unable to capture payment as Stripe is disabled')
         flash('Stripe is currently unavailable. Please try again later')
         return redirect(url_for('tickets.main'))
@@ -150,7 +151,7 @@ def stripe_tryagain(payment_id):
         valid_states=['new', 'captured'],  # once it's charged it's too late
     )
 
-    if not app.config.get('STRIPE'):
+    if not feature_enabled('STRIPE'):
         logger.warn('Unable to retry payment as Stripe is disabled')
         flash('Stripe is currently unavailable. Please try again later')
         return redirect(url_for('tickets.main'))
@@ -292,7 +293,7 @@ def stripe_payment_paid(payment):
     msg.body = render_template('emails/tickets-paid-email-stripe.txt',
                                user=payment.user, payment=payment)
 
-    if app.config.get('ISSUE_TICKETS'):
+    if feature_enabled('ISSUE_TICKETS'):
         page = render_receipt(payment.tickets, pdf=True)
         pdf = render_pdf(page)
         msg.attach('Receipt.pdf', 'application/pdf', pdf.read())

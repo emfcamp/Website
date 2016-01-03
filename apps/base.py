@@ -11,7 +11,7 @@ from flask import (
 )
 from jinja2.exceptions import TemplateNotFound
 
-from .common import feature_flag
+from .common import feature_flag, feature_enabled, site_flag
 from models.ticket import TicketType
 from models.payment import StripePayment
 from models.site_state import get_site_state
@@ -23,7 +23,7 @@ base = Blueprint('base', __name__)
 @base.route("/")
 def main():
     full_price = TicketType.get_price_cheapest_full()
-    if not (app.config.get('BANK_TRANSFER') or app.config.get('GOCARDLESS')):
+    if not (feature_enabled('BANK_TRANSFER') or feature_enabled('GOCARDLESS')):
         # Only card payment left
         full_price += StripePayment.premium('GBP', full_price)
 
@@ -36,7 +36,7 @@ def main():
 
 
 @base.route("/", methods=['POST'])
-@feature_flag('TICKETS_SITE')
+@site_flag('TICKETS_SITE')
 def main_post():
     ms = MailSnake(app.config['MAILCHIMP_KEY'])
     try:
@@ -79,13 +79,13 @@ def about():
 
 
 @base.route("/talks/")
-@feature_flag('TICKETS_SITE')
+@site_flag('TICKETS_SITE')
 def talks():
     return redirect(url_for('.talks_2014'))
 
 
 @base.route("/talks/2014")
-@feature_flag('TICKETS_SITE')
+@site_flag('TICKETS_SITE')
 def talks_2014():
     talks = []
     talk_path = os.path.abspath(os.path.join(__file__, '..', '..', 'talks', '2014'))
@@ -102,7 +102,7 @@ def talks_2014():
 
 
 @base.route("/talks/2012")
-@feature_flag('TICKETS_SITE')
+@site_flag('TICKETS_SITE')
 def talks_2012():
     days = {}
     talk_path = os.path.abspath(os.path.join(__file__, '..', '..', 'talks', '2012'))

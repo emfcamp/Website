@@ -3,7 +3,7 @@ Hi, {{ user.name }},
 We've just received confirmation from Stripe that your payment for
 {{ payment.amount | price(payment.currency) }} has cleared.
 
-{% if config.get('ISSUE_TICKETS') %}
+{% if feature_enabled('ISSUE_TICKETS') %}
 {% include 'emails/receipt-blurb.txt' %}
 {% endif %}
 

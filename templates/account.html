@@ -7,7 +7,7 @@
 <nav>
   <ul class="nav nav-pills">
     <li><a href="{{ url_for('tickets.main') }}">Your tickets</a></li>
-    {% if is_feature_flag_set('CFP') %}
+    {% if feature_enabled('CFP') %}
       <li><a href="{{ url_for('cfp.proposals') }}">Your proposals</a></li>
     {% endif %}
   </ul>
@@ -20,7 +20,7 @@
   <fieldset>
     <div class="panel panel-default">
       <div class="panel-heading">
-        {% if is_feature_flag_set('CFP') %}
+        {% if feature_enabled('CFP') %}
           <p>If you've made a submission to the CFP then your name (as it's set here) will be used
                 in the schedule.</p>
         {% endif %}

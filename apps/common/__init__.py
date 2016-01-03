@@ -2,7 +2,7 @@
 from decorator import decorator
 from datetime import datetime
 
-from main import db, mail, external_url
+from main import db, mail, external_url, cache
 from flask import session, render_template, abort, current_app as app, request
 from flask.ext.login import login_user, current_user
 
@@ -60,7 +60,7 @@ def load_utility_functions(app_obj):
             CURRENCIES=CURRENCIES,
             CURRENCY_SYMBOLS=CURRENCY_SYMBOLS,
             external_url=external_url,
-            is_feature_flag_set=is_feature_flag_set
+            feature_enabled=feature_enabled
         )
 
     @app_obj.context_processor
@@ -117,30 +117,34 @@ def process_basket():
     return basket, total
 
 
-def feature_flag(flag):
+def feature_flag(feature):
     """
     Decorator for toggling features within the app.
 
-    If the feature is enabled in either the database or the config (with the
-    database overriding the config settings) call the function, otherwise
-    abort with code 404.
+    For now, returns a 404 if the feature is disabled.
     """
     def call(f, *args, **kw):
-        if is_feature_flag_set(flag):
+        if feature_enabled(feature):
             return f(*args, **kw)
         return abort(404)
     return decorator(call)
 
+def site_flag(site):
+    def call(f, *args, **kw):
+        if app.config.get(site):
+            return f(*args, **kw)
+        return abort(404)
+    return decorator(call)
 
-# Simple function, used in templates
-def is_feature_flag_set(flag):
+@cache.memoize(timeout=30)
+def feature_enabled(feature):
     """
-    If the feature flag is present in the database use that, otherwise fall
-    back to using the config file.
+    If a feature flag is defined in the database return that,
+    otherwise fall back to the config setting.
     """
-    db_flag = FeatureFlag.get_flag(flag)
-    is_set_in_db = db_flag and (db_flag.enabled is True)
-    is_config_fallback = (db_flag is None) and\
-                         (app.config.get(flag, False) is True)
+    db_flag = FeatureFlag.query.get(feature)
+    if db_flag:
+        return db_flag.enabled
 
-    return is_set_in_db or is_config_fallback
+    return app.config.get(feature, False)
+

@@ -37,6 +37,10 @@
                     <a href="{{ url_for('.payments') }}">
                     All payments</span>
                 </a></li>
+                <li {% if nav_active == 'admin_txns' -%} class="active" {%- endif %}>
+                    <a href="{{ url_for('.suppressed') }}">
+                    Suppressed transactions</span>
+                </a></li>
                 <li {% if nav_active == 'admin_expiring' -%} class="active" {%- endif %}><a href="{{ url_for('.expiring') }}">
                     Expiring payments <span class="badge">{{ expiring_count }}</span>
                 </a></li>
