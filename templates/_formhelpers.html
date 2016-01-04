@@ -1,4 +1,4 @@
-{% macro render_field(field, horizontal=False, glyphicon=None) %}
+{% macro render_field(field, horizontal=False, glyphicon=None, help_link='') %}
 
 {% if horizontal == True %}
     {% set horizontal = 10 %}
@@ -11,21 +11,25 @@
 
 <div class="form-group {%- if field.errors %} has-error {%- endif %}">
     <label for="{{ field.name }}" class="{% if horizontal -%} col-sm-{{labelw}} {% endif -%} control-label">
-        {{ field.label.text }}</label>
+        {{ field.label.text }}
+        {%- if help_link %}
+            <a href="{{ help_link }}" target="_blank">?</a>
+        {%- endif %}
+    </label>
     <div class="{% if horizontal -%} col-sm-{{fieldw}} {% endif -%} controls">
-    {%- if glyphicon %}
-    <div class="input-group">
-    {%- endif %}
-    {{ field(class_='form-control', **kwargs)|safe }}
-    {%- if glyphicon %}
-    <span class="glyphicon glyphicon-{{ glyphicon }} input-group-addon"></span>
+        {%- if glyphicon %}
+        <div class="input-group">
+        {%- endif %}
+            {{ field(class_='form-control', **kwargs)|safe }}
+        {%- if glyphicon %}
+            <span class="glyphicon glyphicon-{{ glyphicon }} input-group-addon"></span>
+        </div>
+        {%- endif %}
+        {% if field.errors %}
+            {% for error in field.errors %}
+              <span class="help-block">{{ error }}</span>
+            {% endfor %}
+        {% endif -%}
     </div>
-    {%- endif %}
-    {% if field.errors %}
-        {% for error in field.errors %}
-          <span class="help-block">{{ error }}</span>
-        {% endfor %}
-    {% endif -%}
-  </div>
 </div>
 {% endmacro %}

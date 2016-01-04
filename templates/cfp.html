@@ -7,7 +7,7 @@
   {% endif %}
 
   <h2>Call for Participation</h2>
-  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#what" aria-expanded="false" aria-controls="payments-table">
+  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#what" aria-expanded="true" aria-controls="#what">
     <h3>What we're looking for<small class="glyphicon glyphicon-chevron-down"></small></h3>
   </a>
   <div class="collapse in" id="what">
@@ -35,19 +35,20 @@
       welcome</strong>.</p>
   </div>
 
-  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#selection" aria-expanded="false" aria-controls="payments-table">
+  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#selection" aria-expanded="true" aria-controls="#selection">
     <h3>Selection<small class="glyphicon glyphicon-chevron-down"></small></h3>
   </a>
-  <div class="collapse" id="selection">
+  <div class="collapse in" id="selection">
     <p>After you submit a proposal, it will be considered anonymously by a diverse
       selection panel. We may take into account other factors later on in the process
       to see where we can support you.</p>
+    <p>For more on this see our <a href="{{ url_for('.guidance', _anchor='process') }}" target="_blank">guidance</a>.</p>
   </div>
 
-  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#money" aria-expanded="false" aria-controls="payments-table">
+  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#money" aria-expanded="true" aria-controls="#money">
     <h3>Money<small class="glyphicon glyphicon-chevron-down"></small></h3>
   </a>
-  <div class="collapse" id="money">
+  <div class="collapse in" id="money">
     <p>EMF is a non-profit community event, entirely run by unpaid volunteers. All of
       the ticket cost goes directly towards turning a field into a habitable and amazing place
       to spend a weekend, and everyone who attends contributes to making it a success.</p>
@@ -58,21 +59,34 @@
       who can only attend for the day of their talk. Please let us know if that's the case.</p>
   </div>
 
-  <h3>Submit a proposal</h3>
-  <p>We need a rough idea of what you want to present at EMF, what sort of
-    resources you'll need, and how long you'll expect it to last. If you need some
-    help writing your proposal, <a href="mailto:content@emfcamp.org">we're happy to
-   help</a>. If you're not confident speaking, we'll help you out however we
-   can.</p>
+  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#guidance" aria-expanded="true" aria-controls="#guidance">
+    <h3>Submit a proposal<small class="glyphicon glyphicon-chevron-down"></small></h3>
+  </a>
+  <div class="collapse in" id="guidance">
+    <p>We need a rough idea of what you want to present at EMF, what sort of
+      resources you'll need, and how long you'll expect it to last. If you need some
+      help writing your proposal, <a href="mailto:content@emfcamp.org">we're happy to
+      help</a>. If you're not confident speaking, we'll help you out however we
+      can.</p>
+
+    <p>For more detailed information about the form and what we're looking for
+      please see our <a href="{{ url_for('.guidance') }}" target="_blank">guidance page.</a></p>
+  </div>
 
   {% if not current_user.is_authenticated() %}
   <p>If you've already bought a ticket for this year, please <a href="{{ url_for('users.login') }}">log in</a>
      so we can link the submission to your account.</p>
   {% endif %}
 
-  <div class="alert alert-info">
-  Fields marked <span class="glyphicon glyphicon-globe"></span> will be displayed in the schedule &mdash;
-  you'll be able to change them later.
+  <div class="well">
+    <p>
+      The review process is anonymised, please don't include any details that make
+      you identifiable in the title or description of your submission.
+    </p>
+    <p>
+      If your proposal is accepted you'll have a chance to tweak what is displayed
+      in the schedule later (e.g. to add credits, expand the description)
+    </p>
   </div>
 
   <label class="visible-xs">
@@ -106,20 +120,20 @@
     <form action={{ url_for('cfp.main', cfp_type=form.type) }} method="post" class="form-horizontal cfp-form" role="form">
       <fieldset>
       {{ form.hidden_tag() }}
-
+      <p><a href="{{ url_for('.guidance', _anchor=form.type) }}" target="_blank">Further information on what we expect from a {{ form.type }}.</a></p>
       {% if not current_user.is_authenticated() %}
-        {{ render_field(form.name, True, glyphicon='globe', placeholder="Your name") }}
-
+        {# Use col-sm-3/col-sm-9 split for labels/inputs #}
+        {{ render_field(form.name, 9, placeholder="Your name", help_link=url_for('.guidance', _anchor='form-name')) }}
         {% if form.type == 'talk' %}
-          {{ render_field(form.email, True, placeholder="We'll only use this to contact you about the talk") }}
+          {{ render_field(form.email, 9, help_link=url_for('.guidance', _anchor='form-email'), placeholder="We'll only use this to contact you about the talk") }}
         {% elif form.type == 'workshop' %}
-          {{ render_field(form.email, True, placeholder="We'll only use this to contact you about the workshop") }}
+          {{ render_field(form.email, 9, help_link=url_for('.guidance', _anchor='form-email'), placeholder="We'll only use this to contact you about the workshop") }}
         {% elif form.type == 'installation' %}
-          {{ render_field(form.email, True, placeholder="We'll only use this to contact you about the installation") }}
+          {{ render_field(form.email, 9, help_link=url_for('.guidance', _anchor='form-email'), placeholder="We'll only use this to contact you about the installation") }}
         {% endif %}
       {% endif %}
 
-      {{ render_field(form.title, True, glyphicon='globe', placeholder="A one-sentence summary (it should fit in a tweet)") }}
+      {{ render_field(form.title, 9, help_link=url_for('.guidance', _anchor='form-title'), placeholder="An anonymised one-sentence summary (it should fit in a tweet)") }}
       <div class="text-right help-block hidden show-remaining" data-for="title" data-max="140">
         <small>
           Characters remaining: <span class="remaining"></span><span class="too-long"> (but don't worry)</span>
@@ -128,21 +142,21 @@
       </fieldset>
 
       <fieldset>
-      {{ render_field(form.description, True, placeholder="Description to be anonymised for review.") }}
-      {{ render_field(form.requirements, True, placeholder="Do you have any requirements (e.g. atari to HDMI adaptors, 3-phase power)?") }}
+      {{ render_field(form.description, 9, help_link=url_for('.guidance', _anchor='form-description'), placeholder="An anonymised description to send to the reviewers.") }}
+      {{ render_field(form.requirements, 9, help_link=url_for('.guidance', _anchor='form-requirements'), placeholder="Do you have any requirements (e.g. atari to HDMI adaptors, 3-phase power)?") }}
 
       {% if form.type == 'talk' %}
-        {{ render_field(form.length, True) }}
-        {{ render_field(form.category, True) }}
+        {{ render_field(form.length, 9, help_link=url_for('.guidance', _anchor='form-length')) }}
+        {{ render_field(form.category, 9, help_link=url_for('.guidance', _anchor='form-category')) }}
       {% elif form.type == 'workshop' %}
-        {{ render_field(form.length, True, placeholder="Your best guess, whether in minutes or days") }}
-        {{ render_field(form.attendees, True, placeholder="The number of people you can accommodate in your workshop") }}
-        {{ render_field(form.cost, True, placeholder="0") }}
+        {{ render_field(form.length, 9, help_link=url_for('.guidance', _anchor='form-length'), placeholder="Your best guess, whether in minutes or days") }}
+        {{ render_field(form.attendees, 9, help_link=url_for('.guidance', _anchor='form-attendees'), placeholder="The number of people you can accommodate in your workshop") }}
+        {{ render_field(form.cost, 9, help_link=url_for('.guidance', _anchor='form-cost'), placeholder="0") }}
       {% elif form.type == 'installation' %}
-        {{ render_field(form.size, True, placeholder="We need to know how much space to reserve") }}
+        {{ render_field(form.size, 9, help_link=url_for('.guidance', _anchor='form-size'), placeholder="We need to know how much space to reserve") }}
       {% endif %}
 
-      {{ render_field(form.notice, True) }}
+      {{ render_field(form.notice, 9, help_link=url_for('.guidance', _anchor='form-notice')) }}
 
       </fieldset>
       <fieldset>
@@ -151,6 +165,7 @@
           <label class="checkbox">
             {{ form.need_help() }}
             {{ form.need_help.label.text }}
+            <a href="{{ url_for('.guidance', _anchor='form-help') }}" target="_blank">?</a>
           </label>
           {% for error in form.need_help.errors %}
           <div class="help-block">{{ error }}</div>
@@ -161,6 +176,7 @@
           <label class="checkbox">
             {{ form.need_money() }}
             {{ form.need_money.label.text }}
+            <a href="{{ url_for('.guidance', _anchor='form-funding') }}" target="_blank">?</a>
           </label>
           {% for error in form.need_money.errors %}
           <div class="help-block">{{ error }}</div>
@@ -207,6 +223,13 @@
 {% block foot %}
 <script type="text/javascript">
 $(function() {
+
+  // If Javascript is on and the user has proposals hide all the blurb,
+  // otherwise show it.
+  var has_proposals = '{{ has_proposals }}' == 'True';
+  if (has_proposals) {
+    $('.collapse').removeClass('in');
+  }
 
   $('.cfp-types a').on('show.bs.tab', function(e) {
     var $prev = $(e.relatedTarget);
