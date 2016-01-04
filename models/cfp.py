@@ -21,6 +21,7 @@ class Proposal(db.Model):
     requires_help = db.Column(db.Boolean)
     requires_notice = db.Column(db.String)
     requires_financing = db.Column(db.Boolean)
+    one_day = db.Column(db.Boolean)
 
     # Store the next version so we can find the most recent by looking for NULL
     next_version_id = db.Column(db.Integer, db.ForeignKey('proposal.id'))
