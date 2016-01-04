@@ -112,7 +112,7 @@ class TicketType(db.Model):
                      all()
 
     @classmethod
-    @cache.cached(timeout=60, key_prefix="get_price_cheapest_full")
+    @cache.memoize(timeout=60)
     def get_price_cheapest_full(cls, discount_token=None):
         """ Get the cheapest full ticket price. This may return
             None if there are no tickets (currently) available. """
