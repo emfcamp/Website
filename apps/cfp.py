@@ -41,12 +41,9 @@ class ProposalForm(Form):
     need_money = BooleanField('I will be seeking funding in order to run/create this.')
     notice = SelectField('Required notice', default='1 month',
                           choices=[('No notice', 'No notice required'),
-                                   ('1 day', '1 day'),
                                    ('1 week', '1 week'),
-                                   ('2 weeks', '2 weeks'),
                                    ('1 month', '1 month'),
-                                   ('2 months', '2 months'),
-                                   ('> 2 months', 'Longer than 2 months'),
+                                   ('> 1 month', 'Longer than 1 month'),
                                   ])
 
     diversity = FormField(DiversityForm)
@@ -162,9 +159,12 @@ def main(cfp_type='talk'):
 
     full_price = TicketType.get_price_cheapest_full()
 
+    has_proposals = current_user.proposals.count() > 0 if hasattr(current_user, 'proposals') else False
+
     return render_template('cfp.html', full_price=full_price,
                            forms=forms, active_cfp_type=cfp_type,
-                           has_errors=bool(form.errors))
+                           has_errors=bool(form.errors),
+                           has_proposals=has_proposals)
 
 
 @cfp.route('/cfp/complete')
@@ -184,3 +184,7 @@ def proposals():
         return redirect(url_for('.main'))
 
     return render_template('cfp_proposals.html', proposals=proposals)
+
+@cfp.route('/cfp/guidance')
+def guidance():
+    return render_template('cfp-guidance.html')
