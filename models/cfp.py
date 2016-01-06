@@ -9,18 +9,18 @@ class Proposal(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created = db.Column(db.DateTime, default=datetime.utcnow)
     state = db.Column(db.String, nullable=False, default='new')
-    type = db.Column(db.String, nullable=False) # Talk, workshop or installation
+    type = db.Column(db.String, nullable=False)  # talk, workshop or installation
 
     # Core information
     title = db.Column(db.String, nullable=False)
-    description = db.Column(db.String)
+    description = db.Column(db.String, nullable=False)
     requirements = db.Column(db.String)
-    length = db.Column(db.String)
+    length = db.Column(db.String)  # only used for talks and workshops
+    notice_required = db.Column(db.String)
 
     # Flags
-    requires_help = db.Column(db.Boolean)
-    requires_notice = db.Column(db.String)
-    requires_financing = db.Column(db.Boolean)
+    needs_help = db.Column(db.Boolean)
+    needs_money = db.Column(db.Boolean)
     one_day = db.Column(db.Boolean)
 
     # Store the next version so we can find the most recent by looking for NULL
@@ -32,14 +32,12 @@ class Proposal(db.Model):
 
 class TalkProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'talk'}
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
-    category = db.relationship('TalkCategory', backref='proposals')
 
 
 class WorkshopProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'workshop'}
     attendees = db.Column(db.String)
-    cost = db.Column(db.Integer)
+    cost = db.Column(db.String)
 
 
 class InstallationProposal(Proposal):
@@ -52,13 +50,3 @@ class TalkCategory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
 
-    @classmethod
-    @cache.cached(timeout=60, key_prefix='get_cfp_categories')
-    def get_categories_selection(cls):
-        categories = TalkCategory.query.all()
-
-        # Id has to be a string to match the HTML return
-        categories = [(str(c.id), c.name) for c in categories]
-        categories.append(('NULL', 'None of the above'))
-
-        return categories

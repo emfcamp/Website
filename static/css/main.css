@@ -550,8 +550,14 @@ a.collapse-toggle:focus .glyphicon {
 /*
  * collapse toggles are normally white, grey on hover with only the text underlined
  */
-a.collapse-toggle { text-decoration: none; }
-a.collapse-toggle .glyphicon { color: white; }
+a.collapse-toggle {
+  text-decoration: none;
+}
+a.collapse-toggle .glyphicon {
+  color: white;
+  margin-left: 0.3em;
+}
+
 a.collapse-toggle:hover            { text-decoration: underline; }
 a.collapse-toggle:hover .glyphicon { text-decoration: none; }
 
@@ -573,3 +579,9 @@ a.collapse-toggle:hover .glyphicon {
 .cfp-guidance dd {
   margin-left: 40px;
 }
+
+.cfp-guidance.well a,
+.cfp-guidance.well a.collapse-toggle .glyphicon {
+  color: inherit;
+}
+

@@ -1,26 +1,15 @@
+{% set main_class = 'cfp-guidance' %}
 {% extends "base.html" %}
-{% block title %}Help: Call for Participants{% endblock %}
+{% block title %}Call for Participation guidance{% endblock %}
 {% block body %}
-<segment class="cfp-guidance">
+<div class="cfp-guidance well">
 
-<h2>Help for the EMF 2016 Call for Participation form</h2>
-
-<p>
-  EMF aims to present a diverse and interesting range of talks, workshops and
-  installations. We want to present you with things that you wouldn't normally
-  get to experience from a wide range of people.
-</p>
+<h2>Call for Participation guidance</h2>
 
 <p>
-  To that end we've opened our Call for Participation (CfP). The CfP is an
-  anonymised process by which we aim to select the most interesting things for
-  you to experience at this year's event.
-</p>
-
-<p>
-  We have 3 broad types of experience that we host: talks, workshops and
-  installations. Some experiences may fall between types and some may fall
-  outside. If this is the case pick what you feel is most relevant and we'll
+  We have 3 broad categories of proposal: talks, workshops and installations.
+  Some experiences may fall between categories and some outside.
+  If this is the case, pick what you feel is most relevant and we'll
   work with you to figure out what's best.
 </p>
 
@@ -28,24 +17,24 @@
   <a id="talk"></a>
   <dt>Talks</dt>
   <dd>
-    Talks are pretty easy to explain. We have several stages a person (or
-    group) stand at the front and tell the audience about something they find
-    awesome. This can be anything from an interesting exploit in their favourite
+    We have three fully-equipped amplified stages that can host a person or group
+    to speak about something they find awesome.
+    This can be anything from an interesting exploit in their favourite
     browser to a history of cheese-making.
   </dd>
     <a id="workshop"></a>
   <dt>Workshops</dt>
   <dd>
-    Workshops are generally smaller than talks and involve the audience
+    Workshops are generally smaller than talks and involve the attendees
     doing something. Previous workshops have included making titanium sporks,
-    stop-motion animation and knitting.
+    a treasure hunt around the site, and knitting.
   </dd>
     <a id="installation"></a>
   <dt>Installations</dt>
   <dd>
     Installations are weekend-long projects. Some are static and brought on
-    to the site for people to look at or use (for example: a giant grid of LEDs,
-    and a robot cocktail maker).
+    to the site for people to look at or use.
+    At EMF 2014, attendees brought a giant grid of LEDs and a robotic cocktail maker.
   </dd>
 </dl>
 
@@ -54,59 +43,58 @@
 </a>
 <div class="collapse in" id="form">
   <p>
-    If you want to submit a proposal to any of the 3 groups you'll need to fill
+    If you want to submit a proposal in any of the 3 categories you'll need to fill
     in appropriate CfP form. The forms are broadly the same but there are a few
     differences between them. We'll quickly go over each field so that you know
-    what we're after (and why).
+    what we're after and why.
   </p>
 
   <p>
-    <strong>Note:</strong> when you make a submission it will be editable for the
-    first 48 hours. After that it'll be locked and set to our anonymisers (see
+    <strong>Note:</strong> when you make a submission it will usually be editable for the
+    first 48 hours. After that it'll be locked and sent to our anonymisers (see
     below for details on the full process). If there are any changes you need to
-    make after this: don't worry! If your proposal is accepted you'll have a
+    make after this, don't worry! If your proposal is accepted, you'll have a
     chance to finalise all the details before they're added to our schedule.
   </p>
 
   <dl>
   <a id="form-name"></a>
-    <dt>Name (new users only)</dt>
+    <dt>Name</dt>
     <dd>
-      We mainly use what ever you put in this to help anonymise your submission.
-      It's also what your tickets will be listed under. If you would like an
+      This can help us anonymise your submission, and will be included in
+      emails from us. If you would like an
       alternate name to be displayed in the schedule we'll get this from you
       after your proposal has been accepted.
     </dd>
     <a id="form-email"></a>
     <dt>Email (new users only)</dt>
     <dd>
-      This will be our main method of contacting you as well as how we
-      authenticate you on our website (we use a password-less system). This will
-      only be visible to our admin.
+      This is our main method of contacting you, and we'll send links here
+      if you need to log in again later.
+      This will usually only be visible to our web team.
     </dd>
     <a id="form-title"></a>
     <dt>Title</dt>
     <dd>
       What is your talk/workshop/installation called? Obviously it should give
       some idea about what the proposal is about. We also ask that you keep titles
-      reasonably short, the length of a tweet (140 characters) is a pretty good
+      reasonably short &ndash; the length of a tweet (140 characters) is a pretty good
       maximum length.
     </dd>
     <a id="form-description"></a>
     <dt>Description</dt>
     <dd>
       More detail on your proposal than you can give in your title. This will be
-      anonymised so please don't put in any identifiable details (e.g. rather than
-      "writing a building Emojli" try "what we learnt building a joke app"). Our
+      anonymised so please don't put in any identifiable details. For example, instead of
+      "how we created Emojli", try "what we learnt building a joke app". Our
       anonymisers will be pretty busy so if they can't anonymise your submission
       they may ask for a re-write.
     </dd>
     <a id="form-requirements"></a>
     <dt>Requirements</dt>
     <dd>
-      Is there anything you need? We'll have some basics available (e.g.
-      projectors) but if you need something specific (like a VGA adaptor for a
-      BBC Micro) we'll have to negotiate getting it.
+      Is there anything you need? We should have everything you need to present,
+      but if you need something specific or unusual, we'll look into providing it.
     </dd>
     <a id="form-help"></a>
     <dt>The help checkbox</dt>
@@ -125,7 +113,7 @@
       know if you're planning to crowdfund any part of your submission so we can
       let our community help as well.
     </dd>
-    <a id="form-notice"></a>
+    <a id="form-notice-required"></a>
     <dt>Notice</dt>
     <dd>
       Preparing talks, planning workshops and building installations take time, we
@@ -157,7 +145,7 @@
       feel capable of teaching at once will help us organise our schedule.
     </dd>
     <a id="form-cost"></a>
-    <dt>Cost (workshop only)</dt>
+    <dt>Cost (workshops only)</dt>
     <dd>
       Many workshops have a material cost, obviously it is unfair to ask you to
       bear this. Letting us know what this fee is likely to be will help us
@@ -215,5 +203,5 @@
     </li>
   </ol>
 </div>
-</segment>
+</div>
 {% endblock %}

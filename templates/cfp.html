@@ -7,9 +7,6 @@
   {% endif %}
 
   <h2>Call for Participation</h2>
-  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#what" aria-expanded="true" aria-controls="#what">
-    <h3>What we're looking for<small class="glyphicon glyphicon-chevron-down"></small></h3>
-  </a>
   <div class="collapse in" id="what">
     <p class="emphasis">Electromagnetic Field is a UK camping festival for those
       with an inquisitive mind or an interest in making things: hackers, artists,
@@ -65,7 +62,7 @@
   <div class="collapse in" id="guidance">
     <p>We need a rough idea of what you want to present at EMF, what sort of
       resources you'll need, and how long you'll expect it to last. If you need some
-      help writing your proposal, <a href="mailto:content@emfcamp.org">we're happy to
+      help writing your proposal, <a href="mailto:{{ config['CONTENT_EMAIL'][1] }}">we're happy to
       help</a>. If you're not confident speaking, we'll help you out however we
       can.</p>
 
@@ -80,7 +77,7 @@
 
   <div class="well">
     <p>
-      The review process is anonymised, please don't include any details that make
+      The review process is anonymised, so please don't include any details that make
       you identifiable in the title or description of your submission.
     </p>
     <p>
@@ -122,18 +119,15 @@
       {{ form.hidden_tag() }}
       <p><a href="{{ url_for('.guidance', _anchor=form.type) }}" target="_blank">Further information on what we expect from a {{ form.type }}.</a></p>
       {% if not current_user.is_authenticated() %}
-        {# Use col-sm-3/col-sm-9 split for labels/inputs #}
-        {{ render_field(form.name, 9, placeholder="Your name", help_link=url_for('.guidance', _anchor='form-name')) }}
-        {% if form.type == 'talk' %}
-          {{ render_field(form.email, 9, help_link=url_for('.guidance', _anchor='form-email'), placeholder="We'll only use this to contact you about the talk") }}
-        {% elif form.type == 'workshop' %}
-          {{ render_field(form.email, 9, help_link=url_for('.guidance', _anchor='form-email'), placeholder="We'll only use this to contact you about the workshop") }}
-        {% elif form.type == 'installation' %}
-          {{ render_field(form.email, 9, help_link=url_for('.guidance', _anchor='form-email'), placeholder="We'll only use this to contact you about the installation") }}
+        {% if current_user.is_anonymous() %}
+          {{ render_field(form.name, 9, placeholder="Your name", help_link=url_for('.guidance', _anchor='form-name')) }}
+          {{ render_field(form.email, 9, help_link=url_for('.guidance', _anchor='form-email'), placeholder="We need this to update you about your talk and so you can log back in") }}
+        {% else %}
+          {{ render_field(form.name, 9, placeholder="Your name", help_link=url_for('.guidance', _anchor='form-name')) }}
         {% endif %}
       {% endif %}
 
-      {{ render_field(form.title, 9, help_link=url_for('.guidance', _anchor='form-title'), placeholder="An anonymised one-sentence summary (it should fit in a tweet)") }}
+      {{ render_field(form.title, 9, help_link=url_for('.guidance', _anchor='form-title'), placeholder="A one-sentence summary (it should fit in a tweet)") }}
       <div class="text-right help-block hidden show-remaining" data-for="title" data-max="140">
         <small>
           Characters remaining: <span class="remaining"></span><span class="too-long"> (but don't worry)</span>
@@ -147,38 +141,51 @@
 
       {% if form.type == 'talk' %}
         {{ render_field(form.length, 9, help_link=url_for('.guidance', _anchor='form-length')) }}
-        {{ render_field(form.category, 9, help_link=url_for('.guidance', _anchor='form-category')) }}
       {% elif form.type == 'workshop' %}
         {{ render_field(form.length, 9, help_link=url_for('.guidance', _anchor='form-length'), placeholder="Your best guess, whether in minutes or days") }}
         {{ render_field(form.attendees, 9, help_link=url_for('.guidance', _anchor='form-attendees'), placeholder="The number of people you can accommodate in your workshop") }}
-        {{ render_field(form.cost, 9, help_link=url_for('.guidance', _anchor='form-cost'), placeholder="0") }}
+
+        {{ render_field(form.cost, 9, help_link=url_for('.guidance', _anchor='form-cost'), placeholder="If attendees need to pay for materials") }}
       {% elif form.type == 'installation' %}
         {{ render_field(form.size, 9, help_link=url_for('.guidance', _anchor='form-size'), placeholder="We need to know how much space to reserve") }}
       {% endif %}
 
-      {{ render_field(form.notice, 9, help_link=url_for('.guidance', _anchor='form-notice')) }}
+      {{ render_field(form.notice_required, 9, help_link=url_for('.guidance', _anchor='form-notice-required')) }}
 
       </fieldset>
       <fieldset>
 
         <div class="col-md-9 col-sm-offset-3">
           <label class="checkbox">
-            {{ form.need_help() }}
-            {{ form.need_help.label.text }}
+            {{ form.needs_help() }}
+            {% if form.type == 'talk' %}
+            I'd like help with preparing this proposal or during the talk.
+            {% elif form.type == 'workshop' %}
+            I'd like help with preparing this proposal or during the workshop.
+            {% elif form.type == 'installation' %}
+            I'd like help with preparing this proposal or the installation itself.
+            {% endif %}
             <a href="{{ url_for('.guidance', _anchor='form-help') }}" target="_blank">?</a>
           </label>
-          {% for error in form.need_help.errors %}
+          {% for error in form.needs_help.errors %}
           <div class="help-block">{{ error }}</div>
           {% endfor %}
         </div>
 
         <div class="col-md-9 col-sm-offset-3">
           <label class="checkbox">
-            {{ form.need_money() }}
-            {{ form.need_money.label.text }}
+            {{ form.needs_money() }}
+            {% if form.type == 'talk' %}
+            I'll be seeking funding in order to present this talk.
+            {% elif form.type == 'workshop' %}
+            I'll be seeking funding in order to run this workshop.
+            {% elif form.type == 'installation' %}
+            I'll be seeking funding in order to create this installation.
+            {% endif %}
+
             <a href="{{ url_for('.guidance', _anchor='form-funding') }}" target="_blank">?</a>
           </label>
-          {% for error in form.need_money.errors %}
+          {% for error in form.needs_money.errors %}
           <div class="help-block">{{ error }}</div>
           {% endfor %}
         </div>
@@ -195,7 +202,7 @@
             how well we're doing with outreach.
           </div>
           <div class="row">
-          <div id="diversity" class="col-md-11">
+          <div id="diversity" class="col-md-10 col-md-offset-1">
             <p></p>
             {{ render_field(form.diversity.age, True) }}
             {{ render_field(form.diversity.gender, True) }}
@@ -224,13 +231,14 @@
 <script type="text/javascript">
 $(function() {
 
-  // If Javascript is on and the user has proposals hide all the blurb,
-  // otherwise show it.
-  var has_proposals = '{{ has_proposals }}' == 'True';
+  // If the user has already made a submission, hide all the blurb.
+  // Fallback is just to show it.
+  var has_proposals = {{ has_proposals|tojson }};
   if (has_proposals) {
     $('.collapse').removeClass('in');
   }
 
+  // Copy values across when the user switches tab
   $('.cfp-types a').on('show.bs.tab', function(e) {
     var $prev = $(e.relatedTarget);
     var $curr = $(this);
@@ -249,6 +257,7 @@ $(function() {
     return true;
   });
 
+  // Count down the length limit, but don't block the user if they exceed it
   $('.show-remaining').each(function() {
     var $t = $(this);
     var field_sel = $t.data('for');

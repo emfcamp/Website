@@ -37,9 +37,9 @@ class ProposalForm(Form):
     title = StringField("Title", [Required()])
     description = TextAreaField("Description", [Required()])
     requirements = StringField("Requirements")
-    need_help = BooleanField('I would like help with preparing this proposal or the submission itself.')
-    need_money = BooleanField('I will be seeking funding in order to run/create this.')
-    notice = SelectField('Required notice', default='1 month',
+    needs_help = BooleanField("Needs help")
+    needs_money = BooleanField("Needs funding")
+    notice_required = SelectField("Required notice", default="No notice required",
                           choices=[('No notice', 'No notice required'),
                                    ('1 week', '1 week'),
                                    ('1 month', '1 month'),
@@ -63,14 +63,13 @@ class TalkProposalForm(ProposalForm):
                                   ('45 mins', "45 minutes"),
                                   ('> 45 mins', "Longer than 45 minutes"),
                                   ])
-    category = SelectField('Category')
 
 
 class WorkshopProposalForm(ProposalForm):
     type = 'workshop'
     length = StringField("Duration", [Required()])
     attendees = StringField("Attendees", [Required()])
-    cost = IntegerField(u'Cost per attendee (£)')
+    cost = IntegerField("Cost per attendee")
 
 
 class InstallationProposalForm(ProposalForm):
@@ -85,10 +84,7 @@ def main(cfp_type='talk'):
     if cfp_type not in ['talk', 'workshop', 'installation']:
         abort(404)
 
-    talk = TalkProposalForm()
-    talk.category.choices = TalkCategory.get_categories_selection()
-
-    forms = [talk, WorkshopProposalForm(), InstallationProposalForm()]
+    forms = [TalkProposalForm(), WorkshopProposalForm(), InstallationProposalForm()]
     (form,) = [f for f in forms if f.type == cfp_type]
 
     # If the user is already logged in set their name & email for the form
@@ -114,12 +110,13 @@ def main(cfp_type='talk'):
         if cfp_type == 'talk':
             cfp = TalkProposal()
             cfp.length = form.length.data
-            cfp.category_id = form.category.data
+
         elif cfp_type == 'workshop':
             cfp = WorkshopProposal()
             cfp.length = form.length.data
             cfp.attendees = form.attendees.data
             cfp.cost = form.cost.data
+
         elif cfp_type == 'installation':
             cfp = InstallationProposal()
             cfp.size = form.size.data
@@ -129,9 +126,10 @@ def main(cfp_type='talk'):
         cfp.title = form.title.data
         cfp.requirements = form.requirements.data
         cfp.description = form.description.data
-        cfp.requires_help = form.need_help.data
-        cfp.requires_notice = form.notice.data
-        cfp.requires_financing = form.need_money.data
+        cfp.notice_required = form.notice_required.data
+
+        cfp.needs_help = form.needs_help.data
+        cfp.needs_money = form.needs_money.data
 
         db.session.add(cfp)
         db.session.commit()

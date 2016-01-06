@@ -1,4 +1,4 @@
-{% macro render_field(field, horizontal=False, glyphicon=None, help_link='') %}
+{% macro render_field(field, horizontal=False, glyphicon_before=None, glyphicon_after=None, help_link='') %}
 
 {% if horizontal == True %}
     {% set horizontal = 10 %}
@@ -17,13 +17,18 @@
         {%- endif %}
     </label>
     <div class="{% if horizontal -%} col-sm-{{fieldw}} {% endif -%} controls">
-        {%- if glyphicon %}
+        {%- if glyphicon_before or glyphicon_after %}
         <div class="input-group">
-        {%- endif %}
+            {%- if glyphicon_before%}
+            <span class="glyphicon glyphicon-{{ glyphicon_before }} input-group-addon"></span>
+            {%- endif %}
             {{ field(class_='form-control', **kwargs)|safe }}
-        {%- if glyphicon %}
-            <span class="glyphicon glyphicon-{{ glyphicon }} input-group-addon"></span>
+            {%- if glyphicon_after %}
+            <span class="glyphicon glyphicon-{{ glyphicon_after }} input-group-addon"></span>
+            {%- endif %}
         </div>
+        {% else %}
+            {{ field(class_='form-control', **kwargs)|safe }}
         {%- endif %}
         {% if field.errors %}
             {% for error in field.errors %}
