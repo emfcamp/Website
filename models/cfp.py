@@ -1,4 +1,4 @@
-from main import db, cache
+from main import db
 from datetime import datetime
 
 

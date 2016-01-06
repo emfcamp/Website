@@ -5,7 +5,7 @@
 <div>If you haven't yet bought your tickets, please reserve them now.</div>
 <p></p>
 <a class="btn btn-default" href="{{ url_for('cfp.main') }}">Add another</a>
-{% if is_feature_flag_set('TICKET_SALES') %}
+{% if feature_enabled('TICKET_SALES') %}
   <a class="btn btn-success" href="{{ url_for('tickets.main') }}">Buy Tickets</a>
 {% endif %}
 {% endblock %}

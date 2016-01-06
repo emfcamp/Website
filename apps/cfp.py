@@ -17,7 +17,7 @@ from main import db, mail
 from models.user import User, UserDiversity
 from models.ticket import TicketType
 from models.cfp import (
-    TalkProposal, WorkshopProposal, InstallationProposal, TalkCategory
+    TalkProposal, WorkshopProposal, InstallationProposal
 )
 from .common import feature_flag, create_current_user
 from .common.forms import Form
