@@ -187,28 +187,6 @@
       </fieldset>
       <p></p>
 
-      {% if current_user.is_anonymous() or not current_user.diversity %}
-      <fieldset>
-        <div class="col-md-11 col-md-offset-1">
-        <div class="panel panel-warning">
-          <div class="panel-heading">
-            If you're comfortable telling us a little bit about yourself, we'd appreciate it.
-            This information won't be available to the selection panel &ndash; we'll only use it to help find out
-            how well we're doing with outreach.
-          </div>
-          <div class="row">
-          <div id="diversity" class="col-md-10 col-md-offset-1">
-            <p></p>
-            {{ render_field(form.diversity.age, True) }}
-            {{ render_field(form.diversity.gender, True) }}
-            {{ render_field(form.diversity.ethnicity, True) }}
-          </div>
-          </div>
-        </div>
-        </div>
-      </fieldset>
-      {% endif %}
-
       <div class="form-actions">
         <button type="submit" name="Create" class="btn btn-success btn-lg pull-right debounce">Submit proposal</button>
       </div>

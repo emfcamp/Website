@@ -25,12 +25,6 @@ from .common.forms import Form
 cfp = Blueprint('cfp', __name__)
 
 
-class DiversityForm(Form):
-    age = StringField('Age')
-    gender = StringField('Gender')
-    ethnicity = StringField('Ethnicity')
-
-
 class ProposalForm(Form):
     name = StringField("Name", [Required()])
     email = StringField("Email", [Email(), Required()])
@@ -45,8 +39,6 @@ class ProposalForm(Form):
                                    ('1 month', '1 month'),
                                    ('> 1 month', 'Longer than 1 month'),
                                   ])
-
-    diversity = FormField(DiversityForm)
 
     def validate_email(form, field):
         if current_user.is_anonymous() and User.does_user_exist(field.data):
@@ -139,16 +131,6 @@ def main(cfp_type='talk'):
         db.session.add(cfp)
         db.session.commit()
 
-        if not current_user.diversity and any(form.diversity.data.values()):
-            diversity = UserDiversity()
-            diversity.age = form.diversity.age.data
-            diversity.gender = form.diversity.gender.data
-            diversity.user_id = current_user.id
-            diversity.ethnicity = form.diversity.ethnicity.data
-
-            db.session.add(diversity)
-            db.session.commit()
-
         # Send confirmation message
         msg = Message('Electromagnetic Field CFP Submission',
                       sender=app.config['CONTENT_EMAIL'],
@@ -170,10 +152,30 @@ def main(cfp_type='talk'):
                            has_proposals=has_proposals)
 
 
-@cfp.route('/cfp/complete')
+class DiversityForm(Form):
+    age = StringField('Age')
+    gender = StringField('Gender')
+    ethnicity = StringField('Ethnicity')
+
+
+@cfp.route('/cfp/complete', methods=['GET', 'POST'])
 @feature_flag('CFP')
 def complete():
-    return render_template('cfp_complete.html')
+    form = DiversityForm()
+    if form.validate_on_submit():
+        if not current_user.diversity:
+            current_user.diversity = UserDiversity()
+            current_user.diversity.user_id = current_user.id
+            db.session.add(current_user.diversity)
+
+        current_user.diversity.age = form.age.data
+        current_user.diversity.gender = form.gender.data
+        current_user.diversity.ethnicity = form.ethnicity.data
+
+        db.session.commit()
+        return redirect(url_for('users.account'))
+
+    return render_template('cfp_complete.html', form=form)
 
 
 @cfp.route('/cfp/proposals')
