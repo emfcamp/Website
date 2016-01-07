@@ -127,12 +127,7 @@
         {% endif %}
       {% endif %}
 
-      {{ render_field(form.title, 9, help_link=url_for('.guidance', _anchor='form-title'), placeholder="A one-sentence summary (it should fit in a tweet)") }}
-      <div class="text-right help-block hidden show-remaining" data-for="title" data-max="140">
-        <small>
-          Characters remaining: <span class="remaining"></span><span class="too-long"> (but don't worry)</span>
-        </small>
-      </div>
+      {{ render_field(form.title, 9, help_link=url_for('.guidance', _anchor='form-title'), placeholder="A one-sentence summary") }}
       </fieldset>
 
       <fieldset>
@@ -230,7 +225,7 @@
 {% block foot %}
 <script type="text/javascript">
 $(function() {
-
+  'use strict';
   // If the user has already made a submission, hide all the blurb.
   // Fallback is just to show it.
   var has_proposals = {{ has_proposals|tojson }};
@@ -255,21 +250,6 @@ $(function() {
     });
 
     return true;
-  });
-
-  // Count down the length limit, but don't block the user if they exceed it
-  $('.show-remaining').each(function() {
-    var $t = $(this);
-    var field_sel = $t.data('for');
-    var $field = $t.closest('form').find('[name=' + field_sel + ']');
-    var max_length = $t.data('max');
-    $field.on('change keydown keyup', function() {
-      var length = this.value.length;
-      var remaining = max_length - length;
-      $('.remaining', $t).text(remaining);
-      $('.too-long', $t).toggle(remaining < 0);
-    }).change();
-    $t.removeClass('hidden');
   });
 });
 </script>
