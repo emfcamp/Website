@@ -74,7 +74,12 @@ class WorkshopProposalForm(ProposalForm):
 
 class InstallationProposalForm(ProposalForm):
     type = 'installation'
-    size = StringField("Physical size", [Required()])
+    size = SelectField('Physical size', default="medium",
+                                        choices=[('small', 'Smaller than a bread-bin'),
+                                                 ('medium', 'Size of a wheelie bin'),
+                                                 ('large', 'Size of a car'),
+                                                 ('huge', 'Bigger than a car'),
+                                                ])
 
 
 @cfp.route('/cfp')
