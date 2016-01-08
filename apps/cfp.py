@@ -34,8 +34,7 @@ class ProposalForm(Form):
     needs_help = BooleanField("Needs help")
     needs_money = BooleanField("Needs funding")
     notice_required = SelectField("Required notice", default="No notice required",
-                          choices=[('No notice', 'No notice required'),
-                                   ('1 week', '1 week'),
+                          choices=[('1 week', '1 week'),
                                    ('1 month', '1 month'),
                                    ('> 1 month', 'Longer than 1 month'),
                                   ])
