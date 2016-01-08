@@ -66,11 +66,18 @@ class WorkshopProposalForm(ProposalForm):
 class InstallationProposalForm(ProposalForm):
     type = 'installation'
     size = SelectField('Physical size', default="medium",
-                                        choices=[('small', 'Smaller than a bread-bin'),
-                                                 ('medium', 'Size of a wheelie bin'),
-                                                 ('large', 'Size of a car'),
-                                                 ('huge', 'Bigger than a car'),
+                                        choices=[('small', 'Smaller than a wheelie bin'),
+                                                 ('medium', 'Smaller than a car'),
+                                                 ('large', 'Smaller than a lorry'),
+                                                 ('huge', 'Bigger than a lorry'),
                                                 ])
+    needs_emf_funds = BooleanField('EMF funds')
+    funds = SelectField('Amount requested', choices=[(u'< £50', u'Less than £50'),
+                                                     (u'< £100', u'Less than £100'),
+                                                     (u'< £300', u'Less than £300'),
+                                                     (u'< £500', u'Less than £500'),
+                                                     (u'> £500', u'More than £500'),
+                                                    ])
 
 
 @cfp.route('/cfp')
@@ -116,6 +123,8 @@ def main(cfp_type='talk'):
         elif cfp_type == 'installation':
             cfp = InstallationProposal()
             cfp.size = form.size.data
+            if form.needs_emf_funds.data:
+                cfp.emf_funds = form.funds.data
 
         cfp.user_id = current_user.id
 

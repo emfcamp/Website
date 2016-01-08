@@ -43,6 +43,7 @@ class WorkshopProposal(Proposal):
 class InstallationProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'installation'}
     size = db.Column(db.String)
+    emf_funds = db.Column(db.String, nullable=True)
 
 
 class TalkCategory(db.Model):
