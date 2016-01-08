@@ -153,13 +153,7 @@
         <div class="col-md-9 col-sm-offset-3">
           <label class="checkbox">
             {{ form.needs_help() }}
-            {% if form.type == 'talk' %}
-            I'd like help with preparing this proposal or during the talk.
-            {% elif form.type == 'workshop' %}
-            I'd like help with preparing this proposal or during the workshop.
-            {% elif form.type == 'installation' %}
-            I'd like help with preparing this proposal or the installation itself.
-            {% endif %}
+            I'd like help with preparing this proposal.
             <a href="{{ url_for('.guidance', _anchor='form-help') }}" target="_blank">?</a>
           </label>
           {% for error in form.needs_help.errors %}
