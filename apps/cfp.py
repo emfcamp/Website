@@ -32,7 +32,6 @@ class ProposalForm(Form):
     description = TextAreaField("Description", [Required()])
     requirements = StringField("Requirements")
     needs_help = BooleanField("Needs help")
-    needs_money = BooleanField("Needs funding")
     notice_required = SelectField("Required notice", default="No notice required",
                           choices=[('1 week', '1 week'),
                                    ('1 month', '1 month'),
@@ -134,7 +133,6 @@ def main(cfp_type='talk'):
         cfp.notice_required = form.notice_required.data
 
         cfp.needs_help = form.needs_help.data
-        cfp.needs_money = form.needs_money.data
 
         db.session.add(cfp)
         db.session.commit()
