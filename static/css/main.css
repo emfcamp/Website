@@ -1,3 +1,10 @@
+/*
+ * Breakpoints
+ *   - 550px
+ *   - 768px
+ *   - 1200px
+ */
+
 body {
   font-size: 16px;
   color: white;
@@ -403,6 +410,28 @@ div.micro img {
 
 .cfp-tab a {
   color: #333;
+}
+
+@media (max-width: 550px){
+  .cfp-types.nav-tabs > li {
+    display: block;
+    max-width: 150px;
+    height: 138px;
+  }
+  .cfp-types.nav-tabs > li > a {
+    height: 100%;
+  }
+}
+
+@media (min-width: 550px) and (max-width: 768px) {
+  .cfp-types.nav-tabs > li {
+    display: block;
+    max-width: 170px;
+    height: 138px;
+  }
+  .cfp-types.nav-tabs > li > a {
+    height: 100%;
+  }
 }
 
 .cfp-types.nav-tabs > li > a {

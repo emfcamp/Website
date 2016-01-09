@@ -187,7 +187,7 @@
       <h5>Other details</h5>
       <p>These won't go to our reviewers but may form part of the decision by the adjudicator (e.g. we may reject submissions that have requirements we can't easily meet).</p>
       {% if form.type == 'talk' %}
-        {% call _render_cfp_field(form.requirements, form.type, placeholder="Do you have any special requirements e.g. atari to HDMI adaptors)?") %}
+        {% call _render_cfp_field(form.requirements, form.type, placeholder="Do you have any special requirements e.g. atari to HDMI cable?") %}
           We'll have projectors, basic adaptors (VGA/DVI), laptops and microphones but do you need anything else? e.g. cameras for demos, rocket fuel.
         {% endcall %}
         {% call _render_cfp_field(form.length, form.type) %}
@@ -209,7 +209,7 @@
         {% endcall %}
 
       {% elif form.type == 'installation' %}
-        {% call _render_cfp_field(form.requirements, form.type, placeholder="Do you have any requirements (e.g. aviation launch clearance, somewhere dry)?") %}
+        {% call _render_cfp_field(form.requirements, form.type, placeholder="Do you have any requirements (e.g. somewhere dry)?") %}
           What does your installation need in order to run? Power and internet will be available (although if you need e.g. static IPs tell us) but beyond these we'll need time to organise things.
         {% endcall %}
         {% call _render_cfp_field(form.size, form.type) %}
