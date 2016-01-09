@@ -8,7 +8,7 @@ from flask_mail import Message
 from wtforms.validators import Required, Email, ValidationError
 from wtforms import (
     BooleanField, StringField, IntegerField,
-    FormField, TextAreaField, SelectField,
+    TextAreaField, SelectField,
 )
 
 from sqlalchemy.exc import IntegrityError
