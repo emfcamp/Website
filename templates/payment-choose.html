@@ -11,8 +11,16 @@
         <li>{{ticket.name}}</li>
         {% endfor %}
     </ul>
-    The total price is <b>{{ total | price(user_currency) }}</b>.
-    If this isn't right, or the currency is wrong, <a href="{{url_for('tickets.choose')}}">choose your tickets again</a>.
+    <p>The total price is <b>{{ total | price(user_currency) }}</b>.
+    If this isn't right, you can:</p>
+    <form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="btn-group" role="group">
+        <a class="btn btn-default" href="{{url_for('tickets.choose')}}">Change tickets</a>
+        <button name="change_currency" value="{% if user_currency == 'GBP' %}EUR{% else %}GBP{% endif %}"
+            class="btn btn-default">Pay in {% if user_currency == 'GBP' %}Euros (€){% else %}Pounds (£){% endif %}</button>
+    </div>
+</form>
 </div>
 
 <form method="post" class="pay-method">

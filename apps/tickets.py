@@ -226,6 +226,11 @@ class TicketPaymentForm(Form):
 
 @tickets.route("/tickets/pay", methods=['GET', 'POST'])
 def pay():
+
+    if request.form.get("change_currency") in ('GBP', 'EUR'):
+        set_user_currency(request.form.get("change_currency"))
+        return redirect(url_for('.pay'))
+
     form = TicketPaymentForm()
 
     if not current_user.is_anonymous():
