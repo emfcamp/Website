@@ -51,7 +51,8 @@ class TalkProposalForm(ProposalForm):
                                   ('10 mins', "10 minutes"),
                                   ('30 mins', "30 minutes"),
                                   ('45 mins', "45 minutes"),
-                                  ('> 45 mins', "Longer than 45 minutes"),
+                                  ('60 mins', "1 hour"),
+                                  ('> 60 mins', "Longer than 1 hour"),
                                   ])
 
 
