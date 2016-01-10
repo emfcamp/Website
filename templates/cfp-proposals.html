@@ -5,24 +5,29 @@
 <h1>Your proposals</h1>
 
 <table class="table">
-  <tr>
-    <th>Type</th>
-    <th>Length</th>
-    <th>Capacity</th>
-    <th>Size</th>
-  </tr>
   {% set cfp_cycler = cycler('odd', 'even') %}
-  {% for sub in proposals %}
+  {% for proposal in proposals %}
   <tr class="{{- cfp_cycler.next() }}">
-    <td colspan="4">
-      <a href="{{ url_for('.edit_proposal', proposal_id=sub.id) }}">{{ sub.title }}</a>
+    <td>
+      <h4><a href="{{ url_for('.edit_proposal', proposal_id=proposal.id) }}">{{ proposal.title }}</a></h4>
+      <p>{{ proposal.type|title }}</p>
+      <dl class="dl-horizontal">
+        <dt>Submitted</dt>
+        <dd>{{ proposal.created.strftime('%d %B') }}</dd>
+        {% if proposal.type == 'talk' %}
+        <dt>Duration</dt>
+        <dd>{{ proposal.length }}</dd>
+        {% elif proposal.type == 'workshop' %}
+        <dt>Duration</dt>
+        <dd>{{ proposal.length }}</dd>
+        {% elif proposal.type == 'installation' %}
+        <dt>Size</dt>
+        <dd>{{ proposal.size }}</dd>
+        {% endif %}
+        <dt>Required notice</dt>
+        <dd>{{ proposal.notice_required }}</dd>
+      </dl>
     </td>
-  </tr>
-  <tr class="{{- cfp_cycler.next() }}">
-    <td>{{ sub.type | title }}</td>
-    <td>{{ sub.length or 'N/A'}}</td>
-    <td>{{ sub.attendees or 'N/A'}}</td>
-    <td>{{ sub.size or 'N/A'}}</td>
   </tr>
   {% endfor %}
 
