@@ -41,7 +41,7 @@
                                 <a role="menuitem" href="{{ url_for('tickets.choose') }}">Tickets</a>
                             </li>
                         {% endif %}
-                        {% if config.get('CFP') %}
+                        {% if feature_enabled('CFP') %}
                             <li role="presentation">
                                 <a role="menuitem" href="{{ url_for('cfp.main') }}">Call for Participation</a>
                             </li>
