@@ -1,0 +1,53 @@
+{% from "_formhelpers.html" import render_field %}
+
+{% extends "base.html" %}
+{% block title %}Edit Proposal - {{ proposal.title }}{% endblock %}
+{% block body %}
+<h2>Edit CFP submission</h2>
+
+<p>You have until {{ proposal.get_deadline().strftime('%d %B %H:%M') }} to edit this submission.</p>
+
+<form class="form-horizontal" method="post">
+  {{ form.hidden_tag() }}
+  {{ render_field(form.title, 9) }}
+  {{ render_field(form.description, 9) }}
+
+  {% if proposal.type == 'talk' %}
+    {{ render_field(form.requirements, 9) }}
+    {{ render_field(form.length, 9) }}
+
+  {% elif proposal.type == 'workshop' %}
+    {{ render_field(form.requirements, 9) }}
+    {{ render_field(form.length, 9) }}
+    {{ render_field(form.attendees, 9) }}
+    {{ render_field(form.cost, 9) }}
+
+  {% elif proposal.type == 'installation' %}
+    {{ render_field(form.requirements, 9) }}
+    {{ render_field(form.size, 9) }}
+    <div>
+    {# Checkbox also shows/hides the select box. This is controlled via scripts in the same way as the above collapse blocks #}
+      <div class="col-md-9 col-sm-offset-3">
+        <label id="emf-funds-toggle" class="collapse-toggle" data-toggle="collapse" href="#toggleSelect" aria-expanded="true" areia-controls="#toggleSelect">
+          {{ form.needs_emf_funds() }}
+          I will need help from EMF to help cover costs of this installation.
+        </label>
+        {% for error in form.needs_emf_funds.errors %}
+        <div class="help-block">{{ error }}</div>
+        {% endfor %}
+      </div>
+      <div class="collapse in" id="toggleSelect">
+        {{ render_field(form.funds, 9)}}
+      </div>
+    </div>
+    <div class="clearfix"></div>
+  {% endif %}
+
+  {{ render_field(form.notice_required, 9) }}
+  <div class="pull-right">
+    <a href="{{ url_for('.proposals') }}" class="btn btn-default">Back</a>
+    <button type="submit" class="btn btn-success">Update</button>
+  </div>
+</form>
+
+{% endblock %}

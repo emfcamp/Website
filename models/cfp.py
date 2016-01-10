@@ -1,5 +1,5 @@
 from main import db
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class Proposal(db.Model):
@@ -28,6 +28,9 @@ class Proposal(db.Model):
     previous_version = db.relationship('Proposal')
 
     __mapper_args__ = {'polymorphic_on': type}
+
+    def get_deadline(self):
+        return self.created + timedelta(days=2)
 
 
 class TalkProposal(Proposal):

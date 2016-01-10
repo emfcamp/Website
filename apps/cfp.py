@@ -13,11 +13,13 @@ from wtforms import (
 
 from sqlalchemy.exc import IntegrityError
 
+from datetime import datetime
+
 from main import db, mail
 from models.user import User, UserDiversity
 from models.ticket import TicketType
 from models.cfp import (
-    TalkProposal, WorkshopProposal, InstallationProposal
+    TalkProposal, WorkshopProposal, InstallationProposal, Proposal
 )
 from .common import feature_flag, create_current_user
 from .common.forms import Form
@@ -195,6 +197,62 @@ def proposals():
         return redirect(url_for('.main'))
 
     return render_template('cfp_proposals.html', proposals=proposals)
+
+@cfp.route('/cfp/proposals/<int:proposal_id>/edit', methods=['GET', 'POST'])
+def edit_proposal(proposal_id):
+    proposal = Proposal.query.get(proposal_id)
+
+    form = TalkProposalForm() if proposal.type == 'talk' else\
+           WorkshopProposalForm() if proposal.type == 'workshop' else\
+           InstallationProposalForm()
+
+    # If the user is already logged in set their name & email for the form
+    if current_user.is_authenticated():
+        form.name.data = current_user.name
+        form.email.data = current_user.email
+
+    if form.validate_on_submit():
+        if datetime.utcnow() > proposal.get_deadline():
+            flash('This submission can no longer be edited. Sorry')
+            return redirect(url_for('.proposals'))
+
+        if proposal.type == 'talk':
+            proposal.length = form.length.data
+
+        elif proposal.type == 'workshop':
+            proposal.length = form.length.data
+            proposal.attendees = form.attendees.data
+            proposal.cost = form.cost.data
+
+        elif proposal.type == 'installation':
+            proposal.size = form.size.data
+            proposal.funds = form.funds.data
+
+        proposal.title = form.title.data
+        proposal.description = form.description.data
+        proposal.requirements = form.requirements.data
+        proposal.notice_required = form.notice_required.data
+        db.session.commit()
+
+    if proposal.type == 'talk':
+        form.length.data = proposal.length
+
+    elif proposal.type == 'workshop':
+        form.length.data = proposal.length
+        form.attendees.data = proposal.attendees
+        form.cost.data = proposal.cost
+
+    elif proposal.type == 'installation':
+        form.size.data = proposal.size
+        form.funds.data = proposal.funds
+
+    form.title.data = proposal.title
+    form.description.data = proposal.description
+    form.requirements.data = proposal.requirements
+    form.notice_required.data = proposal.notice_required
+
+    return render_template('cfp_edit.html', proposal=proposal,
+                                            form=form)
 
 @cfp.route('/cfp/guidance')
 def guidance():

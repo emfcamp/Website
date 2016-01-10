@@ -14,7 +14,9 @@
   {% set cfp_cycler = cycler('odd', 'even') %}
   {% for sub in proposals %}
   <tr class="{{- cfp_cycler.next() }}">
-    <td colspan="4">{{ sub.title }}</td>
+    <td colspan="4">
+      <a href="{{ url_for('.edit_proposal', proposal_id=sub.id) }}">{{ sub.title }}</a> - editable until {{ sub.get_deadline().strftime('%d %B %H:%M')}}.
+    </td>
   </tr>
   <tr class="{{- cfp_cycler.next() }}">
     <td>{{ sub.type | title }}</td>
