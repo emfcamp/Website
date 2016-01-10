@@ -70,7 +70,7 @@ def login():
     if request.args.get('email'):
         form.email.data = request.args.get('email')
 
-    return render_template("login.html", form=form)
+    return render_template("login.html", form=form, next=request.args.get('next'))
 
 
 class SignupForm(Form):
