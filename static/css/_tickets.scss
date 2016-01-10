@@ -1,0 +1,48 @@
+.ticket-info.form-horizontal .form-group {
+  margin-top: 2ex;
+  margin-bottom: 0;
+}
+
+#choose_tickets button[name="set_currency"] {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.receipt-qr {
+  min-width: 74px;
+  min-height: 74px;
+}
+
+.ticket-types label {
+  font-size: 110%;
+}
+
+.ticket-types p.description {
+  font-size: 90%;
+}
+
+.ticket-types select.amount {
+  min-width: 3em;
+}
+
+@media (max-width: 768px) {
+  .tickets .volunteer,
+  .tickets .accessible {
+    display: none
+  }
+}
+
+/* Set of hacks because IE doesn't can't flexbox */
+.panel--payment {
+  position: relative;
+}
+
+.panel--payment .panel-body {
+  padding-bottom: 80px;
+}
+
+.panel--payment .panel-footer-center{
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
