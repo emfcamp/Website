@@ -160,16 +160,6 @@
 <script type="text/javascript">
 $(function() {
   'use strict';
-  // If the user has already made a submission, hide all the blurb.
-  // Fallback is just to show it.
-  var has_proposals = {{ has_proposals|tojson }};
-  if (has_proposals) {
-    $('.collapse').removeClass('in');
-  } else {
-    // Funds select box should always be hidden to start with
-    $('#toggleSelect.collapse').removeClass('in');
-    $('.collapse.help-block').removeClass('in');
-  }
 
   // Copy values across when the user switches tab
   $('.cfp-types a').on('show.bs.tab', function(e) {

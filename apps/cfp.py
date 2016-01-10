@@ -149,12 +149,9 @@ def main(cfp_type='talk'):
 
     full_price = TicketType.get_price_cheapest_full()
 
-    has_proposals = current_user.proposals.count() > 0 if hasattr(current_user, 'proposals') else False
-
     return render_template('cfp.html', full_price=full_price,
                            forms=forms, active_cfp_type=cfp_type,
-                           has_errors=bool(form.errors),
-                           has_proposals=has_proposals)
+                           has_errors=bool(form.errors))
 
 
 class DiversityForm(Form):
