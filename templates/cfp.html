@@ -81,7 +81,7 @@
       <fieldset>
         <legend>Your Details</legend>
         <p>If you've already bought a ticket, please
-            <a href="{{ url_for('users.login') }}">log in</a>.</p>
+            <a href="{{ url_for('users.login') }}" target="_blank">log in</a>.</p>
           {{ render_field(form.name, horizontal=9, placeholder="Your name (or pseudonym)") }}
           {{ render_field(form.email, horizontal=9, placeholder="Your email address") }}
       </fieldset>
