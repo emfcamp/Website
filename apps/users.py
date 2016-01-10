@@ -7,13 +7,9 @@ from flask.ext.login import (
 )
 from wtforms.validators import Required, Email, ValidationError
 from wtforms import StringField, HiddenField, SubmitField
-from sqlalchemy.exc import IntegrityError
 
 from main import db
-from common import (
-    set_user_currency, feature_flag, site_flag,
-    create_current_user, send_template_email,
-)
+from common import set_user_currency, send_template_email
 from .common.forms import Form
 from models.user import User, UserDiversity
 import re
@@ -44,7 +40,6 @@ class LoginForm(Form):
 
 
 @users.route("/login", methods=['GET', 'POST'])
-@feature_flag('TICKET_SALES')
 def login():
     if current_user.is_authenticated():
         return redirect(request.args.get('next', url_for('tickets.main')))
@@ -81,7 +76,6 @@ def logout():
 
 
 @users.route("/set-currency", methods=['POST'])
-@site_flag('TICKETS_SITE')
 def set_currency():
     if request.form['currency'] not in ('GBP', 'EUR'):
         abort(400)
