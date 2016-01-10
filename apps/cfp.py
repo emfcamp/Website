@@ -179,7 +179,7 @@ def complete():
         current_user.diversity.ethnicity = form.ethnicity.data
 
         db.session.commit()
-        return redirect(url_for('users.account'))
+        return redirect(url_for('.proposals'))
 
     return render_template('cfp_complete.html', form=form)
 

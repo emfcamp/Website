@@ -2,11 +2,10 @@
 {% extends "base.html" %}
 {% block body %}
 <div class="alert alert-success">Thanks for your submission!</div>
-<div>We'll be in touch by email. If you'd like to submit another talk, just click below.</div>
-<div>If you haven't yet bought your tickets, please reserve them now.</div>
-<p></p>
+<div>We'll be in touch by email. If you'd like to submit another proposal, just click below.</div>
 
 {% if not current_user.diversity %}
+<p>&nbsp;</p>
 <form action={{ url_for('cfp.complete') }} method="post" class="form-horizontal" role="form">
   {{ form.hidden_tag() }}
   <fieldset>
@@ -28,14 +27,11 @@
   </fieldset>
 
   <div class="form-actions">
-    <button type="submit" name="Create" class="btn btn-success pull-right debounce">Update user account</button>
+    <button type="submit" name="Create" class="btn btn-success pull-right debounce">View your proposals</button>
   </div>
 </form>
-{% endif %}
-
-<a class="btn btn-default pull-right" href="{{ url_for('cfp.main') }}">Add another</a>
-{% if feature_enabled('TICKET_SALES') %}
-  <a class="btn btn-success pull-right" href="{{ url_for('tickets.main') }}">Buy Tickets</a>
+{% else %}
+  <a href="{{ url_for('.proposals') }}" class="btn btn-success pull-right">View your proposals</a>
 {% endif %}
 
 {% endblock %}
