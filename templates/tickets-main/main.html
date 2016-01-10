@@ -3,47 +3,30 @@
 {% block body %}
 
 {% if tickets %}
-  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#ticket-table" aria-expanded="false" aria-controls="ticket-table">
-    <h3>Your tickets <small class="glyphicon glyphicon-chevron-down"></small></h2>
-  </a>
+  <h3>Your tickets</h2>
   <a id="your-tickets"></a>
-  <div class="collapse in" id="ticket-table">
-    {% include "tickets-main/ticket-list.html" %}
-  </div>
+  {% include "tickets-main/ticket-list.html" %}
   <div class="clearfix"></div>
 {% endif %}
 
 {% if payments %}
-  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#payments-table" aria-expanded="false" aria-controls="payments-table">
-    <h3>Your payments <small class="glyphicon glyphicon-chevron-down"></small></h2>
-  </a>
+  <h3>Your payments</h2>
   <a id="your-payments"></a>
-  <div class="collapse in" id="payments-table">
-    {% include "tickets-main/payments.html" %}
-  </div>
+  {% include "tickets-main/payments.html" %}
   <div class="clearfix"></div>
 {% endif %}
 
 {% if transferred_to %}
-  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#transfer-to-table" aria-expanded="false" aria-controls="transfer-to-table">
-    <h3>Tickets received <small class="glyphicon glyphicon-chevron-down"></small></h2>
-  </a>
+  <h3>Tickets received</h2>
   <a id="transfers-to"></a>
-  <div class="collapse" id="transfer-to-table">
-    {% include "tickets-main/transferred-to.html" %}
-  </div>
+  {% include "tickets-main/transferred-to.html" %}
   <div class="clearfix"></div>
 {% endif %}
 
 {% if transferred_from %}
-  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#transfer-from-table" aria-expanded="false" aria-controls="transfer-from-table">
-    <h3>Tickets given <small class="glyphicon glyphicon-chevron-down"></small></h2>
-  </a>
+  <h3>Tickets given</h2>
   <a id="transfers-from"></a>
-  <div class="collapse" id="transfer-from-table">
-    {% include "tickets-main/transferred-from.html" %}
-  </div>
-
+  {% include "tickets-main/transferred-from.html" %}
   <div class="clearfix"></div>
 {% endif %}
 
