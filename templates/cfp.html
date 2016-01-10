@@ -105,7 +105,7 @@
                             placeholder="Any unusual requirements") %}
             We'll provide all the usual AV equipment, but let us know if you need anything unusual.
         {% endcall %}
-        {{ render_field(form.length, horizontal=9) }}
+        {{ render_field(form.length, horizontal=9, placeholder="Your best guess, whether in minutes or days") }}
       {% endif %}
 
       {% call render_field(form.notice_required, horizontal=9) %}
