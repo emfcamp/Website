@@ -24,16 +24,22 @@
 <div class="container">
     <div class="main-row">
         <div class="col-md-10 col-md-offset-1 main-column">
-            <header>
-                <h1><a href="/"><div id="logo" alt="Electromagnetic Field"></div></a></h1>
+            <header role="banner">
+                <h1 aria-label="Electromagnetic Field">
+                    <a href="/"><div id="logo" alt="Electromagnetic Field"></div></a>
+                </h1>
                 <div id="header-text">August 5<sup>th</sup>&ndash;7<sup>th</sup> 2016<br/>
                      Guildford, UK</div>
 
-                <div id="menu-container">
-                    <ul class="menu">
-                        <li><a href="{{ url_for('base.about') }}">About</a>
+                <div id="menu-container" role="navigation" aria-label="main navigation">
+                    <ul class="menu" role="menu">
+                        <li role="presentation">
+                            <a role="menuitem" href="{{ url_for('base.about') }}">About</a>
+                        </li>
                         {% if SITE_STATE == 'sales' and SALES_STATE == 'available' %}
-                            <li><a href="{{ url_for('tickets.choose') }}">Tickets</a></li>
+                            <li role="presentation">
+                                <a role="menuitem" href="{{ url_for('tickets.choose') }}">Tickets</a>
+                            </li>
                         {% endif %}
                         {#<li><a target="_blank" href="http://blog.emfcamp.org">Blog</a>#}
                         {#<li><a href="https://frab.emfcamp.org/en/EMF2014/public/schedule/2">Programme</a>#}
@@ -43,25 +49,35 @@
                 </div>
                 <div style="clear:both"></div>
             </header>
-            <div id="main-content" class="{{ main_class }}">
+            <div id="main-content" class="{{ main_class }}" role="main">
                 {% for message in get_flashed_messages() -%}
                     <div class="alert alert-warning">{{ message }}</div>
                 {% endfor -%}
                 {% block body -%}{% endblock -%}
                 <div class="push"></div>
             </div>
-            <footer>
+            <footer role="contentinfo">
                 <div id="bottom-menu-container">
-                    <ul class="menu">
-                        <li><a target="_blank" href="https://wiki.emfcamp.org">Wiki</a>
-                        <li><a target="_blank" href="{{ url_for('base.code_of_conduct') }}">Code of Conduct</a>
-
+                    <ul class="menu" role="menu">
+                        <li role="presentation">
+                            <a role="menuitem" target="_blank" href="https://wiki.emfcamp.org">Wiki</a>
+                        </li>
+                        <li role="presentation">
+                            <a role="menuitem" target="_blank" href="{{ url_for('base.code_of_conduct') }}">
+                                Code of Conduct</a>
+                        </li>
                       {% if feature_enabled('TICKET_SALES') %}
                       {% if current_user.is_authenticated() %}
-                        <li><a href="{{ url_for('users.account') }}">My account</a></li>
-                        <li><a href="{{ url_for('users.logout') }}">Log out</a></li>
+                      <li role="presentation">
+                        <a role="menuitem" href="{{ url_for('users.account') }}">My account</a>
+                      </li>
+                      <li role="presentation">
+                        <a role="menuitem" href="{{ url_for('users.logout') }}">Log out</a>
+                      </li>
                       {% else %}
-                        <li><a href="{{ url_for('users.login') }}">Log in</a></li>
+                      <li role="presentation">
+                        <a role="menuitem" href="{{ url_for('users.login') }}">Log in</a>
+                      </li>
                       {% endif %}
                       {% endif %}
                     </ul>
