@@ -41,6 +41,11 @@
                                 <a role="menuitem" href="{{ url_for('tickets.choose') }}">Tickets</a>
                             </li>
                         {% endif %}
+                        {% if config.get('CFP') %}
+                            <li role="presentation">
+                                <a role="menuitem" href="{{ url_for('cfp.main') }}">Give a Talk</a>
+                            </li>
+                        {% endif %}
                         {#<li><a target="_blank" href="http://blog.emfcamp.org">Blog</a>#}
                         {#<li><a href="https://frab.emfcamp.org/en/EMF2014/public/schedule/2">Programme</a>#}
                         {#<li><a href="https://www.youtube.com/user/emfcamp1/videos">Videos</a>#}
