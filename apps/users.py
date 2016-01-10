@@ -73,39 +73,6 @@ def login():
     return render_template("login.html", form=form, next=request.args.get('next'))
 
 
-class SignupForm(Form):
-    name = StringField('Full name', [Required()])
-    email = StringField('Email', [Email(), Required()])
-
-    next = NextURLField('Next')
-
-    def validate_email(form, field):
-        if current_user.is_anonymous() and User.does_user_exist(field.data):
-            field.was_duplicate = True
-            raise ValidationError('Account already exists')
-
-
-@users.route("/signup", methods=['GET', 'POST'])
-@site_flag('TICKETS_SITE')
-@feature_flag('TICKET_SALES')
-def signup():
-    if current_user.is_authenticated():
-        return redirect(url_for('tickets.main'))
-    form = SignupForm(request.form, next=request.args.get('next'))
-
-    if request.method == 'POST' and form.validate():
-        try:
-            create_current_user(form.email.data, form.name.data)
-        except IntegrityError as e:
-            app.logger.warn('Adding user raised %r, possible double-click', e)
-            flash('An error occurred adding your account. Please try again.')
-            return redirect(url_for('users.signup'))
-
-        return redirect(form.next.data or url_for('tickets.main'))
-
-    return render_template("signup.html", form=form, existing_email=request.args.get('existing_email'))
-
-
 @users.route("/logout")
 @login_required
 def logout():
