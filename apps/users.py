@@ -152,12 +152,13 @@ def account():
         flash("Your details have been saved.")
         return redirect(url_for('.account'))
 
-    # This is a required field so should always be set
-    form.name.data = current_user.name
+    if request.method != 'POST':
+        # This is a required field so should always be set
+        form.name.data = current_user.name
 
-    if current_user.diversity:
-        form.age.data = current_user.diversity.age
-        form.gender.data = current_user.diversity.gender
-        form.ethnicity.data = current_user.diversity.ethnicity
+        if current_user.diversity:
+            form.age.data = current_user.diversity.age
+            form.gender.data = current_user.diversity.gender
+            form.ethnicity.data = current_user.diversity.ethnicity
 
     return render_template("account.html", form=form)

@@ -133,7 +133,6 @@ def main(cfp_type='talk'):
         cfp.requirements = form.requirements.data
         cfp.description = form.description.data
         cfp.notice_required = form.notice_required.data
-
         cfp.needs_help = form.needs_help.data
 
         db.session.add(cfp)
@@ -196,23 +195,18 @@ def proposals():
     if not proposals:
         return redirect(url_for('.main'))
 
-    return render_template('cfp_proposals.html', proposals=proposals)
+    return render_template('cfp-proposals.html', proposals=proposals)
 
 @cfp.route('/cfp/proposals/<int:proposal_id>/edit', methods=['GET', 'POST'])
 def edit_proposal(proposal_id):
     proposal = Proposal.query.get(proposal_id)
 
-    form = TalkProposalForm() if proposal.type == 'talk' else\
-           WorkshopProposalForm() if proposal.type == 'workshop' else\
+    form = TalkProposalForm() if proposal.type == 'talk' else \
+           WorkshopProposalForm() if proposal.type == 'workshop' else \
            InstallationProposalForm()
 
-    # If the user is already logged in set their name & email for the form
-    if current_user.is_authenticated():
-        form.name.data = current_user.name
-        form.email.data = current_user.email
-
     if form.validate_on_submit():
-        if datetime.utcnow() > proposal.get_deadline():
+        if proposal.status != 'new':
             flash('This submission can no longer be edited. Sorry')
             return redirect(url_for('.proposals'))
 
@@ -232,26 +226,30 @@ def edit_proposal(proposal_id):
         proposal.description = form.description.data
         proposal.requirements = form.requirements.data
         proposal.notice_required = form.notice_required.data
+        proposal.needs_help = form.needs_help.data
+
         db.session.commit()
 
-    if proposal.type == 'talk':
-        form.length.data = proposal.length
+    if request.method != 'POST':
+        if proposal.type == 'talk':
+            form.length.data = proposal.length
 
-    elif proposal.type == 'workshop':
-        form.length.data = proposal.length
-        form.attendees.data = proposal.attendees
-        form.cost.data = proposal.cost
+        elif proposal.type == 'workshop':
+            form.length.data = proposal.length
+            form.attendees.data = proposal.attendees
+            form.cost.data = proposal.cost
 
-    elif proposal.type == 'installation':
-        form.size.data = proposal.size
-        form.funds.data = proposal.funds
+        elif proposal.type == 'installation':
+            form.size.data = proposal.size
+            form.funds.data = proposal.funds
 
-    form.title.data = proposal.title
-    form.description.data = proposal.description
-    form.requirements.data = proposal.requirements
-    form.notice_required.data = proposal.notice_required
+        form.title.data = proposal.title
+        form.description.data = proposal.description
+        form.requirements.data = proposal.requirements
+        form.notice_required.data = proposal.notice_required
+        form.needs_help.data = proposal.needs_help
 
-    return render_template('cfp_edit.html', proposal=proposal,
+    return render_template('cfp-edit.html', proposal=proposal,
                                             form=form)
 
 @cfp.route('/cfp/guidance')
