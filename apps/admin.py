@@ -640,7 +640,7 @@ def feature_flags():
         form.flags.pop_entry()
 
     # Build the list of flags to display
-    for flg in sorted(db_flags, key=lambda x: x.name):
+    for flg in sorted(db_flags, key=lambda x: x.feature):
         form.flags.append_entry()
         form.flags[-1].feature.data = flg.feature
         form.flags[-1].enabled.data = flg.enabled
