@@ -47,6 +47,7 @@ assets.register('js_main', Bundle('js/main.js',
 def create_app():
     app = Flask(__name__)
     app.config.from_envvar('SETTINGS_FILE')
+    app.jinja_options['extensions'].append('jinja2.ext.do')
 
     if install_logging:
         logger.setup_logging(app)

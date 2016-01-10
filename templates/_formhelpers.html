@@ -1,7 +1,7 @@
-{% macro render_field(field, horizontal=False, glyphicon_before=None, glyphicon_after=None, help_link='') %}
+{% macro render_field(field, horizontal=False, glyphicon_before=None, glyphicon_after=None) %}
 
 {% if caller %}
-{% set help_text = caller() %}
+    {% set help_text = caller() %}
 {% endif %}
 
 {% if horizontal == True %}
@@ -13,12 +13,14 @@
     {% set fieldw = horizontal %}
 {% endif %}
 
+{% if help_text or field.errors %}
+    {# If we have help text, add an aria-describedby attribute to the field. #}
+    {% do kwargs.update({'aria-describedby': "help-block-" + field.name}) %}
+{% endif %}
+
 <div class="form-group {%- if field.errors %} has-error {%- endif %}">
     <label for="{{ field.name }}" class="{% if horizontal -%} col-sm-{{labelw}} {% endif -%} control-label">
         {{ field.label.text }}
-        {%- if help_link %}
-            <a href="{{ help_link }}" target="_blank">?</a>
-        {%- endif %}
     </label>
     <div class="{% if horizontal -%} col-sm-{{fieldw}} {% endif -%} controls">
         {%- if glyphicon_before or glyphicon_after %}
@@ -36,10 +38,10 @@
             {%- endif %}
         {% if field.errors %}
             {% for error in field.errors %}
-              <p class="help-block">{{ error }}</p>
+            <p class="help-block" id="help-block-{{field.name}}">{{ error }}</pa>
               {% endfor %}
         {% elif help_text %}
-            <p class="help-block">{{ help_text }}</p>
+            <p class="help-block" id="help-block-{{field.name}}">{{ help_text }}</p>
         {% endif -%}
     </div>
 </div>

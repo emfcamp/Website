@@ -43,10 +43,18 @@
 
   </div>
     <h2>Submit a proposal</h2>
-  <ul class="nav nav-tabs cfp-types" role="navigation" id="cfp-errors">
+    <ul class="nav nav-tabs cfp-types" role="navigation" id="cfp-errors" role="menu"
+        aria-label="proposal type">
     {% for form in forms %}
       <li {% if form.type == active_cfp_type -%} class="active" {%- endif %}>
-        <a href="{{ url_for('cfp.main', cfp_type=form.type) }}" data-target="#{{ 'tab_' + form.type }}" data-toggle="tab">
+      <a href="{{ url_for('cfp.main', cfp_type=form.type) }}"
+          data-target="#{{ 'tab_' + form.type }}" data-toggle="tab"
+          {% if form.type == active_cfp_type %}
+            aria-selected="true"
+          {% else %}
+            aria-selected="false"
+          {% endif %}
+          >
           {% if form.type == 'talk' %}
             <h4>Talk or Performance</h4>
             <p>Held on one of our stages</p>
