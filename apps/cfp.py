@@ -85,7 +85,9 @@ def main(cfp_type='talk'):
     if cfp_type not in ['talk', 'workshop', 'installation']:
         abort(404)
 
-    forms = [TalkProposalForm(), WorkshopProposalForm(), InstallationProposalForm()]
+    forms = [TalkProposalForm(prefix="talk"),
+             WorkshopProposalForm(prefix="workshop"),
+             InstallationProposalForm(prefix="installation")]
     (form,) = [f for f in forms if f.type == cfp_type]
 
     # If the user is already logged in set their name & email for the form
