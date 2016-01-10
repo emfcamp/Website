@@ -13,8 +13,6 @@ from wtforms import (
 
 from sqlalchemy.exc import IntegrityError
 
-from datetime import datetime
-
 from main import db, mail
 from models.user import User, UserDiversity
 from models.ticket import TicketType
@@ -205,9 +203,12 @@ def edit_proposal(proposal_id):
            WorkshopProposalForm() if proposal.type == 'workshop' else \
            InstallationProposalForm()
 
+    del form.name
+    del form.email
+
     if form.validate_on_submit():
-        if proposal.status != 'new':
-            flash('This submission can no longer be edited. Sorry')
+        if proposal.state != 'new':
+            flash('This submission can no longer be edited.')
             return redirect(url_for('.proposals'))
 
         if proposal.type == 'talk':
@@ -229,6 +230,7 @@ def edit_proposal(proposal_id):
         proposal.needs_help = form.needs_help.data
 
         db.session.commit()
+        flash("Your proposal has been updated")
 
     if request.method != 'POST':
         if proposal.type == 'talk':
