@@ -180,7 +180,7 @@ def complete():
         db.session.commit()
         return redirect(url_for('.proposals'))
 
-    return render_template('cfp_complete.html', form=form)
+    return render_template('cfp-complete.html', form=form)
 
 
 @cfp.route('/cfp/proposals')
