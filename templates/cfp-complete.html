@@ -2,7 +2,7 @@
 {% extends "base.html" %}
 {% block body %}
 <div class="alert alert-success">Thanks for your submission!</div>
-<div>We'll be in touch by email. If you'd like to submit another proposal, just click below.</div>
+<div>We'll be in touch by email as soon as we can.</div>
 
 {% if not current_user.diversity %}
 <p>&nbsp;</p>
@@ -27,7 +27,7 @@
   </fieldset>
 
   <div class="form-actions">
-    <button type="submit" name="Create" class="btn btn-success pull-right debounce">View your proposals</button>
+    <button type="submit" name="Create" class="btn btn-success pull-right debounce">Continue</button>
   </div>
 </form>
 {% else %}
