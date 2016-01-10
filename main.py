@@ -32,14 +32,14 @@ login_manager = LoginManager()
 assets = Environment()
 toolbar = DebugToolbarExtension()
 
-assets.register('css_main', Bundle('css/main.css',
-                output='gen/main-packed.css', filters='cssmin'))
-assets.register('css_admin', Bundle('css/admin.css',
-                output='gen/admin-packed.css', filters='cssmin'))
-assets.register('css_print', Bundle('css/print.css',
-                output='gen/print-packed.css', filters='cssmin'))
-assets.register('css_arrivals', Bundle('css/arrivals.css',
-                output='gen/arrivals-packed.css', filters='cssmin'))
+assets.register('css_main', Bundle('css/main.scss',
+                output='gen/main-packed.css', filters='pyscss,cssmin'))
+assets.register('css_admin', Bundle('css/admin.scss',
+                output='gen/admin-packed.css', filters='pyscss,cssmin'))
+assets.register('css_print', Bundle('css/print.scss',
+                output='gen/print-packed.css', filters='pyscss,cssmin'))
+assets.register('css_arrivals', Bundle('css/arrivals.scss',
+                output='gen/arrivals-packed.css', filters='pyscss,cssmin'))
 assets.register('js_main', Bundle('js/main.js',
                 output='gen/main-packed.js', filters='jsmin'))
 

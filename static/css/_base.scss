@@ -7,11 +7,11 @@
 
 body {
   font-size: 16px;
-  color: white;
+  color: $main-background-text;
 }
 
 a {
-  color: white;
+  color: $main-background-text;
   text-decoration: underline;
 }
 
@@ -24,8 +24,8 @@ html, body, .container, .main-row, .main-column {
 }
 
 .well, .jumbotron {
-  background-color: #d3e0f1;
-  color: #333;
+  background-color: $highlight-background;
+  color: $highlight-background-text;
 }
 
 .panel {
@@ -38,11 +38,11 @@ html, body, .container, .main-row, .main-column {
 }
 
 .panel-default > .panel-heading {
-    background-color: #d3e0f1;
+    background-color: $highlight-background;
 }
 
 .well a, .panel a {
-  color: #5E93CE;
+  color: $highlight-background-link;
 }
 
 .panel .btn, .well .btn {
@@ -50,7 +50,7 @@ html, body, .container, .main-row, .main-column {
 }
 
 .panel .btn-default, .well .btn-default {
-    color: #333;
+    color: $highlight-background-text;
 }
 
 .panel-footer-center {
@@ -59,23 +59,8 @@ html, body, .container, .main-row, .main-column {
     justify-content: center;
 }
 
-/* Set of hacks because IE doesn't can't flexbox */
-.panel--payment {
-  position: relative;
-}
-
-.panel--payment .panel-body {
-  padding-bottom: 80px;
-}
-
-.panel--payment .panel-footer-center{
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-}
-
 header, h2, h3, h4, h5, h6 {
-  font-family: "Raleway","Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-family: $header-font-stack;
   font-weight: 700;
 }
 
@@ -168,7 +153,7 @@ footer #credits {
 }
 
 #bottom-menu-container {
-  font-family: "Raleway","Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-family: $header-font-stack;
   background: url('../images/footer.jpg') no-repeat left top;
   background-size: cover;
   padding: 10px 15px 0px 15px;
@@ -197,7 +182,7 @@ footer #credits {
   min-height: 100%;
   height: auto !important;
   height: 100%;
-  background-color: #5E93CE;
+  background-color: $main-background;
   margin-bottom: -130px;
 }
 
@@ -305,7 +290,7 @@ thead tr {
 }
 
 tr.even {
-    background-color: #d3e0f1;
+    background-color: $highlight-background;
 }
 
 tr.odd {
@@ -345,21 +330,6 @@ img.padit {
 	padding: 24px;
 }
 
-.ticket-info.form-horizontal .form-group {
-  margin-top: 2ex;
-  margin-bottom: 0;
-}
-
-#choose_tickets button[name="set_currency"] {
-  font-weight: bold;
-  font-size: 16px;
-}
-
-.receipt-qr {
-  min-width: 74px;
-  min-height: 74px;
-}
-
 @media print {
   .sidebar-nav { display: none }
   .logout { display: none }
@@ -372,22 +342,6 @@ div.micro img {
   padding: 2px;
   border: #ccc solid 1px;
   margin-bottom: 10px;
-}
-
-.ticket-types label {
-  font-size: 110%;
-}
-
-.ticket-types p.description {
-  font-size: 90%;
-}
-
-.ticket-types select.amount {
-  min-width: 3em;
-}
-
-.cfp-form fieldset {
-  padding-top: 1em;
 }
 
 .help-block {
@@ -414,60 +368,6 @@ legend {
 
 .nav a:hover {
   color: #555;
-}
-
-.cfp-tab {
-  padding: 15px;
-  background-color: #d3e0f1;
-  color: #333;
-}
-
-.cfp-tab a {
-  color: #333;
-}
-
-@media (max-width: 550px){
-  .cfp-types.nav-tabs > li {
-    display: block;
-    max-width: 150px;
-    height: 138px;
-  }
-  .cfp-types.nav-tabs > li > a {
-    height: 100%;
-  }
-}
-
-@media (min-width: 550px) and (max-width: 768px) {
-  .cfp-types.nav-tabs > li {
-    display: block;
-    max-width: 170px;
-    height: 138px;
-  }
-  .cfp-types.nav-tabs > li > a {
-    height: 100%;
-  }
-}
-
-.cfp-types.nav-tabs > li > a {
-  background-color: #B6CCE2;
-  color: #555555;
-  padding-bottom: 9px; /* align tab bottoms */
-}
-
-.cfp-types.nav-tabs > li.active > a,
-.cfp-types.nav-tabs > li.active > a:hover,
-.cfp-types.nav-tabs > li.active > a:focus {
-  background-color: #d3e0f1;
-  padding-bottom: 10px; /* align tab bottoms */
-}
-
-.cfp-types.nav > li > a:hover,
-.cfp-types.nav > li > a:focus {
-  background-color: #e3ecf6;
-}
-
-.cfp-tab .form-actions {
-  margin-top: 2ex;
 }
 
 /* Restore link colours */
@@ -551,13 +451,6 @@ td.checkbox-cell label {
   padding: 8px;
 }
 
-@media (max-width: 768px) {
-  .tickets .volunteer,
-  .tickets .accessible {
-    display: none
-  }
-}
-
 .sponsor a {
   text-decoration: none;
 }
@@ -608,23 +501,3 @@ a.collapse-toggle:hover,
 a.collapse-toggle:hover .glyphicon {
   color: #d3e0f1;
 }
-
-
-/*
- * Make the description lists in the guidance a bit more distinct
- */
-.cfp-guidance dt {
-  margin-top: 15px;
-  font-weight: normal;
-  font-size: 18px;
-}
-
-.cfp-guidance dd {
-  margin-left: 40px;
-}
-
-.cfp-guidance.well a,
-.cfp-guidance.well a.collapse-toggle .glyphicon {
-  color: inherit;
-}
-
