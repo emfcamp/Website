@@ -7,7 +7,7 @@ from flask.ext.login import current_user
 from flask_mail import Message
 from wtforms.validators import Required, Email, ValidationError
 from wtforms import (
-    BooleanField, StringField, IntegerField,
+    BooleanField, StringField,
     TextAreaField, SelectField,
 )
 
@@ -58,7 +58,7 @@ class WorkshopProposalForm(ProposalForm):
     type = 'workshop'
     length = StringField("Duration", [Required()])
     attendees = StringField("Attendees", [Required()])
-    cost = IntegerField("Cost per attendee")
+    cost = StringField("Cost per attendee")
 
 
 class InstallationProposalForm(ProposalForm):
@@ -123,8 +123,7 @@ def main(cfp_type='talk'):
         elif cfp_type == 'installation':
             cfp = InstallationProposal()
             cfp.size = form.size.data
-            if form.needs_emf_funds.data:
-                cfp.emf_funds = form.funds.data
+            cfp.funds = form.funds.data
 
         cfp.user_id = current_user.id
 
