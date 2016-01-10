@@ -1,6 +1,6 @@
 Hi {{ cfp.user.name }},
 
-This is to confirm your submission to our call for participation. We'll try to process your submission as quickly as possible. So you know this was your submission:
+This is to confirm your submission to our call for participation. We'll try to process your submission as quickly as possible. Here's a summary of your submission:
 
 {{ type | capitalize }}
 Title: {{ cfp.title }}
@@ -9,17 +9,12 @@ Description: {{ cfp.description }}
 Duration: {{ cfp.length }}
 {% elif type == 'workshop' %}
 Duration: {{ cfp.length }}
-Attendees: {{ cfp.attendees }}
-{% else %}{# Installation #}
+{% elif type == 'installation' %}
 Size: {{ cfp.size }}
 {%- endif %}
 
-{%- if cfp.one_day and cfp.need_finance %}
-You also indicated that you would only be able to attend for one day and you will need financial support to attend.
-{% elif (type == 'workshop' or type == 'talk') and cfp.one_day %}
-You also indicated that you would only be able to attend for one day.
-{% elif cfp.need_finance %}
-You also indicated that you will need financial support to attend.
+{%- if cfp.needs_help %}
+You indicated that you would like help preparing the proposal, so we'll be in touch as soon as we can.
 {%- endif %}
 
 {%- if new_user %}
