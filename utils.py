@@ -230,7 +230,7 @@ class CreateTickets(Command):
         type_data = [
             # (id, order, admits, name, type limit, personal limit, GBP, EUR, Description)
             # Leave order 0 & 1 free for discount tickets
-            (0, 2, 'full', 'Full Camp Ticket', 200, 10, 100.00, 140.00, True, None),
+            (0, 2, 'full', 'Full Camp Ticket', 193, 10, 100.00, 140.00, True, None),
             # (1, 3, 'full', 'Full Camp Ticket', 200, 10, 105.00, 145.00, True, None),
             # (2, 4, 'full', 'Full Camp Ticket', 300, 10, 110.00, 155.00, True, None),
             # (3, 5, 'full', 'Full Camp Ticket', 400, 10, 120.00, 165.00, True, None),
