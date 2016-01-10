@@ -1,5 +1,9 @@
 {% macro render_field(field, horizontal=False, glyphicon_before=None, glyphicon_after=None, help_link='') %}
 
+{% if caller %}
+{% set help_text = caller() %}
+{% endif %}
+
 {% if horizontal == True %}
     {% set horizontal = 10 %}
 {% endif %}
@@ -29,11 +33,13 @@
         </div>
         {% else %}
             {{ field(class_='form-control', **kwargs)|safe }}
-        {%- endif %}
+            {%- endif %}
         {% if field.errors %}
             {% for error in field.errors %}
-              <span class="help-block">{{ error }}</span>
-            {% endfor %}
+              <p class="help-block">{{ error }}</p>
+              {% endfor %}
+        {% elif help_text %}
+            <p class="help-block">{{ help_text }}</p>
         {% endif -%}
     </div>
 </div>

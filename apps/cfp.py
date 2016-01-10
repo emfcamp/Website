@@ -32,7 +32,7 @@ class ProposalForm(Form):
     description = TextAreaField("Description", [Required()])
     requirements = StringField("Requirements")
     needs_help = BooleanField("Needs help")
-    notice_required = SelectField("Required notice", default="No notice required",
+    notice_required = SelectField("Required notice", default="1 week",
                           choices=[('1 week', '1 week'),
                                    ('1 month', '1 month'),
                                    ('> 1 month', 'Longer than 1 month'),
@@ -41,18 +41,16 @@ class ProposalForm(Form):
     def validate_email(form, field):
         if current_user.is_anonymous() and User.does_user_exist(field.data):
             field.was_duplicate = True
-            raise ValidationError('Account already exists')
+            raise ValidationError('You already have an account - please log in.')
 
 
 class TalkProposalForm(ProposalForm):
     type = 'talk'
-    length = SelectField("Duration", default='30',
+    length = SelectField("Duration", default='25-45 mins',
                          choices=[('< 10 mins', "Shorter than 10 minutes"),
-                                  ('10 mins', "10 minutes"),
-                                  ('30 mins', "30 minutes"),
-                                  ('45 mins', "45 minutes"),
-                                  ('60 mins', "1 hour"),
-                                  ('> 60 mins', "Longer than 1 hour"),
+                                  ('10-25 mins', "10-25 minutes"),
+                                  ('25-45 mins', "25-45 minutes"),
+                                  ('> 45 mins', "Longer than 45 minutes"),
                                   ])
 
 
@@ -71,8 +69,8 @@ class InstallationProposalForm(ProposalForm):
                                                  ('large', 'Smaller than a lorry'),
                                                  ('huge', 'Bigger than a lorry'),
                                                 ])
-    needs_emf_funds = BooleanField('EMF funds')
-    funds = SelectField('Amount requested', choices=[(u'< £50', u'Less than £50'),
+    funds = SelectField('Funding', choices=[         ('0', 'No money needed'),
+                                                     (u'< £50', u'Less than £50'),
                                                      (u'< £100', u'Less than £100'),
                                                      (u'< £300', u'Less than £300'),
                                                      (u'< £500', u'Less than £500'),

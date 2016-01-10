@@ -390,6 +390,20 @@ div.micro img {
   padding-top: 1em;
 }
 
+.help-block {
+  font-size: 0.9em;
+  margin-bottom: 0px;
+}
+
+.form-horizontal .form-group .help-block {
+  padding-left: 0.5em;
+}
+
+legend {
+  margin-bottom: 0px;
+  border-bottom: 1px solid #aaa;
+}
+
 .glyphicon.input-group-addon {
   top: 0px;
 }
@@ -403,7 +417,7 @@ div.micro img {
 }
 
 .cfp-tab {
-  padding: 15px 15px 0 15px;
+  padding: 15px;
   background-color: #d3e0f1;
   color: #333;
 }

@@ -1,17 +1,4 @@
 {% from "_formhelpers.html" import render_field %}
-{% macro _render_cfp_field(field, id_suffix='') %}
-
-{% set hide_id = field.name + '-' + id_suffix + '-' + '-help' %}
-
-<div class="focus-help">
-    {{ render_field(field, horizontal=9, **kwargs) }}
-    <p class="collapse help-block in col-md-9 col-md-offset-3 col-xs-12" id="{{ hide_id }}">
-        <small>{{ caller() }}</small>
-    </p>
-</div>
-
-{% endmacro %}
-
 {% extends "base.html" %}
 {% block title %}Call for Participation{% endblock %}
 {% block body %}
@@ -19,74 +6,43 @@
   <div class="alert alert-danger">Could not submit your proposal. Please <a href="#cfp-errors" class="alert-link">check below</a> and try again.</div>
   {% endif %}
 
-  <h2>Call for Participation</h2>
-  <div class="collapse in" id="what">
+<h2>Call for Participation</h2>
+<div class="well">
     <p class="emphasis">Electromagnetic Field is a UK camping festival for those
       with an inquisitive mind or an interest in making things: hackers, artists,
       geeks, crafters, scientists, and engineers. It's happening near
-      <a href="http://wiki.emfcamp.org/wiki/Getting_Here">Guildford, Surrey</a>
-      on August 5<sup>th</sup>&mdash;7<sup>th</sup>, and tickets are
-      <a href="/">on sale now</a> for £{{ full_price }}. Our last festival in
-      2014 had 1,300 attendees; this year we're aiming for 1,500.</p>
+      Guildford, Surrey on August 5<sup>th</sup>&mdash;7<sup>th</sup> 2016.</p>
 
-    <p>We're looking for people to talk, share, and demonstrate the things they
-      love. We're especially keen to hear from people with
+    <p>We're looking for talks, performances, installations, workshops, and games.
+       We're especially keen to hear from people with
       <a href="{{ url_for('base.diversity') }}">different backgrounds</a> than
-      you'd expect to find at a technology conference. We're not just looking
-      for talks: we also want installations, workshops, and games.</p>
+      you'd expect to find at a technology conference.</p>
 
     <p>At previous events we've heard about everything from genetic modification
       to electronics, blacksmithing to high-energy physics, reverse engineering
-      to lock picking, computer security to crocheting, and quadcopters to beer
-      brewing.  </p>
-
-    <p>If you're enthusiastic about it, we are too! You don't need to be a
+      to lock picking, computer security to crocheting, and quadcopters to brewing.
+      If you're enthusiastic about it, we are too! You don't need to be a
       professional or an expert to present: <strong>impostors are
       welcome</strong>.</p>
-  </div>
 
-  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#selection" aria-expanded="true" aria-controls="#selection">
-    <h3>Selection<small class="glyphicon glyphicon-chevron-down"></small></h3>
-  </a>
-  <div class="collapse in" id="selection">
-    <p>After you submit a proposal, it will be considered anonymously by a diverse
-      selection panel. We may take into account other factors later on in the process
-      to see where we can support you.</p>
-    <p>For more on this see our <a href="{{ url_for('.guidance', _anchor='process') }}" target="_blank">guidance</a>.</p>
-  </div>
-
-  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#money" aria-expanded="true" aria-controls="#money">
-    <h3>Money<small class="glyphicon glyphicon-chevron-down"></small></h3>
-  </a>
-  <div class="collapse in" id="money">
+    <h3>Money</h3>
     <p>EMF is a non-profit community event, entirely run by unpaid volunteers. All of
       the ticket cost goes directly towards turning a field into a habitable and amazing place
-      to spend a weekend, and everyone who attends contributes to making it a success.</p>
+      to spend a weekend, and everyone who attends contributes to making the event a success.</p>
 
-    <p>Because of this, we'd like everyone who participates to buy a ticket and stick around for
+    <p>We'd like everyone who participates to buy a ticket and stick around for
       the whole event. We don't have the budget to pay speakers, although we have a
-      limited amount of money set aside to help those who otherwise can't to afford to come, or
-      who can only attend for the day of their talk. Please let us know if that's the case.</p>
+      limited amount of money set aside to help those who otherwise can't afford to come, or
+      who can only attend for the day of their talk. We'll ask you about this if your
+      proposal is accepted.</p>
+
+    <h3>Selection</h3>
+    <p>After you submit a proposal, it will be considered anonymously by a diverse
+      selection panel. For more on the EMF talk selection process, see our
+        <a href="{{ url_for('.guidance') }}" target="_blank">guidance</a>.</p>
+
   </div>
-
-  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#guidance" aria-expanded="true" aria-controls="#guidance">
-    <h3>Submit a proposal<small class="glyphicon glyphicon-chevron-down"></small></h3>
-  </a>
-  <div class="collapse in" id="guidance">
-    <p>We need a rough idea of what you want to present at EMF, what sort of
-      resources you'll need, and how long you'll expect it to last. If you need some
-      help writing your proposal, <a href="mailto:{{ config['CONTENT_EMAIL'][1] }}">we're happy to
-      help</a>. If you're not confident speaking, we'll help you out however we
-      can.</p>
-
-    <p>For more detailed information about the form and what we're looking for
-      please see our <a href="{{ url_for('.guidance') }}" target="_blank">guidance page.</a></p>
-  </div>
-
-  <label class="visible-xs">
-  Select the category that most closely describes your proposal
-  </label>
-
+    <h2>Submit a proposal</h2>
   <ul class="nav nav-tabs cfp-types" role="navigation" id="cfp-errors">
     {% for form in forms %}
       <li {% if form.type == active_cfp_type -%} class="active" {%- endif %}>
@@ -113,118 +69,61 @@
     <div class="tab-pane {%- if form.type == active_cfp_type %} active {%- endif %}" id="{{ 'tab_' + form.type }}">
     <form action={{ url_for('cfp.main', cfp_type=form.type) }} method="post" class="form-horizontal cfp-form" role="form">
       {{ form.hidden_tag() }}
-
-      {% if form.type == 'talk' %}
-        <p>Whether is a history of cheese or techniques for extracting passwords from databases we want to hear about it. Talks and performances will have a stage, projector and space for an audience. Normally our talks are scheduled to run for either 30 minutes or 1 hour. We will also have lightening talk slots for shorter things and evening music for longer performances.</p>
-      {% elif form.type == 'workshop' %}
-        <p>Workshops are one of the most popular features of EMF, they give people a chance to learn new skills or try out something they wouldn't normally be able to. We'll have several dedicated workshop tents able to seat up to 50 attendees. Each tent will have tables and chairs as well as some A/V equipment for demonstrating on. Previous workshops have included making rope from nettles and live-coded techno.</p>
-      {% elif form.type == 'installation' %}
-        <p>Installations are weekend-long events or projects. Previously we've had robots and film crews. Installations can arrive ready to go or be built on site.</p>
-      {% endif %}
-
-      <fieldset>
       {% if not current_user.is_authenticated() %}
-        <h4>Your Details</h4>
-        <p>If you've already bought a ticket for this year, please <a href="{{ url_for('users.login') }}">log in</a>
-           so we can link the submission to your account, otherwise we'll use your name and email to create one.</p>
-        {% if current_user.is_anonymous() %}
-          {% call _render_cfp_field(form.name, form.type, placeholder="Your name") %}
-            How you'd like to be identified by our system. Pseudonyms are fine and you'll be able to
-            change it for the schedule if you wish. This will visible to admin and anonymisers.
-          {% endcall %}
-          {% call _render_cfp_field(form.email, form.type, placeholder="Your email address") %}
-            How we'll get in contact with you about your proposal as well for logging in. This is only visible
-            to admins.
-          {% endcall %}
-        {% else %}
-          {% call _render_cfp_field(form.name, form.type, placeholder="Your name") %}
-            How you'd like to be identified by our system. Pseudonyms are fine and you'll be able to
-            change it for the schedule if you wish. This will visible to admin and anonymisers.
-          {% endcall %}
-        {% endif %}
-      {% endif %}
-
+      <fieldset>
+        <legend>Your Details</legend>
+        <p>If you've already bought a ticket, please
+            <a href="{{ url_for('users.login') }}">log in</a>.</p>
+          {{ render_field(form.name, horizontal=9, placeholder="Your name (or pseudonym)") }}
+          {{ render_field(form.email, horizontal=9, placeholder="Your email address") }}
       </fieldset>
+      {% endif %}
 
       <fieldset>
-      <h4>About Your Talk</h4>
-      <p>You'll be able to tweak this later. Try to avoid including personally-identifiable information (obviously your name but also things like
-         "inventor of sliced bread"), doing this helps with our anonymised review process.</p>
+          <legend>About Your {{form.type|capitalize}}</legend>
+          <p>You'll be able to tweak these details before we publish them.
+             To help with our anonymised review process, try to avoid including
+             personally identifiable information at this stage.</p>
+          {{render_field(form.title, horizontal=9, placeholder="A short summary")}}
+          {{render_field(form.description, horizontal=9,
+                         placeholder="An anonymised description to send to the reviewers")}}
+     </fieldset>
 
-      {% call _render_cfp_field(form.title, form.type, placeholder="A one-sentence summary") %}
-        A summary of your {{ form.type }}. Try to make it memorable and eye-catching.
-      {% endcall %}
-      {% if form.type == 'talk' %}
-        {% call _render_cfp_field(form.description, form.type, placeholder="An anonymised description to send to the reviewers.") %}
-          What will you talk about or perform? Try to make it clear what will make your talk unique as well as the
-          sort of person it will appeal to.
+     <fieldset>
+         <legend>More Details</legend>
+         <p>We'll use these details to help us schedule your {{form.type}}.</p>
+      {% if form.type in ('talk', 'workshop') %}
+        {% call render_field(form.requirements, horizontal=9,
+                            placeholder="Any unusual requirements") %}
+            We'll provide all the usual AV equipment, but let us know if you need anything unusual.
         {% endcall %}
-      {% elif form.type == 'workshop' %}
-        {% call _render_cfp_field(form.description, form.type, placeholder="An anonymised description to send to the reviewers.") %}
-          What attendees will learn or make? Make sure to include what sort of level the workshop will be pitched at.
-        {% endcall %}
-      {% elif form.type == 'installation' %}
-        {% call _render_cfp_field(form.description, form.type, placeholder="An anonymised description to send to the reviewers.") %}
-          What do you want to build or run? Will it be interactive or something to look at?
-        {% endcall %}
+        {{ render_field(form.length, horizontal=9) }}
       {% endif %}
 
-      <h4>More Details</h4>
-      <p>These won't go to our reviewers but may form part of the decision by the adjudicator (e.g. we may reject submissions that have requirements we can't easily meet).</p>
-      {% if form.type == 'talk' %}
-        {% call _render_cfp_field(form.requirements, form.type, placeholder="Do you have any special requirements e.g. atari to HDMI cable?") %}
-          We'll have projectors, basic adaptors (VGA/DVI), laptops and microphones but do you need anything else? e.g. cameras for demos, rocket fuel.
-        {% endcall %}
-        {% call _render_cfp_field(form.length, form.type) %}
-          How long will your talk or performance be? Doesn't have to be exact but a good estimate will help us a lot.
-        {% endcall %}
-
-      {% elif form.type == 'workshop' %}
-        {% call _render_cfp_field(form.requirements, form.type, placeholder="Do you have any special requirements (e.g. 3-phase power)?") %}
-          We'll have basics like power and A/V but will you need anything else (e.g. soldering irons)? There will be some things we can help supply and the more notice we have the easier it is.
-        {% endcall %}
-        {% call _render_cfp_field(form.length, form.type,  placeholder="Your best guess, whether in minutes or days") %}
-          Obviously different things can take wildly differing amounts of time and we like to ensure a range of different length workshops, from quick 15 minute demos to weekend-long projects.
-        {% endcall %}
-        {% call _render_cfp_field(form.attendees, form.type, placeholder="The number of people you can accommodate in your workshop") %}
-          Our workshop tents generally hold about 50 attendees, if you want to run workshops for more than this we may have to split them up. Similarly if you can only teach 2 people at a time there may be better locations for you to work from.
-        {% endcall %}
-        {% call _render_cfp_field(form.cost, form.type, placeholder="If attendees need to pay for materials") %}
-          Materials are rarely free and unless they are running a workshop can leave you our of pocket which is something we'd like to avoid so we're happy for people to charge a small fee to cover costs. Equally we'd like to know this in advance to inform attendees and because if it's very expensive we may have to look at alternative systems.
-        {% endcall %}
-
-      {% elif form.type == 'installation' %}
-        {% call _render_cfp_field(form.requirements, form.type, placeholder="Do you have any requirements (e.g. somewhere dry)?") %}
-          What does your installation need in order to run? Power and internet will be available (although if you need e.g. static IPs tell us) but beyond these we'll need time to organise things.
-        {% endcall %}
-        {% call _render_cfp_field(form.size, form.type) %}
-          Given installations will be up for most of the weekend we need to know how much space to allocate them.
-        {% endcall %}
-        <div>
-        {# Checkbox also shows/hides the select box. This is controlled via scripts in the same way as the above collapse blocks #}
-          <div class="col-md-9 col-sm-offset-3">
-            <label id="emf-funds-toggle" class="collapse-toggle" data-toggle="collapse" href="#toggleSelect" aria-expanded="true" areia-controls="#toggleSelect">
-              {{ form.needs_emf_funds() }}
-              I will need help from EMF to help cover costs of this installation.
-            </label>
-            {% for error in form.needs_emf_funds.errors %}
-            <div class="help-block">{{ error }}</div>
-            {% endfor %}
-          </div>
-          <div class="collapse in col-md-12" id="toggleSelect">
-            {{ render_field(form.funds, 9)}}
-            <p class="help-block col-md-9 col-md-offset-3 col-xs-12"><small>
-              EMF has some funds intended to make sure awesome things happen, this can cover transportation costs or material costs for your installation.
-            </small></p>
-          </div>
-        </div>
-        <div class="clearfix"></div>
-      {% endif %}
-
-      {% call _render_cfp_field(form.notice_required) %}
-        Obviously you need time to prepare so we'd like to know how much so we can plan accordingly.
+      {% call render_field(form.notice_required, horizontal=9) %}
+        How much notice do you need to prepare? We'll try and give you as much notice as we can.
       {% endcall %}
 
+      {% if form.type == 'workshop' %}
+          {% call render_field(form.attendees, horizontal=9,
+                placeholder="The number of people you can accommodate in your workshop") %}
+                Our workshop tents can accommodate 10-50 attendes per session; if your workshop
+                is smaller than that, we might be able to find somewhere else to hold it.
+          {% endcall %}
+          {{ render_field(form.cost, horizontal=9, placeholder="Do attendees need to pay for materials?") }}
+      {% elif form.type == 'installation' %}
+          {% call render_field(form.requirements, horizontal=9,
+          placeholder="What are your installation's requirements?") %}
+            Let us know if your installation needs power, internet, or anything else special.
+          {% endcall %}
+          {% call render_field(form.size, horizontal=9) %}
+            How much space will your installation take up?
+          {% endcall %}
+          {% call render_field(form.funds, 9) %}
+            We have a limited amount of funding available to make the EMF site look great.
+            If you'd like to apply for a grant, let us know how much you'll need.
+          {% endcall %}
+      {% endif %}
         <div class="col-md-9 col-sm-offset-3">
           <label class="checkbox">
             {{ form.needs_help() }}
@@ -240,13 +139,11 @@
       <div class="form-actions">
         <button type="submit" name="Create" class="btn btn-success btn-lg pull-right debounce">Submit proposal</button>
       </div>
-
+      <div class="clearfix"></div>
     </form>
     </div>
-
     {% endfor %}
-
-  </div>
+</div>
 
 {% endblock %}
 
@@ -265,16 +162,6 @@ $(function() {
     $('.collapse.help-block').removeClass('in');
   }
 
-  // When we collapse the installation's "funds" select box we need to select
-  // the checkbox as well.
-  $('#toggleSelect').on('shown.bs.collapse', function(e) {
-    $('#emf-funds-toggle input').prop('checked', true);
-  });
-
-  $('#toggleSelect').on('hidden.bs.collapse', function(e) {
-    $('#emf-funds-toggle input').prop('checked', false);
-  });
-
   // Copy values across when the user switches tab
   $('.cfp-types a').on('show.bs.tab', function(e) {
     var $prev = $(e.relatedTarget);
@@ -292,17 +179,6 @@ $(function() {
     });
 
     return true;
-  });
-
-  $('.focus-help').each(function (i, ele){ // Get all the form's fields
-    var focusEle = $(ele).find('.form-control');
-    var collapseEle = $(ele).find('.collapse');
-    focusEle.on('focus', function (e){
-      collapseEle.collapse('show');
-    });
-    focusEle.on('blur', function (e){
-      collapseEle.collapse('hide');
-    });
   });
 });
 </script>
