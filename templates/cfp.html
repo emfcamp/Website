@@ -116,7 +116,8 @@
           {% call render_field(form.attendees, horizontal=9,
                 placeholder="The number of people you can accommodate in your workshop") %}
                 Our workshop tents can accommodate 10-50 attendees per session; if your workshop
-                is smaller than that, we might be able to find somewhere else to hold it.
+                is smaller than that, you could consider holding it at a
+                <a href="https://wiki.emfcamp.org/wiki/Villages">village</a> instead.
           {% endcall %}
           {{ render_field(form.cost, horizontal=9, placeholder="If attendees need to pay for materials") }}
       {% elif form.type == 'installation' %}
