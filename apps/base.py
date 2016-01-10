@@ -98,7 +98,7 @@ def talks_2014():
                      event['abstract']
                       ))
 
-    return render_template('talks_2014.html', talks=talks)
+    return render_template('talks-2014.html', talks=talks)
 
 
 @base.route("/talks/2012")
@@ -117,7 +117,7 @@ def talks_2012():
 
         days[day] = rows
 
-    return render_template('talks_2012.html', **days)
+    return render_template('talks-2012.html', **days)
 
 
 @base.route("/about/company")

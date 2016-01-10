@@ -197,7 +197,7 @@ def checkin(receipts):
         return redirect(url_for('arrivals.main'))
 
     user = tickets[0].user
-    return render_template('arrivals/checkin_receipt.html', tickets=tickets, form=form,
+    return render_template('arrivals/checkin-receipt.html', tickets=tickets, form=form,
                            user=user, receipts=','.join(t.receipt for t in tickets), badge=badge)
 
 @arrivals.route('/checkin/receipt/<receipts>/undo', methods=['GET', 'POST'])
@@ -237,5 +237,5 @@ def undo_checkin(receipts):
         return redirect(url_for('arrivals.main'))
 
     user = tickets[0].user
-    return render_template('arrivals/checkin_receipt_undo.html', tickets=tickets, form=form,
+    return render_template('arrivals/checkin-receipt-undo.html', tickets=tickets, form=form,
                            user=user, receipts=','.join(t.receipt for t in tickets), badge=badge)
