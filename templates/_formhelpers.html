@@ -1,4 +1,8 @@
-{% macro render_field(field, horizontal=False, glyphicon=None) %}
+{% macro render_field(field, horizontal=False, glyphicon_before=None, glyphicon_after=None, help_link='') %}
+
+{% if caller %}
+{% set help_text = caller() %}
+{% endif %}
 
 {% if horizontal == True %}
     {% set horizontal = 10 %}
@@ -11,21 +15,32 @@
 
 <div class="form-group {%- if field.errors %} has-error {%- endif %}">
     <label for="{{ field.name }}" class="{% if horizontal -%} col-sm-{{labelw}} {% endif -%} control-label">
-        {{ field.label.text }}</label>
+        {{ field.label.text }}
+        {%- if help_link %}
+            <a href="{{ help_link }}" target="_blank">?</a>
+        {%- endif %}
+    </label>
     <div class="{% if horizontal -%} col-sm-{{fieldw}} {% endif -%} controls">
-    {%- if glyphicon %}
-    <div class="input-group">
-    {%- endif %}
-    {{ field(class_='form-control', **kwargs)|safe }}
-    {%- if glyphicon %}
-    <span class="glyphicon glyphicon-{{ glyphicon }} input-group-addon"></span>
+        {%- if glyphicon_before or glyphicon_after %}
+        <div class="input-group">
+            {%- if glyphicon_before%}
+            <span class="glyphicon glyphicon-{{ glyphicon_before }} input-group-addon"></span>
+            {%- endif %}
+            {{ field(class_='form-control', **kwargs)|safe }}
+            {%- if glyphicon_after %}
+            <span class="glyphicon glyphicon-{{ glyphicon_after }} input-group-addon"></span>
+            {%- endif %}
+        </div>
+        {% else %}
+            {{ field(class_='form-control', **kwargs)|safe }}
+            {%- endif %}
+        {% if field.errors %}
+            {% for error in field.errors %}
+              <p class="help-block">{{ error }}</p>
+              {% endfor %}
+        {% elif help_text %}
+            <p class="help-block">{{ help_text }}</p>
+        {% endif -%}
     </div>
-    {%- endif %}
-    {% if field.errors %}
-        {% for error in field.errors %}
-          <span class="help-block">{{ error }}</span>
-        {% endfor %}
-    {% endif -%}
-  </div>
 </div>
 {% endmacro %}

@@ -6,85 +6,49 @@
   <div class="alert alert-danger">Could not submit your proposal. Please <a href="#cfp-errors" class="alert-link">check below</a> and try again.</div>
   {% endif %}
 
-  <h2>Call for Participation</h2>
-  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#what" aria-expanded="false" aria-controls="payments-table">
-    <h3>What we're looking for<small class="glyphicon glyphicon-chevron-down"></small></h3>
-  </a>
-  <div class="collapse in" id="what">
+<h2>Call for Participation</h2>
+<div class="well">
     <p class="emphasis">Electromagnetic Field is a UK camping festival for those
       with an inquisitive mind or an interest in making things: hackers, artists,
       geeks, crafters, scientists, and engineers. It's happening near
-      <a href="http://wiki.emfcamp.org/wiki/Getting_Here">Guildford, Surrey</a>
-      on August 5<sup>th</sup>&mdash;7<sup>th</sup>, and tickets are
-      <a href="/">on sale now</a> for £{{ full_price }}. Our last festival in
-      2014 had 1,300 attendees; this year we're aiming for 1,500.</p>
+      Guildford, Surrey on August 5<sup>th</sup>&mdash;7<sup>th</sup> 2016.</p>
 
-    <p>We're looking for people to talk, share, and demonstrate the things they
-      love. We're especially keen to hear from people with
+    <p>We're looking for talks, performances, installations, workshops, and games.
+       We're especially keen to hear from people with
       <a href="{{ url_for('base.diversity') }}">different backgrounds</a> than
-      you'd expect to find at a technology conference. We're not just looking
-      for talks: we also want installations, workshops, and games.</p>
+      you'd expect to find at a technology conference.</p>
 
     <p>At previous events we've heard about everything from genetic modification
       to electronics, blacksmithing to high-energy physics, reverse engineering
-      to lock picking, computer security to crocheting, and quadcopters to beer
-      brewing.  </p>
-
-    <p>If you're enthusiastic about it, we are too! You don't need to be a
+      to lock picking, computer security to crocheting, and quadcopters to brewing.
+      If you're enthusiastic about it, we are too! You don't need to be a
       professional or an expert to present: <strong>impostors are
       welcome</strong>.</p>
-  </div>
 
-  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#selection" aria-expanded="false" aria-controls="payments-table">
-    <h3>Selection<small class="glyphicon glyphicon-chevron-down"></small></h3>
-  </a>
-  <div class="collapse" id="selection">
-    <p>After you submit a proposal, it will be considered anonymously by a diverse
-      selection panel. We may take into account other factors later on in the process
-      to see where we can support you.</p>
-  </div>
-
-  <a class="collapse-toggle" role="button" data-toggle="collapse" href="#money" aria-expanded="false" aria-controls="payments-table">
-    <h3>Money<small class="glyphicon glyphicon-chevron-down"></small></h3>
-  </a>
-  <div class="collapse" id="money">
+    <h3>Money</h3>
     <p>EMF is a non-profit community event, entirely run by unpaid volunteers. All of
       the ticket cost goes directly towards turning a field into a habitable and amazing place
-      to spend a weekend, and everyone who attends contributes to making it a success.</p>
+      to spend a weekend, and everyone who attends contributes to making the event a success.</p>
 
-    <p>Because of this, we'd like everyone who participates to buy a ticket and stick around for
+    <p>We'd like everyone who participates to buy a ticket and stick around for
       the whole event. We don't have the budget to pay speakers, although we have a
-      limited amount of money set aside to help those who otherwise can't to afford to come, or
-      who can only attend for the day of their talk. Please let us know if that's the case.</p>
+      limited amount of money set aside to help those who otherwise can't afford to come, or
+      who can only attend for the day of their talk. We'll ask you about this if your
+      proposal is accepted.</p>
+
+    <h3>Selection</h3>
+    <p>After you submit a proposal, it will be considered anonymously by a diverse
+      selection panel. For more on the EMF talk selection process, see our
+        <a href="{{ url_for('.guidance') }}" target="_blank">guidance</a>.</p>
+
   </div>
-
-  <h3>Submit a proposal</h3>
-  <p>We need a rough idea of what you want to present at EMF, what sort of
-    resources you'll need, and how long you'll expect it to last. If you need some
-    help writing your proposal, <a href="mailto:content@emfcamp.org">we're happy to
-   help</a>. If you're not confident speaking, we'll help you out however we
-   can.</p>
-
-  {% if not current_user.is_authenticated() %}
-  <p>If you've already bought a ticket for this year, please <a href="{{ url_for('users.login') }}">log in</a>
-     so we can link the submission to your account.</p>
-  {% endif %}
-
-  <div class="alert alert-info">
-  Fields marked <span class="glyphicon glyphicon-globe"></span> will be displayed in the schedule &mdash;
-  you'll be able to change them later.
-  </div>
-
-  <label class="visible-xs">
-  Select the category that most closely describes your proposal
-  </label>
-
+    <h2>Submit a proposal</h2>
   <ul class="nav nav-tabs cfp-types" role="navigation" id="cfp-errors">
     {% for form in forms %}
       <li {% if form.type == active_cfp_type -%} class="active" {%- endif %}>
         <a href="{{ url_for('cfp.main', cfp_type=form.type) }}" data-target="#{{ 'tab_' + form.type }}" data-toggle="tab">
           {% if form.type == 'talk' %}
-            <h4>Talk</h4>
+            <h4>Talk or Performance</h4>
             <p>Held on one of our stages</p>
           {% elif form.type == 'workshop' %}
             <h4>Workshop</h4>
@@ -104,118 +68,101 @@
 
     <div class="tab-pane {%- if form.type == active_cfp_type %} active {%- endif %}" id="{{ 'tab_' + form.type }}">
     <form action={{ url_for('cfp.main', cfp_type=form.type) }} method="post" class="form-horizontal cfp-form" role="form">
-      <fieldset>
       {{ form.hidden_tag() }}
-
       {% if not current_user.is_authenticated() %}
-        {{ render_field(form.name, True, glyphicon='globe', placeholder="Your name to include in the schedule") }}
-
-        {% if form.type == 'talk' %}
-          {{ render_field(form.email, True, placeholder="We'll only use this to contact you about the talk") }}
-        {% elif form.type == 'workshop' %}
-          {{ render_field(form.email, True, placeholder="We'll only use this to contact you about the workshop") }}
-        {% elif form.type == 'installation' %}
-          {{ render_field(form.email, True, placeholder="We'll only use this to contact you about the installation") }}
-        {% endif %}
+      <fieldset>
+        <legend>Your Details</legend>
+        <p>If you've already bought a ticket, please
+            <a href="{{ url_for('users.login') }}">log in</a>.</p>
+          {{ render_field(form.name, horizontal=9, placeholder="Your name (or pseudonym)") }}
+          {{ render_field(form.email, horizontal=9, placeholder="Your email address") }}
+      </fieldset>
       {% endif %}
 
-      {{ render_field(form.title, True, glyphicon='globe', placeholder="A one-sentence summary (it should fit in a tweet)") }}
-      <div class="text-right help-block hidden show-remaining" data-for="title" data-max="140">
-        <small>
-          Characters remaining: <span class="remaining"></span><span class="too-long"> (but don't worry)</span>
-        </small>
-      </div>
-      </fieldset>
-
       <fieldset>
-      {{ render_field(form.description, True, placeholder="Description and any requirements.") }}
+          <legend>About Your {{form.type|capitalize}}</legend>
+          <p>You'll be able to tweak these details before we publish them.
+             To help with our anonymised review process, try to avoid including
+             personally identifiable information at this stage.</p>
+          {{render_field(form.title, horizontal=9, placeholder="A short summary")}}
+          {{render_field(form.description, horizontal=9,
+                         placeholder="An anonymised description to send to the reviewers")}}
+     </fieldset>
 
-      {% if form.type == 'talk' %}
-        {{ render_field(form.length, True) }}
-        {{ render_field(form.experience, True) }}
-      {% elif form.type == 'workshop' %}
-        {{ render_field(form.length, True, placeholder="Your best guess, whether in minutes or days") }}
-        {{ render_field(form.attendees, True, placeholder="The number of people you can accommodate in your workshop") }}
+     <fieldset>
+         <legend>More Details</legend>
+         <p>We'll use these details to help us schedule your {{form.type}}.</p>
+      {% if form.type in ('talk', 'workshop') %}
+        {% call render_field(form.requirements, horizontal=9,
+                            placeholder="Any unusual requirements") %}
+            We'll provide all the usual AV equipment, but let us know if you need anything unusual.
+        {% endcall %}
+        {{ render_field(form.length, horizontal=9) }}
+      {% endif %}
+
+      {% call render_field(form.notice_required, horizontal=9) %}
+        How much notice do you need to prepare? We'll try and give you as much notice as we can.
+      {% endcall %}
+
+      {% if form.type == 'workshop' %}
+          {% call render_field(form.attendees, horizontal=9,
+                placeholder="The number of people you can accommodate in your workshop") %}
+                Our workshop tents can accommodate 10-50 attendes per session; if your workshop
+                is smaller than that, we might be able to find somewhere else to hold it.
+          {% endcall %}
+          {{ render_field(form.cost, horizontal=9, placeholder="Do attendees need to pay for materials?") }}
       {% elif form.type == 'installation' %}
-        {{ render_field(form.size, True, placeholder="We need to know how much space to reserve") }}
+          {% call render_field(form.requirements, horizontal=9,
+          placeholder="What are your installation's requirements?") %}
+            Let us know if your installation needs power, internet, or anything else special.
+          {% endcall %}
+          {% call render_field(form.size, horizontal=9) %}
+            How much space will your installation take up?
+          {% endcall %}
+          {% call render_field(form.funds, 9) %}
+            We have a limited amount of funding available to make the EMF site look great.
+            If you'd like to apply for a grant, let us know how much you'll need.
+          {% endcall %}
       {% endif %}
-
-      </fieldset>
-      <fieldset>
-
-
         <div class="col-md-9 col-sm-offset-3">
           <label class="checkbox">
-            {{ form.need_finance() }}
-            {{ form.need_finance.label.text }}
+            {{ form.needs_help() }}
+            I'd like help with preparing this proposal.
           </label>
-          {% for error in form.need_finance.errors %}
+          {% for error in form.needs_help.errors %}
           <div class="help-block">{{ error }}</div>
           {% endfor %}
         </div>
-
-      {% if form.type in ['talk', 'workshop'] %}
-        <div class="col-md-9 col-sm-offset-3">
-          <label class="checkbox">
-            {{ form.one_day() }}
-            {{ form.one_day.label.text }}
-          </label>
-          {% for error in form.one_day.errors %}
-          <div class="help-block">{{ error }}</div>
-          {% endfor %}
-        </div>
-      {% endif %}
       </fieldset>
-      <p></p>
-
-      {% if form.type == 'installation' %}
-      <div class="row">
-        <div class="col-md-9 col-sm-offset-3">
-            We may be able to provide materials for your installation &ndash;
-            please <a href="mailto:shiny@emfcamp.org">get in touch</a> for details.
-        </div>
-      </div>
-      {% endif %}
-
-      {% if current_user.is_anonymous() or not current_user.diversity %}
-      <fieldset>
-        <div class="col-md-11 col-md-offset-1">
-        <div class="panel panel-warning">
-          <div class="panel-heading">
-            If you're comfortable telling us a little bit about yourself, we'd appreciate it.
-            This information won't be available to the selection panel &ndash; we'll only use it to help find out
-            how well we're doing with outreach.
-          </div>
-          <div class="row">
-          <div id="diversity" class="col-md-11">
-            <p></p>
-            {{ render_field(form.diversity.age, True) }}
-            {{ render_field(form.diversity.gender, True) }}
-            {{ render_field(form.diversity.ethnicity, True) }}
-          </div>
-          </div>
-        </div>
-        </div>
-      </fieldset>
-      {% endif %}
+      <p>&nbsp;</p>
 
       <div class="form-actions">
         <button type="submit" name="Create" class="btn btn-success btn-lg pull-right debounce">Submit proposal</button>
       </div>
-
+      <div class="clearfix"></div>
     </form>
     </div>
-
     {% endfor %}
-
-  </div>
+</div>
 
 {% endblock %}
 
 {% block foot %}
 <script type="text/javascript">
 $(function() {
+  'use strict';
+  // If the user has already made a submission, hide all the blurb.
+  // Fallback is just to show it.
+  var has_proposals = {{ has_proposals|tojson }};
+  if (has_proposals) {
+    $('.collapse').removeClass('in');
+  } else {
+    // Funds select box should always be hidden to start with
+    $('#toggleSelect.collapse').removeClass('in');
+    $('.collapse.help-block').removeClass('in');
+  }
 
+  // Copy values across when the user switches tab
   $('.cfp-types a').on('show.bs.tab', function(e) {
     var $prev = $(e.relatedTarget);
     var $curr = $(this);
@@ -232,20 +179,6 @@ $(function() {
     });
 
     return true;
-  });
-
-  $('.show-remaining').each(function() {
-    var $t = $(this);
-    var field_sel = $t.data('for');
-    var $field = $t.closest('form').find('[name=' + field_sel + ']');
-    var max_length = $t.data('max');
-    $field.on('change keydown keyup', function() {
-      var length = this.value.length;
-      var remaining = max_length - length;
-      $('.remaining', $t).text(remaining);
-      $('.too-long', $t).toggle(remaining < 0);
-    }).change();
-    $t.removeClass('hidden');
   });
 });
 </script>

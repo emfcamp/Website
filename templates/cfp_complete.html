@@ -1,9 +1,41 @@
+{% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block body %}
 <div class="alert alert-success">Thanks for your submission!</div>
 <div>We'll be in touch by email. If you'd like to submit another talk, just click below.</div>
 <div>If you haven't yet bought your tickets, please reserve them now.</div>
 <p></p>
-<a class="btn btn-default" href="{{ url_for('cfp.main') }}">Add another</a>
-<a class="btn btn-success" href="{{ url_for('tickets.main') }}">Buy Tickets</a>
+
+{% if not current_user.diversity %}
+<form action={{ url_for('cfp.complete') }} method="post" class="form-horizontal" role="form">
+  {{ form.hidden_tag() }}
+  <fieldset>
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        If you're comfortable telling us a little bit about yourself, we'd appreciate it.
+        This information won't be available to the selection panel &ndash; we'll only use it to help find out
+        how well we're doing with outreach.
+      </div>
+      <div class="row">
+        <div id="diversity" class="col-md-10 col-md-offset-1">
+          <p></p>
+          {{ render_field(form.age, True) }}
+          {{ render_field(form.gender, True) }}
+          {{ render_field(form.ethnicity, True) }}
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="form-actions">
+    <button type="submit" name="Create" class="btn btn-success pull-right debounce">Update user account</button>
+  </div>
+</form>
+{% endif %}
+
+<a class="btn btn-default pull-right" href="{{ url_for('cfp.main') }}">Add another</a>
+{% if feature_enabled('TICKET_SALES') %}
+  <a class="btn btn-success pull-right" href="{{ url_for('tickets.main') }}">Buy Tickets</a>
+{% endif %}
+
 {% endblock %}
