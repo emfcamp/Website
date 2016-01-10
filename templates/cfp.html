@@ -3,13 +3,10 @@
 
 {% set hide_id = field.name + '-' + id_suffix + '-' + '-help' %}
 
-<div style="position:relative;">
+<div class="focus-help">
     {{ render_field(field, horizontal=9, **kwargs) }}
-    <a class="collapse-toggle" role="button" data-toggle="collapse" href="#{{ hide_id }}" aria-expanded="true" aria-controls="#{{ hide_id }}" style="position:absolute; cursor: pointer; top: 8px;">
-        <span class="glyphicon glyphicon-chevron-down"></span>
-    </a>
-    <p class="collapse help-block in" id="{{ hide_id }}">
-        {{ caller() }}
+    <p class="collapse help-block in col-md-9 col-md-offset-3 col-xs-12" id="{{ hide_id }}">
+        <small>{{ caller() }}</small>
     </p>
 </div>
 
@@ -86,22 +83,6 @@
       please see our <a href="{{ url_for('.guidance') }}" target="_blank">guidance page.</a></p>
   </div>
 
-  {% if not current_user.is_authenticated() %}
-  <p>If you've already bought a ticket for this year, please <a href="{{ url_for('users.login') }}">log in</a>
-     so we can link the submission to your account.</p>
-  {% endif %}
-
-  <div class="well">
-    <p>
-      The review process is anonymised, so please don't include any details that make
-      you identifiable in the title or description of your submission.
-    </p>
-    <p>
-      If your proposal is accepted you'll have a chance to tweak what is displayed
-      in the schedule later (e.g. to add credits, expand the description)
-    </p>
-  </div>
-
   <label class="visible-xs">
   Select the category that most closely describes your proposal
   </label>
@@ -143,20 +124,22 @@
 
       <fieldset>
       {% if not current_user.is_authenticated() %}
-        <h5>Account details</h5>
-        <p>These are used to log you in to this site and communicate with you. Your email will only be visible to site admins whilst your name will be visible to our anonymisers as well.</p>
+        <h4>Your Details</h4>
+        <p>If you've already bought a ticket for this year, please <a href="{{ url_for('users.login') }}">log in</a>
+           so we can link the submission to your account, otherwise we'll use your name and email to create one.</p>
         {% if current_user.is_anonymous() %}
           {% call _render_cfp_field(form.name, form.type, placeholder="Your name") %}
             How you'd like to be identified by our system. Pseudonyms are fine and you'll be able to
-            change it for the schedule if you wish.
+            change it for the schedule if you wish. This will visible to admin and anonymisers.
           {% endcall %}
           {% call _render_cfp_field(form.email, form.type, placeholder="Your email address") %}
-            How we'll get in contact with you about your proposal as well for logging in.
+            How we'll get in contact with you about your proposal as well for logging in. This is only visible
+            to admins.
           {% endcall %}
         {% else %}
           {% call _render_cfp_field(form.name, form.type, placeholder="Your name") %}
             How you'd like to be identified by our system. Pseudonyms are fine and you'll be able to
-            change it for the schedule if you wish.
+            change it for the schedule if you wish. This will visible to admin and anonymisers.
           {% endcall %}
         {% endif %}
       {% endif %}
@@ -164,27 +147,29 @@
       </fieldset>
 
       <fieldset>
-      <h5>Review submission</h5>
-      <p>The title and description of your proposal will be anonymised and sent to our reviewers in order to decide which talks to accept. If your proposal is accepted you'll have a chance to modify these before they go in the schedule. </p>
+      <h4>About Your Talk</h4>
+      <p>You'll be able to tweak this later. Try to avoid including personally-identifiable information (obviously your name but also things like
+         "inventor of sliced bread"), doing this helps with our anonymised review process.</p>
 
       {% call _render_cfp_field(form.title, form.type, placeholder="A one-sentence summary") %}
         A summary of your {{ form.type }}. Try to make it memorable and eye-catching.
       {% endcall %}
       {% if form.type == 'talk' %}
         {% call _render_cfp_field(form.description, form.type, placeholder="An anonymised description to send to the reviewers.") %}
-          More details on what you'll talk about or perform. Remember this will be anonymised so try to keep identifiable details out of it.
+          What will you talk about or perform? Try to make it clear what will make your talk unique as well as the
+          sort of person it will appeal to.
         {% endcall %}
       {% elif form.type == 'workshop' %}
         {% call _render_cfp_field(form.description, form.type, placeholder="An anonymised description to send to the reviewers.") %}
-          What attendees will learn or make? Remember this will be anonymised so try to keep identifiable details out of it.
+          What attendees will learn or make? Make sure to include what sort of level the workshop will be pitched at.
         {% endcall %}
       {% elif form.type == 'installation' %}
         {% call _render_cfp_field(form.description, form.type, placeholder="An anonymised description to send to the reviewers.") %}
-          What do you want to build or run? Remember this will be anonymised so try to keep identifiable details out of it.
+          What do you want to build or run? Will it be interactive or something to look at?
         {% endcall %}
       {% endif %}
 
-      <h5>Other details</h5>
+      <h4>More Details</h4>
       <p>These won't go to our reviewers but may form part of the decision by the adjudicator (e.g. we may reject submissions that have requirements we can't easily meet).</p>
       {% if form.type == 'talk' %}
         {% call _render_cfp_field(form.requirements, form.type, placeholder="Do you have any special requirements e.g. atari to HDMI cable?") %}
@@ -226,9 +211,11 @@
             <div class="help-block">{{ error }}</div>
             {% endfor %}
           </div>
-          <div class="collapse in" id="toggleSelect">
+          <div class="collapse in col-md-12" id="toggleSelect">
             {{ render_field(form.funds, 9)}}
-            <p class="help-block">EMF has some funds intended to make sure awesome things happen, whether you need money to cover transportation costs of your installation or to make it if you let us know we'll see what we can do.</p>
+            <p class="help-block col-md-9 col-md-offset-3 col-xs-12"><small>
+              EMF has some funds intended to make sure awesome things happen, this can cover transportation costs or material costs for your installation.
+            </small></p>
           </div>
         </div>
         <div class="clearfix"></div>
@@ -280,11 +267,11 @@ $(function() {
 
   // When we collapse the installation's "funds" select box we need to select
   // the checkbox as well.
-  $('#toggleSelect').on('show.bs.collapse', function(e) {
+  $('#toggleSelect').on('shown.bs.collapse', function(e) {
     $('#emf-funds-toggle input').prop('checked', true);
   });
 
-  $('#toggleSelect').on('hide.bs.collapse', function(e) {
+  $('#toggleSelect').on('hidden.bs.collapse', function(e) {
     $('#emf-funds-toggle input').prop('checked', false);
   });
 
@@ -305,6 +292,17 @@ $(function() {
     });
 
     return true;
+  });
+
+  $('.focus-help').each(function (i, ele){ // Get all the form's fields
+    var focusEle = $(ele).find('.form-control');
+    var collapseEle = $(ele).find('.collapse');
+    focusEle.on('focus', function (e){
+      collapseEle.collapse('show');
+    });
+    focusEle.on('blur', function (e){
+      collapseEle.collapse('hide');
+    });
   });
 });
 </script>
