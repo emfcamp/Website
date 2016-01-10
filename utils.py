@@ -14,6 +14,7 @@ from models import (
 from models.payment import (
     BankAccount, BankTransaction,
 )
+from models.cfp import Proposal
 from models.permission import Permission
 from apps.tickets import render_receipt, render_pdf
 
@@ -298,6 +299,7 @@ class MakeAdmin(Command):
 
         print '%s is now an admin' % (user.name)
 
+
 class MakeArrivals(Command):
     """
       Make userid one an arrivals operator for testing purposes.
@@ -341,6 +343,27 @@ class SendTickets(Command):
                 ticket.emailed = True
             db.session.commit()
 
+
+class LockProposals(Command):
+
+    def run(self):
+        edit_window = timedelta(days=app.config.get('EDIT_WINDOW', 2))
+        app.logger.info('Locking proposals older than %d days' % edit_window.days)
+        new_proposals = Proposal.query.filter_by(state='new').all()
+        lock_count = 0
+        for proposal in new_proposals:
+            deadline = proposal.created + edit_window
+
+            if datetime.utcnow() > deadline:
+                proposal.state = 'locked'
+
+                app.logger.debug('Locking proposal %d' % proposal.id)
+                db.session.commit()
+                lock_count += 1
+
+        app.logger.info('Locked %d proposals' % lock_count)
+
+
 if __name__ == "__main__":
     manager = Manager(create_app())
     manager.add_command('createdb', CreateDB())
@@ -352,4 +375,5 @@ if __name__ == "__main__":
     manager.add_command('makearrivals', MakeArrivals())
     manager.add_command('createtokens', CreateTicketTokens())
     manager.add_command('sendtickets', SendTickets())
+    manager.add_command('lockproposals', LockProposals())
     manager.run()
