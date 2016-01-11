@@ -195,7 +195,7 @@ def proposals():
 @cfp.route('/cfp/proposals/<int:proposal_id>/edit', methods=['GET', 'POST'])
 def edit_proposal(proposal_id):
     proposal = Proposal.query.get(proposal_id)
-    if proposal.user != current_user:
+    if not proposal or proposal.user != current_user:
         abort(404)
 
     form = TalkProposalForm() if proposal.type == 'talk' else \
