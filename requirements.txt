@@ -35,6 +35,8 @@ Flask-SQLAlchemy==2.0
 SQLAlchemy==1.0.8
 psycopg2==2.6.1
 py-bcrypt==0.4
+SQLAlchemy-Utils==0.31.4
+SQLAlchemy-Continuum==1.2.2
 
 # assets
 Flask-Assets==0.11
