@@ -95,10 +95,6 @@ def main(cfp_type='talk'):
         form.name.data = current_user.name
         form.email.data = current_user.email
 
-    if request.method == 'POST':
-        app.logger.info('Checking %s proposal for %s (%s)', cfp_type,
-                        form.name.data, form.email.data)
-
     if form.validate_on_submit():
         new_user = False
         if current_user.is_anonymous():
