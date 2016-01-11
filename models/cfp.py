@@ -3,6 +3,7 @@ from datetime import datetime
 
 
 class Proposal(db.Model):
+    __versioned__ = {}
     __tablename__ = 'proposal'
     # Admin
     id = db.Column(db.Integer, primary_key=True)
@@ -22,10 +23,6 @@ class Proposal(db.Model):
     needs_help = db.Column(db.Boolean)
     needs_money = db.Column(db.Boolean)
     one_day = db.Column(db.Boolean)
-
-    # Store the next version so we can find the most recent by looking for NULL
-    next_version_id = db.Column(db.Integer, db.ForeignKey('proposal.id'))
-    previous_version = db.relationship('Proposal')
 
     __mapper_args__ = {'polymorphic_on': type}
 
