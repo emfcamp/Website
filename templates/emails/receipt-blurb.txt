@@ -1,10 +1,10 @@
-You don't need to print out your admission tickets - we can check
-them on your phone - but if you have a parking ticket you'll need
-to print it out and leave it on your dashboard.
+The only tickets you need to print out are for parking (which need
+to be displayed on your dashboard). Your other tickets you can
+print out or we'll check them from a phone.
 
-Now is a good time to share any tickets you bought for friends. You
-can either forward this email to them, or log back in and download
-any combination of e-tickets:
+If you have bought a ticket for someone else you can send it to them
+by logging in, clicking 'transfer' beside the relevant ticket,
+and filling in the form:
 
   https://www.emfcamp.org/tickets
 
