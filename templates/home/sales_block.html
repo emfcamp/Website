@@ -2,8 +2,12 @@
 <p class="emphasis">Tickets for EMF are now on sale for £{{full_price}}!<p>
 <a class="btn btn-lg btn-block btn-primary" href="{{url_for('tickets.choose')}}">Buy your ticket now</a>
 {% elif SALES_STATE == 'unavailable' %}
-<p>Tickets are currently unavailable. Keep an eye on Twitter for
-    an update when the next batch is on sale!</p>
+<p class="emphasis">Tickets for EMF are currently unavailable.</p>
+<p>Keep an eye on
+    <a href="https://www.twitter.com/emfcamp">Twitter</a> or join our
+    mailing list for an update when the next batch goes on sale:
+</p>
+{% include "home/_mailchimp_form.html" %}
 {% elif SALES_STATE == 'sold-out' %}
 <p>EMF is sold out! We're sorry if you didn't manage to get a ticket.</p>
 {% elif SALES_STATE == 'sales-ended' %}
