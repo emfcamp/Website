@@ -53,6 +53,7 @@ def load_utility_functions(app_obj):
 
         if app.config.get('DEBUG'):
             SITE_STATE = request.args.get("site_state", SITE_STATE)
+            SALES_STATE = request.args.get("sales_state", SALES_STATE)
 
         return dict(
             SALES_STATE=SALES_STATE,
