@@ -208,6 +208,8 @@ def edit_proposal(proposal_id):
             flash('This submission can no longer be edited.')
             return redirect(url_for('.proposals'))
 
+        app.logger.info('Proposal %d edited', proposal.id)
+
         if proposal.type == 'talk':
             proposal.length = form.length.data
 

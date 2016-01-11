@@ -108,6 +108,7 @@ def account():
         current_user.diversity.gender = form.gender.data
         current_user.diversity.ethnicity = form.ethnicity.data
 
+        app.logger.info('%s updated user information', current_user.name)
         db.session.commit()
 
         flash("Your details have been saved.")

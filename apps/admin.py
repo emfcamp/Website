@@ -232,7 +232,7 @@ def transaction_reconcile(txn_id, payment_id):
     return render_template('admin/txn-reconcile.html', txn=txn, payment=payment, form=form)
 
 
-@admin.route('/ticket-types', methods=['GET', 'POST'])
+@admin.route('/ticket-types')
 @admin_required
 def ticket_types():
     ticket_types = TicketType.query.all()
@@ -268,6 +268,7 @@ def edit_ticket_type(type_id):
 
     ticket_type = TicketType.query.get(type_id)
     if form.validate_on_submit():
+        app.logger.info('%s editing ticket type %d', current_user.name, type_id)
         for attr in ['name', 'order', 'type_limit', 'personal_limit', 'expires', 'description']:
             cur_val = getattr(ticket_type, attr)
             new_val = getattr(form, attr).data
@@ -337,7 +338,7 @@ def new_ticket_type(copy_id):
 
         tt.prices = [TicketPrice('GBP', form.price_gbp.data),
                      TicketPrice('EUR', form.price_eur.data)]
-        app.logger.info('Adding new TicketType %s', tt)
+        app.logger.info('%s adding new TicketType %s', current_user.name, tt)
         db.session.add(tt)
         db.session.commit()
         return redirect(url_for('.ticket_type_details', type_id=new_id))
@@ -673,6 +674,7 @@ def cfp_categories():
         db.session.commit()
 
         if len(form.name.data) > 0:
+            app.logger.info('%s adding new category %s', current_user.name, form.name.data)
             new_category = TalkCategory()
             new_category.name = form.name.data
 
