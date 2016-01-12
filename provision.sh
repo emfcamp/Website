@@ -6,7 +6,7 @@ make init
 make update
 make data
 
-cat > ~/.bash_profile <<EOF
+cat > /home/vagrant/.bash_profile <<EOF
 cd /vagrant
 . ./env/bin/activate
 EOF
