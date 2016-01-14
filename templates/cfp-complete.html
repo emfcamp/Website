@@ -2,7 +2,9 @@
 {% extends "base.html" %}
 {% block body %}
 <div class="alert alert-success">Thanks for your submission!</div>
-<div>We'll be in touch by email as soon as we can.</div>
+<p>We'll be in touch by email as soon as we can.</p>
+<p><a href="{{ url_for('.proposals') }}" target="_blank">Click here</a> to view or edit your proposals.
+You will be able to make changes until we start the anonymisation process.</p>
 
 {% if not current_user.diversity %}
 <p>&nbsp;</p>
@@ -30,8 +32,6 @@
     <button type="submit" name="Create" class="btn btn-success pull-right debounce">Continue</button>
   </div>
 </form>
-{% else %}
-  <a href="{{ url_for('.proposals') }}" class="btn btn-success pull-right">View your proposals</a>
 {% endif %}
 
 {% endblock %}

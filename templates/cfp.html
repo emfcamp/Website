@@ -93,8 +93,10 @@
              To help with our anonymised review process, try to avoid including
              personally identifiable information at this stage.</p>
           {{render_field(form.title, horizontal=9, placeholder="A short summary")}}
-          {{render_field(form.description, horizontal=9,
-                         placeholder="An anonymised description to send to the reviewers")}}
+          {% call render_field(form.description, horizontal=9,
+                         placeholder="An anonymised description to send to the reviewers") %}
+            Please keep this shorter than 250 words.
+          {% endcall %}
      </fieldset>
 
      <fieldset>
