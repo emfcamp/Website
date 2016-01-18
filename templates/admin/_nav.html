@@ -1,0 +1,41 @@
+{% macro badge(count) %}
+    {% if count > 0 %}
+        <span class="badge">{{count}}</span>
+    {% endif %}
+{% endmacro %}
+
+{% macro menuitem(text, view, badge_count=0) %}
+<li {% if view_name == view -%} class="active" {%- endif %}>
+    <a href="{{url_for(view)}}">{{text}}{{badge(badge_count)}}</a>
+</li>
+{% endmacro %}
+
+<ul class="nav navbar-nav">
+    {% if current_user.admin %}
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+            aria-haspopup="true" aria-expanded="false">Payments
+            {{badge(unreconciled_count + expiring_count)}}
+            <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            {{ menuitem("All", ".payments") }}
+            {{ menuitem("Bank Transfer", ".transactions", unreconciled_count) }}
+            {{ menuitem("Expiring", ".expiring", expiring_count) }}
+            {{ menuitem("Suppressed Transactions", ".suppressed") }}
+        </ul>
+    </li>
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+            aria-haspopup="true" aria-expanded="false">Tickets <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            {{ menuitem("Transfers", ".ticket_transfers") }}
+            {{ menuitem("Ticket Types", ".ticket_types") }}
+        </ul>
+    </li>
+    {{ menuitem("Permissions", ".make_admin") }}
+    {{ menuitem("Feature Flags", ".feature_flags") }}
+{% endif %}
+{% if current_user.arrivals %}
+    {{ menuitem("Arrivals", "make_arrivals", ".make_arrivals")}}
+{% endif %}
+</ul>

@@ -46,7 +46,7 @@ def admin_required(f):
 
 
 @admin.context_processor
-def admin_counts():
+def admin_variables():
     if not request.path.startswith('/admin'):
         return {}
 
@@ -58,7 +58,8 @@ def admin_counts():
     ).group_by(BankPayment.id).count()
 
     return {'unreconciled_count': unreconciled_count,
-            'expiring_count': expiring_count}
+            'expiring_count': expiring_count,
+            'view_name': request.url_rule.endpoint.replace('admin.', '.')}
 
 
 @admin.route("/stats")
