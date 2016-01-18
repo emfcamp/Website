@@ -43,6 +43,7 @@ class User(db.Model, UserMixin):
     proposals = db.relationship('Proposal', lazy='dynamic', backref='user', cascade='all, delete, delete-orphan')
     tickets = db.relationship('Ticket', lazy='dynamic', backref='user', cascade='all, delete, delete-orphan')
     payments = db.relationship('Payment', lazy='dynamic', backref='user', cascade='all')
+    permissions = db.relationship('UserPermission', backref='user', cascade='all')
 
     transfers_to = db.relationship('TicketTransfer',
                                    primaryjoin='TicketTransfer.to_user_id == User.id',
