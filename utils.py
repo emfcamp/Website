@@ -21,7 +21,7 @@ from apps.tickets import render_receipt, render_pdf
 class CreateDB(Command):
     def run(self):
         db.create_all()
-        for permission in ('admin', 'arrivals'):
+        for permission in ('admin', 'arrivals', 'cfp_reviewer', 'cfp_anonymiser'):
             if not Permission.query.filter_by(name=permission).first():
                 db.session.add(Permission(permission))
         db.session.commit()
