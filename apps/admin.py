@@ -662,3 +662,14 @@ def cfp_categories():
         form.categories[-1]['name'].data = cat.name
 
     return render_template('admin/cfp-categories.html', form=form, counts=counts)
+
+
+@admin.route('/cfp-proposals', methods=['GET', 'POST'])
+@admin_required
+def cfp_proposals():
+    if current_user.has_permission('cfp_reviewer', False):
+        # Prevent CfP reviewers from viewing non-anonymised submissions
+        return abort(403)
+
+    proposals = Proposal.query.all()
+    return render_template('admin/cfp-proposals.html', proposals=proposals)

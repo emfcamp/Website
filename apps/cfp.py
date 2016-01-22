@@ -149,7 +149,7 @@ def main(cfp_type='talk'):
 
     full_price = TicketType.get_price_cheapest_full()
 
-    return render_template('cfp.html', full_price=full_price,
+    return render_template('cfp/main.html', full_price=full_price,
                            forms=forms, active_cfp_type=cfp_type,
                            has_errors=bool(form.errors))
 
@@ -177,7 +177,7 @@ def complete():
         db.session.commit()
         return redirect(url_for('.proposals'))
 
-    return render_template('cfp-complete.html', form=form)
+    return render_template('cfp/complete.html', form=form)
 
 
 @cfp.route('/cfp/proposals')
@@ -190,7 +190,7 @@ def proposals():
     if not proposals:
         return redirect(url_for('.main'))
 
-    return render_template('cfp-proposals.html', proposals=proposals)
+    return render_template('cfp/proposals.html', proposals=proposals)
 
 @cfp.route('/cfp/proposals/<int:proposal_id>/edit', methods=['GET', 'POST'])
 def edit_proposal(proposal_id):
@@ -252,9 +252,9 @@ def edit_proposal(proposal_id):
         form.notice_required.data = proposal.notice_required
         form.needs_help.data = proposal.needs_help
 
-    return render_template('cfp-edit.html', proposal=proposal,
+    return render_template('cfp/edit.html', proposal=proposal,
                                             form=form)
 
 @cfp.route('/cfp/guidance')
 def guidance():
-    return render_template('cfp-guidance.html')
+    return render_template('cfp/guidance.html')
