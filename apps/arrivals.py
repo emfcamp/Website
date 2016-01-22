@@ -1,4 +1,3 @@
-from functools import wraps
 import re
 from collections import OrderedDict
 
@@ -17,19 +16,11 @@ from wtforms.validators import Optional
 from models.ticket import Ticket, TicketType, CheckinStateException, TicketCheckin
 from models.user import User
 from views import Form
+from .common import require_permission
 
 arrivals = Blueprint('arrivals', __name__)
 
-
-def arrivals_required(f):
-    @wraps(f)
-    def wrapped(*args, **kwargs):
-        if current_user.is_authenticated():
-            if current_user.arrivals:
-                return f(*args, **kwargs)
-            abort(404)
-        return app.login_manager.unauthorized()
-    return wrapped
+arrivals_required = require_permission('arrivals')  # Decorator to require arrivals permission
 
 
 @arrivals.route('/arrivals')

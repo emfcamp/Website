@@ -14,12 +14,17 @@ from models import (
 from models.payment import (
     BankAccount, BankTransaction,
 )
+from models.permission import Permission
 from apps.tickets import render_receipt, render_pdf
 
 
 class CreateDB(Command):
     def run(self):
         db.create_all()
+        for permission in ('admin', 'arrivals'):
+            if not Permission.query.filter_by(name=permission).first():
+                db.session.add(Permission(permission))
+        db.session.commit()
 
 
 class CreateBankAccounts(Command):
@@ -287,7 +292,7 @@ class MakeAdmin(Command):
         if not userid:
             userid = 1
         user = User.query.get(userid)
-        user.admin = True
+        user.grant_permission('admin')
         s = db.object_session(user)
         s.commit()
 

@@ -130,12 +130,24 @@ def feature_flag(feature):
         return abort(404)
     return decorator(call)
 
+
 def site_flag(site):
     def call(f, *args, **kw):
         if app.config.get(site):
             return f(*args, **kw)
         return abort(404)
     return decorator(call)
+
+
+def require_permission(permission):
+    def call(f, *args, **kwargs):
+        if current_user.is_authenticated():
+            if current_user.has_permission(permission):
+                return f(*args, **kwargs)
+            abort(404)
+        return app.login_manager.unauthorized()
+    return decorator(call)
+
 
 @cache.memoize(timeout=30)
 def feature_enabled(feature):
@@ -148,4 +160,3 @@ def feature_enabled(feature):
         return db_flag.enabled
 
     return app.config.get(feature, False)
-

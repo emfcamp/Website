@@ -1,0 +1,32 @@
+{% extends "admin/base.html" %}
+{% block body %}
+<h2>User Details</h2>
+
+<table class="table table-condensed">
+    <tr><th>ID</th><td>{{user.id}}</td></tr>
+    <tr><th>Name</th><td>{{user.name}}</td></tr>
+    <tr><th>Email</th><td>{{user.email}}</td></tr>
+</table>
+
+
+<h3>Permissions</h3>
+<p>Note that the admin permission implies all other permissions.</p>
+<form method="post">
+{{ form.hidden_tag() }}
+{{ form.keys }}
+
+<table class="table table-condensed">
+    <tr>{% for permission in permissions %}
+            <th>{{permission.name|capitalize}}</th>
+        {% endfor %}
+    </tr>
+    <tr>
+        {% for permission in permissions %}
+            <td>{{ form["permission_" ~ permission.name]() }}</td>
+        {% endfor %}
+    </tr>
+</table>
+{{ form.change(class_="btn btn-success pull-right") }}
+</form>
+
+{% endblock %}

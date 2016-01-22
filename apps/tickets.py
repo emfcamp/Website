@@ -145,7 +145,7 @@ class TicketAmountsForm(Form):
 def choose():
     if get_sales_state(datetime.utcnow()) == 'available':
         pass
-    elif not current_user.is_anonymous() and current_user.admin:
+    elif not current_user.is_anonymous() and current_user.has_permission('admin'):
         pass
     else:
         return render_template("tickets-cutoff.html")
@@ -353,7 +353,7 @@ def transfer(ticket_id):
 @tickets.route("/tickets/<ticket_ids>/receipt")
 @login_required
 def receipt(ticket_ids=None):
-    if current_user.admin and ticket_ids is not None:
+    if current_user.has_permission('admin') and ticket_ids is not None:
         tickets = Ticket.query
     else:
         tickets = current_user.tickets

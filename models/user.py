@@ -1,6 +1,7 @@
 from main import db
 from models import exists
-
+from permission import UserPermission, Permission
+from sqlalchemy.orm.exc import NoResultFound
 from flask.ext.login import UserMixin
 
 import base64
@@ -36,14 +37,12 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, unique=True, index=True)
     name = db.Column(db.String, nullable=False, index=True)
-    admin = db.Column(db.Boolean, default=False, nullable=False)
-    arrivals = db.Column(db.Boolean, default=False, nullable=False)
     phone = db.Column(db.String, nullable=True)
     diversity = db.relationship('UserDiversity', uselist=False, backref='user', cascade='all, delete, delete-orphan')
     proposals = db.relationship('Proposal', lazy='dynamic', backref='user', cascade='all, delete, delete-orphan')
     tickets = db.relationship('Ticket', lazy='dynamic', backref='user', cascade='all, delete, delete-orphan')
     payments = db.relationship('Payment', lazy='dynamic', backref='user', cascade='all')
-    permissions = db.relationship('UserPermission', backref='user', cascade='all')
+    permissions = db.relationship('Permission', backref='user', cascade='all', secondary=UserPermission)
 
     transfers_to = db.relationship('TicketTransfer',
                                    primaryjoin='TicketTransfer.to_user_id == User.id',
@@ -58,6 +57,29 @@ class User(db.Model, UserMixin):
 
     def login_code(self, key):
         return generate_login_code(key, int(time.time()), self.id)
+
+    def has_permission(self, name, cascade=True):
+        if cascade and name != 'admin' and self.has_permission('admin'):
+            return True
+        for permission in self.permissions:
+            if permission.name == name:
+                return True
+        return False
+
+    def grant_permission(self, name):
+        try:
+            perm = Permission.query.filter_by(name=name).one()
+        except NoResultFound:
+            perm = Permission(name)
+            db.session.add(perm)
+        self.permissions.append(perm)
+        db.session.commit()
+
+    def revoke_permission(self, name):
+        for user_perm in self.permissions:
+            if user_perm.name == name:
+                self.permissions.remove(user_perm)
+        db.session.commit()
 
     def __repr__(self):
         return '<User %s>' % self.email
