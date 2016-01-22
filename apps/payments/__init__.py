@@ -19,7 +19,7 @@ def get_user_payment_or_abort(payment_id, provider=None, valid_states=None, allo
         app.logger.warning('Payment %s does not exist.', payment_id)
         abort(404)
 
-    if not (payment.user == current_user or (allow_admin and current_user.admin)):
+    if not (payment.user == current_user or (allow_admin and current_user.has_permission('admin'))):
         app.logger.warning('User not allowed to access payment %s', payment_id)
         abort(404)
 

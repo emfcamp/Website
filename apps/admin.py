@@ -1,12 +1,11 @@
 from datetime import datetime, timedelta
-from functools import wraps
 
 from Levenshtein import ratio, jaro
 from flask import (
     render_template, redirect, request, flash,
     url_for, abort, current_app as app, Blueprint
 )
-from flask.ext.login import login_required, current_user
+from flask.ext.login import current_user
 from flask_mail import Message
 from wtforms.validators import Optional, Regexp, Required
 from wtforms.widgets import TextArea
@@ -19,13 +18,14 @@ from sqlalchemy.sql.functions import func
 
 from main import db, mail, cache
 from models.user import User
+from models.permission import Permission
 from models.payment import Payment, BankPayment, BankTransaction, StateException
 from models.ticket import (
     Ticket, TicketCheckin, TicketType, TicketPrice, TicketTransfer
 )
 from models.cfp import Proposal, TalkCategory
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS
-from .common import feature_enabled
+from .common import feature_enabled, require_permission
 from .common.forms import Form, HiddenIntegerField
 from .payments.stripe import (
     StripeUpdateUnexpected, StripeUpdateConflict, stripe_update_payment,
@@ -33,16 +33,7 @@ from .payments.stripe import (
 
 admin = Blueprint('admin', __name__)
 
-
-def admin_required(f):
-    @wraps(f)
-    def wrapped(*args, **kwargs):
-        if current_user.is_authenticated():
-            if current_user.admin:
-                return f(*args, **kwargs)
-            abort(404)
-        return app.login_manager.unauthorized()
-    return wrapped
+admin_required = require_permission('admin')  # Decorator to require admin permissions
 
 
 @admin.context_processor
@@ -263,7 +254,7 @@ class EditTicketTypeForm(Form):
 
 
 @admin.route('/ticket-types/<int:type_id>/edit', methods=['GET', 'POST'])
-@admin_required
+@require_permission('arrivals')
 def edit_ticket_type(type_id):
     form = EditTicketTypeForm()
 
@@ -356,6 +347,7 @@ def ticket_type_details(type_id):
     ticket_type = TicketType.query.get(type_id)
     return render_template('admin/ticket-type-details.html', ticket_type=ticket_type)
 
+
 @admin.route('/transfers')
 @admin_required
 def ticket_transfers():
@@ -363,70 +355,45 @@ def ticket_transfers():
     return render_template('admin/ticket-transfers.html', transfers=transfer_logs)
 
 
-@admin.route("/admin/make-admin", methods=['GET', 'POST'])
-@login_required
-def make_admin():
-    if current_user.admin:
-
-        class MakeAdminForm(Form):
-            change = SubmitField('Change')
-
-        users = User.query.order_by(User.id).all()
-        # The list of users can change between the
-        # form being generated and it being submitted, but the id's should remain stable
-        for u in users:
-            setattr(MakeAdminForm, str(u.id) + "_admin", BooleanField('admin', default=u.admin))
-
-        if request.method == 'POST':
-            form = MakeAdminForm()
-            if form.validate():
-                for field in form:
-                    if field.name.endswith('_admin'):
-                        id = int(field.name.split("_")[0])
-                        user = User.query.get(id)
-                        if user.admin != field.data:
-                            app.logger.info("user %s (%s) admin: %s -> %s", user.name,
-                                            user.id, user.admin, field.data)
-                            user.admin = field.data
-                            db.session.commit()
-                return redirect(url_for('.make_admin'))
-        adminform = MakeAdminForm(formdata=None)
-        return render_template('admin/users-make-admin.html', users=users, adminform=adminform)
-    else:
-        return(('', 404))
+@admin.route("/users", methods=['GET'])
+@admin_required
+def users():
+    users = User.query.order_by(User.id).all()
+    return render_template('admin/users.html',
+                           users=users)
 
 
-@admin.route("/admin/make-arrivals", methods=['GET', 'POST'])
-@login_required
-def make_arrivals():
-    if current_user.arrivals:
+@admin.route("/users/<int:user_id>", methods=['GET', 'POST'])
+@admin_required
+def user(user_id):
+    user = User.query.filter_by(id=user_id).one()
+    permissions = Permission.query.all()
 
-        class MakeArrivalsForm(Form):
-            change = SubmitField('Change')
+    class PermissionsForm(Form):
+        change = SubmitField('Change')
 
-        users = User.query.order_by(User.id).all()
-        # The list of users can change between the
-        # form being generated and it being submitted, but the id's should remain stable
-        for u in users:
-            setattr(MakeArrivalsForm, str(u.id) + "_arrivals", BooleanField('arrivals', default=u.arrivals))
+    for permission in permissions:
+        setattr(PermissionsForm, "permission_" + permission.name,
+                BooleanField(permission.name, default=user.has_permission(permission.name, False)))
 
-        if request.method == 'POST':
-            form = MakeArrivalsForm()
-            if form.validate():
-                for field in form:
-                    if field.name.endswith('_arrivals'):
-                        id = int(field.name.split("_")[0])
-                        user = User.query.get(id)
-                        if user.arrivals != field.data:
-                            app.logger.info("user %s (%s) arrivals: %s -> %s", user.name,
-                                            user.id, user.arrivals, field.data)
-                            user.arrivals = field.data
-                            db.session.commit()
-                return redirect(url_for('.make_arrivals'))
-        arrivalsform = MakeArrivalsForm(formdata=None)
-        return render_template('admin/users-make-arrivals.html', users=users, arrivalsform=arrivalsform)
-    else:
-        return(('', 404))
+    form = PermissionsForm()
+
+    if request.method == 'POST' and form.validate():
+        for permission in permissions:
+            field = getattr(form, "permission_" + permission.name)
+            if user.has_permission(permission.name, False) != field.data:
+                app.logger.info("user %s (%s) admin: %s -> %s", user.name,
+                                user.id, user.has_permission(permission.name, False), field.data)
+                if field.data:
+                    user.grant_permission(permission.name)
+                else:
+                    user.revoke_permission(permission.name)
+                db.session.commit()
+        return redirect(url_for('.user', user_id=user.id))
+    return render_template('admin/user.html',
+                           user=user,
+                           form=form,
+                           permissions=permissions)
 
 
 @admin.route('/payments')
