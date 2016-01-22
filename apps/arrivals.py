@@ -3,10 +3,9 @@ from collections import OrderedDict
 
 from flask import (
     render_template, redirect, request, flash,
-    url_for, abort, session, current_app as app, Blueprint
+    url_for, session, current_app as app, Blueprint
 )
 from flask.json import jsonify
-from flask.ext.login import current_user
 
 from wtforms import (
     SubmitField,
