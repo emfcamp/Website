@@ -1,9 +1,28 @@
 {% extends "base.html" %}
 
 {% block body %}
-<div class="col-md-10">
-  <p>Tickets for EMF 2016 are not currently on sale online.</p>
-  <p>Please check our <a href="https://twitter.com/emfcamp">Twitter feed</a> for the latest sales information.</p>
-  <p>Unfortunately we cannot reserve any tickets.</p>
-</div>
+    <div class="well">
+        {% if SALES_STATE == 'unavailable' %}
+            <p class="emphasis">There are no tickets currently available for Electromagnetic Field 2016,
+                                but more will be on sale soon.
+            </p>
+            <p>Please follow us <a href="https://twitter.com/emfcamp">on Twitter</a> or
+            join our mailing list to be notified when the next batch of tickets will go on sale:</p>
+            {% include "home/_mailchimp_form.html" %}
+            <p>We can't reserve any tickets, but if we accept your
+            <a href="{{url_for('cfp.main')}}">talk, workshop, or installation proposal</a>,
+            you will be guaranteed a ticket.</p>
+        {% elif SALES_STATE == 'sales-ended' %}
+            <p class="emphasis">We're sorry, ticket sales for Electromagnetic Field 2016 have now ended.</p>
+            <p>There are no tickets for sale on site, so please do not travel to EMF
+            if you haven't got a ticket.</p>
+        {% elif SALES_STATE == 'sold-out' %}
+        <p class="emphasis">We're sorry, but tickets for Electromagnetic Field
+                            2016 are <strong>sold out</strong>.</p>
+        <p>If you're interested in updates on our next event,
+            please follow us <a href="https://twitter.com/emfcamp">on Twitter</a> or
+                join our mailing list:</p>
+                {% include "home/_mailchimp_form.html" %}
+        {% endif %}
+    </div>
 {% endblock %}
