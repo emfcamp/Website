@@ -143,7 +143,12 @@ class TicketAmountsForm(Form):
 @tickets.route("/tickets/choose", methods=['GET', 'POST'])
 @feature_flag('TICKET_SALES')
 def choose():
-    if get_sales_state(datetime.utcnow()) == 'available':
+
+    sales_state = get_sales_state(datetime.utcnow())
+    if app.config.get('DEBUG'):
+        sales_state = request.args.get("sales_state", sales_state)
+
+    if sales_state == 'available':
         pass
     elif not current_user.is_anonymous() and current_user.has_permission('admin'):
         pass
