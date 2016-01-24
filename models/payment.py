@@ -241,7 +241,6 @@ class GoCardlessPayment(Payment):
         return bill_url
 
     def cancel(self):
-        super(GoCardlessPayment, self).cancel()
         if self.state != 'new':
             bill = gocardless.client.bill(self.gcid)
 
@@ -249,6 +248,8 @@ class GoCardlessPayment(Payment):
                 bill.cancel()
             else:
                 raise StateException('GoCardless payment %s cannot be cancelled.' % self.id)
+
+        super(GoCardlessPayment, self).cancel()
 
 
 class StripePayment(Payment):
