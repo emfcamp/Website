@@ -259,7 +259,10 @@ class StripePayment(Payment):
     token = db.Column(db.String)
 
     def cancel(self):
-        raise StateException('Cannot cancel stripe payments')
+        if self.state != 'new':
+            raise StateException('Cannot cancel stripe payments')
+
+        super(StripePayment, self).cancel()
 
     @property
     def description(self):
