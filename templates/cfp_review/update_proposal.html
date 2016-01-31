@@ -1,21 +1,42 @@
 {% extends "cfp_review/base.html" %}
 {% block body %}
-<h2>CfP Proposal</h2>
+<h2>{{proposal.title}} <small>by {{proposal.user.name}}</small></h2>
 
-<table class="table">
-    <tr>
-        <th>Date</th>
-        <th>State</th>
-        <th>Type</th>
-        <th>Submitter</th>
-        <th>Title</th>
-    </tr>
-    <tr>
-        <td>{{proposal.created.strftime("%Y-%m-%d")}}</td>
-        <td>{{proposal.state}}</td>
-        <td>{{proposal.type}}</td>
-        <td>{{proposal.user.name}}</td>
-        <td>{{proposal.title}}</td>
-    </tr>
-</table>
+<dl class="dl-horizontal">
+    <dt>Date</dt>
+    <dd>{{proposal.created.strftime("%Y-%m-%d")}}</dd>
+    <dt>State</dt>
+    <dd>{{proposal.state}}</dd>
+    <dt>Type</dt>
+    <dd>{{proposal.type}}</dd>
+    <dt>Submitter</dt>
+    <dd>{{proposal.user.name}}</dd>
+    <dt>Title</dt>
+    <dd>{{proposal.title}}</dd>
+    <dt>Description</dt>
+    <dd>{{proposal.description}}</dd>
+    <dt>Requirements</dt>
+    <dd>{% if proposal.requirements %}{{ proposal.requirements }}{% else %}None{% endif %}</dd>
+    <dt>Length</dt>
+    <dd>{{proposal.length}}</dd>
+    <dt>Notice Required</dt>
+    <dd>{{proposal.notice_required}}</dd>
+    <dt>Needs Help</dt>
+    <dd>{% if proposal.needs_help -%} Yes {%- else -%} No {%- endif %}</dd>
+    <dt>Needs Money</dt>
+    <dd>{% if proposal.needs_money -%} Yes {%- else -%} No {%- endif %}</dd>
+    <dt>One Day</dt>
+    <dd>{% if proposal.one_day -%} Yes {%- else -%} No {%- endif %}</dd>
+    {% if proposal.type == 'workshop' %}
+        <dt>Attendees</dt>
+        <dd>{{proposal.attendees}}</dd>
+        <dt>Cost</dt>
+        <dd>&pound; {{proposal.cost}}</dd>
+    {% elif proposal.type == 'installation' %}
+        <dt>Size</dt>
+        <dd>{{proposal.size}}</dd>
+        <dt>Funds</dt>
+        <dd>{{proposal.funds}}</dd>
+    {% endif %}
+</dl>
 {% endblock %}
