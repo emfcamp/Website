@@ -58,6 +58,9 @@ reallyreconcile:
 sendtickets:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py sendtickets
 
+lockproposals:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py lockproposals
+
 
 shell:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py shell
