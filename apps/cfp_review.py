@@ -22,6 +22,7 @@ class CategoryForm(Form):
     id = HiddenIntegerField('Category Id', [Required()])
     name = StringField('Category Name', [Required()])
 
+
 class AllCategoriesForm(Form):
     categories = FieldList(FormField(CategoryForm))
     name = StringField('New Category Name')
@@ -61,7 +62,7 @@ def cfp_categories():
         form.categories[-1]['id'].data = cat.id
         form.categories[-1]['name'].data = cat.name
 
-    return render_template('admin/cfp-categories.html', form=form, counts=counts)
+    return render_template('cfp_review/cfp-categories.html', form=form, counts=counts)
 
 
 @cfp_review.route('/admin/cfp-proposals', methods=['GET', 'POST'])
@@ -72,4 +73,4 @@ def cfp_proposals():
         return abort(403)
 
     proposals = Proposal.query.all()
-    return render_template('admin/cfp-proposals.html', proposals=proposals)
+    return render_template('cfp_review/cfp-proposals.html', proposals=proposals)

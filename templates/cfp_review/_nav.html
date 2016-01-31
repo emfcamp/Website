@@ -1,0 +1,20 @@
+{# Will want this later #}
+{% macro badge(count) %}
+    {% if count > 0 %}
+        <span class="badge">{{count}}</span>
+    {% endif %}
+{% endmacro %}
+
+{% macro menuitem(text, view, badge_count=0) %}
+<li {% if view_name == view -%} class="active" {%- endif %}>
+    <a href="{{url_for(view)}}">{{text}}{{badge(badge_count)}}</a>
+</li>
+{% endmacro %}
+
+<ul class="nav navbar-nav">
+    {% if current_user.has_permission('admin') %}
+        {{ menuitem("Admin", "admin.home") }}
+        {{ menuitem("Proposals", ".cfp_proposals") }}
+        {{ menuitem("Categories", ".cfp_categories") }}
+    {% endif %}
+</ul>

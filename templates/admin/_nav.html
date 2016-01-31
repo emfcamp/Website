@@ -15,14 +15,12 @@
     <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
             aria-haspopup="true" aria-expanded="false">Payments
-            {# {{badge(unreconciled_count + expiring_count)}} #}
+            {{badge(unreconciled_count + expiring_count)}}
             <span class="caret"></span></a>
         <ul class="dropdown-menu">
             {{ menuitem("All", "admin.payments") }}
-            {# {{ menuitem("Bank Transfer", "admin.transactions", unreconciled_count) }} #}
-            {{ menuitem("Bank Transfer", "admin.transactions") }}
-            {# {{ menuitem("Expiring", "admin.expiring", expiring_count) }} #}
-            {{ menuitem("Expiring", "admin.expiring") }}
+            {{ menuitem("Bank Transfer", "admin.transactions", unreconciled_count) }}
+            {{ menuitem("Expiring", "admin.expiring", expiring_count) }}
             {{ menuitem("Suppressed Transactions", "admin.suppressed") }}
         </ul>
     </li>
