@@ -1,7 +1,7 @@
 # encoding=utf-8
 
 from flask import (
-    abort, render_template, Blueprint, current_app as app
+    request, abort, render_template, Blueprint, current_app as app
 )
 from flask.ext.login import current_user
 
@@ -18,6 +18,12 @@ admin_required = require_permission('admin')  # Decorator to require admin permi
 from models.cfp import Proposal, TalkCategory
 from .common.forms import Form, HiddenIntegerField
 
+@cfp_review.context_processor
+def cfp_review_variables():
+    return {
+        'view_name': request.url_rule.endpoint.replace('cfp_review.', '.')
+    }
+
 class CategoryForm(Form):
     id = HiddenIntegerField('Category Id', [Required()])
     name = StringField('Category Name', [Required()])
@@ -29,9 +35,9 @@ class AllCategoriesForm(Form):
     update = SubmitField('Update flags')
 
 
-@cfp_review.route('/admin/cfp-categories', methods=['GET', 'POST'])
+@cfp_review.route('/categories', methods=['GET', 'POST'])
 @admin_required
-def cfp_categories():
+def categories():
     categories = {c.id: c for c in TalkCategory.query.all()}
     counts = {c.id: len(c.proposals) for c in categories.values()}
     form = AllCategoriesForm()
@@ -62,15 +68,15 @@ def cfp_categories():
         form.categories[-1]['id'].data = cat.id
         form.categories[-1]['name'].data = cat.name
 
-    return render_template('cfp_review/cfp-categories.html', form=form, counts=counts)
+    return render_template('cfp_review/categories.html', form=form, counts=counts)
 
 
-@cfp_review.route('/admin/cfp-proposals', methods=['GET', 'POST'])
+@cfp_review.route('/proposals')
 @admin_required
-def cfp_proposals():
+def proposals():
     if current_user.has_permission('cfp_reviewer', False):
         # Prevent CfP reviewers from viewing non-anonymised submissions
         return abort(403)
 
     proposals = Proposal.query.all()
-    return render_template('cfp_review/cfp-proposals.html', proposals=proposals)
+    return render_template('cfp_review/proposals.html', proposals=proposals)

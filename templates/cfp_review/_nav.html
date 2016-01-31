@@ -14,7 +14,7 @@
 <ul class="nav navbar-nav">
     {% if current_user.has_permission('admin') %}
         {{ menuitem("Admin", "admin.home") }}
-        {{ menuitem("Proposals", ".cfp_proposals") }}
-        {{ menuitem("Categories", ".cfp_categories") }}
+        {{ menuitem("Proposals", ".proposals") }}
+        {{ menuitem("Categories", ".categories") }}
     {% endif %}
 </ul>

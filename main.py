@@ -135,7 +135,7 @@ def create_app():
     app.register_blueprint(tickets)
     app.register_blueprint(payments)
     app.register_blueprint(cfp)
-    app.register_blueprint(cfp_review)
+    app.register_blueprint(cfp_review, url_prefix='/cfp-review')
     app.register_blueprint(admin, url_prefix='/admin')
 
     return app
