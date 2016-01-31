@@ -39,4 +39,10 @@
         <dd>{{proposal.funds}}</dd>
     {% endif %}
 </dl>
+<form method="post" action="{{ url_for('.update_proposal', proposal_id=proposal.id) }}" class="shrink">
+{{ form.hidden_tag() }}
+{{ form.reject(class_="btn btn-danger pull-right") }}
+{{ form.anonymise(class_="btn btn-success pull-right") }}
+</form>
+
 {% endblock %}

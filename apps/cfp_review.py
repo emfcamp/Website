@@ -1,7 +1,8 @@
 # encoding=utf-8
 
 from flask import (
-    request, abort, render_template, Blueprint, current_app as app
+    redirect, url_for, request, abort, render_template,
+    Blueprint, current_app as app
 )
 from flask.ext.login import current_user
 
@@ -82,6 +83,11 @@ def proposals():
     return render_template('cfp_review/proposals.html', proposals=proposals)
 
 
+class UpdateProposalForm(Form):
+    reject = SubmitField('Reject')
+    anonymise = SubmitField('Anonymise')
+
+
 @cfp_review.route('/proposals/<int:proposal_id>', methods=['GET', 'POST'])
 @admin_required
 def update_proposal(proposal_id):
@@ -89,5 +95,20 @@ def update_proposal(proposal_id):
         # Prevent CfP reviewers from viewing non-anonymised submissions
         return abort(403)
 
+    form = UpdateProposalForm()
     proposal = Proposal.query.get(proposal_id)
-    return render_template('cfp_review/update_proposal.html', proposal=proposal)
+
+    if form.validate_on_submit():
+        if form.reject.data:
+            app.logger.info('Rejecting proposal %s', proposal_id)
+            proposal.set_state('rejected')
+
+        elif form.anonymise.data:
+            app.logger.info('Sending proposal %s for anonymisation', proposal_id)
+            proposal.set_state('to_anonymise')
+
+        db.session.commit()
+        return redirect(url_for('.proposals'))
+
+    return render_template('cfp_review/update_proposal.html',
+                            proposal=proposal, form=form)

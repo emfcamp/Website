@@ -363,7 +363,7 @@ class LockProposals(Command):
             deadline = proposal.created + edit_window
 
             if datetime.utcnow() > deadline:
-                proposal.state = 'locked'
+                proposal.set_state('locked')
 
                 app.logger.debug('Locking proposal %d' % proposal.id)
                 db.session.commit()

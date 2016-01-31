@@ -1,6 +1,11 @@
 from main import db
 from datetime import datetime
 
+CFP_STATES = ['new', 'locked', 'rejected', 'to_anonymise']
+
+class CfpStateException(Exception):
+    pass
+
 
 class Proposal(db.Model):
     __versioned__ = {}
@@ -25,6 +30,12 @@ class Proposal(db.Model):
     one_day = db.Column(db.Boolean)
 
     __mapper_args__ = {'polymorphic_on': type}
+
+    def set_state(self, state):
+        state = state.lower()
+        if state not in CFP_STATES:
+            raise CfpStateException('"%s" is not a valid state' % state)
+        self.state = state
 
 
 class TalkProposal(Proposal):
