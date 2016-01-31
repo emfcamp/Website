@@ -18,18 +18,18 @@
             {{badge(unreconciled_count + expiring_count)}}
             <span class="caret"></span></a>
         <ul class="dropdown-menu">
-            {{ menuitem("All", "admin.payments") }}
-            {{ menuitem("Bank Transfer", "admin.transactions", unreconciled_count) }}
-            {{ menuitem("Expiring", "admin.expiring", expiring_count) }}
-            {{ menuitem("Suppressed Transactions", "admin.suppressed") }}
+            {{ menuitem("All", ".payments") }}
+            {{ menuitem("Bank Transfer", ".transactions", unreconciled_count) }}
+            {{ menuitem("Expiring", ".expiring", expiring_count) }}
+            {{ menuitem("Suppressed Transactions", ".suppressed") }}
         </ul>
     </li>
     <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
             aria-haspopup="true" aria-expanded="false">Tickets <span class="caret"></span></a>
         <ul class="dropdown-menu">
-            {{ menuitem("Transfers", "admin.ticket_transfers") }}
-            {{ menuitem("Ticket Types", "admin.ticket_types") }}
+            {{ menuitem("Transfers", ".ticket_transfers") }}
+            {{ menuitem("Ticket Types", ".ticket_types") }}
         </ul>
     </li>
     <li class="dropdown">
@@ -40,7 +40,7 @@
             {{ menuitem("Categories", "cfp_review.cfp_categories") }}
         </ul>
     </li>
-    {{ menuitem("Users", "admin.users") }}
-    {{ menuitem("Feature Flags", "admin.feature_flags") }}
+    {{ menuitem("Users", ".users") }}
+    {{ menuitem("Feature Flags", ".feature_flags") }}
 {% endif %}
 </ul>
