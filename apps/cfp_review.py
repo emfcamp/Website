@@ -80,3 +80,14 @@ def proposals():
 
     proposals = Proposal.query.all()
     return render_template('cfp_review/proposals.html', proposals=proposals)
+
+
+@cfp_review.route('/proposals/<int:proposal_id>', methods=['GET', 'POST'])
+@admin_required
+def update_proposal(proposal_id):
+    if current_user.has_permission('cfp_reviewer', False):
+        # Prevent CfP reviewers from viewing non-anonymised submissions
+        return abort(403)
+
+    proposal = Proposal.query.get(proposal_id)
+    return render_template('cfp_review/update_proposal.html', proposal=proposal)

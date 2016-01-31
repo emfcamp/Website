@@ -1,0 +1,21 @@
+{% extends "cfp_review/base.html" %}
+{% block body %}
+<h2>CfP Proposal</h2>
+
+<table class="table">
+    <tr>
+        <th>Date</th>
+        <th>State</th>
+        <th>Type</th>
+        <th>Submitter</th>
+        <th>Title</th>
+    </tr>
+    <tr>
+        <td>{{proposal.created.strftime("%Y-%m-%d")}}</td>
+        <td>{{proposal.state}}</td>
+        <td>{{proposal.type}}</td>
+        <td>{{proposal.user.name}}</td>
+        <td>{{proposal.title}}</td>
+    </tr>
+</table>
+{% endblock %}
