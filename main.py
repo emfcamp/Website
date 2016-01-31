@@ -128,12 +128,14 @@ def create_app():
     from apps.tickets import tickets
     from apps.payments import payments
     from apps.cfp import cfp
+    from apps.cfp_review import cfp_review
     from apps.admin import admin
     app.register_blueprint(base)
     app.register_blueprint(users)
     app.register_blueprint(tickets)
     app.register_blueprint(payments)
     app.register_blueprint(cfp)
+    app.register_blueprint(cfp_review)
     app.register_blueprint(admin, url_prefix='/admin')
 
     return app
