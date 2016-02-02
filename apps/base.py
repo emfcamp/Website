@@ -3,7 +3,10 @@ import csv
 import json
 from datetime import datetime
 from mailsnake import MailSnake
-from mailsnake.exceptions import MailSnakeException, ListAlreadySubscribedException
+from mailsnake.exceptions import (
+    MailSnakeException, ListAlreadySubscribedException,
+    InvalidEmailException,
+)
 
 from flask import (
     render_template, redirect, request, flash, Blueprint,
@@ -41,8 +44,12 @@ def main_post():
     ms = MailSnake(app.config['MAILCHIMP_KEY'])
     try:
         email = request.form.get('email')
-        ms.listSubscribe(id='d1798f7c80', email_address=email)
+        ms.listSubscribe(id=app.config['MAILCHIMP_LIST'], email_address=email)
         flash('Thanks for subscribing! You will receive a confirmation email shortly.')
+
+    except InvalidEmailException as e:
+        app.logger.info('Invalid email address: %r', email)
+        flash("Your email address was not accepted - please check and try again.")
 
     except ListAlreadySubscribedException as e:
         app.logger.info('Already subscribed: %s', email)
@@ -54,7 +61,7 @@ def main_post():
         flash(msg)
 
     except MailSnakeException as e:
-        app.logger.error('Error subscribing: %s', e)
+        app.logger.error('Error subscribing: %r', e)
         flash('Sorry, an error occurred.')
 
     return redirect(url_for('.main'))
