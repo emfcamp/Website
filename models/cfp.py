@@ -14,6 +14,7 @@ class Proposal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created = db.Column(db.DateTime, default=datetime.utcnow)
+    modified = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     state = db.Column(db.String, nullable=False, default='new')
     type = db.Column(db.String, nullable=False)  # talk, workshop or installation
 
