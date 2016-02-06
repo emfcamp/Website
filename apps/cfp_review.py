@@ -21,7 +21,9 @@ from .common.forms import Form, HiddenIntegerField
 
 @cfp_review.context_processor
 def cfp_review_variables():
+    new_count = Proposal.query.filter_by(state='new').count()
     return {
+        'new_count': new_count,
         'view_name': request.url_rule.endpoint.replace('cfp_review.', '.')
     }
 
