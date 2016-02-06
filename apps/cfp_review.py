@@ -6,7 +6,7 @@ from flask import (
 )
 from flask.ext.login import current_user
 
-from wtforms import SubmitField, StringField, FieldList, FormField
+from wtforms import SubmitField, StringField, FieldList, FormField, SelectField
 from wtforms.validators import Required
 
 from main import db
@@ -33,7 +33,7 @@ class CategoryForm(Form):
 class AllCategoriesForm(Form):
     categories = FieldList(FormField(CategoryForm))
     name = StringField('New Category Name')
-    update = SubmitField('Update flags')
+    update = SubmitField('Update Categories')
 
 
 @cfp_review.route('/categories', methods=['GET', 'POST'])
@@ -84,6 +84,7 @@ def proposals():
 
 
 class UpdateProposalForm(Form):
+    category = SelectField('Category', coerce=int)
     reject = SubmitField('Reject')
     anonymise = SubmitField('Anonymise')
 
@@ -96,6 +97,8 @@ def update_proposal(proposal_id):
         return abort(403)
 
     form = UpdateProposalForm()
+    form.category.choices = ([(-1, '--None--')] +
+                             [(c.id, c.name) for c in TalkCategory.query.all()])
     proposal = Proposal.query.get(proposal_id)
 
     if form.validate_on_submit():
@@ -104,11 +107,22 @@ def update_proposal(proposal_id):
             proposal.set_state('rejected')
 
         elif form.anonymise.data:
+            if proposal.type == 'talk' and form.category.data == -1:
+                form.category.errors.append('Required (talks only)')
+                return render_template('cfp_review/update_proposal.html',
+                                        proposal=proposal, form=form)
+
+            elif proposal.type == 'talk':
+                proposal.category_id = form.category.data
+
             app.logger.info('Sending proposal %s for anonymisation', proposal_id)
             proposal.set_state('to_anonymise')
 
         db.session.commit()
         return redirect(url_for('.proposals'))
+
+    if proposal.type == 'talk' and proposal.category_id:
+        form.category.data = proposal.category_id
 
     return render_template('cfp_review/update_proposal.html',
                             proposal=proposal, form=form)

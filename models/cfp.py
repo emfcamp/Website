@@ -40,6 +40,7 @@ class Proposal(db.Model):
 
 class TalkProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'talk'}
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
 
 
 class WorkshopProposal(Proposal):
@@ -58,4 +59,5 @@ class TalkCategory(db.Model):
     __tablename__ = 'category'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
+    proposals = db.relationship(TalkProposal, backref='category')
 
