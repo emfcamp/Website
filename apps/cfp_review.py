@@ -1,7 +1,7 @@
 # encoding=utf-8
 
 from flask import (
-    redirect, url_for, request, abort, render_template,
+    redirect, url_for, request, abort, render_template, flash,
     Blueprint, current_app as app
 )
 from flask.ext.login import current_user
@@ -16,7 +16,7 @@ cfp_review = Blueprint('cfp_review', __name__)
 admin_required = require_permission('admin')  # Decorator to require admin permissions
 
 
-from models.cfp import Proposal, TalkCategory
+from models.cfp import Proposal, ProposalCategory
 from .common.forms import Form, HiddenIntegerField
 
 @cfp_review.context_processor
@@ -39,7 +39,7 @@ class AllCategoriesForm(Form):
 @cfp_review.route('/categories', methods=['GET', 'POST'])
 @admin_required
 def categories():
-    categories = {c.id: c for c in TalkCategory.query.all()}
+    categories = {c.id: c for c in ProposalCategory.query.all()}
     counts = {c.id: len(c.proposals) for c in categories.values()}
     form = AllCategoriesForm()
 
@@ -51,7 +51,7 @@ def categories():
 
         if len(form.name.data) > 0:
             app.logger.info('%s adding new category %s', current_user.name, form.name.data)
-            new_category = TalkCategory()
+            new_category = ProposalCategory()
             new_category.name = form.name.data
 
             db.session.add(new_category)
@@ -72,6 +72,36 @@ def categories():
     return render_template('cfp_review/categories.html', form=form, counts=counts)
 
 
+def convert_category_id(val):
+    if val is None:
+        return None
+
+    if hasattr(val, 'lower') and val.lower() == 'null':
+        return None
+
+    return int(val)
+
+
+def build_query_dict(parameters):
+    res = {}
+    fields = [('type', str), ('category_id', convert_category_id),
+              ('state', str), ('needs_help', bool), ('needs_money', bool)]
+
+    for (field_name, field_type) in fields:
+        # if this can't convert to the correct type it will return None
+        val = parameters.get(field_name, None)
+
+        if val is not None:
+            try:
+                val = field_type(val)
+            except ValueError:
+                flash('Invalid parameter value (%r) for parameter %s' % (val, field_name))
+                continue
+            res[field_name] = val
+
+    return res
+
+
 @cfp_review.route('/proposals')
 @admin_required
 def proposals():
@@ -79,12 +109,16 @@ def proposals():
         # Prevent CfP reviewers from viewing non-anonymised submissions
         return abort(403)
 
-    proposals = Proposal.query.all()
+    query_dict = build_query_dict(request.args)
+
+    proposals = Proposal.query.filter_by(**query_dict).all()
+
     return render_template('cfp_review/proposals.html', proposals=proposals)
 
 
 class UpdateProposalForm(Form):
-    category = SelectField('Category', coerce=int)
+    category = SelectField('Category', default=-1, coerce=int,
+                           choices=[(-1, '--None--')])
     reject = SubmitField('Reject')
     anonymise = SubmitField('Anonymise')
 
@@ -97,8 +131,9 @@ def update_proposal(proposal_id):
         return abort(403)
 
     form = UpdateProposalForm()
-    form.category.choices = ([(-1, '--None--')] +
-                             [(c.id, c.name) for c in TalkCategory.query.all()])
+    categories = [(c.id, c.name) for c in ProposalCategory.query.all()]
+    form.category.choices.extend(categories)
+
     proposal = Proposal.query.get(proposal_id)
 
     if form.validate_on_submit():
@@ -108,7 +143,7 @@ def update_proposal(proposal_id):
 
         elif form.anonymise.data:
             if proposal.type == 'talk' and form.category.data == -1:
-                form.category.errors.append('Required (talks only)')
+                form.category.errors.append('Required')
                 return render_template('cfp_review/update_proposal.html',
                                         proposal=proposal, form=form)
 
@@ -116,7 +151,7 @@ def update_proposal(proposal_id):
                 proposal.category_id = form.category.data
 
             app.logger.info('Sending proposal %s for anonymisation', proposal_id)
-            proposal.set_state('to_anonymise')
+            proposal.set_state('checked')
 
         db.session.commit()
         return redirect(url_for('.proposals'))

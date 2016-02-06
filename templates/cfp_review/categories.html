@@ -13,7 +13,9 @@
 {% for cat in form.categories %}
   <tr>
     <td>{{ cat.hidden_tag_without('csrf_token') }}{{ cat['name']() }}</td>
-    <td>{{ counts[cat['id'].data] }}</td>
+    <td><a href="{{ url_for('.proposals', category=cat['id'].data)}}">
+        {{ counts[cat['id'].data] }}
+    </a></td>
   </tr>
 {% endfor %}
 <tr>

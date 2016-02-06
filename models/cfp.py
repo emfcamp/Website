@@ -1,7 +1,7 @@
 from main import db
 from datetime import datetime
 
-CFP_STATES = ['new', 'locked', 'rejected', 'to_anonymise']
+CFP_STATES = ['new', 'locked', 'checked', 'rejected', 'anonymised']
 
 class CfpStateException(Exception):
     pass
@@ -23,6 +23,7 @@ class Proposal(db.Model):
     requirements = db.Column(db.String)
     length = db.Column(db.String)  # only used for talks and workshops
     notice_required = db.Column(db.String)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
 
     # Flags
     needs_help = db.Column(db.Boolean)
@@ -40,8 +41,6 @@ class Proposal(db.Model):
 
 class TalkProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'talk'}
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
-
 
 class WorkshopProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'workshop'}
@@ -55,7 +54,7 @@ class InstallationProposal(Proposal):
     funds = db.Column(db.String, nullable=True)
 
 
-class TalkCategory(db.Model):
+class ProposalCategory(db.Model):
     __tablename__ = 'category'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)

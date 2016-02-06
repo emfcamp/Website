@@ -35,8 +35,13 @@
             <dt>
                 <label for="category" class="control-label">{{ form.category.label.text }}</label>
             </dt>
-            <dd>
+            <dd {%- if form.category.errors %} class="has-error" {%- endif %}>
                 {{ form.category(class_='form-control') | safe }}
+                {% if form.category.errors %}
+                    {% for error in form.category.errors %}
+                        <p class="help-block" id="help-block-{{ loop.index }}">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
             </dd>
         {% elif proposal.type == 'workshop' %}
             <dt>Attendees</dt>
