@@ -1,5 +1,3 @@
-{% from "_formhelpers.html" import render_field %}
-
 {% extends "cfp_review/base.html" %}
 {% block body %}
 <h2>{{proposal.title}} <small>by {{proposal.user.name}}</small></h2>
@@ -59,7 +57,7 @@
         {% if proposal.state == 'locked' %}
             {{ form.reject(class_="btn btn-danger") }}
             &nbsp;
-            {{ form.anonymise(class_="btn btn-success") }}
+            {{ form.checked(class_="btn btn-success") }}
         {% endif %}
     </p>
     <div class="clearfix"></div>

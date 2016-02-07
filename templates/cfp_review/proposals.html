@@ -17,7 +17,7 @@
     <td>{{proposal.type}}</td>
     <td>{{proposal.user.name}}</td>
     <td>
-        <a href="{{ url_for('.update_proposal', proposal_id=proposal.id) }}">{{proposal.title}}</a>
+        <a href="{{ url_for(link_target, proposal_id=proposal.id) }}">{{proposal.title}}</a>
     </td>
 </tr>
 {% endfor %}

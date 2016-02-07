@@ -30,4 +30,7 @@
         </li>
         {{ menuitem("Categories", ".categories") }}
     {% endif %}
+    {% if current_user.has_permission('cfp_anonymiser') %}
+        {{ menuitem('Anonymisation', '.anonymisation') }}
+    {% endif %}
 </ul>

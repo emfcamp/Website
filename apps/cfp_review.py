@@ -6,7 +6,9 @@ from flask import (
 )
 from flask.ext.login import current_user
 
-from wtforms import SubmitField, StringField, FieldList, FormField, SelectField
+from wtforms import (
+    SubmitField, StringField, FieldList, FormField, SelectField, TextAreaField
+)
 from wtforms.validators import Required
 
 from main import db
@@ -130,13 +132,14 @@ def proposals():
     proposals = Proposal.query.filter_by(**query_dict)\
                               .order_by('state', 'modified', 'id').all()
 
-    return render_template('cfp_review/proposals.html', proposals=proposals)
+    return render_template('cfp_review/proposals.html', proposals=proposals,
+                           link_target='.update_proposal')
 
 
-class UpdateProposalForm(Form):
+class CheckProposalForm(Form):
     category = SelectField('Category', default=-1, coerce=int, choices=[(-1, '--None--')])
     reject = SubmitField('Reject')
-    anonymise = SubmitField('Send for Anonymisation')
+    checked = SubmitField('Send for Anonymisation')
 
 
 @cfp_review.route('/proposals/<int:proposal_id>', methods=['GET', 'POST'])
@@ -146,7 +149,7 @@ def update_proposal(proposal_id):
         # Prevent CfP reviewers from viewing non-anonymised submissions
         return abort(403)
 
-    form = UpdateProposalForm()
+    form = CheckProposalForm()
     categories = [(c.id, c.name) for c in ProposalCategory.query.all()]
     form.category.choices.extend(categories)
 
@@ -163,7 +166,7 @@ def update_proposal(proposal_id):
             app.logger.info('Rejecting proposal %s', proposal_id)
             prop.set_state('rejected')
 
-        elif form.anonymise.data:
+        elif form.checked.data:
             if prop.type == 'talk' and form.category.data == -1:
                 form.category.errors.append('Required')
                 return render_template('cfp_review/update_proposal.html',
@@ -182,14 +185,59 @@ def update_proposal(proposal_id):
         form.category.data = prop.category_id
 
     return render_template('cfp_review/update_proposal.html',
-                            proposal=prop, form=form,
-                            next_proposal=next_prop)
+                            proposal=prop, form=form, next_proposal=next_prop)
 
 
 @cfp_review.route('/anonymisation')
 @anon_required
 def anonymisation():
-    return 'hello anon-world'
+    if current_user.has_permission('cfp_reviewer', False):
+        # Prevent CfP reviewers from viewing non-anonymised submissions
+        return abort(403)
+
+    proposals = Proposal.query.filter_by(state='checked').order_by('modified', 'id').all()
+
+    return render_template('cfp_review/proposals.html', proposals=proposals,
+                           link_target='.anonymise_proposal')
+
+
+class AnonymiseProposalForm(Form):
+    title = StringField('Title', [Required()])
+    description = TextAreaField('Description', [Required()])
+    anonymise = SubmitField('Send to review and go to next')
+
+
+@cfp_review.route('/anonymisation/<int:proposal_id>', methods=['GET', 'POST'])
+@anon_required
+def anonymise_proposal(proposal_id):
+    if current_user.has_permission('cfp_reviewer', False):
+        # Prevent CfP reviewers from viewing non-anonymised submissions
+        return abort(403)
+
+    form = AnonymiseProposalForm()
+
+    prop = Proposal.query.get(proposal_id)
+    next_prop = Proposal.query.filter(
+        Proposal.id != prop.id,
+        Proposal.state == 'checked',
+        Proposal.modified >= prop.modified
+    ).order_by('modified', 'id').first()
+
+    if form.validate_on_submit() and form.anonymise.data:
+        prop.title = form.title.data
+        prop.description = form.description.data
+        prop.set_state('anonymised')
+        db.session.commit()
+
+        if not next_prop:
+            return redirect(url_for('.anonymisation'))
+        return redirect(url_for('.anonymise_proposal', proposal_id=next_prop.id))
+
+    form.title.data = prop.title
+    form.description.data = prop.description
+
+    return render_template('cfp_review/anonymise_proposal.html',
+                           proposal=prop, form=form, next_proposal=next_prop)
 
 
 @cfp_review.route('/review')

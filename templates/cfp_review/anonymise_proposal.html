@@ -1,0 +1,59 @@
+{% macro render_dl_field(field) %}
+{% if field.errors %}
+    {# If we have help text, add an aria-describedby attribute to the field. #}
+    {% do kwargs.update({'aria-describedby': "help-block-" + field.name}) %}
+{% endif %}
+
+<dt><label for="{{ field.name }}" class="control-label">
+    {{ field.label.text }}
+</label></dt>
+<dd {%- if field.errors %} class="has-error" {%- endif %}>
+    {{ field(class_='form-control', **kwargs) | safe }}
+    {% if field.errors %}
+        {% for error in field.errors %}
+            <p class="help-block" id="help-block-{{ field.name }}">{{ error }}</p>
+        {% endfor %}
+    {% endif %}
+</dd>
+
+{% endmacro %}
+
+{% extends "cfp_review/base.html" %}
+{% block body %}
+<h2>{{proposal.title}} <small>by {{proposal.user.name}}</small></h2>
+
+<form method="post" action="{{ url_for('.anonymise_proposal', proposal_id=proposal.id) }}" class="shrink">
+{{ form.hidden_tag() }}
+    <dl class="dl-horizontal">
+        <dt>Type</dt>
+        <dd>{{ proposal.type }}</dd>
+        <dt>Submitter</dt>
+        <dd>{{ proposal.user.name }}</dd>
+        {% if proposal.type == 'talk' %}
+            <dt>Category</dt>
+            <dd>{{ proposal.category.name }}</dd>
+        {% endif %}
+
+        {{ render_dl_field(form.title, tabindex=1) }}
+        {{ render_dl_field(form.description, tabindex=2) }}
+    </dl>
+    <p class="pull-right">
+        {{ form.anonymise(class_="btn btn-success", tabindex=3) }}
+    </p>
+    <div class="clearfix"></div>
+    <p class="pull-right">
+        {% if next_proposal %}
+            <a href="{{ url_for('.anonymise_proposal', proposal_id=next_proposal.id) }}"
+                class="btn btn-default">
+                Skip this proposal
+            </a>
+        {% else %}
+            <a href="{{ url_for('.anonymisation') }}"
+                class="btn btn-default">
+                See all remaining proposals
+            </a>
+        {% endif %}
+    </p>
+</form>
+
+{% endblock %}
