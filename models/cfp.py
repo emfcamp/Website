@@ -1,7 +1,16 @@
 from main import db
 from datetime import datetime
 
-CFP_STATES = ['new', 'locked', 'checked', 'rejected', 'anonymised']
+# state: [allowed next state, ] pairs
+CFP_STATES = { 'edit': ['new'],
+               'new': ['locked'],
+               'locked': ['checked', 'rejected', 'edit'],
+               'checked': ['anonymised', 'edit'],
+               'rejected': ['edit'],
+               'anonymised': ['reviewed', 'edit'],
+               'reviewed': ['accepted', 'edit'],
+               'accepted': ['finished'],
+               'finished': [] }
 
 class CfpStateException(Exception):
     pass
@@ -37,11 +46,16 @@ class Proposal(db.Model):
         state = state.lower()
         if state not in CFP_STATES:
             raise CfpStateException('"%s" is not a valid state' % state)
+
+        if state not in CFP_STATES[self.state]:
+            raise CfpStateException('"%s->%s" is not a valid transition' % (self.state, state))
+
         self.state = state
 
 
 class TalkProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'talk'}
+
 
 class WorkshopProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'workshop'}
