@@ -1,7 +1,8 @@
 # encoding=utf-8
 
 from flask import (
-    request, abort, render_template, flash, Blueprint, current_app as app
+    redirect, url_for, request, abort, render_template,
+    flash, Blueprint, current_app as app
 )
 from flask.ext.login import current_user
 
@@ -16,6 +17,8 @@ from .common.forms import Form, HiddenIntegerField
 
 cfp_review = Blueprint('cfp_review', __name__)
 admin_required = require_permission('admin')  # Decorator to require admin permissions
+anon_required = require_permission('cfp_anonymiser')
+review_required = require_permission('cfp_reviewer')
 
 @cfp_review.context_processor
 def cfp_review_variables():
@@ -24,6 +27,19 @@ def cfp_review_variables():
         'new_count': new_count,
         'view_name': request.url_rule.endpoint.replace('cfp_review.', '.')
     }
+
+@cfp_review.route('')
+def main():
+    if current_user.has_permission('admin'):
+        return redirect(url_for('.proposals'))
+
+    if current_user.has_permission('cfp_anonymiser'):
+        return redirect(url_for('.anonymisation'))
+
+    if current_user.has_permission('cfp_reviewer'):
+        return redirect(url_for('.review'))
+
+    abort(404)
 
 class CategoryForm(Form):
     id = HiddenIntegerField('Category Id', [Required()])
@@ -168,3 +184,15 @@ def update_proposal(proposal_id):
     return render_template('cfp_review/update_proposal.html',
                             proposal=prop, form=form,
                             next_proposal=next_prop)
+
+
+@cfp_review.route('/anonymisation')
+@anon_required
+def anonymisation():
+    return 'hello anon-world'
+
+
+@cfp_review.route('/review')
+@review_required
+def review():
+    return 'hello review-world'
