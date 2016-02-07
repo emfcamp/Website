@@ -55,8 +55,27 @@
             <dd>{{proposal.funds}}</dd>
         {% endif %}
     </dl>
-    {{ form.reject(class_="btn btn-danger pull-right") }}
-    {{ form.anonymise(class_="btn btn-success pull-right") }}
+    <p class="pull-right">
+        {% if proposal.state == 'locked' %}
+            {{ form.reject(class_="btn btn-danger") }}
+            &nbsp;
+            {{ form.anonymise(class_="btn btn-success") }}
+        {% endif %}
+    </p>
+    <div class="clearfix"></div>
+    <p class="pull-right">
+        {% if next_proposal %}
+            <a href="{{ url_for('.update_proposal', proposal_id=next_proposal.id) }}"
+                class="btn btn-default">
+                Review next locked proposal
+            </a>
+        {% else %}
+            <a href="{{ url_for('.proposals', state='locked') }}"
+                class="btn btn-default">
+                See all remaining locked proposals
+            </a>
+        {% endif %}
+    </p>
 </form>
 
 {% endblock %}

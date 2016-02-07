@@ -1,8 +1,7 @@
 # encoding=utf-8
 
 from flask import (
-    redirect, url_for, request, abort, render_template, flash,
-    Blueprint, current_app as app
+    request, abort, render_template, flash, Blueprint, current_app as app
 )
 from flask.ext.login import current_user
 
@@ -12,12 +11,11 @@ from wtforms.validators import Required
 from main import db
 from .common import require_permission
 
-cfp_review = Blueprint('cfp_review', __name__)
-admin_required = require_permission('admin')  # Decorator to require admin permissions
-
-
 from models.cfp import Proposal, ProposalCategory
 from .common.forms import Form, HiddenIntegerField
+
+cfp_review = Blueprint('cfp_review', __name__)
+admin_required = require_permission('admin')  # Decorator to require admin permissions
 
 @cfp_review.context_processor
 def cfp_review_variables():
@@ -113,16 +111,16 @@ def proposals():
 
     query_dict = build_query_dict(request.args)
 
-    proposals = Proposal.query.filter_by(**query_dict).all()
+    proposals = Proposal.query.filter_by(**query_dict)\
+                              .order_by('state', 'modified', 'id').all()
 
     return render_template('cfp_review/proposals.html', proposals=proposals)
 
 
 class UpdateProposalForm(Form):
-    category = SelectField('Category', default=-1, coerce=int,
-                           choices=[(-1, '--None--')])
+    category = SelectField('Category', default=-1, coerce=int, choices=[(-1, '--None--')])
     reject = SubmitField('Reject')
-    anonymise = SubmitField('Anonymise')
+    anonymise = SubmitField('Send for Anonymisation')
 
 
 @cfp_review.route('/proposals/<int:proposal_id>', methods=['GET', 'POST'])
@@ -136,30 +134,37 @@ def update_proposal(proposal_id):
     categories = [(c.id, c.name) for c in ProposalCategory.query.all()]
     form.category.choices.extend(categories)
 
-    proposal = Proposal.query.get(proposal_id)
+    prop = Proposal.query.get(proposal_id)
+
+    next_prop = Proposal.query.filter(
+        Proposal.id != prop.id,
+        Proposal.state == 'locked',
+        Proposal.modified >= prop.modified # ie find something after this one
+    ).order_by('modified', 'id').first()
 
     if form.validate_on_submit():
         if form.reject.data:
             app.logger.info('Rejecting proposal %s', proposal_id)
-            proposal.set_state('rejected')
+            prop.set_state('rejected')
 
         elif form.anonymise.data:
-            if proposal.type == 'talk' and form.category.data == -1:
+            if prop.type == 'talk' and form.category.data == -1:
                 form.category.errors.append('Required')
                 return render_template('cfp_review/update_proposal.html',
-                                        proposal=proposal, form=form)
+                                        proposal=prop, form=form,
+                                        next_proposal=next_prop)
 
-            elif proposal.type == 'talk':
-                proposal.category_id = form.category.data
+            elif prop.type == 'talk':
+                prop.category_id = form.category.data
 
             app.logger.info('Sending proposal %s for anonymisation', proposal_id)
-            proposal.set_state('checked')
+            prop.set_state('checked')
 
         db.session.commit()
-        return redirect(url_for('.proposals'))
 
-    if proposal.type == 'talk' and proposal.category_id:
-        form.category.data = proposal.category_id
+    if prop.type == 'talk' and prop.category_id:
+        form.category.data = prop.category_id
 
     return render_template('cfp_review/update_proposal.html',
-                            proposal=proposal, form=form)
+                            proposal=prop, form=form,
+                            next_proposal=next_prop)

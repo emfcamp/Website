@@ -21,5 +21,8 @@
     </td>
 </tr>
 {% endfor %}
+{% if not proposals %}
+    <td colspan="5" class="text-center">No proposals found</td>
+{% endif %}
 </table>
 {% endblock %}
