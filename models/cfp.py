@@ -75,3 +75,12 @@ class ProposalCategory(db.Model):
     name = db.Column(db.String, nullable=False)
     proposals = db.relationship(TalkProposal, backref='category')
 
+
+class CFPMessage(db.Model):
+    __tablename__ = 'message'
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    proposal_id = db.Column(db.Integer, db.ForeignKey('proposal.id'), nullable=False)
+    message = db.Column(db.String, nullable=False)
+
