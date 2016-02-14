@@ -12,9 +12,9 @@ from wtforms import (
 from wtforms.validators import Required
 
 from main import db
-from .common import require_permission
+from .common import require_permission, send_template_email
 
-from models.cfp import Proposal, ProposalCategory
+from models.cfp import Proposal, ProposalCategory, CFPMessage
 from .common.forms import Form, HiddenIntegerField
 
 cfp_review = Blueprint('cfp_review', __name__)
@@ -188,6 +188,59 @@ def update_proposal(proposal_id):
                             proposal=prop, form=form, next_proposal=next_prop)
 
 
+class SendMessageForm(Form):
+    message = TextAreaField('New Message')
+    send = SubmitField('Send Message')
+    mark_read = SubmitField('Mark all as read')
+
+
+@cfp_review.route('/proposals/<int:proposal_id>/message', methods=['GET', 'POST'])
+@admin_required
+def message_proposer(proposal_id):
+    if current_user.has_permission('cfp_reviewer', False):
+        # Prevent CfP reviewers from viewing non-anonymised submissions
+        return abort(403)
+
+    form = SendMessageForm()
+    proposal = Proposal.query.get(proposal_id)
+
+    if form.send.data and form.message.data:
+        msg = CFPMessage()
+        msg.to_user_id = proposal.user_id
+        msg.from_user_id = current_user.id
+        msg.proposal_id = proposal_id
+        msg.message = form.message.data
+
+        db.session.add(msg)
+        db.session.commit()
+
+        app.logger.info('Sending message from %s to %s', current_user.id, proposal.user_id)
+
+        send_template_email('New message about your EMF proposal',
+                            proposal.user.email, app.config['CONTENT_EMAIL'],
+                            'cfp_review/email/new_message.txt', url=url_for('.anonymisation'),
+                            to_user=proposal.user, from_user=current_user,
+                            proposal=proposal)
+
+        # Unset the text field
+        form.message.data = ''
+
+    # Admin can see all messages sent in relation to a proposal
+    messages = CFPMessage.query.filter_by(
+        proposal_id=proposal_id
+    ).order_by('created').all()
+
+    if form.mark_read.data:
+        app.logger.info('mark as read')
+        for msg in messages:
+            if msg.to_user_id == current_user.id and not msg.been_seen:
+                msg.been_seen = True
+            db.session.commit()
+
+    return render_template('cfp_review/message_proposer.html',
+                           form=form, messages=messages, proposal=proposal)
+
+
 @cfp_review.route('/anonymisation')
 @anon_required
 def anonymisation():
@@ -228,6 +281,7 @@ def anonymise_proposal(proposal_id):
         prop.description = form.description.data
         prop.set_state('anonymised')
         db.session.commit()
+        app.logger.info('Sending proposal %s for review', proposal_id)
 
         if not next_prop:
             return redirect(url_for('.anonymisation'))

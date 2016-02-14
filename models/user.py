@@ -51,6 +51,13 @@ class User(db.Model, UserMixin):
                                    primaryjoin='TicketTransfer.from_user_id == User.id',
                                    backref='from_user', lazy='dynamic')
 
+    messages_to = db.relationship('CFPMessage',
+                                   primaryjoin='CFPMessage.to_user_id == User.id',
+                                   backref='to_user', lazy='dynamic')
+    messages_from = db.relationship('CFPMessage',
+                                   primaryjoin='CFPMessage.from_user_id == User.id',
+                                   backref='from_user', lazy='dynamic')
+
     def __init__(self, email, name):
         self.email = email
         self.name = name

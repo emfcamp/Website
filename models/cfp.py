@@ -40,6 +40,9 @@ class Proposal(db.Model):
     needs_money = db.Column(db.Boolean)
     one_day = db.Column(db.Boolean)
 
+    # References to this table
+    messages = db.relationship('CFPMessage', backref='proposal')
+
     __mapper_args__ = {'polymorphic_on': type}
 
     def set_state(self, state):
@@ -77,10 +80,12 @@ class ProposalCategory(db.Model):
 
 
 class CFPMessage(db.Model):
-    __tablename__ = 'message'
+    __tablename__ = 'cfp_message'
     id = db.Column(db.Integer, primary_key=True)
-    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    to_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    from_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     proposal_id = db.Column(db.Integer, db.ForeignKey('proposal.id'), nullable=False)
     message = db.Column(db.String, nullable=False)
+    created = db.Column(db.DateTime, default=datetime.utcnow)
+    been_seen = db.Column(db.Boolean)
 

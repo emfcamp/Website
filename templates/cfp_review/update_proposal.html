@@ -74,6 +74,12 @@
             </a>
         {% endif %}
     </p>
+    <div class="clearfix"></div>
+    <p class="pull-right">
+        <a href="{{ url_for('.message_proposer', proposal_id=proposal.id) }}" class="btn btn-default">
+            View Messages
+        </a>
+    </p>
 </form>
 
 {% endblock %}
