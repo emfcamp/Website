@@ -10,14 +10,14 @@
 <table class="table table-striped message-table">
 {% for msg in messages %}
 <tr>
-    <td class="col-sm-2">{% if msg.from_user_id == proposal.user_id %}
+    <td class="col-sm-2">{% if msg.is_user_recipient(current_user) %}
         <p class="pull-right">{{ msg.from_user.name }} &gt;</p>
     {% endif %}</td>
     <td class="col-sm-8">
         <p>{{ msg.message }}</p>
         <p class="pull-right"><small>Sent: {{ msg.created.strftime('%y-%m-%d %H:%M') }}</small></p>
     </td>
-    <td class="col-sm-2">{% if msg.from_user_id != proposal.user_id %}
+    <td class="col-sm-2">{% if not msg.is_user_recipient(current_user) %}
         &lt; {{ msg.from_user.name }}
     {% endif %}</td>
 </tr>

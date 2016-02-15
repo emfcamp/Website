@@ -82,10 +82,32 @@ class ProposalCategory(db.Model):
 class CFPMessage(db.Model):
     __tablename__ = 'cfp_message'
     id = db.Column(db.Integer, primary_key=True)
-    to_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     from_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     proposal_id = db.Column(db.Integer, db.ForeignKey('proposal.id'), nullable=False)
     message = db.Column(db.String, nullable=False)
     created = db.Column(db.DateTime, default=datetime.utcnow)
-    been_seen = db.Column(db.Boolean)
+    has_been_read = db.Column(db.Boolean)
+
+    def is_user_recipient(self, user):
+        """
+        Because we want messages from proposers to be visible to all admin
+        we need to infer the 'to' portion of the email, either it is
+        to the proposer (from admin) or to admin (& from the proposer).
+
+        Obviously if the proposer is also an admin this doesn't really work
+        but equally they should know where to ask.
+        """
+        is_user_admin = user.has_permission('admin')
+        is_user_proposer = user.id == self.proposal.user_id
+
+        is_from_admin = self.from_user.has_permission('admin')
+        is_from_proposer = self.from_user_id == self.proposal.user_id
+
+        if is_user_proposer and is_from_admin:
+            return True
+
+        if is_user_admin and is_from_proposer:
+            return True
+
+        return False
 

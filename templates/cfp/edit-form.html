@@ -1,0 +1,64 @@
+{% from "_formhelpers.html" import render_field %}
+<form class="form-horizontal cfp-form" method="post">
+  <div class="well">
+    {{ form.hidden_tag() }}
+
+    <fieldset>
+        <legend>About Your {{form.type|capitalize}}</legend>
+        {% if proposal.state == 'new' %}
+        <p>To help with our anonymised review process, try to avoid including
+           personally identifiable information at this stage.</p>
+        {% endif %}
+        {{ render_field(form.title, 9) }}
+        {{ render_field(form.description, 9) }}
+    </fieldset>
+
+    <fieldset>
+        <legend>More Details</legend>
+        <p>We'll use these details to help us schedule your {{form.type}}.</p>
+
+    {% if proposal.type == 'talk' %}
+      {{ render_field(form.requirements, 9) }}
+      {{ render_field(form.length, 9) }}
+      {{ render_field(form.notice_required, 9) }}
+
+    {% elif proposal.type == 'workshop' %}
+      {{ render_field(form.requirements, 9) }}
+      {{ render_field(form.length, 9) }}
+      {{ render_field(form.notice_required, 9) }}
+      {% call render_field(form.attendees, 9) %}
+          Our workshop tents can accommodate 10-50 attendees per session; if your workshop
+          is smaller than that, we might be able to find somewhere else to hold it.
+      {% endcall %}
+      {{ render_field(form.cost, 9) }}
+
+    {% elif proposal.type == 'installation' %}
+      {{ render_field(form.notice_required, 9) }}
+      {{ render_field(form.requirements, 9) }}
+      {{ render_field(form.size, 9) }}
+      {% call render_field(form.funds, 9) %}
+          We have a limited amount of funding available to make the EMF site look great.
+          If you'd like to apply for a grant, let us know how much you'll need.
+      {% endcall %}
+    {% endif %}
+
+    <div class="col-md-9 col-sm-offset-3 {% if proposal.state != 'new' -%} hidden {%- endif %}">
+      <label class="checkbox">
+        {{ form.needs_help() }}
+        I'd like help with preparing this proposal.
+      </label>
+      {% for error in form.needs_help.errors %}
+      <div class="help-block">{{ error }}</div>
+      {% endfor %}
+    </div>
+    </fieldset>
+
+  </div>
+  <div class="pull-right">
+    <a href="{{ url_for('.proposals') }}" class="btn btn-default">Back</a>
+    <button type="submit" class="btn btn-success debounce">Update</button>
+  </div>
+
+  <div class="clearfix"></div>
+
+</form>

@@ -204,9 +204,8 @@ def message_proposer(proposal_id):
     form = SendMessageForm()
     proposal = Proposal.query.get(proposal_id)
 
-    if form.send.data and form.message.data:
+    if request.method == 'POST' and form.send.data and form.message.data:
         msg = CFPMessage()
-        msg.to_user_id = proposal.user_id
         msg.from_user_id = current_user.id
         msg.proposal_id = proposal_id
         msg.message = form.message.data
@@ -230,12 +229,16 @@ def message_proposer(proposal_id):
         proposal_id=proposal_id
     ).order_by('created').all()
 
-    if form.mark_read.data:
-        app.logger.info('mark as read')
+    if request.method == 'POST' and form.mark_read.data:
+        count = 0
         for msg in messages:
-            if msg.to_user_id == current_user.id and not msg.been_seen:
-                msg.been_seen = True
+            if msg.is_user_recipient(current_user) and not msg.has_been_read:
+                msg.has_been_read = True
+                count += 1
+
+        if count:
             db.session.commit()
+            app.logger.info('Marked %d messages to admin on proposal %d as read' % (count, proposal.id))
 
     return render_template('cfp_review/message_proposer.html',
                            form=form, messages=messages, proposal=proposal)

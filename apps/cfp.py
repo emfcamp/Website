@@ -7,7 +7,7 @@ from flask.ext.login import current_user
 from flask_mail import Message
 from wtforms.validators import Required, Email, ValidationError
 from wtforms import (
-    BooleanField, StringField,
+    BooleanField, StringField, SubmitField,
     TextAreaField, SelectField,
 )
 
@@ -17,7 +17,7 @@ from main import db, mail
 from models.user import User, UserDiversity
 from models.ticket import TicketType
 from models.cfp import (
-    TalkProposal, WorkshopProposal, InstallationProposal, Proposal
+    TalkProposal, WorkshopProposal, InstallationProposal, Proposal, CFPMessage
 )
 from .common import feature_flag, create_current_user
 from .common.forms import Form
@@ -192,6 +192,7 @@ def proposals():
 
     return render_template('cfp/proposals.html', proposals=proposals)
 
+
 @cfp.route('/cfp/proposals/<int:proposal_id>/edit', methods=['GET', 'POST'])
 def edit_proposal(proposal_id):
     proposal = Proposal.query.get(proposal_id)
@@ -233,7 +234,7 @@ def edit_proposal(proposal_id):
         db.session.commit()
         flash("Your proposal has been updated")
 
-    if request.method != 'POST':
+    if request.method != 'POST' and proposal.state in ['new', 'edit']:
         if proposal.type == 'talk':
             form.length.data = proposal.length
 
@@ -252,8 +253,50 @@ def edit_proposal(proposal_id):
         form.notice_required.data = proposal.notice_required
         form.needs_help.data = proposal.needs_help
 
-    return render_template('cfp/edit.html', proposal=proposal,
-                                            form=form)
+    return render_template('cfp/edit.html', proposal=proposal, form=form)
+
+
+class MessagesForm(Form):
+    message = TextAreaField('Message')
+    send = SubmitField('Send Message')
+    mark_read = SubmitField('Mark all messages as read')
+
+
+@cfp.route('/cfp/proposals/<int:proposal_id>/messages', methods=['GET', 'POST'])
+def proposal_messages(proposal_id):
+    proposal = Proposal.query.get(proposal_id)
+    if not proposal or proposal.user_id != current_user.id:
+        abort(404)
+
+    form = MessagesForm()
+
+    if request.method == 'POST' and form.send.data and form.message.data:
+        msg = CFPMessage()
+        msg.from_user_id = current_user.id
+        msg.proposal_id = proposal_id
+        msg.message = form.message.data
+
+        db.session.add(msg)
+        db.session.commit()
+        form.message.data = ''
+
+    messages = CFPMessage.query.filter_by(
+        proposal_id=proposal_id
+    ).order_by('created').all()
+
+    if request.method == 'POST' and form.mark_read:
+        count = 0
+        for msg in messages:
+            if msg.is_user_recipient(current_user) and not msg.has_been_read:
+                msg.has_been_read = True
+                count += 1
+
+        if count:
+            db.session.commit()
+            app.logger.info('Marked %d messages to user on proposal %d as read' % (count, proposal.id))
+
+    return render_template('cfp/messages.html',
+                           proposal=proposal, messages=messages, form=form)
 
 @cfp.route('/cfp/guidance')
 def guidance():
