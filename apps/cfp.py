@@ -272,6 +272,7 @@ def proposal_messages(proposal_id):
 
     if request.method == 'POST' and form.send.data and form.message.data:
         msg = CFPMessage()
+        msg.is_to_admin = True
         msg.from_user_id = current_user.id
         msg.proposal_id = proposal_id
         msg.message = form.message.data

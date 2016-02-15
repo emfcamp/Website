@@ -6,6 +6,8 @@ from flask import (
 )
 from flask.ext.login import current_user
 
+from sqlalchemy import or_
+
 from wtforms import (
     SubmitField, StringField, FieldList, FormField, SelectField, TextAreaField
 )
@@ -25,7 +27,15 @@ review_required = require_permission('cfp_reviewer')
 @cfp_review.context_processor
 def cfp_review_variables():
     new_count = Proposal.query.filter_by(state='new').count()
+    unread_count = CFPMessage.query.filter(
+        # is_to_admin AND (has_been_read IS null OR has_been_read IS false)
+        or_(CFPMessage.has_been_read.is_(False),
+            CFPMessage.has_been_read.is_(None)),
+        CFPMessage.is_to_admin.is_(True)
+    ).count()
+
     return {
+        'unread_count': unread_count,
         'new_count': new_count,
         'view_name': request.url_rule.endpoint.replace('cfp_review.', '.')
     }
@@ -206,6 +216,7 @@ def message_proposer(proposal_id):
 
     if request.method == 'POST' and form.send.data and form.message.data:
         msg = CFPMessage()
+        msg.is_to_admin = False
         msg.from_user_id = current_user.id
         msg.proposal_id = proposal_id
         msg.message = form.message.data
