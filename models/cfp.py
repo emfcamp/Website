@@ -55,6 +55,9 @@ class Proposal(db.Model):
 
         self.state = state
 
+    def get_unread_count(self):
+        return len([m for m in self.messages if not m.has_been_read])
+
 
 class TalkProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'talk'}

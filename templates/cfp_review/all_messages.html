@@ -1,0 +1,31 @@
+{% extends "cfp_review/base.html" %}
+{% block body %}
+<h2>All messages</h2>
+
+<table class="table">
+    <tr>
+        <th>Date</th>
+        <th>From</th>
+        <th>Message Count</th>
+        <th>Proposal Title</th>
+    </tr>
+{% for proposal in proposal_with_message %}
+    <tr>
+        <td>
+            {% if not proposal.messages[0].has_been_read %}
+                <span class="badge">{{ proposal.get_unread_count() }}</span>
+            {% endif %}
+            {{ proposal.messages[0].created.strftime("%Y-%m-%d") }}
+        </td>
+        <td>{{ proposal.user.name }}</td>
+        <td>{{ proposal.messages | length }}</td>
+        <td>
+            <a href="{{ url_for('.message_proposer', proposal_id=proposal.id) }}">
+                {{ proposal.title }}
+            </a>
+        </td>
+    </tr>
+{% endfor %}
+</table>
+
+{% endblock %}

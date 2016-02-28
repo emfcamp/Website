@@ -29,6 +29,7 @@
             </ul>
         </li>
         {{ menuitem("Categories", ".categories") }}
+        {{ menuitem("Messages", ".all_messages", unread_count) }}
     {% endif %}
     {% if current_user.has_permission('cfp_anonymiser') %}
         {{ menuitem('Anonymisation', '.anonymisation') }}

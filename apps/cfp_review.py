@@ -207,6 +207,7 @@ class SendMessageForm(Form):
 @cfp_review.route('/proposals/<int:proposal_id>/message', methods=['GET', 'POST'])
 @admin_required
 def message_proposer(proposal_id):
+    # FIXME this is probably not needed as admin should never be reviewers
     if current_user.has_permission('cfp_reviewer', False):
         # Prevent CfP reviewers from viewing non-anonymised submissions
         return abort(403)
@@ -306,6 +307,26 @@ def anonymise_proposal(proposal_id):
 
     return render_template('cfp_review/anonymise_proposal.html',
                            proposal=prop, form=form, next_proposal=next_prop)
+
+
+@cfp_review.route('/messages')
+@admin_required
+def all_messages():
+    # FIXME this is probably not needed as admin should never be reviewers
+    if current_user.has_permission('cfp_reviewer', False):
+        # Prevent CfP reviewers from viewing non-anonymised submissions
+        return abort(403)
+
+    # TODO add search
+    # Query from the proposal because that's actually what we display
+    proposal_with_message = Proposal.query\
+        .join(CFPMessage)\
+        .filter(Proposal.id == CFPMessage.proposal_id)\
+        .order_by(CFPMessage.has_been_read, CFPMessage.created.desc())\
+        .all()
+
+    return render_template('cfp_review/all_messages.html',
+                           proposal_with_message=proposal_with_message)
 
 
 @cfp_review.route('/review')
