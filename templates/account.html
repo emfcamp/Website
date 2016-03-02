@@ -11,6 +11,12 @@
     {% endif %}
     {% if feature_enabled('CFP') %}
       <li><a href="{{ url_for('cfp.proposals') }}">Your proposals</a></li>
+      <li><a href="{{ url_for('cfp.all_messages') }}">
+        All CfP messages
+        {% if unread_count > 0 %}
+          <span class="badge">{{ unread_count }}</span>
+        {% endif %}
+      </a></li>
     {% endif %}
   </ul>
 </nav>
