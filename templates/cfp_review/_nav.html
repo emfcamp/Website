@@ -1,4 +1,4 @@
-{% macro badge(count) %}
+{% macro badge(count, alt_txt="") %}
     {% if count > 0 %}
         <span class="badge">{{count}}</span>
     {% endif %}
@@ -16,7 +16,7 @@
         <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                 aria-haspopup="true" aria-expanded="false">
-                Proposals {{ badge(new_count) }} <span class="caret"></span>
+                Proposals {{ badge(proposal_counts['locked'] + proposal_counts['anon-blocked']) }} <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
                 {{ menuitem("All", ".proposals") }}
@@ -24,14 +24,21 @@
                 {{ menuitem("Workshops", ".proposals", type="workshop") }}
                 {{ menuitem("Installations", ".proposals", type="installation") }}
                 <li role="separator" class="divider"></li>
-                {{ menuitem("New", ".proposals", new_count, state="new") }}
-                {{ menuitem("Locked", ".proposals", new_count, state="locked") }}
+                {% for state in ['edit', 'new', 'locked', 'checked', 'rejected', 'anonymised',
+                                 'anon-blocked', 'reviewed', 'accepted', 'finished'] %}
+                    {# Only show badges for locked & blocked proposals as these are what matters #}
+                    {% if state in ['locked', 'anon-blocked'] %}
+                        {{ menuitem(state | capitalize, ".proposals", proposal_counts[state], state=state)}}
+                    {% else %}
+                        {{ menuitem(state | capitalize, ".proposals", state=state)}}
+                    {% endif %}
+                {% endfor %}
             </ul>
         </li>
         {{ menuitem("Categories", ".categories") }}
         {{ menuitem("Messages", ".all_messages", unread_count) }}
     {% endif %}
     {% if current_user.has_permission('cfp_anonymiser') %}
-        {{ menuitem('Anonymisation', '.anonymisation') }}
+        {{ menuitem('Anonymisation', '.anonymisation', proposal_counts['checked']) }}
     {% endif %}
 </ul>

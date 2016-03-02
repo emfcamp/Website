@@ -5,9 +5,10 @@ from datetime import datetime
 CFP_STATES = { 'edit': ['new'],
                'new': ['locked'],
                'locked': ['checked', 'rejected', 'edit'],
-               'checked': ['anonymised', 'edit'],
+               'checked': ['anonymised', 'anon-blocked', 'edit'],
                'rejected': ['edit'],
                'anonymised': ['reviewed', 'edit'],
+               'anon-blocked': ['reviewed', 'edit'],
                'reviewed': ['accepted', 'edit'],
                'accepted': ['finished'],
                'finished': [] }

@@ -65,12 +65,12 @@
         {% if next_proposal %}
             <a href="{{ url_for('.update_proposal', proposal_id=next_proposal.id) }}"
                 class="btn btn-default">
-                Review next locked proposal
+                Review next {{proposal.state}} proposal
             </a>
         {% else %}
-            <a href="{{ url_for('.proposals', state='locked') }}"
+            <a href="{{ url_for('.proposals', state=proposal.state) }}"
                 class="btn btn-default">
-                See all remaining locked proposals
+                See all remaining {{proposal.state}} proposals
             </a>
         {% endif %}
     </p>

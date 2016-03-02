@@ -16,7 +16,7 @@ from wtforms.validators import Required
 from main import db
 from .common import require_permission, send_template_email
 
-from models.cfp import Proposal, ProposalCategory, CFPMessage
+from models.cfp import Proposal, ProposalCategory, CFPMessage, CFP_STATES
 from .common.forms import Form, HiddenIntegerField
 
 cfp_review = Blueprint('cfp_review', __name__)
@@ -26,7 +26,6 @@ review_required = require_permission('cfp_reviewer')
 
 @cfp_review.context_processor
 def cfp_review_variables():
-    new_count = Proposal.query.filter_by(state='new').count()
     unread_count = CFPMessage.query.filter(
         # is_to_admin AND (has_been_read IS null OR has_been_read IS false)
         or_(CFPMessage.has_been_read.is_(False),
@@ -34,9 +33,12 @@ def cfp_review_variables():
         CFPMessage.is_to_admin.is_(True)
     ).count()
 
+    proposal_counts = {state: Proposal.query.filter_by(state=state).count()
+                                                        for state in CFP_STATES}
+
     return {
         'unread_count': unread_count,
-        'new_count': new_count,
+        'proposal_counts': proposal_counts,
         'view_name': request.url_rule.endpoint.replace('cfp_review.', '.')
     }
 
@@ -167,7 +169,7 @@ def update_proposal(proposal_id):
 
     next_prop = Proposal.query.filter(
         Proposal.id != prop.id,
-        Proposal.state == 'locked',
+        Proposal.state == prop.state,
         Proposal.modified >= prop.modified # ie find something after this one
     ).order_by('modified', 'id').first()
 
@@ -290,6 +292,7 @@ class AnonymiseProposalForm(Form):
     title = StringField('Title', [Required()])
     description = TextAreaField('Description', [Required()])
     anonymise = SubmitField('Send to review and go to next')
+    reject = SubmitField('I cannot anonymise this proposal')
 
 
 @cfp_review.route('/anonymisation/<int:proposal_id>', methods=['GET', 'POST'])
@@ -308,16 +311,23 @@ def anonymise_proposal(proposal_id):
         Proposal.modified >= prop.modified
     ).order_by('modified', 'id').first()
 
-    if form.validate_on_submit() and form.anonymise.data:
-        prop.title = form.title.data
-        prop.description = form.description.data
-        prop.set_state('anonymised')
-        db.session.commit()
-        app.logger.info('Sending proposal %s for review', proposal_id)
+    if form.validate_on_submit():
+        if form.reject.data:
+            prop.set_state('anon-blocked')
+            db.session.commit()
+            app.logger.info('Proposal %s cannot be anonymised', proposal_id)
+
+        if form.anonymise.data:
+            prop.title = form.title.data
+            prop.description = form.description.data
+            prop.set_state('anonymised')
+            db.session.commit()
+            app.logger.info('Sending proposal %s for review', proposal_id)
 
         if not next_prop:
             return redirect(url_for('.anonymisation'))
         return redirect(url_for('.anonymise_proposal', proposal_id=next_prop.id))
+
 
     form.title.data = prop.title
     form.description.data = prop.description
