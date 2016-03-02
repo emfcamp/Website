@@ -24,8 +24,7 @@
                 {{ menuitem("Workshops", ".proposals", type="workshop") }}
                 {{ menuitem("Installations", ".proposals", type="installation") }}
                 <li role="separator" class="divider"></li>
-                {% for state in ['edit', 'new', 'locked', 'checked', 'rejected', 'anonymised',
-                                 'anon-blocked', 'reviewed', 'accepted', 'finished'] %}
+                {% for state in ordered_states %}
                     {# Only show badges for locked & blocked proposals as these are what matters #}
                     {% if state in ['locked', 'anon-blocked'] %}
                         {{ menuitem(state | capitalize, ".proposals", proposal_counts[state], state=state)}}

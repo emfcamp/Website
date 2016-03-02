@@ -9,7 +9,8 @@ from flask.ext.login import current_user
 from sqlalchemy import or_
 
 from wtforms import (
-    SubmitField, StringField, FieldList, FormField, SelectField, TextAreaField
+    SubmitField, StringField, FieldList, FormField, SelectField, TextAreaField,
+    BooleanField
 )
 from wtforms.validators import Required
 
@@ -23,6 +24,8 @@ cfp_review = Blueprint('cfp_review', __name__)
 admin_required = require_permission('admin')  # Decorator to require admin permissions
 anon_required = require_permission('cfp_anonymiser')
 review_required = require_permission('cfp_reviewer')
+ordered_states = ['edit', 'new', 'locked', 'checked', 'rejected', 'anonymised',
+                  'anon-blocked', 'reviewed', 'accepted', 'finished']
 
 @cfp_review.context_processor
 def cfp_review_variables():
@@ -37,6 +40,7 @@ def cfp_review_variables():
                                                         for state in CFP_STATES}
 
     return {
+        'ordered_states': ordered_states,
         'unread_count': unread_count,
         'proposal_counts': proposal_counts,
         'view_name': request.url_rule.endpoint.replace('cfp_review.', '.')
@@ -149,7 +153,26 @@ def proposals():
 
 
 class CheckProposalForm(Form):
+    # Admin can change anything
+    state = SelectField('State', choices=[(s, s) for s in ordered_states])
+    title = StringField('Title', [Required()])
+    description = TextAreaField('Description', [Required()])
+    requirements = StringField('Requirements')
+    length = StringField('Length')
+    notice_required = SelectField("Required notice", choices=[('1 week', '1 week'),
+                                                              ('1 month', '1 month'),
+                                                              ('> 1 month', 'Longer than 1 month'),
+                                                             ])
+    needs_help = BooleanField('Needs Help')
+    needs_money = BooleanField('Needs Help')
+    one_day = BooleanField('Needs Help')
     category = SelectField('Category', default=-1, coerce=int, choices=[(-1, '--None--')])
+    attendees = StringField('Attendees')
+    cost = StringField('Cost')
+    size = StringField('Size')
+    funds = StringField('Funds')
+
+    update = SubmitField('Force update')
     reject = SubmitField('Reject')
     checked = SubmitField('Send for Anonymisation')
 
@@ -160,7 +183,6 @@ def update_proposal(proposal_id):
     if current_user.has_permission('cfp_reviewer', False):
         # Prevent CfP reviewers from viewing non-anonymised submissions
         return abort(403)
-
     form = CheckProposalForm()
     categories = [(c.id, c.name) for c in ProposalCategory.query.all()]
     form.category.choices.extend(categories)
@@ -177,6 +199,7 @@ def update_proposal(proposal_id):
         if form.reject.data:
             app.logger.info('Rejecting proposal %s', proposal_id)
             prop.set_state('rejected')
+            flash('Rejected')
 
         elif form.checked.data:
             if prop.type == 'talk' and form.category.data == -1:
@@ -191,10 +214,60 @@ def update_proposal(proposal_id):
             app.logger.info('Sending proposal %s for anonymisation', proposal_id)
             prop.set_state('checked')
 
+
+            db.session.commit()
+            if not next_prop:
+                return redirect(url_for('.proposals'))
+            return redirect(url_for('.update_proposal', proposal_id=next_prop.id))
+
+
+        elif form.update.data:
+            if prop.type == 'talk':
+                prop.category_id = form.category.data
+            elif prop.type == 'workshop':
+                prop.attendees = form.attendees.data
+                prop.cost = form.cost.data
+            elif prop.type == 'installation':
+                prop.size = form.size.data
+                prop.funds = form.funds.data
+
+            if form.state.data != prop.state:
+                app.logger.info('Force changing state of proposal %s from %s to %s',
+                    proposal_id, prop.state, form.state.data)
+            else:
+                app.logger.info('Updating proposal %s', proposal_id)
+
+            prop.state = form.state.data
+            prop.title = form.title.data
+            prop.description = form.description.data
+            prop.requirements = form.requirements.data
+            prop.length = form.length.data
+            prop.notice_required = form.notice_required.data
+            prop.needs_help = form.needs_help.data
+            prop.needs_money = form.needs_money.data
+            prop.one_day = form.one_day.data
+            flash('Changes saved')
+
         db.session.commit()
+
+    form.state.data = prop.state
+    form.title.data = prop.title
+    form.description.data = prop.description
+    form.requirements.data = prop.requirements
+    form.length.data = prop.length
+    form.notice_required.data = prop.notice_required
+    form.needs_help.data = prop.needs_help
+    form.needs_money.data = prop.needs_money
+    form.one_day.data = prop.one_day
 
     if prop.type == 'talk' and prop.category_id:
         form.category.data = prop.category_id
+    elif prop.type == 'workshop':
+        form.attendees.data = prop.attendees
+        form.cost.data = prop.cost
+    elif prop.type == 'installation':
+        form.size.data = prop.size
+        form.funds.data = prop.funds
 
     return render_template('cfp_review/update_proposal.html',
                             proposal=prop, form=form, next_proposal=next_prop)
