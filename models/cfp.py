@@ -55,8 +55,19 @@ class Proposal(db.Model):
 
         self.state = state
 
-    def get_unread_count(self):
-        return len([m for m in self.messages if not m.has_been_read])
+    def get_unread_messages(self, user):
+        return [m for m in self.messages if (not m.has_been_read and
+                                             m.is_user_recipient(user))]
+
+    def get_unread_count(self, user):
+        return len(self.get_unread_messages(user))
+
+    def mark_messages_read(self, user):
+        messages = self.get_unread_messages(user)
+        for msg in messages:
+            msg.has_been_read = True
+        db.session.commit()
+        return len(messages)
 
 
 class TalkProposal(Proposal):
@@ -92,7 +103,7 @@ class CFPMessage(db.Model):
     message = db.Column(db.String, nullable=False)
     # Flags
     is_to_admin = db.Column(db.Boolean)
-    has_been_read = db.Column(db.Boolean)
+    has_been_read = db.Column(db.Boolean, default=False)
 
     def is_user_recipient(self, user):
         """

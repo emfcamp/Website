@@ -281,23 +281,35 @@ def proposal_messages(proposal_id):
         db.session.commit()
         form.message.data = ''
 
+    should_mark_read = form.mark_read.data or form.send.data
+    if request.method == 'POST' and should_mark_read:
+        count = proposal.mark_messages_read(current_user)
+        app.logger.info('Marked %d messages to admin on proposal %d as read' % (count, proposal.id))
+
     messages = CFPMessage.query.filter_by(
         proposal_id=proposal_id
     ).order_by('created').all()
 
-    if request.method == 'POST' and form.mark_read:
-        count = 0
-        for msg in messages:
-            if msg.is_user_recipient(current_user) and not msg.has_been_read:
-                msg.has_been_read = True
-                count += 1
-
-        if count:
-            db.session.commit()
-            app.logger.info('Marked %d messages to user on proposal %d as read' % (count, proposal.id))
-
     return render_template('cfp/messages.html',
                            proposal=proposal, messages=messages, form=form)
+
+@cfp.route('/cfp/messages')
+def all_messages():
+    if current_user.is_anonymous():
+        return redirect(url_for('.main'))
+
+    proposal_with_message = Proposal.query\
+        .join(CFPMessage)\
+        .filter(Proposal.id == CFPMessage.proposal_id,
+                Proposal.user_id == current_user.id)\
+        .order_by(CFPMessage.has_been_read, CFPMessage.created.desc())\
+        .all()
+
+    proposal_with_message.sort(key=lambda x: (x.get_unread_count(current_user) > 0,
+                                              x.created), reverse=True)
+
+    return render_template('cfp/all_messages.html',
+                           proposal_with_message=proposal_with_message)
 
 @cfp.route('/cfp/guidance')
 def guidance():

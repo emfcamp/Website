@@ -1,11 +1,11 @@
-{% extends "cfp_review/base.html" %}
+{% extends "base.html" %}
 {% block body %}
 <h2>All messages</h2>
 
+<div class="well">
 <table class="table">
     <tr>
         <th>Date</th>
-        <th>From</th>
         <th>Message Count</th>
         <th>Proposal Title</th>
     </tr>
@@ -17,15 +17,14 @@
             {% endif %}
             {{ proposal.messages[0].created.strftime("%Y-%m-%d") }}
         </td>
-        <td>{{ proposal.user.name }}</td>
         <td>{{ proposal.messages | length }}</td>
         <td>
-            <a href="{{ url_for('.message_proposer', proposal_id=proposal.id) }}">
+            <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">
                 {{ proposal.title }}
             </a>
         </td>
     </tr>
 {% endfor %}
 </table>
-
+</div>
 {% endblock %}

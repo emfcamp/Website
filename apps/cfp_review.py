@@ -198,6 +198,29 @@ def update_proposal(proposal_id):
                             proposal=prop, form=form, next_proposal=next_prop)
 
 
+@cfp_review.route('/messages')
+@admin_required
+def all_messages():
+    # FIXME this is probably not needed as admin should never be reviewers
+    if current_user.has_permission('cfp_reviewer', False):
+        # Prevent CfP reviewers from viewing non-anonymised submissions
+        return abort(403)
+
+    # TODO add search
+    # Query from the proposal because that's actually what we display
+    proposal_with_message = Proposal.query\
+        .join(CFPMessage)\
+        .filter(Proposal.id == CFPMessage.proposal_id)\
+        .order_by(CFPMessage.has_been_read, CFPMessage.created.desc())\
+        .all()
+
+    proposal_with_message.sort(key=lambda x: (x.get_unread_count(current_user) > 0,
+                                              x.created), reverse=True)
+
+    return render_template('cfp_review/all_messages.html',
+                           proposal_with_message=proposal_with_message)
+
+
 class SendMessageForm(Form):
     message = TextAreaField('New Message')
     send = SubmitField('Send Message')
@@ -236,21 +259,15 @@ def message_proposer(proposal_id):
         # Unset the text field
         form.message.data = ''
 
+    should_mark_read = form.mark_read.data or form.send.data
+    if request.method == 'POST' and should_mark_read:
+        count = proposal.mark_messages_read(current_user)
+        app.logger.info('Marked %d messages to admin on proposal %d as read' % (count, proposal.id))
+
     # Admin can see all messages sent in relation to a proposal
     messages = CFPMessage.query.filter_by(
         proposal_id=proposal_id
     ).order_by('created').all()
-
-    if request.method == 'POST' and form.mark_read.data:
-        count = 0
-        for msg in messages:
-            if msg.is_user_recipient(current_user) and not msg.has_been_read:
-                msg.has_been_read = True
-                count += 1
-
-        if count:
-            db.session.commit()
-            app.logger.info('Marked %d messages to admin on proposal %d as read' % (count, proposal.id))
 
     return render_template('cfp_review/message_proposer.html',
                            form=form, messages=messages, proposal=proposal)
@@ -307,26 +324,6 @@ def anonymise_proposal(proposal_id):
 
     return render_template('cfp_review/anonymise_proposal.html',
                            proposal=prop, form=form, next_proposal=next_prop)
-
-
-@cfp_review.route('/messages')
-@admin_required
-def all_messages():
-    # FIXME this is probably not needed as admin should never be reviewers
-    if current_user.has_permission('cfp_reviewer', False):
-        # Prevent CfP reviewers from viewing non-anonymised submissions
-        return abort(403)
-
-    # TODO add search
-    # Query from the proposal because that's actually what we display
-    proposal_with_message = Proposal.query\
-        .join(CFPMessage)\
-        .filter(Proposal.id == CFPMessage.proposal_id)\
-        .order_by(CFPMessage.has_been_read, CFPMessage.created.desc())\
-        .all()
-
-    return render_template('cfp_review/all_messages.html',
-                           proposal_with_message=proposal_with_message)
 
 
 @cfp_review.route('/review')
