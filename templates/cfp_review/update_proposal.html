@@ -61,8 +61,8 @@
     </p>
     <div class="clearfix"></div>
     <p class="pull-right">
-        {% if next_proposal %}
-            <a href="{{ url_for('.update_proposal', proposal_id=next_proposal.id) }}"
+        {% if next_id %}
+            <a href="{{ url_for('.update_proposal', proposal_id=next_id) }}"
                 class="btn btn-default">
                 Review next {{proposal.state}} proposal
             </a>
@@ -77,6 +77,10 @@
     <p class="pull-right">
         <a href="{{ url_for('.message_proposer', proposal_id=proposal.id) }}" class="btn btn-default">
             View Messages
+            {%- set unread_count = proposal.get_unread_count(current_user) -%}
+            {%- if unread_count > 0 -%}
+                ({{ unread_count }})
+            {%- endif -%}
         </a>
     </p>
 </form>

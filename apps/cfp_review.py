@@ -224,6 +224,8 @@ def update_proposal(proposal_id):
         Proposal.modified >= prop.modified # ie find something after this one
     ).order_by('modified', 'id').first()
 
+    next_id = next_prop.id if next_prop else None
+
     form = UpdateTalkForm() if prop.type == 'talk' else \
            UpdateWorkshopForm() if prop.type == 'workshop' else \
            UpdateInstallationForm()
@@ -245,15 +247,16 @@ def update_proposal(proposal_id):
             flash('Rejected')
 
         elif form.checked.data:
-            prop.category_id = form.category.data
+            if prop.type == 'talk':
+                prop.category_id = form.category.data
 
             app.logger.info('Sending proposal %s for anonymisation', proposal_id)
             prop.set_state('checked')
 
             db.session.commit()
-            if not next_prop:
+            if not next_id:
                 return redirect(url_for('.proposals'))
-            return redirect(url_for('.update_proposal', proposal_id=next_prop.id))
+            return redirect(url_for('.update_proposal', proposal_id=next_id))
 
         db.session.commit()
         return redirect(url_for('.update_proposal', proposal_id=proposal_id))
@@ -280,7 +283,7 @@ def update_proposal(proposal_id):
         form.funds.data = prop.funds
 
     return render_template('cfp_review/update_proposal.html',
-                            proposal=prop, form=form, next_proposal=next_prop)
+                            proposal=prop, form=form, next_id=next_id)
 
 
 @cfp_review.route('/messages')

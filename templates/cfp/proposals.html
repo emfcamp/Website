@@ -19,20 +19,26 @@
         {% if proposal.state == 'new' %}
           Open for edits
         {% elif proposal.state == 'edit' %}
-          Update required (check the messages)
+          Update required (please check your <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">messages</a>)
         {% elif proposal.state in ['locked', 'checked'] %}
           Awaiting anonymisation
         {% elif proposal.state == 'rejected' %}
-          Rejected, please check your messages
+          Rejected, please check your <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">messages</a>
         {% elif proposal.state == 'anonymised' %}
           Awaiting review
         {% elif proposal.state == 'reviewed' %}
           Awaiting the next round
         {% elif proposal.state == 'accepted' %}
-          Accepted, check your messages
+          Accepted, check your <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">messages</a>
         {% elif proposal.state == 'finished' %}
           Accepted and ready
         {% endif %}
+        </dd>
+        <dt>Messages</dt>
+        <dd>
+          <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">
+            {{ proposal.get_unread_count(current_user) }} unread of {{ proposal.messages | length }}
+          </a>
         </dd>
         {% if proposal.type == 'talk' %}
           <dt>Duration</dt>
