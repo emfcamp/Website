@@ -1,7 +1,6 @@
 Hi {{ to_user.name }},
 
-One of our call for participation co-ordinators ({{ from_user.name }}) had
-some questions about your submission ({{ proposal.title }}).
+We have some questions about your submission ({{ proposal.title }}).
 
 To see the message and respond to it, please go to:
 

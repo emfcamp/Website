@@ -14,7 +14,7 @@ from wtforms import (
 )
 from wtforms.validators import Required
 
-from main import db
+from main import db, external_url
 from .common import require_permission, send_template_email
 
 from models.cfp import Proposal, ProposalCategory, CFPMessage, CFP_STATES
@@ -325,9 +325,10 @@ def message_proposer(proposal_id):
 
         app.logger.info('Sending message from %s to %s', current_user.id, proposal.user_id)
 
+        msg_url = external_url('cfp.proposal_messages', proposal_id=proposal_id)
         send_template_email('New message about your EMF proposal',
                             proposal.user.email, app.config['CONTENT_EMAIL'],
-                            'cfp_review/email/new_message.txt', url=url_for('.anonymisation'),
+                            'cfp_review/email/new_message.txt', url=msg_url,
                             to_user=proposal.user, from_user=current_user,
                             proposal=proposal)
 
