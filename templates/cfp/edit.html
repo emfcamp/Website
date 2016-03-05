@@ -3,9 +3,15 @@
 {% block body %}
 
 <ul class="nav nav-tabs">
-  <li role="presentation" class="active">Details</li>
+  <li role="presentation" class="active"><a href="">Details</a></li>
   <li role="presentation">
-    <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">Messages</a>
+    <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">
+      Messages
+      {% set unread_count = proposal.get_unread_count(current_user) %}
+      {% if unread_count > 0 %}
+        <span class="badge">{{ unread_count }}</span>
+      {% endif %}
+    </a>
   </li>
 </ul>
 

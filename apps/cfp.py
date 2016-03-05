@@ -234,6 +234,8 @@ def edit_proposal(proposal_id):
         db.session.commit()
         flash("Your proposal has been updated")
 
+        return redirect(url_for('.edit_proposal', proposal_id=proposal_id))
+
     if request.method != 'POST' and proposal.state in ['new', 'edit']:
         if proposal.type == 'talk':
             form.length.data = proposal.length
@@ -270,21 +272,22 @@ def proposal_messages(proposal_id):
 
     form = MessagesForm()
 
-    if request.method == 'POST' and form.send.data and form.message.data:
-        msg = CFPMessage()
-        msg.is_to_admin = True
-        msg.from_user_id = current_user.id
-        msg.proposal_id = proposal_id
-        msg.message = form.message.data
+    if request.method == 'POST':
+        if form.send.data and form.message.data:
+            msg = CFPMessage()
+            msg.is_to_admin = True
+            msg.from_user_id = current_user.id
+            msg.proposal_id = proposal_id
+            msg.message = form.message.data
 
-        db.session.add(msg)
-        db.session.commit()
-        form.message.data = ''
+            db.session.add(msg)
+            db.session.commit()
 
-    should_mark_read = form.mark_read.data or form.send.data
-    if request.method == 'POST' and should_mark_read:
-        count = proposal.mark_messages_read(current_user)
-        app.logger.info('Marked %d messages to admin on proposal %d as read' % (count, proposal.id))
+        if form.mark_read or form.send.data:
+            count = proposal.mark_messages_read(current_user)
+            app.logger.info('Marked %d messages to admin on proposal %d as read' % (count, proposal.id))
+
+        return redirect(url_for('.proposal_messages', proposal_id=proposal_id))
 
     messages = CFPMessage.query.filter_by(
         proposal_id=proposal_id

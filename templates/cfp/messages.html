@@ -7,15 +7,31 @@
   <li role="presentation">
     <a href="{{ url_for('.edit_proposal', proposal_id=proposal.id) }}">Details</a>
   </li>
-  <li role="presentation" class="active">Messages</li>
+  <li role="presentation" class="active">
+    <a href="">
+      Messages
+      {% set unread_count = proposal.get_unread_count(current_user) %}
+      {% if unread_count > 0 %}
+        <span class="badge">{{ unread_count }}</span>
+      {% endif %}
+    </a>
+  </li>
 </ul>
 
 <table class="table table-striped">
 {% for msg in messages %}
+{# <tr {% if not msg.has_been_read -%} class="success" {% endif %}> #}
 <tr>
-  <td class="col-sm-2">{% if msg.is_user_recipient(current_user) %}
-      <p class="pull-right">{{ msg.from_user.name }} &gt;</p>
-  {% endif %}</td>
+  <td class="col-sm-2">
+    {%- if msg.is_user_recipient(current_user) -%}
+      <p class="pull-right">
+        {% if not msg.has_been_read %}
+          <span class="glyphicon glyphicon-envelope"></span>
+        {% endif %}
+        {{ msg.from_user.name }} &gt;
+      </p>
+    {%- endif -%}
+  </td>
   <td class="col-sm-8">
       <p>{{ msg.message }}</p>
       <p class="pull-right"><small>Sent: {{ msg.created.strftime('%y-%m-%d %H:%M') }}</small></p>

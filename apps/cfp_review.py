@@ -12,7 +12,7 @@ from wtforms import (
     SubmitField, StringField, FieldList, FormField, SelectField, TextAreaField,
     BooleanField
 )
-from wtforms.validators import Required
+from wtforms.validators import Required, ValidationError
 
 from main import db, external_url
 from .common import require_permission, send_template_email
@@ -78,9 +78,9 @@ def categories():
     form = AllCategoriesForm()
 
     if form.validate_on_submit():
-        for cat in form.categories:
-            cat_id = int(cat['id'].data)
-            categories[cat_id].name = cat['name'].data
+        for form_cat in form.categories:
+            cat_id = int(form_cat['id'].data)
+            categories[cat_id].name = form_cat['name'].data
         db.session.commit()
 
         if len(form.name.data) > 0:
@@ -90,13 +90,8 @@ def categories():
 
             db.session.add(new_category)
             db.session.commit()
-            # import ipdb; ipdb.set_trace()
-            categories[new_category.id] = new_category
-            counts[new_category.id] = 0
-            form.name.data = ''
 
-    for old_field in range(len(form.categories)):
-        form.categories.pop_entry()
+        return redirect(url_for('.categories'))
 
     for cat in sorted(categories.values(), key=lambda x: x.name):
         form.categories.append_entry()
@@ -152,29 +147,67 @@ def proposals():
                            link_target='.update_proposal')
 
 
-class CheckProposalForm(Form):
+class UpdateProposalForm(Form):
     # Admin can change anything
     state = SelectField('State', choices=[(s, s) for s in ordered_states])
     title = StringField('Title', [Required()])
     description = TextAreaField('Description', [Required()])
     requirements = StringField('Requirements')
     length = StringField('Length')
-    notice_required = SelectField("Required notice", choices=[('1 week', '1 week'),
-                                                              ('1 month', '1 month'),
-                                                              ('> 1 month', 'Longer than 1 month'),
-                                                             ])
+    notice_required = SelectField("Required notice",
+                                  choices=[('1 week', '1 week'),
+                                           ('1 month', '1 month'),
+                                           ('> 1 month', 'Longer than 1 month')])
     needs_help = BooleanField('Needs Help')
     needs_money = BooleanField('Needs Help')
     one_day = BooleanField('Needs Help')
-    category = SelectField('Category', default=-1, coerce=int, choices=[(-1, '--None--')])
-    attendees = StringField('Attendees')
-    cost = StringField('Cost')
-    size = StringField('Size')
-    funds = StringField('Funds')
 
     update = SubmitField('Force update')
     reject = SubmitField('Reject')
     checked = SubmitField('Send for Anonymisation')
+
+    def update_proposal(self, proposal):
+        proposal.state = self.state.data
+        proposal.title = self.title.data
+        proposal.description = self.description.data
+        proposal.requirements = self.requirements.data
+        proposal.length = self.length.data
+        proposal.notice_required = self.notice_required.data
+        proposal.needs_help = self.needs_help.data
+        proposal.needs_money = self.needs_money.data
+        proposal.one_day = self.one_day.data
+
+
+class UpdateTalkForm(UpdateProposalForm):
+    category = SelectField('Category', default=-1, coerce=int, choices=[(-1, '--None--')])
+
+    def validate_category(form, field):
+        if field.data < 0:
+            raise ValidationError('Must be set')
+
+    def update_proposal(self, proposal):
+        proposal.category_id = self.category.data
+        super(UpdateTalkForm, self).update_proposal(proposal)
+
+
+class UpdateWorkshopForm(UpdateProposalForm):
+    cost = StringField('Cost')
+    attendees = StringField('Attendees', [Required()])
+
+    def update_proposal(self, proposal):
+        proposal.cost = self.cost.data
+        proposal.attendees = self.attendees.data
+        super(UpdateWorkshopForm, self).update_proposal(proposal)
+
+
+class UpdateInstallationForm(UpdateProposalForm):
+    funds = StringField('Funds')
+    size = StringField('Size', [Required()])
+
+    def update_proposal(self, proposal):
+        proposal.size = self.size.data
+        proposal.funds = self.funds.data
+        super(UpdateInstallationForm, self).update_proposal(proposal)
 
 
 @cfp_review.route('/proposals/<int:proposal_id>', methods=['GET', 'POST'])
@@ -183,72 +216,47 @@ def update_proposal(proposal_id):
     if current_user.has_permission('cfp_reviewer', False):
         # Prevent CfP reviewers from viewing non-anonymised submissions
         return abort(403)
-    form = CheckProposalForm()
-    categories = [(c.id, c.name) for c in ProposalCategory.query.all()]
-    form.category.choices.extend(categories)
 
     prop = Proposal.query.get(proposal_id)
-
     next_prop = Proposal.query.filter(
         Proposal.id != prop.id,
         Proposal.state == prop.state,
         Proposal.modified >= prop.modified # ie find something after this one
     ).order_by('modified', 'id').first()
 
+    form = UpdateTalkForm() if prop.type == 'talk' else \
+           UpdateWorkshopForm() if prop.type == 'workshop' else \
+           UpdateInstallationForm()
+
+    if prop.type == 'talk':
+        categories = [(c.id, c.name) for c in ProposalCategory.query.all()]
+        form.category.choices.extend(categories)
+
+    # Process the POST
     if form.validate_on_submit():
-        if form.reject.data:
+        if form.update.data:
+            app.logger.info('Updating proposal %s', proposal_id)
+            form.update_proposal(prop)
+            flash('Changes saved')
+
+        elif form.reject.data:
             app.logger.info('Rejecting proposal %s', proposal_id)
             prop.set_state('rejected')
             flash('Rejected')
 
         elif form.checked.data:
-            if prop.type == 'talk' and form.category.data == -1:
-                form.category.errors.append('Required')
-                return render_template('cfp_review/update_proposal.html',
-                                        proposal=prop, form=form,
-                                        next_proposal=next_prop)
-
-            elif prop.type == 'talk':
-                prop.category_id = form.category.data
+            prop.category_id = form.category.data
 
             app.logger.info('Sending proposal %s for anonymisation', proposal_id)
             prop.set_state('checked')
-
 
             db.session.commit()
             if not next_prop:
                 return redirect(url_for('.proposals'))
             return redirect(url_for('.update_proposal', proposal_id=next_prop.id))
 
-
-        elif form.update.data:
-            if prop.type == 'talk':
-                prop.category_id = form.category.data
-            elif prop.type == 'workshop':
-                prop.attendees = form.attendees.data
-                prop.cost = form.cost.data
-            elif prop.type == 'installation':
-                prop.size = form.size.data
-                prop.funds = form.funds.data
-
-            if form.state.data != prop.state:
-                app.logger.info('Force changing state of proposal %s from %s to %s',
-                    proposal_id, prop.state, form.state.data)
-            else:
-                app.logger.info('Updating proposal %s', proposal_id)
-
-            prop.state = form.state.data
-            prop.title = form.title.data
-            prop.description = form.description.data
-            prop.requirements = form.requirements.data
-            prop.length = form.length.data
-            prop.notice_required = form.notice_required.data
-            prop.needs_help = form.needs_help.data
-            prop.needs_money = form.needs_money.data
-            prop.one_day = form.one_day.data
-            flash('Changes saved')
-
         db.session.commit()
+        return redirect(url_for('.update_proposal', proposal_id=proposal_id))
 
     form.state.data = prop.state
     form.title.data = prop.title
@@ -262,9 +270,11 @@ def update_proposal(proposal_id):
 
     if prop.type == 'talk' and prop.category_id:
         form.category.data = prop.category_id
+
     elif prop.type == 'workshop':
         form.attendees.data = prop.attendees
         form.cost.data = prop.cost
+
     elif prop.type == 'installation':
         form.size.data = prop.size
         form.funds.data = prop.funds
@@ -313,32 +323,31 @@ def message_proposer(proposal_id):
     form = SendMessageForm()
     proposal = Proposal.query.get(proposal_id)
 
-    if request.method == 'POST' and form.send.data and form.message.data:
-        msg = CFPMessage()
-        msg.is_to_admin = False
-        msg.from_user_id = current_user.id
-        msg.proposal_id = proposal_id
-        msg.message = form.message.data
+    if request.method == 'POST':
+        if form.send.data and form.message.data:
+            msg = CFPMessage()
+            msg.is_to_admin = False
+            msg.from_user_id = current_user.id
+            msg.proposal_id = proposal_id
+            msg.message = form.message.data
 
-        db.session.add(msg)
-        db.session.commit()
+            db.session.add(msg)
+            db.session.commit()
 
-        app.logger.info('Sending message from %s to %s', current_user.id, proposal.user_id)
+            app.logger.info('Sending message from %s to %s', current_user.id, proposal.user_id)
 
-        msg_url = external_url('cfp.proposal_messages', proposal_id=proposal_id)
-        send_template_email('New message about your EMF proposal',
-                            proposal.user.email, app.config['CONTENT_EMAIL'],
-                            'cfp_review/email/new_message.txt', url=msg_url,
-                            to_user=proposal.user, from_user=current_user,
-                            proposal=proposal)
+            msg_url = external_url('cfp.proposal_messages', proposal_id=proposal_id)
+            send_template_email('New message about your EMF proposal',
+                                proposal.user.email, app.config['CONTENT_EMAIL'],
+                                'cfp_review/email/new_message.txt', url=msg_url,
+                                to_user=proposal.user, from_user=current_user,
+                                proposal=proposal)
 
-        # Unset the text field
-        form.message.data = ''
+        if form.mark_read.data or form.send.data:
+            count = proposal.mark_messages_read(current_user)
+            app.logger.info('Marked %d messages to admin on proposal %d as read' % (count, proposal.id))
 
-    should_mark_read = form.mark_read.data or form.send.data
-    if request.method == 'POST' and should_mark_read:
-        count = proposal.mark_messages_read(current_user)
-        app.logger.info('Marked %d messages to admin on proposal %d as read' % (count, proposal.id))
+        return redirect(url_for('.message_proposer', proposal_id=proposal_id))
 
     # Admin can see all messages sent in relation to a proposal
     messages = CFPMessage.query.filter_by(
