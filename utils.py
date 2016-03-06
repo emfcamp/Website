@@ -243,19 +243,19 @@ class CreateTickets(Command):
             (3, 8, 'full', 'Full Camp Ticket (Supporter)', 56, 10, 130.00, 180.00, True,
                 "Support this non-profit event by paying a bit more. "
                 "All money will go towards making EMF more awesome."),
-            (3, 8, 'full', 'Full Camp Ticket (Supporter)', 1100, 10, 130.00, 170.00, True,
+            (9, 8, 'full', 'Full Camp Ticket (Supporter)', 1100, 10, 130.00, 170.00, True,
                 "Support this non-profit event by paying a bit more. "
                 "All money will go towards making EMF more awesome."),
 
             (4, 9, 'full', 'Full Camp Ticket (Gold Supporter)', 6, 10, 150.00, 210.00, True,
                 "Pay even more, receive our undying gratitude."),
-            (4, 9, 'full', 'Full Camp Ticket (Gold Supporter)', 1100, 10, 150.00, 195.00, True,
+            (10, 9, 'full', 'Full Camp Ticket (Gold Supporter)', 1100, 10, 150.00, 195.00, True,
                 "Pay even more, receive our undying gratitude."),
 
             (5, 10, 'kid', 'Under-16 Camp Ticket', 11, 10, 45.00, 64.00, True,
                 "For visitors born after August 5th, 2000. "
                 "All under-16s must be accompanied by an adult."),
-            (5, 10, 'kid', 'Under-16 Camp Ticket', 500, 10, 45.00, 60.00, True,
+            (11, 10, 'kid', 'Under-16 Camp Ticket', 500, 10, 45.00, 60.00, True,
                 "For visitors born after August 5th, 2000. "
                 "All under-16s must be accompanied by an adult."),
 
