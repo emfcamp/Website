@@ -68,6 +68,14 @@
         <input type="submit" name="{{form.gocardless.name}}" value="{{form.gocardless.label.text}}" class="btn btn-lg btn-success debounce"/>
     </div>
 </div>
+{% else %}
+<div class="panel panel-default panel--payment">
+    <div class="panel-heading"><h3 class="panel-title">Direct Debit (preferred)</h3></div>
+    <div class="panel-body">
+        <p>GoCardless is not currently available for Euros.</p>
+        <p>Please try again later or choose another option.</p>
+    </div>
+</div>
 {% endif %}
 {% endif %}
 </div>
