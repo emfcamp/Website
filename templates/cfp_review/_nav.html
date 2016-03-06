@@ -40,4 +40,8 @@
     {% if current_user.has_permission('cfp_anonymiser') %}
         {{ menuitem('Anonymisation', '.anonymisation', proposal_counts['checked']) }}
     {% endif %}
+    {% if current_user.has_permission('cfp_reviewer') %}
+        {{ menuitem('Your Review Categories', '.choose_categories') }}
+        {{ menuitem('Review', '.review_list') }}
+    {% endif %}
 </ul>

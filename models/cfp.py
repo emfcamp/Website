@@ -87,11 +87,18 @@ class InstallationProposal(Proposal):
     funds = db.Column(db.String, nullable=True)
 
 
+category_reviewers = db.Table('category_reviewers',
+    db.Column('id', db.Integer, primary_key=True),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), nullable=False, index=True),
+    db.Column('category_id', db.Integer, db.ForeignKey('category.id'), nullable=False),
+)
+
 class ProposalCategory(db.Model):
     __tablename__ = 'category'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     proposals = db.relationship(TalkProposal, backref='category')
+    users = db.relationship('User', secondary=category_reviewers, backref='review_categories')
 
 
 class CFPMessage(db.Model):

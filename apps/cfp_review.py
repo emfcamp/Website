@@ -59,13 +59,13 @@ def main():
 
     abort(404)
 
-class CategoryForm(Form):
+class UpdateCategoryForm(Form):
     id = HiddenIntegerField('Category Id', [Required()])
     name = StringField('Category Name', [Required()])
 
 
 class AllCategoriesForm(Form):
-    categories = FieldList(FormField(CategoryForm))
+    categories = FieldList(FormField(UpdateCategoryForm))
     name = StringField('New Category Name')
     update = SubmitField('Update Categories')
 
@@ -74,7 +74,6 @@ class AllCategoriesForm(Form):
 @admin_required
 def categories():
     categories = {c.id: c for c in ProposalCategory.query.all()}
-    counts = {c.id: len(c.proposals) for c in categories.values()}
     form = AllCategoriesForm()
 
     if form.validate_on_submit():
@@ -93,12 +92,55 @@ def categories():
 
         return redirect(url_for('.categories'))
 
-    for cat in sorted(categories.values(), key=lambda x: x.name):
+    for cat in sorted(categories.values(), key=lambda x: x.name.lower()):
         form.categories.append_entry()
         form.categories[-1]['id'].data = cat.id
         form.categories[-1]['name'].data = cat.name
 
-    return render_template('cfp_review/categories.html', form=form, counts=counts)
+    return render_template('cfp_review/categories.html', form=form, categories=categories)
+
+class CategoryForm(Form):
+    id = HiddenIntegerField('Category Id', [Required()])
+    is_user_member = BooleanField('Review this category')
+
+
+class CategorySignupForm(Form):
+    categories = FieldList(FormField(CategoryForm))
+    update = SubmitField('Update review categories')
+
+
+@cfp_review.route('/choose-categories', methods=['GET', 'POST'])
+@review_required
+def choose_categories():
+    categories = {c.id: c for c in ProposalCategory.query.all()}
+    form = CategorySignupForm()
+
+    if form.validate_on_submit():
+        for cat in form.categories:
+            cat_id = int(cat['id'].data)
+            reviewer_list = categories[cat_id].users
+            is_current_user_member = current_user in reviewer_list
+
+            if cat.is_user_member.data and not is_current_user_member:
+                reviewer_list.append(current_user)
+                app.logger.info('Adding user, %s, as reviewer for category, %s',
+                        current_user.id, cat_id)
+            elif not cat.is_user_member.data and is_current_user_member:
+                categories[cat_id].users.remove(current_user)
+                app.logger.info('Removing user, %s, as reviewer for category, %s',
+                        current_user.id, cat_id)
+        db.session.commit()
+
+        return redirect(url_for('.choose_categories'))
+
+    current_categories = [c.id for c in current_user.review_categories]
+    for cat in sorted(categories.values(), key=lambda x: x.name):
+        form.categories.append_entry()
+        form.categories[-1]['id'].data = cat.id
+        form.categories[-1]['is_user_member'].data = (cat.id in current_categories)
+
+    return render_template('cfp_review/choose_categories.html', form=form,
+                            categories=categories)
 
 
 def convert_category_id(val):
@@ -422,7 +464,8 @@ def anonymise_proposal(proposal_id):
                            proposal=prop, form=form, next_proposal=next_prop)
 
 
+
 @cfp_review.route('/review')
 @review_required
-def review():
+def review_list():
     return 'hello review-world'

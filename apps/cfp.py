@@ -207,7 +207,7 @@ def edit_proposal(proposal_id):
     del form.email
 
     if form.validate_on_submit():
-        if proposal.state != 'new':
+        if proposal.state not in ['new', 'edit']:
             flash('This submission can no longer be edited.')
             return redirect(url_for('.proposals'))
 

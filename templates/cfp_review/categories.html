@@ -8,22 +8,51 @@
 <thead><tr>
   <th>Category</th>
   <th>Entries</th>
+  <th>Reviewers</th>
 </tr></thead>
 <tbody>
 {% for cat in form.categories %}
   <tr>
-    <td>{{ cat.hidden_tag_without('csrf_token') }}{{ cat['name']() }}</td>
-    <td><a href="{{ url_for('.proposals', category=cat['id'].data)}}">
-        {{ counts[cat['id'].data] }}
+    {% set cat_id = cat['id'].data %}
+    <td>{{ cat.hidden_tag_without('csrf_token') }}{{ cat['name'](class_='form-control') }}</td>
+    <td><a href="{{ url_for('.proposals', category=cat_id)}}">
+        {{ categories[cat_id].proposals | length }}
     </a></td>
+    <td>
+      {{ categories[cat_id].users | length }}
+    </td>
   </tr>
 {% endfor %}
 <tr>
-  <td>{{ form.name }}</td>
+  <td>
+    <div class="input-group">
+      <div class="input-group-addon">+</div>
+      {{ form.name(class_='form-control') }}
+    </div>
+  </td>
+  <td>&nbsp;</td>
   <td>&nbsp;</td>
 </tr>
 </tbody>
 </table>
 {{ form.update(class_='btn btn-success') }}
 </form>
+
+<h3>Reviwers</h3>
+<dl class="dl-horizontal">
+{% for cat in categories.values() %}
+  <dt>{{ cat.name }}</dt>
+  <dd>
+    {% if not cat.users %}
+      -- No reviewers --
+    {% endif %}
+    <ul class="list-unstyled">
+      {% for user in cat.users %}
+        <li>{{ user.name }}</li>
+      {% endfor %}
+    </ul>
+  </dd>
+{% endfor %}
+</dl>
+
 {% endblock %}
