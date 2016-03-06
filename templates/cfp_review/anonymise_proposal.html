@@ -1,22 +1,4 @@
-{% macro render_dl_field(field) %}
-{% if field.errors %}
-    {# If we have help text, add an aria-describedby attribute to the field. #}
-    {% do kwargs.update({'aria-describedby': "help-block-" + field.name}) %}
-{% endif %}
-
-<dt><label for="{{ field.name }}" class="control-label">
-    {{ field.label.text }}
-</label></dt>
-<dd {%- if field.errors %} class="has-error" {%- endif %}>
-    {{ field(class_='form-control', **kwargs) | safe }}
-    {% if field.errors %}
-        {% for error in field.errors %}
-            <p class="help-block" id="help-block-{{ field.name }}">{{ error }}</p>
-        {% endfor %}
-    {% endif %}
-</dd>
-
-{% endmacro %}
+{% from "_formhelpers.html" import render_dl_field %}
 
 {% extends "cfp_review/base.html" %}
 {% block body %}

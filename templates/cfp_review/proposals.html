@@ -4,7 +4,7 @@
 
 <table class="table">
     <tr>
-        <th>Date</th>
+        <th class="col-md-1">Date</th>
         <th>State</th>
         <th>Type</th>
         <th>Submitter</th>
@@ -12,9 +12,9 @@
     </tr>
 {% for proposal in proposals %}
 <tr>
-    <td>{{proposal.created.strftime("%Y-%m-%d")}}</td>
-    <td>{{proposal.state}}</td>
-    <td>{{proposal.type}}</td>
+    <td>{{proposal.created.strftime("%d/%m")}}</td>
+    <td>{{proposal.state | capitalize}}</td>
+    <td>{{proposal.type | capitalize}}</td>
     <td>{{proposal.user.name}}</td>
     <td>
         <a href="{{ url_for(link_target, proposal_id=proposal.id) }}">{{proposal.title}}</a>

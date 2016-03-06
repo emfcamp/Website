@@ -13,6 +13,14 @@ CFP_STATES = { 'edit': ['new'],
                'accepted': ['finished'],
                'finished': [] }
 
+VOTE_STATES = {'new': ['voted', 'recused', 'blocked'],
+               'voted': ['stale'],
+               'recused': [],
+               'blocked': ['resolved', 'stale'],
+               'resolved': ['voted', 'recused', 'blocked'],
+               'stale': ['voted', 'recused', 'blocked'],
+               }
+
 class CfpStateException(Exception):
     pass
 
@@ -23,6 +31,7 @@ class Proposal(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    anonymiser_id = db.Column(db.Integer, db.ForeignKey('user.id'), default=None)
     created = db.Column(db.DateTime, default=datetime.utcnow)
     modified = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     state = db.Column(db.String, nullable=False, default='new')
@@ -43,8 +52,13 @@ class Proposal(db.Model):
 
     # References to this table
     messages = db.relationship('CFPMessage', backref='proposal')
+    votes = db.relationship('CFPVote', backref='proposal')
 
     __mapper_args__ = {'polymorphic_on': type}
+
+    def get_user_vote(self, user):
+        return CFPVote.query.filter_by(proposal_id=self.id, user_id=user.id)\
+            .first()
 
     def set_state(self, state):
         state = state.lower()
@@ -133,3 +147,31 @@ class CFPMessage(db.Model):
 
         return False
 
+class CFPVote(db.Model):
+    __versioned__ = {}
+    __tablename__ = 'cfp_vote'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    proposal_id = db.Column(db.Integer, db.ForeignKey('proposal.id'), nullable=False)
+    state = db.Column(db.String, nullable=False)
+
+    created = db.Column(db.DateTime, default=datetime.utcnow)
+    modified = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    vote = db.Column(db.Integer) # Vote can be null for abstentions
+    note = db.Column(db.String)
+
+    def __init__(self, user, proposal):
+        self.user = user
+        self.proposal = proposal
+        self.state = 'new'
+
+    def set_state(self, state):
+        state = state.lower()
+        if state not in VOTE_STATES:
+            raise CfpStateException('"%s" is not a valid state' % state)
+
+        if state not in VOTE_STATES[self.state]:
+            raise CfpStateException('"%s->%s" is not a valid transition' % (self.state, state))
+
+        self.state = state

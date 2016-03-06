@@ -1,0 +1,63 @@
+{% extends "cfp_review/base.html" %}
+{% block body %}
+<h2>CfP Proposals</h2>
+
+<h3>Requires Review</h3>
+<table class="table">
+    <tr>
+        <th class="col-md-1">Type</th>
+        <th>Title</th>
+        <th>Description</th>
+    </tr>
+{% for proposal in to_review %}
+<tr>
+    <td>{{ proposal.type | capitalize }}</td>
+    <td><a href="{{ url_for('.review_proposal', proposal_id=proposal.id) }}">{{proposal.title}}</a></td>
+    <td>{{ proposal.description | truncate(100) }}</td>
+</tr>
+{% endfor %}
+{% if not to_review %}
+    <td colspan="3" class="text-center">No proposals found</td>
+{% endif %}
+</table>
+
+<h3>Previously Reviewed</h3>
+<table class="table">
+<tr>
+    <th class="col-md-1">Date</th>
+    <th class="col-md-2">Vote Status</th>
+    <th>Type</th>
+    <th>Title</th>
+    <th>Description</th>
+</tr>
+{% for proposal in reviewed %}
+<tr>
+    <td>{{ proposal.get_user_vote(current_user).modified.strftime("%d/%m") }}</td>
+    <td>
+        {% set vote = proposal.get_user_vote(current_user) %}
+        {% if vote.state == 'voted' %}
+            Voted:
+            {% if vote.vote == 0 %}
+                "I wouldn't go"
+            {% elif vote.vote == 1 %}
+                "I might go"
+            {% elif vote.vote == 2 %}
+                "I will go"
+            {% endif %}
+        {% elif vote.state == 'recused' %}
+            Recused
+        {% elif vote.state == 'blocked' %}
+            Awaiting details
+        {% endif %}
+    </td>
+    <td>{{ proposal.type | capitalize }}</td>
+    <td><a href="{{ url_for('.review_proposal', proposal_id=proposal.id) }}">{{proposal.title}}</a></td>
+    <td>{{ proposal.description | truncate(300) }}</td>
+</tr>
+{% endfor %}
+{% if not reviewed %}
+    <td colspan="5" class="text-center">No proposals found</td>
+{% endif %}
+
+</table>
+{% endblock %}

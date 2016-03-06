@@ -20,7 +20,6 @@
 
 <table class="table table-striped">
 {% for msg in messages %}
-{# <tr {% if not msg.has_been_read -%} class="success" {% endif %}> #}
 <tr>
   <td class="col-sm-2">
     {%- if msg.is_user_recipient(current_user) -%}

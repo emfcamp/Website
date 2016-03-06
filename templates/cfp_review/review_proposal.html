@@ -1,0 +1,75 @@
+{% from "_formhelpers.html" import render_field %}
+
+{% extends "cfp_review/base.html" %}
+{% block body %}
+<h2>{{proposal.title}} <small>&mdash; a {{proposal.type | capitalize}}</small></h2>
+<p>{{proposal.description}}</p>
+<p>&nbsp;</p>
+<form method="post" action="{{ url_for('.review_proposal', proposal_id=proposal.id) }}" class="form-horizontal shrink">
+{{ form.hidden_tag() }}
+    {% if previous_vote and previous_vote.state not in ['resolved', 'stale'] %}
+        <dl class="dl-horizontal">
+            <dt>Status</dt>
+            <dd>
+                {% if previous_vote.state == 'new' %}
+                    Something's gone horribly wrong, please contact an admin
+                {% elif previous_vote.state == 'voted' %}
+                    Voted
+                {% elif previous_vote.state == 'recused' %}
+                    You recused yourself from voting on this proposal
+                {% elif previous_vote.state == 'blocked' %}
+                    Await feedback from Admin/submitter
+                {% endif %}
+            </dd>
+            <dt>Your vote</dt>
+            <dd>
+                {% if previous_vote.vote is not none %}
+                    {% if previous_vote.vote == 0 %}
+                        I wouldn't go
+                    {% elif previous_vote.vote == 1 %}
+                        I might go
+                    {% elif previous_vote.vote == 2 %}
+                        I will go
+                    {% endif %}
+                {% else %}
+                    -- Not voted --
+                {% endif %}
+            </dd>
+            <dt>Note:</dt>
+            <dd>{{previous_vote.note}}</dd>
+        </dl>
+        <p class="pull-right">
+            {% if next_id %}
+                <a href="{{ url_for('.review_proposal', proposal_id=next_id) }}" class="btn btn-default">
+                    Skip this proposal
+                </a>
+            {% else %}
+                <a href="{{ url_for('.review_list') }}" class="btn btn-default">
+                    See all remaining proposals
+                </a>
+            {% endif %}
+        </p>
+    {% else %}
+        <div class="col-md-8">
+            {{ render_field(form.vote_value, 9) }}
+            {{ render_field(form.note, 9, rows=4) }}
+        </div>
+        <div class="col-md-4 col-xs-12 btn-group-vertical" role="group">
+            {{ form.vote(class_="btn btn-success") }}
+            {{ form.recuse(class_="btn btn-danger") }}
+            {{ form.question(class_="btn btn-info") }}
+
+            {% if next_id %}
+                <a href="{{ url_for('.review_proposal', proposal_id=next_id) }}" class="btn btn-default">
+                    Skip this proposal
+                </a>
+            {% else %}
+                <a href="{{ url_for('.review_list') }}" class="btn btn-default">
+                    See all remaining proposals
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+</form>
+
+{% endblock %}

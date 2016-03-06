@@ -2,7 +2,7 @@
 
 from flask import (
     redirect, url_for, request, abort, render_template,
-    flash, Blueprint, current_app as app
+    flash, Blueprint, session, current_app as app
 )
 from flask.ext.login import current_user
 
@@ -14,10 +14,12 @@ from wtforms import (
 )
 from wtforms.validators import Required, ValidationError
 
+import random
+from time import time
 from main import db, external_url
 from .common import require_permission, send_template_email
 
-from models.cfp import Proposal, ProposalCategory, CFPMessage, CFP_STATES
+from models.cfp import Proposal, ProposalCategory, CFPMessage, CFPVote, CFP_STATES
 from .common.forms import Form, HiddenIntegerField
 
 cfp_review = Blueprint('cfp_review', __name__)
@@ -55,7 +57,7 @@ def main():
         return redirect(url_for('.anonymisation'))
 
     if current_user.has_permission('cfp_reviewer'):
-        return redirect(url_for('.review'))
+        return redirect(url_for('.review_list'))
 
     abort(404)
 
@@ -201,8 +203,8 @@ class UpdateProposalForm(Form):
                                            ('1 month', '1 month'),
                                            ('> 1 month', 'Longer than 1 month')])
     needs_help = BooleanField('Needs Help')
-    needs_money = BooleanField('Needs Help')
-    one_day = BooleanField('Needs Help')
+    needs_money = BooleanField('Needs Money')
+    one_day = BooleanField('One day only')
 
     update = SubmitField('Force update')
     reject = SubmitField('Reject')
@@ -224,8 +226,8 @@ class UpdateTalkForm(UpdateProposalForm):
     category = SelectField('Category', default=-1, coerce=int, choices=[(-1, '--None--')])
 
     def validate_category(form, field):
-        if field.data < 0:
-            raise ValidationError('Must be set')
+        if field.data < 0 and not form.update.data:
+            raise ValidationError('Required')
 
     def update_proposal(self, proposal):
         proposal.category_id = self.category.data
@@ -252,6 +254,13 @@ class UpdateInstallationForm(UpdateProposalForm):
         super(UpdateInstallationForm, self).update_proposal(proposal)
 
 
+def get_next_proposal_to(prop, state):
+    return Proposal.query.filter(
+        Proposal.id != prop.id,
+        Proposal.state == state,
+        Proposal.modified >= prop.modified # ie find something after this one
+    ).order_by('modified', 'id').first()
+
 @cfp_review.route('/proposals/<int:proposal_id>', methods=['GET', 'POST'])
 @admin_required
 def update_proposal(proposal_id):
@@ -260,11 +269,7 @@ def update_proposal(proposal_id):
         return abort(403)
 
     prop = Proposal.query.get(proposal_id)
-    next_prop = Proposal.query.filter(
-        Proposal.id != prop.id,
-        Proposal.state == prop.state,
-        Proposal.modified >= prop.modified # ie find something after this one
-    ).order_by('modified', 'id').first()
+    next_prop = get_next_proposal_to(prop, prop.state)
 
     next_id = next_prop.id if next_prop else None
 
@@ -430,18 +435,18 @@ def anonymise_proposal(proposal_id):
         # Prevent CfP reviewers from viewing non-anonymised submissions
         return abort(403)
 
-    form = AnonymiseProposalForm()
-
     prop = Proposal.query.get(proposal_id)
-    next_prop = Proposal.query.filter(
-        Proposal.id != prop.id,
-        Proposal.state == 'checked',
-        Proposal.modified >= prop.modified
-    ).order_by('modified', 'id').first()
+    if prop.state != 'checked':
+        # Make sure people only see proposals that are ready
+        return abort(404)
+
+    next_prop = get_next_proposal_to(prop, 'checked')
+    form = AnonymiseProposalForm()
 
     if form.validate_on_submit():
         if form.reject.data:
             prop.set_state('anon-blocked')
+            prop.anonymiser_id = current_user.id
             db.session.commit()
             app.logger.info('Proposal %s cannot be anonymised', proposal_id)
 
@@ -449,6 +454,7 @@ def anonymise_proposal(proposal_id):
             prop.title = form.title.data
             prop.description = form.description.data
             prop.set_state('anonymised')
+            prop.anonymiser_id = current_user.id
             db.session.commit()
             app.logger.info('Sending proposal %s for review', proposal_id)
 
@@ -464,8 +470,112 @@ def anonymise_proposal(proposal_id):
                            proposal=prop, form=form, next_proposal=next_prop)
 
 
-
 @cfp_review.route('/review')
 @review_required
 def review_list():
-    return 'hello review-world'
+    all_proposals = Proposal.query\
+        .outerjoin(ProposalCategory)\
+        .filter(
+            Proposal.state == 'anonymised',
+            Proposal.user_id != current_user.id,
+            or_(Proposal.category_id.in_([cat.id for cat in current_user.review_categories]),
+                Proposal.category_id.is_(None))
+        ).all()
+
+    to_review, reviewed = [], []
+
+    for prop in all_proposals:
+        vote = prop.get_user_vote(current_user)
+        # requires review if the vote doesn't exist or requires re-review
+        requires_review = (vote is None) or (vote.state in ['new', 'resolved', 'stale'])
+
+        if requires_review:
+            to_review.append(prop)
+        else:
+            reviewed.append(prop)
+
+    if session.get('review_order'):
+        del session['review_order']
+
+    # For some reason random seems to 'stall' after the first run and stop
+    # reshuffling the 'to_review' list. To force a reshuffle on each
+    # execution we'll seed the RNG with the current time. This is pretty
+    # horrible but at least works.
+    # FIXME We shouldn't have to reseed the RNG every time
+    random.seed(int(time()))
+    random.shuffle(to_review)
+    session['review_order'] = [p.id for p in to_review]
+
+    reviewed.sort(key=lambda p: p.get_user_vote(current_user).modified)
+
+    return render_template('cfp_review/review_list.html',
+                           to_review=to_review, reviewed=reviewed)
+
+class VoteForm(Form):
+    vote_value = SelectField('Your rating', coerce=int, default=-3,
+                             choices=[(-3, "-- Select a vote --"),
+                                      (0, "I wouldn't go"),
+                                      (1, "I might go"),
+                                      (2, "I will go")])
+    note = TextAreaField('Note')
+
+    vote = SubmitField('Vote')
+    recuse = SubmitField('I can identify the submitter (abstain)')
+    question = SubmitField('I need more information')
+
+    def validate_note(form, field):
+        if not field.data and (form.recuse.data or form.question.data):
+            raise ValidationError('Required')
+
+
+@cfp_review.route('/review/<int:proposal_id>', methods=['GET', 'POST'])
+@review_required
+def review_proposal(proposal_id):
+    prop = Proposal.query.get(proposal_id)
+    # Reviewers can only see anonymised proposals that aren't there's
+    if prop.state != 'anonymised' or prop.user == current_user:
+        return abort(404)
+
+    form = VoteForm()
+
+    review_order = session.get('review_order')
+    if review_order:
+        try:
+            index = review_order.index(proposal_id) + 1
+            next_id = review_order[index] if index < len(review_order) else False
+        except ValueError:
+            next_id = False
+    else:
+        next_id = False
+
+    vote = prop.get_user_vote(current_user)
+
+    if form.validate_on_submit():
+        # Make a new vote if need-be
+        if not vote:
+            vote = CFPVote(current_user, prop)
+            db.session.add(vote)
+
+        # If there's a note add it (will replace the old one but it's versioned)
+        vote.note = form.note.data
+
+
+        if form.vote.data:
+            vote.vote = form.vote_value.data
+            vote.set_state('voted')
+
+        elif form.recuse.data:
+            vote.set_state('recused')
+
+        elif form.question.data:
+            vote.set_state('blocked')
+
+        db.session.commit()
+        if not next_id:
+            return redirect(url_for('.review_list'))
+        return redirect(url_for('.review_proposal', proposal_id=next_id))
+
+    return render_template('cfp_review/review_proposal.html',
+                           form=form, proposal=prop, next_id=next_id,
+                           previous_vote=vote)
+
