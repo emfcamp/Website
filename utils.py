@@ -237,17 +237,25 @@ class CreateTickets(Command):
             # (id, order, admits, name, type limit, personal limit, GBP, EUR, Description)
             # Leave order 0 & 1 free for discount tickets
             (0, 2, 'full', 'Full Camp Ticket', 193, 10, 100.00, 140.00, True, None),
-            # (1, 3, 'full', 'Full Camp Ticket', 200, 10, 105.00, 145.00, True, None),
+            (1, 3, 'full', 'Full Camp Ticket', 350, 10, 110.00, 145.00, True, None),
             # (2, 4, 'full', 'Full Camp Ticket', 300, 10, 110.00, 155.00, True, None),
             # (3, 5, 'full', 'Full Camp Ticket', 400, 10, 120.00, 165.00, True, None),
-            (3, 8, 'full', 'Full Camp Ticket (Supporter)', 1100, 10, 130.00, 180.00, True,
+            (3, 8, 'full', 'Full Camp Ticket (Supporter)', 56, 10, 130.00, 180.00, True,
+                "Support this non-profit event by paying a bit more. "
+                "All money will go towards making EMF more awesome."),
+            (3, 8, 'full', 'Full Camp Ticket (Supporter)', 1100, 10, 130.00, 170.00, True,
                 "Support this non-profit event by paying a bit more. "
                 "All money will go towards making EMF more awesome."),
 
-            (4, 9, 'full', 'Full Camp Ticket (Gold Supporter)', 1100, 10, 150.00, 210.00, True,
+            (4, 9, 'full', 'Full Camp Ticket (Gold Supporter)', 6, 10, 150.00, 210.00, True,
+                "Pay even more, receive our undying gratitude."),
+            (4, 9, 'full', 'Full Camp Ticket (Gold Supporter)', 1100, 10, 150.00, 195.00, True,
                 "Pay even more, receive our undying gratitude."),
 
-            (5, 10, 'kid', 'Under-16 Camp Ticket', 500, 10, 45.00, 64.00, True,
+            (5, 10, 'kid', 'Under-16 Camp Ticket', 11, 10, 45.00, 64.00, True,
+                "For visitors born after August 5th, 2000. "
+                "All under-16s must be accompanied by an adult."),
+            (5, 10, 'kid', 'Under-16 Camp Ticket', 500, 10, 45.00, 60.00, True,
                 "For visitors born after August 5th, 2000. "
                 "All under-16s must be accompanied by an adult."),
 
