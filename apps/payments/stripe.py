@@ -49,6 +49,13 @@ def stripe_start(payment):
 
 def charge_stripe(payment):
     logger.info("Charging Stripe payment %s, token %s", payment.id, payment.token)
+    # If we fail to go from charging to charged, we won't have the charge ID,
+    # so can't process the webhook. The payment will need to be manually resolved.
+    # Test this with 4000000000000341.
+
+    payment.state = 'charging'
+    db.session.commit()
+
     try:
         charge = stripe.Charge.create(
             amount=payment.amount_int,
@@ -67,6 +74,11 @@ def charge_stripe(payment):
         logger.warn("Exception %r confirming payment", e)
         flash('An error occurred with your payment, please try again')
         return redirect(url_for('.stripe_tryagain', payment_id=payment.id))
+
+    finally:
+        # Allow trying again
+        payment.state = 'captured'
+        db.session.commit()
 
     payment.chargeid = charge.id
     if charge.paid:
@@ -148,7 +160,7 @@ class StripeChargeAgainForm(Form):
 def stripe_tryagain(payment_id):
     payment = get_user_payment_or_abort(
         payment_id, 'stripe',
-        valid_states=['new', 'captured'],  # once it's charged it's too late
+        valid_states=['new', 'captured'],  # once it's charging/charged it's too late
     )
 
     if not feature_enabled('STRIPE'):

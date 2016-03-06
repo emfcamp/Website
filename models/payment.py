@@ -261,8 +261,8 @@ class StripePayment(Payment):
     token = db.Column(db.String)
 
     def cancel(self):
-        if self.state != 'new':
-            raise StateException('Cannot cancel stripe payments')
+        if self.state not in ['new', 'captured']:
+            raise StateException('Cannot automatically cancel charging/charged Stripe payments')
 
         super(StripePayment, self).cancel()
 
