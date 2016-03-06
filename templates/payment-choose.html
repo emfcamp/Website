@@ -53,6 +53,7 @@
 <div class="row row-equal">
 <div class="col-sm-4">
 {% if feature_enabled('GOCARDLESS') %}
+{% if user_currency != 'EUR' or feature_enabled('GOCARDLESS_EURO') %}
 <div class="panel panel-default panel--payment">
     <div class="panel-heading"><h3 class="panel-title">Direct Debit (preferred)</h3></div>
     <div class="panel-body">
@@ -67,6 +68,7 @@
         <input type="submit" name="{{form.gocardless.name}}" value="{{form.gocardless.label.text}}" class="btn btn-lg btn-success debounce"/>
     </div>
 </div>
+{% endif %}
 {% endif %}
 </div>
 <div class="col-sm-4">
