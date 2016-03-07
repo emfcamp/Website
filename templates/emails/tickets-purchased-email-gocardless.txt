@@ -8,10 +8,9 @@ Your tickets are:
 
 {% include "emails/email-tickets.txt" %}
 
-Your bill ID from GoCardless was {{ payment.gcid | gcid }}.  You can view this
-by logging into your account at http://www.gocardless.com/
+Your bill ID from GoCardless was {{ payment.gcid | gcid }}.
 
-We expect to receive payment from GoCardless within 6 days or so. We will
+We expect to receive payment from GoCardless within 6 days or so. We'll
 send you an email when we do.
 
 See you soon,
