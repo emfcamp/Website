@@ -2,7 +2,7 @@
 
 DEBUG=${DEBUG:-false}
 
-if [[ $(basename $PWD) != 'var' ]]; then
+if [[ "${PWD##*/}" != 'var' ]]; then
   echo This script should be run inside the var directory.
   exit 1
 fi
