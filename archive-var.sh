@@ -7,7 +7,7 @@ if [[ "${PWD##*/}" != 'var' ]]; then
   exit 1
 fi
 
-find -maxdepth 1 -mtime +5 -name '*.log' -o -name '*.ofx'|while read -r f; do
+find -maxdepth 1 -mtime +5 \( -name '*.log' -o -name '*.ofx' \)|while read -r f; do
   d=$f
   d=${d%.ofx}  # remove suffixes
   d=${d%.log}
