@@ -1,6 +1,7 @@
 from flask import (
     render_template, redirect, request, flash,
-    url_for, abort, Blueprint, current_app as app
+    url_for, abort, Blueprint, current_app as app,
+    session,
 )
 from flask.ext.login import (
     login_user, login_required, logout_user, current_user,
@@ -48,6 +49,7 @@ def login():
         user = User.get_by_code(app.config['SECRET_KEY'], request.args.get('code'))
         if user is not None:
             login_user(user)
+            session.permanent = True
             return redirect(request.args.get('next', url_for('tickets.main')))
         else:
             flash("Your login link was invalid. Please note that they expire after 6 hours.")
@@ -71,6 +73,7 @@ def login():
 @users.route("/logout")
 @login_required
 def logout():
+    session.permanent = False
     logout_user()
     return redirect(url_for('base.main'))
 
