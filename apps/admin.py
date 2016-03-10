@@ -227,12 +227,18 @@ def transaction_reconcile(txn_id, payment_id):
 @admin.route('/ticket-types')
 @admin_required
 def ticket_types():
-    ticket_types = TicketType.query.all()
-    totals = {}
-    for tt in ticket_types:
-        sold = tt.get_sold()
-        totals[tt.admits] = totals[tt.admits] + sold if tt.admits in totals else sold
-    return render_template('admin/ticket-types.html', ticket_types=ticket_types, totals=totals)
+    # This includes expired tickets
+    totals = Payment.query.filter(
+        Payment.state != 'new',
+        Payment.state != 'cancelled',
+    ).join(Ticket).join(TicketType).with_entities(
+        TicketType.admits,
+        func.count(),
+    ).group_by(TicketType.admits).all()
+
+    totals = dict(totals)
+    types = TicketType.query.all()
+    return render_template('admin/ticket-types.html', ticket_types=types, totals=totals)
 
 
 class EditTicketTypeForm(Form):
