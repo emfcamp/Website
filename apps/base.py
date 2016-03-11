@@ -156,7 +156,7 @@ def old_urls_2012():
 
 @base.route('/badge')
 def badge():
-    return redirect('http://wiki-archive.emfcamp.org/2012/wiki/TiLDA')
+    return redirect('https://wiki-archive.emfcamp.org/2012/wiki/TiLDA')
 
 
 @base.route("/code-of-conduct")
@@ -184,7 +184,7 @@ def wave_talks():
 @base.route('/wave/sine')
 @base.route('/wave/SiNE')
 def sine():
-    return redirect('http://wiki.emfcamp.org/wiki/SiNE')
+    return redirect('https://wiki-archive.emfcamp.org/2014/wiki/SiNE')
 
 
 @base.route("/radio", methods=['GET'])
