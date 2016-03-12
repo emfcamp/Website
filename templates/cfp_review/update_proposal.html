@@ -2,77 +2,84 @@
 
 {% extends "cfp_review/base.html" %}
 {% block body %}
-<h2>{{proposal.title}} <small>by {{proposal.user.name}}</small></h2>
 
-<form method="post" action="{{ url_for('.update_proposal', proposal_id=proposal.id) }}" class="shrink">
-{{ form.hidden_tag() }}
-    <dl class="dl-horizontal">
-        <dt>Date</dt>
-        <dd>{{proposal.created.strftime("%Y-%m-%d")}}</dd>
-        <dt>Submitter</dt>
-        <dd>{{proposal.user.name}}</dd>
-        <dt>Anoymised by</dt>
-        <dd>
-            {% if proposal.anonymiser_id %}
-                {{ proposal.anonymiser_id.name }}
-            {% else %}
-                --
-            {% endif %}
-        </dd>
-        <dt>Type</dt>
-        <dd>{{proposal.type}}</dd>
-        {{ render_dl_field(form.state, tabindex=1) }}
-        {{ render_dl_field(form.title, tabindex=3) }}
-        {{ render_dl_field(form.description, tabindex=4) }}
-        {{ render_dl_field(form.requirements, tabindex=5) }}
-        {{ render_dl_field(form.length, tabindex=6) }}
-        {{ render_dl_field(form.notice_required, tabindex=7) }}
-        {{ render_dl_field(form.needs_help, tabindex=8) }}
-        {{ render_dl_field(form.needs_money, tabindex=9) }}
-        {{ render_dl_field(form.one_day, tabindex=10) }}
-        {% if proposal.type == 'talk' %}
-            {{ render_dl_field(form.category, tabindex=11) }}
-        {% elif proposal.type == 'workshop' %}
-            {{ render_dl_field(form.attendees, tabindex=11) }}
-            {{ render_dl_field(form.cost, tabindex=12) }}
-        {% elif proposal.type == 'installation' %}
-            {{ render_dl_field(form.size, tabindex=11) }}
-            {{ render_dl_field(form.funds, tabindex=12) }}
-        {% endif %}
-    </dl>
-    <p class="pull-right">
-        {% if proposal.state == 'locked' %}
-            {{ form.checked(class_="btn btn-success", tabindex=13) }}
-            &nbsp;
-            {{ form.reject(class_="btn btn-danger", tabindex=15) }}
-        {% endif %}
-        &nbsp;
-        {{ form.update(class_="btn btn-danger", tabindex=14) }}
-    </p>
-    <div class="clearfix"></div>
-    <p class="pull-right">
-        {% if next_id %}
-            <a href="{{ url_for('.update_proposal', proposal_id=next_id) }}"
-                class="btn btn-default">
-                Review next {{proposal.state}} proposal
-            </a>
-        {% else %}
-            <a href="{{ url_for('.proposals', state=proposal.state) }}"
-                class="btn btn-default">
-                See all remaining {{proposal.state}} proposals
-            </a>
-        {% endif %}
-    </p>
-    <div class="clearfix"></div>
-    <p class="pull-right">
-        <a href="{{ url_for('.message_proposer', proposal_id=proposal.id) }}" class="btn btn-default">
-            View Messages
+<ul class="nav nav-tabs">
+    <li role="presentation" class="active">
+        <a href="">Details</a>
+    </li>
+    <li role="presentation">
+        <a href="{{ url_for('.message_proposer', proposal_id=proposal.id) }}">
+            Messages
             {%- set unread_count = proposal.get_unread_count(current_user) -%}
             {%- if unread_count > 0 -%}
                 ({{ unread_count }})
             {%- endif -%}
         </a>
-    </p>
+    </li>
+</ul>
+
+<div>&nbsp;</div>
+<form method="post" action="{{ url_for('.update_proposal', proposal_id=proposal.id) }}" class="shrink">
+{{ form.hidden_tag() }}
+    <div class="col-md-8">
+        <h2>{{proposal.title}} <small>by {{proposal.user.name}}</small></h2>
+        <dl class="dl-horizontal">
+            <dt>Date</dt>
+            <dd>{{proposal.created.strftime("%Y-%m-%d")}}</dd>
+            <dt>Submitter</dt>
+            <dd>{{proposal.user.name}}</dd>
+            <dt>E-Mail</dt>
+            <dd>{{proposal.user.email}}</dd>
+            <dt>Anoymised by</dt>
+            <dd>
+                {% if proposal.anonymiser_id %}
+                    {{ proposal.anonymiser.name }}
+                {% else %}
+                    --
+                {% endif %}
+            </dd>
+            <dt>Type</dt>
+            <dd>{{proposal.type}}</dd>
+            {{ render_dl_field(form.state, tabindex=1) }}
+            {{ render_dl_field(form.title, tabindex=3) }}
+            {{ render_dl_field(form.description, tabindex=4, rows=10) }}
+            {{ render_dl_field(form.requirements, tabindex=5) }}
+            {{ render_dl_field(form.length, tabindex=6) }}
+            {{ render_dl_field(form.notice_required, tabindex=7) }}
+            {{ render_dl_field(form.needs_help, tabindex=8) }}
+            {{ render_dl_field(form.needs_money, tabindex=9) }}
+            {{ render_dl_field(form.one_day, tabindex=10) }}
+            {% if proposal.type == 'talk' %}
+                {{ render_dl_field(form.category, tabindex=11) }}
+            {% elif proposal.type == 'workshop' %}
+                {{ render_dl_field(form.attendees, tabindex=11) }}
+                {{ render_dl_field(form.cost, tabindex=12) }}
+            {% elif proposal.type == 'installation' %}
+                {{ render_dl_field(form.size, tabindex=11) }}
+                {{ render_dl_field(form.funds, tabindex=12) }}
+            {% endif %}
+        </dl>
+    </div>
+    <div class="col-md-4 col-xs-12 btn-group-vertical" role="group">
+        <div>&nbsp;</div>
+        {% if proposal.state == 'locked' %}
+            {{ form.checked(class_="btn btn-success", tabindex=13) }}
+            {{ form.reject(class_="btn btn-danger", tabindex=15) }}
+        {% endif %}
+        {{ form.update(class_="btn btn-danger", tabindex=14) }}
+
+        {% if next_id %}
+            <a href="{{ url_for('.update_proposal', proposal_id=next_id) }}"
+                class="btn btn-default">
+                Next {{proposal.state}} proposal
+            </a>
+        {% else %}
+            <a href="{{ url_for('.proposals', state=proposal.state) }}"
+                class="btn btn-default">
+                All remaining {{proposal.state}} proposals
+            </a>
+        {% endif %}
+    </div>
 </form>
 
 {% endblock %}

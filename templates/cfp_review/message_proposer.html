@@ -1,7 +1,22 @@
 {% from "_formhelpers.html" import render_field %}
 {% extends "cfp_review/base.html" %}
 {% block body %}
-<h2>Messages</h2>
+<ul class="nav nav-tabs">
+    <li role="presentation">
+        <a href="{{ url_for('.update_proposal', proposal_id=proposal.id) }}">
+            Details
+        </a>
+    </li>
+    <li role="presentation" class="active">
+        <a href="">
+            Messages
+            {%- set unread_count = proposal.get_unread_count(current_user) -%}
+            {%- if unread_count > 0 -%}
+                ({{ unread_count }})
+            {%- endif -%}
+        </a>
+    </li>
+</ul>
 
 <h4>{{ proposal.title }} <small>by {{ proposal.user.name }}</small></h4>
 <p>{{ proposal.description }}</p>
@@ -34,9 +49,6 @@
 <form method="post" action="{{ url_for('.message_proposer', proposal_id=proposal.id) }}">
     {{ form.hidden_tag() }}
     {{ render_field(form.message, tabindex=1) }}
-    <a href="{{ url_for('.update_proposal', proposal_id=proposal.id) }}" class="btn btn-default">
-        Back
-    </a>
     <div class="pull-right">
         {{ form.send(class_='btn btn-success debounce', tabindex=2) }}
         &nbsp;

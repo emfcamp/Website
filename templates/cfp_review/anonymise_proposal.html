@@ -2,29 +2,30 @@
 
 {% extends "cfp_review/base.html" %}
 {% block body %}
-<h2>{{proposal.title}} <small>by {{proposal.user.name}}</small></h2>
 
 <form method="post" action="{{ url_for('.anonymise_proposal', proposal_id=proposal.id) }}" class="shrink">
 {{ form.hidden_tag() }}
-    <dl class="dl-horizontal">
-        <dt>Type</dt>
-        <dd>{{ proposal.type }}</dd>
-        <dt>Submitter</dt>
-        <dd>{{ proposal.user.name }}</dd>
-        {% if proposal.type == 'talk' %}
-            <dt>Category</dt>
-            <dd>{{ proposal.category.name }}</dd>
-        {% endif %}
+    <div class="col-md-8">
+        <h2>{{proposal.title}} <small>by {{proposal.user.name}}</small></h2>
+        <dl class="dl-horizontal">
+            <dt>Type</dt>
+            <dd>{{ proposal.type }}</dd>
+            <dt>Submitter</dt>
+            <dd>{{ proposal.user.name }}</dd>
+            {% if proposal.type == 'talk' %}
+                <dt>Category</dt>
+                <dd>{{ proposal.category.name }}</dd>
+            {% endif %}
 
-        {{ render_dl_field(form.title, tabindex=1) }}
-        {{ render_dl_field(form.description, tabindex=2) }}
-    </dl>
-    <p class="pull-right">
+            {{ render_dl_field(form.title, tabindex=1) }}
+            {{ render_dl_field(form.description, tabindex=2, rows=10) }}
+        </dl>
+    </div>
+    <div class="col-md-4 col-xs-12 btn-group-vertical" role="group">
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
         {{ form.anonymise(class_="btn btn-success", tabindex=3) }}
         {{ form.reject(class_="btn btn-danger", tabindex=4) }}
-    </p>
-    <div class="clearfix"></div>
-    <p class="pull-right">
         {% if next_proposal %}
             <a href="{{ url_for('.anonymise_proposal', proposal_id=next_proposal.id) }}"
                 class="btn btn-default">
@@ -36,7 +37,7 @@
                 See all remaining proposals
             </a>
         {% endif %}
-    </p>
+    </div>
 </form>
 
 {% endblock %}

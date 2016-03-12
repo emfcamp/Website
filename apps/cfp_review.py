@@ -524,8 +524,14 @@ class VoteForm(Form):
     question = SubmitField('I need more information')
 
     def validate_note(form, field):
-        if not field.data and (form.recuse.data or form.question.data):
+        if not field.data and form.recuse.data:
+            raise ValidationError('Please give a reason')
+        if not field.data and form.question.data:
             raise ValidationError('Required')
+
+    def validate_vote_value(form, field):
+        if field.data == -3 and form.vote.data:
+            raise ValidationError('You need to choose a vote')
 
 
 @cfp_review.route('/review/<int:proposal_id>', methods=['GET', 'POST'])
