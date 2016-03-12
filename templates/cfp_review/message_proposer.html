@@ -16,6 +16,11 @@
             {%- endif -%}
         </a>
     </li>
+    <li role="presentation">
+        <a href="{{ url_for('.proposal_votes', proposal_id=proposal.id) }}">
+            Votes/Reviewer Notes
+        </a>
+    </li>
 </ul>
 
 <h4>{{ proposal.title }} <small>by {{ proposal.user.name }}</small></h4>

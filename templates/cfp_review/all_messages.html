@@ -15,7 +15,7 @@
             {% if proposal.get_unread_count(current_user) > 0 %}
                 <span class="badge">{{ proposal.get_unread_count(current_user) }}</span>
             {% endif %}
-            {{ proposal.messages[0].created.strftime("%Y-%m-%d") }}
+            {{ proposal.messages[0].created.strftime("%d/%m") }}
         </td>
         <td>{{ proposal.user.name }}</td>
         <td>{{ proposal.messages | length }}</td>

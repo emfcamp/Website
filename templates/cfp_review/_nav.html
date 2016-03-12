@@ -36,6 +36,7 @@
         </li>
         {{ menuitem("Categories", ".categories") }}
         {{ menuitem("Messages", ".all_messages", unread_count) }}
+        {{ menuitem("Voting", ".vote_summary") }}
     {% endif %}
     {% if current_user.has_permission('cfp_anonymiser') %}
         {{ menuitem('Anonymisation', '.anonymisation', proposal_counts['checked']) }}

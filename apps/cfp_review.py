@@ -6,7 +6,7 @@ from flask import (
 )
 from flask.ext.login import current_user
 
-from sqlalchemy import or_
+from sqlalchemy import func, or_
 
 from wtforms import (
     SubmitField, StringField, FieldList, FormField, SelectField, TextAreaField,
@@ -407,6 +407,102 @@ def message_proposer(proposal_id):
     return render_template('cfp_review/message_proposer.html',
                            form=form, messages=messages, proposal=proposal)
 
+@cfp_review.route('/votes')
+@admin_required
+def vote_summary():
+    if current_user.has_permission('cfp_reviewer', False):
+        # Prevent CfP reviewers from viewing non-anonymised submissions
+        return abort(403)
+
+    vote_subquery = CFPVote.query\
+        .with_entities(
+            CFPVote.proposal_id, CFPVote.state,
+            func.count('*').label('count')
+        )\
+        .group_by('proposal_id', 'state')\
+        .subquery()
+
+    raw_proposals_with_counts = Proposal.query\
+        .with_entities(Proposal, vote_subquery.c.state, vote_subquery.c.count)\
+        .outerjoin(
+            vote_subquery,
+            Proposal.id == vote_subquery.c.proposal_id
+        )\
+        .filter(Proposal.state == 'anonymised')\
+        .order_by(Proposal.modified)\
+        .all()
+
+    proposals_with_counts = []
+    prev = None
+
+    for prop, state, count in raw_proposals_with_counts:
+        if prop == prev:
+            proposals_with_counts[-1][1][state] = count
+        else:
+            prev = prop
+            proposals_with_counts.append(( prop, { state: count } ))
+    return render_template('cfp_review/vote_summary.html',
+                            proposals_with_counts=proposals_with_counts)
+
+
+class ResolveVoteForm(Form):
+    id = HiddenIntegerField('Vote Id')
+    resolve = BooleanField("Set to 'resolved'")
+
+
+class UpdateVotesForm(Form):
+    votes_to_resolve = FieldList(FormField(ResolveVoteForm))
+    set_all_stale = SubmitField("Set all votes to 'stale'")
+    update = SubmitField("Set selected votes to 'resolved'")
+
+
+@cfp_review.route('/proposals/<int:proposal_id>/votes', methods=['GET', 'POST'])
+@admin_required
+def proposal_votes(proposal_id):
+    if current_user.has_permission('cfp_reviewer', False):
+        # Prevent CfP reviewers from viewing non-anonymised submissions
+        return abort(403)
+
+    form = UpdateVotesForm()
+    proposal = Proposal.query.get(proposal_id)
+    all_votes = {v.id: v for v in proposal.votes}
+
+    if form.validate_on_submit():
+        if form.set_all_stale.data:
+            stale_count = 0
+            for vote in all_votes.values():
+                if vote.state in ['voted', 'blocked']:
+                    vote.set_state('stale')
+                    stale_count += 1
+
+            if stale_count:
+                msg = 'Set to %d stale' % stale_count
+                flash(msg)
+                app.logger.info(msg)
+
+        elif form.update.data:
+            update_count = 0
+            for form_vote in form.votes_to_resolve:
+                vote = all_votes[int(form_vote['id'].data)]
+                if form_vote.resolve.data and vote.state == 'blocked':
+                    vote.set_state('resolved')
+                    update_count += 1
+
+            if update_count:
+                msg = 'Set to %d resolved' % update_count
+                flash(msg)
+                app.logger.info(msg)
+
+        db.session.commit()
+        return redirect(url_for('.proposal_votes', proposal_id=proposal_id))
+
+    for v_id in all_votes:
+        form.votes_to_resolve.append_entry()
+        form.votes_to_resolve[-1]['id'].data = v_id
+
+    return render_template('cfp_review/proposal_votes.html',
+                           proposal=proposal, form=form, votes=all_votes)
+
 
 @cfp_review.route('/anonymisation')
 @anon_required
@@ -512,7 +608,7 @@ def review_list():
                            to_review=to_review, reviewed=reviewed)
 
 class VoteForm(Form):
-    vote_value = SelectField('Your rating', coerce=int, default=-3,
+    vote_value = SelectField('Your vote', coerce=int, default=-3,
                              choices=[(-3, "-- Select a vote --"),
                                       (0, "I wouldn't go"),
                                       (1, "I might go"),
