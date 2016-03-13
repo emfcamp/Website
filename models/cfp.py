@@ -15,7 +15,7 @@ CFP_STATES = { 'edit': ['new'],
 
 VOTE_STATES = {'new': ['voted', 'recused', 'blocked'],
                'voted': ['stale'],
-               'recused': [],
+               'recused': ['resolved', 'stale'],
                'blocked': ['resolved', 'stale'],
                'resolved': ['voted', 'recused', 'blocked'],
                'stale': ['voted', 'recused', 'blocked'],

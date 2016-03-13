@@ -9,66 +9,72 @@
 
 <p>&nbsp;</p>
 <form method="POST">
-{{ form.hidden_tag() }}
-<table class="table">
-    <tr>
-        <th>Reviewer</th>
-        <th>Date</th>
-        <th>Status</th>
-        <th>Vote</th>
-        <th>Note</th>
-        <th></th>
-    </tr>
-{% for vote_form in form.votes_to_resolve %}
-    {% set vote = votes[vote_form['id'].data] %}
-    {% set versions = vote.versions.all() %}
-    {% for ver in (versions | sort(attribute="modified", reverse=True)) %}
-        <tr {%- if loop.first %} class="active" {%- endif %}>
-            {% if loop.first %}
-                <td>{{ vote.user.name }}</td>
-                <td>{{ ver.modified.strftime('%d/%m') }}</td>
-            {% else %}
-                <td>&nbsp;</td>
-                <td>
-                    {{ ver.modified.strftime('%d/%m') }}
-                </td>
-            {% endif %}
-            <td>{{ ver.state | capitalize }}</td>
-            <td>
-                {% if ver.state == 'voted' %}
-                    {% if ver.vote == 0 %}
-                        I wouldn't go
-                    {% elif ver.vote == 1 %}
-                        I might go
-                    {% elif ver.vote == 2 %}
-                        I will go
-                    {% endif %}
-                {% else %}
-                    --
-                {% endif %}
-            </td>
-            <td>{{ ver.note }}</td>
-            {% if loop.first and vote.state == 'blocked' %}
-                {# The actual form bit... #}
-                <td>
-                    {{ vote_form.hidden_tag_without('csrf_token') }}
-                    <div class="checkbox">{{ vote_form.resolve() }}</div>
-                </td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
+    {{ form.hidden_tag() }}
+    <table class="table">
+        <tr>
+            <th>Reviewer</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Vote</th>
+            <th>Note</th>
+            <th class="text-center">Resolve?</th>
         </tr>
-    {% endfor %}
-{% else %}
-    <tr>
-        <td colspan="5" class="text-center">No votes yet</td>
-    </tr>
-{% endfor %}
-</table>
-    <span class="pull-right">
+        {% for vote_form in form.votes_to_resolve %}
+            {% set vote = votes[vote_form['id'].data] %}
+            {% set versions = vote.versions.all() %}
+            {% for ver in (versions | sort(attribute="modified", reverse=True)) %}
+                <tr {%- if loop.first %} class="active" {%- endif %}>
+                    {% if loop.first %}
+                        <td>{{ vote.user.name }}</td>
+                        <td>{{ ver.modified.strftime('%d/%m') }}</td>
+                    {% else %}
+                        <td>&nbsp;</td>
+                        <td>
+                            {{ ver.modified.strftime('%d/%m') }}
+                        </td>
+                    {% endif %}
+                    <td>{{ ver.state | capitalize }}</td>
+                    <td>
+                        {% if ver.state == 'voted' %}
+                            {% if ver.vote == 0 %}
+                                I wouldn't go
+                            {% elif ver.vote == 1 %}
+                                I might go
+                            {% elif ver.vote == 2 %}
+                                I will go
+                            {% endif %}
+                        {% else %}
+                            --
+                        {% endif %}
+                    </td>
+                    <td>{{ ver.note }}</td>
+                    {% if loop.first and vote.state in ['blocked', 'recused'] %}
+                        {# The actual form bit... #}
+                        <td class="text-center">
+                            {{ vote_form.hidden_tag_without('csrf_token') }}
+                            <div class="checkbox">{{ vote_form.resolve() }}</div>
+                        </td>
+                    {% else %}
+                        <td>&nbsp;</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="5" class="text-center">No votes yet</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <div class="pull-right">
+        <div class="checkbox">
+            <label>
+                {{ form.include_recused() }}
+                {{ form.include_recused.label }}
+            </label>
+        </div>
         {{ form.update(class_='btn btn-success') }}
         {{ form.set_all_stale(class_='btn btn-danger') }}
-    </span>
+    </div>
 </form>
 
 {% endblock %}

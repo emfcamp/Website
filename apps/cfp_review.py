@@ -453,6 +453,7 @@ class ResolveVoteForm(Form):
 
 class UpdateVotesForm(Form):
     votes_to_resolve = FieldList(FormField(ResolveVoteForm))
+    include_recused = BooleanField("Also set 'recused' votes to 'stale'")
     set_all_stale = SubmitField("Set all votes to 'stale'")
     update = SubmitField("Set selected votes to 'resolved'")
 
@@ -471,8 +472,10 @@ def proposal_votes(proposal_id):
     if form.validate_on_submit():
         if form.set_all_stale.data:
             stale_count = 0
+            states_to_set = ['voted', 'blocked', 'recused'] if form.include_recused.data\
+                                                            else ['voted', 'blocked']
             for vote in all_votes.values():
-                if vote.state in ['voted', 'blocked']:
+                if vote.state in states_to_set:
                     vote.set_state('stale')
                     stale_count += 1
 
@@ -485,7 +488,7 @@ def proposal_votes(proposal_id):
             update_count = 0
             for form_vote in form.votes_to_resolve:
                 vote = all_votes[int(form_vote['id'].data)]
-                if form_vote.resolve.data and vote.state == 'blocked':
+                if form_vote.resolve.data and vote.state in ['blocked', 'recused']:
                     vote.set_state('resolved')
                     update_count += 1
 
