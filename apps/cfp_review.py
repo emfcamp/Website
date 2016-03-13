@@ -764,6 +764,18 @@ def rank():
             if score >= form.min_score.data:
                 prop.set_state('accepted')
                 count += 1
+                send_template_email('Your EMF proposal has been accepted!',
+                                    prop.user.email, app.config['CONTENT_EMAIL'],
+                                    'cfp_review/email/accepted_msg.txt',
+                                    user=prop.user, proposal=prop)
+            elif not prop.has_rejected_email:
+                prop.has_rejected_email = True
+                send_template_email('Your EMF proposal.',
+                                    prop.user.email, app.config['CONTENT_EMAIL'],
+                                    'cfp_review/email/not_accepted_msg.txt',
+                                    user=prop.user, proposal=prop)
+
+
         db.session.commit()
         msg = "Accepted %d proposals" % count
         app.logger.info(msg)

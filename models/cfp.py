@@ -49,6 +49,7 @@ class Proposal(db.Model):
     needs_help = db.Column(db.Boolean)
     needs_money = db.Column(db.Boolean)
     one_day = db.Column(db.Boolean)
+    has_rejected_email = db.Column(db.Boolean, default=False)
 
     # References to this table
     messages = db.relationship('CFPMessage', backref='proposal')
