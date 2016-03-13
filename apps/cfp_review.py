@@ -10,14 +10,15 @@ from sqlalchemy import func, or_
 
 from wtforms import (
     SubmitField, StringField, FieldList, FormField, SelectField, TextAreaField,
-    BooleanField
+    BooleanField, IntegerField
 )
-from wtforms.validators import Required, ValidationError
+from wtforms.validators import Required, NumberRange, ValidationError
 
 import random
 from time import time
 from main import db, external_url
 from .common import require_permission, send_template_email
+from .majority_judgement import calculate_score
 
 from models.cfp import Proposal, ProposalCategory, CFPMessage, CFPVote, CFP_STATES
 from .common.forms import Form, HiddenIntegerField
@@ -680,4 +681,86 @@ def review_proposal(proposal_id):
     return render_template('cfp_review/review_proposal.html',
                            form=form, proposal=prop, next_id=next_id,
                            previous_vote=vote)
+
+class CloseRoundForm(Form):
+    min_votes = IntegerField('Minimum number of votes', default=10, validators=[NumberRange(min=2)])
+    close_round = SubmitField('Close this round')
+
+
+@cfp_review.route('/close-round', methods=['GET', 'POST'])
+@admin_required
+def close_round():
+    form = CloseRoundForm()
+    min_votes = 0
+
+    vote_subquery = CFPVote.query\
+        .with_entities(
+            CFPVote.proposal_id,
+            func.count('*').label('count')
+        )\
+        .filter(CFPVote.state == 'voted')\
+        .group_by('proposal_id')\
+        .subquery()
+
+    if form.validate_on_submit():
+        min_votes = form.min_votes.data
+
+    proposals = Proposal.query\
+        .with_entities(Proposal, vote_subquery.c.count)\
+        .join(
+            vote_subquery,
+            Proposal.id == vote_subquery.c.proposal_id
+        )\
+        .filter(
+            Proposal.state == 'anonymised',
+            vote_subquery.c.proposal_id > min_votes
+        ).all()
+
+    if form.close_round.data:
+        for (prop, _) in proposals:
+            prop.set_state('reviewed')
+
+        db.session.commit()
+        app.logger.info("CFP Round closed. Set %d proposals to 'reviewed'" % len(proposals))
+
+        return redirect(url_for('.rank'))
+
+    return render_template('cfp_review/close-round.html', proposals=proposals, form=form)
+
+class AcceptanceForm(Form):
+    min_score = IntegerField('Minimum score for acceptance')
+    submit = SubmitField('Accept Proposals')
+
+
+@cfp_review.route('/rank', methods=['GET', 'POST'])
+@admin_required
+def rank():
+    proposals = Proposal.query\
+        .filter_by(state='reviewed').all()
+
+    form = AcceptanceForm()
+    scored_proposals = []
+    for prop in proposals:
+        score_list = [v.vote for v in prop.votes if v.state == 'voted']
+        score = calculate_score(score_list)
+        scored_proposals.append((prop, score))
+
+    scored_proposals = sorted(scored_proposals, key=lambda p: p[1])
+
+    if form.validate_on_submit():
+        for (prop, score) in scored_proposals:
+            count = 0
+            if score >= form.min_score.data:
+                prop.set_state('accepted')
+                count += 1
+        db.session.commit()
+        msg = "Accepted %d proposals" % count
+        app.logger.info(msg)
+        flash(msg)
+        return redirect(url_for('.proposals', state='accepted'))
+    return render_template('cfp_review/rank.html',
+                           proposals=scored_proposals, form=form)
+
+
+
 

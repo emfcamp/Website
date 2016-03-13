@@ -11,18 +11,17 @@
         <th>Title</th>
     </tr>
 {% for proposal in proposals %}
-<tr>
-    <td>{{proposal.created.strftime("%d/%m")}}</td>
-    <td>{{proposal.state | capitalize}}</td>
-    <td>{{proposal.type | capitalize}}</td>
-    <td>{{proposal.user.name}}</td>
-    <td>
-        <a href="{{ url_for(link_target, proposal_id=proposal.id) }}">{{proposal.title}}</a>
-    </td>
-</tr>
-{% endfor %}
-{% if not proposals %}
+    <tr>
+        <td>{{proposal.created.strftime("%d/%m")}}</td>
+        <td>{{proposal.state | capitalize}}</td>
+        <td>{{proposal.type | capitalize}}</td>
+        <td>{{proposal.user.name}}</td>
+        <td>
+            <a href="{{ url_for(link_target, proposal_id=proposal.id) }}">{{proposal.title}}</a>
+        </td>
+    </tr>
+{% else %}
     <td colspan="5" class="text-center">No proposals found</td>
-{% endif %}
+{% endfor %}
 </table>
 {% endblock %}
