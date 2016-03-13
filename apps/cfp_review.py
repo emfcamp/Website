@@ -350,7 +350,7 @@ def all_messages():
         .all()
 
     proposal_with_message.sort(key=lambda x: (x.get_unread_count(current_user) > 0,
-                                              x.created), reverse=True)
+                                              x.messages[-1].created), reverse=True)
 
     return render_template('cfp_review/all_messages.html',
                            proposal_with_message=proposal_with_message)

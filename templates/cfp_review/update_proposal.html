@@ -3,25 +3,8 @@
 {% extends "cfp_review/base.html" %}
 {% block body %}
 
-<ul class="nav nav-tabs">
-    <li role="presentation" class="active">
-        <a href="">Details</a>
-    </li>
-    <li role="presentation">
-        <a href="{{ url_for('.message_proposer', proposal_id=proposal.id) }}">
-            Messages
-            {%- set unread_count = proposal.get_unread_count(current_user) -%}
-            {%- if unread_count > 0 -%}
-                ({{ unread_count }})
-            {%- endif -%}
-        </a>
-    </li>
-    <li role="presentation">
-        <a href="{{ url_for('.proposal_votes', proposal_id=proposal.id) }}">
-            Votes/Reviewer Notes
-        </a>
-    </li>
-</ul>
+{% set active='details' %}
+{% include "cfp_review/_propsal_tabs.html" %}
 
 <div>&nbsp;</div>
 <form method="post" action="{{ url_for('.update_proposal', proposal_id=proposal.id) }}" class="shrink">
