@@ -1,0 +1,775 @@
+id,title,description,length,need_finance,one_day,type,experience,attendees,size
+6,Live coded techno,"An improvised, live coded ""algorave"" style electronic dance music performance using the Tidal DSL, possibly with a collaborator but otherwise solo.
+
+Here is a recent screengrab of a performance: https://www.youtube.com/watch?v=fgRDKxkHCSw
+This gets across the feel of an ideal algorave: https://www.youtube.com/watch?v=CEXvk51IdEo
+
+I could get some other algorave-style performers involved too, and make an evening out of it (http://algorave.com). In that case, I would aim for gender balance in performers.
+
+I could also possibly expand on this towards a tent dedicated to algorave style stuff, and similar approaches to technological music. I might be able to contribute some academic funds towards supporting such a thing. Alternatively, I could just encourage people to apply via this form. Perhaps someone could get back to me on this, ta!",Between 30 minutes and two hours,f,f,workshop,,It would be a late night performance,
+7,EMF network in a field 2014: What we did and how you used it,"We will give a short talk detailing how we set up the network, brought high-speed Internet to the farm, and delivered wired and wirelessly across the site. Particularly we'll talk about what we did differently this time around, what went well, what proved more of a hurdle than expected, and finally we'll go through some stats on how the network was used (so it should be scheduled at the end of the event please).",30 mins,f,f,talk,none,,
+8,How we spent a year building a spaceship simulator in a caravan,"A year ago we bought an old caravan and converted it into a 3 player starship disaster simulator called the ""LHS Bikeshed"". This is the story of how we've done this (and not torn out all of our hair in the process)",30 mins,f,f,talk,repeat,,
+9,LHS bikeshed - A spaceship disaster simulator in a caravan,"The LHS Bikeshed is a 3 player starship disaster simulator in a caravan. Players are trained to fly the ship then given a short scenario that inevitably ends up with them being exploded, burned, suffocated or smeared across the surface of a planet",,f,,installation,,,Caravan + 2 gazeebos
+10,Knitting - from learning to knit scarves to knitting cable and lace,Talk about knitting (will bring samples to show),45 mins,f,f,talk,some,,
+11,Knitting - from learning to knit scarves to knitting cable and lace,Talk about knitting (will bring samples to show),45 mins,f,f,talk,some,,
+12,Learn to knit,Will supply wool and needles for people to knit a small sample.,About two hours,f,f,workshop,,10 (absolute maximum 12),
+13,Hacking and healthcare - what you can do to monitor yourself,"A talk covering the basics of health, what you should be doing, and monitoring yourself at home",45 mins,f,f,talk,some,,
+14,"Hackerspaces and Diversity - a critical look at the communities, organisations and places","NB: this talk is in a very rough form atm. i suspect it will change heavily
+
+this talk will cover the following aspects
+
+* hacking as a privilege
+* toleration of harassment
+* using confrontation to establish hierarchy
+
+as well as means to which they can be combatted
+",30 mins,f,f,talk,some,,
+15,Arm Knitting ,"Use your arm, instead of needles, to knit with. This fun technique allows you to make a scarf very quickly. No knitting experience necessary. ",30 mins,f,f,talk,none,,
+16,"The OpenPolitics Manifesto: an open source plan for the UK. Take control, and create the future you want.","The OpenPolitics project is an open source manifesto being built for the next general election; we want to explain it to attendees, get feedback, debate the ideals, get people inspired to take part, and maybe even kickstart a new political movement. We're building the future anyway - it's time to stand up and start changing the system from the inside as well.
+
+(Sort of partway between talk and workshop, I suppose - talk with substantial audience participation might be a good way to look at it)",1 hour,f,f,workshop,,as many as want to come!,
+17,Tools for the Artisan programmer,"Artisan programmers are the craft programmers looking for tools to help them get things done;  the makers,artists and doers rather than professional coders.
+This talk explains how authors can support artisan use and how to spot a tool - rather than a library or framework. I describe three examples out in the wild that are worth a look for the Artisan toolbox : Processing, Apache Camel and MQTT.",45 mins,f,f,talk,some,,
+52,"Created as a collaborative project by the Hitchin Hackspace team, bighak is a giant ride-on homage to bigtrak.","We'll be driving/programming bighak around the site, but will need access to power for charging the batteries (preferably under cover to protect the electronics). We could do with some financial support to help transport bighak and upgrade the batteries for all day running.",,t,,installation,,,bighak requires ~2m wide openings to drive around. Its ~1m high by 2x2m wide/long
+53,Making rope from nettles,"A chance to make learn how to pick nettles and turn them into string which can then be turned into rope. I need a new pair of laces for my boots so I will be working on those, but also guiding attendees on the steps they need to take to make their own .",An hour or two,f,f,workshop,,As many as you like (assuming a ready supply of nettles),
+54,RoboButler 3000,"We will be running the RoboButler 3000 - a drink collecting robot around the field.  Ideally we'd like to be able to send it to the bar to get drinks for people using an Uber-style app, but that may have issues with licensing.  See http://thinkl33t.co.uk/project-robobutler-3000-part-1/ for some details.",,f,,installation,,,Will be mobile / charged in our village
+55,The Programmer's Guide to Pedagogy,"Learn about how people learn, through common examples of programming activities (pairing, unit testing, pull requests to name a few). ",10 mins,f,f,talk,none,,
+57,Walt Disney World: This was supposed to be the future,"I have a 5 minute lightning talk on the legislative history of Disney World. It's not *quite* as boring as it sounds. Well, maybe a little.",< 10 mins,f,t,talk,repeat,,
+58,Showing keys in public. What could possibly go wrong?,"If a reporter wants to get the point across that certain people shouldn’t have access to a particular key, would it be wise for said reporter to then show that key to the world? Like the New York City subway key? The key to the subway? On the Internet?! This and other media fails will be shown. And maybe even one or two non-fail examples…. Several cases of key-copying-by-sight will be discussed with lots of pictures and videos. How this can happen will be explained, as well as what to do to prevent it.",45 mins,f,f,talk,repeat,,
+18,"Outdoor, Retro-pixel, art gallery! Create your own artworks and animations on a 30 x 30 outdoor pixel screen.","The art gallery is a 1m x 1m box of 900 RGB Leds, programmable using a simple interface. The idea is that people can use a simple web interface to create their 30 x 30 pixel art, that is then uploaded to the screen for the festival to see. The screen supports basic animation at a low frame-rate and a reasonable gamut of colours.
+
+The box is weather proofed so it can be installed outside and can be linked to other units if required. We have a prototype currently operating and are in the final stages of writing a proposal for budget and time frames. ",,f,,installation,,,"1m x 1m for each unit. Can produce up to 4 units, networked. Needs to be placed at head-height or higher. Requires power and some form of networking."
+19,Make your own titanium spork,"Participants will design & make their own titanium spork from sheet metal, with a few simple hand tools. I'll provide all tools and supplies, but I'll need workshop space - ideally benches & chairs. And it will be noisy.
+
+I ran this at OHM (http://jarkman.co.uk/catalog/random/ohmsporks.htm) as well as at the last EMFcamp, and it seemed to be well received.",3 hours,f,f,workshop,,"10 (if we run longer we can do more people, since the tools are used in sequence)",
+20,A Tune On A Stick,"Rotating collaborative musical sequencer thing. I discussed this with Jonty, who seemed very keen, so we'll be making and bringing it. I thought it might be helpful to add it here so it got into your lists.",,f,,installation,,,It'll need a circle about 4m in radius.
+21,Mega Hammock,"The aim is to create a huge, multi-person hammock. Cargo net will be used for the hammock itself with scaff-pole proposed for the support. Custom fixings will be used to attach the hammock to the scaffold (and any available trees). This will be a bigger version of the hammock at EM2012.
+
+Have ticked the ""I can't afford to buy a ticket"" box to indicate that I'll need help with funding the materials, estimated to cost ~£270.
+
+Breakdown £120 (net), £70 (6x£12 scaffold pole), £30 (metal for fixings), £40 (8x£5 for guying straps)",,t,,installation,,,~6x6m
+22,Introduction To Electronic Fashion Workshop,"Participants in the introduction to electronic fashion workshop learn about the materials, equipment and techniques which can be used to construct electronic fashion, e-textile and wearable projects.  Additionally they will sew a simple electronic circuit on to a piece of fabric.
+
+Cost of workshop would be £8.  Requirements one large table and chairs for all attendees.",120 minutes,f,f,workshop,,about 10 per session,
+23,DDD: Disney Driven Development - How Disney's Four Keys can be applied to web development,"This talk is about Disney's four keys (Safety, Courtesy, Efficiency, Show), giving examples of how Disney uses them in building their parks, and how we apply them to web development.",10 mins,f,f,talk,some,,
+24,Writing a functional IPv6 Classifier (OCAML),"I wanted to know what mysteries awaited within IPv6 addresses. I wanted to learn OCAML better. So I wrote a tool in OCAML to classify IPv6 addresses, and extract any latent information. If you want to learn more about the IPv6 address space, and how the addresses are comsumed, what secrets and privacy infringing details they contain, then this is the talk for you. If you want to learn more about OCAML from a noobs point of view, then this is a talk for you. If you are incident response and need new tools for IPv6, then this is the talk for you. If you are a human, then this is the talk for you. If you're a cat or a dog, this is defintely the talk for you. If you're a self-transforming machine-elf, I don't want to see you until you apologise for the last time you appeared on stage. Turtles always welcome.",45 mins,f,f,talk,some,,
+25,LaserTag - Games of Quasar!,"I'll bring a bunch of LaserTag packs and mobile barriers to play around.  They are indoor equipment, so are affected by bright sunlight and they aren't waterpoof - so it needs to be played inside.  I'll estimate that I'll have about 8 packs with me, but if I've space I'll stick more in.  Ideal use would be in a large tent/marquee, ideally with somethings we can use as barriers to hide behind - I'll bring some, but more is good!  I'll probably need WiFi to operate this, it isn't practical for me to reconfigure them to a different SSID as that is quite complex.  I can either bring my own WiFi hotspot just to run that or if you can configure the SSID and WPA2 key to match the details they are configured for that could work.
+
+It will be noisy - the packs talk a lot so best not to run it late at night or too early in the morning.",,f,,installation,,,At least 20m x 10m is recommended.
+26,InfraRed Communications,A bit of theory on how InfraRed (IR) communications work along with some practical exercises demonstrating IR comms in operation.  With the option for people to make their own little IR transmitting and/or receiving device (depending on skill level).,90 minutes,f,f,workshop,,8 per session,
+27,LaserTag - How Quasar works,"An introduction in to how the Quasar lasertag game works, a very brief history (to put in to context the age of the base design), and some demonstrations of it in operation, and some recent enhancements added.",60 Minutes,f,f,workshop,,20,
+28,Collaborative Science Fiction Film made at EMF,"I have organised, directed and run safe shoots for the BBC for half a decade and I would like to make a science fiction short during the 3 days of EMF camp.  The script would be pre-written and use EMF as a backdrop.  The story I have in mind involves a disheveled character in a suit who wakes up on the field and spends a disorientated night wandering around the festival, talking to people and experiencing the events.  As sun rises our hero is retrieved by a spaceship piloted by aliens eager for a report on the inhabitants of Earth.  (This is very much a first idea, I expect it to evolve)
+
+A professional actor will be filmed over the course of the festival, with the bulk of the filming (especially effects-heavy shots) happening early on.  Filming could potentially happen in as little as a single day if this improves logistics.
+
+Although it is ambitious to expect the entire film to be completed by the end of the festival, there is certainly the opportunity to show some of the results of filming at a talk towards the end of the Festival.
+
+A measure of pre-publicity will be needed as attendees to EMF will be invited to appear in the film, or to help make it.  Anyone who wants to help with special effects will be able to retrieve footage from a common network location and upload their processed contributions to the same place.  Attendees will also be able to look up a shot list of desired angles (eg Timelapse Sunrise/Wide shot of field/People at talk) and film content for inclusion into the film.
+
+Equipment will be of the guerilla shoot variety (micro four thirds or DSLR camera, portable sound recorder, low profile boom mic, minimal battery powered handheld lights).  That is not to say that it cannot be clever.  Home-made rigs can offer unusual perspectives or options for timelapse shooting and Attendees would be welcome to bring along or make such filming rigs, for example, go-pro or similar cameras can be used to give specific effects or height (eg using a tethered blimp) .
+
+There is also the potential to partner with equipment manufacturers who might be willing to sponsor this endeavour in terms of loaning kit. I have contacts I could approach at Holdan, Panasonic, Nikon, Zeiss, Robert White, BBC and various Arial Filming Companies any of whom might also be interested in speaking.
+
+Myself and some other interested crew members already have EMF tickets as well as most of the kit required for filming.  I am confident I can get hold of any missing equipment by borrowing it.
+
+I would like to apply for funds to enable us to pay the actor.    ",3 days,f,f,workshop,,Everyone,
+29,"Miracle cures, superpowers and the zombie apocalypse - the current and future state of gene therapy in humans","Gene therapy -- the deliberate modification of a patient's DNA to repair or replace certain genes -- is finally entering the clinc after decades of work. From ""simple"" gene replacement for Haemophilia patients to the more subtle story behind the ""using HIV to cure leukaemia"" headlines, I'll give a quick introduction to the underlying biology and the challenges involved, how it's done, and what we're likely to see emerging into mainstream medicine over the next few years. Then we'll explore some plausible trends for the future of the technology, and end with a few questions about some odd new ethical issues that we'll need to find answers to.
+
+Resources: Laptop projector, voice amplification if necessary.
+
+I'm a biology postdoc with a background in virology and gene therapy, currently working on an academic (and non-profit) preclinical gene therapy project. So I know a bit about the field, can geek out about it for hours at a time, and don't have any financial interest to declare. I've spoken before on other biology-related subjects at the Hackspace, the London Science Museum's Dana Centre, and at Science in The Pub.
+
+I've put 45 minutes as a time, but this can be flexible: pared down to 30 minutes, or easily an hour including questions.",45 mins,f,f,talk,some,,
+56,My Container Ship Holiday Slideshow,"I'm off on a holiday on a container ship this summer. This talk will be a slideshow of my holiday photos. I'll also go on tangents about supply chains, Shenzhen, shipping containers, rare earth metal mines, GPS, etc. The usual. ",30 mins,f,t,talk,some,,
+30,Stop-motion challenge - make a fantastical film at the festival,"Film-making workshop, challenging people to use stop-motion techniques, any camera available and the EMFcamp environment to create short stop-motion movies.  Proposed format: Intro session to introduce the techniques, process and inspire, check-in session(s) to troubleshoot/tweak, nearly-final 'turn it into a film' session, and grand screening to show off the final films to all comers.  The idea of this extended format is to give teams a head start, then get them to shoot their films in their own time, while enjoying the rest of the festival, and have screening films to an audience be an additional motivator.  Could add additional elements eg. the topic of the film has to be EMFCamp (yay free publicity materials!).  I have experience of running this kind of workshops, but having volunteer assistants would be a /huge/ help, if possible.  ","1hr intro session on first day, 1hr check-in/progress sessions and 1 hour to screen finished films",f,f,workshop,,Up to 10 teams with up to 6 people in each,
+31,An immersive art/engineering installation featuring a virtual maze -- a spectacle of interactive light and sound.,"Full proposal: http://drhouse.me.uk/thegrid.pdf
+
+Discover an immersive art/engineering installation comprising a forest of radiant “trees”. As you move through the·grid it senses your presence and initiates a ripple of light and a susurration of subtle clicks, propagating through the system. Traverse your own maze of light or stand back and enjoy the spectacle.
+
+the·grid is a 7 × 7 matrix of aluminium poles, illuminated by white LED strips individually switched by a central controller. User presence is detected by an infrared computer vision system. Applications include a multiplayer virtual “maze”, and inter-active and passive display patterns.
+
+Requirements: 14m × 24m unlit ground, mains power (1kW peak).",,f,,installation,,,14m x 24m (unlit)
+32,Run your own fucking infrastructure II,followup talk ,45 mins,f,f,talk,some,,
+33,The softprinter - a 3D printer that makes clothes,Should have a working prototype on stage to accompany the talk. Based on the OpenKnit project: openknit.org,30 mins,f,f,talk,none,,
+34,"Glass music, the nervous system, mesmerism and the threshold of beauty and harmony","My talk would be based upon one I gave at the ICA a couple of years ago, but that I would like to revise and extend to include a more thorough history of the musical instrument of the 1800s, the Armonica, and its connections to mesmerism. My talk would give a short explanation of how an Armonica works, before expanding upon its connections to mesmerism and feminine distance.
+
+Physician Franz Mesmer notably chose the ghostly strains of the Armonica to soundtrack his mesmeric séances, wherein aristocratic individuals would dip their hands in vats of water filled with magnets supposedly charged with Mesmer’s notion of “animal magnetism”.
+
+The transcendental notion of the feminine came into focus through the glass instruments of the 1800s, whose cold ghostly tones were linked to both healing and hysteria during their short fashionable period. Benjamin Franklin’s glass Armonica was thought of not just as a very becoming instrument for the ladies of the era, but a later poetic symbol of feminine liminality itself. Glass might be thought of as a kind of musical ‘other’ which in its transparent purity was thought to create a bodiless sound, leaving the act of performance to a phantom body.
+
+Although sounding quite serious, I did find the quite remarkable history of the Armonica raises much laughter, especially when in the context of critiquing the ridiculous gender models of the 1800s.
+
+If accepted, I would like a screen to show images and speakers to play audio examples.",45 mins,f,f,talk,repeat,,
+35,The Semantic Web in 20 minutes,"The Semantic Web is the new emerging web of the future. Already emerging as the new way to store data, the web will move from its existing set of linked documents to a web of linked data. The change is happening through government open data initiatives and the poet of the open data movement. This is a Cook's tour this mind blowing phenomenon",30 mins,f,f,talk,none,,
+36,The Semantic Web in 20 minutes,"The Semantic Web is the new emerging web of the future. Already emerging as the new way to store data, the web will move from its existing set of linked documents to a web of linked data. The change is happening through government open data initiatives and the poet of the open data movement. This is a Cook's tour this mind blowing phenomenon",30 mins,f,f,talk,none,,
+37,Amateur Radio - Practical Sign offs,"Hopefully (pending paperwork) I'll be an RSGB registered assessor for the practical element of the foundation and intermediate amateur radio licenses in the UK.
+I'm happy to spend some time (although it could be less formal than a workshop, perhaps a HAM radio village) signing off/witnessing people. ",1-2hours?,f,f,workshop,,Up to 10?,
+38,Infostructure: How does the physical layer shape the web and our society?,"Where is the internet? This is both an abstract, philosophical question and a pressing practical issue. The physical layer is at best obscured behind abstractions, legal constructs and bureaucracy.
+
+At worst, it is literally folkloric - because no maps exist of cabling runs at the local level, engineers have regressed to an undocumented code of signs sprawled on the pavement to mark cable runs.
+
+This has tangible effects on society’s discussion of the internet- because we cannot see the underlying structure, we conceive it as a series of tubes connected to clouds. We create false boundaries between the physical and the virtual, and let our data flow freely into different and dangerous jurisdictions. We cannot discuss centralisation because our data centers and switching rooms are inaccessible.
+
+This talk will discuss through technical, sociological and artistic methods the current shape of the physical layer, its relationship to society and some alternate visions of the physical layer options in use right now. It will draw from from long running research, experiments and research trips through Europe.",30 mins,f,f,talk,some,,
+48,Haskell for everyone else,"Haskell has a reputation as an impenetrable language only for academics. In this workshop, we'll cover the basics and then dive straight in to real world uses including web apps, data analysis and hardware.","3 hours, but can be condensed/simplified",f,f,workshop,,30,
+49,Fuzzy Fuzzy Logic,"Fuzzy logic is used widely in electronic, engineering and robotic applications for dealing with uncertainty. However it is illsuited for certain types of problems, in which it doesn't model uncertainty with enough accuracy. This talk will give an overview of the emerging field of type-2 fuzzy logic, and how and what you can do with it in the real world today. ",30 mins,f,f,talk,some,,
+39,"SHOAL - a sea of illuminated, interactive fish on sticks","An amazing display of a sea of fish that responds to touch, as individual fish light up and move, before spreading colour, light and motion through the entire SHOAL.
+
+Made using new technology, including 3D printing, each fish is self-contained with battery power, sensors, motor, and wireless transceivers. The sensors tell the fish which direction it is facing, whether it has been touched, and how far and how fast it is moving. The fish can then tell their friends what's happening and the motor means all the fish can swim in the same direction, or turn to face someone who has come to play.
+
+REQUIREMENTS:
+A grass area as the sticks go straight into the ground.
+At least two power outlets - one for a computer and another for fish battery charging.
+If there is music at the festival the fish can also be music reactive,  in which case an audio out mini jack from your system would be necessary.",,f,,installation,,,"Max 8x15m area (for around 40 fish), but we can definitely also work on a smaller area"
+40,"bach.js, an unhistory of how the great Baroque composer pioneered Javascript, 250 years before Netscape even existed","Johann Sebastian Bach, German court organist, 18th century composer and early programmer, was born in 1685 into a large family of musicians mostly called Johann. An encounter with hierarchical structures while charting his family tree led him to Javascript as a general language for describing secular actions (like all good Lutherans of the time, he acknowledged that /heilige Handlungen/ should be carried out only by members of the priesthood), but as the sophistication of his requirements increased across the course of his life, he was driven to create idioms that would lay much of the groundwork for future developments in the language.
+
+Participants in this very special JS Bachshop will have the opportunity to consider the use of motifs to ease maintainability, the difficulties of using callbacks to implement counterpoint, recently-unearthed innovations in Baroque-Driven Development, and just how far you can stretch a single pun. Audience participation recommended, and will probably involve singing or pretending to be the Elector of Saxony. May contain more music than Javascript, anecdotes about fainting trumpeters, and a diversion into ways of rehearsing the dissonant call of “Barabbas” in SMP 54.
+
+[10 minutes feels too short, 30 minutes too long. So I'm guessing there'll be 20 minutes of puns, improvisation and snippets of St Matthew Passion, followed by 10 minutes of whatever comes to mind, such as audience questions, more puns, more improvisation and maybe whatever the Javascript equivalent of the Goldberg Variations are. However I could happily do a 10 minute thing, since I can't guarantee at this point that there'll be any actual learning involved.]",30 mins,f,f,talk,some,,
+41,Disruptive disintermediation: selling open digital health services to the NHS,"It's sad when the technology you have to use at work is broken and you have no means to improve it. I'll provide a short update on progress made in the campaign to make NHS IT less bad. Observations on open source, open governance, and disruptive disintermediation included.",< 10 mins,f,f,talk,none,,
+42,Pacman! On a Sphere!,"I've written a version of Pacman that is played on an actual real-world sphere. 4 projectors set around the equator like satellites project onto the sphere, giving a complete projection on its surface.
+
+So... the pacman game is played with the player running around the sphere trying to find all the pills, whilst up to another 4 players play the ghosts trying to hunt him down.
+
+",,f,,installation,,,"It depends on the size of the sphere, but expect about 5m x 5m for a projection onto a sphere about 2m in diameter."
+43,Hands-on nanotech,"Bring nanotech to the people! We're a bunch a physics phd students/professors that want to come to the festival an organize a little bit of outreach. We are thinking of remote controlling a scanning electron microscope, so that people can zoom in on nanostructures and biological samples (think gold coated fly) down ~20nm. We've also bring some laser to play around with. We'd just need a table with power I reckon.",Half a day to a full day,f,f,workshop,,20-50 people?,
+44,Music and passion and frequency bashing,"Hi Guys,
+
+A good friend of ours Richard (He built the red ghost in the pic on your website) told get in touch. We would love to come along to EMF lean some new cool things between music and hacking in return we would be happy to offer music for some night time celebrations.
+
+Here is a couple of links to who we are are and what we do,
+
+https://soundcloud.com/sub-secret
+www.facebook.com/subsecret
+https://www.youtube.com/channel/UCl0xhhpAkAae_j3KIRkcEjA
+
+Obviously we know it is very last minute - but blame richard for being a poor promoter :P
+
+Mark & Steve
+Sub Secret",All night long - or as long as you would like,f,f,workshop,,Everyone,
+45,Wanted! More graduates with skills in Computing and Electronics. How do we get there?  ,"There are great careers to be had in embedded computing and the demand for graduates is set to increase dramatically as we move towards the Internet of Things (IoT).  We know that there are exciting opportunities for these graduates, so what's turning them off the subjects in school? How can we encourage young people choose computing at University?  Let's discuss!
+",30 mins,f,f,talk,some,,
+46,Why risk it? Functional programming on the clientside code with Fay and Elm,"Javascript is often touted as assembly for the web; why deal with its problems, when we can compile to it? In this talk we'll look at Fay and Elm, functional programming languages that help make our code safe. ",30 mins,f,f,talk,some,,
+47,Cryptris: explaining cryptography to non-specialists through playing Tetris,"Developed alongside PhD research into a new cryptographic protocol, Cryptris is a game that seeks to explain to the public the principles of asymmetric cryptography (in mathematical terms as well as in outline). The game explains the concepts of added randomness, cyclical operations and addition graphically to show how keys unlock messages.
+
+The talk would move from the need for crypto (briefly!), the need for tech folk to do a better job of explaining it, how this system represents it and perhaps round off with a bit about the new crypto protocol that was developed alongside it (lattice based crypto). The game and protocol are available open source. No special resources are needed apart from the facility to display slides.
+
+Cryptris here: http://inriamecsci.github.io/cryptris/
+
+I'm not the person who came up with this: unfortunately they are now based in the US and we reckon you can't afford to fly them over. However, I've got an EMF ticket and have been working on the translation of the game and accompanying articles with the team. I've been working in science communication around six years with a focus on tech, physics and engineering, so my maths and understanding can keep up. We're working on the talk together and the lead researcher will be happy to answer any questions arising that I can't take myself.
+",10 mins,f,f,talk,some,,
+50,Nuclear Poker Bunker,"A half-size Hexayurt Quad Dome, within which people play Nuclear Poker, a card game designed to teach Generals too young to remember the Cold War about Mutually Assured Destruction.",,t,,installation,,,~10ft diameter
+51,"How-to synergise your JavaScripts: featuring CRDTs, Merkle trees, zippers etc.",I will show-and-tell my collaborative programming hobby project.,10 mins,f,f,talk,some,,
+59,Architecture of an open government system for real democracy and transparency.,"Presenting and discussion of an open source society operation system which does not need a static hierarchy nor empowering people on a fixed period of time.  #democracy #responsibility #solution_for_peaceful_transformation #finance #economy #knowledge #global_exchange
+
+Target of the talk: Planting a seed for a vision of a responsible democratic society where money and resources serve our needs and providing value for the community is rewarded.",45 mins,f,f,talk,some,,
+60,Awesome tools for programmers,"Over the years I've perfected and changed my workflow on an almost daily basis, and discovered a lot of tools and patterns that helped me become a more productive programmer and a better startup kid. My talk would be a summary of all these tools, comparative pros/cons, real world use cases and experiences from both high traffic production environments and low traffic startup projects.
+
+My experience comes from 8 years commercial, of which the last 2 years have been spent learning from some of the best in the industry and being more heavily involved in Open Source. Feel free to check my linkedin/blog;
+
+http://iops.io/
+http://uk.linkedin.com/pub/cal-leeming/5/391/380/
+
+I've done public speaking about security and vuln disclosures before, but this will be the first time I've talked about this topic. You can see some of these on YouTube, but they are quite old and cringe worthy!",45 mins,f,f,talk,some,,
+61,A Practical Approach to Security Research,"Description:
+
+I've been doing research into various aspects computer security for most of my life. By day, I am lucky enough to work as the head of research for MWR InfoSecurity, doing research into new technologies, and supporting colleagues doing research. I also spend a fair amount of my time encouraging research as part of the culture of the company, and developing and educating people on how they might be able to improve their approach to research.
+
+Rather than give a technical talk about computer security research (although I might use some technical examples during the talk), I would like to talk about methodology, and how I approach new topics. This has changed dramatically for me over the years, and I'd like to present the refinements I made along the way. Most of the key points of this talk are likely to be ""common sense"", but I find it useful to hear them from someone else, as taking your own advice can be challenging while in the middle of trying to solve a particular problem.
+
+Some of this talk is likely to relate to topics outside of computer security, and I hope that people who might attend this talk will leave feeling less intimidated about the prospect of doing research into areas they are not familiar with, whether this is computer related or not.
+
+A brief outline:
+- Choosing a topic (specific implementation vs technology)
+- Defining ""success"" criteria
+- Reviewing current work
+- Gathering information
+- Tooling (existing vs bespoke, programming language choice)
+- Documenting findings
+
+At the end of the talk, I will present the outcome of some of my own research. This is partially because they are good examples of how research can be fun (e.g. implementing a Flappy Bird clone that runs on a mobile payment terminal - http://vimeo.com/89924160), and also partially to show people that behind the flashy demos (which is usually all that the public sees) there is often a structured and well thought out research project, which was equally important to the success of the research than the technical skills being demonstrated.
+
+Resources Required:
+
+Projector, Mini DisplayPort / VGA input",30 mins,f,f,talk,some,,
+62,We are a group of Cambridge students making mobile software and fingerprint scanners for low-cost patient identification in the developing world,"SimPrints is social start-up, developing identification solutions for the most challenging environments on the planet. We are a group of enthusiastic students pulling all-nighters with hackers from Makespace in Cambridge.
+We have developed a rugged, low-cost, portable fingerprint scanner and software that integrates with almost any existing mHealth application, allowing for real-time identification and access to patient records.
+We’re going to present our story, beginning as clueless students who managed to build a prototype from scratch in less than one year. With almost no money we tested it in the remote corners of Bangladesh, working with the largest development NGO in the world.",10 mins,f,f,talk,some,,
+63,Arduino Programming with your TiLDA 2 badge,"Using the TiLDA 2 badge, a simple introduction to Arduino programming.
+Serial comms, controlling RGB leds, reading joystick etc.
+All dependent on final badge hardware.","30 minutes maximum, including installing Arduino IDE.",f,f,workshop,,Not sure. 15 sounds reasonable?,
+64,The answer to 'too much debt' cannot be more debt, so 'tweaking the banks' won't fix capitalism or save the planet, A Crisis Postponed!,"Capitalism is in ""ICU"" across the entire OECD (viz 0% interest rates & huge money printing)... just because we are used to this new normal doesn't mean the problems are fixed ... Politics is being played out rather than Capitalism being practiced... and this hypocrisy is likely to be tripped up by external factors such as another oil price spike.
+
+As a former (and always sceptical) banker/capital & derivatives markets trader, I have an insider's commentary to offer and can answer most questions in plain English",45 mins,f,f,talk,some
+65,Living disastrously: The science of emergency management ,"There are a multitude of reasons why disasters happen. However, there are literally thousands of great scientists out where who could collaborate to improve disaster risk reduction globally.
+
+I'm an expert in modelling vulnerable populations for nuclear emergency planning, and I love to talk about the technology behind disaster management, and to get people who love science and technology enthused about ways that they can contribute with open source applications!
+
+Find out more about my work, conference schedule and research interests at:
+
+www.radpop.co.uk
+http://www.southampton.ac.uk/geography/postgraduate/research_students/rm16g12.page
+
+
+ ",30 mins,f,t,talk,some,,
+66,10 commandments of starting a Hackerspace,"Hackspace evangelist, Nottinghack founder, podcaster and blogger Dominic Morrow passes on 10 DOs & DONTs for starting your own Hackerspace. Over the last 3 years Morrow has visited most UK Hacker & Maker Spaces speaking to the founders and members, following the mailing lists and dispensing his dubious wisdom or upsetting people by telling them they are ""DOING IT WRONG"". ",45 mins,f,f,talk,some,,
+67,Using your TiLDA like an Arduino,"Bring your EMF camp badge the TiLDA and your laptop with the Arduino programming environment to this workshop to learn more about Arduino, programming and using your TiLDA!",30 minues +,f,f,workshop,,10 - 20,
+78,Off-grid solar photovoltaics hands-on workshop,"This will be a hands-on workshop covering the basics of solar photovoltaic power. It will include solar PV ratings, load calculation, system design and battery bank sizing.",1 hours,f,t,workshop,,20,
+68,Amateur Radio: The Original Nerd Hobby!,"I work in technology, giving product roadmaps and technology futures to clients every week sometimes traveling thousands of miles to talk. However, after hours, I find great satisfaction entering an aspect of  the past and exploring the elements of how we communicate: radio!
+
+It's the culture that evolved nerdiness - let's explore our roots and why it still exists!",30 mins,f,f,talk,some,,
+85,DIY Physio for Geeks,"We spend so much time hunched over keyboards, our backs take a lot of pressure where the muscles aren't built for it. This hands-on workshop will cover a quick introduction to the muscles in the back and a hands-on, do-it-yourself guided exercise to release the muscles in your back and neck. Each person works on their own; tennis balls will be provided.  (Also, note to organisers: we'll need a hard and relatively clean floor to lie down on.)",45 mins,f,f,talk,repeat,,
+69,The Kinematocinegraph: Silent movies in the woods.,"A projector, a bedsheet, and a silent movie evening in the woods.  It's a chance to see silent movies with no sound, a chance to sit out in the night air and enjoy flickering images, a chance to relax.
+
+It's a small projector held in an engraved wooden box, placed on an antique tripod and pointed towards a white bedsheet hanging up between the trees. The projector is filled with silent films from Archive.org, and you can sit, relax, and watch films for as long as you like.",,f,,installation,,,"Size can be anything, as long as it's in a place kind of dark, kind of quiet, and has the ability to string up a bedsheet"
+71,Hacking the ZX Spectrum and a bit about the Ben Heck show,"Ben'll be presenting his ZX Spectrum mod, along with talking a bit about himself and how he got involved with element14 and discussing his other mods that he presents on his youtube channel. This topic is subject to change.
+
+Ideally this would be given on the saturday if possible.",45 mins,f,f,talk,none,,
+72,DIY vermiculture,"Quick demo showing how to make a DIY worm bin and explaining why vermiculture is really cool and a great way to compost even for people living in small spaces. Not my original idea, but one I want to share as widely as possible, showing how it's easy to do worm composting for very little money (commercial systems cost £££s). We might have a small working bin to bring. If we can get tools people can make their own. ",30 minutes,f,f,workshop,,it's kind of in-between a talk and a workshop.,
+73,WTF IS ADHD?,"Little if anything would have been invented without ADHD.  It is estimated that 5% of the population have it.  Yet people with ADHD are usually either very successful or unsuccessful in society and yet there is very little support or accomodation for adults.  Little is understood about the condition and debate is ongoing as to what it is, it is often misdiagnosed or missed altogether.   This participatory workshop explores ADHD, the Integrated ADHD model, a little brain science, the medicalisation of difference, the paradigm shift currently occurring psychiatry, problems with the reductionist approach to mental health, self identity, diagnosis,  ADHD in the workplace, strategies and tools.  We will use a virtual learning environment to support the course which will require pre-registration.  The course will be a shorten version of a six week course.  This is not a debate, it is a discussion.  Attendees are required to have lived experience (not necessarily a diagnosis).  Attendees are asked to maintain the confidence of the group.  Although there will be material presented and guidance through various topics, attendees are considered the experts and their ideas and insights sought.  ",two half days.,t,f,workshop,,Any.  Requires two modes of space. One where information is delivered to whole group and one where group can quickly split up into groups of 8 and discuss.,
+70,Make metal castings from 3D Printed Moulds,"(Repeat of talk I gave at OHM2013)
+
+Many people know about 3D printing now, or at least have heard of it. However the machines available to normal people are not capable of making anything other than plastic parts - which are sometimes quite fragile.
+
+Traditional metal casting can make parts of very high strengths, for use in structurally important areas. Turbine blades for jet engines, pistons for combustion engines and so on. Traditional metal casting requires expensive moulds to be created, which takes its use away from home-engineering for all except a few.
+
+However the two processes can be joined, to produce the mould from a home-made 3D printer for use to make traditional metal castings. In this way structurally useful parts can be constructed from equiptment with an expenditure of a few thousand euros.
+
+This talk will focus on the use of 3D printed parts to make investment castings in Aluminium.",45 mins,f,f,talk,repeat,,
+74,WTF IS ADHD? A review of a paradigm shift in psychiatry and wider society.,Attention Deficit (Hyperactivity) Disorder.  Who the fuck would want to identify themselves with that?  Is it more useful or much different than a high functioning autistism(HFA) label?  This talk explores the problems with the reductionist deficit based model of mental health diagnosis and talks about an alternative Integrated Model for ADHD.  The traits that occur together in people with 'ADHD' appear to be caused by a difference in executive function.  Understanding more about the executive function allows insight into the challenges faced by people with this condition.  However some of these traits such as deep concentration(hyperfocus) and creativity are highly valuable and therefore ADHD/HFA might be more usefully understood as a set of exceptionalities and not a medical disorder or a disability.    ,30 mins,t,f,talk,none,,
+75,Demoscene Showcase,Intro to the demoscene and the results of the demoscene competitions that have been going on in the village.,45 mins,f,f,talk,some,,
+76,"Rethinking Hybridity in Art, Science and Engineering, or: The Decade of the Creative Geek","With increasing importance of scientific progress and engineering, the last decade has also been an important one for the artistic side of our society. A separation of both arts and science seems no longer appropriate, at least from an artistic side. In this talk, I want to dive into my approach of combining worlds that did for a long time not seem to belong together, reflecting on art that stems from scientific research, scientific research evolving out of the arts and the anthropological questions that almost naturally evolve around this genuinely new field which is neither art, sciences or humanities, but something new, hybrid, and nevertheless important.",30 mins,f,t,talk,repeat,,
+77,How to use @Firebase for real-time communication between all your projects and devices in 3 simple examples.,"@Firebase is back-end as a service. They abstract common tasks like data storage, authentication, permissions, hosting... In 5 lines of code you can get started. BTW - no example will contain more than 5 lines as I increased the font size so you could see everything in details :)",10 mins,f,f,talk,repeat,,
+79,Pedal powered sounds and lights,"I will be setting up two pedal power generators (probably near the Nottingham hackspace village) which will power 12V loads - including a small sound sysem, a bubble machine and some LED lights in the evening.",,f,,installation,,,3m x 3m
+80,Back to Basics Radio - build a self-powered solderless receiver,"Using only basic parts we will build a simple ""crystal set"" radio receiver which requires no battery to operate. In keeping with the back to basics theme the design will (aim to) be solderless. As well as using off-the-shelf parts we may experiment with ""PoW"" style techniques and try alternative parts made from raw materials.",60-120 minutes depending on devel of experimentation.,f,f,workshop,,Maybe 20. Could do it more than once if sufficient interest.,
+81,Perfect session management in privacy-sensitive web applications: pitfalls and testing,"Web applications that provide sensitive data must have perfect session management. This prevents fixation, leakage and other security problems. In this talk researcher Elger ""Stitch"" Jonker will show what problems and solutions there are using web standards that work anywhere (aka cookies). Did you know that many frameworks are doing it wrong?",45 mins,f,f,talk,repeat,,
+82,USB tinkering for hackers and makers,"The security industry has exploded with USB research over the past few years due
+the the launch of the FaceDancer tool. Unfortunately FaceDancer is limited by
+speed, complexity and cost. To avoid these limitations we have written USBProxy,
+an open source software tool targeted at cheap hardware, such as the BeagleBone
+Black, which allows us to build, explore and break USB devices with simple
+software.
+
+I will show how we can use USBProxy to monitor and debug USB connections and how
+we can build a USB device in software using £35 of hardware. There will be as
+many live demos as I can fit in the time.
+
+Outline of talk:
+Introduction
+ - Me, USBProxy, etc
+ - USB
+ - USBProxy
+
+Monitoring USB traffic
+ - Viewing packets
+ - Debugging connection problems
+ - Man in the middle attacks against devices (keyboard, mouse or flash drive)
+
+Writing devices in software
+ - I'm working on a meta-device that will use Linux device support to create a
+   generic driver for Windows/OSX systems. This is specifically aimed at WiFi
+   drivers.
+
+I will happily break this out in to a workshop afterwards for anyone who brings
+along a BeagleBone Black, microSD card, network cable, etc. Failing that, I'll
+be around site all weekend and always happy to talk to people about it.",45 mins,f,f,talk,some,,
+83,"The other IT for Europe: The 13-yr, 1 Trillion Euro policy failure that cost us our privacy. And what to do about it.",Beamer and possibly microphone depending on size of the gathering.,> 45 mins,f,f,talk,repeat,,
+84,The Dilemmas of Sci-Fi (And How They're Dealt With),"Featuring some of the more well-known science-fiction shows such as Firefly, Stargate and Star Wars, I will explore some of the dilemmas featured, such as whether it is right to kill a man to secure a nation's peace, is it right to let many die to save the life of one and what ethical theories are used in these pieces, such as Utilitarianism or Kantian ethics. I intend to use film clips and presentation software, so a projector and speakers would be required.",30 mins,f,f,talk,none,,
+118,ntlk's engineering delights,My top 5 mega engineering projects,30 mins,f,t,talk,repeat,,
+188,Maker Education ,Short introduction about Maker Education and why we need school and library makerspaces for all,30 mins,f,t,talk,some,,
+86,"If you have lost your balls, how do you get them back?","In between geeking out, reading/watching Sci-Fi and working in IT I play golf.  Losing golf balls in a known region, but being unable to recover them because the grass/weeds/junk is too overgrown seems ridiculous, so why can't I build a sensor to detect their position accurately using X-rays, Ultrasound, Doppler effects or trained ferrets???  Help wanted!",10 mins,f,f,talk,some,,
+87,An Introduction to Glitch Art,"Glitch Art is the aesthetisisation of digital or analog errors, such as artifacts and other ""bugs"".
+
+Glitch artists intentionally attempt to cause errors in hardware (video mixers, audio players, mechanical/electronic toys) and software (media file formats, programs, codecs) to produce visually and audibly chaotic art.
+
+In this part theory, part practice 3-hour workshop participants will first be given a brief introduction into Glitch Art and its impact on art, music and popular culture. Participants will then have a 2-hour practice session where they will delve into the common techniques utilised by glitch artists.
+
+For the practical part of the workshop participants will need a laptop/computer (Mac/Windows/Linux) with the following software installed: GIMP, Audacity, a hex editor, and a good text editor such as Notepad++, Text Edit, Scite or Gedit.",3/4 hours,t,f,workshop,,15,
+89,Beyond Materials: Invisibility and Perfect Imaging,I will talk about my PhD which is on using metamaterials and transformation optics to create invisibility cloaks and perfect Imaging devices. (working invisibility cloak prototypes will not be provided),< 10 mins,f,t,talk,none,,
+90,element14's Ben Heck ,Ben discusses his vlogs for element14 and the ZX Spectrum hack build along with answering any questions that people have.,45 mins,f,f,talk,none,,
+93,"Holy Shit - Art, Science, Magick and Religion","An exploration of the relationships between Art, Science, Magick, Religion, and all-sorts.",> 45 mins,t,t,talk,none,,
+88,Sonification Studies,"Sonificaiton is the use of audio to convey non-audio data. This data can range from ordered data in a csv database file to unordered binary data from image files or random data generators.
+
+In this short demonstration I will give an insight into techniques that can be used to sonify data and how data can be sculpted to produce audio with musical qualities.
+
+This demonstration will culminate with a performance from myself that will use RGB values of an image as a source for audio.
+
+Further information on my approach to sonification can be read here http://www.hellocatfood.com/sonification-studiespixel-waves/
+
+This demonstration will require the use of speakers (enough for an audience to hear) and a projector and screen. There will be flashing images.",1 hour,t,f,workshop,,20,
+145,Privacy Policy Receipt: Get a paper receipt when you trade personal data for web services,"Signing up to a web service usually involves agreeing to give up some privacy - in some cases you are effectively paying for free services with your data. Wouldn't it be cool to get a receipt for this transaction, just like purchases in the 'real world'? This interactive installation will provide people with real paper receipts as a record of their consent and the privacy policy / terms-of-service agreement. Some of these will be very long!",,f,,installation,,,6'x4'
+91,Meteonome (provisional name): A musical performance controlled by the weather.,"The current plan is that this will take the form of a large white umbrella on a stand with guy lines to keep it upright. On the top will be an anemometer and various other sensors will be attached variously. RGB LEDs will illuminate the umbrella from below. A small computer of some kind will read the sensor data and use it to produce pleasant and interesting music from speakers either at the base or at the top under the canopy. The idea being that it's mainly heard by people standing under it. It will require a small amount mains power. It might connect to the wireless network, possibly providing access to its sensor data.",,f,,installation,,,"Probably about 2m diameter, and 2m tall."
+100,Introduction to Information Security and Privacy,"This workshop will give an overview of the range of threats from public and private organisations and the various measures to deal with them.
+
+You will be taught what tools to use (and not use) under certain conditions and how to overcome state-level attacks against your communications on a shoestring budget should you need it.
+
+While many of the threats to electronic communications have been discussed for decades, the revelations made by Edward Snowden last year have shown us the scope and scale of the intrusion on our basic rights as humans and journalists.
+
+Trainer: Arjen Kamphuis is co-founder and Chief Technology Officer of Gendo. (http://www.gendo.nl/en/blog/arjen) since 2005. Previously He worked for IBM as IT architect, trainer and IT strategy advisor. As CTO of Gendo he advises several national governments, non-profits and Fortune-500 companies on technology-policy. Since 2009 Arjen has been training journalists, politicians, lawyers, human rights workers and whistleblowers to defend their communications and data from government or corporate intrusions or manipulation.",45 mins,f,f,talk,repeat,,
+101,Security Zone: hands on lab - bring your own laptops!,"For those of you who attended the introduction to basic theory to privacy and encryption or those who simply want to tool up, come and set up various tools to browse anonymously - being aware of the metadata you leave behind, chat and mail with encryption and prevent data-loss from theft/confiscation of laptops and storage media. This will include the TOR-browser, Truecrypt, GPG, mailcrypto and other tools time permitting.
+The software tools that will be shown and used are all free, open source tools and will work on Windows, Mac and Linux laptops. They will not work on iPads and Android tablets. Please bring a laptop you are able/allowed to install software on.  ",2 hours,f,f,workshop,,20-25,
+92,BarBot - a cocktail making robot.,BarBot is a machine which takes drinks orders and then makes the drinks. Think more of a Heath Robinson / Rube Goldberg type device than an android bartender. Requires mains power and shelter from the elements. Plan was to put one of the Nottinghack village tents.,,f,,installation,,,1.5m x 1.2m x 60cm - full tressle table + ingredient storage space
+94,5 Scientific Tools That'll Blow Your Mind,"Back in the days when I was a professional, card-carrying scientist, I was fascinated by the various tools that were being developed to measure very small things, very precisely. This talk covers some of the ones that really stuck, the ones that make you go ""Really?? That's possible?""
+Likely to be covered (list subject to change for timing):
+- NMR
+- Gravitometers
+- Mass Spec
+- AFM / MFM
+- Crystallography",30 mins,f,f,talk,some,,
+95,The Making Of The·Grid,"We'll talk about the planning, design and construction of The·Grid, a large light and sound installation at EMF. We'll share a few stories from its development and talk about how you can write your own code to run on it, with examples.
+
+We'd like to run this talk on the Saturday so that people have a chance to then write their own patterns for Saturday and Sunday evenings.",45 mins,f,f,talk,some,,
+96,An Introduction to the STM32 by way of Digital Signal Processing,"The STM32 is a family of microprocessors which have become very popular recently. For the price of the AVR that powers an Arduino, you get a 32 bit CPU running at up to 168MHz, many kB of RAM and flash, and a huge suite of advanced peripherals. This talk will cover the basics of the STM32 and its peripherals, and then briefly cover its application in a digital signal processing application - decoding radio telemetry from a high altitude balloon. There will be a workshop at the HAB village later where you can get help setting up and using an STM32.",45 mins,f,f,talk,repeat,,
+97,High Altitude Ballooning,"We'll cover all the basics of high altitude ballooning and share some stories from years of HAB experience. Designing your own flight, what you'll need, things to consider, and top tips to ensure a good result.
+
+As an added incentive, we'll be assembling and launching our own high altitude balloon right after the talk! Come and see a real HAB launch and stick around to watch us track it and receive telemetry live.",45 mins,f,f,talk,repeat,,
+98,"skeuomorphs - or how to reinvent a wheel, differently.","What they are and how skeuomorphs influence design, using examples from ancient architecture (marble column surface emulating tree bark), early electric switches like gastaps, to software interfaces copying analogue dials. A projector and screen would be useful but I could manage naked, ie no props...",< 10 mins,f,f,talk,some,,
+99,Build your own quadrotor from scratch,"This is a talk about building UAVs, in particular quadrotors, from scratch, in an age where it's easy to buy them ready-made, or in kit form where you just have to plug a few components together. Quadrotors present several interesting challenges, especially in the area of flight control, and there's a lot of experience to be gained from taking on the challenge of building your own, solving the problems you encounter along the way and the thrill of getting your own creation flying for the first time.
+
+My aim is to give an insight into what's involved in building your own quadrotor, to show people what's possible, and to inspire people to have a go themselves. I also hope to give other people an appreciation for what goes on inside a quadrotor, and I aim to give everyone an appreciation for the safety issues involved and how to mitigate them.
+
+Requirements:
+
+I will need the usual stage, microphone and A/V for slides/video from my laptop. An audio connection from the laptop may be useful, but is not essential.
+
+A table or some other surface on which I can place some visual aids would be useful, but is not essential.
+
+Providing that I haven't crashed it by EMF, I will have my own quadrotor on show. If the stage space is big enough to do it safely, I may consider a short flying demonstration on stage. This obviously depends very much on the size and safety considerations of the stage area, so this part is strictly optional.",45 mins,f,f,talk,some,,
+102,telling stories about tech,"My job this summer is to find, tell and find new ways to tell stories about people and tech. So here are a few of my favourite stories, and some thoughts on the ideas about tech we embed when we try to tell stories about it. ",30 mins,t,t,talk,some,,
+103,8 bit vomit [Gleeeetch] ,"Chiptune glitch art and music pop-up event/ workshops and mini market.
+It might sound like a crazy idea but why not to have a fun and at the same time educational corner filled with chiptunes and workshop  [e.g. glitch art, chiptune music making,]  and a hardware jewellery stall?
+
+Artists involved - to be confirmed quickly very soon [its a last minute idea as i have only now discovered it]
+
+I have been organising 8 bit vomit events in London and have good connection with artists and apparently there will be loads of new peolpe willing to participate and perform. I bet also people from other chiptune collectives around uk... I am aware that its a non-profit event ;)
+
+Let me pls know what you think of this meta bash at your party?:P As i think its a perfect environement and audience for that sort of music and stuff.
+And if there will be opportunity to use your sound equipment [otherwise i shall be able arrange it]
+
+Here is the lilnk: www.8bitvomit.tumblr.com or www.levistova.com",5 hour [?] ,t,f,workshop,,tbc,
+104,A Cook's Tour of the Semantic Web,The semantic web is set to change the way we store and interact with data. This is a primer explaining what the semantic web is and the linked data technology that it is based on. ,30 mins,f,f,talk,none,,
+105,How to catch a cat burglar with a Slice of Pi,"I'm new to the Raspberry Pi. This is the story of how I embarked on a project to catch fly tippers on our local farms, but got distracted trying to frighten kids at Halloween, and discovered I'm  feeding the local feline population.",30 mins,f,f,talk,none,,
+108,Coding a new generation. How to run a Code Club,Find out whats involved in running a local Code Club for primary age school kids. I will cover lessons learned in getting kids switched onto programming and making. How to extend the Code Club curriculum with simple robotics projects based on the Raspberry Pi and Arduino. Using a Makey Makey to create a banana keyboard. See the games and robot developed by the boys and girls at the local Code Club that I run in the North East of Scotland.,45 mins,t,f,talk,repeat,,
+117,"An unofficial, inappropraite tour of EMF; who made it happen, how and why.","to give attendees some insight into how the camp comes into being, i intend to lead them around the site on a bumbling tour, pointing out bits of information so far only privy to the volunteers who organised it.",30-60mins,f,f,workshop,,max 10,
+106,"BaseBot - cheap, mobile, open source, physical computing platform for education (and fun!)","The BaseBot is a set of laser cut templates, circuit boards and easily sourced standard hardware which acts as a base for experimentation and education with mobile physical computing. I've been developing the base chassis for the last year or so, with the hope that it would be possible to build activities and lesson plans around the project. This talk is an introduction to the project and a call for further involvement, in particular for those with an interest (professionally or otherwise) in education.
+
+In principle a lesson plan using the BaseBot could encompass aspects from visual design, through mechanical assembly and fabrication of custom parts, electronics and software. The complexity could range from very basic - create goggly eyes, make custom graphics, use an existing circuit to drive the robot around a course, to very involved - design and fabricate custom PCBs, modify the laser templates, implement sophisticated GPS and sensor driven navigation, make a system to drive around the space and tweet any unusual temperatures and so on.
+
+I'd love to have more people involved, whether that's making copies of the robot and refining the design, or attempting to create a set of lesson plans to simplify its use in schools.
+
+The BaseBot has a blog at http://basebot.org, and I'll bring along a few robots to play with as well. All templates, pcb layouts and software are open source and will always remain so.",10 mins,f,f,talk,some,,
+107,How to build a low cost Underwater Robot controlled by a Raspberry Pi,"Talk about how to Build a Raspberry Pi based low cost underwater Robot. I will cover components, lessons learned and tips on how to build your own. Based in the North East of Scotland I've been building Underwater Robots for the past four years. My first robot was built from plumbing parts and used an Arduino for control. I next built an OpenROV http://www.openrov.com which is an open source project based on a Beaglebone. My latest Robot which I am currently designing and building uses a Raspberry Pi. I'm a regular exhibitor at Maker Faires throughout the UK. My personal website is http://www.caggy.co.uk and I blog at http://underwaterrov.net",45 mins,t,f,talk,some,,
+109,How to be an Effective Terrorist: fear and loathing in cyber security,"The biggest problem facing cyber security is the fear. Too often the cyber security industry trades on the threats that lurk and the low level of understanding and awareness that most users have (and I say that as a cyber security consultant…). The average user, meanwhile, is aware that there are dangers in cyber space, that there are ‘hackers’ who can ‘steal’ their information, but they do not know how that really happens or why they should, for example, have strong passwords.
+The problem with fear is that, so often, it is not empowering. Fear is undermining, off-putting and breeds insecurity. Literally, in this field, fear causes cyber insecurity.
+This talk borrows from psychology and sociology to argue that if we want better cyber security, we have to connect the dots for people to enable them to control the dangers online and not simply the fears. Rather than simply scaring people with the threat, we need to explain how what they do fits into the bigger picture and, most importantly, we need to give them a clear map of good behaviours.
+",45 mins,f,f,talk,repeat,,
+110,2xAA plays his Game Boy (live chiptune performance),"I would perform and talk about the music I create on my Game Boy. The genre of music is called chiptune and also there are some crowd interactive visuals I've written to go along with my set.
+To do the performance I'd require some large speakers to play sound from and a microphone to talk into. Also for the visual section a projector + screen (ideally projected directly onto myself).",45 minutes to an hour.,t,t,workshop,,∞ or the capacity of the performance area.,
+111,An Operator's Guide to the Enigma Cipher Machine,"Simon Singh, bestselling author of FERMAT'S LAST THEOREM & THE CODE BOOK, discusses the German Enigma cipher machine and how it was cracked during the Second World War by British codebreakers at Bletchley Park. This talk will include a demonstration of a genuine Enigma cipher machine. Simon will also discuss the history of encryption from Ancient Greece through to the Information Age.",45 mins,f,t,talk,repeat,,
+112,Laughter yoga, acting the fool has never felt so good! The quickest way to lift your mood and get high!,"Laughter  yoga is basically a series of silly exercises and deep breathing designed to relieve stress, feel happier, feel more positive and energise the body. Once any initial fears are overcome, it can help you feel more confident and relaxed when interacting with others.
+Even if you don't feel like laughing, playing along will soon trick your mind and have you laughing for real. I will teach you how to laugh like an alligator, blow yourself up into a laughter balloon, put on a laughter suit, find your laughter spot, get your whole body to dance to the rhythm of your own laughter!
+No previous experience required - just a willingness to take part - bring the body, the mind will follow! This is not typical yoga, there are no difficult poses to do and no need to bring a mat.",1 hour,f,f,workshop,,5-50
+114,Running Independent Maker Events,"This talk is a call to action for all the organisers, makers and attendees who go to Make Media's Mini Maker Faire events.  ",10 mins,f,f,talk,none,,
+115,Not Safe For Work: Industrial Control System Security,"Infrastructure supports people, and it needs maintained and secured. The speaker has over 15 years in security, with 9 of those in SCADA. Come learn about the challenges of securing control systems, and how you can help no matter what your background. You will laugh and you will cry, and we'll give you the whole seat, but all you'll need is THE EDGE.",30 mins,f,f,talk,some,,
+116,The Duffin and Ashton Superlative Camera Obscura,"The Duffin and Ashton Superlative Camera Obscura is part of a five year plan to build a permanent Camera Obscura somewhere in Birmingham. For now, we have build a rickety but charming portable camera obscura (think wheelbarrow) which we have been wheeling around the city, raising both questions and eyebrows. We both have a love for photography and for opening the eyes of those around us and hope to intrigue a whole range of people with this structure. The portable camera obscura is build from a wooden frame, blackout plastic, old bicycle wheels, a bathroom mirror and several rolls of duct tape.",5 hours ish,f,t,workshop,,"We plan on wheeling it around, or having it situated so it is available to visit. Not sure if it counts as a demonstration or installation, so attendees aren't really limited. We'd like to attend for more than one day but there is another event that weekend we'd also like to show up at.",
+119,Practical experience with DALI lighting control,"DALI (IEC 62386) is a standard for intelligent lighting control that promises a lot — dimming, colour changing, fault reporting.  Last year I installed a DALI lighting system in a pub in Cambridge.  Here's what I learnt from the experience.",10 mins,f,f,talk,some,,
+120,cyber sound and neuro noise ,"workshop about diy electronic sound devices, oscillators, plasma loudspeakers, and renewable energies. the circuit built resembles molecular structures that can be found in universal processes and neuroscience brain waves senses. ",< 10 mins,t,t,talk,repeat,,
+121,Bluetooth Low Energy Hacking,"As a continuation of our http://www.openbeacon.org/ and http://www.openpcd.org/ projects we created new hackable active RFID tags (ARM Cortex M0 based) with Bluetooth Low Energy support. The Nordic Semiconductor based nRF51822 chip allows access to the packet layer and allows full control over frequencies and timings.
+
+Contrary to other designs that are based on the nRF51822 we're not using the vendor provided SoftDevice (binary blob providing a BLE API), but created our own bar-bone implementation running on the bare hardware.
+
+We released the code under https://github.com/meriac/openbeacon-ng and will announce the new tag soon.
+
+The talk will give a brief introduction of the BLE protocol and dive into some interesting example applications like simultaneous emulation of 100's of tags and active distortion of iBeacon tracking systems.
+
+We plan to provide a corresponding BLE Hacking Workshop (over the whole duration).",45 mins,f,f,talk,some,,
+122,OpenBeacon BLE Hacking Workshop,"Hands-On-BLE hacking workshop using the new nRF51822 based OpenBeacon.org BLE Tags (see corresponding Talk).
+The format would be more a ""BLE Hacking Village"" where people will attend whenever they feel like it and for how long they want, working on that stuff and get support from me. We did a similar thing with the OpenPCD/OpenBeacon project on the last CCC camp (RFID Village) - it turned out to be a successful format.
+
+Is it possible to get/rent a tent with hardfloor, tables  and chairs for up to 10 people (probably around 5x5 meters size or larger), power and Ethernet?
+",3 days,f,f,workshop,,5-10,
+123,Mesh Your Brain: Simple EEG + Networked Robots,"First, a quick overview of current hacker-friendly EEG systems. Then, a more in-depth look at how to hack together a robot army with the NeuroSky MindFlex and a Pinoccio microcontroller.",30 mins,f,f,talk,some,,
+124,Instant Wireless Mesh-Networked Hardware with Pinoccio (Demonstration),"I'll show you how to build pieces of hardware that respond to each other over low-power radio, and to the Internet via WiFi. Q&A after.",20 minutes,f,f,workshop,,50 (depending on the surroundings: is there a podium? a table? a stage? a microphone?),
+125,Where Games Break,"A gently performative, slightly poetic talk on the ways games break; in personal and political, difficult and perfect ways. (about 15-20 mins) Full text: www.hannahnicklin.com/2014/07/where-games-break/
+
+Comes with slides, and me, and some paper with the words written on which I drop as I finish reading each page. Just because it's a small nod to the cracks between things.
+
+I did this at Feral Vector and it went down quite well. I'm not sure on some of my answers to the question below on the days I can attend btw. I may only be able to do the 29th. I may be able to do all 3 days. It all depends on another piece of work. Sorry for not being certain.
+
+Oh and I do mean it about the financial support thing. Sorry for being poor. ",10 mins,t,t,talk,repeat,,
+126,"Why are computers so @#!*, and what can we do about it?","Computers have become ubiquitous and essential, but they remain
+massively error-prone and insecure - as if we were back in the early
+days of the industrial revolution, with steam engines exploding left,
+right, and centre.  Why is this, and can we do better?  Is it science,
+engineering, craft, or bodgery?
+
+I'll talk about attempts to mix better engineering methods from a
+cocktail of empiricism and logic, with examples from network
+protocols, programming languages, and (especially) the concurrency
+behaviour of programming languages and multiprocessors (from the ARMs
+in your phone to x86 and IBM Power servers), together with dealings
+with architects and language standards groups.
+
+(For more details of the underlying research and the many people
+who have contributed, see: http://www.cl.cam.ac.uk/~pes20/)
+
+
+Requirements: I might have to arrive late Friday and leave late
+Saturday, so scheduling on Saturday would be good.  I imagine a 30
+minute slot would fit your schedule best, but it could be longer if
+you prefer.
+
+I've not given this exact talk before, but I've given related talks
+for both general, industrial, and academic audiences many times.
+",30 mins,f,f,talk,some,,
+127,The three main parties railroaded the Data Retention Act through in a week. Where does the fightback begin?,"The three party leaders made a secret deal to pass the Data Retention and Investigatory Powers Act in less than a week. Using the overbearing power of the executive, a legislature agreed legislation that allows the security services access to your entire data footprint for a year. Faced with such a blatant display of political muscle how does a concerned citizen fight back? I don't have all the answers but I have a few ideas. ",30 mins,f,f,talk,none,,
+128,Why fantasy is the key to motivation and creativity,"With the aid of unique hand-made 8-bit slides, I will be discussing my relationship with technology, motivation and creativity, what possessed me to write a branching narrative novel, and the value of fantasy in overcoming difficulties.",30 mins,t,f,talk,some,,
+129,asd,asd,< 10 mins,f,f,talk,none,,
+130,@Raspberry_Pi's creative producer @RachelRayns talks about personal R&D project: Zoë Star, Neurotic #IoT Machines from an Alternate Reality,"Rachel will introduce you to some of the Zoë Star machines - satirical art works poking fun at Internet of Things, Quantified Self and Digital Natives whilst (hopefully!) creating some charming and inspiring interactive experiences.",10 mins,f,t,talk,repeat,
+131,Video Editing 101: How to make your project look good on YouTube (or: How to lie with video),"""Hi guys, welcome to this video, my name's--"" Nobody cares.
+
+There are so many awesome projects out there that aren't getting the recognition they deserve because they're documented poorly. This is half an hour of quick tips to level up documenting your projects with video.
+
+(Skill level: novice to intermediate. If you know what an ""L-cut"" is without having to Google it, this is going to be way too simple for you.)",< 10 mins,f,f,talk,some,,
+132,The Live Evening Quiz Show: EMF versus the internet,"I have no idea what format this quiz is going to take. I do know that it'll be livestreamed to the web, and that players online, on the other side of the world, will be able to affect the game. Beyond that, I haven't worked the format out. IT'LL BE FINE, I'M SURE.",30 mins,f,f,talk,some,,
+133,"The digital democracy dream: could technology really improve politics, and if so, how?","I would like to give a talk about the ways in which the internet is being used all over the world by activists and others to try and win freedoms, and improve democracy. I would look at some that show exciting potential, but also at myths and areas where the internet could pose dangers and end up being anti-democratic. I would like to pose a few challenges for people to think about as well - problems that need  to be solved in this field eg mass debate moderation technologies. Finally I would like if possible to play around with some live voting exercises - my brother has already been in touch with some of you guys on IRC to discuss if this might be possible on your badges and if he might be able to help do this. I am the author of the book People Power: A user's guide to democracy in the UK, published by Transworld www.danjellinek.com/people-power",30 mins,f,f,talk,some,,
+134,"Surface Mount Soldering - SMD by hand isn't hard, build your own Pisioersistence of Vn kit to prove it!","Surface Mount Soldering - Dispelling the often held myth that Surface Mount soldering by hand is hard. Build a Persistence of Vision kit to wave messages to fellow campers!
+
+We will bring soldering irons and tools, we just need some reasonably stable tables and 13amp power for soldering irons.
+
+Projector & Screen for presentation a bonus, but fine if not available.
+
+Cost to cover kit £8.",2 hours,f,f,workshop,,10,
+135,Evading Anti-virus,"A exploration into current techniques malicious hackers use to evade anti-virus systems, presented in a way that less technical attendees can still enjoy whilst containing enough detail to keep more experienced viewers interested.
+
+This research was initially conducted to assist the speaker in testing the security systems of companies as part of his day job, as a Penetration Tester. Through use of practical examples the talk shows how well known anti-virus systems can be bypassed and highlights current failings. The outcome was a presentation that highlights issues with current defensive technologies and aims to show ways in which system security can be improved in the future.
+
+The content can be altered to allow for a talk as short as 45 minutes, or 60 minutes if preferred.
+No specialist equipment is required, just a projector for slides and demo.",45 mins,f,f,talk,some,,
+136,"Underwater robotics, from commercial ports to water buckets","If we can get an extra ticket just a day ticket will do(One camp and one day total), then we can get my colleague Luke Speller of BMT group to do a joint presentation with me on our previous work with robotic fish in ports. The talk would be called ""from fish to manatees, the robotic creatures of the future"" This would include my research work too, both links:
+http://www.roboshoal.com/ also http://www.bmt.org/research/research-directorate/shoal/
+http://brl.ac.uk/researchthemes/biomimeticandneuro-robotics/de-mine2012-2016.aspx
+
+We are both quite experienced speakers, Luke is very experienced with press and large audiences,  I think the folks at the camp will enjoy our joint talk and the general discussion afterwards, there is a lot of hack-level and DIY underwater robotics which is more akin to the research side we will cover too, not just the industrial high end things.",45 mins,t,f,talk,some,,
+137,"Materials and Makers: Thinking about Processes, Products and Supply Chains","Additive manufacturing (3D printing) is opening up new opportunities to make complex or one-off objects. But makers need to think about materials: what materials can be used, how processing affects the properties, and the post-processing of fabricated objects. And thoughtful makers will consider the supply chain and the lifecycle of products as well: where do the materials used in 3D printing come from? What happens to them when they’re discarded? This talk will get you to think about what you already know about materials, begin to learn how the material properties change with manufacturing techniques, and encourage you to explore (and increase!) the range of materials you use.",45 mins,f,f,talk,some,,
+139,Futures of Sexual Healthcare and Digital Fabrication,"Description:  This workshop explores the future of sexual healthcare provision, and the role that digital fabrication (3D printing) might play in it. There’s a long history of localised grassroots innovation around sexual health, and lots of projects exploring what 3D printing has to offer to medicine and healthcare. In this workshop, we bring these two elements together. We’ll encourage participants to go beyond about just printing objects to consider what the qualities of digital fabrication - localisation, mass customisation, digital blueprints - could bring to sexual healthcare. Using foresight analyses, we’ll also encourage people to think about how social, political, and environmental factors might affect sexual healthcare in coming decades. We will use guided ideation to come up with objects, services, and scenarios for the year 2025. Participants will leave the workshop having thought and talked about how sexual healthcare might change in the next ten years, and having produced sketches, models, and other descriptions of their ideas and thoughts.
+
+Requirements: Worktables for participants (ideally tables that seat 4-6 participants). A projector and screen would be useful but can be worked around if not available. We will bring additional materials.
+
+NOTE: We would very much prefer to run this on Saturday or Sunday if possible.",90 minutes ,f,f,workshop,,25,
+141,Google Cardboard workshop,"I would like to run three one hour sessions to make Google Cardboard VR goggles.  I am sourcing the kits from wantcardboard (http://www.wantcardboard.com/), who are offering me 60 kits for just under £600. I would like participants to sign up and pay (£10 each, or possibly £11 to cover incidental expenses as well) in advance: can EMF arrange that, or should I?  I will know what other equipment I need once I'm able to assemble a test kit; at this point, I expect to need a strong white glue, which I can supply.  I discussed this proposal on the EMF IRC channel on 20th July (as espero).
+
+Risk factors: on 5th August, I go on holiday for two weeks; I had hoped to assemble the test kit before then, and place my larger order.  As I have yet to receive that, I may have to place my main order without first assembling a test kit.
+
+Thank you for your consideration.","1 hour x 3 sessions (29th, 30th, 31st)",f,f,workshop,,20 per session,
+143,What do we have in Computers?,"Not very long ago an idea in mathematical logic got instantiated inside a dumb machine that can do a few simple things very quickly.
+It is at once a machine, like the printing press but also a way of expressing ideas, like mathematics or musical notation. We are so early in the process of dealing with this invention/discovery that we confuse the tool and the topic - we call it Computer Science but it's like calling mathematics measuring stick science. What we have is a new way of unambiguously describing procedural knowledge and we have no idea how it will change our culture.
+At the moment there is a priestly cult around people who know the secrets, we are treated well because we are scarce - like scribes in ancient Egypt, and we are similarly instruments of power, can we afford to ignore it?
+But what happens when *everyone* can do it? What about when we can use it to learn other things the way we now read to learn about things we enjoy.
+
+I want to share my favourite examples of using computers to improve our understanding in ways impossible before, including
+ * pocket calculators vs slide rules
+ * computational geometry vs pencil and compass constructions
+ * exploring fractals in Logo
+ * 'Thinking on the page' - How mathematical notation makes calculation easier
+ * simulating evolution
+ * visualising equations
+
+As literacy became widespread the self-elected literary 'elites' wanted a way to separate themselves from 'the masses' (a concept they invented), is there anything we can learn from that transition?",45 mins,f,f,talk,some,,
+142,Programming for impostors and scientists,"A defence of shitty scientific programming. Probably illustrated with pictures of boats as a metaphor for learning via the medium of pain and one slide with manatees.
+
+I work as a scientist and had to learn to program on the job, after doing a biology degree that contained no maths or computational content. Last year I looked at the content for the same degree, ten years on and to my horror, it's exactly the same. Yet many biologists are expected to write or at least engage with software, usually learning these skills at the same time as being expected to deliver results and papers. It's easy to catalogue mistakes beginning programmers make, or to ridicule people's ignorance of tech and coding, but how does that help the situation? Is it the fault of the PhD student I'm working with that their code was full of filepaths that exist only on their own machine, because nobody pointed out that that was a problem?
+
+In this talk, I want to defend shitty programming that works-a Zen & The Art of Motorcycle Maintenance approach to learning, as it were. I'd like to outline some of the issues that scientists learning to code on the job might face, and also acknowledge how learning some software engineering skills will help your science progress faster and more reproducibly, with a few (not original) ideas about what those helpful things might be.
+
+Also may include a bit of a rant about the kind of comments that might make someone feel like they don't belong and a gentle nudge towards ways of encouraging learners.
+
+I also have some contacts/resources to share for anyone who might feel like they're in a similar situation (not necessarily in science, but any kind of job where your job title is not programmer, but you do some programming and permanently feel spread between different fields).
+
+Here, in case it's more coherent, is a blog post I wrote on this topic for a group called the Software Sustainability Institute: http://www.software.ac.uk/blog/2013-05-01-why-are-so-many-biologists-scared-programming",30 mins,f,f,talk,some,,
+144,"Surreal Numbers And Mathematical Games - Uppitiness, Atomic Weight and Chilling","John Conway created/discovered the Surreal Numbers (along with the game of life cellular automaton) while pondering the game of Go. They include all the reals and rationals you probably know but also infinite and infinitesimal values, lots of them.
+
+Combinatorial Game Theory is an additive theory of games with perfect information and no chance element. Fortunately, though it touches on things at the core of Mathematics, it requires almost no other concepts to understand it
+
+It turns out some Games are Numbers, however any Game that is interesting enough to be worth playing is not a Number. We need a new language to describe them (whence Uppitiness, Atomic Weight and Chilling).
+
+We will find out how to play the Nim perfectly, realise Dots and Boxes has more to it than you thought, play Col, Snort and Cutcake, understand the Tweedledee and Tweedledum argument, learn Hackenbush and maybe begin to analyse Go and chess end games.
+",45 mins,f,f,talk,none,,
+148,"Hexayurts, Distributed Infrastructure, and Maximizing Global Minimalism ","The Hexayurt Project is a good, solid ""libre"" housing project with > 1000 units deployed each year, mostly for Burning Man. However, there's more to the story - a transformation vision about how engineering ""outside of the market"" (like FOSS) can change the world in ways that markets cannot manage. Over three billion people live substantially outside of the market: where could they go with Open Source Appropriate Technology?",30 mins,f,f,talk,some,,
+149,"Using Node, Firebase and Arduino to log your IOT projects.",Because you want to know what's going on with your sensors. Because I'm a web developer and everything I do web orientated I've figured a nice / lean / interesting way of logging measurements. I'd love to share so you can be more efficient.,10 mins,t,f,talk,none,,
+150,My SNES and other animals,How and why I'm writing a SNES game in 2014.,< 10 mins,t,f,talk,none,,
+146,"Our Data, Ourselves","I represent the ""Our Data, Ourselves"" project at King's College London, (http://www.kcl.ac.uk/artshums/depts/ddh/newsrecords/2013/ourdata.aspx)
+but I am already committed to attending EMF as part of the Milliways village.
+
+Our project is concerned with the trail of data we leave behind us, particularly on mobile devices, how we can raise awareness and discussion of this, and put it to good use. To this end, we have developed an Android app that tracks, among other data, when apps open network network sockets.
+This has been done in conjunction with some teenage coders via Young Rewired State. They are already contributing to the app, and have started to examine the data they have generated. We will report on their attitudes to privacy, how the app works, and some preliminary results.
+",30 mins,f,f,talk,some,,
+147,"A look at Linux containers, what they do and what they don't","Deep dive into cgroups, unshare and other technologies in the Linux kernel used to create isolated containers (as used by Docker/lxc).",45 mins,f,f,talk,some,,
+151,Making music with iOS,"The iPad and iPhone are surprisingly capable devices for music making. Solo artists can use them to make full tracks anywhere, in any genre. Alex Pounds made a full album on his iPad this year; this workshop will take you through everything you need to get started. We'll cover how to make indie rock songs, electronic music, and chiptune using iOS, explore cheap & expensive apps, and see how to hook up instruments to the iPad.
+
+This workshop will be in the form of a 30-60 minute talk & demo of some of the apps, techniques, and hardware we can use on iOS to make music, followed by an hour or so where attendees can make their own music with access to help & advice.
+
+Workshop attendee requirements: an iOS device. Ideally an iPad, but an iPhone can also be used. Participants are welcome to bring other instruments if they have them. No prior knowledge or experience is required, either on iOS or in music-making.
+
+Presenter requirements: ideally, an Apple TV hooked up to the projector with some form of PA system. The iPad can be used to demo apps wirelessly via Airplay to an Apple TV; note that an Apple TV has an HDMI out and an optical out but no 3.5"" or phono plug output, so hooking it up to a PA system can be tricky.",180 minutes,f,f,workshop,,15,
+152,Vandalising your Github commit history for fun and profit,"Why would anybody feel the need to create a webservice for writing graffiti on a Github commit history graph, when there are real problems that need solving? Come and find out in this talk, which also features the Sinclair Spectrum font and a brief exploration of the Github API.",< 10 mins,f,f,talk,some,,
+153,Will Someone please think of the children! - Helping build the next generation of geeks!,"Description:
+Teaching Information-Security to young people at schools alongside
+conventional forms of IT, such as programming, isn't really happening at
+schools in today’s world. Couple this with the growing concern and the
+very likely possibility that there will be a shortage of security
+professionals in the future (did someone mention skills-shortage),
+something needs to be done. Two computer security students from the UK,
+Dalian Terry & Sam Sanoop, for the past year set up their own initiative
+ECPC (Early Computer Programming Club) which provides learning of
+programming fundamentals to children aged 6-10 as an after-school activity.
+
+What else do we teach a generation that has a better understanding of
+technology from a younger age? Our research, and working with schools in
+the UK, has taken led us to teaching young teenagers, some as old as 16,
+the basics of security as fun after-school workshops. Whether that is
+basic web application or network infrastructure security, they love
+levelling up their hacker fu.
+
+This talk focus on the journey that we have taken in UK schools with
+young kids and teenagers in the different areas of computing and
+computer security. We’ll present the questionable and admirable changes
+being put in place to national curriculum by governments, and how we
+should tackle a serious issue before it is sat staring us right in the
+face, alongside research we feel should be shared in the information
+security community. This talk also include many activities and resources
+we have designed and used.
+
+This talk will show how the 'lessons learned' within the UK can be
+applied to interested parties throughout Europe, and discuss our
+experience in this most interesting of journeys. If you have children,
+or are a educator of children, in fact have any contact with children,
+we are sure you'll find something of interest within this talk.
+
+Additional details: This talk is being submitted to Deepsec which we have a good chance of getting to talk. This talk is a branch of our talk we did at Bsides London Rookie track which can be found on YouTube. This was a really short talk for fifteen minutes which was from an original talk we did at uni for about 30 minutes, so it was really crammed pack with details to get our point across. This project is ongoing and we are going into schools to further our research for Deepsec talk. Hopefully we can build on this and further our talk by doing this at EMF Camp.",45 mins,t,f,talk,some,,
+154,Minimal effort web application security (a.k.a. how to make my job harder),"I spend my days breaking other people's applications. A lot of them are web applications. I used to be a developer, but I found that breaking stuff is much more fun than creating things to someone's specification. Normally, when I talk at conferences, I speak about how $thing is dumb and how I broke it using $exploit. This time, I've decided to jump back over the fence and give you creators some ammo.
+
+In this talk I will present a few quick tips on making your web applications more resistant to common attack vectors, without putting a lot of effort in. In some cases, simply adding a line to a configuration file can completely prevent entire classes of attack from being viable. We'll take a look at hardening against XSS, SQL injection, clickjacking, password cracking, and a few other bits if there's time. With any luck, you'll make my job a bit more difficult.",30 mins,f,f,talk,some,,
+155,IPv6 Beginners Workshop,"We will discover the new Internet Protocol learning about its basics, features and general handling. This workshop is targeted at beginners. Please bring a computer with VirtualBox installed. A basic knowledge about the Internet and IPv4 is recommended. Please also consider attending the advanced IPv6 workshop, if you liked the beginners course.
+
+Please download virtual machine images from the content server before going to the workshop!",180m,f,f,workshop,,6-8,
+156,IPv6 Advanced Users Workshop," We will dig deeper into the new Internet Protocol learning about its advanced features, about transition technologies and security issues. This workshop is targeted at advanced users or people who attended the beginners course. The workshop is based on the book IPv6-Workshop and further material from the speakers work as a consultant. A basic knowledge about IPv6 is required. Please also consider attending the beginners course if you do not have a basic understanding of IPv6 yet. Please bring a computer with VirtualBox installed.
+
+Please download virtual machine images from the content server before going to the workshop!",180m,f,f,workshop,,6-8,
+181,A brief guide to dog behaviour and human interaction,"This is a shortened (and adult) version of the talk I give children at primary schools for dog behaviour and communication.  The school course is primarily targeted at those afraid of dogs but is relevant to anyone looking to understand the basics of canine communication and how it affects their interactions with humans and other creatures.
+
+It is most beneficial for me to bring a dog but as I'm staying for the whole event (ticket already bought :)) I recognise that this would make things tricky and can run the talk without her.
+
+If I were to bring a dog I can run this as a longer term workshop if preferred.",30 mins,f,f,talk,repeat,,
+157,History of Rocketry,"This talk is one I've run for a couple of science fairs, including most recently the Winchester Science Festival.  It takes about an hour (I can go with your timings and can squeeze down to half an hour if need be) and is a mixture of a presentation with a screen, and physical demonstrations.
+
+We look at the history of rocketry over the last two and a half thousand years, from ancient Greece to the modern day.  Along the way we make an aeolipile, a gunpowder flash, and even set of a live hybrid rocket engine.
+
+I'm a schools science communicator. my website is www.out-world.co.uk
+My youtube channel is https://www.youtube.com/channel/UCLSQAP2QzKoW1jEuD5EeMXg
+
+A friend just posted a link to EMF, and I'd love to take part, as I only live down the road! This presentation burns through about £50 of materials for the demonstrations, I wouldn't be able to pay for a ticket, (you don't become rich doing sci-com) but I would be happy to do the presentation free of charge as payment in kind.
+
+Afterwards if you like, I could also run some rocket making workshops if anyone were interested. There are a few different ways of doing this depending upon the space available.
+
+My mobile is 07754527647, landline 01234 740 990 please get in contact because EMF sounds fantastic!
+",> 45 mins,t,f,talk,some,,
+158,"Tastes Great, Less Wordy: Document Natural Language Processing (for Beer)","Natural Language Processing (NLP) is among the oldest of Computer Science fields, dating back at least to the 1950s. In this talk I'll present a crash course in basic NLP, focusing on tools to perform document-level summarization and understanding. Specifically, I'll go through TF•IDF and topic modeling (Latent Dirichlet Allocation mostly). We'll use these techniques to make sense of the language people use on the web when describing beer. I'll introduce a dataset containing more than 3 million paragraph length reviews of 150,000 beers.
+
+We'll use this data to create a concise description for any commercially available beer. These descriptions will draw out the differences between the different techniques, at an intuitive level. We will then look at ways to quantify the distance between documents, which will then be used to show how similar various beers are. By the end of this talk, the audience should have enough of an understanding to use document-level NLP and be able to apply it to their own corpora of interest. And they may learn a few things about beer.",45 mins,f,f,talk,repeat,,
+159,Alex Through the Looking Glass: How Life Reflects Numbers and Numbers Reflect Life,What's the world's favourite number? How do numbers unconciously influence decison-making? And what has Eratosthenes got to do with spaceships? I'll answer all these questions and more in a one hour talk about my latest book.,> 45 mins,f,t,talk,repeat,,
+160,"The One Ring, make your own silver ring","We (you!) will be making a silver or gold forged ring, facettes of hammering will be visible and give a nice shine ( or darkened if you like )
+http://sawugo.nl/#!/the-one-ring-forge-a-silver-or-golden-ring/","about 1,5 hours, depending on skill. We will do the workshop continuously during the festival, you can start up whenever you like and finish at your own leisure.",f,f,workshop,,max 8 at a time,
+161,Games Minus Industry,"Videogames mash all media together with system design, making them inherently flexible in a way nothing else has ever been. Unfortunately, they're also tragically limited by over-dependence on industry and commercially appealing genres. I'll use mountain biking to unpick Super Hexagon, and then the pieces of both to unpick the divergence between the innate weirdness of videogames and the games industry's entrenched resistance to that.",30 mins,f,f,talk,some,,
+164,"The Archers Avoider: How I learned to make my ideal radio, and you can too.","At BBC Research and Development, part of our job is to think about and demonstrate what radio might be like in the future. To do this effectively, we need to be able to quickly and cheaply show how our ideas would work on physical radio sets, because this is still how the majority of people listen.
+
+This talk is about techniques we've developed to do this, from helping people to describe what they want from a radio, to filtering out bad ideas (""cat wigs""), to prototyping experiences on physical devices using a Raspberry Pi and web technologies. The talk will involve some lightweight paper prototyping, I'll also demonstrate my ideal radio, and give people pointers on constructing their own for listening to EMFM.
+
+I don't have any requirements as such. I'm hoping that separately we can help  people make EMFM radios, but I haven't secured funding for this yet. Let me know if you need more information or if I should resubmit this differently.
+
+I've given similar talks before but not this exact one.",30 mins,f,f,talk,some,,
+166,Open Space Projects Needs You,"Will you have a laptop and a projector or would I need to bring one? If you can provide that, what format should my presentation be in (odf, powerpoint, aspect ratio: wide/standard)? ",10 mins,f,f,talk,some,,
+167,The ZX Spectrum - a secret history,"It taught us how to code, and occupied a moment in pop culture somewhere between the Rubik's Cube and Jive Bunny. But even after it stopped being cool, the ZX Spectrum has been a constant inspiration to devotees and hackers over the last 30 years, kept alive through fanzines, disk-swapping, usenet and social networks. Matt Westcott has followed the Spectrum's journey first-hand into obscurity and back again as an object of nostalgia - this is its story, told through personal experiences and a backdrop of world history. Learn how the ZX Spectrum served as a beacon of hope during the Sarajevo war, slipped under the Iron Curtain to find a new set of devotees, and sent its first tweet from an Oxford pub...",30 mins,f,f,talk,repeat,,
+169,Gasman's ZX Spectrum Chiptune Extravaganza,"I perform bleepy electronic music with a Sinclair ZX Spectrum, keytar and vocoder <https://www.youtube.com/watch?v=84yH-zfWDZ0>. My set consists of pop covers, classic tracks from the PC and Amiga demo scene, and original music. (If playing cover songs is likely to cause issues with PRS licensing, I can prepare a set without covers.)
+
+Re tech requirements, I would need a 1x2m table, one power outlet, and one or (preferably) two stereo inputs into your audio mixer as either 1/4"" jack or RCA. (If there can be someone on hand to adjust audio levels during the gig, that's best of all - but not essential). I can also provide visuals, if there's a projector / screen available.",30-45 minutes,f,f,workshop,,As many as your venue and sound system can support :-),
+170,Bitcoin: more money-like than money,"Addressing the conceptions and misconceptions of bitcoin and other cryptocurrencies, and why we should expect most banks (and the governments they own) to be mostly uncooperative.",< 10 mins,f,f,talk,some,,
+171,Rubik's Cube speedsolving,"A workshop for people who like Rubik's Cubes. Come along, solve and compete with other cubers. There will be cubes available to use, but you can also bring your own cube.",Half a day,f,f,workshop,,15,
+172,Hacking biometric security,"A talk about how biometrics are not always secure, & the security systems are often poorly implemented.
+Fingers leave prints everywhere, DNA is shed as you go about your daily life. Super high resolution cameras in everyone's phones mean that iris scans are not what they were. You can spoof many fingerprint readers with a packet of sweets. And even when the locks work, they are rarely physically secure either...
+
+Key revocation is an important part of a security system. Once compromised, how do you change your biometric signature? How do we change our systems to cope with the slowly changing patterns of our bodies? What about twins and doppelgangers?
+
+I'm sure there will be more.",30 mins,f,f,talk,some,,
+173,"A critique of current hackerspace culture, and what we can do to learn from and improve it","A quick talk on the current problems with our scene and ways to improve on them
+
+* elitism
+* mysogyny, sexism, institutionalised racism, society's cultural influence
+* tyranny of the structureless
+* exclusionism (the cliques are strong)
+* multi layered heirachy where previously there was little
+* solutionism (do-ocracy) and other facist methods
+* harassment
+* distance between people who come to use the space and people who run the space
+
+We've had design patterns. Our spaces exist now, theyre not so useful. so we need something else.
+
+The slow cycle of maintenance begins. To continue the software metaphor, we'll call them interfaces. a community's form of interfacing with their members
+
+*Code of Conduct
+*The No Asshole Zone
+*(formalising other processes)
+*formalise heriachies",30 mins,f,f,talk,some,,
+174,Learning to Make – How I built an electromechanical display and taught myself basic electronics and more...,"The only way in life to find the right path is to start moving, if it doesn't feel right at least you know you were going in the wrong direction.
+
+Over the past 5 years since the final year of my undergraduate degree in 2009 I have been building a split-flap display (departure board) like you'd have seen at train stations and airports several years ago. This talk is about how I learn't almost everything I know through curiosity, trying, and making and iterating.",< 10 mins,f,f,talk,none,,
+175,Learning to Make – How I built an electromechanical display and taught myself basic electronics and more...,"The only way in life to find the right path is to start moving, if it doesn't feel right at least you know you were going in the wrong direction.
+
+Over the past 5 years since the final year of my undergraduate degree in 2009 I have been building a split-flap display (departure board) like you'd have seen at train stations and airports several years ago. This talk is about how I learn't almost everything I know through curiosity, trying, and making and iterating.",10 mins,f,f,talk,some,,
+177,"Impro for non-actors: loosen up, get creativity flowing and start saying yes to friends and colleagues","Improvisation is about cooperation, paying attention, but above all is about having fun. Come and learn through doing, in an introduction to improvisation techniques designed for everyone — no experience necessary whatsoever.
+
+Will need a space that however many attendees can move around in. A lot of the work will be done in pairs who need a bit of space to move around and some separation from other pairs. If you imagine that they're all doing pair juggling, or playing giant jenga, that's probably about the right amount of space.","30 minutes minimum, I could run up to 2 hours",f,f,workshop,,"20-40 (might need a helper or two above 20, but no experience required to help make things happen)",
+179,Trials and tribulations of a badge project,"How TiLDA MKe went from a list of Ideas the week before EMW, to epaper and finally the to the badge around your neck. With all the bumps along the way.",45 mins,f,f,talk,none,,
+180,Hacking TiLDA MKe - How to write Firmware for your EMF badge,"This workshop will will cover how to set up the Arduino IDE and how to write and upload a working ""Hello World"" App. It will also cover an overview of the API and components such as the radio, orientation/acceleration sensors, sound, RGB, etc. Please bring your own laptop and micro USB cable!",60 - 90 minutes,f,f,workshop,,20,
+183,Science and the Occult,"An investigation into whether the ancient esoteric mysteries have anything to offer modern science.
+Total hogwash or maybe the baby is being thrown out with the bathwater....?",45 mins,t,t,talk,none,,
+184,Contributing to OpenStreetMap,An introduction to basic editing of OpenStreetMap using the in-browser editor Potlatch2.,One hour (could compress to half an hour),f,f,workshop,,As many as can see a screen (and bring browsing devices if they want to try it out),
+182,Wood turning,"We'll be turning up with a lathe, some wood and pointy sharp things.  We have a stack of bowl blanks and some spindle blanks and will be doing some turning ourselves.  We're also happy to show people how to do some turning at their own risk.
+
+Following questions on IRC, it was recommended that we ask for a 16A electrical feed as we'll be running the lathe (5.5A plate rating) along with grinder (not sure) and vacuum cleaner (not sure).  I suspect inrush current on the motor for the lathe may be higher than 5.5A.
+
+This will be located in the Hax0rz of the Roses village.
+
+Please let me know if you need any further information.",Depends on what people want to do and how long that takes,f,f,workshop,,"One or two at a time, first come first served.  e are only bringing one lathe.",
+194,GPG/PGP Keysigning,A chance to get your GPG/PGP key signed! Bring keyslips and some photo ID.,30 mins,f,f,workshop,,20 unless the time is extended,
+185,The overly excitable lightyear foundation volunteers show you how we built a solar panel using very resource in rural Ghana.,"
+The Lightyear foundation is a UK based science charity filled with self pro-claimed fun loving science geeks that are devoted to make science fun and accessible to all!
+
+The Lightyear foundation run roadshows in areas which do not have access to science equipment for practical based science and demonstrate using resource around, you can make science practical and fun!
+
+In Jun 2014 we ran a solar panel workshop in rural Ghana and this is what we want to demonstrate to the electromagnetic field festival.
+Heres a vid - http://youtu.be/rR5e-qgknk4
+If you want to know more about the charity - http://www.lightyearfoundation.org/
+Or give me a call.
+
+Myf
+Lightyear foundation exec
+07809730004
+myf@lightyearfoundation.org ",,t,,installation,,,3m*3m
+190,How to stand for Parliament: opening up the hidden world of democratic participation,"I'm a geek standing as an MP next year, and I'm learning how it all works as I go along, blogging and publishing open data wherever possible. I'll talk all about what I've found out so far, what's left to learn, and how easy it really is to stand up for a better future.",30 mins,f,f,talk,some,,
+195,The Security of the Internet of Things: Curtains and Power Plants,"A talk about the current state of security in internet-enabled embedded devices with a variety of sensors and actuators, from curtains through home automation systems to full-scale power plants. With plenty of actual examples.",10 mins,f,f,talk,some,,
+186,Can open data help save the world?,"Open data now has support from the G8(7), from the Open Government Partnership (80 countries), from big consultancies (McKinsey, who think it's worth $trillions). At the same time, the amount of data is doubling every couple of years. What does it all mean for people, for businesses, for governments?
+
+Open data is a force that will change the world – we hope for the better. It's hard to imagine how we might scale society without it.
+
+I'll talk about the Open Data Institute's experiences at the front-line over the last 2 years, and what we think might happen next (I run the ODI).
+
+In addition to presenting, I'd like to open up discussion about how we can all engage in this broad topic: how we can help our leaders understand the difference between open, closed, and private data, what impact and problems can be tackled, and how we can ensure we create Knowledge for Everyone.
+
+Notes to curator:
+I'd like a 30min+ slot to include discussion, but the talk can be done in 10m (or indeed extended if you think it's interesting). I hope so!",10 mins,f,f,talk,some,,
+187,The Science of Hedonism and the Hedonism of Science,"Sex, drugs and rock and roll are ancient indulgences: we are hooked, and have been since the very beginning. Modern science has revealed why these ""base"" pursuits define our species. But moreover, scientific innovations have been used to revolutionise how we get laid, get high and rock out. Our highest intellectual achievements combined with our primal pursuits has led to countless spectacular outcomes that continue to change the experience of being human. ",45 mins,f,t,talk,repeat,,
+189,"Recreational Maths in a Field: Flexagons, Folding Tube Maps & Braiding","I have a maths degree and have been working as a secondary school maths teacher for the last 3 years (I've now left and am starting a PhD in September). I would like to present some interesting/unusual mathematical things I've encountered over the last few years:
+
+Flexagons (as seen here: https://www.youtube.com/watch?v=SnnvovjcC_o) are created by gluing paper together so that they can be folded (or 'flexed') to reveal different patterns. I will talk about how these were discovered and how flexagons with different numbers of sides can be made.
+
+Folding Tube Maps: I will talk about modular origami, using tube maps as seen here: http://legavrik.blogspot.co.uk/2012/10/tube-map-platonic-solids.html
+
+Braiding: I will talk about a way to braid bracelets using cardboard with 8 slits and 7 threads. I will then look at which other numbers of threads can be used to braid in this way, leading to some nice maths involving highest common factors.
+
+If there's time, I'll finish by getting 5 members of the audience to create a perfect sine curve.
+
+After the talk (maybe in the bar in the evening?) I would like to give people the opportunity to make flexagons, solids from tube maps and braided bracelets. I will bring all the necessary equipment.",45 mins,f,f,talk,none,,
+193,Nautical bass-music with custom-built MIDI controllers & circuit bent lovelyness.,"Me (Toby Cole, and usually my Brother but he won't be able to make it) write electronic music & build our own controllers (e.g. https://www.youtube.com/watch?v=4sHIvnnuScU and https://www.youtube.com/watch?v=ZSTvR0rPP4w )
+At the last EMF camp I did a gig/demo/talk, playing our music live and then taking questions between songs about how our kit is set up.
+I'd need a sturdy table, some floor space and a decent sound-system (the one for speakers last time wasn't quite up to scratch for music).",30-60 mins,f,f,workshop,,Only limited by venue.,
+196,How buying multiple train tickets can be much cheaper than one,"Due to the horrendous complexity of the British railway system, it is possible to buy more than one train ticket for a journey - for exactly the same trains - and save upwards of 70% on the cost of the ticket. Hear how this works and the site I built that helps you find these savings.",10 mins,f,f,talk,repeat,,
+197,Machine learning and its use in creepy internet stalking,"I am a masters student, very into applications of machine learning. I work as a research assistant in predictive maintenance for power systems, mostly using statistics and machine learning, but that's not interesting to talk about. What is cool is how people can use the massive amounts of existing data to come up with very creepy things. So the presentation would consist on, firstly, the extreme vulnerability that most people have to being stalked online and then focusing on a few examples of research going on in universities on network inference topics - for instance, the ""famous"" paper that infers IQ, sexuality, etc from facebook likes (http://www.pnas.org/content/early/2013/03/06/1218772110.full.pdf+html) or Tsinghua University's paper that infers social ties from cellphone usage.
+The purpose of this talk is to shed light on the topic of social network inference and show yet another application of machine learning.",10 mins,f,f,talk,some,,
+198,Emojli: How we accidentally built an app and why we never want to build one again.,"We came up with a terrible idea for an app. A week later, 70,000 people had signed up for it. We hadn't even built the thing. Learn from our story of woe, and don't ever build an app.",30 mins,f,f,talk,some,,
+199,Origami for Geeks,"A discipline that spans art and mathematics must surely appeal to geeks. This is a demonstration of a few simple to intermediate origami models, hopefully subjects geeks will like, with pointers to further resources to explore this absorbing hobby. I will also be conspicuously folding paper throughout the weekend in an attempt to engage anyone who shows a moment's weakness.",1 hour,f,f,workshop,,20,
+200,Reading Hilter's Mind: Bletchley Park and The First Computer,"The world's first computer, Colossus, was commissioned in 1943 just a few minutes away from the EMF camp. It gave Bletchley Park unprecedented access to the Hitler's most private communications. How did it work? Why was it built? Who designed it? All this and several shameless plugs for The National Museum of Computing.",30 mins,f,f,talk,repeat,,
+201,Fakebit Polytechnic: Wiimote-controlled chiptune-inspired lo-fi synthpop from Dave Green (former NTK editor) & Dave Pape (Museum of Techno),"Laptop-based live band performance of say 20-30 min, requires 2x stereo DI inputs, 2x vocal mics, 2x mic stands, can also use a video projector if available as in this demo clip:
+https://www.youtube.com/watch?v=Z8oTn3CIqLw&list=PL96F9E3B8DDE90A4C
+(& sorry to be a pain but can only do Sat night after 8pm, preferably not massively later than 10-10.30pm as may have to drive back that night - Geek Showoff have also asked me ie Dave Green to do 9 min as part of their hour on Sat though that'll be different material and more presentation-based : )",30 mins,f,t,talk,some,,
+203,Geocaching!,We'll go for a geocaching walk around the area. There are loads around and we can decide how many we want to do when we all meet up.,3 hours? Depends.,f,f,workshop,,Indefinite,
+204,Experimental/Noise DJ-Set/Performance,Experimental & Noise DJ-Set/Performance includes mix selection of new and old classics noise and extreme sounds. requires 2 cd mixer + 1 vinyl deck + mixing table 4 channels,2 hours/set,t,t,workshop,,100,
+205,Listen to Singer-Songwriter Hannah Howe perform original tunes and a mix of acoustic covers - something for everyone! ,"I singing and playing the acoustic guitar. I usually play 2 sets of 35-40mins(ish) with a break 15min in the middle.  I will require some PA to plug guitar and vocal into, and power for my effects pedal.  I can bring a microphone and stand if that helps! I may need some help setting up and getting the sound right.",> 45 mins,f,f,talk,none,,
+206,PHP Shenanigans ,A quick run through of some of the more interesting attacks I've seen on my web application honeypots. I will be showing not only the attack vector but also some of the more interesting payloads that I've seen in the wild. I will close with how you can setup a simple honeypot of your own.,30 mins,f,f,talk,some,,
+218,Learn to solder,Never soldered before or been so long you need a refresher? Make a flashing LED badge and learn basic soldering techniques. Badge kit costs £2.,30min,f,f,workshop,,20,
+219,"Robotics and Computer Vision with MATLAB and SImulink connected to Arduino, Raspberry Pi and LEGO Mindstorms","In this talk I will discuss how to dramatically improve the speed and quality of your robotics and computer vision projects using MATLAB and Simulink to program your Arduino, Raspberry Pi and LEGO Mindstorms.
+Firstly, I will introduce MATLAB and Simulink, the industry standard tools used by engineers worldwide to program everything from cars engines to smartphone cameras to spacecraft navigation systems.
+Next I will give some examples of how these tools can greatly speed up the development of software for a wide range of low-cost hardware devices. Examples include, getting started with Computer Vision on a Raspberry Pi in only 3 lines of code; Programming an Arduino without learning C++ and modifying your code at runtime; Graphically designing a complex control system for a LEGO Mindstorms robot.
+This talk will include a number of demonstrations and I'll be happy to speak to people afterwards to provide more details on the projects.",30 mins,f,f,talk,some,,
+207,How to hack jazz! Or the hackers guide to jazz.,"How to hack jazz; how anyone can skip the theory and get straight to jamming.
+
+https://www.youtube.com/watch?v=NdNX5Qz4g5I
+
+and
+
+https://soundcloud.com/irichop
+
+In a nutshell: a few months ago I bought a jazz theory text, laughed at the amount of conditional statements, got inspired to make an algorithm that has ended up augmenting my playing ability and general understanding of music theory. Bit of a hard task to explain the whole of jazz theory in ten minutes, and describe how to emulate it faster and better, but will be light hearted and creative and hopefully inspiring.
+
+Need loudspeakers, a mixer to plug LR phono cable from my sound card. A projector/screen to show slides from my macbook. And will either post array's for chord voicing's and scales on website, or have dropbox link, or something that you put on your server at the site for people to access.
+
+About myself, I'm a professional touring electronic musician under the alias Mouldy Soul, I have toured US/Can/Oz/UK and headlined festivals playing funky happy glitch hop in 2013! I am a music tech graduate, been playing with the Arduino since last year of uni, 5/6 years ago. Have leant back to programming the last year instead of touring, to help automate some of the tasks I repetitively do in the studio and augment my physical ability and enhance my live performances by making these jazz algorithms.
+
+I was just gonna come for the badge actually :) ",10 mins,f,f,talk,none,,
+208,From Bitcoin to Skynet: A primer for beginners and futurists (tinfoil hat not included),"As well as a giving a beginner's guide to Bitcoin and other decentralisation technologies, this talk will hint at potential impacts on the world we live in. This is a chance for technologists to hear the truth about Bitcoin rather than the myths, including about why it is more than just a currency.
+
+NOTE FOR EMFCAMP: If there is little or no QnA time allowed within the 30 mins, I would suggest giving this a 45 minute slot. I can easily fill it out if there aren't questions. I've given a version of this talk before to a small group in Sheffield, but this will be a revised version. The last one lead to QnA going on for over an hour. ",30 mins,f,f,talk,repeat,,
+209,We don't need no stinkin' tension wrenches,"You thought two hackers, one keyboard was bad? Just wait until you see what hollywood does to lockpickers. From no-contact lockpicking to real rocks in a fake keys, and from reasonably realistic heists to 'fuck it, we'll do it live', we'll overview the diverse manner in which lockpickers and lockpicking are portrayed in the media. ",45 mins,t,f,talk,some,,
+210,Dermot performing a few of his self-scrawled-lyrically-vivid acoustic songs and an range of instrumental covers: from Bowie to (Scott) Joplin! ,"Me and a Spanish guitar. My biggest entusiasms in music are The Kinks and Snooks Eaglin, and it shows! Need a mic, an amp and a lead. ",30-60 mins as required.,f,f,workshop,,1000 would be nice,
+211,"Long-term dreams, short-term sociopaths, suicidal infrastructure, the tech industry, and your next line of code.","ot only does technology have a real and lasting political impact on the world that builds and uses it, but the manner in which it is built changes that impact. We are facing a set of civilizational challenges unprecedented in both their depth and breadth. The same forces that are twisting the modern Internet pose deadly challenges to many other kinds of infrastructure.  The answers, if we can make them work, lie in a profound rethink of how we approach technical, intellectual, and societal problems.  This is not some abstract shift to happen in the distant future - we can, and must, start rethinking how we work here and now.  Let's explore how we can change everything from our funding models to our ways of developing systems in teams to build a world we may survive.
+--
+I can do this with or without slides -- it'd be nice to have a projector available, but I can adapt if I don't have one and I'm not sure if I'll end up wanting slides or not.",45 mins,t,f,talk,some,,
+212,Painting in Clojure,Explore how to model the painting style of Jackson Pollock and how this can be expressed in Clojure.,30 mins,f,f,talk,repeat,,
+213,3DScanbot Live scanning ,"This is a fun experiential 3dscanning allowing you to get 3dscan of your head or body that can then be used online, in games or 3dprinted
+we have done many exhibitions at 02 with Telefonica we scanned nearly 2k people for the Campus Party, we have done many other events
+some of the previous events has been
+3FS- A Fete Worse Than Death 20th Anniversary Exhibitor - London
+BPE Exhibitor, Olympia London
+New Revolutionaries Exhibitor - BBH  London
+LTExpo  Speaker - London
+CTC- Women in Tech - London
+LNK Exhibitor, Croydon
+Minibar Speaker, London
+Tech City Roadshow  Whitgift Shopping Centre, Croydon
+3DPrintingEvent  – Speaker - Madrid
+DevLab Exhibitor - London
+Silicon Milk Roundabout Exhibitor - London
+MWC- WIPJam Exhibitor - Barcelona
+
+DroidCon Exhibitor - London
+3dprinting event Speaker - Eindhoven
+Geekcon TelAviv - Israel
+Ad-tech Acxiom - Olympia –  London
+Campus-Party Telefonica - O2 Arena –  London
+3fs Hack the Barbican - London
+ArtHackaton2 – Mentor - Digital Sizzle -  London
+3DPrinting & Manufacturing  – The Additive Edge - Hub Westminster -  London
+TOABerlin – Speaker & Moderator- Tech, Art and Science event – Berlin
+we have a team of about 3 -4 people usually
+and need  3X3 meter space to install
+if the weather is good we can do it outdoor inside gazebo but it needs a space with good ambient light but not direct sunlight to work
+i also do live paintings at events along side it.",2 day,f,f,workshop,,every one can be scanned we ,
+214,The Art End of Data,A look at a bunch of works that use data as an art material.,10 mins,f,f,talk,some,,
+215,"RSI: avoiding it, dealing with it","Discussion about RSI and what to do about it, led by someone who's had it and recovered from it (but still needs a non-standard keyboard).  Discussion will also probably cover alternate input devices.",30 mins,f,f,talk,some,,
+216,The teardrop trailer tiny tour - Yes we did make this ourselves! Come and visit.,Thinking of making your own teardrop trailer (micro-caravan)? Or just curious. Come and take a look at ours and ask us questions. As long as we are awake and around we are happy to talk about what works and what we would do differently. Members of Teardrop Caravans of GB particularly welcome. ,,f,,installation,,,We are living in the teardrop on site so no extra space needed. We have space booked in the campervan field and an attached awning for son which will also serve for getting-out-of-rain.
+217,Want to braid your own lanyard? I can show you how.,"Depending on the extra raw materials you can bring (wool, old lanyard parts, dingle-dangles (gonks, bells, whatever), needle/thread) this can be elaborate or basic. Bring the braid back when its long enough and I'll show you how to finish off. ",10 minutes max.,f,f,workshop,,"Suggest that I do this as a stop/find-me-and-try-it exercise.  I will bring 20 braiding discs and five lucets to loan out and  so I can show c20 people per day how to do this. If no-one brings back the tools after day one then there will be no-one traned on day two, etc..you how to make these.",
+220,How Many Bugs Can a Time Server Have?,"Tim and Mike will talk about a number of new advisories (to be released on the 29th), including remote root in a network device.",45 mins,f,f,talk,none,,
+221,Networking education in Africa,"This isn't so much a talk as a call for ideas from other folks. I'll kick of by talking about my experience visiting several educational projects in Zambia last month, and some ideas that I have for tech to get involved in helping local initiatives (there's some stuff here about this: https://www.pickering.org/hangout-zambia ). I don't have a tons of experience to relate but have an idea of the need, lots of questions and very few answers. Best outcome is that an active discussion spills out over beer afterwards and smarter folks than me can help solve some of the problems.",30 mins,f,f,talk,none,,
+222,Rolling your own mini-Heroku,"Unless you were building in PHP, deploying a web app used to be a real pain, but with the introduction of Platform as a Service (PaaS) like Heroku our lives suddenly became a lot easier. Now 7 years after the launch we're seeing the insurgence of open source PaaSs like CloudFoundry and Flynn. Cristiano shows you what the Developer team at PayPal has done to build their own PaaS and introduces Dokkufy, the easy way to roll your own mini-Heroku.",30 mins,f,f,talk,some,,
+223,Open Space Projects,"Inclusive and collaborative space projects for the techy, creative and curious and where to get started.  (20 minutes)",30 mins,f,f,talk,some,,
+224,GNU Radio and Software Defined Radio for Amateur Radio and Everyone,"This talk will cover the fundamentals of software defined radios, analog and digital signals, and how to construct flow graphs in GNU Radio Companion to manipulate signals. Software defined radios are rapidly growing in popularity as receivers and transmitters. The talk will go over how they differ from traditional radios and what advantages they bring to the table.",45 mins,f,f,talk,repeat,,
+225,Impending Singularity and disbanding economy of scarcity  ,"Talk around Singularity and what could happen, would the economy of scarcity be disbanded, what would it be like to live in the society that is based on abundance. What are the likely practical aspects on day to day lives, politics and governance",< 10 mins,f,f,talk,some,,
+226,Hacking with Psychedelics - The uses of these amazingly powerful substances,"An introduction to many uses of these amazingly powerful substances, including use for programming and other creative endevours.
+
+Psychedelic substances, and their real powers are little known to most people in main stream society. I believe this is of great detriment to humanity. As we start to come out of the dark ages of drug prohibition, I hope to encourage more people to explore these substances and use them for the benefit of themselves, their work, and the world.
+
+I will outline some uses of these substances: their uses in programming, engineering, and science, artistic practice, medicine, and simply for enjoyment.
+
+I will describe how certain substances can be used, and what each can be used for, including the use of LSD in both large doses, and microdosing, and the use of ayahuasca, mushrooms, and ketamine.
+
+I will also talk about safety, risk reduction and legality of some substances in various countries and how they can be obtained. This will not, however, be an encylopedic talk on such matters, which can be researched on the web by those who may have been inspired by this talk to learn more.",30 mins,f,f,talk,some,,

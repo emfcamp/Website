@@ -61,6 +61,9 @@ sendtickets:
 lockproposals:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py lockproposals
 
+importcfp:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py importcfp
+
 
 shell:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py shell
