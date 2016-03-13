@@ -70,6 +70,9 @@ class Proposal(db.Model):
 
         self.state = state
 
+    def get_unread_vote_note_count(self):
+        return len([v for v in self.votes if not v.has_been_read])
+
     def get_unread_messages(self, user):
         return [m for m in self.messages if (not m.has_been_read and
                                              m.is_user_recipient(user))]
@@ -154,6 +157,7 @@ class CFPVote(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     proposal_id = db.Column(db.Integer, db.ForeignKey('proposal.id'), nullable=False)
     state = db.Column(db.String, nullable=False)
+    has_been_read = db.Column(db.Boolean, default=False)
 
     created = db.Column(db.DateTime, default=datetime.utcnow)
     modified = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

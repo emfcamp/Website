@@ -11,7 +11,7 @@
     </li>
     <li role="presentation" {% if active == 'votes' %} class="active" {% endif %}>
         <a href="{{ url_for('.proposal_votes', proposal_id=proposal.id) }}">
-            Votes/Reviewer Notes ({{ proposal.votes | length }})
+            Votes/Reviewer Notes ({{ proposal.get_unread_vote_note_count() }}/{{ proposal.votes | length }})
         </a>
     </li>
 </ul>

@@ -415,33 +415,20 @@ def vote_summary():
         # Prevent CfP reviewers from viewing non-anonymised submissions
         return abort(403)
 
-    vote_subquery = CFPVote.query\
-        .with_entities(
-            CFPVote.proposal_id, CFPVote.state,
-            func.count('*').label('count')
-        )\
-        .group_by('proposal_id', 'state')\
-        .subquery()
-
-    raw_proposals_with_counts = Proposal.query\
-        .with_entities(Proposal, vote_subquery.c.state, vote_subquery.c.count)\
-        .outerjoin(
-            vote_subquery,
-            Proposal.id == vote_subquery.c.proposal_id
-        )\
-        .filter(Proposal.state == 'anonymised')\
-        .order_by(Proposal.modified)\
-        .all()
+    proposals = Proposal.query.filter_by(state='anonymised')\
+                              .order_by('modified').all()
 
     proposals_with_counts = []
-    prev = None
+    for prop in proposals:
+        state_counts = {}
+        for v in prop.votes:
+            state_counts.setdefault(v.state, 0)
+            state_counts[v.state] += 1
+        proposals_with_counts.append((prop, state_counts))
 
-    for prop, state, count in raw_proposals_with_counts:
-        if prop == prev:
-            proposals_with_counts[-1][1][state] = count
-        else:
-            prev = prop
-            proposals_with_counts.append(( prop, { state: count } ))
+    sort_key = lambda p: (p[0].get_unread_vote_note_count() > 0, p[0].created)
+    proposals_with_counts.sort(key=sort_key, reverse=True)
+
     return render_template('cfp_review/vote_summary.html',
                             proposals_with_counts=proposals_with_counts)
 
@@ -455,7 +442,9 @@ class UpdateVotesForm(Form):
     votes_to_resolve = FieldList(FormField(ResolveVoteForm))
     include_recused = BooleanField("Also set 'recused' votes to 'stale'")
     set_all_stale = SubmitField("Set all votes to 'stale'")
+    resolve_all = SubmitField("Set all 'blocked' votes to 'resolved'")
     update = SubmitField("Set selected votes to 'resolved'")
+    set_all_read = SubmitField("Set all notes to read")
 
 
 @cfp_review.route('/proposals/<int:proposal_id>/votes', methods=['GET', 'POST'])
@@ -470,6 +459,7 @@ def proposal_votes(proposal_id):
     all_votes = {v.id: v for v in proposal.votes}
 
     if form.validate_on_submit():
+        msg = ''
         if form.set_all_stale.data:
             stale_count = 0
             states_to_set = ['voted', 'blocked', 'recused'] if form.include_recused.data\
@@ -481,8 +471,6 @@ def proposal_votes(proposal_id):
 
             if stale_count:
                 msg = 'Set to %d stale' % stale_count
-                flash(msg)
-                app.logger.info(msg)
 
         elif form.update.data:
             update_count = 0
@@ -494,8 +482,21 @@ def proposal_votes(proposal_id):
 
             if update_count:
                 msg = 'Set to %d resolved' % update_count
-                flash(msg)
-                app.logger.info(msg)
+
+        elif form.resolve_all.data:
+            resolved_count = 0
+            for vote in all_votes.values():
+                if vote.state == 'blocked':
+                    vote.set_state('resolved')
+                    resolved_count += 1
+
+        if msg:
+            flash(msg)
+            app.logger.info(msg)
+
+        # Regardless, set everything to read
+        for v in all_votes.values():
+            v.has_been_read = True
 
         db.session.commit()
         return redirect(url_for('.proposal_votes', proposal_id=proposal_id))
@@ -663,7 +664,11 @@ def review_proposal(proposal_id):
             db.session.add(vote)
 
         # If there's a note add it (will replace the old one but it's versioned)
-        vote.note = form.note.data
+        if form.note.data:
+            vote.note = form.note.data
+            vote.has_been_read = False
+        else:
+            vote.has_been_read = True
 
 
         if form.vote.data:
