@@ -7,23 +7,25 @@ data = dict(map(lambda t: t.split(':'), res.text.split(' ')))
 
 submission = []
 
-for key in ('full', 'kids'):
+for key, admits in [('full', 'full'), ('kids', 'kid')]:
 	submission.append("tickets,type=%s,status=all value=%s" % (
-			key, data[key]))
+			key, data[admits]))
 	submission.append("tickets,type=%s,status=bought value=%s" % (
-			key, data[key + "_bought"]))
+			key, data[admits + "_paid"]))
 	submission.append("tickets,type=%s,status=unpaid value=%s" % (
-			key, data[key + "_unpaid"]))
+			key, data[admits + "_unexpired"]))
+	submission.append("tickets,type=%s,status=expired value=%s" % (
+			key, data[admits + "_expired"]))
 
 submission.append("tickets,type=full,status=gocardless_unpaid value=%s" % (
 		  data["full_gocardless_unpaid"]))
 submission.append("tickets,type=full,status=banktransfer_unpaid value=%s" % (
 		  data["full_banktransfer_unpaid"]))
- 
+
 submission.append("tickets,type=parking,status=bought value=%s" % (
-		  data["parking_bought"]))
+		  data["car_paid"]))
 submission.append("tickets,type=campervan,status=bought value=%s" % (
-		  data["campervan_bought"]))
+		  data["campervan_paid"]))
 
 submission.append("people,status=registered value=%s" % (
 		  data["users"]))
