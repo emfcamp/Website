@@ -3,9 +3,11 @@
 {% extends "cfp_review/base.html" %}
 {% block body %}
 
+
 {% if previous_vote and previous_vote.state not in ['resolved', 'stale'] %}
     <div class="col-md-9">
-        <h3>{{proposal.title}} <small>&mdash; a {{proposal.type | capitalize}}</small></h3>
+        <h3>{{proposal.title}}</h3>
+        <h3><small>&mdash; a {{proposal.type | capitalize}}</small></h3>
         <dl class="dl-horizontal">
             <dt>Status</dt>
             <dd>
@@ -37,14 +39,20 @@
             <dt>Description</dt><dd>{{ proposal.description }}</dd>
         </dl>
         <div class="pull-right">
-            <a href="{{ url_for('.review_list') }}" class="btn btn-default">
-                Back
-            </a>
+            <form method="POST" action="{{ url_for('.review_proposal', proposal_id=proposal.id) }}">
+                {{ form.hidden_tag() }}
+                {{ form.change(class_="btn btn-danger") }}
+                <a href="{{ url_for('.review_list') }}" class="btn btn-default">
+                    Back
+                </a>
+            </form>
         </div>
     </div>
 {% else %}
     <div class="col-md-7">
-        <h3>{{proposal.title}} <small>&mdash; a {{proposal.type | capitalize}}</small></h3>
+        <h3><small>{{ remaining }} proposals remain.</small></h3>
+        <h3>{{proposal.title}}</h3>
+        <h3><small>&mdash; a {{proposal.type | capitalize}}</small></h3>
         <div>&nbsp;</div>
         <div>{{ proposal.description }}</div>
     </div>
@@ -56,20 +64,20 @@
             <div>&nbsp;</div>
             {{ form.hidden_tag() }}
             {{ render_field(form.vote_value, tabindex=1) }}
-            {{ render_field(form.note, rows=4, tabindex=2) }}
+            {{ form.vote(class_="btn btn-success col-xs-12", tabindex=2) }}
+            {{ render_field(form.note, rows=4, tabindex=3) }}
         </div>
         <div class="col-xs-12 btn-group-vertical">
-            {{ form.vote(class_="btn btn-success", tabindex=3) }}
             {{ form.recuse(class_="btn btn-danger", tabindex=4) }}
             {{ form.question(class_="btn btn-info", tabindex=5) }}
 
             {% if next_id %}
                 <a href="{{ url_for('.review_proposal', proposal_id=next_id) }}" class="btn btn-default">
-                    Skip this
+                    View next proposal
                 </a>
             {% endif %}
             <a href="{{ url_for('.review_list') }}" class="btn btn-default">
-                See all proposals
+                List of all proposals
             </a>
         </div>
     </form>

@@ -13,8 +13,9 @@ CFP_STATES = { 'edit': ['new'],
                'accepted': ['finished'],
                'finished': [] }
 
+# Most of these states are the same they're kept distinct for semantic reasons
 VOTE_STATES = {'new': ['voted', 'recused', 'blocked'],
-               'voted': ['stale'],
+               'voted': ['resolved', 'stale'],
                'recused': ['resolved', 'stale'],
                'blocked': ['resolved', 'stale'],
                'resolved': ['voted', 'recused', 'blocked'],

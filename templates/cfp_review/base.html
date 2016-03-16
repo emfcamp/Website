@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% block title %}{% endblock %}{% if self.title() %} - {% endif %}EMF CFP Review</title>
+        <title>{% block title %}{% endblock %}{% if self.title() %} - {% endif %}EMF CfP</title>
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
         {% assets "css_admin" -%}
         <link rel="stylesheet" href="{{ ASSET_URL }}">
@@ -21,7 +21,7 @@
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
         <div class="navbar-header">
-            <a class="navbar-brand" href="{{ url_for('cfp_review.proposals') }}">EMF CFP Review</a>
+            <a class="navbar-brand" href="{{ url_for('cfp_review.main') }}">EMF CfP</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             {% include "cfp_review/_nav.html" %}

@@ -573,44 +573,60 @@ def anonymise_proposal(proposal_id):
     return render_template('cfp_review/anonymise_proposal.html',
                            proposal=prop, form=form, next_proposal=next_prop)
 
+def get_proposals_to_review(user):
+    categories = [cat.id for cat in user.review_categories]
+    return Proposal.query\
+        .outerjoin(ProposalCategory)\
+        .filter(
+            Proposal.state == 'anonymised',
+            Proposal.user_id != user.id,
+            or_(Proposal.category_id.in_(categories),
+                Proposal.category_id.is_(None))
+        ).all()
+
+def get_safe_index_sort(index_list):
+    def safe_index_sort(prop):
+        try:
+            return index_list.index(prop)
+        except ValueError:
+            return len(index_list)
+    return safe_index_sort
 
 @cfp_review.route('/review')
 @review_required
 def review_list():
-    all_proposals = Proposal.query\
-        .outerjoin(ProposalCategory)\
-        .filter(
-            Proposal.state == 'anonymised',
-            Proposal.user_id != current_user.id,
-            or_(Proposal.category_id.in_([cat.id for cat in current_user.review_categories]),
-                Proposal.category_id.is_(None))
-        ).all()
+    all_proposals = get_proposals_to_review(current_user)
 
     to_review, reviewed = [], []
-
     for prop in all_proposals:
         vote = prop.get_user_vote(current_user)
-        # requires review if the vote doesn't exist or requires re-review
-        requires_review = (vote is None) or (vote.state in ['new', 'resolved', 'stale'])
 
-        if requires_review:
+        if (vote is None) or (vote.state in ['new', 'resolved', 'stale']):
             to_review.append(prop)
         else:
             reviewed.append(prop)
 
-    if session.get('review_order'):
-        del session['review_order']
+    review_order = session.get('review_order', [])
+    if not review_order or not set(to_review).issubset(review_order):
+        # For some reason random seems to 'stall' after the first run and stop
+        # reshuffling the 'to_review' list. To force a reshuffle on each
+        # execution we'll seed the RNG with the current time. This is pretty
+        # horrible but at least works.
+        # FIXME We shouldn't have to reseed the RNG every time
+        random.seed(int(time()))
+        random.shuffle(to_review)
+        session['review_order'] = [p.id for p in to_review]
 
-    # For some reason random seems to 'stall' after the first run and stop
-    # reshuffling the 'to_review' list. To force a reshuffle on each
-    # execution we'll seed the RNG with the current time. This is pretty
-    # horrible but at least works.
-    # FIXME We shouldn't have to reseed the RNG every time
-    random.seed(int(time()))
-    random.shuffle(to_review)
-    session['review_order'] = [p.id for p in to_review]
+    else:
+        # Sort updated proposals to the top based on the previous
+        # review order
+        to_review.sort(key=get_safe_index_sort(review_order))
 
-    reviewed.sort(key=lambda p: p.get_user_vote(current_user).modified)
+    # reviewed.sort(key=lambda p: p.get_user_vote(current_user).modified)
+    reviewed.sort(key=lambda p: (p.get_user_vote(current_user).state,
+                                 p.get_user_vote(current_user).vote,
+                                 p.get_user_vote(current_user).modified),
+                  reverse=True)
 
     return render_template('cfp_review/review_list.html',
                            to_review=to_review, reviewed=reviewed)
@@ -621,17 +637,18 @@ class VoteForm(Form):
                                       (0, "I wouldn't go"),
                                       (1, "I might go"),
                                       (2, "I will go")])
-    note = TextAreaField('Note')
+    note = TextAreaField('Message')
 
     vote = SubmitField('Vote')
+    change = SubmitField("I'd like to change my response")
     recuse = SubmitField('I can identify the submitter (abstain)')
     question = SubmitField('I need more information')
 
     def validate_note(form, field):
         if not field.data and form.recuse.data:
-            raise ValidationError('Please give a reason')
+            raise ValidationError('Please tell us why you are recusing your self. If you can identify the submitter please tell us who it is.')
         if not field.data and form.question.data:
-            raise ValidationError('Required')
+            raise ValidationError('Please let us know what\'s unclear')
 
     def validate_vote_value(form, field):
         if field.data == -3 and form.vote.data:
@@ -648,14 +665,20 @@ def review_proposal(proposal_id):
 
     form = VoteForm()
 
+    # If proposals
     review_order = session.get('review_order')
-    if review_order:
-        try:
-            index = review_order.index(proposal_id) + 1
-            next_id = review_order[index] if index < len(review_order) else False
-        except ValueError:
-            next_id = False
+
+    # If the review order is missing redirect to the list to rebuild it
+    if review_order is None:
+        return redirect(url_for('.review_list'))
+
+    if review_order and proposal_id in review_order:
+        index = review_order.index(proposal_id) + 1
+        next_id = review_order[index] if index < len(review_order) else None
+        remaining = len(review_order) - 1
+
     else:
+        remaining = 0
         next_id = False
 
     vote = prop.get_user_vote(current_user)
@@ -673,17 +696,26 @@ def review_proposal(proposal_id):
         else:
             vote.has_been_read = True
 
-
+        # Update vote state
         if form.vote.data:
             vote.vote = form.vote_value.data
             vote.set_state('voted')
+            review_order.remove(prop.id)
 
         elif form.recuse.data:
             vote.set_state('recused')
+            review_order.remove(prop.id)
 
         elif form.question.data:
             vote.set_state('blocked')
+            review_order.remove(prop.id)
 
+        elif form.change.data:
+            vote.set_state('resolved')
+            flash("Proposal re-opened for review")
+            review_order.append(prop.id)
+
+        session['review_order'] = review_order
         db.session.commit()
         if not next_id:
             return redirect(url_for('.review_list'))
@@ -691,7 +723,7 @@ def review_proposal(proposal_id):
 
     return render_template('cfp_review/review_proposal.html',
                            form=form, proposal=prop, next_id=next_id,
-                           previous_vote=vote)
+                           previous_vote=vote, remaining=remaining)
 
 class CloseRoundForm(Form):
     min_votes = IntegerField('Minimum number of votes', default=10, validators=[NumberRange(min=2)])
