@@ -55,28 +55,32 @@ def admin_variables():
 
 @admin.route("/stats")
 def stats():
-    full = Ticket.query.join(TicketType).filter_by(admits='full').join(Payment).filter(Payment.state != 'new')
-    kids = Ticket.query.join(TicketType).filter_by(admits='kid').join(Payment).filter(Payment.state != 'new')
+    # Don't care about the state of the payment if it's paid for
+    paid = Ticket.query.filter_by(paid=True)
 
-    # cancelled tickets get their expiry set to the cancellation time
-    full_unexpired = full.filter(Ticket.expires >= datetime.utcnow())
-    kids_unexpired = kids.filter(Ticket.expires >= datetime.utcnow())
-    full_unpaid = full_unexpired.filter(Ticket.paid == False)  # noqa
-    kids_unpaid = kids_unexpired.filter(Ticket.paid == False)  # noqa
+    parking_paid = paid.join(TicketType).filter_by(admits='car')
+    campervan_paid = paid.join(TicketType).filter_by(admits='campervan')
 
-    full_bought = full.filter(Ticket.paid)
-    kids_bought = kids.filter(Ticket.paid)
+    # For new payments, the user hasn't committed to paying yet
+    unpaid = Payment.query.filter(
+        Payment.state != 'new',
+        Payment.state != 'cancelled'
+    ).join(Ticket).filter_by(paid=False)
 
-    full_gocardless_unpaid = full_unpaid.filter(Payment.provider == 'gocardless',
-                                                Payment.state == 'inprogress')
-    full_banktransfer_unpaid = full_unpaid.filter(Payment.provider == 'banktransfer',
-                                                  Payment.state == 'inprogress')
+    expired = unpaid.filter_by(expired=True)
+    unexpired = unpaid.filter_by(expired=False)
 
-    parking_bought = Ticket.query.filter_by(paid=True).join(TicketType).filter(
-        TicketType.admits == 'car')
-    campervan_bought = Ticket.query.filter_by(paid=True).join(TicketType).filter(
-        TicketType.admits == 'campervan')
+    # Providers who take a while to clear - don't care about captured Stripe payments
+    gocardless_unpaid = unpaid.filter(Payment.provider == 'gocardless',
+                                      Payment.state == 'inprogress')
+    banktransfer_unpaid = unpaid.filter(Payment.provider == 'banktransfer',
+                                        Payment.state == 'inprogress')
 
+    # TODO: remove this if it's not needed
+    full_gocardless_unpaid = gocardless_unpaid.join(TicketType).filter_by(admits='full')
+    full_banktransfer_unpaid = banktransfer_unpaid.join(TicketType).filter_by(admits='full')
+
+    # These are people queries - don't care about cars or campervans being checked in
     checked_in = Ticket.query.filter(TicketType.admits.in_(['full', 'kid'])) \
                              .join(TicketCheckin).filter_by(checked_in=True)
     badged_up = TicketCheckin.query.filter_by(badged_up=True)
@@ -85,18 +89,36 @@ def stats():
 
     proposals = Proposal.query
 
+    # Simple count queries
     queries = [
-        'full', 'kids',
-        'full_bought', 'kids_bought',
-        'full_unpaid', 'kids_unpaid',
-        'full_gocardless_unpaid', 'full_banktransfer_unpaid',
-        'parking_bought', 'campervan_bought',
         'checked_in', 'badged_up',
         'users',
         'proposals',
+        'gocardless_unpaid', 'banktransfer_unpaid',
+        'full_gocardless_unpaid', 'full_banktransfer_unpaid',
     ]
-
     stats = ['%s:%s' % (q, locals()[q].count()) for q in queries]
+
+    # Admission types breakdown
+    admit_types = ['full', 'kid', 'campervan', 'car']
+    admit_totals = dict.fromkeys(admit_types, 0)
+
+    for query in 'paid', 'expired', 'unexpired':
+        tickets = locals()[query].join(TicketType).with_entities(
+            TicketType.admits,
+            func.count(),
+        ).group_by(TicketType.admits).all()
+        tickets = dict(tickets)
+
+        for a in admit_types:
+            stats.append('%s_%s:%s' % (a, query, tickets.get(a, 0)))
+            admit_totals[a] += tickets.get(a, 0)
+
+    # and totals
+    for a in admit_types:
+        stats.append('%s:%s' % (a, admit_totals[a]))
+
+
     return ' '.join(stats)
 
 

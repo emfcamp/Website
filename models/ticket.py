@@ -1,8 +1,8 @@
 from main import db, cache
 from flask import current_app as app
 
-from sqlalchemy.orm import Session
-from sqlalchemy import event, or_
+from sqlalchemy.orm import Session, column_property
+from sqlalchemy import event, or_, and_, func
 from sqlalchemy.exc import IntegrityError
 
 from decimal import Decimal
@@ -175,6 +175,7 @@ class Ticket(db.Model):
     type_id = db.Column(db.Integer, db.ForeignKey('ticket_type.id'), nullable=False, index=True)
     paid = db.Column(db.Boolean, default=False, nullable=False, index=True)
     expires = db.Column(db.DateTime, nullable=False)
+    expired = column_property(and_(expires < func.now(), paid == False))  # noqa
     receipt = db.Column(db.String, unique=True)
     qrcode = db.Column(db.String, unique=True)
     emailed = db.Column(db.Boolean, default=False, nullable=False)
@@ -197,11 +198,6 @@ class Ticket(db.Model):
         self.user_id = user_id
         self.expires = datetime.utcnow() + timedelta(hours=2)
         self.ignore_capacity = False
-
-    def expired(self):
-        if self.paid:
-            return False
-        return self.expires < datetime.utcnow()
 
     def clone(self, new_code=None, ignore_capacity=False):
         if new_code is not None:
@@ -278,7 +274,7 @@ class Ticket(db.Model):
         attrs = [self.type.admits]
         if self.paid:
             attrs.append('paid')
-        if self.expired():
+        if self.expired:
             attrs.append('expired')
         return "<Ticket %s: %s>" % (self.id, ', '.join(attrs))
 

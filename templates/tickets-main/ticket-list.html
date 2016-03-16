@@ -15,7 +15,7 @@
 <tr class="
 {{- loop.cycle('odd', 'even') }}
 {%- if t.paid %} paid {%- endif -%}
-{%- if t.expired() %} expired {%- endif -%}
+{%- if t.expired %} expired {%- endif -%}
 ">
 <td class="checkbox-cell">
   {% if t.paid and feature_enabled('ISSUE_TICKETS') %}
@@ -30,7 +30,7 @@
     Cancelled
     {%- elif t.paid %}
     Paid
-    {%- elif t.expired() %}
+    {%- elif t.expired %}
     Unpaid
     {%- else %}
     Pending
