@@ -109,7 +109,7 @@ def home():
 @admin.route('/transactions')
 @admin_required
 def transactions():
-    txns = BankTransaction.query.filter_by(payment_id=None, suppressed=False).order_by('posted desc')
+    txns = BankTransaction.query.filter_by(payment_id=None, suppressed=False).order_by(BankTransaction.posted.desc())
     return render_template('admin/txns.html', txns=txns)
 
 
