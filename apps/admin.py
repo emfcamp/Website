@@ -77,12 +77,12 @@ def stats():
                                         Payment.state == 'inprogress')
 
     # TODO: remove this if it's not needed
-    full_gocardless_unpaid = unexpired.filter(Payment.provider == 'gocardless',
-                                              Payment.state == 'inprogress'). \
-                                              join(TicketType).filter_by(admits='full')
-    full_banktransfer_unpaid = unexpired.filter(Payment.provider == 'banktransfer',
-                                                Payment.state == 'inprogress'). \
-                                                join(TicketType).filter_by(admits='full')
+    full_gocardless_unexpired = unexpired.filter(Payment.provider == 'gocardless',
+                                                 Payment.state == 'inprogress'). \
+                                                 join(TicketType).filter_by(admits='full')
+    full_banktransfer_unexpired = unexpired.filter(Payment.provider == 'banktransfer',
+                                                   Payment.state == 'inprogress'). \
+                                                   join(TicketType).filter_by(admits='full')
 
     # These are people queries - don't care about cars or campervans being checked in
     checked_in = Ticket.query.filter(TicketType.admits.in_(['full', 'kid'])) \
@@ -99,7 +99,7 @@ def stats():
         'users',
         'proposals',
         'gocardless_unpaid', 'banktransfer_unpaid',
-        'full_gocardless_unpaid', 'full_banktransfer_unpaid',
+        'full_gocardless_unexpired', 'full_banktransfer_unexpired',
     ]
     stats = ['%s:%s' % (q, locals()[q].count()) for q in queries]
 

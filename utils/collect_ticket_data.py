@@ -18,9 +18,9 @@ for key, admits in [('full', 'full'), ('kids', 'kid')]:
 			key, data[admits + "_expired"]))
 
 submission.append("tickets,type=full,status=gocardless_unpaid value=%s" % (
-		  data["full_gocardless_unpaid"]))
+		  data["full_gocardless_unexpired"]))
 submission.append("tickets,type=full,status=banktransfer_unpaid value=%s" % (
-		  data["full_banktransfer_unpaid"]))
+		  data["full_banktransfer_unexpired"]))
 
 submission.append("tickets,type=parking,status=bought value=%s" % (
 		  data["car_paid"]))
