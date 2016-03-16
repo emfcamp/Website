@@ -77,8 +77,12 @@ def stats():
                                         Payment.state == 'inprogress')
 
     # TODO: remove this if it's not needed
-    full_gocardless_unpaid = gocardless_unpaid.join(TicketType).filter_by(admits='full')
-    full_banktransfer_unpaid = banktransfer_unpaid.join(TicketType).filter_by(admits='full')
+    full_gocardless_unpaid = unexpired.filter(Payment.provider == 'gocardless',
+                                              Payment.state == 'inprogress'). \
+                                              join(TicketType).filter_by(admits='full')
+    full_banktransfer_unpaid = unexpired.filter(Payment.provider == 'banktransfer',
+                                                Payment.state == 'inprogress'). \
+                                                join(TicketType).filter_by(admits='full')
 
     # These are people queries - don't care about cars or campervans being checked in
     checked_in = Ticket.query.filter(TicketType.admits.in_(['full', 'kid'])) \
