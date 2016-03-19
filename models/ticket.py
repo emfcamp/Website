@@ -37,6 +37,7 @@ class TicketType(db.Model):
     is_transferable = db.Column(db.Boolean, default=True, nullable=False)
     # Nullable fields
     expires = db.Column(db.DateTime)
+    expired = column_property(expires < func.now())
     description = db.Column(db.String)
     discount_token = db.Column(db.String)
 
@@ -99,6 +100,8 @@ class TicketType(db.Model):
         return sold_tickets
 
     def get_remaining(self):
+        if self.expired:
+            return 0
         return self.type_limit - self.get_sold().count()
 
     def user_limit(self, user, discount_token):
