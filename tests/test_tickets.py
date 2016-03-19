@@ -16,7 +16,6 @@ class TicketTestCase(unittest.TestCase):
             self.db.session.add(self.user)
             self.db.session.commit()
 
-    @unittest.skip("Test needs updating")
     def test_ticket_creation(self):
         with self.app.app_context():
             self.db.session.add(self.user)
@@ -24,8 +23,22 @@ class TicketTestCase(unittest.TestCase):
             ticket = Ticket(type=tt, user_id=self.user.id)
             self.db.session.add(ticket)
             self.db.session.commit()
+
+            # A ticket without a payment isn't sold...
+            assert sum(TicketType.get_ticket_sales().values()) == 0
             assert ticket.id is not None
+
+            ticket.paid = True
+            self.db.session.flush()
+            # ... but a paid one is
             assert sum(TicketType.get_ticket_sales().values()) == 1
+
             ticket.expires = datetime.now() - timedelta(minutes=1)
             self.db.session.flush()
+            # Expired tickets still count towards capacity
             assert sum(TicketType.get_ticket_sales().values()) == 1
+
+            ticket.paid = False
+            self.db.session.flush()
+            assert sum(TicketType.get_ticket_sales().values()) == 0
+
