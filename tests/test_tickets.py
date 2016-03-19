@@ -27,4 +27,4 @@ class TicketTestCase(unittest.TestCase):
             assert sum(TicketType.get_ticket_sales().values()) == 1
             ticket.expires = datetime.now() - timedelta(minutes=1)
             self.db.session.flush()
-            assert sum(TicketType.get_ticket_sales().values()) == 0
+            assert sum(TicketType.get_ticket_sales().values()) == 1
