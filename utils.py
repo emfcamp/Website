@@ -198,19 +198,11 @@ class Reconcile(Command):
 
         app.logger.info('Reconciliation complete: %s paid, %s failed', paid, failed)
 
-def add_ticket_types(ticket_list):
-    types = []
-
-    for row in ticket_list:
-        tt = TicketType(*row[:5], personal_limit=row[5], description=row[9],
-            has_badge=row[8], discount_token=row[10], expires=row[11],
-            is_transferable=row[12])
-        tt.prices = [TicketPrice('GBP', row[6]), TicketPrice('EUR', row[7])]
-        types.append(tt)
-
+def add_ticket_types(types):
     for tt in types:
         existing_tt = TicketType.query.get(tt.id)
         if existing_tt:
+            # NB we don't even consider updating prices. If we do, make sure no tickets have been bought.
             app.logger.info('Refreshing TicketType %s (id: %s)', tt.name, tt.id)
             for f in ['name', 'type_limit', 'expires', 'personal_limit', 'order', 'description']:
                 cur_val = getattr(existing_tt, f)
@@ -227,59 +219,98 @@ def add_ticket_types(ticket_list):
 
     app.logger.info('Tickets refreshed')
 
+def get_main_ticket_types():
+    #
+    # Update the DB consistently without breaking existing tickets.
+    #
+    # Ticket prices are immutable, so to change prices, create a new type
+    # with a unique id, and set the type limit for the previous one to the
+    # number of guaranteed paid tickets (which might be 0).
+    #
+    # This is fiddly. It should probably be moved out to a json file.
+
+    type_data = [
+        # (id, order, admits, name, type limit, personal limit, GBP, EUR, Description, [Token, Expiry, Transferable])
+        # Leave order 0 & 1 free for discount tickets
+        (0, 2, 'full', 'Full Camp Ticket', 193, 10, 100.00, 140.00, True, None, None, datetime(2016, 1, 10, 20, 24), None),
+        (1, 3, 'full', 'Full Camp Ticket', 350, 10, 110.00, 145.00, True, None, None, datetime(2016, 3, 6, 13, 5), None),
+        (2, 4, 'full', 'Full Camp Ticket', 993, 10, 120.00, 158.00, True, None, None, None, None),
+        # (3, 5, 'full', 'Full Camp Ticket', 400, 10, 120.00, 165.00, True, None, None, None, None),
+        (3, 8, 'full', 'Full Camp Ticket (Supporter)', 56, 10, 130.00, 180.00, True,
+            "Support this non-profit event by paying a bit more. "
+            "All money will go towards making EMF more awesome.",
+            None, None, None),
+        (9, 8, 'full', 'Full Camp Ticket (Supporter)', 1100, 10, 130.00, 170.00, True,
+            "Support this non-profit event by paying a bit more. "
+            "All money will go towards making EMF more awesome.",
+            None, None, None),
+
+        (4, 9, 'full', 'Full Camp Ticket (Gold Supporter)', 6, 10, 150.00, 210.00, True,
+            "Pay even more, receive our undying gratitude.",
+            None, None, None),
+        (10, 9, 'full', 'Full Camp Ticket (Gold Supporter)', 1100, 10, 150.00, 195.00, True,
+            "Pay even more, receive our undying gratitude.",
+            None, None, None),
+
+        (5, 10, 'kid', 'Under-16 Camp Ticket', 11, 10, 45.00, 64.00, True,
+            "For visitors born after August 5th, 2000. "
+            "All under-16s must be accompanied by an adult.",
+            None, None, None),
+        (11, 10, 'kid', 'Under-16 Camp Ticket', 500, 10, 45.00, 60.00, True,
+            "For visitors born after August 5th, 2000. "
+            "All under-16s must be accompanied by an adult.",
+            None, None, None),
+
+        (6, 15, 'kid', 'Under-5 Camp Ticket', 200, 4, 0, 0, False,
+            "For children born after August 5th, 2011. "
+            "All children must be accompanied by an adult.",
+            None, None, None),
+
+        (7, 30, 'car', 'Parking Ticket', 450, 4, 15.00, 21.00, False,
+            "We're trying to keep cars to a minimum. "
+            "Please take public transport or car-share if you can.",
+            None, None, None),
+
+        (8, 35, 'campervan',
+            'Caravan/Campervan Ticket', 60, 2, 30.00, 42.00, False,
+            "If you bring a caravan, you won't need a separate parking ticket for the towing car.",
+            None, None, None),
+    ]
+    # most of these tickets have no tokens or expiry dates
+    assert all([len(t) == 13 for t in type_data])
+
+    types = []
+    for row in type_data:
+        tt = TicketType(*row[:5], personal_limit=row[5], description=row[9],
+            has_badge=row[8], discount_token=row[10], expires=row[11],
+            is_transferable=row[12])
+        tt.prices = [TicketPrice('GBP', row[6]), TicketPrice('EUR', row[7])]
+        types.append(tt)
+
+    return types
+
+def test_main_ticket_types():
+    # Test things like non-unique keys
+    types = get_main_ticket_types()
+    ids = [tt.id for tt in types]
+    if len(set(ids)) < len(ids):
+        raise Exception('Duplicate ticket type ID')
+
+
 class CreateTickets(Command):
     def run(self):
-        #
-        # if you change these, change ticket_forms in views/tickets.py as well.
-        #
-
-        type_data = [
-            # (id, order, admits, name, type limit, personal limit, GBP, EUR, Description)
-            # Leave order 0 & 1 free for discount tickets
-            (0, 2, 'full', 'Full Camp Ticket', 193, 10, 100.00, 140.00, True, None),
-            (1, 3, 'full', 'Full Camp Ticket', 350, 10, 110.00, 145.00, True, None),
-            (2, 4, 'full', 'Full Camp Ticket', 450, 10, 120.00, 158.00, True, None),
-            # (3, 5, 'full', 'Full Camp Ticket', 400, 10, 120.00, 165.00, True, None),
-            (3, 8, 'full', 'Full Camp Ticket (Supporter)', 56, 10, 130.00, 180.00, True,
-                "Support this non-profit event by paying a bit more. "
-                "All money will go towards making EMF more awesome."),
-            (9, 8, 'full', 'Full Camp Ticket (Supporter)', 1100, 10, 130.00, 170.00, True,
-                "Support this non-profit event by paying a bit more. "
-                "All money will go towards making EMF more awesome."),
-
-            (4, 9, 'full', 'Full Camp Ticket (Gold Supporter)', 6, 10, 150.00, 210.00, True,
-                "Pay even more, receive our undying gratitude."),
-            (10, 9, 'full', 'Full Camp Ticket (Gold Supporter)', 1100, 10, 150.00, 195.00, True,
-                "Pay even more, receive our undying gratitude."),
-
-            (5, 10, 'kid', 'Under-16 Camp Ticket', 11, 10, 45.00, 64.00, True,
-                "For visitors born after August 5th, 2000. "
-                "All under-16s must be accompanied by an adult."),
-            (11, 10, 'kid', 'Under-16 Camp Ticket', 500, 10, 45.00, 60.00, True,
-                "For visitors born after August 5th, 2000. "
-                "All under-16s must be accompanied by an adult."),
-
-            (6, 15, 'kid', 'Under-5 Camp Ticket', 200, 4, 0, 0, False,
-                "For children born after August 5th, 2011. "
-                "All children must be accompanied by an adult."),
-
-            (7, 30, 'car', 'Parking Ticket', 450, 4, 15.00, 21.00, False,
-                "We're trying to keep cars to a minimum. "
-                "Please take public transport or car-share if you can."),
-
-            (8, 35, 'campervan',
-                'Caravan/Campervan Ticket', 60, 2, 30.00, 42.00, False,
-                "If you bring a caravan, you won't need a separate parking ticket for the towing car."),
-        ]
-        # none of these tickets have tokens or expiry dates
-        type_data = [ t + (None, None, None) for t in type_data]
-
-        add_ticket_types(type_data)
+        types = get_main_ticket_types()
+        add_ticket_types(types)
 
 
 class CreateTicketTokens(Command):
-    # This is effectively the same as creating a ticket
+    # This is effectively the same as creating a ticket, but
+    # we need to make sure they don't conflict with non-token tickets.
+
     def run(self):
+        app.logger.critical('Tokens are disabled for now. Please remove this line to test.')
+        return
+
         discount_ticket_types = [
             (9, 0, 'full', 'Complimentary Full Camp Ticket', 1, 1, 0.0, 0.0, True, None, 'super-lucky'),
             (10, 1, 'full', 'Discount Full Camp Ticket', 10, 1, 70.00, 90.00, True, None, 'lucky')
