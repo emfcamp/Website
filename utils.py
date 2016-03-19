@@ -234,7 +234,7 @@ def get_main_ticket_types():
         # Leave order 0 & 1 free for discount tickets
         (0, 2, 'full', 'Full Camp Ticket', 193, 10, 100.00, 140.00, True, None, None, datetime(2016, 1, 10, 20, 24), None),
         (1, 3, 'full', 'Full Camp Ticket', 350, 10, 110.00, 145.00, True, None, None, datetime(2016, 3, 6, 13, 5), None),
-        (2, 4, 'full', 'Full Camp Ticket', 993, 10, 120.00, 158.00, True, None, None, None, None),
+        (2, 4, 'full', 'Full Camp Ticket', 450, 10, 120.00, 158.00, True, None, None, None, None),
         # (3, 5, 'full', 'Full Camp Ticket', 400, 10, 120.00, 165.00, True, None, None, None, None),
         (3, 8, 'full', 'Full Camp Ticket (Supporter)', 56, 10, 130.00, 180.00, True,
             "Support this non-profit event by paying a bit more. "
