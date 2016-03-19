@@ -36,7 +36,7 @@
     <td>{{ type.order }}</td>
     <td>{{ type.admits }}</td>
     <td>£{{ type.get_price('GBP') }}</td>
-    <td>{{ type.get_sold() }}</td>
+    <td>{{ type.get_sold().count() }}</td>
     <td>{{ type.type_limit }}</td>
     <td>{% if type.expires %}{{ type.expires.strftime('%Y-%m-%d') }}{% else %}--{% endif %}</td>
     <td>{{ type.discount_token or '--' }}</td>

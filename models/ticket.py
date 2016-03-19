@@ -1,5 +1,6 @@
 from main import db, cache
 from flask import current_app as app
+from models.payment import Payment
 
 from sqlalchemy.orm import Session, column_property
 from sqlalchemy import event, or_, and_, func
@@ -16,9 +17,8 @@ def validate_safechars(val):
     match = re.match('[%s]+' % re.escape(safechars_lower), val)
     return bool(match)
 
-class TicketError(Exception):
+class TicketLimitException(Exception):
     pass
-
 
 class CheckinStateException(Exception):
     pass
@@ -82,14 +82,24 @@ class TicketType(db.Model):
         return self.discount_token == discount_token and self.is_in_date()
 
     def get_sold(self, query=None):
-        query = Ticket.query if query is None else query
+        if query is None:
+            query = Ticket.query
 
-        return query.filter_by(type=self).\
-            filter(or_(Ticket.expires >= datetime.utcnow(), Ticket.paid)). \
-            count()
+        # A ticket is sold if it's set to paid, or if it's reserved
+        # (there's a valid payment associated with it)
+        sold_tickets = query.filter(
+            Ticket.type == self,
+            or_(Ticket.paid,
+                Payment.query.filter(
+                    Payment.state != 'new',
+                    Payment.state != 'cancelled',
+                ).filter(Payment.tickets.expression).exists())
+        )
+
+        return sold_tickets
 
     def get_remaining(self):
-        return self.type_limit - self.get_sold()
+        return self.type_limit - self.get_sold().count()
 
     def user_limit(self, user, discount_token):
         if not self.is_in_date() or not self.is_correct_discount_token(discount_token):
@@ -97,7 +107,7 @@ class TicketType(db.Model):
 
         if user.is_authenticated():
             # How many have been sold to this user
-            user_count = self.get_sold( user.tickets )
+            user_count = self.get_sold(user.tickets).count()
         else:
             user_count = 0
 
@@ -129,6 +139,7 @@ class TicketType(db.Model):
     def get_ticket_sales(cls):
         """ Get the number of tickets sold, by ticket type.
             Returns a dict of type -> count """
+        # FIXME: should this filter by payment type?
         full_tickets = TicketType.query.filter_by(admits='full').all()
         kid_tickets = TicketType.query.filter_by(admits='kid').all()
         admissions_tickets = full_tickets + kid_tickets
@@ -136,14 +147,17 @@ class TicketType(db.Model):
         ticket_totals = {}
 
         for ticket_type in admissions_tickets:
-            ticket_totals[ticket_type] = ticket_type.get_sold()
+            ticket_totals[ticket_type] = ticket_type.get_sold().count()
         return ticket_totals
 
     @classmethod
     def get_tickets_remaining(cls):
         """ Get the total number of tickets remaining. """
-        total = Ticket.query.join(Ticket.type).filter(or_(TicketType.admits == 'full',
-                                                          TicketType.admits == 'kid')).count()
+        total = Payment.query.filter(
+            Payment.state != 'new',
+            Payment.state != 'cancelled',
+        ).join(Ticket).join(Ticket.type).filter(or_(TicketType.admits == 'full',
+                                                    TicketType.admits == 'kid')).count()
         return app.config.get('MAXIMUM_ADMISSIONS') - total
 
 
@@ -339,10 +353,9 @@ class TicketCheckin(db.Model):
     def __init__(self, ticket):
         self.ticket = ticket
 
-# FIXME this should probably be somewhere else as it's not really part of the model
 @event.listens_for(Session, 'before_flush')
 def check_capacity(session, flush_context, instances):
-    tickets_in_session = {}
+    tt_totals = {}
 
     for obj in session.new:
         if not isinstance(obj, Ticket):
@@ -351,29 +364,26 @@ def check_capacity(session, flush_context, instances):
         if obj.ignore_capacity:
             continue
 
-        tickets_in_session[obj.type] = 1 if obj.type not in tickets_in_session \
-                                         else tickets_in_session[obj.type] + 1
+        tt = obj.type
 
-    if not tickets_in_session:
+        if tt not in tt_totals:
+            tt_totals[tt] = tt.get_sold().count()
+
+        tt_totals[tt] += 1
+
+    if not tt_totals:
         # Don't block unrelated updates
         return
 
-    full_tickets = TicketType.query.filter_by( admits='full' ).all()
-    kid_tickets = TicketType.query.filter_by( admits='kid' ).all()
-    admissions_tickets = full_tickets + kid_tickets
+    total_admissions = 0
+    for tt, total in tt_totals.items():
+        if total > tt.type_limit:
+            app.logger.warn('Total tickets of type %s (%s) %s > %s', tt.id, tt.name, total, tt.type_limit)
+            raise TicketLimitException('Ticket limit exceeded for %s' % tt.name)
 
-    ticket_totals = {}
+        if tt.admits in ['full', 'kid']:
+            total_admissions += total
 
-    people = 0
-    for type in admissions_tickets:
-        sold = type.get_sold() + tickets_in_session.get(type, 0)
+    if total_admissions > app.config.get('MAXIMUM_ADMISSIONS'):
+        raise TicketLimitException('No more admission tickets available')
 
-        people += sold
-        ticket_totals[type] = sold
-
-    if people > app.config.get('MAXIMUM_ADMISSIONS'):
-        raise TicketError('No more admission tickets available')
-
-    for type, total in ticket_totals.items():
-        if total > type.type_limit:
-            raise TicketError('No more tickets of type %s available' % type.name)

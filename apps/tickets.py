@@ -15,12 +15,15 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from main import db
 from .common import (
-    get_user_currency, set_user_currency, get_basket_and_total, process_basket,
+    get_user_currency, set_user_currency, get_basket_and_total, create_basket,
     CURRENCY_SYMBOLS, feature_flag, create_current_user, send_template_email)
 from .common.forms import IntegerSelectField, HiddenIntegerField, Form
 from .common.receipt import make_qr_png, render_pdf, render_receipt
 from models.user import User
-from models.ticket import TicketType, Ticket, validate_safechars
+from models.ticket import (
+    TicketLimitException, TicketType, Ticket,
+    validate_safechars,
+)
 from models.payment import BankPayment, StripePayment, GoCardlessPayment
 from models.site_state import get_sales_state
 from models.payment import Payment
@@ -42,7 +45,7 @@ def create_payment(paymenttype):
     """
 
     infodata = session.get('ticketinfo')
-    basket, total = process_basket()
+    basket, total = create_basket()  # creates Ticket objects
     currency = get_user_currency()
 
     if not (basket and total):
@@ -267,7 +270,13 @@ def pay():
         elif form.stripe.data:
             payment_type = StripePayment
 
-        payment = create_payment(payment_type)
+        try:
+            payment = create_payment(payment_type)
+        except TicketLimitException as e:
+            app.logger.warn('Limit exceeded creating tickets: %s' % e)
+            flash("We're sorry, we were unable to reserve your tickets. %s" % e)
+            return redirect(url_for('tickets.choose'))
+
         if not payment:
             app.logger.warn('Unable to add payment and tickets to database')
             flash("We're sorry, your session information has been lost. Please try ordering again.")

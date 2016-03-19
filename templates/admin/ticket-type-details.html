@@ -7,7 +7,7 @@
   <dt>Order</dt><dd>{{ ticket_type.order }}</dd>
   <dt>Admits</dt><dd>{{ ticket_type.admits }}</dd>
   <dt>Price</dt><dd>£{{ ticket_type.get_price('GBP') }} / €{{ ticket_type.get_price('EUR') }}</dd>
-  <dt>Sold</dt><dd>{{ ticket_type.get_sold() }}</dd>
+  <dt>Sold</dt><dd>{{ ticket_type.get_sold().count() }}</dd>
   <dt>Maximum</dt><dd>{{ ticket_type.type_limit }}</dd>
   <dt>Personal Maximum</dt><dd>{{ ticket_type.personal_limit }}</dd>
   <dt>Expires</dt><dd>{% if ticket_type.expires %}{{ ticket_type.expires.strftime('%Y-%m-%d') }}{% else %}--{% endif %}</dd>

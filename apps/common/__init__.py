@@ -109,7 +109,7 @@ def get_basket_and_total():
 
 # This actually adds the user's tickets to the database. This should only be used
 # just before a ticket is bought
-def process_basket():
+def create_basket():
     user_id = current_user.id
     items, total = get_basket_and_total()
 
