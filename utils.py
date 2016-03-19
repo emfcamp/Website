@@ -387,7 +387,7 @@ class LockProposals(Command):
 
     def run(self):
         edit_window = timedelta(days=app.config.get('EDIT_WINDOW', 2))
-        app.logger.info('Locking proposals older than %d days' % edit_window.days)
+        app.logger.info('Locking proposals older than %s', edit_window)
         new_proposals = Proposal.query.filter_by(state='new').all()
         lock_count = 0
         for proposal in new_proposals:
@@ -396,11 +396,11 @@ class LockProposals(Command):
             if datetime.utcnow() > deadline:
                 proposal.state = 'locked'
 
-                app.logger.debug('Locking proposal %d' % proposal.id)
+                app.logger.debug('Locking proposal %d', proposal.id)
                 db.session.commit()
                 lock_count += 1
 
-        app.logger.info('Locked %d proposals' % lock_count)
+        app.logger.info('Locked %d proposals', lock_count)
 
 
 if __name__ == "__main__":

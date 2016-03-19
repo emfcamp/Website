@@ -273,7 +273,7 @@ def pay():
         try:
             payment = create_payment(payment_type)
         except TicketLimitException as e:
-            app.logger.warn('Limit exceeded creating tickets: %s' % e)
+            app.logger.warn('Limit exceeded creating tickets: %s', e)
             flash("We're sorry, we were unable to reserve your tickets. %s" % e)
             return redirect(url_for('tickets.choose'))
 
