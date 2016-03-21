@@ -3,8 +3,9 @@
 <h2>CfP Proposals</h2>
 
 <p>
-    This page shows all the proposals <a href="#to-review-table">awaiting</a> review
-    and those that you have <a href="#reviewed-table">already</a> reviewed.
+    This page shows all the proposals <a href="#to-review-table">awaiting</a>
+    review (in a random order) and those that you have
+    <a href="#reviewed-table">already</a> reviewed.
 </p>
 
 <p>
@@ -16,10 +17,10 @@
             add it to the message box.
         </li>
         <li>
-            <strong>Recuse yourself</strong>: If you can identify the proposer or
-            have another conflict of interest you should recuse yourself. This is
-            counted as abstaining (i.e. a no-vote). If you need to do this
-            please tell us why you've done so in the message box.
+            <strong>Abstain (recuse yourself)</strong>: If you can identify the
+            proposer or have another conflict of interest you should recuse
+            yourself. This is an abstention (i.e. a no-vote). If you need to
+            do this please tell us why you've done so in the message box.
         </li>
         <li>
             <strong>Request information</strong>: If you feel the proposal is
@@ -49,15 +50,14 @@
         <th>Description</th>
     </tr>
 {% for proposal in to_review %}
-<tr>
-    <td>{{ proposal.type | capitalize }}</td>
-    <td><a href="{{ url_for('.review_proposal', proposal_id=proposal.id) }}">{{proposal.title}}</a></td>
-    <td>{{ proposal.description | truncate(100) }}</td>
-</tr>
+    <tr>
+        <td>{{ proposal.type | capitalize }}</td>
+        <td><a href="{{ url_for('.review_proposal', proposal_id=proposal.id) }}">{{proposal.title}}</a></td>
+        <td>{{ proposal.description | truncate(100) }}</td>
+    </tr>
+{% else %}
+    <td colspan="3" class="text-center">No proposals to review</td>
 {% endfor %}
-{% if not to_review %}
-    <td colspan="3" class="text-center">No proposals found</td>
-{% endif %}
 </table>
 
 <a id="reviewed-table"></a>
@@ -71,44 +71,43 @@
     <th>Note</th>
 </tr>
 {% for proposal in reviewed %}
-<tr>
-    <td>{{ proposal.get_user_vote(current_user).modified.strftime("%d/%m") }}</td>
-    <td>{{ proposal.type | capitalize }}</td>
-    <td><a href="{{ url_for('.review_proposal', proposal_id=proposal.id) }}">{{ proposal.title }}</a></td>
-    <td
-    {% set vote = proposal.get_user_vote(current_user) %}
-    {% if vote.state == 'recused' %}
-        class="danger"
-    {% elif vote.state == 'blocked' %}
-        class="info"
-    {% endif %}>
-        {% if vote.state == 'voted' %}
-            Voted:
-            {% if vote.vote == 0 %}
-                "I wouldn't go"
-            {% elif vote.vote == 1 %}
-                "I might go"
-            {% elif vote.vote == 2 %}
-                "I will go"
-            {% endif %}
-        {% elif vote.state == 'recused' %}
-            Recused
+    <tr>
+        <td>{{ proposal.get_user_vote(current_user).modified.strftime("%d/%m") }}</td>
+        <td>{{ proposal.type | capitalize }}</td>
+        <td><a href="{{ url_for('.review_proposal', proposal_id=proposal.id) }}">{{ proposal.title }}</a></td>
+        <td
+        {% set vote = proposal.get_user_vote(current_user) %}
+        {% if vote.state == 'recused' %}
+            class="danger"
         {% elif vote.state == 'blocked' %}
-            Awaiting details
-        {% endif %}
-    </td>
-    <td>
-        {% if vote.note %}
-            {{ vote.note | truncate(300) }}
-        {% else %}
-                --
-        {% endif %}
-    </td>
-</tr>
+            class="info"
+        {% endif %}>
+            {% if vote.state == 'voted' %}
+                Voted:
+                {% if vote.vote == 0 %}
+                    "I won't go"
+                {% elif vote.vote == 1 %}
+                    "I might go"
+                {% elif vote.vote == 2 %}
+                    "I will go"
+                {% endif %}
+            {% elif vote.state == 'recused' %}
+                Recused
+            {% elif vote.state == 'blocked' %}
+                Awaiting details
+            {% endif %}
+        </td>
+        <td>
+            {% if vote.note %}
+                {{ vote.note | truncate(300) }}
+            {% else %}
+                    --
+            {% endif %}
+        </td>
+    </tr>
+{% else %}
+    <td colspan="5" class="text-center">No reviewed proposals</td>
 {% endfor %}
-{% if not reviewed %}
-    <td colspan="5" class="text-center">No proposals found</td>
-{% endif %}
 
 </table>
 {% endblock %}

@@ -634,7 +634,7 @@ def review_list():
 class VoteForm(Form):
     vote_value = SelectField('Your vote', coerce=int, default=-3,
                              choices=[(-3, "-- Select a vote --"),
-                                      (0, "I wouldn't go"),
+                                      (0, "I won't go"),
                                       (1, "I might go"),
                                       (2, "I will go")])
     note = TextAreaField('Message')
@@ -713,7 +713,8 @@ def review_proposal(proposal_id):
         elif form.change.data:
             vote.set_state('resolved')
             flash("Proposal re-opened for review")
-            review_order.append(prop.id)
+            review_order.insert(0, proposal_id)
+            next_id = proposal_id
 
         session['review_order'] = review_order
         db.session.commit()
@@ -721,6 +722,8 @@ def review_proposal(proposal_id):
             return redirect(url_for('.review_list'))
         return redirect(url_for('.review_proposal', proposal_id=next_id))
 
+    if vote.note:
+        form.note.data = vote.note
     return render_template('cfp_review/review_proposal.html',
                            form=form, proposal=prop, next_id=next_id,
                            previous_vote=vote, remaining=remaining)

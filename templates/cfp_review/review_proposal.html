@@ -6,8 +6,8 @@
 
 {% if previous_vote and previous_vote.state not in ['resolved', 'stale'] %}
     <div class="col-md-9">
+        <h4>{{proposal.type | capitalize}}</h4>
         <h3>{{proposal.title}}</h3>
-        <h3><small>&mdash; a {{proposal.type | capitalize}}</small></h3>
         <dl class="dl-horizontal">
             <dt>Status</dt>
             <dd>
@@ -25,7 +25,7 @@
             <dd>
                 {% if previous_vote.state == 'voted' %}
                     {% if previous_vote.vote == 0 %}
-                        I wouldn't go
+                        I won't go
                     {% elif previous_vote.vote == 1 %}
                         I might go
                     {% elif previous_vote.vote == 2 %}
@@ -50,9 +50,8 @@
     </div>
 {% else %}
     <div class="col-md-7">
-        <h3><small>{{ remaining }} proposals remain.</small></h3>
+        <h4>{{proposal.type | capitalize}}</h4>
         <h3>{{proposal.title}}</h3>
-        <h3><small>&mdash; a {{proposal.type | capitalize}}</small></h3>
         <div>&nbsp;</div>
         <div>{{ proposal.description }}</div>
     </div>
@@ -79,6 +78,7 @@
             <a href="{{ url_for('.review_list') }}" class="btn btn-default">
                 List of all proposals
             </a>
+            <h4 class="pull-right">{{ remaining }} proposals remain</h4>
         </div>
     </form>
 {% endif %}
