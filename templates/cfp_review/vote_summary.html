@@ -5,7 +5,7 @@
 <table class="table table-striped">
     <tr>
         <th class="text-center">Date</th>
-        <th class="text-center">Unread notes</th>
+        <th class="text-center">Notes</th>
         <th class="text-center">Votes</th>
         <th class="text-center">Blocked</th>
         <th class="text-center">Recused</th>
@@ -14,7 +14,9 @@
 {% for proposal, counts in proposals_with_counts %}
     <tr>
         <td class="text-center">{{ proposal.created.strftime("%d/%m") }}</td>
-        <td class="text-center">{{ proposal.get_unread_vote_note_count() }}</td>
+        <td class="text-center">
+            {{ proposal.get_unread_vote_note_count() }}/{{ proposal.get_total_note_count() }}
+        </td>
         <td class="text-center">{{ counts.get('voted', 0) }}</td>
         <td class="text-center">{{ counts.get('blocked', 0) }}</td>
         <td class="text-center">{{ counts.get('recused', 0) }}</td>

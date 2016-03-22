@@ -57,7 +57,7 @@
                             {% if loop.first and not vote.has_been_read %}
                                 <span class="glyphicon glyphicon-envelope"></span>
                             {% endif %}
-                            {{ ver.note }}
+                            {{ ver.note if ver.note else '--' }}
                         </td>
                         {% if loop.first and vote.state in ['blocked', 'recused'] %}
                             {# The actual form bit... #}

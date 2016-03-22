@@ -75,6 +75,9 @@ class Proposal(db.Model):
     def get_unread_vote_note_count(self):
         return len([v for v in self.votes if not v.has_been_read])
 
+    def get_total_note_count(self):
+        return len([v for v in self.votes if v.note and len(v.note) > 0])
+
     def get_unread_messages(self, user):
         return [m for m in self.messages if (not m.has_been_read and
                                              m.is_user_recipient(user))]

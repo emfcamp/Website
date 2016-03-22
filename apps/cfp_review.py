@@ -42,10 +42,16 @@ def cfp_review_variables():
     proposal_counts = {state: Proposal.query.filter_by(state=state).count()
                                                         for state in CFP_STATES}
 
+    unread_reviewer_notes = CFPVote.query.filter(
+        or_(CFPVote.has_been_read.is_(False),
+            CFPVote.has_been_read.is_(None))
+    ).count()
+
     return {
         'ordered_states': ordered_states,
         'unread_count': unread_count,
         'proposal_counts': proposal_counts,
+        'unread_reviewer_notes': unread_reviewer_notes,
         'view_name': request.url_rule.endpoint.replace('cfp_review.', '.')
     }
 
@@ -575,11 +581,17 @@ def anonymise_proposal(proposal_id):
 
 def get_proposals_to_review(user):
     categories = [cat.id for cat in user.review_categories]
+    types = ['talk', 'workshop']
+
+    if user.has_permission('admin'):
+        types.append('installation')
+
     return Proposal.query\
         .outerjoin(ProposalCategory)\
         .filter(
             Proposal.state == 'anonymised',
             Proposal.user_id != user.id,
+            Proposal.type.in_(types),
             or_(Proposal.category_id.in_(categories),
                 Proposal.category_id.is_(None))
         ).all()
@@ -632,14 +644,12 @@ def review_list():
                            to_review=to_review, reviewed=reviewed)
 
 class VoteForm(Form):
-    vote_value = SelectField('Your vote', coerce=int, default=-3,
-                             choices=[(-3, "-- Select a vote --"),
-                                      (0, "I won't go"),
-                                      (1, "I might go"),
-                                      (2, "I will go")])
+    vote_wont = SubmitField('I won\'t go')
+    vote_might = SubmitField('I might go')
+    vote_will = SubmitField('I will go')
+
     note = TextAreaField('Message')
 
-    vote = SubmitField('Vote')
     change = SubmitField("I'd like to change my response")
     recuse = SubmitField('I can identify the submitter (abstain)')
     question = SubmitField('I need more information')
@@ -650,22 +660,23 @@ class VoteForm(Form):
         if not field.data and form.question.data:
             raise ValidationError('Please let us know what\'s unclear')
 
-    def validate_vote_value(form, field):
-        if field.data == -3 and form.vote.data:
-            raise ValidationError('You need to choose a vote')
-
 
 @cfp_review.route('/review/<int:proposal_id>', methods=['GET', 'POST'])
 @review_required
 def review_proposal(proposal_id):
     prop = Proposal.query.get(proposal_id)
-    # Reviewers can only see anonymised proposals that aren't there's
-    if prop.state != 'anonymised' or prop.user == current_user:
+
+    # Reviewers can only see anonymised proposals that aren't theirs
+    # Also, only admin are reviewing installations
+    if prop.state != 'anonymised'\
+            or prop.user == current_user\
+            or (prop.type == 'installation' and
+                not current_user.has_permission('admin')):
         return abort(404)
 
     form = VoteForm()
 
-    # If proposals
+
     review_order = session.get('review_order')
 
     # If the review order is missing redirect to the list to rebuild it
@@ -675,7 +686,7 @@ def review_proposal(proposal_id):
     if review_order and proposal_id in review_order:
         index = review_order.index(proposal_id) + 1
         next_id = review_order[index] if index < len(review_order) else None
-        remaining = len(review_order) - 1
+        remaining = len(review_order)
 
     else:
         remaining = 0
@@ -696,33 +707,42 @@ def review_proposal(proposal_id):
         else:
             vote.has_been_read = True
 
+        vote_value = 2 if form.vote_will.data else\
+                     1 if form.vote_might.data else\
+                     0 if form.vote_wont.data else None
+
         # Update vote state
-        if form.vote.data:
-            vote.vote = form.vote_value.data
+        message = 'error'
+        if vote_value is not None:
+            vote.vote = vote_value
             vote.set_state('voted')
             review_order.remove(prop.id)
+            message = 'You voted ' + (['won\'t', 'might', 'will'][vote_value]) + ' go'
 
         elif form.recuse.data:
             vote.set_state('recused')
             review_order.remove(prop.id)
+            message = 'You declared a conflict of interest'
 
         elif form.question.data:
             vote.set_state('blocked')
             review_order.remove(prop.id)
+            message = 'You requested more information'
 
         elif form.change.data:
             vote.set_state('resolved')
-            flash("Proposal re-opened for review")
+            message = 'Proposal re-opened for review'
             review_order.insert(0, proposal_id)
             next_id = proposal_id
 
+        flash(message, 'info')
         session['review_order'] = review_order
         db.session.commit()
         if not next_id:
             return redirect(url_for('.review_list'))
         return redirect(url_for('.review_proposal', proposal_id=next_id))
 
-    if vote.note:
+    if vote and vote.note:
         form.note.data = vote.note
     return render_template('cfp_review/review_proposal.html',
                            form=form, proposal=prop, next_id=next_id,
@@ -731,6 +751,8 @@ def review_proposal(proposal_id):
 class CloseRoundForm(Form):
     min_votes = IntegerField('Minimum number of votes', default=10, validators=[NumberRange(min=2)])
     close_round = SubmitField('Close this round')
+    confirm = SubmitField('Confirm')
+    cancel = SubmitField('Cancel')
 
 
 @cfp_review.route('/close-round', methods=['GET', 'POST'])
@@ -748,9 +770,6 @@ def close_round():
         .group_by('proposal_id')\
         .subquery()
 
-    if form.validate_on_submit():
-        min_votes = form.min_votes.data
-
     proposals = Proposal.query\
         .with_entities(Proposal, vote_subquery.c.count)\
         .join(
@@ -758,24 +777,42 @@ def close_round():
             Proposal.id == vote_subquery.c.proposal_id
         )\
         .filter(
-            Proposal.state == 'anonymised',
-            vote_subquery.c.proposal_id > min_votes
-        ).all()
+            Proposal.state == 'anonymised'
+        ).order_by(vote_subquery.c.count.desc()).all()
 
-    if form.close_round.data:
-        for (prop, _) in proposals:
-            prop.set_state('reviewed')
+    preview = False
+    if form.validate_on_submit():
+        if form.confirm.data:
+            min_votes = session['min_votes']
+            for (prop, vote_count) in proposals:
+                if vote_count >= min_votes:
+                    prop.set_state('reviewed')
 
-        db.session.commit()
-        app.logger.info("CFP Round closed. Set %d proposals to 'reviewed'" % len(proposals))
+            db.session.commit()
+            del session['min_votes']
+            app.logger.info("CFP Round closed. Set %d proposals to 'reviewed'" % len(proposals))
 
-        return redirect(url_for('.rank'))
+            return redirect(url_for('.rank'))
 
-    return render_template('cfp_review/close-round.html', proposals=proposals, form=form)
+        elif form.close_round.data:
+            preview = True
+            session['min_votes'] = form.min_votes.data
+            flash('Blue proposals will be marked as "reviewed"')
+
+        elif form.cancel.data:
+            form.min_votes.data = form.min_votes.default
+            if 'min_votes' in session:
+                del session['min_votes']
+
+    return render_template('cfp_review/close-round.html', form=form,
+                           proposals=proposals, preview=preview,
+                           min_votes=session.get('min_votes'))
 
 class AcceptanceForm(Form):
     min_score = IntegerField('Minimum score for acceptance')
-    submit = SubmitField('Accept Proposals')
+    set_score = SubmitField('Accept Proposals')
+    confirm = SubmitField('Confirm')
+    cancel = SubmitField('Cancel')
 
 
 @cfp_review.route('/rank', methods=['GET', 'POST'])
@@ -791,34 +828,50 @@ def rank():
         score = calculate_score(score_list)
         scored_proposals.append((prop, score))
 
-    scored_proposals = sorted(scored_proposals, key=lambda p: p[1])
+    scored_proposals = sorted(scored_proposals, key=lambda p: p[1], reverse=True)
 
+    preview = False
     if form.validate_on_submit():
-        for (prop, score) in scored_proposals:
-            count = 0
-            if score >= form.min_score.data:
-                prop.set_state('accepted')
-                count += 1
-                send_template_email('Your EMF proposal has been accepted!',
-                                    prop.user.email, app.config['CONTENT_EMAIL'],
-                                    'cfp_review/email/accepted_msg.txt',
-                                    user=prop.user, proposal=prop)
-            elif not prop.has_rejected_email:
-                prop.has_rejected_email = True
-                send_template_email('Your EMF proposal.',
-                                    prop.user.email, app.config['CONTENT_EMAIL'],
-                                    'cfp_review/email/not_accepted_msg.txt',
-                                    user=prop.user, proposal=prop)
+        if form.confirm.data:
+            min_score = session['min_score']
+            for (prop, score) in scored_proposals:
+                count = 0
+                if score >= min_score:
+                    prop.set_state('accepted')
+                    count += 1
+                    send_template_email('Your EMF proposal has been accepted!',
+                                        prop.user.email, app.config['CONTENT_EMAIL'],
+                                        'cfp_review/email/accepted_msg.txt',
+                                        user=prop.user, proposal=prop)
+
+                elif not prop.has_rejected_email:
+                    prop.has_rejected_email = True
+                    send_template_email('Your EMF proposal.',
+                                        prop.user.email, app.config['CONTENT_EMAIL'],
+                                        'cfp_review/email/not_accepted_msg.txt',
+                                        user=prop.user, proposal=prop)
 
 
-        db.session.commit()
-        msg = "Accepted %d proposals" % count
-        app.logger.info(msg)
-        flash(msg)
-        return redirect(url_for('.proposals', state='accepted'))
-    return render_template('cfp_review/rank.html',
-                           proposals=scored_proposals, form=form)
+            db.session.commit()
+            del session['min_score']
+            msg = "Accepted %d proposals; min score: %d" % (count, min_score)
+            app.logger.info(msg)
+            flash(msg, 'info')
+            return redirect(url_for('.proposals', state='accepted'))
 
+        elif form.set_score.data:
+            preview = True
+            session['min_score'] = form.min_score.data
+            flash('Blue proposals will be accepted', 'info')
 
+        elif form.cancel.data and 'min_score' in session:
+            del session['min_score']
 
+    accepted_count = Proposal.query\
+        .filter(
+            Proposal.state.in_(['accepted', 'finished'])
+        ).count()
 
+    return render_template('cfp_review/rank.html', form=form, preview=preview,
+                           proposals=scored_proposals, accepted_count=accepted_count,
+                           min_score=session.get('min_score'))

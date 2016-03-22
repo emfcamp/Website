@@ -36,7 +36,7 @@
             </ul>
         </li>
         {{ menuitem("Messages", ".all_messages", unread_count) }}
-        {{ menuitem("Voting", ".vote_summary") }}
+        {{ menuitem("Voting", ".vote_summary", unread_reviewer_notes) }}
         <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                 aria-haspopup="true" aria-expanded="false"
@@ -46,7 +46,7 @@
             <ul class="dropdown-menu">
                 {{ menuitem("Categories", ".categories") }}
                 <li role="separator" class="divider"></li>
-                {{ menuitem("Close", ".close_round") }}
+                {{ menuitem("Close Round", ".close_round") }}
                 {{ menuitem("Rank", ".rank") }}
                 <li role="separator" class="divider"></li>
                 {{ menuitem('Anonymisation', '.anonymisation', proposal_counts['checked']) }}
