@@ -234,5 +234,50 @@
     </li>
   </ol>
 </div>
+
+<hr>
+
+<a class="collapse-toggle" role="button" data-toggle="collapse" href="#faq" aria-expanded="true" aria-controls="#faq">
+  <h3>The FAQ<small class="glyphicon glyphicon-chevron-down"></small></h3>
+</a>
+<div class="collapse in" id="faq">
+  <dl>
+    <dt>Why do you have your own messaging system?</dt>
+    <dd>
+      Because wrangling email from multiple people, possibly on
+      multiple topics (i.e. if one person has several submissions) rapidly gets
+      very tricky.
+
+      We realise being sent a "you have pending messages" email sucks and we'd
+      rather not do it but we just couldn't make alternatives work in the time
+      we had to implement all of this.
+    </dd>
+    <dt>I have questions!</dt>
+    <dd>
+      If it's not here (or in the
+      <a href="https://wiki.emfcamp.org/wiki/FAQ">wiki FAQ</a>) then feel free
+      to email <a href="mailto:{{ config['CONTENT_EMAIL'][0] }}">{{ config['CONTENT_EMAIL'][0] }}</a>
+    </dd>
+    <dt>Why aren't installations put through the same review process?</dt>
+    <dd>
+      <p>
+        There are many reasons (e.g. safety, space, money) but broadly the process
+        of organising an installation for us often ends up more of a dialogue than
+        a straight submission system will allow for.
+      </p>
+      <p>
+        There are also considerations
+        that may have to be made by the orga team as well (e.g. how to supply
+        power). All of this makes the process a lot slower which in turn places
+        extra limitations on those making the installations as there's less time
+        available to them.
+      </p>
+      <p>
+        In the future we'd like to place installations into the main part of the
+        review process but currently that's not feasible.
+      </p>
+    </dd>
+  </dl>
+</div>
 </div>
 {% endblock %}
