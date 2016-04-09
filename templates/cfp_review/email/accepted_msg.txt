@@ -1,8 +1,8 @@
 Hi {{ user.name }},
 
 Your {{ proposal.type }} ({{ proposal.title }}) has been accepted!
-We'll be in contact shortly to check how you'd like it to listed as well as to
-confirm other details.
+We'll be in contact shortly to check how you'd like it to be listed as well
+as to confirm any other details with you.
 
 Thanks!
 
