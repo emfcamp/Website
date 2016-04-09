@@ -62,7 +62,7 @@
         <td>{{ proposal.description | truncate(100) }}</td>
     </tr>
 {% else %}
-    <td colspan="3" class="text-center">No proposals to review</td>
+    <tr><td colspan="4" class="text-center">No proposals to review</td></tr>
 {% endfor %}
 </table>
 
@@ -112,7 +112,7 @@
         </td>
     </tr>
 {% else %}
-    <td colspan="5" class="text-center">No reviewed proposals</td>
+    <tr><td colspan="5" class="text-center">No reviewed proposals</td></tr>
 {% endfor %}
 
 </table>
