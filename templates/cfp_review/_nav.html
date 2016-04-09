@@ -15,7 +15,8 @@
         {{ menuitem("Admin", "admin.home") }}
         <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                aria-haspopup="true" aria-expanded="false">
+                aria-haspopup="true" aria-expanded="false"
+            >
                 Proposals {{ badge(proposal_counts['locked'] + proposal_counts['anon-blocked']) }} <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
@@ -34,14 +35,31 @@
                 {% endfor %}
             </ul>
         </li>
-        {{ menuitem("Categories", ".categories") }}
         {{ menuitem("Messages", ".all_messages", unread_count) }}
         {{ menuitem("Voting", ".vote_summary") }}
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                aria-haspopup="true" aria-expanded="false"
+            >
+                Misc
+            </a>
+            <ul class="dropdown-menu">
+                {{ menuitem("Categories", ".categories") }}
+                <li role="separator" class="divider"></li>
+                {{ menuitem("Close", ".close_round") }}
+                {{ menuitem("Rank", ".rank") }}
+                <li role="separator" class="divider"></li>
+                {{ menuitem('Anonymisation', '.anonymisation', proposal_counts['checked']) }}
+                {{ menuitem('Your Review Categories', '.choose_categories') }}
+                {{ menuitem('Review', '.review_list') }}
+            </ul>
+        </li>
     {% endif %}
-    {% if current_user.has_permission('cfp_anonymiser') %}
+    {# Hide these menus from admin as they're in the misc dropdown #}
+    {% if current_user.has_permission('cfp_anonymiser') and not current_user.has_permission('admin') %}
         {{ menuitem('Anonymisation', '.anonymisation', proposal_counts['checked']) }}
     {% endif %}
-    {% if current_user.has_permission('cfp_reviewer') %}
+    {% if current_user.has_permission('cfp_reviewer') and not current_user.has_permission('admin') %}
         {{ menuitem('Your Review Categories', '.choose_categories') }}
         {{ menuitem('Review', '.review_list') }}
     {% endif %}

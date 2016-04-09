@@ -1,4 +1,4 @@
-{% from "_formhelpers.html" import render_dl_field %}
+{% from "_formhelpers.html" import render_field, render_dl_field %}
 
 {% extends "cfp_review/base.html" %}
 {% block body %}
@@ -28,33 +28,36 @@
             </dd>
             <dt>Type</dt>
             <dd>{{proposal.type}}</dd>
-            {{ render_dl_field(form.state, tabindex=1) }}
-            {{ render_dl_field(form.title, tabindex=3) }}
-            {{ render_dl_field(form.description, tabindex=4, rows=10) }}
-            {{ render_dl_field(form.requirements, tabindex=5) }}
-            {{ render_dl_field(form.length, tabindex=6) }}
-            {{ render_dl_field(form.notice_required, tabindex=7) }}
-            {{ render_dl_field(form.needs_help, tabindex=8) }}
-            {{ render_dl_field(form.needs_money, tabindex=9) }}
-            {{ render_dl_field(form.one_day, tabindex=10) }}
-            {% if proposal.type == 'talk' %}
-                {{ render_dl_field(form.category, tabindex=11) }}
-            {% elif proposal.type == 'workshop' %}
-                {{ render_dl_field(form.attendees, tabindex=11) }}
-                {{ render_dl_field(form.cost, tabindex=12) }}
+            {{ render_dl_field(form.state) }}
+            {{ render_dl_field(form.title) }}
+            {{ render_dl_field(form.description, rows=10) }}
+            {{ render_dl_field(form.requirements) }}
+            {{ render_dl_field(form.length) }}
+            {{ render_dl_field(form.notice_required) }}
+            {{ render_dl_field(form.needs_help) }}
+            {{ render_dl_field(form.needs_money) }}
+            {{ render_dl_field(form.one_day) }}
+            {% if proposal.type == 'workshop' %}
+                {{ render_dl_field(form.attendees) }}
+                {{ render_dl_field(form.cost) }}
             {% elif proposal.type == 'installation' %}
-                {{ render_dl_field(form.size, tabindex=11) }}
-                {{ render_dl_field(form.funds, tabindex=12) }}
+                {{ render_dl_field(form.size) }}
+                {{ render_dl_field(form.funds) }}
             {% endif %}
         </dl>
     </div>
     <div class="col-md-4 col-xs-12 btn-group-vertical" role="group">
         <div>&nbsp;</div>
-        {% if proposal.state == 'locked' %}
-            {{ form.checked(class_="btn btn-success", tabindex=13) }}
-            {{ form.reject(class_="btn btn-danger", tabindex=15) }}
+        {% if proposal.type == 'talk' %}
+            {{ render_field(form.category, tabindex=1) }}
+        {% else %}
+            <div>&nbsp;</div><div>&nbsp;</div><div>&nbsp;</div>
         {% endif %}
-        {{ form.update(class_="btn btn-danger", tabindex=14) }}
+        {% if proposal.state == 'locked' %}
+            {{ form.checked(class_="btn btn-success", tabindex=2) }}
+            {{ form.reject(class_="btn btn-danger", tabindex=3) }}
+        {% endif %}
+        {{ form.update(class_="btn btn-danger", tabindex=4) }}
 
         {% if next_id %}
             <a href="{{ url_for('.update_proposal', proposal_id=next_id) }}"

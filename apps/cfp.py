@@ -163,6 +163,8 @@ class DiversityForm(Form):
 @cfp.route('/cfp/complete', methods=['GET', 'POST'])
 @feature_flag('CFP')
 def complete():
+    if current_user.is_anonymous():
+        return redirect(url_for('.main'))
     form = DiversityForm()
     if form.validate_on_submit():
         if not current_user.diversity:
@@ -194,7 +196,12 @@ def proposals():
 
 
 @cfp.route('/cfp/proposals/<int:proposal_id>/edit', methods=['GET', 'POST'])
+@feature_flag('CFP')
 def edit_proposal(proposal_id):
+    if current_user.is_anonymous():
+        return redirect(url_for('users.login', next=url_for('.edit_proposal',
+                                                           proposal_id=proposal_id)))
+
     proposal = Proposal.query.get(proposal_id)
     if not proposal or proposal.user != current_user:
         abort(404)
@@ -265,7 +272,11 @@ class MessagesForm(Form):
 
 
 @cfp.route('/cfp/proposals/<int:proposal_id>/messages', methods=['GET', 'POST'])
+@feature_flag('CFP')
 def proposal_messages(proposal_id):
+    if current_user.is_anonymous():
+        return redirect(url_for('users.login', next=url_for('.proposal_messages',
+                                                           proposal_id=proposal_id)))
     proposal = Proposal.query.get(proposal_id)
     if not proposal or proposal.user_id != current_user.id:
         abort(404)
@@ -297,6 +308,7 @@ def proposal_messages(proposal_id):
                            proposal=proposal, messages=messages, form=form)
 
 @cfp.route('/cfp/messages')
+@feature_flag('CFP')
 def all_messages():
     if current_user.is_anonymous():
         return redirect(url_for('.main'))

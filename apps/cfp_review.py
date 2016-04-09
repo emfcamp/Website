@@ -51,6 +51,9 @@ def cfp_review_variables():
 
 @cfp_review.route('')
 def main():
+    if current_user.is_anonymous():
+        return redirect(url_for('users.login', next=url_for('.main')))
+
     if current_user.has_permission('admin'):
         return redirect(url_for('.proposals'))
 
@@ -227,7 +230,7 @@ class UpdateTalkForm(UpdateProposalForm):
     category = SelectField('Category', default=-1, coerce=int, choices=[(-1, '--None--')])
 
     def validate_category(form, field):
-        if field.data < 0 and not form.update.data:
+        if field.data < 0 and form.checked.data:
             raise ValidationError('Required')
 
     def update_proposal(self, proposal):
