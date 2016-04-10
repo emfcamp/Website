@@ -5,6 +5,7 @@ from flask import Flask, _request_ctx_stack, url_for, render_template
 from flask_mail import Mail
 from flask.ext.login import LoginManager
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.migrate import Migrate
 from sqlalchemy_continuum import make_versioned
 from sqlalchemy_continuum.manager import VersioningManager
 from sqlalchemy_continuum.plugins import FlaskPlugin
@@ -29,6 +30,7 @@ else:
 cache = Cache()
 csrf = CsrfProtect()
 db = SQLAlchemy()
+migrate = Migrate()
 manager = VersioningManager(options={'strategy': 'subquery'})
 make_versioned(manager=manager, plugins=[FlaskPlugin()])
 mail = Mail()
@@ -68,6 +70,7 @@ def create_app():
     for extension in (cdn, csrf, cache, db, mail, assets, toolbar):
         extension.init_app(app)
 
+    migrate.init_app(app, db)
     login_manager.setup_app(app, add_context_processor=True)
     app.login_manager.login_view = 'users.login'
 

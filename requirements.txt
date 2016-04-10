@@ -37,6 +37,7 @@ psycopg2==2.6.1
 py-bcrypt==0.4
 SQLAlchemy-Utils==0.31.4
 SQLAlchemy-Continuum==1.2.2
+flask-migrate==1.8.0
 
 # assets
 Flask-Assets==0.11

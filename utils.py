@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 import ofxparse
 from flask.ext.script import Command, Manager, Option
+from flask.ext.migrate import MigrateCommand
 from flask import render_template, current_app as app
 from flask_mail import Message
 from sqlalchemy.orm.exc import NoResultFound
@@ -415,4 +416,5 @@ if __name__ == "__main__":
     manager.add_command('createtokens', CreateTicketTokens())
     manager.add_command('sendtickets', SendTickets())
     manager.add_command('lockproposals', LockProposals())
+    manager.add_command('db', MigrateCommand)
     manager.run()
