@@ -20,15 +20,6 @@ from models.permission import Permission
 from apps.tickets import render_receipt, render_pdf
 
 
-class CreateDB(Command):
-    def run(self):
-        db.create_all()
-        for permission in ('admin', 'arrivals', 'cfp_reviewer', 'cfp_anonymiser'):
-            if not Permission.query.filter_by(name=permission).first():
-                db.session.add(Permission(permission))
-        db.session.commit()
-
-
 class CreateBankAccounts(Command):
     def run(self):
         gbp = BankAccount('492900', '20716473590526', 'GBP')
@@ -300,6 +291,9 @@ def test_main_ticket_types():
 
 class CreateTickets(Command):
     def run(self):
+        for permission in ('admin', 'arrivals', 'cfp_reviewer', 'cfp_anonymiser'):
+            if not Permission.query.filter_by(name=permission).first():
+                db.session.add(Permission(permission))
         types = get_main_ticket_types()
         add_ticket_types(types)
 
@@ -406,7 +400,6 @@ class LockProposals(Command):
 
 if __name__ == "__main__":
     manager = Manager(create_app())
-    manager.add_command('createdb', CreateDB())
     manager.add_command('createbankaccounts', CreateBankAccounts())
     manager.add_command('loadofx', LoadOfx())
     manager.add_command('reconcile', Reconcile())

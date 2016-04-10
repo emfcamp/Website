@@ -32,7 +32,7 @@ clean:
 
 
 db:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createdb
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py db upgrade
 
 data: db tickets bankaccounts
 
