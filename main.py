@@ -65,13 +65,9 @@ def create_app():
     if install_logging:
         logger.setup_logging(app)
 
-    cdn.init_app(app)  # Only enabled if configured
-    csrf.init_app(app)
-    cache.init_app(app)
-    db.init_app(app)
-    mail.init_app(app)
-    assets.init_app(app)
-    toolbar.init_app(app)
+    for extension in (cdn, csrf, cache, db, mail, assets, toolbar):
+        extension.init_app(app)
+
     login_manager.setup_app(app, add_context_processor=True)
     app.login_manager.login_view = 'users.login'
 
