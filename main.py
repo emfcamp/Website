@@ -6,6 +6,7 @@ from flask_mail import Mail
 from flask.ext.login import LoginManager
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.migrate import Migrate
+from sqlalchemy import MetaData
 from sqlalchemy_continuum import make_versioned
 from sqlalchemy_continuum.manager import VersioningManager
 from sqlalchemy_continuum.plugins import FlaskPlugin
@@ -27,9 +28,17 @@ if len(logging.root.handlers) == 0:
 else:
     install_logging = False
 
+naming_convention = {
+    "ix": 'ix_%(column_0_label)s',
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(column_0_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    "pk": "pk_%(table_name)s"
+}
+db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
+
 cache = Cache()
 csrf = CsrfProtect()
-db = SQLAlchemy()
 migrate = Migrate()
 manager = VersioningManager(options={'strategy': 'subquery'})
 make_versioned(manager=manager, plugins=[FlaskPlugin()])
@@ -70,7 +79,8 @@ def create_app():
     for extension in (cdn, csrf, cache, db, mail, assets, toolbar):
         extension.init_app(app)
 
-    migrate.init_app(app, db)
+    migrate.init_app(app, db, render_as_batch=True)
+
     login_manager.setup_app(app, add_context_processor=True)
     app.login_manager.login_view = 'users.login'
 

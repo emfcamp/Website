@@ -21,25 +21,29 @@ def upgrade():
     sa.Column('sort_code', sa.String(), nullable=False),
     sa.Column('acct_id', sa.String(), nullable=False),
     sa.Column('currency', sa.String(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_bank_account'))
     )
-    op.create_index('ix_bank_account_sort_code_acct_id', 'bank_account', ['sort_code', 'acct_id'], unique=True)
+    with op.batch_alter_table('bank_account', schema=None) as batch_op:
+        batch_op.create_index('ix_bank_account_sort_code_acct_id', ['sort_code', 'acct_id'], unique=True)
+
     op.create_table('category',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_category'))
     )
     op.create_table('feature_flag',
     sa.Column('feature', sa.String(), nullable=False),
     sa.Column('enabled', sa.Boolean(), nullable=False),
-    sa.PrimaryKeyConstraint('feature')
+    sa.PrimaryKeyConstraint('feature', name=op.f('pk_feature_flag'))
     )
     op.create_table('permission',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=True),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_permission'))
     )
-    op.create_index(op.f('ix_permission_name'), 'permission', ['name'], unique=True)
+    with op.batch_alter_table('permission', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_permission_name'), ['name'], unique=True)
+
     op.create_table('proposal_version',
     sa.Column('id', sa.Integer(), autoincrement=False, nullable=False),
     sa.Column('user_id', sa.Integer(), autoincrement=False, nullable=True),
@@ -60,10 +64,12 @@ def upgrade():
     sa.Column('funds', sa.String(), autoincrement=False, nullable=True),
     sa.Column('transaction_id', sa.BigInteger(), autoincrement=False, nullable=False),
     sa.Column('operation_type', sa.SmallInteger(), nullable=False),
-    sa.PrimaryKeyConstraint('id', 'transaction_id')
+    sa.PrimaryKeyConstraint('id', 'transaction_id', name=op.f('pk_proposal_version'))
     )
-    op.create_index(op.f('ix_proposal_version_operation_type'), 'proposal_version', ['operation_type'], unique=False)
-    op.create_index(op.f('ix_proposal_version_transaction_id'), 'proposal_version', ['transaction_id'], unique=False)
+    with op.batch_alter_table('proposal_version', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_proposal_version_operation_type'), ['operation_type'], unique=False)
+        batch_op.create_index(batch_op.f('ix_proposal_version_transaction_id'), ['transaction_id'], unique=False)
+
     op.create_table('ticket_type',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
@@ -76,24 +82,26 @@ def upgrade():
     sa.Column('expires', sa.DateTime(), nullable=True),
     sa.Column('description', sa.String(), nullable=True),
     sa.Column('discount_token', sa.String(), nullable=True),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_ticket_type'))
     )
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('email', sa.String(), nullable=True),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('phone', sa.String(), nullable=True),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_user'))
     )
-    op.create_index(op.f('ix_user_email'), 'user', ['email'], unique=True)
-    op.create_index(op.f('ix_user_name'), 'user', ['name'], unique=False)
+    with op.batch_alter_table('user', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_user_email'), ['email'], unique=True)
+        batch_op.create_index(batch_op.f('ix_user_name'), ['name'], unique=False)
+
     op.create_table('diversity',
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('age', sa.String(), nullable=True),
     sa.Column('gender', sa.String(), nullable=True),
     sa.Column('ethnicity', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('user_id')
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], name=op.f('fk_diversity_user_id_user')),
+    sa.PrimaryKeyConstraint('user_id', name=op.f('pk_diversity'))
     )
     op.create_table('payment',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -107,11 +115,11 @@ def upgrade():
     sa.Column('gcid', sa.String(), nullable=True),
     sa.Column('chargeid', sa.String(), nullable=True),
     sa.Column('token', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('bankref'),
-    sa.UniqueConstraint('chargeid'),
-    sa.UniqueConstraint('gcid')
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], name=op.f('fk_payment_user_id_user')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_payment')),
+    sa.UniqueConstraint('bankref', name=op.f('uq_payment_bankref')),
+    sa.UniqueConstraint('chargeid', name=op.f('uq_payment_chargeid')),
+    sa.UniqueConstraint('gcid', name=op.f('uq_payment_gcid'))
     )
     op.create_table('proposal',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -131,35 +139,39 @@ def upgrade():
     sa.Column('cost', sa.String(), nullable=True),
     sa.Column('size', sa.String(), nullable=True),
     sa.Column('funds', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], name=op.f('fk_proposal_user_id_user')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_proposal'))
     )
     op.create_table('ticket_price',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('code', sa.Integer(), nullable=False),
     sa.Column('currency', sa.String(), nullable=False),
     sa.Column('price_int', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['code'], ['ticket_type.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['code'], ['ticket_type.id'], name=op.f('fk_ticket_price_code_ticket_type')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_ticket_price'))
     )
     op.create_table('transaction',
     sa.Column('issued_at', sa.DateTime(), nullable=True),
     sa.Column('id', sa.BigInteger(), nullable=False),
     sa.Column('remote_addr', sa.String(length=50), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], name=op.f('fk_transaction_user_id_user')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_transaction'))
     )
-    op.create_index(op.f('ix_transaction_user_id'), 'transaction', ['user_id'], unique=False)
+    with op.batch_alter_table('transaction', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_transaction_user_id'), ['user_id'], unique=False)
+
     op.create_table('user_permission',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('permission_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['permission_id'], [u'permission.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], [u'user.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['permission_id'], [u'permission.id'], name=op.f('fk_user_permission_permission_id_permission')),
+    sa.ForeignKeyConstraint(['user_id'], [u'user.id'], name=op.f('fk_user_permission_user_id_user')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_user_permission'))
     )
-    op.create_index(op.f('ix_user_permission_user_id'), 'user_permission', ['user_id'], unique=False)
+    with op.batch_alter_table('user_permission', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_user_permission_user_id'), ['user_id'], unique=False)
+
     op.create_table('bank_transaction',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('account_id', sa.Integer(), nullable=False),
@@ -170,19 +182,21 @@ def upgrade():
     sa.Column('payee', sa.String(), nullable=False),
     sa.Column('payment_id', sa.Integer(), nullable=True),
     sa.Column('suppressed', sa.Boolean(), nullable=False),
-    sa.ForeignKeyConstraint(['account_id'], [u'bank_account.id'], ),
-    sa.ForeignKeyConstraint(['payment_id'], ['payment.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['account_id'], [u'bank_account.id'], name=op.f('fk_bank_transaction_account_id_bank_account')),
+    sa.ForeignKeyConstraint(['payment_id'], ['payment.id'], name=op.f('fk_bank_transaction_payment_id_payment')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_bank_transaction'))
     )
-    op.create_index(op.f('ix_bank_transaction_fit_id'), 'bank_transaction', ['fit_id'], unique=False)
-    op.create_index('ix_bank_transaction_u1', 'bank_transaction', ['account_id', 'posted', 'type', 'amount_int', 'payee', 'fit_id'], unique=True)
+    with op.batch_alter_table('bank_transaction', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_bank_transaction_fit_id'), ['fit_id'], unique=False)
+        batch_op.create_index('ix_bank_transaction_u1', ['account_id', 'posted', 'type', 'amount_int', 'payee', 'fit_id'], unique=True)
+
     op.create_table('payment_change',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('payment_id', sa.Integer(), nullable=False),
     sa.Column('timestamp', sa.DateTime(), nullable=False),
     sa.Column('state', sa.String(), nullable=False),
-    sa.ForeignKeyConstraint(['payment_id'], ['payment.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['payment_id'], ['payment.id'], name=op.f('fk_payment_change_payment_id_payment')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_payment_change'))
     )
     op.create_table('ticket',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -194,30 +208,32 @@ def upgrade():
     sa.Column('qrcode', sa.String(), nullable=True),
     sa.Column('emailed', sa.Boolean(), nullable=False),
     sa.Column('payment_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['payment_id'], ['payment.id'], ),
-    sa.ForeignKeyConstraint(['type_id'], ['ticket_type.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('qrcode'),
-    sa.UniqueConstraint('receipt')
+    sa.ForeignKeyConstraint(['payment_id'], ['payment.id'], name=op.f('fk_ticket_payment_id_payment')),
+    sa.ForeignKeyConstraint(['type_id'], ['ticket_type.id'], name=op.f('fk_ticket_type_id_ticket_type')),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], name=op.f('fk_ticket_user_id_user')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_ticket')),
+    sa.UniqueConstraint('qrcode', name=op.f('uq_ticket_qrcode')),
+    sa.UniqueConstraint('receipt', name=op.f('uq_ticket_receipt'))
     )
-    op.create_index(op.f('ix_ticket_paid'), 'ticket', ['paid'], unique=False)
-    op.create_index(op.f('ix_ticket_type_id'), 'ticket', ['type_id'], unique=False)
+    with op.batch_alter_table('ticket', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_ticket_paid'), ['paid'], unique=False)
+        batch_op.create_index(batch_op.f('ix_ticket_type_id'), ['type_id'], unique=False)
+
     op.create_table('ticket_attrib',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('ticket_id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('value', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['ticket_id'], ['ticket.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['ticket_id'], ['ticket.id'], name=op.f('fk_ticket_attrib_ticket_id_ticket')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_ticket_attrib'))
     )
     op.create_table('ticket_checkin',
     sa.Column('ticket_id', sa.Integer(), nullable=False),
     sa.Column('checked_in', sa.Boolean(), nullable=False),
     sa.Column('timestamp', sa.DateTime(), nullable=False),
     sa.Column('badged_up', sa.Boolean(), nullable=False),
-    sa.ForeignKeyConstraint(['ticket_id'], [u'ticket.id'], ),
-    sa.PrimaryKeyConstraint('ticket_id')
+    sa.ForeignKeyConstraint(['ticket_id'], [u'ticket.id'], name=op.f('fk_ticket_checkin_ticket_id_ticket')),
+    sa.PrimaryKeyConstraint('ticket_id', name=op.f('pk_ticket_checkin'))
     )
     op.create_table('ticket_transfer',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -225,10 +241,10 @@ def upgrade():
     sa.Column('to_user_id', sa.Integer(), nullable=False),
     sa.Column('from_user_id', sa.Integer(), nullable=False),
     sa.Column('timestamp', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['from_user_id'], ['user.id'], ),
-    sa.ForeignKeyConstraint(['ticket_id'], ['ticket.id'], ),
-    sa.ForeignKeyConstraint(['to_user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.ForeignKeyConstraint(['from_user_id'], ['user.id'], name=op.f('fk_ticket_transfer_from_user_id_user')),
+    sa.ForeignKeyConstraint(['ticket_id'], ['ticket.id'], name=op.f('fk_ticket_transfer_ticket_id_ticket')),
+    sa.ForeignKeyConstraint(['to_user_id'], ['user.id'], name=op.f('fk_ticket_transfer_to_user_id_user')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_ticket_transfer'))
     )
     ### end Alembic commands ###
 
@@ -238,32 +254,48 @@ def downgrade():
     op.drop_table('ticket_transfer')
     op.drop_table('ticket_checkin')
     op.drop_table('ticket_attrib')
-    op.drop_index(op.f('ix_ticket_type_id'), table_name='ticket')
-    op.drop_index(op.f('ix_ticket_paid'), table_name='ticket')
+    with op.batch_alter_table('ticket', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_ticket_type_id'))
+        batch_op.drop_index(batch_op.f('ix_ticket_paid'))
+
     op.drop_table('ticket')
     op.drop_table('payment_change')
-    op.drop_index('ix_bank_transaction_u1', table_name='bank_transaction')
-    op.drop_index(op.f('ix_bank_transaction_fit_id'), table_name='bank_transaction')
+    with op.batch_alter_table('bank_transaction', schema=None) as batch_op:
+        batch_op.drop_index('ix_bank_transaction_u1')
+        batch_op.drop_index(batch_op.f('ix_bank_transaction_fit_id'))
+
     op.drop_table('bank_transaction')
-    op.drop_index(op.f('ix_user_permission_user_id'), table_name='user_permission')
+    with op.batch_alter_table('user_permission', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_user_permission_user_id'))
+
     op.drop_table('user_permission')
-    op.drop_index(op.f('ix_transaction_user_id'), table_name='transaction')
+    with op.batch_alter_table('transaction', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_transaction_user_id'))
+
     op.drop_table('transaction')
     op.drop_table('ticket_price')
     op.drop_table('proposal')
     op.drop_table('payment')
     op.drop_table('diversity')
-    op.drop_index(op.f('ix_user_name'), table_name='user')
-    op.drop_index(op.f('ix_user_email'), table_name='user')
+    with op.batch_alter_table('user', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_user_name'))
+        batch_op.drop_index(batch_op.f('ix_user_email'))
+
     op.drop_table('user')
     op.drop_table('ticket_type')
-    op.drop_index(op.f('ix_proposal_version_transaction_id'), table_name='proposal_version')
-    op.drop_index(op.f('ix_proposal_version_operation_type'), table_name='proposal_version')
+    with op.batch_alter_table('proposal_version', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_proposal_version_transaction_id'))
+        batch_op.drop_index(batch_op.f('ix_proposal_version_operation_type'))
+
     op.drop_table('proposal_version')
-    op.drop_index(op.f('ix_permission_name'), table_name='permission')
+    with op.batch_alter_table('permission', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_permission_name'))
+
     op.drop_table('permission')
     op.drop_table('feature_flag')
     op.drop_table('category')
-    op.drop_index('ix_bank_account_sort_code_acct_id', table_name='bank_account')
+    with op.batch_alter_table('bank_account', schema=None) as batch_op:
+        batch_op.drop_index('ix_bank_account_sort_code_acct_id')
+
     op.drop_table('bank_account')
     ### end Alembic commands ###
