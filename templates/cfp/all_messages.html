@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>All messages</h2>
+
+<div class="well">
+<table class="table">
+    <tr>
+        <th>Date</th>
+        <th>Message Count</th>
+        <th>Proposal Title</th>
+    </tr>
+{% for proposal in proposal_with_message %}
+    <tr>
+        <td>
+            {% if proposal.get_unread_count(current_user) > 0 %}
+                <span class="badge">{{ proposal.get_unread_count(current_user) }}</span>
+            {% endif %}
+            {{ proposal.messages[0].created.strftime("%Y-%m-%d") }}
+        </td>
+        <td>{{ proposal.messages | length }}</td>
+        <td>
+            <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">
+                {{ proposal.title }}
+            </a>
+        </td>
+    </tr>
+{% endfor %}
+</table>
+</div>
+{% endblock %}

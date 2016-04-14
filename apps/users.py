@@ -6,6 +6,9 @@ from flask import (
 from flask.ext.login import (
     login_user, login_required, logout_user, current_user,
 )
+
+from sqlalchemy import or_
+
 from wtforms.validators import Required, Email, ValidationError
 from wtforms import StringField, HiddenField, SubmitField
 
@@ -13,6 +16,7 @@ from main import db
 from common import set_user_currency, send_template_email
 from .common.forms import Form
 from models.user import User, UserDiversity
+from models.cfp import Proposal, CFPMessage
 import re
 
 users = Blueprint('users', __name__)
@@ -126,4 +130,13 @@ def account():
             form.gender.data = current_user.diversity.gender
             form.ethnicity.data = current_user.diversity.ethnicity
 
-    return render_template("account.html", form=form)
+    unread_count = CFPMessage.query\
+        .join(Proposal)\
+        .filter(Proposal.user_id == current_user.id,
+                Proposal.id == CFPMessage.proposal_id,
+                CFPMessage.is_to_admin.is_(False),
+                or_(CFPMessage.has_been_read.is_(False),
+                    CFPMessage.has_been_read.is_(None)))\
+        .count()
+
+    return render_template("account.html", form=form, unread_count=unread_count)

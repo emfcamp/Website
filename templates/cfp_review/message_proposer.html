@@ -1,0 +1,46 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "cfp_review/base.html" %}
+{% block body %}
+
+{% set active='messages' %}
+{% include "cfp_review/_propsal_tabs.html" %}
+
+<h4>{{ proposal.title }} <small>by {{ proposal.user.name }}</small></h4>
+<p>{{ proposal.description }}</p>
+<p>&nbsp;</p>
+
+<table class="table table-striped message-table">
+{% for msg in messages %}
+<tr>
+    <td class="col-sm-2">
+        {% if msg.is_user_recipient(current_user) %}
+            <p class="pull-right">
+                {% if not msg.has_been_read %}
+                    <span class="glyphicon glyphicon-envelope"></span>
+                {% endif %}
+                {{ msg.from_user.name }} &gt;
+            </p>
+        {% endif %}
+    </td>
+    <td class="col-sm-8">
+        <p>{{ msg.message }}</p>
+        <p class="pull-right"><small>Sent: {{ msg.created.strftime('%y-%m-%d %H:%M') }}</small></p>
+    </td>
+    <td class="col-sm-2">{% if not msg.is_user_recipient(current_user) %}
+        &lt; {{ msg.from_user.name }}
+    {% endif %}</td>
+</tr>
+{% endfor %}
+</table>
+
+<form method="post" action="{{ url_for('.message_proposer', proposal_id=proposal.id) }}">
+    {{ form.hidden_tag() }}
+    {{ render_field(form.message, tabindex=1) }}
+    <div class="pull-right">
+        {{ form.send(class_='btn btn-success debounce', tabindex=2) }}
+        &nbsp;
+        {{ form.mark_read(class_='btn btn-success debounce') }}
+    </div>
+</form>
+
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "cfp_review/base.html" %}
+{% block body %}
+<h2>Ranked proposals</h2>
+
+<p>
+    Set the score to determine which proposals will be accepted this round
+</p>
+{% if preview %}
+    <p>
+        <span class="bg-info">Proposals</span> will be accepted
+    </p>
+{% endif %}
+<p>
+    <strong>{{ accepted_count }}</strong> already accepted proposals.
+</p>
+
+<table class="table">
+    <tr>
+        <th>Rank</th>
+        <th>Type</th>
+        <th>Submitter</th>
+        <th>Title</th>
+    </tr>
+{% for (prop, score) in proposals %}
+    <tr {% if preview and score >= min_score %} class="info" {% endif %}>
+        <td>{{ score }}</td>
+        <td>{{prop.type | capitalize}}</td>
+        <td>{{prop.user.name}}</td>
+        <td><a href="{{ url_for('.update_proposal', proposal_id=prop.id) }}">{{prop.title}}</a></td>
+    </tr>
+{% else %}
+    <tr><td colspan="5" class="text-center">No proposals found</td></tr>
+{% endfor %}
+</table>
+<br>
+<form method="POST" class="form-inline pull-right">
+    {{ form.hidden_tag() }}
+
+    {% if preview %}
+        {{ form.confirm(class_='btn btn-success') }}
+        {{ form.cancel(class_='btn btn-danger') }}
+    {% else %}
+        <div class="form-group {%- if form.min_score.errors %} has-error {%- endif %}">
+            <label for="{{ form.min_score.name }}" class="control-label">
+                {{ form.min_score.label.text }}
+            </label>
+            {{ form.min_score(class_="form-control") }}
+            {% for error in form.min_score.errors %}
+                <p class="help-block" id="help-block-{{field.name}}">{{ error }}</pa>
+            {% endfor %}
+        </div>
+        {{ form.set_score(class_='btn btn-success') }}
+    {% endif %}
+</form>
+
+{% endblock %}

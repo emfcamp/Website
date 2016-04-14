@@ -1,0 +1,119 @@
+{% extends "cfp_review/base.html" %}
+{% block body %}
+<h2>CfP Proposals</h2>
+
+<p>
+    This page shows all the proposals <a href="#to-review-table">awaiting</a>
+    review (in a random order) and those that you have
+    <a href="#reviewed-table">already</a> reviewed.
+</p>
+
+<p>
+    There are three responses you can give to a proposal:
+    <ul>
+        <li>
+            <strong>Vote</strong>: State whether you wont, might or will go to the
+            talk/workshop/installation/gig. If you'd like to leave general feedback
+            add it to the message box.
+        </li>
+        <li>
+            <strong>Abstain (recuse yourself)</strong>: If you can identify the
+            proposer or have another conflict of interest you should recuse
+            yourself. This is an abstention (i.e. a no-vote). If you need to
+            do this please tell us why you've done so in the message box.
+        </li>
+        <li>
+            <strong>Request information</strong>: If you feel the proposal is
+            unclear and that you need to know more you can send questions to the
+            co-ordinator using the message box. When the proposer has answered
+            them we'll mark your questions as resolved and the proposal will be
+            added back to your 'requires review' list.
+        </li>
+    </ul>
+</p>
+
+<p>
+    If, at any time, you'd like to change your vote on a proposal:
+    <ol>
+        <li>Click it in the <a href="#reviewed-table">'Previously Reviewed'</a> list.</li>
+        <li>Click on red "I'd like to change my response" button in the bottom right</li>
+        <li>The proposal will be added back into your "Requires Review" list.</li>
+    </ol>
+</p>
+
+<a id="to-review-table"></a>
+<h3>Requires Review ({{ to_review | length }})</h3>
+<table class="table">
+    <tr>
+        <th class="col-md-1">Type</th>
+        <th>Title</th>
+        <th>Category</th>
+        <th>Description</th>
+    </tr>
+{% for proposal in to_review %}
+    <tr>
+        <td>{{ proposal.type | capitalize }}</td>
+        <td><a href="{{ url_for('.review_proposal', proposal_id=proposal.id) }}">{{proposal.title}}</a></td>
+        <td>{% if proposal.category %}
+            {{ proposal.category.name }}
+        {% else %}
+            --
+        {% endif %}</td>
+        <td>{{ proposal.description | truncate(100) }}</td>
+    </tr>
+{% else %}
+    <tr><td colspan="4" class="text-center">No proposals to review</td></tr>
+{% endfor %}
+</table>
+
+<a id="reviewed-table"></a>
+<h3>Previously Reviewed ({{ reviewed | length }})</h3>
+<table class="table">
+<tr>
+    <th class="col-md-1">Date</th>
+    <th>Type</th>
+    <th>Title</th>
+    <th class="col-md-3">Vote Status</th>
+    <th>Note</th>
+</tr>
+{% for proposal in reviewed %}
+    <tr>
+        <td>{{ proposal.get_user_vote(current_user).modified.strftime("%d/%m") }}</td>
+        <td>{{ proposal.type | capitalize }}</td>
+        <td><a href="{{ url_for('.review_proposal', proposal_id=proposal.id) }}">{{ proposal.title }}</a></td>
+        <td
+        {% set vote = proposal.get_user_vote(current_user) %}
+        {% if vote.state == 'recused' %}
+            class="danger"
+        {% elif vote.state == 'blocked' %}
+            class="info"
+        {% endif %}>
+            {% if vote.state == 'voted' %}
+                Voted:
+                {% if vote.vote == 0 %}
+                    "I won't go"
+                {% elif vote.vote == 1 %}
+                    "I might go"
+                {% elif vote.vote == 2 %}
+                    "I will go"
+                {% endif %}
+            {% elif vote.state == 'recused' %}
+                Recused
+            {% elif vote.state == 'blocked' %}
+                Awaiting details
+            {% endif %}
+        </td>
+        <td>
+            {% if vote.note %}
+                {{ vote.note | truncate(300) }}
+            {% else %}
+                    --
+            {% endif %}
+        </td>
+    </tr>
+{% else %}
+    <tr><td colspan="5" class="text-center">No reviewed proposals</td></tr>
+{% endfor %}
+
+</table>
+{% endblock %}

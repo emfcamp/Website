@@ -23,10 +23,10 @@ from models.payment import Payment, BankPayment, BankTransaction, StateException
 from models.ticket import (
     Ticket, TicketCheckin, TicketType, TicketPrice, TicketTransfer
 )
-from models.cfp import Proposal, TalkCategory
+from models.cfp import Proposal
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS
 from .common import feature_enabled, require_permission
-from .common.forms import Form, HiddenIntegerField
+from .common.forms import Form
 from .payments.stripe import (
     StripeUpdateUnexpected, StripeUpdateConflict, stripe_update_payment,
 )
@@ -647,61 +647,3 @@ def feature_flags():
         form.flags[-1].enabled.data = flg.enabled
 
     return render_template('admin/feature-flags.html', form=form)
-
-
-class CategoryForm(Form):
-    id = HiddenIntegerField('Category Id', [Required()])
-    name = StringField('Category Name', [Required()])
-
-class AllCategoriesForm(Form):
-    categories = FieldList(FormField(CategoryForm))
-    name = StringField('New Category Name')
-    update = SubmitField('Update flags')
-
-
-# TODO this should probably be moved into it's own blueprint
-@admin.route('/cfp-categories', methods=['GET', 'POST'])
-@admin_required
-def cfp_categories():
-    categories = {c.id: c for c in TalkCategory.query.all()}
-    counts = {c.id: len(c.proposals) for c in categories.values()}
-    form = AllCategoriesForm()
-
-    if form.validate_on_submit():
-        for cat in form.categories:
-            cat_id = int(cat['id'].data)
-            categories[cat_id].name = cat['name'].data
-        db.session.commit()
-
-        if len(form.name.data) > 0:
-            app.logger.info('%s adding new category %s', current_user.name, form.name.data)
-            new_category = TalkCategory()
-            new_category.name = form.name.data
-
-            db.session.add(new_category)
-            db.session.commit()
-            # import ipdb; ipdb.set_trace()
-            categories[new_category.id] = new_category
-            counts[new_category.id] = 0
-            form.name.data = ''
-
-    for old_field in range(len(form.categories)):
-        form.categories.pop_entry()
-
-    for cat in sorted(categories.values(), key=lambda x: x.name):
-        form.categories.append_entry()
-        form.categories[-1]['id'].data = cat.id
-        form.categories[-1]['name'].data = cat.name
-
-    return render_template('admin/cfp-categories.html', form=form, counts=counts)
-
-
-@admin.route('/cfp-proposals', methods=['GET', 'POST'])
-@admin_required
-def cfp_proposals():
-    if current_user.has_permission('cfp_reviewer', False):
-        # Prevent CfP reviewers from viewing non-anonymised submissions
-        return abort(403)
-
-    proposals = Proposal.query.all()
-    return render_template('admin/cfp-proposals.html', proposals=proposals)

@@ -1,0 +1,54 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "cfp_review/base.html" %}
+{% block body %}
+<h2>Close the round</h2>
+<p>
+    To close the round a minimum number of votes must be required on each proposal.
+</p>
+{% if preview %}
+    <p>
+        Proposals to be set as 'reviewed' are like <span class="bg-info">this.</span>
+    </p>
+{% endif %}
+<br>
+<table class="table">
+    <tr>
+        <th class="col-md-1">Date</th>
+        <th>Type</th>
+        <th>Votes</th>
+        <th>Submitter</th>
+        <th>Title</th>
+    </tr>
+{% for (prop, vote_count) in proposals %}
+    <tr {% if preview and vote_count >= min_votes %} class="info" {% endif %}>
+        <td>{{prop.created.strftime("%d/%m")}}</td>
+        <td>{{prop.type | capitalize}}</td>
+        <td>{{ vote_count }}</td>
+        <td>{{prop.user.name}}</td>
+        <td><a href="{{ url_for('.update_proposal', proposal_id=prop.id) }}">{{prop.title}}</a></td>
+    </tr>
+{% else %}
+    <tr><td colspan="5" class="text-center">No proposals found</td></tr>
+{% endfor %}
+</table>
+<br>
+<form method="POST" class="form-inline pull-right">
+    {{ form.hidden_tag() }}
+
+    {% if preview %}
+        {{ form.confirm(class_='btn btn-success') }}
+        {{ form.cancel(class_='btn btn-danger') }}
+    {% else %}
+        <div class="form-group {%- if form.min_votes.errors %} has-error {%- endif %}">
+            <label for="{{ form.min_votes.name }}" class="control-label">
+                {{ form.min_votes.label.text }}
+            </label>
+            {{ form.min_votes(class_="form-control") }}
+            {% for error in form.min_votes.errors %}
+                <p class="help-block" id="help-block-{{field.name}}">{{ error }}</pa>
+            {% endfor %}
+        </div>
+        {{ form.close_round(class_='btn btn-success') }}
+    {% endif %}
+</form>
+{% endblock %}

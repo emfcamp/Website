@@ -1,0 +1,95 @@
+{% extends "cfp_review/base.html" %}
+{% block body %}
+
+{% set active='votes' %}
+{% include "cfp_review/_propsal_tabs.html" %}
+
+{# <p>{{ proposal.description }}</p> #}
+
+<p>&nbsp;</p>
+<form method="POST">
+    <div class="col-md-8">
+        <h3>{{proposal.title}} <small>&mdash; a {{ proposal.type | capitalize }}</small></h3>
+        <table class="table">
+        {{ form.hidden_tag() }}
+            <tr>
+                <th>Reviewer</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Vote</th>
+                <th>Note</th>
+                <th></th>
+            </tr>
+            {% for vote_form in form.votes_to_resolve %}
+                {% set vote = votes[vote_form['id'].data] %}
+                {% set versions = vote.versions.all() %}
+                {# We want to skip versions with minor changes #}
+                {% for ver in (versions | sort(attribute="modified", reverse=True))
+                    if 'state' in ver.changeset or
+                        'vote' in ver.changeset or
+                        'note' in ver.changeset
+                %}
+                    <tr {%- if loop.first %} class="active" {%- endif %}>
+                        {% if loop.first %}
+                            <td>{{ vote.user.name }}</td>
+                            <td>{{ ver.modified.strftime('%d/%m') }}</td>
+                        {% else %}
+                            <td>&nbsp;</td>
+                            <td>
+                                {{ ver.modified.strftime('%d/%m') }}
+                            </td>
+                        {% endif %}
+                        <td>{{ ver.state | capitalize }}</td>
+                        <td>
+                            {% if ver.state == 'voted' %}
+                                {% if ver.vote == 0 %}
+                                    I won't go
+                                {% elif ver.vote == 1 %}
+                                    I might go
+                                {% elif ver.vote == 2 %}
+                                    I will go
+                                {% endif %}
+                            {% else %}
+                                --
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if loop.first and not vote.has_been_read %}
+                                <span class="glyphicon glyphicon-envelope"></span>
+                            {% endif %}
+                            {{ ver.note if ver.note else '--' }}
+                        </td>
+                        {% if loop.first and vote.state in ['blocked', 'recused'] %}
+                            {# The actual form bit... #}
+                            <td class="text-center">
+                                {{ vote_form.hidden_tag_without('csrf_token') }}
+                                <div class="checkbox">{{ vote_form.resolve() }}</div>
+                            </td>
+                        {% else %}
+                            <td>&nbsp;</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td colspan="5" class="text-center">No votes yet</td></tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="col-md-4">
+        <div>&nbsp;</div><div>&nbsp;</div>
+        <div class="btn-group-vertical">
+            {{ form.resolve_all(class_='btn btn-primary') }}
+            {{ form.set_all_read(class_='btn btn-success') }}
+            {{ form.update(class_='btn btn-info') }}
+        </div>
+        <div class="checkbox">
+            <label>
+                {{ form.include_recused() }}
+                {{ form.include_recused.label }}
+            </label>
+        </div>
+        {{ form.set_all_stale(class_='btn btn-danger') }}
+    </div>
+</form>
+
+{% endblock %}

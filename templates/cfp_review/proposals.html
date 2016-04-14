@@ -1,0 +1,27 @@
+{% extends "cfp_review/base.html" %}
+{% block body %}
+<h2>CfP Proposals</h2>
+
+<table class="table">
+    <tr>
+        <th class="col-md-1">Date</th>
+        <th>State</th>
+        <th>Type</th>
+        <th>Submitter</th>
+        <th>Title</th>
+    </tr>
+{% for proposal in proposals %}
+    <tr>
+        <td>{{proposal.created.strftime("%d/%m")}}</td>
+        <td>{{proposal.state | capitalize}}</td>
+        <td>{{proposal.type | capitalize}}</td>
+        <td>{{proposal.user.name}}</td>
+        <td>
+            <a href="{{ url_for(link_target, proposal_id=proposal.id) }}">{{proposal.title}}</a>
+        </td>
+    </tr>
+{% else %}
+    <tr><td colspan="5" class="text-center">No proposals found</td></tr>
+{% endfor %}
+</table>
+{% endblock %}
