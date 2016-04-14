@@ -188,10 +188,6 @@ def build_query_dict(parameters):
 @cfp_review.route('/proposals')
 @admin_required
 def proposals():
-    if current_user.has_permission('cfp_reviewer', False):
-        # Prevent CfP reviewers from viewing non-anonymised submissions
-        return abort(403)
-
     query_dict = build_query_dict(request.args)
 
     proposals = Proposal.query.filter_by(**query_dict)\
@@ -274,10 +270,6 @@ def get_next_proposal_to(prop, state):
 @cfp_review.route('/proposals/<int:proposal_id>', methods=['GET', 'POST'])
 @admin_required
 def update_proposal(proposal_id):
-    if current_user.has_permission('cfp_reviewer', False):
-        # Prevent CfP reviewers from viewing non-anonymised submissions
-        return abort(403)
-
     prop = Proposal.query.get(proposal_id)
     next_prop = get_next_proposal_to(prop, prop.state)
 
@@ -346,11 +338,6 @@ def update_proposal(proposal_id):
 @cfp_review.route('/messages')
 @admin_required
 def all_messages():
-    # FIXME this is probably not needed as admin should never be reviewers
-    if current_user.has_permission('cfp_reviewer', False):
-        # Prevent CfP reviewers from viewing non-anonymised submissions
-        return abort(403)
-
     # TODO add search
     # Query from the proposal because that's actually what we display
     proposal_with_message = Proposal.query\
@@ -375,11 +362,6 @@ class SendMessageForm(Form):
 @cfp_review.route('/proposals/<int:proposal_id>/message', methods=['GET', 'POST'])
 @admin_required
 def message_proposer(proposal_id):
-    # FIXME this is probably not needed as admin should never be reviewers
-    if current_user.has_permission('cfp_reviewer', False):
-        # Prevent CfP reviewers from viewing non-anonymised submissions
-        return abort(403)
-
     form = SendMessageForm()
     proposal = Proposal.query.get(proposal_id)
 
@@ -420,10 +402,6 @@ def message_proposer(proposal_id):
 @cfp_review.route('/votes')
 @admin_required
 def vote_summary():
-    if current_user.has_permission('cfp_reviewer', False):
-        # Prevent CfP reviewers from viewing non-anonymised submissions
-        return abort(403)
-
     proposals = Proposal.query.filter_by(state='anonymised')\
                               .order_by('modified').all()
 
@@ -459,10 +437,6 @@ class UpdateVotesForm(Form):
 @cfp_review.route('/proposals/<int:proposal_id>/votes', methods=['GET', 'POST'])
 @admin_required
 def proposal_votes(proposal_id):
-    if current_user.has_permission('cfp_reviewer', False):
-        # Prevent CfP reviewers from viewing non-anonymised submissions
-        return abort(403)
-
     form = UpdateVotesForm()
     proposal = Proposal.query.get(proposal_id)
     all_votes = {v.id: v for v in proposal.votes}
@@ -521,10 +495,6 @@ def proposal_votes(proposal_id):
 @cfp_review.route('/anonymisation')
 @anon_required
 def anonymisation():
-    if current_user.has_permission('cfp_reviewer', False):
-        # Prevent CfP reviewers from viewing non-anonymised submissions
-        return abort(403)
-
     proposals = Proposal.query.filter_by(state='checked').order_by('modified', 'id').all()
 
     return render_template('cfp_review/proposals.html', proposals=proposals,
@@ -541,10 +511,6 @@ class AnonymiseProposalForm(Form):
 @cfp_review.route('/anonymisation/<int:proposal_id>', methods=['GET', 'POST'])
 @anon_required
 def anonymise_proposal(proposal_id):
-    if current_user.has_permission('cfp_reviewer', False):
-        # Prevent CfP reviewers from viewing non-anonymised submissions
-        return abort(403)
-
     prop = Proposal.query.get(proposal_id)
     if prop.state != 'checked':
         # Make sure people only see proposals that are ready
