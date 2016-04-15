@@ -21,6 +21,12 @@ from apps.tickets import render_receipt, render_pdf
 from unicodecsv import DictReader
 
 
+class CreateDB(Command):
+    # For testing - you usually want to use db migrate/db upgrade instead
+    def run(self):
+        db.create_all()
+
+
 class CreateBankAccounts(Command):
     def run(self):
         gbp = BankAccount('492900', '20716473590526', 'GBP')
@@ -459,5 +465,6 @@ if __name__ == "__main__":
     manager.add_command('sendtickets', SendTickets())
     manager.add_command('lockproposals', LockProposals())
     manager.add_command('importcfp', ImportCFP())
+    manager.add_command('createdb', CreateDB())
     manager.add_command('db', MigrateCommand)
     manager.run()
