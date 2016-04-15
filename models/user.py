@@ -39,16 +39,28 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String, nullable=False, index=True)
     phone = db.Column(db.String, nullable=True)
     diversity = db.relationship('UserDiversity', uselist=False, backref='user', cascade='all, delete, delete-orphan')
-    proposals = db.relationship('Proposal', lazy='dynamic', backref='user', cascade='all, delete, delete-orphan')
     tickets = db.relationship('Ticket', lazy='dynamic', backref='user', cascade='all, delete, delete-orphan')
     payments = db.relationship('Payment', lazy='dynamic', backref='user', cascade='all')
     permissions = db.relationship('Permission', backref='user', cascade='all', secondary=UserPermission)
+    votes = db.relationship('CFPVote', backref='user', lazy='dynamic')
 
+    proposals = db.relationship('Proposal',
+                                primaryjoin='Proposal.user_id == User.id',
+                                backref='user', lazy='dynamic',
+                                cascade='all, delete, delete-orphan')
+    anonymised_proposals = db.relationship('Proposal',
+                                           primaryjoin='Proposal.anonymiser_id == User.id',
+                                           backref='anonymiser', lazy='dynamic',
+                                           cascade='all, delete, delete-orphan')
     transfers_to = db.relationship('TicketTransfer',
                                    primaryjoin='TicketTransfer.to_user_id == User.id',
                                    backref='to_user', lazy='dynamic')
     transfers_from = db.relationship('TicketTransfer',
                                    primaryjoin='TicketTransfer.from_user_id == User.id',
+                                   backref='from_user', lazy='dynamic')
+
+    messages_from = db.relationship('CFPMessage',
+                                   primaryjoin='CFPMessage.from_user_id == User.id',
                                    backref='from_user', lazy='dynamic')
 
     def __init__(self, email, name):

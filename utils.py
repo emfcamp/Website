@@ -15,9 +15,10 @@ from models import (
 from models.payment import (
     BankAccount, BankTransaction,
 )
-from models.cfp import Proposal
+from models.cfp import Proposal, TalkProposal, WorkshopProposal, InstallationProposal
 from models.permission import Permission
 from apps.tickets import render_receipt, render_pdf
+from unicodecsv import DictReader
 
 
 class CreateBankAccounts(Command):
@@ -389,13 +390,61 @@ class LockProposals(Command):
             deadline = proposal.created + edit_window
 
             if datetime.utcnow() > deadline:
-                proposal.state = 'locked'
+                proposal.set_state('locked')
 
                 app.logger.debug('Locking proposal %d', proposal.id)
                 db.session.commit()
                 lock_count += 1
 
         app.logger.info('Locked %d proposals', lock_count)
+
+class ImportCFP(Command):
+    option_list = [Option('-f', '--file', dest='filename',
+                          help='The .csv file to load',
+                          default='tests/2014_proposals.csv'),
+                   Option('-s', '--state', dest='state', default='locked',
+                          help='The state to import the proposals as')]
+
+    def run(self, filename, state):
+        with open(filename) as csvfile:
+            # id, title, description, length, need_finance,
+            # one_day, type, experience, attendees, size
+            reader = DictReader(csvfile)
+            count = 0
+            for row in reader:
+                if Proposal.query.filter_by(title=row['title']).first():
+                    continue
+
+                user = User('%d@test.com' % count, 'test_cfp_user_%d' % count)
+                db.session.add(user)
+
+                proposal = TalkProposal() if row['type'] == u'talk' else\
+                    WorkshopProposal() if row['type'] == u'workshop' else\
+                    InstallationProposal()
+
+                proposal.state = state
+                proposal.title = row['title']
+                proposal.description = row['description']
+
+                proposal.one_day = True if row.get('one_day') == 't' else False
+                proposal.needs_money = True if row.get('need_finance') == 't' else False
+
+                if row['type'] == 'talk':
+                    proposal.length = row['length']
+
+                elif row['type'] == 'workshop':
+                    proposal.length = row['length']
+                    proposal.attendees = row['attendees']
+
+                else:
+                    proposal.size = row['size']
+
+                proposal.user = user
+                db.session.add(proposal)
+                db.session.commit()
+                count += 1
+        app.logger.info('Imported %d proposals' % count)
+
 
 
 if __name__ == "__main__":
@@ -409,5 +458,6 @@ if __name__ == "__main__":
     manager.add_command('createtokens', CreateTicketTokens())
     manager.add_command('sendtickets', SendTickets())
     manager.add_command('lockproposals', LockProposals())
+    manager.add_command('importcfp', ImportCFP())
     manager.add_command('db', MigrateCommand)
     manager.run()

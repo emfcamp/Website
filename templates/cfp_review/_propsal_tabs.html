@@ -1,0 +1,17 @@
+<ul class="nav nav-tabs">
+    <li role="presentation" {% if active == 'details' %} class="active" {% endif %}>
+        <a href="{{ url_for('.update_proposal', proposal_id=proposal.id) }}">
+            Details
+        </a>
+    </li>
+    <li role="presentation" {% if active == 'messages' %} class="active" {% endif %}>
+        <a href="{{ url_for('.message_proposer', proposal_id=proposal.id) }}">
+            Messages ({{ proposal.get_unread_count(current_user) }}/{{ proposal.messages | length }})
+        </a>
+    </li>
+    <li role="presentation" {% if active == 'votes' %} class="active" {% endif %}>
+        <a href="{{ url_for('.proposal_votes', proposal_id=proposal.id) }}">
+            Votes/Reviewer Notes ({{ proposal.get_unread_vote_note_count() }}/{{ proposal.votes | length }})
+        </a>
+    </li>
+</ul>

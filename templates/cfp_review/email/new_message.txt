@@ -1,0 +1,11 @@
+Hi {{ to_user.name }},
+
+We have some questions about your submission ({{ proposal.title }}).
+
+To see the message and respond to it, please go to:
+
+{{ url }}
+
+Thanks!
+
+The EMF Team (specifically {{from_user.name}})

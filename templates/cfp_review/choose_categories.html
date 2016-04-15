@@ -1,26 +1,21 @@
-{% extends "admin/base.html" %}
-{% set nav_active = 'ticket_types' %}
+{% extends "cfp_review/base.html" %}
 {% block body %}
-<h2>CFP categories</h2>
+<h2>Choose your CFP categories</h2>
 
 <form method='POST'>
 {{ form.hidden_tag() }}
 <table class="table table-condensed">
 <thead><tr>
   <th>Category</th>
-  <th>Entries</th>
+  <th>Review this?</th>
 </tr></thead>
 <tbody>
 {% for cat in form.categories %}
   <tr>
-    <td>{{ cat.hidden_tag_without('csrf_token') }}{{ cat['name']() }}</td>
-    <td>{{ counts[cat['id'].data] }}</td>
+    <td>{{ cat.hidden_tag_without('csrf_token') }}{{ categories[cat['id'].data].name }}</td>
+    <td>{{ cat.is_user_member() }}</td>
   </tr>
 {% endfor %}
-<tr>
-  <td>{{ form.name }}</td>
-  <td>&nbsp;</td>
-</tr>
 </tbody>
 </table>
 {{ form.update(class_='btn btn-success') }}

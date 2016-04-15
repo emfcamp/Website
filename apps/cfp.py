@@ -7,7 +7,7 @@ from flask.ext.login import current_user
 from flask_mail import Message
 from wtforms.validators import Required, Email, ValidationError
 from wtforms import (
-    BooleanField, StringField,
+    BooleanField, StringField, SubmitField,
     TextAreaField, SelectField,
 )
 
@@ -17,7 +17,7 @@ from main import db, mail
 from models.user import User, UserDiversity
 from models.ticket import TicketType
 from models.cfp import (
-    TalkProposal, WorkshopProposal, InstallationProposal, Proposal
+    TalkProposal, WorkshopProposal, InstallationProposal, Proposal, CFPMessage
 )
 from .common import feature_flag, create_current_user
 from .common.forms import Form
@@ -163,6 +163,8 @@ class DiversityForm(Form):
 @cfp.route('/cfp/complete', methods=['GET', 'POST'])
 @feature_flag('CFP')
 def complete():
+    if current_user.is_anonymous():
+        return redirect(url_for('.main'))
     form = DiversityForm()
     if form.validate_on_submit():
         if not current_user.diversity:
@@ -192,8 +194,14 @@ def proposals():
 
     return render_template('cfp/proposals.html', proposals=proposals)
 
+
 @cfp.route('/cfp/proposals/<int:proposal_id>/edit', methods=['GET', 'POST'])
+@feature_flag('CFP')
 def edit_proposal(proposal_id):
+    if current_user.is_anonymous():
+        return redirect(url_for('users.login', next=url_for('.edit_proposal',
+                                                           proposal_id=proposal_id)))
+
     proposal = Proposal.query.get(proposal_id)
     if not proposal or proposal.user != current_user:
         abort(404)
@@ -206,7 +214,7 @@ def edit_proposal(proposal_id):
     del form.email
 
     if form.validate_on_submit():
-        if proposal.state != 'new':
+        if proposal.state not in ['new', 'edit']:
             flash('This submission can no longer be edited.')
             return redirect(url_for('.proposals'))
 
@@ -233,7 +241,9 @@ def edit_proposal(proposal_id):
         db.session.commit()
         flash("Your proposal has been updated")
 
-    if request.method != 'POST':
+        return redirect(url_for('.edit_proposal', proposal_id=proposal_id))
+
+    if request.method != 'POST' and proposal.state in ['new', 'edit']:
         if proposal.type == 'talk':
             form.length.data = proposal.length
 
@@ -252,8 +262,69 @@ def edit_proposal(proposal_id):
         form.notice_required.data = proposal.notice_required
         form.needs_help.data = proposal.needs_help
 
-    return render_template('cfp/edit.html', proposal=proposal,
-                                            form=form)
+    return render_template('cfp/edit.html', proposal=proposal, form=form)
+
+
+class MessagesForm(Form):
+    message = TextAreaField('Message')
+    send = SubmitField('Send Message')
+    mark_read = SubmitField('Mark all messages as read')
+
+
+@cfp.route('/cfp/proposals/<int:proposal_id>/messages', methods=['GET', 'POST'])
+@feature_flag('CFP')
+def proposal_messages(proposal_id):
+    if current_user.is_anonymous():
+        return redirect(url_for('users.login', next=url_for('.proposal_messages',
+                                                           proposal_id=proposal_id)))
+    proposal = Proposal.query.get(proposal_id)
+    if not proposal or proposal.user_id != current_user.id:
+        abort(404)
+
+    form = MessagesForm()
+
+    if request.method == 'POST':
+        if form.send.data and form.message.data:
+            msg = CFPMessage()
+            msg.is_to_admin = True
+            msg.from_user_id = current_user.id
+            msg.proposal_id = proposal_id
+            msg.message = form.message.data
+
+            db.session.add(msg)
+            db.session.commit()
+
+        if form.mark_read or form.send.data:
+            count = proposal.mark_messages_read(current_user)
+            app.logger.info('Marked %d messages to admin on proposal %d as read' % (count, proposal.id))
+
+        return redirect(url_for('.proposal_messages', proposal_id=proposal_id))
+
+    messages = CFPMessage.query.filter_by(
+        proposal_id=proposal_id
+    ).order_by('created').all()
+
+    return render_template('cfp/messages.html',
+                           proposal=proposal, messages=messages, form=form)
+
+@cfp.route('/cfp/messages')
+@feature_flag('CFP')
+def all_messages():
+    if current_user.is_anonymous():
+        return redirect(url_for('.main'))
+
+    proposal_with_message = Proposal.query\
+        .join(CFPMessage)\
+        .filter(Proposal.id == CFPMessage.proposal_id,
+                Proposal.user_id == current_user.id)\
+        .order_by(CFPMessage.has_been_read, CFPMessage.created.desc())\
+        .all()
+
+    proposal_with_message.sort(key=lambda x: (x.get_unread_count(current_user) > 0,
+                                              x.created), reverse=True)
+
+    return render_template('cfp/all_messages.html',
+                           proposal_with_message=proposal_with_message)
 
 @cfp.route('/cfp/guidance')
 def guidance():

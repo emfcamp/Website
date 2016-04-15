@@ -1,0 +1,32 @@
+{% extends "cfp_review/base.html" %}
+{% block body %}
+<h2>Votes summary</h2>
+
+<table class="table table-striped">
+    <tr>
+        <th class="text-center">Date</th>
+        <th class="text-center">Notes</th>
+        <th class="text-center">Votes</th>
+        <th class="text-center">Blocked</th>
+        <th class="text-center">Recused</th>
+        <th>Proposal Title</th>
+    </tr>
+{% for proposal, counts in proposals_with_counts %}
+    <tr>
+        <td class="text-center">{{ proposal.created.strftime("%d/%m") }}</td>
+        <td class="text-center">
+            {{ proposal.get_unread_vote_note_count() }}/{{ proposal.get_total_note_count() }}
+        </td>
+        <td class="text-center">{{ counts.get('voted', 0) }}</td>
+        <td class="text-center">{{ counts.get('blocked', 0) }}</td>
+        <td class="text-center">{{ counts.get('recused', 0) }}</td>
+        <td>
+            <a href="{{ url_for('.proposal_votes', proposal_id=proposal.id) }}">
+                {{ proposal.title }}
+            </a>
+        </td>
+    </tr>
+{% endfor %}
+</table>
+
+{% endblock %}

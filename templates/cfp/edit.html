@@ -1,76 +1,64 @@
-{% from "_formhelpers.html" import render_field %}
-
 {% extends "base.html" %}
 {% block title %}Edit Proposal - {{ proposal.title }}{% endblock %}
 {% block body %}
-<h2>Edit Proposal</h2>
 
-<div>You can currently edit your proposal as it has not been sent for review.
+<ul class="nav nav-tabs">
+  <li role="presentation" class="active"><a href="">Details</a></li>
+  <li role="presentation">
+    <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">
+      Messages
+      {% set unread_count = proposal.get_unread_count(current_user) %}
+      {% if unread_count > 0 %}
+        <span class="badge">{{ unread_count }}</span>
+      {% endif %}
+    </a>
+  </li>
+</ul>
+
+
+<h2>Proposal Detail</h2>
+
+{% if proposal.state in ['new', 'edit'] %}
+  <div>You can currently edit your proposal as it has not been sent for review.
      For more information on the selection process, please see our
-     <a href="{{ url_for('.guidance') }}" target="_blank">guidance</a>.</p></div>
-
-<form class="form-horizontal cfp-form" method="post">
-  <div class="well">
-    {{ form.hidden_tag() }}
-
-    <fieldset>
-        <legend>About Your {{form.type|capitalize}}</legend>
-        {% if proposal.state == 'new' %}
-        <p>To help with our anonymised review process, try to avoid including
-           personally identifiable information at this stage.</p>
-        {% endif %}
-        {{ render_field(form.title, 9) }}
-        {{ render_field(form.description, 9) }}
-    </fieldset>
-
-    <fieldset>
-        <legend>More Details</legend>
-        <p>We'll use these details to help us schedule your {{form.type}}.</p>
-
-    {% if proposal.type == 'talk' %}
-      {{ render_field(form.requirements, 9) }}
-      {{ render_field(form.length, 9) }}
-      {{ render_field(form.notice_required, 9) }}
-
-    {% elif proposal.type == 'workshop' %}
-      {{ render_field(form.requirements, 9) }}
-      {{ render_field(form.length, 9) }}
-      {{ render_field(form.notice_required, 9) }}
-      {% call render_field(form.attendees, 9) %}
-          Our workshop tents can accommodate 10-50 attendees per session; if your workshop
-          is smaller than that, we might be able to find somewhere else to hold it.
-      {% endcall %}
-      {{ render_field(form.cost, 9) }}
-
-    {% elif proposal.type == 'installation' %}
-      {{ render_field(form.notice_required, 9) }}
-      {{ render_field(form.requirements, 9) }}
-      {{ render_field(form.size, 9) }}
-      {% call render_field(form.funds, 9) %}
-          We have a limited amount of funding available to make the EMF site look great.
-          If you'd like to apply for a grant, let us know how much you'll need.
-      {% endcall %}
-    {% endif %}
-
-    <div class="col-md-9 col-sm-offset-3 {% if proposal.state != 'new' -%} hidden {%- endif %}">
-      <label class="checkbox">
-        {{ form.needs_help() }}
-        I'd like help with preparing this proposal.
-      </label>
-      {% for error in form.needs_help.errors %}
-      <div class="help-block">{{ error }}</div>
-      {% endfor %}
+     <a href="{{ url_for('.guidance') }}" target="_blank">guidance</a>.
+  </div>
+  {% include "cfp/edit-form.html" %}
+{% else %}
+  <div class="well"><div class="row">
+    <div class="col-md-12">
+      You can't currently edit your proposal as it's being reviewed, if you have
+      any questions you can use the messaging system, below, to ask them.
     </div>
-    </fieldset>
-
-  </div>
-  <div class="pull-right">
-    <a href="{{ url_for('.proposals') }}" class="btn btn-default">Back</a>
-    <button type="submit" class="btn btn-success debounce">Update</button>
-  </div>
-
-  <div class="clearfix"></div>
-
-</form>
+    <div class="col-md-6">
+      <legend>About your {{proposal.type|capitalize}}</legend>
+      <dl class="dl-horizontal">
+        <dt>Title</dt><dd>{{proposal.title}}</dd>
+        <dt>Submitted</dt><dd>{{proposal.created.strftime('%d %B')}}</dd>
+        <dt>Status</dt><dd>{{proposal.state|capitalize}}</dd>
+        <dt>Description</dt><dd>{{proposal.description}}</dd>
+      </dl>
+    </div>
+    <div class="col-md-6">
+      <legend>Further details</legend>
+      <dl class="dl-horizontal">
+        <dt>Requirements</dt><dd>{{proposal.requirements}}</dd>
+        {% if proposal.type == 'talk' %}
+          <dt>Length</dt><dd>{{proposal.length}}</dd>
+          <dt>Notice Required</dt><dd>{{proposal.notice_required}}</dd>
+        {% elif proposal.type == 'workshop' %}
+          <dt>Length</dt><dd>{{proposal.length}}</dd>
+          <dt>Notice Required</dt><dd>{{proposal.notice_required}}</dd>
+          <dt>Attendees</dt><dd>{{proposal.attendees}}</dd>
+          <dt>Cost per attendee</dt><dd>£{{proposal.cost}}</dd>
+        {% elif proposal.type == 'installation' %}
+          <dt>Notice Required</dt><dd>{{proposal.notice_required}}</dd>
+          <dt>Size</dt><dd>{{proposal.size}}</dd>
+          <dt>Funds requested</dt><dd>£{{proposal.funds}}</dd>
+        {% endif %}
+      </dl>
+    </div>
+  </div></div>
+{% endif %}
 
 {% endblock %}
