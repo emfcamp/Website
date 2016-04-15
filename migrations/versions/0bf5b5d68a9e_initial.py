@@ -2,7 +2,7 @@
 
 Revision ID: 0bf5b5d68a9e
 Revises: None
-Create Date: 2016-04-10 18:45:14.609391
+Create Date: 2016-04-15 00:07:04.666446
 
 """
 
@@ -31,6 +31,24 @@ def upgrade():
     sa.Column('name', sa.String(), nullable=False),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_category'))
     )
+    op.create_table('cfp_vote_version',
+    sa.Column('id', sa.Integer(), autoincrement=False, nullable=False),
+    sa.Column('user_id', sa.Integer(), autoincrement=False, nullable=True),
+    sa.Column('proposal_id', sa.Integer(), autoincrement=False, nullable=True),
+    sa.Column('state', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('has_been_read', sa.Boolean(), autoincrement=False, nullable=True),
+    sa.Column('created', sa.DateTime(), autoincrement=False, nullable=True),
+    sa.Column('modified', sa.DateTime(), autoincrement=False, nullable=True),
+    sa.Column('vote', sa.Integer(), autoincrement=False, nullable=True),
+    sa.Column('note', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('transaction_id', sa.BigInteger(), autoincrement=False, nullable=False),
+    sa.Column('operation_type', sa.SmallInteger(), nullable=False),
+    sa.PrimaryKeyConstraint('id', 'transaction_id', name=op.f('pk_cfp_vote_version'))
+    )
+    with op.batch_alter_table('cfp_vote_version', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_cfp_vote_version_operation_type'), ['operation_type'], unique=False)
+        batch_op.create_index(batch_op.f('ix_cfp_vote_version_transaction_id'), ['transaction_id'], unique=False)
+
     op.create_table('feature_flag',
     sa.Column('feature', sa.String(), nullable=False),
     sa.Column('enabled', sa.Boolean(), nullable=False),
@@ -47,7 +65,9 @@ def upgrade():
     op.create_table('proposal_version',
     sa.Column('id', sa.Integer(), autoincrement=False, nullable=False),
     sa.Column('user_id', sa.Integer(), autoincrement=False, nullable=True),
+    sa.Column('anonymiser_id', sa.Integer(), autoincrement=False, nullable=True),
     sa.Column('created', sa.DateTime(), autoincrement=False, nullable=True),
+    sa.Column('modified', sa.DateTime(), autoincrement=False, nullable=True),
     sa.Column('state', sa.String(), autoincrement=False, nullable=True),
     sa.Column('type', sa.String(), autoincrement=False, nullable=True),
     sa.Column('title', sa.String(), autoincrement=False, nullable=True),
@@ -55,9 +75,11 @@ def upgrade():
     sa.Column('requirements', sa.String(), autoincrement=False, nullable=True),
     sa.Column('length', sa.String(), autoincrement=False, nullable=True),
     sa.Column('notice_required', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('category_id', sa.Integer(), autoincrement=False, nullable=True),
     sa.Column('needs_help', sa.Boolean(), autoincrement=False, nullable=True),
     sa.Column('needs_money', sa.Boolean(), autoincrement=False, nullable=True),
     sa.Column('one_day', sa.Boolean(), autoincrement=False, nullable=True),
+    sa.Column('has_rejected_email', sa.Boolean(), autoincrement=False, nullable=True),
     sa.Column('attendees', sa.String(), autoincrement=False, nullable=True),
     sa.Column('cost', sa.String(), autoincrement=False, nullable=True),
     sa.Column('size', sa.String(), autoincrement=False, nullable=True),
@@ -95,6 +117,17 @@ def upgrade():
         batch_op.create_index(batch_op.f('ix_user_email'), ['email'], unique=True)
         batch_op.create_index(batch_op.f('ix_user_name'), ['name'], unique=False)
 
+    op.create_table('category_reviewers',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('category_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['category_id'], ['category.id'], name=op.f('fk_category_reviewers_category_id_category')),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], name=op.f('fk_category_reviewers_user_id_user')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_category_reviewers'))
+    )
+    with op.batch_alter_table('category_reviewers', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_category_reviewers_user_id'), ['user_id'], unique=False)
+
     op.create_table('diversity',
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('age', sa.String(), nullable=True),
@@ -124,7 +157,9 @@ def upgrade():
     op.create_table('proposal',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('anonymiser_id', sa.Integer(), nullable=True),
     sa.Column('created', sa.DateTime(), nullable=True),
+    sa.Column('modified', sa.DateTime(), nullable=True),
     sa.Column('state', sa.String(), nullable=False),
     sa.Column('type', sa.String(), nullable=False),
     sa.Column('title', sa.String(), nullable=False),
@@ -132,13 +167,17 @@ def upgrade():
     sa.Column('requirements', sa.String(), nullable=True),
     sa.Column('length', sa.String(), nullable=True),
     sa.Column('notice_required', sa.String(), nullable=True),
+    sa.Column('category_id', sa.Integer(), nullable=True),
     sa.Column('needs_help', sa.Boolean(), nullable=True),
     sa.Column('needs_money', sa.Boolean(), nullable=True),
     sa.Column('one_day', sa.Boolean(), nullable=True),
+    sa.Column('has_rejected_email', sa.Boolean(), nullable=True),
     sa.Column('attendees', sa.String(), nullable=True),
     sa.Column('cost', sa.String(), nullable=True),
     sa.Column('size', sa.String(), nullable=True),
     sa.Column('funds', sa.String(), nullable=True),
+    sa.ForeignKeyConstraint(['anonymiser_id'], ['user.id'], name=op.f('fk_proposal_anonymiser_id_user')),
+    sa.ForeignKeyConstraint(['category_id'], ['category.id'], name=op.f('fk_proposal_category_id_category')),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], name=op.f('fk_proposal_user_id_user')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_proposal'))
     )
@@ -190,6 +229,32 @@ def upgrade():
         batch_op.create_index(batch_op.f('ix_bank_transaction_fit_id'), ['fit_id'], unique=False)
         batch_op.create_index('ix_bank_transaction_u1', ['account_id', 'posted', 'type', 'amount_int', 'payee', 'fit_id'], unique=True)
 
+    op.create_table('cfp_message',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created', sa.DateTime(), nullable=True),
+    sa.Column('from_user_id', sa.Integer(), nullable=False),
+    sa.Column('proposal_id', sa.Integer(), nullable=False),
+    sa.Column('message', sa.String(), nullable=False),
+    sa.Column('is_to_admin', sa.Boolean(), nullable=True),
+    sa.Column('has_been_read', sa.Boolean(), nullable=True),
+    sa.ForeignKeyConstraint(['from_user_id'], ['user.id'], name=op.f('fk_cfp_message_from_user_id_user')),
+    sa.ForeignKeyConstraint(['proposal_id'], ['proposal.id'], name=op.f('fk_cfp_message_proposal_id_proposal')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_cfp_message'))
+    )
+    op.create_table('cfp_vote',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('proposal_id', sa.Integer(), nullable=False),
+    sa.Column('state', sa.String(), nullable=False),
+    sa.Column('has_been_read', sa.Boolean(), nullable=True),
+    sa.Column('created', sa.DateTime(), nullable=True),
+    sa.Column('modified', sa.DateTime(), nullable=True),
+    sa.Column('vote', sa.Integer(), nullable=True),
+    sa.Column('note', sa.String(), nullable=True),
+    sa.ForeignKeyConstraint(['proposal_id'], ['proposal.id'], name=op.f('fk_cfp_vote_proposal_id_proposal')),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], name=op.f('fk_cfp_vote_user_id_user')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_cfp_vote'))
+    )
     op.create_table('payment_change',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('payment_id', sa.Integer(), nullable=False),
@@ -260,6 +325,8 @@ def downgrade():
 
     op.drop_table('ticket')
     op.drop_table('payment_change')
+    op.drop_table('cfp_vote')
+    op.drop_table('cfp_message')
     with op.batch_alter_table('bank_transaction', schema=None) as batch_op:
         batch_op.drop_index('ix_bank_transaction_u1')
         batch_op.drop_index(batch_op.f('ix_bank_transaction_fit_id'))
@@ -277,6 +344,10 @@ def downgrade():
     op.drop_table('proposal')
     op.drop_table('payment')
     op.drop_table('diversity')
+    with op.batch_alter_table('category_reviewers', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_category_reviewers_user_id'))
+
+    op.drop_table('category_reviewers')
     with op.batch_alter_table('user', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_user_name'))
         batch_op.drop_index(batch_op.f('ix_user_email'))
@@ -293,6 +364,11 @@ def downgrade():
 
     op.drop_table('permission')
     op.drop_table('feature_flag')
+    with op.batch_alter_table('cfp_vote_version', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_cfp_vote_version_transaction_id'))
+        batch_op.drop_index(batch_op.f('ix_cfp_vote_version_operation_type'))
+
+    op.drop_table('cfp_vote_version')
     op.drop_table('category')
     with op.batch_alter_table('bank_account', schema=None) as batch_op:
         batch_op.drop_index('ix_bank_account_sort_code_acct_id')
