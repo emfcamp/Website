@@ -45,7 +45,7 @@
             </label>
             {{ form.min_votes(class_="form-control") }}
             {% for error in form.min_votes.errors %}
-                <p class="help-block" id="help-block-{{field.name}}">{{ error }}</pa>
+                <p class="help-block" id="help-block-{{form.min_votes.name}}">{{ error }}</pa>
             {% endfor %}
         </div>
         {{ form.close_round(class_='btn btn-success') }}

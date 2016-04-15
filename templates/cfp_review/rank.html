@@ -46,7 +46,7 @@
             </label>
             {{ form.min_score(class_="form-control") }}
             {% for error in form.min_score.errors %}
-                <p class="help-block" id="help-block-{{field.name}}">{{ error }}</pa>
+                <p class="help-block" id="help-block-{{form.min_score.name}}">{{ error }}</pa>
             {% endfor %}
         </div>
         {{ form.set_score(class_='btn btn-success') }}
