@@ -48,11 +48,7 @@
     </div>
     <div class="col-md-4 col-xs-12 btn-group-vertical" role="group">
         <div>&nbsp;</div>
-        {% if proposal.type == 'talk' %}
-            {{ render_field(form.category, tabindex=1) }}
-        {% else %}
-            <div>&nbsp;</div><div>&nbsp;</div><div>&nbsp;</div>
-        {% endif %}
+        {{ render_field(form.category, tabindex=1) }}
         {% if proposal.state == 'locked' %}
             {{ form.checked(class_="btn btn-success", tabindex=2) }}
             {{ form.reject(class_="btn btn-danger", tabindex=3) }}

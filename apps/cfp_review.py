@@ -216,6 +216,8 @@ class UpdateProposalForm(Form):
     reject = SubmitField('Reject')
     checked = SubmitField('Send for Anonymisation')
 
+    category = SelectField('Category', default=-1, coerce=int)
+
     def update_proposal(self, proposal):
         proposal.state = self.state.data
         proposal.title = self.title.data
@@ -226,18 +228,11 @@ class UpdateProposalForm(Form):
         proposal.needs_help = self.needs_help.data
         proposal.needs_money = self.needs_money.data
         proposal.one_day = self.one_day.data
-
-
-class UpdateTalkForm(UpdateProposalForm):
-    category = SelectField('Category', default=-1, coerce=int)
+        proposal.category_id = self.category.data
 
     def validate_category(form, field):
         if field.data < 0 and form.checked.data:
             raise ValidationError('Required')
-
-    def update_proposal(self, proposal):
-        proposal.category_id = self.category.data
-        super(UpdateTalkForm, self).update_proposal(proposal)
 
 
 class UpdateWorkshopForm(UpdateProposalForm):
@@ -275,13 +270,14 @@ def update_proposal(proposal_id):
 
     next_id = next_prop.id if next_prop else None
 
-    form = UpdateTalkForm() if prop.type == 'talk' else \
+    form = UpdateProposalForm() if prop.type == 'talk' else \
            UpdateWorkshopForm() if prop.type == 'workshop' else \
            UpdateInstallationForm()
 
-    if prop.type == 'talk':
-        categories = [(c.id, c.name) for c in ProposalCategory.query.all()]
-        form.category.choices = [(-1, '--None--')] + categories
+    categories = [(c.id, c.name) for c in ProposalCategory.query
+                                                          .order_by('name')
+                                                          .all()]
+    form.category.choices = [(-1, '--None--')] + categories
 
     # Process the POST
     if form.validate_on_submit():
@@ -296,7 +292,7 @@ def update_proposal(proposal_id):
             flash('Rejected')
 
         elif form.checked.data:
-            if prop.type == 'talk':
+            if form.category.data > 0:
                 prop.category_id = form.category.data
 
             app.logger.info('Sending proposal %s for anonymisation', proposal_id)
@@ -320,10 +316,10 @@ def update_proposal(proposal_id):
     form.needs_money.data = prop.needs_money
     form.one_day.data = prop.one_day
 
-    if prop.type == 'talk' and prop.category_id:
+    if prop.category_id:
         form.category.data = prop.category_id
 
-    elif prop.type == 'workshop':
+    if prop.type == 'workshop':
         form.attendees.data = prop.attendees
         form.cost.data = prop.cost
 
@@ -545,12 +541,14 @@ def anonymise_proposal(proposal_id):
     return render_template('cfp_review/anonymise_proposal.html',
                            proposal=prop, form=form, next_proposal=next_prop)
 
-def get_proposals_to_review(user):
-    categories = [cat.id for cat in user.review_categories]
-    types = ['talk', 'workshop']
 
+def get_proposals_to_review(user):
     if user.has_permission('admin'):
-        types.append('installation')
+        types = ['talk', 'workshop', 'installation']
+        categories = ProposalCategory.query.all()
+    else:
+        types = ['talk', 'workshop']
+        categories = [cat.id for cat in user.review_categories]
 
     return Proposal.query\
         .outerjoin(ProposalCategory)\
@@ -562,6 +560,7 @@ def get_proposals_to_review(user):
                 Proposal.category_id.is_(None))
         ).all()
 
+
 def get_safe_index_sort(index_list):
     def safe_index_sort(prop):
         try:
@@ -569,6 +568,7 @@ def get_safe_index_sort(index_list):
         except ValueError:
             return len(index_list)
     return safe_index_sort
+
 
 @cfp_review.route('/review')
 @review_required
@@ -816,7 +816,6 @@ def rank():
                                         prop.user.email, app.config['CONTENT_EMAIL'],
                                         'cfp_review/email/not_accepted_msg.txt',
                                         user=prop.user, proposal=prop)
-
 
             db.session.commit()
             del session['min_score']
