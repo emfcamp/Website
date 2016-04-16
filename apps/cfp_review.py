@@ -229,7 +229,7 @@ class UpdateProposalForm(Form):
 
 
 class UpdateTalkForm(UpdateProposalForm):
-    category = SelectField('Category', default=-1, coerce=int, choices=[(-1, '--None--')])
+    category = SelectField('Category', default=-1, coerce=int)
 
     def validate_category(form, field):
         if field.data < 0 and form.checked.data:
@@ -281,7 +281,7 @@ def update_proposal(proposal_id):
 
     if prop.type == 'talk':
         categories = [(c.id, c.name) for c in ProposalCategory.query.all()]
-        form.category.choices.extend(categories)
+        form.category.choices = [(-1, '--None--')] + categories
 
     # Process the POST
     if form.validate_on_submit():
