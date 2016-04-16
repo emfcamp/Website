@@ -15,7 +15,7 @@
   <tr>
     {% set cat_id = cat['id'].data %}
     <td>{{ cat.hidden_tag_without('csrf_token') }}{{ cat['name'](class_='form-control') }}</td>
-    <td><a href="{{ url_for('.proposals', category=cat_id)}}">
+    <td><a href="{{ url_for('.proposals', category_id=cat_id)}}">
         {{ categories[cat_id].proposals | length }}
     </a></td>
     <td>
