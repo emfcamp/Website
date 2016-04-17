@@ -12,10 +12,8 @@
             <dd>{{ proposal.type }}</dd>
             <dt>Submitter</dt>
             <dd>{{ proposal.user.name }}</dd>
-            {% if proposal.type == 'talk' %}
-                <dt>Category</dt>
-                <dd>{{ proposal.category.name }}</dd>
-            {% endif %}
+            <dt>Category</dt>
+            <dd>{{ proposal.category.name }}</dd>
 
             {{ render_dl_field(form.title, tabindex=1) }}
             {{ render_dl_field(form.description, tabindex=2, rows=10) }}

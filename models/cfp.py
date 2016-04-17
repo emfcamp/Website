@@ -120,7 +120,7 @@ class ProposalCategory(db.Model):
     __tablename__ = 'category'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
-    proposals = db.relationship(TalkProposal, backref='category')
+    proposals = db.relationship(Proposal, backref='category')
     users = db.relationship('User', secondary=category_reviewers, backref='review_categories')
 
 
