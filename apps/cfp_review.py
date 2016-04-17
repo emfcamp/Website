@@ -20,8 +20,9 @@ from main import db, external_url
 from .common import require_permission, send_template_email
 from .majority_judgement import calculate_score
 
+from models.user import User
 from models.cfp import (
-    Proposal, category_reviewers, ProposalCategory,
+    Proposal, ProposalCategory,
     CFPMessage, CFPVote, CFP_STATES
 )
 from .common.forms import Form, HiddenIntegerField
@@ -552,7 +553,8 @@ def get_proposals_to_review(user):
             .filter(Proposal.state == 'anonymised')
     else:
         proposals = user.query \
-            .join(category_reviewers, ProposalCategory, Proposal) \
+            .join(User.review_categories, Proposal) \
+            .with_entities(Proposal) \
             .filter(
                 Proposal.state == 'anonymised',
                 Proposal.user_id != user.id,
