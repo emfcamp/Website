@@ -27,8 +27,8 @@
 {% else %}
   <div class="well"><div class="row">
     <div class="col-md-12">
-      You can't currently edit your proposal as it's being reviewed, if you have
-      any questions you can use the messaging system, below, to ask them.
+      You can't currently edit your proposal as it's being reviewed.
+      If you have any questions please <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">add a message</a>.
     </div>
     <div class="col-md-6">
       <legend>About your {{proposal.type|capitalize}}</legend>

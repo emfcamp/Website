@@ -812,7 +812,7 @@ def rank():
 
                 elif not prop.has_rejected_email:
                     prop.has_rejected_email = True
-                    send_template_email('Your EMF proposal.',
+                    send_template_email('Your EMF proposal',
                                         prop.user.email, app.config['CONTENT_EMAIL'],
                                         'cfp_review/email/not_accepted_msg.txt',
                                         user=prop.user, proposal=prop)

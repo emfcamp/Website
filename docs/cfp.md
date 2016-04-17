@@ -8,7 +8,7 @@ There are 3 types of proposal which is accepted to the CfP:
 ## Review process ##
 
 1. Submission
-2. Sanity checks (in order to reject, e.g. hate speech)
+2. Sanity checks (in order to reject, e.g. hate speech or spam)
 3. Anonymisation
 4. Review (score 0, 1 or 2)
 5. Judging (all submissions are ranked according to Majority judgement)
@@ -35,7 +35,7 @@ Submissions flow through the following state machine:
 
 * 'edit' - State that indicates the proposal isn't new but can be edited
 * 'new' - Initial state of a proposal
-* 'locked' - After two days 'new' proposals become 'locked'. 'Locked' proposals are then checked (e.g. for hate speech) and are either:
+* 'locked' - After two days 'new' proposals become 'locked'. 'Locked' proposals are then checked and are either:
     * 'checked' - The proposal is fine and is ready to be anonymised
     * 'rejected' - There is some problem with the proposal, the admin can then work to resolve this with the submitter.
 * 'anonymised' - 'checked' proposals then have their title and description checked for identifying information which might bias the reviewers.
