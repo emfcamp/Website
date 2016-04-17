@@ -20,7 +20,10 @@ from main import db, external_url
 from .common import require_permission, send_template_email
 from .majority_judgement import calculate_score
 
-from models.cfp import Proposal, ProposalCategory, CFPMessage, CFPVote, CFP_STATES
+from models.cfp import (
+    Proposal, category_reviewers, ProposalCategory,
+    CFPMessage, CFPVote, CFP_STATES
+)
 from .common.forms import Form, HiddenIntegerField
 
 cfp_review = Blueprint('cfp_review', __name__)
@@ -543,22 +546,19 @@ def anonymise_proposal(proposal_id):
 
 
 def get_proposals_to_review(user):
-    if user.has_permission('admin'):
-        types = ['talk', 'workshop', 'installation']
-        categories = ProposalCategory.query.all()
-    else:
-        types = ['talk', 'workshop']
-        categories = [cat.id for cat in user.review_categories]
 
-    return Proposal.query\
-        .outerjoin(ProposalCategory)\
-        .filter(
-            Proposal.state == 'anonymised',
-            Proposal.user_id != user.id,
-            Proposal.type.in_(types),
-            or_(Proposal.category_id.in_(categories),
-                Proposal.category_id.is_(None))
-        ).all()
+    if user.has_permission('admin'):
+        proposals = Proposal.query \
+            .filter(Proposal.state == 'anonymised')
+    else:
+        proposals = user.query \
+            .join(category_reviewers, ProposalCategory, Proposal) \
+            .filter(
+                Proposal.state == 'anonymised',
+                Proposal.user_id != user.id,
+                Proposal.type.in_(['talk', 'workshop']))
+
+    return proposals.all()
 
 
 def get_safe_index_sort(index_list):
