@@ -811,7 +811,7 @@ def rank():
             min_score = session['min_score']
             for (prop, score) in scored_proposals:
                 count = 0
-                import ipdb; ipdb.set_trace()
+
                 if score >= min_score:
                     prop.set_state('accepted')
                     count += 1
