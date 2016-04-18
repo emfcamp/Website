@@ -24,6 +24,7 @@ The majority judgement algorithm is this:
     5. Repeat steps 2-4 until the submissions are sorted or each group is empty
 """
 
+
 class MajorityJudgementException(Exception):
     pass
 
@@ -39,14 +40,15 @@ def get_floor_median(values):
     median_index = int((len(values) - 0.5) // 2)
     return values[median_index]
 
+
 def calculate_score(score_list, base=3):
     """
-    Using the majority judgement (MJ) algorithm (i.e. taking the median as the score
-    for any round) calculate a score.
+    Using the majority judgement (MJ) algorithm (i.e. taking the median as the
+    score for any round) calculate a score.
 
     The score is calculated by using the MJ sorted list of scores as the digits
-    of a number in the base of the maximum score + 1 (e.g. if the max score that
-    can be given by an individual is 2 the base is 3).
+    of a number in the base of the maximum score + 1 (e.g. if the max score
+    that can be given by an individual is 2 the base is 3).
 
     e.g. the score list [2, 1, 2, 0] is scored as 47 (in base 3)
         [2, 1, 2, 0]              ->
@@ -54,17 +56,48 @@ def calculate_score(score_list, base=3):
         (MJ sort)                 -> [1, 2, 0, 2]
         (convert to base 3 value) -> [1*27, 2*9, 0*3, 2*1]
         (sum)                     -> 47
+
     """
-    score_list = sorted(score_list[:])
-    # Calculate our initial unit
-    power = base ** (len(score_list) - 1)
-    res = 0
+    score_list = sorted(list(score_list)[:])
+    res = []
     while score_list:
         score = get_floor_median(score_list)
-        if score >= base:
-            msg = 'Incorrectly set base. Got %d, expected values <%d' % (score, base)
-            raise MajorityJudgementException(msg)
-        res += score * power
-        power = int(power / base)
+        if not (0 <= score < base):
+            raise MajorityJudgementException(('Incorrectly set base. Got %s, '
+                                              + 'expected 0 <= values < %s')
+                                             % (score, base))
+        res.append(str(score))
         score_list.remove(score)
-    return res
+
+    res = ''.join(res)
+    # Use int to cast from an arbitrary base
+    return int(res, base)
+
+
+def calculate_normalised_score(score_list, max_score_length,
+                               default_vote=1, base=3):
+    """
+    Normalise scores calculated using the MJ algorithm by assuming padding
+    a score_list with default_vote's until it is a certain length.
+
+    This means that a score list of [2, 2] == [2, 1, 2].
+
+    The default value is assumed to be a 'neutral' score of 1 in base 3.
+    """
+    if not (0 <= default_vote < base):
+        raise MajorityJudgementException('Incorrectly set default, must be '
+                                         + 'between 0 and %s (inclusive).'
+                                         % (base - 1))
+
+    score_list = list(score_list)[:]
+    list_len = len(score_list)
+    if list_len > max_score_length:
+        raise MajorityJudgementException('Score list is too long, must be '
+                                         + 'less than %s.' % max_score_length)
+
+    # If required pad the list
+    if list_len < max_score_length:
+        to_add = [default_vote] * (max_score_length - list_len)
+        score_list = score_list + to_add
+
+    return calculate_score(score_list, base)
