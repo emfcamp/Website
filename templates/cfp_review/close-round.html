@@ -20,7 +20,7 @@
         <th>Title</th>
     </tr>
 {% for (prop, vote_count) in proposals %}
-    <tr {% if preview and vote_count >= min_votes %} class="info" {% endif %}>
+    <tr {% if preview and vote_count >= min_votes or prop.state=='reviewed' %} class="info" {% endif %}>
         <td>{{prop.created.strftime("%d/%m")}}</td>
         <td>{{prop.type | capitalize}}</td>
         <td>{{ vote_count }}</td>

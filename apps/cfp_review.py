@@ -745,7 +745,7 @@ def close_round():
             Proposal.id == vote_subquery.c.proposal_id
         )\
         .filter(
-            Proposal.state == 'anonymised'
+            Proposal.state.in_(['anonymised', 'reviewed'])
         ).order_by(vote_subquery.c.count.desc()).all()
 
     preview = False
@@ -811,6 +811,7 @@ def rank():
             min_score = session['min_score']
             for (prop, score) in scored_proposals:
                 count = 0
+                import ipdb; ipdb.set_trace()
                 if score >= min_score:
                     prop.set_state('accepted')
                     count += 1
