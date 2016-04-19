@@ -59,6 +59,10 @@ html, body, .container, .main-row, .main-column {
     justify-content: center;
 }
 
+.well .panel-default {
+    border-color: #333;
+}
+
 header, h2, h3, h4, h5, h6 {
   font-family: $header-font-stack;
   font-weight: 700;
