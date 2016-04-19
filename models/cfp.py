@@ -34,8 +34,8 @@ class Proposal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     anonymiser_id = db.Column(db.Integer, db.ForeignKey('user.id'), default=None)
-    created = db.Column(db.DateTime, default=datetime.utcnow)
-    modified = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    modified = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, onupdate=datetime.utcnow)
     state = db.Column(db.String, nullable=False, default='new')
     type = db.Column(db.String, nullable=False)  # talk, workshop or installation
 
