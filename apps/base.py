@@ -140,6 +140,11 @@ def sponsors():
     return render_template('sponsors/sponsors.html')
 
 
+@base.route('/sponsor')
+def sponsor():
+    return render_template('sponsors/sponsor.html')
+
+
 @base.route("/participating")
 @base.route("/get_involved")
 @base.route("/contact")
