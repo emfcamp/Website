@@ -72,13 +72,16 @@ def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static/images'),
                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
+
 @base.route('/404')
 def raise_404():
     abort(404)
 
+
 @base.route('/500')
 def raise_500():
     abort(500)
+
 
 @base.route("/about")
 def about():
@@ -135,14 +138,6 @@ def company():
 @base.route('/sponsors')
 def sponsors():
     return render_template('sponsors/sponsors.html')
-
-
-@base.route('/sponsors/<sponsor>')
-def sponsor_page(sponsor):
-    try:
-        return render_template('sponsors/%s.html' % sponsor)
-    except TemplateNotFound:
-        abort(404)
 
 
 @base.route("/participating")
