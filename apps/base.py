@@ -12,7 +12,6 @@ from flask import (
     render_template, redirect, request, flash, Blueprint,
     url_for, send_from_directory, abort, Markup, current_app as app
 )
-from jinja2.exceptions import TemplateNotFound
 
 from .common import feature_flag, feature_enabled, site_flag
 from models.ticket import TicketType
