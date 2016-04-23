@@ -792,15 +792,9 @@ def rank():
     form = AcceptanceForm()
     scored_proposals = []
 
-    # Count all reviewers who aren't admin
-    reviewer_count = User.query.filter(
-        User.permissions.any(name='cfp_reviewer'),
-        ~User.permissions.any(name='admin')
-    ).count()
-
     for prop in proposals:
         score_list = [v.vote for v in prop.votes if v.state == 'voted']
-        score = calculate_max_normalised_score(score_list, reviewer_count)
+        score = calculate_max_normalised_score(score_list)
         scored_proposals.append((prop, score))
 
     scored_proposals = sorted(scored_proposals, key=lambda p: p[1], reverse=True)
