@@ -74,3 +74,13 @@ def transfer_cancel(payment_id):
         return redirect(url_for('tickets.main'))
 
     return render_template('transfer-cancel.html', payment=payment, form=form)
+
+
+def send_confirmation(payment):
+    msg = Message("Electromagnetic Field ticket purchase update",
+                  sender=app.config['TICKETS_EMAIL'],
+                  recipients=[payment.user.email])
+    msg.body = render_template("emails/tickets-paid-email-banktransfer.txt",
+                  user=payment.user, payment=payment)
+    mail.send(msg)
+

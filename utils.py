@@ -18,6 +18,7 @@ from models.payment import (
 from models.cfp import Proposal, TalkProposal, WorkshopProposal, InstallationProposal
 from models.permission import Permission
 from apps.tickets import render_receipt, render_pdf
+from apps.payments import banktransfer
 from unicodecsv import DictReader
 
 
@@ -185,12 +186,7 @@ class Reconcile(Command):
                 payment.paid()
                 db.session.commit()
 
-                msg = Message("Electromagnetic Field ticket purchase update",
-                              sender=app.config['TICKETS_EMAIL'],
-                              recipients=[payment.user.email])
-                msg.body = render_template("emails/tickets-paid-email-banktransfer.txt",
-                              user=payment.user, payment=payment)
-                mail.send(msg)
+                banktransfer.send_confirmation(payment)
 
             app.logger.info("Payment reconciled")
             paid += 1
