@@ -10,7 +10,7 @@ from sqlalchemy import func, or_
 
 from wtforms import (
     SubmitField, StringField, FieldList, FormField, SelectField, TextAreaField,
-    BooleanField, IntegerField
+    BooleanField, IntegerField, FloatField
 )
 from wtforms.validators import Required, NumberRange, ValidationError
 
@@ -18,7 +18,7 @@ import random
 from time import time
 from main import db, external_url
 from .common import require_permission, send_template_email
-from .majority_judgement import calculate_normalised_score
+from .majority_judgement import calculate_max_normalised_score
 
 from models.user import User
 from models.cfp import (
@@ -777,7 +777,7 @@ def close_round():
                            min_votes=session.get('min_votes'))
 
 class AcceptanceForm(Form):
-    min_score = IntegerField('Minimum score for acceptance')
+    min_score = FloatField('Minimum score for acceptance')
     set_score = SubmitField('Accept Proposals')
     confirm = SubmitField('Confirm')
     cancel = SubmitField('Cancel')
@@ -800,7 +800,7 @@ def rank():
 
     for prop in proposals:
         score_list = [v.vote for v in prop.votes if v.state == 'voted']
-        score = calculate_normalised_score(score_list, reviewer_count)
+        score = calculate_max_normalised_score(score_list, reviewer_count)
         scored_proposals.append((prop, score))
 
     scored_proposals = sorted(scored_proposals, key=lambda p: p[1], reverse=True)

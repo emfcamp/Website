@@ -73,6 +73,18 @@ def calculate_score(score_list, base=3):
     # Use int to cast from an arbitrary base
     return int(res, base)
 
+def calculate_max_normalised_score(score_list, base=3):
+    """
+    Calculate the score of a score_list as a fraction of the maximum possible
+    score for that may votes.
+    """
+    if not score_list:
+        return 0
+
+    max_score_digit = str(base - 1)
+    max_score = int(max_score_digit * len(score_list), base)
+    return float(calculate_score(score_list, base)) / max_score
+
 
 def calculate_normalised_score(score_list, max_score_length,
                                default_vote=1, base=3):
@@ -83,6 +95,8 @@ def calculate_normalised_score(score_list, max_score_length,
     This means that a score list of [2, 2] == [2, 1, 2].
 
     The default value is assumed to be a 'neutral' score of 1 in base 3.
+
+    This is depricated, do not use
     """
     if not (0 <= default_vote < base):
         raise MajorityJudgementException('Incorrectly set default, must be '

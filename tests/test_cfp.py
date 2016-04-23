@@ -3,6 +3,7 @@ from __future__ import absolute_import
 import unittest
 from apps.majority_judgement import (
     get_floor_median, calculate_score, calculate_normalised_score,
+    calculate_max_normalised_score,
     MajorityJudgementException
 )
 
@@ -66,4 +67,26 @@ class CFPRankingTestCase(unittest.TestCase):
         with self.assertRaises(MajorityJudgementException):
             calculate_normalised_score([2, 2], 1, default_vote=-1)
 
+    def test_calculate_max_normalised_score(self):
+        def assert_within_delta(test, expected):
+            result = calculate_max_normalised_score(test)
+            assert -0.01 < result - expected < 0.01
 
+        assert calculate_max_normalised_score([]) == 0
+        assert_within_delta([0, ], 0.0)
+        assert_within_delta([2, ], 1.0)
+
+        assert_within_delta([0, 1], 0.125)
+        assert_within_delta([2, 1], 0.625)
+        assert_within_delta([2, 2, 1], 0.885)
+        assert_within_delta([1, 2, 2, 1], 0.625)
+
+    def test_ordering(self):
+        expected = [[2, 1], [1, 2, 2, 0], [1, 1], [2, 1, 0], [0, 2, 0]]
+        test = [[0, 2, 0], [1, 2, 2, 0], [2, 1, 0], [2, 1], [1, 1]]
+
+        # Sort test using the max normalised score
+        result = sorted(test, key=lambda x: calculate_max_normalised_score(x),
+                        reverse=True)
+
+        assert expected == result
