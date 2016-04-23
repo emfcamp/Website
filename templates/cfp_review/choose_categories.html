@@ -7,13 +7,18 @@
 <table class="table table-condensed">
 <thead><tr>
   <th>Category</th>
+  <th>Reviewer count</th>
+  <th>Proposal count</th>
   <th>Review this?</th>
 </tr></thead>
 <tbody>
-{% for cat in form.categories %}
+{% for cat_form in form.categories %}
   <tr>
-    <td>{{ cat.hidden_tag_without('csrf_token') }}{{ categories[cat['id'].data].name }}</td>
-    <td>{{ cat.is_user_member() }}</td>
+    {% set cat = categories[cat_form['id'].data] %}
+    <td>{{ cat_form.hidden_tag_without('csrf_token') }}{{ cat.name }}</td>
+    <td>{{ cat.users | length }}</td>
+    <td>{{ cat.proposals | length }}</td>
+    <td>{{ cat_form.is_user_member() }}</td>
   </tr>
 {% endfor %}
 </tbody>
