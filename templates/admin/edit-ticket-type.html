@@ -30,8 +30,14 @@
 <div><div class="col-sm-4 text-right"><strong>Price</strong> (€)</div>
   <div class="col-sm-8">{{ ticket_type.get_price('EUR') }}</div>
 </div>
-<div><div class="col-sm-4 text-right"><strong>Discount Token</strong></div>
-  <div class="col-sm-8">{{ ticket_type.discount_token }}</div>
+<div class="form-group">{{ form.has_badge.label(class_="col-sm-4 control-label") }}
+  <div class="col-sm-8">{{ form.has_badge(class_="form-control") }}</div>
+</div>
+<div class="form-group">{{ form.is_transferable.label(class_="col-sm-4 control-label") }}
+  <div class="col-sm-8">{{ form.is_transferable(class_="form-control") }}</div>
+</div>
+<div class="form-group">{{ form.discount_token.label(class_="col-sm-4 control-label") }}
+  <div class="col-sm-8">{{ form.discount_token(class_="form-control") }}</div>
 </div>
 <div class="form-group">{{ form.description.label(class_="col-sm-4 control-label") }}
   <div class="col-sm-8">{{ form.description(class_="form-control", rows="4", cols="50") }}</div>

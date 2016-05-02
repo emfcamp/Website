@@ -199,7 +199,8 @@ def add_ticket_types(types):
         if existing_tt:
             # NB we don't even consider updating prices. If we do, make sure no tickets have been bought.
             app.logger.info('Refreshing TicketType %s (id: %s)', tt.name, tt.id)
-            for f in ['name', 'type_limit', 'expires', 'personal_limit', 'order', 'description']:
+            for f in ['name', 'type_limit', 'expires', 'personal_limit', 'order',
+                      'has_badge', 'is_transferable', 'description']:
                 cur_val = getattr(existing_tt, f)
                 new_val = getattr(tt, f)
 
@@ -225,51 +226,52 @@ def get_main_ticket_types():
     # This is fiddly. It should probably be moved out to a json file.
 
     type_data = [
-        # (id, order, admits, name, type limit, personal limit, GBP, EUR, Description, [Token, Expiry, Transferable])
+        # (id, order, admits, name, type limit, personal limit, GBP, EUR, badge, description, [token, expiry, transferable])
         # Leave order 0 & 1 free for discount tickets
-        (0, 2, 'full', 'Full Camp Ticket', 193, 10, 100.00, 140.00, True, None, None, datetime(2016, 1, 10, 20, 24), None),
-        (1, 3, 'full', 'Full Camp Ticket', 350, 10, 110.00, 145.00, True, None, None, datetime(2016, 3, 6, 13, 5), None),
-        (2, 4, 'full', 'Full Camp Ticket', 500, 10, 120.00, 158.00, True, None, None, datetime(2016, 4, 4, 11, 0), None),
+        (12, 1, 'full', 'Full Camp Ticket (Discount Template)', 0, 1, 105.00, 142.00, True, None, None, datetime(2016, 8, 1, 12, 0), False),
+        (0, 2, 'full', 'Full Camp Ticket', 193, 10, 100.00, 140.00, True, None, None, datetime(2016, 1, 10, 20, 24), True),
+        (1, 3, 'full', 'Full Camp Ticket', 350, 10, 110.00, 145.00, True, None, None, datetime(2016, 3, 6, 13, 5), True),
+        (2, 4, 'full', 'Full Camp Ticket', 500, 10, 120.00, 158.00, True, None, None, datetime(2016, 6, 4, 11, 0), True),
         # (3, 5, 'full', 'Full Camp Ticket', 400, 10, 120.00, 165.00, True, None, None, None, None),
         (3, 8, 'full', 'Full Camp Ticket (Supporter)', 56, 10, 130.00, 180.00, True,
             "Support this non-profit event by paying a bit more. "
             "All money will go towards making EMF more awesome.",
-            None, None, None),
+            None, None, True),
         (9, 8, 'full', 'Full Camp Ticket (Supporter)', 1100, 10, 130.00, 170.00, True,
             "Support this non-profit event by paying a bit more. "
             "All money will go towards making EMF more awesome.",
-            None, None, None),
+            None, None, True),
 
         (4, 9, 'full', 'Full Camp Ticket (Gold Supporter)', 6, 10, 150.00, 210.00, True,
             "Pay even more, receive our undying gratitude.",
-            None, None, None),
+            None, None, True),
         (10, 9, 'full', 'Full Camp Ticket (Gold Supporter)', 1100, 10, 150.00, 195.00, True,
             "Pay even more, receive our undying gratitude.",
-            None, None, None),
+            None, None, True),
 
         (5, 10, 'kid', 'Under-16 Camp Ticket', 11, 10, 45.00, 64.00, True,
             "For visitors born after August 5th, 2000. "
             "All under-16s must be accompanied by an adult.",
-            None, None, None),
+            None, None, True),
         (11, 10, 'kid', 'Under-16 Camp Ticket', 500, 10, 45.00, 60.00, True,
             "For visitors born after August 5th, 2000. "
             "All under-16s must be accompanied by an adult.",
-            None, None, None),
+            None, None, True),
 
         (6, 15, 'kid', 'Under-5 Camp Ticket', 200, 4, 0, 0, False,
             "For children born after August 5th, 2011. "
             "All children must be accompanied by an adult.",
-            None, None, None),
+            None, None, True),
 
         (7, 30, 'car', 'Parking Ticket', 450, 4, 15.00, 21.00, False,
             "We're trying to keep cars to a minimum. "
             "Please take public transport or car-share if you can.",
-            None, None, None),
+            None, None, True),
 
         (8, 35, 'campervan',
             'Caravan/Campervan Ticket', 60, 2, 30.00, 42.00, False,
             "If you bring a caravan, you won't need a separate parking ticket for the towing car.",
-            None, None, None),
+            None, None, True),
     ]
     # most of these tickets have no tokens or expiry dates
     assert all([len(t) == 13 for t in type_data])

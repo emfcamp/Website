@@ -273,6 +273,9 @@ class EditTicketTypeForm(Form):
     type_limit = IntegerField('Maximum tickets to sell')
     personal_limit = IntegerField('Maximum tickets to sell to an individual')
     expires = DateField('Expiry Date (Optional)', [Optional()])
+    has_badge = BooleanField('Issue Badge')
+    is_transferable = BooleanField('Transferable')
+    discount_token = StringField('Discount token', [Optional(), Regexp('^[-_0-9a-zA-Z]+$')])
     description = StringField('Description', [Optional()], widget=TextArea())
     submit = SubmitField('Save')
 
@@ -282,7 +285,10 @@ class EditTicketTypeForm(Form):
         self.type_limit.data = ticket_type.type_limit
         self.personal_limit.data = ticket_type.personal_limit
         self.expires.data = ticket_type.expires
+        self.has_badge.data = ticket_type.has_badge
+        self.is_transferable.data = ticket_type.is_transferable
         self.description.data = ticket_type.description
+        self.discount_token.data = ticket_type.discount_token
 
 
 @admin.route('/ticket-types/<int:type_id>/edit', methods=['GET', 'POST'])
@@ -293,7 +299,8 @@ def edit_ticket_type(type_id):
     ticket_type = TicketType.query.get(type_id)
     if form.validate_on_submit():
         app.logger.info('%s editing ticket type %d', current_user.name, type_id)
-        for attr in ['name', 'order', 'type_limit', 'personal_limit', 'expires', 'description']:
+        for attr in ['name', 'order', 'type_limit', 'personal_limit', 'expires',
+                     'has_badge', 'is_transferable', 'discount_token', 'description']:
             cur_val = getattr(ticket_type, attr)
             new_val = getattr(form, attr).data
 
@@ -365,6 +372,7 @@ def new_ticket_type(copy_id):
         app.logger.info('%s adding new TicketType %s', current_user.name, tt)
         db.session.add(tt)
         db.session.commit()
+        flash('Your new ticket type has been created')
         return redirect(url_for('.ticket_type_details', type_id=new_id))
 
     if copy_id != -1:
