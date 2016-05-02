@@ -37,7 +37,7 @@ class TicketType(db.Model):
     is_transferable = db.Column(db.Boolean, default=True, nullable=False)
     # Nullable fields
     expires = db.Column(db.DateTime)
-    expired = column_property(and_(expires != None, expires < func.now()))
+    expired = column_property(and_(expires is not None, expires < func.now()))
     description = db.Column(db.String)
     discount_token = db.Column(db.String)
 
@@ -122,10 +122,10 @@ class TicketType(db.Model):
 
     @classmethod
     @cache.memoize(timeout=60)
-    def get_price_cheapest_full(cls, discount_token=None):
+    def get_price_cheapest_full(cls):
         """ Get the cheapest full ticket price. This may return
             None if there are no tickets (currently) available. """
-        types = TicketType.query.filter_by(admits='full')
+        types = TicketType.query.filter_by(admits='full', discount_token=None)
         prices = [tt.get_price('GBP') for tt in types if tt.get_remaining() > 0 and
                                                          'supporter' not in tt.name.lower()]
         if len(prices) > 0:
