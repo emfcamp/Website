@@ -37,7 +37,7 @@ class TicketType(db.Model):
     is_transferable = db.Column(db.Boolean, default=True, nullable=False)
     # Nullable fields
     expires = db.Column(db.DateTime)
-    expired = column_property(expires < func.now())
+    expired = column_property(and_(expires != None, expires < func.now()))
     description = db.Column(db.String)
     discount_token = db.Column(db.String)
 
@@ -117,12 +117,8 @@ class TicketType(db.Model):
         return min(self.personal_limit - user_count, self.get_remaining())
 
     @classmethod
-    def get_types_for_token(cls, token, query=None):
-        query = TicketType.query if query is None else query
-        return query.filter_by(discount_token=token).\
-                     filter(or_(TicketType.expires > datetime.utcnow(),
-                                TicketType.expires.is_(None))).\
-                     all()
+    def get_types_for_token(cls, token):
+        return TicketType.query.filter_by(discount_token=token, expired=False).all()
 
     @classmethod
     @cache.memoize(timeout=60)
