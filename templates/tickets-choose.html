@@ -36,7 +36,7 @@
 <tbody>
 {% set row_class = cycler('odd', 'even') %}
 {% for f in form.types %}
-{% if f._any %}
+{% if f._any or f.amount.errors %}
 <tr data-price="{{ f._type.get_price(user_currency) }}"
     {% for price in f._type.prices -%}
         data-price-{{ price.currency }}="{{ price.value }}"
