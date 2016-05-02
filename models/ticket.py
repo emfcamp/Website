@@ -129,8 +129,7 @@ class TicketType(db.Model):
     def get_price_cheapest_full(cls, discount_token=None):
         """ Get the cheapest full ticket price. This may return
             None if there are no tickets (currently) available. """
-        types = cls.get_types_for_token(discount_token,
-                                        TicketType.query.filter_by(admits='full'))
+        types = TicketType.query.filter_by(admits='full')
         prices = [tt.get_price('GBP') for tt in types if tt.get_remaining() > 0 and
                                                          'supporter' not in tt.name.lower()]
         if len(prices) > 0:
