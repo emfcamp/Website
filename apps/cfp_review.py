@@ -220,10 +220,9 @@ class UpdateProposalForm(Form):
     reject = SubmitField('Reject')
     checked = SubmitField('Send for Anonymisation')
 
-    category = SelectField('Category', default=-1, coerce=int)
+    category = SelectField('Category')
 
     def update_proposal(self, proposal):
-        proposal.state = self.state.data
         proposal.title = self.title.data
         proposal.description = self.description.data
         proposal.requirements = self.requirements.data
@@ -232,11 +231,10 @@ class UpdateProposalForm(Form):
         proposal.needs_help = self.needs_help.data
         proposal.needs_money = self.needs_money.data
         proposal.one_day = self.one_day.data
-        proposal.category_id = self.category.data
-
-    def validate_category(form, field):
-        if field.data < 0 and form.checked.data:
-            raise ValidationError('Required')
+        if self.category.data == '':
+            proposal.category_id = None
+        else:
+            proposal.category_id = int(self.category.data)
 
 
 class UpdateWorkshopForm(UpdateProposalForm):
@@ -278,28 +276,27 @@ def update_proposal(proposal_id):
            UpdateWorkshopForm() if prop.type == 'workshop' else \
            UpdateInstallationForm()
 
-    categories = [(c.id, c.name) for c in ProposalCategory.query
-                                                          .order_by('name')
-                                                          .all()]
-    form.category.choices = [(-1, '--None--')] + categories
+    categories = ProposalCategory.query.order_by('name').all()
+    form.category.choices = [('', '')] + [(str(c.id), c.name) for c in categories]
 
     # Process the POST
     if form.validate_on_submit():
         if form.update.data:
             app.logger.info('Updating proposal %s', proposal_id)
             form.update_proposal(prop)
+            # NB bypasses the transition rules
+            prop.state = form.state.data
             flash('Changes saved')
 
         elif form.reject.data:
             app.logger.info('Rejecting proposal %s', proposal_id)
+            form.update_proposal(prop)
             prop.set_state('rejected')
             flash('Rejected')
 
         elif form.checked.data:
-            if form.category.data > 0:
-                prop.category_id = form.category.data
-
             app.logger.info('Sending proposal %s for anonymisation', proposal_id)
+            form.update_proposal(prop)
             prop.set_state('checked')
 
             db.session.commit()
@@ -320,8 +317,10 @@ def update_proposal(proposal_id):
     form.needs_money.data = prop.needs_money
     form.one_day.data = prop.one_day
 
-    if prop.category_id:
-        form.category.data = prop.category_id
+    if prop.category_id is None:
+        form.category.data = ''
+    else:
+        form.category.data = str(prop.category_id)
 
     if prop.type == 'workshop':
         form.attendees.data = prop.attendees
@@ -552,9 +551,15 @@ def get_proposals_to_review(user):
         proposals = Proposal.query \
             .filter(Proposal.state == 'anonymised')
     else:
-        proposals = user.query \
-            .join(User.review_categories, Proposal) \
-            .with_entities(Proposal) \
+        user_categories = User.query \
+            .join(User.review_categories) \
+            .with_entities(ProposalCategory) \
+            .filter(User.id == user.id)
+
+        # This is fine without grouping, as a user currently
+        # can only be tied to a proposal through one category
+        proposals = Proposal.query \
+            .outerjoin(user_categories.subquery()) \
             .filter(
                 Proposal.state == 'anonymised',
                 Proposal.user_id != user.id,

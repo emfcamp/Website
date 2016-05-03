@@ -60,7 +60,7 @@
         {{ menuitem('Anonymisation', '.anonymisation', proposal_counts['checked']) }}
     {% endif %}
     {% if current_user.has_permission('cfp_reviewer') and not current_user.has_permission('admin') %}
-        {{ menuitem('Your Review Categories', '.choose_categories') }}
+        {# {{ menuitem('Your Review Categories', '.choose_categories') }} #}
         {{ menuitem('Review', '.review_list') }}
     {% endif %}
 </ul>
