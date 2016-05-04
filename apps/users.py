@@ -13,7 +13,9 @@ from wtforms.validators import Required, Email, ValidationError
 from wtforms import StringField, HiddenField, SubmitField
 
 from main import db
-from common import set_user_currency, send_template_email
+from common import (
+    set_user_currency, send_template_email, feature_flag,
+)
 from .common.forms import Form
 from models.user import User, UserDiversity
 from models.cfp import Proposal, CFPMessage
@@ -43,6 +45,17 @@ class LoginForm(Form):
             raise ValidationError('Email address not found')
         form._user = user
 
+@users.route('/login/<email>')
+@feature_flag('BYPASS_LOGIN')
+def login_by_email(email):
+    user = User.query.filter_by(email=email).one()
+
+    if current_user.is_authenticated():
+        logout_user()
+
+    login_user(user)
+    session.permanent = True
+    return redirect(request.args.get('next', url_for('tickets.main')))
 
 @users.route("/login", methods=['GET', 'POST'])
 def login():

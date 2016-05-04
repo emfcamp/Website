@@ -74,6 +74,9 @@ testemails:
 admin:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py makeadmin
 
+users:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py makeusers
+
 arrivals:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py makearrivals
 

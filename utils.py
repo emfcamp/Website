@@ -402,6 +402,7 @@ class LockProposals(Command):
 
         app.logger.info('Locked %d proposals', lock_count)
 
+
 class ImportCFP(Command):
     option_list = [Option('-f', '--file', dest='filename',
                           help='The .csv file to load',
@@ -419,7 +420,7 @@ class ImportCFP(Command):
                 if Proposal.query.filter_by(title=row['title']).first():
                     continue
 
-                user = User('%d@test.com' % count, 'test_cfp_user_%d' % count)
+                user = User('user_%d@test.invalid' % count, 'test_cfp_user_%d' % count)
                 db.session.add(user)
 
                 proposal = TalkProposal() if row['type'] == u'talk' else\
@@ -450,6 +451,31 @@ class ImportCFP(Command):
         app.logger.info('Imported %d proposals' % count)
 
 
+class MakeUsers(Command):
+    def run(self):
+        user = User('admin@test.invalid', 'Test Admin')
+        user.grant_permission('admin')
+        cfp = TalkProposal()
+        cfp.user = user
+        cfp.title = 'test (admin)'
+        cfp.description = 'test proposal from admin'
+
+        user2 = User('anonymiser@test.invalid', 'Test Anonymiser')
+        user2.grant_permission('cfp_anonymiser')
+        cfp = TalkProposal()
+        cfp.user = user2
+        cfp.title = 'test (anonymiser)'
+        cfp.description = 'test proposal from anonymiser'
+
+        user3 = User('reviewer@test.invalid', 'Test reviewer')
+        user3.grant_permission('cfp_reviewer')
+        cfp = TalkProposal()
+        cfp.user = user3
+        cfp.title = 'test (reviewer)'
+        cfp.description = 'test proposal from reviewer'
+
+        db.session.commit()
+
 
 if __name__ == "__main__":
     manager = Manager(create_app())
@@ -464,5 +490,6 @@ if __name__ == "__main__":
     manager.add_command('lockproposals', LockProposals())
     manager.add_command('importcfp', ImportCFP())
     manager.add_command('createdb', CreateDB())
+    manager.add_command('makeusers', MakeUsers())
     manager.add_command('db', MigrateCommand)
     manager.run()

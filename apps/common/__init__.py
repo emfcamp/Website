@@ -132,12 +132,15 @@ def feature_flag(feature):
 
 
 def site_flag(site):
+    """
+    Used currently for toggling off features
+    that haven't been separated by blueprint
+    """
     def call(f, *args, **kw):
         if app.config.get(site):
             return f(*args, **kw)
         return abort(404)
     return decorator(call)
-
 
 def require_permission(permission):
     def call(f, *args, **kwargs):
