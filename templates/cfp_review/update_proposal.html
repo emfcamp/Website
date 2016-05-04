@@ -50,10 +50,10 @@
         <div>&nbsp;</div>
         {{ render_field(form.category, tabindex=1) }}
         {% if proposal.state == 'locked' %}
-            {{ form.checked(class_="btn btn-success", tabindex=2) }}
-            {{ form.reject(class_="btn btn-danger", tabindex=3) }}
+            {{ form.checked(class_="btn btn-success debounce", tabindex=2) }}
+            {{ form.reject(class_="btn btn-danger debounce", tabindex=3) }}
         {% endif %}
-        {{ form.update(class_="btn btn-danger", tabindex=4) }}
+        {{ form.update(class_="btn btn-danger debounce", tabindex=4) }}
 
         {% if next_id %}
             <a href="{{ url_for('.update_proposal', proposal_id=next_id) }}"

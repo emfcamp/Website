@@ -78,9 +78,9 @@
     <div class="col-md-4">
         <div>&nbsp;</div><div>&nbsp;</div>
         <div class="btn-group-vertical">
-            {{ form.resolve_all(class_='btn btn-primary') }}
-            {{ form.set_all_read(class_='btn btn-success') }}
-            {{ form.update(class_='btn btn-info') }}
+            {{ form.set_all_read(class_='btn btn-success debounce') }}
+            {{ form.resolve_all(class_='btn btn-primary debounce') }}
+            {{ form.update(class_='btn btn-info debounce') }}
         </div>
         <div class="checkbox">
             <label>
@@ -88,7 +88,7 @@
                 {{ form.include_recused.label }}
             </label>
         </div>
-        {{ form.set_all_stale(class_='btn btn-danger') }}
+        {{ form.set_all_stale(class_='btn btn-danger debounce') }}
     </div>
 </form>
 

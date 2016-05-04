@@ -41,7 +41,7 @@
         <div class="pull-right">
             <form method="POST" action="{{ url_for('.review_proposal', proposal_id=proposal.id) }}">
                 {{ form.hidden_tag() }}
-                {{ form.change(class_="btn btn-danger") }}
+                {{ form.change(class_="btn btn-danger debounce") }}
                 <a href="{{ url_for('.review_list') }}" class="btn btn-default">
                     Back
                 </a>
@@ -64,20 +64,20 @@
             {{ form.hidden_tag() }}
             <div class="btn-group btn-group-justified">
                 <div class="btn-group">
-                    {{ form.vote_wont(class_="btn btn-success", tabindex=1) }}
+                    {{ form.vote_wont(class_="btn btn-success debounce", tabindex=1) }}
                 </div>
                 <div class="btn-group">
-                    {{ form.vote_might(class_="btn btn-success", tabindex=2) }}
+                    {{ form.vote_might(class_="btn btn-success debounce", tabindex=2) }}
                 </div>
                 <div class="btn-group">
-                    {{ form.vote_will(class_="btn btn-success", tabindex=3) }}
+                    {{ form.vote_will(class_="btn btn-success debounce", tabindex=3) }}
                 </div>
             </div>
             {{ render_field(form.note, rows=4, tabindex=3) }}
         </div>
         <div class="col-xs-12 btn-group-vertical">
-            {{ form.recuse(class_="btn btn-danger", tabindex=4) }}
-            {{ form.question(class_="btn btn-info", tabindex=5) }}
+            {{ form.recuse(class_="btn btn-danger debounce", tabindex=4) }}
+            {{ form.question(class_="btn btn-info debounce", tabindex=5) }}
         </div>
         <div class="col-xs-12">&nbsp;</div>
         <div class="col-xs-12 btn-group-vertical">

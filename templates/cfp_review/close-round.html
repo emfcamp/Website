@@ -36,8 +36,8 @@
     {{ form.hidden_tag() }}
 
     {% if preview %}
-        {{ form.confirm(class_='btn btn-success') }}
-        {{ form.cancel(class_='btn btn-danger') }}
+        {{ form.confirm(class_='btn btn-success debounce') }}
+        {{ form.cancel(class_='btn btn-danger debounce') }}
     {% else %}
         <div class="form-group {%- if form.min_votes.errors %} has-error {%- endif %}">
             <label for="{{ form.min_votes.name }}" class="control-label">
@@ -48,7 +48,7 @@
                 <p class="help-block" id="help-block-{{form.min_votes.name}}">{{ error }}</pa>
             {% endfor %}
         </div>
-        {{ form.close_round(class_='btn btn-success') }}
+        {{ form.close_round(class_='btn btn-success debounce') }}
     {% endif %}
 </form>
 {% endblock %}
