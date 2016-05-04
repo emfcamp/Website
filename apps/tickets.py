@@ -144,8 +144,14 @@ class TicketAmountsForm(Form):
 @tickets.route("/tickets/choose", methods=['GET', 'POST'])
 @feature_flag('TICKET_SALES')
 def choose():
-
+    token = session.get('ticket_token')
     sales_state = get_sales_state(datetime.utcnow())
+
+    if sales_state == 'unavailable':
+        # Allow people with valid discount tokens to buy tickets
+        if token is not None and TicketType.get_types_for_token(token):
+            sales_state = 'available'
+
     if app.config.get('DEBUG'):
         sales_state = request.args.get("sales_state", sales_state)
 
@@ -159,8 +165,6 @@ def choose():
     form = TicketAmountsForm()
 
     tts = TicketType.query.order_by(TicketType.order).all()
-
-    token = session.get('ticket_token')
     limits = dict([(tt.id, tt.user_limit(current_user, token)) for tt in tts])
 
     if request.method != 'POST':

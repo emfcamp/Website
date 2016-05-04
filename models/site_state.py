@@ -20,11 +20,12 @@ def get_site_state(date):
 @cache.cached(timeout=60, key_prefix='get_sales_state')
 def get_sales_state(date):
     if TicketType.get_tickets_remaining() < 1:
+        # We've hit capacity - no more tickets will be sold
         return "sold-out"
     elif date > datetime(2016, 8, 7):
         return "sales-ended"
     elif TicketType.get_price_cheapest_full() is None:
-        # Tickets not currently available, but we're not sold out
+        # Tickets not currently available, probably just for this round, but we haven't hit site capacity
         return "unavailable"
     else:
         return "available"
