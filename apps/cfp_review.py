@@ -15,6 +15,7 @@ from wtforms import (
 from wtforms.validators import Required, NumberRange, ValidationError
 
 import random
+from datetime import datetime, MINYEAR
 from time import time
 from main import db, external_url
 from .common import require_permission, send_template_email
@@ -546,26 +547,55 @@ def anonymise_proposal(proposal_id):
 
 
 def get_proposals_to_review(user):
-
     if user.has_permission('admin'):
-        proposals = Proposal.query \
+        proposal_query = Proposal.query \
             .filter(Proposal.state == 'anonymised')
     else:
-        user_categories = User.query \
-            .join(User.review_categories) \
-            .with_entities(ProposalCategory) \
-            .filter(User.id == user.id)
-
         # This is fine without grouping, as a user currently
         # can only be tied to a proposal through one category
-        proposals = Proposal.query \
-            .outerjoin(user_categories.subquery()) \
+        proposal_query = Proposal.query \
             .filter(
                 Proposal.state == 'anonymised',
                 Proposal.user_id != user.id,
                 Proposal.type.in_(['talk', 'workshop']))
 
-    return proposals.all()
+    last_vote_cast = CFPVote.query.filter_by(user_id=user.id)\
+        .order_by(CFPVote.modified.desc()).first()
+
+    if last_vote_cast:
+        last_voted = last_vote_cast.modified
+
+        old_proposals = proposal_query.filter(Proposal.modified <= last_voted).all()
+        new_proposals = proposal_query.filter(Proposal.modified > last_voted).all()
+    else:
+        old_proposals = []
+        new_proposals = proposal_query.all()
+
+    # In theory new_reviewed should always be empty
+    new_to_review, new_reviewed = sort_reviewed(user, new_proposals)
+    old_to_review, old_reviewed = sort_reviewed(user, old_proposals)
+
+    for new in new_to_review:
+        new.is_new = True
+
+    return {
+        'new_to_review': new_to_review,
+        'old_to_review': old_to_review,
+        'reviewed': old_reviewed + new_reviewed
+    }
+
+
+def sort_reviewed(user, proposal_list):
+    to_review, reviewed = [], []
+    for prop in proposal_list:
+        vote = prop.get_user_vote(user)
+
+        if (vote is None) or (vote.state in ['new', 'resolved', 'stale']):
+            to_review.append(prop)
+        else:
+            reviewed.append(prop)
+
+    return (to_review, reviewed)
 
 
 def get_safe_index_sort(index_list):
@@ -581,15 +611,7 @@ def get_safe_index_sort(index_list):
 @review_required
 def review_list():
     all_proposals = get_proposals_to_review(current_user)
-
-    to_review, reviewed = [], []
-    for prop in all_proposals:
-        vote = prop.get_user_vote(current_user)
-
-        if (vote is None) or (vote.state in ['new', 'resolved', 'stale']):
-            to_review.append(prop)
-        else:
-            reviewed.append(prop)
+    to_review = all_proposals['old_to_review'] + all_proposals['new_to_review']
 
     review_order = session.get('review_order', [])
     if not review_order or not set(to_review).issubset(review_order):
@@ -599,7 +621,13 @@ def review_list():
         # horrible but at least works.
         # FIXME We shouldn't have to reseed the RNG every time
         random.seed(int(time()))
-        random.shuffle(to_review)
+
+        random.shuffle(all_proposals['new_to_review'])
+        random.shuffle(all_proposals['old_to_review'])
+
+        to_review = all_proposals['new_to_review'] + all_proposals['old_to_review']
+
+        to_review = to_review[:30] # Only take the top 30
         session['review_order'] = [p.id for p in to_review]
 
     else:
@@ -607,7 +635,7 @@ def review_list():
         # review order
         to_review.sort(key=get_safe_index_sort(review_order))
 
-    # reviewed.sort(key=lambda p: p.get_user_vote(current_user).modified)
+    reviewed = all_proposals['reviewed']
     reviewed.sort(key=lambda p: (p.get_user_vote(current_user).state,
                                  p.get_user_vote(current_user).vote,
                                  p.get_user_vote(current_user).modified),

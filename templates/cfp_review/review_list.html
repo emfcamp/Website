@@ -41,26 +41,22 @@
     </ol>
 </p>
 
+<p>
+    Proposals you've not yet seen before will be highlighted in <span class="label label-info">blue.</span>
+</p>
+
 <a id="to-review-table"></a>
 <h3>Requires Review ({{ to_review | length }})</h3>
 <table class="table">
     <tr>
         <th class="col-md-1">Type</th>
         <th>Title</th>
-{#
-        <th>Category</th>
-#}
         <th>Description</th>
     </tr>
 {% for proposal in to_review %}
-    <tr>
+    <tr {%- if proposal.is_new %} class="info" {%- endif %}>
         <td>{{ proposal.type | capitalize }}</td>
         <td><a href="{{ url_for('.review_proposal', proposal_id=proposal.id) }}">{{proposal.title}}</a></td>
-{#
-        <td>{% if proposal.category %}
-            {{ proposal.category.name }}
-        {% endif %}</td>
-#}
         <td>{{ proposal.description | truncate(100) }}</td>
     </tr>
 {% else %}
