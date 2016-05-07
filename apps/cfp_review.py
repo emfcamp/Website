@@ -15,13 +15,11 @@ from wtforms import (
 from wtforms.validators import Required, NumberRange, ValidationError
 
 import random
-from datetime import datetime, MINYEAR
 from time import time
 from main import db, external_url
 from .common import require_permission, send_template_email
 from .majority_judgement import calculate_max_normalised_score
 
-from models.user import User
 from models.cfp import (
     Proposal, ProposalCategory,
     CFPMessage, CFPVote, CFP_STATES
