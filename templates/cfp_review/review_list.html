@@ -42,27 +42,35 @@
 </p>
 
 <p>
-    Proposals you've not yet seen before will be highlighted in <span class="label label-info">blue.</span>
+    Proposals that have been updated since your last visit will be highlighted in <span class="label label-info">blue.</span>
 </p>
 
 <a id="to-review-table"></a>
 <h3>Requires Review ({{ to_review | length }})</h3>
+
+<form action={{ url_for('cfp_review.review_list') }} method="post" role="form">
+{{ form.hidden_tag() }}
 <table class="table">
     <tr>
         <th class="col-md-1">Type</th>
         <th>Title</th>
         <th>Description</th>
     </tr>
+{% if to_review %}
 {% for proposal in to_review %}
     <tr {%- if proposal.is_new %} class="info" {%- endif %}>
         <td>{{ proposal.type | capitalize }}</td>
         <td><a href="{{ url_for('.review_proposal', proposal_id=proposal.id) }}">{{proposal.title}}</a></td>
         <td>{{ proposal.description | truncate(100) }}</td>
     </tr>
+{% endfor %}
+    <tr><td colspan="4" class="text-center">{{ form.reload_proposals(class_="btn btn-info") }}</td></tr>
 {% else %}
     <tr><td colspan="4" class="text-center">No proposals to review</td></tr>
-{% endfor %}
+    <tr><td colspan="4" class="text-center">{{ form.show_proposals(class_="btn btn-success") }}</td></tr>
+{% endif %}
 </table>
+</form>
 
 <a id="reviewed-table"></a>
 <h3>Previously Reviewed ({{ reviewed | length }})</h3>
@@ -76,11 +84,11 @@
 </tr>
 {% for proposal in reviewed %}
     <tr>
-        <td>{{ proposal.get_user_vote(current_user).modified.strftime("%d/%m") }}</td>
+        {% set vote = proposal.user_vote %}
+        <td>{{ vote.modified.strftime("%d/%m") }}</td>
         <td>{{ proposal.type | capitalize }}</td>
         <td><a href="{{ url_for('.review_proposal', proposal_id=proposal.id) }}">{{ proposal.title }}</a></td>
         <td
-        {% set vote = proposal.get_user_vote(current_user) %}
         {% if vote.state == 'recused' %}
             class="danger"
         {% elif vote.state == 'blocked' %}

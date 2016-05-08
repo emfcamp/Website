@@ -7,6 +7,7 @@ from flask import (
 from flask.ext.login import current_user
 
 from sqlalchemy import func, or_
+from sqlalchemy.orm import aliased
 
 from wtforms import (
     SubmitField, StringField, FieldList, FormField, SelectField, TextAreaField,
@@ -15,7 +16,7 @@ from wtforms import (
 from wtforms.validators import Required, NumberRange, ValidationError
 
 import random
-from time import time
+from datetime import datetime
 from main import db, external_url
 from .common import require_permission, send_template_email
 from .majority_judgement import calculate_max_normalised_score
@@ -451,7 +452,7 @@ def proposal_votes(proposal_id):
                     stale_count += 1
 
             if stale_count:
-                msg = 'Set to %d stale' % stale_count
+                msg = 'Set %d votes to stale' % stale_count
 
         elif form.update.data:
             update_count = 0
@@ -462,7 +463,7 @@ def proposal_votes(proposal_id):
                     update_count += 1
 
             if update_count:
-                msg = 'Set to %d resolved' % update_count
+                msg = 'Set %d votes to resolved' % update_count
 
         elif form.resolve_all.data:
             resolved_count = 0
@@ -544,103 +545,100 @@ def anonymise_proposal(proposal_id):
                            proposal=prop, form=form, next_proposal=next_prop)
 
 
-def get_proposals_to_review(user):
-    if user.has_permission('admin'):
-        proposal_query = Proposal.query \
-            .filter(Proposal.state == 'anonymised')
-    else:
-        # This is fine without grouping, as a user currently
-        # can only be tied to a proposal through one category
-        proposal_query = Proposal.query \
-            .filter(
-                Proposal.state == 'anonymised',
-                Proposal.user_id != user.id,
-                Proposal.type.in_(['talk', 'workshop']))
+class ReviewListForm(Form):
+    show_proposals = SubmitField("Show me some more proposals")
+    reload_proposals = SubmitField("Show some different proposals")
 
-    last_vote_cast = CFPVote.query.filter_by(user_id=user.id)\
+@cfp_review.route('/review', methods=['GET', 'POST'])
+@review_required
+def review_list():
+    form = ReviewListForm()
+
+    if form.validate_on_submit():
+        app.logger.info('Clearing review order')
+        session['review_order'] = None
+        session['review_order_dt'] = None
+        return redirect(url_for('.review_list'))
+
+    last_vote_cast = CFPVote.query.filter_by(user_id=current_user.id) \
         .order_by(CFPVote.modified.desc()).first()
 
     if last_vote_cast:
-        last_voted = last_vote_cast.modified
-
-        old_proposals = proposal_query.filter(Proposal.modified <= last_voted).all()
-        new_proposals = proposal_query.filter(Proposal.modified > last_voted).all()
+        last_visit = last_vote_cast.modified
     else:
-        old_proposals = []
-        new_proposals = proposal_query.all()
+        last_visit = None
 
-    # In theory new_reviewed should always be empty
-    new_to_review, new_reviewed = sort_reviewed(user, new_proposals)
-    old_to_review, old_reviewed = sort_reviewed(user, old_proposals)
+    proposal_query = Proposal.query.filter(Proposal.state == 'anonymised')
 
-    for new in new_to_review:
-        new.is_new = True
+    if not current_user.has_permission('admin'):
+        # reviewers shouldn't see their own proposals, and don't review installations
+        proposal_query = proposal_query.filter(
+            Proposal.user_id != current_user.id,
+            Proposal.type.in_(['talk', 'workshop']))
 
-    return {
-        'new_to_review': new_to_review,
-        'old_to_review': old_to_review,
-        'reviewed': old_reviewed + new_reviewed
-    }
+    to_review_again = []
+    to_review_new = []
+    to_review_old = []
+    reviewed = []
 
+    user_votes = aliased(CFPVote, CFPVote.query.filter_by(user_id=current_user.id).subquery())
 
-def sort_reviewed(user, proposal_list):
-    to_review, reviewed = [], []
-    for prop in proposal_list:
-        vote = prop.get_user_vote(user)
-
-        if (vote is None) or (vote.state in ['new', 'resolved', 'stale']):
-            to_review.append(prop)
+    for proposal, vote in proposal_query.outerjoin(user_votes).with_entities(Proposal, user_votes).all():
+        proposal.user_vote = vote
+        if vote:
+            if vote.state in ['new', 'resolved', 'stale']:
+                proposal.is_new = True
+                to_review_again.append(proposal)
+            else:
+                reviewed.append(((vote.state, vote.vote, vote.modified), proposal))
         else:
-            reviewed.append(prop)
+            # modified doesn't really describe when proposals are "new", but it's near enough
+            if last_visit and proposal.modified > last_visit:
+                proposal.is_new = True
+                to_review_new.append(proposal)
+            else:
+                to_review_old.append(proposal)
 
-    return (to_review, reviewed)
+    reviewed = [p for o, p in sorted(reviewed, reverse=True)]
 
-
-def get_safe_index_sort(index_list):
-    def safe_index_sort(prop):
-        try:
-            return index_list.index(prop)
-        except ValueError:
-            return len(index_list)
-    return safe_index_sort
-
-
-@cfp_review.route('/review')
-@review_required
-def review_list():
-    all_proposals = get_proposals_to_review(current_user)
-    to_review = all_proposals['old_to_review'] + all_proposals['new_to_review']
-
-    review_order = session.get('review_order', [])
-    if not review_order or not set(to_review).issubset(review_order):
+    review_order = session.get('review_order')
+    review_order_dt = session.get('review_order_dt')
+    if review_order is None \
+           or not set([p.id for p in to_review_again]).issubset(review_order) \
+           or (to_review_new and (last_visit is None or review_order_dt < last_visit)):
         # For some reason random seems to 'stall' after the first run and stop
         # reshuffling the 'to_review' list. To force a reshuffle on each
         # execution we'll seed the RNG with the current time. This is pretty
         # horrible but at least works.
         # FIXME We shouldn't have to reseed the RNG every time
-        random.seed(int(time()))
+        random.seed(datetime.utcnow())
 
-        random.shuffle(all_proposals['new_to_review'])
-        random.shuffle(all_proposals['old_to_review'])
+        random.shuffle(to_review_again)
+        random.shuffle(to_review_new)
+        random.shuffle(to_review_old)
 
-        to_review = all_proposals['new_to_review'] + all_proposals['old_to_review']
+        to_review_max = 10
 
-        to_review = to_review[:30] # Only take the top 30
+        # prioritise showing proposals that have been voted on before
+        # after that, split new and old proportionally for fairness
+        to_review = to_review_again[:]
+        other_max = max(0, to_review_max - len(to_review))
+        other_count = len(to_review_old) + len(to_review_new)
+        if other_count:
+            old_max = int(float(len(to_review_old)) / other_count * other_max)
+            new_max = other_max - old_max
+            to_review += to_review_new[:new_max] + to_review_old[:old_max]
+
         session['review_order'] = [p.id for p in to_review]
+        session['review_order_dt'] = datetime.utcnow()
 
     else:
-        # Sort updated proposals to the top based on the previous
-        # review order
-        to_review.sort(key=get_safe_index_sort(review_order))
-
-    reviewed = all_proposals['reviewed']
-    reviewed.sort(key=lambda p: (p.get_user_vote(current_user).state,
-                                 p.get_user_vote(current_user).vote,
-                                 p.get_user_vote(current_user).modified),
-                  reverse=True)
+        # Sort proposals based on the previous review order
+        to_review_dict = dict((p.id, p) for p in to_review_again + to_review_new + to_review_old)
+        to_review = [to_review_dict[i] for i in session['review_order'] if i in to_review_dict]
 
     return render_template('cfp_review/review_list.html',
-                           to_review=to_review, reviewed=reviewed)
+                           to_review=to_review, reviewed=reviewed, form=form)
 
 class VoteForm(Form):
     vote_wont = SubmitField('I won\'t go')
@@ -736,6 +734,7 @@ def review_proposal(proposal_id):
 
         flash(message, 'info')
         session['review_order'] = review_order
+        session['review_order_dt'] = datetime.utcnow()
         db.session.commit()
         if not next_id:
             return redirect(url_for('.review_list'))

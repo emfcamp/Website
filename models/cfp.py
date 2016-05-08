@@ -185,3 +185,7 @@ class CFPVote(db.Model):
             raise CfpStateException('"%s->%s" is not a valid transition' % (self.state, state))
 
         self.state = state
+
+# TODO: change the relationships on User and Proposal to 1-to-1
+db.Index('ix_cfp_vote_user_id_proposal_id', CFPVote.user_id, CFPVote.proposal_id, unique=True)
+
