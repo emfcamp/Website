@@ -19,26 +19,35 @@
 </ul>
 
 <div class="well">
-<table class="table table-striped">
+<table class="table">
+{% set msg_cycler = cycler('odd', 'even') %}
 {% for msg in messages %}
-<tr>
-  <td class="col-sm-2">
-    {%- if msg.is_user_recipient(current_user) -%}
-      <p class="pull-right">
-        {% if not msg.has_been_read %}
-          <span class="glyphicon glyphicon-envelope"></span>
+<tr class="{{ msg_cycler.current }}">
+  <td>
+    <div class="row">
+      <div class="col-sm-6">
+        {% if True or msg.is_user_recipient(current_user) and not msg.has_been_read %}
+        <small><span class="glyphicon glyphicon-envelope"></span></small>
         {% endif %}
-        {{ msg.from_user.name }} &gt;
-      </p>
-    {%- endif -%}
+        {% if msg.is_user_recipient(current_user) %}
+        {{ msg.from_user.name }}
+        {% else %}
+        {{ current_user.name }}
+        {%- endif -%}
+        {% if msg.is_user_recipient(current_user) and not msg.has_been_read %}
+        </b>
+        {% endif %}
+      </div>
+      <div class="col-sm-3 pull-sm-right">
+        <small>{{ msg.created.strftime('%Y-%m-%d %H:%M') }}</small>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12">
+        <div style="white-space: pre-wrap">{{ msg.message }}</div>
+      </div>
+    </div>
   </td>
-  <td class="col-sm-8">
-      <p>{{ msg.message }}</p>
-      <p class="pull-right"><small>Sent: {{ msg.created.strftime('%y-%m-%d %H:%M') }}</small></p>
-  </td>
-  <td class="col-sm-2">{% if not msg.is_user_recipient(current_user) %}
-      &lt; {{ msg.from_user.name }}
-  {% endif %}</td>
 </tr>
 {% endfor %}
 </table>
