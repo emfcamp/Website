@@ -12,11 +12,14 @@
     {% if feature_enabled('CFP') %}
       <li><a href="{{ url_for('cfp.proposals') }}">Your proposals</a></li>
       <li><a href="{{ url_for('cfp.all_messages') }}">
-        All CfP messages
+        Your messages
         {% if unread_count > 0 %}
           <span class="badge">{{ unread_count }}</span>
         {% endif %}
       </a></li>
+      {% if current_user.has_permission('cfp_reviewer') %}
+      <li><a href="{{ url_for('cfp_review.review_list') }}">Review proposals</a></li>
+      {% endif %}
     {% endif %}
   </ul>
 </nav>
