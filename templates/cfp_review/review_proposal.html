@@ -3,22 +3,19 @@
 {% extends "cfp_review/base.html" %}
 {% block body %}
 
-
 {% if previous_vote and previous_vote.state not in ['resolved', 'stale'] %}
     <div class="col-md-9">
-        <h4>{{proposal.type | capitalize}}</h4>
+        <h4>Proposal: {{proposal.type | capitalize}}</h4>
         <h3>{{proposal.title}}</h3>
         <dl class="dl-horizontal">
             <dt>Status</dt>
             <dd>
-                {% if previous_vote.state == 'new' %}
-                    Something's gone horribly wrong, please contact an admin
-                {% elif previous_vote.state == 'voted' %}
+                {% if previous_vote.state == 'voted' %}
                     Voted
                 {% elif previous_vote.state == 'recused' %}
-                    You recused yourself from voting on this proposal
+                    You chose not to vote on this proposal
                 {% elif previous_vote.state == 'blocked' %}
-                    Await feedback from Admin/submitter
+                    Await feedback from Admin/proposer
                 {% endif %}
             </dd>
             <dt>Your vote</dt>
@@ -36,7 +33,7 @@
                 {% endif %}
             </dd>
             <dt>Note:</dt><dd>{{previous_vote.note}}</dd>
-            <dt>Description</dt><dd>{{ proposal.description }}</dd>
+            <dt>Description</dt><dd style="white-space: pre-wrap">{{ proposal.description }}</dd>
         </dl>
         <div class="pull-right">
             <form method="POST" action="{{ url_for('.review_proposal', proposal_id=proposal.id) }}">
@@ -50,11 +47,14 @@
     </div>
 {% else %}
     <div class="col-md-7">
-        <h4>{{proposal.type | capitalize}}</h4>
+        <h4>Proposal: {{proposal.type | capitalize}}</h4>
         <h3>{{proposal.title}}</h3>
         <div>&nbsp;</div>
-        <div>{{ proposal.description }}</div>
+        <div style="white-space: pre-wrap">{{ proposal.description }}</div>
+        <div>&nbsp;</div>
     </div>
+
+
     <form method="post"
         action="{{ url_for('.review_proposal', proposal_id=proposal.id) }}"
         class="form-horizontal shrink col-md-5 col-xs-12"
@@ -73,6 +73,7 @@
                     {{ form.vote_will(class_="btn btn-success debounce", tabindex=3) }}
                 </div>
             </div>
+            <div>&nbsp;</div>
             {{ render_field(form.note, rows=4, tabindex=3) }}
         </div>
         <div class="col-xs-12 btn-group-vertical">

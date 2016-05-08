@@ -546,14 +546,14 @@ class VoteForm(Form):
     note = TextAreaField('Message')
 
     change = SubmitField("I'd like to change my response")
-    recuse = SubmitField('I can identify the submitter (abstain)')
+    recuse = SubmitField('I can identify the submitter (do not vote)')
     question = SubmitField('I need more information')
 
     def validate_note(form, field):
         if not field.data and form.recuse.data:
-            raise ValidationError('Please tell us why you are recusing your self. If you can identify the submitter please tell us who it is.')
+            raise ValidationError("Please tell us why you're not voting. If you can identify the submitter, please tell us who it is.")
         if not field.data and form.question.data:
-            raise ValidationError('Please let us know what\'s unclear')
+            raise ValidationError("Please let us know what's unclear")
 
 
 @cfp_review.route('/review/<int:proposal_id>', methods=['GET', 'POST'])
