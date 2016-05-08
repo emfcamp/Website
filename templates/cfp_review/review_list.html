@@ -83,13 +83,12 @@
             class="info"
         {% endif %}>
             {% if vote.state == 'voted' %}
-                Voted:
                 {% if vote.vote == 0 %}
-                    "I won't go"
+                    I won't go
                 {% elif vote.vote == 1 %}
-                    "I might go"
+                    I might go
                 {% elif vote.vote == 2 %}
-                    "I will go"
+                    I will go
                 {% endif %}
             {% elif vote.state == 'recused' %}
                 Did not vote
