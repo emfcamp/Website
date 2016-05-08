@@ -43,9 +43,9 @@ def cfp_review_variables():
     ).count()
 
     count_dict = dict(Proposal.query.with_entities(
-            Proposal.state,
-            func.count(Proposal.state)
-        ).group_by(Proposal.state).all())
+        Proposal.state,
+        func.count(Proposal.state),
+    ).group_by(Proposal.state).all())
     proposal_counts = {state: count_dict.get(state, 0) for state in CFP_STATES}
 
     unread_reviewer_notes = CFPVote.query.filter(
