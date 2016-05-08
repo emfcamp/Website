@@ -48,7 +48,6 @@
     </div>
     <div class="col-md-4 col-xs-12 btn-group-vertical" role="group">
         <div>&nbsp;</div>
-        {{ render_field(form.category, tabindex=1) }}
         {% if proposal.state == 'locked' %}
             {{ form.checked(class_="btn btn-success debounce", tabindex=2) }}
             {{ form.reject(class_="btn btn-danger debounce", tabindex=3) }}

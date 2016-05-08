@@ -45,13 +45,12 @@ class Proposal(db.Model):
     requirements = db.Column(db.String)
     length = db.Column(db.String)  # only used for talks and workshops
     notice_required = db.Column(db.String)
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
 
     # Flags
-    needs_help = db.Column(db.Boolean)
-    needs_money = db.Column(db.Boolean)
-    one_day = db.Column(db.Boolean)
-    has_rejected_email = db.Column(db.Boolean, default=False)
+    needs_help = db.Column(db.Boolean, nullable=False, default=False)
+    needs_money = db.Column(db.Boolean, nullable=False, default=False)
+    one_day = db.Column(db.Boolean, nullable=False, default=False)
+    has_rejected_email = db.Column(db.Boolean, nullable=False, default=False)
 
     # References to this table
     messages = db.relationship('CFPMessage', backref='proposal')
@@ -60,6 +59,7 @@ class Proposal(db.Model):
     __mapper_args__ = {'polymorphic_on': type}
 
     def get_user_vote(self, user):
+        # there can't be more than one vote per user per proposal
         return CFPVote.query.filter_by(proposal_id=self.id, user_id=user.id)\
             .first()
 
@@ -110,20 +110,6 @@ class InstallationProposal(Proposal):
     funds = db.Column(db.String, nullable=True)
 
 
-category_reviewers = db.Table('category_reviewers',
-    db.Column('id', db.Integer, primary_key=True),
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), nullable=False, index=True),
-    db.Column('category_id', db.Integer, db.ForeignKey('category.id'), nullable=False),
-)
-
-class ProposalCategory(db.Model):
-    __tablename__ = 'category'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    proposals = db.relationship(Proposal, backref='category')
-    users = db.relationship('User', secondary=category_reviewers, backref='review_categories')
-
-
 class CFPMessage(db.Model):
     __tablename__ = 'cfp_message'
     id = db.Column(db.Integer, primary_key=True)
@@ -163,10 +149,10 @@ class CFPVote(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     proposal_id = db.Column(db.Integer, db.ForeignKey('proposal.id'), nullable=False)
     state = db.Column(db.String, nullable=False)
-    has_been_read = db.Column(db.Boolean, default=False)
+    has_been_read = db.Column(db.Boolean, nullable=False, default=False)
 
-    created = db.Column(db.DateTime, default=datetime.utcnow)
-    modified = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    modified = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     vote = db.Column(db.Integer) # Vote can be null for abstentions
     note = db.Column(db.String)

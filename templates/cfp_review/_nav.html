@@ -44,13 +44,10 @@
                 Misc
             </a>
             <ul class="dropdown-menu">
-                {{ menuitem("Categories", ".categories") }}
-                <li role="separator" class="divider"></li>
                 {{ menuitem("Close Round", ".close_round") }}
                 {{ menuitem("Rank", ".rank") }}
                 <li role="separator" class="divider"></li>
                 {{ menuitem('Anonymisation', '.anonymisation', proposal_counts['checked']) }}
-                {{ menuitem('Your Review Categories', '.choose_categories') }}
                 {{ menuitem('Review', '.review_list') }}
             </ul>
         </li>
@@ -60,7 +57,6 @@
         {{ menuitem('Anonymisation', '.anonymisation', proposal_counts['checked']) }}
     {% endif %}
     {% if current_user.has_permission('cfp_reviewer') and not current_user.has_permission('admin') %}
-        {# {{ menuitem('Your Review Categories', '.choose_categories') }} #}
         {{ menuitem('Review', '.review_list') }}
     {% endif %}
 </ul>

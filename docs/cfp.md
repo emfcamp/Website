@@ -17,12 +17,11 @@ There are 3 types of proposal which is accepted to the CfP:
 
 ## Tables ##
 
-There are 4 tables used in the CfP:
+There are 3 main tables used in the CfP:
 
-* proposal - the information received from the users
-* category - used to group talk proposals for reviewers
-* CFPmessage - implements a simple messaging system between submitters and admin
-* CFPVotes - votes from reviewers against a proposal
+* Proposal - the information received from the users
+* CFPMessage - implements a simple messaging system between submitters and admin
+* CFPVote - votes from reviewers against a proposal
 
 ### Polymorphic tables ###
 
