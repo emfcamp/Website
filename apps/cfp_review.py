@@ -507,7 +507,7 @@ def review_list():
         random.shuffle(to_review_new)
         random.shuffle(to_review_old)
 
-        to_review_max = 10
+        to_review_max = 30
 
         # prioritise showing proposals that have been voted on before
         # after that, split new and old proportionally for fairness
