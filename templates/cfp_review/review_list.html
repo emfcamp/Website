@@ -67,7 +67,7 @@
     <th class="col-md-1">Date</th>
     <th>Type</th>
     <th>Title</th>
-    <th class="col-md-3">Vote Status</th>
+    <th class="col-md-3">Vote</th>
     <th>Note</th>
 </tr>
 {% for proposal in reviewed %}
@@ -84,11 +84,11 @@
         {% endif %}>
             {% if vote.state == 'voted' %}
                 {% if vote.vote == 0 %}
-                    I won't go
+                    Bad
                 {% elif vote.vote == 1 %}
-                    I might go
+                    OK
                 {% elif vote.vote == 2 %}
-                    I will go
+                    Excellent
                 {% endif %}
             {% elif vote.state == 'recused' %}
                 Did not vote

@@ -539,9 +539,9 @@ def review_list():
                            to_review=to_review, reviewed=reviewed, form=form)
 
 class VoteForm(Form):
-    vote_wont = SubmitField('I won\'t go')
-    vote_might = SubmitField('I might go')
-    vote_will = SubmitField('I will go')
+    vote_bad = SubmitField('Bad')
+    vote_ok = SubmitField('OK')
+    vote_excellent = SubmitField('Excellent')
 
     note = TextAreaField('Message')
 
@@ -602,9 +602,9 @@ def review_proposal(proposal_id):
         else:
             vote.has_been_read = True
 
-        vote_value = 2 if form.vote_will.data else\
-                     1 if form.vote_might.data else\
-                     0 if form.vote_wont.data else None
+        vote_value = 2 if form.vote_excellent.data else\
+                     1 if form.vote_ok.data else\
+                     0 if form.vote_bad.data else None
 
         # Update vote state
         message = 'error'
@@ -612,7 +612,7 @@ def review_proposal(proposal_id):
             vote.vote = vote_value
             vote.set_state('voted')
             review_order.remove(prop.id)
-            message = 'You voted ' + (['won\'t', 'might', 'will'][vote_value]) + ' go'
+            message = 'You voted: ' + (['Bad', 'OK', 'Excellent'][vote_value])
 
         elif form.recuse.data:
             vote.set_state('recused')

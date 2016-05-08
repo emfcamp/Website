@@ -22,17 +22,17 @@
             <dd>
                 {% if previous_vote.state == 'voted' %}
                     {% if previous_vote.vote == 0 %}
-                        I won't go
+                        Bad
                     {% elif previous_vote.vote == 1 %}
-                        I might go
+                        OK
                     {% elif previous_vote.vote == 2 %}
-                        I will go
+                        Excellent
                     {% endif %}
                 {% else %}
                     --
                 {% endif %}
             </dd>
-            <dt>Note:</dt><dd>{{previous_vote.note}}</dd>
+            <dt>Note</dt><dd>{{previous_vote.note or '--'}}</dd>
             <dt>Description</dt><dd style="white-space: pre-wrap">{{ proposal.description }}</dd>
         </dl>
         <div class="pull-right">
@@ -62,15 +62,17 @@
         <div class="col-xs-12">
             <div>&nbsp;</div>
             {{ form.hidden_tag() }}
+            <div>I think this proposal is:</div>
+            <div>&nbsp;</div>
             <div class="btn-group btn-group-justified">
                 <div class="btn-group">
-                    {{ form.vote_wont(class_="btn btn-success debounce", tabindex=1) }}
+                    {{ form.vote_bad(class_="btn btn-success debounce", tabindex=1) }}
                 </div>
                 <div class="btn-group">
-                    {{ form.vote_might(class_="btn btn-success debounce", tabindex=2) }}
+                    {{ form.vote_ok(class_="btn btn-success debounce", tabindex=2) }}
                 </div>
                 <div class="btn-group">
-                    {{ form.vote_will(class_="btn btn-success debounce", tabindex=3) }}
+                    {{ form.vote_excellent(class_="btn btn-success debounce", tabindex=3) }}
                 </div>
             </div>
             <div>&nbsp;</div>

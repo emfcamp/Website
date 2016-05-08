@@ -43,11 +43,11 @@
                         <td>
                             {% if ver.state == 'voted' %}
                                 {% if ver.vote == 0 %}
-                                    I won't go
+                                    Bad
                                 {% elif ver.vote == 1 %}
-                                    I might go
+                                    OK
                                 {% elif ver.vote == 2 %}
-                                    I will go
+                                    Excellent
                                 {% endif %}
                             {% else %}
                                 --
