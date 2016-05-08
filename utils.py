@@ -456,9 +456,9 @@ class MakeUsers(Command):
 if __name__ == "__main__":
     manager = Manager(create_app())
     manager.add_command('createdb', CreateDB())
-    manager.add_command('createbankaccounts', CreateBankAccounts())
     manager.add_command('db', MigrateCommand)
 
+    manager.add_command('createbankaccounts', CreateBankAccounts())
     manager.add_command('loadofx', LoadOfx())
     manager.add_command('reconcile', Reconcile())
 
