@@ -20,11 +20,13 @@
     <tr>
         <th><i class="glyphicon glyphicon-user"></i> Name</th>
         <th><i class="glyphicon glyphicon-envelope"></i> email</th>
+        <th><i class="glyphicon glyphicon-lock"></i> Permissions</th>
     </tr>
 {% for u in users %}
 <tr class="{{ loop.cycle('odd', 'even') }}">
     <td><a href="{{ url_for('.user', user_id=u.id) }}">{{ u.name }}</a></td>
     <td>{{ u.email }}</td>
+    <td>{% for permission in u.permissions %}{{ permission.name }}{% endfor %}</td>
 </tr>
 {% endfor %}
 </table>
