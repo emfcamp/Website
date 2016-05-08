@@ -16,6 +16,7 @@ from wtforms import (
 )
 from wtforms.fields.html5 import EmailField
 
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.functions import func
 
@@ -423,15 +424,16 @@ def users():
         app.logger.info('%s manually created new user with email %s and id: %s',
                          current_user.id, email, user.id)
 
+        code = user.login_code(app.config['SECRET_KEY'])
         send_template_email('Welcome to the EMF website',
                             email, app.config['CONTACT_EMAIL'],
                             'emails/manually_added_user.txt',
-                            user=user)
+                            user=user, code=code)
 
         flash('Created account for: %s' % name)
         return redirect(url_for('.users'))
 
-    users = User.query.order_by(User.id).all()
+    users = User.query.order_by(User.id).options(joinedload(User.permissions)).all()
     return render_template('admin/users.html', users=users, form=form)
 
 

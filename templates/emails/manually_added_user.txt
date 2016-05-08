@@ -1,12 +1,14 @@
 Hi {{ user.name }},
 
-This is an email to let you know that you now have an account on the EMF website.
+This is to let you know that you now have an account on website for
+Electromagnetic Field 2016!
+
 You can log into this account by visiting:
 
-{{ external_url('users.login', next='account') }}
+{{ external_url('users.login', code=code, next='account') }}
 
-If you think you've been added in error please ignore this email or reply to let
-us know.
+If you think you've been added in error, please let us know by replying
+to this email.
 
 Love,
 
