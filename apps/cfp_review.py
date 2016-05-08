@@ -42,8 +42,11 @@ def cfp_review_variables():
         CFPMessage.is_to_admin.is_(True)
     ).count()
 
-    proposal_counts = {state: Proposal.query.filter_by(state=state).count()
-                                                        for state in CFP_STATES}
+    count_dict = dict(Proposal.query.with_entities(
+            Proposal.state,
+            func.count(Proposal.state)
+        ).group_by(Proposal.state).all())
+    proposal_counts = {state: count_dict.get(state, 0) for state in CFP_STATES}
 
     unread_reviewer_notes = CFPVote.query.filter(
         or_(CFPVote.has_been_read.is_(False),
