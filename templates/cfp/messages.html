@@ -26,7 +26,7 @@
   <td>
     <div class="row">
       <div class="col-sm-6">
-        {% if True or msg.is_user_recipient(current_user) and not msg.has_been_read %}
+        {% if msg.is_user_recipient(current_user) and not msg.has_been_read %}
         <small><span class="glyphicon glyphicon-envelope"></span></small>
         {% endif %}
         {% if msg.is_user_recipient(current_user) %}
