@@ -34,7 +34,10 @@ clean:
 db:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py db upgrade
 
-data: db tickets bankaccounts
+data: db perms tickets bankaccounts
+
+perms:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createperms
 
 tickets:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createtickets

@@ -296,64 +296,8 @@ def test_main_ticket_types():
 
 class CreateTickets(Command):
     def run(self):
-        for permission in ('admin', 'arrivals', 'cfp_reviewer', 'cfp_anonymiser'):
-            if not Permission.query.filter_by(name=permission).first():
-                db.session.add(Permission(permission))
         types = get_main_ticket_types()
         add_ticket_types(types)
-
-
-class CreateTicketTokens(Command):
-    # This is effectively the same as creating a ticket, but
-    # we need to make sure they don't conflict with non-token tickets.
-
-    def run(self):
-        app.logger.critical('Tokens are disabled for now. Please remove this line to test.')
-        return
-
-        discount_ticket_types = [
-            (9, 0, 'full', 'Complimentary Full Camp Ticket', 1, 1, 0.0, 0.0, True, None, 'super-lucky'),
-            (10, 1, 'full', 'Discount Full Camp Ticket', 10, 1, 70.00, 90.00, True, None, 'lucky')
-        ]
-
-        discount_ticket_types = [ tt + (datetime.utcnow() + timedelta(days=7), False)
-            for tt in discount_ticket_types]
-
-        add_ticket_types(discount_ticket_types)
-
-
-class MakeAdmin(Command):
-    """
-      Make userid one an admin for testing purposes.
-    """
-    option_list = (Option('-u', '--userid', dest='userid', help="The userid to make an admin (defaults to 1)"),)
-
-    def run(self, userid):
-        if not userid:
-            userid = 1
-        user = User.query.get(userid)
-        user.grant_permission('admin')
-        s = db.object_session(user)
-        s.commit()
-
-        print '%s is now an admin' % (user.name)
-
-
-class MakeArrivals(Command):
-    """
-      Make userid one an arrivals operator for testing purposes.
-    """
-    option_list = (Option('-u', '--userid', dest='userid', help="The userid to make an arrivals operator (defaults to 1)"),)
-
-    def run(self, userid):
-        if not userid:
-            userid = 1
-        user = User.query.get(userid)
-        user.arrivals = True
-        s = db.object_session(user)
-        s.commit()
-
-        print '%s is now an arrivals operator' % (user.name)
 
 
 class SendTickets(Command):
@@ -451,6 +395,31 @@ class ImportCFP(Command):
         app.logger.info('Imported %d proposals' % count)
 
 
+class MakeAdmin(Command):
+    """
+    Make the first user in the DB an admin for testing purposes
+    """
+    option_list = (Option('-u', '--user-id', dest='user_id', help="The user_id to make an admin (defaults to first)"),)
+
+    def run(self, user_id):
+        if user_id:
+            user = User.query.get(user_id)
+        else:
+            user = User.query.order_by(User.id).first()
+
+        user.grant_permission('admin')
+        db.session.commit()
+
+        print '%r is now an admin' % user.name
+
+class CreatePermissions(Command):
+    def run(self):
+        for permission in ('admin', 'arrivals', 'cfp_reviewer', 'cfp_anonymiser'):
+            if not Permission.query.filter_by(name=permission).first():
+                db.session.add(Permission(permission))
+
+        db.session.commit()
+
 class MakeUsers(Command):
     def run(self):
         user = User('admin@test.invalid', 'Test Admin')
@@ -467,29 +436,40 @@ class MakeUsers(Command):
         cfp.title = 'test (anonymiser)'
         cfp.description = 'test proposal from anonymiser'
 
-        user3 = User('reviewer@test.invalid', 'Test reviewer')
+        user3 = User('reviewer@test.invalid', 'Test Reviewer')
         user3.grant_permission('cfp_reviewer')
         cfp = TalkProposal()
         cfp.user = user3
         cfp.title = 'test (reviewer)'
         cfp.description = 'test proposal from reviewer'
 
+        user4 = User('arrivals@test.invalid', 'Test Arrivals')
+        user4.grant_permission('arrivals')
+        cfp = TalkProposal()
+        cfp.user = user4
+        cfp.title = 'test (arrivals)'
+        cfp.description = 'test proposal from arrivals'
+
         db.session.commit()
 
 
 if __name__ == "__main__":
     manager = Manager(create_app())
+    manager.add_command('createdb', CreateDB())
     manager.add_command('createbankaccounts', CreateBankAccounts())
+    manager.add_command('db', MigrateCommand)
+
     manager.add_command('loadofx', LoadOfx())
     manager.add_command('reconcile', Reconcile())
+
     manager.add_command('createtickets', CreateTickets())
-    manager.add_command('makeadmin', MakeAdmin())
-    manager.add_command('makearrivals', MakeArrivals())
-    manager.add_command('createtokens', CreateTicketTokens())
     manager.add_command('sendtickets', SendTickets())
+
     manager.add_command('lockproposals', LockProposals())
     manager.add_command('importcfp', ImportCFP())
-    manager.add_command('createdb', CreateDB())
+
+    manager.add_command('createperms', CreatePermissions())
+    manager.add_command('makeadmin', MakeAdmin())
     manager.add_command('makeusers', MakeUsers())
-    manager.add_command('db', MigrateCommand)
+
     manager.run()
