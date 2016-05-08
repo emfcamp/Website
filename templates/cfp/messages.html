@@ -22,7 +22,7 @@
 <table class="table">
 {% set msg_cycler = cycler('odd', 'even') %}
 {% for msg in messages %}
-<tr class="{{ msg_cycler.current }}">
+<tr class="{{ msg_cycler.next() }}">
   <td>
     <div class="row">
       <div class="col-sm-6">
