@@ -18,6 +18,7 @@
   </li>
 </ul>
 
+<div class="well">
 <table class="table table-striped">
 {% for msg in messages %}
 <tr>
@@ -41,6 +42,7 @@
 </tr>
 {% endfor %}
 </table>
+</div>
 
 <form method="post" action="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">
     {{ form.hidden_tag() }}

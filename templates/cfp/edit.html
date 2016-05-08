@@ -30,13 +30,14 @@
       You can't currently edit your proposal as it's being reviewed.
       If you have any questions please <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">add a message</a>.
     </div>
+    <div>&nbsp;</div>
     <div class="col-md-6">
       <legend>About your {{proposal.type|capitalize}}</legend>
-      <dl class="dl-horizontal">
+      <dl class="dl-vertical">
         <dt>Title</dt><dd>{{proposal.title}}</dd>
         <dt>Submitted</dt><dd>{{proposal.created.strftime('%d %B')}}</dd>
         <dt>Status</dt><dd>{{proposal.state|capitalize}}</dd>
-        <dt>Description</dt><dd>{{proposal.description}}</dd>
+        <dt>Description</dt><dd style="white-space: pre-wrap">{{proposal.description}}</dd>
       </dl>
     </div>
     <div class="col-md-6">
