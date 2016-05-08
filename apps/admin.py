@@ -422,13 +422,20 @@ def user(user_id):
         for permission in permissions:
             field = getattr(form, "permission_" + permission.name)
             if user.has_permission(permission.name, False) != field.data:
-                app.logger.info("user %s (%s) admin: %s -> %s", user.name,
-                                user.id, user.has_permission(permission.name, False), field.data)
+                app.logger.info("user %s (%s) %s: %s -> %s",
+                                user.name,
+                                user.id,
+                                permission.name,
+                                user.has_permission(permission.name, False),
+                                field.data)
+
                 if field.data:
                     user.grant_permission(permission.name)
                 else:
                     user.revoke_permission(permission.name)
+
                 db.session.commit()
+
         return redirect(url_for('.user', user_id=user.id))
     return render_template('admin/user.html',
                            user=user,
