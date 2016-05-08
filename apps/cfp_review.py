@@ -16,7 +16,7 @@ from wtforms import (
 from wtforms.validators import Required, NumberRange, ValidationError
 
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 from main import db, external_url
 from .common import require_permission, send_template_email
 from .majority_judgement import calculate_max_normalised_score
@@ -447,16 +447,19 @@ def review_list():
     if form.validate_on_submit():
         app.logger.info('Clearing review order')
         session['review_order'] = None
-        session['review_order_dt'] = None
+        session['review_order_dt'] = datetime.utcnow()
         return redirect(url_for('.review_list'))
 
-    last_vote_cast = CFPVote.query.filter_by(user_id=current_user.id) \
-        .order_by(CFPVote.modified.desc()).first()
+    review_order_dt = session.get('review_order_dt')
 
-    if last_vote_cast:
-        last_visit = last_vote_cast.modified
-    else:
-        last_visit = None
+    last_visit = session.get('review_visit_dt')
+    if not last_visit:
+        last_vote_cast = CFPVote.query.filter_by(user_id=current_user.id) \
+            .order_by(CFPVote.modified.desc()).first()
+
+        if last_vote_cast:
+            last_visit = last_vote_cast.modified
+            review_order_dt = last_vote_cast.modified
 
     proposal_query = Proposal.query.filter(Proposal.state == 'anonymised')
 
@@ -483,19 +486,18 @@ def review_list():
                 reviewed.append(((vote.state, vote.vote, vote.modified), proposal))
         else:
             # modified doesn't really describe when proposals are "new", but it's near enough
-            if last_visit and proposal.modified > last_visit:
+            if last_visit is None or review_order_dt is None or proposal.modified < review_order_dt:
+                to_review_old.append(proposal)
+            else:
                 proposal.is_new = True
                 to_review_new.append(proposal)
-            else:
-                to_review_old.append(proposal)
 
     reviewed = [p for o, p in sorted(reviewed, reverse=True)]
 
     review_order = session.get('review_order')
-    review_order_dt = session.get('review_order_dt')
     if review_order is None \
            or not set([p.id for p in to_review_again]).issubset(review_order) \
-           or (to_review_new and (last_visit is None or review_order_dt < last_visit)):
+           or (to_review_new and (last_visit is None or datetime.utcnow() - last_visit > timedelta(hours=1))):
         # For some reason random seems to 'stall' after the first run and stop
         # reshuffling the 'to_review' list. To force a reshuffle on each
         # execution we'll seed the RNG with the current time. This is pretty
@@ -520,12 +522,15 @@ def review_list():
             to_review += to_review_new[:new_max] + to_review_old[:old_max]
 
         session['review_order'] = [p.id for p in to_review]
-        session['review_order_dt'] = datetime.utcnow()
+        session['review_order_dt'] = last_visit
+        session['review_visit_dt'] = datetime.utcnow()
 
     else:
         # Sort proposals based on the previous review order
         to_review_dict = dict((p.id, p) for p in to_review_again + to_review_new + to_review_old)
         to_review = [to_review_dict[i] for i in session['review_order'] if i in to_review_dict]
+
+        session['review_visit_dt'] = datetime.utcnow()
 
     return render_template('cfp_review/review_list.html',
                            to_review=to_review, reviewed=reviewed, form=form)
@@ -563,8 +568,8 @@ def review_proposal(proposal_id):
 
     form = VoteForm()
 
-
     review_order = session.get('review_order')
+    session['review_visit_dt'] = datetime.utcnow()
 
     # If the review order is missing redirect to the list to rebuild it
     if review_order is None:
@@ -624,7 +629,6 @@ def review_proposal(proposal_id):
 
         flash(message, 'info')
         session['review_order'] = review_order
-        session['review_order_dt'] = datetime.utcnow()
         db.session.commit()
         if not next_id:
             return redirect(url_for('.review_list'))
