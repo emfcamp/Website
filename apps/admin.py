@@ -7,12 +7,15 @@ from flask import (
 )
 from flask.ext.login import current_user
 from flask_mail import Message
-from wtforms.validators import Optional, Regexp, Required
+
+from wtforms.validators import Optional, Regexp, Required, Email, ValidationError
 from wtforms.widgets import TextArea
 from wtforms import (
     SubmitField, BooleanField, StringField, RadioField, HiddenField,
-    DateField, IntegerField, FieldList, FormField, SelectField,
+    DateField, IntegerField, FieldList, FormField, SelectField
 )
+from wtforms.fields.html5 import EmailField
+
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.functions import func
 
@@ -25,7 +28,7 @@ from models.ticket import (
 )
 from models.cfp import Proposal
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS
-from .common import feature_enabled, require_permission
+from .common import feature_enabled, require_permission, send_template_email
 from .common.forms import Form
 from .payments.stripe import (
     StripeUpdateUnexpected, StripeUpdateConflict, stripe_update_payment,
@@ -395,12 +398,41 @@ def ticket_transfers():
     return render_template('admin/ticket-transfers.html', transfers=transfer_logs)
 
 
-@admin.route("/users", methods=['GET'])
+class NewUserForm(Form):
+    name = StringField('Name', [Required()])
+    email = EmailField('Email', [Email(), Required()])
+    add = SubmitField('Add User')
+
+    def validate_email(form, field):
+        if User.does_user_exist(field.data):
+            field.was_duplicate = True
+            raise ValidationError('Account already exists')
+
+
+@admin.route("/users", methods=['GET', 'POST'])
 @admin_required
 def users():
+    form = NewUserForm()
+
+    if form.validate_on_submit():
+        email, name = form.email.data, form.name.data
+        user = User(email, name)
+
+        db.session.add(user)
+        db.session.commit()
+        app.logger.info('%s manually created new user with email %s and id: %s',
+                         current_user.id, email, user.id)
+
+        send_template_email('Welcome to the EMF website',
+                            email, app.config['CONTACT_EMAIL'],
+                            'emails/manually_added_user.txt',
+                            user=user)
+
+        flash('Created account for: %s' % name)
+        return redirect(url_for('.users'))
+
     users = User.query.order_by(User.id).all()
-    return render_template('admin/users.html',
-                           users=users)
+    return render_template('admin/users.html', users=users, form=form)
 
 
 @admin.route("/users/<int:user_id>", methods=['GET', 'POST'])

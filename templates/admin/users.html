@@ -1,7 +1,21 @@
+{% from "_formhelpers.html" import render_field %}
 {% extends "admin/base.html" %}
 {% block body %}
-<h2>User List</h2>
+<h2>Users</h2>
 
+<h4>Add User</h4>
+<form method="POST" class="form-horizontal">
+{{ form.hidden_tag() }}
+
+{{ render_field(form.name, True) }}
+{{ render_field(form.email, True) }}
+
+<div class="pull-right">{{ form.add(class_="btn btn-success") }}</div>
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+</form>
+
+<h4>User List</h4>
 <table class="table table-condensed">
     <tr>
         <th><i class="glyphicon glyphicon-user"></i> Name</th>
