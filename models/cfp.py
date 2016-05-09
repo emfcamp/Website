@@ -6,11 +6,11 @@ CFP_STATES = { 'edit': ['accepted', 'rejected', 'new'],
                'new': ['accepted', 'rejected', 'locked'],
                'locked': ['accepted', 'rejected', 'checked', 'edit'],
                'checked': ['accepted', 'rejected', 'anonymised', 'anon-blocked', 'edit'],
-               'rejected': ['accepted', 'edit'],
+               'rejected': ['accepted', 'rejected', 'edit'],
                'anonymised': ['accepted', 'rejected', 'reviewed', 'edit'],
                'anon-blocked': ['accepted', 'rejected', 'reviewed', 'edit'],
                'reviewed': ['accepted', 'rejected', 'edit'],
-               'accepted': ['rejected', 'finished'],
+               'accepted': ['accepted', 'rejected', 'finished'],
                'finished': ['accepted', 'rejected'] }
 
 # Most of these states are the same they're kept distinct for semantic reasons

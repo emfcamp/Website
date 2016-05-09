@@ -193,13 +193,11 @@ def update_proposal(proposal_id):
             prop.set_state('rejected')
 
             if form.reject_with_message.data:
-                send_accepted_rejected_email(prop, accepted=False)
-                prop.has_rejected_email = True
+                accept_or_reject_proposal(prop, accepted=False)
 
         elif form.accept.data:
             msg = 'Manually accepting proposal %s' % proposal_id
-            send_accepted_rejected_email(prop, accepted=True)
-            prop.set_state('accepted')
+            accept_or_reject_proposal(prop, accepted=True)
 
         elif form.checked.data:
             msg = 'Sending proposal %s for anonymisation' % proposal_id
@@ -715,15 +713,17 @@ class AcceptanceForm(Form):
     confirm = SubmitField('Confirm')
     cancel = SubmitField('Cancel')
 
-def send_accepted_rejected_email(proposal, accepted=False):
+def accept_or_reject_proposal(proposal, accepted=False):
     if not accepted and proposal.has_rejected_email:
         return
 
     elif accepted:
+        proposal.set_state('accepted')
         subject = 'Your EMF proposal has been accepted'
         template = 'cfp_review/email/accepted_msg.txt'
 
     else:
+        proposal.has_rejected_email = True
         subject = 'Your EMF proposal has been reviewed'
         template = 'cfp_review/email/not_accepted_msg.txt'
 
@@ -757,12 +757,10 @@ def rank():
 
                 if score >= min_score:
                     count += 1
-                    send_accepted_rejected_email(prop, accepted=True)
-                    prop.set_state('accepted')
+                    accept_or_reject_proposal(prop, accepted=True)
 
                 else:
-                    send_accepted_rejected_email(prop, accepted=False)
-                    prop.has_rejected_email = True
+                    accept_or_reject_proposal(prop, accepted=False)
 
             db.session.commit()
             del session['min_score']
