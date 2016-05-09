@@ -37,7 +37,7 @@
         <dt>Title</dt><dd>{{proposal.title}}</dd>
         <dt>Submitted</dt><dd>{{proposal.created.strftime('%d %B')}}</dd>
         <dt>Status</dt><dd>{{proposal.state|capitalize}}</dd>
-        <dt>Description</dt><dd style="white-space: pre-wrap">{{proposal.description}}</dd>
+        <dt>Description</dt><dd class="multiline">{{ proposal.description }}</dd>
       </dl>
     </div>
     <div class="col-md-6">
