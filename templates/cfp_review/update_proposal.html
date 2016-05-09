@@ -53,6 +53,8 @@
             {{ form.reject(class_="btn btn-danger debounce", tabindex=3) }}
         {% endif %}
         {{ form.update(class_="btn btn-danger debounce", tabindex=4) }}
+        {{ form.accept(class_="btn btn-danger debounce", tabindex=4) }}
+        {{ form.reject_with_message(class_="btn btn-danger debounce", tabindex=4) }}
 
         {% if next_id %}
             <a href="{{ url_for('.update_proposal', proposal_id=next_id) }}"
