@@ -114,7 +114,7 @@ class UpdateProposalForm(Form):
     state = SelectField('State', choices=[(s, s) for s in ordered_states])
     title = StringField('Title', [Required()])
     description = TextAreaField('Description', [Required()])
-    requirements = StringField('Requirements')
+    requirements = TextAreaField('Requirements')
     length = StringField('Length')
     notice_required = SelectField("Required notice",
                                   choices=[('1 week', '1 week'),
