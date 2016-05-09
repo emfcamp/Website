@@ -2,16 +2,16 @@ from main import db
 from datetime import datetime
 
 # state: [allowed next state, ] pairs
-CFP_STATES = { 'edit': ['new'],
-               'new': ['locked'],
-               'locked': ['checked', 'rejected', 'edit'],
-               'checked': ['anonymised', 'anon-blocked', 'edit'],
-               'rejected': ['edit'],
-               'anonymised': ['reviewed', 'edit'],
-               'anon-blocked': ['reviewed', 'edit'],
-               'reviewed': ['accepted', 'edit'],
-               'accepted': ['finished'],
-               'finished': ['accepted'] }
+CFP_STATES = { 'edit': ['accepted', 'rejected', 'new'],
+               'new': ['accepted', 'rejected', 'locked'],
+               'locked': ['accepted', 'rejected', 'checked', 'edit'],
+               'checked': ['accepted', 'rejected', 'anonymised', 'anon-blocked', 'edit'],
+               'rejected': ['accepted', 'edit'],
+               'anonymised': ['accepted', 'rejected', 'reviewed', 'edit'],
+               'anon-blocked': ['accepted', 'rejected', 'reviewed', 'edit'],
+               'reviewed': ['accepted', 'rejected', 'edit'],
+               'accepted': ['rejected', 'finished'],
+               'finished': ['accepted', 'rejected'] }
 
 # Most of these states are the same they're kept distinct for semantic reasons
 # and because I'm lazy
