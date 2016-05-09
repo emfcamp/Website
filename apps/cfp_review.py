@@ -638,7 +638,7 @@ def review_proposal(proposal_id):
                            previous_vote=vote, remaining=remaining)
 
 class CloseRoundForm(Form):
-    min_votes = IntegerField('Minimum number of votes', default=10, validators=[NumberRange(min=2)])
+    min_votes = IntegerField('Minimum number of votes', default=10, validators=[NumberRange(min=1)])
     close_round = SubmitField('Close this round')
     confirm = SubmitField('Confirm')
     cancel = SubmitField('Cancel')
@@ -703,6 +703,25 @@ class AcceptanceForm(Form):
     confirm = SubmitField('Confirm')
     cancel = SubmitField('Cancel')
 
+def accept_or_reject_proposal(proposal, accepted=False):
+    if not accepted and proposal.has_rejected_email:
+        return
+
+    elif accepted:
+        proposal.set_state('accepted')
+        subject = 'Your EMF proposal has been accepted'
+        template = 'cfp_review/email/accepted_msg.txt'
+
+    else:
+        proposal.has_rejected_email = True
+        subject = 'Your EMF proposal has been reviewed'
+        template = 'cfp_review/email/not_accepted_msg.txt'
+
+    user = proposal.user
+    send_template_email(subject,
+                        user.email, app.config['CONTENT_EMAIL'],
+                        template, user=user, proposal=proposal)
+
 
 @cfp_review.route('/rank', methods=['GET', 'POST'])
 @admin_required
@@ -728,19 +747,11 @@ def rank():
                 count = 0
 
                 if score >= min_score:
-                    prop.set_state('accepted')
                     count += 1
-                    send_template_email('Your EMF proposal has been accepted!',
-                                        prop.user.email, app.config['CONTENT_EMAIL'],
-                                        'cfp_review/email/accepted_msg.txt',
-                                        user=prop.user, proposal=prop)
+                    accept_or_reject_proposal(prop, accepted=True)
 
-                elif not prop.has_rejected_email:
-                    prop.has_rejected_email = True
-                    send_template_email('Your EMF proposal',
-                                        prop.user.email, app.config['CONTENT_EMAIL'],
-                                        'cfp_review/email/not_accepted_msg.txt',
-                                        user=prop.user, proposal=prop)
+                else:
+                    accept_or_reject_proposal(prop, accepted=False)
 
             db.session.commit()
             del session['min_score']
