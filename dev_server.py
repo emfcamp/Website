@@ -32,4 +32,5 @@ if __name__ == "__main__":
 
     host = app.config.get('HOST', default_host)
     port = app.config.get('PORT', default_port)
+
     app.run(processes=2, host=host, port=port)

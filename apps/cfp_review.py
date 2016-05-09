@@ -501,12 +501,6 @@ def review_list():
     if review_order is None \
            or not set([p.id for p in to_review_again]).issubset(review_order) \
            or (to_review_new and (last_visit is None or datetime.utcnow() - last_visit > timedelta(hours=1))):
-        # For some reason random seems to 'stall' after the first run and stop
-        # reshuffling the 'to_review' list. To force a reshuffle on each
-        # execution we'll seed the RNG with the current time. This is pretty
-        # horrible but at least works.
-        # FIXME We shouldn't have to reseed the RNG every time
-        random.seed(datetime.utcnow())
 
         random.shuffle(to_review_again)
         random.shuffle(to_review_new)
