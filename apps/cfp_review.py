@@ -33,6 +33,7 @@ review_required = require_permission('cfp_reviewer')
 ordered_states = ['edit', 'new', 'locked', 'checked', 'rejected', 'anonymised',
                   'anon-blocked', 'reviewed', 'accepted', 'finished']
 
+
 @cfp_review.context_processor
 def cfp_review_variables():
     unread_count = CFPMessage.query.filter(
@@ -127,6 +128,8 @@ class UpdateProposalForm(Form):
     update = SubmitField('Force update')
     reject = SubmitField('Reject')
     checked = SubmitField('Send for Anonymisation')
+    accept = SubmitField('Accept and send standard email')
+    reject_with_message = SubmitField('Reject and send standard email')
 
     def update_proposal(self, proposal):
         proposal.title = self.title.data
@@ -137,6 +140,7 @@ class UpdateProposalForm(Form):
         proposal.needs_help = self.needs_help.data
         proposal.needs_money = self.needs_money.data
         proposal.one_day = self.one_day.data
+
 
 class UpdateWorkshopForm(UpdateProposalForm):
     cost = StringField('Cost')
@@ -179,29 +183,35 @@ def update_proposal(proposal_id):
 
     # Process the POST
     if form.validate_on_submit():
+        form.update_proposal(prop)
         if form.update.data:
-            app.logger.info('Updating proposal %s', proposal_id)
-            form.update_proposal(prop)
-            # NB bypasses the transition rules
+            msg = 'Updating proposal %s' % proposal_id
             prop.state = form.state.data
-            flash('Changes saved')
 
-        elif form.reject.data:
-            app.logger.info('Rejecting proposal %s', proposal_id)
-            form.update_proposal(prop)
+        elif form.reject.data or form.reject_with_message.data:
+            msg = 'Rejecting proposal %s' % proposal_id
             prop.set_state('rejected')
-            flash('Rejected')
+
+            if form.reject_with_message.data:
+                accept_or_reject_proposal(prop, accepted=False)
+
+        elif form.accept.data:
+            msg = 'Manually accepting proposal %s' % proposal_id
+            accept_or_reject_proposal(prop, accepted=True)
 
         elif form.checked.data:
-            app.logger.info('Sending proposal %s for anonymisation', proposal_id)
-            form.update_proposal(prop)
+            msg = 'Sending proposal %s for anonymisation' % proposal_id
             prop.set_state('checked')
 
+            flash(msg)
+            app.logger.info(msg)
             db.session.commit()
             if not next_id:
                 return redirect(url_for('.proposals'))
             return redirect(url_for('.update_proposal', proposal_id=next_id))
 
+        flash(msg)
+        app.logger.info(msg)
         db.session.commit()
         return redirect(url_for('.update_proposal', proposal_id=proposal_id))
 
@@ -638,7 +648,7 @@ def review_proposal(proposal_id):
                            previous_vote=vote, remaining=remaining)
 
 class CloseRoundForm(Form):
-    min_votes = IntegerField('Minimum number of votes', default=10, validators=[NumberRange(min=2)])
+    min_votes = IntegerField('Minimum number of votes', default=10, validators=[NumberRange(min=1)])
     close_round = SubmitField('Close this round')
     confirm = SubmitField('Confirm')
     cancel = SubmitField('Cancel')
@@ -703,6 +713,24 @@ class AcceptanceForm(Form):
     confirm = SubmitField('Confirm')
     cancel = SubmitField('Cancel')
 
+def accept_or_reject_proposal(proposal, accepted=False):
+    if not accepted and proposal.has_rejected_email:
+        return
+
+    elif accepted:
+        proposal.set_state('accepted')
+        subject = 'Your EMF proposal has been accepted'
+        template = 'cfp_review/email/accepted_msg.txt'
+
+    else:
+        proposal.has_rejected_email = True
+        subject = 'Your EMF proposal has been reviewed'
+        template = 'cfp_review/email/not_accepted_msg.txt'
+
+    user = proposal.user
+    send_template_email(subject, user.email, app.config['CONTENT_EMAIL'],
+                        template, user=user, proposal=proposal)
+
 
 @cfp_review.route('/rank', methods=['GET', 'POST'])
 @admin_required
@@ -728,19 +756,11 @@ def rank():
                 count = 0
 
                 if score >= min_score:
-                    prop.set_state('accepted')
                     count += 1
-                    send_template_email('Your EMF proposal has been accepted!',
-                                        prop.user.email, app.config['CONTENT_EMAIL'],
-                                        'cfp_review/email/accepted_msg.txt',
-                                        user=prop.user, proposal=prop)
+                    accept_or_reject_proposal(prop, accepted=True)
 
-                elif not prop.has_rejected_email:
-                    prop.has_rejected_email = True
-                    send_template_email('Your EMF proposal',
-                                        prop.user.email, app.config['CONTENT_EMAIL'],
-                                        'cfp_review/email/not_accepted_msg.txt',
-                                        user=prop.user, proposal=prop)
+                else:
+                    accept_or_reject_proposal(prop, accepted=False)
 
             db.session.commit()
             del session['min_score']
