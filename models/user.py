@@ -1,6 +1,6 @@
 from main import db
-from models import exists
 from permission import UserPermission, Permission
+from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 from flask.ext.login import UserMixin
 
@@ -97,8 +97,16 @@ class User(db.Model, UserMixin):
         return '<User %s>' % self.email
 
     @classmethod
+    def get_by_email(cls, email):
+        return User.query.filter(func.lower(User.email) == func.lower(email)).one()
+
+    @classmethod
     def does_user_exist(cls, email):
-        return exists(User.query.filter_by(email=email))
+        try:
+            User.get_by_email(email)
+            return True
+        except NoResultFound:
+            return False
 
     @classmethod
     def get_by_code(cls, key, code):

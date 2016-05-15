@@ -20,6 +20,7 @@ from .common.forms import Form
 from models.user import User, UserDiversity
 from models.cfp import Proposal, CFPMessage
 import re
+from sqlalchemy.orm.exc import NoResultFound
 
 users = Blueprint('users', __name__)
 
@@ -40,15 +41,16 @@ class LoginForm(Form):
     next = NextURLField('Next')
 
     def validate_email(form, field):
-        user = User.query.filter_by(email=form.email.data).first()
-        if not user:
+        try:
+            user = User.get_by_email(form.email.data)
+        except NoResultFound:
             raise ValidationError('Email address not found')
         form._user = user
 
 @users.route('/login/<email>')
 @feature_flag('BYPASS_LOGIN')
 def login_by_email(email):
-    user = User.query.filter_by(email=email).one()
+    user = User.get_by_email(email)
 
     if current_user.is_authenticated():
         logout_user()
