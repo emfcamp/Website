@@ -79,15 +79,15 @@
                       <li role="presentation">
                         <a role="menuitem" href="{{ url_for('users.account') }}">My account</a>
                       </li>
-                      <li role="presentation">
-                        <a role="menuitem" href="{{ url_for('users.logout') }}">Log out</a>
-                      </li>
                       {% else %}
                       <li role="presentation">
                         <a role="menuitem" href="{{ url_for('users.login') }}">Log in</a>
                       </li>
                       {% endif %}
                       {% endif %}
+                      <li role="presentation">
+                        <a role="menuitem" href="https://wiki.emfcamp.org/wiki/Contact">Contact</a>
+                      </li>
                     </ul>
                     <div class="share">
                       <a target="_blank" href="https://twitter.com/emfcamp">@emfcamp</a> |  <a target="_blank" href="https://www.facebook.com/emfcamp">facebook.com/emfcamp</a>

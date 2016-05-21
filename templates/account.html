@@ -21,9 +21,12 @@
       <li><a href="{{ url_for('cfp_review.review_list') }}">Review proposals</a></li>
       {% endif %}
     {% endif %}
+
+  </ul>
+  <ul class="nav nav-pills">
+    <li><a href="{{ url_for('users.logout') }}">Log out</a></li>
   </ul>
 </nav>
-<p>&nbsp;</p>
 <h3>Your details</h3>
 
 <form method="post" class="form-horizontal col-md-12">
