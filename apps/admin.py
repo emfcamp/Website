@@ -30,7 +30,7 @@ from models.ticket import (
 from models.cfp import Proposal
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS
 from .common import feature_enabled, require_permission, send_template_email
-from .common.forms import Form
+from .common.forms import Form, IntegerSelectField, HiddenIntegerField
 from .payments.stripe import (
     StripeUpdateUnexpected, StripeUpdateConflict, stripe_update_payment,
 )
@@ -395,6 +395,96 @@ def new_ticket_type(copy_id):
 def ticket_type_details(type_id):
     ticket_type = TicketType.query.get(type_id)
     return render_template('admin/ticket-type-details.html', ticket_type=ticket_type)
+
+
+class TicketAmountForm(Form):
+    amount = IntegerSelectField('Number of tickets', [Optional()])
+    type_id = HiddenIntegerField('Ticket Type', [Required()])
+
+class FreeTicketsForm(Form):
+    types = FieldList(FormField(TicketAmountForm))
+    allocate = SubmitField('Allocate tickets')
+
+class FreeTicketsNewUserForm(FreeTicketsForm):
+    name = StringField('Name', [Required()])
+    email = EmailField('Email', [Email(), Required()])
+
+    def validate_email(form, field):
+        if User.does_user_exist(field.data):
+            field.was_duplicate = True
+            raise ValidationError('Account already exists')
+
+@admin.route('/tickets/choose-free', methods=['GET', 'POST'])
+@admin.route('/tickets/choose-free/<int:user_id>', methods=['GET', 'POST'])
+@admin_required
+def tickets_choose_free(user_id=None):
+    has_price = TicketPrice.query.filter(TicketPrice.price_int > 0)
+
+    free_tts = TicketType.query.filter(
+        ~has_price.filter(TicketPrice.type.expression).exists(),
+    ).order_by(TicketType.order).all()
+
+    if user_id is None:
+        form = FreeTicketsNewUserForm()
+        user = None
+        new_user = True
+    else:
+        form = FreeTicketsForm()
+        user = User.query.get(user_id)
+        new_user = False
+
+    if request.method != 'POST':
+        for tt in free_tts:
+            form.types.append_entry()
+            form.types[-1].type_id.data = tt.id
+
+    tts = {tt.id: tt for tt in free_tts}
+    for f in form.types:
+        f._type = tts[f.type_id.data]
+        # TODO: apply per-user limits
+        values = range(f._type.personal_limit + 1)
+        f.amount.values = values
+        f._any = any(values)
+
+    if form.validate_on_submit():
+        if new_user:
+            app.logger.info('Creating new user with email %s and name %s',
+                             form.email.data, form.name.data)
+            user = User(form.email.data, form.name.data)
+            flash('Created account for %s' % form.email.data)
+
+        tickets = []
+        for f in form.types:
+            if f.amount.data:
+                tt = f._type
+                for i in range(f.amount.data):
+                    t = Ticket(type=tt, user_id=user_id)
+                    t.paid = True
+                    user.tickets.append(t)
+                    tickets.append(t)
+
+                app.logger.info('Allocated %s %s tickets to user', f.amount.data, tt.name)
+
+        db.session.add(user)
+        db.session.commit()
+
+        code = user.login_code(app.config['SECRET_KEY'])
+        send_template_email('Your tickets to EMF',
+                            user.email, app.config['CONTACT_EMAIL'],
+                            'emails/tickets-free.txt',
+                            user=user, code=code, tickets=tickets,
+                            new_user=new_user)
+
+        flash('Allocated %s ticket(s)' % len(tickets))
+        return redirect(url_for('.tickets_choose_free'))
+
+    if new_user:
+        users = User.query.order_by(User.id).all()
+    else:
+        users = None
+
+    return render_template('admin/tickets-choose-free.html',
+                           form=form, tts=free_tts, user=user, users=users)
 
 
 @admin.route('/transfers')
