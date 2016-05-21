@@ -1,7 +1,7 @@
 {% from "_formhelpers.html" import render_field %}
 {% extends "admin/base.html" %}
 {% block body %}
-<h2>Users</h2>
+<h2>Free tickets</h2>
 
 <h4>Allocate free tickets</h4>
 <form method="post" class="form-horizontal">
@@ -14,7 +14,7 @@
   <dt>Email</dt><dd>{{ user.email }}
 </dl>
 {% else %}
-<p>To allocate free tickets, pick a user below or create a new account:</p>
+<p>To allocate free tickets, pick a user below or enter details for a new account:</p>
 {{ render_field(form.name, True) }}
 {{ render_field(form.email, True) }}
 {% endif %}
