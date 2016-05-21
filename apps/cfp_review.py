@@ -360,7 +360,7 @@ def proposal_votes(proposal_id):
         elif form.update.data:
             update_count = 0
             for form_vote in form.votes_to_resolve:
-                vote = all_votes[int(form_vote['id'].data)]
+                vote = all_votes[form_vote['id'].data]
                 if form_vote.resolve.data and vote.state in ['blocked', 'recused']:
                     vote.set_state('resolved')
                     update_count += 1

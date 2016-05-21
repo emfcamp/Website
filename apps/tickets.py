@@ -35,10 +35,6 @@ from payments.stripe import stripe_start
 tickets = Blueprint('tickets', __name__)
 
 
-class TicketForm(Form):
-    ticket_id = HiddenIntegerField('Ticket Type', [Required()])
-
-
 def create_payment(paymenttype):
     """
     Insert payment and tickets from session data into DB
@@ -127,7 +123,7 @@ def tickets_token(token=None):
 
 class TicketAmountForm(Form):
     amount = IntegerSelectField('Number of tickets', [Optional()])
-    code = HiddenIntegerField('Ticket Type', [Required()])
+    type_id = HiddenIntegerField('Ticket Type', [Required()])
 
 
 class TicketAmountsForm(Form):
@@ -165,15 +161,14 @@ def choose():
     form = TicketAmountsForm()
 
     tts = TicketType.query.order_by(TicketType.order).all()
-    limits = dict([(tt.id, tt.user_limit(current_user, token)) for tt in tts])
+    limits = dict((tt.id, tt.user_limit(current_user, token)) for tt in tts)
 
     if request.method != 'POST':
         # Empty form - populate ticket types
         first_full = False
         for tt in tts:
             form.types.append_entry()
-            # Set as unicode because that's what the browser will return
-            form.types[-1].code.data = tt.id
+            form.types[-1].type_id.data = tt.id
 
             if (not first_full) and (tt.admits == 'full') and (limits[tt.id] > 0):
                 first_full = True
@@ -181,7 +176,7 @@ def choose():
 
     tts = dict((tt.id, tt) for tt in tts)
     for f in form.types:
-        t_id = int(f.code.data)  # On form return this may be a string
+        t_id = f.type_id.data
         f._type = tts[t_id]
 
         values = range(limits[t_id] + 1)

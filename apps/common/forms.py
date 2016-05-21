@@ -3,9 +3,9 @@ from flask_wtf import Form as BaseForm
 from flask_wtf.form import _is_hidden
 
 from wtforms import (
-    IntegerField, SelectField, HiddenField,
+    IntegerField, SelectField,
 )
-from wtforms.widgets import Input
+from wtforms.widgets import Input, HiddenInput
 from wtforms.fields import StringField
 from wtforms.compat import string_types
 
@@ -27,10 +27,8 @@ class IntegerSelectField(SelectField):
         self.choices = [(i, self.fmt(i)) for i in vals]
 
 
-class HiddenIntegerField(HiddenField, IntegerField):
-    """
-    widget=HiddenInput() doesn't work with WTF-Flask's hidden_tag()
-    """
+class HiddenIntegerField(IntegerField):
+    widget = HiddenInput()
 
 
 class TelInput(Input):
