@@ -303,6 +303,11 @@ def edit_ticket_type(type_id):
     ticket_type = TicketType.query.get(type_id)
     if form.validate_on_submit():
         app.logger.info('%s editing ticket type %d', current_user.name, type_id)
+        if not form.discount_token.data:
+            form.discount_token.data = None
+        if not form.description.data:
+            form.description.data = None
+
         for attr in ['name', 'order', 'type_limit', 'personal_limit', 'expires',
                      'has_badge', 'is_transferable', 'discount_token', 'description']:
             cur_val = getattr(ticket_type, attr)
