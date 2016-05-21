@@ -1,6 +1,6 @@
 Hi {{ user.name }},
 
-You've been sent {% if tickets | count > 1 -%} {{ tickets | count }} free tickets {%- else -%} a free ticket {%- endif %} to Electromagnetic Field 2016.
+You've been sent {% if tickets | count > 1 -%} {{ tickets | count }} complimentary tickets {%- else -%} a complimentary ticket {%- endif %} to Electromagnetic Field 2016.
 
 {% if new_user %}
 We've created an account for you. We'll email

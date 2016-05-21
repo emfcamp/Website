@@ -469,7 +469,7 @@ def tickets_choose_free(user_id=None):
         db.session.commit()
 
         code = user.login_code(app.config['SECRET_KEY'])
-        send_template_email('Your tickets to EMF',
+        send_template_email('Your complimentary tickets to EMF',
                             user.email, app.config['CONTACT_EMAIL'],
                             'emails/tickets-free.txt',
                             user=user, code=code, tickets=tickets,
