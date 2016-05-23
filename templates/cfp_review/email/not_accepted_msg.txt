@@ -1,13 +1,11 @@
 Hi {{ user.name }},
 
-We've just closed a round of our Call for Participation at EMF. Unfortunately
-your  {{ proposal.type }} ({{ proposal.title }}) was not accepted this time
-but has been automatically added to the next round.
+We've just closed a round of the Electromagnetic Field Call for Participation. Unfortunately your {{ proposal.type }} "{{ proposal.title }}" was not selected but has been automatically added to the next round.
 
-If it's accepted in another round we'll let you know (later rounds are larger).
+Don't panic, there's several more rounds to come - if it's accepted in another round we'll let you know (later rounds are larger).
 
-If you have any questions, feel free to get in touch.
+If you have any questions, don't hesitate to get in contact:
+{{ external_url("cfp.proposal_messages", proposal_id=proposal.id) }}
 
-Thanks!
-
+Thanks,
 The EMF Team
