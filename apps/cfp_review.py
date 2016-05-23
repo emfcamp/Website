@@ -723,12 +723,12 @@ def accept_or_reject_proposal(proposal, accepted=False):
 
     elif accepted:
         proposal.set_state('accepted')
-        subject = 'Your EMF proposal has been accepted'
+        subject = 'Your EMF proposal "%s" has been accepted!' % proposal.title
         template = 'cfp_review/email/accepted_msg.txt'
 
     else:
         proposal.has_rejected_email = True
-        subject = 'Your EMF proposal has been reviewed'
+        subject = 'Your EMF proposal "%s" has been passed to the next round' % proposal.title
         template = 'cfp_review/email/not_accepted_msg.txt'
 
     user = proposal.user

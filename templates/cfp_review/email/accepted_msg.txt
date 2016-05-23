@@ -1,9 +1,11 @@
 Hi {{ user.name }},
 
-Your {{ proposal.type }} ({{ proposal.title }}) has been accepted!
-We'll be in contact shortly to check how you'd like it to be listed as well
-as to confirm any other details with you.
+Your Electromagnetic Field 2016 {{ proposal.type }} "{{ proposal.title }}" has been accepted!
 
-Thanks!
+We'll be in contact shortly to check how you'd like it to be listed in the schedule as well as to confirm some other details with you.
 
+If you have any questions, don't hesitate to get in contact:
+{{ external_url("cfp.proposal_messages", proposal_id=proposal.id) }}
+
+Thanks,
 The EMF Team
