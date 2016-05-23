@@ -218,7 +218,7 @@ def edit_proposal(proposal_id):
             flash('This submission can no longer be edited.')
             return redirect(url_for('.proposals'))
 
-        app.logger.info('Proposal %d edited', proposal.id)
+        app.logger.info('Proposal %s edited', proposal.id)
 
         if proposal.type == 'talk':
             proposal.length = form.length.data
@@ -296,7 +296,7 @@ def proposal_messages(proposal_id):
 
         if form.mark_read or form.send.data:
             count = proposal.mark_messages_read(current_user)
-            app.logger.info('Marked %d messages to admin on proposal %d as read' % (count, proposal.id))
+            app.logger.info('Marked %s messages to admin on proposal %s as read' % (count, proposal.id))
 
         return redirect(url_for('.proposal_messages', proposal_id=proposal_id))
 

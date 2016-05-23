@@ -294,7 +294,7 @@ def message_proposer(proposal_id):
 
         if form.mark_read.data or form.send.data:
             count = proposal.mark_messages_read(current_user)
-            app.logger.info('Marked %d messages to admin on proposal %d as read' % (count, proposal.id))
+            app.logger.info('Marked %s messages to admin on proposal %s as read' % (count, proposal.id))
 
         return redirect(url_for('.message_proposer', proposal_id=proposal_id))
 
@@ -360,7 +360,7 @@ def proposal_votes(proposal_id):
                     stale_count += 1
 
             if stale_count:
-                msg = 'Set %d votes to stale' % stale_count
+                msg = 'Set %s votes to stale' % stale_count
 
         elif form.update.data:
             update_count = 0
@@ -371,7 +371,7 @@ def proposal_votes(proposal_id):
                     update_count += 1
 
             if update_count:
-                msg = 'Set %d votes to resolved' % update_count
+                msg = 'Set %s votes to resolved' % update_count
 
         elif form.resolve_all.data:
             resolved_count = 0
@@ -694,7 +694,7 @@ def close_round():
 
             db.session.commit()
             del session['min_votes']
-            app.logger.info("CFP Round closed. Set %d proposals to 'reviewed'" % len(proposals))
+            app.logger.info("CFP Round closed. Set %s proposals to 'reviewed'" % len(proposals))
 
             return redirect(url_for('.rank'))
 
@@ -773,7 +773,7 @@ def rank():
 
             db.session.commit()
             del session['min_score']
-            msg = "Accepted %d proposals; min score: %d" % (count, min_score)
+            msg = "Accepted %s proposals; min score: %s" % (count, min_score)
             app.logger.info(msg)
             flash(msg, 'info')
             return redirect(url_for('.proposals', state='accepted'))

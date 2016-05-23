@@ -322,7 +322,7 @@ class TicketTransfer(db.Model):
         self.from_user_id = from_user.id
 
     def __repr__(self):
-        return "<Transfer Ticket: %d from %d to %d on %s>" % (
+        return "<Transfer Ticket: %s from %s to %s on %s>" % (
             self.ticket_id, self.from_user_id, self.to_user_id, self.datetime)
 
 

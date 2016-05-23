@@ -340,11 +340,11 @@ class LockProposals(Command):
             if datetime.utcnow() > deadline:
                 proposal.set_state('locked')
 
-                app.logger.debug('Locking proposal %d', proposal.id)
+                app.logger.debug('Locking proposal %s', proposal.id)
                 db.session.commit()
                 lock_count += 1
 
-        app.logger.info('Locked %d proposals', lock_count)
+        app.logger.info('Locked %s proposals', lock_count)
 
 
 class ImportCFP(Command):
@@ -364,7 +364,7 @@ class ImportCFP(Command):
                 if Proposal.query.filter_by(title=row['title']).first():
                     continue
 
-                user = User('user_%d@test.invalid' % count, 'test_cfp_user_%d' % count)
+                user = User('user_%s@test.invalid' % count, 'test_cfp_user_%s' % count)
                 db.session.add(user)
 
                 proposal = TalkProposal() if row['type'] == u'talk' else\
@@ -392,7 +392,7 @@ class ImportCFP(Command):
                 db.session.add(proposal)
                 db.session.commit()
                 count += 1
-        app.logger.info('Imported %d proposals' % count)
+        app.logger.info('Imported %s proposals' % count)
 
 
 class MakeAdmin(Command):
