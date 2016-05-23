@@ -760,8 +760,8 @@ def rank():
     if form.validate_on_submit():
         if form.confirm.data:
             min_score = session['min_score']
+            count = 0
             for (prop, score) in scored_proposals:
-                count = 0
 
                 if score >= min_score:
                     count += 1
