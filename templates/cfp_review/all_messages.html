@@ -2,6 +2,9 @@
 {% block body %}
 <h2>All messages</h2>
 
+{% if types != 'all' %}
+<p>Not showing installations. To include installations, click <a href="{{ url_for('.all_messages', types='all') }}">here</a>.</p>
+{% endif %}
 <table class="table">
     <tr>
         <th>Date</th>

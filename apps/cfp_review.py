@@ -237,22 +237,26 @@ def update_proposal(proposal_id):
                             proposal=prop, form=form, next_id=next_id)
 
 
+@cfp_review.route('/messages/<types>')
 @cfp_review.route('/messages')
 @admin_required
-def all_messages():
+def all_messages(types=None):
     # TODO add search
     # Query from the proposal because that's actually what we display
     proposal_with_message = Proposal.query\
         .join(CFPMessage)\
         .filter(Proposal.id == CFPMessage.proposal_id)\
-        .order_by(CFPMessage.has_been_read, CFPMessage.created.desc())\
-        .all()
+        .order_by(CFPMessage.has_been_read, CFPMessage.created.desc())
 
+    if types != 'all':
+        proposal_with_message = proposal_with_message.filter(Proposal.type != 'installation')
+
+    proposal_with_message = proposal_with_message.all()
     proposal_with_message.sort(key=lambda x: (x.get_unread_count(current_user) > 0,
                                               x.messages[-1].created), reverse=True)
 
     return render_template('cfp_review/all_messages.html',
-                           proposal_with_message=proposal_with_message)
+                           proposal_with_message=proposal_with_message, types=types)
 
 
 class SendMessageForm(Form):
