@@ -193,11 +193,12 @@ def update_proposal(proposal_id):
             prop.set_state('rejected')
 
             if form.reject_with_message.data:
-                accept_or_reject_proposal(prop, accepted=False)
+                send_email_for_proposal(prop, accepted=False)
 
         elif form.accept.data:
             msg = 'Manually accepting proposal %s' % proposal_id
-            accept_or_reject_proposal(prop, accepted=True)
+            prop.set_state('accepted')
+            send_email_for_proposal(prop, accepted=True)
 
         elif form.checked.data:
             msg = 'Sending proposal %s for anonymisation' % proposal_id
@@ -653,7 +654,7 @@ def review_proposal(proposal_id):
 
 class CloseRoundForm(Form):
     min_votes = IntegerField('Minimum number of votes', default=10, validators=[NumberRange(min=1)])
-    close_round = SubmitField('Close this round')
+    close_round = SubmitField('Close this round...')
     confirm = SubmitField('Confirm')
     cancel = SubmitField('Cancel')
 
@@ -688,7 +689,7 @@ def close_round():
         if form.confirm.data:
             min_votes = session['min_votes']
             for (prop, vote_count) in proposals:
-                if vote_count >= min_votes:
+                if vote_count >= min_votes and prop.state != 'reviewed':
                     prop.set_state('reviewed')
 
             db.session.commit()
@@ -713,20 +714,23 @@ def close_round():
 
 class AcceptanceForm(Form):
     min_score = FloatField('Minimum score for acceptance')
-    set_score = SubmitField('Accept Proposals')
+    set_score = SubmitField('Accept Proposals...')
     confirm = SubmitField('Confirm')
     cancel = SubmitField('Cancel')
 
-def accept_or_reject_proposal(proposal, accepted=False):
-    if not accepted and proposal.has_rejected_email:
-        return
-
-    elif accepted:
-        proposal.set_state('accepted')
+def send_email_for_proposal(proposal, accepted):
+    if accepted:
+        app.logger.info('Sending accepted email for proposal %s', proposal.id)
         subject = 'Your EMF proposal "%s" has been accepted!' % proposal.title
         template = 'cfp_review/email/accepted_msg.txt'
 
     else:
+        # If it's not accepted, it can still be accepted in the next round.
+        # Send the proposer an email so they don't feel ignored, but only once.
+        if proposal.has_rejected_email:
+            return
+
+        app.logger.info('Sending not-accepted email for proposal %s', proposal.id)
         proposal.has_rejected_email = True
         subject = 'Your EMF proposal "%s" has been passed to the next round' % proposal.title
         template = 'cfp_review/email/not_accepted_msg.txt'
@@ -761,10 +765,11 @@ def rank():
 
                 if score >= min_score:
                     count += 1
-                    accept_or_reject_proposal(prop, accepted=True)
+                    prop.set_state('accepted')
+                    send_email_for_proposal(prop, accepted=True)
 
                 else:
-                    accept_or_reject_proposal(prop, accepted=False)
+                    send_email_for_proposal(prop, accepted=False)
 
             db.session.commit()
             del session['min_score']
