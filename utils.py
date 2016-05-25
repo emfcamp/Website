@@ -266,6 +266,11 @@ def get_main_ticket_types():
             "All children must be accompanied by an adult.",
             None, None, True),
 
+        (13, 25, 'other',
+            'Tent (Template)', 0, 1, 300.00, 400.00, False,
+            "Pre-ordered village tents will be placed on site before the event starts.",
+            None, None, True),
+
         (7, 30, 'car', 'Parking Ticket', 450, 4, 15.00, 21.00, False,
             "We're trying to keep cars to a minimum. "
             "Please take public transport or car-share if you can.",
