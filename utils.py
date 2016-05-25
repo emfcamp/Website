@@ -293,9 +293,9 @@ def get_main_ticket_types():
 def test_main_ticket_types():
     # Test things like non-unique keys
     types = get_main_ticket_types()
-    ids = [tt.id for tt in types]
-    if len(set(ids)) < len(ids):
-        raise Exception('Duplicate ticket type ID')
+    fixed_ids = [tt.fixed_id for tt in types]
+    if len(set(fixed_ids)) < len(fixed_ids):
+        raise Exception('Duplicate ticket type fixed_id')
 
 
 class CreateTickets(Command):

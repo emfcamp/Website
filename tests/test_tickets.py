@@ -19,7 +19,7 @@ class TicketTestCase(unittest.TestCase):
     def test_ticket_creation(self):
         with self.app.app_context():
             self.db.session.add(self.user)
-            tt = TicketType.query.filter_by(admits='full').first()
+            tt = TicketType.query.filter_by(fixed_id=0).one()
             ticket = Ticket(type=tt, user_id=self.user.id)
             self.db.session.add(ticket)
             self.db.session.commit()
