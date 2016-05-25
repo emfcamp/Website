@@ -27,6 +27,7 @@ class CheckinStateException(Exception):
 class TicketType(db.Model):
     __tablename__ = 'ticket_type'
     id = db.Column(db.Integer, primary_key=True)
+    fixed_id = db.Column(db.Integer, unique=True)
     name = db.Column(db.String, nullable=False)
     order = db.Column(db.Integer, nullable=False)
     # admits should possible be an enum
@@ -44,13 +45,13 @@ class TicketType(db.Model):
     # replace with capacity table?
     admits_types = ('full', 'kid', 'campervan', 'car', 'other')
 
-    def __init__(self, id, order, admits, name, type_limit, personal_limit,
+    def __init__(self, order, admits, name, type_limit, personal_limit,
                  expires=None, discount_token=None, description=None,
                  has_badge=True, is_transferable=True):
+
         if admits not in self.admits_types:
             raise Exception('unknown admission type')
 
-        self.id = id
         self.name = name
         self.order = order
         self.admits = admits
@@ -63,8 +64,12 @@ class TicketType(db.Model):
         self.is_transferable = is_transferable
 
     def __repr__(self):
-        return "<TicketType: (Name: %s, Admits: %s, Token: %s)>" % \
-            (self.name, self.admits, self.discount_token)
+        if self.fixed_id is not None:
+            clsname = 'FixedTicketType %s' % self.fixed_id
+        else:
+            clsname = 'TicketType %s' % self.id
+
+        return "<%s: %s>" % (clsname, self.name)
 
     def get_price(self, currency):
         for price in self.prices:

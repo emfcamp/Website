@@ -363,13 +363,11 @@ def new_ticket_type(copy_id):
     form = NewTicketTypeForm()
 
     if form.validate_on_submit():
-        new_id = db.session.query(func.max(TicketType.id)) + 1
-
         expires = form.expires.data if form.expires.data else None
         token = form.discount_token.data if form.discount_token.data else None
         description = form.description.data if form.description.data else None
 
-        tt = TicketType(new_id, form.order.data, form.admits.data,
+        tt = TicketType(form.order.data, form.admits.data,
                         form.name.data, form.type_limit.data, expires=expires,
                         discount_token=token, description=description,
                         personal_limit=form.personal_limit.data,
@@ -382,7 +380,7 @@ def new_ticket_type(copy_id):
         db.session.add(tt)
         db.session.commit()
         flash('Your new ticket type has been created')
-        return redirect(url_for('.ticket_type_details', type_id=new_id))
+        return redirect(url_for('.ticket_type_details', type_id=tt.id))
 
     if copy_id != -1:
         form.init_with_ticket_type(TicketType.query.get(copy_id))

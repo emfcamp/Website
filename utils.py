@@ -195,10 +195,16 @@ class Reconcile(Command):
 
 def add_ticket_types(types):
     for tt in types:
-        existing_tt = TicketType.query.get(tt.id)
-        if existing_tt:
+        try:
+            existing_tt = TicketType.query.filter_by(fixed_id=tt.fixed_id).one()
+
+        except NoResultFound:
+            app.logger.info('Adding TicketType %s (fixed_id: %s)', tt.name, tt.fixed_id)
+            db.session.add(tt)
+
+        else:
             # NB we don't even consider updating prices. If we do, make sure no tickets have been bought.
-            app.logger.info('Refreshing TicketType %s (id: %s)', tt.name, tt.id)
+            app.logger.info('Refreshing TicketType %s (id: %s, fixed_id: %s)', tt.name, tt.id, tt.fixed_id)
             for f in ['name', 'type_limit', 'expires', 'personal_limit', 'order',
                       'has_badge', 'is_transferable', 'description']:
                 cur_val = getattr(existing_tt, f)
@@ -207,9 +213,6 @@ def add_ticket_types(types):
                 if cur_val != new_val:
                     app.logger.info(' %10s: %r -> %r', f, cur_val, new_val)
                     setattr(existing_tt, f, new_val)
-        else:
-            app.logger.info('Adding TicketType %s (id: %s)', tt.name, tt.id)
-            db.session.add(tt)
 
         db.session.commit()
 
@@ -226,7 +229,7 @@ def get_main_ticket_types():
     # This is fiddly. It should probably be moved out to a json file.
 
     type_data = [
-        # (id, order, admits, name, type limit, personal limit, GBP, EUR, badge, description, [token, expiry, transferable])
+        # (fixed_id, order, admits, name, type limit, personal limit, GBP, EUR, badge, description, [token, expiry, transferable])
         # Leave order 0 & 1 free for discount tickets
         (12, 1, 'full', 'Full Camp Ticket (Discount Template)', 0, 1, 105.00, 142.00, True, None, 'example', datetime(2016, 8, 1, 12, 0), False),
         (0, 2, 'full', 'Full Camp Ticket', 193, 10, 100.00, 140.00, True, None, None, datetime(2016, 1, 10, 20, 24), True),
@@ -278,9 +281,10 @@ def get_main_ticket_types():
 
     types = []
     for row in type_data:
-        tt = TicketType(*row[:5], personal_limit=row[5], description=row[9],
+        tt = TicketType(*row[1:5], personal_limit=row[5], description=row[9],
             has_badge=row[8], discount_token=row[10], expires=row[11],
             is_transferable=row[12])
+        tt.fixed_id = row[0]
         tt.prices = [TicketPrice('GBP', row[6]), TicketPrice('EUR', row[7])]
         types.append(tt)
 
