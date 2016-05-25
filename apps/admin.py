@@ -363,7 +363,7 @@ def new_ticket_type(copy_id):
     form = NewTicketTypeForm()
 
     if form.validate_on_submit():
-        new_id = TicketType.query.all()[-1].id + 1
+        new_id = db.session.query(func.max(TicketType.id)) + 1
 
         expires = form.expires.data if form.expires.data else None
         token = form.discount_token.data if form.discount_token.data else None
