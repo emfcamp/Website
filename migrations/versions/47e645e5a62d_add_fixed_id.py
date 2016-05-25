@@ -19,15 +19,15 @@ def upgrade():
         batch_op.add_column(sa.Column('fixed_id', sa.Integer(), nullable=True))
         batch_op.create_unique_constraint(batch_op.f('uq_ticket_type_fixed_id'), ['fixed_id'])
 
-    conn = op.get_bind()
+    bind = op.get_bind()
+    session = sa.orm.Session(bind=bind)
 
-    from models import *
+    from models import TicketType
 
-    fixed_tts = TicketType.query.filter(TicketType.id <= 12)
+    fixed_tts = session.query(TicketType).filter(TicketType.id <= 12)
     for tt in fixed_tts:
         tt.fixed_id = tt.id
 
-    session = sa.orm.session.object_session(fixed_tts.first())
     session.commit()
 
 
