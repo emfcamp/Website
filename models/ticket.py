@@ -38,7 +38,7 @@ class TicketType(db.Model):
     is_transferable = db.Column(db.Boolean, default=True, nullable=False)
     # Nullable fields
     expires = db.Column(db.DateTime)
-    expired = column_property(and_(expires is not None, expires < func.now()))
+    expired = column_property(and_(~expires.is_(None), expires < func.now()))
     description = db.Column(db.String)
     discount_token = db.Column(db.String)
 
@@ -79,14 +79,6 @@ class TicketType(db.Model):
     def get_price_ex_vat(self, currency):
         return self.get_price(currency) / Decimal('1.2')
 
-    def is_in_date(self):
-        return self.expires is None or self.expires >= datetime.utcnow()
-
-    def is_correct_discount_token(self, discount_token):
-        if not self.discount_token:
-            return True
-        return self.discount_token == discount_token and self.is_in_date()
-
     def get_sold(self, query=None):
         if query is None:
             query = Ticket.query
@@ -110,7 +102,11 @@ class TicketType(db.Model):
         return self.type_limit - self.get_sold().count()
 
     def user_limit(self, user, discount_token):
-        if not self.is_in_date() or not self.is_correct_discount_token(discount_token):
+        if self.expired:
+            return 0
+
+        # Why do we need to check this?
+        if self.discount_token != discount_token:
             return 0
 
         if user.is_authenticated():

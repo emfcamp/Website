@@ -111,14 +111,18 @@ def main():
 @tickets.route("/tickets/token/")
 @tickets.route("/tickets/token/<token>")
 def tickets_token(token=None):
-    if TicketType.get_types_for_token(token):
+    tts = TicketType.get_types_for_token(token)
+    if tts:
         session['ticket_token'] = token
     else:
         if 'ticket_token' in session:
             del session['ticket_token']
         flash('Ticket token was invalid')
 
-    return redirect(url_for('tickets.choose'))
+    if any(tt.admits in ['full', 'kid'] for tt in tts):
+        return redirect(url_for('tickets.choose'))
+
+    return redirect(url_for('tickets.choose', extra='other'))
 
 
 class TicketAmountForm(Form):
@@ -138,15 +142,27 @@ class TicketAmountsForm(Form):
 
 
 @tickets.route("/tickets/choose", methods=['GET', 'POST'])
+@tickets.route("/tickets/choose/<extra>", methods=['GET', 'POST'])
 @feature_flag('TICKET_SALES')
-def choose():
+def choose(extra=None):
     token = session.get('ticket_token')
     sales_state = get_sales_state(datetime.utcnow())
 
+    if extra is None:
+        admissions = True
+    else:
+        admissions = False
+
     if sales_state == 'unavailable':
-        # Allow people with valid discount tokens to buy tickets
-        if token is not None and TicketType.get_types_for_token(token):
+        # For the main entry point, we assume people want admissions tickets,
+        # but we still need to sell people e.g. parking tickets until cut-off.
+        if not admissions:
             sales_state = 'available'
+
+        # Allow people with valid discount tokens to buy tickets
+        elif token is not None and TicketType.get_types_for_token(token):
+            sales_state = 'available'
+
 
     if app.config.get('DEBUG'):
         sales_state = request.args.get("sales_state", sales_state)
@@ -160,21 +176,22 @@ def choose():
 
     form = TicketAmountsForm()
 
-    tts = TicketType.query.order_by(TicketType.order).all()
+    if admissions:
+        tts = TicketType.query
+    else:
+        tts = TicketType.query.filter(~TicketType.admits.in_(['full', 'kid']))
+
+    tts = tts.order_by(TicketType.order).all()
     limits = dict((tt.id, tt.user_limit(current_user, token)) for tt in tts)
 
     if request.method != 'POST':
         # Empty form - populate ticket types
-        first_full = False
         for tt in tts:
             form.types.append_entry()
             form.types[-1].type_id.data = tt.id
 
-            if (not first_full) and (tt.admits == 'full') and (limits[tt.id] > 0):
-                first_full = True
-                # form.types[0].amount.data = 1
 
-    tts = dict((tt.id, tt) for tt in tts)
+    tts = {tt.id: tt for tt in tts}
     for f in form.types:
         t_id = f.type_id.data
         f._type = tts[t_id]
@@ -211,7 +228,7 @@ def choose():
 
     form.currency_code.data = get_user_currency()
 
-    return render_template("tickets-choose.html", form=form)
+    return render_template("tickets-choose.html", form=form, admissions=admissions)
 
 
 class TicketPaymentForm(Form):

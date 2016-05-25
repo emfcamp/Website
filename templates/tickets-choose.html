@@ -2,12 +2,18 @@
 {% block title %}Buy Tickets{% endblock %}
 {% block body %}
 <div class="well">
+{% if admissions %}
     {% include 'ticket-blurb.html' %}
-</div>
-
-{% if not current_user.is_authenticated() %}
-<p>If you've already bought a ticket this year, <a href="{{url_for('users.login')}}">log in</a> to view your ticket status.</p>
+{% else %}
+    <p>
+      By buying a ticket you are agreeing to our <a href="{{url_for('payments.terms')}}">Terms
+      and Conditions</a> and the <a href="{{url_for('base.code_of_conduct')}}">Code of Conduct</a>.
+    </p>
 {% endif %}
+{% if not current_user.is_authenticated() %}
+    <p>If you've already bought a ticket this year, <a href="{{url_for('users.login')}}">log in</a> to view your ticket status.</p>
+{% endif %}
+</div>
 
 <form method="post" class="choose-tickets-form" id="choose_tickets">
     {{form.hidden_tag()}}
