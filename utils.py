@@ -204,7 +204,7 @@ def add_ticket_types(types):
 
         else:
             # NB we don't even consider updating prices. If we do, make sure no tickets have been bought.
-            app.logger.info('Refreshing TicketType %s (id: %s, fixed_id: %s)', tt.name, tt.id, tt.fixed_id)
+            app.logger.info('Refreshing TicketType %s (id: %s, fixed_id: %s)', tt.name, existing_tt.id, tt.fixed_id)
             for f in ['name', 'type_limit', 'expires', 'personal_limit', 'order',
                       'has_badge', 'is_transferable', 'description']:
                 cur_val = getattr(existing_tt, f)
