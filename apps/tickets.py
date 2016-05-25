@@ -150,8 +150,10 @@ def choose(extra=None):
 
     if extra is None:
         admissions = True
-    else:
+    elif extra == 'other':
         admissions = False
+    else:
+        abort(404)
 
     if sales_state == 'unavailable':
         # For the main entry point, we assume people want admissions tickets,

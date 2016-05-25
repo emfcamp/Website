@@ -106,7 +106,7 @@ class TicketType(db.Model):
             return 0
 
         # Why do we need to check this?
-        if self.discount_token != discount_token:
+        if self.discount_token is not None and self.discount_token != discount_token:
             return 0
 
         if user.is_authenticated():
