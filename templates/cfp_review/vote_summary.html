@@ -2,6 +2,30 @@
 {% block body %}
 <h2>Votes summary</h2>
 
+<div class="row">
+    <div class="col-md-6">
+        <h4>Votes</h4>
+        <dl class="dl-horizontal">
+            <dt>Min</dt>
+            <dd>{{ summary.get('min_votes', 0) }}</dd>
+            <dt>Max</dt>
+            <dd>{{ summary.get('max_votes', 0) }}</dd>
+            <dt>Ave</dt>
+            <dd>{{ (summary.get('votes_total', 0) / (proposals_with_counts | count) ) | round }}</dd>
+            <dt>Total</dt>
+            <dd>{{ summary.get('votes_total', 0)}}</dd>
+        </dl>
+    </div>
+    <div class="col-md-6">
+        <h4>Status</h4>
+        <dl class="dl-horizontal">
+            <dt>Notes</dt><dd>{{ summary.get('notes_unread', 0) }}/{{ summary.get('notes_total', 0) }}</dd>
+            <dt>Blocked</dt><dd>{{ summary.get('block_total', 0) }}</dd>
+            <dt>Recused</dt><dd>{{ summary.get('recused_total', 0) }}</dd>
+        </dl>
+    </div>
+</div>
+
 <table class="table table-striped">
     <tr>
         <th class="text-center">Date</th>

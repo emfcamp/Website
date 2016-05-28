@@ -323,7 +323,22 @@ def vote_summary():
     sort_key = lambda p: (p[0].get_unread_vote_note_count() > 0, p[0].created)
     proposals_with_counts.sort(key=sort_key, reverse=True)
 
-    return render_template('cfp_review/vote_summary.html',
+
+    get_voted = lambda p: p[1].get('voted', 0)
+    summary = {
+        'notes_total': CFPVote.query.filter(CFPVote.note.isnot(None)).count(),
+        'notes_unread': CFPVote.query.filter(
+            or_(CFPVote.has_been_read.is_(False),
+                CFPVote.has_been_read.is_(None))
+        ).count(),
+        'votes_total': CFPVote.query.filter_by(state='voted').count(),
+        'blocked_total': CFPVote.query.filter_by(state='blocked').count(),
+        'recused_total': CFPVote.query.filter_by(state='recused').count(),
+        'min_votes': get_voted(min(proposals_with_counts, key=get_voted)),
+        'max_votes': get_voted(max(proposals_with_counts, key=get_voted))
+    }
+
+    return render_template('cfp_review/vote_summary.html', summary=summary,
                             proposals_with_counts=proposals_with_counts)
 
 
