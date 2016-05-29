@@ -416,8 +416,8 @@ def receipt(ticket_ids=None):
     tickets = tickets.filter_by(paid=True) \
         .join(TicketType).outerjoin(Payment).filter(
             or_(Payment.id.is_(None),
-            Payment.state != "cancelled")
-        ).order_by(TicketType.order)
+            Payment.state != "cancelled"))
+    tickets = tickets.order_by(TicketType.order)
 
     if ticket_ids is not None:
         ticket_ids = map(int, ticket_ids.split(','))
