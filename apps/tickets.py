@@ -91,8 +91,8 @@ def main():
         return redirect(url_for('tickets.receipt') + '?pdf=1')
 
     all_tickets = current_user.tickets.join(TicketType).outerjoin(Payment).filter(
-                  or_(Payment.id.is_(None),
-                  Payment.state != "cancelled"))
+        or_(Payment.id.is_(None),
+        Payment.state != "cancelled"))
     tickets = all_tickets.filter(TicketType.admits != 'other').all()
     other_items = all_tickets.filter(TicketType.admits == 'other').all()
     payments = current_user.payments.filter(Payment.state != "cancelled").all()
