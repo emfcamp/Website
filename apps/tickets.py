@@ -132,7 +132,8 @@ class TicketAmountForm(Form):
 
 class TicketAmountsForm(Form):
     types = FieldList(FormField(TicketAmountForm))
-    buy = SubmitField('Buy Tickets')
+    buy = SubmitField('Buy')
+    buy_tickets = SubmitField('Buy Tickets')
     currency_code = HiddenField('Currency')
     set_currency = StringField('Set Currency', [Optional()])
 
@@ -178,8 +179,11 @@ def choose(extra=None):
 
     form = TicketAmountsForm()
 
+    # If this is the main page, exclude tents and other paraphernalia.
+    # For the non-admissions page, only exclude actual admissions tickets.
+    # This means both pages show parking and caravan tickets.
     if admissions:
-        tts = TicketType.query
+        tts = TicketType.query.filter(~TicketType.admits.in_(['other']))
     else:
         tts = TicketType.query.filter(~TicketType.admits.in_(['full', 'kid']))
 
@@ -203,7 +207,7 @@ def choose(extra=None):
         f._any = any(values)
 
     if form.validate_on_submit():
-        if form.buy.data:
+        if form.buy_tickets.data or form.buy.data:
             set_user_currency(form.currency_code.data)
 
             basket = []

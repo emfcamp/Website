@@ -87,7 +87,11 @@
 </table>
 
 <div class="form-actions pull-right">
+    {% if admissions %}
+    {{ form.buy_tickets(class_="btn btn-success btn-lg debounce") }}
+    {% else %}
     {{ form.buy(class_="btn btn-success btn-lg debounce") }}
+    {% endif %}
 </div>
 
 </form>
