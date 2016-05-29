@@ -9,6 +9,14 @@
   <div class="clearfix"></div>
 {% endif %}
 
+{% if other_items %}
+  <h3>Your other purchases</h2>
+  <a id="your-tickets"></a>
+  {% include "tickets-main/other-items-list.html" %}
+  <div class="clearfix"></div>
+{% endif %}
+
+
 {% if payments %}
   <h3>Your payments</h2>
   <a id="your-payments"></a>

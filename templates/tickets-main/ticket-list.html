@@ -3,30 +3,32 @@
 
 <table class="table tickets btns-table">
 <tr>
+{% if feature_enabled('ISSUE_TICKETS') %}
   <th class="checkbox-cell"></th>
+{% endif %}
   <th>Type</th>
   <th>Status</th>
 </tr>
 
 {%- for t in tickets -%}
 
-{# only display tickets that have a payment #}
-{%- if t.payment %}
 <tr class="
 {{- loop.cycle('odd', 'even') }}
 {%- if t.paid %} paid {%- endif -%}
 {%- if t.expired %} expired {%- endif -%}
 ">
+{% if feature_enabled('ISSUE_TICKETS') %}
 <td class="checkbox-cell">
-  {% if t.paid and feature_enabled('ISSUE_TICKETS') %}
+  {% if t.paid %}
   <label>
     <input type="checkbox" name="ticket_id" value="{{ t.id }}">
   </label>
   {% endif %}
 </td>
+{% endif %}
 <td>{{ t.type.name }}</td>
 <td>
-    {% if t.payment.state == 'cancelled' %}
+    {% if t.payment and t.payment.state == 'cancelled' %}
     Cancelled
     {%- elif t.paid %}
     Paid
@@ -42,7 +44,6 @@
   {% endif %}
 </td>
 </tr>
-{% endif -%}
 {% endfor -%}
 
 </table>

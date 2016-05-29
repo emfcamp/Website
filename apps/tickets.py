@@ -10,6 +10,7 @@ from wtforms import (
     FieldList, FormField, HiddenField,
 )
 from wtforms.fields.html5 import EmailField
+from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -88,7 +89,11 @@ def main():
             return redirect(url_for('tickets.receipt', ticket_ids=','.join(ticket_ids)) + '?pdf=1')
         return redirect(url_for('tickets.receipt') + '?pdf=1')
 
-    tickets = current_user.tickets.join(Payment).filter(Payment.state != "cancelled").all()
+    all_tickets = current_user.tickets.join(TicketType).outerjoin(Payment).filter(
+                  or_(Payment.id.is_(None),
+                  Payment.state != "cancelled"))
+    tickets = all_tickets.filter(TicketType.admits != 'other').all()
+    other_items = all_tickets.filter(TicketType.admits == 'other').all()
     payments = current_user.payments.filter(Payment.state != "cancelled").all()
 
     if not tickets and not payments:
@@ -101,6 +106,7 @@ def main():
 
     return render_template("tickets-main/main.html",
                            tickets=tickets,
+                           other_items=other_items,
                            payments=payments,
                            form=form,
                            show_receipt=show_receipt,

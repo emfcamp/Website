@@ -1,0 +1,34 @@
+<table class="table tickets btns-table">
+<tr>
+  <th>Type</th>
+  <th>Status</th>
+</tr>
+
+{%- for t in other_items -%}
+
+<tr class="
+{{- loop.cycle('odd', 'even') }}
+{%- if t.paid %} paid {%- endif -%}
+{%- if t.expired %} expired {%- endif -%}
+">
+<td>{{ t.type.name }}</td>
+<td>
+    {% if t.payment and t.payment.state == 'cancelled' %}
+    Cancelled
+    {%- elif t.paid %}
+    Paid
+    {%- elif t.expired %}
+    Unpaid
+    {%- else %}
+    Pending
+    {%- endif %}
+</td>
+<td>
+  {% if t.paid and t.type.is_transferable %}
+    <a class="btn btn-default" href="{{ url_for('.transfer', ticket_id=t.id) }}">Transfer</a>
+  {% endif %}
+</td>
+</tr>
+{% endfor -%}
+
+</table>
