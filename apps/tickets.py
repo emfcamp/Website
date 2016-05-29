@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from decimal import Decimal
 from flask import (
     render_template, redirect, request, flash, Blueprint,
     url_for, session, send_file, abort, current_app as app
@@ -288,7 +289,7 @@ def pay(extra=None):
         return redirect(url_for('tickets.main'))
 
     if form.validate_on_submit():
-        if int(form.basket_total.data) != int(total):
+        if Decimal(form.basket_total.data) != Decimal(total):
             # Check that the user's basket approximately matches what we told them they were paying.
             app.logger.warn("User's basket has changed value %s -> %s", form.basket_total.data, total)
             flash("""The tickets you selected have changed, possibly because you had two windows open.
