@@ -143,7 +143,7 @@ class UpdateProposalForm(Form):
 
 
 class UpdateWorkshopForm(UpdateProposalForm):
-    cost = StringField('Cost')
+    cost = StringField('Cost per attendee')
     attendees = StringField('Attendees', [Required()])
 
     def update_proposal(self, proposal):

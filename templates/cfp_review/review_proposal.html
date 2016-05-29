@@ -33,8 +33,8 @@
                 {% endif %}
             </dd>
             <dt>Note</dt><dd>{{previous_vote.note or '--'}}</dd>
-            {%- if proposal.type == 'workshop' and proposal.cost > 0 -%}
-                <dt>Cost</dt><dd>£{{ proposal.cost }}/attendee</dd>
+            {%- if proposal.type == 'workshop' and proposal.cost -%}
+                <dt>Cost per attendee</dt><dd>{{ proposal.cost }}</dd>
             {%- endif -%}
             <dt>Description</dt><dd class="multiline">{{ proposal.description }}</dd>
         </dl>
@@ -53,8 +53,8 @@
         <h4>Proposal: {{proposal.type | capitalize}}</h4>
         <h3>{{proposal.title}}</h3>
         <div>&nbsp;</div>
-        {%- if proposal.type == 'workshop' and proposal.cost > 0 -%}
-            <div><strong>Cost:</strong> £{{ proposal.cost }}/attendee</div>
+        {%- if proposal.type == 'workshop' and proposal.cost -%}
+            <div><strong>Cost per attendee:</strong> {{ proposal.cost }}</div>
             <div>&nbsp;</div>
         {%- endif -%}
         <div class="multiline">{{ proposal.description }}</div>
