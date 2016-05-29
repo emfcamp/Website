@@ -129,7 +129,7 @@ def tickets_token(token=None):
     if any(tt.admits in ['full', 'kid'] for tt in tts):
         return redirect(url_for('tickets.choose'))
 
-    return redirect(url_for('tickets.choose', extra='other'))
+    return redirect(url_for('tickets.choose', flow='other'))
 
 
 class TicketAmountForm(Form):
@@ -150,15 +150,15 @@ class TicketAmountsForm(Form):
 
 
 @tickets.route("/tickets/choose", methods=['GET', 'POST'])
-@tickets.route("/tickets/choose/<extra>", methods=['GET', 'POST'])
+@tickets.route("/tickets/choose/<flow>", methods=['GET', 'POST'])
 @feature_flag('TICKET_SALES')
-def choose(extra=None):
+def choose(flow=None):
     token = session.get('ticket_token')
     sales_state = get_sales_state(datetime.utcnow())
 
-    if extra is None:
+    if flow is None:
         admissions = True
-    elif extra == 'other':
+    elif flow == 'other':
         admissions = False
     else:
         abort(404)
@@ -227,12 +227,11 @@ def choose(extra=None):
             if basket:
                 session['basket'] = basket
 
-                if admissions:
-                    return redirect(url_for('tickets.pay'))
-                else:
-                    return redirect(url_for('tickets.pay', extra='other'))
-            else:
+                return redirect(url_for('tickets.pay', flow=flow))
+            elif admissions:
                 flash("Please select at least one ticket to buy.")
+            else:
+                flash("Please select at least one item to buy.")
 
     if request.method == 'POST' and form.set_currency.data:
         if form.set_currency.validate(form):
@@ -263,12 +262,12 @@ class TicketPaymentForm(Form):
 
 
 @tickets.route("/tickets/pay", methods=['GET', 'POST'])
-@tickets.route("/tickets/pay/<extra>", methods=['GET', 'POST'])
-def pay(extra=None):
+@tickets.route("/tickets/pay/<flow>", methods=['GET', 'POST'])
+def pay(flow=None):
 
-    if extra is None:
+    if flow is None:
         admissions = True
-    elif extra == 'other':
+    elif flow == 'other':
         admissions = False
     else:
         abort(404)
@@ -285,7 +284,10 @@ def pay(extra=None):
 
     basket, total = get_basket_and_total()
     if not basket:
-        flash("Please select at least one ticket to buy.")
+        if admissions:
+            flash("Please select at least one ticket to buy.")
+        else:
+            flash("Please select at least one item to buy.")
         return redirect(url_for('tickets.main'))
 
     if form.validate_on_submit():
@@ -294,10 +296,7 @@ def pay(extra=None):
             app.logger.warn("User's basket has changed value %s -> %s", form.basket_total.data, total)
             flash("""The tickets you selected have changed, possibly because you had two windows open.
                   Please verify that you've selected the correct tickets.""")
-            if admissions:
-                return redirect(url_for('tickets.pay'))
-            else:
-                return redirect(url_for('tickets.pay', extra='other'))
+            return redirect(url_for('tickets.pay', flow=flow))
 
         if current_user.is_anonymous():
             try:
@@ -318,18 +317,12 @@ def pay(extra=None):
         except TicketLimitException as e:
             app.logger.warn('Limit exceeded creating tickets: %s', e)
             flash("We're sorry, we were unable to reserve your tickets. %s" % e)
-            if admissions:
-                return redirect(url_for('tickets.choose'))
-            else:
-                return redirect(url_for('tickets.choose', extra='other'))
+            return redirect(url_for('tickets.choose', flow=flow))
 
         if not payment:
             app.logger.warn('Unable to add payment and tickets to database')
             flash("We're sorry, your session information has been lost. Please try ordering again.")
-            if admissions:
-                return redirect(url_for('tickets.choose'))
-            else:
-                return redirect(url_for('tickets.choose', extra='other'))
+            return redirect(url_for('tickets.choose', flow=flow))
 
         if payment_type == GoCardlessPayment:
             return gocardless_start(payment)

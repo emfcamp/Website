@@ -24,7 +24,7 @@
         {% if admissions %}
         <a class="btn btn-default" href="{{url_for('tickets.choose')}}">Change tickets</a>
         {% else %}
-        <a class="btn btn-default" href="{{url_for('tickets.choose', extra='other')}}">Change items</a>
+        <a class="btn btn-default" href="{{url_for('tickets.choose', flow='other')}}">Change items</a>
         {% endif %}
         <button name="change_currency" value="{% if user_currency == 'GBP' %}EUR{% else %}GBP{% endif %}"
             class="btn btn-default">Pay in {% if user_currency == 'GBP' %}Euros (€){% else %}Pounds (£){% endif %}</button>

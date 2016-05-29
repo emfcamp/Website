@@ -10,6 +10,14 @@ Buy Items
 <div class="well">
 {% if admissions %}
     {% include 'ticket-blurb.html' %}
+
+    <p>To order additional items, such as parking tickets or village tents, please
+        <a href="{{ url_for('tickets.choose', flow='other') }}">click here</a>.
+
+    <p>
+      By buying a ticket you are agreeing to our <a href="{{url_for('payments.terms')}}">Terms
+      and Conditions</a> and the <a href="{{url_for('base.code_of_conduct')}}">Code of Conduct</a>.
+    </p>
 {% else %}
     <p>
       By making a purchase you are agreeing to our <a href="{{url_for('payments.terms')}}">Terms
