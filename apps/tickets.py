@@ -132,8 +132,8 @@ class TicketAmountForm(Form):
 
 class TicketAmountsForm(Form):
     types = FieldList(FormField(TicketAmountForm))
-    buy = SubmitField('Buy')
-    buy_tickets = SubmitField('Buy Tickets')
+    buy = SubmitField('Buy Tickets')
+    buy_other = SubmitField('Buy')
     currency_code = HiddenField('Currency')
     set_currency = StringField('Set Currency', [Optional()])
 
@@ -207,7 +207,7 @@ def choose(extra=None):
         f._any = any(values)
 
     if form.validate_on_submit():
-        if form.buy_tickets.data or form.buy.data:
+        if form.buy.data or form.buy_other.data:
             set_user_currency(form.currency_code.data)
 
             basket = []
@@ -220,7 +220,10 @@ def choose(extra=None):
             if basket:
                 session['basket'] = basket
 
-                return redirect(url_for('tickets.pay'))
+                if admissions:
+                    return redirect(url_for('tickets.pay'))
+                else:
+                    return redirect(url_for('tickets.pay', extra='other'))
             else:
                 flash("Please select at least one ticket to buy.")
 
@@ -253,7 +256,15 @@ class TicketPaymentForm(Form):
 
 
 @tickets.route("/tickets/pay", methods=['GET', 'POST'])
-def pay():
+@tickets.route("/tickets/pay/<extra>", methods=['GET', 'POST'])
+def pay(extra=None):
+
+    if extra is None:
+        admissions = True
+    elif extra == 'other':
+        admissions = False
+    else:
+        abort(404)
 
     if request.form.get("change_currency") in ('GBP', 'EUR'):
         set_user_currency(request.form.get("change_currency"))
@@ -276,7 +287,10 @@ def pay():
             app.logger.warn("User's basket has changed value %s -> %s", form.basket_total.data, total)
             flash("""The tickets you selected have changed, possibly because you had two windows open.
                   Please verify that you've selected the correct tickets.""")
-            return redirect(url_for('tickets.pay'))
+            if admissions:
+                return redirect(url_for('tickets.pay'))
+            else:
+                return redirect(url_for('tickets.pay', extra='other'))
 
         if current_user.is_anonymous():
             try:
@@ -297,12 +311,18 @@ def pay():
         except TicketLimitException as e:
             app.logger.warn('Limit exceeded creating tickets: %s', e)
             flash("We're sorry, we were unable to reserve your tickets. %s" % e)
-            return redirect(url_for('tickets.choose'))
+            if admissions:
+                return redirect(url_for('tickets.choose'))
+            else:
+                return redirect(url_for('tickets.choose', extra='other'))
 
         if not payment:
             app.logger.warn('Unable to add payment and tickets to database')
             flash("We're sorry, your session information has been lost. Please try ordering again.")
-            return redirect(url_for('tickets.choose'))
+            if admissions:
+                return redirect(url_for('tickets.choose'))
+            else:
+                return redirect(url_for('tickets.choose', extra='other'))
 
         if payment_type == GoCardlessPayment:
             return gocardless_start(payment)
@@ -315,7 +335,8 @@ def pay():
 
     return render_template('payment-choose.html', form=form,
                            basket=basket, total=total, StripePayment=StripePayment,
-                           is_anonymous=current_user.is_anonymous())
+                           is_anonymous=current_user.is_anonymous(),
+                           admissions=admissions)
 
 
 class TicketTransferForm(Form):

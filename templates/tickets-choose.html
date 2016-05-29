@@ -1,12 +1,18 @@
 {% extends "base.html" %}
-{% block title %}Buy Tickets{% endblock %}
+{% block title %}
+{% if admissions %}
+Buy Tickets
+{% else %}
+Buy Items
+{% endif %}
+{% endblock %}
 {% block body %}
 <div class="well">
 {% if admissions %}
     {% include 'ticket-blurb.html' %}
 {% else %}
     <p>
-      By buying a ticket you are agreeing to our <a href="{{url_for('payments.terms')}}">Terms
+      By buying a ticket, reservation or item you are agreeing to our <a href="{{url_for('payments.terms')}}">Terms
       and Conditions</a> and the <a href="{{url_for('base.code_of_conduct')}}">Code of Conduct</a>.
     </p>
 {% endif %}
@@ -33,7 +39,11 @@
 
 <thead>
 <tr>
+    {% if admissions %}
     <th>Ticket Type</th>
+    {% else %}
+    <th>Item Type</th>
+    {% endif %}
     <th>Cost</th>
     <th>Amount</th>
 </tr>
@@ -88,9 +98,9 @@
 
 <div class="form-actions pull-right">
     {% if admissions %}
-    {{ form.buy_tickets(class_="btn btn-success btn-lg debounce") }}
-    {% else %}
     {{ form.buy(class_="btn btn-success btn-lg debounce") }}
+    {% else %}
+    {{ form.buy_other(class_="btn btn-success btn-lg debounce") }}
     {% endif %}
 </div>
 
