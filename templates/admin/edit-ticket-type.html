@@ -1,4 +1,5 @@
 {% extends "admin/base.html" %}
+{% from "_formhelpers.html" import render_field, render_static %}
 {% set nav_active = 'ticket_types' %}
 {% block body %}
 
@@ -6,42 +7,19 @@
 
 <form method="post" class="form-horizontal">
 {{ form.hidden_tag() }}
-<div class="form-group">{{ form.name.label(class_="col-sm-4 control-label") }}
-  <div class="col-sm-8">{{ form.name(class_="form-control") }}</div>
-</div>
-<div class="form-group">{{ form.order.label(class_="col-sm-4 control-label") }}
-  <div class="col-sm-8">{{ form.order(class_="form-control") }}</div>
-</div>
-<div><div class="col-sm-4 text-right"><strong>Admits</strong></div>
-  <div class="col-sm-8">{{ ticket_type.admits }}</div>
-</div>
-<div class="form-group">{{ form.type_limit.label(class_="col-sm-4 control-label") }}
-  <div class="col-sm-8">{{ form.type_limit(class_="form-control") }}</div>
-</div>
-<div class="form-group">{{ form.personal_limit.label(class_="col-sm-4 control-label") }}
-  <div class="col-sm-8">{{ form.personal_limit(class_="form-control") }}</div>
-</div>
-<div class="form-group">{{ form.expires.label(class_="col-sm-4 control-label") }}
-  <div class="col-sm-8">{{ form.expires(class_="form-control", placeholder="YYYY-MM-DD") }}</div>
-</div>
-<div><div class="col-sm-4 text-right"><strong>Price</strong> (£)</div>
-  <div class="col-sm-8">{{ ticket_type.get_price('GBP') }}</div>
-</div>
-<div><div class="col-sm-4 text-right"><strong>Price</strong> (€)</div>
-  <div class="col-sm-8">{{ ticket_type.get_price('EUR') }}</div>
-</div>
-<div class="form-group">{{ form.has_badge.label(class_="col-sm-4 control-label") }}
-  <div class="col-sm-8">{{ form.has_badge(class_="form-control") }}</div>
-</div>
-<div class="form-group">{{ form.is_transferable.label(class_="col-sm-4 control-label") }}
-  <div class="col-sm-8">{{ form.is_transferable(class_="form-control") }}</div>
-</div>
-<div class="form-group">{{ form.discount_token.label(class_="col-sm-4 control-label") }}
-  <div class="col-sm-8">{{ form.discount_token(class_="form-control") }}</div>
-</div>
-<div class="form-group">{{ form.description.label(class_="col-sm-4 control-label") }}
-  <div class="col-sm-8">{{ form.description(class_="form-control", rows="4", cols="50") }}</div>
-</div>
+
+{{ render_field(form.name, horizontal=8) }}
+{{ render_field(form.order, horizontal=8) }}
+{{ render_static(form.admits, horizontal=8) }}
+{{ render_field(form.type_limit, horizontal=8) }}
+{{ render_field(form.personal_limit, horizontal=8) }}
+{{ render_field(form.expires, horizontal=8, placeholder="YYYY-MM-DD") }}
+{{ render_static(form.price_gbp, horizontal=8) }}
+{{ render_static(form.price_eur, horizontal=8) }}
+{{ render_field(form.has_badge, horizontal=8) }}
+{{ render_field(form.is_transferable, horizontal=8) }}
+{{ render_field(form.discount_token, horizontal=8) }}
+{{ render_field(form.description, horizontal=8, rows="4", cols="50") }}
 
 <div class="pull-right">{{ form.submit(class_="btn btn-success debounce") }}</div>
 </form>

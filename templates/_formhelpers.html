@@ -47,6 +47,44 @@
 </div>
 {% endmacro %}
 
+{% macro render_static(field, horizontal=False) %}
+
+{% if caller %}
+    {% set help_text = caller() %}
+{% endif %}
+
+{% if horizontal == True %}
+    {% set horizontal = 10 %}
+{% endif %}
+
+{% if horizontal != False %}
+    {% set labelw = 12 - horizontal %}
+    {% set fieldw = horizontal %}
+{% endif %}
+
+{% if help_text or field.errors %}
+    {# If we have help text, add an aria-describedby attribute to the field. #}
+    {% do kwargs.update({'aria-describedby': "help-block-" + field.name}) %}
+{% endif %}
+
+<div class="form-group {%- if field.errors %} has-error {%- endif %}">
+    <label class="{% if horizontal -%} col-sm-{{labelw}} {% endif -%} control-label">
+        {{ field.label.text }}
+    </label>
+    <div class="{% if horizontal -%} col-sm-{{fieldw}} {% endif -%} controls">
+        {{ field(**kwargs)|safe }}
+        {% if field.errors %}
+            {% for error in field.errors %}
+            <p class="help-block" id="help-block-{{field.name}}">{{ error }}</pa>
+              {% endfor %}
+        {% elif help_text %}
+            <p class="help-block" id="help-block-{{field.name}}">{{ help_text }}</p>
+        {% endif -%}
+    </div>
+</div>
+{% endmacro %}
+
+
 {% macro render_dl_field(field) %}
 {% if field.errors %}
     {# If we have help text, add an aria-describedby attribute to the field. #}

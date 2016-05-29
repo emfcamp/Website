@@ -30,7 +30,7 @@ from models.ticket import (
 from models.cfp import Proposal
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS
 from .common import feature_enabled, require_permission, send_template_email
-from .common.forms import Form, IntegerSelectField, HiddenIntegerField
+from .common.forms import Form, IntegerSelectField, HiddenIntegerField, StaticField
 from .payments.stripe import (
     StripeUpdateUnexpected, StripeUpdateConflict, stripe_update_payment,
 )
@@ -270,13 +270,19 @@ def ticket_types():
     types = TicketType.query.all()
     return render_template('admin/ticket-types.html', ticket_types=types, totals=totals)
 
+ADMITS_LABELS = [('full', 'Adult'), ('kid', 'Under 16'),
+                 ('campervan', 'Campervan'), ('car', 'Car'),
+                 ('other', 'Other')]
 
 class EditTicketTypeForm(Form):
     name = StringField('Name')
     order = IntegerField('Order')
+    admits = StaticField('Admits')
     type_limit = IntegerField('Maximum tickets to sell')
     personal_limit = IntegerField('Maximum tickets to sell to an individual')
     expires = DateField('Expiry Date (Optional)', [Optional()])
+    price_gbp = StaticField('Price (GBP)')
+    price_eur = StaticField('Price (EUR)')
     has_badge = BooleanField('Issue Badge')
     is_transferable = BooleanField('Transferable')
     discount_token = StringField('Discount token', [Optional(), Regexp('^[-_0-9a-zA-Z]+$')])
@@ -286,9 +292,12 @@ class EditTicketTypeForm(Form):
     def init_with_ticket_type(self, ticket_type):
         self.name.data = ticket_type.name
         self.order.data = ticket_type.order
+        self.admits.data = dict(ADMITS_LABELS)[ticket_type.admits]
         self.type_limit.data = ticket_type.type_limit
         self.personal_limit.data = ticket_type.personal_limit
         self.expires.data = ticket_type.expires
+        self.price_gbp.data = ticket_type.get_price('GBP')
+        self.price_eur.data = ticket_type.get_price('EUR')
         self.has_badge.data = ticket_type.has_badge
         self.is_transferable.data = ticket_type.is_transferable
         self.description.data = ticket_type.description
@@ -327,9 +336,7 @@ def edit_ticket_type(type_id):
 class NewTicketTypeForm(Form):
     name = StringField('Name')
     order = IntegerField('Order')
-    admits = RadioField('Admits', choices=[('full', 'Adult'), ('kid', 'Under 16'),
-                                           ('campervan', 'Campervan'), ('car', 'Car'),
-                                           ('other', 'Other')])
+    admits = RadioField('Admits', choices=ADMITS_LABELS)
     type_limit = IntegerField('Maximum tickets to sell')
     personal_limit = IntegerField('Maximum tickets to sell to an individual')
     expires = DateField('Expiry Date (Optional)', [Optional()])
