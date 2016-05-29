@@ -12,7 +12,7 @@ from wtforms.validators import Optional, Regexp, Required, Email, ValidationErro
 from wtforms.widgets import TextArea
 from wtforms import (
     SubmitField, BooleanField, StringField, RadioField, HiddenField,
-    DateField, IntegerField, FieldList, FormField, SelectField
+    DateField, IntegerField, DecimalField, FieldList, FormField, SelectField,
 )
 from wtforms.fields.html5 import EmailField
 
@@ -333,8 +333,8 @@ class NewTicketTypeForm(Form):
     type_limit = IntegerField('Maximum tickets to sell')
     personal_limit = IntegerField('Maximum tickets to sell to an individual')
     expires = DateField('Expiry Date (Optional)', [Optional()])
-    price_gbp = IntegerField('Price (GBP)')
-    price_eur = IntegerField('Price (EUR)')
+    price_gbp = DecimalField('Price (GBP)')
+    price_eur = DecimalField('Price (EUR)')
     has_badge = BooleanField('Issue Badge')
     is_transferable = BooleanField('Transferable')
     discount_token = StringField('Discount token', [Optional(), Regexp('^[-_0-9a-zA-Z]+$')])
