@@ -414,8 +414,10 @@ def receipt(ticket_ids=None):
         tickets = current_user.tickets
 
     tickets = tickets.filter_by(paid=True) \
-        .join(Payment).filter(~Payment.state.in_(['cancelled'])) \
-        .join(TicketType).order_by(TicketType.order)
+        .join(TicketType).outerjoin(Payment).filter(
+            or_(Payment.id.is_(None),
+            Payment.state != "cancelled")
+        ).order_by(TicketType.order)
 
     if ticket_ids is not None:
         ticket_ids = map(int, ticket_ids.split(','))
