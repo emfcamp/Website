@@ -465,7 +465,7 @@ class MakeUsers(Command):
 
 class UpdateSegments(Command):
     def run(self):
-        segment_name = 'Ticketholders 2016'
+        segment_name = 'Ticketholders'
         segment_id = None
 
         tix = Ticket.query.filter_by(paid=True).join(User).\
