@@ -20,6 +20,7 @@ from models.permission import Permission
 from apps.tickets import render_receipt, render_pdf
 from apps.payments import banktransfer
 from unicodecsv import DictReader
+from mailsnake import MailSnake
 
 
 class CreateDB(Command):
@@ -462,6 +463,31 @@ class MakeUsers(Command):
         db.session.commit()
 
 
+class UpdateSegments(Command):
+    def run(self):
+        segment_name = 'Ticketholders 2016'
+        segment_id = None
+
+        tix = Ticket.query.filter_by(paid=True).join(User).\
+            group_by(User).with_entities(User).order_by(User.id)
+        email_addresses = [ticket.email for ticket in tix]
+
+        ms = MailSnake(app.config['MAILCHIMP_KEY'])
+        segments = ms.listStaticSegments(id=app.config['MAILCHIMP_LIST'])
+
+        for segment in segments:
+            if segment['name'] == segment_name:
+                segment_id = segment['id']
+
+        if segment_id is None:
+            segment_id = ms.listStaticSegmentAdd(id=app.config['MAILCHIMP_LIST'], name=segment_name)
+
+        results = ms.listStaticSegmentMembersAdd(id=app.config['MAILCHIMP_LIST'],
+                                                 seg_id=segment_id, batch=email_addresses)
+        app.logger.info("Segment updated. Success: %s, failed: %s", results['success'],
+                        len(results['errors']))
+
+
 if __name__ == "__main__":
     manager = Manager(create_app())
     manager.add_command('createdb', CreateDB())
@@ -480,5 +506,7 @@ if __name__ == "__main__":
     manager.add_command('createperms', CreatePermissions())
     manager.add_command('makeadmin', MakeAdmin())
     manager.add_command('makeusers', MakeUsers())
+
+    manager.add_command('updatesegments', UpdateSegments())
 
     manager.run()
