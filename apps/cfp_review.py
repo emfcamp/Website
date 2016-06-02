@@ -31,7 +31,7 @@ admin_required = require_permission('admin')  # Decorator to require admin permi
 anon_required = require_permission('cfp_anonymiser')
 review_required = require_permission('cfp_reviewer')
 ordered_states = ['edit', 'new', 'locked', 'checked', 'rejected', 'anonymised',
-                  'anon-blocked', 'reviewed', 'accepted', 'finished']
+                  'anon-blocked', 'manual-review', 'reviewed', 'accepted', 'finished']
 
 
 @cfp_review.context_processor

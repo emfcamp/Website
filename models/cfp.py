@@ -10,6 +10,7 @@ CFP_STATES = { 'edit': ['accepted', 'rejected', 'new'],
                'anonymised': ['accepted', 'rejected', 'reviewed', 'edit'],
                'anon-blocked': ['accepted', 'rejected', 'reviewed', 'edit'],
                'reviewed': ['accepted', 'rejected', 'edit'],
+               'manual-review': ['accepted', 'rejected', 'edit'],
                'accepted': ['accepted', 'rejected', 'finished'],
                'finished': ['accepted', 'rejected'] }
 
