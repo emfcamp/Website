@@ -28,5 +28,47 @@
 </table>
 {{ form.change(class_="btn btn-success pull-right") }}
 </form>
+<div class="row">&nbsp;</div>
+
+<h3>Tickets</h3>
+<table class="table table-condensed">
+    <tr>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Checked in?</th>
+    </tr>
+    {% for ticket in user.tickets %}
+        <tr>
+            <td>{{ ticket.type.name }}</td>
+            <td>{% if ticket.paid -%}
+                Paid
+            {%- elif ticket.expired -%}
+                Expired
+            {%- else -%}
+                --
+            {%- endif %}</td>
+            <td>{% if ticket.checkin %}Yes{% else %}No{% endif %}</td>
+        </tr>
+    {% endfor %}
+</table>
+<div class="row">&nbsp;</div>
+
+<h3>Proposals</h3>
+<table class="table table-condensed">
+    <tr>
+        <th>Title</th>
+        <th>Type</th>
+        <th>State</th>
+    </tr>
+    {% for proposal in user.proposals %}
+        <tr>
+            <td>
+                <a href="{{ url_for('cfp_review.update_proposal', proposal_id = proposal.id ) }}">{{ proposal.title }}</a>
+            </td>
+            <td>{{ proposal.type }}</td>
+            <td>{{ proposal.state }}</td>
+        </tr>
+    {% endfor %}
+</table>
 
 {% endblock %}
