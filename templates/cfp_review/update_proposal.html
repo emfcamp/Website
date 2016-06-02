@@ -15,7 +15,9 @@
             <dt>Date</dt>
             <dd>{{proposal.created.strftime("%Y-%m-%d %H:%M")}}</dd>
             <dt>Submitter</dt>
-            <dd>{{proposal.user.name}}</dd>
+            <dd>
+                <a href="{{ url_for('admin.user', user_id=proposal.user.id) }}">{{proposal.user.name}}</a>
+            </dd>
             <dt>E-Mail</dt>
             <dd>{{proposal.user.email}}</dd>
             <dt>Anoymised by</dt>

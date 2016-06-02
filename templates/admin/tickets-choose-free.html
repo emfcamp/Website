@@ -10,8 +10,8 @@
 {% if user %}
 <p>To allocate free tickets to this user, choose the number of tickets:</p>
 <dl>
-  <dt>Name</dt><dd>{{ user.name }}
-  <dt>Email</dt><dd>{{ user.email }}
+  <dt>Name</dt><dd><a href="{{ url_for('.user', user_id=user.id) }}">{{ user.name }}</a></dd>
+  <dt>Email</dt><dd>{{ user.email }}</dd>
 </dl>
 {% else %}
 <p>To allocate free tickets, pick a user below or enter details for a new account:</p>

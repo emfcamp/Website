@@ -5,7 +5,7 @@
 {% set active='messages' %}
 {% include "cfp_review/_propsal_tabs.html" %}
 
-<h4>{{ proposal.title }} <small>by {{ proposal.user.name }}</small></h4>
+<h4>{{ proposal.title }} <small>by <a href="{{ url_for('admin.user', user_id=proposal.user.id) }}">{{proposal.user.name}}</a></small></h4>
 <p class="multiline">{{ proposal.description }}</p>
 <p>&nbsp;</p>
 

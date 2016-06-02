@@ -14,8 +14,8 @@
   <tr>
     <td>{{ trans.timestamp.strftime('%d %b %Y') }}</td>
     <td>{{ trans.ticket.type.name }}</td>
-    <td>{{ trans.from_user.name }}</td>
-    <td>{{ trans.to_user.name }}</td>
+    <td><a href="{{ url_for('.user', user_id=trans.from_user.id) }}">{{ trans.from_user.name }}</a></td>
+    <td><a href="{{ url_for('.user', user_id=trans.to_user.id) }}">{{ trans.to_user.name }}</a></td>
   </tr>
 
   {% endfor %}
