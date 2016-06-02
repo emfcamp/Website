@@ -1,0 +1,21 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'list_free_tickets' %}
+{% block body %}
+
+<h2>Complimentary Tickets Given</h2>
+<table class="table table-condensed table-striped">
+  <tr>
+    <th>Ticket Type</th>
+    <th>Name</th>
+  </tr>
+  {% for ticket in free_tickets %}
+    <tr>
+      <td>{{ ticket.type.name }}</td>
+      <td>
+        <a href="{{ url_for('.user', user_id=ticket.user.id) }}">{{ ticket.user.name }}</a>
+      </td>
+    </tr>
+  {% endfor %}
+</table>
+
+{% endblock %}

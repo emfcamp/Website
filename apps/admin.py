@@ -491,6 +491,24 @@ def tickets_choose_free(user_id=None):
     return render_template('admin/tickets-choose-free.html',
                            form=form, tts=free_tts, user=user, users=users)
 
+@admin.route('/tickets/list-free')
+@admin_required
+def list_free_tickets():
+    free_tickets = Ticket.query\
+        .join(TicketType)\
+        .join(TicketPrice)\
+        .filter(
+            TicketType.id == Ticket.type_id,
+            TicketType.id == TicketPrice.code,
+            TicketPrice.price_int == 0
+        ).order_by(
+            Ticket.user_id,
+            TicketType.order
+        ).all()
+
+    return render_template('admin/tickets-list-free.html',
+                           free_tickets=free_tickets)
+
 
 @admin.route('/transfers')
 @admin_required
