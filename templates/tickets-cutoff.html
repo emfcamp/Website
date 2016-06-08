@@ -25,7 +25,9 @@
                 {% include "home/_mailchimp_form.html" %}
         {% endif %}
 
+        {% if SALES_STATE != 'sales-ended' %}
         <p>To order additional items, such as parking tickets or village tents, please
             <a href="{{ url_for('tickets.choose', flow='other') }}">click here</a>.
+        {% endif %}
     </div>
 {% endblock %}

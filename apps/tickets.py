@@ -163,9 +163,10 @@ def choose(flow=None):
     else:
         abort(404)
 
-    if sales_state == 'unavailable':
+    if sales_state in ['unavailable', 'sold-out']:
         # For the main entry point, we assume people want admissions tickets,
-        # but we still need to sell people e.g. parking tickets until cut-off.
+        # but we still need to sell people e.g. parking tickets or tents until
+        # the final cutoff (sales-ended).
         if not admissions:
             sales_state = 'available'
 
