@@ -246,7 +246,7 @@ class GoCardlessPayment(Payment):
 
             if bill.can_be_cancelled:
                 bill.cancel()
-            else:
+            elif bill.status != 'cancelled':
                 raise StateException('GoCardless payment %s cannot be cancelled.' % self.id)
 
         super(GoCardlessPayment, self).cancel()
