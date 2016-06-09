@@ -24,6 +24,8 @@
           Awaiting anonymisation
         {% elif proposal.state == 'rejected' %}
           Rejected, please check your <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">messages</a>
+        {% elif proposal.state == 'cancelled' %}
+          Cancelled
         {% elif proposal.state == 'anonymised' %}
           Awaiting review
         {% elif proposal.state == 'reviewed' %}
