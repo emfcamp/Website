@@ -30,8 +30,10 @@ cfp_review = Blueprint('cfp_review', __name__)
 admin_required = require_permission('admin')  # Decorator to require admin permissions
 anon_required = require_permission('cfp_anonymiser')
 review_required = require_permission('cfp_reviewer')
-ordered_states = ['edit', 'new', 'locked', 'checked', 'rejected', 'anonymised',
-                  'anon-blocked', 'manual-review', 'reviewed', 'accepted', 'finished']
+ordered_states = [
+    'edit', 'new', 'locked', 'checked', 'rejected', 'cancelled', 'anonymised',
+    'anon-blocked', 'manual-review', 'reviewed', 'accepted', 'finished'
+]
 
 
 @cfp_review.context_processor
