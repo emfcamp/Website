@@ -465,6 +465,20 @@ class MakeUsers(Command):
 
 class UpdateSegments(Command):
     def run(self):
+        self.update_ticketholders_list()
+        self.update_main_list_segment()
+
+    def update_ticketholders_list(self):
+        ms = MailSnake(app.config['MAILCHIMP_KEY'])
+        list_id = '5f939ca32a'  # Ticketholders 2016
+        tix = Ticket.query.filter_by(paid=True).join(User).\
+            group_by(User).with_entities(User).order_by(User.id)
+        email_addresses = [{'EMAIL': ticket.email, 'EMAIL_TYPE': 'html'} for ticket in tix]
+        res = ms.listBatchSubscribe(id=list_id, batch=email_addresses,
+                                    double_optin=False, update_existing=True)
+        print(res)
+
+    def update_main_list_segment(self):
         segment_name = 'Ticketholders'
         segment_id = None
 
