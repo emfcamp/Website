@@ -289,7 +289,10 @@ class Ticket(db.Model):
             attrs.append('paid')
         if self.expired:
             attrs.append('expired')
-        return "<Ticket %s: %s>" % (self.id, ', '.join(attrs))
+        if self.id is None:
+            return "<Ticket %s: %s>" % (self.type.name, ', '.join(attrs))
+        else:
+            return "<Ticket %s %s: %s>" % (self.id, self.type.name, ', '.join(attrs))
 
     def transfer(self, from_user, to_user):
         """
@@ -324,7 +327,7 @@ class TicketTransfer(db.Model):
 
     def __repr__(self):
         return "<Transfer Ticket: %s from %s to %s on %s>" % (
-            self.ticket_id, self.from_user_id, self.to_user_id, self.datetime)
+            self.ticket_id, self.from_user_id, self.to_user_id, self.timestamp)
 
 
 class TicketAttrib(db.Model):
