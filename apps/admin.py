@@ -268,7 +268,7 @@ def tickets():
 @admin_required
 def tickets_unpaid():
     tickets = Ticket.query.filter(
-        Ticket.paid == False,
+        ~Ticket.paid,
     ).order_by(Ticket.id).all()
 
     return render_template('admin/tickets.html', tickets=tickets)
