@@ -4,7 +4,7 @@ from flask import request, _request_ctx_stack
 from flask_mail import email_dispatched
 
 if __name__ == "__main__":
-    app = create_app()
+    app = create_app(dev_server=True)
     if app.config.get('DEBUG'):
         with app.app_context():
             db.create_all()

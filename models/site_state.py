@@ -1,11 +1,16 @@
 # coding=utf-8
 from __future__ import division, absolute_import, print_function, unicode_literals
 from datetime import datetime
-from main import cache
+from main import cache, db
 from models.ticket import TicketType
 
+class SiteState(db.Model):
+    __tablename__ = 'site_state'
+    name = db.Column(db.String, primary_key=True)
+    state = db.Column(db.String)
 
-def get_site_state(date):
+
+def calc_site_state(date):
     """ Logic to set the state of the homepage based on date. """
     if date < datetime(2015, 12, 14, 20):
         return "before-sales"
@@ -16,9 +21,7 @@ def get_site_state(date):
     else:
         return "after-event"
 
-
-@cache.cached(timeout=60, key_prefix='get_sales_state')
-def get_sales_state(date):
+def calc_sales_state(date):
     if TicketType.get_tickets_remaining() < 1:
         # We've hit capacity - no more tickets will be sold
         return "sold-out"
@@ -29,3 +32,32 @@ def get_sales_state(date):
         return "unavailable"
     else:
         return "available"
+
+
+@cache.cached(timeout=60, key_prefix='get_states')
+def get_states():
+    states = SiteState.query.all()
+    states = {s.name: s.state for s in states}
+
+    date = datetime.utcnow()
+
+    if states.get('site_state') is None:
+        states['site_state'] = calc_site_state(date)
+
+    if states.get('sales_state') is None:
+        states['sales_state'] = calc_sales_state(date)
+
+    return states
+
+def refresh_states():
+    key = get_states.make_cache_key()
+    cache.delete(key)
+
+def get_site_state():
+    states = get_states()
+    return states['site_state']
+
+def get_sales_state():
+    states = get_states()
+    return states['sales_state']
+

@@ -29,6 +29,7 @@ itsdangerous==0.24
 flask-cdn==1.5.0
 Flask-DebugToolbar==0.10.0
 flask-cache==0.13.1
+python-memcached==1.58
 
 # database
 Flask-SQLAlchemy==2.1

@@ -20,7 +20,7 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.functions import func
 
-from main import db, mail, cache
+from main import db, mail
 from models.user import User
 from models.permission import Permission
 from models.payment import Payment, BankPayment, BankTransaction, StateException
@@ -28,8 +28,8 @@ from models.ticket import (
     Ticket, TicketCheckin, TicketType, TicketPrice, TicketTransfer
 )
 from models.cfp import Proposal
-from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS
-from .common import feature_enabled, require_permission, send_template_email
+from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
+from .common import require_permission, send_template_email
 from .common.forms import Form, IntegerSelectField, HiddenIntegerField, StaticField
 from .payments.stripe import (
     StripeUpdateUnexpected, StripeUpdateConflict, stripe_update_payment,
@@ -783,7 +783,7 @@ def feature_flags():
                 app.logger.info('Updating flag %s to %s', feature, flg.enabled.data)
                 db_flag_dict[feature].enabled = flg.enabled.data
                 db.session.commit()
-                cache.delete_memoized(feature_enabled, feature)
+                refresh_flags()
 
         # Add new flags if required
         if form.new_feature.data:
@@ -793,9 +793,7 @@ def feature_flags():
             app.logger.info('Overriding new flag %s to %s', new_flag.feature, new_flag.enabled)
             db.session.add(new_flag)
             db.session.commit()
-
-            # Clear the cache for which would have previously returned None
-            cache.delete_memoized(feature_enabled, new_flag.feature)
+            refresh_flags()
 
             db_flags = FeatureFlag.query.all()
 

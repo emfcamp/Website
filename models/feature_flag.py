@@ -1,4 +1,4 @@
-from main import db
+from main import db, cache
 
 # feature flags that can be overridden in the DB
 DB_FEATURE_FLAGS = [
@@ -22,4 +22,15 @@ class FeatureFlag(db.Model):
     def __init__(self, feature, enabled=False):
         self.feature = feature
         self.enabled = enabled
+
+@cache.cached(timeout=60, key_prefix='get_db_flags')
+def get_db_flags():
+    flags = FeatureFlag.query.all()
+    flags = {f.feature: f.enabled for f in flags}
+
+    return flags
+
+def refresh_flags():
+    key = get_db_flags.make_cache_key()
+    cache.delete(key)
 

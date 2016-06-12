@@ -386,3 +386,7 @@ def check_capacity(session, flush_context, instances):
     if total_admissions > app.config.get('MAXIMUM_ADMISSIONS'):
         raise TicketLimitException('No more admission tickets available')
 
+    # Clear cached state based on number of available tickets
+    refresh_states()
+
+from models.site_state import refresh_states

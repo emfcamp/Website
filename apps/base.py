@@ -1,7 +1,6 @@
 import os
 import csv
 import json
-from datetime import datetime
 from mailsnake import MailSnake
 from mailsnake.exceptions import (
     MailSnakeException, ListAlreadySubscribedException,
@@ -29,7 +28,7 @@ def main():
         # Only card payment left
         full_price += StripePayment.premium('GBP', full_price)
 
-    state = get_site_state(datetime.now())
+    state = get_site_state()
     if app.config.get('DEBUG'):
         state = request.args.get("site_state", state)
 

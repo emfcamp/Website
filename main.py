@@ -70,7 +70,7 @@ assets.register('js_main', Bundle('js/main.js',
                 output='gen/main-packed.js', filters='jsmin'))
 
 
-def create_app():
+def create_app(dev_server=False):
     app = Flask(__name__)
     app.config.from_envvar('SETTINGS_FILE')
     app.jinja_options['extensions'].append('jinja2.ext.do')
@@ -87,6 +87,7 @@ def create_app():
     app.login_manager.login_view = 'users.login'
 
     from models.user import User
+    from models import site_state, feature_flag
 
     @login_manager.user_loader
     def load_user(userid):
@@ -104,6 +105,11 @@ def create_app():
 
         stripe.api_key = app.config['STRIPE_SECRET_KEY']
 
+        @app.before_request
+        def load_per_request_state():
+            site_state.get_states()
+            feature_flag.get_db_flags()
+
     if app.config.get('DEBUG'):
         # Prevent staging site from being displayed on Google
         @app.after_request
@@ -118,6 +124,11 @@ def create_app():
             if os.getpid() != ppid:
                 db.engine.dispose()
                 random.seed()
+
+    @app.before_request
+    def simple_cache_warning():
+        if not dev_server and app.config.get('CACHE_TYPE', 'null') == 'simple':
+            logging.warn('Per-process cache being used outside dev server - refreshing will not work')
 
     @app.after_request
     def send_security_headers(response):

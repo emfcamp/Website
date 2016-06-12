@@ -1,14 +1,13 @@
 # encoding=utf-8
 from decorator import decorator
-from datetime import datetime
 
-from main import db, mail, external_url, cache
+from main import db, mail, external_url
 from flask import session, render_template, abort, current_app as app, request
 from flask.ext.login import login_user, current_user
 
 from models.ticket import Ticket, TicketType
 from models.site_state import get_site_state, get_sales_state
-from models.feature_flag import FeatureFlag
+from models.feature_flag import get_db_flags
 from models import User
 
 from flask_mail import Message
@@ -47,9 +46,8 @@ def load_utility_functions(app_obj):
 
     @app_obj.context_processor
     def utility_processor():
-        now = datetime.utcnow()
-        SALES_STATE = get_sales_state(now)
-        SITE_STATE = get_site_state(now)
+        SALES_STATE = get_sales_state()
+        SITE_STATE = get_site_state()
 
         if app.config.get('DEBUG'):
             SITE_STATE = request.args.get("site_state", SITE_STATE)
@@ -152,14 +150,15 @@ def require_permission(permission):
     return decorator(call)
 
 
-@cache.memoize(timeout=30)
 def feature_enabled(feature):
     """
     If a feature flag is defined in the database return that,
     otherwise fall back to the config setting.
     """
-    db_flag = FeatureFlag.query.get(feature)
-    if db_flag:
-        return db_flag.enabled
+    db_flags = get_db_flags()
+
+    if feature in db_flags:
+        return db_flags[feature]
 
     return app.config.get(feature, False)
+

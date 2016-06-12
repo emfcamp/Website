@@ -154,7 +154,7 @@ class TicketAmountsForm(Form):
 @feature_flag('TICKET_SALES')
 def choose(flow=None):
     token = session.get('ticket_token')
-    sales_state = get_sales_state(datetime.utcnow())
+    sales_state = get_sales_state()
 
     if flow is None:
         admissions = True
