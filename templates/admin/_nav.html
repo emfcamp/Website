@@ -28,7 +28,8 @@
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
             aria-haspopup="true" aria-expanded="false">Tickets <span class="caret"></span></a>
         <ul class="dropdown-menu">
-            {{ menuitem("All", ".tickets") }}
+            {{ menuitem("Paid", ".tickets") }}
+            {{ menuitem("Unpaid", ".tickets_unpaid") }}
             {{ menuitem("Transfers", ".ticket_transfers") }}
             {{ menuitem("Ticket Types", ".ticket_types") }}
             {{ menuitem("Free Tickets", ".tickets_choose_free") }}
