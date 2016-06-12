@@ -31,7 +31,7 @@
 </tr></thead>
 <tbody>
 {% for type in ticket_types|sort(attribute='order') %}
-<tr class="ticket-type {% if type.expired -%} expired {%- endif %}">
+<tr class="ticket-type {% if type.expired or type.get_sold().count() >= type.type_limit -%} expired {%- endif %}">
     <td><a href="{{ url_for('.ticket_type_details', type_id=type.id) }}">{{ type.name }}</a></td>
     <td>{{ type.order }}</td>
     <td>{{ type.admits }}</td>
