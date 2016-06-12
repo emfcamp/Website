@@ -495,13 +495,14 @@ def tickets_choose_free(user_id=None):
 @admin.route('/tickets/list-free')
 @admin_required
 def list_free_tickets():
-    free_tickets = Ticket.query\
-        .join(TicketType)\
-        .join(TicketPrice)\
+    # Complimentary tickets and transferred tickets can both have no payment.
+    # This page is actually intended to be a list of complimentary tickets.
+    free_tickets = Ticket.query \
+        .join(TicketType) \
         .filter(
-            TicketType.id == Ticket.type_id,
-            TicketType.id == TicketPrice.code,
-            TicketPrice.price_int == 0
+            Ticket.paid,
+            Ticket.payment_id.is_(None),
+            ~TicketTransfer.query.filter(TicketTransfer.ticket.expression).exists(),
         ).order_by(
             Ticket.user_id,
             TicketType.order
