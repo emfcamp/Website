@@ -21,6 +21,8 @@ header h1 > * {
 }
 .multiline { white-space: pre-wrap }
 
-.ticket-type.expired a {
-  text-decoration: line-through;
+.ticket-type .expired,
+.ticket-type .limit-reached {
+  font-weight: bold;
+  color: #a00;
 }
