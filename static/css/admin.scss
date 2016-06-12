@@ -20,3 +20,7 @@ header h1 > * {
     vertical-align: middle;
 }
 .multiline { white-space: pre-wrap }
+
+.ticket-type.expired a {
+  text-decoration: line-through;
+}
