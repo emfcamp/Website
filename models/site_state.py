@@ -9,6 +9,16 @@ class SiteState(db.Model):
     name = db.Column(db.String, primary_key=True)
     state = db.Column(db.String)
 
+    def __init__(self, name, state=None):
+        self.name = name
+        self.state = state
+
+
+VALID_STATES = {
+    'site_state': ["before-sales", "sales", "event", "after-event"],
+    'sales_state': ["sold-out", "sales-ended", "unavailable", "available"],
+}
+
 
 def calc_site_state(date):
     """ Logic to set the state of the homepage based on date. """

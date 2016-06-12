@@ -29,6 +29,7 @@ from models.ticket import (
 )
 from models.cfp import Proposal
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
+from models.site_state import SiteState, VALID_STATES, refresh_states
 from .common import require_permission, send_template_email
 from .common.forms import Form, IntegerSelectField, HiddenIntegerField, StaticField
 from .payments.stripe import (
@@ -812,3 +813,49 @@ def feature_flags():
         form.flags[-1].enabled.data = flg.enabled
 
     return render_template('admin/feature-flags.html', form=form)
+
+
+class SiteStateForm(Form):
+    site_state = SelectField('Site', choices=[('', '(automatic)')] +
+                             zip(VALID_STATES['site_state'], VALID_STATES['site_state']))
+    sales_state = SelectField('Sales', choices=[('', '(automatic)')] +
+                              zip(VALID_STATES['sales_state'], VALID_STATES['sales_state']))
+    update = SubmitField('Update states')
+
+
+@admin.route('/site-states', methods=['GET', 'POST'])
+@admin_required
+def site_states():
+    form = SiteStateForm()
+
+    db_states = SiteState.query.all()
+    db_states = {s.name: s for s in db_states}
+
+    if request.method != 'POST':
+        # Empty form
+        for name in VALID_STATES.keys():
+            if name in db_states:
+                getattr(form, name).data = db_states[name].state
+
+    if form.validate_on_submit():
+        for name in VALID_STATES.keys():
+            state_form = getattr(form, name)
+            if state_form.data == '':
+                state_form.data = None
+
+            if name in db_states:
+                if db_states[name].state != state_form.data:
+                    app.logger.info('Updating state %s to %s', name, state_form.data)
+                    db_states[name].state = state_form.data
+
+            else:
+                if state_form.data:
+                    state = SiteState(name, state_form.data)
+                    db.session.add(state)
+
+        db.session.commit()
+        refresh_states()
+        return redirect(url_for('.site_states'))
+
+    return render_template('admin/site-states.html', form=form)
+
