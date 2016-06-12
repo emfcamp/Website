@@ -1,0 +1,33 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'tickets' %}
+{% block body %}
+<h2>Tickets</h2>
+
+<table class="table table-condensed table-striped">
+<thead>
+  <tr>
+    <th>Full name</th>
+    <th>Email</th>
+    <th>Ticket type</th>
+    <th>Source</th>
+  </tr>
+</thead>
+<tbody>
+{% for ticket in tickets %}
+  <tr>
+    <td><a href="{{ url_for('.user', user_id=ticket.user.id) }}">{{ ticket.user.name }}</a></td>
+    <td>{{ ticket.user.email }}</td>
+    <td><a href="{{ url_for('.ticket_type_details', type_id=ticket.type.id) }}">{{ ticket.type.name }}</a></td>
+    {% if ticket.payment %}
+    <td>{{ ticket.payment.name }} {{ ticket.payment.id }}</td>
+    {% elif ticket.transfers %}
+    <td>Transferred</td>
+    {% else %}
+    <td></td>
+    {% endif %}
+  </tr>
+{% endfor %}
+</tbody>
+</table>
+
+{% endblock %}

@@ -255,6 +255,17 @@ def transaction_reconcile(txn_id, payment_id):
     return render_template('admin/txn-reconcile.html', txn=txn, payment=payment, form=form)
 
 
+@admin.route('/tickets')
+@admin_required
+def tickets():
+    tickets = Ticket.query.filter(
+        Ticket.paid,
+    ).order_by(Ticket.id).all()
+
+    return render_template('admin/tickets.html', tickets=tickets)
+
+
+
 @admin.route('/ticket-types')
 @admin_required
 def ticket_types():
