@@ -436,7 +436,7 @@ class AnonymiseProposalForm(Form):
 @anon_required
 def anonymise_proposal(proposal_id):
     prop = Proposal.query.get(proposal_id)
-    if prop.state != 'checked':
+    if prop.state in ['new', 'edit', 'locked']:
         # Make sure people only see proposals that are ready
         return abort(404)
 
