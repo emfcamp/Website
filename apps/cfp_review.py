@@ -443,7 +443,7 @@ def anonymise_proposal(proposal_id):
     next_prop = get_next_proposal_to(prop, 'checked')
     form = AnonymiseProposalForm()
 
-    if form.validate_on_submit():
+    if prop.state == 'checked' and form.validate_on_submit():
         if form.reject.data:
             prop.set_state('anon-blocked')
             prop.anonymiser_id = current_user.id

@@ -17,6 +17,7 @@
             {{ render_dl_field(form.description, tabindex=2, rows=10) }}
         </dl>
     </div>
+    {% if proposal.state == 'checked' %}
     <div class="col-md-4 col-xs-12 btn-group-vertical" role="group">
         <div>&nbsp;</div>
         <div>&nbsp;</div>
@@ -34,6 +35,7 @@
             </a>
         {% endif %}
     </div>
+    {% endif %}
 </form>
 
 {% endblock %}
