@@ -260,12 +260,6 @@ class StripePayment(Payment):
     chargeid = db.Column(db.String, unique=True)
     token = db.Column(db.String)
 
-    def cancel(self):
-        if self.state not in ['new', 'captured']:
-            raise StateException('Cannot automatically cancel charging/charged Stripe payments')
-
-        super(StripePayment, self).cancel()
-
     @property
     def description(self):
         return 'EMF 2016 tickets'
