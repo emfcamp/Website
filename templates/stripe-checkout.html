@@ -101,7 +101,7 @@ $(window).on('load', function() {
        So mobile users will probably get a popup warning. */
     setTimeout(function() {
         $('#popups-warning').removeClass('hidden');
-    }, 1000);
+    }, 2000);
     /* Stripe will time out if it can't open in 8000ms, but
        that's when running from DOMContentLoaded. */
     EMF.stripe_checkout();
