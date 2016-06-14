@@ -314,7 +314,7 @@ class StripePayment(Payment):
         charge = stripe.Charge.retrieve(self.chargeid)
 
         if not charge.refunded:
-            refund = stripe.Refund.create(charge)
+            refund = stripe.Refund.create(charge=self.chargeid)
             stripe_refund = StripeRefund(self)
             stripe_refund.refundid = refund.id
 
