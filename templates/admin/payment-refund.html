@@ -1,0 +1,39 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'admin_payments' %}
+{% block body %}
+<h2>Refund payment</h2>
+
+<p>To manually refund this payment, please click below.</p>
+
+<dl class="dl-horizontal">
+<dt>Name</dt><dd>{{ payment.user.name }}</dd>
+<dt>Email</dt><dd>{{ payment.user.email }}</dd>
+<dt>Price</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
+{%- if payment.provider == 'banktransfer' %}
+<dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
+{% elif payment.provider == 'gocardless' %}
+<dt>GoCardless ID</dt><dd>{{ payment.gcid }}</dd>
+{% endif -%}
+</dl>
+
+<table class="table table-condensed table-striped">
+<thead><tr>
+  <th>Type</th>
+  <th>Expires</th>
+</tr></thead>
+<tbody>
+{% for t in payment.tickets %}
+<tr>
+  <td>{{ t.type.name }}</td>
+  <td>{{ t.expires.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+<form method="post" action="{{ url_for('.refund_payment', payment_id=payment.id) }}" class="shrink">
+{{ form.hidden_tag() }}
+{{ form.refund(class_="btn btn-danger pull-right") }}
+</form>
+
+{% endblock %}

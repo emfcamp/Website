@@ -774,6 +774,35 @@ def cancel_payment(payment_id):
     return render_template('admin/payment-cancel.html', payment=payment, form=form)
 
 
+class RefundPaymentForm(Form):
+    refund = SubmitField("Refund payment")
+
+@admin.route('/payment/<int:payment_id>/refund', methods=['GET', 'POST'])
+@admin_required
+def refund_payment(payment_id):
+    payment = Payment.query.get_or_404(payment_id)
+
+    form = RefundPaymentForm()
+    if form.validate_on_submit():
+        if form.refund.data:
+            app.logger.info("Manually refunding payment %s", payment.id)
+            try:
+                payment.refund()
+
+            except StateException, e:
+                app.logger.warn('Could not refund payment %s: %s', payment_id, e)
+                flash('Could not refund payment due to a state error')
+                return redirect(url_for('admin.payments'))
+
+            db.session.commit()
+
+            flash("Payment refunded")
+            return redirect(url_for('admin.payments'))
+
+    return render_template('admin/payment-refund.html', payment=payment, form=form)
+
+
+
 class UpdateFeatureFlagForm(Form):
     # We don't allow changing feature flag names
     feature = HiddenField('Feature name', [Required()])

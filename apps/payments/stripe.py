@@ -314,12 +314,15 @@ def stripe_payment_paid(payment):
 
 
 def stripe_payment_refunded(payment):
-    if payment.state == 'cancelled':
-        logger.info('Payment is already cancelled, ignoring')
+    if payment.state == 'refunded':
+        logger.info('Payment is already refunded, ignoring')
         return
 
-    logger.info('Setting payment %s to cancelled', payment.id)
-    payment.cancel()
+    logger.info('Setting payment %s to refunded', payment.id)
+    # Skip the usual refund() method as we trust Stripe's opinion here
+    if payment.state != 'cancelled':
+        payment.cancel_tickets()
+    payment.state = 'refunded'
     db.session.commit()
 
     if not app.config.get('TICKETS_NOTICE_EMAIL'):
@@ -385,3 +388,4 @@ def stripe_dispute_update(type, dispute_data):
 
     # Don't block other events
     return ('', 200)
+
