@@ -1,14 +1,29 @@
 {% extends "cfp_review/base.html" %}
 {% block body %}
-<h2>CfP Proposals</h2>
+<h2>CfP Proposals <small>(showing {{ proposals | count }})</small></h2>
 
 <table class="table">
     <tr>
-        <th class="col-md-1">Date</th>
-        <th>State</th>
-        <th>Type</th>
-        <th>Submitter</th>
-        <th>Title</th>
+        {% if not request.args.get('reverse') %}
+            {% set qs_reverse_new=True %}
+        {% else %}
+            {% set qs_reverse_new=None %}
+        {% endif %}
+        <th class="col-md-1">
+            <a href="{{ url_for(sort_link_target, sort_by='date', reverse=qs_reverse_new, **new_qs) }}">Date</a>
+        </th>
+        <th>
+            <a href="{{ url_for(sort_link_target, sort_by='state', reverse=qs_reverse_new, **new_qs) }}">State</a>
+        </th>
+        <th>
+            <a href="{{ url_for(sort_link_target, sort_by='type', reverse=qs_reverse_new, **new_qs) }}">Type</a>
+        </th>
+        <th>
+            <a href="{{ url_for(sort_link_target, sort_by='user', reverse=qs_reverse_new, **new_qs) }}">User</a>
+        </th>
+        <th>
+            <a href="{{ url_for(sort_link_target, sort_by='title', reverse=qs_reverse_new, **new_qs) }}">Title</a>
+        </th>
     </tr>
 {% for proposal in proposals %}
     <tr>

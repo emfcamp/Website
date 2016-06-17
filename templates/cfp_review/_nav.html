@@ -21,9 +21,12 @@
             </a>
             <ul class="dropdown-menu">
                 {{ menuitem("All", ".proposals") }}
+                <li role="separator" class="divider"></li>
                 {{ menuitem("Talks", ".proposals", type="talk") }}
                 {{ menuitem("Workshops", ".proposals", type="workshop") }}
                 {{ menuitem("Installations", ".proposals", type="installation") }}
+                <li role="separator" class="divider"></li>
+                {{ menuitem("Needs Help", ".proposals", needs_help=True) }}
                 <li role="separator" class="divider"></li>
                 {% for state in ordered_states %}
                     {# Only show badges for locked & blocked proposals as these are what matters #}

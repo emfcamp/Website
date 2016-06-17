@@ -1,6 +1,20 @@
 {% extends "cfp_review/base.html" %}
 {% block body %}
-<h2>Votes summary</h2>
+
+{% set qs_all = 'all' in request.args or None %}
+{% set qs_reverse = request.args.get('reverse') %}
+{% set qs_sort_by = request.args.get('sort_by') %}
+
+<h2>Votes summary <small>(showing {{ proposals_with_counts | count }})</small></h2>
+<p>
+{% if qs_all %}
+    <a href="{{ url_for('.vote_summary', reverse=qs_reverse, sort_by=qs_sort_by) }}">Hide All Votes</a>
+    (only show votes on anonymised proposals)
+{% else %}
+    <a href="{{ url_for('.vote_summary', reverse=qs_reverse, sort_by=qs_sort_by, all=True) }}">Show All Votes</a>
+    (currently only showing votes on anonymised proposals)
+{% endif %}
+</p>
 
 <div class="row">
     <div class="col-md-6">
@@ -28,12 +42,29 @@
 
 <table class="table table-striped">
     <tr>
-        <th class="text-center">Date</th>
-        <th class="text-center">Notes</th>
-        <th class="text-center">Votes</th>
-        <th class="text-center">Blocked</th>
-        <th class="text-center">Recused</th>
-        <th>Proposal Title</th>
+        {% if not qs_reverse %}
+            {% set qs_reverse_new=True %}
+        {% else %}
+            {% set qs_reverse_new=None %}
+        {% endif %}
+        <th class="text-center">
+            <a href="{{ url_for('.vote_summary', sort_by='date', all=qs_all, reverse=qs_reverse_new) }}">Date</a>
+        </th>
+        <th class="text-center">
+            <a href="{{ url_for('.vote_summary', sort_by='notes', all=qs_all, reverse=qs_reverse_new) }}">Notes</a>
+        </th>
+        <th class="text-center">
+            <a href="{{ url_for('.vote_summary', sort_by='votes', all=qs_all, reverse=qs_reverse_new) }}">Votes</a>
+        </th>
+        <th class="text-center">
+            <a href="{{ url_for('.vote_summary', sort_by='blocked', all=qs_all, reverse=qs_reverse_new) }}">Blocked</a>
+        </th>
+        <th class="text-center">
+            <a href="{{ url_for('.vote_summary', sort_by='recused', all=qs_all, reverse=qs_reverse_new) }}">Recused</a>
+        </th>
+        <th>
+            <a href="{{ url_for('.vote_summary', sort_by='title', all=qs_all, reverse=qs_reverse_new) }}">Proposal Title</a>
+        </th>
     </tr>
 {% for proposal, counts in proposals_with_counts %}
     <tr>

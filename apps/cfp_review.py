@@ -51,7 +51,9 @@ def cfp_review_variables():
     ).group_by(Proposal.state).all())
     proposal_counts = {state: count_dict.get(state, 0) for state in CFP_STATES}
 
-    unread_reviewer_notes = CFPVote.query.filter(
+    unread_reviewer_notes = CFPVote.query.join(Proposal).filter(
+        Proposal.id == CFPVote.proposal_id,
+        Proposal.state == 'anonymised',
         or_(CFPVote.has_been_read.is_(False),
             CFPVote.has_been_read.is_(None))
     ).count()
@@ -81,7 +83,7 @@ def main():
     abort(404)
 
 
-def build_query_dict(parameters):
+def build_proposal_query_dict(parameters):
     res = {}
     fields = [('type', str), ('state', str), ('needs_help', bool), ('needs_money', bool)]
 
@@ -99,17 +101,43 @@ def build_query_dict(parameters):
 
     return res
 
+def get_proposal_sort_dict(parameters):
+    sort_keys = {
+        'state': lambda p: (p.state, p.modified, p.title),
+        'date': lambda p: (p.modified, p.title),
+        'type': lambda p: (p.type, p.title),
+        'user': lambda p: (p.user.name, p.title),
+        'title': lambda p: p.title,
+    }
+
+    sort_by_key = parameters.get('sort_by')
+    return {
+        'key': sort_keys.get(sort_by_key, sort_keys['state']),
+        'reverse': bool(parameters.get('reverse'))
+    }
+
 
 @cfp_review.route('/proposals')
 @admin_required
 def proposals():
-    query_dict = build_query_dict(request.args)
+    query_dict = build_proposal_query_dict(request.args)
 
-    proposals = Proposal.query.filter_by(**query_dict)\
-                              .order_by('state', 'modified', 'id').all()
+    proposals = Proposal.query.filter_by(**query_dict).all()
+
+    sort_dict = get_proposal_sort_dict(request.args)
+    proposals.sort(**sort_dict)
+
+    non_sort_query_string = dict(request.args)
+    if 'sort_by' in non_sort_query_string:
+        del non_sort_query_string['sort_by']
+
+    if 'reverse' in non_sort_query_string:
+        del non_sort_query_string['reverse']
 
     return render_template('cfp_review/proposals.html', proposals=proposals,
-                           link_target='.update_proposal')
+                           link_target='.update_proposal',
+                           sort_link_target='.proposals',
+                           new_qs=non_sort_query_string)
 
 
 class UpdateProposalForm(Form):
@@ -239,8 +267,21 @@ def update_proposal(proposal_id):
     return render_template('cfp_review/update_proposal.html',
                             proposal=prop, form=form, next_id=next_id)
 
+def get_all_messages_sort_dict(parameters, user):
+    sort_keys = {
+        'unread': lambda p: (p.get_unread_count(user) > 0, p.messages[-1].created),
+        'date': lambda p: p.messages[-1].created,
+        'from': lambda p: p.user.name,
+        'title': lambda p: p.title,
+        'count': lambda p: len(p.messages),
+    }
 
-@cfp_review.route('/messages/<types>')
+    sort_by_key = parameters.get('sort_by')
+    return {
+        'key': sort_keys.get(sort_by_key, sort_keys['unread']),
+        'reverse': bool(parameters.get('reverse'))
+    }
+
 @cfp_review.route('/messages')
 @admin_required
 def all_messages(types=None):
@@ -251,12 +292,14 @@ def all_messages(types=None):
         .filter(Proposal.id == CFPMessage.proposal_id)\
         .order_by(CFPMessage.has_been_read, CFPMessage.created.desc())
 
-    if types != 'all':
+    # if 'all' not in request.args:
+    if not request.args.get('all'):
         proposal_with_message = proposal_with_message.filter(Proposal.type != 'installation')
 
     proposal_with_message = proposal_with_message.all()
-    proposal_with_message.sort(key=lambda x: (x.get_unread_count(current_user) > 0,
-                                              x.messages[-1].created), reverse=True)
+
+    sort_dict = get_all_messages_sort_dict(request.args, current_user)
+    proposal_with_message.sort(**sort_dict)
 
     return render_template('cfp_review/all_messages.html',
                            proposal_with_message=proposal_with_message, types=types)
@@ -308,37 +351,73 @@ def message_proposer(proposal_id):
     return render_template('cfp_review/message_proposer.html',
                            form=form, messages=messages, proposal=proposal)
 
+def get_vote_summary_sort_args(parameters):
+    sort_keys = {
+        # Notes == unread first then by date
+        'notes': lambda p: (p[0].get_unread_vote_note_count() > 0,
+                            p[0].get_total_note_count()),
+        'date': lambda p: p[0].created,
+        'title': lambda p: p[0].title.lower(),
+        'votes': lambda p: p[1].get('voted', 0),
+        'blocked': lambda p: p[1].get('blocked', 0),
+        'recused': lambda p: p[1].get('recused', 0),
+    }
+
+    sort_by_key = parameters.get('sort_by')
+    return {
+        'key': sort_keys.get(sort_by_key, sort_keys['notes']),
+        'reverse': bool(parameters.get('reverse'))
+    }
+
 @cfp_review.route('/votes')
 @admin_required
 def vote_summary():
-    proposals = Proposal.query.filter_by(state='anonymised')\
-                              .order_by('modified').all()
+    proposal_query = Proposal.query if request.args.get('all', None) else Proposal.query.filter_by(state='anonymised')
+
+    proposals = proposal_query.order_by('modified').all()
 
     proposals_with_counts = []
+    summary = {
+        'notes_total': 0,
+        'notes_unread': 0,
+        'blocked_total': 0,
+        'recused_total': 0,
+        'voted_total': 0,
+        'min_votes': None,
+        'max_votes': 0,
+    }
+
     for prop in proposals:
         state_counts = {}
+        vote_count = len([v for v in prop.votes if v.state == 'voted'])
+
+        if summary['min_votes'] > vote_count or summary['min_votes'] is None:
+            summary['min_votes'] = vote_count
+
+        if summary['max_votes'] < vote_count:
+            summary['max_votes'] = vote_count
+
         for v in prop.votes:
+            # Update proposal values
             state_counts.setdefault(v.state, 0)
             state_counts[v.state] += 1
+
+            # Update note stats
+            if v.note is not None:
+                summary['notes_total'] += 1
+
+            if v.note is not None and not v.has_been_read:
+                summary['notes_unread'] += 1
+
+            # State stats
+            if v.state in ('voted', 'blocked', 'recused'):
+                summary[v.state + '_total'] += 1
+
         proposals_with_counts.append((prop, state_counts))
 
-    sort_key = lambda p: (p[0].get_unread_vote_note_count() > 0, p[0].created)
-    proposals_with_counts.sort(key=sort_key, reverse=True)
-
-
-    get_voted = lambda p: p[1].get('voted', 0)
-    summary = {
-        'notes_total': CFPVote.query.filter(CFPVote.note.isnot(None)).count(),
-        'notes_unread': CFPVote.query.filter(
-            or_(CFPVote.has_been_read.is_(False),
-                CFPVote.has_been_read.is_(None))
-        ).count(),
-        'votes_total': CFPVote.query.filter_by(state='voted').count(),
-        'blocked_total': CFPVote.query.filter_by(state='blocked').count(),
-        'recused_total': CFPVote.query.filter_by(state='recused').count(),
-        'min_votes': get_voted(min(proposals_with_counts, key=get_voted)),
-        'max_votes': get_voted(max(proposals_with_counts, key=get_voted))
-    }
+    # sort_key = lambda p: (p[0].get_unread_vote_note_count() > 0, p[0].created)
+    sort_args = get_vote_summary_sort_args(request.args)
+    proposals_with_counts.sort(**sort_args)
 
     return render_template('cfp_review/vote_summary.html', summary=summary,
                             proposals_with_counts=proposals_with_counts)
@@ -419,10 +498,22 @@ def proposal_votes(proposal_id):
 @cfp_review.route('/anonymisation')
 @anon_required
 def anonymisation():
-    proposals = Proposal.query.filter_by(state='checked').order_by('modified', 'id').all()
+    proposals = Proposal.query.filter_by(state='checked').all()
+
+    sort_dict = get_proposal_sort_dict(request.args)
+    proposals.sort(**sort_dict)
+
+    non_sort_query_string = dict(request.args)
+    if 'sort_by' in non_sort_query_string:
+        del non_sort_query_string['sort_by']
+
+    if 'reverse' in non_sort_query_string:
+        del non_sort_query_string['reverse']
 
     return render_template('cfp_review/proposals.html', proposals=proposals,
-                           link_target='.anonymise_proposal')
+                           link_target='.anonymise_proposal',
+                           sort_link_target='.anonymisation',
+                           new_qs=non_sort_query_string)
 
 
 class AnonymiseProposalForm(Form):
