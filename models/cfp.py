@@ -58,6 +58,18 @@ class Proposal(db.Model):
     messages = db.relationship('CFPMessage', backref='proposal')
     votes = db.relationship('CFPVote', backref='proposal')
 
+    # Fields for finalised info
+    published_names = db.Column(db.String)
+    arrival_time = db.Column(db.DateTime)
+    departure_time = db.Column(db.DateTime)
+    telephone_number = db.Column(db.String)
+    may_record = db.Column(db.Boolean)
+    needs_laptop = db.Column(db.Boolean)
+
+    unavailable_times = db.Column(db.String)
+    further_requests = db.Column(db.String)
+    installation_moveability = db.Column(db.String)
+
     __mapper_args__ = {'polymorphic_on': type}
 
     def get_user_vote(self, user):
