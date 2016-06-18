@@ -287,9 +287,13 @@ def get_all_messages_sort_dict(parameters, user):
     }
 
     sort_by_key = parameters.get('sort_by')
+    reverse = parameters.get('reverse')
+    # If unread sort order we have to have unread on top which means reverse sort
+    if sort_by_key is None or sort_by_key == 'unread':
+        reverse = True
     return {
         'key': sort_keys.get(sort_by_key, sort_keys['unread']),
-        'reverse': bool(parameters.get('reverse'))
+        'reverse': bool(reverse)
     }
 
 @cfp_review.route('/messages')
