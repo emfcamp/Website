@@ -101,6 +101,13 @@ def build_proposal_query_dict(parameters):
 
     return res
 
+def sort_by_notice(notice):
+    return {
+        '1 week': 0,
+        '1 month': 1,
+        '> 1 month': 2,
+    }.get(notice, -1)
+
 def get_proposal_sort_dict(parameters):
     sort_keys = {
         'state': lambda p: (p.state, p.modified, p.title),
@@ -108,7 +115,8 @@ def get_proposal_sort_dict(parameters):
         'type': lambda p: (p.type, p.title),
         'user': lambda p: (p.user.name, p.title),
         'title': lambda p: p.title,
-        'ticket': lambda p: (p.user.tickets.count() > 0, p.title)
+        'ticket': lambda p: (p.user.tickets.count() > 0, p.title),
+        'notice': lambda p: (sort_by_notice(p.notice_required), p.title),
     }
 
     sort_by_key = parameters.get('sort_by')
