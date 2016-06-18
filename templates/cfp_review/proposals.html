@@ -10,29 +10,33 @@
             {% set qs_reverse_new=None %}
         {% endif %}
         <th class="col-md-1">
-            <a href="{{ url_for(sort_link_target, sort_by='date', reverse=qs_reverse_new, **new_qs) }}">Date</a>
+            <a href="{{ url_for('.proposals', sort_by='ticket', reverse=qs_reverse_new, **new_qs) }}">Ticket</a>
+        </th>
+        <th class="col-md-1">
+            <a href="{{ url_for('.proposals', sort_by='date', reverse=qs_reverse_new, **new_qs) }}">Date</a>
         </th>
         <th>
-            <a href="{{ url_for(sort_link_target, sort_by='state', reverse=qs_reverse_new, **new_qs) }}">State</a>
+            <a href="{{ url_for('.proposals', sort_by='state', reverse=qs_reverse_new, **new_qs) }}">State</a>
         </th>
         <th>
-            <a href="{{ url_for(sort_link_target, sort_by='type', reverse=qs_reverse_new, **new_qs) }}">Type</a>
+            <a href="{{ url_for('.proposals', sort_by='type', reverse=qs_reverse_new, **new_qs) }}">Type</a>
         </th>
         <th>
-            <a href="{{ url_for(sort_link_target, sort_by='user', reverse=qs_reverse_new, **new_qs) }}">User</a>
+            <a href="{{ url_for('.proposals', sort_by='user', reverse=qs_reverse_new, **new_qs) }}">User</a>
         </th>
         <th>
-            <a href="{{ url_for(sort_link_target, sort_by='title', reverse=qs_reverse_new, **new_qs) }}">Title</a>
+            <a href="{{ url_for('.proposals', sort_by='title', reverse=qs_reverse_new, **new_qs) }}">Title</a>
         </th>
     </tr>
 {% for proposal in proposals %}
     <tr>
+        <td>{% if proposal.user.tickets.count() > 0 %}Yes{% else %}No{% endif %}</td>
         <td>{{proposal.created.strftime("%d/%m")}}</td>
         <td>{{proposal.state | capitalize}}</td>
         <td>{{proposal.type | capitalize}}</td>
         <td>{{proposal.user.name}}</td>
         <td>
-            <a href="{{ url_for(link_target, proposal_id=proposal.id) }}">{{proposal.title}}</a>
+            <a href="{{ url_for('.update_proposal', proposal_id=proposal.id) }}">{{proposal.title}}</a>
         </td>
     </tr>
 {% else %}

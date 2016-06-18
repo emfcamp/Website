@@ -108,6 +108,7 @@ def get_proposal_sort_dict(parameters):
         'type': lambda p: (p.type, p.title),
         'user': lambda p: (p.user.name, p.title),
         'title': lambda p: p.title,
+        'ticket': lambda p: (p.user.tickets.count() > 0, p.title)
     }
 
     sort_by_key = parameters.get('sort_by')
@@ -127,6 +128,9 @@ def proposals():
     sort_dict = get_proposal_sort_dict(request.args)
     proposals.sort(**sort_dict)
 
+    if 'needs_ticket' in request.args:
+        proposals = filter(lambda p: not (p.user.tickets.count() > 0), proposals)
+
     non_sort_query_string = dict(request.args)
     if 'sort_by' in non_sort_query_string:
         del non_sort_query_string['sort_by']
@@ -135,8 +139,6 @@ def proposals():
         del non_sort_query_string['reverse']
 
     return render_template('cfp_review/proposals.html', proposals=proposals,
-                           link_target='.update_proposal',
-                           sort_link_target='.proposals',
                            new_qs=non_sort_query_string)
 
 
@@ -510,9 +512,7 @@ def anonymisation():
     if 'reverse' in non_sort_query_string:
         del non_sort_query_string['reverse']
 
-    return render_template('cfp_review/proposals.html', proposals=proposals,
-                           link_target='.anonymise_proposal',
-                           sort_link_target='.anonymisation',
+    return render_template('cfp_review/anonymise_list.html', proposals=proposals,
                            new_qs=non_sort_query_string)
 
 
