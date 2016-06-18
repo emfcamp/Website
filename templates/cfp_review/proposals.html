@@ -34,7 +34,9 @@
         <td>{{proposal.created.strftime("%d/%m")}}</td>
         <td>{{proposal.state | capitalize}}</td>
         <td>{{proposal.type | capitalize}}</td>
-        <td>{{proposal.user.name}}</td>
+        <td>
+            <a href="{{ url_for('admin.user', user_id=proposal.user.id ) }}">{{proposal.user.name}}</a>
+        </td>
         <td>
             <a href="{{ url_for('.update_proposal', proposal_id=proposal.id) }}">{{proposal.title}}</a>
         </td>
