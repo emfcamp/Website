@@ -1,6 +1,20 @@
 {% extends "cfp_review/base.html" %}
 {% block body %}
-<h2>CfP Proposals <small>(showing {{ proposals | count }})</small></h2>
+<h2>CfP Proposals</h2>
+
+<h3>Current filters <small>(showing {{ proposals | count }})</small></h3>
+<div class="row">
+<dl class="dl-horizontal col-md-6">
+    <dt>State</dt><dd>{{ request.args.get('state', '--') }}</dd>
+    <dt>Type</dt><dd>{{ request.args.get('type', '--') }}</dd>
+    <dt>Sort by</dt><dd>{{ request.args.get('sort_by', '--') }}</dd>
+</dl>
+<dl class="dl-horizontal col-md-6">
+    <dt>Needs Ticket</dt><dd>{{ request.args.get('needs_ticket', '--') }}</dd>
+    <dt>Needs Help</dt><dd>{{ request.args.get('needs_help', '--') }}</dd>
+    <dt>Needs Money</dt><dd>{{ request.args.get('needs_money', '--') }}</dd>
+</dl>
+</div>
 
 <table class="table">
     <tr>
