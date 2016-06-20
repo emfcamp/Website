@@ -852,7 +852,7 @@ def send_email_for_proposal(proposal, accepted):
 
         app.logger.info('Sending not-accepted email for proposal %s', proposal.id)
         proposal.has_rejected_email = True
-        subject = 'Your EMF proposal "%s" has been passed to the next round' % proposal.title
+        subject = 'An update on your EMF %s "%s"' % (proposal.type, proposal.title)
         template = 'cfp_review/email/not_accepted_msg.txt'
 
     user = proposal.user
