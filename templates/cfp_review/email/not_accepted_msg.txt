@@ -1,8 +1,10 @@
 Hi {{ user.name }},
 
-We've just closed a round of the Electromagnetic Field Call for Participation. Unfortunately your {{ proposal.type }} "{{ proposal.title }}" was not selected but has been automatically added to the next round.
+Just to let you know your EMF {{ proposal.type }} "{{ proposal.title}}" is still up for selection, but was not chosen in today's batch.
 
-Don't panic, there's several more rounds to come - if it's accepted in another round we'll let you know (later rounds are larger).
+To be very clear: Your submission has NOT been rejected yet!
+
+There's still plenty of time for your {{ proposal.type }} to be chosen, and we'll be in touch to let you know for certain in the next three weeks.
 
 If you have any questions, don't hesitate to get in contact:
 {{ external_url("cfp.proposal_messages", proposal_id=proposal.id) }}
