@@ -7,7 +7,6 @@
   {% endif %}
 
 <h2>Call for Participation</h2>
-<div class="well">
     <p class="emphasis">Electromagnetic Field is a UK camping festival for those
       with an inquisitive mind or an interest in making things: hackers, artists,
       geeks, crafters, scientists, and engineers. It's happening near
@@ -51,8 +50,8 @@
       <p>If you have already submitted to the call for participation then you
         need to <a href="{{ url_for('users.login', next=url_for('.proposals') ) }}">login</a>
         in order to view or edit your proposals.</p>
-    {% endif %}
-  </div>
+        {% endif %}
+
     <h2>Submit a proposal</h2>
     <ul class="nav nav-tabs cfp-types" role="navigation" id="cfp-errors" role="menu"
         aria-label="proposal type">

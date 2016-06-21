@@ -1,10 +1,17 @@
 
 $header-font-stack:             "Raleway","Helvetica Neue",Helvetica,Arial,sans-serif;
 
-$main-background:               #5E93CE;
-$main-background-text:          #FFF;
+$body-background:               #3c3c3c;
+$body-background-shadow:        #222;
+
+$main-background:               #171123;
+$main-background-text:          #c8c8c8;
+$main-background-header:        #ffffff;
+
+$main-link:                     $main-background-text;
+$main-link-hover:               #7c1243;
 
 /* Styles for "highlight" elements (wells and panels) */
-$highlight-background:          #d3e0f1;
-$highlight-background-text:     #333;
-$highlight-background-link:     #5E93CE;
+$highlight-background:          #c8c8c8;
+$highlight-background-text:     #1e1e1e;
+$highlight-background-link:     #171123;

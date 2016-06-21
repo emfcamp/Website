@@ -8,15 +8,16 @@
 body {
   font-size: 16px;
   color: $main-background-text;
+  background-color: $body-background;
 }
 
 a {
-  color: $main-background-text;
+  color: $main-link;
   text-decoration: underline;
 }
 
 a:hover {
-  color: #d3e0f1;
+  color: $main-link-hover;
 }
 
 html, body, .container, .main-row, .main-column {
@@ -26,6 +27,7 @@ html, body, .container, .main-row, .main-column {
 .well, .jumbotron {
   background-color: $highlight-background;
   color: $highlight-background-text;
+  border: 1px solid #333;
 }
 
 .panel {
@@ -37,7 +39,17 @@ html, body, .container, .main-row, .main-column {
     margin-top: auto;
 }
 
-.panel-default > .panel-heading {
+.panel-default,
+.panel-default > .panel-heading,
+.panel-default > .panel-footer {
+    background-color: $highlight-background;
+}
+
+.panel-default > .panel-heading > * {
+    color: $highlight-background-text;
+}
+
+.panel-default {
     background-color: $highlight-background;
 }
 
@@ -59,19 +71,17 @@ html, body, .container, .main-row, .main-column {
     justify-content: center;
 }
 
-.well .panel-default {
-    border-color: #333;
-}
-
 header, h2, h3, h4, h5, h6 {
+  color: $main-background-header;
   font-family: $header-font-stack;
-  font-weight: 700;
 }
 
 header {
-  background: url('../images/header.jpg') no-repeat left top;
+  background-image: url('../images/brand/header.jpg');
+  background-size: 100% auto;
   margin:-20px -15px 0px -15px;
   padding: 20px 15px 0px 15px;
+  height: 220px;
 }
 
 header h1 {
@@ -79,14 +89,10 @@ header h1 {
   float: left;
 }
 
-header a:hover {
-  color: #333;
-}
-
 #logo {
-  background: url('../images/logo.png') no-repeat left top;
-  width: 472px;
-  height: 168px;
+  background: url('../images/brand/logo.png') no-repeat left top;
+  width: 350px;
+  height: 125px;
 }
 
 @media(max-width:550px){
@@ -99,7 +105,6 @@ header a:hover {
 }
 
 header #header-text {
-  color: #333;
   float: right;
   text-align: right;
   font-size: 1.5em;
@@ -116,6 +121,14 @@ header #header-text {
 header #menu-container {
   clear: both;
   float:right;
+}
+
+ul.menu a {
+    color: white;
+}
+
+ul.menu a:hover {
+  color: $main-link-hover;
 }
 
 ul.menu {
@@ -139,6 +152,7 @@ ul.menu a {
 }
 
 footer {
+  background: url('../images/brand/footer.jpg') no-repeat left top;
   clear:both;
   position: absolute;
   bottom: 0px;
@@ -158,13 +172,7 @@ footer #credits {
 
 #bottom-menu-container {
   font-family: $header-font-stack;
-  background: url('../images/footer.jpg') no-repeat left top;
-  background-size: cover;
   padding: 10px 15px 0px 15px;
-}
-
-#bottom-menu-container, #bottom-menu-container a {
-  color: #333;
 }
 
 #bottom-menu-container .menu {
@@ -192,7 +200,7 @@ footer #credits {
 
 @media(min-width:768px){
   .main-column {
-    box-shadow: 5px -1px 15px  #bbb, -5px -1px 15px #bbb;
+    box-shadow: 5px -1px 15px $body-background-shadow, -5px -1px 15px $body-background-shadow;
   }
 
 }

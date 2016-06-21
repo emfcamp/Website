@@ -191,6 +191,11 @@ def radio():
     return render_template('radio.html')
 
 
+@base.route('/about/design-elements')
+def design_elements():
+    return render_template('design.html')
+
+
 @base.route("/googlec108e6ab4f75019d.html")
 def google_verification_russ():
     return "google-site-verification: googlec108e6ab4f75019d.html"
