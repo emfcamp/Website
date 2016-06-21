@@ -5,9 +5,12 @@
 <h1>Your proposals</h1>
 
 <table class="table">
-  {% set cfp_cycler = cycler('odd', 'even') %}
+<thead>
+  <tr><th>Details</th></tr>
+</thead>
+<tbody>
   {% for proposal in proposals %}
-  <tr class="{{- cfp_cycler.next() }}">
+  <tr class="{{- loop.cycle('odd', 'even') }}">
     <td>
       <h4><a href="{{ url_for('.edit_proposal', proposal_id=proposal.id) }}">{{ proposal.title }}</a></h4>
       <p>{{ proposal.type|title }}</p>
@@ -59,6 +62,7 @@
   </tr>
   {% endfor %}
 
+</tbody>
 </table>
 
 <div class="pull-right">

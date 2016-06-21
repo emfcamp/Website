@@ -22,36 +22,48 @@
 
 <h4>Friday 31st August 2012</h4>
 <table class="table" width="80%">
+<thead>
 <th>Time</th><th>Stage Alpha</th><th>Stage Beta</th><th>Workshop</th>
+</thead>
+<tbody>
 {% for row in friday %}
 <tr class="{{ loop.cycle('odd', 'even') }}">
     <td><strong>{{ row.0 }}</strong></td><td width="33%">{{ row.1 }}</td><td width="33%">{{ row.2 }}</td><td width="33%">{{ row.3 }}</td>
 </tr>
 {% endfor %}
+</tbody>
 </table>
 
 <br>
 
 <h4>Saturday 1st September 2012</h4>
 <table class="table" width="80%">
+<thead>
 <th>Time</th><th>Stage Alpha</th><th>Stage Beta</th><th>Workshop</th>
+</thead>
+<tbody>
 {% for row in saturday %}
 <tr class="{{ loop.cycle('odd', 'even') }}">
     <td><strong>{{ row.0 }}</strong></td><td width="33%">{{ row.1 }}</td><td width="33%">{{ row.2 }}</td><td width="33%">{{ row.3 | safe() }}</td>
 </tr>
 {% endfor %}
+</tbody>
 </table>
 
 <br>
 
 <h4>Sunday 2nd September 2012</h4>
 <table class="table" width="80%">
+<thead>
 <th>Time</th><th>Stage Alpha</th><th>Stage Beta</th><th>Workshop</th>
+</thead>
+<tbody>
 {% for row in sunday %}
 <tr class="{{ loop.cycle('odd', 'even') }}">
     <td><strong>{{ row.0 }}</strong></td><td width="33%">{{ row.1 }}</td><td width="33%">{{ row.2 }}</td><td width="33%">{{ row.3 | safe() }}</td>
 </tr>
 {% endfor %}
+</tbody>
 </table>
 
 </ul>

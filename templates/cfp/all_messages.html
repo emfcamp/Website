@@ -2,15 +2,17 @@
 {% block body %}
 <h2>All messages</h2>
 
-<div class="well">
 <table class="table">
+<thead>
     <tr>
         <th>Date</th>
         <th>Message Count</th>
         <th>Proposal Title</th>
     </tr>
+</thead>
+<tbody>
 {% for proposal in proposal_with_message %}
-    <tr>
+    <tr class="{{ loop.cycle('odd', 'even') }}">
         <td>
             {% if proposal.get_unread_count(current_user) > 0 %}
                 <span class="badge">{{ proposal.get_unread_count(current_user) }}</span>
@@ -25,6 +27,7 @@
         </td>
     </tr>
 {% endfor %}
+</tbody>
 </table>
-</div>
+
 {% endblock %}

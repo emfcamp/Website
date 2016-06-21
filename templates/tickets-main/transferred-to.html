@@ -1,10 +1,13 @@
 <table class="table">
+<thead>
   <tr>
     <th>Date</th>
     <th>Type</th>
     <th>Sender's name</th>
     <th>Sender's email</th>
   </tr>
+</thead>
+<tbody>
 
   {% for trans in transferred_to %}
   <tr class="{{- loop.cycle('odd', 'even') }}">
@@ -14,4 +17,5 @@
     <td>{{ trans.from_user.email }}</td>
   </tr>
   {% endfor %}
+</tbody>
 </table>

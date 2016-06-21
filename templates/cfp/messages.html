@@ -18,11 +18,9 @@
   </li>
 </ul>
 
-<div class="well">
 <table class="table">
-{% set msg_cycler = cycler('odd', 'even') %}
 {% for msg in messages %}
-<tr class="{{ msg_cycler.next() }}">
+<tr class="{{ loop.cycle('odd', 'even') }}">
   <td>
     <div class="row">
       <div class="col-sm-6">
@@ -51,7 +49,6 @@
 </tr>
 {% endfor %}
 </table>
-</div>
 
 <form method="post" action="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">
     {{ form.hidden_tag() }}

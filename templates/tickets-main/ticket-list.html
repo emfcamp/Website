@@ -2,7 +2,7 @@
 {{ form.hidden_tag() }}
 
 <table class="table tickets btns-table">
-<thead>
+  <thead>
     <tr>
     {% if feature_enabled('ISSUE_TICKETS') %}
       <th class="checkbox-cell"></th>
@@ -11,8 +11,8 @@
       <th>Status</th>
       <th></th>
     </tr>
-</thead>
-<tbody>
+  </thead>
+  <tbody>
 {%- for t in tickets -%}
 
 <tr class="
@@ -48,7 +48,7 @@
 </td>
 </tr>
 {% endfor -%}
-</tbody>
+  </tbody>
 </table>
 
 {% if show_receipt and feature_enabled('ISSUE_TICKETS') %}

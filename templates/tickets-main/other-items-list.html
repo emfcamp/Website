@@ -1,11 +1,15 @@
 <table class="table tickets btns-table">
+<thead>
 <tr>
   <th>Type</th>
   <th>Status</th>
+  <th></th>
 </tr>
+</thead>
+
+<tbody>
 
 {%- for t in other_items -%}
-
 <tr class="
 {{- loop.cycle('odd', 'even') }}
 {%- if t.paid %} paid {%- endif -%}
@@ -31,4 +35,5 @@
 </tr>
 {% endfor -%}
 
+</tbody>
 </table>
