@@ -2,14 +2,17 @@
 {{ form.hidden_tag() }}
 
 <table class="table tickets btns-table">
-<tr>
-{% if feature_enabled('ISSUE_TICKETS') %}
-  <th class="checkbox-cell"></th>
-{% endif %}
-  <th>Type</th>
-  <th>Status</th>
-</tr>
-
+<thead>
+    <tr>
+    {% if feature_enabled('ISSUE_TICKETS') %}
+      <th class="checkbox-cell"></th>
+    {% endif %}
+      <th>Type</th>
+      <th>Status</th>
+      <th></th>
+    </tr>
+</thead>
+<tbody>
 {%- for t in tickets -%}
 
 <tr class="
@@ -45,14 +48,12 @@
 </td>
 </tr>
 {% endfor -%}
-
+</tbody>
 </table>
 
 {% if show_receipt and feature_enabled('ISSUE_TICKETS') %}
 {{ form.forward(class_="btn btn-default pull-right") }}
 {% else %}
-<div class="well">
-    We'll email you when your e-tickets are ready closer to the event.
-</div>
+<p>We'll email you when your e-tickets are ready closer to the event.</p>
 {% endif %}
 </form>

@@ -1,10 +1,12 @@
 <table class="table btns-table">
+<thead>
   <tr>
     <th>Type</th>
     <th>Amount</th>
     <th>Progress</th>
     <th colspan="2"></th>
-  </tr>
+</tr>
+</thead>
   {% for p in payments %}
     <tr class="{{- loop.cycle('odd', 'even') -}}">
       <td>

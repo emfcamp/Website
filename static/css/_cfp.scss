@@ -4,15 +4,6 @@
   padding-top: 1em;
 }
 
-.cfp-tab {
-  padding: 15px;
-  background-color: $highlight-background;
-  color: #333;
-}
-
-.cfp-tab a {
-  color: #333;
-}
 
 @media (max-width: 550px){
   .cfp-types.nav-tabs > li {
@@ -36,9 +27,13 @@
   }
 }
 
+.cfp-types.nav-tabs h4 {
+  color: $highlight-background-text
+}
+
 .cfp-types.nav-tabs > li > a {
-  background-color: #B6CCE2;
-  color: #555555;
+    background-color: $highlight-2-background;
+  color: $highlight-background-text;
   padding-bottom: 9px; /* align tab bottoms */
 }
 
@@ -46,12 +41,19 @@
 .cfp-types.nav-tabs > li.active > a:hover,
 .cfp-types.nav-tabs > li.active > a:focus {
   background-color: $highlight-background;
+  color: $highlight-background-text;
   padding-bottom: 10px; /* align tab bottoms */
+}
+
+.cfp-tab {
+  background-color: $highlight-background;
+  color: $highlight-background-text;
+  padding: 15px;
 }
 
 .cfp-types.nav > li > a:hover,
 .cfp-types.nav > li > a:focus {
-  background-color: #e3ecf6;
+  background-color: $highlight-background;
 }
 
 .cfp-tab .form-actions {

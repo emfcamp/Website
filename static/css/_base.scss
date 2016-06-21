@@ -8,28 +8,33 @@
 body {
   font-size: 16px;
   color: $main-background-text;
+  background-color: $body-background;
 }
 
 a {
-  color: $main-background-text;
+  color: $main-link;
   text-decoration: underline;
 }
 
 a:hover {
-  color: #d3e0f1;
+  color: $main-link-hover;
 }
 
 html, body, .container, .main-row, .main-column {
   height: 100%;
 }
 
-.well, .jumbotron {
+.well, .jumbotron, .panel {
   background-color: $highlight-background;
   color: $highlight-background-text;
 }
 
+.well, .jumbotron, .panel {
+  border: none;
+}
+
 .panel {
-    color: #333;
+    color: $highlight-background-text;
     display: block;
 }
 
@@ -37,20 +42,21 @@ html, body, .container, .main-row, .main-column {
     margin-top: auto;
 }
 
-.panel-default > .panel-heading {
+.panel-default > .panel-heading,
+.panel-default > .panel-footer {
+    background-color: $highlight-2-background
+}
+
+.panel-default > .panel-heading > * {
+    color: $highlight-background-text;
+}
+
+.panel-default {
     background-color: $highlight-background;
 }
 
 .well a, .panel a {
   color: $highlight-background-link;
-}
-
-.panel .btn, .well .btn {
-    color: white;
-}
-
-.panel .btn-default, .well .btn-default {
-    color: $highlight-background-text;
 }
 
 .panel-footer-center {
@@ -59,17 +65,13 @@ html, body, .container, .main-row, .main-column {
     justify-content: center;
 }
 
-.well .panel-default {
-    border-color: #333;
-}
-
 header, h2, h3, h4, h5, h6 {
-  font-family: $header-font-stack;
-  font-weight: 700;
+    color: $main-background-header;
+    font-family: $header-font-stack;
 }
 
 header {
-  background: url('../images/header.jpg') no-repeat left top;
+  background-image: url('../images/brand/header.jpg');
   margin:-20px -15px 0px -15px;
   padding: 20px 15px 0px 15px;
 }
@@ -77,29 +79,17 @@ header {
 header h1 {
   display: block;
   float: left;
-}
-
-header a:hover {
-  color: #333;
+  margin-bottom: 0;
 }
 
 #logo {
-  background: url('../images/logo.png') no-repeat left top;
-  width: 472px;
-  height: 168px;
-}
-
-@media(max-width:550px){
-  #logo {
-    background: url('../images/logo-small.png') no-repeat left top;
-    width: 370px;
-    height: 132px;
-    margin-left: -10px;
-  }
+  background: url('../images/brand/logo.png') no-repeat left top;
+  background-size: 350px 125px;
+  width: 350px;
+  height: 125px;
 }
 
 header #header-text {
-  color: #333;
   float: right;
   text-align: right;
   font-size: 1.5em;
@@ -116,6 +106,14 @@ header #header-text {
 header #menu-container {
   clear: both;
   float:right;
+}
+
+ul.menu a {
+    color: white;
+}
+
+ul.menu a:hover {
+  color: $main-link-hover;
 }
 
 ul.menu {
@@ -139,6 +137,7 @@ ul.menu a {
 }
 
 footer {
+  background: url('../images/brand/footer.jpg') no-repeat left top;
   clear:both;
   position: absolute;
   bottom: 0px;
@@ -158,13 +157,7 @@ footer #credits {
 
 #bottom-menu-container {
   font-family: $header-font-stack;
-  background: url('../images/footer.jpg') no-repeat left top;
-  background-size: cover;
   padding: 10px 15px 0px 15px;
-}
-
-#bottom-menu-container, #bottom-menu-container a {
-  color: #333;
 }
 
 #bottom-menu-container .menu {
@@ -192,9 +185,8 @@ footer #credits {
 
 @media(min-width:768px){
   .main-column {
-    box-shadow: 5px -1px 15px  #bbb, -5px -1px 15px #bbb;
+    box-shadow: 5px -1px 15px $body-background-shadow, -5px -1px 15px $body-background-shadow;
   }
-
 }
 
 @media(max-width:768px) {
@@ -252,74 +244,6 @@ p, u, ol {padding-bottom: 5px;}
 p.summary {
     font-size: 130%
 }
-
-table {
-    color: #333;
-    margin: 1ex 0.5em 0 0;
-}
-
-table a {
-    color: #333;
-}
-
-td, th {
-    padding: 1ex 0.5em;
-}
-
-th {
-    font-weight: bold;
-}
-
-thead tr {
-    /* background-color: #82aad4; */
-    color: white;
-}
-
-.table > tbody > tr > th,
-.table > tfoot > tr > th,
-.table > thead > tr > td,
-.table > tfoot > tr > td {
-    border-top: 1px solid transparent;
-    color: white;
-}
-
-.table > tbody > tr > td,
-.table > thead > tr > th {
-    border-top: 1px solid #7d9fcb;
-}
-
-.table > thead > tr > th {
-    /* border-bottom: 2px solid #7d9fcb; */
-    border-bottom: 2px solid transparent;
-}
-
-tr.even {
-    background-color: $highlight-background;
-}
-
-tr.odd {
-    background-color: #aec6ea;
-}
-
-.well table,
-.well table a,
-.well thead tr,
-.well .table > tbody > tr > th,
-.well .table > tfoot > tr > th,
-.well .table > thead > tr > td,
-.well .table > tfoot > tr > td {
-  color: inherit;
-}
-
-.btns-table > tbody > tr > td {
-    vertical-align: inherit;
-    padding: 11px 8px;
-}
-
-.btns-table > tbody > tr > td .btn {
-    margin: -7px 0px -6px;
-}
-
 
 .errors {
   color: #933;
@@ -402,45 +326,6 @@ legend {
 }
 
 .alert-link {
-  text-decoration: none;
-}
-
-/* But not for buttons */
-.alert-danger a.btn-primary,
-.alert-danger a.btn-default,
-.alert-danger a.btn-info,
-.alert-danger a.btn-success,
-.alert-danger a.btn-warning,
-.alert-danger a.btn-danger {
-  color: #fff;
-}
-
-/* Show the hover borders by default to avoid bleeding */
-.btn-primary {
-  border: 1px solid #285e8e;
-}
-
-.btn-default {
-  border: 1px solid #adadad;
-}
-
-.btn-info {
-  border: 1px solid #269abc;
-}
-
-.btn-success {
-  border: 1px solid #398439;
-}
-
-.btn-warning {
-  border: 1px solid #d58512;
-}
-
-.btn-danger {
-  border: 1px solid #ac2925;
-}
-
-.btn {
   text-decoration: none;
 }
 

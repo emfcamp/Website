@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Design Elements Test{% endblock %}
+{% block body %}
+<h2>Design Elements Test (Header Level Two)</h2>
+<h3>Header Level Three</h3>
+
+<p>Lorem ipsum dolor sit amet, consectetur <a href="/">adipiscing elit</a>, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+<h4>Header Level Four</h4>
+<ul>
+  <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</li>
+  <li>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</li>
+</ul>
+
+<div class="well">
+    <strong>Well Element</strong><br>
+    Lorem ipsum dolor sit amet, consectetur <a href="/">adipiscing elit</a>, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>Panel Element</h4>
+    </div>
+    <div class="panel-body">
+  Lorem ipsum dolor sit amet, consectetur <a href="/">adipiscing elit</a>, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+    </div>
+    <div class="panel-footer">
+        Panel footer
+    </div>
+</div>
+
+<h4>Form Elements</h4>
+<form class="form-inline">
+    <div class="input-group">
+        <input type="text" class="form-control">
+    </div>
+</form>
+
+<h4>Buttons</h4>
+<input class="btn btn-default" value="Default">
+<input class="btn btn-primary" value="Primary">
+<input class="btn btn-success" value="Success">
+<input class="btn btn-info" value="Info">
+<input class="btn btn-warning" value="Warning">
+<input class="btn btn-danger" value="Danger">
+
+<h4>Ticket Types Table</h4>
+
+<table class="table ticket-types">
+<thead>
+<tr>
+    <th>Item Type</th>
+    <th>Cost</th>
+    <th>Amount</th>
+</tr>
+</thead>
+<tbody>
+<tr data-price="15" data-price-gbp="15" data-price-eur="21" class="ticket-type form-group
+        odd">
+    <td>
+        <div style="display:none;"><input id="types-1-type_id" name="types-1-type_id" type="hidden" value="13"></div>
+        <label for="types-1-amount"><b>Parking Ticket</b></label>
+        <p class="description">We're trying to keep cars to a minimum. Please take public transport or car-share if you can.</p>
+    </td>
+    <td>
+        <span class="price">£15.00</span>
+    </td>
+    <td>
+        <div class="controls"><select class="amount" id="types-1-amount" name="types-1-amount"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select>
+        </div>
+    </td>
+</tr>
+
+<tr data-price="30" data-price-gbp="30" data-price-eur="42" class="ticket-type form-group even">
+    <td>
+        <div style="display:none;"><input id="types-2-type_id" name="types-2-type_id" type="hidden" value="14"></div>
+        <label for="types-2-amount"><b>Caravan/Campervan Ticket</b></label>
+        <p class="description">If you bring a caravan, you won't need a separate parking ticket for the towing car.</p>
+    </td>
+    <td>
+        <span class="price">£30.00</span>
+    </td>
+    <td>
+        <div class="controls"><select class="amount" id="types-2-amount" name="types-2-amount"><option value="0">0</option><option value="1">1</option><option value="2">2</option></select>
+        </div>
+    </td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+    <td colspan="3">
+    <div id="summary" class="pull-right">
+        <div style="display: none;">Total will be shown on the next page</div>
+        <div style="">
+            <label>Total:
+            <strong id="total" style="text-align: right">£0.00</strong>
+            </label>
+        </div>
+    </div>
+    </td>
+</tr></tfoot>
+</table>
+
+{% endblock %}
