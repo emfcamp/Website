@@ -7,7 +7,6 @@ Buy Items
 {% endif %}
 {% endblock %}
 {% block body %}
-<div class="well">
 {% if admissions %}
     {% include 'ticket-blurb.html' %}
 
@@ -27,7 +26,6 @@ Buy Items
 {% if not current_user.is_authenticated() %}
     <p>If you've already bought a ticket this year, <a href="{{url_for('users.login')}}">log in</a> to view your ticket status.</p>
 {% endif %}
-</div>
 
 <form method="post" class="choose-tickets-form" id="choose_tickets">
     {{form.hidden_tag()}}

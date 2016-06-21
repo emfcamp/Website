@@ -24,14 +24,17 @@ html, body, .container, .main-row, .main-column {
   height: 100%;
 }
 
-.well, .jumbotron {
+.well, .jumbotron, .panel {
   background-color: $highlight-background;
   color: $highlight-background-text;
-  border: 1px solid #333;
+}
+
+.well, .jumbotron, .panel {
+  border: none;
 }
 
 .panel {
-    color: #333;
+    color: $highlight-background-text;
     display: block;
 }
 
@@ -39,10 +42,9 @@ html, body, .container, .main-row, .main-column {
     margin-top: auto;
 }
 
-.panel-default,
 .panel-default > .panel-heading,
 .panel-default > .panel-footer {
-    background-color: $highlight-background;
+    background-color: $highlight-2-background
 }
 
 .panel-default > .panel-heading > * {
@@ -57,14 +59,6 @@ html, body, .container, .main-row, .main-column {
   color: $highlight-background-link;
 }
 
-.panel .btn, .well .btn {
-    color: white;
-}
-
-.panel .btn-default, .well .btn-default {
-    color: $highlight-background-text;
-}
-
 .panel-footer-center {
     display: flex;
     flex-direction: row;
@@ -72,8 +66,8 @@ html, body, .container, .main-row, .main-column {
 }
 
 header, h2, h3, h4, h5, h6 {
-  color: $main-background-header;
-  font-family: $header-font-stack;
+    color: $main-background-header;
+    font-family: $header-font-stack;
 }
 
 header {
@@ -202,7 +196,6 @@ footer #credits {
   .main-column {
     box-shadow: 5px -1px 15px $body-background-shadow, -5px -1px 15px $body-background-shadow;
   }
-
 }
 
 @media(max-width:768px) {
@@ -260,74 +253,6 @@ p, u, ol {padding-bottom: 5px;}
 p.summary {
     font-size: 130%
 }
-
-table {
-    color: #333;
-    margin: 1ex 0.5em 0 0;
-}
-
-table a {
-    color: #333;
-}
-
-td, th {
-    padding: 1ex 0.5em;
-}
-
-th {
-    font-weight: bold;
-}
-
-thead tr {
-    /* background-color: #82aad4; */
-    color: white;
-}
-
-.table > tbody > tr > th,
-.table > tfoot > tr > th,
-.table > thead > tr > td,
-.table > tfoot > tr > td {
-    border-top: 1px solid transparent;
-    color: white;
-}
-
-.table > tbody > tr > td,
-.table > thead > tr > th {
-    border-top: 1px solid #7d9fcb;
-}
-
-.table > thead > tr > th {
-    /* border-bottom: 2px solid #7d9fcb; */
-    border-bottom: 2px solid transparent;
-}
-
-tr.even {
-    background-color: $highlight-background;
-}
-
-tr.odd {
-    background-color: #aec6ea;
-}
-
-.well table,
-.well table a,
-.well thead tr,
-.well .table > tbody > tr > th,
-.well .table > tfoot > tr > th,
-.well .table > thead > tr > td,
-.well .table > tfoot > tr > td {
-  color: inherit;
-}
-
-.btns-table > tbody > tr > td {
-    vertical-align: inherit;
-    padding: 11px 8px;
-}
-
-.btns-table > tbody > tr > td .btn {
-    margin: -7px 0px -6px;
-}
-
 
 .errors {
   color: #933;
@@ -410,45 +335,6 @@ legend {
 }
 
 .alert-link {
-  text-decoration: none;
-}
-
-/* But not for buttons */
-.alert-danger a.btn-primary,
-.alert-danger a.btn-default,
-.alert-danger a.btn-info,
-.alert-danger a.btn-success,
-.alert-danger a.btn-warning,
-.alert-danger a.btn-danger {
-  color: #fff;
-}
-
-/* Show the hover borders by default to avoid bleeding */
-.btn-primary {
-  border: 1px solid #285e8e;
-}
-
-.btn-default {
-  border: 1px solid #adadad;
-}
-
-.btn-info {
-  border: 1px solid #269abc;
-}
-
-.btn-success {
-  border: 1px solid #398439;
-}
-
-.btn-warning {
-  border: 1px solid #d58512;
-}
-
-.btn-danger {
-  border: 1px solid #ac2925;
-}
-
-.btn {
   text-decoration: none;
 }
 

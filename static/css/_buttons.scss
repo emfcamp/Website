@@ -1,0 +1,47 @@
+
+
+/* Show the hover borders by default to avoid bleeding */
+.btn-primary {
+    border: 1px solid #285e8e;
+}
+
+.btn-default {
+  border: 1px solid #adadad;
+}
+
+.btn-info {
+  border: 1px solid #269abc;
+}
+
+.btn-success {
+  border: 1px solid #398439;
+}
+
+.btn-warning {
+  border: 1px solid #d58512;
+}
+
+.btn-danger {
+  border: 1px solid #ac2925;
+}
+
+.btn {
+  text-decoration: none;
+}
+
+.alert-danger a.btn-primary,
+.alert-danger a.btn-default,
+.alert-danger a.btn-info,
+.alert-danger a.btn-success,
+.alert-danger a.btn-warning,
+.alert-danger a.btn-danger {
+  color: #fff;
+}
+
+.panel .btn, .well .btn {
+    color: white;
+}
+
+.panel .btn-default, .well .btn-default {
+    color: $highlight-background-text;
+}

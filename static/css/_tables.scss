@@ -1,0 +1,74 @@
+table, table a {
+    color: $highlight-background-text;
+}
+
+table tr:first-child th:first-child {
+    border-top-left-radius: 4px;
+}
+
+table tr:first-child th:last-child {
+    border-top-right-radius: 4px;
+}
+
+table tr:last-child td:first-child {
+    border-bottom-left-radius: 4px;
+}
+
+table tr:last-child td:last-child {
+    border-bottom-right-radius: 4px;
+}
+
+th {
+    color: $highlight-background-text;
+    font-family: $header-font-stack;
+}
+
+.table > tfoot > tr > th,
+.table > tfoot > tr > td {
+    border-top: 0px;
+    color: white;
+}
+
+.table > tbody > tr > td,
+.table > thead > tr > th {
+    border-top: 1px solid #ddd;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 10px;
+    padding-bottom: 5px;
+}
+
+.table > thead > tr > th {
+    border-bottom: none;
+}
+
+thead tr {
+    background-color: $highlight-background;
+}
+
+tr.even {
+    background-color: $highlight-background;
+}
+
+tr.odd {
+    background-color: $highlight-2-background;
+}
+
+.well table,
+.well table a,
+.well thead tr,
+.well .table > tbody > tr > th,
+.well .table > tfoot > tr > th,
+.well .table > thead > tr > td,
+.well .table > tfoot > tr > td {
+  color: inherit;
+}
+
+.btns-table > tbody > tr > td {
+    vertical-align: inherit;
+    padding: 11px 8px;
+}
+
+.btns-table > tbody > tr > td .btn {
+    margin: -7px 0px -6px;
+}
