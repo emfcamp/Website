@@ -27,8 +27,13 @@
   }
 }
 
+.cfp-types.nav-tabs h4 {
+  color: $highlight-background-text
+}
+
 .cfp-types.nav-tabs > li > a {
-  color: #555555;
+    background-color: $highlight-2-background;
+  color: $highlight-background-text;
   padding-bottom: 9px; /* align tab bottoms */
 }
 
@@ -48,7 +53,7 @@
 
 .cfp-types.nav > li > a:hover,
 .cfp-types.nav > li > a:focus {
-  background-color: #7c1243;
+  background-color: $highlight-background;
 }
 
 .cfp-tab .form-actions {

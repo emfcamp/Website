@@ -3,7 +3,6 @@
 {% block title %}Choose Payment{% endblock %}
 {% block body %}
 
-<div class="well">
     {% if admissions %}
     You've selected the following {% if basket|count == 1 %}ticket{% else %}
     {{ basket|count }} tickets{% endif %}:
@@ -30,7 +29,6 @@
             class="btn btn-default">Pay in {% if user_currency == 'GBP' %}Euros (€){% else %}Pounds (£){% endif %}</button>
     </div>
 </form>
-</div>
 
 <form method="post" class="pay-method">
 {{ form.hidden_tag() }}

@@ -1,9 +1,18 @@
-
-
 /* Show the hover borders by default to avoid bleeding */
 .btn-primary {
-    border: 1px solid #285e8e;
+    background-color: #7c1243;
+    border: 1px solid #33071C;
 }
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active,
+.open>.dropdown-toggle.btn-primary {
+    background-color: #33071C;
+    border: 1px solid #33071C;
+}
+
 
 .btn-default {
   border: 1px solid #adadad;
