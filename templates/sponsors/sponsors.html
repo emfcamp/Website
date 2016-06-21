@@ -6,8 +6,6 @@
 
 <h2>Sponsors</h2>
 
-<p>EMF wouldn't be possible without the help of these lovely people.</p>
-
 {% macro sponsor(url, image) %}
 <div class="sponsor">
 <a class="clearfix" href="{{ url }}">
@@ -19,15 +17,42 @@
 <div class="col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
 
 <h3>Gold</h3>
+{{ sponsor("https://www.microsoft.com/", "microsoft.jpg") }}
+{{ sponsor("https://www.nexmo.com/", "nexmo.png") }}
+{{ sponsor("http://www.engineering.ucl.ac.uk/", "ucl.png") }}
+{#
+Spotify
+#}
 
 <h3>Badge</h3>
+{{ sponsor("http://www.ti.com/", "ti.png") }}
+{{ sponsor("http://www.st.com/", "st.jpg") }}
+{{ sponsor("http://www.hcduk.com/", "hcd.jpg") }}
+{{ sponsor("http://www.getsmarterenergy.com/", "getsmarterenergy.png") }}
+{{ sponsor("https://www.we-online.com/", "wurth.jpg") }}
+{#
+RS
+#}
 
-<h3>Networking</h3>
+<h3>Silver</h3>
+{{ sponsor("https://www.portcullis-security.com/", "portcullis.jpg") }}
+{{ sponsor("https://www.yelp.com/", "yelp.png") }}
+{{ sponsor("https://www.heartinternet.uk/", "heartinternet.png") }}
 
+<h3>Bronze</h3>
+{{ sponsor("https://www.codethink.co.uk/", "codethink.png") }}
+{{ sponsor("https://www.twilio.com/", "twilio.png") }}
+{{ sponsor("https://www.chef.io/", "chef.png") }}
+{#{{ sponsor("http://www.medicalconnections.co.uk/", "medicalconnections.png") }}#}
+{#
+Improbable
+Just Add Sharks
+#}
 </div>
-
+{#
 <div class="clearfix col-xs-12">
 <h3>Special Thanks</h3>
 
 </div>
+#}
 {% endblock %}
