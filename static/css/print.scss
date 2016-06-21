@@ -4,6 +4,15 @@
   .container {
     width: auto;
   }
+
+  body {
+    margin-bottom: 6ex;
+  }
+
+  dl.company-info {
+    position: fixed;
+  }
+
 }
 
 .cancelled .table:before {
@@ -15,10 +24,6 @@
   left: 0;
   right: 0;
   top: auto;
-}
-
-body {
-  margin-bottom: 6ex;
 }
 
 .invoice h2 {
@@ -114,9 +119,7 @@ body {
   margin-left: 180px;
 }
 
-
 dl.company-info {
-  position: fixed;
   bottom: 0;
   padding-top: 5ex;
 }
