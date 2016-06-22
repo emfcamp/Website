@@ -1,0 +1,54 @@
+{% extends "admin/base.html" %}
+{% from "_formhelpers.html" import render_field %}
+{% set nav_active = 'admin_payments' %}
+{% block body %}
+<h2>Refund Stripe payment</h2>
+
+<h4>Current refunds</h4>
+{% if refunded_tickets %}
+<table>
+<thead>
+  <tr>
+    <th class="col-sm-2">Ticket</th>
+    <th class="col-sm-3">Provider</th>
+    <th>Refunded at</th>
+  </tr>
+</thead>
+<tbody>
+{% for t in refunded_tickets %}
+  <tr class="{{ loop.cycle('odd', 'even') }}">
+    <td class="col-sm-2">{{ t.id }}</td>
+    <td class="col-sm-3">{{ t.refund.provider | capitalize }}</td>
+    <td>{{ t.refund.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+  </tr>
+{% endfor %}
+</tbody>
+<table>
+{% endif %}
+
+<p></p>
+
+<p>To manually refund this payment, please select tickets to refund below.</p>
+
+<p>Free tickets that are not refunded will be marked as paid.</p>
+
+<form method="post" action="{{ url_for('.stripe_refund', payment_id=payment.id) }}" class="form-horizontal" role="form">
+{{ form.hidden_tag() }}
+
+{% for f in form.tickets %}
+  {{ f.hidden_tag_without('csrf_token') }}
+  <div class="col-sm-11 col-sm-offset-1">
+    <label class="checkbox">
+      {{ f.refund(disabled=f._disabled) }} {{ f.refund.label.text }} ({{ f._ticket.type.get_price(payment.currency) | price(payment.currency) }})
+    </label>
+    {% for error in f.refund.errors %}
+    <div class="help-block">{{ error }}</div>
+    {% endfor %}
+  </div>
+
+{% endfor %}
+
+{{ form.refund(class_="btn btn-danger pull-right") }}
+</form>
+
+{% endblock %}

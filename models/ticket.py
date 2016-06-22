@@ -187,12 +187,14 @@ class Ticket(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     type_id = db.Column(db.Integer, db.ForeignKey('ticket_type.id'), nullable=False, index=True)
     paid = db.Column(db.Boolean, default=False, nullable=False, index=True)
+    # Until a ticket is paid for, we track the payment's expiry
     expires = db.Column(db.DateTime, nullable=False)
     expired = column_property(and_(expires < func.now(), paid == False))  # noqa
     receipt = db.Column(db.String, unique=True)
     qrcode = db.Column(db.String, unique=True)
     emailed = db.Column(db.Boolean, default=False, nullable=False)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
+    refund_id = db.Column(db.Integer, db.ForeignKey('refund.id'))
     attribs = db.relationship("TicketAttrib", backref="ticket", cascade='all')
     transfers = db.relationship('TicketTransfer', backref='ticket')
     checkin = db.relationship('TicketCheckin', uselist=False, backref='ticket', cascade='all')

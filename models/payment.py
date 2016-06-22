@@ -1,4 +1,4 @@
-from main import db, gocardless, stripe, external_url
+from main import db, gocardless, external_url
 from sqlalchemy import event
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import get_history
@@ -27,6 +27,7 @@ class Payment(db.Model):
     changes = db.relationship('PaymentChange', backref='payment',
                               order_by='PaymentChange.timestamp, PaymentChange.id')
     tickets = db.relationship('Ticket', lazy='dynamic', backref='payment', cascade='all')
+    refunds = db.relationship('Refund', lazy='dynamic', backref='payment', cascade='all')
     __mapper_args__ = {'polymorphic_on': provider}
 
     def __init__(self, currency, amount):
@@ -51,6 +52,11 @@ class Payment(db.Model):
         premium = premium.quantize(Decimal(1), ROUND_UP)
         return premium / 100
 
+    @classmethod
+    def premium_refund(cls, currency, amount):
+        # Just use the default calculation
+        return cls.premium(currency, amount)
+
     def paid(self):
         if self.state == 'paid':
             raise StateException('Payment is already paid')
@@ -59,11 +65,6 @@ class Payment(db.Model):
             ticket.paid = True
         self.state = 'paid'
 
-    def cancel_tickets(self):
-        for ticket in self.tickets:
-            ticket.expires = datetime.utcnow()
-            ticket.paid = False
-
     def cancel(self):
         if self.state == 'cancelled':
             raise StateException('Payment is already cancelled')
@@ -71,11 +72,18 @@ class Payment(db.Model):
         elif self.state == 'refunded':
             raise StateException('Refunded payments cannot be cancelled')
 
-        if self.state != 'refunded':
-            self.cancel_tickets()
+        for ticket in self.tickets:
+            ticket.paid = False
+            if self.state != 'refunded':
+                ticket.expires = datetime.utcnow()
+
         self.state = 'cancelled'
 
-    def refund(self):
+    def manual_refund(self):
+        # Only to be called for full out-of-band refunds, for book-keeping.
+        # Providers should cancel tickets individually and insert their
+        # own Refunds subclass for partial refunds.
+
         if self.state == 'refunded':
             raise StateException('Payment is already refunded')
 
@@ -83,8 +91,20 @@ class Payment(db.Model):
             # If we receive money for a cancelled payment, it will be set to paid
             raise StateException('Refunded payments cannot be cancelled')
 
-        if self.state != 'cancelled':
-            self.cancel_tickets()
+        refund = Refund(self, self.amount)
+        for ticket in self.tickets:
+            if ticket.user != self.user:
+                raise StateException('Cannot refund transferred ticket')
+            if self.state != 'cancelled':
+                ticket.expires = datetime.utcnow()
+            if ticket.refund is not None:
+                raise StateException('Ticket is already refunded')
+            if ticket.type.get_price(self.currency) and not ticket.paid:
+                # This might turn out to be too strict
+                raise StateException('Ticket is not paid, so cannot be refunded')
+            ticket.paid = False
+            ticket.refund = refund
+
         self.state = 'refunded'
 
     def clone(self, ignore_capacity=False):
@@ -116,11 +136,11 @@ class BankPayment(Payment):
     def __repr__(self):
         return "<BankPayment: %s %s>" % (self.state, self.bankref)
 
-    def refund(self):
+    def manual_refund(self):
         if self.state != 'paid':
             raise StateException('Only paid BankPayments can be marked as refunded')
 
-        super(BankPayment, self).refund()
+        super(BankPayment, self).manual_refund()
 
 
 class BankAccount(db.Model):
@@ -275,6 +295,7 @@ class GoCardlessPayment(Payment):
             pass
 
         else:
+            # FIXME: move this out to the app
             bill = gocardless.client.bill(self.gcid)
 
             if bill.can_be_cancelled:
@@ -284,13 +305,13 @@ class GoCardlessPayment(Payment):
 
         super(GoCardlessPayment, self).cancel()
 
-    def refund(self):
+    def manual_refund(self):
         # https://help.gocardless.com/customer/portal/articles/1580207
         # "At the moment, it isn't usually possible to refund a customer via GoCardless"
         if self.state != 'paid':
             raise StateException('Only paid GoCardless payments can be marked as refunded')
 
-        super(GoCardlessPayment, self).refund()
+        super(GoCardlessPayment, self).manual_refund()
 
 
 class StripePayment(Payment):
@@ -307,32 +328,15 @@ class StripePayment(Payment):
 
         super(StripePayment, self).cancel()
 
-    def refund(self):
-        if self.state not in ['charged', 'paid']:
-            raise StateException('Only charged/paid StripePayments can be refunded')
-
-        charge = stripe.Charge.retrieve(self.chargeid)
-
-        if not charge.refunded:
-            refund = stripe.Refund.create(charge=self.chargeid)
-            stripe_refund = StripeRefund(self)
-            stripe_refund.refundid = refund.id
-
-        super(StripePayment, self).refund()
-
     @property
     def description(self):
         return 'EMF 2016 tickets'
 
+    def manual_refund(self):
+        if self.state not in ['charged', 'paid']:
+            raise StateException('Only paid or charged StripePayments can be marked as refunded')
 
-class StripeRefund(db.Model):
-    __tablename__ = 'stripe_refund'
-    id = db.Column(db.Integer, primary_key=True)
-    refundid = db.Column(db.String, unique=True)
-    payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'), nullable=False)
-
-    def __init__(self, payment):
-        self.payment = payment
+        super(StripePayment, self).manual_refund()
 
 
 class PaymentChange(db.Model):
@@ -362,3 +366,43 @@ def payment_change(session, flush_context):
     for obj in session.deleted:
         if isinstance(obj, Payment):
             raise Exception('Payments cannot be deleted')
+
+
+class Refund(db.Model):
+    __tablename__ = 'refund'
+    id = db.Column(db.Integer, primary_key=True)
+    payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'), nullable=False)
+    provider = db.Column(db.String, nullable=False)
+    amount_int = db.Column(db.Integer, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    tickets = db.relationship('Ticket', lazy='dynamic', backref='refund', cascade='all')
+    __mapper_args__ = {'polymorphic_on': provider}
+
+    def __init__(self, payment, amount):
+        self.payment_id = payment.id
+        self.payment = payment
+        self.amount = amount
+
+    @property
+    def amount(self):
+        return Decimal(self.amount_int) / 100
+
+    @amount.setter
+    def amount(self, val):
+        self.amount_int = int(val * 100)
+
+
+class StripeRefund(Refund):
+    __mapper_args__ = {'polymorphic_identity': 'stripe'}
+    refundid = db.Column(db.String, unique=True)
+
+
+class StripeRefundOld(db.Model):
+    __tablename__ = 'stripe_refund'
+    id = db.Column(db.Integer, primary_key=True)
+    refundid = db.Column(db.String, unique=True)
+    payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'), nullable=False)
+
+    def __init__(self, payment):
+        self.payment = payment
+
