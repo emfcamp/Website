@@ -17,7 +17,6 @@ from wtforms import (
 from wtforms.fields.html5 import EmailField
 
 from sqlalchemy.orm import joinedload
-from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql.functions import func
 
 from main import db, mail, stripe
@@ -155,10 +154,7 @@ class TransactionSuppressForm(Form):
 @admin.route('/transaction/<int:txn_id>/suppress', methods=['GET', 'POST'])
 @admin_required
 def transaction_suppress(txn_id):
-    try:
-        txn = BankTransaction.query.get(txn_id)
-    except NoResultFound:
-        abort(404)
+    txn = BankTransaction.query.get_or_404(txn_id)
 
     form = TransactionSuppressForm()
     if form.validate_on_submit():
@@ -333,7 +329,7 @@ class EditTicketTypeForm(Form):
 def edit_ticket_type(type_id):
     form = EditTicketTypeForm()
 
-    ticket_type = TicketType.query.get(type_id)
+    ticket_type = TicketType.query.get_or_404(type_id)
     if form.validate_on_submit():
         app.logger.info('%s editing ticket type %s', current_user.name, type_id)
         if form.discount_token.data == '':
@@ -422,7 +418,7 @@ def new_ticket_type(copy_id):
 @admin.route('/ticket-types/<int:type_id>')
 @admin_required
 def ticket_type_details(type_id):
-    ticket_type = TicketType.query.get(type_id)
+    ticket_type = TicketType.query.get_or_404(type_id)
     return render_template('admin/ticket-type-details.html', ticket_type=ticket_type)
 
 
@@ -459,7 +455,7 @@ def tickets_choose_free(user_id=None):
         new_user = True
     else:
         form = FreeTicketsForm()
-        user = User.query.get(user_id)
+        user = User.query.get_or_404(user_id)
         new_user = False
 
     if request.method != 'POST':

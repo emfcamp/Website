@@ -212,7 +212,7 @@ def get_next_proposal_to(prop, state):
 @cfp_review.route('/proposals/<int:proposal_id>', methods=['GET', 'POST'])
 @admin_required
 def update_proposal(proposal_id):
-    prop = Proposal.query.get(proposal_id)
+    prop = Proposal.query.get_or_404(proposal_id)
     next_prop = get_next_proposal_to(prop, prop.state)
 
     next_id = next_prop.id if next_prop else None
@@ -329,7 +329,7 @@ class SendMessageForm(Form):
 @admin_required
 def message_proposer(proposal_id):
     form = SendMessageForm()
-    proposal = Proposal.query.get(proposal_id)
+    proposal = Proposal.query.get_or_404(proposal_id)
 
     if request.method == 'POST':
         if form.send.data and form.message.data:
@@ -455,7 +455,7 @@ class UpdateVotesForm(Form):
 @admin_required
 def proposal_votes(proposal_id):
     form = UpdateVotesForm()
-    proposal = Proposal.query.get(proposal_id)
+    proposal = Proposal.query.get_or_404(proposal_id)
     all_votes = {v.id: v for v in proposal.votes}
 
     if form.validate_on_submit():
@@ -538,7 +538,7 @@ class AnonymiseProposalForm(Form):
 @cfp_review.route('/anonymisation/<int:proposal_id>', methods=['GET', 'POST'])
 @anon_required
 def anonymise_proposal(proposal_id):
-    prop = Proposal.query.get(proposal_id)
+    prop = Proposal.query.get_or_404(proposal_id)
     if prop.state in ['new', 'edit', 'locked']:
         # Make sure people only see proposals that are ready
         return abort(404)
@@ -688,7 +688,7 @@ class VoteForm(Form):
 @cfp_review.route('/review/<int:proposal_id>', methods=['GET', 'POST'])
 @review_required
 def review_proposal(proposal_id):
-    prop = Proposal.query.get(proposal_id)
+    prop = Proposal.query.get_or_404(proposal_id)
 
     # Reviewers can only see anonymised proposals that aren't theirs
     # Also, only admin are reviewing installations

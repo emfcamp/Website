@@ -202,8 +202,8 @@ def edit_proposal(proposal_id):
         return redirect(url_for('users.login', next=url_for('.edit_proposal',
                                                            proposal_id=proposal_id)))
 
-    proposal = Proposal.query.get(proposal_id)
-    if not proposal or proposal.user != current_user:
+    proposal = Proposal.query.get_or_404(proposal_id)
+    if proposal.user != current_user:
         abort(404)
 
     form = TalkProposalForm() if proposal.type == 'talk' else \
@@ -277,8 +277,8 @@ def proposal_messages(proposal_id):
     if current_user.is_anonymous():
         return redirect(url_for('users.login', next=url_for('.proposal_messages',
                                                            proposal_id=proposal_id)))
-    proposal = Proposal.query.get(proposal_id)
-    if not proposal or proposal.user_id != current_user.id:
+    proposal = Proposal.query.get_or_404(proposal_id)
+    if proposal.user_id != current_user.id:
         abort(404)
 
     form = MessagesForm()

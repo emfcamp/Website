@@ -207,6 +207,8 @@ class Ticket(db.Model):
         elif type_id is not None:
             self.type_id = type_id
             self.type = TicketType.query.get(type_id)
+            if not self.type:
+                raise ValueError('Ticket type not found')
         else:
             raise ValueError('Type must be specified')
 
