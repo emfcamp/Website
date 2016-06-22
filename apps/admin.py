@@ -24,7 +24,7 @@ from main import db, mail, stripe
 from models.user import User
 from models.permission import Permission
 from models.payment import (
-    Payment, BankPayment, StripePayment, StripeRefund,
+    Payment, BankPayment, BankRefund, StripeRefund,
     BankTransaction, StateException,
 )
 from models.ticket import (
@@ -781,7 +781,7 @@ def cancel_payment(payment_id):
 class RefundPaymentForm(Form):
     refund = SubmitField("Refund payment")
 
-@admin.route('/payment/<int:payment_id>/refund', methods=['GET', 'POST'])
+@admin.route('/payment/<int:payment_id>/full-refund', methods=['GET', 'POST'])
 @admin_required
 def refund_payment(payment_id):
     payment = Payment.query.get_or_404(payment_id)
@@ -806,23 +806,21 @@ def refund_payment(payment_id):
     return render_template('admin/payment-refund.html', payment=payment, form=form)
 
 
-class StripeRefundTicketForm(Form):
+
+class PartialRefundTicketForm(Form):
     ticket_id = HiddenIntegerField('Ticket ID', [Required()])
     refund = BooleanField('Refund ticket', default=True)
 
-class StripeRefundForm(Form):
-    tickets = FieldList(FormField(StripeRefundTicketForm))
-    refund = SubmitField('Refund payment')
+class PartialRefundForm(Form):
+    tickets = FieldList(FormField(PartialRefundTicketForm))
+    refund = SubmitField('I have refunded these tickets by bank transfer')
+    stripe_refund = SubmitField('Refund through Stripe')
 
 
-@admin.route("/payment/stripe/<int:payment_id>/refund", methods=['GET', 'POST'])
+@admin.route("/payment/<int:payment_id>/refund", methods=['GET', 'POST'])
 @admin_required
-def stripe_refund(payment_id):
-    payment = Payment.query.get(payment_id)
-    if payment.provider != 'stripe':
-        app.logger.warning('Payment %s is of type %s, not Stripe', payment.provider)
-        flash('Payment is not a Stripe payment')
-        return redirect(url_for('.payments'))
+def partial_refund(payment_id):
+    payment = Payment.query.get_or_404(payment_id)
 
     valid_states = ['charged', 'paid', 'partrefunded']
     if payment.state not in valid_states:
@@ -830,7 +828,10 @@ def stripe_refund(payment_id):
         flash('Payment is not currently refundable')
         return redirect(url_for('.payments'))
 
-    form = StripeRefundForm(request.form)
+    form = PartialRefundForm(request.form)
+
+    if payment.provider != 'stripe':
+        form.stripe_refund.data = ''
 
     if request.method != 'POST':
         for ticket in payment.tickets:
@@ -848,34 +849,41 @@ def stripe_refund(payment_id):
             f._disabled = True
 
     if form.validate_on_submit():
-        if form.refund.data:
+        if form.refund.data or form.stripe_refund.data:
             tickets = [f._ticket for f in form.tickets if f.refund.data and not f._disabled]
             total = sum(t.type.get_price(payment.currency) for t in tickets)
 
             if not total:
                 flash('Please select some non-free tickets to refund')
-                return redirect(url_for('.stripe_refund', payment_id=payment.id))
+                return redirect(url_for('.partial_refund', payment_id=payment.id))
 
             if any(t.user != payment.user for t in tickets):
                 flash('Cannot refund transferred ticket')
-                return redirect(url_for('.stripe_refund', payment_id=payment.id))
+                return redirect(url_for('.partial_refund', payment_id=payment.id))
 
-            premium = StripePayment.premium_refund(payment.currency, total)
+            premium = payment.__class__.premium_refund(payment.currency, total)
             app.logger.info('Refunding %s tickets from payment %s, totalling %s %s and %s %s premium',
                         len(tickets), payment.id, total, payment.currency, premium, payment.currency)
 
-            charge = stripe.Charge.retrieve(payment.chargeid)
+            if form.stripe_refund.data:
+                app.logger.info('Refunding using Stripe')
+                charge = stripe.Charge.retrieve(payment.chargeid)
 
-            if charge.refunded:
-                # This happened unexpectedly - send the email as usual
-                stripe_payment_refunded(payment)
-                flash('This charge has already been fully refunded.')
-                return redirect(url_for('.stripe_refund', payment_id=payment.id))
+                if charge.refunded:
+                    # This happened unexpectedly - send the email as usual
+                    stripe_payment_refunded(payment)
+                    flash('This charge has already been fully refunded.')
+                    return redirect(url_for('.partial_refund', payment_id=payment.id))
 
-            original_state = payment.state
-            payment.state = 'refunding'
+                payment.state = 'refunding'
+                refund = StripeRefund(payment, total + premium)
 
-            refund = StripeRefund(payment, total + premium)
+            else:
+                app.logger.info('Refunding out of band')
+
+                payment.state = 'refunding'
+                refund = BankRefund(payment, total + premium)
+
 
             for ticket in tickets:
                 ticket.paid = False
@@ -902,22 +910,24 @@ def stripe_refund(payment_id):
 
             db.session.commit()
 
-            try:
-                stripe_refund = stripe.Refund.create(
-                    charge=payment.chargeid,
-                    amount=refund.amount_int)
+            if form.stripe_refund.data:
+                try:
+                    stripe_refund = stripe.Refund.create(
+                        charge=payment.chargeid,
+                        amount=refund.amount_int)
 
-            except Exception as e:
-                app.logger.warn("Exception %r refunding payment", e)
-                flash('An error occurred refunding. Please check the state of the payment.')
-                return redirect(url_for('.stripe_refund', payment_id=payment.id))
+                except Exception as e:
+                    app.logger.warn("Exception %r refunding payment", e)
+                    flash('An error occurred refunding with Stripe. Please check the state of the payment.')
+                    return redirect(url_for('.partial_refund', payment_id=payment.id))
 
-            refund.refundid = stripe_refund.id
-            if stripe_refund.status != 'succeeded':
-                # Should never happen according to the docs
-                app.logger.warn("Refund status is %s, not succeeded", stripe_refund.status)
-                flash('An error occurred refunding. Please check the state of the payment.')
-                return redirect(url_for('.stripe_refund', payment_id=payment.id))
+                refund.refundid = stripe_refund.id
+                if stripe_refund.status != 'succeeded':
+                    # Should never happen according to the docs
+                    app.logger.warn("Refund status is %s, not succeeded", stripe_refund.status)
+                    flash('The refund with Stripe was not successful. Please check the state of the payment.')
+                    return redirect(url_for('.partial_refund', payment_id=payment.id))
+
 
             if all_refunded:
                 payment.state = 'refunded'
@@ -932,8 +942,8 @@ def stripe_refund(payment_id):
         return redirect(url_for('.payments'))
 
     refunded_tickets = [t for t in payment.tickets if t.refund]
-    return render_template('admin/stripe-refund.html', payment=payment, form=form,
-                           refunded_tickets = refunded_tickets)
+    return render_template('admin/partial-refund.html', payment=payment, form=form,
+                           refunded_tickets=refunded_tickets)
 
 
 class UpdateFeatureFlagForm(Form):

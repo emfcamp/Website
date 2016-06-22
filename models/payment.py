@@ -91,7 +91,7 @@ class Payment(db.Model):
             # If we receive money for a cancelled payment, it will be set to paid
             raise StateException('Refunded payments cannot be cancelled')
 
-        refund = Refund(self, self.amount)
+        refund = BankRefund(self, self.amount)
         for ticket in self.tickets:
             if ticket.user != self.user:
                 raise StateException('Cannot refund transferred ticket')
@@ -391,6 +391,9 @@ class Refund(db.Model):
     def amount(self, val):
         self.amount_int = int(val * 100)
 
+
+class BankRefund(Refund):
+    __mapper_args__ = {'polymorphic_identity': 'banktransfer'}
 
 class StripeRefund(Refund):
     __mapper_args__ = {'polymorphic_identity': 'stripe'}

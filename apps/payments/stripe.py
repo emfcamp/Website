@@ -320,10 +320,9 @@ def stripe_payment_refunded(payment):
 
     logger.info('Setting payment %s to refunded', payment.id)
     for ticket in payment.tickets:
-        for ticket in self.tickets:
-            ticket.paid = False
-            if self.state != 'cancelled':
-                ticket.expires = datetime.utcnow()
+        ticket.paid = False
+        if payment.state != 'cancelled':
+            ticket.expires = datetime.utcnow()
 
     payment.state = 'refunded'
     db.session.commit()

@@ -27,15 +27,12 @@
   <td>
     {% if payment.provider == 'stripe' %}
     <a class="btn btn-success" href="{{ url_for('.update_payment', payment_id=payment.id) }}">Update</a>
-    {% if payment.state in ['charged', 'paid', 'partrefunded'] %}
-    <a class="btn btn-danger" href="{{ url_for('.stripe_refund', payment_id=payment.id) }}">Refund</a>
-    {% endif %}
     {% endif %}
     {% if payment.provider in ['gocardless', 'banktransfer'] and payment.state not in ['cancelled', 'paid', 'refunded'] %}
     <a class="btn btn-danger" href="{{ url_for('.cancel_payment', payment_id=payment.id) }}">Cancel</a>
     {% endif %}
-    {% if payment.provider in ['gocardless', 'banktransfer'] and payment.state == 'paid' %}
-    <a class="btn btn-danger" href="{{ url_for('.refund_payment', payment_id=payment.id) }}">Refund</a>
+    {% if payment.state in ['charged', 'paid', 'partrefunded'] %}
+    <a class="btn btn-danger" href="{{ url_for('.partial_refund', payment_id=payment.id) }}">Refund</a>
     {% endif %}
   </td>
 </tr>

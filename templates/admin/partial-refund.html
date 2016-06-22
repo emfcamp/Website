@@ -2,7 +2,7 @@
 {% from "_formhelpers.html" import render_field %}
 {% set nav_active = 'admin_payments' %}
 {% block body %}
-<h2>Refund Stripe payment</h2>
+<h2>Refund payment</h2>
 
 <h4>Current refunds</h4>
 {% if refunded_tickets %}
@@ -28,11 +28,11 @@
 
 <p></p>
 
-<p>To manually refund this payment, please select tickets to refund below.</p>
+<p>To refund this payment, please select tickets to refund below.</p>
 
 <p>Free tickets that are not refunded will be marked as paid.</p>
 
-<form method="post" action="{{ url_for('.stripe_refund', payment_id=payment.id) }}" class="form-horizontal" role="form">
+<form method="post" action="{{ url_for('.partial_refund', payment_id=payment.id) }}" class="form-horizontal" role="form">
 {{ form.hidden_tag() }}
 
 {% for f in form.tickets %}
@@ -49,6 +49,9 @@
 {% endfor %}
 
 {{ form.refund(class_="btn btn-danger pull-right") }}
+{% if payment.provider == 'stripe' %}
+{{ form.stripe_refund(class_="btn btn-warning pull-right") }}
+{% endif %}
 </form>
 
 {% endblock %}
