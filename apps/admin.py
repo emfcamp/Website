@@ -278,10 +278,11 @@ def tickets_unpaid():
 @admin_required
 def ticket_types():
     # This includes expired tickets
-    totals = Payment.query.filter(
+    totals = Payment.query.join(Ticket).filter(
         Payment.state != 'new',
         Payment.state != 'cancelled',
-    ).join(Ticket).join(TicketType).with_entities(
+        Ticket.refund_id.is_(None),
+    ).join(TicketType).with_entities(
         TicketType.admits,
         func.count(),
     ).group_by(TicketType.admits).all()
