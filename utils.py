@@ -327,7 +327,7 @@ class SendTransferReminder(Command):
 
             msg.body = render_template("emails/transfer-reminder.txt", user=user)
 
-            app.logger.info('Emailing %s transfer reminder for %s tickets', user.email, user.tickets.filter_by(paid=True).count())
+            app.logger.info('Emailing %s transfer reminder', user.email)
             mail.send(msg)
 
             for ticket in user.tickets:
