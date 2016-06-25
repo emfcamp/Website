@@ -193,6 +193,7 @@ class Ticket(db.Model):
     receipt = db.Column(db.String, unique=True)
     qrcode = db.Column(db.String, unique=True)
     emailed = db.Column(db.Boolean, default=False, nullable=False)
+    transfer_reminder_sent = db.Column(db.Boolean, default=False, nullable=False)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
     refund_id = db.Column(db.Integer, db.ForeignKey('refund.id'))
     attribs = db.relationship("TicketAttrib", backref="ticket", cascade='all')

@@ -1,13 +1,17 @@
 #!/usr/bin/env python
 # coding=utf-8
 from datetime import datetime, timedelta
-
 import ofxparse
+from unicodecsv import DictReader
+from mailsnake import MailSnake
+
 from flask.ext.script import Command, Manager, Option
 from flask.ext.migrate import MigrateCommand
 from flask import render_template, current_app as app
 from flask_mail import Message
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.sql.functions import func
+
 from main import create_app, mail, db
 from models import (
     User, TicketType, Ticket, TicketPrice
@@ -19,9 +23,6 @@ from models.cfp import Proposal, TalkProposal, WorkshopProposal, InstallationPro
 from models.permission import Permission
 from apps.tickets import render_receipt, render_pdf
 from apps.payments import banktransfer
-from unicodecsv import DictReader
-from mailsnake import MailSnake
-
 
 class CreateDB(Command):
     # For testing - you usually want to use db migrate/db upgrade instead
@@ -310,6 +311,30 @@ class CreateTickets(Command):
         add_ticket_types(types)
 
 
+class SendTransferReminder(Command):
+
+    def run(self):
+        users_to_email = User.query.join(Ticket, TicketType).filter(
+            TicketType.admits == 'full',
+            Ticket.paid == True,  # noqa
+            Ticket.transfer_reminder_sent == False,
+        ).group_by(User).having(func.count() > 1)
+
+        for user in users_to_email:
+            msg = Message("Your Electromagnetic Field Tickets",
+                          sender=app.config['TICKETS_EMAIL'],
+                          recipients=[user.email])
+
+            msg.body = render_template("emails/transfer-reminder.txt", user=user)
+
+            app.logger.info('Emailing %s transfer reminder for %s tickets', user.email, user.tickets.count())
+            mail.send(msg)
+
+            for ticket in user.tickets:
+                ticket.transfer_reminder_sent = True
+            db.session.commit()
+
+
 class SendTickets(Command):
 
     def run(self):
@@ -511,6 +536,7 @@ if __name__ == "__main__":
     manager.add_command('loadofx', LoadOfx())
     manager.add_command('reconcile', Reconcile())
 
+    manager.add_command('sendtransferreminder', SendTransferReminder())
     manager.add_command('createtickets', CreateTickets())
     manager.add_command('sendtickets', SendTickets())
 

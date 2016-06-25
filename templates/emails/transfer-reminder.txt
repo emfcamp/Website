@@ -1,0 +1,22 @@
+Hello {{ user.name }}!
+
+You've currently got more than one adult EMF ticket registered against
+your email address.
+
+We'd really appreciate you transferring the tickets for others to their
+email addresses so we can send them information as the event approaches.
+
+When you arrive at the event we may also ask for your email address or
+ID at check-in, so it is important that each ticket be registered to
+the correct person.
+
+Don't worry, tickets can be transferred again if people need to sell
+them on!
+
+You can find all the tickets registered to your account on the
+following page, along with a "transfer" button:
+
+{{ external_url('users.login') }}
+
+Looking forward to seeing you all in the field,
+The EMF team
