@@ -145,7 +145,7 @@ def proposals():
                 Ticket.expired == False),
         )
         proposals = Proposal.query.join(Proposal.user).filter(
-            User.will_have_ticket == False,
+            User.will_have_ticket == False,  # noqa
             ~paid_tickets.filter(User.tickets.expression).exists()
         ).all()
 
