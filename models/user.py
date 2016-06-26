@@ -38,6 +38,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String, unique=True, index=True)
     name = db.Column(db.String, nullable=False, index=True)
     phone = db.Column(db.String, nullable=True)
+    will_have_ticket = db.Column(db.Boolean, nullable=False, default=False)  # for CfP filtering
     diversity = db.relationship('UserDiversity', uselist=False, backref='user', cascade='all, delete, delete-orphan')
     tickets = db.relationship('Ticket', lazy='dynamic', backref='user', cascade='all, delete, delete-orphan')
     payments = db.relationship('Payment', lazy='dynamic', backref='user', cascade='all')

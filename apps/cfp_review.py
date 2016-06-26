@@ -164,6 +164,7 @@ class UpdateProposalForm(Form):
     needs_help = BooleanField('Needs Help')
     needs_money = BooleanField('Needs Money')
     one_day = BooleanField('One day only')
+    will_have_ticket = BooleanField('Will have a ticket')
 
     update = SubmitField('Force update')
     reject = SubmitField('Reject')
@@ -180,6 +181,7 @@ class UpdateProposalForm(Form):
         proposal.needs_help = self.needs_help.data
         proposal.needs_money = self.needs_money.data
         proposal.one_day = self.one_day.data
+        proposal.user.will_have_ticket = self.will_have_ticket.data
 
 
 class UpdateWorkshopForm(UpdateProposalForm):
@@ -265,6 +267,7 @@ def update_proposal(proposal_id):
     form.needs_help.data = prop.needs_help
     form.needs_money.data = prop.needs_money
     form.one_day.data = prop.one_day
+    form.will_have_ticket.data = prop.user.will_have_ticket
 
     if prop.type == 'workshop':
         form.attendees.data = prop.attendees
