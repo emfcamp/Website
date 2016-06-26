@@ -21,6 +21,8 @@ from main import db, external_url
 from .common import require_permission, send_template_email
 from .majority_judgement import calculate_max_normalised_score
 
+from models.ticket import Ticket, TicketType
+from models.user import User
 from models.cfp import (
     Proposal, CFPMessage, CFPVote, CFP_STATES
 )
@@ -137,7 +139,15 @@ def proposals():
     proposals.sort(**sort_dict)
 
     if 'needs_ticket' in request.args:
-        proposals = filter(lambda p: not (p.user.tickets.count() > 0), proposals)
+        paid_tickets = Ticket.query.join(TicketType).filter(
+            TicketType.admits == 'full',
+            or_(Ticket.paid == True,  # noqa
+                Ticket.expired == False),
+        )
+        proposals = Proposal.query.join(Proposal.user).filter(
+            User.will_have_ticket == False,
+            ~paid_tickets.filter(User.tickets.expression).exists()
+        ).all()
 
     non_sort_query_string = dict(request.args)
     if 'sort_by' in non_sort_query_string:
