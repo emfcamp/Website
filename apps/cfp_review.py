@@ -132,22 +132,22 @@ def get_proposal_sort_dict(parameters):
 @admin_required
 def proposals():
     query_dict = build_proposal_query_dict(request.args)
+    proposals = Proposal.query.filter_by(**query_dict)
 
-    proposals = Proposal.query.filter_by(**query_dict).all()
-
-    sort_dict = get_proposal_sort_dict(request.args)
-    proposals.sort(**sort_dict)
-
-    if 'needs_ticket' in request.args:
+    if request.args.get('needs_ticket') == 'True':
         paid_tickets = Ticket.query.join(TicketType).filter(
             TicketType.admits == 'full',
             or_(Ticket.paid == True,  # noqa
                 Ticket.expired == False),
         )
-        proposals = Proposal.query.join(Proposal.user).filter(
+        proposals = proposals.join(Proposal.user).filter(
             User.will_have_ticket == False,  # noqa
             ~paid_tickets.filter(User.tickets.expression).exists()
-        ).all()
+        )
+
+    sort_dict = get_proposal_sort_dict(request.args)
+    proposals = proposals.all()
+    proposals.sort(**sort_dict)
 
     non_sort_query_string = dict(request.args)
     if 'sort_by' in non_sort_query_string:
