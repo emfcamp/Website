@@ -508,10 +508,10 @@ class UpdateSegments(Command):
         app.logger.info("Ticketholders list: adding %s addresses, removing %s addresses",
                         len(to_add), len(to_remove))
 
-        res = ms.listBatchUnsubscribe(id=list_id, batch=list(to_remove), send_goodbye=False)
+        res = ms.listBatchUnsubscribe(id=list_id, emails=list(to_remove), send_goodbye=False)
         print(res)
 
-        to_add_data = [{'EMAIL': ticket.email, 'EMAIL_TYPE': 'html'} for email in to_add]
+        to_add_data = [{'EMAIL': email, 'EMAIL_TYPE': 'html'} for email in to_add]
         res = ms.listBatchSubscribe(id=list_id, batch=to_add_data,
                                     double_optin=False, update_existing=True)
         print(res)
