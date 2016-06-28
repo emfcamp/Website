@@ -498,8 +498,21 @@ class UpdateSegments(Command):
         list_id = '5f939ca32a'  # Ticketholders 2016
         tix = Ticket.query.filter_by(paid=True).join(User).\
             group_by(User).with_entities(User).order_by(User.id)
-        email_addresses = [{'EMAIL': ticket.email, 'EMAIL_TYPE': 'html'} for ticket in tix]
-        res = ms.listBatchSubscribe(id=list_id, batch=email_addresses,
+
+        list_members = {member['email'] for member in ms.listMembers(id=list_id, limit=10000)['data']}
+        current_users = {ticket.email for ticket in tix}
+
+        to_remove = list_members - current_users
+        to_add = current_users - list_members
+
+        app.logger.info("Ticketholders list: adding %s addresses, removing %s addresses",
+                        len(to_add), len(to_remove))
+
+        res = ms.listBatchUnsubscribe(id=list_id, batch=list(to_remove), send_goodbye=False)
+        print(res)
+
+        to_add_data = [{'EMAIL': ticket.email, 'EMAIL_TYPE': 'html'} for email in to_add]
+        res = ms.listBatchSubscribe(id=list_id, batch=to_add_data,
                                     double_optin=False, update_existing=True)
         print(res)
 
