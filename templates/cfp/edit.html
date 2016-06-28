@@ -26,10 +26,16 @@
   {% include "cfp/edit-form.html" %}
 {% else %}
   <div class="well"><div class="row">
-    <div class="col-md-12">
-      You can't currently edit your proposal as it's being reviewed.
-      If you have any questions please <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">add a message</a>.
-    </div>
+    {% if proposal.state in ['accepted', 'finished']  %}
+      <div>Your talk has been accepted, if you haven't already please visit
+        <a href="{{ url_for('.finalise_proposal', proposal_id=proposal.id ) }}">finalise your details</a>.
+      </div>
+    {% else %}
+      <div class="col-md-12">
+        You can't currently edit your proposal as it's being reviewed.
+        If you have any questions please <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">add a message</a>.
+      </div>
+    {% endif %}
     <div>&nbsp;</div>
     <div class="col-md-6">
       <legend>About your {{proposal.type|capitalize}}</legend>

@@ -13,7 +13,7 @@ CFP_STATES = { 'edit': ['accepted', 'rejected', 'new'],
                'reviewed': ['accepted', 'rejected', 'edit'],
                'manual-review': ['accepted', 'rejected', 'edit'],
                'accepted': ['accepted', 'rejected', 'finished'],
-               'finished': ['accepted', 'rejected'] }
+               'finished': ['rejected', 'finished'] }
 
 # Most of these states are the same they're kept distinct for semantic reasons
 # and because I'm lazy
@@ -60,15 +60,13 @@ class Proposal(db.Model):
 
     # Fields for finalised info
     published_names = db.Column(db.String)
-    arrival_time = db.Column(db.DateTime)
-    departure_time = db.Column(db.DateTime)
+    arrival_period = db.Column(db.String)
+    departure_period = db.Column(db.String)
     telephone_number = db.Column(db.String)
     may_record = db.Column(db.Boolean)
     needs_laptop = db.Column(db.Boolean)
 
-    unavailable_times = db.Column(db.String)
-    further_requests = db.Column(db.String)
-    installation_moveability = db.Column(db.String)
+    available_times = db.Column(db.String)
 
     __mapper_args__ = {'polymorphic_on': type}
 

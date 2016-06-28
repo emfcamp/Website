@@ -1,0 +1,92 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block title %}Finalise Proposal - {{ proposal.title }}{% endblock %}
+{% block body %}
+
+<form class="form-horizontal cfp-form" method="post">
+  <div class="well">
+    {{ form.hidden_tag() }}
+
+    <fieldset>
+        <legend>Confirm Your Details</legend>
+        <p>Please confirm how you would like your name, and those of any
+          collaborators to appear in the schedule? Any name(s) you give here
+          are separate to the one attached to your ticket.</p>
+        {{ render_field(form.name, 9) }}
+        <p>If you can supply a telephone number it helps us contact you
+          once we're on site. It will be treated with strictest confidence
+          and only accessible to those that absolutely need it.</p>
+        {{ render_field(form.telephone_number, 9) }}
+    </fieldset>
+
+    <fieldset>
+        <legend>Confirm Your {{proposal.type|capitalize}}</legend>
+        <p>Please confirm how you would like your title and description to
+          appear in the schedule?</p>
+        {{ render_field(form.title, 9) }}
+        {{ render_field(form.description, 9) }}
+    </fieldset>
+
+    <fieldset>
+        <legend>Your Availability</legend>
+        <p>When will you be on site, and when would you prefer to present?</p>
+        <p>We won't schedule you for any time when you're travelling and we'll
+          do our best to pick a time that you are comfortable with.</p>
+
+        {{ render_field(form.arrival_period, 9) }}
+        {{ render_field(form.departure_period, 9) }}
+
+        {% if proposal.type in ('talk', 'workshop') %}
+          <p>Talks and workshops will be scheduled between <strong>10am and 8pm</strong> everyday
+            <strong>except Friday</strong> when talks will start at <strong>1pm</strong>.</p>
+          <table class="table">
+            <thead>
+              <tr><th>Day</th><th>10am - 1pm</th><th>1pm - 4pm</th><th>4pm - 8pm</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Friday</th>
+                <td>n/a</td>
+                <td>{{ form.fri_13_16(class_='form-control') }}</td>
+                <td>{{ form.fri_16_20(class_='form-control') }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Saturday</th>
+                <td>{{ form.sat_10_13(class_='form-control') }}</td>
+                <td>{{ form.sat_13_16(class_='form-control') }}</td>
+                <td>{{ form.sat_16_20(class_='form-control') }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Sunday</th>
+                <td>{{ form.sun_10_13(class_='form-control') }}</td>
+                <td>{{ form.sun_13_16(class_='form-control') }}</td>
+                <td>{{ form.sun_16_20(class_='form-control') }}</td>
+              </tr>
+            </tbody>
+          </table>
+        {% endif %}
+
+    </fieldset>
+
+    <fieldset>
+        <legend>Final Requirements</legend>
+        {{ render_field(form.may_record, 7) }}
+        {{ render_field(form.needs_laptop, 7) }}
+        {% if proposal.type == 'installation' %}
+          <p>In addition to any requirements (including being under cover, power
+            and water) please let us know if special provisions are needed for
+            moving your installation (e.g. if it is fragile, must be disarmed first)</p>
+        {% endif %}
+        {{ render_field(form.requirements, 9) }}
+
+    </fieldset>
+  </div>
+  <div class="pull-right">
+    <a href="{{ url_for('.edit_proposal', proposal_id=proposal.id) }}" class="btn btn-default">Back</a>
+    <button type="submit" class="btn btn-success debounce">Update</button>
+  </div>
+
+  <div class="clearfix"></div>
+
+</form>
+{% endblock %}

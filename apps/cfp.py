@@ -20,7 +20,7 @@ from models.cfp import (
     TalkProposal, WorkshopProposal, InstallationProposal, Proposal, CFPMessage
 )
 from .common import feature_flag, create_current_user
-from .common.forms import Form
+from .common.forms import Form, TelField
 
 cfp = Blueprint('cfp', __name__)
 
@@ -263,6 +263,148 @@ def edit_proposal(proposal_id):
         form.needs_help.data = proposal.needs_help
 
     return render_template('cfp/edit.html', proposal=proposal, form=form)
+
+
+class AcceptedForm(Form):
+    name = StringField('Name(s, for schedule)', [Required()])
+    title = StringField('Title', [Required()])
+    description = TextAreaField('Description', [Required()])
+    telephone_number = TelField('Telephone')
+
+    may_record = BooleanField('I am happy for this to be recorded', default=True)
+    needs_laptop = BooleanField('I will need to borrow a laptop for slides')
+    requirements = TextAreaField('Requirements')
+    arrival_period = SelectField('Estimated arrival time', default='fri pm',
+                                choices=[('fri am', 'Friday am'),
+                                         ('fri pm', 'Friday pm'),
+                                         ('sat am', 'Saturday am'),
+                                         ('sat pm', 'Saturday pm'),
+                                         ('sun am', 'Sunday am'),
+                                         ('sun pm', 'Sunday pm'),
+                                         ])
+    departure_period = SelectField('Estimated departure time', default='mon am',
+                                  choices=[('fri pm', 'Friday pm'),
+                                           ('sat am', 'Saturday am'),
+                                           ('sat pm', 'Saturday pm'),
+                                           ('sun am', 'Sunday am'),
+                                           ('sun pm', 'Sunday pm'),
+                                           ('mon am', 'Monday am'),
+                                           ])
+    # Availability times
+    fri_13_16 = BooleanField(default=True)
+    fri_16_20 = BooleanField(default=True)
+    sat_10_13 = BooleanField(default=True)
+    sat_13_16 = BooleanField(default=True)
+    sat_16_20 = BooleanField(default=True)
+    sun_10_13 = BooleanField(default=True)
+    sun_13_16 = BooleanField(default=True)
+    sun_16_20 = BooleanField(default=True)
+
+    def get_availability_json(self):
+        res = []
+        for field_name in (             'fri_13_16', 'fri_16_20',
+                           'sat_10_13', 'sat_13_16', 'sat_16_20',
+                           'sun_10_13', 'sun_13_16', 'sun_16_20'):
+            field = getattr(self, field_name)
+
+            if not field.data:
+                continue
+            res.append(field_name)
+        return ', '.join(res)
+
+    def set_from_availability_json(self, available_times):
+
+        for field_name in (             'fri_13_16', 'fri_16_20',
+                           'sat_10_13', 'sat_13_16', 'sat_16_20',
+                           'sun_10_13', 'sun_13_16', 'sun_16_20'):
+            field = getattr(self, field_name)
+
+            if field_name in available_times:
+                field.data = True
+            else:
+                field.data = False
+
+    def validate_departure_period(form, field):
+        arr_day, arr_time = form.arrival_period.data.split()
+        dep_day, dep_time = form.departure_period.data.split()
+
+        arr_val = {'fri': 0, 'sat': 1, 'sun': 2}[arr_day]
+        dep_val = {'fri': 0, 'sat': 1, 'sun': 2, 'mon': 3}[dep_day]
+
+        # Arrival day is before departure day; we're done here.
+        if arr_val < dep_val:
+            return
+
+        # Arrival day is after departure
+        if arr_val > dep_val:
+            raise ValidationError('Departure must be after arrival')
+
+        # Arrival day is same as departure day (might be 1 day ticket)
+        # so only error in case of time-travel
+        if dep_time == 'am' and arr_time == 'pm':
+            raise ValidationError('Departure must be after arrival')
+
+
+@cfp.route('/cfp/proposals/<int:proposal_id>/finalise', methods=['GET', 'POST'])
+@feature_flag('CFP')
+def finalise_proposal(proposal_id):
+    if current_user.is_anonymous():
+        return redirect(url_for('users.login', next=url_for('.edit_proposal',
+                                                           proposal_id=proposal_id)))
+
+    proposal = Proposal.query.get_or_404(proposal_id)
+    if proposal.user != current_user:
+        abort(404)
+
+    if proposal.state not in ('accepted', 'finished'):
+        return redirect(url_for('.edit_proposal', proposal_id=proposal_id))
+
+    form = AcceptedForm()
+
+    if form.validate_on_submit():
+        proposal.published_names = form.name.data
+        proposal.title = form.title.data
+        proposal.description = form.description.data
+        proposal.telephone_number = form.telephone_number.data
+
+        proposal.may_record = form.may_record.data
+        proposal.needs_laptop = form.needs_laptop.data
+        proposal.requirements = form.requirements.data
+
+        proposal.arrival_period = form.arrival_period.data
+        proposal.departure_period = form.departure_period.data
+
+        proposal.available_times = form.get_availability_json()
+        proposal.set_state('finished')
+
+        db.session.commit()
+        app.logger.info('Finished proposal %d' % proposal.id)
+        flash('Thank you for finalising your details!')
+
+        return redirect(url_for('.edit_proposal', proposal_id=proposal_id))
+
+
+    else:
+        if proposal.published_names:
+            form.name.data = proposal.published_names
+        else:
+            form.name.data = current_user.name
+
+        form.title.data = proposal.title
+        form.description.data = proposal.description
+        form.telephone_number.data = proposal.telephone_number
+
+        form.may_record.data = proposal.may_record
+        form.needs_laptop.data = proposal.needs_laptop
+        form.requirements.data = proposal.requirements
+
+        form.arrival_period.data = proposal.arrival_period
+        form.departure_period.data = proposal.departure_period
+
+        if proposal.available_times:
+            form.set_from_availability_json(proposal.available_times)
+
+    return render_template('cfp/accepted.html', form=form, proposal=proposal)
 
 
 class MessagesForm(Form):
