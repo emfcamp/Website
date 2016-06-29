@@ -277,11 +277,11 @@ def tickets_unpaid():
 @admin.route('/ticket-types')
 @admin_required
 def ticket_types():
-    # This includes expired tickets
-    totals = Payment.query.join(Ticket).filter(
-        Payment.state != 'new',
-        Payment.state != 'cancelled',
+    # This is an admissions-based view, so includes expired tickets
+    totals = Ticket.query.outerjoin(Payment).filter(
         Ticket.refund_id.is_(None),
+        or_(Ticket.paid == True,  # noqa
+            ~Payment.state.in_(['new', 'cancelled']))
     ).join(TicketType).with_entities(
         TicketType.admits,
         func.count(),
