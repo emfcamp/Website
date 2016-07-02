@@ -1,12 +1,14 @@
 # encoding=utf-8
 
+import warnings
+
 from flask import (
     redirect, url_for, request, abort, render_template,
     flash, Blueprint, session, current_app as app
 )
 from flask.ext.login import current_user
 
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, exc as sa_exc
 from sqlalchemy.orm import aliased
 
 from wtforms import (
@@ -209,6 +211,14 @@ class UpdateProposalForm(Form):
         proposal.available_times = self.available_times.data
 
 
+class UpdateTalkForm(UpdateProposalForm):
+    make_performance = SubmitField('Convert to performance')
+
+
+class UpdatePerformanceForm(UpdateProposalForm):
+    make_talk = SubmitField('Convert to talk')
+
+
 class UpdateWorkshopForm(UpdateProposalForm):
     cost = StringField('Cost per attendee')
     attendees = StringField('Attendees', [Required()])
@@ -239,19 +249,45 @@ def get_next_proposal_to(prop, state):
 @cfp_review.route('/proposals/<int:proposal_id>', methods=['GET', 'POST'])
 @admin_required
 def update_proposal(proposal_id):
+    def log_and_close(msg, next_page, expunge_session=False, proposal_id=None):
+        flash(msg)
+        app.logger.info(msg)
+        if expunge_session:
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore', category=sa_exc.SAWarning)
+                db.session.commit()
+                db.session.expunge_all()
+        else:
+            db.session.commit()
+
+        return redirect(url_for(next_page, proposal_id=proposal_id))
+
     prop = Proposal.query.get_or_404(proposal_id)
     next_prop = get_next_proposal_to(prop, prop.state)
 
     next_id = next_prop.id if next_prop else None
 
-    form = UpdateProposalForm() if prop.type == 'talk' else \
+    form = UpdateTalkForm() if prop.type == 'talk' else \
            UpdateWorkshopForm() if prop.type == 'workshop' else \
+           UpdatePerformanceForm() if prop.type == 'performance' else \
            UpdateInstallationForm()
 
     # Process the POST
     if form.validate_on_submit():
         form.update_proposal(prop)
-        if form.update.data:
+        expunge = False
+
+        if prop.type == 'talk' and form.make_performance.data:
+            prop.type = 'performance'
+            expunge = True
+            msg = '%s making a performance' % proposal_id
+
+        elif prop.type == 'performance' and form.make_talk.data:
+            prop.type = 'talk'
+            expunge = True
+            msg = '%s making a talk' % proposal_id
+
+        elif form.update.data:
             msg = 'Updating proposal %s' % proposal_id
             prop.state = form.state.data
 
@@ -271,17 +307,10 @@ def update_proposal(proposal_id):
             msg = 'Sending proposal %s for anonymisation' % proposal_id
             prop.set_state('checked')
 
-            flash(msg)
-            app.logger.info(msg)
-            db.session.commit()
             if not next_id:
-                return redirect(url_for('.proposals'))
-            return redirect(url_for('.update_proposal', proposal_id=next_id))
-
-        flash(msg)
-        app.logger.info(msg)
-        db.session.commit()
-        return redirect(url_for('.update_proposal', proposal_id=proposal_id))
+                return log_and_close(msg, '.proposals')
+            return log_and_close(msg, '.update_proposal', proposal_id=next_id)
+        return log_and_close(msg, '.update_proposal', expunge_session=expunge, proposal_id=proposal_id)
 
     form.state.data = prop.state
     form.title.data = prop.title

@@ -105,6 +105,9 @@ class Proposal(db.Model):
         db.session.commit()
         return len(messages)
 
+class PerformanceProposal(Proposal):
+    __mapper_args__ = {'polymorphic_identity': 'performance'}
+
 
 class TalkProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'talk'}

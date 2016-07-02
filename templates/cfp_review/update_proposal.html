@@ -70,6 +70,11 @@
         {{ form.update(class_="btn btn-danger debounce", tabindex=4) }}
         {{ form.accept(class_="btn btn-danger debounce", tabindex=4) }}
         {{ form.reject_with_message(class_="btn btn-danger debounce", tabindex=4) }}
+        {% if proposal.type == 'talk' %}
+            {{ form.make_performance(class_="btn btn-danger debounce", tabindex=4) }}
+        {% elif proposal.type == 'performance' %}
+            {{ form.make_talk(class_="btn btn-danger debounce", tabindex=4) }}
+        {% endif %}
 
         {% if next_id %}
             <a href="{{ url_for('.update_proposal', proposal_id=next_id) }}"
