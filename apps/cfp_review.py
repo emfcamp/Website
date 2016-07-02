@@ -176,6 +176,14 @@ class UpdateProposalForm(Form):
     one_day = BooleanField('One day only')
     will_have_ticket = BooleanField('Will have a ticket')
 
+    published_names = StringField('Published names')
+    arrival_period = StringField('Arrival time')
+    departure_period = StringField('Departure time')
+    telephone_number = StringField('Telephone')
+    may_record = BooleanField('May record')
+    needs_laptop = BooleanField('Needs laptop')
+    available_times = StringField('Available times')
+
     update = SubmitField('Force update')
     reject = SubmitField('Reject')
     checked = SubmitField('Send for Anonymisation')
@@ -192,6 +200,13 @@ class UpdateProposalForm(Form):
         proposal.needs_money = self.needs_money.data
         proposal.one_day = self.one_day.data
         proposal.user.will_have_ticket = self.will_have_ticket.data
+        proposal.published_names = self.published_names.data
+        proposal.arrival_period = self.arrival_period.data
+        proposal.departure_period = self.departure_period.data
+        proposal.telephone_number = self.telephone_number.data
+        proposal.may_record = self.may_record.data
+        proposal.needs_laptop = self.needs_laptop.data
+        proposal.available_times = self.available_times.data
 
 
 class UpdateWorkshopForm(UpdateProposalForm):
@@ -278,6 +293,13 @@ def update_proposal(proposal_id):
     form.needs_money.data = prop.needs_money
     form.one_day.data = prop.one_day
     form.will_have_ticket.data = prop.user.will_have_ticket
+    form.published_names.data = prop.published_names
+    form.arrival_period.data = prop.arrival_period
+    form.departure_period.data = prop.departure_period
+    form.telephone_number.data = prop.telephone_number
+    form.may_record.data = prop.may_record
+    form.needs_laptop.data = prop.needs_laptop
+    form.available_times.data = prop.available_times
 
     if prop.type == 'workshop':
         form.attendees.data = prop.attendees
