@@ -71,7 +71,8 @@ eventlet==0.17.4
 
 # ticket PDFs
 qrcode==5.1
-git+https://github.com/emfcamp/xhtml2pdf#egg=xhtml2pdf
+git+https://github.com/xhtml2pdf/xhtml2pdf#egg=xhtml2pdf
+httplib2==0.9.2
 html5lib==0.999999
 PyPDF2==1.25.1
 Pillow==2.9.0
