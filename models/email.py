@@ -23,6 +23,9 @@ class EmailJobRecipient(db.Model):
     job_id = db.Column(db.Integer, db.ForeignKey('email_job.id'), nullable=False)
     sent = db.Column(db.Boolean, default=False)
 
+    user = db.relationship('User')
+    job = db.relationship('EmailJob')
+
     def __init__(self, job, user):
         self.job = job
         self.user = user
