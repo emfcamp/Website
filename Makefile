@@ -64,6 +64,9 @@ reallyreconcile:
 sendtickets:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py sendtickets
 
+faketickets:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py makefaketickets
+
 lockproposals:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py lockproposals
 
@@ -81,7 +84,7 @@ admin:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py makeadmin
 
 users:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py makeusers
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py makefakeusers
 
 arrivals:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py makearrivals

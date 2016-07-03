@@ -402,7 +402,7 @@ class ImportCFP(Command):
                 if Proposal.query.filter_by(title=row['title']).first():
                     continue
 
-                user = User('user_%s@test.invalid' % count, faker.name())
+                user = User('cfp_%s@test.invalid' % count, faker.name())
                 db.session.add(user)
 
                 proposal = TalkProposal() if row['type'] == u'talk' else\
@@ -430,30 +430,6 @@ class ImportCFP(Command):
                 db.session.add(proposal)
 
                 db.session.commit()
-
-                try:
-                    # Choose a random number and type of tickets for this user
-                    full_count = random.choice([1] * 3 + [0, 2, 3])
-                    full_type = TicketType.query.filter_by(fixed_id=random.choice([0, 1, 2, 3])).one()
-                    full_tickets = [Ticket(user.id, type=full_type) for _ in range(full_count)]
-
-                    kids_count = random.choice([0] * 10 + [1, 2])
-                    kids_type = TicketType.query.filter_by(fixed_id=random.choice([5, 6])).one()
-                    kids_tickets = [Ticket(user.id, type=kids_type) for _ in range(kids_count)]
-
-                    vehicle_count = random.choice([0] * 2 + [1])
-                    vehicle_type = TicketType.query.filter_by(fixed_id=random.choice([7] * 5 + [8])).one()
-                    vehicle_tickets = [Ticket(user.id, type=vehicle_type) for _ in range(vehicle_count)]
-
-                    for t in full_tickets + kids_tickets + vehicle_tickets:
-                        t.paid = random.choice([True] * 4 + [False])
-                        t.refunded = random.choice([False] * 20 + [True])
-
-                    db.session.commit()
-
-                except TicketLimitException:
-                    db.session.rollback()
-
                 count += 1
 
         app.logger.info('Imported %s proposals' % count)
@@ -484,37 +460,78 @@ class CreatePermissions(Command):
 
         db.session.commit()
 
-class MakeUsers(Command):
+class MakeFakeUsers(Command):
     def run(self):
-        user = User('admin@test.invalid', 'Test Admin')
-        user.grant_permission('admin')
-        cfp = TalkProposal()
-        cfp.user = user
-        cfp.title = 'test (admin)'
-        cfp.description = 'test proposal from admin'
+        if not User.query.filter_by(email='admin@test.invalid').first():
+            user = User('admin@test.invalid', 'Test Admin')
+            user.grant_permission('admin')
+            cfp = TalkProposal()
+            cfp.user = user
+            cfp.title = 'test (admin)'
+            cfp.description = 'test proposal from admin'
+            db.session.add(user)
 
-        user2 = User('anonymiser@test.invalid', 'Test Anonymiser')
-        user2.grant_permission('cfp_anonymiser')
-        cfp = TalkProposal()
-        cfp.user = user2
-        cfp.title = 'test (anonymiser)'
-        cfp.description = 'test proposal from anonymiser'
+        if not User.query.filter_by(email='anonymiser@test.invalid').first():
+            user2 = User('anonymiser@test.invalid', 'Test Anonymiser')
+            user2.grant_permission('cfp_anonymiser')
+            cfp = TalkProposal()
+            cfp.user = user2
+            cfp.title = 'test (anonymiser)'
+            cfp.description = 'test proposal from anonymiser'
+            db.session.add(user2)
 
-        user3 = User('reviewer@test.invalid', 'Test Reviewer')
-        user3.grant_permission('cfp_reviewer')
-        cfp = TalkProposal()
-        cfp.user = user3
-        cfp.title = 'test (reviewer)'
-        cfp.description = 'test proposal from reviewer'
+        if not User.query.filter_by(email='reviewer@test.invalid').first():
+            user3 = User('reviewer@test.invalid', 'Test Reviewer')
+            user3.grant_permission('cfp_reviewer')
+            cfp = TalkProposal()
+            cfp.user = user3
+            cfp.title = 'test (reviewer)'
+            cfp.description = 'test proposal from reviewer'
+            db.session.add(user3)
 
-        user4 = User('arrivals@test.invalid', 'Test Arrivals')
-        user4.grant_permission('arrivals')
-        cfp = TalkProposal()
-        cfp.user = user4
-        cfp.title = 'test (arrivals)'
-        cfp.description = 'test proposal from arrivals'
+        if not User.query.filter_by(email='arrivals@test.invalid').first():
+            user4 = User('arrivals@test.invalid', 'Test Arrivals')
+            user4.grant_permission('arrivals')
+            cfp = TalkProposal()
+            cfp.user = user4
+            cfp.title = 'test (arrivals)'
+            cfp.description = 'test proposal from arrivals'
+            db.session.add(user4)
 
         db.session.commit()
+
+
+class MakeFakeTickets(Command):
+    def run(self):
+        faker = Faker()
+        for i in range(1500):
+            user = User('user_%s@test.invalid' % i, faker.name())
+            db.session.add(user)
+            db.session.commit()
+
+        for user in User.query.all():
+            try:
+                # Choose a random number and type of tickets for this user
+                full_count = random.choice([1] * 3 + [2, 3])
+                full_type = TicketType.query.filter_by(fixed_id=random.choice([0, 1, 2, 3] * 30 + [9, 10] * 3 + [4])).one()
+                full_tickets = [Ticket(user.id, type=full_type) for _ in range(full_count)]
+
+                kids_count = random.choice([0] * 10 + [1, 2])
+                kids_type = TicketType.query.filter_by(fixed_id=random.choice([5, 11, 6])).one()
+                kids_tickets = [Ticket(user.id, type=kids_type) for _ in range(kids_count)]
+
+                vehicle_count = random.choice([0] * 2 + [1])
+                vehicle_type = TicketType.query.filter_by(fixed_id=random.choice([7] * 5 + [8])).one()
+                vehicle_tickets = [Ticket(user.id, type=vehicle_type) for _ in range(vehicle_count)]
+
+                for t in full_tickets + kids_tickets + vehicle_tickets:
+                    t.paid = random.choice([True] * 4 + [False])
+                    t.refunded = random.choice([False] * 20 + [True])
+
+                db.session.commit()
+
+            except TicketLimitException:
+                db.session.rollback()
 
 
 class UpdateSegments(Command):
@@ -587,7 +604,8 @@ if __name__ == "__main__":
 
     manager.add_command('createperms', CreatePermissions())
     manager.add_command('makeadmin', MakeAdmin())
-    manager.add_command('makeusers', MakeUsers())
+    manager.add_command('makefakeusers', MakeFakeUsers())
+    manager.add_command('makefaketickets', MakeFakeTickets())
 
     manager.add_command('updatesegments', UpdateSegments())
 
