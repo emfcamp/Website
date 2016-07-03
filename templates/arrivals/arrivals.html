@@ -95,7 +95,7 @@ EMF.search_arrivals_done = function(data) {
         ],
         createdRow: function(row, data, index) {
             var state = data.state;
-            if (state == 'cancelled') {
+            if (state == 'cancelled' || state == 'refunded') {
                 $(row).addClass('cancelled');
             } else if (state != 'paid') {
                 $(row).addClass('unpaid');
