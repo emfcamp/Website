@@ -290,21 +290,11 @@ class AcceptedForm(Form):
                                            ('sun pm', 'Sunday pm'),
                                            ('mon am', 'Monday am'),
                                            ])
-    # Availability times
-    fri_13_16 = BooleanField(default=True)
-    fri_16_20 = BooleanField(default=True)
-    sat_10_13 = BooleanField(default=True)
-    sat_13_16 = BooleanField(default=True)
-    sat_16_20 = BooleanField(default=True)
-    sun_10_13 = BooleanField(default=True)
-    sun_13_16 = BooleanField(default=True)
-    sun_16_20 = BooleanField(default=True)
+    _available_slots = tuple()
 
     def get_availability_json(self):
         res = []
-        for field_name in (             'fri_13_16', 'fri_16_20',
-                           'sat_10_13', 'sat_13_16', 'sat_16_20',
-                           'sun_10_13', 'sun_13_16', 'sun_16_20'):
+        for field_name in self._available_slots:
             field = getattr(self, field_name)
 
             if not field.data:
@@ -313,10 +303,7 @@ class AcceptedForm(Form):
         return ', '.join(res)
 
     def set_from_availability_json(self, available_times):
-
-        for field_name in (             'fri_13_16', 'fri_16_20',
-                           'sat_10_13', 'sat_13_16', 'sat_16_20',
-                           'sun_10_13', 'sun_13_16', 'sun_16_20'):
+        for field_name in self._available_slots:
             field = getattr(self, field_name)
 
             if field_name in available_times:
@@ -345,6 +332,33 @@ class AcceptedForm(Form):
             raise ValidationError('Departure must be after arrival')
 
 
+class DaytimeAcceptedForm(AcceptedForm):
+    # Availability times
+    fri_13_16 = BooleanField(default=True)
+    fri_16_20 = BooleanField(default=True)
+    sat_10_13 = BooleanField(default=True)
+    sat_13_16 = BooleanField(default=True)
+    sat_16_20 = BooleanField(default=True)
+    sun_10_13 = BooleanField(default=True)
+    sun_13_16 = BooleanField(default=True)
+    sun_16_20 = BooleanField(default=True)
+    _available_slots = (             'fri_13_16', 'fri_16_20',
+                        'sat_10_13', 'sat_13_16', 'sat_16_20',
+                        'sun_10_13', 'sun_13_16', 'sun_16_20')
+
+
+class EventingAcceptedForm(AcceptedForm):
+    fri_20_22 = BooleanField(default=True)
+    fri_22_24 = BooleanField(default=True)
+    sat_20_22 = BooleanField(default=True)
+    sat_22_24 = BooleanField(default=True)
+    sun_20_22 = BooleanField(default=True)
+    sun_22_24 = BooleanField(default=True)
+    _available_slots = ('fri_20_22', 'fri_22_24',
+                        'sat_20_22', 'sat_22_24',
+                        'sun_20_22', 'sun_22_24')
+
+
 @cfp.route('/cfp/proposals/<int:proposal_id>/finalise', methods=['GET', 'POST'])
 @feature_flag('CFP')
 def finalise_proposal(proposal_id):
@@ -359,7 +373,10 @@ def finalise_proposal(proposal_id):
     if proposal.state not in ('accepted', 'finished'):
         return redirect(url_for('.edit_proposal', proposal_id=proposal_id))
 
-    form = AcceptedForm()
+    form = DaytimeAcceptedForm() if proposal.type in ('talk', 'workshop') else \
+           EventingAcceptedForm() if proposal.type == 'performance' else \
+           AcceptedForm()
+
 
     if form.validate_on_submit():
         proposal.published_names = form.name.data

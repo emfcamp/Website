@@ -64,6 +64,31 @@
               </tr>
             </tbody>
           </table>
+        {% elif proposal.type == 'performance' %}
+          <p>Performances will be scheduled between <strong>8pm and 12pm</strong> (midnight)
+            everyday. There is a 12pm curfew on amplified music.</p>
+          <table class="table">
+            <thead>
+              <tr><th>Day</th><th>8pm - 10pm</th><th>10pm - 12pm</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Friday</th>
+                <td>{{ form.fri_20_22(class_='form-control') }}</td>
+                <td>{{ form.fri_22_24(class_='form-control') }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Saturday</th>
+                <td>{{ form.sat_20_22(class_='form-control') }}</td>
+                <td>{{ form.sat_22_24(class_='form-control') }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Sunday</th>
+                <td>{{ form.sun_20_22(class_='form-control') }}</td>
+                <td>{{ form.sun_22_24(class_='form-control') }}</td>
+              </tr>
+            </tbody>
+          </table>
         {% endif %}
 
     </fieldset>
