@@ -1,14 +1,14 @@
 """Add checkin note column
 
 Revision ID: b2905567e649
-Revises: 7aa0e3890262
+Revises: f92bf42367a1
 Create Date: 2016-07-03 14:37:01.264853
 
 """
 
 # revision identifiers, used by Alembic.
 revision = 'b2905567e649'
-down_revision = '7aa0e3890262'
+down_revision = 'f92bf42367a1'
 
 from alembic import op
 import sqlalchemy as sa
