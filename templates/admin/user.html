@@ -1,3 +1,4 @@
+{% from "_formhelpers.html" import render_field %}
 {% extends "admin/base.html" %}
 {% block body %}
 <h2>User Details</h2>
@@ -26,7 +27,12 @@
         {% endfor %}
     </tr>
 </table>
-{{ form.change(class_="btn btn-success pull-right") }}
+{{ form.change_permissions(class_="btn btn-success pull-right") }}
+
+<div class="row">&nbsp;</div>
+<hr>
+{{ render_field(form.note) }}
+{{ form.add_note(class_="btn btn-success pull-right") }}
 </form>
 <div class="row">&nbsp;</div>
 

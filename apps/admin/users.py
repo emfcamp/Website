@@ -64,34 +64,43 @@ def user(user_id):
     user = User.query.filter_by(id=user_id).one()
     permissions = Permission.query.all()
 
-    class PermissionsForm(Form):
-        change = SubmitField('Change')
+    class UserForm(Form):
+        note = StringField('Check-in note (will be shown to user)')
+        add_note = SubmitField('Save Note')
+        change_permissions = SubmitField('Change')
 
     for permission in permissions:
-        setattr(PermissionsForm, "permission_" + permission.name,
+        setattr(UserForm, "permission_" + permission.name,
                 BooleanField(permission.name, default=user.has_permission(permission.name, False)))
 
-    form = PermissionsForm()
+    form = UserForm()
 
-    if request.method == 'POST' and form.validate():
-        for permission in permissions:
-            field = getattr(form, "permission_" + permission.name)
-            if user.has_permission(permission.name, False) != field.data:
-                app.logger.info("user %s (%s) %s: %s -> %s",
-                                user.name,
-                                user.id,
-                                permission.name,
-                                user.has_permission(permission.name, False),
-                                field.data)
+    if form.validate_on_submit():
+        if form.change_permissions.data:
+            for permission in permissions:
+                field = getattr(form, "permission_" + permission.name)
+                if user.has_permission(permission.name, False) != field.data:
+                    app.logger.info("user %s (%s) %s: %s -> %s",
+                                    user.name,
+                                    user.id,
+                                    permission.name,
+                                    user.has_permission(permission.name, False),
+                                    field.data)
 
-                if field.data:
-                    user.grant_permission(permission.name)
-                else:
-                    user.revoke_permission(permission.name)
+                    if field.data:
+                        user.grant_permission(permission.name)
+                    else:
+                        user.revoke_permission(permission.name)
 
-                db.session.commit()
+                    db.session.commit()
+
+        elif form.add_note.data:
+            user.checkin_note = form.note.data
+            db.session.commit()
 
         return redirect(url_for('.user', user_id=user.id))
+
+    form.note.data = user.checkin_note
     return render_template('admin/user.html',
                            user=user,
                            form=form,
