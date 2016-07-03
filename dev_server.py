@@ -6,8 +6,6 @@ from flask_mail import email_dispatched
 if __name__ == "__main__":
     app = create_app(dev_server=True)
     if app.config.get('DEBUG'):
-        with app.app_context():
-            db.create_all()
         email_dispatched.connect(logger.mail_logging)
 
     if app.config.get('FIX_URL_SCHEME'):
