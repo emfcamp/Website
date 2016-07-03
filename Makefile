@@ -34,6 +34,9 @@ clean:
 db:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py db upgrade
 
+migrate:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py db migrate -m '$(msg)'
+
 data: db perms tickets bankaccounts
 
 perms:
