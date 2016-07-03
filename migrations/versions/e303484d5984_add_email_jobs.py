@@ -27,7 +27,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('job_id', sa.Integer(), nullable=False),
-    sa.Column('sent', sa.Boolean(), nullable=True),
+    sa.Column('sent', sa.Boolean(), nullable=True, server_default=sa.false()),
     sa.ForeignKeyConstraint(['job_id'], ['email_job.id'], name=op.f('fk_email_recipient_job_id_email_job')),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], name=op.f('fk_email_recipient_user_id_user')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_email_recipient'))
