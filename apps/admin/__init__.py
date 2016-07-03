@@ -88,7 +88,7 @@ def stats():
                              .join(TicketCheckin).filter_by(checked_in=True)
     badged_up = TicketCheckin.query.filter_by(badged_up=True)
 
-    users = User.query
+    users = User.query  # noqa
 
     proposals = Proposal.query
 
@@ -107,7 +107,7 @@ def stats():
     admit_totals = dict.fromkeys(admit_types, 0)
 
     for query in 'paid', 'expired', 'unexpired':
-        tickets = locals()[query].join(TicketType).with_entities(
+        tickets = locals()[query].join(TicketType).with_entities(  # noqa
             TicketType.admits,
             func.count(),
         ).group_by(TicketType.admits).all()
