@@ -32,7 +32,7 @@ def render_pdf(html, url_root=None):
     # This needs to fetch URLs found within the page, so if
     # you're running a dev server, use app.run(processes=2)
     if url_root is None:
-        url_root = request.url_root
+        url_root = app.config.get('BASE_URL', request.url_root)
 
     def fix_link(uri, rel):
         if uri.startswith('//'):
@@ -74,3 +74,15 @@ def make_qr_png(*args, **kwargs):
     qrfile.seek(0)
 
     return qrfile
+
+
+def attach_tickets(msg, tickets):
+    # Attach tickets to a mail Message
+    page = render_receipt(tickets, pdf=True)
+    pdf = render_pdf(page)
+    plural = (tickets.count() != 1 and 's' or '')
+    msg.attach('Ticket%s.pdf' % plural, 'application/pdf', pdf.read())
+
+    for t in tickets:
+        t.emailed = True
+

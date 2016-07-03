@@ -10,6 +10,7 @@ from wtforms import SubmitField
 from main import db, mail
 from ..common import get_user_currency, feature_enabled
 from ..common.forms import Form
+from ..common.receipt import attach_tickets
 from . import get_user_payment_or_abort, payments
 
 logger = logging.getLogger(__name__)
@@ -82,5 +83,10 @@ def send_confirmation(payment):
                   recipients=[payment.user.email])
     msg.body = render_template("emails/tickets-paid-email-banktransfer.txt",
                   user=payment.user, payment=payment)
+
+    if feature_enabled('ISSUE_TICKETS'):
+        attach_tickets(msg, payment.user.tickets)
+
     mail.send(msg)
+    db.session.commit()
 

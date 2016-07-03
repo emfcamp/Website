@@ -15,6 +15,7 @@ from main import db, gocardless, mail, csrf
 from models.payment import GoCardlessPayment
 from ..common import feature_enabled
 from ..common.forms import Form
+from ..common.receipt import attach_tickets
 from . import get_user_payment_or_abort
 from . import payments
 
@@ -275,6 +276,11 @@ def gocardless_bill_paid(resource, action, data):
                       recipients=[payment.user.email])
         msg.body = render_template("emails/tickets-paid-email-gocardless.txt",
                                    user=payment.user, payment=payment)
+
+        if feature_enabled('ISSUE_TICKETS'):
+            attach_tickets(msg, payment.user)
+
         mail.send(msg)
+        db.session.commit()
 
     return ('', 200)

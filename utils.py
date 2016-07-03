@@ -23,8 +23,8 @@ from models.payment import (
 )
 from models.cfp import Proposal, TalkProposal, WorkshopProposal, InstallationProposal
 from models.permission import Permission
-from apps.tickets import render_receipt, render_pdf
 from apps.payments import banktransfer
+from apps.common.receipt import attach_tickets
 
 class CreateDB(Command):
     # For testing - you usually want to use db migrate/db upgrade instead
@@ -345,8 +345,6 @@ class SendTickets(Command):
 
         for user in users:
             tickets = all_tickets.filter_by(user_id=user.id)
-            page = render_receipt(tickets, pdf=True)
-            pdf = render_pdf(page, url_root=app.config.get('BASE_URL'))
             plural = (tickets.count() != 1 and 's' or '')
 
             msg = Message("Your Electromagnetic Field Ticket%s" % plural,
@@ -354,13 +352,11 @@ class SendTickets(Command):
                           recipients=[user.email])
 
             msg.body = render_template("emails/receipt.txt", user=user)
-            msg.attach('Receipt.pdf', 'application/pdf', pdf.read())
+
+            attach_tickets(msg, tickets)
 
             app.logger.info('Emailing %s receipt for %s tickets', user.email, tickets.count())
             mail.send(msg)
-
-            for ticket in tickets:
-                ticket.emailed = True
             db.session.commit()
 
 

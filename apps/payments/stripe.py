@@ -15,7 +15,7 @@ from main import db, stripe, mail, csrf
 from models.payment import StripePayment
 from ..common import feature_enabled
 from ..common.forms import Form
-from ..common.receipt import render_receipt, render_pdf
+from ..common.receipt import attach_tickets
 from . import get_user_payment_or_abort
 from . import payments
 
@@ -101,15 +101,10 @@ def charge_stripe(payment):
                                user=payment.user, payment=payment)
 
     if feature_enabled('ISSUE_TICKETS') and charge.paid:
-        page = render_receipt(user.tickets, pdf=True)
-        pdf = render_pdf(page)
-        msg.attach('Receipt.pdf', 'application/pdf', pdf.read())
-
-        for t in user.tickets:
-            t.emailed = True
-        db.session.commit()
+        attach_tickets(msg, payment.user.tickets)
 
     mail.send(msg)
+    db.session.commit()
 
     return redirect(url_for('.stripe_waiting', payment_id=payment.id))
 
@@ -306,15 +301,10 @@ def stripe_payment_paid(payment):
                                user=payment.user, payment=payment)
 
     if feature_enabled('ISSUE_TICKETS'):
-        page = render_receipt(user.tickets, pdf=True)
-        pdf = render_pdf(page)
-        msg.attach('Receipt.pdf', 'application/pdf', pdf.read())
-
-        for t in user.tickets:
-            t.emailed = True
-        db.session.commit()
+        attach_tickets(msg, payment.user.tickets)
 
     mail.send(msg)
+    db.session.commit()
 
 
 def stripe_payment_refunded(payment):
