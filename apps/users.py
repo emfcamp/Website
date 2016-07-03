@@ -74,7 +74,7 @@ def login():
             flash("Your login link was invalid. Please note that they expire after 6 hours.")
 
     form = LoginForm(request.form, next=request.args.get('next'))
-    if request.method == 'POST' and form.validate():
+    if form.validate_on_submit():
         code = form._user.login_code(app.config['SECRET_KEY'])
         send_template_email('Electromagnetic Field: Login details',
                             to=form._user.email,

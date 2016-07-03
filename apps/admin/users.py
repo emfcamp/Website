@@ -2,7 +2,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 from . import admin, admin_required
 from flask import (
-    render_template, redirect, request, flash,
+    render_template, redirect, flash,
     url_for, current_app as app
 )
 from flask.ext.login import current_user
