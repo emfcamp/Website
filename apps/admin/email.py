@@ -1,17 +1,13 @@
 # coding=utf-8
 from __future__ import division, absolute_import, print_function, unicode_literals
 from . import admin, admin_required
-import textwrap
 import markdown
 from inlinestyler.utils import inline_css
 from flask import (
-    render_template, redirect, request, flash,
-    url_for, current_app as app, Markup
+    render_template, redirect, flash,
+    url_for, Markup
 )
-from wtforms import (
-    SubmitField, BooleanField, HiddenField,
-    FieldList, FormField, SelectField, StringField
-)
+from wtforms import SubmitField, StringField
 from wtforms.validators import Required
 from wtforms.widgets import TextArea
 from main import db
@@ -49,7 +45,7 @@ def email():
         job = EmailJob(form.subject.data, format_plaintext_email(form.text.data),
                        format_html_email(form.text.data, form.subject.data))
         db.session.add(job)
-        users = User.query.join(Ticket).filter(Ticket.paid == True).group_by(User.id).all()
+        users = User.query.join(Ticket).filter(Ticket.paid == True).group_by(User.id).all()  # noqa
         for user in users:
             db.session.add(EmailJobRecipient(job, user))
         db.session.commit()
