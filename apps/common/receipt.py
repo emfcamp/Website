@@ -14,12 +14,6 @@ from models.ticket import TicketType
 def render_receipt(tickets, png=False, table=False, pdf=False):
     user = tickets[0].user
 
-    for ticket in tickets:
-        if ticket.receipt is None:
-            ticket.create_receipt()
-        if ticket.qrcode is None:
-            ticket.create_qrcode()
-
     entrance_tickets = tickets.filter(TicketType.admits.in_(['full', 'kids'])).all()
     vehicle_tickets = tickets.filter(TicketType.admits.in_(['car', 'campervan'])).all()
 

@@ -190,8 +190,6 @@ class Ticket(db.Model):
     # Until a ticket is paid for, we track the payment's expiry
     expires = db.Column(db.DateTime, nullable=False)
     expired = column_property(and_(expires < func.now(), paid == False))  # noqa
-    receipt = db.Column(db.String, unique=True)
-    qrcode = db.Column(db.String, unique=True)
     emailed = db.Column(db.Boolean, default=False, nullable=False)
     transfer_reminder_sent = db.Column(db.Boolean, default=False, nullable=False)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
@@ -230,12 +228,6 @@ class Ticket(db.Model):
 
         return other
 
-    def create_receipt(self):
-        self.create_safechars_random('receipt', 6)
-
-    def create_qrcode(self):
-        self.create_safechars_random('qrcode', 8)
-
     def check_in(self):
         if not self.checkin:
             self.checkin = TicketCheckin(self)
@@ -273,20 +265,6 @@ class Ticket(db.Model):
 
         self.checkin.badged_up = False
         db.session.commit()
-
-    def create_safechars_random(self, name, length):
-        if getattr(self, name) is not None:
-            raise Exception('Ticket already has random value for %s' % name)
-
-        while True:
-            random.seed()
-            val = ''.join(random.sample(safechars_lower, length))
-            setattr(self, name, val)
-            try:
-                db.session.commit()
-                break
-            except IntegrityError:
-                db.session.rollback()
 
     def __repr__(self):
         attrs = [self.type.admits]
