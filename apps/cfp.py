@@ -347,7 +347,7 @@ class DaytimeAcceptedForm(AcceptedForm):
                         'sun_10_13', 'sun_13_16', 'sun_16_20')
 
 
-class EventingAcceptedForm(AcceptedForm):
+class EveningAcceptedForm(AcceptedForm):
     fri_20_22 = BooleanField(default=True)
     fri_22_24 = BooleanField(default=True)
     sat_20_22 = BooleanField(default=True)
@@ -374,7 +374,7 @@ def finalise_proposal(proposal_id):
         return redirect(url_for('.edit_proposal', proposal_id=proposal_id))
 
     form = DaytimeAcceptedForm() if proposal.type in ('talk', 'workshop') else \
-           EventingAcceptedForm() if proposal.type == 'performance' else \
+           EveningAcceptedForm() if proposal.type == 'performance' else \
            AcceptedForm()
 
 
