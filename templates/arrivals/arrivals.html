@@ -32,9 +32,9 @@
 
 {% block foot %}
 <script type="text/javascript">
-var isBadgeMode = {% if badge %}true{% else %}false{% endif %};
 if (typeof(EMF) != 'object'){ var EMF = {}; }
-EMF.search_url = "{{ url_for('arrivals.search') }}";
+EMF.isBadgeMode = {{ badge | tojson }};
+EMF.search_url = {{ url_for('arrivals.search') | tojson }};
 EMF.search_count = 0;
 EMF.search_count_received = 0;
 EMF.search_arrivals = function() {
@@ -77,7 +77,7 @@ EMF.search_arrivals_done = function(data) {
             {
                 data: 'action',
                 render: function(data) {
-                    if (isBadgeMode) {
+                    if (EMF.isBadgeMode) {
                         if (data.badged_up) {
                             return '<a class="btn btn-danger undo-badge-up" href="{0}">Return badge</a>'.replace('{0}', data.url);
                         } else {
