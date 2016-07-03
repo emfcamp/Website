@@ -42,9 +42,13 @@ def render_pdf(html, url_root=None):
 
     return pdffile
 
+def get_checkin_url(code):
+    base = app.config.get('CHECKIN_BASE')
+    return urljoin(base, '/'.join(['checkin', code]))
+
 
 def format_inline_qr(code):
-    url = app.config.get('CHECKIN_BASE') + code
+    url = get_checkin_url(code)
 
     qrfile = StringIO()
     qr = qrcode.make(url, image_factory=SvgPathImage)
@@ -60,10 +64,11 @@ def format_inline_qr(code):
     return Markup(etree.tostring(root))
 
 
-def make_qr_png(*args, **kwargs):
+def make_qr_png(code, *args, **kwargs):
+    url = get_checkin_url(code)
     qrfile = StringIO()
 
-    qr = qrcode.make(*args, **kwargs)
+    qr = qrcode.make(url, *args, **kwargs)
     qr.save(qrfile, 'PNG')
     qrfile.seek(0)
 

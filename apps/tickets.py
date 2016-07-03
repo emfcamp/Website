@@ -447,7 +447,5 @@ def tickets_qrcode(code):
         app.logger.debug('')
         abort(404)
 
-    url = app.config.get('CHECKIN_BASE') + code
-
-    qrfile = make_qr_png(url, box_size=3)
+    qrfile = make_qr_png(code, box_size=3)
     return send_file(qrfile, mimetype='image/png')
