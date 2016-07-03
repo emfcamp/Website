@@ -1,0 +1,27 @@
+{% extends "admin/base.html" %}
+{% block body %}
+<h2>Send Ticketholder Email</h2>
+
+{% if html %}
+<h3>Preview</h3>
+<iframe width="640px" height="960px" srcdoc="{{html}}">
+</iframe>
+<form method="post">
+{{ form.hidden_tag() }}
+{{ form.subject(size=120) }}
+{{ form.text(cols=120, rows=30) }}
+
+{{ form.preview(class_="btn btn-success pull-right") }}
+{{ form.send(class_="btn btn-danger pull-right") }}
+</form>
+{% else %}
+<h3>Compose</h3>
+<form method="post">
+{{ form.hidden_tag() }}
+{{ form.subject(size=120) }}
+{{ form.text(cols=120, rows=30) }}
+
+{{ form.preview(class_="btn btn-success pull-right") }}
+</form>
+{% endif %}
+{% endblock %}

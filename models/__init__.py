@@ -8,6 +8,7 @@ from user import *  # noqa
 from payment import *  # noqa
 from ticket import *  # noqa
 from cfp import *  # noqa
-from permission import * # noqa
+from permission import *  # noqa
+from email import *  # noqa
 
 db.configure_mappers()

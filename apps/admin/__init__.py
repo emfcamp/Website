@@ -239,3 +239,4 @@ def site_states():
 from . import payments  # noqa
 from . import tickets  # noqa
 from . import users  # noqa
+from . import email  # noqa
