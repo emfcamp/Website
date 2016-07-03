@@ -6,7 +6,7 @@ from xhtml2pdf import pisa
 import qrcode
 from qrcode.image.svg import SvgPathImage
 from lxml import etree
-from flask import Markup, render_template, request, app
+from flask import Markup, render_template, request, current_app as app
 
 from models.ticket import TicketType
 
