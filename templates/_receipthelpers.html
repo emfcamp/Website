@@ -5,15 +5,11 @@
 
     <div class="{{ classname }}">
       {{ caller() }}
-      <table>
-        {% for t in tickets %}
-          <tr class="ticket">
-            <td class="type ticket-with-blurb">
-              <b>{{ t.type.name }}</b>
-            </td>
-          </tr>
-        {% endfor %}
-      </table>
+
+      {% for t in tickets %}
+          <div class="type ticket-with-blurb"><b>{{ t.type.name }}</b></div>
+      {% endfor %}
+
     </div>
   {% else %}
     <div class="{{ classname }}">

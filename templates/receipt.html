@@ -41,9 +41,9 @@
     {{ render_header(user, qrcode_string, pdf or png) }}
     <p>{{ entrance_tickets|length }} entrance ticket{{ entrance_tickets|length != 1 and 's' or '' }}</p>
     {% call render_tickets(entrance_tickets[:6], "entrance-tickets", pdf, table, png) %}
-    <p>Present the following to the volunteers at the <u>camp entrance gate</u> on your arrival.
-      You will receive a wristband and booklet with site map.
-    </p>
+     <p>Present the following to the volunteers at the <u>camp entrance gate</u> on your arrival.
+        You will receive a wristband and booklet with site map.
+      </p>
     {% endcall %}
   {% endif %}
 
@@ -54,14 +54,17 @@
   {% endif %}
 
   {% if vehicle_tickets %}
-    {{ render_header(user, qrcode_string, pdf or png) }}
 
-    {% call render_tickets(vehicle_tickets, "vehicle-tickets", pdf, table, png) %}
-    <p>Please present this page to the volunteers at the <u>main access gate</u> on your arrival.
-       They will show you where to park and unload your stuff.</p>
-    <p>For details on getting to the site, please visit
-       <a href="https://wiki.emfcamp.org/wiki/Travel">our wiki page</a>.</p>
-    {% endcall %}
+    {% for t in vehicle_tickets %}
+      {{ render_header(user, qrcode_string, pdf or png) }}
+      {% call render_tickets([t], "vehicle-tickets", pdf, table, png) %}
+        <p>Please present this page to the volunteers at the <u>main access gate</u> on your arrival.
+           They will show you where to park and unload your stuff.</p>
+        <p>For details on getting to the site, please visit
+           <a href="https://wiki.emfcamp.org/wiki/Travel">our wiki page</a>.</p>
+      {% endcall %}
+      <div><pdf:nextpage /></div>
+    {% endfor %}
   {% endif %}
 
 </div>
