@@ -1,3 +1,4 @@
+{% from "_receipthelpers.html" import render_tickets, render_header %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -29,100 +30,39 @@
 {% block body %}
 
 <div id="main-content" class="receipt">
-
-  <h2>
-    <img src="{{ url_for('static', filename='images/logo_only_black.png') }}" class="logo" width="90"/>
-    Electromagnetic Field 2016
-  </h2>
-  <div>
-    {% set user_qrcode = user.checkin_code(config.get('SECRET_KEY')) %}
-    <h3>{{ user.name }} &ndash; {{ user.email }}</h2>
-    <div class="qr">
-      {% if pdf %}
-        <img src="{{ url_for('tickets.tickets_qrcode', code=user_qrcode, ignore_safechar=True) }}">
-      {% else %}
-        {{ format_inline_qr(user_qrcode) }}
-      {% endif %}
-    </div>
-    <p>{{ entrance_tickets|length }} entrance ticket{{ entrance_tickets|length != 1 and 's' or '' }}</p>
-  </div>
-
-{% macro render_tickets(tickets, classname) %}
-
-  {% if pdf or table %}
-    {# xhtml2pdf doesn't support loads of CSS, and cascades
-       padding, width and display weirdly. Fall back to tables. #}
-
-    <div class="{{ classname }}">
-
-    {{ caller() }}
-
-    <table>
-    {% for t in tickets %}
-    <tr class="ticket">
-      <td class="type ticket-with-blurb">
-        <b>{{ t.type.name }}</b>
-      </td>
-    </tr>
-    {% endfor %}
-    </table>
-    </div>
-
+  {% if pdf or png %}
+    {% set qrcode_string = user.checkin_code(config.get('SECRET_KEY')) %}
   {% else %}
-
-    <div class="{{ classname }}">
-    {% for t in tickets %}
-
-      {% if loop.index == 1 %}
-      {# Few browsers support page-break-after: avoid #}
-      <div class="ticket-with-blurb">
-        {{ caller() }}
-      {% endif %}
-
-      <div class="ticket">
-        <div class="col-sm-5 col-sm-offset-1 type">
-          <b>{{ t.type.name }}</b>
-        </div>
-      </div>
-
-      {% if loop.index == 1 %}
-      </div>
-      {% endif %}
-
-    {% endfor %}
-    </div>
-
-  {% endif %}
-
-{% endmacro %}
-
-
-  {% if vehicle_tickets %}
-
-  {% call render_tickets(vehicle_tickets, "vehicle-tickets") %}
-  <p>Please present this page to the volunteers at the <u>main access gate</u> on your arrival.
-     They will show you where to park and unload your stuff.</p>
-  <p>For details on getting to the site, please visit
-     <a href="https://wiki.emfcamp.org/wiki/Travel">our wiki page</a>.</p>
-  {% endcall %}
-
+    {% set qrcode_string = format_inline_qr(user.checkin_code(config.get('SECRET_KEY'))) %}
   {% endif %}
 
 
   {% if entrance_tickets %}
-
-  {% call render_tickets(entrance_tickets[:6], "entrance-tickets") %}
-  <p>Present the following to the volunteers at the <u>camp entrance gate</u> on your arrival.
-    You will receive a wristband and booklet with site map.
-  </p>
-  {% endcall %}
-
+    {{ render_header(user, qrcode_string, pdf or png) }}
+    <p>{{ entrance_tickets|length }} entrance ticket{{ entrance_tickets|length != 1 and 's' or '' }}</p>
+    {% call render_tickets(entrance_tickets[:6], "entrance-tickets", pdf, table, png) %}
+    <p>Present the following to the volunteers at the <u>camp entrance gate</u> on your arrival.
+      You will receive a wristband and booklet with site map.
+    </p>
+    {% endcall %}
   {% endif %}
 
+  {% if pdf and entrance_tickets and vehicle_tickets %}
+    <div>
+      <pdf:nextpage />
+    </div>
+  {% endif %}
 
-{#
-#}
+  {% if vehicle_tickets %}
+    {{ render_header(user, qrcode_string, pdf or png) }}
 
+    {% call render_tickets(vehicle_tickets, "vehicle-tickets", pdf, table, png) %}
+    <p>Please present this page to the volunteers at the <u>main access gate</u> on your arrival.
+       They will show you where to park and unload your stuff.</p>
+    <p>For details on getting to the site, please visit
+       <a href="https://wiki.emfcamp.org/wiki/Travel">our wiki page</a>.</p>
+    {% endcall %}
+  {% endif %}
 
 </div>
 {% endblock %}
