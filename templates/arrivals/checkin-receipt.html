@@ -15,6 +15,13 @@
 <dt>Email</dt><dd>{{ user.email }}</dd>
 </dl>
 
+{% if user.checkin_note and not badge %}
+<div class="well">
+  <p><strong>Please pass on this note:</strong></p>
+  <p>{{ user.checkin_note }}</p>
+</div>
+{% endif %}
+
 <table class="table table-condensed table-striped">
 <thead><tr>
   <th>Type</th>
