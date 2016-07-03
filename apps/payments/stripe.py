@@ -100,12 +100,12 @@ def charge_stripe(payment):
     msg.body = render_template("emails/tickets-purchased-email-stripe.txt",
                                user=payment.user, payment=payment)
 
-    if feature_enabled('ISSUE_TICKETS'):
-        page = render_receipt(payment.tickets, pdf=True)
+    if feature_enabled('ISSUE_TICKETS') and charge.paid:
+        page = render_receipt(user.tickets, pdf=True)
         pdf = render_pdf(page)
         msg.attach('Receipt.pdf', 'application/pdf', pdf.read())
 
-        for t in payment.tickets:
+        for t in user.tickets:
             t.emailed = True
         db.session.commit()
 
@@ -306,9 +306,13 @@ def stripe_payment_paid(payment):
                                user=payment.user, payment=payment)
 
     if feature_enabled('ISSUE_TICKETS'):
-        page = render_receipt(payment.tickets, pdf=True)
+        page = render_receipt(user.tickets, pdf=True)
         pdf = render_pdf(page)
         msg.attach('Receipt.pdf', 'application/pdf', pdf.read())
+
+        for t in user.tickets:
+            t.emailed = True
+        db.session.commit()
 
     mail.send(msg)
 
