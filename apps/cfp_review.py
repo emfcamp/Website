@@ -1,12 +1,14 @@
 # encoding=utf-8
 
+import warnings
+
 from flask import (
     redirect, url_for, request, abort, render_template,
     flash, Blueprint, session, current_app as app
 )
 from flask.ext.login import current_user
 
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, exc as sa_exc
 from sqlalchemy.orm import aliased
 
 from wtforms import (
@@ -176,6 +178,14 @@ class UpdateProposalForm(Form):
     one_day = BooleanField('One day only')
     will_have_ticket = BooleanField('Will have a ticket')
 
+    published_names = StringField('Published names')
+    arrival_period = StringField('Arrival time')
+    departure_period = StringField('Departure time')
+    telephone_number = StringField('Telephone')
+    may_record = BooleanField('May record')
+    needs_laptop = BooleanField('Needs laptop')
+    available_times = StringField('Available times')
+
     update = SubmitField('Force update')
     reject = SubmitField('Reject')
     checked = SubmitField('Send for Anonymisation')
@@ -192,6 +202,21 @@ class UpdateProposalForm(Form):
         proposal.needs_money = self.needs_money.data
         proposal.one_day = self.one_day.data
         proposal.user.will_have_ticket = self.will_have_ticket.data
+        proposal.published_names = self.published_names.data
+        proposal.arrival_period = self.arrival_period.data
+        proposal.departure_period = self.departure_period.data
+        proposal.telephone_number = self.telephone_number.data
+        proposal.may_record = self.may_record.data
+        proposal.needs_laptop = self.needs_laptop.data
+        proposal.available_times = self.available_times.data
+
+
+class UpdateTalkForm(UpdateProposalForm):
+    make_performance = SubmitField('Convert to performance')
+
+
+class UpdatePerformanceForm(UpdateProposalForm):
+    make_talk = SubmitField('Convert to talk')
 
 
 class UpdateWorkshopForm(UpdateProposalForm):
@@ -224,19 +249,45 @@ def get_next_proposal_to(prop, state):
 @cfp_review.route('/proposals/<int:proposal_id>', methods=['GET', 'POST'])
 @admin_required
 def update_proposal(proposal_id):
+    def log_and_close(msg, next_page, expunge_session=False, proposal_id=None):
+        flash(msg)
+        app.logger.info(msg)
+        if expunge_session:
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore', category=sa_exc.SAWarning)
+                db.session.commit()
+                db.session.expunge_all()
+        else:
+            db.session.commit()
+
+        return redirect(url_for(next_page, proposal_id=proposal_id))
+
     prop = Proposal.query.get_or_404(proposal_id)
     next_prop = get_next_proposal_to(prop, prop.state)
 
     next_id = next_prop.id if next_prop else None
 
-    form = UpdateProposalForm() if prop.type == 'talk' else \
+    form = UpdateTalkForm() if prop.type == 'talk' else \
            UpdateWorkshopForm() if prop.type == 'workshop' else \
+           UpdatePerformanceForm() if prop.type == 'performance' else \
            UpdateInstallationForm()
 
     # Process the POST
     if form.validate_on_submit():
         form.update_proposal(prop)
-        if form.update.data:
+        expunge = False
+
+        if prop.type == 'talk' and form.make_performance.data:
+            prop.type = 'performance'
+            expunge = True
+            msg = '%s making a performance' % proposal_id
+
+        elif prop.type == 'performance' and form.make_talk.data:
+            prop.type = 'talk'
+            expunge = True
+            msg = '%s making a talk' % proposal_id
+
+        elif form.update.data:
             msg = 'Updating proposal %s' % proposal_id
             prop.state = form.state.data
 
@@ -256,17 +307,10 @@ def update_proposal(proposal_id):
             msg = 'Sending proposal %s for anonymisation' % proposal_id
             prop.set_state('checked')
 
-            flash(msg)
-            app.logger.info(msg)
-            db.session.commit()
             if not next_id:
-                return redirect(url_for('.proposals'))
-            return redirect(url_for('.update_proposal', proposal_id=next_id))
-
-        flash(msg)
-        app.logger.info(msg)
-        db.session.commit()
-        return redirect(url_for('.update_proposal', proposal_id=proposal_id))
+                return log_and_close(msg, '.proposals')
+            return log_and_close(msg, '.update_proposal', proposal_id=next_id)
+        return log_and_close(msg, '.update_proposal', expunge_session=expunge, proposal_id=proposal_id)
 
     form.state.data = prop.state
     form.title.data = prop.title
@@ -278,6 +322,13 @@ def update_proposal(proposal_id):
     form.needs_money.data = prop.needs_money
     form.one_day.data = prop.one_day
     form.will_have_ticket.data = prop.user.will_have_ticket
+    form.published_names.data = prop.published_names
+    form.arrival_period.data = prop.arrival_period
+    form.departure_period.data = prop.departure_period
+    form.telephone_number.data = prop.telephone_number
+    form.may_record.data = prop.may_record
+    form.needs_laptop.data = prop.needs_laptop
+    form.available_times.data = prop.available_times
 
     if prop.type == 'workshop':
         form.attendees.data = prop.attendees

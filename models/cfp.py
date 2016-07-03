@@ -13,7 +13,7 @@ CFP_STATES = { 'edit': ['accepted', 'rejected', 'new'],
                'reviewed': ['accepted', 'rejected', 'edit'],
                'manual-review': ['accepted', 'rejected', 'edit'],
                'accepted': ['accepted', 'rejected', 'finished'],
-               'finished': ['accepted', 'rejected'] }
+               'finished': ['rejected', 'finished'] }
 
 # Most of these states are the same they're kept distinct for semantic reasons
 # and because I'm lazy
@@ -58,6 +58,16 @@ class Proposal(db.Model):
     messages = db.relationship('CFPMessage', backref='proposal')
     votes = db.relationship('CFPVote', backref='proposal')
 
+    # Fields for finalised info
+    published_names = db.Column(db.String)
+    arrival_period = db.Column(db.String)
+    departure_period = db.Column(db.String)
+    telephone_number = db.Column(db.String)
+    may_record = db.Column(db.Boolean)
+    needs_laptop = db.Column(db.Boolean)
+
+    available_times = db.Column(db.String)
+
     __mapper_args__ = {'polymorphic_on': type}
 
     def get_user_vote(self, user):
@@ -94,6 +104,9 @@ class Proposal(db.Model):
             msg.has_been_read = True
         db.session.commit()
         return len(messages)
+
+class PerformanceProposal(Proposal):
+    __mapper_args__ = {'polymorphic_identity': 'performance'}
 
 
 class TalkProposal(Proposal):
