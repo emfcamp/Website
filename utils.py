@@ -23,8 +23,11 @@ from models.payment import (
 )
 from models.cfp import Proposal, TalkProposal, WorkshopProposal, InstallationProposal
 from models.permission import Permission
+from models.email import EmailJobRecipient
+from apps.tickets import render_receipt, render_pdf
 from apps.payments import banktransfer
 from apps.common.receipt import attach_tickets
+
 
 class CreateDB(Command):
     # For testing - you usually want to use db migrate/db upgrade instead
@@ -582,6 +585,23 @@ class UpdateSegments(Command):
                         len(results['errors']))
 
 
+class SendEmails(Command):
+    def run(self):
+        with mail.connect() as conn:
+            for rec in EmailJobRecipient.query.filter(EmailJobRecipient.sent == False):  # noqa
+                self.send_email(rec)
+
+    def send_email(self, rec):
+        msg = Message(rec.job.subject, sender=app.config['CONTACT_EMAIL'])
+        msg.add_recipient(rec.user.email)
+        msg.body = rec.job.text_body
+        msg.body = rec.job.html_body
+        mail.send(msg)
+        rec.sent = True
+        db.session.add(rec)
+        db.session.commit()
+
+
 if __name__ == "__main__":
     manager = Manager(create_app())
     manager.add_command('createdb', CreateDB())
@@ -604,5 +624,6 @@ if __name__ == "__main__":
     manager.add_command('makefaketickets', MakeFakeTickets())
 
     manager.add_command('updatesegments', UpdateSegments())
+    manager.add_command('sendemails', SendEmails())
 
     manager.run()
