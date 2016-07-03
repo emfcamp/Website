@@ -45,9 +45,6 @@ perms:
 tickets:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createtickets
 
-tokens:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createtokens
-
 bankaccounts:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createbankaccounts
 
