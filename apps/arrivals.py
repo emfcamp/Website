@@ -14,7 +14,7 @@ from wtforms.validators import Optional
 
 from models.ticket import Ticket, TicketType, CheckinStateException, TicketCheckin
 from models.user import User
-from views import Form
+from .common.forms import Form
 from .common import require_permission
 
 arrivals = Blueprint('arrivals', __name__)
@@ -22,27 +22,27 @@ arrivals = Blueprint('arrivals', __name__)
 arrivals_required = require_permission('arrivals')  # Decorator to require arrivals permission
 
 
-@arrivals.route('/arrivals')
+@arrivals.route('')
 @arrivals_required
 def main():
     badge = bool(session.get('badge'))
     return render_template('arrivals/arrivals.html', badge=badge)
 
 
-@arrivals.route('/arrivals/check-in')
+@arrivals.route('/check-in')
 def begin_check_in():
     session.pop('badge', None)
     return redirect(url_for('.main'))
 
 
-@arrivals.route('/arrivals/badge-up')
+@arrivals.route('/badge-up')
 def begin_badge_up():
     session['badge'] = True
     return redirect(url_for('.main'))
 
 
-@arrivals.route('/arrivals/search')
-@arrivals.route('/arrivals/search/<query>')
+@arrivals.route('/search')
+@arrivals.route('/search/<query>')
 @arrivals_required
 def search(query=None):
     if query is None:
@@ -101,7 +101,7 @@ def search(query=None):
                 'email': ticket.user.email,
                 'type': ticket.type.name,
                 'receipt': ticket.receipt,
-                'state': ticket.payment.state,
+                'state': ticket.payment.state if ticket.payment else 'paid',
                 'action': {},
             }
             if badge:
