@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 import ofxparse
 from unicodecsv import DictReader
 from mailsnake import MailSnake
+import random
+from faker import Faker
 
 from flask.ext.script import Command, Manager, Option
 from flask.ext.migrate import MigrateCommand
@@ -14,7 +16,7 @@ from sqlalchemy.sql.functions import func
 
 from main import create_app, mail, db
 from models import (
-    User, TicketType, Ticket, TicketPrice
+    User, TicketType, Ticket, TicketPrice, TicketLimitException
 )
 from models.payment import (
     BankAccount, BankTransaction,
@@ -390,6 +392,7 @@ class ImportCFP(Command):
                           help='The state to import the proposals as')]
 
     def run(self, filename, state):
+        faker = Faker()
         with open(filename) as csvfile:
             # id, title, description, length, need_finance,
             # one_day, type, experience, attendees, size
@@ -399,7 +402,7 @@ class ImportCFP(Command):
                 if Proposal.query.filter_by(title=row['title']).first():
                     continue
 
-                user = User('user_%s@test.invalid' % count, 'test_cfp_user_%s' % count)
+                user = User('user_%s@test.invalid' % count, faker.name())
                 db.session.add(user)
 
                 proposal = TalkProposal() if row['type'] == u'talk' else\
@@ -425,8 +428,34 @@ class ImportCFP(Command):
 
                 proposal.user = user
                 db.session.add(proposal)
+
                 db.session.commit()
+
+                try:
+                    # Choose a random number and type of tickets for this user
+                    full_count = random.choice([1] * 3 + [0, 2, 3])
+                    full_type = TicketType.query.filter_by(fixed_id=random.choice([0, 1, 2, 3])).one()
+                    full_tickets = [Ticket(user.id, type=full_type) for _ in range(full_count)]
+
+                    kids_count = random.choice([0] * 10 + [1, 2])
+                    kids_type = TicketType.query.filter_by(fixed_id=random.choice([5, 6])).one()
+                    kids_tickets = [Ticket(user.id, type=kids_type) for _ in range(kids_count)]
+
+                    vehicle_count = random.choice([0] * 2 + [1])
+                    vehicle_type = TicketType.query.filter_by(fixed_id=random.choice([7] * 5 + [8])).one()
+                    vehicle_tickets = [Ticket(user.id, type=vehicle_type) for _ in range(vehicle_count)]
+
+                    for t in full_tickets + kids_tickets + vehicle_tickets:
+                        t.paid = random.choice([True] * 4 + [False])
+                        t.refunded = random.choice([False] * 20 + [True])
+
+                    db.session.commit()
+
+                except TicketLimitException:
+                    db.session.rollback()
+
                 count += 1
+
         app.logger.info('Imported %s proposals' % count)
 
 
