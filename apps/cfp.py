@@ -266,7 +266,7 @@ def edit_proposal(proposal_id):
 
 
 class AcceptedForm(Form):
-    name = StringField('Name(s, for schedule)', [Required()])
+    name = StringField('Names for schedule', [Required()])
     title = StringField('Title', [Required()])
     description = TextAreaField('Description', [Required()])
     telephone_number = TelField('Telephone')
@@ -360,7 +360,7 @@ class EventingAcceptedForm(AcceptedForm):
 
 
 @cfp.route('/cfp/proposals/<int:proposal_id>/finalise', methods=['GET', 'POST'])
-@feature_flag('CFP')
+@feature_flag('CFP_FINALISE')
 def finalise_proposal(proposal_id):
     if current_user.is_anonymous():
         return redirect(url_for('users.login', next=url_for('.edit_proposal',
@@ -395,7 +395,7 @@ def finalise_proposal(proposal_id):
         proposal.set_state('finished')
 
         db.session.commit()
-        app.logger.info('Finished proposal %d' % proposal.id)
+        app.logger.info('Finished proposal %s', proposal_id)
         flash('Thank you for finalising your details!')
 
         return redirect(url_for('.edit_proposal', proposal_id=proposal_id))

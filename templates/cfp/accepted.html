@@ -10,7 +10,7 @@
     <fieldset>
         <legend>Confirm Your Details</legend>
         <p>Please confirm how you would like your name, and those of any
-          collaborators to appear in the schedule? Any name(s) you give here
+          collaborators to appear in the schedule. Any names you give here
           are separate to the one attached to your ticket.</p>
         {{ render_field(form.name, 9) }}
         <p>If you can supply a telephone number it helps us contact you
@@ -22,7 +22,7 @@
     <fieldset>
         <legend>Confirm Your {{proposal.type|capitalize}}</legend>
         <p>Please confirm how you would like your title and description to
-          appear in the schedule?</p>
+          appear in the schedule</p>
         {{ render_field(form.title, 9) }}
         {{ render_field(form.description, 9) }}
     </fieldset>
@@ -37,7 +37,7 @@
         {{ render_field(form.departure_period, 9) }}
 
         {% if proposal.type in ('talk', 'workshop') %}
-          <p>Talks and workshops will be scheduled between <strong>10am and 8pm</strong> everyday
+          <p>Talks and workshops will be scheduled between <strong>10am and 8pm</strong> every day
             <strong>except Friday</strong> when talks will start at <strong>1pm</strong>.</p>
           <table class="table">
             <thead>
@@ -65,11 +65,11 @@
             </tbody>
           </table>
         {% elif proposal.type == 'performance' %}
-          <p>Performances will be scheduled between <strong>8pm and 12pm</strong> (midnight)
-            everyday. There is a 12pm curfew on amplified music.</p>
+          <p>Performances will be scheduled between <strong>8pm and 12am</strong> (midnight)
+            every day. There is a 12am curfew on amplified music.</p>
           <table class="table">
             <thead>
-              <tr><th>Day</th><th>8pm - 10pm</th><th>10pm - 12pm</th></tr>
+              <tr><th>Day</th><th>8pm - 10pm</th><th>10pm - 12am</th></tr>
             </thead>
             <tbody>
               <tr>
@@ -100,7 +100,7 @@
         {% if proposal.type == 'installation' %}
           <p>In addition to any requirements (including being under cover, power
             and water) please let us know if special provisions are needed for
-            moving your installation (e.g. if it is fragile, must be disarmed first)</p>
+            moving your installation (e.g. if it is fragile, must be disarmed first).</p>
         {% endif %}
         {{ render_field(form.requirements, 9) }}
 
