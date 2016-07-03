@@ -35,74 +35,62 @@
     Electromagnetic Field 2016
   </h2>
   <div>
+    {% set user_qrcode = user.checkin_code(config.get('SECRET_KEY')) %}
     <h3>{{ user.name }} &ndash; {{ user.email }}</h2>
+    <div class="qr">
+      {% if pdf %}
+        <img src="{{ url_for('tickets.tickets_qrcode', code=user_qrcode, ignore_safechar=True) }}">
+      {% else %}
+        {{ format_inline_qr(user_qrcode) }}
+      {% endif %}
+    </div>
     <p>{{ entrance_tickets|length }} entrance ticket{{ entrance_tickets|length != 1 and 's' or '' }}</p>
   </div>
 
 {% macro render_tickets(tickets, classname) %}
 
   {% if pdf or table %}
-  {# xhtml2pdf doesn't support loads of CSS, and cascades
-     padding, width and display weirdly. Fall back to tables. #}
+    {# xhtml2pdf doesn't support loads of CSS, and cascades
+       padding, width and display weirdly. Fall back to tables. #}
 
-  <div class="{{ classname }}">
+    <div class="{{ classname }}">
 
-  {{ caller() }}
+    {{ caller() }}
 
-  <table>
-  {% for t in tickets %}
-  <tr class="ticket">
-    <td class="type ticket-with-blurb">
-      <b>{{ t.type.name }}</b>
-    </td>
-    <td>
-      <div class="qr">
-        <img src="{{ url_for('tickets.tickets_qrcode', code=t.qrcode) }}" />
-      </div>
-      <div class="code">
-        {{ t.receipt }}
-      </div>
-    </td>
-  </tr>
-  {% endfor %}
-  </table>
-  </div>
+    <table>
+    {% for t in tickets %}
+    <tr class="ticket">
+      <td class="type ticket-with-blurb">
+        <b>{{ t.type.name }}</b>
+      </td>
+    </tr>
+    {% endfor %}
+    </table>
+    </div>
 
   {% else %}
 
-  <div class="{{ classname }}">
-  {% for t in tickets %}
+    <div class="{{ classname }}">
+    {% for t in tickets %}
 
-    {% if loop.index == 1 %}
-    {# Few browsers support page-break-after: avoid #}
-    <div class="ticket-with-blurb">
-      {{ caller() }}
-    {% endif %}
+      {% if loop.index == 1 %}
+      {# Few browsers support page-break-after: avoid #}
+      <div class="ticket-with-blurb">
+        {{ caller() }}
+      {% endif %}
 
-    <div class="ticket">
-      <div class="col-sm-5 col-sm-offset-1 type">
-        <b>{{ t.type.name }}</b>
-      </div>
-      <div class="col-sm-4">
-        <div class="qr">
-          {% if png %}
-          <img src="{{ url_for('tickets.tickets_qrcode', code=t.qrcode) }}" />
-          {% else %}
-          {{ format_inline_qr(t.qrcode) }}
-          {% endif %}
-        </div>
-        <div class="code">
-          {{ t.receipt }}
+      <div class="ticket">
+        <div class="col-sm-5 col-sm-offset-1 type">
+          <b>{{ t.type.name }}</b>
         </div>
       </div>
-    </div>
 
-    {% if loop.index == 1 %}
-    </div>
-    {% endif %}
+      {% if loop.index == 1 %}
+      </div>
+      {% endif %}
 
-  {% endfor %}
-  </div>
+    {% endfor %}
+    </div>
 
   {% endif %}
 

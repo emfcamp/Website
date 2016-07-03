@@ -440,10 +440,11 @@ def receipt(ticket_ids=None):
 
 @tickets.route("/receipt/<code>/qr")
 def tickets_qrcode(code):
-    if len(code) > 8:
+    if len(code) > 64:
         abort(404)
-
-    if not validate_safechars(code):
+    ignore_safechar = request.args.get('ignore_safechar', False)
+    if not ignore_safechar and not validate_safechars(code):
+        app.logger.debug('')
         abort(404)
 
     url = app.config.get('CHECKIN_BASE') + code

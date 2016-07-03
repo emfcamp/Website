@@ -10,6 +10,7 @@ import hashlib
 from datetime import datetime, timedelta
 import time
 
+CHECKIN_VERSION = 1
 
 def generate_login_code(key, timestamp, uid):
     msg = "%s-%s" % (int(timestamp), uid)
@@ -31,6 +32,20 @@ def verify_login_code(key, current_timestamp, code):
             return int(uid)
     return None
 
+def generate_checkin_code(key, uid, version=CHECKIN_VERSION):
+    msg = '%s-%s' % (version, uid)
+    mac = hmac.new(key, msg, digestmod=hashlib.sha256)
+    return msg + '-' + base64.urlsafe_b64encode(mac.digest())[:20]
+
+def verify_checkin_code(key, code, expected_version=CHECKIN_VERSION):
+    try:
+        version, uid, _ = code.split('-', 2)
+    except ValueError:
+        raise None
+
+    if hmac.compare_digest(generate_checkin_code(key, uid, version=expected_version), code):
+        return int(uid)
+    return None
 
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
@@ -73,6 +88,9 @@ class User(db.Model, UserMixin):
     def login_code(self, key):
         return generate_login_code(key, int(time.time()), self.id)
 
+    def checkin_code(self, key):
+        return generate_checkin_code(key, self.id)
+
     def has_permission(self, name, cascade=True):
         if cascade and name != 'admin' and self.has_permission('admin'):
             return True
@@ -114,6 +132,14 @@ class User(db.Model, UserMixin):
     @classmethod
     def get_by_code(cls, key, code):
         uid = verify_login_code(key, time.time(), code)
+        if uid is None:
+            return None
+
+        return User.query.filter_by(id=uid).one()
+
+    @classmethod
+    def get_by_checkin_code(cls, key, code):
+        uid = verify_checkin_code(key, code)
         if uid is None:
             return None
 
