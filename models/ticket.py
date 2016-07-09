@@ -91,6 +91,7 @@ class TicketType(db.Model):
                 Payment.query.filter(
                     Payment.state != 'new',
                     Payment.state != 'cancelled',
+                    Payment.state != 'refunded',
                 ).filter(Payment.tickets.expression).exists())
         )
 
@@ -155,6 +156,7 @@ class TicketType(db.Model):
         total = Payment.query.filter(
             Payment.state != 'new',
             Payment.state != 'cancelled',
+            Payment.state != 'refunded',
         ).join(Ticket).join(Ticket.type).filter(or_(TicketType.admits == 'full',
                                                     TicketType.admits == 'kid')).count()
         return app.config.get('MAXIMUM_ADMISSIONS') - total

@@ -174,7 +174,7 @@ def ticket_types():
     totals = Ticket.query.outerjoin(Payment).filter(
         Ticket.refund_id.is_(None),
         or_(Ticket.paid == True,  # noqa
-            ~Payment.state.in_(['new', 'cancelled']))
+            ~Payment.state.in_(['new', 'cancelled', 'refunded']))
     ).join(TicketType).with_entities(
         TicketType.admits,
         func.count(),
