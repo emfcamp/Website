@@ -10,7 +10,7 @@ Buy Items
 {% if admissions %}
     {% include 'ticket-blurb.html' %}
 
-    <p>To order additional items, such as parking tickets or village tents, please
+    <p>To order additional items, such as {# village tents #} t-shirts, please
         <a href="{{ url_for('tickets.choose', flow='other') }}">click here</a>.
 
     <p>
@@ -20,42 +20,51 @@ Buy Items
 {% else %}
     <h2>T-shirts</h2>
     <p>
-      All of our t-shirts will be navy blue with professionally printed EMF logo on high quality
-      cotton. We're doing a limited run (based on what on supplier can manage before the event)
-      all pre-ordered t-shirts will be available for collection on site.
+      We're doing a limited run of navy blue t-shirts with a professionally-printed design on high quality
+      cotton. Pre-ordered t-shirts will be available for collection during the event.
     </p>
+    <div>&nbsp;</div>
+    <div class="row">
+        <img class="img-responsive md-col-12" src="{{ url_for('static', filename='images/EMF-2016-Tshirts-V1-02.jpg') }}">
+    </div>
     <h3>Sizing</h3>
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-sm-6">
         <h5>Semi-fitted</h5>
         <ul>
-          <li>S 44cm (17in)  65cm(26in)</li>
-          <li>M 49cm (19in)  66cm(26in)</li>
-          <li>L 54cm (21in)  69cm(27in)</li>
-          <li>XL 59cm (23in)  69cm(27in)</li>
-          <li>XXL 64cm (25in)  72cm(28in)</li>
+          <li>S&nbsp; 44cm (17in) x 65cm (26in)</li>
+          <li>M&nbsp; 49cm (19in) x 66cm (26in)</li>
+          <li>L&nbsp; 54cm (21in) x 69cm (27in)</li>
+          <li>XL&nbsp; 59cm (23in) x 69cm (27in)</li>
+          <li>XXL&nbsp; 64cm (25in) x 72cm (28in)</li>
         </ul>
       </div>
-      <div class="col-md-6">
+      <div class="col-sm-6">
         <h5>Unfitted</h5>
         <ul>
-          <li>S 46cm (18in)  71cm(28in)</li>
-          <li>M 51cm (20in)  73cm(29in)</li>
-          <li>L 56cm (22in)  76cm(30in)</li>
-          <li>XL 61cm (24in)  79cm(31in)</li>
-          <li>XXL 66cm (26in)  81cm(32in)</li>
+          <li>S&nbsp; 46cm (18in) x 71cm (28in)</li>
+          <li>M&nbsp; 51cm (20in) x 73cm (29in)</li>
+          <li>L&nbsp; 56cm (22in) x 76cm (30in)</li>
+          <li>XL&nbsp; 61cm (24in) x 79cm (31in)</li>
+          <li>XXL&nbsp; 66cm (26in) x 81cm (32in)</li>
         </ul>
       </div>
     </div>
+
     <div>&nbsp;</div>
     <h2>Parking &amp; Caravan tickets</h2>
     <p>
-      As we have limited parking spaces (and encourage you to car-share or use public
-      transport) if you want to bring a car you'll need a ticket. Similarly if you
-      would like to stay in a campervan you'll need to let us know as we have even
-      more limited space for them. If it's a towed caravan you won't need a separate
-      parking ticket.
+      We have limited space for parking, so if you're coming by car you'll need a parking ticket.
+      We recommend you share a car or use public transport to travel to the site.
+      A dedicated shuttle bus service will be operating from a nearby station &mdash;
+      see our <a href="https://wiki.emfcamp.org/wiki/Travel" target="_new">Travel Guide</a> for more information.
     </p>
+    <p>
+      There is a restricted area on-site for caravans and campervans. If you're bringing your
+      caravan with a car, you don't need a separate parking ticket.
+    </p>
+
+    <div>&nbsp;</div>
     <p>
       By making a purchase you are agreeing to our <a href="{{url_for('payments.terms')}}">Terms
       and Conditions</a> and the <a href="{{url_for('base.code_of_conduct')}}">Code of Conduct</a>.
