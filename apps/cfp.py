@@ -1,7 +1,8 @@
 # encoding=utf-8
 from flask import (
     render_template, redirect, request, flash,
-    url_for, abort, current_app as app, Blueprint
+    url_for, abort, current_app as app, Blueprint,
+    Markup
 )
 from flask.ext.login import current_user
 from flask_mail import Message
@@ -41,7 +42,10 @@ class ProposalForm(Form):
     def validate_email(form, field):
         if current_user.is_anonymous() and User.does_user_exist(field.data):
             field.was_duplicate = True
-            raise ValidationError('You already have an account - please log in.')
+            msg = '''You already have an account. Please <a href="%s" target="_new">click here</a> to log in.''' % \
+                url_for('users.login', next=url_for('cfp.main', cfp_type=form.active_cfp_type), email=field.data)
+
+            raise ValidationError(Markup(msg))
 
 
 class TalkProposalForm(ProposalForm):
@@ -89,6 +93,7 @@ def main(cfp_type='talk'):
              WorkshopProposalForm(prefix="workshop"),
              InstallationProposalForm(prefix="installation")]
     (form,) = [f for f in forms if f.type == cfp_type]
+    form.active_cfp_type = cfp_type
 
     # If the user is already logged in set their name & email for the form
     if current_user.is_authenticated():
