@@ -276,12 +276,26 @@ def get_main_ticket_types():
             "Pre-ordered village tents will be placed on site before the event starts.",
             'example', datetime(2016, 7, 1, 12, 0), True),
 
-        (7, 30, 'car', 'Parking Ticket', 450, 4, 15.00, 21.00, False,
+        (14, 30, 'other',
+            "Semi-fitted T-Shirt - S", 200, 10, 10.00, 12.00, False,
+            "Pre-order the official Electromagnetic Field t-shirt. T-shirts will be available to collect during the event.",
+            None, datetime(2016, 7, 15, 0, 0), False),
+        (15, 31, 'other', "Semi-fitted T-Shirt - M", 200, 10, 10.00, 12.00, False, None, None, datetime(2016, 7, 15, 0, 0), False),
+        (16, 32, 'other', "Semi-fitted T-Shirt - L", 200, 10, 10.00, 12.00, False, None, None, datetime(2016, 7, 15, 0, 0), False),
+        (17, 33, 'other', "Semi-fitted T-Shirt - XL", 200, 10, 10.00, 12.00, False, None, None, datetime(2016, 7, 15, 0, 0), False),
+        (18, 34, 'other', "Semi-fitted T-Shirt - XXL", 200, 10, 10.00, 12.00, False, None, None, datetime(2016, 7, 15, 0, 0), False),
+        (19, 35, 'other', "Unfitted T-Shirt - S", 200, 10, 10.00, 12.00, False, None, None, datetime(2016, 7, 15, 0, 0), False),
+        (20, 36, 'other', "Unfitted T-Shirt - M", 200, 10, 10.00, 12.00, False, None, None, datetime(2016, 7, 15, 0, 0), False),
+        (21, 37, 'other', "Unfitted T-Shirt - L", 200, 10, 10.00, 12.00, False, None, None, datetime(2016, 7, 15, 0, 0), False),
+        (22, 38, 'other', "Unfitted T-Shirt - XL", 200, 10, 10.00, 12.00, False, None, None, datetime(2016, 7, 15, 0, 0), False),
+        (23, 39, 'other', "Unfitted T-Shirt - XXL", 200, 10, 10.00, 12.00, False, None, None, datetime(2016, 7, 15, 0, 0), False),
+
+        (7, 50, 'car', 'Parking Ticket', 450, 4, 15.00, 21.00, False,
             "We're trying to keep cars to a minimum. "
             "Please take public transport or car-share if you can.",
             None, None, True),
 
-        (8, 35, 'campervan',
+        (8, 55, 'campervan',
             'Caravan/Campervan Ticket', 60, 2, 30.00, 42.00, False,
             "If you bring a caravan, you won't need a separate parking ticket for the towing car.",
             None, None, True),
