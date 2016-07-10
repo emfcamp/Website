@@ -296,7 +296,7 @@ def get_main_ticket_types():
             None, None, True),
 
         (8, 55, 'campervan',
-            'Caravan/Campervan Ticket', 60, 2, 30.00, 42.00, False,
+            u'Caravan/\u200cCampervan Ticket', 60, 2, 30.00, 42.00, False,
             "If you bring a caravan, you won't need a separate parking ticket for the towing car.",
             None, None, True),
     ]
