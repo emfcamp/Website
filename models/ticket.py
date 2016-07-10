@@ -385,6 +385,7 @@ def check_capacity(session, flush_context, instances):
         return
 
     total_admissions = 0
+    total_tees = 0
     for tt, total in tt_totals.items():
         if total > tt.type_limit:
             app.logger.warn('Total tickets of type %s (%s) %s > %s', tt.id, tt.name, total, tt.type_limit)
@@ -393,8 +394,14 @@ def check_capacity(session, flush_context, instances):
         if tt.admits in ['full', 'kid']:
             total_admissions += total
 
+        if tt.fixed_id in range(14, 24):  # T-shirt ticket types
+            total_tees += total
+
     if total_admissions > app.config.get('MAXIMUM_ADMISSIONS'):
         raise TicketLimitException('No more admission tickets available')
+
+    if total_tees > app.config.get('MAXIMUM_TEES'):
+        raise TicketLimitException('No more t-shirts available')
 
     # Clear cached state based on number of available tickets
     refresh_states()
