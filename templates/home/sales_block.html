@@ -1,15 +1,20 @@
 {% if SALES_STATE == 'available' %}
-<p class="emphasis">Tickets for EMF are now on sale for £{{full_price}}!<p>
-<a class="btn btn-lg btn-block btn-primary" href="{{url_for('tickets.choose')}}">Buy your ticket now</a>
+  <p class="emphasis">Tickets for EMF are now on sale for £{{full_price}}!<p>
+  <a class="btn btn-lg btn-block btn-primary" href="{{url_for('tickets.choose')}}">Buy your ticket now</a>
 {% elif SALES_STATE == 'unavailable' %}
-<p class="emphasis">Tickets for EMF are currently unavailable.</p>
-<p>Keep an eye on
-    <a href="https://www.twitter.com/emfcamp">Twitter</a> or join our
-    mailing list for an update when the next batch goes on sale:
-</p>
-{% include "home/_mailchimp_form.html" %}
+  <p class="emphasis">Tickets for EMF are currently unavailable.</p>
+  <p>Keep an eye on
+      <a href="https://www.twitter.com/emfcamp">Twitter</a> or join our
+      mailing list for an update when the next batch goes on sale:
+  </p>
+  {% include "home/_mailchimp_form.html" %}
 {% elif SALES_STATE == 'sold-out' %}
-<p>We&rsquo;re sorry to say EMF is sold out! However if you submit something to our <a href="{{ url_for('cfp.main') }}">Call For Participation</a> and get accepted, we can guarantee you a ticket!</p>
-{% elif SALES_STATE == 'sales-ended' %}
-<p>Ticket sales have now ended.</p>
+  <p>We&rsquo;re sorry to say EMF is sold out!
+  {% if config.get('CFP') %}
+  However if you submit something to our <a href="{{ url_for('cfp.main') }}">Call For Participation</a> and get accepted, we can guarantee you a ticket!</p>
+  {% else %}
+  If you submitted something to our Call For Participation and it's accepted, we can guarantee you a ticket.</p>
+  {% endif %}
+  {% elif SALES_STATE == 'sales-ended' %}
+  <p>Ticket sales have now ended.</p>
 {% endif %}
