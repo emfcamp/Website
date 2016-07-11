@@ -89,18 +89,22 @@ def main():
 
 def build_proposal_query_dict(parameters):
     res = {}
-    fields = [('type', str), ('state', str), ('needs_help', bool), ('needs_money', bool)]
+    fields = [('type', str), ('state', str), ('one_day', bool),
+              ('needs_help', bool), ('needs_money', bool), ('needs_ticket', bool)]
 
     for (field_name, field_type) in fields:
-        # if this can't convert to the correct type it will return None
         val = parameters.get(field_name, None)
 
         if val is not None:
-            try:
-                val = field_type(val)
-            except ValueError:
-                flash('Invalid parameter value (%r) for parameter %s' % (val, field_name))
-                continue
+            # This is awful
+            if field_type == bool:
+                if val in ['True', '1']:
+                    val = True
+                elif val in ['False', '0']:
+                    val = False
+                else:
+                    val = None
+
             res[field_name] = val
 
     return res
@@ -134,18 +138,27 @@ def get_proposal_sort_dict(parameters):
 @admin_required
 def proposals():
     query_dict = build_proposal_query_dict(request.args)
-    proposals = Proposal.query.filter_by(**query_dict)
 
-    if request.args.get('needs_ticket') == 'True':
+    if 'needs_ticket' in query_dict:
+        needs_ticket = query_dict.pop('needs_ticket')
         paid_tickets = Ticket.query.join(TicketType).filter(
             TicketType.admits == 'full',
             or_(Ticket.paid == True,  # noqa
                 Ticket.expired == False),
         )
-        proposals = proposals.join(Proposal.user).filter(
-            User.will_have_ticket == False,  # noqa
-            ~paid_tickets.filter(User.tickets.expression).exists()
-        )
+        proposals = Proposal.query.filter_by(**query_dict)
+        if needs_ticket:
+            proposals = proposals.join(Proposal.user).filter(
+                User.will_have_ticket == False,  # noqa
+                ~paid_tickets.filter(User.tickets.expression).exists()
+            )
+        else:
+            proposals = proposals.join(Proposal.user).filter(or_(
+                User.will_have_ticket == True,  # noqa
+                paid_tickets.filter(User.tickets.expression).exists()
+            ))
+    else:
+        proposals = Proposal.query.filter_by(**query_dict)
 
     sort_dict = get_proposal_sort_dict(request.args)
     proposals = proposals.all()

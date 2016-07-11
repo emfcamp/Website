@@ -28,7 +28,7 @@
                 <li role="separator" class="divider"></li>
                 {{ menuitem("Needs Help", ".proposals", needs_help=True) }}
                 {{ menuitem("Needs Ticket", ".proposals", needs_ticket=True) }}
-                {{ menuitem("Accepted and Needs Ticket", ".proposals", needs_ticket=True, state='accepted') }}
+                {{ menuitem("Accepted and Needs Full Ticket", ".proposals", needs_ticket=True, state='accepted', one_day=False) }}
                 {{ menuitem("Needs Money", ".proposals", needs_money=True) }}
                 <li role="separator" class="divider"></li>
                 {% for state in ordered_states %}
