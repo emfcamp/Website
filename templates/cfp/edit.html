@@ -26,7 +26,7 @@
   {% include "cfp/edit-form.html" %}
 {% else %}
   <div class="well"><div class="row">
-    {% if config.get('CFP_FINALISE') and proposal.state in ['accepted', 'finished']  %}
+    {% if feature_enabled('CFP_FINALISE') and proposal.state in ['accepted', 'finished']  %}
       <div>Your talk has been accepted! If you haven't already please visit
         <a href="{{ url_for('.finalise_proposal', proposal_id=proposal.id ) }}">finalise your details</a>.
       </div>
