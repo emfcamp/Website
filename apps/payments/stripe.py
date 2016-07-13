@@ -246,6 +246,7 @@ def stripe_webhook():
         return handler(type, obj_data)
     except Exception as e:
         logger.error('Unexcepted exception during webhook: %r', e)
+        logger.info('Webhook data: %s', request.data)
         abort(500)
 
 
@@ -286,7 +287,7 @@ def stripe_payment_paid(payment):
         logger.info('Payment is already paid, ignoring')
         return
 
-    if payment.state != 'charged':
+    if payment.state not in ['charged', 'partrefunded']:
         logger.error('Current payment state is %s (should be charged)', payment.state)
         raise StripeUpdateConflict()
 
