@@ -1,0 +1,19 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'list_free_tickets' %}
+{% block body %}
+<h2>Cancel Complimentary Ticket</h2>
+
+<p>To cancel this complimentary ticket, please click below.</p>
+
+<dl class="dl-horizontal">
+<dt>Name</dt><dd>{{ ticket.user.name }}</dd>
+<dt>Email</dt><dd>{{ ticket.user.email }}</dd>
+<dt>Type</dt><dd>{{ ticket.type.name }}</dd>
+</dl>
+
+<form method="post" action="{{ url_for('.cancel_free_ticket', ticket_id=ticket.id) }}" class="shrink">
+{{ form.hidden_tag() }}
+{{ form.cancel(class_="btn btn-danger pull-right") }}
+</form>
+
+{% endblock %}

@@ -5,7 +5,7 @@ from . import admin, admin_required
 from Levenshtein import ratio, jaro
 from flask import (
     render_template, redirect, request, flash,
-    url_for, current_app as app
+    url_for, current_app as app, abort,
 )
 from flask.ext.login import current_user
 from flask_mail import Message
@@ -428,6 +428,37 @@ def list_free_tickets():
 
     return render_template('admin/tickets-list-free.html',
                            free_tickets=free_tickets)
+
+class CancelTicketForm(Form):
+    cancel = SubmitField("Cancel ticket")
+
+@admin.route('/ticket/<int:ticket_id>/cancel-free', methods=['GET', 'POST'])
+@admin_required
+def cancel_free_ticket(ticket_id):
+    ticket = Ticket.query.get_or_404(ticket_id)
+    if ticket.payment is not None:
+        abort(404)
+
+    if not ticket.paid:
+        app.logger.warn('Ticket %s is already cancelled', ticket.id)
+        flash('This ticket is already cancelled')
+        return redirect(url_for('admin.list_free_tickets'))
+
+    form = CancelTicketForm()
+    if form.validate_on_submit():
+        if form.cancel.data:
+            app.logger.info('Cancelling free ticket %s', ticket.id)
+            now = datetime.utcnow()
+            ticket.paid = False
+            if ticket.expires is None or ticket.expires > now:
+                ticket.expires = now
+
+            db.session.commit()
+
+            flash('Ticket cancelled')
+            return redirect(url_for('admin.list_free_tickets'))
+
+    return render_template('admin/ticket-cancel-free.html', ticket=ticket, form=form)
 
 
 @admin.route('/transfers')
