@@ -87,7 +87,7 @@ class TicketType(db.Model):
         # (there's a valid payment associated with it and it's not refunded).
         sold_tickets = query.filter(
             Ticket.type == self,
-            Ticket.refund.is_(None),
+            Ticket.refund_id.is_(None),
             or_(Ticket.paid,
                 Payment.query.filter(
                     Payment.state != 'new',
