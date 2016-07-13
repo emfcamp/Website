@@ -25,7 +25,7 @@
             <dt>Max</dt>
             <dd>{{ summary.get('max_votes', 0) }}</dd>
             <dt>Ave</dt>
-            <dd>{{ (summary.get('votes_total', 0) / (proposals_with_counts | count) ) | round }}</dd>
+            <dd>{% if proposals_with_counts %}{{ (summary.get('votes_total', 0) / (proposals_with_counts | count) ) | round }}{% endif %}</dd>
             <dt>Total</dt>
             <dd>{{ summary.get('votes_total', 0)}}</dd>
         </dl>
