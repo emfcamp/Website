@@ -33,7 +33,7 @@ class TicketTestCase(unittest.TestCase):
             # ... but a paid one is
             assert sum(TicketType.get_ticket_sales().values()) == 1
 
-            ticket.expires = datetime.now() - timedelta(minutes=1)
+            ticket.expires = datetime.utcnow() - timedelta(minutes=1)
             self.db.session.flush()
             # Expired tickets still count towards capacity
             assert sum(TicketType.get_ticket_sales().values()) == 1
