@@ -17,6 +17,9 @@ logger = logging.getLogger(__name__)
 
 
 def transfer_start(payment):
+    if not feature_enabled('BANK_TRANSFER'):
+        return redirect(url_for('tickets.pay'))
+
     if get_user_currency() == 'EUR' and not feature_enabled('BANK_TRANSFER_EURO'):
         return redirect(url_for('tickets.pay'))
 
