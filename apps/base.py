@@ -191,6 +191,11 @@ def radio():
     return render_template('radio.html')
 
 
+@base.route('/about/branding')
+def branding():
+    return render_template('branding.html')
+
+
 @base.route('/about/design-elements')
 def design_elements():
     return render_template('design.html')
