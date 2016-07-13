@@ -72,10 +72,11 @@ class Payment(db.Model):
         elif self.state == 'refunded':
             raise StateException('Refunded payments cannot be cancelled')
 
+        now = datetime.utcnow()
         for ticket in self.tickets:
             ticket.paid = False
-            if self.state != 'refunded':
-                ticket.expires = datetime.utcnow()
+            if ticket.expires is None or ticket.expires > now:
+                ticket.expires = now
 
         self.state = 'cancelled'
 
@@ -92,11 +93,12 @@ class Payment(db.Model):
             raise StateException('Refunded payments cannot be cancelled')
 
         refund = BankRefund(self, self.amount)
+        now = datetime.utcnow()
         for ticket in self.tickets:
             if ticket.user != self.user:
                 raise StateException('Cannot refund transferred ticket')
-            if self.state != 'cancelled':
-                ticket.expires = datetime.utcnow()
+            if ticket.expires is None or ticket.expires > now:
+                ticket.expires = now
             if ticket.refund is not None:
                 raise StateException('Ticket is already refunded')
             if ticket.type.get_price(self.currency) and not ticket.paid:

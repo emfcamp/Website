@@ -291,9 +291,11 @@ def partial_refund(payment_id):
                 payment.state = 'refunding'
                 refund = BankRefund(payment, total + premium)
 
+            now = datetime.utcnow()
             for ticket in tickets:
                 ticket.paid = False
-                ticket.expires = datetime.utcnow()
+                if ticket.expires is None or ticket.expires > now:
+                    ticket.expires = now
                 ticket.refund = refund
 
             priced_tickets = [t for t in payment.tickets if t.type.get_price(payment.currency)]
