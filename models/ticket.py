@@ -84,9 +84,10 @@ class TicketType(db.Model):
             query = Ticket.query
 
         # A ticket is sold if it's set to paid, or if it's reserved
-        # (there's a valid payment associated with it)
+        # (there's a valid payment associated with it and it's not refunded).
         sold_tickets = query.filter(
             Ticket.type == self,
+            Ticket.refund.is_(None),
             or_(Ticket.paid,
                 Payment.query.filter(
                     Payment.state != 'new',
