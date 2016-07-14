@@ -287,8 +287,12 @@ def stripe_payment_paid(payment):
         logger.info('Payment is already paid, ignoring')
         return
 
-    if payment.state not in ['charged', 'partrefunded']:
-        logger.error('Current payment state is %s (should be charged or partrefunded)', payment.state)
+    if payment.state == 'partrefunded':
+        logger.info('Payment is already partially refunded, ignoring')
+        return
+
+    if payment.state != 'charged':
+        logger.error('Current payment state is %s (should be charged)', payment.state)
         raise StripeUpdateConflict()
 
     logger.info('Setting payment %s to paid', payment.id)
