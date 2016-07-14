@@ -20,7 +20,7 @@ from models.ticket import TicketType
 from models.cfp import (
     TalkProposal, WorkshopProposal, InstallationProposal, Proposal, CFPMessage
 )
-from .common import feature_flag, feature_enabled, create_current_user
+from .common import feature_flag, create_current_user
 from .common.forms import Form, TelField
 
 cfp = Blueprint('cfp', __name__)
@@ -89,13 +89,10 @@ def main(cfp_type='talk'):
     if cfp_type not in ['talk', 'workshop', 'installation']:
         abort(404)
 
-    if not feature_enabled('CFP_SUBMIT'):
-        if current_user.is_authenticated() and current_user.proposals:
-            flash('The Call for Participation is now closed. We will be in touch if your proposal is accepted.')
-            return redirect(url_for('cfp.proposals'))
+    ignore_closed = 'closed' in request.args
 
-        flash('The Call for Participation is now closed.')
-        return redirect(url_for('base.main'))
+    if app.config.get('CFP_CLOSED') and not ignore_closed:
+        return render_template('cfp/closed.html')
 
     forms = [TalkProposalForm(prefix="talk"),
              WorkshopProposalForm(prefix="workshop"),
@@ -164,7 +161,7 @@ def main(cfp_type='talk'):
 
     return render_template('cfp/main.html', full_price=full_price,
                            forms=forms, active_cfp_type=cfp_type,
-                           has_errors=bool(form.errors))
+                           has_errors=bool(form.errors), ignore_closed=ignore_closed)
 
 
 class DiversityForm(Form):
@@ -175,7 +172,6 @@ class DiversityForm(Form):
 
 @cfp.route('/cfp/complete', methods=['GET', 'POST'])
 @feature_flag('CFP')
-@feature_flag('CFP_SUBMIT')
 def complete():
     if current_user.is_anonymous():
         return redirect(url_for('.main'))

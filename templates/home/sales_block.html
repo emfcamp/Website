@@ -10,11 +10,11 @@
   {% include "home/_mailchimp_form.html" %}
 {% elif SALES_STATE == 'sold-out' %}
   <p>We&rsquo;re sorry to say EMF is sold out!
-  {% if feature_enabled('CFP') and feature_enabled('CFP_SUBMIT') %}
+  {% if feature_enabled('CFP') and not config.get('CFP_CLOSED') %}
   However if you submit something to our <a href="{{ url_for('cfp.main') }}">Call For Participation</a> and get accepted, we can guarantee you a ticket!</p>
   {% else %}
   If you submitted something to our Call For Participation and it's accepted, we can guarantee you a ticket.</p>
   {% endif %}
-  {% elif SALES_STATE == 'sales-ended' %}
+{% elif SALES_STATE == 'sales-ended' %}
   <p>Ticket sales have now ended.</p>
 {% endif %}
