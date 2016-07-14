@@ -32,8 +32,8 @@
             <dd>{{proposal.type}}</dd>
             {{ render_dl_field(form.state) }}
             {{ render_dl_field(form.title) }}
-            {{ render_dl_field(form.description, rows=10) }}
-            {{ render_dl_field(form.requirements, rows=5) }}
+            {{ render_dl_field(form.description, rows=5) }}
+            {{ render_dl_field(form.requirements, rows=3) }}
             {{ render_dl_field(form.length) }}
             {{ render_dl_field(form.notice_required) }}
             {{ render_dl_field(form.needs_help) }}
@@ -49,7 +49,15 @@
             {{ render_dl_field(form.will_have_ticket) }}
         </dl>
         {% if proposal.state in ('accepted', 'finished') %}
-        <h4>Schedule details</h4>
+        <h4>Scheduling</h4>
+            <dl class="dl-horizontal">
+                {{ render_dl_field(form.allowed_venues) }}
+                {{ render_dl_field(form.allowed_times) }}
+                {{ render_dl_field(form.scheduled_duration) }}
+                {{ render_dl_field(form.scheduled_venue) }}
+                {{ render_dl_field(form.scheduled_time) }}
+            </dl>
+        <h4>User schedule details</h4>
             <dl class="dl-horizontal">
                 {{ render_dl_field(form.published_names) }}
                 {{ render_dl_field(form.arrival_period) }}

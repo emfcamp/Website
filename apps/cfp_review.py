@@ -19,6 +19,7 @@ from wtforms.validators import Required, NumberRange, ValidationError
 
 import random
 from datetime import datetime, timedelta
+import dateutil
 from main import db, external_url
 from .common import require_permission, send_template_email
 from .majority_judgement import calculate_max_normalised_score
@@ -26,7 +27,7 @@ from .majority_judgement import calculate_max_normalised_score
 from models.ticket import Ticket, TicketType
 from models.user import User
 from models.cfp import (
-    Proposal, CFPMessage, CFPVote, CFP_STATES
+    Proposal, CFPMessage, CFPVote, CFP_STATES, Venue
 )
 from .common.forms import Form, HiddenIntegerField
 
@@ -199,6 +200,12 @@ class UpdateProposalForm(Form):
     needs_laptop = BooleanField('Needs laptop')
     available_times = StringField('Available times')
 
+    allowed_venues = StringField('Allowed Venues')
+    allowed_times = TextAreaField('Allowed Time Periods')
+    scheduled_duration = StringField('Duration')
+    scheduled_time = StringField('Scheduled Time')
+    scheduled_venue = StringField('Scheduled Venue')
+
     update = SubmitField('Force update')
     reject = SubmitField('Reject')
     checked = SubmitField('Send for Anonymisation')
@@ -222,6 +229,25 @@ class UpdateProposalForm(Form):
         proposal.may_record = self.may_record.data
         proposal.needs_laptop = self.needs_laptop.data
         proposal.available_times = self.available_times.data
+
+        if self.scheduled_time.data:
+            proposal.scheduled_time = dateutil.parser.parse(self.scheduled_time.data)
+        else:
+            proposal.scheduled_time = None
+
+        proposal.scheduled_duration = self.scheduled_duration.data
+        proposal.allowed_times = self.allowed_times.data
+
+        if self.scheduled_venue.data:
+            proposal.scheduled_venue = Venue.query.filter(Venue.name == self.scheduled_venue.data.strip()).one().name
+        else:
+            proposal.scheduled_venue = None
+
+        # Only set this if we're overriding the default
+        if proposal.get_allowed_venues_serialised().strip() != self.allowed_venues.data.strip():
+            proposal.allowed_venues = self.allowed_venues.data.strip()
+            # Validates the new data. Bit nasty.
+            proposal.get_allowed_venues()
 
 
 class UpdateTalkForm(UpdateProposalForm):
@@ -342,6 +368,12 @@ def update_proposal(proposal_id):
     form.may_record.data = prop.may_record
     form.needs_laptop.data = prop.needs_laptop
     form.available_times.data = prop.available_times
+
+    form.allowed_venues.data = prop.get_allowed_venues_serialised()
+    form.allowed_times.data = prop.get_allowed_time_periods_serialised()
+    form.scheduled_time.data = prop.scheduled_time
+    form.scheduled_duration.data = prop.scheduled_duration
+    form.scheduled_venue.data = prop.scheduled_venue
 
     if prop.type == 'workshop':
         form.attendees.data = prop.attendees

@@ -46,6 +46,17 @@
         <dt>Description</dt><dd class="multiline">{{ proposal.description | urlize }}</dd>
       </dl>
     </div>
+    {% if proposal.scheduled_duration and (proposal.type == 'talk' or proposal.type == 'workshop') %}
+    <div class="col-md-6">
+      <legend>Your scheduled slot</legend>
+      <dl class="dl-horizontal">
+        <dt>Slot length</dt><dd>{{proposal.scheduled_duration}} minutes</dd>
+        <dt>Slot time</dt><dd>{% if proposal.scheduled_time %}{{proposal.scheduled_time.strftime('%A at %-I:%M %p')}}{% else %}Not yet scheduled{% endif %}</dd>
+        <dt>Venue</dt><dd>{{proposal.scheduled_venue or "Not yet scheduled"}}</dd>
+      </dl>
+      <div>If your slot is not suitable, please <b><a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">  get in touch with us!</a></b></div>
+    </div>
+    {% else %}
     <div class="col-md-6">
       <legend>Further details</legend>
       <dl class="dl-horizontal">
@@ -65,6 +76,7 @@
         {% endif %}
       </dl>
     </div>
+    {% endif %}
   </div></div>
 {% endif %}
 
