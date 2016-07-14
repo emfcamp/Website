@@ -168,9 +168,8 @@ def tickets_unpaid():
     return render_template('admin/tickets.html', tickets=tickets)
 
 
-@admin.route('/ticket-types')
-@admin_required
-def ticket_types():
+@admin.route('/ticket-report')
+def ticket_report():
     # This is an admissions-based view, so includes expired tickets
     totals = Ticket.query.outerjoin(Payment).filter(
         Ticket.refund_id.is_(None),
@@ -180,10 +179,27 @@ def ticket_types():
         TicketType.admits,
         func.count(),
     ).group_by(TicketType.admits).all()
-
     totals = dict(totals)
+
+    query = db.session.query(TicketType.admits, func.count(), func.sum(TicketPrice.price_int)).\
+        select_from(Ticket).join(TicketType).join(TicketPrice).\
+        filter(TicketPrice.currency == 'GBP', Ticket.paid == True).group_by(TicketType.admits)  # noqa
+
+    accounting_totals = {}
+    for row in query.all():
+        accounting_totals[row[0]] = {
+            'count': row[1],
+            'total': row[2]
+        }
+
+    return render_template('admin/ticket-report.html', totals=totals, accounting_totals=accounting_totals)
+
+
+@admin.route('/ticket-types')
+@admin_required
+def ticket_types():
     types = TicketType.query.all()
-    return render_template('admin/ticket-types.html', ticket_types=types, totals=totals)
+    return render_template('admin/ticket-types.html', ticket_types=types)
 
 ADMITS_LABELS = [('full', 'Adult'), ('kid', 'Under 16'),
                  ('campervan', 'Campervan'), ('car', 'Car'),

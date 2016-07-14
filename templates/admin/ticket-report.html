@@ -1,0 +1,37 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'ticket_types' %}
+{% block body %}
+<h2>Ticket Report</h2>
+<h3>Admission totals (paid or reserved only)</h3>
+    <table class="table table-condensed">
+        <thead><tr><th>Full</th><th>Kids</th><th>Campervans</th><th>Cars</th><th>Other</th></tr></thead>
+        <tbody><tr>
+        {% for key in ['full', 'kid', 'campervan', 'car', 'other'] -%}
+            <td>{{ totals[key] or 0 }}</td>
+        {% endfor %}
+        </tr></tbody>
+    </table>
+
+<h3>Accounting totals (paid tickets only)</h3>
+    <table class="table table-condensed">
+        <thead><tr><th></th><th>Full</th><th>Kids</th><th>Campervans</th><th>Cars</th><th>Other</th></tr></thead>
+        <tbody>
+        <tr><th>Number of Tickets</th>
+        {% for key in ['full', 'kid', 'campervan', 'car', 'other'] -%}
+            <td>{% if key in accounting_totals %}
+                {{ accounting_totals[key]['count']}}
+            {% endif %}</td>
+        {% endfor %}
+        </tr>
+        <tr><th>Total</th>
+        {% for key in ['full', 'kid', 'campervan', 'car', 'other'] -%}
+        <td>{% if key in accounting_totals %}
+                £{{ accounting_totals[key]['total'] / 100}}
+            {% endif %}</td>
+        {% endfor %}
+        </tr>
+        </tbody>
+    </table>
+
+
+{% endblock %}
