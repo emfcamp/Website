@@ -98,7 +98,7 @@
           </div>
         {% else %}
           <p>If you've already bought a ticket, please
-              <a href="{{ url_for('users.login', next=url_for('.main', cfp_type=form.type) + ('?closed' if ignore_closed) else '') }}" target="_blank">log in</a>.</p>
+              <a href="{{ url_for('users.login', next=url_for('.main', cfp_type=form.type) + ('?closed' if ignore_closed else '')) }}" target="_blank">log in</a>.</p>
         {% endif %}
         {{ render_field(form.name, horizontal=9, placeholder="Your name (or pseudonym)") }}
         {{ render_field(form.email, horizontal=9, placeholder="Your email address") }}
