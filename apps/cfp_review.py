@@ -954,15 +954,10 @@ def send_email_for_proposal(proposal, accepted):
         template = 'cfp_review/email/accepted_msg.txt'
 
     else:
-        # If it's not accepted, it can still be accepted in the next round.
-        # Send the proposer an email so they don't feel ignored, but only once.
-        if proposal.has_rejected_email:
-            return
-
         app.logger.info('Sending not-accepted email for proposal %s', proposal.id)
         proposal.has_rejected_email = True
-        subject = 'An update on your EMF %s "%s"' % (proposal.type, proposal.title)
-        template = 'cfp_review/email/not_accepted_msg.txt'
+        subject = 'Your EMF %s proposal "%s" was not accepted.' % (proposal.type, proposal.title)
+        template = 'emails/cfp-rejected.txt'
 
     user = proposal.user
     send_template_email(subject, user.email, app.config['CONTENT_EMAIL'],

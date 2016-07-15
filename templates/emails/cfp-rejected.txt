@@ -1,0 +1,14 @@
+Hi {{ proposal.user.name }},
+
+We're very sorry but your EMF {{ proposal.type }} proposal '{{ proposal.title }}' was not selected by our review panel.
+
+If you have an EMF ticket there are still plenty of chances to present this year - we have lightning talks every day (except Friday), and many of the villages also have stage and workshop space that you may be able to use.
+
+* Lightning talks are generally around five minutes. If you'd be interested in giving one please ask at the Info Desk or email lightning@emfcamp.org
+
+* Villages have varying facilities and their own programmes of events - feel free to approach one if you think they might like to host your talk or workshop. If you're not sure who to talk to, email villagecontent@emfcamp.org. You can find a list of them on our wiki: https://wiki.emfcamp.org/wiki/Villages
+
+This year we've had many more high-quality applications than we could possibly host - turning applications down is always very hard, but we only have a small amount of slots to fill. We'll be in touch when the CFP opens for future EMF events, giving you the best chance of being selected.
+
+Thanks,
+The EMF team

@@ -76,6 +76,9 @@ emailspeakersaboutslot:
 emailspeakersaboutfinalising:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py emailspeakersaboutfinalising
 
+rejectunacceptedtalks:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py rejectunacceptedtalks
+
 
 shell:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py shell

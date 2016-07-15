@@ -599,7 +599,7 @@ class UpdateSegments(Command):
 class EmailSpeakersAboutSlot(Command):
 
     def run(self):
-	proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot('')).\
+        proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot('')).\
             filter(Proposal.state.in_(['accepted', 'finished'])).\
             filter(Proposal.type.in_(['talk', 'workshop'])).all()
 
@@ -621,7 +621,7 @@ class EmailSpeakersAboutSlot(Command):
 class EmailSpeakersAboutFinalising(Command):
 
     def run(self):
-	proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot('')).\
+        proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot('')).\
             filter(Proposal.state.in_(['accepted'])).\
             filter(Proposal.type.in_(['talk', 'workshop'])).all()
 
@@ -638,6 +638,26 @@ class EmailSpeakersAboutFinalising(Command):
             mail.send(msg)
             db.session.commit()
 
+class RejectUnacceptedTalks(Command):
+
+    def run(self):
+        proposals = Proposal.query.filter(Proposal.state.in_(['reviewed'])).all()
+
+        for proposal in proposals:
+            proposal.set_state('rejected')
+            proposal.has_rejected_email = True
+
+            user = proposal.user
+
+            msg = Message("Your EMF %s proposal '%s' was not accepted." % (proposal.type, proposal.title),
+                          sender=app.config['SPEAKERS_EMAIL'],
+                          recipients=[user.email])
+
+            msg.body = render_template("emails/cfp-rejected.txt", user=user, proposal=proposal)
+
+            app.logger.info('Emailing %s about rejecting proposal %s', user.email, proposal.title)
+            mail.send(msg)
+            db.session.commit()
 
 class SendEmails(Command):
     def run(self):
@@ -682,5 +702,6 @@ if __name__ == "__main__":
 
     manager.add_command('emailspeakersaboutslot', EmailSpeakersAboutSlot())
     manager.add_command('emailspeakersaboutfinalising', EmailSpeakersAboutFinalising())
+    manager.add_command('rejectunacceptedtalks', RejectUnacceptedTalks())
 
     manager.run()
