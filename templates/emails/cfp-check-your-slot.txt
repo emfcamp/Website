@@ -1,0 +1,23 @@
+Hi {{ proposal.user.name }},
+
+We need some final information about your {{ proposal.type }} '{{ proposal.title }}'.
+
+You have been allocated a {{ proposal.scheduled_duration }} minute slot - if this isn't suitable, please get in touch with us immediately. Please note that while you are allowed on-stage Q&A, we would prefer it if you told the audience to meet you somewhere after to discuss it.
+
+You should now finalise the details for your {{ proposal.type }} on our website. Most importantly you can tell us when you're available so that we don't accidentally schedule you for a time when you're not around!
+
+https://www.emfcamp.org/login?next=%2Fcfp%2Fproposals%2F{{ proposal.id }}%2Ffinalise
+
+Don't worry, you'll be able to update your {{ proposal.type }} title and description all the way up to the event - just make sure you set your availability now.
+
+To summarise, we urgently need you to:
+
+* Let us know if a {{ proposal.scheduled_duration }} minute slot isn't suitable.
+* Fill in the form with your availability so we can schedule you.
+
+And less urgently:
+
+* Write a great description of your {{ proposal.type }} we can publish in the schedule!
+
+Looking forward to seeing you in the field,
+All the EMF team

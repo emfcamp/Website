@@ -70,6 +70,12 @@ lockproposals:
 importcfp:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py importcfp
 
+emailspeakersaboutslot:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py emailspeakersaboutslot
+
+emailspeakersaboutfinalising:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py emailspeakersaboutfinalising
+
 
 shell:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py shell

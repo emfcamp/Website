@@ -596,6 +596,48 @@ class UpdateSegments(Command):
         app.logger.info("Segment updated. Success: %s, failed: %s", results['success'],
                         len(results['errors']))
 
+class EmailSpeakersAboutSlot(Command):
+
+    def run(self):
+	proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot('')).\
+            filter(Proposal.state.in_(['accepted', 'finished'])).\
+            filter(Proposal.type.in_(['talk', 'workshop'])).all()
+
+        for proposal in proposals:
+            user = proposal.user
+
+            msg = Message("We need information about your EMF %s '%s'" % (proposal.type, proposal.title),
+                          sender=app.config['SPEAKERS_EMAIL'],
+                          recipients=[user.email])
+
+            msg.body = render_template("emails/cfp-check-your-slot.txt", user=user, proposal=proposal)
+
+            print msg
+
+            app.logger.info('Emailing %s about proposal %s', user.email, proposal.title)
+            mail.send(msg)
+            db.session.commit()
+
+class EmailSpeakersAboutFinalising(Command):
+
+    def run(self):
+	proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot('')).\
+            filter(Proposal.state.in_(['accepted'])).\
+            filter(Proposal.type.in_(['talk', 'workshop'])).all()
+
+        for proposal in proposals:
+            user = proposal.user
+
+            msg = Message("We really need information about your EMF %s '%s'!" % (proposal.type, proposal.title),
+                          sender=app.config['SPEAKERS_EMAIL'],
+                          recipients=[user.email])
+
+            msg.body = render_template("emails/cfp-please-finalise.txt", user=user, proposal=proposal)
+
+            app.logger.info('Emailing %s about proposal %s', user.email, proposal.title)
+            mail.send(msg)
+            db.session.commit()
+
 
 class SendEmails(Command):
     def run(self):
@@ -637,5 +679,8 @@ if __name__ == "__main__":
 
     manager.add_command('updatesegments', UpdateSegments())
     manager.add_command('sendemails', SendEmails())
+
+    manager.add_command('emailspeakersaboutslot', EmailSpeakersAboutSlot())
+    manager.add_command('emailspeakersaboutfinalising', EmailSpeakersAboutFinalising())
 
     manager.run()
