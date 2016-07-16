@@ -692,7 +692,7 @@ class SetRoughDurations(Command):
             '< 10 mins': 15
         }
 
-        proposals = Proposal.query.filter_by(scheduled_duration='', type='talk').\
+        proposals = Proposal.query.filter_by(scheduled_duration=None, type='talk').\
             filter(Proposal.state.in_(['accepted', 'finished'])).all()
 
         for proposal in proposals:
