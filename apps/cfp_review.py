@@ -126,6 +126,7 @@ def get_proposal_sort_dict(parameters):
         'title': lambda p: p.title,
         'ticket': lambda p: (p.user.tickets.count() > 0, p.title),
         'notice': lambda p: (sort_by_notice(p.notice_required), p.title),
+        'duration': lambda p: (p.scheduled_duration or 0)
     }
 
     sort_by_key = parameters.get('sort_by')
