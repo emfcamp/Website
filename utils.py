@@ -684,12 +684,11 @@ class ImportVenues(Command):
 
 class SetRoughDurations(Command):
     def run(self):
-        print "WAT"
         length_map = {
             '> 45 mins': 60,
             '25-45 mins': 30,
-            '10-25 mins': 15,
-            '< 10 mins': 15
+            '10-25 mins': 20,
+            '< 10 mins': 10
         }
 
         proposals = Proposal.query.filter_by(scheduled_duration=None, type='talk').\
