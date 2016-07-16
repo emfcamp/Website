@@ -599,7 +599,7 @@ class UpdateSegments(Command):
 class EmailSpeakersAboutSlot(Command):
 
     def run(self):
-        proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot('')).\
+        proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
             filter(Proposal.state.in_(['accepted', 'finished'])).\
             filter(Proposal.type.in_(['talk', 'workshop'])).all()
 
@@ -612,8 +612,6 @@ class EmailSpeakersAboutSlot(Command):
 
             msg.body = render_template("emails/cfp-check-your-slot.txt", user=user, proposal=proposal)
 
-            print msg
-
             app.logger.info('Emailing %s about proposal %s', user.email, proposal.title)
             mail.send(msg)
             db.session.commit()
@@ -621,7 +619,7 @@ class EmailSpeakersAboutSlot(Command):
 class EmailSpeakersAboutFinalising(Command):
 
     def run(self):
-        proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot('')).\
+        proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
             filter(Proposal.state.in_(['accepted'])).\
             filter(Proposal.type.in_(['talk', 'workshop'])).all()
 
