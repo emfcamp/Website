@@ -236,7 +236,11 @@ class UpdateProposalForm(Form):
         else:
             proposal.scheduled_time = None
 
-        proposal.scheduled_duration = self.scheduled_duration.data
+        if self.scheduled_duration:
+            proposal.scheduled_duration = self.scheduled_duration.data
+        else:
+            proposal.scheduled_duration = None
+
         proposal.allowed_times = self.allowed_times.data
 
         if self.scheduled_venue.data:
