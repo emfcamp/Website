@@ -82,6 +82,9 @@ rejectunacceptedtalks:
 importvenues:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py importvenues
 
+setroughdurations:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py setroughdurations
+
 shell:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py shell
 

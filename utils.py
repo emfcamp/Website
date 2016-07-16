@@ -682,6 +682,25 @@ class ImportVenues(Command):
 
         db.session.commit()
 
+class SetRoughDurations(Command):
+    def run(self):
+        print "WAT"
+        length_map = {
+            '> 45 mins': 60,
+            '25-45 mins': 30,
+            '10-25 mins': 15,
+            '< 10 mins': 15
+        }
+
+        proposals = Proposal.query.filter_by(scheduled_duration='', type='talk').\
+            filter(Proposal.state.in_(['accepted', 'finished'])).all()
+
+        for proposal in proposals:
+            proposal.scheduled_duration = length_map[proposal.length]
+            app.logger.info('Setting duration for talk "%s" to "%s"' % (proposal.title, proposal.scheduled_duration))
+
+        db.session.commit()
+
 class SendEmails(Command):
     def run(self):
         with mail.connect() as conn:
@@ -728,5 +747,6 @@ if __name__ == "__main__":
     manager.add_command('rejectunacceptedtalks', RejectUnacceptedTalks())
 
     manager.add_command('importvenues', ImportVenues())
+    manager.add_command('setroughdurations', SetRoughDurations())
 
     manager.run()
