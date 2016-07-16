@@ -2,6 +2,7 @@ from main import db
 from datetime import datetime
 from collections import namedtuple
 from dateutil.parser import parse as parse_date
+from sqlalchemy import UniqueConstraint
 
 # state: [allowed next state, ] pairs
 CFP_STATES = { 'edit': ['accepted', 'rejected', 'new'],
@@ -268,6 +269,9 @@ class Venue(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     type = db.Column(db.String, nullable=True)
+    __table_args__ = (
+        UniqueConstraint('name', 'type', name='_venue_name_type_uniq'),
+    )
 
 # TODO: change the relationships on User and Proposal to 1-to-1
 db.Index('ix_cfp_vote_user_id_proposal_id', CFPVote.user_id, CFPVote.proposal_id, unique=True)

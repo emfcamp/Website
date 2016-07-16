@@ -21,7 +21,7 @@ from models import (
 from models.payment import (
     BankAccount, BankTransaction,
 )
-from models.cfp import Proposal, TalkProposal, WorkshopProposal, InstallationProposal
+from models.cfp import Proposal, TalkProposal, WorkshopProposal, InstallationProposal, Venue
 from models.permission import Permission
 from models.email import EmailJobRecipient
 from apps.payments import banktransfer
@@ -659,6 +659,29 @@ class RejectUnacceptedTalks(Command):
             mail.send(msg)
             db.session.commit()
 
+class ImportVenues(Command):
+    venues = [
+        ('Stage A', 'talk'),
+        ('Stage B', 'talk'),
+        ('Stage C', 'talk'),
+        ('Workshop 1', 'workshop'),
+        ('Workshop 2', 'workshop'),
+        ('Stage A', 'performance')
+    ]
+
+    def run(self):
+        for name, type in self.venues:
+            if (Venue.query.filter_by(name=name, type=type).all()):
+                continue
+
+            venue = Venue()
+            venue.name = name
+            venue.type = type
+            db.session.add(venue)
+            app.logger.info('Adding venue "%s" as type "%s"' % (name, type))
+
+        db.session.commit()
+
 class SendEmails(Command):
     def run(self):
         with mail.connect() as conn:
@@ -703,5 +726,7 @@ if __name__ == "__main__":
     manager.add_command('emailspeakersaboutslot', EmailSpeakersAboutSlot())
     manager.add_command('emailspeakersaboutfinalising', EmailSpeakersAboutFinalising())
     manager.add_command('rejectunacceptedtalks', RejectUnacceptedTalks())
+
+    manager.add_command('importvenues', ImportVenues())
 
     manager.run()

@@ -79,6 +79,8 @@ emailspeakersaboutfinalising:
 rejectunacceptedtalks:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py rejectunacceptedtalks
 
+importvenues:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py importvenues
 
 shell:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py shell
