@@ -148,7 +148,7 @@ class Proposal(db.Model):
         venue_names = DEFAULT_VENUES[self.type]
         if self.allowed_venues:
             venue_names = [ v.strip() for v in self.allowed_venues.split(',') ]
-        found = Venue.query.filter(Venue.name.in_(venue_names)).all()
+        found = Venue.query.filter(Venue.name.in_(venue_names)).filter_by(type=self.type).all()
         # If we didn't actually find all the venues we're using, bail hard
         if len(found) != len(venue_names):
             raise InvalidVenueException("Invalid Venue in allowed_venues!")
