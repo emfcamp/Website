@@ -30,7 +30,7 @@
       <div>Your talk has been accepted! If you haven't already please visit
         <a href="{{ url_for('.finalise_proposal', proposal_id=proposal.id ) }}">finalise your details</a>.
       </div>
-    {% else %}
+    {% elif proposal.state not in ['new', 'edit', 'rejected', 'cancelled'] %}
       <div class="col-md-12">
         You can't currently edit your proposal as it's being reviewed.
         If you have any questions please <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">add a message</a>.
