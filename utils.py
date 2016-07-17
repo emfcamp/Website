@@ -659,22 +659,22 @@ class RejectUnacceptedTalks(Command):
 
 class ImportVenues(Command):
     venues = [
-        ('Stage A', 'talk'),
-        ('Stage B', 'talk'),
-        ('Stage C', 'talk'),
-        ('Workshop 1', 'workshop'),
-        ('Workshop 2', 'workshop'),
-        ('Stage A', 'performance')
+        ('Stage A', ['talk', 'performance']),
+        ('Stage B', ['talk']),
+        ('Stage C', ['talk']),
+        ('Workshop 1', ['workshop']),
+        ('Workshop 2', ['workshop'])
     ]
 
     def run(self):
         for name, type in self.venues:
-            if (Venue.query.filter_by(name=name, type=type).all()):
+            type_str = ','.join(type)
+            if (Venue.query.filter_by(name=name, type=type_str).all()):
                 continue
 
             venue = Venue()
             venue.name = name
-            venue.type = type
+            venue.type = type_str
             db.session.add(venue)
             app.logger.info('Adding venue "%s" as type "%s"' % (name, type))
 

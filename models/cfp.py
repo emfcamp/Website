@@ -148,7 +148,7 @@ class Proposal(db.Model):
         venue_names = DEFAULT_VENUES[self.type]
         if self.allowed_venues:
             venue_names = [ v.strip() for v in self.allowed_venues.split(',') ]
-        found = Venue.query.filter(Venue.name.in_(venue_names)).distinct(Venue.name).group_by(Venue.name).all()
+        found = Venue.query.filter(Venue.name.in_(venue_names)).all()
         # If we didn't actually find all the venues we're using, bail hard
         if len(found) != len(venue_names):
             raise InvalidVenueException("Invalid Venue in allowed_venues!")
@@ -270,7 +270,7 @@ class Venue(db.Model):
     name = db.Column(db.String, nullable=False)
     type = db.Column(db.String, nullable=True)
     __table_args__ = (
-        UniqueConstraint('name', 'type', name='_venue_name_type_uniq'),
+        UniqueConstraint('name', name='_venue_name_uniq'),
     )
 
 # TODO: change the relationships on User and Proposal to 1-to-1
