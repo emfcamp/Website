@@ -25,7 +25,6 @@ from .common.forms import Form, TelField
 
 cfp = Blueprint('cfp', __name__)
 
-
 class ProposalForm(Form):
     name = StringField("Name", [Required()])
     email = StringField("Email", [Email(), Required()])
@@ -508,3 +507,11 @@ def all_messages():
 @cfp.route('/cfp/guidance')
 def guidance():
     return render_template('cfp/guidance.html')
+
+@cfp.route('/schedule')
+def schedule():
+    schedule_data =[]
+    return render_template('cfp/schedule.html', schedule_data=schedule_data)
+
+
+
