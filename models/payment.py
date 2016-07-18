@@ -46,6 +46,8 @@ class Payment(db.Model):
     def premium(cls, currency, amount):
         if not hasattr(cls, 'premium_percent'):
             return Decimal(0)
+        if amount is None:
+            return None
 
         amount_int = int(amount * 100)
         premium = Decimal(cls.premium_percent) / 100 * amount_int

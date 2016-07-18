@@ -24,7 +24,7 @@ base = Blueprint('base', __name__)
 @base.route("/")
 def main():
     full_price = TicketType.get_price_cheapest_full()
-    if not (feature_enabled('BANK_TRANSFER') or feature_enabled('GOCARDLESS')):
+    if not (feature_enabled('BANK_TRANSFER') or feature_enabled('GOCARDLESS')) and full_price is not None:
         # Only card payment left
         full_price += StripePayment.premium('GBP', full_price)
 
