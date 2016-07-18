@@ -88,28 +88,6 @@ def main():
     abort(404)
 
 
-def build_proposal_query_dict(parameters):
-    res = {}
-    fields = [('type', str), ('state', str), ('one_day', bool),
-              ('needs_help', bool), ('needs_money', bool), ('needs_ticket', bool)]
-
-    for (field_name, field_type) in fields:
-        val = parameters.get(field_name, None)
-
-        if val is not None:
-            # This is awful
-            if field_type == bool:
-                if val in ['True', '1']:
-                    val = True
-                elif val in ['False', '0']:
-                    val = False
-                else:
-                    val = None
-
-            res[field_name] = val
-
-    return res
-
 def sort_by_notice(notice):
     return {
         '1 week': 0,
@@ -136,19 +114,40 @@ def get_proposal_sort_dict(parameters):
     }
 
 
+def bool_qs(val):
+    # Explicit true/false values are better than the implicit notset=&set=anything that bool does
+    if val in ['True', '1']:
+        return True
+    elif val in ['False', '0']:
+        return False
+    raise ValueError('Invalid querystring boolean')
+
 @cfp_review.route('/proposals')
 @admin_required
 def proposals():
-    query_dict = build_proposal_query_dict(request.args)
 
-    if 'needs_ticket' in query_dict:
-        needs_ticket = query_dict.pop('needs_ticket')
+    bool_names = ['one_day', 'needs_help', 'needs_money']
+    bool_vals = [request.args.get(n, type=bool_qs) for n in bool_names]
+    bool_dict = {n: v for n, v in zip(bool_names, bool_vals) if v is not None}
+
+    proposals = Proposal.query.filter_by(**bool_dict)
+
+    types = request.args.getlist('type')
+    if types:
+        proposals = proposals.filter(Proposal.type.in_(types))
+
+    states = request.args.getlist('state')
+    if states:
+        proposals = proposals.filter(Proposal.state.in_(states))
+
+    needs_ticket = request.args.get('needs_ticket', type=bool_qs)
+    if needs_ticket is not None:
         paid_tickets = Ticket.query.join(TicketType).filter(
             TicketType.admits == 'full',
             or_(Ticket.paid == True,  # noqa
                 Ticket.expired == False),
         )
-        proposals = Proposal.query.filter_by(**query_dict)
+
         if needs_ticket:
             proposals = proposals.join(Proposal.user).filter(
                 User.will_have_ticket == False,  # noqa
@@ -159,8 +158,6 @@ def proposals():
                 User.will_have_ticket == True,  # noqa
                 paid_tickets.filter(User.tickets.expression).exists()
             ))
-    else:
-        proposals = Proposal.query.filter_by(**query_dict)
 
     sort_dict = get_proposal_sort_dict(request.args)
     proposals = proposals.all()
