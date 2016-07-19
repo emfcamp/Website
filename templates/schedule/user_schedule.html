@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}EMF 2016 Schedule{% endblock %}
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dhtmlxscheduler_flat.css' ) }}">
+  <style type="text/css" media="screen">
+    html, body{
+      margin:0px;
+      padding:0px;
+      height:100%;
+      overflow:hidden;
+    }
+  </style>
+{% endblock %}
+{# {% block body %} #}
+{% block document %}
+{# <h1>Schedule</h1> #}
+<div id="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
+    <div class="dhx_cal_navline">
+        <div class="dhx_cal_prev_button">&nbsp;</div>
+        <div class="dhx_cal_next_button">&nbsp;</div>
+        <div class="dhx_cal_today_button"></div>
+        <div class="dhx_cal_date"></div>
+        <div class="dhx_cal_tab" name="day_tab"></div>
+        <div class="dhx_cal_tab" name="emf_tab"></div>
+    </div>
+    <div class="dhx_cal_header"></div>
+    <div class="dhx_multi_day"><div class="dhx_multi_day_icon"></div></div>
+    <div class="dhx_cal_data"></div>
+</div>
+
+{% endblock %}
+{% block foot %}
+  <script src="{{ url_for('static', filename='js/dhtmlxscheduler.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/dhtmlxscheduler_limit.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/dhtmlxscheduler_readonly.js') }}"></script>
+  <script>
+    (function(){
+      'use strict';
+      var scheduleData = {{ schedule_data | tojson | safe }};
+
+      // Because we're not savages: set the date format to a proper one
+      scheduler.config.api_date = "%Y-%m-%d %H:%i:%s";
+      scheduler.config.xml_date = "%Y-%m-%d %H:%i:%s";
+
+      // Nothing scheduled is multi-day so switch it off
+      scheduler.config.multi_day = false;
+
+      // There'll be no events outside the weekend so lock the view to it
+      scheduler.config.limit_view = true;
+      scheduler.config.limit_start = new Date(2014, 7, 29);
+      scheduler.config.limit_end  = new Date (2014, 8, 1);
+
+      // This is read only so block all modifications
+      scheduler.config.readonly_form = true;
+      scheduler.config.details_on_dblclick = true;
+      scheduler.config.dblclick_create = false;
+      scheduler.attachEvent("onBeforeDrag",function(){ return false; });
+      scheduler.attachEvent("onClick",function (id){
+        scheduler.showLightbox(id);
+        return false;// block further actions
+      });
+
+      // Set up a custom view that only shows the days we're running
+      scheduler.locale.labels.emf_tab = 'emf';
+      scheduler.attachEvent('onTemplatesReady', function () {
+        scheduler.templates.emf_date = scheduler.templates.week_date;
+        scheduler.templates.emf_scale_date = scheduler.templates.week_scale_date;
+
+        // scheduler.date.emf_start = function(d) { return scheduler.date.week_start(d); };
+        scheduler.date.emf_start = function(d) { return new Date(2014, 7, 29); };
+        scheduler.date.add_emf = function (d, inc) { return new Date(2014, 8, 1); };
+        scheduler.date.get_emf_end = function (d) { return new Date(2014, 8, 1); };
+      });
+
+      //
+      scheduler.init('scheduler_here', new Date(2014, 7, 30, 15), "emf");
+      scheduler.parse(scheduleData, 'json');
+    })();
+  </script>
+{% endblock %}

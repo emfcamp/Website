@@ -23,6 +23,7 @@ from models.cfp import (
 from .common import feature_flag, create_current_user
 from .common.forms import Form, TelField
 
+
 cfp = Blueprint('cfp', __name__)
 
 class ProposalForm(Form):
@@ -507,11 +508,3 @@ def all_messages():
 @cfp.route('/cfp/guidance')
 def guidance():
     return render_template('cfp/guidance.html')
-
-@cfp.route('/schedule')
-def schedule():
-    schedule_data =[]
-    return render_template('cfp/schedule.html', schedule_data=schedule_data)
-
-
-

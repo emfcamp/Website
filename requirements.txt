@@ -80,6 +80,9 @@ PyPDF2==1.25.1
 Pillow==2.9.0
 reportlab==3.2.0
 
+# iCal production for schedule
+icalendar==3.10
+
 # Mailchimp
 mailsnake==1.6.3
 
