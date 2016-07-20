@@ -203,6 +203,8 @@ class UpdateProposalForm(Form):
     scheduled_duration = StringField('Duration')
     scheduled_time = StringField('Scheduled Time')
     scheduled_venue = StringField('Scheduled Venue')
+    potential_time = StringField('Potential Time')
+    potential_venue = StringField('Potential Venue')
 
     update = SubmitField('Force update')
     reject = SubmitField('Reject')
@@ -228,11 +230,6 @@ class UpdateProposalForm(Form):
         proposal.needs_laptop = self.needs_laptop.data
         proposal.available_times = self.available_times.data
 
-        if self.scheduled_time.data:
-            proposal.scheduled_time = dateutil.parser.parse(self.scheduled_time.data)
-        else:
-            proposal.scheduled_time = None
-
         if self.scheduled_duration.data:
             proposal.scheduled_duration = self.scheduled_duration.data
         else:
@@ -240,10 +237,25 @@ class UpdateProposalForm(Form):
 
         proposal.allowed_times = self.allowed_times.data
 
+        if self.scheduled_time.data:
+            proposal.scheduled_time = dateutil.parser.parse(self.scheduled_time.data)
+        else:
+            proposal.scheduled_time = None
+
         if self.scheduled_venue.data:
             proposal.scheduled_venue = Venue.query.filter(Venue.name == self.scheduled_venue.data.strip()).one().name
         else:
             proposal.scheduled_venue = None
+
+        if self.potential_time.data:
+            proposal.potential_time = dateutil.parser.parse(self.potential_time.data)
+        else:
+            proposal.potential_time = None
+
+        if self.potential_venue.data:
+            proposal.potential_venue = Venue.query.filter(Venue.name == self.potential_venue.data.strip()).one().name
+        else:
+            proposal.potential_venue = None
 
         # Only set this if we're overriding the default
         if proposal.get_allowed_venues_serialised().strip() != self.allowed_venues.data.strip():
@@ -376,6 +388,8 @@ def update_proposal(proposal_id):
     form.scheduled_time.data = prop.scheduled_time
     form.scheduled_duration.data = prop.scheduled_duration
     form.scheduled_venue.data = prop.scheduled_venue
+    form.potential_time.data = prop.potential_time
+    form.potential_venue.data = prop.potential_venue
 
     if prop.type == 'workshop':
         form.attendees.data = prop.attendees

@@ -47,6 +47,13 @@ for day, times in _periods.items():
             datetime(_month[0], _month[1], int(day), int(end_hr))
         )
 
+# Override the friday start time to begin at 2pm, the only talk at 1pm
+# should be the opening ceremony
+TIME_PERIODS['fri_13_16'] = period(
+    datetime(_month[0], _month[1], 5, 14),
+    datetime(_month[0], _month[1], 5, 16)
+)
+
 # We may also have other venues in the DB, but these are the ones to be
 # returned by default if there are none
 DEFAULT_VENUES = {
@@ -103,9 +110,11 @@ class Proposal(db.Model):
     # Fields for scheduling
     allowed_venues = db.Column(db.String, nullable=True)
     allowed_times = db.Column(db.String, nullable=True)
-    scheduled_time = db.Column(db.DateTime, nullable=True)
     scheduled_duration = db.Column(db.Integer, nullable=True)
+    scheduled_time = db.Column(db.DateTime, nullable=True)
     scheduled_venue = db.Column(db.Integer, db.ForeignKey('venue.id'))
+    potential_time = db.Column(db.DateTime, nullable=True)
+    potential_venue = db.Column(db.Integer, db.ForeignKey('venue.id'))
 
     __mapper_args__ = {'polymorphic_on': type}
 
@@ -181,6 +190,12 @@ class Proposal(db.Model):
 
     def get_allowed_time_periods_serialised(self):
         return '\n'.join([ "%s > %s" % (v.start, v.end) for v in self.get_allowed_time_periods() ])
+
+    def get_allowed_time_periods_with_default(self):
+        allowed_time_periods = self.get_allowed_time_periods()
+        if not allowed_time_periods:
+            allowed_time_periods = TIME_PERIODS.values()
+        return allowed_time_periods
 
 class PerformanceProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'performance'}

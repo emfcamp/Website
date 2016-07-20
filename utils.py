@@ -5,6 +5,7 @@ import ofxparse
 from unicodecsv import DictReader
 from mailsnake import MailSnake
 import random
+import json
 from faker import Faker
 
 from flask.ext.script import Command, Manager, Option
@@ -698,6 +699,41 @@ class SetRoughDurations(Command):
 
         db.session.commit()
 
+class OutputSchedulerData(Command):
+    def run(self):
+        proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
+            filter(Proposal.state.in_(['finished', 'accepted'])).\
+            filter(Proposal.type.in_(['talk', 'workshop'])).all()
+
+        proposal_data = []
+        for proposal in proposals:
+            export = {
+                'id': proposal.id,
+                'duration': proposal.scheduled_duration,
+                'speakers': [ proposal.user.id ],
+                'title': proposal.title,
+                'valid_venues': [ v.id for v in proposal.get_allowed_venues() ],
+                'time_ranges': [
+                    {"start": str(p.start), "end": str(p.end)} for p in proposal.get_allowed_time_periods_with_default()
+                ],
+            }
+
+            if proposal.scheduled_venue:
+                export['venue'] = proposal.scheduled_venue.id
+            if proposal.potential_venue:
+                export['venue'] = proposal.potential_venue.id
+
+            if proposal.scheduled_time:
+                export['time'] = str(proposal.scheduled_time)
+            if proposal.potential_time:
+                export['time'] = str(proposal.potential_time)
+
+            proposal_data.append(export)
+
+        db.session.commit()
+
+        print json.dumps(proposal_data, sort_keys=True, indent=4, separators=(',', ': '))
+
 class SendEmails(Command):
     def run(self):
         with mail.connect() as conn:
@@ -745,5 +781,6 @@ if __name__ == "__main__":
 
     manager.add_command('importvenues', ImportVenues())
     manager.add_command('setroughdurations', SetRoughDurations())
+    manager.add_command('outputschedulerdata', OutputSchedulerData())
 
     manager.run()

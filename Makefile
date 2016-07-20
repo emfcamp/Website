@@ -85,6 +85,9 @@ importvenues:
 setroughdurations:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py setroughdurations
 
+outputschedulerdata:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py outputschedulerdata
+
 shell:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py shell
 
