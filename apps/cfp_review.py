@@ -235,7 +235,8 @@ class UpdateProposalForm(Form):
         else:
             proposal.scheduled_duration = None
 
-        proposal.allowed_times = self.allowed_times.data
+        if proposal.get_allowed_time_periods_serialised() != self.allowed_times.data:
+            proposal.allowed_times = self.allowed_times.data
 
         if self.scheduled_time.data:
             proposal.scheduled_time = dateutil.parser.parse(self.scheduled_time.data)
