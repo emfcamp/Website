@@ -19,6 +19,17 @@ def line_up():
 
     return render_template('schedule/line-up.html', proposals=proposals)
 
+
+@schedule.route('/favourites')
+@feature_flag('SCHEDULE')
+def favourites():
+    if current_user.is_anonymous():
+        return redirect(url_for('users.login', next=url_for('.favourites')))
+
+    proposals = current_user.favourites
+
+    return render_template('schedule/favourites.html', proposals=proposals)
+
 class FavouriteProposalForm(Form):
     pass
 

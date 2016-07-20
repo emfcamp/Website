@@ -1,7 +1,8 @@
+{% from "schedule/_proposal_lister.html" import list_proposals %}
 {% extends "base.html" %}
 {% block title %}Line-up{% endblock %}
 {% block body %}
-<h1>Lineup</h1>
+<h1>Line-up</h1>
 <p>
   This is a list of all the talks, workshops, performances and installations
   that (should) be at Electromagnetic Field in 2016. The full schedule will be
@@ -10,17 +11,7 @@
 <p>
   <strong>NB:</strong> this list is liable to change.
 </p>
-{% for type, type_proposals in proposals | groupby('type') %}
-    <h2>{{ type | capitalize }}</h2>
-    <ul>
-      {% for prop in type_proposals | sort(attribute='title') %}
-        <li>
-            <a href="{{ url_for('.line_up_proposal', proposal_id=prop.id) }}">
-                {{ prop.title }} &mdash; <em>{{ prop.published_names or prop.user.name }}</em>
-            </a>
-        </li>
-      {% endfor %}
-    </ul>
-{% endfor %}
+
+{{ list_proposals(proposals) }}
 
 {% endblock %}

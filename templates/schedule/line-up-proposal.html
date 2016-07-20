@@ -22,14 +22,20 @@
     {%- endif -%}
     Favourite
   </button>
-  <a type="btn btn-primary" href="{{ url_for('.line_up') }}">
-    Back
-  </a>
   </form>
 {% else %}
   <p>If you would like to mark this as a favourite please
     <a href="{{ url_for('users.login', next=url_for('.line_up_proposal', proposal_id=proposal.id)) }}">login</a>.
   </p>
 {% endif %}
-
+<ul class='list-inline text-muted'>
+  <li>
+    <p><a type="btn btn-primary" href="{{ url_for('.line_up') }}">Line-up</a></p>
+  </li>
+  {% if current_user.is_authenticated() %}
+    <li>
+      <a type="btn btn-primary" href="{{ url_for('.favourites') }}">Favourites</a>
+    </li>
+  {% endif %}
+</ul>
 {% endblock %}
