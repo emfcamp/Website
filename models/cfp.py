@@ -69,6 +69,12 @@ class CfpStateException(Exception):
 class InvalidVenueException(Exception):
     pass
 
+
+FavouriteProposals = db.Table('favourite_proposals',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('proposal_id', db.Integer, db.ForeignKey('proposal.id')),
+)
+
 class Proposal(db.Model):
     __versioned__ = {}
     __tablename__ = 'proposal'
@@ -97,6 +103,7 @@ class Proposal(db.Model):
     # References to this table
     messages = db.relationship('CFPMessage', backref='proposal')
     votes = db.relationship('CFPVote', backref='proposal')
+    favourites = db.relationship('User', secondary=FavouriteProposals, backref=db.backref('favourites', lazy='dynamic'))
 
     # Fields for finalised info
     published_names = db.Column(db.String)
