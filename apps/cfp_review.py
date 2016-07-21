@@ -244,7 +244,7 @@ class UpdateProposalForm(Form):
             proposal.scheduled_time = None
 
         if self.scheduled_venue.data:
-            proposal.scheduled_venue = Venue.query.filter(Venue.name == self.scheduled_venue.data.strip()).one().name
+            proposal.scheduled_venue = Venue.query.filter(Venue.name == self.scheduled_venue.data.strip()).one().id
         else:
             proposal.scheduled_venue = None
 
@@ -254,7 +254,7 @@ class UpdateProposalForm(Form):
             proposal.potential_time = None
 
         if self.potential_venue.data:
-            proposal.potential_venue = Venue.query.filter(Venue.name == self.potential_venue.data.strip()).one().name
+            proposal.potential_venue = Venue.query.filter(Venue.name == self.potential_venue.data.strip()).one().id
         else:
             proposal.potential_venue = None
 
@@ -388,9 +388,13 @@ def update_proposal(proposal_id):
     form.allowed_times.data = prop.get_allowed_time_periods_serialised()
     form.scheduled_time.data = prop.scheduled_time
     form.scheduled_duration.data = prop.scheduled_duration
-    form.scheduled_venue.data = prop.scheduled_venue
     form.potential_time.data = prop.potential_time
-    form.potential_venue.data = prop.potential_venue
+    
+    if prop.scheduled_venue:
+        form.scheduled_venue.data = Venue.query.filter_by(id=prop.scheduled_venue).one().name
+
+    if prop.potential_venue:
+        form.potential_venue.data = Venue.query.filter_by(id=prop.potential_venue).one().name
 
     if prop.type == 'workshop':
         form.attendees.data = prop.attendees
