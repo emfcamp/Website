@@ -746,9 +746,10 @@ class ImportSchedulerData(Command):
         for event in schedule:
             proposal = Proposal.query.filter_by(id=event['id']).one()
 
-            if not proposal.scheduled_venue or proposal.scheduled_venue.id != event['venue']:
-                proposal.potential_venue = event['venue']
-                app.logger.info('"%s" now potentially in venue "%s"' % (proposal.title, proposal.potential_venue.name))
+            venue_name = Venue.query.filter_by(id=event['venue']).one().name
+            if not proposal.scheduled_venue or proposal.scheduled_venue != venue_name:
+                proposal.potential_venue = venue_name
+                app.logger.info('"%s" now potentially in venue "%s"' % (proposal.title, proposal.potential_venue))
             else:
                 proposal.potental_venue = None
 
