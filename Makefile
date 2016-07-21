@@ -88,6 +88,9 @@ setroughdurations:
 outputschedulerdata:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py outputschedulerdata
 
+importschedulerdata:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py importschedulerdata
+
 shell:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py shell
 

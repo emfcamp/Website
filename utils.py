@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding=utf-8
 from datetime import datetime, timedelta
+from dateutil import parser
 import ofxparse
 from unicodecsv import DictReader
 from mailsnake import MailSnake
@@ -734,6 +735,32 @@ class OutputSchedulerData(Command):
 
         print json.dumps(proposal_data, sort_keys=True, indent=4, separators=(',', ': '))
 
+class ImportSchedulerData(Command):
+    option_list = [Option('-f', '--file', dest='filename',
+                          help='The .json file to load',
+                          default='schedule.json')]
+
+    def run(self, filename):
+        schedule = json.load(open(filename))
+
+        for event in schedule:
+            proposal = Proposal.query.filter_by(id=event['id']).one()
+
+            if proposal.scheduled_venue.id != event['venue']:
+                proposal.potential_venue = event['venue']
+                app.logger.info('"%s" now potentially in venue "%s"' % (proposal.title, proposal.potential_venue.name))
+            else:
+                proposal.potental_venue = None
+
+            time = parser.parse(event['time'])
+            if proposal.scheduled_time != time:
+                proposal.potential_time = time
+                app.logger.info('"%s" now potentially in time "%s"' % (proposal.title, proposal.potential_time))
+            else:
+                proposal.potental_time = None
+
+        db.session.commit()
+
 class SendEmails(Command):
     def run(self):
         with mail.connect() as conn:
@@ -782,5 +809,6 @@ if __name__ == "__main__":
     manager.add_command('importvenues', ImportVenues())
     manager.add_command('setroughdurations', SetRoughDurations())
     manager.add_command('outputschedulerdata', OutputSchedulerData())
+    manager.add_command('importschedulerdata', ImportSchedulerData())
 
     manager.run()
