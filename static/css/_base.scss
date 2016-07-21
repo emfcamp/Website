@@ -59,6 +59,11 @@ html, body, .container, .main-row, .main-column {
   color: $highlight-background-link;
 }
 
+.well .has-error .help-block a,
+.panel .has-error .help-block a {
+  color: inherit;
+}
+
 .panel-footer-center {
     display: flex;
     flex-direction: row;

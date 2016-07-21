@@ -2,7 +2,8 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from flask import (
     render_template, redirect, request, flash, Blueprint,
-    url_for, session, send_file, abort, current_app as app
+    url_for, session, send_file, abort, current_app as app,
+    Markup
 )
 from flask.ext.login import login_required, current_user
 from wtforms.validators import Required, Optional, Email, ValidationError
@@ -259,7 +260,10 @@ class TicketPaymentForm(Form):
     def validate_email(form, field):
         if current_user.is_anonymous() and User.does_user_exist(field.data):
             field.was_duplicate = True
-            raise ValidationError('Account already exists')
+            msg = '''Account already exists. Please <a href="%s">click here</a> to log in.''' % \
+                url_for('users.login', next=url_for('tickets.pay', flow=form.flow), email=field.data)
+
+            raise ValidationError(Markup(msg))
 
 
 @tickets.route("/tickets/pay", methods=['GET', 'POST'])
@@ -278,6 +282,7 @@ def pay(flow=None):
         return redirect(url_for('.pay'))
 
     form = TicketPaymentForm()
+    form.flow = flow
 
     if not current_user.is_anonymous():
         del form.email
@@ -414,11 +419,7 @@ def receipt(ticket_ids=None):
     else:
         tickets = current_user.tickets
 
-    tickets = tickets.filter_by(paid=True) \
-        .join(TicketType).outerjoin(Payment).filter(
-            or_(Payment.id.is_(None),
-            Payment.state != "cancelled"))
-    tickets = tickets.order_by(TicketType.order)
+    tickets = tickets.filter_by(paid=True).order_by(TicketType.order)
 
     if ticket_ids is not None:
         ticket_ids = map(int, ticket_ids.split(','))

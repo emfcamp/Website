@@ -1,22 +1,7 @@
 {% extends "admin/base.html" %}
 {% set nav_active = 'ticket_types' %}
 {% block body %}
-<h2>Ticket types</h2>
-
-<p>
-  Admission totals (paid or reserved only).
-</p>
-<table class="table table-condensed">
-<thead><tr><th>Full</th><th>Kids</th><th>Campervans</th><th>Cars</th><th>Other</th></tr></thead>
-<tbody><tr>
-{% for key in ['full', 'kid', 'campervan', 'car', 'other'] %}<td>{{ totals[key] }}</td>{% endfor %}
-</tr></tbody>
-</table>
-
-<p>
-  Current ticket types
-</p>
-
+<h2>Ticket Types</h2>
 <table class="table table-condensed table-striped">
 <thead><tr>
   <th>Name</th>

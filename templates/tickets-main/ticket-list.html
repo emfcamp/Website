@@ -35,6 +35,8 @@
     Cancelled
     {%- elif t.paid %}
     Paid
+    {%- elif t.refund %}
+    Refunded
     {%- elif t.expired %}
     Unpaid
     {%- else %}

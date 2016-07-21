@@ -51,6 +51,14 @@
   padding: 15px;
 }
 
+.cfp-tab a {
+  color: $highlight-background-link;
+}
+
+.cfp-tab .has-error .help-block a {
+  color: inherit;
+}
+
 .cfp-types.nav > li > a:hover,
 .cfp-types.nav > li > a:focus {
   background-color: $highlight-background;

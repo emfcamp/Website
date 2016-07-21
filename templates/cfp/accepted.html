@@ -24,12 +24,13 @@
         <p>Please confirm how you would like your title and description to
           appear in the schedule</p>
         {{ render_field(form.title, 9) }}
+        <div class="col-md-9 col-md-offset-3"><small>Your description should be about 100-150 words.</small></div>
         {{ render_field(form.description, 9) }}
     </fieldset>
 
     <fieldset>
         <legend>Your Availability</legend>
-        <p>When will you be on site, and when would you prefer to present?</p>
+        <p>When will you be on site, and when are you available to present?</p>
         <p>We won't schedule you for any time when you're travelling and we'll
           do our best to pick a time that you are comfortable with.</p>
 
@@ -105,6 +106,20 @@
         {{ render_field(form.requirements, 9) }}
 
     </fieldset>
+
+    {% if proposal.scheduled_duration and (proposal.type == 'talk' or proposal.type == 'workshop') %}
+    <fieldset>
+      <legend>Your currently scheduled slot</legend>
+      <dl class="dl-horizontal">
+        <dt>Slot length</dt><dd>{{proposal.scheduled_duration}} minutes</dd>
+        <dt>Slot time</dt><dd>{% if proposal.scheduled_time %}{{proposal.scheduled_time.strftime('%A at %-I:%M %p')}}{% else %}Not yet scheduled{% endif %}</dd>
+        <dt>Venue</dt><dd>{{proposal.scheduled_venue or "Not yet scheduled"}}</dd>
+      </dl>
+      <div>If your slot is not suitable, please <b><a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">  get in touch with us!</a></b></div>
+    </fieldset>
+	{% endif %}
+
+
   </div>
   <div class="pull-right">
     <a href="{{ url_for('.edit_proposal', proposal_id=proposal.id) }}" class="btn btn-default">Back</a>

@@ -84,13 +84,15 @@ class TicketType(db.Model):
             query = Ticket.query
 
         # A ticket is sold if it's set to paid, or if it's reserved
-        # (there's a valid payment associated with it)
+        # (there's a valid payment associated with it and it's not refunded).
         sold_tickets = query.filter(
             Ticket.type == self,
+            Ticket.refund_id.is_(None),
             or_(Ticket.paid,
                 Payment.query.filter(
                     Payment.state != 'new',
                     Payment.state != 'cancelled',
+                    Payment.state != 'refunded',
                 ).filter(Payment.tickets.expression).exists())
         )
 
@@ -155,6 +157,7 @@ class TicketType(db.Model):
         total = Payment.query.filter(
             Payment.state != 'new',
             Payment.state != 'cancelled',
+            Payment.state != 'refunded',
         ).join(Ticket).join(Ticket.type).filter(or_(TicketType.admits == 'full',
                                                     TicketType.admits == 'kid')).count()
         return app.config.get('MAXIMUM_ADMISSIONS') - total
@@ -361,6 +364,7 @@ def check_capacity(session, flush_context, instances):
         return
 
     total_admissions = 0
+    total_tees = 0
     for tt, total in tt_totals.items():
         if total > tt.type_limit:
             app.logger.warn('Total tickets of type %s (%s) %s > %s', tt.id, tt.name, total, tt.type_limit)
@@ -369,8 +373,14 @@ def check_capacity(session, flush_context, instances):
         if tt.admits in ['full', 'kid']:
             total_admissions += total
 
+        if tt.fixed_id in range(14, 24):  # T-shirt ticket types
+            total_tees += total
+
     if total_admissions > app.config.get('MAXIMUM_ADMISSIONS'):
         raise TicketLimitException('No more admission tickets available')
+
+    if total_tees > app.config.get('MAXIMUM_TEES'):
+        raise TicketLimitException('No more t-shirts available')
 
     # Clear cached state based on number of available tickets
     refresh_states()

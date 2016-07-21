@@ -5,6 +5,7 @@ import ofxparse
 from unicodecsv import DictReader
 from mailsnake import MailSnake
 import random
+import json
 from faker import Faker
 
 from flask.ext.script import Command, Manager, Option
@@ -21,7 +22,7 @@ from models import (
 from models.payment import (
     BankAccount, BankTransaction,
 )
-from models.cfp import Proposal, TalkProposal, WorkshopProposal, InstallationProposal
+from models.cfp import Proposal, TalkProposal, WorkshopProposal, InstallationProposal, Venue
 from models.permission import Permission
 from models.email import EmailJobRecipient
 from apps.payments import banktransfer
@@ -240,50 +241,63 @@ def get_main_ticket_types():
         (12, 1, 'full', 'Full Camp Ticket (Discount Template)', 0, 1, 105.00, 142.00, True, None, 'example', datetime(2016, 8, 1, 12, 0), False),
         (0, 2, 'full', 'Full Camp Ticket', 193, 10, 100.00, 140.00, True, None, None, datetime(2016, 1, 10, 20, 24), True),
         (1, 3, 'full', 'Full Camp Ticket', 350, 10, 110.00, 145.00, True, None, None, datetime(2016, 3, 6, 13, 5), True),
-        (2, 4, 'full', 'Full Camp Ticket', 500, 10, 120.00, 158.00, True, None, None, datetime(2016, 4, 4, 11, 0), True),
-        # (3, 5, 'full', 'Full Camp Ticket', 400, 10, 120.00, 165.00, True, None, None, None, None),
+        (2, 4, 'full', 'Full Camp Ticket', 636, 10, 120.00, 158.00, True, None, None, datetime(2016, 6, 7, 0, 0), True),
         (3, 8, 'full', 'Full Camp Ticket (Supporter)', 56, 10, 130.00, 180.00, True,
             "Support this non-profit event by paying a bit more. "
             "All money will go towards making EMF more awesome.",
-            None, None, True),
+            None, datetime(2016, 6, 8, 0, 0), True),
         (9, 8, 'full', 'Full Camp Ticket (Supporter)', 1100, 10, 130.00, 170.00, True,
             "Support this non-profit event by paying a bit more. "
             "All money will go towards making EMF more awesome.",
-            None, None, True),
+            None, datetime(2016, 6, 8, 0, 0), True),
 
         (4, 9, 'full', 'Full Camp Ticket (Gold Supporter)', 6, 10, 150.00, 210.00, True,
             "Pay even more, receive our undying gratitude.",
-            None, None, True),
+            None, datetime(2016, 6, 8, 0, 0), True),
         (10, 9, 'full', 'Full Camp Ticket (Gold Supporter)', 1100, 10, 150.00, 195.00, True,
             "Pay even more, receive our undying gratitude.",
-            None, None, True),
+            None, datetime(2016, 6, 8, 0, 0), True),
 
         (5, 10, 'kid', 'Under-16 Camp Ticket', 11, 10, 45.00, 64.00, True,
             "For visitors born after August 5th, 2000. "
             "All under-16s must be accompanied by an adult.",
-            None, None, True),
+            None, datetime(2016, 6, 8, 0, 0), True),
         (11, 10, 'kid', 'Under-16 Camp Ticket', 500, 10, 45.00, 60.00, True,
             "For visitors born after August 5th, 2000. "
             "All under-16s must be accompanied by an adult.",
-            None, None, True),
+            None, datetime(2016, 6, 8, 0, 0), True),
 
         (6, 15, 'kid', 'Under-5 Camp Ticket', 200, 4, 0, 0, False,
             "For children born after August 5th, 2011. "
             "All children must be accompanied by an adult.",
-            None, None, True),
+            None, datetime(2016, 6, 8, 0, 0), True),
 
         (13, 25, 'other',
             'Tent (Template)', 0, 1, 300.00, 400.00, False,
             "Pre-ordered village tents will be placed on site before the event starts.",
             'example', datetime(2016, 7, 1, 12, 0), True),
 
-        (7, 30, 'car', 'Parking Ticket', 450, 4, 15.00, 21.00, False,
+        (14, 30, 'other',
+            "Semi-fitted T-Shirt - S", 200, 10, 10.00, 12.00, False,
+            "Pre-order the official Electromagnetic Field t-shirt. T-shirts will be available to collect during the event.",
+            None, datetime(2016, 7, 15, 0, 0), False),
+        (15, 31, 'other', "Semi-fitted T-Shirt - M", 200, 10, 10.00, 12.00, False, None, None, datetime(2016, 7, 15, 0, 0), False),
+        (16, 32, 'other', "Semi-fitted T-Shirt - L", 200, 10, 10.00, 12.00, False, None, None, datetime(2016, 7, 15, 0, 0), False),
+        (17, 33, 'other', "Semi-fitted T-Shirt - XL", 200, 10, 10.00, 12.00, False, None, None, datetime(2016, 7, 15, 0, 0), False),
+        (18, 34, 'other', "Semi-fitted T-Shirt - XXL", 200, 10, 10.00, 12.00, False, None, None, datetime(2016, 7, 15, 0, 0), False),
+        (19, 35, 'other', "Unfitted T-Shirt - S", 200, 10, 10.00, 12.00, False, None, None, datetime(2016, 7, 15, 0, 0), False),
+        (20, 36, 'other', "Unfitted T-Shirt - M", 200, 10, 10.00, 12.00, False, None, None, datetime(2016, 7, 15, 0, 0), False),
+        (21, 37, 'other', "Unfitted T-Shirt - L", 200, 10, 10.00, 12.00, False, None, None, datetime(2016, 7, 15, 0, 0), False),
+        (22, 38, 'other', "Unfitted T-Shirt - XL", 200, 10, 10.00, 12.00, False, None, None, datetime(2016, 7, 15, 0, 0), False),
+        (23, 39, 'other', "Unfitted T-Shirt - XXL", 200, 10, 10.00, 12.00, False, None, None, datetime(2016, 7, 15, 0, 0), False),
+
+        (7, 50, 'car', 'Parking Ticket', 450, 4, 15.00, 21.00, False,
             "We're trying to keep cars to a minimum. "
             "Please take public transport or car-share if you can.",
             None, None, True),
 
-        (8, 35, 'campervan',
-            'Caravan/Campervan Ticket', 60, 2, 30.00, 42.00, False,
+        (8, 55, 'campervan',
+            u'Caravan/\u200cCampervan Ticket', 60, 2, 30.00, 42.00, False,
             "If you bring a caravan, you won't need a separate parking ticket for the towing car.",
             None, None, True),
     ]
@@ -583,6 +597,142 @@ class UpdateSegments(Command):
         app.logger.info("Segment updated. Success: %s, failed: %s", results['success'],
                         len(results['errors']))
 
+class EmailSpeakersAboutSlot(Command):
+
+    def run(self):
+        proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
+            filter(Proposal.state.in_(['accepted', 'finished'])).\
+            filter(Proposal.type.in_(['talk', 'workshop'])).all()
+
+        for proposal in proposals:
+            user = proposal.user
+
+            msg = Message("We need information about your EMF %s '%s'" % (proposal.type, proposal.title),
+                          sender=app.config['SPEAKERS_EMAIL'],
+                          recipients=[user.email])
+
+            msg.body = render_template("emails/cfp-check-your-slot.txt", user=user, proposal=proposal)
+
+            app.logger.info('Emailing %s about proposal %s', user.email, proposal.title)
+            mail.send(msg)
+            db.session.commit()
+
+class EmailSpeakersAboutFinalising(Command):
+
+    def run(self):
+        proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
+            filter(Proposal.state.in_(['accepted'])).\
+            filter(Proposal.type.in_(['talk', 'workshop'])).all()
+
+        for proposal in proposals:
+            user = proposal.user
+
+            msg = Message("We really need information about your EMF %s '%s'!" % (proposal.type, proposal.title),
+                          sender=app.config['SPEAKERS_EMAIL'],
+                          recipients=[user.email])
+
+            msg.body = render_template("emails/cfp-please-finalise.txt", user=user, proposal=proposal)
+
+            app.logger.info('Emailing %s about proposal %s', user.email, proposal.title)
+            mail.send(msg)
+            db.session.commit()
+
+class RejectUnacceptedTalks(Command):
+
+    def run(self):
+        proposals = Proposal.query.filter(Proposal.state.in_(['reviewed'])).all()
+
+        for proposal in proposals:
+            proposal.set_state('rejected')
+            proposal.has_rejected_email = True
+
+            user = proposal.user
+
+            msg = Message("Your EMF %s proposal '%s' was not accepted." % (proposal.type, proposal.title),
+                          sender=app.config['SPEAKERS_EMAIL'],
+                          recipients=[user.email])
+
+            msg.body = render_template("emails/cfp-rejected.txt", user=user, proposal=proposal)
+
+            app.logger.info('Emailing %s about rejecting proposal %s', user.email, proposal.title)
+            mail.send(msg)
+            db.session.commit()
+
+class ImportVenues(Command):
+    venues = [
+        ('Stage A', ['talk', 'performance']),
+        ('Stage B', ['talk']),
+        ('Stage C', ['talk']),
+        ('Workshop 1', ['workshop']),
+        ('Workshop 2', ['workshop'])
+    ]
+
+    def run(self):
+        for name, type in self.venues:
+            type_str = ','.join(type)
+            if (Venue.query.filter_by(name=name, type=type_str).all()):
+                continue
+
+            venue = Venue()
+            venue.name = name
+            venue.type = type_str
+            db.session.add(venue)
+            app.logger.info('Adding venue "%s" as type "%s"' % (name, type))
+
+        db.session.commit()
+
+class SetRoughDurations(Command):
+    def run(self):
+        length_map = {
+            '> 45 mins': 60,
+            '25-45 mins': 30,
+            '10-25 mins': 20,
+            '< 10 mins': 10
+        }
+
+        proposals = Proposal.query.filter_by(scheduled_duration=None, type='talk').\
+            filter(Proposal.state.in_(['accepted', 'finished'])).all()
+
+        for proposal in proposals:
+            proposal.scheduled_duration = length_map[proposal.length]
+            app.logger.info('Setting duration for talk "%s" to "%s"' % (proposal.title, proposal.scheduled_duration))
+
+        db.session.commit()
+
+class OutputSchedulerData(Command):
+    def run(self):
+        proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
+            filter(Proposal.state.in_(['finished', 'accepted'])).\
+            filter(Proposal.type.in_(['talk', 'workshop'])).all()
+
+        proposal_data = []
+        for proposal in proposals:
+            export = {
+                'id': proposal.id,
+                'duration': proposal.scheduled_duration,
+                'speakers': [ proposal.user.id ],
+                'title': proposal.title,
+                'valid_venues': [ v.id for v in proposal.get_allowed_venues() ],
+                'time_ranges': [
+                    {"start": str(p.start), "end": str(p.end)} for p in proposal.get_allowed_time_periods_with_default()
+                ],
+            }
+
+            if proposal.scheduled_venue:
+                export['venue'] = proposal.scheduled_venue.id
+            if proposal.potential_venue:
+                export['venue'] = proposal.potential_venue.id
+
+            if proposal.scheduled_time:
+                export['time'] = str(proposal.scheduled_time)
+            if proposal.potential_time:
+                export['time'] = str(proposal.potential_time)
+
+            proposal_data.append(export)
+
+        db.session.commit()
+
+        print json.dumps(proposal_data, sort_keys=True, indent=4, separators=(',', ': '))
 
 class SendEmails(Command):
     def run(self):
@@ -624,5 +774,13 @@ if __name__ == "__main__":
 
     manager.add_command('updatesegments', UpdateSegments())
     manager.add_command('sendemails', SendEmails())
+
+    manager.add_command('emailspeakersaboutslot', EmailSpeakersAboutSlot())
+    manager.add_command('emailspeakersaboutfinalising', EmailSpeakersAboutFinalising())
+    manager.add_command('rejectunacceptedtalks', RejectUnacceptedTalks())
+
+    manager.add_command('importvenues', ImportVenues())
+    manager.add_command('setroughdurations', SetRoughDurations())
+    manager.add_command('outputschedulerdata', OutputSchedulerData())
 
     manager.run()

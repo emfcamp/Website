@@ -46,6 +46,8 @@ class Payment(db.Model):
     def premium(cls, currency, amount):
         if not hasattr(cls, 'premium_percent'):
             return Decimal(0)
+        if amount is None:
+            return None
 
         amount_int = int(amount * 100)
         premium = Decimal(cls.premium_percent) / 100 * amount_int
@@ -72,10 +74,11 @@ class Payment(db.Model):
         elif self.state == 'refunded':
             raise StateException('Refunded payments cannot be cancelled')
 
+        now = datetime.utcnow()
         for ticket in self.tickets:
             ticket.paid = False
-            if self.state != 'refunded':
-                ticket.expires = datetime.utcnow()
+            if ticket.expires is None or ticket.expires > now:
+                ticket.expires = now
 
         self.state = 'cancelled'
 
@@ -92,11 +95,12 @@ class Payment(db.Model):
             raise StateException('Refunded payments cannot be cancelled')
 
         refund = BankRefund(self, self.amount)
+        now = datetime.utcnow()
         for ticket in self.tickets:
             if ticket.user != self.user:
                 raise StateException('Cannot refund transferred ticket')
-            if self.state != 'cancelled':
-                ticket.expires = datetime.utcnow()
+            if ticket.expires is None or ticket.expires > now:
+                ticket.expires = now
             if ticket.refund is not None:
                 raise StateException('Ticket is already refunded')
             if ticket.type.get_price(self.currency) and not ticket.paid:

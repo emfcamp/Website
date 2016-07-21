@@ -19,6 +19,7 @@ from wtforms.validators import Required, NumberRange, ValidationError
 
 import random
 from datetime import datetime, timedelta
+import dateutil
 from main import db, external_url
 from .common import require_permission, send_template_email
 from .majority_judgement import calculate_max_normalised_score
@@ -26,7 +27,7 @@ from .majority_judgement import calculate_max_normalised_score
 from models.ticket import Ticket, TicketType
 from models.user import User
 from models.cfp import (
-    Proposal, CFPMessage, CFPVote, CFP_STATES
+    Proposal, CFPMessage, CFPVote, CFP_STATES, Venue
 )
 from .common.forms import Form, HiddenIntegerField
 
@@ -87,24 +88,6 @@ def main():
     abort(404)
 
 
-def build_proposal_query_dict(parameters):
-    res = {}
-    fields = [('type', str), ('state', str), ('needs_help', bool), ('needs_money', bool)]
-
-    for (field_name, field_type) in fields:
-        # if this can't convert to the correct type it will return None
-        val = parameters.get(field_name, None)
-
-        if val is not None:
-            try:
-                val = field_type(val)
-            except ValueError:
-                flash('Invalid parameter value (%r) for parameter %s' % (val, field_name))
-                continue
-            res[field_name] = val
-
-    return res
-
 def sort_by_notice(notice):
     return {
         '1 week': 0,
@@ -121,6 +104,7 @@ def get_proposal_sort_dict(parameters):
         'title': lambda p: p.title,
         'ticket': lambda p: (p.user.tickets.count() > 0, p.title),
         'notice': lambda p: (sort_by_notice(p.notice_required), p.title),
+        'duration': lambda p: (p.scheduled_duration or 0)
     }
 
     sort_by_key = parameters.get('sort_by')
@@ -130,22 +114,50 @@ def get_proposal_sort_dict(parameters):
     }
 
 
+def bool_qs(val):
+    # Explicit true/false values are better than the implicit notset=&set=anything that bool does
+    if val in ['True', '1']:
+        return True
+    elif val in ['False', '0']:
+        return False
+    raise ValueError('Invalid querystring boolean')
+
 @cfp_review.route('/proposals')
 @admin_required
 def proposals():
-    query_dict = build_proposal_query_dict(request.args)
-    proposals = Proposal.query.filter_by(**query_dict)
 
-    if request.args.get('needs_ticket') == 'True':
+    bool_names = ['one_day', 'needs_help', 'needs_money']
+    bool_vals = [request.args.get(n, type=bool_qs) for n in bool_names]
+    bool_dict = {n: v for n, v in zip(bool_names, bool_vals) if v is not None}
+
+    proposals = Proposal.query.filter_by(**bool_dict)
+
+    types = request.args.getlist('type')
+    if types:
+        proposals = proposals.filter(Proposal.type.in_(types))
+
+    states = request.args.getlist('state')
+    if states:
+        proposals = proposals.filter(Proposal.state.in_(states))
+
+    needs_ticket = request.args.get('needs_ticket', type=bool_qs)
+    if needs_ticket is not None:
         paid_tickets = Ticket.query.join(TicketType).filter(
             TicketType.admits == 'full',
             or_(Ticket.paid == True,  # noqa
                 Ticket.expired == False),
         )
-        proposals = proposals.join(Proposal.user).filter(
-            User.will_have_ticket == False,  # noqa
-            ~paid_tickets.filter(User.tickets.expression).exists()
-        )
+
+        if needs_ticket:
+            proposals = proposals.join(Proposal.user).filter(
+                User.will_have_ticket == False,  # noqa
+                ~paid_tickets.filter(User.tickets.expression).exists()
+            )
+        else:
+            proposals = proposals.join(Proposal.user).filter(or_(
+                User.will_have_ticket == True,  # noqa
+                paid_tickets.filter(User.tickets.expression).exists()
+            ))
 
     sort_dict = get_proposal_sort_dict(request.args)
     proposals = proposals.all()
@@ -186,6 +198,14 @@ class UpdateProposalForm(Form):
     needs_laptop = BooleanField('Needs laptop')
     available_times = StringField('Available times')
 
+    allowed_venues = StringField('Allowed Venues')
+    allowed_times = TextAreaField('Allowed Time Periods')
+    scheduled_duration = StringField('Duration')
+    scheduled_time = StringField('Scheduled Time')
+    scheduled_venue = StringField('Scheduled Venue')
+    potential_time = StringField('Potential Time')
+    potential_venue = StringField('Potential Venue')
+
     update = SubmitField('Force update')
     reject = SubmitField('Reject')
     checked = SubmitField('Send for Anonymisation')
@@ -209,6 +229,40 @@ class UpdateProposalForm(Form):
         proposal.may_record = self.may_record.data
         proposal.needs_laptop = self.needs_laptop.data
         proposal.available_times = self.available_times.data
+
+        if self.scheduled_duration.data:
+            proposal.scheduled_duration = self.scheduled_duration.data
+        else:
+            proposal.scheduled_duration = None
+
+        if proposal.get_allowed_time_periods_serialised() != self.allowed_times.data:
+            proposal.allowed_times = self.allowed_times.data
+
+        if self.scheduled_time.data:
+            proposal.scheduled_time = dateutil.parser.parse(self.scheduled_time.data)
+        else:
+            proposal.scheduled_time = None
+
+        if self.scheduled_venue.data:
+            proposal.scheduled_venue = Venue.query.filter(Venue.name == self.scheduled_venue.data.strip()).one().name
+        else:
+            proposal.scheduled_venue = None
+
+        if self.potential_time.data:
+            proposal.potential_time = dateutil.parser.parse(self.potential_time.data)
+        else:
+            proposal.potential_time = None
+
+        if self.potential_venue.data:
+            proposal.potential_venue = Venue.query.filter(Venue.name == self.potential_venue.data.strip()).one().name
+        else:
+            proposal.potential_venue = None
+
+        # Only set this if we're overriding the default
+        if proposal.get_allowed_venues_serialised().strip() != self.allowed_venues.data.strip():
+            proposal.allowed_venues = self.allowed_venues.data.strip()
+            # Validates the new data. Bit nasty.
+            proposal.get_allowed_venues()
 
 
 class UpdateTalkForm(UpdateProposalForm):
@@ -329,6 +383,14 @@ def update_proposal(proposal_id):
     form.may_record.data = prop.may_record
     form.needs_laptop.data = prop.needs_laptop
     form.available_times.data = prop.available_times
+
+    form.allowed_venues.data = prop.get_allowed_venues_serialised()
+    form.allowed_times.data = prop.get_allowed_time_periods_serialised()
+    form.scheduled_time.data = prop.scheduled_time
+    form.scheduled_duration.data = prop.scheduled_duration
+    form.scheduled_venue.data = prop.scheduled_venue
+    form.potential_time.data = prop.potential_time
+    form.potential_venue.data = prop.potential_venue
 
     if prop.type == 'workshop':
         form.attendees.data = prop.attendees
@@ -705,7 +767,7 @@ def review_list():
         random.shuffle(to_review_new)
         random.shuffle(to_review_old)
 
-        to_review_max = 30
+        to_review_max = 100
 
         # prioritise showing proposals that have been voted on before
         # after that, split new and old proportionally for fairness
@@ -909,15 +971,10 @@ def send_email_for_proposal(proposal, accepted):
         template = 'cfp_review/email/accepted_msg.txt'
 
     else:
-        # If it's not accepted, it can still be accepted in the next round.
-        # Send the proposer an email so they don't feel ignored, but only once.
-        if proposal.has_rejected_email:
-            return
-
         app.logger.info('Sending not-accepted email for proposal %s', proposal.id)
         proposal.has_rejected_email = True
-        subject = 'An update on your EMF %s "%s"' % (proposal.type, proposal.title)
-        template = 'cfp_review/email/not_accepted_msg.txt'
+        subject = 'Your EMF %s proposal "%s" was not accepted.' % (proposal.type, proposal.title)
+        template = 'emails/cfp-rejected.txt'
 
     user = proposal.user
     send_template_email(subject, user.email, app.config['CONTENT_EMAIL'],

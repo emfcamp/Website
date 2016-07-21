@@ -18,6 +18,10 @@
   </li>
 </ul>
 
+<br>
+<div>If you have any questions about your proposal or the CFP process, please send us a message via the form below.</div>
+<br>
+
 <table class="table">
 {% for msg in messages %}
 <tr class="{{ loop.cycle('odd', 'even') }}">
@@ -42,7 +46,7 @@
     </div>
     <div class="row">
       <div class="col-sm-12">
-        <div class="multiline">{{ msg.message }}</div>
+        <div class="multiline">{{ msg.message | urlize }}</div>
       </div>
     </div>
   </td>

@@ -1,5 +1,8 @@
 from main import db
 from datetime import datetime
+from collections import namedtuple
+from dateutil.parser import parse as parse_date
+from sqlalchemy import UniqueConstraint
 
 # state: [allowed next state, ] pairs
 CFP_STATES = { 'edit': ['accepted', 'rejected', 'new'],
@@ -25,9 +28,52 @@ VOTE_STATES = {'new': ['voted', 'recused', 'blocked'],
                'stale': ['voted', 'recused', 'blocked'],
                }
 
+# These are the time periods speakers can select as being available in the form
+# Oh no there's vomit everywhere
+TIME_PERIODS = {}
+_month = (2016, 8) # Lol rite # FIXME
+_periods = {
+    5: ['fri_13_16', 'fri_16_20'],
+    6: ['sat_10_13', 'sat_13_16', 'sat_16_20'],
+    7: ['sun_10_13', 'sun_13_16', 'sun_16_20'],
+}
+
+period = namedtuple('Period', 'start end')
+for day, times in _periods.items():
+    for time_str in times:
+        _, start_hr, end_hr = time_str.split('_')
+        TIME_PERIODS[time_str] = period(
+            datetime(_month[0], _month[1], int(day), int(start_hr)),
+            datetime(_month[0], _month[1], int(day), int(end_hr))
+        )
+
+# Override the friday start time to begin at 2pm, the only talk at 1pm
+# should be the opening ceremony
+TIME_PERIODS['fri_13_16'] = period(
+    datetime(_month[0], _month[1], 5, 14),
+    datetime(_month[0], _month[1], 5, 16)
+)
+
+# We may also have other venues in the DB, but these are the ones to be
+# returned by default if there are none
+DEFAULT_VENUES = {
+    'talk': ['Stage A', 'Stage B', 'Stage C'],
+    'workshop': ['Workshop 1', 'Workshop 2'],
+    'performance': ['Stage A'],
+    'installation': []
+}
+
 class CfpStateException(Exception):
     pass
 
+class InvalidVenueException(Exception):
+    pass
+
+
+FavouriteProposals = db.Table('favourite_proposals',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('proposal_id', db.Integer, db.ForeignKey('proposal.id')),
+)
 
 class Proposal(db.Model):
     __versioned__ = {}
@@ -57,6 +103,7 @@ class Proposal(db.Model):
     # References to this table
     messages = db.relationship('CFPMessage', backref='proposal')
     votes = db.relationship('CFPVote', backref='proposal')
+    favourites = db.relationship('User', secondary=FavouriteProposals, backref=db.backref('favourites', lazy='dynamic'))
 
     # Fields for finalised info
     published_names = db.Column(db.String)
@@ -65,8 +112,16 @@ class Proposal(db.Model):
     telephone_number = db.Column(db.String)
     may_record = db.Column(db.Boolean)
     needs_laptop = db.Column(db.Boolean)
-
     available_times = db.Column(db.String)
+
+    # Fields for scheduling
+    allowed_venues = db.Column(db.String, nullable=True)
+    allowed_times = db.Column(db.String, nullable=True)
+    scheduled_duration = db.Column(db.Integer, nullable=True)
+    scheduled_time = db.Column(db.DateTime, nullable=True)
+    scheduled_venue = db.Column(db.Integer, db.ForeignKey('venue.id'))
+    potential_time = db.Column(db.DateTime, nullable=True)
+    potential_venue = db.Column(db.Integer, db.ForeignKey('venue.id'))
 
     __mapper_args__ = {'polymorphic_on': type}
 
@@ -104,6 +159,50 @@ class Proposal(db.Model):
             msg.has_been_read = True
         db.session.commit()
         return len(messages)
+
+    def get_allowed_venues(self):
+        venue_names = DEFAULT_VENUES[self.type]
+        if self.allowed_venues:
+            venue_names = [ v.strip() for v in self.allowed_venues.split(',') ]
+        found = Venue.query.filter(Venue.name.in_(venue_names)).all()
+        # If we didn't actually find all the venues we're using, bail hard
+        if len(found) != len(venue_names):
+            raise InvalidVenueException("Invalid Venue in allowed_venues!")
+        return found
+
+    def get_allowed_venues_serialised(self):
+        return ','.join([ v.name for v in self.get_allowed_venues() ])
+
+    def get_allowed_time_periods(self):
+        time_periods = []
+
+        if self.allowed_times:
+            for p in self.allowed_times.split('\n'):
+                if p:
+                    start, end = p.split(' > ')
+                    time_periods.append(
+                        period(
+                            parse_date(start),
+                            parse_date(end),
+                        )
+                    )
+
+        # If we've not overridden it, use the user-specified periods
+        if not time_periods and self.available_times:
+            for p in self.available_times.split(','):
+                if p:
+                    time_periods.append(TIME_PERIODS[p.strip()])
+
+        return time_periods
+
+    def get_allowed_time_periods_serialised(self):
+        return '\n'.join([ "%s > %s" % (v.start, v.end) for v in self.get_allowed_time_periods() ])
+
+    def get_allowed_time_periods_with_default(self):
+        allowed_time_periods = self.get_allowed_time_periods()
+        if not allowed_time_periods:
+            allowed_time_periods = TIME_PERIODS.values()
+        return allowed_time_periods
 
 class PerformanceProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'performance'}
@@ -187,6 +286,14 @@ class CFPVote(db.Model):
 
         self.state = state
 
+class Venue(db.Model):
+    __tablename__ = 'venue'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    type = db.Column(db.String, nullable=True)
+    __table_args__ = (
+        UniqueConstraint('name', name='_venue_name_uniq'),
+    )
+
 # TODO: change the relationships on User and Proposal to 1-to-1
 db.Index('ix_cfp_vote_user_id_proposal_id', CFPVote.user_id, CFPVote.proposal_id, unique=True)
-

@@ -6,7 +6,7 @@
 {% include "cfp_review/_propsal_tabs.html" %}
 
 <h4>{{ proposal.title }} <small>by <a href="{{ url_for('admin.user', user_id=proposal.user.id) }}">{{proposal.user.name}}</a></small></h4>
-<p class="multiline">{{ proposal.description }}</p>
+<p class="multiline">{{ proposal.description | urlize }}</p>
 <p>&nbsp;</p>
 
 <table class="table table-striped message-table">
@@ -23,7 +23,7 @@
         {% endif %}
     </td>
     <td class="col-sm-8">
-        <p class="multiline">{{ msg.message }}</p>
+        <p class="multiline">{{ msg.message | urlize }}</p>
         <p class="pull-right"><small>Sent: {{ msg.created.strftime('%y-%m-%d %H:%M') }}</small></p>
     </td>
     <td class="col-sm-2">{% if not msg.is_user_recipient(current_user) %}

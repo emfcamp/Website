@@ -36,7 +36,7 @@
             {%- if proposal.type == 'workshop' and proposal.cost -%}
                 <dt>Cost per attendee</dt><dd>{{ proposal.cost }}</dd>
             {%- endif -%}
-            <dt>Description</dt><dd class="multiline">{{ proposal.description }}</dd>
+            <dt>Description</dt><dd class="multiline">{{ proposal.description | urlize }}</dd>
         </dl>
         <div class="pull-right">
             <form method="POST" action="{{ url_for('.review_proposal', proposal_id=proposal.id) }}">
@@ -57,7 +57,7 @@
             <div><strong>Cost per attendee:</strong> {{ proposal.cost }}</div>
             <div>&nbsp;</div>
         {%- endif -%}
-        <div class="multiline">{{ proposal.description }}</div>
+        <div class="multiline">{{ proposal.description | urlize }}</div>
         <div>&nbsp;</div>
     </div>
 

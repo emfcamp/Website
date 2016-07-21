@@ -57,7 +57,7 @@
         aria-label="proposal type">
     {% for form in forms %}
       <li {% if form.type == active_cfp_type -%} class="active" {%- endif %}>
-      <a href="{{ url_for('cfp.main', cfp_type=form.type) }}"
+      <a href="{{ url_for('cfp.main', cfp_type=form.type) + ('?closed' if ignore_closed else '') }}"
           data-target="#{{ 'tab_' + form.type }}" data-toggle="tab"
           {% if form.type == active_cfp_type %}
             aria-selected="true"
@@ -85,15 +85,23 @@
     {% for form in forms %}
 
     <div class="tab-pane {%- if form.type == active_cfp_type %} active {%- endif %}" id="{{ 'tab_' + form.type }}">
-    <form action={{ url_for('cfp.main', cfp_type=form.type) }} method="post" class="form-horizontal cfp-form" role="form">
+    <form action={{ url_for('cfp.main', cfp_type=form.type) + ('?closed' if ignore_closed else '') }} method="post" class="form-horizontal cfp-form" role="form">
       {{ form.hidden_tag() }}
       {% if not current_user.is_authenticated() %}
       <fieldset>
         <legend>Your Details</legend>
-        <p>If you've already bought a ticket, please
-            <a href="{{ url_for('users.login', next=url_for('.main') ) }}" target="_blank">log in</a>.</p>
-          {{ render_field(form.name, horizontal=9, placeholder="Your name (or pseudonym)") }}
-          {{ render_field(form.email, horizontal=9, placeholder="Your email address") }}
+        {% if form.email.was_duplicate %}
+          <div class="alert alert-warning">
+              This email address already exists in our system, possibly because you previously tried to submit a proposal and
+              we automatically created an account for you.
+              Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('.main', cfp_type=form.active_cfp_type) + ('?closed' if ignore_closed else ''), email=form.email.data) }}" target="_new">click here</a> to log in.
+          </div>
+        {% else %}
+          <p>If you've already bought a ticket, please
+              <a href="{{ url_for('users.login', next=url_for('.main', cfp_type=form.type) + ('?closed' if ignore_closed else '')) }}" target="_blank">log in</a>.</p>
+        {% endif %}
+        {{ render_field(form.name, horizontal=9, placeholder="Your name (or pseudonym)") }}
+        {{ render_field(form.email, horizontal=9, placeholder="Your email address") }}
       </fieldset>
       {% endif %}
 

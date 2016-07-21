@@ -70,6 +70,23 @@ lockproposals:
 importcfp:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py importcfp
 
+emailspeakersaboutslot:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py emailspeakersaboutslot
+
+emailspeakersaboutfinalising:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py emailspeakersaboutfinalising
+
+rejectunacceptedtalks:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py rejectunacceptedtalks
+
+importvenues:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py importvenues
+
+setroughdurations:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py setroughdurations
+
+outputschedulerdata:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py outputschedulerdata
 
 shell:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py shell

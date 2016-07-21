@@ -159,6 +159,7 @@ def create_app(dev_server=False):
     from apps.payments import payments
     from apps.cfp import cfp
     from apps.cfp_review import cfp_review
+    from apps.schedule import schedule
     from apps.arrivals import arrivals
     from apps.admin import admin
     app.register_blueprint(base)
@@ -167,6 +168,7 @@ def create_app(dev_server=False):
     app.register_blueprint(payments)
     app.register_blueprint(cfp)
     app.register_blueprint(cfp_review, url_prefix='/cfp-review')
+    app.register_blueprint(schedule)
     app.register_blueprint(arrivals, url_prefix='/arrivals')
     app.register_blueprint(admin, url_prefix='/admin')
 

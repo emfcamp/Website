@@ -38,6 +38,9 @@
         <th class="col-md-1">
             <a href="{{ url_for('.proposals', sort_by='notice', reverse=qs_reverse_new, **new_qs) }}">Notice</a>
         </th>
+        <th class="">
+            <a href="{{ url_for('.proposals', sort_by='duration', reverse=qs_reverse_new, **new_qs) }}">Duration</a>
+        </th>
         <th>
             <a href="{{ url_for('.proposals', sort_by='user', reverse=qs_reverse_new, **new_qs) }}">User</a>
         </th>
@@ -52,6 +55,7 @@
         <td>{{proposal.state | capitalize}}</td>
         <td>{{proposal.type | capitalize}}</td>
         <td>{{proposal.notice_required or '--'}}</td>
+        <td>{{proposal.scheduled_duration or '--'}}</td>
         <td>
             <a href="{{ url_for('admin.user', user_id=proposal.user.id ) }}">{{proposal.user.name}}</a>
         </td>

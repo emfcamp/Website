@@ -1,11 +1,12 @@
 # coding=utf-8
 from __future__ import division, absolute_import, print_function, unicode_literals
 from . import admin, admin_required
+from datetime import datetime
 
 from Levenshtein import ratio, jaro
 from flask import (
     render_template, redirect, request, flash,
-    url_for, current_app as app
+    url_for, current_app as app, abort,
 )
 from flask.ext.login import current_user
 from flask_mail import Message
@@ -167,22 +168,38 @@ def tickets_unpaid():
     return render_template('admin/tickets.html', tickets=tickets)
 
 
-@admin.route('/ticket-types')
-@admin_required
-def ticket_types():
+@admin.route('/ticket-report')
+def ticket_report():
     # This is an admissions-based view, so includes expired tickets
     totals = Ticket.query.outerjoin(Payment).filter(
         Ticket.refund_id.is_(None),
         or_(Ticket.paid == True,  # noqa
-            ~Payment.state.in_(['new', 'cancelled']))
+            ~Payment.state.in_(['new', 'cancelled', 'refunded']))
     ).join(TicketType).with_entities(
         TicketType.admits,
         func.count(),
     ).group_by(TicketType.admits).all()
-
     totals = dict(totals)
+
+    query = db.session.query(TicketType.admits, func.count(), func.sum(TicketPrice.price_int)).\
+        select_from(Ticket).join(TicketType).join(TicketPrice).\
+        filter(TicketPrice.currency == 'GBP', Ticket.paid == True).group_by(TicketType.admits)  # noqa
+
+    accounting_totals = {}
+    for row in query.all():
+        accounting_totals[row[0]] = {
+            'count': row[1],
+            'total': row[2]
+        }
+
+    return render_template('admin/ticket-report.html', totals=totals, accounting_totals=accounting_totals)
+
+
+@admin.route('/ticket-types')
+@admin_required
+def ticket_types():
     types = TicketType.query.all()
-    return render_template('admin/ticket-types.html', ticket_types=types, totals=totals)
+    return render_template('admin/ticket-types.html', ticket_types=types)
 
 ADMITS_LABELS = [('full', 'Adult'), ('kid', 'Under 16'),
                  ('campervan', 'Campervan'), ('car', 'Car'),
@@ -428,6 +445,37 @@ def list_free_tickets():
 
     return render_template('admin/tickets-list-free.html',
                            free_tickets=free_tickets)
+
+class CancelTicketForm(Form):
+    cancel = SubmitField("Cancel ticket")
+
+@admin.route('/ticket/<int:ticket_id>/cancel-free', methods=['GET', 'POST'])
+@admin_required
+def cancel_free_ticket(ticket_id):
+    ticket = Ticket.query.get_or_404(ticket_id)
+    if ticket.payment is not None:
+        abort(404)
+
+    if not ticket.paid:
+        app.logger.warn('Ticket %s is already cancelled', ticket.id)
+        flash('This ticket is already cancelled')
+        return redirect(url_for('admin.list_free_tickets'))
+
+    form = CancelTicketForm()
+    if form.validate_on_submit():
+        if form.cancel.data:
+            app.logger.info('Cancelling free ticket %s', ticket.id)
+            now = datetime.utcnow()
+            ticket.paid = False
+            if ticket.expires is None or ticket.expires > now:
+                ticket.expires = now
+
+            db.session.commit()
+
+            flash('Ticket cancelled')
+            return redirect(url_for('admin.list_free_tickets'))
+
+    return render_template('admin/ticket-cancel-free.html', ticket=ticket, form=form)
 
 
 @admin.route('/transfers')

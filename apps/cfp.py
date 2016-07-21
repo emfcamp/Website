@@ -1,7 +1,8 @@
 # encoding=utf-8
 from flask import (
     render_template, redirect, request, flash,
-    url_for, abort, current_app as app, Blueprint
+    url_for, abort, current_app as app, Blueprint,
+    Markup
 )
 from flask.ext.login import current_user
 from flask_mail import Message
@@ -41,7 +42,10 @@ class ProposalForm(Form):
     def validate_email(form, field):
         if current_user.is_anonymous() and User.does_user_exist(field.data):
             field.was_duplicate = True
-            raise ValidationError('You already have an account - please log in.')
+            msg = '''You already have an account. Please <a href="%s" target="_new">click here</a> to log in.''' % \
+                url_for('users.login', next=url_for('cfp.main', cfp_type=form.active_cfp_type), email=field.data)
+
+            raise ValidationError(Markup(msg))
 
 
 class TalkProposalForm(ProposalForm):
@@ -85,10 +89,16 @@ def main(cfp_type='talk'):
     if cfp_type not in ['talk', 'workshop', 'installation']:
         abort(404)
 
+    ignore_closed = 'closed' in request.args
+
+    if app.config.get('CFP_CLOSED') and not ignore_closed:
+        return render_template('cfp/closed.html')
+
     forms = [TalkProposalForm(prefix="talk"),
              WorkshopProposalForm(prefix="workshop"),
              InstallationProposalForm(prefix="installation")]
     (form,) = [f for f in forms if f.type == cfp_type]
+    form.active_cfp_type = cfp_type
 
     # If the user is already logged in set their name & email for the form
     if current_user.is_authenticated():
@@ -151,7 +161,7 @@ def main(cfp_type='talk'):
 
     return render_template('cfp/main.html', full_price=full_price,
                            forms=forms, active_cfp_type=cfp_type,
-                           has_errors=bool(form.errors))
+                           has_errors=bool(form.errors), ignore_closed=ignore_closed)
 
 
 class DiversityForm(Form):
@@ -347,7 +357,7 @@ class DaytimeAcceptedForm(AcceptedForm):
                         'sun_10_13', 'sun_13_16', 'sun_16_20')
 
 
-class EventingAcceptedForm(AcceptedForm):
+class EveningAcceptedForm(AcceptedForm):
     fri_20_22 = BooleanField(default=True)
     fri_22_24 = BooleanField(default=True)
     sat_20_22 = BooleanField(default=True)
@@ -360,6 +370,7 @@ class EventingAcceptedForm(AcceptedForm):
 
 
 @cfp.route('/cfp/proposals/<int:proposal_id>/finalise', methods=['GET', 'POST'])
+@feature_flag('CFP')
 @feature_flag('CFP_FINALISE')
 def finalise_proposal(proposal_id):
     if current_user.is_anonymous():
@@ -374,7 +385,7 @@ def finalise_proposal(proposal_id):
         return redirect(url_for('.edit_proposal', proposal_id=proposal_id))
 
     form = DaytimeAcceptedForm() if proposal.type in ('talk', 'workshop') else \
-           EventingAcceptedForm() if proposal.type == 'performance' else \
+           EveningAcceptedForm() if proposal.type == 'performance' else \
            AcceptedForm()
 
 

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ proposal.title }}{% endblock %}
+{% block body %}
+
+<h1>{{ proposal.title }}</h1>
+<h2><small>{{ proposal.type | capitalize }} by {{ proposal.published_names or proposal.user.name }}</small></h2>
+
+{% if proposal.type == 'workshop' and proposal.cost > 0 %}
+  <p>Attendance of this workshop will cost <strong>&pound;{{ proposal.cost }}</strong></p>
+{% endif %}
+
+<p>{{ proposal.description }}</p>
+
+{% if current_user.is_authenticated() %}
+  <form method="POST">
+  {{ form.hidden_tag() }}
+  <button type="submit" class="btn btn-primary">
+    {%- if is_fave -%}
+      <i class="glyphicon glyphicon-star"></i>
+    {%- else -%}
+      <i class="glyphicon glyphicon-star-empty"></i>
+    {%- endif -%}
+    Favourite
+  </button>
+  </form>
+{% else %}
+  <p>If you would like to mark this as a favourite please
+    <a href="{{ url_for('users.login', next=url_for('.line_up_proposal', proposal_id=proposal.id)) }}">login</a>.
+  </p>
+{% endif %}
+<ul class='list-inline text-muted'>
+  <li>
+    <p><a type="btn btn-primary" href="{{ url_for('.line_up') }}">Line-up</a></p>
+  </li>
+  {% if current_user.is_authenticated() %}
+    <li>
+      <a type="btn btn-primary" href="{{ url_for('.favourites') }}">Favourites</a>
+    </li>
+  {% endif %}
+</ul>
+{% endblock %}
