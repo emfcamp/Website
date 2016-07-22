@@ -20,11 +20,11 @@
 <body>
 
 {% block document %}
-<div class="container">
+<div class="container invoice">
   <div class="main-row">
     <div class="col-md-10 col-md-offset-1 main-column">
 
-      <div id="main-content" class="invoice {% if payment.state == 'cancelled' -%} cancelled {%- endif %}">
+      <div id="main-content" class="{% if payment.state == 'cancelled' -%} cancelled {%- endif %}">
 
 {% block body %}
 
