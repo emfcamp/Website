@@ -88,7 +88,7 @@ def send_confirmation(payment):
                   user=payment.user, payment=payment)
 
     if feature_enabled('ISSUE_TICKETS'):
-        attach_tickets(msg, payment.user.tickets)
+        attach_tickets(msg, payment.user)
 
     mail.send(msg)
     db.session.commit()

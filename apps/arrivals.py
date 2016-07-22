@@ -13,7 +13,7 @@ from wtforms import (
 from wtforms.validators import Optional
 
 from models.ticket import Ticket, TicketType, CheckinStateException, TicketCheckin
-from models.user import User
+from models.user import User, checkin_code_re
 from .common.forms import Form
 from .common import require_permission
 
@@ -62,7 +62,7 @@ def search(query=None):
                                       .order_by(User.name, TicketType.order).limit(100)
 
         else:
-            match = re.match(re.escape(app.config.get('CHECKIN_BASE')) + r'([0-9a-z]+)', query)
+            match = re.match(re.escape(app.config.get('CHECKIN_BASE')) + '(%s)' % checkin_code_re, query)
             if match:
                 query = match.group(1)
 
@@ -73,16 +73,13 @@ def search(query=None):
             else:
                 tickets = Ticket.query
 
-            qrcode_tickets = tickets.filter( Ticket.qrcode == query )
-            receipt_tickets = tickets.filter( Ticket.receipt == query)
             name_tickets = tickets.join(User).order_by(User.name)
             email_tickets = tickets.join(User).order_by(User.email)
             for word in filter(None, query.split(' ')):
                 name_tickets = name_tickets.filter( User.name.ilike('%' + word + '%') )
                 email_tickets = email_tickets.filter( User.email.ilike('%' + word + '%') )
 
-            tickets = (qrcode_tickets.all() + receipt_tickets.all() +
-                       name_tickets.limit(100).all() + email_tickets.limit(100).all())
+            tickets = (name_tickets.limit(100).all() + email_tickets.limit(100).all())
             tickets = list(OrderedDict.fromkeys(tickets))
 
         tickets_data = []

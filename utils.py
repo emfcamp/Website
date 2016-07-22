@@ -356,11 +356,11 @@ class SendTransferReminder(Command):
 class SendTickets(Command):
 
     def run(self):
-        all_tickets = Ticket.query.filter_by(paid=True, emailed=False)
-        users = all_tickets.join(User).group_by(User).with_entities(User).order_by(User.id)
+        paid_tickets = Ticket.query.filter_by(paid=True, emailed=False)
+        users = paid_tickets.join(User).group_by(User).with_entities(User).order_by(User.id)
 
         for user in users:
-            tickets = all_tickets.filter_by(user_id=user.id)
+            tickets = paid_tickets.filter_by(user_id=user.id)
             plural = (tickets.count() != 1 and 's' or '')
 
             msg = Message("Your Electromagnetic Field Ticket%s" % plural,
@@ -369,7 +369,7 @@ class SendTickets(Command):
 
             msg.body = render_template("emails/receipt.txt", user=user)
 
-            attach_tickets(msg, tickets)
+            attach_tickets(msg, user)
 
             app.logger.info('Emailing %s receipt for %s tickets', user.email, tickets.count())
             mail.send(msg)

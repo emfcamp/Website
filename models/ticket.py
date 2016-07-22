@@ -4,11 +4,9 @@ from models.payment import Payment
 
 from sqlalchemy.orm import Session, column_property
 from sqlalchemy import event, or_, and_, func
-from sqlalchemy.exc import IntegrityError
 
 from decimal import Decimal
 from datetime import datetime, timedelta
-import random
 import re
 
 safechars_lower = "2346789bcdfghjkmpqrtvwxy"

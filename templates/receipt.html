@@ -1,18 +1,75 @@
-{% from "_receipthelpers.html" import render_tickets, render_header %}
+{# xhtml2pdf doesn't support loads of CSS, including stuff necessary for Bootstrap,
+   so we use a separate base page here. Due to its reliance on ReportLab, it also
+   cascades padding, width and fonts weirdly, and doesn't support float, so we add
+   pdf-specific overrides. #}
+
+{%- macro render_header() %}
+{% if pdf %}
+<table class="header">
+  <tr><td style="width: 100%">
+{% else %}
+<div class="row header">
+  <div class="col-xs-9">
+{% endif %}
+
+    <h2>
+        <img src="{{ url_for('static', filename='images/logo-white-cropped.png') }}" class="img-responsive" width="400"/>
+    </h2>
+
+{% if pdf %}
+  </td><td style="width: 120px">
+{% else %}
+  </div><div class="col-sm-3">
+{% endif %}
+
+    <div>
+        <div class="qrcode">
+          {% if pdf or png %}
+            <img src="{{ url_for('tickets.tickets_qrcode', checkin_code=user.checkin_code) }}">
+          {% else %}
+            {# Preferred format is SVG because it scales and we don't pass the checkin code back #}
+            {{ format_inline_qr(config.get('CHECKIN_BASE') + user.checkin_code) }}
+          {% endif %}
+        </div>
+    </div>
+
+{% if pdf %}
+  </td></tr>
+</table>
+{% else %}
+  </div>
+</div>
+{% endif %}
+{% endmacro -%}
+
+{% macro render_footer() %}
+<div class="barcode">
+  {% if pdf or png %}
+    {% if pdf %}<center>{% endif %}
+    <img src="{{ url_for('tickets.tickets_barcode', checkin_code=user.checkin_code) }}">
+    {% if pdf %}</center>{% endif %}
+  {% else %}
+    {# Preferred format is SVG because it scales and we don't pass the checkin code back #}
+    {{ format_inline_barcode(user.checkin_code) }}
+  {% endif %}
+</div>
+{% endmacro -%}
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="{%- if pdf -%} pdf {% endif %}">
     <head>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{% block title %}Electromagnetic Field{% endblock %}</title>
-        <meta property="fb:admins" content="286100493"/>
 {% if not pdf %}
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 {% endif %}
         {% assets "css_print" -%}
         <link rel="stylesheet" href="{{ ASSET_URL }}">
         {% endassets -%}
+        <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Raleway:700,500">
         {% block head -%}{% endblock -%}
         <!--[if lt IE 9]>
               <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
@@ -24,102 +81,66 @@
 
 {% block document %}
 <div class="container">
-  <div class="main-row">
-    <div class="col-md-10 col-md-offset-1 main-column">
+    <div class="main-row">
+        <div class="col-md-10 col-md-offset-1 main-column">
 
 {% block body %}
 
 <div id="main-content" class="receipt">
-  {% if pdf or png %}
-    {% set qrcode_string = user.checkin_code(config.get('SECRET_KEY')) %}
-  {% else %}
-    {% set qrcode_string = format_inline_qr(user.checkin_code(config.get('SECRET_KEY'))) %}
-  {% endif %}
 
+  {% if entrance_tts_counts %}
+    {{ render_header() }}
+    <h3>{{ user.name }} &ndash; {{ user.email }}</h3>
 
-  {% if entrance_tickets %}
-    {{ render_header(user, qrcode_string, pdf or png) }}
-    <p>{{ entrance_tickets|length }} entrance ticket{{ entrance_tickets|length != 1 and 's' or '' }}</p>
-    {% call render_tickets(entrance_tickets[:6], "entrance-tickets", pdf, table, png) %}
-     <p>Present the following to the volunteers at the <u>camp entrance gate</u> on your arrival.
-        You will receive a wristband and booklet with site map.
-      </p>
-    {% endcall %}
-  {% endif %}
+    <h4>{{ entrance_tickets_count }} entrance ticket{{ entrance_tickets_count != 1 and 's' or '' }}</h4>
+    <div class="entrance-tickets">
+        <p>Present the code above to the volunteers at the <b>camp entrance gate</b> on your arrival.
+           You will receive a wristband and booklet with site map.
+        </p>
+        <p>Once inside the camp, you can exchange this ticket at the <b>badge centre</b>
+           for an Electromagnetic Field 2016 badge.
+        </p>
 
-  {% if pdf and entrance_tickets and vehicle_tickets %}
-    <div>
-      <pdf:nextpage />
+        {% for tt, ticket_count in entrance_tts_counts %}
+        <div class="ticket-type">{{ ticket_count }} {{ tt.name }}</div>
+        {% endfor %}
     </div>
+    {{ render_footer() }}
+
+    {% if vehicle_tickets %}
+      <div class="nextpage"></div>
+    {% endif %}
+
   {% endif %}
 
   {% if vehicle_tickets %}
-
-    {% for t in vehicle_tickets %}
-      {{ render_header(user, qrcode_string, pdf or png) }}
-      {% call render_tickets([t], "vehicle-tickets", pdf, table, png) %}
-        <p>Please present this page to the volunteers at the <u>main access gate</u> on your arrival.
+    {% for ticket in vehicle_tickets %}
+    {{ render_header() }}
+    <h4>Parking ticket {{ loop.index }}</h4>
+    <div class="vehicle-tickets">
+        <p>Present this page to the volunteers at the <b>main access gate</b> on your arrival.
            They will show you where to park and unload your stuff.</p>
         <p>For details on getting to the site, please visit
            <a href="https://wiki.emfcamp.org/wiki/Travel">our wiki page</a>.</p>
-      {% endcall %}
-      <div><pdf:nextpage /></div>
+
+        <div class="ticket-type">{{ ticket.name }}</div>
+    </div>
+    {{ render_footer() }}
+
+    {% if not loop.last %}
+      <div class="nextpage"></div>
+    {% endif %}
+
     {% endfor %}
   {% endif %}
 
 </div>
 {% endblock %}
 
-
+        </div>
     </div>
-  </div>
 </div>
 {% endblock %}
-
-{%- block foot %}
-<style type="text/css">
-{% if pdf %}
-
-{# xhtml2pdf doesn't support float or child selectors #}
-.ticket div {
-  display: inline-block
-}
-{# And some resets because we don't have bootstrap #}
-.receipt h2 {
-  font-size: 30px;
-}
-.receipt h3 {
-  font-size: 24px;
-}
-.receipt h2, .receipt h3 {
-  margin-top: 20px;
-  margin-bottom: 10px;
-}
-.receipt p {
-  margin: 0 0 10px;
-}
-.receipt a {
-  color: #428bca;
-}
-
-{% else %}
-
-{# Much easier than table-cell #}
-.ticket div {
-  display: inline-block;
-  vertical-align: middle;
-  float: none;
-}
-
-{# needed for display: inline-block, and for printers, because
-   A4 is usually smaller than the 768px of bootstrap's sm size #}
-@media (max-width: 768px) {
-  .col-sm-5 { width: 260px; }
-  .col-sm-4 { width: 230px; }
-}
-{% endif %}
-</style>
-{% endblock -%}
 
 {% if not config.get('DEBUG') and request.headers.get('dnt') != '1' %}
 <script>

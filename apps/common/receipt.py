@@ -5,21 +5,36 @@ from urlparse import urljoin
 from xhtml2pdf import pisa
 import qrcode
 from qrcode.image.svg import SvgPathImage
+import barcode
+from barcode.writer import ImageWriter, SVGWriter
 from lxml import etree
+
 from flask import Markup, render_template, request, current_app as app
+from sqlalchemy import func
 
-from models.ticket import TicketType
+from models.ticket import Ticket, TicketType
 
 
-def render_receipt(tickets, png=False, table=False, pdf=False):
-    user = tickets[0].user
+def render_receipt(user, png=False, pdf=False):
+    tickets = (user.tickets
+                  .filter_by(paid=True)
+                  .join(TicketType)
+                  .order_by(TicketType.order))
 
-    entrance_tickets = tickets.filter(TicketType.admits.in_(['full', 'kids'])).all()
+    entrance_tts_counts = (tickets.filter(TicketType.admits.in_(['full', 'kids']))
+        .with_entities(TicketType, func.count(Ticket.id).label('ticket_count'))
+        .group_by(TicketType).all())
+    entrance_tickets_count = sum(c for tt, c in entrance_tts_counts)
+
     vehicle_tickets = tickets.filter(TicketType.admits.in_(['car', 'campervan'])).all()
 
-    return render_template('receipt.html', user=user, format_inline_qr=format_inline_qr,
-                           entrance_tickets=entrance_tickets, vehicle_tickets=vehicle_tickets,
-                           pdf=pdf, png=png, table=table)
+    return render_template('receipt.html', user=user,
+                           format_inline_qr=format_inline_qr,
+                           format_inline_barcode=format_inline_barcode,
+                           entrance_tts_counts=entrance_tts_counts,
+                           entrance_tickets_count=entrance_tickets_count,
+                           vehicle_tickets=vehicle_tickets,
+                           pdf=pdf, png=png)
 
 
 def render_pdf(html, url_root=None):
@@ -42,43 +57,66 @@ def render_pdf(html, url_root=None):
 
     return pdffile
 
-def get_checkin_url(code):
-    base = app.config.get('CHECKIN_BASE')
-    return urljoin(base, '/'.join(['checkin', code]))
-
-
-def format_inline_qr(code):
-    url = get_checkin_url(code)
-
+def format_inline_qr(data):
     qrfile = StringIO()
-    qr = qrcode.make(url, image_factory=SvgPathImage)
+    qr = qrcode.make(data, image_factory=SvgPathImage)
     qr.save(qrfile, 'SVG')
     qrfile.seek(0)
 
     root = etree.XML(qrfile.read())
-    # Wrap inside an element with the right default namespace
-    svgns = 'http://www.w3.org/2000/svg'
-    newroot = root.makeelement('{%s}svg' % svgns, nsmap={None: svgns})
-    newroot.append(root)
+    # Allow us to scale it with CSS
+    del root.attrib['width']
+    del root.attrib['height']
+    root.attrib['preserveAspectRatio'] = 'none'
 
     return Markup(etree.tostring(root))
 
 
-def make_qr_png(code, *args, **kwargs):
-    url = get_checkin_url(code)
+def make_qr_png(*args, **kwargs):
     qrfile = StringIO()
 
-    qr = qrcode.make(url, *args, **kwargs)
+    qr = qrcode.make(*args, **kwargs)
     qr.save(qrfile, 'PNG')
     qrfile.seek(0)
 
     return qrfile
 
 
-def attach_tickets(msg, tickets):
+def format_inline_barcode(data):
+    barcodefile = StringIO()
+
+    # data is written into the SVG without a CDATA, so base64 encode it
+    code128 = barcode.get('code128', data, writer=SVGWriter())
+    code128.write(barcodefile, {'write_text': False})
+    barcodefile.seek(0)
+
+    root = etree.XML(barcodefile.read())
+    # Allow us to scale it with CSS
+    root.attrib['viewBox'] = '0 0 %s %s' % (root.attrib['width'], root.attrib['height'])
+    del root.attrib['width']
+    del root.attrib['height']
+    root.attrib['preserveAspectRatio'] = 'none'
+
+    return Markup(etree.tostring(root))
+
+
+def make_barcode_png(data, **options):
+    barcodefile = StringIO()
+
+    code128 = barcode.get('code128', data, writer=ImageWriter())
+    # Sizes here are the ones used in the PDF
+    code128.write(barcodefile, {'write_text': False, 'module_height': 8})
+    barcodefile.seek(0)
+
+    return barcodefile
+
+
+def attach_tickets(msg, user):
     # Attach tickets to a mail Message
-    page = render_receipt(tickets, pdf=True)
+    page = render_receipt(user, pdf=True)
     pdf = render_pdf(page)
+
+    tickets = user.tickets.filter_by(paid=True)
     plural = (tickets.count() != 1 and 's' or '')
     msg.attach('Ticket%s.pdf' % plural, 'application/pdf', pdf.read())
 

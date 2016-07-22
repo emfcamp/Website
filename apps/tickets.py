@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
+import re
+
 from flask import (
     render_template, redirect, request, flash, Blueprint,
     url_for, session, send_file, abort, current_app as app,
@@ -21,12 +23,11 @@ from .common import (
     get_user_currency, set_user_currency, get_basket_and_total, create_basket,
     CURRENCY_SYMBOLS, feature_flag, create_current_user, send_template_email)
 from .common.forms import IntegerSelectField, HiddenIntegerField, Form
-from .common.receipt import make_qr_png, render_pdf, render_receipt
-from models.user import User
-from models.ticket import (
-    TicketLimitException, TicketType, Ticket,
-    validate_safechars,
+from .common.receipt import (
+    make_qr_png, make_barcode_png, render_pdf, render_receipt,
 )
+from models.user import User, checkin_code_re
+from models.ticket import TicketLimitException, TicketType
 from models.payment import BankPayment, StripePayment, GoCardlessPayment
 from models.site_state import get_sales_state
 from models.payment import Payment
@@ -75,21 +76,10 @@ def create_payment(paymenttype):
     return payment
 
 
-class ReceiptForm(Form):
-    forward = SubmitField('Show e-Tickets')
-
-
 @tickets.route("/tickets/", methods=['GET', 'POST'])
 def main():
     if current_user.is_anonymous():
         return redirect(url_for('tickets.choose'))
-
-    form = ReceiptForm()
-    if form.validate_on_submit():
-        ticket_ids = map(str, request.form.getlist('ticket_id', type=int))
-        if ticket_ids:
-            return redirect(url_for('tickets.receipt', ticket_ids=','.join(ticket_ids)) + '?pdf=1')
-        return redirect(url_for('tickets.receipt') + '?pdf=1')
 
     all_tickets = current_user.tickets.join(TicketType).outerjoin(Payment).filter(
         or_(Payment.id.is_(None),
@@ -110,7 +100,6 @@ def main():
                            tickets=tickets,
                            other_items=other_items,
                            payments=payments,
-                           form=form,
                            show_receipt=show_receipt,
                            transferred_to=transferred_to,
                            transferred_from=transferred_from)
@@ -411,42 +400,52 @@ def transfer(ticket_id):
 
 
 @tickets.route("/tickets/receipt")
-@tickets.route("/tickets/<ticket_ids>/receipt")
+@tickets.route("/tickets/<user_id>/receipt")
 @login_required
-def receipt(ticket_ids=None):
-    if current_user.has_permission('admin') and ticket_ids is not None:
-        tickets = Ticket.query
+def receipt(user_id=None):
+    if current_user.has_permission('admin') and user_id is not None:
+        user = User.query.get(user_id).one()
     else:
-        tickets = current_user.tickets
+        user = current_user
 
-    tickets = tickets.filter_by(paid=True).order_by(TicketType.order)
-
-    if ticket_ids is not None:
-        ticket_ids = map(int, ticket_ids.split(','))
-        tickets = tickets.filter(Ticket.id.in_(ticket_ids))
-
-    if not tickets.all():
+    if not user.tickets.filter_by(paid=True).all():
         abort(404)
 
     png = bool(request.args.get('png'))
     pdf = bool(request.args.get('pdf'))
-    table = bool(request.args.get('table'))
 
-    page = render_receipt(tickets, png, table, pdf)
+    page = render_receipt(user, png, pdf)
     if pdf:
         return send_file(render_pdf(page), mimetype='application/pdf')
 
     return page
 
 
-@tickets.route("/receipt/<code>/qr")
-def tickets_qrcode(code):
-    if len(code) > 64:
-        abort(404)
-    ignore_safechar = request.args.get('ignore_safechar', False)
-    if not ignore_safechar and not validate_safechars(code):
-        app.logger.debug('')
+# Generate a PNG-based QR code as xhtml2pdf doesn't support SVG.
+#
+# This only accepts the code on purpose - we can't authenticate the
+# user from the PDF renderer, and a full URL is awkward to validate.
+@tickets.route("/receipt/<checkin_code>/qr")
+def tickets_qrcode(checkin_code):
+    if len(checkin_code) > 40:
         abort(404)
 
-    qrfile = make_qr_png(code, box_size=3)
+    if not re.match('^%s$' % checkin_code_re, checkin_code):
+        abort(404)
+
+    url = app.config.get('CHECKIN_BASE') + checkin_code
+
+    qrfile = make_qr_png(url, box_size=3)
     return send_file(qrfile, mimetype='image/png')
+
+@tickets.route("/receipt/<checkin_code>/barcode")
+def tickets_barcode(checkin_code):
+    if len(checkin_code) > 40:
+        abort(404)
+
+    if not re.match('^%s$' % checkin_code_re, checkin_code):
+        abort(404)
+
+    barcodefile = make_barcode_png(checkin_code)
+    return send_file(barcodefile, mimetype='image/png')
+
