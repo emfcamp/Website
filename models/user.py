@@ -1,19 +1,22 @@
-from main import db
-from permission import UserPermission, Permission
-from sqlalchemy import func
-from sqlalchemy.orm.exc import NoResultFound
-from flask.ext.login import UserMixin
-
 import base64
 import hmac
 import hashlib
 from datetime import datetime, timedelta
 import time
+import struct
 
+from main import db
+from permission import UserPermission, Permission
+from sqlalchemy import func
+from sqlalchemy.orm.exc import NoResultFound
+from flask import current_app as app
+from flask.ext.login import UserMixin
+
+checkin_code_re = r'[0-9a-zA-Z_-]+'
 
 def generate_login_code(key, timestamp, uid):
     msg = "%s-%s" % (int(timestamp), uid)
-    mac = hmac.new(key, msg, digestmod=hashlib.sha256)
+    mac = hmac.new(key, 'login-' + msg, digestmod=hashlib.sha256)
     # Truncate the digest to 20 base64 bytes
     return msg + "-" + base64.urlsafe_b64encode(mac.digest())[:20]
 
@@ -23,7 +26,7 @@ def verify_login_code(key, current_timestamp, code):
         timestamp, uid, _ = code.split("-", 2)
     except ValueError:
         return None
-    if hmac.compare_digest(generate_login_code(key, timestamp, uid), code):
+    if generate_login_code(key, timestamp, uid) == code:
         age = datetime.fromtimestamp(current_timestamp) - datetime.fromtimestamp(int(timestamp))
         if age > timedelta(hours=6):
             return None
@@ -31,6 +34,22 @@ def verify_login_code(key, current_timestamp, code):
             return int(uid)
     return None
 
+def generate_checkin_code(key, user_id, version=1):
+    # H = short (< 65536), B = byte (< 256)
+    msg = struct.pack('HB', user_id, version)
+    mac = hmac.new(key, 'checkin-' + msg, digestmod=hashlib.sha256)
+    # An input length that's a multiple of 3 ensures no wasted output
+    # 9 bytes (72 bits) won't resist offline attacks, so be careful
+    return base64.urlsafe_b64encode(msg + mac.digest()[:9])
+
+def verify_checkin_code(key, code):
+    user_id, version = struct.unpack('HB', code)
+    assert version == 1
+
+    expected_code = generate_checkin_code(key, user_id, version=version)
+    if hmac.compare_digest(expected_code, code):
+        return user_id
+    return None
 
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
@@ -73,6 +92,10 @@ class User(db.Model, UserMixin):
     def login_code(self, key):
         return generate_login_code(key, int(time.time()), self.id)
 
+    @property
+    def checkin_code(self):
+        return generate_checkin_code(app.config.get('SECRET_KEY'), self.id)
+
     def has_permission(self, name, cascade=True):
         if cascade and name != 'admin' and self.has_permission('admin'):
             return True
@@ -114,6 +137,14 @@ class User(db.Model, UserMixin):
     @classmethod
     def get_by_code(cls, key, code):
         uid = verify_login_code(key, time.time(), code)
+        if uid is None:
+            return None
+
+        return User.query.filter_by(id=uid).one()
+
+    @classmethod
+    def get_by_checkin_code(cls, key, code):
+        uid = verify_checkin_code(key, code)
         if uid is None:
             return None
 

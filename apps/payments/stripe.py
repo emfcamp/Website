@@ -101,7 +101,7 @@ def charge_stripe(payment):
                                user=payment.user, payment=payment)
 
     if feature_enabled('ISSUE_TICKETS') and charge.paid:
-        attach_tickets(msg, payment.user.tickets)
+        attach_tickets(msg, payment.user)
 
     mail.send(msg)
     db.session.commit()
@@ -306,7 +306,7 @@ def stripe_payment_paid(payment):
                                user=payment.user, payment=payment)
 
     if feature_enabled('ISSUE_TICKETS'):
-        attach_tickets(msg, payment.user.tickets)
+        attach_tickets(msg, payment.user)
 
     mail.send(msg)
     db.session.commit()
