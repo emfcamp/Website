@@ -749,9 +749,9 @@ class ImportSchedulerData(Command):
         schedule = json.load(open(filename))
 
         for event in schedule:
-            if not 'time' in event or not event['time']:
+            if 'time' not in event or not event['time']:
                 continue
-            if not 'venue' in event or not event['venue']:
+            if 'venue' not in event or not event['venue']:
                 continue
 
             proposal = Proposal.query.filter_by(id=event['id']).one()
