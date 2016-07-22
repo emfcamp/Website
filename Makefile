@@ -89,6 +89,11 @@ outputschedulerdata:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py outputschedulerdata
 
 importschedulerdata:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py importschedulerdata --persist
+
+runscheduler:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py outputschedulerdata
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py runscheduler
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py importschedulerdata
 
 shell:

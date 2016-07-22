@@ -28,7 +28,7 @@ from models.permission import Permission
 from models.email import EmailJobRecipient
 from apps.payments import banktransfer
 from apps.common.receipt import attach_tickets
-
+from lib.slotmachine import SlotMachine
 
 class CreateDB(Command):
     # For testing - you usually want to use db migrate/db upgrade instead
@@ -737,11 +737,15 @@ class OutputSchedulerData(Command):
         db.session.commit()
 
 class ImportSchedulerData(Command):
-    option_list = [Option('-f', '--file', dest='filename',
-                          help='The .json file to load',
-                          default='schedule.json')]
+    option_list = [
+        Option('-f', '--file', dest='filename',
+            help='The .json file to load',
+            default='schedule.json'),
+        Option('-p', '--persist', dest='persist', action='store_true',
+            help='Persist the changes rather than doing a dry run')
+    ]
 
-    def run(self, filename):
+    def run(self, filename, persist):
         schedule = json.load(open(filename))
 
         for event in schedule:
@@ -786,7 +790,16 @@ class ImportSchedulerData(Command):
 
                 app.logger.info('Moved "%s": "%s" on "%s" -> "%s" on "%s"' % (proposal.title, previous_venue_name, previous_potential_time, new_venue_name, proposal.potential_time))
 
-        db.session.commit()
+        if persist:
+            db.session.commit()
+        else:
+            app.logger.info("DRY RUN: `make importschedulerdata` to persist these")
+            db.session.rollback()
+
+class RunScheduler(Command):
+    def run(self):
+        sm = SlotMachine()
+        sm.schedule(app.config['EVENT_START'], 'schedule.json', 'schedule.json')
 
 class SendEmails(Command):
     def run(self):
@@ -837,5 +850,6 @@ if __name__ == "__main__":
     manager.add_command('setroughdurations', SetRoughDurations())
     manager.add_command('outputschedulerdata', OutputSchedulerData())
     manager.add_command('importschedulerdata', ImportSchedulerData())
+    manager.add_command('runscheduler', RunScheduler())
 
     manager.run()
