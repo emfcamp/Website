@@ -731,9 +731,10 @@ class OutputSchedulerData(Command):
 
             proposal_data.append(export)
 
-        db.session.commit()
+        with open('schedule.json', 'w') as outfile:
+            json.dump(proposal_data, outfile, sort_keys=True, indent=4, separators=(',', ': '))
 
-        print json.dumps(proposal_data, sort_keys=True, indent=4, separators=(',', ': '))
+        db.session.commit()
 
 class ImportSchedulerData(Command):
     option_list = [Option('-f', '--file', dest='filename',
@@ -744,21 +745,46 @@ class ImportSchedulerData(Command):
         schedule = json.load(open(filename))
 
         for event in schedule:
+            if not 'time' in event or not event['time']:
+                continue
+            if not 'venue' in event or not event['venue']:
+                continue
+
             proposal = Proposal.query.filter_by(id=event['id']).one()
 
-            if not proposal.scheduled_venue or proposal.scheduled_venue.id != event['venue']:
-                proposal.potential_venue = event['venue']
-                venue_name = Venue.query.filter_by(id=event['venue']).one().name
-                app.logger.info('"%s" now potentially in venue "%s"' % (proposal.title, venue_name))
-            else:
-                proposal.potental_venue = None
+            # Keep history of the venue while updating
+            current_scheduled_venue = None
+            previous_potential_venue = None
+            if proposal.scheduled_venue:
+                current_scheduled_venue = proposal.scheduled_venue
+            if proposal.potential_venue:
+                previous_potential_venue = proposal.potential_venue
 
-            time = parser.parse(event['time'])
-            if not proposal.scheduled_time or proposal.scheduled_time != time:
-                proposal.potential_time = time
-                app.logger.info('"%s" now potentially in time "%s"' % (proposal.title, proposal.potential_time))
-            else:
-                proposal.potental_time = None
+            proposal.potential_venue = event['venue']
+            if proposal.potential_venue == current_scheduled_venue:
+                proposal.potential_venue = None
+
+            # Same for time
+            previous_potential_time = proposal.potential_time
+            proposal.potential_time = parser.parse(event['time'])
+            if proposal.potential_time == proposal.scheduled_time:
+                proposal.potential_time = None
+
+            # Then say what changed
+            if proposal.potential_venue != previous_potential_venue or proposal.potential_time != previous_potential_time:
+                previous_venue_name = new_venue_name = None
+                if previous_potential_venue:
+                    previous_venue_name = Venue.query.filter_by(id=previous_potential_venue).one().name
+                if proposal.potential_venue:
+                    new_venue_name = Venue.query.filter_by(id=proposal.potential_venue).one().name
+
+                # And we want to try and make sure both are populated
+                if proposal.potential_venue and not proposal.potential_time:
+                    proposal.potential_time = proposal.scheduled_time
+                if proposal.potential_time and not proposal.potential_venue:
+                    proposal.potential_venue = proposal.scheduled_venue
+
+                app.logger.info('Moved "%s": "%s" on "%s" -> "%s" on "%s"' % (proposal.title, previous_venue_name, previous_potential_time, new_venue_name, proposal.potential_time))
 
         db.session.commit()
 
