@@ -720,9 +720,9 @@ class OutputSchedulerData(Command):
             }
 
             if proposal.scheduled_venue:
-                export['venue'] = proposal.scheduled_venue.id
+                export['venue'] = proposal.scheduled_venue
             if proposal.potential_venue:
-                export['venue'] = proposal.potential_venue.id
+                export['venue'] = proposal.potential_venue
 
             if proposal.scheduled_time:
                 export['time'] = str(proposal.scheduled_time)
