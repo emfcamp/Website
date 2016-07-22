@@ -389,7 +389,7 @@ def update_proposal(proposal_id):
     form.scheduled_time.data = prop.scheduled_time
     form.scheduled_duration.data = prop.scheduled_duration
     form.potential_time.data = prop.potential_time
-    
+
     if prop.scheduled_venue:
         form.scheduled_venue.data = Venue.query.filter_by(id=prop.scheduled_venue).one().name
 
