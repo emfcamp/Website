@@ -11,10 +11,6 @@
     position: fixed;
   }
 
-  a::after {
-    content: " " attr(href);
-  }
-
   .receipt .nextpage {
     border-top: none !important;
   }
@@ -139,7 +135,7 @@
 }
 
 .invoice dl.company-info dt:after {
-  content: ':\00a0';
+  content: ':	';
 }
 
 .invoice dl.company-info dd:after {
