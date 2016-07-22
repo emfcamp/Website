@@ -139,7 +139,7 @@
 }
 
 .invoice dl.company-info dt:after {
-  content: ': ';
+  content: ':\00a0';
 }
 
 .invoice dl.company-info dd:after {
