@@ -804,7 +804,7 @@ class RunScheduler(Command):
 
 class ApplyPotentialSchedule(Command):
     def run(self):
-        proposals = Proposal.query.filter(\
+        proposals = Proposal.query.filter(
             (Proposal.potential_venue.isnot(None) | Proposal.potential_time.isnot(None))).\
             filter(Proposal.type.in_(['talk', 'workshop'])).all()
 
