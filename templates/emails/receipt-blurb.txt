@@ -1,17 +1,19 @@
-The only tickets you need to print out are for parking (which need
-to be displayed on your dashboard). Your other tickets you can
-print out or we'll check them from a phone.
+We've attached a PDF to this email. Admissions tickets can be shown
+on your phone, but we recommend you print them out for convenience.
 
+{% if payment %}
 If you have bought a ticket for someone else you can send it to them
-by logging in, clicking 'transfer' beside the relevant ticket,
-and filling in the form:
+by logging in and clicking 'transfer' beside the relevant ticket:
 
   https://www.emfcamp.org/tickets
 
+{% endif %}
 If you're coming by car and you don't have a parking ticket, you'll
 need to buy one before you arrive:
 
-  https://www.emfcamp.org/tickets/choose
+  https://www.emfcamp.org/tickets/choose/other
+
+Any parking tickets must be printed and displayed on your dashboard.
 
 If you're travelling by public transport, we will be running shuttle
 buses between a local train station and the festival site.
@@ -24,11 +26,6 @@ and driving directions, please see the Travel section of our wiki:
 For some idea of what to bring take a look at our packing list:
 
   https://wiki.emfcamp.org/wiki/Packing_List
-
-Don't forget to check out our recent blog posts for the latest
-updates on EMF:
-
-  http://blog.emfcamp.org
 
 And lastly, EMF is entirely volunteer-run. Please consider
 contributing a few hours of your time at the festival to help the
