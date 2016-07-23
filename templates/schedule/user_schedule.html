@@ -11,9 +11,7 @@
     }
   </style>
 {% endblock %}
-{# {% block body %} #}
 {% block document %}
-{# <h1>Schedule</h1> #}
 <div id="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
     <div class="dhx_cal_navline">
         <div class="dhx_cal_prev_button">&nbsp;</div>
@@ -34,8 +32,9 @@
   <script>
     (function(){
       'use strict';
-      var scheduleData = {{ schedule_data | tojson | safe }};
-
+      var scheduleData = {{ schedule_data | tojson | safe }},
+          start = new Date(2016, 7, 5),
+          end = new Date(2016, 7, 8);
       // Because we're not savages: set the date format to a proper one
       scheduler.config.api_date = "%Y-%m-%d %H:%i:%s";
       scheduler.config.xml_date = "%Y-%m-%d %H:%i:%s";
@@ -45,8 +44,12 @@
 
       // There'll be no events outside the weekend so lock the view to it
       scheduler.config.limit_view = true;
-      scheduler.config.limit_start = new Date(2014, 7, 29);
-      scheduler.config.limit_end  = new Date (2014, 8, 1);
+      scheduler.config.limit_start = start;
+      scheduler.config.limit_end  = end;
+
+      // Make it style
+      scheduler.config.hour_size_px = 132;
+      scheduler.config.separate_short_events = true;
 
       // This is read only so block all modifications
       scheduler.config.readonly_form = true;
@@ -65,13 +68,13 @@
         scheduler.templates.emf_scale_date = scheduler.templates.week_scale_date;
 
         // scheduler.date.emf_start = function(d) { return scheduler.date.week_start(d); };
-        scheduler.date.emf_start = function(d) { return new Date(2014, 7, 29); };
-        scheduler.date.add_emf = function (d, inc) { return new Date(2014, 8, 1); };
-        scheduler.date.get_emf_end = function (d) { return new Date(2014, 8, 1); };
+        scheduler.date.emf_start = function(d) { return start; };
+        scheduler.date.add_emf = function (d, inc) { return end; };
+        scheduler.date.get_emf_end = function (d) { return end; };
       });
 
       //
-      scheduler.init('scheduler_here', new Date(2014, 7, 30, 15), "emf");
+      scheduler.init('scheduler_here', start, "emf");
       scheduler.parse(scheduleData, 'json');
     })();
   </script>
