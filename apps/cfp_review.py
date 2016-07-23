@@ -1039,3 +1039,16 @@ def rank():
     return render_template('cfp_review/rank.html', form=form, preview=preview,
                            proposals=scored_proposals, accepted_count=accepted_count,
                            min_score=session.get('min_score'))
+
+@cfp_review.route('/potential_schedule_changes', methods=['GET', 'POST'])
+@admin_required
+def potential_schedule_changes():
+    proposals = Proposal.query.filter(\
+                (Proposal.potential_venue.isnot(None) | Proposal.potential_time.isnot(None))).\
+                filter(Proposal.type.in_(['talk', 'workshop'])).all()
+
+    for proposal in proposals:
+        proposal.scheduled_venue_name = Venue.query.filter_by(id=proposal.scheduled_venue).one().name
+        proposal.potential_venue_name = Venue.query.filter_by(id=proposal.potential_venue).one().name
+
+    return render_template('cfp_review/potential_schedule_changes.html', proposals=proposals)

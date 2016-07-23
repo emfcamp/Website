@@ -1,0 +1,61 @@
+{% extends "cfp_review/base.html" %}
+{% block body %}
+<h2>Potential Schedule Changes</h2>
+
+<h3><small>To apply and notify users, run <code>make applypotentialschedule</code></small></h3>
+
+<table class="table">
+    <tr>
+        <th>
+            Type
+        </th>
+        <th class="">
+            Duration
+        </th>
+        <th>
+            User
+        </th>
+        <th>
+            Title
+        </th>
+        <th>
+            Cur Venue
+        </th>
+        <th>
+            Cur Time
+        </th>
+        <th>
+            New Venue
+        </th>
+        <th>
+            New Time
+        </th>
+    </tr>
+{% for proposal in proposals %}
+    <tr>
+        <td>{{proposal.type | capitalize}}</td>
+        <td>{{proposal.scheduled_duration or '--'}}</td>
+        <td>
+            <a href="{{ url_for('admin.user', user_id=proposal.user.id ) }}">{{proposal.user.name}}</a>
+        </td>
+        <td>
+            <a href="{{ url_for('.update_proposal', proposal_id=proposal.id) }}">{{proposal.title}}</a>
+        </td>
+        <td>
+            {{ proposal.scheduled_venue_name }}
+        </td>
+        <td>
+            {{ proposal.scheduled_time.strftime('%A at %-I:%M %p') }}
+        </td>
+        <td>
+            {{ proposal.potential_venue_name }}
+        </td>
+        <td>
+            {{ proposal.potential_time.strftime('%A at %-I:%M %p') }}
+        </td>
+    </tr>
+{% else %}
+    <tr><td colspan="5" class="text-center">No potential changes found</td></tr>
+{% endfor %}
+</table>
+{% endblock %}
