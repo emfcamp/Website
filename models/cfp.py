@@ -173,6 +173,19 @@ class Proposal(db.Model):
     def get_allowed_venues_serialised(self):
         return ','.join([ v.name for v in self.get_allowed_venues() ])
 
+    # Reduces the time periods to the smallest contiguous set we can
+    def make_periods_contiguous(self, time_periods):
+        time_periods.sort(key=lambda x: x.start)
+        contiguous_periods = [time_periods.pop(0)]
+        for time_period in time_periods:
+            if time_period.start <= contiguous_periods[-1].end and\
+                    contiguous_periods[-1].end < time_period.end:
+                contiguous_periods[-1] = period(contiguous_periods[-1].start, time_period.end)
+                continue
+
+            contiguous_periods.append(time_period)
+        return contiguous_periods
+
     def get_allowed_time_periods(self):
         time_periods = []
 
@@ -192,8 +205,7 @@ class Proposal(db.Model):
             for p in self.available_times.split(','):
                 if p:
                     time_periods.append(TIME_PERIODS[p.strip()])
-
-        return time_periods
+        return self.make_periods_contiguous(time_periods)
 
     def get_allowed_time_periods_serialised(self):
         return '\n'.join([ "%s > %s" % (v.start, v.end) for v in self.get_allowed_time_periods() ])
@@ -202,7 +214,7 @@ class Proposal(db.Model):
         allowed_time_periods = self.get_allowed_time_periods()
         if not allowed_time_periods:
             allowed_time_periods = TIME_PERIODS.values()
-        return allowed_time_periods
+        return self.make_periods_contiguous(allowed_time_periods)
 
 class PerformanceProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'performance'}
