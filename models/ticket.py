@@ -67,7 +67,8 @@ class TicketType(db.Model):
         else:
             clsname = 'TicketType %s' % self.id
 
-        return "<%s: %s>" % (clsname, self.name)
+        r = "<%s: %s>" % (clsname, self.name)
+        return r.encode('utf-8')
 
     def get_price(self, currency):
         for price in self.prices:
@@ -274,9 +275,10 @@ class Ticket(db.Model):
         if self.expired:
             attrs.append('expired')
         if self.id is None:
-            return "<Ticket %s: %s>" % (self.type.name, ', '.join(attrs))
+            r = "<Ticket %s: %s>" % (self.type.name, ', '.join(attrs))
         else:
-            return "<Ticket %s %s: %s>" % (self.id, self.type.name, ', '.join(attrs))
+            r = "<Ticket %s %s: %s>" % (self.id, self.type.name, ', '.join(attrs))
+        return r.encode('utf-8')
 
     def transfer(self, from_user, to_user):
         """
@@ -326,7 +328,8 @@ class TicketAttrib(db.Model):
         self.value = value
 
     def __repr__(self):
-        return "<TicketAttrib %s: %s>" % (self.name, self.value)
+        r = "<TicketAttrib %s: %s>" % (self.name, self.value)
+        return r.encode('utf-8')
 
 
 class TicketCheckin(db.Model):
