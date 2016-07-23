@@ -1043,9 +1043,9 @@ def rank():
 @cfp_review.route('/potential_schedule_changes', methods=['GET', 'POST'])
 @admin_required
 def potential_schedule_changes():
-    proposals = Proposal.query.filter(\
-                (Proposal.potential_venue.isnot(None) | Proposal.potential_time.isnot(None))).\
-                filter(Proposal.type.in_(['talk', 'workshop'])).all()
+    proposals = Proposal.query.filter(
+        (Proposal.potential_venue.isnot(None) | Proposal.potential_time.isnot(None)),
+        Proposal.type.in_(['talk', 'workshop'])).all()
 
     for proposal in proposals:
         if proposal.scheduled_venue:
