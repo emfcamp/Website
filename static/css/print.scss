@@ -192,7 +192,17 @@
 
 @page {
   size: a4 portrait;
-  margin: 2.1cm 2.5cm;
+  @frame contents {
+    /* -pdf-frame-border: 1; */
+    margin: 1.4cm 2.5cm;
+  }
+  @frame footer_frame {
+    /* -pdf-frame-border: 1; */
+    -pdf-frame-content: footer;
+    bottom: 0;
+    height: 210px;
+    margin: 0 2cm 2.1cm 2cm;
+  }
 }
 /* With webfonts, div seems to set the base font family and weight for everything else */
 .pdf div {
@@ -241,4 +251,3 @@ html.pdf {
 .pdf .barcode img {
   height: inherit;
 }
-

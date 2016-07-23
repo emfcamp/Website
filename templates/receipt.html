@@ -105,7 +105,7 @@
         <div class="ticket-type">{{ ticket_count }} {{ tt.name }}</div>
         {% endfor %}
     </div>
-    {{ render_footer() }}
+    {% if not pdf %}{{ render_footer() }}{% endif %}
 
     {% if vehicle_tickets %}
       <div class="nextpage"></div>
@@ -125,13 +125,20 @@
 
         <div class="ticket-type">{{ ticket.name }}</div>
     </div>
-    {{ render_footer() }}
+    {% if not pdf %}{{ render_footer() }}{% endif %}
 
     {% if not loop.last %}
       <div class="nextpage"></div>
     {% endif %}
 
     {% endfor %}
+
+  {% endif %}
+
+  {% if pdf %}
+  <div id="footer">
+  {{ render_footer() }}
+  </div>
   {% endif %}
 
 </div>
