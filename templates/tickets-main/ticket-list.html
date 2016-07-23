@@ -1,3 +1,9 @@
+{% if show_receipt and feature_enabled('ISSUE_TICKETS') %}
+<p>
+<a class="btn btn-success" href="{{ url_for('tickets.receipt') }}">Printable ticket</a>
+<a class="btn btn-primary" href="{{ url_for('tickets.receipt') + '?pdf=1' }}">Download PDF</a>
+</p>
+{% endif %}
 <table class="table tickets btns-table">
   <thead>
     <tr>
@@ -38,9 +44,6 @@
   </tbody>
 </table>
 
-{% if show_receipt and feature_enabled('ISSUE_TICKETS') %}
-<a class="btn btn-default pull-right" href="{{ url_for('tickets.receipt') + '?pdf=1' }}">PDF</a>
-<a class="btn btn-default pull-right" href="{{ url_for('tickets.receipt') }}">Printable ticket</a>
-{% else %}
+{% if not (show_receipt and feature_enabled('ISSUE_TICKETS')) %}
 <p>We'll email you when your e-tickets are ready closer to the event.</p>
 {% endif %}
