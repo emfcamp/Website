@@ -30,6 +30,8 @@ def render_receipt(user, png=False, pdf=False):
 
     transferred_tickets = user.transfers_from.order_by('timestamp').all()
 
+    tees = tickets.filter(TicketType.fixed_id.in_(range(14, 24))).all()  # t-shirts
+
     return render_template('receipt.html', user=user,
                            format_inline_qr=format_inline_qr,
                            format_inline_barcode=format_inline_barcode,
@@ -37,6 +39,7 @@ def render_receipt(user, png=False, pdf=False):
                            entrance_tickets_count=entrance_tickets_count,
                            vehicle_tickets=vehicle_tickets,
                            transferred_tickets=transferred_tickets,
+                           tees=tees,
                            pdf=pdf, png=png)
 
 
