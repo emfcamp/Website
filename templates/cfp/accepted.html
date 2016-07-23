@@ -113,7 +113,7 @@
       <dl class="dl-horizontal">
         <dt>Slot length</dt><dd>{{proposal.scheduled_duration}} minutes</dd>
         <dt>Slot time</dt><dd>{% if proposal.scheduled_time %}{{proposal.scheduled_time.strftime('%A at %-I:%M %p')}}{% else %}Not yet scheduled{% endif %}</dd>
-        <dt>Venue</dt><dd>{{proposal.scheduled_venue or "Not yet scheduled"}}</dd>
+        <dt>Venue</dt><dd>{{proposal.scheduled_venue_name or "Not yet scheduled"}}</dd>
       </dl>
       <div>If your slot is not suitable, please <b><a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">  get in touch with us!</a></b></div>
     </fieldset>

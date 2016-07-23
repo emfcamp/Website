@@ -18,7 +18,7 @@ from main import db, mail
 from models.user import User, UserDiversity
 from models.ticket import TicketType
 from models.cfp import (
-    TalkProposal, WorkshopProposal, InstallationProposal, Proposal, CFPMessage
+    TalkProposal, WorkshopProposal, InstallationProposal, Proposal, CFPMessage, Venue
 )
 from .common import feature_flag, create_current_user
 from .common.forms import Form, TelField
@@ -202,6 +202,10 @@ def proposals():
     if not proposals:
         return redirect(url_for('.main'))
 
+    for proposal in proposals:
+        if proposal.scheduled_venue:
+            proposal.scheduled_venue_name = Venue.query.filter_by(id=proposal.scheduled_venue).one().name
+
     return render_template('cfp/proposals.html', proposals=proposals)
 
 
@@ -271,6 +275,9 @@ def edit_proposal(proposal_id):
         form.requirements.data = proposal.requirements
         form.notice_required.data = proposal.notice_required
         form.needs_help.data = proposal.needs_help
+
+    if proposal.scheduled_venue:
+        proposal.scheduled_venue_name = Venue.query.filter_by(id=proposal.scheduled_venue).one().name
 
     return render_template('cfp/edit.html', proposal=proposal, form=form)
 
@@ -388,6 +395,8 @@ def finalise_proposal(proposal_id):
            EveningAcceptedForm() if proposal.type == 'performance' else \
            AcceptedForm()
 
+    if proposal.scheduled_venue:
+        proposal.scheduled_venue_name = Venue.query.filter_by(id=proposal.scheduled_venue).one().name
 
     if form.validate_on_submit():
         proposal.published_names = form.name.data
