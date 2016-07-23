@@ -374,6 +374,7 @@ class SendTickets(Command):
 
             app.logger.info('Emailing %s receipt for %s tickets', user.email, tickets.count())
             mail.send(msg)
+
             db.session.commit()
 
 

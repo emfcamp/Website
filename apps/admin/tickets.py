@@ -28,8 +28,9 @@ from models.payment import Payment, BankPayment, BankTransaction
 from models.ticket import (
     Ticket, TicketType, TicketPrice, TicketTransfer
 )
-from ..common import require_permission, send_template_email
+from ..common import require_permission, feature_enabled
 from ..common.forms import Form, IntegerSelectField, HiddenIntegerField, StaticField
+from ..common.receipt import attach_tickets
 
 
 @admin.route('/transactions')
@@ -138,8 +139,13 @@ def transaction_reconcile(txn_id, payment_id):
             msg = Message("Electromagnetic Field ticket purchase update",
                           sender=app.config['TICKETS_EMAIL'],
                           recipients=[payment.user.email])
+
             msg.body = render_template("emails/tickets-paid-email-banktransfer.txt",
                                        user=payment.user, payment=payment)
+
+            if feature_enabled('ISSUE_TICKETS'):
+                attach_tickets(msg, payment.user)
+
             mail.send(msg)
 
             flash("Payment ID %s marked as paid" % payment.id)
@@ -409,11 +415,18 @@ def tickets_choose_free(user_id=None):
         db.session.commit()
 
         code = user.login_code(app.config['SECRET_KEY'])
-        send_template_email('Your complimentary tickets to EMF',
-                            user.email, app.config['CONTACT_EMAIL'],
-                            'emails/tickets-free.txt',
+        msg = Message('Your complimentary tickets to EMF',
+                      sender=app.config['TICKETS_EMAIL'],
+                      recipients=[user.email])
+
+        msg.body = render_template('emails/tickets-free.txt',
                             user=user, code=code, tickets=tickets,
                             new_user=new_user)
+
+        if feature_enabled('ISSUE_TICKETS'):
+            attach_tickets(msg, user)
+
+        mail.send(msg)
 
         flash('Allocated %s ticket(s)' % len(tickets))
         return redirect(url_for('.tickets_choose_free'))
