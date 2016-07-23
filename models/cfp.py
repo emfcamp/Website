@@ -1,5 +1,5 @@
 from main import db
-from datetime import datetime
+from datetime import datetime, timedelta
 from collections import namedtuple
 from dateutil.parser import parse as parse_date
 from sqlalchemy import UniqueConstraint
@@ -218,6 +218,29 @@ class Proposal(db.Model):
         if not allowed_time_periods:
             allowed_time_periods = TIME_PERIODS.values()
         return self.make_periods_contiguous(allowed_time_periods)
+
+    def end_date(self):
+        start = self.scheduled_time
+        duration = self.scheduled_duration
+        if start and duration:
+            return start + timedelta(minutes=int(duration))
+        return None
+
+    def get_schedule_dict(self):
+        res = {
+            'id': self.id,
+            'start_date': self.scheduled_time,
+            'end_date': self.end_date(),
+            'venue': self.scheduled_venue,
+            'title': self.title,
+            'speaker': self.published_names,
+            'description': self.description,
+            'type': self.type
+        }
+        if self.type == 'workshop':
+            res['cost'] = self.cost
+        return res
+
 
 class PerformanceProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'performance'}
