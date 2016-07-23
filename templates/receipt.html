@@ -1,14 +1,14 @@
 {# xhtml2pdf doesn't support loads of CSS, including stuff necessary for Bootstrap,
-   so we use a separate base page here. Due to its reliance on ReportLab, it also
-   cascades padding, width and fonts weirdly, and doesn't support float, so we add
-   pdf-specific overrides. #}
+   so we use a separate base page here. It has a bug when cascading through multiple
+   classes, so we avoid that. Due to its reliance on ReportLab, it also cascades
+   fonts weirdly, and doesn't support float, so we add pdf-specific overrides. #}
 
 {%- macro render_header() %}
 {% if pdf %}
 <table class="header">
   <tr><td style="width: 100%">
 {% else %}
-<div class="row header">
+<div class="row">
   <div class="col-xs-9">
 {% endif %}
 
@@ -17,20 +17,18 @@
     </h2>
 
 {% if pdf %}
-  </td><td style="width: 120px">
+  </td><td style="width: 200px">
 {% else %}
   </div><div class="col-sm-3">
 {% endif %}
 
-    <div>
-        <div class="qrcode">
-          {% if pdf or png %}
-            <img src="{{ url_for('tickets.tickets_qrcode', checkin_code=user.checkin_code) }}">
-          {% else %}
-            {# Preferred format is SVG because it scales and we don't pass the checkin code back #}
-            {{ format_inline_qr(config.get('CHECKIN_BASE') + user.checkin_code) }}
-          {% endif %}
-        </div>
+    <div class="qrcode">
+      {% if pdf or png %}
+        <img src="{{ url_for('tickets.tickets_qrcode', checkin_code=user.checkin_code) }}">
+      {% else %}
+        {# Preferred format is SVG because it scales and we don't pass the checkin code back #}
+        {{ format_inline_qr(config.get('CHECKIN_BASE') + user.checkin_code) }}
+      {% endif %}
     </div>
 
 {% if pdf %}
@@ -42,7 +40,7 @@
 {% endif %}
 {% endmacro -%}
 
-{% macro render_footer() %}
+{% macro render_barcode() %}
 <div class="barcode">
   {% if pdf or png %}
     {% if pdf %}<center>{% endif %}
@@ -66,7 +64,7 @@
 {% if not pdf %}
         <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 {% endif %}
-        {% assets "css_print" -%}
+        {% assets "css_receipt" -%}
         <link rel="stylesheet" href="{{ ASSET_URL }}">
         {% endassets -%}
         <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Raleway:700,500">
@@ -86,7 +84,27 @@
 
 {% block body %}
 
-<div id="main-content" class="receipt">
+<div id="main-content">
+
+  {% if False %}
+  CSS Cascade Test: this colours both red and blue as blue in xhtml2pdf.
+  <style>
+  .outer .test1 { color: green }
+  .outer .test2 { color: orange }
+  .outer .test1 .inner { color: red }
+  .outer .test2 .inner { color: blue }
+  </style>
+  <div class="outer">
+    <div class="test1">
+      green
+      <div class="inner">red</div>
+    </div>
+    <div class="test2">
+      orange
+      <div class="inner">blue</div>
+    </div>
+  </div>
+  {% endif %}
 
   {% if entrance_tts_counts %}
     {{ render_header() }}
@@ -100,12 +118,26 @@
         <p>Once inside the camp, you can exchange this ticket at the <b>badge centre</b>
            for an Electromagnetic Field 2016 badge.
         </p>
+        {{ render_barcode() }}
 
+        <h4>Your ticket details</h4>
         {% for tt, ticket_count in entrance_tts_counts %}
         <div class="ticket-type">{{ ticket_count }} {{ tt.name }}</div>
         {% endfor %}
+
+        <div>&nbsp;</div>
+
+        {% if transferred_tickets %}
+        <h4>Your transferred tickets</h4>
+        <p>You have transferred {{ transferred_tickets|count }} ticket{{ transferred_tickets|count != 1 and 's' or '' }},
+           which we&rsquo;ve sent out in a separate PDF.
+           If you&rsquo;re arriving at the entrance gate together, you only need this copy.
+        </p>
+        {% for t in transferred_tickets %}
+        <div class="ticket-transfer">{{ t.to_user.name }}: {{ t.ticket.type.name }}</div>
+        {% endfor %}
+        {% endif %}
     </div>
-    {% if not pdf %}{{ render_footer() }}{% endif %}
 
     {% if vehicle_tickets %}
       <div class="nextpage"></div>
@@ -123,9 +155,10 @@
         <p>For details on getting to the site, please visit
            <a href="https://wiki.emfcamp.org/wiki/Travel">our wiki page</a>.</p>
 
+        {{ render_barcode() }}
+
         <div class="ticket-type">{{ ticket.name }}</div>
     </div>
-    {% if not pdf %}{{ render_footer() }}{% endif %}
 
     {% if not loop.last %}
       <div class="nextpage"></div>
@@ -134,13 +167,6 @@
     {% endfor %}
 
   {% endif %}
-
-  {% if pdf %}
-  <div id="footer">
-  {{ render_footer() }}
-  </div>
-  {% endif %}
-
 </div>
 {% endblock %}
 

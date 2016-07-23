@@ -58,7 +58,11 @@ assets.register('css_admin', Bundle('css/admin.scss',
                 output='gen/admin-packed.css',
                 depends='css/*.scss',
                 filters='pyscss,cssmin'))
-assets.register('css_print', Bundle('css/print.scss',
+assets.register('css_invoice', Bundle('css/invoice.scss',
+                output='gen/print-packed.css',
+                depends='css/*.scss',
+                filters='pyscss,cssmin'))
+assets.register('css_receipt', Bundle('css/receipt.scss',
                 output='gen/print-packed.css',
                 depends='css/*.scss',
                 filters='pyscss,cssmin'))

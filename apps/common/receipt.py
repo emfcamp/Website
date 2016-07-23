@@ -28,12 +28,15 @@ def render_receipt(user, png=False, pdf=False):
 
     vehicle_tickets = tickets.filter(TicketType.admits.in_(['car', 'campervan'])).all()
 
+    transferred_tickets = user.transfers_from.order_by('timestamp').all()
+
     return render_template('receipt.html', user=user,
                            format_inline_qr=format_inline_qr,
                            format_inline_barcode=format_inline_barcode,
                            entrance_tts_counts=entrance_tts_counts,
                            entrance_tickets_count=entrance_tickets_count,
                            vehicle_tickets=vehicle_tickets,
+                           transferred_tickets=transferred_tickets,
                            pdf=pdf, png=png)
 
 
