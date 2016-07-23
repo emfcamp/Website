@@ -1,6 +1,4 @@
 # encoding=utf-8
-from dateutil import parser
-import datetime
 import json
 
 from flask import (
@@ -14,7 +12,7 @@ from main import db
 
 from .common import feature_flag
 from .common.forms import Form
-from models.cfp import Proposal
+from models.cfp import Proposal, Venue
 
 schedule = Blueprint('schedule', __name__)
 
@@ -34,17 +32,24 @@ def main():
     if request.headers.get('Content-Type') == 'text/calendar':
         return schedule_ical()
 
+    favourites = [f.id for f in current_user.favourites]
+
     def add_event(event):
         event['text'] = event['title']
         event['start_date'] = event['start_date'].strftime('%Y-%m-%d %H:%M:00')
         event['end_date'] = event['end_date'].strftime('%Y-%m-%d %H:%M:00')
+        event['is_fave'] = event['id'] in favourites
         return event
+
 
     # {id:1, text:"Meeting",   start_date:"04/11/2013 14:00",end_date:"04/11/2013 17:00"}
     schedule_data = _get_scheduled_proposals()
     schedule_data = [add_event(e) for e in schedule_data]
 
-    return render_template('schedule/user_schedule.html', schedule_data=schedule_data)
+    venues = [{'key': v.id, 'label': v.name} for v in Venue.query.all()]
+
+    return render_template('schedule/user_schedule.html', venues=venues,
+                            schedule_data=schedule_data)
 
 
 @schedule.route('/schedule.json')

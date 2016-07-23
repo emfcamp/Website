@@ -3,23 +3,72 @@
 {% block head %}
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dhtmlxscheduler_flat.css' ) }}">
   <style type="text/css" media="screen">
-    html, body{
-      margin:0px;
-      padding:0px;
-      height:100%;
-      overflow:hidden;
-    }
+
   </style>
 {% endblock %}
 {% block document %}
+{# Banner bar #}
+<header role="banner" class="schedule-banner">
+    <h1 aria-label="Electromagnetic Field">
+        <a href="/"><div id="logo" alt="Electromagnetic Field"></div></a>
+    </h1>
+    <div id="header-text" class="banner-text">August 5<sup>th</sup>&ndash;7<sup>th</sup> 2016<br/>
+         Guildford, UK</div>
+
+    <div id="menu-container" class="banner-text" role="navigation" aria-label="main navigation">
+        <ul class="menu" role="menu">
+            <li role="presentation">
+                <a role="menuitem" href="{{ url_for('base.about') }}">About</a>
+            </li>
+            {% if SITE_STATE == 'sales' and SALES_STATE == 'available' %}
+                <li role="presentation">
+                    <a role="menuitem" href="{{ url_for('tickets.choose') }}">Tickets</a>
+                </li>
+            {% endif %}
+            {% if feature_enabled('CFP') and not config.get('CFP_CLOSED') %}
+                <li role="presentation">
+                    <a role="menuitem" href="{{ url_for('cfp.main') }}">Call for Participation</a>
+                </li>
+            {% endif %}
+            <li role="presentation">
+                <a role="menuitem" href="{{ url_for('.line_up') }}">Line-up</a>
+            </li>
+            <li role="presentation">
+                <a role="menuitem" href="{{ url_for('schedule.main') }}">Schedule</a>
+            </li>
+            <li role="presentation">
+                <a role="menuitem" href="{{ url_for('base.sponsors') }}">Sponsors</a>
+            </li>
+        </ul>
+    </div>
+    <div style="clear:both"></div>
+</header>
+
+{# Template for the popup #}
+<div id="event_popup" class="event_popup">
+    <div><h3>
+        <span id="event_title"></span>
+        <small>By: <span id="event_speaker"></span></small>
+    </h3></div>
+
+    <div><strong>Venue:</strong> <span id="event_venue"></span></div>
+    <div><strong>Time:</strong> <span id="event_day"></span> at <span id="event_time"></span>
+    </div>
+    <div><span id="workshop_cost"></span></div>
+
+    <div class="scroll_box"><span id="event_description"></span></div>
+    <button class="btn pull-right" onClick="emf_scheduler.close_popup()">Close</button>
+</div>
+
+{# Actual schedule bit #}
 <div id="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
     <div class="dhx_cal_navline">
         <div class="dhx_cal_prev_button">&nbsp;</div>
         <div class="dhx_cal_next_button">&nbsp;</div>
         <div class="dhx_cal_today_button"></div>
         <div class="dhx_cal_date"></div>
-        <div class="dhx_cal_tab" name="day_tab"></div>
-        <div class="dhx_cal_tab" name="emf_tab"></div>
+        <div class="dhx_cal_tab" name="emf_day_tab" id="emf_day_tab"></div>
+        <div class="dhx_cal_tab" name="emf_weekend_tab" id="emf_weekend_tab"></div>
     </div>
     <div class="dhx_cal_header"></div>
     <div class="dhx_multi_day"><div class="dhx_multi_day_icon"></div></div>
@@ -30,52 +79,167 @@
 {% block foot %}
   <script src="{{ url_for('static', filename='js/dhtmlx_scheduler.js') }}"></script>
   <script>
+    var emf_scheduler = {};
     (function(){
-      'use strict';
-      var scheduleData = {{ schedule_data | tojson | safe }},
-          start = new Date(2016, 7, 5),
-          end = new Date(2016, 7, 8);
-      // Because we're not savages: set the date format to a proper one
-      scheduler.config.api_date = "%Y-%m-%d %H:%i:%s";
-      scheduler.config.xml_date = "%Y-%m-%d %H:%i:%s";
+        'use strict';
+        var scheduleData = {{ schedule_data | tojson }},
+            venues = {{ venues | tojson }},
+            start_date = new Date(2016, 7, 5),
+            end_date = new Date(2016, 7, 8),
+            venue_dict = {},
+            day_format = "%D, %jth",   // e.g. Friday, 5th
+            day_formatter = scheduler.date.date_to_str(day_format),
+            time_formatter = scheduler.date.date_to_str("%H:%i"); // e.g. 22:33
 
-      // Nothing scheduled is multi-day so switch it off
-      scheduler.config.multi_day = false;
+        // Easily retrieve venue name from its ID
+        for(var i = 0; i<venues.length; i++){
+            venue_dict[venues[i].key] = venues[i].label;
+        }
 
-      // There'll be no events outside the weekend so lock the view to it
-      scheduler.config.limit_view = true;
-      scheduler.config.limit_start = start;
-      scheduler.config.limit_end  = end;
+        /*
+         * Required config
+         */
+        // Make sure dates are parsed correctly
+        scheduler.config.api_date = "%Y-%m-%d %H:%i:%s";
+        scheduler.config.xml_date = "%Y-%m-%d %H:%i:%s";
 
-      // Make it style
-      scheduler.config.hour_size_px = 132;
-      scheduler.config.separate_short_events = true;
+        // Nothing scheduled is multi-day so switch it off
+        scheduler.config.multi_day = false;
 
-      // This is read only so block all modifications
-      scheduler.config.readonly_form = true;
-      scheduler.config.details_on_dblclick = true;
-      scheduler.config.dblclick_create = false;
-      scheduler.attachEvent("onBeforeDrag",function(){ return false; });
-      scheduler.attachEvent("onClick",function (id){
-        scheduler.showLightbox(id);
-        return false;// block further actions
-      });
+        /*
+         * Views
+         */
+        // Configure venues view
+        scheduler.locale.labels.emf_day_tab = "Day"
+        scheduler.locale.labels.section_custom="Section";
+        scheduler.createUnitsView({
+            name: "emf_day",
+            property: "venue",
+            list: venues,
+            size: 5,
+            step: 3,
+        });
 
-      // Set up a custom view that only shows the days we're running
-      scheduler.locale.labels.emf_tab = 'emf';
-      scheduler.attachEvent('onTemplatesReady', function () {
-        scheduler.templates.emf_date = scheduler.templates.week_date;
-        scheduler.templates.emf_scale_date = scheduler.templates.week_scale_date;
+        scheduler.locale.labels.emf_weekend_tab = "Weekend"
+        scheduler.createUnitsView({
+            name:"emf_weekend",
+            property:"venue",
+            list:venues,
+            days: 3,
+        });
 
-        // scheduler.date.emf_start = function(d) { return scheduler.date.week_start(d); };
-        scheduler.date.emf_start = function(d) { return start; };
-        scheduler.date.add_emf = function (d, inc) { return end; };
-        scheduler.date.get_emf_end = function (d) { return end; };
-      });
+        // Make sure in weekend view you can't scroll away
+        scheduler.date.add_emf_weekend = function (date,inc) {
+            return scheduler.date.add(start_date, venues.length*3 ,"day");
+        };
 
-      //
-      scheduler.init('scheduler_here', start, "emf");
-      scheduler.parse(scheduleData, 'json');
+        scheduler.date.get_emf_weekend_end = function (date) {
+            return scheduler.date.add(start_date, venues.length*3 ,"day");
+        };
+
+        scheduler.date.get_emf_weekend_start = function (date) {
+            return start_date;
+        };
+
+        scheduler._click.dhx_cal_tab = function () {
+            // Override the view toggle so that it always locks weekend view to
+            // Friday
+            var name = this.getAttribute("name"),
+                mode = name.substring(0, name.search("_tab")),
+                date = (mode === "emf_weekend" ) ? start_date : scheduler._date;
+            scheduler.setCurrentView(date, mode);
+        }
+
+        scheduler._click.dhx_second_scale_bar = function () {
+            console.log(arguments);
+            scheduler.setCurrentView(date, 'emf_day');
+        }
+
+        // scheduler.date.week_emf_day_start = scheduler.date.week_start;
+
+        // There'll be no events outside the weekend so lock the view to it
+        scheduler.config.limit_view = true;
+        scheduler.config.limit_start = start_date;
+        scheduler.config.limit_end  = end_date;
+
+        /*
+         * Make it read-only
+         */
+        // This is read only so block all modifications
+        scheduler.config.readonly_form = true;
+        scheduler.config.details_on_dblclick = true;
+        scheduler.config.dblclick_create = false;
+        scheduler.attachEvent("onBeforeDrag",function(){ return false; });
+        scheduler.attachEvent("onClick",function (id){
+            scheduler.showLightbox(id);
+            return false;// block further actions
+        });
+
+        /*
+         * Custom popup
+         */
+
+
+        var set_inner = function (id, text) {
+            var element = document.getElementById(id);
+            element.innerHTML = text;
+        };
+
+        scheduler.showLightbox = function(id) {
+            var ev = scheduler.getEvent(id);
+
+            scheduler.startLightbox(id, document.getElementById("event_popup"));
+
+            set_inner('event_title', ev.title)
+            set_inner('event_speaker', ev.speaker)
+
+            set_inner('event_venue', venue_dict[ev.venue])
+            set_inner('event_day', day_formatter(ev.start_date))
+            set_inner('event_time', time_formatter(ev.start_date))
+            set_inner('event_description', ev.description)
+
+            if (ev.type === 'workshop' && parseInt(ev.cost) > 0) {
+                var cost = '<strong>Cost:</strong> &pound;' + ev.cost;
+                set_inner('workshop_cost', cost)
+            }
+        };
+
+        emf_scheduler.close_popup = function close_popup() {
+            scheduler.endLightbox(false, document.getElementById("event_popup"));
+        }
+
+        /*
+         * Styles
+         */
+        // Set the date format
+        scheduler.config.default_date = day_format;
+        // Make it show 10 min slots
+        scheduler.config.first_hour = 8;
+        scheduler.config.hour_size_px = 132;
+        scheduler.config.separate_short_events = true;
+
+        // Format the tooltips
+        scheduler.templates.tooltip_text = function(start, end, event) {
+            return "<b>Event:</b> " + event.text + "<br/>"+
+                   "<b>Start date:</b> " + time_formatter(start) + "<br/>"+
+                   "<b>End date:</b> " + time_formatter(end) + "<br/>"+
+                   "<b>Venue:</b> " + venue_dict[event.venue];
+        };
+
+        scheduler.templates.event_class=function(start,end,event){
+            var res = [];
+
+            if (start < new Date() ) {
+                res.push('past_event');
+            }
+            if (event.is_fave ) {
+                res.push('favourite');
+            }
+            return res.join(' ');
+        }
+
+        scheduler.init('scheduler_here', start_date, "emf_weekend");
+        scheduler.parse(scheduleData, 'json');
     })();
   </script>
 {% endblock %}
