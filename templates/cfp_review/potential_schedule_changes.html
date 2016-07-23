@@ -42,10 +42,10 @@
             <a href="{{ url_for('.update_proposal', proposal_id=proposal.id) }}">{{proposal.title}}</a>
         </td>
         <td>
-            {{ proposal.scheduled_venue_name }}
+            {% if proposal.scheduled_venue_name %}{{ proposal.scheduled_venue_name }}{% endif %}
         </td>
         <td>
-            {{ proposal.scheduled_time.strftime('%A at %-I:%M %p') }}
+            {% if proposal.scheduled_time %}{{ proposal.scheduled_time.strftime('%A at %-I:%M %p') }}{% endif %}
         </td>
         <td>
             {{ proposal.potential_venue_name }}

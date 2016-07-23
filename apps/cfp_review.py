@@ -1048,7 +1048,9 @@ def potential_schedule_changes():
                 filter(Proposal.type.in_(['talk', 'workshop'])).all()
 
     for proposal in proposals:
-        proposal.scheduled_venue_name = Venue.query.filter_by(id=proposal.scheduled_venue).one().name
-        proposal.potential_venue_name = Venue.query.filter_by(id=proposal.potential_venue).one().name
+        if proposal.scheduled_venue:
+            proposal.scheduled_venue_name = Venue.query.filter_by(id=proposal.scheduled_venue).one().name
+        if proposal.potential_venue:
+            proposal.potential_venue_name = Venue.query.filter_by(id=proposal.potential_venue).one().name
 
     return render_template('cfp_review/potential_schedule_changes.html', proposals=proposals)
