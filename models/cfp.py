@@ -175,7 +175,7 @@ class Proposal(db.Model):
 
     # Reduces the time periods to the smallest contiguous set we can
     def make_periods_contiguous(self, time_periods):
-        if not time_periods
+        if not time_periods:
             return []
 
         time_periods.sort(key=lambda x: x.start)
