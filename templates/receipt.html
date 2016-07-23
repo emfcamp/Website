@@ -150,10 +150,18 @@
     {{ render_header() }}
     <h4>Parking ticket {{ loop.index }}</h4>
     <div class="vehicle-tickets">
-        <p>Present this page to the volunteers at the <b>main access gate</b> on your arrival.
+        <p>Please put this on your dashboard before arriving at EMF.
+           Volunteers at the <b>main access gate</b> will check it on your arrival.
            They will show you where to park and unload your stuff.</p>
         <p>For details on getting to the site, please visit
            <a href="https://wiki.emfcamp.org/wiki/Travel">our wiki page</a>.</p>
+        <p>If you fill in your number below we will try to contact you about
+           your vehicle in case of emergency.</p>
+        <div>&nbsp;</div>
+        <table style="height: 70px; width: 100%"><tr>
+           <td style="width: 300px; font-size: 30pt">Phone number</td>
+           <td style="border: 0.7mm solid black"></td>
+        </tr></table>
 
         {{ render_barcode() }}
 
