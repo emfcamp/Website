@@ -96,6 +96,9 @@ runscheduler:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py runscheduler
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py importschedulerdata
 
+applypotentialschedule:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py applypotentialschedule
+
 shell:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py shell
 

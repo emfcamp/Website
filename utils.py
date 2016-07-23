@@ -802,6 +802,47 @@ class RunScheduler(Command):
         sm = SlotMachine()
         sm.schedule(app.config['EVENT_START'], 'schedule.json', 'schedule.json')
 
+class ApplyPotentialSchedule(Command):
+    def run(self):
+        proposals = Proposal.query.filter(\
+            (Proposal.potential_venue.isnot(None) | Proposal.potential_time.isnot(None))).\
+            filter(Proposal.type.in_(['talk', 'workshop'])).all()
+
+        for proposal in proposals:
+            user = proposal.user
+
+            previously_unscheduled = True
+            if proposal.scheduled_venue or proposal.scheduled_time:
+                previously_unscheduled = False
+
+            if proposal.potential_venue:
+                proposal.scheduled_venue = proposal.potential_venue
+                proposal.potential_venue = None
+
+            if proposal.potential_time:
+                proposal.scheduled_time = proposal.potential_time
+                proposal.potential_time = None
+
+            venue_name = Venue.query.filter_by(id=proposal.scheduled_venue).one().name
+
+            if previously_unscheduled:
+                msg = Message("Your EMF %s has been scheduled ('%s')" % (proposal.type, proposal.title),
+                              sender=app.config['SPEAKERS_EMAIL'],
+                              recipients=[user.email])
+
+                msg.body = render_template("emails/cfp-slot-scheduled.txt", user=user, proposal=proposal, venue_name=venue_name)
+                app.logger.info('Emailing %s about proposal %s being scheduled', user.email, proposal.title)
+            else:
+                msg = Message("Your EMF %s slot has been moved ('%s')" % (proposal.type, proposal.title),
+                              sender=app.config['SPEAKERS_EMAIL'],
+                              recipients=[user.email])
+
+                msg.body = render_template("emails/cfp-slot-moved.txt", user=user, proposal=proposal, venue_name=venue_name)
+                app.logger.info('Emailing %s about proposal %s moving', user.email, proposal.title)
+
+            mail.send(msg)
+            db.session.commit()
+
 class SendEmails(Command):
     def run(self):
         with mail.connect() as conn:
@@ -852,5 +893,6 @@ if __name__ == "__main__":
     manager.add_command('outputschedulerdata', OutputSchedulerData())
     manager.add_command('importschedulerdata', ImportSchedulerData())
     manager.add_command('runscheduler', RunScheduler())
+    manager.add_command('applypotentialschedule', ApplyPotentialSchedule())
 
     manager.run()

@@ -1,0 +1,20 @@
+Hi {{ proposal.user.name }},
+
+Unfortunately we have had to move your EMF {{ proposal.type }}. We've done our best to minimise the amount of hassle it will cause you.
+
+You now have a {{ proposal.scheduled_duration }} minute slot in {{ venue_name }} on {{ proposal.scheduled_time.strftime('%A at %-I:%M %p') }}. If this is not suitable, please let us know as soon as possible.
+
+Things to note:
+
+* If you have any special requirements and have not spoken to our speaker ops team about them, please get in touch.
+
+* Please report to the Green Room 30 minutes before your {{ proposal.type }} so that the speaker ops team can make sure everything is ready for you, and your {{ proposal.type}} will go as smoothly as possible!
+
+* It is possible that we may have to reschedule your {{ proposal.type }} before the event starts, so please make sure you've told us when you can speak in your final details: https://www.emfcamp.org/login?next=%2Fcfp%2Fproposals%2F{{ proposal.id }}%2Ffinalise
+
+* You can also update your talk title and description at any time using the link above, so make sure it sounds great!
+
+* While you are allowed on-stage Q&A within your slot, we would prefer it if you asked the audience to meet you somewhere afterwards to discuss it.
+
+Apologies for having to make this change,
+The EMF Speaker Ops Team
