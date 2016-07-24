@@ -46,12 +46,14 @@
                                 <a role="menuitem" href="{{ url_for('cfp.main') }}">Call for Participation</a>
                             </li>
                         {% endif %}
+                        {% if feature_enabled('SCHEDULE') %}
                             <li role="presentation">
                                 <a role="menuitem" href="{{ url_for('schedule.line_up') }}">Line-up</a>
                             </li>
                             <li role="presentation">
                                 <a role="menuitem" href="{{ url_for('schedule.main') }}">Schedule</a>
                             </li>
+                        {% endif %}
                             <li role="presentation">
                                 <a role="menuitem" href="{{ url_for('base.sponsors') }}">Sponsors</a>
                             </li>
