@@ -1054,3 +1054,56 @@ def potential_schedule_changes():
             proposal.potential_venue_name = Venue.query.filter_by(id=proposal.potential_venue).one().name
 
     return render_template('cfp_review/potential_schedule_changes.html', proposals=proposals)
+
+@cfp_review.route('/scheduler')
+@admin_required
+def scheduler():
+    proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
+	filter(Proposal.state.in_(['finished', 'accepted'])).\
+	filter(Proposal.type.in_(['talk', 'workshop'])).all()
+
+    schedule_data = []
+    for proposal in proposals:
+	export = {
+	    'id': proposal.id,
+	    'duration': proposal.scheduled_duration,
+            'is_potential': False,
+	    'speakers': [ proposal.user.id ],
+	    'text': proposal.title,
+	    'valid_venues': [ v.id for v in proposal.get_allowed_venues() ],
+	    'valid_time_ranges': [
+		{"start": str(p.start), "end": str(p.end)} for p in proposal.get_allowed_time_periods_with_default()
+	    ],
+	}
+
+	if proposal.scheduled_venue:
+	    export['venue'] = proposal.scheduled_venue
+	if proposal.potential_venue:
+	    export['venue'] = proposal.potential_venue
+            export['is_potential'] = True
+
+	if proposal.scheduled_time:
+	    export['start_date'] = proposal.scheduled_time
+	if proposal.potential_time:
+	    export['start_date'] = proposal.potential_time
+            export['is_potential'] = True
+
+	if 'start_date' in export:
+            export['end_date'] = export['start_date'] + timedelta(minutes=proposal.scheduled_duration)
+            export['start_date'] = str(export['start_date'])
+            export['end_date'] = str(export['end_date'])
+
+	schedule_data.append(export)
+
+    venues = [{'key': v.id, 'label': v.name} for v in Venue.query.all()]
+
+    return render_template('cfp_review/scheduler.html', venues=venues, schedule_data=schedule_data)
+
+@cfp_review.route('/scheduler_update', methods=['GET', 'POST'])
+@admin_required
+def scheduler_update():
+    proposal = Proposal.query.filter_by(id=request.form['id']).one()
+    proposal.potential_time = dateutil.parser.parse(request.form['time']).replace(tzinfo=None)
+    proposal.potential_venue = request.form['venue']
+    db.session.commit()
+    return "OK", 200
