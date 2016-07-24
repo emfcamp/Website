@@ -13,6 +13,7 @@ from main import db
 
 from .common import feature_flag
 from models.cfp import Proposal, Venue
+from models.ical import ICalSource
 
 schedule = Blueprint('schedule', __name__)
 
@@ -47,9 +48,19 @@ def main():
 
     # {id:1, text:"Meeting",   start_date:"04/11/2013 14:00",end_date:"04/11/2013 17:00"}
     schedule_data = _get_scheduled_proposals()
-    schedule_data = [add_event(e) for e in schedule_data]
 
     venues = [{'key': v.id, 'label': v.name} for v in Venue.query.all()]
+
+    ical_sources = ICalSource.query.filter_by(enabled=True).all()
+    ical_data = []
+
+    for source in ical_sources:
+        ical_data = ical_data + source.get_ical_feed()
+        venues.append({ 'key': source.venue, 'label': source.venue })
+
+    schedule_data = schedule_data + ical_data
+
+    schedule_data = [add_event(e) for e in schedule_data]
 
     return render_template('schedule/user_schedule.html', venues=venues,
                             schedule_data=schedule_data)

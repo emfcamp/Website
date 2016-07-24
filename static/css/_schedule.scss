@@ -82,6 +82,12 @@ html, body{
     background-color: rgba($schedule-block, 85%);
 }
 
+// Style the 'scroll venue' next/previous buttons to draw attention to them
+.dhx_scale_bar .dhx_cal_prev_button,
+.dhx_scale_bar .dhx_cal_next_button {
+    background-color: lighten($schedule-block, 60%)
+}
+
 .dhx_cal_container .dhx_cal_data .dhx_scale_holder .dhx_cal_event {
     &.past_event div {
         background-color: rgba($schedule-block, 60%);

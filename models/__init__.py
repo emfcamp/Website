@@ -10,5 +10,6 @@ from ticket import *  # noqa
 from cfp import *  # noqa
 from permission import *  # noqa
 from email import *  # noqa
+from ical import *  # noqa
 
 db.configure_mappers()

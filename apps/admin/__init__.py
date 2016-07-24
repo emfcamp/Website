@@ -25,7 +25,7 @@ from models.ticket import (
     Ticket, TicketCheckin, TicketType
 )
 from models.cfp import Proposal
-from models.schedule import ICalSource
+from models.ical import ICalSource
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
 from models.site_state import SiteState, VALID_STATES, refresh_states
 from ..common import require_permission

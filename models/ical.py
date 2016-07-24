@@ -1,5 +1,5 @@
 import requests
-from icalendar import Calendar, Event
+from icalendar import Calendar
 
 from main import db, cache
 
@@ -21,5 +21,23 @@ class ICalSource(db.Model):
 
     @cache.memoize(timeout=300)
     def get_ical_feed(self):
-        res = requests.get(self.url)
+        request = requests.get(self.url)
+        if request.status_code != 200:
+            return []
+
+        cal = Calendar.from_ical(request.text)
+        res = []
+        for component in cal.walk():
+            if component.name == 'VEVENT':
+                event = {
+                    'start_date': component.get('dtstart').dt,
+                    'end_date': component.get('dtend').dt,
+                    'title': component.get('summary').decode(),
+                    'description': component.get('description').decode(),
+                    'venue': self.venue,
+                    'id': component.get('uid').decode(),
+                }
+
+                res.append(event)
+
         return res
