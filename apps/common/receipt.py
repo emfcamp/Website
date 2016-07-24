@@ -21,7 +21,7 @@ def render_receipt(user, png=False, pdf=False):
                   .join(TicketType)
                   .order_by(TicketType.order))
 
-    entrance_tts_counts = (tickets.filter(TicketType.admits.in_(['full', 'kids']))
+    entrance_tts_counts = (tickets.filter(TicketType.admits.in_(['full', 'kid']))
         .with_entities(TicketType, func.count(Ticket.id).label('ticket_count'))
         .group_by(TicketType).all())
     entrance_tickets_count = sum(c for tt, c in entrance_tts_counts)
@@ -30,7 +30,9 @@ def render_receipt(user, png=False, pdf=False):
 
     transferred_tickets = user.transfers_from.order_by('timestamp').all()
 
-    tees = tickets.filter(TicketType.fixed_id.in_(range(14, 24))).all()  # t-shirts
+    tees = (tickets.filter(TicketType.fixed_id.in_(range(14, 24)))
+                  .with_entities(TicketType, func.count(Ticket.id).label('ticket_count'))
+                  .group_by(TicketType).all())  # t-shirts
 
     return render_template('receipt.html', user=user,
                            format_inline_qr=format_inline_qr,

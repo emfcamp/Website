@@ -110,6 +110,7 @@
     {{ render_header() }}
     <h3>{{ user.name }} &ndash; {{ user.email }}</h3>
 
+    {% if entrance_tts_counts %}
     <h4>{{ entrance_tickets_count }} entrance ticket{{ entrance_tickets_count != 1 and 's' or '' }}</h4>
     <div class="entrance-tickets">
         <p>Present the code above to the volunteers at the <b>camp entrance gate</b> on your arrival.
@@ -119,18 +120,40 @@
            for an Electromagnetic Field 2016 badge.
            {% if tees %} Prepaid t-shirts will be available at the entrance gate when announced. {% endif %}
         </p>
+
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
+
+    {% else %}
+    <div class="entrance-tickets">
+        <p>Your account does not have any associated entrance tickets. This ticket will not allow you to enter
+           the event.</p>
+        <p>Once inside the camp, prepaid t-shirts will be available at the entrance gate when announced.</p>
+
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
+
+    {% endif %}
+
         {{ render_barcode() }}
 
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
+
+        {% if entrance_tts_counts %}
         <div>&nbsp;</div>
 
         <h4>Your ticket details</h4>
         {% for tt, ticket_count in entrance_tts_counts %}
         <div class="ticket-type">{{ ticket_count }} {{ tt.name }}</div>
         {% endfor %}
-
-        <div>&nbsp;</div>
+        {% endif %}
 
         {% if transferred_tickets %}
+        <div>&nbsp;</div>
+
         <h4>Your transferred tickets</h4>
         <p>You have transferred {{ transferred_tickets|count }} ticket{{ transferred_tickets|count != 1 and 's' or '' }},
            which we&rsquo;ve sent out in a separate PDF.
@@ -138,6 +161,15 @@
         </p>
         {% for t in transferred_tickets %}
         <div class="ticket-transfer">{{ t.to_user.name }}: {{ t.ticket.type.name }}</div>
+        {% endfor %}
+        {% endif %}
+
+        {% if tees %}
+        <div>&nbsp;</div>
+
+        <h4>Your purchase details</h4>
+        {% for tt, ticket_count in tees %}
+        <div class="ticket-type">{{ ticket_count }} {{ tt.name }}</div>
         {% endfor %}
         {% endif %}
     </div>
@@ -161,8 +193,13 @@
         <p style="padding-bottom: 14px">If you fill in your number below we will try to contact you about
            your vehicle in case of emergency.</p>
 
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
+
         {{ render_barcode() }}
 
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
         <div>&nbsp;</div>
 
         <h4>Your ticket details</h4>
