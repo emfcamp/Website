@@ -361,8 +361,8 @@ class SendTickets(Command):
             TicketType.admits.in_(['full', 'kid', 'car', 'campervan']),
             TicketType.fixed_id.in_(range(14, 24))))
 
-        users = tickets.filter(Ticket.emailed == False).join(User) \
-                       .group_by(User).with_entities(User).order_by(User.id)
+        users = (tickets.filter(Ticket.emailed == False).join(User)  # noqa
+                        .group_by(User).with_entities(User).order_by(User.id))
 
         for user in users:
             user_tickets = tickets.filter(User.id == user.id)
