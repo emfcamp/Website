@@ -1,9 +1,19 @@
 {% from "_formhelpers.html" import render_field  %}
 {% extends "admin/base.html" %}
 {% set nav_active = 'schedule-feeds' %}
-{% block title %}{{ feed.name }}{% endblock %}
+{% block title %}
+{%- if feed -%}
+    Edit Feed - {{ feed.name }}
+{%- else -%}
+    New Feed
+{%- endif -%}
+{% endblock %}
 {% block body %}
-<h2>Edit Feed - {{ feed.name }}</h2>
+{% if feed %}
+    <h2>Edit Feed - {{ feed.name }}</h2>
+{% else %}
+    <h2>New Feed</h2>
+{% endif %}
 
 <form method="POST">
     {{ form.hidden_tag() }}

@@ -250,8 +250,8 @@ class ScheduleForm(Form):
     enabled = BooleanField('Enabled')
     phone = TelField('Phone')
     email = StringField('Email')
-    lat = FloatField('lat')
-    lon = FloatField('lon')
+    lat = FloatField('lat', [Optional()])
+    lon = FloatField('lon', [Optional()])
 
     submit = SubmitField('Save')
 
@@ -293,6 +293,22 @@ def feed(feed_id):
     form.init_from_feed(feed)
 
     return render_template('admin/edit-feed.html', feed=feed, form=form)
+
+@admin.route('/schedule-feeds/new', methods=['GET', 'POST'])
+@admin_required
+def new_feed():
+    form = ScheduleForm()
+
+    if form.validate_on_submit():
+        feed = ICalSource()
+        form.update_feed(feed)
+        db.session.add(feed)
+        db.session.commit()
+        msg = "Created feed %s" % feed.name
+        flash(msg)
+        app.logger.info(msg)
+        return redirect(url_for('.feed', feed_id=feed.id))
+    return render_template('admin/edit-feed.html', form=form)
 
 from . import payments  # noqa
 from . import tickets  # noqa
