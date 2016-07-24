@@ -47,7 +47,7 @@
 {# Template for the popup #}
 <div id="event_popup" class="event_popup">
     <div><h3>
-        <span id="event_title"></span>
+        <a id="title_link"><span id="event_title"></span></a>
         <small>By: <span id="event_speaker"></span></small>
     </h3></div>
 
@@ -57,7 +57,15 @@
     <div><span id="workshop_cost"></span></div>
 
     <div class="scroll_box"><span id="event_description"></span></div>
+
     <button class="btn pull-right" onClick="emf_scheduler.close_popup()">Close</button>
+    <form id="favourite_form" method="post" action="">
+        <input id="csrf_token" name=_csrf_token type=hidden value="{{ csrf_token() }}">
+        <button class="btn btn-primary pull-right debouncel" onClick="emf_scheduler.favourite(); return false;">
+            <i id="favourite_icon" class="glyphicon"></i>
+            Favourite
+        </button>
+    </form>
 </div>
 
 {# Actual schedule bit #}
@@ -89,7 +97,8 @@
             venue_dict = {},
             day_format = "%D, %jth",   // e.g. Friday, 5th
             day_formatter = scheduler.date.date_to_str(day_format),
-            time_formatter = scheduler.date.date_to_str("%H:%i"); // e.g. 22:33
+            time_formatter = scheduler.date.date_to_str("%H:%i"), // e.g. 22:33
+            debounce = false;
 
         // Easily retrieve venue name from its ID
         for(var i = 0; i<venues.length; i++){
@@ -179,17 +188,24 @@
          * Custom popup
          */
 
-
-        var set_inner = function (id, text) {
-            var element = document.getElementById(id);
-            element.innerHTML = text;
-        };
+        var get_ele = function (id) { return document.getElementById(id); },
+            popup_event;
 
         scheduler.showLightbox = function(id) {
-            var ev = scheduler.getEvent(id);
+            function set_inner(id, text) {
+                var element = get_ele(id);
+                element.innerHTML = text;
+            }
+            var ev = scheduler.getEvent(id),
+                fave = get_ele('favourite_icon'),
+                link = get_ele('title_link'),
+                form = get_ele('favourite_form'),
+                ev_href = "{{ url_for('.line_up') }}" + '/' + ev.id;
 
+            // Open the popup
             scheduler.startLightbox(id, document.getElementById("event_popup"));
 
+            // Set the basic details
             set_inner('event_title', ev.title)
             set_inner('event_speaker', ev.speaker)
 
@@ -199,13 +215,53 @@
             set_inner('event_description', ev.description)
 
             if (ev.type === 'workshop' && parseInt(ev.cost) > 0) {
-                var cost = '<strong>Cost:</strong> &pound;' + ev.cost;
-                set_inner('workshop_cost', cost)
+                set_inner('workshop_cost',
+                          '<strong>Cost:</strong> &pound;' + ev.cost)
             }
+
+            // Set the link and indicate whether this is a faved event
+            link.href = ev_href;
+            form.action = ev_href;
+            fave.className = ev.is_fave ? "glyphicon glyphicon-star" :
+                                          "glyphicon glyphicon-star-empty";
+
+            popup_event = ev;
         };
 
+        function _close_popup(){
+            scheduler.endLightbox(false, get_ele("event_popup"));
+            popup_event = null;
+        }
+
         emf_scheduler.close_popup = function close_popup() {
-            scheduler.endLightbox(false, document.getElementById("event_popup"));
+            _close_popup();
+        }
+
+        emf_scheduler.favourite = function close_popup() {
+            if (debounce) {
+                _close_popup();
+                return;
+            }
+
+            var http = new XMLHttpRequest(),
+                form = get_ele('favourite_form'),
+                csrf = get_ele('csrf_token'),
+                event = popup_event.id;
+
+            http.open("POST", form.action, true);
+            http.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+
+            var params = csrf.name + '=' + csrf.value;
+            http.send(params);
+            debounce = true;
+            setTimeout(function() {
+                debounce = false;
+            }, 250);
+
+            popup_event.is_fave = !popup_event.is_fave;
+
+            scheduler.updateEvent(popup_event.id);
+            scheduler.endLightbox(false, get_ele("event_popup"));
         }
 
         /*

@@ -3,7 +3,7 @@ import json
 
 from flask import (
     Blueprint, render_template, redirect, url_for, flash,
-    request, Response
+    request, Response, abort
 )
 from flask.ext.login import current_user
 from icalendar import Calendar, Event
@@ -11,7 +11,6 @@ from icalendar import Calendar, Event
 from main import db
 
 from .common import feature_flag
-from .common.forms import Form
 from models.cfp import Proposal, Venue
 
 schedule = Blueprint('schedule', __name__)
@@ -105,22 +104,16 @@ def favourites():
 
     return render_template('schedule/favourites.html', proposals=proposals)
 
-class FavouriteProposalForm(Form):
-    pass
-
 @schedule.route('/line-up/<int:proposal_id>', methods=['GET', 'POST'])
 @feature_flag('SCHEDULE')
 def line_up_proposal(proposal_id):
     proposal = Proposal.query.get_or_404(proposal_id)
-    form = FavouriteProposalForm()
 
     if not current_user.is_anonymous():
         is_fave = proposal in current_user.favourites
     else:
         is_fave = False
 
-    # Use the form for CSRF token but explicitly check for post requests as
-    # an empty form is always valid
     if (request.method == "POST") and not current_user.is_anonymous():
         if is_fave:
             current_user.favourites.remove(proposal)
@@ -132,5 +125,5 @@ def line_up_proposal(proposal_id):
         flash(msg)
         return redirect(url_for('.line_up_proposal', proposal_id=proposal.id))
 
-    return render_template('schedule/line-up-proposal.html', form=form,
+    return render_template('schedule/line-up-proposal.html',
                            proposal=proposal, is_fave=is_fave)
