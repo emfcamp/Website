@@ -3,7 +3,7 @@ import json
 
 from flask import (
     Blueprint, render_template, redirect, url_for, flash,
-    request, Response, abort
+    request, Response
 )
 from flask.ext.login import current_user
 from icalendar import Calendar, Event
