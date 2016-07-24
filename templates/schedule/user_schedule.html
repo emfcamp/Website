@@ -1,10 +1,10 @@
 {% extends "base.html" %}
-{% block title %}EMF 2016 Schedule{% endblock %}
+{% block title %}Schedule{% endblock %}
 {% block head %}
+  {% assets 'css_schedule' %}
+  <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+  {% endassets %}
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dhtmlxscheduler_flat.css' ) }}">
-  <style type="text/css" media="screen">
-
-  </style>
 {% endblock %}
 {% block document %}
 {# Banner bar #}

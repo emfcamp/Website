@@ -66,6 +66,10 @@ assets.register('css_receipt', Bundle('css/receipt.scss',
                 output='gen/print-packed.css',
                 depends='css/*.scss',
                 filters='pyscss,cssmin'))
+assets.register('css_schedule', Bundle('css/schedule.scss',
+                output='gen/schedule-packed.css',
+                depends='css/*.scss',
+                filters='pyscss,cssmin'))
 assets.register('css_arrivals', Bundle('css/arrivals.scss',
                 output='gen/arrivals-packed.css',
                 depends='css/*.scss',
