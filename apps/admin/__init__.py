@@ -3,14 +3,14 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 from datetime import datetime, timedelta
 
 from flask import (
-    render_template, redirect, request,
+    render_template, redirect, request, flash,
     url_for, current_app as app, Blueprint
 )
 
-from wtforms.validators import Optional, Required
+from wtforms.validators import Optional, Required, URL
 from wtforms import (
-    SubmitField, BooleanField, HiddenField,
-    FieldList, FormField, SelectField,
+    SubmitField, BooleanField, HiddenField, StringField,
+    FieldList, FormField, SelectField, FloatField
 )
 
 from sqlalchemy.sql.functions import func
@@ -25,10 +25,11 @@ from models.ticket import (
     Ticket, TicketCheckin, TicketType
 )
 from models.cfp import Proposal
+from models.schedule import ICalSource
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
 from models.site_state import SiteState, VALID_STATES, refresh_states
 from ..common import require_permission
-from ..common.forms import Form
+from ..common.forms import Form, TelField
 
 admin = Blueprint('admin', __name__)
 
@@ -235,6 +236,63 @@ def site_states():
         return redirect(url_for('.site_states'))
 
     return render_template('admin/site-states.html', form=form)
+
+@admin.route('/schedule-feeds')
+@admin_required
+def schedule_feeds():
+    feeds = ICalSource.query.all()
+    return render_template('admin/schedule-feeds.html', feeds=feeds)
+
+class ScheduleForm(Form):
+    feed_name = StringField('Name', [Required()])
+    venue = StringField('Venue', [Required()])
+    url = StringField('iCal URL', [Required(), URL()])
+    enabled = BooleanField('Enabled')
+    phone = TelField('Phone')
+    email = StringField('Email')
+    lat = FloatField('lat')
+    lon = FloatField('lon')
+
+    submit = SubmitField('Save')
+
+    def update_feed(self, feed):
+        feed.name = self.feed_name.data
+        feed.venue = self.venue.data
+        feed.enabled = self.enabled.data
+        feed.url = self.url.data
+        feed.contact_phone = self.phone.data
+        feed.contact_email = self.email.data
+        feed.lat = self.lat.data
+        feed.lon = self.lon.data
+
+    def init_from_feed(self, feed):
+        self.feed_name.data = feed.name
+        self.venue.data = feed.venue
+        self.enabled.data = feed.enabled
+        self.url.data = feed.url
+        self.phone.data = feed.contact_phone
+        self.email.data = feed.contact_email
+        self.lat.data = feed.lat
+        self.lon.data = feed.lon
+
+
+@admin.route('/schedule-feeds/<int:feed_id>', methods=['GET', 'POST'])
+@admin_required
+def feed(feed_id):
+    feed = ICalSource.query.get_or_404(feed_id)
+    form = ScheduleForm()
+
+    if form.validate_on_submit():
+        form.update_feed(feed)
+        db.session.commit()
+        msg = "Updated feed %s" % feed.name
+        flash(msg)
+        app.logger.info(msg)
+        return redirect(url_for('.feed', feed_id=feed_id))
+
+    form.init_from_feed(feed)
+
+    return render_template('admin/edit-feed.html', feed=feed, form=form)
 
 from . import payments  # noqa
 from . import tickets  # noqa

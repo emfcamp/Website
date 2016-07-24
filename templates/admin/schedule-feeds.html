@@ -1,0 +1,29 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'schedule-feeds' %}
+{% block body %}
+<h2>ICal feeds</h2>
+<p>
+    These are external feeds to use in the schedule.
+</p>
+
+<table class="table table-condensed">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Venue</th>
+            <th>Email</th>
+            <th>Phone</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for f in feeds %}
+        <tr>
+            <td><a href="{{ url_for('.feed', feed_id=f.id) }}">{{ f.name }}</a></td>
+            <td>{{ f.venue }}</td>
+            <td>{{ f.contact_email }}</td>
+            <td>{{ f.contact_phone }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

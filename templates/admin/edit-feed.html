@@ -1,0 +1,26 @@
+{% from "_formhelpers.html" import render_field  %}
+{% extends "admin/base.html" %}
+{% set nav_active = 'schedule-feeds' %}
+{% block title %}{{ feed.name }}{% endblock %}
+{% block body %}
+<h2>Edit Feed - {{ feed.name }}</h2>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="checkbox"><label>
+        {{ form.enabled(class_="checkbox") }} Enabled
+    </label></div>
+
+    {{ render_field(form.feed_name, true) }}
+    {{ render_field(form.venue, true) }}
+    {{ render_field(form.url, true) }}
+    {{ render_field(form.phone, true) }}
+    {{ render_field(form.email, true) }}
+    {{ render_field(form.lat, true) }}
+    {{ render_field(form.lon, true) }}
+
+    {{ form.submit(class_="btn btn-success") }}
+    <a class="btn" href="{{ url_for('.schedule_feeds') }}">Back</a>
+</form>
+{% endblock %}
