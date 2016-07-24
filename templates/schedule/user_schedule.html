@@ -40,7 +40,7 @@
                     </li>
                 {% endif %}
                 <li role="presentation">
-                    <a role="menuitem" href="{{ url_for('.line_up') }}">Line-up</a>
+                    <a role="menuitem" href="{{ url_for('schedule.line_up') }}">Line-up</a>
                 </li>
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('schedule.main') }}">Schedule</a>
@@ -154,6 +154,24 @@
             list:venues,
             days: 3,
         });
+
+        // Clamp day view
+        scheduler.date.add_emf_day = function (day, inc) {
+            var res = scheduler.date.add(day, inc, "day"),
+                last_day = new Date(end_date);
+
+            // end date is Monday (to set inclusive ranges) last day is Sunday
+            last_day.setUTCDate(end_date.getUTCDate() - 1);
+
+            // Test on the date value so we can compare using less/greater than
+            // or equals
+            if (res.getUTCDate() <= start_date.getUTCDate()) {
+                return start_date;
+            } else if (res.getUTCDate() >= last_day.getUTCDate()) {
+                return last_day;
+            }
+            return res;
+        }
 
         // Make sure in weekend view you can't scroll away
         scheduler.date.add_emf_weekend = function (date,inc) {
@@ -283,15 +301,13 @@
             _close_popup();
         }
 
-        emf_scheduler.favourite = function () {
-            if (debounce) {
-                _close_popup();
-                return;
-            }
+        emf_scheduler.favourite = function favourite() {
+            if (debounce) { return; }
 
             var http = new XMLHttpRequest(),
                 form = get_ele('favourite_form'),
                 csrf = get_ele('csrf_token'),
+                fave = get_ele('favourite_icon'),
                 event = popup_event.id;
 
             http.open("POST", form.action, true);
@@ -306,8 +322,10 @@
 
             popup_event.is_fave = !popup_event.is_fave;
 
+            fave.className = popup_event.is_fave ? "glyphicon glyphicon-star" :
+                                                   "glyphicon glyphicon-star-empty";
+
             scheduler.updateEvent(popup_event.id);
-            scheduler.endLightbox(false, get_ele("event_popup"));
         }
 
 		$(document).keyup(function(e){
