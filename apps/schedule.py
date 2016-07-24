@@ -68,7 +68,7 @@ def schedule_json():
 @feature_flag('SCHEDULE')
 def schedule_ical():
     schedule = _get_scheduled_proposals()
-    title = 'EMF 2014'
+    title = 'EMF 2016'
 
     cal = Calendar()
     cal.add('summary', title)
