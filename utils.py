@@ -13,8 +13,8 @@ from flask.ext.script import Command, Manager, Option
 from flask.ext.migrate import MigrateCommand
 from flask import render_template, current_app as app
 from flask_mail import Message
+from sqlalchemy import or_, func
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy.sql.functions import func
 
 from main import create_app, mail, db
 from models import (
@@ -357,16 +357,15 @@ class SendTransferReminder(Command):
 class SendTickets(Command):
 
     def run(self):
-        tickets = Ticket.query.filter_by(paid=True).join(TicketType) \
-                        .filter(or_(
-                             TicketType.admits.in_(['full', 'kid', 'car', 'campervan']),
-                             TicketType.fixed_id.in_(range(14, 24))))
-        users = tickets.filter_by(emailed=False).join(User) \
-                            .group_by(User).with_entities(User).order_by(User.id)
-        users = User.query.filter_by(email='marksteward@gmail.com')
+        tickets = Ticket.query.filter_by(paid=True).join(TicketType).filter(or_(
+            TicketType.admits.in_(['full', 'kid', 'car', 'campervan']),
+            TicketType.fixed_id.in_(range(14, 24))))
+
+        users = tickets.filter(Ticket.emailed == False).join(User) \
+                       .group_by(User).with_entities(User).order_by(User.id)
 
         for user in users:
-            user_tickets = tickets.filter_by(user_id=user.id)
+            user_tickets = tickets.filter(User.id == user.id)
             plural = (tickets.count() != 1 and 's' or '')
 
             msg = Message("Your Electromagnetic Field Ticket%s" % plural,
@@ -377,7 +376,7 @@ class SendTickets(Command):
 
             attach_tickets(msg, user)
 
-            app.logger.info('Emailing %s receipt for %s tickets', user.email, tickets.count())
+            app.logger.info('Emailing %s receipt for %s tickets', user.email, user_tickets.count())
             mail.send(msg)
 
             db.session.commit()
