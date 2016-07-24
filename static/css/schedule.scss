@@ -10,30 +10,46 @@ html, body{
 
 .event_popup {
     position: absolute;
-    top: 500px;
-    // bottom: 100px;
-    left: 150px;
-    right: 150px;
     z-index: 100001;
     display: none;
     color: $main-background;
     background-color: white;
     border: 2px outset gray;
-    padding: 20px;
-    font-size: 14pt;
     h3 {
         color: $main-background;
     }
     .scroll_box {
-        max-height: 300px;
         overflow-y: scroll;
         margin-top: 10px;
         margin-bottom: 10px;
     }
 }
 
-.schedule-banner .banner-text {
-    padding-right: 20px;
+@media (max-width: 768px) {
+.event_popup {
+    top: 100px;
+    left: 50px;
+    right: 50px;
+    padding: 10px;
+    font-size: 12pt;
+}
+}
+
+@media (min-width: 768px) {
+.event_popup {
+    top: 325px;
+    left: 150px;
+    right: 150px;
+    padding: 20px;
+    font-size: 14pt;
+}
+}
+
+.schedule-banner {
+    margin-bottom: 0;
+    .banner-text {
+        padding-right: 20px;
+    }
 }
 
 .dhx_cal_container .dhx_cal_data .dhx_scale_holder .dhx_cal_event div {
@@ -55,15 +71,41 @@ html, body{
         background-color: rgba(lighten($schedule-block, 13%), 70%);
     }
 }
-
-#emf_weekend_tab { // Scheduler sets position on the element
-    left: 100px !important;
+@media (max-width: 768px) {
+    .dhx_cal_navline .dhx_cal_tab {
+        width: auto;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .dhx_cal_container .dhx_cal_navline .dhx_cal_date {
+        font-size: 15px;
+    }
+    .dhx_cal_today_button {
+        display: none;
+    }
+    #emf_day_tab {
+        font-size: 12px;
+        left: 5px !important;
+    }
+    #emf_weekend_tab {
+        font-size: 12px;
+        left: 50px !important;
+    }
 }
 
-#emf_day_tab { // Scheduler sets position on the element
-    left: 20px !important;
+@media (min-width: 768px) {
+    .dhx_cal_navline .dhx_cal_tab {
+        width: 70px;
+    }
+    #emf_day_tab {
+        font-size: 14px;
+        left: 20px !important;
+    }
+    #emf_weekend_tab {
+        font-size: 14px;
+        left: 110px !important;
+    }
 }
-
 .dhx_cal_container .dhx_cal_tab,
 .dhx_cal_container .dhx_cal_prev_button,
 .dhx_cal_container .dhx_cal_next_button,

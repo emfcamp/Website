@@ -31,7 +31,8 @@ def main():
     if request.headers.get('Content-Type') == 'text/calendar':
         return schedule_ical()
 
-    favourites = [f.id for f in current_user.favourites]
+    favourites = [f.id for f in current_user.favourites] if not current_user.is_anonymous()\
+                                                         else []
 
     def add_event(event):
         event['text'] = event['title']

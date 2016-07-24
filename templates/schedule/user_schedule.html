@@ -8,38 +8,48 @@
 {% endblock %}
 {% block document %}
 {# Banner bar #}
-<header role="banner" class="schedule-banner">
-    <h1 aria-label="Electromagnetic Field">
-        <a href="/"><div id="logo" alt="Electromagnetic Field"></div></a>
-    </h1>
-    <div id="header-text" class="banner-text">August 5<sup>th</sup>&ndash;7<sup>th</sup> 2016<br/>
-         Guildford, UK</div>
+<header role="banner" id="header" class="schedule-banner navbar navbar-default">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+        <h1 aria-label="Electromagnetic Field">
+            <a href="/"><div id="logo" alt="Electromagnetic Field"></div></a>
+        </h1>
+        <div id="header-text" class="banner-text">August 5<sup>th</sup>&ndash;7<sup>th</sup> 2016<br/>
+             Guildford, UK</div>
 
-    <div id="menu-container" class="banner-text" role="navigation" aria-label="main navigation">
-        <ul class="menu" role="menu">
-            <li role="presentation">
-                <a role="menuitem" href="{{ url_for('base.about') }}">About</a>
-            </li>
-            {% if SITE_STATE == 'sales' and SALES_STATE == 'available' %}
+        <div id="menu-container" class="banner-text" role="navigation" aria-label="main navigation">
+            <ul class="menu" role="menu">
                 <li role="presentation">
-                    <a role="menuitem" href="{{ url_for('tickets.choose') }}">Tickets</a>
+                    <a role="menuitem" href="{{ url_for('base.about') }}">About</a>
                 </li>
-            {% endif %}
-            {% if feature_enabled('CFP') and not config.get('CFP_CLOSED') %}
+                {% if SITE_STATE == 'sales' and SALES_STATE == 'available' %}
+                    <li role="presentation">
+                        <a role="menuitem" href="{{ url_for('tickets.choose') }}">Tickets</a>
+                    </li>
+                {% endif %}
+                {% if feature_enabled('CFP') and not config.get('CFP_CLOSED') %}
+                    <li role="presentation">
+                        <a role="menuitem" href="{{ url_for('cfp.main') }}">Call for Participation</a>
+                    </li>
+                {% endif %}
                 <li role="presentation">
-                    <a role="menuitem" href="{{ url_for('cfp.main') }}">Call for Participation</a>
+                    <a role="menuitem" href="{{ url_for('.line_up') }}">Line-up</a>
                 </li>
-            {% endif %}
-            <li role="presentation">
-                <a role="menuitem" href="{{ url_for('.line_up') }}">Line-up</a>
-            </li>
-            <li role="presentation">
-                <a role="menuitem" href="{{ url_for('schedule.main') }}">Schedule</a>
-            </li>
-            <li role="presentation">
-                <a role="menuitem" href="{{ url_for('base.sponsors') }}">Sponsors</a>
-            </li>
-        </ul>
+                <li role="presentation">
+                    <a role="menuitem" href="{{ url_for('schedule.main') }}">Schedule</a>
+                </li>
+                <li role="presentation">
+                    <a role="menuitem" href="{{ url_for('base.sponsors') }}">Sponsors</a>
+                </li>
+            </ul>
+        </div>
     </div>
     <div style="clear:both"></div>
 </header>
@@ -56,12 +66,12 @@
     </div>
     <div><span id="workshop_cost"></span></div>
 
-    <div class="scroll_box"><span id="event_description"></span></div>
+    <div class="scroll_box" id="scroll_box" style=""><span id="event_description"></span></div>
 
     <button class="btn pull-right" onClick="emf_scheduler.close_popup()">Close</button>
     <form id="favourite_form" method="post" action="">
         <input id="csrf_token" name=_csrf_token type=hidden value="{{ csrf_token() }}">
-        <button class="btn btn-primary pull-right debouncel" onClick="emf_scheduler.favourite(); return false;">
+        <button id="favourite_btn" class="btn btn-primary pull-right debouncel" onClick="emf_scheduler.favourite(); return false;">
             <i id="favourite_icon" class="glyphicon"></i>
             Favourite
         </button>
@@ -92,6 +102,7 @@
         'use strict';
         var scheduleData = {{ schedule_data | tojson }},
             venues = {{ venues | tojson }},
+            is_anonymous = {% if current_user.is_anonymous() -%} true {%- else -%} false {%- endif %},
             start_date = new Date(2016, 7, 5),
             end_date = new Date(2016, 7, 8),
             venue_dict = {},
@@ -187,6 +198,27 @@
         /*
          * Custom popup
          */
+        scheduler.showCover = function showCover(box){
+            var view_height = window.innerHeight||document.documentElement.clientHeight,
+                header_offset = get_ele('header').offsetTop,
+                header_height = get_ele('header').offsetHeight + header_offset,
+                schedule_height = get_ele('scheduler_here').offsetHeight,
+                margin = view_height > 800 ? 150 : 50;
+
+            if (box){
+                box.style.display="block";
+
+                var top = header_height + margin,
+                    bottom = view_height - margin,
+                    difference = bottom - top,
+                    scroll = get_ele('scroll_box'),
+                    max_height = difference - (scroll.offsetTop + 40);
+
+                scroll.style['max-height'] = max_height + 'px';
+
+            }
+            this.show_cover();
+        };
 
         var get_ele = function (id) { return document.getElementById(id); },
             popup_event;
@@ -200,6 +232,7 @@
                 fave = get_ele('favourite_icon'),
                 link = get_ele('title_link'),
                 form = get_ele('favourite_form'),
+                btn = get_ele('favourite_btn'),
                 ev_href = "{{ url_for('.line_up') }}" + '/' + ev.id;
 
             // Open the popup
@@ -224,6 +257,9 @@
             form.action = ev_href;
             fave.className = ev.is_fave ? "glyphicon glyphicon-star" :
                                           "glyphicon glyphicon-star-empty";
+            if ( is_anonymous ) {
+                btn.style.display = 'none';
+            }
 
             popup_event = ev;
         };
@@ -293,6 +329,18 @@
             }
             return res.join(' ');
         }
+
+        function size_scheduler(){
+            var view_height = window.innerHeight||document.documentElement.clientHeight,
+                header_offset = get_ele('header').offsetTop,
+                header_height = get_ele('header').offsetHeight + header_offset,
+                schedule_height = view_height - header_height,
+                schedule = get_ele('scheduler_here');
+            schedule.style.height = schedule_height + 'px';
+        }
+
+        scheduler.attachEvent("onSchedulerReady", size_scheduler);
+        window.onresize = size_scheduler;
 
         scheduler.init('scheduler_here', start_date, "emf_weekend");
         scheduler.parse(scheduleData, 'json');
