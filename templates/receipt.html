@@ -117,7 +117,7 @@
   </div>
   {% endif %}
 
-  {% if entrance_tts_counts %}
+  {% if entrance_tts_counts or tees %}
     {{ render_header() }}
     <h3>{{ user.name }} &ndash; {{ user.email }}</h3>
 
@@ -137,13 +137,11 @@
 
     {% else %}
     <div class="entrance-tickets">
-        <p>Your account does not have any associated entrance tickets. This ticket will not allow you to enter
-           the event.</p>
+        <p>Your account has no associated entrance tickets. This ticket will not allow you to enter the event.</p>
         <p>Once inside the camp, prepaid t-shirts will be available at the entrance gate when announced.</p>
 
         <div>&nbsp;</div>
-        <div>&nbsp;</div>
-        <div>&nbsp;</div>
+        <center><h1>Not an entrance ticket</h1></center>
         <div>&nbsp;</div>
 
     {% endif %}
