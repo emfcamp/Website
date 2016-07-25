@@ -35,6 +35,7 @@ cfp_review = Blueprint('cfp_review', __name__)
 admin_required = require_permission('admin')  # Decorator to require admin permissions
 anon_required = require_permission('cfp_anonymiser')
 review_required = require_permission('cfp_reviewer')
+schedule_required = require_permission('cfp_schedule')
 ordered_states = [
     'edit', 'new', 'locked', 'checked', 'rejected', 'cancelled', 'anonymised',
     'anon-blocked', 'manual-review', 'reviewed', 'accepted', 'finished'
@@ -1041,7 +1042,7 @@ def rank():
                            min_score=session.get('min_score'))
 
 @cfp_review.route('/potential_schedule_changes', methods=['GET', 'POST'])
-@admin_required
+@schedule_required
 def potential_schedule_changes():
     proposals = Proposal.query.filter(
         (Proposal.potential_venue.isnot(None) | Proposal.potential_time.isnot(None)),
@@ -1056,7 +1057,7 @@ def potential_schedule_changes():
     return render_template('cfp_review/potential_schedule_changes.html', proposals=proposals)
 
 @cfp_review.route('/scheduler')
-@admin_required
+@schedule_required
 def scheduler():
     proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
         filter(Proposal.state.in_(['finished', 'accepted'])).\
