@@ -357,16 +357,19 @@ class SendTransferReminder(Command):
 class SendTickets(Command):
 
     def run(self):
-        tickets = Ticket.query.filter_by(paid=True).join(TicketType).filter(or_(
+        paid_items = Ticket.query.filter_by(paid=True).join(TicketType).filter(or_(
             TicketType.admits.in_(['full', 'kid', 'car', 'campervan']),
             TicketType.fixed_id.in_(range(14, 24))))
 
-        users = (tickets.filter(Ticket.emailed == False).join(User)  # noqa
-                        .group_by(User).with_entities(User).order_by(User.id))
+        users = (paid_items.filter(Ticket.emailed == False).join(User)  # noqa
+                           .group_by(User).with_entities(User).order_by(User.id))
 
         for user in users:
-            user_tickets = tickets.filter(User.id == user.id)
-            plural = (tickets.count() != 1 and 's' or '')
+            user_tickets = Ticket.query.filter_by(paid=True).join(TicketType, User).filter(
+                TicketType.admits.in_(['full', 'kid', 'car', 'campervan']),
+                User.id == user.id)
+
+            plural = (user_tickets.count() != 1 and 's' or '')
 
             msg = Message("Your Electromagnetic Field Ticket%s" % plural,
                           sender=app.config['TICKETS_EMAIL'],
