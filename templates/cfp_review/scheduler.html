@@ -147,7 +147,7 @@
             schedule.style.height = schedule_height + 'px';
         }
 
-        scheduler.attachEvent("onClick",function (id){
+        scheduler.attachEvent("onDblClick",function (id){
             window.open('/cfp-review/proposals/' + id);
             return false;// block further actions
         });
