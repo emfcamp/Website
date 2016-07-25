@@ -190,8 +190,11 @@ def checkin(user_id):
                 failed.append(t)
 
         if failed:
-            flash("Already checked in: \n" +
-                  ', '.join(str(t.id) for t in failed))
+            failed_str = ', '.join(str(t.id) for t in failed)
+            if badge:
+                flash("Already issued: %s" % failed_str)
+            else:
+                flash("Already checked in: %s" % failed_str)
 
             return redirect(url_for('.checkin', user_id=user.id))
 
