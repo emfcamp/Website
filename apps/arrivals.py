@@ -1,21 +1,15 @@
 import re
 from collections import OrderedDict
-from base64 import urlsafe_b64decode
 
 from flask import (
     render_template, redirect, request, flash,
     url_for, session, current_app as app, Blueprint, abort,
     Markup, render_template_string,
 )
-from flask.json import jsonify
 from sqlalchemy import func
-
-from wtforms import SubmitField
-from wtforms.validators import Optional
 
 from models.ticket import Ticket, TicketType, CheckinStateException, TicketCheckin
 from models.user import User, checkin_code_re
-from .common.forms import Form
 from .common import require_permission, json_response
 
 arrivals = Blueprint('arrivals', __name__)
@@ -169,13 +163,6 @@ def search(query=None):
     return data
 
 
-class CheckinForm(Form):
-    proceed = SubmitField('Check in', [Optional()])
-
-class BadgeUpForm(Form):
-    proceed = SubmitField('Issue badge', [Optional()])
-
-
 @arrivals.route('/checkin/<int:user_id>', methods=['GET', 'POST'])
 @arrivals_required
 def checkin(user_id):
@@ -190,35 +177,7 @@ def checkin(user_id):
     else:
         tickets = user.tickets.filter_by(paid=True)
 
-    user_data = {
-        'name': user.name,
-        'email': user.email,
-    }
-
-    tickets_data = []
-    for ticket in tickets:
-        ticket_data = {
-            'id': ticket.id,
-            'type': ticket.type.name,
-        }
-        if badge:
-            ticket_data['badged_up'] = ticket.checkin.badged_up
-        else:
-            ticket_data['checked_in'] = ticket.checkin and ticket.checkin.checked_in
-
-        tickets_data.append(ticket_data)
-
-    data = {
-        'user': user_data,
-        'tickets': tickets_data,
-    }
-
-    if badge:
-        form = BadgeUpForm()
-    else:
-        form = CheckinForm()
-
-    if form.validate_on_submit():
+    if request.method == 'POST':
         failed = []
         for t in tickets:
             # Only allow bulk completion, not undoing
@@ -244,8 +203,8 @@ def checkin(user_id):
 
         return redirect(url_for('.main'))
 
-    return render_template('arrivals/checkin.html', tickets=tickets, form=form,
-                           user=user, badge=badge)
+    return render_template('arrivals/checkin.html', user=user,
+                           tickets=tickets, badge=badge)
 
 
 @arrivals.route('/checkin/ticket/<ticket_id>', methods=['POST'])

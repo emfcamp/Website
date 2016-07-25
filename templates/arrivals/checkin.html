@@ -39,7 +39,8 @@
   <td>
     {% if badge %}
       {%- if ticket.checkin.badged_up %}
-        Badge issued
+        Badge issued {{ ticket.checkin.versions[-1].transaction.issued_at.strftime('%A %H:%M') }}
+        by {{ ticket.checkin.versions[-1].transaction.user.name }}
       {% else %}
         Badge not issued
       {% endif -%}
@@ -57,24 +58,24 @@
     {% if badge %}
       {%- if ticket.checkin.badged_up %}
         <form method="post" action="{{ url_for('arrivals.undo_ticket_checkin', ticket_id=ticket.id) }}">
-        {{ form.hidden_tag() }}
+        <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
         <input type="submit" class="btn btn-danger debounce" value="Return badge"/>
         </form>
       {% else %}
         <form method="post" action="{{ url_for('arrivals.ticket_checkin', ticket_id=ticket.id) }}">
-        {{ form.hidden_tag() }}
+        <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
         <input type="submit" class="btn btn-success debounce" value="Issue badge"/>
         </form>
       {% endif -%}
     {% else %}
       {%- if ticket.checkin.checked_in %}
         <form method="post" action="{{ url_for('arrivals.undo_ticket_checkin', ticket_id=ticket.id) }}">
-        {{ form.hidden_tag() }}
+        <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
         <input type="submit" class="btn btn-danger debounce" value="Undo check-in"/>
         </form>
       {% else %}
         <form method="post" action="{{ url_for('arrivals.ticket_checkin', ticket_id=ticket.id) }}">
-        {{ form.hidden_tag() }}
+        <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
         <input type="submit" class="btn btn-success debounce" value="Check in"/>
         </form>
       {% endif -%}
@@ -88,7 +89,7 @@
 
 <form method="post" action="{{ url_for('arrivals.checkin', user_id=user.id) }}" class="shrink">
 <div class="col-sm-5 col-sm-offset-7">
-  {{ form.hidden_tag() }}
+  <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
   {% if badge %}
   <input type="submit" class="btn btn-info form-control debounce" value="Issue all badges"/>
   {% else %}
