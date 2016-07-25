@@ -58,6 +58,8 @@
                 {{ menuitem('Review', '.review_list') }}
             </ul>
         </li>
+    {% endif %}
+    {% if current_user.has_permission('admin') or current_user.has_permission('cfp_schedule') %}
         <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                 aria-haspopup="true" aria-expanded="false"
