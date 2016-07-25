@@ -427,10 +427,7 @@ def receipt(user_id=None):
 # user from the PDF renderer, and a full URL is awkward to validate.
 @tickets.route("/receipt/<checkin_code>/qr")
 def tickets_qrcode(checkin_code):
-    if len(checkin_code) > 40:
-        abort(404)
-
-    if not re.match('^%s$' % checkin_code_re, checkin_code):
+    if not re.match('%s$' % checkin_code_re, checkin_code):
         abort(404)
 
     url = app.config.get('CHECKIN_BASE') + checkin_code
@@ -440,10 +437,7 @@ def tickets_qrcode(checkin_code):
 
 @tickets.route("/receipt/<checkin_code>/barcode")
 def tickets_barcode(checkin_code):
-    if len(checkin_code) > 40:
-        abort(404)
-
-    if not re.match('^%s$' % checkin_code_re, checkin_code):
+    if not re.match('%s$' % checkin_code_re, checkin_code):
         abort(404)
 
     barcodefile = make_barcode_png(checkin_code)

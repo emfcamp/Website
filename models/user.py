@@ -12,7 +12,8 @@ from sqlalchemy.orm.exc import NoResultFound
 from flask import current_app as app
 from flask.ext.login import UserMixin
 
-checkin_code_re = r'[0-9a-zA-Z_-]+'
+CHECKIN_CODE_LEN = 16
+checkin_code_re = r'[0-9a-zA-Z_-]{%s}' % CHECKIN_CODE_LEN
 
 def generate_login_code(key, timestamp, uid):
     msg = "%s-%s" % (int(timestamp), uid)
@@ -26,7 +27,7 @@ def verify_login_code(key, current_timestamp, code):
         timestamp, uid, _ = code.split("-", 2)
     except ValueError:
         return None
-    if generate_login_code(key, timestamp, uid) == code:
+    if hmac.compare_digest(generate_login_code(key, timestamp, uid), code):
         age = datetime.fromtimestamp(current_timestamp) - datetime.fromtimestamp(int(timestamp))
         if age > timedelta(hours=6):
             return None
@@ -40,11 +41,16 @@ def generate_checkin_code(key, user_id, version=1):
     mac = hmac.new(key, 'checkin-' + msg, digestmod=hashlib.sha256)
     # An input length that's a multiple of 3 ensures no wasted output
     # 9 bytes (72 bits) won't resist offline attacks, so be careful
-    return base64.urlsafe_b64encode(msg + mac.digest()[:9])
+    code = base64.urlsafe_b64encode(msg + mac.digest()[:9])
+    # The output length should be (len(msg) + 9) / 3 * 4
+    assert len(code) == CHECKIN_CODE_LEN
+    return code
 
 def verify_checkin_code(key, code):
-    user_id, version = struct.unpack('HB', code)
-    assert version == 1
+    msg = base64.urlsafe_b64decode(code.encode('utf-8')[:4])
+    user_id, version = struct.unpack('HB', msg)
+    if version != 1:
+        return None
 
     expected_code = generate_checkin_code(key, user_id, version=version)
     if hmac.compare_digest(expected_code, code):

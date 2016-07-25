@@ -5,8 +5,10 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{% block title %}Electromagnetic Field{% endblock %}</title>
-        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-        <link rel="stylesheet" href="//cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css">
+        {% assets 'https://netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css',
+                  'https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css' -%}
+        <link rel="stylesheet" href="{{ ASSET_URL }}">
+        {% endassets -%}
         {% assets "css_arrivals" -%}
         <link rel="stylesheet" href="{{ ASSET_URL }}">
         {% endassets -%}
@@ -15,13 +17,24 @@
     </head>
 <body>
 {% block document %}
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{{ url_for('.main') }}">Arrivals</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            {% include "arrivals/_nav.html" %}
+        </div>
+    </div>
+</nav>
+
 <div class="container arrivals">
-    <header>
-        <h1>
-            <span class="logo"></span>
-            <a href="{{ url_for('arrivals.main') }}">Electromagnetic Field</a>
-        </h1>
-    </header>
     <div class="row">
         <div class="col-md-9">
         {% for message in get_flashed_messages() -%}
@@ -31,20 +44,15 @@
         {% block body -%}{% endblock -%}
         </div>
     </div>
-    <footer>
-      <div id="bottom-menu-container">
-        <ul class="menu">
-          <li><a href="{{ url_for('arrivals.begin_check_in') }}">Check in</a></li>
-          <li><a href="{{ url_for('arrivals.begin_badge_up') }}">Issue badges</a></li>
-        <div style="clear: both"></div>
-      </div>
-
-    </footer>
 </div>
 {% endblock %}
-<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-<script src="//netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-<script src="//cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js"></script>
+{% assets 'https://code.jquery.com/jquery-1.11.3.min.js',
+          'https://netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js',
+          'https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js',
+          'https://bartaz.github.io/sandbox.js/jquery.highlight.js',
+          'https://cdn.datatables.net/plug-ins/1.10.12/features/searchHighlight/dataTables.searchHighlight.min.js' %}
+<script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %}
 {% block foot -%}{% endblock -%}
 </body>
 </html>

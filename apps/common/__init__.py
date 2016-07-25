@@ -3,7 +3,10 @@ from decorator import decorator
 
 from main import db, mail, external_url
 from flask import session, render_template, abort, current_app as app, request
+from flask.json import jsonify
 from flask.ext.login import login_user, current_user
+from werkzeug import BaseResponse
+from werkzeug.exceptions import HTTPException
 
 from models.ticket import Ticket, TicketType
 from models.site_state import get_site_state, get_sales_state
@@ -149,6 +152,32 @@ def require_permission(permission):
         return app.login_manager.unauthorized()
     return decorator(call)
 
+@decorator
+def json_response(f, *args, **kwargs):
+    try:
+        response = f(*args, **kwargs)
+
+    except HTTPException as e:
+        data = {'error': str(e),
+                'description': e.description}
+        return jsonify(data), e.code
+
+    except Exception as e:
+        app.logger.error('Exception during json request: %r', e)
+        # Werkzeug sends the response and then logs, which is fiddly
+        from werkzeug.debug.tbtools import get_current_traceback
+        traceback = get_current_traceback(ignore_system_exceptions=True)
+        app.logger.info('Traceback %s', traceback.plaintext)
+
+        data = {'error': e.__class__.__name__,
+                'description': str(e)}
+        return jsonify(data), 500
+
+    else:
+        if isinstance(response, (app.response_class, BaseResponse)):
+            return response
+
+        return jsonify(response), 200
 
 def feature_enabled(feature):
     """

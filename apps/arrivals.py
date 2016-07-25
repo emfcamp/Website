@@ -1,21 +1,22 @@
 import re
 from collections import OrderedDict
+from base64 import urlsafe_b64decode
 
 from flask import (
     render_template, redirect, request, flash,
-    url_for, session, current_app as app, Blueprint
+    url_for, session, current_app as app, Blueprint, abort,
+    render_template_string, Markup,
 )
 from flask.json import jsonify
+from sqlalchemy import func
 
-from wtforms import (
-    SubmitField,
-)
+from wtforms import SubmitField
 from wtforms.validators import Optional
 
 from models.ticket import Ticket, TicketType, CheckinStateException, TicketCheckin
 from models.user import User, checkin_code_re
 from .common.forms import Form
-from .common import require_permission
+from .common import require_permission, json_response
 
 arrivals = Blueprint('arrivals', __name__)
 
@@ -30,139 +31,197 @@ def main():
 
 
 @arrivals.route('/check-in')
+@arrivals_required
 def begin_check_in():
     session.pop('badge', None)
     return redirect(url_for('.main'))
 
 
 @arrivals.route('/badge-up')
+@arrivals_required
 def begin_badge_up():
     session['badge'] = True
     return redirect(url_for('.main'))
 
 
-@arrivals.route('/search')
-@arrivals.route('/search/<query>')
+# Entrypoint for QR code if desired
+@arrivals.route('/checkin/qrcode/<code>')
+@arrivals_required
+def checkin_qrcode(code):
+    match = re.match('%s$' % checkin_code_re, code)
+    if not match:
+        abort(404)
+
+    user = User.get_by_checkin_code(app.config.get('SECRET_KEY'), code)
+    return redirect(url_for('.checkin', user_id=user.id))
+
+
+def user_from_code(query):
+    if not query:
+        return None
+
+    # QR code
+    match = re.match(re.escape(app.config.get('CHECKIN_BASE')) + '(%s)$' % checkin_code_re, query)
+    if not match:
+        # Barcode
+        match = re.match('(%s)$' % checkin_code_re, query)
+
+    if not match:
+        return None
+
+    code = match.group(1)
+    user = User.get_by_checkin_code(app.config.get('SECRET_KEY'), code)
+    return user
+
+def users_from_query(query):
+    names = User.query.order_by(User.name)
+    emails = User.query.order_by(User.email)
+
+    def escape(like):
+        return like.replace('^', '^^').replace('%', '^%')
+
+    def name_match(pattern, query):
+        return names.filter(User.name.ilike(pattern.format(query), escape='^')).limit(10).all()
+
+    def email_match(pattern, query):
+        return emails.filter(User.email.ilike(pattern.format(query), escape='^')).limit(10).all()
+
+    fulls = []
+    starts = []
+    contains = []
+    query = query.lower()
+    words = map(escape, filter(None, query.split(' ')))
+
+    if ' ' in query:
+        fulls += name_match('%{0}%', '%'.join(words))
+        fulls += email_match('%{0}%', '%'.join(words))
+
+    for word in words:
+        starts += name_match('{0}%', word)
+        contains += name_match('%{0}%', word)
+
+    for word in words:
+        starts += email_match('{0}%', word)
+        contains += email_match('%{0}%', word)
+
+    # make unique, but keep in order
+    users = list(OrderedDict.fromkeys(fulls + starts + contains))[:10]
+    return users
+
+
+@arrivals.route('/search', methods=['GET', 'POST'])
+@arrivals.route('/search/<query>')  # debug only
+@json_response
 @arrivals_required
 def search(query=None):
-    if query is None:
-        query = request.args.get('q')
+    if not (app.config.get('DEBUG') and query):
+        query = request.form.get('q')
 
+    if query.startswith('fail'):
+        raise ValueError('User-requested failure: %s' % query)
+
+    if not query:
+        abort(404)
+
+    data = {}
+    if request.form.get('n'):
+        # To serialise requests as they may go slow for certain query strings
+        data['n'] = int(request.form.get('n'))
+
+    query = query.strip()
     badge = bool(session.get('badge'))
 
-    try:
-        query = query.strip()
+    user = user_from_code(query)
 
-        if not query:
-            if badge:
-                tickets = []
+    if user:
+        return {'location': url_for('.checkin', user_id=user.id)}
 
-            else:
-                tickets = Ticket.query.filter_by(paid=True).join(User).join(TicketType) \
-                                      .order_by(User.name, TicketType.order).limit(100)
+    users_ordered = users_from_query(query)
+    users = User.query.filter(User.id.in_([u.id for u in users_ordered]))
+    tickets = users.join(Ticket).filter_by(paid=True) \
+                   .group_by(User).with_entities(User.id, func.count(User.id))
+    tickets = dict(tickets)
 
-        else:
-            match = re.match(re.escape(app.config.get('CHECKIN_BASE')) + '(%s)' % checkin_code_re, query)
-            if match:
-                query = match.group(1)
+    checkins = users.join(Ticket, TicketCheckin)
+    if badge:
+        completes = checkins.filter_by(badged_up=True) \
+                            .join(TicketType).filter_by(has_badge=True)
+    else:
+        completes = checkins.filter_by(checked_in=True)
 
-            if badge:
-                tickets = Ticket.query\
-                                .join(TicketCheckin).filter_by( checked_in=True)\
-                                .join(TicketType).filter_by( has_badge=True)
-            else:
-                tickets = Ticket.query
+    completes = completes.group_by(User).with_entities(User.id, func.count(User.id))
+    completes = dict(completes)
 
-            name_tickets = tickets.join(User).order_by(User.name)
-            email_tickets = tickets.join(User).order_by(User.email)
-            for word in filter(None, query.split(' ')):
-                name_tickets = name_tickets.filter( User.name.ilike('%' + word + '%') )
-                email_tickets = email_tickets.filter( User.email.ilike('%' + word + '%') )
-
-            tickets = (name_tickets.limit(100).all() + email_tickets.limit(100).all())
-            tickets = list(OrderedDict.fromkeys(tickets))
-
-        tickets_data = []
-        emails_seen = set()
-        for ticket in tickets:
-            if ticket in emails_seen:
-                continue
-            emails_seen.add(ticket.user.email)
-
-            if not ticket.receipt:
-                # unpaid tickets won't have receipts
-                ticket.create_receipt()
-
-            ticket_data = {
-                'name': ticket.user.name,
-                'email': ticket.user.email,
-                'type': ticket.type.name,
-                'receipt': ticket.receipt,
-                'state': ticket.payment.state if ticket.payment else 'paid',
-                'action': {},
-            }
-            if badge:
-                if ticket.checkin.badged_up:
-                    ticket_data['action']['badged_up'] = True
-                    ticket_data['action']['url'] = url_for('arrivals.undo_checkin', receipts=ticket.receipt)
-                else:
-                    ticket_data['action']['badged_up'] = False
-                    ticket_data['action']['url'] = url_for('arrivals.checkin', receipts=ticket.receipt)
-            else:
-                if ticket.checkin and ticket.checkin.checked_in:
-                    ticket_data['action']['checked_in'] = True
-                    ticket_data['action']['url'] = url_for('arrivals.undo_checkin', receipts=ticket.receipt)
-                else:
-                    ticket_data['action']['checked_in'] = False
-                    ticket_data['action']['url'] = url_for('arrivals.checkin', receipts=ticket.receipt)
-
-            tickets_data.append(ticket_data)
-
-        data = {
-            'tickets': tickets_data,
+    user_data = []
+    for u in users:
+        user = {
+            'id': u.id,
+            'name': u.name,
+            'email': u.email,
+            'tickets': tickets.get(u.id, 0),
+            'completes': completes.get(u.id, 0),
+            'url': url_for('.checkin', user_id=u.id)
         }
-        if len(emails_seen) == 1:
-            data['all_receipts'] = url_for('arrivals.checkin', receipts=','.join(t.receipt for t in tickets))
-        if request.args.get('n'):
-            data['n'] = request.args.get('n')
+        user_data.append(user)
 
-        return jsonify(data), 200
+    data['users'] = user_data
 
-    except Exception, e:
-        return jsonify({'error': repr(e)}), 500
-
-@arrivals.route('/checkin/qrcode/<qrcode>')
-@arrivals_required
-def checkin_qrcode(qrcode):
-    ticket = Ticket.query.filter_by(qrcode=qrcode).one()
-    return redirect(url_for('arrivals.checkin', receipts=ticket.receipt))
+    return data
 
 
 class CheckinForm(Form):
     proceed = SubmitField('Check in', [Optional()])
-    undo = SubmitField('Undo check-in', [Optional()])
 
 class BadgeUpForm(Form):
     proceed = SubmitField('Issue badge', [Optional()])
-    undo = SubmitField('Return badge', [Optional()])
 
 
-@arrivals.route('/checkin/receipt/<receipts>', methods=['GET', 'POST'])
+@arrivals.route('/checkin/<int:user_id>', methods=['GET', 'POST'])
 @arrivals_required
-def checkin(receipts):
+def checkin(user_id):
     badge = bool(session.get('badge'))
+    user = User.query.get_or_404(user_id)
+
+    if badge:
+        # Ticket must be checked in to receive a badge
+        tickets = user.tickets \
+                      .join(TicketCheckin).filter_by(checked_in=True) \
+                      .join(TicketType).filter_by(has_badge=True)
+    else:
+        tickets = user.tickets.filter_by(paid=True)
+
+    user_data = {
+        'name': user.name,
+        'email': user.email,
+    }
+
+    tickets_data = []
+    for ticket in tickets:
+        ticket_data = {
+            'id': ticket.id,
+            'type': ticket.type.name,
+        }
+        if badge:
+            ticket_data['badged_up'] = ticket.checkin.badged_up
+        else:
+            ticket_data['checked_in'] = ticket.checkin and ticket.checkin.checked_in
+
+        tickets_data.append(ticket_data)
+
+    data = {
+        'user': user_data,
+        'tickets': tickets_data,
+    }
 
     if badge:
         form = BadgeUpForm()
     else:
         form = CheckinForm()
 
-    receipts = receipts.split(',')
-    tickets = Ticket.query.filter( Ticket.receipt.in_(receipts) ).join(TicketType).order_by(TicketType.order)
-
     if form.validate_on_submit():
         failed = []
         for t in tickets:
+            # Only allow bulk completion, not undoing
             try:
                 if badge:
                     t.badge_up()
@@ -173,56 +232,51 @@ def checkin(receipts):
 
         if failed:
             flash("Already checked in: \n" +
-                  ', '.join(t.receipt for t in failed))
-            return redirect(url_for('arrivals.undo_checkin', receipts=','.join(t.receipt for t in tickets)))
+                  ', '.join(str(t.id) for t in failed))
 
-        if tickets.count() == 1:
-            flash("1 ticket checked in")
-        else:
-            flash("%s tickets checked in" % tickets.count())
+            return redirect(url_for('.checkin', user_id=user.id))
 
-        return redirect(url_for('arrivals.main'))
+        html = render_template_string('''
+            {{ tickets.count() }} ticket {{- tickets.count() != 1 and 's' or '' }} checked in.
+            <a class="alert-link" href="{{ url_for('.checkin', user_id=user.id) }}">Show tickets</a>.
+        ''', user=user, tickets=tickets)
+        flash(Markup(html))
 
-    user = tickets[0].user
-    return render_template('arrivals/checkin-receipt.html', tickets=tickets, form=form,
-                           user=user, receipts=','.join(t.receipt for t in tickets), badge=badge)
+        return redirect(url_for('.main'))
 
-@arrivals.route('/checkin/receipt/<receipts>/undo', methods=['GET', 'POST'])
+    return render_template('arrivals/checkin.html', tickets=tickets, form=form,
+                           user=user, badge=badge)
+
+
+@arrivals.route('/checkin/ticket/<ticket_id>', methods=['POST'])
 @arrivals_required
-def undo_checkin(receipts):
+def ticket_checkin(ticket_id):
     badge = bool(session.get('badge'))
+    ticket = Ticket.query.get_or_404(ticket_id)
 
-    if badge:
-        form = BadgeUpForm()
-    else:
-        form = CheckinForm()
-
-    receipts = receipts.split(',')
-    tickets = Ticket.query.filter( Ticket.receipt.in_(receipts) ).join(TicketType).order_by(TicketType.order)
-
-    if form.validate_on_submit():
-        failed = []
-        for t in tickets:
-            try:
-                if badge:
-                    t.undo_badge_up()
-                else:
-                    t.undo_check_in()
-            except CheckinStateException:
-                failed.append(t)
-
-        if failed:
-            flash("Not yet checked in: \n" +
-                  ', '.join(t.receipt for t in failed))
-            return redirect(url_for('arrivals.checkin', receipts=','.join(t.receipt for t in tickets)))
-
-        if tickets.count() == 1:
-            flash("1 ticket check-in undone")
+    try:
+        if badge:
+            ticket.badge_up()
         else:
-            flash("%s tickets check-ins undone" % tickets.count())
+            ticket.check_in()
+    except CheckinStateException as e:
+        flash(str(e))
 
-        return redirect(url_for('arrivals.main'))
+    return redirect(url_for('.checkin', user_id=ticket.user.id))
 
-    user = tickets[0].user
-    return render_template('arrivals/checkin-receipt-undo.html', tickets=tickets, form=form,
-                           user=user, receipts=','.join(t.receipt for t in tickets), badge=badge)
+@arrivals.route('/checkin/ticket/<ticket_id>/undo', methods=['POST'])
+@arrivals_required
+def undo_ticket_checkin(ticket_id):
+    badge = bool(session.get('badge'))
+    ticket = Ticket.query.get_or_404(ticket_id)
+
+    try:
+        if badge:
+            ticket.undo_badge_up()
+        else:
+            ticket.undo_check_in()
+    except CheckinStateException as e:
+        flash(str(e))
+
+    return redirect(url_for('.checkin', user_id=ticket.user.id))
+

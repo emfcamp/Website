@@ -333,10 +333,10 @@ class TicketAttrib(db.Model):
 
 
 class TicketCheckin(db.Model):
+    __versioned__ = {}
     __tablename__ = 'ticket_checkin'
     ticket_id = db.Column(db.Integer, db.ForeignKey(Ticket.id), primary_key=True)
     checked_in = db.Column(db.Boolean, default=False, nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     badged_up = db.Column(db.Boolean, default=False, nullable=False)
 
     def __init__(self, ticket):

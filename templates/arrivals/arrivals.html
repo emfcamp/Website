@@ -3,29 +3,23 @@
 {% if badge %}
 <h2>Badges</h2>
 {% else %}
-<h2>Arrivals</h2>
+<h2>Check-in</h2>
 {% endif %}
 
 <form class="form-horizontal">
   <div class="col-sm-9">
     <input type="text" class="form-control" id="query"/>
   </div>
-  <div class="col-sm-3">
-    {% if badge %}
-    <a class="btn btn-info form-control" id="check-in-all">Issue all badges</a>
-    {% else %}
-    <a class="btn btn-info form-control" id="check-in-all">Check in all</a>
-    {% endif %}
-  </div>
 </form>
 
-<div class="minipush"></div>
-
 <div class="row" style="display: none" id="error">
-  <div class="col-sm-12 alert alert-danger">An error occurred fetching tickets: <span id="error-text"></span></div>
+  <div class="col-sm-12 alert alert-danger">
+      <p>An error occurred fetching tickets: <b id="error-text"></b></p>
+      <p id="error-description"></p>
+  </div>
 </div>
 <div class="row">
-  <div class="col-sm-12" id="tickets">Loading...</div>
+  <table id="tickets-data" class="table display nowrap"></table>
 </div>
 
 {% endblock %}
@@ -35,15 +29,28 @@
 if (typeof(EMF) != 'object'){ var EMF = {}; }
 EMF.isBadgeMode = {{ badge | tojson }};
 EMF.search_url = {{ url_for('arrivals.search') | tojson }};
+
+EMF.csrftoken = {{ csrf_token() | tojson }};
+EMF.enable_csrf = function() {
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", EMF.csrftoken);
+            }
+        }
+    });
+};
+
 EMF.search_count = 0;
 EMF.search_count_received = 0;
 EMF.search_arrivals = function() {
     var query = $('#query').val();
-    if ($.trim(query).length == 1) {
-        query = '';
+    if ($.trim(query).length <= 1) {
+        return;
     }
     EMF.search_count++;
-    var data = $.getJSON(EMF.search_url, { q: query, n: EMF.search_count })
+
+    var data = $.post(EMF.search_url, { q: query, n: EMF.search_count })
         .done(EMF.search_arrivals_done)
         .fail(EMF.search_arrivals_fail);
 
@@ -51,71 +58,61 @@ EMF.search_arrivals = function() {
 EMF.search_arrivals_fail = function(jqXHR) {
     var data = jqXHR.responseJSON;
     $('#error-text').text(data.error);
+    $('#error-description').text(data.description);
     $('#error').show();
     $('#tickets').hide();
 };
-EMF.search_arrivals_done = function(data) {
-    var search_count = parseInt(data.n, 10);
-    if (search_count < EMF.search_count_received) { return; }
-    EMF.search_count_received = search_count;
-    $('#tickets').html('<table id="tickets-data" class="table display nowrap"></table>');
-    var allow_checkin_all = ('all_receipts' in data);
-    $('#check-in-all').toggleClass('disabled', !allow_checkin_all).prop('href', data.all_receipts);
 
-    $('#tickets-data').DataTable({
-        data: data.tickets,
-        columns: [
-            { data: 'name' },
-            {
-                data: 'email',
-                render: function(data) {
-                    return '<a class="email-link">{0}</a>'.replace('{0}', data);
+EMF.search_arrivals_done = function(data) {
+    var search_count = Number(data.n);
+    if (search_count < EMF.search_count_received) return;
+    EMF.search_count_received = search_count;
+
+    $('#error').hide();
+
+    if (data.location) {
+        $('#query').val('');
+        window.location = data.location;
+        return;
+    }
+
+    if (EMF.tickets_data == undefined) {
+        EMF.tickets_data = $('#tickets-data').DataTable({
+            columns: [
+                { data: 'name' },
+                { data: 'email' },
+            ],
+            createdRow: function(row, data, index) {
+                if (data.tickets == 0) {
+                    $(row).addClass('no-tickets');
+                } else if (data.completes == data.tickets) {
+                    $(row).addClass('complete');
+                } else if (data.completes > 0) {
+                    $(row).addClass('partial');
+                } else {
+                    $(row).addClass('has-tickets');
                 }
+                var link = $('<a>').attr('href', data.url);
+                $('td', row).wrapInner(link);
             },
-            { data: 'type' },
-            { data: 'receipt', className: 'receipt' },
-            {
-                data: 'action',
-                render: function(data) {
-                    if (EMF.isBadgeMode) {
-                        if (data.badged_up) {
-                            return '<a class="btn btn-danger undo-badge-up" href="{0}">Return badge</a>'.replace('{0}', data.url);
-                        } else {
-                            return '<a class="btn btn-success badge-up" href="{0}">Issue badge</a>'.replace('{0}', data.url);
-                        }
-                    } else {
-                        if (data.checked_in) {
-                            return '<a class="btn btn-danger undo-check-in" href="{0}">Undo check-in</a>'.replace('{0}', data.url);
-                        } else {
-                            return '<a class="btn btn-success check-in" href="{0}">Check in</a>'.replace('{0}', data.url);
-                        }
-                    }
-                }
-            }
-        ],
-        createdRow: function(row, data, index) {
-            var state = data.state;
-            if (state == 'cancelled' || state == 'refunded') {
-                $(row).addClass('cancelled');
-            } else if (state != 'paid') {
-                $(row).addClass('unpaid');
-            }
-        },
-        bFilter: false,
-        bLengthChange: false,
-        bSort: false,
-        bPaginate: !allow_checkin_all
-    });
-    $('.email-link').on('click', EMF.select_email);
+            bFilter: false,
+            bLengthChange: false,
+            bSort: false,
+            bPaginate: false,
+            bAutoWidth: false,
+            searchHighlight: true
+        });
+    }
+    EMF.tickets_data.clear();
+    EMF.tickets_data.settings()[0].oPreviousSearch.sSearch = $('#query').val();
+    EMF.tickets_data.rows.add(data.users).draw();
 };
+
 EMF.cancel_return = function(e) {
     if (e.keyCode == 13) {
         e.cancelBubble = true;
         return false;
     }
-};
-EMF.select_email = function() {
-    $('#query').val($(this).text()).trigger('change');
 };
 EMF.search_timer = null;
 EMF.delay_search_arrivals = function() {
@@ -126,13 +123,13 @@ EMF.delay_search_arrivals = function() {
     EMF.timer = setTimeout(function() {
         EMF.search_timer = null;
         EMF.search_arrivals();
-    }, 100);
+    }, 250);
 };
 $(function() {
+    EMF.enable_csrf();
     $('#query').on('change keyup', EMF.delay_search_arrivals)
                .on('keydown', EMF.cancel_return)
                .focus();
 });
-$(EMF.search_arrivals);
 </script>
 {% endblock %}

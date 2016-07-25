@@ -1,44 +1,33 @@
-.email-link {
+body {
+  padding-top: 70px;
+}
+
+#query {
+  margin-bottom: 2ex;
+}
+
+#tickets-data .highlight {
   font-weight: bold;
+}
+
+#tickets-data td {
+  padding: 0;
+}
+
+table.dataTable.display tbody tr:hover {
+  background-color: #ddd;
+}
+
+table.dataTable.display tbody tr:hover a {
+  color: #2a6496;
+  color: #333;
+}
+
+#tickets-data td > a {
+  padding: 8px 10px;
   cursor: pointer;
+  display: block;
+  text-decoration: none;
+  color: #555;
 }
-
-.minipush {
-  padding-top: 2ex;
-  clear: both;
-}
-
-td.receipt {
-  font-weight: bold;
-}
-
-.unpaid td {
-  background-color: #ebccd1;
-  color: #a94442;
-}
-
-.unpaid td a {
-  color: #a94442;
-}
-
-.unpaid td a.btn {
-  color: #fff;
-}
-
-#bottom-menu-container {
-  background-color: #eee;
-  padding: 10px 15px 2px 15px;
-  margin-top: 20px;
-}
-
-#bottom-menu-container .menu {
-  background-color: #eee;
-}
-
-#bottom-menu-container ul.menu li{
-  display:inline-block;
-  padding-left: 0;
-  padding-right: 1em;
-}
-
 
