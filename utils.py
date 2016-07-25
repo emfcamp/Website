@@ -475,7 +475,7 @@ class MakeAdmin(Command):
 
 class CreatePermissions(Command):
     def run(self):
-        for permission in ('admin', 'arrivals', 'cfp_reviewer', 'cfp_anonymiser'):
+        for permission in ('admin', 'arrivals', 'cfp_reviewer', 'cfp_anonymiser', 'cfp_schedule'):
             if not Permission.query.filter_by(name=permission).first():
                 db.session.add(Permission(permission))
 
