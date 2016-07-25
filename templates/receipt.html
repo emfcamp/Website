@@ -68,6 +68,17 @@
         <link rel="stylesheet" href="{{ ASSET_URL }}">
         {% endassets -%}
         <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Raleway:700,500">
+        {% if not pdf %}
+        <style type="text/css">
+          @media (min-width: 550px) {
+            div.header {
+              display: flex;
+              align-items: center;
+            }
+          }
+        </style>
+        {% endif %}
+
         {% block head -%}{% endblock -%}
         <!--[if lt IE 9]>
               <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>

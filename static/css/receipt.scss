@@ -51,16 +51,6 @@ body {
   height: 50px;
 }
 
-/* Hide from xhtml2pdf */
-@media screen {
-  @media (min-width: 550px) {
-    div.header {
-      display: flex;
-      align-items: center;
-    }
-  }
-}
-
 /* xhtml2pdf-specific styling
 
    We can't trust xhtml2pdf with more than two levels in a
