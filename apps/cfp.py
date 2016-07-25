@@ -2,7 +2,7 @@
 from flask import (
     render_template, redirect, request, flash,
     url_for, abort, current_app as app, Blueprint,
-    Markup
+    Markup, render_template_string,
 )
 from flask.ext.login import current_user
 from flask_mail import Message
@@ -42,10 +42,13 @@ class ProposalForm(Form):
     def validate_email(form, field):
         if current_user.is_anonymous() and User.does_user_exist(field.data):
             field.was_duplicate = True
-            msg = '''You already have an account. Please <a href="%s" target="_new">click here</a> to log in.''' % \
-                url_for('users.login', next=url_for('cfp.main', cfp_type=form.active_cfp_type), email=field.data)
+            cfp_url = url_for('cfp.main', cfp_type=form.active_cfp_type)
 
-            raise ValidationError(Markup(msg))
+            msg = Markup(render_template_string('''You already have an account.
+                Please <a href="{{ url }}" target="_new">click here</a> to log in.''',
+                url=url_for('users.login', next=cfp_url, email=field.data)))
+
+            raise ValidationError(msg)
 
 
 class TalkProposalForm(ProposalForm):

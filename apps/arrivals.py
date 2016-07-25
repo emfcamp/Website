@@ -5,7 +5,7 @@ from base64 import urlsafe_b64decode
 from flask import (
     render_template, redirect, request, flash,
     url_for, session, current_app as app, Blueprint, abort,
-    render_template_string, Markup,
+    Markup, render_template_string,
 )
 from flask.json import jsonify
 from sqlalchemy import func
@@ -236,11 +236,11 @@ def checkin(user_id):
 
             return redirect(url_for('.checkin', user_id=user.id))
 
-        html = render_template_string('''
+        msg = Markup(render_template_string('''
             {{ tickets.count() }} ticket {{- tickets.count() != 1 and 's' or '' }} checked in.
-            <a class="alert-link" href="{{ url_for('.checkin', user_id=user.id) }}">Show tickets</a>.
-        ''', user=user, tickets=tickets)
-        flash(Markup(html))
+            <a class="alert-link" href="{{ url_for('.checkin', user_id=user.id) }}">Show tickets</a>.''',
+            user=user, tickets=tickets))
+        flash(msg)
 
         return redirect(url_for('.main'))
 

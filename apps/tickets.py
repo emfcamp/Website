@@ -5,7 +5,7 @@ import re
 from flask import (
     render_template, redirect, request, flash, Blueprint,
     url_for, session, send_file, abort, current_app as app,
-    Markup
+    Markup, render_template_string,
 )
 from flask.ext.login import login_required, current_user
 from wtforms.validators import Required, Optional, Email, ValidationError
@@ -249,10 +249,13 @@ class TicketPaymentForm(Form):
     def validate_email(form, field):
         if current_user.is_anonymous() and User.does_user_exist(field.data):
             field.was_duplicate = True
-            msg = '''Account already exists. Please <a href="%s">click here</a> to log in.''' % \
-                url_for('users.login', next=url_for('tickets.pay', flow=form.flow), email=field.data)
+            pay_url = url_for('tickets.pay', flow=form.flow)
 
-            raise ValidationError(Markup(msg))
+            msg = Markup(render_template_string('''Account already exists.
+                Please <a href="{{ url }}">click here</a> to log in.''',
+                url=url_for('users.login', next=pay_url, email=field.data)))
+
+            raise ValidationError(msg)
 
 
 @tickets.route("/tickets/pay", methods=['GET', 'POST'])
