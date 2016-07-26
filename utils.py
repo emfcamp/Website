@@ -813,7 +813,9 @@ class ApplyPotentialSchedule(Command):
     def run(self):
         proposals = Proposal.query.filter(
             (Proposal.potential_venue.isnot(None) | Proposal.potential_time.isnot(None))).\
-            filter(Proposal.type.in_(['talk', 'workshop'])).all()
+            filter(Proposal.type.in_(['talk', 'workshop'])).\
+            filter(Proposal.state.in_(['accepted', 'finished'])).\
+            all()
 
         for proposal in proposals:
             user = proposal.user
