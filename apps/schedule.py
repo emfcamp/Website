@@ -87,7 +87,7 @@ def schedule_ical():
 
     return Response(cal.to_ical(), mimetype='text/calendar')
 
-@schedule.route('/line-up')
+@schedule.route('/line-up/2016')
 @feature_flag('SCHEDULE')
 def line_up():
     proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
