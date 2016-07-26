@@ -249,6 +249,8 @@
             if (ev.type === 'workshop' && parseInt(ev.cost) > 0) {
                 set_inner('workshop_cost',
                           '<strong>Cost:</strong> &pound;' + ev.cost)
+            } else {
+                set_inner('workshop_cost','')
             }
 
             // Set the link and indicate whether this is a faved event
