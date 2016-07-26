@@ -87,6 +87,11 @@ def schedule_ical():
 
     return Response(cal.to_ical(), mimetype='text/calendar')
 
+@schedule.route('/line-up')
+@feature_flag('SCHEDULE')
+def line_up_redirect():
+    return redirect(url_for('.line_up'))
+
 @schedule.route('/line-up/2016')
 @feature_flag('SCHEDULE')
 def line_up():
