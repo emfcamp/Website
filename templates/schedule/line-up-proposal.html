@@ -13,7 +13,7 @@
   <p>Attendance of this workshop will cost: <strong>{{ proposal.cost }}</strong></p>
 {% endif %}
 
-<p>{{ proposal.description }}</p>
+<p class="multiline">{{ proposal.description | urlize }}</p>
 <hr>
 {% if current_user.is_authenticated() %}
   <form method="POST">

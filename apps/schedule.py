@@ -6,6 +6,7 @@ from flask import (
     request, Response
 )
 from flask.ext.login import current_user
+from jinja2.utils import urlize
 from icalendar import Calendar, Event
 
 from main import db
@@ -37,6 +38,7 @@ def main():
 
     def add_event(event):
         event['text'] = event['title']
+        event['description'] = urlize(event['description'])
         event['start_date'] = event['start_date'].strftime('%Y-%m-%d %H:%M:00')
         event['end_date'] = event['end_date'].strftime('%Y-%m-%d %H:%M:00')
         event['is_fave'] = event['id'] in favourites
