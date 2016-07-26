@@ -5,6 +5,10 @@
 <h1>{{ proposal.title }}</h1>
 <h2><small>{{ proposal.type | capitalize }} by {{ proposal.published_names or proposal.user.name }}</small></h2>
 
+{% if proposal.scheduled_time and venue_name %}
+<p><strong>{{ proposal.scheduled_time.strftime('%A at %-I:%M %p') }}</strong> in <strong>{{ venue_name }}</strong>
+{% endif %}
+
 {% if proposal.type == 'workshop' and proposal.cost > 0 %}
   <p>Attendance of this workshop will cost: <strong>{{ proposal.cost }}</strong></p>
 {% endif %}

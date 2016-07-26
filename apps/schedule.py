@@ -134,5 +134,9 @@ def line_up_proposal(proposal_id):
         flash(msg)
         return redirect(url_for('.line_up_proposal', proposal_id=proposal.id))
 
+    venue_name = None
+    if proposal.scheduled_venue:
+        venue_name = Venue.query.filter_by(id=proposal.scheduled_venue).one().name
+
     return render_template('schedule/line-up-proposal.html',
-                           proposal=proposal, is_fave=is_fave)
+                           proposal=proposal, is_fave=is_fave, venue_name=venue_name)
