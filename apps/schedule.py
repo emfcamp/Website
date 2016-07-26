@@ -119,6 +119,8 @@ def favourites():
 @feature_flag('SCHEDULE')
 def line_up_proposal(proposal_id):
     proposal = Proposal.query.get_or_404(proposal_id)
+    if proposal.state not in ('accepted', 'finished'):
+        return "Not Found", 404
 
     if not current_user.is_anonymous():
         is_fave = proposal in current_user.favourites
