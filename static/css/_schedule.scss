@@ -22,17 +22,16 @@ html, body{
     }
 }
 
-@media (max-width: 768px) {
+// By default put the popup at the very top
 .event_popup {
-    top: 100px;
-    left: 50px;
-    right: 50px;
-    padding: 10px;
-    font-size: 12pt;
-}
+    top: 75px;
+    left: 75px;
+    right: 75px;
+    padding: 15px;
+    font-size: 14pt;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 768px) and (min-height: 512px) {
 .event_popup {
     top: 325px;
     left: 150px;
@@ -46,6 +45,35 @@ html, body{
     margin-bottom: 0;
     .banner-text {
         padding-right: 20px;
+    }
+
+    .navbar-header { width: 100%; }
+
+    // Please forgive me for all the !importants /o\
+    // On large enough screens (width & height) show the full header
+    @media (min-width: 768px) and (min-height: 512px) {
+        .navbar-toggle { display: none; }
+        .navbar-collapse.collapse {
+            display: block !important;
+            height: auto!important;
+            padding-bottom: 0;
+            overflow: visible!important;
+        }
+    }
+
+    // On more limited screens only show the header if the toggle is clicked
+    @media (max-width: 768px), (max-height: 512px) {
+        .navbar-toggle {
+            float: right !important;
+            display: block !important;
+        }
+        .navbar-collapse.collapse {
+            display: none !important;
+            &.in {
+                display: block !important;
+                overflow-y: visible;
+            }
+        }
     }
 }
 
