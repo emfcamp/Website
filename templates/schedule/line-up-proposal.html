@@ -14,7 +14,7 @@
 {% endif %}
 
 <p>{{ proposal.description }}</p>
-
+<hr>
 {% if current_user.is_authenticated() %}
   <form method="POST">
   <input id="csrf_token" name=_csrf_token type=hidden value="{{ csrf_token() }}">

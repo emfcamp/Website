@@ -76,6 +76,11 @@
             Favourite
         </button>
     </form>
+    <div id="loggedout" style="display:none; margin-right: 1em;" class="pull-right">
+		<small>
+			To mark this as a favourite please <a href="/login?next=/schedule">login</a>.
+		</small>
+	</div>
 </div>
 
 {# Actual schedule bit #}
@@ -232,6 +237,7 @@
                 fave = get_ele('favourite_icon'),
                 link = get_ele('title_link'),
                 form = get_ele('favourite_form'),
+                loggedout = get_ele('loggedout'),
                 btn = get_ele('favourite_btn'),
                 ev_href = "{{ url_for('.line_up') }}" + '/' + ev.id;
 
@@ -259,6 +265,7 @@
                                           "glyphicon glyphicon-star-empty";
             if ( is_anonymous ) {
                 btn.style.display = 'none';
+                loggedout.style.display = 'block';
             }
 
             popup_event = ev;
