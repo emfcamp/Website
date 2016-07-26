@@ -108,13 +108,15 @@
         var scheduleData = {{ schedule_data | tojson }},
             venues = {{ venues | tojson }},
             is_anonymous = {% if current_user.is_anonymous() -%} true {%- else -%} false {%- endif %},
+            todays_date = new Date(),
             start_date = new Date(2016, 7, 5),
             end_date = new Date(2016, 7, 8),
             venue_dict = {},
             day_format = "%D, %jth",   // e.g. Friday, 5th
             day_formatter = scheduler.date.date_to_str(day_format),
             time_formatter = scheduler.date.date_to_str("%H:%i"), // e.g. 22:33
-            debounce = false;
+            debounce = false,
+            date_to_show = (start_date < todays_date) ? todays_date : start_date;
 
         // Easily retrieve venue name from its ID
         for(var i = 0; i<venues.length; i++){
@@ -319,7 +321,7 @@
         scheduler.config.default_date = day_format;
         // Make it show 10 min slots
         scheduler.config.first_hour = 9;
-        scheduler.config.hour_size_px = 132;
+        scheduler.config.hour_size_px = 131;
         scheduler.config.separate_short_events = true;
 
         // Format the tooltips
@@ -360,7 +362,7 @@
             }
         }
 
-        scheduler.init('scheduler_here', start_date, "emf_weekend");
+        scheduler.init('scheduler_here', date_to_show, "emf_day");
         scheduler.parse(scheduleData, 'json');
     })();
   </script>
