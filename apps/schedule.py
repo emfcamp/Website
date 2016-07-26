@@ -107,7 +107,7 @@ def favourites():
 
     return render_template('schedule/favourites.html', proposals=proposals)
 
-@schedule.route('/line-up/<int:proposal_id>', methods=['GET', 'POST'])
+@schedule.route('/line-up/2016/<int:proposal_id>', methods=['GET', 'POST'])
 @feature_flag('SCHEDULE')
 def line_up_proposal(proposal_id):
     proposal = Proposal.query.get_or_404(proposal_id)

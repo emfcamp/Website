@@ -4,7 +4,7 @@ Unfortunately we have had to move your EMF {{ proposal.type }}. We've done our b
 
 You now have a {{ proposal.scheduled_duration }} minute slot in {{ venue_name }} on {{ proposal.scheduled_time.strftime('%A at %-I:%M %p') }}. If this is not suitable, please let us know as soon as possible.
 
-If you'd like to share this with people, the public link to your talk is: https://www.emfcamp.org/line-up/{{ proposal.id }}
+If you'd like to share this with people, the public link to your talk is: https://www.emfcamp.org/line-up/2016/{{ proposal.id }}
 
 Things to note:
 
