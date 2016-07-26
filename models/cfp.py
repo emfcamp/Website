@@ -233,7 +233,7 @@ class Proposal(db.Model):
             'end_date': self.end_date(),
             'venue': self.scheduled_venue,
             'title': self.title,
-            'speaker': self.published_names,
+            'speaker': self.published_names or self.user.name,
             'description': self.description,
             'type': self.type
         }
