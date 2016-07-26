@@ -90,7 +90,9 @@ def schedule_ical():
 @schedule.route('/line-up')
 @feature_flag('SCHEDULE')
 def line_up():
-    proposals = Proposal.query.filter_by(state='finished').all()
+    proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
+                filter(Proposal.state.in_(['accepted', 'finished'])).\
+                filter(Proposal.type.in_(['talk', 'workshop'])).all()
 
     return render_template('schedule/line-up.html', proposals=proposals)
 
