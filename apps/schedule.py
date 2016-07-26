@@ -19,7 +19,8 @@ schedule = Blueprint('schedule', __name__)
 def _get_scheduled_proposals():
     proposals = Proposal.query.filter_by(state='finished')\
                               .filter(Proposal.scheduled_time.isnot(None),
-                                      Proposal.scheduled_venue.isnot(None))
+                                      Proposal.scheduled_venue.isnot(None),
+                                      Proposal.scheduled_duration.isnot(None))
     return [p.get_schedule_dict() for p in proposals]
 
 @schedule.route('/schedule')
