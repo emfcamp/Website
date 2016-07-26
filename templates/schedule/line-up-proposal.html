@@ -6,7 +6,7 @@
 <h2><small>{{ proposal.type | capitalize }} by {{ proposal.published_names or proposal.user.name }}</small></h2>
 
 {% if proposal.type == 'workshop' and proposal.cost > 0 %}
-  <p>Attendance of this workshop will cost <strong>&pound;{{ proposal.cost }}</strong></p>
+  <p>Attendance of this workshop will cost: <strong>{{ proposal.cost }}</strong></p>
 {% endif %}
 
 <p>{{ proposal.description }}</p>
