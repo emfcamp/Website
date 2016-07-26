@@ -246,9 +246,9 @@
             set_inner('event_time', time_formatter(ev.start_date))
             set_inner('event_description', ev.description)
 
-            if (ev.type === 'workshop' && parseInt(ev.cost) > 0) {
+            if (ev.type === 'workshop' && ev.cost.trim() != '') {
                 set_inner('workshop_cost',
-                          '<strong>Cost:</strong> &pound;' + ev.cost)
+                          '<strong>Cost:</strong> ' + ev.cost)
             } else {
                 set_inner('workshop_cost','')
             }
