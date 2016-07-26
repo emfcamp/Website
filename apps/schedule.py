@@ -17,7 +17,7 @@ schedule = Blueprint('schedule', __name__)
 
 
 def _get_scheduled_proposals():
-    proposals = Proposal.query.filter_by(state='finished')\
+    proposals = Proposal.query.filter(Proposal.state.in_(['accepted', 'finished']))\
                               .filter(Proposal.scheduled_time.isnot(None),
                                       Proposal.scheduled_venue.isnot(None),
                                       Proposal.scheduled_duration.isnot(None))
