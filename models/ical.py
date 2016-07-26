@@ -29,13 +29,16 @@ class ICalSource(db.Model):
         res = []
         for component in cal.walk():
             if component.name == 'VEVENT':
+                # icalendar components have a 'decode' method. Don't use it,
+                # instead force cast to unicode to avoid decode errors
                 event = {
+                    'source': 'ical',
                     'start_date': component.get('dtstart').dt,
                     'end_date': component.get('dtend').dt,
-                    'title': component.get('summary').decode(),
-                    'description': component.get('description').decode(),
+                    'title': unicode(component.get('summary')),
+                    'description': unicode(component.get('description')),
                     'venue': self.venue,
-                    'id': component.get('uid').decode(),
+                    'id': unicode(component.get('uid')),
                 }
 
                 res.append(event)
