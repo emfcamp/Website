@@ -21,7 +21,6 @@ def generate_login_code(key, timestamp, uid):
     # Truncate the digest to 20 base64 bytes
     return msg + "-" + base64.urlsafe_b64encode(mac.digest())[:20]
 
-
 def verify_login_code(key, current_timestamp, code):
     try:
         timestamp, uid, _ = code.split("-", 2)
@@ -34,6 +33,14 @@ def verify_login_code(key, current_timestamp, code):
         else:
             return int(uid)
     return None
+
+
+def generate_sso_code(key, timestamp, uid):
+    msg = "%s-%s" % (int(timestamp), uid)
+    mac = hmac.new(key, 'sso-' + msg, digestmod=hashlib.sha256)
+    # Truncate the digest to 20 base64 bytes
+    return msg + "-" + base64.urlsafe_b64encode(mac.digest())[:20]
+
 
 def generate_checkin_code(key, user_id, version=1):
     # H = short (< 65536), B = byte (< 256)
@@ -56,6 +63,7 @@ def verify_checkin_code(key, code):
     if hmac.compare_digest(expected_code, code):
         return user_id
     return None
+
 
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
@@ -97,6 +105,9 @@ class User(db.Model, UserMixin):
 
     def login_code(self, key):
         return generate_login_code(key, int(time.time()), self.id)
+
+    def sso_code(self, key):
+        return generate_sso_code(key, int(time.time()), self.id)
 
     @property
     def checkin_code(self):
