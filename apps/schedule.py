@@ -97,8 +97,8 @@ def line_up_redirect():
 @feature_flag('SCHEDULE')
 def line_up():
     proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
-                filter(Proposal.state.in_(['accepted', 'finished'])).\
-                filter(Proposal.type.in_(['talk', 'workshop'])).all()
+        filter(Proposal.state.in_(['accepted', 'finished'])).\
+        filter(Proposal.type.in_(['talk', 'workshop'])).all()
 
     return render_template('schedule/line-up.html', proposals=proposals)
 
