@@ -274,7 +274,7 @@
             _close_popup();
         }
 
-        emf_scheduler.favourite = function close_popup() {
+        emf_scheduler.favourite = function () {
             if (debounce) {
                 _close_popup();
                 return;
@@ -346,6 +346,12 @@
 
         scheduler.attachEvent("onSchedulerReady", size_scheduler);
         window.onresize = size_scheduler;
+
+        window.onclick = function (mouseEvent) {
+            if (mouseEvent.target.className.indexOf('dhx_cal_cover') !== -1) {
+                _close_popup();
+            }
+        }
 
         scheduler.init('scheduler_here', start_date, "emf_weekend");
         scheduler.parse(scheduleData, 'json');
