@@ -4,7 +4,7 @@ from lxml import etree
 _punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 
 def slugify(text, delim=u'-'):
-    """Generates an ASCII-only slug."""
+    """Generates a nicer looking slug."""
     result = []
     for word in _punct_re.split(text.lower()):
         word = word.encode('utf-8')
