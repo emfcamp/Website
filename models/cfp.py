@@ -231,7 +231,7 @@ class Proposal(db.Model):
             'id': self.id,
             'start_date': self.scheduled_time,
             'end_date': self.end_date(),
-            'venue': self.scheduled_venue,
+            'venue': self.venue,
             'title': self.title,
             'speaker': self.published_names or self.user.name,
             'description': self.description,
@@ -329,6 +329,10 @@ class Venue(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     type = db.Column(db.String, nullable=True)
+
+    proposals = db.relationship('Proposal', backref='venue', lazy='dynamic',
+                                primaryjoin='Proposal.scheduled_venue == Venue.id')
+
     __table_args__ = (
         UniqueConstraint('name', name='_venue_name_uniq'),
     )
