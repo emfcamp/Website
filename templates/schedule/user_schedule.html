@@ -9,6 +9,12 @@
 {% block document %}
 {# Banner bar #}
 <header role="banner" id="header" class="schedule-banner navbar navbar-default">
+    <div class="alert alert-info alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        Please note: this schedule is still incomplete and provisional.
+    </div>
     <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
             <span class="sr-only">Toggle navigation</span>
@@ -344,7 +350,7 @@
             return res.join(' ');
         }
 
-        function size_scheduler(){
+        emf_scheduler.size_scheduler = function size_scheduler(){
             var view_height = window.innerHeight||document.documentElement.clientHeight,
                 header_offset = get_ele('header').offsetTop,
                 header_height = get_ele('header').offsetHeight + header_offset,
@@ -353,8 +359,8 @@
             schedule.style.height = schedule_height + 'px';
         }
 
-        scheduler.attachEvent("onSchedulerReady", size_scheduler);
-        window.onresize = size_scheduler;
+        scheduler.attachEvent("onSchedulerReady", emf_scheduler.size_scheduler);
+        window.onresize = emf_scheduler.size_scheduler;
 
         window.onclick = function (mouseEvent) {
             if (mouseEvent.target.className.indexOf('dhx_cal_cover') !== -1) {

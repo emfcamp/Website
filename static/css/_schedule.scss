@@ -48,6 +48,13 @@ html, body{
     }
 
     .navbar-header { width: 100%; }
+    .alert {
+        position: absolute;
+        left: 50%;
+        width: 600px;
+        margin-left: -300px;
+        z-index: 2;
+    }
 
     // Please forgive me for all the !importants /o\
     // On large enough screens (width & height) show the full header
