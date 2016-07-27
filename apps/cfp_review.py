@@ -4,7 +4,7 @@ import warnings
 
 from flask import (
     redirect, url_for, request, abort, render_template,
-    flash, Blueprint, session, current_app as app
+    flash, Blueprint, session, jsonify, current_app as app
 )
 from flask.ext.login import current_user
 
@@ -1094,6 +1094,11 @@ def scheduler():
             export['start_date'] = str(export['start_date'])
             export['end_date'] = str(export['end_date'])
 
+        # We can't show things that are not yet in a slot!
+        # FIXME: Show them somewhere
+        if 'venue' not in export or 'start_date' not in export:
+            continue
+
         schedule_data.append(export)
 
     venues = [{'key': v.id, 'label': v.name} for v in Venue.query.all()]
@@ -1106,5 +1111,12 @@ def scheduler_update():
     proposal = Proposal.query.filter_by(id=request.form['id']).one()
     proposal.potential_time = dateutil.parser.parse(request.form['time']).replace(tzinfo=None)
     proposal.potential_venue = request.form['venue']
+
+    changed = True
+    if proposal.potential_time == proposal.scheduled_time and str(proposal.potential_venue) == str(proposal.scheduled_venue):
+        proposal.potential_time = None
+        proposal.potential_venue = None
+        changed = False
+
     db.session.commit()
-    return "OK", 200
+    return jsonify({'changed': changed})
