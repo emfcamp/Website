@@ -13,6 +13,7 @@ from main import db
 
 from .common import feature_flag
 from models.cfp import Proposal, Venue
+from .schedule_xml import export_frab
 
 schedule = Blueprint('schedule', __name__)
 
@@ -44,7 +45,6 @@ def main():
         event['is_fave'] = event['id'] in favourites
         return event
 
-
     # {id:1, text:"Meeting",   start_date:"04/11/2013 14:00",end_date:"04/11/2013 17:00"}
     schedule_data = _get_scheduled_proposals()
     schedule_data = [add_event(e) for e in schedule_data]
@@ -66,6 +66,13 @@ def schedule_json():
     schedule = [convert_time_to_str(p) for p in _get_scheduled_proposals()]
 
     return Response(json.dumps(schedule), mimetype='application/json')
+
+@schedule.route('/schedule.frab')
+@feature_flag('SCHEDULE')
+def schedule_frab():
+    schedule = export_frab(_get_scheduled_proposals())
+
+    return Response(schedule, mimetype='application/xml')
 
 @schedule.route('/schedule.ical')
 @feature_flag('SCHEDULE')
