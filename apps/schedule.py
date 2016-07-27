@@ -43,6 +43,7 @@ def main():
         event['start_date'] = event['start_date'].strftime('%Y-%m-%d %H:%M:00')
         event['end_date'] = event['end_date'].strftime('%Y-%m-%d %H:%M:00')
         event['is_fave'] = event['id'] in favourites
+        event['venue'] = event['venue'].id
         return event
 
     # {id:1, text:"Meeting",   start_date:"04/11/2013 14:00",end_date:"04/11/2013 17:00"}
@@ -61,6 +62,7 @@ def schedule_json():
     def convert_time_to_str(event):
         event['start_date'] = event['start_date'].strftime('%Y-%m-%d %H:%M:00')
         event['end_date'] = event['end_date'].strftime('%Y-%m-%d %H:%M:00')
+        event['venue'] = event['venue'].name
         return event
 
     schedule = [convert_time_to_str(p) for p in _get_scheduled_proposals()]
@@ -90,7 +92,7 @@ def schedule_ical():
         cal_event = Event()
         cal_event.add('uid', event['id'])
         cal_event.add('summary', event['title'])
-        cal_event.add('location', event['venue'])
+        cal_event.add('location', event['venue'].name)
         cal_event.add('dtstart', event['start_date'])
         cal_event.add('dtend', event['end_date'])
         cal.add_component(cal_event)
