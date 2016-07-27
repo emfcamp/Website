@@ -1094,6 +1094,11 @@ def scheduler():
             export['start_date'] = str(export['start_date'])
             export['end_date'] = str(export['end_date'])
 
+        # We can't show things that are not yet in a slot!
+        # FIXME: Show them somewhere
+        if 'venue' not in export or 'start_date' not in export:
+            continue
+
         schedule_data.append(export)
 
     venues = [{'key': v.id, 'label': v.name} for v in Venue.query.all()]
