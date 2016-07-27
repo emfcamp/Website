@@ -773,7 +773,7 @@ class ImportSchedulerData(Command):
                 previous_potential_venue = proposal.potential_venue
 
             proposal.potential_venue = event['venue']
-            if proposal.potential_venue == current_scheduled_venue:
+            if str(proposal.potential_venue) == str(current_scheduled_venue):
                 proposal.potential_venue = None
 
             # Same for time
@@ -783,7 +783,7 @@ class ImportSchedulerData(Command):
                 proposal.potential_time = None
 
             # Then say what changed
-            if proposal.potential_venue != previous_potential_venue or proposal.potential_time != previous_potential_time:
+            if str(proposal.potential_venue) != str(previous_potential_venue) or proposal.potential_time != previous_potential_time:
                 previous_venue_name = new_venue_name = None
                 if previous_potential_venue:
                     previous_venue_name = Venue.query.filter_by(id=previous_potential_venue).one().name

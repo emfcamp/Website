@@ -191,7 +191,11 @@
                         venue: ev.venue
                     },
 					success: function (result) {
-                        ev.is_potential = true;
+                        if (result.changed) {
+                            ev.is_potential = true;
+                        } else {
+                            ev.is_potential = false;
+                        }
 					},
                     error: function (result) {
                         range_valid = false;
