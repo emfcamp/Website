@@ -123,7 +123,8 @@
             day_formatter = scheduler.date.date_to_str(day_format),
             time_formatter = scheduler.date.date_to_str("%H:%i"), // e.g. 22:33
             debounce = false,
-            date_to_show = (start_date < todays_date) ? todays_date : start_date;
+            date_to_show = (start_date <= todays_date) ? todays_date : start_date,
+            week_or_day = (start_date <= todays_date && end_date >= todays_date) ? 'emf_day' : 'emf_weekend';
 
         // Easily retrieve venue name from its ID
         for(var i = 0; i<venues.length; i++){
@@ -369,7 +370,11 @@
             }
         }
 
-        scheduler.init('scheduler_here', date_to_show, "emf_day");
+        if ($(window).width() <= 1024) {
+            week_or_day = 'emf_day';
+        }
+
+        scheduler.init('scheduler_here', date_to_show, week_or_day);
         scheduler.parse(scheduleData, 'json');
     })();
   </script>
