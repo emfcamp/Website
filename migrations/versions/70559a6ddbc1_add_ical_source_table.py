@@ -20,7 +20,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('venue', sa.String(), nullable=False),
-    sa.Column('enabled', sa.Boolean(), nullable=True),
+    sa.Column('enabled', sa.Boolean(), nullable=True, server_default=sa.false()),
     sa.Column('url', sa.String(), nullable=False),
     sa.Column('contact_phone', sa.String(), nullable=True),
     sa.Column('contact_email', sa.String(), nullable=True),
