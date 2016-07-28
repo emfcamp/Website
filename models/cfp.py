@@ -226,7 +226,7 @@ class Proposal(db.Model):
             return start + timedelta(minutes=int(duration))
         return None
 
-    def get_schedule_dict(self):
+    def get_schedule_dict(self, favourites_ids):
         res = {
             'id': self.id,
             'start_date': self.scheduled_time,
@@ -235,7 +235,8 @@ class Proposal(db.Model):
             'title': self.title,
             'speaker': self.published_names or self.user.name,
             'description': self.description,
-            'type': self.type
+            'type': self.type,
+            'is_fave': self.id in favourites_ids
         }
         if self.type == 'workshop':
             res['cost'] = self.cost

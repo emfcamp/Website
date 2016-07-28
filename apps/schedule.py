@@ -19,41 +19,47 @@ from .schedule_xml import export_frab
 schedule = Blueprint('schedule', __name__)
 
 
-def _get_scheduled_proposals():
+def _get_scheduled_proposals(filter_obj={}):
+    if current_user.is_anonymous():
+        favourites = []
+    else:
+        favourites = [f.id for f in current_user.favourites]
+
     schedule = Proposal.query.filter(Proposal.state.in_(['accepted', 'finished']),
                                       Proposal.scheduled_time.isnot(None),
                                       Proposal.scheduled_venue.isnot(None),
                                       Proposal.scheduled_duration.isnot(None)
                                     ).all()
 
-    schedule = [p.get_schedule_dict() for p in schedule]
+    schedule = [p.get_schedule_dict(favourites) for p in schedule]
 
     ical_sources = ICalSource.query.filter_by(enabled=True).all()
 
     for source in ical_sources:
         schedule = schedule + source.get_ical_feed()
 
+    if 'is_favourite' in filter_obj and filter_obj['is_favourite']:
+        schedule = [s for s in schedule if s.get('is_fave', False)]
+
+    if 'venue' in filter_obj:
+        schedule = [s for s in schedule if s['venue'].name in filter_obj['venue']]
+
     return schedule
+
 
 @schedule.route('/schedule')
 @feature_flag('SCHEDULE')
 def main():
-    if current_user.is_anonymous():
-        favourites = []
-    else:
-        favourites = [f.id for f in current_user.favourites]
-
     def add_event(event):
         event['text'] = event['title']
         event['description'] = urlize(event['description'])
         event['start_date'] = event['start_date'].strftime('%Y-%m-%d %H:%M:00')
         event['end_date'] = event['end_date'].strftime('%Y-%m-%d %H:%M:00')
-        event['is_fave'] = event['id'] in favourites
         event['venue'] = event['venue'].id
         return event
 
     # {id:1, text:"Meeting",   start_date:"04/11/2013 14:00",end_date:"04/11/2013 17:00"}
-    schedule_data = _get_scheduled_proposals()
+    schedule_data = _get_scheduled_proposals(request.args)
     venues = set([(e['venue'].id, e['venue'].name) for e in schedule_data])
     venues = [{'key': v[0], 'label': v[1]} for v in venues]
     venues = sorted(venues, key=lambda x: x['label'])
@@ -77,7 +83,7 @@ def schedule_json():
         event['venue'] = event['venue'].name
         return event
 
-    schedule = [convert_time_to_str(p) for p in _get_scheduled_proposals()]
+    schedule = [convert_time_to_str(p) for p in _get_scheduled_proposals(request.args)]
 
     # NB this is JSON in a top-level array (security issue for low-end browsers)
     return Response(json.dumps(schedule), mimetype='application/json')
@@ -85,14 +91,14 @@ def schedule_json():
 @schedule.route('/schedule.frab')
 @feature_flag('SCHEDULE')
 def schedule_frab():
-    schedule = export_frab(_get_scheduled_proposals())
+    schedule = export_frab(_get_scheduled_proposals(request.args))
 
     return Response(schedule, mimetype='application/xml')
 
 @schedule.route('/schedule.ical')
 @feature_flag('SCHEDULE')
 def schedule_ical():
-    schedule = _get_scheduled_proposals()
+    schedule = _get_scheduled_proposals(request.args)
     title = 'EMF 2016'
 
     cal = Calendar()
