@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ "$1" == '' ]]; then
-  upstream=$(ssh gauss.emfcamp.org sudo /var/www/www.emfcamp.org/utils/dump_upstream.sh)
+  upstream=$(ssh gauss.emfcamp.org sudo /var/www/www.emfcamp.org/utils/export_upstream_for_arrivals.sh)
 else
   upstream=$(cat "$1")
 fi
