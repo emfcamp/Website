@@ -31,7 +31,7 @@ html, body{
     font-size: 14pt;
 }
 
-@media (min-width: 768px) and (min-height: 512px) {
+@media (min-width: 768px) and (min-height: 650px) {
 .event_popup {
     top: 325px;
     left: 150px;
@@ -79,7 +79,7 @@ html, body{
 
     // Please forgive me for all the !importants /o\
     // On large enough screens (width & height) show the full header
-    @media (min-width: 768px) and (min-height: 512px) {
+    @media (min-width: 768px) and (min-height: 650px) {
         .navbar-toggle { display: none; }
         .navbar-collapse.collapse {
             display: block !important;
@@ -90,7 +90,7 @@ html, body{
     }
 
     // On more limited screens only show the header if the toggle is clicked
-    @media (max-width: 768px), (max-height: 512px) {
+    @media (max-width: 768px), (max-height: 650px) {
         .navbar-toggle {
             float: right !important;
             display: block !important;
