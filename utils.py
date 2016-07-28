@@ -795,8 +795,6 @@ class ImportSchedulerData(Command):
                     proposal.potential_time = proposal.scheduled_time
                 if proposal.potential_time and not proposal.potential_venue:
                     proposal.potential_venue = proposal.scheduled_venue
-
-dy
                 app.logger.info('Moved "%s": "%s" on "%s" -> "%s" on "%s"' % (proposal.title, previous_venue_name, previous_potential_time, new_venue_name, proposal.potential_time))
 
         if persist:
