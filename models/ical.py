@@ -37,7 +37,7 @@ class ICalSource(db.Model):
                     'end_date': component.get('dtend').dt,
                     'title': unicode(component.get('summary')),
                     'description': unicode(component.get('description')),
-                    'venue': self.venue,
+                    'venue': self,
                     'id': unicode(component.get('uid')),
                 }
 

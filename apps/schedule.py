@@ -20,21 +20,24 @@ schedule = Blueprint('schedule', __name__)
 
 
 def _get_scheduled_proposals():
-    proposals = Proposal.query.filter(Proposal.state.in_(['accepted', 'finished']))\
-                              .filter(Proposal.scheduled_time.isnot(None),
+    schedule = Proposal.query.filter(Proposal.state.in_(['accepted', 'finished']),
+                                      Proposal.scheduled_time.isnot(None),
                                       Proposal.scheduled_venue.isnot(None),
-                                      Proposal.scheduled_duration.isnot(None))
-    return [p.get_schedule_dict() for p in proposals]
+                                      Proposal.scheduled_duration.isnot(None)
+                                    ).all()
+
+    schedule = [p.get_schedule_dict() for p in schedule]
+
+    ical_sources = ICalSource.query.filter_by(enabled=True).all()
+
+    for source in ical_sources:
+        schedule = schedule + source.get_ical_feed()
+
+    return schedule
 
 @schedule.route('/schedule')
 @feature_flag('SCHEDULE')
 def main():
-    if request.headers.get('Content-Type') == 'application/json':
-        return schedule_json()
-
-    if request.headers.get('Content-Type') == 'text/calendar':
-        return schedule_ical()
-
     favourites = [f.id for f in current_user.favourites] if not current_user.is_anonymous()\
                                                          else []
 
@@ -49,19 +52,15 @@ def main():
 
     # {id:1, text:"Meeting",   start_date:"04/11/2013 14:00",end_date:"04/11/2013 17:00"}
     schedule_data = _get_scheduled_proposals()
-
-    venues = [{'key': v.id, 'label': v.name} for v in Venue.query.all()]
-
-    ical_sources = ICalSource.query.filter_by(enabled=True).all()
-    ical_data = []
-
-    for source in ical_sources:
-        ical_data = ical_data + source.get_ical_feed()
-        venues.append({ 'key': source.venue, 'label': source.venue })
-
-    schedule_data = schedule_data + ical_data
+    venues = set([(e['venue'].id, e['venue'].name) for e in schedule_data])
+    venues = [{'key': v[0], 'label': v[1]} for v in venues]
+    venues = sorted(venues, key=lambda x: x['label'])
 
     schedule_data = [add_event(e) for e in schedule_data]
+
+    # venues = [{'key': v.id, 'label': v.name} for v in Venue.query.filter_by().all()] +\
+    #          [{'key': v.id, 'label': v.name} for v in ICalSource.query.filter_by(enabled=True).all()]
+
 
     return render_template('schedule/user_schedule.html', venues=venues,
                             schedule_data=schedule_data)
