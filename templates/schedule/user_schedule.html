@@ -9,7 +9,7 @@
 {% block document %}
 {# Banner bar #}
 <header role="banner" id="header" class="schedule-banner navbar navbar-default">
-    <div class="alert alert-info alert-dismissible" role="alert" style="display: none" id="under-construction">
+    <div class="alert alert-info alert-dismissible" role="alert" style="display: none">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
@@ -124,7 +124,6 @@ document.getElementById('enable-javascript').style.display = 'none';
     (function(){
         'use strict';
 
-        $('#under-construction').show();
         $('#scheduler_here').show();
 
         var scheduleData = {{ schedule_data | tojson }},
