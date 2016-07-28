@@ -3,7 +3,7 @@ import json
 
 from flask import (
     Blueprint, render_template, redirect, url_for, flash,
-    request, Response
+    request, Response, abort,
 )
 from flask.ext.login import current_user
 from jinja2.utils import urlize
@@ -38,8 +38,10 @@ def _get_scheduled_proposals():
 @schedule.route('/schedule')
 @feature_flag('SCHEDULE')
 def main():
-    favourites = [f.id for f in current_user.favourites] if not current_user.is_anonymous()\
-                                                         else []
+    if current_user.is_anonymous():
+        favourites = []
+    else:
+        favourites = [f.id for f in current_user.favourites]
 
     def add_event(event):
         event['text'] = event['title']
@@ -77,6 +79,7 @@ def schedule_json():
 
     schedule = [convert_time_to_str(p) for p in _get_scheduled_proposals()]
 
+    # NB this is JSON in a top-level array (security issue for low-end browsers)
     return Response(json.dumps(schedule), mimetype='application/json')
 
 @schedule.route('/schedule.frab')
@@ -139,7 +142,7 @@ def favourites():
 def line_up_proposal(proposal_id):
     proposal = Proposal.query.get_or_404(proposal_id)
     if proposal.state not in ('accepted', 'finished'):
-        return "Not Found", 404
+        abort(404)
 
     if not current_user.is_anonymous():
         is_fave = proposal in current_user.favourites
