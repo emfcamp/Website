@@ -3,14 +3,11 @@ Hi {{ to_user.name }},
 Your friend {{ from_user.name }} has transferred a ticket to you for
 Electromagnetic Field 2016.
 
-{% if new_user %}
-To allow this to happen we've created an account for you.
-{%- if not feature_enabled('ISSUE_TICKETS') %} We'll email
-you important information nearer the event. {%- endif %}
-{% endif %}
-
 {% if feature_enabled('ISSUE_TICKETS') %}
 {% include 'emails/receipt-blurb.txt' %}
+{% elif new_user %}
+We've created an account for you. We'll email
+you important information nearer the event.
 {% endif %}
 
 You can log in and view your ticket here:
