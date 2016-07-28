@@ -8,6 +8,7 @@ from flask import (
     Markup, render_template_string,
 )
 from flask.ext.login import login_required, current_user
+from flask_mail import Message
 from wtforms.validators import Required, Optional, Email, ValidationError
 from wtforms import (
     SubmitField, StringField,
@@ -18,13 +19,14 @@ from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
-from main import db
+from main import db, mail
 from .common import (
     get_user_currency, set_user_currency, get_basket_and_total, create_basket,
-    CURRENCY_SYMBOLS, feature_flag, create_current_user, send_template_email)
+    CURRENCY_SYMBOLS, feature_flag, create_current_user, feature_enabled,
+)
 from .common.forms import IntegerSelectField, HiddenIntegerField, Form
 from .common.receipt import (
-    make_qr_png, make_barcode_png, render_pdf, render_receipt,
+    make_qr_png, make_barcode_png, render_pdf, render_receipt, attach_tickets,
 )
 from models.user import User, checkin_code_re
 from models.ticket import TicketLimitException, TicketType
@@ -383,18 +385,27 @@ def transfer(ticket_id):
 
         # Alert the users via email
         code = to_user.login_code(app.config['SECRET_KEY'])
-        send_template_email("You've been sent a ticket to EMF 2016!",
-                            to=to_user.email,
-                            sender=app.config['TICKETS_EMAIL'],
-                            template='emails/ticket-transfer-new-owner.txt',
+
+        msg = Message("You've been sent a ticket to EMF 2016!",
+                      sender=app.config.get('TICKETS_EMAIL'),
+                      recipients=[to_user.email])
+        msg.body = render_template('emails/ticket-transfer-new-owner.txt',
                             to_user=to_user, from_user=current_user,
                             new_user=new_user, code=code)
 
-        send_template_email("You sent someone an EMF 2016 ticket",
-                            to=current_user.email,
-                            sender=app.config['TICKETS_EMAIL'],
-                            template='emails/ticket-transfer-original-owner.txt',
+        if feature_enabled('ISSUE_TICKETS'):
+            attach_tickets(msg, to_user)
+
+        mail.send(msg)
+        db.session.commit()
+
+        msg = Message("You sent someone an EMF 2016 ticket",
+                      sender=app.config.get('TICKETS_EMAIL'),
+                      recipients=[current_user.email])
+        msg.body = render_template('emails/ticket-transfer-original-owner.txt',
                             to_user=to_user, from_user=current_user)
+
+        mail.send(msg)
 
         flash("Your ticket was transferred.")
         return redirect(url_for('tickets.main'))
