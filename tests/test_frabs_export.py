@@ -64,28 +64,24 @@ class XMLTestCase(unittest.TestCase):
         assert is_valid
 
     def test_export_frab(self):
-        class DemoVenue():
-            def __init__(self, name):
-                self.name = name
-
         events = [{
             'id': 1,
             'title': 'The foo bar',
-            'venue': DemoVenue('here'),
+            'venue': 'here',
             'description': 'The foo bar',
             'end_date': datetime(2016, 8, 5, 11, 00),
             'start_date': datetime(2016, 8, 5, 10, 30),
         }, {
             'id': 2,
             'title': 'The foo bartt',
-            'venue': DemoVenue('There'),
+            'venue': 'There',
             'description': 'The foo bar',
             'end_date': datetime(2016, 8, 5, 11, 00),
             'start_date': datetime(2016, 8, 5, 10, 30),
         }, {
             'id': 3,
             'title': 'The foo bartt2',
-            'venue': DemoVenue('here'),
+            'venue': 'here',
             'type': 'workshop',
             'description': 'The foo bar',
             'end_date': datetime(2016, 8, 6, 11, 00),

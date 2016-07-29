@@ -130,11 +130,16 @@ html, body{
         background-color: rgba(lighten($schedule-block, 13%), 70%);
     }
 }
+#filter_modal_btn {
+    top: 14px;
+    position: absolute;
+}
 @media (max-width: 768px) {
     .dhx_cal_navline .dhx_cal_tab {
         width: auto;
         padding-left: 10px;
         padding-right: 10px;
+        font-size: 12px;
     }
     .dhx_cal_container .dhx_cal_navline .dhx_cal_date {
         font-size: 15px;
@@ -143,26 +148,38 @@ html, body{
         display: none;
     }
     #emf_day_tab {
-        font-size: 12px;
         left: 5px !important;
     }
     #emf_weekend_tab {
-        font-size: 12px;
         left: 50px !important;
+    }
+    #filter_modal_btn {
+        left: 125px !important
+    }
+}
+
+.schedule.modal {
+    color: #888;
+    margin: 50px;
+
+    .modal-header h4 {
+        color: #888;
     }
 }
 
 @media (min-width: 768px) {
     .dhx_cal_navline .dhx_cal_tab {
         width: 70px;
+        font-size: 14px;
     }
     #emf_day_tab {
-        font-size: 14px;
         left: 20px !important;
     }
     #emf_weekend_tab {
-        font-size: 14px;
         left: 110px !important;
+    }
+    #filter_modal_btn {
+        left: 195px !important
     }
 }
 .dhx_cal_container .dhx_cal_tab,

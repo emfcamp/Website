@@ -231,12 +231,13 @@ class Proposal(db.Model):
             'id': self.id,
             'start_date': self.scheduled_time,
             'end_date': self.end_date(),
-            'venue': self.venue,
+            'venue': self.venue.name,
             'title': self.title,
             'speaker': self.published_names or self.user.name,
             'description': self.description,
             'type': self.type,
-            'is_fave': self.id in favourites_ids
+            'is_fave': self.id in favourites_ids,
+            'source': 'database',
         }
         if self.type == 'workshop':
             res['cost'] = self.cost

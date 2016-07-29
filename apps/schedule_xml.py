@@ -75,7 +75,7 @@ def export_frab(schedule):
 
     for event in schedule:
         day_key = event['start_date'].strftime('%Y-%m-%d')
-        venue_key = event['venue'].name
+        venue_key = event['venue']
 
         if day_key not in days_dict:
             index += 1

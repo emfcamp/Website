@@ -14,7 +14,7 @@ from main import db
 from .common import feature_flag
 from models.cfp import Proposal, Venue
 from models.ical import ICalSource
-from .schedule_xml import export_frab
+from .schedule_xml import export_frab, slugify
 
 schedule = Blueprint('schedule', __name__)
 
@@ -55,20 +55,19 @@ def main():
         event['description'] = urlize(event['description'])
         event['start_date'] = event['start_date'].strftime('%Y-%m-%d %H:%M:00')
         event['end_date'] = event['end_date'].strftime('%Y-%m-%d %H:%M:00')
-        event['venue'] = event['venue'].id
+        event['venue'] = slugify(event['venue'])
+        if event.get('source', 'ical') == 'database':
+            event['link'] = url_for('.line_up_proposal', proposal_id=event['id'])
         return event
 
     # {id:1, text:"Meeting",   start_date:"04/11/2013 14:00",end_date:"04/11/2013 17:00"}
-    schedule_data = _get_scheduled_proposals(request.args)
-    venues = set([(e['venue'].id, e['venue'].name) for e in schedule_data])
-    venues = [{'key': v[0], 'label': v[1]} for v in venues]
-    venues = sorted(venues, key=lambda x: x['label'])
+    schedule_data = _get_scheduled_proposals()
+
+    venues = set([e['venue'] for e in schedule_data])
+    venues = [{'key': slugify(v), 'label': v} for v in venues]
+    venues = sorted(venues, key=lambda x: x['key'])
 
     schedule_data = [add_event(e) for e in schedule_data]
-
-    # venues = [{'key': v.id, 'label': v.name} for v in Venue.query.filter_by().all()] +\
-    #          [{'key': v.id, 'label': v.name} for v in ICalSource.query.filter_by(enabled=True).all()]
-
 
     return render_template('schedule/user_schedule.html', venues=venues,
                             schedule_data=schedule_data)
@@ -80,7 +79,6 @@ def schedule_json():
     def convert_time_to_str(event):
         event['start_date'] = event['start_date'].strftime('%Y-%m-%d %H:%M:00')
         event['end_date'] = event['end_date'].strftime('%Y-%m-%d %H:%M:00')
-        event['venue'] = event['venue'].name
         return event
 
     schedule = [convert_time_to_str(p) for p in _get_scheduled_proposals(request.args)]
@@ -111,7 +109,7 @@ def schedule_ical():
         cal_event = Event()
         cal_event.add('uid', event['id'])
         cal_event.add('summary', event['title'])
-        cal_event.add('location', event['venue'].name)
+        cal_event.add('location', event['venue'])
         cal_event.add('dtstart', event['start_date'])
         cal_event.add('dtend', event['end_date'])
         cal.add_component(cal_event)

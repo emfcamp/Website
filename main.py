@@ -76,6 +76,8 @@ assets.register('css_arrivals', Bundle('css/arrivals.scss',
                 filters='pyscss,cssmin'))
 assets.register('js_main', Bundle('js/main.js',
                 output='gen/main-packed.js', filters='jsmin'))
+assets.register('js_schedule', Bundle('js/schedule.js',
+                output='gen/schedule-packed.js', filters='jsmin'))
 
 
 def create_app(dev_server=False):
