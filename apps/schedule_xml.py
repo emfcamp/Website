@@ -1,5 +1,3 @@
-import re
-
 from lxml import etree
 from slugify import slugify_unicode
 
