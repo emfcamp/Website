@@ -5,7 +5,7 @@ from datetime import datetime
 from lxml import etree
 
 from apps.schedule_xml import (
-    make_root, add_day, add_room, add_event, slugify, get_duration, export_frab
+    make_root, add_day, add_room, add_event, get_duration, export_frab
 )
 
 _schema = None
@@ -94,9 +94,6 @@ class XMLTestCase(unittest.TestCase):
         is_valid = schema.validate(frab_doc)
 
         assert is_valid
-
-    def test_slugify(self):
-        assert slugify('Hello world') == 'hello-world'
 
     def test_get_duration(self):
         start = datetime(2016, 8, 15, 11, 00)

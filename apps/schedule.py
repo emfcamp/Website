@@ -8,13 +8,14 @@ from flask import (
 from flask.ext.login import current_user
 from jinja2.utils import urlize
 from icalendar import Calendar, Event
+from slugify import slugify_unicode as slugify
 
 from main import db
 
 from .common import feature_flag
 from models.cfp import Proposal, Venue
 from models.ical import ICalSource
-from .schedule_xml import export_frab, slugify
+from .schedule_xml import export_frab
 
 schedule = Blueprint('schedule', __name__)
 

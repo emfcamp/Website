@@ -19,18 +19,37 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         week_or_day = (start_date <= todays_date && end_date >= todays_date) ? 'emf_day' : 'emf_weekend',
         id, ele, id_str;
 
-    function _get_onchange(id){
-        return function() {
-            var index = filter.venues.indexOf(id);
+    /*
+     * Required config
+     */
+    // Make sure dates are parsed correctly
+    scheduler.config.api_date = "%Y-%m-%d %H:%i:%s";
+    scheduler.config.xml_date = "%Y-%m-%d %H:%i:%s";
 
-            if (index >= 0) {
-                filter.venues.splice(index, 1);
-            } else {
-                filter.venues.push(id);
-            }
-            scheduler.updateView();
-        };
-    }
+    // Nothing scheduled is multi-day so switch it off
+    scheduler.config.multi_day = false;
+
+    /*
+     * Views
+     */
+    // Configure venues view
+    scheduler.locale.labels.emf_day_tab = "Day";
+    scheduler.locale.labels.section_custom="Section";
+    scheduler.createUnitsView({
+        name: "emf_day",
+        property: "venue",
+        list: scheduler.serverList('venues', venues),
+        size: 5,
+        step: 3,
+    });
+
+    scheduler.locale.labels.emf_weekend_tab = "Weekend";
+    scheduler.createUnitsView({
+        name:"emf_weekend",
+        property:"venue",
+        list: scheduler.serverList('venues', venues),
+        days: 3,
+    });
 
     // Easily retrieve venue name from its ID
     for(var i = 0; i<venues.length; i++){
@@ -51,42 +70,37 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         ele.checked = true;
         ele.onchange = _get_onchange(venues[i].key);
     }
+
     ele = $('#is_favourite')[0].onchange = function() {
         filter.is_favourite = !filter.is_favourite;
         scheduler.updateView();
     };
 
-    /*
-     * Required config
-     */
-    // Make sure dates are parsed correctly
-    scheduler.config.api_date = "%Y-%m-%d %H:%i:%s";
-    scheduler.config.xml_date = "%Y-%m-%d %H:%i:%s";
+    function _get_onchange(id){
+        return function() {
+            var index = filter.venues.indexOf(id),
+                venue_index = venues.indexOf(venue_dict[id]);
 
-    // Nothing scheduled is multi-day so switch it off
-    scheduler.config.multi_day = false;
+            if (index >= 0) {
+                filter.venues.splice(index, 1);
+                venues.splice(index, 1);
+            } else {
+                filter.venues.push(id);
+                venues.push({key:id, label: venue_dict[id]});
+                venues.sort(function (a, b) {
+                    return a.key === b.key ? 0 :
+                           a.key > b.key ? 1 : -1;
+                });
 
-    /*
-     * Views
-     */
-    // Configure venues view
-    scheduler.locale.labels.emf_day_tab = "Day";
-    scheduler.locale.labels.section_custom="Section";
-    scheduler.createUnitsView({
-        name: "emf_day",
-        property: "venue",
-        list: venues,
-        size: 5,
-        step: 3,
-    });
-
-    scheduler.locale.labels.emf_weekend_tab = "Weekend";
-    scheduler.createUnitsView({
-        name:"emf_weekend",
-        property:"venue",
-        list:venues,
-        days: 3,
-    });
+                filter.venues.sort(function (a, b) {
+                    return venue_dict[a] === venue_dict[b] ? 0 :
+                           venue_dict[a] > venue_dict[b] ? 1 : -1;
+                });
+            }
+            scheduler.updateCollection('venues', venues);
+            scheduler.updateView();
+        };
+    }
 
     // Set the filter for both views
     function _filter_events(id, event){
@@ -142,10 +156,10 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         scheduler.setCurrentView(date, mode);
     };
 
-    scheduler._click.dhx_second_scale_bar = function () {
-        console.log(arguments);
-        scheduler.setCurrentView(date, 'emf_day');
-    };
+    // scheduler._click.dhx_second_scale_bar = function () {
+    //     console.log(arguments);
+    //     scheduler.setCurrentView(date, 'emf_day');
+    // };
 
     // scheduler.date.week_emf_day_start = scheduler.date.week_start;
 
