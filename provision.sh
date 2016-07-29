@@ -1,6 +1,6 @@
 cd /vagrant
 sudo apt-get update
-sudo apt-get install -y python-dev python-virtualenv libxml2-dev libxslt1-dev libffi-dev postgresql-server-dev-9.4 git
+sudo apt-get install -y python-dev python-virtualenv libxml2-dev libxslt1-dev libffi-dev postgresql-server-dev-9.4 git glpk-utils
 touch .inside-vagrant
 make init
 make update
