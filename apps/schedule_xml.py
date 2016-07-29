@@ -1,16 +1,8 @@
 import re
+
 from lxml import etree
+from slugify import slugify_unicode
 
-_punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
-
-def slugify(text, delim=u'-'):
-    """Generates a nicer looking slug."""
-    result = []
-    for word in _punct_re.split(text.lower()):
-        word = word.encode('utf-8')
-        if word:
-            result.append(word)
-    return unicode(delim.join(result))
 
 def get_duration(start_time, end_time):
     # str(timedelta) creates e.g. hrs:min:sec...
@@ -63,10 +55,10 @@ def add_event(room, event):
     _add_sub_with_text(event_node, 'abstract', event['description'])
     _add_sub_with_text(event_node, 'description', event['description'])
 
-    _add_sub_with_text(event_node, 'slug', slugify(event['title']))
+    _add_sub_with_text(event_node, 'slug', 'emf2016-%s-%s' % (event['id'], slugify_unicode(event['title']).lower()))
 
-    _add_sub_with_text(event_node, 'subtitle', 'n/a')
-    _add_sub_with_text(event_node, 'track', 'n/a')
+    _add_sub_with_text(event_node, 'subtitle', '')
+    _add_sub_with_text(event_node, 'track', '')
 
 def export_frab(schedule):
     root = make_root()
