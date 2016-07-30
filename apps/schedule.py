@@ -31,6 +31,7 @@ def get_schedule_dict(proposal, favourites_ids):
         'speaker': proposal.published_names or proposal.user.name,
         'description': proposal.description,
         'type': proposal.type,
+        'may_record': proposal.may_record,
         'is_fave': proposal.id in favourites_ids,
         'source': 'database',
     }
@@ -50,7 +51,7 @@ def _get_scheduled_proposals(filter_obj={}):
                                       Proposal.scheduled_duration.isnot(None)
                                     ).all()
 
-    schedule = [get_schedule_dict(favourites) for p in schedule]
+    schedule = [get_schedule_dict(p, favourites) for p in schedule]
 
     ical_sources = ICalSource.query.filter_by(enabled=True).all()
 

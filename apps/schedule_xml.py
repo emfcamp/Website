@@ -58,6 +58,15 @@ def add_event(room, event):
     _add_sub_with_text(event_node, 'subtitle', '')
     _add_sub_with_text(event_node, 'track', '')
 
+    add_recording(event_node, event)
+
+def add_recording(event_node, event):
+
+    recording_node = etree.SubElement(event_node, 'recording')
+
+    _add_sub_with_text(recording_node, 'license', 'CC BY-SA 3.0')
+    _add_sub_with_text(recording_node, 'optout', 'false' if event['may_record'] else 'true')
+
 def export_frab(schedule):
     root = make_root()
     days_dict = {}
