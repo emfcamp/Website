@@ -9,7 +9,7 @@
 <p><strong>{{ proposal.scheduled_time.strftime('%A at %-I:%M %p') }}</strong> in <strong>{{ venue_name }}</strong>
 {% endif %}
 
-{% if proposal.type == 'workshop' and proposal.cost > 0 %}
+{% if proposal.type == 'workshop' and proposal.cost != '' %}
   <p>Attendance of this workshop will cost: <strong>{{ proposal.cost }}</strong></p>
 {% endif %}
 
