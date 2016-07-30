@@ -4,6 +4,7 @@ from StringIO import StringIO
 from datetime import datetime
 from lxml import etree
 
+from .core import get_app
 from apps.schedule_xml import (
     make_root, add_day, add_room, add_event, get_duration, export_frab
 )
@@ -20,6 +21,14 @@ def get_frabs_schema():
     return _schema
 
 class XMLTestCase(unittest.TestCase):
+    def setUp(self):
+        self.client, self.app, self.db = get_app()
+        self.ctx = self.app.test_request_context()
+        self.ctx.push()
+
+    def tearDown(self):
+        self.ctx.pop()
+
     def test_empty_schema_fails(self):
         empty_root = etree.Element('root')
         schema = get_frabs_schema()

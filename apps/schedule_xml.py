@@ -65,7 +65,7 @@ def add_room(day, name):
     return etree.SubElement(day, 'room', name=name)
 
 def add_event(room, event):
-    url = external_url('.line_up_proposal', proposal_id=event['id'], slug=None)
+    url = external_url('schedule.line_up_proposal', proposal_id=event['id'], slug=None)
 
     event_node = etree.SubElement(room, 'event', id=str(event['id']),
                                                  guid=str(uuid5(NAMESPACE_URL, url)))
@@ -96,7 +96,7 @@ def add_recording(event_node, event):
     recording_node = etree.SubElement(event_node, 'recording')
 
     _add_sub_with_text(recording_node, 'license', 'CC BY-SA 3.0')
-    _add_sub_with_text(recording_node, 'optout', 'false' if event['may_record'] else 'true')
+    _add_sub_with_text(recording_node, 'optout', 'false' if event.get('may_record') else 'true')
 
 
 def export_frab(schedule):
