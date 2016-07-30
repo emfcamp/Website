@@ -1,8 +1,12 @@
-from main import db
 from datetime import datetime, timedelta
 from collections import namedtuple
 from dateutil.parser import parse as parse_date
+import re
+
 from sqlalchemy import UniqueConstraint
+from slugify import slugify_unicode
+
+from main import db
 
 # state: [allowed next state, ] pairs
 CFP_STATES = { 'edit': ['accepted', 'rejected', 'new'],
@@ -243,6 +247,27 @@ class Proposal(db.Model):
             res['cost'] = self.cost
         return res
 
+    @property
+    def slug(self):
+        slug = slugify_unicode(self.title).lower()
+        if len(slug) > 60:
+            words = re.split(' +|[,.;:!?]+', self.title)
+            break_words = ['and', 'which', 'with', 'without', 'for', '-', '']
+
+            for i, word in reversed(list(enumerate(words))):
+                new_slug = slugify_unicode(' '.join(words[:i])).lower()
+                if word in break_words:
+                    if len(new_slug) > 10 and not len(new_slug) > 60:
+                        slug = new_slug
+                        break
+
+                elif len(slug) > 60 and len(new_slug) > 10:
+                    slug = new_slug
+
+        if len(slug) > 60:
+            slug = slug[:60] + '-'
+
+        return slug
 
 class PerformanceProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'performance'}

@@ -4,7 +4,7 @@
         <ul>
           {% for prop in type_proposals | sort(attribute='title') %}
             <li>
-                <a href="{{ url_for('.line_up_proposal', proposal_id=prop.id) }}">
+                <a href="{{ url_for('.line_up_proposal', proposal_id=prop.id, slug=prop.slug) }}">
                     {{ prop.title }} &mdash; <em>{{ prop.published_names or prop.user.name }}</em>
                 </a>
             </li>

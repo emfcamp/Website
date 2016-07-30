@@ -144,11 +144,15 @@ def favourites():
     return render_template('schedule/favourites.html', proposals=proposals)
 
 @schedule.route('/line-up/2016/<int:proposal_id>', methods=['GET', 'POST'])
+@schedule.route('/line-up/2016/<int:proposal_id>-<slug>', methods=['GET', 'POST'])
 @feature_flag('SCHEDULE')
-def line_up_proposal(proposal_id):
+def line_up_proposal(proposal_id, slug=None):
     proposal = Proposal.query.get_or_404(proposal_id)
     if proposal.state not in ('accepted', 'finished'):
         abort(404)
+
+    if slug != proposal.slug:
+        return redirect(url_for('.line_up_proposal', proposal_id=proposal.id, slug=proposal.slug))
 
     if not current_user.is_anonymous():
         is_fave = proposal in current_user.favourites
@@ -164,7 +168,7 @@ def line_up_proposal(proposal_id):
             msg = 'Added "%s" to favourites' % proposal.title
         db.session.commit()
         flash(msg)
-        return redirect(url_for('.line_up_proposal', proposal_id=proposal.id))
+        return redirect(url_for('.line_up_proposal', proposal_id=proposal.id, slug=proposal.slug))
 
     venue_name = None
     if proposal.scheduled_venue:
