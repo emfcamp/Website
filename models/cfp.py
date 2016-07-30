@@ -252,6 +252,7 @@ class Proposal(db.Model):
 
         return slug
 
+
 class PerformanceProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'performance'}
 

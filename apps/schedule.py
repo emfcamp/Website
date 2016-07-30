@@ -21,7 +21,7 @@ from .schedule_xml import export_frab
 schedule = Blueprint('schedule', __name__)
 
 
-def get_schedule_dict(proposal, favourites_ids):
+def _get_proposal_dict(proposal, favourites_ids):
     res = {
         'id': proposal.id,
         'start_date': proposal.scheduled_time,
@@ -39,6 +39,21 @@ def get_schedule_dict(proposal, favourites_ids):
         res['cost'] = proposal.cost
     return res
 
+def _get_ical_dict(proposal, favourites_ids):
+    return {
+        'id': proposal.id,
+        'start_date': proposal.start_date,
+        'end_date': proposal.end_date,
+        'venue': proposal.venue.name,
+        'title': proposal.title,
+        'speaker': '',
+        'description': proposal.description,
+        'type': 'talk',
+        'may_record': False,
+        'is_fave': proposal.id in favourites_ids,
+        'source': 'database',
+    }
+
 def _get_scheduled_proposals(filter_obj={}):
     if current_user.is_anonymous():
         favourites = []
@@ -51,12 +66,12 @@ def _get_scheduled_proposals(filter_obj={}):
                                       Proposal.scheduled_duration.isnot(None)
                                     ).all()
 
-    schedule = [get_schedule_dict(p, favourites) for p in schedule]
+    schedule = [_get_proposal_dict(p, favourites) for p in schedule]
 
     ical_sources = ICalSource.query.filter_by(enabled=True).all()
 
     for source in ical_sources:
-        schedule = schedule + source.get_ical_feed()
+        schedule = schedule + [_get_ical_dict(p) for p in source.get_ical_feed()]
 
     if 'is_favourite' in filter_obj and filter_obj['is_favourite']:
         schedule = [s for s in schedule if s.get('is_fave', False)]
@@ -65,7 +80,6 @@ def _get_scheduled_proposals(filter_obj={}):
         schedule = [s for s in schedule if s['venue'].name in filter_obj['venue']]
 
     return schedule
-
 
 @schedule.route('/schedule')
 @feature_flag('SCHEDULE')
