@@ -21,6 +21,23 @@ from .schedule_xml import export_frab
 schedule = Blueprint('schedule', __name__)
 
 
+def get_schedule_dict(proposal, favourites_ids):
+    res = {
+        'id': proposal.id,
+        'start_date': proposal.scheduled_time,
+        'end_date': proposal.end_date(),
+        'venue': proposal.venue.name,
+        'title': proposal.title,
+        'speaker': proposal.published_names or proposal.user.name,
+        'description': proposal.description,
+        'type': proposal.type,
+        'is_fave': proposal.id in favourites_ids,
+        'source': 'database',
+    }
+    if proposal.type == 'workshop':
+        res['cost'] = proposal.cost
+    return res
+
 def _get_scheduled_proposals(filter_obj={}):
     if current_user.is_anonymous():
         favourites = []
@@ -33,7 +50,7 @@ def _get_scheduled_proposals(filter_obj={}):
                                       Proposal.scheduled_duration.isnot(None)
                                     ).all()
 
-    schedule = [p.get_schedule_dict(favourites) for p in schedule]
+    schedule = [get_schedule_dict(favourites) for p in schedule]
 
     ical_sources = ICalSource.query.filter_by(enabled=True).all()
 
