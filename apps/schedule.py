@@ -1,6 +1,7 @@
 # encoding=utf-8
 import json
 import cgi
+import pytz
 
 from flask import (
     Blueprint, render_template, redirect, url_for, flash,
@@ -21,11 +22,13 @@ from .schedule_xml import export_frab
 schedule = Blueprint('schedule', __name__)
 
 
+event_tz = pytz.timezone('Europe/London')
+
 def get_schedule_dict(proposal, favourites_ids):
     res = {
         'id': proposal.id,
-        'start_date': proposal.scheduled_time,
-        'end_date': proposal.end_date(),
+        'start_date': event_tz.localize(proposal.scheduled_time),
+        'end_date': event_tz.localize(proposal.end_date()),
         'venue': proposal.venue.name,
         'title': proposal.title,
         'speaker': proposal.published_names or proposal.user.name,

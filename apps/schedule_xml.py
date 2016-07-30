@@ -1,9 +1,14 @@
 from uuid import uuid5, NAMESPACE_URL
+from datetime import time, datetime, timedelta
+import pytz
 
 from lxml import etree
 from slugify import slugify_unicode
 
 from main import external_url
+
+event_tz = pytz.timezone('Europe/London')
+
 
 def get_duration(start_time, end_time):
     # str(timedelta) creates e.g. hrs:min:sec...
@@ -11,6 +16,23 @@ def get_duration(start_time, end_time):
     hours = int(duration // 60)
     minutes = int(duration % 60)
     return '{0:01d}:{1:02d}'.format(hours, minutes)
+
+def get_day_start_end(dt, start_time=time(4, 0)):
+    # A day changeover of 4am allows us to have late events.
+    # All in local time because that's what people deal in.
+    start_date = dt.date()
+    if dt.time() < start_time:
+        start_date -= timedelta(days=1)
+
+    end_date = start_date + timedelta(days=1)
+
+    start_dt = datetime.combine(start_date, start_time)
+    end_dt = datetime.combine(end_date, start_time)
+
+    start_dt = event_tz.localize(start_dt)
+    end_dt = event_tz.localize(end_dt)
+
+    return start_dt, end_dt
 
 def _add_sub_with_text(parent, element, text):
     node = etree.SubElement(parent, element)
@@ -33,9 +55,11 @@ def make_root():
 
     return root
 
-def add_day(root, index=0, date=None):
-    # Skip the start/end attributes as we'll assume stuff may run all day
-    return etree.SubElement(root, 'day', index=str(index), date=date.strftime('%Y-%m-%d'))
+def add_day(root, index, start, end):
+    # Don't include start because it's not needed
+    return etree.SubElement(root, 'day', index=str(index),
+                                         date=start.strftime('%Y-%m-%d'),
+                                         end=end.isoformat())
 
 def add_room(day, name):
     return etree.SubElement(day, 'room', name=name)
@@ -74,18 +98,20 @@ def add_recording(event_node, event):
     _add_sub_with_text(recording_node, 'license', 'CC BY-SA 3.0')
     _add_sub_with_text(recording_node, 'optout', 'false' if event['may_record'] else 'true')
 
+
 def export_frab(schedule):
     root = make_root()
     days_dict = {}
     index = 0
 
     for event in schedule:
-        day_key = event['start_date'].strftime('%Y-%m-%d')
+        day_start, day_end = get_day_start_end(event['start_date'])
+        day_key = day_start.strftime('%Y-%m-%d')
         venue_key = event['venue']
 
         if day_key not in days_dict:
             index += 1
-            node = add_day(root, index=index, date=event['start_date'])
+            node = add_day(root, index, day_start, day_end)
             days_dict[day_key] = {
                 'node': node,
                 'rooms': {}
