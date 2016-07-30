@@ -86,6 +86,7 @@ def about():
     return render_template('about.html')
 
 
+@base.route("/talks")
 @base.route("/talks/")
 @site_flag('TICKETS_SITE')
 def talks():
