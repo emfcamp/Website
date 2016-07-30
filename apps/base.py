@@ -89,7 +89,7 @@ def about():
 @base.route("/talks/")
 @site_flag('TICKETS_SITE')
 def talks():
-    return redirect(url_for('.talks_2014'))
+    return redirect(url_for('schedule.line_up'))
 
 
 @base.route("/talks/2014")
