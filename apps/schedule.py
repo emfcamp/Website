@@ -1,5 +1,6 @@
 # encoding=utf-8
 import json
+import cgi
 
 from flask import (
     Blueprint, render_template, redirect, url_for, flash,
@@ -52,7 +53,7 @@ def _get_scheduled_proposals(filter_obj={}):
 @feature_flag('SCHEDULE')
 def main():
     def add_event(event):
-        event['text'] = event['title']
+        event['text'] = cgi.escape(event['title'])
         event['description'] = urlize(event['description'])
         event['start_date'] = event['start_date'].strftime('%Y-%m-%d %H:%M:00')
         event['end_date'] = event['end_date'].strftime('%Y-%m-%d %H:%M:00')

@@ -11,7 +11,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
             'is_favourite': false
         },
         venue_dict = {},
-        day_format = "%D, %jth",   // e.g. Friday, 5th
+        day_format = "%D, %jth",   // e.g. Friday, 5th (FIXME: deal with 1st and 2nd)
         day_formatter = scheduler.date.date_to_str(day_format),
         time_formatter = scheduler.date.date_to_str("%H:%i"), // e.g. 22:33
         debounce = false,
@@ -209,45 +209,36 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         popup_event;
 
     scheduler.showLightbox = function(id) {
-        function set_inner(id, text) {
-            var element = get_ele(id);
-            element.innerHTML = text;
-        }
-        var ev = scheduler.getEvent(id),
-            fave = get_ele('favourite_icon'),
-            link = get_ele('title_link'),
-            form = get_ele('favourite_form'),
-            btn = get_ele('favourite_btn'),
-            loggedout = get_ele('loggedout'),
-            ev_href = ev.link;
+        var ev = scheduler.getEvent(id);
 
         // Open the popup
         scheduler.startLightbox(id, document.getElementById("event_popup"));
 
         // Set the basic details
-        set_inner('event_title', ev.title);
-        set_inner('event_speaker', ev.speaker);
+        $('#event_title').text(ev.title);
+        $('#event_speaker').text(ev.speaker);
 
-        set_inner('event_venue', venue_dict[ev.venue]);
-        set_inner('event_day', day_formatter(ev.start_date));
-        set_inner('event_time', time_formatter(ev.start_date));
-        set_inner('event_description', ev.description);
+        $('#event_venue').text(venue_dict[ev.venue]);
+        $('#event_day').text(day_formatter(ev.start_date));
+        $('#event_time').text(time_formatter(ev.start_date));
+        $('#event_description').html(ev.description);
 
         if (ev.type === 'workshop' && ev.cost.trim() !== '') {
-            set_inner('workshop_cost',
-                      '<strong>Cost:</strong> ' + ev.cost);
+            var cost = $('<span class="event-cost">').text(ev.cost);
+            $('#workshop_cost').html('<strong>Cost:</strong> ' + cost.html());
         } else {
-            set_inner('workshop_cost','');
+            $('#workshop_cost').html('');
         }
 
         // Set the link and indicate whether this is a faved event
-        link.href = ev_href;
-        form.action = ev_href;
-        fave.className = ev.is_fave ? "glyphicon glyphicon-star" :
-                                      "glyphicon glyphicon-star-empty";
+        $('#title_link').attr('href', ev.link);
+        $('#favourite_form').attr('action', ev.link);
+        $('#favourite_icon').removeClass('glyphicon-star glyphicon-star-empty');
+        $('#favourite_icon').addClass(ev.is_fave ? 'glyphicon-star' : 'glyphicon-star-empty');
+
         if ( is_anonymous ) {
-            btn.style.display = 'none';
-            loggedout.style.display = 'block';
+            $('#favourite_btn').hide();
+            $('#loggedout').show();
         }
 
         popup_event = ev;
