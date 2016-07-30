@@ -1,6 +1,9 @@
+from uuid import uuid5, NAMESPACE_URL
+
 from lxml import etree
 from slugify import slugify_unicode
 
+from main import external_url
 
 def get_duration(start_time, end_time):
     # str(timedelta) creates e.g. hrs:min:sec...
@@ -38,7 +41,11 @@ def add_room(day, name):
     return etree.SubElement(day, 'room', name=name)
 
 def add_event(room, event):
-    event_node = etree.SubElement(room, 'event', id=str(event['id']))
+    url = external_url('.line_up_proposal', proposal_id=event['id'], slug=None)
+
+    event_node = etree.SubElement(room, 'event', id=str(event['id']),
+                                                 guid=str(uuid5(NAMESPACE_URL, url)))
+
     _add_sub_with_text(event_node, 'room', room.attrib['name'])
     _add_sub_with_text(event_node, 'title', event['title'])
     _add_sub_with_text(event_node, 'type', event.get('type', 'talk'))
