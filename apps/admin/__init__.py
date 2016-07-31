@@ -10,7 +10,7 @@ from flask import (
 from wtforms.validators import Optional, Required, URL
 from wtforms import (
     SubmitField, BooleanField, HiddenField, StringField,
-    FieldList, FormField, SelectField, FloatField
+    FieldList, FormField, SelectField, FloatField, IntegerField
 )
 
 from sqlalchemy.sql.functions import func
@@ -252,6 +252,7 @@ class ScheduleForm(Form):
     email = StringField('Email')
     lat = FloatField('lat', [Optional()])
     lon = FloatField('lon', [Optional()])
+    priority = IntegerField('priority', [Optional()])
 
     submit = SubmitField('Save')
 
@@ -264,6 +265,7 @@ class ScheduleForm(Form):
         feed.contact_email = self.email.data
         feed.lat = self.lat.data
         feed.lon = self.lon.data
+        feed.priority = self.priority.data
 
     def init_from_feed(self, feed):
         self.feed_name.data = feed.name
@@ -274,7 +276,7 @@ class ScheduleForm(Form):
         self.email.data = feed.contact_email
         self.lat.data = feed.lat
         self.lon.data = feed.lon
-
+        self.priority.data = feed.priority
 
 @admin.route('/schedule-feeds/<int:feed_id>', methods=['GET', 'POST'])
 @admin_required

@@ -340,6 +340,7 @@ class Venue(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     type = db.Column(db.String, nullable=True)
+    priority = db.Column(db.Integer, nullable=True, default=0)
 
     proposals = db.relationship('Proposal', backref='venue', lazy='dynamic',
                                 primaryjoin='Proposal.scheduled_venue == Venue.id')

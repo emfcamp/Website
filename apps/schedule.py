@@ -37,6 +37,7 @@ def _get_proposal_dict(proposal, favourites_ids):
         'may_record': proposal.may_record,
         'is_fave': proposal.id in favourites_ids,
         'source': 'database',
+        'link': url_for('.line_up_proposal', proposal_id=proposal.id),
     }
     if proposal.type == 'workshop':
         res['cost'] = proposal.cost
@@ -44,7 +45,7 @@ def _get_proposal_dict(proposal, favourites_ids):
 
 def _get_ical_dict(event, favourites_ids):
     return {
-        'id': event.id,
+        'id': event.uid,
         'start_date': event.start_dt,
         'end_date': event.end_dt,
         'venue': event.location or '(Unknown)',
@@ -55,6 +56,7 @@ def _get_ical_dict(event, favourites_ids):
         'may_record': False,
         'is_fave': event.id in favourites_ids,
         'source': 'database',
+        'link': 'none yet',
     }
 
 def _get_scheduled_proposals(filter_obj={}):
@@ -74,7 +76,14 @@ def _get_scheduled_proposals(filter_obj={}):
     ical_sources = CalendarSource.query.filter_by(enabled=True)
 
     for source in ical_sources:
-        schedule += [_get_ical_dict(e, []) for e in source.events]
+        for e in source.events:
+            d = _get_ical_dict(e, [])
+            # Override venue if we have a venue set on the source
+            if source.main_venue:
+                d['venue'] = source.main_venue
+            else:
+                d['venue'] = e.location
+            schedule.append(d)
 
     if 'is_favourite' in filter_obj and filter_obj['is_favourite']:
         schedule = [s for s in schedule if s.get('is_fave', False)]
@@ -83,6 +92,30 @@ def _get_scheduled_proposals(filter_obj={}):
         schedule = [s for s in schedule if s['venue'].name in filter_obj['venue']]
 
     return schedule
+
+def _get_priority_sorted_venues(venues_to_allow):
+    main_venues = Venue.query.filter().all()
+    main_venues = sorted(main_venues, key=lambda x: x.priority)
+    main_venues.reverse()
+    main_venue_names = [v.name for v in main_venues]
+
+    ical_sources = CalendarSource.query.filter_by(enabled=True)
+    ical_sources = sorted(ical_sources, key=lambda x: x.priority)
+    ical_sources.reverse()
+    ical_source_names = [v.main_venue for v in ical_sources]
+
+    # List event venues that are not overridden with zero priority
+    for source in ical_sources:
+        for e in source.events:
+            if not source.main_venue:
+                ical_source_names.append(e['location'])
+
+    names = []
+    for name_list in (main_venue_names, ical_source_names):
+        for name in name_list:
+            if name not in names and name in venues_to_allow:
+                names.append(name)
+    return names
 
 @schedule.route('/schedule')
 @feature_flag('SCHEDULE')
@@ -93,16 +126,14 @@ def main():
         event['start_date'] = event['start_date'].strftime('%Y-%m-%d %H:%M:00')
         event['end_date'] = event['end_date'].strftime('%Y-%m-%d %H:%M:00')
         event['venue'] = slugify(event['venue'])
-        if event.get('source', 'ical') == 'database':
-            event['link'] = url_for('.line_up_proposal', proposal_id=event['id'])
         return event
 
     # {id:1, text:"Meeting",   start_date:"04/11/2013 14:00",end_date:"04/11/2013 17:00"}
     schedule_data = _get_scheduled_proposals()
 
-    venues = set([e['venue'] for e in schedule_data])
+    venues_with_events = set([e['venue'] for e in schedule_data])
+    venues = _get_priority_sorted_venues(venues_with_events)
     venues = [{'key': slugify(v), 'label': v} for v in venues]
-    venues = sorted(venues, key=lambda x: x['key'])
 
     schedule_data = [add_event(e) for e in schedule_data]
 

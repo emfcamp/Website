@@ -29,6 +29,7 @@
     {{ render_field(form.email, true) }}
     {{ render_field(form.lat, true) }}
     {{ render_field(form.lon, true) }}
+    {{ render_field(form.priority, true) }}
 
     {{ form.submit(class_="btn btn-success") }}
     <a class="btn" href="{{ url_for('.schedule_feeds') }}">Back</a>

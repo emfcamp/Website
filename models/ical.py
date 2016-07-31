@@ -19,6 +19,7 @@ class CalendarSource(db.Model):
     contact_email = db.Column(db.String)
     lat = db.Column(db.Float)
     lon = db.Column(db.Float)
+    priority = db.Column(db.Integer, default=0)
 
     def __init__(self, url):
         self.url = url
@@ -72,8 +73,7 @@ class CalendarSource(db.Model):
 
                 event.summary = unicode(component.get('summary'))
                 event.description = unicode(component.get('description'))
-                # We override venue with the admin-defined one
-                event.location = self.main_venue
+                event.location = unicode(component.get('location'))
 
                 db.session.commit()
 
