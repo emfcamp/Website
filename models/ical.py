@@ -72,15 +72,16 @@ class CalendarSource(db.Model):
 
                 event.summary = unicode(component.get('summary'))
                 event.description = unicode(component.get('description'))
-                event.location = unicode(component.get('location'))
+                # We override venue with the admin-defined one
+                event.location = self.main_venue
 
                 db.session.commit()
 
         events = CalendarEvent.query.filter_by(source_id=self.id)
         to_delete = [p for p in events if p.uid not in uid_seen]
 
-        for uid in to_delete:
-            db.session.delete(CalendarEvent.query.get(uid))
+        for e in to_delete:
+            db.session.delete(e)
             db.session.commit()
 
 

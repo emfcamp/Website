@@ -872,11 +872,19 @@ class SendEmails(Command):
 class CreateCalendars(Command):
     def run(self):
         icals = [
-            'https://calendar.google.com/calendar/ical/3s832k79jjbrl9o9e8ifmgflhg%40group.calendar.google.com/public/basic.ics',
+            {
+		'url': 'https://calendar.google.com/calendar/ical/3s832k79jjbrl9o9e8ifmgflhg%40group.calendar.google.com/public/basic.ics',
+                'main_venue': 'Stage A',
+            },
+            {
+		'url': 'https://calendar.google.com/calendar/ical/5nkm5d7nahs9bcgn4q1btjg3c4%40group.calendar.google.com/public/basic.ics',
+                'main_venue': 'Workshop 3',
+            }
         ]
 
-        for url in icals:
-            source = CalendarSource(url)
+        for cal in icals:
+            source = CalendarSource(cal['url'])
+            source.main_venue = cal['main_venue']
             db.session.add(source)
 
         db.session.commit()
