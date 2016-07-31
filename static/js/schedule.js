@@ -11,6 +11,10 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
             'is_favourite': false
         },
         venue_dict = {},
+        timeline_venues = [
+            {key:'main-schedule-items', label:'Main', open: true, children: []},
+            {key:'village-schedule-items', label:'Villages', open: true, children: []},
+        ],
         day_format = "%D, %jth",   // e.g. Friday, 5th (FIXME: deal with 1st and 2nd)
         day_formatter = scheduler.date.date_to_str(day_format),
         time_formatter = scheduler.date.date_to_str("%H:%i"), // e.g. 22:33
@@ -25,7 +29,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
             {"key": "Workshop-2", "label": "Workshop 2"},
             {"key": "Workshop-3", "label": "Workshop 3"}
         ],
-        id, ele, id_str;
+        id, ele, id_str, ven;
 
     /*
      * Required config
@@ -40,44 +44,32 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
     /*
      * Views
      */
-    // Configure venues view
-    scheduler.locale.labels.emf_day_tab = "Day";
-    scheduler.locale.labels.section_custom="Section";
-    scheduler.createUnitsView({
-        name: "emf_day",
-        property: "venue",
-        list: scheduler.serverList('venues', venues),
-        size: 6,
-        step: 1,
-    });
-
-    scheduler.locale.labels.emf_weekend_tab = "Weekend";
-    scheduler.createUnitsView({
-        name:"emf_weekend",
-        property:"venue",
-        list: scheduler.serverList('main_venues', main_venues),
-        days: 3,
-        size: 6,
-    });
-
+    // Initialise a load of stuff
     // Easily retrieve venue name from its ID
     for(var i = 0; i<venues.length; i++){
-        venue_dict[venues[i].key] = venues[i];
-        filter.venues.push(venues[i].key);
+        ven = venues[i];
+        venue_dict[ven.key] = ven;
+        filter.venues.push(ven.key);
 
-        id_str = 'venue_'+venues[i].key;
+        id_str = 'venue_'+ven.key;
 
         ele = $('#filters').append(
             '<div class="checkbox">' +
                 '<label>' +
-                  '<input id="'+id_str+'" type="checkbox"> ' + venues[i].label +
+                  '<input id="'+id_str+'" type="checkbox"> ' + ven.label +
                 '</label>' +
             '</div>'
         );
 
         ele = $('#' + id_str)[0];
         ele.checked = true;
-        ele.onchange = _get_onchange(venues[i].key);
+        ele.onchange = _get_onchange(ven.key);
+
+        if (ven.source === 'main') {
+            timeline_venues[0].children.push(ven);
+        } else {
+            timeline_venues[1].children.push(ven);
+        }
     }
 
     ele = $('#is_favourite')[0].onchange = function() {
@@ -116,6 +108,42 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
             scheduler.updateView();
         };
     }
+    // Configure venues view
+    scheduler.locale.labels.emf_day_tab = "Day";
+    scheduler.locale.labels.section_custom="Section";
+    scheduler.createUnitsView({
+        name: "emf_day",
+        property: "venue",
+        list: scheduler.serverList('venues', venues),
+        size: 6,
+        step: 1,
+    });
+
+    scheduler.locale.labels.emf_weekend_tab = "Weekend";
+    scheduler.createUnitsView({
+        name:"emf_weekend",
+        property:"venue",
+        list: scheduler.serverList('main_venues', main_venues),
+        days: 3,
+        size: 6,
+    });
+
+    scheduler.locale.labels.emf_timeline_tab = "Timeline";
+    scheduler.createTimelineView({
+        section_autoheight: false,
+        name:"emf_timeline",
+        x_unit: "minute",
+        x_date: "%H:%i",
+        x_step: 60,
+        x_size: 15,
+        x_start: 9,
+        x_length: 48,
+        y_unit: scheduler.serverList('venues', timeline_venues),
+        y_property: "venue",
+        render: "tree",
+        folder_dy:20,
+        dy:40
+    });
 
     // Set the filter for both views
     function _filter_events(id, event){
@@ -132,18 +160,18 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
     scheduler.filter_emf_weekend = _filter_events;
 
     // Clamp day view
-    scheduler.date.add_emf_day = function (day, inc) {
+    scheduler.date.add_emf_timeline = scheduler.date.add_emf_day = function (day, inc) {
         var res = scheduler.date.add(day, inc, "day"),
             last_day = new Date(end_date);
 
         // end date is Monday (to set inclusive ranges) last day is Sunday
-        last_day.setUTCDate(end_date.getUTCDate() - 1);
+        last_day.setDate(end_date.getDate() - 1);
 
         // Test on the date value so we can compare using less/greater than
         // or equals
-        if (res.getUTCDate() <= start_date.getUTCDate()) {
+        if (res.getDate() <= start_date.getDate()) {
             return start_date;
-        } else if (res.getUTCDate() >= last_day.getUTCDate()) {
+        } else if (res.getDate() >= last_day.getDate()) {
             return last_day;
         }
         return res;
@@ -318,6 +346,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
                "<b>Venue:</b> " + venue_dict[event.venue].label;
     };
 
+    // Add custom CSS classes based on the event properties
     scheduler.templates.event_class=function(start,end,event){
         var res = [];
 

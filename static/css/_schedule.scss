@@ -104,7 +104,8 @@ html, body{
         }
     }
 }
-
+// .dhx_matrix_scell.item { width: 150px !important; }
+.dhx_matrix_line .dhx_cal_event_line,
 .dhx_cal_container .dhx_cal_data .dhx_scale_holder .dhx_cal_event div {
     color: $schedule-text;
     background-color: rgba($schedule-block, 85%);
@@ -153,8 +154,11 @@ html, body{
     #emf_weekend_tab {
         left: 50px !important;
     }
-    #filter_modal_btn {
+    #emf_timeline_tab {
         left: 125px !important
+    }
+    #filter_modal_btn {
+        left: 195px !important
     }
 }
 
@@ -178,8 +182,11 @@ html, body{
     #emf_weekend_tab {
         left: 110px !important;
     }
-    #filter_modal_btn {
+    #emf_timeline_tab {
         left: 195px !important
+    }
+    #filter_modal_btn {
+        left: 280px !important;
     }
 }
 .dhx_cal_container .dhx_cal_tab,
