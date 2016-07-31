@@ -39,16 +39,24 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         name: "emf_day",
         property: "venue",
         list: scheduler.serverList('venues', venues),
-        size: 5,
-        step: 3,
+        size: 6,
+        step: 1,
     });
 
     scheduler.locale.labels.emf_weekend_tab = "Weekend";
     scheduler.createUnitsView({
         name:"emf_weekend",
         property:"venue",
-        list: scheduler.serverList('venues', venues),
+        list: [
+            {"key": "Stage-A", "label": "Stage A"},
+            {"key": "Stage-B", "label": "Stage B"},
+            {"key": "Stage-C", "label": "Stage C"},
+            {"key": "Workshop-1", "label": "Workshop 1"},
+            {"key": "Workshop-2", "label": "Workshop 2"}, 
+            {"key": "Workshop-3", "label": "Workshop 3"}
+        ],
         days: 3,
+        size: 6,
     });
 
     // Easily retrieve venue name from its ID
