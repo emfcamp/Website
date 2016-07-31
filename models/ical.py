@@ -33,7 +33,7 @@ class CalendarSource(db.Model):
         return "<%s %s: %s>" % (self.__class__.__name__, self.id, self.url)
 
     def refresh(self):
-        request = requests.get(self.url)
+        request = requests.get(self.url.strip())
 
         cal = Calendar.from_ical(request.text)
         uid_seen = []
