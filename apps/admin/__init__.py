@@ -25,7 +25,7 @@ from models.ticket import (
     Ticket, TicketCheckin, TicketType
 )
 from models.cfp import Proposal
-from models.ical import ICalSource
+from models.ical import CalendarSource
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
 from models.site_state import SiteState, VALID_STATES, refresh_states
 from ..common import require_permission
@@ -240,14 +240,14 @@ def site_states():
 @admin.route('/schedule-feeds')
 @admin_required
 def schedule_feeds():
-    feeds = ICalSource.query.all()
+    feeds = CalendarSource.query.all()
     return render_template('admin/schedule-feeds.html', feeds=feeds)
 
 class ScheduleForm(Form):
     feed_name = StringField('Name', [Required()])
-    venue = StringField('Venue', [Required()])
     url = StringField('iCal URL', [Required(), URL()])
     enabled = BooleanField('Enabled')
+    main_venue = StringField('Main Venue')
     phone = TelField('Phone')
     email = StringField('Email')
     lat = FloatField('lat', [Optional()])
@@ -257,9 +257,9 @@ class ScheduleForm(Form):
 
     def update_feed(self, feed):
         feed.name = self.feed_name.data
-        feed.venue = self.venue.data
-        feed.enabled = self.enabled.data
         feed.url = self.url.data
+        feed.enabled = self.enabled.data
+        feed.main_venue = self.main_venue.data
         feed.contact_phone = self.phone.data
         feed.contact_email = self.email.data
         feed.lat = self.lat.data
@@ -267,9 +267,9 @@ class ScheduleForm(Form):
 
     def init_from_feed(self, feed):
         self.feed_name.data = feed.name
-        self.venue.data = feed.venue
-        self.enabled.data = feed.enabled
         self.url.data = feed.url
+        self.enabled.data = feed.enabled
+        self.main_venue.data = feed.main_venue
         self.phone.data = feed.contact_phone
         self.email.data = feed.contact_email
         self.lat.data = feed.lat
@@ -279,7 +279,7 @@ class ScheduleForm(Form):
 @admin.route('/schedule-feeds/<int:feed_id>', methods=['GET', 'POST'])
 @admin_required
 def feed(feed_id):
-    feed = ICalSource.query.get_or_404(feed_id)
+    feed = CalendarSource.query.get_or_404(feed_id)
     form = ScheduleForm()
 
     if form.validate_on_submit():
@@ -300,7 +300,7 @@ def new_feed():
     form = ScheduleForm()
 
     if form.validate_on_submit():
-        feed = ICalSource()
+        feed = CalendarSource()
         form.update_feed(feed)
         db.session.add(feed)
         db.session.commit()

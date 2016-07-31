@@ -1,77 +1,132 @@
 import requests
 from icalendar import Calendar
-from pytz import timezone
+import pytz
 
 from main import db
+from flask import current_app as app
+from sqlalchemy import UniqueConstraint
+from sqlalchemy.orm.exc import NoResultFound
 
-local_zone = timezone('Europe/London')
 
-class ICalSource(db.Model):
-    __tablename__ = 'ical_source'
+class CalendarSource(db.Model):
+    __tablename__ = 'calendar_source'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    venue = db.Column(db.String, nullable=False)
-    enabled = db.Column(db.Boolean, default=True)
     url = db.Column(db.String, nullable=False)
+    enabled = db.Column(db.Boolean, nullable=False, default=True)
+    name = db.Column(db.String)
+    main_venue = db.Column(db.String)
     contact_phone = db.Column(db.String)
     contact_email = db.Column(db.String)
     lat = db.Column(db.Float)
     lon = db.Column(db.Float)
 
+    def __init__(self, url):
+        self.url = url
+
     # Make sure these are identifiable to the memoize cache
     def __repr__(self):
-        return "%s(%s: '%s')" % (self.__class__.__name__, self.id, self.url)
+        return "<%s %s: %s>" % (self.__class__.__name__, self.id, self.url)
 
-    def get_ical_feed(self):
+    def refresh(self):
         request = requests.get(self.url)
-        if request.status_code != 200:
-            return self.proposals
 
         cal = Calendar.from_ical(request.text)
         uid_seen = []
+
+        if self.name is None:
+            self.name = cal.get('X-WR-CALNAME')
+
+        # Fall back to event-local time
+        default_tz = cal.get('X-WR-TIMEZONE', 'Europe/London')
+
         for component in cal.walk():
             if component.name == 'VEVENT':
-                uid = unicode(component.get('uid'))
+                if not component.get('uid'):
+                    app.logger.debug('Ignoring event %s as it has no UID', component.get('Summary'))
+                    continue
+
+                uid = unicode(component['uid'])
+                if uid in uid_seen:
+                    app.logger.debug('Ignoring event %s with duplicate UID', component.get('Summary'))
+                    continue
+
                 uid_seen.append(uid)
-                proposal = ICalProposal.query.get(uid)
+                try:
+                    event = CalendarEvent.query.filter_by(source_id=self.id, uid=uid).one()
 
-                if proposal is None:
-                    proposal = ICalProposal()
-                    proposal.uid = uid
-                    proposal.venue_id = self.id
-                    db.session.add(proposal)
+                except NoResultFound:
+                    event = CalendarEvent()
+                    event.uid = uid
+                    event.source_id = self.id
+                    db.session.add(event)
 
-                proposal.start_date = component.get('dtstart').dt
-                proposal.start_date.replace(tzinfo=local_zone)
-                proposal.end_date = component.get('dtend').dt
-                proposal.end_date.replace(tzinfo=local_zone)
+                start_dt = component.get('dtstart').dt
+                if start_dt.tzinfo is None:
+                    start_dt = default_tz.localize(start_dt)
+                event.start_dt = start_dt
 
-                proposal.title = unicode(component.get('summary'))
-                proposal.description = unicode(component.get('description'))
+                end_dt = component.get('dtend').dt
+                if end_dt.tzinfo is None:
+                    end_dt = default_tz.localize(end_dt)
+                event.end_dt = end_dt
+
+                event.summary = unicode(component.get('summary'))
+                event.description = unicode(component.get('description'))
+                event.location = unicode(component.get('location'))
 
                 db.session.commit()
 
-        proposals = ICalProposal.query.filter_by(venue_id=self.id)
-        to_delete = [p for p in proposals if p.uid not in uid_seen]
+        events = CalendarEvent.query.filter_by(source_id=self.id)
+        to_delete = [p for p in events if p.uid not in uid_seen]
 
         for uid in to_delete:
-            db.session.delete(ICalProposal.query.get(uid))
+            db.session.delete(CalendarEvent.query.get(uid))
             db.session.commit()
 
-        return self.proposals
 
+class CalendarEvent(db.Model):
+    __tablename__ = 'calendar_event'
 
-class ICalProposal(db.Model):
-    __tablename__ = 'ical_proposal'
+    id = db.Column(db.Integer, primary_key=True)
+    uid = db.Column(db.String)
+    # iCal supports some weird timezones, so let's see if this will do
+    # You can use UTC for maths even if we've lost the information
+    start_utc = db.Column(db.DateTime(), nullable=False)
+    start_local = db.Column(db.DateTime(), nullable=False)
+    start_tz = db.Column(db.String)
+    end_utc = db.Column(db.DateTime(), nullable=False)
+    end_local = db.Column(db.DateTime(), nullable=False)
+    end_tz = db.Column(db.String)
 
-    id = db.Column(db.Integer)
-    uid = db.Column(db.String, primary_key=True)
-    start_date = db.Column(db.DateTime, nullable=False)
-    end_date = db.Column(db.DateTime, nullable=False)
-    venue_id = db.Column(db.Integer, db.ForeignKey('ical_source.id'),
-                         nullable=False, index=True)
-    title = db.Column(db.String, nullable=True)
+    source_id = db.Column(db.Integer, db.ForeignKey(CalendarSource.id),
+                                      nullable=False, index=True)
+    summary = db.Column(db.String, nullable=True)
     description = db.Column(db.String, nullable=True)
+    location = db.Column(db.String, nullable=True)
 
-    venue = db.relationship('ICalSource', backref='proposals')
+    source = db.relationship(CalendarSource, backref='events')
+
+    @property
+    def start_dt(self):
+        return pytz.timezone(self.start_tz).localize(self.start_local)
+
+    @start_dt.setter
+    def start_dt(self, dt):
+        self.start_utc = dt.astimezone(pytz.UTC).replace(tzinfo=None)
+        self.start_local = dt.replace(tzinfo=None)
+        self.start_tz = dt.tzinfo.zone
+
+    @property
+    def end_dt(self):
+        return pytz.timezone(self.end_tz).localize(self.end_local)
+
+    @end_dt.setter
+    def end_dt(self, dt):
+        self.end_utc = dt.astimezone(pytz.UTC).replace(tzinfo=None)
+        self.end_local = dt.replace(tzinfo=None)
+        self.end_tz = dt.tzinfo.zone
+
+    __table_args__ = (
+        UniqueConstraint(source_id, uid),
+    )
 

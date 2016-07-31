@@ -15,7 +15,7 @@ from main import db
 
 from .common import feature_flag
 from models.cfp import Proposal, Venue
-from models.ical import ICalSource
+from models.ical import CalendarSource
 from .schedule_xml import export_frab
 
 schedule = Blueprint('schedule', __name__)
@@ -39,18 +39,18 @@ def _get_proposal_dict(proposal, favourites_ids):
         res['cost'] = proposal.cost
     return res
 
-def _get_ical_dict(proposal, favourites_ids):
+def _get_ical_dict(event, favourites_ids):
     return {
-        'id': proposal.id,
-        'start_date': proposal.start_date,
-        'end_date': proposal.end_date,
-        'venue': proposal.venue.name,
-        'title': proposal.title,
+        'id': event.id,
+        'start_date': event.start_dt,
+        'end_date': event.end_dt,
+        'venue': event.location or '(Unknown)',
+        'title': event.summary,
         'speaker': '',
-        'description': proposal.description,
+        'description': event.description,
         'type': 'talk',
         'may_record': False,
-        'is_fave': proposal.id in favourites_ids,
+        'is_fave': event.id in favourites_ids,
         'source': 'database',
     }
 
@@ -68,10 +68,10 @@ def _get_scheduled_proposals(filter_obj={}):
 
     schedule = [_get_proposal_dict(p, favourites) for p in schedule]
 
-    ical_sources = ICalSource.query.filter_by(enabled=True).all()
+    ical_sources = CalendarSource.query.filter_by(enabled=True)
 
     for source in ical_sources:
-        schedule = schedule + [_get_ical_dict(p) for p in source.get_ical_feed()]
+        schedule += [_get_ical_dict(e, []) for e in source.events]
 
     if 'is_favourite' in filter_obj and filter_obj['is_favourite']:
         schedule = [s for s in schedule if s.get('is_fave', False)]

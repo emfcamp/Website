@@ -1,7 +1,7 @@
 {% extends "admin/base.html" %}
 {% set nav_active = 'schedule-feeds' %}
 {% block body %}
-<h2>ICal feeds</h2>
+<h2>iCal feeds</h2>
 <p>
     These are external feeds to use in the schedule.
 </p>
@@ -10,7 +10,7 @@
     <thead>
         <tr>
             <th>Name</th>
-            <th>Venue</th>
+            <th>Main Venue</th>
             <th>Email</th>
             <th>Phone</th>
         </tr>
@@ -18,10 +18,10 @@
     <tbody>
         {% for f in feeds %}
         <tr>
-            <td><a href="{{ url_for('.feed', feed_id=f.id) }}">{{ f.name }}</a></td>
-            <td>{{ f.venue }}</td>
-            <td>{{ f.contact_email }}</td>
-            <td>{{ f.contact_phone }}</td>
+            <td><a href="{{ url_for('.feed', feed_id=f.id) }}">{{ f.name or f.url }}</a></td>
+            <td>{{ f.main_venue or '' }}</td>
+            <td>{{ f.contact_email or '' }}</td>
+            <td>{{ f.contact_phone or '' }}</td>
         </tr>
         {% endfor %}
     </tbody>

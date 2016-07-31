@@ -26,6 +26,7 @@ from models.payment import (
 from models.cfp import Proposal, TalkProposal, WorkshopProposal, InstallationProposal, Venue
 from models.permission import Permission
 from models.email import EmailJobRecipient
+from models.ical import CalendarSource
 from apps.payments import banktransfer
 from apps.common.receipt import attach_tickets
 from lib.slotmachine import SlotMachine
@@ -868,6 +869,26 @@ class SendEmails(Command):
         db.session.commit()
 
 
+class CreateCalendars(Command):
+    def run(self):
+        icals = [
+            'https://calendar.google.com/calendar/ical/3s832k79jjbrl9o9e8ifmgflhg%40group.calendar.google.com/public/basic.ics',
+        ]
+
+        for url in icals:
+            source = CalendarSource(url)
+            db.session.add(source)
+
+        db.session.commit()
+
+class RefreshCalendars(Command):
+    def run(self):
+        for source in CalendarSource.query.filter_by(enabled=True).all():
+            source.refresh()
+
+        db.session.commit()
+
+
 if __name__ == "__main__":
     manager = Manager(create_app())
     manager.add_command('createdb', CreateDB())
@@ -902,5 +923,8 @@ if __name__ == "__main__":
     manager.add_command('importschedulerdata', ImportSchedulerData())
     manager.add_command('runscheduler', RunScheduler())
     manager.add_command('applypotentialschedule', ApplyPotentialSchedule())
+
+    manager.add_command('createcalendars', CreateCalendars())
+    manager.add_command('refreshcalendars', RefreshCalendars())
 
     manager.run()

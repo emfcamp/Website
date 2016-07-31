@@ -114,6 +114,12 @@ users:
 arrivals:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py makearrivals
 
+calendars:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createcalendars
+
+refreshcalendars:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py refreshcalendars
+
 test:
 	$(ENV) SETTINGS_FILE=./config/test.cfg flake8 ./models ./apps ./utils.py --ignore=E501,E302,W391,E201,E202,E127,E128,E151,E261,E303,E124
 	$(ENV) SETTINGS_FILE=./config/test.cfg nosetests ./utils.py ./tests/ ./models/
