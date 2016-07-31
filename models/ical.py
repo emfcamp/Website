@@ -65,12 +65,12 @@ class CalendarSource(db.Model):
 
                 start_dt = component.get('dtstart').dt
                 if start_dt.tzinfo is not None:
-                    start_dt = start_dt.astimezone(local_tz)
+                    start_dt = start_dt.astimezone(local_tz).replace(tzinfo=None)
                 event.start_dt = start_dt
 
                 end_dt = component.get('dtend').dt
                 if end_dt.tzinfo is not None:
-                    end_dt = end_dt.astimezone(local_tz)
+                    end_dt = end_dt.astimezone(local_tz).replace(tzinfo=None)
                 event.end_dt = end_dt
 
                 event.summary = unicode(component.get('summary'))
