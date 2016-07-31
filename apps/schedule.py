@@ -8,6 +8,7 @@ from flask import (
     request, Response, abort,
 )
 from flask.ext.login import current_user
+from flask import current_app as app
 from jinja2.utils import urlize
 from icalendar import Calendar, Event
 from slugify import slugify_unicode as slugify
@@ -17,6 +18,7 @@ from main import db
 from .common import feature_flag
 from models.cfp import Proposal, Venue
 from models.ical import CalendarSource, CalendarEvent
+from models.user import User, generate_checkin_code
 from .schedule_xml import export_frab
 
 schedule = Blueprint('schedule', __name__)
@@ -59,12 +61,17 @@ def _get_ical_dict(event, favourites_ids):
         'link': url_for('.line_up_external', event_id=event.id),
     }
 
-def _get_scheduled_proposals(filter_obj={}):
-    if current_user.is_anonymous():
+def _get_scheduled_proposals(filter_obj={}, override_user=None):
+    if override_user:
+        user = override_user
+    else:
+        user = current_user
+
+    if user.is_anonymous():
         proposal_favourites = external_favourites = []
     else:
-        proposal_favourites = [f.id for f in current_user.favourites]
-        external_favourites = [f.id for f in current_user.calendar_favourites]
+        proposal_favourites = [f.id for f in user.favourites]
+        external_favourites = [f.id for f in user.calendar_favourites]
 
     schedule = Proposal.query.filter(Proposal.state.in_(['accepted', 'finished']),
                                       Proposal.scheduled_time.isnot(None),
@@ -185,6 +192,62 @@ def schedule_ical():
 
     return Response(cal.to_ical(), mimetype='text/calendar')
 
+@schedule.route('/favourites.json')
+@feature_flag('SCHEDULE')
+def favourites_json():
+    code = request.args.get('token', None)
+    user = None
+    if code:
+        user = User.get_by_checkin_code(app.config.get('FEED_SECRET_KEY'), str(code))
+    if not current_user.is_anonymous():
+        user = current_user
+    if not user:
+        abort(404)
+
+    def convert_time_to_str(event):
+        event['start_date'] = event['start_date'].strftime('%Y-%m-%d %H:%M:00')
+        event['end_date'] = event['end_date'].strftime('%Y-%m-%d %H:%M:00')
+        return event
+
+    schedule = [convert_time_to_str(p) for p in _get_scheduled_proposals(request.args, override_user=user) if p['is_fave']]
+
+    # NB this is JSON in a top-level array (security issue for low-end browsers)
+    return Response(json.dumps(schedule), mimetype='application/json')
+
+@schedule.route('/favourites.ical')
+@feature_flag('SCHEDULE')
+def favourites_ical():
+    code = request.args.get('token', None)
+    user = None
+    if code:
+        user = User.get_by_checkin_code(app.config.get('FEED_SECRET_KEY'), str(code))
+    if not current_user.is_anonymous():
+        user = current_user
+    if not user:
+        abort(404)
+
+    schedule = _get_scheduled_proposals(request.args, override_user=user)
+    title = 'EMF 2016 Favourites for ' + user.name
+
+    cal = Calendar()
+    cal.add('summary', title)
+    cal.add('X-WR-CALNAME', title)
+    cal.add('X-WR-CALDESC', title)
+    cal.add('version', '2.0')
+
+    for event in schedule:
+        if not event['is_fave']:
+            continue
+        cal_event = Event()
+        cal_event.add('uid', event['id'])
+        cal_event.add('summary', event['title'])
+        cal_event.add('location', event['venue'])
+        cal_event.add('dtstart', event['start_date'])
+        cal_event.add('dtend', event['end_date'])
+        cal.add_component(cal_event)
+
+    return Response(cal.to_ical(), mimetype='text/calendar')
+
 @schedule.route('/line-up')
 @feature_flag('SCHEDULE')
 def line_up_redirect():
@@ -211,7 +274,9 @@ def favourites():
     proposals = current_user.favourites
     externals = current_user.calendar_favourites
 
-    return render_template('schedule/favourites.html', proposals=proposals, externals=externals)
+    token = generate_checkin_code(app.config.get('FEED_SECRET_KEY'), current_user.id)
+
+    return render_template('schedule/favourites.html', proposals=proposals, externals=externals, token=token)
 
 @schedule.route('/line-up/2016/<int:proposal_id>', methods=['GET', 'POST'])
 @schedule.route('/line-up/2016/<int:proposal_id>-<slug>', methods=['GET', 'POST'])
