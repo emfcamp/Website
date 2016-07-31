@@ -305,7 +305,7 @@ def new_feed():
     form = ScheduleForm()
 
     if form.validate_on_submit():
-        feed = CalendarSource()
+        feed = CalendarSource('')
         form.update_feed(feed)
         db.session.add(feed)
         db.session.commit()
