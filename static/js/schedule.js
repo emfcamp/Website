@@ -62,7 +62,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
 
     // Easily retrieve venue name from its ID
     for(var i = 0; i<venues.length; i++){
-        venue_dict[venues[i].key] = venues[i].label;
+        venue_dict[venues[i].key] = venues[i];
         filter.venues.push(venues[i].key);
 
         id_str = 'venue_'+venues[i].key;
@@ -85,6 +85,18 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         scheduler.updateView();
     };
 
+    function _sortVenues(a, b) {
+        var venueA = (typeof a === 'object') ? a : venue_dict[a],
+            venueB = (typeof b === 'object') ? b :venue_dict[b];
+
+        if (venueA.source !== venueB.source) {
+            return venueA.source === 'ical' ? 1 : -1;
+        } else if (venueA.order != venueB.order) {
+            return venueA.order > venueB.order ? 1: -1;
+        }
+        return venueA.key > venueB.key ? 1: -1;
+    }
+
     function _get_onchange(id){
         return function() {
             var index = filter.venues.indexOf(id),
@@ -95,16 +107,10 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
                 venues.splice(index, 1);
             } else {
                 filter.venues.push(id);
-                venues.push({key:id, label: venue_dict[id]});
-                venues.sort(function (a, b) {
-                    return a.key === b.key ? 0 :
-                           a.key > b.key ? 1 : -1;
-                });
+                venues.push(venue_dict[id]);
+                venues.sort(_sortVenues);
 
-                filter.venues.sort(function (a, b) {
-                    return venue_dict[a] === venue_dict[b] ? 0 :
-                           venue_dict[a] > venue_dict[b] ? 1 : -1;
-                });
+                filter.venues.sort(_sortVenues);
             }
             scheduler.updateCollection('venues', venues);
             scheduler.updateView();
@@ -227,7 +233,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         $('#event_title').text(ev.title);
         $('#event_speaker').text(ev.speaker);
 
-        $('#event_venue').text(venue_dict[ev.venue]);
+        $('#event_venue').text(venue_dict[ev.venue].label);
         $('#event_day').text(day_formatter(ev.start_date));
         $('#event_time').text(time_formatter(ev.start_date));
         $('#event_description').html(ev.description);
@@ -309,7 +315,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         return "<b>Event:</b> " + event.text + "<br/>"+
                "<b>Start date:</b> " + time_formatter(start) + "<br/>"+
                "<b>End date:</b> " + time_formatter(end) + "<br/>"+
-               "<b>Venue:</b> " + venue_dict[event.venue];
+               "<b>Venue:</b> " + venue_dict[event.venue].label;
     };
 
     scheduler.templates.event_class=function(start,end,event){

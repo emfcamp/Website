@@ -103,27 +103,32 @@ def _get_scheduled_proposals(filter_obj={}, override_user=None):
 
 def _get_priority_sorted_venues(venues_to_allow):
     main_venues = Venue.query.filter().all()
-    main_venues = sorted(main_venues, key=lambda x: x.priority)
-    main_venues.reverse()
-    main_venue_names = [v.name for v in main_venues]
+    main_venue_names = [(v.name, 'main', v.priority) for v in main_venues]
 
     ical_sources = CalendarSource.query.filter_by(enabled=True)
-    ical_sources = sorted(ical_sources, key=lambda x: x.priority)
-    ical_sources.reverse()
-    ical_source_names = [v.main_venue for v in ical_sources]
+    ical_source_names = [(v.main_venue, 'ical', v.priority) for v in ical_sources]
 
     # List event venues that are not overridden with zero priority
     for source in ical_sources:
         for e in source.events:
             if not source.main_venue:
-                ical_source_names.append(e['location'])
+                ical_source_names.append((e['location'], 'ical', source.priority))
 
-    names = []
-    for name_list in (main_venue_names, ical_source_names):
-        for name in name_list:
-            if name not in names and name in venues_to_allow:
-                names.append(name)
-    return names
+    res = []
+    seen_names = []
+    for venue in main_venue_names + ical_source_names:
+        name = venue[0]
+        if name not in seen_names and name in venues_to_allow:
+            seen_names.append(name)
+            res.append({
+                'key': slugify(name),
+                'label': name,
+                'source': 'main'if name == 'Workshop 3' else venue[1],
+                'order': venue[2]
+            })
+
+    res = sorted(res, key=lambda v: (v['source'] == 'ical', v['order']))
+    return res
 
 @schedule.route('/schedule')
 @feature_flag('SCHEDULE')
@@ -141,7 +146,6 @@ def main():
 
     venues_with_events = set([e['venue'] for e in schedule_data])
     venues = _get_priority_sorted_venues(venues_with_events)
-    venues = [{'key': slugify(v), 'label': v} for v in venues]
 
     schedule_data = [add_event(e) for e in schedule_data]
 
