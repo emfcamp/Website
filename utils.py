@@ -879,11 +879,19 @@ class CreateCalendars(Command):
             {
 		'url': 'https://calendar.google.com/calendar/ical/5nkm5d7nahs9bcgn4q1btjg3c4%40group.calendar.google.com/public/basic.ics',
                 'main_venue': 'Workshop 3',
+            },
+            {
+		'url': 'https://calendar.google.com/calendar/ical/lhifjvb20rqasl45up83uug6v4%40group.calendar.google.com/private-65383035eae3d04567fb11e2bbe496af/basic.ics',
+                'main_venue': 'Radio Village',
             }
         ]
 
         for cal in icals:
-            source = CalendarSource(cal['url'])
+            existing_calendars = CalendarSource.query.filter_by(url=cal['url']).all()
+            if existing_calendars:
+                source = existing_calendars[0]
+            else:
+                source = CalendarSource(cal['url'])
             source.main_venue = cal['main_venue']
             db.session.add(source)
 
