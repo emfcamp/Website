@@ -85,6 +85,9 @@ def raise_500():
 def about():
     return render_template('about.html')
 
+@base.route("/network")
+def network():
+    return redirect('https://wiki.emfcamp.org/wiki/Network')
 
 @base.route("/talks")
 @base.route("/talks/")
