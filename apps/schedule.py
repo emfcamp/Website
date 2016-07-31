@@ -28,7 +28,7 @@ def _get_proposal_dict(proposal, favourites_ids):
     res = {
         'id': proposal.id,
         'start_date': event_tz.localize(proposal.scheduled_time),
-        'end_date': event_tz.localize(proposal.end_date()),
+        'end_date': event_tz.localize(proposal.end_date),
         'venue': proposal.venue.name,
         'title': proposal.title,
         'speaker': proposal.published_names or proposal.user.name,

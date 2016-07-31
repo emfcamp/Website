@@ -223,6 +223,7 @@ class Proposal(db.Model):
             allowed_time_periods = TIME_PERIODS.values()
         return self.make_periods_contiguous(allowed_time_periods)
 
+    @property
     def end_date(self):
         start = self.scheduled_time
         duration = self.scheduled_duration
