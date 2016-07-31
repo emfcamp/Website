@@ -41,9 +41,7 @@ class CalendarSource(db.Model):
         if self.name is None:
             self.name = cal.get('X-WR-CALNAME')
 
-        # Fall back to event-local time
-        default_tz = cal.get('X-WR-TIMEZONE', 'Europe/London')
-
+        local_tz = pytz.timezone("Europe/London")
         for component in cal.walk():
             if component.name == 'VEVENT':
                 if not component.get('uid'):
@@ -66,13 +64,13 @@ class CalendarSource(db.Model):
                     db.session.add(event)
 
                 start_dt = component.get('dtstart').dt
-                if start_dt.tzinfo is None:
-                    start_dt = default_tz.localize(start_dt)
+                if start_dt.tzinfo is not None:
+                    start_dt = start_dt.astimezone(local_tz)
                 event.start_dt = start_dt
 
                 end_dt = component.get('dtend').dt
-                if end_dt.tzinfo is None:
-                    end_dt = default_tz.localize(end_dt)
+                if end_dt.tzinfo is not None:
+                    end_dt = end_dt.astimezone(local_tz)
                 event.end_dt = end_dt
 
                 event.summary = unicode(component.get('summary'))
@@ -106,14 +104,8 @@ class CalendarEvent(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     uid = db.Column(db.String)
-    # iCal supports some weird timezones, so let's see if this will do
-    # You can use UTC for maths even if we've lost the information
-    start_utc = db.Column(db.DateTime(), nullable=False)
-    start_local = db.Column(db.DateTime(), nullable=False)
-    start_tz = db.Column(db.String)
-    end_utc = db.Column(db.DateTime(), nullable=False)
-    end_local = db.Column(db.DateTime(), nullable=False)
-    end_tz = db.Column(db.String)
+    start_dt = db.Column(db.DateTime(), nullable=False)
+    end_dt = db.Column(db.DateTime(), nullable=False)
 
     source_id = db.Column(db.Integer, db.ForeignKey(CalendarSource.id),
                                       nullable=False, index=True)
@@ -123,26 +115,6 @@ class CalendarEvent(db.Model):
 
     source = db.relationship(CalendarSource, backref='events')
     calendar_favourites = db.relationship('User', secondary=FavouriteCalendarEvents, backref=db.backref('calendar_favourites', lazy='dynamic'))
-
-    @property
-    def start_dt(self):
-        return pytz.timezone(self.start_tz).localize(self.start_local)
-
-    @start_dt.setter
-    def start_dt(self, dt):
-        self.start_utc = dt.astimezone(pytz.UTC).replace(tzinfo=None)
-        self.start_local = dt.replace(tzinfo=None)
-        self.start_tz = dt.tzinfo.zone
-
-    @property
-    def end_dt(self):
-        return pytz.timezone(self.end_tz).localize(self.end_local)
-
-    @end_dt.setter
-    def end_dt(self, dt):
-        self.end_utc = dt.astimezone(pytz.UTC).replace(tzinfo=None)
-        self.end_local = dt.replace(tzinfo=None)
-        self.end_tz = dt.tzinfo.zone
 
     @property
     def title(self):
