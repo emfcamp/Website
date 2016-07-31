@@ -286,9 +286,6 @@ def line_up_proposal(proposal_id, slug=None):
     if proposal.state not in ('accepted', 'finished'):
         abort(404)
 
-    if slug != proposal.slug:
-        return redirect(url_for('.line_up_proposal', proposal_id=proposal.id, slug=proposal.slug))
-
     if not current_user.is_anonymous():
         is_fave = proposal in current_user.favourites
     else:
@@ -305,6 +302,9 @@ def line_up_proposal(proposal_id, slug=None):
         flash(msg)
         return redirect(url_for('.line_up_proposal', proposal_id=proposal.id, slug=proposal.slug))
 
+    if slug != proposal.slug:
+        return redirect(url_for('.line_up_proposal', proposal_id=proposal.id, slug=proposal.slug))
+
     venue_name = None
     if proposal.scheduled_venue:
         venue_name = Venue.query.filter_by(id=proposal.scheduled_venue).one().name
@@ -317,9 +317,6 @@ def line_up_proposal(proposal_id, slug=None):
 @feature_flag('SCHEDULE')
 def line_up_external(event_id, slug=None):
     event = CalendarEvent.query.get_or_404(event_id)
-
-    if slug != event.slug:
-        return redirect(url_for('.line_up_external', event_id=event.id, slug=event.slug))
 
     if not current_user.is_anonymous():
         is_fave = event in current_user.calendar_favourites
@@ -335,6 +332,9 @@ def line_up_external(event_id, slug=None):
             msg = 'Added "%s" to favourites' % event.title
         db.session.commit()
         flash(msg)
+        return redirect(url_for('.line_up_external', event_id=event.id, slug=event.slug))
+
+    if slug != event.slug:
         return redirect(url_for('.line_up_external', event_id=event.id, slug=event.slug))
 
     return render_template('schedule/line-up-external.html',
