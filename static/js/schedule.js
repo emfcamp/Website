@@ -17,6 +17,14 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         debounce = false,
         date_to_show = (start_date <= todays_date) ? todays_date : start_date,
         week_or_day = (start_date <= todays_date && end_date >= todays_date) ? 'emf_day' : 'emf_weekend',
+        main_venues = [
+            {"key": "Stage-A", "label": "Stage A"},
+            {"key": "Stage-B", "label": "Stage B"},
+            {"key": "Stage-C", "label": "Stage C"},
+            {"key": "Workshop-1", "label": "Workshop 1"},
+            {"key": "Workshop-2", "label": "Workshop 2"},
+            {"key": "Workshop-3", "label": "Workshop 3"}
+        ],
         id, ele, id_str;
 
     /*
@@ -47,14 +55,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
     scheduler.createUnitsView({
         name:"emf_weekend",
         property:"venue",
-        list: [
-            {"key": "Stage-A", "label": "Stage A"},
-            {"key": "Stage-B", "label": "Stage B"},
-            {"key": "Stage-C", "label": "Stage C"},
-            {"key": "Workshop-1", "label": "Workshop 1"},
-            {"key": "Workshop-2", "label": "Workshop 2"}, 
-            {"key": "Workshop-3", "label": "Workshop 3"}
-        ],
+        list: scheduler.serverList('main_venues', main_venues),
         days: 3,
         size: 6,
     });
@@ -144,11 +145,11 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
 
     // Make sure in weekend view you can't scroll away
     scheduler.date.add_emf_weekend = function (date,inc) {
-        return scheduler.date.add(start_date, venues.length*3 ,"day");
+        return scheduler.date.add(start_date, main_venues.length*3 ,"day");
     };
 
     scheduler.date.get_emf_weekend_end = function (date) {
-        return scheduler.date.add(start_date, venues.length*3 ,"day");
+        return scheduler.date.add(start_date, main_venues.length*3 ,"day");
     };
 
     scheduler.date.get_emf_weekend_start = function (date) {
