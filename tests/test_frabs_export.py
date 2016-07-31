@@ -4,6 +4,7 @@ from StringIO import StringIO
 from datetime import datetime
 from lxml import etree
 
+from .core import get_app
 from apps.schedule_xml import (
     make_root, add_day, add_room, add_event, get_duration, export_frab
 )
@@ -20,6 +21,14 @@ def get_frabs_schema():
     return _schema
 
 class XMLTestCase(unittest.TestCase):
+    def setUp(self):
+        self.client, self.app, self.db = get_app()
+        self.ctx = self.app.test_request_context()
+        self.ctx.push()
+
+    def tearDown(self):
+        self.ctx.pop()
+
     def test_empty_schema_fails(self):
         empty_root = etree.Element('root')
         schema = get_frabs_schema()
@@ -29,7 +38,7 @@ class XMLTestCase(unittest.TestCase):
 
     def test_min_version_is_valid(self):
         root = make_root()
-        add_day(root, index=1, date=datetime(2016, 8, 5))
+        add_day(root, index=1, start=datetime(2016, 8, 5, 4, 0), end=datetime(2016, 8, 6, 4, 0))
 
         schema = get_frabs_schema()
         is_valid = schema.validate(root)
@@ -37,7 +46,7 @@ class XMLTestCase(unittest.TestCase):
 
     def test_simple_room(self):
         root = make_root()
-        day = add_day(root, index=1, date=datetime(2016, 8, 5))
+        day = add_day(root, index=1, start=datetime(2016, 8, 5, 4, 0), end=datetime(2016, 8, 6, 4, 0))
         add_room(day, 'the hinterlands')
 
         schema = get_frabs_schema()
@@ -46,7 +55,7 @@ class XMLTestCase(unittest.TestCase):
 
     def test_simple_event(self):
         root = make_root()
-        day = add_day(root, index=1, date=datetime(2016, 8, 5))
+        day = add_day(root, index=1, start=datetime(2016, 8, 5, 4, 0), end=datetime(2016, 8, 6, 4, 0))
         room = add_room(day, 'the hinterlands')
 
         event = {
