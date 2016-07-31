@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ event.title }}{% endblock %}
+{% block body %}
+
+<h1>{{ event.title }}</h1>
+
+<p><strong>{{ event.start_dt.strftime('%A at %-I:%M %p') }}</strong> in <strong>{{ venue_name }}</strong>
+
+<p class="multiline">{{ event.description | urlize }}</p>
+<hr>
+{% if current_user.is_authenticated() %}
+  <form method="POST">
+  <input id="csrf_token" name=_csrf_token type=hidden value="{{ csrf_token() }}">
+  <button type="submit" class="btn btn-primary">
+    {%- if is_fave -%}
+      <i class="glyphicon glyphicon-star"></i>
+    {%- else -%}
+      <i class="glyphicon glyphicon-star-empty"></i>
+    {%- endif -%}
+    Favourite
+  </button>
+  </form>
+{% else %}
+  <p>If you would like to mark this as a favourite please
+    <a href="{{ url_for('users.login', next=url_for('.line_up_external', event_id=event.id)) }}">login</a>.
+  </p>
+{% endif %}
+<ul class='list-inline text-muted'>
+  <li>
+    <p><a type="btn btn-primary" href="{{ url_for('.line_up') }}">Line-up</a></p>
+  </li>
+  {% if current_user.is_authenticated() %}
+    <li>
+      <a type="btn btn-primary" href="{{ url_for('.favourites') }}">Favourites</a>
+    </li>
+  {% endif %}
+</ul>
+{% endblock %}

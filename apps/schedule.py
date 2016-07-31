@@ -16,7 +16,7 @@ from main import db
 
 from .common import feature_flag
 from models.cfp import Proposal, Venue
-from models.ical import CalendarSource
+from models.ical import CalendarSource, CalendarEvent
 from .schedule_xml import export_frab
 
 schedule = Blueprint('schedule', __name__)
@@ -55,15 +55,16 @@ def _get_ical_dict(event, favourites_ids):
         'type': 'talk',
         'may_record': False,
         'is_fave': event.id in favourites_ids,
-        'source': 'database',
-        'link': 'none yet',
+        'source': 'external',
+        'link': url_for('.line_up_external', event_id=event.id),
     }
 
 def _get_scheduled_proposals(filter_obj={}):
     if current_user.is_anonymous():
-        favourites = []
+        proposal_favourites = external_favourites = []
     else:
-        favourites = [f.id for f in current_user.favourites]
+        proposal_favourites = [f.id for f in current_user.favourites]
+        external_favourites = [f.id for f in current_user.calendar_favourites]
 
     schedule = Proposal.query.filter(Proposal.state.in_(['accepted', 'finished']),
                                       Proposal.scheduled_time.isnot(None),
@@ -71,13 +72,13 @@ def _get_scheduled_proposals(filter_obj={}):
                                       Proposal.scheduled_duration.isnot(None)
                                     ).all()
 
-    schedule = [_get_proposal_dict(p, favourites) for p in schedule]
+    schedule = [_get_proposal_dict(p, proposal_favourites) for p in schedule]
 
     ical_sources = CalendarSource.query.filter_by(enabled=True)
 
     for source in ical_sources:
         for e in source.events:
-            d = _get_ical_dict(e, [])
+            d = _get_ical_dict(e, external_favourites)
             # Override venue if we have a venue set on the source
             if source.main_venue:
                 d['venue'] = source.main_venue
@@ -196,7 +197,9 @@ def line_up():
         filter(Proposal.state.in_(['accepted', 'finished'])).\
         filter(Proposal.type.in_(['talk', 'workshop'])).all()
 
-    return render_template('schedule/line-up.html', proposals=proposals)
+    externals = CalendarSource.get_enabled_events()
+
+    return render_template('schedule/line-up.html', proposals=proposals, externals=externals)
 
 
 @schedule.route('/favourites')
@@ -206,8 +209,9 @@ def favourites():
         return redirect(url_for('users.login', next=url_for('.favourites')))
 
     proposals = current_user.favourites
+    externals = current_user.calendar_favourites
 
-    return render_template('schedule/favourites.html', proposals=proposals)
+    return render_template('schedule/favourites.html', proposals=proposals, externals=externals)
 
 @schedule.route('/line-up/2016/<int:proposal_id>', methods=['GET', 'POST'])
 @schedule.route('/line-up/2016/<int:proposal_id>-<slug>', methods=['GET', 'POST'])
@@ -242,3 +246,31 @@ def line_up_proposal(proposal_id, slug=None):
 
     return render_template('schedule/line-up-proposal.html',
                            proposal=proposal, is_fave=is_fave, venue_name=venue_name)
+
+@schedule.route('/line-up/2016/external/<int:event_id>', methods=['GET', 'POST'])
+@schedule.route('/line-up/2016/external/<int:event_id>-<slug>', methods=['GET', 'POST'])
+@feature_flag('SCHEDULE')
+def line_up_external(event_id, slug=None):
+    event = CalendarEvent.query.get_or_404(event_id)
+
+    if slug != event.slug:
+        return redirect(url_for('.line_up_external', event_id=event.id, slug=event.slug))
+
+    if not current_user.is_anonymous():
+        is_fave = event in current_user.calendar_favourites
+    else:
+        is_fave = False
+
+    if (request.method == "POST") and not current_user.is_anonymous():
+        if is_fave:
+            current_user.calendar_favourites.remove(event)
+            msg = 'Removed "%s" from favourites' % event.title
+        else:
+            current_user.calendar_favourites.append(event)
+            msg = 'Added "%s" to favourites' % event.title
+        db.session.commit()
+        flash(msg)
+        return redirect(url_for('.line_up_external', event_id=event.id, slug=event.slug))
+
+    return render_template('schedule/line-up-external.html',
+                           event=event, is_fave=is_fave, venue_name=event.venue)

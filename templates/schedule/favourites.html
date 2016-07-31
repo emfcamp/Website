@@ -1,10 +1,12 @@
 {% from "schedule/_proposal_lister.html" import list_proposals %}
+{% from "schedule/_external_lister.html" import list_externals %}
 {% extends "base.html" %}
 {% block title %}Favourites{% endblock %}
 {% block body %}
 <h1>Favourites</h1>
 
 {{ list_proposals(proposals) }}
+{{ list_externals(externals) }}
 
 {% if proposals.count() == 0 %}
     <p>

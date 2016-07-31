@@ -248,6 +248,7 @@ class ScheduleForm(Form):
     url = StringField('iCal URL', [Required(), URL()])
     enabled = BooleanField('Enabled')
     main_venue = StringField('Main Venue')
+    type = StringField('Type')
     phone = TelField('Phone')
     email = StringField('Email')
     lat = FloatField('lat', [Optional()])
@@ -261,6 +262,7 @@ class ScheduleForm(Form):
         feed.url = self.url.data
         feed.enabled = self.enabled.data
         feed.main_venue = self.main_venue.data
+        feed.type = self.type.data
         feed.contact_phone = self.phone.data
         feed.contact_email = self.email.data
         feed.lat = self.lat.data
@@ -272,6 +274,7 @@ class ScheduleForm(Form):
         self.url.data = feed.url
         self.enabled.data = feed.enabled
         self.main_venue.data = feed.main_venue
+        self.type.data = feed.type
         self.phone.data = feed.contact_phone
         self.email.data = feed.contact_email
         self.lat.data = feed.lat

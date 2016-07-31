@@ -1,4 +1,5 @@
 {% from "schedule/_proposal_lister.html" import list_proposals %}
+{% from "schedule/_external_lister.html" import list_externals %}
 {% extends "base.html" %}
 {% block title %}Line-up{% endblock %}
 {% block body %}
@@ -13,5 +14,6 @@
 {% endif %}
 
 {{ list_proposals(proposals) }}
+{{ list_externals(externals) }}
 
 {% endblock %}

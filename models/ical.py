@@ -7,6 +7,9 @@ from flask import current_app as app
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm.exc import NoResultFound
 
+import re
+from slugify import slugify_unicode
+
 
 class CalendarSource(db.Model):
     __tablename__ = 'calendar_source'
@@ -14,6 +17,7 @@ class CalendarSource(db.Model):
     url = db.Column(db.String, nullable=False)
     enabled = db.Column(db.Boolean, nullable=False, default=True)
     name = db.Column(db.String)
+    type = db.Column(db.String, default="Village")
     main_venue = db.Column(db.String)
     contact_phone = db.Column(db.String)
     contact_email = db.Column(db.String)
@@ -84,6 +88,18 @@ class CalendarSource(db.Model):
             db.session.delete(e)
             db.session.commit()
 
+    @classmethod
+    def get_enabled_events(self):
+        sources = CalendarSource.query.filter_by(enabled=True)
+        events = []
+        for source in sources:
+            events.extend(source.events)
+        return events
+
+FavouriteCalendarEvents = db.Table('favourite_calendar_events',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('event_id', db.Integer, db.ForeignKey('calendar_event.id')),
+)
 
 class CalendarEvent(db.Model):
     __tablename__ = 'calendar_event'
@@ -106,6 +122,7 @@ class CalendarEvent(db.Model):
     location = db.Column(db.String, nullable=True)
 
     source = db.relationship(CalendarSource, backref='events')
+    calendar_favourites = db.relationship('User', secondary=FavouriteCalendarEvents, backref=db.backref('calendar_favourites', lazy='dynamic'))
 
     @property
     def start_dt(self):
@@ -126,6 +143,43 @@ class CalendarEvent(db.Model):
         self.end_utc = dt.astimezone(pytz.UTC).replace(tzinfo=None)
         self.end_local = dt.replace(tzinfo=None)
         self.end_tz = dt.tzinfo.zone
+
+    @property
+    def title(self):
+        return self.summary
+
+    @property
+    def venue(self):
+        if self.source.main_venue:
+            return self.source.main_venue
+        else:
+            return self.location
+
+    @property
+    def type(self):
+        return self.source.type
+
+    @property
+    def slug(self):
+        slug = slugify_unicode(self.summary).lower()
+        if len(slug) > 60:
+            words = re.split(' +|[,.;:!?]+', self.summary)
+            break_words = ['and', 'which', 'with', 'without', 'for', '-', '']
+
+            for i, word in reversed(list(enumerate(words))):
+                new_slug = slugify_unicode(' '.join(words[:i])).lower()
+                if word in break_words:
+                    if len(new_slug) > 10 and not len(new_slug) > 60:
+                        slug = new_slug
+                        break
+
+                elif len(slug) > 60 and len(new_slug) > 10:
+                    slug = new_slug
+
+        if len(slug) > 60:
+            slug = slug[:60] + '-'
+
+        return slug
 
     __table_args__ = (
         UniqueConstraint(source_id, uid),
