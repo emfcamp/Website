@@ -169,9 +169,17 @@ def schedule_json():
 @schedule.route('/schedule.frab')
 @feature_flag('SCHEDULE')
 def schedule_frab():
-    schedule = export_frab(_get_scheduled_proposals(request.args))
+    schedule = Proposal.query.filter(Proposal.state.in_(['accepted', 'finished']),
+                                      Proposal.scheduled_time.isnot(None),
+                                      Proposal.scheduled_venue.isnot(None),
+                                      Proposal.scheduled_duration.isnot(None)
+                                    ).all()
 
-    return Response(schedule, mimetype='application/xml')
+    schedule = [_get_proposal_dict(p, []) for p in schedule]
+
+    frab = export_frab(schedule)
+
+    return Response(frab, mimetype='application/xml')
 
 @schedule.route('/schedule.ical')
 @feature_flag('SCHEDULE')
