@@ -873,15 +873,15 @@ class CreateCalendars(Command):
     def run(self):
         icals = [
             {
-		'url': 'https://calendar.google.com/calendar/ical/3s832k79jjbrl9o9e8ifmgflhg%40group.calendar.google.com/public/basic.ics',
+                'url': 'https://calendar.google.com/calendar/ical/3s832k79jjbrl9o9e8ifmgflhg%40group.calendar.google.com/public/basic.ics',
                 'main_venue': 'Stage A',
             },
             {
-		'url': 'https://calendar.google.com/calendar/ical/5nkm5d7nahs9bcgn4q1btjg3c4%40group.calendar.google.com/public/basic.ics',
+                'url': 'https://calendar.google.com/calendar/ical/5nkm5d7nahs9bcgn4q1btjg3c4%40group.calendar.google.com/public/basic.ics',
                 'main_venue': 'Workshop 3',
             },
             {
-		'url': 'https://calendar.google.com/calendar/ical/lhifjvb20rqasl45up83uug6v4%40group.calendar.google.com/private-65383035eae3d04567fb11e2bbe496af/basic.ics',
+                'url': 'https://calendar.google.com/calendar/ical/lhifjvb20rqasl45up83uug6v4%40group.calendar.google.com/private-65383035eae3d04567fb11e2bbe496af/basic.ics',
                 'main_venue': 'Radio Village',
             }
         ]
