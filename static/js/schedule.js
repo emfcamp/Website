@@ -132,6 +132,8 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
     scheduler.createTimelineView({
         section_autoheight: false,
         name:"emf_timeline",
+        // Width of initial column
+        dx: 150,
         x_unit: "minute",
         x_date: "%H:%i",
         x_step: 60,
