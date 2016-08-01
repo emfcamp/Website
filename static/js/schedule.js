@@ -337,14 +337,14 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
     scheduler.config.default_date = day_format;
     // Make it show 10 min slots
     scheduler.config.first_hour = 9;
-    scheduler.config.hour_size_px = 131;
+    scheduler.config.hour_size_px = 132;
     scheduler.config.separate_short_events = true;
 
     // Format the tooltips
     scheduler.templates.tooltip_text = function(start, end, event) {
         return "<b>Event:</b> " + event.text + "<br/>"+
-               "<b>Start date:</b> " + time_formatter(start) + "<br/>"+
-               "<b>End date:</b> " + time_formatter(end) + "<br/>"+
+               "<b>Start:</b> " + time_formatter(start) + "<br/>"+
+               "<b>Finish:</b> " + time_formatter(end) + "<br/>"+
                "<b>Venue:</b> " + venue_dict[event.venue].label;
     };
 
