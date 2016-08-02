@@ -28,7 +28,7 @@ def render_receipt(user, png=False, pdf=False):
 
     vehicle_tickets = tickets.filter(TicketType.admits.in_(['car', 'campervan'])).all()
 
-    transferred_tickets = user.transfers_from.order_by('timestamp').all()
+    transferred_tickets = user.transfers_from.filter_by(paid=True).order_by('timestamp').all()
 
     tees = (tickets.filter(TicketType.fixed_id.in_(range(14, 24)))
                   .with_entities(TicketType, func.count(Ticket.id).label('ticket_count'))
