@@ -13,7 +13,7 @@ from jinja2.utils import urlize
 from icalendar import Calendar, Event
 from slugify import slugify_unicode as slugify
 
-from main import db
+from main import db, external_url
 
 from .common import feature_flag
 from models.cfp import Proposal, Venue
@@ -39,7 +39,7 @@ def _get_proposal_dict(proposal, favourites_ids):
         'may_record': proposal.may_record,
         'is_fave': proposal.id in favourites_ids,
         'source': 'database',
-        'link': url_for('.line_up_proposal', proposal_id=proposal.id),
+        'link': external_url('.line_up_proposal', proposal_id=proposal.id),
     }
     if proposal.type == 'workshop':
         res['cost'] = proposal.cost
@@ -58,7 +58,7 @@ def _get_ical_dict(event, favourites_ids):
         'may_record': False,
         'is_fave': event.id in favourites_ids,
         'source': 'external',
-        'link': url_for('.line_up_external', event_id=event.id),
+        'link': external_url('.line_up_external', event_id=event.id),
     }
 
 def _get_scheduled_proposals(filter_obj={}, override_user=None):
