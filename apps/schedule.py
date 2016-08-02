@@ -97,7 +97,7 @@ def _get_scheduled_proposals(filter_obj={}, override_user=None):
         schedule = [s for s in schedule if s.get('is_fave', False)]
 
     if 'venue' in filter_obj:
-        schedule = [s for s in schedule if s['venue'].name in filter_obj['venue']]
+        schedule = [s for s in schedule if s['venue'] in filter_obj.getlist('venue')]
 
     return schedule
 
