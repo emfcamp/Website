@@ -47,7 +47,7 @@ def _get_proposal_dict(proposal, favourites_ids):
 
 def _get_ical_dict(event, favourites_ids):
     return {
-        'id': event.uid,
+        'id': -event.id,
         'start_date': event.start_dt,
         'end_date': event.end_dt,
         'venue': event.location or '(Unknown)',
