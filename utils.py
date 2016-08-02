@@ -873,17 +873,50 @@ class CreateCalendars(Command):
     def run(self):
         icals = [
             {
-                'url': 'https://calendar.google.com/calendar/ical/3s832k79jjbrl9o9e8ifmgflhg%40group.calendar.google.com/public/basic.ics',
-                'main_venue': 'Stage A',
+                "name": "EMF Youth",
+                "url": "https://calendar.google.com/calendar/ical/5nkm5d7nahs9bcgn4q1btjg3c4%40group.calendar.google.com/public/basic.ics",
+                "main_venue": "Workshop 3",
             },
             {
-                'url': 'https://calendar.google.com/calendar/ical/5nkm5d7nahs9bcgn4q1btjg3c4%40group.calendar.google.com/public/basic.ics',
-                'main_venue': 'Workshop 3',
+                "name": "EMF Music",
+                "url": "https://calendar.google.com/calendar/ical/3s832k79jjbrl9o9e8ifmgflhg%40group.calendar.google.com/public/basic.ics",
+                "main_venue": "Stage A",
             },
             {
-                'url': 'https://calendar.google.com/calendar/ical/lhifjvb20rqasl45up83uug6v4%40group.calendar.google.com/private-65383035eae3d04567fb11e2bbe496af/basic.ics',
-                'main_venue': 'Radio Village',
-            }
+                "name": "EMF Film",
+                "url": "http://p04-calendars.icloud.com/published/2/iSu19GpxhFD47NHBtEuNRQWpt0qew4aaj3FVRj-Fjglz2QMdy6opkoZBTTTvPN_cxUU7ZxlBg8ZoTELIBiyjyenVNi82c_10agpwUpaXJro",
+                "main_venue": "Stage B",
+            },
+            {
+                "name": "Maths Village",
+                "url": "http://www.mscroggs.co.uk/emfcal",
+                "main_venue": "Maths Village",
+            },
+            {
+                "name": "Algorave",
+                "url": "https://calendar.google.com/calendar/ical/slab.org_77m028f92l9guddfbhrrtghj2g%40group.calendar.google.com/public/basic.ics",
+                "main_venue": "Algorave Village",
+            },
+            {
+                "name": "Radio Village",
+                "url": "https://calendar.google.com/calendar/ical/lhifjvb20rqasl45up83uug6v4%40group.calendar.google.com/public/basic.ics",
+                "main_venue": "Radio Village",
+            },
+            {
+                "name": "Hacking Hamlet",
+                "url": "https://calendar.google.com/calendar/ical/nvs1s1r6pmvf7v4d82349ns9u4%40group.calendar.google.com/public/basic.ics",
+                "main_venue": "Hacking Hamlet",
+            },
+            {
+                "name": "Nottinghack",
+                "url": "https://calendar.google.com/calendar/ical/o8apcgfbmjkkv0uk5fos4tuc3o%40group.calendar.google.com/public/basic.ics",
+                "main_venue": "Nottinghack Village",
+            },
+            {
+                "name": "Blacksmiths",
+                "url": "https://calendar.google.com/calendar/ical/i1fa3r5jokroruadgp15aqfo5c%40group.calendar.google.com/public/basic.ics",
+                "main_venue": "Blacksmiths",
+            },
         ]
 
         for cal in icals:
@@ -892,6 +925,7 @@ class CreateCalendars(Command):
                 source = existing_calendars[0]
             else:
                 source = CalendarSource(cal['url'])
+            source.name = cal['name']
             source.main_venue = cal['main_venue']
             db.session.add(source)
 
