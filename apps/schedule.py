@@ -48,8 +48,8 @@ def _get_proposal_dict(proposal, favourites_ids):
 def _get_ical_dict(event, favourites_ids):
     return {
         'id': -event.id,
-        'start_date': event.start_dt,
-        'end_date': event.end_dt,
+        'start_date': event_tz.localize(event.start_dt),
+        'end_date': event_tz.localize(event.end_dt),
         'venue': event.location or '(Unknown)',
         'title': event.summary,
         'speaker': '',
@@ -182,6 +182,7 @@ def schedule_frab():
     return Response(frab, mimetype='application/xml')
 
 @schedule.route('/schedule.ical')
+@schedule.route('/schedule.ics')
 @feature_flag('SCHEDULE')
 def schedule_ical():
     schedule = _get_scheduled_proposals(request.args)
@@ -227,6 +228,7 @@ def favourites_json():
     return Response(json.dumps(schedule), mimetype='application/json')
 
 @schedule.route('/favourites.ical')
+@schedule.route('/favourites.ics')
 @feature_flag('SCHEDULE')
 def favourites_ical():
     code = request.args.get('token', None)
