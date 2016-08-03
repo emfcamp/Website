@@ -427,6 +427,7 @@ def tickets_choose_free(user_id=None):
             attach_tickets(msg, user)
 
         mail.send(msg)
+        db.session.commit()
 
         flash('Allocated %s ticket(s)' % len(tickets))
         return redirect(url_for('.tickets_choose_free'))
