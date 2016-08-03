@@ -12,7 +12,7 @@ from lxml import etree
 from flask import Markup, render_template, request, current_app as app
 from sqlalchemy import func
 
-from models.ticket import Ticket, TicketType
+from models.ticket import Ticket, TicketType, TicketTransfer
 
 
 def render_receipt(user, png=False, pdf=False):
@@ -28,7 +28,8 @@ def render_receipt(user, png=False, pdf=False):
 
     vehicle_tickets = tickets.filter(TicketType.admits.in_(['car', 'campervan'])).all()
 
-    transferred_tickets = user.transfers_from.filter_by(paid=True).order_by('timestamp').all()
+    transferred_tickets = user.transfers_from.join(Ticket).filter_by(paid=True) \
+                              .with_entities(TicketTransfer).order_by('timestamp').all()
 
     tees = (tickets.filter(TicketType.fixed_id.in_(range(14, 24)))
                   .with_entities(TicketType, func.count(Ticket.id).label('ticket_count'))

@@ -16,16 +16,32 @@
 </dl>
 
 {% if user.checkin_note and not badge %}
-<div class="well">
-  <p><strong>Please pass on this note:</strong></p>
+<div class="alert alert-info">
+  <p><strong>Important instructions for this attendee:</strong></p>
   <p>{{ user.checkin_note }}</p>
 </div>
 {% endif %}
 
+{% if source not in (None, 'code') %}
+<div class="alert alert-warning">
+  <div class="row" style="display: flex">
+    <div class="col-sm-2 hidden-xs" style="display: flex">
+      <div style="border: 3px dotted #aa8d4b; width: 100%"></div>
+    </div>
+    <div class="col-sm-10">
+      <h4>Request ID</h4>
+      <p>Please validate the above ticketholder details with identification before {% if badge %} issuing a badge {% else %} checking them in {%- endif %}.</p>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% if tickets.count() %}
 <table class="table table-condensed table-striped">
 <thead><tr>
   <th class="hidden-xs">ID</th>
   <th>Type</th>
+  <th>Transferred from</th>
   <th>Status</th>
   {% if tickets.count() > 1 %}
   <th></th>
@@ -36,6 +52,12 @@
 <tr>
   <td class="hidden-xs">{{ ticket.id }}</td>
   <td>{{ ticket.type.name }}</td>
+  <td>
+    {% if ticket.transfers %}
+      {% set from_user = ticket.transfers[-1].from_user %}
+      <a href="{{ url_for('.checkin', user_id=from_user.id) }}">{{ from_user.name }}</a>
+    {% endif %}
+  </td>
   <td>
     {% if badge %}
       {%- if ticket.checkin.badged_up %}
@@ -86,7 +108,14 @@
 {% endfor %}
 </tbody>
 </table>
+{% else %}
+<div class="alert alert-danger">
+  <h4>This account has no entrance tickets</h4>
+  <p>Please ask them to provide ID for any other names the tickets may be under.</p>
+</div>
+{% endif %}
 
+{% if tickets.count() %}
 <form method="post" action="{{ url_for('arrivals.checkin', user_id=user.id) }}" class="shrink">
 <div class="col-sm-5 col-sm-offset-7">
   <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
@@ -97,5 +126,79 @@
   {% endif %}
 </div>
 </form>
+{% endif %}
+
+<div>&nbsp;</div>
+
+{% if transferred_tickets.count() %}
+<h3>Transferred tickets</h3>
+<table class="table table-condensed table-striped">
+<thead><tr>
+  <th class="hidden-xs">ID</th>
+  <th>Type</th>
+  <th>Transferred to</th>
+  <th>Status</th>
+  {% if transferred_tickets.count() > 1 %}
+  <th></th>
+  {% endif %}
+</tr></thead>
+<tbody>
+{% for ticket in transferred_tickets %}
+<tr>
+  <td class="hidden-xs">{{ ticket.id }}</td>
+  <td>{{ ticket.type.name }}</td>
+  <td><a href="{{ url_for('.checkin', user_id=ticket.user.id) }}">{{ ticket.user.name }}</a></td>
+  <td>
+    {% if badge %}
+      {%- if ticket.checkin.badged_up %}
+        Badge issued {{ ticket.checkin.versions[-1].transaction.issued_at.strftime('%A %H:%M') }}
+        by {{ ticket.checkin.versions[-1].transaction.user.name }}
+      {% else %}
+        Badge not issued
+      {% endif -%}
+    {% else %}
+      {%- if ticket.checkin.checked_in %}
+        Checked in {{ ticket.checkin.versions[-1].transaction.issued_at.strftime('%A %H:%M') }}
+        by {{ ticket.checkin.versions[-1].transaction.user.name }}
+      {% else %}
+        Not checked in
+      {% endif -%}
+    {% endif -%}
+  </td>
+  {% if transferred_tickets.count() > 1 %}
+  <td>
+    {% if badge %}
+      {%- if ticket.checkin.badged_up %}
+        <form method="post" action="{{ url_for('arrivals.undo_ticket_checkin', ticket_id=ticket.id) }}">
+        <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
+        <input type="submit" class="btn btn-danger debounce" value="Return badge"/>
+        </form>
+      {% else %}
+        <form method="post" action="{{ url_for('arrivals.ticket_checkin', ticket_id=ticket.id) }}">
+        <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
+        <input type="submit" class="btn btn-success debounce" value="Issue badge"/>
+        </form>
+      {% endif -%}
+    {% else %}
+      {%- if ticket.checkin.checked_in %}
+        <form method="post" action="{{ url_for('arrivals.undo_ticket_checkin', ticket_id=ticket.id) }}">
+        <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
+        <input type="submit" class="btn btn-danger debounce" value="Undo check-in"/>
+        </form>
+      {% else %}
+        <form method="post" action="{{ url_for('arrivals.ticket_checkin', ticket_id=ticket.id) }}">
+        <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
+        <input type="submit" class="btn btn-success debounce" value="Check in"/>
+        </form>
+      {% endif -%}
+    {% endif %}
+  </td>
+  {% endif %}
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endif %}
+
 
 {% endblock %}

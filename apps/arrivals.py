@@ -47,7 +47,7 @@ def checkin_qrcode(code):
         abort(404)
 
     user = User.get_by_checkin_code(app.config.get('SECRET_KEY'), code)
-    return redirect(url_for('.checkin', user_id=user.id))
+    return redirect(url_for('.checkin', user_id=user.id, source='code'))
 
 
 def user_from_code(query):
@@ -128,7 +128,7 @@ def search(query=None):
     user = user_from_code(query)
 
     if user:
-        return {'location': url_for('.checkin', user_id=user.id)}
+        return {'location': url_for('.checkin', user_id=user.id, source='code')}
 
     users_ordered = users_from_query(query)
     users = User.query.filter(User.id.in_([u.id for u in users_ordered]))
@@ -154,7 +154,7 @@ def search(query=None):
             'email': u.email,
             'tickets': tickets.get(u.id, 0),
             'completes': completes.get(u.id, 0),
-            'url': url_for('.checkin', user_id=u.id)
+            'url': url_for('.checkin', user_id=u.id, source='typed')
         }
         user_data.append(user)
 
@@ -164,18 +164,29 @@ def search(query=None):
 
 
 @arrivals.route('/checkin/<int:user_id>', methods=['GET', 'POST'])
+@arrivals.route('/checkin/<int:user_id>/<source>', methods=['GET', 'POST'])
 @arrivals_required
-def checkin(user_id):
+def checkin(user_id, source=None):
     badge = bool(session.get('badge'))
     user = User.query.get_or_404(user_id)
+
+    if source not in (None, 'typed', 'transfer', 'code'):
+        abort(404)
 
     if badge:
         # Ticket must be checked in to receive a badge
         tickets = user.tickets \
                       .join(TicketCheckin).filter_by(checked_in=True) \
                       .join(TicketType).filter_by(has_badge=True)
+        transferred_tickets = user.transfers_from.join(Ticket).with_entities(Ticket) \
+                      .join(TicketCheckin).filter_by(checked_in=True) \
+                      .join(TicketType).filter_by(has_badge=True)
     else:
-        tickets = user.tickets.filter_by(paid=True)
+        tickets = user.tickets.filter_by(paid=True) \
+                      .join(TicketType).filter(TicketType.admits.in_(['full', 'kid']))
+        transferred_tickets = user.transfers_from.join(Ticket) \
+                      .with_entities(Ticket).filter_by(paid=True) \
+                      .join(TicketType).filter(TicketType.admits.in_(['full', 'kid']))
 
     if request.method == 'POST':
         failed = []
@@ -191,10 +202,11 @@ def checkin(user_id):
 
         if failed:
             failed_str = ', '.join(str(t.id) for t in failed)
+            success_count = tickets.count() - len(failed)
             if badge:
-                flash("Already issued: %s" % failed_str)
+                flash("Issued %s badges. Already issued: %s" % (success_count, failed_str))
             else:
-                flash("Already checked in: %s" % failed_str)
+                flash("Checked in %s tickets. Already checked in: %s" % (success_count, failed_str))
 
             return redirect(url_for('.checkin', user_id=user.id))
 
@@ -207,7 +219,8 @@ def checkin(user_id):
         return redirect(url_for('.main'))
 
     return render_template('arrivals/checkin.html', user=user,
-                           tickets=tickets, badge=badge)
+                           tickets=tickets, transferred_tickets=transferred_tickets,
+                           badge=badge, source=source)
 
 
 @arrivals.route('/checkin/ticket/<ticket_id>', methods=['POST'])
