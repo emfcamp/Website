@@ -15,7 +15,7 @@ from slugify import slugify_unicode as slugify
 
 from main import db, external_url
 
-from .common import feature_flag
+from .common import feature_flag, json_response
 from models.cfp import Proposal, Venue
 from models.ical import CalendarSource, CalendarEvent
 from models.user import User, generate_checkin_code
@@ -325,6 +325,32 @@ def line_up_proposal(proposal_id, slug=None):
 
     return render_template('schedule/line-up-proposal.html',
                            proposal=proposal, is_fave=is_fave, venue_name=venue_name)
+
+@schedule.route('/line-up/2016/<int:proposal_id>.json')
+@schedule.route('/line-up/2016/<int:proposal_id>-<slug>.json')
+@json_response
+@feature_flag('SCHEDULE')
+def line_up_proposal_json(proposal_id, slug=None):
+    proposal = Proposal.query.get_or_404(proposal_id)
+    if proposal.state not in ('accepted', 'finished'):
+        abort(404)
+
+    if not current_user.is_anonymous():
+        favourites_ids = [f.id for f in current_user.favourites]
+    else:
+        favourites_ids = []
+
+    data = _get_proposal_dict(proposal, favourites_ids)
+
+    data['start_date'] = data['start_date'].strftime('%Y-%m-%d %H:%M:%S')
+    data['end_date'] = data['end_date'].strftime('%Y-%m-%d %H:%M:%S')
+    # Remove unnecessary data for now
+    del data['link']
+    del data['source']
+    del data['id']
+
+    return data
+
 
 @schedule.route('/line-up/2016/external/<int:event_id>', methods=['GET', 'POST'])
 @schedule.route('/line-up/2016/external/<int:event_id>-<slug>', methods=['GET', 'POST'])
