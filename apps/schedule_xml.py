@@ -47,7 +47,7 @@ def make_root():
     conference = etree.SubElement(root, 'conference')
 
     _add_sub_with_text(conference, 'title', 'Electromagnetic Field 2016')
-    _add_sub_with_text(conference, 'acronym', 'EMF2016')
+    _add_sub_with_text(conference, 'acronym', 'emf16')
     _add_sub_with_text(conference, 'start', '2016-08-05')
     _add_sub_with_text(conference, 'end', '2016-08-07')
     _add_sub_with_text(conference, 'days', '3')
