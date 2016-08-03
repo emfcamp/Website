@@ -26,6 +26,8 @@ def verify_login_code(key, current_timestamp, code):
         timestamp, uid, _ = code.split("-", 2)
     except ValueError:
         return None
+    if isinstance(code, unicode):
+        code = code.encode('utf-8')
     if hmac.compare_digest(generate_login_code(key, timestamp, uid), code):
         age = datetime.fromtimestamp(current_timestamp) - datetime.fromtimestamp(int(timestamp))
         if age > timedelta(hours=6):
@@ -60,6 +62,8 @@ def verify_checkin_code(key, code):
         return None
 
     expected_code = generate_checkin_code(key, user_id, version=version)
+    if isinstance(code, unicode):
+        code = code.encode('utf-8')
     if hmac.compare_digest(expected_code, code):
         return user_id
     return None
