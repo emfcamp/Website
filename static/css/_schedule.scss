@@ -31,7 +31,7 @@ html, body{
     font-size: 14pt;
 }
 
-@media (min-width: 768px) and (min-height: 700px) {
+@media (min-width: 768px) and (min-height: 800px) {
 .event_popup {
     top: 325px;
     left: 150px;
@@ -79,7 +79,7 @@ html, body{
 
     // Please forgive me for all the !importants /o\
     // On large enough screens (width & height) show the full header
-    @media (min-width: 768px) and (min-height: 700px) {
+    @media (min-width: 768px) and (min-height: 800px) {
         .navbar-toggle { display: none; }
         .navbar-collapse.collapse {
             display: block !important;
@@ -90,7 +90,7 @@ html, body{
     }
 
     // On more limited screens only show the header if the toggle is clicked
-    @media (max-width: 768px), (max-height: 700px) {
+    @media (max-width: 768px), (max-height: 800px) {
         .navbar-toggle {
             float: right !important;
             display: block !important;
@@ -135,7 +135,7 @@ html, body{
 }
 
 // @media (max-width: 768px) {
-@media (max-width: 768px), (max-height: 700px) {
+@media (max-width: 768px), (max-height: 800px) {
     .dhx_cal_navline .dhx_cal_prev_button {
         right: 30px !important;
     }
@@ -163,7 +163,7 @@ html, body{
     position: absolute;
 }
 // @media (max-width: 768px) {
-@media (max-width: 768px), (max-height: 700px) {
+@media (max-width: 768px), (max-height: 800px) {
     .dhx_cal_navline .dhx_cal_tab {
         width: auto;
         padding-left: 10px;
