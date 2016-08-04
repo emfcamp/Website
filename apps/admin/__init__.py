@@ -85,7 +85,7 @@ def stats():
         join(TicketType).filter_by(admits='full')
 
     # These are people queries - don't care about cars or campervans being checked in
-    checked_in = Ticket.query.filter(TicketType.admits.in_(['full', 'kid'])) \
+    checked_in = Ticket.query.join(TicketType).filter(TicketType.admits.in_(['full', 'kid'])) \
                              .join(TicketCheckin).filter_by(checked_in=True)
     badged_up = TicketCheckin.query.filter_by(badged_up=True)
 
