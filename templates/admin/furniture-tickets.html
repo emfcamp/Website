@@ -12,10 +12,10 @@
   </tr>
   {% for u, tt, count in tickets %}
   <tr>
-    <td>u.name</td>
-    <td>u.email</td>
-    <td>tt.name</td>
-    <td>count</td>
+    <td>{{ u.name }}</td>
+    <td>{{ u.email }}</td>
+    <td>{{ tt.name }}</td>
+    <td>{{ count }}</td>
   </tr>
 
   {% endfor %}

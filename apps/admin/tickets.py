@@ -504,7 +504,8 @@ def ticket_transfers():
 def furniture():
     tickets = TicketType.query.filter(TicketType.name.in_(['Table', 'Chair'])) \
                         .join(Ticket, User).group_by(User, TicketType) \
-                        .with_entities(User, TicketType, func.count(Ticket.id))
+                        .with_entities(User, TicketType, func.count(Ticket.id)) \
+                        .order_by(User.name, TicketType.order)
     return render_template('admin/furniture-tickets.html', tickets=tickets)
 
 
