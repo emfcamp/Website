@@ -8,6 +8,9 @@
         color: #000000!important;
         background-color: #ff944d!important;
     }
+    .dhx_scale_hour {
+        height: 131px !important;
+    }
   </style>
   <script type="text/javascript">
       var csrftoken = "{{ csrf_token() }}"
@@ -133,7 +136,7 @@
         scheduler.config.default_date = day_format;
         // Make it show 10 min slots
         scheduler.config.first_hour = 10;
-        scheduler.config.hour_size_px = 131;
+        scheduler.config.hour_size_px = 132;
         scheduler.config.separate_short_events = true;
 
         var get_ele = function (id) { return document.getElementById(id); }
