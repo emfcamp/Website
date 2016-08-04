@@ -243,36 +243,36 @@ def get_main_ticket_types():
         (12, 1, 'full', 'Full Camp Ticket (Discount Template)', 0, 1, 105.00, 142.00, True, None, 'example', datetime(2016, 8, 1, 12, 0), False),
         (0, 2, 'full', 'Full Camp Ticket', 193, 10, 100.00, 140.00, True, None, None, datetime(2016, 1, 10, 20, 24), True),
         (1, 3, 'full', 'Full Camp Ticket', 350, 10, 110.00, 145.00, True, None, None, datetime(2016, 3, 6, 13, 5), True),
-        (2, 4, 'full', 'Full Camp Ticket', 636, 10, 120.00, 158.00, True, None, None, datetime(2016, 6, 7, 0, 0), True),
+        (2, 4, 'full', 'Full Camp Ticket', 659, 10, 120.00, 158.00, True, None, None, datetime(2016, 7, 24, 0, 0), True),
         (3, 8, 'full', 'Full Camp Ticket (Supporter)', 56, 10, 130.00, 180.00, True,
             "Support this non-profit event by paying a bit more. "
             "All money will go towards making EMF more awesome.",
             None, datetime(2016, 6, 8, 0, 0), True),
-        (9, 8, 'full', 'Full Camp Ticket (Supporter)', 1100, 10, 130.00, 170.00, True,
+        (9, 8, 'full', 'Full Camp Ticket (Supporter)', 140, 10, 130.00, 170.00, True,
             "Support this non-profit event by paying a bit more. "
             "All money will go towards making EMF more awesome.",
-            None, datetime(2016, 6, 8, 0, 0), True),
+            None, datetime(2016, 7, 24, 0, 0), True),
 
         (4, 9, 'full', 'Full Camp Ticket (Gold Supporter)', 6, 10, 150.00, 210.00, True,
             "Pay even more, receive our undying gratitude.",
             None, datetime(2016, 6, 8, 0, 0), True),
-        (10, 9, 'full', 'Full Camp Ticket (Gold Supporter)', 1100, 10, 150.00, 195.00, True,
+        (10, 9, 'full', 'Full Camp Ticket (Gold Supporter)', 45, 10, 150.00, 195.00, True,
             "Pay even more, receive our undying gratitude.",
-            None, datetime(2016, 6, 8, 0, 0), True),
+            None, datetime(2016, 7, 24, 0, 0), True),
 
         (5, 10, 'kid', 'Under-16 Camp Ticket', 11, 10, 45.00, 64.00, True,
             "For visitors born after August 5th, 2000. "
             "All under-16s must be accompanied by an adult.",
             None, datetime(2016, 6, 8, 0, 0), True),
-        (11, 10, 'kid', 'Under-16 Camp Ticket', 500, 10, 45.00, 60.00, True,
+        (11, 10, 'kid', 'Under-16 Camp Ticket', 500, 80, 45.00, 60.00, True,
             "For visitors born after August 5th, 2000. "
             "All under-16s must be accompanied by an adult.",
-            None, datetime(2016, 6, 8, 0, 0), True),
+            None, datetime(2016, 8, 4, 0, 0), True),
 
-        (6, 15, 'kid', 'Under-5 Camp Ticket', 200, 4, 0, 0, False,
+        (6, 15, 'kid', 'Under-5 Camp Ticket', 35, 4, 0, 0, False,
             "For children born after August 5th, 2011. "
             "All children must be accompanied by an adult.",
-            None, datetime(2016, 6, 8, 0, 0), True),
+            None, datetime(2016, 8, 4, 0, 0), True),
 
         (13, 25, 'other',
             'Tent (Template)', 0, 1, 300.00, 400.00, False,
@@ -293,7 +293,7 @@ def get_main_ticket_types():
         (22, 38, 'other', "Unfitted T-Shirt - XL", 200, 10, 10.00, 12.00, False, None, None, datetime(2016, 7, 15, 0, 0), False),
         (23, 39, 'other', "Unfitted T-Shirt - XXL", 200, 10, 10.00, 12.00, False, None, None, datetime(2016, 7, 15, 0, 0), False),
 
-        (7, 50, 'car', 'Parking Ticket', 450, 4, 15.00, 21.00, False,
+        (7, 50, 'car', 'Parking Ticket', 700, 4, 15.00, 21.00, False,
             "We're trying to keep cars to a minimum. "
             "Please take public transport or car-share if you can.",
             None, None, True),
