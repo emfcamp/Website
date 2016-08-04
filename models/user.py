@@ -22,12 +22,12 @@ def generate_login_code(key, timestamp, uid):
     return msg + "-" + base64.urlsafe_b64encode(mac.digest())[:20]
 
 def verify_login_code(key, current_timestamp, code):
+    if isinstance(code, unicode):
+        code = code.encode('utf-8')
     try:
         timestamp, uid, _ = code.split("-", 2)
     except ValueError:
         return None
-    if isinstance(code, unicode):
-        code = code.encode('utf-8')
     if hmac.compare_digest(generate_login_code(key, timestamp, uid), code):
         age = datetime.fromtimestamp(current_timestamp) - datetime.fromtimestamp(int(timestamp))
         if age > timedelta(hours=6):
