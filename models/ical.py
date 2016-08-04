@@ -64,12 +64,12 @@ class CalendarSource(db.Model):
                     db.session.add(event)
 
                 start_dt = component.get('dtstart').dt
-                if hasattr(start_dt, 'tzinfo'):
+                if hasattr(start_dt, 'tzinfo') and start_dt.tzinfo is not None:
                     start_dt = start_dt.astimezone(local_tz).replace(tzinfo=None)
                 event.start_dt = start_dt
 
                 end_dt = component.get('dtend').dt
-                if hasattr(end_dt, 'tzinfo'):
+                if hasattr(end_dt, 'tzinfo') and end_dt.tzinfo is not None:
                     end_dt = end_dt.astimezone(local_tz).replace(tzinfo=None)
                 event.end_dt = end_dt
 
