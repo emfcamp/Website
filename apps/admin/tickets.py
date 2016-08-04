@@ -497,3 +497,14 @@ def cancel_free_ticket(ticket_id):
 def ticket_transfers():
     transfer_logs = TicketTransfer.query.all()
     return render_template('admin/ticket-transfers.html', transfers=transfer_logs)
+
+
+@admin.route('/furniture')
+@admin_required
+def furniture():
+    tickets = TicketType.query.filter(TicketType.name.in_(['Table', 'Chair'])) \
+                        .join(Ticket, User).group_by(User, TicketType) \
+                        .with_entities(User, TicketType, func.count(Ticket.id))
+    return render_template('admin/furniture-tickets.html', tickets=tickets)
+
+
