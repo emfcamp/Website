@@ -20,7 +20,6 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         time_formatter = scheduler.date.date_to_str("%H:%i"), // e.g. 22:33
         debounce = false,
         date_to_show = (start_date <= todays_date) ? todays_date : start_date,
-        week_or_day = (start_date <= todays_date && end_date >= todays_date) ? 'emf_day' : 'emf_weekend',
         main_venues = [
             {"key": "Stage-A", "label": "Stage A"},
             {"key": "Stage-B", "label": "Stage B"},
@@ -84,7 +83,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         if (venueA.source !== venueB.source) {
             return venueA.source === 'ical' ? 1 : -1;
         } else if (venueA.order != venueB.order) {
-            return venueA.order > venueB.order ? 1: -1;
+            return venueA.order < venueB.order ? 1: -1;
         }
         return venueA.key > venueB.key ? 1: -1;
     }
@@ -119,16 +118,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         step: 1,
     });
 
-    scheduler.locale.labels.emf_weekend_tab = "Weekend";
-    scheduler.createUnitsView({
-        name:"emf_weekend",
-        property:"venue",
-        list: scheduler.serverList('main_venues', main_venues),
-        days: 3,
-        size: 6,
-    });
-
-    scheduler.locale.labels.emf_timeline_tab = "Timeline";
+    scheduler.locale.labels.emf_timeline_tab = "All Events";
     scheduler.createTimelineView({
         section_autoheight: false,
         name:"emf_timeline",
@@ -147,6 +137,10 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         dy:40
     });
 
+    scheduler.templates.emf_timeline_date = function(start_day, end_day) {
+        return day_formatter(start_day);
+    };
+
     // Set the filter for both views
     function _filter_events(id, event){
         var test_venues = filter.venues,
@@ -159,7 +153,6 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         return is_favourite && is_venue;
     }
     scheduler.filter_emf_day = _filter_events;
-    scheduler.filter_emf_weekend = _filter_events;
 
     // Clamp day view
     scheduler.date.add_emf_timeline = scheduler.date.add_emf_day = function (day, inc) {
@@ -178,35 +171,6 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         }
         return res;
     };
-
-    // Make sure in weekend view you can't scroll away
-    scheduler.date.add_emf_weekend = function (date,inc) {
-        return scheduler.date.add(start_date, main_venues.length*3 ,"day");
-    };
-
-    scheduler.date.get_emf_weekend_end = function (date) {
-        return scheduler.date.add(start_date, main_venues.length*3 ,"day");
-    };
-
-    scheduler.date.get_emf_weekend_start = function (date) {
-        return start_date;
-    };
-
-    scheduler._click.dhx_cal_tab = function () {
-        // Override the view toggle so that it always locks weekend view to
-        // Friday
-        var name = this.getAttribute("name"),
-            mode = name.substring(0, name.search("_tab")),
-            date = (mode === "emf_weekend" ) ? start_date : scheduler._date;
-        scheduler.setCurrentView(date, mode);
-    };
-
-    // scheduler._click.dhx_second_scale_bar = function () {
-    //     console.log(arguments);
-    //     scheduler.setCurrentView(date, 'emf_day');
-    // };
-
-    // scheduler.date.week_emf_day_start = scheduler.date.week_start;
 
     // There'll be no events outside the weekend so lock the view to it
     scheduler.config.limit_view = true;
@@ -335,9 +299,11 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
     // Set the date format
     scheduler.config.show_loading = true;
     scheduler.config.default_date = day_format;
-    // Make it show 10 min slots
+    // First hour to show
     scheduler.config.first_hour = 9;
-    scheduler.config.hour_size_px = 132;
+    // If there's enough space show hours with 10 minute divisions
+    scheduler.config.hour_size_px = ($(window).width() <= 768) ? 88: 132; //132;
+    // scheduler.config.hour_size_px = 132;
     scheduler.config.separate_short_events = true;
 
     // Format the tooltips
@@ -360,18 +326,25 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         }
         return res.join(' ');
     };
-
-    emf_scheduler.size_scheduler = function size_scheduler(){
+    function _sizeScheduler(){
         var view_height = window.innerHeight||document.documentElement.clientHeight,
             header_offset = get_ele('header').offsetTop,
             header_height = get_ele('header').offsetHeight + header_offset,
             schedule_height = view_height - header_height,
             schedule = get_ele('scheduler_here');
-        schedule.style.height = schedule_height + 'px';
-    };
 
-    scheduler.attachEvent("onSchedulerReady", emf_scheduler.size_scheduler);
-    window.onresize = emf_scheduler.size_scheduler;
+        scheduler.config.hour_size_px = ($(window).width() <= 768) ? 88: 132; //132;
+        scheduler.updateView();
+        schedule.style.height = schedule_height + 'px';
+    }
+
+    // Apparently this is what we need to use if we'd like to detect when
+    // the screen is rendered
+    scheduler.attachEvent("onViewChange", function () {
+        _sizeScheduler();
+        emf_scheduler.size_scheduler = _sizeScheduler;
+        window.onresize = _sizeScheduler;
+    });
 
     window.onclick = function (mouseEvent) {
         if (mouseEvent.target.className.indexOf('dhx_cal_cover') !== -1) {
@@ -379,10 +352,8 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         }
     };
 
-    if ($(window).width() <= 1024) {
-        week_or_day = 'emf_day';
-    }
+    var initial_view = ($(window).width() <= 768) ? 'emf_day': 'emf_timeline';
 
-    scheduler.init('scheduler_here', date_to_show, week_or_day);
+    scheduler.init('scheduler_here', date_to_show, initial_view);
     scheduler.parse(schedule_data, 'json');
 }

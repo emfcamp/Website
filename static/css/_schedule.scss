@@ -109,6 +109,13 @@ html, body{
 .dhx_scale_hour {
     height: 131px !important;
 }
+
+@media (max-width: 768px) {
+    .dhx_scale_hour {
+        height: 87px !important;
+    }
+}
+
 .dhx_matrix_line .dhx_cal_event_line,
 .dhx_cal_container .dhx_cal_data .dhx_scale_holder .dhx_cal_event div {
     color: $schedule-text;
@@ -116,9 +123,25 @@ html, body{
 }
 
 // Style the 'scroll venue' next/previous buttons to draw attention to them
+.dhx_scale_bar .dhx_cal_next_button {
+    background: url(/static/images/scheduler/arrow_right_white.png) center center no-repeat;
+}
+.dhx_scale_bar .dhx_cal_prev_button {
+    background: url(/static/images/scheduler/arrow_left_white.png) center center no-repeat;
+}
 .dhx_scale_bar .dhx_cal_prev_button,
 .dhx_scale_bar .dhx_cal_next_button {
-    background-color: lighten($schedule-block, 60%)
+    background-color: #2c4fd0;
+}
+
+// @media (max-width: 768px) {
+@media (max-width: 768px), (max-height: 650px) {
+    .dhx_cal_navline .dhx_cal_prev_button {
+        right: 30px !important;
+    }
+    .dhx_cal_navline .dhx_cal_next_button {
+        right: 0px !important;
+    }
 }
 
 .dhx_cal_container .dhx_cal_data .dhx_scale_holder .dhx_cal_event {
@@ -139,12 +162,28 @@ html, body{
     top: 14px;
     position: absolute;
 }
-@media (max-width: 768px) {
+// @media (max-width: 768px) {
+@media (max-width: 768px), (max-height: 650px) {
     .dhx_cal_navline .dhx_cal_tab {
         width: auto;
         padding-left: 10px;
         padding-right: 10px;
         font-size: 12px;
+    }
+    .dhx_cal_navline {
+        height: 31px !important;
+    }
+    .dhx_cal_date,
+    .dhx_cal_next_button,
+    .dhx_cal_prev_button,
+    .dhx_cal_tab {
+        top: -1px !important;
+    }
+    .dhx_cal_header {
+        top: 35px !important;
+    }
+    .dhx_cal_data {
+        top: 71px !important;
     }
     .dhx_cal_container .dhx_cal_navline .dhx_cal_date {
         font-size: 15px;
@@ -153,16 +192,29 @@ html, body{
         display: none;
     }
     #emf_day_tab {
-        left: 5px !important;
-    }
-    #emf_weekend_tab {
-        left: 50px !important;
+        left: 1px !important;
     }
     #emf_timeline_tab {
-        left: 125px !important
+        left: 43px !important
     }
     #filter_modal_btn {
-        left: 195px !important
+        left: 109px !important
+    }
+}
+
+@media (min-width: 768px) {
+    .dhx_cal_navline .dhx_cal_tab {
+        width: 70px;
+        font-size: 14px;
+    }
+    #emf_day_tab {
+        left: 20px !important;
+    }
+    #emf_timeline_tab {
+        left: 110px !important
+    }
+    #filter_modal_btn {
+        left: 200px !important;
     }
 }
 
@@ -175,24 +227,6 @@ html, body{
     }
 }
 
-@media (min-width: 768px) {
-    .dhx_cal_navline .dhx_cal_tab {
-        width: 70px;
-        font-size: 14px;
-    }
-    #emf_day_tab {
-        left: 20px !important;
-    }
-    #emf_weekend_tab {
-        left: 110px !important;
-    }
-    #emf_timeline_tab {
-        left: 195px !important
-    }
-    #filter_modal_btn {
-        left: 280px !important;
-    }
-}
 .dhx_cal_container .dhx_cal_tab,
 .dhx_cal_container .dhx_cal_prev_button,
 .dhx_cal_container .dhx_cal_next_button,

@@ -127,7 +127,7 @@ def _get_priority_sorted_venues(venues_to_allow):
                 'order': venue[2]
             })
 
-    res = sorted(res, key=lambda v: (v['source'] == 'ical', v['order']))
+    res = sorted(res, key=lambda v: (v['source'] != 'ical', v['order']), reverse=True)
     return res
 
 @schedule.route('/schedule')
