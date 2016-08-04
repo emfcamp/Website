@@ -8,6 +8,7 @@ from flask import (
 )
 from sqlalchemy import func
 
+from main import db
 from models.ticket import Ticket, TicketType, CheckinStateException, TicketCheckin
 from models.user import User, checkin_code_re
 from .common import require_permission, json_response
@@ -200,6 +201,8 @@ def checkin(user_id, source=None):
             except CheckinStateException:
                 failed.append(t)
 
+        db.session.commit()
+
         if failed:
             failed_str = ', '.join(str(t.id) for t in failed)
             success_count = tickets.count() - len(failed)
@@ -237,6 +240,8 @@ def ticket_checkin(ticket_id):
     except CheckinStateException as e:
         flash(str(e))
 
+    db.session.commit()
+
     return redirect(url_for('.checkin', user_id=ticket.user.id))
 
 @arrivals.route('/checkin/ticket/<ticket_id>/undo', methods=['POST'])
@@ -252,6 +257,8 @@ def undo_ticket_checkin(ticket_id):
             ticket.undo_check_in()
     except CheckinStateException as e:
         flash(str(e))
+
+    db.session.commit()
 
     return redirect(url_for('.checkin', user_id=ticket.user.id))
 
