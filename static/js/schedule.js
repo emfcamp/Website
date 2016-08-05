@@ -225,7 +225,12 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
 
         // Set the basic details
         $('#event_title').text(ev.title);
-        $('#event_speaker').text(ev.speaker);
+        if (ev.speaker.trim() == '') {
+            $('#event_speaker_wrapper').hide();
+        } else {
+            $('#event_speaker').text(ev.speaker);
+            $('#event_speaker_wrapper').show();
+        }
 
         $('#event_venue').text(venue_dict[ev.venue].label);
         $('#event_day').text(day_formatter(ev.start_date));
