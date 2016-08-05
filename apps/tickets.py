@@ -414,11 +414,11 @@ def transfer(ticket_id):
 
 
 @tickets.route("/tickets/receipt")
-@tickets.route("/tickets/<user_id>/receipt")
+@tickets.route("/tickets/<int:user_id>/receipt")
 @login_required
 def receipt(user_id=None):
     if current_user.has_permission('admin') and user_id is not None:
-        user = User.query.get(user_id).one()
+        user = User.query.get(user_id)
     else:
         user = current_user
 
