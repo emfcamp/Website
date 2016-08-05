@@ -34,8 +34,8 @@ def get_day_start_end(dt, start_time=time(4, 0)):
 
     return start_dt, end_dt
 
-def _add_sub_with_text(parent, element, text):
-    node = etree.SubElement(parent, element)
+def _add_sub_with_text(parent, element, text, **extra):
+    node = etree.SubElement(parent, element, **extra)
     node.text = text
     return node
 
@@ -89,7 +89,14 @@ def add_event(room, event):
     _add_sub_with_text(event_node, 'subtitle', '')
     _add_sub_with_text(event_node, 'track', '')
 
+    add_persons(event_node, event)
     add_recording(event_node, event)
+
+def add_persons(event_node, event):
+
+    persons_node = etree.SubElement(event_node, 'persons')
+
+    _add_sub_with_text(persons_node, 'person', event['speaker'], id=str(event['user_id']))
 
 def add_recording(event_node, event):
 
