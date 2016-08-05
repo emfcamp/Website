@@ -1,6 +1,8 @@
 #!/bin/bash
 
-CONNSTR=postgresql://emfcamp-site@localhost/emfcamp-site
+set -e
+
+. utils/databases.cfg
 
 pg_dump -a \
   -t user \
@@ -9,4 +11,4 @@ pg_dump -a \
   -t ticket_price \
   -t ticket \
   -t ticket_transfer \
-  --dbname "$CONNSTR"
+  -d $PG_CONNSTR
