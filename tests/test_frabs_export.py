@@ -62,6 +62,8 @@ class XMLTestCase(unittest.TestCase):
             'id': 1,
             'title': 'The foo bar',
             'description': 'The foo bar',
+            'speaker': 'Someone',
+            'user_id': 123,
             'end_date': datetime(2016, 8, 5, 11, 00),
             'start_date': datetime(2016, 8, 5, 10, 30),
         }
@@ -78,6 +80,8 @@ class XMLTestCase(unittest.TestCase):
             'title': 'The foo bar',
             'venue': 'here',
             'description': 'The foo bar',
+            'speaker': 'Someone',
+            'user_id': 123,
             'end_date': datetime(2016, 8, 5, 11, 00),
             'start_date': datetime(2016, 8, 5, 10, 30),
         }, {
@@ -85,6 +89,8 @@ class XMLTestCase(unittest.TestCase):
             'title': 'The foo bartt',
             'venue': 'There',
             'description': 'The foo bar',
+            'speaker': 'Someone',
+            'user_id': 123,
             'end_date': datetime(2016, 8, 5, 11, 00),
             'start_date': datetime(2016, 8, 5, 10, 30),
         }, {
@@ -93,6 +99,8 @@ class XMLTestCase(unittest.TestCase):
             'venue': 'here',
             'type': 'workshop',
             'description': 'The foo bar',
+            'speaker': 'Someone',
+            'user_id': 123,
             'end_date': datetime(2016, 8, 6, 11, 00),
             'start_date': datetime(2016, 8, 6, 10, 30),
         }, ]
