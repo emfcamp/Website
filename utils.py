@@ -298,6 +298,11 @@ def get_main_ticket_types():
             "Please take public transport or car-share if you can.",
             None, None, True),
 
+        (24, 50, 'car', 'Parking Ticket (Cash)', 700, 4, 0, 0, False,
+            "We're trying to keep cars to a minimum. "
+            "Please take public transport or car-share if you can.",
+            None, None, True),
+
         (8, 55, 'campervan',
             u'Caravan/\u200cCampervan Ticket', 60, 2, 30.00, 42.00, False,
             "If you bring a caravan, you won't need a separate parking ticket for the towing car.",
@@ -939,6 +944,23 @@ class RefreshCalendars(Command):
 
         db.session.commit()
 
+class CreateParkingTickets(Command):
+    def run(self):
+        tt = TicketType.query.filter_by(fixed_id=24).one()
+
+        for i in range(1, 50 + 1):
+            email = 'user_%s@parking.invalid' % i
+            if not User.query.filter_by(email=email).first():
+                u = User(email, 'Parking ticket %s' % i)
+                db.session.add(u)
+                db.session.commit()
+
+                t = Ticket(u.id, tt)
+                t.paid = True
+                t.emailed = True
+
+        db.session.commit()
+
 
 if __name__ == "__main__":
     manager = Manager(create_app())
@@ -978,4 +1000,5 @@ if __name__ == "__main__":
     manager.add_command('createcalendars', CreateCalendars())
     manager.add_command('refreshcalendars', RefreshCalendars())
 
+    manager.add_command('createparkingtickets', CreateParkingTickets())
     manager.run()

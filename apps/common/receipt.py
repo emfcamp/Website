@@ -46,6 +46,17 @@ def render_receipt(user, png=False, pdf=False):
                            pdf=pdf, png=png)
 
 
+def render_parking_receipts(png=False, pdf=False):
+    vehicle_tickets = TicketType.query.filter_by(fixed_id=24).one().tickets
+    users = [t.user for t in vehicle_tickets]
+
+    return render_template('parking-receipts.html', users=users,
+                           format_inline_qr=format_inline_qr,
+                           format_inline_barcode=format_inline_barcode,
+                           vehicle_tickets=vehicle_tickets,
+                           pdf=pdf, png=png)
+
+
 def render_pdf(html, url_root=None):
     # This needs to fetch URLs found within the page, so if
     # you're running a dev server, use app.run(processes=2)
