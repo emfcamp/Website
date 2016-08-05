@@ -1,0 +1,24 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'furniture' %}
+{% block body %}
+
+<h2>T-shirt tickets</h2>
+<table class="table table-condensed table-striped">
+  <tr>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Ticket type</th>
+    <th>Count</th>
+  </tr>
+  {% for u, tt, count in tickets %}
+  <tr>
+    <td>{{ u.name }}</td>
+    <td>{{ u.email }}</td>
+    <td>{{ tt.name }}</td>
+    <td>{{ count }}</td>
+  </tr>
+
+  {% endfor %}
+</table>
+
+{% endblock %}
