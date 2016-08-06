@@ -151,11 +151,11 @@ html, body{
 
     &.favourite div {
         color: #fff;
-        background-color: lighten($schedule-block, 13%);
+        background-color: lighten($schedule-block, 25%);
     }
 
     &.favourite.past_event div {
-        background-color: rgba(lighten($schedule-block, 13%), 70%);
+        background-color: rgba(lighten($schedule-block, 25%), 70%);
     }
 }
 #filter_modal_btn {
