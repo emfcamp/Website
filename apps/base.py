@@ -208,3 +208,9 @@ def design_elements():
 @base.route("/googlec108e6ab4f75019d.html")
 def google_verification_russ():
     return "google-site-verification: googlec108e6ab4f75019d.html"
+
+@base.route("/herald")
+def herald():
+    return redirect('https://wiki.emfcamp.org/wiki/Herald')
+
+
