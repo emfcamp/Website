@@ -175,7 +175,7 @@ def schedule_frab():
                                       Proposal.scheduled_time.isnot(None),
                                       Proposal.scheduled_venue.isnot(None),
                                       Proposal.scheduled_duration.isnot(None)
-                                    ).all()
+                                    ).order_by(Proposal.scheduled_time).all()
 
     schedule = [_get_proposal_dict(p, []) for p in schedule]
 
