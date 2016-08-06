@@ -233,6 +233,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         }
 
         $('#event_venue').text(venue_dict[ev.venue].label);
+        $('#event_venue').attr('href', ev.map_link);
         $('#event_day').text(day_formatter(ev.start_date));
         $('#event_time').text(time_formatter(ev.start_date));
         $('#event_description').html(ev.description);

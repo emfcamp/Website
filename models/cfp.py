@@ -253,6 +253,19 @@ class Proposal(db.Model):
 
         return slug
 
+    @property
+    def latlon(self):
+        if self.venue.lat and self.venue.lon:
+            return [self.venue.lat, self.venue.lon]
+        return None
+
+    @property
+    def map_link(self):
+        latlon = self.latlon
+        if latlon:
+            return 'https://map.emfcamp.org/#19?lat=%s&lon=%s' % (latlon[0], latlon[1])
+        return None
+
 
 class PerformanceProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'performance'}
@@ -342,6 +355,8 @@ class Venue(db.Model):
     name = db.Column(db.String, nullable=False)
     type = db.Column(db.String, nullable=True)
     priority = db.Column(db.Integer, nullable=True, default=0)
+    lat = db.Column(db.Float)
+    lon = db.Column(db.Float)
 
     proposals = db.relationship('Proposal', backref='venue', lazy='dynamic',
                                 primaryjoin='Proposal.scheduled_venue == Venue.id')

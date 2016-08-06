@@ -4,7 +4,7 @@
 
 <h1>{{ event.title }}</h1>
 
-<p><strong>{{ event.start_dt.strftime('%A from %-I:%M %p') }}</strong> - <strong>{{ event.end_dt.strftime('%-I:%M %p') }}</strong> in <strong>{{ venue_name }}</strong>
+<p><strong>{{ event.start_dt.strftime('%A from %-I:%M %p') }}</strong> - <strong>{{ event.end_dt.strftime('%-I:%M %p') }}</strong> in <strong><a href="{{ event.map_link }}">{{ venue_name }}</a></strong>
 
 <p class="multiline">{{ event.description | urlize }}</p>
 <hr>

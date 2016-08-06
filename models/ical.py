@@ -153,6 +153,19 @@ class CalendarEvent(db.Model):
 
         return slug
 
+    @property
+    def latlon(self):
+        if self.source.lat and self.source.lon:
+            return [self.source.lat, self.source.lon]
+        return None
+
+    @property
+    def map_link(self):
+        latlon = self.latlon
+        if latlon:
+            return 'https://map.emfcamp.org/#19?lat=%s&lon=%s' % (latlon[0], latlon[1])
+        return None
+
     __table_args__ = (
         UniqueConstraint(source_id, uid),
     )
