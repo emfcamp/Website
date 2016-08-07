@@ -1046,7 +1046,7 @@ def rank():
 def potential_schedule_changes():
     proposals = Proposal.query.filter(
         (Proposal.potential_venue.isnot(None) | Proposal.potential_time.isnot(None)),
-        ).filter(Proposal.scheduled_duration.isnot(None)).all()
+    ).filter(Proposal.scheduled_duration.isnot(None)).all()
 
     for proposal in proposals:
         if proposal.scheduled_venue:
