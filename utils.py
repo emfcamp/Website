@@ -878,62 +878,28 @@ class SendEmails(Command):
 
 class CreateCalendars(Command):
     def run(self):
-        icals = [
-            {
-                "name": "EMF Youth",
-                "url": "https://calendar.google.com/calendar/ical/5nkm5d7nahs9bcgn4q1btjg3c4%40group.calendar.google.com/public/basic.ics",
-                "main_venue": "Workshop 3",
-            },
-            {
-                "name": "EMF Music",
-                "url": "https://calendar.google.com/calendar/ical/3s832k79jjbrl9o9e8ifmgflhg%40group.calendar.google.com/public/basic.ics",
-                "main_venue": "Stage A",
-            },
-            {
-                "name": "EMF Film",
-                "url": "http://p04-calendars.icloud.com/published/2/iSu19GpxhFD47NHBtEuNRQWpt0qew4aaj3FVRj-Fjglz2QMdy6opkoZBTTTvPN_cxUU7ZxlBg8ZoTELIBiyjyenVNi82c_10agpwUpaXJro",
-                "main_venue": "Stage B",
-            },
-            {
-                "name": "Maths Village",
-                "url": "http://www.mscroggs.co.uk/emfcal",
-                "main_venue": "Maths Village",
-            },
-            {
-                "name": "Algorave",
-                "url": "https://calendar.google.com/calendar/ical/slab.org_77m028f92l9guddfbhrrtghj2g%40group.calendar.google.com/public/basic.ics",
-                "main_venue": "Algorave Village",
-            },
-            {
-                "name": "Radio Village",
-                "url": "https://calendar.google.com/calendar/ical/lhifjvb20rqasl45up83uug6v4%40group.calendar.google.com/public/basic.ics",
-                "main_venue": "Radio Village",
-            },
-            {
-                "name": "Hacking Hamlet",
-                "url": "https://calendar.google.com/calendar/ical/nvs1s1r6pmvf7v4d82349ns9u4%40group.calendar.google.com/public/basic.ics",
-                "main_venue": "Hacking Hamlet",
-            },
-            {
-                "name": "Nottinghack",
-                "url": "https://calendar.google.com/calendar/ical/o8apcgfbmjkkv0uk5fos4tuc3o%40group.calendar.google.com/public/basic.ics",
-                "main_venue": "Nottinghack Village",
-            },
-            {
-                "name": "Blacksmiths",
-                "url": "https://calendar.google.com/calendar/ical/i1fa3r5jokroruadgp15aqfo5c%40group.calendar.google.com/public/basic.ics",
-                "main_venue": "Blacksmiths",
-            },
-        ]
+        icals = json.load(open('calendars.json'))
 
         for cal in icals:
-            existing_calendars = CalendarSource.query.filter_by(url=cal['url']).all()
-            if existing_calendars:
-                source = existing_calendars[0]
+            existing_calendar = CalendarSource.query.filter_by(url=cal['url']).first()
+            if existing_calendar:
+                source = existing_calendar
+                app.logger.info('Refreshing calendar %s', source.name)
             else:
                 source = CalendarSource(cal['url'])
-            source.name = cal['name']
-            source.main_venue = cal['main_venue']
+                app.logger.info('Adding calendar %s', cal['name'])
+
+            cal['lat'] = cal.get('lat')
+            cal['lon'] = cal.get('lon')
+
+            for f in ['name', 'type', 'priority', 'main_venue', 'lat', 'lon']:
+                cur_val = getattr(source, f)
+                new_val = cal[f]
+
+                if cur_val != new_val:
+                    app.logger.info(' %10s: %r -> %r', f, cur_val, new_val)
+                    setattr(source, f, new_val)
+
             db.session.add(source)
 
         db.session.commit()
@@ -948,13 +914,22 @@ class RefreshCalendars(Command):
 class ExportCalendars(Command):
     def run(self):
         data = []
-        for source in CalendarSource.query.filter_by(enabled=True).all():
-            data.append(OrderedDict([
+        calendars = CalendarSource.query.filter_by(enabled=True) \
+                                  .order_by(CalendarSource.priority, CalendarSource.id)
+        for source in calendars:
+            source_data = OrderedDict([
                 ('name', source.name),
                 ('url', source.url),
-                ('main_venue', source.main_venue)]))
+                ('type', source.type),
+                ('priority', source.priority),
+                ('main_venue', source.main_venue)])
+            if source.lat:
+                source_data['lat'] = source.lat
+                source_data['lon'] = source.lon
 
-        print json.dumps(data, indent=4)
+            data.append(source_data)
+
+        json.dump(data, open('calendars.json', 'w'), indent=4)
 
 
 class CreateParkingTickets(Command):
