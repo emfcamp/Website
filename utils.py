@@ -929,7 +929,7 @@ class ExportCalendars(Command):
 
             data.append(source_data)
 
-        json.dump(data, open('calendars.json', 'w'), indent=4)
+        json.dump(data, open('calendars.json', 'w'), indent=4, separators=(',', ': '))
 
 
 class CreateParkingTickets(Command):
