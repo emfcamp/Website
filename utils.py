@@ -8,6 +8,7 @@ from mailsnake import MailSnake
 import random
 import json
 from faker import Faker
+from collections import OrderedDict
 
 from flask.ext.script import Command, Manager, Option
 from flask.ext.migrate import MigrateCommand
@@ -944,6 +945,18 @@ class RefreshCalendars(Command):
 
         db.session.commit()
 
+class ExportCalendars(Command):
+    def run(self):
+        data = []
+        for source in CalendarSource.query.filter_by(enabled=True).all():
+            data.append(OrderedDict([
+                ('name', source.name),
+                ('url', source.url),
+                ('main_venue', source.main_venue)]))
+
+        print json.dumps(data, indent=4)
+
+
 class CreateParkingTickets(Command):
     def run(self):
         tt = TicketType.query.filter_by(fixed_id=24).one()
@@ -999,6 +1012,7 @@ if __name__ == "__main__":
 
     manager.add_command('createcalendars', CreateCalendars())
     manager.add_command('refreshcalendars', RefreshCalendars())
+    manager.add_command('exportcalendars', ExportCalendars())
 
     manager.add_command('createparkingtickets', CreateParkingTickets())
     manager.run()

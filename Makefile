@@ -120,6 +120,9 @@ calendars:
 refreshcalendars:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py refreshcalendars
 
+exportcalendars:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py exportcalendars
+
 parkingtickets:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createparkingtickets
 
