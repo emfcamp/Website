@@ -19,7 +19,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         day_formatter = scheduler.date.date_to_str(day_format),
         time_formatter = scheduler.date.date_to_str("%H:%i"), // e.g. 22:33
         debounce = false,
-        date_to_show = (start_date <= todays_date) ? todays_date : start_date,
+        date_to_show = (todays_date >= start_date && todays_date <= end_date) ? todays_date : start_date,
         main_venues = [
             {"key": "Stage-A", "label": "Stage A"},
             {"key": "Stage-B", "label": "Stage B"},
