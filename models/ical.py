@@ -44,6 +44,9 @@ class CalendarSource(db.Model):
         local_tz = pytz.timezone("Europe/London")
         for component in cal.walk():
             if component.name == 'VEVENT':
+                if 'rrule' in component:
+                    app.logger.warning('Event %s has rrule, which is not processed', component.get('Summary'))
+
                 if not component.get('uid'):
                     app.logger.debug('Ignoring event %s as it has no UID', component.get('Summary'))
                     continue
