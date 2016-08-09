@@ -407,3 +407,17 @@ a.collapse-toggle:hover .glyphicon {
 }
 
 .multiline { white-space: pre-wrap }
+
+.credit {
+  position: relative;
+  bottom: 24px;
+  right: 8px;
+}
+
+.credit a,
+.credit a:hover,
+.credit a:active,
+.credit a:focus,
+.credit a:visited {
+  tdext-decoration: none;
+}
