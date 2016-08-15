@@ -4,15 +4,20 @@
 {% block title %}Line-up{% endblock %}
 {% block body %}
 <h1>Line-up</h1>
-<p>
-  This is a list of all the talks &amp; workshops that (should) be at Electromagnetic Field in 2016. Not all stages and time-periods are announced yet, so check back frequently.
-</p>
-<p>You can also get this list as an <a href="{{ url_for('.schedule_ical') }}">iCal feed</a> for your calendar, and a <a href="{{ url_for('.schedule_json') }}">json feed</a> for your giant robot.</p>
-{% if current_user.is_authenticated() %}
-<p>
-  <strong><a type="btn btn-primary" href="{{ url_for('.favourites') }}">View your favourited talks</a></strong>
-</p>
+<div class="well">
+{% if SITE_STATE == 'before-event' or SITE_STATE == 'event' %}
+<p>This is a list of all the talks &amp; workshops that (should) be at Electromagnetic Field in 2016.
+   Not all stages and time-periods are announced yet, so check back frequently.</p>
+<p>You can also get this list as an <a href="{{ url_for('.schedule_ical') }}">iCal feed</a>
+   for your calendar, and a <a href="{{ url_for('.schedule_json') }}">json feed</a> for your giant robot.</p>
+{% else %}
+<p>This is a list of all the talks &amp; workshops that were at Electromagnetic Field in 2016.</p>
+<p>You can find videos of talks on the <a href="https://media.ccc.de/c/emf16">CCC website</a> or <a href="https://www.youtube.com/ElectromagneticField">our YouTube channel</a>.
 {% endif %}
+{% if current_user.is_authenticated() %}
+<div><strong><a type="btn btn-primary" href="{{ url_for('.favourites') }}">View your favourited talks</a></strong></div>
+{% endif %}
+</div>
 
 {{ list_proposals(proposals) }}
 {{ list_externals(externals) }}
