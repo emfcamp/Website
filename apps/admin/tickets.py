@@ -512,8 +512,10 @@ def furniture():
 @admin.route('/tees')
 @admin_required
 def tees():
-    tickets = TicketType.query.filter(TicketType.fixed_id.in_(range(14, 24))) \
-                        .join(Ticket, User).group_by(User, TicketType) \
+    tickets = TicketType.query.join(Ticket, User) \
+                        .filter(TicketType.fixed_id.in_(range(14, 24))) \
+                        .filter(Ticket.paid.is_(True)) \
+                        .group_by(User, TicketType) \
                         .with_entities(User, TicketType, func.count(Ticket.id)) \
                         .order_by(User.name, TicketType.order)
     return render_template('admin/tee-tickets.html', tickets=tickets)
