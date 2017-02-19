@@ -1,5 +1,13 @@
-# from pip/setuptools/pyopenssl
-wheel==0.24.0
+# from pip/setuptools
+pip==9.0.1
+wheel==0.29.0
+setuptools==34.2.0
+appdirs==1.4.0
+six==1.10.0
+packaging==16.8
+pyparsing==2.1.10
+
+# from ndg-httpsclient
 cffi==1.8.2
 cryptography==1.5
 enum34==1.0.4
@@ -9,7 +17,6 @@ ndg-httpsclient==0.4.0
 pyasn1==0.1.8
 pycparser==2.14
 pyOpenSSL==0.15.1
-six==1.9.0
 
 # basic/shared dependencies
 decorator==4.0.2
@@ -106,7 +113,7 @@ fake-factory==0.5.8
 python-dateutil==2.5.3
 
 # scheduling
-pulp==1.6.1
+pulp==1.6.2
 Unidecode==0.4.19
 awesome-slugify==1.6.5
 regex==2016.7.21
