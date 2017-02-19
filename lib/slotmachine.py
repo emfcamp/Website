@@ -155,14 +155,16 @@ class SlotMachine(object):
             return result
         return accept
 
+    @classmethod
     def num_slots(self, start_time, end_time):
         return int((parser.parse(end_time) - parser.parse(start_time)).total_seconds() / 60 / 10)
 
+    @classmethod
     def calculate_slots(self, event_start, range_start, range_end):
         slot_start = int((parser.parse(range_start) - parser.parse(event_start)).total_seconds() / 60 / 10)
         # We add one to allow the talk to finish in the last slot of this period,
         # as we force a single-slot changeover
-        return range(slot_start, slot_start+self.num_slots(range_start, range_end)+1)
+        return range(slot_start, slot_start+SlotMachine.num_slots(range_start, range_end)+1)
 
     def calc_time(self, event_start, slots):
         return (parser.parse(event_start) + relativedelta.relativedelta(minutes=slots*10))
@@ -183,7 +185,7 @@ class SlotMachine(object):
             slots = []
 
             for trange in event['time_ranges']:
-                event_slots = self.calculate_slots(event_start, trange['start'], trange['end'])
+                event_slots = SlotMachine.calculate_slots(event_start, trange['start'], trange['end'])
                 slots.extend(event_slots)
 
             slots_available = slots_available.union(set(slots))
