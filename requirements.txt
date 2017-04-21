@@ -16,7 +16,7 @@ pyOpenSSL==0.15.1
 
 # basic/shared dependencies
 decorator==4.0.2
-certifi==2015.4.28
+certifi==2017.4.17
 iso8601==0.1.10
 lxml==3.4.4
 python-Levenshtein==0.12.0
