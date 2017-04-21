@@ -93,7 +93,7 @@ mailsnake==1.6.3
 gocardless==0.5.3
 stripe==1.25.0
 ofxparse==0.14
-beautifulsoup4==4.4.0
+beautifulsoup4==4.5.3
 
 # testing
 flake8==2.4.1
