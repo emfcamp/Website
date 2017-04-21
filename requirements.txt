@@ -70,7 +70,7 @@ Flask-Login==0.2.11
 
 # gunicorn
 gunicorn==19.3.0
-greenlet==0.4.7
+greenlet==0.4.12
 eventlet==0.17.4
 
 # ticket PDFs
