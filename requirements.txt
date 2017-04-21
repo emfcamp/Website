@@ -74,7 +74,7 @@ greenlet==0.4.7
 eventlet==0.17.4
 
 # ticket PDFs
-qrcode==5.1
+qrcode==5.3
 git+https://github.com/emfcamp/python-barcode#egg=pyBarcode
 git+https://github.com/xhtml2pdf/xhtml2pdf#egg=xhtml2pdf
 httplib2==0.10.3
