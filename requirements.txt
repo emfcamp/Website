@@ -38,7 +38,7 @@ Flask-Cache==0.13.1
 python-memcached==1.58
 
 # database
-Flask-SQLAlchemy==2.1
+Flask-SQLAlchemy==2.2
 SQLAlchemy==1.0.8
 psycopg2==2.6.1
 py-bcrypt==0.4
