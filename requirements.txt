@@ -62,7 +62,7 @@ blinker==1.4
 
 # forms
 Flask-WTF==0.12
-WTForms==2.0.2
+WTForms==2.1
 
 # other Flask modules
 Flask-Script==2.0.5
