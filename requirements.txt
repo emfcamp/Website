@@ -81,7 +81,7 @@ httplib2==0.10.3
 html5lib==0.999999999
 PyPDF2==1.25.1
 Pillow==4.1.0
-reportlab==3.2.0
+reportlab==3.4.0
 
 # iCal production for schedule
 icalendar==3.10
