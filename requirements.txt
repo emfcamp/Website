@@ -106,7 +106,7 @@ pbr==1.5.0
 funcsigs==0.4
 unicodecsv==0.9.0
 fake-factory==0.5.8
-python-dateutil==2.5.3
+python-dateutil==2.6.0
 
 # scheduling
 pulp==1.6.2
