@@ -20,7 +20,7 @@ certifi==2015.4.28
 iso8601==0.1.10
 lxml==3.4.4
 python-Levenshtein==0.12.0
-simplejson==3.8.0
+simplejson==3.10.0
 requests==2.7.0
 markdown==2.6.6
 inlinestyler==0.2.3
