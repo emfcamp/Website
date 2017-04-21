@@ -18,7 +18,7 @@ pyOpenSSL==0.15.1
 decorator==4.0.2
 certifi==2015.4.28
 iso8601==0.1.10
-lxml==3.4.4
+lxml==3.7.3
 python-Levenshtein==0.12.0
 simplejson==3.8.0
 requests==2.7.0
