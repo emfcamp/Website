@@ -66,7 +66,7 @@ WTForms==2.0.2
 
 # other Flask modules
 Flask-Script==2.0.5
-Flask-Login==0.2.11
+Flask-Login==0.4.0
 
 # gunicorn
 gunicorn==19.3.0
