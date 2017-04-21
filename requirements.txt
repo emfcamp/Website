@@ -84,7 +84,7 @@ Pillow==4.1.0
 reportlab==3.2.0
 
 # iCal production for schedule
-icalendar==3.10
+icalendar==3.11.3
 
 # Mailchimp
 mailsnake==1.6.3
