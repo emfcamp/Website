@@ -61,7 +61,7 @@ Flask-Mail==0.9.1
 blinker==1.4
 
 # forms
-Flask-WTF==0.12
+Flask-WTF==0.14.2
 WTForms==2.0.2
 
 # other Flask modules
