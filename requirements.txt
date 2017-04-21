@@ -24,7 +24,7 @@ simplejson==3.8.0
 requests==2.7.0
 markdown==2.6.6
 inlinestyler==0.2.3
-cssutils==1.0.1
+cssutils==1.0.2
 
 # web framework
 Flask==0.10.1
