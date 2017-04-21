@@ -10,7 +10,7 @@ pyparsing==2.1.10
 # from ndg-httpsclient
 cffi==1.8.2
 cryptography==1.5
-enum34==1.0.4
+enum34==1.1.6
 idna==2.0
 ipaddress==1.0.14
 ndg-httpsclient==0.4.0
