@@ -91,7 +91,7 @@ mailsnake==1.6.3
 
 # payments
 gocardless==0.5.3
-stripe==1.25.0
+stripe==1.53.0
 ofxparse==0.14
 beautifulsoup4==4.4.0
 
