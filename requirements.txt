@@ -112,4 +112,4 @@ python-dateutil==2.5.3
 pulp==1.6.2
 Unidecode==0.4.19
 awesome-slugify==1.6.5
-regex==2016.7.21
+regex==2017.04.05
