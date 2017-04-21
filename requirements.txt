@@ -44,7 +44,7 @@ psycopg2==2.6.1
 py-bcrypt==0.4
 SQLAlchemy-Utils==0.31.4
 SQLAlchemy-Continuum==1.2.2
-Flask-Migrate==1.8.0
+Flask-Migrate==2.0.3
 Mako==1.0.4
 python-editor==1.0
 
