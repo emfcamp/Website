@@ -2,7 +2,6 @@ pip==9.0.1
 wheel==0.29.0
 six==1.10.0
 packaging==16.8
-pyparsing==2.1.10
 
 # from ndg-httpsclient
 cffi==1.8.2
