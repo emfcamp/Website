@@ -98,7 +98,7 @@ beautifulsoup4==4.4.0
 # testing
 flake8==2.4.1
 mock==1.3.0
-mccabe==0.2.1
+mccabe==0.6.1
 pep8==1.5.7
 pyflakes==0.8.1
 nose==1.3.7
