@@ -1,16 +1,12 @@
-# from pip/setuptools
 pip==9.0.1
 wheel==0.29.0
-setuptools==34.2.0
-appdirs==1.4.0
 six==1.10.0
 packaging==16.8
-pyparsing==2.1.10
 
 # from ndg-httpsclient
 cffi==1.8.2
-cryptography==1.5
-enum34==1.0.4
+cryptography==1.8.1
+enum34==1.1.6
 idna==2.0
 ipaddress==1.0.14
 ndg-httpsclient==0.4.0
@@ -81,10 +77,10 @@ eventlet==0.17.4
 qrcode==5.1
 git+https://github.com/emfcamp/python-barcode#egg=pyBarcode
 git+https://github.com/xhtml2pdf/xhtml2pdf#egg=xhtml2pdf
-httplib2==0.9.2
-html5lib==0.999999
+httplib2==0.10.3
+html5lib==0.999999999
 PyPDF2==1.25.1
-Pillow==2.9.0
+Pillow==4.1.0
 reportlab==3.2.0
 
 # iCal production for schedule

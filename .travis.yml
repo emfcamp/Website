@@ -1,7 +1,5 @@
 language: python
-cache:
-  directories:
-    - $HOME/.cache/pip
+cache: pip
 sudo: false
 python:
   - 2.7
