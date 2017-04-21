@@ -8,7 +8,7 @@ cffi==1.8.2
 cryptography==1.8.1
 enum34==1.1.6
 idna==2.0
-ipaddress==1.0.14
+ipaddress==1.0.18
 ndg-httpsclient==0.4.0
 pyasn1==0.1.8
 pycparser==2.14
