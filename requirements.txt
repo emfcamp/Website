@@ -11,7 +11,7 @@ idna==2.0
 ipaddress==1.0.14
 ndg-httpsclient==0.4.0
 pyasn1==0.1.8
-pycparser==2.14
+pycparser==2.17
 pyOpenSSL==0.15.1
 
 # basic/shared dependencies
