@@ -49,7 +49,7 @@ Mako==1.0.4
 python-editor==1.0
 
 # assets
-Flask-Assets==0.11
+Flask-Assets==0.12
 webassets==0.11
 pyScss==1.3.4
 pathlib==1.0.1
