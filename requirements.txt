@@ -84,7 +84,7 @@ git+https://github.com/xhtml2pdf/xhtml2pdf#egg=xhtml2pdf
 httplib2==0.10.3
 html5lib==0.999999999
 PyPDF2==1.25.1
-Pillow==2.9.0
+Pillow==4.1.0
 reportlab==3.2.0
 
 # iCal production for schedule
