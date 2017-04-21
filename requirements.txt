@@ -110,6 +110,6 @@ python-dateutil==2.5.3
 
 # scheduling
 pulp==1.6.2
-Unidecode==0.4.19
+Unidecode==0.04.20
 awesome-slugify==1.6.5
 regex==2016.7.21
