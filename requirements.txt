@@ -15,7 +15,7 @@ pycparser==2.14
 pyOpenSSL==0.15.1
 
 # basic/shared dependencies
-decorator==4.0.2
+decorator==4.0.11
 certifi==2015.4.28
 iso8601==0.1.10
 lxml==3.4.4
