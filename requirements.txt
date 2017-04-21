@@ -1,8 +1,5 @@
-# from pip/setuptools
 pip==9.0.1
 wheel==0.29.0
-setuptools==34.2.0
-appdirs==1.4.0
 six==1.10.0
 packaging==16.8
 pyparsing==2.1.10
