@@ -54,7 +54,7 @@ webassets==0.11
 pyScss==1.3.4
 pathlib==1.0.1
 cssmin==0.2.0
-jsmin==2.1.4
+jsmin==2.2.1
 
 # mail
 Flask-Mail==0.9.1
