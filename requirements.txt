@@ -69,7 +69,7 @@ Flask-Script==2.0.5
 Flask-Login==0.2.11
 
 # gunicorn
-gunicorn==19.3.0
+gunicorn==19.7.1
 greenlet==0.4.7
 eventlet==0.17.4
 
