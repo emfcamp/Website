@@ -74,7 +74,7 @@ def main_post():
                          Please contact %s to update your settings.""" % app.config['TICKETS_EMAIL'][1])
 
             elif title == 'Invalid Resource':
-                app.logger.warn('Invalid Resource from MailChimp, assuming bad email: %r', e, email)
+                app.logger.warn('Invalid Resource from MailChimp, assuming bad email: %r', email)
                 flash("Your email address was not accepted - please check and try again.")
 
             else:
