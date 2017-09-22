@@ -1,11 +1,9 @@
 import os
 import csv
 import json
-from mailsnake import MailSnake
-from mailsnake.exceptions import (
-    MailSnakeException, ListAlreadySubscribedException,
-    InvalidEmailException, ListInvalidUnsubMemberException,
-)
+from mailchimp3 import MailChimp
+from mailchimp3.helpers import get_subscriber_hash
+from requests import HTTPError
 
 from flask import (
     render_template, redirect, request, flash, Blueprint,
@@ -39,31 +37,51 @@ def main():
 @base.route("/", methods=['POST'])
 @site_flag('TICKETS_SITE')
 def main_post():
-    ms = MailSnake(app.config['MAILCHIMP_KEY'])
+    # mc_user will be removed in v2.1.0
+    mc = MailChimp(mc_secret=app.config['MAILCHIMP_KEY'], mc_user='python-mailchimp')
     try:
         email = request.form.get('email')
-        ms.listSubscribe(id=app.config['MAILCHIMP_LIST'], email_address=email)
-        flash('Thanks for subscribing! You will receive a confirmation email shortly.')
 
-    except InvalidEmailException as e:
-        app.logger.info('Invalid email address: %r', email)
-        flash("Your email address was not accepted - please check and try again.")
+        try:
+            data = mc.lists.members.create_or_update(
+                list_id=app.config['MAILCHIMP_LIST'],
+                subscriber_hash=get_subscriber_hash(email),
+                data={'email_address': email, 'status': 'subscribed', 'status_if_new': 'pending'}
+            )
+            status = data.get('status')
+            if status == 'pending':
+                Flash('Thanks for subscribing! You will receive a confirmation email shortly.')
+            elif status == 'subscribed':
+                flash('You were already subscribed! Thanks for checking back.')
+            else:
+                raise ValueError('Unexpected status %s' % status)
 
-    except ListAlreadySubscribedException as e:
-        app.logger.info('Already subscribed: %s', email)
-        if e.message and e.message != "Something went wrong, please try again later.":
-            msg = Markup(e.message)
-        else:
-            msg = """You are already subscribed to our list.
-                     Please contact %s to update your settings.""" % app.config['TICKETS_EMAIL'][1]
-        flash(msg)
+        except ValueError as e:
+            # ugh, this library is awful
+            app.logger.info('ValueError from mailchimp3 %s, assuming bad email: %r', e, email)
+            flash("Your email address was not accepted - please check and try again.")
 
-    except ListInvalidUnsubMemberException as e:
-        app.logger.info('Opted-out email address: %r', email)
-        flash("""You've already unsubscribed from our list, so we can't add you again.
-                 Please contact %s to update your settings.""" % app.config['TICKETS_EMAIL'][1])
+        # should also be changed to exceptions in v2.1.0
+        except HTTPError as e:
+            if e.response.status_code != 400:
+                raise
 
-    except MailSnakeException as e:
+            data = e.response.json()
+            title = data.get('title')
+            if title == "Member In Compliance State":
+                app.logger.info('Member in compliance state: %r', email)
+                flash("""You've already been unsubscribed from our list, so we can't add you again.
+                         Please contact %s to update your settings.""" % app.config['TICKETS_EMAIL'][1])
+
+            elif title == 'Invalid Resource':
+                app.logger.warn('Invalid Resource from MailChimp, assuming bad email: %r', e, email)
+                flash("Your email address was not accepted - please check and try again.")
+
+            else:
+                app.logger.warn('MailChimp returned %s: %s', title, data.get('detail'))
+                flash('Sorry, an error occurred: %s.' % (title or 'unknown'))
+
+    except Exception as e:
         app.logger.error('Error subscribing: %r', e)
         flash('Sorry, an error occurred.')
 
