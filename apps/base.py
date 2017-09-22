@@ -4,7 +4,7 @@ import json
 from mailsnake import MailSnake
 from mailsnake.exceptions import (
     MailSnakeException, ListAlreadySubscribedException,
-    InvalidEmailException,
+    InvalidEmailException, ListInvalidUnsubMemberException,
 )
 
 from flask import (
@@ -51,12 +51,17 @@ def main_post():
 
     except ListAlreadySubscribedException as e:
         app.logger.info('Already subscribed: %s', email)
-        if e.message:
+        if e.message and e.message != "Something went wrong, please try again later.":
             msg = Markup(e.message)
         else:
             msg = """You are already subscribed to our list.
                      Please contact %s to update your settings.""" % app.config['TICKETS_EMAIL'][1]
         flash(msg)
+
+    except ListInvalidUnsubMemberException as e:
+        app.logger.info('Opted-out email address: %r', email)
+        flash("""You've already unsubscribed from our list, so we can't add you again.
+                 Please contact %s to update your settings.""" % app.config['TICKETS_EMAIL'][1])
 
     except MailSnakeException as e:
         app.logger.error('Error subscribing: %r', e)
