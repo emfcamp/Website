@@ -127,6 +127,6 @@ parkingtickets:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createparkingtickets
 
 test:
-	$(ENV) SETTINGS_FILE=./config/test.cfg flake8 ./*.py ./models ./apps ./utils.py ./lib
-	$(ENV) SETTINGS_FILE=./config/test.cfg nosetests ./utils.py ./tests/ ./models/ ./lib/tests/
+	$(ENV) SETTINGS_FILE=./config/test.cfg flake8 ./*.py ./models ./apps ./utils.py
+	$(ENV) SETTINGS_FILE=./config/test.cfg nosetests ./utils.py ./tests/ ./models/
 
