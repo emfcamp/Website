@@ -3,6 +3,14 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 import unittest
 from .core import get_app
 
+URLS = [
+    '/',
+    '/about',
+    '/cfp',
+    '/login',
+    '/sponsors'
+]
+
 
 class BasicTestCase(unittest.TestCase):
 
@@ -13,5 +21,6 @@ class BasicTestCase(unittest.TestCase):
         pass
 
     def test_root(self):
-        rv = self.client.get('/')
-        assert 'Electromagnetic Field' in rv.data.decode('utf-8')
+        for url in URLS:
+            rv = self.client.get(url)
+            assert 'Electromagnetic Field' in rv.data.decode('utf-8')
