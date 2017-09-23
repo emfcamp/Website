@@ -129,6 +129,7 @@ def create_app(dev_server=False):
 
         # Prevent DB connections and random numbers being shared
         ppid = os.getpid()
+
         @app.before_request
         def fix_shared_state():
             if os.getpid() != ppid:

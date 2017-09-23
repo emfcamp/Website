@@ -4,7 +4,10 @@ from collections import defaultdict
 from slotmachine import SlotMachine, Unsatisfiable
 Talk = SlotMachine.Talk
 
-unzip = lambda l: zip(*l)
+
+def unzip(l):
+    return zip(*l)
+
 
 class UtilTestCase(unittest.TestCase):
     def test_calculate_slots(self):
@@ -70,7 +73,7 @@ class ScheduleTalksTestCase(unittest.TestCase):
 
         with self.assertRaises(Unsatisfiable):
             solved = sm.schedule_talks(talk_defs, avail_slots, old_talks=old_talks)
-            print solved
+            print(solved)
 
     def test_simple(self):
         talk_defs = [

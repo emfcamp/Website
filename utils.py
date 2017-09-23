@@ -55,7 +55,7 @@ class LoadOfx(Command):
     option_list = [Option('-f', '--file', dest='filename', help="The .ofx file to load")]
 
     def run(self, filename):
-        ofx = ofxparse.OfxParser.parse(file(filename))
+        ofx = ofxparse.OfxParser.parse(open(filename))
 
         acct_id = ofx.account.account_id
         sort_code = ofx.account.routing_number
@@ -477,7 +477,7 @@ class MakeAdmin(Command):
         user.grant_permission('admin')
         db.session.commit()
 
-        print '%r is now an admin' % user.name
+        print('%r is now an admin' % user.name)
 
 class CreatePermissions(Command):
     def run(self):

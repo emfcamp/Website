@@ -1,6 +1,5 @@
 from __future__ import absolute_import
 import unittest
-from StringIO import StringIO
 from datetime import datetime
 from lxml import etree
 
@@ -106,18 +105,18 @@ class XMLTestCase(unittest.TestCase):
         }, ]
 
         frab = export_frab(events)
-        frab_doc = etree.parse(StringIO(frab))
+        frab_doc = etree.fromstring(frab)
         schema = get_frabs_schema()
         is_valid = schema.validate(frab_doc)
 
         assert is_valid
 
     def test_get_duration(self):
-        start = datetime(2016, 8, 15, 11, 00)
+        start = datetime(2016, 8, 15, 11, 0)
         stop = datetime(2016, 8, 15, 11, 30)
         assert get_duration(start, stop) == '0:30'
-        stop = datetime(2016, 8, 15, 11, 05)
+        stop = datetime(2016, 8, 15, 11, 5)
         assert get_duration(start, stop) == '0:05'
-        stop = datetime(2016, 8, 15, 12, 00)
+        stop = datetime(2016, 8, 15, 12, 0)
         assert get_duration(start, stop) == '1:00'
 

@@ -5,15 +5,17 @@ from datetime import datetime, timedelta
 import time
 import struct
 
-from main import db
-from permission import UserPermission, Permission
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 from flask import current_app as app
 from flask_login import UserMixin
 
+from main import db
+from .permission import UserPermission, Permission
+
 CHECKIN_CODE_LEN = 16
 checkin_code_re = r'[0-9a-zA-Z_-]{%s}' % CHECKIN_CODE_LEN
+
 
 def generate_login_code(key, timestamp, uid):
     msg = "%s-%s" % (int(timestamp), uid)
@@ -21,8 +23,9 @@ def generate_login_code(key, timestamp, uid):
     # Truncate the digest to 20 base64 bytes
     return msg + "-" + base64.urlsafe_b64encode(mac.digest())[:20]
 
+
 def verify_login_code(key, current_timestamp, code):
-    if isinstance(code, unicode):
+    if isinstance(code, str):
         code = code.encode('utf-8')
     try:
         timestamp, uid, _ = code.split("-", 2)
@@ -55,6 +58,7 @@ def generate_checkin_code(key, user_id, version=1):
     assert len(code) == CHECKIN_CODE_LEN
     return code
 
+
 def verify_checkin_code(key, code):
     msg = base64.urlsafe_b64decode(code.encode('utf-8')[:4])
     user_id, version = struct.unpack('HB', msg)
@@ -62,7 +66,7 @@ def verify_checkin_code(key, code):
         return None
 
     expected_code = generate_checkin_code(key, user_id, version=version)
-    if isinstance(code, unicode):
+    if isinstance(code, str):
         code = code.encode('utf-8')
     if hmac.compare_digest(expected_code, code):
         return user_id

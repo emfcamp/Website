@@ -20,6 +20,13 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
 from main import db, mail
+from models.user import User, checkin_code_re
+from models.ticket import TicketLimitException, TicketType
+from models.payment import BankPayment, StripePayment, GoCardlessPayment
+from models.site_state import get_sales_state
+from models.payment import Payment
+
+
 from .common import (
     get_user_currency, set_user_currency, get_basket_and_total, create_basket,
     CURRENCY_SYMBOLS, feature_flag, create_current_user, feature_enabled,
@@ -28,14 +35,9 @@ from .common.forms import IntegerSelectField, HiddenIntegerField, Form
 from .common.receipt import (
     make_qr_png, make_barcode_png, render_pdf, render_receipt, attach_tickets,
 )
-from models.user import User, checkin_code_re
-from models.ticket import TicketLimitException, TicketType
-from models.payment import BankPayment, StripePayment, GoCardlessPayment
-from models.site_state import get_sales_state
-from models.payment import Payment
-from payments.gocardless import gocardless_start
-from payments.banktransfer import transfer_start
-from payments.stripe import stripe_start
+from .payments.gocardless import gocardless_start
+from .payments.banktransfer import transfer_start
+from .payments.stripe import stripe_start
 
 
 tickets = Blueprint('tickets', __name__)

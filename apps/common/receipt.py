@@ -1,7 +1,7 @@
 # coding=utf-8
 from __future__ import division, absolute_import, print_function, unicode_literals
-from StringIO import StringIO
-from urlparse import urljoin
+from io import StringIO
+from urllib.parse import urljoin
 from xhtml2pdf import pisa
 import qrcode
 from qrcode.image.svg import SvgPathImage

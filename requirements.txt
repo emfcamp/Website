@@ -108,7 +108,7 @@ unicodecsv==0.14.1
 python-dateutil==2.6.1
 
 # scheduling
-pulp==1.6.8
+pulp-py3==1.5.5
 Unidecode==0.04.21
 awesome-slugify==1.6.5
 regex==2017.07.28

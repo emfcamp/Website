@@ -14,7 +14,7 @@ run:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./dev_server.py
 
 init:
-	virtualenv --clear ./env
+	virtualenv -p python3 --clear ./env
 
 update:
 	$(ENV) pip install --upgrade pip wheel setuptools
@@ -127,6 +127,6 @@ parkingtickets:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createparkingtickets
 
 test:
-	$(ENV) SETTINGS_FILE=./config/test.cfg flake8 ./models ./apps ./utils.py
+	$(ENV) SETTINGS_FILE=./config/test.cfg flake8 ./*.py ./models ./apps ./utils.py ./lib
 	$(ENV) SETTINGS_FILE=./config/test.cfg nosetests ./utils.py ./tests/ ./models/ ./lib/tests/
 

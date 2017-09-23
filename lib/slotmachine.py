@@ -95,13 +95,13 @@ class SlotMachine(object):
             active(s, talk_id, venue)
             for (slot, talk_id, venue) in old_talks
             for s in range(slot, slot + talks_by_id[talk_id].duration)
-        # And we'd prefer to just move stage rather than slot
+            # And we'd prefer to just move stage rather than slot
         )) + (5 * pulp.lpSum(
             active(s, talk_id, v)
             for (slot, talk_id, _) in old_talks
             for s in range(slot, slot + talks_by_id[talk_id].duration)
             for v in self.talk_permissions[talk_id]['venues']
-        # But if they have to move slot, 60mins either way is ok
+            # But if they have to move slot, 60mins either way is ok
         )) + pulp.lpSum(
             active(s, talk_id, v)
             for (slot, talk_id, _) in old_talks
@@ -127,7 +127,7 @@ class SlotMachine(object):
                         ) <= 1
                     )
 
-        print "Beginning solve..."
+        print("Beginning solve...")
         problem.solve(pulp.GLPK())
 
         if pulp.LpStatus[problem.status] != 'Optimal':
@@ -164,10 +164,10 @@ class SlotMachine(object):
         slot_start = int((parser.parse(range_start) - parser.parse(event_start)).total_seconds() / 60 / 10)
         # We add one to allow the talk to finish in the last slot of this period,
         # as we force a single-slot changeover
-        return range(slot_start, slot_start+SlotMachine.num_slots(range_start, range_end)+1)
+        return range(slot_start, slot_start + SlotMachine.num_slots(range_start, range_end) + 1)
 
     def calc_time(self, event_start, slots):
-        return (parser.parse(event_start) + relativedelta.relativedelta(minutes=slots*10))
+        return (parser.parse(event_start) + relativedelta.relativedelta(minutes=slots * 10))
 
     def calc_slot(self, event_start, time):
         return int((parser.parse(time) - parser.parse(event_start)).total_seconds() / 60 / 10)
@@ -197,8 +197,8 @@ class SlotMachine(object):
 
             talks.append(
                 self.Talk(
-                    id=event['id'], 
-                    venues=event['valid_venues'], 
+                    id=event['id'],
+                    venues=event['valid_venues'],
                     speakers=event['speakers'],
                     # We add one slot to allow for a single-slot changeover period
                     duration=int(event['duration'] / 10) + 1
@@ -208,7 +208,7 @@ class SlotMachine(object):
             if 'time' in event and 'venue' in event:
                 old_slots.append((self.calc_slot(event_start, event['time']), event['id'], event['venue']))
 
-        print "BEGINNING SCHEDULING %s EVENTS" % len(talks)
+        print("BEGINNING SCHEDULING %s EVENTS" % len(talks))
         solved = self.schedule_talks(talks, slots_available, old_talks=old_slots)
 
         for slot_id, talk_id, venue_id in solved:
@@ -218,4 +218,4 @@ class SlotMachine(object):
         with open(outfile, 'w') as f:
             json.dump(talk_data.values(), f, sort_keys=True, indent=4, separators=(',', ': '))
 
-        print "New schedule written"
+        print("New schedule written")

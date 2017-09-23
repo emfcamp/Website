@@ -1,3 +1,4 @@
+import re
 from flask import (
     render_template, redirect, request, flash,
     url_for, abort, Blueprint, current_app as app,
@@ -8,19 +9,20 @@ from flask.ext.login import (
 )
 
 from sqlalchemy import or_
+from sqlalchemy.orm.exc import NoResultFound
 
 from wtforms.validators import Required, Email, ValidationError
 from wtforms import StringField, HiddenField, SubmitField
 
 from main import db
-from common import (
+from models.user import User, UserDiversity
+from models.cfp import Proposal, CFPMessage
+
+from .common import (
     set_user_currency, send_template_email, feature_flag,
 )
 from .common.forms import Form
-from models.user import User, UserDiversity
-from models.cfp import Proposal, CFPMessage
-import re
-from sqlalchemy.orm.exc import NoResultFound
+
 
 users = Blueprint('users', __name__)
 
@@ -52,7 +54,7 @@ class LoginForm(Form):
 def login_by_email(email):
     user = User.get_by_email(email)
 
-    if current_user.is_authenticated():
+    if current_user.is_authenticated:
         logout_user()
 
     login_user(user)
@@ -61,7 +63,7 @@ def login_by_email(email):
 
 @users.route("/login", methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated():
+    if current_user.is_authenticated:
         return redirect(request.args.get('next', url_for('tickets.main')))
 
     if request.args.get('code'):
@@ -167,7 +169,7 @@ def sso(site=None):
     if site not in volunteer_sites:
         abort(404)
 
-    if not current_user.is_authenticated():
+    if not current_user.is_authenticated:
         return redirect(url_for('.login', next=url_for('.sso', site=site)))
 
     key = app.config['VOLUNTEER_SECRET_KEY']
