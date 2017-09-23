@@ -7,7 +7,7 @@ from requests import HTTPError
 
 from flask import (
     render_template, redirect, request, flash, Blueprint,
-    url_for, send_from_directory, abort, Markup, current_app as app
+    url_for, send_from_directory, abort, current_app as app
 )
 
 from .common import feature_flag, feature_enabled, site_flag
@@ -50,7 +50,7 @@ def main_post():
             )
             status = data.get('status')
             if status == 'pending':
-                Flash('Thanks for subscribing! You will receive a confirmation email shortly.')
+                flash('Thanks for subscribing! You will receive a confirmation email shortly.')
             elif status == 'subscribed':
                 flash('You were already subscribed! Thanks for checking back.')
             else:
