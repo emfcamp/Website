@@ -29,7 +29,8 @@ from models.email import EmailJobRecipient
 from models.ical import CalendarSource
 from apps.payments import banktransfer
 from apps.common.receipt import attach_tickets
-from lib.slotmachine import SlotMachine
+from slotmachine import SlotMachine
+
 
 class CreateDB(Command):
     # For testing - you usually want to use db migrate/db upgrade instead
