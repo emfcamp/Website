@@ -919,7 +919,6 @@ if __name__ == "__main__":
     manager.add_command('makefakeusers', MakeFakeUsers())
     manager.add_command('makefaketickets', MakeFakeTickets())
 
-    manager.add_command('updatesegments', UpdateSegments())
     manager.add_command('sendemails', SendEmails())
 
     manager.add_command('emailspeakersaboutslot', EmailSpeakersAboutSlot())
