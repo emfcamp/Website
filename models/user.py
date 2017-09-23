@@ -19,7 +19,7 @@ checkin_code_re = r'[0-9a-zA-Z_-]{%s}' % CHECKIN_CODE_LEN
 
 def generate_login_code(key, timestamp, uid):
     msg = "%s-%s" % (int(timestamp), uid)
-    mac = hmac.new(key, 'login-' + msg, digestmod=hashlib.sha256)
+    mac = hmac.new(key, b'login-' + msg.encode('utf-8'), digestmod=hashlib.sha256)
     # Truncate the digest to 20 base64 bytes
     return msg + "-" + base64.urlsafe_b64encode(mac.digest())[:20]
 
