@@ -15,7 +15,7 @@
 
 <p class="multiline">{{ proposal.description | urlize }}</p>
 <hr>
-{% if current_user.is_authenticated() %}
+{% if current_user.is_authenticated %}
   <form method="POST">
   <input id="csrf_token" name=_csrf_token type=hidden value="{{ csrf_token() }}">
   <button type="submit" class="btn btn-primary">
@@ -36,7 +36,7 @@
   <li>
     <p><a type="btn btn-primary" href="{{ url_for('.line_up') }}">Line-up</a></p>
   </li>
-  {% if current_user.is_authenticated() %}
+  {% if current_user.is_authenticated %}
     <li>
       <a type="btn btn-primary" href="{{ url_for('.favourites') }}">Favourites</a>
     </li>

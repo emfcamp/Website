@@ -4,7 +4,7 @@ from decorator import decorator
 from main import db, mail, external_url
 from flask import session, render_template, abort, current_app as app, request
 from flask.json import jsonify
-from flask.ext.login import login_user, current_user
+from flask_login import login_user, current_user
 from werkzeug import BaseResponse
 from werkzeug.exceptions import HTTPException
 

@@ -73,7 +73,7 @@ def _get_scheduled_proposals(filter_obj={}, override_user=None):
     else:
         user = current_user
 
-    if user.is_anonymous():
+    if user.is_anonymous:
         proposal_favourites = external_favourites = []
     else:
         proposal_favourites = [f.id for f in user.favourites]
@@ -219,7 +219,7 @@ def favourites_json():
     user = None
     if code:
         user = User.get_by_checkin_code(app.config.get('FEED_SECRET_KEY'), str(code))
-    if not current_user.is_anonymous():
+    if not current_user.is_anonymous:
         user = current_user
     if not user:
         abort(404)
@@ -242,7 +242,7 @@ def favourites_ical():
     user = None
     if code:
         user = User.get_by_checkin_code(app.config.get('FEED_SECRET_KEY'), str(code))
-    if not current_user.is_anonymous():
+    if not current_user.is_anonymous:
         user = current_user
     if not user:
         abort(404)
@@ -290,7 +290,7 @@ def line_up():
 @schedule.route('/favourites')
 @feature_flag('SCHEDULE')
 def favourites():
-    if current_user.is_anonymous():
+    if current_user.is_anonymous:
         return redirect(url_for('users.login', next=url_for('.favourites')))
 
     proposals = current_user.favourites
@@ -308,12 +308,12 @@ def line_up_proposal(proposal_id, slug=None):
     if proposal.state not in ('accepted', 'finished'):
         abort(404)
 
-    if not current_user.is_anonymous():
+    if not current_user.is_anonymous:
         is_fave = proposal in current_user.favourites
     else:
         is_fave = False
 
-    if (request.method == "POST") and not current_user.is_anonymous():
+    if (request.method == "POST") and not current_user.is_anonymous:
         if is_fave:
             current_user.favourites.remove(proposal)
             msg = 'Removed "%s" from favourites' % proposal.title
@@ -343,7 +343,7 @@ def line_up_proposal_json(proposal_id, slug=None):
     if proposal.state not in ('accepted', 'finished'):
         abort(404)
 
-    if not current_user.is_anonymous():
+    if not current_user.is_anonymous:
         favourites_ids = [f.id for f in current_user.favourites]
     else:
         favourites_ids = []
@@ -366,12 +366,12 @@ def line_up_proposal_json(proposal_id, slug=None):
 def line_up_external(event_id, slug=None):
     event = CalendarEvent.query.get_or_404(event_id)
 
-    if not current_user.is_anonymous():
+    if not current_user.is_anonymous:
         is_fave = event in current_user.calendar_favourites
     else:
         is_fave = False
 
-    if (request.method == "POST") and not current_user.is_anonymous():
+    if (request.method == "POST") and not current_user.is_anonymous:
         if is_fave:
             current_user.calendar_favourites.remove(event)
             msg = 'Removed "%s" from favourites' % event.title

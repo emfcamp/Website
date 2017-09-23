@@ -64,7 +64,7 @@ def calculate_score(score_list, base=3):
         score = get_floor_median(score_list)
         if not (0 <= score < base):
             raise MajorityJudgementException(('Incorrectly set base. Got %s, '
-                                              + 'expected 0 <= values < %s')
+                                              'expected 0 <= values < %s')
                                              % (score, base))
         res.append(str(score))
         score_list.remove(score)
@@ -100,14 +100,14 @@ def calculate_normalised_score(score_list, max_score_length,
     """
     if not (0 <= default_vote < base):
         raise MajorityJudgementException('Incorrectly set default, must be '
-                                         + 'between 0 and %s (inclusive).'
+                                         'between 0 and %s (inclusive).'
                                          % (base - 1))
 
     score_list = list(score_list)[:]
     list_len = len(score_list)
     if list_len > max_score_length:
         raise MajorityJudgementException('Score list is too long, must be '
-                                         + 'less than %s.' % max_score_length)
+                                         'less than %s.' % max_score_length)
 
     # If required pad the list
     if list_len < max_score_length:

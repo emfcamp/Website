@@ -10,7 +10,7 @@ from permission import UserPermission, Permission
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 from flask import current_app as app
-from flask.ext.login import UserMixin
+from flask_login import UserMixin
 
 CHECKIN_CODE_LEN = 16
 checkin_code_re = r'[0-9a-zA-Z_-]{%s}' % CHECKIN_CODE_LEN

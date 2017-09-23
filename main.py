@@ -5,16 +5,16 @@ import os
 
 from flask import Flask, _request_ctx_stack, url_for, render_template
 from flask_mail import Mail
-from flask.ext.login import LoginManager
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.migrate import Migrate
+from flask_login import LoginManager
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from sqlalchemy import MetaData
 from sqlalchemy_continuum import make_versioned
 from sqlalchemy_continuum.manager import VersioningManager
 from sqlalchemy_continuum.plugins import FlaskPlugin
-from flask.ext.assets import Environment, Bundle
-from flask.ext.cdn import CDN
-from flask.ext.cache import Cache
+from flask_assets import Environment, Bundle
+from flask_cdn import CDN
+from flask_cache import Cache
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_wtf import CsrfProtect
 import gocardless

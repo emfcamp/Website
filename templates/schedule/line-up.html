@@ -14,7 +14,7 @@
 <p>This is a list of all the talks &amp; workshops that were at Electromagnetic Field in 2016.</p>
 <p>You can find videos of talks on the <a href="https://media.ccc.de/c/emf16">CCC website</a> or <a href="https://www.youtube.com/ElectromagneticField">our YouTube channel</a>.
 {% endif %}
-{% if current_user.is_authenticated() %}
+{% if current_user.is_authenticated %}
 <div><strong><a type="btn btn-primary" href="{{ url_for('.favourites') }}">View your favourited talks</a></strong></div>
 {% endif %}
 </div>

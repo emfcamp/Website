@@ -9,8 +9,8 @@ import json
 from faker import Faker
 from collections import OrderedDict
 
-from flask.ext.script import Command, Manager, Option
-from flask.ext.migrate import MigrateCommand
+from flask_script import Command, Manager, Option
+from flask_migrate import MigrateCommand
 from flask import render_template, current_app as app
 from flask_mail import Message
 from sqlalchemy import or_, func

@@ -152,7 +152,7 @@ document.getElementById('enable-javascript').style.display = 'none';
         $('#scheduler_here').show();
         var schedule_data = {{ schedule_data | tojson }},
             venues = {{ venues | tojson }},
-            is_anonymous = {% if current_user.is_anonymous() -%} true {%- else -%} false {%- endif %};
+            is_anonymous = {% if current_user.is_anonymous -%} true {%- else -%} false {%- endif %};
 
         init_emf_scheduler(schedule_data, venues, is_anonymous);
     </script>

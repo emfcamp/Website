@@ -6,7 +6,7 @@
         <p class="emphasis">The Call for Partitipation is now closed</p>
         <p>If you have been asked to submit a new proposal, please
             <a href="{{ url_for('cfp.main') + '?closed' }}">click here</a>.</p>
-        {% if current_user.is_authenticated() %}
+        {% if current_user.is_authenticated %}
           {% if current_user.proposals %}
           <a class="btn btn-default" href="{{ url_for('cfp.proposals') }}">View my proposals</a>
           {% endif %}

@@ -96,7 +96,7 @@
                                 Code of Conduct</a>
                         </li>
                       {% if feature_enabled('TICKET_SALES') %}
-                      {% if current_user.is_authenticated() %}
+                      {% if current_user.is_authenticated %}
                       <li role="presentation">
                         <a role="menuitem" href="{{ url_for('users.account') }}">My account</a>
                       </li>

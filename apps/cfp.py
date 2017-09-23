@@ -40,7 +40,7 @@ class ProposalForm(Form):
                                   ])
 
     def validate_email(form, field):
-        if current_user.is_anonymous() and User.does_user_exist(field.data):
+        if current_user.is_anonymous and User.does_user_exist(field.data):
             field.was_duplicate = True
             cfp_url = url_for('cfp.main', cfp_type=form.active_cfp_type)
 
@@ -104,7 +104,7 @@ def main(cfp_type='talk'):
     form.active_cfp_type = cfp_type
 
     # If the user is already logged in set their name & email for the form
-    if current_user.is_authenticated():
+    if current_user.is_authenticated:
         form.name.data = current_user.name
         form.email.data = current_user.email
 
@@ -114,7 +114,7 @@ def main(cfp_type='talk'):
 
     if form.validate_on_submit():
         new_user = False
-        if current_user.is_anonymous():
+        if current_user.is_anonymous:
             try:
                 create_current_user(form.email.data, form.name.data)
                 new_user = True
@@ -176,7 +176,7 @@ class DiversityForm(Form):
 @cfp.route('/cfp/complete', methods=['GET', 'POST'])
 @feature_flag('CFP')
 def complete():
-    if current_user.is_anonymous():
+    if current_user.is_anonymous:
         return redirect(url_for('.main'))
     form = DiversityForm()
     if form.validate_on_submit():
@@ -198,7 +198,7 @@ def complete():
 @cfp.route('/cfp/proposals')
 @feature_flag('CFP')
 def proposals():
-    if current_user.is_anonymous():
+    if current_user.is_anonymous:
         return redirect(url_for('.main'))
 
     proposals = current_user.proposals.all()
@@ -215,7 +215,7 @@ def proposals():
 @cfp.route('/cfp/proposals/<int:proposal_id>/edit', methods=['GET', 'POST'])
 @feature_flag('CFP')
 def edit_proposal(proposal_id):
-    if current_user.is_anonymous():
+    if current_user.is_anonymous:
         return redirect(url_for('users.login', next=url_for('.edit_proposal',
                                                            proposal_id=proposal_id)))
 
@@ -383,7 +383,7 @@ class EveningAcceptedForm(AcceptedForm):
 @feature_flag('CFP')
 @feature_flag('CFP_FINALISE')
 def finalise_proposal(proposal_id):
-    if current_user.is_anonymous():
+    if current_user.is_anonymous:
         return redirect(url_for('users.login', next=url_for('.edit_proposal',
                                                            proposal_id=proposal_id)))
 
@@ -456,7 +456,7 @@ class MessagesForm(Form):
 @cfp.route('/cfp/proposals/<int:proposal_id>/messages', methods=['GET', 'POST'])
 @feature_flag('CFP')
 def proposal_messages(proposal_id):
-    if current_user.is_anonymous():
+    if current_user.is_anonymous:
         return redirect(url_for('users.login', next=url_for('.proposal_messages',
                                                            proposal_id=proposal_id)))
     proposal = Proposal.query.get_or_404(proposal_id)
@@ -492,7 +492,7 @@ def proposal_messages(proposal_id):
 @cfp.route('/cfp/messages')
 @feature_flag('CFP')
 def all_messages():
-    if current_user.is_anonymous():
+    if current_user.is_anonymous:
         return redirect(url_for('.main'))
 
     proposal_with_message = Proposal.query\

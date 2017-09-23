@@ -74,7 +74,7 @@ def cfp_review_variables():
 
 @cfp_review.route('')
 def main():
-    if current_user.is_anonymous():
+    if current_user.is_anonymous:
         return redirect(url_for('users.login', next=url_for('.main')))
 
     if current_user.has_permission('admin'):

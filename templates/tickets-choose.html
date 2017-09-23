@@ -82,7 +82,7 @@ Buy Items
       and Conditions</a> and the <a href="{{url_for('base.code_of_conduct')}}">Code of Conduct</a>.
     </p>
 {% endif %}
-{% if not current_user.is_authenticated() %}
+{% if not current_user.is_authenticated %}
     <p>If you've already bought a ticket this year, <a href="{{url_for('users.login')}}">log in</a> to view your ticket status.</p>
 {% endif %}
 

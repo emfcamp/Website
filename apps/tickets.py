@@ -80,7 +80,7 @@ def create_payment(paymenttype):
 
 @tickets.route("/tickets/", methods=['GET', 'POST'])
 def main():
-    if current_user.is_anonymous():
+    if current_user.is_anonymous:
         return redirect(url_for('tickets.choose'))
 
     all_tickets = current_user.tickets.join(TicketType).outerjoin(Payment).filter(
@@ -172,7 +172,7 @@ def choose(flow=None):
 
     if sales_state == 'available':
         pass
-    elif not current_user.is_anonymous() and current_user.has_permission('admin'):
+    elif not current_user.is_anonymous and current_user.has_permission('admin'):
         pass
     else:
         return render_template("tickets-cutoff.html")
@@ -249,7 +249,7 @@ class TicketPaymentForm(Form):
     stripe = SubmitField('Pay by card')
 
     def validate_email(form, field):
-        if current_user.is_anonymous() and User.does_user_exist(field.data):
+        if current_user.is_anonymous and User.does_user_exist(field.data):
             field.was_duplicate = True
             pay_url = url_for('tickets.pay', flow=form.flow)
 
@@ -278,7 +278,7 @@ def pay(flow=None):
     form = TicketPaymentForm()
     form.flow = flow
 
-    if not current_user.is_anonymous():
+    if not current_user.is_anonymous:
         del form.email
         del form.name
 
@@ -298,7 +298,7 @@ def pay(flow=None):
                   Please verify that you've selected the correct tickets.""")
             return redirect(url_for('tickets.pay', flow=flow))
 
-        if current_user.is_anonymous():
+        if current_user.is_anonymous:
             try:
                 create_current_user(form.email.data, form.name.data)
             except IntegrityError as e:
@@ -335,7 +335,7 @@ def pay(flow=None):
 
     return render_template('payment-choose.html', form=form,
                            basket=basket, total=total, StripePayment=StripePayment,
-                           is_anonymous=current_user.is_anonymous(),
+                           is_anonymous=current_user.is_anonymous,
                            admissions=admissions)
 
 
