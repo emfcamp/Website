@@ -18,20 +18,24 @@ checkin_code_re = r'[0-9a-zA-Z_-]{%s}' % CHECKIN_CODE_LEN
 
 
 def generate_login_code(key, timestamp, uid):
-    msg = "%s-%s" % (int(timestamp), uid)
-    mac = hmac.new(key, b'login-' + msg.encode('utf-8'), digestmod=hashlib.sha256)
+    """ Note: this outputs bytes because you need to check it with hmac.compare_digest """
+    if isinstance(uid, bytes):
+        uid = uid.decode('utf-8')
+    msg = ("%s-%s" % (int(timestamp), uid)).encode('utf-8')
+    mac = hmac.new(key, b'login-' + msg, digestmod=hashlib.sha256)
     # Truncate the digest to 20 base64 bytes
-    return msg + "-" + base64.urlsafe_b64encode(mac.digest())[:20]
+    return msg + b"-" + base64.urlsafe_b64encode(mac.digest())[:20]
 
 
 def verify_login_code(key, current_timestamp, code):
     if isinstance(code, str):
         code = code.encode('utf-8')
     try:
-        timestamp, uid, _ = code.split("-", 2)
+        timestamp, uid, _ = code.split(b"-", 2)
     except ValueError:
         return None
-    if hmac.compare_digest(generate_login_code(key, timestamp, uid), code):
+    login_code = generate_login_code(key, timestamp, uid)
+    if hmac.compare_digest(login_code, code):
         age = datetime.fromtimestamp(current_timestamp) - datetime.fromtimestamp(int(timestamp))
         if age > timedelta(hours=6):
             return None
