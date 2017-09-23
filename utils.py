@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 from dateutil import parser
 import ofxparse
 from unicodecsv import DictReader
-from mailsnake import MailSnake
 import random
 import json
 from faker import Faker
@@ -561,57 +560,6 @@ class MakeFakeTickets(Command):
             except TicketLimitException:
                 db.session.rollback()
 
-
-class UpdateSegments(Command):
-    def run(self):
-        self.update_ticketholders_list()
-        self.update_main_list_segment()
-
-    def update_ticketholders_list(self):
-        ms = MailSnake(app.config['MAILCHIMP_KEY'])
-        list_id = '5f939ca32a'  # Ticketholders 2016
-        tix = Ticket.query.filter_by(paid=True).join(User).\
-            group_by(User).with_entities(User).order_by(User.id)
-
-        list_members = {member['email'] for member in ms.listMembers(id=list_id, limit=10000)['data']}
-        current_users = {ticket.email for ticket in tix}
-
-        to_remove = list_members - current_users
-        to_add = current_users - list_members
-
-        app.logger.info("Ticketholders list: adding %s addresses, removing %s addresses",
-                        len(to_add), len(to_remove))
-
-        res = ms.listBatchUnsubscribe(id=list_id, emails=list(to_remove), send_goodbye=False)
-        print(res)
-
-        to_add_data = [{'EMAIL': email, 'EMAIL_TYPE': 'html'} for email in to_add]
-        res = ms.listBatchSubscribe(id=list_id, batch=to_add_data,
-                                    double_optin=False, update_existing=True)
-        print(res)
-
-    def update_main_list_segment(self):
-        segment_name = 'Ticketholders'
-        segment_id = None
-
-        tix = Ticket.query.filter_by(paid=True).join(User).\
-            group_by(User).with_entities(User).order_by(User.id)
-        email_addresses = [ticket.email for ticket in tix]
-
-        ms = MailSnake(app.config['MAILCHIMP_KEY'])
-        segments = ms.listStaticSegments(id=app.config['MAILCHIMP_LIST'])
-
-        for segment in segments:
-            if segment['name'] == segment_name:
-                segment_id = segment['id']
-
-        if segment_id is None:
-            segment_id = ms.listStaticSegmentAdd(id=app.config['MAILCHIMP_LIST'], name=segment_name)
-
-        results = ms.listStaticSegmentMembersAdd(id=app.config['MAILCHIMP_LIST'],
-                                                 seg_id=segment_id, batch=email_addresses)
-        app.logger.info("Segment updated. Success: %s, failed: %s", results['success'],
-                        len(results['errors']))
 
 class EmailSpeakersAboutSlot(Command):
 
