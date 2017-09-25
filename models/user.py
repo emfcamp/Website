@@ -17,23 +17,41 @@ CHECKIN_CODE_LEN = 16
 checkin_code_re = r'[0-9a-zA-Z_-]{%s}' % CHECKIN_CODE_LEN
 
 
-def generate_login_code(key, timestamp, uid):
+def generate_hmac_msg(prefix, key, timestamp, uid):
     """ Note: this outputs bytes because you need to check it with hmac.compare_digest """
     if isinstance(uid, bytes):
         uid = uid.decode('utf-8')
+
+    if isinstance(key, str):
+        key = key.encode('utf-8')
+
+    if isinstance(prefix, str):
+        prefix = prefix.encode('utf-8')
+
     msg = ("%s-%s" % (int(timestamp), uid)).encode('utf-8')
-    mac = hmac.new(key, b'login-' + msg, digestmod=hashlib.sha256)
+    mac = hmac.new(key, prefix + msg, digestmod=hashlib.sha256)
     # Truncate the digest to 20 base64 bytes
     return msg + b"-" + base64.urlsafe_b64encode(mac.digest())[:20]
+
+
+def generate_login_code(key, timestamp, uid):
+    """ Note: this outputs bytes because you need to check it with hmac.compare_digest"""
+    return generate_hmac_msg('login-', key, timestamp, uid)
+
+
+def generate_sso_code(key, timestamp, uid):
+    return generate_hmac_msg('sso-', key, timestamp, uid)
 
 
 def verify_login_code(key, current_timestamp, code):
     if isinstance(code, str):
         code = code.encode('utf-8')
+
     try:
         timestamp, uid, _ = code.split(b"-", 2)
     except ValueError:
         return None
+
     login_code = generate_login_code(key, timestamp, uid)
     if hmac.compare_digest(login_code, code):
         age = datetime.fromtimestamp(current_timestamp) - datetime.fromtimestamp(int(timestamp))
@@ -44,17 +62,12 @@ def verify_login_code(key, current_timestamp, code):
     return None
 
 
-def generate_sso_code(key, timestamp, uid):
-    msg = "%s-%s" % (int(timestamp), uid)
-    mac = hmac.new(key, 'sso-' + msg, digestmod=hashlib.sha256)
-    # Truncate the digest to 20 base64 bytes
-    return msg + "-" + base64.urlsafe_b64encode(mac.digest())[:20]
-
-
 def generate_checkin_code(key, user_id, version=1):
+    if isinstance(key, str):
+        key = key.encode('utf-8')
     # H = short (< 65536), B = byte (< 256)
     msg = struct.pack('HB', user_id, version)
-    mac = hmac.new(key, 'checkin-' + msg, digestmod=hashlib.sha256)
+    mac = hmac.new(key, b'checkin-' + msg, digestmod=hashlib.sha256)
     # An input length that's a multiple of 3 ensures no wasted output
     # 9 bytes (72 bits) won't resist offline attacks, so be careful
     code = base64.urlsafe_b64encode(msg + mac.digest()[:9])
@@ -72,6 +85,7 @@ def verify_checkin_code(key, code):
     expected_code = generate_checkin_code(key, user_id, version=version)
     if isinstance(code, str):
         code = code.encode('utf-8')
+
     if hmac.compare_digest(expected_code, code):
         return user_id
     return None
