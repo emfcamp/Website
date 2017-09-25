@@ -110,7 +110,7 @@ class TicketType(db.Model):
         if self.discount_token is not None and self.discount_token != discount_token:
             return 0
 
-        if user.is_authenticated():
+        if user.is_authenticated:
             # How many have been sold to this user
             user_count = self.get_sold(user.tickets).count()
         else:

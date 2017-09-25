@@ -145,7 +145,7 @@ def site_flag(site):
 
 def require_permission(permission):
     def call(f, *args, **kwargs):
-        if current_user.is_authenticated():
+        if current_user.is_authenticated:
             if current_user.has_permission(permission):
                 return f(*args, **kwargs)
             abort(404)
