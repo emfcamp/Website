@@ -28,6 +28,8 @@ listdepends:
 	$(ENV) pip list|cut -d\  -f1|while read x; do echo $$x $$(pip show $$x|grep Requires); done
 
 clean:
+	rm -rf ./__pycache__  # In theory pycache should be version dependent
+	rm -rf ./lib          # & this shouldn't exist any more
 	rm -rf ./env
 
 
