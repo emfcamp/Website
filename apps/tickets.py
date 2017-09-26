@@ -20,6 +20,13 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
 from main import db, mail
+from models.user import User, checkin_code_re
+from models.ticket import TicketLimitException, TicketType
+from models.payment import BankPayment, StripePayment, GoCardlessPayment
+from models.site_state import get_sales_state
+from models.payment import Payment
+
+
 from .common import (
     get_user_currency, set_user_currency, get_basket_and_total, create_basket,
     CURRENCY_SYMBOLS, feature_flag, create_current_user, feature_enabled,
@@ -28,14 +35,9 @@ from .common.forms import IntegerSelectField, HiddenIntegerField, Form
 from .common.receipt import (
     make_qr_png, make_barcode_png, render_pdf, render_receipt, attach_tickets,
 )
-from models.user import User, checkin_code_re
-from models.ticket import TicketLimitException, TicketType
-from models.payment import BankPayment, StripePayment, GoCardlessPayment
-from models.site_state import get_sales_state
-from models.payment import Payment
-from payments.gocardless import gocardless_start
-from payments.banktransfer import transfer_start
-from payments.stripe import stripe_start
+from .payments.gocardless import gocardless_start
+from .payments.banktransfer import transfer_start
+from .payments.stripe import stripe_start
 
 
 tickets = Blueprint('tickets', __name__)
@@ -80,7 +82,7 @@ def create_payment(paymenttype):
 
 @tickets.route("/tickets/", methods=['GET', 'POST'])
 def main():
-    if current_user.is_anonymous():
+    if current_user.is_anonymous:
         return redirect(url_for('tickets.choose'))
 
     all_tickets = current_user.tickets.join(TicketType).outerjoin(Payment).filter(
@@ -172,7 +174,7 @@ def choose(flow=None):
 
     if sales_state == 'available':
         pass
-    elif not current_user.is_anonymous() and current_user.has_permission('admin'):
+    elif not current_user.is_anonymous and current_user.has_permission('admin'):
         pass
     else:
         return render_template("tickets-cutoff.html")
@@ -249,7 +251,7 @@ class TicketPaymentForm(Form):
     stripe = SubmitField('Pay by card')
 
     def validate_email(form, field):
-        if current_user.is_anonymous() and User.does_user_exist(field.data):
+        if current_user.is_anonymous and User.does_user_exist(field.data):
             field.was_duplicate = True
             pay_url = url_for('tickets.pay', flow=form.flow)
 
@@ -278,7 +280,7 @@ def pay(flow=None):
     form = TicketPaymentForm()
     form.flow = flow
 
-    if not current_user.is_anonymous():
+    if not current_user.is_anonymous:
         del form.email
         del form.name
 
@@ -298,7 +300,7 @@ def pay(flow=None):
                   Please verify that you've selected the correct tickets.""")
             return redirect(url_for('tickets.pay', flow=flow))
 
-        if current_user.is_anonymous():
+        if current_user.is_anonymous:
             try:
                 create_current_user(form.email.data, form.name.data)
             except IntegrityError as e:
@@ -335,7 +337,7 @@ def pay(flow=None):
 
     return render_template('payment-choose.html', form=form,
                            basket=basket, total=total, StripePayment=StripePayment,
-                           is_anonymous=current_user.is_anonymous(),
+                           is_anonymous=current_user.is_anonymous,
                            admissions=admissions)
 
 

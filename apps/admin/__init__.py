@@ -141,7 +141,8 @@ class UpdateFeatureFlagForm(Form):
 class FeatureFlagForm(Form):
     flags = FieldList(FormField(UpdateFeatureFlagForm))
     new_feature = SelectField('New feature name', [Optional()],
-                              choices=[('', 'Add a new flag')] + zip(DB_FEATURE_FLAGS, DB_FEATURE_FLAGS))
+                              choices=[('', 'Add a new flag')] +
+                              list(zip(DB_FEATURE_FLAGS, DB_FEATURE_FLAGS)))
     new_enabled = BooleanField('New feature enabled', [Optional()])
     update = SubmitField('Update flags')
 
@@ -196,9 +197,9 @@ def feature_flags():
 
 class SiteStateForm(Form):
     site_state = SelectField('Site', choices=[('', '(automatic)')] +
-                             zip(VALID_STATES['site_state'], VALID_STATES['site_state']))
+                             list(zip(VALID_STATES['site_state'], VALID_STATES['site_state'])))
     sales_state = SelectField('Sales', choices=[('', '(automatic)')] +
-                              zip(VALID_STATES['sales_state'], VALID_STATES['sales_state']))
+                              list(zip(VALID_STATES['sales_state'], VALID_STATES['sales_state'])))
     update = SubmitField('Update states')
 
 

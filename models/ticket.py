@@ -386,4 +386,4 @@ def check_capacity(session, flush_context, instances):
     # Clear cached state based on number of available tickets
     refresh_states()
 
-from models.site_state import refresh_states
+from models.site_state import refresh_states  # noqa

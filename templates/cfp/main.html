@@ -43,7 +43,7 @@
         <a href="{{ url_for('.guidance') }}" target="_blank">guidance</a>.</p>
 
     <h3>Previous submissions</h3>
-    {% if current_user.is_authenticated() %}
+    {% if current_user.is_authenticated %}
       <p>If you've already submitted to the call for participation then you can
         view and edit you proposal(s) <a href="{{ url_for('.proposals') }}">here</a>.</p>
     {% else %}
@@ -87,7 +87,7 @@
     <div class="tab-pane {%- if form.type == active_cfp_type %} active {%- endif %}" id="{{ 'tab_' + form.type }}">
     <form action={{ url_for('cfp.main', cfp_type=form.type) + ('?closed' if ignore_closed else '') }} method="post" class="form-horizontal cfp-form" role="form">
       {{ form.hidden_tag() }}
-      {% if not current_user.is_authenticated() %}
+      {% if not current_user.is_authenticated %}
       <fieldset>
         <legend>Your Details</legend>
         {% if form.email.was_duplicate %}

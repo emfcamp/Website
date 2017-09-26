@@ -145,8 +145,7 @@ def talks_2012():
         reader = csv.reader(open(os.path.join(talk_path, '%s.csv' % day), 'r'))
         rows = []
         for row in reader:
-            cells = [unicode(cell, 'utf-8') for cell in row]
-            cells = ['' if c == '"' else c for c in cells]
+            cells = ['' if c == '"' else c for c in row]
             app.logger.debug(cells)
             rows.append(cells)
 

@@ -9,8 +9,8 @@ import json
 from faker import Faker
 from collections import OrderedDict
 
-from flask.ext.script import Command, Manager, Option
-from flask.ext.migrate import MigrateCommand
+from flask_script import Command, Manager, Option
+from flask_migrate import MigrateCommand
 from flask import render_template, current_app as app
 from flask_mail import Message
 from sqlalchemy import or_, func
@@ -29,7 +29,8 @@ from models.email import EmailJobRecipient
 from models.ical import CalendarSource
 from apps.payments import banktransfer
 from apps.common.receipt import attach_tickets
-from lib.slotmachine import SlotMachine
+from slotmachine import SlotMachine
+
 
 class CreateDB(Command):
     # For testing - you usually want to use db migrate/db upgrade instead
@@ -55,7 +56,7 @@ class LoadOfx(Command):
     option_list = [Option('-f', '--file', dest='filename', help="The .ofx file to load")]
 
     def run(self, filename):
-        ofx = ofxparse.OfxParser.parse(file(filename))
+        ofx = ofxparse.OfxParser.parse(open(filename))
 
         acct_id = ofx.account.account_id
         sort_code = ofx.account.routing_number
@@ -477,7 +478,7 @@ class MakeAdmin(Command):
         user.grant_permission('admin')
         db.session.commit()
 
-        print '%r is now an admin' % user.name
+        print('%r is now an admin' % user.name)
 
 class CreatePermissions(Command):
     def run(self):

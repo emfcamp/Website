@@ -51,7 +51,7 @@ class CalendarSource(db.Model):
                     app.logger.debug('Ignoring event %s as it has no UID', component.get('Summary'))
                     continue
 
-                uid = unicode(component['uid'])
+                uid = str(component['uid'])
                 if uid in uid_seen:
                     app.logger.debug('Ignoring event %s with duplicate UID', component.get('Summary'))
                     continue
@@ -76,9 +76,9 @@ class CalendarSource(db.Model):
                     end_dt = end_dt.astimezone(local_tz).replace(tzinfo=None)
                 event.end_dt = end_dt
 
-                event.summary = unicode(component.get('summary'))
-                event.description = unicode(component.get('description'))
-                event.location = unicode(component.get('location'))
+                event.summary = component.get('summary')
+                event.description = component.get('description')
+                event.location = component.get('location')
 
                 db.session.commit()
 

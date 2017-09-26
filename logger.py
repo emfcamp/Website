@@ -31,7 +31,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
             message = self.format(record)
             self.stream.write(message + '\n')
             self.flush()
-        except Exception, e:
+        except Exception:
             self.handleError(record)
 
     def colorize(self, message, record):
@@ -43,10 +43,8 @@ class ColorizingStreamHandler(logging.StreamHandler):
     def format(self, record):
         message = logging.StreamHandler.format(self, record)
         if self.is_tty:
-           message = self.colorize(message, record)
-                    
+            message = self.colorize(message, record)
         return message
-
 
 
 class ContextFormatter(logging.Formatter):
@@ -59,7 +57,7 @@ class ContextFormatter(logging.Formatter):
             record.user = _request_ctx_stack.top.user_email
         except AttributeError:
             record.user = 'Anon'
-        except Exception, e:
+        except Exception:
             record.user = 'Unknown'
 
         record.pid = self.pid
@@ -111,6 +109,7 @@ def setup_logging(app):
 
         logger = logging.getLogger('iso8601.iso8601')
         logger.setLevel(logging.INFO)
+
 
 def mail_logging(message, app):
     msg = u'''

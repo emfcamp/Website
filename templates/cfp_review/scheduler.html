@@ -41,7 +41,7 @@
         'use strict';
         var scheduleData = {{ schedule_data | tojson }},
             venues = {{ venues | tojson }},
-            is_anonymous = {% if current_user.is_anonymous() -%} true {%- else -%} false {%- endif %},
+            is_anonymous = {% if current_user.is_anonymous -%} true {%- else -%} false {%- endif %},
             start_date = new Date(2016, 7, 5),
             end_date = new Date(2016, 7, 8),
             venue_dict = {},

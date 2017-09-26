@@ -1,5 +1,5 @@
 import os
-from main import create_app, logger, db
+from main import create_app, logger
 from flask import request, _request_ctx_stack
 from flask_mail import email_dispatched
 
