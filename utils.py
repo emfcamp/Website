@@ -5,21 +5,21 @@ from flask_migrate import MigrateCommand
 
 from main import create_app
 
-from utils.admin import MakeAdmin, CreatePermissions, SendEmails
-from utils.banking import CreateBankAccounts, LoadOfx, Reconcile
-from utils.cfp import (
+from tasks.admin import MakeAdmin, CreatePermissions, SendEmails
+from tasks.banking import CreateBankAccounts, LoadOfx, Reconcile
+from tasks.cfp import (
     ImportCFP, LockProposals, EmailSpeakersAboutSlot,
     EmailSpeakersAboutFinalising, RejectUnacceptedTalks
 )
-from utils.dev import CreateDB, MakeFakeUsers, MakeFakeTickets
-from utils.external_calendars import (
+from tasks.dev import CreateDB, MakeFakeUsers, MakeFakeTickets
+from tasks.external_calendars import (
     CreateCalendars, RefreshCalendars, ExportCalendars
 )
-from utils.schedule import (
+from tasks.schedule import (
     ImportVenues, SetRoughDurations, OutputSchedulerData, ImportSchedulerData,
     RunScheduler, ApplyPotentialSchedule
 )
-from utils.tickets import (
+from tasks.tickets import (
     CreateTickets, CreateParkingTickets, SendTickets, SendTransferReminder
 )
 
