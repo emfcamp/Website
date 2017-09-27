@@ -111,4 +111,4 @@ python-dateutil==2.6.1
 git+https://github.com/emfcamp/slotmachine#egg=slotmachine
 Unidecode==0.04.21
 awesome-slugify==1.6.5
-regex==2017.07.28
+regex==2017.09.23
