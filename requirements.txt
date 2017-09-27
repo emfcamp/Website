@@ -60,7 +60,7 @@ Flask-Mail==0.9.1
 blinker==1.4
 
 # forms
-Flask-WTF==0.12  # Blocked due to use of _is_hidden
+Flask-WTF==0.14.2  # Blocked due to use of _is_hidden
 WTForms==2.1
 
 # other Flask modules
