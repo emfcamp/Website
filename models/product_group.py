@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from main import db
 
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import UniqueConstraint, and_, func
 from sqlalchemy.orm import column_property
 
 # state: [allowed next state, ] pairs
@@ -45,18 +45,25 @@ class ProductGroup(db.Model):
     name = db.Column(db.String, unique=True, nullable=False)
     description = db.Column(db.String)
 
-    expiry = db.Column(db.DateTime)
+    expires = db.Column(db.DateTime)
+    __expired = column_property(and_(~expires.is_(None), expires < func.now()))
     # A max capacity of -1 implies no max (use parent"s if set)
     capacity_max = db.Column(db.Integer, default=-1)
     capacity_used = db.Column(db.Integer, default=0)
     capacity_remaining = column_property(capacity_max - capacity_used)
+    discount_token = db.Column(db.String)
 
     parent = db.relationship("ProductGroup", remote_side=[id], backref="children", cascade="all")
 
     db.CheckConstraint("capacity_used <= capacity_max", "within_capacity")
 
-    def __init__(self, name, **kwargs):
-        super().__init__(name=name, **kwargs)
+    def __init__(self, name, parent=None, discount_token='', **kwargs):
+        # Check for the pathological case that of setting a discount token on
+        # a group with a parent that already has a token.
+        if discount_token and parent and not parent.token_correct(discount_token):
+            raise ProductGroupException('Parent and child tokens must be the same.')
+        super().__init__(name=name, parent=parent, discount_token=discount_token,
+                         **kwargs)
 
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self.name)
@@ -98,11 +105,15 @@ class ProductGroup(db.Model):
         if self.parent and self.parent.has_expired():
             return True
 
-        if self.expiry:
-            return datetime.utcnow() > self.expiry
-        return False
+        return self.expires and self.expires < datetime.utcnow()
 
-    def issue_instances(self, count=1):
+    def token_correct(self, token):
+        if self.parent and not self.parent.token_correct(token):
+            return False
+
+        return (not self.discount_token) or (self.discount_token == token)
+
+    def issue_instances(self, count=1, token=''):
         """
         If possible (i.e. the ProductGroup has not expired and has capacity)
         reduce the available capacity by count.
@@ -113,8 +124,11 @@ class ProductGroup(db.Model):
         if self.has_expired():
             raise ProductGroupException("ProductGroup has expired.")
 
+        if not self.token_correct(token):
+            raise ProductGroupException("Incorrect discount token.")
+
         if self.parent:
-            self.parent.issue_instances(count)
+            self.parent.issue_instances(count, token)
         self.capacity_used += count
 
     def return_instances(self, count=1):
@@ -130,6 +144,10 @@ class ProductGroup(db.Model):
     @classmethod
     def get_by_name(cls, name):
         return ProductGroup.query.filter_by(name=name).first()
+
+    @classmethod
+    def get_product_groups_for_token(cls, token):
+        return ProductGroup.query.filter_by(discount_token=token, __expired=False).all()
 
 
 class PriceTier(ProductGroup):
@@ -213,14 +231,14 @@ class ProductInstance(db.Model):
         self.state = new_state
 
     @classmethod
-    def create_instances(self, user, tier, currency, count=1):
+    def create_instances(self, user, tier, currency, count=1, token=''):
         try:
             price = [p for p in tier.prices if p.currency == currency.lower()][0]
         except IndexError:
             msg = 'Could not find currency, %s, for %s' % (currency, tier)
             raise ProductGroupException(msg)
 
-        tier.issue_instances(count)
+        tier.issue_instances(count, token)
 
         return [ProductInstance(price_tier_id=tier.id,
                                 user_id=user.id,

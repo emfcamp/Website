@@ -23,7 +23,7 @@ class SingleProductGroupTest(unittest.TestCase):
         self.app.testing = True
 
         with self.app.app_context():
-            item = ProductGroup(self.item_name, capacity_max=1, expiry=datetime(2012, 8, 31))
+            item = ProductGroup(self.item_name, capacity_max=1, expires=datetime(2012, 8, 31))
             self.db.session.add(item)
 
             self.db.session.commit()
@@ -41,7 +41,6 @@ class SingleProductGroupTest(unittest.TestCase):
 
             with self.assertRaises(ValueError):
                 item.has_capacity(-1)
-
 
     def test_has_expired(self):
         with self.app.app_context():
@@ -131,6 +130,23 @@ class MultipleProductGroupTest(unittest.TestCase):
             self.assertFalse(parent.has_capacity())
             self.assertFalse(item1.has_capacity())
             self.assertFalse(item2.has_capacity())
+
+    def test_token(self):
+        with self.app.app_context():
+            parent = self.get_item(name=self.parent_name)
+            parent.discount_token = 'test'
+
+            item = self.get_item(name=self.group1_name)
+
+            # A token is required by the parent
+            with self.assertRaises(ProductGroupException):
+                item.issue_instances()
+
+            item.issue_instances(token='test')
+            self.assertEqual(1, item.capacity_used)
+
+            with self.assertRaises(ProductGroupException):
+                ProductGroup('Bad group', parent=parent, discount_token='double-up')
 
 
 class ProductInstanceTest(unittest.TestCase):
@@ -285,3 +301,6 @@ class ProductInstanceTest(unittest.TestCase):
             instance.state = 'paid'
 
             self.assertEqual({'paid': 1, 'checked-in': 0}, tier.get_sold())
+
+            parent = ProductGroup.get_by_name(self.pg_name)
+            self.assertEqual({'paid': 1, 'checked-in': 0}, parent.get_sold())
