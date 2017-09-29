@@ -12,28 +12,33 @@ from lxml import etree
 from flask import Markup, render_template, request, current_app as app
 from sqlalchemy import func
 
-from models.ticket import Ticket, TicketType, TicketTransfer
+from models.product_group import ProductInstance, ProductGroup, PriceTier, ProductTransfer
+# from models.ticket import Ticket, TicketType, TicketTransfer
 
 
 def render_receipt(user, png=False, pdf=False):
     tickets = (user.tickets
                   .filter_by(paid=True)
-                  .join(TicketType)
-                  .order_by(TicketType.order))
+                  .join(PriceTier)
+                  .order_by(PriceTier.order))
 
-    entrance_tts_counts = (tickets.filter(TicketType.admits.in_(['full', 'kid']))
-        .with_entities(TicketType, func.count(Ticket.id).label('ticket_count'))
-        .group_by(TicketType).all())
+    entrance_tts_counts = (tickets.filter_by(is_ticket=True)
+        .with_entities(ProductGroup, func.count(ProductInstance.id).label('ticket_count'))
+        .group_by(ProductGroup).all())
     entrance_tickets_count = sum(c for tt, c in entrance_tts_counts)
 
-    vehicle_tickets = tickets.filter(TicketType.admits.in_(['car', 'campervan'])).all()
+    # FIXME
+    # vehicle_tickets = tickets.filter(TicketType.admits.in_(['car', 'campervan'])).all()
+    vehicle_tickets = ['FIXME']
 
-    transferred_tickets = user.transfers_from.join(Ticket).filter_by(paid=True) \
-                              .with_entities(TicketTransfer).order_by('timestamp').all()
+    transferred_tickets = user.transfers_from.join(ProductInstance).filter_by(is_paid_for=True) \
+                              .with_entities(ProductTransfer).order_by('timestamp').all()
 
-    tees = (tickets.filter(TicketType.fixed_id.in_(range(14, 24)))
-                  .with_entities(TicketType, func.count(Ticket.id).label('ticket_count'))
-                  .group_by(TicketType).all())  # t-shirts
+    # FIXME
+    # tees = (tickets.filter(TicketType.fixed_id.in_(range(14, 24)))
+    #               .with_entities(TicketType, func.count(Ticket.id).label('ticket_count'))
+    #               .group_by(TicketType).all())  # t-shirts
+    tees = ['FIXME']
 
     return render_template('receipt.html', user=user,
                            format_inline_qr=format_inline_qr,
@@ -47,7 +52,9 @@ def render_receipt(user, png=False, pdf=False):
 
 
 def render_parking_receipts(png=False, pdf=False):
-    vehicle_tickets = TicketType.query.filter_by(fixed_id=24).one().tickets
+    # FIXME
+    # vehicle_tickets = TicketType.query.filter_by(fixed_id=24).one().tickets
+    vehicle_tickets = ['FIXME']
     users = [t.user for t in vehicle_tickets]
 
     return render_template('parking-receipts.html', users=users,

@@ -11,7 +11,7 @@ from flask import (
 )
 
 from .common import feature_flag, feature_enabled, site_flag
-from models.ticket import TicketType
+from models.product_group import ProductGroup
 from models.payment import StripePayment
 from models.site_state import get_site_state
 
@@ -21,7 +21,7 @@ base = Blueprint('base', __name__)
 
 @base.route("/")
 def main():
-    full_price = TicketType.get_price_cheapest_full()
+    full_price = ProductGroup.get_price_cheapest_full()
     if not (feature_enabled('BANK_TRANSFER') or feature_enabled('GOCARDLESS')) and full_price is not None:
         # Only card payment left
         full_price += StripePayment.premium('GBP', full_price)

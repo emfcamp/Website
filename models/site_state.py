@@ -2,7 +2,8 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 from datetime import datetime
 from main import cache, db
-from models.ticket import TicketType
+# from models.ticket import TicketType
+from models.product_group import ProductGroup
 
 class SiteState(db.Model):
     __tablename__ = 'site_state'
@@ -25,12 +26,14 @@ def calc_site_state(date):
     return "before-sales"
 
 def calc_sales_state(date):
-    if TicketType.get_tickets_remaining() < 1:
+    # if TicketType.get_tickets_remaining() < 1:
+    site_capacity = ProductGroup.get_by_name('site_capacity')
+    if site_capacity.get_total_remaining_capacity() < 1:
         # We've hit capacity - no more tickets will be sold
         return "sold-out"
     elif date > datetime(2016, 8, 7):
         return "sales-ended"
-    elif TicketType.get_price_cheapest_full() is None:
+    elif site_capacity.get_price_cheapest_full() is None:
         # Tickets not currently available, probably just for this round, but we haven't hit site capacity
         return "unavailable"
     else:

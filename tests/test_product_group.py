@@ -3,14 +3,14 @@ import sys
 import unittest
 
 from decimal import Decimal
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest.mock import patch, Mock
 
 from .core import get_app
 from models.user import User
 from models.product_group import (
     PRODUCT_INSTANCE_STATES, ProductGroupException, ProductInstanceStateException,
-    ProductTransferException, ProductGroup, PriceTier, Price, ProductInstance
+    ProductTransferException, ProductGroup, PriceTier, Price, ProductInstance, bought_states
 )
 
 class SingleProductGroupTest(unittest.TestCase):
@@ -107,7 +107,7 @@ class MultipleProductGroupTest(unittest.TestCase):
             item1 = PriceTier(self.group1_name, parent=parent)
             self.db.session.add(item1)
 
-            item2 = ProductGroup(self.group2_name, parent=parent)
+            item2 = PriceTier(self.group2_name, parent=parent)
             self.db.session.add(item2)
 
             self.db.session.commit()
@@ -120,7 +120,7 @@ class MultipleProductGroupTest(unittest.TestCase):
             self.db.session.commit()
 
     # We want to mostly check that capacities are inherited & shared
-    def test_has_capacity_propogates(self):
+    def test_has_capacity_propagates(self):
         with self.app.app_context():
             item1 = self.get_item(name=self.group1_name)
             item2 = self.get_item(name=self.group2_name)
@@ -144,6 +144,21 @@ class MultipleProductGroupTest(unittest.TestCase):
             self.assertEqual(sys.maxsize, item2.remaining_capacity())
             self.assertEqual(0, item2.get_total_remaining_capacity())
 
+    def test_flag_propagation(self):
+        with self.app.app_context():
+            parent = self.get_item(self.parent_name)
+
+            for flag in ['allow_check_in', 'allow_badge_up', 'is_visible', 'is_transferable']:
+                parent_value = getattr(parent, flag)
+
+                group1 = ProductGroup(flag, parent=parent)
+                self.assertEqual(getattr(group1, flag), parent_value)
+
+                group2 = ProductGroup('!' + flag, parent=parent, **{flag: not parent_value})
+
+                self.assertEqual(getattr(group2, flag), not parent_value)
+
+
     def test_token(self):
         with self.app.app_context():
             parent = self.get_item(name=self.parent_name)
@@ -161,38 +176,21 @@ class MultipleProductGroupTest(unittest.TestCase):
             with self.assertRaises(ProductGroupException):
                 ProductGroup('Bad group', parent=parent, discount_token='double-up')
 
-    def test_check_flag(self):
+    def test_get_cheapest(self):
         with self.app.app_context():
-            item = self.get_item(name=self.group1_name)
+            item1 = self.get_item(name=self.group1_name)
+            price1 = Price(price_tier=item1, currency='gbp', price_int=5)
+
+            item2 = self.get_item(name=self.group2_name)
+            price2 = Price(price_tier=item2, currency='gbp', price_int=500)
+
+            self.db.session.add(price1)
+            self.db.session.add(price2)
+            self.db.session.commit()
+
             parent = self.get_item(name=self.parent_name)
 
-            # If a price tier gets None on a flag check it's an error as it's
-            # not set anywhere in the hierarchy
-            with self.assertRaises(ProductGroupException):
-                item.check_flag('allow_check_in')
-            self.assertIsNone(parent.check_flag('allow_check_in'))
-
-            # Gets closest value
-            item.allow_check_in = True
-            self.db.session.commit()
-
-            self.assertTrue(item.check_flag('allow_check_in'))
-            self.assertIsNone(parent.check_flag('allow_check_in'))
-
-            # Check the item masks the parent value
-            item.allow_check_in = False
-            parent.allow_check_in = True
-            self.db.session.commit()
-
-            self.assertFalse(item.check_flag('allow_check_in'))
-            self.assertTrue(parent.check_flag('allow_check_in'))
-
-            # Check it gets the parent value correctly if None
-            item.allow_check_in = None
-            self.db.session.commit()
-
-            self.assertTrue(item.check_flag('allow_check_in'))
-            self.assertTrue(parent.check_flag('allow_check_in'))
+            self.assertEqual(item1, parent.get_cheapest('gbp'))
 
 
 class ProductInstanceTest(unittest.TestCase):
@@ -221,7 +219,7 @@ class ProductInstanceTest(unittest.TestCase):
             user = User(self.user_email, 'test_user')
             self.db.session.add(user)
 
-            parent = ProductGroup(self.pg_name, capacity_max=3)
+            parent = ProductGroup(self.pg_name, capacity_max=3, allow_check_in=False)
             tier = PriceTier(self.tier_name, parent=parent)
             price = Price(price_tier=tier, currency="gbp", price_int=666)
             # These have `cascade=all` so just add the bottom of the hierarchy
@@ -254,10 +252,6 @@ class ProductInstanceTest(unittest.TestCase):
 
             # NB: Decimal('6.66') != Decimal(6.66) == Decimal(float(6.66)) ~= 6.6600000000000001
             self.assertEqual(instance.price.value, Decimal('6.66'))
-
-            # Test bad currencies error
-            with self.assertRaises(ProductGroupException):
-                ProductInstance.create_instances(user, tier, 'wtf')
 
             # Test issuing multiple instances works
             more_instances = ProductInstance.create_instances(user, tier, 'gbp', 2)
@@ -349,13 +343,15 @@ class ProductInstanceTest(unittest.TestCase):
             # Test it works at the PriceTier level
             tier = PriceTier.get_by_name(self.tier_name)
             instance = self.get_instance(self.db.session)
+            expect = {s: 0 for s in bought_states}
 
             instance.state = 'paid'
+            expect['paid'] = 1
 
-            self.assertEqual({'paid': 1, 'checked-in': 0}, tier.get_sold())
+            self.assertEqual(expect, tier.get_sold())
 
             parent = ProductGroup.get_by_name(self.pg_name)
-            self.assertEqual({'paid': 1, 'checked-in': 0}, parent.get_sold())
+            self.assertEqual(expect, parent.get_sold())
 
     def test_user_limit(self):
         with self.app.app_context():
@@ -406,7 +402,7 @@ class ProductTransferTest(unittest.TestCase):
             self.db.session.add(user1)
             self.db.session.add(user2)
 
-            tier = PriceTier(self.pg_name)
+            tier = PriceTier(self.pg_name, allow_check_in=True)
             price = Price(price_tier=tier, currency="gbp", price_int=666)
             # These have `cascade=all` so just add the bottom of the hierarchy
             self.db.session.add(price)
@@ -472,10 +468,11 @@ class ProductTransferTest(unittest.TestCase):
             item.state = 'checked-in'
             self.db.session.commit()
 
-            self.assertEqual(item, user2.get_admissions()[0])
-            self.assertNotIn(item, user1.get_admissions())
+            self.assertEqual(item, user2.get_tickets()[0])
+            self.assertNotIn(item, user1.get_tickets())
 
             xfer = item.transfers[0]
 
             self.assertEqual(xfer.to_user.id, user2.id)
             self.assertEqual(xfer.from_user.id, user1.id)
+

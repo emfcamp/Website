@@ -25,9 +25,13 @@ from sqlalchemy.sql.functions import func
 from main import db, mail
 from models.user import User
 from models.payment import Payment, BankPayment, BankTransaction
-from models.ticket import (
-    Ticket, TicketType, TicketPrice, TicketTransfer
+from models.product_group import (
+    ProductInstance, PriceTier, ProductGroup, Price, ProductTransfer
 )
+
+# from models.ticket import (
+#     Ticket, TicketType, TicketPrice, TicketTransfer
+# )
 from ..common import require_permission, feature_enabled
 from ..common.forms import Form, IntegerSelectField, HiddenIntegerField, StaticField
 from ..common.receipt import attach_tickets
@@ -157,9 +161,7 @@ def transaction_reconcile(txn_id, payment_id):
 @admin.route('/tickets')
 @admin_required
 def tickets():
-    tickets = Ticket.query.filter(
-        Ticket.paid,
-    ).order_by(Ticket.id).all()
+    tickets = ProductInstance.query.filter_by(is_paid_for=True).order_by(ProductInstance.id).all()
 
     return render_template('admin/tickets.html', tickets=tickets)
 
@@ -167,9 +169,7 @@ def tickets():
 @admin.route('/tickets/unpaid')
 @admin_required
 def tickets_unpaid():
-    tickets = Ticket.query.filter(
-        ~Ticket.paid,
-    ).order_by(Ticket.id).all()
+    tickets = ProductInstance.query.filter_by(is_paid_for=False).order_by(ProductInstance.id).all()
 
     return render_template('admin/tickets.html', tickets=tickets)
 
@@ -177,26 +177,27 @@ def tickets_unpaid():
 @admin.route('/ticket-report')
 def ticket_report():
     # This is an admissions-based view, so includes expired tickets
-    totals = Ticket.query.outerjoin(Payment).filter(
-        Ticket.refund_id.is_(None),
-        or_(Ticket.paid == True,  # noqa
+    totals = ProductInstance.query.outerjoin(Payment).filter(
+        ProductInstance.refund_id.is_(None),
+        or_(ProductInstance.is_paid_for == True,  # noqa
             ~Payment.state.in_(['new', 'cancelled', 'refunded']))
-    ).join(TicketType).with_entities(
-        TicketType.admits,
+    ).join(PriceTier).with_entities(
+        PriceTier.name,
         func.count(),
-    ).group_by(TicketType.admits).all()
+    ).group_by(PriceTier.name).all()
     totals = dict(totals)
 
-    query = db.session.query(TicketType.admits, func.count(), func.sum(TicketPrice.price_int)).\
-        select_from(Ticket).join(TicketType).join(TicketPrice).\
-        filter(TicketPrice.currency == 'GBP', Ticket.paid == True).group_by(TicketType.admits)  # noqa
+    # FIXME
+    # query = db.session.query(TicketType.admits, func.count(), func.sum(TicketPrice.price_int)).\
+    #     select_from(Ticket).join(TicketType).join(TicketPrice).\
+    #     filter(TicketPrice.currency == 'GBP', Ticket.paid == True).group_by(TicketType.admits)  # noqa
 
     accounting_totals = {}
-    for row in query.all():
-        accounting_totals[row[0]] = {
-            'count': row[1],
-            'total': row[2]
-        }
+    # for row in query.all():
+    #     accounting_totals[row[0]] = {
+    #         'count': row[1],
+    #         'total': row[2]
+    #     }
 
     return render_template('admin/ticket-report.html', totals=totals, accounting_totals=accounting_totals)
 
@@ -204,7 +205,7 @@ def ticket_report():
 @admin.route('/ticket-types')
 @admin_required
 def ticket_types():
-    types = TicketType.query.all()
+    types = ProductGroup.query.all()
     return render_template('admin/ticket-types.html', ticket_types=types)
 
 ADMITS_LABELS = [('full', 'Adult'), ('kid', 'Under 16'),
@@ -212,6 +213,7 @@ ADMITS_LABELS = [('full', 'Adult'), ('kid', 'Under 16'),
                  ('other', 'Other')]
 
 
+# FIXME -- Basically this whole form...
 class EditTicketTypeForm(Form):
     name = StringField('Name')
     order = IntegerField('Order')
@@ -247,7 +249,7 @@ class EditTicketTypeForm(Form):
 def edit_ticket_type(type_id):
     form = EditTicketTypeForm()
 
-    ticket_type = TicketType.query.get_or_404(type_id)
+    ticket_type = ProductGroup.query.get_or_404(type_id)
     if form.validate_on_submit():
         app.logger.info('%s editing ticket type %s', current_user.name, type_id)
         if form.discount_token.data == '':
@@ -312,15 +314,16 @@ def new_ticket_type(copy_id):
         token = form.discount_token.data if form.discount_token.data else None
         description = form.description.data if form.description.data else None
 
-        tt = TicketType(form.order.data, form.admits.data,
-                        form.name.data, form.type_limit.data, expires=expires,
+        # FIXME
+        tt = PriceTier(order=form.order.data, parent=form.admits.data,
+                        name=form.name.data, expires=expires,
                         discount_token=token, description=description,
                         personal_limit=form.personal_limit.data,
                         has_badge=form.has_badge.data,
                         is_transferable=form.is_transferable.data)
 
-        tt.prices = [TicketPrice('GBP', form.price_gbp.data),
-                     TicketPrice('EUR', form.price_eur.data)]
+        tt.prices = [Price('GBP', form.price_gbp.data),
+                     Price('EUR', form.price_eur.data)]
         app.logger.info('%s adding new TicketType %s', current_user.name, tt)
         db.session.add(tt)
         db.session.commit()
@@ -328,7 +331,7 @@ def new_ticket_type(copy_id):
         return redirect(url_for('.ticket_type_details', type_id=tt.id))
 
     if copy_id != -1:
-        form.init_with_ticket_type(TicketType.query.get(copy_id))
+        form.init_with_ticket_type(PriceTier.query.get(copy_id))
 
     return render_template('admin/new-ticket-type.html', ticket_type_id=copy_id, form=form)
 
@@ -336,7 +339,8 @@ def new_ticket_type(copy_id):
 @admin.route('/ticket-types/<int:type_id>')
 @admin_required
 def ticket_type_details(type_id):
-    ticket_type = TicketType.query.get_or_404(type_id)
+    # FIXME should this be ProductGroup?
+    ticket_type = PriceTier.query.get_or_404(type_id)
     return render_template('admin/ticket-type-details.html', ticket_type=ticket_type)
 
 
@@ -364,11 +368,11 @@ class FreeTicketsNewUserForm(FreeTicketsForm):
 @admin.route('/tickets/choose-free/<int:user_id>', methods=['GET', 'POST'])
 @admin_required
 def tickets_choose_free(user_id=None):
-    has_price = TicketPrice.query.filter(TicketPrice.price_int > 0)
+    has_price = Price.query.filter(Price.price_int > 0)
 
-    free_tts = TicketType.query.filter(
-        ~has_price.filter(TicketPrice.type.expression).exists(),
-    ).order_by(TicketType.order).all()
+    free_tts = PriceTier.query.filter(
+        ~has_price.filter(Price.type.expression).exists(),
+    ).order_by(PriceTier.order).all()
 
     if user_id is None:
         form = FreeTicketsNewUserForm()
@@ -403,9 +407,10 @@ def tickets_choose_free(user_id=None):
         for f in form.types:
             if f.amount.data:
                 tt = f._type
+                # FIXME
                 for i in range(f.amount.data):
-                    t = Ticket(type=tt, user_id=user_id)
-                    t.paid = True
+                    t = ProductInstance.create_instances(user=user, tier=tt, currency='GBP')
+                    t.state = 'paid'
                     user.tickets.append(t)
                     tickets.append(t)
 
@@ -446,15 +451,15 @@ def tickets_choose_free(user_id=None):
 def list_free_tickets():
     # Complimentary tickets and transferred tickets can both have no payment.
     # This page is actually intended to be a list of complimentary tickets.
-    free_tickets = Ticket.query \
-        .join(TicketType) \
+    free_tickets = ProductInstance.query \
+        .join(PriceTier) \
         .filter(
-            Ticket.paid,
-            Ticket.payment_id.is_(None),
-            ~TicketTransfer.query.filter(TicketTransfer.ticket.expression).exists(),
+            ProductInstance.is_paid_for,
+            ProductInstance.payment_id.is_(None),
+            ~ProductTransfer.query.filter(ProductTransfer.ticket.expression).exists(),
         ).order_by(
-            Ticket.user_id,
-            TicketType.order
+            ProductInstance.user_id,
+            ProductGroup.order
         ).all()
 
     return render_template('admin/tickets-list-free.html',
@@ -466,11 +471,11 @@ class CancelTicketForm(Form):
 @admin.route('/ticket/<int:ticket_id>/cancel-free', methods=['GET', 'POST'])
 @admin_required
 def cancel_free_ticket(ticket_id):
-    ticket = Ticket.query.get_or_404(ticket_id)
+    ticket = ProductInstance.query.get_or_404(ticket_id)
     if ticket.payment is not None:
         abort(404)
 
-    if not ticket.paid:
+    if not ticket.is_paid_for:
         app.logger.warn('Ticket %s is already cancelled', ticket.id)
         flash('This ticket is already cancelled')
         return redirect(url_for('admin.list_free_tickets'))
@@ -480,7 +485,7 @@ def cancel_free_ticket(ticket_id):
         if form.cancel.data:
             app.logger.info('Cancelling free ticket %s', ticket.id)
             now = datetime.utcnow()
-            ticket.paid = False
+            ticket.state = 'refunded'
             if ticket.expires is None or ticket.expires > now:
                 ticket.expires = now
 
@@ -495,29 +500,33 @@ def cancel_free_ticket(ticket_id):
 @admin.route('/transfers')
 @admin_required
 def ticket_transfers():
-    transfer_logs = TicketTransfer.query.all()
+    transfer_logs = ProductTransfer.query.all()
     return render_template('admin/ticket-transfers.html', transfers=transfer_logs)
 
 
+# FIXME
 @admin.route('/furniture')
 @admin_required
 def furniture():
-    tickets = TicketType.query.filter(TicketType.name.in_(['Table', 'Chair'])) \
-                        .join(Ticket, User).group_by(User, TicketType) \
-                        .with_entities(User, TicketType, func.count(Ticket.id)) \
-                        .order_by(User.name, TicketType.order)
+    # tickets = TicketType.query.filter(TicketType.name.in_(['Table', 'Chair'])) \
+    #                     .join(Ticket, User).group_by(User, TicketType) \
+    #                     .with_entities(User, TicketType, func.count(Ticket.id)) \
+    #                     .order_by(User.name, TicketType.order)
+    tickets = []
     return render_template('admin/furniture-tickets.html', tickets=tickets)
 
 
+# FIXME
 @admin.route('/tees')
 @admin_required
 def tees():
-    tickets = TicketType.query.join(Ticket, User) \
-                        .filter(TicketType.fixed_id.in_(range(14, 24))) \
-                        .filter(Ticket.paid.is_(True)) \
-                        .group_by(User, TicketType) \
-                        .with_entities(User, TicketType, func.count(Ticket.id)) \
-                        .order_by(User.name, TicketType.order)
+    # tickets = TicketType.query.join(Ticket, User) \
+    #                     .filter(TicketType.fixed_id.in_(range(14, 24))) \
+    #                     .filter(Ticket.paid.is_(True)) \
+    #                     .group_by(User, TicketType) \
+    #                     .with_entities(User, TicketType, func.count(Ticket.id)) \
+    #                     .order_by(User.name, TicketType.order)
+    tickets = []
     return render_template('admin/tee-tickets.html', tickets=tickets)
 
 

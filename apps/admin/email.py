@@ -12,7 +12,7 @@ from wtforms.validators import Required
 from wtforms.widgets import TextArea
 from main import db
 from models.user import User
-from models.ticket import Ticket
+# from models.ticket import Ticket
 from models.email import EmailJob, EmailJobRecipient
 from ..common.forms import Form
 

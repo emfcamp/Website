@@ -21,7 +21,8 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from main import db, mail
 from models.user import User, checkin_code_re
-from models.ticket import TicketLimitException, TicketType
+from models.product_group import ProductGroup, bought_states
+# from models.ticket import TicketLimitException, TicketType
 from models.payment import BankPayment, StripePayment, GoCardlessPayment
 from models.site_state import get_sales_state
 from models.payment import Payment
@@ -65,7 +66,7 @@ def create_payment(paymenttype):
     app.logger.info('Ticket info: %s', infodata)
 
     for ticket in basket:
-        current_user.tickets.append(ticket)
+        # current_user.tickets.append(ticket) # this shouldn't be needed
         ticket.payment = payment
         if currency == 'GBP':
             ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS_TRANSFER'))
@@ -85,11 +86,16 @@ def main():
     if current_user.is_anonymous:
         return redirect(url_for('tickets.choose'))
 
-    all_tickets = current_user.tickets.join(TicketType).outerjoin(Payment).filter(
-        or_(Payment.id.is_(None),
-        Payment.state != "cancelled"))
-    tickets = all_tickets.filter(TicketType.admits != 'other').all()
-    other_items = all_tickets.filter(TicketType.admits == 'other').all()
+    all_tickets = current_user.products \
+                              .join(ProductGroup) \
+                              .outerjoin(Payment) \
+                              .filter(or_(Payment.id.is_(None),
+                                          Payment.state != "cancelled"
+                                        )
+                                      )
+
+    tickets = all_tickets.filter_by(is_ticket=True).all()
+    other_items = all_tickets.filter(is_ticket=False).all()
     payments = current_user.payments.filter(Payment.state != "cancelled").all()
 
     if not tickets and not payments:
@@ -112,7 +118,7 @@ def main():
 @tickets.route("/tickets/token/")
 @tickets.route("/tickets/token/<token>")
 def tickets_token(token=None):
-    tts = TicketType.get_types_for_token(token)
+    tts = ProductGroup.get_product_groups_for_token(token)
     if tts:
         session['ticket_token'] = token
     else:
@@ -120,7 +126,7 @@ def tickets_token(token=None):
             del session['ticket_token']
         flash('Ticket token was invalid')
 
-    if any(tt.admits in ['full', 'kid'] for tt in tts):
+    if any(tt.allow_check_in for tt in tts):
         return redirect(url_for('tickets.choose'))
 
     return redirect(url_for('tickets.choose', flow='other'))
@@ -165,7 +171,7 @@ def choose(flow=None):
             sales_state = 'available'
 
         # Allow people with valid discount tokens to buy tickets
-        elif token is not None and TicketType.get_types_for_token(token):
+        elif token is not None and ProductGroup.get_product_groups_for_token(token):
             sales_state = 'available'
 
 
@@ -185,11 +191,11 @@ def choose(flow=None):
     # For the non-admissions page, only exclude actual admissions tickets.
     # This means both pages show parking and caravan tickets.
     if admissions:
-        tts = TicketType.query.filter(~TicketType.admits.in_(['other']))
+        tts = ProductGroup.query.filter_by(allow_check_in=True, is_visible=True)
     else:
-        tts = TicketType.query.filter(~TicketType.admits.in_(['full', 'kid']))
+        tts = ProductGroup.query.filter_by(allow_check_in=False, is_visible=True)
 
-    tts = tts.order_by(TicketType.order).all()
+    tts = tts.order_by(ProductGroup.order).all()
     limits = dict((tt.id, tt.user_limit(current_user, token)) for tt in tts)
 
     if request.method != 'POST':
@@ -218,7 +224,8 @@ def choose(flow=None):
                     tt = f._type
                     app.logger.info('Adding %s %s tickets to basket', f.amount.data, tt.name)
                     basket += [tt.id] * f.amount.data
-
+                    # FIXME Should be able to create actual ProductInstances here rather than
+                    # attach them to the session
             if basket:
                 session['basket'] = basket
 
@@ -284,7 +291,7 @@ def pay(flow=None):
         del form.email
         del form.name
 
-    basket, total = get_basket_and_total()
+    basket, total = get_basket_and_total(get_user_currency())
     if not basket:
         if admissions:
             flash("Please select at least one ticket to buy.")
@@ -314,9 +321,11 @@ def pay(flow=None):
         elif form.stripe.data:
             payment_type = StripePayment
 
+        #
         try:
             payment = create_payment(payment_type)
-        except TicketLimitException as e:
+        # FIXME this should be a much more tightly scoped exception
+        except Exception as e: # TicketLimitException as e:
             app.logger.warn('Limit exceeded creating tickets: %s', e)
             flash("We're sorry, we were unable to reserve your tickets. %s" % e)
             return redirect(url_for('tickets.choose', flow=flow))
@@ -359,7 +368,7 @@ def transfer(ticket_id):
     except NoResultFound:
         return redirect(url_for('tickets.main'))
 
-    if not ticket or not ticket.paid or not ticket.type.is_transferable:
+    if not ticket or ticket.state not in bought_states or not ticket.type.is_transferable:
         return redirect(url_for('tickets.main'))
 
     form = TicketTransferForm()
@@ -424,7 +433,7 @@ def receipt(user_id=None):
     else:
         user = current_user
 
-    if not user.tickets.filter_by(paid=True).all():
+    if not user.tickets.filter_by(state='paid').all():
         abort(404)
 
     png = bool(request.args.get('png'))

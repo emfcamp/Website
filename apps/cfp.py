@@ -16,7 +16,7 @@ from sqlalchemy.exc import IntegrityError
 
 from main import db, mail
 from models.user import User, UserDiversity
-from models.ticket import TicketType
+from models.product_group import ProductGroup
 from models.cfp import (
     TalkProposal, WorkshopProposal, InstallationProposal, Proposal, CFPMessage, Venue
 )
@@ -160,7 +160,7 @@ def main(cfp_type='talk'):
 
         return redirect(url_for('.complete'))
 
-    full_price = TicketType.get_price_cheapest_full()
+    full_price = ProductGroup.get_price_cheapest_full()
 
     return render_template('cfp/main.html', full_price=full_price,
                            forms=forms, active_cfp_type=cfp_type,

@@ -8,7 +8,8 @@ from flask_login import login_user, current_user
 from werkzeug import BaseResponse
 from werkzeug.exceptions import HTTPException
 
-from models.ticket import Ticket, TicketType
+# from models.ticket import Ticket, TicketType
+from models.product_group import PriceTier, ProductInstance
 from models.site_state import get_site_state, get_sales_state
 from models.feature_flag import get_db_flags
 from models import User
@@ -101,9 +102,9 @@ def set_user_currency(currency):
 
 # This avoids adding tickets to the db so should avoid a lot of auto-flush
 # problems, unless you need the tickets persisted, use this.
-def get_basket_and_total():
-    basket = [TicketType.query.get(id) for id in session.get('basket', [])]
-    total = sum(tt.get_price(get_user_currency()) for tt in basket)
+def get_basket_and_total(currency):
+    basket = [PriceTier.query.get(id) for id in session.get('basket', [])]
+    total = sum(tt.get_price(currency) for tt in basket)
     app.logger.debug('Got basket %s with total %s', basket, total)
     return basket, total
 
@@ -111,10 +112,11 @@ def get_basket_and_total():
 # This actually adds the user's tickets to the database. This should only be used
 # just before a ticket is bought
 def create_basket():
-    user_id = current_user.id
-    items, total = get_basket_and_total()
+    user = current_user
+    currency = get_user_currency()
+    items, total = get_basket_and_total(currency)
 
-    basket = [Ticket(type=tt, user_id=user_id) for tt in items]
+    basket = [ProductInstance.create_instances(user, tt, currency) for tt in items]
     app.logger.debug('Added tickets to db for basket %s with total %s', basket, total)
     return basket, total
 

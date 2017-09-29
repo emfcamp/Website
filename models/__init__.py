@@ -8,10 +8,10 @@ def exists(query):
 
 from .user import *  # noqa
 from .payment import *  # noqa
-from .ticket import *  # noqa
 from .cfp import *  # noqa
 from .permission import *  # noqa
 from .email import *  # noqa
 from .ical import *  # noqa
+from .product_group import * # noqa
 
 db.configure_mappers()

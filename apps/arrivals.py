@@ -9,7 +9,7 @@ from flask import (
 from sqlalchemy import func
 
 from main import db
-from models.ticket import Ticket, TicketType, CheckinStateException, TicketCheckin
+from models.product_group import ProductInstance, CheckinStateException
 from models.user import User, checkin_code_re
 from .common import require_permission, json_response
 
@@ -133,16 +133,15 @@ def search(query=None):
 
     users_ordered = users_from_query(query)
     users = User.query.filter(User.id.in_([u.id for u in users_ordered]))
-    tickets = users.join(Ticket).filter_by(paid=True) \
+
+    tickets = users.join(ProductInstance.owner).filter_by(is_valid_ticket=True) \
                    .group_by(User).with_entities(User.id, func.count(User.id))
     tickets = dict(tickets)
 
-    checkins = users.join(Ticket, TicketCheckin)
     if badge:
-        completes = checkins.filter_by(badged_up=True) \
-                            .join(TicketType).filter_by(has_badge=True)
+        completes = users.join(ProductInstance.owner).filter_by(is_valid_ticket=True, state='badged-up')
     else:
-        completes = checkins.filter_by(checked_in=True)
+        completes = users.join(ProductInstance.owner).filter_by(is_valid_ticket=True, state='checked-in')
 
     completes = completes.group_by(User).with_entities(User.id, func.count(User.id))
     completes = dict(completes)
@@ -175,19 +174,12 @@ def checkin(user_id, source=None):
         abort(404)
 
     if badge:
+        # TODO check this works as expected with transferred tickets
         # Ticket must be checked in to receive a badge
-        tickets = user.tickets \
-                      .join(TicketCheckin).filter_by(checked_in=True) \
-                      .join(TicketType).filter_by(has_badge=True)
-        transferred_tickets = user.transfers_from.join(Ticket).with_entities(Ticket) \
-                      .join(TicketCheckin).filter_by(checked_in=True) \
-                      .join(TicketType).filter_by(has_badge=True)
+        tickets = [t for t in user.get_tickets if t.state == 'checked-in' and
+                                                  t.price_tier.allow_badge_up]
     else:
-        tickets = user.tickets.filter_by(paid=True) \
-                      .join(TicketType).filter(TicketType.admits.in_(['full', 'kid']))
-        transferred_tickets = user.transfers_from.join(Ticket) \
-                      .with_entities(Ticket).filter_by(paid=True) \
-                      .join(TicketType).filter(TicketType.admits.in_(['full', 'kid']))
+        tickets = user.products.filter_by(is_valid_ticket=True)
 
     if request.method == 'POST':
         failed = []
@@ -222,7 +214,7 @@ def checkin(user_id, source=None):
         return redirect(url_for('.main'))
 
     return render_template('arrivals/checkin.html', user=user,
-                           tickets=tickets, transferred_tickets=transferred_tickets,
+                           tickets=tickets, transferred_tickets=[], # FIXME
                            badge=badge, source=source)
 
 
@@ -230,7 +222,7 @@ def checkin(user_id, source=None):
 @arrivals_required
 def ticket_checkin(ticket_id):
     badge = bool(session.get('badge'))
-    ticket = Ticket.query.get_or_404(ticket_id)
+    ticket = ProductInstance.query.filter_by(is_valid_ticket=True).get_or_404(ticket_id)
 
     try:
         if badge:
@@ -248,7 +240,7 @@ def ticket_checkin(ticket_id):
 @arrivals_required
 def undo_ticket_checkin(ticket_id):
     badge = bool(session.get('badge'))
-    ticket = Ticket.query.get_or_404(ticket_id)
+    ticket = ProductInstance.query.filter_by(is_valid_ticket=True).get_or_404(ticket_id)
 
     try:
         if badge:

@@ -5,8 +5,9 @@ from flask_script import Command
 
 from main import db
 from models.cfp import TalkProposal
-from models.ticket import Ticket, TicketType, TicketLimitException
+# from models.ticket import Ticket, TicketType, TicketLimitException
 from models.user import User
+from models.product_group import ProductGroup, ProductInstance
 
 
 class CreateDB(Command):
@@ -67,23 +68,25 @@ class MakeFakeTickets(Command):
         for user in User.query.all():
             try:
                 # Choose a random number and type of tickets for this user
+
                 full_count = random.choice([1] * 3 + [2, 3])
-                full_type = TicketType.query.filter_by(fixed_id=random.choice([0, 1, 2, 3] * 30 + [9, 10] * 3 + [4])).one()
-                full_tickets = [Ticket(user.id, type=full_type) for _ in range(full_count)]
+                full_type = ProductGroup.get_by_name('full').get_cheapest()
+                full_tickets = ProductInstance.create_instances(user, full_type, 'GBP', full_count)
+
 
                 kids_count = random.choice([0] * 10 + [1, 2])
-                kids_type = TicketType.query.filter_by(fixed_id=random.choice([5, 11, 6])).one()
-                kids_tickets = [Ticket(user.id, type=kids_type) for _ in range(kids_count)]
+                kids_type = ProductGroup.get_by_name(random.choice('u5', 'u16')).get_cheapest()
+                kids_tickets = ProductInstance.create_instances(user, kids_type, 'GBP', kids_count)
 
                 vehicle_count = random.choice([0] * 2 + [1])
-                vehicle_type = TicketType.query.filter_by(fixed_id=random.choice([7] * 5 + [8])).one()
-                vehicle_tickets = [Ticket(user.id, type=vehicle_type) for _ in range(vehicle_count)]
+                vehicle_type = ProductGroup.get_by_name(random.choice('cat', 'campervan')).get_cheapest()
+                vehicle_tickets = ProductInstance.create_instances(user, vehicle_type, 'GBP', vehicle_count)
 
                 for t in full_tickets + kids_tickets + vehicle_tickets:
-                    t.paid = random.choice([True] * 4 + [False])
-                    t.refunded = random.choice([False] * 20 + [True])
+                    db.session.add(t)
+                    t.state = random.choice(['paid'] * 4 + ['expired'] + ['refunded'])
 
                 db.session.commit()
 
-            except TicketLimitException:
+            except:
                 db.session.rollback()

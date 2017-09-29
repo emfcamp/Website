@@ -18,7 +18,8 @@ from sqlalchemy.sql.functions import func
 
 from main import db, mail, stripe
 from models.payment import Payment, BankPayment, BankRefund, StripeRefund, StateException
-from models.ticket import Ticket
+from models.product_group import ProductInstance
+# from models.ticket import Ticket
 from ..common.forms import Form, HiddenIntegerField
 from ..payments.stripe import (
     StripeUpdateUnexpected, StripeUpdateConflict, stripe_update_payment,
@@ -29,10 +30,10 @@ from ..payments.stripe import (
 @admin.route('/payments')
 @admin_required
 def payments():
-    payments = Payment.query.join(Ticket).with_entities(
+    payments = Payment.query.join(ProductInstance).with_entities(
         Payment,
-        func.min(Ticket.expires).label('first_expires'),
-        func.count(Ticket.id).label('ticket_count'),
+        func.min(ProductInstance.expires).label('first_expires'),
+        func.count(ProductInstance.id).label('ticket_count'),
     ).group_by(Payment).order_by(Payment.id).all()
 
     return render_template('admin/payments.html', payments=payments)
@@ -41,13 +42,13 @@ def payments():
 @admin.route('/payments/expiring')
 @admin_required
 def expiring():
-    expiring = BankPayment.query.join(Ticket).filter(
+    expiring = BankPayment.query.join(ProductInstance).filter(
         BankPayment.state == 'inprogress',
-        Ticket.expires < datetime.utcnow() + timedelta(days=3),
+        ProductInstance.expires < datetime.utcnow() + timedelta(days=3),
     ).with_entities(
         BankPayment,
-        func.min(Ticket.expires).label('first_expires'),
-        func.count(Ticket.id).label('ticket_count'),
+        func.min(ProductInstance.expires).label('first_expires'),
+        func.count(ProductInstance.id).label('ticket_count'),
     ).group_by(BankPayment).order_by('first_expires').all()
 
     return render_template('admin/payments-expiring.html', expiring=expiring)
@@ -66,7 +67,7 @@ def reset_expiry(payment_id):
     if form.validate_on_submit():
         if form.reset.data:
             app.logger.info("%s manually extending expiry for payment %s", current_user.name, payment.id)
-            for t in payment.tickets:
+            for t in payment.purchases:
                 if payment.currency == 'GBP':
                     t.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS_TRANSFER'))
                 elif payment.currency == 'EUR':
@@ -241,11 +242,11 @@ def partial_refund(payment_id):
         form.stripe_refund.data = ''
 
     if request.method != 'POST':
-        for ticket in payment.tickets:
+        for ticket in payment.purchases:
             form.tickets.append_entry()
             form.tickets[-1].ticket_id.data = ticket.id
 
-    tickets_dict = {t.id: t for t in payment.tickets}
+    tickets_dict = {t.id: t for t in payment.purchases}
 
     for f in form.tickets:
         f._ticket = tickets_dict[f.ticket_id.data]
@@ -258,7 +259,7 @@ def partial_refund(payment_id):
     if form.validate_on_submit():
         if form.refund.data or form.stripe_refund.data:
             tickets = [f._ticket for f in form.tickets if f.refund.data and not f._disabled]
-            total = sum(t.type.get_price(payment.currency) for t in tickets)
+            total = sum(t.price_tier.get_price(payment.currency) for t in tickets)
 
             if not total:
                 flash('Please select some non-free tickets to refund')
@@ -298,8 +299,8 @@ def partial_refund(payment_id):
                     ticket.expires = now
                 ticket.refund = refund
 
-            priced_tickets = [t for t in payment.tickets if t.type.get_price(payment.currency)]
-            unpriced_tickets = [t for t in payment.tickets if not t.type.get_price(payment.currency)]
+            priced_tickets = [t for t in payment.purchases if t.price_tier.get_price(payment.currency)]
+            unpriced_tickets = [t for t in payment.purchases if not t.price_tier.get_price(payment.currency)]
 
             all_refunded = False
             if all(t.refund for t in priced_tickets):
@@ -348,6 +349,6 @@ def partial_refund(payment_id):
 
         return redirect(url_for('.payments'))
 
-    refunded_tickets = [t for t in payment.tickets if t.refund]
+    refunded_tickets = [t for t in payment.purchases if t.refund]
     return render_template('admin/partial-refund.html', payment=payment, form=form,
                            refunded_tickets=refunded_tickets)

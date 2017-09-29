@@ -24,8 +24,8 @@ from main import db, external_url
 from .common import require_permission, send_template_email
 from .majority_judgement import calculate_max_normalised_score
 
-from models.ticket import Ticket, TicketType
-from models.user import User
+# from models.ticket import Ticket, TicketType
+# from models.user import User
 from models.cfp import (
     Proposal, CFPMessage, CFPVote, CFP_STATES, Venue
 )
@@ -141,24 +141,25 @@ def proposals():
     if states:
         proposals = proposals.filter(Proposal.state.in_(states))
 
-    needs_ticket = request.args.get('needs_ticket', type=bool_qs)
-    if needs_ticket is not None:
-        paid_tickets = Ticket.query.join(TicketType).filter(
-            TicketType.admits == 'full',
-            or_(Ticket.paid == True,  # noqa
-                Ticket.expired == False),
-        )
+    # FIXME I'm not quite sure what this was supposed to be doing...
+    # needs_ticket = request.args.get('needs_ticket', type=bool_qs)
+    # if needs_ticket is not None:
+    #     paid_tickets = Ticket.query.join(TicketType).filter(
+    #         TicketType.admits == 'full',
+    #         or_(Ticket.paid == True,  # noqa
+    #             Ticket.expired == False),
+    #     )
 
-        if needs_ticket:
-            proposals = proposals.join(Proposal.user).filter(
-                User.will_have_ticket == False,  # noqa
-                ~paid_tickets.filter(User.tickets.expression).exists()
-            )
-        else:
-            proposals = proposals.join(Proposal.user).filter(or_(
-                User.will_have_ticket == True,  # noqa
-                paid_tickets.filter(User.tickets.expression).exists()
-            ))
+    #     if needs_ticket:
+    #         proposals = proposals.join(Proposal.user).filter(
+    #             User.will_have_ticket == False,  # noqa
+    #             ~paid_tickets.filter(User.tickets.expression).exists()
+    #         )
+    #     else:
+    #         proposals = proposals.join(Proposal.user).filter(or_(
+    #             User.will_have_ticket == True,  # noqa
+    #             paid_tickets.filter(User.tickets.expression).exists()
+    #         ))
 
     sort_dict = get_proposal_sort_dict(request.args)
     proposals = proposals.all()

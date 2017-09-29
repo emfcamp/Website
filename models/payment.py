@@ -26,7 +26,6 @@ class Payment(db.Model):
     reminder_sent = db.Column(db.Boolean, nullable=False, default=False)
     changes = db.relationship('PaymentChange', backref='payment',
                               order_by='PaymentChange.timestamp, PaymentChange.id')
-    tickets = db.relationship('Ticket', lazy='dynamic', backref='payment', cascade='all')
     refunds = db.relationship('Refund', lazy='dynamic', backref='payment', cascade='all')
     __mapper_args__ = {'polymorphic_on': provider}
 
@@ -379,7 +378,6 @@ class Refund(db.Model):
     provider = db.Column(db.String, nullable=False)
     amount_int = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    tickets = db.relationship('Ticket', lazy='dynamic', backref='refund', cascade='all')
     __mapper_args__ = {'polymorphic_on': provider}
 
     def __init__(self, payment, amount):

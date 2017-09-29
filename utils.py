@@ -20,7 +20,7 @@ from tasks.schedule import (
     RunScheduler, ApplyPotentialSchedule
 )
 from tasks.tickets import (
-    CreateTickets, CreateParkingTickets, SendTickets, SendTransferReminder
+    CreateTickets, SendTickets, SendTransferReminder
 )
 
 if __name__ == "__main__":
@@ -61,5 +61,4 @@ if __name__ == "__main__":
     manager.add_command('refreshcalendars', RefreshCalendars())
     manager.add_command('exportcalendars', ExportCalendars())
 
-    manager.add_command('createparkingtickets', CreateParkingTickets())
     manager.run()

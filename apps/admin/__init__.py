@@ -21,9 +21,10 @@ from models.payment import (
     Payment, BankPayment,
     BankTransaction,
 )
-from models.ticket import (
-    Ticket, TicketCheckin, TicketType
-)
+# from models.ticket import (
+#     Ticket, TicketCheckin, TicketType
+# )
+from models.product_group import ProductInstance, ProductGroup
 from models.cfp import Proposal
 from models.ical import CalendarSource
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
@@ -44,9 +45,9 @@ def admin_variables():
 
     unreconciled_count = BankTransaction.query.filter_by(payment_id=None, suppressed=False).count()
 
-    expiring_count = BankPayment.query.join(Ticket).filter(
+    expiring_count = BankPayment.query.join(ProductInstance).filter(
         BankPayment.state == 'inprogress',
-        Ticket.expires < datetime.utcnow() + timedelta(days=3),
+        ProductInstance.expires < datetime.utcnow() + timedelta(days=3),
     ).group_by(BankPayment.id).count()
 
     return {'unreconciled_count': unreconciled_count,
@@ -57,16 +58,16 @@ def admin_variables():
 @admin.route("/stats")
 def stats():
     # Don't care about the state of the payment if it's paid for
-    paid = Ticket.query.filter_by(paid=True)
+    paid = ProductInstance.query.filter(is_paid_for=True)
 
-    parking_paid = paid.join(TicketType).filter_by(admits='car')
-    campervan_paid = paid.join(TicketType).filter_by(admits='campervan')
+    parking_paid = ProductGroup.get_by_name('car').get_sold()
+    campervan_paid = ProductGroup.get_by_name('campervan').get_sold()
 
     # For new payments, the user hasn't committed to paying yet
     unpaid = Payment.query.filter(
         Payment.state != 'new',
         Payment.state != 'cancelled'
-    ).join(Ticket).filter_by(paid=False)
+    ).join(ProductInstance).filter_by(is_paid_for=False)
 
     expired = unpaid.filter_by(expired=True)
     unexpired = unpaid.filter_by(expired=False)
@@ -80,15 +81,14 @@ def stats():
     # TODO: remove this if it's not needed
     full_gocardless_unexpired = unexpired.filter(Payment.provider == 'gocardless',
                                                  Payment.state == 'inprogress'). \
-        join(TicketType).filter_by(admits='full')
+        join(ProductInstance).filter(is_ticket=True)
     full_banktransfer_unexpired = unexpired.filter(Payment.provider == 'banktransfer',
                                                    Payment.state == 'inprogress'). \
-        join(TicketType).filter_by(admits='full')
+        join(ProductInstance).filter(is_ticket=True)
 
     # These are people queries - don't care about cars or campervans being checked in
-    checked_in = Ticket.query.join(TicketType).filter(TicketType.admits.in_(['full', 'kid'])) \
-                             .join(TicketCheckin).filter_by(checked_in=True)
-    badged_up = TicketCheckin.query.filter_by(badged_up=True)
+    checked_in = ProductInstance.query.filter(ProductInstance.state.in_(['checked-in', 'badged-up']))
+    badged_up = ProductInstance.query.filter_by(state='badged-up')
 
     users = User.query  # noqa
 
@@ -108,11 +108,12 @@ def stats():
     admit_types = ['full', 'kid', 'campervan', 'car']
     admit_totals = dict.fromkeys(admit_types, 0)
 
+    # FIXME not sure how this was working but it should be cleaned up
     for query in 'paid', 'expired', 'unexpired':
         tickets = locals()[query].join(TicketType).with_entities(  # noqa
-            TicketType.admits,
+            # TicketType.admits,
             func.count(),
-        ).group_by(TicketType.admits).all()
+        )# .group_by(TicketType.admits).all()
         tickets = dict(tickets)
 
         for a in admit_types:

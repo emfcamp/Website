@@ -101,7 +101,8 @@ class User(db.Model, UserMixin):
     checkin_note = db.Column(db.String, nullable=True)
 
     diversity = db.relationship('UserDiversity', uselist=False, backref='user', cascade='all, delete, delete-orphan')
-    tickets = db.relationship('Ticket', lazy='dynamic', backref='user', cascade='all, delete, delete-orphan')
+    # tickets = db.relationship('Ticket', lazy='dynamic', backref='user', cascade='all, delete, delete-orphan')
+    tickets = []
     payments = db.relationship('Payment', lazy='dynamic', backref='user', cascade='all')
     permissions = db.relationship('Permission', backref='user', cascade='all', secondary=UserPermission)
     votes = db.relationship('CFPVote', backref='user', lazy='dynamic')
@@ -114,12 +115,6 @@ class User(db.Model, UserMixin):
                                            primaryjoin='Proposal.anonymiser_id == User.id',
                                            backref='anonymiser', lazy='dynamic',
                                            cascade='all, delete, delete-orphan')
-    transfers_to = db.relationship('TicketTransfer',
-                                   primaryjoin='TicketTransfer.to_user_id == User.id',
-                                   backref='to_user', lazy='dynamic')
-    transfers_from = db.relationship('TicketTransfer',
-                                   primaryjoin='TicketTransfer.from_user_id == User.id',
-                                   backref='from_user', lazy='dynamic')
 
     messages_from = db.relationship('CFPMessage',
                                    primaryjoin='CFPMessage.from_user_id == User.id',
@@ -135,8 +130,13 @@ class User(db.Model, UserMixin):
     def sso_code(self, key):
         return generate_sso_code(key, int(time.time()), self.id)
 
-    def get_admissions(self):
-        return [p for p in self.products if p.allow_admission()]
+    # FIXME this should probably not be done..
+    @property
+    def tickets(self):
+        return self.products
+
+    def get_tickets(self):
+        return [p for p in self.products if p.is_valid_ticket]
 
     @property
     def checkin_code(self):

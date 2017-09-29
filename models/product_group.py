@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from main import db
 
-from sqlalchemy import UniqueConstraint, and_, func
+from sqlalchemy import and_, func
 from sqlalchemy.orm import column_property
 
 # state: [allowed next state, ] pairs
@@ -23,6 +23,7 @@ PRODUCT_INSTANCE_STATES = { 'reserved': ['payment-pending', 'expired'],
 non_blocking_states = ('expired', 'refunded')
 # These are the states that a product has to be in for admission
 admission_states = ('receipt-emailed', 'checked-in', 'badged-up')
+bought_states = ('paid', ) + admission_states
 allowed_states = set(PRODUCT_INSTANCE_STATES.keys())
 
 # In hours
@@ -56,7 +57,9 @@ class ProductGroup(db.Model):
     type = db.Column(db.String, nullable=False)
 
     name = db.Column(db.String, unique=True, nullable=False)
+    display_name = db.Column(db.String)
     description = db.Column(db.String)
+    order = db.Column(db.Integer)
 
     expires = db.Column(db.DateTime)
     __expired = column_property(and_(~expires.is_(None), expires < func.now()))
@@ -66,11 +69,12 @@ class ProductGroup(db.Model):
     capacity_used = db.Column(db.Integer, default=0)
     discount_token = db.Column(db.String)
 
-    # Flags
-    allow_check_in = db.Column(db.Boolean, default=None)
-    allow_badge_up = db.Column(db.Boolean, default=None)
-    is_visible = db.Column(db.Boolean, default=None)
-    is_transferable = db.Column(db.Boolean, default=None)
+    # Flags: all work on a system of closest wins. On __init__ a child receives
+    # its parent's flags.
+    allow_check_in = db.Column(db.Boolean, default=False, nullable=False)
+    allow_badge_up = db.Column(db.Boolean, default=False, nullable=False)
+    is_visible = db.Column(db.Boolean, default=False, nullable=False)
+    is_transferable = db.Column(db.Boolean, default=False, nullable=False)
 
     parent = db.relationship("ProductGroup", remote_side=[id], backref="children", cascade="all")
 
@@ -81,6 +85,12 @@ class ProductGroup(db.Model):
         # a group with a parent that already has a token.
         if discount_token and parent and not parent.token_correct(discount_token):
             raise ProductGroupException('Parent and child tokens must be the same.')
+
+        if parent:
+            for flag in ['allow_check_in', 'allow_badge_up', 'is_visible', 'is_transferable']:
+                if (flag not in kwargs) or (kwargs[flag] is None):
+                    kwargs[flag] = getattr(parent, flag)
+
         super().__init__(name=name, parent=parent, discount_token=discount_token,
                          **kwargs)
 
@@ -96,7 +106,7 @@ class ProductGroup(db.Model):
         return res
 
     def get_sold(self):
-        return self.get_counts_by_state(['paid', 'checked-in'])
+        return self.get_counts_by_state(bought_states)
 
     def has_capacity(self, count=1):
         """
@@ -148,26 +158,6 @@ class ProductGroup(db.Model):
 
         return (not self.discount_token) or (self.discount_token == token)
 
-    def check_flag(self, flag):
-        """
-        Check whether this ProductGroup, or its ancestors, has a particular
-        flag set.
-
-        If a flag has a NULL value it is ignored.
-
-        The 'closest' flag takes priority.
-
-        If no ProductGroups in the tree have the flag then None is returned.
-        """
-        this_flag = getattr(self, flag)
-        if this_flag is not None:
-            return this_flag
-
-        if self.parent:
-            return self.parent.check_flag(flag)
-
-        return None
-
     def issue_instances(self, count=1, token=''):
         """
         If possible (i.e. the ProductGroup has not expired and has capacity)
@@ -195,10 +185,23 @@ class ProductGroup(db.Model):
         self.parent.return_instances(count)
         self.capacity_used -= count
 
+    def get_cheapest(self, currency='gbp', token='', res=[]):
+        for child in self.children:
+            if child.token_correct(token):
+                res = child.get_cheapest(currency, token, res)
+        res = [r for r in res if r is not None]
+        if not res:
+            return None
+        return min(res, key=lambda x: x['price'])['tier']
+
     # This is mostly used in testing...
     @classmethod
     def get_by_name(cls, name):
         return ProductGroup.query.filter_by(name=name).first()
+
+    @classmethod
+    def get_price_cheapest_full(cls):
+        return cls.get_by_name('full').get_cheapest()
 
     @classmethod
     def get_product_groups_for_token(cls, token):
@@ -209,6 +212,17 @@ class PriceTier(ProductGroup):
     __mapper_args__ = {'polymorphic_identity': 'price_tier'}
 
     personal_limit = db.Column(db.Integer, default=10, nullable=False)
+
+    def get_cheapest(self, currency, token='', res=[]):
+        price = self.get_price(currency)
+        res.append({'tier': self, 'price': price.value})
+        return res
+
+    def get_price(self, currency):
+        price = [p for p in self.prices if p.currency == currency.upper()]
+        if len(price) != 1:
+            raise ProductGroupException('Unknown currency %s' % currency)
+        return price[0]
 
     def get_counts_by_state(self, states_to_get=allowed_states, res={}):
         if res == {}:
@@ -240,25 +254,18 @@ class PriceTier(ProductGroup):
 
         return min(self.personal_limit - user_count, self.get_total_remaining_capacity())
 
-    def check_flag(self, flag):
-        res = super().check_flag(flag)
-        if res is None:
-            raise ProductGroupException('%s flag not set for %s' % (flag, self))
-        return res
-
 
 class Price(db.Model):
     __tablename__ = "product_price"
-    # Only allow 1 price per currency per price tier
-    __table_args__ = (
-        UniqueConstraint('price_tier_id', 'currency', name='_product_currency_uniq'),
-    )
 
     id = db.Column(db.Integer, primary_key=True)
     price_tier_id = db.Column(db.Integer, db.ForeignKey("product_group.id"), nullable=False)
     currency = db.Column(db.String, nullable=False)
     price_int = db.Column(db.Integer, nullable=False)
     price_tier = db.relationship(PriceTier, backref=db.backref("prices", cascade="all"))
+
+    def __init__(self, currency=None, **kwargs):
+        super().__init__(currency=currency.upper(), **kwargs)
 
     @property
     def value(self):
@@ -299,20 +306,27 @@ class ProductInstance(db.Model):
 
     # State tracking info
     state = db.Column(db.String, default='reserved', nullable=False)
-    # Until a ticket is paid for, we track the payment's expiry
+    # Until an instance is paid for, we track the payment's expiry
     expires = db.Column(db.DateTime, nullable=False)
+    # Because everything wants to know whether an item's a ticket or not
+    is_ticket = db.Column(db.Boolean, nullable=False)
+    is_valid_ticket = column_property(and_(is_ticket.is_(True), state.in_(admission_states)))
+    is_paid_for = column_property(state.in_(bought_states))
 
     # Relationships
     owner = db.relationship('User', backref='products', foreign_keys=[owner_id])
     purchaser = db.relationship('User', backref='purchases', foreign_keys=[purchaser_id])
     price = db.relationship(Price, backref='purchases')
     price_tier = db.relationship(PriceTier, backref='purchases')
-    payment = db.relationship('Payment', backref='purchase')
-    refund = db.relationship('Refund', backref='purchase')
+    payment = db.relationship('Payment', backref='purchases')
+    refund = db.relationship('Refund', backref='purchases')
 
-    def __init__(self, **kwargs):
+    def __init__(self, price_tier, price, purchaser, owner, **kwargs):
         expires = datetime.utcnow() + timedelta(hours=PRODUCT_INSTANCE_EXPIRY_TIME)
-        super().__init__(expires=expires, **kwargs)
+        is_ticket = price_tier.allow_check_in
+
+        super().__init__(price_tier=price_tier, price=price, purchaser=purchaser,
+                         owner=owner, expires=expires, is_ticket=is_ticket, **kwargs)
 
     def __repr__(self):
         if self.id is None:
@@ -320,7 +334,7 @@ class ProductInstance(db.Model):
         return "<ProductInstance %s %s: %s>" % (self.id, self.price_tier.name, self.state)
 
     def check_in(self):
-        if not self.price_tier.check_flag('allow_check_in'):
+        if not self.price_tier.allow_check_in:
             raise ProductGroupException("Check-in not allowed with %s" % self.price_tier)
 
         if self.state == 'checked-in':
@@ -333,7 +347,7 @@ class ProductInstance(db.Model):
         self.set_state('paid')
 
     def badge_up(self):
-        if not self.price_tier.check_flag('allow_check_in'):
+        if not self.price_tier.allow_badge_up:
             raise ProductGroupException("Badge-up not allowed with %s" % self.price_tier)
 
         if self.state == 'badge-up':
@@ -344,9 +358,6 @@ class ProductInstance(db.Model):
         if self.state != 'badge-up':
             raise CheckinStateException("Ticket is not badged up.")
         self.set_state('check-in')
-
-    def allow_admission(self):
-        return self.state in admission_states and self.price_tier.check_flag('allow_check_in')
 
     def set_state(self, new_state):
         new_state = new_state.lower()
@@ -360,7 +371,7 @@ class ProductInstance(db.Model):
         self.state = new_state
 
     def transfer(self, from_user, to_user, session):
-        if not self.price_tier.check_flag('is_transferable'):
+        if not self.price_tier.is_transferable:
             raise ProductTransferException('This item is not transferable.')
 
         if self.owner != from_user:
@@ -376,23 +387,16 @@ class ProductInstance(db.Model):
         session.commit()
 
     @classmethod
-    def create_instances(self, user, tier, currency, count=1, token=''):
-        try:
-            price = [p for p in tier.prices if p.currency == currency.lower()][0]
-        except IndexError:
-            msg = 'Could not find currency, %s, for %s' % (currency, tier)
-            raise ProductGroupException(msg)
+    def create_instances(cls, user, tier, currency, count=1, token=''):
+        price = tier.get_price(currency)
 
         if count > tier.user_limit(user, token):
             raise ProductGroupException('Insufficient user capacity.')
 
         tier.issue_instances(count, token)
 
-        return [ProductInstance(price_tier_id=tier.id,
-                                owner_id=user.id,
-                                purchaser_id=user.id,
-                                price_id=price.id,
-                ) for c in range(count)]
+        return [ProductInstance(tier, price, user, user) for c in range(count)]
+
 
 class ProductTransfer(db.Model):
     __tablename__ = 'product_transfer'
@@ -403,8 +407,8 @@ class ProductTransfer(db.Model):
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     product_instance = db.relationship(ProductInstance, backref=db.backref("transfers", cascade="all"))
-    to_user = db.relationship('User', backref="to_transfers", foreign_keys=[to_user_id])
-    from_user = db.relationship('User', backref="from_transfers", foreign_keys=[from_user_id])
+    to_user = db.relationship('User', backref="transfers_to", foreign_keys=[to_user_id])
+    from_user = db.relationship('User', backref="transfers_from", foreign_keys=[from_user_id])
 
     def __init__(self, product_instance, to_user, from_user):
         if to_user.id == from_user.id:
@@ -414,3 +418,4 @@ class ProductTransfer(db.Model):
     def __repr__(self):
         return "<Product Transfer: %s from %s to %s on %s>" % (
             self.ticket_id, self.from_user_id, self.to_user_id, self.timestamp)
+
