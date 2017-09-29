@@ -10,7 +10,7 @@ from .core import get_app
 from models.user import User
 from models.product_group import (
     PRODUCT_INSTANCE_STATES, ProductGroupException, ProductInstanceStateException,
-    ProductGroup, PriceTier, Price, ProductInstance
+    ProductTransferException, ProductGroup, PriceTier, Price, ProductInstance
 )
 
 class SingleProductGroupTest(unittest.TestCase):
@@ -104,7 +104,7 @@ class MultipleProductGroupTest(unittest.TestCase):
         with self.app.app_context(), self.db.session.no_autoflush:
 
             parent = ProductGroup(self.parent_name, capacity_max=3)
-            item1 = ProductGroup(self.group1_name, parent=parent)
+            item1 = PriceTier(self.group1_name, parent=parent)
             self.db.session.add(item1)
 
             item2 = ProductGroup(self.group2_name, parent=parent)
@@ -166,8 +166,10 @@ class MultipleProductGroupTest(unittest.TestCase):
             item = self.get_item(name=self.group1_name)
             parent = self.get_item(name=self.parent_name)
 
-            # None propagates
-            self.assertIsNone(item.check_flag('allow_check_in'))
+            # If a price tier gets None on a flag check it's an error as it's
+            # not set anywhere in the hierarchy
+            with self.assertRaises(ProductGroupException):
+                item.check_flag('allow_check_in')
             self.assertIsNone(parent.check_flag('allow_check_in'))
 
             # Gets closest value
@@ -177,16 +179,16 @@ class MultipleProductGroupTest(unittest.TestCase):
             self.assertTrue(item.check_flag('allow_check_in'))
             self.assertIsNone(parent.check_flag('allow_check_in'))
 
-            # Somewhat redundant but check False
+            # Check the item masks the parent value
             item.allow_check_in = False
+            parent.allow_check_in = True
             self.db.session.commit()
 
             self.assertFalse(item.check_flag('allow_check_in'))
-            self.assertIsNone(parent.check_flag('allow_check_in'))
+            self.assertTrue(parent.check_flag('allow_check_in'))
 
-            # Check it gets parent value correctly
+            # Check it gets the parent value correctly if None
             item.allow_check_in = None
-            parent.allow_check_in = True
             self.db.session.commit()
 
             self.assertTrue(item.check_flag('allow_check_in'))
@@ -375,7 +377,7 @@ class ProductInstanceTest(unittest.TestCase):
             # Test it works at the PriceTier level
             instance = self.get_instance(self.db.session)
 
-            instance.state = 'paid'
+            instance.state = 'receipt-emailed'
 
             with self.assertRaises(ProductGroupException):
                 instance.check_in()
@@ -386,3 +388,94 @@ class ProductInstanceTest(unittest.TestCase):
 
             instance.check_in()
             self.assertEqual('checked-in', instance.state)
+
+
+class ProductTransferTest(unittest.TestCase):
+    pg_name = 'pg'
+    user1_email = 'a@b.c'
+    user2_email = 'b@b.c'
+
+    def setUp(self):
+        self.client, self.app, self.db = get_app()
+        self.app.testing = True
+
+        with self.app.app_context():
+
+            user1 = User(self.user1_email, 'test_user1')
+            user2 = User(self.user2_email, 'test_user2')
+            self.db.session.add(user1)
+            self.db.session.add(user2)
+
+            tier = PriceTier(self.pg_name)
+            price = Price(price_tier=tier, currency="gbp", price_int=666)
+            # These have `cascade=all` so just add the bottom of the hierarchy
+            self.db.session.add(price)
+            self.db.session.commit()
+
+            # PriceTier needs to have been committed before this
+            instance = ProductInstance.create_instances(user1, tier, 'gbp')[0]
+            self.db.session.add(instance)
+
+            self.db.session.commit()
+
+    def tearDown(self):
+        with self.app.app_context():
+            for inst in User.get_by_email(self.user1_email).products:
+                self.db.session.delete(inst)
+
+            for inst in User.get_by_email(self.user1_email).purchases:
+                self.db.session.delete(inst)
+
+            for inst in User.get_by_email(self.user2_email).products:
+                self.db.session.delete(inst)
+
+            for inst in User.get_by_email(self.user2_email).purchases:
+                self.db.session.delete(inst)
+
+            self.db.session.delete(User.get_by_email(self.user1_email))
+            self.db.session.delete(User.get_by_email(self.user2_email))
+            self.db.session.delete(ProductGroup.get_by_name(self.pg_name))
+            self.db.session.commit()
+
+    def test_transfer(self):
+        with self.app.app_context():
+            user1 = User.get_by_email(self.user1_email)
+            user2 = User.get_by_email(self.user2_email)
+            item = user1.purchases[0]
+
+            item.price_tier.allow_check_in = True
+            item.price_tier.is_transferable = False
+
+            with self.assertRaises(ProductTransferException) as e:
+                item.transfer(user1, user2, self.db.session)
+                self.assertIn('not transferable', e.args[0])
+
+            with self.assertRaises(ProductTransferException) as e:
+                item.transfer(user2, user1, self.db.session)
+
+                self.assertIn('does not own this item', e.args[0])
+
+            self.db.session.commit()
+            item.price_tier.is_transferable = True
+
+            with self.assertRaises(ProductTransferException) as e:
+                item.transfer(user1, user1, self.db.session)
+
+                self.assertIn('users must be different', e.args[0])
+
+            item.transfer(user1, user2, self.db.session)
+            self.db.session.commit()
+
+            self.assertEqual(item.owner_id, user2.id)
+            self.assertEqual(item.purchaser_id, user1.id)
+
+            item.state = 'checked-in'
+            self.db.session.commit()
+
+            self.assertEqual(item, user2.get_admissions()[0])
+            self.assertNotIn(item, user1.get_admissions())
+
+            xfer = item.transfers[0]
+
+            self.assertEqual(xfer.to_user.id, user2.id)
+            self.assertEqual(xfer.from_user.id, user1.id)

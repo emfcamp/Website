@@ -135,6 +135,9 @@ class User(db.Model, UserMixin):
     def sso_code(self, key):
         return generate_sso_code(key, int(time.time()), self.id)
 
+    def get_admissions(self):
+        return [p for p in self.products if p.allow_admission()]
+
     @property
     def checkin_code(self):
         return generate_checkin_code(app.config.get('SECRET_KEY'), self.id)

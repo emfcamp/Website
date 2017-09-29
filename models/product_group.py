@@ -12,14 +12,17 @@ from sqlalchemy.orm import column_property
 PRODUCT_INSTANCE_STATES = { 'reserved': ['payment-pending', 'expired'],
                             'payment-pending': ['expired', 'paid'],
                             'expired': [],
-                            'paid': ['checked-in', 'refunded'],
+                            'paid': ['receipt-emailed', 'refunded'],
+                            'receipt-emailed': ['checked-in', 'paid', 'refunded'],
                             'refunded': [],
                             # allow undoing of check-in
-                            'checked-in': ['paid', 'badged-up'],
+                            'checked-in': ['receipt-emailed', 'badged-up'],
                             'badged-up': ['checked-in'],
                             }
 # non_blocking_states are those states that don't contribute towards a user limit
 non_blocking_states = ('expired', 'refunded')
+# These are the states that a product has to be in for admission
+admission_states = ('receipt-emailed', 'checked-in', 'badged-up')
 allowed_states = set(PRODUCT_INSTANCE_STATES.keys())
 
 # In hours
@@ -29,12 +32,13 @@ PRODUCT_INSTANCE_EXPIRY_TIME = 2
 class ProductInstanceStateException(Exception):
     pass
 
-
 class ProductGroupException(Exception):
     pass
 
-
 class CheckinStateException(Exception):
+    pass
+
+class ProductTransferException(Exception):
     pass
 
 
@@ -66,7 +70,7 @@ class ProductGroup(db.Model):
     allow_check_in = db.Column(db.Boolean, default=None)
     allow_badge_up = db.Column(db.Boolean, default=None)
     is_visible = db.Column(db.Boolean, default=None)
-    is_transferable = db.Column(db.Boolean, default=True)
+    is_transferable = db.Column(db.Boolean, default=None)
 
     parent = db.relationship("ProductGroup", remote_side=[id], backref="children", cascade="all")
 
@@ -236,6 +240,12 @@ class PriceTier(ProductGroup):
 
         return min(self.personal_limit - user_count, self.get_total_remaining_capacity())
 
+    def check_flag(self, flag):
+        res = super().check_flag(flag)
+        if res is None:
+            raise ProductGroupException('%s flag not set for %s' % (flag, self))
+        return res
+
 
 class Price(db.Model):
     __tablename__ = "product_price"
@@ -335,6 +345,9 @@ class ProductInstance(db.Model):
             raise CheckinStateException("Ticket is not badged up.")
         self.set_state('check-in')
 
+    def allow_admission(self):
+        return self.state in admission_states and self.price_tier.check_flag('allow_check_in')
+
     def set_state(self, new_state):
         new_state = new_state.lower()
 
@@ -346,9 +359,21 @@ class ProductInstance(db.Model):
 
         self.state = new_state
 
-    def transfer(self, from_user, to_user):
+    def transfer(self, from_user, to_user, session):
         if not self.price_tier.check_flag('is_transferable'):
-            raise ProductGroupException('This item is not transferable.')
+            raise ProductTransferException('This item is not transferable.')
+
+        if self.owner != from_user:
+            raise ProductTransferException('%s does not own this item' % from_user)
+
+        # The ticket will need to be re-issued via email
+        if self.state == 'receipt-emailed':
+            self.set_state('paid')
+
+        self.owner = to_user
+
+        session.add(ProductTransfer(product_instance=self, to_user=to_user, from_user=from_user))
+        session.commit()
 
     @classmethod
     def create_instances(self, user, tier, currency, count=1, token=''):
@@ -368,3 +393,24 @@ class ProductInstance(db.Model):
                                 purchaser_id=user.id,
                                 price_id=price.id,
                 ) for c in range(count)]
+
+class ProductTransfer(db.Model):
+    __tablename__ = 'product_transfer'
+    id = db.Column(db.Integer, primary_key=True)
+    product_instance_id = db.Column(db.Integer, db.ForeignKey('product_instance.id'), nullable=False)
+    to_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    from_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    product_instance = db.relationship(ProductInstance, backref=db.backref("transfers", cascade="all"))
+    to_user = db.relationship('User', backref="to_transfers", foreign_keys=[to_user_id])
+    from_user = db.relationship('User', backref="from_transfers", foreign_keys=[from_user_id])
+
+    def __init__(self, product_instance, to_user, from_user):
+        if to_user.id == from_user.id:
+            raise ProductTransferException('"From" and "To" users must be different.')
+        super().__init__(product_instance=product_instance, to_user=to_user, from_user=from_user)
+
+    def __repr__(self):
+        return "<Product Transfer: %s from %s to %s on %s>" % (
+            self.ticket_id, self.from_user_id, self.to_user_id, self.timestamp)
