@@ -1,4 +1,5 @@
 # coding=utf-8
+import sys
 import unittest
 
 from decimal import Decimal
@@ -80,12 +81,12 @@ class SingleProductGroupTest(unittest.TestCase):
     def test_capacity_remaining(self):
         with self.app.app_context():
             item = self.get_item()
-            self.assertEqual(item.capacity_max, item.capacity_remaining)
+            self.assertEqual(item.capacity_max, item.get_total_remaining_capacity())
 
             item.capacity_used = item.capacity_max
 
             self.db.session.commit()
-            self.assertEqual(0, item.capacity_remaining)
+            self.assertEqual(0, item.get_total_remaining_capacity())
 
 
 class MultipleProductGroupTest(unittest.TestCase):
@@ -119,17 +120,29 @@ class MultipleProductGroupTest(unittest.TestCase):
             self.db.session.commit()
 
     # We want to mostly check that capacities are inherited & shared
-    def test_has_capacity_cascades(self):
+    def test_has_capacity_propogates(self):
         with self.app.app_context():
             item1 = self.get_item(name=self.group1_name)
+            item2 = self.get_item(name=self.group2_name)
+            parent = self.get_item(name=self.parent_name)
+
+            self.assertEqual(3, item1.get_total_remaining_capacity())
+            self.assertEqual(3, item2.get_total_remaining_capacity())
+            self.assertEqual(3, parent.get_total_remaining_capacity())
+
             item1.issue_instances(3)
             self.db.session.commit()
 
-            parent = self.get_item(name=self.parent_name)
-            item2 = self.get_item(name=self.group2_name)
-            self.assertFalse(parent.has_capacity())
-            self.assertFalse(item1.has_capacity())
-            self.assertFalse(item2.has_capacity())
+            # All the capacity went from item1
+            self.assertEqual(0, item1.get_total_remaining_capacity())
+
+            # Change due to item1 will have propagated to the parent
+            self.assertEqual(0, parent.remaining_capacity())
+            self.assertEqual(0, parent.remaining_capacity())
+
+            # item2 still has capacity but is limited by its parent
+            self.assertEqual(sys.maxsize, item2.remaining_capacity())
+            self.assertEqual(0, item2.get_total_remaining_capacity())
 
     def test_token(self):
         with self.app.app_context():
@@ -185,6 +198,12 @@ class ProductInstanceTest(unittest.TestCase):
 
     def tearDown(self):
         with self.app.app_context():
+            for inst in User.get_by_email(self.user_email).products:
+                self.db.session.delete(inst)
+
+            for inst in User.get_by_email(self.user_email).purchases:
+                self.db.session.delete(inst)
+
             self.db.session.delete(User.get_by_email(self.user_email))
             self.db.session.delete(ProductGroup.get_by_name(self.pg_name))
             self.db.session.commit()
@@ -304,3 +323,18 @@ class ProductInstanceTest(unittest.TestCase):
 
             parent = ProductGroup.get_by_name(self.pg_name)
             self.assertEqual({'paid': 1, 'checked-in': 0}, parent.get_sold())
+
+    def test_user_limit(self):
+        with self.app.app_context():
+            user = User.get_by_email(self.user_email)
+            tier = PriceTier.get_by_name(self.tier_name)
+            tier.personal_limit = 1
+
+            self.db.session.commit()
+
+            self.assertEqual(1, tier.user_limit(user))
+
+            self.get_instance(self.db.session)
+
+            self.assertEqual(0, tier.user_limit(user))
+            self.assertTrue(tier.has_capacity())

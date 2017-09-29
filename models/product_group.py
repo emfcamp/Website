@@ -1,4 +1,5 @@
 # coding=utf-8
+import sys
 from decimal import Decimal
 from datetime import datetime, timedelta
 
@@ -16,7 +17,9 @@ PRODUCT_INSTANCE_STATES = { 'reserved': ['payment-pending', 'expired'],
                             # allow undoing of check-in
                             'checked-in': ['paid'],
                             }
-allowed_states = list(PRODUCT_INSTANCE_STATES.keys())
+# non_blocking_states are those states that don't contribute towards a user limit
+non_blocking_states = ('expired', 'refunded')
+allowed_states = set(PRODUCT_INSTANCE_STATES.keys())
 
 # In hours
 PRODUCT_INSTANCE_EXPIRY_TIME = 2
@@ -47,10 +50,9 @@ class ProductGroup(db.Model):
 
     expires = db.Column(db.DateTime)
     __expired = column_property(and_(~expires.is_(None), expires < func.now()))
-    # A max capacity of -1 implies no max (use parent"s if set)
-    capacity_max = db.Column(db.Integer, default=-1)
+    # A max capacity of None implies no max (or use parent's if set)
+    capacity_max = db.Column(db.Integer, default=None)
     capacity_used = db.Column(db.Integer, default=0)
-    capacity_remaining = column_property(capacity_max - capacity_used)
     discount_token = db.Column(db.String)
 
     parent = db.relationship("ProductGroup", remote_side=[id], backref="children", cascade="all")
@@ -90,12 +92,28 @@ class ProductGroup(db.Model):
         if count < 1:
             raise ValueError("Count cannot be less than 1.")
 
-        if self.parent and not self.parent.has_capacity():
-            return False
+        return count <= self.get_total_remaining_capacity()
 
-        if self.capacity_max >= 0:
-            return (self.capacity_used + count) <= self.capacity_max
-        return True
+    def remaining_capacity(self):
+        """
+        Return remaining capacity or sys.maxsize (a very big integer) if
+        capacity_max is not set (i.e. None).
+        """
+        if self.capacity_max is None:
+            return sys.maxsize
+        return self.capacity_max - self.capacity_used
+
+    def get_total_remaining_capacity(self):
+        """
+        Get the capacity remaining to this ProductGroup, and all its ancestors.
+
+        Returns sys.maxsize if no ProductGroups have a capacity_max set.
+        """
+        remaining = [self.remaining_capacity()]
+        if self.parent:
+            remaining.append(self.parent.get_total_remaining_capacity())
+
+        return min(remaining)
 
     def has_expired(self):
         """
@@ -153,6 +171,8 @@ class ProductGroup(db.Model):
 class PriceTier(ProductGroup):
     __mapper_args__ = {'polymorphic_identity': 'price_tier'}
 
+    personal_limit = db.Column(db.Integer, default=10, nullable=False)
+
     def get_counts_by_state(self, states_to_get=allowed_states, res={}):
         if res == {}:
             res = {s: 0 for s in states_to_get}
@@ -163,6 +183,25 @@ class PriceTier(ProductGroup):
                 res[state] += 1
 
         return res
+
+    def user_limit(self, user, token=''):
+        if self.has_expired():
+            return 0
+
+        if not self.token_correct(token):
+            return 0
+
+        if user.is_authenticated:
+            # How many have been sold to this user
+            user_count = ProductInstance.query.filter(
+                ProductInstance.price_tier == self,
+                ProductInstance.purchaser == user,
+                ~ProductInstance.state.in_(non_blocking_states)
+            ).count()
+        else:
+            user_count = 0
+
+        return min(self.personal_limit - user_count, self.get_total_remaining_capacity())
 
 
 class Price(db.Model):
@@ -192,7 +231,8 @@ class ProductInstance(db.Model):
     __tablename__ = "product_instance"
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    purchaser_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     price_tier_id = db.Column(db.Integer, db.ForeignKey('product_group.id'), nullable=False)
     price_id = db.Column(db.Integer, db.ForeignKey('product_price.id'))
 
@@ -210,6 +250,8 @@ class ProductInstance(db.Model):
     refund_id = db.Column(db.Integer, db.ForeignKey('refund.id'))
 
     # Relationships
+    owner = db.relationship('User', backref='products', foreign_keys=[owner_id])
+    purchaser = db.relationship('User', backref='purchases', foreign_keys=[purchaser_id])
     price = db.relationship(Price, backref='purchases')
     price_tier = db.relationship(PriceTier, backref='purchases')
     payment = db.relationship('Payment', backref='purchase')
@@ -238,9 +280,13 @@ class ProductInstance(db.Model):
             msg = 'Could not find currency, %s, for %s' % (currency, tier)
             raise ProductGroupException(msg)
 
+        if count > tier.user_limit(user, token):
+            raise ProductGroupException('Insufficient user capacity.')
+
         tier.issue_instances(count, token)
 
         return [ProductInstance(price_tier_id=tier.id,
-                                user_id=user.id,
+                                owner_id=user.id,
+                                purchaser_id=user.id,
                                 price_id=price.id,
                 ) for c in range(count)]
