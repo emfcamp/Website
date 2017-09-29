@@ -161,6 +161,37 @@ class MultipleProductGroupTest(unittest.TestCase):
             with self.assertRaises(ProductGroupException):
                 ProductGroup('Bad group', parent=parent, discount_token='double-up')
 
+    def test_check_flag(self):
+        with self.app.app_context():
+            item = self.get_item(name=self.group1_name)
+            parent = self.get_item(name=self.parent_name)
+
+            # None propagates
+            self.assertIsNone(item.check_flag('allow_check_in'))
+            self.assertIsNone(parent.check_flag('allow_check_in'))
+
+            # Gets closest value
+            item.allow_check_in = True
+            self.db.session.commit()
+
+            self.assertTrue(item.check_flag('allow_check_in'))
+            self.assertIsNone(parent.check_flag('allow_check_in'))
+
+            # Somewhat redundant but check False
+            item.allow_check_in = False
+            self.db.session.commit()
+
+            self.assertFalse(item.check_flag('allow_check_in'))
+            self.assertIsNone(parent.check_flag('allow_check_in'))
+
+            # Check it gets parent value correctly
+            item.allow_check_in = None
+            parent.allow_check_in = True
+            self.db.session.commit()
+
+            self.assertTrue(item.check_flag('allow_check_in'))
+            self.assertTrue(parent.check_flag('allow_check_in'))
+
 
 class ProductInstanceTest(unittest.TestCase):
     pg_name = 'pg'
@@ -338,3 +369,20 @@ class ProductInstanceTest(unittest.TestCase):
 
             self.assertEqual(0, tier.user_limit(user))
             self.assertTrue(tier.has_capacity())
+
+    def test_check_in(self):
+        with self.app.app_context():
+            # Test it works at the PriceTier level
+            instance = self.get_instance(self.db.session)
+
+            instance.state = 'paid'
+
+            with self.assertRaises(ProductGroupException):
+                instance.check_in()
+
+            tier = PriceTier.get_by_name(self.tier_name)
+            tier.allow_check_in = True
+            self.db.session.commit()
+
+            instance.check_in()
+            self.assertEqual('checked-in', instance.state)

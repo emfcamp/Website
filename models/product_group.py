@@ -15,7 +15,8 @@ PRODUCT_INSTANCE_STATES = { 'reserved': ['payment-pending', 'expired'],
                             'paid': ['checked-in', 'refunded'],
                             'refunded': [],
                             # allow undoing of check-in
-                            'checked-in': ['paid'],
+                            'checked-in': ['paid', 'badged-up'],
+                            'badged-up': ['checked-in'],
                             }
 # non_blocking_states are those states that don't contribute towards a user limit
 non_blocking_states = ('expired', 'refunded')
@@ -31,6 +32,11 @@ class ProductInstanceStateException(Exception):
 
 class ProductGroupException(Exception):
     pass
+
+
+class CheckinStateException(Exception):
+    pass
+
 
 class ProductGroup(db.Model):
     __tablename__ = "product_group"
@@ -50,10 +56,17 @@ class ProductGroup(db.Model):
 
     expires = db.Column(db.DateTime)
     __expired = column_property(and_(~expires.is_(None), expires < func.now()))
+
     # A max capacity of None implies no max (or use parent's if set)
     capacity_max = db.Column(db.Integer, default=None)
     capacity_used = db.Column(db.Integer, default=0)
     discount_token = db.Column(db.String)
+
+    # Flags
+    allow_check_in = db.Column(db.Boolean, default=None)
+    allow_badge_up = db.Column(db.Boolean, default=None)
+    is_visible = db.Column(db.Boolean, default=None)
+    is_transferable = db.Column(db.Boolean, default=True)
 
     parent = db.relationship("ProductGroup", remote_side=[id], backref="children", cascade="all")
 
@@ -130,6 +143,26 @@ class ProductGroup(db.Model):
             return False
 
         return (not self.discount_token) or (self.discount_token == token)
+
+    def check_flag(self, flag):
+        """
+        Check whether this ProductGroup, or its ancestors, has a particular
+        flag set.
+
+        If a flag has a NULL value it is ignored.
+
+        The 'closest' flag takes priority.
+
+        If no ProductGroups in the tree have the flag then None is returned.
+        """
+        this_flag = getattr(self, flag)
+        if this_flag is not None:
+            return this_flag
+
+        if self.parent:
+            return self.parent.check_flag(flag)
+
+        return None
 
     def issue_instances(self, count=1, token=''):
         """
@@ -231,10 +264,24 @@ class ProductInstance(db.Model):
     __tablename__ = "product_instance"
 
     id = db.Column(db.Integer, primary_key=True)
+
+    # User FKs
+    # Store the owner & purchaser so that we can calculate user_limits against
+    # the former. We don't want to make it possible to buy over the
+    # personal_limit of a product by transferring away purchases.
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     purchaser_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    # Product FKs.
+    # We don't technically need to store the price tier as we can get it from
+    # the price but most of the time we want the tier rather than the price and
+    # this means we can easily swap currency without changing the tier.
     price_tier_id = db.Column(db.Integer, db.ForeignKey('product_group.id'), nullable=False)
     price_id = db.Column(db.Integer, db.ForeignKey('product_price.id'))
+
+    # Financial FKs
+    payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
+    refund_id = db.Column(db.Integer, db.ForeignKey('refund.id'))
 
     # History
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
@@ -244,10 +291,6 @@ class ProductInstance(db.Model):
     state = db.Column(db.String, default='reserved', nullable=False)
     # Until a ticket is paid for, we track the payment's expiry
     expires = db.Column(db.DateTime, nullable=False)
-
-    # Financial tracking
-    payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
-    refund_id = db.Column(db.Integer, db.ForeignKey('refund.id'))
 
     # Relationships
     owner = db.relationship('User', backref='products', foreign_keys=[owner_id])
@@ -261,6 +304,37 @@ class ProductInstance(db.Model):
         expires = datetime.utcnow() + timedelta(hours=PRODUCT_INSTANCE_EXPIRY_TIME)
         super().__init__(expires=expires, **kwargs)
 
+    def __repr__(self):
+        if self.id is None:
+            return "<ProductInstance -- %s: %s>" % (self.price_tier.name, self.state)
+        return "<ProductInstance %s %s: %s>" % (self.id, self.price_tier.name, self.state)
+
+    def check_in(self):
+        if not self.price_tier.check_flag('allow_check_in'):
+            raise ProductGroupException("Check-in not allowed with %s" % self.price_tier)
+
+        if self.state == 'checked-in':
+            raise CheckinStateException("Ticket is already checked in.")
+        self.set_state('checked-in')
+
+    def undo_check_in(self):
+        if self.state != 'checked-in':
+            raise CheckinStateException("Ticket is not checked in.")
+        self.set_state('paid')
+
+    def badge_up(self):
+        if not self.price_tier.check_flag('allow_check_in'):
+            raise ProductGroupException("Badge-up not allowed with %s" % self.price_tier)
+
+        if self.state == 'badge-up':
+            raise CheckinStateException("Ticket is already badged up.")
+        self.set_state('badge-up')
+
+    def undo_badge_up(self):
+        if self.state != 'badge-up':
+            raise CheckinStateException("Ticket is not badged up.")
+        self.set_state('check-in')
+
     def set_state(self, new_state):
         new_state = new_state.lower()
 
@@ -271,6 +345,10 @@ class ProductInstance(db.Model):
             raise ProductInstanceStateException('"%s->%s" is not a valid transition' % (self.state, new_state))
 
         self.state = new_state
+
+    def transfer(self, from_user, to_user):
+        if not self.price_tier.check_flag('is_transferable'):
+            raise ProductGroupException('This item is not transferable.')
 
     @classmethod
     def create_instances(self, user, tier, currency, count=1, token=''):
