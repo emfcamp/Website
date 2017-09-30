@@ -6,6 +6,10 @@ ifeq ("$(SETTINGS)", "")
 	endif
 endif
 
+ifeq ("$(TEST_SETTINGS)", "")
+	TEST_SETTINGS=./config/test.cfg
+endif
+
 ifeq ("$(VIRTUAL_ENV)", "")
   ENV=. env/bin/activate;
 endif
@@ -129,6 +133,6 @@ parkingtickets:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createparkingtickets
 
 test:
-	$(ENV) SETTINGS_FILE=./config/test.cfg flake8 ./*.py ./models ./apps ./tasks ./utils.py
-	$(ENV) SETTINGS_FILE=./config/test.cfg nosetests ./utils.py ./tests/ ./models/
+	$(ENV) SETTINGS_FILE=$(TEST_SETTINGS) flake8 ./*.py ./models ./apps ./tasks ./utils.py
+	$(ENV) SETTINGS_FILE=$(TEST_SETTINGS) nosetests ./utils.py ./tests/ ./models/
 
