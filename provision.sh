@@ -15,8 +15,8 @@ EOF
 
 pg_ctlcluster 9.6 main reload
 su postgres -c 'createuser -s vagrant'
-su postgres -c 'createdb -O vagrant emf-site'
-su postgres -c 'createdb -O vagrant emf-site-test'
+su postgres -c 'createdb -O vagrant emf_site'
+su postgres -c 'createdb -O vagrant emf_site_test'
 
 touch .inside-vagrant
 make clean

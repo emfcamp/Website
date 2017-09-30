@@ -15,6 +15,6 @@ env:
 install:
   - make update
 before_script:
-  - psql -c 'create database emf-site-test;' -U postgres
+  - psql -c 'create database emf_site_test;' -U postgres
 script:
   - make test
