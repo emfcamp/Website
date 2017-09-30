@@ -9,7 +9,7 @@ from flask import (
 from sqlalchemy import func
 
 from main import db
-from models.product_group import ProductInstance, CheckinStateException
+from models.purchase import Purchase, CheckinStateException
 from models.user import User, checkin_code_re
 from .common import require_permission, json_response
 
@@ -134,14 +134,14 @@ def search(query=None):
     users_ordered = users_from_query(query)
     users = User.query.filter(User.id.in_([u.id for u in users_ordered]))
 
-    tickets = users.join(ProductInstance.owner).filter_by(is_valid_ticket=True) \
+    tickets = users.join(Purchase.owner).filter_by(is_valid_ticket=True) \
                    .group_by(User).with_entities(User.id, func.count(User.id))
     tickets = dict(tickets)
 
     if badge:
-        completes = users.join(ProductInstance.owner).filter_by(is_valid_ticket=True, state='badged-up')
+        completes = users.join(Purchase.owner).filter_by(is_valid_ticket=True, state='badged-up')
     else:
-        completes = users.join(ProductInstance.owner).filter_by(is_valid_ticket=True, state='checked-in')
+        completes = users.join(Purchase.owner).filter_by(is_valid_ticket=True, state='checked-in')
 
     completes = completes.group_by(User).with_entities(User.id, func.count(User.id))
     completes = dict(completes)
@@ -222,7 +222,7 @@ def checkin(user_id, source=None):
 @arrivals_required
 def ticket_checkin(ticket_id):
     badge = bool(session.get('badge'))
-    ticket = ProductInstance.query.filter_by(is_valid_ticket=True).get_or_404(ticket_id)
+    ticket = Purchase.query.filter_by(is_valid_ticket=True).get_or_404(ticket_id)
 
     try:
         if badge:
@@ -240,7 +240,7 @@ def ticket_checkin(ticket_id):
 @arrivals_required
 def undo_ticket_checkin(ticket_id):
     badge = bool(session.get('badge'))
-    ticket = ProductInstance.query.filter_by(is_valid_ticket=True).get_or_404(ticket_id)
+    ticket = Purchase.query.filter_by(is_valid_ticket=True).get_or_404(ticket_id)
 
     try:
         if badge:

@@ -16,7 +16,7 @@ from sqlalchemy.exc import IntegrityError
 
 from main import db, mail
 from models.user import User, UserDiversity
-from models.product_group import ProductGroup
+from models.product import ProductGroup
 from models.cfp import (
     TalkProposal, WorkshopProposal, InstallationProposal, Proposal, CFPMessage, Venue
 )

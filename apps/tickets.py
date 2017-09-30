@@ -21,7 +21,8 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from main import db, mail
 from models.user import User, checkin_code_re
-from models.product_group import ProductGroup, bought_states
+from models.product import ProductGroup
+from models import bought_states
 # from models.ticket import TicketLimitException, TicketType
 from models.payment import BankPayment, StripePayment, GoCardlessPayment
 from models.site_state import get_sales_state

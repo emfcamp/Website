@@ -12,7 +12,11 @@ from lxml import etree
 from flask import Markup, render_template, request, current_app as app
 from sqlalchemy import func
 
-from models.product_group import ProductInstance, ProductGroup, PriceTier, ProductTransfer
+from models.product import ProductGroup, PriceTier
+from models.purchase import PurchaseTransfer
+from models import Purchase
+
+
 # from models.ticket import Ticket, TicketType, TicketTransfer
 
 
@@ -23,7 +27,7 @@ def render_receipt(user, png=False, pdf=False):
                   .order_by(PriceTier.order))
 
     entrance_tts_counts = (tickets.filter_by(is_ticket=True)
-        .with_entities(ProductGroup, func.count(ProductInstance.id).label('ticket_count'))
+        .with_entities(ProductGroup, func.count(Purchase.id).label('ticket_count'))
         .group_by(ProductGroup).all())
     entrance_tickets_count = sum(c for tt, c in entrance_tts_counts)
 
@@ -31,8 +35,8 @@ def render_receipt(user, png=False, pdf=False):
     # vehicle_tickets = tickets.filter(TicketType.admits.in_(['car', 'campervan'])).all()
     vehicle_tickets = ['FIXME']
 
-    transferred_tickets = user.transfers_from.join(ProductInstance).filter_by(is_paid_for=True) \
-                              .with_entities(ProductTransfer).order_by('timestamp').all()
+    transferred_tickets = user.transfers_from.join(Purchase).filter_by(is_paid_for=True) \
+                              .with_entities(PurchaseTransfer).order_by('timestamp').all()
 
     # FIXME
     # tees = (tickets.filter(TicketType.fixed_id.in_(range(14, 24)))

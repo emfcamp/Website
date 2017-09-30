@@ -10,7 +10,7 @@ from flask_script import Command
 
 from main import db # mail,
 # from apps.common.receipt import attach_tickets
-from models.product_group import ProductGroup, PriceTier, Price
+from models.product import ProductGroup, PriceTier, Price
 # from models.ticket import Ticket, TicketPrice, TicketType
 # from models.user import User
 

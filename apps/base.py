@@ -11,7 +11,7 @@ from flask import (
 )
 
 from .common import feature_flag, feature_enabled, site_flag
-from models.product_group import ProductGroup
+from models.product import ProductGroup
 from models.payment import StripePayment
 from models.site_state import get_site_state
 

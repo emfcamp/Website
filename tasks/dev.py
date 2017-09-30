@@ -7,7 +7,8 @@ from main import db
 from models.cfp import TalkProposal
 # from models.ticket import Ticket, TicketType, TicketLimitException
 from models.user import User
-from models.product_group import ProductGroup, ProductInstance
+from models.product import ProductGroup
+from models.purchase import Purchase
 
 
 class CreateDB(Command):
@@ -71,16 +72,16 @@ class MakeFakeTickets(Command):
 
                 full_count = random.choice([1] * 3 + [2, 3])
                 full_type = ProductGroup.get_by_name('full').get_cheapest()
-                full_tickets = ProductInstance.create_instances(user, full_type, 'GBP', full_count)
+                full_tickets = Purchase.create_instances(user, full_type, 'GBP', full_count)
 
 
                 kids_count = random.choice([0] * 10 + [1, 2])
                 kids_type = ProductGroup.get_by_name(random.choice('u5', 'u16')).get_cheapest()
-                kids_tickets = ProductInstance.create_instances(user, kids_type, 'GBP', kids_count)
+                kids_tickets = Purchase.create_instances(user, kids_type, 'GBP', kids_count)
 
                 vehicle_count = random.choice([0] * 2 + [1])
                 vehicle_type = ProductGroup.get_by_name(random.choice('cat', 'campervan')).get_cheapest()
-                vehicle_tickets = ProductInstance.create_instances(user, vehicle_type, 'GBP', vehicle_count)
+                vehicle_tickets = Purchase.create_instances(user, vehicle_type, 'GBP', vehicle_count)
 
                 for t in full_tickets + kids_tickets + vehicle_tickets:
                     db.session.add(t)

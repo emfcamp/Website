@@ -24,7 +24,8 @@ from models.payment import (
 # from models.ticket import (
 #     Ticket, TicketCheckin, TicketType
 # )
-from models.product_group import ProductInstance, ProductGroup
+from models.product import ProductGroup
+from models.purchase import Purchase
 from models.cfp import Proposal
 from models.ical import CalendarSource
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
@@ -45,9 +46,9 @@ def admin_variables():
 
     unreconciled_count = BankTransaction.query.filter_by(payment_id=None, suppressed=False).count()
 
-    expiring_count = BankPayment.query.join(ProductInstance).filter(
+    expiring_count = BankPayment.query.join(Purchase).filter(
         BankPayment.state == 'inprogress',
-        ProductInstance.expires < datetime.utcnow() + timedelta(days=3),
+        Purchase.expires < datetime.utcnow() + timedelta(days=3),
     ).group_by(BankPayment.id).count()
 
     return {'unreconciled_count': unreconciled_count,
@@ -58,7 +59,7 @@ def admin_variables():
 @admin.route("/stats")
 def stats():
     # Don't care about the state of the payment if it's paid for
-    paid = ProductInstance.query.filter(is_paid_for=True)
+    paid = Purchase.query.filter(is_paid_for=True)
 
     parking_paid = ProductGroup.get_by_name('car').get_sold()
     campervan_paid = ProductGroup.get_by_name('campervan').get_sold()
@@ -67,7 +68,7 @@ def stats():
     unpaid = Payment.query.filter(
         Payment.state != 'new',
         Payment.state != 'cancelled'
-    ).join(ProductInstance).filter_by(is_paid_for=False)
+    ).join(Purchase).filter_by(is_paid_for=False)
 
     expired = unpaid.filter_by(expired=True)
     unexpired = unpaid.filter_by(expired=False)
@@ -81,14 +82,14 @@ def stats():
     # TODO: remove this if it's not needed
     full_gocardless_unexpired = unexpired.filter(Payment.provider == 'gocardless',
                                                  Payment.state == 'inprogress'). \
-        join(ProductInstance).filter(is_ticket=True)
+        join(Purchase).filter(is_ticket=True)
     full_banktransfer_unexpired = unexpired.filter(Payment.provider == 'banktransfer',
                                                    Payment.state == 'inprogress'). \
-        join(ProductInstance).filter(is_ticket=True)
+        join(Purchase).filter(is_ticket=True)
 
     # These are people queries - don't care about cars or campervans being checked in
-    checked_in = ProductInstance.query.filter(ProductInstance.state.in_(['checked-in', 'badged-up']))
-    badged_up = ProductInstance.query.filter_by(state='badged-up')
+    checked_in = Purchase.query.filter(Purchase.state.in_(['checked-in', 'badged-up']))
+    badged_up = Purchase.query.filter_by(state='badged-up')
 
     users = User.query  # noqa
 

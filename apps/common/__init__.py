@@ -9,7 +9,8 @@ from werkzeug import BaseResponse
 from werkzeug.exceptions import HTTPException
 
 # from models.ticket import Ticket, TicketType
-from models.product_group import PriceTier, ProductInstance
+from models.product import PriceTier
+from models.purchase import Purchase
 from models.site_state import get_site_state, get_sales_state
 from models.feature_flag import get_db_flags
 from models import User
@@ -116,7 +117,7 @@ def create_basket():
     currency = get_user_currency()
     items, total = get_basket_and_total(currency)
 
-    basket = [ProductInstance.create_instances(user, tt, currency) for tt in items]
+    basket = [Purchase.create_instances(user, tt, currency) for tt in items]
     app.logger.debug('Added tickets to db for basket %s with total %s', basket, total)
     return basket, total
 

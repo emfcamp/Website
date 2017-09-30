@@ -18,7 +18,7 @@ from sqlalchemy.sql.functions import func
 
 from main import db, mail, stripe
 from models.payment import Payment, BankPayment, BankRefund, StripeRefund, StateException
-from models.product_group import ProductInstance
+from models.purchase import Purchase
 # from models.ticket import Ticket
 from ..common.forms import Form, HiddenIntegerField
 from ..payments.stripe import (
@@ -30,10 +30,10 @@ from ..payments.stripe import (
 @admin.route('/payments')
 @admin_required
 def payments():
-    payments = Payment.query.join(ProductInstance).with_entities(
+    payments = Payment.query.join(Purchase).with_entities(
         Payment,
-        func.min(ProductInstance.expires).label('first_expires'),
-        func.count(ProductInstance.id).label('ticket_count'),
+        func.min(Purchase.expires).label('first_expires'),
+        func.count(Purchase.id).label('ticket_count'),
     ).group_by(Payment).order_by(Payment.id).all()
 
     return render_template('admin/payments.html', payments=payments)
@@ -42,13 +42,13 @@ def payments():
 @admin.route('/payments/expiring')
 @admin_required
 def expiring():
-    expiring = BankPayment.query.join(ProductInstance).filter(
+    expiring = BankPayment.query.join(Purchase).filter(
         BankPayment.state == 'inprogress',
-        ProductInstance.expires < datetime.utcnow() + timedelta(days=3),
+        Purchase.expires < datetime.utcnow() + timedelta(days=3),
     ).with_entities(
         BankPayment,
-        func.min(ProductInstance.expires).label('first_expires'),
-        func.count(ProductInstance.id).label('ticket_count'),
+        func.min(Purchase.expires).label('first_expires'),
+        func.count(Purchase.id).label('ticket_count'),
     ).group_by(BankPayment).order_by('first_expires').all()
 
     return render_template('admin/payments-expiring.html', expiring=expiring)

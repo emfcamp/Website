@@ -12,6 +12,8 @@ from .cfp import *  # noqa
 from .permission import *  # noqa
 from .email import *  # noqa
 from .ical import *  # noqa
-from .product_group import * # noqa
+from .product import * # noqa
+from .purchase import * # noqa
+
 
 db.configure_mappers()

@@ -8,10 +8,12 @@ from unittest.mock import patch, Mock
 
 from .core import get_app
 from models.user import User
-from models.product_group import (
-    PRODUCT_INSTANCE_STATES, ProductGroupException, ProductInstanceStateException,
-    ProductTransferException, ProductGroup, PriceTier, Price, ProductInstance, bought_states
+from models.product import (
+    ProductGroupException, ProductGroup, PriceTier, Price
 )
+from models.purchase import PurchaseStateException, PurchaseTransferException, PURCHASE_STATES
+from models import Purchase, bought_states
+
 
 class SingleProductGroupTest(unittest.TestCase):
     item_name = 'killer_tent'
@@ -203,7 +205,7 @@ class ProductInstanceTest(unittest.TestCase):
         if tier is None:
             tier = PriceTier.get_by_name(self.tier_name)
 
-        instance = ProductInstance.create_instances(user, tier, 'gbp')[0]
+        instance = Purchase.create_instances(user, tier, 'gbp')[0]
 
         session.add(instance)
         session.commit()
@@ -254,16 +256,16 @@ class ProductInstanceTest(unittest.TestCase):
             self.assertEqual(instance.price.value, Decimal('6.66'))
 
             # Test issuing multiple instances works
-            more_instances = ProductInstance.create_instances(user, tier, 'gbp', 2)
+            more_instances = Purchase.create_instances(user, tier, 'gbp', 2)
             self.assertEqual(2, len(more_instances))
             self.assertEqual(3, ProductGroup.get_by_name(self.pg_name).capacity_used)
 
             # Test issuing beyond capacity errors
             with self.assertRaises(ProductGroupException):
-                ProductInstance.create_instances(user, tier, 'gbp')
+                Purchase.create_instances(user, tier, 'gbp')
 
     def test_product_instance_state_machine(self):
-        states_dict = PRODUCT_INSTANCE_STATES
+        states_dict = PURCHASE_STATES
 
         # 'reserved' is the start state, all other states must
         # exist as the next_state of some state.
@@ -287,10 +289,10 @@ class ProductInstanceTest(unittest.TestCase):
         with self.app.app_context():
             instance = self.get_instance(self.db.session)
 
-            with self.assertRaises(ProductInstanceStateException):
+            with self.assertRaises(PurchaseStateException):
                 instance.set_state('disallowed-state')
 
-            with self.assertRaises(ProductInstanceStateException):
+            with self.assertRaises(PurchaseStateException):
                 instance.set_state('paid')
 
             instance.set_state('payment-pending')
@@ -304,7 +306,7 @@ class ProductInstanceTest(unittest.TestCase):
             instance1 = self.get_instance(self.db.session)
 
             states_count = tier1.get_counts_by_state()
-            expect = {s: 0 for s in PRODUCT_INSTANCE_STATES.keys()}
+            expect = {s: 0 for s in PURCHASE_STATES.keys()}
             expect['reserved'] = 1
 
             self.assertEqual(expect, states_count)
@@ -409,7 +411,7 @@ class ProductTransferTest(unittest.TestCase):
             self.db.session.commit()
 
             # PriceTier needs to have been committed before this
-            instance = ProductInstance.create_instances(user1, tier, 'gbp')[0]
+            instance = Purchase.create_instances(user1, tier, 'gbp')[0]
             self.db.session.add(instance)
 
             self.db.session.commit()
@@ -442,11 +444,11 @@ class ProductTransferTest(unittest.TestCase):
             item.price_tier.allow_check_in = True
             item.price_tier.is_transferable = False
 
-            with self.assertRaises(ProductTransferException) as e:
+            with self.assertRaises(PurchaseTransferException) as e:
                 item.transfer(user1, user2, self.db.session)
                 self.assertIn('not transferable', e.args[0])
 
-            with self.assertRaises(ProductTransferException) as e:
+            with self.assertRaises(PurchaseTransferException) as e:
                 item.transfer(user2, user1, self.db.session)
 
                 self.assertIn('does not own this item', e.args[0])
@@ -454,7 +456,7 @@ class ProductTransferTest(unittest.TestCase):
             self.db.session.commit()
             item.price_tier.is_transferable = True
 
-            with self.assertRaises(ProductTransferException) as e:
+            with self.assertRaises(PurchaseTransferException) as e:
                 item.transfer(user1, user1, self.db.session)
 
                 self.assertIn('users must be different', e.args[0])

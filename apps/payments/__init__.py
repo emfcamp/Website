@@ -4,8 +4,9 @@ from flask.ext.login import login_required, current_user
 from sqlalchemy.sql.functions import func
 
 # from models import TicketType, Ticket
-from models.payment import Payment
-from models.product_group import ProductInstance, PriceTier
+from models import Payment
+from models import PriceTier
+from models.purchase import Purchase
 
 payments = Blueprint('payments', __name__)
 
@@ -47,7 +48,7 @@ def invoice(payment_id):
     payment = get_user_payment_or_abort(payment_id, allow_admin=True)
 
     invoice_lines = payment.tickets.join(PriceTier). \
-        with_entities(PriceTier, func.count(ProductInstance.price_tier_id)). \
+        with_entities(PriceTier, func.count(Purchase.price_tier_id)). \
         group_by(PriceTier).order_by(PriceTier.order).all()
 
     ticket_sum = sum(tt.get_price_ex_vat(payment.currency) * count for tt, count in invoice_lines)

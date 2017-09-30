@@ -25,9 +25,11 @@ from sqlalchemy.sql.functions import func
 from main import db, mail
 from models.user import User
 from models.payment import Payment, BankPayment, BankTransaction
-from models.product_group import (
-    ProductInstance, PriceTier, ProductGroup, Price, ProductTransfer
+from models.product import (
+    PriceTier, ProductGroup, Price
 )
+from models.purchase import PurchaseTransfer
+from models import Purchase
 
 # from models.ticket import (
 #     Ticket, TicketType, TicketPrice, TicketTransfer
@@ -161,7 +163,7 @@ def transaction_reconcile(txn_id, payment_id):
 @admin.route('/tickets')
 @admin_required
 def tickets():
-    tickets = ProductInstance.query.filter_by(is_paid_for=True).order_by(ProductInstance.id).all()
+    tickets = Purchase.query.filter_by(is_paid_for=True).order_by(Purchase.id).all()
 
     return render_template('admin/tickets.html', tickets=tickets)
 
@@ -169,7 +171,7 @@ def tickets():
 @admin.route('/tickets/unpaid')
 @admin_required
 def tickets_unpaid():
-    tickets = ProductInstance.query.filter_by(is_paid_for=False).order_by(ProductInstance.id).all()
+    tickets = Purchase.query.filter_by(is_paid_for=False).order_by(Purchase.id).all()
 
     return render_template('admin/tickets.html', tickets=tickets)
 
@@ -177,9 +179,9 @@ def tickets_unpaid():
 @admin.route('/ticket-report')
 def ticket_report():
     # This is an admissions-based view, so includes expired tickets
-    totals = ProductInstance.query.outerjoin(Payment).filter(
-        ProductInstance.refund_id.is_(None),
-        or_(ProductInstance.is_paid_for == True,  # noqa
+    totals = Purchase.query.outerjoin(Payment).filter(
+        Purchase.refund_id.is_(None),
+        or_(Purchase.is_paid_for == True,  # noqa
             ~Payment.state.in_(['new', 'cancelled', 'refunded']))
     ).join(PriceTier).with_entities(
         PriceTier.name,
@@ -409,7 +411,7 @@ def tickets_choose_free(user_id=None):
                 tt = f._type
                 # FIXME
                 for i in range(f.amount.data):
-                    t = ProductInstance.create_instances(user=user, tier=tt, currency='GBP')
+                    t = Purchase.create_instances(user=user, tier=tt, currency='GBP')
                     t.state = 'paid'
                     user.tickets.append(t)
                     tickets.append(t)
@@ -451,14 +453,14 @@ def tickets_choose_free(user_id=None):
 def list_free_tickets():
     # Complimentary tickets and transferred tickets can both have no payment.
     # This page is actually intended to be a list of complimentary tickets.
-    free_tickets = ProductInstance.query \
+    free_tickets = Purchase.query \
         .join(PriceTier) \
         .filter(
-            ProductInstance.is_paid_for,
-            ProductInstance.payment_id.is_(None),
-            ~ProductTransfer.query.filter(ProductTransfer.ticket.expression).exists(),
+            Purchase.is_paid_for,
+            Purchase.payment_id.is_(None),
+            ~PurchaseTransfer.query.filter(PurchaseTransfer.ticket.expression).exists(),
         ).order_by(
-            ProductInstance.user_id,
+            Purchase.user_id,
             ProductGroup.order
         ).all()
 
@@ -471,7 +473,7 @@ class CancelTicketForm(Form):
 @admin.route('/ticket/<int:ticket_id>/cancel-free', methods=['GET', 'POST'])
 @admin_required
 def cancel_free_ticket(ticket_id):
-    ticket = ProductInstance.query.get_or_404(ticket_id)
+    ticket = Purchase.query.get_or_404(ticket_id)
     if ticket.payment is not None:
         abort(404)
 
@@ -500,7 +502,7 @@ def cancel_free_ticket(ticket_id):
 @admin.route('/transfers')
 @admin_required
 def ticket_transfers():
-    transfer_logs = ProductTransfer.query.all()
+    transfer_logs = PurchaseTransfer.query.all()
     return render_template('admin/ticket-transfers.html', transfers=transfer_logs)
 
 

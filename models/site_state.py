@@ -3,7 +3,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 from datetime import datetime
 from main import cache, db
 # from models.ticket import TicketType
-from models.product_group import ProductGroup
+from models.product import ProductGroup
 
 class SiteState(db.Model):
     __tablename__ = 'site_state'
