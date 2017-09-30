@@ -2,14 +2,14 @@ from decimal import Decimal
 
 from main import db
 from .purchase import Purchase, non_blocking_states, bought_states, allowed_states
-from .mixins import CapacityMixin, InheritedAttributesMixin
+from .mixins import CapacityMixin  # , InheritedAttributesMixin
 
 
 class ProductGroupException(Exception):
     pass
 
 
-class ProductGroup(db.Model, CapacityMixin): #, InheritedAttributesMixin):
+class ProductGroup(db.Model, CapacityMixin):  # , InheritedAttributesMixin):
     """ Represents a logical group of products.
 
         Capacity and attributes on a ProductGroup cascade down to the products within it.
@@ -64,7 +64,7 @@ class ProductGroup(db.Model, CapacityMixin): #, InheritedAttributesMixin):
         return ProductGroup.query.filter_by(discount_token=token, __expired=False).all()
 
 
-class Product(db.Model, CapacityMixin): #, InheritedAttributesMixin):
+class Product(db.Model, CapacityMixin):  # , InheritedAttributesMixin):
     """ A product (ticket or other item) which is for sale. """
     id = db.Column(db.Integer, primary_key=True)
     parent_id = db.Column(db.Integer, db.ForeignKey("product_group.id"), nullable=False)

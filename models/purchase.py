@@ -19,7 +19,7 @@ non_blocking_states = ('expired', 'refunded')
 admission_states = ('receipt-emailed', 'checked-in', 'badged-up')
 bought_states = ('paid', ) + admission_states
 allowed_states = set(PURCHASE_STATES.keys())
-PURCHASE_EXPIRY_TIME = 2 # In hours
+PURCHASE_EXPIRY_TIME = 2  # In hours
 
 
 class CheckinStateException(Exception):
@@ -134,7 +134,7 @@ class Ticket(Purchase):
         'polymorphic_identity': 'ticket'
     }
 
-    #is_valid_ticket = column_property(super().state.in_(admission_states))
+    #  is_valid_ticket = column_property(super().state.in_(admission_states))
 
     def check_in(self):
         if not self.price_tier.allow_check_in:
