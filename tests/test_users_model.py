@@ -116,7 +116,7 @@ class UserModelTests(unittest.TestCase):
         with self.app.app_context():
             self.assertTrue(User.does_user_exist(self.admin_email))
             self.assertTrue(User.does_user_exist(self.admin_email.upper()))
-            self.assertFalse(User.does_user_exist('sir@notappearing.com'))
+            self.assertFalse(User.does_user_exist('sir.notappearinginthisfilm@test.invalid'))
 
     def test_has_permission(self):
         with self.app.app_context():

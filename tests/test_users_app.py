@@ -58,7 +58,7 @@ class UserAppTests(unittest.TestCase):
         with self.app.app_context(), mail.record_messages() as outbox:
             # Trying to login with an arbitrary email should look the same
             # as doing so with a valid email.
-            form = dict(email='sir@notappearing.com')
+            form = dict(email='sir.notappearinginthisfilm@test.invalid')
             post = self.client.post(url, data=form, follow_redirects=True)
 
             self.assertEqual(200, post.status_code)
