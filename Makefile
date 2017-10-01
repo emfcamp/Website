@@ -134,5 +134,4 @@ parkingtickets:
 
 test:
 	$(ENV) SETTINGS_FILE=$(TEST_SETTINGS) flake8 ./*.py ./models ./apps ./tasks ./utils.py
-	$(ENV) SETTINGS_FILE=$(TEST_SETTINGS) nosetests ./utils.py ./tests/ ./models/
-
+	$(ENV) SETTINGS_FILE=$(TEST_SETTINGS) pytest ./tests/ ./models/
