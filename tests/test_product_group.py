@@ -3,13 +3,13 @@ import sys
 import unittest
 
 from decimal import Decimal
-from datetime import datetime, timedelta
+from datetime import datetime
 from unittest.mock import patch, Mock
 
 from .core import get_app
 from models.user import User
 from models.product import (
-    ProductGroupException, ProductGroup, PriceTier, Price
+    ProductGroupException, Product, ProductGroup, PriceTier, Price
 )
 from models.purchase import PurchaseStateException, PurchaseTransferException, PURCHASE_STATES
 from models import Purchase, bought_states
@@ -26,14 +26,9 @@ class SingleProductGroupTest(unittest.TestCase):
         self.app.testing = True
 
         with self.app.app_context():
-            item = ProductGroup(self.item_name, capacity_max=1, expires=datetime(2012, 8, 31))
+            item = ProductGroup(name=self.item_name, capacity_max=1, expires=datetime(2012, 8, 31))
             self.db.session.add(item)
 
-            self.db.session.commit()
-
-    def tearDown(self):
-        with self.app.app_context():
-            self.db.session.delete(self.get_item())
             self.db.session.commit()
 
     def test_has_capacity(self):
@@ -49,11 +44,11 @@ class SingleProductGroupTest(unittest.TestCase):
         with self.app.app_context():
             item = self.get_item()
 
-            with patch('models.product_group.datetime') as mock_good_datetime:
+            with patch('models.mixins.datetime') as mock_good_datetime:
                 mock_good_datetime.utcnow = Mock(return_value=datetime(2012, 8, 2))
                 self.assertFalse(item.has_expired())
 
-            with patch('models.product_group.datetime') as mock_expired_datetime:
+            with patch('models.mixins.datetime') as mock_expired_datetime:
                 mock_expired_datetime.utcnow = Mock(return_value=datetime(2012, 9, 2))
                 self.assertTrue(item.has_expired())
 
@@ -62,15 +57,14 @@ class SingleProductGroupTest(unittest.TestCase):
             item = self.get_item()
 
             # Will raise an error if we try to issue once expired
-            with patch('models.product_group.datetime') as mock_expired_datetime:
+            with patch('models.mixins.datetime') as mock_expired_datetime:
                 mock_expired_datetime.utcnow = Mock(return_value=datetime(2012, 9, 2))
 
                 with self.assertRaises(ProductGroupException):
                     item.issue_instances()
 
-
             # Now test with a good value for now()
-            with patch('models.product_group.datetime') as mock_good_datetime:
+            with patch('models.mixins.datetime') as mock_good_datetime:
                 mock_good_datetime.utcnow = Mock(return_value=datetime(2012, 8, 2))
 
                 item.issue_instances()
@@ -106,19 +100,12 @@ class MultipleProductGroupTest(unittest.TestCase):
         with self.app.app_context(), self.db.session.no_autoflush:
 
             parent = ProductGroup(self.parent_name, capacity_max=3)
-            item1 = PriceTier(self.group1_name, parent=parent)
+            item1 = PriceTier(name=self.group1_name, parent=parent)
             self.db.session.add(item1)
 
-            item2 = PriceTier(self.group2_name, parent=parent)
+            item2 = PriceTier(name=self.group2_name, parent=parent)
             self.db.session.add(item2)
 
-            self.db.session.commit()
-
-    def tearDown(self):
-        with self.app.app_context():
-            # deletes should cascade so just delete the parent
-            item = self.get_item(name=self.parent_name)
-            self.db.session.delete(item)
             self.db.session.commit()
 
     # We want to mostly check that capacities are inherited & shared
@@ -153,30 +140,12 @@ class MultipleProductGroupTest(unittest.TestCase):
             for flag in ['allow_check_in', 'allow_badge_up', 'is_visible', 'is_transferable']:
                 parent_value = getattr(parent, flag)
 
-                group1 = ProductGroup(flag, parent=parent)
+                group1 = ProductGroup(name=flag, parent=parent)
                 self.assertEqual(getattr(group1, flag), parent_value)
 
                 group2 = ProductGroup('!' + flag, parent=parent, **{flag: not parent_value})
 
                 self.assertEqual(getattr(group2, flag), not parent_value)
-
-
-    def test_token(self):
-        with self.app.app_context():
-            parent = self.get_item(name=self.parent_name)
-            parent.discount_token = 'test'
-
-            item = self.get_item(name=self.group1_name)
-
-            # A token is required by the parent
-            with self.assertRaises(ProductGroupException):
-                item.issue_instances()
-
-            item.issue_instances(token='test')
-            self.assertEqual(1, item.capacity_used)
-
-            with self.assertRaises(ProductGroupException):
-                ProductGroup('Bad group', parent=parent, discount_token='double-up')
 
     def test_get_cheapest(self):
         with self.app.app_context():
@@ -221,24 +190,13 @@ class ProductInstanceTest(unittest.TestCase):
             user = User(self.user_email, 'test_user')
             self.db.session.add(user)
 
-            parent = ProductGroup(self.pg_name, capacity_max=3, allow_check_in=False)
-            tier = PriceTier(self.tier_name, parent=parent)
+            group = ProductGroup(name="product_group")
+            product = Product(name=self.pg_name, capacity_max=3, parent=group)
+            tier = PriceTier(name=self.tier_name, parent=product)
             price = Price(price_tier=tier, currency="gbp", price_int=666)
             # These have `cascade=all` so just add the bottom of the hierarchy
             self.db.session.add(price)
 
-            self.db.session.commit()
-
-    def tearDown(self):
-        with self.app.app_context():
-            for inst in User.get_by_email(self.user_email).products:
-                self.db.session.delete(inst)
-
-            for inst in User.get_by_email(self.user_email).purchases:
-                self.db.session.delete(inst)
-
-            self.db.session.delete(User.get_by_email(self.user_email))
-            self.db.session.delete(ProductGroup.get_by_name(self.pg_name))
             self.db.session.commit()
 
     def test_create_instances(self):
@@ -404,7 +362,9 @@ class ProductTransferTest(unittest.TestCase):
             self.db.session.add(user1)
             self.db.session.add(user2)
 
-            tier = PriceTier(self.pg_name, allow_check_in=True)
+            product_group = ProductGroup(name="product_group")
+            product = Product(name="product", parent=product_group)
+            tier = PriceTier(name=self.pg_name, parent=product)
             price = Price(price_tier=tier, currency="gbp", price_int=666)
             # These have `cascade=all` so just add the bottom of the hierarchy
             self.db.session.add(price)
@@ -414,25 +374,6 @@ class ProductTransferTest(unittest.TestCase):
             instance = Purchase.create_instances(user1, tier, 'gbp')[0]
             self.db.session.add(instance)
 
-            self.db.session.commit()
-
-    def tearDown(self):
-        with self.app.app_context():
-            for inst in User.get_by_email(self.user1_email).products:
-                self.db.session.delete(inst)
-
-            for inst in User.get_by_email(self.user1_email).purchases:
-                self.db.session.delete(inst)
-
-            for inst in User.get_by_email(self.user2_email).products:
-                self.db.session.delete(inst)
-
-            for inst in User.get_by_email(self.user2_email).purchases:
-                self.db.session.delete(inst)
-
-            self.db.session.delete(User.get_by_email(self.user1_email))
-            self.db.session.delete(User.get_by_email(self.user2_email))
-            self.db.session.delete(ProductGroup.get_by_name(self.pg_name))
             self.db.session.commit()
 
     def test_transfer(self):

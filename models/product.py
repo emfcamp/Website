@@ -2,14 +2,14 @@ from decimal import Decimal
 
 from main import db
 from .purchase import Purchase, non_blocking_states, bought_states, allowed_states
-from .mixins import CapacityMixin  # , InheritedAttributesMixin
+from .mixins import CapacityMixin, InheritedAttributesMixin
 
 
 class ProductGroupException(Exception):
     pass
 
 
-class ProductGroup(db.Model, CapacityMixin):  # , InheritedAttributesMixin):
+class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
     """ Represents a logical group of products.
 
         Capacity and attributes on a ProductGroup cascade down to the products within it.
@@ -50,7 +50,6 @@ class ProductGroup(db.Model, CapacityMixin):  # , InheritedAttributesMixin):
             return None
         return min(res, key=lambda x: x['price'])['tier']
 
-    # This is mostly used in testing...
     @classmethod
     def get_by_name(cls, name):
         return ProductGroup.query.filter_by(name=name).first()
@@ -64,14 +63,19 @@ class ProductGroup(db.Model, CapacityMixin):  # , InheritedAttributesMixin):
         return ProductGroup.query.filter_by(discount_token=token, __expired=False).all()
 
 
-class Product(db.Model, CapacityMixin):  # , InheritedAttributesMixin):
+class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
     """ A product (ticket or other item) which is for sale. """
     id = db.Column(db.Integer, primary_key=True)
     parent_id = db.Column(db.Integer, db.ForeignKey("product_group.id"), nullable=False)
 
-    name = db.Column(db.String)
+    name = db.Column(db.String, nullable=False)
+    display_name = db.Column(db.String)
     description = db.Column(db.String)
     parent = db.relationship(ProductGroup, backref="products", cascade="all")
+
+    @classmethod
+    def get_by_name(cls, name):
+        return Product.query.filter_by(name=name).first()
 
 
 class PriceTier(db.Model, CapacityMixin):
@@ -80,6 +84,7 @@ class PriceTier(db.Model, CapacityMixin):
         PriceTiers have a capacity and an expiry through the CapacityMixin.
     """
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
     parent_id = db.Column(db.Integer, db.ForeignKey("product.id"), nullable=False)
     parent = db.relationship(Product, backref="price_tiers", cascade="all")
 
@@ -113,9 +118,6 @@ class PriceTier(db.Model, CapacityMixin):
 
     def user_limit(self, user, token=''):
         if self.has_expired():
-            return 0
-
-        if not self.token_correct(token):
             return 0
 
         if user.is_authenticated:

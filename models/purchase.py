@@ -63,7 +63,7 @@ class Purchase(db.Model):
 
     # Relationships
     owner = db.relationship('User', backref='purchases', foreign_keys=[owner_id])
-    purchaser = db.relationship('User', backref='purchases_purchaser', foreign_keys=[purchaser_id])
+    purchaser = db.relationship('User', backref='purchased', foreign_keys=[purchaser_id])
     price = db.relationship('Price', backref='purchases')
     price_tier = db.relationship('PriceTier', backref='purchases')
     payment = db.relationship('Payment', backref='purchases')
@@ -71,10 +71,9 @@ class Purchase(db.Model):
 
     def __init__(self, price_tier, price, purchaser, owner, **kwargs):
         expires = datetime.utcnow() + timedelta(hours=PURCHASE_EXPIRY_TIME)
-        is_ticket = price_tier.allow_check_in
 
         super().__init__(price_tier=price_tier, price=price, purchaser=purchaser,
-                         owner=owner, expires=expires, is_ticket=is_ticket, **kwargs)
+                         owner=owner, expires=expires, **kwargs)
 
     def __repr__(self):
         if self.id is None:

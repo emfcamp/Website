@@ -130,13 +130,12 @@ class User(db.Model, UserMixin):
     def sso_code(self, key):
         return generate_sso_code(key, int(time.time()), self.id)
 
-    # FIXME this should probably not be done..
     @property
     def tickets(self):
-        return self.products
+        return [p for p in self.purchases if p.is_ticket]
 
     def get_tickets(self):
-        return [p for p in self.products if p.is_valid_ticket]
+        return [p for p in self.purchases if p.is_ticket and p.is_valid_ticket]
 
     @property
     def checkin_code(self):

@@ -27,7 +27,7 @@ def calc_site_state(date):
 
 def calc_sales_state(date):
     # if TicketType.get_tickets_remaining() < 1:
-    site_capacity = ProductGroup.get_by_name('site_capacity')
+    site_capacity = ProductGroup.get_by_name('Admission Tickets')
     if site_capacity.get_total_remaining_capacity() < 1:
         # We've hit capacity - no more tickets will be sold
         return "sold-out"
