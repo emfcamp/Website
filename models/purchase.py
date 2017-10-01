@@ -1,23 +1,25 @@
 from datetime import datetime, timedelta
 from sqlalchemy.orm import column_property
 from main import db
+from .exc import CapacityException
+
+# The type of a product determines how we handle it after purchase.
+#
+# Both `admission_ticket` and `parking_ticket` will generate a ticket,
+# but only `admission_ticket` allows access to the site.
+PRODUCT_TYPES = ["admission_ticket", "parking_ticket", "merchandise"]
 
 # state: [allowed next state, ] pairs
 PURCHASE_STATES = {'reserved': ['payment-pending', 'expired'],
                             'payment-pending': ['expired', 'paid'],
                             'expired': [],
                             'paid': ['receipt-emailed', 'refunded'],
-                            'receipt-emailed': ['checked-in', 'paid', 'refunded'],
+                            'receipt-emailed': ['paid', 'refunded'],
                             'refunded': [],
-                   # allow undoing of check-in
-                            'checked-in': ['receipt-emailed', 'badged-up'],
-                            'badged-up': ['checked-in'],
                    }
 # non_blocking_states are those states that don't contribute towards a user limit
 non_blocking_states = ('expired', 'refunded')
-# These are the states that a product has to be in for admission
-admission_states = ('receipt-emailed', 'checked-in', 'badged-up')
-bought_states = ('paid', ) + admission_states
+bought_states = ('paid', 'receipt-emailed')
 allowed_states = set(PURCHASE_STATES.keys())
 PURCHASE_EXPIRY_TIME = 2  # In hours
 
@@ -84,6 +86,10 @@ class Purchase(db.Model):
     def is_ticket(self):
         return self.type == 'ticket'
 
+    @property
+    def is_paid(self):
+        return self.state in bought_states
+
     def set_state(self, new_state):
         new_state = new_state.lower()
 
@@ -112,15 +118,42 @@ class Purchase(db.Model):
         session.commit()
 
     @classmethod
-    def create_instances(cls, user, tier, currency, count=1, token=''):
+    def class_from_product(cls, product):
+        """ Return the class of purchase used for the given Product.
+
+            Raises an exception if the purchase has no type.
+        """
+        product_type = product.get_type()
+        if product_type is None:
+            raise Exception("Product %s has no type" % (product))
+
+        if product_type in ['admission_ticket', 'parking_ticket']:
+            return Ticket
+        else:
+            return Purchase
+
+    @classmethod
+    def create_instances(cls, user, tier, currency, count=1):
+        """ Generate a number of Purchases when given a PriceTier.
+
+            This ensures that capacity is available, and instantiates
+            the correct Purchase type, returning a list of Purchases.
+        """
         price = tier.get_price(currency)
 
-        if count > tier.user_limit(user, token):
-            raise Exception('Insufficient user capacity.')
+        if count > tier.user_limit(user):
+            raise CapacityException('Insufficient user capacity.')
 
-        tier.issue_instances(count, token)
+        purchase_cls = cls.class_from_product(tier.parent)
 
-        return [Purchase(tier, price, user, user) for c in range(count)]
+        # TODO: This is the critical bit for ticket-buying race conditions.
+        # As we're not doing a commit here, everything is in the current
+        # transaction which the caller must commit. We might want to issue
+        # a SELECT FOR UPDATE at this point to acquire locks on the
+        # appropriate capacity counters.
+        tier.issue_instances(count)
+
+        return [purchase_cls(tier, price, user, user) for c in range(count)]
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -129,37 +162,53 @@ class Purchase(db.Model):
 
 
 class Ticket(Purchase):
+    """ A ticket, which is a specific type of purchase.
+
+        This can either be an admission ticket or a parking ticket.
+    """
     __mapper_args__ = {
         'polymorphic_identity': 'ticket'
     }
 
-    #  is_valid_ticket = column_property(super().state.in_(admission_states))
+    checked_in = db.Column(db.Boolean, default=False)
+    badge_issued = db.Column(db.Boolean, default=False)
+
+    def get_ticket_type(self):
+        """ Return the type of this ticket: 'admission' or 'parking' """
+        product_type = self.price_tier.parent.get_type()
+        if product_type == 'admission_ticket':
+            return 'admission'
+        elif product_type == 'parking_ticket':
+            return 'parking'
 
     def check_in(self):
-        if not self.price_tier.allow_check_in:
-            raise CheckinStateException("Check-in not allowed with %s" % self.price_tier)
+        ticket_type = self.get_ticket_type()
+        if ticket_type != 'admission':
+            raise CheckinStateException("Check-in not allowed with %s ticket" % ticket_type)
 
-        if self.state == 'checked-in':
+        if self.checked_in is True:
             raise CheckinStateException("Ticket is already checked in.")
-        self.set_state('checked-in')
+
+        self.checked_in = True
 
     def undo_check_in(self):
-        if self.state != 'checked-in':
+        if self.checked_in is False:
             raise CheckinStateException("Ticket is not checked in.")
-        self.set_state('paid')
+        self.checked_in = False
 
     def badge_up(self):
-        if not self.price_tier.allow_badge_up:
-            raise CheckinStateException("Badge-up not allowed with %s" % self.price_tier)
+        ticket_type = self.get_ticket_type()
+        if ticket_type != 'admission':
+            raise CheckinStateException("Badge-up not allowed with %s" % ticket_type)
 
-        if self.state == 'badge-up':
+        if self.badge_issued is True:
             raise CheckinStateException("Ticket is already badged up.")
-        self.set_state('badge-up')
+        self.badge_issued = True
 
     def undo_badge_up(self):
-        if self.state != 'badge-up':
+        if self.badge_issued is False:
             raise CheckinStateException("Ticket is not badged up.")
-        self.set_state('check-in')
+        self.badge_issued = True
 
 
 class PurchaseTransfer(db.Model):

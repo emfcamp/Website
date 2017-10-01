@@ -132,10 +132,11 @@ class User(db.Model, UserMixin):
 
     @property
     def tickets(self):
+        """ This returns all tickets (in all states) bought by the user """
         return [p for p in self.purchases if p.is_ticket]
 
     def get_tickets(self):
-        return [p for p in self.purchases if p.is_ticket and p.is_valid_ticket]
+        return [p for p in self.purchases if p.is_ticket and p.is_paid]
 
     @property
     def checkin_code(self):

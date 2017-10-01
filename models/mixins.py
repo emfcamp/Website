@@ -4,10 +4,8 @@ from datetime import datetime
 from sqlalchemy.orm import column_property
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import and_, func
-
-
-class CapacityException(Exception):
-    pass
+from .purchase import bought_states
+from .exc import CapacityException
 
 
 class CapacityMixin(object):
@@ -98,6 +96,15 @@ class CapacityMixin(object):
             raise ValueError("Count cannot be less than 1.")
         self.parent.return_instances(count)
         self.capacity_used -= count
+
+    def get_purchase_count(self, states=None):
+        """ Get the count of purchases, optionally filtered by purchase state.
+            If no states are specified then it will count purchased tickets.
+        """
+        if states is None:
+            states = bought_states
+        counts = self.get_purchase_count_by_state(states)
+        return sum(counts.values())
 
 
 class InheritedAttributesMixin(object):
