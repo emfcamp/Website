@@ -86,7 +86,7 @@ reportlab==3.4.0
 icalendar==3.11.7
 
 # Mailchimp
-mailchimp3==2.0.17
+mailchimp3==2.0.18
 
 # payments
 gocardless==0.5.3
