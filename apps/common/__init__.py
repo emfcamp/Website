@@ -33,7 +33,7 @@ CURRENCY_SYMBOLS = dict((c.code, c.symbol) for c in CURRENCIES)
 def load_utility_functions(app_obj):
     @app_obj.template_filter('price')
     def format_price(amount, currency, after=False):
-        amount = u'{0:.2f}'.format(amount)
+        amount = '{0:.2f}'.format(amount)
         symbol = CURRENCY_SYMBOLS[currency]
         if after:
             return amount + symbol

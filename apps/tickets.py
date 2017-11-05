@@ -188,28 +188,25 @@ def choose(flow=None):
 
     form = TicketAmountsForm()
 
-    # If this is the main page, exclude tents and other paraphernalia.
-    # For the non-admissions page, only exclude actual admissions tickets.
-    # This means both pages show parking and caravan tickets.
-    if admissions:
-        tts = ProductGroup.query.filter_by(allow_check_in=True, is_visible=True)
-    else:
-        tts = ProductGroup.query.filter_by(allow_check_in=False, is_visible=True)
+    # FIXME probably want some better identifier for this...
+    # FIXME reimplement /other page
+    products = ProductGroup.get_by_name('General').products
 
-    tts = tts.order_by(ProductGroup.order).all()
-    limits = dict((tt.id, tt.user_limit(current_user, token)) for tt in tts)
+    price_tiers = [pd.get_lowest_price_tier('GBP') for pd in products]
+    price_tiers = sorted(price_tiers, key=lambda x: x.get_price('GBP').value)
+    limits = dict((pt.id, pt.user_limit(current_user, token)) for pt in price_tiers)
 
     if request.method != 'POST':
         # Empty form - populate ticket types
-        for tt in tts:
+        for pt in price_tiers:
             form.types.append_entry()
-            form.types[-1].type_id.data = tt.id
+            form.types[-1].type_id.data = pt.id
 
 
-    tts = {tt.id: tt for tt in tts}
+    price_tiers = {pt.id: pt for pt in price_tiers}
     for f in form.types:
         t_id = f.type_id.data
-        f._type = tts[t_id]
+        f._type = price_tiers[t_id]
 
         values = range(limits[t_id] + 1)
         f.amount.values = values
@@ -245,7 +242,6 @@ def choose(flow=None):
                 field.errors = []
 
     form.currency_code.data = get_user_currency()
-
     return render_template("tickets-choose.html", form=form, admissions=admissions)
 
 

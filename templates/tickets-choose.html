@@ -118,7 +118,7 @@ Buy Items
 {% set row_class = cycler('odd', 'even') %} {# required as we skip rows #}
 {% for f in form.types %}
 {% if f._any or f.amount.errors %}
-<tr data-price="{{ f._type.get_price(user_currency) }}"
+<tr data-price="{{ f._type.get_price(user_currency).value }}"
     {% for price in f._type.prices -%}
         data-price-{{ price.currency }}="{{ price.value }}"
     {% endfor -%}
@@ -127,11 +127,11 @@ Buy Items
         {{ row_class.next() }}">
     <td>
         {{ f.hidden_tag_without('csrf_token') }}
-        <label for="{{ f.amount.id }}"><b>{{ f._type.name }}</b></label>
-        {% if f._type.description %}<p class="description">{{ f._type.description }}</p>{% endif %}
+        <label for="{{ f.amount.id }}"><b>{{ f._type.parent.display_name }}</b></label>
+        {% if f._type.parent.description %}<p class="description">{{ f._type.parent.description }}</p>{% endif %}
     </td>
     <td>
-        <span class="price">{{ f._type.get_price(user_currency) | price(user_currency) }}</span>
+        <span class="price">{{ f._type.get_price(user_currency).value | price(user_currency) }}</span>
     </td>
     <td>
         <div class="controls">{{ f.amount(class_="amount")|safe }}

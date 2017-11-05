@@ -97,11 +97,24 @@ class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
 
             Returns a Price object, or None if no price was found.
         """
-        prices = [tier.get_price(currency) for tier in self.price_tiers]
-        prices = list(sorted(prices, key=lambda price: price.price_int))
-        if len(prices) == 0:
+        return self.__get_cheapest_tier_price_pair(currency)[1]
+
+    def get_lowest_price_tier(self, currency='GBP'):
+        """ Fetch the cheapest price tier for this product.
+
+            An optional argument, currency, can be specified with which to check
+            the price. Defaults to GBP.
+
+            Returns a PriceTier object, or None if no price found.
+        """
+        return self.__get_cheapest_tier_price_pair(currency)[0]
+
+    def __get_cheapest_tier_price_pair(self, currency):
+        pairs = [(tier, tier.get_price(currency)) for tier in self.price_tiers]
+        pairs = list(sorted(pairs, key=lambda p: p[1].price_int))
+        if len(pairs) == 0:
             return None
-        return prices[0]
+        return pairs[0]
 
     def get_type(self):
         """ Return the type of this product (ticket, merchandise, etc).
