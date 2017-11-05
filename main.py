@@ -87,6 +87,7 @@ def create_app(dev_server=False):
 
     if install_logging:
         logger.setup_logging(app)
+        app.logger.info('db URI: %s', app.config.get('SQLALCHEMY_DATABASE_URI'))
 
     for extension in (cdn, csrf, cache, db, mail, assets, toolbar):
         extension.init_app(app)
