@@ -19,7 +19,7 @@ from models.product import ProductGroup, Product, PriceTier, Price
 def create_product_groups():
     # FIXME might be worth creating separate sub-classes for site-capacity & allocations
     site_capacity = ProductGroup(name='Admission Tickets',
-                                 type='ticket',
+                                 type='admission_ticket',
                                  expires=datetime(2018, 9, 3),
                                  capacity_max=app.config.get('MAXIMUM_ADMISSIONS'))
     db.session.add(site_capacity)

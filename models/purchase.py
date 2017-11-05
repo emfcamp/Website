@@ -64,12 +64,8 @@ class Purchase(db.Model):
     is_paid_for = column_property(state.in_(bought_states))
 
     # Relationships
-    owner = db.relationship('User', backref='purchases', foreign_keys=[owner_id])
-    purchaser = db.relationship('User', backref='purchased', foreign_keys=[purchaser_id])
     price = db.relationship('Price', backref='purchases')
     price_tier = db.relationship('PriceTier', backref='purchases')
-    payment = db.relationship('Payment', backref='purchases')
-    refund = db.relationship('Refund', backref='purchases')
 
     def __init__(self, price_tier, price, purchaser, owner, **kwargs):
         expires = datetime.utcnow() + timedelta(hours=PURCHASE_EXPIRY_TIME)
@@ -101,7 +97,14 @@ class Purchase(db.Model):
 
         self.state = new_state
 
+    def change_currency(self, currency):
+        raise Exception("you wish.")
+
     def transfer(self, from_user, to_user, session):
+        # TODO it'd be cool if you could transfer an allow someone else to pay
+        if self.state not in bought_states:
+            raise PurchaseTransferException('Only paid items may be transferred.')
+
         if not self.price_tier.is_transferable:
             raise PurchaseTransferException('This item is not transferable.')
 
@@ -133,13 +136,31 @@ class Purchase(db.Model):
             return Purchase
 
     @classmethod
-    def create_instances(cls, user, tier, currency, count=1):
+    def safe_create_instances(cls, session, user, items, currency):
+        """ Transactionally issue products.
+
+            Item should be a list of (PriceTier, count) pairs.
+        """
+        try:
+            res = []
+            for tier, count in items:
+                # Session is passed in so that we can check capacity with
+                # SELECT FOR UPDATE
+                res += cls.create_instances(session, user, tier, currency, count)
+            session.commit()
+            return res
+        except:
+            session.rollback()
+            raise
+
+    @classmethod
+    def create_instances(cls, session, user, tier, currency, count=1):
         """ Generate a number of Purchases when given a PriceTier.
 
             This ensures that capacity is available, and instantiates
             the correct Purchase type, returning a list of Purchases.
         """
-        price = tier.get_price(currency)
+        price = tier.get_price_object(currency)
 
         if count > tier.user_limit(user):
             raise CapacityException('Insufficient user capacity.')
@@ -151,7 +172,7 @@ class Purchase(db.Model):
         # transaction which the caller must commit. We might want to issue
         # a SELECT FOR UPDATE at this point to acquire locks on the
         # appropriate capacity counters.
-        tier.issue_instances(count)
+        tier.issue_instances(session, count)
 
         return [purchase_cls(tier, price, user, user) for c in range(count)]
 

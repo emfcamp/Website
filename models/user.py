@@ -120,6 +120,15 @@ class User(db.Model, UserMixin):
                                    primaryjoin='CFPMessage.from_user_id == User.id',
                                    backref='from_user', lazy='dynamic')
 
+    owned_products = db.relationship('Purchase',
+                                    backref='owner', lazy='dynamic',
+                                    primaryjoin='Purchase.owner_id == User.id',
+                                    cascade='all, delete, delete-orphan')
+    purchased_products = db.relationship('Purchase',
+                                         backref='purchaser', lazy='dynamic',
+                                         primaryjoin='Purchase.purchaser_id == User.id',
+                                         cascade='all, delete, delete-orphan')
+
     def __init__(self, email, name):
         self.email = email
         self.name = name
@@ -131,12 +140,17 @@ class User(db.Model, UserMixin):
         return generate_sso_code(key, int(time.time()), self.id)
 
     @property
-    def tickets(self):
+    def purchased_tickets(self):
         """ This returns all tickets (in all states) bought by the user """
-        return [p for p in self.purchases if p.is_ticket]
+        return [p for p in self.purchased_products if p.is_ticket]
+
+    @property
+    def owned_tickets(self):
+        """ This returns all tickets (in all states) bought by the user """
+        return [p for p in self.owned_products if p.is_ticket]
 
     def get_tickets(self):
-        return [p for p in self.purchases if p.is_ticket and p.is_paid]
+        return [p for p in self.owned_products if p.is_ticket and p.is_paid]
 
     @property
     def checkin_code(self):

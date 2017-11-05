@@ -17,6 +17,7 @@ class StateException(Exception):
 
 class Payment(db.Model):
     __tablename__ = 'payment'
+    __versioned__ = {}
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     provider = db.Column(db.String, nullable=False)
@@ -27,6 +28,10 @@ class Payment(db.Model):
     changes = db.relationship('PaymentChange', backref='payment',
                               order_by='PaymentChange.timestamp, PaymentChange.id')
     refunds = db.relationship('Refund', lazy='dynamic', backref='payment', cascade='all')
+    purchases = db.relationship('Purchase', lazy='dynamic', backref='payment',
+                             primaryjoin='Purchase.payment_id == Payment.id',
+                             cascade='all')
+
     __mapper_args__ = {'polymorphic_on': provider}
 
     def __init__(self, currency, amount):
@@ -148,6 +153,7 @@ class BankPayment(Payment):
 
 class BankAccount(db.Model):
     __tablename__ = 'bank_account'
+    __versioned__ = {}
     id = db.Column(db.Integer, primary_key=True)
     sort_code = db.Column(db.String, nullable=False)
     acct_id = db.Column(db.String, nullable=False)
@@ -165,6 +171,7 @@ class BankAccount(db.Model):
 db.Index('ix_bank_account_sort_code_acct_id', BankAccount.sort_code, BankAccount.acct_id, unique=True)
 
 class BankTransaction(db.Model):
+    __versioned__ = {}
     __tablename__ = 'bank_transaction'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -343,6 +350,7 @@ class StripePayment(Payment):
 
 
 class PaymentChange(db.Model):
+    __versioned__ = {}
     __tablename__ = 'payment_change'
     id = db.Column(db.Integer, primary_key=True)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'), nullable=False)
@@ -372,12 +380,16 @@ def payment_change(session, flush_context):
 
 
 class Refund(db.Model):
+    __versioned__ = {}
     __tablename__ = 'refund'
     id = db.Column(db.Integer, primary_key=True)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'), nullable=False)
     provider = db.Column(db.String, nullable=False)
     amount_int = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    puchases = db.relationship('Purchase', lazy='dynamic', backref='refunds',
+                               primaryjoin='Purchase.refund_id == Refund.id',
+                               cascade='all')
     __mapper_args__ = {'polymorphic_on': provider}
 
     def __init__(self, payment, amount):
@@ -403,6 +415,7 @@ class StripeRefund(Refund):
 
 
 class StripeRefundOld(db.Model):
+    __versioned__ = {}
     __tablename__ = 'stripe_refund'
     id = db.Column(db.Integer, primary_key=True)
     refundid = db.Column(db.String, unique=True)

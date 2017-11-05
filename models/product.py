@@ -69,8 +69,10 @@ class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
         return Product.query.filter_by(name=name).first()
 
     @classmethod
-    def get_cheapest_price(cls, product_name='full'):
-        return cls.get_by_name(product_name).get_price('GBP')
+    def get_cheapest_price(cls, product_name='full', currency='GBP'):
+        return cls.get_by_name(product_name)\
+                  .get_lowest_price_tier(currency)\
+                  .get_price(currency)
 
     def get_purchase_count_by_state(self, states_to_get=None):
         """ Return a count of purchases, broken down by state.
@@ -92,13 +94,6 @@ class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
             states[k] += v
         return states
 
-    def get_price(self, currency):
-        """ Fetch the cheapest price for this product in a given currency.
-
-            Returns a Price object, or None if no price was found.
-        """
-        return self.__get_cheapest_tier_price_pair(currency)[1]
-
     def get_lowest_price_tier(self, currency='GBP'):
         """ Fetch the cheapest price tier for this product.
 
@@ -107,14 +102,11 @@ class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
 
             Returns a PriceTier object, or None if no price found.
         """
-        return self.__get_cheapest_tier_price_pair(currency)[0]
-
-    def __get_cheapest_tier_price_pair(self, currency):
         pairs = [(tier, tier.get_price(currency)) for tier in self.price_tiers]
-        pairs = list(sorted(pairs, key=lambda p: p[1].price_int))
+        pairs = list(sorted(pairs, key=lambda p: p[1]))
         if len(pairs) == 0:
             return None
-        return pairs[0]
+        return pairs[0][0]
 
     def get_type(self):
         """ Return the type of this product (ticket, merchandise, etc).
@@ -151,6 +143,10 @@ class PriceTier(db.Model, CapacityMixin):
         # I think this might only be because of tests and creation.
         return PriceTier.query.filter_by(name=name).first()
 
+    @classmethod
+    def get_by_id(cls, id):
+        return PriceTier.query.get_or_404(id)
+
     def get_purchase_count_by_state(self, states_to_get=None):
         """ Return a count of purchases, broken down by state.
             Optionally filter the states required to `states_to_get`.
@@ -173,7 +169,17 @@ class PriceTier(db.Model, CapacityMixin):
     def get_price(self, currency):
         """ Get the price for this tier in the given currency.
 
-            Returns a Price object, or None if no price was found.
+            Returns the value in that currency or None if the price is
+            not found.
+        """
+        return self.get_price_object(currency).value
+
+    def get_price_object(self, currency):
+        """ Get the price for this tier in the given currency.
+
+            Returns a Price object or None if no price found.
+
+            You should not be using this method.
         """
         for price in self.prices:
             if price.currency == currency.upper():

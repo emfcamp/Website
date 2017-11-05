@@ -101,23 +101,26 @@ def set_user_currency(currency):
     session['currency'] = currency
 
 
-# This avoids adding tickets to the db so should avoid a lot of auto-flush
-# problems, unless you need the tickets persisted, use this.
-def get_basket_and_total(currency):
-    basket = [PriceTier.query.get(id) for id in session.get('basket', [])]
-    total = sum(tt.get_price(currency) for tt in basket)
+def get_basket_cost(basket):
+    return sum([p.price.value for p in basket], 0)
+
+def get_basket_and_total():
+    basket = current_user.purchased_products.filter_by(state='reserved').all()
+    currency = basket[0].price.currency
+
+    total = get_basket_cost(basket)
     app.logger.debug('Got basket %s with total %s', basket, total)
-    return basket, total
+    return basket, total, currency
 
-
-# This actually adds the user's tickets to the database. This should only be used
-# just before a ticket is bought
-def create_basket():
+# This creates the user's items in the reserved state.
+def create_basket(items):
     user = current_user
     currency = get_user_currency()
-    items, total = get_basket_and_total(currency)
 
-    basket = [Purchase.create_instances(user, tt, currency) for tt in items]
+    basket = Purchase.safe_create_instances(db.session, user, items, currency)
+    app.logger.info('Make basket with: %s', basket)
+
+    total = get_basket_cost(basket)
     app.logger.debug('Added tickets to db for basket %s with total %s', basket, total)
     return basket, total
 

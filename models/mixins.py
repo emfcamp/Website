@@ -31,7 +31,7 @@ class CapacityMixin(object):
 
     db.CheckConstraint("capacity_used <= capacity_max", "within_capacity")
 
-    def has_capacity(self, count=1):
+    def has_capacity(self, count=1, session=None):
         """
         Determine whether this object, and all its ancestors, have
         available capacity.
@@ -42,26 +42,37 @@ class CapacityMixin(object):
         if count < 1:
             raise ValueError("Count cannot be less than 1.")
 
-        return count <= self.get_total_remaining_capacity()
+        return count <= self.get_total_remaining_capacity(session)
 
-    def remaining_capacity(self):
+    def remaining_capacity(self, session=None):
         """
         Return remaining capacity or sys.maxsize (a very big integer) if
         capacity_max is not set (i.e. None).
-        """
-        if self.capacity_max is None:
-            return sys.maxsize
-        return self.capacity_max - self.capacity_used
 
-    def get_total_remaining_capacity(self):
+        If a session is provided this check is performed with 'FOR UPDATE'
+        row locking.
+        """
+        if session is None:
+            item = self
+        else:
+            item = session.query(self.__class__)\
+                          .with_for_update()\
+                          .filter_by(id=self.id)\
+                          .first()
+
+        if item.capacity_max is None:
+            return sys.maxsize
+        return item.capacity_max - item.capacity_used
+
+    def get_total_remaining_capacity(self, session=None):
         """
         Get the capacity remaining to this object, and all its ancestors.
 
         Returns sys.maxsize if no object have a capacity_max set.
         """
-        remaining = [self.remaining_capacity()]
+        remaining = [self.remaining_capacity(session)]
         if self.parent:
-            remaining.append(self.parent.get_total_remaining_capacity())
+            remaining.append(self.parent.get_total_remaining_capacity(session))
 
         return min(remaining)
 
@@ -75,19 +86,19 @@ class CapacityMixin(object):
 
         return self.expires and self.expires < datetime.utcnow()
 
-    def issue_instances(self, count=1, token=''):
+    def issue_instances(self, session, count=1, token=''):
         """
         If possible (i.e. the object has not expired and has capacity)
         reduce the available capacity by count.
         """
-        if not self.has_capacity(count):
+        if not self.has_capacity(count, session):
             raise CapacityException("Out of capacity.")
 
         if self.has_expired():
             raise CapacityException("Expired.")
 
         if self.parent:
-            self.parent.issue_instances(count, token)
+            self.parent.issue_instances(session, count, token)
         self.capacity_used += count
 
     def return_instances(self, count=1):

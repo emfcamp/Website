@@ -11,8 +11,8 @@
     {{ basket|count }} items{% endif %}:
     {% endif %}
     <ul>
-        {% for ticket in basket %}
-        <li>{{ticket.name}}</li>
+        {% for purchase in basket %}
+        <li>{{purchase.price_tier.parent.display_name}}</li>
         {% endfor %}
     </ul>
     <p>The total price is <b>{{ total | price(user_currency) }}</b>.

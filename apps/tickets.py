@@ -21,9 +21,9 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from main import db, mail
 from models.user import User, checkin_code_re
-from models.product import ProductGroup
+from models.product import ProductGroup, PriceTier
+from models.purchase import Purchase
 from models import bought_states
-# from models.ticket import TicketLimitException, TicketType
 from models.payment import BankPayment, StripePayment, GoCardlessPayment
 from models.site_state import get_sales_state
 from models.payment import Payment
@@ -51,8 +51,11 @@ def create_payment(paymenttype):
     """
 
     infodata = session.get('ticketinfo')
-    basket, total = create_basket()  # creates Ticket objects
     currency = get_user_currency()
+    basket, total, original_currency = get_basket_and_total()
+
+    if currency != original_currency:
+        raise Exception("Currency mismatch got: %s, expected: %s", currency, original_currency)
 
     if not (basket and total):
         return None
@@ -87,16 +90,17 @@ def main():
     if current_user.is_anonymous:
         return redirect(url_for('tickets.choose'))
 
-    all_tickets = current_user.products \
-                              .join(ProductGroup) \
+    # FIXME all of this
+    all_tickets = current_user.purchased_products \
+                              .join(PriceTier) \
                               .outerjoin(Payment) \
                               .filter(or_(Payment.id.is_(None),
                                           Payment.state != "cancelled"
                                         )
                                       )
 
-    tickets = all_tickets.filter_by(is_ticket=True).all()
-    other_items = all_tickets.filter(is_ticket=False).all()
+    tickets = all_tickets.filter(Purchase.is_ticket.is_(True)).all()
+    other_items = all_tickets.filter(Purchase.is_ticket.is_(False)).all()
     payments = current_user.payments.filter(Payment.state != "cancelled").all()
 
     if not tickets and not payments:
@@ -193,7 +197,7 @@ def choose(flow=None):
     products = ProductGroup.get_by_name('General').products
 
     price_tiers = [pd.get_lowest_price_tier('GBP') for pd in products]
-    price_tiers = sorted(price_tiers, key=lambda x: x.get_price('GBP').value)
+    price_tiers = sorted(price_tiers, key=lambda x: x.get_price('GBP'))
     limits = dict((pt.id, pt.user_limit(current_user, token)) for pt in price_tiers)
 
     if request.method != 'POST':
@@ -216,16 +220,17 @@ def choose(flow=None):
         if form.buy.data or form.buy_other.data:
             set_user_currency(form.currency_code.data)
 
-            basket = []
+            items = []
             for f in form.types:
                 if f.amount.data:
                     tt = f._type
                     app.logger.info('Adding %s %s tickets to basket', f.amount.data, tt.name)
-                    basket += [tt.id] * f.amount.data
-                    # FIXME Should be able to create actual ProductInstances here rather than
-                    # attach them to the session
+                    items.append([PriceTier.get_by_id(tt.id), f.amount.data])
+
+            basket, total = create_basket(items)
             if basket:
-                session['basket'] = basket
+
+                app.logger.info('total: %s basket: %s', total, basket)
 
                 return redirect(url_for('tickets.pay', flow=flow))
             elif admissions:
@@ -288,7 +293,7 @@ def pay(flow=None):
         del form.email
         del form.name
 
-    basket, total = get_basket_and_total(get_user_currency())
+    basket, total, _ = get_basket_and_total()
     if not basket:
         if admissions:
             flash("Please select at least one ticket to buy.")

@@ -411,7 +411,8 @@ def tickets_choose_free(user_id=None):
                 tt = f._type
                 # FIXME
                 for i in range(f.amount.data):
-                    t = Purchase.create_instances(user=user, tier=tt, currency='GBP')
+                    # FIXME use the proper method
+                    t = Purchase.create_instances(db.session, user=user, tier=tt, currency='GBP')
                     t.state = 'paid'
                     user.tickets.append(t)
                     tickets.append(t)

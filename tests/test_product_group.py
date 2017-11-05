@@ -61,18 +61,18 @@ class SingleProductGroupTest(unittest.TestCase):
                 mock_expired_datetime.utcnow = Mock(return_value=datetime(2012, 9, 2))
 
                 with self.assertRaises(CapacityException):
-                    item.issue_instances()
+                    item.issue_instances(self.db.session)
 
             # Now test with a good value for now()
             with patch('models.mixins.datetime') as mock_good_datetime:
                 mock_good_datetime.utcnow = Mock(return_value=datetime(2012, 8, 2))
 
-                item.issue_instances()
+                item.issue_instances(self.db.session)
                 self.db.session.commit()
 
                 self.assertFalse(item.has_capacity())
                 with self.assertRaises(CapacityException):
-                    item.issue_instances()
+                    item.issue_instances(self.db.session)
 
     def test_capacity_remaining(self):
         with self.app.app_context():
@@ -123,15 +123,15 @@ class MultipleProductGroupTest(unittest.TestCase):
             assert self.tier2_1.get_total_remaining_capacity() == 10
 
             # Issue three instances to exhaust product1
-            self.tier1_1.issue_instances(3)
+            self.tier1_1.issue_instances(self.db.session, 3)
             self.db.session.commit()
 
             # Now we shouldn't be able to issue any more tickets from this product
             with pytest.raises(CapacityException):
-                self.tier1_1.issue_instances(1)
+                self.tier1_1.issue_instances(self.db.session, 1)
 
             with pytest.raises(CapacityException):
-                self.tier1_2.issue_instances(1)
+                self.tier1_2.issue_instances(self.db.session, 1)
 
             # All the capacity went from product1
             assert self.tier1_1.get_total_remaining_capacity() == 0
@@ -154,7 +154,7 @@ class MultipleProductGroupTest(unittest.TestCase):
             self.db.session.add(price2)
             self.db.session.commit()
 
-            assert price1 == self.product1.get_price('GBP')
+            assert price1 == self.product1.get_lowest_price_tier().get_price_object('gbp')
 
 
 class PurchaseTest(unittest.TestCase):
@@ -169,7 +169,7 @@ class PurchaseTest(unittest.TestCase):
             tier = PriceTier.get_by_name(self.tier_name)
             assert tier is not None
 
-        instance = Purchase.create_instances(user, tier, 'gbp')[0]
+        instance = Purchase.create_instances(session, user, tier, 'gbp')[0]
 
         session.add(instance)
         session.commit()
@@ -210,13 +210,13 @@ class PurchaseTest(unittest.TestCase):
             assert instance.price.value == Decimal('6.66')
 
             # Test issuing multiple instances works
-            more_instances = Purchase.create_instances(user, tier, 'gbp', 2)
+            more_instances = Purchase.create_instances(self.db.session, user, tier, 'gbp', 2)
             assert len(more_instances) == 2
             assert product.capacity_used == 3
 
             # Test issuing beyond capacity errors
             with pytest.raises(CapacityException):
-                Purchase.create_instances(user, tier, 'gbp')
+                Purchase.create_instances(self.db.session, user, tier, 'gbp')
 
     def test_product_instance_state_machine(self):
         states_dict = PURCHASE_STATES
@@ -356,7 +356,7 @@ class ProductTransferTest(unittest.TestCase):
             self.db.session.commit()
 
             # PriceTier needs to have been committed before this
-            instance = Purchase.create_instances(user1, tier, 'gbp')[0]
+            instance = Purchase.create_instances(self.db.session, user1, tier, 'gbp')[0]
             self.db.session.add(instance)
 
             self.db.session.commit()
@@ -365,7 +365,7 @@ class ProductTransferTest(unittest.TestCase):
         with self.app.app_context():
             user1 = User.get_by_email(self.user1_email)
             user2 = User.get_by_email(self.user2_email)
-            item = user1.purchases[0]
+            item = user1.purchased_products[0]
 
             item.price_tier.allow_check_in = True
             item.price_tier.is_transferable = False
@@ -396,7 +396,7 @@ class ProductTransferTest(unittest.TestCase):
             item.state = 'paid'
             self.db.session.commit()
             print(item.owner)
-            print(user2.tickets[0].state)
+            print(user2.owned_tickets[0].state)
             self.assertEqual(item, user2.get_tickets()[0])
             self.assertNotIn(item, user1.get_tickets())
 

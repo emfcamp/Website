@@ -26,6 +26,10 @@ def transfer_start(payment):
     logger.info("Created bank payment %s (%s)", payment.id, payment.bankref)
 
     payment.state = "inprogress"
+
+    for product in current_user.purchased_products:
+        product.set_state('payment-pending')
+
     db.session.commit()
 
     msg = Message("Your EMF ticket purchase",
