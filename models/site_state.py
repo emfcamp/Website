@@ -1,9 +1,11 @@
 # coding=utf-8
 from __future__ import division, absolute_import, print_function, unicode_literals
 from datetime import datetime
+from dateutil.parser import parse
 from main import cache, db
+from flask import current_app as app
 # from models.ticket import TicketType
-from models.product import ProductGroup
+from models.product import Product, ProductGroup
 
 class SiteState(db.Model):
     __tablename__ = 'site_state'
@@ -20,10 +22,19 @@ VALID_STATES = {
     'sales_state': ["sold-out", "sales-ended", "unavailable", "available"],
 }
 
+def config_date(key):
+    return parse(app.config.get(key))
 
 def calc_site_state(date):
     """ Logic to set the state of the homepage based on date. """
-    return "before-sales"
+    if date < config_date('SALES_START'):
+        return "before-sales"
+    elif date < config_date('EVENT_START'):
+        return "sales"
+    elif date < config_date('EVENT_END'):
+        return "event"
+    else:
+        return "after-event"
 
 def calc_sales_state(date):
     # if TicketType.get_tickets_remaining() < 1:
@@ -31,9 +42,9 @@ def calc_sales_state(date):
     if site_capacity.get_total_remaining_capacity() < 1:
         # We've hit capacity - no more tickets will be sold
         return "sold-out"
-    elif date > datetime(2016, 8, 7):
+    elif date > config_date('EVENT_END'):
         return "sales-ended"
-    elif site_capacity.get_price_cheapest_full() is None:
+    elif Product.get_cheapest_price('full') is None:
         # Tickets not currently available, probably just for this round, but we haven't hit site capacity
         return "unavailable"
     else:

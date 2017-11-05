@@ -68,6 +68,10 @@ class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
     def get_by_name(cls, name):
         return Product.query.filter_by(name=name).first()
 
+    @classmethod
+    def get_cheapest_price(cls, product_name='full'):
+        return cls.get_by_name(product_name).get_price('GBP')
+
     def get_purchase_count_by_state(self, states_to_get=None):
         """ Return a count of purchases, broken down by state.
             Optionally filter the states required to `states_to_get`.
