@@ -8,8 +8,6 @@ from flask_login import login_user, current_user
 from werkzeug import BaseResponse
 from werkzeug.exceptions import HTTPException
 
-# from models.ticket import Ticket, TicketType
-from models.product import PriceTier
 from models.purchase import Purchase
 from models.site_state import get_site_state, get_sales_state
 from models.feature_flag import get_db_flags

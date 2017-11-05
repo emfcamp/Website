@@ -86,6 +86,10 @@ class Purchase(db.Model):
     def is_paid(self):
         return self.state in bought_states
 
+    @property
+    def is_transferable(self):
+        return self.price_tier.parent.get_attribute('is_transferable')
+
     def set_state(self, new_state):
         new_state = new_state.lower()
 
@@ -105,7 +109,7 @@ class Purchase(db.Model):
         if self.state not in bought_states:
             raise PurchaseTransferException('Only paid items may be transferred.')
 
-        if not self.price_tier.is_transferable:
+        if not self.is_transferable:
             raise PurchaseTransferException('This item is not transferable.')
 
         if self.owner != from_user:

@@ -372,6 +372,13 @@ class ProductTransferTest(unittest.TestCase):
 
             with self.assertRaises(PurchaseTransferException) as e:
                 item.transfer(user1, user2, self.db.session)
+                self.assertIn('Only paid items may be transferred.', e.args[0])
+
+            item.state = 'paid'
+            self.db.session.commit()
+
+            with self.assertRaises(PurchaseTransferException) as e:
+                item.transfer(user1, user2, self.db.session)
                 self.assertIn('not transferable', e.args[0])
 
             with self.assertRaises(PurchaseTransferException) as e:
@@ -380,7 +387,7 @@ class ProductTransferTest(unittest.TestCase):
                 self.assertIn('does not own this item', e.args[0])
 
             self.db.session.commit()
-            item.price_tier.is_transferable = True
+            item.price_tier.parent.set_attribute('is_transferable', True)
 
             with self.assertRaises(PurchaseTransferException) as e:
                 item.transfer(user1, user1, self.db.session)
@@ -393,10 +400,6 @@ class ProductTransferTest(unittest.TestCase):
             self.assertEqual(item.owner_id, user2.id)
             self.assertEqual(item.purchaser_id, user1.id)
 
-            item.state = 'paid'
-            self.db.session.commit()
-            print(item.owner)
-            print(user2.owned_tickets[0].state)
             self.assertEqual(item, user2.get_tickets()[0])
             self.assertNotIn(item, user1.get_tickets())
 

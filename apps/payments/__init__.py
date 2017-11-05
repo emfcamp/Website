@@ -3,7 +3,6 @@ from flask import render_template, redirect, url_for, abort, flash, current_app 
 from flask.ext.login import login_required, current_user
 from sqlalchemy.sql.functions import func
 
-# from models import TicketType, Ticket
 from models import Payment
 from models import PriceTier
 from models.purchase import Purchase

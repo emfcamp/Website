@@ -1,13 +1,13 @@
 """reset migrations
 
-Revision ID: 5ebcb1b5fb3f
+Revision ID: 585a54a3cd79
 Revises: None
-Create Date: 2017-11-05 13:46:11.527506
+Create Date: 2017-11-05 23:27:09.718003
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '5ebcb1b5fb3f'
+revision = '585a54a3cd79'
 down_revision = None
 
 from alembic import op
@@ -25,6 +25,38 @@ def upgrade():
     )
     with op.batch_alter_table('bank_account', schema=None) as batch_op:
         batch_op.create_index('ix_bank_account_sort_code_acct_id', ['sort_code', 'acct_id'], unique=True)
+
+    op.create_table('bank_account_version',
+    sa.Column('id', sa.Integer(), autoincrement=False, nullable=False),
+    sa.Column('sort_code', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('acct_id', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('currency', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('transaction_id', sa.BigInteger(), autoincrement=False, nullable=False),
+    sa.Column('operation_type', sa.SmallInteger(), nullable=False),
+    sa.PrimaryKeyConstraint('id', 'transaction_id', name=op.f('pk_bank_account_version'))
+    )
+    with op.batch_alter_table('bank_account_version', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_bank_account_version_operation_type'), ['operation_type'], unique=False)
+        batch_op.create_index(batch_op.f('ix_bank_account_version_transaction_id'), ['transaction_id'], unique=False)
+
+    op.create_table('bank_transaction_version',
+    sa.Column('id', sa.Integer(), autoincrement=False, nullable=False),
+    sa.Column('account_id', sa.Integer(), autoincrement=False, nullable=True),
+    sa.Column('posted', sa.DateTime(), autoincrement=False, nullable=True),
+    sa.Column('type', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('amount_int', sa.Integer(), autoincrement=False, nullable=True),
+    sa.Column('fit_id', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('payee', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('payment_id', sa.Integer(), autoincrement=False, nullable=True),
+    sa.Column('suppressed', sa.Boolean(), autoincrement=False, nullable=True),
+    sa.Column('transaction_id', sa.BigInteger(), autoincrement=False, nullable=False),
+    sa.Column('operation_type', sa.SmallInteger(), nullable=False),
+    sa.PrimaryKeyConstraint('id', 'transaction_id', name=op.f('pk_bank_transaction_version'))
+    )
+    with op.batch_alter_table('bank_transaction_version', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_bank_transaction_version_fit_id'), ['fit_id'], unique=False)
+        batch_op.create_index(batch_op.f('ix_bank_transaction_version_operation_type'), ['operation_type'], unique=False)
+        batch_op.create_index(batch_op.f('ix_bank_transaction_version_transaction_id'), ['transaction_id'], unique=False)
 
     op.create_table('calendar_source',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -82,6 +114,39 @@ def upgrade():
     sa.Column('enabled', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('feature', name=op.f('pk_feature_flag'))
     )
+    op.create_table('payment_change_version',
+    sa.Column('id', sa.Integer(), autoincrement=False, nullable=False),
+    sa.Column('payment_id', sa.Integer(), autoincrement=False, nullable=True),
+    sa.Column('timestamp', sa.DateTime(), autoincrement=False, nullable=True),
+    sa.Column('state', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('transaction_id', sa.BigInteger(), autoincrement=False, nullable=False),
+    sa.Column('operation_type', sa.SmallInteger(), nullable=False),
+    sa.PrimaryKeyConstraint('id', 'transaction_id', name=op.f('pk_payment_change_version'))
+    )
+    with op.batch_alter_table('payment_change_version', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_payment_change_version_operation_type'), ['operation_type'], unique=False)
+        batch_op.create_index(batch_op.f('ix_payment_change_version_transaction_id'), ['transaction_id'], unique=False)
+
+    op.create_table('payment_version',
+    sa.Column('id', sa.Integer(), autoincrement=False, nullable=False),
+    sa.Column('user_id', sa.Integer(), autoincrement=False, nullable=True),
+    sa.Column('provider', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('currency', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('amount_int', sa.Integer(), autoincrement=False, nullable=True),
+    sa.Column('state', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('reminder_sent', sa.Boolean(), autoincrement=False, nullable=True),
+    sa.Column('bankref', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('gcid', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('chargeid', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('token', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('transaction_id', sa.BigInteger(), autoincrement=False, nullable=False),
+    sa.Column('operation_type', sa.SmallInteger(), nullable=False),
+    sa.PrimaryKeyConstraint('id', 'transaction_id', name=op.f('pk_payment_version'))
+    )
+    with op.batch_alter_table('payment_version', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_payment_version_operation_type'), ['operation_type'], unique=False)
+        batch_op.create_index(batch_op.f('ix_payment_version_transaction_id'), ['transaction_id'], unique=False)
+
     op.create_table('permission',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=True),
@@ -169,11 +234,38 @@ def upgrade():
         batch_op.create_index(batch_op.f('ix_purchase_version_operation_type'), ['operation_type'], unique=False)
         batch_op.create_index(batch_op.f('ix_purchase_version_transaction_id'), ['transaction_id'], unique=False)
 
+    op.create_table('refund_version',
+    sa.Column('id', sa.Integer(), autoincrement=False, nullable=False),
+    sa.Column('payment_id', sa.Integer(), autoincrement=False, nullable=True),
+    sa.Column('provider', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('amount_int', sa.Integer(), autoincrement=False, nullable=True),
+    sa.Column('timestamp', sa.DateTime(), autoincrement=False, nullable=True),
+    sa.Column('refundid', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('transaction_id', sa.BigInteger(), autoincrement=False, nullable=False),
+    sa.Column('operation_type', sa.SmallInteger(), nullable=False),
+    sa.PrimaryKeyConstraint('id', 'transaction_id', name=op.f('pk_refund_version'))
+    )
+    with op.batch_alter_table('refund_version', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_refund_version_operation_type'), ['operation_type'], unique=False)
+        batch_op.create_index(batch_op.f('ix_refund_version_transaction_id'), ['transaction_id'], unique=False)
+
     op.create_table('site_state',
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('state', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('name', name=op.f('pk_site_state'))
     )
+    op.create_table('stripe_refund_version',
+    sa.Column('id', sa.Integer(), autoincrement=False, nullable=False),
+    sa.Column('refundid', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('payment_id', sa.Integer(), autoincrement=False, nullable=True),
+    sa.Column('transaction_id', sa.BigInteger(), autoincrement=False, nullable=False),
+    sa.Column('operation_type', sa.SmallInteger(), nullable=False),
+    sa.PrimaryKeyConstraint('id', 'transaction_id', name=op.f('pk_stripe_refund_version'))
+    )
+    with op.batch_alter_table('stripe_refund_version', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_stripe_refund_version_operation_type'), ['operation_type'], unique=False)
+        batch_op.create_index(batch_op.f('ix_stripe_refund_version_transaction_id'), ['transaction_id'], unique=False)
+
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('email', sa.String(), nullable=True),
@@ -510,7 +602,17 @@ def downgrade():
         batch_op.drop_index(batch_op.f('ix_user_email'))
 
     op.drop_table('user')
+    with op.batch_alter_table('stripe_refund_version', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_stripe_refund_version_transaction_id'))
+        batch_op.drop_index(batch_op.f('ix_stripe_refund_version_operation_type'))
+
+    op.drop_table('stripe_refund_version')
     op.drop_table('site_state')
+    with op.batch_alter_table('refund_version', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_refund_version_transaction_id'))
+        batch_op.drop_index(batch_op.f('ix_refund_version_operation_type'))
+
+    op.drop_table('refund_version')
     with op.batch_alter_table('purchase_version', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_purchase_version_transaction_id'))
         batch_op.drop_index(batch_op.f('ix_purchase_version_operation_type'))
@@ -526,6 +628,16 @@ def downgrade():
         batch_op.drop_index(batch_op.f('ix_permission_name'))
 
     op.drop_table('permission')
+    with op.batch_alter_table('payment_version', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_payment_version_transaction_id'))
+        batch_op.drop_index(batch_op.f('ix_payment_version_operation_type'))
+
+    op.drop_table('payment_version')
+    with op.batch_alter_table('payment_change_version', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_payment_change_version_transaction_id'))
+        batch_op.drop_index(batch_op.f('ix_payment_change_version_operation_type'))
+
+    op.drop_table('payment_change_version')
     op.drop_table('feature_flag')
     with op.batch_alter_table('favourite_proposals_version', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_favourite_proposals_version_transaction_id'))
@@ -539,6 +651,17 @@ def downgrade():
 
     op.drop_table('cfp_vote_version')
     op.drop_table('calendar_source')
+    with op.batch_alter_table('bank_transaction_version', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_bank_transaction_version_transaction_id'))
+        batch_op.drop_index(batch_op.f('ix_bank_transaction_version_operation_type'))
+        batch_op.drop_index(batch_op.f('ix_bank_transaction_version_fit_id'))
+
+    op.drop_table('bank_transaction_version')
+    with op.batch_alter_table('bank_account_version', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_bank_account_version_transaction_id'))
+        batch_op.drop_index(batch_op.f('ix_bank_account_version_operation_type'))
+
+    op.drop_table('bank_account_version')
     with op.batch_alter_table('bank_account', schema=None) as batch_op:
         batch_op.drop_index('ix_bank_account_sort_code_acct_id')
 

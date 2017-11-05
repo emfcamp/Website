@@ -64,8 +64,10 @@ def create_product_groups():
     for order, (name, display_name, has_xfer, has_badge, capacity, description, prices) in enumerate(attendee_types):
         if Product.get_by_name(name):
             continue
-        pg = Product(name=name, display_name=display_name,
-                          capacity_max=capacity, description=description, parent=general)
+        pg = Product(name=name, display_name=display_name, capacity_max=capacity,
+                     description=description, parent=general,
+                     attributes={'is_transferable': has_xfer,
+                                 'has_badge': has_badge})
         db.session.add(pg)
 
         for index, (price_cap, gbp, eur) in enumerate(prices):
