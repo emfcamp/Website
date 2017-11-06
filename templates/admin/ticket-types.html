@@ -16,7 +16,7 @@
   <th></th>
 </tr></thead>
 <tbody>
-{% for type in ticket_types|sort(attribute='order') %}
+{% for type in ticket_types %}
 <tr class="ticket-type">
     <td><a href="{{ url_for('.ticket_type_details', type_id=type.id) }}">{{ type.name }}</a></td>
     <td>{{ type.order }}</td>

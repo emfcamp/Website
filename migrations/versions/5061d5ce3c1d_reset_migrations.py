@@ -1,13 +1,13 @@
 """reset migrations
 
-Revision ID: 585a54a3cd79
+Revision ID: 5061d5ce3c1d
 Revises: None
-Create Date: 2017-11-05 23:27:09.718003
+Create Date: 2017-11-06 22:20:30.218745
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '585a54a3cd79'
+revision = '5061d5ce3c1d'
 down_revision = None
 
 from alembic import op
@@ -524,8 +524,8 @@ def upgrade():
     op.create_table('purchase',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('type', sa.String(), nullable=False),
-    sa.Column('owner_id', sa.Integer(), nullable=False),
-    sa.Column('purchaser_id', sa.Integer(), nullable=False),
+    sa.Column('owner_id', sa.Integer(), nullable=True),
+    sa.Column('purchaser_id', sa.Integer(), nullable=True),
     sa.Column('price_tier_id', sa.Integer(), nullable=False),
     sa.Column('price_id', sa.Integer(), nullable=True),
     sa.Column('payment_id', sa.Integer(), nullable=True),

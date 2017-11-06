@@ -11,11 +11,11 @@ PRODUCT_TYPES = ["admission_ticket", "parking_ticket", "merchandise"]
 
 # state: [allowed next state, ] pairs
 PURCHASE_STATES = {'reserved': ['payment-pending', 'expired'],
-                            'payment-pending': ['expired', 'paid'],
-                            'expired': [],
-                            'paid': ['receipt-emailed', 'refunded'],
-                            'receipt-emailed': ['paid', 'refunded'],
-                            'refunded': [],
+                   'payment-pending': ['expired', 'paid'],
+                   'expired': [],
+                   'paid': ['receipt-emailed', 'refunded'],
+                   'receipt-emailed': ['paid', 'refunded'],
+                   'refunded': [],
                    }
 # non_blocking_states are those states that don't contribute towards a user limit
 non_blocking_states = ('expired', 'refunded')
@@ -39,8 +39,13 @@ class Purchase(db.Model):
     # Store the owner & purchaser so that we can calculate user_limits against
     # the former. We don't want to make it possible to buy over the
     # personal_limit of a product by transferring away purchases.
-    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    purchaser_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    purchaser_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    # Add constraints so that you can reserve a purchase anonymously but
+    # otherwise must be logged in.
+    db.CheckConstraint("state != 'reserved' AND owner_id is NULL", "anon_owner")
+    db.CheckConstraint("state != 'reserved' AND purchaser_id is NULL", "anon_purchaser")
 
     # Product FKs.
     # We don't technically need to store the price tier as we can get it from
@@ -89,6 +94,14 @@ class Purchase(db.Model):
     @property
     def is_transferable(self):
         return self.price_tier.parent.get_attribute('is_transferable')
+
+    def set_user(self, user):
+        if self.state != 'reserved' or \
+           self.owner_id is not None or \
+           self.purchaser_id is not None:
+            raise PurchaseStateException('Can only set state on purchases that are unclaimed & reserved.')
+        self.owner_id = user.id
+        self.purchaser_id = user.id
 
     def set_state(self, new_state):
         new_state = new_state.lower()
