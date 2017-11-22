@@ -41,6 +41,9 @@ migrate:
 
 data: db perms tickets bankaccounts
 
+exportdb:
+	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py exportdb
+
 perms:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createperms
 

@@ -22,11 +22,14 @@ from tasks.schedule import (
 from tasks.tickets import (
     CreateTickets, CreateParkingTickets, SendTickets, SendTransferReminder
 )
+from tasks.exportdb import ExportDB
+
 
 if __name__ == "__main__":
     manager = Manager(create_app())
     manager.add_command('createdb', CreateDB())
     manager.add_command('db', MigrateCommand)
+    manager.add_command('exportdb', ExportDB())
 
     manager.add_command('createbankaccounts', CreateBankAccounts())
     manager.add_command('loadofx', LoadOfx())

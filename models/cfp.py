@@ -3,8 +3,10 @@ from collections import namedtuple
 from dateutil.parser import parse as parse_date
 import re
 
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import UniqueConstraint, func, select
+from sqlalchemy.orm import column_property
 from slugify import slugify_unicode
+from models import group_dict, export_field_counts, export_field_edits, export_field_intervals, count_groups, range_dict
 
 from main import db
 
@@ -109,6 +111,11 @@ class Proposal(db.Model):
     votes = db.relationship('CFPVote', backref='proposal')
     favourites = db.relationship('User', secondary=FavouriteProposals, backref=db.backref('favourites', lazy='dynamic'))
 
+    favourite_count = column_property(select([func.count(FavouriteProposals.c.proposal_id)]).where(
+        FavouriteProposals.c.proposal_id == id,
+    ), deferred=True)
+
+
     # Fields for finalised info
     published_names = db.Column(db.String)
     arrival_period = db.Column(db.String)
@@ -128,6 +135,43 @@ class Proposal(db.Model):
     potential_venue = db.Column(db.Integer, db.ForeignKey('venue.id'))
 
     __mapper_args__ = {'polymorphic_on': type}
+
+    @classmethod
+    def get_export_data(cls):
+        if cls.__name__ == 'Proposal':
+            # Export stats for each proposal type separately
+            return {}
+
+        count_fields = ['needs_help', 'needs_money', 'needs_laptop',
+                         'one_day', 'notice_required', 'may_record', 'state']
+
+        edits_fields = ['title', 'description', 'requirements', 'length',
+                        'notice_required', 'needs_help', 'needs_money', 'one_day',
+                        'has_rejected_email', 'published_names', 'arrival_period',
+                        'departure_period', 'telephone_number', 'may_record',
+                        'needs_laptop', 'available_times',
+                        'attendees', 'cost', 'size', 'funds']
+
+        data = {
+            'private': {
+                'favourites': {
+                    'counts': group_dict(count_groups(cls.query.join(cls.favourites), cls.id)),
+                }
+            },
+            'public': {
+                'proposals': {
+                    'counts': export_field_counts(cls, count_fields),
+                    'edits': export_field_edits(cls, edits_fields),
+                },
+                'favourites': {
+                    'counts': range_dict(cls.query.with_entities(cls.favourite_count), [0, 1, 10, 20, 30, 40, 50, 100, 200]),
+                }
+            },
+            'tables': ['proposal', 'proposal_version', 'favourite_proposals', 'favourite_proposals_version'],
+        }
+        data['public']['proposals']['counts']['created_week'] = export_field_intervals(cls, 'created', 'week', 'YYYY-MM-DD')
+
+        return data
 
     def get_user_vote(self, user):
         # there can't be more than one vote per user per proposal
