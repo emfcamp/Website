@@ -13,6 +13,14 @@ from main import db
 class ExportDB(Command):
     """
     Dump public and private data, run as a last step before wiping the DB after an event
+
+    Model classes should implement get_export_data, which returns a dict with keys:
+        public   Public data to save in git
+        private  Private data that should be stored for a limited amount of time
+        tables   Tables this method exported, used to sanity check the export process
+
+    Alternatively, add __export_data__ = False to a class to state that get_export_data
+    shouldn't be called, and that its associated table doesn't need to be checked.
     """
     def run(self):
         # As we go, we check against the list of all tables, in case we forget about some
@@ -37,9 +45,6 @@ class ExportDB(Command):
             os.makedirs(os.path.join(path, dirname), exist_ok=True)
 
         for model_class in all_model_classes:
-            #if hasattr(model_class, '__export_class__'):
-            #    model_class = model_class.__export_class__
-
             if model_class in seen_model_classes:
                 continue
 
@@ -50,6 +55,13 @@ class ExportDB(Command):
 
             if table in fixtures + ignore:
                 app.logger.debug('Ignoring %s', model)
+                remaining_tables.remove(table)
+                continue
+
+            if not getattr(model_class, '__export_data__', True):
+                # We don't remove the version table, as we want
+                # to be explicit about chucking away edit stats
+                app.logger.debug('Skipping %s', model)
                 remaining_tables.remove(table)
                 continue
 
@@ -74,9 +86,6 @@ class ExportDB(Command):
 
                 exported_tables = export.get('tables', [table])
                 remaining_tables -= set(exported_tables)
-
-            if table in remaining_tables:
-                remaining_tables.remove(table)
 
         if remaining_tables:
             app.logger.warning('Remaining tables: %s', ', '.join(remaining_tables))

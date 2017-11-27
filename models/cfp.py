@@ -6,9 +6,10 @@ import re
 from sqlalchemy import UniqueConstraint, func, select
 from sqlalchemy.orm import column_property
 from slugify import slugify_unicode
-from models import group_dict, export_field_counts, export_field_edits, export_field_intervals, count_groups, range_dict
+from models import export_field_counts, export_field_edits, export_field_intervals, range_dict
 
 from main import db
+from .user import User
 
 # state: [allowed next state, ] pairs
 CFP_STATES = { 'edit': ['accepted', 'rejected', 'new'],
@@ -109,7 +110,7 @@ class Proposal(db.Model):
     # References to this table
     messages = db.relationship('CFPMessage', backref='proposal')
     votes = db.relationship('CFPVote', backref='proposal')
-    favourites = db.relationship('User', secondary=FavouriteProposals, backref=db.backref('favourites', lazy='dynamic'))
+    favourites = db.relationship(User, secondary=FavouriteProposals, backref=db.backref('favourites', lazy='dynamic'))
 
     favourite_count = column_property(select([func.count(FavouriteProposals.c.proposal_id)]).where(
         FavouriteProposals.c.proposal_id == id,
@@ -155,7 +156,7 @@ class Proposal(db.Model):
         data = {
             'private': {
                 'favourites': {
-                    'counts': group_dict(count_groups(cls.query.join(cls.favourites), cls.id)),
+                    'talks': cls.query.with_entities(cls.id, cls.title, cls.favourite_count).all(),
                 }
             },
             'public': {
@@ -363,6 +364,31 @@ class CFPMessage(db.Model):
 
         return False
 
+    @classmethod
+    def get_export_data(cls):
+        count_fields = ['has_been_read']
+
+        message_contents = cls.query.join(User).with_entities(
+            cls.proposal_id, cls.message, cls.is_to_admin, cls.has_been_read,
+            cls.from_user_id, User.name,
+        ).all()
+
+        data = {
+            'private': {
+                'message': message_contents,
+            },
+            'public': {
+                'messages': {
+                    'counts': export_field_counts(cls, count_fields),
+                },
+            },
+            'tables': ['cfp_message', 'cfp_message_version'],
+        }
+        data['public']['messages']['counts']['created_day'] = export_field_intervals(cls, 'created', 'day', 'YYYY-MM-DD')
+
+        return data
+
+
 class CFPVote(db.Model):
     __versioned__ = {}
     __tablename__ = 'cfp_vote'
@@ -393,8 +419,31 @@ class CFPVote(db.Model):
 
         self.state = state
 
+    @classmethod
+    def get_export_data(cls):
+        count_fields = ['state', 'has_been_read', 'vote']
+        edits_fields = ['state', 'vote', 'note']
+
+        data = {
+            'private': {
+            },
+            'public': {
+                'votes': {
+                    'counts': export_field_counts(cls, count_fields),
+                    'edits': export_field_edits(cls, edits_fields),
+                },
+            },
+            'tables': ['cfp_vote', 'cfp_vote_version'],
+        }
+        data['public']['votes']['counts']['created_day'] = export_field_intervals(cls, 'created', 'day', 'YYYY-MM-DD')
+
+        return data
+
+
 class Venue(db.Model):
     __tablename__ = 'venue'
+    __export_data__ = False
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     type = db.Column(db.String, nullable=True)
@@ -408,6 +457,7 @@ class Venue(db.Model):
     __table_args__ = (
         UniqueConstraint('name', name='_venue_name_uniq'),
     )
+
 
 # TODO: change the relationships on User and Proposal to 1-to-1
 db.Index('ix_cfp_vote_user_id_proposal_id', CFPVote.user_id, CFPVote.proposal_id, unique=True)

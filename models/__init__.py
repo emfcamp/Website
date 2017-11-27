@@ -31,6 +31,9 @@ def range_dict(rows, boundaries):
 
     for c, *_ in rows:
         i = bisect(boundaries, c)
+        if i == 0:
+            raise IndexError('{} is below the lowest boundary {}'.format(
+                             c, boundaries[0]))
         counts[ranges[i - 1]] += 1
 
     return counts
