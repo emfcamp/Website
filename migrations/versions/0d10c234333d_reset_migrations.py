@@ -1,13 +1,13 @@
 """reset migrations
 
-Revision ID: 5061d5ce3c1d
+Revision ID: 0d10c234333d
 Revises: None
-Create Date: 2017-11-06 22:20:30.218745
+Create Date: 2017-12-02 16:39:55.282294
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '5061d5ce3c1d'
+revision = '0d10c234333d'
 down_revision = None
 
 from alembic import op

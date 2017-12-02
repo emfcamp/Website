@@ -8,6 +8,10 @@ from .purchase import bought_states
 from .exc import CapacityException
 
 
+# These need to be used in migrations
+CAPACITY_CONSTRAINT_SQL = "capacity_used <= capacity_max"
+CAPACITY_CONSTRAINT_NAME = "within_capacity"
+
 class CapacityMixin(object):
     """ Defines a database object which has an optional maximum capacity and an optional parent
         (which must also inherit CapacityMixin). Objects also have an expiry date.
@@ -29,7 +33,9 @@ class CapacityMixin(object):
     def __expired(self):
         return column_property(and_(~self.expires.is_(None), self.expires < func.now()))
 
-    db.CheckConstraint("capacity_used <= capacity_max", "within_capacity")
+    # This doesn't really do anything here as flask-migrate/alembic doesn't
+    # seem to for CHECK-constraints but it's here for completeness
+    db.CheckConstraint(CAPACITY_CONSTRAINT_SQL, name=CAPACITY_CONSTRAINT_NAME)
 
     def has_capacity(self, count=1, session=None):
         """

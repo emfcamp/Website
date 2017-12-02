@@ -23,6 +23,11 @@ bought_states = ('paid', 'receipt-emailed')
 allowed_states = set(PURCHASE_STATES.keys())
 PURCHASE_EXPIRY_TIME = 2  # In hours
 
+# See note in mixins.py on CheckConstraints
+ANON_OWNER_SQL = "state != 'reserved' AND owner_id is NULL"
+ANON_OWNER_NAME = "anon_owner"
+ANON_PURCHASER_SQL = "state != 'reserved' AND purchaser_id is NULL"
+ANON_PURCHASER_NAME = "anon_purchaser"
 
 class CheckinStateException(Exception):
     pass
@@ -43,9 +48,9 @@ class Purchase(db.Model):
     purchaser_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     # Add constraints so that you can reserve a purchase anonymously but
-    # otherwise must be logged in.
-    db.CheckConstraint("state != 'reserved' AND owner_id is NULL", "anon_owner")
-    db.CheckConstraint("state != 'reserved' AND purchaser_id is NULL", "anon_purchaser")
+    # otherwise must be logged in. See note in mixins.py on CheckConstraints
+    db.CheckConstraint(ANON_OWNER_SQL, ANON_OWNER_NAME)
+    db.CheckConstraint(ANON_PURCHASER_SQL, ANON_PURCHASER_NAME)
 
     # Product FKs.
     # We don't technically need to store the price tier as we can get it from
