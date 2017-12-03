@@ -14,7 +14,7 @@
     </tr>
   </thead>
   <tbody>
-{%- for t in tickets -%}
+{%- for t in tickets if t.state != 'cancelled' -%}
 
 <tr class="
 {{- loop.cycle('odd', 'even') }}

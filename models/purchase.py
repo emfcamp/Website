@@ -9,24 +9,27 @@ from .exc import CapacityException
 # but only `admission_ticket` allows access to the site.
 PRODUCT_TYPES = ["admission_ticket", "parking_ticket", "merchandise"]
 
-# state: [allowed next state, ] pairs
-PURCHASE_STATES = {'reserved': ['payment-pending', 'expired'],
+# state: [allowed next state, ] pairs, see docs/ticket_states.md
+PURCHASE_STATES = {'reserved': ['payment-pending', 'expired', 'cancelled'],
                    'payment-pending': ['expired', 'paid'],
                    'expired': [],
+                   'cancelled': [],
                    'paid': ['receipt-emailed', 'refunded'],
                    'receipt-emailed': ['paid', 'refunded'],
                    'refunded': [],
                    }
 # non_blocking_states are those states that don't contribute towards a user limit
-non_blocking_states = ('expired', 'refunded')
+non_blocking_states = ('expired', 'refunded', 'cancelled')
 bought_states = ('paid', 'receipt-emailed')
+anon_states = ('reserved', 'cancelled', 'expired')
 allowed_states = set(PURCHASE_STATES.keys())
 PURCHASE_EXPIRY_TIME = 2  # In hours
 
 # See note in mixins.py on CheckConstraints
-ANON_OWNER_SQL = "owner_id IS NOT NULL OR state = 'reserved'"
+anon_state_strs = ','.join(["'{0}'".format(s) for s in anon_states])
+ANON_OWNER_SQL = "owner_id IS NOT NULL OR state in ({0})".format(anon_state_strs)
 ANON_OWNER_NAME = "anon_owner"
-ANON_PURCHASER_SQL = "purchaser_id IS NOT NULL OR state = 'reserved'"
+ANON_PURCHASER_SQL = "purchaser_id IS NOT NULL OR state in ({0})".format(anon_state_strs)
 ANON_PURCHASER_NAME = "anon_purchaser"
 
 class CheckinStateException(Exception):

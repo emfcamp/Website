@@ -103,17 +103,18 @@ def set_user_currency(currency):
 def get_basket_cost(basket):
     return sum([p.price.value for p in basket], 0)
 
-def get_basket_and_total():
+def get_basket():
     if current_user.is_anonymous:
-        basket = session.get('reserved_purchase_ids')
+        basket = session.get('reserved_purchase_ids', [])
         # TODO error handling if basket is empty
-        basket = [Purchase.query.filter_by(id=b,
-                                           state='reserved',
-                                           owner_id=None,
-                                           purchaser_id=None).first() for b in basket]
-    else:
-        basket = current_user.purchased_products.filter_by(state='reserved').all()
+        return [Purchase.query.filter_by(id=b,
+                                         state='reserved',
+                                         owner_id=None,
+                                         purchaser_id=None).first() for b in basket]
+    return current_user.purchased_products.filter_by(state='reserved').all()
 
+def get_basket_and_total():
+    basket = get_basket()
     if not basket:
         return [], 0, get_user_currency()
 
@@ -124,11 +125,17 @@ def get_basket_and_total():
     return basket, total, currency
 
 def get_basket_size():
-    if current_user.is_anonymous and session.get('reserved_purchase_ids', []) == []:
-        return 0
-    elif not current_user.is_anonymous and len(current_user.purchased_products) == 0:
-        return 0
-    return len(get_basket_and_total()[0])
+    return len(get_basket())
+
+def empty_basket():
+    basket = get_basket()
+
+    for purchase in basket:
+        purchase.set_state('cancelled')
+
+    session.pop('reserved_purchase_ids', None)
+    db.session.commit()
+
 
 # This creates the user's items in the reserved state.
 def create_basket(items):

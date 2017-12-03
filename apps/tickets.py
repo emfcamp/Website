@@ -32,6 +32,7 @@ from models.payment import Payment
 from .common import (
     get_user_currency, set_user_currency, get_basket_and_total, create_basket,
     CURRENCY_SYMBOLS, feature_flag, create_current_user, feature_enabled,
+    empty_basket
 )
 from .common.forms import IntegerSelectField, HiddenIntegerField, Form
 from .common.receipt import (
@@ -43,7 +44,6 @@ from .payments.stripe import stripe_start
 
 
 tickets = Blueprint('tickets', __name__)
-
 
 def create_payment(paymenttype):
     """
@@ -92,6 +92,7 @@ def main():
 
     # FIXME all of this
     all_tickets = current_user.purchased_products \
+                              .filter(Purchase.state != 'cancelled') \
                               .join(PriceTier) \
                               .outerjoin(Payment) \
                               .filter(or_(Payment.id.is_(None),
@@ -158,6 +159,11 @@ class TicketAmountsForm(Form):
 @tickets.route("/tickets/choose/<flow>", methods=['GET', 'POST'])
 @feature_flag('TICKET_SALES')
 def choose(flow=None):
+    is_new_basket = request.args.get('is_new_basket', False)
+    if is_new_basket:
+        empty_basket()
+        return redirect(url_for('tickets.choose', flow=flow))
+
     token = session.get('ticket_token')
     sales_state = get_sales_state()
 
@@ -276,7 +282,6 @@ class TicketPaymentForm(Form):
 @tickets.route("/tickets/pay", methods=['GET', 'POST'])
 @tickets.route("/tickets/pay/<flow>", methods=['GET', 'POST'])
 def pay(flow=None):
-
     if flow is None:
         admissions = True
     elif flow == 'other':

@@ -27,7 +27,7 @@ def transfer_start(payment):
 
     payment.state = "inprogress"
 
-    for product in current_user.purchased_products:
+    for product in current_user.purchased_products.filter_by(state='reserved').all():
         product.set_state('payment-pending')
 
     db.session.commit()

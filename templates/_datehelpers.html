@@ -2,7 +2,7 @@
 {% set total_seconds = dt.total_seconds() %}
 {# str(timedelta) -> D days, HH:MM:SS.sss #}
 {%- if total_seconds > 86400 -%}
-    {{ (dt|string).split(',')[0] }}
+    {{ (total_seconds/86400.0)|round|int }} days
 {%- elif total_seconds > 7200 -%}
     {% set hours = (dt|string).split(':')[0] %}
     {{hours}} hours

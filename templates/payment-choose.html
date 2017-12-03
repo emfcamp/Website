@@ -21,8 +21,9 @@
     <form method="POST">
     {{ form.hidden_tag() }}
     <div class="btn-group" role="group">
+        <a class="btn btn-default" href="{{url_for('tickets.choose', is_new_basket=True)}}">Empty basket</a>
         {% if admissions %}
-        <a class="btn btn-default" href="{{url_for('tickets.choose')}}">Change tickets</a>
+        <a class="btn btn-default" href="{{url_for('tickets.choose')}}">Add more tickets</a>
         {% else %}
         <a class="btn btn-default" href="{{url_for('tickets.choose', flow='other')}}">Change items</a>
         {% endif %}
