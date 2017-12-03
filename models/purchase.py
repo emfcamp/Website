@@ -24,9 +24,9 @@ allowed_states = set(PURCHASE_STATES.keys())
 PURCHASE_EXPIRY_TIME = 2  # In hours
 
 # See note in mixins.py on CheckConstraints
-ANON_OWNER_SQL = "state != 'reserved' AND owner_id is NULL"
+ANON_OWNER_SQL = "owner_id IS NOT NULL OR state = 'reserved'"
 ANON_OWNER_NAME = "anon_owner"
-ANON_PURCHASER_SQL = "state != 'reserved' AND purchaser_id is NULL"
+ANON_PURCHASER_SQL = "purchaser_id IS NOT NULL OR state = 'reserved'"
 ANON_PURCHASER_NAME = "anon_purchaser"
 
 class CheckinStateException(Exception):
@@ -39,6 +39,7 @@ class Purchase(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String, nullable=False)
+    is_ticket = column_property(type == 'ticket')
 
     # User FKs
     # Store the owner & purchaser so that we can calculate user_limits against
@@ -71,7 +72,7 @@ class Purchase(db.Model):
     state = db.Column(db.String, default='reserved', nullable=False)
     # Until an instance is paid for, we track the payment's expiry
     expires = db.Column(db.DateTime, nullable=False)
-    is_paid_for = column_property(state.in_(bought_states))
+    is_paid = column_property(state.in_(bought_states))
 
     # Relationships
     price = db.relationship('Price', backref='purchases')
@@ -89,14 +90,6 @@ class Purchase(db.Model):
         return "<ProductInstance %s %s: %s>" % (self.id, self.price_tier.name, self.state)
 
     @property
-    def is_ticket(self):
-        return self.type == 'ticket'
-
-    @property
-    def is_paid(self):
-        return self.state in bought_states
-
-    @property
     def is_transferable(self):
         return self.price_tier.parent.get_attribute('is_transferable')
 
@@ -110,6 +103,9 @@ class Purchase(db.Model):
 
     def set_state(self, new_state):
         new_state = new_state.lower()
+
+        if new_state == self.state:
+            return
 
         if new_state not in PURCHASE_STATES:
             raise PurchaseStateException('"%s" is not a valid state.')
@@ -196,6 +192,8 @@ class Purchase(db.Model):
         # appropriate capacity counters.
         tier.issue_instances(session, count)
 
+        if user.is_anonymous:
+            return [purchase_cls(tier, price, None, None) for c in range(count)]
         return [purchase_cls(tier, price, user, user) for c in range(count)]
 
     __mapper_args__ = {

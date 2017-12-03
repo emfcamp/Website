@@ -106,10 +106,10 @@ def main():
     if not tickets and not payments:
         return redirect(url_for('tickets.choose'))
 
-    transferred_to = current_user.transfers_to.all()
-    transferred_from = current_user.transfers_from.all()
+    transferred_to = current_user.transfers_to
+    transferred_from = current_user.transfers_from
 
-    show_receipt = any([tt for tt in tickets if tt.paid is True])
+    show_receipt = any([tt for tt in tickets if tt.is_paid is True])
 
     return render_template("tickets-main/main.html",
                            tickets=tickets,
@@ -231,6 +231,8 @@ def choose(flow=None):
             if basket:
 
                 app.logger.info('total: %s basket: %s', total, basket)
+                if current_user.is_anonymous:
+                    session['reserved_purchase_ids'] = [b.id for b in basket]
 
                 return redirect(url_for('tickets.pay', flow=flow))
             elif admissions:
@@ -311,7 +313,9 @@ def pay(flow=None):
 
         if current_user.is_anonymous:
             try:
-                create_current_user(form.email.data, form.name.data)
+                new_user = create_current_user(form.email.data, form.name.data)
+                for purchase in basket:
+                    purchase.set_user(new_user)
             except IntegrityError as e:
                 app.logger.warn('Adding user raised %r, possible double-click', e)
                 return None

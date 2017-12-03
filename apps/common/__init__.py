@@ -103,7 +103,12 @@ def get_basket_cost(basket):
     return sum([p.price.value for p in basket], 0)
 
 def get_basket_and_total():
-    basket = current_user.purchased_products.filter_by(state='reserved').all()
+    if current_user.is_anonymous:
+        basket = session.get('reserved_purchase_ids')
+        # TODO error handling if basket is empty
+        basket = [Purchase.query.filter_by(id=b, state='reserved').first() for b in basket]
+    else:
+        basket = current_user.purchased_products.filter_by(state='reserved').all()
     currency = basket[0].price.currency
 
     total = get_basket_cost(basket)
