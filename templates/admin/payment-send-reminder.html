@@ -19,7 +19,7 @@
   <th>Expires</th>
 </tr></thead>
 <tbody>
-{% for t in payment.tickets %}
+{% for t in payment.purchases %}
 <tr>
   <td>{{ t.type.name }}</td>
   <td>{{ t.expires.strftime('%Y-%m-%d %H:%M:%S') }}</td>

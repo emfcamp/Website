@@ -10,7 +10,7 @@ from .exc import CapacityException
 PRODUCT_TYPES = ["admission_ticket", "parking_ticket", "merchandise"]
 
 # state: [allowed next state, ] pairs, see docs/ticket_states.md
-PURCHASE_STATES = {'reserved': ['payment-pending', 'expired', 'cancelled'],
+PURCHASE_STATES = {'reserved': ['payment-pending', 'expired', 'cancelled', 'paid'],
                    'payment-pending': ['expired', 'paid'],
                    'expired': [],
                    'cancelled': [],
@@ -269,8 +269,6 @@ class PurchaseTransfer(db.Model):
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     product_instance = db.relationship(Purchase, backref=db.backref("transfers", cascade="all"))
-    to_user = db.relationship('User', backref="transfers_to", foreign_keys=[to_user_id])
-    from_user = db.relationship('User', backref="transfers_from", foreign_keys=[from_user_id])
 
     def __init__(self, product_instance, to_user, from_user):
         if to_user.id == from_user.id:

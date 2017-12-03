@@ -67,8 +67,8 @@ class Payment(db.Model):
         if self.state == 'paid':
             raise StateException('Payment is already paid')
 
-        for ticket in self.tickets:
-            ticket.paid = True
+        for purchase in self.purchases:
+            purchase.set_state('paid')
         self.state = 'paid'
 
     def cancel(self):

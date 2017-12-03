@@ -101,8 +101,6 @@ class User(db.Model, UserMixin):
     checkin_note = db.Column(db.String, nullable=True)
 
     diversity = db.relationship('UserDiversity', uselist=False, backref='user', cascade='all, delete, delete-orphan')
-    # tickets = db.relationship('Ticket', lazy='dynamic', backref='user', cascade='all, delete, delete-orphan')
-    tickets = []
     payments = db.relationship('Payment', lazy='dynamic', backref='user', cascade='all')
     permissions = db.relationship('Permission', backref='user', cascade='all', secondary=UserPermission)
     votes = db.relationship('CFPVote', backref='user', lazy='dynamic')
@@ -117,17 +115,26 @@ class User(db.Model, UserMixin):
                                            cascade='all, delete, delete-orphan')
 
     messages_from = db.relationship('CFPMessage',
-                                   primaryjoin='CFPMessage.from_user_id == User.id',
-                                   backref='from_user', lazy='dynamic')
+                                    primaryjoin='CFPMessage.from_user_id == User.id',
+                                    backref='from_user', lazy='dynamic')
 
     owned_products = db.relationship('Purchase',
-                                    backref='owner', lazy='dynamic',
-                                    primaryjoin='Purchase.owner_id == User.id',
-                                    cascade='all, delete, delete-orphan')
+                                     backref='owner', lazy='dynamic',
+                                     primaryjoin='Purchase.owner_id == User.id',
+                                     cascade='all, delete, delete-orphan')
     purchased_products = db.relationship('Purchase',
                                          backref='purchaser', lazy='dynamic',
                                          primaryjoin='Purchase.purchaser_id == User.id',
                                          cascade='all, delete, delete-orphan')
+
+    transfers_to = db.relationship('PurchaseTransfer',
+                                   backref='transfered_to', lazy='dynamic',
+                                   primaryjoin='PurchaseTransfer.to_user_id == User.id',
+                                   cascade='all, delete, delete-orphan')
+    transfers_from = db.relationship('PurchaseTransfer',
+                                     backref='transfered_from', lazy='dynamic',
+                                     primaryjoin='PurchaseTransfer.from_user_id == User.id',
+                                     cascade='all, delete, delete-orphan')
 
     def __init__(self, email, name):
         self.email = email
@@ -142,7 +149,8 @@ class User(db.Model, UserMixin):
     @property
     def purchased_tickets(self):
         """ This returns all tickets (in all states) bought by the user """
-        return [p for p in self.purchased_products if p.is_ticket]
+        # return [p for p in self.purchased_products if p.is_ticket]
+        return self.purchased_products.filter_by(is_ticket=True)
 
     @property
     def owned_tickets(self):

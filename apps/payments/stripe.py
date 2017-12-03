@@ -86,7 +86,7 @@ def charge_stripe(payment):
     else:
         payment.state = 'charged'
 
-        for t in payment.tickets:
+        for t in payment.purchases:
             t.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS_STRIPE'])
             logger.info("Set expiry for ticket %s", t.id)
 
@@ -319,7 +319,7 @@ def stripe_payment_refunded(payment):
 
     logger.info('Setting payment %s to refunded', payment.id)
     now = datetime.utcnow()
-    for ticket in payment.tickets:
+    for ticket in payment.purchases:
         ticket.paid = False
         if ticket.expires is None or ticket.expires > now:
             ticket.expires = now

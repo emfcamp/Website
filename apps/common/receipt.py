@@ -12,34 +12,32 @@ from lxml import etree
 from flask import Markup, render_template, request, current_app as app
 from sqlalchemy import func
 
-from models.product import ProductGroup, PriceTier
+from models.product import Product, ProductGroup, PriceTier
 from models.purchase import PurchaseTransfer
 from models import Purchase
 
 
 def render_receipt(user, png=False, pdf=False):
-    tickets = (user.tickets
-                  .filter_by(paid=True)
-                  .join(PriceTier)
-                  .order_by(PriceTier.order))
-
-    entrance_tts_counts = (tickets.filter_by(is_ticket=True)
-        .with_entities(ProductGroup, func.count(Purchase.id).label('ticket_count'))
-        .group_by(ProductGroup).all())
+    entrance_tts_counts = (user.purchased_products
+                               .filter_by(state='paid', is_ticket=True)
+                               .join(PriceTier)
+                               .with_entities(PriceTier,
+                                              func.count(Purchase.id)
+                                                  .label('ticket_count'))
+                               .group_by(PriceTier).all())
     entrance_tickets_count = sum(c for tt, c in entrance_tts_counts)
 
-    # FIXME
-    # vehicle_tickets = tickets.filter(TicketType.admits.in_(['car', 'campervan'])).all()
-    vehicle_tickets = ['FIXME']
+    other = user.purchased_products.filter_by(state='paid', is_ticket=False) \
+                                   .join(PriceTier, Product, ProductGroup)
 
-    transferred_tickets = user.transfers_from.join(Purchase).filter_by(is_paid_for=True) \
+    vehicle_tickets = other.filter(ProductGroup.name == 'Parking').all()
+
+    tees = (other.filter(ProductGroup.name == 'Tee')
+                 .with_entities(PriceTier, func.count(Purchase.id).label('ticket_count'))
+                 .group_by(PriceTier).all())  # t-shirts
+
+    transferred_tickets = user.transfers_from.join(Purchase).filter_by(state='paid') \
                               .with_entities(PurchaseTransfer).order_by('timestamp').all()
-
-    # FIXME
-    # tees = (tickets.filter(TicketType.fixed_id.in_(range(14, 24)))
-    #               .with_entities(TicketType, func.count(Ticket.id).label('ticket_count'))
-    #               .group_by(TicketType).all())  # t-shirts
-    tees = ['FIXME']
 
     return render_template('receipt.html', user=user,
                            format_inline_qr=format_inline_qr,
@@ -141,13 +139,17 @@ def make_barcode_png(data, **options):
 
 def attach_tickets(msg, user):
     # Attach tickets to a mail Message
-    page = render_receipt(user, pdf=True)
-    pdf = render_pdf(page)
+    # TODO make this work again
+    app.logger.warn("This still isn't working, no receipts are being sent")
+    return
+    # page = render_receipt(user, pdf=True)
+    # pdf = render_pdf(page)
 
-    tickets = user.tickets.filter_by(paid=True)
-    plural = (tickets.count() != 1 and 's' or '')
-    msg.attach('Ticket%s.pdf' % plural, 'application/pdf', pdf.read())
+    # tickets = user.tickets.filter_by(paid=True)
+    # plural = (tickets.count() != 1 and 's' or '')
+    # msg.attach('Ticket%s.pdf' % plural, 'application/pdf', pdf.read())
 
-    for t in tickets:
-        t.emailed = True
+    # tickets = user.purchased_products.filter_by(state='paid')
+    # for t in tickets:
+    #     tickets.set_state('receipt-emailed')
 

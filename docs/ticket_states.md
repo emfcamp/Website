@@ -15,7 +15,7 @@ There are 7 states that a purchase can be in:
 
 Transitions between states are limited to:
 
-* reserved -> payment-pending, expired, cancelled
+* reserved -> payment-pending, expired, cancelled, paid
 * payment-pending -> expired, paid
 * expired -> 
 * cancelled -> 

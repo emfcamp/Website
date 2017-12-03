@@ -12,7 +12,7 @@ from models.product import (
 )
 from models.exc import CapacityException
 from models.purchase import PurchaseStateException, PurchaseTransferException, PURCHASE_STATES
-from models import Purchase, bought_states
+from models import Purchase
 
 
 class SingleProductGroupTest(unittest.TestCase):

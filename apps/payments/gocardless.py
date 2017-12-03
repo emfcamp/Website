@@ -95,7 +95,7 @@ def gocardless_complete(payment_id):
     payment.gcid = gcid
     payment.state = 'inprogress'
 
-    for t in payment.tickets:
+    for t in payment.purchases:
         # We need to make sure of a 5 working days grace
         # for gocardless payments, so push the ticket expiry forwards
         t.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS_GOCARDLESS'])

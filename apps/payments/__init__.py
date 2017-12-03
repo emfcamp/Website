@@ -46,7 +46,7 @@ def terms():
 def invoice(payment_id):
     payment = get_user_payment_or_abort(payment_id, allow_admin=True)
 
-    invoice_lines = payment.tickets.join(PriceTier). \
+    invoice_lines = payment.purchases.join(PriceTier). \
         with_entities(PriceTier, func.count(Purchase.price_tier_id)). \
         group_by(PriceTier).order_by(PriceTier.order).all()
 
@@ -69,7 +69,7 @@ def invoice(payment_id):
 
     app.logger.debug('Invoice total: %s + %s = %s', subtotal, vat, payment.amount)
 
-    due_date = min(t.expires for t in payment.tickets)
+    due_date = min(t.expires for t in payment.purchases)
 
     return render_template('invoice.html', payment=payment, invoice_lines=invoice_lines,
                            premium=premium, subtotal=subtotal, vat=vat, due_date=due_date)

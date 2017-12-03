@@ -1,4 +1,4 @@
-{% for type, tickets in payment.tickets|groupby('type') -%}
+{% for type, tickets in payment.purchases|groupby('type') -%}
 {{ type.name }}: {{ tickets|length }} at {{ type.get_price(payment.currency) | price(payment.currency) }}
 {% endfor %}
 
