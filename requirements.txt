@@ -89,7 +89,7 @@ icalendar==3.11.7
 mailchimp3==2.0.17
 
 # payments
-gocardless==0.5.3
+gocardless_pro==1.2.0
 stripe==1.66.0
 ofxparse==0.16
 beautifulsoup4==4.6.0

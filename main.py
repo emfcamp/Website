@@ -17,8 +17,8 @@ from flask_cdn import CDN
 from flask_cache import Cache
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_wtf import CsrfProtect
-import gocardless
 import stripe
+import gocardless_pro
 
 
 # If we have logging handlers set up here, don't touch them.
@@ -49,6 +49,7 @@ cdn = CDN()
 login_manager = LoginManager()
 assets = Environment()
 toolbar = DebugToolbarExtension()
+gocardless_client = None
 
 assets.register('css_main', Bundle('css/main.scss',
                 output='gen/main-packed.css',
@@ -108,12 +109,9 @@ def create_app(dev_server=False):
         return user
 
     if app.config.get('TICKETS_SITE'):
-        gocardless.environment = app.config['GOCARDLESS_ENVIRONMENT']
-        gocardless.set_details(app_id=app.config['GOCARDLESS_APP_ID'],
-                               app_secret=app.config['GOCARDLESS_APP_SECRET'],
-                               access_token=app.config['GOCARDLESS_ACCESS_TOKEN'],
-                               merchant_id=app.config['GOCARDLESS_MERCHANT_ID'])
-
+        global gocardless_client
+        gocardless_client = gocardless_pro.Client(access_token=app.config['GOCARDLESS_ACCESS_TOKEN'],
+                                                  environment=app.config['GOCARDLESS_ENVIRONMENT'])
         stripe.api_key = app.config['STRIPE_SECRET_KEY']
 
         @app.before_request

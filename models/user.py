@@ -128,11 +128,11 @@ class User(db.Model, UserMixin):
                                          cascade='all, delete, delete-orphan')
 
     transfers_to = db.relationship('PurchaseTransfer',
-                                   backref='transfered_to', lazy='dynamic',
+                                   backref='to_user', lazy='dynamic',
                                    primaryjoin='PurchaseTransfer.to_user_id == User.id',
                                    cascade='all, delete, delete-orphan')
     transfers_from = db.relationship('PurchaseTransfer',
-                                     backref='transfered_from', lazy='dynamic',
+                                     backref='from_user', lazy='dynamic',
                                      primaryjoin='PurchaseTransfer.from_user_id == User.id',
                                      cascade='all, delete, delete-orphan')
 

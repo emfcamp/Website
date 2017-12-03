@@ -247,7 +247,7 @@ class PurchaseTest(unittest.TestCase):
                 instance.set_state('disallowed-state')
 
             with self.assertRaises(PurchaseStateException):
-                instance.set_state('paid')
+                instance.set_state('receipt-emailed')
 
             instance.set_state('payment-pending')
 

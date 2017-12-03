@@ -142,7 +142,9 @@ class Purchase(db.Model):
 
         self.owner = to_user
 
-        session.add(PurchaseTransfer(product_instance=self, to_user=to_user, from_user=from_user))
+        session.add(PurchaseTransfer(product_instance=self,
+                                     to_user=to_user,
+                                     from_user=from_user))
         session.commit()
 
     @classmethod
@@ -273,7 +275,9 @@ class PurchaseTransfer(db.Model):
     def __init__(self, product_instance, to_user, from_user):
         if to_user.id == from_user.id:
             raise PurchaseTransferException('"From" and "To" users must be different.')
-        super().__init__(product_instance=product_instance, to_user=to_user, from_user=from_user)
+        super().__init__(product_instance=product_instance,
+                         to_user_id=to_user.id,
+                         from_user_id=from_user.id)
 
     def __repr__(self):
         return "<Purchase Transfer: %s from %s to %s on %s>" % (

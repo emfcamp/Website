@@ -1,4 +1,4 @@
-from main import db, gocardless, external_url
+from main import db, gocardless_client
 from sqlalchemy import event
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import get_history
@@ -278,24 +278,26 @@ class GoCardlessPayment(Payment):
     name = 'GoCardless payment'
 
     __mapper_args__ = {'polymorphic_identity': 'gocardless'}
+    session_token = db.Column(db.String, unique=True)
+    redirect_id = db.Column(db.String, unique=True)
+    mandate = db.Column(db.String, unique=True)
     gcid = db.Column(db.String, unique=True)
 
-    def bill_url(self, name):
-        # TODO: check country
-        bill_url = gocardless.client.new_bill_url(
-            amount=self.amount,
-            name=name,
-            user={
-                'email': self.user.email
+    def payment_params(self):
+        return {
+            "amount": self.amount,
+            "currency": self.currency,
+            "links": {
+                "mandate": self.mandate
             },
-            redirect_uri=external_url('payments.gocardless_complete', payment_id=self.id),
-            cancel_uri=external_url('payments.gocardless_cancel', payment_id=self.id),
-            currency=self.currency,
-        )
-
-        return bill_url
+            "metadata": {
+                "user_id": self.user_id,
+                "payment_id": self.id
+            }
+        }
 
     def cancel(self):
+        # TODO make this work again
         if self.state == 'new':
             # No bill to check
             pass
@@ -305,13 +307,14 @@ class GoCardlessPayment(Payment):
             pass
 
         else:
+            pass
             # FIXME: move this out to the app
-            bill = gocardless.client.bill(self.gcid)
+            gocardless_client.payments.cancel(self.gcid)
 
-            if bill.can_be_cancelled:
-                bill.cancel()
-            elif bill.status != 'cancelled':
-                raise StateException('GoCardless will not allow this bill to be cancelled')
+            # if bill.can_be_cancelled:
+            #     bill.cancel()
+            # elif bill.status != 'cancelled':
+            #     raise StateException('GoCardless will not allow this bill to be cancelled')
 
         super(GoCardlessPayment, self).cancel()
 
