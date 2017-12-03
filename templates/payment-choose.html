@@ -1,3 +1,4 @@
+{% from "_datehelpers.html" import pprint_timedelta %}
 {% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block title %}Choose Payment{% endblock %}
@@ -12,7 +13,7 @@
     {% endif %}
     <ul>
         {% for purchase in basket %}
-        <li>{{purchase.price_tier.parent.display_name}}</li>
+        <li>{{purchase.price_tier.parent.display_name}} &mdash; expires in {{ pprint_timedelta(purchase.expires_in) }}</li>
         {% endfor %}
     </ul>
     <p>The total price is <b>{{ total | price(user_currency) }}</b>.

@@ -71,6 +71,13 @@
                                 <a role="menuitem" href="{{ url_for('base.sponsors') }}">Sponsors</a>
                             </li>
                         #}
+                        {% if get_basket_size() > 0 %}
+                            <li role="presentation">
+                                <a role="menuitem" href="{{ url_for('tickets.pay') }}">
+                                    Basket ({{get_basket_size()}})
+                                </a>
+                            </li>
+                        {% endif %}
                         {#
                             <li role="presentation">
                                 <a target="_blank" href="http://blog.emfcamp.org">Blog</a>

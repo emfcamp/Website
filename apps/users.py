@@ -95,6 +95,7 @@ def login():
 @login_required
 def logout():
     session.permanent = False
+    session.pop('reserved_purchase_ids', None)
     logout_user()
     return redirect(url_for('base.main'))
 

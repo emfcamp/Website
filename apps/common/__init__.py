@@ -62,7 +62,8 @@ def load_utility_functions(app_obj):
             CURRENCIES=CURRENCIES,
             CURRENCY_SYMBOLS=CURRENCY_SYMBOLS,
             external_url=external_url,
-            feature_enabled=feature_enabled
+            feature_enabled=feature_enabled,
+            get_basket_size=get_basket_size
         )
 
     @app_obj.context_processor
@@ -106,14 +107,28 @@ def get_basket_and_total():
     if current_user.is_anonymous:
         basket = session.get('reserved_purchase_ids')
         # TODO error handling if basket is empty
-        basket = [Purchase.query.filter_by(id=b, state='reserved').first() for b in basket]
+        basket = [Purchase.query.filter_by(id=b,
+                                           state='reserved',
+                                           owner_id=None,
+                                           purchaser_id=None).first() for b in basket]
     else:
         basket = current_user.purchased_products.filter_by(state='reserved').all()
+
+    if not basket:
+        return [], 0, get_user_currency()
+
     currency = basket[0].price.currency
 
     total = get_basket_cost(basket)
     app.logger.debug('Got basket %s with total %s', basket, total)
     return basket, total, currency
+
+def get_basket_size():
+    if current_user.is_anonymous and session.get('reserved_purchase_ids', []) == []:
+        return 0
+    elif not current_user.is_anonymous and len(current_user.purchased_products) == 0:
+        return 0
+    return len(get_basket_and_total()[0])
 
 # This creates the user's items in the reserved state.
 def create_basket(items):
