@@ -17,9 +17,6 @@ from models.purchase import PurchaseTransfer
 from models import Purchase
 
 
-# from models.ticket import Ticket, TicketType, TicketTransfer
-
-
 def render_receipt(user, png=False, pdf=False):
     tickets = (user.tickets
                   .filter_by(paid=True)

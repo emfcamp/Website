@@ -1,0 +1,16 @@
+{% macro pprint_timedelta(dt) %}
+{% set total_seconds = dt.total_seconds() %}
+{# str(timedelta) -> D days, HH:MM:SS.sss #}
+{%- if total_seconds > 86400 -%}
+    {{ (dt|string).split(',')[0] }}
+{%- elif total_seconds > 7200 -%}
+    {% set hours = (dt|string).split(':')[0] %}
+    {{hours}} hours
+{%- elif total_seconds > 3600 -%}
+    {% set hours, minutes, _ = (dt|string).split(':') %}
+    {{hours}} hour {{minutes}} minutes
+{%- else -%}
+    {% set minutes = (dt|string).split(':')[1] %}
+    {{minutes}} minutes
+{%- endif -%}
+{% endmacro %}

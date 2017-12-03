@@ -90,6 +90,10 @@ class Purchase(db.Model):
         return "<ProductInstance %s %s: %s>" % (self.id, self.price_tier.name, self.state)
 
     @property
+    def expires_in(self):
+        return self.expires - datetime.utcnow()
+
+    @property
     def is_transferable(self):
         return self.price_tier.parent.get_attribute('is_transferable')
 
