@@ -149,6 +149,7 @@ class BankPayment(Payment):
 
 class BankAccount(db.Model):
     __tablename__ = 'bank_account'
+    __export_data__ = False
     id = db.Column(db.Integer, primary_key=True)
     sort_code = db.Column(db.String, nullable=False)
     acct_id = db.Column(db.String, nullable=False)

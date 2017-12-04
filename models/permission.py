@@ -5,6 +5,7 @@ from main import db
 
 class Permission(db.Model):
     __tablename__ = 'permission'
+    __export_data__ = False
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, index=True)
 

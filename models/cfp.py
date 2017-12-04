@@ -153,10 +153,12 @@ class Proposal(db.Model):
                         'needs_laptop', 'available_times',
                         'attendees', 'cost', 'size', 'funds']
 
+        proposals = cls.query.with_entities(cls.id, cls.title, cls.favourite_count).order_by(cls.id)
+
         data = {
             'private': {
                 'favourites': {
-                    'talks': cls.query.with_entities(cls.id, cls.title, cls.favourite_count).all(),
+                    'proposals': proposals,
                 }
             },
             'public': {
@@ -369,9 +371,9 @@ class CFPMessage(db.Model):
         count_fields = ['has_been_read']
 
         message_contents = cls.query.join(User).with_entities(
-            cls.proposal_id, cls.message, cls.is_to_admin, cls.has_been_read,
-            cls.from_user_id, User.name,
-        ).all()
+            cls.proposal_id, cls.from_user_id, User.name.label('user_name'),
+            cls.is_to_admin, cls.has_been_read, cls.message,
+        ).order_by(cls.id)
 
         data = {
             'private': {

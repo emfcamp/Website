@@ -6,6 +6,7 @@ from models.ticket import TicketType
 
 class SiteState(db.Model):
     __tablename__ = 'site_state'
+    __export_data__ = False
     name = db.Column(db.String, primary_key=True)
     state = db.Column(db.String)
 

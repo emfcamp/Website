@@ -3,23 +3,27 @@ from collections import OrderedDict
 from decimal import Decimal
 
 from main import db
-from sqlalchemy import true, distinct
+from sqlalchemy import true, distinct, inspect
+from sqlalchemy.orm.base import NO_VALUE
 from sqlalchemy.sql.functions import func
 from sqlalchemy_continuum.utils import version_class
 
 def exists(query):
     return db.session.query(true()).filter(query.exists()).scalar()
 
-def count_groups(query, *entities):
-    return query.with_entities(func.count(), *entities).group_by(*entities)
+def to_dict(obj):
+    return OrderedDict((a.key, getattr(obj, a.key)) for a in inspect(obj).attrs if a.loaded_value != NO_VALUE)
 
-def group_dict(rows):
+def count_groups(query, *entities):
+    return query.with_entities(func.count(), *entities).group_by(*entities).order_by(*entities)
+
+def nest_count_keys(rows):
     """ For JSON's sake, because it doesn't support tuples as keys """
-    tree = {}
+    tree = OrderedDict()
     for c, *key in rows:
         node = tree
         for k in key[:-1]:
-            node = node.setdefault(k, {})
+            node = node.setdefault(k, OrderedDict())
         node[key[-1]] = c
 
     return tree
@@ -39,10 +43,10 @@ def range_dict(rows, boundaries):
     return counts
 
 def export_field_intervals(cls, field, interval, fmt):
-    return group_dict(count_groups(cls.query, func.to_char(func.date_trunc(interval, getattr(cls, field)), fmt)))
+    return nest_count_keys(count_groups(cls.query, func.to_char(func.date_trunc(interval, getattr(cls, field)), fmt)))
 
 def export_field_counts(cls, fields):
-    return {f: group_dict(count_groups(cls.query, getattr(cls, f))) for f in fields}
+    return {f: nest_count_keys(count_groups(cls.query, getattr(cls, f))) for f in fields}
 
 def export_field_edits(cls, fields):
     cls_version = version_class(cls)

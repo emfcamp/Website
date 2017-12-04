@@ -24,6 +24,7 @@ class CheckinStateException(Exception):
 
 class TicketType(db.Model):
     __tablename__ = 'ticket_type'
+    __export_data__ = False
     id = db.Column(db.Integer, primary_key=True)
     fixed_id = db.Column(db.Integer, unique=True)
     name = db.Column(db.String, nullable=False)
@@ -163,6 +164,7 @@ class TicketType(db.Model):
 
 class TicketPrice(db.Model):
     __tablename__ = 'ticket_price'
+    __export_data__ = False
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.Integer, db.ForeignKey('ticket_type.id'), nullable=False)
     currency = db.Column(db.String, nullable=False)

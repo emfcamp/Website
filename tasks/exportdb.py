@@ -8,6 +8,7 @@ from flask_script import Command, Option
 from sqlalchemy_continuum.utils import version_class, is_versioned
 
 from main import db
+from apps.common.json import ExportEncoder
 
 
 class ExportDB(Command):
@@ -26,9 +27,8 @@ class ExportDB(Command):
         # As we go, we check against the list of all tables, in case we forget about some
         # new object type (e.g. association table).
 
-        # Exclude tables we know will never be exported, such as fixtures.
-        fixtures = ['bank_account', 'permission', 'ticket_price', 'ticket_type', 'venue']
-        ignore = ['alembic_version', 'feature_flag', 'site_state']
+        # Exclude tables we know will never be exported
+        ignore = ['alembic_version']
         needs_work = []
 
         all_model_classes = {cls for cls in db.Model._decl_class_registry.values()
@@ -53,7 +53,7 @@ class ExportDB(Command):
             table = model_class.__table__.name
             model = model_class.__name__
 
-            if table in fixtures + ignore:
+            if table in ignore:
                 app.logger.debug('Ignoring %s', model)
                 remaining_tables.remove(table)
                 continue
@@ -77,7 +77,7 @@ class ExportDB(Command):
                     for dirname in ['public', 'private']:
                         if dirname in export:
                             filename = os.path.join(path, dirname, '{}.json'.format(model))
-                            simplejson.dump(export[dirname], open(filename, 'w'), indent=4, sort_keys=True)
+                            simplejson.dump(export[dirname], open(filename, 'w'), indent=4, cls=ExportEncoder)
                             app.logger.info('Exported data from %s to %s', model, filename)
 
                 except Exception as e:
@@ -95,7 +95,7 @@ class ExportDB(Command):
             'remaining_tables': sorted(list(remaining_tables))
         }
         filename = os.path.join(path, 'export.json')
-        simplejson.dump(data, open(filename, 'w'), indent=4, sort_keys=True)
+        simplejson.dump(data, open(filename, 'w'), indent=4, cls=ExportEncoder)
 
         app.logger.info('Export complete, summary written to %s', filename)
 
