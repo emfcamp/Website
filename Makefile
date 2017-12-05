@@ -18,11 +18,10 @@ run:
 	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./dev_server.py
 
 init:
-	virtualenv -p python3 --clear ./env
+	python3 -m venv --clear ./env
 
 update:
 	$(ENV) pip install --upgrade pip wheel setuptools
-	$(ENV) pip install ndg-httpsclient
 	$(ENV) pip install -r ./requirements.txt
 
 outdated:
