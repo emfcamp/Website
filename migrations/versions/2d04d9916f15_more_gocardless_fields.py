@@ -1,14 +1,14 @@
 """more gocardless fields
 
 Revision ID: 2d04d9916f15
-Revises: 2f73f2095e58
+Revises: 0d10c234333d
 Create Date: 2017-12-04 00:15:45.616946
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '2d04d9916f15'
-down_revision = '2f73f2095e58'
+down_revision = '0d10c234333d'
 
 from alembic import op
 import sqlalchemy as sa

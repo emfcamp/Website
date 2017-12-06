@@ -1,16 +1,11 @@
-import sys
 from main import db
 from datetime import datetime
 from sqlalchemy.orm import column_property
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy import and_, func
+from sqlalchemy import and_, func, FetchedValue
 from .purchase import bought_states
 from .exc import CapacityException
 
-
-# These need to be used in migrations
-CAPACITY_CONSTRAINT_SQL = "capacity_used <= capacity_max"
-CAPACITY_CONSTRAINT_NAME = "within_capacity"
 
 class CapacityMixin(object):
     """ Defines a database object which has an optional maximum capacity and an optional parent
@@ -25,7 +20,7 @@ class CapacityMixin(object):
     # A max capacity of None implies no max (or use parent's if set)
 
     capacity_max = db.Column(db.Integer, default=None)
-    capacity_used = db.Column(db.Integer, default=0)
+    capacity_used = db.Column(db.Integer, default=0, server_onupdate=FetchedValue())
 
     expires = db.Column(db.DateTime)
 
@@ -33,11 +28,7 @@ class CapacityMixin(object):
     def __expired(self):
         return column_property(and_(~self.expires.is_(None), self.expires < func.now()))
 
-    # This doesn't really do anything here as flask-migrate/alembic doesn't
-    # seem to for CHECK-constraints but it's here for completeness
-    db.CheckConstraint(CAPACITY_CONSTRAINT_SQL, name=CAPACITY_CONSTRAINT_NAME)
-
-    def has_capacity(self, count=1, session=None):
+    def has_capacity(self, count=1):
         """
         Determine whether this object, and all its ancestors, have
         available capacity.
@@ -48,37 +39,26 @@ class CapacityMixin(object):
         if count < 1:
             raise ValueError("Count cannot be less than 1.")
 
-        return count <= self.get_total_remaining_capacity(session)
+        return count <= self.get_total_remaining_capacity()
 
-    def remaining_capacity(self, session=None):
+    def remaining_capacity(self):
         """
-        Return remaining capacity or sys.maxsize (a very big integer) if
+        Return remaining capacity or inf if
         capacity_max is not set (i.e. None).
-
-        If a session is provided this check is performed with 'FOR UPDATE'
-        row locking.
         """
-        if session is None:
-            item = self
-        else:
-            item = session.query(self.__class__)\
-                          .with_for_update()\
-                          .filter_by(id=self.id)\
-                          .first()
+        if self.capacity_max is None:
+            return float('inf')
+        return self.capacity_max - self.capacity_used
 
-        if item.capacity_max is None:
-            return sys.maxsize
-        return item.capacity_max - item.capacity_used
-
-    def get_total_remaining_capacity(self, session=None):
+    def get_total_remaining_capacity(self):
         """
         Get the capacity remaining to this object, and all its ancestors.
 
-        Returns sys.maxsize if no object have a capacity_max set.
+        Returns inf if no objects have a capacity_max set.
         """
-        remaining = [self.remaining_capacity(session)]
+        remaining = [self.remaining_capacity()]
         if self.parent:
-            remaining.append(self.parent.get_total_remaining_capacity(session))
+            remaining.append(self.parent.get_total_remaining_capacity())
 
         return min(remaining)
 
@@ -92,27 +72,30 @@ class CapacityMixin(object):
 
         return self.expires and self.expires < datetime.utcnow()
 
-    def issue_instances(self, session, count=1, token=''):
+    def issue_instances(self, count=1, token=''):
         """
         If possible (i.e. the object has not expired and has capacity)
         reduce the available capacity by count.
+
+        This design (cascading up instead of carving out allocations)
+        is liable to contention if there's a rush on reservations.
         """
-        if not self.has_capacity(count, session):
+        if not self.has_capacity(count):
             raise CapacityException("Out of capacity.")
 
         if self.has_expired():
             raise CapacityException("Expired.")
 
         if self.parent:
-            self.parent.issue_instances(session, count, token)
-        self.capacity_used += count
+            self.parent.issue_instances(count, token)
+        self.capacity_used = self.__class__.capacity_used + count
 
     def return_instances(self, count=1):
         " Reintroduce previously used capacity "
         if count < 1:
             raise ValueError("Count cannot be less than 1.")
         self.parent.return_instances(count)
-        self.capacity_used -= count
+        self.capacity_used = self.__class__.capacity_used - count
 
     def get_purchase_count(self, states=None):
         """ Get the count of purchases, optionally filtered by purchase state.

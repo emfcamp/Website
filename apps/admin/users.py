@@ -5,7 +5,7 @@ from flask import (
     render_template, redirect, flash,
     url_for, current_app as app
 )
-from flask.ext.login import current_user
+from flask_login import current_user
 
 from wtforms.validators import Required, Email, ValidationError
 from wtforms import SubmitField, BooleanField, StringField

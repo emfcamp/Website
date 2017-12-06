@@ -100,7 +100,7 @@ Buy Items
 
 <div class="clearfix"></div>
 
-<table class="table ticket-types">
+<table class="table products">
 
 <thead>
 <tr>
@@ -122,7 +122,7 @@ Buy Items
     {% for price in f._type.prices -%}
         data-price-{{ price.currency }}="{{ price.value }}"
     {% endfor -%}
-    class="ticket-type form-group
+    class="product form-group
         {% if f.amount.errors -%} has-error {%- endif %}
         {{ row_class.next() }}">
     <td>
@@ -189,7 +189,7 @@ EMF.format_price = function(amount, currency, after) {
 };
 EMF.update_currency = function() {
   EMF.user_currency = $('#currency_code').val();
-  $('.ticket-type').each(function() {
+  $('.product').each(function() {
     var $t = $(this);
     var price = $t.data('price-' + EMF.user_currency.toLowerCase());
     $t.data('price', price);

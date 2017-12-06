@@ -1,12 +1,11 @@
 import logging
-import uuid
 from datetime import datetime, timedelta
 
 from flask import (
     render_template, redirect, request, flash,
     url_for, current_app as app
 )
-from flask.ext.login import login_required
+from flask_login import login_required
 from flask_mail import Message
 from wtforms import SubmitField
 
@@ -29,13 +28,9 @@ def webhook(resource=None, action=None):
 def gocardless_start(payment):
     logger.info("Created GoCardless payment %s", payment.id)
 
-    # TODO if we already have a mandate on a previous payment we (should?) be
-    # able to use that.
-    payment.session_token = "%s-%s" % (payment.id, uuid.uuid4())
-
     redirect_flow = gocardless_client.redirect_flows.create(params={
         "description": "Electromagnetic Field",
-        "session_token": payment.session_token,
+        "session_token": payment.id,
         "success_redirect_url": external_url('payments.gocardless_mandate', payment_id=payment.id)
     })
 
@@ -58,7 +53,7 @@ def gocardless_mandate(payment_id):
     logger.info("Completing payment %s, gcid %s", payment.id, request.args.get('resource_id'))
 
     try:
-        params = {"session_token": payment.session_token}
+        params = {"session_token": payment.id}
         redirect_flow = gocardless_client.redirect_flow \
                                          .complete(payment.redirect_id,
                                                    params=params)

@@ -8,7 +8,7 @@ from flask import (
     render_template, redirect, request, flash,
     url_for, current_app as app, abort,
 )
-from flask.ext.login import current_user
+from flask_login import current_user
 from flask_mail import Message
 
 from wtforms.validators import Optional, Regexp, Required, Email, ValidationError
@@ -19,21 +19,19 @@ from wtforms import (
 )
 from wtforms.fields.html5 import EmailField
 
-from sqlalchemy import or_
 from sqlalchemy.sql.functions import func
 
 from main import db, mail
+from models.exc import CapacityException
 from models.user import User
 from models.payment import Payment, BankPayment, BankTransaction
 from models.product import (
-    PriceTier, ProductGroup, Price
+    ProductGroup, Product, PriceTier, Price,
 )
-from models.purchase import PurchaseTransfer
-from models import Purchase
+from models.purchase import (
+    Purchase, Ticket, PurchaseTransfer, bought_states,
+)
 
-# from models.ticket import (
-#     Ticket, TicketType, TicketPrice, TicketTransfer
-# )
 from ..common import require_permission, feature_enabled
 from ..common.forms import Form, IntegerSelectField, HiddenIntegerField, StaticField
 from ..common.receipt import attach_tickets
@@ -161,9 +159,10 @@ def transaction_reconcile(txn_id, payment_id):
 
 
 @admin.route('/tickets')
+@admin.route('/tickets/paid')
 @admin_required
 def tickets():
-    tickets = Purchase.query.filter_by(is_paid_for=True).order_by(Purchase.id).all()
+    tickets = Ticket.query.filter_by(is_paid_for=True).order_by(Ticket.id).all()
 
     return render_template('admin/tickets.html', tickets=tickets)
 
@@ -179,48 +178,39 @@ def tickets_unpaid():
 @admin.route('/ticket-report')
 def ticket_report():
     # This is an admissions-based view, so includes expired tickets
-    totals = Purchase.query.outerjoin(Payment).filter(
-        Purchase.refund_id.is_(None),
-        or_(Purchase.is_paid_for == True,  # noqa
-            ~Payment.state.in_(['new', 'cancelled', 'refunded']))
-    ).join(PriceTier).with_entities(
-        PriceTier.name,
-        func.count(),
-    ).group_by(PriceTier.name).all()
+    totals = Ticket.query.outerjoin(Payment) \
+        .filter(Ticket.state.in_(bought_states)) \
+        .with_entities(PriceTier.name, func.count()) \
+        .group_by(PriceTier.name).all()
+
     totals = dict(totals)
 
-    # FIXME
-    # query = db.session.query(TicketType.admits, func.count(), func.sum(TicketPrice.price_int)).\
-    #     select_from(Ticket).join(TicketType).join(TicketPrice).\
-    #     filter(TicketPrice.currency == 'GBP', Ticket.paid == True).group_by(TicketType.admits)  # noqa
+    query = Ticket.query.filter(is_paid_for=True).join(PriceTier, Price) \
+        .with_entities(Product.name, func.count(), func.sum(Price.price_int)) \
+        .group_by(Product.name)
 
     accounting_totals = {}
-    # for row in query.all():
-    #     accounting_totals[row[0]] = {
-    #         'count': row[1],
-    #         'total': row[2]
-    #     }
+    for row in query.all():
+        accounting_totals[row[0]] = {
+            'count': row[1],
+            'total': row[2]
+        }
 
     return render_template('admin/ticket-report.html', totals=totals, accounting_totals=accounting_totals)
 
 
-@admin.route('/ticket-types')
+@admin.route('/products')
 @admin_required
-def ticket_types():
-    types = ProductGroup.query.all()
-    return render_template('admin/ticket-types.html', ticket_types=types)
-
-ADMITS_LABELS = [('full', 'Adult'), ('kid', 'Under 16'),
-                 ('campervan', 'Campervan'), ('car', 'Car'),
-                 ('other', 'Other')]
+def products():
+    products = Product.query.all()
+    return render_template('admin/products.html', products=products)
 
 
-# FIXME -- Basically this whole form...
-class EditTicketTypeForm(Form):
+class EditProductForm(Form):
     name = StringField('Name')
     order = IntegerField('Order')
-    admits = StaticField('Admits')
-    type_limit = IntegerField('Maximum tickets to sell')
+    type = StaticField('Type')
+    capacity_limit = IntegerField('Maximum tickets to sell')
     personal_limit = IntegerField('Maximum tickets to sell to an individual')
     expires = DateField('Expiry Date (Optional)', [Optional()])
     price_gbp = StaticField('Price (GBP)')
@@ -231,55 +221,55 @@ class EditTicketTypeForm(Form):
     description = StringField('Description', [Optional()], widget=TextArea())
     submit = SubmitField('Save')
 
-    def init_with_ticket_type(self, ticket_type):
-        self.name.data = ticket_type.name
-        self.order.data = ticket_type.order
-        self.admits.data = dict(ADMITS_LABELS)[ticket_type.admits]
-        self.type_limit.data = ticket_type.type_limit
-        self.personal_limit.data = ticket_type.personal_limit
-        self.expires.data = ticket_type.expires
-        self.price_gbp.data = ticket_type.get_price('GBP')
-        self.price_eur.data = ticket_type.get_price('EUR')
-        self.has_badge.data = ticket_type.has_badge
-        self.is_transferable.data = ticket_type.is_transferable
-        self.description.data = ticket_type.description
-        self.discount_token.data = ticket_type.discount_token
+    def init_with_product(self, product):
+        self.name.data = product.name
+        self.order.data = product.order
+        self.type.data = product.type
+        self.capacity_max.data = product.capacity_max
+        self.personal_limit.data = product.personal_limit
+        self.expires.data = product.expires
+        self.price_gbp.data = product.get_price('GBP')
+        self.price_eur.data = product.get_price('EUR')
+        self.has_badge.data = product.has_badge
+        self.is_transferable.data = product.is_transferable
+        self.description.data = product.description
+        self.discount_token.data = product.discount_token
 
 
-@admin.route('/ticket-types/<int:type_id>/edit', methods=['GET', 'POST'])
+@admin.route('/products/<int:product_id>/edit', methods=['GET', 'POST'])
 @require_permission('arrivals')
-def edit_ticket_type(type_id):
-    form = EditTicketTypeForm()
+def edit_product(product_id):
+    form = EditProductForm()
 
-    ticket_type = ProductGroup.query.get_or_404(type_id)
+    product = Product.query.get_or_404(product_id)
     if form.validate_on_submit():
-        app.logger.info('%s editing ticket type %s', current_user.name, type_id)
+        app.logger.info('%s editing product %s', current_user.name, product_id)
         if form.discount_token.data == '':
             form.discount_token.data = None
         if form.description.data == '':
             form.description.data = None
 
-        for attr in ['name', 'order', 'type_limit', 'personal_limit', 'expires',
+        for attr in ['name', 'order', 'capacity_max', 'personal_limit', 'expires',
                      'has_badge', 'is_transferable', 'discount_token', 'description']:
-            cur_val = getattr(ticket_type, attr)
+            cur_val = getattr(product, attr)
             new_val = getattr(form, attr).data
 
             if cur_val != new_val:
                 app.logger.info(' %10s: %r -> %r', attr, cur_val, new_val)
-                setattr(ticket_type, attr, new_val)
+                setattr(product, attr, new_val)
 
         db.session.commit()
-        return redirect(url_for('.ticket_type_details', type_id=type_id))
+        return redirect(url_for('.product_details', product_id=product_id))
 
-    form.init_with_ticket_type(ticket_type)
-    return render_template('admin/edit-ticket-type.html', ticket_type=ticket_type, form=form)
+    form.init_with_product(product)
+    return render_template('admin/edit-product.html', product=product, form=form)
 
 
-class NewTicketTypeForm(Form):
+class NewProductForm(Form):
     name = StringField('Name')
     order = IntegerField('Order')
-    admits = RadioField('Admits', choices=ADMITS_LABELS)
-    type_limit = IntegerField('Maximum tickets to sell')
+    types = RadioField('Type')
+    capacity_max = IntegerField('Maximum tickets to sell')
     personal_limit = IntegerField('Maximum tickets to sell to an individual')
     expires = DateField('Expiry Date (Optional)', [Optional()])
     price_gbp = DecimalField('Price (GBP)')
@@ -290,69 +280,75 @@ class NewTicketTypeForm(Form):
     description = StringField('Description', [Optional()], widget=TextArea())
     submit = SubmitField('Create')
 
-    def init_with_ticket_type(self, ticket_type):
-        self.name.data = ticket_type.name
-        self.order.data = ticket_type.order
-        self.admits.data = ticket_type.admits
-        self.type_limit.data = ticket_type.type_limit
-        self.personal_limit.data = ticket_type.personal_limit
-        self.expires.data = ticket_type.expires
-        self.has_badge.data = ticket_type.has_badge
-        self.is_transferable.data = ticket_type.is_transferable
-        self.price_gbp.data = ticket_type.get_price('GBP')
-        self.price_eur.data = ticket_type.get_price('EUR')
-        self.description.data = ticket_type.description
-        self.discount_token.data = ticket_type.discount_token
+    def init_with_ticket_product(self, ticket_product):
+        self.name.data = ticket_product.name
+        self.order.data = ticket_product.order
+        self.admits.data = ticket_product.admits
+        self.capacity_max.data = ticket_product.capacity_max
+        self.personal_limit.data = ticket_product.personal_limit
+        self.expires.data = ticket_product.expires
+        self.has_badge.data = ticket_product.has_badge
+        self.is_transferable.data = ticket_product.is_transferable
+        self.price_gbp.data = ticket_product.get_price('GBP')
+        self.price_eur.data = ticket_product.get_price('EUR')
+        self.description.data = ticket_product.description
+        self.discount_token.data = ticket_product.discount_token
 
 
-@admin.route('/new-ticket-type/', defaults={'copy_id': -1}, methods=['GET', 'POST'])
-@admin.route('/new-ticket-type/<int:copy_id>', methods=['GET', 'POST'])
+@admin.route('/new-product/', defaults={'copy_id': -1}, methods=['GET', 'POST'])
+@admin.route('/new-product/<int:copy_id>', methods=['GET', 'POST'])
 @admin_required
-def new_ticket_type(copy_id):
-    form = NewTicketTypeForm()
+def new_product(copy_id):
+    form = NewProductForm()
 
     if form.validate_on_submit():
         expires = form.expires.data if form.expires.data else None
         token = form.discount_token.data if form.discount_token.data else None
         description = form.description.data if form.description.data else None
 
-        # FIXME
-        tt = PriceTier(order=form.order.data, parent=form.admits.data,
-                        name=form.name.data, expires=expires,
-                        discount_token=token, description=description,
-                        personal_limit=form.personal_limit.data,
-                        has_badge=form.has_badge.data,
-                        is_transferable=form.is_transferable.data)
+        pt = PriceTier(order=form.order.data, parent=form.admits.data,
+                       name=form.name.data, expires=expires,
+                       discount_token=token, description=description,
+                       personal_limit=form.personal_limit.data,
+                       has_badge=form.has_badge.data,
+                       is_transferable=form.is_transferable.data)
 
-        tt.prices = [Price('GBP', form.price_gbp.data),
+        pt.prices = [Price('GBP', form.price_gbp.data),
                      Price('EUR', form.price_eur.data)]
-        app.logger.info('%s adding new TicketType %s', current_user.name, tt)
-        db.session.add(tt)
+        app.logger.info('%s adding new Product %s', current_user.name, pt)
+        db.session.add(pt)
         db.session.commit()
-        flash('Your new ticket type has been created')
-        return redirect(url_for('.ticket_type_details', type_id=tt.id))
+        flash('Your new ticket product has been created')
+        return redirect(url_for('.product_details', product_id=pt.id))
 
     if copy_id != -1:
-        form.init_with_ticket_type(PriceTier.query.get(copy_id))
+        form.init_with_product(PriceTier.query.get(copy_id))
 
-    return render_template('admin/new-ticket-type.html', ticket_type_id=copy_id, form=form)
+    return render_template('admin/new-product.html', product_id=copy_id, form=form)
 
 
-@admin.route('/ticket-types/<int:type_id>')
+@admin.route('/products/<int:product_id>')
 @admin_required
-def ticket_type_details(type_id):
-    # FIXME should this be ProductGroup?
-    ticket_type = PriceTier.query.get_or_404(type_id)
-    return render_template('admin/ticket-type-details.html', ticket_type=ticket_type)
+def product_details(product_id):
+    product = Product.query.get_or_404(product_id)
+    return render_template('admin/product-details.html', product=product)
+
+
+# FIXME
+@admin.route('/products/<int:product_id>/price-tiers/<int:tier_id>')
+@admin_required
+def price_tier_details(tier_id):
+    tier = PriceTier.query.get_or_404(tier_id)
+    return render_template('admin/price-tier-details.html', tier=tier)
 
 
 class TicketAmountForm(Form):
     amount = IntegerSelectField('Number of tickets', [Optional()])
-    type_id = HiddenIntegerField('Ticket Type', [Required()])
+    tier_id = HiddenIntegerField('Price tier', [Required()])
 
 
 class FreeTicketsForm(Form):
-    types = FieldList(FormField(TicketAmountForm))
+    price_tiers = FieldList(FormField(TicketAmountForm))
     allocate = SubmitField('Allocate tickets')
 
 
@@ -372,9 +368,9 @@ class FreeTicketsNewUserForm(FreeTicketsForm):
 def tickets_choose_free(user_id=None):
     has_price = Price.query.filter(Price.price_int > 0)
 
-    free_tts = PriceTier.query.filter(
-        ~has_price.filter(Price.type.expression).exists(),
-    ).order_by(PriceTier.order).all()
+    free_pts = PriceTier.query.join(Product).filter(
+        ~has_price.filter(Price.price_tier.expression).exists(),
+    ).order_by(Product.order).all()
 
     if user_id is None:
         form = FreeTicketsNewUserForm()
@@ -386,15 +382,15 @@ def tickets_choose_free(user_id=None):
         new_user = False
 
     if request.method != 'POST':
-        for tt in free_tts:
-            form.types.append_entry()
-            form.types[-1].type_id.data = tt.id
+        for pt in free_pts:
+            form.price_tiers.append_entry()
+            form.price_tiers[-1].tier_id.data = pt.id
 
-    tts = {tt.id: tt for tt in free_tts}
-    for f in form.types:
-        f._type = tts[f.type_id.data]
+    pts = {pt.id: pt for pt in free_pts}
+    for f in form.price_tiers:
+        f._tier = pts[f.tier_id.data]
         # TODO: apply per-user limits
-        values = range(f._type.personal_limit + 1)
+        values = range(f._tier.personal_limit + 1)
         f.amount.values = values
         f._any = any(values)
 
@@ -406,18 +402,22 @@ def tickets_choose_free(user_id=None):
             flash('Created account for %s' % form.email.data)
 
         tickets = []
-        for f in form.types:
+        for f in form.price_tiers:
             if f.amount.data:
-                tt = f._type
-                # FIXME
+                pt = f._tier
                 for i in range(f.amount.data):
                     # FIXME use the proper method
-                    t = Purchase.create_instances(db.session, user=user, tier=tt, currency='GBP')
-                    t.state = 'paid'
+                    try:
+                        t = Purchase.create_instances(user=user, tier=pt, currency='GBP')
+                    except CapacityException:
+                        db.session.rollback()
+                        raise
+
+                    t.set_state('paid')
                     user.tickets.append(t)
                     tickets.append(t)
 
-                app.logger.info('Allocated %s %s tickets to user', f.amount.data, tt.name)
+                app.logger.info('Allocated %s %s tickets to user', f.amount.data, pt.name)
 
         db.session.add(user)
         db.session.commit()
@@ -446,7 +446,7 @@ def tickets_choose_free(user_id=None):
         users = None
 
     return render_template('admin/tickets-choose-free.html',
-                           form=form, tts=free_tts, user=user, users=users)
+                           form=form, pts=free_pts, user=user, users=users)
 
 
 @admin.route('/tickets/list-free')
@@ -488,7 +488,7 @@ def cancel_free_ticket(ticket_id):
         if form.cancel.data:
             app.logger.info('Cancelling free ticket %s', ticket.id)
             now = datetime.utcnow()
-            ticket.state = 'refunded'
+            ticket.set_state('refunded')
             if ticket.expires is None or ticket.expires > now:
                 ticket.expires = now
 
@@ -507,29 +507,25 @@ def ticket_transfers():
     return render_template('admin/ticket-transfers.html', transfers=transfer_logs)
 
 
-# FIXME
 @admin.route('/furniture')
 @admin_required
 def furniture():
-    # tickets = TicketType.query.filter(TicketType.name.in_(['Table', 'Chair'])) \
-    #                     .join(Ticket, User).group_by(User, TicketType) \
-    #                     .with_entities(User, TicketType, func.count(Ticket.id)) \
-    #                     .order_by(User.name, TicketType.order)
-    tickets = []
-    return render_template('admin/furniture-tickets.html', tickets=tickets)
+    purchases = ProductGroup.query.filter_by(name='furniture') \
+                            .join(Product, Purchase, User).group_by(User.id, Product.id) \
+                            .with_entities(User, Product, func.count(Purchase.id)) \
+                            .order_by(User.name, Product.order)
+
+    return render_template('admin/furniture-purchases.html', purchases=purchases)
 
 
-# FIXME
 @admin.route('/tees')
 @admin_required
 def tees():
-    # tickets = TicketType.query.join(Ticket, User) \
-    #                     .filter(TicketType.fixed_id.in_(range(14, 24))) \
-    #                     .filter(Ticket.paid.is_(True)) \
-    #                     .group_by(User, TicketType) \
-    #                     .with_entities(User, TicketType, func.count(Ticket.id)) \
-    #                     .order_by(User.name, TicketType.order)
-    tickets = []
-    return render_template('admin/tee-tickets.html', tickets=tickets)
+    purchases = ProductGroup.query.filter_by(name='tees') \
+                            .join(Product, Purchase, User).group_by(User.id, Product.id) \
+                            .with_entities(User, Product, func.count(Purchase.id)) \
+                            .order_by(User.name, Product.order)
+
+    return render_template('admin/tee-purchases.html', purchases=purchases)
 
 

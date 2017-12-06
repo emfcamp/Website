@@ -158,7 +158,7 @@ class User(db.Model, UserMixin):
         return [p for p in self.owned_products if p.is_ticket]
 
     def get_tickets(self):
-        return [p for p in self.owned_products if p.is_ticket and p.is_paid]
+        return [p for p in self.owned_products if p.is_ticket and p.is_paid_for]
 
     @property
     def checkin_code(self):
@@ -192,15 +192,11 @@ class User(db.Model, UserMixin):
 
     @classmethod
     def get_by_email(cls, email):
-        return User.query.filter(func.lower(User.email) == func.lower(email)).one()
+        return User.query.filter(func.lower(User.email) == func.lower(email)).one_or_none()
 
     @classmethod
     def does_user_exist(cls, email):
-        try:
-            User.get_by_email(email)
-            return True
-        except NoResultFound:
-            return False
+        return bool(User.get_by_email(email))
 
     @classmethod
     def get_by_code(cls, key, code):

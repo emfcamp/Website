@@ -7,14 +7,14 @@
   <tr>
     <th>Name</th>
     <th>Email</th>
-    <th>Ticket type</th>
+    <th>Product</th>
     <th>Count</th>
   </tr>
-  {% for u, tt, count in tickets %}
+  {% for user, product, count in tickets %}
   <tr>
-    <td>{{ u.name }}</td>
-    <td>{{ u.email }}</td>
-    <td>{{ tt.name }}</td>
+    <td>{{ user.name }}</td>
+    <td>{{ user.email }}</td>
+    <td>{{ product.name }}</td>
     <td>{{ count }}</td>
   </tr>
 

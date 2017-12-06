@@ -69,12 +69,12 @@
 <tbody>
 {% set line_class = cycler('odd', 'even') %}
 
-{%- for tt, count in invoice_lines -%}
+{%- for pt, count in invoice_lines -%}
 <tr class="ticket {{ line_class.next() }}">
-<td>{{ tt.name }}</td>
-<td>{{ tt.get_price_ex_vat(payment.currency) | price(payment.currency) }}</td>
+<td>{{ pt.name }}</td>
+<td>{{ pt.get_price_ex_vat(payment.currency) | price(payment.currency) }}</td>
 <td>{{ count }}
-<td>{{ (tt.get_price_ex_vat(payment.currency) * count) | price(payment.currency) }}</td>
+<td>{{ (pt.get_price_ex_vat(payment.currency) * count) | price(payment.currency) }}</td>
 </tr>
 {% endfor -%}
 

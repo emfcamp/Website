@@ -1,5 +1,6 @@
 from decimal import Decimal
-from sqlalchemy import func
+
+from sqlalchemy import func, UniqueConstraint
 
 from main import db
 from .purchase import Purchase, non_blocking_states, allowed_states
@@ -19,14 +20,23 @@ class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     parent_id = db.Column(db.Integer, db.ForeignKey("product_group.id"))
-    type = db.Column(db.String, nullable=True)
-
+    type = db.Column(db.String, nullable=False)
     name = db.Column(db.String, unique=True, nullable=False)
+
     parent = db.relationship("ProductGroup", remote_side=[id], backref="children", cascade="all")
 
+    def __init__(self, type=None, parent=None, parent_id=None, **kwargs):
+        if type is None:
+            if parent is None:
+                type = ProductGroup.query.get(parent_id).type
+            else:
+                type = parent.type
+
+        super().__init__(type=type, parent=parent, parent_id=parent_id, **kwargs)
+
     @classmethod
-    def get_by_name(cls, name):
-        return ProductGroup.query.filter_by(name=name).first()
+    def get_by_name(cls, group_name):
+        return ProductGroup.query.filter_by(name=group_name).one_or_none()
 
     def get_purchase_count_by_state(self, states_to_get=None):
         """ Return a count of purchases, broken down by state.
@@ -53,26 +63,26 @@ class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
 class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
     """ A product (ticket or other item) which is for sale. """
     id = db.Column(db.Integer, primary_key=True)
-    parent_id = db.Column(db.Integer, db.ForeignKey("product_group.id"), nullable=False)
-
-    # TODO: Do we need both name and display_name? Is it just because of the creation task?
-    # Can we fix that with an admin interface and fixtures?
-    # (We also need to identify the "full ticket" product to display the price on the
-    # front page)
+    parent_id = db.Column(db.Integer, db.ForeignKey(ProductGroup.id), nullable=False)
     name = db.Column(db.String, nullable=False)
     display_name = db.Column(db.String)
     description = db.Column(db.String)
+    order = db.Column(db.Integer)
     parent = db.relationship(ProductGroup, backref="products", cascade="all")
 
-    @classmethod
-    def get_by_name(cls, name):
-        return Product.query.filter_by(name=name).first()
+    UniqueConstraint('name', 'parent_id')
 
     @classmethod
-    def get_cheapest_price(cls, product_name='full', currency='GBP'):
-        return cls.get_by_name(product_name)\
-                  .get_lowest_price_tier(currency)\
-                  .get_price(currency)
+    def get_by_name(cls, group_name, product_name):
+        group = ProductGroup.query.filter_by(name=group_name)
+        product = group.join(Product).filter_by(name=product_name).with_entities(Product)
+        return product.one_or_none()
+
+    @classmethod
+    def get_cheapest_price(cls, group_name='general', product_name='full', currency='GBP'):
+        product = Product.get_by_name(group_name, product_name)
+        tier = product.get_lowest_price_tier(currency)
+        return tier.get_price(currency)
 
     def get_purchase_count_by_state(self, states_to_get=None):
         """ Return a count of purchases, broken down by state.
@@ -132,20 +142,19 @@ class PriceTier(db.Model, CapacityMixin):
     """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
-    parent_id = db.Column(db.Integer, db.ForeignKey("product.id"), nullable=False)
+    parent_id = db.Column(db.Integer, db.ForeignKey(Product.id), nullable=False)
     parent = db.relationship(Product, backref="price_tiers", cascade="all")
 
     personal_limit = db.Column(db.Integer, default=10, nullable=False)
 
-    @classmethod
-    def get_by_name(cls, name):
-        # FIXME: Do we need to get this by name - does it *need* a name?
-        # I think this might only be because of tests and creation.
-        return PriceTier.query.filter_by(name=name).first()
+    UniqueConstraint('name', 'parent_id')
 
     @classmethod
-    def get_by_id(cls, id):
-        return PriceTier.query.get_or_404(id)
+    def get_by_name(cls, group_name, product_name, tier_name):
+        group = ProductGroup.filter_by(name=group_name)
+        product = group.join(Product).filter_by(name=product_name)
+        tier = product.join(PriceTier).filter_by(name=tier_name)
+        return tier.one_or_none()
 
     def get_purchase_count_by_state(self, states_to_get=None):
         """ Return a count of purchases, broken down by state.

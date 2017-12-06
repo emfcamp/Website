@@ -4,12 +4,11 @@ from flask import (
     url_for, abort, Blueprint, current_app as app,
     session,
 )
-from flask.ext.login import (
+from flask_login import (
     login_user, login_required, logout_user, current_user,
 )
 
 from sqlalchemy import or_
-from sqlalchemy.orm.exc import NoResultFound
 
 from wtforms.validators import Required, Email, ValidationError
 from wtforms import StringField, HiddenField, SubmitField
@@ -43,9 +42,8 @@ class LoginForm(Form):
     next = NextURLField('Next')
 
     def validate_email(form, field):
-        try:
-            user = User.get_by_email(form.email.data)
-        except NoResultFound:
+        user = User.get_by_email(form.email.data)
+        if user is None:
             raise ValidationError('Email address not found')
         form._user = user
 
@@ -57,8 +55,12 @@ def login_by_email(email):
     if current_user.is_authenticated:
         logout_user()
 
-    login_user(user)
-    session.permanent = True
+    if user is None:
+        flash("Your email address was not recognised")
+    else:
+        login_user(user)
+        session.permanent = True
+
     return redirect(request.args.get('next', url_for('tickets.main')))
 
 @users.route("/login", methods=['GET', 'POST'])

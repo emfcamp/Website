@@ -7,7 +7,7 @@ from .exc import CapacityException
 #
 # Both `admission_ticket` and `parking_ticket` will generate a ticket,
 # but only `admission_ticket` allows access to the site.
-PRODUCT_TYPES = ["admission_ticket", "parking_ticket", "merchandise"]
+PRODUCT_TYPES = ["admission_ticket", "ticket", "merchandise"]
 
 # state: [allowed next state, ] pairs, see docs/ticket_states.md
 PURCHASE_STATES = {'reserved': ['payment-pending', 'expired', 'cancelled', 'paid'],
@@ -25,19 +25,13 @@ anon_states = ('reserved', 'cancelled', 'expired')
 allowed_states = set(PURCHASE_STATES.keys())
 PURCHASE_EXPIRY_TIME = 2  # In hours
 
-# See note in mixins.py on CheckConstraints
-anon_state_strs = ','.join(["'{0}'".format(s) for s in anon_states])
-ANON_OWNER_SQL = "owner_id IS NOT NULL OR state in ({0})".format(anon_state_strs)
-ANON_OWNER_NAME = "anon_owner"
-ANON_PURCHASER_SQL = "purchaser_id IS NOT NULL OR state in ({0})".format(anon_state_strs)
-ANON_PURCHASER_NAME = "anon_purchaser"
-
 class CheckinStateException(Exception):
     pass
 
 
 class Purchase(db.Model):
     """ A Purchase. This could be a ticket or an item of merchandise. """
+    __tablename__ = 'purchase'
     __versioned__ = {}
 
     id = db.Column(db.Integer, primary_key=True)
@@ -51,17 +45,12 @@ class Purchase(db.Model):
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     purchaser_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-    # Add constraints so that you can reserve a purchase anonymously but
-    # otherwise must be logged in. See note in mixins.py on CheckConstraints
-    db.CheckConstraint(ANON_OWNER_SQL, ANON_OWNER_NAME)
-    db.CheckConstraint(ANON_PURCHASER_SQL, ANON_PURCHASER_NAME)
-
     # Product FKs.
-    # We don't technically need to store the price tier as we can get it from
-    # the price but most of the time we want the tier rather than the price and
-    # this means we can easily swap currency without changing the tier.
+    # price_tier and product_id are denormalised for convenience.
+    # We don't expect them to change, even if price_id does (by switching currency)
+    price_id = db.Column(db.Integer, db.ForeignKey('product_price.id'), nullable=False)
     price_tier_id = db.Column(db.Integer, db.ForeignKey('price_tier.id'), nullable=False)
-    price_id = db.Column(db.Integer, db.ForeignKey('product_price.id'))
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
 
     # Financial FKs
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
@@ -75,22 +64,29 @@ class Purchase(db.Model):
     state = db.Column(db.String, default='reserved', nullable=False)
     # Until an instance is paid for, we track the payment's expiry
     expires = db.Column(db.DateTime, nullable=False)
-    is_paid = column_property(state.in_(bought_states))
+    is_paid_for = column_property(state.in_(bought_states))
 
     # Relationships
     price = db.relationship('Price', backref='purchases')
     price_tier = db.relationship('PriceTier', backref='purchases')
 
-    def __init__(self, price_tier, price, purchaser, owner, **kwargs):
-        expires = datetime.utcnow() + timedelta(hours=PURCHASE_EXPIRY_TIME)
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': 'purchase'
+    }
 
-        super().__init__(price_tier=price_tier, price=price, purchaser=purchaser,
-                         owner=owner, expires=expires, **kwargs)
+
+    def __init__(self, price, user=None, state=None, **kwargs):
+        self.expires = datetime.utcnow() + timedelta(hours=PURCHASE_EXPIRY_TIME)
+        if user is None and state is not None and state not in anon_states:
+            raise PurchaseStateException('%s is not a valid state for unclaimed purchases' % state)
+
+        super().__init__(price=price, purchaser=user, owner=user, state=state, **kwargs)
 
     def __repr__(self):
         if self.id is None:
-            return "<ProductInstance -- %s: %s>" % (self.price_tier.name, self.state)
-        return "<ProductInstance %s %s: %s>" % (self.id, self.price_tier.name, self.state)
+            return "<Purchase -- %s: %s>" % (self.price_tier.name, self.state)
+        return "<Purchase %s %s: %s>" % (self.id, self.price_tier.name, self.state)
 
     @property
     def expires_in(self):
@@ -105,12 +101,14 @@ class Purchase(db.Model):
            self.owner_id is not None or \
            self.purchaser_id is not None:
             raise PurchaseStateException('Can only set state on purchases that are unclaimed & reserved.')
+
+        if user is None:
+            raise PurchaseStateException('Cannot unclaim a purchase.')
+
         self.owner_id = user.id
         self.purchaser_id = user.id
 
     def set_state(self, new_state):
-        new_state = new_state.lower()
-
         if new_state == self.state:
             return
 
@@ -120,14 +118,18 @@ class Purchase(db.Model):
         if new_state not in PURCHASE_STATES[self.state]:
             raise PurchaseStateException('"%s->%s" is not a valid transition' % (self.state, new_state))
 
+        if self.owner_id is None or self.purchaser_id is None:
+            if new_state not in anon_states:
+                raise PurchaseStateException('%s is not a valid state for unclaimed purchases' % new_state)
+
         self.state = new_state
 
     def change_currency(self, currency):
-        raise Exception("you wish.")
+        raise NotImplemented()
 
     def transfer(self, from_user, to_user, session):
-        # TODO it'd be cool if you could transfer an allow someone else to pay
         if self.state not in bought_states:
+            # We don't allow reserved items to be transferred to prevent a rush
             raise PurchaseTransferException('Only paid items may be transferred.')
 
         if not self.is_transferable:
@@ -145,7 +147,6 @@ class Purchase(db.Model):
         session.add(PurchaseTransfer(product_instance=self,
                                      to_user=to_user,
                                      from_user=from_user))
-        session.commit()
 
     @classmethod
     def class_from_product(cls, product):
@@ -157,31 +158,15 @@ class Purchase(db.Model):
         if product_type is None:
             raise Exception("Product %s has no type" % (product))
 
-        if product_type in ['admission_ticket', 'parking_ticket']:
+        if product_type == 'admission':
+            return AdmissionTicket
+        elif product_type in {'campervan', 'parking'}:
             return Ticket
         else:
             return Purchase
 
     @classmethod
-    def safe_create_instances(cls, session, user, items, currency):
-        """ Transactionally issue products.
-
-            Item should be a list of (PriceTier, count) pairs.
-        """
-        try:
-            res = []
-            for tier, count in items:
-                # Session is passed in so that we can check capacity with
-                # SELECT FOR UPDATE
-                res += cls.create_instances(session, user, tier, currency, count)
-            session.commit()
-            return res
-        except:
-            session.rollback()
-            raise
-
-    @classmethod
-    def create_instances(cls, session, user, tier, currency, count=1):
+    def create_instances(cls, user, tier, currency, count=1):
         """ Generate a number of Purchases when given a PriceTier.
 
             This ensures that capacity is available, and instantiates
@@ -194,51 +179,36 @@ class Purchase(db.Model):
 
         purchase_cls = cls.class_from_product(tier.parent)
 
-        # TODO: This is the critical bit for ticket-buying race conditions.
-        # As we're not doing a commit here, everything is in the current
-        # transaction which the caller must commit. We might want to issue
-        # a SELECT FOR UPDATE at this point to acquire locks on the
-        # appropriate capacity counters.
-        tier.issue_instances(session, count)
+        tier.issue_instances(count)
+        db.session.flush()
+        if tier.remaining_capacity <= 0:
+            raise CapacityException('Insufficient user capacity.')
 
-        if user.is_anonymous:
-            return [purchase_cls(tier, price, None, None) for c in range(count)]
-        return [purchase_cls(tier, price, user, user) for c in range(count)]
-
-    __mapper_args__ = {
-        'polymorphic_on': type,
-        'polymorphic_identity': 'purchase'
-    }
+        return [purchase_cls(tier, price, user) for c in range(count)]
 
 
 class Ticket(Purchase):
-    """ A ticket, which is a specific type of purchase.
+    """ A ticket, which is a specific type of purchase, but with different vocabulary.
 
-        This can either be an admission ticket or a parking ticket.
+        This can either be an admission ticket or a parking/camping ticket.
     """
     __mapper_args__ = {
         'polymorphic_identity': 'ticket'
     }
 
+
+class AdmissionTicket(Ticket):
+    """ A ticket that can contribute to the licensed capacity and be issued a badge. """
     checked_in = db.Column(db.Boolean, default=False)
     badge_issued = db.Column(db.Boolean, default=False)
 
-    def get_ticket_type(self):
-        """ Return the type of this ticket: 'admission' or 'parking' """
-        product_type = self.price_tier.parent.get_type()
-        if product_type == 'admission_ticket':
-            return 'admission'
-        elif product_type == 'parking_ticket':
-            return 'parking'
+    __mapper_args__ = {
+        'polymorphic_identity': 'admission_ticket'
+    }
 
     def check_in(self):
-        ticket_type = self.get_ticket_type()
-        if ticket_type != 'admission':
-            raise CheckinStateException("Check-in not allowed with %s ticket" % ticket_type)
-
         if self.checked_in is True:
             raise CheckinStateException("Ticket is already checked in.")
-
         self.checked_in = True
 
     def undo_check_in(self):
@@ -247,10 +217,6 @@ class Ticket(Purchase):
         self.checked_in = False
 
     def badge_up(self):
-        ticket_type = self.get_ticket_type()
-        if ticket_type != 'admission':
-            raise CheckinStateException("Badge-up not allowed with %s" % ticket_type)
-
         if self.badge_issued is True:
             raise CheckinStateException("Ticket is already badged up.")
         self.badge_issued = True
@@ -259,6 +225,7 @@ class Ticket(Purchase):
         if self.badge_issued is False:
             raise CheckinStateException("Ticket is not badged up.")
         self.badge_issued = True
+
 
 
 class PurchaseTransfer(db.Model):

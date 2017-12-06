@@ -1,7 +1,6 @@
 from main import db, gocardless_client
 from sqlalchemy import event
 from sqlalchemy.orm import Session
-from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
 
 import random
@@ -18,6 +17,7 @@ class StateException(Exception):
 class Payment(db.Model):
     __tablename__ = 'payment'
     __versioned__ = {}
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     provider = db.Column(db.String, nullable=False)
@@ -25,11 +25,8 @@ class Payment(db.Model):
     amount_int = db.Column(db.Integer, nullable=False)
     state = db.Column(db.String, nullable=False, default='new')
     reminder_sent = db.Column(db.Boolean, nullable=False, default=False)
-    changes = db.relationship('PaymentChange', backref='payment',
-                              order_by='PaymentChange.timestamp, PaymentChange.id')
     refunds = db.relationship('Refund', lazy='dynamic', backref='payment', cascade='all')
     purchases = db.relationship('Purchase', lazy='dynamic', backref='payment',
-                             primaryjoin='Purchase.payment_id == Payment.id',
                              cascade='all')
 
     __mapper_args__ = {'polymorphic_on': provider}
@@ -129,6 +126,13 @@ class Payment(db.Model):
         return 'WEB-%05d' % self.id
 
 
+@event.listens_for(Session, 'after_flush')
+def payment_change(session, flush_context):
+    for obj in session.deleted:
+        if isinstance(obj, Payment):
+            raise Exception('Payments cannot be deleted')
+
+
 class BankPayment(Payment):
     name = 'Bank transfer'
 
@@ -153,7 +157,6 @@ class BankPayment(Payment):
 
 class BankAccount(db.Model):
     __tablename__ = 'bank_account'
-    __versioned__ = {}
     id = db.Column(db.Integer, primary_key=True)
     sort_code = db.Column(db.String, nullable=False)
     acct_id = db.Column(db.String, nullable=False)
@@ -171,7 +174,6 @@ class BankAccount(db.Model):
 db.Index('ix_bank_account_sort_code_acct_id', BankAccount.sort_code, BankAccount.acct_id, unique=True)
 
 class BankTransaction(db.Model):
-    __versioned__ = {}
     __tablename__ = 'bank_transaction'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -297,7 +299,6 @@ class GoCardlessPayment(Payment):
         }
 
     def cancel(self):
-        # TODO make this work again
         if self.state == 'new':
             # No bill to check
             pass
@@ -352,36 +353,6 @@ class StripePayment(Payment):
         super(StripePayment, self).manual_refund()
 
 
-class PaymentChange(db.Model):
-    __versioned__ = {}
-    __tablename__ = 'payment_change'
-    id = db.Column(db.Integer, primary_key=True)
-    payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'), nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    state = db.Column(db.String, nullable=False)
-
-    def __init__(self, payment, state):
-        self.payment = payment
-        self.state = state
-
-
-@event.listens_for(Session, 'after_flush')
-def payment_change(session, flush_context):
-    for obj in session.new:
-        if isinstance(obj, Payment):
-            PaymentChange(obj, obj.state)
-
-    for obj in session.dirty:
-        if isinstance(obj, Payment):
-            added = get_history(obj, 'state').added
-            if added:
-                PaymentChange(obj, added[0])
-
-    for obj in session.deleted:
-        if isinstance(obj, Payment):
-            raise Exception('Payments cannot be deleted')
-
-
 class Refund(db.Model):
     __versioned__ = {}
     __tablename__ = 'refund'
@@ -390,9 +361,8 @@ class Refund(db.Model):
     provider = db.Column(db.String, nullable=False)
     amount_int = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    puchases = db.relationship('Purchase', lazy='dynamic', backref='refunds',
-                               primaryjoin='Purchase.refund_id == Refund.id',
-                               cascade='all')
+    purchases = db.relationship('Purchase', lazy='dynamic', backref='refunds', cascade='all')
+
     __mapper_args__ = {'polymorphic_on': provider}
 
     def __init__(self, payment, amount):
@@ -408,22 +378,11 @@ class Refund(db.Model):
     def amount(self, val):
         self.amount_int = int(val * 100)
 
-
 class BankRefund(Refund):
     __mapper_args__ = {'polymorphic_identity': 'banktransfer'}
 
 class StripeRefund(Refund):
     __mapper_args__ = {'polymorphic_identity': 'stripe'}
+
     refundid = db.Column(db.String, unique=True)
-
-
-class StripeRefundOld(db.Model):
-    __versioned__ = {}
-    __tablename__ = 'stripe_refund'
-    id = db.Column(db.Integer, primary_key=True)
-    refundid = db.Column(db.String, unique=True)
-    payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'), nullable=False)
-
-    def __init__(self, payment):
-        self.payment = payment
 

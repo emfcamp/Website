@@ -8,7 +8,7 @@ from flask import (
     render_template, redirect, request, flash,
     url_for, abort, current_app as app
 )
-from flask.ext.login import current_user
+from flask_login import current_user
 from flask_mail import Message
 
 from wtforms.validators import Required
@@ -250,7 +250,7 @@ def partial_refund(payment_id):
 
     for f in form.tickets:
         f._ticket = tickets_dict[f.ticket_id.data]
-        f.refund.label.text = '%s - %s' % (f._ticket.id, f._ticket.type.name)
+        f.refund.label.text = '%s - %s' % (f._ticket.id, f._ticket.product.display_name)
         if f._ticket.refund_id is None and f._ticket.paid:
             f._disabled = False
         else:

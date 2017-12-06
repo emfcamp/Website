@@ -7,7 +7,7 @@ from flask import (
     Blueprint, render_template, redirect, url_for, flash,
     request, Response, abort,
 )
-from flask.ext.login import current_user
+from flask_login import current_user
 from flask import current_app as app
 from jinja2.utils import urlize
 from icalendar import Calendar, Event

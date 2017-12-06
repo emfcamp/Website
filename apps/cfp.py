@@ -4,7 +4,7 @@ from flask import (
     url_for, abort, current_app as app, Blueprint,
     Markup, render_template_string,
 )
-from flask.ext.login import current_user
+from flask_login import current_user
 from flask_mail import Message
 from wtforms.validators import Required, Email, ValidationError
 from wtforms import (

@@ -13,19 +13,19 @@ from flask import Markup, render_template, request, current_app as app
 from sqlalchemy import func
 
 from models.product import Product, ProductGroup, PriceTier
-from models.purchase import PurchaseTransfer
+from models.purchase import PurchaseTransfer, Ticket
 from models import Purchase
 
 
 def render_receipt(user, png=False, pdf=False):
-    entrance_tts_counts = (user.purchased_products
+    entrance_products_counts = (user.purchased_products
                                .filter_by(state='paid', is_ticket=True)
-                               .join(PriceTier)
-                               .with_entities(PriceTier,
+                               .join(Product)
+                               .with_entities(Product,
                                               func.count(Purchase.id)
                                                   .label('ticket_count'))
-                               .group_by(PriceTier).all())
-    entrance_tickets_count = sum(c for tt, c in entrance_tts_counts)
+                               .group_by(Product).all())
+    entrance_tickets_count = sum(c for p, c in entrance_products_counts)
 
     other = user.purchased_products.filter_by(state='paid', is_ticket=False) \
                                    .join(PriceTier, Product, ProductGroup)
@@ -42,7 +42,7 @@ def render_receipt(user, png=False, pdf=False):
     return render_template('receipt.html', user=user,
                            format_inline_qr=format_inline_qr,
                            format_inline_barcode=format_inline_barcode,
-                           entrance_tts_counts=entrance_tts_counts,
+                           entrance_products_counts=entrance_products_counts,
                            entrance_tickets_count=entrance_tickets_count,
                            vehicle_tickets=vehicle_tickets,
                            transferred_tickets=transferred_tickets,
@@ -51,9 +51,10 @@ def render_receipt(user, png=False, pdf=False):
 
 
 def render_parking_receipts(png=False, pdf=False):
-    # FIXME
-    # vehicle_tickets = TicketType.query.filter_by(fixed_id=24).one().tickets
-    vehicle_tickets = ['FIXME']
+    vehicle_tickets = Ticket.query.filter(is_paid_for=True) \
+        .join(PriceTier, Product, ProductGroup) \
+        .filter_by(type='parking')
+
     users = [t.user for t in vehicle_tickets]
 
     return render_template('parking-receipts.html', users=users,

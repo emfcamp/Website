@@ -5,9 +5,8 @@ from flask_script import Command
 
 from main import db
 from models.cfp import TalkProposal
-# from models.ticket import Ticket, TicketType, TicketLimitException
 from models.user import User
-from models.product import ProductGroup
+from models.product import Product
 from models.purchase import Purchase
 
 
@@ -71,23 +70,25 @@ class MakeFakeTickets(Command):
                 # Choose a random number and type of tickets for this user
 
                 full_count = random.choice([1] * 3 + [2, 3])
-                full_type = ProductGroup.get_by_name('full').get_cheapest()
-                full_tickets = Purchase.create_instances(user, db.session, full_type, 'GBP', full_count)
+                full_type = Product.get_by_name('general', 'full').get_cheapest()
+                full_tickets = Purchase.create_instances(user, full_type, 'GBP', full_count)
 
 
                 kids_count = random.choice([0] * 10 + [1, 2])
-                kids_type = ProductGroup.get_by_name(random.choice('u5', 'u16')).get_cheapest()
-                kids_tickets = Purchase.create_instances(user, db.session, kids_type, 'GBP', kids_count)
+                kids_type = Product.get_by_name('general', random.choice('u5', 'u16')).get_cheapest()
+                kids_tickets = Purchase.create_instances(user, kids_type, 'GBP', kids_count)
 
                 vehicle_count = random.choice([0] * 2 + [1])
-                vehicle_type = ProductGroup.get_by_name(random.choice('cat', 'campervan')).get_cheapest()
-                vehicle_tickets = Purchase.create_instances(user, db.session, vehicle_type, 'GBP', vehicle_count)
+                vehicle_type = Product.get_by_name('general', random.choice('parking', 'campervan')).get_cheapest()
+                vehicle_tickets = Purchase.create_instances(user, vehicle_type, 'GBP', vehicle_count)
 
                 for t in full_tickets + kids_tickets + vehicle_tickets:
                     db.session.add(t)
                     t.state = random.choice(['paid'] * 4 + ['expired'] + ['refunded'])
 
-                db.session.commit()
-
             except:
                 db.session.rollback()
+                raise
+
+            db.session.commit()
+

@@ -3,7 +3,7 @@ from flask import (
     render_template, redirect, request, flash,
     url_for, current_app as app
 )
-from flask.ext.login import login_required, current_user
+from flask_login import login_required, current_user
 from flask_mail import Message
 from wtforms import SubmitField
 

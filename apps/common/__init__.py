@@ -140,10 +140,22 @@ def empty_basket():
 # This creates the user's items in the reserved state.
 def create_basket(items):
     user = current_user
+    if user.is_anonymous:
+        user = None
+
     currency = get_user_currency()
 
-    basket = Purchase.safe_create_instances(db.session, user, items, currency)
-    app.logger.info('Make basket with: %s', basket)
+    basket = []
+    try:
+        for tier, count in items:
+            basket += Purchase.create_instances(user, tier, currency, count)
+
+    except:
+        session.rollback()
+        raise
+
+    session.commit()
+    app.logger.info('Made basket with: %s', basket)
 
     total = get_basket_cost(basket)
     app.logger.debug('Added tickets to db for basket %s with total %s', basket, total)

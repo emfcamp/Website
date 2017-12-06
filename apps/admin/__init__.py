@@ -21,11 +21,10 @@ from models.payment import (
     Payment, BankPayment,
     BankTransaction,
 )
-# from models.ticket import (
-#     Ticket, TicketCheckin, TicketType
-# )
-from models.product import ProductGroup
-from models.purchase import Purchase
+from models.product import ProductGroup, Product, PriceTier
+from models.purchase import (
+    Purchase, Ticket, AdmissionTicket,
+)
 from models.cfp import Proposal
 from models.ical import CalendarSource
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
@@ -58,17 +57,18 @@ def admin_variables():
 
 @admin.route("/stats")
 def stats():
-    # Don't care about the state of the payment if it's paid for
-    paid = Purchase.query.filter(is_paid_for=True)
+    paid_all = Ticket.query.filter_by(is_paid_for=True)
+    parking_paid = paid_all.join(PriceTier, Product, ProductGroup).filter_by(type='parking').count()
+    campervan_paid = paid_all.join(PriceTier, Product, ProductGroup).filter_by(type='campervan').count()
 
-    parking_paid = ProductGroup.get_by_name('car').get_sold()
-    campervan_paid = ProductGroup.get_by_name('campervan').get_sold()
+    # Don't care about the state of the payment if it's paid for
+    paid = AdmissionTicket.query.filter(is_paid_for=True)
 
     # For new payments, the user hasn't committed to paying yet
-    unpaid = Payment.query.filter(
+    unpaid = AdmissionTicket.filter_by(is_paid_for=False).join(Payment).filter(
         Payment.state != 'new',
-        Payment.state != 'cancelled'
-    ).join(Purchase).filter_by(is_paid_for=False)
+        Payment.state != 'cancelled',
+    )
 
     expired = unpaid.filter_by(expired=True)
     unexpired = unpaid.filter_by(expired=False)
@@ -79,17 +79,19 @@ def stats():
     banktransfer_unpaid = unpaid.filter(Payment.provider == 'banktransfer',
                                         Payment.state == 'inprogress')
 
-    # TODO: remove this if it's not needed
-    full_gocardless_unexpired = unexpired.filter(Payment.provider == 'gocardless',
-                                                 Payment.state == 'inprogress'). \
-        join(Purchase).filter(is_ticket=True)
-    full_banktransfer_unexpired = unexpired.filter(Payment.provider == 'banktransfer',
-                                                   Payment.state == 'inprogress'). \
-        join(Purchase).filter(is_ticket=True)
+    admissions_gocardless_unexpired = unexpired.filter(
+        Payment.provider == 'gocardless',
+        Payment.state == 'inprogress',
+    ).join(AdmissionTicket)
+
+    admissions_banktransfer_unexpired = unexpired.filter(
+        Payment.provider == 'banktransfer',
+        Payment.state == 'inprogress',
+    ).join(AdmissionTicket)
 
     # These are people queries - don't care about cars or campervans being checked in
-    checked_in = Purchase.query.filter(Purchase.state.in_(['checked-in', 'badged-up']))
-    badged_up = Purchase.query.filter_by(state='badged-up')
+    checked_in = AdmissionTicket.query.filter_by(checked_in=True)
+    badged_up = AdmissionTicket.query.filter_by(badged_up=True)
 
     users = User.query  # noqa
 
@@ -103,27 +105,27 @@ def stats():
         'gocardless_unpaid', 'banktransfer_unpaid',
         'full_gocardless_unexpired', 'full_banktransfer_unexpired',
     ]
-    stats = ['%s:%s' % (q, locals()[q].count()) for q in queries]
+    stats = ['{}:{}'.format(q, locals()[q].count()) for q in queries]
 
-    # Admission types breakdown
-    admit_types = ['full', 'kid', 'campervan', 'car']
-    admit_totals = dict.fromkeys(admit_types, 0)
+    # Ticket types breakdown
+    ticket_types = ['admission', 'campervan', 'parking']
+    ticket_type_totals = dict.fromkeys(ticket_types, 0)
 
-    # FIXME not sure how this was working but it should be cleaned up
     for query in 'paid', 'expired', 'unexpired':
-        tickets = locals()[query].join(TicketType).with_entities(  # noqa
-            # TicketType.admits,
-            func.count(),
-        )# .group_by(TicketType.admits).all()
-        tickets = dict(tickets)
+        counts = locals()[query].join(PriceTier, Product, ProductGroup) \
+            .filter(ProductGroup.type.in_(ticket_types)) \
+            .with_entities(
+                ProductGroup.type,
+                func.count()) \
+            .group_by(ProductGroup.type).all()
+        counts = dict(counts)
 
-        for a in admit_types:
-            stats.append('%s_%s:%s' % (a, query, tickets.get(a, 0)))
-            admit_totals[a] += tickets.get(a, 0)
+        for t in ticket_types:
+            stats.append('{}_{}:{}'.format(t, query, counts.get(t, 0)))
+            ticket_type_totals[t] += counts.get(t, 0)
 
-    # and totals
-    for a in admit_types:
-        stats.append('%s:%s' % (a, admit_totals[a]))
+    for t in ticket_types:
+        stats.append('{}:{}'.format(t, ticket_type_totals[t]))
 
     return ' '.join(stats)
 

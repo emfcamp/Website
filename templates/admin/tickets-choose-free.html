@@ -19,24 +19,24 @@
 {{ render_field(form.email, True) }}
 {% endif %}
 
-<table class="table ticket-types">
+<table class="table products">
     <thead>
     <tr>
-        <th>Ticket Type</th>
+        <th>Product</th>
         <th>Amount</th>
     </tr>
     </thead>
 
     <tbody>
     {% set row_class = cycler('odd', 'even') %}
-    {% for f in form.types %}
+    {% for f in form.tiers %}
     {% if f._any or f.amount.errors %}
     <tr class="{{ loop.cycle('odd', 'even') }}
                {% if f.amount.errors -%} has-error {%- endif %}">
         <td>
             {{ f.hidden_tag_without('csrf_token') }}
-            <label for="{{ f.amount.id }}"><b>{{ f._type.name }}</b></label>
-            {% if f._type.description %}<p class="description">{{ f._type.description }}</p>{% endif %}
+            <label for="{{ f.amount.id }}"><b>{{ f._tier.name }}</b></label>
+            {% if f._tier.description %}<p class="description">{{ f._tier.description }}</p>{% endif %}
         </td>
         <td>
             <div class="controls">{{ f.amount(class_="amount") | safe }}

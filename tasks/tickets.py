@@ -18,19 +18,18 @@ from models.product import ProductGroup, Product, PriceTier, Price
 
 def create_product_groups():
     # FIXME might be worth creating separate sub-classes for site-capacity & allocations
-    site_capacity = ProductGroup(name='Admission Tickets',
-                                 type='admission_ticket',
+    site_capacity = ProductGroup(name='admissions',
+                                 type='admissions',
                                  expires=datetime(2018, 9, 3),
                                  capacity_max=app.config.get('MAXIMUM_ADMISSIONS'))
     db.session.add(site_capacity)
-    db.session.commit()
 
     allocations = (
         # name, capacity
-        ('Vendors', 100),
-        ('Sponsors', 200),
-        ('Speakers', 100),
-        ('General', None),
+        ('vendors', 100),
+        ('sponsors', 200),
+        ('speakers', 100),
+        ('general', None),
     )
 
     for name, capacity in allocations:
@@ -38,9 +37,8 @@ def create_product_groups():
             continue
         pg = ProductGroup(name=name, capacity_max=capacity, parent=site_capacity)
         db.session.add(pg)
-    db.session.commit()
 
-    general = ProductGroup.get_by_name('General')
+    general = ProductGroup.get_by_name('general')
 
     attendee_types = (
         # name, display name, transferable, badge, capacity, description, (early cap, gbp, eur), (std cap, gbp eur), (late cap, gbp, eur)
@@ -62,7 +60,7 @@ def create_product_groups():
     )
 
     for order, (name, display_name, has_xfer, has_badge, capacity, description, prices) in enumerate(attendee_types):
-        if Product.get_by_name(name):
+        if Product.get_by_name('general', name):
             continue
         pg = Product(name=name, display_name=display_name, capacity_max=capacity,
                      description=description, parent=general,
@@ -86,19 +84,17 @@ def create_product_groups():
 
             pt = PriceTier(name=tier_name, capacity_max=price_cap, personal_limit=10, parent=pg)
             db.session.add(pt)
-            db.session.add(Price(currency='gbp', price_int=gbp * 100, price_tier=pt))
-            db.session.add(Price(currency='eur', price_int=eur * 100, price_tier=pt))
-
-    db.session.commit()
+            db.session.add(Price(currency='GBP', price_int=gbp * 100, price_tier=pt))
+            db.session.add(Price(currency='EUR', price_int=eur * 100, price_tier=pt))
 
     misc = (
         # name, display_name, cap, personal_limit, gbp, eur, description
-        ('car', 'Parking Ticket', 1700, 4, 15, 21, "We're trying to keep cars to a minimum. Please take public transport or car-share if you can."),
+        ('parking', 'Parking Ticket', 1700, 4, 15, 21, "We're trying to keep cars to a minimum. Please take public transport or car-share if you can."),
         ('campervan', 'Caravan/\u200cCampervan Ticket', 60, 2, 30, 42, "If you bring a caravan, you won't need a separate parking ticket for the towing car."),
     )
 
-    parking_pg = ProductGroup(name='Parking',
-                        expires=datetime(2018, 9, 3))
+    parking_pg = ProductGroup(name='parking', type='parking',
+                              expires=datetime(2018, 9, 3))
 
 
     for name, display_name, cap, personal_limit, gbp, eur, description in misc:
@@ -106,8 +102,8 @@ def create_product_groups():
         pt = PriceTier(name=name, personal_limit=personal_limit,
                        parent=ticket)
         db.session.add(pt)
-        db.session.add(Price(currency='gbp', price_int=gbp * 100, price_tier=pt))
-        db.session.add(Price(currency='eur', price_int=eur * 100, price_tier=pt))
+        db.session.add(Price(currency='GBP', price_int=gbp * 100, price_tier=pt))
+        db.session.add(Price(currency='EUR', price_int=eur * 100, price_tier=pt))
 
     db.session.commit()
 

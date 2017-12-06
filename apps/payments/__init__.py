@@ -1,6 +1,6 @@
 from decimal import Decimal
 from flask import render_template, redirect, url_for, abort, flash, current_app as app, Blueprint
-from flask.ext.login import login_required, current_user
+from flask_login import login_required, current_user
 from sqlalchemy.sql.functions import func
 
 from models import Payment
@@ -50,7 +50,7 @@ def invoice(payment_id):
         with_entities(PriceTier, func.count(Purchase.price_tier_id)). \
         group_by(PriceTier).order_by(PriceTier.order).all()
 
-    ticket_sum = sum(tt.get_price_ex_vat(payment.currency) * count for tt, count in invoice_lines)
+    ticket_sum = sum(pt.get_price_ex_vat(payment.currency) * count for pt, count in invoice_lines)
     if payment.provider == 'stripe':
         premium = payment.__class__.premium(payment.currency, ticket_sum)
     else:

@@ -6,7 +6,7 @@ from flask import (
     redirect, url_for, request, abort, render_template,
     flash, Blueprint, session, jsonify, current_app as app
 )
-from flask.ext.login import current_user
+from flask_login import current_user
 
 from sqlalchemy import func, or_, exc as sa_exc
 from sqlalchemy.orm import aliased
@@ -24,8 +24,7 @@ from main import db, external_url
 from .common import require_permission, send_template_email
 from .majority_judgement import calculate_max_normalised_score
 
-# from models.ticket import Ticket, TicketType
-# from models.user import User
+from models.user import User
 from models.cfp import (
     Proposal, CFPMessage, CFPVote, CFP_STATES, Venue
 )
@@ -141,25 +140,28 @@ def proposals():
     if states:
         proposals = proposals.filter(Proposal.state.in_(states))
 
-    # FIXME I'm not quite sure what this was supposed to be doing...
-    # needs_ticket = request.args.get('needs_ticket', type=bool_qs)
-    # if needs_ticket is not None:
-    #     paid_tickets = Ticket.query.join(TicketType).filter(
-    #         TicketType.admits == 'full',
-    #         or_(Ticket.paid == True,  # noqa
-    #             Ticket.expired == False),
-    #     )
+    needs_ticket = request.args.get('needs_ticket', type=bool_qs)
+    if needs_ticket is not None:
+        # FIXME: we need to work out whether to store "will_have_ticket"
+        # on the User, Product or Purchase. NB it's also the same flag
+        # as whether someone can buy add-on tickets like parking/kids.
 
-    #     if needs_ticket:
-    #         proposals = proposals.join(Proposal.user).filter(
-    #             User.will_have_ticket == False,  # noqa
-    #             ~paid_tickets.filter(User.tickets.expression).exists()
-    #         )
-    #     else:
-    #         proposals = proposals.join(Proposal.user).filter(or_(
-    #             User.will_have_ticket == True,  # noqa
-    #             paid_tickets.filter(User.tickets.expression).exists()
-    #         ))
+        # paid_tickets = Ticket.query.join(TicketType).filter(
+        #     TicketType.admits == 'full',
+        #     or_(Ticket.paid == True,  # noqa
+        #         Ticket.expired == False),
+        # )
+
+        if needs_ticket:
+            proposals = proposals.join(Proposal.user).filter(
+                User.will_have_ticket == False,  # noqa
+                # ~paid_tickets.filter(User.tickets.expression).exists()
+            )
+        else:
+            proposals = proposals.join(Proposal.user).filter(or_(
+                User.will_have_ticket == True,  # noqa
+                # paid_tickets.filter(User.tickets.expression).exists()
+            ))
 
     sort_dict = get_proposal_sort_dict(request.args)
     proposals = proposals.all()

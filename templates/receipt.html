@@ -117,11 +117,11 @@
   </div>
   {% endif %}
 
-  {% if entrance_tts_counts or tees %}
+  {% if entrance_products_counts or tees %}
     {{ render_header() }}
     <h3>{{ user.name }} &ndash; {{ user.email }}</h3>
 
-    {% if entrance_tts_counts %}
+    {% if entrance_products_counts %}
     <h4>{{ entrance_tickets_count }} entrance ticket{{ entrance_tickets_count != 1 and 's' or '' }}</h4>
     <div class="entrance-tickets">
         <p>Present the code above to the volunteers at the <b>camp entrance gate</b> on your arrival.
@@ -151,12 +151,12 @@
         <div>&nbsp;</div>
         <div>&nbsp;</div>
 
-        {% if entrance_tts_counts %}
+        {% if entrance_products_counts %}
         <div>&nbsp;</div>
 
         <h4>Your ticket details</h4>
-        {% for tt, ticket_count in entrance_tts_counts %}
-        <div class="ticket-type">{{ ticket_count }} {{ tt.name }}</div>
+        {% for product, ticket_count in entrance_products_counts %}
+        <div class="product">{{ ticket_count }} {{ product.name }}</div>
         {% endfor %}
         {% endif %}
 
@@ -169,7 +169,7 @@
            If you&rsquo;re arriving at the entrance gate together, you only need this copy.
         </p>
         {% for t in transferred_tickets %}
-        <div class="ticket-transfer">{{ t.to_user.name }}: {{ t.ticket.type.name }}</div>
+        <div class="ticket-transfer">{{ t.to_user.name }}: {{ t.ticket.product.name }}</div>
         {% endfor %}
         {% endif %}
 
@@ -177,8 +177,8 @@
         <div>&nbsp;</div>
 
         <h4>Your purchase details</h4>
-        {% for tt, ticket_count in tees %}
-        <div class="ticket-type">{{ ticket_count }} {{ tt.name }}</div>
+        {% for product, ticket_count in tees %}
+        <div class="product">{{ ticket_count }} {{ product.name }}</div>
         {% endfor %}
         {% endif %}
     </div>
@@ -212,7 +212,7 @@
         <div>&nbsp;</div>
 
         <h4>Your ticket details</h4>
-        <div class="ticket-type">{{ ticket.type.name }}</div>
+        <div class="product">{{ ticket.product.name }}</div>
 
         <div>&nbsp;</div>
 

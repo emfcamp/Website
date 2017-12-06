@@ -7,7 +7,7 @@ from flask import (
     url_for, session, send_file, abort, current_app as app,
     Markup, render_template_string,
 )
-from flask.ext.login import login_required, current_user
+from flask_login import login_required, current_user
 from flask_mail import Message
 from wtforms.validators import Required, Optional, Email, ValidationError
 from wtforms import (
@@ -22,7 +22,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from main import db, mail
 from models.user import User, checkin_code_re
 from models.product import ProductGroup, PriceTier
-from models.purchase import Purchase
+from models.purchase import Purchase, Ticket
 from models import bought_states
 from models.payment import BankPayment, StripePayment, GoCardlessPayment
 from models.site_state import get_sales_state
@@ -110,7 +110,7 @@ def main():
     transferred_to = current_user.transfers_to
     transferred_from = current_user.transfers_from
 
-    show_receipt = any([tt for tt in tickets if tt.is_paid is True])
+    show_receipt = any([t for t in tickets if t.is_paid_for is True])
 
     return render_template("tickets-main/main.html",
                            tickets=tickets,
@@ -124,15 +124,15 @@ def main():
 @tickets.route("/tickets/token/")
 @tickets.route("/tickets/token/<token>")
 def tickets_token(token=None):
-    tts = ProductGroup.get_product_groups_for_token(token)
-    if tts:
+    groups = ProductGroup.get_product_groups_for_token(token)
+    if groups:
         session['ticket_token'] = token
     else:
         if 'ticket_token' in session:
             del session['ticket_token']
         flash('Ticket token was invalid')
 
-    if any(tt.allow_check_in for tt in tts):
+    if any(group.allow_check_in for group in groups):
         return redirect(url_for('tickets.choose'))
 
     return redirect(url_for('tickets.choose', flow='other'))
@@ -140,11 +140,11 @@ def tickets_token(token=None):
 
 class TicketAmountForm(Form):
     amount = IntegerSelectField('Number of tickets', [Optional()])
-    type_id = HiddenIntegerField('Ticket Type', [Required()])
+    tier_id = HiddenIntegerField('Price tier', [Required()])
 
 
 class TicketAmountsForm(Form):
-    types = FieldList(FormField(TicketAmountForm))
+    tiers = FieldList(FormField(TicketAmountForm))
     buy = SubmitField('Buy Tickets')
     buy_other = SubmitField('Buy')
     currency_code = HiddenField('Currency')
@@ -198,27 +198,26 @@ def choose(flow=None):
 
     form = TicketAmountsForm()
 
-    # FIXME probably want some better identifier for this...
     # FIXME reimplement /other page
-    products = ProductGroup.get_by_name('General').products
+    products = ProductGroup.get_by_name('general').products
 
     price_tiers = [pd.get_lowest_price_tier('GBP') for pd in products]
     price_tiers = sorted(price_tiers, key=lambda x: x.get_price('GBP'))
     limits = dict((pt.id, pt.user_limit(current_user, token)) for pt in price_tiers)
 
     if request.method != 'POST':
-        # Empty form - populate ticket types
+        # Empty form - populate price tiers
         for pt in price_tiers:
-            form.types.append_entry()
-            form.types[-1].type_id.data = pt.id
+            form.tiers.append_entry()
+            form.tiers[-1].tier_id.data = pt.id
 
 
     price_tiers = {pt.id: pt for pt in price_tiers}
-    for f in form.types:
-        t_id = f.type_id.data
-        f._type = price_tiers[t_id]
+    for f in form.tiers:
+        pt_id = f.tier_id.data
+        f._tier = price_tiers[pt_id]
 
-        values = range(limits[t_id] + 1)
+        values = range(limits[pt_id] + 1)
         f.amount.values = values
         f._any = any(values)
 
@@ -227,11 +226,17 @@ def choose(flow=None):
             set_user_currency(form.currency_code.data)
 
             items = []
-            for f in form.types:
+            for f in form.tiers:
                 if f.amount.data:
-                    tt = f._type
-                    app.logger.info('Adding %s %s tickets to basket', f.amount.data, tt.name)
-                    items.append([PriceTier.get_by_id(tt.id), f.amount.data])
+                    pt = f._tier
+                    app.logger.info('Adding %s %s tickets to basket', f.amount.data, pt.name)
+                    tier = PriceTier.query.get(pt.id)
+                    if not tier:
+                        flash("Ticket not available. Please try again")
+                        items = []
+                        break
+
+                    items.append((tier, f.amount.data))
 
             basket, total = create_basket(items)
             if basket:
@@ -379,7 +384,7 @@ def transfer(ticket_id):
     except NoResultFound:
         return redirect(url_for('tickets.main'))
 
-    if not ticket or ticket.state not in bought_states or not ticket.type.is_transferable:
+    if not ticket or ticket.state not in bought_states or not ticket.price_tier.get_attribute('is_transferable'):
         return redirect(url_for('tickets.main'))
 
     form = TicketTransferForm()
@@ -400,7 +405,9 @@ def transfer(ticket_id):
             new_user = False
             to_user = User.query.filter_by(email=email).one()
 
+        Ticket.query.with_for_update.get(ticket_id)
         ticket.transfer(from_user=current_user, to_user=to_user)
+        db.session.commit()
 
         app.logger.info('Ticket %s transferred from %s to %s', ticket,
                         current_user, to_user)

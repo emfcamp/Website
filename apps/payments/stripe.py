@@ -6,7 +6,7 @@ from flask import (
     render_template, redirect, request, flash,
     url_for, abort, current_app as app
 )
-from flask.ext.login import login_required
+from flask_login import login_required
 from flask_mail import Message
 from wtforms import SubmitField, HiddenField
 from sqlalchemy.orm.exc import NoResultFound
