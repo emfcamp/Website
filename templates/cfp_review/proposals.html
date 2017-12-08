@@ -50,7 +50,7 @@
     </tr>
 {% for proposal in proposals %}
     <tr>
-        <td>{% if proposal.user.tickets.count() > 0 %}Yes{% else %}No{% endif %}</td>
+        <td>{% if proposal.user.will_have_ticket %}Yes{% else %}No{% endif %}</td>
         <td>{{proposal.created.strftime("%d/%m")}}</td>
         <td>{{proposal.state | capitalize}}</td>
         <td>{{proposal.type | capitalize}}</td>

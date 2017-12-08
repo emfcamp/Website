@@ -36,7 +36,7 @@ def payments():
         func.count(Purchase.id).label('ticket_count'),
     ).group_by(Payment).order_by(Payment.id).all()
 
-    return render_template('admin/payments.html', payments=payments)
+    return render_template('admin/payments/payments.html', payments=payments)
 
 
 @admin.route('/payments/expiring')
@@ -51,7 +51,7 @@ def expiring():
         func.count(Purchase.id).label('ticket_count'),
     ).group_by(BankPayment).order_by('first_expires').all()
 
-    return render_template('admin/payments-expiring.html', expiring=expiring)
+    return render_template('admin/payments/payments-expiring.html', expiring=expiring)
 
 
 class ResetExpiryForm(Form):
@@ -80,7 +80,7 @@ def reset_expiry(payment_id):
             flash("Expiry reset for payment %s" % payment.id)
             return redirect(url_for('admin.expiring'))
 
-    return render_template('admin/payment-reset-expiry.html', payment=payment, form=form)
+    return render_template('admin/payments/payment-reset-expiry.html', payment=payment, form=form)
 
 
 class SendReminderForm(Form):
@@ -115,7 +115,7 @@ def send_reminder(payment_id):
             flash("Reminder email for payment %s sent" % payment.id)
             return redirect(url_for('admin.expiring'))
 
-    return render_template('admin/payment-send-reminder.html', payment=payment, form=form)
+    return render_template('admin/payments/payment-send-reminder.html', payment=payment, form=form)
 
 
 class UpdatePaymentForm(Form):
@@ -147,7 +147,7 @@ def update_payment(payment_id):
             flash('Payment status updated')
             return redirect(url_for('admin.update_payment', payment_id=payment.id))
 
-    return render_template('admin/payment-update.html', payment=payment, form=form)
+    return render_template('admin/payments/payment-update.html', payment=payment, form=form)
 
 
 class CancelPaymentForm(Form):
@@ -182,7 +182,7 @@ def cancel_payment(payment_id):
             flash("Payment %s cancelled" % payment.id)
             return redirect(url_for('admin.expiring'))
 
-    return render_template('admin/payment-cancel.html', payment=payment, form=form)
+    return render_template('admin/payments/payment-cancel.html', payment=payment, form=form)
 
 
 class RefundPaymentForm(Form):
@@ -211,7 +211,7 @@ def refund_payment(payment_id):
             flash("Payment refunded")
             return redirect(url_for('admin.payments'))
 
-    return render_template('admin/payment-refund.html', payment=payment, form=form)
+    return render_template('admin/payments/payment-refund.html', payment=payment, form=form)
 
 
 class PartialRefundTicketForm(Form):
@@ -350,5 +350,5 @@ def partial_refund(payment_id):
         return redirect(url_for('.payments'))
 
     refunded_tickets = [t for t in payment.purchases if t.refund]
-    return render_template('admin/partial-refund.html', payment=payment, form=form,
+    return render_template('admin/payments/partial-refund.html', payment=payment, form=form,
                            refunded_tickets=refunded_tickets)

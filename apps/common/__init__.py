@@ -148,7 +148,7 @@ def create_basket(items):
     basket = []
     try:
         for tier, count in items:
-            basket += Purchase.create_instances(user, tier, currency, count)
+            basket += Purchase.create_purchases(user, tier, currency, count)
 
     except:
         session.rollback()

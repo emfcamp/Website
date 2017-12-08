@@ -326,7 +326,9 @@ def new_feed():
 def parking_tickets():
     return render_parking_receipts()
 
+from . import accounts  # noqa
 from . import payments  # noqa
+from . import products  # noqa
 from . import tickets  # noqa
 from . import users  # noqa
 from . import email  # noqa

@@ -169,10 +169,10 @@ class PurchaseTest(unittest.TestCase):
             tier = PriceTier.get_by_name(self.pg_name, self.product_name, self.tier_name)
             assert tier is not None
 
-        instance = Purchase.create_instances(user, tier, 'GBP')[0]
+        purchase = Purchase.create_purchases(user, tier, 'GBP')[0]
         session.commit()
 
-        return instance
+        return purchase
 
     def setUp(self):
         self.client, self.app, self.db = get_app()
@@ -192,31 +192,31 @@ class PurchaseTest(unittest.TestCase):
 
             self.db.session.commit()
 
-    def test_create_instances(self):
+    def test_create_purchases(self):
         with self.app.app_context():
             user = User.get_by_email(self.user_email)
             tier = PriceTier.get_by_name(self.pg_name, self.product_name, self.tier_name)
             product = tier.parent
             assert tier.capacity_used == 0
 
-            instance = self.get_purchase(self.db.session)
+            purchase = self.get_purchase(self.db.session)
 
             assert tier.capacity_used == 1
             assert product.capacity_used == 1
 
             # NB: Decimal('6.66') != Decimal(6.66) == Decimal(float(6.66)) ~= 6.6600000000000001
-            assert instance.price.value == Decimal('6.66')
+            assert purchase.price.value == Decimal('6.66')
 
             # Test issuing multiple instances works
-            more_instances = Purchase.create_instances(user, tier, 'GBP', 2)
-            assert len(more_instances) == 2
+            more_purchases = Purchase.create_purchases(user, tier, 'GBP', 2)
+            assert len(more_purchases) == 2
             assert product.capacity_used == 3
 
             # Test issuing beyond capacity errors
             with pytest.raises(CapacityException):
-                Purchase.create_instances(user, tier, 'GBP')
+                Purchase.create_purchases(user, tier, 'GBP')
 
-    def test_product_instance_state_machine(self):
+    def test_purchase_state_machine(self):
         states_dict = PURCHASE_STATES
 
         # 'reserved' is the start state, all other states must
@@ -239,23 +239,23 @@ class PurchaseTest(unittest.TestCase):
 
     def test_set_state(self):
         with self.app.app_context():
-            instance = self.get_purchase(self.db.session)
+            purchase = self.get_purchase(self.db.session)
 
             with self.assertRaises(PurchaseStateException):
-                instance.set_state('disallowed-state')
+                purchase.set_state('disallowed-state')
 
             with self.assertRaises(PurchaseStateException):
-                instance.set_state('receipt-emailed')
+                purchase.set_state('receipt-emailed')
 
-            instance.set_state('payment-pending')
+            purchase.set_state('payment-pending')
 
-            self.assertEqual('payment-pending', instance.state)
+            self.assertEqual('payment-pending', purchase.state)
 
     def test_product_group_get_counts_by_state(self):
         with self.app.app_context():
             # Test it works at the PriceTier level
             tier1 = PriceTier.get_by_name(self.tier_name)
-            instance1 = self.get_purchase(self.db.session)
+            purchase1 = self.get_purchase(self.db.session)
 
             states_count = tier1.get_purchase_count_by_state()
             expect = {s: 0 for s in PURCHASE_STATES.keys()}
@@ -271,8 +271,8 @@ class PurchaseTest(unittest.TestCase):
             assert expect == product_states
 
             # Test that other states show up
-            instance1.set_state('payment-pending')
-            self.db.session.add(instance1)
+            purchase1.set_state('payment-pending')
+            self.db.session.add(purchase1)
             self.db.session.commit()
 
             product_states = product.get_purchase_count_by_state()
@@ -281,7 +281,7 @@ class PurchaseTest(unittest.TestCase):
 
             assert expect == product_states
 
-            # Add another instance in another tier
+            # Add another purchase in another tier
             tier2 = PriceTier(name='2', parent=product)
             price = Price(price_tier=tier2, currency='GBP', price_int=666)
             self.db.session.add(price)
@@ -296,8 +296,8 @@ class PurchaseTest(unittest.TestCase):
         with self.app.app_context():
             # Test it works at the PriceTier level
             tier = PriceTier.get_by_name(self.tier_name)
-            instance = self.get_purchase(self.db.session)
-            instance.state = 'paid'
+            purchase = self.get_purchase(self.db.session)
+            purchase.state = 'paid'
             self.db.session.commit()
             assert tier.get_purchase_count() == 1
 
@@ -354,8 +354,8 @@ class ProductTransferTest(unittest.TestCase):
             self.db.session.commit()
 
             # PriceTier needs to have been committed before this
-            instance = Purchase.create_instances(self.db.session, user1, tier, 'GBP')[0]
-            self.db.session.add(instance)
+            purchase = Purchase.create_purchases(self.db.session, user1, tier, 'GBP')[0]
+            self.db.session.add(purchase)
 
             self.db.session.commit()
 

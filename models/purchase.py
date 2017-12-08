@@ -144,7 +144,7 @@ class Purchase(db.Model):
 
         self.owner = to_user
 
-        session.add(PurchaseTransfer(product_instance=self,
+        session.add(PurchaseTransfer(purchase=self,
                                      to_user=to_user,
                                      from_user=from_user))
 
@@ -166,7 +166,7 @@ class Purchase(db.Model):
             return Purchase
 
     @classmethod
-    def create_instances(cls, user, tier, currency, count=1):
+    def create_purchases(cls, user, tier, currency, count=1):
         """ Generate a number of Purchases when given a PriceTier.
 
             This ensures that capacity is available, and instantiates
@@ -175,14 +175,14 @@ class Purchase(db.Model):
         price = tier.get_price_object(currency)
 
         if count > tier.user_limit(user):
-            raise CapacityException('Insufficient user capacity.')
+            raise CapacityException('Insufficient capacity.')
 
         purchase_cls = cls.class_from_product(tier.parent)
 
         tier.issue_instances(count)
         db.session.flush()
-        if tier.remaining_capacity <= 0:
-            raise CapacityException('Insufficient user capacity.')
+        if tier.remaining_capacity < 0:
+            raise CapacityException('Insufficient capacity.')
 
         return [purchase_cls(tier, price, user) for c in range(count)]
 
@@ -237,12 +237,12 @@ class PurchaseTransfer(db.Model):
     from_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
-    product_instance = db.relationship(Purchase, backref=db.backref("transfers", cascade="all"))
+    purchase = db.relationship(Purchase, backref=db.backref("transfers", cascade="all"))
 
-    def __init__(self, product_instance, to_user, from_user):
+    def __init__(self, purchase, to_user, from_user):
         if to_user.id == from_user.id:
             raise PurchaseTransferException('"From" and "To" users must be different.')
-        super().__init__(product_instance=product_instance,
+        super().__init__(purchase=purchase,
                          to_user_id=to_user.id,
                          from_user_id=from_user.id)
 

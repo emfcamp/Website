@@ -55,7 +55,7 @@ def users():
         return redirect(url_for('.users'))
 
     users = User.query.order_by(User.id).options(joinedload(User.permissions)).all()
-    return render_template('admin/users.html', users=users, form=form)
+    return render_template('admin/users/users.html', users=users, form=form)
 
 
 @admin.route("/users/<int:user_id>", methods=['GET', 'POST'])
@@ -101,7 +101,7 @@ def user(user_id):
         return redirect(url_for('.user', user_id=user.id))
 
     form.note.data = user.checkin_note
-    return render_template('admin/user.html',
+    return render_template('admin/users/user.html',
                            user=user,
                            form=form,
                            permissions=permissions)
