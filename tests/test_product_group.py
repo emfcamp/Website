@@ -154,7 +154,7 @@ class MultipleProductGroupTest(unittest.TestCase):
             self.db.session.add(price2)
             self.db.session.commit()
 
-            assert price1 == self.product1.get_lowest_price_tier().get_price_object('GBP')
+            assert price1 == self.product1.get_cheapest_price('GBP')
 
 
 class PurchaseTest(unittest.TestCase):
@@ -170,7 +170,7 @@ class PurchaseTest(unittest.TestCase):
             assert tier is not None
 
         purchase = Purchase.create_purchases(user, tier, 'GBP')[0]
-        session.commit()
+        self.db.session.commit()
 
         return purchase
 

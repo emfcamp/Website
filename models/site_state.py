@@ -37,13 +37,13 @@ def calc_site_state(date):
         return "after-event"
 
 def calc_sales_state(date):
-    site_capacity = ProductGroup.get_by_name('admissions')
+    site_capacity = ProductGroup.get_by_name('general')
     if site_capacity.get_total_remaining_capacity() < 1:
         # We've hit capacity - no more tickets will be sold
         return "sold-out"
     elif date > config_date('EVENT_END'):
         return "sales-ended"
-    elif Product.get_cheapest_price() is None:
+    elif Product.get_by_name('full').get_cheapest_price('GBP') is None:
         # Tickets not currently available, probably just for this round, but we haven't hit site capacity
         return "unavailable"
     else:

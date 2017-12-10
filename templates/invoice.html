@@ -50,7 +50,7 @@
 
 <div class="invoice-details">
   <dl class="dl-horizontal">
-    <dt>Invoice date</dt><dd>{{ payment.changes[0].timestamp.strftime('%d %b %Y') }}</dd>
+    <dt>Invoice date</dt><dd>{{ payment.versions[0].transaction.issued_at.strftime('%d %b %Y') }}</dd>
     <dt>Invoice number</dt><dd>{{ payment.invoice_number() }}</dd>
     <dt>VAT number</dt><dd>188170679</dd>
   </dl>
@@ -59,7 +59,7 @@
 <table class="table">
 <thead>
 <tr>
-  <th>Ticket type</th>
+  <th>Product</th>
   <th>Unit price</th>
   <th>Quantity</th>
   <th>Amount</th>
@@ -71,10 +71,10 @@
 
 {%- for pt, count in invoice_lines -%}
 <tr class="ticket {{ line_class.next() }}">
-<td>{{ pt.name }}</td>
-<td>{{ pt.get_price_ex_vat(payment.currency) | price(payment.currency) }}</td>
+<td>{{ pt.parent.display_name }}</td>
+<td>{{ pt.get_price(payment.currency).value_ex_vat | price(payment.currency) }}</td>
 <td>{{ count }}
-<td>{{ (pt.get_price_ex_vat(payment.currency) * count) | price(payment.currency) }}</td>
+<td>{{ (pt.get_price(payment.currency).value_ex_vat * count) | price(payment.currency) }}</td>
 </tr>
 {% endfor -%}
 

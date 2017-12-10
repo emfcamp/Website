@@ -1,6 +1,8 @@
 from decimal import Decimal
 
 from sqlalchemy import func, UniqueConstraint
+from sqlalchemy.ext.associationproxy import association_proxy
+
 
 from main import db
 from .purchase import Purchase, non_blocking_states, allowed_states
@@ -23,7 +25,8 @@ class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
     type = db.Column(db.String, nullable=False)
     name = db.Column(db.String, unique=True, nullable=False)
 
-    parent = db.relationship("ProductGroup", remote_side=[id], backref="children", cascade="all")
+    products = db.relationship('Product', backref='parent', cascade='all')
+    children = db.relationship('ProductGroup', backref=db.backref('parent', remote_side=[id]), cascade='all')
 
     def __init__(self, type=None, parent=None, parent_id=None, **kwargs):
         if type is None:
@@ -59,30 +62,28 @@ class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self.name)
 
+    def __str__(self):
+        return self.name
 
 class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
     """ A product (ticket or other item) which is for sale. """
     id = db.Column(db.Integer, primary_key=True)
-    parent_id = db.Column(db.Integer, db.ForeignKey(ProductGroup.id), nullable=False)
+    group_id = db.Column(db.Integer, db.ForeignKey(ProductGroup.id), nullable=False)
     name = db.Column(db.String, nullable=False)
     display_name = db.Column(db.String)
     description = db.Column(db.String)
-    order = db.Column(db.Integer)
-    parent = db.relationship(ProductGroup, backref="products", cascade="all")
+    price_tiers = db.relationship('PriceTier', backref='parent', cascade='all')
+    product_view_products = db.relationship('ProductViewProduct', backref='product')
 
-    UniqueConstraint('name', 'parent_id')
+    __table_args__ = (
+        UniqueConstraint('name', 'group_id'),
+    )
 
     @classmethod
     def get_by_name(cls, group_name, product_name):
         group = ProductGroup.query.filter_by(name=group_name)
         product = group.join(Product).filter_by(name=product_name).with_entities(Product)
         return product.one_or_none()
-
-    @classmethod
-    def get_cheapest_price(cls, group_name='general', product_name='full', currency='GBP'):
-        product = Product.get_by_name(group_name, product_name)
-        tier = product.get_lowest_price_tier(currency)
-        return tier.get_price(currency)
 
     def get_purchase_count_by_state(self, states_to_get=None):
         """ Return a count of purchases, broken down by state.
@@ -104,19 +105,17 @@ class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
             states[k] += v
         return states
 
-    def get_lowest_price_tier(self, currency='GBP'):
-        """ Fetch the cheapest price tier for this product.
+    def get_cheapest_price(self, currency='GBP'):
+        price = PriceTier.query.filter_by(product_id=self.id) \
+                         .join(Price).filter_by(currency=currency) \
+                         .with_entities(Price) \
+                         .order_by(Price.price_int).first()
+        return price
 
-            An optional argument, currency, can be specified with which to check
-            the price. Defaults to GBP.
-
-            Returns a PriceTier object, or None if no price found.
-        """
-        pairs = [(tier, tier.get_price(currency)) for tier in self.price_tiers]
-        pairs = list(sorted(pairs, key=lambda p: p[1]))
-        if len(pairs) == 0:
-            return None
-        return pairs[0][0]
+    def get_price_tier(self, name):
+        tier = PriceTier.query.filter_by(product_id=self.id) \
+                        .filter_by(name=name)
+        return tier.one_or_none()
 
     def get_type(self):
         """ Return the type of this product (ticket, merchandise, etc).
@@ -133,6 +132,8 @@ class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
     def __repr__(self):
         return "<Product: %s>" % self.name
 
+    def __str__(self):
+        return self.name
 
 class PriceTier(db.Model, CapacityMixin):
     """A pricing level for a Product.
@@ -142,16 +143,18 @@ class PriceTier(db.Model, CapacityMixin):
     """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
-    parent_id = db.Column(db.Integer, db.ForeignKey(Product.id), nullable=False)
-    parent = db.relationship(Product, backref="price_tiers", cascade="all")
+    product_id = db.Column(db.Integer, db.ForeignKey(Product.id), nullable=False)
 
+    prices = db.relationship('Price', backref='price_tier', cascade='all')
     personal_limit = db.Column(db.Integer, default=10, nullable=False)
 
-    UniqueConstraint('name', 'parent_id')
+    __table_args__ = (
+        UniqueConstraint('name', 'product_id'),
+    )
 
     @classmethod
     def get_by_name(cls, group_name, product_name, tier_name):
-        group = ProductGroup.filter_by(name=group_name)
+        group = ProductGroup.query.filter_by(name=group_name)
         product = group.join(Product).filter_by(name=product_name)
         tier = product.join(PriceTier).filter_by(name=tier_name)
         return tier.one_or_none()
@@ -176,26 +179,10 @@ class PriceTier(db.Model, CapacityMixin):
         return states
 
     def get_price(self, currency):
-        """ Get the price for this tier in the given currency.
+        price = Price.query.filter_by(price_tier_id=self.id, currency=currency)
+        return price.one_or_none()
 
-            Returns the value in that currency or None if the price is
-            not found.
-        """
-        return self.get_price_object(currency).value
-
-    def get_price_object(self, currency):
-        """ Get the price for this tier in the given currency.
-
-            Returns a Price object or None if no price found.
-
-            You should not be using this method.
-        """
-        for price in self.prices:
-            if price.currency == currency.upper():
-                return price
-        return None
-
-    def user_limit(self, user, token=''):
+    def user_limit(self, user):
         if self.has_expired():
             return 0
 
@@ -214,19 +201,21 @@ class PriceTier(db.Model, CapacityMixin):
     def __repr__(self):
         return "<PriceTier %s>" % self.name
 
+    def __str__(self):
+        return self.name
+
 
 class Price(db.Model):
     """ Represents the price of a product, at a given price tier, in a given currency.
 
-        Prices are immutable and should not be changed!
+        Prices are immutable and should not be changed. We expire the PriceTier instead.
     """
-    __tablename__ = "product_price"
+    __tablename__ = "price"
 
     id = db.Column(db.Integer, primary_key=True)
     price_tier_id = db.Column(db.Integer, db.ForeignKey("price_tier.id"), nullable=False)
     currency = db.Column(db.String, nullable=False)
     price_int = db.Column(db.Integer, nullable=False)
-    price_tier = db.relationship(PriceTier, backref=db.backref("prices", cascade="all"))
 
     def __init__(self, currency=None, **kwargs):
         super().__init__(currency=currency.upper(), **kwargs)
@@ -239,5 +228,59 @@ class Price(db.Model):
     def value(self, val):
         self.price_int = int(val * 100)
 
+    @property
+    def value_ex_vat(self):
+        return self.value / Decimal('1.2')
+
+    @value_ex_vat.setter
+    def value_ex_vat(self, val):
+        self.value = val * Decimal('1.2')
+
     def __repr__(self):
         return "<Price for %r: %.2f %s>" % (self.price_tier, self.value, self.currency)
+
+    def __str__(self):
+        return '%0.2f %s' % (self.value, self.currency)
+
+
+class ProductView(db.Model):
+    __table_name__ = 'product_view'
+
+    """ A selection of products to be shown together for sale. """
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+
+    product_view_products = db.relationship('ProductViewProduct', backref='view', order_by='ProductViewProduct.order')
+    products = association_proxy('product_view_products', 'product')
+
+    def __init__(self, name):
+        self.name = name
+
+    @classmethod
+    def get_by_name(cls, name):
+        return ProductView.query.filter_by(name=name).one_or_none()
+
+    def __repr__(self):
+        return "<ProductView: %s>" % self.name
+
+    def __str__(self):
+        return self.name
+
+class ProductViewProduct(db.Model):
+    __table_name__ = 'product_view_product'
+
+    view_id = db.Column(db.Integer, db.ForeignKey(ProductView.id), primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey(Product.id), primary_key=True)
+
+    order = db.Column(db.Integer, nullable=False, default=0)
+
+    def __init__(self, view, product, order=None):
+        self.view = view
+        self.product = product
+        if order is not None:
+            self.order = order
+
+    def __repr__(self):
+        return '<ProductViewProduct: view {}, product {}, order {}>'.format(
+            self.view_id, self.product_id, self.order)
+

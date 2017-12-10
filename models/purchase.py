@@ -48,7 +48,7 @@ class Purchase(db.Model):
     # Product FKs.
     # price_tier and product_id are denormalised for convenience.
     # We don't expect them to change, even if price_id does (by switching currency)
-    price_id = db.Column(db.Integer, db.ForeignKey('product_price.id'), nullable=False)
+    price_id = db.Column(db.Integer, db.ForeignKey('price.id'), nullable=False)
     price_tier_id = db.Column(db.Integer, db.ForeignKey('price_tier.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
 
@@ -68,7 +68,8 @@ class Purchase(db.Model):
 
     # Relationships
     price = db.relationship('Price', backref='purchases')
-    price_tier = db.relationship('PriceTier', backref='purchases')
+    price_tier = db.relationship('PriceTier')
+    product = db.relationship('Product')
 
     __mapper_args__ = {
         'polymorphic_on': type,
@@ -81,7 +82,8 @@ class Purchase(db.Model):
         if user is None and state is not None and state not in anon_states:
             raise PurchaseStateException('%s is not a valid state for unclaimed purchases' % state)
 
-        super().__init__(price=price, purchaser=user, owner=user, state=state, **kwargs)
+        super().__init__(price=price, price_tier=price.price_tier, product=price.price_tier.parent,
+                         purchaser=user, owner=user, state=state, **kwargs)
 
     def __repr__(self):
         if self.id is None:
@@ -172,7 +174,7 @@ class Purchase(db.Model):
             This ensures that capacity is available, and instantiates
             the correct Purchase type, returning a list of Purchases.
         """
-        price = tier.get_price_object(currency)
+        price = tier.get_price(currency)
 
         if count > tier.user_limit(user):
             raise CapacityException('Insufficient capacity.')
@@ -181,10 +183,10 @@ class Purchase(db.Model):
 
         tier.issue_instances(count)
         db.session.flush()
-        if tier.remaining_capacity < 0:
+        if tier.get_total_remaining_capacity() < 0:
             raise CapacityException('Insufficient capacity.')
 
-        return [purchase_cls(tier, price, user) for c in range(count)]
+        return [purchase_cls(price=price, user=user) for c in range(count)]
 
 
 class Ticket(Purchase):

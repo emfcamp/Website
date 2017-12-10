@@ -25,9 +25,8 @@ class Payment(db.Model):
     amount_int = db.Column(db.Integer, nullable=False)
     state = db.Column(db.String, nullable=False, default='new')
     reminder_sent = db.Column(db.Boolean, nullable=False, default=False)
-    refunds = db.relationship('Refund', lazy='dynamic', backref='payment', cascade='all')
-    purchases = db.relationship('Purchase', lazy='dynamic', backref='payment',
-                             cascade='all')
+    refunds = db.relationship('Refund', backref='payment', cascade='all')
+    purchases = db.relationship('Purchase', backref='payment', cascade='all')
 
     __mapper_args__ = {'polymorphic_on': provider}
 
@@ -361,7 +360,7 @@ class Refund(db.Model):
     provider = db.Column(db.String, nullable=False)
     amount_int = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    purchases = db.relationship('Purchase', lazy='dynamic', backref='refunds', cascade='all')
+    purchases = db.relationship('Purchase', backref=db.backref('refunds', cascade='all'))
 
     __mapper_args__ = {'polymorphic_on': provider}
 

@@ -1,7 +1,7 @@
 Hi {{ user.name }},
 
 This is to confirm that you've bought
-{%- if payment.purchases.all() | count == 1 %} a ticket {%- else %} {{ payment.purchases.all() |count }} tickets
+{%- if payment.purchases | count == 1 %} a ticket {%- else %} {{ payment.purchases | count }} tickets
 {%- endif %} for Electromagnetic Field 2016.
 
 Your tickets are:

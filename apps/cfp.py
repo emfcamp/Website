@@ -201,7 +201,7 @@ def proposals():
     if current_user.is_anonymous:
         return redirect(url_for('.main'))
 
-    proposals = current_user.proposals.all()
+    proposals = current_user.proposals
     if not proposals:
         return redirect(url_for('.main'))
 

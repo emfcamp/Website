@@ -11,7 +11,7 @@ from flask import (
 )
 
 from .common import feature_flag, site_flag
-from models.product import Product
+from models.product import Product, ProductView, ProductViewProduct
 from models.site_state import get_site_state
 
 
@@ -20,7 +20,10 @@ base = Blueprint('base', __name__)
 
 @base.route("/")
 def main():
-    full_price = Product.get_cheapest_price()
+    full = ProductView.query.filter_by(name='main') \
+                      .join(ProductViewProduct, Product) \
+                      .with_entities(Product).first()
+    full_price = full.get_cheapest_price('GBP')
 
     state = get_site_state()
     if app.config.get('DEBUG'):

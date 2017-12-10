@@ -8,6 +8,7 @@ from flask_login import login_user, current_user
 from werkzeug import BaseResponse
 from werkzeug.exceptions import HTTPException
 
+from models.product import Price
 from models.purchase import Purchase
 from models.site_state import get_site_state, get_sales_state
 from models.feature_flag import get_db_flags
@@ -30,7 +31,13 @@ CURRENCY_SYMBOLS = dict((c.code, c.symbol) for c in CURRENCIES)
 
 def load_utility_functions(app_obj):
     @app_obj.template_filter('price')
-    def format_price(amount, currency, after=False):
+    def format_price(price, currency=None, after=False):
+        if isinstance(price, Price):
+            currency = price.currency
+            amount = price.value
+            # TODO: look up after from CURRENCIES
+        else:
+            amount = price
         amount = '{0:.2f}'.format(amount)
         symbol = CURRENCY_SYMBOLS[currency]
         if after:
@@ -151,10 +158,10 @@ def create_basket(items):
             basket += Purchase.create_purchases(user, tier, currency, count)
 
     except:
-        session.rollback()
+        db.session.rollback()
         raise
 
-    session.commit()
+    db.session.commit()
     app.logger.info('Made basket with: %s', basket)
 
     total = get_basket_cost(basket)

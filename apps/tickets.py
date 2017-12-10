@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
 import re
+from collections import OrderedDict
 
 from flask import (
     render_template, redirect, request, flash, Blueprint,
@@ -20,8 +21,9 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
 from main import db, mail
+from models.exc import CapacityException
 from models.user import User, checkin_code_re
-from models.product import ProductGroup, PriceTier
+from models.product import ProductGroup, PriceTier, ProductView
 from models.purchase import Purchase, Ticket
 from models import bought_states
 from models.payment import BankPayment, StripePayment, GoCardlessPayment
@@ -159,6 +161,14 @@ class TicketAmountsForm(Form):
 @tickets.route("/tickets/choose/<flow>", methods=['GET', 'POST'])
 @feature_flag('TICKET_SALES')
 def choose(flow=None):
+    if flow is None:
+        flow = 'main'
+
+    # For now, use the flow name as a view name. This might change.
+    view = ProductView.get_by_name(flow)
+    if not view:
+        abort(404)
+
     is_new_basket = request.args.get('is_new_basket', False)
     if is_new_basket:
         empty_basket()
@@ -167,18 +177,11 @@ def choose(flow=None):
     token = session.get('ticket_token')
     sales_state = get_sales_state()
 
-    if flow is None:
-        admissions = True
-    elif flow == 'other':
-        admissions = False
-    else:
-        abort(404)
-
     if sales_state in ['unavailable', 'sold-out']:
         # For the main entry point, we assume people want admissions tickets,
         # but we still need to sell people e.g. parking tickets or tents until
         # the final cutoff (sales-ended).
-        if not admissions:
+        if flow != 'main':
             sales_state = 'available'
 
         # Allow people with valid discount tokens to buy tickets
@@ -196,28 +199,26 @@ def choose(flow=None):
     else:
         return render_template("tickets-cutoff.html")
 
+    tiers = OrderedDict()
+    for product in view.products:
+        product_tiers = sorted(product.price_tiers, key=lambda x: x.get_price('GBP').value)
+        pt = product_tiers[0]
+        tiers[pt.id] = pt
+
     form = TicketAmountsForm()
 
-    # FIXME reimplement /other page
-    products = ProductGroup.get_by_name('general').products
-
-    price_tiers = [pd.get_lowest_price_tier('GBP') for pd in products]
-    price_tiers = sorted(price_tiers, key=lambda x: x.get_price('GBP'))
-    limits = dict((pt.id, pt.user_limit(current_user, token)) for pt in price_tiers)
-
     if request.method != 'POST':
-        # Empty form - populate price tiers
-        for pt in price_tiers:
+        # Empty form - populate products
+        for pt_id in tiers.keys():
             form.tiers.append_entry()
-            form.tiers[-1].tier_id.data = pt.id
+            form.tiers[-1].tier_id.data = pt_id
 
-
-    price_tiers = {pt.id: pt for pt in price_tiers}
     for f in form.tiers:
         pt_id = f.tier_id.data
-        f._tier = price_tiers[pt_id]
+        f._tier = tiers[pt_id]
 
-        values = range(limits[pt_id] + 1)
+        user_limit = tiers[pt_id].user_limit(current_user)
+        values = range(user_limit + 1)
         f.amount.values = values
         f._any = any(values)
 
@@ -246,7 +247,7 @@ def choose(flow=None):
                     session['reserved_purchase_ids'] = [b.id for b in basket]
 
                 return redirect(url_for('tickets.pay', flow=flow))
-            elif admissions:
+            elif flow == 'main':
                 flash("Please select at least one ticket to buy.")
             else:
                 flash("Please select at least one item to buy.")
@@ -260,7 +261,7 @@ def choose(flow=None):
                 field.errors = []
 
     form.currency_code.data = get_user_currency()
-    return render_template("tickets-choose.html", form=form, admissions=admissions)
+    return render_template("tickets-choose.html", form=form, flow=flow)
 
 
 class TicketPaymentForm(Form):
@@ -287,11 +288,7 @@ class TicketPaymentForm(Form):
 @tickets.route("/tickets/pay", methods=['GET', 'POST'])
 @tickets.route("/tickets/pay/<flow>", methods=['GET', 'POST'])
 def pay(flow=None):
-    if flow is None:
-        admissions = True
-    elif flow == 'other':
-        admissions = False
-    else:
+    if flow not in ['main', 'other']:
         abort(404)
 
     if request.form.get("change_currency") in ('GBP', 'EUR'):
@@ -307,7 +304,7 @@ def pay(flow=None):
 
     basket, total, _ = get_basket_and_total()
     if not basket:
-        if admissions:
+        if flow == 'main':
             flash("Please select at least one ticket to buy.")
         else:
             flash("Please select at least one item to buy.")
@@ -337,11 +334,9 @@ def pay(flow=None):
         elif form.stripe.data:
             payment_type = StripePayment
 
-        #
         try:
             payment = create_payment(payment_type)
-        # FIXME this should be a much more tightly scoped exception
-        except Exception as e: # TicketLimitException as e:
+        except CapacityException as e:
             app.logger.warn('Limit exceeded creating tickets: %s', e)
             flash("We're sorry, we were unable to reserve your tickets. %s" % e)
             return redirect(url_for('tickets.choose', flow=flow))
@@ -363,7 +358,7 @@ def pay(flow=None):
     return render_template('payment-choose.html', form=form,
                            basket=basket, total=total, StripePayment=StripePayment,
                            is_anonymous=current_user.is_anonymous,
-                           admissions=admissions)
+                           flow=flow)
 
 
 class TicketTransferForm(Form):

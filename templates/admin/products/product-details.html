@@ -4,7 +4,6 @@
 
 <dl class="dl-horizontal">
   <dt>Name</dt><dd>{{ product.name }}</dd>
-  <dt>Order</dt><dd>{{ product.order }}</dd>
   <dt>Admits</dt><dd>{{ product.admits }}</dd>
   <dt>Price</dt><dd>£{{ product.get_price('GBP') }} / €{{ product.get_price('EUR') }}</dd>
   <dt>Sold</dt><dd>{{ product.get_sold().count() }}</dd>
@@ -13,7 +12,6 @@
   <dt>Expires</dt><dd>{% if product.expires %}{{ product.expires.strftime('%Y-%m-%d') }}{% else %}--{% endif %}</dd>
   <dt>Issue Badge</dt><dd>{{ product.has_badge }}</dd>
   <dt>Transferable</dt><dd>{{ product.is_transferable }}</dd>
-  <dt>Discount Token</dt><dd>{{ product.discount_token or '--'}}</dd>
   <dt>Description</dt><dd>{{ product.description or '--' }}</dd>
 </dl>
 <div class="pull-right">

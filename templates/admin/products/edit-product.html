@@ -9,16 +9,13 @@
 {{ form.hidden_tag() }}
 
 {{ render_field(form.name, horizontal=8) }}
-{{ render_field(form.order, horizontal=8) }}
-{{ render_static(form.type, horizontal=8) }}
 {{ render_field(form.capacity_max, horizontal=8) }}
 {{ render_field(form.personal_limit, horizontal=8) }}
 {{ render_field(form.expires, horizontal=8, placeholder="YYYY-MM-DD") }}
 {{ render_static(form.price_gbp, horizontal=8) }}
 {{ render_static(form.price_eur, horizontal=8) }}
-{{ render_field(form.has_badge, horizontal=8) }}
-{{ render_field(form.is_transferable, horizontal=8) }}
-{{ render_field(form.discount_token, horizontal=8) }}
+{{ render_field(form.badge, horizontal=8) }}
+{{ render_field(form.transferable, horizontal=8) }}
 {{ render_field(form.description, horizontal=8, rows="4", cols="50") }}
 
 <div class="pull-right">{{ form.submit(class_="btn btn-success debounce") }}</div>

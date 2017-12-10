@@ -6,6 +6,7 @@ from flask import (
     render_template, redirect, request, flash,
     url_for, current_app as app, Blueprint
 )
+from flask_admin import Admin
 
 from wtforms.validators import Optional, Required, URL
 from wtforms import (
@@ -36,6 +37,10 @@ from ..common.receipt import render_parking_receipts
 admin = Blueprint('admin', __name__)
 
 admin_required = require_permission('admin')  # Decorator to require admin permissions
+
+# flask_admin doesn't call register_blueprint if no app is passed to the constructor
+admin_new = Admin(url='/admin/new', name='EMF Admin', template_mode='bootstrap3', base_template='flask-admin-base.html')
+admin_new.endpoint_prefix = 'admin_new'
 
 
 @admin.context_processor
@@ -326,9 +331,11 @@ def new_feed():
 def parking_tickets():
     return render_parking_receipts()
 
-from . import accounts  # noqa
-from . import payments  # noqa
-from . import products  # noqa
-from . import tickets  # noqa
-from . import users  # noqa
-from . import email  # noqa
+from . import accounts  # noqa: F401
+from . import payments  # noqa: F401
+from . import products  # noqa: F401
+from . import tickets  # noqa: F401
+from . import users  # noqa: F401
+from . import email  # noqa: F401
+
+

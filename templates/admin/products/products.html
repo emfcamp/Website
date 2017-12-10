@@ -6,32 +6,31 @@
 <table class="table table-condensed table-striped">
 <thead><tr>
   <th>Name</th>
-  <th>Order</th>
+  <th>Display Name</th>
   <th>Admits</th>
   <th>Price</th>
   <th>Sold</th>
   <th>Max</th>
   <th>Expires</th>
-  <th>Discount token</th>
+  <th></th>
   <th></th>
 </tr></thead>
 <tbody>
 {% for product in products %}
 <tr class="ticket-product">
-    <td><a href="{{ url_for('.product_details', product_id=product.id) }}">{{ product.name }}</a></td>
-    <td>{{ product.order }}</td>
-    <td>{{ product.admits }}</td>
-    <td>£{{ product.get_price('GBP') }}</td>
-    <td class="{% if product.get_sold().count() >= product.product_limit -%} limit-reached {%- endif %}">
-      {{ product.get_sold().count() }}
+    <td>{{ product.name }}</td>
+    <td><a href="{{ url_for('.product_details', product_id=product.id) }}">{{ product.display_name }}</a></td>
+    <td>{{ product.type }}</td>
+    <td>£{{ product.get_cheapest_price('GBP').value }}</td>
+    <td class="{% if not product.has_capacity() -%} limit-reached {%- endif %}">
+      {{ product.capacity_used or '' }}
     </td>
-    <td class="{% if product.get_sold().count() >= product.product_limit -%} limit-reached {%- endif %}">
-      {{ product.product_limit }}
+    <td class="{% if not product.has_capacity() -%} limit-reached {%- endif %}">
+      {{ product.capacity_max if product.capacity_max != None }}
     </td>
     <td class="{% if product.expired -%} expired {%- endif %}">
-      {% if product.expires %}{{ product.expires.strftime('%Y-%m-%d') }}{% else %}--{% endif %}
+      {{ product.expires.strftime('%Y-%m-%d') if product.expires != None }}
     </td>
-    <td>{{ product.discount_token or '--' }}</td>
     <td>
         <a class="btn btn-sm btn-success" href="{{ url_for('.new_product', copy_id=product.id) }}">Copy</a>
     </td>

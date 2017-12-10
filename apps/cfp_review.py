@@ -24,7 +24,6 @@ from main import db, external_url
 from .common import require_permission, send_template_email
 from .majority_judgement import calculate_max_normalised_score
 
-from models.user import User
 from models.cfp import (
     Proposal, CFPMessage, CFPVote, CFP_STATES, Venue
 )
@@ -142,26 +141,7 @@ def proposals():
 
     needs_ticket = request.args.get('needs_ticket', type=bool_qs)
     if needs_ticket is not None:
-        # FIXME: we need to work out whether to store "will_have_ticket"
-        # on the User, Product or Purchase. NB it's also the same flag
-        # as whether someone can buy add-on tickets like parking/kids.
-
-        # paid_tickets = Ticket.query.join(TicketType).filter(
-        #     TicketType.admits == 'full',
-        #     or_(Ticket.paid == True,  # noqa
-        #         Ticket.expired == False),
-        # )
-
-        if needs_ticket:
-            proposals = proposals.join(Proposal.user).filter(
-                User.will_have_ticket == False,  # noqa
-                # ~paid_tickets.filter(User.tickets.expression).exists()
-            )
-        else:
-            proposals = proposals.join(Proposal.user).filter(or_(
-                User.will_have_ticket == True,  # noqa
-                # paid_tickets.filter(User.tickets.expression).exists()
-            ))
+        proposals = proposals.join(Proposal.user).filter_by(will_have_ticket=not needs_ticket)
 
     sort_dict = get_proposal_sort_dict(request.args)
     proposals = proposals.all()

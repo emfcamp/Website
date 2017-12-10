@@ -1,5 +1,4 @@
 from main import db
-from datetime import datetime
 from sqlalchemy.orm import column_property
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import and_, func, FetchedValue
@@ -70,7 +69,7 @@ class CapacityMixin(object):
         if self.parent and self.parent.has_expired():
             return True
 
-        return self.expires and self.expires < datetime.utcnow()
+        return self.expires and self.__expired
 
     def issue_instances(self, count=1, token=''):
         """

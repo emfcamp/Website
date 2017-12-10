@@ -23,7 +23,7 @@ from models.exc import CapacityException
 from models.user import User
 from models.payment import Payment
 from models.product import (
-    ProductGroup, Product, PriceTier, Price,
+    Product, PriceTier, Price,
 )
 from models.purchase import (
     Purchase, Ticket, PurchaseTransfer, bought_states,
@@ -102,7 +102,7 @@ def tickets_choose_free(user_id=None):
 
     free_pts = PriceTier.query.join(Product).filter(
         ~has_price.filter(Price.price_tier.expression).exists(),
-    ).order_by(Product.order).all()
+    ).order_by(Product.name).all()
 
     if user_id is None:
         form = FreeTicketsNewUserForm()
@@ -194,7 +194,6 @@ def list_free_tickets():
             ~PurchaseTransfer.query.filter(PurchaseTransfer.purchase.expression).exists(),
         ).order_by(
             Purchase.owner_id,
-            Product.order
         ).all()
 
     return render_template('admin/tickets/tickets-list-free.html',

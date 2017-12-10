@@ -74,9 +74,9 @@ class InvalidVenueException(Exception):
     pass
 
 
-FavouriteProposals = db.Table('favourite_proposals',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('proposal_id', db.Integer, db.ForeignKey('proposal.id')),
+FavouriteProposal = db.Table('favourite_proposal', db.Model.metadata,
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('proposal_id', db.Integer, db.ForeignKey('proposal.id'), primary_key=True),
 )
 
 class Proposal(db.Model):
@@ -107,7 +107,7 @@ class Proposal(db.Model):
     # References to this table
     messages = db.relationship('CFPMessage', backref='proposal')
     votes = db.relationship('CFPVote', backref='proposal')
-    favourites = db.relationship('User', secondary=FavouriteProposals, backref=db.backref('favourites', lazy='dynamic'))
+    favourites = db.relationship('User', secondary=FavouriteProposal, backref=db.backref('favourites'))
 
     # Fields for finalised info
     published_names = db.Column(db.String)
@@ -358,7 +358,7 @@ class Venue(db.Model):
     lat = db.Column(db.Float)
     lon = db.Column(db.Float)
 
-    proposals = db.relationship('Proposal', backref='venue', lazy='dynamic',
+    proposals = db.relationship('Proposal', backref='venue',
                                 primaryjoin='Proposal.scheduled_venue == Venue.id')
 
     __table_args__ = (

@@ -58,6 +58,7 @@ Flask-WTF==0.12  # Blocked due to use of _is_hidden
 WTForms==2.1
 
 # other Flask modules
+Flask-Admin==1.5.0
 Flask-Script==2.0.6
 Flask-Login==0.4.0
 

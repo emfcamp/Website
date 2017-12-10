@@ -134,8 +134,10 @@ class UserModelTests(unittest.TestCase):
             self.assertFalse(user.has_permission(self.permission_name))
 
             user.grant_permission(self.permission_name)
+            db.session.commit()
             self.assertTrue(user.has_permission(self.permission_name))
 
             user.revoke_permission(self.permission_name)
+            db.session.commit()
             self.assertFalse(user.has_permission(self.permission_name))
 

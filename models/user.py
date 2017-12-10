@@ -100,7 +100,7 @@ class User(db.Model, UserMixin):
     will_have_ticket = db.Column(db.Boolean, nullable=False, default=False)  # for CfP filtering
     checkin_note = db.Column(db.String, nullable=True)
 
-    diversity = db.relationship('UserDiversity', uselist=False, backref='user', cascade='all, delete, delete-orphan')
+    diversity = db.relationship('UserDiversity', uselist=False, backref='user', cascade='all, delete-orphan')
     payments = db.relationship('Payment', lazy='dynamic', backref='user', cascade='all')
     permissions = db.relationship('Permission', backref='user', cascade='all', secondary=UserPermission)
     votes = db.relationship('CFPVote', backref='user', lazy='dynamic')
@@ -108,11 +108,11 @@ class User(db.Model, UserMixin):
     proposals = db.relationship('Proposal',
                                 primaryjoin='Proposal.user_id == User.id',
                                 backref='user', lazy='dynamic',
-                                cascade='all, delete, delete-orphan')
+                                cascade='all, delete-orphan')
     anonymised_proposals = db.relationship('Proposal',
                                            primaryjoin='Proposal.anonymiser_id == User.id',
                                            backref='anonymiser', lazy='dynamic',
-                                           cascade='all, delete, delete-orphan')
+                                           cascade='all, delete-orphan')
 
     messages_from = db.relationship('CFPMessage',
                                     primaryjoin='CFPMessage.from_user_id == User.id',
@@ -121,20 +121,20 @@ class User(db.Model, UserMixin):
     owned_products = db.relationship('Purchase',
                                      backref='owner', lazy='dynamic',
                                      primaryjoin='Purchase.owner_id == User.id',
-                                     cascade='all, delete, delete-orphan')
+                                     cascade='all, delete-orphan')
     purchased_products = db.relationship('Purchase',
                                          backref='purchaser', lazy='dynamic',
                                          primaryjoin='Purchase.purchaser_id == User.id',
-                                         cascade='all, delete, delete-orphan')
+                                         cascade='all, delete-orphan')
 
     transfers_to = db.relationship('PurchaseTransfer',
                                    backref='to_user', lazy='dynamic',
                                    primaryjoin='PurchaseTransfer.to_user_id == User.id',
-                                   cascade='all, delete, delete-orphan')
+                                   cascade='all, delete-orphan')
     transfers_from = db.relationship('PurchaseTransfer',
                                      backref='from_user', lazy='dynamic',
                                      primaryjoin='PurchaseTransfer.from_user_id == User.id',
-                                     cascade='all, delete, delete-orphan')
+                                     cascade='all, delete-orphan')
 
     def __init__(self, email, name):
         self.email = email
@@ -179,13 +179,11 @@ class User(db.Model, UserMixin):
             perm = Permission(name)
             db.session.add(perm)
         self.permissions.append(perm)
-        db.session.commit()
 
     def revoke_permission(self, name):
         for user_perm in self.permissions:
             if user_perm.name == name:
                 self.permissions.remove(user_perm)
-        db.session.commit()
 
     def __repr__(self):
         return '<User %s>' % self.email

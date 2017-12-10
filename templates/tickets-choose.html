@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% block title %}
-{% if admissions %}
+{% if flow == 'main' %}
 Buy Tickets
 {% else %}
 Buy Items
 {% endif %}
 {% endblock %}
 {% block body %}
-{% if admissions %}
+{% if flow == 'main' %}
     {% include 'ticket-blurb.html' %}
 
     <p>To order additional items, such as {# village tents or t-shirts #} parking tickets, please
@@ -104,10 +104,10 @@ Buy Items
 
 <thead>
 <tr>
-    {% if admissions %}
+    {% if flow == 'main' %}
     <th>Ticket Type</th>
     {% else %}
-    <th>Item Type</th>
+    <th>Product</th>
     {% endif %}
     <th>Cost</th>
     <th>Amount</th>
@@ -116,10 +116,10 @@ Buy Items
 
 <tbody>
 {% set row_class = cycler('odd', 'even') %} {# required as we skip rows #}
-{% for f in form.types %}
+{% for f in form.tiers %}
 {% if f._any or f.amount.errors %}
-<tr data-price="{{ f._type.get_price(user_currency) }}"
-    {% for price in f._type.prices -%}
+<tr data-price="{{ f._tier.get_price(user_currency).value }}"
+    {% for price in f._tier.prices -%}
         data-price-{{ price.currency }}="{{ price.value }}"
     {% endfor -%}
     class="product form-group
@@ -127,11 +127,11 @@ Buy Items
         {{ row_class.next() }}">
     <td>
         {{ f.hidden_tag_without('csrf_token') }}
-        <label for="{{ f.amount.id }}"><b>{{ f._type.parent.display_name }}</b></label>
-        {% if f._type.parent.description %}<p class="description">{{ f._type.parent.description }}</p>{% endif %}
+        <label for="{{ f.amount.id }}"><b>{{ f._tier.parent.display_name }}</b></label>
+        {% if f._tier.parent.description %}<p class="description">{{ f._tier.parent.description }}</p>{% endif %}
     </td>
     <td>
-        <span class="price">{{ f._type.get_price(user_currency) | price(user_currency) }}</span>
+        <span class="price">{{ f._tier.get_price(user_currency) | price(user_currency) }}</span>
     </td>
     <td>
         <div class="controls">{{ f.amount(class_="amount")|safe }}
@@ -162,7 +162,7 @@ Buy Items
 </table>
 
 <div class="form-actions pull-right">
-    {% if admissions %}
+    {% if flow == 'main' %}
     {{ form.buy(class_="btn btn-primary btn-lg debounce") }}
     {% else %}
     {{ form.buy_other(class_="btn btn-primary btn-lg debounce") }}

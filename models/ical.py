@@ -80,14 +80,11 @@ class CalendarSource(db.Model):
                 event.description = component.get('description')
                 event.location = component.get('location')
 
-                db.session.commit()
-
         events = CalendarEvent.query.filter_by(source_id=self.id)
         to_delete = [p for p in events if p.uid not in uid_seen]
 
         for e in to_delete:
             db.session.delete(e)
-            db.session.commit()
 
     @classmethod
     def get_enabled_events(self):
@@ -97,9 +94,9 @@ class CalendarSource(db.Model):
             events.extend(source.events)
         return events
 
-FavouriteCalendarEvents = db.Table('favourite_calendar_events',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('event_id', db.Integer, db.ForeignKey('calendar_event.id')),
+FavouriteCalendarEvent = db.Table('favourite_calendar_event', db.Model.metadata,
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('event_id', db.Integer, db.ForeignKey('calendar_event.id'), primary_key=True),
 )
 
 class CalendarEvent(db.Model):
@@ -117,7 +114,7 @@ class CalendarEvent(db.Model):
     location = db.Column(db.String, nullable=True)
 
     source = db.relationship(CalendarSource, backref='events')
-    calendar_favourites = db.relationship('User', secondary=FavouriteCalendarEvents, backref=db.backref('calendar_favourites', lazy='dynamic'))
+    calendar_favourites = db.relationship('User', secondary=FavouriteCalendarEvent, backref=db.backref('calendar_favourites'))
 
     @property
     def title(self):

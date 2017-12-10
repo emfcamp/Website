@@ -1,17 +1,17 @@
 # coding=utf-8
 from __future__ import division, absolute_import, print_function, unicode_literals
-from . import admin, admin_required
 
 from flask import (
     render_template, redirect, flash,
     url_for, current_app as app,
 )
 from flask_login import current_user
+from flask_admin.contrib.sqla import ModelView
 
-from wtforms.validators import Optional, Regexp
+from wtforms.validators import Optional
 from wtforms.widgets import TextArea
 from wtforms import (
-    SubmitField, BooleanField, StringField, RadioField,
+    SubmitField, BooleanField, StringField,
     DateField, IntegerField, DecimalField,
 )
 
@@ -20,7 +20,7 @@ from sqlalchemy.sql.functions import func
 from main import db
 from models.user import User
 from models.product import (
-    ProductGroup, Product, PriceTier, Price,
+    ProductGroup, Product, PriceTier, Price, ProductView, ProductViewProduct,
 )
 from models.purchase import (
     Purchase, PurchaseTransfer,
@@ -29,6 +29,14 @@ from models.purchase import (
 from ..common import require_permission
 from ..common.forms import Form, StaticField
 
+from . import admin, admin_new, admin_required
+
+admin_new.add_view(ModelView(ProductGroup, db.session))
+admin_new.add_view(ModelView(Product, db.session))
+admin_new.add_view(ModelView(PriceTier, db.session))
+admin_new.add_view(ModelView(Price, db.session))
+admin_new.add_view(ModelView(ProductView, db.session))
+admin_new.add_view(ModelView(ProductViewProduct, db.session))
 
 @admin.route('/products')
 @admin_required
@@ -39,33 +47,26 @@ def products():
 
 class EditProductForm(Form):
     name = StringField('Name')
-    order = IntegerField('Order')
-    type = StaticField('Type')
-    capacity_limit = IntegerField('Maximum to sell')
-    personal_limit = IntegerField('Maximum to sell to an individual')
+    capacity_max = IntegerField('Maximum to sell')
     expires = DateField('Expiry Date (Optional)', [Optional()])
+    personal_limit = IntegerField('Maximum to sell to an individual')
     price_gbp = StaticField('Price (GBP)')
     price_eur = StaticField('Price (EUR)')
-    has_badge = BooleanField('Issue Badge')
-    is_transferable = BooleanField('Transferable')
-    discount_token = StringField('Discount token', [Optional(), Regexp('^[-_0-9a-zA-Z]+$')])
+    badge = BooleanField('Issue Badge')
+    transferable = BooleanField('Transferable')
     description = StringField('Description', [Optional()], widget=TextArea())
     submit = SubmitField('Save')
 
     def init_with_product(self, product):
         self.name.data = product.name
-        self.order.data = product.order
-        self.type.data = product.type
         self.capacity_max.data = product.capacity_max
-        self.personal_limit.data = product.personal_limit
         self.expires.data = product.expires
-        self.price_gbp.data = product.get_price('GBP')
-        self.price_eur.data = product.get_price('EUR')
-        self.has_badge.data = product.has_badge
-        self.is_transferable.data = product.is_transferable
+        self.personal_limit.data = product.get_price_tier('standard').personal_limit
+        self.price_gbp.data = product.get_price_tier('standard').get_price('GBP')
+        self.price_eur.data = product.get_price_tier('standard').get_price('EUR')
+        self.badge.data = product.get_attribute('badge')
+        self.transferable.data = product.get_attribute('transferable')
         self.description.data = product.description
-        self.discount_token.data = product.discount_token
-
 
 @admin.route('/products/<int:product_id>/edit', methods=['GET', 'POST'])
 @require_permission('arrivals')
@@ -75,19 +76,17 @@ def edit_product(product_id):
     product = Product.query.get_or_404(product_id)
     if form.validate_on_submit():
         app.logger.info('%s editing product %s', current_user.name, product_id)
-        if form.discount_token.data == '':
-            form.discount_token.data = None
-        if form.description.data == '':
-            form.description.data = None
-
-        for attr in ['name', 'order', 'capacity_max', 'personal_limit', 'expires',
-                     'has_badge', 'is_transferable', 'discount_token', 'description']:
+        for attr in ['name', 'capacity_max', 'expires', 'description']:
             cur_val = getattr(product, attr)
             new_val = getattr(form, attr).data
 
             if cur_val != new_val:
                 app.logger.info(' %10s: %r -> %r', attr, cur_val, new_val)
                 setattr(product, attr, new_val)
+
+#        for attr in ['badge', 'transferable']
+#
+# 'personal_limit', price_gbp, price_eur
 
         db.session.commit()
         return redirect(url_for('.product_details', product_id=product_id))
@@ -98,8 +97,6 @@ def edit_product(product_id):
 
 class NewProductForm(Form):
     name = StringField('Name')
-    order = IntegerField('Order')
-    types = RadioField('Type')
     capacity_max = IntegerField('Maximum to sell')
     personal_limit = IntegerField('Maximum to sell to an individual')
     expires = DateField('Expiry Date (Optional)', [Optional()])
@@ -107,24 +104,19 @@ class NewProductForm(Form):
     price_eur = DecimalField('Price (EUR)')
     has_badge = BooleanField('Issue Badge')
     is_transferable = BooleanField('Transferable')
-    discount_token = StringField('Discount token', [Optional(), Regexp('^[-_0-9a-zA-Z]+$')])
     description = StringField('Description', [Optional()], widget=TextArea())
     submit = SubmitField('Create')
 
-    def init_with_ticket_product(self, ticket_product):
-        self.name.data = ticket_product.name
-        self.order.data = ticket_product.order
-        self.admits.data = ticket_product.admits
-        self.capacity_max.data = ticket_product.capacity_max
-        self.personal_limit.data = ticket_product.personal_limit
-        self.expires.data = ticket_product.expires
-        self.has_badge.data = ticket_product.has_badge
-        self.is_transferable.data = ticket_product.is_transferable
-        self.price_gbp.data = ticket_product.get_price('GBP')
-        self.price_eur.data = ticket_product.get_price('EUR')
-        self.description.data = ticket_product.description
-        self.discount_token.data = ticket_product.discount_token
-
+    def init_with_product(self, product):
+        self.name.data = product.name
+        self.capacity_max.data = product.capacity_max
+        self.personal_limit.data = product.personal_limit
+        self.expires.data = product.expires
+        self.has_badge.data = product.has_badge
+        self.is_transferable.data = product.is_transferable
+        self.price_gbp.data = product.get_price('GBP')
+        self.price_eur.data = product.get_price('EUR')
+        self.description.data = product.description
 
 @admin.route('/new-product/', defaults={'copy_id': -1}, methods=['GET', 'POST'])
 @admin.route('/new-product/<int:copy_id>', methods=['GET', 'POST'])
@@ -134,15 +126,16 @@ def new_product(copy_id):
 
     if form.validate_on_submit():
         expires = form.expires.data if form.expires.data else None
-        token = form.discount_token.data if form.discount_token.data else None
         description = form.description.data if form.description.data else None
 
-        pt = PriceTier(order=form.order.data, parent=form.admits.data,
+        pt = PriceTier(parent_id=form.parent_id.data,
                        name=form.name.data, expires=expires,
-                       discount_token=token, description=description,
-                       personal_limit=form.personal_limit.data,
-                       has_badge=form.has_badge.data,
-                       is_transferable=form.is_transferable.data)
+                       description=description,
+                       personal_limit=form.personal_limit.data)
+
+        #
+        #               has_badge=form.has_badge.data,
+        #               is_transferable=form.is_transferable.data)
 
         pt.prices = [Price('GBP', form.price_gbp.data),
                      Price('EUR', form.price_eur.data)]
@@ -165,7 +158,7 @@ def product_details(product_id):
     return render_template('admin/products/product-details.html', product=product)
 
 
-# FIXME
+
 @admin.route('/products/<int:product_id>/price-tiers/<int:tier_id>')
 @admin_required
 def price_tier_details(tier_id):
@@ -186,7 +179,7 @@ def furniture():
     purchases = ProductGroup.query.filter_by(name='furniture') \
                             .join(Product, Purchase, Purchase.owner).group_by(User.id, Product.id) \
                             .with_entities(User, Product, func.count(Purchase.id)) \
-                            .order_by(User.name, Product.order)
+                            .order_by(User.name)
 
     return render_template('admin/products/furniture-purchases.html', purchases=purchases)
 
@@ -197,7 +190,7 @@ def tees():
     purchases = ProductGroup.query.filter_by(name='tees') \
                             .join(Product, Purchase, Purchase.owner).group_by(User.id, Product.id) \
                             .with_entities(User, Product, func.count(Purchase.id)) \
-                            .order_by(User.name, Product.order)
+                            .order_by(User.name)
 
     return render_template('admin/products/tee-purchases.html', purchases=purchases)
 

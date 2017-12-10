@@ -1,5 +1,5 @@
-{% for type, tickets in payment.purchases|groupby('type') -%}
-{{ type.name }}: {{ tickets|length }} at {{ type.get_price(payment.currency) | price(payment.currency) }}
+{% for tier, tickets in payment.purchases | groupby('price_tier') -%}
+{{ tier.product.name }}: {{ tickets|length }} at {{ tier.get_price(payment.currency) | price(payment.currency) }}
 {% endfor %}
 
 Total: {{ payment.amount | price(payment.currency) }}
