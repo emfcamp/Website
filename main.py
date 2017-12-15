@@ -4,7 +4,7 @@ import random
 import os
 
 from flask import Flask, _request_ctx_stack, url_for, render_template
-import fix_flask_admin  # noqa: F401
+from flask_admin import Admin
 from flask_mail import Mail
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
@@ -172,7 +172,8 @@ def create_app(dev_server=False):
     from apps.cfp_review import cfp_review
     from apps.schedule import schedule
     from apps.arrivals import arrivals
-    from apps.admin import admin, admin_new
+    from apps.admin import admin, admin_new as admin_new_registry
+    from apps.admin.flask_admin_base import AppAdminIndexView
     app.register_blueprint(base)
     app.register_blueprint(users)
     app.register_blueprint(tickets)
@@ -183,7 +184,12 @@ def create_app(dev_server=False):
     app.register_blueprint(arrivals, url_prefix='/arrivals')
     app.register_blueprint(admin, url_prefix='/admin')
 
+    admin_new = Admin(url='/admin/new', name='EMF Admin', template_mode='bootstrap3',
+                      base_template='flask-admin-base.html',
+                      index_view=AppAdminIndexView(url='/admin/new'))
+    admin_new.endpoint_prefix = 'admin_new'
     admin_new.init_app(app)
+    admin_new_registry.init_admin(admin_new)
 
     return app
 

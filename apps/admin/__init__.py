@@ -6,7 +6,6 @@ from flask import (
     render_template, redirect, request, flash,
     url_for, current_app as app, Blueprint
 )
-from flask_admin import Admin
 
 from wtforms.validators import Optional, Required, URL
 from wtforms import (
@@ -34,13 +33,13 @@ from ..common import require_permission
 from ..common.forms import Form, TelField
 from ..common.receipt import render_parking_receipts
 
+from . import flask_admin_base as admin_new  # noqa: F401
+from .flask_admin_base import AppModelView  # noqa: F401
+
+
 admin = Blueprint('admin', __name__)
 
 admin_required = require_permission('admin')  # Decorator to require admin permissions
-
-# flask_admin doesn't call register_blueprint if no app is passed to the constructor
-admin_new = Admin(url='/admin/new', name='EMF Admin', template_mode='bootstrap3', base_template='flask-admin-base.html')
-admin_new.endpoint_prefix = 'admin_new'
 
 
 @admin.context_processor

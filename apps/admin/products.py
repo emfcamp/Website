@@ -6,7 +6,6 @@ from flask import (
     url_for, current_app as app,
 )
 from flask_login import current_user
-from flask_admin.contrib.sqla import ModelView
 
 from wtforms.validators import Optional
 from wtforms.widgets import TextArea
@@ -25,18 +24,19 @@ from models.product import (
 from models.purchase import (
     Purchase, PurchaseTransfer,
 )
+from . import AppModelView, admin_new
 
 from ..common import require_permission
 from ..common.forms import Form, StaticField
 
-from . import admin, admin_new, admin_required
+from . import admin, admin_required
 
-admin_new.add_view(ModelView(ProductGroup, db.session))
-admin_new.add_view(ModelView(Product, db.session))
-admin_new.add_view(ModelView(PriceTier, db.session))
-admin_new.add_view(ModelView(Price, db.session))
-admin_new.add_view(ModelView(ProductView, db.session))
-admin_new.add_view(ModelView(ProductViewProduct, db.session))
+admin_new.add_view(AppModelView(ProductGroup, db.session))
+admin_new.add_view(AppModelView(Product, db.session))
+admin_new.add_view(AppModelView(PriceTier, db.session))
+admin_new.add_view(AppModelView(Price, db.session))
+admin_new.add_view(AppModelView(ProductView, db.session))
+admin_new.add_view(AppModelView(ProductViewProduct, db.session))
 
 @admin.route('/products')
 @admin_required
