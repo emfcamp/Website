@@ -108,9 +108,16 @@ def raise_500():
 def about():
     return render_template('about.html')
 
+
+@base.route("/about/privacy")
+def privacy():
+    return render_template('privacy.html')
+
+
 @base.route("/network")
 def network():
     return redirect('https://wiki.emfcamp.org/wiki/Network')
+
 
 @base.route("/talks")
 @base.route("/talks/")
