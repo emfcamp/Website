@@ -33,9 +33,6 @@ from ..common import require_permission
 from ..common.forms import Form, TelField
 from ..common.receipt import render_parking_receipts
 
-from . import flask_admin_base as admin_new  # noqa: F401
-from .flask_admin_base import AppModelView  # noqa: F401
-
 
 admin = Blueprint('admin', __name__)
 

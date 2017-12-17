@@ -40,22 +40,3 @@ class AppModelView(FlaskAdminAppMixin, ModelView):
     pass
 
 
-# And now a singleton to receive view registrations before create_app
-
-_views = []
-_admin = None
-
-def add_view(view):
-    if not isinstance(view, FlaskAdminAppMixin):
-        raise ValueError('{!r} must include FlaskAdminAppMixin'.format(view))
-    _views.append(view)
-    if _admin is not None:
-        print(view)
-        _admin.add_view(view)
-
-def init_admin(admin):
-    global _admin
-    _admin = admin
-    for view in _views:
-        _admin.add_view(view)
-

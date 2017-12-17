@@ -16,7 +16,7 @@ from wtforms import (
 
 from sqlalchemy.sql.functions import func
 
-from main import db
+from main import db, admin_new
 from models.user import User
 from models.product import (
     ProductGroup, Product, PriceTier, Price, ProductView, ProductViewProduct,
@@ -24,19 +24,19 @@ from models.product import (
 from models.purchase import (
     Purchase, PurchaseTransfer,
 )
-from . import AppModelView, admin_new
-
 from ..common import require_permission
+from ..common.flask_admin_base import AppModelView
 from ..common.forms import Form, StaticField
 
 from . import admin, admin_required
 
-admin_new.add_view(AppModelView(ProductGroup, db.session))
-admin_new.add_view(AppModelView(Product, db.session))
-admin_new.add_view(AppModelView(PriceTier, db.session))
-admin_new.add_view(AppModelView(Price, db.session))
-admin_new.add_view(AppModelView(ProductView, db.session))
-admin_new.add_view(AppModelView(ProductViewProduct, db.session))
+
+admin_new.add_view(AppModelView(ProductGroup, db.session, category='Products'))
+admin_new.add_view(AppModelView(Product, db.session, category='Products'))
+admin_new.add_view(AppModelView(PriceTier, db.session, category='Products'))
+admin_new.add_view(AppModelView(Price, db.session, category='Products'))
+admin_new.add_view(AppModelView(ProductView, db.session, category='Products'))
+admin_new.add_view(AppModelView(ProductViewProduct, db.session, category='Products'))
 
 @admin.route('/products')
 @admin_required
