@@ -284,19 +284,6 @@ class GoCardlessPayment(Payment):
     mandate = db.Column(db.String, unique=True)
     gcid = db.Column(db.String, unique=True)
 
-    def payment_params(self):
-        return {
-            "amount": str(self.amount),
-            "currency": self.currency,
-            "links": {
-                "mandate": self.mandate
-            },
-            "metadata": {
-                "user_id": str(self.user_id),
-                "payment_id": str(self.id),
-            }
-        }
-
     def cancel(self):
         if self.state == 'new':
             # No bill to check
