@@ -27,10 +27,11 @@ def webhook(resource=None, action=None):
 
 def gocardless_start(payment):
     logger.info("Created GoCardless payment %s", payment.id)
+    payment.session_token = str(payment.id)
 
     redirect_flow = gocardless_client.redirect_flows.create(params={
         "description": "Electromagnetic Field",
-        "session_token": payment.id,
+        "session_token": payment.session_token,
         "success_redirect_url": external_url('payments.gocardless_mandate', payment_id=payment.id)
     })
 
@@ -53,8 +54,8 @@ def gocardless_mandate(payment_id):
     logger.info("Completing payment %s, gcid %s", payment.id, request.args.get('resource_id'))
 
     try:
-        params = {"session_token": payment.id}
-        redirect_flow = gocardless_client.redirect_flow \
+        params = {"session_token": payment.session_token}
+        redirect_flow = gocardless_client.redirect_flows \
                                          .complete(payment.redirect_id,
                                                    params=params)
         payment.mandate = redirect_flow.links.mandate
@@ -73,10 +74,11 @@ def gocardless_mandate(payment_id):
         flash("An error occurred with your payment, please contact %s" % app.config['TICKETS_EMAIL'][1])
         return redirect(url_for('tickets.main'))
 
-    for t in payment.purchases:
+    for t in payment.purchases.all():
         # We need to make sure of a 5 working days grace
         # for gocardless payments, so push the ticket expiry forwards
         t.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS_GOCARDLESS'])
+        t.set_state('payment-pending')
         logger.info("Reset expiry for ticket %s", t.id)
 
     db.session.commit()

@@ -186,7 +186,7 @@ class PriceTier(db.Model, CapacityMixin):
         if self.has_expired():
             return 0
 
-        if user.is_authenticated:
+        if user and user.is_authenticated:
             # How many have been sold to this user
             user_count = Purchase.query.filter(
                 Purchase.price_tier == self,
@@ -203,6 +203,10 @@ class PriceTier(db.Model, CapacityMixin):
 
     def __str__(self):
         return self.name
+
+    def __lt__(self, other):
+        # This is apparently used by jinja's groupby filter
+        return self.id < other.id
 
 
 class Price(db.Model):

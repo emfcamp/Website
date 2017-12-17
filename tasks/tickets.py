@@ -2,18 +2,10 @@
 
 from datetime import datetime
 
-from flask import current_app as app # , render_template
+from flask import current_app as app
 from flask_script import Command
-# from flask_mail import Message
-# from sqlalchemy import or_, func
-# from sqlalchemy.orm.exc import NoResultFound
-
-from main import db # mail,
-# from apps.common.receipt import attach_tickets
+from main import db
 from models.product import ProductGroup, Product, PriceTier, Price, ProductView, ProductViewProduct
-# from models.ticket import Ticket, TicketPrice, TicketType
-# from models.user import User
-
 
 
 def create_product_groups():

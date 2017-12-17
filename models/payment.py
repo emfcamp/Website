@@ -286,14 +286,14 @@ class GoCardlessPayment(Payment):
 
     def payment_params(self):
         return {
-            "amount": self.amount,
+            "amount": str(self.amount),
             "currency": self.currency,
             "links": {
                 "mandate": self.mandate
             },
             "metadata": {
-                "user_id": self.user_id,
-                "payment_id": self.id
+                "user_id": str(self.user_id),
+                "payment_id": str(self.id),
             }
         }
 

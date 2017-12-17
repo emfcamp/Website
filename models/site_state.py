@@ -43,7 +43,7 @@ def calc_sales_state(date):
         return "sold-out"
     elif date > config_date('EVENT_END'):
         return "sales-ended"
-    elif Product.get_by_name('full').get_cheapest_price('GBP') is None:
+    elif Product.get_by_name('general', 'full').get_cheapest_price('GBP') is None:
         # Tickets not currently available, probably just for this round, but we haven't hit site capacity
         return "unavailable"
     else:

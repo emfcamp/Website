@@ -36,7 +36,7 @@ class Purchase(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String, nullable=False)
-    is_ticket = column_property(type == 'ticket')
+    is_ticket = column_property(type == 'ticket' or type == 'admission_ticket')
 
     # User FKs
     # Store the owner & purchaser so that we can calculate user_limits against
@@ -160,7 +160,7 @@ class Purchase(db.Model):
         if product_type is None:
             raise Exception("Product %s has no type" % (product))
 
-        if product_type == 'admission':
+        if product_type == 'admissions':
             return AdmissionTicket
         elif product_type in {'campervan', 'parking'}:
             return Ticket

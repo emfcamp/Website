@@ -1,3 +1,4 @@
+{% from "_datehelpers.html" import pprint_timedelta %}
 <table class="table tickets btns-table">
 <thead>
 <tr>
@@ -9,22 +10,24 @@
 
 <tbody>
 
-{%- for t in other_items -%}
+{%- for t in other_items if t.state != 'cancelled' -%}
 <tr class="
 {{- loop.cycle('odd', 'even') }}
 {%- if t.paid %} paid {%- endif -%}
 {%- if t.expired %} expired {%- endif -%}
 ">
-<td>{{ t.type.name }}</td>
+<td>{{ t.price_tier.parent.display_name }}</td>
 <td>
     {% if t.payment and t.payment.state == 'cancelled' %}
     Cancelled
     {%- elif t.paid %}
     Paid
+    {%- elif t.refund %}
+    Refunded
     {%- elif t.expired %}
     Unpaid
     {%- else %}
-    Pending
+    Pending (expires in {{ pprint_timedelta(t.expires_in) }})
     {%- endif %}
 </td>
 <td>
