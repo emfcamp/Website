@@ -9,6 +9,7 @@ from models.user import (
     generate_checkin_code, verify_checkin_code
 )
 
+
 # Tests of the static functions in the user model
 class UserFunctionTests(unittest.TestCase):
 
