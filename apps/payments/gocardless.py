@@ -28,7 +28,7 @@ def webhook(resource=None, action=None):
     return inner
 
 def gocardless_start(payment):
-    logger.info("Starting GoCardless flow for payment {}", payment.id)
+    logger.info("Starting GoCardless flow for payment %d", payment.id)
 
     prefilled_customer = {
         "email": payment.user.email,
@@ -47,7 +47,7 @@ def gocardless_start(payment):
         "prefilled_customer": prefilled_customer,
     })
 
-    logger.debug('GoCardless redirect ID: {}', redirect_flow.id)
+    logger.debug('GoCardless redirect ID: %s', redirect_flow.id)
     assert payment.redirect_id is None
     payment.redirect_id = redirect_flow.id
     db.session.commit()
@@ -64,10 +64,10 @@ def gocardless_complete(payment_id):
     )
     redirect_id = request.args.get('redirect_flow_id')
     if redirect_id != payment.redirect_id:
-        logging.error('Invalid redirect_flow_id for payment {}: {}', payment.id, repr(redirect_id))
+        logging.error('Invalid redirect_flow_id for payment %d: %s', payment.id, repr(redirect_id))
         abort(400)
 
-    logger.info("Completing GoCardless payment {}", payment.id)
+    logger.info("Completing GoCardless payment %d", payment.id)
 
     try:
         # We've already validated the redirect_id, so we don't expect this to fail
@@ -79,12 +79,12 @@ def gocardless_complete(payment_id):
 
     except gocardless_pro.errors.InvalidStateError as e:
         # Assume the webhook will do its magic
-        logging.error('InvalidStateError from GoCardless confirming mandate: {}', e.message)
+        logging.error('InvalidStateError from GoCardless confirming mandate: %s', e.message)
         flash("An error occurred with your mandate, please check below or contact {}".format(app.config['TICKETS_EMAIL'][1]))
         return redirect(url_for('tickets.main'))
 
     except Exception as e:
-        logger.error("Exception {} confirming mandate", repr(e))
+        logger.error("Exception %s confirming mandate", repr(e))
         flash("An error occurred with your payment, please contact {}".format(app.config['TICKETS_EMAIL'][1]))
         return redirect(url_for('tickets.main'))
 
@@ -103,7 +103,7 @@ def gocardless_complete(payment_id):
         payment.status = "inprogress"
 
     except Exception as e:
-        logger.error("Exception {} confirming payment", repr(e))
+        logger.error("Exception %s confirming payment", repr(e))
         flash("An error occurred with your payment, please contact {}".format(app.config['TICKETS_EMAIL'][1]))
         return redirect(url_for('tickets.main'))
 
@@ -112,11 +112,11 @@ def gocardless_complete(payment_id):
         # for gocardless payments, so push the ticket expiry forwards
         t.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS_GOCARDLESS'])
         t.set_state('payment-pending')
-        logger.info("Reset expiry for ticket {}", t.id)
+        logger.info("Reset expiry for ticket %d", t.id)
 
     db.session.commit()
 
-    logger.info("Payment {} completed OK", payment.id)
+    logger.info("Payment %d completed OK", payment.id)
 
     # should we send the resource_uri in the bill email?
     msg = Message("Your EMF ticket purchase",
@@ -151,7 +151,7 @@ def gocardless_tryagain(payment_id):
         flash('GoCardless is currently unavailable. Please try again later')
         return redirect(url_for('tickets.main'))
 
-    logger.info("Trying payment {} again", payment.id)
+    logger.info("Trying payment %d again", payment.id)
     gocardless_client.payments.retry(payment.gcid)
     flash('Your gocardless payment has been retried')
     return redirect('tickets')
