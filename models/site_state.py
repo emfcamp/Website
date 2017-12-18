@@ -22,14 +22,7 @@ VALID_STATES = {
 
 def calc_site_state(date):
     """ Logic to set the state of the homepage based on date. """
-    if date < datetime(2015, 12, 14, 20):
-        return "before-sales"
-    elif date < datetime(2016, 8, 5):
-        return "sales"
-    elif date < datetime(2016, 8, 8, 9):
-        return "event"
-    else:
-        return "after-event"
+    return "before-sales"
 
 def calc_sales_state(date):
     if TicketType.get_tickets_remaining() < 1:
