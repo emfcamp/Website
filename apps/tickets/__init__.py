@@ -6,16 +6,9 @@ from collections import OrderedDict
 from flask import (
     render_template, redirect, request, flash, Blueprint,
     url_for, session, send_file, abort, current_app as app,
-    Markup, render_template_string,
 )
 from flask_login import login_required, current_user
 from flask_mail import Message
-from wtforms.validators import Required, Optional, Email, ValidationError
-from wtforms import (
-    SubmitField, StringField,
-    FieldList, FormField, HiddenField,
-)
-from wtforms.fields.html5 import EmailField
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
@@ -30,22 +23,22 @@ from models.payment import BankPayment, StripePayment, GoCardlessPayment
 from models.site_state import get_sales_state
 from models.payment import Payment
 
-
-from .common import (
+from ..common import (
     get_user_currency, set_user_currency, get_basket_and_total, create_basket,
-    CURRENCY_SYMBOLS, feature_flag, create_current_user, feature_enabled,
+    feature_flag, create_current_user, feature_enabled,
     empty_basket
 )
-from .common.forms import IntegerSelectField, HiddenIntegerField, Form
-from .common.receipt import (
+from ..common.receipt import (
     make_qr_png, make_barcode_png, render_pdf, render_receipt, attach_tickets,
 )
-from .payments.gocardless import gocardless_start
-from .payments.banktransfer import transfer_start
-from .payments.stripe import stripe_start
+from ..payments.gocardless import gocardless_start
+from ..payments.banktransfer import transfer_start
+from ..payments.stripe import stripe_start
 
+from .forms import TicketAmountsForm, TicketTransferForm, TicketPaymentForm
 
 tickets = Blueprint('tickets', __name__)
+
 
 def create_payment(paymenttype):
     """
@@ -98,9 +91,7 @@ def main():
                               .join(PriceTier) \
                               .outerjoin(Payment) \
                               .filter(or_(Payment.id.is_(None),
-                                          Payment.state != "cancelled"
-                                        )
-                                      )
+                                          Payment.state != "cancelled"))
 
     tickets = all_tickets.filter(Purchase.is_ticket.is_(True)).all()
     other_items = all_tickets.filter(Purchase.is_ticket.is_(False)).all()
@@ -140,23 +131,6 @@ def tickets_token(token=None):
     return redirect(url_for('tickets.choose', flow='other'))
 
 
-class TicketAmountForm(Form):
-    amount = IntegerSelectField('Number of tickets', [Optional()])
-    tier_id = HiddenIntegerField('Price tier', [Required()])
-
-
-class TicketAmountsForm(Form):
-    tiers = FieldList(FormField(TicketAmountForm))
-    buy = SubmitField('Buy Tickets')
-    buy_other = SubmitField('Buy')
-    currency_code = HiddenField('Currency')
-    set_currency = StringField('Set Currency', [Optional()])
-
-    def validate_set_currency(form, field):
-        if field.data not in CURRENCY_SYMBOLS:
-            raise ValidationError('Invalid currency %s' % field.data)
-
-
 @tickets.route("/tickets/choose", methods=['GET', 'POST'])
 @tickets.route("/tickets/choose/<flow>", methods=['GET', 'POST'])
 @feature_flag('TICKET_SALES')
@@ -187,7 +161,6 @@ def choose(flow=None):
         # Allow people with valid discount tokens to buy tickets
         elif token is not None and ProductGroup.get_product_groups_for_token(token):
             sales_state = 'available'
-
 
     if app.config.get('DEBUG'):
         sales_state = request.args.get("sales_state", sales_state)
@@ -264,27 +237,6 @@ def choose(flow=None):
     return render_template("tickets-choose.html", form=form, flow=flow)
 
 
-class TicketPaymentForm(Form):
-    email = EmailField('Email', [Email(), Required()])
-    name = StringField('Name', [Required()])
-    basket_total = HiddenField('basket total')
-
-    gocardless = SubmitField('Pay by Direct Debit')
-    banktransfer = SubmitField('Pay by Bank Transfer')
-    stripe = SubmitField('Pay by card')
-
-    def validate_email(form, field):
-        if current_user.is_anonymous and User.does_user_exist(field.data):
-            field.was_duplicate = True
-            pay_url = url_for('tickets.pay', flow=form.flow)
-
-            msg = Markup(render_template_string('''Account already exists.
-                Please <a href="{{ url }}">click here</a> to log in.''',
-                url=url_for('users.login', next=pay_url, email=field.data)))
-
-            raise ValidationError(msg)
-
-
 @tickets.route("/tickets/pay", methods=['GET', 'POST'])
 @tickets.route("/tickets/pay/<flow>", methods=['GET', 'POST'])
 def pay(flow=None):
@@ -293,7 +245,7 @@ def pay(flow=None):
 
     if request.form.get("change_currency") in ('GBP', 'EUR'):
         set_user_currency(request.form.get("change_currency"))
-        return redirect(url_for('.pay'))
+        return redirect(url_for('.pay', flow=flow))
 
     form = TicketPaymentForm()
     form.flow = flow
@@ -361,16 +313,6 @@ def pay(flow=None):
                            flow=flow)
 
 
-class TicketTransferForm(Form):
-    name = StringField('Name', [Required()])
-    email = EmailField('Email', [Required()])
-
-    transfer = SubmitField('Transfer Ticket')
-
-    def validate_email(form, field):
-        if current_user.email == field.data:
-            raise ValidationError('You cannot transfer a ticket to yourself')
-
 @tickets.route('/tickets/<ticket_id>/transfer', methods=['GET', 'POST'])
 @login_required
 def transfer(ticket_id):
@@ -379,7 +321,9 @@ def transfer(ticket_id):
     except NoResultFound:
         return redirect(url_for('tickets.main'))
 
-    if not ticket or ticket.state not in bought_states or not ticket.price_tier.get_attribute('is_transferable'):
+    if (not ticket or
+            ticket.state not in bought_states or
+            not ticket.price_tier.get_attribute('is_transferable')):
         return redirect(url_for('tickets.main'))
 
     form = TicketTransferForm()
@@ -410,12 +354,12 @@ def transfer(ticket_id):
         # Alert the users via email
         code = to_user.login_code(app.config['SECRET_KEY'])
 
-        msg = Message("You've been sent a ticket to EMF 2016!",
+        msg = Message("You've been sent a ticket to EMF!",
                       sender=app.config.get('TICKETS_EMAIL'),
                       recipients=[to_user.email])
         msg.body = render_template('emails/ticket-transfer-new-owner.txt',
-                            to_user=to_user, from_user=current_user,
-                            new_user=new_user, code=code)
+                                   to_user=to_user, from_user=current_user,
+                                   new_user=new_user, code=code)
 
         if feature_enabled('ISSUE_TICKETS'):
             attach_tickets(msg, to_user)
@@ -423,11 +367,11 @@ def transfer(ticket_id):
         mail.send(msg)
         db.session.commit()
 
-        msg = Message("You sent someone an EMF 2016 ticket",
+        msg = Message("You sent someone an EMF ticket",
                       sender=app.config.get('TICKETS_EMAIL'),
                       recipients=[current_user.email])
         msg.body = render_template('emails/ticket-transfer-original-owner.txt',
-                            to_user=to_user, from_user=current_user)
+                                   to_user=to_user, from_user=current_user)
 
         mail.send(msg)
 
@@ -473,6 +417,7 @@ def tickets_qrcode(checkin_code):
     qrfile = make_qr_png(url, box_size=3)
     return send_file(qrfile, mimetype='image/png')
 
+
 @tickets.route("/receipt/<checkin_code>/barcode")
 def tickets_barcode(checkin_code):
     if not re.match('%s$' % checkin_code_re, checkin_code):
@@ -480,4 +425,3 @@ def tickets_barcode(checkin_code):
 
     barcodefile = make_barcode_png(checkin_code)
     return send_file(barcodefile, mimetype='image/png')
-
