@@ -1,6 +1,5 @@
 import logging
 import logging.config
-import logger
 import random
 import os
 
