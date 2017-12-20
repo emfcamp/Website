@@ -89,8 +89,13 @@ def create_app(dev_server=False):
     app.jinja_options['extensions'].append('jinja2.ext.do')
 
     if install_logging:
-        logger.setup_logging(app)
-        app.logger.info('db URI: %s', app.config.get('SQLALCHEMY_DATABASE_URI'))
+        # Flask has now kindly installed its own log handler which we will summarily remove.
+        app.logger.propagate = 1
+        app.logger.handlers = []
+        if not app.debug:
+            logging.root.setLevel(logging.INFO)
+        else:
+            logging.root.setLevel(logging.DEBUG)
 
     for extension in (cdn, csrf, cache, db, mail, assets, toolbar):
         extension.init_app(app)
