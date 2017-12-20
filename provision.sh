@@ -1,6 +1,6 @@
 cd /vagrant
 sudo apt-get update
-sudo apt-get install -y python3-dev python-venv libxml2-dev libxslt1-dev libffi-dev postgresql-server-dev-9.6 postgresql-9.6 git glpk-utils
+sudo apt-get install -y python3-dev python3-venv libxml2-dev libxslt1-dev libffi-dev postgresql-server-dev-9.6 postgresql-9.6 git glpk-utils
 
 cat > /etc/postgresql/9.6/main/pg_hba.conf <<EOF
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
