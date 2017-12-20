@@ -49,7 +49,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
 
 
 class ContextFormatter(logging.Formatter):
-    def __init__(self, fmt, _dfs, _stl):
+    def __init__(self, fmt, _dfs=None, _stl=None):
         self.pid = os.getpid()
         logging.Formatter.__init__(self, fmt)
 
