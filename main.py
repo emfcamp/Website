@@ -1,4 +1,5 @@
 import logging
+import logging.config
 import logger
 import random
 import os
@@ -26,7 +27,7 @@ import gocardless_pro
 # want to overwrite nosetests' handlers
 if len(logging.root.handlers) == 0:
     install_logging = True
-    logging.basicConfig(level=logging.NOTSET)
+    logging.config.fileConfig('logging.conf')
 else:
     install_logging = False
 
