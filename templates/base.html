@@ -73,7 +73,7 @@
                         #}
                         {% if get_basket_size() > 0 %}
                             <li role="presentation">
-                                <a role="menuitem" href="{{ url_for('tickets.pay') }}">
+                                <a role="menuitem" href="{{ url_for('tickets.pay', flow="main") }}">
                                     Basket ({{get_basket_size()}})
                                 </a>
                             </li>
