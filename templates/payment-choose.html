@@ -50,9 +50,20 @@
     <div class="panel-body">
         <p>We'll need your name and the email address to send your ticket to,
             so please make sure they're correct:</p>
-        <div class="form-group">
             {{ render_field(form.name, horizontal=True) }}
             {{ render_field(form.email, horizontal=True) }}
+            <div class="form-group col-sm-12">
+            <label class="control-label" for="allow_promo">
+                Send me occasional emails about future EMF events
+            </label>
+            {{ form.allow_promo() }}
+            </div>
+        <div class="col-sm-12">
+        <p><small>Your name and email are used to manage your ticket and contact you with
+            information about the event. Unless you choose to receive emails in future,
+            we will delete your personal data after the event.
+            We don't send your personal data to anyone else.
+            <a href="{{ url_for('base.privacy') }}" target="_blank">More privacy info</a>.</small></p>
         </div>
     </div>
 </div>

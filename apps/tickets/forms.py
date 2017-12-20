@@ -2,8 +2,7 @@ from flask import Markup, render_template_string, url_for
 from flask_login import current_user
 from wtforms.validators import Required, Optional, Email, ValidationError
 from wtforms import (
-    SubmitField, StringField,
-    FieldList, FormField, HiddenField,
+    SubmitField, StringField, FieldList, FormField, HiddenField, BooleanField
 )
 from wtforms.fields.html5 import EmailField
 
@@ -43,6 +42,7 @@ class TicketTransferForm(Form):
 class TicketPaymentForm(Form):
     email = EmailField('Email', [Email(), Required()])
     name = StringField('Name', [Required()])
+    allow_promo = BooleanField('Send me occasional emails about future EMF events')
     basket_total = HiddenField('basket total')
 
     gocardless = SubmitField('Pay by Direct Debit')
