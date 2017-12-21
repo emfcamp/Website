@@ -90,7 +90,7 @@ mailchimp3==2.0.17
 
 # payments
 gocardless==0.5.3
-stripe==1.66.0
+stripe==1.67.0
 ofxparse==0.16
 beautifulsoup4==4.6.0
 
