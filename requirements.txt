@@ -4,7 +4,7 @@ six==1.11.0
 packaging==16.8
 
 # from ndg-httpsclient
-cffi==1.11.0
+cffi==1.11.2
 cryptography==2.0.3
 enum34==1.1.6
 idna==2.6
