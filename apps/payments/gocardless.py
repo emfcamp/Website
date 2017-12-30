@@ -175,6 +175,15 @@ def gocardless_cancel(payment_id):
     form = GoCardlessCancelForm(request.form)
     if form.validate_on_submit():
         if form.yes.data:
+
+            try:
+                gocardless_client.payments.cancel(payment.gcid)
+
+            except gocardless_pro.errors.InvalidStateError as e:
+                logging.error('InvalidStateError from GoCardless confirming mandate: %s', e.message)
+                flash("An error occurred with your mandate, please check below or contact {}".format(app.config['TICKETS_EMAIL'][1]))
+                return redirect(url_for('tickets.main'))
+
             logger.info('Cancelling GoCardless payment %s', payment.id)
             payment.cancel()
             db.session.commit()

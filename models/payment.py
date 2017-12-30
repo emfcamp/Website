@@ -75,10 +75,10 @@ class Payment(db.Model):
             raise StateException('Refunded payments cannot be cancelled')
 
         now = datetime.utcnow()
-        for ticket in self.tickets:
-            ticket.paid = False
-            if ticket.expires is None or ticket.expires > now:
-                ticket.expires = now
+        for purchase in self.purchases:
+            purchase.set_state('cancelled')
+            if purchase.expires is None or purchase.expires > now:
+                purchase.expires = now
 
         self.state = 'cancelled'
 
@@ -285,23 +285,8 @@ class GoCardlessPayment(Payment):
     gcid = db.Column(db.String, unique=True)
 
     def cancel(self):
-        if self.state == 'new':
-            # No bill to check
-            pass
-
-        elif self.state in ['cancelled', 'refunded']:
-            # Don't cancel the debit before raising
-            pass
-
-        else:
-            pass
-            # FIXME: move this out to the app
-            gocardless_client.payments.cancel(self.gcid)
-
-            # if bill.can_be_cancelled:
-            #     bill.cancel()
-            # elif bill.status != 'cancelled':
-            #     raise StateException('GoCardless will not allow this bill to be cancelled')
+        if self.state in ['cancelled', 'refunded']:
+            raise StateException('Payment has already been {}'.format(self.state))
 
         super(GoCardlessPayment, self).cancel()
 

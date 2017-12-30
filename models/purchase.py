@@ -11,7 +11,7 @@ PRODUCT_TYPES = ["admission_ticket", "ticket", "merchandise"]
 
 # state: [allowed next state, ] pairs, see docs/ticket_states.md
 PURCHASE_STATES = {'reserved': ['payment-pending', 'expired', 'cancelled', 'paid'],
-                   'payment-pending': ['expired', 'paid'],
+                   'payment-pending': ['expired', 'paid', 'cancelled'],
                    'expired': [],
                    'cancelled': [],
                    'paid': ['receipt-emailed', 'refunded'],
