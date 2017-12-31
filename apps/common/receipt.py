@@ -1,6 +1,6 @@
 # coding=utf-8
 from __future__ import division, absolute_import, print_function, unicode_literals
-from io import StringIO
+import io
 from urllib.parse import urljoin
 from xhtml2pdf import pisa
 import qrcode
@@ -24,7 +24,7 @@ def render_receipt(user, png=False, pdf=False):
                                .with_entities(Product,
                                               func.count(Purchase.id)
                                                   .label('ticket_count'))
-                               .group_by(Product).all())
+                               .group_by(Product.id).all())
     entrance_tickets_count = sum(c for p, c in entrance_products_counts)
 
     other = user.purchased_products.filter_by(state='paid', is_ticket=False) \
@@ -78,14 +78,14 @@ def render_pdf(html, url_root=None):
 
         return urljoin(url_root, uri)
 
-    pdffile = StringIO()
+    pdffile = io.StringIO()
     pisa.CreatePDF(html, pdffile, link_callback=fix_link)
     pdffile.seek(0)
 
     return pdffile
 
 def format_inline_qr(data):
-    qrfile = StringIO()
+    qrfile = io.BytesIO()
     qr = qrcode.make(data, image_factory=SvgPathImage)
     qr.save(qrfile, 'SVG')
     qrfile.seek(0)
@@ -96,11 +96,11 @@ def format_inline_qr(data):
     del root.attrib['height']
     root.attrib['preserveAspectRatio'] = 'none'
 
-    return Markup(etree.tostring(root))
+    return Markup(etree.tostring(root).decode('utf-8'))
 
 
 def make_qr_png(*args, **kwargs):
-    qrfile = StringIO()
+    qrfile = io.BytesIO()
 
     qr = qrcode.make(*args, **kwargs)
     qr.save(qrfile, 'PNG')
@@ -110,7 +110,7 @@ def make_qr_png(*args, **kwargs):
 
 
 def format_inline_barcode(data):
-    barcodefile = StringIO()
+    barcodefile = io.BytesIO()
 
     # data is written into the SVG without a CDATA, so base64 encode it
     code128 = barcode.get('code128', data, writer=SVGWriter())
@@ -124,11 +124,11 @@ def format_inline_barcode(data):
     del root.attrib['height']
     root.attrib['preserveAspectRatio'] = 'none'
 
-    return Markup(etree.tostring(root))
+    return Markup(etree.tostring(root).decode('utf-8'))
 
 
 def make_barcode_png(data, **options):
-    barcodefile = StringIO()
+    barcodefile = io.BytesIO()
 
     code128 = barcode.get('code128', data, writer=ImageWriter())
     # Sizes here are the ones used in the PDF

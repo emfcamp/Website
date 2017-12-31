@@ -1,4 +1,4 @@
-from main import db, gocardless_client
+from main import db
 from sqlalchemy import event
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
