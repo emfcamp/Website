@@ -15,8 +15,8 @@
 <tbody>
 {% for ticket in tickets %}
   <tr>
-    <td><a href="{{ url_for('.user', user_id=ticket.user.id) }}">{{ ticket.user.name }}</a></td>
-    <td>{{ ticket.user.email }}</td>
+    <td><a href="{{ url_for('.user', user_id=ticket.owner.id) }}">{{ ticket.owner.name }}</a></td>
+    <td>{{ ticket.owner.email }}</td>
     <td><a href="{{ url_for('.product_details', product_id=ticket.product.id) }}">{{ ticket.product.name }}</a></td>
     {% if ticket.payment %}
     <td>{{ ticket.payment.name }} {{ ticket.payment.id }}</td>
