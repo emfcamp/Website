@@ -251,7 +251,7 @@ def partial_refund(payment_id):
     for f in form.tickets:
         f._ticket = tickets_dict[f.ticket_id.data]
         f.refund.label.text = '%s - %s' % (f._ticket.id, f._ticket.product.display_name)
-        if f._ticket.refund_id is None and f._ticket.paid:
+        if f._ticket.refund_id is None and f._ticket.state == 'paid':
             f._disabled = False
         else:
             f._disabled = True
@@ -349,6 +349,6 @@ def partial_refund(payment_id):
 
         return redirect(url_for('.payments'))
 
-    refunded_tickets = [t for t in payment.purchases if t.refund]
-    return render_template('admin/payments/partial-refund.html', payment=payment, form=form,
+    refunded_tickets = [t for t in payment.purchases if t.state == 'refunded']
+    return render_template('admin/payments/payment-refund.html', payment=payment, form=form,
                            refunded_tickets=refunded_tickets)

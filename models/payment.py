@@ -96,14 +96,14 @@ class Payment(db.Model):
 
         refund = BankRefund(self, self.amount)
         now = datetime.utcnow()
-        for ticket in self.tickets:
-            if ticket.user != self.user:
+        for ticket in self.purchases:
+            if ticket.owner != self.user:
                 raise StateException('Cannot refund transferred ticket')
             if ticket.expires is None or ticket.expires > now:
                 ticket.expires = now
-            if ticket.refund is not None:
+            if ticket.state == 'refunded':
                 raise StateException('Ticket is already refunded')
-            if ticket.type.get_price(self.currency) and not ticket.paid:
+            if ticket.price_tier.get_price(self.currency) and ticket.state != 'paid':
                 # This might turn out to be too strict
                 raise StateException('Ticket is not paid, so cannot be refunded')
             ticket.paid = False
