@@ -58,7 +58,7 @@ def export_field_edits(cls, fields):
 
         edits[f] = {
             'max': max_,
-            'avg': avg.quantize(Decimal('0.01')),
+            'avg': avg.quantize(Decimal('0.01')) if avg else None,
         }
 
     return edits
