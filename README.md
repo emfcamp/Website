@@ -17,7 +17,7 @@ Install [Vagrant](https://www.vagrantup.com/) and
 [VirtualBox](https://www.virtualbox.org/).
 
 ```
-vagrant up
+vagrant up --provider virtualbox
 vagrant ssh
 make data
 make
