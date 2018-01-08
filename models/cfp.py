@@ -6,7 +6,7 @@ import re
 from sqlalchemy import UniqueConstraint, func, select
 from sqlalchemy.orm import column_property
 from slugify import slugify_unicode
-from models import export_field_counts, export_field_edits, export_field_intervals, range_dict
+from models import export_attr_counts, export_attr_edits, export_intervals, bucketise
 
 from main import db
 from .user import User
@@ -112,6 +112,7 @@ class Proposal(db.Model):
     votes = db.relationship('CFPVote', backref='proposal')
     favourites = db.relationship(User, secondary=FavouriteProposals, backref=db.backref('favourites', lazy='dynamic'))
 
+    # Convenience for individual objects. Use an outerjoin and groupby for more than a few records
     favourite_count = column_property(select([func.count(FavouriteProposals.c.proposal_id)]).where(
         FavouriteProposals.c.proposal_id == id,
     ), deferred=True)
@@ -143,17 +144,19 @@ class Proposal(db.Model):
             # Export stats for each proposal type separately
             return {}
 
-        count_fields = ['needs_help', 'needs_money', 'needs_laptop',
-                         'one_day', 'notice_required', 'may_record', 'state']
+        count_attrs = ['needs_help', 'needs_money', 'needs_laptop',
+                       'one_day', 'notice_required', 'may_record', 'state']
 
-        edits_fields = ['title', 'description', 'requirements', 'length',
-                        'notice_required', 'needs_help', 'needs_money', 'one_day',
-                        'has_rejected_email', 'published_names', 'arrival_period',
-                        'departure_period', 'telephone_number', 'may_record',
-                        'needs_laptop', 'available_times',
-                        'attendees', 'cost', 'size', 'funds']
+        edits_attrs = ['title', 'description', 'requirements', 'length',
+                       'notice_required', 'needs_help', 'needs_money', 'one_day',
+                       'has_rejected_email', 'published_names', 'arrival_period',
+                       'departure_period', 'telephone_number', 'may_record',
+                       'needs_laptop', 'available_times',
+                       'attendees', 'cost', 'size', 'funds']
 
+        # Don't care about performance of favourite_count here
         proposals = cls.query.with_entities(cls.id, cls.title, cls.favourite_count).order_by(cls.id)
+        favourite_counts = [p.favourite_count for p in proposals]
 
         data = {
             'private': {
@@ -163,16 +166,16 @@ class Proposal(db.Model):
             },
             'public': {
                 'proposals': {
-                    'counts': export_field_counts(cls, count_fields),
-                    'edits': export_field_edits(cls, edits_fields),
+                    'counts': export_attr_counts(cls, count_attrs),
+                    'edits': export_attr_edits(cls, edits_attrs),
                 },
                 'favourites': {
-                    'counts': range_dict(cls.query.with_entities(cls.favourite_count), [0, 1, 10, 20, 30, 40, 50, 100, 200]),
+                    'counts': bucketise(favourite_counts, [0, 1, 10, 20, 30, 40, 50, 100, 200]),
                 }
             },
             'tables': ['proposal', 'proposal_version', 'favourite_proposals', 'favourite_proposals_version'],
         }
-        data['public']['proposals']['counts']['created_week'] = export_field_intervals(cls, 'created', 'week', 'YYYY-MM-DD')
+        data['public']['proposals']['counts']['created_week'] = export_intervals(cls.query, cls.created, 'week', 'YYYY-MM-DD')
 
         return data
 
@@ -368,7 +371,7 @@ class CFPMessage(db.Model):
 
     @classmethod
     def get_export_data(cls):
-        count_fields = ['has_been_read']
+        count_attrs = ['has_been_read']
 
         message_contents = cls.query.join(User).with_entities(
             cls.proposal_id, cls.from_user_id, User.name.label('user_name'),
@@ -381,12 +384,12 @@ class CFPMessage(db.Model):
             },
             'public': {
                 'messages': {
-                    'counts': export_field_counts(cls, count_fields),
+                    'counts': export_attr_counts(cls, count_attrs),
                 },
             },
             'tables': ['cfp_message', 'cfp_message_version'],
         }
-        data['public']['messages']['counts']['created_day'] = export_field_intervals(cls, 'created', 'day', 'YYYY-MM-DD')
+        data['public']['messages']['counts']['created_day'] = export_intervals(cls.query, cls.created, 'day', 'YYYY-MM-DD')
 
         return data
 
@@ -423,21 +426,21 @@ class CFPVote(db.Model):
 
     @classmethod
     def get_export_data(cls):
-        count_fields = ['state', 'has_been_read', 'vote']
-        edits_fields = ['state', 'vote', 'note']
+        count_attrs = ['state', 'has_been_read', 'vote']
+        edits_attrs = ['state', 'vote', 'note']
 
         data = {
             'private': {
             },
             'public': {
                 'votes': {
-                    'counts': export_field_counts(cls, count_fields),
-                    'edits': export_field_edits(cls, edits_fields),
+                    'counts': export_attr_counts(cls, count_attrs),
+                    'edits': export_attr_edits(cls, edits_attrs),
                 },
             },
             'tables': ['cfp_vote', 'cfp_vote_version'],
         }
-        data['public']['votes']['counts']['created_day'] = export_field_intervals(cls, 'created', 'day', 'YYYY-MM-DD')
+        data['public']['votes']['counts']['created_day'] = export_intervals(cls.query, cls.created, 'day', 'YYYY-MM-DD')
 
         return data
 

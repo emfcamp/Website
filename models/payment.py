@@ -1,5 +1,5 @@
 from main import db, gocardless, external_url
-from sqlalchemy import event
+from sqlalchemy import event, func, column
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
@@ -8,6 +8,9 @@ import random
 import re
 from decimal import Decimal, ROUND_UP
 from datetime import datetime
+
+from . import export_attr_counts, export_intervals, bucketise
+import models
 
 safechars = "2346789BCDFGHJKMPQRTVWXY"
 
@@ -33,6 +36,38 @@ class Payment(db.Model):
     def __init__(self, currency, amount):
         self.currency = currency
         self.amount = amount
+
+    @classmethod
+    def get_export_data(cls):
+        if cls.__name__ == 'Payment':
+            # Export stats for each payment type separately
+            return {}
+
+        ticket_counts = cls.query.outerjoin(cls.tickets).group_by(cls.id).with_entities(func.count(models.Ticket.id))
+        refund_counts = cls.query.outerjoin(cls.refunds).group_by(cls.id).with_entities(func.count(Refund.id))
+        changes = cls.query.outerjoin(cls.changes).group_by(cls.id)
+        change_counts = changes.with_entities(func.count(PaymentChange.id))
+        first_changes = changes.with_entities(func.min(PaymentChange.timestamp).label('created')).from_self()
+
+        data = {
+            'public': {
+                'payments': {
+                    'counts': {
+                        'tickets': bucketise(ticket_counts, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20]),
+                        'refunds': bucketise(refund_counts, [0, 1, 2, 3, 4]),
+                        'changes': bucketise(change_counts, range(10)),
+                        'created_week': export_intervals(first_changes, column('created'), 'week', 'YYYY-MM-DD')
+                    },
+                },
+            },
+            'tables': ['payment'],
+        }
+
+        count_attrs = ['state', 'reminder_sent']
+        data['public']['payments']['counts'].update(export_attr_counts(cls, count_attrs))
+
+        return data
+
 
     @property
     def amount(self):
@@ -168,6 +203,7 @@ db.Index('ix_bank_account_sort_code_acct_id', BankAccount.sort_code, BankAccount
 
 class BankTransaction(db.Model):
     __tablename__ = 'bank_transaction'
+    __export_data__ = False
 
     id = db.Column(db.Integer, primary_key=True)
     account_id = db.Column(db.Integer, db.ForeignKey(BankAccount.id), nullable=False)
@@ -388,6 +424,31 @@ class Refund(db.Model):
         self.payment = payment
         self.amount = amount
 
+    @classmethod
+    def get_export_data(cls):
+        if cls.__name__ == 'Refund':
+            # Export stats for each refund type separately
+            return {}
+
+        ticket_counts = cls.query.outerjoin(cls.tickets).group_by(cls.id).with_entities(func.count('Ticket.id'))
+        data = {
+            'public': {
+                'refunds': {
+                    'counts': {
+                        'timestamp_week': export_intervals(cls.query, cls.timestamp, 'week', 'YYYY-MM-DD'),
+                        'tickets': bucketise(ticket_counts, [0, 1, 2, 3, 4]),
+                    },
+                    'amounts': {
+                        'counts': bucketise(cls.query.with_entities(cls.amount_int / 100), [0, 10, 20, 30, 40, 50, 100, 150, 200]),
+                    },
+                },
+            },
+            'tables': ['refund'],
+        }
+
+        return data
+
+
     @property
     def amount(self):
         return Decimal(self.amount_int) / 100
@@ -407,6 +468,7 @@ class StripeRefund(Refund):
 
 class StripeRefundOld(db.Model):
     __tablename__ = 'stripe_refund'
+    __export_data__ = False
     id = db.Column(db.Integer, primary_key=True)
     refundid = db.Column(db.String, unique=True)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'), nullable=False)

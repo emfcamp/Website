@@ -1,13 +1,19 @@
 from main import db, cache
 from flask import current_app as app
-from models.payment import Payment
 
-from sqlalchemy.orm import Session, column_property
 from sqlalchemy import event, or_, and_, func
+from sqlalchemy.orm import Session, column_property
 
 from decimal import Decimal
 from datetime import datetime, timedelta
 import re
+from collections import Counter, defaultdict
+
+import models
+from . import (
+    export_attr_counts, export_counts, export_intervals,
+    iter_attr_edits, bucketise,
+)
 
 safechars_lower = "2346789bcdfghjkmpqrtvwxy"
 
@@ -88,11 +94,11 @@ class TicketType(db.Model):
             Ticket.type == self,
             Ticket.refund_id.is_(None),
             or_(Ticket.paid,
-                Payment.query.filter(
-                    Payment.state != 'new',
-                    Payment.state != 'cancelled',
-                    Payment.state != 'refunded',
-                ).filter(Payment.tickets.expression).exists())
+                models.Payment.query.filter(
+                    models.Payment.state != 'new',
+                    models.Payment.state != 'cancelled',
+                    models.Payment.state != 'refunded',
+                ).filter(models.Payment.tickets.expression).exists())
         )
 
         return sold_tickets
@@ -153,10 +159,10 @@ class TicketType(db.Model):
     @classmethod
     def get_tickets_remaining(cls):
         """ Get the total number of tickets remaining. """
-        total = Payment.query.filter(
-            Payment.state != 'new',
-            Payment.state != 'cancelled',
-            Payment.state != 'refunded',
+        total = models.Payment.query.filter(
+            models.Payment.state != 'new',
+            models.Payment.state != 'cancelled',
+            models.Payment.state != 'refunded',
         ).join(Ticket).join(Ticket.type).filter(or_(TicketType.admits == 'full',
                                                     TicketType.admits == 'kid')).count()
         return app.config.get('MAXIMUM_ADMISSIONS') - total
@@ -217,6 +223,20 @@ class Ticket(db.Model):
         self.user_id = user_id
         self.expires = datetime.utcnow() + timedelta(hours=2)
         self.ignore_capacity = False
+
+    @classmethod
+    def get_export_data(cls):
+        count_attrs = ['paid', 'emailed', 'transfer_reminder_sent']
+        data = {
+            'public': {
+                'tickets': {
+                    'counts': export_attr_counts(cls, count_attrs),
+                },
+            },
+            'tables': ['ticket'],
+        }
+
+        return data
 
     def clone(self, new_code=None, ignore_capacity=False):
         if new_code is not None:
@@ -314,9 +334,38 @@ class TicketTransfer(db.Model):
         return "<Transfer Ticket: %s from %s to %s on %s>" % (
             self.ticket_id, self.from_user_id, self.to_user_id, self.timestamp)
 
+    @classmethod
+    def get_export_data(cls):
+        c = func.count(Ticket.id)
+        untransferred = Ticket.query.join(TicketType) \
+                                    .filter(TicketType.admits.in_(['full', 'kid'])) \
+                                    .with_entities(c - 1, Ticket.user_id) \
+                                    .group_by(Ticket.user_id)
+
+        user_transfers = cls.query.outerjoin(models.User.transfers_from) \
+                                  .with_entities(func.count(cls.id), models.User.id) \
+                                  .group_by(models.User.id)
+
+        data = {
+            'public': {
+                'tickets': {
+                    'counts': {
+                        'untransferred': bucketise(untransferred, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20]),
+                        'user_transfers': bucketise(user_transfers, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20]),
+                        'transferred_week': export_intervals(cls.query, cls.timestamp, 'week', 'YYYY-MM-DD'),
+                    },
+                },
+            },
+            'tables': ['ticket_transfer'],
+        }
+
+        return data
+
+
 
 class TicketAttrib(db.Model):
     __tablename__ = 'ticket_attrib'
+    __export_data__ = False
     id = db.Column(db.Integer, primary_key=True)
     ticket_id = db.Column(db.Integer, db.ForeignKey('ticket.id'), nullable=False)
     name = db.Column(db.String, nullable=False)
@@ -339,6 +388,51 @@ class TicketCheckin(db.Model):
 
     def __init__(self, ticket):
         self.ticket = ticket
+
+    @classmethod
+    def get_export_data(cls):
+        tickets_checkins = Ticket.query.outerjoin(cls)
+        count_cols = [cls.checked_in, cls.badged_up]
+
+        ticket_admits = Ticket.query.join(TicketType) \
+                                    .with_entities(Ticket.id, TicketType.admits)
+        ticket_admits = dict(ticket_admits.all())
+
+        edits_attrs = ['checked_in', 'badged_up']
+        edits_iter = iter_attr_edits(cls, edits_attrs)
+        hours = {
+            'full': defaultdict(list),
+            'kid': defaultdict(list),
+        }
+        for pk, attr_times in edits_iter:
+            ticket_id, = pk
+            admits = ticket_admits[ticket_id]
+            for attr, times in attr_times.items():
+                last_time = max(times).replace(minute=0)
+                hours[admits][attr].append(last_time.strftime('%Y-%m-%d %H:%M'))
+
+        data = {
+            'public': {
+                'tickets': {
+                    'counts': {
+                        'paid': export_counts(tickets_checkins.filter(Ticket.paid == True), count_cols),  # noqa: E712
+                        'unpaid': export_counts(tickets_checkins.filter(Ticket.paid == False), count_cols),  # noqa: E712
+                        'full': {
+                            'checked_in_hour': Counter(hours['full']['checked_in']),
+                            'badged_up_hour': Counter(hours['full']['badged_up']),
+                        },
+                        'kid': {
+                            'checked_in_hour': Counter(hours['kid']['checked_in']),
+                            'badged_up_hour': Counter(hours['kid']['badged_up']),
+                        },
+                    },
+                },
+            },
+            'tables': ['ticket_checkin', 'ticket_checkin_version'],
+        }
+
+        return data
+
 
 @event.listens_for(Session, 'before_flush')
 def check_capacity(session, flush_context, instances):

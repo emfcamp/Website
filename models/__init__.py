@@ -1,12 +1,13 @@
 from bisect import bisect
 from collections import OrderedDict
 from decimal import Decimal
+from itertools import groupby
 
 from main import db
-from sqlalchemy import true, distinct, inspect
+from sqlalchemy import true, inspect
 from sqlalchemy.orm.base import NO_VALUE
 from sqlalchemy.sql.functions import func
-from sqlalchemy_continuum.utils import version_class
+from sqlalchemy_continuum.utils import version_class, transaction_class
 
 def exists(query):
     return db.session.query(true()).filter(query.exists()).scalar()
@@ -28,40 +29,99 @@ def nest_count_keys(rows):
 
     return tree
 
-def range_dict(rows, boundaries):
+def bucketise(vals, boundaries):
+    """ Sort values into bins, like pandas.cut """
     ranges = ['%s-%s' % (a, b - 1) if b - 1 > a else str(a) for a, b in zip(boundaries[:-1], boundaries[1:])]
     ranges.append('%s+' % boundaries[-1])
     counts = OrderedDict.fromkeys(ranges, 0)
 
-    for c, *_ in rows:
-        i = bisect(boundaries, c)
+    for val in vals:
+        if isinstance(val, tuple):
+            # As a convenience for fetching counts/single columns in sqla
+            val, *_ = val
+
+        i = bisect(boundaries, val)
         if i == 0:
             raise IndexError('{} is below the lowest boundary {}'.format(
-                             c, boundaries[0]))
+                             val, boundaries[0]))
         counts[ranges[i - 1]] += 1
 
     return counts
 
-def export_field_intervals(cls, field, interval, fmt):
-    return nest_count_keys(count_groups(cls.query, func.to_char(func.date_trunc(interval, getattr(cls, field)), fmt)))
+def export_intervals(query, date_entity, interval, fmt):
+    return nest_count_keys(count_groups(query, func.to_char(func.date_trunc(interval, date_entity), fmt)))
 
-def export_field_counts(cls, fields):
-    return {f: nest_count_keys(count_groups(cls.query, getattr(cls, f))) for f in fields}
+def export_counts(query, cols):
+    counts = OrderedDict()
+    for col in cols:
+        counts[col.name] = nest_count_keys(count_groups(query, col))
 
-def export_field_edits(cls, fields):
-    cls_version = version_class(cls)
-    edits = {}
-    for f in fields:
-        c = func.count(distinct(getattr(cls_version, f)))
-        max_, avg = cls_version.query.with_entities(cls_version.id, c).group_by(cls_version.id) \
-            .from_self().with_entities(func.max(c), func.avg(c)).one()
+    return counts
 
-        edits[f] = {
-            'max': max_,
-            'avg': avg.quantize(Decimal('0.01')) if avg else None,
-        }
+def export_attr_counts(cls, attrs):
+    cols = [getattr(cls, a) for a in attrs]
+    return export_counts(cls.query, cols)
+
+def export_attr_edits(cls, attrs):
+    edits_iter = iter_attr_edits(cls, attrs)
+    maxes = dict.fromkeys(attrs, 0)
+    totals = dict.fromkeys(attrs, 0)
+    count = 0
+
+    for pk, attr_times in edits_iter:
+        for a in attrs:
+            maxes[a] = max(maxes[a], len(attr_times[a]))
+            totals[a] += len(attr_times[a])
+        count += 1
+
+    edits = OrderedDict()
+    for a in attrs:
+        if count == 0:
+            edits[a] = {
+                'max': 0,
+                'avg': Decimal('0.00'),
+            }
+
+        else:
+            avg = Decimal(totals[a]) / count
+            edits[a] = {
+                'max': maxes[a],
+                'avg': avg.quantize(Decimal('0.01')),
+            }
 
     return edits
+
+def iter_attr_edits(cls, attrs, query=None):
+    pk_cols = [k for k in inspect(cls).primary_key]
+
+    cls_version = version_class(cls)
+    pk_cols_version = [getattr(cls_version, k.name) for k in pk_cols]
+    attrs_version = [getattr(cls_version, a) for a in attrs]
+    cls_transaction = transaction_class(cls)
+
+    if query is None:
+        query = cls_version.query
+
+    all_versions = query.join(cls_version.transaction) \
+                        .with_entities(*pk_cols_version + attrs_version + [cls_transaction.issued_at]) \
+                        .order_by(*pk_cols_version + [cls_version.transaction_id])
+
+    def get_pk(row):
+        return [getattr(row, k.name) for k in pk_cols_version]
+
+    for pk, versions in groupby(all_versions, get_pk):
+        # We don't yet process inserts/deletes, but should
+        first = next(versions)
+        attr_vals = {a: getattr(first, a) for a in attrs}
+        attr_times = {a: [first.issued_at] for a in attrs}
+        for version in versions:
+            for attr in attrs:
+                val = getattr(version, attr)
+                if val != attr_vals[attr]:
+                    attr_times[attr].append(version.issued_at)
+                    attr_vals[attr] = val
+
+        yield (pk, attr_times)
 
 
 from .user import *  # noqa

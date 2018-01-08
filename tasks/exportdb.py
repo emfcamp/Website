@@ -28,7 +28,7 @@ class ExportDB(Command):
         # new object type (e.g. association table).
 
         # Exclude tables we know will never be exported
-        ignore = ['alembic_version']
+        ignore = ['alembic_version', 'transaction']
         needs_work = []
 
         all_model_classes = {cls for cls in db.Model._decl_class_registry.values()
