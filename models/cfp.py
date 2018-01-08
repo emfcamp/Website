@@ -156,12 +156,38 @@ class Proposal(db.Model):
 
         # Don't care about performance of favourite_count here
         proposals = cls.query.with_entities(cls.id, cls.title, cls.favourite_count).order_by(cls.id)
+
+        proposals = cls.query.with_entities(
+            cls.id, cls.title, cls.description,
+            cls.favourite_count,
+            cls.length, cls.notice_required, cls.needs_money,
+            cls.available_times, cls.allowed_times,
+            cls.arrival_period, cls.departure_period,
+            cls.needs_laptop, cls.may_record,
+        ).order_by(cls.id)
+
+        if cls.__name__ == 'Workshop':
+            proposal.add_columns(cls.attendees, cls.cost)
+        elif cls.__name__ == 'Installation':
+            proposal.add_columns(cls.size, cls.funds)
+
+        # Some unaccepted proposals have scheduling data, but we shouldn't need to keep that
+        accepted_proposals = proposals.filter(cls.state.in_(['accepted', 'finished'])) \
+                                      .join(cls.user) \
+                                      .add_columns(
+                                          User.name, User.email, cls.published_names,
+                                          cls.scheduled_time, cls.scheduled_duration, cls.scheduled_venue,
+                                      )
+
+        other_proposals = proposals.filter(~cls.state.in_(['accepted', 'finished']))
+
         favourite_counts = [p.favourite_count for p in proposals]
 
         data = {
             'private': {
                 'favourites': {
-                    'proposals': proposals,
+                    'accepted_proposals': accepted_proposals,
+                    'other_proposals': other_proposals,
                 }
             },
             'public': {

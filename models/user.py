@@ -132,6 +132,19 @@ class User(db.Model, UserMixin):
         self.email = email
         self.name = name
 
+    @classmethod
+    def get_export_data(cls):
+        data = {
+            'public': {
+                'users': {
+                    'count': cls.query.count(),
+                },
+            },
+            'tables': ['user'],
+        }
+
+        return data
+
     def login_code(self, key):
         return generate_login_code(key, int(time.time()), self.id)
 
@@ -259,8 +272,6 @@ class UserDiversity(db.Model):
                     'sex': sexes,
                     'ethnicity': ethnicities,
                 },
-            },
-            'public': {
             },
             'tables': ['diversity'],
         }
