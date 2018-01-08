@@ -166,10 +166,10 @@ class Proposal(db.Model):
             cls.needs_laptop, cls.may_record,
         ).order_by(cls.id)
 
-        if cls.__name__ == 'Workshop':
-            proposal.add_columns(cls.attendees, cls.cost)
-        elif cls.__name__ == 'Installation':
-            proposal.add_columns(cls.size, cls.funds)
+        if cls.__name__ == 'WorkshopProposal':
+            proposals = proposals.add_columns(cls.attendees, cls.cost)
+        elif cls.__name__ == 'InstallationProposal':
+            proposals = proposals.add_columns(cls.size, cls.funds)
 
         # Some unaccepted proposals have scheduling data, but we shouldn't need to keep that
         accepted_proposals = proposals.filter(cls.state.in_(['accepted', 'finished'])) \
