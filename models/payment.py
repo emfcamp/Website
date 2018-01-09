@@ -63,7 +63,7 @@ class Payment(db.Model):
             'tables': ['payment'],
         }
 
-        count_attrs = ['state', 'reminder_sent']
+        count_attrs = ['state', 'reminder_sent', 'currency']
         data['public']['payments']['counts'].update(export_attr_counts(cls, count_attrs))
 
         return data

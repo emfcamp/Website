@@ -154,12 +154,9 @@ class Proposal(db.Model):
                        'needs_laptop', 'available_times',
                        'attendees', 'cost', 'size', 'funds']
 
-        # Don't care about performance of favourite_count here
-        proposals = cls.query.with_entities(cls.id, cls.title, cls.favourite_count).order_by(cls.id)
-
         proposals = cls.query.with_entities(
             cls.id, cls.title, cls.description,
-            cls.favourite_count,
+            cls.favourite_count,  # don't care about performance here
             cls.length, cls.notice_required, cls.needs_money,
             cls.available_times, cls.allowed_times,
             cls.arrival_period, cls.departure_period,
@@ -174,13 +171,23 @@ class Proposal(db.Model):
         # Some unaccepted proposals have scheduling data, but we shouldn't need to keep that
         accepted_columns = (
             User.name, User.email, cls.published_names,
-            cls.scheduled_time, cls.scheduled_duration, cls.scheduled_venue,
+            cls.scheduled_time, cls.scheduled_duration, Venue.name,
         )
         accepted_proposals = proposals.filter(cls.state.in_(['accepted', 'finished'])) \
+                                      .outerjoin(Venue, Venue.id == cls.scheduled_venue) \
                                       .join(cls.user) \
                                       .add_columns(*accepted_columns)
 
         other_proposals = proposals.filter(~cls.state.in_(['accepted', 'finished']))
+
+        public_columns = (
+            cls.title, cls.description,
+            cls.published_names.label('names'), cls.may_record,
+            cls.scheduled_time, cls.scheduled_duration, Venue.name.label('venue'),
+        )
+        accepted_public = cls.query.filter(cls.state.in_(['accepted', 'finished'])) \
+                                   .outerjoin(Venue, Venue.id == cls.scheduled_venue) \
+                                   .with_entities(*public_columns)
 
         favourite_counts = [p.favourite_count for p in proposals]
 
@@ -195,10 +202,11 @@ class Proposal(db.Model):
                 'proposals': {
                     'counts': export_attr_counts(cls, count_attrs),
                     'edits': export_attr_edits(cls, edits_attrs),
+                    'accepted': accepted_public,
                 },
                 'favourites': {
                     'counts': bucketise(favourite_counts, [0, 1, 10, 20, 30, 40, 50, 100, 200]),
-                }
+                },
             },
             'tables': ['proposal', 'proposal_version', 'favourite_proposals', 'favourite_proposals_version'],
         }
