@@ -16,7 +16,7 @@ def to_dict(obj):
     return OrderedDict((a.key, getattr(obj, a.key)) for a in inspect(obj).attrs if a.loaded_value != NO_VALUE)
 
 def count_groups(query, *entities):
-    return query.with_entities(func.count(), *entities).group_by(*entities).order_by(*entities)
+    return query.with_entities(func.count().label('count'), *entities).group_by(*entities).order_by(*entities)
 
 def nest_count_keys(rows):
     """ For JSON's sake, because it doesn't support tuples as keys """

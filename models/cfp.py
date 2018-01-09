@@ -172,12 +172,13 @@ class Proposal(db.Model):
             proposals = proposals.add_columns(cls.size, cls.funds)
 
         # Some unaccepted proposals have scheduling data, but we shouldn't need to keep that
+        accepted_columns = (
+            User.name, User.email, cls.published_names,
+            cls.scheduled_time, cls.scheduled_duration, cls.scheduled_venue,
+        )
         accepted_proposals = proposals.filter(cls.state.in_(['accepted', 'finished'])) \
                                       .join(cls.user) \
-                                      .add_columns(
-                                          User.name, User.email, cls.published_names,
-                                          cls.scheduled_time, cls.scheduled_duration, cls.scheduled_venue,
-                                      )
+                                      .add_columns(*accepted_columns)
 
         other_proposals = proposals.filter(~cls.state.in_(['accepted', 'finished']))
 

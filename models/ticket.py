@@ -1,7 +1,7 @@
 from main import db, cache
 from flask import current_app as app
 
-from sqlalchemy import event, or_, and_, func
+from sqlalchemy import event, or_, and_, func, case
 from sqlalchemy.orm import Session, column_property
 
 from decimal import Decimal
@@ -11,8 +11,8 @@ from collections import Counter, defaultdict
 
 import models
 from . import (
-    export_attr_counts, export_counts, export_intervals,
-    iter_attr_edits, bucketise,
+    export_counts, export_intervals,
+    iter_attr_edits, bucketise, count_groups, nest_count_keys,
 )
 
 safechars_lower = "2346789bcdfghjkmpqrtvwxy"
@@ -226,11 +226,21 @@ class Ticket(db.Model):
 
     @classmethod
     def get_export_data(cls):
-        count_attrs = ['paid', 'emailed', 'transfer_reminder_sent']
+        tickets = cls.query.join(TicketType)
+
+        count_cols = [cls.paid, TicketType.id, TicketType.name, TicketType.admits]
+        paid = case({True: 'paid', False: 'unpaid'}, value=cls.paid)
+        count_cols_public = [paid, TicketType.admits]
+
         data = {
+            'private': {
+                'tickets': {
+                    'counts': count_groups(tickets, *count_cols),
+                },
+            },
             'public': {
                 'tickets': {
-                    'counts': export_attr_counts(cls, count_attrs),
+                    'counts': nest_count_keys(count_groups(tickets, *count_cols_public)),
                 },
             },
             'tables': ['ticket'],

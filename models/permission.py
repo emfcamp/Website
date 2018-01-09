@@ -22,8 +22,6 @@ class Permission(db.Model):
             'private': {
                 'permissions': users,
             },
-            'public': {
-            },
             'tables': ['permission', 'user_permission'],
         }
 

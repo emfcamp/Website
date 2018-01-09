@@ -16,8 +16,9 @@ class ExportEncoder(JSONEncoder):
         def _iterconvert(obj):
             # namedtuple/sqlalchemy result
             if isinstance(obj, tuple) and hasattr(obj, '_asdict'):
+                # this doesn't include any columns without label()s
                 dct = obj._asdict()
-                # sqlalchemy result's asdict is broken
+                # sqlalchemy result's asdict has broken ordering
                 if not isinstance(dct, OrderedDict):
                     dct = OrderedDict((k, dct[k]) for k in obj._fields)
                 obj = dct
