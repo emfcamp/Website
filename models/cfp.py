@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from collections import namedtuple
 from dateutil.parser import parse as parse_date
 import re
+from itertools import groupby
 
 from sqlalchemy import UniqueConstraint, func, select
 from sqlalchemy.orm import column_property
@@ -180,6 +181,16 @@ class Proposal(db.Model):
 
         other_proposals = proposals.filter(~cls.state.in_(['accepted', 'finished']))
 
+        user_favourites = cls.query.filter(cls.state.in_(['accepted', 'finished'])) \
+                                   .join(cls.favourites) \
+                                   .with_entities(User.id.label('user_id'), cls.id) \
+                                   .order_by(User.id)
+
+        anon_favourites = []
+        for user_id, proposals in groupby(user_favourites, lambda r: r.user_id):
+            anon_favourites.append([p.id for p in proposals])
+        anon_favourites.sort()
+
         public_columns = (
             cls.title, cls.description,
             cls.published_names.label('names'), cls.may_record,
@@ -193,10 +204,11 @@ class Proposal(db.Model):
 
         data = {
             'private': {
-                'favourites': {
+                'proposals': {
                     'accepted_proposals': accepted_proposals,
                     'other_proposals': other_proposals,
-                }
+                },
+                'favourites': anon_favourites,
             },
             'public': {
                 'proposals': {
