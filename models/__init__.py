@@ -31,7 +31,7 @@ def nest_count_keys(rows):
 
 def bucketise(vals, boundaries):
     """ Sort values into bins, like pandas.cut """
-    ranges = ['%s-%s' % (a, b - 1) if b - 1 > a else str(a) for a, b in zip(boundaries[:-1], boundaries[1:])]
+    ranges = ['%s-%s' % (a, b - 1) if isinstance(b, int) and b - 1 > a else str(a) for a, b in zip(boundaries[:-1], boundaries[1:])]
     ranges.append('%s+' % boundaries[-1])
     counts = OrderedDict.fromkeys(ranges, 0)
 

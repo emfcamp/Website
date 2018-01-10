@@ -1,13 +1,13 @@
 from main import db, gocardless, external_url
 from sqlalchemy import event, func, column
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, aliased
 from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.orm.exc import NoResultFound
 
 import random
 import re
 from decimal import Decimal, ROUND_UP
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from . import export_attr_counts, export_intervals, bucketise
 import models
@@ -49,6 +49,17 @@ class Payment(db.Model):
         change_counts = changes.with_entities(func.count(PaymentChange.id))
         first_changes = changes.with_entities(func.min(PaymentChange.timestamp).label('created')).from_self()
 
+        changes_new = aliased(cls.changes)
+        changes_paid = aliased(cls.changes)
+        active_time = func.max(changes_paid.timestamp) - func.max(changes_new.timestamp)
+        active_times = cls.query.join(changes_new, changes_paid) \
+                 .filter(changes_new.state == 'new') \
+                 .filter(changes_paid.state == 'paid') \
+                 .with_entities(active_time.label('active_time')) \
+                 .group_by(cls.id)
+
+        time_buckets = [timedelta(0), timedelta(minutes=1), timedelta(hours=1)] + [timedelta(d) for d in [1, 2, 3, 4, 5, 6, 7, 14, 28, 60]]
+
         data = {
             'public': {
                 'payments': {
@@ -56,11 +67,12 @@ class Payment(db.Model):
                         'tickets': bucketise(ticket_counts, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20]),
                         'refunds': bucketise(refund_counts, [0, 1, 2, 3, 4]),
                         'changes': bucketise(change_counts, range(10)),
-                        'created_week': export_intervals(first_changes, column('created'), 'week', 'YYYY-MM-DD')
+                        'created_week': export_intervals(first_changes, column('created'), 'week', 'YYYY-MM-DD'),
+                        'active_time': bucketise([r.active_time for r in active_times], time_buckets),
                     },
                 },
             },
-            'tables': ['payment'],
+            'tables': ['payment', 'payment_change'],
         }
 
         count_attrs = ['state', 'reminder_sent', 'currency']
