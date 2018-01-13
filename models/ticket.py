@@ -232,10 +232,20 @@ class Ticket(db.Model):
         paid = case({True: 'paid', False: 'unpaid'}, value=cls.paid)
         count_cols_public = [paid, TicketType.admits]
 
+        amounts = cls.query.join(models.Payment, TicketType, TicketPrice) \
+                           .filter(models.Payment.currency == TicketPrice.currency) \
+                           .with_entities(
+                               func.sum(TicketPrice.price_int / 100),
+                               paid, TicketPrice.currency, TicketType.admits
+                           ) \
+                           .group_by(paid, TicketType.admits, TicketPrice.currency) \
+                           .order_by(paid, TicketType.admits, TicketPrice.currency)
+
         data = {
             'private': {
                 'tickets': {
                     'counts': count_groups(tickets, *count_cols),
+                    'amounts': nest_count_keys(amounts),
                 },
             },
             'public': {

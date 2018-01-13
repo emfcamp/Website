@@ -58,17 +58,19 @@ class Payment(db.Model):
                  .with_entities(active_time.label('active_time')) \
                  .group_by(cls.id)
 
-        time_buckets = [timedelta(0), timedelta(minutes=1), timedelta(hours=1)] + [timedelta(d) for d in [1, 2, 3, 4, 5, 6, 7, 14, 28, 60]]
+        time_buckets = [timedelta(0), timedelta(minutes=1), timedelta(hours=1)] + \
+                       [timedelta(d) for d in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 28, 60]]
 
         data = {
             'public': {
                 'payments': {
                     'counts': {
-                        'tickets': bucketise(ticket_counts, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20]),
+                        'items': bucketise(ticket_counts, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20]),
                         'refunds': bucketise(refund_counts, [0, 1, 2, 3, 4]),
                         'changes': bucketise(change_counts, range(10)),
                         'created_week': export_intervals(first_changes, column('created'), 'week', 'YYYY-MM-DD'),
                         'active_time': bucketise([r.active_time for r in active_times], time_buckets),
+                        'amounts': bucketise(cls.query.with_entities(cls.amount_int / 100), [0, 10, 20, 30, 40, 50, 100, 150, 200]),
                     },
                 },
             },
@@ -449,9 +451,7 @@ class Refund(db.Model):
                     'counts': {
                         'timestamp_week': export_intervals(cls.query, cls.timestamp, 'week', 'YYYY-MM-DD'),
                         'tickets': bucketise(ticket_counts, [0, 1, 2, 3, 4]),
-                    },
-                    'amounts': {
-                        'counts': bucketise(cls.query.with_entities(cls.amount_int / 100), [0, 10, 20, 30, 40, 50, 100, 150, 200]),
+                        'amounts': bucketise(cls.query.with_entities(cls.amount_int / 100), [0, 10, 20, 30, 40, 50, 100, 150, 200]),
                     },
                 },
             },
