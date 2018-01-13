@@ -4,7 +4,8 @@ import pytz
 
 from main import db
 from flask import current_app as app
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import UniqueConstraint, func, select
+from sqlalchemy.orm import column_property
 from sqlalchemy.orm.exc import NoResultFound
 
 import re
@@ -31,6 +32,23 @@ class CalendarSource(db.Model):
     # Make sure these are identifiable to the memoize cache
     def __repr__(self):
         return "<%s %s: %s>" % (self.__class__.__name__, self.id, self.url)
+
+    @classmethod
+    def get_export_data(cls):
+        sources = cls.query.with_entities(
+            cls.id, cls.name, cls.type, cls.enabled, cls.url,
+            cls.main_venue, cls.lat, cls.lon, cls.priority,
+        ).order_by(cls.id)
+
+        data = {
+            'public': {
+                'sources': sources,
+            },
+            'tables': ['calendar_source'],
+        }
+
+        return data
+
 
     def refresh(self):
         request = requests.get(self.url.strip())
@@ -115,6 +133,29 @@ class CalendarEvent(db.Model):
 
     source = db.relationship(CalendarSource, backref='events')
     calendar_favourites = db.relationship('User', secondary=FavouriteCalendarEvent, backref=db.backref('calendar_favourites'))
+
+    favourite_count = column_property(select([func.count(FavouriteCalendarEvent.c.user_id)]).where(
+        FavouriteCalendarEvent.c.user_id == id,
+    ), deferred=True)
+
+
+    @classmethod
+    def get_export_data(cls):
+        events = cls.query.with_entities(
+            cls.source_id, cls.uid, cls.start_dt, cls.end_dt,
+            cls.summary, cls.description, cls.location,
+            cls.favourite_count,
+        ).order_by(cls.source_id, cls.id)
+
+        data = {
+            'public': {
+                'events': events,
+            },
+            'tables': ['calendar_event', 'favourite_calendar_event'],
+        }
+
+        return data
+
 
     @property
     def title(self):

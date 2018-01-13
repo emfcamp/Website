@@ -1,0 +1,496 @@
+{
+    "favourites": {
+        "counts": {
+            "0": 0,
+            "1-9": 0,
+            "10-19": 0,
+            "20-29": 0,
+            "30-39": 0,
+            "40-49": 0,
+            "50-99": 0,
+            "100-199": 0,
+            "200+": 0
+        }
+    },
+    "proposals": {
+        "accepted": [
+            {
+                "title": "a smartphone brain-computer interface workshop",
+                "description": "This workshop premiers the world's first \u00a320 brain-smartphone interface, and describes the theory behind it (especially SSVEP).  This is v0.1: we finished soldering the boards on Thursday; we don't know how well they work; the code (currently only for Android) continues to be developed as of Friday.  The workshop's goal is to open the project to a larger community, spurring further development.  At worst, you'll get to walk around wearing tin foil, a bathing cap and electrodes; at best, you'll be able to identify various EEG signals on your phone.  If you can, please bring a POCKET KNIFE, a SMALL SCREWDRIVER, and a PAPER NAPKIN/SERVIETTE.  See http://bit.ly/2axdWku for hardware, software, etc.  (Colin and his sons have run Google Cardboard workshops at EMF 2014, CCC 2015, Tokyo Hackerspace, the Okinawa Institute of Science and Technology and Maker Festival Toronto).",
+                "names": "Colin Rowat",
+                "may_record": true,
+                "scheduled_time": "2016-08-06 14:20:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 2"
+            },
+            {
+                "title": "LED Cards",
+                "description": "Use conductive thread and LEDs to brighten up your drawings. We'll be creating a simple circuit on a card, or you can bring your own material along (maybe a bag or T-Shirt) to adapt. All components provided. Suitable for ages 8+ ( parental / guardian supervision for under 14s ). \u00a35 to cover the cost of components. Lasts for a minimum of 45mins depends on sewing and drawing speed.",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": "2016-08-05 20:00:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 2"
+            },
+            {
+                "title": "a smartphone brain-computer interface workshop",
+                "description": "This workshop premiers the world's first \u00a320 brain-smartphone interface, and describes the theory behind it (especially SSVEP).  This is v0.1: we finished soldering the boards on Thursday; we don't know how well they work; the code (currently only for Android) continues to be developed as of Friday.  The workshop's goal is to open the project to a larger community, spurring further development.  At worst, you'll get to walk around wearing tin foil, a bathing cap and electrodes; at best, you'll be able to identify various EEG signals on your phone.  If you can, please bring a POCKET KNIFE, a SMALL SCREWDRIVER, and a PAPER NAPKIN/SERVIETTE.  See http://bit.ly/2axdWku for hardware, software, etc.  (Colin and his sons have run Google Cardboard workshops at EMF 2014, CCC 2015, Tokyo Hackerspace, the Okinawa Institute of Science and Technology and Maker Festival Toronto).",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": "2016-08-07 19:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 1"
+            },
+            {
+                "title": "Maths card tricks",
+                "description": "Katie Steckles does some maths card tricks - and so can you!\r\n\r\nThis is the workshop follow-up to the preceding talk: https://www.emfcamp.org/line-up/2016/265",
+                "names": "Katie Steckles",
+                "may_record": true,
+                "scheduled_time": "2016-08-07 16:50:00",
+                "scheduled_duration": 45,
+                "venue": "Workshop 2"
+            },
+            {
+                "title": "Make your own titanium spork",
+                "description": "Attendees will make their own titanium spork, to their own design, cutting it from sheet and hammering it to shape. No experience required.",
+                "names": "Richard Sewell",
+                "may_record": true,
+                "scheduled_time": "2016-08-07 12:40:00",
+                "scheduled_duration": 240,
+                "venue": "Workshop 2"
+            },
+            {
+                "title": "Enter-tent-ment karaoke",
+                "description": "We've moved the karaoke tent over to Workshop 2 for the last night. Help us drink up the last of the bar and go out in style",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": "2016-08-07 21:30:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 2"
+            },
+            {
+                "title": "Imperfect VR Workshop",
+                "description": "We will build fun, quirky and imperfect Virtual Reality experiences with A-Frame (https://aframe.io/) and Google Cardboard (https://www.google.com/get/cardboard/). A-Frame is a beginner-friendly but capable entity-component framework by Mozilla folks to create VR experiences from markup and code. \r\n\r\nEveryone who can slide a smartphone into a cardboard is welcome for this workshop. I will teach the basics and cover some advanced concepts like coding interactions and components with JavaScript. But mostly you will explore and experiment. \r\n\r\nAfter the workshop everyone should have a good understanding to create their own VR worlds in a few lines of markup/code. Imperfect VR: We are not aiming for a perfect reality but will have fun in the virtual. Cheap 3D assets. Blocky textures. Weird sounds. We want to stumble around the EMF campground with smartphones in our faces. Forget VR mainstream. Motion sickness will not be avoided but guaranteed.\r\n\r\nThe files for the workshop are here: https://github.com/i3games/imperfect-vr\r\n\r\nImperfect VR is inspired by \"Imperfect Cinema\" by Allister Gall / Dan Paolantonio (http://www.imperfectcinema.com/) which is inspired by \"For an imperfect cinema\" by Julio Garc\u00eda Espinosa (http://www.ejumpcut.org/archive/onlinessays/JC20folder/ImperfectCinema.html).\r\n\r\nYou might also watch https://www.youtube.com/watch?v=LuG8ElyirC0.",
+                "names": "Michael Straeubig",
+                "may_record": true,
+                "scheduled_time": "2016-08-07 10:00:00",
+                "scheduled_duration": 150,
+                "venue": "Workshop 2"
+            },
+            {
+                "title": "Skull Radio Workshop",
+                "description": "A soldering workshop where people make a bone conduction kit. It allows the user to bite a medal rod, that sends vibrations via their teeth, jawbone into their inner ear. It allows people to listen to music without the sound travelling via the air. Its a through hole soldering kit.",
+                "names": "Jeffrey Roe",
+                "may_record": true,
+                "scheduled_time": "2016-08-06 19:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 1"
+            },
+            {
+                "title": "Meditation for Hackers",
+                "description": "Applied workshop practicing ~5-7 very different meditation techniques and discussing dozens of variants. Will include discussion of the basic mechanisms and instruction on how to customize to your own preferences.\r\n\r\nNo experience required. Techniques taught include methods that tend to work well for people who find \"emptying your mind\" difficult.\r\n\r\nThis will have no religion, metaphysics, \"woo\", etc \u2014 just practical methods. Techniques taught will not be particular to any \"school\", though people with prior experience will recognize at least one.\r\n\r\nWear comfortable clothing; pee first; turn your electronics off while at the workshop; bring some drink/snack in case you get thirsty or hungry. [If slated outdoors]Bring something comfortable to sit on, as it may be on grass or dirt.[/if] ",
+                "names": "Sai",
+                "may_record": false,
+                "scheduled_time": "2016-08-07 17:50:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 2"
+            },
+            {
+                "title": "A Fresh Look At Mental Health",
+                "description": "A fresh look at mental health will be a hands on, interactive, informal, and fun session where participants should expect to engage in constructive debate, reflect on real patient experiences and share their insights on mental health conditions. Participants will be introduced to key components that make up the mental health system and explore some of the most cutting edge principles that form the foundations of good mental health.",
+                "names": "Andrew Gordon",
+                "may_record": true,
+                "scheduled_time": "2016-08-05 14:10:00",
+                "scheduled_duration": 110,
+                "venue": "Workshop 2"
+            },
+            {
+                "title": "Building an open source political platform",
+                "description": "This is a practical session where interested people can come together to discuss the ideas of open source politics, work together on policy ideas, and maybe even boot up a new political movement for the 21st century. We'll also present some experiences from running on an open source platform in the 2015 general election. We had an unscheduled discussion workshop at the last EMFcamp, and the tent we borrowed was absolutely rammed, so be sure to arrive early!",
+                "names": "James Smith",
+                "may_record": true,
+                "scheduled_time": "2016-08-06 12:50:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 1"
+            },
+            {
+                "title": "Learn to Knit!",
+                "description": "Learn how to knit, up your skill level, or just bring your projects along - we'll have yarn, needles, patterns to try out, and people to help you learn all the tricks.",
+                "names": "Kate Bolin",
+                "may_record": true,
+                "scheduled_time": "2016-08-07 11:50:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 1"
+            },
+            {
+                "title": "Swing Dancing for Engineers",
+                "description": "A beginners swing dance lesson using engineering terms to explain the movements and connections. No technical knowledge required. No dance partner required. If you've two left feet, no problem!",
+                "names": "Jo Franchetti",
+                "may_record": true,
+                "scheduled_time": "2016-08-05 20:30:00",
+                "scheduled_duration": 60,
+                "venue": "Stage C"
+            },
+            {
+                "title": "Running your own cellular network using OpenBSC & Co",
+                "description": "This workshop will demonstrate how to use OsmoBTS, OpenBSC, OsmoNITB, OsmoSGSN and OpenGGSN to run a small, private GSM/GPRS network for research and experimentation purpose.\r\n\r\nUsing such a small/private network you can learn first hand about cellular technology, its protocols, interfaces, network elements and security.\r\n\r\nThe above-mentioned free software is far from new, and has been presented many times at other events before. However, a tutorial with hands-on experience with setting up your own cellular network is still something out of reach of most hackers. Let's try to change that!",
+                "names": "Harald Welte",
+                "may_record": true,
+                "scheduled_time": "2016-08-06 10:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 2"
+            },
+            {
+                "title": "Hebocon (Low-tech robot fight)",
+                "description": "Hebocon is a fight between terrible robots. Scavenge what you can at EMFCamp and bring your gaffer-taped robots to fight. We'll have some boxes of junk to rummage through for parts as well. Aim to lose with flair - winning is an embarrassment!\r\n\r\nIf you'd like to take part, there's more information on the event page: https://wiki.emfcamp.org/wiki/Hebocon",
+                "names": "Jim MacArthur",
+                "may_record": true,
+                "scheduled_time": "2016-08-06 18:10:00",
+                "scheduled_duration": 110,
+                "venue": "Stage C"
+            },
+            {
+                "title": "a smartphone brain-computer interface workshop",
+                "description": "This workshop premiers the world's first \u00a320 brain-smartphone interface, and describes the theory behind it (especially SSVEP).  This is v0.1: we finished soldering the boards on Thursday; we don't know how well they work; the code (currently only for Android) continues to be developed as of Friday.  The workshop's goal is to open the project to a larger community, spurring further development.  At worst, you'll get to walk around wearing tin foil, a bathing cap and electrodes; at best, you'll be able to identify various EEG signals on your phone.  If you can, please bring a POCKET KNIFE and a SMALL SCREWDRIVER.  See http://bit.ly/2axdWku for hardware, software, etc.  (Colin and his sons have run Google Cardboard workshops at EMF 2014, CCC 2015, Tokyo Hackerspace, the Okinawa Institute of Science and Technology and Maker Festival Toronto).",
+                "names": "Colin Rowat",
+                "may_record": false,
+                "scheduled_time": "2016-08-05 19:30:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 1"
+            },
+            {
+                "title": "The One Ring Workshop",
+                "description": "hooray we're on the flyer! So it's probably time to send in the workshop CfP =] Mobile gold- and silversmithee, as seen on previous EMFcamp, Dutch and German hacker camps. We (you!) will make a nice faceted silver ring from scratch, all the basic steps from the first year of the goldsmithing school are involved in this proces. Your smiting style will show itself in the finished ring, hence The One Ring =]",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Kite Mapping Part 2",
+                "description": "this workshop is cancelled as we didn't get photos yesterday, so there's nothing to stitch together.\r\n\r\nif anyone wants to check out the software, it can be found at https://mapknitter.org/",
+                "names": "Linda Sandvik",
+                "may_record": false,
+                "scheduled_time": "2016-08-07 11:10:00",
+                "scheduled_duration": 30,
+                "venue": "Workshop 1"
+            },
+            {
+                "title": "Tracing (U)SIM card communication using Osmocom SIMtrace",
+                "description": "Using the Osmocom SIMtrace hardware/firmware/software, you can perform protocol analysis on the (U)SIM card interface between your phone and the actual card.\r\n\r\nSuch protocol traces can be helpful to learn and understand about the (U)SIM card related protocols, as well as their many obscure features and how those features can become security issues.\r\n\r\nOsmocom SIMtrace is an open hardware project with full schematics + layouts released.  All software, including host software and USB device firmware is released as Free Software.",
+                "names": "Harald Welte",
+                "may_record": true,
+                "scheduled_time": "2016-08-06 15:40:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 2"
+            },
+            {
+                "title": "Introduction to Mixology - making the Old Fashioned cocktail",
+                "description": "The Old Fashioned cocktail is one of the simplest cocktails, yet few people seem to agree on how to make it.  In addition to being delicious, it's an excellent cocktail for learning about a given spirit.  Come learn how to make them yourself and more about Mixology in general.  Materials (yes including booze)  will be provided.",
+                "names": "Ryan Alexander",
+                "may_record": true,
+                "scheduled_time": "2016-08-05 18:20:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 1"
+            },
+            {
+                "title": "backyard optics",
+                "description": "In this workshop we'll go through a few optical components you can build with easily obtainable supplies, including diffraction gratings, integrating spheres, and (hopefully- it's quite difficult to make) even a Fabry-Perot etalon. I'll demonstrate how  to set up a few cool optical experiments, including a physical Fourier Transform, and measuring the speed of light. If anyone's interested, I'll also talk them through the derivation of the speed of light from Maxwell's equations. ",
+                "names": "Dan Weatherill",
+                "may_record": true,
+                "scheduled_time": "2016-08-07 10:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 1"
+            },
+            {
+                "title": "DIY Solar Charger Workshop",
+                "description": "Build your own solar powered charging unit. Two solar PV modules recharge integrated batteries and a regulator circuit ensures smooth 5V DC output. Use it to recharge your devices and power your projects. Learn solar photovoltaic basics. All parts included.",
+                "names": "Matthew Little",
+                "may_record": true,
+                "scheduled_time": "2016-08-06 12:10:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 2"
+            },
+            {
+                "title": "Paper Circuits",
+                "description": "Build simple circuits with just card and copper strip. Ideal from age 3 to 83.",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": "2016-08-07 14:40:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 1"
+            },
+            {
+                "title": "Yarn making 101",
+                "description": "Covering the basics of using a drop spindle to create your own wool yarn.\r\nEach participant will get a kit containing a rudiemntary drop spindle and 50g of wool fibre to spin with, which they can take away with them.\r\n\r\nExtra yarn making workshops will be running at the Nottinghack village all weekend. So if you can't make this one, check our schedule.",
+                "names": "Vicki Winter",
+                "may_record": false,
+                "scheduled_time": "2016-08-06 15:40:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 1"
+            },
+            {
+                "title": "Realtime Web",
+                "description": "We\u2019ll cover a number of ways that we can use realtime data in a webpage, looking at XHR Polling, Server Sent Events and Websockets - seeing the capabilities of each approach, and how to utilise them in a browser.\r\n\r\nThis workshop will be code-together; you\u2019ll need a laptop or tablet with a web browser installed.  We\u2019ll use a web based IDE to code along (or, automatically sync if you want to observe instead).\r\n\r\nWe\u2019ll create things like:\r\n* an animated & synchronised rainbow of colours across our devices\r\n* a virtual flock of birds flying through the room\r\n* a musical instrument that spans across all of our laptops/phones/tablets\r\n* a rudimentary sensor network using our devices to gather data\r\n\r\nYou\u2019ll leave with a better knowledge of realtime web technologies, the things you can do by combining devices, and have everything you need to create your own multi-device interactions.",
+                "names": "Ben Foxall",
+                "may_record": true,
+                "scheduled_time": "2016-08-07 13:30:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 1"
+            },
+            {
+                "title": "Dungeons and Dragons & board games open session",
+                "description": "This is an open session for people interested in playing Dungeons and Dragons and those who would like to run a D&D game. No experience necessary for players. Players are encouraged to bring dice if they have them, an active imagination, and patience for new players!\r\n\r\nSome good quality board games will also be provided if there are not enough DMs to go around (or you can bring your own). \r\n\r\nGames confirmed for the night: \r\n* Catherine running a 5e D&D adventure \"Fire from the Sky\" (6 players)\r\n* Niall running an Apocalypse World tabletop adventure (5-6 players)\r\n* Andrew J running a D&D Castle Ravenloft boardgame (5 players)\r\n* Andrew A running a 5e D&D adventure - a 1st level newbie game or a more advanced game depending on desire (6 players)\r\n* Robin with his custom Awful Green Things from Outer Space set (? players)\r\n\r\nFirst come first served on the night. Non-participating spectators are welcome.\r\n\r\nOther board games on offer for remaining space (if any): Pillars of Eternity: Lords of the Eastern Reach; Codenames; Ascension",
+                "names": "Catherine Flick",
+                "may_record": false,
+                "scheduled_time": "2016-08-06 20:30:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 1"
+            },
+            {
+                "title": "Make your own weather station",
+                "description": "A workshop aimed at 8-16 year olds (but grown up friendly too) that get participants making a set of weather stations to be deployed around site. \r\nTogether, will make 10 arduino weather stations that accurately measure temperature, humidity, barometric pressure, light and rain. We will also make our own wind speed sensors using ping pong balls. \r\nThis interactive bit of kit will be used as a jumping off point to talk about super cool stuff like hyper local weather, climate change, urban heat islands, the effects of different surfaces and practical applications for the Internet of Things. The groups will think about where we might see differences in weather readings across the EMF site and then deploy the stations around the site to test their ideas over the course of the rest of the festival.\r\nWe also plan to automate the data feed from each station so that we can get hourly updates to twitter from different parts of the festival. ",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Surface-mount electronics (SMD) assembly for terrified beginners",
+                "description": "A workshop for people afraid of surface mount assembly/rework. You know those tiny little components in modern electronic devices? It's both possible and easy to assemble those by hand. You can do it, and I'll teach you how. Think you don't have the tools? Think you can't manually place 0402s? Everything is possible with patience and practice. The equipment is minimal and you probably already have it. We're going to build two switch-mode power supplies (one step-up, one step-down) using tiny SMD parts. They're going to work. We'll learn the answer to THERE'S A SHORT ON A TINY PART OMG WHAT NOW? After this, you'll no longer need to be scared of SMD. Avoid caffeine immediately before the workshop, because shaky hands are a disadvantage.",
+                "names": "Kliment",
+                "may_record": true,
+                "scheduled_time": "2016-08-07 15:50:00",
+                "scheduled_duration": 80,
+                "venue": "Workshop 1"
+            },
+            {
+                "title": "Having Daft Ideas",
+                "description": "We've made a lot of daft things, some of which have proved to be quite popular, and we've made and used card-based processes for some of those things.\r\n\r\nWe'll give a short introduction to the background of some of our own daft ideas for collective playthings and computer-propelled art objects, and to semiformal idea-generating processes.\r\n\r\nThen, attendees will use an experimental card-based process to generate new daft ideas, and we'll discuss their practicality and awesomeness. And hope to see some of them in action at EMF2018.",
+                "names": "Libby Miller, Richard Sewell, John Hawkes-Reed",
+                "may_record": true,
+                "scheduled_time": "2016-08-06 10:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 1"
+            },
+            {
+                "title": "The Artists guide to the Deep Learning Galaxy (for any level of experience)",
+                "description": "The brain inspired deep learning algorithms have been a huge success in recent years for major challenges of Artificial Intelligence leading to systems that predict cancer, galaxies, weather, generate poetry or gene sequences. But also made an impact in the art community, when tools for generated art came up first in 2014. To the effect of exhibitions of solely computer generated art.\r\n\r\nIn this workshop, we introduce the attendees to the galaxy of deep learning while not requiring any specific skills in math or programming (about 20-30min). After that, we got plenty of time to get our own hands dirty with a small project in the same field of computer generated images (about 1.5-2h). ",
+                "names": "KRN & MX & OLF",
+                "may_record": true,
+                "scheduled_time": "2016-08-05 16:30:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 2"
+            },
+            {
+                "title": "Kite mapping",
+                "description": "*Notice: this workshop will only run if there is sufficient wind*\r\n\r\nSuitable for ages 5 and up, young children to be accompanied by parents or older siblings.\r\n\r\nPlease bring gloves (sailing/cycling/gardening gloves or any other strong gloves). if you have a large kite (delta kite or similar) you can bring your own.\r\n\r\nQuick introductions and brief sharing of interest in aerial mapping. Brief introduction of  Public Lab, materials, online tool, and the concept of civic science as a kind of science that questions what and how things are. Kite flying basics and safety incl. walking to site. Camera basics incl. attaching to rig . Aerial mapping. Debrief and overview of next steps.",
+                "names": "Linda Sandvik",
+                "may_record": false,
+                "scheduled_time": "2016-08-06 14:00:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 1"
+            },
+            {
+                "title": "Eggshell carving",
+                "description": "Hands on workshop on eggshell carving: describtion and demonstration of the different phases of the process:\r\n\r\n- Learning about the structure, physics and biology of eggshells\r\n- Choosing your eggs\r\n- Blowing and cleaning eggs\r\n- Preparing the design\r\n- Choosing the tools\r\n- Carving\r\n- Finishing\r\n\r\nParticipants will be able to carve their own eggshells and take them home!\r\n",
+                "names": "Rebecca Kleinberger",
+                "may_record": true,
+                "scheduled_time": "2016-08-06 17:20:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 1"
+            },
+            {
+                "title": "35mm pinhole camera building workshop/photo walk",
+                "description": "Assemble and try shooting with a laser cut pinhole camera kit using easy to buy and develop 35mm film. The workshop has already been trialed with great success at Tate Liverpool as part of their Art Gym program in April.\r\n\r\nParticipants will be able to keep their camera although development of the film would likely occur off-site.",
+                "names": "Jame Nixon",
+                "may_record": true,
+                "scheduled_time": "2016-08-05 14:10:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 1"
+            },
+            {
+                "title": "Introduction to Japanese Bookbinding",
+                "description": "A quick introduction to japanese stab binding, a simple and attractive book structure that's easy to make at home. All materials provided and you'll come out with a notebook to record your EMF memories/plan hacks etc. Involves some sharp implements (craft knives, awls), so younger EMFers should be accompanied by a parent.",
+                "names": "Ben Dornan",
+                "may_record": true,
+                "scheduled_time": "2016-08-05 16:30:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 1"
+            },
+            {
+                "title": "Satellite microkit: Taking the microbit to the final frontier",
+                "description": "The satellite microkit is an add-on to the BBC microbit. It turns the microbit into a data logger for a wide range of activities and experiments. We are looking for help to build an inspirational portfolio of activities to engage young people in a scientific/technical education and career path.",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Go workshop and open discussion",
+                "description": "We'll learn how to play Go and discuss AI related to Go",
+                "names": "Steven Gravell",
+                "may_record": false,
+                "scheduled_time": "2016-08-07 17:20:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 1"
+            },
+            {
+                "title": "Musification",
+                "description": "Musification workshop introduces participants to everyday sounds as materials for musical expression. The focus of this workshop is on using electroacoustic technology developed at the MIT Media Lab to transform everyday sounds into musical medium and to use them to create new instruments and performances. Participants will use sound augmentation toolkits provided as a starting point to interact with everyday sounds to generate ideas for new musical instruments and performances. \r\n\r\nAs part of the workshop attendees will be able to build their own transducer module to convert things into audio sources. The goal of the workshop is for participants to perform their musical pieces created during the workshop.\r\n",
+                "names": "Akito van Troyer",
+                "may_record": true,
+                "scheduled_time": "2016-08-06 18:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 2"
+            }
+        ],
+        "counts": {
+            "needs_help": {
+                "false": 55,
+                "true": 15
+            },
+            "needs_money": {
+                "false": 70
+            },
+            "needs_laptop": {
+                "false": 48,
+                "true": 1,
+                "null": 21
+            },
+            "one_day": {
+                "false": 69,
+                "true": 1
+            },
+            "notice_required": {
+                "> 1 month": 7,
+                "1 month": 23,
+                "1 week": 40
+            },
+            "may_record": {
+                "false": 25,
+                "true": 24,
+                "null": 21
+            },
+            "state": {
+                "accepted": 7,
+                "cancelled": 11,
+                "finished": 30,
+                "locked": 3,
+                "manual-review": 5,
+                "rejected": 14
+            },
+            "created_week": {
+                "2016-01-11": 5,
+                "2016-01-18": 4,
+                "2016-01-25": 1,
+                "2016-02-01": 4,
+                "2016-02-08": 2,
+                "2016-02-15": 2,
+                "2016-02-29": 1,
+                "2016-03-07": 2,
+                "2016-03-14": 2,
+                "2016-04-18": 4,
+                "2016-04-25": 3,
+                "2016-05-09": 1,
+                "2016-05-16": 2,
+                "2016-05-23": 2,
+                "2016-05-30": 2,
+                "2016-06-06": 4,
+                "2016-06-13": 5,
+                "2016-06-20": 5,
+                "2016-06-27": 6,
+                "2016-07-04": 1,
+                "2016-07-11": 1,
+                "2016-07-18": 4,
+                "2016-07-25": 1,
+                "2016-08-01": 6
+            }
+        },
+        "edits": {
+            "title": {
+                "avg": 1.21,
+                "max": 3
+            },
+            "description": {
+                "avg": 2.04,
+                "max": 12
+            },
+            "requirements": {
+                "avg": 1.30,
+                "max": 3
+            },
+            "length": {
+                "avg": 1.01,
+                "max": 2
+            },
+            "notice_required": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "needs_help": {
+                "avg": 1.01,
+                "max": 2
+            },
+            "needs_money": {
+                "avg": 1.41,
+                "max": 2
+            },
+            "one_day": {
+                "avg": 1.43,
+                "max": 2
+            },
+            "has_rejected_email": {
+                "avg": 1.71,
+                "max": 3
+            },
+            "published_names": {
+                "avg": 2.14,
+                "max": 4
+            },
+            "arrival_period": {
+                "avg": 2.14,
+                "max": 4
+            },
+            "departure_period": {
+                "avg": 2.14,
+                "max": 4
+            },
+            "telephone_number": {
+                "avg": 2.04,
+                "max": 3
+            },
+            "may_record": {
+                "avg": 2.03,
+                "max": 3
+            },
+            "needs_laptop": {
+                "avg": 1.71,
+                "max": 3
+            },
+            "available_times": {
+                "avg": 2.13,
+                "max": 3
+            },
+            "attendees": {
+                "avg": 1.03,
+                "max": 2
+            },
+            "cost": {
+                "avg": 1.09,
+                "max": 3
+            },
+            "size": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "funds": {
+                "avg": 1.00,
+                "max": 1
+            }
+        }
+    }
+}

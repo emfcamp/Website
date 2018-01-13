@@ -1,0 +1,2124 @@
+{
+    "events": [
+        {
+            "source_id": 1,
+            "uid": "7ejs324pf5ifb56ir9me17856g@google.com",
+            "start_dt": "2016-08-06 15:45:00",
+            "end_dt": "2016-08-06 17:45:00",
+            "summary": "CoderDojo",
+            "description": "CoderDojo is an international network of independent, volunteer-led computer programming clubs for young people. At this workshop, run by two existing CoderDojo volunteer mentors from Buckinghamshire, participants can work on a choice of guided projects in Scratch or HTML, or can come up with their own project to pursue (in any language, though only Scratch and HTML can be mentor-supported) if preferred. \n\nAnyone interested in becoming a CoderDojo mentor in their own area is also welcome to come along for a chat.\n\nAge range: 7-12 (must have an adult helper)\nEquipment needed: Every attendee must have a laptop that they can install some coding software e.g. Scratch on. \nNumber of attendees: Max. 15\n",
+            "location": "Workshop 3",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 1,
+            "uid": "5gnqpnvh9fefei46elr3e8smnc@google.com",
+            "start_dt": "2016-08-06 14:15:00",
+            "end_dt": "2016-08-06 15:15:00",
+            "summary": "UV torches trail",
+            "description": "Create your own UV torch before using it on our UV torches trail around the EMF camp site (trail available at any time but best done in the evening if possible). \n\nAge range: Approx. 5-16 (adult/parent's will need to help with the instructions)\nEquipment needed: None, everything will be provided. \nNumber of attendees: There are 100 kits available but there is a limit of 30 people in the workshop tent at a time. ",
+            "location": "Workshop 3",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 1,
+            "uid": "7quvlcitkab49v5pdf1paf95t0@google.com",
+            "start_dt": "2016-08-07 16:00:00",
+            "end_dt": "2016-08-07 17:30:00",
+            "summary": "Cryptography",
+            "description": "What is the history of Cryptography? How people shared secrets before computers? What is an enigma machine and how does it work? All the answers at this workshop!\n\nAge range: 11+\nEquipment needed: None\nNumber of attendees: Max. 25",
+            "location": "Workshop 3",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 1,
+            "uid": "5bvdosk7i6e1ep7j0s0r385pn4@google.com",
+            "start_dt": "2016-08-07 16:30:00",
+            "end_dt": "2016-08-07 17:30:00",
+            "summary": "EMF Olympic sailing event",
+            "description": "As the Olympic Games gets underway, join us for our own miniature EMF Olympic sailing event. Choose a nation, build them a sailboat and then race them across the 'sea'. Please note: this workshop will be taking place outside Workshop 3, therefore if we experience bad weather it may not be possible to go ahead. \n\nAge range: Approx. 4-16 (adult/parental supervision needed for under 11's)\nEquipment needed: None\nNumber of attendees: Max. 30",
+            "location": "Outside workshop 3",
+            "favourite_count": 3
+        },
+        {
+            "source_id": 1,
+            "uid": "mj9ucnv6ei8cv44806o1h725js@google.com",
+            "start_dt": "2016-08-06 12:15:00",
+            "end_dt": "2016-08-06 13:45:00",
+            "summary": "Pom Poms",
+            "description": "Sarah from PomPomPlanet shows us how to make the perfect pom pom.\n\nAge range: Approx. 3-16 (adult/parental supervision needed for under 11's)\nEquipment needed: None\nNumber of attendees: Max. 30 (including adult helpers)",
+            "location": "Workshop 3",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 1,
+            "uid": "jhbictgqc7tch6csjcqkk5h7mk@google.com",
+            "start_dt": "2016-08-05 18:15:00",
+            "end_dt": "2016-08-05 20:15:00",
+            "summary": "Programming 101 with Lego Mindstorms robots",
+            "description": "An introduction to programming: Choose a Lego Mindstorms robot and programme it to help you solve a problem. \n\nAge range: 9-16 (adult/parental supervision needed for under 11's)\nEquipment needed: None\nNumber of attendees: Max. 16",
+            "location": "Workshop 3",
+            "favourite_count": 3
+        },
+        {
+            "source_id": 1,
+            "uid": "8mbg6kbg5ckop9jqprfns6p70g@google.com",
+            "start_dt": "2016-08-05 16:00:00",
+            "end_dt": "2016-08-05 19:00:00",
+            "summary": "Make a weather station",
+            "description": "Help make a set of Arduino-powered weather stations that will accurately measure temperature, humidity, barometric pressure, light, rain & wind speed. Then set off on an expedition around the EMF camp to set up the weather stations. You can follow their hourly weather updates through Twitter throughout the festival.  \n\nAge range: 8-16 year olds (adult/parental supervision needed for under 11's)\nEquipment needed: None\nNumber of attendees: Max. 30 (including parent helpers)",
+            "location": "Workshop 3",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 1,
+            "uid": "7c08q8spi1nml5u6pkl8mekouc@google.com",
+            "start_dt": "2016-08-05 14:30:00",
+            "end_dt": "2016-08-05 15:30:00",
+            "summary": "Bubble Trouble",
+            "description": "Who can make the biggest bubble? Whose will last the longest before it pops? Join us to make your own bubble blowers and get into some bubble trouble!\n\nAge range: Approx. 3-16 (adult/parental supervision needed for under 11's)\nEquipment needed: None\nNumber of attendees: Max. 30 (including parent helpers)",
+            "location": "Workshop 3",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 1,
+            "uid": "29dvslec71on7m0rlaub0jull0@google.com",
+            "start_dt": "2016-08-07 09:45:00",
+            "end_dt": "2016-08-07 11:45:00",
+            "summary": "Bridge building competition",
+            "description": "Join in this family-friendly competition where you will work in teams and compete to build the strongest bridge. Engineering theory and building materials will be provided to help you during construction. Who will win the prize?\n\nAge range: 7-16 (adult/parental help needed for under 11's)\nEquipment needed: None\nNumber of attendees: Max. 30 (including adults)",
+            "location": "Workshop 3",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 1,
+            "uid": "jpgj1pc79e23s7tc0qglv169r4@google.com",
+            "start_dt": "2016-08-07 14:30:00",
+            "end_dt": "2016-08-07 15:30:00",
+            "summary": "Make a moving robot out of rubbish with The Crafty Robot",
+            "description": "Make your own USB powered rechargeable moving robot with a Fizzbit and some household and packaging materials. Bring your best craft skills for some high-creativity low-tech robot building fun.\n\nAge range: 7-16 (adult/parental supervision needed for under 11's)\nEquipment needed: None\nNumber of attendees: Max. 30 (including adult helpers)",
+            "location": "Workshop 3",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 1,
+            "uid": "kvt3m8m78920qtc34mrpjeo76c@google.com",
+            "start_dt": "2016-08-06 18:15:00",
+            "end_dt": "2016-08-06 20:15:00",
+            "summary": "Sonic Pi: Making music using computer code",
+            "description": "Sonic Pi is a computer program for making all kinds of music using computer code. Learn to code creatively by composing or performing music in an incredible range of styles from classical to algorave. \n\nAge range: 10-16\nEquipment needed: Every attendee must have a laptop and some headphones if possible. It would be useful if participants can download and install Sonic Pi in advance from http://sonic-pi.net/\nNumber of attendees: Max. 15",
+            "location": "Workshop 3",
+            "favourite_count": 3
+        },
+        {
+            "source_id": 1,
+            "uid": "kjjasov3a32qp47p4c4h6g7adg@google.com",
+            "start_dt": "2016-08-07 18:00:00",
+            "end_dt": "2016-08-07 20:00:00",
+            "summary": "Programming 101 with Lego Mindstorms robots",
+            "description": "An introduction to programming: Choose a Lego Mindstorms robot and programme it to help you solve a problem. \n\nAge range: 9-16\nEquipment needed: None\nNumber of attendees: Max. 16",
+            "location": "Workshop 3",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 1,
+            "uid": "3tkqe678u6lo959h3mt4ntlm88@google.com",
+            "start_dt": "2016-08-07 12:30:00",
+            "end_dt": "2016-08-07 14:00:00",
+            "summary": "Draw. Write. Play. ",
+            "description": "Games, challenges and techniques to get us back to basics with the right side of our brains. Explore imagination, intuition and creativity through playing with drawing and writing.\n\nAge range: 4-16 (adult/parental supervision needed for under 11's)\nEquipment needed: None\nNumber of attendees: Max. 20",
+            "location": "Workshop 3",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 1,
+            "uid": "rh9n4h3o05gsjun0ofiom49kmk@google.com",
+            "start_dt": "2016-08-06 12:30:00",
+            "end_dt": "2016-08-06 13:30:00",
+            "summary": "Geocaching walk",
+            "description": "Geocaching is a real-world, outdoor treasure hunting game using GPS-enabled devices and is great for all players of all ages. Participants navigate to a specific set of GPS coordinates and then attempt to find the geocache (container) hidden at that location. Join us for an introduction to the sport, and then head on out into the campsite to locate our specially placed EMF caches. Can you find them all?\n\nAge range: Open to all (adults included)\nEquipment needed: A smart phone or GPS device. \nNumber of attendees: Max. 50\n\n",
+            "location": "Meet outside Workshop 3",
+            "favourite_count": 1
+        },
+        {
+            "source_id": 1,
+            "uid": "pnt5mg5u732bngh4b7nqho5qto@google.com",
+            "start_dt": "2016-08-06 10:30:00",
+            "end_dt": "2016-08-06 12:00:00",
+            "summary": "DIY Marble run",
+            "description": "Come and play with our amazing marble run. Available all weekend from this time. \n\nAge range: Open to all (adults included)\nEquipment needed: None but do feel free to bring things to add to the marble run. \nNumber of attendees: As many as can fit around the run. ",
+            "location": "Outside Workshop 3 tent",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 1,
+            "uid": "18mcqlpereg4l76s5cvr4itr7s@google.com",
+            "start_dt": "2016-08-06 09:45:00",
+            "end_dt": "2016-08-06 11:45:00",
+            "summary": "3D print your own key tag",
+            "description": "Customise your own key tag and watch, as your design becomes reality using a 3D printer. \n\nAge range: 10-14\nEquipment needed: None\nNumber of attendees: Max. 18 (Workshop will run 3 times with 6 people per workshop, sign up at 9:40 for your timed session)\n",
+            "location": "Workshop 3",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 2,
+            "uid": "oghsel62nn9drphhohnusmjlhk@google.com",
+            "start_dt": "2016-08-05 21:45:00",
+            "end_dt": "2016-08-05 22:45:00",
+            "summary": "DJ Tasmo",
+            "description": "Beats with an Underscore\nA dj set with well selected drums and basses and some drops in between\n(like in https://hearthis.at/tasmo/tasmo-beats-mit-unterstrich-rpten/)",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 2,
+            "uid": "sevg2263mipt36aereq273p664@google.com",
+            "start_dt": "2016-08-06 23:00:00",
+            "end_dt": "2016-08-06 23:45:00",
+            "summary": "Gasman",
+            "description": "Gasman's ZX Spectrum Chiptune Extravaganza (The Revenge)\nA chip music performance featuring retro video game melodies, pop anthems and searing keytar solos from the world's foremost ZX Spectrum rock star.",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 2,
+            "uid": "g9e2h4id90she7aao8t8e4hrho@google.com",
+            "start_dt": "2016-08-07 21:00:00",
+            "end_dt": "2016-08-07 21:45:00",
+            "summary": "Metalogue",
+            "description": "Metalogue combines cinematic sound design with elements of industrial, IDM, ambient, and experimental electronic sub-genres. Metalogue's music is available at metalogue.bandcamp.com",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 2,
+            "uid": "ih6fouvu2r772ott58c3e7jvog@google.com",
+            "start_dt": "2016-08-06 22:00:00",
+            "end_dt": "2016-08-06 23:00:00",
+            "summary": "Shirty Music",
+            "description": "Exploring new ways of performing with a homemade laser drum kit that visually turns movement into sound. \nhttp://www.shirtymusic.com/",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 2,
+            "uid": "oa5g9155ufc5sqt0q9iu11t8mo@google.com",
+            "start_dt": "2016-08-06 21:00:00",
+            "end_dt": "2016-08-06 21:45:00",
+            "summary": "8 Bit Beats",
+            "description": "A DJ set of game/tech-culture related dance tracks, in the range of electro/house, veering occasionally into dubstep/drum and bass. Chip tunes, remixes, mashups will all show their pixellated faces.\n",
+            "location": "Stage A",
+            "favourite_count": 4
+        },
+        {
+            "source_id": 2,
+            "uid": "e6l2d4hql0he2aav47shihpo50@google.com",
+            "start_dt": "2016-08-05 23:00:00",
+            "end_dt": "2016-08-05 23:45:00",
+            "summary": "2xAA Plays More Gameboys",
+            "description": "Music event all played from Game Boys.\nMore house this time as I'm using Game Boy Advances rather than the original Game Boy.",
+            "location": "Stage A",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 2,
+            "uid": "c3sf312arkue9aj97fhusci2tk@google.com",
+            "start_dt": "2016-08-05 20:45:00",
+            "end_dt": "2016-08-05 21:30:00",
+            "summary": "Riotmiloo",
+            "description": "\nRiotmiloo's musical roots come from riotgrrrl\u2019s screams and protest. Using Industrial and electronic sounds, she creates a cathartic and hypnotic rhythm and noise experience. www.riotmiloo.co.uk",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 2,
+            "uid": "eqd5tujaic2fki91ll3g5e0o54@google.com",
+            "start_dt": "2016-08-07 22:00:00",
+            "end_dt": "2016-08-07 22:45:00",
+            "summary": "2xAA VS Gasman",
+            "description": "2xAA and Gasman simultaneously take the stage, seeing EMF 2016 to a close.",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 3,
+            "uid": "0EA9D824-1C62-4D2B-9584-635A2B31AE9A",
+            "start_dt": "2016-08-05 20:30:00",
+            "end_dt": "2016-08-05 23:00:00",
+            "summary": "Film Festival - The Internet's Own Boy",
+            "description": "The story of programming prodigy and information activist Aaron Swartz. From Swartz's help in the development of the basic internet protocol RSS to his co-founding of Reddit, his fingerprints are all over the internet. But it was Swartz's groundbreaking work in social justice and political organising combined with his aggressive approach to information access that ensnared him in a two year legal nightmare. It was a battle that ended with the taking of his own life at the age of 26. Aaron's story touched a nerve with people far beyond the online communities in which he was a celebrity. This film is a personal story about what we lose when we are tone deaf about technology and its relationship to our civil liberties. Source: IMDB\n",
+            "location": "None",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 3,
+            "uid": "34AF6BB3-C07F-42FB-B30C-993656558893",
+            "start_dt": "2016-08-07 20:30:00",
+            "end_dt": "2016-08-07 23:00:00",
+            "summary": "Film Festival - Sita Sings The Blues",
+            "description": "A dazzling, surprising and sometimes hilarious animation in three different styles that interprets a ancient Indian story. Roger Ebert declared \u201cI was enchanted. I was swept away\u201d.\n\nSita is a Hindu goddess, the leading lady of India\u2019s epic the Ramayana and a dutiful wife who follows her husband Rama on a 14 year exile to a forest, only to be kidnapped by an evil king from Sri Lanka.  Despite remaining faithful to her husband, Sita is put through many tests. Nina (the filmmaker Nina Paley herself) is an artist who finds parallels in Sita\u2019s life when her husband \u2013 in India on a work project - decides to break up their marriage and dump her via email. Three hilarious Indonesian shadow puppets with Indian accents \u2013 linking the popularity of the Ramayana from India all the way to the Far East - narrate both the ancient tragedy and modern comedy in this beautifully animated interpretation of the epic.\n\nIn her first feature length film, Paley juxtaposes multiple narrative and visual styles to create a highly entertaining yet moving vision of the Ramayana. Musical numbers choreographed to the 1920's jazz vocals of Annette Hanshaw feature a cast of hundreds: flying monkeys, evil monsters, gods, goddesses, warriors, sages, and winged eyeballs. A tale of truth, justice and a woman\u2019s cry for equal treatment. Sita Sings the Blues earns its tagline as \\\"The Greatest Break-Up Story Ever Told.\u201d From: www.sitasingstheblues.com",
+            "location": "None",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 3,
+            "uid": "AEE8C554-8EA7-46FA-8B8F-49F20618B66A",
+            "start_dt": "2016-08-06 20:30:00",
+            "end_dt": "2016-08-06 23:00:00",
+            "summary": "Film Festival - B2B: The Amiga Years! With Director's Talk / Q&A",
+            "description": "* Featuring introduction & Q&A by directors Anthony & Nicola Caulfield *\n\nNewly released, The Amiga Years! follows on from Anthony & Nicola Caulfield\u2019s first film. Here they discover How the Commodore Amiga helped influence a generation of Developers to take Video Gaming to a whole new level.\n\nFrom Bedrooms to Billions: The Amiga Years! is a feature film documentary that explores the influence of the Commodore Amiga and how it influenced a generation of developers to take video game development, music and publishing to a whole new level which then changed the video game industry forever!\u00a0\n\u00a0\nThis film, which is the sequel to the acclaimed 'From Bedrooms to Billions' (2014) looks at the creation of the now legendary Commodore Amiga a remarkable and very personal tale told by the surviving team members themselves. The film then goes onto explore how once released in 1985 the Commodore Amiga helped evolve the video games industry as a whole new set of \u00a0games and experiences were possible thanks to its incredible custom hardware. Many of these styles of games, music and demos as well as development techniques honed during the Amiga era are still present in the video games industry we know today.\n",
+            "location": "None",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "p81ujrapsro7lhrsrpg1ed0em0@google.com",
+            "start_dt": "2016-08-07 12:00:00",
+            "end_dt": "2016-08-07 15:00:00",
+            "summary": "Workshops - live coding + DIY synths",
+            "description": "Live coding with Tidal and possibly other environments\nSynth building - Rock Drill 4069 group build and ensemble performance\n+ quite possibly more!",
+            "location": "",
+            "favourite_count": 1
+        },
+        {
+            "source_id": 4,
+            "uid": "rqec5f9boo7es4e1r33o75m07c@google.com",
+            "start_dt": "2016-08-07 00:00:00",
+            "end_dt": "2016-08-07 02:00:00",
+            "summary": "Headphone session",
+            "description": "",
+            "location": "",
+            "favourite_count": 9
+        },
+        {
+            "source_id": 4,
+            "uid": "jc23d6b4cc9mlbdj4ve2lv71ms@google.com",
+            "start_dt": "2016-08-07 18:00:00",
+            "end_dt": "2016-08-07 23:00:00",
+            "summary": "Live performances",
+            "description": "Line-up to follow",
+            "location": "",
+            "favourite_count": 2
+        },
+        {
+            "source_id": 4,
+            "uid": "vqbiv98qj68nrrao1phmuj9j3k@google.com",
+            "start_dt": "2016-08-06 12:00:00",
+            "end_dt": "2016-08-06 15:00:00",
+            "summary": "Live coding workshops",
+            "description": "Learn about languages like supercollider, foxdot, gibber and tidalcycles. Bring a laptop (or come and watch).",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "nj03e93el5t2bm48l327k3m45g@google.com",
+            "start_dt": "2016-08-06 00:00:00",
+            "end_dt": "2016-08-06 02:00:00",
+            "summary": "Headphone session",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "6b9qoajkl0saq0rpln7iup411g@google.com",
+            "start_dt": "2016-08-06 17:00:00",
+            "end_dt": "2016-08-07 00:00:00",
+            "summary": "Live performances",
+            "description": "Line-up to follow",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "ocgpqb7ukf2cgdk652s8u3870g@google.com",
+            "start_dt": "2016-08-05 17:00:00",
+            "end_dt": "2016-08-06 00:00:00",
+            "summary": "Live performances",
+            "description": "Line-up to follow",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "25ke5k2ghhog6ire87el2ct9pc@google.com",
+            "start_dt": "2016-08-06 18:45:00",
+            "end_dt": "2016-08-06 19:20:00",
+            "summary": "Claudius Maximus",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "36bhftmbe6ml7frdalnte283uo@google.com",
+            "start_dt": "2016-08-06 18:10:00",
+            "end_dt": "2016-08-06 18:45:00",
+            "summary": "Les Hutchins",
+            "description": "",
+            "location": "",
+            "favourite_count": 2
+        },
+        {
+            "source_id": 4,
+            "uid": "0ojtmsvfen9p78bj6glcae80nk@google.com",
+            "start_dt": "2016-08-06 17:35:00",
+            "end_dt": "2016-08-06 18:10:00",
+            "summary": "Medial Ages",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "6uodb7bglqnlnv4iae47q93838@google.com",
+            "start_dt": "2016-08-06 17:00:00",
+            "end_dt": "2016-08-06 17:35:00",
+            "summary": "Simon+Evan",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "e7ed4r94i7a0f1a6832brqmdk4@google.com",
+            "start_dt": "2016-08-06 20:30:00",
+            "end_dt": "2016-08-06 21:05:00",
+            "summary": "REPL Electric",
+            "description": "",
+            "location": "",
+            "favourite_count": 1
+        },
+        {
+            "source_id": 4,
+            "uid": "r2ct72r8gkfnacr28f9qfgqmvk@google.com",
+            "start_dt": "2016-08-06 19:55:00",
+            "end_dt": "2016-08-06 20:30:00",
+            "summary": "aalleexx",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "k9udcbakqf9okdlnr50p8m8p6g@google.com",
+            "start_dt": "2016-08-06 19:20:00",
+            "end_dt": "2016-08-06 19:55:00",
+            "summary": "Martin Klang",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "3voh9sc00fojtvjbc8rre50400@google.com",
+            "start_dt": "2016-08-06 23:25:00",
+            "end_dt": "2016-08-07 00:00:00",
+            "summary": "UIAESK!",
+            "description": "",
+            "location": "",
+            "favourite_count": 2
+        },
+        {
+            "source_id": 4,
+            "uid": "80iaq079gu6jauvqh1p3s5srcs@google.com",
+            "start_dt": "2016-08-06 22:50:00",
+            "end_dt": "2016-08-06 23:25:00",
+            "summary": "Qirky",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "hds6284rfba3b26m8cts9dhh5k@google.com",
+            "start_dt": "2016-08-06 22:15:00",
+            "end_dt": "2016-08-06 22:50:00",
+            "summary": "2xaa",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "bhio66gdapg26sfgu37of6taik@google.com",
+            "start_dt": "2016-08-06 21:40:00",
+            "end_dt": "2016-08-06 22:15:00",
+            "summary": "Lil data",
+            "description": "",
+            "location": "",
+            "favourite_count": 4
+        },
+        {
+            "source_id": 4,
+            "uid": "hbqtv62gegjo9f857hoatfscq8@google.com",
+            "start_dt": "2016-08-06 21:05:00",
+            "end_dt": "2016-08-06 21:40:00",
+            "summary": "Adam Williams",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "h405cjachto421h4msid6pmab8@google.com",
+            "start_dt": "2016-08-07 15:00:00",
+            "end_dt": "2016-08-07 16:00:00",
+            "summary": "Drone jam - bring a drone",
+            "description": "Bring a drone-making device of some kind for a group improvisation",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "5easjk62nr7p90vmess3hemmr8@google.com",
+            "start_dt": "2016-08-07 23:00:00",
+            "end_dt": "2016-08-08 00:00:00",
+            "summary": "Headphone party",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 5,
+            "uid": "event-1@mscroggs.co.uk",
+            "start_dt": "2016-08-05 15:40:00",
+            "end_dt": "2016-08-05 15:45:00",
+            "summary": "Test event",
+            "description": "At this event, we will test our Twitter bot.",
+            "location": "The Maths Village marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 5,
+            "uid": "event-2@mscroggs.co.uk",
+            "start_dt": "2016-08-05 20:00:00",
+            "end_dt": "2016-08-05 23:59:00",
+            "summary": "Maths Jam",
+            "description": "An evening of maths discussion and puzzles, like Maths Jam (http://mathsjam.com). With regular trips to the bar to buy more beer.",
+            "location": "The Maths Village marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 5,
+            "uid": "event-3@mscroggs.co.uk",
+            "start_dt": "2016-08-05 20:15:00",
+            "end_dt": "2016-08-05 22:00:00",
+            "summary": "Hyperbolic crochet workshop",
+            "description": "We will teach you how to make hyperbolic surfaces using crochet. No prior ability to crochet required.",
+            "location": "The Maths Village marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 5,
+            "uid": "event-4@mscroggs.co.uk",
+            "start_dt": "2016-08-05 20:30:00",
+            "end_dt": "2016-08-05 23:00:00",
+            "summary": "Flexagon making",
+            "description": "We will make flexagons. Drop in any time this evening, they don't take very long.",
+            "location": "The Maths Village marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 5,
+            "uid": "event-5@mscroggs.co.uk",
+            "start_dt": "2016-08-06 09:00:00",
+            "end_dt": "2016-08-06 10:00:00",
+            "summary": "Morning yoga",
+            "description": "Disclaimer: not maths",
+            "location": "The Maths Village marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 5,
+            "uid": "event-6@mscroggs.co.uk",
+            "start_dt": "2016-08-06 10:30:00",
+            "end_dt": "2016-08-06 11:00:00",
+            "summary": "First aid workshop",
+            "description": "We will show you how to perform CPR on a dummy. This is for fun and is obviously not actual first aid training.\nDisclaimer: not maths",
+            "location": "The Maths Village marquee",
+            "favourite_count": 1
+        },
+        {
+            "source_id": 5,
+            "uid": "event-7@mscroggs.co.uk",
+            "start_dt": "2016-08-06 11:00:00",
+            "end_dt": "2016-08-06 11:30:00",
+            "summary": "Suturing (stitching) workshop",
+            "description": "Learn how to put medical style stiches into pork belly. Useful for fixing clothes or multiple bird roasts. This is for fun and is obviously not actual medical training.\nDisclaimer: not maths",
+            "location": "The Maths Village marquee",
+            "favourite_count": 3
+        },
+        {
+            "source_id": 5,
+            "uid": "event-8@mscroggs.co.uk",
+            "start_dt": "2016-08-06 11:30:00",
+            "end_dt": "2016-08-06 12:00:00",
+            "summary": "Suturing (stitching) workshop",
+            "description": "Learn how to put medical style stiches into pork belly. Useful for fixing clothes or multiple bird roasts. This is for fun and is obviously not actual medical training.\nDisclaimer: not maths",
+            "location": "The Maths Village marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 5,
+            "uid": "event-9@mscroggs.co.uk",
+            "start_dt": "2016-08-06 21:00:00",
+            "end_dt": "2016-08-06 23:00:00",
+            "summary": "Giant Cards Against Humanity game",
+            "description": "Giant Cards Against Humanity game",
+            "location": "The Maths Village marquee",
+            "favourite_count": 8
+        },
+        {
+            "source_id": 5,
+            "uid": "event-10@mscroggs.co.uk",
+            "start_dt": "2016-08-07 08:00:00",
+            "end_dt": "2016-08-07 09:00:00",
+            "summary": "Morning yoga",
+            "description": "Disclaimer: not maths",
+            "location": "The Maths Village marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 5,
+            "uid": "event-11@mscroggs.co.uk",
+            "start_dt": "2016-08-07 10:00:00",
+            "end_dt": "2016-08-07 11:00:00",
+            "summary": "The Maths of poker",
+            "description": "Basic mathematics and game theory of poker for beginners. We can have a game at the end if people want.",
+            "location": "The Maths Village marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 5,
+            "uid": "event-12@mscroggs.co.uk",
+            "start_dt": "2016-08-07 11:00:00",
+            "end_dt": "2016-08-07 11:20:00",
+            "summary": "Cauchy's functional equation",
+            "description": "An interactive session investigating solutions to Cauchy's functional equation (f(x+y)=f(x)+f(y)).",
+            "location": "The Maths Village marquee",
+            "favourite_count": 12
+        },
+        {
+            "source_id": 7,
+            "uid": "uniir9q60ae45g7n4olt6ceoms@google.com",
+            "start_dt": "2016-08-05 19:25:00",
+            "end_dt": "2016-08-05 19:40:00",
+            "summary": "ISS Pass",
+            "description": "Date Start Alt Az Highest Alt Az End Alt Az Pass type\n05 Aug 19:30:38 10\u00b0 SW 19:33:50 51\u00b0 SSE 19:37:01 10\u00b0 E daylight \n\nhttps://wiki.emfcamp.org/wiki/Village:Amateur_Radio ",
+            "location": "Radio Village",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 8,
+            "uid": "esjl51toc6gdtnekkgi8jvjd54@google.com",
+            "start_dt": "2016-08-07 20:30:00",
+            "end_dt": "2016-08-08 00:00:00",
+            "summary": "Lights!",
+            "description": "Come see a load of lights, potentially user-controlled, maybe synchronised to music, maybe just \"on\". ",
+            "location": "Hacking Hamlet Village - Camping Field A",
+            "favourite_count": 1
+        },
+        {
+            "source_id": 8,
+            "uid": "05p3h4fa583hlosd1viqmvdgvo@google.com",
+            "start_dt": "2016-08-06 20:30:00",
+            "end_dt": "2016-08-07 00:00:00",
+            "summary": "Lights!",
+            "description": "Come see a load of lights, potentially user-controlled, maybe synchronised to music, maybe just \"on\". ",
+            "location": "Hacking Hamlet Village - Camping Field A",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 8,
+            "uid": "gc5d797legc3o22701cg8gm1oc@google.com",
+            "start_dt": "2016-08-05 20:30:00",
+            "end_dt": "2016-08-06 00:00:00",
+            "summary": "Lights!",
+            "description": "Come see a load of lights, potentially user-controlled, maybe synchronised to music, maybe just \"on\". ",
+            "location": "Hacking Hamlet Village - Camping Field A",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 8,
+            "uid": "s4svlph53s3882i3ij8nr1kgcs@google.com",
+            "start_dt": "2016-08-06 13:30:00",
+            "end_dt": "2016-08-06 14:30:00",
+            "summary": "CANCELLED - Pizzas",
+            "description": "Sorry, no pizzas today!",
+            "location": "The Hacking Hamlet Village (Camping Field A)",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 8,
+            "uid": "sd2lgfj0p28cfsvu09mng46vuo@google.com",
+            "start_dt": "2016-08-05 14:00:00",
+            "end_dt": "2016-08-05 15:00:00",
+            "summary": "Pizzas",
+            "description": "After a morning of setting up tents and connecting up to the EMF network, come and grab a pizza for lunch after the opening ceremony. We're cooking stone-baked pizzas in a wood-fired oven with a selection of toppings. \nFirst-come, first-served. ",
+            "location": "The Hacking Hamlet Village (Camping Field A)",
+            "favourite_count": 2
+        },
+        {
+            "source_id": 8,
+            "uid": "63j46rs0tlgpqmmds3qoa3g6ac@google.com",
+            "start_dt": "2016-08-06 21:51:00",
+            "end_dt": "2016-08-06 21:56:00",
+            "summary": "ISS Pass",
+            "description": "Mat is hoping to relay a message with GB4EMF callsign to the ISS during the event.",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 8,
+            "uid": "imm81j6nt7k7t56ch1g7ghrtpg@google.com",
+            "start_dt": "2016-08-05 22:43:00",
+            "end_dt": "2016-08-05 22:47:00",
+            "summary": "ISS Pass",
+            "description": "Mat is hoping to relay a message with GB4EMF callsign to the ISS during the event.",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 8,
+            "uid": "d13e78ebtq8gvvkoeaccr1ldo8@google.com",
+            "start_dt": "2016-08-05 21:11:00",
+            "end_dt": "2016-08-05 21:13:00",
+            "summary": "ISS Pass",
+            "description": "Mat is hoping to relay a message with GB4EMF callsign to the ISS during the event.",
+            "location": "",
+            "favourite_count": 2
+        },
+        {
+            "source_id": 9,
+            "uid": "k52faga80qdrppc1gc96uo6sjk@google.com",
+            "start_dt": "2016-08-05 12:00:00",
+            "end_dt": "2016-08-05 14:00:00",
+            "summary": "Nottinghack Tuckshop ",
+            "description": "Come and visit the Nottingham Hackspace village and visit our tuckshop for a selection of drinks, sweets and other snacks. Cash, card and contactless payment accepted (including Apple Pay).\n\nGuaranteed service between the hours of 12:00 - 14:00 and 18:00 - 21:00, there may be someone to serve you outside these times but you may have to come back later if not.",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 9,
+            "uid": "64rjap336os6cb9j6oq32b9k60oj6b9oc4oj2b9kc8sj0ohicksjad1n6c@google.com",
+            "start_dt": "2016-08-06 10:30:00",
+            "end_dt": "2016-08-06 12:00:00",
+            "summary": "Yarn-Making Workshop",
+            "description": "Attendance of this workshop will cost: \u00a37.50 (any profits would be going to our Nottinghack 2.5 fundraising efforts)\n\nCovering the basics of using a drop spindle to create your own wool yarn. Each participant will get a kit containing a rudimentary drop spindle and 50g of wool fibre to spin with, which they can take away with them.",
+            "location": "Nottinghack Village",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 9,
+            "uid": "6crm6c9lcksjgbb2clh30b9k6limab9p68r3gb9pcosmaeb5copjcdpkco@google.com",
+            "start_dt": "2016-08-05 14:00:00",
+            "end_dt": "2016-08-05 15:30:00",
+            "summary": "Yarn-Making Workshop",
+            "description": "Attendance of this workshop will cost: \u00a37.50 (any profits would be going to our Nottinghack 2.5 fundraising efforts)\n\nCovering the basics of using a drop spindle to create your own wool yarn. Each participant will get a kit containing a rudimentary drop spindle and 50g of wool fibre to spin with, which they can take away with them.",
+            "location": "Nottinghack Village",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 9,
+            "uid": "r0oh7o43qph8nf6itb13d35dtg@google.com",
+            "start_dt": "2016-08-07 13:30:00",
+            "end_dt": "2016-08-07 14:00:00",
+            "summary": "Badges of Nerd Honour: Speedcubing",
+            "description": "A brief talk and demonstration: Michael solves the cube in an honourable timeframe (hopefully averaging under 27.5 seconds) and tells you that \"it's easy\"\nNB: there are no actual badges! (you have to do these things for yourself!)",
+            "location": "Nottnghack Village",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 9,
+            "uid": "ufdga5qstbrumnvitq6h2vk7is@google.com",
+            "start_dt": "2016-08-06 13:30:00",
+            "end_dt": "2016-08-06 14:00:00",
+            "summary": "Badges of Nerd Honour: Pi Memorisation",
+            "description": "A brief talk and recital: Michael attempts to recall the digits of Pi (hopefully to 650 decimal places) and tells you that \"it's easy\".\nNB: there are no actual badges! (you have to do these things for yourself!)",
+            "location": "Nottinghack Village",
+            "favourite_count": 8
+        },
+        {
+            "source_id": 9,
+            "uid": "s3dkfjieg5g57d0osuko3g6u2o@google.com",
+            "start_dt": "2016-08-07 12:00:00",
+            "end_dt": "2016-08-07 14:00:00",
+            "summary": "Nottinghack Tuckshop",
+            "description": "Come and visit the Nottingham Hackspace village and visit our tuckshop for a selection of drinks, sweets and other snacks. Cash, card and contactless payment accepted (including Apple Pay).\n\nGuaranteed service between the hours of 12:00 - 14:00 and 18:00 - 21:00, there may be someone to serve you outside these times but you may have to come back later if not.",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 9,
+            "uid": "c2gahajitbi1niukp25r3coaog@google.com",
+            "start_dt": "2016-08-06 12:00:00",
+            "end_dt": "2016-08-06 14:00:00",
+            "summary": "Nottinghack Tuckshop",
+            "description": "Come and visit the Nottingham Hackspace village and visit our tuckshop for a selection of drinks, sweets and other snacks. Cash, card and contactless payment accepted (including Apple Pay).\n\nGuaranteed service between the hours of 12:00 - 14:00 and 18:00 - 21:00, there may be someone to serve you outside these times but you may have to come back later if not.",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 9,
+            "uid": "1b1bp9kqfkdjqas1757f3d9bn0@google.com",
+            "start_dt": "2016-08-05 22:00:00",
+            "end_dt": "2016-08-06 00:00:00",
+            "summary": "Drunk haircuts - one style available",
+            "description": "Drunk haircuts - one style available*\n\n\"Have you ever had a haircut? Do you want one? RIGHT NOW? OK, I'll cut your hair all off but you have to promise not to sue me, yeah?\" Michael E.\n\n(* style may vary)\n",
+            "location": "Nottinghack Village",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 9,
+            "uid": "es2cq2dktg92liombcbqflo1uo@google.com",
+            "start_dt": "2016-08-07 22:00:00",
+            "end_dt": "2016-08-08 00:00:00",
+            "summary": "Drunk haircuts - one style available",
+            "description": "Drunk haircuts - one style available*\n\n\"Have you ever had a haircut? Do you want one? RIGHT NOW? OK, I'll cut your hair all off but you have to promise not to sue me, yeah?\" Michael E.\n\n(* style may vary)\n",
+            "location": "Nottinghack Village",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 9,
+            "uid": "cau0b59qm35iiketklhk99i9hk@google.com",
+            "start_dt": "2016-08-06 22:00:00",
+            "end_dt": "2016-08-07 00:00:00",
+            "summary": "Drunk haircuts - one style available",
+            "description": "Drunk haircuts - one style available*\n\n\"Have you ever had a haircut? Do you want one? RIGHT NOW? OK, I'll cut your hair all off but you have to promise not to sue me, yeah?\" Michael E.\n\n(* style may vary)\n",
+            "location": "Nottinghack Village",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 9,
+            "uid": "3qhntuvi2s4hp0nkvegq68plho@google.com",
+            "start_dt": "2016-08-05 18:00:00",
+            "end_dt": "2016-08-05 21:00:00",
+            "summary": "Nottinghack Tuckshop",
+            "description": "Come and visit the Nottingham Hackspace village and visit our tuckshop for a selection of drinks, sweets and other snacks. Cash, card and contactless payment accepted (including Apple Pay).\n\nGuaranteed service between the hours of 12:00 - 14:00 and 18:00 - 21:00, there may be someone to serve you outside these times but you may have to come back later if not.",
+            "location": "",
+            "favourite_count": 5
+        },
+        {
+            "source_id": 9,
+            "uid": "h4specc9i0nj27p7k3inm4qga8@google.com",
+            "start_dt": "2016-08-07 06:00:00",
+            "end_dt": "2016-08-07 09:00:00",
+            "summary": "Morning Aerobics",
+            "description": "At Rick-Rolling station",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 9,
+            "uid": "254jmgcp6ipq1866sn08bahk10@google.com",
+            "start_dt": "2016-08-06 06:00:00",
+            "end_dt": "2016-08-06 09:00:00",
+            "summary": "Morning Run",
+            "description": "Join Lieutenant Erskine for a military style bootcamp workout and get to see the sights of Guildford during the easrly hours of Saturday morning.\n\nCamouflage optional, meet at Rick-Rolling station",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 9,
+            "uid": "k9fota85hl4on3lai1jqbbai5o@google.com",
+            "start_dt": "2016-08-07 05:00:00",
+            "end_dt": "2016-08-07 06:00:00",
+            "summary": "Nothing. Go away, you should be in bed",
+            "description": "",
+            "location": "bed",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 9,
+            "uid": "oincaqsh0pqpaksj0i18hm6vgo@google.com",
+            "start_dt": "2016-08-06 05:00:00",
+            "end_dt": "2016-08-06 06:00:00",
+            "summary": "Nothing. Go away, you should be in bed",
+            "description": "",
+            "location": "bed",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 9,
+            "uid": "t342a76q4rj0v68enmbauqmdi4@google.com",
+            "start_dt": "2016-08-07 18:00:00",
+            "end_dt": "2016-08-07 21:00:00",
+            "summary": "Nottinghack Tuckshop",
+            "description": "Come and visit the Nottingham Hackspace village and visit our tuckshop for a selection of drinks, sweets and other snacks. Cash, card and contactless payment accepted (including Apple Pay).\n\nGuaranteed service between the hours of 12:00 - 14:00 and 18:00 - 21:00, there may be someone to serve you outside these times but you may have to come back later if not.",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 9,
+            "uid": "jgsjfcnahu69jue7iv1p26taps@google.com",
+            "start_dt": "2016-08-06 18:00:00",
+            "end_dt": "2016-08-06 21:00:00",
+            "summary": "Nottinghack Tuckshop",
+            "description": "Come and visit the Nottingham Hackspace village and visit our tuckshop for a selection of drinks, sweets and other snacks. Cash, card and contactless payment accepted (including Apple Pay).\n\nGuaranteed service between the hours of 12:00 - 14:00 and 18:00 - 21:00, there may be someone to serve you outside these times but you may have to come back later if not.",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 10,
+            "uid": "a864m3u49hvrat4qjvpj1r9gv0@google.com",
+            "start_dt": "2016-08-07 16:00:00",
+            "end_dt": "2016-08-07 17:30:00",
+            "summary": "Blacksmithing 10 places teachers Ian and Richard",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 10,
+            "uid": "rcp8lcr64ntg4n5c90789doalo@google.com",
+            "start_dt": "2016-08-07 14:00:00",
+            "end_dt": "2016-08-07 15:30:00",
+            "summary": "Blacksmithing 10 places teachers Ian and Richard",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 10,
+            "uid": "l0fivfqj0ae20ttg4c6a5p8e9o@google.com",
+            "start_dt": "2016-08-07 12:00:00",
+            "end_dt": "2016-08-07 13:30:00",
+            "summary": "Blacksmithing 10 places teachers Richard and Ian",
+            "description": "",
+            "location": "",
+            "favourite_count": 2
+        },
+        {
+            "source_id": 10,
+            "uid": "pdpeiil2dcaptu9trfsbdm96ns@google.com",
+            "start_dt": "2016-08-07 10:00:00",
+            "end_dt": "2016-08-07 11:30:00",
+            "summary": "Blacksmithing 10 places teachers Richard and Lizzie",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 10,
+            "uid": "844tk2k7h09169l5fe2ngdib4k@google.com",
+            "start_dt": "2016-08-07 08:00:00",
+            "end_dt": "2016-08-07 09:30:00",
+            "summary": "Blacksmithing 5 places teacher Richard",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 10,
+            "uid": "50k87bt1ccujn6sq5ulb19qcro@google.com",
+            "start_dt": "2016-08-06 20:00:00",
+            "end_dt": "2016-08-06 21:30:00",
+            "summary": "Blacksmithing 5 places teacher Ian",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 10,
+            "uid": "14l4r58j156mojmoafbkq523b0@google.com",
+            "start_dt": "2016-08-06 18:00:00",
+            "end_dt": "2016-08-06 19:30:00",
+            "summary": "Blacksmithing 10 places teachers Ian and Lizzie",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 10,
+            "uid": "2qlit48qf8ifr7cseu83hvd860@google.com",
+            "start_dt": "2016-08-06 16:00:00",
+            "end_dt": "2016-08-06 17:30:00",
+            "summary": "Blacksmithing 10 places teachers Ian and Richard",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 10,
+            "uid": "5h2sj7fqkhmthbvu67nmm2jbco@google.com",
+            "start_dt": "2016-08-06 14:00:00",
+            "end_dt": "2016-08-06 15:30:00",
+            "summary": "Blacksmithing 10 places teachers Ian and Richard",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 10,
+            "uid": "fu7rfu4tesv3dvsmlj1vg99d3c@google.com",
+            "start_dt": "2016-08-06 12:00:00",
+            "end_dt": "2016-08-06 13:30:00",
+            "summary": "Blacksmithing 10 places teachers Ian and Richard",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 10,
+            "uid": "lcflbv49p8i3p418sk943i115g@google.com",
+            "start_dt": "2016-08-06 10:00:00",
+            "end_dt": "2016-08-06 11:30:00",
+            "summary": "Blacksmithing 10 places teachers Richard and Lizzie",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 10,
+            "uid": "8m3cjnlbp5leqdjbh8904p7198@google.com",
+            "start_dt": "2016-08-05 20:00:00",
+            "end_dt": "2016-08-05 21:30:00",
+            "summary": "Blacksmithing 5 places teacher Ian - SOLD OUT",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 10,
+            "uid": "42n4lrqn76kvmti18s7egva2vc@google.com",
+            "start_dt": "2016-08-05 18:00:00",
+            "end_dt": "2016-08-05 19:30:00",
+            "summary": "Blacksmithing 10 places teachers Ian and Lizzie",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 10,
+            "uid": "m2in10pop1i2k7qeuaa6ntr4rc@google.com",
+            "start_dt": "2016-08-05 16:00:00",
+            "end_dt": "2016-08-05 17:30:00",
+            "summary": "Blacksmithing 10 places Teachers Ian and Richard",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 10,
+            "uid": "lgcglnkaggna73irnrhrfnpih0@google.com",
+            "start_dt": "2016-08-05 14:00:00",
+            "end_dt": "2016-08-05 15:30:00",
+            "summary": "Blacksmithing 10 places teachers Ian and Richard",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 10,
+            "uid": "77ife0h170lqlaegia7bm2qarg@google.com",
+            "start_dt": "2016-08-06 08:00:00",
+            "end_dt": "2016-08-06 09:30:00",
+            "summary": "5 places teacher Richard",
+            "description": "",
+            "location": "",
+            "favourite_count": 7
+        },
+        {
+            "source_id": 11,
+            "uid": "a50bs5inoqhdigea8ti0lnpals@google.com",
+            "start_dt": "2016-08-06 13:00:00",
+            "end_dt": "2016-08-06 18:00:00",
+            "summary": "SurreyEARS Soldering Challenge!",
+            "description": "Want to learn to solder? Or are you a soldering pro who enjoys a challenge? In the SurreyEARS Soldering Challenge we cater for both worlds by providing some PCB kits to test your metal (skills) and tuition to help you get those darn SMD specks into place. For beginners we teach you the basics of soldering through-hole components, or larger SMD if you're already familiar with the basics. For the pros there is a timed challenge for which the world record is currently 17 minutes - can you beat it?! Kits are \u00a32 and we provide all that you need. Flashy LEDs included in the price!",
+            "location": "HABVille Village",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 12,
+            "uid": "cptdai92c86basu1729r2d0e3c@google.com",
+            "start_dt": "2016-08-06 12:00:00",
+            "end_dt": "2016-08-06 13:00:00",
+            "summary": "Intro to Badge Hacking",
+            "description": "",
+            "location": "BOC Tent",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 12,
+            "uid": "hn3tk1c847rvst9q96l3jkoj8k@google.com",
+            "start_dt": "2016-08-06 17:00:00",
+            "end_dt": "2016-08-06 18:00:00",
+            "summary": "Intro to Badge Hacking",
+            "description": "",
+            "location": "BOC Tent",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 12,
+            "uid": "uo53f6e29tlittd93s9cqh6t7s@google.com",
+            "start_dt": "2016-08-07 12:00:00",
+            "end_dt": "2016-08-07 13:00:00",
+            "summary": "Intro to Badge Hacking",
+            "description": "",
+            "location": "BOC Tent",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 12,
+            "uid": "ahvqn658f3kcr56udqt1073e2k@google.com",
+            "start_dt": "2016-08-06 15:00:00",
+            "end_dt": "2016-08-06 16:00:00",
+            "summary": "Case Making Workshop",
+            "description": "FabLab Truck have kits for you to make a case for your badge, \u00a35 for wood \u00a310 for plastic\n\nBring your badge!",
+            "location": "Badge Tent",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 13,
+            "uid": "to6d5000cjqidfntbi0snh4pqo@google.com",
+            "start_dt": "2016-08-06 09:00:00",
+            "end_dt": "2016-08-06 10:00:00",
+            "summary": "Morning Sleep",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 13,
+            "uid": "9lp8ovo8kpngkop1mdurp976eo@google.com",
+            "start_dt": "2016-08-06 14:00:00",
+            "end_dt": "2016-08-06 16:00:00",
+            "summary": "Basic Electronic Assembly",
+            "description": "Assembly of a simple electronic game circuit board, concentrating on the recognition of simple components and good soldering technique (through hole only, no surface mount). \n\nAdrian Johnson will give instruction for 8 students to build a simple electronic game.  There is no charge to attend, but if you want to take the completed game away it will be \u00a35 for the cost of the parts.\n\nNo tools required, all will be provided for you to use.",
+            "location": "Haxors of the Roses Village",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 13,
+            "uid": "dnsfvppee1f8p5ht84v45kb0uo@google.com",
+            "start_dt": "2016-08-06 10:00:00",
+            "end_dt": "2016-08-06 12:00:00",
+            "summary": "Basic Electronic Assembly",
+            "description": "Assembly of a simple electronic game circuit board, concentrating on the recognition of simple components and good soldering technique (through hole only, no surface mount). \n\nAdrian Johnson will give instruction for 8 students to build a simple electronic game.  There is no charge to attend, but if you want to take the completed game away it will be \u00a35 for the cost of the parts.\n\nNo tools required, all will be provided for you to use.",
+            "location": "Haxors of the Roses Village",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 13,
+            "uid": "qsfa9q9bg4d29kh32dgl0sep3s@google.com",
+            "start_dt": "2016-08-07 10:00:00",
+            "end_dt": "2016-08-07 12:00:00",
+            "summary": "Basic Electronic Assembly",
+            "description": "Assembly of a simple electronic game circuit board, concentrating on the recognition of simple components and good soldering technique (through hole only, no surface mount). \n\nAdrian Johnson will give instruction for 8 students to build a simple electronic game.  There is no charge to attend, but if you want to take the completed game away it will be \u00a35 for the cost of the parts.\n\nNo tools required, all will be provided for you to use.",
+            "location": "Haxors of the Roses Village",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 13,
+            "uid": "4tl2394galqb6q0p11pd3cjasg@google.com",
+            "start_dt": "2016-08-07 14:00:00",
+            "end_dt": "2016-08-07 16:00:00",
+            "summary": "Basic Electronic Assembly",
+            "description": "Assembly of a simple electronic game circuit board, concentrating on the recognition of simple components and good soldering technique (through hole only, no surface mount). \n\nAdrian Johnson will give instruction for 8 students to build a simple electronic game.  There is no charge to attend, but if you want to take the completed game away it will be \u00a35 for the cost of the parts.\n\nNo tools required, all will be provided for you to use.",
+            "location": "Haxors of the Roses Village",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "37k6cah8tv5e7s6jss4hpn1f9c@google.com",
+            "start_dt": "2016-08-05 10:00:00",
+            "end_dt": "2016-08-05 17:00:00",
+            "summary": "[Walk-in Activity] Hands on with the micro:bit ",
+            "description": "The BBC microbit provides a highly accessible Internet of Things device which can be easily programmed using a number of different programming tools, all from your web browser! Explore the http://microbit.co.uk programming tutorials using our microbits and then look at the various microbit robots we have to start planning your microbit invention!\n\nAll activities available online! aka.ms/emfcamp",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "vonj5l7lv4cuabqb33j072h144@google.com",
+            "start_dt": "2016-08-05 10:00:00",
+            "end_dt": "2016-08-05 17:00:00",
+            "summary": "[Walk-in Activity] Project Patrick: Building your own personal AI assistant (Easy)",
+            "description": "Project Patrick is a cloud connected speech controlled digital assistant \u2013 like Amazon\u2019s Echo. You can easily build your own \u2018Patrick\u2019 to run on your PC or your Raspberry Pi 3. All base code and services are available from GitHub. Patrick uses Windows 10 speech recogniser and speech to text voices to listen and respond. It uses the LUIS cognitive service to easily determine the command to execute.  A simple services model means you can easily build your own services and extend your Patrick.\n\nAll activities available online! aka.ms/emfcamp",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "fpncogtt3kuhgar775c16vh3fc@google.com",
+            "start_dt": "2016-08-05 10:00:00",
+            "end_dt": "2016-08-05 17:00:00",
+            "summary": "[Walk-in Activity] Windows IoT Core Workshop (Raspberry Pi) (Intermediate)",
+            "description": "All activities available online! aka.ms/emfcamp",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "um49gpmbqbo6e5gs8pk7elg7ao@google.com",
+            "start_dt": "2016-08-05 10:00:00",
+            "end_dt": "2016-08-05 17:00:00",
+            "summary": "[Walk-in Activity] Azure IoT Kits Workshop (Feather M0) (Experienced)",
+            "description": "Learn how to build, program and connect a Feather M0 to Microsoft Azure\u2019s IOT Hub, a commercial IoT platform designed to support millions of devices globally. Use our Azure IoT Starter Kits to build a simple sensor solution and connect it to the cloud.\n\nAll activities available online! aka.ms/emfcamp",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "t8gm1gs9a1krjpcsniimbb2n68@google.com",
+            "start_dt": "2016-08-05 10:00:00",
+            "end_dt": "2016-08-05 17:00:00",
+            "summary": "[Walk-in Activity] Build a micro-sumo battle strategy",
+            "description": "Using the Arduino based Pololu Zumo V1.2 robot, come and build a battle strategy using the Arduino coding tools and test it in combat at our mini Sumo Dojo. Our Zumos are Bluetooth enabled so now you can use remote computing power to! Micro-sumo is a fun way to get into real time IoT device solution design. Come play, and test your metal in our sumo competition!\n\nAll activities available online! aka.ms/emfcamp",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 1
+        },
+        {
+            "source_id": 14,
+            "uid": "6cbnp71t8q9lvqd7noj12flvk0@google.com",
+            "start_dt": "2016-08-06 10:00:00",
+            "end_dt": "2016-08-06 17:00:00",
+            "summary": "[Walk-in Activity] Hands on with the micro:bit",
+            "description": "The BBC microbit provides a highly accessible Internet of Things device which can be easily programmed using a number of different programming tools, all from your web browser! Explore the http://microbit.co.uk programming tutorials using our microbits and then look at the various microbit robots we have to start planning your microbit invention!\n\nAll activities available online! aka.ms/emfcamp",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "st428o7lssbs23ht7rhhmk55no@google.com",
+            "start_dt": "2016-08-06 10:00:00",
+            "end_dt": "2016-08-06 17:00:00",
+            "summary": "[Walk-in Activity] Build a micro-sumo battle strategy",
+            "description": "Using the Arduino based Pololu Zumo V1.2 robot, come and build a battle strategy using the Arduino coding tools and test it in combat at our mini Sumo Dojo. Our Zumos are Bluetooth enabled so now you can use remote computing power to! Micro-sumo is a fun way to get into real time IoT device solution design. Come play, and test your metal in our sumo competition!\n\nAll activities available online! aka.ms/emfcamp",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "uhafqu20gvt8kfhcd0cdr97sv0@google.com",
+            "start_dt": "2016-08-06 10:00:00",
+            "end_dt": "2016-08-06 17:00:00",
+            "summary": "[Walk-in Activity] Azure IoT Kits Workshop (Feather M0) (Experienced)",
+            "description": "Learn how to build, program and connect a Feather M0 to Microsoft Azure\u2019s IOT Hub, a commercial IoT platform designed to support millions of devices globally. Use our Azure IoT Starter Kits to build a simple sensor solution and connect it to the cloud.\n\nAll activities available online! aka.ms/emfcamp",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "nlehug8u048lutvsp44kthlsrg@google.com",
+            "start_dt": "2016-08-05 17:30:00",
+            "end_dt": "2016-08-05 18:00:00",
+            "summary": "[Talk] Azure IoT Suite Remote Monitoring solution for EMF Camp Badge",
+            "description": "",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "vrnrvqaq99s8iplhu8gft0lna4@google.com",
+            "start_dt": "2016-08-05 13:30:00",
+            "end_dt": "2016-08-05 14:00:00",
+            "summary": "[Talk] Project Patrick: Building your own personal AI assistant",
+            "description": "",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "edrtllkb5q7t3m0pd8j0vs42j4@google.com",
+            "start_dt": "2016-08-05 14:30:00",
+            "end_dt": "2016-08-05 14:45:00",
+            "summary": "[Talk] Windows IoT Core programming",
+            "description": "",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "d0g08j3l3arlt0ojdqjnpr0ed8@google.com",
+            "start_dt": "2016-08-05 15:30:00",
+            "end_dt": "2016-08-05 16:00:00",
+            "summary": "[Talk] Alljoyn connected IoT with Windows 10",
+            "description": "",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 1
+        },
+        {
+            "source_id": 14,
+            "uid": "4dpngjj9581f2a4mqaffk2jths@google.com",
+            "start_dt": "2016-08-05 16:30:00",
+            "end_dt": "2016-08-05 17:00:00",
+            "summary": "[Talk] Azure IoT",
+            "description": "",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 1
+        },
+        {
+            "source_id": 14,
+            "uid": "6laf134lhgposl96vkt9v8rd7o@google.com",
+            "start_dt": "2016-08-05 12:30:00",
+            "end_dt": "2016-08-05 13:00:00",
+            "summary": "[Talk] Introduction to micro-sumo",
+            "description": "",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "0mabiur94niarrbipmfhsb6aro@google.com",
+            "start_dt": "2016-08-06 12:30:00",
+            "end_dt": "2016-08-06 13:00:00",
+            "summary": "[Talk] Introduction to micro-sumo",
+            "description": "",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 1
+        },
+        {
+            "source_id": 14,
+            "uid": "7r735egodqmtf58fsqa1sdbm2o@google.com",
+            "start_dt": "2016-08-06 10:00:00",
+            "end_dt": "2016-08-06 17:00:00",
+            "summary": "[Walk-in Activity] Windows IoT Core Workshop (Raspberry Pi) (Intermediate)",
+            "description": "All activities available online! aka.ms/emfcamp",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "0jb7502a83eaiserdhaelohfrg@google.com",
+            "start_dt": "2016-08-06 10:00:00",
+            "end_dt": "2016-08-06 17:00:00",
+            "summary": "[Walk-in Activity] Project Patrick: Building your own personal AI assistant (Easy)",
+            "description": "Project Patrick is a cloud connected speech controlled digital assistant \u2013 like Amazon\u2019s Echo. You can easily build your own \u2018Patrick\u2019 to run on your PC or your Raspberry Pi 3. All base code and services are available from GitHub. Patrick uses Windows 10 speech recogniser and speech to text voices to listen and respond. It uses the LUIS cognitive service to easily determine the command to execute.  A simple services model means you can easily build your own services and extend your Patrick.\n\nAll activities available online! aka.ms/emfcamp",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "h9k1knf0t3sbfdoj4b38dkdl9o@google.com",
+            "start_dt": "2016-08-06 17:30:00",
+            "end_dt": "2016-08-06 18:00:00",
+            "summary": "[Talk] Azure IoT Suite Remote Monitoring solution for EMF Camp Badge",
+            "description": "",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "g7vevcaa8q2l076m1qicjqvvh8@google.com",
+            "start_dt": "2016-08-06 13:30:00",
+            "end_dt": "2016-08-06 14:00:00",
+            "summary": "[Talk] Project Patrick: Building your own personal AI assistant",
+            "description": "",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "pdeh9tlnne1qphd7rqdjd4h9cs@google.com",
+            "start_dt": "2016-08-06 14:30:00",
+            "end_dt": "2016-08-06 15:00:00",
+            "summary": "[Talk] Windows IoT Core programming",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "63up40nmbmdoniursn6quo7270@google.com",
+            "start_dt": "2016-08-06 15:30:00",
+            "end_dt": "2016-08-06 16:00:00",
+            "summary": "[Talk] Alljoyn connected IoT with Windows 10",
+            "description": "",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "22348i58r401r35keu15kfb3mc@google.com",
+            "start_dt": "2016-08-06 16:30:00",
+            "end_dt": "2016-08-06 17:00:00",
+            "summary": "[Talk] Azure IoT",
+            "description": "",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 2
+        },
+        {
+            "source_id": 14,
+            "uid": "99n1t2977frfu4gvt8the1hqfs@google.com",
+            "start_dt": "2016-08-07 10:00:00",
+            "end_dt": "2016-08-07 17:00:00",
+            "summary": "[Walk-in Activity] Windows IoT Core Workshop (Raspberry Pi) (Intermediate)",
+            "description": "All activities available online! aka.ms/emfcamp",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "gcjpfn5dsjdtl0gmtohs1t6kf0@google.com",
+            "start_dt": "2016-08-07 10:00:00",
+            "end_dt": "2016-08-07 17:00:00",
+            "summary": "[Walk-in Activity] Hands on with the micro:bit",
+            "description": "The BBC microbit provides a highly accessible Internet of Things device which can be easily programmed using a number of different programming tools, all from your web browser! Explore the http://microbit.co.uk programming tutorials using our microbits and then look at the various microbit robots we have to start planning your microbit invention!\n\nAll activities available online! aka.ms/emfcamp",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "3ce8m8a6qoenipeftueta2071s@google.com",
+            "start_dt": "2016-08-07 10:00:00",
+            "end_dt": "2016-08-07 17:00:00",
+            "summary": "[Walk-in Activity] Project Patrick: Building your own personal AI assistant (Easy)",
+            "description": "Project Patrick is a cloud connected speech controlled digital assistant \u2013 like Amazon\u2019s Echo. You can easily build your own \u2018Patrick\u2019 to run on your PC or your Raspberry Pi 3. All base code and services are available from GitHub. Patrick uses Windows 10 speech recogniser and speech to text voices to listen and respond. It uses the LUIS cognitive service to easily determine the command to execute.  A simple services model means you can easily build your own services and extend your Patrick.\n\nAll activities available online! aka.ms/emfcamp",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "e28fimgnqpgf0vr9s5re1f3ui0@google.com",
+            "start_dt": "2016-08-07 10:00:00",
+            "end_dt": "2016-08-07 17:00:00",
+            "summary": "[Walk-in Activity] Azure IoT Kits Workshop (Feather M0) (Experienced)",
+            "description": "Learn how to build, program and connect a Feather M0 to Microsoft Azure\u2019s IOT Hub, a commercial IoT platform designed to support millions of devices globally. Use our Azure IoT Starter Kits to build a simple sensor solution and connect it to the cloud.\n\nAll activities available online! aka.ms/emfcamp",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "u2s8dgacfircbrhn8tqi7c8e7c@google.com",
+            "start_dt": "2016-08-07 15:00:00",
+            "end_dt": "2016-08-07 16:00:00",
+            "summary": "CodeBug Coding Workshop (instructor led)",
+            "description": "Whether you are a newbie to coding and electronics, or a seasoned expert, you will have fun programming CodeBug with blocks to scroll your name, respond to your touch and control multicolour LEDs (the same as the one on your EMF badge).\n\nAge range: 5-100 (adult/parental supervision needed for under 11's)\nEquipment needed: None (though you can bring your own laptop if you prefer).\nNumber of attendees: Max. 30\nFree\n\n3pm - 4+",
+            "location": "Make.Invent.Do Village Microsoft Marquee",
+            "favourite_count": 5
+        },
+        {
+            "source_id": 16,
+            "uid": "iss1@samvan.co.uk",
+            "start_dt": "2016-08-04 23:36:00",
+            "end_dt": "2016-08-04 23:38:00",
+            "summary": "International Space Sation Pass",
+            "description": "Approach: 10\u00c2\u00b0 above W\nDeparture: 38\u00c2\u00b0 above WSW\nMax Height: 38\u00c2\u00b0\n\nDuration: 2 minutes\n\nWeather for Loseley Park, Guildford, United Kingdom:\nSummary: \nCloud Cover: 0%\nPrecipitation Chance: 0%\nWeather data provided by Forecast",
+            "location": "10\u00c2\u00b0 above W",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 16,
+            "uid": "iss2@samvan.co.uk",
+            "start_dt": "2016-08-05 21:11:00",
+            "end_dt": "2016-08-05 21:13:00",
+            "summary": "International Space Sation Pass",
+            "description": "Approach: 38\u00c2\u00b0 above E\nDeparture: 11\u00c2\u00b0 above E\nMax Height: 38\u00c2\u00b0\n\nDuration: 2 minutes\n\nWeather for Loseley Park, Guildford, United Kingdom:\nSummary: \nCloud Cover: 0%\nPrecipitation Chance: 0%\nWeather data provided by Forecast",
+            "location": "38\u00c2\u00b0 above E",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 16,
+            "uid": "iss3@samvan.co.uk",
+            "start_dt": "2016-08-05 22:43:00",
+            "end_dt": "2016-08-05 22:47:00",
+            "summary": "International Space Sation Pass",
+            "description": "Approach: 10\u00c2\u00b0 above W\nDeparture: 36\u00c2\u00b0 above SE\nMax Height: 69\u00c2\u00b0\n\nDuration: 4 minutes\n\nWeather for Loseley Park, Guildford, United Kingdom:\nSummary: \nCloud Cover: 0%\nPrecipitation Chance: 0%\nWeather data provided by Forecast",
+            "location": "10\u00c2\u00b0 above W",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 16,
+            "uid": "iss4@samvan.co.uk",
+            "start_dt": "2016-08-06 00:20:00",
+            "end_dt": "2016-08-06 00:20:00",
+            "summary": "International Space Sation Pass",
+            "description": "Approach: 10\u00c2\u00b0 above W\nDeparture: 10\u00c2\u00b0 above W\nMax Height: 10\u00c2\u00b0\n\nDuration: less than  1 minute\n\nWeather for Loseley Park, Guildford, United Kingdom:\nSummary: \nCloud Cover: 0%\nPrecipitation Chance: 0%\nWeather data provided by Forecast",
+            "location": "10\u00c2\u00b0 above W",
+            "favourite_count": 1
+        },
+        {
+            "source_id": 16,
+            "uid": "iss5@samvan.co.uk",
+            "start_dt": "2016-08-06 21:51:00",
+            "end_dt": "2016-08-06 21:56:00",
+            "summary": "International Space Sation Pass",
+            "description": "Approach: 23\u00c2\u00b0 above W\nDeparture: 13\u00c2\u00b0 above ESE\nMax Height: 86\u00c2\u00b0\n\nDuration: 5 minutes\n\nWeather for Loseley Park, Guildford, United Kingdom:\nSummary: \nCloud Cover: 0%\nPrecipitation Chance: 0%\nWeather data provided by Forecast",
+            "location": "23\u00c2\u00b0 above W",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 16,
+            "uid": "iss6@samvan.co.uk",
+            "start_dt": "2016-08-06 23:27:00",
+            "end_dt": "2016-08-06 23:29:00",
+            "summary": "International Space Sation Pass",
+            "description": "Approach: 11\u00c2\u00b0 above W\nDeparture: 25\u00c2\u00b0 above WSW\nMax Height: 25\u00c2\u00b0\n\nDuration: 2 minutes\n\nWeather for Loseley Park, Guildford, United Kingdom:\nSummary: \nCloud Cover: 0%\nPrecipitation Chance: 0%\nWeather data provided by Forecast",
+            "location": "11\u00c2\u00b0 above W",
+            "favourite_count": 1
+        },
+        {
+            "source_id": 16,
+            "uid": "iss7@samvan.co.uk",
+            "start_dt": "2016-08-07 22:33:00",
+            "end_dt": "2016-08-07 22:37:00",
+            "summary": "International Space Sation Pass",
+            "description": "Approach: 10\u00c2\u00b0 above W\nDeparture: 34\u00c2\u00b0 above SSE\nMax Height: 44\u00c2\u00b0\n\nDuration: 4 minutes\n\nWeather for Loseley Park, Guildford, United Kingdom:\nSummary: \nCloud Cover: 0%\nPrecipitation Chance: 0%\nWeather data provided by Forecast",
+            "location": "10\u00c2\u00b0 above W",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 16,
+            "uid": "iss8@samvan.co.uk",
+            "start_dt": "2016-08-08 21:42:00",
+            "end_dt": "2016-08-08 21:46:00",
+            "summary": "International Space Sation Pass",
+            "description": "Approach: 22\u00c2\u00b0 above W\nDeparture: 15\u00c2\u00b0 above ESE\nMax Height: 63\u00c2\u00b0\n\nDuration: 4 minutes\n\nWeather for Loseley Park, Guildford, United Kingdom:\nSummary: \nCloud Cover: 0%\nPrecipitation Chance: 0%\nWeather data provided by Forecast",
+            "location": "22\u00c2\u00b0 above W",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 16,
+            "uid": "iss9@samvan.co.uk",
+            "start_dt": "2016-08-09 22:24:00",
+            "end_dt": "2016-08-09 22:27:00",
+            "summary": "International Space Sation Pass",
+            "description": "Approach: 11\u00c2\u00b0 above W\nDeparture: 24\u00c2\u00b0 above S\nMax Height: 27\u00c2\u00b0\n\nDuration: 3 minutes\n\nWeather for Loseley Park, Guildford, United Kingdom:\nSummary: \nCloud Cover: 0%\nPrecipitation Chance: 0%\nWeather data provided by Forecast",
+            "location": "11\u00c2\u00b0 above W",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 16,
+            "uid": "iss10@samvan.co.uk",
+            "start_dt": "2016-08-10 21:32:00",
+            "end_dt": "2016-08-10 21:37:00",
+            "summary": "International Space Sation Pass",
+            "description": "Approach: 17\u00c2\u00b0 above W\nDeparture: 13\u00c2\u00b0 above SE\nMax Height: 40\u00c2\u00b0\n\nDuration: 5 minutes\n\nWeather for Loseley Park, Guildford, United Kingdom:\nSummary: \nCloud Cover: 0%\nPrecipitation Chance: 0%\nWeather data provided by Forecast",
+            "location": "17\u00c2\u00b0 above W",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 17,
+            "uid": "mpn6jlfoockeldjfvled9cp994@google.com",
+            "start_dt": "2016-08-07 10:00:00",
+            "end_dt": "2016-08-07 20:10:00",
+            "summary": "SawuGo Mobile Goldsmith workshop @EMF2016",
+            "description": "Mobile goldsmithing workshop, We (you!) will make a nice faceted silver ring from scratch, all basic steps from the first year of the goldsmithing school are involved in this process. Your smiting style will show itself in the finished ring, hence The One Ring =]\nDuration: 2 hours, sometimes quicker or longer. Take as long as you like, in between talks and other adventures =]\nWe don\u2019t use timeslots: not necessary as everybody takes their own time, just pop in anytime you like. No skillz required except you have to be at least 10+ yrs.\n\nLearning metalworking techniques design, skills, and more, check out www.SawuGo.nl/workshop\n",
+            "location": "EMFcamp, Guildford, UK",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 17,
+            "uid": "nbfru5bgb762ud3lg5bqsnj5ro@google.com",
+            "start_dt": "2016-08-06 10:00:00",
+            "end_dt": "2016-08-06 20:30:00",
+            "summary": "SawuGo Mobile Goldsmith workshop @EMF2016",
+            "description": "Mobile goldsmithing workshop, We (you!) will make a nice faceted silver ring from scratch, all basic steps from the first year of the goldsmithing school are involved in this process. Your smiting style will show itself in the finished ring, hence The One Ring =]\nDuration: 2 hours, sometimes quicker or longer. Take as long as you like, in between talks and other adventures =]\nWe don\u2019t use timeslots: not necessary as everybody takes their own time, just pop in anytime you like. No skillz required except you have to be at least 10+ yrs.\n\nLearning metalworking techniques design, skills, and more, check out www.SawuGo.nl/workshop\n",
+            "location": "EMFcamp, Guildford UK",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 17,
+            "uid": "ga7mvtieof8a93ioi2sogefc1c@google.com",
+            "start_dt": "2016-08-05 11:00:00",
+            "end_dt": "2016-08-05 20:30:00",
+            "summary": "SawuGo Mobile Goldsmith workshop @EMF2016",
+            "description": "Mobile goldsmithing workshop, We (you!) will make a nice faceted silver ring from scratch, all basic steps from the first year of the goldsmithing school are involved in this process. Your smiting style will show itself in the finished ring, hence The One Ring =]\nDuration: 2 hours, sometimes quicker or longer. Take as long as you like, in between talks and other adventures =]\nWe don\u2019t use timeslots: not necessary as everybody takes their own time, just pop in anytime you like. No skillz required except you have to be at least 10+ yrs.\n\nLearning metalworking techniques design, skills, and more, check out www.SawuGo.nl/workshop",
+            "location": "EMF2016, Guildford, Verenigd Koninkrijk",
+            "favourite_count": 3
+        },
+        {
+            "source_id": 17,
+            "uid": "2cua3qgpn8qid85vgp1a2ihjds@google.com",
+            "start_dt": "2017-04-23 08:00:00",
+            "end_dt": "2017-04-24 09:00:00",
+            "summary": "MF UK  in Newcastle 2017 rond deze tijd",
+            "description": "http://www.makerfaireuk.com\necht iets voor ons, groot en veel make / creatief",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 18,
+            "uid": "lueo52cfalvtjatkv4sat2j810@google.com",
+            "start_dt": "2016-08-06 20:00:00",
+            "end_dt": "2016-08-06 23:00:00",
+            "summary": "Blind navigation crash course",
+            "description": "Want to learn how to navigate blind (with a guide cane) from someone who does so all the time? This is an ad hoc crash course in blind navigation \u2014 hopefully without too much crashing.\n\nRunning into things *is* part of the deal for new guide cane users (\u2026 and even experienced ones), so expect a certain amount of that \u2014 while wearing a blackout eye mask.\n\nTo participate, find me (Sai) at a time when I'm available or contact me (saizai on Twitter/IRC/etc) to schedule. I'm easily identifiable \u2014 wide brimmed hat, sunglasses, white-and-red guide cane, and white-and-red support cane.\n\nNo equipment or costs required; you'll be using my own personal guide cane(s). I can only do 1 person at a time during the day and 2 people after dark \u2014 but another 1-2 can come along and observe / help out.",
+            "location": "Outside Stage A",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 18,
+            "uid": "2jnu8hu6gugpcl5qvg7sn2oqso@google.com",
+            "start_dt": "2016-08-05 20:00:00",
+            "end_dt": "2016-08-05 22:50:00",
+            "summary": "Blind navigation crash course",
+            "description": "Want to learn how to navigate blind (with a guide cane) from someone who does so all the time? This is an ad hoc crash course in blind navigation \u2014 hopefully without too much crashing.\n\nRunning into things *is* part of the deal for new guide cane users (\u2026 and even experienced ones), so expect a certain amount of that \u2014 while wearing a blackout eye mask.\n\nTo participate, find me (Sai) at a time when I'm available or contact me (saizai on Twitter/IRC/etc) to schedule. I'm easily identifiable \u2014 wide brimmed hat, sunglasses, white-and-red guide cane, and white-and-red support cane.\n\nNo equipment or costs required; you'll be using my own personal guide cane(s). I can only do 1 person at a time during the day and 2 people after dark \u2014 but another 1-2 can come along and observe / help out.",
+            "location": "Outside Stage A",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 18,
+            "uid": "7lp4cu53d2f6ae7ipugqf11k6k@google.com",
+            "start_dt": "2016-08-07 14:00:00",
+            "end_dt": "2016-08-07 15:30:00",
+            "summary": "Blind navigation crash course",
+            "description": "Want to learn how to navigate blind (with a guide cane) from someone who does so all the time? This is an ad hoc crash course in blind navigation \u2014 hopefully without too much crashing.\n\nRunning into things *is* part of the deal for new guide cane users (\u2026 and even experienced ones), so expect a certain amount of that \u2014 while wearing a blackout eye mask.\n\nTo participate, find me (Sai) at a time when I'm available or contact me (saizai on Twitter/IRC/etc) to schedule. I'm easily identifiable \u2014 wide brimmed hat, sunglasses, white-and-red guide cane, and white-and-red support cane.\n\nNo equipment or costs required; you'll be using my own personal guide cane(s). I can only do 1 person at a time during the day and 2 people after dark \u2014 but another 1-2 can come along and observe / help out.",
+            "location": "Outside Stage B",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 18,
+            "uid": "klsiujklm44fj82hr6ircrh1r0@google.com",
+            "start_dt": "2016-08-05 17:50:00",
+            "end_dt": "2016-08-05 18:40:00",
+            "summary": "Blind navigation crash course",
+            "description": "Want to learn how to navigate blind (with a guide cane) from someone who does so all the time? This is an ad hoc crash course in blind navigation \u2014 hopefully without too much crashing.\n\nRunning into things *is* part of the deal for new guide cane users (\u2026 and even experienced ones), so expect a certain amount of that \u2014 while wearing a blackout eye mask.\n\nTo participate, find me (Sai) at a time when I'm available or contact me (saizai on Twitter/IRC/etc) to schedule. I'm easily identifiable \u2014 wide brimmed hat, sunglasses, white-and-red guide cane, and white-and-red support cane.\n\nNo equipment or costs required; you'll be using my own personal guide cane(s). I can only do 1 person at a time during the day and 2 people after dark \u2014 but another 1-2 can come along and observe / help out.",
+            "location": "Outside Stage B",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 18,
+            "uid": "4hgr86j32u576sb4ijn52jc6v8@google.com",
+            "start_dt": "2016-08-05 15:20:00",
+            "end_dt": "2016-08-05 16:10:00",
+            "summary": "Blind navigation crash course",
+            "description": "Want to learn how to navigate blind (with a guide cane) from someone who does so all the time? This is an ad hoc crash course in blind navigation \u2014 hopefully without too much crashing.\n\nRunning into things *is* part of the deal for new guide cane users (\u2026 and even experienced ones), so expect a certain amount of that \u2014 while wearing a blackout eye mask.\n\nTo participate, find me (Sai) at a time when I'm available or contact me (saizai on Twitter/IRC/etc) to schedule. I'm easily identifiable \u2014 wide brimmed hat, sunglasses, white-and-red guide cane, and white-and-red support cane.\n\nNo equipment or costs required; you'll be using my own personal guide cane(s). I can only do 1 person at a time during the day and 2 people after dark \u2014 but another 1-2 can come along and observe / help out.",
+            "location": "In shade of red tent directly next to Stage C",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 18,
+            "uid": "ar5b00dga9ek5d928ta3tj1dd4@google.com",
+            "start_dt": "2016-08-05 14:30:00",
+            "end_dt": "2016-08-05 14:55:00",
+            "summary": "Blind navigation crash course",
+            "description": "Want to learn how to navigate blind (with a guide cane) from someone who does so all the time? This is an ad hoc crash course in blind navigation \u2014 hopefully without too much crashing.\n\nRunning into things *is* part of the deal for new guide cane users (\u2026 and even experienced ones), so expect a certain amount of that \u2014 while wearing a blackout eye mask.\n\nTo participate, find me (Sai) at a time when I'm available or contact me (saizai on Twitter/IRC/etc) to schedule. I'm easily identifiable \u2014 wide brimmed hat, sunglasses, white-and-red guide cane, and white-and-red support cane.\n\nNo equipment or costs required; you'll be using my own personal guide cane(s). I can only do 1 person at a time during the day and 2 people after dark \u2014 but another 1-2 can come along and observe / help out.",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 18,
+            "uid": "k5dnsdv14k5dq7qhungtq4jomc@google.com",
+            "start_dt": "2016-08-06 10:30:00",
+            "end_dt": "2016-08-06 11:20:00",
+            "summary": "Blind navigation crash course",
+            "description": "Want to learn how to navigate blind (with a guide cane) from someone who does so all the time? This is an ad hoc crash course in blind navigation \u2014 hopefully without too much crashing.\n\nRunning into things *is* part of the deal for new guide cane users (\u2026 and even experienced ones), so expect a certain amount of that \u2014 while wearing a blackout eye mask.\n\nTo participate, find me (Sai) at a time when I'm available or contact me (saizai on Twitter/IRC/etc) to schedule. I'm easily identifiable \u2014 wide brimmed hat, sunglasses, white-and-red guide cane, and white-and-red support cane.\n\nNo equipment or costs required; you'll be using my own personal guide cane(s). I can only do 1 person at a time during the day and 2 people after dark \u2014 but another 1-2 can come along and observe / help out.",
+            "location": "Outside Stage C",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "3pp3a0mjhki7au3a3f390fu288@google.com",
+            "start_dt": "2016-08-06 10:00:00",
+            "end_dt": "2016-08-06 16:00:00",
+            "summary": "RC2014 Z80 Homebrew Computer ",
+            "description": "Join Spencer to make the RC2014 a retro computer kit you can build yourself! ",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "dlhuegl05ffamdqqdbdtb6ifds@google.com",
+            "start_dt": "2016-08-05 15:00:00",
+            "end_dt": "2016-08-05 16:30:00",
+            "summary": "Surface-mount electronics (SMD) assembly for terrified beginners",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "dksg7c37u0iibodnrhedbf54cs@google.com",
+            "start_dt": "2016-08-06 15:00:00",
+            "end_dt": "2016-08-06 16:30:00",
+            "summary": "Surface-mount electronics (SMD) assembly for terrified beginners",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "su05v613487rh17eov83591rp4@google.com",
+            "start_dt": "2016-08-07 10:00:00",
+            "end_dt": "2016-08-07 18:00:00",
+            "summary": "MSRaynsford's Laser Cut Machines",
+            "description": "Martin will be selling his amazing Marble Machine kits as well as his famous Useless Machine. Martin will be available to talk all things laser cutting as well as helping you to make your laser cut kits! ",
+            "location": "Hack Centre \u2666 (Just Add Sharks Tent) ",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "mnnhn03slfkf5c6kjd4t104lng@google.com",
+            "start_dt": "2016-08-06 09:00:00",
+            "end_dt": "2016-08-06 11:00:00",
+            "summary": "Hack-N-Swap-O-Rama\u2122",
+            "description": "Bring a shoe box of crap to trade, swap, sell, barter, borrow - but definatel",
+            "location": "Hack Centre \u2666",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "an57kqdctdcirbd4m2qqjrl6qk@google.com",
+            "start_dt": "2016-08-07 15:00:00",
+            "end_dt": "2016-08-07 16:00:00",
+            "summary": "The Curious Electric Company",
+            "description": "Matt Little will be vending electronics kits and sundries from the Curious Electric Company range and and on hand to help and advise on your environmentally focused projects in the Hack Centre. ",
+            "location": "Hack Centre \u2666",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "df555fs6q0tth7cfdvj9ri7uoc@google.com",
+            "start_dt": "2016-08-07 14:00:00",
+            "end_dt": "2016-08-07 15:00:00",
+            "summary": "Part Fusion - Wearables Electronics",
+            "description": "Robert Fitzsimons will be selling & instructing on wearable electronics kits and learn to solder badges",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "oomcb6ktktkl9chjqjnv1uhq20@google.com",
+            "start_dt": "2016-08-06 15:00:00",
+            "end_dt": "2016-08-06 16:00:00",
+            "summary": "Rock Drill 4069 Touch Synthesizer Build ",
+            "description": "Join Iain Sharp for a simple single board Touch Synthesizer Build ... make amazing noise... or horrible sound you decide? Suitable for beginners. \u00a312",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "tek0trt0lccm0ik5f6o7ar6d4s@google.com",
+            "start_dt": "2016-08-05 21:00:00",
+            "end_dt": "2016-08-05 23:30:00",
+            "summary": "Just Add Sharks Customer Party!",
+            "description": "The sharks (Dominic, Martin, Kirsty and Spencer) invite their customers (current and future) to join them at the Just Add Sharks Tent for the finest Nottingham craft ale from Totally Brewed (the team's neighbour in Nottingham) for their award winning \"Punch in the Face\".  ",
+            "location": "Just Add Sharks Tent (next to Hack Centre) ",
+            "favourite_count": 1
+        },
+        {
+            "source_id": 19,
+            "uid": "4thjurvilf4b9ctncunogra8h8@google.com",
+            "start_dt": "2016-08-06 13:00:00",
+            "end_dt": "2016-08-06 16:30:00",
+            "summary": "Arduino for total newbies with Mitch Altman",
+            "description": "Join Mitch in the Hack Centre for Arduino for total newbies, \u00a330 for materials! Limited to 15 so first come first served! ",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "t7b4n9sfst6nlc3q73hle21ejg@google.com",
+            "start_dt": "2016-08-07 13:00:00",
+            "end_dt": "2016-08-07 16:30:00",
+            "summary": "Arduino for total newbies with Mitch Altman",
+            "description": "Join Mitch in the Hack Centre for Arduino for total newbies, \u00a330 for materials! Limited to 15 so first come first served! ",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "9ldtiuc41qecekmjq3jgt04o90@google.com",
+            "start_dt": "2016-08-06 19:00:00",
+            "end_dt": "2016-08-06 20:30:00",
+            "summary": "Surface-mount electronics (SMD) assembly for terrified beginners",
+            "description": "",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "6j9p83e2lt85rn2heekgd7o51g@google.com",
+            "start_dt": "2016-08-06 10:00:00",
+            "end_dt": "2016-08-06 18:00:00",
+            "summary": "MSRaynsford's Laser Cut Machines",
+            "description": "Martin will be selling his amazing Marble Machine kits as well as his famous Useless Machine. Martin will be available to talk all things laser cutting as well as helping you to make your laser cut kits! ",
+            "location": "Hack Centre \u2666 (Just Add Sharks Tent) ",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "rnh4dr6sou6mmjduhl7ngikbas@google.com",
+            "start_dt": "2016-08-06 19:00:00",
+            "end_dt": "2016-08-06 20:30:00",
+            "summary": "Skull Radio Bone Conduction Kit with Jeffrey Roe ",
+            "description": "Redirected from Workshop 1\nCome and make a radio you can only hear in your head (no drugs required). TOG founder and prime-hacker-of-eire Jeffrey Roe will be conducting an electronics workshop to make a Skull Radio bone conduction kit. \u00a310 per person. All tools provided. Long live TOG. ",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "goq0ijtlp6j00l4hrjh3sa3dr4@google.com",
+            "start_dt": "2016-08-06 12:00:00",
+            "end_dt": "2016-08-06 13:00:00",
+            "summary": "TiLDA Mk.3 Redirected from the BOC",
+            "description": "ALREADY ADVERTISED ELSEWHERE MAY BE OVER SUBSCRIBED.",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "j906sda53cfloe5vf3q21kl8e8@google.com",
+            "start_dt": "2016-08-06 17:00:00",
+            "end_dt": "2016-08-06 18:30:00",
+            "summary": "Surface-mount electronics (SMD) assembly for terrified beginners",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "fl0enuldqhbp5uspdn96air56s@google.com",
+            "start_dt": "2016-08-06 14:00:00",
+            "end_dt": "2016-08-06 18:00:00",
+            "summary": "MeArm & MiRobot kits & Instruction with Dr Ben Gray",
+            "description": "Why not try your hand at making a robot arm? Get 20% regular prices on robot kits from MiRobot & MeArm with Ben Grey kits from \u00a330 up. ",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "b3r8k9l4n7skuf74edcct5k7ms@google.com",
+            "start_dt": "2016-08-07 10:30:00",
+            "end_dt": "2016-08-07 17:30:00",
+            "summary": "MeArm & MiRobot kits & Instruction with Dr Ben Gray",
+            "description": "Why not try your hand at making a robot arm? Get 20% regular prices on robot kits from MiRobot & MeArm with Ben Grey kits from \u00a330 up. ",
+            "location": "Hack Centre",
+            "favourite_count": 8
+        },
+        {
+            "source_id": 19,
+            "uid": "hmmfpncan5ni4td7hqisdpq6b4@google.com",
+            "start_dt": "2016-08-06 15:30:00",
+            "end_dt": "2016-08-06 16:30:00",
+            "summary": "Curious Electric Company",
+            "description": "Matt Little will be available selling kits from The Curious Electric Company in the Hack Centre inc. Bat Listener kit, Mousebot and more. Tweet @CuriousElectric",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "jd6vmeboual3h6m07e51vjbegc@google.com",
+            "start_dt": "2016-08-07 15:00:00",
+            "end_dt": "2016-08-07 16:00:00",
+            "summary": "Rock Drill 4069 Touch Synthesizer Build ",
+            "description": "Join Iain Sharp for a simple single board Touch Synthesizer Build ... make amazing noise... or horrible sound you decide? Suitable for beginners. \u00a312",
+            "location": "",
+            "favourite_count": 1
+        },
+        {
+            "source_id": 19,
+            "uid": "0ohv8fg1kvu4fcj9b8epkd9tjg@google.com",
+            "start_dt": "2016-08-07 10:00:00",
+            "end_dt": "2016-08-07 16:00:00",
+            "summary": "RC2014 Z80 Homebrew Computer ",
+            "description": "Join Spencer to make the RC2014 a retro computer kit you can build yourself! ",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "jpg3d43qcgsf158v67gi4qjgvk@google.com",
+            "start_dt": "2016-08-07 17:30:00",
+            "end_dt": "2016-08-07 19:00:00",
+            "summary": "Surface-mount electronics (SMD) assembly for terrified beginners",
+            "description": "",
+            "location": "Hack Centre",
+            "favourite_count": 2
+        },
+        {
+            "source_id": 20,
+            "uid": "47465ijvt9onoga2mtfhvap1c8@google.com",
+            "start_dt": "2016-08-07 10:00:00",
+            "end_dt": "2016-08-07 11:00:00",
+            "summary": "Pancakes",
+            "description": "Start your Sunday morning with a pancake and a choice of sweet topping. First come first served. From 10am until they run out.",
+            "location": "NEVER TOO MUCH BUNTING",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 20,
+            "uid": "7846ncdr0q0gu2q2494hhvum9k@google.com",
+            "start_dt": "2016-08-06 20:00:00",
+            "end_dt": "2016-08-06 22:00:00",
+            "summary": "Monochrome BBS - Social Networking 90s style",
+            "description": "Long before Facebook and Twitter, social networking happened through IRC and BBSs (Bulletin Board System.) Monochrome was the UK's most popular internet BBS throughout the 90s, and is still going today. We'll have some terminals set up for you to see what it's about, and seasoned users will be on hand to answer any questions.",
+            "location": "NEVER TOO MUCH BUNTING",
+            "favourite_count": 1
+        },
+        {
+            "source_id": 20,
+            "uid": "ldhr1v1gi2vffs665doop0o4m4@google.com",
+            "start_dt": "2016-08-05 20:00:00",
+            "end_dt": "2016-08-05 22:00:00",
+            "summary": "Monochrome BBS - Social Networking 90s style",
+            "description": "Long before Facebook and Twitter, social networking happened through IRC and BBSs (Bulletin Board System.) Monochrome was the UK's most popular internet BBS throughout the 90s, and is still going today. We'll have some terminals set up for you to see what it's about, and seasoned users will be on hand to answer any questions.",
+            "location": "NEVER TOO MUCH BUNTING",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 20,
+            "uid": "egm4pivgbo8ber1t1nf86gsrks@google.com",
+            "start_dt": "2016-08-06 11:15:00",
+            "end_dt": "2016-08-06 12:15:00",
+            "summary": "Hand Sewing",
+            "description": "A hand sewing workshop. Come along and try English paper piecing, a traditional patchwork technique and make either a pin cushion or a lavender sachet, or both. No experience needed. Materials will be provided free.",
+            "location": "NEVER TOO MUCH BUNTING",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 20,
+            "uid": "vkumj32669si74ua0ncuuors6g@google.com",
+            "start_dt": "2016-08-07 15:00:00",
+            "end_dt": "2016-08-07 17:00:00",
+            "summary": "Hand sewing workshop",
+            "description": "A hand sewing workshop. Come along and try English paper piecing, a traditional patchwork technique and make either a pin cushion or a lavender sachet, or both. No experience needed. Materials will be provided free.  The village is in camping A and is the one with a lot of bunting on tall poles.",
+            "location": "Mono/Never too much bunting",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 21,
+            "uid": "20160805T153314Z-59176186@marudot.com",
+            "start_dt": "2016-08-06 09:30:00",
+            "end_dt": "2016-08-06 10:30:00",
+            "summary": "Laser Engraved toast",
+            "description": "Come round for some free laser engraved toast. We have jam and butter too!",
+            "location": "Fablab Camp",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 22,
+            "uid": "tnc92q7q65ifnkjedvtkvqgr60@google.com",
+            "start_dt": "2016-08-05 20:30:00",
+            "end_dt": "2016-08-05 23:30:00",
+            "summary": "Werewolf",
+            "description": "Join us in the hunt, and help the village lynch those pesky werewolves before it's too late!\n\nFor more information on the game, please see here - https://en.wikipedia.org/wiki/Ultimate_Werewolf ",
+            "location": "Miller's Hollow - Near Stage B",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 22,
+            "uid": "5ebb8gt60fsme7rt0vuo1hc2fk@google.com",
+            "start_dt": "2016-08-06 21:00:00",
+            "end_dt": "2016-08-06 23:30:00",
+            "summary": "Wetewolf",
+            "description": "Join us in the hunt, and help the village lynch those pesky werewolves before it's too late!\n\nFor more information on the game, please see here - https://en.wikipedia.org/wiki/Ultimate_Werewolf ",
+            "location": "Miller's Hollow - next to stage B",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 22,
+            "uid": "k8260dqfbb8evee5idal88q0j0@google.com",
+            "start_dt": "2016-08-07 21:00:00",
+            "end_dt": "2016-08-07 23:30:00",
+            "summary": "Werewolf",
+            "description": "Join us in the hunt, and help the village lynch those pesky werewolves before it's too late!\n\nFor more information on the game, please see here - https://en.wikipedia.org/wiki/Ultimate_Werewolf ",
+            "location": "Miller's Hollow - next to stage B",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 23,
+            "uid": "460l5cvtuj0on6gveqqnrvvmhc@google.com",
+            "start_dt": "2016-08-07 20:30:00",
+            "end_dt": "2016-08-08 00:00:00",
+            "summary": "Scottish Consulate Chill with Milliways",
+            "description": "We're tired and have to start packup.\nAfter the closing ceremony we'll be hanging with McFly and the gang! Come say hi",
+            "location": "Milliways",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 23,
+            "uid": "sudbej156htsqd89dmusv7n93k@google.com",
+            "start_dt": "2016-08-06 20:30:00",
+            "end_dt": "2016-08-07 00:00:00",
+            "summary": "Scottish Consulate Goes Dutch",
+            "description": "We feel the need to enjoy a cultural exchange with our Dutch friends. \nI wonder what this could be!",
+            "location": "Scottish Consulate",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 23,
+            "uid": "46q2bqcm2c88n6ob8a19gqhdg4@google.com",
+            "start_dt": "2016-08-05 20:30:00",
+            "end_dt": "2016-08-06 00:00:00",
+            "summary": "Whiskyleaks @ Milliways",
+            "description": "Whiskyleaks - the annual whisky drinking festival, brought to you by Milliways and the Scottish Consulate ",
+            "location": "MIlliways",
+            "favourite_count": 1
+        },
+        {
+            "source_id": 24,
+            "uid": "oi79nkdmtrof2m14h3r8pg87s4@google.com",
+            "start_dt": "2016-08-07 13:00:00",
+            "end_dt": "2016-08-07 19:00:00",
+            "summary": "Bring and break - Bring hardware and learn how to break it",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 24,
+            "uid": "dv31to17spf9dspnhtlumc76r0@google.com",
+            "start_dt": "2016-08-06 22:00:00",
+            "end_dt": "2016-08-07 00:00:00",
+            "summary": "Disco Disco - Party",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 24,
+            "uid": "he66t43a5d1dq1m5l5qhi2acss@google.com",
+            "start_dt": "2016-08-06 20:00:00",
+            "end_dt": "2016-08-06 21:00:00",
+            "summary": "Introduction to mobile application security",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 24,
+            "uid": "6871u8sg4410034eo637f6uil0@google.com",
+            "start_dt": "2016-08-06 17:00:00",
+            "end_dt": "2016-08-06 20:00:00",
+            "summary": "Software security for hardware peeps",
+            "description": "Workshop - Bring VMware (Workstation trial or Player should both work)",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 24,
+            "uid": "fo8ishrb1i8m3128750gff0vno@google.com",
+            "start_dt": "2016-08-06 13:00:00",
+            "end_dt": "2016-08-06 14:00:00",
+            "summary": "Hacking for 7 year olds: Playing with Scratch",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 24,
+            "uid": "86276vs9jut5gvnnlb4g13ke70@google.com",
+            "start_dt": "2016-08-06 11:00:00",
+            "end_dt": "2016-08-06 12:00:00",
+            "summary": "Virtualisation vs containers: Security models, pros and cons",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 24,
+            "uid": "oqb6bbhol8d5e14hn6nm7pto5o@google.com",
+            "start_dt": "2016-08-06 10:30:00",
+            "end_dt": "2016-08-06 11:00:00",
+            "summary": "Introduction to CTF (Capture the Flag)",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 25,
+            "uid": "dt2h8rjuplr79mejkk306jq31c@google.com",
+            "start_dt": "2016-08-06 20:00:00",
+            "end_dt": "2016-08-07 00:00:00",
+            "summary": "Minecraft Night",
+            "description": "We have a public Minecraft server running. Join us with the IP address 137.74.160.105.\nFeel free to bring your laptop and a chair to the Reading Minecraft Village to hang with us IRL as well as online. Limited power points in our village, so the Lounge may also be utilised depending on numbers.\n\nThere may be a small prize for the coolest build.",
+            "location": "Reading Minecraft Village",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 26,
+            "uid": "20160805T170815Z-563250687@marudot.com",
+            "start_dt": "2016-08-06 10:00:00",
+            "end_dt": "2016-08-06 22:00:00",
+            "summary": "EmptyEpsilon spaceship simulator",
+            "description": "play a game with 6 people all controlling a single spaceship in various scenario's",
+            "location": "between portcullis and The Dutch",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 26,
+            "uid": "20160805T170815Z-1441202313@marudot.com",
+            "start_dt": "2016-08-07 10:00:00",
+            "end_dt": "2016-08-07 22:00:00",
+            "summary": "EmptyEpsilon spaceship simulator",
+            "description": "play a game with 6 people all controlling a single spaceship in various scenario's",
+            "location": "between portcullis and The Dutch",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 27,
+            "uid": "ekpd7punbbpc6c3uha050ju7b0@google.com",
+            "start_dt": "2016-08-07 13:00:00",
+            "end_dt": "2016-08-07 15:30:00",
+            "summary": "Micro Pi Noon",
+            "description": "Come and fight Raspberry sub A6 Micro Robots, it's poptastic fun. House robots are available to fight. Find us behind stage \"C\", the first blue pavilion.\n",
+            "location": "Makespace Village",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 27,
+            "uid": "q388q7qiu2fnagfiepqjd30qhs@google.com",
+            "start_dt": "2016-08-06 13:30:00",
+            "end_dt": "2016-08-06 16:30:00",
+            "summary": "Micro Pi Noon",
+            "description": "Come and fight Raspberry sub A6 Micro Robots, it's poptastic fun. House robots are available to fight. Find us behind stage \"C\", the first blue pavilion.\n",
+            "location": "Makespace village",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 28,
+            "uid": "dnha52ejq50e9a4bq0flp72tpo@google.com",
+            "start_dt": "2016-08-07 20:30:00",
+            "end_dt": "2016-08-07 22:30:00",
+            "summary": "Intense Videogames ",
+            "description": "How long can you last? \nWe're showing:\nSUPER HYPERCUBE : pre-release showing! Guide cubes in virtual reality.\nDevil Daggers : you vs hell monsters\nSuper Hexagon : a hexagon has 6 sides. ",
+            "location": "Stage C",
+            "favourite_count": 1
+        },
+        {
+            "source_id": 28,
+            "uid": "rd5gu55mn4m0khs4c2o65eis0c@google.com",
+            "start_dt": "2016-08-06 20:30:00",
+            "end_dt": "2016-08-06 22:30:00",
+            "summary": "Tranquil Videogames",
+            "description": "Come play and spectate some tranquil indie videogames. We'll be showing Kentucky Route Zero, Proteus and Panoramical. There will be good colours and sounds. ",
+            "location": "Stage C",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 29,
+            "uid": "he67ucac6b8k5k270ig7hhg9bk@google.com",
+            "start_dt": "2016-08-06 14:00:00",
+            "end_dt": "2016-08-06 18:00:00",
+            "summary": "Flying",
+            "description": "",
+            "location": "flying field",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 29,
+            "uid": "ujs24o92qicdudfaplkjit540g@google.com",
+            "start_dt": "2016-08-07 13:00:00",
+            "end_dt": "2016-08-07 17:00:00",
+            "summary": "Flying",
+            "description": "",
+            "location": "flying field",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 30,
+            "uid": "is4ekeigg21itkknrmmrcjtoi0@google.com",
+            "start_dt": "2016-08-06 18:30:00",
+            "end_dt": "2016-08-06 19:30:00",
+            "summary": "HAB",
+            "description": "HAB launch at 7pm, habville.",
+            "location": "HabVille, EMF",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "9fts2a26scp5hdp01fghk33qno@google.com",
+            "start_dt": "2016-08-07 12:00:00",
+            "end_dt": "2016-08-07 13:00:00",
+            "summary": "the nature chamber with the minusonic board",
+            "description": "Minusonic is a project designed to detect the micro-sonic, the minuscule sounds in the environment around us.\n\nWe\u2019ve developed the Minusonic board v1 which has a small microphone attached that we\u2019ve enhanced through experienced circuit-know-how, to make it ultra-sensitive to tiny frequencies and decibels of sound. You are then able to plug in your headphones and hear these sounds that are normally outside of our hearing range, from the sound of ants footsteps to those of a spider, any insect.\n\nIf it's too loud to hear the insect on camp, there are recordings of the sounds of ants to hear and you can still test the mike out in its shoe box. It can detect lost of other everyday sounds that we wouldn't normally hear.\n\nBring an insect if you find one and lets try!\n\nhttp://minusonic.designbywatson.com/\n",
+            "location": "the lounge",
+            "favourite_count": 0
+        }
+    ]
+}

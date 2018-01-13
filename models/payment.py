@@ -1,12 +1,16 @@
 from main import db
-from sqlalchemy import event
-from sqlalchemy.orm import Session
+from sqlalchemy import event, func, column
+from sqlalchemy.orm import Session, aliased
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy_continuum.utils import version_class, transaction_class
 
 import random
 import re
 from decimal import Decimal, ROUND_UP
-from datetime import datetime
+from datetime import datetime, timedelta
+
+from . import export_attr_counts, export_intervals, bucketise
+import models
 
 safechars = "2346789BCDFGHJKMPQRTVWXY"
 
@@ -33,6 +37,63 @@ class Payment(db.Model):
     def __init__(self, currency, amount):
         self.currency = currency
         self.amount = amount
+
+    @classmethod
+    def get_export_data(cls):
+        if cls.__name__ == 'Payment':
+            # Export stats for each payment type separately
+            return {}
+
+        purchase_counts = cls.query.outerjoin(cls.purchases).group_by(cls.id).with_entities(func.count(models.Ticket.id))
+        refund_counts = cls.query.outerjoin(cls.refunds).group_by(cls.id).with_entities(func.count(Refund.id))
+
+        cls_version = version_class(cls)
+        cls_transaction = transaction_class(cls)
+        changes = cls.query.join(cls.versions).group_by(cls.id)
+        change_counts = changes.with_entities(func.count(cls_version.id))
+        first_changes = changes.join(cls_version.transaction) \
+                               .with_entities(func.min(cls_transaction.issued_at).label('created')) \
+                               .from_self()
+
+        cls_ver_new = aliased(cls.versions)
+        cls_ver_paid = aliased(cls.versions)
+        cls_txn_new = aliased(cls_version.transaction)
+        cls_txn_paid = aliased(cls_version.transaction)
+        active_time = func.max(cls_txn_paid.issued_at) - func.max(cls_txn_new.issued_at)
+        active_times = cls.query \
+            .join(cls_ver_new, cls_ver_new.id == cls.id) \
+            .join(cls_ver_paid, cls_ver_paid.id == cls.id) \
+            .join(cls_txn_new, cls_txn_new.id == cls_ver_new.transaction_id) \
+            .join(cls_txn_paid, cls_txn_paid.id == cls_ver_paid.transaction_id) \
+            .filter(cls_ver_new.state == 'new') \
+            .filter(cls_ver_paid.state == 'paid') \
+            .with_entities(active_time.label('active_time')) \
+            .group_by(cls.id)
+
+        time_buckets = [timedelta(0), timedelta(minutes=1), timedelta(hours=1)] + \
+                       [timedelta(d) for d in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 28, 60]]
+
+        data = {
+            'public': {
+                'payments': {
+                    'counts': {
+                        'purchases': bucketise(purchase_counts, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20]),
+                        'refunds': bucketise(refund_counts, [0, 1, 2, 3, 4]),
+                        'changes': bucketise(change_counts, range(10)),
+                        'created_week': export_intervals(first_changes, column('created'), 'week', 'YYYY-MM-DD'),
+                        'active_time': bucketise([r.active_time for r in active_times], time_buckets),
+                        'amounts': bucketise(cls.query.with_entities(cls.amount_int / 100), [0, 10, 20, 30, 40, 50, 100, 150, 200]),
+                    },
+                },
+            },
+            'tables': ['payment', 'payment_version'],
+        }
+
+        count_attrs = ['state', 'reminder_sent', 'currency']
+        data['public']['payments']['counts'].update(export_attr_counts(cls, count_attrs))
+
+        return data
+
 
     @property
     def amount(self):
@@ -156,6 +217,7 @@ class BankPayment(Payment):
 
 class BankAccount(db.Model):
     __tablename__ = 'bank_account'
+    __export_data__ = False
     id = db.Column(db.Integer, primary_key=True)
     sort_code = db.Column(db.String, nullable=False)
     acct_id = db.Column(db.String, nullable=False)
@@ -174,6 +236,7 @@ db.Index('ix_bank_account_sort_code_acct_id', BankAccount.sort_code, BankAccount
 
 class BankTransaction(db.Model):
     __tablename__ = 'bank_transaction'
+    __export_data__ = False
 
     id = db.Column(db.Integer, primary_key=True)
     account_id = db.Column(db.Integer, db.ForeignKey(BankAccount.id), nullable=False)
@@ -340,6 +403,29 @@ class Refund(db.Model):
         self.payment_id = payment.id
         self.payment = payment
         self.amount = amount
+
+    @classmethod
+    def get_export_data(cls):
+        if cls.__name__ == 'Refund':
+            # Export stats for each refund type separately
+            return {}
+
+        purchase_counts = cls.query.outerjoin(cls.purchases).group_by(cls.id).with_entities(func.count('Ticket.id'))
+        data = {
+            'public': {
+                'refunds': {
+                    'counts': {
+                        'timestamp_week': export_intervals(cls.query, cls.timestamp, 'week', 'YYYY-MM-DD'),
+                        'purchases': bucketise(purchase_counts, [0, 1, 2, 3, 4]),
+                        'amounts': bucketise(cls.query.with_entities(cls.amount_int / 100), [0, 10, 20, 30, 40, 50, 100, 150, 200]),
+                    },
+                },
+            },
+            'tables': ['refund'],
+        }
+
+        return data
+
 
     @property
     def amount(self):

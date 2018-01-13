@@ -16,3 +16,4 @@ config/live.cfg*
 .vagrant
 utils/databases.cfg
 .cache/
+exports/*/private

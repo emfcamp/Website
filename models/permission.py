@@ -2,6 +2,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 from main import db
 
+import models
 
 class Permission(db.Model):
     __tablename__ = 'permission'
@@ -10,6 +11,21 @@ class Permission(db.Model):
 
     def __init__(self, name):
         self.name = name
+
+    @classmethod
+    def get_export_data(cls):
+        users = cls.query.join(UserPermission, models.User) \
+                         .with_entities(models.User.id, models.User.email, Permission.name) \
+                         .order_by(models.User.id, Permission.id)
+
+        data = {
+            'private': {
+                'permissions': users,
+            },
+            'tables': ['permission', 'user_permission'],
+        }
+
+        return data
 
 
 UserPermission = db.Table('user_permission', db.Model.metadata,

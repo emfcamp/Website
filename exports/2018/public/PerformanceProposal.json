@@ -1,0 +1,189 @@
+{
+    "favourites": {
+        "counts": {
+            "0": 6,
+            "1-9": 0,
+            "10-19": 0,
+            "20-29": 0,
+            "30-39": 0,
+            "40-49": 0,
+            "50-99": 0,
+            "100-199": 0,
+            "200+": 0
+        }
+    },
+    "proposals": {
+        "accepted": [
+            {
+                "title": "Gasman's ZX Spectrum Chiptune Extravaganza (The Revenge)",
+                "description": "A chip music performance featuring retro video game melodies, pop anthems and searing keytar solos from the world's foremost ZX Spectrum rock star.",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "music performance",
+                "description": "Metalogue is the alias of London based musician / producer / programmer Robin Fencott. Metalogue combines cinematic sound design with elements of industrial, IDM, ambient, and experimental electronic sub-genres. Metalogue's music is available at metalogue.bandcamp.com",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "2xAA plays more Game Boys",
+                "description": "Music event all played from Game Boys.\r\nIt's more house this time as I'm using Game Boy Advances rather than the original Game Boy.\r\n\r\n\r\nI can do 45 minutes or longer, so if you need more music I can go for about 1 hour 30 or do two sets.\r\nEveryone loved loved it last year, I had a really good response \ud83d\udc4c",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Electronic Live Performance",
+                "description": "Riotmiloo's musical roots come from riotgrrrl\u2019s screams and protest. Riotmiloo started as the lead Singer of the London garage punk band Venom Seeds (2003-2008) before showing strong interest in industrial  and electronic sounds.\r\n\r\nAfter numerous successful collaborations with international electronic, industrial and techno artists,  she is noticed by magazines worldwide for bringing strong vocal elements and her intense stage presence, creating a cathartic and hypnotic rhythm and noise experience.\r\n\r\nRiotmiloo released her debut album, \"La Pierre Soud\u00e9e\"  on German label Ant-zen in June 2015. This collaborative work includes the participation of many electronic artists. This unique album has received many glowing reviews internationally. \r\n\r\nListen to Riotmiloo's \"La Pierre Soud\u00e9e\": http://ant-zen.bandcamp.com/album/la-pierre-soud-e\r\n\r\nPlease find more info, pictures and videos on Riotmiloo's EPK: http://bit.ly/1Z84WzL",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "8bit Beats",
+                "description": "A DJ set of game/tech-culture related dance tracks, in the range of electro/house, veering occasionally into dupstep/drum and bass. Chip tunes, remixes, mashups will all show their pixelated faces.",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "beats with an underscore",
+                "description": "a dj set with well selected drums  and basses and some drops in between (like in https://hearthis.at/tasmo/tasmo-beats-mit-unterstrich-rpten/)",
+                "names": "tasmo",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            }
+        ],
+        "counts": {
+            "needs_help": {
+                "false": 5,
+                "true": 1
+            },
+            "needs_money": {
+                "false": 6
+            },
+            "needs_laptop": {
+                "false": 6
+            },
+            "one_day": {
+                "false": 5,
+                "true": 1
+            },
+            "notice_required": {
+                "1 month": 3,
+                "1 week": 3
+            },
+            "may_record": {
+                "false": 6
+            },
+            "state": {
+                "accepted": 5,
+                "finished": 1
+            },
+            "created_week": {
+                "2016-03-07": 1,
+                "2016-06-13": 1,
+                "2016-06-20": 1,
+                "2016-06-27": 2,
+                "2016-07-04": 1
+            }
+        },
+        "edits": {
+            "title": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "description": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "requirements": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "length": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "notice_required": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "needs_help": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "needs_money": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "one_day": {
+                "avg": 1.17,
+                "max": 2
+            },
+            "has_rejected_email": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "published_names": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "arrival_period": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "departure_period": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "telephone_number": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "may_record": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "needs_laptop": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "available_times": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "attendees": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "cost": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "size": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "funds": {
+                "avg": 1.00,
+                "max": 1
+            }
+        }
+    }
+}

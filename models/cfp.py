@@ -2,11 +2,15 @@ from datetime import datetime, timedelta
 from collections import namedtuple
 from dateutil.parser import parse as parse_date
 import re
+from itertools import groupby
 
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import UniqueConstraint, func, select
+from sqlalchemy.orm import column_property
 from slugify import slugify_unicode
+from models import export_attr_counts, export_attr_edits, export_intervals, bucketise
 
 from main import db
+from .user import User
 
 # state: [allowed next state, ] pairs
 CFP_STATES = { 'edit': ['accepted', 'rejected', 'new'],
@@ -107,7 +111,12 @@ class Proposal(db.Model):
     # References to this table
     messages = db.relationship('CFPMessage', backref='proposal')
     votes = db.relationship('CFPVote', backref='proposal')
-    favourites = db.relationship('User', secondary=FavouriteProposal, backref=db.backref('favourites'))
+    favourites = db.relationship(User, secondary=FavouriteProposal, backref=db.backref('favourites'))
+
+    # Convenience for individual objects. Use an outerjoin and groupby for more than a few records
+    favourite_count = column_property(select([func.count(FavouriteProposal.c.proposal_id)]).where(
+        FavouriteProposal.c.proposal_id == id,
+    ), deferred=True)
 
     # Fields for finalised info
     published_names = db.Column(db.String)
@@ -128,6 +137,93 @@ class Proposal(db.Model):
     potential_venue = db.Column(db.Integer, db.ForeignKey('venue.id'))
 
     __mapper_args__ = {'polymorphic_on': type}
+
+    @classmethod
+    def get_export_data(cls):
+        if cls.__name__ == 'Proposal':
+            # Export stats for each proposal type separately
+            return {}
+
+        count_attrs = ['needs_help', 'needs_money', 'needs_laptop',
+                       'one_day', 'notice_required', 'may_record', 'state']
+
+        edits_attrs = ['title', 'description', 'requirements', 'length',
+                       'notice_required', 'needs_help', 'needs_money', 'one_day',
+                       'has_rejected_email', 'published_names', 'arrival_period',
+                       'departure_period', 'telephone_number', 'may_record',
+                       'needs_laptop', 'available_times',
+                       'attendees', 'cost', 'size', 'funds']
+
+        proposals = cls.query.with_entities(
+            cls.id, cls.title, cls.description,
+            cls.favourite_count,  # don't care about performance here
+            cls.length, cls.notice_required, cls.needs_money,
+            cls.available_times, cls.allowed_times,
+            cls.arrival_period, cls.departure_period,
+            cls.needs_laptop, cls.may_record,
+        ).order_by(cls.id)
+
+        if cls.__name__ == 'WorkshopProposal':
+            proposals = proposals.add_columns(cls.attendees, cls.cost)
+        elif cls.__name__ == 'InstallationProposal':
+            proposals = proposals.add_columns(cls.size, cls.funds)
+
+        # Some unaccepted proposals have scheduling data, but we shouldn't need to keep that
+        accepted_columns = (
+            User.name, User.email, cls.published_names,
+            cls.scheduled_time, cls.scheduled_duration, Venue.name,
+        )
+        accepted_proposals = proposals.filter(cls.state.in_(['accepted', 'finished'])) \
+                                      .outerjoin(Venue, Venue.id == cls.scheduled_venue) \
+                                      .join(cls.user) \
+                                      .add_columns(*accepted_columns)
+
+        other_proposals = proposals.filter(~cls.state.in_(['accepted', 'finished']))
+
+        user_favourites = cls.query.filter(cls.state.in_(['accepted', 'finished'])) \
+                                   .join(cls.favourites) \
+                                   .with_entities(User.id.label('user_id'), cls.id) \
+                                   .order_by(User.id)
+
+        anon_favourites = []
+        for user_id, proposals in groupby(user_favourites, lambda r: r.user_id):
+            anon_favourites.append([p.id for p in proposals])
+        anon_favourites.sort()
+
+        public_columns = (
+            cls.title, cls.description,
+            cls.published_names.label('names'), cls.may_record,
+            cls.scheduled_time, cls.scheduled_duration, Venue.name.label('venue'),
+        )
+        accepted_public = cls.query.filter(cls.state.in_(['accepted', 'finished'])) \
+                                   .outerjoin(Venue, Venue.id == cls.scheduled_venue) \
+                                   .with_entities(*public_columns)
+
+        favourite_counts = [p.favourite_count for p in proposals]
+
+        data = {
+            'private': {
+                'proposals': {
+                    'accepted_proposals': accepted_proposals,
+                    'other_proposals': other_proposals,
+                },
+                'favourites': anon_favourites,
+            },
+            'public': {
+                'proposals': {
+                    'counts': export_attr_counts(cls, count_attrs),
+                    'edits': export_attr_edits(cls, edits_attrs),
+                    'accepted': accepted_public,
+                },
+                'favourites': {
+                    'counts': bucketise(favourite_counts, [0, 1, 10, 20, 30, 40, 50, 100, 200]),
+                },
+            },
+            'tables': ['proposal', 'proposal_version', 'favourite_proposal', 'favourite_proposal_version'],
+        }
+        data['public']['proposals']['counts']['created_week'] = export_intervals(cls.query, cls.created, 'week', 'YYYY-MM-DD')
+
+        return data
 
     def get_user_vote(self, user):
         # there can't be more than one vote per user per proposal
@@ -319,6 +415,31 @@ class CFPMessage(db.Model):
 
         return False
 
+    @classmethod
+    def get_export_data(cls):
+        count_attrs = ['has_been_read']
+
+        message_contents = cls.query.join(User).with_entities(
+            cls.proposal_id, User.email.label('from_user_email'), User.name.label('from_user_name'),
+            cls.is_to_admin, cls.has_been_read, cls.message,
+        ).order_by(cls.id)
+
+        data = {
+            'private': {
+                'message': message_contents,
+            },
+            'public': {
+                'messages': {
+                    'counts': export_attr_counts(cls, count_attrs),
+                },
+            },
+            'tables': ['cfp_message', 'cfp_message_version'],
+        }
+        data['public']['messages']['counts']['created_day'] = export_intervals(cls.query, cls.created, 'day', 'YYYY-MM-DD')
+
+        return data
+
+
 class CFPVote(db.Model):
     __versioned__ = {}
     __tablename__ = 'cfp_vote'
@@ -349,8 +470,29 @@ class CFPVote(db.Model):
 
         self.state = state
 
+    @classmethod
+    def get_export_data(cls):
+        count_attrs = ['state', 'has_been_read', 'vote']
+        edits_attrs = ['state', 'vote', 'note']
+
+        data = {
+            'public': {
+                'votes': {
+                    'counts': export_attr_counts(cls, count_attrs),
+                    'edits': export_attr_edits(cls, edits_attrs),
+                },
+            },
+            'tables': ['cfp_vote', 'cfp_vote_version'],
+        }
+        data['public']['votes']['counts']['created_day'] = export_intervals(cls.query, cls.created, 'day', 'YYYY-MM-DD')
+
+        return data
+
+
 class Venue(db.Model):
     __tablename__ = 'venue'
+    __export_data__ = False
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     type = db.Column(db.String, nullable=True)
@@ -364,6 +506,7 @@ class Venue(db.Model):
     __table_args__ = (
         UniqueConstraint('name', name='_venue_name_uniq'),
     )
+
 
 # TODO: change the relationships on User and Proposal to 1-to-1
 db.Index('ix_cfp_vote_user_id_proposal_id', CFPVote.user_id, CFPVote.proposal_id, unique=True)
