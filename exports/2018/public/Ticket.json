@@ -1,0 +1,20 @@
+{
+    "tickets": {
+        "counts": {
+            "paid": {
+                "campervan": 59,
+                "car": 593,
+                "full": 1556,
+                "kid": 129,
+                "other": 403
+            },
+            "unpaid": {
+                "campervan": 11,
+                "car": 59,
+                "full": 279,
+                "kid": 22,
+                "other": 48
+            }
+        }
+    }
+}

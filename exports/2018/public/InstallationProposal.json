@@ -1,0 +1,525 @@
+{
+    "favourites": {
+        "counts": {
+            "0": 0,
+            "1-9": 0,
+            "10-19": 0,
+            "20-29": 0,
+            "30-39": 0,
+            "40-49": 0,
+            "50-99": 0,
+            "100-199": 0,
+            "200+": 0
+        }
+    },
+    "proposals": {
+        "accepted": [
+            {
+                "title": "World'O'Techno",
+                "description": "It's a thing on wheels that plays a different techno track for every square foot of the planet. I plan to abandon it on the site with obvious instructions to suggest that people move it about to change the tune.",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "A Tune on a Stick",
+                "description": "Rotating collaborative musical sequencer thing.",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Black-lit Black Hole",
+                "description": "I\u2019m writing on behalf of an art and astronomy collective making work based upon how the invisible beyond can manifest itself on Earth through light. Alongside our practice we organise art and science events and exhibitions, with the aim of bringing artists, scientists and technologists together to make new work and projects.\r\n\r\nI would like to create a black-lit installation that explores light bodies and invisible patterns. \r\nI created a similar installation for a recent exhibition called VOID at St John on Bethnal Green church. EMF represents a great opportunity to take the tensile piece into the outdoors and also meet folk with tech skills who might be interested in collaborating.\r\n\r\nFor EMF I would like to create the installation between trees with black and fluorescent green fishing wire. By night the upward section of the installation would be visible with black light. By day, the underside structure would be visible. \r\n\r\nI can bear the material costs and time, but it would be great to have a small amount towards transport. It would take 1.5 days to install. \r\nAll i would need from EMF is power supply (2 gang). ",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Fire Pong",
+                "description": "Pong game utilising flame effects - either as a moving \"puck\" or as game status indicators.",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "The Giant Staring Eye",
+                "description": "A giant eye that stares at passers-by.",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Spherical Pacman (and projection system)",
+                "description": "I set up Spherical Pacman at last EMF, as its first outing. It's a complete multiplayer pacman clone played on a weather balloon, using 4x projectors to create a full spherical projection map.\r\n\r\nGame wise, 5 players can play - 1 as pacman, the rest as ghosts. It's pretty chaotic with several people running around the balloon.\r\n\r\nI plan to have multiple visualisations on the rig this time, as well as the pacman, so it should serve ok as a relatively permanent install (last time I needed to babysit it, which meant it was only set up late one night).",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "The Nature Chamber - plug in your ear phones and listen to microcosmic sounds made by insects you place into the chamber",
+                "description": "The Nature Chamber is a portable box that can detect inputs from the microcosmic world, such as the footsteps of an ant, centipede, insects and then allows you to listen to the sound these inputs make through their ear phones that the user can then record.\r\n\r\nUsers that interact with the box will be able to hear the invisible, a new sound, something they may never have heard before. They will perceive their environment; see the natural environment in a different way after plugging in and hearing a different type of music.\r\n\r\nThe electronic engineering takes a small microphone that is amplified with an operational amplifier chip (op amp); the amplification is controlled by a potentiometer and then fed to a power amplifier to increase the audio level. The microphone is then enclosed in a paper cone to funnel the inputs from the ant/insect into the microphone. \r\n\r\nIn addition to hearing the microcosmic sounds the insects inside The Nature Chamber make, we can also send these analogue inputs through an Arduino to control video. See example https://youtu.be/Q08AgVP_yIE\r\n\r\nThese inputs are fed through a Max Msp patch converting the Arduino serial data to midi to be compatible as a trigger for pause and play in Resolume Arena of a selected video.  In essence each \u2018footstep\u2019 (insect input) will trigger a frame of the video, the more frequent the inputs coming from The Nature Chamber the faster the frames of the video are triggered. ",
+                "names": "Chris Watson",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "The Starship Bridge Simulator",
+                "description": "Our simulator looks a bit like this in action: http://daid.eu/~daid/20150723_184520.small.jpg\r\n\r\nHave you seen Star Trek? Basically that.\r\n\r\nWe have 5 standing stations (like lecture stands with touch screens) and a main screen (beamer or tv screen, siren and smoke generator are optional) including a captain, each ship can be crewed by 6 people.\r\n\r\nemptyepsilon.org",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": "2016-08-05 22:00:00",
+                "scheduled_duration": 120,
+                "venue": "Stage C"
+            },
+            {
+                "title": "Twitbeeb",
+                "description": "Tweet like it's 1982! A BBC B connected to a Raspberry Pi. Tweets with the event hashtag are shown on the Beeb's screen and tweets can be typed and sent from the @twitbeeb account.",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "BarBot",
+                "description": "Robot tended bar",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "The reality simulator",
+                "description": "A demonstration of why interacting with the world via a screen and a grabby thing (or a pickaxe) is rubbish.\r\n\r\nIt's an opaque box on wheels that you push around from the inside. There'll be a clear screen, but slightly too small. There'll be a grabby-hand-on-a-stick, which will be terrible. It'll probably have an inventory shelf. Somewhere on the site will be a BFG. Maybe. \r\n\r\nOr we could call it 'Credulous Rift'. ",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "We Just Like to Make Stuff",
+                "description": "Miniature Rope making, lots of interesting LED light units (working on a Rubik Cube with LEDs), Miniature neons, and odd games (Spherical Chess! Steerable Night-time Kite flying). ",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "LaserTag",
+                "description": "LaserTag game to be played either inside a tent or just after sunset or later (the equipment doesn't like daylight very much).  The equipment isn't waterproof so if it is raining it can only be used inside.",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Simulated-phosphor spectrum display",
+                "description": "A laser projection of the local radio activity onto glow-in-the-dark fabric, for CRT-style persistence. Make a phone call, use the Wi-Fi or use some other radio device and see it pop up on the display.\r\n\r\nIt's very likely that it'll switch around with displaying other stuff depending on what looks cool.",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Fab Lab Truck",
+                "description": "The Fab Lab Truck is a mobile Fabrication Lab / Makerspace, containing a professional Trotec lasercutter, 3D printers, vinyl cutter and small CNC. We offer the use of these machines to the community for free during the event.",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Bighak",
+                "description": "A 5 x scale, ride on  version of the 80s bigtrak",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Making a film at EMF!",
+                "description": "Either a 'flat' or a 360 film made around the site.  Would like to work out exact theme via collaboration on the wiki/mailing lists/irc a bit like 'Tentman' was organised last year.  ",
+                "names": "Alia Sheikh",
+                "may_record": true,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Foot Fall Field",
+                "description": "We detect footsteps with a lidar scanner over a 6m square area of the site, and project reactive entertainment onto that area from a projector on a pole. EG, ripples triggered by feet, paths with powerups, giant game of Dance Dance Revolution. Probably all of the above. Games will all be very instant-engagement, so it could even be projecting across one of the tracks.",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Laser Maze",
+                "description": "A game that involves making your way around the course trying to avoid breaking laser beams. In event of beam breakage, lights flash and (optional) sounder sounds. The maze has been successfully used at a Mini-Maker Faire. Also includes inflatable shark...",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Sticker Wall",
+                "description": "Many people in the community have stickers all over the place on their laptops.\r\n\r\nI started collecting pictures on the Pinterest board: https://uk.pinterest.com/mstefanow/laptop-stickers/\r\n\r\nEvery conference / festival / congress is a supply of stickers... I created a sticker wall at #cccamp15 #32c3 - https://twitter.com/klapauzius/status/686654265172078593 - and I'd really like to create something similar at EMFCAMP.\r\n\r\nLoads of stickers. Loads of other materials. Coins, cables, pictures, random stuff... Anything really. Stickers as the main theme and all the other objects as an addition...\r\n\r\nIt's about reusing existing materials and create some value out of the entropy.\r\n\r\nMany thanks",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Large-scale LED skywriting / light painting",
+                "description": "Skywriting in the dark, gone large. A self-contained wand rotating for text or trippy colourful patterns.\r\n\r\nConstruction:\r\n- Take one meter of RGB LED strip and attach to stick\r\n- Connect battery, control board, and rope\r\n- Spin rope around at night\r\n\r\nArtistic effect:\r\n- Abstract patterns / wavy lines\r\n- Clock\r\n- Digital signage\r\n- Real-time message display over BLE and/or WiFi (might not be a good idea if people only write swearwords)\r\n\r\nPractical concerns:\r\n- Will need to stop and change the battery occasionally\r\n- It's a large spinning thing, might need to be roped off\r\n- The spinning motor could be raised above head height but I'd need help with this\r\n- Reasonably weather-proof, should be OK in light rain",
+                "names": "Philip R",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "The EMF Film Festival",
+                "description": "There's been a steady stream of technology-based documentaries that have emerged over the past few years; from the fascinating King of Kong to the very niche (but equally good) Helvetica. Last year, the UK's home computing revolution was showcased in From Bedrooms To Billions. Let's have a dedicated tent set up for a curated programme of documentaries and features that appeal to the creators and enthusiasts drawn to EMF. Modern documentaries could be interspersed with classic movies and newsreels focussed on technology. It may even be possible to hold Q&As or discussion panels as well as morning screenings for younger guests. If EMF attendees have made their own films, we could showcase them.",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Awesome Retro tent",
+                "description": "At EMF 2014 we ran a significant part of the retro gaming tent. We'd love to do that again, at the same size, or bigger (if you want).\r\nWe'll bring over our stuff again (e.g. retro gaming consoles, home computers, lighting & decoration) if you can provide us with a tent and some seating. \r\nNote: A pile of used sofas or \"beer benches\" would be preferred over the hay bales we used last time; we're sometimes still getting straws and hay dust out of some of the equipment we brought over then ;-)\r\nWe would need some funding again though, to make this all happen. Last time that was GBP 500, which was exactly sufficient for what we brought then. This time I would expect we'll need slightly more, but not that much more.\r\nCheers!",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Dorkbot / algorave tent",
+                "description": "A tent with a lovely handmade soundsystem (dangernoise from sheffield).\r\n\r\nThe tent should be placed away from sleeping areas so that we can make noise until the midnight curfew.\r\n\r\nBy day we would have informal 'dorkbot' style presentations (bringing together dorkbotlondon, dorkbotsheffield and others), hands-on live coding workshops, and technology-based performances. We could also collaborate with other villages and/or the main emfcamp team on building up this programme. By night we would have 'algorave' style performances - algorithmic dance music.\r\n\r\nI have enough headphone amplifiers for up to 100 people, so there is the possibility of continuing later than midnight with some relaxing headphone music.\r\n\r\nI'd stream the performances live on eulerroom.com http://eulerroom.com/\r\n\r\nWe already have 3-4 top algorave producers coming to EMFcamp (I guess I shouldn't list them if this is anonymised), but it would be good to have up to 10 tickets on reserve to fill the programme.\r\n\r\nAlso, any 'shiny' budget towards this would be appreciated - towards the cost of the tent, and the petrol + expenses (food and ticket) of the sound engineer (who made the soundsystem himself and would be up for doing a talk on it). It'd be good to know about this sooner rather than later, so we can try to fundraise the rest. We might be able to find a sponsor for all of it, in which case we would obviously pass back the shiny budget.",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Communicating around the world without the Internet",
+                "description": "My daughter and I can establish an Amateur Radio station with which we can communicate around the world with other Amateur Radio operations using phone (voice) and digital computer communications. This is a fascinating technical hobby for people of all ages - school to retirement.",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Teardrop tour",
+                "description": "We will be using our home-made teardrop trailer to camp in and in 2014 did some informal tours of the rig and explained how it was built and some of the history of these designs. About 30 people wandered over to look and ask questions in response to a simple sign. We propose to do something more formal for 2016 with extra information, list of links for those who might want to build one and a mini-display of different options made by others in the UK. ",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Musical Ballpit",
+                "description": "The musical ballpit is a multi-sensory installation, using image processing to turn playing in a ballpit into beautiful (or horrible) sounds. Come and play!",
+                "names": "Jodi Crisp and Scott Lamb",
+                "may_record": true,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Astronomy - day and night",
+                "description": "A 40mm solar telescope (656.3 nm Hydrogen alpha spectral line) for use during the day and a 406mm reflecting telescope on a Dobsonian mount and some 25x100 binoculars for use at night.  At EMF 2014 well in excess of 50 people looked through the solar telescope and one rather mature gent said it was a \"life changing experience\".",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Trippy water droplets",
+                "description": "I am planning on building one of these contraptions:\r\n\r\nhttp://www.electroboom.com/?p=268\r\n\r\nMy setup will make a few enhancements and allow for anyone to control the wave forms being fed to the speakers and the speed of the strobe light. This is both visually fun while being educational about vision, the human eye and rasperry pis.",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "The TwitterTicker v2",
+                "description": "I very hastily provided a receipt printer spitting out tweets mentioning emfcamp last time. I'd like to do something similar for the bar or another public area but make it a bit less like a receipt printer screwed to the bar and add support for things like pictures. Contemplating making it cut each message so it \"rains\" tweets like confetti.",
+                "names": "Mark Phelan",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Art meets technology meets green",
+                "description": "Our ambition is to create an engineered representation of conservation issues that introduces the problems, solutions and activities within conservation. Our aim is to bring the issues to people and inspire action through innovative use of technology. The installation will be thought provoking, entertaining and collaborative. Art meets technology meets green.\r\n\r\nMore about us\r\nThe Smart Earth Network brings together conservationists, technologists and entrepreneurs to collaborate on innovations which help us better protect nature. A Goldsmiths student is studying at a 'hub of radical experimentation forging links between digital technologies and artistic practice'. And I am a self-employed engineer and have worked on a number of technical jobs at music festivals (e.g. IoWFest, Download, V Festival, Wireless) and other live events including a world record breaking video wall made from mobile phones.",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Mario Kart Karnival!",
+                "description": "A small marquee containing a TV, Gamecube and scoreboard. Two challenges: Fastest lap on Mario Kart Double Dash and a knockout championship. Fastest lap can be undertaken anytime with scores uploaded by photo to a dedicated Twitter account. Knockout groupings drawn before the event, competitors given a time frame to meet up, play their match and post results. This then repeats for the next rounds. All organised via a dedicated Twitter account. We think this will be a fun way for people to meet. Small prizes for the winners. We're bringing a camper van so ideally would have this set up next to it (which means we can use the power from the hook-up).",
+                "names": "PJ Evans",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Chill-Out Projection Dome",
+                "description": "At the first EMFCamp I set up a geodesic dome that I did projection mapping in. This year I'd like to do the same. It's a 5m diameter dome that's around 2m tall and I just need power nearby to run the projector and speakers. Here's a picture of the set up at EMFCamp v1:\r\n\r\nhttps://www.flickr.com/photos/h1kari/7929206732/in/album-72157631339744702/",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "The Marvellous Mystery Machine",
+                "description": "The Marvellous Mystery Machine is the result of top secret hacking efforts over the last several month by cabal of hackers whose motivation remains unclear. \r\n\r\nCan you find it? Can you work out what it does, and how it does it? Can you solve it's mysteries and it's puzzles? What secrets does it keep, and what will it reveal?\r\n\r\nOnly the most cunning and sneaky will prevail...",
+                "names": "Mysterious Cabal Inc.",
+                "may_record": true,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "The\u00b7Grid",
+                "description": "We\u2019d love to bring The\u00b7Grid back to EMF!  And with new RGB LED strip, individual controllers per pole, sophisticated sound generators, and improved computer vision, it\u2019ll be better than ever!\r\n\r\nThe\u00b7Grid debuted at EMF 2014 with an array of 49 poles mounted with white LEDs and clicker-sounders.  Combined with computer control and a variety of patterns, the result was a mesmerizing experience for hundreds of revellers.  This time, we have some improvements in mind.  We'd replace the centralised switching with dimmable controllers per pole to back up the colourful new RGB LEDs.  We're also adding a programmable sounder to each pole for a wider variety of immersive aural effects.  Finally, we have plans to improve the computer vision system, enhancing the interactivity that many people enjoyed.\r\n\r\nWe expect the improvements to cost around \u00a3700: \u00a3350 for new LED strip and \u00a3350 for the new controller electronics.  We can cover the electronics cost, if EMF could give us \u00a3350 for the new LED strip.\r\n\r\nAs previously, we require around 24 by 14m of unlit ground, and mains power (1.2kW peak).\r\n\r\nFor more information, please refer to http://www.thegrid.fish/proposal2.pdf which includes a risk assessment and more detailed plans.",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Shroud",
+                "description": "A video art installation based on the mathematics of random fields and perlin noise, using symmetry to induce the perception of recognisable forms through the visual cortex.",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Giant Rabbit",
+                "description": "A giant inflatable rabbit lit with RGB LEDS, shaped like the notorious rabbits from Nottinghak",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Automated / hackable flying arena with miniature quadcopters",
+                "description": "This is a system I have been developing for some time at the Edinburgh Hacklab. It uses a set of Optitrack high speed infrared motion capture cameras to fly standard Hubsan X4 toy quadcopters under precision computer control, within a bounded indoor area. It is currently capable of very accurate hover, and scripted flight between given positions. I'm working on more aerobatic capabilities and would aim to have these ready by the camp, but can't guarantee it.\r\n\r\nAs well as pre-made demonstrations, I would propose to expose a simple public API that anyone could use to write their own flight scripts and run them on the system. The system would try to prevent API users from doing anything that could cause a crash. More ambitious visitors could perhaps get involved with lower level hacking on the system.\r\n\r\nCurrently I have a small number of vehicles, and the cameras are on fixed wall mounts at the Edinburgh Hacklab. In order to bring the system to EMF I would need to build and transport a rigid frame on which to mount the cameras, and stock up on vehicles and spare parts for inevitable losses during the event. If EMF could provide some scaffolding onsite this might help, and reduce cost.\r\n\r\nIf the system is to operate throughout the event some volunteer help would also be needed, as it needs a decent amount of babysitting, and I'd rather not be chained to it for the whole camp.\r\n\r\nBelieve it or not I have hardly any videos of this right now but here's a hover test from early testing to prove I'm not talking out of my ass: https://www.youtube.com/watch?v=q9RIgPPRbrw",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Symbiosis",
+                "description": "An interactive installation of the participants respiration, promoting healthy, relaxing breathing and cooperation between participants.",
+                "names": "Kira Zhigalina and Adrian Godwin",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "PULSE",
+                "description": "PULSE is an interactive light and sound installation, designed by three electronic engineers.\r\n\r\nThe setup consists of three very high (26ft) poles, brightly lit up with hundreds of individually controlled RGB LEDs. The game is roughly based on the concept of \u2018Guitar Hero\u2019, with multiple coloured blocks of light descending down the three poles, synchronised to music. The player (or players in multiplayer mode) must play along to the music by hitting the correct coloured button \u2013 of which five are mounted on podiums in front of the poles. For advanced players, the button colours are able to change order during the game.\r\n\r\nReal time scores are displayed on a large illuminated arcade-style display, and all scores registered during the event can also be viewed on the leaderboard through a web interface. This interface also allows players to set the game\u2019s difficulty, configure its settings, and to choose the music they want to play.\r\n\r\nThe size and complexity of the installation will be very eye catching and draw a lot of interest \u2013 when not being played it runs in a demo mode, using the three 26ft columns of light to display synchronised and colour changing patterns.",
+                "names": "Andy Cowan, John Alton, Daniel Saul",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "title": "Firefly Lanterns",
+                "description": "A set of 10 lanterns provide a dim red glow, each giving a brief, yellow flash every 2 seconds. Like fireflies and many other phosphorescent creatures, each lantern can see the others' flashes and adjust its timing accordingly, causing the whole swarm to drift into a stable, synchronised pattern. But a sudden noise by one of the lanterns will cause it to flash early, breaking the pattern and reintroducing some chaos to the swarm.\r\n\r\n(Note about the physical size: each lantern is about 30-50cm diameter, mounted on 1.5-2m poles. So they're pretty small, but it's intended to be spread over an area of a few tens of square metres. They don't need a dedicated space: mingling them amongst other stuff is completely fine, 'though it'd be better if they could all (/most) be seen at once, and weren't directly illuminated by other bright lights.)",
+                "names": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            }
+        ],
+        "counts": {
+            "needs_help": {
+                "false": 42,
+                "true": 13
+            },
+            "needs_money": {
+                "false": 55
+            },
+            "needs_laptop": {
+                "false": 26,
+                "null": 29
+            },
+            "one_day": {
+                "false": 55
+            },
+            "notice_required": {
+                "> 1 month": 14,
+                "1 month": 20,
+                "1 week": 21
+            },
+            "may_record": {
+                "false": 23,
+                "true": 3,
+                "null": 29
+            },
+            "state": {
+                "accepted": 32,
+                "cancelled": 6,
+                "finished": 9,
+                "manual-review": 3,
+                "rejected": 5
+            },
+            "created_week": {
+                "2016-01-11": 8,
+                "2016-01-18": 6,
+                "2016-01-25": 1,
+                "2016-02-01": 1,
+                "2016-02-22": 2,
+                "2016-02-29": 3,
+                "2016-03-07": 1,
+                "2016-03-14": 4,
+                "2016-04-11": 1,
+                "2016-04-18": 1,
+                "2016-05-16": 1,
+                "2016-05-23": 3,
+                "2016-05-30": 3,
+                "2016-06-06": 3,
+                "2016-06-13": 5,
+                "2016-06-20": 4,
+                "2016-06-27": 4,
+                "2016-07-04": 2,
+                "2016-07-11": 1,
+                "2016-07-18": 1
+            }
+        },
+        "edits": {
+            "title": {
+                "avg": 1.04,
+                "max": 2
+            },
+            "description": {
+                "avg": 1.16,
+                "max": 4
+            },
+            "requirements": {
+                "avg": 1.07,
+                "max": 3
+            },
+            "length": {
+                "avg": 2.00,
+                "max": 2
+            },
+            "notice_required": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "needs_help": {
+                "avg": 1.05,
+                "max": 3
+            },
+            "needs_money": {
+                "avg": 1.51,
+                "max": 2
+            },
+            "one_day": {
+                "avg": 1.51,
+                "max": 2
+            },
+            "has_rejected_email": {
+                "avg": 1.53,
+                "max": 3
+            },
+            "published_names": {
+                "avg": 1.49,
+                "max": 3
+            },
+            "arrival_period": {
+                "avg": 1.49,
+                "max": 3
+            },
+            "departure_period": {
+                "avg": 1.49,
+                "max": 3
+            },
+            "telephone_number": {
+                "avg": 1.49,
+                "max": 3
+            },
+            "may_record": {
+                "avg": 1.47,
+                "max": 2
+            },
+            "needs_laptop": {
+                "avg": 1.47,
+                "max": 2
+            },
+            "available_times": {
+                "avg": 1.47,
+                "max": 2
+            },
+            "attendees": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "cost": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "size": {
+                "avg": 1.04,
+                "max": 2
+            },
+            "funds": {
+                "avg": 1.02,
+                "max": 2
+            }
+        }
+    }
+}
