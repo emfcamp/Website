@@ -421,7 +421,7 @@ class CFPMessage(db.Model):
         count_attrs = ['has_been_read']
 
         message_contents = cls.query.join(User).with_entities(
-            cls.proposal_id, cls.from_user_id, User.name.label('user_name'),
+            cls.proposal_id, User.email.label('from_user_email'), User.name.label('from_user_name'),
             cls.is_to_admin, cls.has_been_read, cls.message,
         ).order_by(cls.id)
 
