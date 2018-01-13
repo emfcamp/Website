@@ -97,5 +97,11 @@ class ExportDB(Command):
         filename = os.path.join(path, 'export.json')
         simplejson.dump(data, open(filename, 'w'), indent=4, cls=ExportEncoder)
 
+        with app.test_client() as client:
+            for schedule in ['schedule.frab', 'schedule.json', 'schedule.ics']:
+                resp = client.get('/{}'.format(schedule))
+                with open(os.path.join(path, 'public', schedule), 'wb') as f:
+                    f.write(resp.data)
+
         app.logger.info('Export complete, summary written to %s', filename)
 

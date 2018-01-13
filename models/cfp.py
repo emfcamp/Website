@@ -477,8 +477,6 @@ class CFPVote(db.Model):
         edits_attrs = ['state', 'vote', 'note']
 
         data = {
-            'private': {
-            },
             'public': {
                 'votes': {
                     'counts': export_attr_counts(cls, count_attrs),
