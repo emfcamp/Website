@@ -236,8 +236,7 @@ class Ticket(db.Model):
                            .filter(models.Payment.currency == TicketPrice.currency) \
                            .with_entities(
                                func.sum(TicketPrice.price_int / 100),
-                               paid, TicketPrice.currency, TicketType.admits
-                           ) \
+                               paid, TicketPrice.currency, TicketType.admits) \
                            .group_by(paid, TicketType.admits, TicketPrice.currency) \
                            .order_by(paid, TicketType.admits, TicketPrice.currency)
 
