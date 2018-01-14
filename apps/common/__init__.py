@@ -101,6 +101,13 @@ def load_utility_functions(app_obj):
                 .format(s=s, s_suff=suffix(s.day),
                         s_month=s.strftime('%B'),
                         e=e, e_suff=suffix(e.day))
+
+            simple_dates = '{s.day}&mdash;' \
+                '{e.day} ' \
+                '{s_month}' \
+                .format(s=s, s_month=s.strftime('%B'),
+                        e=e)
+
         else:
             fancy_dates = '{s_month} ' \
                 '{s.day}<sup>{s_suff}</sup>&ndash;' \
@@ -111,8 +118,17 @@ def load_utility_functions(app_obj):
                         e=e, e_suff=suffix(e.day),
                         e_month=e.strftime('%B'))
 
+            simple_dates = '{s.day} ' \
+                '{s_month}&ndash;' \
+                '{e.day} ' \
+                '{e_month}' \
+                .format(s=s, s_month=s.strftime('%B'),
+                        e=e, e_month=e.strftime('%B'))
+
+
         return {
             'fancy_dates': Markup(fancy_dates),
+            'simple_dates': Markup(simple_dates),
             'event_start': s,
             'event_end': e,
             'event_year': s.year,
