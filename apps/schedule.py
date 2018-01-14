@@ -19,6 +19,7 @@ from .common import feature_flag, json_response
 from models.cfp import Proposal, Venue
 from models.ical import CalendarSource, CalendarEvent
 from models.user import User, generate_checkin_code
+from models.site_state import event_start
 from .schedule_xml import export_frab
 
 schedule = Blueprint('schedule', __name__)
@@ -192,7 +193,7 @@ def schedule_frab():
 @feature_flag('SCHEDULE')
 def schedule_ical():
     schedule = _get_scheduled_proposals(request.args)
-    title = 'EMF 2016'
+    title = 'EMF {}'.format(event_start().year)
 
     cal = Calendar()
     cal.add('summary', title)
@@ -248,7 +249,7 @@ def favourites_ical():
         abort(404)
 
     schedule = _get_scheduled_proposals(request.args, override_user=user)
-    title = 'EMF 2016 Favourites for ' + user.name
+    title = 'EMF {} Favourites for {}'.format(event_start().year, user.name)
 
     cal = Calendar()
     cal.add('summary', title)

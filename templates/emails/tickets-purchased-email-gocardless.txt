@@ -2,7 +2,7 @@ Hi {{ user.name }},
 
 This is to confirm that you've bought
 {%- if payment.purchases | count == 1 %} a ticket {%- else %} {{ payment.purchases | count }} tickets
-{%- endif %} for Electromagnetic Field 2016.
+{%- endif %} for Electromagnetic Field {{ event_year }}.
 
 Your tickets are:
 

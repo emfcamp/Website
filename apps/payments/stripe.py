@@ -13,6 +13,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from main import db, stripe, mail, csrf
 from models.payment import StripePayment
+from models.site_state import event_start
 from ..common import feature_enabled
 from ..common.forms import Form
 from ..common.receipt import attach_tickets
@@ -56,13 +57,15 @@ def charge_stripe(payment):
     payment.state = 'charging'
     db.session.commit()
 
+    # max 15 chars, appended to company name
+    description = 'Tickets {}'.format(event_start().year)
     try:
         charge = stripe.Charge.create(
             amount=payment.amount_int,
             currency=payment.currency.lower(),
             card=payment.token,
             description=payment.description,
-            statement_description='Tickets 2016',  # max 15 chars, appended to company name
+            statement_description=description,
         )
     except stripe.CardError as e:
         error = e.json_body['error']

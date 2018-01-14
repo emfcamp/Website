@@ -7,7 +7,7 @@ We've just received confirmation from GoCardless that your payment for
 {% include 'emails/receipt-blurb.txt' %}
 {% endif %}
 
-See you soon at Electromagnetic Field 2016!
+See you soon at Electromagnetic Field {{ event_year }}!
 
 Love,
 

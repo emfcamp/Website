@@ -20,12 +20,12 @@
         </p>
     </div>
     <div class="col-md-6">
-        <p class="emphasis">Electromagnetic Field 2016 will be held on
-                             <strong>August 5&ndash;7 2016</strong>
+        <p class="emphasis">Electromagnetic Field {{ event_year }} will be held on
+                             <strong>{{ fancy_dates }} {{ event_year }}</strong>
                              at <strong>Loseley Park, Guildford</strong>.</p>
         <p>More details to be announced soon.</p>
        <div class="well">
-          <p>If you're interested in updates about EMF 2016, follow us on
+          <p>If you're interested in updates about EMF {{ event_year }}, follow us on
           <a href="https://www.twitter.com/emfcamp">Twitter</a> or join our mailing list:</p>
           <form method="post" class="form-inline" role="form">
             <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">

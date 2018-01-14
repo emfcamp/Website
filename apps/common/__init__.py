@@ -1,8 +1,9 @@
 # encoding=utf-8
 from decorator import decorator
+from datetime import datetime
 
 from main import db, mail, external_url
-from flask import session, render_template, abort, current_app as app, request
+from flask import session, render_template, abort, current_app as app, request, Markup
 from flask.json import jsonify
 from flask_login import login_user, current_user
 from werkzeug import BaseResponse
@@ -10,7 +11,7 @@ from werkzeug.exceptions import HTTPException
 
 from models.product import Price
 from models.purchase import Purchase
-from models.site_state import get_site_state, get_sales_state
+from models.site_state import get_site_state, get_sales_state, event_start, event_end
 from models.feature_flag import get_db_flags
 from models import User
 
@@ -77,6 +78,46 @@ def load_utility_functions(app_obj):
     def currency_processor():
         currency = get_user_currency()
         return {'user_currency': currency}
+
+    @app_obj.context_processor
+    def now_processor():
+        now = datetime.utcnow()
+        return {'year': now.year}
+
+    @app_obj.context_processor
+    def event_date_processor():
+        def suffix(d):
+            return 'th' if 11 <= d <= 13 else {1: 'st', 2: 'nd', 3: 'rd'}.get(d % 10, 'th')
+
+        s = event_start()
+        e = event_end()
+        assert s.year == e.year
+        if s.month == e.month:
+            fancy_dates = '{s_month} ' \
+                '<span style="white-space: nowrap">' \
+                '{s.day}<sup>{s_suff}</sup>&mdash;' \
+                '{e.day}<sup>{e_suff}</sup>' \
+                '</span>' \
+                .format(s=s, s_suff=suffix(s.day),
+                        s_month=s.strftime('%B'),
+                        e=e, e_suff=suffix(e.day))
+        else:
+            fancy_dates = '{s_month} ' \
+                '{s.day}<sup>{s_suff}</sup>&ndash;' \
+                '{e_month} ' \
+                '{e.day}<sup>{e_suff}</sup>' \
+                .format(s=s, s_suff=suffix(s.day),
+                        s_month=s.strftime('%B'),
+                        e=e, e_suff=suffix(e.day),
+                        e_month=e.strftime('%B'))
+
+        return {
+            'fancy_dates': Markup(fancy_dates),
+            'event_start': s,
+            'event_end': e,
+            'event_year': s.year,
+        }
+
 
 
 def send_template_email(subject, to, sender, template, **kwargs):

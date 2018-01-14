@@ -26,6 +26,12 @@ VALID_STATES = {
 def config_date(key):
     return parse(app.config.get(key))
 
+def event_start():
+    return config_date('EVENT_START')
+
+def event_end():
+    return config_date('EVENT_END')
+
 def calc_site_state(date):
     """ Logic to set the state of the homepage based on date. """
     if date < config_date('SALES_START'):

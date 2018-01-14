@@ -6,6 +6,7 @@ from lxml import etree
 from slugify import slugify_unicode
 
 from main import external_url
+from models.site_state import event_start, event_end
 
 event_tz = pytz.timezone('Europe/London')
 
@@ -46,10 +47,10 @@ def make_root():
 
     conference = etree.SubElement(root, 'conference')
 
-    _add_sub_with_text(conference, 'title', 'Electromagnetic Field 2016')
-    _add_sub_with_text(conference, 'acronym', 'emf16')
-    _add_sub_with_text(conference, 'start', '2016-08-05')
-    _add_sub_with_text(conference, 'end', '2016-08-07')
+    _add_sub_with_text(conference, 'title', 'Electromagnetic Field {}'.format(event_start().year))
+    _add_sub_with_text(conference, 'acronym', 'emf{}'.format(event_start().year % 100))
+    _add_sub_with_text(conference, 'start', event_start().strftime('%Y-%m-%d'))
+    _add_sub_with_text(conference, 'end', event_end().strftime('%Y-%m-%d'))
     _add_sub_with_text(conference, 'days', '3')
     _add_sub_with_text(conference, 'timeslot_duration', '00:10')
 
@@ -84,7 +85,7 @@ def add_event(room, event):
     _add_sub_with_text(event_node, 'abstract', event['description'])
     _add_sub_with_text(event_node, 'description', event['description'])
 
-    _add_sub_with_text(event_node, 'slug', 'emf2016-%s-%s' % (event['id'], slugify_unicode(event['title']).lower()))
+    _add_sub_with_text(event_node, 'slug', 'emf%s-%s-%s' % (event_start().year, event['id'], slugify_unicode(event['title']).lower()))
 
     _add_sub_with_text(event_node, 'subtitle', '')
     _add_sub_with_text(event_node, 'track', '')

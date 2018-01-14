@@ -2,13 +2,13 @@
     Surrounding scope needs the following attributes:
     itemscope itemtype="http://schema.org/Festival"
 #}
-<meta itemprop="startDate" content="2016-08-05T08:00">
-<meta itemprop="endDate" content="2016-08-07T23:30">
+<meta itemprop="startDate" content="{{ event_start.strftime('%Y-%m-%d') }}T08:00">
+<meta itemprop="endDate" content="{{ event_end.strftime('%Y-%m-%d') }}T23:30">
 <meta itemprop="url" content="https://www.emfcamp.org/">
 <p class="emphasis">
-    <span itemprop="name">Electromagnetic Field 2016</span>
+    <span itemprop="name">Electromagnetic Field {{ event_year }}</span>
     will be held on
-    <strong>August 5&ndash;7 2016</strong>
+    <strong>{{ fancy_dates }} {{ event_year }}</strong>
     at
         <span itemprop="location" itemscope itemtype="http://schema.org/Place">
             <span itemprop="name" style="font-weight: bold">Loseley Park</span>,

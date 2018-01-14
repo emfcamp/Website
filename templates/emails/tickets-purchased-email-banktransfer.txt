@@ -2,14 +2,14 @@ Hi {{ user.name }},
 
 {% if payment.purchases | count == 1 -%}
 This is to confirm that you've reserved a ticket for {{ payment.amount | price(payment.currency) }} for
-Electromagnetic Field 2016!
+Electromagnetic Field {{ event_year }}!
 
 This ticket will be reserved for you for 10 days while you send the money
 by bank transfer. We'll let you know by email when your payment has been
 received.
 {%- else -%}
 This is to confirm that you've reserved {{ payment.purchases | count }} tickets for {{ payment.amount | price(payment.currency) }}
-for Electromagnetic Field 2016!
+for Electromagnetic Field {{ event_year }}!
 
 These tickets will be reserved for you for 10 days while you send the money
 by bank transfer. We'll let you know by email when your payment has been

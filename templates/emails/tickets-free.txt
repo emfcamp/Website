@@ -1,6 +1,6 @@
 Hi {{ user.name }},
 
-You've been sent {% if tickets | count > 1 -%} {{ tickets | count }} complimentary tickets {%- else -%} a complimentary ticket {%- endif %} to Electromagnetic Field 2016.
+You've been sent {% if tickets | count > 1 -%} {{ tickets | count }} complimentary tickets {%- else -%} a complimentary ticket {%- endif %} to Electromagnetic Field {{ event_year }}.
 
 {% if feature_enabled('ISSUE_TICKETS') %}
 {% include 'emails/receipt-blurb.txt' %}
@@ -13,7 +13,7 @@ You can log in and view your {% if tickets | count > 1 -%} tickets {%- else -%} 
 
 {{ external_url('users.login', code=code) }}
 
-See you soon at Electromagnetic Field 2016!
+See you soon at Electromagnetic Field {{ event_year }}!
 
 Love,
 

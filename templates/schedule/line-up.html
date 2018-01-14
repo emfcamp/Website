@@ -6,7 +6,7 @@
 <h1>Line-up</h1>
 <div class="well">
 {% if SITE_STATE == 'before-event' or SITE_STATE == 'event' %}
-<p>This is a list of all the talks &amp; workshops that (should) be at Electromagnetic Field in 2016.
+<p>This is a list of all the talks &amp; workshops that (should) be at Electromagnetic Field in {{ event_year }}.
    Not all stages and time-periods are announced yet, so check back frequently.</p>
 <p>You can also get this list as an <a href="{{ url_for('.schedule_ical') }}">iCal feed</a>
    for your calendar, and a <a href="{{ url_for('.schedule_json') }}">json feed</a> for your giant robot.</p>

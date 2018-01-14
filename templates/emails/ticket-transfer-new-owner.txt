@@ -1,7 +1,7 @@
 Hi {{ to_user.name }},
 
 Your friend {{ from_user.name }} has transferred a ticket to you for
-Electromagnetic Field 2016.
+Electromagnetic Field {{ event_year }}.
 
 {% if feature_enabled('ISSUE_TICKETS') %}
 {% include 'emails/receipt-blurb.txt' %}
@@ -14,7 +14,7 @@ You can log in and view your ticket here:
 
 {{ external_url('users.login', code=code) }}
 
-See you soon at Electromagnetic Field 2016!
+See you soon at Electromagnetic Field {{ event_year }}!
 
 Love,
 

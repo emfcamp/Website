@@ -1,7 +1,7 @@
 Hi {{ user.name }},
 
 This is to let you know that you now have an account on website for
-Electromagnetic Field 2016!
+Electromagnetic Field {{ event_year }}!
 
 You can log into this account by visiting:
 

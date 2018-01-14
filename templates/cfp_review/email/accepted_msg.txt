@@ -1,6 +1,6 @@
 Hi {{ user.name }},
 
-Your Electromagnetic Field 2016 {{ proposal.type }} "{{ proposal.title }}" has been accepted!
+Your Electromagnetic Field {{ event_year }} {{ proposal.type }} "{{ proposal.title }}" has been accepted!
 
 We'll be in contact shortly to check how you'd like it to be listed in the schedule as well as to confirm some other details with you.
 

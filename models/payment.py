@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 
 from . import export_attr_counts, export_intervals, bucketise
 import models
+from models.site_state import event_start
 
 safechars = "2346789BCDFGHJKMPQRTVWXY"
 
@@ -378,7 +379,7 @@ class StripePayment(Payment):
 
     @property
     def description(self):
-        return 'EMF 2016 tickets'
+        return 'EMF {} tickets'.format(event_start().year)
 
     def manual_refund(self):
         if self.state not in ['charged', 'paid']:
