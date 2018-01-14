@@ -1,13 +1,13 @@
 """reset migrations
 
-Revision ID: 0d10c234333d
+Revision ID: 558311ed1c89
 Revises: None
-Create Date: 2017-12-02 16:39:55.282294
+Create Date: 2018-01-14 00:29:49.948756
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '0d10c234333d'
+revision = '558311ed1c89'
 down_revision = None
 
 from alembic import op
@@ -25,38 +25,6 @@ def upgrade():
     )
     with op.batch_alter_table('bank_account', schema=None) as batch_op:
         batch_op.create_index('ix_bank_account_sort_code_acct_id', ['sort_code', 'acct_id'], unique=True)
-
-    op.create_table('bank_account_version',
-    sa.Column('id', sa.Integer(), autoincrement=False, nullable=False),
-    sa.Column('sort_code', sa.String(), autoincrement=False, nullable=True),
-    sa.Column('acct_id', sa.String(), autoincrement=False, nullable=True),
-    sa.Column('currency', sa.String(), autoincrement=False, nullable=True),
-    sa.Column('transaction_id', sa.BigInteger(), autoincrement=False, nullable=False),
-    sa.Column('operation_type', sa.SmallInteger(), nullable=False),
-    sa.PrimaryKeyConstraint('id', 'transaction_id', name=op.f('pk_bank_account_version'))
-    )
-    with op.batch_alter_table('bank_account_version', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_bank_account_version_operation_type'), ['operation_type'], unique=False)
-        batch_op.create_index(batch_op.f('ix_bank_account_version_transaction_id'), ['transaction_id'], unique=False)
-
-    op.create_table('bank_transaction_version',
-    sa.Column('id', sa.Integer(), autoincrement=False, nullable=False),
-    sa.Column('account_id', sa.Integer(), autoincrement=False, nullable=True),
-    sa.Column('posted', sa.DateTime(), autoincrement=False, nullable=True),
-    sa.Column('type', sa.String(), autoincrement=False, nullable=True),
-    sa.Column('amount_int', sa.Integer(), autoincrement=False, nullable=True),
-    sa.Column('fit_id', sa.String(), autoincrement=False, nullable=True),
-    sa.Column('payee', sa.String(), autoincrement=False, nullable=True),
-    sa.Column('payment_id', sa.Integer(), autoincrement=False, nullable=True),
-    sa.Column('suppressed', sa.Boolean(), autoincrement=False, nullable=True),
-    sa.Column('transaction_id', sa.BigInteger(), autoincrement=False, nullable=False),
-    sa.Column('operation_type', sa.SmallInteger(), nullable=False),
-    sa.PrimaryKeyConstraint('id', 'transaction_id', name=op.f('pk_bank_transaction_version'))
-    )
-    with op.batch_alter_table('bank_transaction_version', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_bank_transaction_version_fit_id'), ['fit_id'], unique=False)
-        batch_op.create_index(batch_op.f('ix_bank_transaction_version_operation_type'), ['operation_type'], unique=False)
-        batch_op.create_index(batch_op.f('ix_bank_transaction_version_transaction_id'), ['transaction_id'], unique=False)
 
     op.create_table('calendar_source',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -98,35 +66,22 @@ def upgrade():
     sa.Column('created', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_email_job'))
     )
-    op.create_table('favourite_proposals_version',
-    sa.Column('user_id', sa.Integer(), autoincrement=False, nullable=True),
-    sa.Column('proposal_id', sa.Integer(), autoincrement=False, nullable=True),
+    op.create_table('favourite_proposal_version',
+    sa.Column('user_id', sa.Integer(), autoincrement=False, nullable=False),
+    sa.Column('proposal_id', sa.Integer(), autoincrement=False, nullable=False),
     sa.Column('transaction_id', sa.BigInteger(), autoincrement=False, nullable=False),
     sa.Column('operation_type', sa.SmallInteger(), nullable=False),
-    sa.PrimaryKeyConstraint('transaction_id', name=op.f('pk_favourite_proposals_version'))
+    sa.PrimaryKeyConstraint('user_id', 'proposal_id', 'transaction_id', name=op.f('pk_favourite_proposal_version'))
     )
-    with op.batch_alter_table('favourite_proposals_version', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_favourite_proposals_version_operation_type'), ['operation_type'], unique=False)
-        batch_op.create_index(batch_op.f('ix_favourite_proposals_version_transaction_id'), ['transaction_id'], unique=False)
+    with op.batch_alter_table('favourite_proposal_version', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_favourite_proposal_version_operation_type'), ['operation_type'], unique=False)
+        batch_op.create_index(batch_op.f('ix_favourite_proposal_version_transaction_id'), ['transaction_id'], unique=False)
 
     op.create_table('feature_flag',
     sa.Column('feature', sa.String(), nullable=False),
     sa.Column('enabled', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('feature', name=op.f('pk_feature_flag'))
     )
-    op.create_table('payment_change_version',
-    sa.Column('id', sa.Integer(), autoincrement=False, nullable=False),
-    sa.Column('payment_id', sa.Integer(), autoincrement=False, nullable=True),
-    sa.Column('timestamp', sa.DateTime(), autoincrement=False, nullable=True),
-    sa.Column('state', sa.String(), autoincrement=False, nullable=True),
-    sa.Column('transaction_id', sa.BigInteger(), autoincrement=False, nullable=False),
-    sa.Column('operation_type', sa.SmallInteger(), nullable=False),
-    sa.PrimaryKeyConstraint('id', 'transaction_id', name=op.f('pk_payment_change_version'))
-    )
-    with op.batch_alter_table('payment_change_version', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_payment_change_version_operation_type'), ['operation_type'], unique=False)
-        batch_op.create_index(batch_op.f('ix_payment_change_version_transaction_id'), ['transaction_id'], unique=False)
-
     op.create_table('payment_version',
     sa.Column('id', sa.Integer(), autoincrement=False, nullable=False),
     sa.Column('user_id', sa.Integer(), autoincrement=False, nullable=True),
@@ -136,6 +91,9 @@ def upgrade():
     sa.Column('state', sa.String(), autoincrement=False, nullable=True),
     sa.Column('reminder_sent', sa.Boolean(), autoincrement=False, nullable=True),
     sa.Column('bankref', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('session_token', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('redirect_id', sa.String(), autoincrement=False, nullable=True),
+    sa.Column('mandate', sa.String(), autoincrement=False, nullable=True),
     sa.Column('gcid', sa.String(), autoincrement=False, nullable=True),
     sa.Column('chargeid', sa.String(), autoincrement=False, nullable=True),
     sa.Column('token', sa.String(), autoincrement=False, nullable=True),
@@ -162,11 +120,16 @@ def upgrade():
     sa.Column('attributes', sa.JSON(), nullable=True),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('parent_id', sa.Integer(), nullable=True),
-    sa.Column('type', sa.String(), nullable=True),
+    sa.Column('type', sa.String(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
     sa.ForeignKeyConstraint(['parent_id'], ['product_group.id'], name=op.f('fk_product_group_parent_id_product_group')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_product_group')),
     sa.UniqueConstraint('name', name=op.f('uq_product_group_name'))
+    )
+    op.create_table('product_view',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(), nullable=False),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_product_view'))
     )
     op.create_table('proposal_version',
     sa.Column('id', sa.Integer(), autoincrement=False, nullable=False),
@@ -196,9 +159,9 @@ def upgrade():
     sa.Column('allowed_times', sa.String(), autoincrement=False, nullable=True),
     sa.Column('scheduled_duration', sa.Integer(), autoincrement=False, nullable=True),
     sa.Column('scheduled_time', sa.DateTime(), autoincrement=False, nullable=True),
-    sa.Column('scheduled_venue', sa.Integer(), autoincrement=False, nullable=True),
+    sa.Column('scheduled_venue_id', sa.Integer(), autoincrement=False, nullable=True),
     sa.Column('potential_time', sa.DateTime(), autoincrement=False, nullable=True),
-    sa.Column('potential_venue', sa.Integer(), autoincrement=False, nullable=True),
+    sa.Column('potential_venue_id', sa.Integer(), autoincrement=False, nullable=True),
     sa.Column('attendees', sa.String(), autoincrement=False, nullable=True),
     sa.Column('cost', sa.String(), autoincrement=False, nullable=True),
     sa.Column('size', sa.String(), autoincrement=False, nullable=True),
@@ -216,8 +179,9 @@ def upgrade():
     sa.Column('type', sa.String(), autoincrement=False, nullable=True),
     sa.Column('owner_id', sa.Integer(), autoincrement=False, nullable=True),
     sa.Column('purchaser_id', sa.Integer(), autoincrement=False, nullable=True),
-    sa.Column('price_tier_id', sa.Integer(), autoincrement=False, nullable=True),
     sa.Column('price_id', sa.Integer(), autoincrement=False, nullable=True),
+    sa.Column('price_tier_id', sa.Integer(), autoincrement=False, nullable=True),
+    sa.Column('product_id', sa.Integer(), autoincrement=False, nullable=True),
     sa.Column('payment_id', sa.Integer(), autoincrement=False, nullable=True),
     sa.Column('refund_id', sa.Integer(), autoincrement=False, nullable=True),
     sa.Column('created', sa.DateTime(), autoincrement=False, nullable=True),
@@ -254,18 +218,6 @@ def upgrade():
     sa.Column('state', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('name', name=op.f('pk_site_state'))
     )
-    op.create_table('stripe_refund_version',
-    sa.Column('id', sa.Integer(), autoincrement=False, nullable=False),
-    sa.Column('refundid', sa.String(), autoincrement=False, nullable=True),
-    sa.Column('payment_id', sa.Integer(), autoincrement=False, nullable=True),
-    sa.Column('transaction_id', sa.BigInteger(), autoincrement=False, nullable=False),
-    sa.Column('operation_type', sa.SmallInteger(), nullable=False),
-    sa.PrimaryKeyConstraint('id', 'transaction_id', name=op.f('pk_stripe_refund_version'))
-    )
-    with op.batch_alter_table('stripe_refund_version', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_stripe_refund_version_operation_type'), ['operation_type'], unique=False)
-        batch_op.create_index(batch_op.f('ix_stripe_refund_version_transaction_id'), ['transaction_id'], unique=False)
-
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('email', sa.String(), nullable=True),
@@ -331,6 +283,9 @@ def upgrade():
     sa.Column('state', sa.String(), nullable=False),
     sa.Column('reminder_sent', sa.Boolean(), nullable=False),
     sa.Column('bankref', sa.String(), nullable=True),
+    sa.Column('session_token', sa.String(), nullable=True),
+    sa.Column('redirect_id', sa.String(), nullable=True),
+    sa.Column('mandate', sa.String(), nullable=True),
     sa.Column('gcid', sa.String(), nullable=True),
     sa.Column('chargeid', sa.String(), nullable=True),
     sa.Column('token', sa.String(), nullable=True),
@@ -338,7 +293,10 @@ def upgrade():
     sa.PrimaryKeyConstraint('id', name=op.f('pk_payment')),
     sa.UniqueConstraint('bankref', name=op.f('uq_payment_bankref')),
     sa.UniqueConstraint('chargeid', name=op.f('uq_payment_chargeid')),
-    sa.UniqueConstraint('gcid', name=op.f('uq_payment_gcid'))
+    sa.UniqueConstraint('gcid', name=op.f('uq_payment_gcid')),
+    sa.UniqueConstraint('mandate', name=op.f('uq_payment_mandate')),
+    sa.UniqueConstraint('redirect_id', name=op.f('uq_payment_redirect_id')),
+    sa.UniqueConstraint('session_token', name=op.f('uq_payment_session_token'))
     )
     op.create_table('product',
     sa.Column('capacity_max', sa.Integer(), nullable=True),
@@ -346,12 +304,13 @@ def upgrade():
     sa.Column('expires', sa.DateTime(), nullable=True),
     sa.Column('attributes', sa.JSON(), nullable=True),
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('parent_id', sa.Integer(), nullable=False),
+    sa.Column('group_id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('display_name', sa.String(), nullable=True),
     sa.Column('description', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['parent_id'], ['product_group.id'], name=op.f('fk_product_parent_id_product_group')),
-    sa.PrimaryKeyConstraint('id', name=op.f('pk_product'))
+    sa.ForeignKeyConstraint(['group_id'], ['product_group.id'], name=op.f('fk_product_group_id_product_group')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_product')),
+    sa.UniqueConstraint('name', 'group_id', name=op.f('uq_product_name'))
     )
     op.create_table('proposal',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -381,16 +340,16 @@ def upgrade():
     sa.Column('allowed_times', sa.String(), nullable=True),
     sa.Column('scheduled_duration', sa.Integer(), nullable=True),
     sa.Column('scheduled_time', sa.DateTime(), nullable=True),
-    sa.Column('scheduled_venue', sa.Integer(), nullable=True),
+    sa.Column('scheduled_venue_id', sa.Integer(), nullable=True),
     sa.Column('potential_time', sa.DateTime(), nullable=True),
-    sa.Column('potential_venue', sa.Integer(), nullable=True),
+    sa.Column('potential_venue_id', sa.Integer(), nullable=True),
     sa.Column('attendees', sa.String(), nullable=True),
     sa.Column('cost', sa.String(), nullable=True),
     sa.Column('size', sa.String(), nullable=True),
     sa.Column('funds', sa.String(), nullable=True),
     sa.ForeignKeyConstraint(['anonymiser_id'], ['user.id'], name=op.f('fk_proposal_anonymiser_id_user')),
-    sa.ForeignKeyConstraint(['potential_venue'], ['venue.id'], name=op.f('fk_proposal_potential_venue_venue')),
-    sa.ForeignKeyConstraint(['scheduled_venue'], ['venue.id'], name=op.f('fk_proposal_scheduled_venue_venue')),
+    sa.ForeignKeyConstraint(['potential_venue_id'], ['venue.id'], name=op.f('fk_proposal_potential_venue_id_venue')),
+    sa.ForeignKeyConstraint(['scheduled_venue_id'], ['venue.id'], name=op.f('fk_proposal_scheduled_venue_id_venue')),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], name=op.f('fk_proposal_user_id_user')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_proposal'))
     )
@@ -463,25 +422,19 @@ def upgrade():
     with op.batch_alter_table('cfp_vote', schema=None) as batch_op:
         batch_op.create_index('ix_cfp_vote_user_id_proposal_id', ['user_id', 'proposal_id'], unique=True)
 
-    op.create_table('favourite_calendar_events',
-    sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.Column('event_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['event_id'], ['calendar_event.id'], name=op.f('fk_favourite_calendar_events_event_id_calendar_event')),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], name=op.f('fk_favourite_calendar_events_user_id_user'))
+    op.create_table('favourite_calendar_event',
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('event_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['event_id'], ['calendar_event.id'], name=op.f('fk_favourite_calendar_event_event_id_calendar_event')),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], name=op.f('fk_favourite_calendar_event_user_id_user')),
+    sa.PrimaryKeyConstraint('user_id', 'event_id', name=op.f('pk_favourite_calendar_event'))
     )
-    op.create_table('favourite_proposals',
-    sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.Column('proposal_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['proposal_id'], ['proposal.id'], name=op.f('fk_favourite_proposals_proposal_id_proposal')),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], name=op.f('fk_favourite_proposals_user_id_user'))
-    )
-    op.create_table('payment_change',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('payment_id', sa.Integer(), nullable=False),
-    sa.Column('timestamp', sa.DateTime(), nullable=False),
-    sa.Column('state', sa.String(), nullable=False),
-    sa.ForeignKeyConstraint(['payment_id'], ['payment.id'], name=op.f('fk_payment_change_payment_id_payment')),
-    sa.PrimaryKeyConstraint('id', name=op.f('pk_payment_change'))
+    op.create_table('favourite_proposal',
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('proposal_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['proposal_id'], ['proposal.id'], name=op.f('fk_favourite_proposal_proposal_id_proposal')),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], name=op.f('fk_favourite_proposal_user_id_user')),
+    sa.PrimaryKeyConstraint('user_id', 'proposal_id', name=op.f('pk_favourite_proposal'))
     )
     op.create_table('price_tier',
     sa.Column('capacity_max', sa.Integer(), nullable=True),
@@ -489,10 +442,19 @@ def upgrade():
     sa.Column('expires', sa.DateTime(), nullable=True),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
-    sa.Column('parent_id', sa.Integer(), nullable=False),
+    sa.Column('product_id', sa.Integer(), nullable=False),
     sa.Column('personal_limit', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['parent_id'], ['product.id'], name=op.f('fk_price_tier_parent_id_product')),
-    sa.PrimaryKeyConstraint('id', name=op.f('pk_price_tier'))
+    sa.ForeignKeyConstraint(['product_id'], ['product.id'], name=op.f('fk_price_tier_product_id_product')),
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_price_tier')),
+    sa.UniqueConstraint('name', 'product_id', name=op.f('uq_price_tier_name'))
+    )
+    op.create_table('product_view_product',
+    sa.Column('view_id', sa.Integer(), nullable=False),
+    sa.Column('product_id', sa.Integer(), nullable=False),
+    sa.Column('order', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['product_id'], ['product.id'], name=op.f('fk_product_view_product_product_id_product')),
+    sa.ForeignKeyConstraint(['view_id'], ['product_view.id'], name=op.f('fk_product_view_product_view_id_product_view')),
+    sa.PrimaryKeyConstraint('view_id', 'product_id', name=op.f('pk_product_view_product'))
     )
     op.create_table('refund',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -504,14 +466,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['payment_id'], ['payment.id'], name=op.f('fk_refund_payment_id_payment')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_refund')),
     sa.UniqueConstraint('refundid', name=op.f('uq_refund_refundid'))
-    )
-    op.create_table('stripe_refund',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('refundid', sa.String(), nullable=True),
-    sa.Column('payment_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['payment_id'], ['payment.id'], name=op.f('fk_stripe_refund_payment_id_payment')),
-    sa.PrimaryKeyConstraint('id', name=op.f('pk_stripe_refund')),
-    sa.UniqueConstraint('refundid', name=op.f('uq_stripe_refund_refundid'))
     )
     op.create_table('price',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -526,8 +480,9 @@ def upgrade():
     sa.Column('type', sa.String(), nullable=False),
     sa.Column('owner_id', sa.Integer(), nullable=True),
     sa.Column('purchaser_id', sa.Integer(), nullable=True),
+    sa.Column('price_id', sa.Integer(), nullable=False),
     sa.Column('price_tier_id', sa.Integer(), nullable=False),
-    sa.Column('price_id', sa.Integer(), nullable=True),
+    sa.Column('product_id', sa.Integer(), nullable=False),
     sa.Column('payment_id', sa.Integer(), nullable=True),
     sa.Column('refund_id', sa.Integer(), nullable=True),
     sa.Column('created', sa.DateTime(), nullable=False),
@@ -540,6 +495,7 @@ def upgrade():
     sa.ForeignKeyConstraint(['payment_id'], ['payment.id'], name=op.f('fk_purchase_payment_id_payment')),
     sa.ForeignKeyConstraint(['price_id'], ['price.id'], name=op.f('fk_purchase_price_id_price')),
     sa.ForeignKeyConstraint(['price_tier_id'], ['price_tier.id'], name=op.f('fk_purchase_price_tier_id_price_tier')),
+    sa.ForeignKeyConstraint(['product_id'], ['product.id'], name=op.f('fk_purchase_product_id_product')),
     sa.ForeignKeyConstraint(['purchaser_id'], ['user.id'], name=op.f('fk_purchase_purchaser_id_user')),
     sa.ForeignKeyConstraint(['refund_id'], ['refund.id'], name=op.f('fk_purchase_refund_id_refund')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_purchase'))
@@ -563,12 +519,11 @@ def downgrade():
     op.drop_table('purchase_transfer')
     op.drop_table('purchase')
     op.drop_table('price')
-    op.drop_table('stripe_refund')
     op.drop_table('refund')
+    op.drop_table('product_view_product')
     op.drop_table('price_tier')
-    op.drop_table('payment_change')
-    op.drop_table('favourite_proposals')
-    op.drop_table('favourite_calendar_events')
+    op.drop_table('favourite_proposal')
+    op.drop_table('favourite_calendar_event')
     with op.batch_alter_table('cfp_vote', schema=None) as batch_op:
         batch_op.drop_index('ix_cfp_vote_user_id_proposal_id')
 
@@ -602,11 +557,6 @@ def downgrade():
         batch_op.drop_index(batch_op.f('ix_user_email'))
 
     op.drop_table('user')
-    with op.batch_alter_table('stripe_refund_version', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_stripe_refund_version_transaction_id'))
-        batch_op.drop_index(batch_op.f('ix_stripe_refund_version_operation_type'))
-
-    op.drop_table('stripe_refund_version')
     op.drop_table('site_state')
     with op.batch_alter_table('refund_version', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_refund_version_transaction_id'))
@@ -623,6 +573,7 @@ def downgrade():
         batch_op.drop_index(batch_op.f('ix_proposal_version_operation_type'))
 
     op.drop_table('proposal_version')
+    op.drop_table('product_view')
     op.drop_table('product_group')
     with op.batch_alter_table('permission', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_permission_name'))
@@ -633,17 +584,12 @@ def downgrade():
         batch_op.drop_index(batch_op.f('ix_payment_version_operation_type'))
 
     op.drop_table('payment_version')
-    with op.batch_alter_table('payment_change_version', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_payment_change_version_transaction_id'))
-        batch_op.drop_index(batch_op.f('ix_payment_change_version_operation_type'))
-
-    op.drop_table('payment_change_version')
     op.drop_table('feature_flag')
-    with op.batch_alter_table('favourite_proposals_version', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_favourite_proposals_version_transaction_id'))
-        batch_op.drop_index(batch_op.f('ix_favourite_proposals_version_operation_type'))
+    with op.batch_alter_table('favourite_proposal_version', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_favourite_proposal_version_transaction_id'))
+        batch_op.drop_index(batch_op.f('ix_favourite_proposal_version_operation_type'))
 
-    op.drop_table('favourite_proposals_version')
+    op.drop_table('favourite_proposal_version')
     op.drop_table('email_job')
     with op.batch_alter_table('cfp_vote_version', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_cfp_vote_version_transaction_id'))
@@ -651,17 +597,6 @@ def downgrade():
 
     op.drop_table('cfp_vote_version')
     op.drop_table('calendar_source')
-    with op.batch_alter_table('bank_transaction_version', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_bank_transaction_version_transaction_id'))
-        batch_op.drop_index(batch_op.f('ix_bank_transaction_version_operation_type'))
-        batch_op.drop_index(batch_op.f('ix_bank_transaction_version_fit_id'))
-
-    op.drop_table('bank_transaction_version')
-    with op.batch_alter_table('bank_account_version', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_bank_account_version_transaction_id'))
-        batch_op.drop_index(batch_op.f('ix_bank_account_version_operation_type'))
-
-    op.drop_table('bank_account_version')
     with op.batch_alter_table('bank_account', schema=None) as batch_op:
         batch_op.drop_index('ix_bank_account_sort_code_acct_id')
 
