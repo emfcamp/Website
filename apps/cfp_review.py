@@ -228,9 +228,9 @@ class UpdateProposalForm(Form):
             proposal.scheduled_time = None
 
         if self.scheduled_venue.data:
-            proposal.scheduled_venue = Venue.query.filter(Venue.name == self.scheduled_venue.data.strip()).one().id
+            proposal.scheduled_venue_id = Venue.query.filter(Venue.name == self.scheduled_venue.data.strip()).one().id
         else:
-            proposal.scheduled_venue = None
+            proposal.scheduled_venue_id = None
 
         if self.potential_time.data:
             proposal.potential_time = dateutil.parser.parse(self.potential_time.data)
@@ -375,10 +375,10 @@ def update_proposal(proposal_id):
     form.potential_time.data = prop.potential_time
 
     if prop.scheduled_venue:
-        form.scheduled_venue.data = Venue.query.filter_by(id=prop.scheduled_venue).one().name
+        form.scheduled_venue.data = prop.scheduled_venue.name
 
     if prop.potential_venue:
-        form.potential_venue.data = Venue.query.filter_by(id=prop.potential_venue).one().name
+        form.potential_venue.data = prop.potential_venue.name
 
     if prop.type == 'workshop':
         form.attendees.data = prop.attendees
@@ -1033,9 +1033,9 @@ def potential_schedule_changes():
 
     for proposal in proposals:
         if proposal.scheduled_venue:
-            proposal.scheduled_venue_name = Venue.query.filter_by(id=proposal.scheduled_venue).one().name
+            proposal.scheduled_venue_name = proposal.scheduled_venue.name
         if proposal.potential_venue:
-            proposal.potential_venue_name = Venue.query.filter_by(id=proposal.potential_venue).one().name
+            proposal.potential_venue_name = proposal.potential_venue.name
 
     return render_template('cfp_review/potential_schedule_changes.html', proposals=proposals)
 
@@ -1060,9 +1060,9 @@ def scheduler():
         }
 
         if proposal.scheduled_venue:
-            export['venue'] = proposal.scheduled_venue
+            export['venue'] = proposal.scheduled_venue_id
         if proposal.potential_venue:
-            export['venue'] = proposal.potential_venue
+            export['venue'] = proposal.potential_venue_id
             export['is_potential'] = True
 
         if proposal.scheduled_time:
@@ -1095,7 +1095,7 @@ def scheduler_update():
     proposal.potential_venue = request.form['venue']
 
     changed = True
-    if proposal.potential_time == proposal.scheduled_time and str(proposal.potential_venue) == str(proposal.scheduled_venue):
+    if proposal.potential_time == proposal.scheduled_time and str(proposal.potential_venue_id) == str(proposal.scheduled_venue_id):
         proposal.potential_time = None
         proposal.potential_venue = None
         changed = False

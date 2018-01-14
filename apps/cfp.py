@@ -17,7 +17,7 @@ from sqlalchemy.exc import IntegrityError
 from main import db, mail
 from models.user import User, UserDiversity
 from models.cfp import (
-    TalkProposal, WorkshopProposal, InstallationProposal, Proposal, CFPMessage, Venue
+    TalkProposal, WorkshopProposal, InstallationProposal, Proposal, CFPMessage
 )
 from .common import feature_flag, create_current_user
 from .common.forms import Form, TelField
@@ -206,7 +206,7 @@ def proposals():
 
     for proposal in proposals:
         if proposal.scheduled_venue:
-            proposal.scheduled_venue_name = Venue.query.filter_by(id=proposal.scheduled_venue).one().name
+            proposal.scheduled_venue_name = proposal.scheduled_venue.name
 
     return render_template('cfp/proposals.html', proposals=proposals)
 
@@ -279,7 +279,7 @@ def edit_proposal(proposal_id):
         form.needs_help.data = proposal.needs_help
 
     if proposal.scheduled_venue:
-        proposal.scheduled_venue_name = Venue.query.filter_by(id=proposal.scheduled_venue).one().name
+        proposal.scheduled_venue_name = proposal.scheduled_venue.name
 
     return render_template('cfp/edit.html', proposal=proposal, form=form)
 
@@ -398,7 +398,7 @@ def finalise_proposal(proposal_id):
            AcceptedForm()
 
     if proposal.scheduled_venue:
-        proposal.scheduled_venue_name = Venue.query.filter_by(id=proposal.scheduled_venue).one().name
+        proposal.scheduled_venue_name = proposal.scheduled_venue.name
 
     if form.validate_on_submit():
         proposal.published_names = form.name.data

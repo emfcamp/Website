@@ -132,9 +132,14 @@ class Proposal(db.Model):
     allowed_times = db.Column(db.String, nullable=True)
     scheduled_duration = db.Column(db.Integer, nullable=True)
     scheduled_time = db.Column(db.DateTime, nullable=True)
-    scheduled_venue = db.Column(db.Integer, db.ForeignKey('venue.id'))
+    scheduled_venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'))
     potential_time = db.Column(db.DateTime, nullable=True)
-    potential_venue = db.Column(db.Integer, db.ForeignKey('venue.id'))
+    potential_venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'))
+
+    scheduled_venue = db.relationship('Venue', backref='proposals', cascade='all',
+                                      primaryjoin='Venue.id == Proposal.scheduled_venue_id')
+    potential_venue = db.relationship('Venue',
+                                      primaryjoin='Venue.id == Proposal.potential_venue_id')
 
     __mapper_args__ = {'polymorphic_on': type}
 
@@ -174,7 +179,7 @@ class Proposal(db.Model):
             cls.scheduled_time, cls.scheduled_duration, Venue.name,
         )
         accepted_proposals = proposals.filter(cls.state.in_(['accepted', 'finished'])) \
-                                      .outerjoin(Venue, Venue.id == cls.scheduled_venue) \
+                                      .outerjoin(cls.scheduled_venue) \
                                       .join(cls.user) \
                                       .add_columns(*accepted_columns)
 
@@ -196,7 +201,7 @@ class Proposal(db.Model):
             cls.scheduled_time, cls.scheduled_duration, Venue.name.label('venue'),
         )
         accepted_public = cls.query.filter(cls.state.in_(['accepted', 'finished'])) \
-                                   .outerjoin(Venue, Venue.id == cls.scheduled_venue) \
+                                   .outerjoin(cls.scheduled_venue) \
                                    .with_entities(*public_columns)
 
         favourite_counts = [p.favourite_count for p in proposals]
@@ -351,15 +356,15 @@ class Proposal(db.Model):
 
     @property
     def latlon(self):
-        if self.venue.lat and self.venue.lon:
-            return [self.venue.lat, self.venue.lon]
+        if self.scheduled_venue.lat and self.scheduled_venue.lon:
+            return [self.scheduled_venue.lat, self.scheduled_venue.lon]
         return None
 
     @property
     def map_link(self):
         latlon = self.latlon
         if latlon:
-            return 'https://map.emfcamp.org/?lat=%s&lon=%s&title=%s#19/%s/%s' % (latlon[0], latlon[1], self.venue.name, latlon[0], latlon[1])
+            return 'https://map.emfcamp.org/?lat=%s&lon=%s&title=%s#19/%s/%s' % (latlon[0], latlon[1], self.scheduled_venue.name, latlon[0], latlon[1])
         return None
 
 
@@ -499,9 +504,6 @@ class Venue(db.Model):
     priority = db.Column(db.Integer, nullable=True, default=0)
     lat = db.Column(db.Float)
     lon = db.Column(db.Float)
-
-    proposals = db.relationship('Proposal', backref='venue',
-                                primaryjoin='Proposal.scheduled_venue == Venue.id')
 
     __table_args__ = (
         UniqueConstraint('name', name='_venue_name_uniq'),

@@ -31,7 +31,7 @@ def _get_proposal_dict(proposal, favourites_ids):
         'id': proposal.id,
         'start_date': event_tz.localize(proposal.scheduled_time),
         'end_date': event_tz.localize(proposal.end_date),
-        'venue': proposal.venue.name,
+        'venue': proposal.scheduled_venue.name,
         'latlon': proposal.latlon,
         'map_link': proposal.map_link,
         'title': proposal.title,
@@ -81,7 +81,7 @@ def _get_scheduled_proposals(filter_obj={}, override_user=None):
 
     schedule = Proposal.query.filter(Proposal.state.in_(['accepted', 'finished']),
                                       Proposal.scheduled_time.isnot(None),
-                                      Proposal.scheduled_venue.isnot(None),
+                                      Proposal.scheduled_venue_id.isnot(None),
                                       Proposal.scheduled_duration.isnot(None)
                                     ).all()
 
@@ -177,7 +177,7 @@ def schedule_json():
 def schedule_frab():
     schedule = Proposal.query.filter(Proposal.state.in_(['accepted', 'finished']),
                                       Proposal.scheduled_time.isnot(None),
-                                      Proposal.scheduled_venue.isnot(None),
+                                      Proposal.scheduled_venue_id.isnot(None),
                                       Proposal.scheduled_duration.isnot(None)
                                     ).order_by(Proposal.scheduled_time).all()
 
@@ -329,7 +329,7 @@ def line_up_proposal(proposal_id, slug=None):
 
     venue_name = None
     if proposal.scheduled_venue:
-        venue_name = Venue.query.filter_by(id=proposal.scheduled_venue).one().name
+        venue_name = proposal.scheduled_venue.name
 
     return render_template('schedule/line-up-proposal.html',
                            proposal=proposal, is_fave=is_fave, venue_name=venue_name)
