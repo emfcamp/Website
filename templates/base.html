@@ -38,7 +38,7 @@
                         </li>
                         {% if SITE_STATE == 'sales' and SALES_STATE == 'available' %}
                             <li role="presentation">
-                                <a role="menuitem" href="{{ url_for('tickets.choose') }}">Tickets</a>
+                                <a role="menuitem" href="{{ url_for('tickets.main') }}">Tickets</a>
                             </li>
                         {% endif %}
                         {% if feature_enabled('CFP') and not config.get('CFP_CLOSED') %}
