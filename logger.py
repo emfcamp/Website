@@ -48,6 +48,9 @@ class ColorizingStreamHandler(logging.StreamHandler):
         return message
 
 
+class GreenStreamHandler(ColorizingStreamHandler):
+    INFO = sgr(GREEN)
+
 class ContextFormatter(logging.Formatter):
     def __init__(self, fmt, _dfs=None, _stl=None):
         self.pid = os.getpid()
