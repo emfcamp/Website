@@ -46,10 +46,10 @@ These are manually resolved via scripts and the admin panel.
 #### Stripe
 This is the easiest method to "pay" for a ticket when you're developing. The details for a successful payment are:
 
-- **email**: what ever you want
+- **email**: whatever you want
 - **card number**: 4242 4242 4242 4242
-- **expiry**: anything that's in the future
-- **cvc**: anything
+- **expiry**: anything in the future, e.g. 12/34
+- **cvc**: anything, e.g. 123
 
 If you want to test specific modes please check [their documentation](https://stripe.com/docs/testing 'Stripe testing docs')
 
@@ -71,6 +71,22 @@ Unfortunately GoCardless don't offer a simple method of setting up a developer s
     - **Cancel URI**: `http://localhost:5000/pay/gocardless/`
 
 In theory you should now be able to use GoCardless to checkout. You should see the payments under [payments](https://dashboard-sandbox.gocardless.com/payments) (top left)
+
+To create a successful Direct Debit in the sandbox, use:
+- **sort code**: 20-00-00
+- **account number**: 55779911
+- **postcode**: any valid postcode, e.g. SW1A 1AA
+- **city**: any value
+
+Test users
+==========
+
+Create three test users with:
+
+```make users````
+
+and enable `BYPASS_LOGIN` in config. You can then log in using, e.g. `/login/admin@test.invalid` and navigate to `/admin/`.
+
 
 Links to Documentation
 ======================
