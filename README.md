@@ -83,7 +83,7 @@ Test users
 
 Create three test users with:
 
-```make users````
+```make users```
 
 and enable `BYPASS_LOGIN` in config. You can then log in using, e.g. `/login/admin@test.invalid` and navigate to `/admin/`.
 
