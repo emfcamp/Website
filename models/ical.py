@@ -132,7 +132,7 @@ class CalendarEvent(db.Model):
     location = db.Column(db.String, nullable=True)
 
     source = db.relationship(CalendarSource, backref='events')
-    calendar_favourites = db.relationship('User', secondary=FavouriteCalendarEvent, backref=db.backref('calendar_favourites'))
+    calendar_favourites = db.relationship('User', secondary=FavouriteCalendarEvent, backref='calendar_favourites')
 
     favourite_count = column_property(select([func.count(FavouriteCalendarEvent.c.user_id)]).where(
         FavouriteCalendarEvent.c.user_id == id,
