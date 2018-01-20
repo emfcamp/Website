@@ -1,6 +1,9 @@
 import logging
 from datetime import datetime, timedelta
 import re
+import hmac
+import hashlib
+import json
 
 from flask import (
     render_template, redirect, request, flash,
@@ -10,9 +13,12 @@ from flask_login import login_required
 from flask_mail import Message
 from wtforms import SubmitField
 import gocardless_pro.errors
+from sqlalchemy.orm.exc import NoResultFound
 
-from main import db, mail, external_url, gocardless_client
+from main import db, mail, external_url, gocardless_client, csrf
+from models.payment import GoCardlessPayment
 from ..common import feature_enabled
+from ..common.receipt import attach_tickets
 from ..common.forms import Form
 from . import get_user_payment_or_abort
 from . import payments
@@ -28,7 +34,7 @@ def webhook(resource=None, action=None):
     return inner
 
 def gocardless_start(payment):
-    logger.info("Starting GoCardless flow for payment %d", payment.id)
+    logger.info("Starting GoCardless flow for payment %s", payment.id)
 
     prefilled_customer = {
         "email": payment.user.email,
@@ -64,10 +70,10 @@ def gocardless_complete(payment_id):
     )
     redirect_id = request.args.get('redirect_flow_id')
     if redirect_id != payment.redirect_id:
-        logging.error('Invalid redirect_flow_id for payment %d: %s', payment.id, repr(redirect_id))
+        logging.error('Invalid redirect_flow_id for payment %s: %s', payment.id, repr(redirect_id))
         abort(400)
 
-    logger.info("Completing GoCardless payment %d", payment.id)
+    logger.info("Completing GoCardless payment %s", payment.id)
 
     try:
         # We've already validated the redirect_id, so we don't expect this to fail
@@ -89,7 +95,7 @@ def gocardless_complete(payment_id):
         return redirect(url_for('tickets.main'))
 
     try:
-        gcpayment = gocardless_client.payments.create(params={
+        gc_payment = gocardless_client.payments.create(params={
             "amount": payment.amount_int,
             "currency": payment.currency,
             "links": {
@@ -99,8 +105,8 @@ def gocardless_complete(payment_id):
                 "payment_id": str(payment.id),
             },
         }, headers={'Idempotency-Key': str(payment.id)})
-        payment.gcid = gcpayment.id
-        payment.status = "inprogress"
+        payment.gcid = gc_payment.id
+        payment.state = 'inprogress'
 
     except Exception as e:
         logger.error("Exception %s confirming payment", repr(e))
@@ -112,13 +118,12 @@ def gocardless_complete(payment_id):
         # for gocardless payments, so push the ticket expiry forwards
         t.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS_GOCARDLESS'])
         t.set_state('payment-pending')
-        logger.info("Reset expiry for ticket %d", t.id)
+        logger.info("Reset expiry for ticket %s", t.id)
 
     db.session.commit()
 
-    logger.info("Payment %d completed OK", payment.id)
+    logger.info("Payment %s completed OK", payment.id)
 
-    # should we send the resource_uri in the bill email?
     msg = Message("Your EMF ticket purchase",
                   sender=app.config['TICKETS_EMAIL'],
                   recipients=[payment.user.email])
@@ -151,7 +156,7 @@ def gocardless_tryagain(payment_id):
         flash('GoCardless is currently unavailable. Please try again later')
         return redirect(url_for('tickets.main'))
 
-    logger.info("Trying payment %d again", payment.id)
+    logger.info("Trying payment %s again", payment.id)
     gocardless_client.payments.retry(payment.gcid)
     flash('Your gocardless payment has been retried')
     return redirect('tickets')
@@ -196,17 +201,160 @@ def gocardless_cancel(payment_id):
     return render_template('gocardless-cancel.html', payment=payment, form=form)
 
 
-# TODO resurrect these endpoints...
+def is_valid_signature(request):
+    secret = bytes(app.config.get('GOCARDLESS_WEBHOOK_SECRET'), 'utf-8')
+    computed_signature = hmac.new(
+        secret, request.data, hashlib.sha256).hexdigest()
+    provided_signature = request.headers.get('Webhook-Signature')
+    return hmac.compare_digest(provided_signature, computed_signature)
 
-# @webhook('bill')
-# @webhook('bill', 'created')
-# @webhook('bill', 'withdrawn')
-# @webhook('bill', 'failed')
-# def gocardless_bill(resource, action, data):
+@csrf.exempt
+@payments.route("/gocardless-webhook", methods=['POST'])
+def gocardless_webhook():
+    # Documentation: https://developer.gocardless.com/api-reference/#appendix-webhooks
+    # For testing, see https://developer.gocardless.com/getting-started/developer-tools/scenario-simulators/
 
-# @webhook('bill', 'cancelled')
-# def gocardless_bill_cancelled(resource, action, data):
+    logger.debug("GoCardless webhook received: %s", request.data)
+    if not is_valid_signature(request):
+        logger.error("Unable to validate GoCardless webhook")
+        abort(498)
+
+    origin = request.headers.get('Origin')
+    if origin not in ['https://api.gocardless.com', 'https://api-sandbox.gocardless.com']:
+        logger.error("Invalid webhook origin: %s", origin)
+        abort(500)
+
+    content_type = request.headers.get('Content-Type')
+    if content_type != 'application/json':
+        logger.error("Invalid webhook content type: %s", content_type)
+        abort(500)
+
+    try:
+        payload = json.loads(request.data.decode('utf-8'))
+        for event in payload['events']:
+            resource = event['resource_type']
+            action = event['action']
+            # The examples suggest details is optional, despite being "recommended"
+            origin = event.get('details', {}).get('origin')
+            cause = event.get('details', {}).get('cause')
+            logger.info("Webhook resource type: %s, action: %s, cause: %s, origin: %s", resource, action, cause, origin)
+
+            try:
+                handler = webhook_handlers[(resource, action)]
+            except KeyError as e:
+                try:
+                    handler = webhook_handlers[resource, None]
+                except KeyError as e:
+                    handler = webhook_handlers[(None, None)]
+
+            handler(resource, action, event)
+
+    except Exception as e:
+        logger.error("Unexpected exception during webhook: %r", e)
+        abort(500)
+
+    # As far as I can tell, the webhook response content is entirely
+    # for my benefit, and they only check the first character of the
+    # response code. As we log everything, and I don't want GC to be
+    # a store of debug info, always return 204 No Content.
+    #
+    # We therefore don't need to worry about payloads with a mixture
+    # of known and unknown events (the documentation is ambiguous).
+    return ('', 204)
 
 
-# @webhook('bill', 'paid')
-# def gocardless_bill_paid(resource, action, data):
+@webhook()
+def gocardless_default(resource, action, event):
+    logger.info("Default handler called for %s", event)
+
+
+# https://developer.gocardless.com/api-reference/#events-payment-actions
+@webhook('payments', 'created')
+@webhook('payments', 'submitted')
+@webhook('payments', 'paid_out')
+def gocardless_payment_do_nothing(resource, action, event):
+    gcid = event['links']['payment']
+    try:
+        payment = GoCardlessPayment.query.filter_by(gcid=gcid).one()
+    except NoResultFound:
+        logger.warn("Payment for payment %s not found, skipping", gcid)
+        return
+
+    logging.info("Received %s action for gcid %s, payment %s",
+                 action, gcid, payment.id)
+
+
+@webhook('payments', 'failed')
+@webhook('payments', 'cancelled')
+def gocardless_payment_cancelled(resource, action, event):
+
+    gcid = event['links']['payment']
+    try:
+        payment = GoCardlessPayment.query.filter_by(gcid=gcid).one()
+    except NoResultFound:
+        logger.warn("Payment for payment %s not found, skipping", gcid)
+        return
+
+    logger.info("Received cancelled action for gcid %s, payment %s",
+                gcid, payment.id)
+
+    gc_payment = gocardless_client.payments.get(payment.gcid)
+    if gc_payment.status != 'cancelled':
+        logger.error("Payment status is %s (should be cancelled), ignoring", gc_payment.status)
+        return
+
+    if payment.state == 'cancelled':
+        logger.info('Payment is already cancelled, skipping')
+        return
+
+    if payment.state != 'inprogress':
+        logger.error("Current payment state is %s (should be inprogress), ignoring", payment.state)
+        return
+
+    logger.info("Setting payment %s to cancelled", payment.id)
+    payment.cancel()
+    db.session.commit()
+
+
+@webhook('payments', 'confirmed')
+def gocardless_payment_paid(resource, action, event):
+
+    gcid = event['links']['payment']
+    try:
+        payment = GoCardlessPayment.query.filter_by(gcid=gcid).one()
+    except NoResultFound:
+        logger.warn("Payment for payment %s not found, skipping", gcid)
+        return
+
+    logger.info("Received paid action for gcid %s, payment %s",
+                gcid, payment.id)
+
+    gc_payment = gocardless_client.payments.get(payment.gcid)
+    if gc_payment.status != 'paid':
+        logger.error("Payment status is %s (should be paid), ignoring", gc_payment.status)
+        return
+
+    if payment.state == 'paid':
+        logger.info('Payment is already paid, skipping')
+        return
+
+    if payment.state != 'inprogress':
+        logger.error("Current payment state is %s (should be inprogress), ignoring", payment.state)
+        return
+
+    logger.info("Setting payment %s to paid", payment.id)
+    payment.paid()
+    db.session.commit()
+
+    msg = Message("Your EMF ticket payment has been confirmed",
+                  sender=app.config['TICKETS_EMAIL'],
+                  recipients=[payment.user.email])
+    msg.body = render_template('emails/tickets-paid-email-gocardless.txt',
+                               user=payment.user, payment=payment)
+
+    if feature_enabled('ISSUE_TICKETS'):
+        attach_tickets(msg, payment.user)
+
+    mail.send(msg)
+    db.session.commit()
+
