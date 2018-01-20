@@ -326,7 +326,7 @@ def gocardless_payment_paid(resource, action, event):
         logger.warn("Payment for payment %s not found, skipping", gcid)
         return
 
-    logger.info("Received paid action for gcid %s, payment %s",
+    logger.info("Received confirmed action for gcid %s, payment %s",
                 gcid, payment.id)
 
     gc_payment = gocardless_client.payments.get(payment.gcid)
