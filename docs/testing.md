@@ -38,6 +38,8 @@ To create a successful Direct Debit in the sandbox, use:
 - **postcode**: any valid postcode, e.g. SW1A 1AA
 - **city**: any value
 
+You can force different results based on the first name. For more, check [their documentation](https://developer.gocardless.com/getting-started/developer-tools/scenario-simulators)
+
 Test users
 ==========
 
