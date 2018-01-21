@@ -62,6 +62,7 @@ unicodecsv = "==0.14.1"
 python-dateutil = "*"
 slotmachine = {git = "https://github.com/emfcamp/slotmachine"}
 awesome-slugify = "*"
+faker = "*"
 
 
 [dev-packages]
@@ -69,7 +70,6 @@ awesome-slugify = "*"
 pytest = "*"
 mock = "*"
 "flake8" = "*"
-faker = "*"
 
 [requires]
 python_version = "3.5"
