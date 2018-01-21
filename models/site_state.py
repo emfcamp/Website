@@ -2,10 +2,14 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 from datetime import datetime
 from dateutil.parser import parse
-from main import cache, db
+
 from flask import current_app as app
-# from models.ticket import TicketType
-from models.product import Product, ProductGroup
+
+from main import cache, db
+from models.product import (
+    Product, ProductGroup, ProductView,
+    ProductViewProduct, PriceTier,
+)
 
 class SiteState(db.Model):
     __tablename__ = 'site_state'
@@ -50,11 +54,20 @@ def calc_sales_state(date):
         return "sold-out"
     elif date > config_date('EVENT_END'):
         return "sales-ended"
-    elif Product.get_by_name('general', 'full').get_cheapest_price('GBP') is None:
+
+    # Active price tier for the full ticket product in the main flow.
+    view = ProductView.query.filter_by(name='main')
+    product = view.join(ProductViewProduct, Product).filter_by(name='full')
+    tier = product.join(Product.price_tiers) \
+                  .filter_by(active=True) \
+                  .with_entities(PriceTier) \
+                  .one_or_none()
+
+    if tier is None or tier.has_expired() or tier.get_total_remaining_capacity() <= 0:
         # Tickets not currently available, probably just for this round, but we haven't hit site capacity
         return "unavailable"
-    else:
-        return "available"
+
+    return "available"
 
 
 @cache.cached(timeout=60, key_prefix='get_states')

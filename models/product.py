@@ -140,13 +140,19 @@ class PriceTier(db.Model, CapacityMixin):
 
         PriceTiers have a capacity and an expiry through the CapacityMixin.
         They have one Price object per currency.
+
+        In theory PriceTiers could cascade based on price, but this is problematic
+        with popular products as we need to update the customer each time.
+        For now, only one PriceTier is active (unexpired) per Product at once.
     """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey(Product.id), nullable=False)
 
-    prices = db.relationship('Price', backref='price_tier', cascade='all')
     personal_limit = db.Column(db.Integer, default=10, nullable=False)
+    active = db.Column(db.Boolean, default=True, nullable=False)
+
+    prices = db.relationship('Price', backref='price_tier', cascade='all')
 
     __table_args__ = (
         UniqueConstraint('name', 'product_id'),
