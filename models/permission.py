@@ -29,6 +29,5 @@ class Permission(db.Model):
 
 
 UserPermission = db.Table('user_permission', db.Model.metadata,
-    db.Column('id', db.Integer, primary_key=True),
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), nullable=False, index=True),
-    db.Column('permission_id', db.Integer, db.ForeignKey('permission.id'), nullable=False))
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('permission_id', db.Integer, db.ForeignKey('permission.id'), primary_key=True))
