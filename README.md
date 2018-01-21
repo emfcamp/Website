@@ -36,5 +36,5 @@ For more, see:
 * [Documentation](docs/documentation.md)
 * [Testing](docs/testing.md)
 * [Deployment](docs/deployment.md)
-* [Contributing](docs/contributing.md)
+* [Contributing](.github/CONTRIBUTING.md)
 

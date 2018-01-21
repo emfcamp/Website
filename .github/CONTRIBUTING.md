@@ -1,5 +1,9 @@
-Get Involved
-============
+## Ticket Issues
+
+If you have a current issue buying tickets through the EMF website,
+please email tickets@emfcamp.org as this is the fastest way for us to help you out.
+
+## Get Involved
 
 If you want to get involved, the best way is to join us on IRC, on #emfcamp-web on chat.freenode.net.
 
