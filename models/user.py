@@ -104,6 +104,8 @@ class User(db.Model, UserMixin):
     phone = db.Column(db.String, nullable=True)
     will_have_ticket = db.Column(db.Boolean, nullable=False, default=False)  # for CfP filtering
     checkin_note = db.Column(db.String, nullable=True)
+    # Whether the user has opted in to receive promo emails after this event:
+    promo_opt_in = db.Column(db.Boolean, nullable=False, default=False)
 
     diversity = db.relationship('UserDiversity', uselist=False, backref='user', cascade='all, delete-orphan')
     payments = db.relationship('Payment', lazy='dynamic', backref='user', cascade='all')

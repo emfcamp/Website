@@ -279,6 +279,10 @@ def pay(flow=None):
                 app.logger.warn('Adding user raised %r, possible double-click', e)
                 return None
 
+        if form.allow_promo.data:
+            current_user.promo_opt_in = True
+            db.session.add(current_user)
+
         if form.gocardless.data:
             payment_type = GoCardlessPayment
         elif form.banktransfer.data:
