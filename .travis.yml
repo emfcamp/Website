@@ -18,3 +18,9 @@ before_script:
   - psql -c 'create database emf_site_test;' -U postgres
 script:
   - make test
+notifications:
+  irc:
+    channels:
+      - "chat.freenode.net#emfcamp-web"
+    on_success: change
+    on_failure: always
