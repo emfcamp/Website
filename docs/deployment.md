@@ -16,6 +16,6 @@ Update the DB:
 
 Restart gunicorn:
 
-    systemctl gunicorn restart
+    systemctl restart gunicorn
 
 Monitor `/var/log/syslog` for errors.
