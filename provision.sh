@@ -1,6 +1,7 @@
 cd /vagrant
 sudo apt-get update
-sudo apt-get install -y python3-dev python3-venv libxml2-dev libxslt1-dev libffi-dev postgresql-server-dev-9.6 postgresql-9.6 git glpk-utils
+sudo apt-get install -y python3-dev libxml2-dev libxslt1-dev libffi-dev postgresql-server-dev-9.6 postgresql-9.6 git glpk-utils python3-pip
+sudo pip3 install pipenv
 
 cat > /etc/postgresql/9.6/main/pg_hba.conf <<EOF
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
@@ -19,12 +20,8 @@ su postgres -c 'createdb -O vagrant emf_site'
 su postgres -c 'createdb -O vagrant emf_site_test'
 
 touch .inside-vagrant
-make clean
-make init
-make update
-make data
 
 cat > /home/vagrant/.bash_profile <<EOF
-cd /vagrant
-. ./env/bin/activate
+    cd /vagrant
+    pipenv shell
 EOF

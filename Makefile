@@ -10,19 +10,13 @@ ifeq ("$(TEST_SETTINGS)", "")
 	TEST_SETTINGS=./config/test.cfg
 endif
 
-ifeq ("$(VIRTUAL_ENV)", "")
-  ENV=. env/bin/activate;
-endif
+.PHONY: run update outdated listdepends clean
 
 run:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./dev_server.py
-
-init:
-	python3 -m venv --clear ./env
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./dev_server.py
 
 update:
-	$(ENV) pip install --upgrade pip wheel setuptools
-	$(ENV) pip install -r ./requirements.txt
+	pipenv install --dev --ignore-pipfile
 
 outdated:
 	$(ENV) pip list --outdated
@@ -37,103 +31,103 @@ clean:
 
 
 db:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py db upgrade
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py db upgrade
 
 migrate:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py db migrate -m '$(msg)'
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py db migrate -m '$(msg)'
 
 data: db perms tickets bankaccounts
 
 exportdb:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py exportdb
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py exportdb
 
 perms:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createperms
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py createperms
 
 tickets:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createtickets
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py createtickets
 
 bankaccounts:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createbankaccounts
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py createbankaccounts
 
 loadofx:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py loadofx -f var/data.ofx
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py loadofx -f var/data-eur.ofx
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py loadofx -f var/data.ofx
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py loadofx -f var/data-eur.ofx
 
 checkreconcile:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py reconcile
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py reconcile
 
 reallyreconcile:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py reconcile -d
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py reconcile -d
 
 sendtickets:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py sendtickets
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py sendtickets
 
 faketickets:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py makefaketickets
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makefaketickets
 
 lockproposals:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py lockproposals
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py lockproposals
 
 importcfp:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py importcfp
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py importcfp
 
 emailspeakersaboutslot:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py emailspeakersaboutslot
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py emailspeakersaboutslot
 
 emailspeakersaboutfinalising:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py emailspeakersaboutfinalising
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py emailspeakersaboutfinalising
 
 rejectunacceptedtalks:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py rejectunacceptedtalks
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py rejectunacceptedtalks
 
 importvenues:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py importvenues
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py importvenues
 
 setroughdurations:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py setroughdurations
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py setroughdurations
 
 outputschedulerdata:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py outputschedulerdata
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py outputschedulerdata
 
 importschedulerdata:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py importschedulerdata --persist
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py importschedulerdata --persist
 
 runscheduler:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py outputschedulerdata
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py runscheduler
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py importschedulerdata
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py outputschedulerdata
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py runscheduler
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py importschedulerdata
 
 applypotentialschedule:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py applypotentialschedule
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py applypotentialschedule
 
 shell:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py shell
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py shell
 
 testemails:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py testemails
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py testemails
 
 admin:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py makeadmin
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makeadmin
 
 users:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py makefakeusers
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makefakeusers
 
 arrivals:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py makearrivals
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makearrivals
 
 calendars:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createcalendars
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py createcalendars
 
 refreshcalendars:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py refreshcalendars
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py refreshcalendars
 
 exportcalendars:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py exportcalendars
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py exportcalendars
 
 parkingtickets:
-	$(ENV) SETTINGS_FILE=$(SETTINGS) python ./utils.py createparkingtickets
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py createparkingtickets
 
 test:
-	$(ENV) SETTINGS_FILE=$(TEST_SETTINGS) flake8 ./*.py ./models ./apps ./tasks ./utils.py
-	$(ENV) SETTINGS_FILE=$(TEST_SETTINGS) pytest ./tests/ ./models/
+	SETTINGS_FILE=$(TEST_SETTINGS) pipenv run flake8 ./*.py ./models ./apps ./tasks ./utils.py
+	SETTINGS_FILE=$(TEST_SETTINGS) pipenv run pytest ./tests/ ./models/
