@@ -11,7 +11,7 @@ from flask_login import login_required, current_user
 from flask_mail import Message
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import joinedload, undefer
+from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 
 from main import db, mail
