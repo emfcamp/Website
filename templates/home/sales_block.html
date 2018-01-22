@@ -1,6 +1,6 @@
 {% if SALES_STATE == 'available' %}
   <p class="emphasis">Tickets for EMF are now on sale for £{{ full_price.value }}!<p>
-  <a class="btn btn-lg btn-block btn-primary" href="{{url_for('tickets.choose')}}">Buy your ticket now</a>
+  <a class="btn btn-lg btn-block btn-primary" href="{{url_for('tickets.main')}}">Buy your ticket now</a>
 {% elif SALES_STATE == 'unavailable' %}
   <p class="emphasis">Tickets for EMF are currently unavailable.</p>
   <p>Keep an eye on

@@ -8,7 +8,7 @@
     them. The recipient will be able to access the ticket on this site, and
     we'll email them important information nearer the event.</p>
     <p>By filling in this form you are transferring ownership of the ticket.
-    You'll be able to refer to it in the <a href="{{ url_for('tickets.main', _anchor='transfers-to') }}">tickets given</a>
+    You'll be able to refer to it in the <a href="{{ url_for('users.tickets', _anchor='transfers-to') }}">tickets given</a>
     section of the tickets page.</p>
 </div>
 
@@ -22,7 +22,7 @@
       {{ render_field(form.email, horizontal=True) }}
     </div>
   </div>
-  <a class="btn btn-default" href="{{ url_for('tickets.main') }}">Back</a>
+  <a class="btn btn-default" href="{{ url_for('users.tickets') }}">Back</a>
   {{ form.transfer(class_="btn btn-success") }}
 </fieldset>
 </form>

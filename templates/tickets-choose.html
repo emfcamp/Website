@@ -11,7 +11,7 @@ Buy Items
     {% include 'ticket-blurb.html' %}
 
     <p>To order additional items, such as {# village tents or t-shirts #} parking tickets, please
-        <a href="{{ url_for('tickets.choose', flow='other') }}">click here</a>.
+        <a href="{{ url_for('tickets.main', flow='other') }}">click here</a>.
 
     <p>
       By buying a ticket you are agreeing to our <a href="{{url_for('payments.terms')}}">Terms

@@ -10,7 +10,7 @@
 <form method="post" action="{{ url_for('payments.gocardless_cancel', payment_id=payment.id) }}">
 {{ form.hidden_tag() }}
 {{ form.yes(class_="btn btn-danger debounce") }}
-<a class="btn btn-info" href="{{ url_for('tickets.main') }}">Go back to my tickets</a>
+<a class="btn btn-info" href="{{ url_for('users.tickets') }}">Go back to my tickets</a>
 </form>
 
 <h3></h3>

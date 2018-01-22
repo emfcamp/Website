@@ -8,7 +8,7 @@ The tickets will expire in a few days if not paid for.
 If you don't want the tickets you can ignore this email. {% if payment.provider in ['gocardless', 'banktransfer'] -%} Otherwise,
 if you wish to pay for the tickets, you can go to the EMF website:
 
-{{ external_url('tickets.main') }}
+{{ external_url('users.tickets') }}
 
 and complete the payment process.
 

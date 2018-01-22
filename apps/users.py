@@ -16,6 +16,9 @@ from wtforms import StringField, HiddenField, SubmitField
 from main import db
 from models.user import User, UserDiversity
 from models.cfp import Proposal, CFPMessage
+from models.purchase import Purchase
+from models.product import PriceTier
+from models.payment import Payment
 
 from .common import (
     set_user_currency, send_template_email, feature_flag,
@@ -90,7 +93,7 @@ def login():
     if request.args.get('email'):
         form.email.data = request.args.get('email')
 
-    return render_template("login.html", form=form, next=request.args.get('next'))
+    return render_template("account/login.html", form=form, next=request.args.get('next'))
 
 
 @users.route("/logout")
@@ -159,7 +162,39 @@ def account():
                     CFPMessage.has_been_read.is_(None)))\
         .count()
 
-    return render_template("account.html", form=form, unread_count=unread_count)
+    return render_template("account/main.html", form=form, unread_count=unread_count)
+
+
+@users.route("/account/tickets", methods=['GET', 'POST'])
+@login_required
+def tickets():
+    # FIXME all of this
+    all_tickets = current_user.purchased_products \
+                              .filter(Purchase.state != 'cancelled') \
+                              .join(PriceTier) \
+                              .outerjoin(Payment) \
+                              .filter(or_(Payment.id.is_(None),
+                                          Payment.state != "cancelled"))
+
+    tickets = all_tickets.filter(Purchase.is_ticket.is_(True)).all()
+    other_items = all_tickets.filter(Purchase.is_ticket.is_(False)).all()
+    payments = current_user.payments.filter(Payment.state != "cancelled").all()
+
+    if not tickets and not payments:
+        return redirect(url_for('tickets.choose'))
+
+    transferred_to = current_user.transfers_to
+    transferred_from = current_user.transfers_from
+
+    show_receipt = any([t for t in tickets if t.is_paid_for is True])
+
+    return render_template("account/tickets.html",
+                           tickets=tickets,
+                           other_items=other_items,
+                           payments=payments,
+                           show_receipt=show_receipt,
+                           transferred_to=transferred_to,
+                           transferred_from=transferred_from)
 
 
 @users.route("/sso/<site>")

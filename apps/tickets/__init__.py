@@ -9,7 +9,6 @@ from flask import (
 )
 from flask_login import login_required, current_user
 from flask_mail import Message
-from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
@@ -21,11 +20,10 @@ from models.product import (
     ProductGroup, PriceTier, ProductView,
     ProductViewProduct, Product,
 )
-from models.purchase import Purchase, Ticket
+from models.purchase import Ticket
 from models import bought_states
 from models.payment import BankPayment, StripePayment, GoCardlessPayment
 from models.site_state import get_sales_state
-from models.payment import Payment
 
 from ..common import (
     get_user_currency, set_user_currency, get_basket_and_total, create_basket,
@@ -83,41 +81,6 @@ def create_payment(paymenttype):
 
     return payment
 
-
-@tickets.route("/tickets/", methods=['GET', 'POST'])
-def main():
-    if current_user.is_anonymous:
-        return redirect(url_for('tickets.choose'))
-
-    # FIXME all of this
-    all_tickets = current_user.purchased_products \
-                              .filter(Purchase.state != 'cancelled') \
-                              .join(PriceTier) \
-                              .outerjoin(Payment) \
-                              .filter(or_(Payment.id.is_(None),
-                                          Payment.state != "cancelled"))
-
-    tickets = all_tickets.filter(Purchase.is_ticket.is_(True)).all()
-    other_items = all_tickets.filter(Purchase.is_ticket.is_(False)).all()
-    payments = current_user.payments.filter(Payment.state != "cancelled").all()
-
-    if not tickets and not payments:
-        return redirect(url_for('tickets.choose'))
-
-    transferred_to = current_user.transfers_to
-    transferred_from = current_user.transfers_from
-
-    show_receipt = any([t for t in tickets if t.is_paid_for is True])
-
-    return render_template("tickets-main/main.html",
-                           tickets=tickets,
-                           other_items=other_items,
-                           payments=payments,
-                           show_receipt=show_receipt,
-                           transferred_to=transferred_to,
-                           transferred_from=transferred_from)
-
-
 @tickets.route("/tickets/token/")
 @tickets.route("/tickets/token/<token>")
 def tickets_token(token=None):
@@ -130,15 +93,15 @@ def tickets_token(token=None):
         flash('Ticket token was invalid')
 
     if any(group.allow_check_in for group in groups):
-        return redirect(url_for('tickets.choose'))
+        return redirect(url_for('tickets.main'))
 
-    return redirect(url_for('tickets.choose', flow='other'))
+    return redirect(url_for('tickets.main', flow='other'))
 
 
-@tickets.route("/tickets/choose", methods=['GET', 'POST'])
-@tickets.route("/tickets/choose/<flow>", methods=['GET', 'POST'])
+@tickets.route("/tickets", methods=['GET', 'POST'])
+@tickets.route("/tickets/<flow>", methods=['GET', 'POST'])
 @feature_flag('TICKET_SALES')
-def choose(flow=None):
+def main(flow=None):
     if flow is None:
         flow = 'main'
 
@@ -150,7 +113,7 @@ def choose(flow=None):
     is_new_basket = request.args.get('is_new_basket', False)
     if is_new_basket:
         empty_basket()
-        return redirect(url_for('tickets.choose', flow=flow))
+        return redirect(url_for('tickets.main', flow=flow))
 
     token = session.get('ticket_token')
     sales_state = get_sales_state()
@@ -182,9 +145,8 @@ def choose(flow=None):
                                  .with_entities(Product) \
                                  .order_by(ProductViewProduct.order) \
                                  .options(joinedload(Product.price_tiers)
-                                     .undefer(PriceTier.purchase_count)
-                                     .joinedload(PriceTier.prices)
-                                 )
+                                          .undefer(PriceTier.purchase_count)
+                                          .joinedload(PriceTier.prices))
 
     for product in products:
         product_tiers = sorted(product.price_tiers, key=lambda x: x.get_price('GBP').value)
@@ -308,12 +270,12 @@ def pay(flow=None):
         except CapacityException as e:
             app.logger.warn('Limit exceeded creating tickets: %s', e)
             flash("We're sorry, we were unable to reserve your tickets. %s" % e)
-            return redirect(url_for('tickets.choose', flow=flow))
+            return redirect(url_for('tickets.main', flow=flow))
 
         if not payment:
             app.logger.warn('Unable to add payment and tickets to database')
             flash("We're sorry, your session information has been lost. Please try ordering again.")
-            return redirect(url_for('tickets.choose', flow=flow))
+            return redirect(url_for('tickets.main', flow=flow))
 
         if payment_type == GoCardlessPayment:
             return gocardless_start(payment)
