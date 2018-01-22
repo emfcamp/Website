@@ -179,7 +179,6 @@ def choose(flow=None):
     tiers = OrderedDict()
     products = ProductViewProduct.query.filter_by(view_id=view.id) \
                                  .join(ProductViewProduct.product) \
-                                 .join(User, User.id == current_user.id) \
                                  .with_entities(Product) \
                                  .order_by(ProductViewProduct.order) \
                                  .options(joinedload(Product.price_tiers)
