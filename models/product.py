@@ -1,17 +1,27 @@
 from decimal import Decimal
 
-from sqlalchemy import func, UniqueConstraint
+from sqlalchemy import func, UniqueConstraint, inspect, select, and_
 from sqlalchemy.ext.associationproxy import association_proxy
-
+from sqlalchemy.orm import column_property
 
 from main import db
 from .purchase import Purchase, non_blocking_states, allowed_states
 from .mixins import CapacityMixin, InheritedAttributesMixin
+import models
 
 
 class ProductGroupException(Exception):
     pass
 
+class MultipleLoadedResultsFound(Exception):
+    pass
+
+def one_or_none(result):
+    if len(result) == 1:
+        return result[0]
+    if len(result) == 0:
+        return None
+    raise MultipleLoadedResultsFound()
 
 class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
     """ Represents a logical group of products.
@@ -152,11 +162,18 @@ class PriceTier(db.Model, CapacityMixin):
     personal_limit = db.Column(db.Integer, default=10, nullable=False)
     active = db.Column(db.Boolean, default=True, nullable=False)
 
-    prices = db.relationship('Price', backref='price_tier', cascade='all')
-
     __table_args__ = (
         UniqueConstraint('name', 'product_id'),
     )
+    prices = db.relationship('Price', backref='price_tier', cascade='all')
+
+    # Convenience for user_limit. Use undefer and a join on User or contains_eager
+    purchase_count = column_property(select([func.count(Purchase.id)]).where(and_(
+        Purchase.price_tier_id == id,
+        Purchase.purchaser_id == models.User.id,
+        ~Purchase.state.in_(non_blocking_states),
+    )), deferred=True)
+
 
     @classmethod
     def get_by_name(cls, group_name, product_name, tier_name):
@@ -185,8 +202,18 @@ class PriceTier(db.Model, CapacityMixin):
         return states
 
     def get_price(self, currency):
+        if 'prices' in inspect(self).unloaded:
+            return self.get_price_unloaded(currency)
+        else:
+            return self.get_price_loaded(currency)
+
+    def get_price_unloaded(self, currency):
         price = Price.query.filter_by(price_tier_id=self.id, currency=currency)
         return price.one_or_none()
+
+    def get_price_loaded(self, currency):
+        prices = [p for p in self.prices if p.currency == currency]
+        return one_or_none(prices)
 
     def user_limit(self, user):
         if self.has_expired():
@@ -194,11 +221,14 @@ class PriceTier(db.Model, CapacityMixin):
 
         if user and user.is_authenticated:
             # How many have been sold to this user
-            user_count = Purchase.query.filter(
-                Purchase.price_tier == self,
-                Purchase.purchaser == user,
-                ~Purchase.state.in_(non_blocking_states)
-            ).count()
+            if 'purchase_count' in inspect(self).unloaded:
+                user_count = Purchase.query.filter(
+                    Purchase.price_tier == self,
+                    Purchase.purchaser == user,
+                    ~Purchase.state.in_(non_blocking_states),
+                ).count()
+            else:
+                user_count = self.purchase_count
         else:
             user_count = 0
 

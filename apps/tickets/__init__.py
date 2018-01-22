@@ -11,12 +11,16 @@ from flask_login import login_required, current_user
 from flask_mail import Message
 from sqlalchemy import or_
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import joinedload, undefer
 from sqlalchemy.orm.exc import NoResultFound
 
 from main import db, mail
 from models.exc import CapacityException
 from models.user import User, checkin_code_re
-from models.product import ProductGroup, PriceTier, ProductView
+from models.product import (
+    ProductGroup, PriceTier, ProductView,
+    ProductViewProduct, Product,
+)
 from models.purchase import Purchase, Ticket
 from models import bought_states
 from models.payment import BankPayment, StripePayment, GoCardlessPayment
@@ -173,8 +177,18 @@ def choose(flow=None):
         return render_template("tickets-cutoff.html")
 
     tiers = OrderedDict()
-    for product in view.products:
-        product_tiers = sorted(product.price_tiers, key=lambda x: x.get_price('GBP').value)
+    products = ProductViewProduct.query.filter_by(view_id=view.id) \
+                                 .join(ProductViewProduct.product) \
+                                 .join(User, User.id == current_user.id) \
+                                 .with_entities(Product) \
+                                 .order_by(ProductViewProduct.order) \
+                                 .options(joinedload(Product.price_tiers)
+                                     .undefer(PriceTier.purchase_count)
+                                     .joinedload(PriceTier.prices)
+                                 )
+
+    for product in products:
+        product_tiers = sorted(product.price_tiers, key=lambda x: x.get_price_loaded('GBP').value)
         pt = product_tiers[0]
         tiers[pt.id] = pt
 
