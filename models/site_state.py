@@ -1,15 +1,20 @@
 # coding=utf-8
 from __future__ import division, absolute_import, print_function, unicode_literals
+import logging
 from datetime import datetime
 from dateutil.parser import parse
 
 from flask import current_app as app
+from sqlalchemy.orm.exc import MultipleResultsFound
 
 from main import cache, db
 from models.product import (
     Product, ProductGroup, ProductView,
     ProductViewProduct, PriceTier,
 )
+
+log = logging.getLogger(__name__)
+
 
 class SiteState(db.Model):
     __tablename__ = 'site_state'
@@ -58,10 +63,14 @@ def calc_sales_state(date):
     # Active price tier for the full ticket product in the main flow.
     view = ProductView.query.filter_by(name='main')
     product = view.join(ProductViewProduct, Product).filter_by(name='full')
-    tier = product.join(Product.price_tiers) \
-                  .filter_by(active=True) \
-                  .with_entities(PriceTier) \
-                  .one_or_none()
+    try:
+        tier = product.join(Product.price_tiers) \
+                      .filter_by(active=True) \
+                      .with_entities(PriceTier) \
+                      .one_or_none()
+    except MultipleResultsFound:
+        log.error("Multiple active PriceTiers found. Forcing sales state to unavailable.")
+        return "unavailable"
 
     if tier is None or tier.has_expired() or tier.get_total_remaining_capacity() <= 0:
         # Tickets not currently available, probably just for this round, but we haven't hit site capacity
