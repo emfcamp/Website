@@ -23,7 +23,10 @@ def main():
     full = ProductView.query.filter_by(name='main') \
                       .join(ProductViewProduct, Product) \
                       .with_entities(Product).first()
-    full_price = full.get_cheapest_price('GBP')
+    if full is not None:
+        full_price = full.get_cheapest_price('GBP')
+    else:
+        full_price = None
 
     state = get_site_state()
     if app.config.get('DEBUG'):
