@@ -188,7 +188,7 @@ def choose(flow=None):
                                  )
 
     for product in products:
-        product_tiers = sorted(product.price_tiers, key=lambda x: x.get_price_loaded('GBP').value)
+        product_tiers = sorted(product.price_tiers, key=lambda x: x.get_price('GBP').value)
         pt = product_tiers[0]
         tiers[pt.id] = pt
 
