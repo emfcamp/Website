@@ -140,13 +140,24 @@ def main(flow=None):
         return render_template("tickets-cutoff.html")
 
     tiers = OrderedDict()
-    products = ProductViewProduct.query.filter_by(view_id=view.id) \
-                                 .join(ProductViewProduct.product) \
-                                 .with_entities(Product) \
-                                 .order_by(ProductViewProduct.order) \
-                                 .options(joinedload(Product.price_tiers)
-                                          .undefer(PriceTier.purchase_count)
-                                          .joinedload(PriceTier.prices))
+    if current_user.is_authenticated:
+        products = ProductViewProduct.query.filter_by(view_id=view.id) \
+                                     .join(ProductViewProduct.product) \
+                                     .join(User, User.id == current_user.id) \
+                                     .with_entities(Product) \
+                                     .order_by(ProductViewProduct.order) \
+                                     .options(joinedload(Product.price_tiers)
+                                              .undefer(PriceTier.purchase_count)
+                                              .joinedload(PriceTier.prices)
+                                     )
+    else:
+        products = ProductViewProduct.query.filter_by(view_id=view.id) \
+                                     .join(ProductViewProduct.product) \
+                                     .with_entities(Product) \
+                                     .order_by(ProductViewProduct.order) \
+                                     .options(joinedload(Product.price_tiers)
+                                              .joinedload(PriceTier.prices)
+                                     )
 
     for product in products:
         product_tiers = sorted(product.price_tiers, key=lambda x: x.get_price('GBP').value)
