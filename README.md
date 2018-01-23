@@ -24,6 +24,7 @@ vagrant ssh
 This installs the necessary packages and dependencies for you. Then run:
 
 ```
+make update
 make data
 make
 ```
