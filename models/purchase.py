@@ -39,9 +39,7 @@ class Purchase(db.Model):
     is_ticket = column_property(type == 'ticket' or type == 'admission_ticket')
 
     # User FKs
-    # Store the owner & purchaser so that we can calculate user_limits against
-    # the former. We don't want to make it possible to buy over the
-    # personal_limit of a product by transferring away purchases.
+    # Store the owner & purchaser separately so that we can track payment statistics
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     purchaser_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
@@ -176,7 +174,7 @@ class Purchase(db.Model):
         """
         price = tier.get_price(currency)
 
-        if count > tier.user_limit(user):
+        if count > tier.user_limit():
             raise CapacityException('Insufficient capacity.')
 
         purchase_cls = cls.class_from_product(tier.parent)

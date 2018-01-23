@@ -140,24 +140,13 @@ def main(flow=None):
         return render_template("tickets-cutoff.html")
 
     tiers = OrderedDict()
-    if current_user.is_authenticated:
-        products = ProductViewProduct.query.filter_by(view_id=view.id) \
-                                     .join(ProductViewProduct.product) \
-                                     .join(User, User.id == current_user.id) \
-                                     .with_entities(Product) \
-                                     .order_by(ProductViewProduct.order) \
-                                     .options(joinedload(Product.price_tiers)
-                                              .undefer(PriceTier.purchase_count)
-                                              .joinedload(PriceTier.prices)
-                                     )
-    else:
-        products = ProductViewProduct.query.filter_by(view_id=view.id) \
-                                     .join(ProductViewProduct.product) \
-                                     .with_entities(Product) \
-                                     .order_by(ProductViewProduct.order) \
-                                     .options(joinedload(Product.price_tiers)
-                                              .joinedload(PriceTier.prices)
-                                     )
+    products = ProductViewProduct.query.filter_by(view_id=view.id) \
+                                 .join(ProductViewProduct.product) \
+                                 .with_entities(Product) \
+                                 .order_by(ProductViewProduct.order) \
+                                 .options(joinedload(Product.price_tiers)
+                                          .joinedload(PriceTier.prices)
+                                 )
 
     for product in products:
         product_tiers = sorted(product.price_tiers, key=lambda x: x.get_price('GBP').value)
@@ -176,7 +165,7 @@ def main(flow=None):
         pt_id = f.tier_id.data
         f._tier = tiers[pt_id]
 
-        user_limit = tiers[pt_id].user_limit(current_user)
+        user_limit = tiers[pt_id].user_limit()
         values = range(user_limit + 1)
         f.amount.values = values
         f._any = any(values)
