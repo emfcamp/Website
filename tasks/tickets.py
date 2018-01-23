@@ -55,10 +55,10 @@ def create_product_groups():
         ('full-sg', 'Full Camp Ticket (Gold Supporter)', True, True, None, 'Support this non-profit event by paying a bit more. All money will go towards making EMF more awesome.',
             ((None, 200, 240),)
         ),
-        ('u16', 'Under-16', True, False, 150, 'For visitors born after August 30th, 2002. All under-16s must be accompanied by an adult.',
+        ('u18', 'Under-18', True, False, 150, 'For visitors born after August 30th, 2000. All under-18s must be accompanied by an adult.',
             ((None, 55, 63),)
         ),
-        ('u5', 'Under-5', True, False, 50, 'For children born after August 30th, 2013. All children must be accompanied by an adult.',
+        ('u12', 'Under-12', True, False, 50, 'For children born after August 30th, 2006. All children must be accompanied by an adult.',
             ((None, 0, 0),)
         ),
     ]
