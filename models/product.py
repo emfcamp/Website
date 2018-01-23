@@ -1,13 +1,11 @@
 from decimal import Decimal
 
-from sqlalchemy import func, UniqueConstraint, inspect, select, and_
+from sqlalchemy import func, UniqueConstraint, inspect
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import column_property
 
 from main import db
-from .purchase import Purchase, non_blocking_states, allowed_states
+from .purchase import Purchase, allowed_states
 from .mixins import CapacityMixin, InheritedAttributesMixin
-import models
 
 
 class ProductGroupException(Exception):
