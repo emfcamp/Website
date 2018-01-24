@@ -18,7 +18,7 @@ from models.site_state import get_site_state
 
 base = Blueprint('base', __name__)
 
-@cache.cached(timeout=60, key_prefix='get_full_ticket')
+@cache.cached(timeout=60, key_prefix='get_full_price')
 def get_full_price():
     full = ProductView.query.filter_by(name='main') \
                             .join(ProductViewProduct, Product) \
