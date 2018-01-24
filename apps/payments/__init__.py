@@ -69,10 +69,8 @@ def invoice(payment_id):
 
     app.logger.debug('Invoice total: %s + %s = %s', subtotal, vat, payment.amount)
 
-    due_date = payment.expires
-
     return render_template('invoice.html', payment=payment, invoice_lines=invoice_lines,
-                           premium=premium, subtotal=subtotal, vat=vat, due_date=due_date)
+                           premium=premium, subtotal=subtotal, vat=vat)
 
 
 from . import banktransfer  # noqa: F401
