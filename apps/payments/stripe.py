@@ -126,7 +126,7 @@ def stripe_capture(payment_id):
     if not feature_enabled('STRIPE'):
         logger.warn('Unable to capture payment as Stripe is disabled')
         flash('Stripe is currently unavailable. Please try again later')
-        return redirect(url_for('tickets.main'))
+        return redirect(url_for('users.tickets'))
 
     form = StripeAuthorizeForm(request.form)
     if form.validate_on_submit():
@@ -162,7 +162,7 @@ def stripe_tryagain(payment_id):
     if not feature_enabled('STRIPE'):
         logger.warn('Unable to retry payment as Stripe is disabled')
         flash('Stripe is currently unavailable. Please try again later')
-        return redirect(url_for('tickets.main'))
+        return redirect(url_for('users.tickets'))
 
     if payment.state == 'new':
         return redirect(url_for('.stripe_capture', payment_id=payment.id))
@@ -206,7 +206,7 @@ def stripe_cancel(payment_id):
             logger.info('Payment %s cancelled', payment.id)
             flash('Payment cancelled')
 
-        return redirect(url_for('tickets.main'))
+        return redirect(url_for('users.tickets'))
 
     return render_template('stripe-cancel.html', payment=payment, form=form)
 

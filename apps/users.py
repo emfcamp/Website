@@ -64,19 +64,19 @@ def login_by_email(email):
         login_user(user)
         session.permanent = True
 
-    return redirect(request.args.get('next', url_for('tickets.main')))
+    return redirect(request.args.get('next', url_for('.account')))
 
 @users.route("/login", methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(request.args.get('next', url_for('tickets.main')))
+        return redirect(request.args.get('next', url_for('.account')))
 
     if request.args.get('code'):
         user = User.get_by_code(app.config['SECRET_KEY'], request.args.get('code'))
         if user is not None:
             login_user(user)
             session.permanent = True
-            return redirect(request.args.get('next', url_for('tickets.main')))
+            return redirect(request.args.get('next', url_for('.account')))
         else:
             flash("Your login link was invalid. Please note that they expire after 6 hours.")
 

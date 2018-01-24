@@ -87,12 +87,12 @@ def gocardless_complete(payment_id):
         # Assume the webhook will do its magic
         logging.error('InvalidStateError from GoCardless confirming mandate: %s', e.message)
         flash("An error occurred with your mandate, please check below or contact {}".format(app.config['TICKETS_EMAIL'][1]))
-        return redirect(url_for('tickets.main'))
+        return redirect(url_for('users.tickets'))
 
     except Exception as e:
         logger.error("Exception %s confirming mandate", repr(e))
         flash("An error occurred with your payment, please contact {}".format(app.config['TICKETS_EMAIL'][1]))
-        return redirect(url_for('tickets.main'))
+        return redirect(url_for('users.tickets'))
 
     try:
         gc_payment = gocardless_client.payments.create(params={
@@ -111,7 +111,7 @@ def gocardless_complete(payment_id):
     except Exception as e:
         logger.error("Exception %s confirming payment", repr(e))
         flash("An error occurred with your payment, please contact {}".format(app.config['TICKETS_EMAIL'][1]))
-        return redirect(url_for('tickets.main'))
+        return redirect(url_for('users.tickets'))
 
     # We need to make sure of a 5 working days grace
     # for gocardless payments, so push the payment expiry forwards
@@ -155,7 +155,7 @@ def gocardless_tryagain(payment_id):
     if not feature_enabled('GOCARDLESS'):
         logger.error('Unable to retry payment %s as GoCardless is disabled', payment.id)
         flash('GoCardless is currently unavailable. Please try again later')
-        return redirect(url_for('tickets.main'))
+        return redirect(url_for('users.tickets'))
 
     logger.info("Trying payment %s again", payment.id)
     gocardless_client.payments.retry(payment.gcid)
@@ -176,7 +176,7 @@ def gocardless_cancel(payment_id):
     if payment.state == 'cancelled':
         logger.info('Payment %s has already been cancelled', payment.id)
         flash('Payment has already been cancelled')
-        return redirect(url_for('tickets.main'))
+        return redirect(url_for('users.tickets'))
 
     form = GoCardlessCancelForm(request.form)
     if form.validate_on_submit():
@@ -188,7 +188,7 @@ def gocardless_cancel(payment_id):
             except gocardless_pro.errors.InvalidStateError as e:
                 logging.error('InvalidStateError from GoCardless confirming mandate: %s', e.message)
                 flash("An error occurred with your mandate, please check below or contact {}".format(app.config['TICKETS_EMAIL'][1]))
-                return redirect(url_for('tickets.main'))
+                return redirect(url_for('users.tickets'))
 
             logger.info('Cancelling GoCardless payment %s', payment.id)
             payment.cancel()
@@ -197,7 +197,7 @@ def gocardless_cancel(payment_id):
             logger.info('Payment %s cancelled', payment.id)
             flash('Payment cancelled')
 
-        return redirect(url_for('tickets.main'))
+        return redirect(url_for('users.tickets'))
 
     return render_template('gocardless-cancel.html', payment=payment, form=form)
 

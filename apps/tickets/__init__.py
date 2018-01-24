@@ -300,12 +300,12 @@ def transfer(ticket_id):
     try:
         ticket = current_user.tickets.filter_by(id=ticket_id).one()
     except NoResultFound:
-        return redirect(url_for('tickets.main'))
+        return redirect(url_for('users.tickets'))
 
     if (not ticket or
             ticket.state not in bought_states or
             not ticket.price_tier.get_attribute('is_transferable')):
-        return redirect(url_for('tickets.main'))
+        return redirect(url_for('users.tickets'))
 
     form = TicketTransferForm()
 
@@ -357,7 +357,7 @@ def transfer(ticket_id):
         mail.send(msg)
 
         flash("Your ticket was transferred.")
-        return redirect(url_for('tickets.main'))
+        return redirect(url_for('users.tickets'))
 
     return render_template('ticket-transfer.html', ticket=ticket, form=form)
 
