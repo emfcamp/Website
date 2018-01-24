@@ -10,7 +10,7 @@
 <dt>Email</dt><dd>{{ payment.user.email }}</dd>
 <dt>Price</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
 <dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
-<dt>Expires</dt><dd>{{ payment.expires.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
+<dt>Expires</dt><dd>{{ payment.expires and payment.expires.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
 <dt>Already bought</dt><dd>{{ payment.user.tickets.filter_by(paid=True).all() | count }}</dd>
 </dl>
 

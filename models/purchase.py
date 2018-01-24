@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from sqlalchemy.orm import column_property
 from main import db
 from .exc import CapacityException

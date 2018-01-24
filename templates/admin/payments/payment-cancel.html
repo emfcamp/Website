@@ -14,7 +14,7 @@
 {% elif payment.provider == 'gocardless' %}
 <dt>GoCardless ID</dt><dd>{{ payment.gcid }}</dd>
 {% endif -%}
-<dt>Expires</dt><dd>{{ payment.expires.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
+<dt>Expires</dt><dd>{{ payment.expires and payment.expires.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
 </dl>
 
 <table class="table table-condensed table-striped">

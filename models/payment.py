@@ -156,7 +156,6 @@ class Payment(db.Model):
             raise StateException('Refunded payments cannot be cancelled')
 
         refund = BankRefund(self, self.amount)
-        now = datetime.utcnow()
         for purchase in self.purchases:
             if purchase.owner != self.user:
                 raise StateException('Cannot refund transferred purchase')

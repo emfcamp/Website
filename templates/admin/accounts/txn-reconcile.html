@@ -18,7 +18,7 @@
 <dt>Email</dt><dd>{{ payment.user.email }}</dd>
 <dt>Price</dt><dd><b>{{ payment.amount | price(payment.currency) }}</b></dd>
 <dt>Reference</dt><dd><b>{{ payment.bankref | bankref }}</b></dd>
-<dt>Expires</dt><dd><b>{{ payment.expires.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
+<dt>Expires</dt><dd><b>{{ payment.expires and payment.expires.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
 </dl>
 
 <table class="table table-condensed table-striped">
