@@ -46,7 +46,7 @@
     {% for ticket in user.tickets %}
         <tr>
             <td>{{ ticket.type.name }}</td>
-            <td>{% if ticket.paid -%}
+            <td>{% if ticket.is_paid_for -%}
                 Paid
             {%- elif ticket.expired -%}
                 Expired

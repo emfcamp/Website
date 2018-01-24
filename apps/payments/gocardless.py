@@ -113,17 +113,18 @@ def gocardless_complete(payment_id):
         flash("An error occurred with your payment, please contact {}".format(app.config['TICKETS_EMAIL'][1]))
         return redirect(url_for('tickets.main'))
 
-    for t in payment.purchases:
-        # We need to make sure of a 5 working days grace
-        # for gocardless payments, so push the ticket expiry forwards
-        t.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS_GOCARDLESS'])
-        t.set_state('payment-pending')
-        logger.info("Reset expiry for ticket %s", t.id)
+    # We need to make sure of a 5 working days grace
+    # for gocardless payments, so push the payment expiry forwards
+    payment.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS_GOCARDLESS'])
+    for purchase in payment.purchases:
+        purchase.set_state('payment-pending')
+        logger.info("Reset expiry for purchase %s", purchase.id)
 
     db.session.commit()
 
     logger.info("Payment %s completed OK", payment.id)
 
+    # FIXME: determine whether these are tickets or generic products
     msg = Message("Your EMF ticket purchase",
                   sender=app.config['TICKETS_EMAIL'],
                   recipients=[payment.user.email])

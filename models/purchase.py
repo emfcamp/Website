@@ -23,7 +23,6 @@ non_blocking_states = ('expired', 'refunded', 'cancelled')
 bought_states = ('paid', 'receipt-emailed')
 anon_states = ('reserved', 'cancelled', 'expired')
 allowed_states = set(PURCHASE_STATES.keys())
-PURCHASE_EXPIRY_TIME = 2  # In hours
 
 class CheckinStateException(Exception):
     pass
@@ -60,8 +59,6 @@ class Purchase(db.Model):
 
     # State tracking info
     state = db.Column(db.String, default='reserved', nullable=False)
-    # Until an instance is paid for, we track the payment's expiry
-    expires = db.Column(db.DateTime, nullable=False)
     is_paid_for = column_property(state.in_(bought_states))
 
     # Relationships
@@ -76,7 +73,6 @@ class Purchase(db.Model):
 
 
     def __init__(self, price, user=None, state=None, **kwargs):
-        self.expires = datetime.utcnow() + timedelta(hours=PURCHASE_EXPIRY_TIME)
         if user is None and state is not None and state not in anon_states:
             raise PurchaseStateException('%s is not a valid state for unclaimed purchases' % state)
 
@@ -87,10 +83,6 @@ class Purchase(db.Model):
         if self.id is None:
             return "<Purchase -- %s: %s>" % (self.price_tier.name, self.state)
         return "<Purchase %s %s: %s>" % (self.id, self.price_tier.name, self.state)
-
-    @property
-    def expires_in(self):
-        return self.expires - datetime.utcnow()
 
     @property
     def is_transferable(self):

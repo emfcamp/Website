@@ -32,8 +32,7 @@ from ..payments.stripe import (
 def payments():
     payments = Payment.query.join(Purchase).with_entities(
         Payment,
-        func.min(Purchase.expires).label('first_expires'),
-        func.count(Purchase.id).label('ticket_count'),
+        func.count(Purchase.id).label('purchase_count'),
     ).group_by(Payment).order_by(Payment.id).all()
 
     return render_template('admin/payments/payments.html', payments=payments)
@@ -44,12 +43,11 @@ def payments():
 def expiring():
     expiring = BankPayment.query.join(Purchase).filter(
         BankPayment.state == 'inprogress',
-        Purchase.expires < datetime.utcnow() + timedelta(days=3),
+        BankPayment.expires < datetime.utcnow() + timedelta(days=3),
     ).with_entities(
         BankPayment,
-        func.min(Purchase.expires).label('first_expires'),
-        func.count(Purchase.id).label('ticket_count'),
-    ).group_by(BankPayment).order_by('first_expires').all()
+        func.count(Purchase.id).label('purchase_count'),
+    ).group_by(BankPayment).order_by(BankPayment.expires).all()
 
     return render_template('admin/payments/payments-expiring.html', expiring=expiring)
 
@@ -67,15 +65,15 @@ def reset_expiry(payment_id):
     if form.validate_on_submit():
         if form.reset.data:
             app.logger.info("%s manually extending expiry for payment %s", current_user.name, payment.id)
-            for t in payment.purchases:
-                if payment.currency == 'GBP':
-                    t.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS_TRANSFER'))
-                elif payment.currency == 'EUR':
-                    t.expires = datetime.utcnow() + timedelta(
-                        days=app.config.get('EXPIRY_DAYS_TRANSFER_EURO'))
-                app.logger.info("Reset expiry for ticket %s", t.id)
+            if payment.currency == 'GBP':
+                days = app.config.get('EXPIRY_DAYS_TRANSFER')
+            elif payment.currency == 'EUR':
+                days = app.config.get('EXPIRY_DAYS_TRANSFER_EURO')
 
+            payment.expires = datetime.utcnow() + timedelta(days=days)
             db.session.commit()
+
+            app.logger.info("Reset expiry by %s days", days)
 
             flash("Expiry reset for payment %s" % payment.id)
             return redirect(url_for('admin.expiring'))
@@ -292,11 +290,8 @@ def partial_refund(payment_id):
                 payment.state = 'refunding'
                 refund = BankRefund(payment, total + premium)
 
-            now = datetime.utcnow()
             for ticket in tickets:
-                ticket.paid = False
-                if ticket.expires is None or ticket.expires > now:
-                    ticket.expires = now
+                ticket.state = 'refunded'
                 ticket.refund = refund
 
             priced_tickets = [t for t in payment.purchases if t.price_tier.get_price(payment.currency)]
@@ -309,10 +304,13 @@ def partial_refund(payment_id):
                 for ticket in unpriced_tickets:
                     if not ticket.refund:
                         app.logger.info('Removing free ticket %s from refunded payment', ticket.id)
-                        if not ticket.paid:
+                        if ticket.state != 'paid':
                             # The only thing keeping this ticket from being valid was the payment
                             app.logger.info('Setting orphaned free ticket %s to paid', ticket.id)
-                            ticket.paid = True
+                            ticket.state = 'paid'
+
+                            # FIXME: should we cover the receipt-emailed state too?
+                            # Should we even put free tickets in a Payment?
 
                         ticket.payment = None
                         ticket.payment_id = None

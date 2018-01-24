@@ -18,18 +18,17 @@
 <dt>Email</dt><dd>{{ payment.user.email }}</dd>
 <dt>Price</dt><dd><b>{{ payment.amount | price(payment.currency) }}</b></dd>
 <dt>Reference</dt><dd><b>{{ payment.bankref | bankref }}</b></dd>
+<dt>Expires</dt><dd><b>{{ payment.expires.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
 </dl>
 
 <table class="table table-condensed table-striped">
 <thead><tr>
   <th>Type</th>
-  <th>Expires</th>
 </tr></thead>
 <tbody>
-{% for t in payment.purchases %}
+{% for purchase in payment.purchases %}
 <tr>
-  <td>{{ t.type.name }}</td>
-  <td>{{ t.expires.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+  <td>{{ purchase.type.name }}</td>
 </tr>
 {% endfor %}
 </tbody>

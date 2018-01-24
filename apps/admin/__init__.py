@@ -48,7 +48,7 @@ def admin_variables():
 
     expiring_count = BankPayment.query.join(Purchase).filter(
         BankPayment.state == 'inprogress',
-        Purchase.expires < datetime.utcnow() + timedelta(days=3),
+        BankPayment.expires < datetime.utcnow() + timedelta(days=3),
     ).group_by(BankPayment.id).count()
 
     return {'unreconciled_count': unreconciled_count,

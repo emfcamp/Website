@@ -220,8 +220,6 @@ def cancel_free_ticket(ticket_id):
             app.logger.info('Cancelling free ticket %s', ticket.id)
             now = datetime.utcnow()
             ticket.set_state('refunded')
-            if ticket.expires is None or ticket.expires > now:
-                ticket.expires = now
 
             db.session.commit()
 

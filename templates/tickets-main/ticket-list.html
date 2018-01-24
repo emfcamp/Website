@@ -18,25 +18,25 @@
 
 <tr class="
 {{- loop.cycle('odd', 'even') }}
-{%- if t.paid %} paid {%- endif -%}
-{%- if t.expired %} expired {%- endif -%}
+{%- if t.is_paid_for %} paid {%- endif -%}
+{%- if t.payment and t.payment.expired %} expired {%- endif -%}
 ">
 <td>{{ t.price_tier.parent.display_name }}</td>
 <td>
     {% if t.payment and t.payment.state == 'cancelled' %}
     Cancelled
-    {%- elif t.paid %}
+    {%- elif t.is_paid_for %}
     Paid
     {%- elif t.refund %}
     Refunded
-    {%- elif t.expired %}
+    {%- elif t.payment and t.payment.expired %}
     Unpaid
     {%- else %}
-    Pending (expires in {{ pprint_timedelta(t.expires_in) }})
+    Pending {% if t.payment.expires -%} (expires in {{ pprint_timedelta(t.payment.expires_in) }}) {%- endif %}
     {%- endif %}
 </td>
 <td>
-  {% if t.paid and t.type.is_transferable %}
+  {% if t.is_paid_for and t.type.is_transferable %}
     <a class="btn btn-default" href="{{ url_for('.transfer', ticket_id=t.id) }}">Transfer</a>
   {% endif %}
 </td>

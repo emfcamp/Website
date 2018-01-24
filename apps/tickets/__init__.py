@@ -44,7 +44,7 @@ tickets = Blueprint('tickets', __name__)
 
 def create_payment(paymenttype):
     """
-    Insert payment and tickets from session data into DB
+    Insert payment and purchases from session data into DB
     """
 
     infodata = session.get('ticketinfo')
@@ -61,18 +61,20 @@ def create_payment(paymenttype):
     payment.amount += paymenttype.premium(currency, total)
     current_user.payments.append(payment)
 
-    app.logger.info('Creating tickets for basket %s', basket)
-    app.logger.info('Payment: %s for %s %s (ticket total %s)', paymenttype.name,
+    app.logger.info('Creating purchases for basket %s', basket)
+    app.logger.info('Payment: %s for %s %s (purchase total %s)', paymenttype.name,
                     payment.amount, currency, total)
     app.logger.info('Ticket info: %s', infodata)
 
-    for ticket in basket:
-        # current_user.tickets.append(ticket) # this shouldn't be needed
-        ticket.payment = payment
-        if currency == 'GBP':
-            ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS_TRANSFER'))
-        elif currency == 'EUR':
-            ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS_TRANSFER_EURO'))
+    if currency == 'GBP':
+        days = app.config.get('EXPIRY_DAYS_TRANSFER')
+    elif currency == 'EUR':
+        days = app.config.get('EXPIRY_DAYS_TRANSFER_EURO')
+
+    payment.expires = datetime.utcnow() + timedelta(days=days)
+
+    for purchase in basket:
+        purchase.payment = payment
 
     db.session.commit()
 

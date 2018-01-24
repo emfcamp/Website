@@ -88,15 +88,16 @@ def charge_stripe(payment):
         payment.paid()
     else:
         payment.state = 'charged'
+        payment.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS_STRIPE'])
 
-        for t in payment.purchases:
-            t.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS_STRIPE'])
-            logger.info("Set expiry for ticket %s", t.id)
+        for purchase in payment.purchases:
+            logger.info("Set expiry for purchase %s", purchase.id)
 
     db.session.commit()
 
     logger.info('Payment %s completed OK (state %s)', payment.id, payment.state)
 
+    # FIXME: determine whether these are tickets or generic products
     msg = Message("Your EMF ticket purchase",
                   sender=app.config.get('TICKETS_EMAIL'),
                   recipients=[payment.user.email])
@@ -323,9 +324,7 @@ def stripe_payment_refunded(payment):
     logger.info('Setting payment %s to refunded', payment.id)
     now = datetime.utcnow()
     for ticket in payment.purchases:
-        ticket.paid = False
-        if ticket.expires is None or ticket.expires > now:
-            ticket.expires = now
+        ticket.state = 'refunded'
 
     payment.state = 'refunded'
     db.session.commit()

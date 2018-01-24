@@ -13,7 +13,7 @@
     {% endif %}
     <ul>
         {% for purchase in basket %}
-        <li>{{purchase.price_tier.parent.display_name}} &mdash; expires in {{ pprint_timedelta(purchase.expires_in) }}</li>
+        <li>{{purchase.price_tier.parent.display_name}}</li>
         {% endfor %}
     </ul>
     <p>The total price is <b>{{ total | price(user_currency) }}</b>.
