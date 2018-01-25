@@ -14,7 +14,7 @@
     </tr>
   </thead>
   <tbody>
-{%- for t in tickets if t.state != 'cancelled' -%}
+{%- for t in tickets -%}
 
 <tr class="
 {{- loop.cycle('odd', 'even') }}
@@ -23,9 +23,7 @@
 ">
 <td>{{ t.price_tier.parent.display_name }}</td>
 <td>
-    {% if t.payment and t.payment.state == 'cancelled' %}
-    Cancelled
-    {%- elif t.is_paid_for %}
+    {%- if t.is_paid_for %}
     Paid
     {%- elif t.refund %}
     Refunded

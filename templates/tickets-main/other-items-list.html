@@ -10,7 +10,7 @@
 
 <tbody>
 
-{%- for item in other_items if item.state != 'cancelled' -%}
+{%- for item in other_items -%}
 <tr class="
 {{- loop.cycle('odd', 'even') }}
 {%- if item.is_paid_for %} paid {%- endif -%}
@@ -18,9 +18,7 @@
 ">
 <td>{{ item.price_tier.parent.display_name }}</td>
 <td>
-    {% if item.payment and item.payment.state == 'cancelled' %}
-    Cancelled
-    {%- elif item.is_paid_for %}
+    {%- if item.is_paid_for %}
     Paid
     {%- elif item.state == 'refunded' %}
     Refunded

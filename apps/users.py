@@ -168,17 +168,13 @@ def account():
 @users.route("/account/tickets", methods=['GET', 'POST'])
 @login_required
 def tickets():
-    # FIXME all of this
     all_tickets = current_user.purchased_products \
                               .filter(Purchase.state != 'cancelled') \
-                              .join(PriceTier) \
-                              .outerjoin(Payment) \
-                              .filter(or_(Payment.id.is_(None),
-                                          Payment.state != "cancelled")) \
                               .order_by(Purchase.id)
 
     tickets = all_tickets.filter(Purchase.is_ticket.is_(True)).all()
     other_items = all_tickets.filter(Purchase.is_ticket.is_(False)).all()
+
     payments = current_user.payments.filter(Payment.state != "cancelled") \
                                     .order_by(Payment.id).all()
 
