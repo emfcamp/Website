@@ -71,6 +71,9 @@ def reset_expiry(payment_id):
                 days = app.config.get('EXPIRY_DAYS_TRANSFER_EURO')
 
             payment.expires = datetime.utcnow() + timedelta(days=days)
+            for purchase in payment.purchases:
+                purchase.set_state('payment-pending')
+
             db.session.commit()
 
             app.logger.info("Reset expiry by %s days", days)

@@ -56,6 +56,9 @@ def gocardless_start(payment):
     logger.debug('GoCardless redirect ID: %s', redirect_flow.id)
     assert payment.redirect_id is None
     payment.redirect_id = redirect_flow.id
+    # "Redirect flows expire 30 minutes after they are first created. You cannot complete an expired redirect flow."
+    # https://developer.gocardless.com/api-reference/#core-endpoints-redirect-flows
+    payment.expires = datetime.utcnow() + timedelta(minutes=30)
     db.session.commit()
 
     return redirect(redirect_flow.redirect_url)
@@ -73,7 +76,7 @@ def gocardless_complete(payment_id):
         logging.error('Invalid redirect_flow_id for payment %s: %s', payment.id, repr(redirect_id))
         abort(400)
 
-    logger.info("Completing GoCardless payment %s", payment.id)
+    logger.info("Completing GoCardless payment %s (%s)", payment.id, payment.redirect_id)
 
     try:
         # We've already validated the redirect_id, so we don't expect this to fail
@@ -82,6 +85,8 @@ def gocardless_complete(payment_id):
             params={"session_token": str(payment.id)},
         )
         payment.mandate = redirect_flow.links.mandate
+        payment.state = 'captured'
+        db.session.commit()
 
     except gocardless_pro.errors.InvalidStateError as e:
         # Assume the webhook will do its magic
@@ -94,7 +99,23 @@ def gocardless_complete(payment_id):
         flash("An error occurred with your payment, please contact {}".format(app.config['TICKETS_EMAIL'][1]))
         return redirect(url_for('users.tickets'))
 
+    return create_gc_payment(payment)
+
+
+@payments.route('/pay/gocardless/<int:payment_id>/waiting')
+@login_required
+def gocardless_waiting(payment_id):
+    payment = get_user_payment_or_abort(
+        payment_id, 'gocardless',
+        valid_states=['new', 'inprogress', 'paid'],
+    )
+    return render_template('gocardless-waiting.html', payment=payment,
+                           days=app.config['EXPIRY_DAYS_GOCARDLESS'])
+
+
+def create_gc_payment(payment):
     try:
+        logger.info("Creating GC payment for %s (%s)", payment.id, payment.mandate)
         gc_payment = gocardless_client.payments.create(params={
             "amount": payment.amount_int,
             "currency": payment.currency,
@@ -105,6 +126,7 @@ def gocardless_complete(payment_id):
                 "payment_id": str(payment.id),
             },
         }, headers={'Idempotency-Key': str(payment.id)})
+
         payment.gcid = gc_payment.id
         payment.state = 'inprogress'
 
@@ -118,11 +140,9 @@ def gocardless_complete(payment_id):
     payment.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS_GOCARDLESS'])
     for purchase in payment.purchases:
         purchase.set_state('payment-pending')
-        logger.info("Reset expiry for purchase %s", purchase.id)
 
     db.session.commit()
-
-    logger.info("Payment %s completed OK", payment.id)
+    logger.info("Reset expiry for payment %s", payment.id)
 
     # FIXME: determine whether these are tickets or generic products
     msg = Message("Your EMF ticket purchase",
@@ -134,22 +154,13 @@ def gocardless_complete(payment_id):
 
     return redirect(url_for('.gocardless_waiting', payment_id=payment.id))
 
-@payments.route('/pay/gocardless/<int:payment_id>/waiting')
-@login_required
-def gocardless_waiting(payment_id):
-    payment = get_user_payment_or_abort(
-        payment_id, 'gocardless',
-        valid_states=['new', 'inprogress', 'paid'],
-    )
-    return render_template('gocardless-waiting.html', payment=payment,
-                           days=app.config['EXPIRY_DAYS_GOCARDLESS'])
 
 @payments.route('/pay/gocardless/<int:payment_id>/tryagain')
 @login_required
 def gocardless_tryagain(payment_id):
     payment = get_user_payment_or_abort(
         payment_id, 'gocardless',
-        valid_states=['new'],
+        valid_states=['new', 'captured', 'failed'],
     )
 
     if not feature_enabled('GOCARDLESS'):
@@ -157,10 +168,47 @@ def gocardless_tryagain(payment_id):
         flash('GoCardless is currently unavailable. Please try again later')
         return redirect(url_for('users.tickets'))
 
-    logger.info("Trying payment %s again", payment.id)
-    gocardless_client.payments.retry(payment.gcid)
-    flash('Your gocardless payment has been retried')
-    return redirect('tickets')
+    if payment.state == 'new':
+        if payment.redirect_id is None:
+            return gocardless_start(payment)
+
+        else:
+            logger.info("Trying to capture payment %s (%s) again", payment.id, payment.redirect_id)
+            redirect_flow = gocardless_client.redirect_flows.get(payment.redirect_id)
+
+            # If the flow's already been used, we get additional entries in links,
+            # a confirmation_url "for 15 minutes", and redirect_url disappears.
+            if redirect_flow.redirect_url is None:
+                logger.error('Unable to retry payment %s as flow is invalid', payment.id)
+                flash("Your GoCardless mandate could not be confirmed. Please try again.")
+                return redirect(url_for('users.tickets'))
+
+            return redirect(redirect_flow.redirect_url)
+
+    elif payment.state == 'captured':
+        return create_gc_payment(payment)
+
+    # At this point, we've probably got a valid mandate but the user had no funds.
+    try:
+        logger.info("Trying payment %s (%s) again", payment.id, payment.gcid)
+        gocardless_client.payments.retry(payment.gcid)
+
+        payment.state = 'inprogress'
+        db.session.commit()
+
+    except gocardless_pro.errors.InvalidStateError as e:
+        logging.error('InvalidStateError from GoCardless retrying payment: %s', e.message)
+        flash("An error occurred with your payment, please check below or contact {}".format(app.config['TICKETS_EMAIL'][1]))
+        return redirect(url_for('users.tickets'))
+
+    except Exception as e:
+        logger.error("Exception %s retrying payment", repr(e))
+        flash("An error occurred with your payment, please contact {}".format(app.config['TICKETS_EMAIL'][1]))
+        return redirect(url_for('users.tickets'))
+
+        flash("Your GoCardless payment is being retried")
+        return redirect(url_for('users.tickets'))
+
 
 class GoCardlessCancelForm(Form):
     yes = SubmitField('Cancel payment')
@@ -186,8 +234,8 @@ def gocardless_cancel(payment_id):
                 gocardless_client.payments.cancel(payment.gcid)
 
             except gocardless_pro.errors.InvalidStateError as e:
-                logging.error('InvalidStateError from GoCardless confirming mandate: %s', e.message)
-                flash("An error occurred with your mandate, please check below or contact {}".format(app.config['TICKETS_EMAIL'][1]))
+                logging.error('InvalidStateError from GoCardless cancelling payment: %s', e.message)
+                flash("An error occurred with your payment, please check below or contact {}".format(app.config['TICKETS_EMAIL'][1]))
                 return redirect(url_for('users.tickets'))
 
             logger.info('Cancelling GoCardless payment %s', payment.id)
@@ -286,6 +334,66 @@ def gocardless_payment_do_nothing(resource, action, event):
 
 
 @webhook('payments', 'failed')
+def gocardless_payment_failed(resource, action, event):
+
+    gcid = event['links']['payment']
+    try:
+        payment = GoCardlessPayment.query.filter_by(gcid=gcid).one()
+    except NoResultFound:
+        logger.warn("Payment for payment %s not found, skipping", gcid)
+        return
+
+    logger.info("Received failed action for gcid %s, payment %s",
+                gcid, payment.id)
+
+    gc_payment = gocardless_client.payments.get(payment.gcid)
+    if gc_payment.status != 'failed':
+        logger.error("Payment status is %s (should be failed), ignoring", gc_payment.status)
+        return
+
+    if payment.state == 'failed':
+        logger.info('Payment is already failed, skipping')
+        return
+
+    if payment.state != 'inprogress':
+        logger.error("Current payment state is %s (should be inprogress), ignoring", payment.state)
+        return
+
+    logger.info("Setting payment %s to failed", payment.id)
+    payment.state = 'failed'
+    db.session.commit()
+
+
+@webhook('payments', 'resubmission_requested')
+def gocardless_payment_failed(resource, action, event):
+
+    gcid = event['links']['payment']
+    try:
+        payment = GoCardlessPayment.query.filter_by(gcid=gcid).one()
+    except NoResultFound:
+        logger.warn("Payment for payment %s not found, skipping", gcid)
+        return
+
+    logger.info("Received resubmission action for gcid %s, payment %s",
+                gcid, payment.id)
+
+    gc_payment = gocardless_client.payments.get(payment.gcid)
+    logger.info("Payment status is %s", gc_payment.status)
+
+    if payment.state == 'inprogress':
+        logger.info('Payment is already inprogress, skipping')
+        return
+
+    if payment.state != 'failed':
+        logger.error("Current payment state is %s (should be failed), ignoring", payment.state)
+        return
+
+    logger.info("Setting payment %s to inprogress", payment.id)
+    payment.state = 'inprogress'
+    db.session.commit()
+
+
+
 @webhook('payments', 'cancelled')
 def gocardless_payment_cancelled(resource, action, event):
 
