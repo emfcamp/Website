@@ -174,11 +174,13 @@ def tickets():
                               .join(PriceTier) \
                               .outerjoin(Payment) \
                               .filter(or_(Payment.id.is_(None),
-                                          Payment.state != "cancelled"))
+                                          Payment.state != "cancelled")) \
+                              .order_by(Purchase.id)
 
     tickets = all_tickets.filter(Purchase.is_ticket.is_(True)).all()
     other_items = all_tickets.filter(Purchase.is_ticket.is_(False)).all()
-    payments = current_user.payments.filter(Payment.state != "cancelled").all()
+    payments = current_user.payments.filter(Payment.state != "cancelled") \
+                                    .order_by(Payment.id).all()
 
     if not tickets and not payments:
         return redirect(url_for('tickets.choose'))

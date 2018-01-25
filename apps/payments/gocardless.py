@@ -206,8 +206,8 @@ def gocardless_tryagain(payment_id):
         flash("An error occurred with your payment, please contact {}".format(app.config['TICKETS_EMAIL'][1]))
         return redirect(url_for('users.tickets'))
 
-        flash("Your GoCardless payment is being retried")
-        return redirect(url_for('users.tickets'))
+    flash("Your GoCardless payment is being retried")
+    return redirect(url_for('users.tickets'))
 
 
 class GoCardlessCancelForm(Form):
@@ -218,7 +218,8 @@ class GoCardlessCancelForm(Form):
 def gocardless_cancel(payment_id):
     payment = get_user_payment_or_abort(
         payment_id, 'gocardless',
-        valid_states=['new', 'cancelled'],  # once it's inprogress, there's potentially money moving around
+        # once it's inprogress, there's potentially money moving around
+        valid_states=['new', 'failed', 'cancelled'],
     )
 
     if payment.state == 'cancelled':
@@ -365,7 +366,7 @@ def gocardless_payment_failed(resource, action, event):
 
 
 @webhook('payments', 'resubmission_requested')
-def gocardless_payment_failed(resource, action, event):
+def gocardless_payment_retried(resource, action, event):
 
     gcid = event['links']['payment']
     try:
