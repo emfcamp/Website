@@ -17,7 +17,6 @@ from main import db
 from models.user import User, UserDiversity
 from models.cfp import Proposal, CFPMessage
 from models.purchase import Purchase
-from models.product import PriceTier
 from models.payment import Payment
 
 from .common import (
