@@ -17,7 +17,7 @@
         {%- if p.state == "inprogress" and p.provider == "banktransfer" %}
           <a href="{{ url_for('payments.transfer_waiting', payment_id=p.id) }}">Pending</a>
         {%- else -%}
-          {{ {'new': 'New', 'inprogress': 'Pending', 'paid': 'Complete', 'captured': 'Not paid', 'charging': 'Charging', 'partrefunded': 'Partially refunded', 'refunded': 'Refunded', 'failed': 'Failed', 'retrying': 'Retrying'}[p.state] -}}
+          {{ {'new': 'New', 'inprogress': 'Pending', 'paid': 'Complete', 'captured': 'Not paid', 'charging': 'Charging', 'partrefunded': 'Partially refunded', 'refunded': 'Refunded', 'failed': 'Failed'}[p.state] -}}
         {% endif -%}
         {%- if p.provider == "banktransfer" %}, reference: {{ p.bankref | bankref }} {% endif %}
       </td>
