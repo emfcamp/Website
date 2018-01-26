@@ -134,7 +134,7 @@
     {% endif %}
     <dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
   </dl>
-  {% elif payment.provider == 'gocardless' %}
+  {% elif payment.provider == 'gocardless' and payment.state != 'inprogress' %}
   <div>Payment to be made online at {{ external_url('payments.gocardless_tryagain', payment_id=payment.id) }}</div>
   {% elif payment.provider == 'stripe' %}
   <div>Payment to be made online at {{ external_url('payments.stripe_tryagain', payment_id=payment.id) }}</div>
