@@ -10,29 +10,27 @@
 
 <tbody>
 
-{%- for t in other_items if t.state != 'cancelled' -%}
+{%- for item in other_items -%}
 <tr class="
 {{- loop.cycle('odd', 'even') }}
-{%- if t.paid %} paid {%- endif -%}
-{%- if t.expired %} expired {%- endif -%}
+{%- if item.is_paid_for %} paid {%- endif -%}
+{%- if item.payment and item.payment.expired %} expired {%- endif -%}
 ">
-<td>{{ t.price_tier.parent.display_name }}</td>
+<td>{{ item.price_tier.parent.display_name }}</td>
 <td>
-    {% if t.payment and t.payment.state == 'cancelled' %}
-    Cancelled
-    {%- elif t.paid %}
+    {%- if item.is_paid_for %}
     Paid
-    {%- elif t.refund %}
+    {%- elif item.state == 'refunded' %}
     Refunded
-    {%- elif t.expired %}
+    {%- elif item.payment and item.payment.expired %}
     Unpaid
     {%- else %}
-    Pending (expires in {{ pprint_timedelta(t.expires_in) }})
-    {%- endif %}
+    Pending
+    {% endif %}
 </td>
 <td>
-  {% if t.paid and t.type.is_transferable %}
-    <a class="btn btn-default" href="{{ url_for('.transfer', ticket_id=t.id) }}">Transfer</a>
+  {% if item.is_paid_for and item.type.is_transferable %}
+    <a class="btn btn-default" href="{{ url_for('.transfer', ticket_id=item.id) }}">Transfer</a>
   {% endif %}
 </td>
 </tr>

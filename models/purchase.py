@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from sqlalchemy.orm import column_property
 from main import db
 from .exc import CapacityException
@@ -23,7 +23,6 @@ non_blocking_states = ('expired', 'refunded', 'cancelled')
 bought_states = ('paid', 'receipt-emailed')
 anon_states = ('reserved', 'cancelled', 'expired')
 allowed_states = set(PURCHASE_STATES.keys())
-PURCHASE_EXPIRY_TIME = 2  # In hours
 
 class CheckinStateException(Exception):
     pass
@@ -39,9 +38,7 @@ class Purchase(db.Model):
     is_ticket = column_property(type == 'ticket' or type == 'admission_ticket')
 
     # User FKs
-    # Store the owner & purchaser so that we can calculate user_limits against
-    # the former. We don't want to make it possible to buy over the
-    # personal_limit of a product by transferring away purchases.
+    # Store the owner & purchaser separately so that we can track payment statistics
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     purchaser_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
@@ -62,8 +59,6 @@ class Purchase(db.Model):
 
     # State tracking info
     state = db.Column(db.String, default='reserved', nullable=False)
-    # Until an instance is paid for, we track the payment's expiry
-    expires = db.Column(db.DateTime, nullable=False)
     is_paid_for = column_property(state.in_(bought_states))
 
     # Relationships
@@ -78,7 +73,6 @@ class Purchase(db.Model):
 
 
     def __init__(self, price, user=None, state=None, **kwargs):
-        self.expires = datetime.utcnow() + timedelta(hours=PURCHASE_EXPIRY_TIME)
         if user is None and state is not None and state not in anon_states:
             raise PurchaseStateException('%s is not a valid state for unclaimed purchases' % state)
 
@@ -89,10 +83,6 @@ class Purchase(db.Model):
         if self.id is None:
             return "<Purchase -- %s: %s>" % (self.price_tier.name, self.state)
         return "<Purchase %s %s: %s>" % (self.id, self.price_tier.name, self.state)
-
-    @property
-    def expires_in(self):
-        return self.expires - datetime.utcnow()
 
     @property
     def is_transferable(self):
@@ -176,7 +166,7 @@ class Purchase(db.Model):
         """
         price = tier.get_price(currency)
 
-        if count > tier.user_limit(user):
+        if count > tier.user_limit():
             raise CapacityException('Insufficient capacity.')
 
         purchase_cls = cls.class_from_product(tier.parent)

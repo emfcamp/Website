@@ -14,18 +14,17 @@
 {% elif payment.provider == 'gocardless' %}
 <dt>GoCardless ID</dt><dd>{{ payment.gcid }}</dd>
 {% endif -%}
+<dt>Expires</dt><dd>{{ payment.expires and payment.expires.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
 </dl>
 
 <table class="table table-condensed table-striped">
 <thead><tr>
   <th>Type</th>
-  <th>Expires</th>
 </tr></thead>
 <tbody>
-{% for t in payment.purchases %}
+{% for purchase in payment.purchases %}
 <tr>
-  <td>{{ t.type.name }}</td>
-  <td>{{ t.expires.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+  <td>{{ purchase.type.name }}</td>
 </tr>
 {% endfor %}
 </tbody>

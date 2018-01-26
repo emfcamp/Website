@@ -4,8 +4,8 @@
 <div class="col-md-10">
 
 <h2>Thank you!</h2>
-<p>Your tickets have been reserved for {{ days }} days while you pay by bank transfer.
-  We'll email you when we receive your payment.</p>
+<p>Your tickets have been reserved {% if payment.expires -%} until {{ payment.expires.strftime('%-d %B %Y') }}{% endif %}
+  while you pay by bank transfer. We'll email you when we receive your payment.</p>
 
 <h2>How to Pay</h2>
 

@@ -14,7 +14,7 @@
 
     {% else %}
     <p>Your Stripe payment for {{ payment.amount | price(payment.currency) }}
-       has been set up and your tickets will be reserved for {{ days }} days
+       has been set up and your tickets will be reserved {% if payment.expires -%} until {{ payment.expires.strftime('%-d %B %Y') }}{% endif %}
        to allow for your payment to arrive.
        We will email you when the transaction has been completed.</p>
     {% endif %}

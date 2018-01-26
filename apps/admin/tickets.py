@@ -1,7 +1,6 @@
 # coding=utf-8
 from __future__ import division, absolute_import, print_function, unicode_literals
 from . import admin, admin_required
-from datetime import datetime
 
 from flask import (
     render_template, redirect, request, flash,
@@ -46,7 +45,9 @@ def tickets():
 @admin.route('/tickets/unpaid')
 @admin_required
 def tickets_unpaid():
-    tickets = Purchase.query.filter_by(is_paid_for=False).order_by(Purchase.id).all()
+    tickets = Purchase.query.filter_by(is_paid_for=False) \
+                            .filter(~Purchase.owner_id.is_(None)) \
+                            .order_by(Purchase.id).all()
 
     return render_template('admin/tickets/tickets.html', tickets=tickets)
 
@@ -218,10 +219,7 @@ def cancel_free_ticket(ticket_id):
     if form.validate_on_submit():
         if form.cancel.data:
             app.logger.info('Cancelling free ticket %s', ticket.id)
-            now = datetime.utcnow()
-            ticket.set_state('refunded')
-            if ticket.expires is None or ticket.expires > now:
-                ticket.expires = now
+            ticket.set_state('cancelled')
 
             db.session.commit()
 

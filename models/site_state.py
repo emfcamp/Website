@@ -53,7 +53,7 @@ def calc_site_state(date):
         return "after-event"
 
 def calc_sales_state(date):
-    site_capacity = ProductGroup.get_by_name('general')
+    site_capacity = ProductGroup.get_by_name('admissions')
     if site_capacity is None:
         return "unavailable"
 

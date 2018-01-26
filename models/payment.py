@@ -30,6 +30,8 @@ class Payment(db.Model):
     amount_int = db.Column(db.Integer, nullable=False)
     state = db.Column(db.String, nullable=False, default='new')
     reminder_sent = db.Column(db.Boolean, nullable=False, default=False)
+    expires = db.Column(db.DateTime, nullable=True)
+
     refunds = db.relationship('Refund', backref='payment', cascade='all')
     purchases = db.relationship('Purchase', backref='payment', cascade='all')
 
@@ -136,17 +138,14 @@ class Payment(db.Model):
         elif self.state == 'refunded':
             raise StateException('Refunded payments cannot be cancelled')
 
-        now = datetime.utcnow()
         for purchase in self.purchases:
             purchase.set_state('cancelled')
-            if purchase.expires is None or purchase.expires > now:
-                purchase.expires = now
 
         self.state = 'cancelled'
 
     def manual_refund(self):
         # Only to be called for full out-of-band refunds, for book-keeping.
-        # Providers should cancel tickets individually and insert their
+        # Providers should cancel purchases individually and insert their
         # own Refunds subclass for partial refunds.
 
         if self.state == 'refunded':
@@ -157,34 +156,36 @@ class Payment(db.Model):
             raise StateException('Refunded payments cannot be cancelled')
 
         refund = BankRefund(self, self.amount)
-        now = datetime.utcnow()
-        for ticket in self.purchases:
-            if ticket.owner != self.user:
-                raise StateException('Cannot refund transferred ticket')
-            if ticket.expires is None or ticket.expires > now:
-                ticket.expires = now
-            if ticket.state == 'refunded':
-                raise StateException('Ticket is already refunded')
-            if ticket.price_tier.get_price(self.currency) and ticket.state != 'paid':
+        for purchase in self.purchases:
+            if purchase.owner != self.user:
+                raise StateException('Cannot refund transferred purchase')
+            if purchase.state == 'refunded':
+                raise StateException('Purchase is already refunded')
+            if purchase.price_tier.get_price(self.currency) > 0 and purchase.state != 'paid':
                 # This might turn out to be too strict
-                raise StateException('Ticket is not paid, so cannot be refunded')
-            ticket.paid = False
-            ticket.refund = refund
+                raise StateException('Purchase is not paid, so cannot be refunded')
+            purchase.state = 'refunded'
+            purchase.refund = refund
 
         self.state = 'refunded'
 
+    # TESTME
     def clone(self, ignore_capacity=False):
         other = self.__class__(self.currency, self.amount)
-        for ticket in self.tickets:
-            new_ticket = ticket.clone(ignore_capacity=ignore_capacity)
-            self.user.tickets.append(new_ticket)
-            new_ticket.payment = other
+        for purchase in self.purchases:
+            new_purchase = purchase.clone(ignore_capacity=ignore_capacity)
+            self.user.purchases.append(new_purchase)
+            new_purchase.payment = other
 
         self.user.payments.append(other)
         return other
 
     def invoice_number(self):
         return 'WEB-%05d' % self.id
+
+    @property
+    def expires_in(self):
+        return self.expires - datetime.utcnow()
 
 
 @event.listens_for(Session, 'after_flush')
@@ -379,7 +380,7 @@ class StripePayment(Payment):
 
     @property
     def description(self):
-        return 'EMF {} tickets'.format(event_start().year)
+        return 'EMF {} purchase'.format(event_start().year)
 
     def manual_refund(self):
         if self.state not in ['charged', 'paid']:

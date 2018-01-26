@@ -65,14 +65,12 @@ def invoice(payment_id):
         app.logger.error('Invoice total mismatch: %s + %s - %s = %s', subtotal, vat,
                          payment.amount, subtotal + vat - payment.amount)
         flash('Your invoice cannot currently be displayed')
-        return redirect(url_for('tickets.main'))
+        return redirect(url_for('users.tickets'))
 
     app.logger.debug('Invoice total: %s + %s = %s', subtotal, vat, payment.amount)
 
-    due_date = min(t.expires for t in payment.purchases)
-
     return render_template('invoice.html', payment=payment, invoice_lines=invoice_lines,
-                           premium=premium, subtotal=subtotal, vat=vat, due_date=due_date)
+                           premium=premium, subtotal=subtotal, vat=vat)
 
 
 from . import banktransfer  # noqa: F401

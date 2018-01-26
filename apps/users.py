@@ -17,7 +17,6 @@ from main import db
 from models.user import User, UserDiversity
 from models.cfp import Proposal, CFPMessage
 from models.purchase import Purchase
-from models.product import PriceTier
 from models.payment import Payment
 
 from .common import (
@@ -64,19 +63,19 @@ def login_by_email(email):
         login_user(user)
         session.permanent = True
 
-    return redirect(request.args.get('next', url_for('tickets.main')))
+    return redirect(request.args.get('next', url_for('.account')))
 
 @users.route("/login", methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(request.args.get('next', url_for('tickets.main')))
+        return redirect(request.args.get('next', url_for('.account')))
 
     if request.args.get('code'):
         user = User.get_by_code(app.config['SECRET_KEY'], request.args.get('code'))
         if user is not None:
             login_user(user)
             session.permanent = True
-            return redirect(request.args.get('next', url_for('tickets.main')))
+            return redirect(request.args.get('next', url_for('.account')))
         else:
             flash("Your login link was invalid. Please note that they expire after 6 hours.")
 
@@ -168,17 +167,15 @@ def account():
 @users.route("/account/tickets", methods=['GET', 'POST'])
 @login_required
 def tickets():
-    # FIXME all of this
     all_tickets = current_user.purchased_products \
                               .filter(Purchase.state != 'cancelled') \
-                              .join(PriceTier) \
-                              .outerjoin(Payment) \
-                              .filter(or_(Payment.id.is_(None),
-                                          Payment.state != "cancelled"))
+                              .order_by(Purchase.id)
 
     tickets = all_tickets.filter(Purchase.is_ticket.is_(True)).all()
     other_items = all_tickets.filter(Purchase.is_ticket.is_(False)).all()
-    payments = current_user.payments.filter(Payment.state != "cancelled").all()
+
+    payments = current_user.payments.filter(Payment.state != "cancelled") \
+                                    .order_by(Payment.id).all()
 
     if not tickets and not payments:
         return redirect(url_for('tickets.choose'))

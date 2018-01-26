@@ -69,7 +69,7 @@ class CapacityMixin(object):
         if self.parent and self.parent.has_expired():
             return True
 
-        return self.expires and self.__expired
+        return bool(self.expires) and self.__expired
 
     def issue_instances(self, count=1, token=''):
         """

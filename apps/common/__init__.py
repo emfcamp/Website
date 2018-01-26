@@ -51,8 +51,8 @@ def load_utility_functions(app_obj):
 
     @app_obj.template_filter('gcid')
     def format_gcid(gcid):
-        if len(gcid) > 12:
-            return 'ending %s' % gcid[-12:]
+        if len(gcid) > 14:
+            return 'ending %s' % gcid[-14:]
         return gcid
 
     @app_obj.context_processor

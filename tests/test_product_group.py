@@ -304,21 +304,6 @@ class PurchaseTest(unittest.TestCase):
             parent = ProductGroup.get_by_name(self.pg_name)
             assert parent.get_purchase_count() == 1
 
-    def test_user_limit(self):
-        with self.app.app_context():
-            user = User.get_by_email(self.user_email)
-            tier = PriceTier.get_by_name(self.tier_name)
-            tier.personal_limit = 1
-
-            self.db.session.commit()
-
-            self.assertEqual(1, tier.user_limit(user))
-
-            self.get_purchase(self.db.session)
-
-            self.assertEqual(0, tier.user_limit(user))
-            self.assertTrue(tier.has_capacity())
-
     def test_check_in(self):
         with self.app.app_context():
             ticket = self.get_purchase(self.db.session)

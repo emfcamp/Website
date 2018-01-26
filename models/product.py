@@ -1,13 +1,11 @@
 from decimal import Decimal
 
-from sqlalchemy import func, UniqueConstraint, inspect, select, and_
+from sqlalchemy import func, UniqueConstraint, inspect
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm import column_property
 
 from main import db
-from .purchase import Purchase, non_blocking_states, allowed_states
+from .purchase import Purchase, allowed_states
 from .mixins import CapacityMixin, InheritedAttributesMixin
-import models
 
 
 class ProductGroupException(Exception):
@@ -167,13 +165,6 @@ class PriceTier(db.Model, CapacityMixin):
     )
     prices = db.relationship('Price', backref='price_tier', cascade='all')
 
-    # Convenience for user_limit. Use undefer and a join on User or contains_eager
-    purchase_count = column_property(select([func.count(Purchase.id)]).where(and_(
-        Purchase.price_tier_id == id,
-        Purchase.purchaser_id == models.User.id,
-        ~Purchase.state.in_(non_blocking_states),
-    )), deferred=True)
-
 
     @classmethod
     def get_by_name(cls, group_name, product_name, tier_name):
@@ -215,24 +206,11 @@ class PriceTier(db.Model, CapacityMixin):
         prices = [p for p in self.prices if p.currency == currency]
         return one_or_none(prices)
 
-    def user_limit(self, user):
+    def user_limit(self):
         if self.has_expired():
             return 0
 
-        if user and user.is_authenticated:
-            # How many have been sold to this user
-            if 'purchase_count' in inspect(self).unloaded:
-                user_count = Purchase.query.filter(
-                    Purchase.price_tier == self,
-                    Purchase.purchaser == user,
-                    ~Purchase.state.in_(non_blocking_states),
-                ).count()
-            else:
-                user_count = self.purchase_count
-        else:
-            user_count = 0
-
-        return min(self.personal_limit - user_count, self.get_total_remaining_capacity())
+        return min(self.personal_limit, self.get_total_remaining_capacity())
 
     def __repr__(self):
         return "<PriceTier %s>" % self.name

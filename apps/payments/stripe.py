@@ -88,15 +88,13 @@ def charge_stripe(payment):
         payment.paid()
     else:
         payment.state = 'charged'
-
-        for t in payment.purchases:
-            t.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS_STRIPE'])
-            logger.info("Set expiry for ticket %s", t.id)
+        payment.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS_STRIPE'])
 
     db.session.commit()
 
     logger.info('Payment %s completed OK (state %s)', payment.id, payment.state)
 
+    # FIXME: determine whether these are tickets or generic products
     msg = Message("Your EMF ticket purchase",
                   sender=app.config.get('TICKETS_EMAIL'),
                   recipients=[payment.user.email])
@@ -128,7 +126,7 @@ def stripe_capture(payment_id):
     if not feature_enabled('STRIPE'):
         logger.warn('Unable to capture payment as Stripe is disabled')
         flash('Stripe is currently unavailable. Please try again later')
-        return redirect(url_for('tickets.main'))
+        return redirect(url_for('users.tickets'))
 
     form = StripeAuthorizeForm(request.form)
     if form.validate_on_submit():
@@ -164,7 +162,7 @@ def stripe_tryagain(payment_id):
     if not feature_enabled('STRIPE'):
         logger.warn('Unable to retry payment as Stripe is disabled')
         flash('Stripe is currently unavailable. Please try again later')
-        return redirect(url_for('tickets.main'))
+        return redirect(url_for('users.tickets'))
 
     if payment.state == 'new':
         return redirect(url_for('.stripe_capture', payment_id=payment.id))
@@ -208,7 +206,7 @@ def stripe_cancel(payment_id):
             logger.info('Payment %s cancelled', payment.id)
             flash('Payment cancelled')
 
-        return redirect(url_for('tickets.main'))
+        return redirect(url_for('users.tickets'))
 
     return render_template('stripe-cancel.html', payment=payment, form=form)
 
@@ -321,11 +319,8 @@ def stripe_payment_refunded(payment):
         return
 
     logger.info('Setting payment %s to refunded', payment.id)
-    now = datetime.utcnow()
     for ticket in payment.purchases:
-        ticket.paid = False
-        if ticket.expires is None or ticket.expires > now:
-            ticket.expires = now
+        ticket.state = 'refunded'
 
     payment.state = 'refunded'
     db.session.commit()

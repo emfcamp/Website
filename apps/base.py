@@ -10,6 +10,7 @@ from flask import (
     url_for, send_from_directory, abort, current_app as app
 )
 
+from main import cache
 from .common import feature_flag, site_flag
 from models.product import Product, ProductView, ProductViewProduct
 from models.site_state import get_site_state
@@ -17,23 +18,25 @@ from models.site_state import get_site_state
 
 base = Blueprint('base', __name__)
 
+@cache.cached(timeout=60, key_prefix='get_full_price')
+def get_full_price():
+    full = ProductView.query.filter_by(name='main') \
+                            .join(ProductViewProduct, Product) \
+                            .with_entities(Product).first()
+    if full is not None:
+        return full.get_cheapest_price('GBP')
+
+    return None
+
 
 @base.route("/")
 def main():
-    full = ProductView.query.filter_by(name='main') \
-                      .join(ProductViewProduct, Product) \
-                      .with_entities(Product).first()
-    if full is not None:
-        full_price = full.get_cheapest_price('GBP')
-    else:
-        full_price = None
-
     state = get_site_state()
     if app.config.get('DEBUG'):
         state = request.args.get("site_state", state)
 
     return render_template('home/%s.html' % state,
-                           full_price=full_price)
+                           full_price=get_full_price())
 
 
 @base.route("/", methods=['POST'])

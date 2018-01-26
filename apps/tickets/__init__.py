@@ -44,7 +44,7 @@ tickets = Blueprint('tickets', __name__)
 
 def create_payment(paymenttype):
     """
-    Insert payment and tickets from session data into DB
+    Insert payment and purchases from session data into DB
     """
 
     infodata = session.get('ticketinfo')
@@ -61,18 +61,20 @@ def create_payment(paymenttype):
     payment.amount += paymenttype.premium(currency, total)
     current_user.payments.append(payment)
 
-    app.logger.info('Creating tickets for basket %s', basket)
-    app.logger.info('Payment: %s for %s %s (ticket total %s)', paymenttype.name,
+    app.logger.info('Creating purchases for basket %s', basket)
+    app.logger.info('Payment: %s for %s %s (purchase total %s)', paymenttype.name,
                     payment.amount, currency, total)
     app.logger.info('Ticket info: %s', infodata)
 
-    for ticket in basket:
-        # current_user.tickets.append(ticket) # this shouldn't be needed
-        ticket.payment = payment
-        if currency == 'GBP':
-            ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS_TRANSFER'))
-        elif currency == 'EUR':
-            ticket.expires = datetime.utcnow() + timedelta(days=app.config.get('EXPIRY_DAYS_TRANSFER_EURO'))
+    if currency == 'GBP':
+        days = app.config.get('EXPIRY_DAYS_TRANSFER')
+    elif currency == 'EUR':
+        days = app.config.get('EXPIRY_DAYS_TRANSFER_EURO')
+
+    payment.expires = datetime.utcnow() + timedelta(days=days)
+
+    for purchase in basket:
+        purchase.payment = payment
 
     db.session.commit()
 
@@ -140,24 +142,13 @@ def main(flow=None):
         return render_template("tickets-cutoff.html")
 
     tiers = OrderedDict()
-    if current_user.is_authenticated:
-        products = ProductViewProduct.query.filter_by(view_id=view.id) \
-                                     .join(ProductViewProduct.product) \
-                                     .join(User, User.id == current_user.id) \
-                                     .with_entities(Product) \
-                                     .order_by(ProductViewProduct.order) \
-                                     .options(joinedload(Product.price_tiers)
-                                              .undefer(PriceTier.purchase_count)
-                                              .joinedload(PriceTier.prices)
-                                     )
-    else:
-        products = ProductViewProduct.query.filter_by(view_id=view.id) \
-                                     .join(ProductViewProduct.product) \
-                                     .with_entities(Product) \
-                                     .order_by(ProductViewProduct.order) \
-                                     .options(joinedload(Product.price_tiers)
-                                              .joinedload(PriceTier.prices)
-                                     )
+    products = ProductViewProduct.query.filter_by(view_id=view.id) \
+                                 .join(ProductViewProduct.product) \
+                                 .with_entities(Product) \
+                                 .order_by(ProductViewProduct.order) \
+                                 .options(joinedload(Product.price_tiers)
+                                          .joinedload(PriceTier.prices)
+                                 )
 
     for product in products:
         product_tiers = sorted(product.price_tiers, key=lambda x: x.get_price('GBP').value)
@@ -176,7 +167,7 @@ def main(flow=None):
         pt_id = f.tier_id.data
         f._tier = tiers[pt_id]
 
-        user_limit = tiers[pt_id].user_limit(current_user)
+        user_limit = tiers[pt_id].user_limit()
         values = range(user_limit + 1)
         f.amount.values = values
         f._any = any(values)
@@ -309,12 +300,12 @@ def transfer(ticket_id):
     try:
         ticket = current_user.tickets.filter_by(id=ticket_id).one()
     except NoResultFound:
-        return redirect(url_for('tickets.main'))
+        return redirect(url_for('users.tickets'))
 
     if (not ticket or
             ticket.state not in bought_states or
             not ticket.price_tier.get_attribute('is_transferable')):
-        return redirect(url_for('tickets.main'))
+        return redirect(url_for('users.tickets'))
 
     form = TicketTransferForm()
 
@@ -366,7 +357,7 @@ def transfer(ticket_id):
         mail.send(msg)
 
         flash("Your ticket was transferred.")
-        return redirect(url_for('tickets.main'))
+        return redirect(url_for('users.tickets'))
 
     return render_template('ticket-transfer.html', ticket=ticket, form=form)
 
