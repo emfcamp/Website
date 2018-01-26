@@ -42,16 +42,23 @@ def gocardless_start(payment):
     match = re.match(r'^ *([^ ,]+) +([^ ,]+) *$', payment.user.name)
     if match:
         prefilled_customer.update({
-            'given_name': match.group(1),
-            'family_name': match.group(2),
+            "given_name": match.group(1),
+            "family_name": match.group(2),
         })
 
-    redirect_flow = gocardless_client.redirect_flows.create(params={
+    params={
         "description": "Electromagnetic Field",
         "session_token": str(payment.id),
         "success_redirect_url": external_url('payments.gocardless_complete', payment_id=payment.id),
         "prefilled_customer": prefilled_customer,
-    })
+    }
+    if payment.currency == 'GBP':
+        params["scheme"] = "bacs"
+    elif payment.currency == 'EUR':
+        # sepa_cor1 isn't an option, so let's hope it upgrades automatically
+        params["scheme"] = "sepa_core"
+
+    redirect_flow = gocardless_client.redirect_flows.create(params=params)
 
     logger.debug('GoCardless redirect ID: %s', redirect_flow.id)
     assert payment.redirect_id is None
@@ -129,6 +136,20 @@ def create_gc_payment(payment):
 
         payment.gcid = gc_payment.id
         payment.state = 'inprogress'
+
+    except gocardless_pro.errors.ValidationFailedError as exc:
+        currency_errors = [e for e in exc.errors if e['field'] == 'currency']
+        if currency_errors:
+            # e['message'] will be one of:
+            #   'must be GBP for a bacs mandate'
+            #   'must be EUR for a sepa_core mandate'
+            logger.error("Currency exception %r confirming payment", exc)
+            flash("Your account cannot be used for {} payments".format(payment.currency))
+        else:
+            logger.error("Exception %s confirming payment", repr(exc))
+            flash("An error occurred with your payment, please contact {}".format(app.config['TICKETS_EMAIL'][1]))
+
+        return redirect(url_for('users.tickets'))
 
     except Exception as e:
         logger.error("Exception %s confirming payment", repr(e))

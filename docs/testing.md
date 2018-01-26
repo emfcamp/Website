@@ -32,13 +32,26 @@ Unfortunately GoCardless don't offer a simple method of setting up a developer s
 
 In theory you should now be able to use GoCardless to checkout. You should see the payments under [payments](https://dashboard-sandbox.gocardless.com/payments) (top left)
 
-To create a successful Direct Debit in the sandbox, use:
-- **sort code**: 20-00-00
-- **account number**: 55779911
-- **postcode**: any valid postcode, e.g. SW1A 1AA
-- **city**: any value
+To create a successful Direct Debit in the sandbox, use the [test bank details](https://developer.gocardless.com/getting-started/developer-tools/test-bank-details/):
+- **Country**: UK
+- **Sort code**: 20-00-00
+- **Account number**: 55779911 or 44779911
+- **Postcode**: any valid postcode, e.g. SW1A 1AA
+- **City**: any value
 
-You can force different results based on the first name. For more, check [their documentation](https://developer.gocardless.com/getting-started/developer-tools/scenario-simulators)
+For Euro accounts, use a country and IBAN from the [standard IBAN test list](http://www.voxstone.co.uk/IbanChecker.aspx), for example:
+- **Country**: France
+- **IBAN**: FR1420041010050500013M02606
+
+- **Country**: Germany
+- **IBAN**: DE89370400440532013000
+
+- **Country**: Netherlands
+- **IBAN**: NL39RABO0300065264
+
+If you can't choose a country above the account number field or you get the error "scheme is not supported for your organisation", you need to get your account unlocked for Euros. Enter your sandbox email address at https://support.gocardless.com/hc/en-gb/requests/new and say you'd like SEPA payments enabled on your account.
+
+You can force different results based on the first name. For more, check [their documentation](https://developer.gocardless.com/getting-started/developer-tools/scenario-simulators). These scenarios will play out via webhooks a minute or so after you complete the flow.
 
 Test users
 ==========
