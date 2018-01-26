@@ -1,7 +1,9 @@
 [![Build Status](https://travis-ci.org/emfcamp/Website.svg?branch=master)](https://travis-ci.org/emfcamp/Website)
 
 #### Bank Transfer
-These are manually resolved via scripts and the admin panel. There's currently no easy way to test reconciliation.
+These are manually resolved via scripts and the admin panel.
+
+This is the easiest way to get unpaid tickets into the system, but there's currently no easy way to test reconciliation.
 
 #### Stripe
 This is the easiest method to "pay" for a ticket when you're developing. The details for a successful payment are:
