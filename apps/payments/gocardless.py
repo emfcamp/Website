@@ -46,7 +46,7 @@ def gocardless_start(payment):
             "family_name": match.group(2),
         })
 
-    params={
+    params = {
         "description": "Electromagnetic Field",
         "session_token": str(payment.id),
         "success_redirect_url": external_url('payments.gocardless_complete', payment_id=payment.id),
