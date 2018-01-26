@@ -80,7 +80,7 @@ def gocardless_complete(payment_id):
     )
     redirect_id = request.args.get('redirect_flow_id')
     if redirect_id != payment.redirect_id:
-        logging.error('Invalid redirect_flow_id for payment %s: %s', payment.id, repr(redirect_id))
+        logging.error('Invalid redirect_flow_id for payment %s: %r', payment.id, redirect_id)
         abort(400)
 
     logger.info("Completing GoCardless payment %s (%s)", payment.id, payment.redirect_id)
@@ -102,7 +102,7 @@ def gocardless_complete(payment_id):
         return redirect(url_for('users.tickets'))
 
     except Exception as e:
-        logger.error("Exception %s confirming mandate", repr(e))
+        logger.error("Exception %r confirming mandate", e)
         flash("An error occurred with your payment, please contact {}".format(app.config['TICKETS_EMAIL'][1]))
         return redirect(url_for('users.tickets'))
 
@@ -146,13 +146,13 @@ def create_gc_payment(payment):
             logger.error("Currency exception %r confirming payment", exc)
             flash("Your account cannot be used for {} payments".format(payment.currency))
         else:
-            logger.error("Exception %s confirming payment", repr(exc))
+            logger.error("Exception %r confirming payment", exc)
             flash("An error occurred with your payment, please contact {}".format(app.config['TICKETS_EMAIL'][1]))
 
         return redirect(url_for('users.tickets'))
 
     except Exception as e:
-        logger.error("Exception %s confirming payment", repr(e))
+        logger.error("Exception %r confirming payment", e)
         flash("An error occurred with your payment, please contact {}".format(app.config['TICKETS_EMAIL'][1]))
         return redirect(url_for('users.tickets'))
 
@@ -223,7 +223,7 @@ def gocardless_tryagain(payment_id):
         return redirect(url_for('users.tickets'))
 
     except Exception as e:
-        logger.error("Exception %s retrying payment", repr(e))
+        logger.error("Exception %r retrying payment", e)
         flash("An error occurred with your payment, please contact {}".format(app.config['TICKETS_EMAIL'][1]))
         return redirect(url_for('users.tickets'))
 
