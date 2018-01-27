@@ -1,7 +1,5 @@
 import logging
 import logging.config
-import random
-import os
 
 from flask import Flask, _request_ctx_stack, url_for, render_template
 from flask_mail import Mail
@@ -131,15 +129,6 @@ def create_app(dev_server=False):
         def send_noindex_header(response):
             response.headers['X-Robots-Tag'] = 'noindex, nofollow'
             return response
-
-        # Prevent DB connections and random numbers being shared
-        ppid = os.getpid()
-
-        @app.before_request
-        def fix_shared_state():
-            if os.getpid() != ppid:
-                db.engine.dispose()
-                random.seed()
 
     @app.before_request
     def simple_cache_warning():

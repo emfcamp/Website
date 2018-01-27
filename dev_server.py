@@ -1,11 +1,22 @@
 import os
 import logger
-from main import create_app
+import random
+
+from main import create_app, db
 from flask import request, _request_ctx_stack
 from flask_mail import email_dispatched
 
 if __name__ == "__main__":
     app = create_app(dev_server=True)
+    # Prevent DB connections and random numbers being shared
+    ppid = os.getpid()
+
+    @app.before_request
+    def fix_shared_state():
+        if os.getpid() != ppid:
+            db.engine.dispose()
+            random.seed()
+
     if app.config.get('DEBUG'):
         email_dispatched.connect(logger.mail_logging)
 
