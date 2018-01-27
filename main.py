@@ -123,7 +123,7 @@ def create_app(dev_server=False):
             site_state.get_states()
             feature_flag.get_db_flags()
 
-    if app.config.get('DEBUG'):
+    if app.config.get('NO_INDEX'):
         # Prevent staging site from being displayed on Google
         @app.after_request
         def send_noindex_header(response):
