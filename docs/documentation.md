@@ -11,7 +11,7 @@ Development processes
 
 We're always open to pull requests (where you fork the repo in Github and ask us to merge back your changes). However, it's a good idea to discuss the change on IRC before starting work.
 
-Once tickets are on sale, new development should be done on feature branches. We try to merge to master frequently, so hide anything accessible to visitors behind config. Bugfixes will usually be done on master.
+Once tickets are on sale, people with access to the repo should keep any new development to feature branches. We try to merge to master frequently, so hide anything accessible to visitors behind config. Bugfixes will usually be done on master.
 
 We test all branches with Travis - you can run `make test` locally to run these tests during development.
 
