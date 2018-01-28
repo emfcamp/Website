@@ -219,7 +219,7 @@ def cancel_free_ticket(ticket_id):
     if form.validate_on_submit():
         if form.cancel.data:
             app.logger.info('Cancelling free ticket %s', ticket.id)
-            ticket.set_state('cancelled')
+            ticket.cancel()
 
             db.session.commit()
 

@@ -174,9 +174,10 @@ def get_basket():
         # TODO error handling if basket is empty
         return [Purchase.query.filter_by(id=b,
                                          state='reserved',
+                                         payment_id=None,
                                          owner_id=None,
                                          purchaser_id=None).first() for b in basket]
-    return current_user.purchased_products.filter_by(state='reserved').all()
+    return current_user.purchased_products.filter_by(state='reserved', payment_id=None).all()
 
 def get_basket_and_total():
     basket = get_basket()
@@ -196,7 +197,7 @@ def empty_basket():
     basket = get_basket()
 
     for purchase in basket:
-        purchase.set_state('cancelled')
+        purchase.cancel()
 
     session.pop('reserved_purchase_ids', None)
     db.session.commit()

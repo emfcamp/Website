@@ -139,7 +139,7 @@ class Payment(db.Model):
             raise StateException('Refunded payments cannot be cancelled')
 
         for purchase in self.purchases:
-            purchase.set_state('cancelled')
+            purchase.cancel()
 
         self.state = 'cancelled'
 

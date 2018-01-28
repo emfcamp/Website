@@ -116,6 +116,13 @@ class Purchase(db.Model):
 
         self.state = new_state
 
+    def cancel(self):
+        # FIXME: this should be moved to Basket along with create_purchases,
+        # and should issue/return and flush an entire basket at once
+        self.price_tier.return_instances(1)
+        db.session.flush()
+        self.set_state('cancelled')
+
     def change_currency(self, currency):
         raise NotImplemented()
 
