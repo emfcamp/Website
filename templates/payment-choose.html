@@ -4,7 +4,7 @@
 {% block title %}Choose Payment{% endblock %}
 {% block body %}
 
-    {% if admissions %}
+    {% if flow == 'main' %}
     You've selected the following {% if basket|count == 1 %}ticket{% else %}
     {{ basket|count }} tickets{% endif %}:
     {% else %}
@@ -22,10 +22,10 @@
     {{ form.hidden_tag() }}
     <div class="btn-group" role="group">
         <a class="btn btn-default" href="{{url_for('tickets.main', is_new_basket=True)}}">Empty basket</a>
-        {% if admissions %}
+        {% if flow == 'main' %}
         <a class="btn btn-default" href="{{url_for('tickets.main')}}">Add more tickets</a>
         {% else %}
-        <a class="btn btn-default" href="{{url_for('tickets.main', flow='other')}}">Change items</a>
+        <a class="btn btn-default" href="{{url_for('tickets.main', flow=flow)}}">Change items</a>
         {% endif %}
         <button name="change_currency" value="{% if user_currency == 'GBP' %}EUR{% else %}GBP{% endif %}"
             class="btn btn-default">Pay in {% if user_currency == 'GBP' %}Euros (€){% else %}Pounds (£){% endif %}</button>
@@ -42,7 +42,7 @@
 <div class="alert alert-warning">
     This email address already exists in our system, possibly because you previously tried to buy a ticket and
     we automatically created an account for you.
-    Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('tickets.pay', flow=(None if admissions else 'other')), email=form.email.data) }}">click here</a> to log in.
+    Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('tickets.pay', flow=flow), email=form.email.data) }}">click here</a> to log in.
 </div>
 {% endif %}
 
