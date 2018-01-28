@@ -162,6 +162,8 @@ def get_user_currency(default='GBP'):
 
 
 def set_user_currency(currency):
+    for purchase in get_basket():
+        purchase.change_currency(currency)
     session['currency'] = currency
 
 
@@ -170,25 +172,30 @@ def get_basket_cost(basket):
 
 def get_basket():
     if current_user.is_anonymous:
-        basket = session.get('reserved_purchase_ids', [])
-        # TODO error handling if basket is empty
-        return [Purchase.query.filter_by(id=b,
-                                         state='reserved',
-                                         payment_id=None,
-                                         owner_id=None,
-                                         purchaser_id=None).first() for b in basket]
-    return current_user.purchased_products.filter_by(state='reserved', payment_id=None).all()
+        ids = session.get('reserved_purchase_ids', [])
+        basket = Purchase.query.filter_by(state='reserved',
+                                          payment_id=None,
+                                          owner_id=None) \
+                               .filter(Purchase.id.in_(ids)) \
+                               .order_by(Purchase.id) \
+                               .all()
+
+    else:
+        basket = current_user.purchased_products \
+                             .filter_by(state='reserved', payment_id=None) \
+                             .order_by(Purchase.id) \
+                             .all()
+
+    return basket
 
 def get_basket_and_total():
     basket = get_basket()
     if not basket:
-        return [], 0, get_user_currency()
-
-    currency = basket[0].price.currency
+        return [], 0
 
     total = get_basket_cost(basket)
     app.logger.debug('Got basket %s with total %s', basket, total)
-    return basket, total, currency
+    return basket, total
 
 def get_basket_size():
     return len(get_basket())

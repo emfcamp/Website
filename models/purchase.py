@@ -124,7 +124,7 @@ class Purchase(db.Model):
         self.set_state('cancelled')
 
     def change_currency(self, currency):
-        raise NotImplemented()
+        self.price = self.price_tier.get_price(currency)
 
     def transfer(self, from_user, to_user, session):
         if self.state not in bought_states:

@@ -49,10 +49,11 @@ def create_payment(paymenttype):
 
     infodata = session.get('ticketinfo')
     currency = get_user_currency()
-    basket, total, original_currency = get_basket_and_total()
+    basket, total = get_basket_and_total()
 
-    if currency != original_currency:
-        raise Exception("Currency mismatch got: %s, expected: %s", currency, original_currency)
+    for purchase in basket:
+        if purchase.price.currency != currency:
+            raise Exception("Currency mismatch got: {}, expected: {}".format(currency, purchase.price.currency))
 
     if not (basket and total):
         return None
@@ -175,6 +176,7 @@ def main(flow=None):
     if form.validate_on_submit():
         if form.buy.data or form.buy_other.data:
             set_user_currency(form.currency_code.data)
+            db.session.commit()
 
             items = []
             for f in form.tiers:
@@ -206,6 +208,7 @@ def main(flow=None):
         if form.set_currency.validate(form):
             app.logger.info("Updating currency to %s only", form.set_currency.data)
             set_user_currency(form.set_currency.data)
+            db.session.commit()
 
             for field in form:
                 field.errors = []
@@ -222,6 +225,8 @@ def pay(flow=None):
 
     if request.form.get("change_currency") in ('GBP', 'EUR'):
         set_user_currency(request.form.get("change_currency"))
+        db.session.commit()
+
         return redirect(url_for('.pay', flow=flow))
 
     form = TicketPaymentForm()
@@ -231,7 +236,7 @@ def pay(flow=None):
         del form.email
         del form.name
 
-    basket, total, _ = get_basket_and_total()
+    basket, total = get_basket_and_total()
     if not basket:
         if flow == 'main':
             flash("Please select at least one ticket to buy.")
