@@ -1,8 +1,21 @@
+Development hints
+=================
+
+We have just upgraded to python3, so there may be bits of code or stylistic choices that only make sense in python2.7
+
+We've also recently changed Ticket to Purchase, and TicketType to Product.
+There may still be bits of old code that refer to these classes or use confusing names. Please fix them if you see them!
+
+Development processes
+=====================
+
+Once tickets are on sale, new development should be done on feature branches. We try to merge to master frequently, so hide anything accessible to visitors behind config. Bugfixes will usually be done on master.
+
+We test all branches with Travis - you can run `make test` locally to run these tests during development.
+
+
 Links to Documentation
 ======================
-
-N.B. the version might be wrong for some of these, check against requirements.txt
-
 ## Flask
 
 * [Flask](http://flask.pocoo.org/docs/)
@@ -21,8 +34,9 @@ N.B. the version might be wrong for some of these, check against requirements.tx
 ## Database
 
 * [Flask-SQLAlchemy](http://packages.python.org/Flask-SQLAlchemy/)
+* [SQLAlchemy-Continuum](https://sqlalchemy-continuum.readthedocs.io/en/latest/)
 
-Note that Flask creates its own declarative base.
+If you're familiar with SQLAlchemy, note that Flask creates its own declarative base. This is the db.Model used in our models.
 
 
 ## Ticket object model
