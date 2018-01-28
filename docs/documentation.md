@@ -81,9 +81,13 @@ Type is just a column on ProductGroup, but it determines the subclass of Purchas
 
 All classes with CapacityMixin also have InheritedAttributesMixin except for PriceTier. These allow attributes like "has badge" and "is transferable" to cascade down the hierarchy.
 
-The hierarchy from the leaf-level ProductGroup down to Purchase is all a parent relationship (this is necessitated by the CapacityMixin). This means it's always possible to identify the Type of a Purchase by joining directly up to ProductGroup. It should not be necessary to recurse through ProductGroup except when updating capacity usage.
+The hierarchy from the leaf-level ProductGroup down to Purchase is all a parent relationship (this is necessitated by the CapacityMixin). This means it's always possible to identify the Type of a Purchase by joining directly up to ProductGroup. It should not be necessary to recurse through ProductGroup except when checking or updating capacity usage.
 
 Price is immutable, so a Purchase can switch currency by referring to other prices within a PriceTier. A Product can only change prices by expiring the relevant PriceTier and adding another.
 
-Only one PriceTier is active at once, and we don't expose what tier was used except to show the price. We use separate products for the "Supporter" tickets, not PriceTiers.
+Only one PriceTier is active at once, and we don't expose what tier was used except to show the price. We use separate products for the "Supporter" tickets, not PriceTiers, and they're collected into a ProductGroup so we can issue fixed tranches of tickets.
+
+Purchase is currently used to implement baskets. We use unpaid purchases to reserve the items, and associate them with a User when the corresponding Payment is created. The relevant PriceTier and Product are stored on the Purchase for convenience.
+
+Payment, Refund and Purchase are versioned so we can track money-related changes. The rest of the hierarchy should be exportable to fixtures.
 
