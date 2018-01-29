@@ -117,7 +117,10 @@ def main(flow=None):
 
     if view.token and session.get('ticket_token') != view.token:
         # Users with the right tokens and admins can access token-based views
-        if not current_user.is_anonymous and current_user.has_permission('admin'):
+        if current_user.is_anonymous:
+            abort(404)
+
+        elif not current_user.has_permission('admin'):
             abort(404)
 
     is_new_basket = request.args.get('is_new_basket', False)
