@@ -23,7 +23,7 @@ from models.product import (
 from models.purchase import Ticket
 from models import bought_states
 from models.payment import BankPayment, StripePayment, GoCardlessPayment
-from models.site_state import get_sales_state
+from models.site_state import get_sales_state, config_date
 
 from ..common import (
     get_user_currency, set_user_currency, get_basket_and_total, create_basket,
@@ -111,7 +111,12 @@ def main(flow=None):
     if not view:
         abort(404)
 
+    if datetime.utcnow() < config_date('SALES_START') and not view.token:
+        # Allow us to set TICKET_SALES before sales start
+        abort(404)
+
     if view.token and session.get('ticket_token') != view.token:
+        # Users with the right tokens and admins can access token-based views
         if not current_user.is_anonymous and current_user.has_permission('admin'):
             abort(404)
 
