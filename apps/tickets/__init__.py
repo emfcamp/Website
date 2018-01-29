@@ -129,6 +129,10 @@ def main(flow=None):
         if flow != 'main':
             sales_state = 'available'
 
+    elif sales_state == 'before-sales' and view.token:
+        # Allow us to do last-minute sanity checks on production
+        sales_state = 'available'
+
     if app.config.get('DEBUG'):
         sales_state = request.args.get("sales_state", sales_state)
 
