@@ -119,7 +119,6 @@ def main(flow=None):
         empty_basket()
         return redirect(url_for('tickets.main', flow=flow))
 
-    token = session.get('ticket_token')
     sales_state = get_sales_state()
 
     if sales_state in ['unavailable', 'sold-out']:
