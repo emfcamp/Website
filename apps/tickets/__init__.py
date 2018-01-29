@@ -112,7 +112,8 @@ def main(flow=None):
         abort(404)
 
     if view.token and session.get('ticket_token') != view.token:
-        abort(404)
+        if not current_user.is_anonymous and current_user.has_permission('admin'):
+            abort(404)
 
     is_new_basket = request.args.get('is_new_basket', False)
     if is_new_basket:
@@ -224,7 +225,8 @@ def pay(flow=None):
         abort(404)
 
     if view.token and session.get('ticket_token') != view.token:
-        abort(404)
+        if not current_user.is_anonymous and current_user.has_permission('admin'):
+            abort(404)
 
     if request.form.get("change_currency") in ('GBP', 'EUR'):
         set_user_currency(request.form.get("change_currency"))
