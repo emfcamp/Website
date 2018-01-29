@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% block title %}
-{% if flow == 'main' %}
+{% if ticket_view %}
 Buy Tickets
 {% else %}
 Buy Items
 {% endif %}
 {% endblock %}
 {% block body %}
-{% if flow == 'main' %}
+{% if ticket_view %}
     {% include 'ticket-blurb.html' %}
 
     <p>To order additional items, such as {# village tents or t-shirts #} parking tickets, please
@@ -104,7 +104,7 @@ Buy Items
 
 <thead>
 <tr>
-    {% if flow == 'main' %}
+    {% if ticket_view %}
     <th>Ticket Type</th>
     {% else %}
     <th>Product</th>
@@ -162,7 +162,7 @@ Buy Items
 </table>
 
 <div class="form-actions pull-right">
-    {% if flow == 'main' %}
+    {% if ticket_view %}
     {{ form.buy(class_="btn btn-primary btn-lg debounce") }}
     {% else %}
     {{ form.buy_other(class_="btn btn-primary btn-lg debounce") }}

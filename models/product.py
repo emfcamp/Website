@@ -267,6 +267,7 @@ class ProductView(db.Model):
     """ A selection of products to be shown together for sale. """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
+    token = db.Column(db.String, nullable=True)
 
     product_view_products = db.relationship('ProductViewProduct', backref='view', order_by='ProductViewProduct.order')
     products = association_proxy('product_view_products', 'product')
@@ -276,7 +277,15 @@ class ProductView(db.Model):
 
     @classmethod
     def get_by_name(cls, name):
+        if name is None:
+            return None
         return ProductView.query.filter_by(name=name).one_or_none()
+
+    @classmethod
+    def get_by_token(cls, token):
+        if token is None:
+            return None
+        return ProductView.query.filter_by(token=token).one_or_none()
 
     def __repr__(self):
         return "<ProductView: %s>" % self.name

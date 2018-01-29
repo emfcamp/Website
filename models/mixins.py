@@ -71,7 +71,7 @@ class CapacityMixin(object):
 
         return bool(self.expires) and self.__expired
 
-    def issue_instances(self, count, token=''):
+    def issue_instances(self, count):
         """
         If possible (i.e. the object has not expired and has capacity)
         reduce the available capacity by count.
@@ -86,7 +86,7 @@ class CapacityMixin(object):
             raise CapacityException("Expired.")
 
         if self.parent:
-            self.parent.issue_instances(count, token)
+            self.parent.issue_instances(count)
         self.capacity_used = self.__class__.capacity_used + count
 
     def return_instances(self, count):

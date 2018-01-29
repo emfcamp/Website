@@ -17,7 +17,7 @@ from main import db, mail
 from models.exc import CapacityException
 from models.user import User, checkin_code_re
 from models.product import (
-    ProductGroup, PriceTier, ProductView,
+    PriceTier, ProductView,
     ProductViewProduct, Product,
 )
 from models.purchase import Ticket
@@ -87,18 +87,16 @@ def create_payment(paymenttype):
 @tickets.route("/tickets/token/")
 @tickets.route("/tickets/token/<token>")
 def tickets_token(token=None):
-    groups = ProductGroup.get_product_groups_for_token(token)
-    if groups:
+    view = ProductView.get_by_token(token)
+    if view:
         session['ticket_token'] = token
-    else:
-        if 'ticket_token' in session:
-            del session['ticket_token']
-        flash('Ticket token was invalid')
+        return redirect(url_for('tickets.main', flow=view.name))
 
-    if any(group.allow_check_in for group in groups):
-        return redirect(url_for('tickets.main'))
+    if 'ticket_token' in session:
+        del session['ticket_token']
+    flash('Ticket token was invalid')
+    return redirect(url_for('tickets.main'))
 
-    return redirect(url_for('tickets.main', flow='other'))
 
 
 @tickets.route("/tickets", methods=['GET', 'POST'])
@@ -113,6 +111,9 @@ def main(flow=None):
     if not view:
         abort(404)
 
+    if view.token and session.get('ticket_token') != view.token:
+        abort(404)
+
     is_new_basket = request.args.get('is_new_basket', False)
     if is_new_basket:
         empty_basket()
@@ -123,13 +124,9 @@ def main(flow=None):
 
     if sales_state in ['unavailable', 'sold-out']:
         # For the main entry point, we assume people want admissions tickets,
-        # but we still need to sell people e.g. parking tickets or tents until
-        # the final cutoff (sales-ended).
+        # but we still need to sell people parking tickets, tents or tickets
+        # from tokens until the final cutoff (sales-ended).
         if flow != 'main':
-            sales_state = 'available'
-
-        # Allow people with valid discount tokens to buy tickets
-        elif token is not None and ProductGroup.get_product_groups_for_token(token):
             sales_state = 'available'
 
     if app.config.get('DEBUG'):
@@ -151,10 +148,13 @@ def main(flow=None):
                                           .joinedload(PriceTier.prices)
                                  )
 
+    ticket_view = False
     for product in products:
         product_tiers = sorted(product.price_tiers, key=lambda x: x.get_price('GBP').value)
         pt = product_tiers[0]
         tiers[pt.id] = pt
+        if product.parent.type == 'admissions':
+            ticket_view = True
 
     form = TicketAmountsForm()
 
@@ -199,7 +199,7 @@ def main(flow=None):
                     session['reserved_purchase_ids'] = [b.id for b in basket]
 
                 return redirect(url_for('tickets.pay', flow=flow))
-            elif flow == 'main':
+            elif ticket_view:
                 flash("Please select at least one ticket to buy.")
             else:
                 flash("Please select at least one item to buy.")
@@ -214,13 +214,17 @@ def main(flow=None):
                 field.errors = []
 
     form.currency_code.data = get_user_currency()
-    return render_template("tickets-choose.html", form=form, flow=flow)
+    return render_template("tickets-choose.html", form=form, flow=flow, ticket_view=ticket_view)
 
 
 @tickets.route("/tickets/pay", methods=['GET', 'POST'])
 @tickets.route("/tickets/pay/<flow>", methods=['GET', 'POST'])
 def pay(flow=None):
-    if flow not in ['main', 'other']:
+    view = ProductView.get_by_name(flow)
+    if not view:
+        abort(404)
+
+    if view.token and session.get('ticket_token') != view.token:
         abort(404)
 
     if request.form.get("change_currency") in ('GBP', 'EUR'):
