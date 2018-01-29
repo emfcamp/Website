@@ -170,6 +170,15 @@ def cancel_payment(payment_id):
     if form.validate_on_submit():
         if form.cancel.data and (payment.provider in ['banktransfer', 'gocardless']):
             app.logger.info("%s manually cancelling payment %s", current_user.name, payment.id)
+
+            if payment.provider == 'gocardless' and payment.gcid is not None:
+                try:
+                    gocardless_client.payments.cancel(payment.gcid)
+
+                except gocardless_pro.errors.InvalidStateError as e:
+                    logging.error('InvalidStateError from GoCardless cancelling payment: %s', e.message)
+                    flash("Error cancelling with GoCardless")
+
             try:
                 payment.cancel()
             except StateException as e:
