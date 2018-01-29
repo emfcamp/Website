@@ -158,8 +158,13 @@ def main(flow=None):
 
     ticket_view = False
     for product in products:
-        product_tiers = sorted(product.price_tiers, key=lambda x: x.get_price('GBP').value)
-        pt = product_tiers[0]
+        pts = [tier for tier in product.price_tiers if tier.active]
+        if len(pts) > 1:
+            app.logger.error("Multiple active PriceTiers found for %s. Excluding product.", product)
+            continue
+
+        pt = pts[0]
+
         tiers[pt.id] = pt
         if product.parent.type == 'admissions':
             ticket_view = True
