@@ -31,6 +31,7 @@ make
 You should then be able to view your development server on http://localhost:5000.
 
 Once you've created an account, you can use `make admin` to make your user an administrator.
+Or, you can create an account and simultaneously make it an admin by using `make admin ARGS="-e email@domain.tld"`
 
 For more, see:
 

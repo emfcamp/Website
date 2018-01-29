@@ -11,13 +11,23 @@ class MakeAdmin(Command):
     """
     Make the first user in the DB an admin for testing purposes
     """
-    option_list = (Option('-u', '--user-id', dest='user_id', help="The user_id to make an admin (defaults to first)"),)
+    option_list = (Option('-u', '--user-id', dest='user_id', help="The user_id to make an admin (defaults to first)"),
+                   Option('-e', '--email', dest='email', help="Create a new user with this e-mail and make it an admin"),
+                   )
 
-    def run(self, user_id):
-        if user_id:
+    def run(self, user_id, email):
+        if email:
+            user = User(email, "Initial Admin User")
+            db.session.add(user)
+            db.session.commit()
+        elif user_id:
             user = User.query.get(user_id)
         else:
             user = User.query.order_by(User.id).first()
+
+        if not user:
+            print("No user exists or matches the search.")
+            return
 
         user.grant_permission('admin')
         db.session.commit()

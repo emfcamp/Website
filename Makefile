@@ -108,7 +108,7 @@ testemails:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py testemails
 
 admin:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makeadmin
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makeadmin ${ARGS}
 
 users:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makefakeusers
