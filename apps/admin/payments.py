@@ -15,8 +15,9 @@ from wtforms.validators import Required
 from wtforms import SubmitField, BooleanField, FieldList, FormField
 
 from sqlalchemy.sql.functions import func
+import gocardless_pro.errors
 
-from main import db, mail, stripe
+from main import db, mail, stripe, gocardless_client
 from models.payment import Payment, BankPayment, BankRefund, StripeRefund, StateException
 from models.purchase import Purchase
 # from models.ticket import Ticket
@@ -176,7 +177,7 @@ def cancel_payment(payment_id):
                     gocardless_client.payments.cancel(payment.gcid)
 
                 except gocardless_pro.errors.InvalidStateError as e:
-                    logging.error('InvalidStateError from GoCardless cancelling payment: %s', e.message)
+                    app.logger.error('InvalidStateError from GoCardless cancelling payment: %s', e.message)
                     flash("Error cancelling with GoCardless")
 
             try:
