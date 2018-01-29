@@ -173,12 +173,15 @@ def get_basket_cost(basket):
 def get_basket():
     if current_user.is_anonymous:
         ids = session.get('reserved_purchase_ids', [])
-        basket = Purchase.query.filter_by(state='reserved',
-                                          payment_id=None,
-                                          owner_id=None) \
-                               .filter(Purchase.id.in_(ids)) \
-                               .order_by(Purchase.id) \
-                               .all()
+        if ids:
+            basket = Purchase.query.filter_by(state='reserved',
+                                              payment_id=None,
+                                              owner_id=None) \
+                                   .filter(Purchase.id.in_(ids)) \
+                                   .order_by(Purchase.id) \
+                                   .all()
+        else:
+            basket = []
 
     else:
         basket = current_user.purchased_products \
