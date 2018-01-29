@@ -72,7 +72,11 @@
 
 <h3>Choose a Payment Method</h3>
 <div class="row row-equal">
+{% if feature_enabled('STRIPE') %}
 <div class="col-sm-4">
+{% else %}
+<div class="col-sm-6">
+{% endif %}
 {% if feature_enabled('GOCARDLESS') %}
 {% if user_currency != 'EUR' or feature_enabled('GOCARDLESS_EURO') %}
 <div class="panel panel-default panel--payment">
@@ -100,7 +104,11 @@
 {% endif %}
 {% endif %}
 </div>
+{% if feature_enabled('STRIPE') %}
 <div class="col-sm-4">
+{% else %}
+<div class="col-sm-6">
+{% endif %}
 {% if feature_enabled('BANK_TRANSFER') %}
 <div class="panel panel-default panel--payment">
     <div class="panel-heading"><h3 class="panel-title">Bank Transfer</h3></div>
@@ -113,8 +121,8 @@
 </div>
 {% endif %}
 </div>
-<div class="col-sm-4">
 {% if feature_enabled('STRIPE') %}
+<div class="col-sm-4">
 <div class="panel panel-default panel--payment">
     <div class="panel-heading"><h3 class="panel-title">Credit/Debit Card</h3></div>
     <div class="panel-body">
@@ -131,6 +139,8 @@
 {% endif %}
 </div>
 </form>
+</div>
+<div class="row">
 <div class="well">If you're unsure about anything, please check out our <a href="https://wiki.emfcamp.org/wiki/FAQ#Ticket_Sales">FAQ</a>
 or drop us an <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email</a>.</div>
 
