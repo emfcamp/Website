@@ -312,7 +312,7 @@ def pay(flow=None):
     form.basket_total.data = total
 
     return render_template('payment-choose.html', form=form,
-                           basket=basket, total=total, StripePayment=StripePayment,
+                           basket=basket, total=total,
                            is_anonymous=current_user.is_anonymous,
                            flow=flow)
 

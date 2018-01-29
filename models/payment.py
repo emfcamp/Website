@@ -6,7 +6,7 @@ from sqlalchemy_continuum.utils import version_class, transaction_class
 
 import random
 import re
-from decimal import Decimal, ROUND_UP
+from decimal import Decimal
 from datetime import datetime, timedelta
 
 from . import export_attr_counts, export_intervals, bucketise
@@ -97,7 +97,6 @@ class Payment(db.Model):
 
         return data
 
-
     @property
     def amount(self):
         return Decimal(self.amount_int) / 100
@@ -108,15 +107,10 @@ class Payment(db.Model):
 
     @classmethod
     def premium(cls, currency, amount):
-        if not hasattr(cls, 'premium_percent'):
-            return Decimal(0)
-        if amount is None:
-            return None
-
-        amount_int = int(amount * 100)
-        premium = Decimal(cls.premium_percent) / 100 * amount_int
-        premium = premium.quantize(Decimal(1), ROUND_UP)
-        return premium / 100
+        """ Used to be used for credit card premiums, which now aren't allowed.
+            TODO: cut this out entirely.
+        """
+        return Decimal(0)
 
     @classmethod
     def premium_refund(cls, currency, amount):
@@ -340,6 +334,7 @@ db.Index('ix_bank_transaction_u1',
          BankTransaction.fit_id,
          unique=True)
 
+
 class GoCardlessPayment(Payment):
     name = 'GoCardless payment'
 
@@ -366,7 +361,6 @@ class GoCardlessPayment(Payment):
 
 class StripePayment(Payment):
     name = 'Stripe payment'
-    premium_percent = 5
 
     __mapper_args__ = {'polymorphic_identity': 'stripe'}
     chargeid = db.Column(db.String, unique=True)
@@ -428,7 +422,6 @@ class Refund(db.Model):
 
         return data
 
-
     @property
     def amount(self):
         return Decimal(self.amount_int) / 100
@@ -437,11 +430,12 @@ class Refund(db.Model):
     def amount(self, val):
         self.amount_int = int(val * 100)
 
+
 class BankRefund(Refund):
     __mapper_args__ = {'polymorphic_identity': 'banktransfer'}
+
 
 class StripeRefund(Refund):
     __mapper_args__ = {'polymorphic_identity': 'stripe'}
 
     refundid = db.Column(db.String, unique=True)
-
