@@ -339,6 +339,22 @@ def gocardless_default(resource, action, event):
     logger.info("Default handler called for %s", event)
 
 
+@webhook('mandates', 'created')
+@webhook('mandates', 'submitted')
+@webhook('mandates', 'active')
+@webhook('mandates', 'reinstated')
+@webhook('mandates', 'transferred')
+@webhook('mandates', 'cancelled')
+@webhook('mandates', 'failed')
+@webhook('mandates', 'expired')
+@webhook('mandates', 'replaced')
+def gocardless_mandate_ignore(resource, action, event):
+    """ Ignore mandate-related noise
+        https://developer.gocardless.com/api-reference/#events-mandate-actions
+    """
+    pass
+
+
 # https://developer.gocardless.com/api-reference/#events-payment-actions
 @webhook('payments', 'created')
 @webhook('payments', 'submitted')
