@@ -176,7 +176,7 @@ def stripe_tryagain(payment_id):
             payment.cancel()
             db.session.commit()
             flash("Your payment has been cancelled. Please place your order again.")
-            return redirect(url_for('tickets.choose'))
+            return redirect(url_for('tickets.main'))
 
     return render_template('stripe-tryagain.html', payment=payment, form=form)
 

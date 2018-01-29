@@ -110,7 +110,7 @@ def set_currency():
         abort(400)
 
     set_user_currency(request.form['currency'])
-    return redirect(url_for('tickets.choose'))
+    return redirect(url_for('tickets.main'))
 
 
 class AccountForm(Form):
@@ -178,7 +178,7 @@ def tickets():
                                     .order_by(Payment.id).all()
 
     if not tickets and not payments:
-        return redirect(url_for('tickets.choose'))
+        return redirect(url_for('tickets.main'))
 
     transferred_to = current_user.transfers_to
     transferred_from = current_user.transfers_from
