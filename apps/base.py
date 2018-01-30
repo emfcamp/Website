@@ -1,4 +1,3 @@
-import operator
 import os
 import csv
 import json
@@ -150,6 +149,10 @@ def talks_2016():
 
     for event in data:
         if event['source'] != 'external':
+            # Hack to remove Stitch's "hilarious" failed <script>
+            if '<script>' in event['speaker']:
+                event['speaker'] = event['speaker'][0:event['speaker'].find('<script>')] # "Some idiot"
+
             # All official (non-external) content is on a stage or workshop, so we don't care about anything that isn't
             if event['venue'] in stage_venues:
                 stage_events.append(event)
@@ -157,8 +160,8 @@ def talks_2016():
                 workshop_events.append(event)
 
     # Sort should avoid leading punctuation and whitespace and be case-insensitive
-    stage_events.sort(key = lambda event: event['title'].strip().strip('\'').upper())
-    workshop_events.sort(key = lambda event: event['title'].strip().strip('\'').upper())
+    stage_events.sort(key=lambda event: event['title'].strip().strip('\'').upper())
+    workshop_events.sort(key=lambda event: event['title'].strip().strip('\'').upper())
 
     venues = [{'name': 'Main Stages', 'events': stage_events},
               {'name': 'Workshops', 'events': workshop_events}]
