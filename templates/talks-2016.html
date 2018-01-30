@@ -1,22 +1,46 @@
 {% extends "base.html" %}
 {% block title %}2016 Programme{% endblock %}
+{% block head %}
+<script language="javascript" type="text/javascript">
+  <!--
+  function toggleEvent(button, rowId)
+  {
+    row = $('#' + rowId);
+    if (row.is(':visible')) {
+      $(button).text("[+]");
+      row.hide();
+    }
+    else {
+      $(button).html("[&ndash;]");
+      row.show();
+    }
+    return false;
+  }
+  -->
+</script>
+{% endblock %}
 {% block body %}
 <h2>EMF 2016 Programme</h2>
 <p>These were the talks and workshops which happened at EMF 2016.
 You can find videos of many of the talks on the <a href="https://media.ccc.de/c/emf16">CCC website</a> or <a href="https://www.youtube.com/ElectromagneticField">our YouTube channel</a>.</p>
 
 {% for venue in venues %}
+{% set venue_loop = loop %}
 
 <h3>{{ venue.name }}</h3>
 
 <table class="table">
   <thead>
-  <th>Name</th><th>Title</th>
+  <th>Name</th><th colspan="2">Title</th>
 </thead>
 <tbody>
 {% for row in venue.events %}
 <tr class="{{- loop.cycle('odd', 'even') }}">
     <td><strong>{{ row.speaker }}</strong></td><td>{{ row.title }}</td>
+    <td align="right"><a href="#" onclick="return toggleEvent(this, 'event{{ venue_loop.index }}-{{ loop.index }}')">[+]</a></td>
+</tr>
+<tr class="{{- loop.cycle('odd', 'even') }}" id="event{{ venue_loop.index }}-{{ loop.index }}" style="display: none;">
+    <td colspan="3">{{ row.description }}</td>
 </tr>
 {% endfor %}
 </tbody>
