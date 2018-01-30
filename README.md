@@ -33,6 +33,8 @@ You should then be able to view your development server on http://localhost:5000
 Once you've created an account, you can use `make admin` to make your user an administrator.
 Or, you can create an account and simultaneously make it an admin by using `make admin ARGS="-e email@domain.tld"`
 
+E-mail sending is disabled in development (but is printed out on the console). You can also login directly by setting BYPASS_LOGIN=True in config/development.cfg and then using a URL of the form e.g. `/login/admin@test.invalid` and navigate to `/admin/`.
+
 For more, see:
 
 * [Documentation](docs/documentation.md)

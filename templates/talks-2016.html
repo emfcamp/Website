@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}2016 Programme{% endblock %}
+{% block body %}
+<h2>EMF 2016 Programme</h2>
+<p>These were the talks which happened at EMF 2016.
+Most of them are now available <a href="https://www.youtube.com/playlist?list=PL1Hr6VkuONaHy8EZtLIXIMZQ858315pmt">on YouTube</a>.</p>
+
+{% for venue in venues %}
+
+<h3>{{ venue.name }}</h3>
+
+<table class="table">
+  <thead>
+  <th>Name</th><th>Title</th>
+</thead>
+<tbody>
+{% for row in venue.events %}
+<tr class="{{- loop.cycle('odd', 'even') }}">
+    <td><strong>{{ row.speaker }}</strong></td><td>{{ row.title }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+{% endfor %}
+
+{% endblock %}

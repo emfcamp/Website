@@ -1,3 +1,4 @@
+import operator
 import os
 import csv
 import json
@@ -131,6 +132,36 @@ def talks():
     return redirect(url_for('schedule.line_up'))
 
 
+@base.route("/talks/2016")
+@site_flag('TICKETS_SITE')
+def talks_2016():
+    talk_path = os.path.abspath(os.path.join(__file__, '..', '..', 'exports', '2016', 'public'))
+    data = json.load(open(os.path.join(talk_path, 'schedule.json'), 'r'))
+
+    stage_venues = ['Stage A', 'Stage B', 'Stage C']
+    workshop_venues = ['Workshop 1', 'Workshop 2', 'Workshop 3']
+
+    stage_events = []
+    workshop_events = []
+
+    for event in data:
+        if event['source'] != 'external':
+            # All official (non-external) content is on a stage or workshop, so we don't care about anything that isn't
+            if event['venue'] in stage_venues:
+                stage_events.append(event)
+            elif event['venue'] in workshop_venues:
+                workshop_events.append(event)
+
+    # Sort should avoid leading punctuation and whitespace and be case-insensitive
+    stage_events.sort(key = lambda event: event['title'].strip().strip('\'').upper())
+    workshop_events.sort(key = lambda event: event['title'].strip().strip('\'').upper())
+
+    venues = [{'name': 'Main Stages', 'events': stage_events},
+              {'name': 'Workshops', 'events': workshop_events}]
+
+    return render_template('talks-2016.html', venues=venues)
+
+
 @base.route("/talks/2014")
 @site_flag('TICKETS_SITE')
 def talks_2014():
@@ -141,8 +172,8 @@ def talks_2014():
         if event['type'] not in ('lecture', 'workshop', 'other'):
             continue
         talks.append((", ".join(map(lambda speaker: speaker['full_public_name'], event['speakers'])),
-                     event['title'],
-                     event['abstract']
+                      event['title'],
+                      event['abstract']
                       ))
 
     return render_template('talks-2014.html', talks=talks)
