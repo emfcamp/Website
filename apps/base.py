@@ -148,16 +148,24 @@ def talks_2016():
     workshop_events = []
 
     for event in data:
-        if event['source'] != 'external':
-            # Hack to remove Stitch's "hilarious" failed <script>
-            if '<script>' in event['speaker']:
-                event['speaker'] = event['speaker'][0:event['speaker'].find('<script>')] # "Some idiot"
+        if event['source'] == 'external':
+            continue
 
-            # All official (non-external) content is on a stage or workshop, so we don't care about anything that isn't
-            if event['venue'] in stage_venues:
-                stage_events.append(event)
-            elif event['venue'] in workshop_venues:
-                workshop_events.append(event)
+        # Hack to remove Stitch's "hilarious" failed <script>
+        if '<script>' in event['speaker']:
+            event['speaker'] = event['speaker'][0:event['speaker'].find('<script>')] # "Some idiot"
+
+        # All official (non-external) content is on a stage or workshop, so we don't care about anything that isn't
+        if event['venue'] in stage_venues:
+            events_list = stage_events
+        elif event['venue'] in workshop_venues:
+            events_list = workshop_events
+        else:
+            continue
+
+        # Make sure it's not already in the list (basically repeated workshops)
+        if not any(e['title'] == event['title'] for e in events_list):
+            events_list.append(event)
 
     # Sort should avoid leading punctuation and whitespace and be case-insensitive
     stage_events.sort(key=lambda event: event['title'].strip().strip('\'').upper())
