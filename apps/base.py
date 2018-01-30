@@ -12,7 +12,7 @@ from flask import (
 
 from main import cache
 from .common import feature_flag, site_flag
-from models.product import Product, ProductView, ProductViewProduct
+from models.product import Product, ProductView, ProductViewProduct, PriceTier
 from models.site_state import get_site_state
 
 
@@ -21,10 +21,14 @@ base = Blueprint('base', __name__)
 @cache.cached(timeout=60, key_prefix='get_full_price')
 def get_full_price():
     full = ProductView.query.filter_by(name='main') \
-                            .join(ProductViewProduct, Product) \
-                            .with_entities(Product).first()
+                            .join(ProductViewProduct, Product, PriceTier) \
+                            .filter_by(active=True) \
+                            .order_by(ProductViewProduct.order) \
+                            .with_entities(PriceTier) \
+                            .first()
+
     if full is not None:
-        return full.get_cheapest_price('GBP')
+        return full.get_price('GBP')
 
     return None
 
