@@ -253,7 +253,8 @@ def gocardless_cancel(payment_id):
         if form.yes.data:
 
             try:
-                gocardless_client.payments.cancel(payment.gcid)
+                if payment.gcid is not None:
+                    gocardless_client.payments.cancel(payment.gcid)
 
             except gocardless_pro.errors.InvalidStateError as e:
                 logging.error('InvalidStateError from GoCardless cancelling payment: %s', e.message)

@@ -204,7 +204,14 @@ def main(flow=None):
 
                     items.append((tier, f.amount.data))
 
-            basket, total = create_basket(items)
+            try:
+                basket, total = create_basket(items)
+            except CapacityException as e:
+                app.logger.warn('Limit exceeded creating tickets: %s', e)
+                flash("We're very sorry, but there is not enough capacity available to "
+                      "allocate these tickets. You may be able to try again with a smaller amount.")
+                return redirect(url_for("tickets.main", flow=flow))
+
             if basket:
 
                 app.logger.info('total: %s basket: %s', total, basket)
@@ -290,12 +297,7 @@ def pay(flow=None):
         elif form.stripe.data:
             payment_type = StripePayment
 
-        try:
-            payment = create_payment(payment_type)
-        except CapacityException as e:
-            app.logger.warn('Limit exceeded creating tickets: %s', e)
-            flash("We're sorry, we were unable to reserve your tickets. %s" % e)
-            return redirect(url_for('tickets.main', flow=flow))
+        payment = create_payment(payment_type)
 
         if not payment:
             app.logger.warn('Unable to add payment and tickets to database')
