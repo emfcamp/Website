@@ -1,0 +1,32 @@
+version: 1
+handlers:
+  stream_handler:
+    class: logger.ColorizingStreamHandler
+    level: NOTSET
+    formatter: formatter
+    stream: ext://sys.stderr
+  sqlalchemy:
+    class: logger.GreenStreamHandler
+    level: NOTSET
+    formatter: formatter
+    stream: ext://sys.stderr
+
+formatters:
+  formatter:
+    class: loggingmanager.ContextFormatter
+    format: "%(asctime)s %(name)-12s %(levelname)-8s %(user)-12s %(message)s"
+
+root:
+  level: NOTSET
+  handlers: [stream_handler]
+
+loggers:
+  werkzeug:
+    level: INFO
+  sqlalchemy.engine.base.Engine:
+    handlers: [sqlalchemy]
+    propagate: false
+  mailchimp3:
+    level: WARN
+  iso8601:
+    level: WARN
