@@ -217,9 +217,9 @@ def company():
     return render_template('company.html')
 
 
-@base.route('/sponsors')
-def sponsors():
-    return render_template('sponsors/sponsors.html')
+# @base.route('/sponsors')
+# def sponsors():
+#     return render_template('sponsors/sponsors.html')
 
 
 @base.route('/sponsor')
