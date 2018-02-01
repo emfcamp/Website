@@ -1,6 +1,8 @@
 import base64
 import hmac
 import hashlib
+import random
+import string
 from datetime import datetime, timedelta
 import time
 import struct
@@ -9,10 +11,11 @@ from collections import defaultdict
 
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
-from flask import current_app as app
-from flask_login import UserMixin
+from flask import current_app as app, session
+from flask_login import UserMixin, AnonymousUserMixin
 
 from main import db
+from loggingmanager import set_user_id
 from . import bucketise
 from .permission import UserPermission, Permission
 
@@ -302,3 +305,30 @@ class UserDiversity(db.Model):
 
         return data
 
+
+class AnonymousUser(AnonymousUserMixin):
+    """ An anonymous user - the only persistent item here is the ID
+        which is stored in the session.
+    """
+    def __init__(self, id):
+        self.id = id
+
+    def get_id(self):
+        return self.id
+
+
+def load_anonymous_user():
+    """ Factory method for anonymous users which stores a user ID in
+        the session. This is assigned to `login_manager.anonymous_user`
+        in main.py.
+    """
+    if 'anon_id' in session:
+        au = AnonymousUser(session['anon_id'])
+    else:
+        aid = ''.join(random.choice(string.ascii_lowercase + string.digits)
+                      for _ in range(8))
+        session['anon_id'] = aid
+        au = AnonymousUser(aid)
+
+    set_user_id(au.get_id())
+    return au

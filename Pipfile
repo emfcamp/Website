@@ -63,6 +63,7 @@ python-dateutil = "*"
 slotmachine = {git = "https://github.com/emfcamp/slotmachine"}
 awesome-slugify = "*"
 faker = "*"
+pyyaml = "*"
 
 
 [dev-packages]
@@ -71,5 +72,7 @@ pytest = "*"
 mock = "*"
 "flake8" = "*"
 
+
 [requires]
+
 python_version = "3.5"

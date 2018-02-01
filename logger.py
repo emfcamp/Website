@@ -1,6 +1,4 @@
-from flask import _request_ctx_stack
 import logging
-import os
 
 # Ansi color codes
 CSI = '\x1b['
@@ -50,23 +48,6 @@ class ColorizingStreamHandler(logging.StreamHandler):
 
 class GreenStreamHandler(ColorizingStreamHandler):
     INFO = sgr(GREEN)
-
-class ContextFormatter(logging.Formatter):
-    def __init__(self, fmt, _dfs=None, _stl=None):
-        self.pid = os.getpid()
-        logging.Formatter.__init__(self, fmt)
-
-    def format(self, record):
-        try:
-            record.user = _request_ctx_stack.top.user_email
-        except AttributeError:
-            record.user = 'Anon'
-        except Exception:
-            record.user = 'Unknown'
-
-        record.pid = self.pid
-
-        return logging.Formatter.format(self, record)
 
 
 def mail_logging(message, app):

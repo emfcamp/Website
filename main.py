@@ -1,7 +1,8 @@
+import yaml
 import logging
 import logging.config
 
-from flask import Flask, _request_ctx_stack, url_for, render_template
+from flask import Flask, url_for, render_template
 from flask_mail import Mail
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
@@ -15,6 +16,7 @@ from flask_cdn import CDN
 from flask_cache import Cache
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_wtf import CsrfProtect
+from loggingmanager import create_logging_manager, set_user_id
 import stripe
 import gocardless_pro
 
@@ -24,7 +26,9 @@ import gocardless_pro
 # want to overwrite nosetests' handlers
 if len(logging.root.handlers) == 0:
     install_logging = True
-    logging.config.fileConfig('logging.conf')
+    with open('logging.yaml', 'r') as f:
+        conf = yaml.load(f)
+        logging.config.dictConfig(conf)
 else:
     install_logging = False
 
@@ -86,6 +90,7 @@ def create_app(dev_server=False):
     app.jinja_options['extensions'].append('jinja2.ext.do')
 
     if install_logging:
+        create_logging_manager(app)
         # Flask has now kindly installed its own log handler which we will summarily remove.
         app.logger.propagate = 1
         app.logger.handlers = []
@@ -102,15 +107,17 @@ def create_app(dev_server=False):
     login_manager.setup_app(app, add_context_processor=True)
     app.login_manager.login_view = 'users.login'
 
-    from models.user import User
+    from models.user import User, load_anonymous_user
     from models import site_state, feature_flag
 
     @login_manager.user_loader
     def load_user(userid):
         user = User.query.filter_by(id=userid).first()
         if user:
-            _request_ctx_stack.top.user_email = user.email
+            set_user_id(user.email)
         return user
+
+    login_manager.anonymous_user = load_anonymous_user
 
     if app.config.get('TICKETS_SITE'):
         global gocardless_client
