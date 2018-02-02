@@ -1,5 +1,7 @@
 from main import db
+from sqlalchemy import event
 from sqlalchemy.orm import column_property
+from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import and_, func, FetchedValue
 from .purchase import bought_states
@@ -17,15 +19,48 @@ class CapacityMixin(object):
     """
 
     # A max capacity of None implies no max (or use parent's if set)
-
     capacity_max = db.Column(db.Integer, default=None)
     capacity_used = db.Column(db.Integer, default=0, server_onupdate=FetchedValue())
 
     expires = db.Column(db.DateTime)
 
     @declared_attr
-    def __expired(self):
-        return column_property(and_(~self.expires.is_(None), self.expires < func.now()))
+    def __expired(cls):
+        return column_property(and_(~cls.expires.is_(None), cls.expires < func.now()))
+
+    @declared_attr
+    def __add_event_listeners(cls):
+        """
+        capacity_used will be touched by multiple users at once, so we lean on the
+        DB to lock and update it. This requires an engine with implicit row-level
+        locking, like PostgreSQL.
+
+        This is done as late as possible to allow for speculative checking of the
+        resulting capacity. A consumer must still check after the flush that this
+        transaction doesn't pull any capacities below zero before committing, e.g.
+
+        ```
+        with db.session.no_autoflush:
+            allocation.return_instances(1)
+            allocation.issue_instances(5)
+        db.session.flush()
+        assert allocation.get_total_remaining_capacity() >= 0
+        db.session.commit()
+        ```
+
+        SQLAlchemy locks from parent classes down. This is slightly suboptimal,
+        but not worth working around. It appears to update in PK order within a
+        class, so self-referencing classes shouldn't deadlock.
+
+        hybrid_property.update_expression doesn't yet work on instances as of 1.2.2,
+        so this adds a `before_event` event handler to every subclass and swaps
+        out capacity_used with the appropriate expression.
+        """
+        @event.listens_for(cls, 'before_update')
+        def before_update(mapper, connection, target):
+            history = get_history(target, 'capacity_used')
+            delta = sum(history.added) - sum(history.deleted)
+            target.capacity_used = target.__class__.capacity_used + delta
 
     def has_capacity(self, count=1):
         """
@@ -87,16 +122,15 @@ class CapacityMixin(object):
 
         if self.parent:
             self.parent.issue_instances(count)
-        self.capacity_used = self.__class__.capacity_used + count
+
+        self.capacity_used += count
 
     def return_instances(self, count):
         " Reintroduce previously used capacity "
-        if count < 1:
-            raise ValueError("Count cannot be less than 1.")
-
         if self.parent:
             self.parent.return_instances(count)
-        self.capacity_used = self.__class__.capacity_used - count
+
+        self.capacity_used -= count
 
     def get_purchase_count(self, states=None):
         """ Get the count of purchases, optionally filtered by purchase state.

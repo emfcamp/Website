@@ -62,29 +62,30 @@ class Basket:
         """ Generate the necessary Purchases for this basket,
             checking capacity from when the objects were loaded. """
 
-        for line in self._lines:
-            issue_count = line.count - len(line.purchases)
-            if issue_count > 0:
+        with db.session.no_autoflush:
+            for line in self._lines:
+                issue_count = line.count - len(line.purchases)
+                if issue_count > 0:
 
-                # user_limit takes into account existing purchases
-                if issue_count > line.tier.user_limit():
-                    raise CapacityException('Insufficient capacity.')
+                    # user_limit takes into account existing purchases
+                    if issue_count > line.tier.user_limit():
+                        raise CapacityException('Insufficient capacity.')
 
-                line.tier.issue_instances(issue_count)
+                    line.tier.issue_instances(issue_count)
 
-                product = line.tier.parent
-                if product.parent.type == 'admissions':
-                    purchase_cls = AdmissionTicket
-                elif product.parent.type in {'campervan', 'parking'}:
-                    purchase_cls = Ticket
-                else:
-                    purchase_cls = Purchase
+                    product = line.tier.parent
+                    if product.parent.type == 'admissions':
+                        purchase_cls = AdmissionTicket
+                    elif product.parent.type in {'campervan', 'parking'}:
+                        purchase_cls = Ticket
+                    else:
+                        purchase_cls = Purchase
 
-                price = line.tier.get_price(currency)
-                line.purchases += [purchase_cls(price=price, user=user) for _ in range(issue_count)]
+                    price = line.tier.get_price(currency)
+                    line.purchases += [purchase_cls(price=price, user=user) for _ in range(issue_count)]
 
-            # If there are already reserved tickets, leave them.
-            # The user will complete their purchase soon.
+                # If there are already reserved tickets, leave them.
+                # The user will complete their purchase soon.
 
 
     def ensure_purchase_capacity(self):
