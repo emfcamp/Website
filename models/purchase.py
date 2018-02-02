@@ -1,7 +1,6 @@
 from datetime import datetime
 from sqlalchemy.orm import column_property
 from main import db
-from .exc import CapacityException
 
 # The type of a product determines how we handle it after purchase.
 #
@@ -116,13 +115,6 @@ class Purchase(db.Model):
 
         self.state = new_state
 
-    def cancel(self):
-        # FIXME: this should be moved to Basket along with create_purchases,
-        # and should issue/return and flush an entire basket at once
-        self.price_tier.return_instances(1)
-        db.session.flush()
-        self.set_state('cancelled')
-
     def change_currency(self, currency):
         self.price = self.price_tier.get_price(currency)
 
@@ -146,44 +138,6 @@ class Purchase(db.Model):
         session.add(PurchaseTransfer(purchase=self,
                                      to_user=to_user,
                                      from_user=from_user))
-
-    @classmethod
-    def class_from_product(cls, product):
-        """ Return the class of purchase used for the given Product.
-
-            Raises an exception if the purchase has no type.
-        """
-        product_type = product.get_type()
-        if product_type is None:
-            raise Exception("Product %s has no type" % (product))
-
-        if product_type == 'admissions':
-            return AdmissionTicket
-        elif product_type in {'campervan', 'parking'}:
-            return Ticket
-        else:
-            return Purchase
-
-    @classmethod
-    def create_purchases(cls, user, tier, currency, count=1):
-        """ Generate a number of Purchases when given a PriceTier.
-
-            This ensures that capacity is available, and instantiates
-            the correct Purchase type, returning a list of Purchases.
-        """
-        price = tier.get_price(currency)
-
-        if count > tier.user_limit():
-            raise CapacityException('Insufficient capacity.')
-
-        purchase_cls = cls.class_from_product(tier.parent)
-
-        tier.issue_instances(count)
-        db.session.flush()
-        if tier.get_total_remaining_capacity() < 0:
-            raise CapacityException('Insufficient capacity.')
-
-        return [purchase_cls(price=price, user=user) for c in range(count)]
 
 
 class Ticket(Purchase):

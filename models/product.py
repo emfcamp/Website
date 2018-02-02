@@ -125,18 +125,6 @@ class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
                         .filter_by(name=name)
         return tier.one_or_none()
 
-    def get_type(self):
-        """ Return the type of this product (ticket, merchandise, etc).
-
-            We'll iterate up the product tree until we find the type.
-        """
-        obj = self.parent
-        while getattr(obj, 'type') is None or obj.type is None:
-            if obj.parent is None:
-                return None
-            obj = obj.parent
-        return obj.type
-
     def __repr__(self):
         return "<Product: %s>" % self.name
 

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from decimal import Decimal
 import re
 from collections import OrderedDict
@@ -20,15 +20,15 @@ from models.product import (
     PriceTier, ProductView,
     ProductViewProduct, Product,
 )
-from models.purchase import Ticket
 from models import bought_states
+from models.basket import Basket
 from models.payment import BankPayment, StripePayment, GoCardlessPayment
+from models.purchase import Ticket
 from models.site_state import get_sales_state, config_date
 
 from ..common import (
-    get_user_currency, set_user_currency, get_basket_and_total, create_basket,
+    get_user_currency, set_user_currency,
     feature_flag, create_current_user, feature_enabled,
-    empty_basket
 )
 from ..common.receipt import (
     make_qr_png, make_barcode_png, render_pdf, render_receipt, attach_tickets,
@@ -41,48 +41,6 @@ from .forms import TicketAmountsForm, TicketTransferForm, TicketPaymentForm
 
 tickets = Blueprint('tickets', __name__)
 
-
-def create_payment(paymenttype):
-    """
-    Insert payment and purchases from session data into DB
-    """
-
-    infodata = session.get('ticketinfo')
-    currency = get_user_currency()
-    basket, total = get_basket_and_total()
-
-    for purchase in basket:
-        if purchase.price.currency != currency:
-            raise Exception("Currency mismatch got: {}, expected: {}".format(currency, purchase.price.currency))
-
-    if not (basket and total):
-        return None
-
-    payment = paymenttype(currency, total)
-    payment.amount += paymenttype.premium(currency, total)
-    current_user.payments.append(payment)
-
-    app.logger.info('Creating purchases for basket %s', basket)
-    app.logger.info('Payment: %s for %s %s (purchase total %s)', paymenttype.name,
-                    payment.amount, currency, total)
-    app.logger.info('Ticket info: %s', infodata)
-
-    if currency == 'GBP':
-        days = app.config.get('EXPIRY_DAYS_TRANSFER')
-    elif currency == 'EUR':
-        days = app.config.get('EXPIRY_DAYS_TRANSFER_EURO')
-
-    payment.expires = datetime.utcnow() + timedelta(days=days)
-
-    for purchase in basket:
-        purchase.payment = payment
-
-    db.session.commit()
-
-    session.pop('basket', None)
-    session.pop('ticketinfo', None)
-
-    return payment
 
 @tickets.route("/tickets/token/")
 @tickets.route("/tickets/token/<token>")
@@ -125,7 +83,9 @@ def main(flow=None):
 
     is_new_basket = request.args.get('is_new_basket', False)
     if is_new_basket:
-        empty_basket()
+        basket = Basket(current_user, session.get('basket_purchase_ids', []))
+        basket.empty()
+        session.pop('basket_purchase_ids', None)
         return redirect(url_for('tickets.main', flow=flow))
 
     sales_state = get_sales_state()
@@ -191,32 +151,32 @@ def main(flow=None):
             set_user_currency(form.currency_code.data)
             db.session.commit()
 
-            items = []
+            basket = Basket(current_user, session.get('basket_purchase_ids', []))
             for f in form.tiers:
                 if f.amount.data:
                     pt = f._tier
                     app.logger.info('Adding %s %s tickets to basket', f.amount.data, pt.name)
                     tier = PriceTier.query.get(pt.id)
-                    if not tier:
-                        flash("Ticket not available. Please try again")
-                        items = []
-                        break
-
-                    items.append((tier, f.amount.data))
+                    # FIXME: check capacity/availability?
+                    basket.set_line(tier, f.amount.data)
 
             try:
-                basket, total = create_basket(items)
+                basket.create_purchases()
+                basket.ensure_purchase_capacity()
+
+                db.session.commit()
+
             except CapacityException as e:
                 app.logger.warn('Limit exceeded creating tickets: %s', e)
                 flash("We're very sorry, but there is not enough capacity available to "
                       "allocate these tickets. You may be able to try again with a smaller amount.")
                 return redirect(url_for("tickets.main", flow=flow))
 
-            if basket:
 
-                app.logger.info('total: %s basket: %s', total, basket)
+            if any(line.count for line in basket.lines):
+                app.logger.info('total: %s lines: %s', basket.total, basket.lines)
                 if current_user.is_anonymous:
-                    session['reserved_purchase_ids'] = [b.id for b in basket]
+                    session['basket_purchase_ids'] = [p.id for p in basket.purchases]
 
                 return redirect(url_for('tickets.pay', flow=flow))
             elif ticket_view:
@@ -261,8 +221,8 @@ def pay(flow=None):
         del form.email
         del form.name
 
-    basket, total = get_basket_and_total()
-    if not basket:
+    basket = Basket(current_user, session.get('basket_purchase_ids', []))
+    if not any(line.count for line in basket.lines):
         if flow == 'main':
             flash("Please select at least one ticket to buy.")
         else:
@@ -270,25 +230,25 @@ def pay(flow=None):
         return redirect(url_for('tickets.main'))
 
     if form.validate_on_submit():
-        if Decimal(form.basket_total.data) != Decimal(total):
+        if Decimal(form.basket_total.data) != Decimal(basket.total):
             # Check that the user's basket approximately matches what we told them they were paying.
-            app.logger.warn("User's basket has changed value %s -> %s", form.basket_total.data, total)
+            app.logger.warn("User's basket has changed value %s -> %s", form.basket_total.data, basket.total)
             flash("""The tickets you selected have changed, possibly because you had two windows open.
                   Please verify that you've selected the correct tickets.""")
             return redirect(url_for('tickets.pay', flow=flow))
 
-        if current_user.is_anonymous:
+        user = current_user
+        if user.is_anonymous:
             try:
                 new_user = create_current_user(form.email.data, form.name.data)
-                for purchase in basket:
-                    purchase.set_user(new_user)
             except IntegrityError as e:
                 app.logger.warn('Adding user raised %r, possible double-click', e)
                 return None
 
+            user = new_user
+
         if form.allow_promo.data:
-            current_user.promo_opt_in = True
-            db.session.add(current_user)
+            user.promo_opt_in = True
 
         if form.gocardless.data:
             payment_type = GoCardlessPayment
@@ -297,10 +257,16 @@ def pay(flow=None):
         elif form.stripe.data:
             payment_type = StripePayment
 
-        payment = create_payment(payment_type)
+        basket.user = user
+        payment = basket.create_payment(payment_type, get_user_currency())
+        # return any unnecessary reservations
+        basket.cancel_extra_purchases()
+        db.session.commit()
+
+        session.pop('basket_purchase_ids', None)
 
         if not payment:
-            app.logger.warn('Unable to add payment and tickets to database')
+            app.logger.warn('User tried to pay for empty basket')
             flash("We're sorry, your session information has been lost. Please try ordering again.")
             return redirect(url_for('tickets.main', flow=flow))
 
@@ -311,10 +277,10 @@ def pay(flow=None):
         elif payment_type == StripePayment:
             return stripe_start(payment)
 
-    form.basket_total.data = total
+    form.basket_total.data = basket.total
 
     return render_template('payment-choose.html', form=form,
-                           basket=basket, total=total,
+                           basket=basket, total=basket.total,
                            is_anonymous=current_user.is_anonymous,
                            flow=flow)
 

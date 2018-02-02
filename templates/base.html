@@ -70,10 +70,10 @@
                             <li role="presentation">
                                 <a role="menuitem" href="{{ url_for('base.sponsor') }}">Sponsor</a>
                             </li>
-                        {% if get_basket_size() > 0 %}
+                        {% if basket.purchases %}
                             <li role="presentation">
                                 <a role="menuitem" href="{{ url_for('tickets.pay', flow="main") }}">
-                                    Basket ({{get_basket_size()}})
+                                    Basket ({{ basket.purchases | length }})
                                 </a>
                             </li>
                         {% endif %}

@@ -9,8 +9,8 @@ from flask_login import login_user, current_user
 from werkzeug import BaseResponse
 from werkzeug.exceptions import HTTPException
 
+from models.basket import Basket
 from models.product import Price
-from models.purchase import Purchase
 from models.site_state import get_site_state, get_sales_state, event_start, event_end
 from models.feature_flag import get_db_flags
 from models import User
@@ -64,6 +64,9 @@ def load_utility_functions(app_obj):
             SITE_STATE = request.args.get("site_state", SITE_STATE)
             SALES_STATE = request.args.get("sales_state", SALES_STATE)
 
+        # This is a big hit for every page. Do we really need it?
+        basket = Basket(current_user, session.get('basket_purchase_ids', []))
+
         return dict(
             SALES_STATE=SALES_STATE,
             SITE_STATE=SITE_STATE,
@@ -71,7 +74,7 @@ def load_utility_functions(app_obj):
             CURRENCY_SYMBOLS=CURRENCY_SYMBOLS,
             external_url=external_url,
             feature_enabled=feature_enabled,
-            get_basket_size=get_basket_size
+            basket=basket,
         )
 
     @app_obj.context_processor
@@ -162,80 +165,11 @@ def get_user_currency(default='GBP'):
 
 
 def set_user_currency(currency):
-    for purchase in get_basket():
+    basket = Basket(current_user, session.get('basket_purchase_ids', []))
+    for purchase in basket:
         purchase.change_currency(currency)
     session['currency'] = currency
 
-
-def get_basket_cost(basket):
-    return sum([p.price.value for p in basket], 0)
-
-def get_basket():
-    if current_user.is_anonymous:
-        ids = session.get('reserved_purchase_ids', [])
-        if ids:
-            basket = Purchase.query.filter_by(state='reserved',
-                                              payment_id=None,
-                                              owner_id=None) \
-                                   .filter(Purchase.id.in_(ids)) \
-                                   .order_by(Purchase.id) \
-                                   .all()
-        else:
-            basket = []
-
-    else:
-        basket = current_user.purchased_products \
-                             .filter_by(state='reserved', payment_id=None) \
-                             .order_by(Purchase.id) \
-                             .all()
-
-    return basket
-
-def get_basket_and_total():
-    basket = get_basket()
-    if not basket:
-        return [], 0
-
-    total = get_basket_cost(basket)
-    app.logger.debug('Got basket %s with total %s', basket, total)
-    return basket, total
-
-def get_basket_size():
-    return len(get_basket())
-
-def empty_basket():
-    basket = get_basket()
-
-    for purchase in basket:
-        purchase.cancel()
-
-    session.pop('reserved_purchase_ids', None)
-    db.session.commit()
-
-
-# This creates the user's items in the reserved state.
-def create_basket(items):
-    user = current_user
-    if user.is_anonymous:
-        user = None
-
-    currency = get_user_currency()
-
-    basket = []
-    try:
-        for tier, count in items:
-            basket += Purchase.create_purchases(user, tier, currency, count)
-
-    except:
-        db.session.rollback()
-        raise
-
-    db.session.commit()
-    app.logger.info('Made basket with: %s', basket)
-
-    total = get_basket_cost(basket)
-    app.logger.debug('Added tickets to db for basket %s with total %s', basket, total)
-    return basket, total
 
 
 def feature_flag(feature):
