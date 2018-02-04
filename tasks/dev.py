@@ -69,6 +69,9 @@ class MakeFakeTickets(Command):
             try:
                 # Choose a random number and type of tickets for this user
 
+                # FIXME: use Basket()
+                raise NotImplementedError()
+
                 full_count = random.choice([1] * 3 + [2, 3])
                 full_type = Product.get_by_name('general', 'full').get_cheapest()
                 full_tickets = Purchase.create_purchases(user, full_type, 'GBP', full_count)

@@ -83,8 +83,8 @@ def main(flow=None):
 
     is_new_basket = request.args.get('is_new_basket', False)
     if is_new_basket:
-        basket = Basket(current_user, session.get('basket_purchase_ids', []))
-        basket.empty()
+        basket = Basket(current_user, get_user_currency(), session.get('basket_purchase_ids', []))
+        basket.clear()
         session.pop('basket_purchase_ids', None)
         return redirect(url_for('tickets.main', flow=flow))
 
@@ -151,14 +151,13 @@ def main(flow=None):
             set_user_currency(form.currency_code.data)
             db.session.commit()
 
-            basket = Basket(current_user, session.get('basket_purchase_ids', []))
+            basket = Basket(current_user, get_user_currency(), session.get('basket_purchase_ids', []))
             for f in form.tiers:
                 if f.amount.data:
                     pt = f._tier
                     app.logger.info('Adding %s %s tickets to basket', f.amount.data, pt.name)
                     tier = PriceTier.query.get(pt.id)
-                    # FIXME: check capacity/availability?
-                    basket.set_line(tier, f.amount.data)
+                    basket[tier] = f.amount.data
 
             try:
                 basket.create_purchases()
@@ -173,8 +172,8 @@ def main(flow=None):
                 return redirect(url_for("tickets.main", flow=flow))
 
 
-            if any(line.count for line in basket.lines):
-                app.logger.info('total: %s lines: %s', basket.total, basket.lines)
+            if any(basket.values()):
+                app.logger.info('Basket total: %s lines: %s', basket.total, basket.items())
                 if current_user.is_anonymous:
                     session['basket_purchase_ids'] = [p.id for p in basket.purchases]
 
@@ -221,8 +220,8 @@ def pay(flow=None):
         del form.email
         del form.name
 
-    basket = Basket(current_user, session.get('basket_purchase_ids', []))
-    if not any(line.count for line in basket.lines):
+    basket = Basket(current_user, get_user_currency(), session.get('basket_purchase_ids', []))
+    if not any(basket.values()):
         if flow == 'main':
             flash("Please select at least one ticket to buy.")
         else:
@@ -258,8 +257,7 @@ def pay(flow=None):
             payment_type = StripePayment
 
         basket.user = user
-        payment = basket.create_payment(payment_type, get_user_currency())
-        # return any unnecessary reservations
+        payment = basket.create_payment(payment_type)
         basket.cancel_extra_purchases()
         db.session.commit()
 

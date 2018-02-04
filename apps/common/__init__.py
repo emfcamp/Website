@@ -64,8 +64,8 @@ def load_utility_functions(app_obj):
             SITE_STATE = request.args.get("site_state", SITE_STATE)
             SALES_STATE = request.args.get("sales_state", SALES_STATE)
 
-        # This is a big hit for every page. Do we really need it?
-        basket = Basket(current_user, session.get('basket_purchase_ids', []))
+        # FIXME: store the basket length in the session instead of this
+        basket = Basket(current_user, get_user_currency(), session.get('basket_purchase_ids', []))
 
         return dict(
             SALES_STATE=SALES_STATE,
@@ -165,8 +165,8 @@ def get_user_currency(default='GBP'):
 
 
 def set_user_currency(currency):
-    basket = Basket(current_user, session.get('basket_purchase_ids', []))
-    for purchase in basket:
+    basket = Basket(current_user, get_user_currency(), session.get('basket_purchase_ids', []))
+    for purchase in basket.purchases:
         purchase.change_currency(currency)
     session['currency'] = currency
 

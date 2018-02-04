@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 import logging
 
 from flask import (
@@ -27,10 +28,18 @@ def transfer_start(payment):
 
     logger.info("Created bank payment %s (%s)", payment.id, payment.bankref)
 
+    # No extra preparation required for bank transfer. We can go straight to inprogress.
+
+    if payment.currency == 'GBP':
+        days = app.config.get('EXPIRY_DAYS_TRANSFER')
+    elif payment.currency == 'EUR':
+        days = app.config.get('EXPIRY_DAYS_TRANSFER_EURO')
+
+    payment.expires = datetime.utcnow() + timedelta(days=days)
     payment.state = "inprogress"
 
-    for product in current_user.purchased_products.filter_by(state='reserved').all():
-        product.set_state('payment-pending')
+    for purchase in payment.purchases:
+        purchase.set_state('payment-pending')
 
     db.session.commit()
 

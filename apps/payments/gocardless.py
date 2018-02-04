@@ -63,9 +63,11 @@ def gocardless_start(payment):
     logger.debug('GoCardless redirect ID: %s', redirect_flow.id)
     assert payment.redirect_id is None
     payment.redirect_id = redirect_flow.id
+
     # "Redirect flows expire 30 minutes after they are first created. You cannot complete an expired redirect flow."
     # https://developer.gocardless.com/api-reference/#core-endpoints-redirect-flows
     payment.expires = datetime.utcnow() + timedelta(minutes=30)
+
     db.session.commit()
 
     return redirect(redirect_flow.redirect_url)

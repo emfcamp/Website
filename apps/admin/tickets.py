@@ -134,6 +134,9 @@ def tickets_choose_free(user_id=None):
             user = User(form.email.data, form.name.data)
             flash('Created account for %s' % form.email.data)
 
+        # FIXME: use Basket()
+        raise NotImplementedError()
+
         tickets = []
         for f in form.price_tiers:
             if f.amount.data:
