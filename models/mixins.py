@@ -20,7 +20,7 @@ class CapacityMixin(object):
 
     # A max capacity of None implies no max (or use parent's if set)
     capacity_max = db.Column(db.Integer, default=None)
-    capacity_used = db.Column(db.Integer, default=0, server_onupdate=FetchedValue())
+    capacity_used = db.Column(db.Integer, default=0, nullable=False, server_onupdate=FetchedValue())
 
     expires = db.Column(db.DateTime)
 
