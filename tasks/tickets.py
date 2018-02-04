@@ -45,9 +45,9 @@ def create_product_groups():
     general = ProductGroup.get_by_name('general')
 
     products = [
-        # name, display name, transferable, badge, capacity, description, (early cap, gbp, eur), (std cap, gbp eur), (late cap, gbp, eur)
+        # name, display name, transferable, badge, capacity, description, (std cap, gbp eur), (early cap, gbp, eur), (late cap, gbp, eur)
         ('full', 'Full Camp Ticket', True, True, None, 'Full ticket',
-            ((250, 105, 125), (1500, 115, 135), (None, 125, 145))
+            ((1500, 115, 135), (250, 105, 125), (None, 125, 145))
         ),
         ('full-s', 'Full Camp Ticket (Supporter)', True, True, None, 'Support this non-profit event by paying a bit more. All money will go towards making EMF more awesome.',
             ((None, 150, 180),)
@@ -74,20 +74,22 @@ def create_product_groups():
                                  'has_badge': has_badge})
 
         for index, (price_cap, gbp, eur) in enumerate(prices):
-            if len(prices) == 1:
+            if len(prices) == 1 or index == 0:
                 tier_name = name + '-std'
+                active = True
 
-            elif index == 0:
-                tier_name = name + '-early-bird'
             elif index == 1:
-                tier_name = name + '-std'
+                tier_name = name + '-early-bird'
+                active = False
+
             elif index == 2:
                 tier_name = name + '-late'
+                active = False
 
             if PriceTier.get_by_name('general', 'name', tier_name):
                 continue
 
-            pt = PriceTier(name=tier_name, capacity_max=price_cap, personal_limit=10, parent=product)
+            pt = PriceTier(name=tier_name, capacity_max=price_cap, personal_limit=10, parent=product, active=active)
             Price(currency='GBP', price_int=gbp * 100, price_tier=pt)
             Price(currency='EUR', price_int=eur * 100, price_tier=pt)
 
