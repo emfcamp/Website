@@ -311,10 +311,10 @@ class AnonymousUser(AnonymousUserMixin):
         which is stored in the session.
     """
     def __init__(self, id):
-        self.id = id
+        self.anon_id = id
 
     def get_id(self):
-        return self.id
+        return self.anon_id
 
 
 def load_anonymous_user():
