@@ -1,0 +1,57 @@
+{% extends 'volunteering/base.html' %}
+{% from "_formhelpers.html" import render_field %}
+
+{% macro shift_cell(col_name, shifts) -%}
+<td>
+    {% if col_name not in shifts %}
+        --
+    {% else %}
+        <a href="{{ url_for('.shift', id=shifts[col_name]) }}">Do {{ col_name }} shift</a>
+    {% endif %}
+</td>
+{%- endmacro %}
+
+{% block title %}
+    Volunteer Schedule
+{% endblock %}
+{% block body %}
+    <from class="form-horizontal" submit="POST">
+        <h2>Filters</h2>
+        {{ render_field(form.trained_for) }}
+        {{ render_field(form.roles) }}
+        {{ render_field(form.location) }}
+    </from>
+
+    {# FIXME these tabs should work either via pure JS or server #}
+    <ul class="nav nav-tabs" role="navigation" role="menu">
+        <li role="presentation" class="active"><a href="#">Friday</a></li>
+        <li role="presentation"><a href="#">Saturday</a></li>
+        <li role="presentation"><a href="#">Sunday</a></li>
+    </ul>
+    <div class="tab-content">
+        {# FIXME oh gods we need another schedule viewer... #}
+        <table class="table table-bordered">
+            <thead><tr>
+                <th>Time</th>
+                {# FIXME locations should be dynamic not hard-coded #}
+                {# FIXME make the locations reflect the filters #}
+                <th>Bar</th>
+                <th>Bar (secret)</th>
+                <th>Gate</th>
+                <th>Stage A</th>
+                <th>Stage B</th>
+                <th>Stage C</th>
+            </tr></thead>
+            <tbody>
+                {% for time_slot in all_shifts %}
+                    <tr>
+                        <th scope="row">{{ time_slot['time'] }}:00</th>
+                    {% for col_name in locations %}
+                        {{ shift_cell(col_name, time_slot['shifts']) }}
+                    {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

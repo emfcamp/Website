@@ -1,0 +1,27 @@
+{% extends 'volunteering/base.html' %}
+{% from "_formhelpers.html" import render_field %}
+
+{% block title %}
+    EMF Volunteer Sign-Up
+{% endblock %}
+{% block body %}
+    <h1>Sign up to volunteer at Electromagnetic Field</h1>
+    <form class="form-horizontal" method="post">
+        {{ form.hidden_tag() }}
+        {% if current_user.is_anonymous %}
+            {{ render_field(form.name) }}
+            {{ render_field(form.email) }}
+        {% else %}
+            <p>
+                Because you already have an account with us we'll use that.
+            </p>
+        {% endif %}
+        {{ render_field(form.age) }}
+        {{ render_field(form.phone_number) }}
+        <div class="pull-right">
+            <button type="submit" class="btn btn-success debounce">
+                Volunteer!
+            </button>
+        </div>
+    </form>
+{% endblock %}
