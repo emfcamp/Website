@@ -159,25 +159,24 @@ def main(flow=None):
                     tier = PriceTier.query.get(pt.id)
                     basket[tier] = f.amount.data
 
-            try:
-                basket.create_purchases()
-                basket.ensure_purchase_capacity()
-
-                db.session.commit()
-
-            except CapacityException as e:
-                app.logger.warn('Limit exceeded creating tickets: %s', e)
-                flash("We're very sorry, but there is not enough capacity available to "
-                      "allocate these tickets. You may be able to try again with a smaller amount.")
-                return redirect(url_for("tickets.main", flow=flow))
-
-
             if any(basket.values()):
-                app.logger.info('Basket total: %s lines: %s', basket.total, basket.items())
-                if current_user.is_anonymous:
-                    session['basket_purchase_ids'] = [p.id for p in basket.purchases]
+                try:
+                    basket.create_purchases()
+                    basket.ensure_purchase_capacity()
+
+                    db.session.commit()
+
+                except CapacityException as e:
+                    app.logger.warn('Limit exceeded creating tickets: %s', e)
+                    flash("We're very sorry, but there is not enough capacity available to "
+                          "allocate these tickets. You may be able to try again with a smaller amount.")
+                    return redirect(url_for("tickets.main", flow=flow))
+
+                app.logger.info('Basket %s', basket)
+                session['basket_purchase_ids'] = [p.id for p in basket.purchases]
 
                 return redirect(url_for('tickets.pay', flow=flow))
+
             elif ticket_view:
                 flash("Please select at least one ticket to buy.")
             else:

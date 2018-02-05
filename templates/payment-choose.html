@@ -5,18 +5,18 @@
 {% block body %}
 
     {% if flow == 'main' %}
-    You've selected the following {% if basket|count == 1 %}ticket{% else %}
-    {{ basket|count }} tickets{% endif %}:
+    You've selected the following {% if basket.purchases|count == 1 %}ticket{% else %}
+    {{ basket.purchases|count }} tickets{% endif %}:
     {% else %}
-    You've selected the following {% if basket|count == 1 %}item{% else %}
-    {{ basket|count }} items{% endif %}:
+    You've selected the following {% if basket.purchases|count == 1 %}item{% else %}
+    {{ basket.purchases|count }} items{% endif %}:
     {% endif %}
     <ul>
-        {% for purchase in basket %}
+        {% for purchase in basket.purchases %}
         <li>{{purchase.price_tier.parent.display_name}}</li>
         {% endfor %}
     </ul>
-    <p>The total price is <b>{{ total | price(user_currency) }}</b>.
+    <p>The total price is <b>{{ basket.total | price(user_currency) }}</b>.
     If this isn't right, you can:</p>
     <form method="POST">
     {{ form.hidden_tag() }}

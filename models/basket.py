@@ -65,6 +65,9 @@ class Basket(MutableMapping):
     def __len__(self):
         return len(self._lines)
 
+    def __str__(self):
+        lines = ['{} {}'.format(line.count, line.tier) for line in self._lines]
+        return '<Basket {} ({} {})>'.format(','.join(lines), self.total, self.currency)
 
     @property
     def purchases(self):
@@ -102,9 +105,8 @@ class Basket(MutableMapping):
 
         purchases = sorted(purchases, key=get_pt)
         for tier, tier_purchases in groupby(purchases, get_pt):
-            self[tier] = len(tier_purchases)
-
-        self._purchases = purchases
+            tier_purchases = list(tier_purchases)
+            self._lines.append(Line(tier, len(tier_purchases), tier_purchases))
 
 
     def create_purchases(self):
@@ -205,7 +207,8 @@ class Basket(MutableMapping):
 
         for purchase in self.purchases:
             purchase.payment = payment
-            purchase.set_user(self.user)
+            if purchase.purchaser_id is None:
+                purchase.set_user(self.user)
 
         return payment
 
