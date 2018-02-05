@@ -52,11 +52,7 @@ class Basket(MutableMapping):
 
     def __delitem__(self, key):
         line = self._get_line(key)
-        for purchase in line.purchases:
-            purchase.set_state('cancelled')
-
-        line.tier.return_instances(len(line.purchases))
-        line.purchases = []
+        self._lines.remove(line)
 
     def __iter__(self):
         for line in list(self._lines):
@@ -68,6 +64,7 @@ class Basket(MutableMapping):
     def __str__(self):
         lines = ['{} {}'.format(line.count, line.tier) for line in self._lines]
         return '<Basket {} ({} {})>'.format(','.join(lines), self.total, self.currency)
+
 
     @property
     def purchases(self):
@@ -155,21 +152,31 @@ class Basket(MutableMapping):
                 db.session.rollback()
                 raise CapacityException('Insufficient capacity.')
 
+    def cancel_purchases(self):
+        with db.session.no_autoflush:
+            for line in self._lines:
+                for purchase in line.purchases:
+                    purchase.set_state('cancelled')
+
+                line.tier.return_instances(len(line.purchases))
+                line.purchases = []
+
     def cancel_extra_purchases(self):
         """
         Return unnecessary reservations. This will typically be done after
         creating the payment object, so users don't find they've lost a ticket
         after originally reserving it.
         """
-        for line in self._lines:
-            return_count = len(line.purchases) - line.count
-            if return_count > 0:
-                # cancel purchases from the end
-                for _, purchase in zip(range(return_count), reversed(line.purchases)):
-                    purchase.set_state('cancelled')
+        with db.session.no_autoflush:
+            for line in self._lines:
+                return_count = len(line.purchases) - line.count
+                if return_count > 0:
+                    # cancel purchases from the end
+                    for _, purchase in zip(range(return_count), reversed(line.purchases)):
+                        purchase.set_state('cancelled')
 
-                line.tier.return_instances(return_count)
-                line.purchases = line.purchases[:line.count]
+                    line.tier.return_instances(return_count)
+                    line.purchases = line.purchases[:line.count]
 
 
     def create_payment(self, payment_cls):

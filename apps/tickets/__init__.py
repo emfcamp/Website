@@ -84,7 +84,9 @@ def main(flow=None):
     is_new_basket = request.args.get('is_new_basket', False)
     if is_new_basket:
         basket = Basket(current_user, get_user_currency(), session.get('basket_purchase_ids', []))
-        basket.clear()
+        basket.cancel_purchases()
+        db.session.commit()
+
         session.pop('basket_purchase_ids', None)
         return redirect(url_for('tickets.main', flow=flow))
 
