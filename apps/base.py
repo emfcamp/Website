@@ -7,7 +7,7 @@ from requests import HTTPError
 
 from flask import (
     render_template, redirect, request, flash, Blueprint,
-    url_for, send_from_directory, abort, current_app as app
+    url_for, send_from_directory, abort, current_app as app,
 )
 
 from main import cache

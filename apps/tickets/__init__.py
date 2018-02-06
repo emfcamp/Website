@@ -83,11 +83,11 @@ def main(flow=None):
 
     is_new_basket = request.args.get('is_new_basket', False)
     if is_new_basket:
-        basket = Basket(current_user, get_user_currency(), session.get('basket_purchase_ids', []))
+        basket = Basket.from_session(current_user, get_user_currency())
         basket.cancel_purchases()
         db.session.commit()
 
-        session.pop('basket_purchase_ids', None)
+        Basket.clear_from_session()
         return redirect(url_for('tickets.main', flow=flow))
 
     sales_state = get_sales_state()
@@ -131,29 +131,52 @@ def main(flow=None):
         if product.parent.type == 'admissions':
             ticket_view = True
 
+    basket = Basket.from_session(current_user, get_user_currency())
+
     form = TicketAmountsForm()
 
+    """
+    For consistency and to avoid surprises, we try to ensure a few things here:
+    - if the user successfully submits a form with no errors, their basket is updated
+    - if they don't, the basket is left untouched
+    - the basket is updated to match, even if they've sneakily added tickets in another tab
+    - if they already have tickets in their basket, only reserve the extra tickets as necessary
+    - don't unreserve surplus tickets until the payment is created
+    - if the user hasn't submitted anything, we use their current reserved ticket counts
+    - if the user has reserved tickets from exhausted tiers on this view, we still show them
+    - if the user has reserved tickets from other views, don't show and don't mess with them
+
+    We currently don't deal with multiple price tiers being available around the same time.
+    Reserved tickets from a previous tier should be cancelled before activating a new one.
+    """
     if request.method != 'POST':
         # Empty form - populate products
-        for pt_id in tiers.keys():
+        for pt_id, tier in tiers.items():
             form.tiers.append_entry()
-            form.tiers[-1].tier_id.data = pt_id
+            f = form.tiers[-1]
+            f.tier_id.data = pt_id
 
+            f.amount.data = basket.get(tier, 0)
+
+
+    # Whether submitted or not, update the allowed amounts before validating
     for f in form.tiers:
         pt_id = f.tier_id.data
-        f._tier = tiers[pt_id]
+        tier = tiers[pt_id]
+        f._tier = tier
 
-        user_limit = tiers[pt_id].user_limit()
+        # If they've already got reserved tickets, let them keep them
+        user_limit = max(tier.user_limit(), basket.get(tier, 0))
         values = range(user_limit + 1)
         f.amount.values = values
         f._any = any(values)
+
 
     if form.validate_on_submit():
         if form.buy.data or form.buy_other.data:
             set_user_currency(form.currency_code.data)
             db.session.commit()
 
-            basket = Basket(current_user, get_user_currency(), session.get('basket_purchase_ids', []))
             for f in form.tiers:
                 if f.amount.data:
                     pt = f._tier
@@ -175,7 +198,7 @@ def main(flow=None):
                     return redirect(url_for("tickets.main", flow=flow))
 
                 app.logger.info('Basket %s', basket)
-                session['basket_purchase_ids'] = [p.id for p in basket.purchases]
+                basket.save_to_session()
 
                 return redirect(url_for('tickets.pay', flow=flow))
 
@@ -221,7 +244,7 @@ def pay(flow=None):
         del form.email
         del form.name
 
-    basket = Basket(current_user, get_user_currency(), session.get('basket_purchase_ids', []))
+    basket = Basket.from_session(current_user, get_user_currency())
     if not any(basket.values()):
         if flow == 'main':
             flash("Please select at least one ticket to buy.")
@@ -259,10 +282,10 @@ def pay(flow=None):
 
         basket.user = user
         payment = basket.create_payment(payment_type)
-        basket.cancel_extra_purchases()
+        basket.cancel_surplus_purchases()
         db.session.commit()
 
-        session.pop('basket_purchase_ids', None)
+        Basket.clear_from_session()
 
         if not payment:
             app.logger.warn('User tried to pay for empty basket')

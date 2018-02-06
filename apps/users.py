@@ -1,4 +1,5 @@
 import re
+
 from flask import (
     render_template, redirect, request, flash,
     url_for, abort, Blueprint, current_app as app,
@@ -18,6 +19,7 @@ from models.user import User, UserDiversity
 from models.cfp import Proposal, CFPMessage
 from models.purchase import Purchase
 from models.payment import Payment
+from models.basket import Basket
 
 from .common import (
     set_user_currency, send_template_email, feature_flag,
@@ -99,7 +101,7 @@ def login():
 @login_required
 def logout():
     session.permanent = False
-    session.pop('basket_purchase_ids', None)
+    Basket.clear_from_session()
     logout_user()
     return redirect(url_for('base.main'))
 

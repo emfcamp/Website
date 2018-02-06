@@ -1,12 +1,14 @@
 from collections.abc import MutableMapping
 from itertools import groupby
 
-from flask import current_app as app
+from flask import current_app as app, session
+from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 
 from main import db
 from .exc import CapacityException
 from .purchase import Purchase, Ticket, AdmissionTicket
+from .user import User
 
 class Line:
     def __init__(self, tier, count, purchases=None):
@@ -25,12 +27,28 @@ class Basket(MutableMapping):
     ids should be trustworthy (e.g. stored in flask.session)
     """
 
-    def __init__(self, user, currency, ids):
+    def __init__(self, user, currency, ids, surplus_ids):
         self.user = user
         self.currency = currency
         self._lines = []
-        self._ids = ids
-        self.load_purchases()
+        self.load_purchases(ids, surplus_ids)
+
+    @classmethod
+    def from_session(self, user, currency):
+        purchases = session.get('basket_purchase_ids', [])
+        surplus_purchases = session.get('basket_surplus_purchase_ids', [])
+        basket = Basket(user, currency, purchases, surplus_purchases)
+        return basket
+
+    @classmethod
+    def clear_from_session(self):
+        session.pop('basket_purchase_ids', None)
+        session.pop('basket_surplus_purchase_ids', None)
+
+    def save_to_session(self):
+        session['basket_purchase_ids'] = [p.id for p in self.purchases]
+        session['basket_surplus_purchase_ids'] = [p.id for p in self.surplus_purchases]
+
 
     def _get_line(self, tier):
         for line in self._lines:
@@ -68,7 +86,17 @@ class Basket(MutableMapping):
 
     @property
     def purchases(self):
-        return [p for line in self._lines for p in line.purchases]
+        return [p for line in self._lines for p in line.purchases[:line.count]]
+
+    @property
+    def surplus_purchases(self):
+        return [p for line in self._lines for p in line.purchases[line.count:]]
+
+    def set_currency(self, currency):
+        for line in self._lines:
+            for purchase in line.purchases:
+                purchase.change_currency(currency)
+
 
     @property
     def total(self):
@@ -79,31 +107,38 @@ class Basket(MutableMapping):
 
         return total
 
-    def load_purchases(self):
-        if self._ids:
-            purchases = set(
-                Purchase.query.filter_by(state='reserved', payment_id=None)
-                              .filter(Purchase.id.in_(self._ids))
-                              .options(joinedload(Purchase.price_tier))
-            )
+    def load_purchases(self, ids, surplus_ids):
+        ids = set(ids)
+        surplus_ids = set(surplus_ids)
 
-        else:
-            purchases = set()
+        criteria = []
+        if ids | surplus_ids:
+            criteria.append(Purchase.id.in_(ids | surplus_ids))
 
         if self.user.is_authenticated:
-            purchases |= set(
-                self.user.purchased_products
-                         .filter_by(state='reserved', payment_id=None)
-                         .options(joinedload(Purchase.price_tier))
-            )
+            criteria.append(User.id == self.user.id)
+
+        if criteria:
+            all_purchases = Purchase.query.filter_by(state='reserved', payment_id=None) \
+                                          .filter(or_(*criteria)) \
+                                          .options(joinedload(Purchase.price_tier)) \
+                                          .all()
+
+        else:
+            all_purchases = []
 
         def get_pt(p):
             return p.price_tier
 
-        purchases = sorted(purchases, key=get_pt)
-        for tier, tier_purchases in groupby(purchases, get_pt):
-            tier_purchases = list(tier_purchases)
-            self._lines.append(Line(tier, len(tier_purchases), tier_purchases))
+        all_purchases = sorted(all_purchases, key=get_pt)
+        for tier, tier_purchases in groupby(all_purchases, get_pt):
+            tier_purchases = sorted(tier_purchases, key=lambda p: p.id)
+
+            purchases = [p for p in tier_purchases if p.id in ids]
+            surplus_purchases = [p for p in tier_purchases if p.id in surplus_ids]
+
+            app.logger.debug('Basket line: %s %s %s', tier, purchases, surplus_purchases)
+            self._lines.append(Line(tier, len(purchases), purchases + surplus_purchases))
 
 
     def create_purchases(self):
@@ -114,6 +149,7 @@ class Basket(MutableMapping):
         if user.is_anonymous:
             user = None
 
+        purchases_to_flush = []
         with db.session.no_autoflush:
             for line in self._lines:
                 issue_count = line.count - len(line.purchases)
@@ -134,10 +170,16 @@ class Basket(MutableMapping):
                         purchase_cls = Purchase
 
                     price = line.tier.get_price(self.currency)
-                    line.purchases += [purchase_cls(price=price, user=user) for _ in range(issue_count)]
+                    purchases = [purchase_cls(price=price, user=user) for _ in range(issue_count)]
+                    line.purchases += purchases
+                    purchases_to_flush += purchases
 
                 # If there are already reserved tickets, leave them.
                 # The user will complete their purchase soon.
+
+        # Insert the purchases right away, as column_property and
+        # polymorphic columns are reloaded from the DB after insert
+        db.session.flush(purchases_to_flush)
 
     def ensure_purchase_capacity(self):
         """
@@ -159,9 +201,10 @@ class Basket(MutableMapping):
                     purchase.set_state('cancelled')
 
                 line.tier.return_instances(len(line.purchases))
-                line.purchases = []
 
-    def cancel_extra_purchases(self):
+        self._lines = []
+
+    def cancel_surplus_purchases(self):
         """
         Return unnecessary reservations. This will typically be done after
         creating the payment object, so users don't find they've lost a ticket
@@ -169,13 +212,12 @@ class Basket(MutableMapping):
         """
         with db.session.no_autoflush:
             for line in self._lines:
-                return_count = len(line.purchases) - line.count
-                if return_count > 0:
-                    # cancel purchases from the end
-                    for _, purchase in zip(range(return_count), reversed(line.purchases)):
+                if line.count < len(line.purchases):
+                    line.tier.return_instances(len(line.purchases) - line.count)
+
+                    for purchase in line.purchases[line.count:]:
                         purchase.set_state('cancelled')
 
-                    line.tier.return_instances(return_count)
                     line.purchases = line.purchases[:line.count]
 
 
