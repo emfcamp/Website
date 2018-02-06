@@ -465,7 +465,7 @@ def gocardless_payment_cancelled(resource, action, event):
 
 
 @webhook('payments', 'confirmed')
-def gocardless_payment_paid(resource, action, event):
+def gocardless_payment_confirmed(resource, action, event):
 
     gcid = event['links']['payment']
     try:
@@ -478,8 +478,8 @@ def gocardless_payment_paid(resource, action, event):
                 gcid, payment.id)
 
     gc_payment = gocardless_client.payments.get(payment.gcid)
-    if gc_payment.status != 'paid':
-        logger.error("Payment status is %s (should be paid), ignoring", gc_payment.status)
+    if gc_payment.status != 'confirmed':
+        logger.error("Payment status is %s (should be confirmed), ignoring", gc_payment.status)
         return
 
     if payment.state == 'paid':
