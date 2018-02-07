@@ -11,7 +11,7 @@
 <dt>Price</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
 <dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
 <dt>Expires</dt><dd>{{ payment.expires and payment.expires.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
-<dt>Already bought</dt><dd>{{ payment.user.tickets.filter_by(paid=True).all() | count }}</dd>
+<dt>Already bought</dt><dd>{{ payment.user.owned_tickets.filter_by(is_paid_for=True).all() | count }}</dd>
 </dl>
 
 <table class="table table-condensed table-striped">
