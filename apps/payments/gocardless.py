@@ -336,7 +336,7 @@ def gocardless_webhook():
 
 
 @webhook()
-def gocardless_default(resource, action, event):
+def gocardless_webhook_default(resource, action, event):
     logger.info("Default handler called for %s", event)
 
 
@@ -349,7 +349,7 @@ def gocardless_default(resource, action, event):
 @webhook('mandates', 'failed')
 @webhook('mandates', 'expired')
 @webhook('mandates', 'replaced')
-def gocardless_mandate_ignore(resource, action, event):
+def gocardless_webhook_mandate_ignore(resource, action, event):
     """ Ignore mandate-related noise
         https://developer.gocardless.com/api-reference/#events-mandate-actions
     """
@@ -360,7 +360,7 @@ def gocardless_mandate_ignore(resource, action, event):
 @webhook('payments', 'created')
 @webhook('payments', 'submitted')
 @webhook('payments', 'paid_out')
-def gocardless_payment_do_nothing(resource, action, event):
+def gocardless_webhook_payment_do_nothing(resource, action, event):
     gcid = event['links']['payment']
     try:
         payment = GoCardlessPayment.query.filter_by(gcid=gcid).one()
@@ -373,7 +373,7 @@ def gocardless_payment_do_nothing(resource, action, event):
 
 
 @webhook('payments', 'failed')
-def gocardless_payment_failed(resource, action, event):
+def gocardless_webhook_payment_failed(resource, action, event):
 
     gcid = event['links']['payment']
     try:
@@ -404,7 +404,7 @@ def gocardless_payment_failed(resource, action, event):
 
 
 @webhook('payments', 'resubmission_requested')
-def gocardless_payment_retried(resource, action, event):
+def gocardless_webhook_payment_retried(resource, action, event):
 
     gcid = event['links']['payment']
     try:
@@ -434,7 +434,7 @@ def gocardless_payment_retried(resource, action, event):
 
 
 @webhook('payments', 'cancelled')
-def gocardless_payment_cancelled(resource, action, event):
+def gocardless_webhook_payment_cancelled(resource, action, event):
 
     gcid = event['links']['payment']
     try:
@@ -452,7 +452,7 @@ def gocardless_payment_cancelled(resource, action, event):
         return
 
     if payment.state == 'cancelled':
-        logger.info('Payment is already cancelled, skipping')
+        logger.info('Payment is already cancelled, ignoring')
         return
 
     if payment.state != 'inprogress':
@@ -465,7 +465,7 @@ def gocardless_payment_cancelled(resource, action, event):
 
 
 @webhook('payments', 'confirmed')
-def gocardless_payment_confirmed(resource, action, event):
+def gocardless_webhook_payment_confirmed(resource, action, event):
 
     gcid = event['links']['payment']
     try:
@@ -482,8 +482,24 @@ def gocardless_payment_confirmed(resource, action, event):
         logger.error("Payment status is %s (should be confirmed or paid_out), ignoring", gc_payment.status)
         return
 
+    gocardless_payment_paid(payment)
+
+
+def gocardless_update_payment(payment):
+    gc_payment = gocardless_client.payments.get(payment.gcid)
+    if gc_payment.status in {'confirmed', 'paid_out'}:
+        return gocardless_payment_paid(payment)
+
+    app.logger.warn('Payment object is not paid, ignoring')
+
+
+def gocardless_payment_paid(payment):
     if payment.state == 'paid':
-        logger.info('Payment is already paid, skipping')
+        logger.info('Payment is already paid, ignoring')
+        return
+
+    if payment.state == 'partrefunded':
+        logger.info('Payment is already partially refunded, ignoring')
         return
 
     if payment.state != 'inprogress':

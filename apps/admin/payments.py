@@ -26,6 +26,7 @@ from ..payments.stripe import (
     StripeUpdateUnexpected, StripeUpdateConflict, stripe_update_payment,
     stripe_payment_refunded,
 )
+from ..payments.gocardless import gocardless_update_payment
 
 
 @admin.route('/payments')
@@ -129,7 +130,7 @@ class UpdatePaymentForm(Form):
 def update_payment(payment_id):
     payment = Payment.query.get_or_404(payment_id)
 
-    if payment.provider != 'stripe':
+    if payment.provider not in {'gocardless', 'stripe'}:
         abort(404)
 
     form = UpdatePaymentForm()
@@ -137,14 +138,18 @@ def update_payment(payment_id):
         if form.update.data:
             app.logger.info('Requesting updated status for %s payment %s', payment.provider, payment.id)
 
-            try:
-                stripe_update_payment(payment)
-            except StripeUpdateConflict:
-                flash('Unable to update due to a status conflict')
-                return redirect(url_for('admin.update_payment', payment_id=payment.id))
-            except StripeUpdateUnexpected:
-                flash('Unable to update due to an unexpected response from Stripe')
-                return redirect(url_for('admin.update_payment', payment_id=payment.id))
+            if payment.provider == 'gocardless':
+                gocardless_update_payment(payment)
+
+            elif payment.provider == 'stripe':
+                try:
+                    stripe_update_payment(payment)
+                except StripeUpdateConflict:
+                    flash('Unable to update due to a status conflict')
+                    return redirect(url_for('admin.update_payment', payment_id=payment.id))
+                except StripeUpdateUnexpected:
+                    flash('Unable to update due to an unexpected response from Stripe')
+                    return redirect(url_for('admin.update_payment', payment_id=payment.id))
 
             flash('Payment status updated')
             return redirect(url_for('admin.update_payment', payment_id=payment.id))
