@@ -117,6 +117,23 @@ class Payment(db.Model):
         # Just use the default calculation
         return cls.premium(currency, amount)
 
+    def change_currency(self, currency):
+        if self.state in {'paid', 'partrefunded', 'refunded'}:
+            raise StateException('Cannot change currency after payment is reconciled')
+
+        if self.currency == currency:
+            raise Exception('Currency is already {}'.format(currency))
+
+        # Sanity check
+        assert self.amount == sum(p.price.value for p in self.purchases)
+
+        for p in self.purchases:
+            p.change_currency(currency)
+
+        self.amount = sum(p.price.value for p in self.purchases)
+        # If we added a premium, it would need to be added again here
+        self.currency = currency
+
     def paid(self):
         if self.state == 'paid':
             raise StateException('Payment is already paid')
