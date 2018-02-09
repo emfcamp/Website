@@ -1,11 +1,13 @@
 import logging
+
 from flask import (
     render_template, redirect, request, flash,
     url_for, current_app as app
 )
 from flask_login import login_required, current_user
 from flask_mail import Message
-from wtforms import SubmitField
+from wtforms import SubmitField, HiddenField
+from wtforms.validators import Required, AnyOf
 
 from main import db, mail
 from ..common import get_user_currency, feature_enabled
@@ -42,14 +44,57 @@ def transfer_start(payment):
     return redirect(url_for('payments.transfer_waiting', payment_id=payment.id))
 
 
+class TransferChangeCurrencyForm(Form):
+    currency = HiddenField('New currency', [Required(), AnyOf(['EUR', 'GBP'])])
+    change = SubmitField('Change currency')
+
 @payments.route("/pay/transfer/<int:payment_id>/waiting")
 @login_required
 def transfer_waiting(payment_id):
+    form = TransferChangeCurrencyForm(request.form)
+
     payment = get_user_payment_or_abort(
         payment_id, 'banktransfer',
         valid_states=['inprogress'],
     )
-    return render_template('transfer-waiting.html', payment=payment, days=app.config['EXPIRY_DAYS_TRANSFER'])
+
+    if payment.currency == 'GBP':
+        form.currency.data = 'EUR'
+    elif payment.currency == 'EUR':
+        form.currency.data = 'GBP'
+
+    return render_template('transfer-waiting.html', payment=payment,
+                           form=form, days=app.config['EXPIRY_DAYS_TRANSFER'])
+
+
+@payments.route("/pay/transfer/<int:payment_id>/change-currency", methods=['POST'])
+@login_required
+def transfer_change_currency(payment_id):
+    payment = get_user_payment_or_abort(
+        payment_id, 'banktransfer',
+        valid_states=['inprogress'],
+    )
+
+    form = TransferChangeCurrencyForm(request.form)
+    if form.validate_on_submit():
+        if form.change.data:
+            logger.info('Changing currency for bank transfer %s', payment.id)
+
+            currency = form.currency.data
+
+            if currency == payment.currency:
+                flash("Currency is already {}".format(currency))
+                return redirect(url_for('payments.transfer_waiting', payment_id=payment.id))
+
+            payment.change_currency(currency)
+            db.session.commit()
+
+            logging.info('Payment %s changed to %s', payment.id, currency)
+            flash("Currency changed to {}".format(currency))
+
+        return redirect(url_for('payments.transfer_waiting', payment_id=payment.id))
+
+    return redirect(url_for('payments.transfer_waiting', payment_id=payment.id))
 
 
 class TransferCancelForm(Form):
