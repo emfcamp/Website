@@ -1,21 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% block title %}Electromagnetic Field{% endblock %}</title>
-        {% assets 'https://netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css',
-                  'https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css' -%}
+{% extends "base.html" %}
+{% block css %}
+    {% assets "css_arrivals" -%}
         <link rel="stylesheet" href="{{ ASSET_URL }}">
-        {% endassets -%}
-        {% assets "css_arrivals" -%}
-        <link rel="stylesheet" href="{{ ASSET_URL }}">
-        {% endassets -%}
-        {% block head -%}{% endblock -%}
-        <link rel="shortcut icon" href="/favicon.ico">
-    </head>
-<body>
+    {% endassets -%}
+{% endblock %}
+
 {% block document %}
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
@@ -46,17 +35,11 @@
     </div>
 </div>
 {% endblock %}
-{% assets 'https://code.jquery.com/jquery-1.11.3.min.js',
-          'https://netdna.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js',
-          'https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js',
+
+{% block foot %}
+{% assets 'https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js',
           'https://bartaz.github.io/sandbox.js/jquery.highlight.js',
           'https://cdn.datatables.net/plug-ins/1.10.12/features/searchHighlight/dataTables.searchHighlight.min.js' %}
 <script type="text/javascript" src="{{ ASSET_URL }}"></script>
 {% endassets %}
-{% assets 'js_main' %}
-<script type="text/javascript" src="{{ ASSET_URL }}"></script>
-{% endassets %}
-{% block foot -%}{% endblock -%}
-</body>
-</html>
-
+{% endblock -%}
