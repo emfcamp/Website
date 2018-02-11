@@ -64,8 +64,7 @@ def load_utility_functions(app_obj):
             SITE_STATE = request.args.get("site_state", SITE_STATE)
             SALES_STATE = request.args.get("sales_state", SALES_STATE)
 
-        # FIXME: store the basket length in the session instead of this
-        basket = Basket.from_session(current_user, get_user_currency())
+        basket_count = len(session.get('basket_purchase_ids', []))
 
         return dict(
             SALES_STATE=SALES_STATE,
@@ -74,7 +73,7 @@ def load_utility_functions(app_obj):
             CURRENCY_SYMBOLS=CURRENCY_SYMBOLS,
             external_url=external_url,
             feature_enabled=feature_enabled,
-            basket=basket,
+            basket_count=basket_count,
         )
 
     @app_obj.context_processor

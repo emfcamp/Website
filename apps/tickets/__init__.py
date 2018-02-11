@@ -139,7 +139,7 @@ def main(flow=None):
     For consistency and to avoid surprises, we try to ensure a few things here:
     - if the user successfully submits a form with no errors, their basket is updated
     - if they don't, the basket is left untouched
-    - the basket is updated to match, even if they've sneakily added tickets in another tab
+    - the basket is updated to match what was submitted, even if they added tickets in another tab
     - if they already have tickets in their basket, only reserve the extra tickets as necessary
     - don't unreserve surplus tickets until the payment is created
     - if the user hasn't submitted anything, we use their current reserved ticket counts
@@ -174,8 +174,10 @@ def main(flow=None):
 
     if form.validate_on_submit():
         if form.buy.data or form.buy_other.data:
-            set_user_currency(form.currency_code.data)
-            db.session.commit()
+            if form.currency_code.data != get_user_currency():
+                set_user_currency(form.currency_code.data)
+                # Commit so we don't lose the currency change if an error occurs
+                db.session.commit()
 
             for f in form.tiers:
                 if f.amount.data:
@@ -185,6 +187,8 @@ def main(flow=None):
                     basket[tier] = f.amount.data
 
             if any(basket.values()):
+                app.logger.info('Basket %s', basket)
+
                 try:
                     basket.create_purchases()
                     basket.ensure_purchase_capacity()
@@ -197,7 +201,6 @@ def main(flow=None):
                           "allocate these tickets. You may be able to try again with a smaller amount.")
                     return redirect(url_for("tickets.main", flow=flow))
 
-                app.logger.info('Basket %s', basket)
                 basket.save_to_session()
 
                 return redirect(url_for('tickets.pay', flow=flow))
