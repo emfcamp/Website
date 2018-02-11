@@ -160,6 +160,7 @@ def main(flow=None):
 
 
     # Whether submitted or not, update the allowed amounts before validating
+    capacity_gone = False
     for f in form.tiers:
         pt_id = f.tier_id.data
         tier = tiers[pt_id]
@@ -167,10 +168,11 @@ def main(flow=None):
 
         # If they've already got reserved tickets, let them keep them
         user_limit = max(tier.user_limit(), basket.get(tier, 0))
+        if f.amount.data > user_limit:
+            capacity_gone = True
         values = range(user_limit + 1)
         f.amount.values = values
         f._any = any(values)
-
 
     if form.validate_on_submit():
         if form.buy.data or form.buy_other.data:
@@ -196,6 +198,8 @@ def main(flow=None):
                     db.session.commit()
 
                 except CapacityException as e:
+                    # Damn, capacity's gone since we created the purchases
+                    # Redirect back to show what's currently in the basket
                     app.logger.warn('Limit exceeded creating tickets: %s', e)
                     flash("We're very sorry, but there is not enough capacity available to "
                           "allocate these tickets. You may be able to try again with a smaller amount.")
@@ -218,6 +222,10 @@ def main(flow=None):
 
             for field in form:
                 field.errors = []
+
+    if capacity_gone:
+        flash("We're sorry, but there is not enough capacity available to "
+              "allocate these tickets. You may be able to try again with a smaller amount.")
 
     form.currency_code.data = get_user_currency()
     return render_template("tickets-choose.html", form=form, flow=flow, ticket_view=ticket_view)
