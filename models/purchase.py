@@ -38,8 +38,8 @@ class Purchase(db.Model):
 
     # User FKs
     # Store the owner & purchaser separately so that we can track payment statistics
-    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    purchaser_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
+    purchaser_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
 
     # Product FKs.
     # price_tier and product_id are denormalised for convenience.

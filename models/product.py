@@ -254,7 +254,7 @@ class ProductView(db.Model):
 
     """ A selection of products to be shown together for sale. """
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, nullable=False, index=True)
     token = db.Column(db.String, nullable=True)
 
     product_view_products = db.relationship('ProductViewProduct', backref='view', order_by='ProductViewProduct.order')
