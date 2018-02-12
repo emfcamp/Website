@@ -118,7 +118,7 @@ class Purchase(db.Model):
     def change_currency(self, currency):
         self.price = self.price_tier.get_price(currency)
 
-    def transfer(self, from_user, to_user, session):
+    def transfer(self, from_user, to_user):
         if self.state not in bought_states:
             # We don't allow reserved items to be transferred to prevent a rush
             raise PurchaseTransferException('Only paid items may be transferred.')
@@ -135,9 +135,9 @@ class Purchase(db.Model):
 
         self.owner = to_user
 
-        session.add(PurchaseTransfer(purchase=self,
-                                     to_user=to_user,
-                                     from_user=from_user))
+        PurchaseTransfer(purchase=self,
+                         to_user=to_user,
+                         from_user=from_user)
 
 
 class Ticket(Purchase):

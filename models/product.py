@@ -1,10 +1,11 @@
 from decimal import Decimal
+from collections import defaultdict
 
 from sqlalchemy import func, UniqueConstraint, inspect
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from main import db
-from .purchase import Purchase, allowed_states
+from .purchase import Purchase
 from .mixins import CapacityMixin, InheritedAttributesMixin
 
 
@@ -49,23 +50,19 @@ class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
     def get_by_name(cls, group_name):
         return ProductGroup.query.filter_by(name=group_name).one_or_none()
 
-    def get_purchase_count_by_state(self, states_to_get=None):
-        """ Return a count of purchases, broken down by state.
-            Optionally filter the states required to `states_to_get`.
-
-            Returns a dictionary of state -> count"""
-        if states_to_get is None:
-            states_to_get = allowed_states
-        res = {state: 0 for state in states_to_get}
+    @property
+    def purchase_count_by_state(self):
+        states = defaultdict(int)
 
         for child in self.children:
-            for k, v in child.get_purchase_count_by_state(states_to_get).items():
-                res[k] += v
+            for k, v in child.purchase_count_by_state.items():
+                states[k] += v
 
         for product in self.products:
-            for k, v in product.get_purchase_count_by_state(states_to_get).items():
-                res[k] += v
-        return res
+            for k, v in product.purchase_count_by_state.items():
+                states[k] += v
+
+        return dict(**states)
 
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self.name)
@@ -93,25 +90,14 @@ class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
         product = group.join(Product).filter_by(name=product_name).with_entities(Product)
         return product.one_or_none()
 
-    def get_purchase_count_by_state(self, states_to_get=None):
-        """ Return a count of purchases, broken down by state.
-            Optionally filter the states required to `states_to_get`.
+    @property
+    def purchase_count_by_state(self):
+        states = Purchase.query.join(PriceTier, Product) \
+                               .filter(Product.id == self.id) \
+                               .with_entities(Purchase.state, func.count(Purchase.id)) \
+                               .group_by(Purchase.state)
 
-            Returns a dictionary of state -> count"""
-        if states_to_get is None:
-            states_to_get = allowed_states
-
-        # Don't cascade down here for performance reasons, do a direct query.
-        cls = Purchase.class_from_product(self)
-        res = db.session.query(cls.state, func.count(cls.id)).\
-            join(PriceTier).\
-            filter(PriceTier.id.in_(t.id for t in self.price_tiers)).\
-            filter(cls.state.in_(states_to_get)).\
-            group_by(cls.state).all()
-        states = {state: 0 for state in states_to_get}
-        for k, v in res:
-            states[k] += v
-        return states
+        return dict(states)
 
     def get_cheapest_price(self, currency='GBP'):
         price = PriceTier.query.filter_by(product_id=self.id) \
@@ -158,27 +144,17 @@ class PriceTier(db.Model, CapacityMixin):
     def get_by_name(cls, group_name, product_name, tier_name):
         group = ProductGroup.query.filter_by(name=group_name)
         product = group.join(Product).filter_by(name=product_name)
-        tier = product.join(PriceTier).filter_by(name=tier_name)
+        tier = product.join(PriceTier).filter_by(name=tier_name).with_entities(PriceTier)
         return tier.one_or_none()
 
-    def get_purchase_count_by_state(self, states_to_get=None):
-        """ Return a count of purchases, broken down by state.
-            Optionally filter the states required to `states_to_get`.
+    @property
+    def purchase_count_by_state(self):
+        states = Purchase.query.join(PriceTier) \
+                               .filter(PriceTier.id == self.id) \
+                               .with_entities(Purchase.state, func.count(Purchase.id)) \
+                               .group_by(Purchase.state)
 
-            Returns a dictionary of state -> count"""
-        if states_to_get is None:
-            states_to_get = allowed_states
-
-        cls = Purchase.class_from_product(self.parent)
-        res = db.session.query(cls.state, func.count(cls.id)).\
-            filter(cls.price_tier == self).\
-            filter(cls.state.in_(states_to_get)).\
-            group_by(cls.state).all()
-
-        states = {state: 0 for state in states_to_get}
-        for k, v in res:
-            states[k] += v
-        return states
+        return dict(states)
 
     def get_price(self, currency):
         if 'prices' in inspect(self).unloaded:

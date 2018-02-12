@@ -131,3 +131,7 @@ parkingtickets:
 test:
 	SETTINGS_FILE=$(TEST_SETTINGS) pipenv run flake8 ./*.py ./models ./apps ./tasks ./utils.py
 	SETTINGS_FILE=$(TEST_SETTINGS) pipenv run pytest ./tests/ ./models/
+
+testdb:
+	SETTINGS_FILE=$(TEST_SETTINGS) pipenv run python ./utils.py db upgrade
+

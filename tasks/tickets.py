@@ -36,7 +36,8 @@ def create_product_groups():
             continue
         ProductGroup(name=name, capacity_max=capacity, parent=admissions)
 
-    if not ProductView.get_by_name('main'):
+    view = ProductView.get_by_name('main')
+    if not view:
         view = ProductView('main')
         db.session.add(view)
 
