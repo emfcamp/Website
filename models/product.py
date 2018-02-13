@@ -143,7 +143,7 @@ class PriceTier(db.Model, CapacityMixin):
     @classmethod
     def get_by_name(cls, group_name, product_name, tier_name):
         group = ProductGroup.query.filter_by(name=group_name)
-        product = group.join(Product).filter_by(name=product_name)
+        product = group.join(Product).filter_by(name=product_name).with_entities(Product)
         tier = product.join(PriceTier).filter_by(name=tier_name).with_entities(PriceTier)
         return tier.one_or_none()
 
