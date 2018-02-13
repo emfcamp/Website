@@ -355,7 +355,8 @@ def gocardless_webhook_mandate_ignore(resource, action, event):
     """ Ignore mandate-related noise
         https://developer.gocardless.com/api-reference/#events-mandate-actions
     """
-    pass
+    mandate = event['links']['mandate']
+    logger.info('Received %s action for mandate %s', action, mandate)
 
 
 # https://developer.gocardless.com/api-reference/#events-payment-actions
