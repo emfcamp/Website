@@ -13,19 +13,9 @@ from wtforms import (
     FieldList, FormField, SelectField, FloatField, IntegerField
 )
 
-from sqlalchemy.sql.functions import func
-
 from main import db
-from models.user import User
-from models.payment import (
-    Payment, BankPayment,
-    BankTransaction,
-)
-from models.product import ProductGroup, Product, PriceTier
-from models.purchase import (
-    Purchase, Ticket, AdmissionTicket,
-)
-from models.cfp import Proposal
+from models.payment import BankPayment, BankTransaction
+from models.purchase import Purchase
 from models.ical import CalendarSource
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
 from models.site_state import SiteState, VALID_STATES, refresh_states
@@ -54,81 +44,6 @@ def admin_variables():
     return {'unreconciled_count': unreconciled_count,
             'expiring_count': expiring_count,
             'view_name': request.url_rule.endpoint.replace('admin.', '.')}
-
-
-@admin.route("/stats")
-def stats():
-    paid_all = Ticket.query.filter_by(is_paid_for=True)
-    parking_paid = paid_all.join(PriceTier, Product, ProductGroup).filter_by(type='parking').count()
-    campervan_paid = paid_all.join(PriceTier, Product, ProductGroup).filter_by(type='campervan').count()
-
-    # Don't care about the state of the payment if it's paid for
-    paid = AdmissionTicket.query.filter(is_paid_for=True)
-
-    # For new payments, the user hasn't committed to paying yet
-    unpaid = AdmissionTicket.filter_by(is_paid_for=False).join(Payment).filter(
-        Payment.state != 'new',
-        Payment.state != 'cancelled',
-    )
-
-    expired = unpaid.filter_by(expired=True)
-    unexpired = unpaid.filter_by(expired=False)
-
-    # Providers who take a while to clear - don't care about captured Stripe payments
-    gocardless_unpaid = unpaid.filter(Payment.provider == 'gocardless',
-                                      Payment.state == 'inprogress')
-    banktransfer_unpaid = unpaid.filter(Payment.provider == 'banktransfer',
-                                        Payment.state == 'inprogress')
-
-    admissions_gocardless_unexpired = unexpired.filter(
-        Payment.provider == 'gocardless',
-        Payment.state == 'inprogress',
-    ).join(AdmissionTicket)
-
-    admissions_banktransfer_unexpired = unexpired.filter(
-        Payment.provider == 'banktransfer',
-        Payment.state == 'inprogress',
-    ).join(AdmissionTicket)
-
-    # These are people queries - don't care about cars or campervans being checked in
-    checked_in = AdmissionTicket.query.filter_by(checked_in=True)
-    badged_up = AdmissionTicket.query.filter_by(badged_up=True)
-
-    users = User.query  # noqa
-
-    proposals = Proposal.query
-
-    # Simple count queries
-    queries = [
-        'checked_in', 'badged_up',
-        'users',
-        'proposals',
-        'gocardless_unpaid', 'banktransfer_unpaid',
-        'full_gocardless_unexpired', 'full_banktransfer_unexpired',
-    ]
-    stats = ['{}:{}'.format(q, locals()[q].count()) for q in queries]
-
-    # Ticket types breakdown
-    ticket_types = ['admission', 'campervan', 'parking']
-    ticket_type_totals = dict.fromkeys(ticket_types, 0)
-
-    for query in 'paid', 'expired', 'unexpired':
-        counts = locals()[query].join(PriceTier, Product, ProductGroup) \
-            .filter(ProductGroup.type.in_(ticket_types)) \
-            .with_entities(
-                ProductGroup.type,
-                func.count()) \
-            .group_by(ProductGroup.type).all()
-        counts = dict(counts)
-
-        for t in ticket_types:
-            stats.append('{}_{}:{}'.format(t, query, counts.get(t, 0)))
-            ticket_type_totals[t] += counts.get(t, 0)
-
-    for t in ticket_types:
-        stats.append('{}:{}'.format(t, ticket_type_totals[t]))
-
-    return ' '.join(stats)
 
 
 @admin.route('/')
