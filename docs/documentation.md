@@ -15,7 +15,7 @@ git update-index --skip-worktree Pipfile.lock config/test.cfg
 To undo this (if either file has been updated by someone else):
 
 ```
-git no-update-index --skip-worktree Pipfile.lock config/test.cfg
+git update-index --no-skip-worktree Pipfile.lock config/test.cfg
 ```
 
 Development processes
