@@ -6,6 +6,18 @@ We have just upgraded to python3, so there may be bits of code or stylistic choi
 We've also recently changed Ticket to Purchase, and TicketType to Product.
 There may still be bits of old code that refer to these classes or use confusing names. Please fix them if you see them!
 
+Depending on your setup, you probably want to run the following to avoid accidentally committing things:
+
+```
+git update-index --skip-worktree Pipfile.lock config/test.cfg
+```
+
+To undo this (if either file has been updated by someone else):
+
+```
+git no-update-index --skip-worktree Pipfile.lock config/test.cfg
+```
+
 Development processes
 =====================
 
