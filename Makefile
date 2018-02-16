@@ -16,7 +16,7 @@ run:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./dev_server.py
 
 update:
-	pipenv install --dev --ignore-pipfile
+	PIPENV_MAX_SUBPROCESS=$$(($$(nproc)+1)) pipenv install --dev --ignore-pipfile
 
 outdated:
 	$(ENV) pip list --outdated
