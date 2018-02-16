@@ -383,7 +383,7 @@ class EveningAcceptedForm(AcceptedForm):
 @feature_flag('CFP_FINALISE')
 def finalise_proposal(proposal_id):
     if current_user.is_anonymous:
-        return redirect(url_for('users.login', next=url_for('.edit_proposal',
+        return redirect(url_for('users.login', next=url_for('.finalise_proposal',
                                                            proposal_id=proposal_id)))
 
     proposal = Proposal.query.get_or_404(proposal_id)

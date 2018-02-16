@@ -12,7 +12,7 @@ you important information nearer the event.
 
 You can log in and view your ticket here:
 
-{{ external_url('users.login', code=code) }}
+  {{ external_url('users.login', code=code) }}
 
 See you soon at Electromagnetic Field {{ event_year }}!
 

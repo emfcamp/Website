@@ -12,7 +12,9 @@ Things to note:
 
 * Please report to the Green Room 30 minutes before your {{ proposal.type }} so that the speaker ops team can make sure everything is ready for you, and your {{ proposal.type}} will go as smoothly as possible!
 
-* It is possible that we may have to reschedule your {{ proposal.type }} before the event starts, so please make sure you've told us when you can speak in your final details: https://www.emfcamp.org/login?next=%2Fcfp%2Fproposals%2F{{ proposal.id }}%2Ffinalise
+* It is possible that we may have to reschedule your {{ proposal.type }} before the event starts, so please make sure you've told us when you can speak in your final details:
+
+  {{ external_url('cfp.finalise_proposal', proposal_id=proposal.id) }}
 
 * You can also update your talk title and description at any time using the link above, so make sure it sounds great!
 

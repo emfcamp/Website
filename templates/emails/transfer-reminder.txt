@@ -16,7 +16,7 @@ them on!
 You can find all the tickets registered to your account on the
 following page, along with a "transfer" button:
 
-https://www.emfcamp.org/login
+  {{ external_url('users.tickets') }}
 
 Looking forward to seeing you all in the field,
 The EMF team

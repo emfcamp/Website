@@ -21,7 +21,9 @@ You indicated that you would like help preparing the proposal, so we'll be in to
 As you've not previously registered with us, we've created an account for you that is tied to this email address.
 {%- endif %}
 
-You can login at {{ external_url('users.login') }} to review or update your submission.
+You can login to review or update your submission here:
+
+  {{ external_url('users.login') }}
 
 Any problems please contact us.
 

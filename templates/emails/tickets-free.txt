@@ -11,7 +11,7 @@ you important information nearer the event.
 
 You can log in and view your {% if tickets | count > 1 -%} tickets {%- else -%} ticket {%- endif %} here:
 
-{{ external_url('users.login', code=code) }}
+  {{ external_url('users.login', code=code) }}
 
 See you soon at Electromagnetic Field {{ event_year }}!
 

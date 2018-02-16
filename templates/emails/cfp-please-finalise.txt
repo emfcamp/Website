@@ -6,7 +6,7 @@ You have been allocated a {{ proposal.scheduled_duration }} minute slot - if thi
 
 We need you to finalise the details for your {{ proposal.type }} on our website. Most importantly you should tell us when you're available so that we don't accidentally schedule a slot when you're not around!
 
-https://www.emfcamp.org/login?next=%2Fcfp%2Fproposals%2F{{ proposal.id }}%2Ffinalise
+  {{ external_url('cfp.finalise_proposal', proposal_id=proposal.id) }}
 
 Don't worry, you'll be able to update your {{ proposal.type }} title and description all the way up to the event - just make sure you set your availability now.
 

@@ -5,13 +5,13 @@ on your phone, but we recommend you print them out for convenience.
 If you have bought a ticket for someone else you can send it to them
 by logging in and clicking 'transfer' beside the relevant ticket:
 
-  https://www.emfcamp.org/tickets
+  {{ external_url('users.tickets') }}
 
 {% endif %}
 If you're coming by car and you don't have a parking ticket, you'll
 need to buy one before you arrive:
 
-  https://www.emfcamp.org/tickets/choose/other
+  {{ external_url('tickets.main', flow='other') }}
 
 Any parking tickets must be printed and displayed on your dashboard.
 

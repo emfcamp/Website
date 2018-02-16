@@ -2,12 +2,13 @@ Hi {{ user.name }},
 
 Just to let you know your EMF {{ proposal.type }} "{{ proposal.title}}" is still up for selection, but was not chosen in today's batch.
 
-To be very clear: Your submission has NOT been rejected yet!
+To be very clear: your submission has NOT been rejected yet!
 
 There's still plenty of time for your {{ proposal.type }} to be chosen, and we'll be in touch to let you know for certain in the next three weeks.
 
 If you have any questions, don't hesitate to get in contact:
-{{ external_url("cfp.proposal_messages", proposal_id=proposal.id) }}
+
+  {{ external_url('cfp.proposal_messages', proposal_id=proposal.id) }}
 
 Thanks,
 The EMF Team
