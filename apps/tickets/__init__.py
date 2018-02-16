@@ -322,19 +322,20 @@ def pay(flow=None):
 @login_required
 def transfer(ticket_id):
     try:
-        ticket = current_user.tickets.filter_by(id=ticket_id).one()
+        ticket = current_user.owned_products.filter_by(id=ticket_id).one()
     except NoResultFound:
         return redirect(url_for('users.tickets'))
 
+    # Currently we only deal with ticket transfers, but other
+    # items could be transferable in the future.
     if (not ticket or
             ticket.state not in bought_states or
-            not ticket.price_tier.get_attribute('is_transferable')):
+            not ticket.product.get_attribute('is_transferable')):
         return redirect(url_for('users.tickets'))
 
     form = TicketTransferForm()
 
     if form.validate_on_submit():
-        assert ticket.user_id == current_user.id
         email = form.email.data
 
         if not User.does_user_exist(email):
@@ -349,7 +350,9 @@ def transfer(ticket_id):
             new_user = False
             to_user = User.query.filter_by(email=email).one()
 
-        Ticket.query.with_for_update.get(ticket_id)
+        ticket = Ticket.query.with_for_update().get(ticket_id)
+        assert ticket.owner_id == current_user.id
+
         ticket.transfer(from_user=current_user, to_user=to_user)
         db.session.commit()
 

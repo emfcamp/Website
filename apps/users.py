@@ -169,12 +169,12 @@ def account():
 @users.route("/account/tickets", methods=['GET', 'POST'])
 @login_required
 def tickets():
-    all_tickets = current_user.purchased_products \
-                              .filter(Purchase.state != 'cancelled') \
-                              .order_by(Purchase.id)
+    owned_purchases = current_user.owned_products \
+                                  .filter(Purchase.state != 'cancelled') \
+                                  .order_by(Purchase.id)
 
-    tickets = all_tickets.filter(Purchase.is_ticket.is_(True)).all()
-    other_items = all_tickets.filter(Purchase.is_ticket.is_(False)).all()
+    tickets = owned_purchases.filter(Purchase.is_ticket.is_(True)).all()
+    other_items = owned_purchases.filter(Purchase.is_ticket.is_(False)).all()
 
     payments = current_user.payments.filter(Payment.state != "cancelled") \
                                     .order_by(Payment.id).all()

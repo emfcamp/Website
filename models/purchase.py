@@ -85,7 +85,7 @@ class Purchase(db.Model):
 
     @property
     def is_transferable(self):
-        return self.price_tier.parent.get_attribute('is_transferable')
+        return self.product.get_attribute('is_transferable')
 
     def set_user(self, user):
         if self.state != 'reserved' or \

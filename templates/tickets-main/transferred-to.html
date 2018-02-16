@@ -12,7 +12,7 @@
   {% for trans in transferred_to %}
   <tr class="{{- loop.cycle('odd', 'even') }}">
     <td>{{ trans.timestamp.strftime('%d %b %Y') }}</td>
-    <td>{{ trans.ticket.type.name }}</td>
+    <td>{{ trans.purchase.product.name }}</td>
     <td>{{ trans.from_user.name }}</td>
     <td>{{ trans.from_user.email }}</td>
   </tr>

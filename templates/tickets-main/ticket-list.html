@@ -34,8 +34,8 @@
     {%- endif %}
 </td>
 <td>
-  {% if t.is_paid_for and t.type.is_transferable %}
-    <a class="btn btn-default" href="{{ url_for('.transfer', ticket_id=t.id) }}">Transfer</a>
+  {% if t.is_paid_for and t.is_transferable %}
+    <a class="btn btn-default" href="{{ url_for('tickets.transfer', ticket_id=t.id) }}">Transfer</a>
   {% endif %}
 </td>
 </tr>
