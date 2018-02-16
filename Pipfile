@@ -71,6 +71,7 @@ pyyaml = "*"
 pytest = "*"
 mock = "*"
 "flake8" = "*"
+locust = "*"
 
 
 [requires]
