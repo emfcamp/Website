@@ -17,7 +17,7 @@ if __name__ == "__main__":
             db.engine.dispose()
             random.seed()
 
-    if app.config.get('DEBUG'):
+    if app.config.get('DEBUG') or app.config.get('MAIL_SUPPRESS_SEND'):
         email_dispatched.connect(logger.mail_logging)
 
     if app.config.get('FIX_URL_SCHEME'):
