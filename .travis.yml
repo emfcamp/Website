@@ -14,7 +14,7 @@ env:
   - TEST_SETTINGS=./config/travis.cfg
 install:
   - pip install pipenv
-  - pipenv install --deploy
+  - pipenv install --dev --deploy
 before_script:
   - psql -c 'create database emf_site_test;' -U postgres
 script:
