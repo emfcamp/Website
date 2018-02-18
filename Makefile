@@ -18,11 +18,9 @@ run:
 update:
 	PIPENV_MAX_SUBPROCESS=$$(($$(nproc)+1)) pipenv install --dev --ignore-pipfile
 
-outdated:
-	$(ENV) pip list --outdated
-
-listdepends:
-	$(ENV) pip list|cut -d\  -f1|while read x; do echo $$x $$(pip show $$x|grep Requires); done
+lock:
+	PIPENV_MAX_SUBPROCESS=$$(($$(nproc)+1)) pipenv install --dev
+	pipenv lock
 
 clean:
 	rm -rf ./__pycache__  # In theory pycache should be version dependent
