@@ -19,6 +19,9 @@ before_script:
   - psql -c 'create database emf_site_test;' -U postgres
 script:
   - make test
+branches:
+  only:
+  - master
 notifications:
   irc:
     channels:
