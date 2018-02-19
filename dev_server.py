@@ -36,11 +36,34 @@ if __name__ == "__main__":
         default_host = '0.0.0.0'
         default_port = 5000
     else:
-        # Safe defaults
-        default_host = None  # i.e. localhost
-        default_port = None  # i.e. 5000
+        # Safe defaults mapped by flask.app.Flask.run
+        default_host = None  # i.e. 127.0.0.1
+        default_port = None  # i.e. 5000 unless specified in SERVER_NAME
 
-    host = app.config.get('HOST', default_host)
-    port = app.config.get('PORT', default_port)
+    config_options = {
+        'HOST': 'host',
+        'PORT': 'port',
+        'MAX_PROCESSES': 'processes',
+        'DEV_SERVER_EVALEX': 'use_evalex',
+        'DEV_SERVER_RELOAD': 'use_reloader',
+        'DEV_SERVER_RELOAD_FILES': 'extra_files',
+    }
+    # Flask sets use_debugger, use_evalex and use_reloader when DEBUG is on.
+    # We allow the debugger for nice tracebacks, but turn evalex off as it's
+    # one step away from RCE.
+    # NB: using the debug toolbar means lots will be leaked, including paths,
+    # secrets and DB credentials, so only use it when running on localhost.
+    options = {
+        'host': default_host,
+        'port': default_port,
+        'processes': 2,
+        'use_evalex': False,
+        'extra_files': [os.environ.get('SETTINGS_FILE'), 'logging.yaml'],
+    }
+    for key, option in config_options.items():
+        if key in app.config:
+            options[option] = app.config[key]
 
-    app.run(processes=2, host=host, port=port)
+    # http://werkzeug.pocoo.org/docs/latest/serving/
+    app.run(**options)
+
