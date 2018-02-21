@@ -1,8 +1,12 @@
+import time
 import yaml
 import logging
 import logging.config
 
-from flask import Flask, url_for, render_template
+from flask import (
+    Flask, url_for, render_template,
+    request,
+)
 from flask_mail import Mail
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
@@ -154,6 +158,19 @@ def create_app(dev_server=False):
 
         return response
 
+    from apps.metrics import request_duration, request_count
+
+    @app.before_request
+    def before_request():
+        request._start_time = time.time()
+
+    @app.after_request
+    def after_request(response):
+        request_duration.labels(request.endpoint, request.method).observe(time.time() - request._start_time)
+        request_count.labels(request.endpoint, request.method, response.status_code).inc()
+        return response
+
+
     @app.errorhandler(404)
     def handle_404(e):
         return render_template('errors/404.html'), 404
@@ -166,6 +183,7 @@ def create_app(dev_server=False):
     load_utility_functions(app)
 
     from apps.base import base
+    from apps.metrics import metrics
     from apps.users import users
     from apps.tickets import tickets
     from apps.payments import payments
@@ -175,6 +193,7 @@ def create_app(dev_server=False):
     from apps.arrivals import arrivals
     app.register_blueprint(base)
     app.register_blueprint(users)
+    app.register_blueprint(metrics)
     app.register_blueprint(tickets)
     app.register_blueprint(payments)
     app.register_blueprint(cfp)

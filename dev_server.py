@@ -1,10 +1,12 @@
 import os
 import logger
 import random
+import shutil
 
 from main import create_app, db
 from flask import request, _request_ctx_stack
 from flask_mail import email_dispatched
+import prometheus_client.multiprocess
 
 if __name__ == "__main__":
     app = create_app(dev_server=True)
@@ -16,6 +18,20 @@ if __name__ == "__main__":
         if os.getpid() != ppid:
             db.engine.dispose()
             random.seed()
+
+    @app.after_request
+    def prometheus_cleanup(response):
+        # this keeps livesum and liveall accurate
+        # other metrics will hang around until restart
+        prometheus_client.multiprocess.mark_process_dead(os.getpid())
+        return response
+
+    prometheus_dir = 'var/prometheus'
+    if os.path.exists(prometheus_dir):
+        shutil.rmtree(prometheus_dir)
+    if not os.path.exists(prometheus_dir):
+        os.mkdir(prometheus_dir)
+    os.environ['prometheus_multiproc_dir'] = prometheus_dir
 
     if app.config.get('DEBUG') or app.config.get('MAIL_SUPPRESS_SEND'):
         email_dispatched.connect(logger.mail_logging)

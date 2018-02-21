@@ -64,6 +64,7 @@ slotmachine = {git = "https://github.com/emfcamp/slotmachine"}
 awesome-slugify = "*"
 faker = "*"
 pyyaml = "*"
+prometheus-client = "*"
 
 
 [dev-packages]
