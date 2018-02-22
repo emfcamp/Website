@@ -6,7 +6,7 @@ from prometheus_client import (
     generate_latest, CONTENT_TYPE_LATEST,
 )
 from prometheus_client.core import (
-    Gauge, GaugeMetricFamily, Histogram, Counter,
+    GaugeMetricFamily, Histogram, Counter,
 )
 from prometheus_client.multiprocess import MultiProcessCollector
 from sqlalchemy import cast, String
@@ -18,7 +18,6 @@ from models.purchase import Purchase, AdmissionTicket
 
 metrics = Blueprint('metric', __name__)
 
-external_scrape = Histogram('external_scrape_duration_seconds', "Time to fetch out-of-process metrics")
 request_duration = Histogram('emf_request_duration_seconds', "Request duration", ['endpoint', 'method'])
 request_count = Counter('emf_request_count', "Request Count", ['endpoint', 'method', 'http_status'])
 
@@ -28,7 +27,6 @@ def gauge_groups(gauge, query, *entities):
 
 # Custom collectors don't work
 class ExternalMetrics:
-    @external_scrape.time()
     def collect(self):
         # Strictly, we should include all possible combinations, with 0
 
