@@ -18,7 +18,7 @@ from models.purchase import Purchase, AdmissionTicket
 
 metrics = Blueprint('metric', __name__)
 
-external_scrape = Gauge('external_scrape_duration_seconds', "Time to fetch out-of-process metrics", multiprocess_mode='all')
+external_scrape = Histogram('external_scrape_duration_seconds', "Time to fetch out-of-process metrics")
 request_duration = Histogram('emf_request_duration_seconds', "Request duration", ['endpoint', 'method'])
 request_count = Counter('emf_request_count', "Request Count", ['endpoint', 'method', 'http_status'])
 
