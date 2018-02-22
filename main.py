@@ -158,7 +158,7 @@ def create_app(dev_server=False):
 
         return response
 
-    from apps.metrics import request_duration, request_count
+    from apps.metrics import request_duration, request_total
 
     @app.before_request
     def before_request():
@@ -167,7 +167,7 @@ def create_app(dev_server=False):
     @app.after_request
     def after_request(response):
         request_duration.labels(request.endpoint, request.method).observe(time.time() - request._start_time)
-        request_count.labels(request.endpoint, request.method, response.status_code).inc()
+        request_total.labels(request.endpoint, request.method, response.status_code).inc()
         return response
 
 

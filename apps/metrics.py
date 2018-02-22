@@ -19,7 +19,7 @@ from models.purchase import Purchase, AdmissionTicket
 metrics = Blueprint('metric', __name__)
 
 request_duration = Histogram('emf_request_duration_seconds', "Request duration", ['endpoint', 'method'])
-request_count = Counter('emf_request_count', "Request Count", ['endpoint', 'method', 'http_status'])
+request_total = Counter('emf_request_total', "Total request count", ['endpoint', 'method', 'http_status'])
 
 def gauge_groups(gauge, query, *entities):
     for count, *key in count_groups(query, *entities):
