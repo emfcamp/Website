@@ -9,6 +9,7 @@ from flask import (
 )
 from flask_login import login_required, current_user
 from flask_mail import Message
+from prometheus_client import Counter
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
@@ -41,6 +42,11 @@ from .forms import TicketAmountsForm, TicketTransferForm, TicketPaymentForm
 
 tickets = Blueprint('tickets', __name__)
 
+invalid_tokens = Counter('emf_invalid_token_total', "Invalid ticket tokens")
+empty_baskets = Counter('emf_basket_empty_total', "Attempted purchases of empty baskets")
+no_capacity = Counter('emf_basket_no_capacity_total', "Attempted purchases that failed due to capacity")
+price_changed = Counter('emf_basket_price_changed_total', "Attempted purchases that failed due to changed prices")
+
 
 @tickets.route("/tickets/token/")
 @tickets.route("/tickets/token/<token>")
@@ -52,6 +58,8 @@ def tickets_token(token=None):
 
     if 'ticket_token' in session:
         del session['ticket_token']
+
+    invalid_tokens.inc()
     flash('Ticket token was invalid')
     return redirect(url_for('tickets.main'))
 
@@ -200,6 +208,7 @@ def main(flow=None):
                 except CapacityException as e:
                     # Damn, capacity's gone since we created the purchases
                     # Redirect back to show what's currently in the basket
+                    no_capacity.inc()
                     app.logger.warn('Limit exceeded creating tickets: %s', e)
                     flash("We're very sorry, but there is not enough capacity available to "
                           "allocate these tickets. You may be able to try again with a smaller amount.")
@@ -209,10 +218,12 @@ def main(flow=None):
 
                 return redirect(url_for('tickets.pay', flow=flow))
 
-            elif ticket_view:
-                flash("Please select at least one ticket to buy.")
             else:
-                flash("Please select at least one item to buy.")
+                empty_baskets.inc()
+                if ticket_view:
+                    flash("Please select at least one ticket to buy.")
+                else:
+                    flash("Please select at least one item to buy.")
 
     if request.method == 'POST' and form.set_currency.data:
         if form.set_currency.validate(form):
@@ -224,6 +235,7 @@ def main(flow=None):
                 field.errors = []
 
     if capacity_gone:
+        no_capacity.inc()
         flash("We're sorry, but there is not enough capacity available to "
               "allocate these tickets. You may be able to try again with a smaller amount.")
 
@@ -257,6 +269,7 @@ def pay(flow=None):
 
     basket = Basket.from_session(current_user, get_user_currency())
     if not any(basket.values()):
+        empty_baskets.inc()
         if flow == 'main':
             flash("Please select at least one ticket to buy.")
         else:
@@ -266,6 +279,7 @@ def pay(flow=None):
     if form.validate_on_submit():
         if Decimal(form.basket_total.data) != Decimal(basket.total):
             # Check that the user's basket approximately matches what we told them they were paying.
+            price_changed.inc()
             app.logger.warn("User's basket has changed value %s -> %s", form.basket_total.data, basket.total)
             flash("""The tickets you selected have changed, possibly because you had two windows open.
                   Please verify that you've selected the correct tickets.""")
@@ -299,6 +313,7 @@ def pay(flow=None):
         Basket.clear_from_session()
 
         if not payment:
+            empty_baskets.inc()
             app.logger.warn('User tried to pay for empty basket')
             flash("We're sorry, your session information has been lost. Please try ordering again.")
             return redirect(url_for('tickets.main', flow=flow))
