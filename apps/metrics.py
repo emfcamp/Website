@@ -25,8 +25,11 @@ def gauge_groups(gauge, query, *entities):
     for count, *key in count_groups(query, *entities):
         gauge.add_metric(key, count)
 
-# Custom collectors don't work
 class ExternalMetrics:
+    def __init__(self, registry=None):
+        if registry is not None:
+            registry.register(self)
+
     def collect(self):
         # Strictly, we should include all possible combinations, with 0
 
@@ -51,9 +54,9 @@ class ExternalMetrics:
 @metrics.route('/metrics')
 def collect_metrics():
     registry = CollectorRegistry()
-    registry.register(MultiProcessCollector(None))
-    registry.register(PlatformCollector(None))
-    registry.register(ExternalMetrics())
+    MultiProcessCollector(registry)
+    PlatformCollector(registry)
+    ExternalMetrics(registry)
 
     data = generate_latest(registry)
 
