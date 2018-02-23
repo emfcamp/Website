@@ -8,10 +8,24 @@ Buy Items
 {% endblock %}
 {% block body %}
 {% if ticket_view %}
+    {% if not available %}
+    <div class="well">
+      <p class="emphasis">There are no tickets currently available for Electromagnetic Field {{ event_year }},
+                          but more will be on sale soon.
+      </p>
+      <p>Please follow us <a href="https://twitter.com/emfcamp">on Twitter</a> or
+      join our mailing list to be notified when more tickets are on sale:</p>
+      {% include "home/_mailchimp_form.html" %}
+      <p>We can't reserve any tickets, but if we accept your
+      <a href="{{url_for('cfp.main')}}">talk, workshop, or installation proposal</a>,
+      you will be guaranteed a ticket.</p>
+    </div>
+    {% endif %}
+
     {% include 'ticket-blurb.html' %}
 
-    <p>To order additional items, such as {# village tents or t-shirts #} parking tickets, please
-        <a href="{{ url_for('tickets.main', flow='other') }}">click here</a>.
+    {#<p>To order additional items, such as village tents or t-shirts, please
+        <a href="{{ url_for('tickets.main', flow='other') }}">click here</a>.#}
 
     <p>
       By buying a ticket you are agreeing to our <a href="{{url_for('payments.terms')}}">Terms
@@ -110,14 +124,18 @@ Buy Items
     <th>Product</th>
     {% endif %}
     <th>Cost</th>
+    {% if available %}
     <th>Amount</th>
+    {% else %}
+    <th><span class="invisible">Amount</span></th>
+    {% endif %}
 </tr>
 </thead>
 
 <tbody>
 {% set row_class = cycler('odd', 'even') %} {# required as we skip rows #}
 {% for f in form.tiers %}
-{% if f._any or f.amount.errors %}
+{% if f._any or f.amount.errors or not available %}
 <tr data-price="{{ f._tier.get_price(user_currency).value }}"
     {% for price in f._tier.prices -%}
         data-price-{{ price.currency }}="{{ price.value }}"
@@ -134,6 +152,7 @@ Buy Items
         <span class="price">{{ f._tier.get_price(user_currency) | price(user_currency) }}</span>
     </td>
     <td>
+        {% if available %}
         <div class="controls">{{ f.amount(class_="amount")|safe }}
         {% if f.amount.errors %}
             {% for error in f.amount.errors %}
@@ -141,11 +160,13 @@ Buy Items
             {% endfor %}
         {% endif %}
         </div>
+        {% endif %}
     </td>
 </tr>
 {% endif %}
 {% endfor %}
 </tbody>
+{% if available %}
 <tfoot>
 <tr>
     <td colspan="3">
@@ -158,9 +179,12 @@ Buy Items
         </div>
     </div>
     </td>
+</tr>
 </tfoot>
+{% endif %}
 </table>
 
+{% if available %}
 <div class="form-actions pull-right">
     {% if ticket_view %}
     {{ form.buy(class_="btn btn-primary btn-lg debounce") }}
@@ -168,6 +192,7 @@ Buy Items
     {{ form.buy_other(class_="btn btn-primary btn-lg debounce") }}
     {% endif %}
 </div>
+{% endif %}
 
 </form>
 {% endblock %}

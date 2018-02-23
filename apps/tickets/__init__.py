@@ -110,7 +110,7 @@ def main(flow=None):
     if app.config.get('DEBUG'):
         sales_state = request.args.get("sales_state", sales_state)
 
-    if sales_state == 'available':
+    if sales_state in {'available', 'unavailable'}:
         pass
     elif not current_user.is_anonymous and current_user.has_permission('admin'):
         pass
@@ -153,6 +153,7 @@ def main(flow=None):
     - if the user hasn't submitted anything, we use their current reserved ticket counts
     - if the user has reserved tickets from exhausted tiers on this view, we still show them
     - if the user has reserved tickets from other views, don't show and don't mess with them
+    - show the sold-out/unavailable states only when the user doesn't have reserved tickets
 
     We currently don't deal with multiple price tiers being available around the same time.
     Reserved tickets from a previous tier should be cancelled before activating a new one.
@@ -182,6 +183,14 @@ def main(flow=None):
         f.amount.values = values
         f._any = any(values)
 
+    available = True
+    if sales_state == 'unavailable':
+        if not any(p.product in products for p in basket.purchases):
+            # If they have any reservations, they bypass the unavailable state.
+            # This means someone can use another view to get access to this one
+            # again. I'm not sure what to do about this. It usually won't matter.
+            available = False
+
     if form.validate_on_submit():
         if form.buy.data or form.buy_other.data:
             if form.currency_code.data != get_user_currency():
@@ -190,11 +199,16 @@ def main(flow=None):
                 db.session.commit()
 
             for f in form.tiers:
-                if f.amount.data:
-                    pt = f._tier
+                pt = f._tier
+                if f.amount.data != basket.get(pt, 0):
                     app.logger.info('Adding %s %s tickets to basket', f.amount.data, pt.name)
                     tier = PriceTier.query.get(pt.id)
                     basket[tier] = f.amount.data
+
+            if not available:
+                app.logger.warn('User has no reservations, enforcing unavailable state')
+                basket.save_to_session()
+                return redirect(url_for('tickets.main', flow=flow))
 
             if any(basket.values()):
                 app.logger.info('Basket %s', basket)
@@ -225,6 +239,9 @@ def main(flow=None):
                 else:
                     flash("Please select at least one item to buy.")
 
+                basket.save_to_session()
+                return redirect(url_for('tickets.main', flow=flow))
+
     if request.method == 'POST' and form.set_currency.data:
         if form.set_currency.validate(form):
             app.logger.info("Updating currency to %s only", form.set_currency.data)
@@ -240,7 +257,7 @@ def main(flow=None):
               "allocate these tickets. You may be able to try again with a smaller amount.")
 
     form.currency_code.data = get_user_currency()
-    return render_template("tickets-choose.html", form=form, flow=flow, ticket_view=ticket_view)
+    return render_template("tickets-choose.html", form=form, flow=flow, ticket_view=ticket_view, available=available)
 
 
 @tickets.route("/tickets/pay", methods=['GET', 'POST'])

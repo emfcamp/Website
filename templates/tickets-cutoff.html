@@ -2,17 +2,7 @@
 
 {% block body %}
     <div class="well">
-        {% if SALES_STATE == 'unavailable' %}
-            <p class="emphasis">There are no tickets currently available for Electromagnetic Field {{ event_year }},
-                                but more will be on sale soon.
-            </p>
-            <p>Please follow us <a href="https://twitter.com/emfcamp">on Twitter</a> or
-            join our mailing list to be notified when more tickets are on sale:</p>
-            {% include "home/_mailchimp_form.html" %}
-            <p>We can't reserve any tickets, but if we accept your
-            <a href="{{url_for('cfp.main')}}">talk, workshop, or installation proposal</a>,
-            you will be guaranteed a ticket.</p>
-        {% elif SALES_STATE == 'sales-ended' %}
+        {% if SALES_STATE == 'sales-ended' %}
             <p class="emphasis">We're sorry, ticket sales for Electromagnetic Field {{ event_year }} have now ended.</p>
             <p>There are no tickets for sale on site, so please do not travel to EMF
             if you haven't got a ticket.</p>
