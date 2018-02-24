@@ -18,6 +18,9 @@ run:
 update:
 	PIPENV_MAX_SUBPROCESS=$$(($$(nproc)+1)) pipenv install --dev --ignore-pipfile
 
+deploy:
+	PIPENV_MAX_SUBPROCESS=$$(($$(nproc)+1)) PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy
+
 lock:
 	PIPENV_MAX_SUBPROCESS=$$(($$(nproc)+1)) pipenv install --dev
 	pipenv lock
