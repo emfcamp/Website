@@ -99,10 +99,8 @@ class FreeTicketsNewUserForm(FreeTicketsForm):
 @admin.route('/tickets/choose-free/<int:user_id>', methods=['GET', 'POST'])
 @admin_required
 def tickets_choose_free(user_id=None):
-    has_price = Price.query.filter(Price.price_int > 0)
-
     free_pts = PriceTier.query.join(Product).filter(
-        ~has_price.filter(Price.price_tier.expression).exists(),
+        ~PriceTier.prices.any(Price.price_int > 0),
     ).order_by(Product.name).all()
 
     if user_id is None:
