@@ -3,11 +3,12 @@ import re
 from decimal import Decimal
 from datetime import datetime, timedelta
 
-from sqlalchemy import event, func, column, and_
-from sqlalchemy.orm import Session, aliased, column_property
+from sqlalchemy import event, func, column
+from sqlalchemy.orm import Session, aliased
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy_continuum.utils import version_class, transaction_class
 
+from main import db
 from . import export_attr_counts, export_intervals, bucketise
 import models
 from models.site_state import event_start
