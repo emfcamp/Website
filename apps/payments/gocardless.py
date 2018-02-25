@@ -80,15 +80,27 @@ def gocardless_complete(payment_id):
         payment_id, 'gocardless',
         valid_states=['new'],
     )
-    redirect_id = request.args.get('redirect_flow_id')
-    if redirect_id != payment.redirect_id:
-        logging.error('Invalid redirect_flow_id for payment %s: %r', payment.id, redirect_id)
-        abort(400)
+    untrusted_redirect_id = request.args.get('redirect_flow_id')
+    if untrusted_redirect_id != payment.redirect_id:
+        # This probably means the user changed currency but then completed a previous flow.
+        # We don't get webhooks for flows, so validate it now.
+        try:
+            redirect_flow = gocardless_client.redirect_flows.get(untrusted_redirect_id)
+        except gocardless_pro.errors.InvalidApiUsageError as e:
+            logging.warn('InvalidApiUsageError from GoCardless getting flow: %s', e.message)
+            abort(404)
+
+        if redirect_flow.session_token != str(payment.id):
+            logging.error('Invalid redirect_flow_id for payment %s: %r (%s)',
+                          payment.id, untrusted_redirect_id, redirect_flow.session_token)
+            abort(404)
+
+        payment.redirect_id = redirect_flow.id
 
     logger.info("Completing GoCardless payment %s (%s)", payment.id, payment.redirect_id)
 
     try:
-        # We've already validated the redirect_id, so we don't expect this to fail
+        # We've already validated the redirect_id, so don't expect this to fail
         redirect_flow = gocardless_client.redirect_flows.complete(
             payment.redirect_id,
             params={"session_token": str(payment.id)},
@@ -192,21 +204,22 @@ def gocardless_tryagain(payment_id):
         return redirect(url_for('users.tickets'))
 
     if payment.state == 'new':
-        if payment.redirect_id is None:
-            return gocardless_start(payment)
-
-        else:
-            logger.info("Trying to capture payment %s (%s) again", payment.id, payment.redirect_id)
+        if payment.redirect_id is not None:
             redirect_flow = gocardless_client.redirect_flows.get(payment.redirect_id)
 
             # If the flow's already been used, we get additional entries in links,
             # a confirmation_url "for 15 minutes", and redirect_url disappears.
             if redirect_flow.redirect_url is None:
-                logger.error('Unable to retry payment %s as flow is invalid', payment.id)
-                flash("Your GoCardless mandate could not be confirmed. Please try again.")
-                return redirect(url_for('users.tickets'))
+                logger.info("Assuming flow for payment %s (%s) is captured", payment.id, payment.redirect_id)
+                payment.set_state('captured')
+                db.session.commit()
+                return redirect(redirect_flow.redirect_url)
 
-            return redirect(redirect_flow.redirect_url)
+        # Otherwise, always try again. GC say flows are valid for
+        # 30 minutes, but I don't want to hardcode that here.
+        logger.info("Trying to capture payment %s again", payment.id)
+        payment.redirect_id = None
+        return gocardless_start(payment)
 
     elif payment.state == 'captured':
         return create_gc_payment(payment)
