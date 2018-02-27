@@ -17,7 +17,11 @@ Buy Items
       join our mailing list to be notified when more tickets are on sale:</p>
       {% include "home/_mailchimp_form.html" %}
       <p>We can't reserve any tickets, but if we accept your
+      {% if config['CFP'] %}
       <a href="{{url_for('cfp.main')}}">talk, workshop, or installation proposal</a>,
+      {% else %}
+      talk, workshop, or installation proposal,
+      {% endif %}
       you will be guaranteed a ticket.</p>
     </div>
     {% endif %}
