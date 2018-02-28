@@ -661,10 +661,10 @@
         },
         "text-unidecode": {
             "hashes": [
-                "sha256:02efd86b9c0f489f858d8cead62e94d3760dab444054b258734716f7602330a3",
-                "sha256:d0afd5e8a7ac69bfb1372e1bbfa3c63c22e3db8ae1284690e96b45c4430d08d0"
+                "sha256:801e38bd550b943563660a91de8d4b6fa5df60a542be9093f7abf819f86050cc",
+                "sha256:5a1375bb2ba7968740508ae38d92e1f889a0832913cb1c447d5e2046061a396d"
             ],
-            "version": "==1.1"
+            "version": "==1.2"
         },
         "unicodecsv": {
             "hashes": [
@@ -863,9 +863,9 @@
         },
         "msgpack-python": {
             "hashes": [
-                "sha256:c1f3f8d02206f84258a3b4f99fbc0a4e3c849721c9361196c3bfd5243e4304cd"
+                "sha256:7f5d6e59228b65c47cfdae76a4aea71f6902525f18256862cda69888a686b5f9"
             ],
-            "version": "==0.5.4"
+            "version": "==0.5.5"
         },
         "pbr": {
             "hashes": [
