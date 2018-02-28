@@ -19,7 +19,7 @@ update:
 	PIPENV_MAX_SUBPROCESS=$$(($$(nproc)+1)) pipenv install --dev --ignore-pipfile
 
 deploy:
-	PIPENV_MAX_SUBPROCESS=$$(($$(nproc)+1)) PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy
+	PIPENV_MAX_SUBPROCESS=$$(($$(nproc)+1)) pipenv install --deploy
 
 lock:
 	pipenv --rm  # pipenv update doesn't work on Ubuntu 16.04
