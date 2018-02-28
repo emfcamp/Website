@@ -12,7 +12,7 @@ cd to the site directory:
 
 Install/update the virtualenv:
 
-    sudo pipenv install --deploy
+    sudo make deploy
 
 Update the DB:
 
