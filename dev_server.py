@@ -12,7 +12,7 @@ if __name__ == "__main__":
     os.environ['prometheus_multiproc_dir'] = prometheus_dir
 
     if os.path.exists(prometheus_dir):
-        shutil.rmtree(prometheus_dir)
+        shutil.rmtree(prometheus_dir, True)
     if not os.path.exists(prometheus_dir):
         os.mkdir(prometheus_dir)
 
