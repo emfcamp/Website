@@ -51,8 +51,8 @@
          <legend>More details</legend>
          <p>We'll use these details to help us schedule your {{form.human_type}}.</p>
         {% call render_field(form.requirements, horizontal=9,
-                            placeholder="Any unusual requirements") %}
-            We'll provide all the usual AV equipment, but let us know if you need anything unusual.
+                            placeholder="Such as tools, assistants, or other non-standard things") %}
+            We'll provide a standard set of Audio-Visual equipment.
         {% endcall %}
       {% if form.type in ('talk', 'performance', 'workshop', 'youthworkshop') %}
         {{ render_field(form.length, horizontal=9, placeholder="Your best guess, whether in minutes or days") }}
@@ -65,9 +65,11 @@
       {% if form.type in ('workshop', 'youthworkshop') %}
           {% call render_field(form.attendees, horizontal=9,
                 placeholder="The number of people you can accommodate in your workshop") %}
+                {% if form.type != 'youthworkshop' %}
                 Our workshop tents can accommodate 10-50 attendees per session; if your workshop
                 is smaller than that, you could consider holding it at a
                 <a href="https://wiki.emfcamp.org/wiki/Villages">village</a> instead.
+                {% endif %}
           {% endcall %}
           {{ render_field(form.cost, horizontal=9, placeholder="If attendees need to pay for materials") }}
           {{ render_field(form.participant_equipment, horizontal=9, placeholder="Things they should bring - such as a laptop, arduino, or knitting needles") }}
