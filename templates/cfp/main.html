@@ -2,10 +2,6 @@
 {% extends "base.html" %}
 {% block title %}Call for Participation{% endblock %}
 {% block body %}
-  {% if has_errors %}
-  <div class="alert alert-danger">Could not submit your proposal. Please <a href="#cfp-errors" class="alert-link">check below</a> and try again.</div>
-  {% endif %}
-
 <h2>Call for Participation</h2>
     <p class="emphasis">Electromagnetic Field is a UK camping festival for those
       with an inquisitive mind or an interest in making things: hackers, artists,
@@ -52,153 +48,16 @@
         in order to view or edit your proposals.</p>
         {% endif %}
 
-    <h2>Submit a proposal</h2>
-    <ul class="nav nav-tabs cfp-types" role="navigation" id="cfp-errors" role="menu"
-        aria-label="proposal type">
-    {% for form in forms %}
-      <li {% if form.type == active_cfp_type -%} class="active" {%- endif %}>
-      <a href="{{ url_for('cfp.main', cfp_type=form.type) + ('?closed' if ignore_closed else '') }}"
-          data-target="#{{ 'tab_' + form.type }}" data-toggle="tab"
-          {% if form.type == active_cfp_type %}
-            aria-selected="true"
-          {% else %}
-            aria-selected="false"
-          {% endif %}
-          >
-          {% if form.type == 'talk' %}
-            <h4>Talk or Performance</h4>
-            <p>Held on one of our stages</p>
-          {% elif form.type == 'workshop' %}
-            <h4>Workshop</h4>
-            <p>Demonstration or activity</p>
-          {% elif form.type == 'installation' %}
-            <h4>Installation</h4>
-            <p>Creation around the site</p>
-          {% endif %}
-        </a>
-        </button>
-      </li>
-    {% endfor %}
-  </ul>
-
-  <div class="tab-content cfp-tab">
-    {% for form in forms %}
-
-    <div class="tab-pane {%- if form.type == active_cfp_type %} active {%- endif %}" id="{{ 'tab_' + form.type }}">
-    <form action={{ url_for('cfp.main', cfp_type=form.type) + ('?closed' if ignore_closed else '') }} method="post" class="form-horizontal cfp-form" role="form">
-      {{ form.hidden_tag() }}
-      {% if not current_user.is_authenticated %}
-      <fieldset>
-        <legend>Your Details</legend>
-        {% if form.email.was_duplicate %}
-          <div class="alert alert-warning">
-              This email address already exists in our system, possibly because you previously tried to submit a proposal and
-              we automatically created an account for you.
-              Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('.main', cfp_type=form.active_cfp_type) + ('?closed' if ignore_closed else ''), email=form.email.data) }}" target="_new">click here</a> to log in.
-          </div>
-        {% else %}
-          <p>If you've already bought a ticket, please
-              <a href="{{ url_for('users.login', next=url_for('.main', cfp_type=form.type) + ('?closed' if ignore_closed else '')) }}" target="_blank">log in</a>.</p>
-        {% endif %}
-        {{ render_field(form.name, horizontal=9, placeholder="Your name (or pseudonym)") }}
-        {{ render_field(form.email, horizontal=9, placeholder="Your email address") }}
-      </fieldset>
-      {% endif %}
-
-      <fieldset>
-          <legend>About Your {{form.type|capitalize}}</legend>
-          <p>You'll be able to tweak the title and description before we publish them.
-             To help with our anonymised review process, try to avoid including
-             personally identifiable information at this stage.</p>
-          {{render_field(form.title, horizontal=9, placeholder="A short summary")}}
-          {% call render_field(form.description, horizontal=9,
-                         placeholder="An anonymised description to send to the reviewers") %}
-            Please keep this shorter than 250 words.
-          {% endcall %}
-     </fieldset>
-
-     <fieldset>
-         <legend>More Details</legend>
-         <p>We'll use these details to help us schedule your {{form.type}}.</p>
-      {% if form.type in ('talk', 'workshop') %}
-        {% call render_field(form.requirements, horizontal=9,
-                            placeholder="Any unusual requirements") %}
-            We'll provide all the usual AV equipment, but let us know if you need anything unusual.
-        {% endcall %}
-        {{ render_field(form.length, horizontal=9, placeholder="Your best guess, whether in minutes or days") }}
-      {% endif %}
-
-      {% call render_field(form.notice_required, horizontal=9) %}
-        How much notice do you need to prepare? We'll try and give you as much notice as we can.
-      {% endcall %}
-
-      {% if form.type == 'workshop' %}
-          {% call render_field(form.attendees, horizontal=9,
-                placeholder="The number of people you can accommodate in your workshop") %}
-                Our workshop tents can accommodate 10-50 attendees per session; if your workshop
-                is smaller than that, you could consider holding it at a
-                <a href="https://wiki.emfcamp.org/wiki/Villages">village</a> instead.
-          {% endcall %}
-          {{ render_field(form.cost, horizontal=9, placeholder="If attendees need to pay for materials") }}
-      {% elif form.type == 'installation' %}
-          {% call render_field(form.requirements, horizontal=9,
-          placeholder="What are your installation's requirements?") %}
-            Let us know if your installation needs power, internet, or anything else special.
-          {% endcall %}
-          {% call render_field(form.size, horizontal=9) %}
-            How much space will your installation take up?
-          {% endcall %}
-          {% call render_field(form.funds, 9) %}
-            We have a limited amount of funding available to make the EMF site look great.
-            If you'd like to apply for a grant, let us know how much you'll need.
-          {% endcall %}
-      {% endif %}
-        <div class="col-md-9 col-sm-offset-3">
-          <label class="checkbox">
-            {{ form.needs_help() }}
-            I'd like help with preparing this proposal.
-          </label>
-          {% for error in form.needs_help.errors %}
-          <div class="help-block">{{ error }}</div>
-          {% endfor %}
-        </div>
-      </fieldset>
-      <p>&nbsp;</p>
-
-      <div class="form-actions">
-        <button type="submit" name="Create" class="btn btn-primary btn-lg pull-right debounce">Submit proposal</button>
-      </div>
-      <div class="clearfix"></div>
-    </form>
-    </div>
-    {% endfor %}
-</div>
-
-{% endblock %}
-
-{% block foot %}
-<script type="text/javascript">
-$(function() {
-  'use strict';
-
-  // Copy values across when the user switches tab
-  $('.cfp-types a').on('show.bs.tab', function(e) {
-    var $prev = $(e.relatedTarget);
-    var $curr = $(this);
-    var $prev_tab = $($prev.data('target'));
-    var $curr_tab = $($curr.data('target'));
-    $.each(['name', 'email', 'title', 'description', 'requirements', 'needs_help'], function(i, f) {
-      var $curr_f = $curr_tab.find('[name$=-' + f + ']');
-      var $prev_f = $prev_tab.find('[name$=-' + f + ']');
-      if ($curr_f.attr('type') == 'checkbox') {
-          $curr_f.prop('checked', $prev_f.prop('checked'));
-      } else {
-          $curr_f.val($prev_f.val());
-      }
-    });
-
-    return true;
-  });
-});
-</script>
+    <h2>Submit a new proposal</h2>
+    
+    <h4><a href="/cfp/talk">Talk</a></h4>
+    <p>Held on one of our stages</p>
+    <h4><a href="/cfp/workshop">Workshop</a></h4>
+    <p>Demonstration or activity in one of our workshops</p>
+    <h4><a href="/cfp/youthworkshop">Youth Workshop</a></h4>
+    <p>Workshop for under 12's in our youth workshop</p>
+    <h4><a href="/cfp/performance">Performance</a></h4>
+    <p>A performance of music, art, film - not a talk</p>
+    <h4><a href="/cfp/installation">Installation</a></h4>
+    <p>Creation around the site</p>
 {% endblock %}

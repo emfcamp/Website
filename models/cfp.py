@@ -157,7 +157,8 @@ class Proposal(db.Model):
                        'has_rejected_email', 'published_names', 'arrival_period',
                        'departure_period', 'telephone_number', 'may_record',
                        'needs_laptop', 'available_times',
-                       'attendees', 'cost', 'size', 'funds']
+                       'attendees', 'cost', 'size', 'funds',
+                       'age_range', 'participant_equipment']
 
         proposals = cls.query.with_entities(
             cls.id, cls.title, cls.description,
@@ -172,6 +173,8 @@ class Proposal(db.Model):
             proposals = proposals.add_columns(cls.attendees, cls.cost)
         elif cls.__name__ == 'InstallationProposal':
             proposals = proposals.add_columns(cls.size, cls.funds)
+        elif cls.__name__ == 'YouthWorkshopProposal':
+            proposals = proposals.add_columns(cls.attendees, cls.cost, cls.age_range, cls.participant_equipment)
 
         # Some unaccepted proposals have scheduling data, but we shouldn't need to keep that
         accepted_columns = (
@@ -267,12 +270,13 @@ class Proposal(db.Model):
 
     def get_allowed_venues(self):
         venue_names = DEFAULT_VENUES[self.type]
+        found = []
         if self.allowed_venues:
             venue_names = [ v.strip() for v in self.allowed_venues.split(',') ]
-        found = Venue.query.filter(Venue.name.in_(venue_names)).all()
-        # If we didn't actually find all the venues we're using, bail hard
-        if len(found) != len(venue_names):
-            raise InvalidVenueException("Invalid Venue in allowed_venues!")
+            found = Venue.query.filter(Venue.name.in_(venue_names)).all()
+            # If we didn't actually find all the venues we're using, bail hard
+            if len(found) != len(venue_names):
+                raise InvalidVenueException("Invalid Venue in allowed_venues!")
         return found
 
     def get_allowed_venues_serialised(self):
@@ -380,6 +384,13 @@ class WorkshopProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'workshop'}
     attendees = db.Column(db.String)
     cost = db.Column(db.String)
+    age_range = db.Column(db.String)
+    participant_equipment = db.Column(db.String)
+
+
+class YouthWorkshopProposal(WorkshopProposal):
+    __mapper_args__ = {'polymorphic_identity': 'youthworkshop'}
+    valid_dbs = db.Column(db.Boolean, nullable=False, default=False)
 
 
 class InstallationProposal(Proposal):

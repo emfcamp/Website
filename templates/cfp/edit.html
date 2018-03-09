@@ -38,7 +38,7 @@
     {% endif %}
     <div>&nbsp;</div>
     <div class="col-md-6">
-      <legend>About your {{proposal.type|capitalize}}</legend>
+      <legend>About your {{proposal.human_type}}</legend>
       <dl class="dl-vertical">
         <dt>Title</dt><dd>{{proposal.title}}</dd>
         <dt>Submitted</dt><dd>{{proposal.created.strftime('%d %B')}}</dd>
