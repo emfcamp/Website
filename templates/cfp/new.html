@@ -8,12 +8,7 @@
 
 <h2>Submit a {{form.human_type}} proposal</h2>
 
-    <h3>What we're looking for</h3>
-
-    <h3>Selection</h3>
-    <p>After you submit a proposal, it will be considered anonymously by a diverse
-      selection panel. For more on the EMF selection process, see our
-        <a href="{{ url_for('.guidance') }}" target="_blank">guidance</a>.</p>
+  {% include 'cfp/form_' + form.type + '_include.html' %}
 
   <div class="tab-content cfp-tab">
     <div class="tab-pane {%- if form.type == active_cfp_type %} active {%- endif %}" id="{{ 'tab_' + form.type }}">
@@ -40,11 +35,14 @@
       <fieldset>
           <legend>About your {{form.human_type}}</legend>
           <p>You'll be able to tweak the title and description before we publish them.
+             {% if form.type not in ('performance', 'youthworkshop') %}
              To help with our anonymised review process, try to avoid including
-             personally identifiable information at this stage.</p>
+             personally identifiable information at this stage.
+             {% endif %}
+          </p>
           {{render_field(form.title, horizontal=9, placeholder="A short summary")}}
           {% call render_field(form.description, horizontal=9,
-                         placeholder="An anonymised description to send to the reviewers") %}
+                         placeholder="A description to send to the reviewers") %}
             Please keep this shorter than 250 words.
           {% endcall %}
      </fieldset>
@@ -98,6 +96,7 @@
             {{ form.needs_help() }}
             I'd like advice or help with this proposal
           </label>
+          <small>We're happy to advise on submissions before they are reviewed</small>
           {% for error in form.needs_help.errors %}
           <div class="help-block">{{ error }}</div>
           {% endfor %}
