@@ -115,12 +115,32 @@ def raise_500():
 
 @base.route("/about")
 def about():
-    return render_template('about.html')
+    return render_template('about/index.html')
 
 
 @base.route("/about/privacy")
 def privacy():
-    return render_template('privacy.html')
+    return render_template('about/privacy.html')
+
+
+@base.route('/about/branding')
+def branding():
+    return render_template('about/branding.html')
+
+
+@base.route('/about/design-elements')
+def design_elements():
+    return render_template('about/design.html')
+
+
+@base.route("/about/company")
+def company():
+    return render_template('about/company.html')
+
+
+@base.route("/about/volunteering")
+def volunteering():
+    return render_template('about/volunteering.html')
 
 
 @base.route("/network")
@@ -212,11 +232,6 @@ def talks_2012():
     return render_template('talks-2012.html', **days)
 
 
-@base.route("/about/company")
-def company():
-    return render_template('company.html')
-
-
 # @base.route('/sponsors')
 # def sponsors():
 #     return render_template('sponsors/sponsors.html')
@@ -275,23 +290,15 @@ def radio():
     return render_template('radio.html')
 
 
-@base.route('/about/branding')
-def branding():
-    return render_template('branding.html')
-
-
-@base.route('/about/design-elements')
-def design_elements():
-    return render_template('design.html')
-
-
 @base.route("/googlec108e6ab4f75019d.html")
 def google_verification_russ():
     return "google-site-verification: googlec108e6ab4f75019d.html"
 
+
 @base.route("/google3189d9169f2faf7f.html")
 def google_verification_mark():
     return "google-site-verification: google3189d9169f2faf7f.html"
+
 
 @base.route("/herald")
 def herald():
