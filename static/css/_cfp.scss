@@ -39,14 +39,13 @@
 
 .cfp-choose-type a.list-group-item {
   text-decoration: none;
-  background-color: $highlight-2-background;
-  color: $highlight-2-background-text;
-  border-color: $highlight-2-background-border;
+  background-color: $highlight-3-background;
+  border-color: $highlight-3-border;
   padding-top: 15px;
   padding-bottom: 15px;
 }
 
 .cfp-choose-type a.list-group-item:hover {
-  background-color: $highlight-2-background-hover;
+  background-color: $highlight-3-background-hover;
 }
 
