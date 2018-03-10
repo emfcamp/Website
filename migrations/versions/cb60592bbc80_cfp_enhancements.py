@@ -12,6 +12,7 @@ down_revision = '0c41275c0244'
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.sql import expression
 
 
 def upgrade():
@@ -19,7 +20,7 @@ def upgrade():
     with op.batch_alter_table('proposal', schema=None) as batch_op:
         batch_op.add_column(sa.Column('age_range', sa.String(), nullable=True))
         batch_op.add_column(sa.Column('participant_equipment', sa.String(), nullable=True))
-        batch_op.add_column(sa.Column('valid_dbs', sa.Boolean(), nullable=False))
+        batch_op.add_column(sa.Column('valid_dbs', sa.Boolean(), nullable=False, server_default=expression.false()))
 
     with op.batch_alter_table('proposal_version', schema=None) as batch_op:
         batch_op.add_column(sa.Column('age_range', sa.String(), autoincrement=False, nullable=True))
