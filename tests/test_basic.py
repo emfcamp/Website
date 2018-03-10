@@ -8,7 +8,8 @@ URLS = [
     '/about',
     '/cfp',
     '/login',
-    '/sponsors'
+    '/sponsors',
+    '/metrics'
 ]
 
 
