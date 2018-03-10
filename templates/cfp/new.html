@@ -51,7 +51,7 @@
          <p>We'll use these details to help us schedule your {{form.model.human_type}}.</p>
         {% call render_field(form.requirements, horizontal=9,
                             placeholder="Such as tools, assistants, or other non-standard things") %}
-          {% if cfp_type in ('talk', 'performance') %}
+          {% if cfp_type in ('talk', 'performance', 'workshop') %}
             We'll provide a standard set of Audio-Visual equipment.
           {% endif %}
         {% endcall %}
