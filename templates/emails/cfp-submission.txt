@@ -1,19 +1,17 @@
-Hi {{ cfp.user.name }},
+Hi {{ proposal.user.name }},
 
 This is to confirm your submission to our call for participation. We'll try to process your submission as quickly as possible. Here's a summary of your submission:
 
-{{ type | capitalize }}
-Title: {{ cfp.title }}
-Description: {{ cfp.description }}
-{%- if type == 'talk' %}
-Duration: {{ cfp.length }}
-{% elif type == 'workshop' %}
-Duration: {{ cfp.length }}
-{% elif type == 'installation' %}
-Size: {{ cfp.size }}
+{{ proposal.human_type | title }}
+Title: {{ proposal.title }}
+Description: {{ proposal.description }}
+{%- if proposal.type in ['talk', 'youthworkshop', 'workshop', 'performance'] %}
+Duration: {{ proposal.length }}
+{% elif proposal.type == 'installation' %}
+Size: {{ proposal.size }}
 {%- endif %}
 
-{%- if cfp.needs_help %}
+{%- if proposal.needs_help %}
 You indicated that you would like help preparing the proposal, so we'll be in touch as soon as we can.
 {%- endif %}
 

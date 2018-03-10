@@ -4,14 +4,14 @@
     {{ form.hidden_tag() }}
 
     <fieldset>
-        <legend>About your {{form.human_type}}</legend>
+        <legend>About your {{proposal.human_type}}</legend>
         {{ render_field(form.title, 9) }}
         {{ render_field(form.description, 9) }}
     </fieldset>
 
     <fieldset>
         <legend>More Details</legend>
-        <p>We'll use these details to help us schedule your {{form.human_type}}.</p>
+        <p>We'll use these details to help us schedule your {{proposal.human_type}}.</p>
 
     {% if proposal.type in ('talk', 'performance') %}
       {{ render_field(form.requirements, 9) }}
@@ -41,7 +41,7 @@
     {% endif %}
 
     <div class="col-md-9 col-sm-offset-3 {% if proposal.state != 'new' -%} hidden {%- endif %}">
-      {% if form.type == 'youthworkshop' %}
+      {% if proposal.type == 'youthworkshop' %}
       <label class="checkbox">
         {{ form.valid_dbs() }}
         I have a valid <a href="https://www.gov.uk/government/organisations/disclosure-and-barring-service/about#dbs-checks" target="_blank">DBS check</a>

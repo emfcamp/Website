@@ -51,8 +51,7 @@ class ProposalForm(Form):
 
 
 class TalkProposalForm(ProposalForm):
-    type = 'talk'
-    human_type = type
+    model = TalkProposal
     length = SelectField("Duration", default='25-45 mins',
                          choices=[('< 10 mins', "Shorter than 10 minutes"),
                                   ('10-25 mins', "10-25 minutes"),
@@ -62,8 +61,7 @@ class TalkProposalForm(ProposalForm):
 
 
 class WorkshopProposalForm(ProposalForm):
-    type = 'workshop'
-    human_type = type
+    model = WorkshopProposal
     length = StringField("Duration", [Required()])
     attendees = StringField("Attendees", [Required()])
     cost = StringField("Cost per attendee")
@@ -72,8 +70,7 @@ class WorkshopProposalForm(ProposalForm):
 
 
 class YouthWorkshopProposalForm(ProposalForm):
-    type = 'youthworkshop'
-    human_type = 'youth workshop'
+    model = YouthWorkshopProposal
     length = StringField("Duration", [Required()])
     attendees = StringField("Attendees", [Required()])
     cost = StringField("Cost per attendee")
@@ -83,8 +80,7 @@ class YouthWorkshopProposalForm(ProposalForm):
 
 
 class PerformanceProposalForm(ProposalForm):
-    type = 'performance'
-    human_type = type
+    model = PerformanceProposal
     length = SelectField("Duration", default='25-45 mins',
                          choices=[('< 10 mins', "Shorter than 10 minutes"),
                                   ('10-25 mins', "10-25 minutes"),
@@ -95,8 +91,7 @@ class PerformanceProposalForm(ProposalForm):
 
 
 class InstallationProposalForm(ProposalForm):
-    type = 'installation'
-    human_type = type
+    model = InstallationProposal
     size = SelectField('Physical size', default="medium",
                                         choices=[('small', 'Smaller than a wheelie bin'),
                                                  ('medium', 'Smaller than a car'),
@@ -212,14 +207,12 @@ def form(cfp_type='talk'):
                       recipients=[current_user.email])
 
         msg.body = render_template('emails/cfp-submission.txt',
-                                   cfp=cfp, type=cfp_type, new_user=new_user)
+                                   proposal=cfp, new_user=new_user)
         mail.send(msg)
 
         return redirect(url_for('.complete'))
 
-    full_price = None
-
-    return render_template('cfp/new.html', full_price=full_price, form=form,
+    return render_template('cfp/new.html', cfp_type=cfp_type, form=form,
                            has_errors=bool(form.errors), ignore_closed=ignore_closed)
 
 

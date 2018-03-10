@@ -371,17 +371,19 @@ class Proposal(db.Model):
             return 'https://map.emfcamp.org/?lat=%s&lon=%s&title=%s#19/%s/%s' % (latlon[0], latlon[1], self.scheduled_venue.name, latlon[0], latlon[1])
         return None
 
-
 class PerformanceProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'performance'}
+    human_type = 'performance'
 
 
 class TalkProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'talk'}
+    human_type = 'talk'
 
 
 class WorkshopProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'workshop'}
+    human_type = 'workshop'
     attendees = db.Column(db.String)
     cost = db.Column(db.String)
     age_range = db.Column(db.String)
@@ -390,11 +392,13 @@ class WorkshopProposal(Proposal):
 
 class YouthWorkshopProposal(WorkshopProposal):
     __mapper_args__ = {'polymorphic_identity': 'youthworkshop'}
+    human_type = 'youth workshop'
     valid_dbs = db.Column(db.Boolean, nullable=False, default=False)
 
 
 class InstallationProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'installation'}
+    human_type = 'installation'
     size = db.Column(db.String)
     funds = db.Column(db.String, nullable=True)
 

@@ -20,7 +20,7 @@
     </fieldset>
 
     <fieldset>
-        <legend>Confirm Your {{proposal.type|capitalize}}</legend>
+        <legend>Confirm Your {{proposal.human_type | title}}</legend>
         <p>Please confirm how you would like your title and description to
           appear in the schedule</p>
         {{ render_field(form.title, 9) }}
