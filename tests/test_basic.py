@@ -8,7 +8,6 @@ URLS = [
     '/about',
     '/cfp',
     '/login',
-    '/sponsors',
     '/metrics'
 ]
 
@@ -18,10 +17,7 @@ class BasicTestCase(unittest.TestCase):
     def setUp(self):
         self.client, self.app, self.db = get_app()
 
-    def tearDown(self):
-        pass
-
-    def test_root(self):
+    def test_url(self):
         for url in URLS:
             rv = self.client.get(url)
-            assert 'Electromagnetic Field' in rv.data.decode('utf-8')
+            assert rv.status_code == 200, "Fetching %s results in HTTP 200" % url
