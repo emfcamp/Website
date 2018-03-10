@@ -51,7 +51,9 @@
          <p>We'll use these details to help us schedule your {{form.human_type}}.</p>
         {% call render_field(form.requirements, horizontal=9,
                             placeholder="Such as tools, assistants, or other non-standard things") %}
+          {% if form.type in ('talk', 'performance') %}
             We'll provide a standard set of Audio-Visual equipment.
+          {% endif %}
         {% endcall %}
       {% if form.type in ('talk', 'performance', 'workshop', 'youthworkshop') %}
         {{ render_field(form.length, horizontal=9, placeholder="Your best guess, whether in minutes or days") }}
