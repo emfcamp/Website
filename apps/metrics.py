@@ -40,8 +40,8 @@ class ExternalMetrics:
                                          labels=['provider', 'state'])
         emf_attendees = GaugeMetricFamily('emf_attendees', "Attendees",
                                           labels=['checked_in', 'badged_up'])
-        emf_cfp = GaugeMetricFamily('emf_cfp', "CfP Submissions",
-                                    labels=['type', 'state'])
+        emf_proposals = GaugeMetricFamily('emf_proposals', "CfP Submissions",
+                                          labels=['type', 'state'])
 
         gauge_groups(emf_purchases, Purchase.query.join(Product),
                      Product.name, Purchase.state)
@@ -49,14 +49,14 @@ class ExternalMetrics:
                      Payment.provider, Payment.state)
         gauge_groups(emf_attendees, AdmissionTicket.query,
                      cast(AdmissionTicket.checked_in, String), cast(AdmissionTicket.badge_issued, String))
-        gauge_groups(emf_cfp, Proposal.query,
+        gauge_groups(emf_proposals, Proposal.query,
                      Proposal.type, Proposal.state)
 
         return [
             emf_purchases,
             emf_payments,
             emf_attendees,
-            emf_cfp
+            emf_proposals,
         ]
 
 
