@@ -170,7 +170,7 @@ def account():
 @login_required
 def tickets():
     owned_purchases = current_user.owned_products \
-                                  .filter(Purchase.state != 'cancelled') \
+                                  .filter(~Purchase.state.in_(['cancelled', 'reserved'])) \
                                   .order_by(Purchase.id)
 
     tickets = owned_purchases.filter(Purchase.is_ticket.is_(True)).all()
