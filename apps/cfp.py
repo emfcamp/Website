@@ -116,15 +116,15 @@ class InstallationProposalForm(ProposalForm):
 def get_cfp_type_form(cfp_type):
     form = None
     if cfp_type == 'talk':
-        form = TalkProposalForm(prefix="talk")
+        form = TalkProposalForm()
     elif cfp_type == 'performance':
-        form = PerformanceProposalForm(prefix="performance")
+        form = PerformanceProposalForm()
     elif cfp_type == 'workshop':
-        form = WorkshopProposalForm(prefix="workshop")
+        form = WorkshopProposalForm()
     elif cfp_type == 'youthworkshop':
-        form = YouthWorkshopProposalForm(prefix="youthworkshop")
+        form = YouthWorkshopProposalForm()
     elif cfp_type == 'installation':
-        form = InstallationProposalForm(prefix="installation")
+        form = InstallationProposalForm()
     return form
 
 
@@ -137,7 +137,6 @@ def main():
 @feature_flag('CFP')
 def form(cfp_type='talk'):
     form = get_cfp_type_form(cfp_type)
-    form.active_cfp_type = cfp_type
     if not form:
         abort(404)
 
@@ -220,8 +219,7 @@ def form(cfp_type='talk'):
 
     full_price = None
 
-    return render_template('cfp/new.html', full_price=full_price,
-                           form=form, active_cfp_type=cfp_type,
+    return render_template('cfp/new.html', full_price=full_price, form=form,
                            has_errors=bool(form.errors), ignore_closed=ignore_closed)
 
 

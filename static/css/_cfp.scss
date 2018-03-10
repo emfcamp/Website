@@ -5,66 +5,21 @@
 }
 
 
-@media (max-width: 550px){
-  .cfp-types.nav-tabs > li {
-    display: block;
-    max-width: 150px;
-    height: 138px;
-  }
-  .cfp-types.nav-tabs > li > a {
-    height: 100%;
-  }
-}
-
-@media (min-width: 550px) and (max-width: 768px) {
-  .cfp-types.nav-tabs > li {
-    display: block;
-    max-width: 170px;
-    height: 138px;
-  }
-  .cfp-types.nav-tabs > li > a {
-    height: 100%;
-  }
-}
-
-.cfp-types.nav-tabs h4 {
-  color: $highlight-background-text
-}
-
-.cfp-types.nav-tabs > li > a {
-    background-color: $highlight-2-background;
-  color: $highlight-background-text;
-  padding-bottom: 9px; /* align tab bottoms */
-}
-
-.cfp-types.nav-tabs > li.active > a,
-.cfp-types.nav-tabs > li.active > a:hover,
-.cfp-types.nav-tabs > li.active > a:focus {
-  background-color: $highlight-background;
-  color: $highlight-background-text;
-  padding-bottom: 10px; /* align tab bottoms */
-}
-
-.cfp-tab {
+.cfp-pane {
   background-color: $highlight-background;
   color: $highlight-background-text;
   padding: 15px;
 }
 
-.cfp-tab a {
+.cfp-pane a {
   color: $highlight-background-link;
 }
 
-.cfp-tab .has-error .help-block a {
+.cfp-pane .has-error .help-block a {
   color: inherit;
 }
 
-.cfp-types.nav > li > a:hover,
-.cfp-types.nav > li > a:focus {
-  background-color: $highlight-background;
-}
-
-.cfp-tab .form-actions {
+.cfp-pane .form-actions {
   margin-top: 2ex;
 }
 .cfp-guidance dt {
