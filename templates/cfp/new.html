@@ -24,8 +24,8 @@
               Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('.main', cfp_type=form.active_cfp_type) + ('?closed' if ignore_closed else ''), email=form.email.data) }}" target="_new">click here</a> to log in.
           </div>
         {% else %}
-          <p>If you've already bought a ticket, please
-              <a href="{{ url_for('users.login', next=url_for('.main', cfp_type=form.type) + ('?closed' if ignore_closed else '')) }}" target="_blank">log in</a>.</p>
+          <p>
+            <a href="{{ url_for('users.login', next=url_for('.main', cfp_type=form.type) + ('?closed' if ignore_closed else '')) }}" target="_blank">Please, log in,</a> if you've already bought a ticket (or had one transferred to you).</p>
         {% endif %}
         {{ render_field(form.name, horizontal=9, placeholder="Your name (or pseudonym)") }}
         {{ render_field(form.email, horizontal=9, placeholder="Your email address") }}
