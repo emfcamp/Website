@@ -8,7 +8,6 @@ from sqlalchemy.orm import joinedload
 from main import db
 from .exc import CapacityException
 from .purchase import Purchase, Ticket, AdmissionTicket
-from .user import User
 
 class Line:
     def __init__(self, tier, count, purchases=None):
@@ -116,13 +115,13 @@ class Basket(MutableMapping):
             criteria.append(Purchase.id.in_(ids | surplus_ids))
 
         if self.user.is_authenticated:
-            criteria.append(User.id == self.user.id)
+            criteria.append(Purchase.owner_id == self.user.id)
 
         if criteria:
             all_purchases = Purchase.query.filter_by(state='reserved', payment_id=None) \
                                           .filter(or_(*criteria)) \
-                                          .options(joinedload(Purchase.price_tier)) \
-                                          .all()
+                                          .options(joinedload(Purchase.price_tier))
+            all_purchases = all_purchases.all()
 
         else:
             all_purchases = []

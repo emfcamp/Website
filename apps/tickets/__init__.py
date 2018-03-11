@@ -202,8 +202,7 @@ def main(flow=None):
                 pt = f._tier
                 if f.amount.data != basket.get(pt, 0):
                     app.logger.info('Adding %s %s tickets to basket', f.amount.data, pt.name)
-                    tier = PriceTier.query.get(pt.id)
-                    basket[tier] = f.amount.data
+                    basket[pt] = f.amount.data
 
             if not available:
                 app.logger.warn('User has no reservations, enforcing unavailable state')
@@ -222,6 +221,7 @@ def main(flow=None):
                 except CapacityException as e:
                     # Damn, capacity's gone since we created the purchases
                     # Redirect back to show what's currently in the basket
+                    db.session.rollback()
                     no_capacity.inc()
                     app.logger.warn('Limit exceeded creating tickets: %s', e)
                     flash("We're very sorry, but there is not enough capacity available to "

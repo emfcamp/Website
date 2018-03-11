@@ -18,6 +18,7 @@ from wtforms.fields.html5 import EmailField
 from sqlalchemy.sql.functions import func
 
 from main import db, mail
+from models.basket import Basket
 from models.exc import CapacityException
 from models.user import User
 from models.payment import Payment
@@ -81,12 +82,12 @@ class TicketAmountForm(Form):
     tier_id = HiddenIntegerField('Price tier', [Required()])
 
 
-class FreeTicketsForm(Form):
+class TicketsForm(Form):
     price_tiers = FieldList(FormField(TicketAmountForm))
     allocate = SubmitField('Allocate tickets')
 
 
-class FreeTicketsNewUserForm(FreeTicketsForm):
+class TicketsNewUserForm(TicketsForm):
     name = StringField('Name', [Required()])
     email = EmailField('Email', [Email(), Required()])
 
@@ -104,11 +105,11 @@ def tickets_choose_free(user_id=None):
     ).order_by(Product.name).all()
 
     if user_id is None:
-        form = FreeTicketsNewUserForm()
+        form = TicketsNewUserForm()
         user = None
         new_user = True
     else:
-        form = FreeTicketsForm()
+        form = TicketsForm()
         user = User.query.get_or_404(user_id)
         new_user = False
 
@@ -228,5 +229,85 @@ def cancel_free_ticket(ticket_id):
             return redirect(url_for('admin.list_free_tickets'))
 
     return render_template('admin/tickets/ticket-cancel-free.html', ticket=ticket, form=form)
+
+
+@admin.route('/tickets/reserve', methods=['GET', 'POST'])
+@admin.route('/tickets/reserve/<int:user_id>', methods=['GET', 'POST'])
+@admin_required
+def tickets_reserve(user_id=None):
+    pts = PriceTier.query.join(Product) \
+                         .order_by(Product.name).all()
+
+    if user_id is None:
+        form = TicketsNewUserForm()
+        user = None
+        new_user = True
+    else:
+        form = TicketsForm()
+        user = User.query.get_or_404(user_id)
+        new_user = False
+
+    if request.method != 'POST':
+        for pt in pts:
+            form.price_tiers.append_entry()
+            form.price_tiers[-1].tier_id.data = pt.id
+
+    pts = {pt.id: pt for pt in pts}
+    for f in form.price_tiers:
+        f._tier = pts[f.tier_id.data]
+        # TODO: apply per-user limits
+        values = range(f._tier.personal_limit + 1)
+        f.amount.values = values
+        f._any = any(values)
+
+    if form.validate_on_submit():
+        if new_user:
+            app.logger.info('Creating new user with email %s and name %s',
+                            form.email.data, form.name.data)
+            user = User(form.email.data, form.name.data)
+            flash('Created account for %s' % form.email.data)
+
+            db.session.add(user)
+
+        basket = Basket(user, 'GBP', [], [])
+        for f in form.price_tiers:
+            if f.amount.data:
+                basket[f._tier] = f.amount.data
+
+        app.logger.info('Admin basket %s', basket)
+
+        try:
+            basket.create_purchases()
+            basket.ensure_purchase_capacity()
+
+            db.session.commit()
+
+        except CapacityException as e:
+            db.session.rollback()
+            app.logger.warn('Limit exceeded creating admin tickets: %s', e)
+            return redirect(url_for('.tickets_reserve', user_id=user_id))
+
+        code = user.login_code(app.config['SECRET_KEY'])
+        msg = Message('Your reserved tickets to EMF',
+                      sender=app.config['TICKETS_EMAIL'],
+                      recipients=[user.email])
+
+        msg.body = render_template('emails/tickets-reserved.txt',
+                            user=user, code=code, tickets=basket.purchases,
+                            new_user=new_user)
+
+        mail.send(msg)
+        db.session.commit()
+
+        flash('Reserved tickets for {}'.format(user))
+        return redirect(url_for('.tickets_reserve'))
+
+    if new_user:
+        users = User.query.order_by(User.id).all()
+    else:
+        users = None
+
+    return render_template('admin/tickets/tickets-reserve.html',
+                           form=form, pts=pts, user=user, users=users)
 
 
