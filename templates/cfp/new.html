@@ -49,13 +49,13 @@
      <fieldset>
          <legend>More details</legend>
          <p>We'll use these details to help us schedule your {{form.model.human_type}}.</p>
+      {% if cfp_type in ('talk', 'performance', 'workshop', 'youthworkshop') %}
         {% call render_field(form.requirements, horizontal=9,
                             placeholder="Such as tools, assistants, or other non-standard things") %}
           {% if cfp_type in ('talk', 'performance', 'workshop') %}
             We'll provide a standard set of Audio-Visual equipment.
           {% endif %}
         {% endcall %}
-      {% if cfp_type in ('talk', 'performance', 'workshop', 'youthworkshop') %}
         {{ render_field(form.length, horizontal=9, placeholder="Your best guess, whether in minutes or days") }}
       {% endif %}
 
