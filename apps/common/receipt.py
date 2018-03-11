@@ -1,16 +1,16 @@
 # coding=utf-8
 from __future__ import division, absolute_import, print_function, unicode_literals
 import io
-from urllib.parse import urljoin
-from xhtml2pdf import pisa
+from lxml import etree
+import asyncio
+
+from flask import Markup, render_template
+from sqlalchemy import func
+from pyppeteer.launcher import launch
 import qrcode
 from qrcode.image.svg import SvgPathImage
 import barcode
 from barcode.writer import ImageWriter, SVGWriter
-from lxml import etree
-
-from flask import Markup, render_template, request, current_app as app
-from sqlalchemy import func
 
 from models.product import Product, ProductGroup, PriceTier
 from models.purchase import PurchaseTransfer, Ticket
@@ -64,25 +64,36 @@ def render_parking_receipts(png=False, pdf=False):
                            pdf=pdf, png=png)
 
 
-def render_pdf(html, url_root=None):
+def render_pdf(url, html):
     # This needs to fetch URLs found within the page, so if
     # you're running a dev server, use app.run(processes=2)
-    if url_root is None:
-        url_root = app.config.get('BASE_URL', request.url_root)
+    async def to_pdf():
+        # TOSO: make it possible to use a running process
+        browser = await launch(executablePath='google-chrome')
 
-    def fix_link(uri, rel):
-        if uri.startswith('//'):
-            uri = 'https:' + uri
-        if uri.startswith('https://'):
-            return uri
+        page = await browser.newPage()
 
-        return urljoin(url_root, uri)
+        async def request_intercepted(request):
+            if request.url == url:
+                await request.respond({'body': html})
+            else:
+                await request.continue_()
 
-    pdffile = io.StringIO()
-    pisa.CreatePDF(html, pdffile, link_callback=fix_link)
-    pdffile.seek(0)
+        page.on('request', request_intercepted)
+        await page.setRequestInterception(True)
 
+        await page.goto(url)
+        pdf = await page.pdf()
+        await browser.close()
+        return pdf
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    pdf = loop.run_until_complete(to_pdf())
+
+    pdffile = io.BytesIO(pdf)
     return pdffile
+
 
 def format_inline_qr(data):
     qrfile = io.BytesIO()
@@ -140,17 +151,14 @@ def make_barcode_png(data, **options):
 
 def attach_tickets(msg, user):
     # Attach tickets to a mail Message
-    # TODO make this work again
-    app.logger.warn("This still isn't working, no receipts are being sent")
-    return
-    # page = render_receipt(user, pdf=True)
-    # pdf = render_pdf(page)
+    page = render_receipt(user, pdf=True)
+    pdf = render_pdf(page)
 
-    # tickets = user.tickets.filter_by(paid=True)
-    # plural = (tickets.count() != 1 and 's' or '')
-    # msg.attach('Ticket%s.pdf' % plural, 'application/pdf', pdf.read())
+    tickets = user.tickets.filter_by(paid=True)
+    plural = (tickets.count() != 1 and 's' or '')
+    msg.attach('Ticket%s.pdf' % plural, 'application/pdf', pdf.read())
 
-    # tickets = user.purchased_products.filter_by(state='paid')
-    # for t in tickets:
-    #     tickets.set_state('receipt-emailed')
+    tickets = user.purchased_products.filter_by(state='paid')
+    for t in tickets:
+        tickets.set_state('receipt-emailed')
 

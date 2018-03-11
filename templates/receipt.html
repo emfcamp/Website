@@ -23,7 +23,7 @@
 {% endif %}
 
     <div class="qrcode">
-      {% if pdf or png %}
+      {% if png %}
         <img src="{{ url_for('tickets.tickets_qrcode', checkin_code=user.checkin_code) }}">
       {% else %}
         {# Preferred format is SVG because it scales and we don't pass the checkin code back #}
@@ -169,7 +169,7 @@
            If you&rsquo;re arriving at the entrance gate together, you only need this copy.
         </p>
         {% for t in transferred_tickets %}
-        <div class="ticket-transfer">{{ t.to_user.name }}: {{ t.ticket.product.name }}</div>
+        <div class="ticket-transfer">{{ t.to_user.name }}: {{ t.purchase.product.name }}</div>
         {% endfor %}
         {% endif %}
 

@@ -44,13 +44,7 @@ gunicorn = "*"
 eventlet = "*"
 qrcode = "==5.3"
 pybarcode = {git = "https://github.com/emfcamp/python-barcode"}
-"xhtml2pdf" = {git = "https://github.com/xhtml2pdf/xhtml2pdf"}
-"httplib2" = "==0.10.3"
-"html5lib" = "==0.999999999"
-webencodings = "==0.5.1"
-"pypdf2" = "==1.26.0"
-pillow = "==4.2.1"
-reportlab = "==3.4.0"
+pillow = "*"
 icalendar = "==3.11.7"
 pytz = "*"
 "mailchimp3" = "==2.0.17"
@@ -65,6 +59,7 @@ awesome-slugify = "*"
 faker = "*"
 pyyaml = "*"
 prometheus-client = "*"
+pyppeteer = "*"
 
 
 [dev-packages]

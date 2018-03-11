@@ -14,7 +14,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 
-from main import db, mail
+from main import db, mail, external_url
 from models.exc import CapacityException
 from models.user import User, checkin_code_re
 from models.product import (
@@ -438,7 +438,8 @@ def receipt(user_id=None):
 
     page = render_receipt(user, png, pdf)
     if pdf:
-        return send_file(render_pdf(page), mimetype='application/pdf')
+        url = external_url('tickets.receipt', user_id=user_id)
+        return send_file(render_pdf(url, page), mimetype='application/pdf')
 
     return page
 
