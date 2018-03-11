@@ -26,7 +26,7 @@
           <p>
             <a href="{{ url_for('users.login', next=url_for('.main', cfp_type=cfp_type) + ('?closed' if ignore_closed else '')) }}" target="_blank">Please log in</a> if you've already bought a ticket (or had one transferred to you).</p>
         {% endif %}
-        {{ render_field(form.name, horizontal=9, placeholder="Your name (or pseudonym)") }}
+        {{ render_field(form.name, horizontal=9, placeholder="Your name" + (' (or pseudonym)' if cfp_type != 'youthworkshop' else '')) }}
         {{ render_field(form.email, horizontal=9, placeholder="Your email address") }}
       </fieldset>
       {% endif %}
@@ -94,6 +94,7 @@
             {{ form.valid_dbs() }}
             I have a valid <a href="https://www.gov.uk/government/organisations/disclosure-and-barring-service/about#dbs-checks" target="_blank">DBS check</a>
           </label>
+          <small>This is not a requirement but please let us know if you have one</small>
           {% endif %}
           <label class="checkbox">
             {{ form.needs_help() }}
