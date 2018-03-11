@@ -177,7 +177,7 @@ def main(flow=None):
 
         # If they've already got reserved tickets, let them keep them
         user_limit = max(tier.user_limit(), basket.get(tier, 0))
-        if f.amount.data > user_limit:
+        if f.amount.data and f.amount.data > user_limit:
             capacity_gone = True
         values = range(user_limit + 1)
         f.amount.values = values
