@@ -1,0 +1,117 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block title %}Call for Participation{% endblock %}
+{% block body %}
+  {% if has_errors %}
+  <div class="alert alert-danger">Could not submit your proposal. Please <a href="#cfp-errors" class="alert-link">check below</a> and try again.</div>
+  {% endif %}
+
+<h2>Submit a {{form.model.human_type}} proposal</h2>
+
+  {% include 'cfp/form_' + cfp_type + '_include.html' %}
+
+  <div class="cfp-pane" id="cfp-errors">
+    <form action={{ url_for('cfp.form', cfp_type=cfp_type) + ('?closed' if ignore_closed else '') }} method="post" class="form-horizontal cfp-form" role="form">
+      {{ form.hidden_tag() }}
+      {% if not current_user.is_authenticated %}
+      <fieldset>
+        <legend>Your details</legend>
+        {% if form.email.was_duplicate %}
+          <div class="alert alert-warning">
+              This email address already exists in our system, possibly because you previously tried to submit a proposal and
+              we automatically created an account for you.
+              Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('.main', cfp_type=cfp_type) + ('?closed' if ignore_closed else ''), email=form.email.data) }}" target="_new">click here</a> to log in.
+          </div>
+        {% else %}
+          <p>
+            <a href="{{ url_for('users.login', next=url_for('.main', cfp_type=cfp_type) + ('?closed' if ignore_closed else '')) }}" target="_blank">Please log in</a> if you've already bought a ticket (or had one transferred to you).</p>
+        {% endif %}
+        {{ render_field(form.name, horizontal=9, placeholder="Your name (or pseudonym)") }}
+        {{ render_field(form.email, horizontal=9, placeholder="Your email address") }}
+      </fieldset>
+      {% endif %}
+
+      <fieldset>
+          <legend>About your {{form.model.human_type}}</legend>
+          <p>You'll be able to tweak the title and description before we publish them.
+             {% if cfp_type not in ('performance', 'youthworkshop') %}
+             To help with our anonymised review process, try to avoid including
+             personally identifiable information at this stage.
+             {% endif %}
+          </p>
+          {{render_field(form.title, horizontal=9, placeholder="A short summary")}}
+          {% call render_field(form.description, horizontal=9,
+                         placeholder="A description to send to the reviewers") %}
+            Please keep this shorter than 250 words.
+          {% endcall %}
+     </fieldset>
+
+     <fieldset>
+         <legend>More details</legend>
+         <p>We'll use these details to help us schedule your {{form.model.human_type}}.</p>
+        {% call render_field(form.requirements, horizontal=9,
+                            placeholder="Such as tools, assistants, or other non-standard things") %}
+          {% if cfp_type in ('talk', 'performance', 'workshop') %}
+            We'll provide a standard set of Audio-Visual equipment.
+          {% endif %}
+        {% endcall %}
+      {% if cfp_type in ('talk', 'performance', 'workshop', 'youthworkshop') %}
+        {{ render_field(form.length, horizontal=9, placeholder="Your best guess, whether in minutes or days") }}
+      {% endif %}
+
+      {% call render_field(form.notice_required, horizontal=9) %}
+        If accepted, how much notice do you need? We'll try and give you as much time as we can.
+      {% endcall %}
+
+      {% if cfp_type in ('workshop', 'youthworkshop') %}
+          {% call render_field(form.attendees, horizontal=9,
+                placeholder="The number of people you can accommodate in your workshop") %}
+                {% if cfp_type != 'youthworkshop' %}
+                Our workshop tents can accommodate 10-50 attendees per session; if your workshop
+                is smaller than that, you could consider holding it at a
+                <a href="https://wiki.emfcamp.org/wiki/Villages">village</a> instead.
+                {% endif %}
+          {% endcall %}
+          {{ render_field(form.cost, horizontal=9, placeholder="If attendees need to pay for materials") }}
+          {{ render_field(form.participant_equipment, horizontal=9, placeholder="Things they should bring - such as a laptop, arduino, or knitting needles") }}
+          {{ render_field(form.age_range, horizontal=9, placeholder="What age group is this suitable for? Approximate is fine") }}
+      {% elif cfp_type == 'installation' %}
+          {% call render_field(form.requirements, horizontal=9,
+          placeholder="What are your installation's requirements?") %}
+            Let us know if your installation needs power, internet, or anything else special.
+          {% endcall %}
+          {% call render_field(form.size, horizontal=9) %}
+            How much space will your installation take up?
+          {% endcall %}
+          {% call render_field(form.funds, 9) %}
+            We have a limited amount of funding available to make the EMF site look great.
+            If you'd like to apply for a grant, let us know how much you'll need.
+          {% endcall %}
+      {% endif %}
+        <div class="col-md-9 col-sm-offset-3">
+          {% if cfp_type == 'youthworkshop' %}
+          <label class="checkbox">
+            {{ form.valid_dbs() }}
+            I have a valid <a href="https://www.gov.uk/government/organisations/disclosure-and-barring-service/about#dbs-checks" target="_blank">DBS check</a>
+          </label>
+          {% endif %}
+          <label class="checkbox">
+            {{ form.needs_help() }}
+            I'd like advice or help with this proposal
+          </label>
+          <small>We're happy to advise on submissions before they are reviewed</small>
+          {% for error in form.needs_help.errors %}
+          <div class="help-block">{{ error }}</div>
+          {% endfor %}
+        </div>
+      </fieldset>
+      <p>&nbsp;</p>
+
+      <div class="form-actions">
+        <button type="submit" name="Create" class="btn btn-primary btn-lg pull-right debounce">Submit proposal</button>
+      </div>
+      <div class="clearfix"></div>
+    </form>
+</div>
+
+{% endblock %}

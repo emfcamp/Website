@@ -4,25 +4,21 @@
     {{ form.hidden_tag() }}
 
     <fieldset>
-        <legend>About Your {{form.type|capitalize}}</legend>
-        {% if proposal.state == 'new' %}
-        <p>To help with our anonymised review process, try to avoid including
-           personally identifiable information at this stage.</p>
-        {% endif %}
+        <legend>About your {{proposal.human_type}}</legend>
         {{ render_field(form.title, 9) }}
         {{ render_field(form.description, 9) }}
     </fieldset>
 
     <fieldset>
         <legend>More Details</legend>
-        <p>We'll use these details to help us schedule your {{form.type}}.</p>
+        <p>We'll use these details to help us schedule your {{proposal.human_type}}.</p>
 
-    {% if proposal.type == 'talk' %}
+    {% if proposal.type in ('talk', 'performance') %}
       {{ render_field(form.requirements, 9) }}
       {{ render_field(form.length, 9) }}
       {{ render_field(form.notice_required, 9) }}
 
-    {% elif proposal.type == 'workshop' %}
+    {% elif proposal.type in ('workshop', 'youthworkshop') %}
       {{ render_field(form.requirements, 9) }}
       {{ render_field(form.length, 9) }}
       {{ render_field(form.notice_required, 9) }}
@@ -31,6 +27,8 @@
           is smaller than that, we might be able to find somewhere else to hold it.
       {% endcall %}
       {{ render_field(form.cost, 9) }}
+      {{ render_field(form.participant_equipment, 9)}}
+      {{ render_field(form.age_range, 9) }}
 
     {% elif proposal.type == 'installation' %}
       {{ render_field(form.notice_required, 9) }}
@@ -43,6 +41,12 @@
     {% endif %}
 
     <div class="col-md-9 col-sm-offset-3 {% if proposal.state != 'new' -%} hidden {%- endif %}">
+      {% if proposal.type == 'youthworkshop' %}
+      <label class="checkbox">
+        {{ form.valid_dbs() }}
+        I have a valid <a href="https://www.gov.uk/government/organisations/disclosure-and-barring-service/about#dbs-checks" target="_blank">DBS check</a>
+      </label>
+      {% endif %}
       <label class="checkbox">
         {{ form.needs_help() }}
         I'd like help with preparing this proposal.

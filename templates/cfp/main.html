@@ -2,18 +2,14 @@
 {% extends "base.html" %}
 {% block title %}Call for Participation{% endblock %}
 {% block body %}
-  {% if has_errors %}
-  <div class="alert alert-danger">Could not submit your proposal. Please <a href="#cfp-errors" class="alert-link">check below</a> and try again.</div>
-  {% endif %}
-
 <h2>Call for Participation</h2>
     <p class="emphasis">Electromagnetic Field is a UK camping festival for those
       with an inquisitive mind or an interest in making things: hackers, artists,
       geeks, crafters, scientists, and engineers. It's happening near
       Ledbury, Herefordshire on {{ fancy_dates }} {{ event_year }}.</p>
 
-    <p>We're looking for talks, performances, installations, and workshops.
-       We're especially keen to hear from people with
+    <p>We're looking for talks, performances, installations, and workshops for
+    all ages.  We're especially keen to hear from people with
       <a href="{{ url_for('base.diversity') }}">different backgrounds</a> than
       you'd expect to find at a technology conference.</p>
 
@@ -27,178 +23,40 @@
     <h3>Money</h3>
     <p>EMF is a non-profit community event, entirely run by unpaid volunteers. All of
       the ticket cost goes directly towards turning a field into a habitable and amazing place
-      to spend a weekend, and everyone who attends contributes to making the event a success.</p>
+      to spend a weekend, and all those who attend contribute to making the event a success.</p>
 
-    <p>We'd like everyone who participates to buy a ticket and stick around for
-      the whole event. We don't have the budget to pay speakers, although we have a
-      limited amount of money set aside to help those who otherwise can't afford to come, or
-      who can only attend for the day of their talk or workshop. We'll ask you about this if your
-      proposal is accepted.</p>
+    <p>Everybody who has a proposal accepted is guaranteed the opportunity to
+    buy a ticket, and given the option of a discounted full ticket or a free
+    day ticket if they don't want to come for the entire event. We can also
+    offer to cover transport costs for those that cannot afford them.</p>
 
-    <p>Everybody who has a proposal accepted is guaranteed a full ticket for a discounted price.</p>
+    <p>We ask that if you can afford it, you buy a full price ticket - this
+    allows us to use our limited funds to assist those who otherwise could not
+    attend or present at the event.</p>
 
     <h3>Selection</h3>
-    <p>After you submit a proposal, it will be considered anonymously by a diverse
+    <p>After you submit a proposal, it will be considered by a diverse
       selection panel. For more on the EMF selection process, see our
         <a href="{{ url_for('.guidance') }}" target="_blank">guidance</a>.</p>
 
-    <h3>Previous submissions</h3>
+    <h2>Submit a new proposal</h2>
+    <p>Please select the type of proposal you want to submit:</p>
+    <div class="list-group cfp-choose-type">
+        <a href="/cfp/talk" class="list-group-item"><strong>Talk</strong> &ndash; held on one of our stages</a>
+        <a href="/cfp/workshop" class="list-group-item"><strong>Workshop</strong> &ndash; demonstration or group activity</a>
+        <a href="/cfp/youthworkshop" class="list-group-item"><strong>Youth Workshop</strong> &ndash; for under 13s</a>
+        <a href="/cfp/performance" class="list-group-item"><strong>Performance</strong> &ndash; of music, art, film</a>
+        <a href="/cfp/installation" class="list-group-item"><strong>Installation</strong> &ndash; creation around the site</a>
+    </div>
+
     {% if current_user.is_authenticated %}
       <p>If you've already submitted to the call for participation then you can
-        view and edit you proposal(s) <a href="{{ url_for('.proposals') }}">here</a>.</p>
+        view and edit your proposals <a href="{{ url_for('.proposals') }}">here</a>.</p>
     {% else %}
       <p>If you have already submitted to the call for participation then you
         need to <a href="{{ url_for('users.login', next=url_for('.proposals') ) }}">login</a>
         in order to view or edit your proposals.</p>
         {% endif %}
 
-    <h2>Submit a proposal</h2>
-    <ul class="nav nav-tabs cfp-types" role="navigation" id="cfp-errors" role="menu"
-        aria-label="proposal type">
-    {% for form in forms %}
-      <li {% if form.type == active_cfp_type -%} class="active" {%- endif %}>
-      <a href="{{ url_for('cfp.main', cfp_type=form.type) + ('?closed' if ignore_closed else '') }}"
-          data-target="#{{ 'tab_' + form.type }}" data-toggle="tab"
-          {% if form.type == active_cfp_type %}
-            aria-selected="true"
-          {% else %}
-            aria-selected="false"
-          {% endif %}
-          >
-          {% if form.type == 'talk' %}
-            <h4>Talk or Performance</h4>
-            <p>Held on one of our stages</p>
-          {% elif form.type == 'workshop' %}
-            <h4>Workshop</h4>
-            <p>Demonstration or activity</p>
-          {% elif form.type == 'installation' %}
-            <h4>Installation</h4>
-            <p>Creation around the site</p>
-          {% endif %}
-        </a>
-        </button>
-      </li>
-    {% endfor %}
-  </ul>
 
-  <div class="tab-content cfp-tab">
-    {% for form in forms %}
-
-    <div class="tab-pane {%- if form.type == active_cfp_type %} active {%- endif %}" id="{{ 'tab_' + form.type }}">
-    <form action={{ url_for('cfp.main', cfp_type=form.type) + ('?closed' if ignore_closed else '') }} method="post" class="form-horizontal cfp-form" role="form">
-      {{ form.hidden_tag() }}
-      {% if not current_user.is_authenticated %}
-      <fieldset>
-        <legend>Your Details</legend>
-        {% if form.email.was_duplicate %}
-          <div class="alert alert-warning">
-              This email address already exists in our system, possibly because you previously tried to submit a proposal and
-              we automatically created an account for you.
-              Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('.main', cfp_type=form.active_cfp_type) + ('?closed' if ignore_closed else ''), email=form.email.data) }}" target="_new">click here</a> to log in.
-          </div>
-        {% else %}
-          <p>If you've already bought a ticket, please
-              <a href="{{ url_for('users.login', next=url_for('.main', cfp_type=form.type) + ('?closed' if ignore_closed else '')) }}" target="_blank">log in</a>.</p>
-        {% endif %}
-        {{ render_field(form.name, horizontal=9, placeholder="Your name (or pseudonym)") }}
-        {{ render_field(form.email, horizontal=9, placeholder="Your email address") }}
-      </fieldset>
-      {% endif %}
-
-      <fieldset>
-          <legend>About Your {{form.type|capitalize}}</legend>
-          <p>You'll be able to tweak the title and description before we publish them.
-             To help with our anonymised review process, try to avoid including
-             personally identifiable information at this stage.</p>
-          {{render_field(form.title, horizontal=9, placeholder="A short summary")}}
-          {% call render_field(form.description, horizontal=9,
-                         placeholder="An anonymised description to send to the reviewers") %}
-            Please keep this shorter than 250 words.
-          {% endcall %}
-     </fieldset>
-
-     <fieldset>
-         <legend>More Details</legend>
-         <p>We'll use these details to help us schedule your {{form.type}}.</p>
-      {% if form.type in ('talk', 'workshop') %}
-        {% call render_field(form.requirements, horizontal=9,
-                            placeholder="Any unusual requirements") %}
-            We'll provide all the usual AV equipment, but let us know if you need anything unusual.
-        {% endcall %}
-        {{ render_field(form.length, horizontal=9, placeholder="Your best guess, whether in minutes or days") }}
-      {% endif %}
-
-      {% call render_field(form.notice_required, horizontal=9) %}
-        How much notice do you need to prepare? We'll try and give you as much notice as we can.
-      {% endcall %}
-
-      {% if form.type == 'workshop' %}
-          {% call render_field(form.attendees, horizontal=9,
-                placeholder="The number of people you can accommodate in your workshop") %}
-                Our workshop tents can accommodate 10-50 attendees per session; if your workshop
-                is smaller than that, you could consider holding it at a
-                <a href="https://wiki.emfcamp.org/wiki/Villages">village</a> instead.
-          {% endcall %}
-          {{ render_field(form.cost, horizontal=9, placeholder="If attendees need to pay for materials") }}
-      {% elif form.type == 'installation' %}
-          {% call render_field(form.requirements, horizontal=9,
-          placeholder="What are your installation's requirements?") %}
-            Let us know if your installation needs power, internet, or anything else special.
-          {% endcall %}
-          {% call render_field(form.size, horizontal=9) %}
-            How much space will your installation take up?
-          {% endcall %}
-          {% call render_field(form.funds, 9) %}
-            We have a limited amount of funding available to make the EMF site look great.
-            If you'd like to apply for a grant, let us know how much you'll need.
-          {% endcall %}
-      {% endif %}
-        <div class="col-md-9 col-sm-offset-3">
-          <label class="checkbox">
-            {{ form.needs_help() }}
-            I'd like help with preparing this proposal.
-          </label>
-          {% for error in form.needs_help.errors %}
-          <div class="help-block">{{ error }}</div>
-          {% endfor %}
-        </div>
-      </fieldset>
-      <p>&nbsp;</p>
-
-      <div class="form-actions">
-        <button type="submit" name="Create" class="btn btn-primary btn-lg pull-right debounce">Submit proposal</button>
-      </div>
-      <div class="clearfix"></div>
-    </form>
-    </div>
-    {% endfor %}
-</div>
-
-{% endblock %}
-
-{% block foot %}
-<script type="text/javascript">
-$(function() {
-  'use strict';
-
-  // Copy values across when the user switches tab
-  $('.cfp-types a').on('show.bs.tab', function(e) {
-    var $prev = $(e.relatedTarget);
-    var $curr = $(this);
-    var $prev_tab = $($prev.data('target'));
-    var $curr_tab = $($curr.data('target'));
-    $.each(['name', 'email', 'title', 'description', 'requirements', 'needs_help'], function(i, f) {
-      var $curr_f = $curr_tab.find('[name$=-' + f + ']');
-      var $prev_f = $prev_tab.find('[name$=-' + f + ']');
-      if ($curr_f.attr('type') == 'checkbox') {
-          $curr_f.prop('checked', $prev_f.prop('checked'));
-      } else {
-          $curr_f.val($prev_f.val());
-      }
-    });
-
-    return true;
-  });
-});
-</script>
 {% endblock %}

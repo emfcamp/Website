@@ -15,6 +15,7 @@ from models import count_groups
 from models.payment import Payment
 from models.product import Product
 from models.purchase import Purchase, AdmissionTicket
+from models.cfp import Proposal
 
 metrics = Blueprint('metric', __name__)
 
@@ -33,9 +34,14 @@ class ExternalMetrics:
     def collect(self):
         # Strictly, we should include all possible combinations, with 0
 
-        emf_purchases = GaugeMetricFamily('emf_purchases', "Purchases", labels=['product', 'state'])
-        emf_payments = GaugeMetricFamily('emf_payments', "Payments", labels=['provider', 'state'])
-        emf_attendees = GaugeMetricFamily('emf_attendees', "Attendees", labels=['checked_in', 'badged_up'])
+        emf_purchases = GaugeMetricFamily('emf_purchases', "Tickets purchased",
+                                          labels=['product', 'state'])
+        emf_payments = GaugeMetricFamily('emf_payments', "Payments received",
+                                         labels=['provider', 'state'])
+        emf_attendees = GaugeMetricFamily('emf_attendees', "Attendees",
+                                          labels=['checked_in', 'badged_up'])
+        emf_proposals = GaugeMetricFamily('emf_proposals', "CfP Submissions",
+                                          labels=['type', 'state'])
 
         gauge_groups(emf_purchases, Purchase.query.join(Product),
                      Product.name, Purchase.state)
@@ -43,11 +49,14 @@ class ExternalMetrics:
                      Payment.provider, Payment.state)
         gauge_groups(emf_attendees, AdmissionTicket.query,
                      cast(AdmissionTicket.checked_in, String), cast(AdmissionTicket.badge_issued, String))
+        gauge_groups(emf_proposals, Proposal.query,
+                     Proposal.type, Proposal.state)
 
         return [
             emf_purchases,
             emf_payments,
             emf_attendees,
+            emf_proposals,
         ]
 
 

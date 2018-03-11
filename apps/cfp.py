@@ -17,7 +17,7 @@ from sqlalchemy.exc import IntegrityError
 from main import db, mail
 from models.user import User, UserDiversity
 from models.cfp import (
-    TalkProposal, WorkshopProposal, InstallationProposal, Proposal, CFPMessage
+    TalkProposal, WorkshopProposal, YouthWorkshopProposal, PerformanceProposal, InstallationProposal, Proposal, CFPMessage
 )
 from .common import feature_flag, create_current_user
 from .common.forms import Form, TelField
@@ -41,7 +41,7 @@ class ProposalForm(Form):
     def validate_email(form, field):
         if current_user.is_anonymous and User.does_user_exist(field.data):
             field.was_duplicate = True
-            cfp_url = url_for('cfp.main', cfp_type=form.active_cfp_type)
+            cfp_url = url_for('cfp.main')
 
             msg = Markup(render_template_string('''You already have an account.
                 Please <a href="{{ url }}" target="_new">click here</a> to log in.''',
@@ -51,7 +51,7 @@ class ProposalForm(Form):
 
 
 class TalkProposalForm(ProposalForm):
-    type = 'talk'
+    model = TalkProposal
     length = SelectField("Duration", default='25-45 mins',
                          choices=[('< 10 mins', "Shorter than 10 minutes"),
                                   ('10-25 mins', "10-25 minutes"),
@@ -61,46 +61,84 @@ class TalkProposalForm(ProposalForm):
 
 
 class WorkshopProposalForm(ProposalForm):
-    type = 'workshop'
+    model = WorkshopProposal
     length = StringField("Duration", [Required()])
     attendees = StringField("Attendees", [Required()])
     cost = StringField("Cost per attendee")
+    participant_equipment = StringField("Attendee equipment")
+    age_range = StringField("Age range")
+
+
+class YouthWorkshopProposalForm(ProposalForm):
+    model = YouthWorkshopProposal
+    length = StringField("Duration", [Required()])
+    attendees = StringField("Attendees", [Required()])
+    cost = StringField("Cost per attendee")
+    participant_equipment = StringField("Attendee equipment")
+    age_range = StringField("Age range")
+    valid_dbs = BooleanField("I have a valid DBS check")
+
+
+class PerformanceProposalForm(ProposalForm):
+    model = PerformanceProposal
+    length = SelectField("Duration", default='25-45 mins',
+                         choices=[('< 10 mins', "Shorter than 10 minutes"),
+                                  ('10-25 mins', "10-25 minutes"),
+                                  ('25-45 mins', "25-45 minutes"),
+                                  ('> 45 mins', "Longer than 45 minutes"),
+                                  ])
+
 
 
 class InstallationProposalForm(ProposalForm):
-    type = 'installation'
+    model = InstallationProposal
     size = SelectField('Physical size', default="medium",
                                         choices=[('small', 'Smaller than a wheelie bin'),
                                                  ('medium', 'Smaller than a car'),
                                                  ('large', 'Smaller than a lorry'),
                                                  ('huge', 'Bigger than a lorry'),
                                                 ])
-    funds = SelectField('Funding', choices=[         ('0', 'No money needed'),
-                                                     (u'< £50', u'Less than £50'),
-                                                     (u'< £100', u'Less than £100'),
-                                                     (u'< £300', u'Less than £300'),
-                                                     (u'< £500', u'Less than £500'),
-                                                     (u'> £500', u'More than £500'),
-                                                    ])
+    funds = SelectField('Funding', choices=[
+        ('0', 'No money needed'),
+        (u'< £50', u'Less than £50'),
+        (u'< £100', u'Less than £100'),
+        (u'< £300', u'Less than £300'),
+        (u'< £500', u'Less than £500'),
+        (u'> £500', u'More than £500'),
+    ])
+
+
+def get_cfp_type_form(cfp_type):
+    form = None
+    if cfp_type == 'talk':
+        form = TalkProposalForm()
+    elif cfp_type == 'performance':
+        form = PerformanceProposalForm()
+    elif cfp_type == 'workshop':
+        form = WorkshopProposalForm()
+    elif cfp_type == 'youthworkshop':
+        form = YouthWorkshopProposalForm()
+    elif cfp_type == 'installation':
+        form = InstallationProposalForm()
+    return form
 
 
 @cfp.route('/cfp')
+@feature_flag('CFP')
+def main():
+    return render_template('cfp/main.html')
+
 @cfp.route('/cfp/<string:cfp_type>', methods=['GET', 'POST'])
 @feature_flag('CFP')
-def main(cfp_type='talk'):
-    if cfp_type not in ['talk', 'workshop', 'installation']:
+def form(cfp_type='talk'):
+    form = get_cfp_type_form(cfp_type)
+    if not form:
         abort(404)
 
     ignore_closed = 'closed' in request.args
 
     if app.config.get('CFP_CLOSED') and not ignore_closed:
         return render_template('cfp/closed.html')
-
-    forms = [TalkProposalForm(prefix="talk"),
-             WorkshopProposalForm(prefix="workshop"),
-             InstallationProposalForm(prefix="installation")]
-    (form,) = [f for f in forms if f.type == cfp_type]
-    form.active_cfp_type = cfp_type
 
     # If the user is already logged in set their name & email for the form
     if current_user.is_authenticated:
@@ -126,11 +164,26 @@ def main(cfp_type='talk'):
             cfp = TalkProposal()
             cfp.length = form.length.data
 
+        elif cfp_type == 'performance':
+            cfp = PerformanceProposal()
+            cfp.length = form.length.data
+
         elif cfp_type == 'workshop':
             cfp = WorkshopProposal()
             cfp.length = form.length.data
             cfp.attendees = form.attendees.data
             cfp.cost = form.cost.data
+            cfp.participant_equipment = form.participant_equipment.data
+            cfp.age_range = form.age_range.data
+
+        elif cfp_type == 'youthworkshop':
+            cfp = YouthWorkshopProposal()
+            cfp.length = form.length.data
+            cfp.attendees = form.attendees.data
+            cfp.cost = form.cost.data
+            cfp.participant_equipment = form.participant_equipment.data
+            cfp.age_range = form.age_range.data
+            cfp.valid_dbs = form.valid_dbs.data
 
         elif cfp_type == 'installation':
             cfp = InstallationProposal()
@@ -154,15 +207,12 @@ def main(cfp_type='talk'):
                       recipients=[current_user.email])
 
         msg.body = render_template('emails/cfp-submission.txt',
-                                   cfp=cfp, type=cfp_type, new_user=new_user)
+                                   proposal=cfp, new_user=new_user)
         mail.send(msg)
 
         return redirect(url_for('.complete'))
 
-    full_price = None
-
-    return render_template('cfp/main.html', full_price=full_price,
-                           forms=forms, active_cfp_type=cfp_type,
+    return render_template('cfp/new.html', cfp_type=cfp_type, form=form,
                            has_errors=bool(form.errors), ignore_closed=ignore_closed)
 
 
@@ -222,10 +272,7 @@ def edit_proposal(proposal_id):
     if proposal.user != current_user:
         abort(404)
 
-    form = TalkProposalForm() if proposal.type == 'talk' else \
-           WorkshopProposalForm() if proposal.type == 'workshop' else \
-           InstallationProposalForm()
-
+    form = get_cfp_type_form(proposal.type)
     del form.name
     del form.email
 
@@ -236,13 +283,23 @@ def edit_proposal(proposal_id):
 
         app.logger.info('Proposal %s edited', proposal.id)
 
-        if proposal.type == 'talk':
+        if proposal.type in ('talk', 'performance'):
             proposal.length = form.length.data
 
         elif proposal.type == 'workshop':
             proposal.length = form.length.data
             proposal.attendees = form.attendees.data
             proposal.cost = form.cost.data
+            proposal.participant_equipment = form.participant_equipment.data
+            proposal.age_range = form.age_range.data
+
+        elif proposal.type == 'youthworkshop':
+            proposal.length = form.length.data
+            proposal.attendees = form.attendees.data
+            proposal.cost = form.cost.data
+            proposal.participant_equipment = form.participant_equipment.data
+            proposal.age_range = form.age_range.data
+            proposal.valid_dbs = form.valid_dbs.data
 
         elif proposal.type == 'installation':
             proposal.size = form.size.data
@@ -260,13 +317,23 @@ def edit_proposal(proposal_id):
         return redirect(url_for('.edit_proposal', proposal_id=proposal_id))
 
     if request.method != 'POST' and proposal.state in ['new', 'edit']:
-        if proposal.type == 'talk':
+        if proposal.type in ('talk', 'performance'):
             form.length.data = proposal.length
 
         elif proposal.type == 'workshop':
             form.length.data = proposal.length
             form.attendees.data = proposal.attendees
             form.cost.data = proposal.cost
+            form.participant_equipment.data = proposal.participant_equipment
+            form.age_range.data = proposal.age_range
+
+        elif proposal.type == 'youthworkshop':
+            form.length.data = proposal.length
+            form.attendees.data = proposal.attendees
+            form.cost.data = proposal.cost
+            form.participant_equipment.data = proposal.participant_equipment
+            form.age_range.data = proposal.age_range
+            form.valid_dbs.data = proposal.valid_dbs
 
         elif proposal.type == 'installation':
             form.size.data = proposal.size
@@ -361,7 +428,7 @@ class DaytimeAcceptedForm(AcceptedForm):
     sun_10_13 = BooleanField(default=True)
     sun_13_16 = BooleanField(default=True)
     sun_16_20 = BooleanField(default=True)
-    _available_slots = (             'fri_13_16', 'fri_16_20',
+    _available_slots = ('fri_13_16', 'fri_16_20',
                         'sat_10_13', 'sat_13_16', 'sat_16_20',
                         'sun_10_13', 'sun_13_16', 'sun_16_20')
 
@@ -393,7 +460,7 @@ def finalise_proposal(proposal_id):
     if proposal.state not in ('accepted', 'finished'):
         return redirect(url_for('.edit_proposal', proposal_id=proposal_id))
 
-    form = DaytimeAcceptedForm() if proposal.type in ('talk', 'workshop') else \
+    form = DaytimeAcceptedForm() if proposal.type in ('talk', 'workshop', 'youthworkshop') else \
            EveningAcceptedForm() if proposal.type == 'performance' else \
            AcceptedForm()
 
