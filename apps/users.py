@@ -1,28 +1,29 @@
 import re
+import time
 
 from flask import (
     render_template, redirect, request, flash,
     url_for, abort, Blueprint, current_app as app,
-    session,
+    session, Markup, render_template_string,
 )
 from flask_login import (
     login_user, login_required, logout_user, current_user,
 )
-
+from flask_mail import Message
 from sqlalchemy import or_
-
+from wtforms import StringField, HiddenField, SubmitField, BooleanField
+from wtforms.fields.html5 import EmailField
 from wtforms.validators import Required, Email, ValidationError
-from wtforms import StringField, HiddenField, SubmitField
 
-from main import db
-from models.user import User, UserDiversity
+from main import db, mail
+from models.user import User, UserDiversity, verify_signup_code
 from models.cfp import Proposal, CFPMessage
 from models.purchase import Purchase
 from models.payment import Payment
 from models.basket import Basket
 
 from .common import (
-    set_user_currency, send_template_email, feature_flag,
+    set_user_currency, feature_flag,
 )
 from .common.forms import Form
 
@@ -67,6 +68,7 @@ def login_by_email(email):
 
     return redirect(request.args.get('next', url_for('.account')))
 
+
 @users.route("/login", methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -84,11 +86,14 @@ def login():
     form = LoginForm(request.form, next=request.args.get('next'))
     if form.validate_on_submit():
         code = form._user.login_code(app.config['SECRET_KEY'])
-        send_template_email('Electromagnetic Field: Login details',
-                            to=form._user.email,
-                            sender=app.config['TICKETS_EMAIL'],
-                            template='emails/login-code.txt',
-                            user=form._user, code=code, next_url=request.args.get('next'))
+
+        msg = Message('Electromagnetic Field: Login details',
+                      sender=app.config['TICKETS_EMAIL'],
+                      recipients=[form._user.email])
+        msg.body = render_template('emails/login-code.txt', user=form._user,
+                                    code=code, next_url=request.args.get('next'))
+        mail.send(msg)
+
         flash("We've sent you an email with your login link")
 
     if request.args.get('email'):
@@ -104,6 +109,66 @@ def logout():
     Basket.clear_from_session()
     logout_user()
     return redirect(url_for('base.main'))
+
+
+class SignupForm(Form):
+    email = EmailField('Email', [Email(), Required()])
+    name = StringField('Name', [Required()])
+    allow_promo = BooleanField('Send me occasional emails about future EMF events')
+    signup = SubmitField('Sign up')
+
+    def validate_email(form, field):
+        if User.does_user_exist(field.data):
+            field.was_duplicate = True
+
+            msg = Markup(
+                render_template_string('Account already exists. '
+                                       'Please <a href="{{ url }}">click here</a> to log in.',
+                                       url=url_for('users.login', email=field.data)))
+            raise ValidationError(msg)
+
+
+@users.route("/signup", methods=['GET', 'POST'])
+def signup():
+    if not request.args.get('code'):
+        abort(404)
+
+    uid = verify_signup_code(app.config['SECRET_KEY'], time.time(), request.args.get('code'))
+    if uid is None:
+        flash("Your signup link was invalid. Please note that they expire after 6 hours.")
+        return redirect(url_for('.account'))
+
+    user = User.query.get_or_404(uid)
+    if not user.has_permission('admin'):
+        app.logger.warn("Signup link resolves to non-admin user %s", user)
+        abort(404)
+
+    form = SignupForm()
+
+    if current_user.is_authenticated:
+        return redirect(url_for('.account'))
+
+    if form.validate_on_submit():
+        email, name = form.email.data, form.name.data
+        user = User(email, name)
+
+        db.session.add(user)
+        db.session.commit()
+        app.logger.info('Signed up new user with email %s and id %s',
+                        email, user.id)
+
+        msg = Message('Welcome to the EMF website',
+                      sender=app.config['CONTACT_EMAIL'],
+                      recipients=[email])
+        msg.body = render_template('emails/signup-user.txt', user=user)
+        mail.send(msg)
+
+        return redirect(url_for('.account'))
+
+    if request.args.get('email'):
+        form.email.data = request.args.get('email')
+
+    return render_template("account/signup.html", form=form)
 
 
 @users.route("/set-currency", methods=['POST'])

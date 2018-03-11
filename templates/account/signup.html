@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Sign up{% endblock %}
+{% block body %}
+    <h2>Sign Up</h2>
+
+<form method="post" class="pay-method form-horizontal">
+{{ form.hidden_tag() }}
+
+{% include "user-signup.html" %}
+
+<div class="form-actions pull-right">
+{{ form.signup(class_="btn btn-success btn-lg debounce") }}
+</div>
+
+{% endblock %}

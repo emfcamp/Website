@@ -1,0 +1,16 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "admin/base.html" %}
+{% block body %}
+<h2>Sign-up Link</h2>
+
+{% if code %}
+<p><input class="form-control" readonly value="{{ external_url('users.signup', code=code) }}"/></p>
+{% else %}
+<p>Generate a link that will allow a visitor to create an account:</p>
+{% endif %}
+
+<form method="post">
+{{ form.hidden_tag() }}
+{{ form.create(class_="btn btn-success") }}
+</form>
+{% endblock %}
