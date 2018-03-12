@@ -383,8 +383,8 @@ td.checkbox-cell label {
 /* Make sure that focused elements don't change colour etc. unless also hovered */
 a.collapse-toggle:focus,
 a.collapse-toggle:focus .glyphicon {
-  color: white;
   text-decoration: none;
+  color: inherit;
 }
 
 /*
@@ -394,16 +394,13 @@ a.collapse-toggle {
   text-decoration: none;
 }
 a.collapse-toggle .glyphicon {
-  color: white;
   margin-left: 0.3em;
 }
 
 a.collapse-toggle:hover            { text-decoration: underline; }
 a.collapse-toggle:hover .glyphicon { text-decoration: none; }
 
-a.collapse-toggle:hover,
 a.collapse-toggle:hover .glyphicon {
-  color: #d3e0f1;
 }
 
 .multiline { white-space: pre-wrap }

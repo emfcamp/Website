@@ -3,10 +3,11 @@
 {% block title %}Call for Participation{% endblock %}
 {% block body %}
 <h2>Call for Participation</h2>
-    <p class="emphasis">Electromagnetic Field is a UK camping festival for those
-      with an inquisitive mind or an interest in making things: hackers, artists,
-      geeks, crafters, scientists, and engineers. It's happening near
-      Ledbury, Herefordshire on {{ fancy_dates }} {{ event_year }}.</p>
+    <p class="emphasis"><a href="{{ url_for('base.about') }}">Electromagnetic
+        Field</a> is a UK camping festival for those with an inquisitive mind
+        or an interest in making things. It will be held from {{ fancy_dates }} at <a
+        href="https://wiki.emfcamp.org/wiki/Location">Eastnor
+        Castle Deer Park</a>, Ledbury.</p>
 
     <p>We're looking for talks, performances, installations, and workshops for
     all ages.  We're especially keen to hear from people with
@@ -25,10 +26,9 @@
       the ticket cost goes directly towards turning a field into a habitable and amazing place
       to spend a weekend, and all those who attend contribute to making the event a success.</p>
 
-    <p>Everybody who has a proposal accepted is guaranteed the opportunity to
-    buy a ticket, and given the option of a discounted full ticket or a free
-    day ticket if they don't want to come for the entire event. We can also
-    offer to cover transport costs for those that cannot afford them.</p>
+    <p>You will be guaranteed a ticket to EMF if your proposal is accepted, with the option of a
+    discounted weekend ticket or a free day ticket. We also have some budget to cover transport
+    costs for those who can't otherwise afford to come.</p>
 
     <p>We ask that if you can afford it, you buy a full price ticket - this
     allows us to use our limited funds to assist those who otherwise could not
@@ -42,21 +42,20 @@
     <h2>Submit a new proposal</h2>
     <p>Please select the type of proposal you want to submit:</p>
     <div class="list-group cfp-choose-type">
-        <a href="/cfp/talk" class="list-group-item"><strong>Talk</strong> &ndash; held on one of our stages</a>
-        <a href="/cfp/workshop" class="list-group-item"><strong>Workshop</strong> &ndash; demonstration or group activity</a>
-        <a href="/cfp/youthworkshop" class="list-group-item"><strong>Youth Workshop</strong> &ndash; for under 13s</a>
-        <a href="/cfp/performance" class="list-group-item"><strong>Performance</strong> &ndash; of music, art, film</a>
-        <a href="/cfp/installation" class="list-group-item"><strong>Installation</strong> &ndash; creation around the site</a>
+        <a href="/cfp/talk" class="list-group-item"><strong>Talk</strong> &ndash; A presentation on a stage</a>
+        <a href="/cfp/workshop" class="list-group-item"><strong>Workshop</strong> &ndash; A workshop in an area with tables &amp; other equipment</a>
+        <a href="/cfp/youthworkshop" class="list-group-item"><strong>Youth Workshop</strong> &ndash; A workshop for attendees under 13</a>
+        <a href="/cfp/performance" class="list-group-item"><strong>Performance</strong> &ndash; A performance of music, art, dance, or film</a>
+        <a href="/cfp/installation" class="list-group-item"><strong>Installation</strong> &ndash; A creation for attendees to admire or interact with</a>
     </div>
 
     {% if current_user.is_authenticated %}
-      <p>If you've already submitted to the call for participation then you can
-        view and edit your proposals <a href="{{ url_for('.proposals') }}">here</a>.</p>
+      <p>If you've already submitted a proposal, you can
+        view and edit it <a href="{{ url_for('.proposals') }}">here</a>.</p>
     {% else %}
-      <p>If you have already submitted to the call for participation then you
+      <p>If you have already submitted a proposal
         need to <a href="{{ url_for('users.login', next=url_for('.proposals') ) }}">login</a>
-        in order to view or edit your proposals.</p>
+        in order to view or edit it.</p>
         {% endif %}
-
 
 {% endblock %}

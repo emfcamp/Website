@@ -26,22 +26,23 @@
           <p>
             <a href="{{ url_for('users.login', next=url_for('.main', cfp_type=cfp_type) + ('?closed' if ignore_closed else '')) }}" target="_blank">Please log in</a> if you've already bought a ticket (or had one transferred to you).</p>
         {% endif %}
-        {{ render_field(form.name, horizontal=9, placeholder="Your name (or pseudonym)") }}
+        {{ render_field(form.name, horizontal=9, placeholder="Your name" + (' (or pseudonym)' if cfp_type != 'youthworkshop' else '')) }}
         {{ render_field(form.email, horizontal=9, placeholder="Your email address") }}
       </fieldset>
       {% endif %}
 
       <fieldset>
           <legend>About your {{form.model.human_type}}</legend>
-          <p>You'll be able to tweak the title and description before we publish them.
-             {% if cfp_type not in ('performance', 'youthworkshop') %}
-             To help with our anonymised review process, try to avoid including
-             personally identifiable information at this stage.
-             {% endif %}
-          </p>
+          {% if cfp_type in ('talk', 'workshop') %}
+              <p>These fields will be anonymised before being sent to our reviewers. Please
+                try to avoid including personally identifiable information.
+            </p>
+        {% endif %}
+        <p>You'll be able to tweak the title and description before we publish them in
+           the schedule.</p>
           {{render_field(form.title, horizontal=9, placeholder="A short summary")}}
           {% call render_field(form.description, horizontal=9,
-                         placeholder="A description to send to the reviewers") %}
+                         placeholder="A fuller description of your proposal") %}
             Please keep this shorter than 250 words.
           {% endcall %}
      </fieldset>
@@ -52,8 +53,8 @@
       {% if cfp_type in ('talk', 'performance', 'workshop', 'youthworkshop') %}
         {% call render_field(form.requirements, horizontal=9,
                             placeholder="Such as tools, assistants, or other non-standard things") %}
-          {% if cfp_type in ('talk', 'performance', 'workshop') %}
-            We'll provide a standard set of Audio-Visual equipment.
+          {% if cfp_type in ('talk', 'performance', 'workshop', 'youthworkshop') %}
+            We'll provide a sound system and projector or screen.
           {% endif %}
         {% endcall %}
         {{ render_field(form.length, horizontal=9, placeholder="Your best guess, whether in minutes or days") }}
@@ -94,6 +95,7 @@
             {{ form.valid_dbs() }}
             I have a valid <a href="https://www.gov.uk/government/organisations/disclosure-and-barring-service/about#dbs-checks" target="_blank">DBS check</a>
           </label>
+          <small>This is not a requirement but please let us know if you have one</small>
           {% endif %}
           <label class="checkbox">
             {{ form.needs_help() }}
