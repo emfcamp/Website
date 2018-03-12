@@ -22,10 +22,10 @@
     {{ form.hidden_tag() }}
     <div class="btn-group" role="group">
         {% if flow == 'main' %}
-        <a class="btn btn-default" href="{{url_for('tickets.main', is_new_basket=True)}}">Empty basket</a>
+        <a class="btn btn-default" href="{{url_for('tickets.tickets_clear')}}">Empty basket</a>
         <a class="btn btn-default" href="{{url_for('tickets.main')}}">Add more tickets</a>
         {% else %}
-        <a class="btn btn-default" href="{{url_for('tickets.main', flow=flow, is_new_basket=True)}}">Empty basket</a>
+        <a class="btn btn-default" href="{{url_for('tickets.tickets_clear', flow=flow)}}">Empty basket</a>
         <a class="btn btn-default" href="{{url_for('tickets.main', flow=flow)}}">Change items</a>
         {% endif %}
         <button name="change_currency" value="{% if user_currency == 'GBP' %}EUR{% else %}GBP{% endif %}"

@@ -269,7 +269,7 @@ def tickets_reserve(user_id=None):
 
             db.session.add(user)
 
-        basket = Basket(user, 'GBP', [], [])
+        basket = Basket(user, 'GBP')
         for f in form.price_tiers:
             if f.amount.data:
                 basket[f._tier] = f.amount.data

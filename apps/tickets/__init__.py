@@ -64,6 +64,31 @@ def tickets_token(token=None):
     return redirect(url_for('tickets.main'))
 
 
+@tickets.route("/tickets/clear")
+@tickets.route("/tickets/<flow>/clear")
+@feature_flag('TICKET_SALES')
+def tickets_clear(flow=None):
+    basket = Basket.from_session(current_user, get_user_currency())
+    basket.cancel_purchases()
+    db.session.commit()
+
+    Basket.clear_from_session()
+    return redirect(url_for('tickets.main', flow=flow))
+
+
+@tickets.route("/tickets/reserved")
+@tickets.route("/tickets/<flow>/reserved")
+@feature_flag('TICKET_SALES')
+def tickets_reserved(flow=None):
+    if current_user.is_anonymous:
+        abort(404)
+
+    basket = Basket(current_user, get_user_currency())
+    basket.load_purchases_from_db()
+
+    basket.save_to_session()
+    return redirect(url_for('tickets.main', flow=flow))
+
 
 @tickets.route("/tickets", methods=['GET', 'POST'])
 @tickets.route("/tickets/<flow>", methods=['GET', 'POST'])
@@ -88,15 +113,6 @@ def main(flow=None):
 
         elif not current_user.has_permission('admin'):
             abort(404)
-
-    is_new_basket = request.args.get('is_new_basket', False)
-    if is_new_basket:
-        basket = Basket.from_session(current_user, get_user_currency())
-        basket.cancel_purchases()
-        db.session.commit()
-
-        Basket.clear_from_session()
-        return redirect(url_for('tickets.main', flow=flow))
 
     sales_state = get_sales_state()
 
