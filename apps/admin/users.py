@@ -48,7 +48,7 @@ def users():
         code = user.login_code(app.config['SECRET_KEY'])
         send_template_email('Welcome to the EMF website',
                             email, app.config['CONTACT_EMAIL'],
-                            'emails/manually_added_user.txt',
+                            'emails/manually-added-user.txt',
                             user=user, code=code)
 
         flash('Created account for: %s' % name)
