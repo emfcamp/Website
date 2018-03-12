@@ -205,6 +205,10 @@ def create_app(dev_server=False):
     app.register_blueprint(schedule)
     app.register_blueprint(arrivals, url_prefix='/arrivals')
 
+    if app.config.get('VOLUNTEERS'):
+        from apps.volunteers import volunteers
+        app.register_blueprint(volunteers, url_prefix='/volunteers')
+
     from flask_admin import Admin
     from apps.common.flask_admin_base import AppAdminIndexView
 

@@ -1,0 +1,11 @@
+{% macro menuitem(text, view) %}
+<li {% if view_name == view -%} class="active" {%- endif %}>
+    <a href="{{ url_for(view) }}">{{ text }}</a>
+</li>
+{% endmacro %}
+
+<ul class="nav navbar-nav">
+    {% if current_user.has_permission('volunteers:admin') %}
+    {{ menuitem("Venues", ".venue_list") }}
+{% endif %}
+</ul>
