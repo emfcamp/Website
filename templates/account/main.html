@@ -29,34 +29,48 @@
 </nav>
 <h3>Your details</h3>
 
-<form method="post" class="form-horizontal col-md-12">
-  {{ form.hidden_tag() }}
-  <fieldset>
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        {% if feature_enabled('CFP') %}
-          <p>If you've made a submission to the CfP then your name (as it's set here) will be used
-                in the schedule.</p>
-        {% endif %}
-        <p>If you're comfortable telling us a little bit about yourself, we'd appreciate it.
-                This information will only be used it to find out how well we're doing with outreach.</p>
-      </div>
-      <div class="row">
-        <div id="diversity" class="col-md-11">
-          <div class="form-group">
-            <label for="fake-email-field" class="horizontal col-sm-2 control-label">Email</label>
-            <div class="col-sm-10 ">
-              <p class="form-control-static">{{ current_user.email }}</p>
-            </div>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    {% if feature_enabled('CFP') %}
+      <div>If you've made a submission to the CfP then your name (as it's set here) will be used
+           in the schedule.</div>
+    {% endif %}
+  </div>
+  <form method="post" class="form-horizontal">
+    {{ form.hidden_tag() }}
+    <fieldset>
+      <p></p>
+      <div class="col-sm-12">
+        <div class="form-group">
+          <label for="fake-email-field" class="col-sm-2 control-label">Email</label>
+          <div class="col-sm-10">
+            <div class="form-control-static">{{ current_user.email }}</div>
           </div>
-          {{ render_field(form.name, True) }}
-          {{ render_field(form.age, True) }}
-          {{ render_field(form.gender, True) }}
-          {{ render_field(form.ethnicity, True) }}
-          {{ form.forward(class_="btn btn-default pull-right", style="margin-bottom: 15px;") }}
+        </div>
+        {{ render_field(form.name, True) }}
+        <div class="form-group">
+          <div class="col-sm-10 col-sm-offset-2">
+            {{ form.allow_promo() }}
+            <label class="control-label" for="allow_promo">
+                Send me occasional emails about future EMF events
+            </label>
+          </div>
         </div>
       </div>
-    </div>
-  </fieldset>
-</form>
+    </fieldset>
+    <fieldset>
+      <div class="col-sm-12">
+        If you're comfortable telling us a little bit about yourself, we'd appreciate it.
+        This information will only be used it to find out how well we're doing with outreach.
+      </div>
+      <div class="col-sm-12">
+        <p></p>
+        {{ render_field(form.age, True) }}
+        {{ render_field(form.gender, True) }}
+        {{ render_field(form.ethnicity, True) }}
+        {{ form.forward(class_="btn btn-default pull-right", style="margin-bottom: 15px;") }}
+      </div>
+    </fieldset>
+  </form>
+</div>
 {% endblock %}

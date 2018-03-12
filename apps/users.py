@@ -152,6 +152,9 @@ def signup():
         email, name = form.email.data, form.name.data
         user = User(email, name)
 
+        if form.allow_promo.data:
+            user.promo_opt_in = True
+
         db.session.add(user)
         db.session.commit()
         app.logger.info('Signed up new user with email %s and id %s',
@@ -184,6 +187,8 @@ def set_currency():
 
 class AccountForm(Form):
     name = StringField('Name', [Required()])
+    allow_promo = BooleanField('Send me occasional emails about future EMF events')
+
     age = StringField('Age')
     gender = StringField('Gender')
     ethnicity = StringField('Ethnicity')
@@ -202,6 +207,8 @@ def account():
             db.session.add(current_user.diversity)
 
         current_user.name = form.name.data
+        current_user.promo_opt_in = form.allow_promo.data
+
         current_user.diversity.age = form.age.data
         current_user.diversity.gender = form.gender.data
         current_user.diversity.ethnicity = form.ethnicity.data
@@ -215,6 +222,7 @@ def account():
     if request.method != 'POST':
         # This is a required field so should always be set
         form.name.data = current_user.name
+        form.allow_promo.data = current_user.promo_opt_in
 
         if current_user.diversity:
             form.age.data = current_user.diversity.age
