@@ -5,7 +5,7 @@ Electromagnetic Field {{ event_year }}!
 
 You can log into this account by visiting:
 
-  {{ external_url('users.login', code=code, next=url_for('account')) }}
+  {{ external_url('users.login', code=code, next=url_for('users.account')) }}
 
 If you think you've been added in error, please let us know by replying
 to this email.
