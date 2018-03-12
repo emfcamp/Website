@@ -166,10 +166,14 @@ def create_app(dev_server=False):
 
     @app.after_request
     def after_request(response):
-        request_duration.labels(request.endpoint, request.method).observe(time.time() - request._start_time)
+        try:
+            request_duration.labels(request.endpoint, request.method).observe(
+                time.time() - request._start_time)
+        except AttributeError:
+            # In some cases this isn't present?
+            logging.exception("Request without _start_time")
         request_total.labels(request.endpoint, request.method, response.status_code).inc()
         return response
-
 
     @app.errorhandler(404)
     def handle_404(e):
