@@ -1,0 +1,15 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends 'volunteers/base.html' %}
+{% block body %}
+    <form method="post">
+        {{ form.hidden_tag() }}
+
+        {% if new_venue %}
+            {{ render_field(form.id) }}
+        {% endif %}
+
+        {{ render_field(form.name) }}
+        {{ render_field(form.mapref) }}
+        {{ render_field(form.create) }}
+    </form>
+{% endblock body %}
