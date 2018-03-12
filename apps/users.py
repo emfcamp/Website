@@ -163,6 +163,8 @@ def signup():
         msg.body = render_template('emails/signup-user.txt', user=user)
         mail.send(msg)
 
+        login_user(user)
+
         return redirect(url_for('.account'))
 
     if request.args.get('email'):

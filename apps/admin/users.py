@@ -47,7 +47,7 @@ def users():
 
         code = user.login_code(app.config['SECRET_KEY'])
         msg = Message('Welcome to the EMF website',
-                      app.config['CONTACT_EMAIL'],
+                      sender=app.config['CONTACT_EMAIL'],
                       recipients=[email])
         msg.body = render_template('emails/manually-added-user.txt',
                                    user=user, code=code)
