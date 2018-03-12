@@ -33,15 +33,16 @@
 
       <fieldset>
           <legend>About your {{form.model.human_type}}</legend>
-          <p>You'll be able to tweak the title and description before we publish them.
-             {% if cfp_type in ('talk', 'workshop') %}
-             To help with our anonymised review process, try to avoid including
-             personally identifiable information at this stage.
-             {% endif %}
-          </p>
+          {% if cfp_type in ('talk', 'workshop') %}
+              <p>These fields will be anonymised before being sent to our reviewers. Please
+                try to avoid including personally identifiable information.
+            </p>
+        {% endif %}
+        <p>You'll be able to tweak the title and description before we publish them in
+           the schedule.</p>
           {{render_field(form.title, horizontal=9, placeholder="A short summary")}}
           {% call render_field(form.description, horizontal=9,
-                         placeholder="A description to send to the reviewers") %}
+                         placeholder="A fuller description of your proposal") %}
             Please keep this shorter than 250 words.
           {% endcall %}
      </fieldset>
@@ -53,7 +54,7 @@
         {% call render_field(form.requirements, horizontal=9,
                             placeholder="Such as tools, assistants, or other non-standard things") %}
           {% if cfp_type in ('talk', 'performance', 'workshop', 'youthworkshop') %}
-            We'll provide a standard set of Audio-Visual equipment.
+            We'll provide a sound system and projector or screen.
           {% endif %}
         {% endcall %}
         {{ render_field(form.length, horizontal=9, placeholder="Your best guess, whether in minutes or days") }}
