@@ -34,7 +34,7 @@
       <fieldset>
           <legend>About your {{form.model.human_type}}</legend>
           <p>You'll be able to tweak the title and description before we publish them.
-             {% if cfp_type not in ('performance', 'youthworkshop') %}
+             {% if cfp_type in ('talk', 'workshop') %}
              To help with our anonymised review process, try to avoid including
              personally identifiable information at this stage.
              {% endif %}
