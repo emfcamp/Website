@@ -136,7 +136,7 @@ def signup():
     uid = verify_signup_code(app.config['SECRET_KEY'], time.time(), request.args.get('code'))
     if uid is None:
         flash("Your signup link was invalid. Please note that they expire after 6 hours.")
-        return redirect(url_for('.account'))
+        abort(404)
 
     user = User.query.get_or_404(uid)
     if not user.has_permission('admin'):
