@@ -1,29 +1,26 @@
 # encoding=utf-8
-
+import random
+from datetime import datetime, timedelta
 import warnings
 
+import dateutil
 from flask import (
     redirect, url_for, request, abort, render_template,
     flash, Blueprint, session, jsonify, current_app as app
 )
 from flask_login import current_user
-
+from flask_mail import Message
 from sqlalchemy import func, or_, exc as sa_exc
 from sqlalchemy.orm import aliased
-
 from wtforms import (
     SubmitField, StringField, FieldList, FormField, SelectField, TextAreaField,
     BooleanField, IntegerField, FloatField
 )
 from wtforms.validators import Required, NumberRange, ValidationError
 
-import random
-from datetime import datetime, timedelta
-import dateutil
-from main import db, external_url
-from .common import require_permission, send_template_email
+from main import db, mail, external_url
+from .common import require_permission
 from .majority_judgement import calculate_max_normalised_score
-
 from models.cfp import (
     Proposal, CFPMessage, CFPVote, CFP_STATES, Venue
 )
@@ -459,11 +456,13 @@ def message_proposer(proposal_id):
             app.logger.info('Sending message from %s to %s', current_user.id, proposal.user_id)
 
             msg_url = external_url('cfp.proposal_messages', proposal_id=proposal_id)
-            send_template_email('New message about your EMF proposal',
-                                proposal.user.email, app.config['CONTENT_EMAIL'],
-                                'cfp_review/email/new_message.txt', url=msg_url,
-                                to_user=proposal.user, from_user=current_user,
-                                proposal=proposal)
+            msg = Message('New message about your EMF proposal',
+                          sender=app.config['CONTENT_EMAIL'],
+                          recipients=[proposal.user.email])
+            msg.body = render_template('cfp_review/email/new_message.txt', url=msg_url,
+                                       to_user=proposal.user, from_user=current_user,
+                                       proposal=proposal)
+            mail.send(msg)
 
         if form.mark_read.data or form.send.data:
             count = proposal.mark_messages_read(current_user)
@@ -964,9 +963,10 @@ def send_email_for_proposal(proposal, accepted):
         subject = 'Your EMF %s proposal "%s" was not accepted.' % (proposal.type, proposal.title)
         template = 'emails/cfp-rejected.txt'
 
-    user = proposal.user
-    send_template_email(subject, user.email, app.config['CONTENT_EMAIL'],
-                        template, user=user, proposal=proposal)
+    msg = Message(subject, sender=app.config['CONTENT_EMAIL'],
+                  recipients=[proposal.user.email])
+    msg.body = render_template(template, user=proposal.user, proposal=proposal)
+    mail.send(msg)
 
 
 @cfp_review.route('/rank', methods=['GET', 'POST'])
