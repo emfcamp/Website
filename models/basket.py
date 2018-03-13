@@ -2,13 +2,11 @@ from collections.abc import MutableMapping
 from itertools import groupby
 
 from flask import current_app as app, session
-from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 
 from main import db
 from .exc import CapacityException
 from .purchase import Purchase, Ticket, AdmissionTicket
-from .user import User
 
 class Line:
     def __init__(self, tier, count, purchases=None):
@@ -27,17 +25,18 @@ class Basket(MutableMapping):
     ids should be trustworthy (e.g. stored in flask.session)
     """
 
-    def __init__(self, user, currency, ids, surplus_ids):
+    def __init__(self, user, currency):
         self.user = user
         self.currency = currency
         self._lines = []
-        self.load_purchases(ids, surplus_ids)
 
     @classmethod
     def from_session(self, user, currency):
         purchases = session.get('basket_purchase_ids', [])
         surplus_purchases = session.get('basket_surplus_purchase_ids', [])
-        basket = Basket(user, currency, purchases, surplus_purchases)
+
+        basket = Basket(user, currency)
+        basket.load_purchases_from_ids(purchases, surplus_purchases)
         return basket
 
     @classmethod
@@ -107,38 +106,40 @@ class Basket(MutableMapping):
 
         return total
 
-    def load_purchases(self, ids, surplus_ids):
-        ids = set(ids)
-        surplus_ids = set(surplus_ids)
 
-        criteria = []
-        if ids | surplus_ids:
-            criteria.append(Purchase.id.in_(ids | surplus_ids))
-
-        if self.user.is_authenticated:
-            criteria.append(User.id == self.user.id)
-
-        if criteria:
-            all_purchases = Purchase.query.filter_by(state='reserved', payment_id=None) \
-                                          .filter(or_(*criteria)) \
-                                          .options(joinedload(Purchase.price_tier)) \
-                                          .all()
-
-        else:
-            all_purchases = []
-
+    def load_purchases(self, purchases, chosen_ids=None):
         def get_pt(p):
             return p.price_tier
 
-        all_purchases = sorted(all_purchases, key=get_pt)
-        for tier, tier_purchases in groupby(all_purchases, get_pt):
+        purchases = sorted(purchases, key=get_pt)
+        for tier, tier_purchases in groupby(purchases, get_pt):
             tier_purchases = sorted(tier_purchases, key=lambda p: p.id)
 
-            purchases = [p for p in tier_purchases if p.id in ids]
-            surplus_purchases = [p for p in tier_purchases if p.id in surplus_ids]
+            if chosen_ids is not None:
+                purchases = [p for p in tier_purchases if p.id in chosen_ids]
+                surplus_purchases = [p for p in tier_purchases if p.id not in chosen_ids]
+            else:
+                purchases = tier_purchases
+                surplus_purchases = []
 
             app.logger.debug('Basket line: %s %s %s', tier, purchases, surplus_purchases)
             self._lines.append(Line(tier, len(purchases), purchases + surplus_purchases))
+
+    def load_purchases_from_ids(self, chosen_ids, surplus_ids):
+        chosen_ids = set(chosen_ids)
+        surplus_ids = set(surplus_ids)
+        if chosen_ids | surplus_ids:
+            purchases = Purchase.query.filter_by(state='reserved', payment_id=None) \
+                                      .filter(Purchase.id.in_(chosen_ids | surplus_ids)) \
+                                      .options(joinedload(Purchase.price_tier))
+
+            self.load_purchases(purchases, chosen_ids)
+
+    def load_purchases_from_db(self):
+        purchases = Purchase.query.filter_by(state='reserved', payment_id=None) \
+                                  .filter(Purchase.owner_id == self.user.id) \
+                                  .options(joinedload(Purchase.price_tier))
+        self.load_purchases(purchases)
 
 
     def create_purchases(self):

@@ -1,22 +1,22 @@
 # coding=utf-8
 from __future__ import division, absolute_import, print_function, unicode_literals
-from . import admin, admin_required
+import time
+
 from flask import (
     render_template, redirect, flash,
     url_for, current_app as app
 )
 from flask_login import current_user
-
-from wtforms.validators import Required, Email, ValidationError
+from flask_mail import Message
+from sqlalchemy.orm import joinedload
 from wtforms import SubmitField, BooleanField, StringField
 from wtforms.fields.html5 import EmailField
+from wtforms.validators import Required, Email, ValidationError
 
-from sqlalchemy.orm import joinedload
-
-from main import db
-from models.user import User
+from . import admin, admin_required
+from main import db, mail
+from models.user import User, generate_signup_code
 from models.permission import Permission
-from ..common import send_template_email
 from ..common.forms import Form
 
 
@@ -46,10 +46,12 @@ def users():
                         current_user.id, email, user.id)
 
         code = user.login_code(app.config['SECRET_KEY'])
-        send_template_email('Welcome to the EMF website',
-                            email, app.config['CONTACT_EMAIL'],
-                            'emails/manually-added-user.txt',
-                            user=user, code=code)
+        msg = Message('Welcome to the EMF website',
+                      sender=app.config['CONTACT_EMAIL'],
+                      recipients=[email])
+        msg.body = render_template('emails/manually-added-user.txt',
+                                   user=user, code=code)
+        mail.send(msg)
 
         flash('Created account for: %s' % name)
         return redirect(url_for('.users'))
@@ -105,3 +107,20 @@ def user(user_id):
                            user=user,
                            form=form,
                            permissions=permissions)
+
+class SignupForm(Form):
+    create = SubmitField('Create link')
+
+@admin.route("/user/signup", methods=['GET', 'POST'])
+@admin_required
+def user_signup():
+    form = SignupForm()
+
+    code = None
+    if form.validate_on_submit():
+        app.logger.info('User %s creating signup link', current_user)
+        code = generate_signup_code(app.config['SECRET_KEY'], time.time(), current_user.id)
+
+    return render_template('admin/users/signup.html', form=form, code=code)
+
+

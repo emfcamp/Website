@@ -64,6 +64,31 @@ def tickets_token(token=None):
     return redirect(url_for('tickets.main'))
 
 
+@tickets.route("/tickets/clear")
+@tickets.route("/tickets/<flow>/clear")
+@feature_flag('TICKET_SALES')
+def tickets_clear(flow=None):
+    basket = Basket.from_session(current_user, get_user_currency())
+    basket.cancel_purchases()
+    db.session.commit()
+
+    Basket.clear_from_session()
+    return redirect(url_for('tickets.main', flow=flow))
+
+
+@tickets.route("/tickets/reserved")
+@tickets.route("/tickets/<flow>/reserved")
+@feature_flag('TICKET_SALES')
+def tickets_reserved(flow=None):
+    if current_user.is_anonymous:
+        abort(404)
+
+    basket = Basket(current_user, get_user_currency())
+    basket.load_purchases_from_db()
+
+    basket.save_to_session()
+    return redirect(url_for('tickets.main', flow=flow))
+
 
 @tickets.route("/tickets", methods=['GET', 'POST'])
 @tickets.route("/tickets/<flow>", methods=['GET', 'POST'])
@@ -88,15 +113,6 @@ def main(flow=None):
 
         elif not current_user.has_permission('admin'):
             abort(404)
-
-    is_new_basket = request.args.get('is_new_basket', False)
-    if is_new_basket:
-        basket = Basket.from_session(current_user, get_user_currency())
-        basket.cancel_purchases()
-        db.session.commit()
-
-        Basket.clear_from_session()
-        return redirect(url_for('tickets.main', flow=flow))
 
     sales_state = get_sales_state()
 
@@ -202,8 +218,7 @@ def main(flow=None):
                 pt = f._tier
                 if f.amount.data != basket.get(pt, 0):
                     app.logger.info('Adding %s %s tickets to basket', f.amount.data, pt.name)
-                    tier = PriceTier.query.get(pt.id)
-                    basket[tier] = f.amount.data
+                    basket[pt] = f.amount.data
 
             if not available:
                 app.logger.warn('User has no reservations, enforcing unavailable state')
@@ -222,6 +237,7 @@ def main(flow=None):
                 except CapacityException as e:
                     # Damn, capacity's gone since we created the purchases
                     # Redirect back to show what's currently in the basket
+                    db.session.rollback()
                     no_capacity.inc()
                     app.logger.warn('Limit exceeded creating tickets: %s', e)
                     flash("We're very sorry, but there is not enough capacity available to "

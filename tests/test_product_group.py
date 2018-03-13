@@ -39,7 +39,7 @@ class SingleProductGroupTest(unittest.TestCase):
         self.db.session.commit()
 
     def create_purchases(self, tier, count):
-        basket = Basket(self.user, 'GBP', [], [])
+        basket = Basket(self.user, 'GBP')
         basket[tier] = count
         basket.create_purchases()
         basket.ensure_purchase_capacity()
@@ -144,7 +144,7 @@ class MultipleProductGroupTest(unittest.TestCase):
         self.db.session.commit()
 
     def create_purchases(self, tier, count):
-        basket = Basket(self.user, 'GBP', [], [])
+        basket = Basket(self.user, 'GBP')
         basket[tier] = count
         basket.create_purchases()
         basket.ensure_purchase_capacity()
@@ -229,7 +229,7 @@ class PurchaseTest(unittest.TestCase):
         self.db.session.commit()
 
     def create_purchases(self, tier, count):
-        basket = Basket(self.user, 'GBP', [], [])
+        basket = Basket(self.user, 'GBP')
         basket[tier] = count
         basket.create_purchases()
         basket.ensure_purchase_capacity()
@@ -401,7 +401,7 @@ class ProductTransferTest(unittest.TestCase):
         self.db.session.commit()
 
         # PriceTier needs to have been committed before this
-        basket = Basket(self.user1, 'GBP', [], [])
+        basket = Basket(self.user1, 'GBP')
         basket[self.tier] = 1
         basket.create_purchases()
         basket.ensure_purchase_capacity()

@@ -18,14 +18,14 @@
     </ul>
     <p>The total price is <b>{{ basket.total | price(user_currency) }}</b>.
     If this isn't right, you can:</p>
-    <form method="POST">
+    <form method="post">
     {{ form.hidden_tag() }}
     <div class="btn-group" role="group">
         {% if flow == 'main' %}
-        <a class="btn btn-default" href="{{url_for('tickets.main', is_new_basket=True)}}">Empty basket</a>
+        <a class="btn btn-default" href="{{url_for('tickets.tickets_clear')}}">Empty basket</a>
         <a class="btn btn-default" href="{{url_for('tickets.main')}}">Add more tickets</a>
         {% else %}
-        <a class="btn btn-default" href="{{url_for('tickets.main', flow=flow, is_new_basket=True)}}">Empty basket</a>
+        <a class="btn btn-default" href="{{url_for('tickets.tickets_clear', flow=flow)}}">Empty basket</a>
         <a class="btn btn-default" href="{{url_for('tickets.main', flow=flow)}}">Change items</a>
         {% endif %}
         <button name="change_currency" value="{% if user_currency == 'GBP' %}EUR{% else %}GBP{% endif %}"
@@ -47,28 +47,7 @@
 </div>
 {% endif %}
 
-<div class="panel panel-default">
-    <div class="panel-body">
-        <p>We'll need your name and the email address to send your ticket to,
-            so please make sure they're correct:</p>
-            {{ render_field(form.name, horizontal=True) }}
-            {{ render_field(form.email, horizontal=True) }}
-            <div class="form-group col-sm-12">
-            <p></p>
-            {{ form.allow_promo() }}
-            <label class="control-label" for="allow_promo">
-                Send me occasional emails about future EMF events
-            </label>
-            </div>
-        <div class="col-sm-12">
-        <p><small>Your name and email are used to manage your ticket and contact you with
-            information about the event. Unless you choose to receive emails in future,
-            we will delete your personal data after the event.
-            We don't send your personal data to anyone else.
-            <a href="{{ url_for('base.privacy') }}" target="_blank">More privacy info</a>.</small></p>
-        </div>
-    </div>
-</div>
+{% include "user-signup.html" %}
 {% endif %}
 
 <h3>Choose a Payment Method</h3>

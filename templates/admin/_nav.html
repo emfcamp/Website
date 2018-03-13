@@ -31,10 +31,12 @@
             {{ menuitem("Paid", ".tickets") }}
             {{ menuitem("Unpaid", ".tickets_unpaid") }}
             {{ menuitem("Transfers", ".purchase_transfers") }}
-            {{ menuitem("Free Tickets", ".tickets_choose_free") }}
+            {{ menuitem("Free Tickets", ".list_free_tickets") }}
+            <li role="separator" class="divider"></li>
+            {{ menuitem("Reserve Tickets", ".tickets_reserve") }}
+            {{ menuitem("Allocate Free Tickets", ".tickets_choose_free") }}
             <li role="separator" class="divider"></li>
             {{ menuitem("Products", "admin_new.product.index_view") }}
-            {{ menuitem("Free Tickets (given)", ".list_free_tickets") }}
             {{ menuitem("Reports", ".ticket_report") }}
             {{ menuitem("Furniture", ".furniture") }}
         </ul>
@@ -47,7 +49,15 @@
             {{ menuitem("Messages", "cfp_review.all_messages") }}
         </ul>
     </li>
-    {{ menuitem("Users", ".users") }}
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+            aria-haspopup="true" aria-expanded="false">Users <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            {{ menuitem("All users", ".users") }}
+            {{ menuitem("Signup link", ".user_signup") }}
+        </ul>
+    </li>
+
     <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
             aria-haspopup="true" aria-expanded="false">Config <span class="caret"></span></a>

@@ -40,16 +40,7 @@ def generate_hmac_msg(prefix, key, timestamp, uid):
     return msg + b"-" + base64.urlsafe_b64encode(mac.digest())[:20]
 
 
-def generate_login_code(key, timestamp, uid):
-    """ Note: this outputs bytes because you need to check it with hmac.compare_digest"""
-    return generate_hmac_msg('login-', key, timestamp, uid)
-
-
-def generate_sso_code(key, timestamp, uid):
-    return generate_hmac_msg('sso-', key, timestamp, uid)
-
-
-def verify_login_code(key, current_timestamp, code):
+def verify_hmac_msg(prefix, key, current_timestamp, code, valid_hours):
     if isinstance(code, str):
         code = code.encode('utf-8')
 
@@ -58,14 +49,32 @@ def verify_login_code(key, current_timestamp, code):
     except ValueError:
         return None
 
-    login_code = generate_login_code(key, timestamp, uid)
-    if hmac.compare_digest(login_code, code):
+    expected_code = generate_hmac_msg(prefix, key, timestamp, uid)
+    if hmac.compare_digest(expected_code, code):
         age = datetime.fromtimestamp(current_timestamp) - datetime.fromtimestamp(int(timestamp))
-        if age > timedelta(hours=6):
+        if age > timedelta(hours=valid_hours):
             return None
         else:
             return int(uid)
     return None
+
+
+def generate_login_code(key, timestamp, uid):
+    """ Note: this outputs bytes because you need to check it with hmac.compare_digest"""
+    return generate_hmac_msg('login-', key, timestamp, uid)
+
+def generate_sso_code(key, timestamp, uid):
+    return generate_hmac_msg('sso-', key, timestamp, uid)
+
+def generate_signup_code(key, timestamp, uid):
+    return generate_hmac_msg('signup-', key, timestamp, uid)
+
+
+def verify_login_code(key, current_timestamp, code):
+    return verify_hmac_msg('login-', key, current_timestamp, code, valid_hours=6)
+
+def verify_signup_code(key, current_timestamp, code):
+    return verify_hmac_msg('signup-', key, current_timestamp, code, valid_hours=6)
 
 
 def generate_checkin_code(key, user_id, version=1):
@@ -95,6 +104,7 @@ def verify_checkin_code(key, code):
     if hmac.compare_digest(expected_code, code):
         return user_id
     return None
+
 
 
 class User(db.Model, UserMixin):
@@ -186,7 +196,7 @@ class User(db.Model, UserMixin):
 
     @property
     def checkin_code(self):
-        return generate_checkin_code(app.config.get('SECRET_KEY'), self.id)
+        return generate_checkin_code(app.config['SECRET_KEY'], self.id)
 
     def has_permission(self, name, cascade=True):
         if cascade and name != 'admin' and self.has_permission('admin'):
