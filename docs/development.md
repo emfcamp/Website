@@ -32,14 +32,19 @@ Code style
 ==========
 
 We generally follow [PEP8](https://www.python.org/dev/peps/pep-0008/). Flake will
-pick up obvious violations of this style, so please listen to it. Beyond that, we're
-not dogmatic about style as long as it's readable, but you may find your code
-tidied up in a later commit if it's messy or follows an anti-pattern.
+pick up obvious violations of this style, and is run automatically by `make test`.
+
+Beyond that, we're not dogmatic about style as long as it's readable. Don't worry
+if you find your code tidied up in a later commit. We've changed conventions on
+a few things over time.
+
+To bear in mind:
 
  - lines can be longer than 79 characters if it makes sense
  - splitting a line into multiple steps is usually better than using backslashes
  - formatting SQLAlchemy queries cleanly is difficult, so conventions are more relaxed
  - Prometheus metrics aren't constant, so don't UPPERCASE them
+ - single-character variables are fine in list comprehensions
 
 Always end multi-line lists in a comma. This makes git diffs work more cleanly.
 If you're used to JavaScript/JSON, Python will not do what you expect with:
