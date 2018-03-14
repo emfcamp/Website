@@ -12,7 +12,7 @@ def get_app():
         root = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
         os.environ['SETTINGS_FILE'] = os.path.join(root, 'config', 'test.cfg')
 
-    prometheus_dir = '/tmp/emf_test_prometheus'
+    prometheus_dir = os.path.join(os.environ['TMPDIR'], 'emf_test_prometheus')
     os.environ['prometheus_multiproc_dir'] = prometheus_dir
 
     if os.path.exists(prometheus_dir):

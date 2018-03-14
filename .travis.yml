@@ -11,7 +11,10 @@ addons:
 services:
   - postgresql
 env:
-  - TEST_SETTINGS=./config/travis.cfg
+  global:
+    - TMPDIR=/tmp
+  matrix:
+    - TEST_SETTINGS=./config/travis.cfg
 install:
   - pip install pipenv
   - pipenv install --dev --deploy
