@@ -30,3 +30,7 @@ loggers:
     level: WARN
   iso8601:
     level: WARN
+  pyppeteer:
+    level: WARN
+  websockets.protocol:
+    level: WARN

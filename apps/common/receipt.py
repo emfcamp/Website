@@ -3,14 +3,18 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 import io
 from lxml import etree
 import asyncio
+from urllib.parse import urljoin
 
-from flask import Markup, render_template
+from flask import Markup, render_template, current_app as app
 from sqlalchemy import func
+from pyppeteer.browser import Browser
+from pyppeteer.connection import Connection
 from pyppeteer.launcher import launch
 import qrcode
 from qrcode.image.svg import SvgPathImage
 import barcode
 from barcode.writer import ImageWriter, SVGWriter
+import requests
 
 from models.product import Product, ProductGroup, PriceTier
 from models.purchase import PurchaseTransfer, Ticket
@@ -67,13 +71,21 @@ def render_parking_receipts(png=False, pdf=False):
 def render_pdf(url, html):
     # This needs to fetch URLs found within the page, so if
     # you're running a dev server, use app.run(processes=2)
+
     async def to_pdf():
-        # TOSO: make it possible to use a running process
-        browser = await launch(executablePath='google-chrome')
+        if app.config.get('CHROME_URL'):
+            version_url = urljoin(app.config['CHROME_URL'], 'json/version')
+            data = requests.get(version_url).json()
+            con = Connection( data['webSocketDebuggerUrl'])
+            browser = await Browser.create(con)
+
+        else:
+            browser = await launch(executablePath='google-chrome')
 
         page = await browser.newPage()
 
         async def request_intercepted(request):
+            app.logger.debug('Intercepted URL: %s', request.url)
             if request.url == url:
                 await request.respond({'body': html})
             else:
