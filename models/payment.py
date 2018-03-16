@@ -149,10 +149,12 @@ class Payment(db.Model):
         elif self.state == 'refunded':
             raise StateException('Refunded payments cannot be cancelled')
 
-        for purchase in self.purchases:
-            purchase.set_state('cancelled')
+        with db.session.no_autoflush:
+            for purchase in self.purchases:
+                purchase.cancel()
 
         self.state = 'cancelled'
+        db.session.flush()
 
     def manual_refund(self):
         # Only to be called for full out-of-band refunds, for book-keeping.

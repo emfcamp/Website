@@ -199,9 +199,7 @@ class Basket(MutableMapping):
         with db.session.no_autoflush:
             for line in self._lines:
                 for purchase in line.purchases:
-                    purchase.set_state('cancelled')
-
-                line.tier.return_instances(len(line.purchases))
+                    purchase.cancel()
 
         self._lines = []
 
@@ -214,10 +212,8 @@ class Basket(MutableMapping):
         with db.session.no_autoflush:
             for line in self._lines:
                 if line.count < len(line.purchases):
-                    line.tier.return_instances(len(line.purchases) - line.count)
-
                     for purchase in line.purchases[line.count:]:
-                        purchase.set_state('cancelled')
+                        purchase.cancel()
 
                     line.purchases = line.purchases[:line.count]
 
