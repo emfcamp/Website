@@ -114,6 +114,8 @@ def transaction_reconcile(txn_id, payment_id):
                 flash("Transaction %s already reconciled" % txn.id)
                 return redirect(url_for('admin.transactions'))
 
+            payment.lock()
+
             if payment.state == 'paid':
                 app.logger.error("Payment has already been paid")
                 flash("Payment %s already paid" % payment.id)

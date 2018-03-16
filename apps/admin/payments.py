@@ -67,6 +67,9 @@ def reset_expiry(payment_id):
     if form.validate_on_submit():
         if form.reset.data:
             app.logger.info("%s manually extending expiry for payment %s", current_user.name, payment.id)
+
+            payment.lock()
+
             if payment.currency == 'GBP':
                 days = app.config.get('EXPIRY_DAYS_TRANSFER')
             elif payment.currency == 'EUR':
@@ -97,6 +100,8 @@ def send_reminder(payment_id):
         if form.remind.data:
             app.logger.info("%s sending reminder email to %s <%s> for payment %s",
                             current_user.name, payment.user.name, payment.user.email, payment.id)
+
+            payment.lock()
 
             if payment.reminder_sent:
                 app.logger.error('Reminder for payment %s already sent', payment.id)
@@ -134,6 +139,8 @@ def update_payment(payment_id):
     if form.validate_on_submit():
         if form.update.data:
             app.logger.info('Requesting updated status for %s payment %s', payment.provider, payment.id)
+
+            payment.lock()
 
             if payment.provider == 'gocardless':
                 gocardless_update_payment(payment)
@@ -174,6 +181,8 @@ def cancel_payment(payment_id):
         if form.cancel.data and (payment.provider in ['banktransfer', 'gocardless']):
             app.logger.info("%s manually cancelling payment %s", current_user.name, payment.id)
 
+            payment.lock()
+
             if payment.provider == 'gocardless' and payment.gcid is not None:
                 try:
                     gocardless_client.payments.cancel(payment.gcid)
@@ -211,6 +220,9 @@ def refund_payment(payment_id):
     if form.validate_on_submit():
         if form.refund.data:
             app.logger.info("Manually refunding payment %s", payment.id)
+
+            payment.lock()
+
             try:
                 payment.manual_refund()
 
@@ -271,6 +283,9 @@ def partial_refund(payment_id):
 
     if form.validate_on_submit():
         if form.refund.data or form.stripe_refund.data:
+
+            payment.lock()
+
             tickets = [f._ticket for f in form.tickets if f.refund.data and not f._disabled]
             total = sum(t.price_tier.get_price(payment.currency) for t in tickets)
 

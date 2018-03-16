@@ -17,7 +17,7 @@ from models.site_state import event_start
 from ..common import feature_enabled
 from ..common.forms import Form
 from ..common.receipt import attach_tickets
-from . import get_user_payment_or_abort
+from . import get_user_payment_or_abort, lock_user_payment_or_abort
 from . import payments
 
 logger = logging.getLogger(__name__)
@@ -56,32 +56,38 @@ def charge_stripe(payment):
 
     payment.state = 'charging'
     db.session.commit()
+    payment = get_user_payment_or_abort(
+        payment.id, 'stripe',
+        valid_states=['charging'],
+    )
 
     # max 15 chars, appended to company name
     description = 'Tickets {}'.format(event_start().year)
     try:
-        charge = stripe.Charge.create(
-            amount=payment.amount_int,
-            currency=payment.currency.lower(),
-            card=payment.token,
-            description=payment.description,
-            statement_description=description,
-        )
-    except stripe.CardError as e:
-        error = e.json_body['error']
-        logger.warn('Card payment failed with exception "%s"', e)
-        # Don't save the charge_id - they can try again
-        flash('Unfortunately your card payment failed with the error: %s' % (error['message']))
-        return redirect(url_for('.stripe_tryagain', payment_id=payment.id))
-    except Exception as e:
-        logger.warn("Exception %r confirming payment", e)
-        flash('An error occurred with your payment, please try again')
-        return redirect(url_for('.stripe_tryagain', payment_id=payment.id))
+        try:
+            charge = stripe.Charge.create(
+                amount=payment.amount_int,
+                currency=payment.currency.lower(),
+                card=payment.token,
+                description=payment.description,
+                statement_description=description,
+            )
+        except stripe.CardError as e:
+            error = e.json_body['error']
+            logger.warn('Card payment failed with exception "%s"', e)
+            flash('Unfortunately your card payment failed with the error: %s' % (error['message']))
+            raise
 
-    finally:
+        except Exception as e:
+            logger.warn("Exception %r confirming payment", e)
+            flash('An error occurred with your payment, please try again')
+            raise
+
+    except Exception:
         # Allow trying again
         payment.state = 'captured'
         db.session.commit()
+        return redirect(url_for('.stripe_tryagain', payment_id=payment.id))
 
     payment.chargeid = charge.id
     if charge.paid:
@@ -118,7 +124,7 @@ class StripeAuthorizeForm(Form):
 @payments.route("/pay/stripe/<int:payment_id>/capture", methods=['GET', 'POST'])
 @login_required
 def stripe_capture(payment_id):
-    payment = get_user_payment_or_abort(
+    payment = lock_user_payment_or_abort(
         payment_id, 'stripe',
         valid_states=['new'],
     )
@@ -135,6 +141,11 @@ def stripe_capture(payment_id):
             payment.token = form.token.data
             payment.state = 'captured'
             db.session.commit()
+
+            payment = lock_user_payment_or_abort(
+                payment_id, 'stripe',
+                valid_states=['captured'],
+            )
         except Exception as e:
             logger.warn("Exception %r updating payment", e)
             flash('An error occurred with your payment, please try again')
@@ -154,7 +165,7 @@ class StripeChargeAgainForm(Form):
 @payments.route("/pay/stripe/<int:payment_id>/tryagain", methods=['GET', 'POST'])
 @login_required
 def stripe_tryagain(payment_id):
-    payment = get_user_payment_or_abort(
+    payment = lock_user_payment_or_abort(
         payment_id, 'stripe',
         valid_states=['new', 'captured'],  # once it's charging/charged it's too late
     )
@@ -188,7 +199,7 @@ class StripeCancelForm(Form):
 @payments.route("/pay/stripe/<int:payment_id>/cancel", methods=['GET', 'POST'])
 @login_required
 def stripe_cancel(payment_id):
-    payment = get_user_payment_or_abort(
+    payment = lock_user_payment_or_abort(
         payment_id, 'stripe',
         valid_states=['new', 'captured'],
     )
@@ -263,9 +274,10 @@ def stripe_ping(type, ping_data):
     return ('', 200)
 
 
-def get_payment_or_abort(charge_id):
+def lock_payment_or_abort(charge_id):
     try:
-        return StripePayment.query.filter_by(chargeid=charge_id).one()
+        return StripePayment.query.filter_by(chargeid=charge_id) \
+                                  .with_for_update().one()
     except NoResultFound:
         logger.error('Payment for charge %s not found', charge_id)
         abort(409)
@@ -341,7 +353,7 @@ def stripe_payment_refunded(payment):
 @webhook('charge.refunded')
 @webhook('charge.updated')
 def stripe_charge_updated(type, charge_data):
-    payment = get_payment_or_abort(charge_data['id'])
+    payment = lock_payment_or_abort(charge_data['id'])
 
     logger.info('Received %s message for charge %s, payment %s', type, charge_data['id'], payment.id)
 
@@ -383,9 +395,10 @@ def stripe_charge_failed(type, charge_data):
 @webhook('charge.dispute.updated')
 @webhook('charge.dispute.closed')
 def stripe_dispute_update(type, dispute_data):
-    payment = get_payment_or_abort(dispute_data['charge'])
+    payment = lock_payment_or_abort(dispute_data['charge'])
     logger.critical('Unexpected charge dispute event %s for payment %s: %s', type, payment.id, dispute_data)
 
+    db.session.rollback()
     # Don't block other events
     return ('', 200)
 

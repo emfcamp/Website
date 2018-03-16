@@ -150,21 +150,27 @@ class Reconcile(Command):
             app.logger.info("Matched to payment %s by %s for %s %s",
                 payment.id, payment.user.name, payment.amount, payment.currency)
 
+            if doit:
+                payment.lock()
+
             if txn.amount != payment.amount:
                 app.logger.warn("Transaction amount %s doesn't match %s, skipping",
                                 txn.amount, payment.amount)
                 failed += 1
+                db.session.rollback()
                 continue
 
             if txn.account.currency != payment.currency:
                 app.logger.warn("Transaction currency %s doesn't match %s, skipping",
                                 txn.account.currency, payment.currency)
                 failed += 1
+                db.session.rollback()
                 continue
 
             if payment.state == 'paid':
                 app.logger.error("Payment %s has already been paid", payment.id)
                 failed += 1
+                db.session.rollback()
                 continue
 
             if doit:

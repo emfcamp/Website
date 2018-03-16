@@ -200,6 +200,9 @@ class Payment(db.Model):
     def expires_in(self):
         return self.expires - datetime.utcnow()
 
+    def lock(self):
+        Payment.query.with_for_update().get(self.id)
+
 
 @event.listens_for(Session, 'after_flush')
 def payment_change(session, flush_context):

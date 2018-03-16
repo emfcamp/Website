@@ -20,10 +20,13 @@ from models.payment import GoCardlessPayment
 from ..common import feature_enabled
 from ..common.receipt import attach_tickets
 from ..common.forms import Form
-from . import get_user_payment_or_abort
+from . import get_user_payment_or_abort, lock_user_payment_or_abort
 from . import payments
 
 logger = logging.getLogger(__name__)
+
+class IgnoreWebhook(Exception):
+    pass
 
 webhook_handlers = {}
 
@@ -76,7 +79,7 @@ def gocardless_start(payment):
 @payments.route("/pay/gocardless/<int:payment_id>/complete")
 @login_required
 def gocardless_complete(payment_id):
-    payment = get_user_payment_or_abort(
+    payment = lock_user_payment_or_abort(
         payment_id, 'gocardless',
         valid_states=['new'],
     )
@@ -109,6 +112,10 @@ def gocardless_complete(payment_id):
         payment.state = 'captured'
         db.session.commit()
 
+        payment = lock_user_payment_or_abort(
+            payment_id, 'gocardless',
+            valid_states=['captured'],
+        )
     except gocardless_pro.errors.InvalidStateError as e:
         # Assume the webhook will do its magic
         logging.error('InvalidStateError from GoCardless confirming mandate: %s', e.message)
@@ -193,7 +200,7 @@ def create_gc_payment(payment):
 @payments.route('/pay/gocardless/<int:payment_id>/tryagain')
 @login_required
 def gocardless_tryagain(payment_id):
-    payment = get_user_payment_or_abort(
+    payment = lock_user_payment_or_abort(
         payment_id, 'gocardless',
         valid_states=['new', 'captured', 'failed'],
     )
@@ -252,7 +259,7 @@ class GoCardlessCancelForm(Form):
 @payments.route("/pay/gocardless/<int:payment_id>/cancel", methods=['GET', 'POST'])
 @login_required
 def gocardless_cancel(payment_id):
-    payment = get_user_payment_or_abort(
+    payment = lock_user_payment_or_abort(
         payment_id, 'gocardless',
         # once it's inprogress, there's potentially money moving around
         valid_states=['new', 'failed', 'cancelled'],
@@ -334,7 +341,14 @@ def gocardless_webhook():
                 except KeyError as e:
                     handler = webhook_handlers[(None, None)]
 
-            handler(resource, action, event)
+            try:
+                handler(resource, action, event)
+
+            except IgnoreWebhook:
+                pass
+
+            finally:
+                db.session.rollback()
 
     except Exception as e:
         logger.error("Unexpected exception during webhook: %r", e)
@@ -372,31 +386,33 @@ def gocardless_webhook_mandate_ignore(resource, action, event):
     logger.info('Received %s action for mandate %s', action, mandate)
 
 
+def lock_payment_or_ignore(gcid):
+    try:
+        return GoCardlessPayment.query.filter_by(gcid=gcid) \
+                                      .with_for_update().one()
+    except NoResultFound:
+        logger.warn("Payment for GC payment %s not found, skipping", gcid)
+        # FIXME: if GC send us a payment.created before we've managed to
+        # save gcid to the DB, is that worth replying with a 404 for?
+        raise IgnoreWebhook()
+
+
 # https://developer.gocardless.com/api-reference/#events-payment-actions
 @webhook('payments', 'created')
 @webhook('payments', 'submitted')
 @webhook('payments', 'paid_out')
 def gocardless_webhook_payment_do_nothing(resource, action, event):
     gcid = event['links']['payment']
-    try:
-        payment = GoCardlessPayment.query.filter_by(gcid=gcid).one()
-    except NoResultFound:
-        logger.warn("Payment for payment %s not found, skipping", gcid)
-        return
+    payment = lock_payment_or_ignore(gcid)
 
     logging.info("Received %s action for gcid %s, payment %s",
                  action, gcid, payment.id)
-
 
 @webhook('payments', 'failed')
 def gocardless_webhook_payment_failed(resource, action, event):
 
     gcid = event['links']['payment']
-    try:
-        payment = GoCardlessPayment.query.filter_by(gcid=gcid).one()
-    except NoResultFound:
-        logger.warn("Payment for payment %s not found, skipping", gcid)
-        return
+    payment = lock_payment_or_ignore(gcid)
 
     logger.info("Received failed action for gcid %s, payment %s",
                 gcid, payment.id)
@@ -423,11 +439,7 @@ def gocardless_webhook_payment_failed(resource, action, event):
 def gocardless_webhook_payment_retried(resource, action, event):
 
     gcid = event['links']['payment']
-    try:
-        payment = GoCardlessPayment.query.filter_by(gcid=gcid).one()
-    except NoResultFound:
-        logger.warn("Payment for payment %s not found, skipping", gcid)
-        return
+    payment = lock_payment_or_ignore(gcid)
 
     logger.info("Received resubmission action for gcid %s, payment %s",
                 gcid, payment.id)
@@ -453,11 +465,7 @@ def gocardless_webhook_payment_retried(resource, action, event):
 def gocardless_webhook_payment_cancelled(resource, action, event):
 
     gcid = event['links']['payment']
-    try:
-        payment = GoCardlessPayment.query.filter_by(gcid=gcid).one()
-    except NoResultFound:
-        logger.warn("Payment for payment %s not found, skipping", gcid)
-        return
+    payment = lock_payment_or_ignore(gcid)
 
     logger.info("Received cancelled action for gcid %s, payment %s",
                 gcid, payment.id)
@@ -484,11 +492,7 @@ def gocardless_webhook_payment_cancelled(resource, action, event):
 def gocardless_webhook_payment_confirmed(resource, action, event):
 
     gcid = event['links']['payment']
-    try:
-        payment = GoCardlessPayment.query.filter_by(gcid=gcid).one()
-    except NoResultFound:
-        logger.warn("Payment for payment %s not found, skipping", gcid)
-        return
+    payment = lock_payment_or_ignore(gcid)
 
     logger.info("Received confirmed action for gcid %s, payment %s",
                 gcid, payment.id)
@@ -524,7 +528,6 @@ def gocardless_payment_paid(payment):
 
     logger.info("Setting payment %s to paid", payment.id)
     payment.paid()
-    db.session.commit()
 
     msg = Message("Your EMF ticket payment has been confirmed",
                   sender=app.config['TICKETS_EMAIL'],
@@ -535,6 +538,6 @@ def gocardless_payment_paid(payment):
     if feature_enabled('ISSUE_TICKETS'):
         attach_tickets(msg, payment.user)
 
-    mail.send(msg)
     db.session.commit()
+    mail.send(msg)
 

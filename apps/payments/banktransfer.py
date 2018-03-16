@@ -14,7 +14,8 @@ from main import db, mail
 from ..common import get_user_currency, feature_enabled
 from ..common.forms import Form
 from ..common.receipt import attach_tickets
-from . import get_user_payment_or_abort, payments
+from . import get_user_payment_or_abort, lock_user_payment_or_abort
+from . import payments
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +80,7 @@ def transfer_waiting(payment_id):
 @payments.route("/pay/transfer/<int:payment_id>/change-currency", methods=['POST'])
 @login_required
 def transfer_change_currency(payment_id):
-    payment = get_user_payment_or_abort(
+    payment = lock_user_payment_or_abort(
         payment_id, 'banktransfer',
         valid_states=['inprogress'],
     )
@@ -113,7 +114,7 @@ class TransferCancelForm(Form):
 @payments.route("/pay/transfer/<int:payment_id>/cancel", methods=['GET', 'POST'])
 @login_required
 def transfer_cancel(payment_id):
-    payment = get_user_payment_or_abort(
+    payment = lock_user_payment_or_abort(
         payment_id, 'banktransfer',
         valid_states=['new', 'inprogress', 'cancelled'],
     )
