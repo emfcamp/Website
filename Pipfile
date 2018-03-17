@@ -60,8 +60,6 @@ faker = "*"
 pyyaml = "*"
 prometheus-client = "*"
 pyppeteer = "*"
-pyee = "*"
-websockets = "*"
 
 
 [dev-packages]
