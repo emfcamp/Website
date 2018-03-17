@@ -1,0 +1,24 @@
+{% extends 'volunteers/base.html' %}
+{% block body %}
+    <table class="table">
+        <thead><tr>
+            <th>Id</th><th>Name</th><th>Location</th>
+        </tr></thead>
+        <tbody>
+            {% for v in venues %}
+                <tr>
+                    <td>{{ v.id }}</td>
+                    <td><a href="{{ url_for('.venue', venue_id=v.id) }}">{{ v.name }}</a></td>
+                    <td><a href="{{ v.mapref }}">{{ v.mapref }}</a></td>
+                </tr>
+            {% else %}
+                <tr><td class="text-center" colspan="3">No venues added.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a class="btn btn-default" role="button" href="{{ url_for('.new_venue') }}">
+        Create venue
+    </a>
+
+{% endblock body %}
