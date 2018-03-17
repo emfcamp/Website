@@ -274,7 +274,7 @@ def tickets_reserve(user_id=None):
             if f.amount.data:
                 basket[f._tier] = f.amount.data
 
-        app.logger.info('Admin basket %s', basket)
+        app.logger.info('Admin basket for %s %s', user.email, basket)
 
         try:
             basket.create_purchases()
@@ -299,7 +299,7 @@ def tickets_reserve(user_id=None):
         mail.send(msg)
         db.session.commit()
 
-        flash('Reserved tickets for {}'.format(user))
+        flash('Reserved tickets and emailed {}'.format(user.email))
         return redirect(url_for('.tickets_reserve'))
 
     if new_user:
