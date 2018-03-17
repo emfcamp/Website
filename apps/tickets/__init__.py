@@ -81,7 +81,7 @@ def tickets_clear(flow=None):
 @feature_flag('TICKET_SALES')
 def tickets_reserved(flow=None):
     if current_user.is_anonymous:
-        abort(404)
+        return redirect(url_for('users.login', next=url_for('.tickets_reserved', flow=flow)))
 
     basket = Basket(current_user, get_user_currency())
     basket.load_purchases_from_db()
