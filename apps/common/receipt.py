@@ -76,7 +76,7 @@ def render_pdf(url, html):
         if app.config.get('CHROME_URL'):
             version_url = urljoin(app.config['CHROME_URL'], 'json/version')
             data = requests.get(version_url).json()
-            con = Connection( data['webSocketDebuggerUrl'])
+            con = Connection(data['webSocketDebuggerUrl'])
             browser = await Browser.create(con)
 
         else:
