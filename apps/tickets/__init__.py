@@ -87,7 +87,7 @@ def tickets_reserved(flow=None):
     basket.load_purchases_from_db()
 
     basket.save_to_session()
-    return redirect(url_for('tickets.main', flow=flow))
+    return redirect(url_for('tickets.pay', flow=flow))
 
 
 @tickets.route("/tickets", methods=['GET', 'POST'])
@@ -279,6 +279,9 @@ def main(flow=None):
 @tickets.route("/tickets/pay", methods=['GET', 'POST'])
 @tickets.route("/tickets/pay/<flow>", methods=['GET', 'POST'])
 def pay(flow=None):
+    if flow is None:
+        flow = 'main'
+
     view = ProductView.get_by_name(flow)
     if not view:
         abort(404)
