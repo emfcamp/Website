@@ -1,0 +1,84 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "admin/base.html" %}
+{% block body %}
+<h2>Tickets</h2>
+
+<h4>Reserve tickets</h4>
+<form method="post" class="form-horizontal">
+{{ form.hidden_tag() }}
+
+{% if user %}
+<p>To reserve tickets for this user, choose the number of tickets:</p>
+<dl>
+  <dt>Name</dt><dd><a href="{{ url_for('.user', user_id=user.id) }}">{{ user.name }}</a></dd>
+  <dt>Email</dt><dd>{{ user.email }}</dd>
+</dl>
+{% else %}
+<p>To reserve tickets, pick a user below or enter details for a new account:</p>
+{{ render_field(form.name, True) }}
+{{ render_field(form.email, True) }}
+{% endif %}
+
+<table class="table products">
+    <thead>
+    <tr>
+        <th>Product</th>
+        <th>Price Tier</th>
+        <th>Cost</th>
+        <th>Amount</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% set row_class = cycler('odd', 'even') %}
+    {% for f in form.price_tiers %}
+    {% if f._any or f.amount.errors %}
+    <tr class="{{ loop.cycle('odd', 'even') }}
+               {% if f.amount.errors -%} has-error {%- endif %}">
+        <td>
+            {{ f.hidden_tag_without('csrf_token') }}
+            <label for="{{ f.amount.id }}"><b>{{ f._tier.parent.display_name }}</b></label>
+            {% if f._tier.parent.description %}<p class="description">{{ f._tier.parent.description }}</p>{% endif %}
+        </td>
+        <td>
+            {{ f._tier.name }}
+        </td>
+        <td>
+            {{ f._tier.get_price('GBP') | price('GBP') }}
+        </td>
+        <td>
+            <div class="controls">{{ f.amount(class_="amount") | safe }}
+            {% if f.amount.errors %}
+                {% for error in f.amount.errors %}
+                <div class="help-block">{{ error }}</div>
+                {% endfor %}
+            {% endif %}
+            </div>
+        </td>
+    </tr>
+    {% endif %}
+    {% endfor %}
+</tbody>
+</table>
+
+<div class="pull-right">{{ form.allocate(class_="btn btn-success debounce") }}</div>
+<div>&nbsp;</div>
+</form>
+
+{% if not user %}
+<h4>Choose user</h4>
+<table class="table table-condensed">
+    <tr>
+        <th>Name</th>
+        <th>Email</th>
+    </tr>
+    {% for u in users %}
+    <tr class="{{ loop.cycle('odd', 'even') }}">
+        <td><a href="{{ url_for('.tickets_reserve', user_id=u.id) }}">{{ u.name }}</a></td>
+        <td>{{ u.email }}</td>
+    </tr>
+{% endfor %}
+</table>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,18 @@
+Hi {{ user.name }},
+
+You've been reserved {% if tickets | count > 1 -%} {{ tickets | count }} tickets {%- else -%} a ticket {%- endif %} to Electromagnetic Field {{ event_year }}.
+
+{% if new_user %}
+We've created an account for you. We'll email
+you important information nearer the event.
+{% endif %}
+
+You can log in and pay for your {% if tickets | count > 1 -%} tickets {%- else -%} ticket {%- endif %} here:
+
+  {{ external_url('users.login', code=code) }}
+
+
+Love,
+
+All the EMF team
+
