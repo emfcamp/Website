@@ -270,14 +270,16 @@ class Proposal(db.Model):
         return len(messages)
 
     def get_allowed_venues(self):
-        venue_names = DEFAULT_VENUES[self.type]
-        found = []
         if self.allowed_venues:
             venue_names = [ v.strip() for v in self.allowed_venues.split(',') ]
-            found = Venue.query.filter(Venue.name.in_(venue_names)).all()
-            # If we didn't actually find all the venues we're using, bail hard
-            if len(found) != len(venue_names):
-                raise InvalidVenueException("Invalid Venue in allowed_venues!")
+        else:
+            venue_names = DEFAULT_VENUES[self.type]
+
+        found = Venue.query.filter(Venue.name.in_(venue_names)).all()
+        # If we didn't actually find all the venues we're using, bail hard
+        if len(found) != len(venue_names):
+            raise InvalidVenueException("Invalid Venue in allowed_venues!")
+
         return found
 
     def get_allowed_venues_serialised(self):

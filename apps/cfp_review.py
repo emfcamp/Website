@@ -22,7 +22,8 @@ from main import db, mail, external_url
 from .common import require_permission
 from .majority_judgement import calculate_max_normalised_score
 from models.cfp import (
-    Proposal, CFPMessage, CFPVote, CFP_STATES, Venue
+    Proposal, CFPMessage, CFPVote, CFP_STATES, Venue,
+    InvalidVenueException,
 )
 from .common.forms import Form, HiddenIntegerField
 
@@ -309,7 +310,16 @@ def update_proposal(proposal_id):
 
     # Process the POST
     if form.validate_on_submit():
-        form.update_proposal(prop)
+        try:
+            form.update_proposal(prop)
+        except InvalidVenueException:
+            # FIXME: this should just be standard field validator,
+            # e.g. validate_allowed_venues. That way it'll show up
+            # in the form where the error is.
+            flash('Invalid venue')
+            return render_template('cfp_review/update_proposal.html',
+                                   proposal=prop, form=form, next_id=next_id)
+
         expunge = False
 
         if prop.type == 'talk' and form.make_performance.data:

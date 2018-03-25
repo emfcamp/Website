@@ -18,6 +18,7 @@ class ImportVenues(Command):
         ('Stage C', ['talk'], 98),
         ('Workshop 1', ['workshop'], 97),
         ('Workshop 2', ['workshop'], 96),
+        ('Workshop 3', ['youthworkshop'], 95),
     ]
 
     def run(self):
