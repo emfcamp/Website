@@ -67,8 +67,9 @@ TIME_PERIODS['fri_13_16'] = period(
 DEFAULT_VENUES = {
     'talk': ['Stage A', 'Stage B', 'Stage C'],
     'workshop': ['Workshop 1', 'Workshop 2'],
+    'youthworkshop': ['Workshop 3'],
     'performance': ['Stage A'],
-    'installation': []
+    'installation': [],
 }
 
 class CfpStateException(Exception):
