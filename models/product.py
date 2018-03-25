@@ -199,7 +199,7 @@ class Price(db.Model):
     currency = db.Column(db.String, nullable=False)
     price_int = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, currency=None, **kwargs):
+    def __init__(self, currency, **kwargs):
         super().__init__(currency=currency.upper(), **kwargs)
 
     @property
