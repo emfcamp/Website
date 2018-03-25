@@ -213,6 +213,8 @@ def main(flow=None):
                 set_user_currency(form.currency_code.data)
                 # Commit so we don't lose the currency change if an error occurs
                 db.session.commit()
+                # Reload the basket because set_user_currency has changed it under us
+                basket = Basket.from_session(current_user, get_user_currency())
 
             for f in form.tiers:
                 pt = f._tier
