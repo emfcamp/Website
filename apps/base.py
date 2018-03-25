@@ -125,7 +125,7 @@ def privacy():
 
 @base.route('/about/branding')
 def branding():
-    return render_template('about/branding.html')
+    return render_template('branding.html')
 
 
 @base.route('/about/design-elements')
