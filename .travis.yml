@@ -11,8 +11,6 @@ addons:
 services:
   - postgresql
 env:
-  global:
-    - TMPDIR=/tmp
   matrix:
     - TEST_SETTINGS=./config/travis.cfg
 install:
