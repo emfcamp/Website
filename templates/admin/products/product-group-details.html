@@ -1,0 +1,42 @@
+{% from "admin/products/_macros.html" import format_expiry %}
+{% extends "admin/base.html" %}
+{% set nav_active = 'products' %}
+{% block title %}Product Group: {{ group.name }}{% endblock %}
+{% block body %}
+
+<h2>Product Group: {{ group.name }}</h2>
+
+<dl class="dl-horizontal">
+  <dt>Parent</dt><dd>
+  {% if group.parent %}
+      <a href="{{ url_for('admin.product_group_details', group_id=group.parent.id) }}">{{ group.parent }}</a>
+  {% else %}
+    None
+  {% endif %}
+  </dd>
+  <dt>Type</dt><dd>{{ group.type }}</dd>
+  <dt>Sold</dt><dd>{{ group.capacity_used }}</dd>
+  <dt>Maximum</dt><dd>{{ group.capacity_max }}</dd>
+  <dt>Expires</dt><dd>{{ format_expiry(group) }}</dd>
+</dl>
+
+{% if group.children %}
+    <h3>Child Groups</h3>
+    <table>
+        {% for child in group.children %}
+            <tr><td><a href="{{ url_for('admin.product_group_details', group_id=child.id) }}">
+                {{child.name}}</a></td></tr>
+        {% endfor %}
+    </table>
+{% endif %}
+
+{% if group.products %}
+    <h3>Child Products</h3>
+    <table>
+        {% for product in group.products %}
+            <tr><td><a href="{{ url_for('admin.product_details', product_id=product.id)}}">
+                {{product.name}}</a></td></tr>
+        {% endfor %}
+    </table>
+{% endif %}
+{% endblock %}

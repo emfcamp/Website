@@ -41,8 +41,8 @@ admin_new.add_view(AppModelView(ProductViewProduct, db.session, category='Produc
 @admin.route('/products')
 @admin_required
 def products():
-    products = Product.query.all()
-    return render_template('admin/products/products.html', products=products)
+    root_groups = ProductGroup.query.filter_by(parent_id=None).order_by(ProductGroup.id).all()
+    return render_template('admin/products/overview.html', root_groups=root_groups)
 
 
 class EditProductForm(Form):
@@ -159,11 +159,18 @@ def product_details(product_id):
 
 
 
-@admin.route('/products/<int:product_id>/price-tiers/<int:tier_id>')
+@admin.route('/products/price-tiers/<int:tier_id>')
 @admin_required
 def price_tier_details(tier_id):
     tier = PriceTier.query.get_or_404(tier_id)
     return render_template('admin/products/price-tier-details.html', tier=tier)
+
+
+@admin.route('/products/group/<int:group_id>')
+@admin_required
+def product_group_details(group_id):
+    group = ProductGroup.query.get_or_404(group_id)
+    return render_template('admin/products/product-group-details.html', group=group)
 
 
 @admin.route('/transfers')

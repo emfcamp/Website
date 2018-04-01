@@ -1,0 +1,26 @@
+{% from "admin/products/_macros.html" import format_expiry %}
+{% extends "admin/base.html" %}
+{% set nav_active = 'products' %}
+{% block title %}Price Tier: {{ tier.name }}{% endblock %}
+{% block body %}
+
+<h2>Price Tier: {{ tier.name }}</h2>
+
+<dl class="dl-horizontal">
+  <dt>Product</dt><dd>
+      <a href="{{ url_for('admin.product_details', product_id=tier.parent.id) }}">{{ tier.parent }}</a>
+  </dd>
+  <dt>Sold</dt><dd>{{ tier.capacity_used }}</dd>
+  <dt>Maximum</dt><dd>{{ tier.capacity_max }}</dd>
+  <dt>Expires</dt><dd>{{ format_expiry(tier) }}</dd>
+</dl>
+
+<h3>Prices</h3>
+
+<dl class="dl-horizontal">
+    {% for price in tier.prices %}
+        <dt>{{price.currency}}</dt><dd>{{price.value}}</dd>
+    {% endfor %}
+</dl>
+
+{% endblock %}
