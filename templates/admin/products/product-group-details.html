@@ -24,7 +24,7 @@
     <h3>Child Groups</h3>
     <table class="table">
         {% for child in group.children %}
-            <tr><td><a href="{{ url_for('admin.product_group_details', group_id=child.id) }}">
+            <tr><td><a href="{{ url_for('.product_group_details', group_id=child.id) }}">
                 {{child.name}}</a></td></tr>
         {% endfor %}
     </table>
@@ -34,15 +34,22 @@
     <h3>Child Products</h3>
     <table class="table">
         {% for product in group.products %}
-            <tr><td><a href="{{ url_for('admin.product_details', product_id=product.id)}}">
+            <tr><td><a href="{{ url_for('.product_details', product_id=product.id)}}">
                 {{product.name}}</a></td></tr>
         {% endfor %}
     </table>
 {% endif %}
 
 <div class="pull-right">
+    {#
     {% if not group.parent %}
         <a class="btn btn-default" href="">Assign Parent</a>
+    {% endif %}
+    #}
+    {% if not group.products %}
+        <a class="btn btn-default" href="{{ url_for('.product_group_new', parent=group.id) }}">
+            Add child product group
+        </a>
     {% endif %}
     <a class="btn btn-primary" href="{{ url_for('.product_group_edit', group_id=group.id) }}">Edit</a>
 </div>

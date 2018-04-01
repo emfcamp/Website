@@ -1,5 +1,6 @@
 body {
   padding-top: 70px;
+  padding-bottom: 40px;
 }
 
 header h1 {
@@ -25,4 +26,12 @@ header h1 > * {
 .product .limit-reached {
   font-weight: bold;
   color: #a00;
+}
+
+
+#product_overview .expired,
+    #product_overview .expired a,
+    #product_overview .inactive,
+    #product_overview .inactive a {
+    color: #a99;
 }
