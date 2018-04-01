@@ -2,7 +2,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 
 from flask import (
-    render_template, redirect, flash,
+    render_template, redirect, flash, request, abort,
     url_for, current_app as app,
 )
 from flask_login import current_user
@@ -164,6 +164,18 @@ def product_details(product_id):
 def price_tier_details(tier_id):
     tier = PriceTier.query.get_or_404(tier_id)
     return render_template('admin/products/price-tier-details.html', tier=tier)
+
+
+@admin.route('/products/price-tiers/<int:tier_id>', methods=['POST'])
+@admin_required
+def price_tier_modify(tier_id):
+    tier = PriceTier.query.get_or_404(tier_id)
+    if request.form.get('delete') and tier.unused:
+        db.session.delete(tier)
+        db.session.commit()
+        flash("Price tier deleted")
+        return redirect(url_for('admin.products'))
+    return abort(401)
 
 
 @admin.route('/products/group/<int:group_id>')

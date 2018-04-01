@@ -156,6 +156,15 @@ class PriceTier(db.Model, CapacityMixin):
 
         return dict(states)
 
+    @property
+    def purchase_count(self):
+        return Purchase.query.join(PriceTier).filter(PriceTier.id == self.id).count()
+
+    @property
+    def unused(self):
+        """ Whether this tier is unused and can be safely deleted. """
+        return self.purchase_count == 0 and not self.active
+
     def get_price(self, currency):
         if 'prices' in inspect(self).unloaded:
             return self.get_price_unloaded(currency)

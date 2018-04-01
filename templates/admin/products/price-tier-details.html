@@ -10,6 +10,7 @@
   <dt>Product</dt><dd>
       <a href="{{ url_for('admin.product_details', product_id=tier.parent.id) }}">{{ tier.parent }}</a>
   </dd>
+  <dt>Active</dt><dd>{{ tier.active }}</dd>
   <dt>Sold</dt><dd>{{ tier.capacity_used }}</dd>
   <dt>Maximum</dt><dd>{{ tier.capacity_max }}</dd>
   <dt>Expires</dt><dd>{{ format_expiry(tier) }}</dd>
@@ -22,5 +23,16 @@
         <dt>{{price.currency}}</dt><dd>{{price.value}}</dd>
     {% endfor %}
 </dl>
+
+{% if tier.unused %}
+    <p>This price tier has no purchases and and is inactive. It can be safely deleted.</p>
+{% endif %}
+
+<form method="post">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+{% if tier.unused %}
+    <button name="delete" value="1" class="btn btn-danger">Delete</button>
+{% endif %}
+</form>
 
 {% endblock %}
