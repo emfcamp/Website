@@ -10,7 +10,7 @@ from flask_login import current_user
 from wtforms.validators import Optional
 from wtforms.widgets import TextArea
 from wtforms import (
-    SubmitField, BooleanField, StringField,
+    SubmitField, BooleanField, StringField, SelectField,
     DateField, IntegerField, DecimalField,
 )
 
@@ -67,6 +67,7 @@ class EditProductForm(Form):
         self.badge.data = product.get_attribute('badge')
         self.transferable.data = product.get_attribute('transferable')
         self.description.data = product.description
+
 
 @admin.route('/products/<int:product_id>/edit', methods=['GET', 'POST'])
 @require_permission('arrivals')
@@ -183,6 +184,88 @@ def price_tier_modify(tier_id):
 def product_group_details(group_id):
     group = ProductGroup.query.get_or_404(group_id)
     return render_template('admin/products/product-group-details.html', group=group)
+
+
+class ProductGroupSelectField(SelectField):
+    def __init__(self, name):
+        groups = ProductGroup.query.all()
+        options = [(group.id, group.name) for group in groups]
+        super().__init__(name, options)
+
+
+class ProductGroupReparentForm(Form):
+    parent = ProductGroupSelectField("New parent")
+    submit = SubmitField('Submit')
+
+
+class ProductGroupForm(Form):
+    name = StringField('Name')
+    type = StringField('Type')
+    capacity_max = IntegerField('Maximum to sell (Optional)', [Optional()])
+    expires = DateField('Expiry Date (Optional)', [Optional()])
+
+
+class NewProductGroupForm(ProductGroupForm):
+    submit = SubmitField('Create')
+
+
+class EditProductGroupForm(ProductGroupForm):
+    submit = SubmitField('Save')
+
+    def init_with_pg(self, pg):
+        self.name.data = pg.name
+        self.type.data = pg.type
+        self.capacity_max.data = pg.capacity_max
+        self.expires.data = pg.expires
+
+    def update_pg(self, pg):
+        pg.name = self.name.data
+        pg.type = self.type.data
+        pg.capacity_max = self.capacity_max.data
+        pg.expires = self.expires.data
+        return pg
+
+
+@admin.route('/products/group/new', methods=['GET', 'POST'])
+@admin_required
+def product_group_new():
+    if request.args.get('parent'):
+        parent = ProductGroup.query.get_or_404(request.args.get('parent'))
+    else:
+        parent = None
+
+    form = NewProductGroupForm()
+
+    if form.validate_on_submit():
+        pg = ProductGroup(form.type.data, parent, parent.id if parent else None,
+                          name=form.name.data, capacity_max=form.capacity_max.data,
+                          expires=form.expires.data)
+        app.logger.info('%s adding new ProductGroup %s', current_user.name, pg)
+        db.session.add(pg)
+        db.session.commit()
+        flash("ProductGroup created")
+        return redirect(url_for('.product_group_details', group_id=pg.id))
+
+    return render_template('admin/products/product-group-edit.html',
+                           method='new', parent=parent, form=form)
+
+
+@admin.route('/products/group/<int:group_id>/edit', methods=['GET', 'POST'])
+@admin_required
+def product_group_edit(group_id):
+    group = ProductGroup.query.get_or_404(group_id)
+    form = EditProductGroupForm()
+    if form.validate_on_submit():
+        group = form.update_pg(group)
+        db.session.add(group)
+        db.session.commit()
+        flash("ProductGroup updated")
+        return redirect(url_for('.product_group_details', group_id=group.id))
+
+    form.init_with_pg(group)
+
+    return render_template('admin/products/product-group-edit.html',
+                           method='edit', group=group, form=form)
 
 
 @admin.route('/transfers')

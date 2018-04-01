@@ -33,6 +33,11 @@
 {% if tier.unused %}
     <button name="delete" value="1" class="btn btn-danger">Delete</button>
 {% endif %}
+{#
+{% if not tier.active %}
+    <button name="activate" value="1" class="btn">Activate</button>
+{% endif %}
+#}
 </form>
 
 {% endblock %}

@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+{% from "_formhelpers.html" import render_field, render_static %}
+{% set nav_active = 'products' %}
+{% block body %}
+
+{% if method == 'new' %}
+<h2>Create new product group</h2>
+
+    {% if parent %}
+        <p>You're creating a new product group under <strong>{{parent.name}}</strong>.</p>
+    {% else %}
+        <p>You're creating a new <strong>root product group</strong>.</p>
+    {% endif %}
+{% endif %}
+
+{% if method == 'edit' %}
+    <h2>Edit product group: {{ group }}</h2>
+{% endif %}
+
+<form method="post" class="form-horizontal">
+{{ form.hidden_tag() }}
+
+{{ render_field(form.name, horizontal=8) }}
+{{ render_field(form.type, horizontal=8) }}
+{{ render_field(form.expires, horizontal=8, placeholder="YYYY-MM-DD") }}
+{{ render_static(form.capacity_max, horizontal=8) }}
+<div class="pull-right">{{ form.submit(class_="btn btn-success debounce") }}</div>
+</form>
+
+{% endblock %}
