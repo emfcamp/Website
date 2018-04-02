@@ -15,7 +15,7 @@
 
 {% macro render_group(group, depth=0) -%}
 <tr class="{% if group.has_expired() %}expired{% endif %}">
-    <th>{% for i in range(0, depth) %}&nbsp;{% endfor %}
+    <th>{% for i in range(0, depth) %}→{% endfor %}
         <a href="{{url_for('admin.product_group_details', group_id=group.id)}}">{{group|title}}</a>
     </th>
     <td></td>
