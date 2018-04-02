@@ -1,6 +1,7 @@
 from decimal import Decimal
 from collections import defaultdict
 
+from sqlalchemy.orm import validates
 from sqlalchemy import func, UniqueConstraint, inspect
 from sqlalchemy.ext.associationproxy import association_proxy
 
@@ -40,6 +41,8 @@ class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
                                cascade='all', order_by='ProductGroup.id')
 
     def __init__(self, type=None, parent=None, parent_id=None, **kwargs):
+        # XXX: Why are we specifying both parent and parent_id here?
+        # Should also have mandatory argument for name.
         if type is None:
             if parent is None:
                 type = ProductGroup.query.get(parent_id).type
@@ -51,6 +54,55 @@ class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
     @classmethod
     def get_by_name(cls, group_name):
         return ProductGroup.query.filter_by(name=group_name).one_or_none()
+
+    @validates('capacity_max')
+    def validate_capacity_max(self, _, capacity_max):
+        """ Validate the following rules for ProductGroup capacity on allocation-level
+            ProductGroups:
+
+            - If a parent ProductGroup has a max capacity set, either all child ProductGroups
+                must have it set, or they must all be None.
+
+            - The sum of child ProductGroup capacities cannot exceed the parent
+                ProductGroup capacity.
+        """
+        if not self.parent or self.parent.capacity_max is None:
+            return capacity_max
+
+        siblings = list(self.parent.children)
+        if self in siblings:
+            siblings.remove(self)
+
+        if capacity_max is None:
+            if any(sibling.capacity_max for sibling in siblings):
+                raise ValueError("capacity_max must be provided if siblings have capacity_max set.")
+        else:
+            if any(sibling.capacity_max is None for sibling in siblings):
+                raise ValueError("One or more sibling ProductGroups has a None capacity. "
+                                 "This is a bug and you should fix that first.")
+
+            sibling_capacity = sum(sibling.capacity_max for sibling in siblings)
+            if sibling_capacity + capacity_max > self.parent.capacity_max:
+                raise ValueError("New capacity_max (%s) + sum of sibling capacities (%s) exceeds "
+                                 "parent ProductGroup capacity (%s)." % (capacity_max, sibling_capacity,
+                                                                         self.parent.capacity_max))
+        return capacity_max
+
+
+    @property
+    def unallocated_capacity(self):
+        """ If this is an allocation-level ProductGroup (i.e. it has a capacity_max
+            set, and all childen also do), return the total unallocated capacity.
+
+            Otherwise, return None.
+        """
+
+        if self.capacity_max is None or len(self.children) == 0 or \
+                any(child.capacity_max is None for child in self.children):
+            return None
+
+        return self.capacity_max - sum(child.capacity_max for child in self.children)
+
 
     @property
     def purchase_count_by_state(self):

@@ -23,10 +23,14 @@
 {% if group.children %}
     <h3>Child Groups</h3>
     <table class="table">
+        <tr><th>Group</th><th>Max Capacity</th></tr>
         {% for child in group.children %}
             <tr><td><a href="{{ url_for('.product_group_details', group_id=child.id) }}">
-                {{child.name}}</a></td></tr>
+                        {{child.name}}</a></td>
+                <td>{{child.capacity_max}}</td>
+            </tr>
         {% endfor %}
+        <tr><th>Unallocated Capacity</th><td>{{group.unallocated_capacity}}</td></tr>
     </table>
 {% endif %}
 
@@ -34,8 +38,10 @@
     <h3>Child Products</h3>
     <table class="table">
         {% for product in group.products %}
-            <tr><td><a href="{{ url_for('.product_details', product_id=product.id)}}">
-                {{product.name}}</a></td></tr>
+            <tr>
+                <td><a href="{{ url_for('.product_details', product_id=product.id)}}">
+                        {{product.name}}</a></td>
+            </tr>
         {% endfor %}
     </table>
 {% endif %}
