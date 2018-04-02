@@ -34,8 +34,10 @@ class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
     type = db.Column(db.String, nullable=False)
     name = db.Column(db.String, unique=True, nullable=False)
 
-    products = db.relationship('Product', backref='parent', cascade='all')
-    children = db.relationship('ProductGroup', backref=db.backref('parent', remote_side=[id]), cascade='all')
+    products = db.relationship('Product', backref='parent', cascade='all',
+                               order_by='Product.id')
+    children = db.relationship('ProductGroup', backref=db.backref('parent', remote_side=[id]),
+                               cascade='all', order_by='ProductGroup.id')
 
     def __init__(self, type=None, parent=None, parent_id=None, **kwargs):
         if type is None:
@@ -77,7 +79,7 @@ class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
     name = db.Column(db.String, nullable=False)
     display_name = db.Column(db.String)
     description = db.Column(db.String)
-    price_tiers = db.relationship('PriceTier', backref='parent', cascade='all')
+    price_tiers = db.relationship('PriceTier', backref='parent', cascade='all', order_by='PriceTier.id')
     product_view_products = db.relationship('ProductViewProduct', backref='product')
 
     __table_args__ = (
@@ -137,7 +139,7 @@ class PriceTier(db.Model, CapacityMixin):
     __table_args__ = (
         UniqueConstraint('name', 'product_id'),
     )
-    prices = db.relationship('Price', backref='price_tier', cascade='all')
+    prices = db.relationship('Price', backref='price_tier', cascade='all', order_by='Price.id')
 
 
     @classmethod
