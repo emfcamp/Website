@@ -29,10 +29,7 @@ def get_app():
         except:
             pass
 
-        try:
-            db.drop_all()
-        except:
-            pass
+        db.drop_all()
 
         db.create_all()
         CreateBankAccounts().run()
