@@ -66,6 +66,10 @@ class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
             - The sum of child ProductGroup capacities cannot exceed the parent
                 ProductGroup capacity.
         """
+
+        if capacity_max < self.capacity_used:
+            raise ValueError("capacity_max cannot be lower than capacity_used")
+
         if not self.parent or self.parent.capacity_max is None:
             return capacity_max
 
