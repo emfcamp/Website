@@ -1,10 +1,10 @@
-{% from "admin/products/_macros.html" import format_expiry %}
+{% from "admin/products/_macros.html" import format_expiry, breadcrumb %}
 {% extends "admin/base.html" %}
 {% set nav_active = 'products' %}
 {% block title %}Product: {{ product.display_name }}{% endblock %}
 {% block body %}
-
-<h2>Product: {{ product.display_name }} </h2>
+    
+{{ breadcrumb(product) }}
 
 <dl class="dl-horizontal">
   <dt>Internal Name</dt>

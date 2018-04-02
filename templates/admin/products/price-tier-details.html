@@ -1,10 +1,10 @@
-{% from "admin/products/_macros.html" import format_expiry %}
+{% from "admin/products/_macros.html" import format_expiry, breadcrumb %}
 {% extends "admin/base.html" %}
 {% set nav_active = 'products' %}
 {% block title %}Price Tier: {{ tier.name }}{% endblock %}
 {% block body %}
 
-<h2>Price Tier: {{ tier.name }}</h2>
+{{ breadcrumb(tier) }}
 
 <dl class="dl-horizontal">
   <dt>Product</dt><dd>
