@@ -27,7 +27,7 @@ def create_product_groups():
         ('vendors', 100),
         ('sponsors', 200),
         ('speakers', 100),
-        ('general', None),
+        ('general', 800),
     ]
 
     admissions = ProductGroup.get_by_name('admissions')
