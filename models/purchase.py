@@ -13,8 +13,8 @@ PURCHASE_STATES = {'reserved': ['payment-pending', 'expired', 'cancelled', 'paid
                    'payment-pending': ['expired', 'paid', 'cancelled'],
                    'expired': [],
                    'cancelled': [],
-                   'paid': ['receipt-emailed', 'refunded'],
-                   'receipt-emailed': ['paid', 'refunded'],
+                   'paid': ['receipt-emailed', 'refunded', 'cancelled'],
+                   'receipt-emailed': ['paid', 'refunded', 'cancelled'],
                    'refunded': [],
                    }
 # non_blocking_states are those states that don't contribute towards a user limit

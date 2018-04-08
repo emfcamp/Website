@@ -121,40 +121,43 @@ def tickets_choose_free(user_id=None):
     pts = {pt.id: pt for pt in free_pts}
     for f in form.price_tiers:
         f._tier = pts[f.tier_id.data]
-        # TODO: apply per-user limits
         values = range(f._tier.personal_limit + 1)
         f.amount.values = values
         f._any = any(values)
 
     if form.validate_on_submit():
+        if not any(f.amount.data for f in form.price_tiers):
+            flash('Please choose some tickets to allocate')
+            return redirect(url_for('.tickets_choose_free', user_id=user_id))
+
         if new_user:
             app.logger.info('Creating new user with email %s and name %s',
                             form.email.data, form.name.data)
             user = User(form.email.data, form.name.data)
+            db.session.add(user)
             flash('Created account for %s' % form.email.data)
 
-        # FIXME: use Basket()
-        raise NotImplementedError()
-
-        tickets = []
+        basket = Basket(user, 'GBP')
         for f in form.price_tiers:
             if f.amount.data:
-                pt = f._tier
-                for i in range(f.amount.data):
-                    # FIXME use the proper method
-                    try:
-                        t = Purchase.create_purchases(user=user, tier=pt, currency='GBP')
-                    except CapacityException:
-                        db.session.rollback()
-                        raise
+                basket[f._tier] = f.amount.data
 
-                    t.set_state('paid')
-                    user.tickets.append(t)
-                    tickets.append(t)
+        app.logger.info('Admin basket for %s %s', user.email, basket)
 
-                app.logger.info('Allocated %s %s tickets to user', f.amount.data, pt.name)
+        try:
+            basket.create_purchases()
+            basket.ensure_purchase_capacity()
+            assert basket.total == 0
 
-        db.session.add(user)
+        except CapacityException as e:
+            db.session.rollback()
+            app.logger.warn('Limit exceeded creating admin tickets: %s', e)
+            return redirect(url_for('.tickets_choose_free', user_id=user_id))
+
+        for p in basket.purchases:
+            p.set_state('paid')
+
+        app.logger.info('Allocated %s %s tickets to user', len(basket.purchases))
         db.session.commit()
 
         code = user.login_code(app.config['SECRET_KEY'])
@@ -163,7 +166,7 @@ def tickets_choose_free(user_id=None):
                       recipients=[user.email])
 
         msg.body = render_template('emails/tickets-free.txt',
-                            user=user, code=code, tickets=tickets,
+                            user=user, code=code, tickets=basket.purchases,
                             new_user=new_user)
 
         if feature_enabled('ISSUE_TICKETS'):
@@ -172,7 +175,7 @@ def tickets_choose_free(user_id=None):
         mail.send(msg)
         db.session.commit()
 
-        flash('Allocated %s ticket(s)' % len(tickets))
+        flash('Allocated %s ticket(s)' % len(basket.purchases))
         return redirect(url_for('.tickets_choose_free'))
 
     if new_user:
@@ -181,7 +184,7 @@ def tickets_choose_free(user_id=None):
         users = None
 
     return render_template('admin/tickets/tickets-choose-free.html',
-                           form=form, pts=free_pts, user=user, users=users)
+                           form=form, user=user, users=users)
 
 
 @admin.route('/tickets/list-free')
@@ -211,11 +214,6 @@ def cancel_free_ticket(ticket_id):
     ticket = Purchase.query.get_or_404(ticket_id)
     if ticket.payment is not None:
         abort(404)
-
-    if not ticket.is_paid_for:
-        app.logger.warn('Ticket %s is already cancelled', ticket.id)
-        flash('This ticket is already cancelled')
-        return redirect(url_for('admin.list_free_tickets'))
 
     form = CancelTicketForm()
     if form.validate_on_submit():

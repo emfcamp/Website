@@ -1,3 +1,4 @@
+{% from "admin/products/_macros.html" import remaining %}
 {% from "_formhelpers.html" import render_field %}
 {% extends "admin/base.html" %}
 {% block body %}
@@ -22,23 +23,28 @@
 <table class="table products">
     <thead>
     <tr>
+        <th>Product Group</th>
         <th>Product</th>
+        <th>Display Name</th>
+        <th>Used</th>
+        <th>Remaining</th>
         <th>Amount</th>
     </tr>
     </thead>
 
     <tbody>
     {% set row_class = cycler('odd', 'even') %}
-    {% for f in form.tiers %}
+    {% for f in form.price_tiers %}
     {% if f._any or f.amount.errors %}
     <tr class="{{ loop.cycle('odd', 'even') }}
                {% if f.amount.errors -%} has-error {%- endif %}">
+        <td>{{ f._tier.parent.parent.name }}</td>
+        <td>{{ f._tier.parent.name }}</td>
+        <td>{{ f._tier.parent.display_name }}</td>
+        <td>{{ f._tier.capacity_used }}</td>
+        <td>{{ remaining(f._tier) }}</td>
         <td>
             {{ f.hidden_tag_without('csrf_token') }}
-            <label for="{{ f.amount.id }}"><b>{{ f._tier.name }}</b></label>
-            {% if f._tier.description %}<p class="description">{{ f._tier.description }}</p>{% endif %}
-        </td>
-        <td>
             <div class="controls">{{ f.amount(class_="amount") | safe }}
             {% if f.amount.errors %}
                 {% for error in f.amount.errors %}

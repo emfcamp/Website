@@ -5,15 +5,19 @@
 <h2>Complimentary Tickets Given</h2>
 <table class="table table-striped btns-table">
   <tr>
-    <th>Ticket Type</th>
-    <th>Name</th>
+    <th>Product Group</th>
+    <th>Product</th>
+    <th>Display Name</th>
+    <th>Issued To</th>
     <th></th>
   </tr>
   {% for ticket in free_tickets %}
     <tr>
-      <td>{{ ticket.type.name }}</td>
+      <td>{{ ticket.price_tier.parent.parent.name }}</td>
+      <td>{{ ticket.price_tier.parent.name }}</td>
+      <td>{{ ticket.price_tier.parent.display_name }}</td>
       <td>
-        <a href="{{ url_for('.user', user_id=ticket.user.id) }}">{{ ticket.user.name }}</a>
+        <a href="{{ url_for('.user', user_id=ticket.owner.id) }}">{{ ticket.owner.name }}</a>
       </td>
       <td>
         <a class="btn btn-danger" href="{{ url_for('.cancel_free_ticket', ticket_id=ticket.id) }}">Cancel</a>
