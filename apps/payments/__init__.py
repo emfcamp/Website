@@ -1,8 +1,15 @@
 from decimal import Decimal
-from flask import render_template, redirect, url_for, abort, flash, current_app as app, Blueprint
+
+from flask import (
+    current_app as app, request, Blueprint,
+    render_template, redirect, abort, flash,
+    url_for, send_file,
+)
 from flask_login import login_required, current_user
 from sqlalchemy.sql.functions import func
 
+from main import external_url
+from ..common.receipt import render_pdf
 from models.payment import Payment
 from models.product import Product, PriceTier
 from models.purchase import Purchase
@@ -69,8 +76,14 @@ def invoice(payment_id):
 
     app.logger.debug('Invoice total: %s + %s = %s', subtotal, vat, payment.amount)
 
-    return render_template('invoice.html', payment=payment, invoice_lines=invoice_lines,
+    page = render_template('invoice.html', payment=payment, invoice_lines=invoice_lines,
                            premium=premium, subtotal=subtotal, vat=vat)
+
+    if request.args.get('pdf'):
+        url = external_url('.invoice', payment_id=payment_id)
+        return send_file(render_pdf(url, page), mimetype='application/pdf')
+
+    return page
 
 
 from . import banktransfer  # noqa: F401

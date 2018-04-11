@@ -4,6 +4,7 @@
   }
 
   body {
+    margin-top: 0;
     margin-bottom: 6ex;
   }
 
@@ -11,6 +12,12 @@
     position: fixed;
     bottom: 0;
   }
+}
+
+/* Also used for PDF */
+body {
+  margin-top: 4ex;
+  margin-bottom: 4ex;
 }
 
 .cancelled .table:before {
