@@ -1,6 +1,7 @@
 # coding=utf-8
 from __future__ import division, absolute_import, print_function, unicode_literals
 import io
+import os
 from lxml import etree
 import asyncio
 from urllib.parse import urljoin
@@ -80,7 +81,10 @@ def render_pdf(url, html):
             browser = await Browser.create(con)
 
         else:
-            browser = await launch(executablePath='google-chrome')
+            chrome_dir = 'var/pyppeteer'
+            if not os.path.exists(chrome_dir):
+                os.mkdir(chrome_dir)
+            browser = await launch(executablePath='google-chrome', userDataDir=chrome_dir)
 
         page = await browser.newPage()
 
