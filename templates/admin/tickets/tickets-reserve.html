@@ -22,6 +22,7 @@
 <table class="table products">
     <thead>
     <tr>
+        <th>Product Group</th>
         <th>Product</th>
         <th>Price Tier</th>
         <th>Cost</th>
@@ -37,6 +38,9 @@
                {% if f.amount.errors -%} has-error {%- endif %}">
         <td>
             {{ f.hidden_tag_without('csrf_token') }}
+            {{ f._tier.parent.parent.name }}
+        </td>
+        <td>
             <label for="{{ f.amount.id }}"><b>{{ f._tier.parent.display_name }}</b></label>
             {% if f._tier.parent.description %}<p class="description">{{ f._tier.parent.description }}</p>{% endif %}
         </td>
