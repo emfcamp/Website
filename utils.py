@@ -20,7 +20,7 @@ from tasks.schedule import (
     RunScheduler, ApplyPotentialSchedule
 )
 from tasks.tickets import (
-    CreateTickets, SendTickets, SendTransferReminder
+    CreateTickets, SendTickets, SendTransferReminder, CancelReservedTickets,
 )
 from tasks.exportdb import ExportDB
 
@@ -36,6 +36,7 @@ if __name__ == "__main__":
     manager.add_command('reconcile', Reconcile())
 
     manager.add_command('sendtransferreminder', SendTransferReminder())
+    manager.add_command('cancelreservedtickets', CancelReservedTickets())
     manager.add_command('createtickets', CreateTickets())
     manager.add_command('sendtickets', SendTickets())
 

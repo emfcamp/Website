@@ -60,6 +60,9 @@ checkreconcile:
 reallyreconcile:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py reconcile -d
 
+cancelreservedtickets:
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py cancelreservedtickets
+
 sendtickets:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py sendtickets
 

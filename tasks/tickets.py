@@ -1,11 +1,13 @@
 # coding=utf-8
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import current_app as app
 from flask_script import Command
 from main import db
+from models.payment import Payment
 from models.product import ProductGroup, Product, PriceTier, Price, ProductView, ProductViewProduct
+from models.purchase import Purchase
 
 
 def create_product_groups():
@@ -127,6 +129,32 @@ class CreateTickets(Command):
     def run(self):
         create_product_groups()
 
+
+class CancelReservedTickets(Command):
+    def run(self):
+        # Payments where someone started the process but didn't complete
+        payments = Purchase.query.filter(
+            Purchase.state == 'reserved',
+            Purchase.modified < datetime.utcnow() - timedelta(days=3),
+            ~Purchase.payment_id.is_(None),
+        ).join(Payment).with_entities(Payment).group_by(Payment)
+
+        for payment in payments:
+            app.logger.info('Cancelling payment %s', payment.id)
+            assert payment.state == 'new' and payment.provider in {'gocardless', 'stripe'}
+            payment.cancel()
+
+        # Purchases that were added to baskets but not checked out
+        purchases = Purchase.query.filter(
+            Purchase.state == 'reserved',
+            Purchase.modified < datetime.utcnow() - timedelta(days=3),
+            Purchase.payment_id.is_(None),
+        )
+        for purchase in purchases:
+            app.logger.info('Cancelling purchase %s', purchase.id)
+            purchase.cancel()
+
+        db.session.commit()
 
 class SendTransferReminder(Command):
 
