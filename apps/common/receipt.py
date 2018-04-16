@@ -2,6 +2,8 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 import io
 import os
+import tempfile
+import shutil
 from lxml import etree
 import asyncio
 from urllib.parse import urljoin
@@ -84,7 +86,9 @@ def render_pdf(url, html):
             chrome_dir = 'var/pyppeteer'
             if not os.path.exists(chrome_dir):
                 os.mkdir(chrome_dir)
-            browser = await launch(executablePath='google-chrome', userDataDir=chrome_dir)
+
+            tmp_chrome_dir = tempfile.mkdtemp(dir=chrome_dir)
+            browser = await launch(executablePath='google-chrome', userDataDir=tmp_chrome_dir)
 
         page = await browser.newPage()
 
@@ -101,6 +105,10 @@ def render_pdf(url, html):
         await page.goto(url)
         pdf = await page.pdf()
         await browser.close()
+
+        if not app.config.get('CHROME_URL'):
+            shutil.rmtree(tmp_chrome_dir)
+
         return pdf
 
     loop = asyncio.new_event_loop()
