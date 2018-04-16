@@ -140,6 +140,7 @@ class CancelReservedTickets(Command):
         ).join(Payment).with_entities(Payment).group_by(Payment)
 
         for payment in payments:
+            payment.lock()
             app.logger.info('Cancelling payment %s', payment.id)
             assert payment.state == 'new' and payment.provider in {'gocardless', 'stripe'}
             payment.cancel()
