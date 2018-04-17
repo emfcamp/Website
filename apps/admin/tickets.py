@@ -157,7 +157,7 @@ def tickets_choose_free(user_id=None):
         for p in basket.purchases:
             p.set_state('paid')
 
-        app.logger.info('Allocated %s %s tickets to user', len(basket.purchases))
+        app.logger.info('Allocated %s tickets to user', len(basket.purchases))
         db.session.commit()
 
         code = user.login_code(app.config['SECRET_KEY'])
