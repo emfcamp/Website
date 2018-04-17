@@ -2,7 +2,7 @@ Hi {{ user.name }},
 
 You've been sent {% if tickets | count > 1 -%} {{ tickets | count }} complimentary tickets {%- else -%} a complimentary ticket {%- endif %} to Electromagnetic Field {{ event_year }}.
 
-{% if feature_enabled('ISSUE_TICKETS') %}
+{% if feature_enabled('ISSUE_TICKETS') -%}
 {% include 'emails/receipt-blurb.txt' %}
 {% elif new_user %}
 We've created an account for you. We'll email

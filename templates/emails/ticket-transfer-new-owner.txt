@@ -3,7 +3,7 @@ Hi {{ to_user.name }},
 Your friend {{ from_user.name }} has transferred a ticket to you for
 Electromagnetic Field {{ event_year }}.
 
-{% if feature_enabled('ISSUE_TICKETS') %}
+{% if feature_enabled('ISSUE_TICKETS') -%}
 {% include 'emails/receipt-blurb.txt' %}
 {% elif new_user %}
 We've created an account for you. We'll email

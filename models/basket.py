@@ -218,6 +218,18 @@ class Basket(MutableMapping):
                     line.purchases = line.purchases[:line.count]
 
 
+    def check_out_free(self):
+        if self.total != 0:
+            raise Exception("Cannot check out free basket with total of {}".format(self.total))
+
+        if self.user is None:
+            raise Exception("Cannot check out basket with no user")
+
+        for purchase in self.purchases:
+            if purchase.owner is None:
+                purchase.set_user(self.user)
+            purchase.set_state('paid')
+
     def create_payment(self, payment_cls):
         """
         Insert payment and purchases from session data into DB.
@@ -239,7 +251,6 @@ class Basket(MutableMapping):
             if purchase.payment_id is not None:
                 raise Exception("Purchase {} has a payment already".format(purchase.id))
 
-            purchase.user = self.user
 
         payment = payment_cls(self.currency, self.total)
 

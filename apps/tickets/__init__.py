@@ -227,30 +227,7 @@ def main(flow=None):
                 basket.save_to_session()
                 return redirect(url_for('tickets.main', flow=flow))
 
-            if any(basket.values()):
-                app.logger.info('Basket %s', basket)
-
-                try:
-                    basket.create_purchases()
-                    basket.ensure_purchase_capacity()
-
-                    db.session.commit()
-
-                except CapacityException as e:
-                    # Damn, capacity's gone since we created the purchases
-                    # Redirect back to show what's currently in the basket
-                    db.session.rollback()
-                    no_capacity.inc()
-                    app.logger.warn('Limit exceeded creating tickets: %s', e)
-                    flash("We're very sorry, but there is not enough capacity available to "
-                          "allocate these tickets. You may be able to try again with a smaller amount.")
-                    return redirect(url_for("tickets.main", flow=flow))
-
-                basket.save_to_session()
-
-                return redirect(url_for('tickets.pay', flow=flow))
-
-            else:
+            if not any(basket.values()):
                 empty_baskets.inc()
                 if ticket_view:
                     flash("Please select at least one ticket to buy.")
@@ -259,6 +236,62 @@ def main(flow=None):
 
                 basket.save_to_session()
                 return redirect(url_for('tickets.main', flow=flow))
+
+            app.logger.info('Basket %s', basket)
+
+            try:
+                basket.create_purchases()
+                basket.ensure_purchase_capacity()
+
+                db.session.commit()
+
+            except CapacityException as e:
+                # Damn, capacity's gone since we created the purchases
+                # Redirect back to show what's currently in the basket
+                db.session.rollback()
+                no_capacity.inc()
+                app.logger.warn('Limit exceeded creating tickets: %s', e)
+                flash("We're very sorry, but there is not enough capacity available to "
+                      "allocate these tickets. You may be able to try again with a smaller amount.")
+                return redirect(url_for("tickets.main", flow=flow))
+
+            basket.save_to_session()
+
+            if basket.total != 0:
+                # Send the user off to pay
+                return redirect(url_for('tickets.pay', flow=flow))
+
+            # We currently only sell one free ticket, which is to enforce capacity.
+            # We don't let people order an under-12 ticket on its own.
+            if not current_user.is_authenticated:
+                flash("You must be logged in to buy additional free tickets")
+                return redirect(url_for("tickets.main", flow=flow))
+
+            admissions_tickets = [t for t in current_user.owned_tickets if t.type == 'admission_ticket']
+            if not any(admissions_tickets):
+                flash("You must have an admissions ticket to buy additional free tickets")
+                return redirect(url_for("tickets.main", flow=flow))
+
+            basket.user = current_user
+            basket.check_out_free()
+            db.session.commit()
+
+            Basket.clear_from_session()
+
+            msg = Message("Your EMF ticket order",
+                          sender=app.config['TICKETS_EMAIL'],
+                          recipients=[current_user.email])
+            msg.body = render_template("emails/tickets-ordered-email-free.txt",
+                                       user=current_user, basket=basket)
+            mail.send(msg)
+
+            if len(basket.purchases) == 1:
+                flash("Your ticket has been confirmed")
+            else:
+                flash("Your tickets have been confirmed")
+
+            return redirect(url_for('users.tickets'))
+
 
     if request.method == 'POST' and form.set_currency.data:
         if form.set_currency.validate(form):

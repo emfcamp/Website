@@ -4,7 +4,7 @@ This is to confirm that you've bought
 {%- if payment.purchases | count == 1 %} a ticket {%- else %} {{ payment.purchases | count }} tickets {%- endif %} for
 Electromagnetic Field {{ event_year }}.
 
-{% if payment.state == 'paid' and feature_enabled('ISSUE_TICKETS') %}
+{% if payment.state == 'paid' and feature_enabled('ISSUE_TICKETS') -%}
 {% include 'emails/receipt-blurb.txt' %}
 {% else %}
 Your tickets are:

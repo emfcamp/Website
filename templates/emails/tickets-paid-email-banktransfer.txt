@@ -3,7 +3,7 @@ Hi {{ user.name }},
 This is to confirm that we've received {{ payment.amount | price(payment.currency) }} for transaction {{ payment.bankref | bankref }} from
 you as payment for {% if payment.purchases | count > 1 %}{{ payment.purchases | count }} tickets{% else %}a ticket{% endif %} for Electromagnetic Field.
 
-{% if feature_enabled('ISSUE_TICKETS') %}
+{% if feature_enabled('ISSUE_TICKETS') -%}
 {% include 'emails/receipt-blurb.txt' %}
 {% endif %}
 
