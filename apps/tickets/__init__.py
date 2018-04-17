@@ -434,7 +434,7 @@ def transfer(ticket_id):
 
         else:
             new_user = False
-            to_user = User.query.filter_by(email=email).one()
+            to_user = User.get_by_email(email)
 
         ticket = Ticket.query.with_for_update().get(ticket_id)
         assert ticket.owner_id == current_user.id
