@@ -1,0 +1,21 @@
+Hi, {{ user.name }},
+
+This is to confirm that you've ordered
+{%- if basket.purchases | count == 1 %} a ticket {%- else %} {{ basket.purchases | count }} tickets {%- endif %} for
+Electromagnetic Field {{ event_year }}.
+
+{% if feature_enabled('ISSUE_TICKETS') -%}
+{% include 'emails/receipt-blurb.txt' %}
+{% else %}
+Your tickets are:
+
+{% for line in basket._lines -%}
+{{ line.tier.parent.display_name }}: {{ line.count }}
+{% endfor %}
+{% endif %}
+
+See you soon,
+
+Love,
+
+All the EMF team
