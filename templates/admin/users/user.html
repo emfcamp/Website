@@ -39,20 +39,16 @@
 <h3>Tickets</h3>
 <table class="table table-condensed">
     <tr>
+        <th>Product Group</th>
         <th>Name</th>
-        <th>Status</th>
+        <th>State</th>
         <th>Checked in?</th>
     </tr>
-    {% for ticket in user.tickets %}
+    {% for ticket in user.owned_tickets %}
         <tr>
-            <td>{{ ticket.type.name }}</td>
-            <td>{% if ticket.is_paid_for -%}
-                Paid
-            {%- elif ticket.expired -%}
-                Expired
-            {%- else -%}
-                --
-            {%- endif %}</td>
+            <td>{{ ticket.product.parent.name }}</td>
+            <td>{{ ticket.product.display_name }}</td>
+            <td>{{ ticket.state }}</td>
             <td>{% if ticket.checkin %}Yes{% else %}No{% endif %}</td>
         </tr>
     {% endfor %}
