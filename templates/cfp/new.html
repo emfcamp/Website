@@ -10,7 +10,7 @@
 
   {% include 'cfp/form_' + cfp_type + '_include.html' %}
 
-  <div class="cfp-pane" id="cfp-errors">
+  <div class="well" id="cfp-errors">
     <form action={{ url_for('cfp.form', cfp_type=cfp_type) + ('?closed' if ignore_closed else '') }} method="post" class="form-horizontal cfp-form" role="form">
       {{ form.hidden_tag() }}
       {% if not current_user.is_authenticated %}
