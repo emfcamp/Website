@@ -61,13 +61,13 @@
     <fieldset>
       <div class="col-sm-12">
         If you're comfortable telling us a little bit about yourself, we'd appreciate it.
-        This information will only be used it to find out how well we're doing with outreach.
+        This information will only be summarised, to find out how well we're doing with outreach.
       </div>
       <div class="col-sm-12">
         <p></p>
-        {{ render_field(form.age, True) }}
-        {{ render_field(form.gender, True) }}
-        {{ render_field(form.ethnicity, True) }}
+        {{ render_field(form.age, True, placeholder="Optional") }}
+        {{ render_field(form.gender, True, placeholder="Optional") }}
+        {{ render_field(form.ethnicity, True, placeholder="Optional") }}
         {{ form.forward(class_="btn btn-default pull-right", style="margin-bottom: 15px;") }}
       </div>
     </fieldset>
