@@ -24,11 +24,16 @@
           </div>
         {% else %}
           <p>
-            <a href="{{ url_for('users.login', next=url_for('.main', cfp_type=cfp_type) + ('?closed' if ignore_closed else '')) }}" target="_blank">Please log in</a> if you've already bought a ticket (or had one transferred to you).</p>
+            <a href="{{ url_for('users.login', next=url_for('.main', cfp_type=cfp_type) + ('?closed' if ignore_closed else '')) }}" target="_blank">Please log in</a> if you've already bought a ticket (or had one transferred to you). We will use this address for any questions about your proposal.</p>
         {% endif %}
         {{ render_field(form.name, horizontal=9, placeholder="Your name" + (' (or pseudonym)' if cfp_type != 'youthworkshop' else '')) }}
         {{ render_field(form.email, horizontal=9, placeholder="Your email address") }}
       </fieldset>
+      {% else %}
+      <div class="alert alert-info">
+      <p>Your proposal will be associated with your existing account: {{ current_user.email }}</p>
+      <div>We will use this address for any questions about your proposal, so if it isn't you, please <a href="{{ url_for('users.logout') }}">log out</a>.</div>
+      </div>
       {% endif %}
 
       <fieldset>
