@@ -10,7 +10,7 @@
   {% for p in payments %}
     <tr class="{{- loop.cycle('odd', 'even') -}}">
       <td>
-          <a href="{{ url_for('payments.invoice', payment_id=p.id) }}">{{ p.name }}</a>
+          {{ p.name }}
       </td>
       <td>{{ p.amount | price(p.currency) }}</td>
       <td>
@@ -32,14 +32,15 @@
           <a href="{{ url_for('payments.stripe_tryagain', payment_id=p.id) }}" class="btn btn-success">Charge</a>
         {% endif -%}
       </td>
-      <td>
+      <td class="btn-group" role="group">
         {%- if p.state in ["new", "failed"] and p.provider == "gocardless" %}
           <a href="{{ url_for('payments.gocardless_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
         {%- elif p.state in ["new", "inprogress"] and p.provider == "banktransfer" %}
           <a href="{{ url_for('payments.transfer_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
         {%- elif p.state in ["new", "captured"] and p.provider == "stripe" %}
           <a href="{{ url_for('payments.stripe_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
-        {% endif -%}
+      {% endif -%}
+      <a href="{{ url_for('payments.invoice', payment_id=p.id) }}" class="btn btn-default">View Invoice</a>
       </td>
     </tr>
   {% endfor %}
