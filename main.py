@@ -205,17 +205,35 @@ def create_app(dev_server=False):
     app.register_blueprint(schedule)
     app.register_blueprint(arrivals, url_prefix='/arrivals')
 
-    if app.config.get('VOLUNTEERS'):
-        from apps.volunteers import volunteers
-        app.register_blueprint(volunteers, url_prefix='/volunteers')
 
     from flask_admin import Admin
-    from apps.common.flask_admin_base import AppAdminIndexView
+
+    if app.config.get('VOLUNTEERS'):
+        app.logger.info("Set up volunteers")
+
+        from apps.volunteers.base import VolunteerIndexView
+        global volunteers
+        # Use the flask-admin system to run the volunteer stuff
+        # This is all pretty janky to account cope with imports & using flask
+        # admin for this and admin_new but separately.
+        volunteers = Admin(url='/volunteers', name='EMF Volunteers',
+                           template_mode='bootstrap3',
+                           index_view=VolunteerIndexView(url='/volunteers'),
+                           base_template='volunteers/base.html')
+
+        volunteers.endpoint = 'volunteers'
+        volunteers.endpoint_prefix = 'volunteers'
+        volunteers.init_app(app)
+
+        from apps.volunteers import init
+        init()
 
     global admin_new
+    from apps.common.flask_admin_base import AppAdminIndexView
     admin_new = Admin(url='/admin/new', name='EMF Admin', template_mode='bootstrap3',
-                      base_template='flask-admin-base.html',
-                      index_view=AppAdminIndexView(url='/admin/new'))
+                      index_view=AppAdminIndexView(url='/admin/new'),
+                      base_template='flask-admin-base.html')
+
     admin_new.endpoint_prefix = 'admin_new'
 
     from apps.admin import admin

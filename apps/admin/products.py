@@ -295,5 +295,3 @@ def tees():
                             .order_by(User.name)
 
     return render_template('admin/products/tee-purchases.html', purchases=purchases)
-
-
