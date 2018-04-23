@@ -2,7 +2,7 @@
 from main import db
 
 class Venue(db.Model):
-    __tablename__ = 'volunteer-venue'
+    __tablename__ = 'volunteer_venue'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, index=True)
     mapref = db.Column(db.String)
