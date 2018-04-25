@@ -58,7 +58,7 @@ def suppressed():
 
 
 def score_reconciliation(txn, payment):
-    words = txn.payee.replace('-', ' ').split(' ')
+    words = list(filter(None, re.split('\W+', txn.payee)))
 
     bankref_distances = [ratio(w, payment.bankref) for w in words]
     # Get the two best matches, for the two parts of the bankref
