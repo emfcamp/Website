@@ -61,8 +61,10 @@ def suppressed():
 def score_reconciliation(txn, payment):
     words = list(filter(None, re.split('\W+', txn.payee)))
 
-    bankref_distances = [ratio(w, payment.bankref) for w in words]
+    bankref_parts = [payment.bankref[:4], payment.bankref[4:]]
+    bankref_distances = [ratio(w, p) for w in words for p in bankref_parts]
     # Get the two best matches, for the two parts of the bankref
+    # A match gives 1.0, a 2-char substring 0.666, and a 6-char superstring 0.857
     bankref_score = sum(sorted(bankref_distances)[-2:])
     name_score = jaro(txn.payee, payment.user.name)
 
