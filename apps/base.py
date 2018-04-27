@@ -232,9 +232,9 @@ def talks_2012():
     return render_template('talks-2012.html', **days)
 
 
-# @base.route('/sponsors')
-# def sponsors():
-#     return render_template('sponsors/sponsors.html')
+@base.route('/sponsors')
+def sponsors():
+    return render_template('sponsors/sponsors.html')
 
 
 @base.route('/sponsor')
