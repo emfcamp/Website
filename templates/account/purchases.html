@@ -5,14 +5,14 @@
 {% if tickets %}
   <h3>Your tickets</h2>
   <a id="your-tickets"></a>
-  {% include "tickets-main/ticket-list.html" %}
+  {% include "account/purchases/ticket-list.html" %}
   <div class="clearfix"></div>
 {% endif %}
 
 {% if other_items %}
   <h3>Your other purchases</h2>
   <a id="your-tickets"></a>
-  {% include "tickets-main/other-items-list.html" %}
+  {% include "account/purchases/other-items-list.html" %}
   <div class="clearfix"></div>
 {% endif %}
 
@@ -20,21 +20,21 @@
 {% if payments %}
   <h3>Your payments</h2>
   <a id="your-payments"></a>
-  {% include "tickets-main/payments.html" %}
+  {% include "account/purchases/payments.html" %}
   <div class="clearfix"></div>
 {% endif %}
 
 {% if transferred_to %}
   <h3>Tickets received</h2>
   <a id="transfers-to"></a>
-  {% include "tickets-main/transferred-to.html" %}
+  {% include "account/purchases/transferred-to.html" %}
   <div class="clearfix"></div>
 {% endif %}
 
 {% if transferred_from %}
   <h3>Tickets given</h2>
   <a id="transfers-from"></a>
-  {% include "tickets-main/transferred-from.html" %}
+  {% include "account/purchases/transferred-from.html" %}
   <div class="clearfix"></div>
 {% endif %}
 

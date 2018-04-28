@@ -241,9 +241,14 @@ def account():
     return render_template("account/main.html", form=form, unread_count=unread_count)
 
 
-@users.route("/account/tickets", methods=['GET', 'POST'])
+@users.route('/account/tickets')
+def purchases_redirect():
+    return redirect(url_for('.purchases'))
+
+
+@users.route('/account/purchases', methods=['GET', 'POST'])
 @login_required
-def tickets():
+def purchases():
     owned_purchases = current_user.owned_products \
                                   .filter(~Purchase.state.in_(['cancelled', 'reserved'])) \
                                   .order_by(Purchase.id)
@@ -262,7 +267,7 @@ def tickets():
 
     show_receipt = any([t for t in tickets if t.is_paid_for is True])
 
-    return render_template("account/tickets.html",
+    return render_template("account/purchases.html",
                            tickets=tickets,
                            other_items=other_items,
                            payments=payments,
