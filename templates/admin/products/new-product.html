@@ -10,6 +10,7 @@
 <form method="post" class="form-horizontal">
 {{ form.hidden_tag() }}
 {{ render_field(form.name, horizontal=8) }}
+{{ render_field(form.display_name, horizontal=8) }}
 {{ render_field(form.capacity_max, horizontal=8) }}
 {{ render_field(form.expires, horizontal=8, placeholder="YYYY-MM-DD") }}
 {{ render_field(form.description, horizontal=8, rows="4", cols="50") }}
