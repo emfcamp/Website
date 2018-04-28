@@ -273,11 +273,6 @@ def favourites_ical():
 
 @schedule.route('/line-up')
 @feature_flag('SCHEDULE')
-def line_up_redirect():
-    return redirect(url_for('.line_up'))
-
-@schedule.route('/line-up/2016')
-@feature_flag('SCHEDULE')
 def line_up():
     proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
         filter(Proposal.state.in_(['accepted', 'finished'])).\
