@@ -290,7 +290,7 @@ def main(flow=None):
             else:
                 flash("Your tickets have been confirmed")
 
-            return redirect(url_for('users.tickets'))
+            return redirect(url_for('users.purchases'))
 
 
     if request.method == 'POST' and form.set_currency.data:
@@ -410,14 +410,14 @@ def transfer(ticket_id):
     try:
         ticket = current_user.owned_products.filter_by(id=ticket_id).one()
     except NoResultFound:
-        return redirect(url_for('users.tickets'))
+        return redirect(url_for('users.purchases'))
 
     # Currently we only deal with ticket transfers, but other
     # items could be transferable in the future.
     if (not ticket or
             ticket.state not in bought_states or
             not ticket.product.get_attribute('is_transferable')):
-        return redirect(url_for('users.tickets'))
+        return redirect(url_for('users.purchases'))
 
     form = TicketTransferForm()
 
@@ -470,7 +470,7 @@ def transfer(ticket_id):
         mail.send(msg)
 
         flash("Your ticket was transferred.")
-        return redirect(url_for('users.tickets'))
+        return redirect(url_for('users.purchases'))
 
     return render_template('ticket-transfer.html', ticket=ticket, form=form)
 

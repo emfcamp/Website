@@ -86,7 +86,7 @@ def invoice(payment_id):
         app.logger.error('Invoice total mismatch: %s + %s - %s = %s', subtotal, vat,
                          payment.amount, subtotal + vat - payment.amount)
         flash('Your invoice cannot currently be displayed')
-        return redirect(url_for('users.tickets'))
+        return redirect(url_for('users.purchases'))
 
     app.logger.debug('Invoice total: %s + %s = %s', subtotal, vat, payment.amount)
 

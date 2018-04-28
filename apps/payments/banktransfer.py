@@ -122,7 +122,7 @@ def transfer_cancel(payment_id):
     if payment.state == 'cancelled':
         logger.info('Payment %s has already been cancelled', payment.id)
         flash('Payment has already been cancelled')
-        return redirect(url_for('users.tickets'))
+        return redirect(url_for('users.purchases'))
 
     form = TransferCancelForm(request.form)
     if form.validate_on_submit():
@@ -134,7 +134,7 @@ def transfer_cancel(payment_id):
             logging.info('Payment %s cancelled', payment.id)
             flash('Payment cancelled')
 
-        return redirect(url_for('users.tickets'))
+        return redirect(url_for('users.purchases'))
 
     return render_template('transfer-cancel.html', payment=payment, form=form)
 

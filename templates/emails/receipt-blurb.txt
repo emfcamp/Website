@@ -5,7 +5,7 @@ on your phone, but we recommend you print them out for convenience.
 If you have bought a ticket for someone else you can send it to them
 by logging in and clicking 'transfer' beside the relevant ticket:
 
-  {{ external_url('users.tickets') }}
+  {{ external_url('users.purchases') }}
 
 {% endif %}
 If you're coming by car and you don't have a parking ticket, you'll

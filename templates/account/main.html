@@ -7,7 +7,7 @@
 <nav>
   <ul class="nav nav-pills">
     {% if feature_enabled('TICKET_SALES') %}
-      <li><a href="{{ url_for('users.tickets') }}">Your tickets</a></li>
+      <li><a href="{{ url_for('users.purchases') }}">Your tickets</a></li>
     {% endif %}
     {% if feature_enabled('CFP') %}
       <li><a href="{{ url_for('cfp.proposals') }}">Your proposals</a></li>
