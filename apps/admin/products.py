@@ -68,6 +68,7 @@ def new_product(copy_id, parent_id):
     if form.validate_on_submit():
         product = Product(parent=parent,
                        name=form.name.data,
+                       display_name=form.display_name.data,
                        expires=form.expires.data or None,
                        capacity_max=form.capacity_max.data or None,
                        description=form.description.data or None)
