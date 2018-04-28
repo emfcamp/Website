@@ -5,12 +5,12 @@
     {{ (total_seconds/86400.0)|round|int }} days
 {%- elif total_seconds > 7200 -%}
     {% set hours = (dt|string).split(':')[0] %}
-    {{hours}} hours
+    {{hours|int}} hours
 {%- elif total_seconds > 3600 -%}
     {% set hours, minutes, _ = (dt|string).split(':') %}
-    {{hours}} hour {{minutes}} minutes
+    {{hours|int}} hour {{minutes|int}} minutes
 {%- else -%}
     {% set minutes = (dt|string).split(':')[1] %}
-    {{minutes}} minutes
+    {{minutes|int}} minutes
 {%- endif -%}
 {% endmacro %}
