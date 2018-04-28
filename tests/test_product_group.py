@@ -107,6 +107,39 @@ class SingleProductGroupTest(unittest.TestCase):
             self.assertEqual(0, self.item.get_total_remaining_capacity())
 
 
+class ProductGroupInitialiseTest(unittest.TestCase):
+    parent_group_template = 'parent_group{}'
+    group_template = 'group{}'
+
+    def setUp(self):
+        self.client, self.app, self.db = get_app()
+        self.app.testing = True
+
+    def create_fixtures(self):
+        self.parent_group_name = self.parent_group_template.format(random_string(8))
+        self.parent_group = ProductGroup(type='test', name=self.parent_group_name, capacity_max=10)
+        self.db.session.add(self.parent_group)
+
+        self.db.session.commit()
+
+    def test_capacity_propagation(self):
+        with self.app.app_context():
+            self.create_fixtures()
+
+            self.group_name = self.group_template.format(random_string(8))
+            # Create a product group without a parent so validate_capacity_max returns early
+            self.group = ProductGroup(type='test')
+            assert self.group.name is None
+            assert self.group.id is None
+
+            # Now add a parent
+            self.group.parent = self.parent_group
+
+            # This should call validate_capacity_max, which may flush the session, which we don't want
+            self.group.capacity_max = 5
+            assert self.group.id is not None
+
+
 class MultipleProductGroupTest(unittest.TestCase):
     user_email_template = '{}@test.invalid'
     group_template = 'group{}'
