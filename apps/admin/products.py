@@ -22,7 +22,7 @@ from ..common.flask_admin_base import AppModelView
 
 from . import admin, admin_required
 from .forms import (EditProductForm, NewProductForm,
-                    NewProductGroupForm, EditProductGroupForm, PriceTierForm)
+                    NewProductGroupForm, EditProductGroupForm)
 
 
 admin_new.add_view(AppModelView(ProductGroup, db.session, category='Products'))
