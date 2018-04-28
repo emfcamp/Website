@@ -17,12 +17,11 @@ from models.product import (
 from models.purchase import (
     Purchase, PurchaseTransfer,
 )
-from ..common import require_permission
 from ..common.flask_admin_base import AppModelView
 
 from . import admin, admin_required
 from .forms import (EditProductForm, NewProductForm,
-                    NewProductGroupForm, EditProductGroupForm)
+                    NewProductGroupForm, EditProductGroupForm, PriceTierForm)
 
 
 admin_new.add_view(AppModelView(ProductGroup, db.session, category='Products'))
@@ -40,25 +39,14 @@ def products():
 
 
 @admin.route('/products/<int:product_id>/edit', methods=['GET', 'POST'])
-@require_permission('arrivals')
+@admin_required
 def edit_product(product_id):
     form = EditProductForm()
 
     product = Product.query.get_or_404(product_id)
     if form.validate_on_submit():
         app.logger.info('%s editing product %s', current_user.name, product_id)
-        for attr in ['name', 'capacity_max', 'expires', 'description']:
-            cur_val = getattr(product, attr)
-            new_val = getattr(form, attr).data
-
-            if cur_val != new_val:
-                app.logger.info(' %10s: %r -> %r', attr, cur_val, new_val)
-                setattr(product, attr, new_val)
-
-#        for attr in ['badge', 'transferable']
-#
-# 'personal_limit', price_gbp, price_eur
-
+        form.update_product(product)
         db.session.commit()
         return redirect(url_for('.product_details', product_id=product_id))
 
@@ -66,37 +54,33 @@ def edit_product(product_id):
     return render_template('admin/products/edit-product.html', product=product, form=form)
 
 
-@admin.route('/new-product/', defaults={'copy_id': -1}, methods=['GET', 'POST'])
-@admin.route('/new-product/<int:copy_id>', methods=['GET', 'POST'])
+@admin.route('/products/group/<int:parent_id>/new', defaults={'copy_id': None}, methods=['GET', 'POST'])
+@admin.route('/products/<int:copy_id>/clone', defaults={'parent_id': None}, methods=['GET', 'POST'])
 @admin_required
-def new_product(copy_id):
+def new_product(copy_id, parent_id):
+    if parent_id:
+        parent = ProductGroup.query.get_or_404(parent_id)
+    else:
+        parent = Product.query.get(copy_id).parent
+
     form = NewProductForm()
 
     if form.validate_on_submit():
-        expires = form.expires.data if form.expires.data else None
-        description = form.description.data if form.description.data else None
-
-        pt = PriceTier(parent_id=form.parent_id.data,
-                       name=form.name.data, expires=expires,
-                       description=description,
-                       personal_limit=form.personal_limit.data)
-
-        #
-        #               has_badge=form.has_badge.data,
-        #               is_transferable=form.is_transferable.data)
-
-        pt.prices = [Price('GBP', form.price_gbp.data),
-                     Price('EUR', form.price_eur.data)]
-        app.logger.info('%s adding new Product %s', current_user.name, pt)
-        db.session.add(pt)
+        product = Product(parent=parent,
+                       name=form.name.data,
+                       expires=form.expires.data or None,
+                       capacity_max=form.capacity_max.data or None,
+                       description=form.description.data or None)
+        app.logger.info('%s adding new Product %s', current_user.name, product)
+        db.session.add(product)
         db.session.commit()
         flash('Your new ticket product has been created')
-        return redirect(url_for('.product_details', product_id=pt.id))
+        return redirect(url_for('.product_details', product_id=product.id))
 
-    if copy_id != -1:
-        form.init_with_product(PriceTier.query.get(copy_id))
+    if copy_id:
+        form.init_with_product(Product.query.get(copy_id))
 
-    return render_template('admin/products/new-product.html', product_id=copy_id, form=form)
+    return render_template('admin/products/new-product.html', parent=parent, product_id=copy_id, form=form)
 
 
 @admin.route('/products/<int:product_id>')
@@ -105,6 +89,25 @@ def product_details(product_id):
     product = Product.query.get_or_404(product_id)
     return render_template('admin/products/product-details.html', product=product)
 
+
+@admin.route('/products/<int:product_id>/new-tier', methods=['GET', 'POST'])
+@admin_required
+def new_price_tier(product_id):
+    form = PriceTierForm()
+    product = Product.query.get_or_404(product_id)
+
+    if form.validate_on_submit():
+        pt = PriceTier(form.name.data)
+        pt.prices = [Price('GBP', form.price_gbp.data),
+                     Price('EUR', form.price_eur.data)]
+
+        # Only activate this price tier if it's the first one added.
+        pt.active = (len(product.price_tiers) == 0)
+        product.price_tiers.append(pt)
+        db.session.commit()
+        return redirect(url_for('.price_tier_details', tier_id=pt.id))
+
+    return render_template('admin/products/price-tier-new.html', product=product, form=form)
 
 
 @admin.route('/products/price-tiers/<int:tier_id>')
@@ -122,7 +125,23 @@ def price_tier_modify(tier_id):
         db.session.delete(tier)
         db.session.commit()
         flash("Price tier deleted")
-        return redirect(url_for('admin.products'))
+        return redirect(url_for('.price_tier_details', tier_id=tier.id))
+
+    if request.form.get('activate'):
+        for t in tier.parent.price_tiers:
+            t.active = False
+
+        tier.active = True
+        db.session.commit()
+        flash("Price tier activated")
+        return redirect(url_for('.price_tier_details', tier_id=tier.id))
+
+    if request.form.get('deactivate'):
+        tier.active = False
+        db.session.commit()
+        flash("Price tier deactivated")
+        return redirect(url_for('.price_tier_details', tier_id=tier.id))
+
     return abort(401)
 
 

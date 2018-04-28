@@ -69,4 +69,3 @@ class Form(BaseForm):
         fields = [isinstance(f, string_types) and getattr(self, f) or f for f in exclude_fields]
         keep_fields = [f for f in self if _is_hidden(f) and f not in fields]
         return BaseForm.hidden_tag(self, *keep_fields)
-

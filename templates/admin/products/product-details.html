@@ -36,8 +36,15 @@
     {% endfor %}
 </table>
 
-<div class="pull-right">
-<a class="btn btn-success" href="{{ url_for('.new_product', copy_id=product.id) }}">Create Copy</a>
-<a class="btn btn-warning" href="{{ url_for('.edit_product', product_id=product.id) }}">Edit</a>
+<div class="pull-right btn-group">
+    <a class="btn btn-default" href="{{ url_for('.new_price_tier', product_id=product.id) }}">
+        New Price Tier
+    </a>
+    <a class="btn btn-default" href="{{ url_for('.new_product', copy_id=product.id) }}">
+        Clone
+    </a>
+    <a class="btn btn-warning" href="{{ url_for('.edit_product', product_id=product.id) }}">
+        Edit
+    </a>
 </div>
 {% endblock %}

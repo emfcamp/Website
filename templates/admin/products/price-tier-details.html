@@ -28,16 +28,16 @@
     <p>This price tier has no purchases and and is inactive. It can be safely deleted.</p>
 {% endif %}
 
-<form method="post">
+<form method="post" class="btn-group">
 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 {% if tier.unused %}
     <button name="delete" value="1" class="btn btn-danger">Delete</button>
 {% endif %}
-{#
-{% if not tier.active %}
-    <button name="activate" value="1" class="btn">Activate</button>
+{% if tier.active %}
+    <button name="deactivate" value="1" class="btn btn-default">Deactivate</button>
+{% else %}
+    <button name="activate" value="1" class="btn btn-default">Activate</button>
 {% endif %}
-#}
 </form>
 
 {% endblock %}

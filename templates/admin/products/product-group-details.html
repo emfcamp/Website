@@ -37,16 +37,27 @@
 {% if group.products %}
     <h3>Child Products</h3>
     <table class="table">
+        <tr>
+            <th>Short name</th>
+            <th>Display Name</th>
+            <th>Max capacity</th>
+            <th>Used Capacity</th>
+            <th>Expires</th>
+        </tr>
         {% for product in group.products %}
             <tr>
                 <td><a href="{{ url_for('.product_details', product_id=product.id)}}">
                         {{product.name}}</a></td>
+                <td>{{product.display_name}}</td>
+                <td>{{product.capacity_max}}</td>
+                <td>{{product.capacity_used}}</td>
+                <td>{{product.expires}}</td>
             </tr>
         {% endfor %}
     </table>
 {% endif %}
 
-<div class="pull-right">
+<div class="pull-right btn-group">
     {#
     {% if not group.parent %}
         <a class="btn btn-default" href="">Assign Parent</a>
@@ -57,7 +68,8 @@
             Add child product group
         </a>
     {% endif %}
-    <a class="btn btn-primary" href="{{ url_for('.product_group_edit', group_id=group.id) }}">Edit</a>
+    <a class="btn btn-primary" href="{{ url_for('.new_product', parent_id=group.id) }}">New Product</a>
+    <a class="btn btn-default" href="{{ url_for('.product_group_edit', group_id=group.id) }}">Edit</a>
 </div>
 
 {% endblock %}

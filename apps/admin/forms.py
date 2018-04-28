@@ -1,61 +1,43 @@
 from wtforms.validators import Optional
 from wtforms.widgets import TextArea
 from wtforms import (
-    SubmitField, BooleanField, StringField, SelectField,
+    SubmitField, StringField, SelectField,
     DateField, IntegerField, DecimalField,
 )
 
 from models.product import ProductGroup
 
-from ..common.forms import Form, StaticField
+from ..common.forms import Form
 
 
-class EditProductForm(Form):
-    name = StringField('Name')
-    capacity_max = IntegerField('Maximum to sell')
+class ProductForm(Form):
+    name = StringField('Internal Name')
+    display_name = StringField('Display Name')
+    capacity_max = IntegerField('Maximum to sell (Optional)', [Optional()])
     expires = DateField('Expiry Date (Optional)', [Optional()])
-    personal_limit = IntegerField('Maximum to sell to an individual')
-    price_gbp = StaticField('Price (GBP)')
-    price_eur = StaticField('Price (EUR)')
-    badge = BooleanField('Issue Badge')
-    transferable = BooleanField('Transferable')
     description = StringField('Description', [Optional()], widget=TextArea())
-    submit = SubmitField('Save')
 
     def init_with_product(self, product):
+        self.display_name.data = product.display_name
         self.name.data = product.name
         self.capacity_max.data = product.capacity_max
         self.expires.data = product.expires
-        self.personal_limit.data = product.get_price_tier('standard').personal_limit
-        self.price_gbp.data = product.get_price_tier('standard').get_price('GBP')
-        self.price_eur.data = product.get_price_tier('standard').get_price('EUR')
-        self.badge.data = product.get_attribute('badge')
-        self.transferable.data = product.get_attribute('transferable')
         self.description.data = product.description
 
+    def update_product(self, product):
+        product.display_name = self.display_name.data
+        product.name = self.name.data
+        product.capacity_max = self.capacity_max.data
+        product.expires = self.expires.data
+        product.description = self.description.data
 
-class NewProductForm(Form):
-    name = StringField('Name')
-    capacity_max = IntegerField('Maximum to sell')
-    personal_limit = IntegerField('Maximum to sell to an individual')
-    expires = DateField('Expiry Date (Optional)', [Optional()])
-    price_gbp = DecimalField('Price (GBP)')
-    price_eur = DecimalField('Price (EUR)')
-    has_badge = BooleanField('Issue Badge')
-    is_transferable = BooleanField('Transferable')
-    description = StringField('Description', [Optional()], widget=TextArea())
+
+class NewProductForm(ProductForm):
     submit = SubmitField('Create')
 
-    def init_with_product(self, product):
-        self.name.data = product.name
-        self.capacity_max.data = product.capacity_max
-        self.personal_limit.data = product.personal_limit
-        self.expires.data = product.expires
-        self.has_badge.data = product.has_badge
-        self.is_transferable.data = product.is_transferable
-        self.price_gbp.data = product.get_price('GBP')
-        self.price_eur.data = product.get_price('EUR')
-        self.description.data = product.description
+
+class EditProductForm(ProductForm):
+    submit = SubmitField('Save')
 
 
 class ProductGroupSelectField(SelectField):
@@ -97,3 +79,8 @@ class EditProductGroupForm(ProductGroupForm):
         pg.expires = self.expires.data
         return pg
 
+class PriceTierForm(Form):
+    name = StringField('Name')
+    price_gbp = DecimalField('Price (GBP)')
+    price_eur = DecimalField('Price (EUR)')
+    submit = SubmitField('Submit')

@@ -1,0 +1,17 @@
+{% extends "admin/base.html" %}
+{% from "_formhelpers.html" import render_field %}
+{% set nav_active = 'products' %}
+{% block body %}
+<h2>Add a new price tier for {{product}}</h2>
+
+
+<form method="post" class="form-horizontal">
+    {{ form.hidden_tag() }}
+    {{ render_field(form.name, horizontal=8) }}
+    {{ render_field(form.price_gbp, horizontal=8) }}
+    {{ render_field(form.price_eur, horizontal=8) }}
+
+<div class="pull-right">{{ form.submit(class_="btn btn-success debounce") }}</div>
+</form>
+
+{% endblock %}
