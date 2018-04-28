@@ -122,7 +122,7 @@ class ProductGroupInitialiseTest(unittest.TestCase):
 
         self.db.session.commit()
 
-    def test_capacity_propagation(self):
+    def test_validate_capacity_max(self):
         with self.app.app_context():
             self.create_fixtures()
 
@@ -137,6 +137,10 @@ class ProductGroupInitialiseTest(unittest.TestCase):
 
             # This should call validate_capacity_max, which may flush the session, which we don't want
             self.group.capacity_max = 5
+
+            # If that was OK, we can continue
+            self.group.name = self.group_name
+            self.db.session.flush()
             assert self.group.id is not None
 
 
