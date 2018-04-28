@@ -24,6 +24,8 @@ def create_product_groups():
         pg = ProductGroup(name=name, type=name, capacity_max=capacity, expires=expires)
         db.session.add(pg)
 
+    db.session.flush()
+
     allocations = [
         # name, capacity
         ('vendors', 100),

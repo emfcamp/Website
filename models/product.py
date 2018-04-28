@@ -49,6 +49,9 @@ class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
             else:
                 type = parent.type
 
+        if type is None:
+            raise ValueError('ProductGroup requires a type')
+
         super().__init__(type=type, parent=parent, parent_id=parent_id, **kwargs)
 
     @classmethod
