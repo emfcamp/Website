@@ -203,8 +203,8 @@ class PriceTier(db.Model, CapacityMixin):
     )
     prices = db.relationship('Price', backref='price_tier', cascade='all', order_by='Price.id')
 
-    def __init__(self, name=None):
-        super().__init__(name=name)
+    def __init__(self, name=None, **kwargs):
+        super().__init__(name=name, **kwargs)
 
     @classmethod
     def get_by_name(cls, group_name, product_name, tier_name):
@@ -274,7 +274,7 @@ class Price(db.Model):
     currency = db.Column(db.String, nullable=False)
     price_int = db.Column(db.Integer, nullable=False)
 
-    def __init__(self, currency, value, **kwargs):
+    def __init__(self, currency, value=None, **kwargs):
         super().__init__(currency=currency.upper(), **kwargs)
         if value is not None:
             self.value = value
