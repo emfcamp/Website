@@ -13,6 +13,8 @@
 <ul class="nav navbar-nav">
     {% if current_user.has_permission('admin') %}
         {{ menuitem("Admin", "admin.home") }}
+    {% endif %}
+    {% if current_user.has_permission('cfp_admin') %}
         <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                 aria-haspopup="true" aria-expanded="false"
@@ -59,7 +61,7 @@
             </ul>
         </li>
     {% endif %}
-    {% if current_user.has_permission('admin') or current_user.has_permission('cfp_schedule') %}
+    {% if current_user.has_permission('cfp_admin') or current_user.has_permission('cfp_schedule') %}
         <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                 aria-haspopup="true" aria-expanded="false"
@@ -73,10 +75,10 @@
         </li>
     {% endif %}
     {# Hide these menus from admin as they're in the misc dropdown #}
-    {% if current_user.has_permission('cfp_anonymiser') and not current_user.has_permission('admin') %}
+    {% if current_user.has_permission('cfp_anonymiser') and not current_user.has_permission('cfp_admin') %}
         {{ menuitem('Anonymisation', '.anonymisation', proposal_counts['checked']) }}
     {% endif %}
-    {% if current_user.has_permission('cfp_reviewer') and not current_user.has_permission('admin') %}
+    {% if current_user.has_permission('cfp_reviewer') and not current_user.has_permission('cfp_admin') %}
         {{ menuitem('Review', '.review_list') }}
     {% endif %}
 </ul>

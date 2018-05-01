@@ -28,7 +28,7 @@ from models.cfp import (
 from .common.forms import Form, HiddenIntegerField
 
 cfp_review = Blueprint('cfp_review', __name__)
-admin_required = require_permission('admin')  # Decorator to require admin permissions
+admin_required = require_permission('cfp_admin')  # Decorator to require admin permissions
 anon_required = require_permission('cfp_anonymiser')
 review_required = require_permission('cfp_reviewer')
 schedule_required = require_permission('cfp_schedule')
@@ -73,7 +73,7 @@ def main():
     if current_user.is_anonymous:
         return redirect(url_for('users.login', next=url_for('.main')))
 
-    if current_user.has_permission('admin'):
+    if current_user.has_permission('cfp_admin'):
         return redirect(url_for('.proposals'))
 
     if current_user.has_permission('cfp_anonymiser'):
@@ -724,7 +724,7 @@ def review_list():
 
     proposal_query = Proposal.query.filter(Proposal.state == 'anonymised')
 
-    if not current_user.has_permission('admin'):
+    if not current_user.has_permission('cfp_admin'):
         # reviewers shouldn't see their own proposals, and don't review installations
         proposal_query = proposal_query.filter(
             Proposal.user_id != current_user.id,
@@ -818,7 +818,7 @@ def review_proposal(proposal_id):
     if prop.state != 'anonymised'\
             or prop.user == current_user\
             or (prop.type == 'installation' and
-                not current_user.has_permission('admin')):
+                not current_user.has_permission('cfp_admin')):
         return abort(404)
 
     form = VoteForm()

@@ -17,8 +17,17 @@
           <span class="badge">{{ unread_count }}</span>
         {% endif %}
       </a></li>
-      {% if current_user.has_permission('cfp_reviewer') %}
-      <li><a href="{{ url_for('cfp_review.review_list') }}">Review proposals</a></li>
+      {% if current_user.has_permission('admin') %}
+      <li><a href="{{ url_for('admin.home') }}">Admin</a></li>
+      {% elif current_user.has_permission('cfp_admin') %}
+      <li><a href="{{ url_for('cfp_review.proposals') }}">CFP Admin</a></li>
+      {% else %}
+        {% if current_user.has_permission('cfp_anonymiser') %}
+        <li><a href="{{ url_for('cfp_review.anonymisation') }}">Anonymise proposals</a></li>
+        {% endif %}
+        {% if current_user.has_permission('cfp_reviewer') %}
+        <li><a href="{{ url_for('cfp_review.review_list') }}">Review proposals</a></li>
+        {% endif %}
       {% endif %}
     {% endif %}
 

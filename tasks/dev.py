@@ -19,40 +19,49 @@ class CreateDB(Command):
 class MakeFakeUsers(Command):
     def run(self):
         if not User.query.filter_by(email='admin@test.invalid').first():
-            user = User('admin@test.invalid', 'Test Admin')
-            user.grant_permission('admin')
+            user_admin = User('admin@test.invalid', 'Test Admin')
+            user_admin.grant_permission('admin')
             cfp = TalkProposal()
-            cfp.user = user
+            cfp.user = user_admin
             cfp.title = 'test (admin)'
             cfp.description = 'test proposal from admin'
-            db.session.add(user)
+            db.session.add(user_admin)
+
+        if not User.query.filter_by(email='cfp_admin@test.invalid').first():
+            user_cfp_admin = User('cfp_admin@test.invalid', 'Test CFP Admin')
+            user_cfp_admin.grant_permission('cfp_admin')
+            cfp = TalkProposal()
+            cfp.user = user_cfp_admin
+            cfp.title = 'test (CFP admin)'
+            cfp.description = 'test proposal from CFP admin'
+            db.session.add(user_cfp_admin)
 
         if not User.query.filter_by(email='anonymiser@test.invalid').first():
-            user2 = User('anonymiser@test.invalid', 'Test Anonymiser')
-            user2.grant_permission('cfp_anonymiser')
+            user_anonymiser = User('anonymiser@test.invalid', 'Test Anonymiser')
+            user_anonymiser.grant_permission('cfp_anonymiser')
             cfp = TalkProposal()
-            cfp.user = user2
+            cfp.user = user_anonymiser
             cfp.title = 'test (anonymiser)'
             cfp.description = 'test proposal from anonymiser'
-            db.session.add(user2)
+            db.session.add(user_anonymiser)
 
         if not User.query.filter_by(email='reviewer@test.invalid').first():
-            user3 = User('reviewer@test.invalid', 'Test Reviewer')
-            user3.grant_permission('cfp_reviewer')
+            user_reviewer = User('reviewer@test.invalid', 'Test Reviewer')
+            user_reviewer.grant_permission('cfp_reviewer')
             cfp = TalkProposal()
-            cfp.user = user3
+            cfp.user = user_reviewer
             cfp.title = 'test (reviewer)'
             cfp.description = 'test proposal from reviewer'
-            db.session.add(user3)
+            db.session.add(user_reviewer)
 
         if not User.query.filter_by(email='arrivals@test.invalid').first():
-            user4 = User('arrivals@test.invalid', 'Test Arrivals')
-            user4.grant_permission('arrivals')
+            user_arrivals = User('arrivals@test.invalid', 'Test Arrivals')
+            user_arrivals.grant_permission('arrivals')
             cfp = TalkProposal()
-            cfp.user = user4
+            cfp.user = user_arrivals
             cfp.title = 'test (arrivals)'
             cfp.description = 'test proposal from arrivals'
-            db.session.add(user4)
+            db.session.add(user_arrivals)
 
         db.session.commit()
 

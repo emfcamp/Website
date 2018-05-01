@@ -427,7 +427,7 @@ class CFPMessage(db.Model):
         Obviously if the proposer is also an admin this doesn't really work
         but equally they should know where to ask.
         """
-        is_user_admin = user.has_permission('admin')
+        is_user_admin = user.has_permission('cfp_admin')
         is_user_proposer = user.id == self.proposal.user_id
 
         if is_user_proposer and not self.is_to_admin:
