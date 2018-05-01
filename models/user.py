@@ -199,8 +199,11 @@ class User(db.Model, UserMixin):
         return generate_checkin_code(app.config['SECRET_KEY'], self.id)
 
     def has_permission(self, name, cascade=True):
-        if cascade and name != 'admin' and self.has_permission('admin'):
-            return True
+        if cascade:
+            if name != 'admin' and self.has_permission('admin'):
+                return True
+            if name.startswith('cfp_') and name != 'cfp_admin' and self.has_permission('cfp_admin'):
+                return True
         for permission in self.permissions:
             if permission.name == name:
                 return True
