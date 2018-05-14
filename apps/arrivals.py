@@ -176,7 +176,7 @@ def checkin(user_id, source=None):
     if badge:
         # TODO check this works as expected with transferred tickets
         # Ticket must be checked in to receive a badge
-        tickets = [t for t in user.get_tickets if t.state == 'checked-in' and
+        tickets = [t for t in user.owned_tickets if t.state == 'checked-in' and
                                                   t.price_tier.allow_badge_up]
     else:
         tickets = user.products.filter_by(is_valid_ticket=True)

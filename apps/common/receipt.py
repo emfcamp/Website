@@ -19,38 +19,41 @@ import barcode
 from barcode.writer import ImageWriter, SVGWriter
 import requests
 
+from main import external_url
 from models.product import Product, ProductGroup, PriceTier
 from models.purchase import PurchaseTransfer, Ticket
 from models import Purchase
 
 
 def render_receipt(user, png=False, pdf=False):
-    entrance_products_counts = (user.purchased_products
-                               .filter_by(state='paid', is_ticket=True)
-                               .join(Product)
-                               .with_entities(Product,
-                                              func.count(Purchase.id)
-                                                  .label('ticket_count'))
-                               .group_by(Product.id).all())
-    entrance_tickets_count = sum(c for p, c in entrance_products_counts)
+    purchases = user.owned_purchases.filter_by(is_paid_for=True) \
+                                    .join(PriceTier, Product, ProductGroup)
 
-    other = user.purchased_products.filter_by(state='paid', is_ticket=False) \
-                                   .join(PriceTier, Product, ProductGroup)
+    admissions = purchases.filter(ProductGroup.type == 'admissions') \
+                          .with_entities(Product,
+                                         func.count(Purchase.id).label('ticket_count')) \
+                          .group_by(Product.id).all()
+    admissions_total = sum(c for p, c in admissions)
 
-    vehicle_tickets = other.filter(ProductGroup.name == 'Parking').all()
+    vehicle_tickets = purchases.filter(ProductGroup.type.in_(['parking', 'campervan'])).all()
 
-    tees = (other.filter(ProductGroup.name == 'Tee')
-                 .with_entities(PriceTier, func.count(Purchase.id).label('ticket_count'))
-                 .group_by(PriceTier).all())  # t-shirts
+    # FIXME: should this be grouped by Product?
+    tees = purchases.filter(ProductGroup.name == 'tee') \
+                    .with_entities(PriceTier,
+                                   func.count(Purchase.id).label('ticket_count')) \
+                    .group_by(PriceTier).all()
 
-    transferred_tickets = user.transfers_from.join(Purchase).filter_by(state='paid') \
-                              .with_entities(PurchaseTransfer).order_by('timestamp').all()
+    transferred_tickets = user.transfers_from \
+                              .join(Purchase) \
+                              .filter_by(state='paid') \
+                              .with_entities(PurchaseTransfer) \
+                              .order_by('timestamp').all()
 
     return render_template('receipt.html', user=user,
                            format_inline_qr=format_inline_qr,
                            format_inline_barcode=format_inline_barcode,
-                           entrance_products_counts=entrance_products_counts,
-                           entrance_tickets_count=entrance_tickets_count,
+                           admissions=admissions,
+                           admissions_total=admissions_total,
                            vehicle_tickets=vehicle_tickets,
                            transferred_tickets=transferred_tickets,
                            tees=tees,
@@ -58,11 +61,11 @@ def render_receipt(user, png=False, pdf=False):
 
 
 def render_parking_receipts(png=False, pdf=False):
-    vehicle_tickets = Ticket.query.filter(is_paid_for=True) \
+    vehicle_tickets = Ticket.query.filter_by(is_paid_for=True) \
         .join(PriceTier, Product, ProductGroup) \
         .filter_by(type='parking')
 
-    users = [t.user for t in vehicle_tickets]
+    users = [t.owner for t in vehicle_tickets]
 
     return render_template('parking-receipts.html', users=users,
                            format_inline_qr=format_inline_qr,
@@ -176,13 +179,19 @@ def make_barcode_png(data, **options):
 def attach_tickets(msg, user):
     # Attach tickets to a mail Message
     page = render_receipt(user, pdf=True)
-    pdf = render_pdf(page)
+    url = external_url('tickets.receipt', user_id=user.id)
+    pdf = render_pdf(url, page)
 
-    tickets = user.tickets.filter_by(paid=True)
+    # Types of product groups we include on receipts
+    receipt_types = ['admissions', 'campervan', 'parking', 'tees']
+    tickets = user.owned_tickets.filter(
+        Purchase.type.in_(receipt_types),
+        Purchase.is_paid_for == True,
+    )
+
     plural = (tickets.count() != 1 and 's' or '')
     msg.attach('Ticket%s.pdf' % plural, 'application/pdf', pdf.read())
 
-    tickets = user.purchased_products.filter_by(state='paid')
     for t in tickets:
-        tickets.set_state('receipt-emailed')
+        t.set_state('receipt-emailed')
 

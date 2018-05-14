@@ -1,23 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% block title %}Electromagnetic Field{% endblock %}</title>
-        <meta property="fb:admins" content="286100493"/>
-        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-        {% assets "css_invoice" -%}
-        <link rel="stylesheet" href="{{ ASSET_URL }}">
-        {% endassets -%}
-        {% block head -%}{% endblock -%}
-        <!--[if lt IE 9]>
-              <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-              <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-        <![endif]-->
-        <link rel="shortcut icon" href="/favicon.ico">
-    </head>
-<body>
+{% extends 'base.html' %}
+
+{% block css %}
+{% assets "css_invoice" -%}
+<link rel="stylesheet" href="{{ ASSET_URL }}">
+{% endassets -%}
+{% endblock %}
 
 {% block document %}
 <div class="container invoice">
@@ -28,32 +15,37 @@
 
 {% block body %}
 
-<h2>{% if payment.state == 'paid' -%} Receipt {%- else -%} Invoice {%- endif %}</h2>
+<div class="sender-row">
+  <div class="title">
+    <h2>{% if payment.state == 'paid' -%} Receipt {%- else -%} Invoice {%- endif %}</h2>
+  </div>
 
-<div class="sender">
-  <img src="{{ url_for('static', filename='images/logo_only_black.png') }}" class="logo" height="80"/>
-  <div class="vcard">
-    <span class="fn org">Electromagnetic Field Ltd.</span>
-    <div class="adr">
-      <span class="street-address">2 Ockendon Mews</span>
-      <span class="locality">London</span>
-      <span class="postal-code">N1 3JL</span>
-      <span class="country-name">UNITED KINGDOM</span>
+  <div class="sender">
+    <img class="logo" src="{{ url_for('static', filename='images/logomark-black.svg') }}" height="80"/>
+    <div class="vcard">
+      <div class="fn org">Electromagnetic Field Ltd.</div>
+      <div class="adr">
+        <span class="street-address">2 Ockendon Mews</span>
+        <span class="locality">London</span>
+        <span class="postal-code">N1 3JL</span>
+        <span class="country-name">UNITED KINGDOM</span>
+      </div>
     </div>
   </div>
-</div>
 
-<div class="recipient">
-  <div>{{ payment.user.name }}</div>
-  <div>{{ payment.user.email }}</div>
-</div>
+<div class="recipient-row">
+  <div class="recipient">
+    <div>{{ payment.user.name }}</div>
+    <div>{{ payment.user.email }}</div>
+  </div>
 
-<div class="invoice-details">
-  <dl class="dl-horizontal">
-    <dt>Invoice date</dt><dd>{{ payment.versions[0].transaction.issued_at.strftime('%d %b %Y') }}</dd>
-    <dt>Invoice number</dt><dd>{{ payment.invoice_number() }}</dd>
-    <dt>VAT number</dt><dd>188170679</dd>
-  </dl>
+  <div class="invoice-details">
+    <dl class="dl-horizontal">
+      <dt>Invoice date</dt><dd>{{ payment.versions[0].transaction.issued_at.strftime('%d %b %Y') }}</dd>
+      <dt>Invoice number</dt><dd>{{ payment.invoice_number() }}</dd>
+      <dt>VAT number</dt><dd>188170679</dd>
+    </dl>
+  </div>
 </div>
 
 <table class="table">
@@ -70,7 +62,7 @@
 {% set line_class = cycler('odd', 'even') %}
 
 {%- for pt, count in invoice_lines -%}
-<tr class="ticket {{ line_class.next() }}">
+<tr class="purchase {{ line_class.next() }}">
 <td>{{ pt.parent.display_name }}</td>
 <td>{{ pt.get_price(payment.currency).value_ex_vat | price(payment.currency) }}</td>
 <td>{{ count }}
@@ -151,6 +143,7 @@
       </div>
 
       <footer>
+        {# We don't really need this but people expect it, and it hints that it's printable #}
         <dl class="company-info">
           <dt>Company Registration No</dt><dd>07788466</dd>
           <dt>Registered Office</dt><dd>2 Ockendon Mews, London, N1 3JL, United Kingdom</dd>
@@ -161,17 +154,3 @@
 </div>
 {% endblock %}
 
-{% block foot -%}{% endblock -%}
-
-{% if not config.get('DEBUG') and request.headers.get('dnt') != '1' %}
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-         })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-   ga('create', 'UA-28044531-1', 'emfcamp.org');
-   ga('send', 'pageview');
-</script>
-{% endif %}
-</body>
-</html>

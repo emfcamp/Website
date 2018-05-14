@@ -1,95 +1,15 @@
-{# xhtml2pdf doesn't support loads of CSS, including stuff necessary for Bootstrap,
-   so we use a separate base page here. It has a bug when cascading through multiple
-   classes, so we avoid that. Due to its reliance on ReportLab, it also cascades
-   fonts weirdly, and doesn't support float, so we add pdf-specific overrides. #}
+{% from '_receipthelpers.html' import render_header, render_barcode with context %}
 
-{%- macro render_header() %}
-{% if pdf %}
-<table class="header">
-  <tr><td style="width: 100%">
-{% else %}
-<div class="row">
-  <div class="col-xs-9">
-{% endif %}
+{% extends 'base.html' %}
 
-    <h2>
-        <img src="{{ url_for('static', filename='images/logo-white-cropped.png') }}" class="img-responsive" width="400"/>
-    </h2>
-
-{% if pdf %}
-  </td><td style="width: 200px">
-{% else %}
-  </div><div class="col-sm-3">
-{% endif %}
-
-    <div class="qrcode">
-      {% if png %}
-        <img src="{{ url_for('tickets.tickets_qrcode', checkin_code=user.checkin_code) }}">
-      {% else %}
-        {# Preferred format is SVG because it scales and we don't pass the checkin code back #}
-        {{ format_inline_qr(config.get('CHECKIN_BASE') + user.checkin_code.decode('utf-8')) }}
-      {% endif %}
-    </div>
-
-{% if pdf %}
-  </td></tr>
-</table>
-{% else %}
-  </div>
-</div>
-{% endif %}
-{% endmacro -%}
-
-{% macro render_barcode() %}
-<div class="barcode">
-  {% if pdf or png %}
-    {% if pdf %}<center>{% endif %}
-    <img src="{{ url_for('tickets.tickets_barcode', checkin_code=user.checkin_code) }}">
-    {% if pdf %}</center>{% endif %}
-  {% else %}
-    {# Preferred format is SVG because it scales and we don't pass the checkin code back #}
-    {{ format_inline_barcode(user.checkin_code.decode('utf-8')) }}
-  {% endif %}
-</div>
-{% endmacro -%}
-
-
-<!DOCTYPE html>
-<html lang="en" class="{%- if pdf -%} pdf {% endif %}">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% block title %}Electromagnetic Field{% endblock %}</title>
-{% if not pdf %}
-        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-{% endif %}
-        {% assets "css_receipt" -%}
-        <link rel="stylesheet" href="{{ ASSET_URL }}">
-        {% endassets -%}
-        <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Raleway:700,500">
-        {% if not pdf %}
-        <style type="text/css">
-          @media (min-width: 550px) {
-            div.header {
-              display: flex;
-              align-items: center;
-            }
-          }
-        </style>
-        {% endif %}
-
-        {% block head -%}{% endblock -%}
-        <!--[if lt IE 9]>
-              <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-              <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-        <![endif]-->
-        <link rel="shortcut icon" href="/favicon.ico">
-    </head>
-<body>
+{% block css %}
+{% assets "css_receipt" -%}
+<link rel="stylesheet" href="{{ ASSET_URL }}">
+{% endassets -%}
+{% endblock %}
 
 {% block document %}
-<div class="container">
+<div class="container receipt">
     <div class="main-row">
         <div class="col-md-10 col-md-offset-1 main-column">
 
@@ -97,33 +17,16 @@
 
 <div id="main-content">
 
-  {% if False %}
-  CSS Cascade Test: this colours both red and blue as blue in xhtml2pdf.
-  <style>
-  .outer .test1 { color: green }
-  .outer .test2 { color: orange }
-  .outer .test1 .inner { color: red }
-  .outer .test2 .inner { color: blue }
-  </style>
-  <div class="outer">
-    <div class="test1">
-      green
-      <div class="inner">red</div>
-    </div>
-    <div class="test2">
-      orange
-      <div class="inner">blue</div>
-    </div>
-  </div>
-  {% endif %}
-
-  {% if entrance_products_counts or tees %}
-    {{ render_header() }}
+  {% if admissions or tees %}
+    {{ render_header(user) }}
     <h3>{{ user.name }} &ndash; {{ user.email }}</h3>
 
-    {% if entrance_products_counts %}
-    <h4>{{ entrance_tickets_count }} entrance ticket{{ entrance_tickets_count != 1 and 's' or '' }}</h4>
+    {% if admissions %}
+    <h4>{{ admissions_total }} entrance ticket{{ admissions_total != 1 and 's' or '' }}</h4>
+    {% endif %}
+
     <div class="entrance-tickets">
+        {% if admissions %}
         <p>Present the code above to the volunteers at the <b>camp entrance gate</b> on your arrival.
            You will receive a wristband and booklet with site map.
         </p>
@@ -135,8 +38,7 @@
         <div>&nbsp;</div>
         <div>&nbsp;</div>
 
-    {% else %}
-    <div class="entrance-tickets">
+        {% else %}
         <p>Your account has no associated entrance tickets. This ticket will not allow you to enter the event.</p>
         <p>Once inside the camp, prepaid t-shirts will be available at the entrance gate when announced.</p>
 
@@ -144,19 +46,19 @@
         <center><h1>Not an entrance ticket</h1></center>
         <div>&nbsp;</div>
 
-    {% endif %}
+        {% endif %}
 
-        {{ render_barcode() }}
+        {{ render_barcode(user) }}
 
         <div>&nbsp;</div>
         <div>&nbsp;</div>
 
-        {% if entrance_products_counts %}
+        {% if admissions %}
         <div>&nbsp;</div>
 
         <h4>Your ticket details</h4>
-        {% for product, ticket_count in entrance_products_counts %}
-        <div class="product">{{ ticket_count }} {{ product.name }}</div>
+        {% for product, ticket_count in admissions %}
+        <div class="product">{{ ticket_count }} {{ product.display_name }}</div>
         {% endfor %}
         {% endif %}
 
@@ -165,11 +67,11 @@
 
         <h4>Your transferred tickets</h4>
         <p>You have transferred {{ transferred_tickets|count }} ticket{{ transferred_tickets|count != 1 and 's' or '' }},
-           which we&rsquo;ve sent out in a separate PDF.
+           which we&rsquo;ve sent out in a separate email.
            If you&rsquo;re arriving at the entrance gate together, you only need this copy.
         </p>
         {% for t in transferred_tickets %}
-        <div class="ticket-transfer">{{ t.to_user.name }}: {{ t.purchase.product.name }}</div>
+        <div class="ticket-transfer">{{ t.to_user.name }}: {{ t.purchase.product.display_name }}</div>
         {% endfor %}
         {% endif %}
 
@@ -178,7 +80,7 @@
 
         <h4>Your purchase details</h4>
         {% for product, ticket_count in tees %}
-        <div class="product">{{ ticket_count }} {{ product.name }}</div>
+        <div class="product">{{ ticket_count }} {{ product.display_name }}</div>
         {% endfor %}
         {% endif %}
     </div>
@@ -190,44 +92,7 @@
   {% endif %}
 
   {% if vehicle_tickets %}
-    {% for ticket in vehicle_tickets %}
-    {{ render_header() }}
-    <h3>Parking ticket {{ loop.index }}</h3>
-    <div class="vehicle-tickets">
-        <p>Please put this on your dashboard before arriving at EMF.
-           Volunteers at the <b>main access gate</b> will check it on your arrival.
-           They will show you where to park and unload your stuff.</p>
-        <p>For details on getting to the site, please visit
-           <a href="https://wiki.emfcamp.org/wiki/Travel">our wiki page</a>.</p>
-        <p style="padding-bottom: 14px">If you fill in your number below we will try to contact you about
-           your vehicle in case of emergency.</p>
-
-        <div>&nbsp;</div>
-        <div>&nbsp;</div>
-
-        {{ render_barcode() }}
-
-        <div>&nbsp;</div>
-        <div>&nbsp;</div>
-        <div>&nbsp;</div>
-
-        <h4>Your ticket details</h4>
-        <div class="product">{{ ticket.product.name }}</div>
-
-        <div>&nbsp;</div>
-
-        <table style="height: 70px; width: 100%"><tr>
-           <td style="width: 300px; font-size: 30pt">Phone number</td>
-           <td style="border: 0.7mm solid black"></td>
-        </tr></table>
-    </div>
-
-    {% if not loop.last %}
-      <div class="nextpage"></div>
-    {% endif %}
-
-    {% endfor %}
-
+    {% include 'receipt-parking.html' %}
   {% endif %}
 </div>
 {% endblock %}
@@ -237,15 +102,3 @@
 </div>
 {% endblock %}
 
-{% if not config.get('DEBUG') and request.headers.get('dnt') != '1' %}
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-         })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-   ga('create', 'UA-28044531-1', 'emfcamp.org');
-   ga('send', 'pageview');
-</script>
-{% endif %}
-</body>
-</html>

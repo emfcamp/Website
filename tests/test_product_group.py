@@ -450,7 +450,7 @@ class ProductTransferTest(unittest.TestCase):
         with self.app.app_context():
             self.create_fixtures()
 
-            item = self.user1.purchased_products[0]
+            item = self.user1.purchases[0]
 
             item.price_tier.allow_check_in = True
             item.price_tier.is_transferable = False
@@ -485,8 +485,8 @@ class ProductTransferTest(unittest.TestCase):
             self.assertEqual(item.owner_id, self.user2.id)
             self.assertEqual(item.purchaser_id, self.user1.id)
 
-            self.assertEqual(item, self.user2.get_tickets()[0])
-            self.assertNotIn(item, self.user1.get_tickets())
+            self.assertEqual(item, self.user2.owned_purchases[0])
+            self.assertNotIn(item, self.user1.owned_purchases)
 
             xfer = item.transfers[0]
 

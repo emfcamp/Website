@@ -1,39 +1,29 @@
-@media print {
-  .container {
-    width: auto;
-  }
-
-  /* This affects xhtml2pdf
-  body {
-    margin-bottom: 6ex;
-  }
-  */
-
-  .nextpage {
-    border-top: none !important;
-  }
-  div.header {
-    display: flex;
-    align-items: center;
-  }
-}
-
-body {
-  font-family: "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-
-/* hide from xhtml2pdf */
-@media screen {
-  body {
-    padding-bottom: 40px;
-  }
-}
-
 .nextpage {
   margin-top: 50px;
   border-top: dashed 1px;
   padding-top: 40px;
   page-break-after: always;
+}
+
+@media print {
+  .container {
+    width: auto;
+  }
+
+  body {
+    margin-top: 0;
+    margin-bottom: 6ex;
+  }
+
+  .nextpage {
+    border: none;
+  }
+}
+
+@media screen {
+  body {
+    padding-bottom: 40px;
+  }
 }
 
 .qrcode svg,
@@ -51,62 +41,18 @@ body {
   height: 50px;
 }
 
-/* xhtml2pdf-specific styling
-
-   We can't trust xhtml2pdf with more than two levels in a
-   selector - see CSS Cascade Test in receipt.html for more. */
-
-@page {
-  size: a4 portrait;
-  @frame contents {
-    /* body, div, td, etc all share one padding/margin, so
-       the best we can do is set a suitable one here. */
-    margin: 1.6cm 1.9cm;
-  }
+/* We have to use float because the print width is smaller than -xs- */
+.header .left {
+  float: left;
+}
+.header .right {
+  float: right;
+}
+.header:after {
+  clear: both;
 }
 
-/* Some resets because we don't have bootstrap.
-   div cascades to h1-h6 by default for many attributes. */
-.pdf body {
-  font-size: 14px;
-  line-height: 1.4; /* sic */
-}
-.pdf div {
-  padding: 1mm 8mm; /* defaults */
-  margin: 0 0; /* defaults */
-  padding: 0 0;
-}
-/* Margins don't overlap, so only keep the largest of any that touch */
-.pdf p {
-  margin: 0 0 10px;
-}
-.pdf h2 {
-  font-size: 30px;
-  margin-top: 20px;
-  /*margin-bottom: 10px;*/
-  margin-bottom: 0;
-}
-.pdf h3 {
-  font-size: 24px;
-  margin-top: 20px;
-  /*margin-bottom: 10px;*/
-  margin-bottom: 0;
-}
-.pdf h4 {
-  font-size: 18px;
-  /*margin-top: 10px;*/
-  /*margin-bottom: 10px;*/
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-/* Presumably because webfonts have the same name, we can't use the same one for bold */
-.pdf b,
-.pdf strong {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-
-/* Make links visible in a reader */
-.pdf a {
-  color: #428bca;
+.logo {
+  margin-left: 10px;
+  margin-top: 30px;
 }

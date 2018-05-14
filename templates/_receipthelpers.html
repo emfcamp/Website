@@ -1,0 +1,35 @@
+{%- macro render_header(user) %}
+        <div>&nbsp;</div>
+<div class="row header">
+  <div class="left">
+
+    <h2>
+        <img src="{{ url_for('static', filename='images/logo-black-text.svg') }}" class="img-responsive logo" width="380"/>
+    </h2>
+
+  </div><div class="right">
+
+    <div class="qrcode">
+      {% if png %}
+        <img src="{{ url_for('tickets.tickets_qrcode', checkin_code=user.checkin_code) }}">
+      {% else %}
+        {# Preferred format is SVG because it scales and we don't pass the checkin code back #}
+        {{ format_inline_qr(config.get('CHECKIN_BASE') + user.checkin_code.decode('utf-8')) }}
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endmacro -%}
+
+{% macro render_barcode(user) %}
+<div class="barcode">
+  {% if png %}
+    <img src="{{ url_for('tickets.tickets_barcode', checkin_code=user.checkin_code) }}">
+  {% else %}
+    {# Preferred format is SVG because it scales and we don't pass the checkin code back #}
+    {{ format_inline_barcode(user.checkin_code.decode('utf-8')) }}
+  {% endif %}
+</div>
+{% endmacro -%}
+

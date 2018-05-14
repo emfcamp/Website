@@ -249,12 +249,12 @@ def purchases_redirect():
 @users.route('/account/purchases', methods=['GET', 'POST'])
 @login_required
 def purchases():
-    owned_purchases = current_user.owned_products \
-                                  .filter(~Purchase.state.in_(['cancelled', 'reserved'])) \
-                                  .order_by(Purchase.id)
+    purchases = current_user.owned_purchases \
+                            .filter(~Purchase.state.in_(['cancelled', 'reserved'])) \
+                            .order_by(Purchase.id)
 
-    tickets = owned_purchases.filter(Purchase.is_ticket.is_(True)).all()
-    other_items = owned_purchases.filter(Purchase.is_ticket.is_(False)).all()
+    tickets = purchases.filter_by(is_ticket=True).all()
+    other_items = purchases.filter_by(is_ticket=False).all()
 
     payments = current_user.payments.filter(Payment.state != "cancelled") \
                                     .order_by(Payment.id).all()

@@ -1,0 +1,39 @@
+{% from '_receipthelpers.html' import render_header, render_barcode with context %}
+
+  {% for ticket in vehicle_tickets %}
+    {{ render_header(ticket.owner) }}
+    <h3>Parking ticket {{ loop.index }}</h3>
+    <div class="vehicle-tickets">
+        <p>Please put this on your dashboard before arriving at EMF.
+           Volunteers at the <b>main access gate</b> will check it on your arrival.
+           They will show you where to park and unload your stuff.</p>
+        <p>For details on getting to the site, please visit
+           <a href="https://wiki.emfcamp.org/wiki/Travel">our wiki page</a>.</p>
+        <p style="padding-bottom: 14px">If you fill in your number below we will try to contact you about
+           your vehicle in case of emergency.</p>
+
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
+
+        {{ render_barcode(ticket.owner) }}
+
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
+
+        <h4>Your ticket details</h4>
+        <div class="product">{{ ticket.product.display_name }}</div>
+
+        <div>&nbsp;</div>
+
+        <table style="height: 70px; width: 100%"><tr>
+           <td style="width: 300px; font-size: 30pt">Phone number</td>
+           <td style="border: 0.7mm solid black"></td>
+        </tr></table>
+    </div>
+
+    {% if not loop.last %}
+      <div class="nextpage"></div>
+    {% endif %}
+  {% endfor %}
+

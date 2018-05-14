@@ -138,14 +138,15 @@ class User(db.Model, UserMixin):
                                     primaryjoin='CFPMessage.from_user_id == User.id',
                                     backref='from_user', lazy='dynamic')
 
-    owned_products = db.relationship('Purchase',
-                                     backref='owner', lazy='dynamic',
-                                     primaryjoin='Purchase.owner_id == User.id',
-                                     cascade='all, delete-orphan')
-    purchased_products = db.relationship('Purchase',
-                                         backref='purchaser', lazy='dynamic',
-                                         primaryjoin='Purchase.purchaser_id == User.id',
-                                         cascade='all, delete-orphan')
+    purchases = db.relationship('Purchase', lazy='dynamic',
+                                primaryjoin='Purchase.purchaser_id == User.id')
+
+    owned_purchases = db.relationship('Purchase', lazy='dynamic',
+                                      primaryjoin='Purchase.owner_id == User.id')
+
+    owned_tickets = db.relationship('Ticket', lazy='dynamic',
+                                      primaryjoin='Ticket.owner_id == User.id')
+
 
     transfers_to = db.relationship('PurchaseTransfer',
                                    backref='to_user', lazy='dynamic',
@@ -178,21 +179,6 @@ class User(db.Model, UserMixin):
 
     def sso_code(self, key):
         return generate_sso_code(key, int(time.time()), self.id)
-
-    @property
-    def purchased_tickets(self):
-        """ This returns all tickets (in all states) bought by the user """
-        # return [p for p in self.purchased_products if p.is_ticket]
-        return self.purchased_products.filter_by(is_ticket=True)
-
-    @property
-    def owned_tickets(self):
-        """ This returns all tickets (in all states) bought by the user """
-        return self.owned_products.filter_by(is_ticket=True)
-
-    def get_tickets(self):
-        # return [p for p in self.owned_products if p.is_ticket and p.is_paid_for]
-        return self.owned_tickets.filter_by(is_paid_for=True)
 
     @property
     def checkin_code(self):

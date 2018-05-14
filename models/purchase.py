@@ -61,6 +61,8 @@ class Purchase(db.Model):
     is_paid_for = column_property(state.in_(bought_states))
 
     # Relationships
+    owner = db.relationship('User', primaryjoin='Purchase.owner_id == User.id')
+    purchaser = db.relationship('User', primaryjoin='Purchase.purchaser_id == User.id')
     price = db.relationship('Price', backref='purchases')
     price_tier = db.relationship('PriceTier')
     product = db.relationship('Product')
