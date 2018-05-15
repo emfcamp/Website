@@ -3,17 +3,17 @@
 {% extends "admin/base.html" %}
 {% set nav_active = 'admin_payments' %}
 {% block body %}
-<h2>Update payment</h2>
+<h2>Refund payment</h2>
 
-<p>To refresh the status this payment, please click below.</p>
+<p>To manually refund this payment, please click below.</p>
 
 {{ payment_info(payment) }}
 
 {{ purchase_table(payment) }}
 
-<form method="post" action="{{ url_for('.update_payment', payment_id=payment.id) }}" class="shrink">
+<form method="post" action="{{ url_for('.manual_refund', payment_id=payment.id) }}" class="shrink">
 {{ form.hidden_tag() }}
-{{ form.update(class_="btn btn-success pull-right") }}
+{{ form.refund(class_="btn btn-danger pull-right") }}
 </form>
 
 {% endblock %}

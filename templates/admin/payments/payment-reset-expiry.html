@@ -1,3 +1,5 @@
+{% from 'admin/_paymenthelpers.html' import payment_info, purchase_table with context %}
+
 {% extends "admin/base.html" %}
 {% set nav_active = 'admin_expiring' %}
 {% block body %}
@@ -5,26 +7,9 @@
 
 <p>To reset the expiry for this payment, please click below.</p>
 
-<dl class="dl-horizontal">
-<dt>Name</dt><dd>{{ payment.user.name }}</dd>
-<dt>Email</dt><dd>{{ payment.user.email }}</dd>
-<dt>Price</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
-<dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
-<dt>Expires</dt><dd>{{ payment.expires and payment.expires.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
-</dl>
+{{ payment_info(payment) }}
 
-<table class="table table-condensed table-striped">
-<thead><tr>
-  <th>Type</th>
-</tr></thead>
-<tbody>
-{% for purchase in payment.purchases %}
-<tr>
-  <td>{{ purchase.type.name }}</td>
-</tr>
-{% endfor %}
-</tbody>
-</table>
+{{ purchase_table(payment) }}
 
 <form method="post" action="{{ url_for('.reset_expiry', payment_id=payment.id) }}" class="shrink">
 {{ form.hidden_tag() }}

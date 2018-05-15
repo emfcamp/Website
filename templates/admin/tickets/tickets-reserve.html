@@ -48,7 +48,7 @@
             {{ f._tier.name }}
         </td>
         <td>
-            {{ f._tier.get_price('GBP') | price('GBP') }}
+            {{ f._tier.get_price('GBP') | price }}&nbsp;|&nbsp;{{ f._tier.get_price('EUR') | price }}
         </td>
         <td>
             <div class="controls">{{ f.amount(class_="amount") | safe }}

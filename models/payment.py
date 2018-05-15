@@ -112,11 +112,6 @@ class Payment(db.Model):
         """
         return Decimal(0)
 
-    @classmethod
-    def premium_refund(cls, currency, amount):
-        # Just use the default calculation
-        return cls.premium(currency, amount)
-
     def change_currency(self, currency):
         if self.state in {'paid', 'partrefunded', 'refunded'}:
             raise StateException('Cannot change currency after payment is reconciled')
@@ -174,7 +169,7 @@ class Payment(db.Model):
                 raise StateException('Cannot refund transferred purchase')
             if purchase.state == 'refunded':
                 raise StateException('Purchase is already refunded')
-            if purchase.price_tier.get_price(self.currency) > 0 and purchase.state != 'paid':
+            if purchase.price_tier.get_price(self.currency).value > 0 and not purchase.is_paid_for:
                 # This might turn out to be too strict
                 raise StateException('Purchase is not paid, so cannot be refunded')
             purchase.state = 'refunded'
@@ -413,7 +408,7 @@ class Refund(db.Model):
     provider = db.Column(db.String, nullable=False)
     amount_int = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    purchases = db.relationship('Purchase', backref=db.backref('refunds', cascade='all'))
+    purchases = db.relationship('Purchase', backref=db.backref('refund', cascade='all'))
 
     __mapper_args__ = {'polymorphic_on': provider}
 

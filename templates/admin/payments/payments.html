@@ -33,7 +33,7 @@
     <a class="btn btn-danger" href="{{ url_for('.cancel_payment', payment_id=payment.id) }}">Cancel</a>
     {% endif %}
     {% if payment.state in ['charged', 'paid', 'partrefunded'] %}
-    <a class="btn btn-danger" href="{{ url_for('.partial_refund', payment_id=payment.id) }}">Refund</a>
+    <a class="btn btn-danger" href="{{ url_for('.refund', payment_id=payment.id) }}">Refund</a>
     {% endif %}
   </td>
 </tr>

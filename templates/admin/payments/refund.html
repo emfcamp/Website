@@ -5,21 +5,21 @@
 <h2>Refund payment</h2>
 
 <h4>Current refunds</h4>
-{% if refunded_tickets %}
+{% if refunded_purchases %}
 <table>
 <thead>
   <tr>
-    <th class="col-sm-2">Ticket</th>
-    <th class="col-sm-3">Provider</th>
+    <th class="col-sm-2">Purchase</th>
+    <th class="col-sm-3">Refunded via</th>
     <th>Refunded at</th>
   </tr>
 </thead>
 <tbody>
-{% for t in refunded_tickets %}
+{% for purchase in refunded_purchases %}
   <tr class="{{ loop.cycle('odd', 'even') }}">
-    <td class="col-sm-2">{{ t.id }}</td>
-    <td class="col-sm-3">{{ t.refund.provider | capitalize }}</td>
-    <td>{{ t.refund.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+    <td class="col-sm-2">{{ purchase.id }}</td>
+    <td class="col-sm-3">{{ purchase.refund.provider | capitalize }}</td>
+    <td>{{ purchase.refund.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
   </tr>
 {% endfor %}
 </tbody>
@@ -28,18 +28,18 @@
 
 <p></p>
 
-<p>To refund this payment, please select tickets to refund below.</p>
+<p>To refund this payment, please select purchases to refund below.</p>
 
 <p>Free tickets that are not refunded will be marked as paid.</p>
 
-<form method="post" action="{{ url_for('.partial_refund', payment_id=payment.id) }}" class="form-horizontal" role="form">
+<form method="post" action="{{ url_for('.refund', payment_id=payment.id) }}" class="form-horizontal" role="form">
 {{ form.hidden_tag() }}
 
-{% for f in form.tickets %}
+{% for f in form.purchases %}
   {{ f.hidden_tag_without('csrf_token') }}
   <div class="col-sm-11 col-sm-offset-1">
     <label class="checkbox">
-      {{ f.refund(disabled=f._disabled) }} {{ f.refund.label.text }} ({{ f._ticket.type.get_price(payment.currency) | price(payment.currency) }})
+      {{ f.refund(disabled=f._disabled) }} {{ f.refund.label.text }} ({{ f._purchase.price_tier.get_price(payment.currency) | price(payment.currency) }})
     </label>
     {% for error in f.refund.errors %}
     <div class="help-block">{{ error }}</div>

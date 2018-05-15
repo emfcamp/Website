@@ -207,16 +207,19 @@ def cancel_payment(payment_id):
     return render_template('admin/payments/payment-cancel.html', payment=payment, form=form)
 
 
-class RefundPaymentForm(Form):
+class ManualRefundForm(Form):
     refund = SubmitField("Refund payment")
 
 
-@admin.route('/payment/<int:payment_id>/full-refund', methods=['GET', 'POST'])
+@admin.route('/payment/<int:payment_id>/manual-refund', methods=['GET', 'POST'])
 @admin_required
-def refund_payment(payment_id):
+def manual_refund(payment_id):
+    """ Mark an entire payment as refunded for book-keeping purposes.
+        Doesn't actually take any steps to return money to the user. """
+
     payment = Payment.query.get_or_404(payment_id)
 
-    form = RefundPaymentForm()
+    form = ManualRefundForm()
     if form.validate_on_submit():
         if form.refund.data:
             app.logger.info("Manually refunding payment %s", payment.id)
@@ -236,23 +239,23 @@ def refund_payment(payment_id):
             flash("Payment refunded")
             return redirect(url_for('admin.payments'))
 
-    return render_template('admin/payments/payment-refund.html', payment=payment, form=form)
+    return render_template('admin/payments/manual-refund.html', payment=payment, form=form)
 
 
-class PartialRefundTicketForm(Form):
-    ticket_id = HiddenIntegerField('Ticket ID', [Required()])
-    refund = BooleanField('Refund ticket', default=True)
+class RefundPurchaseForm(Form):
+    purchase_id = HiddenIntegerField('Purchase ID', [Required()])
+    refund = BooleanField('Refund purchase', default=True)
 
 
-class PartialRefundForm(Form):
-    tickets = FieldList(FormField(PartialRefundTicketForm))
-    refund = SubmitField('I have refunded these tickets by bank transfer')
+class RefundForm(Form):
+    purchases = FieldList(FormField(RefundPurchaseForm))
+    refund = SubmitField('I have refunded these purchases by bank transfer')
     stripe_refund = SubmitField('Refund through Stripe')
 
 
 @admin.route("/payment/<int:payment_id>/refund", methods=['GET', 'POST'])
 @admin_required
-def partial_refund(payment_id):
+def refund(payment_id):
     payment = Payment.query.get_or_404(payment_id)
 
     valid_states = ['charged', 'paid', 'partrefunded']
@@ -261,22 +264,22 @@ def partial_refund(payment_id):
         flash('Payment is not currently refundable')
         return redirect(url_for('.payments'))
 
-    form = PartialRefundForm(request.form)
+    form = RefundForm(request.form)
 
     if payment.provider != 'stripe':
         form.stripe_refund.data = ''
 
     if request.method != 'POST':
-        for ticket in payment.purchases:
-            form.tickets.append_entry()
-            form.tickets[-1].ticket_id.data = ticket.id
+        for purchase in payment.purchases:
+            form.purchases.append_entry()
+            form.purchases[-1].purchase_id.data = purchase.id
 
-    tickets_dict = {t.id: t for t in payment.purchases}
+    purchases_dict = {p.id: p for p in payment.purchases}
 
-    for f in form.tickets:
-        f._ticket = tickets_dict[f.ticket_id.data]
-        f.refund.label.text = '%s - %s' % (f._ticket.id, f._ticket.product.display_name)
-        if f._ticket.refund_id is None and f._ticket.state == 'paid':
+    for f in form.purchases:
+        f._purchase = purchases_dict[f.purchase_id.data]
+        f.refund.label.text = '%s - %s' % (f._purchase.id, f._purchase.product.display_name)
+        if f._purchase.refund_id is None and f._purchase.is_paid_for and f._purchase.owner == payment.user:
             f._disabled = False
         else:
             f._disabled = True
@@ -286,20 +289,20 @@ def partial_refund(payment_id):
 
             payment.lock()
 
-            tickets = [f._ticket for f in form.tickets if f.refund.data and not f._disabled]
-            total = sum(t.price_tier.get_price(payment.currency) for t in tickets)
+            purchases = [f._purchase for f in form.purchases if f.refund.data and not f._disabled]
+            total = sum(p.price_tier.get_price(payment.currency).value for p in purchases)
 
             if not total:
-                flash('Please select some non-free tickets to refund')
-                return redirect(url_for('.partial_refund', payment_id=payment.id))
+                flash('Please select some non-free purchases to refund')
+                return redirect(url_for('.refund', payment_id=payment.id))
 
-            if any(t.user != payment.user for t in tickets):
-                flash('Cannot refund transferred ticket')
-                return redirect(url_for('.partial_refund', payment_id=payment.id))
+            if any(p.owner != payment.user for p in purchases):
+                flash('Cannot refund transferred purchase')
+                return redirect(url_for('.refund', payment_id=payment.id))
 
-            premium = payment.__class__.premium_refund(payment.currency, total)
-            app.logger.info('Refunding %s tickets from payment %s, totalling %s %s and %s %s premium',
-                            len(tickets), payment.id, total, payment.currency, premium, payment.currency)
+            # This is where you'd add the premium if it existed
+            app.logger.info('Refunding %s purchases from payment %s, totalling %s %s',
+                            len(purchases), payment.id, total, payment.currency, payment.currency)
 
             if form.stripe_refund.data:
                 app.logger.info('Refunding using Stripe')
@@ -309,41 +312,40 @@ def partial_refund(payment_id):
                     # This happened unexpectedly - send the email as usual
                     stripe_payment_refunded(payment)
                     flash('This charge has already been fully refunded.')
-                    return redirect(url_for('.partial_refund', payment_id=payment.id))
+                    return redirect(url_for('.refund', payment_id=payment.id))
 
                 payment.state = 'refunding'
-                refund = StripeRefund(payment, total + premium)
+                refund = StripeRefund(payment, total)
 
             else:
                 app.logger.info('Refunding out of band')
 
                 payment.state = 'refunding'
-                refund = BankRefund(payment, total + premium)
+                refund = BankRefund(payment, total)
 
-            for ticket in tickets:
-                ticket.state = 'refunded'
-                ticket.refund = refund
+            for purchase in purchases:
+                purchase.state = 'refunded'
+                purchase.refund = refund
 
-            priced_tickets = [t for t in payment.purchases if t.price_tier.get_price(payment.currency)]
-            unpriced_tickets = [t for t in payment.purchases if not t.price_tier.get_price(payment.currency)]
+            priced_purchases = [p for p in payment.purchases if p.price_tier.get_price(payment.currency).value]
+            unpriced_purchases = [p for p in payment.purchases if not p.price_tier.get_price(payment.currency).value]
 
             all_refunded = False
-            if all(t.refund for t in priced_tickets):
+            if all(p.refund for p in priced_purchases):
                 all_refunded = True
-                # Remove remaining free tickets from the payment so they're still valid.
-                for ticket in unpriced_tickets:
-                    if not ticket.refund:
-                        app.logger.info('Removing free ticket %s from refunded payment', ticket.id)
-                        if ticket.state != 'paid':
-                            # The only thing keeping this ticket from being valid was the payment
-                            app.logger.info('Setting orphaned free ticket %s to paid', ticket.id)
-                            ticket.state = 'paid'
+                # Remove remaining free purchases from the payment so they're still valid.
+                for purchase in unpriced_purchases:
+                    if not purchase.refund:
+                        app.logger.info('Removing free purchase %s from refunded payment', purchase.id)
+                        if not purchase.is_paid_for:
+                            # The only thing keeping this purchase from being valid was the payment
+                            app.logger.info('Setting orphaned free purchase %s to paid', purchase.id)
+                            purchase.state = 'paid'
 
-                            # FIXME: should we cover the receipt-emailed state too?
-                            # Should we even put free tickets in a Payment?
+                            # Should we even put free purchases in a Payment?
 
-                        ticket.payment = None
-                        ticket.payment_id = None
+                        purchase.payment = None
+                        purchase.payment_id = None
 
             db.session.commit()
 
@@ -356,14 +358,14 @@ def partial_refund(payment_id):
                 except Exception as e:
                     app.logger.warn("Exception %r refunding payment", e)
                     flash('An error occurred refunding with Stripe. Please check the state of the payment.')
-                    return redirect(url_for('.partial_refund', payment_id=payment.id))
+                    return redirect(url_for('.refund', payment_id=payment.id))
 
                 refund.refundid = stripe_refund.id
                 if stripe_refund.status != 'succeeded':
                     # Should never happen according to the docs
                     app.logger.warn("Refund status is %s, not succeeded", stripe_refund.status)
                     flash('The refund with Stripe was not successful. Please check the state of the payment.')
-                    return redirect(url_for('.partial_refund', payment_id=payment.id))
+                    return redirect(url_for('.refund', payment_id=payment.id))
 
             if all_refunded:
                 payment.state = 'refunded'
@@ -372,11 +374,12 @@ def partial_refund(payment_id):
 
             db.session.commit()
 
-            app.logger.info('Payment %s refund complete for a total of %s', payment.id, total + premium)
-            flash('Refund for %s %s complete' % (total + premium, payment.currency))
+            app.logger.info('Payment %s refund complete for a total of %s', payment.id, total)
+            flash('Refund for %s %s complete' % (total, payment.currency))
 
         return redirect(url_for('.payments'))
 
-    refunded_tickets = [t for t in payment.purchases if t.state == 'refunded']
-    return render_template('admin/payments/payment-refund.html', payment=payment, form=form,
-                           refunded_tickets=refunded_tickets)
+    refunded_purchases = [p for p in payment.purchases if p.state == 'refunded']
+    return render_template('admin/payments/refund.html', payment=payment, form=form,
+                           refunded_purchases=refunded_purchases)
+

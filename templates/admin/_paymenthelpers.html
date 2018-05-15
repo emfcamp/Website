@@ -1,10 +1,4 @@
-{% extends "admin/base.html" %}
-{% set nav_active = 'admin_payments' %}
-{% block body %}
-<h2>Refund payment</h2>
-
-<p>To manually refund this payment, please click below.</p>
-
+{% macro payment_info(payment) %}
 <dl class="dl-horizontal">
 <dt>Name</dt><dd>{{ payment.user.name }}</dd>
 <dt>Email</dt><dd>{{ payment.user.email }}</dd>
@@ -16,23 +10,22 @@
 {% endif -%}
 <dt>Expires</dt><dd>{{ payment.expires and payment.expires.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
 </dl>
+{% endmacro %}
 
+{% macro purchase_table(payment) %}
 <table class="table table-condensed table-striped">
 <thead><tr>
-  <th>Type</th>
+  <th>Product Group</th>
+  <th>Name</th>
 </tr></thead>
 <tbody>
 {% for purchase in payment.purchases %}
 <tr>
-  <td>{{ purchase.type.name }}</td>
+  <td>{{ purchase.product.parent.name }}</td>
+  <td>{{ purchase.product.display_name }}</td>
 </tr>
 {% endfor %}
 </tbody>
 </table>
+{% endmacro %}
 
-<form method="post" action="{{ url_for('.refund_payment', payment_id=payment.id) }}" class="shrink">
-{{ form.hidden_tag() }}
-{{ form.refund(class_="btn btn-danger pull-right") }}
-</form>
-
-{% endblock %}
