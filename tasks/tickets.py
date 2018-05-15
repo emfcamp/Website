@@ -165,7 +165,7 @@ class SendTransferReminder(Command):
         pass
         # users_to_email = User.query.join(Ticket, TicketType).filter(
         #     TicketType.admits == 'full',
-        #     Ticket.paid == True,  # noqa
+        #     Ticket.paid == True,  # noqa: E712
         #     Ticket.transfer_reminder_sent == False,
         # ).group_by(User).having(func.count() > 1)
 
@@ -192,7 +192,7 @@ class SendTickets(Command):
         #     TicketType.admits.in_(['full', 'kid', 'car', 'campervan']),
         #     TicketType.fixed_id.in_(range(14, 24))))
 
-        # users = (paid_items.filter(Ticket.emailed == False).join(User)  # noqa
+        # users = (paid_items.filter(Ticket.emailed == False).join(User)  # noqa: E712
         #                    .group_by(User).with_entities(User).order_by(User.id))
 
         # for user in users:

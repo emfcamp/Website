@@ -45,7 +45,7 @@ class CreatePermissions(Command):
 class SendEmails(Command):
     def run(self):
         with mail.connect() as conn:
-            for rec in EmailJobRecipient.query.filter(EmailJobRecipient.sent == False):  # noqa
+            for rec in EmailJobRecipient.query.filter(EmailJobRecipient.sent == False):  # noqa: E712
                 self.send_email(conn, rec)
 
     def send_email(self, conn, rec):

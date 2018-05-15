@@ -186,7 +186,7 @@ def attach_tickets(msg, user):
     receipt_types = ['admissions', 'campervan', 'parking', 'tees']
     tickets = user.owned_tickets.filter(
         Purchase.type.in_(receipt_types),
-        Purchase.is_paid_for == True,
+        Purchase.is_paid_for == True,  # noqa: E712
     )
 
     plural = (tickets.count() != 1 and 's' or '')
