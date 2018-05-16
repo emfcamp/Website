@@ -302,7 +302,7 @@ def refund(payment_id):
 
             # This is where you'd add the premium if it existed
             app.logger.info('Refunding %s purchases from payment %s, totalling %s %s',
-                            len(purchases), payment.id, total, payment.currency, payment.currency)
+                            len(purchases), payment.id, total, payment.currency)
 
             if form.stripe_refund.data:
                 app.logger.info('Refunding using Stripe')
