@@ -13,7 +13,7 @@
 {% macro sponsor(url, image) %}
 <div class="sponsor">
 <a class="clearfix" href="{{ url }}">
-  <img class="img-responsive col-xs-12" src="{{ url_for('static', filename='images/sponsors/' + image) }}"/>
+  <img class="img-responsive col-xs-12 img-sponsor" src="{{ url_for('static', filename='images/sponsors/' + image) }}"/>
 </a>
 </div>
 {% endmacro %}
@@ -24,7 +24,7 @@
 <h3>Silver</h3>
 {{ sponsor("https://www.codethink.co.uk/", "codethink.png") }}
 <h3>Bronze</h3>
-{{ sponsor("http://www.badgersoft.com/", "badgersoft.png") }}
+{{ sponsor("https://amsat-uk.org/", "amsat-uk.jpg") }}
 {{ sponsor("http://www.msraynsford.co.uk/", "msraynsford.svg") }}
 </div>
 <div class="clearfix col-xs-12">
