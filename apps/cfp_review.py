@@ -557,7 +557,7 @@ def vote_summary():
         state_counts = {}
         vote_count = len([v for v in prop.votes if v.state == 'voted'])
 
-        if summary['min_votes'] > vote_count or summary['min_votes'] is None:
+        if summary['min_votes'] is None or summary['min_votes'] > vote_count:
             summary['min_votes'] = vote_count
 
         if summary['max_votes'] < vote_count:
