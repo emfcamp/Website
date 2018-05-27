@@ -20,7 +20,6 @@ import gocardless_pro.errors
 from main import db, mail, stripe, gocardless_client
 from models.payment import Payment, BankPayment, BankRefund, StripeRefund, StateException
 from models.purchase import Purchase
-# from models.ticket import Ticket
 from ..common.forms import Form, HiddenIntegerField
 from ..payments.stripe import (
     StripeUpdateUnexpected, StripeUpdateConflict, stripe_update_payment,
@@ -39,7 +38,6 @@ def payments():
 
     return render_template('admin/payments/payments.html', payments=payments)
 
-
 @admin.route('/payments/expiring')
 @admin_required
 def expiring():
@@ -52,6 +50,13 @@ def expiring():
     ).group_by(BankPayment).order_by(BankPayment.expires).all()
 
     return render_template('admin/payments/payments-expiring.html', expiring=expiring)
+
+@admin.route('/payment/<int:payment_id>')
+@admin_required
+def payment(payment_id):
+    payment = Payment.query.get_or_404(payment_id)
+
+    return render_template('admin/payments/payment.html', payment=payment)
 
 
 class ResetExpiryForm(Form):

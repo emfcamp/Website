@@ -36,6 +36,28 @@
 </form>
 <div class="row">&nbsp;</div>
 
+<h3>Payments</h3>
+<table class="table table-condensed">
+<thead><tr>
+  <th>Type</th>
+  <th>State</th>
+  <th>Purchases</th>
+  <th>Amount</th>
+  <th>Expires</th>
+</tr></thead>
+<tbody>
+{% for payment in user.payments %}
+<tr>
+  <td><a href="{{ url_for('.payment', payment_id=payment.id) }}">{{ payment.name }}</a></td>
+  <td><a href="{{ url_for('.user', user_id=payment.user.id) }}">{{payment.user.name}}</a></td>
+  <td>{{ payment.purchases | count }}</td>
+  <td><b>{{ payment.amount | price(payment.currency) }}</b></td>
+  <td>{% if payment.expires %}{{ payment.expires.strftime('%Y-%m-%d') }}{% endif %}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
 <h3>Tickets</h3>
 <table class="table table-condensed">
     <tr>

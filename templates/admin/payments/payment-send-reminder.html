@@ -20,7 +20,7 @@
 <dt>Already bought</dt><dd>{{ payment.user.owned_tickets.filter_by(is_paid_for=True).all() | count }}</dd>
 </dl>
 
-{% purchase_table(payment) %}
+{{ purchase_table(payment) }}
 
 <form method="post" action="{{ url_for('.send_reminder', payment_id=payment.id) }}" class="shrink">
 {{ form.hidden_tag() }}

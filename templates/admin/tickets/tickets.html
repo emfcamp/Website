@@ -19,7 +19,7 @@
     <td>{{ ticket.owner.email }}</td>
     <td><a href="{{ url_for('.product_details', product_id=ticket.product.id) }}">{{ ticket.product.name }}</a></td>
     {% if ticket.payment %}
-    <td>{{ ticket.payment.name }} {{ ticket.payment.id }}</td>
+    <td><a href="{{ url_for('.payment', payment_id=ticket.payment.id) }}">{{ ticket.payment.name }} {{ ticket.payment.id }}</a></td>
     {% elif ticket.transfers %}
     <td>Transferred</td>
     {% else %}

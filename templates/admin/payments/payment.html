@@ -1,0 +1,28 @@
+{% from 'admin/_paymenthelpers.html' import payment_info, purchase_table with context %}
+
+{% extends "admin/base.html" %}
+{% set nav_active = 'admin_payments' %}
+{% block body %}
+<h2>Payment {{ payment.id }}</h2>
+
+{{ payment_info(payment) }}
+
+{{ purchase_table(payment) }}
+
+<a class="btn btn-info" href="{{ url_for('payments.invoice', payment_id=payment.id, pdf=1) }}">View PDF Invoice</a>
+
+{% if payment.provider == 'banktransfer' and payment.state == 'inprogress' %}
+<a class="btn btn-primary" href="{{ url_for('.reset_expiry', payment_id=payment.id) }}">Reset expiry</a>
+<a class="btn btn-warning {% if payment.reminder_sent -%} disabled {%- endif %}" href="{{ url_for('.send_reminder', payment_id=payment.id) }}">Remind</a>
+{% endif %}
+{% if payment.provider == 'stripe' or (payment.provider == 'gocardless' and payment.state == 'inprogress') %}
+<a class="btn btn-success" href="{{ url_for('.update_payment', payment_id=payment.id) }}">Update payment</a>
+{% endif %}
+{% if payment.provider in ['gocardless', 'banktransfer'] and payment.state not in ['cancelled', 'paid', 'refunded'] %}
+<a class="btn btn-danger" href="{{ url_for('.cancel_payment', payment_id=payment.id) }}">Cancel payment</a>
+{% endif %}
+{% if payment.state in ['charged', 'paid', 'partrefunded'] %}
+<a class="btn btn-danger" href="{{ url_for('.refund', payment_id=payment.id) }}">Refund payment</a>
+{% endif %}
+
+{% endblock %}

@@ -5,6 +5,7 @@
 
 <table class="table table-condensed table-striped">
 <thead><tr>
+  <th>Type</th>
   <th>Name</th>
   <th>Email</th>
   <th>Purchases</th>
@@ -16,7 +17,8 @@
 <tbody>
 {% for payment, purchase_count in expiring %}
 <tr>
-  <td>{{ payment.user.name }}</td>
+  <td><a href="{{ url_for('.payment', payment_id=payment.id) }}">{{ payment.name }}</a></td>
+  <td><a href="{{ url_for('.user', user_id=payment.user.id) }}">{{ payment.user.name }}</a></td>
   <td>{{ payment.user.email }}</td>
   <td>{{ purchase_count }}</td>
   <td><b>{{ payment.amount | price(payment.currency) }}</b></td>
@@ -26,7 +28,6 @@
     <a class="btn btn-primary" href="{{ url_for('.reset_expiry', payment_id=payment.id) }}">Reset expiry</a>
     <a class="btn btn-warning {% if payment.reminder_sent -%} disabled {%- endif %}"
         href="{{ url_for('.send_reminder', payment_id=payment.id) }}">Remind</a>
-    <a class="btn btn-danger" href="{{ url_for('.cancel_payment', payment_id=payment.id) }}">Cancel</a>
   </td>
 </tr>
 {% endfor %}

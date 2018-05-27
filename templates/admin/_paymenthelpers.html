@@ -1,14 +1,16 @@
 {% macro payment_info(payment) %}
 <dl class="dl-horizontal">
-<dt>Name</dt><dd>{{ payment.user.name }}</dd>
-<dt>Email</dt><dd>{{ payment.user.email }}</dd>
-<dt>Price</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
+<dt>State</dt><dd>{{ payment.state }}</dd>
+<dt>User</dt><dd><a href="{{ url_for('.user', user_id=payment.user.id) }}">{{ payment.user.name }}</a> ({{ payment.user.email }})</dd>
+<dt>Total</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
 {%- if payment.provider == 'banktransfer' %}
 <dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
 {% elif payment.provider == 'gocardless' %}
 <dt>GoCardless ID</dt><dd>{{ payment.gcid }}</dd>
 {% endif -%}
-<dt>Expires</dt><dd>{{ payment.expires and payment.expires.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
+{% if payment.expires %}
+<dt>Expires</dt><dd>{{ payment.expires.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
+{% endif -%}
 </dl>
 {% endmacro %}
 
@@ -16,13 +18,21 @@
 <table class="table table-condensed table-striped">
 <thead><tr>
   <th>Product Group</th>
-  <th>Name</th>
+  <th>Product</th>
+  <th>Display Name</th>
+  <th>Price Tier</th>
+  <th>Price</th>
+  <th>State</th>
 </tr></thead>
 <tbody>
 {% for purchase in payment.purchases %}
 <tr>
   <td>{{ purchase.product.parent.name }}</td>
+  <td><a href="{{url_for('admin.product_details', product_id=purchase.product.id)}}">{{ purchase.product.name}}</a></td>
   <td>{{ purchase.product.display_name }}</td>
+  <td><a href="{{url_for('admin.price_tier_details', tier_id=purchase.price_tier.id)}}">{{ purchase.price_tier.name }}</a></td>
+  <td>{{ purchase.price_tier.get_price(payment.currency) | price }}</td>
+  <td>{{ purchase.state }}</td>
 </tr>
 {% endfor %}
 </tbody>
