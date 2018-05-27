@@ -33,7 +33,7 @@
     </tr>
 {% for proposal in proposals %}
     <tr>
-        <td>{{proposal.type | capitalize}}</td>
+        <td>{{proposal.human_type | capitalize}}</td>
         <td>{{proposal.scheduled_duration or '--'}}</td>
         <td>
             <a href="{{ url_for('admin.user', user_id=proposal.user.id ) }}">{{proposal.user.name}}</a>

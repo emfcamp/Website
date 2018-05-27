@@ -9,7 +9,7 @@
 <p>&nbsp;</p>
 <form method="POST">
     <div class="col-md-8">
-        <h3>{{proposal.title}} <small>&mdash; a {{ proposal.type | capitalize }}</small></h3>
+        <h3>{{proposal.title}} <small>&mdash; a {{ proposal.human_type | capitalize }}</small></h3>
         <table class="table">
         {{ form.hidden_tag() }}
             <tr>

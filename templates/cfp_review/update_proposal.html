@@ -29,7 +29,7 @@
                 {% endif %}
             </dd>
             <dt>Type</dt>
-            <dd>{{proposal.type}}</dd>
+            <dd>{{proposal.human_type}}</dd>
             {{ render_dl_field(form.state) }}
             {{ render_dl_field(form.title) }}
             {{ render_dl_field(form.description, rows=5) }}
@@ -42,6 +42,14 @@
             {% if proposal.type == 'workshop' %}
                 {{ render_dl_field(form.attendees) }}
                 {{ render_dl_field(form.cost) }}
+                {{ render_dl_field(form.participant_equipment) }}
+                {{ render_dl_field(form.age_range) }}
+            {% elif proposal.type == 'youthworkshop' %}
+                {{ render_dl_field(form.attendees) }}
+                {{ render_dl_field(form.cost) }}
+                {{ render_dl_field(form.participant_equipment) }}
+                {{ render_dl_field(form.age_range) }}
+                {{ render_dl_field(form.valid_dbs) }}
             {% elif proposal.type == 'installation' %}
                 {{ render_dl_field(form.size) }}
                 {{ render_dl_field(form.funds) }}

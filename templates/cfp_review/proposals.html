@@ -53,7 +53,7 @@
         <td>{% if proposal.user.will_have_ticket %}Yes{% else %}No{% endif %}</td>
         <td>{{proposal.created.strftime("%d/%m")}}</td>
         <td>{{proposal.state | capitalize}}</td>
-        <td>{{proposal.type | capitalize}}</td>
+        <td>{{proposal.human_type | capitalize}}</td>
         <td>{{proposal.notice_required or '--'}}</td>
         <td>{{proposal.scheduled_duration or '--'}}</td>
         <td>

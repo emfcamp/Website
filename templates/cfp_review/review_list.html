@@ -47,7 +47,7 @@
 {% if to_review %}
 {% for proposal in to_review %}
     <tr {%- if proposal.is_new %} class="info" {%- endif %}>
-        <td>{{ proposal.type | capitalize }}</td>
+        <td>{{ proposal.human_type | capitalize }}</td>
         <td><a href="{{ url_for('.review_proposal', proposal_id=proposal.id) }}">{{proposal.title}}</a></td>
         <td>{{ proposal.description | truncate(100) }}</td>
     </tr>
@@ -74,7 +74,7 @@
     <tr>
         {% set vote = proposal.user_vote %}
         <td>{{ vote.modified.strftime("%d/%m") }}</td>
-        <td>{{ proposal.type | capitalize }}</td>
+        <td>{{ proposal.human_type | capitalize }}</td>
         <td><a href="{{ url_for('.review_proposal', proposal_id=proposal.id) }}">{{ proposal.title }}</a></td>
         <td
         {% if vote.state == 'recused' %}

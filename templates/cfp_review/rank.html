@@ -30,7 +30,7 @@
 {% for (prop, score) in proposals %}
     <tr {% if preview and score >= min_score %} class="info" {% endif %}>
         <td>{{ score }}</td>
-        <td>{{prop.type | capitalize}}</td>
+        <td>{{prop.human_type | capitalize}}</td>
         <td>{{prop.user.name}}</td>
         <td><a href="{{ url_for('.update_proposal', proposal_id=prop.id) }}">{{prop.title}}</a></td>
     </tr>

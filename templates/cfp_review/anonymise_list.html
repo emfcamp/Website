@@ -29,7 +29,7 @@
     <tr>
         <td>{{proposal.created.strftime("%d/%m")}}</td>
         <td>{{proposal.state | capitalize}}</td>
-        <td>{{proposal.type | capitalize}}</td>
+        <td>{{proposal.human_type | capitalize}}</td>
         <td>{{proposal.user.name}}</td>
         <td>
             <a href="{{ url_for('.anonymise_proposal', proposal_id=proposal.id) }}">{{proposal.title}}</a>

@@ -256,13 +256,32 @@ class UpdatePerformanceForm(UpdateProposalForm):
 
 
 class UpdateWorkshopForm(UpdateProposalForm):
-    cost = StringField('Cost per attendee')
     attendees = StringField('Attendees', [Required()])
+    cost = StringField('Cost per attendee')
+    participant_equipment = StringField('Attendee equipment')
+    age_range = StringField('Age range')
 
     def update_proposal(self, proposal):
-        proposal.cost = self.cost.data
         proposal.attendees = self.attendees.data
+        proposal.cost = self.cost.data
+        proposal.participant_equipment = self.participant_equipment.data
+        proposal.age_range = self.age_range.data
         super(UpdateWorkshopForm, self).update_proposal(proposal)
+
+class UpdateYouthWorkshopForm(UpdateProposalForm):
+    attendees = StringField('Attendees', [Required()])
+    cost = StringField('Cost per attendee')
+    participant_equipment = StringField('Attendee equipment')
+    age_range = StringField('Age range')
+    valid_dbs = BooleanField('Has a valid DBS check')
+
+    def update_proposal(self, proposal):
+        proposal.attendees = self.attendees.data
+        proposal.cost = self.cost.data
+        proposal.participant_equipment = self.participant_equipment.data
+        proposal.age_range = self.age_range.data
+        proposal.valid_dbs = self.valid_dbs.data
+        super(UpdateYouthWorkshopForm, self).update_proposal(proposal)
 
 
 class UpdateInstallationForm(UpdateProposalForm):
@@ -305,6 +324,7 @@ def update_proposal(proposal_id):
 
     form = UpdateTalkForm() if prop.type == 'talk' else \
            UpdateWorkshopForm() if prop.type == 'workshop' else \
+           UpdateYouthWorkshopForm() if prop.type == 'youthworkshop' else \
            UpdatePerformanceForm() if prop.type == 'performance' else \
            UpdateInstallationForm()
 
@@ -390,6 +410,15 @@ def update_proposal(proposal_id):
     if prop.type == 'workshop':
         form.attendees.data = prop.attendees
         form.cost.data = prop.cost
+        form.participant_equipment.data = prop.participant_equipment
+        form.age_range.data = prop.age_range
+
+    elif prop.type == 'youthworkshop':
+        form.attendees.data = prop.attendees
+        form.cost.data = prop.cost
+        form.participant_equipment.data = prop.participant_equipment
+        form.age_range.data = prop.age_range
+        form.valid_dbs.data = prop.valid_dbs
 
     elif prop.type == 'installation':
         form.size.data = prop.size
@@ -726,6 +755,7 @@ def review_list():
 
     if not current_user.has_permission('cfp_admin'):
         # reviewers shouldn't see their own proposals, and don't review installations
+        # youth workshops are reviewed separately
         proposal_query = proposal_query.filter(
             Proposal.user_id != current_user.id,
             Proposal.type.in_(['talk', 'workshop']))
