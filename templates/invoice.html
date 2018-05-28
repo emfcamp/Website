@@ -13,6 +13,7 @@
         <div class="navbar-header">
             <div class="navbar-brand">Payment {{ payment.id }}</div>
         </div>
+        {% if payment.user == current_user %}
         <form method="post" action="{{ url_for('.invoice', payment_id=payment.id) }}"
                 id="edit-company" class="navbar-form navbar-left {% if not edit_company -%} hidden {%- endif %}">
             {{ form.hidden_tag() }}
@@ -21,6 +22,7 @@
                 {{ form.update(class_="btn btn-info") }}
             </div>
         </form>
+        {% endif %}
         <ul class="nav navbar-nav">
             <li><a href="?js=0" class="print-invoice">Print Invoice</a></li>
             <li><a href="?pdf=1">Download PDF</a></li>
@@ -62,6 +64,7 @@
     {% if payment.user.company %}
     <div class="company">{{ payment.user.company }}</div>
     {% endif %}
+    {% if payment.user == current_user %}
     <div class="edit-company">
       <a class="edit-company-link" href="?edit_company=1">
       {% if payment.user.company %}
@@ -71,6 +74,7 @@
       {% endif %}
       </a>
     </div>
+    {% endif %}
     <div>{{ payment.user.email }}</div>
   </div>
 
@@ -201,7 +205,6 @@ $(function() {
       $('#edit-company input[type=text]').focus();
       e.preventDefault();
   });
-
 
   $('.print-invoice').on('click', function(e) {
       window.print();
