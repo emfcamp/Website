@@ -11,6 +11,7 @@ from wtforms import (
     BooleanField, StringField, SubmitField,
     TextAreaField, SelectField,
 )
+from wtforms.fields.html5 import EmailField
 
 from sqlalchemy.exc import IntegrityError
 
@@ -27,7 +28,7 @@ cfp = Blueprint('cfp', __name__)
 
 class ProposalForm(Form):
     name = StringField("Name", [Required()])
-    email = StringField("Email", [Email(), Required()])
+    email = EmailField("Email", [Email(), Required()])
     title = StringField("Title", [Required()])
     description = TextAreaField("Description", [Required()])
     requirements = StringField("Requirements")

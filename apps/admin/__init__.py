@@ -7,11 +7,12 @@ from flask import (
     url_for, current_app as app, Blueprint
 )
 
-from wtforms.validators import Optional, Required, URL
+from wtforms.validators import Optional, Required, URL, Email
 from wtforms import (
     SubmitField, BooleanField, HiddenField, StringField,
     FieldList, FormField, SelectField, FloatField, IntegerField
 )
+from wtforms.fields.html5 import EmailField
 
 from main import db
 from models.payment import BankPayment, BankTransaction
@@ -172,7 +173,7 @@ class ScheduleForm(Form):
     main_venue = StringField('Main Venue')
     type = StringField('Type')
     phone = TelField('Phone')
-    email = StringField('Email')
+    email = EmailField('Email', [Email()])
     lat = FloatField('lat', [Optional()])
     lon = FloatField('lon', [Optional()])
     priority = IntegerField('priority', [Optional()])

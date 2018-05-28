@@ -43,7 +43,7 @@ class NextURLField(HiddenField):
 
 
 class LoginForm(Form):
-    email = StringField('Email', [Email(), Required()])
+    email = EmailField('Email', [Email(), Required()])
     next = NextURLField('Next')
 
     def validate_email(form, field):
