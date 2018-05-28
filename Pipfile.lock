@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "14248fa6a8bf76ad198d13051af8600e7f6819eb8a5057d56e8f73a3de804c66"
+            "sha256": "a4bd307c973bc9cae725588e7b4e113534ceedc921f6ed4ef9b4bbf602c378aa"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -18,10 +18,10 @@
     "default": {
         "alembic": {
             "hashes": [
-                "sha256:042851ebe9efa07be6dc1395b1793b6c1d8964a39b73a0ce1649e2bcd41ea732"
+                "sha256:85bd3ea7633024e4930900bc64fb58f9742dedbc6ebb6ecf25be2ea9a3c1b32e"
             ],
             "index": "pypi",
-            "version": "==0.9.6"
+            "version": "==0.9.9"
         },
         "awesome-slugify": {
             "hashes": [
@@ -174,10 +174,11 @@
         },
         "flask-sqlalchemy": {
             "hashes": [
-                "sha256:c5244de44cc85d2267115624d83faef3f9e8f088756788694f305a5d5ad137c5"
+                "sha256:3bc0fac969dd8c0ace01b32060f0c729565293302f0c4269beed154b46bec50b",
+                "sha256:5971b9852b5888655f11db634e87725a9031e170f37c0ce7851cf83497f56e53"
             ],
             "index": "pypi",
-            "version": "==2.1"
+            "version": "==2.3.2"
         },
         "flask-wtf": {
             "hashes": [
@@ -608,17 +609,17 @@
         },
         "sqlalchemy": {
             "hashes": [
-                "sha256:f1191e29e35b6fe1aef7175a09b1707ebb7bd08d0b17cb0feada76c49e5a2d1e"
+                "sha256:8b0ec71af9291191ba83a91c03d157b19ab3e7119e27da97932a4773a3f664a9"
             ],
             "index": "pypi",
-            "version": "==1.1.14"
+            "version": "==1.1.18"
         },
         "sqlalchemy-continuum": {
             "hashes": [
-                "sha256:c9ef4ac3627d297982bbdb0ac5eaaf592b67ad54e40677e3c1629aaa55c78859"
+                "sha256:18376f3ab167209a47849e16d33119e3374ec73f58ac5d3dd8e9a37a84956fb8"
             ],
             "index": "pypi",
-            "version": "==1.3.1"
+            "version": "==1.3.4"
         },
         "sqlalchemy-utils": {
             "hashes": [
