@@ -109,7 +109,7 @@ def verify_checkin_code(key, code):
 
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
-    __versioned__ = {}
+    __versioned__ = {'exclude': ['favourites', 'calendar_favourites']}
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, unique=True, index=True)

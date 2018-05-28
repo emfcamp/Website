@@ -85,7 +85,7 @@ FavouriteProposal = db.Table('favourite_proposal', db.Model.metadata,
 )
 
 class Proposal(db.Model):
-    __versioned__ = {}
+    __versioned__ = {'exclude': ['favourites']}
     __tablename__ = 'proposal'
 
     id = db.Column(db.Integer, primary_key=True)
