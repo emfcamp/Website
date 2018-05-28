@@ -45,7 +45,6 @@ naming_convention = {
 }
 db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
 
-admin_new = None
 cache = Cache()
 csrf = CsrfProtect()
 migrate = Migrate()
@@ -209,19 +208,8 @@ def create_app(dev_server=False):
         from apps.volunteers import volunteers
         app.register_blueprint(volunteers, url_prefix='/volunteers')
 
-    from flask_admin import Admin
-    from apps.common.flask_admin_base import AppAdminIndexView
-
-    global admin_new
-    admin_new = Admin(url='/admin/new', name='EMF Admin', template_mode='bootstrap3',
-                      base_template='flask-admin-base.html',
-                      index_view=AppAdminIndexView(url='/admin/new'))
-    admin_new.endpoint_prefix = 'admin_new'
-
     from apps.admin import admin
     app.register_blueprint(admin, url_prefix='/admin')
-
-    admin_new.init_app(app)
 
     return app
 

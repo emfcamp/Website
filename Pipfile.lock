@@ -111,13 +111,6 @@
             "index": "pypi",
             "version": "==0.12.2"
         },
-        "flask-admin": {
-            "hashes": [
-                "sha256:fe3a96d99f22e293cd7e83d364de6cffd36573ef25db93d6e32102527a624bc5"
-            ],
-            "index": "pypi",
-            "version": "==1.5.0"
-        },
         "flask-assets": {
             "hashes": [
                 "sha256:6031527b89fb3509d1581d932affa5a79dd348cfffb58d0aef99a43461d47847"

@@ -9,27 +9,19 @@ from flask_login import current_user
 
 from sqlalchemy.sql.functions import func
 
-from main import db, admin_new
+from main import db
 from models.user import User
 from models.product import (
-    ProductGroup, Product, PriceTier, Price, ProductView, ProductViewProduct,
+    ProductGroup, Product, PriceTier, Price,
 )
 from models.purchase import (
     Purchase, PurchaseTransfer,
 )
-from ..common.flask_admin_base import AppModelView
 
 from . import admin, admin_required
 from .forms import (EditProductForm, NewProductForm,
                     NewProductGroupForm, EditProductGroupForm, PriceTierForm)
 
-
-admin_new.add_view(AppModelView(ProductGroup, db.session, category='Products'))
-admin_new.add_view(AppModelView(Product, db.session, category='Products'))
-admin_new.add_view(AppModelView(PriceTier, db.session, category='Products'))
-admin_new.add_view(AppModelView(Price, db.session, category='Products'))
-admin_new.add_view(AppModelView(ProductView, db.session, category='Products'))
-admin_new.add_view(AppModelView(ProductViewProduct, db.session, category='Products'))
 
 @admin.route('/products')
 @admin_required
