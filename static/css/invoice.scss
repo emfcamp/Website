@@ -6,15 +6,20 @@ body {
 .navbar {
   margin-bottom: 0;
 }
+.top-form {
+  margin-bottom: 20px;
+}
 #edit-company {
   padding: 10px;
   background-color: #f8f8f8;
   border: solid 0px #e7e7e7;
-  margin-bottom: 20px;
   border-bottom-width: 1px;
 }
 #edit-company .btn {
-  margin-top: 5px;
+  margin-top: 7px;
+}
+#edit-company textarea {
+  height: 73px;
 }
 
 .cancelled .table:before {

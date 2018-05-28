@@ -20,8 +20,9 @@
     </div>
 </nav>
 {% if payment.user == current_user %}
-<div id="edit-company" class="{% if not edit_company -%} hidden {%- endif %}">
-    <form method="post" action="{{ url_for('.invoice', payment_id=payment.id) }}" class="form">
+<div class="top-form">
+    <form method="post" action="{{ url_for('.invoice', payment_id=payment.id) }}"
+            id="edit-company" class="form {% if not edit_company -%} hidden {%- endif %}">
         {{ form.hidden_tag() }}
         {{ form.company(class_="form-control", placeholder="Company name") }}
         {{ form.update(class_="btn btn-info debounce") }}
