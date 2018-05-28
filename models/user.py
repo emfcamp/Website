@@ -115,6 +115,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String, unique=True, index=True)
     name = db.Column(db.String, nullable=False, index=True)
     phone = db.Column(db.String, nullable=True)
+    company = db.Column(db.String)
     will_have_ticket = db.Column(db.Boolean, nullable=False, default=False)  # for CfP filtering
     checkin_note = db.Column(db.String, nullable=True)
     # Whether the user has opted in to receive promo emails after this event:

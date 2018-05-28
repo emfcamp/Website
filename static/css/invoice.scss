@@ -1,22 +1,5 @@
-@media print {
-  .container {
-    width: auto;
-  }
-
-  body {
-    margin-top: 0;
-    margin-bottom: 6ex;
-  }
-
-  dl.company-info {
-    padding-top: 5ex;
-    position: fixed;
-    bottom: 0;
-  }
-}
-
 body {
-  margin-top: 2ex;
+  margin-top: 0;
   margin-bottom: 2ex;
 }
 
@@ -122,6 +105,31 @@ tr.premium td:first-child {
   margin-left: 180px;
 }
 
+@media print {
+  .container {
+    width: auto;
+  }
+
+  body {
+    margin-top: 0;
+    margin-bottom: 6ex;
+  }
+
+  dl.company-info {
+    padding-top: 5ex;
+    position: fixed;
+    bottom: 0;
+  }
+
+  .company-missing {
+    display: none;
+  }
+
+  nav {
+    display: none;
+  }
+}
+
 dl.company-info {
   padding-top: 10ex;
   font-size: 10pt;
@@ -140,4 +148,46 @@ dl.company-info dt:after {
 dl.company-info dd:after {
   content: '.';
 }
+
+#edit-company.hidden {
+  display: none;
+}
+
+.company {
+  display: none;
+}
+
+@media print {
+  .container {
+    width: auto;
+  }
+
+  body {
+    margin-top: 2ex;
+    margin-bottom: 6ex;
+  }
+
+  dl.company-info {
+    padding-top: 5ex;
+    position: fixed;
+    bottom: 0;
+  }
+
+  .company {
+    display: initial;
+  }
+
+  .edit-company {
+    display: none;
+  }
+
+  nav {
+    display: none;
+  }
+
+  .alert {
+    display: none;
+  }
+}
+
 

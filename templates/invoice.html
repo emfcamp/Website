@@ -7,10 +7,33 @@
 {% endblock %}
 
 {% block document %}
+{# navbars are hidden by default when printing #}
+<nav class="navbar navbar-default navbar-static-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <div class="navbar-brand">Payment {{ payment.id }}</div>
+        </div>
+        <form method="post" action="{{ url_for('.invoice', payment_id=payment.id) }}"
+                id="edit-company" class="navbar-form navbar-left {% if not edit_company -%} hidden {%- endif %}">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.company(class_="form-control", placeholder="Company name") }}
+                {{ form.update(class_="btn btn-info") }}
+            </div>
+        </form>
+        <ul class="nav navbar-nav">
+            <li><a href="?js=0" class="print-invoice">Print Invoice</a></li>
+            <li><a href="?pdf=1">Download PDF</a></li>
+        </ul>
+    </div>
+</nav>
 <div class="container invoice">
+  {% for message in get_flashed_messages() -%}
+      <div class="alert alert-warning">{{ message }}</div>
+  {% endfor -%}
+
   <div class="main-row">
     <div class="col-md-10 col-md-offset-1 main-column">
-
       <div id="main-content" class="{% if payment.state == 'cancelled' -%} cancelled {%- endif %}">
 
 {% block body %}
@@ -36,6 +59,18 @@
 <div class="recipient-row">
   <div class="recipient">
     <div>{{ payment.user.name }}</div>
+    {% if payment.user.company %}
+    <div class="company">{{ payment.user.company }}</div>
+    {% endif %}
+    <div class="edit-company">
+      <a class="edit-company-link" href="?edit_company=1">
+      {% if payment.user.company %}
+      {{ payment.user.company }}
+      {% else %}
+      (no company name provided)
+      {% endif %}
+      </a>
+    </div>
     <div>{{ payment.user.email }}</div>
   </div>
 
@@ -154,3 +189,24 @@
 </div>
 {% endblock %}
 
+{% block foot %}
+<script type="text/javascript">
+$(function() {
+  $('.edit-company-link').on('click', function(e) {
+      $('#edit-company').removeClass('hidden').on('keydown', function(e) {
+        if (e.keyCode == 27) {
+            $('#edit-company').addClass('hidden');
+        }
+      });
+      $('#edit-company input[type=text]').focus();
+      e.preventDefault();
+  });
+
+
+  $('.print-invoice').on('click', function(e) {
+      window.print();
+      e.preventDefault();
+  });
+});
+</script>
+{% endblock %}

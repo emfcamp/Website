@@ -1,18 +1,10 @@
-from decimal import Decimal
-
 from flask import (
-    current_app as app, request, Blueprint,
-    render_template, redirect, abort, flash,
-    url_for, send_file,
+    current_app as app, Blueprint,
+    render_template, abort,
 )
-from flask_login import login_required, current_user
-from sqlalchemy.sql.functions import func
+from flask_login import current_user
 
-from main import external_url
-from ..common.receipt import render_pdf
 from models.payment import Payment
-from models.product import Product, PriceTier
-from models.purchase import Purchase
 
 payments = Blueprint('payments', __name__)
 
@@ -62,45 +54,8 @@ def terms():
     return render_template('terms.html')
 
 
-@payments.route('/payment/<int:payment_id>/invoice')
-@login_required
-def invoice(payment_id):
-    payment = get_user_payment_or_abort(payment_id, allow_admin=True)
-
-    invoice_lines = Purchase.query.filter_by(payment_id=payment_id).join(PriceTier, Product) \
-        .with_entities(PriceTier, func.count(Purchase.price_tier_id)) \
-        .group_by(PriceTier, Product.name).order_by(Product.name).all()
-
-    ticket_sum = sum(pt.get_price(payment.currency).value_ex_vat * count for pt, count in invoice_lines)
-    if payment.provider == 'stripe':
-        premium = payment.__class__.premium(payment.currency, ticket_sum)
-    else:
-        premium = Decimal(0)
-
-    subtotal = ticket_sum + premium
-    vat = subtotal * Decimal('0.2')
-    app.logger.debug('Invoice subtotal %s + %s = %s', ticket_sum, premium, subtotal)
-
-    # FIXME: we should use a currency-specific quantization here (or rounder numbers)
-    if subtotal + vat - payment.amount > Decimal('0.01'):
-        app.logger.error('Invoice total mismatch: %s + %s - %s = %s', subtotal, vat,
-                         payment.amount, subtotal + vat - payment.amount)
-        flash('Your invoice cannot currently be displayed')
-        return redirect(url_for('users.purchases'))
-
-    app.logger.debug('Invoice total: %s + %s = %s', subtotal, vat, payment.amount)
-
-    page = render_template('invoice.html', payment=payment, invoice_lines=invoice_lines,
-                           premium=premium, subtotal=subtotal, vat=vat)
-
-    if request.args.get('pdf'):
-        url = external_url('.invoice', payment_id=payment_id)
-        return send_file(render_pdf(url, page), mimetype='application/pdf')
-
-    return page
-
-
 from . import banktransfer  # noqa: F401
 from . import gocardless  # noqa: F401
 from . import stripe  # noqa: F401
+from . import invoice # noqa: F401
 
