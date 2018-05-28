@@ -7,7 +7,7 @@ from flask import (
 )
 from flask_login import login_required, current_user
 from sqlalchemy.sql.functions import func
-from wtforms import StringField, SubmitField
+from wtforms import TextAreaField, SubmitField
 
 from main import external_url, db
 from ..common.receipt import render_pdf
@@ -18,7 +18,7 @@ from . import get_user_payment_or_abort
 from . import payments
 
 class InvoiceForm(Form):
-    company = StringField('Company name')
+    company = TextAreaField('Company name')
     update = SubmitField('Update')
 
 @payments.route('/payment/<int:payment_id>/invoice', methods=['GET', 'POST'])

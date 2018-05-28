@@ -3,6 +3,20 @@ body {
   margin-bottom: 2ex;
 }
 
+.navbar {
+  margin-bottom: 0;
+}
+#edit-company {
+  padding: 10px;
+  background-color: #f8f8f8;
+  border: solid 0px #e7e7e7;
+  margin-bottom: 20px;
+  border-bottom-width: 1px;
+}
+#edit-company .btn {
+  margin-top: 5px;
+}
+
 .cancelled .table:before {
   content: 'CANCELLED';
   font-size: 50pt;
@@ -49,16 +63,15 @@ body {
   display: block;
 }
 
-.recipient-row {
-  padding-top: 20px;
-}
-
 .recipient {
   float: left;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 .invoice-details {
   float: right;
+  padding-top: 20px;
 }
 
 
@@ -149,8 +162,8 @@ dl.company-info dd:after {
   content: '.';
 }
 
-#edit-company.hidden {
-  display: none;
+.company, .edit-company {
+  white-space: pre-wrap;
 }
 
 .company {
@@ -171,6 +184,10 @@ dl.company-info dd:after {
     padding-top: 5ex;
     position: fixed;
     bottom: 0;
+  }
+
+  #edit-company {
+    display: none;
   }
 
   .company {
