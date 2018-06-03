@@ -1,4 +1,3 @@
-{% from "_datehelpers.html" import pprint_timedelta %}
 <table class="table tickets btns-table">
 <thead>
 <tr>
@@ -25,7 +24,7 @@
     {%- elif item.payment and item.payment.expired %}
     Unpaid
     {%- else %}
-    Pending
+    Reserved {% if item.payment.expires -%} until {{ item.payment.expires.day }} {{ '{:%B}'.format(item.payment.expires) }} {%- endif %}
     {% endif %}
 </td>
 <td>

@@ -1,4 +1,3 @@
-{% from "_datehelpers.html" import pprint_timedelta %}
 {% if show_receipt and feature_enabled('ISSUE_TICKETS') %}
 <p>
 <a class="btn btn-success" href="{{ url_for('tickets.receipt') }}">Printable ticket</a>
@@ -30,7 +29,7 @@
     {%- elif t.payment and t.payment.expired %}
     Unpaid
     {%- else %}
-    Pending {% if t.payment.expires -%} (expires in {{ pprint_timedelta(t.payment.expires_in) }}) {%- endif %}
+    Reserved {% if t.payment.expires -%} until {{ t.payment.expires.day }} {{ '{:%B}'.format(t.payment.expires) }} {%- endif %}
     {%- endif %}
 </td>
 <td>
