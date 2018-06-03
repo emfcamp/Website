@@ -22,7 +22,7 @@
             <dd>
                 {% if previous_vote.state == 'voted' %}
                     {% if previous_vote.vote == 0 %}
-                        Bad
+                        Poor
                     {% elif previous_vote.vote == 1 %}
                         OK
                     {% elif previous_vote.vote == 2 %}
@@ -86,7 +86,7 @@
             <div>&nbsp;</div>
             <div class="btn-group btn-group-justified">
                 <div class="btn-group">
-                    {{ form.vote_bad(class_="btn btn-success debounce", tabindex=1) }}
+                    {{ form.vote_poor(class_="btn btn-success debounce", tabindex=1) }}
                 </div>
                 <div class="btn-group">
                     {{ form.vote_ok(class_="btn btn-success debounce", tabindex=2) }}
