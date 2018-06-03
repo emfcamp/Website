@@ -821,7 +821,7 @@ def review_list():
                            to_review=to_review, reviewed=reviewed, form=form)
 
 class VoteForm(Form):
-    vote_bad = SubmitField('Bad')
+    vote_poor = SubmitField('Poor')
     vote_ok = SubmitField('OK')
     vote_excellent = SubmitField('Excellent')
 
@@ -886,7 +886,7 @@ def review_proposal(proposal_id):
 
         vote_value = 2 if form.vote_excellent.data else\
                      1 if form.vote_ok.data else\
-                     0 if form.vote_bad.data else None
+                     0 if form.vote_poor.data else None
 
         # Update vote state
         message = 'error'
@@ -894,7 +894,7 @@ def review_proposal(proposal_id):
             vote.vote = vote_value
             vote.set_state('voted')
             review_order.remove(prop.id)
-            message = 'You voted: ' + (['Bad', 'OK', 'Excellent'][vote_value])
+            message = 'You voted: ' + (['Poor', 'OK', 'Excellent'][vote_value])
 
         elif form.recuse.data:
             vote.set_state('recused')
