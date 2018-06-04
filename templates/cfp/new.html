@@ -13,28 +13,35 @@
   <div class="well" id="cfp-errors">
     <form action={{ url_for('cfp.form', cfp_type=cfp_type) + ('?closed' if ignore_closed else '') }} method="post" class="form-horizontal cfp-form" role="form">
       {{ form.hidden_tag() }}
-      {% if not current_user.is_authenticated %}
       <fieldset>
         <legend>Your details</legend>
-        {% if form.email.was_duplicate %}
+        {% if current_user.is_anonymous %}
+          {% if form.email.was_duplicate %}
           <div class="alert alert-warning">
               This email address already exists in our system, possibly because you previously tried to submit a proposal and
               we automatically created an account for you.
               Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('.main', cfp_type=cfp_type) + ('?closed' if ignore_closed else ''), email=form.email.data) }}" target="_new">click here</a> to log in.
           </div>
-        {% else %}
+          {% else %}
           <p>
             <a href="{{ url_for('users.login', next=url_for('.main', cfp_type=cfp_type) + ('?closed' if ignore_closed else '')) }}" target="_blank">Please log in</a> if you've already bought a ticket (or had one transferred to you). We will use this address for any questions about your proposal.</p>
+          {% endif %}
+        {% else %}
+          <div class="alert alert-info">
+          <div>We will use this address for any questions about your proposal, so if it isn't you, please <a href="{{ url_for('users.logout') }}">log out</a>.</div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Email</label>
+            <div class="col-sm-9">
+              <div class="form-control-static">{{ current_user.email }}</div>
+            </div>
+          </div>
         {% endif %}
         {{ render_field(form.name, horizontal=9, placeholder="Your name" + (' (or pseudonym)' if cfp_type != 'youthworkshop' else '')) }}
+        {% if current_user.is_anonymous %}
         {{ render_field(form.email, horizontal=9, placeholder="Your email address") }}
+        {% endif %}
       </fieldset>
-      {% else %}
-      <div class="alert alert-info">
-      <p>Your proposal will be associated with your existing account: {{ current_user.email }}</p>
-      <div>We will use this address for any questions about your proposal, so if it isn't you, please <a href="{{ url_for('users.logout') }}">log out</a>.</div>
-      </div>
-      {% endif %}
 
       <fieldset>
           <legend>About your {{form.model.human_type}}</legend>

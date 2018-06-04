@@ -88,7 +88,7 @@ class TicketsForm(Form):
 
 
 class TicketsNewUserForm(TicketsForm):
-    name = StringField('Name', [Required()])
+    name = StringField('Name')
     email = EmailField('Email', [Email(), Required()])
 
     def validate_email(form, field):
@@ -260,10 +260,13 @@ def tickets_reserve(user_id=None):
 
     if form.validate_on_submit():
         if new_user:
-            app.logger.info('Creating new user with email %s and name %s',
-                            form.email.data, form.name.data)
-            user = User(form.email.data, form.name.data)
-            flash('Created account for %s' % form.email.data)
+            email, name = form.email.data, form.name.data
+            if not name:
+                name = email
+
+            app.logger.info('Creating new user with email %s and name %s', email, name)
+            user = User(email, name)
+            flash('Created account for %s' % name)
 
             db.session.add(user)
 

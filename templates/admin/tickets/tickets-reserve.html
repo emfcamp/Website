@@ -15,7 +15,7 @@
 </dl>
 {% else %}
 <p>To reserve tickets, pick a user below or enter details for a new account:</p>
-{{ render_field(form.name, True) }}
+{{ render_field(form.name, True, placeholder="Optional") }}
 {{ render_field(form.email, True) }}
 {% endif %}
 

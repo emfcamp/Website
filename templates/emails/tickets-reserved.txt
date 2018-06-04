@@ -1,4 +1,8 @@
+{%- if user.name != user.email -%}
 Hi {{ user.name }},
+{%- else -%}
+Hi,
+{%- endif %}
 
 You've been reserved {% if tickets | count > 1 -%} {{ tickets | count }} tickets {%- else -%} a ticket {%- endif %} to Electromagnetic Field {{ event_year }}.
 

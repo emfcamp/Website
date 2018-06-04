@@ -35,7 +35,7 @@
 <form method="post" class="pay-method">
 {{ form.hidden_tag() }}
 
-{% if is_anonymous %}
+{% if current_user.is_anonymous or current_user.name == current_user.email %}
 <h3>Your Details</h3>
 
 {% if form.email.was_duplicate %}

@@ -336,7 +336,8 @@ def pay(flow=None):
 
     if not current_user.is_anonymous:
         del form.email
-        del form.name
+        if current_user.name != current_user.email:
+            del form.name
 
     basket = Basket.from_session(current_user, get_user_currency())
     if not any(basket.values()):
@@ -365,6 +366,9 @@ def pay(flow=None):
                 return None
 
             user = new_user
+
+        elif user.name == user.email:
+            user.name = form.name.data
 
         if form.allow_promo.data:
             user.promo_opt_in = True

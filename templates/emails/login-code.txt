@@ -1,4 +1,8 @@
+{%- if user.name != user.email %}
 Hi {{ user.name }},
+{%- else %}
+Hi,
+{%- endif %}
 
 Here's your link to log into the Electromagnetic Field web site. It will
 expire in 6 hours:

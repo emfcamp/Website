@@ -1,16 +1,36 @@
 {% from "_formhelpers.html" import render_field %}
 <div class="panel panel-default">
-    <div class="panel-body">
+    <div class="panel-body form-horizontal">
         <p>We'll need your name and the email address to send your ticket to,
-            so please make sure they're correct:</p>
-            {{ render_field(form.name, horizontal=True) }}
-            {{ render_field(form.email, horizontal=True) }}
-            <div class="form-group col-sm-12">
-            {{ form.allow_promo() }}
-            <label class="control-label" for="allow_promo">
-                Send me occasional emails about future EMF events
-            </label>
-            </div>
+           so please make sure they're correct:</p>
+        {% if current_user.is_anonymous or current_user.name == current_user.email %}
+        {{ render_field(form.name, horizontal=True) }}
+        {% else %}
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Name</label>
+          <div class="col-sm-10">
+            <div class="form-control-static">{{ current_user.name }}</div>
+          </div>
+        </div>
+        {% endif %}
+        {% if current_user.is_anonymous %}
+        {{ render_field(form.email, horizontal=True) }}
+        {% else %}
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Email</label>
+          <div class="col-sm-10">
+            <div class="form-control-static">{{ current_user.email }}</div>
+          </div>
+        </div>
+        {% endif %}
+        <div class="form-group">
+          <div class="col-sm-offset-1">
+          {{ form.allow_promo() }}
+          <label class="control-label" for="allow_promo">
+              Send me occasional emails about future EMF events
+          </label>
+          </div>
+        </div>
         <div class="col-sm-12">
         <p><small>Your name and email are used to manage your ticket and contact you with
             information about the event. Unless you choose to receive emails in future,
@@ -18,5 +38,5 @@
             We don't send your personal data to anyone else.
             <a href="{{ url_for('base.privacy') }}" target="_blank">More privacy info</a>.</small></p>
         </div>
-    </div>
+      </div>
 </div>

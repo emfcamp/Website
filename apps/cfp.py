@@ -143,8 +143,9 @@ def form(cfp_type='talk'):
 
     # If the user is already logged in set their name & email for the form
     if current_user.is_authenticated:
-        form.name.data = current_user.name
         form.email.data = current_user.email
+        if current_user.name != current_user.email:
+            form.name.data = current_user.name
 
     if request.method == 'POST':
         app.logger.info('Checking %s proposal for %s (%s)', cfp_type,
@@ -160,6 +161,9 @@ def form(cfp_type='talk'):
                 app.logger.warn('Adding user raised %r, possible double-click', e)
                 flash('An error occurred while creating an account for you. Please try again.')
                 return redirect(url_for('.main'))
+
+        elif current_user.name == current_user.email:
+            current_user.name = form.name.data
 
         if cfp_type == 'talk':
             cfp = TalkProposal()
