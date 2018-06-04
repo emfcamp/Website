@@ -13,7 +13,7 @@ you important information nearer the event.
 
 You can log in and pay for your {% if tickets | count > 1 -%} tickets {%- else -%} ticket {%- endif %} here:
 
-  {{ external_url('users.login', code=code, next=url_for('tickets.tickets_reserved')) }}
+  {{ external_url('users.login', code=code, next=url_for('tickets.tickets_reserved', currency=currency)) }}
 
 
 Love,

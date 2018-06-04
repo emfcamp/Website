@@ -27,7 +27,7 @@ CURRENCIES = [
     Currency('GBP', u'£'),
     Currency('EUR', u'€'),
 ]
-CURRENCY_SYMBOLS = dict((c.code, c.symbol) for c in CURRENCIES)
+CURRENCY_SYMBOLS = {c.code: c.symbol for c in CURRENCIES}
 
 
 def load_utility_functions(app_obj):

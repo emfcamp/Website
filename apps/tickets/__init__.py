@@ -28,7 +28,7 @@ from models.purchase import Ticket
 from models.site_state import get_sales_state, config_date
 
 from ..common import (
-    get_user_currency, set_user_currency,
+    CURRENCY_SYMBOLS, get_user_currency, set_user_currency,
     feature_flag, create_current_user, feature_enabled,
 )
 from ..common.receipt import (
@@ -77,16 +77,21 @@ def tickets_clear(flow=None):
 
 
 @tickets.route("/tickets/reserved")
+@tickets.route("/tickets/reserved/<currency>")
 @tickets.route("/tickets/<flow>/reserved")
+@tickets.route("/tickets/<flow>/reserved/<currency>")
 @feature_flag('TICKET_SALES')
-def tickets_reserved(flow=None):
+def tickets_reserved(flow=None, currency=None):
     if current_user.is_anonymous:
         return redirect(url_for('users.login', next=url_for('.tickets_reserved', flow=flow)))
 
     basket = Basket(current_user, get_user_currency())
     basket.load_purchases_from_db()
-
     basket.save_to_session()
+
+    if currency in CURRENCY_SYMBOLS:
+        set_user_currency(currency)
+
     return redirect(url_for('tickets.pay', flow=flow))
 
 
@@ -404,7 +409,6 @@ def pay(flow=None):
 
     return render_template('payment-choose.html', form=form,
                            basket=basket, total=basket.total,
-                           is_anonymous=current_user.is_anonymous,
                            flow=flow)
 
 

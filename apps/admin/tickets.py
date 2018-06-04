@@ -10,7 +10,7 @@ from flask_mail import Message
 
 from wtforms.validators import Optional, Required, Email, ValidationError
 from wtforms import (
-    SubmitField, StringField,
+    SubmitField, StringField, SelectField,
     FieldList, FormField,
 )
 from wtforms.fields.html5 import EmailField
@@ -29,7 +29,7 @@ from models.purchase import (
     Purchase, Ticket, PurchaseTransfer, bought_states,
 )
 
-from ..common import feature_enabled
+from ..common import feature_enabled, CURRENCY_SYMBOLS
 from ..common.forms import Form, IntegerSelectField, HiddenIntegerField
 from ..common.receipt import attach_tickets
 
@@ -84,6 +84,7 @@ class TicketAmountForm(Form):
 
 class TicketsForm(Form):
     price_tiers = FieldList(FormField(TicketAmountForm))
+    currency = SelectField('Currency', choices=[(None, '')] + list(CURRENCY_SYMBOLS.items()))
     allocate = SubmitField('Allocate tickets')
 
 
@@ -270,7 +271,13 @@ def tickets_reserve(user_id=None):
 
             db.session.add(user)
 
-        basket = Basket(user, 'GBP')
+        currency = form.currency.data
+
+        if currency:
+            basket = Basket(user, currency)
+        else:
+            basket = Basket(user, 'GBP')
+
         for f in form.price_tiers:
             if f.amount.data:
                 basket[f._tier] = f.amount.data
@@ -295,7 +302,7 @@ def tickets_reserve(user_id=None):
 
         msg.body = render_template('emails/tickets-reserved.txt',
                             user=user, code=code, tickets=basket.purchases,
-                            new_user=new_user)
+                            new_user=new_user, currency=currency)
 
         mail.send(msg)
         db.session.commit()

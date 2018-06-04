@@ -27,6 +27,9 @@ class Basket(MutableMapping):
 
     def __init__(self, user, currency):
         self.user = user
+        # Due to the Price, reserved Purchases have an implicit currency,
+        # but this shouldn't be relied on until they're attached to a Payment.
+        # Totals should be calculated based on the basket's currency.
         self.currency = currency
         self._lines = []
 
@@ -92,6 +95,9 @@ class Basket(MutableMapping):
         return [p for line in self._lines for p in line.purchases[line.count:]]
 
     def set_currency(self, currency):
+        # We do this half to save loading the wrong prices on the next page,
+        # and half so there's a record of how often currency changes happen.
+        # When Basket is stored in the DB, we'll just update it there.
         for line in self._lines:
             for purchase in line.purchases:
                 purchase.change_currency(currency)
@@ -241,9 +247,9 @@ class Basket(MutableMapping):
             return None
 
         for purchase in self.purchases:
-            # Sanity checks for possible race conditions
-            if purchase.price.currency != self.currency:
-                raise Exception("Currency mismatch got: {}, expected: {}".format(self.currency, purchase.price.currency))
+            # Reserved purchases can be of a different currency if they were
+            # recovered into separate sessions, or specified in the reserved URL
+            purchase.change_currency(self.currency)
 
             if purchase.state != 'reserved':
                 raise Exception("Purchase {} state is {}, not reserved".format(purchase.id, purchase.state))

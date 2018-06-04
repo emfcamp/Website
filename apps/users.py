@@ -182,6 +182,7 @@ def set_currency():
         abort(400)
 
     set_user_currency(request.form['currency'])
+    db.session.commit()
     return redirect(url_for('tickets.main'))
 
 
