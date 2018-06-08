@@ -14,8 +14,7 @@ from .user import User
 
 # state: [allowed next state, ] pairs
 CFP_STATES = { 'edit': ['accepted', 'rejected', 'new'],
-               'new': ['accepted', 'rejected', 'locked'],
-               'locked': ['accepted', 'rejected', 'checked', 'edit'],
+               'new': ['accepted', 'rejected', 'checked'],
                'checked': ['accepted', 'rejected', 'anonymised', 'anon-blocked', 'edit'],
                'rejected': ['accepted', 'rejected', 'edit'],
                'cancelled': ['accepted', 'rejected', 'edit'],

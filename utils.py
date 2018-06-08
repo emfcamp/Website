@@ -8,8 +8,7 @@ from main import create_app
 from tasks.admin import MakeAdmin, CreatePermissions, SendEmails
 from tasks.banking import CreateBankAccounts, LoadOfx, Reconcile
 from tasks.cfp import (
-    ImportCFP, LockProposals, EmailSpeakersAboutSlot,
-    EmailSpeakersAboutFinalising, RejectUnacceptedTalks
+    ImportCFP, EmailSpeakersAboutSlot, EmailSpeakersAboutFinalising, RejectUnacceptedTalks
 )
 from tasks.dev import MakeFakeData
 from tasks.external_calendars import (
@@ -39,7 +38,6 @@ if __name__ == "__main__":
     manager.add_command('createtickets', CreateTickets())
     manager.add_command('sendtickets', SendTickets())
 
-    manager.add_command('lockproposals', LockProposals())
     manager.add_command('importcfp', ImportCFP())
 
     manager.add_command('createperms', CreatePermissions())

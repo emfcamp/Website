@@ -1,5 +1,4 @@
 # coding=utf-8
-from datetime import datetime, timedelta
 from unicodecsv import DictReader
 
 from faker import Faker
@@ -62,26 +61,6 @@ class ImportCFP(Command):
                 count += 1
 
         app.logger.info('Imported %s proposals' % count)
-
-
-class LockProposals(Command):
-
-    def run(self):
-        edit_window = timedelta(days=app.config.get('EDIT_WINDOW', 2))
-        app.logger.info('Locking proposals older than %s', edit_window)
-        new_proposals = Proposal.query.filter_by(state='new').all()
-        lock_count = 0
-        for proposal in new_proposals:
-            deadline = proposal.created + edit_window
-
-            if datetime.utcnow() > deadline:
-                proposal.set_state('locked')
-
-                app.logger.debug('Locking proposal %s', proposal.id)
-                db.session.commit()
-                lock_count += 1
-
-        app.logger.info('Locked %s proposals', lock_count)
 
 
 class EmailSpeakersAboutSlot(Command):

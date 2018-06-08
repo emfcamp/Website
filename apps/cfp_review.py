@@ -188,11 +188,11 @@ class UpdateProposalForm(Form):
     potential_time = StringField('Potential Time')
     potential_venue = StringField('Potential Venue')
 
-    update = SubmitField('Force update')
-    reject = SubmitField('Reject')
-    checked = SubmitField('Send for Anonymisation')
-    accept = SubmitField('Accept and send standard email')
-    reject_with_message = SubmitField('Reject and send standard email')
+    update = SubmitField('Update')
+    reject = SubmitField('Reject without telling user')
+    checked = SubmitField('Send for anonymisation')
+    accept = SubmitField('Accept and send email')
+    reject_with_message = SubmitField('Reject and send email')
 
     def update_proposal(self, proposal):
         proposal.title = self.title.data
