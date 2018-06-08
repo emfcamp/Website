@@ -11,7 +11,7 @@ from tasks.cfp import (
     ImportCFP, LockProposals, EmailSpeakersAboutSlot,
     EmailSpeakersAboutFinalising, RejectUnacceptedTalks
 )
-from tasks.dev import CreateDB, MakeFakeUsers, MakeFakeTickets
+from tasks.dev import MakeFakeData
 from tasks.external_calendars import (
     CreateCalendars, RefreshCalendars, ExportCalendars
 )
@@ -27,7 +27,6 @@ from tasks.exportdb import ExportDB
 
 if __name__ == "__main__":
     manager = Manager(create_app())
-    manager.add_command('createdb', CreateDB())
     manager.add_command('db', MigrateCommand)
     manager.add_command('exportdb', ExportDB())
 
@@ -45,8 +44,7 @@ if __name__ == "__main__":
 
     manager.add_command('createperms', CreatePermissions())
     manager.add_command('makeadmin', MakeAdmin())
-    manager.add_command('makefakeusers', MakeFakeUsers())
-    manager.add_command('makefaketickets', MakeFakeTickets())
+    manager.add_command('makefakedata', MakeFakeData())
 
     manager.add_command('sendemails', SendEmails())
 

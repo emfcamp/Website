@@ -66,8 +66,8 @@ cancelreservedtickets:
 sendtickets:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py sendtickets
 
-faketickets:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makefaketickets
+fakedata:
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makefakedata
 
 lockproposals:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py lockproposals
@@ -112,9 +112,6 @@ testemails:
 
 admin:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makeadmin ${ARGS}
-
-users:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makefakeusers
 
 arrivals:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makearrivals
