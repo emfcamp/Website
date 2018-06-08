@@ -14,7 +14,7 @@ from .user import User
 
 # state: [allowed next state, ] pairs
 CFP_STATES = { 'edit': ['accepted', 'rejected', 'new'],
-               'new': ['accepted', 'rejected', 'checked'],
+               'new': ['accepted', 'rejected', 'checked', 'manual-review'],
                'checked': ['accepted', 'rejected', 'anonymised', 'anon-blocked', 'edit'],
                'rejected': ['accepted', 'rejected', 'edit'],
                'cancelled': ['accepted', 'rejected', 'edit'],
@@ -70,6 +70,11 @@ DEFAULT_VENUES = {
     'performance': ['Stage A'],
     'installation': [],
 }
+
+# List of submission types which are manually reviewed rather than through
+# the anonymous review system.
+MANUAL_REVIEW_TYPES = ['youthworkshop', 'performance', 'installation']
+
 
 class CfpStateException(Exception):
     pass

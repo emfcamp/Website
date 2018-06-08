@@ -23,7 +23,7 @@ from .common import require_permission
 from .majority_judgement import calculate_max_normalised_score
 from models.cfp import (
     Proposal, CFPMessage, CFPVote, CFP_STATES, Venue,
-    InvalidVenueException,
+    InvalidVenueException, MANUAL_REVIEW_TYPES
 )
 from .common.forms import Form, HiddenIntegerField
 
@@ -190,7 +190,7 @@ class UpdateProposalForm(Form):
 
     update = SubmitField('Update')
     reject = SubmitField('Reject without telling user')
-    checked = SubmitField('Send for anonymisation')
+    checked = SubmitField('Mark as checked')
     accept = SubmitField('Accept and send email')
     reject_with_message = SubmitField('Reject and send email')
 
@@ -369,8 +369,12 @@ def update_proposal(proposal_id):
             send_email_for_proposal(prop, accepted=True)
 
         elif form.checked.data:
-            msg = 'Sending proposal %s for anonymisation' % proposal_id
-            prop.set_state('checked')
+            if prop.type in MANUAL_REVIEW_TYPES:
+                msg = 'Sending proposal %s for manual review' % proposal_id
+                prop.set_state('manual-review')
+            else:
+                msg = 'Sending proposal %s for anonymisation' % proposal_id
+                prop.set_state('checked')
 
             if not next_id:
                 return log_and_close(msg, '.proposals')
