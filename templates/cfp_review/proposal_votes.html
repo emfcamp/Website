@@ -31,7 +31,7 @@
                 %}
                     <tr {%- if loop.first %} class="active" {%- endif %}>
                         {% if loop.first %}
-                            <td>{{ vote.user.name }}</td>
+                            <td><a href="{{ url_for('admin.user', user_id=vote.user.id) }}">{{vote.user.name}}</small></a></td>
                             <td>{{ ver.modified.strftime('%d/%m') }}</td>
                         {% else %}
                             <td>&nbsp;</td>
