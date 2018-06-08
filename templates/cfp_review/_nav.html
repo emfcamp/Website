@@ -19,7 +19,7 @@
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                 aria-haspopup="true" aria-expanded="false"
             >
-                Proposals {{ badge(proposal_counts['locked'] + proposal_counts['anon-blocked']) }} <span class="caret"></span>
+                Proposals {{ badge(proposal_counts['anon-blocked']) }} <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
                 {{ menuitem("All", ".proposals") }}
@@ -37,7 +37,7 @@
                 <li role="separator" class="divider"></li>
                 {% for state in ordered_states %}
                     {# Only show badges for locked & blocked proposals as these are what matters #}
-                    {% if state in ['locked', 'anon-blocked'] %}
+                    {% if state == 'anon-blocked' %}
                         {{ menuitem(state | capitalize, ".proposals", proposal_counts[state], state=state)}}
                     {% else %}
                         {{ menuitem(state | capitalize, ".proposals", state=state)}}
