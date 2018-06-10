@@ -23,7 +23,7 @@ from models.exc import CapacityException
 from models.user import User
 from models.payment import Payment
 from models.product import (
-    Product, PriceTier, Price,
+    ProductGroup, Product, PriceTier, Price,
 )
 from models.purchase import (
     Purchase, Ticket, PurchaseTransfer, bought_states,
@@ -234,8 +234,8 @@ def cancel_free_ticket(ticket_id):
 @admin.route('/tickets/reserve/<int:user_id>', methods=['GET', 'POST'])
 @admin_required
 def tickets_reserve(user_id=None):
-    pts = PriceTier.query.join(Product) \
-                         .order_by(Product.name).all()
+    pts = PriceTier.query.join(Product, ProductGroup) \
+                         .order_by(ProductGroup.name, Product.display_name, Product.id).all()
 
     if user_id is None:
         form = TicketsNewUserForm()
