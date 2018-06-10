@@ -1,12 +1,9 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
-
 decorator = "*"
 "iso8601" = "*"
 python-levenshtein = "==0.12.0"
@@ -35,7 +32,7 @@ cssmin = "==0.2.0"
 jsmin = "==2.2.2"
 flask-mail = "==0.9.1"
 flask-wtf = "==0.12"
-wtforms = "==2.1"
+wtforms = "==2.2.1"
 flask-script = "==2.0.6"
 flask-login = "==0.4.0"
 flask-debugtoolbar = "*"
@@ -60,16 +57,12 @@ pyyaml = "*"
 prometheus-client = "*"
 pyppeteer = "*"
 
-
 [dev-packages]
-
 pytest = "*"
 mock = "*"
 "flake8" = "*"
 locust = "*"
 ipdb = "*"
 
-
 [requires]
-
 python_version = "3.5"
