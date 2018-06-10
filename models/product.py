@@ -307,14 +307,16 @@ class ProductView(db.Model):
 
     """ A selection of products to be shown together for sale. """
     id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String, nullable=False)
     name = db.Column(db.String, nullable=False, index=True)
     token = db.Column(db.String, nullable=True)
 
     product_view_products = db.relationship('ProductViewProduct', backref='view', order_by='ProductViewProduct.order')
     products = association_proxy('product_view_products', 'product')
 
-    def __init__(self, name):
+    def __init__(self, name, type):
         self.name = name
+        self.type = type
 
     @classmethod
     def get_by_name(cls, name):

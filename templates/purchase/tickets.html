@@ -1,3 +1,20 @@
+{% if not available %}
+<div class="well">
+  <p class="emphasis">There are no tickets currently available for Electromagnetic Field {{ event_year }},
+                      but more will be on sale soon.
+  </p>
+  <p>Please follow us <a href="https://twitter.com/emfcamp">on Twitter</a> or
+  join our mailing list to be notified when more tickets are on sale:</p>
+  {% include "home/_mailchimp_form.html" %}
+  <p>We can't reserve any tickets, but if we accept your
+  {% if config['CFP'] %}
+  <a href="{{url_for('cfp.main')}}">talk, workshop, or installation proposal</a>,
+  {% else %}
+  talk, workshop, or installation proposal,
+  {% endif %}
+  you will be guaranteed <strong>two</strong> tickets to EMF.</p>
+</div>
+{% endif %}
 
 <h4>A ticket to Electromagnetic Field will get you:</h4>
 <ul>
@@ -22,5 +39,10 @@
   <strong>Accessibility:</strong> we're committed to making EMF as accessible as we can.
   If you have any requirements or requests you would like to discuss with us please
   feel free to email us on <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">{{ config['TICKETS_EMAIL'][1] }}</a>. We offer free tickets for carers; please drop us an email after you've bought your ticket.
+</p>
+
+<p>
+  By buying a ticket you are agreeing to our <a href="{{url_for('payments.terms')}}">Terms
+  and Conditions</a> and the <a href="{{url_for('base.code_of_conduct')}}">Code of Conduct</a>.
 </p>
 
