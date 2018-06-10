@@ -107,7 +107,7 @@ def create_app(dev_server=False):
     for extension in (cdn, csrf, cache, db, mail, assets, toolbar):
         extension.init_app(app)
 
-    migrate.init_app(app, db, render_as_batch=True)
+    migrate.init_app(app, db)
 
     login_manager.setup_app(app, add_context_processor=True)
     app.login_manager.login_view = 'users.login'
