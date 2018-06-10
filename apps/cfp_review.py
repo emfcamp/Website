@@ -778,7 +778,7 @@ def review_list():
                 proposal.is_new = True
                 to_review_again.append(proposal)
             else:
-                reviewed.append(((vote.state, vote.vote, vote.modified), proposal))
+                reviewed.append(((vote.state, vote.vote or 0, vote.modified), proposal))
         else:
             # modified doesn't really describe when proposals are "new", but it's near enough
             if last_visit is None or review_order_dt is None or proposal.modified < review_order_dt:
