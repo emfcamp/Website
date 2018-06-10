@@ -41,14 +41,7 @@
         </ul>
     </li>
     {{ menuitem("Products", "admin.products") }}
-    <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
-            aria-haspopup="true" aria-expanded="false">CfP <span class="caret"></span></a>
-        <ul class="dropdown-menu">
-            {{ menuitem("Proposals", "cfp_review.proposals") }}
-            {{ menuitem("Messages", "cfp_review.all_messages") }}
-        </ul>
-    </li>
+    {{ menuitem("CfP", "cfp_review.main") }}
     <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
             aria-haspopup="true" aria-expanded="false">Users <span class="caret"></span></a>
