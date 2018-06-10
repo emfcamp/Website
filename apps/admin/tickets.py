@@ -15,18 +15,15 @@ from wtforms import (
 )
 from wtforms.fields.html5 import EmailField
 
-from sqlalchemy.sql.functions import func
-
 from main import db, mail
 from models.basket import Basket
 from models.exc import CapacityException
 from models.user import User
-from models.payment import Payment
 from models.product import (
     ProductGroup, Product, PriceTier, Price,
 )
 from models.purchase import (
-    Purchase, Ticket, PurchaseTransfer, bought_states,
+    Purchase, Ticket, PurchaseTransfer,
 )
 
 from ..common import feature_enabled, CURRENCY_SYMBOLS
@@ -51,30 +48,6 @@ def tickets_unpaid():
                             .order_by(Purchase.id).all()
 
     return render_template('admin/tickets/tickets.html', tickets=tickets)
-
-
-@admin.route('/ticket-report')
-def ticket_report():
-    # This is an admissions-based view, so includes expired tickets
-    totals = Ticket.query.outerjoin(Payment) \
-        .filter(Ticket.state.in_(bought_states)) \
-        .with_entities(PriceTier.name, func.count()) \
-        .group_by(PriceTier.name).all()
-
-    totals = dict(totals)
-
-    query = Ticket.query.filter_by(is_paid_for=True).join(PriceTier, Price) \
-        .with_entities(Product.name, func.count(), func.sum(Price.price_int)) \
-        .group_by(Product.name)
-
-    accounting_totals = {}
-    for row in query.all():
-        accounting_totals[row[0]] = {
-            'count': row[1],
-            'total': row[2]
-        }
-
-    return render_template('admin/tickets/ticket-report.html', totals=totals, accounting_totals=accounting_totals)
 
 
 class TicketAmountForm(Form):
