@@ -842,36 +842,67 @@ class VoteForm(Form):
             raise ValidationError("Please let us know what's unclear")
 
 
+def can_review_proposal(proposal):
+    if proposal.state != 'anonymised':
+        return False
+
+    if current_user.has_permission('cfp_admin'):
+        return True
+
+    if proposal.user == current_user:
+        return False
+
+    if proposal.type == 'installation':
+        # Only admins can review installations currently
+        return False
+
+    return True
+
+
+def get_next_review_proposal(proposal_id):
+    review_order = session.get('review_order')
+    if proposal_id not in review_order:
+        return None
+
+    for i in review_order[review_order.index(proposal_id) + 1:]:
+        proposal = Proposal.query.get(i)
+        if can_review_proposal(proposal):
+            return i
+
+    return None
+
+
+@cfp_review.route('/review/<int:proposal_id>/next')
+@review_required
+def review_proposal_next(proposal_id):
+    next_proposal_id = get_next_review_proposal(proposal_id)
+    if next_proposal_id is None:
+        return redirect(url_for('.review_list'))
+
+    return redirect(url_for('.review_proposal', proposal_id=next_proposal_id))
+
+
 @cfp_review.route('/review/<int:proposal_id>', methods=['GET', 'POST'])
 @review_required
 def review_proposal(proposal_id):
     prop = Proposal.query.get_or_404(proposal_id)
 
-    # Reviewers can only see anonymised proposals that aren't theirs
-    # Also, only admin are reviewing installations
-    if prop.state != 'anonymised'\
-            or prop.user == current_user\
-            or (prop.type == 'installation' and
-                not current_user.has_permission('cfp_admin')):
-        return abort(404)
+    if not can_review_proposal(prop):
+        app.logger.warn('Cannot review proposal %s', proposal_id)
+        flash("Cannot review proposal %s, continuing to next proposal" % proposal_id)
+        return redirect(url_for('.review_proposal_next', proposal_id=proposal_id))
 
-    form = VoteForm()
-
-    review_order = session.get('review_order')
     session['review_visit_dt'] = datetime.utcnow()
 
-    # If the review order is missing redirect to the list to rebuild it
-    if review_order is None:
-        return redirect(url_for('.review_list'))
-
-    if review_order and proposal_id in review_order:
-        index = review_order.index(proposal_id) + 1
-        next_id = review_order[index] if index < len(review_order) else None
-        remaining = len(review_order)
-
+    next_proposal_id = get_next_review_proposal(proposal_id)
+    if next_proposal_id is not None:
+        review_order = session.get('review_order')
+        remaining = len(review_order) - review_order.index(next_proposal_id)
     else:
         remaining = 0
-        next_id = False
+
+
+    form = VoteForm()
 
     vote = prop.get_user_vote(current_user)
 
@@ -897,36 +928,30 @@ def review_proposal(proposal_id):
         if vote_value is not None:
             vote.vote = vote_value
             vote.set_state('voted')
-            review_order.remove(prop.id)
             message = 'You voted: ' + (['Poor', 'OK', 'Excellent'][vote_value])
 
         elif form.recuse.data:
             vote.set_state('recused')
-            review_order.remove(prop.id)
             message = 'You declared a conflict of interest'
 
         elif form.question.data:
             vote.set_state('blocked')
-            review_order.remove(prop.id)
             message = 'You requested more information'
 
         elif form.change.data:
             vote.set_state('resolved')
             message = 'Proposal re-opened for review'
-            review_order.insert(0, proposal_id)
-            next_id = proposal_id
 
         flash(message, 'info')
-        session['review_order'] = review_order
         db.session.commit()
-        if not next_id:
+        if next_proposal_id is None:
             return redirect(url_for('.review_list'))
-        return redirect(url_for('.review_proposal', proposal_id=next_id))
+        return redirect(url_for('.review_proposal', proposal_id=next_proposal_id))
 
     if vote and vote.note:
         form.note.data = vote.note
     return render_template('cfp_review/review_proposal.html',
-                           form=form, proposal=prop, next_id=next_id,
+                           form=form, proposal=prop,
                            previous_vote=vote, remaining=remaining)
 
 class CloseRoundForm(Form):

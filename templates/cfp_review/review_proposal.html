@@ -104,13 +104,13 @@
         </div>
         <div class="col-xs-12">&nbsp;</div>
         <div class="col-xs-12 btn-group-vertical">
-            {% if next_id %}
-                <a href="{{ url_for('.review_proposal', proposal_id=next_id) }}" class="btn btn-default">
-                    View next proposal
+            {% if remaining %}
+                <a href="{{ url_for('.review_proposal_next', proposal_id=proposal.id) }}" class="btn btn-default">
+                    View next proposal ({{ remaining }} remaining)
                 </a>
             {% endif %}
             <a href="{{ url_for('.review_list') }}" class="btn btn-default">
-                View all proposals ({{ remaining }} un-reviewed)
+                View all proposals
             </a>
         </div>
     </form>
