@@ -18,7 +18,8 @@ class TicketAmountForm(Form):
 
 class TicketAmountsForm(Form):
     tiers = FieldList(FormField(TicketAmountForm))
-    buy = SubmitField('Buy Tickets')
+    buy_tickets = SubmitField('Buy Tickets')
+    buy_hire = SubmitField('Order')
     buy_other = SubmitField('Buy')
     currency_code = HiddenField('Currency')
     set_currency = StringField('Set Currency', [Optional()])

@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block title %}
-{% if flow.type == 'tickets' %}
+{% if view.type == 'tickets' %}
 Buy Tickets
-{% elif flow.type == 'hire' %}
+{% elif view.type == 'hire' %}
 Hire Equipment
 {% else %}
 Buy Items
@@ -40,9 +40,9 @@ Buy Items
 
 <thead>
 <tr>
-    {% if flow.type == 'tickets' %}
+    {% if view.type == 'tickets' %}
     <th>Ticket Type</th>
-    {% elif flow.type == 'hire' %}
+    {% elif view.type == 'hire' %}
     <th>Hire</th>
     {% else %}
     <th>Product</th>
@@ -110,9 +110,9 @@ Buy Items
 
 {% if available %}
 <div class="form-actions pull-right">
-    {% if flow.type == 'tickets' %}
+    {% if view.type == 'tickets' %}
     {{ form.buy_tickets(class_="btn btn-primary btn-lg debounce") }}
-    {% elif flow.type == 'hire' %}
+    {% elif view.type == 'hire' %}
     {{ form.buy_hire(class_="btn btn-primary btn-lg debounce") }}
     {% else %}
     {{ form.buy_other(class_="btn btn-primary btn-lg debounce") }}

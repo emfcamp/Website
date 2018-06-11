@@ -213,7 +213,7 @@ def main(flow=None):
             available = False
 
     if form.validate_on_submit():
-        if form.buy.data or form.buy_other.data:
+        if form.buy_tickets.data or form.buy_hire.data or form.buy_other.data:
             if form.currency_code.data != get_user_currency():
                 set_user_currency(form.currency_code.data)
                 # Commit so we don't lose the currency change if an error occurs
@@ -313,7 +313,7 @@ def main(flow=None):
               "allocate these tickets. You may be able to try again with a smaller amount.")
 
     form.currency_code.data = get_user_currency()
-    return render_template("tickets-choose.html", form=form, flow=flow, ticket_view=ticket_view, available=available)
+    return render_template("tickets-choose.html", form=form, flow=flow, view=view, available=available)
 
 
 @tickets.route("/tickets/pay", methods=['GET', 'POST'])
