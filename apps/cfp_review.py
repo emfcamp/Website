@@ -23,7 +23,8 @@ from .common import require_permission
 from .majority_judgement import calculate_max_normalised_score
 from models.cfp import (
     Proposal, CFPMessage, CFPVote, CFP_STATES, Venue,
-    InvalidVenueException, MANUAL_REVIEW_TYPES
+    InvalidVenueException, CfpStateException,
+    MANUAL_REVIEW_TYPES,
 )
 from .common.forms import Form, HiddenIntegerField
 
@@ -923,30 +924,37 @@ def review_proposal(proposal_id):
                      1 if form.vote_ok.data else\
                      0 if form.vote_poor.data else None
 
-        # Update vote state
-        message = 'error'
-        if vote_value is not None:
-            vote.vote = vote_value
-            vote.set_state('voted')
-            message = 'You voted: ' + (['Poor', 'OK', 'Excellent'][vote_value])
+        try:
+            # Update vote state
+            message = 'error'
+            if vote_value is not None:
+                vote.vote = vote_value
+                vote.set_state('voted')
 
-        elif form.recuse.data:
-            vote.set_state('recused')
-            message = 'You declared a conflict of interest'
+                message = 'You voted: ' + (['Poor', 'OK', 'Excellent'][vote_value])
 
-        elif form.question.data:
-            vote.set_state('blocked')
-            message = 'You requested more information'
+            elif form.recuse.data:
+                vote.set_state('recused')
+                message = 'You declared a conflict of interest'
 
-        elif form.change.data:
-            vote.set_state('resolved')
-            message = 'Proposal re-opened for review'
+            elif form.question.data:
+                vote.set_state('blocked')
+                message = 'You requested more information'
 
-        flash(message, 'info')
-        db.session.commit()
-        if next_proposal_id is None:
-            return redirect(url_for('.review_list'))
-        return redirect(url_for('.review_proposal', proposal_id=next_proposal_id))
+            elif form.change.data:
+                vote.set_state('resolved')
+                message = 'Proposal re-opened for review'
+
+            flash(message, 'info')
+            db.session.commit()
+            if next_proposal_id is None:
+                return redirect(url_for('.review_list'))
+            return redirect(url_for('.review_proposal', proposal_id=next_proposal_id))
+
+        except CfpStateException as e:
+            app.logger.warn('Cannot set state: %s', e)
+            flash("Your vote could not be updated: %s" % e)
+            return redirect(url_for('.review_proposal', proposal_id=proposal_id))
 
     if vote and vote.note:
         form.note.data = vote.note
