@@ -67,6 +67,10 @@ assets.register('css_admin', Bundle('css/admin.scss',
                 output='gen/admin-packed.css',
                 depends='css/*.scss',
                 filters=pyscss))
+assets.register('css_volunteering', Bundle('css/volunteering.scss',
+                output='gen/volunteering-packed.css',
+                depends='css/*.scss',
+                filters=pyscss)
 assets.register('css_invoice', Bundle('css/invoice.scss',
                 output='gen/invoice-packed.css',
                 depends='css/*.scss',
@@ -196,6 +200,7 @@ def create_app(dev_server=False):
     from apps.cfp_review import cfp_review
     from apps.schedule import schedule
     from apps.arrivals import arrivals
+    from apps.volunteering import volunteering
     app.register_blueprint(base)
     app.register_blueprint(users)
     app.register_blueprint(metrics)
@@ -205,6 +210,7 @@ def create_app(dev_server=False):
     app.register_blueprint(cfp_review, url_prefix='/cfp-review')
     app.register_blueprint(schedule)
     app.register_blueprint(arrivals, url_prefix='/arrivals')
+    app.register_blueprint(volunteering, url_prefix='/volunteering')
 
     if app.config.get('VOLUNTEERS'):
         from apps.volunteers import volunteers
