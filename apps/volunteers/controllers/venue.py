@@ -6,7 +6,7 @@ from wtforms.validators import ValidationError
 
 from main import db
 
-from models.volunteers.venue import Venue
+from models.volunteers.venue import VolunteerVenue
 
 from ...common.forms import Form, HiddenIntegerField
 
@@ -18,7 +18,7 @@ class VenueForm(Form):
     create = SubmitField('Save Venue')
 
     def validate_name(form, field):
-        venue = Venue.get_by_name(field.data)
+        venue = VolunteerVenue.get_by_name(field.data)
 
         if form.id.data == 0 and venue is not None:
             raise ValidationError('That venue already exists')
@@ -27,7 +27,7 @@ class VenueForm(Form):
 
 
 def create_new_from_form(form):
-    venue = Venue(name=form.name.data, mapref=form.mapref.data)
+    venue = VolunteerVenue(name=form.name.data, mapref=form.mapref.data)
     db.session.add(venue)
     db.session.commit()
     app.logger.info('%s created a new venue, %s (id: %s)',
@@ -35,7 +35,7 @@ def create_new_from_form(form):
     return venue
 
 def update_venue_from_form(form, venue_id):
-    venue = Venue.get_by_id(venue_id)
+    venue = VolunteerVenue.get_by_id(venue_id)
     venue.name = form.name.data
     venue.mapref = form.mapref.data
     db.session.commit()
@@ -44,14 +44,14 @@ def update_venue_from_form(form, venue_id):
     return venue
 
 def init_form_with_venue(form, venue_id):
-    venue = Venue.get_by_id(venue_id)
+    venue = VolunteerVenue.get_by_id(venue_id)
     form.id.data = venue.id
     form.name.data = venue.name
     form.mapref.data = venue.mapref
     return form
 
 def get_venue_by_id(id):
-    return Venue.get_by_id(id)
+    return VolunteerVenue.get_by_id(id)
 
 def get_venues():
-    return Venue.get_all()
+    return VolunteerVenue.get_all()
