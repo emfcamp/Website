@@ -1,7 +1,6 @@
 from flask import (
-    render_template, current_app as app
+    render_template,
 )
-from flask_login import current_user
 
 from ..common.forms import Form
 from . import volunteering

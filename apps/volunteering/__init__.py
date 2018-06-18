@@ -1,6 +1,5 @@
 from flask import (
     Blueprint, redirect, url_for, current_app as app,
-    render_template, abort
 )
 from flask_login import current_user
 
