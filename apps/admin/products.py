@@ -13,6 +13,7 @@ from main import db
 from models.user import User
 from models.product import (
     ProductGroup, Product, PriceTier, Price,
+    ProductView, ProductViewProduct,
 )
 from models.purchase import (
     Purchase, PurchaseTransfer,
@@ -20,7 +21,8 @@ from models.purchase import (
 
 from . import admin, admin_required
 from .forms import (EditProductForm, NewProductForm,
-                    NewProductGroupForm, EditProductGroupForm, PriceTierForm)
+                    NewProductGroupForm, EditProductGroupForm, PriceTierForm,
+                    ProductViewForm)
 
 
 @admin.route('/products')
@@ -214,3 +216,54 @@ def tees():
                             .order_by(User.name)
 
     return render_template('admin/products/tee-purchases.html', purchases=purchases)
+
+
+
+@admin.route('/product_views')
+@admin_required
+def product_views():
+    view_counts = ProductView.query.join(ProductView.product_view_products) \
+                             .with_entities(ProductView, func.count('*')) \
+                             .group_by(ProductView) \
+                             .order_by(ProductView.id).all()
+    return render_template('admin/products/views.html', view_counts=view_counts)
+
+
+@admin.route('/product_view/<int:view_id>', methods=['GET', 'POST'])
+@admin_required
+def product_view(view_id):
+    view = ProductView.query.get_or_404(view_id)
+
+    form = ProductViewForm(obj=view)
+    if request.method != 'POST':
+        # Empty form - populate pvps
+        for pvp in view.product_view_products:
+            form.pvps.append_entry()
+            f = form.pvps[-1]
+            f.product_id.data = pvp.product_id
+
+            f.order.data = pvp.order
+
+    pvp_dict = {pvp.product_id: pvp for pvp in view.product_view_products}
+    for f in form.pvps:
+        pvp = pvp_dict[f.product_id.data]
+        pvp._field = f
+
+    if form.validate_on_submit():
+        if form.update.data:
+            view.name = form.name.data
+            view.type = form.type.data
+            view.token = form.token.data
+
+            for f in form.pvps:
+                pvp_dict[f.product_id.data].order = f.order.data
+
+        else:
+            ProductViewProduct()
+            pass
+
+        db.session.commit()
+
+    return render_template('admin/products/view-edit.html', view=view, form=form)
+
+

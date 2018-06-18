@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block css %}
     {% assets "css_admin" -%}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
         <link rel="stylesheet" href="{{ ASSET_URL }}">
     {% endassets -%}
 {% endblock %}
@@ -33,4 +34,8 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block foot %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
 {% endblock %}

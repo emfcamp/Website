@@ -1,13 +1,14 @@
-from wtforms.validators import Optional
+from wtforms.validators import Optional, Required
 from wtforms.widgets import TextArea
 from wtforms import (
     SubmitField, StringField, SelectField,
     DateField, IntegerField, DecimalField,
+    FieldList, FormField,
 )
 
 from models.product import ProductGroup
 
-from ..common.forms import Form
+from ..common.forms import Form, HiddenIntegerField
 
 
 class ProductForm(Form):
@@ -84,3 +85,19 @@ class PriceTierForm(Form):
     price_gbp = DecimalField('Price (GBP)')
     price_eur = DecimalField('Price (EUR)')
     submit = SubmitField('Submit')
+
+
+class ProductViewProductOrderForm(Form):
+    order = IntegerField('Order', [Required()])
+    product_id = HiddenIntegerField('product_id', [Required()])
+
+
+class ProductViewForm(Form):
+    name = StringField('Name')
+    type = StringField('Type')
+    token = StringField('Token')
+    pvps = FieldList(FormField(ProductViewProductOrderForm))
+
+    update = SubmitField('Update')
+
+

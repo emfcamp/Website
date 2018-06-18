@@ -1,0 +1,42 @@
+{% extends "admin/base.html" %}
+{% from "_formhelpers.html" import render_field  %}
+
+{% set nav_active = 'product_views' %}
+{% block body %}
+
+<h2>Product View {{ view.name }}</h2>
+<form action="" method="post">
+{{ form.hidden_tag() }}
+
+{{ render_field(form.name, horizontal=False) }}
+{{ render_field(form.type, horizontal=False) }}
+{{ render_field(form.token, horizontal=False) }}
+
+<table class="table table-condensed table-striped">
+  <tr>
+    <th>Group</th>
+    <th>Product</th>
+    <th>Display Name</th>
+    <th>Order</th>
+    <th>Delete</th>
+  </tr>
+  {% for pvp in view.product_view_products %}
+  <tr>
+    <td>{{ pvp.product.parent.name }}</td>
+    <td><a tabindex="-1" href="{{ url_for('admin.product_details', product_id=pvp.product.id) }}">{{ pvp.product.name }}</a></td>
+    <td>{{ pvp.product.display_name }}</td>
+    <td>
+      {{ pvp._field.product_id() }}
+      {{ pvp._field.order(class_="form-control") }}
+    </td>
+    <td></td>
+  </tr>
+
+  {% endfor %}
+</table>
+
+{{ form.update(class_="btn btn-success debounce") }}
+
+</form>
+
+{% endblock %}

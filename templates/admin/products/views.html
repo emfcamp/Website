@@ -1,0 +1,22 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'product_views' %}
+{% block body %}
+
+<h2>Product Views</h2>
+<table class="table table-condensed table-striped">
+  <tr>
+    <th>Name</th>
+    <th>Type</th>
+    <th>Products</th>
+  </tr>
+  {% for view, count in view_counts %}
+  <tr>
+    <td><a href="{{ url_for('admin.product_view', view_id=view.id) }}">{{ view.name }}</a></td>
+    <td>{{ view.type }}</td>
+    <td>{{ count }}</td>
+  </tr>
+
+  {% endfor %}
+</table>
+
+{% endblock %}

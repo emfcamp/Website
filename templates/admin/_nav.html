@@ -39,7 +39,14 @@
             {{ menuitem("Furniture", ".furniture") }}
         </ul>
     </li>
-    {{ menuitem("Products", "admin.products") }}
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+            aria-haspopup="true" aria-expanded="false">Products <span class="caret"></span></a>
+        <ul class="dropdown-menu">
+            {{ menuitem("All", "admin.products") }}
+            {{ menuitem("Views", "admin.product_views") }}
+        </ul>
+    </li>
     {{ menuitem("CfP", "cfp_review.main") }}
     <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
