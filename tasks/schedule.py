@@ -71,9 +71,9 @@ class RunScheduler(Command):
             }
 
             if proposal.scheduled_venue:
-                export['venue'] = proposal.scheduled_venue
+                export['venue'] = proposal.scheduled_venue.id
             if proposal.potential_venue:
-                export['venue'] = proposal.potential_venue
+                export['venue'] = proposal.potential_venue.id
 
             if proposal.scheduled_time:
                 export['time'] = str(proposal.scheduled_time)
@@ -83,7 +83,48 @@ class RunScheduler(Command):
             proposal_data.append(export)
         return proposal_data
 
+    def handle_schedule_change(self, proposal, venue, time):
+        # Keep history of the venue while updating
+        current_scheduled_venue = None
+        previous_potential_venue = None
+        if proposal.scheduled_venue:
+            current_scheduled_venue = proposal.scheduled_venue
+        if proposal.potential_venue:
+            previous_potential_venue = proposal.potential_venue
+
+        proposal.potential_venue = venue
+        if str(proposal.potential_venue) == str(current_scheduled_venue):
+            proposal.potential_venue = None
+
+        # Same for time
+        previous_potential_time = proposal.potential_time
+        proposal.potential_time = parser.parse(time)
+        if proposal.potential_time == proposal.scheduled_time:
+            proposal.potential_time = None
+
+        if (str(proposal.potential_venue) == str(previous_potential_venue) and
+                proposal.potential_time == previous_potential_time):
+            # Nothing changed
+            return False
+
+        previous_venue_name = new_venue_name = None
+        if previous_potential_venue:
+            previous_venue_name = previous_potential_venue.name
+        if proposal.potential_venue:
+            new_venue_name = proposal.potential_venue.name
+
+        # And we want to try and make sure both are populated
+        if proposal.potential_venue and not proposal.potential_time:
+            proposal.potential_time = proposal.scheduled_time
+        if proposal.potential_time and not proposal.potential_venue:
+            proposal.potential_venue = proposal.scheduled_venue
+        app.logger.info('Moved "%s": "%s" at "%s" -> "%s" at "%s"' %
+                        (proposal.title, previous_venue_name, previous_potential_time,
+                         new_venue_name, proposal.potential_time))
+        return True
+
     def apply_changes(self, schedule):
+        changes = False
         for event in schedule:
             if 'time' not in event or not event['time']:
                 continue
@@ -91,42 +132,11 @@ class RunScheduler(Command):
                 continue
 
             proposal = Proposal.query.filter_by(id=event['id']).one()
+            venue = Venue.query.get(event['venue'])
+            changes |= self.handle_schedule_change(proposal, venue, event['time'])
 
-            # Keep history of the venue while updating
-            current_scheduled_venue = None
-            previous_potential_venue = None
-            if proposal.scheduled_venue:
-                current_scheduled_venue = proposal.scheduled_venue
-            if proposal.potential_venue:
-                previous_potential_venue = proposal.potential_venue
-
-            proposal.potential_venue = Venue.query.get(event['venue'])
-            if str(proposal.potential_venue) == str(current_scheduled_venue):
-                proposal.potential_venue = None
-
-            # Same for time
-            previous_potential_time = proposal.potential_time
-            proposal.potential_time = parser.parse(event['time'])
-            if proposal.potential_time == proposal.scheduled_time:
-                proposal.potential_time = None
-
-            # Then say what changed
-            if (str(proposal.potential_venue) != str(previous_potential_venue) or
-                    proposal.potential_time != previous_potential_time):
-                previous_venue_name = new_venue_name = None
-                if previous_potential_venue:
-                    previous_venue_name = previous_potential_venue.name
-                if proposal.potential_venue:
-                    new_venue_name = proposal.potential_venue.name
-
-                # And we want to try and make sure both are populated
-                if proposal.potential_venue and not proposal.potential_time:
-                    proposal.potential_time = proposal.scheduled_time
-                if proposal.potential_time and not proposal.potential_venue:
-                    proposal.potential_venue = proposal.scheduled_venue
-                app.logger.info('Moved "%s": "%s" at "%s" -> "%s" at "%s"' %
-                                (proposal.title, previous_venue_name, previous_potential_time,
-                                 new_venue_name, proposal.potential_time))
+        if not changes:
+            app.logger.info("No schedule changes generated")
 
 
     def run(self, persist):
