@@ -164,7 +164,7 @@ class ApplyPotentialSchedule(Command):
             (Proposal.potential_venue != None) | (Proposal.potential_time != None)).\
             filter(Proposal.scheduled_duration.isnot(None)).\
             filter(Proposal.state.in_(['accepted', 'finished'])).\
-            all()
+            all()  # noqa
 
         for proposal in proposals:
             user = proposal.user

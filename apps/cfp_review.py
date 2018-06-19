@@ -1105,7 +1105,7 @@ def rank():
 @schedule_required
 def potential_schedule_changes():
     proposals = Proposal.query.filter(
-        (Proposal.potential_venue != None) | (Proposal.potential_time != None)
+        (Proposal.potential_venue != None) | (Proposal.potential_time != None)  # noqa
     ).filter(Proposal.scheduled_duration.isnot(None)).all()
 
     for proposal in proposals:
