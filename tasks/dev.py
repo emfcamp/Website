@@ -5,7 +5,7 @@ from flask_script import Command
 
 from main import db
 from models.cfp import (TalkProposal, PerformanceProposal, WorkshopProposal,
-                        YouthWorkshopProposal, InstallationProposal)
+                        YouthWorkshopProposal, InstallationProposal, LENGTH_OPTIONS)
 from models.user import User
 
 def fake_proposal(fake):
@@ -17,6 +17,9 @@ def fake_proposal(fake):
     cfp.needs_help = random.random() < 0.2
     cfp.needs_money = random.random() < 0.2
     cfp.one_day = random.random() < 0.2
+
+    if type(cfp) in (TalkProposal, WorkshopProposal):
+        cfp.length = random.choice(LENGTH_OPTIONS)[0]
 
     states = {'accepted': 0.1,
               'rejected': 0.05,
@@ -64,7 +67,10 @@ class MakeFakeData(Command):
 
 
         for i in range(0, 500):
-            user = User(fake.safe_email(), fake.name())
+            email = fake.safe_email()
+            if User.get_by_email(email):
+                continue
+            user = User(email, fake.name())
 
             for i in range(0, int(round(random.uniform(0, 2)))):
                 cfp = fake_proposal(fake)

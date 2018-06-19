@@ -1,6 +1,4 @@
 # coding=utf-8
-import json
-
 from dateutil import parser
 from flask import render_template, current_app as app
 from flask_script import Command, Option
@@ -9,7 +7,7 @@ from flask_mail import Message
 from slotmachine import SlotMachine
 
 from main import db, mail
-from models.cfp import Proposal, Venue
+from models.cfp import Proposal, Venue, ROUGH_LENGTHS
 
 class ImportVenues(Command):
     venues = [
@@ -37,26 +35,24 @@ class ImportVenues(Command):
         db.session.commit()
 
 
-class SetRoughDurations(Command):
-    def run(self):
-        length_map = {
-            '> 45 mins': 60,
-            '25-45 mins': 30,
-            '10-25 mins': 20,
-            '< 10 mins': 10
-        }
+class RunScheduler(Command):
+    option_list = [
+        Option('-p', '--persist', dest='persist', action='store_true',
+            help='Persist the changes rather than doing a dry run')
+    ]
 
+    def set_rough_durations(self):
         proposals = Proposal.query.filter_by(scheduled_duration=None, type='talk').\
             filter(Proposal.state.in_(['accepted', 'finished'])).all()
 
         for proposal in proposals:
-            proposal.scheduled_duration = length_map[proposal.length]
-            app.logger.info('Setting duration for talk "%s" to "%s"' % (proposal.title, proposal.scheduled_duration))
+            proposal.scheduled_duration = ROUGH_LENGTHS[proposal.length]
+            app.logger.info('Setting duration for talk "%s" to "%s"' %
+                            (proposal.title, proposal.scheduled_duration))
 
         db.session.commit()
 
-class OutputSchedulerData(Command):
-    def run(self):
+    def get_scheduler_data(self):
         proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
             filter(Proposal.state.in_(['finished', 'accepted'])).\
             filter(Proposal.type.in_(['talk', 'workshop'])).all()
@@ -85,24 +81,9 @@ class OutputSchedulerData(Command):
                 export['time'] = str(proposal.potential_time)
 
             proposal_data.append(export)
+        return proposal_data
 
-        with open('schedule.json', 'w') as outfile:
-            json.dump(proposal_data, outfile, sort_keys=True, indent=4, separators=(',', ': '))
-
-        db.session.commit()
-
-class ImportSchedulerData(Command):
-    option_list = [
-        Option('-f', '--file', dest='filename',
-            help='The .json file to load',
-            default='schedule.json'),
-        Option('-p', '--persist', dest='persist', action='store_true',
-            help='Persist the changes rather than doing a dry run')
-    ]
-
-    def run(self, filename, persist):
-        schedule = json.load(open(filename))
-
+    def apply_changes(self, schedule):
         for event in schedule:
             if 'time' not in event or not event['time']:
                 continue
@@ -119,7 +100,7 @@ class ImportSchedulerData(Command):
             if proposal.potential_venue:
                 previous_potential_venue = proposal.potential_venue
 
-            proposal.potential_venue = event['venue']
+            proposal.potential_venue = Venue.query.get(event['venue'])
             if str(proposal.potential_venue) == str(current_scheduled_venue):
                 proposal.potential_venue = None
 
@@ -130,30 +111,42 @@ class ImportSchedulerData(Command):
                 proposal.potential_time = None
 
             # Then say what changed
-            if str(proposal.potential_venue) != str(previous_potential_venue) or proposal.potential_time != previous_potential_time:
+            if (str(proposal.potential_venue) != str(previous_potential_venue) or
+                    proposal.potential_time != previous_potential_time):
                 previous_venue_name = new_venue_name = None
                 if previous_potential_venue:
-                    previous_venue_name = Venue.query.filter_by(id=previous_potential_venue).one().name
+                    previous_venue_name = previous_potential_venue.name
                 if proposal.potential_venue:
-                    new_venue_name = Venue.query.filter_by(id=proposal.potential_venue).one().name
+                    new_venue_name = proposal.potential_venue.name
 
                 # And we want to try and make sure both are populated
                 if proposal.potential_venue and not proposal.potential_time:
                     proposal.potential_time = proposal.scheduled_time
                 if proposal.potential_time and not proposal.potential_venue:
                     proposal.potential_venue = proposal.scheduled_venue
-                app.logger.info('Moved "%s": "%s" on "%s" -> "%s" on "%s"' % (proposal.title, previous_venue_name, previous_potential_time, new_venue_name, proposal.potential_time))
+                app.logger.info('Moved "%s": "%s" at "%s" -> "%s" at "%s"' %
+                                (proposal.title, previous_venue_name, previous_potential_time,
+                                 new_venue_name, proposal.potential_time))
+
+
+    def run(self, persist):
+        self.set_rough_durations()
+
+        sm = SlotMachine()
+        data = self.get_scheduler_data()
+        if len(data) == 0:
+            app.logger.error("No talks to schedule!")
+            return
+
+        new_schedule = sm.schedule(app.config['EVENT_START'], data)
+        self.apply_changes(new_schedule)
 
         if persist:
             db.session.commit()
         else:
-            app.logger.info("DRY RUN: `make importschedulerdata` to persist these")
+            app.logger.info("DRY RUN: Pass the `-p` flag to persist these changes")
             db.session.rollback()
 
-class RunScheduler(Command):
-    def run(self):
-        sm = SlotMachine()
-        sm.schedule(app.config['EVENT_START'], 'schedule.json', 'schedule.json')
 
 class ApplyPotentialSchedule(Command):
     def run(self):

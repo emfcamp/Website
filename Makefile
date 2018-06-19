@@ -36,7 +36,7 @@ db:
 migrate:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py db migrate -m '$(msg)'
 
-data: db perms tickets bankaccounts
+data: db perms tickets bankaccounts importvenues
 
 exportdb:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py exportdb
@@ -90,16 +90,8 @@ importvenues:
 setroughdurations:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py setroughdurations
 
-outputschedulerdata:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py outputschedulerdata
-
-importschedulerdata:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py importschedulerdata --persist
-
 runscheduler:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py outputschedulerdata
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py runscheduler
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py importschedulerdata
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py runscheduler -p
 
 applypotentialschedule:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py applypotentialschedule

@@ -35,31 +35,31 @@ VOTE_STATES = {'new': ['voted', 'recused', 'blocked'],
                'stale': ['voted', 'recused', 'blocked'],
                }
 
+# Lengths for talks and workshops as displayed to the user
+LENGTH_OPTIONS = [('< 10 mins', "Shorter than 10 minutes"),
+                  ('10-25 mins', "10-25 minutes"),
+                  ('25-45 mins', "25-45 minutes"),
+                  ('> 45 mins', "Longer than 45 minutes")]
+
+# What we consider these as when scheduling
+ROUGH_LENGTHS = {'> 45 mins': 60,
+                 '25-45 mins': 30,
+                 '10-25 mins': 20,
+                 '< 10 mins': 10
+                }
+
 # These are the time periods speakers can select as being available in the form
-# Oh no there's vomit everywhere
-TIME_PERIODS = {}
-_month = (2016, 8) # Lol rite # FIXME
-_periods = {
-    5: ['fri_13_16', 'fri_16_20'],
-    6: ['sat_10_13', 'sat_13_16', 'sat_16_20'],
-    7: ['sun_10_13', 'sun_13_16', 'sun_16_20'],
-}
-
 period = namedtuple('Period', 'start end')
-for day, times in _periods.items():
-    for time_str in times:
-        _, start_hr, end_hr = time_str.split('_')
-        TIME_PERIODS[time_str] = period(
-            datetime(_month[0], _month[1], int(day), int(start_hr)),
-            datetime(_month[0], _month[1], int(day), int(end_hr))
-        )
-
-# Override the friday start time to begin at 2pm, the only talk at 1pm
-# should be the opening ceremony
-TIME_PERIODS['fri_13_16'] = period(
-    datetime(_month[0], _month[1], 5, 14),
-    datetime(_month[0], _month[1], 5, 16)
-)
+TIME_PERIODS = {
+    'fri_13_16': period(datetime(2018, 8, 31, 14, 0), datetime(2018, 8, 31, 16, 0)),
+    'fri_16_20': period(datetime(2018, 8, 31, 16, 0), datetime(2018, 8, 31, 20, 0)),
+    'sat_10_13': period(datetime(2018, 9, 1, 10, 0), datetime(2018, 9, 1, 13, 0)),
+    'sat_13_16': period(datetime(2018, 9, 1, 13, 0), datetime(2018, 9, 1, 16, 0)),
+    'sat_16_20': period(datetime(2018, 9, 1, 16, 0), datetime(2018, 9, 1, 20, 0)),
+    'sun_10_13': period(datetime(2018, 9, 2, 10, 0), datetime(2018, 9, 2, 13, 0)),
+    'sun_13_16': period(datetime(2018, 9, 2, 13, 0), datetime(2018, 9, 2, 16, 0)),
+    'sun_16_20': period(datetime(2018, 9, 2, 16, 0), datetime(2018, 9, 2, 20, 0)),
+}
 
 # We may also have other venues in the DB, but these are the ones to be
 # returned by default if there are none
@@ -332,7 +332,7 @@ class Proposal(db.Model):
     def get_allowed_time_periods_with_default(self):
         allowed_time_periods = self.get_allowed_time_periods()
         if not allowed_time_periods:
-            allowed_time_periods = TIME_PERIODS.values()
+            allowed_time_periods = list(TIME_PERIODS.values())
         return self.make_periods_contiguous(allowed_time_periods)
 
     @property
@@ -530,6 +530,9 @@ class Venue(db.Model):
     __table_args__ = (
         UniqueConstraint('name', name='_venue_name_uniq'),
     )
+
+    def __repr__(self):
+        return "<Venue id={}, name={}>".format(self.id, self.name)
 
 
 # TODO: change the relationships on User and Proposal to 1-to-1

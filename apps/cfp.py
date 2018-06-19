@@ -18,7 +18,8 @@ from sqlalchemy.exc import IntegrityError
 from main import db, mail
 from models.user import User, UserDiversity
 from models.cfp import (
-    TalkProposal, WorkshopProposal, YouthWorkshopProposal, PerformanceProposal, InstallationProposal, Proposal, CFPMessage
+    TalkProposal, WorkshopProposal, YouthWorkshopProposal, PerformanceProposal,
+    InstallationProposal, Proposal, CFPMessage, LENGTH_OPTIONS
 )
 from .common import feature_flag, create_current_user
 from .common.forms import Form, TelField
@@ -53,12 +54,7 @@ class ProposalForm(Form):
 
 class TalkProposalForm(ProposalForm):
     model = TalkProposal
-    length = SelectField("Duration", default='25-45 mins',
-                         choices=[('< 10 mins', "Shorter than 10 minutes"),
-                                  ('10-25 mins', "10-25 minutes"),
-                                  ('25-45 mins', "25-45 minutes"),
-                                  ('> 45 mins', "Longer than 45 minutes"),
-                                  ])
+    length = SelectField("Duration", default='25-45 mins', choices=LENGTH_OPTIONS)
 
 
 class WorkshopProposalForm(ProposalForm):
@@ -82,13 +78,7 @@ class YouthWorkshopProposalForm(ProposalForm):
 
 class PerformanceProposalForm(ProposalForm):
     model = PerformanceProposal
-    length = SelectField("Duration", default='25-45 mins',
-                         choices=[('< 10 mins', "Shorter than 10 minutes"),
-                                  ('10-25 mins', "10-25 minutes"),
-                                  ('25-45 mins', "25-45 minutes"),
-                                  ('> 45 mins', "Longer than 45 minutes"),
-                                  ])
-
+    length = SelectField("Duration", default='25-45 mins', choices=LENGTH_OPTIONS)
 
 
 class InstallationProposalForm(ProposalForm):

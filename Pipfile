@@ -1,9 +1,12 @@
 [[source]]
+
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
+
 [packages]
+
 decorator = "*"
 "iso8601" = "*"
 python-levenshtein = "==0.12.0"
@@ -50,19 +53,23 @@ ofxparse = "==0.16"
 funcsigs = "==1.0.2"
 unicodecsv = "==0.14.1"
 python-dateutil = "*"
-slotmachine = {git = "https://github.com/emfcamp/slotmachine"}
+slotmachine = {editable = true, git = "https://github.com/emfcamp/slotmachine.git"}
 awesome-slugify = "*"
 faker = "*"
 pyyaml = "*"
 prometheus-client = "*"
 pyppeteer = "*"
 
+
 [dev-packages]
+
 pytest = "*"
 mock = "*"
 "flake8" = "*"
 locust = "*"
 ipdb = "*"
 
+
 [requires]
+
 python_version = "3.5"

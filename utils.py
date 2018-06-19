@@ -15,8 +15,7 @@ from tasks.external_calendars import (
     CreateCalendars, RefreshCalendars, ExportCalendars
 )
 from tasks.schedule import (
-    ImportVenues, SetRoughDurations, OutputSchedulerData, ImportSchedulerData,
-    RunScheduler, ApplyPotentialSchedule
+    ImportVenues, RunScheduler, ApplyPotentialSchedule
 )
 from tasks.tickets import (
     CreateTickets, SendTickets, SendTransferReminder, CancelReservedTickets,
@@ -51,9 +50,6 @@ if __name__ == "__main__":
     manager.add_command('rejectunacceptedtalks', RejectUnacceptedTalks())
 
     manager.add_command('importvenues', ImportVenues())
-    manager.add_command('setroughdurations', SetRoughDurations())
-    manager.add_command('outputschedulerdata', OutputSchedulerData())
-    manager.add_command('importschedulerdata', ImportSchedulerData())
     manager.add_command('runscheduler', RunScheduler())
     manager.add_command('applypotentialschedule', ApplyPotentialSchedule())
 
