@@ -161,7 +161,7 @@ class RunScheduler(Command):
 class ApplyPotentialSchedule(Command):
     def run(self):
         proposals = Proposal.query.filter(
-            (Proposal.potential_venue.isnot(None) | Proposal.potential_time.isnot(None))).\
+            (Proposal.potential_venue != None) | (Proposal.potential_time != None)).\
             filter(Proposal.scheduled_duration.isnot(None)).\
             filter(Proposal.state.in_(['accepted', 'finished'])).\
             all()
@@ -181,7 +181,7 @@ class ApplyPotentialSchedule(Command):
                 proposal.scheduled_time = proposal.potential_time
                 proposal.potential_time = None
 
-            venue_name = Venue.query.filter_by(id=proposal.scheduled_venue).one().name
+            venue_name = proposal.scheduled_venue.name
 
             if previously_unscheduled:
                 msg = Message("Your EMF %s has been scheduled ('%s')" % (proposal.type, proposal.title),
