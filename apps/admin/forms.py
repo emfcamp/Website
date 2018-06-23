@@ -1,14 +1,17 @@
-from wtforms.validators import Optional, Required
+from wtforms.validators import Optional, Required, Email, ValidationError
 from wtforms.widgets import TextArea
 from wtforms import (
     SubmitField, StringField, SelectField,
     DateField, IntegerField, DecimalField,
-    FieldList, FormField,
+    FieldList, FormField, HiddenField
 )
+from wtforms.fields.html5 import EmailField
 
 from models.product import ProductGroup
+from models.basket import Basket
 
-from ..common.forms import Form, HiddenIntegerField
+from ..common import CURRENCY_SYMBOLS
+from ..common.forms import Form, IntegerSelectField, HiddenIntegerField
 
 
 class ProductForm(Form):
@@ -100,4 +103,65 @@ class ProductViewForm(Form):
 
     update = SubmitField('Update')
 
+#
+# Forms for reserving/issuing tickets
+#
 
+class IssueTicketsInitialForm(Form):
+    " Initial form to ask for email "
+    email = EmailField('Email address', [Email(), Required()])
+    issue_free = SubmitField('Issue Free Ticket')
+    reserve = SubmitField('Reserve Ticket for Payment')
+
+
+class TicketAmountForm(Form):
+    " Sub-form for selecting the number for a specific ticket"
+    amount = IntegerSelectField('Number of tickets', [Optional()])
+    tier_id = HiddenIntegerField('Price tier', [Required()])
+
+
+class IssueTicketsForm(Form):
+    price_tiers = FieldList(FormField(TicketAmountForm))
+    allocate = SubmitField('Allocate tickets')
+    currency = HiddenField('Currency', default='GBP')
+
+    def validate_price_tiers(self, field):
+        if not any(f.amount.data for f in field):
+            raise ValidationError("Please choose some tickets to issue")
+
+    def add_price_tiers(self, tiers):
+        if len(self.price_tiers) == 0:
+            # Only add new options if we don't have any already
+            for pt in tiers:
+                self.price_tiers.append_entry()
+                self.price_tiers[-1].tier_id.data = pt.id
+
+        pts = {pt.id: pt for pt in tiers}
+        for f in self.price_tiers:
+            f._tier = pts[f.tier_id.data]
+            values = range(f._tier.personal_limit + 1)
+            f.amount.values = values
+            f._any = any(values)
+
+    def create_basket(self, user):
+        basket = Basket(user, self.currency.data or 'GBP')
+        for f in self.price_tiers:
+            if f.amount.data:
+                basket[f._tier] = f.amount.data
+        return basket
+
+
+class ReserveTicketsForm(IssueTicketsForm):
+    currency = SelectField('Currency', choices=[(None, '')] + list(CURRENCY_SYMBOLS.items()), default='GBP')
+
+
+class ReserveTicketsNewUserForm(ReserveTicketsForm):
+    name = StringField('Name')
+
+
+class IssueFreeTicketsNewUserForm(IssueTicketsForm):
+    name = StringField('Name')
+
+
+class CancelTicketForm(Form):
+    cancel = SubmitField("Cancel ticket")

@@ -1,0 +1,16 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "admin/base.html" %}
+{% block title %}Issue Tickets{% endblock %}
+{% block body %}
+<h2>Issue Tickets</h2>
+
+<form method="post" class="form-horizontal">
+{{ form.hidden_tag() }}
+<p>Use this form to reserve tickets for a user to pay for or issue complimentary tickets. Enter the user's email below:</p>
+{{ render_field(form.email, True) }}
+<div class="btn-group">
+    {{ form.issue_free(class_="btn btn-default debounce") }}{{ form.reserve(class_="btn btn-default debounce") }}
+</div>
+</form>
+
+{% endblock %}

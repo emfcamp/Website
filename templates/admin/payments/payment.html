@@ -1,7 +1,7 @@
 {% from 'admin/_paymenthelpers.html' import payment_info, purchase_table with context %}
-
 {% extends "admin/base.html" %}
 {% set nav_active = 'admin_payments' %}
+{% block title %}Payment {{ payment.id }}{% endblock %}
 {% block body %}
 <h2>Payment {{ payment.id }}</h2>
 

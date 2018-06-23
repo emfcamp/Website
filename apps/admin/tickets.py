@@ -3,20 +3,12 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 from . import admin, admin_required
 
 from flask import (
-    render_template, redirect, request, flash,
+    render_template, redirect, flash,
     url_for, current_app as app, abort,
 )
 from flask_mail import Message
 
-from wtforms.validators import Optional, Required, Email, ValidationError
-from wtforms import (
-    SubmitField, StringField, SelectField,
-    FieldList, FormField,
-)
-from wtforms.fields.html5 import EmailField
-
 from main import db, mail
-from models.basket import Basket
 from models.exc import CapacityException
 from models.user import User
 from models.product import (
@@ -26,8 +18,12 @@ from models.purchase import (
     Purchase, Ticket, PurchaseTransfer,
 )
 
-from ..common import feature_enabled, CURRENCY_SYMBOLS
-from ..common.forms import Form, IntegerSelectField, HiddenIntegerField
+from .forms import (
+    IssueTicketsInitialForm, IssueTicketsForm, IssueFreeTicketsNewUserForm,
+    ReserveTicketsForm, ReserveTicketsNewUserForm, CancelTicketForm
+)
+
+from ..common import feature_enabled
 from ..common.receipt import attach_tickets
 
 
@@ -50,72 +46,45 @@ def tickets_unpaid():
     return render_template('admin/tickets/tickets.html', tickets=tickets)
 
 
-class TicketAmountForm(Form):
-    amount = IntegerSelectField('Number of tickets', [Optional()])
-    tier_id = HiddenIntegerField('Price tier', [Required()])
-
-
-class TicketsForm(Form):
-    price_tiers = FieldList(FormField(TicketAmountForm))
-    currency = SelectField('Currency', choices=[(None, '')] + list(CURRENCY_SYMBOLS.items()))
-    allocate = SubmitField('Allocate tickets')
-
-
-class TicketsNewUserForm(TicketsForm):
-    name = StringField('Name')
-    email = EmailField('Email', [Email(), Required()])
-
-    def validate_email(form, field):
-        if User.does_user_exist(field.data):
-            field.was_duplicate = True
-            raise ValidationError('Account already exists')
-
-@admin.route('/tickets/choose-free', methods=['GET', 'POST'])
-@admin.route('/tickets/choose-free/<int:user_id>', methods=['GET', 'POST'])
+@admin.route('/tickets/issue', methods=['GET', 'POST'])
 @admin_required
-def tickets_choose_free(user_id=None):
+def tickets_issue():
+    form = IssueTicketsInitialForm()
+    if form.validate_on_submit():
+        if form.issue_free.data:
+            return redirect(url_for('.tickets_issue_free', email=form.email.data))
+        elif form.reserve.data:
+            return redirect(url_for('.tickets_reserve', email=form.email.data))
+    return render_template('admin/tickets/tickets-issue.html', form=form)
+
+
+@admin.route('/tickets/issue-free/<email>', methods=['GET', 'POST'])
+@admin_required
+def tickets_issue_free(email):
+    user = User.query.filter_by(email=email).one_or_none()
+
+    if user is None:
+        form = IssueFreeTicketsNewUserForm()
+        new_user = True
+    else:
+        form = IssueTicketsForm()
+        new_user = False
+
     free_pts = PriceTier.query.join(Product).filter(
         ~PriceTier.prices.any(Price.price_int > 0),
     ).order_by(Product.name).all()
 
-    if user_id is None:
-        form = TicketsNewUserForm()
-        user = None
-        new_user = True
-    else:
-        form = TicketsForm()
-        user = User.query.get_or_404(user_id)
-        new_user = False
-
-    if request.method != 'POST':
-        for pt in free_pts:
-            form.price_tiers.append_entry()
-            form.price_tiers[-1].tier_id.data = pt.id
-
-    pts = {pt.id: pt for pt in free_pts}
-    for f in form.price_tiers:
-        f._tier = pts[f.tier_id.data]
-        values = range(f._tier.personal_limit + 1)
-        f.amount.values = values
-        f._any = any(values)
+    form.add_price_tiers(free_pts)
 
     if form.validate_on_submit():
-        if not any(f.amount.data for f in form.price_tiers):
-            flash('Please choose some tickets to allocate')
-            return redirect(url_for('.tickets_choose_free', user_id=user_id))
-
-        if new_user:
+        if not user:
             app.logger.info('Creating new user with email %s and name %s',
-                            form.email.data, form.name.data)
-            user = User(form.email.data, form.name.data)
+                            email, form.name.data)
+            user = User(email, form.name.data)
             db.session.add(user)
-            flash('Created account for %s' % form.email.data)
+            flash('Created account for %s' % email)
 
-        basket = Basket(user, 'GBP')
-        for f in form.price_tiers:
-            if f.amount.data:
-                basket[f._tier] = f.amount.data
-
+        basket = form.create_basket(user)
         app.logger.info('Admin basket for %s %s', user.email, basket)
 
         try:
@@ -126,7 +95,7 @@ def tickets_choose_free(user_id=None):
         except CapacityException as e:
             db.session.rollback()
             app.logger.warn('Limit exceeded creating admin tickets: %s', e)
-            return redirect(url_for('.tickets_choose_free', user_id=user_id))
+            return redirect(url_for('.tickets_issue_free', email=email))
 
         for p in basket.purchases:
             p.set_state('paid')
@@ -135,7 +104,7 @@ def tickets_choose_free(user_id=None):
         db.session.commit()
 
         code = user.login_code(app.config['SECRET_KEY'])
-        msg = Message('Your complimentary tickets to EMF',
+        msg = Message('Your complimentary tickets to Electromagnetic Field',
                       sender=app.config['TICKETS_EMAIL'],
                       recipients=[user.email])
 
@@ -150,15 +119,9 @@ def tickets_choose_free(user_id=None):
         db.session.commit()
 
         flash('Allocated %s ticket(s)' % len(basket.purchases))
-        return redirect(url_for('.tickets_choose_free'))
-
-    if new_user:
-        users = User.query.order_by(User.id).all()
-    else:
-        users = None
-
-    return render_template('admin/tickets/tickets-choose-free.html',
-                           form=form, user=user, users=users)
+        return redirect(url_for('.tickets_issue'))
+    return render_template('admin/tickets/tickets-issue-free.html',
+                           form=form, user=user, email=email)
 
 
 @admin.route('/tickets/list-free')
@@ -178,9 +141,6 @@ def list_free_tickets():
 
     return render_template('admin/tickets/tickets-list-free.html',
                            free_tickets=free_tickets)
-
-class CancelTicketForm(Form):
-    cancel = SubmitField("Cancel ticket")
 
 @admin.route('/ticket/<int:ticket_id>/cancel-free', methods=['GET', 'POST'])
 @admin_required
@@ -203,57 +163,33 @@ def cancel_free_ticket(ticket_id):
     return render_template('admin/tickets/ticket-cancel-free.html', ticket=ticket, form=form)
 
 
-@admin.route('/tickets/reserve', methods=['GET', 'POST'])
-@admin.route('/tickets/reserve/<int:user_id>', methods=['GET', 'POST'])
+@admin.route('/tickets/reserve/<email>', methods=['GET', 'POST'])
 @admin_required
-def tickets_reserve(user_id=None):
+def tickets_reserve(email):
+    user = User.query.filter_by(email=email).one_or_none()
+
+    if user is None:
+        form = ReserveTicketsNewUserForm()
+        new_user = True
+    else:
+        form = ReserveTicketsForm()
+        new_user = False
+
     pts = PriceTier.query.join(Product, ProductGroup) \
                          .order_by(ProductGroup.name, Product.display_name, Product.id).all()
 
-    if user_id is None:
-        form = TicketsNewUserForm()
-        user = None
-        new_user = True
-    else:
-        form = TicketsForm()
-        user = User.query.get_or_404(user_id)
-        new_user = False
-
-    if request.method != 'POST':
-        for pt in pts:
-            form.price_tiers.append_entry()
-            form.price_tiers[-1].tier_id.data = pt.id
-
-    pts = {pt.id: pt for pt in pts}
-    for f in form.price_tiers:
-        f._tier = pts[f.tier_id.data]
-        # TODO: apply per-user limits
-        values = range(f._tier.personal_limit + 1)
-        f.amount.values = values
-        f._any = any(values)
+    form.add_price_tiers(pts)
 
     if form.validate_on_submit():
-        if new_user:
-            email, name = form.email.data, form.name.data
-            if not name:
-                name = email
+        if not user:
+            name = form.name.data
 
             app.logger.info('Creating new user with email %s and name %s', email, name)
             user = User(email, name)
             flash('Created account for %s' % name)
-
             db.session.add(user)
 
-        currency = form.currency.data
-
-        if currency:
-            basket = Basket(user, currency)
-        else:
-            basket = Basket(user, 'GBP')
-
-        for f in form.price_tiers:
-            if f.amount.data:
-                basket[f._tier] = f.amount.data
+        basket = form.create_basket(user)
 
         app.logger.info('Admin basket for %s %s', user.email, basket)
 
@@ -266,7 +202,7 @@ def tickets_reserve(user_id=None):
         except CapacityException as e:
             db.session.rollback()
             app.logger.warn('Limit exceeded creating admin tickets: %s', e)
-            return redirect(url_for('.tickets_reserve', user_id=user_id))
+            return redirect(url_for('.tickets_reserve', email=email))
 
         code = user.login_code(app.config['SECRET_KEY'])
         msg = Message('Your reserved tickets to EMF',
@@ -275,20 +211,15 @@ def tickets_reserve(user_id=None):
 
         msg.body = render_template('emails/tickets-reserved.txt',
                             user=user, code=code, tickets=basket.purchases,
-                            new_user=new_user, currency=currency)
+                            new_user=new_user, currency=form.currency.data)
 
         mail.send(msg)
         db.session.commit()
 
         flash('Reserved tickets and emailed {}'.format(user.email))
-        return redirect(url_for('.tickets_reserve'))
-
-    if new_user:
-        users = User.query.order_by(User.id).all()
-    else:
-        users = None
+        return redirect(url_for('.tickets_issue'))
 
     return render_template('admin/tickets/tickets-reserve.html',
-                           form=form, pts=pts, user=user, users=users)
+                           form=form, pts=pts, user=user)
 
 

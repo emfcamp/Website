@@ -16,7 +16,6 @@
 {% else %}
 <p>To reserve tickets, pick a user below or enter details for a new account:</p>
 {{ render_field(form.name, True, placeholder="Optional") }}
-{{ render_field(form.email, True) }}
 {% endif %}
 
 <table class="table products">
@@ -72,21 +71,4 @@
 <div class="pull-right">{{ form.allocate(class_="btn btn-success debounce") }}</div>
 <div>&nbsp;</div>
 </form>
-
-{% if not user %}
-<h4>Choose user</h4>
-<table class="table table-condensed">
-    <tr>
-        <th>Name</th>
-        <th>Email</th>
-    </tr>
-    {% for u in users %}
-    <tr class="{{ loop.cycle('odd', 'even') }}">
-        <td><a href="{{ url_for('.tickets_reserve', user_id=u.id) }}">{{ u.name }}</a></td>
-        <td>{{ u.email }}</td>
-    </tr>
-{% endfor %}
-</table>
-{% endif %}
-
 {% endblock %}
