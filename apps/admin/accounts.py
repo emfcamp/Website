@@ -1,6 +1,6 @@
 # coding=utf-8
 from __future__ import division, absolute_import, print_function, unicode_literals
-from . import admin, admin_required
+from . import admin
 import re
 
 from Levenshtein import ratio, jaro
@@ -22,7 +22,6 @@ from ..common.receipt import attach_tickets
 
 
 @admin.route('/transactions')
-@admin_required
 def transactions():
     txns = BankTransaction.query.filter_by(payment_id=None, suppressed=False).\
         order_by(BankTransaction.posted.desc())
@@ -34,7 +33,6 @@ class TransactionSuppressForm(Form):
 
 
 @admin.route('/transaction/<int:txn_id>/suppress', methods=['GET', 'POST'])
-@admin_required
 def transaction_suppress(txn_id):
     txn = BankTransaction.query.get_or_404(txn_id)
 
@@ -52,7 +50,6 @@ def transaction_suppress(txn_id):
 
 
 @admin.route('/transactions/suppressed')
-@admin_required
 def suppressed():
     suppressed = BankTransaction.query.filter_by(suppressed=True).all()
     return render_template('admin/accounts/txns-suppressed.html', suppressed=suppressed)
@@ -84,7 +81,6 @@ def score_reconciliation(txn, payment):
 
 
 @admin.route('/transaction/<int:txn_id>/reconcile')
-@admin_required
 def transaction_suggest_payments(txn_id):
     txn = BankTransaction.query.get_or_404(txn_id)
 
@@ -101,7 +97,6 @@ class ManualReconcilePaymentForm(Form):
 
 
 @admin.route('/transaction/<int:txn_id>/reconcile/<int:payment_id>', methods=['GET', 'POST'])
-@admin_required
 def transaction_reconcile(txn_id, payment_id):
     txn = BankTransaction.query.get_or_404(txn_id)
     payment = BankPayment.query.get_or_404(payment_id)

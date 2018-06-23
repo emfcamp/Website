@@ -1,6 +1,6 @@
 # coding=utf-8
 from __future__ import division, absolute_import, print_function, unicode_literals
-from . import admin, admin_required
+from . import admin
 import markdown
 from inlinestyler.utils import inline_css
 from flask import (
@@ -35,7 +35,6 @@ class EmailComposeForm(Form):
 
 
 @admin.route("/email", methods=['GET', 'POST'])
-@admin_required
 def email():
     form = EmailComposeForm()
     if form.validate_on_submit() and form.preview.data is True:

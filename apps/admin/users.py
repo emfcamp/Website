@@ -13,7 +13,7 @@ from wtforms import SubmitField, BooleanField, StringField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import Required, Email, ValidationError
 
-from . import admin, admin_required
+from . import admin
 from main import db, mail
 from models.user import User, generate_signup_code
 from models.permission import Permission
@@ -32,7 +32,6 @@ class NewUserForm(Form):
 
 
 @admin.route("/users", methods=['GET', 'POST'])
-@admin_required
 def users():
     form = NewUserForm()
 
@@ -61,7 +60,6 @@ def users():
 
 
 @admin.route("/users/<int:user_id>", methods=['GET', 'POST'])
-@admin_required
 def user(user_id):
     user = User.query.filter_by(id=user_id).one()
     permissions = Permission.query.all()
@@ -112,7 +110,6 @@ class SignupForm(Form):
     create = SubmitField('Create link')
 
 @admin.route("/user/signup", methods=['GET', 'POST'])
-@admin_required
 def user_signup():
     form = SignupForm()
 

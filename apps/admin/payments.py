@@ -2,7 +2,7 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 from datetime import datetime, timedelta
 
-from . import admin, admin_required
+from . import admin
 
 from flask import (
     render_template, redirect, request, flash,
@@ -29,7 +29,6 @@ from ..payments.gocardless import gocardless_update_payment
 
 
 @admin.route('/payments')
-@admin_required
 def payments():
     payments = Payment.query.join(Purchase).with_entities(
         Payment,
@@ -39,7 +38,6 @@ def payments():
     return render_template('admin/payments/payments.html', payments=payments)
 
 @admin.route('/payments/expiring')
-@admin_required
 def expiring():
     expiring = BankPayment.query.join(Purchase).filter(
         BankPayment.state == 'inprogress',
@@ -52,7 +50,6 @@ def expiring():
     return render_template('admin/payments/payments-expiring.html', expiring=expiring)
 
 @admin.route('/payment/<int:payment_id>')
-@admin_required
 def payment(payment_id):
     payment = Payment.query.get_or_404(payment_id)
 
@@ -64,7 +61,6 @@ class ResetExpiryForm(Form):
 
 
 @admin.route('/payment/<int:payment_id>/reset-expiry', methods=['GET', 'POST'])
-@admin_required
 def reset_expiry(payment_id):
     payment = BankPayment.query.get_or_404(payment_id)
 
@@ -96,7 +92,6 @@ class SendReminderForm(Form):
 
 
 @admin.route('/payment/<int:payment_id>/reminder', methods=['GET', 'POST'])
-@admin_required
 def send_reminder(payment_id):
     payment = BankPayment.query.get_or_404(payment_id)
 
@@ -133,7 +128,6 @@ class UpdatePaymentForm(Form):
 
 
 @admin.route('/payment/<int:payment_id>/update', methods=['GET', 'POST'])
-@admin_required
 def update_payment(payment_id):
     payment = Payment.query.get_or_404(payment_id)
 
@@ -171,7 +165,6 @@ class CancelPaymentForm(Form):
 
 
 @admin.route('/payment/<int:payment_id>/cancel', methods=['GET', 'POST'])
-@admin_required
 def cancel_payment(payment_id):
     payment = Payment.query.get_or_404(payment_id)
 
@@ -217,7 +210,6 @@ class ManualRefundForm(Form):
 
 
 @admin.route('/payment/<int:payment_id>/manual-refund', methods=['GET', 'POST'])
-@admin_required
 def manual_refund(payment_id):
     """ Mark an entire payment as refunded for book-keeping purposes.
         Doesn't actually take any steps to return money to the user. """
@@ -259,7 +251,6 @@ class RefundForm(Form):
 
 
 @admin.route("/payment/<int:payment_id>/refund", methods=['GET', 'POST'])
-@admin_required
 def refund(payment_id):
     payment = Payment.query.get_or_404(payment_id)
 

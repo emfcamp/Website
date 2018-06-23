@@ -4,8 +4,10 @@ from datetime import datetime, timedelta
 
 from flask import (
     render_template, redirect, request, flash,
-    url_for, current_app as app, Blueprint
+    url_for, current_app as app, Blueprint, abort
 )
+
+from flask_login import current_user
 
 from wtforms.validators import Optional, Required, URL, Email
 from wtforms import (
@@ -30,6 +32,13 @@ admin = Blueprint('admin', __name__)
 admin_required = require_permission('admin')  # Decorator to require admin permissions
 
 
+@admin.before_request
+def admin_require_permission():
+    """ Require admin permission for everything under /admin """
+    if not current_user.is_authenticated or not current_user.has_permission('admin'):
+        abort(404)
+
+
 @admin.context_processor
 def admin_variables():
     if not request.path.startswith('/admin'):
@@ -48,7 +57,6 @@ def admin_variables():
 
 
 @admin.route('/')
-@admin_required
 def home():
     return render_template('admin/admin.html')
 
@@ -69,7 +77,6 @@ class FeatureFlagForm(Form):
 
 
 @admin.route('/feature-flags', methods=['GET', 'POST'])
-@admin_required
 def feature_flags():
     form = FeatureFlagForm()
     db_flags = FeatureFlag.query.all()
@@ -125,7 +132,6 @@ class SiteStateForm(Form):
 
 
 @admin.route('/site-states', methods=['GET', 'POST'])
-@admin_required
 def site_states():
     form = SiteStateForm()
 
@@ -161,7 +167,6 @@ def site_states():
     return render_template('admin/site-states.html', form=form)
 
 @admin.route('/schedule-feeds')
-@admin_required
 def schedule_feeds():
     feeds = CalendarSource.query.all()
     return render_template('admin/schedule-feeds.html', feeds=feeds)
@@ -205,7 +210,6 @@ class ScheduleForm(Form):
         self.priority.data = feed.priority
 
 @admin.route('/schedule-feeds/<int:feed_id>', methods=['GET', 'POST'])
-@admin_required
 def feed(feed_id):
     feed = CalendarSource.query.get_or_404(feed_id)
     form = ScheduleForm()
@@ -223,7 +227,6 @@ def feed(feed_id):
     return render_template('admin/edit-feed.html', feed=feed, form=form)
 
 @admin.route('/schedule-feeds/new', methods=['GET', 'POST'])
-@admin_required
 def new_feed():
     form = ScheduleForm()
 
@@ -239,7 +242,6 @@ def new_feed():
     return render_template('admin/edit-feed.html', form=form)
 
 @admin.route('/parking-tickets', methods=['GET', 'POST'])
-@admin_required
 def parking_tickets():
     return render_parking_receipts()
 

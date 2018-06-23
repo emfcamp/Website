@@ -1,6 +1,6 @@
 # coding=utf-8
 from __future__ import division, absolute_import, print_function, unicode_literals
-from . import admin, admin_required
+from . import admin
 
 from flask import (
     render_template, redirect, flash,
@@ -29,7 +29,6 @@ from ..common.receipt import attach_tickets
 
 @admin.route('/tickets')
 @admin.route('/tickets/paid')
-@admin_required
 def tickets():
     tickets = Ticket.query.filter_by(is_paid_for=True).order_by(Ticket.id).all()
 
@@ -37,7 +36,6 @@ def tickets():
 
 
 @admin.route('/tickets/unpaid')
-@admin_required
 def tickets_unpaid():
     tickets = Purchase.query.filter_by(is_paid_for=False) \
                             .filter(~Purchase.owner_id.is_(None)) \
@@ -47,7 +45,6 @@ def tickets_unpaid():
 
 
 @admin.route('/tickets/issue', methods=['GET', 'POST'])
-@admin_required
 def tickets_issue():
     form = IssueTicketsInitialForm()
     if form.validate_on_submit():
@@ -59,7 +56,6 @@ def tickets_issue():
 
 
 @admin.route('/tickets/issue-free/<email>', methods=['GET', 'POST'])
-@admin_required
 def tickets_issue_free(email):
     user = User.query.filter_by(email=email).one_or_none()
 
@@ -125,7 +121,6 @@ def tickets_issue_free(email):
 
 
 @admin.route('/tickets/list-free')
-@admin_required
 def list_free_tickets():
     # Complimentary tickets and transferred tickets can both have no payment.
     # This page is actually intended to be a list of complimentary tickets.
@@ -143,7 +138,6 @@ def list_free_tickets():
                            free_tickets=free_tickets)
 
 @admin.route('/ticket/<int:ticket_id>/cancel-free', methods=['GET', 'POST'])
-@admin_required
 def cancel_free_ticket(ticket_id):
     ticket = Purchase.query.get_or_404(ticket_id)
     if ticket.payment is not None:
@@ -164,7 +158,6 @@ def cancel_free_ticket(ticket_id):
 
 
 @admin.route('/tickets/reserve/<email>', methods=['GET', 'POST'])
-@admin_required
 def tickets_reserve(email):
     user = User.query.filter_by(email=email).one_or_none()
 

@@ -19,21 +19,19 @@ from models.purchase import (
     Purchase, PurchaseTransfer,
 )
 
-from . import admin, admin_required
+from . import admin
 from .forms import (EditProductForm, NewProductForm,
                     NewProductGroupForm, EditProductGroupForm, PriceTierForm,
                     ProductViewForm)
 
 
 @admin.route('/products')
-@admin_required
 def products():
     root_groups = ProductGroup.query.filter_by(parent_id=None).order_by(ProductGroup.id).all()
     return render_template('admin/products/overview.html', root_groups=root_groups)
 
 
 @admin.route('/products/<int:product_id>/edit', methods=['GET', 'POST'])
-@admin_required
 def edit_product(product_id):
     form = EditProductForm()
 
@@ -50,7 +48,6 @@ def edit_product(product_id):
 
 @admin.route('/products/group/<int:parent_id>/new', defaults={'copy_id': None}, methods=['GET', 'POST'])
 @admin.route('/products/<int:copy_id>/clone', defaults={'parent_id': None}, methods=['GET', 'POST'])
-@admin_required
 def new_product(copy_id, parent_id):
     if parent_id:
         parent = ProductGroup.query.get_or_404(parent_id)
@@ -79,14 +76,12 @@ def new_product(copy_id, parent_id):
 
 
 @admin.route('/products/<int:product_id>')
-@admin_required
 def product_details(product_id):
     product = Product.query.get_or_404(product_id)
     return render_template('admin/products/product-details.html', product=product)
 
 
 @admin.route('/products/<int:product_id>/new-tier', methods=['GET', 'POST'])
-@admin_required
 def new_price_tier(product_id):
     form = PriceTierForm()
     product = Product.query.get_or_404(product_id)
@@ -106,14 +101,12 @@ def new_price_tier(product_id):
 
 
 @admin.route('/products/price-tiers/<int:tier_id>')
-@admin_required
 def price_tier_details(tier_id):
     tier = PriceTier.query.get_or_404(tier_id)
     return render_template('admin/products/price-tier-details.html', tier=tier)
 
 
 @admin.route('/products/price-tiers/<int:tier_id>', methods=['POST'])
-@admin_required
 def price_tier_modify(tier_id):
     tier = PriceTier.query.get_or_404(tier_id)
     if request.form.get('delete') and tier.unused:
@@ -141,14 +134,12 @@ def price_tier_modify(tier_id):
 
 
 @admin.route('/products/group/<int:group_id>')
-@admin_required
 def product_group_details(group_id):
     group = ProductGroup.query.get_or_404(group_id)
     return render_template('admin/products/product-group-details.html', group=group)
 
 
 @admin.route('/products/group/new', methods=['GET', 'POST'])
-@admin_required
 def product_group_new():
     if request.args.get('parent'):
         parent = ProductGroup.query.get_or_404(request.args.get('parent'))
@@ -172,7 +163,6 @@ def product_group_new():
 
 
 @admin.route('/products/group/<int:group_id>/edit', methods=['GET', 'POST'])
-@admin_required
 def product_group_edit(group_id):
     group = ProductGroup.query.get_or_404(group_id)
     form = EditProductGroupForm()
@@ -190,14 +180,12 @@ def product_group_edit(group_id):
 
 
 @admin.route('/transfers')
-@admin_required
 def purchase_transfers():
     transfer_logs = PurchaseTransfer.query.all()
     return render_template('admin/products/purchase-transfers.html', transfers=transfer_logs)
 
 
 @admin.route('/furniture')
-@admin_required
 def furniture():
     purchases = ProductGroup.query.filter_by(name='furniture') \
                             .join(Product, Purchase, Purchase.owner).group_by(User.id, Product.id) \
@@ -208,7 +196,6 @@ def furniture():
 
 
 @admin.route('/tees')
-@admin_required
 def tees():
     purchases = ProductGroup.query.filter_by(name='tees') \
                             .join(Product, Purchase, Purchase.owner).group_by(User.id, Product.id) \
@@ -220,7 +207,6 @@ def tees():
 
 
 @admin.route('/product_views')
-@admin_required
 def product_views():
     view_counts = ProductView.query.join(ProductView.product_view_products) \
                              .with_entities(ProductView, func.count('*')) \
@@ -230,7 +216,6 @@ def product_views():
 
 
 @admin.route('/product_view/<int:view_id>', methods=['GET', 'POST'])
-@admin_required
 def product_view(view_id):
     view = ProductView.query.get_or_404(view_id)
 
