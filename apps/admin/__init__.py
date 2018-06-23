@@ -251,3 +251,4 @@ from . import products  # noqa: F401
 from . import tickets  # noqa: F401
 from . import users  # noqa: F401
 from . import email  # noqa: F401
+from . import search  # noqa: F401

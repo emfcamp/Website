@@ -9,7 +9,7 @@ import struct
 import re
 from collections import defaultdict
 
-from sqlalchemy import func
+from sqlalchemy import func, Index, text
 from sqlalchemy.orm.exc import NoResultFound
 from flask import current_app as app, session
 from flask_login import UserMixin, AnonymousUserMixin
@@ -235,6 +235,9 @@ class User(db.Model, UserMixin):
             return None
 
         return User.query.filter_by(id=uid).one()
+
+Index('ix_user_email_tsearch', text("to_tsvector('simple', replace(email, '@', ' '))"), postgresql_using='gin')
+Index('ix_user_name_tsearch', text("to_tsvector('simple', name)"), postgresql_using='gin')
 
 
 class UserDiversity(db.Model):
