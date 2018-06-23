@@ -1,10 +1,8 @@
 Hi {{ user.name }},
 
-Just to let you know your EMF {{ proposal.human_type }} "{{ proposal.title}}" is still up for selection, but was not chosen in today's batch.
+Just to let you know your EMF {{ proposal.human_type }} "{{ proposal.title}}" is still being considered!
 
-To be very clear: your submission has NOT been rejected yet!
-
-There's still plenty of time for your {{ proposal.human_type }} to be chosen, and we'll be in touch to let you know for certain in the next three weeks.
+There's still plenty of time for your {{ proposal.human_type }} to be chosen, and we'll be in touch to let you know for certain at least one month before the event.
 
 If you have any questions, don't hesitate to get in contact:
 
