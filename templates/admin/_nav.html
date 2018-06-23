@@ -67,3 +67,9 @@
     </li>
 {% endif %}
 </ul>
+<form class="navbar-form navbar-right" action="{{url_for('.search')}}" method="get">
+    <div class="form-group">
+        <input type="text" class="form-control" placeholder="Search" name="q" value="{{q}}">
+    </div>
+</form>
+

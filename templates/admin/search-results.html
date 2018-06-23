@@ -1,0 +1,14 @@
+{% extends "admin/base.html" %}
+{% from "_formhelpers.html" import render_field, render_static %}
+{% block title %}Search Results{% endblock %}
+{% block body %}
+
+<h2>Search Results: {{q}}</h2>
+
+<ul>
+{% for user in results %}
+    <li><a href="{{url_for('.user', user_id=user.id)}}">{{user.name}}</a> ({{user.email}})</li>
+{% endfor %}
+</ul>
+
+{% endblock %}
