@@ -11,6 +11,7 @@ from models.cfp import (
     Proposal, TalkProposal, WorkshopProposal, InstallationProposal
 )
 from models.user import User
+from apps.cfp_review import send_email_for_proposal
 
 class ImportCFP(Command):
     option_list = [Option('-f', '--file', dest='filename',
@@ -105,7 +106,7 @@ class EmailSpeakersAboutFinalising(Command):
             db.session.commit()
 
 
-class RejectUnacceptedTalks(Command):
+class RejectUnacceptedProposals(Command):
 
     def run(self):
         proposals = Proposal.query.filter(Proposal.state.in_(['reviewed'])).all()
@@ -116,12 +117,6 @@ class RejectUnacceptedTalks(Command):
 
             user = proposal.user
 
-            msg = Message("Your EMF %s proposal '%s' was not accepted." % (proposal.type, proposal.title),
-                          sender=app.config['SPEAKERS_EMAIL'],
-                          recipients=[user.email])
-
-            msg.body = render_template("emails/cfp-rejected.txt", user=user, proposal=proposal)
-
             app.logger.info('Emailing %s about rejecting proposal %s', user.email, proposal.title)
-            mail.send(msg)
+            send_email_for_proposal(proposal, reason="rejected")
             db.session.commit()

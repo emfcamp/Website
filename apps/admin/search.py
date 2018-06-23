@@ -4,6 +4,9 @@ from models.payment import GoCardlessPayment, StripePayment, BankPayment
 from sqlalchemy import func
 from . import admin
 
+def to_query(q):
+    return " & ".join(q.split(' '))
+
 @admin.route('/search')
 def search():
     q = request.args['q']
@@ -25,5 +28,14 @@ def search():
     if bank_exact:
         return redirect(url_for('.payment', payment_id=bank_exact.id))
 
-    results = User.query.filter(User.name.match(q) | (User.email.match(func.replace(q, '@', ' '))))
+    email_query = to_query(q.replace('@', ' '))
+
+    # Careful with the following query. It'll stop using the indexes if you change the
+    # functions applied to the indexed columns. Which isn't really the end of the world given
+    # how small our dataset is, but I spent ages trying to work out how to get Alembic to add
+    # those indexes. So humour me.
+    results = User.query.filter(
+        func.to_tsvector('simple', User.name).match(to_query(q)) |
+        (func.to_tsvector('simple', func.replace(User.email, '@', ' ')).match(email_query))
+    )
     return render_template('admin/search-results.html', q=q, results=results)

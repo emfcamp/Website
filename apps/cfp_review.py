@@ -362,12 +362,12 @@ def update_proposal(proposal_id):
             prop.set_state('rejected')
 
             if form.reject_with_message.data:
-                send_email_for_proposal(prop, accepted=False)
+                send_email_for_proposal(prop, reason="rejected")
 
         elif form.accept.data:
             msg = 'Manually accepting proposal %s' % proposal_id
             prop.set_state('accepted')
-            send_email_for_proposal(prop, accepted=True)
+            send_email_for_proposal(prop, reason="accepted")
 
         elif form.checked.data:
             if prop.type in MANUAL_REVIEW_TYPES:
@@ -1028,17 +1028,25 @@ class AcceptanceForm(Form):
     confirm = SubmitField('Confirm')
     cancel = SubmitField('Cancel')
 
-def send_email_for_proposal(proposal, accepted):
-    if accepted:
+def send_email_for_proposal(proposal, reason="still-considered"):
+    if reason == "accepted":
         app.logger.info('Sending accepted email for proposal %s', proposal.id)
         subject = 'Your EMF proposal "%s" has been accepted!' % proposal.title
         template = 'cfp_review/email/accepted_msg.txt'
 
-    else:
-        app.logger.info('Sending not-accepted email for proposal %s', proposal.id)
+    elif reason == "still-considered":
+        app.logger.info('Sending still-considered email for proposal %s', proposal.id)
+        subject = 'We\'re still considering your EMF proposal "%s"' % proposal.title
+        template = 'cfp_review/email/not_accepted_msg.txt'
+
+    elif reason == "rejected":
+        app.logger.info('Sending rejected email for proposal %s', proposal.id)
         proposal.has_rejected_email = True
         subject = 'Your EMF %s proposal "%s" was not accepted.' % (proposal.type, proposal.title)
         template = 'emails/cfp-rejected.txt'
+
+    else:
+        raise Exception("Unknown cfp proposal email type %s" % reason)
 
     msg = Message(subject, sender=app.config['CONTENT_EMAIL'],
                   recipients=[proposal.user.email])
@@ -1072,10 +1080,10 @@ def rank():
                 if score >= min_score:
                     count += 1
                     prop.set_state('accepted')
-                    send_email_for_proposal(prop, accepted=True)
+                    send_email_for_proposal(prop, reason="accepted")
 
                 else:
-                    send_email_for_proposal(prop, accepted=False)
+                    send_email_for_proposal(prop, reason="still-considered")
 
                 db.session.commit()
 
