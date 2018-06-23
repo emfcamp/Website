@@ -1085,7 +1085,8 @@ def rank():
                 else:
                     send_email_for_proposal(prop, reason="still-considered")
 
-            db.session.commit()
+                db.session.commit()
+
             del session['min_score']
             msg = "Accepted %s proposals; min score: %s" % (count, min_score)
             app.logger.info(msg)
