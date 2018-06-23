@@ -1029,29 +1029,49 @@ class AcceptanceForm(Form):
     cancel = SubmitField('Cancel')
 
 def send_email_for_proposal(proposal, reason="still-considered"):
-    if reason == "accepted":
-        app.logger.info('Sending accepted email for proposal %s', proposal.id)
-        subject = 'Your EMF proposal "%s" has been accepted!' % proposal.title
-        template = 'cfp_review/email/accepted_msg.txt'
+    attempts = 1
+    proposal_title = proposal.title
 
-    elif reason == "still-considered":
-        app.logger.info('Sending still-considered email for proposal %s', proposal.id)
-        subject = 'We\'re still considering your EMF proposal "%s"' % proposal.title
-        template = 'cfp_review/email/not_accepted_msg.txt'
+    # Shorten the talk title each time we reenter this loop, but only do it
+    # twice. See the comment below for further explanation of this horror.
+    while attempts < 3:
+        new_length = len(proposal.title) / attempts
+        proposal_title = proposal.title[:new_length]
+        attempts += 1
 
-    elif reason == "rejected":
-        app.logger.info('Sending rejected email for proposal %s', proposal.id)
-        proposal.has_rejected_email = True
-        subject = 'Your EMF %s proposal "%s" was not accepted.' % (proposal.type, proposal.title)
-        template = 'emails/cfp-rejected.txt'
+        if reason == "accepted":
+            app.logger.info('Sending accepted email for proposal %s', proposal.id)
+            subject = 'Your EMF proposal "%s" has been accepted!' % proposal.title
+            template = 'cfp_review/email/accepted_msg.txt'
 
-    else:
-        raise Exception("Unknown cfp proposal email type %s" % reason)
+        elif reason == "still-considered":
+            app.logger.info('Sending still-considered email for proposal %s', proposal.id)
+            subject = 'We\'re still considering your EMF proposal "%s"' % proposal.title
+            template = 'cfp_review/email/not_accepted_msg.txt'
 
-    msg = Message(subject, sender=app.config['CONTENT_EMAIL'],
-                  recipients=[proposal.user.email])
-    msg.body = render_template(template, user=proposal.user, proposal=proposal)
-    mail.send(msg)
+        elif reason == "rejected":
+            app.logger.info('Sending rejected email for proposal %s', proposal.id)
+            proposal.has_rejected_email = True
+            subject = 'Your EMF proposal "%s" was not accepted.' % proposal.title
+            template = 'emails/cfp-rejected.txt'
+
+        else:
+            raise Exception("Unknown cfp proposal email type %s" % reason)
+
+        msg = Message(subject, sender=app.config['CONTENT_EMAIL'],
+                    recipients=[proposal.user.email])
+        msg.body = render_template(template, user=proposal.user, proposal=proposal)
+        
+        # Due to https://bugs.python.org/issue27240 heaader re-wrapping may
+        # occasionally fail on arbitrary strings. We try and avoid this by
+        # truncating the talk title in the subject when the error occurrs.
+        # FIXME: This is disgusting and we should remove it when we're on a
+        # fixed version of python.
+        try:
+            mail.send(msg)
+            break # Hurrah it sent!
+        except AttributeError as e:
+            app.logger.error('Failed to email proposal %s: %s', proposal.id, e)
 
 
 @cfp_review.route('/rank', methods=['GET', 'POST'])
