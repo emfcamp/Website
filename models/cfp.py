@@ -11,6 +11,7 @@ from models import export_attr_counts, export_attr_edits, export_intervals, buck
 
 from main import db
 from .user import User
+from .purchase import Ticket
 
 # state: [allowed next state, ] pairs
 CFP_STATES = { 'edit': ['accepted', 'rejected', 'new'],
@@ -272,6 +273,12 @@ class Proposal(db.Model):
             msg.has_been_read = True
         db.session.commit()
         return len(messages)
+
+    def has_ticket(self):
+        " Does the submitter have a ticket? "
+        admission_tickets = self.user.owned_tickets.filter(
+            (Ticket.type == 'admission_ticket') & (Ticket.state == 'paid')).count()
+        return admission_tickets > 0 or self.user.will_have_ticket
 
     def get_allowed_venues(self):
         if self.allowed_venues:
