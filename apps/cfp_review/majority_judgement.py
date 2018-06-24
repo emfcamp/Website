@@ -58,6 +58,8 @@ def calculate_score(score_list, base=3):
         (sum)                     -> 47
 
     """
+    if len(score_list) == 0:
+        return None
     score_list = sorted(list(score_list)[:])
     res = []
     while score_list:

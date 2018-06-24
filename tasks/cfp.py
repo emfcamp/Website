@@ -11,7 +11,7 @@ from models.cfp import (
     Proposal, TalkProposal, WorkshopProposal, InstallationProposal
 )
 from models.user import User
-from apps.cfp_review import send_email_for_proposal
+from apps.cfp_review.base import send_email_for_proposal
 
 class ImportCFP(Command):
     option_list = [Option('-f', '--file', dest='filename',

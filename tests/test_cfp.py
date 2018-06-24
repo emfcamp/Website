@@ -2,11 +2,11 @@ from hypothesis import given, assume
 from hypothesis.strategies import text
 
 from models.cfp import TalkProposal
-from apps.cfp_review import send_email_for_proposal
+from apps.cfp_review.base import send_email_for_proposal
 
 
 @given(title=text(), description=text(), requirements=text())
-def test_cfp(db, app, user, title, description, requirements):
+def test_cfp(db, app, user, outbox, title, description, requirements):
     for c in ["\0", "\r", "\n"]:
         assume(c not in title)
 
@@ -26,4 +26,5 @@ def test_cfp(db, app, user, title, description, requirements):
     with app.test_request_context('/'):
         send_email_for_proposal(proposal, reason='accepted')
 
-    db.session.commit()
+    assert len(outbox) == 1
+    del outbox[:]

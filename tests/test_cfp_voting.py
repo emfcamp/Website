@@ -1,5 +1,7 @@
 import pytest
-from apps.majority_judgement import (
+from hypothesis import given
+from hypothesis.strategies import integers, lists, data
+from apps.cfp_review.majority_judgement import (
     get_floor_median, calculate_score, calculate_normalised_score,
     calculate_max_normalised_score,
     MajorityJudgementException
@@ -12,6 +14,14 @@ def test_get_floor_median():
     assert get_floor_median([1, 2, 3]) == 2
     assert get_floor_median([1, 2, 3, 4]) == 2
     assert get_floor_median([1, 2, 3, 4, 5]) == 3
+    with pytest.raises(Exception):
+        get_floor_median([])
+
+@given(lists(integers(), min_size=1))
+def test_get_floor_median_2(values):
+    result = get_floor_median(values)
+    assert type(result) == int
+
 
 def test_calculate_score():
     score_set = [0, 0]
@@ -40,6 +50,12 @@ def test_calculate_score():
 
     with pytest.raises(MajorityJudgementException):
         calculate_score([-1])
+
+@given(data())
+def test_calculate_score_2(data):
+    base = data.draw(integers(min_value=2, max_value=36))
+    score_list = data.draw(lists(integers(min_value=0, max_value=base - 1)))
+    calculate_score(score_list, base)
 
 def test_calculate_normalised_score():
     # Basic tests
