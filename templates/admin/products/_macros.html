@@ -22,14 +22,14 @@
 {%- endmacro %}
 
 {% macro breadcrumb(item) -%}
-<h2>{{ breadcrumb_part(item) }}</h2>
+<ol class="breadcrumb">{{ breadcrumb_part(item) }}</ol>
 {%- endmacro %}
 
 {% macro breadcrumb_part(item, current=True) -%}
     {% if item.parent %}
-        {{ breadcrumb_part(item.parent, False) }} → 
+        {{ breadcrumb_part(item.parent, False) }}
     {% endif %}
-    {{ render_item(item, link=not current) }}
+    <li {% if current %}class="active"{% endif %}>{{ render_item(item, link=not current) }}</li>
 {%- endmacro %}
 
 {% macro render_item(item, link=True) -%}
