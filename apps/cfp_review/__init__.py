@@ -1,7 +1,6 @@
-from flask import Blueprint, request, current_app as app
+from flask import Blueprint, request
 from sqlalchemy import func, or_
 
-from main import mail
 from models.cfp import Proposal, CFPMessage, CFPVote, CFP_STATES
 from ..common import require_permission
 
@@ -50,50 +49,6 @@ def get_next_proposal_to(prop, state):
         Proposal.state == state,
         Proposal.modified >= prop.modified # ie find something after this one
     ).order_by('modified', 'id').first()
-
-
-def send_email_for_proposal(proposal, reason="still-considered"):
-    proposal_title = proposal.title
-
-    while True:
-        if reason == "accepted":
-            app.logger.info('Sending accepted email for proposal %s', proposal.id)
-            subject = 'Your EMF proposal "%s" has been accepted!' % proposal_title
-            template = 'cfp_review/email/accepted_msg.txt'
-
-        elif reason == "still-considered":
-            app.logger.info('Sending still-considered email for proposal %s', proposal.id)
-            subject = 'We\'re still considering your EMF proposal "%s"' % proposal_title
-            template = 'cfp_review/email/not_accepted_msg.txt'
-
-        elif reason == "rejected":
-            app.logger.info('Sending rejected email for proposal %s', proposal.id)
-            proposal.has_rejected_email = True
-            subject = 'Your EMF proposal "%s" was not accepted.' % proposal_title
-            template = 'emails/cfp-rejected.txt'
-
-        else:
-            raise Exception("Unknown cfp proposal email type %s" % reason)
-
-        msg = Message(subject, sender=app.config['CONTENT_EMAIL'],
-                    recipients=[proposal.user.email])
-        msg.body = render_template(template, user=proposal.user, proposal=proposal)
-
-        # Due to https://bugs.python.org/issue27240 heaader re-wrapping may
-        # occasionally fail on arbitrary strings. We try and avoid this by
-        # removing the talk title in the subject when the error occurrs.
-        # FIXME: This is disgusting and we should remove it when we're on a
-        # fixed version of python.
-        try:
-            mail.send(msg)
-            return True
-        except AttributeError as e:
-            if proposal_title:
-                app.logger.error('Failed to email proposal %s, with title, retrying: %s', proposal.id, e)
-                proposal_title = ""
-            else:
-                app.logger.error('Failed to email proposal %s without title, ABORTING: %s', proposal.id, e)
-                return False
 
 
 @cfp_review.context_processor
