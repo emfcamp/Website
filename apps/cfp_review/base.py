@@ -8,7 +8,7 @@ from flask import (
 )
 from flask_login import current_user
 from flask_mail import Message
-from sqlalchemy import exc as sa_exc, func
+from sqlalchemy import exc as sa_exc, func, exists
 
 from main import db, mail, external_url
 from .majority_judgement import calculate_max_normalised_score
@@ -16,6 +16,8 @@ from models.cfp import (
     Proposal, CFPMessage, CFPVote, Venue,
     InvalidVenueException, MANUAL_REVIEW_TYPES
 )
+from models.user import User
+from models.purchase import Ticket
 from .forms import (
     UpdateTalkForm, UpdatePerformanceForm, UpdateWorkshopForm,
     UpdateYouthWorkshopForm, UpdateInstallationForm, UpdateVotesForm, SendMessageForm,
@@ -75,9 +77,11 @@ def proposals():
         proposals = proposals.filter(Proposal.state.in_(states))
 
     needs_ticket = request.args.get('needs_ticket', type=bool_qs)
-    if needs_ticket is not None:
+    if needs_ticket is True:
         filtered = True
-        proposals = proposals.join(Proposal.user).filter_by(will_have_ticket=not needs_ticket)
+        proposals = proposals.join(Proposal.user).filter_by(will_have_ticket=False).filter(
+            ~exists().where((Ticket.state == 'paid') & (Ticket.type == 'admission-ticket') &
+                            (Ticket.owner_id == User.id)))
 
     sort_dict = get_proposal_sort_dict(request.args)
     proposals = proposals.all()
