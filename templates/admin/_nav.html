@@ -42,11 +42,11 @@
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
             aria-haspopup="true" aria-expanded="false">Products <span class="caret"></span></a>
         <ul class="dropdown-menu">
-            {{ menuitem("All", "admin.products") }}
-            {{ menuitem("Views", "admin.product_views") }}
+            {{ menuitem("Overview", "admin.products") }}
+            <li role="separator" class="divider"></li>
+            {{ menuitem("Product Views", "admin.product_views") }}
         </ul>
     </li>
-    {{ menuitem("CfP", "cfp_review.main") }}
     <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
             aria-haspopup="true" aria-expanded="false">Users <span class="caret"></span></a>
@@ -65,6 +65,8 @@
             {{ menuitem("Schedule iCal Feeds", ".schedule_feeds") }}
         </ul>
     </li>
+    <li role="separator" class="divider"></li>
+    {{ menuitem("CfP", "cfp_review.main") }}
 {% endif %}
 </ul>
 <form class="navbar-form navbar-right" action="{{url_for('.search')}}" method="get">
