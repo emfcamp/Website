@@ -68,6 +68,8 @@ mock = "*"
 "flake8" = "*"
 locust = "*"
 ipdb = "*"
+hypothesis = "*"
+pytest-random-order = "*"
 
 
 [requires]
