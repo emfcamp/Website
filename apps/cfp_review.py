@@ -130,16 +130,21 @@ def proposals():
 
     proposals = Proposal.query.filter_by(**bool_dict)
 
+    filtered = False
+
     types = request.args.getlist('type')
     if types:
+        filtered = True
         proposals = proposals.filter(Proposal.type.in_(types))
 
     states = request.args.getlist('state')
     if states:
+        filtered = True
         proposals = proposals.filter(Proposal.state.in_(states))
 
     needs_ticket = request.args.get('needs_ticket', type=bool_qs)
     if needs_ticket is not None:
+        filtered = True
         proposals = proposals.join(Proposal.user).filter_by(will_have_ticket=not needs_ticket)
 
     sort_dict = get_proposal_sort_dict(request.args)
@@ -154,7 +159,8 @@ def proposals():
         del non_sort_query_string['reverse']
 
     return render_template('cfp_review/proposals.html', proposals=proposals,
-                           new_qs=non_sort_query_string)
+                           new_qs=non_sort_query_string, states=ordered_states,
+                           filtered=filtered, total_proposals=Proposal.query.count())
 
 
 class UpdateProposalForm(Form):

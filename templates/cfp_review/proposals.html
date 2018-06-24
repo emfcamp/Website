@@ -1,22 +1,25 @@
 {% extends "cfp_review/base.html" %}
+{% block title %}Proposals{% endblock %}
 {% block body %}
-<h2>CfP Proposals</h2>
+<h2>Proposals</h2>
 
-<h3>Current filters <small>(showing {{ proposals | count }})</small></h3>
-<div class="row">
-<dl class="dl-horizontal col-md-6">
-    <dt>State</dt><dd>{{ request.args.get('state', '--') }}</dd>
-    <dt>Type</dt><dd>{{ request.args.get('type', '--') }}</dd>
-    <dt>Sort by</dt><dd>{{ request.args.get('sort_by', '--') }}</dd>
-</dl>
-<dl class="dl-horizontal col-md-6">
-    <dt>Needs Ticket</dt><dd>{{ request.args.get('needs_ticket', '--') }}</dd>
-    <dt>Needs Help</dt><dd>{{ request.args.get('needs_help', '--') }}</dd>
-    <dt>Needs Money</dt><dd>{{ request.args.get('needs_money', '--') }}</dd>
-</dl>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a role="button" data-toggle="collapse" data-target="#searchPanel" 
+                aria-controls="searchPanel" aria-expanded="true">
+                Filter <small>(showing {{ proposals | count }}/{{total_proposals}})</small>
+            </a>
+        </h4>
+    </div>
+    <div class="panel-body collapse
+    {%- if filtered %}in{% endif %}
+        " id="searchPanel">
+        {% include "cfp_review/_proposals_filter_form.html" %}
+    </div>
 </div>
 
-<table class="table">
+<table class="table table-condensed">
     <tr>
         {% if not request.args.get('reverse') %}
             {% set qs_reverse_new=True %}
@@ -54,8 +57,8 @@
         <td>{{proposal.created.strftime("%d/%m")}}</td>
         <td>{{proposal.state | capitalize}}</td>
         <td>{{proposal.human_type | capitalize}}</td>
-        <td>{{proposal.notice_required or '--'}}</td>
-        <td>{{proposal.scheduled_duration or '--'}}</td>
+        <td>{{proposal.notice_required or ''}}</td>
+        <td>{{proposal.scheduled_duration or ''}}</td>
         <td>
             <a href="{{ url_for('admin.user', user_id=proposal.user.id ) }}">{{proposal.user.name}}</a>
         </td>

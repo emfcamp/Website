@@ -1,0 +1,68 @@
+{# Filter form on /cfp-review/proposals #}
+<form method="get" class="row">
+    <fieldset class="form-horizontal col-md-6">
+        <div class="form-group">
+            <label for="state" class="col-sm-2">State</label>
+            <div class="col-sm-10">
+                <select id="state" name="state" multiple class="form-control">
+                    {% for state in states %}
+                        <option value="{{state}}" 
+                            {%-if state in request.args.getlist('state') %}
+                                selected
+                            {%-endif %}
+                        >{{state}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="type" class="col-sm-2">Type</label>
+            <div class="col-sm-10">
+                <select id="type" name="type" multiple class="form-control">
+                    <option value="talk">Talk</option>
+                    <option value="workshop">Workshop</option>
+                    <option value="installation">Installation</option>
+                    <option value="youthworkshop">Youth Workshop</option>
+                </select>
+            </div>
+        </div>
+    </fieldset>
+    <fieldset class="form-horizontal col-md-6">
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <input name="needs_ticket" type="checkbox" value="True"
+                            {%- if request.args.get('needs_ticket', False) %}checked{% endif %}>
+                    Needs Ticket
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <input name="needs_help" id="needs_help" type="checkbox" value="True"
+                           {%- if request.args.get('needs_help', False) %}checked{% endif %}>
+                    Needs Help
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <input name="needs_money" id="needs_money" type="checkbox" value="True"
+                           {%- if request.args.get('needs_money', False) %}checked{% endif %}>
+                    Needs Money
+                </label>
+            </div>
+        </div>
+    </fieldset>
+    <fieldset class="form-horizontal col-md-6">
+        <div class="form-group">
+            <div class="btn-group">
+                <button class="btn btn-primary">Apply</button>
+                <a href="{{url_for('.proposals')}}" class="btn btn-default">Clear</a>
+            </div>
+        </div>
+    </fieldset>
+</form>
+
