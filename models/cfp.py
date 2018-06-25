@@ -11,7 +11,6 @@ from models import export_attr_counts, export_attr_edits, export_intervals, buck
 
 from main import db
 from .user import User
-from .purchase import Ticket
 
 # state: [allowed next state, ] pairs
 CFP_STATES = { 'edit': ['accepted', 'rejected', 'new'],
