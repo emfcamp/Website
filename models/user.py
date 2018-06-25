@@ -178,7 +178,8 @@ class User(db.Model, UserMixin):
     def get_owned_tickets(self, paid=None, type=None):
         " Get tickets owned by a user, filtered by type and payment state. "
         for ticket in self.owned_tickets:
-            if paid is not None and ticket.paid != paid:
+            if paid is True and not ticket.is_paid_for or \
+                    paid is False and ticket.is_paid_for:
                 continue
             if type is not None and ticket.type != type:
                 continue
