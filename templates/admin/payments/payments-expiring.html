@@ -22,7 +22,7 @@
   <td>{{ payment.user.email }}</td>
   <td>{{ purchase_count }}</td>
   <td><b>{{ payment.amount | price(payment.currency) }}</b></td>
-  <td>{{ payment.user.owned_tickets.filter_by(is_paid_for=True).all() | count }}</td>
+  <td>{{ payment.user.get_owned_tickets(paid=True)|count }}</td>
   <td>{{ payment.expires and payment.expires.strftime('%Y-%m-%d') }}</td>
   <td>
     <a class="btn btn-primary" href="{{ url_for('.reset_expiry', payment_id=payment.id) }}">Reset expiry</a>

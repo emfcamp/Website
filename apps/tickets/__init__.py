@@ -272,7 +272,7 @@ def main(flow=None):
                 flash("You must be logged in to buy additional free tickets")
                 return redirect(url_for("tickets.main", flow=flow))
 
-            admissions_tickets = [t for t in current_user.owned_tickets if t.type == 'admission_ticket']
+            admissions_tickets = current_user.get_owned_tickets(type='admission_ticket')
             if not any(admissions_tickets):
                 flash("You must have an admissions ticket to buy additional free tickets")
                 return redirect(url_for("tickets.main", flow=flow))

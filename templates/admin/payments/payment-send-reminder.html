@@ -17,7 +17,7 @@
 <dt>GoCardless ID</dt><dd>{{ payment.gcid }}</dd>
 {% endif -%}
 <dt>Expires</dt><dd>{{ payment.expires and payment.expires.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
-<dt>Already bought</dt><dd>{{ payment.user.owned_tickets.filter_by(is_paid_for=True).all() | count }}</dd>
+<dt>Already bought</dt><dd>{{ payment.user.get_owned_tickets(paid=True) | count }}</dd>
 </dl>
 
 {{ purchase_table(payment) }}

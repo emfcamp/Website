@@ -276,8 +276,7 @@ class Proposal(db.Model):
 
     def has_ticket(self):
         " Does the submitter have a ticket? "
-        admission_tickets = self.user.owned_tickets.filter(
-            (Ticket.type == 'admission_ticket') & (Ticket.state == 'paid')).count()
+        admission_tickets = len(list(self.user.get_owned_tickets(paid=True, type='admission_ticket')))
         return admission_tickets > 0 or self.user.will_have_ticket
 
     def get_allowed_venues(self):

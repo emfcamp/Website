@@ -183,6 +183,8 @@ def attach_tickets(msg, user):
     pdf = render_pdf(url, page)
 
     # Types of product groups we include on receipts
+    # TODO: `user.owned_tickets` has changed here, there's some oddness with type...
+    assert False
     receipt_types = ['admissions', 'campervan', 'parking', 'tees']
     tickets = user.owned_tickets.filter(
         Purchase.type.in_(receipt_types),

@@ -9,6 +9,7 @@ from flask import (
 from flask_login import current_user
 from flask_mail import Message
 from sqlalchemy import exc as sa_exc, func, exists
+from sqlalchemy.orm import joinedload
 
 from main import db, mail, external_url
 from .majority_judgement import calculate_max_normalised_score
@@ -84,6 +85,7 @@ def proposals():
                             (Ticket.owner_id == User.id)))
 
     sort_dict = get_proposal_sort_dict(request.args)
+    proposals = proposals.options(joinedload(Proposal.user)).options(joinedload('user.owned_tickets'))
     proposals = proposals.all()
     proposals.sort(**sort_dict)
 

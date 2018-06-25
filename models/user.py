@@ -145,7 +145,7 @@ class User(db.Model, UserMixin):
     owned_purchases = db.relationship('Purchase', lazy='dynamic',
                                       primaryjoin='Purchase.owner_id == User.id')
 
-    owned_tickets = db.relationship('Ticket', lazy='dynamic',
+    owned_tickets = db.relationship('Ticket', lazy='select',
                                       primaryjoin='Ticket.owner_id == User.id')
 
 
@@ -174,6 +174,15 @@ class User(db.Model, UserMixin):
         }
 
         return data
+
+    def get_owned_tickets(self, paid=None, type=None):
+        " Get tickets owned by a user, filtered by type and payment state. "
+        for ticket in self.owned_tickets:
+            if paid is not None and ticket.paid != paid:
+                continue
+            if type is not None and ticket.type != type:
+                continue
+            yield ticket
 
     def login_code(self, key):
         return generate_login_code(key, int(time.time()), self.id)
