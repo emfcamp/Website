@@ -8,6 +8,9 @@ from models.cfp import (TalkProposal, PerformanceProposal, WorkshopProposal,
                         LENGTH_OPTIONS)
 from models.user import User
 
+from models.volunteers.venue import VolunteerVenue
+from models.volunteers.role import Role
+
 def random_state(states):
     cumulative = []
     p = 0
@@ -112,5 +115,29 @@ class MakeFakeData(Command):
                 cfp.user = user
 
             db.session.add(user)
+
+        db.session.commit()
+
+
+class MakeVolunteerData(Command):
+    def run(self):
+        venues = [
+            {"name": "Bar", "mapref": "https://map.emfcamp.org/#19/52.0420157/-2.3770749"},
+            {"name": "Stage A", "mapref": "https://map.emfcamp.org/#17/52.039601/-2.377759"},
+            {"name": "Stage B", "mapref": "https://map.emfcamp.org/#17/52.041798/-2.376412"},
+            {"name": "Stage C", "mapref": "https://map.emfcamp.org/#17/52.040482/-2.377432"},
+            {"name": "Entrance", "mapref": "https://map.emfcamp.org/#18/52.039226/-2.378184"},
+        ]
+        roles = [
+            {"name": "Bar", "description": "Serve people booze", "role_notes": "Must be over 18 and complete online training first"},
+            {"name": "AV", "description": "Make sure folks giving talks can be heard & their slides seen", "role_notes": ""},
+            {"name": "Entrance Steward", "description": "Check tickets and help people get on site.", "role_notes": ""},
+        ]
+
+        for v in venues:
+            db.session.add(VolunteerVenue(**v))
+
+        for r in roles:
+            db.session.add(Role(**r))
 
         db.session.commit()

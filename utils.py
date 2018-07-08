@@ -10,7 +10,7 @@ from tasks.banking import CreateBankAccounts, LoadOfx, Reconcile
 from tasks.cfp import (
     ImportCFP, EmailSpeakersAboutSlot, EmailSpeakersAboutFinalising, RejectUnacceptedProposals
 )
-from tasks.dev import MakeFakeData
+from tasks.dev import MakeFakeData, MakeVolunteerData
 from tasks.external_calendars import (
     CreateCalendars, RefreshCalendars, ExportCalendars
 )
@@ -42,6 +42,7 @@ if __name__ == "__main__":
     manager.add_command('createperms', CreatePermissions())
     manager.add_command('makeadmin', MakeAdmin())
     manager.add_command('makefakedata', MakeFakeData())
+    manager.add_command('makevolunteerdata', MakeVolunteerData())
 
     manager.add_command('sendemails', SendEmails())
 

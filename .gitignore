@@ -117,3 +117,4 @@ config/live.cfg*
 utils/databases.cfg
 .cache/
 exports/*/private
+.com.apple.timemachine.supported

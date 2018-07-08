@@ -13,18 +13,16 @@ class Role(db.Model):
 
 class RolePermission(db.Model):
     __versioned__ = {}
+    __tablename__ = 'volunteer_role_permission'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, index=True)
 
-UserRolePermission = db.Table('user_role_permission', db.Model.metadata,
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-    db.Column('role_permission_id', db.Integer, db.ForeignKey('role_permission.id'), primary_key=True))
 
-
-class RoleVolunteers(db.Model):
+class UserRole(db.Model):
+    __tablename__ = 'volunteer_user_role'
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    role_id = db.Column(db.Integer, db.ForeignKey('role.id'), primary_key=True)
+    role_id = db.Column(db.Integer, db.ForeignKey('volunteer_role.id'), primary_key=True)
 
 
 """
