@@ -6,7 +6,7 @@ from wtforms.validators import ValidationError
 
 from main import db
 
-from models.volunteers.venue import VolunteerVenue
+from models.volunteer.venue import VolunteerVenue
 
 from ...common.forms import Form, HiddenIntegerField
 

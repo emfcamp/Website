@@ -5,7 +5,7 @@
 {% endmacro %}
 
 <ul class="nav navbar-nav">
-    {% if current_user.has_permission('volunteers:admin') %}
+    {% if current_user.has_permission('volunteer:admin') %}
     {{ menuitem("Venues", ".venue_list") }}
 {% endif %}
 </ul>

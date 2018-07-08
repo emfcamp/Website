@@ -213,8 +213,8 @@ def create_app(dev_server=False):
     if app.config.get('VOLUNTEERS'):
         from apps.volunteering import volunteering
         app.register_blueprint(volunteering, url_prefix='/volunteering')
-        from apps.volunteers import volunteers
-        app.register_blueprint(volunteers, url_prefix='/volunteers')
+        from apps.volunteer import volunteer
+        app.register_blueprint(volunteer, url_prefix='/volunteer')
 
     from apps.admin import admin
     app.register_blueprint(admin, url_prefix='/admin')

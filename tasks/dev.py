@@ -8,8 +8,8 @@ from models.cfp import (TalkProposal, PerformanceProposal, WorkshopProposal,
                         LENGTH_OPTIONS)
 from models.user import User
 
-from models.volunteers.venue import VolunteerVenue
-from models.volunteers.role import Role
+from models.volunteer.venue import VolunteerVenue
+from models.volunteer.role import Role
 
 def random_state(states):
     cumulative = []

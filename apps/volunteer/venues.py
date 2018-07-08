@@ -1,19 +1,19 @@
 # encoding=utf-8
 from flask import flash, redirect, render_template, url_for
 
-from . import volunteers, v_admin_required
+from . import volunteer, v_admin_required
 from .controllers.venue import (
     get_venues, create_new_from_form, init_form_with_venue,
     VenueForm, update_venue_from_form
 )
 
 @v_admin_required
-@volunteers.route('/venues')
+@volunteer.route('/venues')
 def venue_list():
-    return render_template('volunteers/venue.html', venues=get_venues())
+    return render_template('volunteer/venue.html', venues=get_venues())
 
 @v_admin_required
-@volunteers.route('/venues/<int:venue_id>', methods=['GET', 'POST'])
+@volunteer.route('/venues/<int:venue_id>', methods=['GET', 'POST'])
 def venue(venue_id):
     form = VenueForm()
 
@@ -23,10 +23,10 @@ def venue(venue_id):
         return redirect(url_for('.venue_list'))
 
     form = init_form_with_venue(form, venue_id)
-    return render_template('volunteers/venue-form.html', new_venue=True, form=form)
+    return render_template('volunteer/venue-form.html', new_venue=True, form=form)
 
 @v_admin_required
-@volunteers.route('/venues/new', methods=['GET', 'POST'])
+@volunteer.route('/venues/new', methods=['GET', 'POST'])
 def new_venue():
     form = VenueForm()
 
@@ -35,4 +35,4 @@ def new_venue():
         flash('Created new venue: {}'.format(venue.name))
         return redirect(url_for('.venue_list'))
 
-    return render_template('volunteers/venue-form.html', new_venue=False, form=form)
+    return render_template('volunteer/venue-form.html', new_venue=False, form=form)

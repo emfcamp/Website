@@ -1,8 +1,8 @@
 # encoding=utf-8
 from flask import render_template
 
-from . import volunteers
+from . import volunteer
 
-@volunteers.route('/')
+@volunteer.route('/')
 def main():
-    return render_template('volunteers/main.html')
+    return render_template('volunteer/main.html')
