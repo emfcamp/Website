@@ -26,6 +26,7 @@ This installs the necessary packages and dependencies for you. Then run:
 ```
 make update
 make data
+make dev-data
 make
 ```
 You should then be able to view your development server on http://localhost:5000.
