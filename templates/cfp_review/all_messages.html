@@ -1,21 +1,21 @@
 {% extends "cfp_review/base.html" %}
 {% block body %}
-<h2>All messages <small>(showing {{ proposal_with_message | count }})</small></h2>
 
-{% set qs_all = 'all' in request.args or None %}
 {% set qs_reverse = request.args.get('reverse') %}
 {% set qs_sort_by = request.args.get('sort_by') %}
 
-{% if not qs_all %}
-<p>Not showing installations. To include installations, click
-<a href="{{ url_for('.all_messages', sort_by=qs_sort_by, reverse=qs_reverse, all=True) }}">here</a>.</p>
-{% else %}
-<p>Showing all messages (including installations). To hide these click
-<a href="{{ url_for('.all_messages', sort_by=qs_sort_by, reverse=qs_reverse) }}">here</a>.</p>
-{% endif %}
+<h2>{{type | capitalize}} messages <small>(showing {{ proposal_with_message | count }})</small></h2>
+
+<p>Showing {{type}} submission messages. Filter by    
+    <a href="{{ url_for('.all_messages', sort_by=qs_sort_by, reverse=qs_reverse, type='talk') }}">talk</a>,
+    <a href="{{ url_for('.all_messages', sort_by=qs_sort_by, reverse=qs_reverse, type='workshop') }}">workshop</a>,
+    <a href="{{ url_for('.all_messages', sort_by=qs_sort_by, reverse=qs_reverse, type='youthworkshop') }}">youth workshop</a>,
+    <a href="{{ url_for('.all_messages', sort_by=qs_sort_by, reverse=qs_reverse, type='installation') }}">installation</a>,
+    <a href="{{ url_for('.all_messages', sort_by=qs_sort_by, reverse=qs_reverse, type='performance') }}">performance</a>.
+</p>
 
 <p>To sort unread messages to the top click
-<a href="{{ url_for('.all_messages', all=qs_all, sort_by='unread') }}">here</a>.</p>
+<a href="{{ url_for('.all_messages', sort_by='unread', type=type) }}">here</a>.</p>
 
 <table class="table">
     <tr>
@@ -25,16 +25,16 @@
             {% set qs_reverse_new=None %}
         {% endif %}
         <th>
-            <a href="{{ url_for('.all_messages', sort_by='date', reverse=qs_reverse_new, all=qs_all) }}">Date</a>
+            <a href="{{ url_for('.all_messages', sort_by='date', reverse=qs_reverse_new, type=type) }}">Date</a>
         </th>
         <th>
-            <a href="{{ url_for('.all_messages', sort_by='from', reverse=qs_reverse_new, all=qs_all) }}">From</a>
+            <a href="{{ url_for('.all_messages', sort_by='from', reverse=qs_reverse_new, type=type) }}">From</a>
         </th>
         <th>
-            <a href="{{ url_for('.all_messages', sort_by='count', reverse=qs_reverse_new, all=qs_all) }}">Message Count</a>
+            <a href="{{ url_for('.all_messages', sort_by='count', reverse=qs_reverse_new, type=type) }}">Message Count</a>
         </th>
         <th>
-            <a href="{{ url_for('.all_messages', sort_by='title', reverse=qs_reverse_new, all=qs_all) }}">Proposal Title</a>
+            <a href="{{ url_for('.all_messages', sort_by='title', reverse=qs_reverse_new, type=type) }}">Proposal Title</a>
         </th>
     </tr>
 {% for proposal in proposal_with_message %}
@@ -43,7 +43,7 @@
             {% if proposal.get_unread_count(current_user) > 0 %}
                 <span class="badge">{{ proposal.get_unread_count(current_user) }}</span>
             {% endif %}
-            {{ proposal.messages[-1].created.strftime("%d/%m") }}
+            {{ proposal.messages[-1].created.strftime("%d/%m/%Y") }}
         </td>
         <td>{{ proposal.user.name }}</td>
         <td>{{ proposal.messages | length }}</td>

@@ -297,17 +297,19 @@ def get_all_messages_sort_dict(parameters, user):
 
 @cfp_review.route('/messages')
 @admin_required
-def all_messages(types=None):
-    # TODO add search
+def all_messages():
+    filter_type = request.args.get('type')
+
     # Query from the proposal because that's actually what we display
     proposal_with_message = Proposal.query\
         .join(CFPMessage)\
         .filter(Proposal.id == CFPMessage.proposal_id)\
         .order_by(CFPMessage.has_been_read, CFPMessage.created.desc())
 
-    # if 'all' not in request.args:
-    if not request.args.get('all'):
-        proposal_with_message = proposal_with_message.filter(Proposal.type != 'installation')
+    if filter_type:
+        proposal_with_message = proposal_with_message.filter(Proposal.type == filter_type)
+    else:
+        filter_type = 'all'
 
     proposal_with_message = proposal_with_message.all()
 
@@ -315,7 +317,7 @@ def all_messages(types=None):
     proposal_with_message.sort(**sort_dict)
 
     return render_template('cfp_review/all_messages.html',
-                           proposal_with_message=proposal_with_message, types=types)
+                           proposal_with_message=proposal_with_message, type=filter_type)
 
 
 @cfp_review.route('/proposals/<int:proposal_id>/message', methods=['GET', 'POST'])
