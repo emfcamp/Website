@@ -20,6 +20,7 @@
             </a>
             <ul class="dropdown-menu">
                 {{ menuitem("All", ".proposals") }}
+                <li role="separator" class="divider"></li>
                 {{ menuitem("Talks", ".proposals", type="talk") }}
                 {{ menuitem("Workshops", ".proposals", type="workshop") }}
                 {{ menuitem("Installations", ".proposals", type="installation") }}
@@ -30,7 +31,22 @@
                 {{ menuitem('New', ".proposals", proposal_counts['new'], state='new')}}
             </ul>
         </li>
-        {{ menuitem("Messages", ".all_messages", unread_count) }}
+        <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                aria-haspopup="true" aria-expanded="false"
+            >
+                Messages {{ badge(unread_count) }} <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                {{ menuitem("All", ".all_messages", unread_count) }}
+                <li role="separator" class="divider"></li>
+                {{ menuitem("Talks", ".all_messages", type="talk") }}
+                {{ menuitem("Workshops", ".all_messages", type="workshop") }}
+                {{ menuitem("Youth Workshops", ".all_messages", type="youthworkshop") }}
+                {{ menuitem("Installations", ".all_messages", type="installation") }}
+                {{ menuitem("Performances", ".all_messages", type="performance") }}
+            </ul>
+        </li>
         {{ menuitem("Voting", ".vote_summary", unread_reviewer_notes) }}
         <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
