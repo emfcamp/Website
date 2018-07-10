@@ -3,7 +3,7 @@ from flask import (
 )
 
 from ..common.forms import Form
-from . import volunteering
+from . import volunteer
 
 from wtforms import (
     SelectMultipleField, BooleanField
@@ -29,16 +29,17 @@ class ScheduleFilterForm(Form):
                                             ('stage-c', 'Stage C')])
 
 
-@volunteering.route('/schedule')
+@volunteer.route('/schedule')
 def schedule():
     # TODO redirect if not logged in
     form = ScheduleFilterForm()
     # TODO actually generate this list
     locations = ["bar-1", "bar-2", "gate", "stage-a", "stage-b", "stage-c"]
-    return render_template('volunteering/schedule.html', locations=locations,
+    return render_template('volunteer/schedule.html', locations=locations,
                             form=form, all_shifts=ALL_SHIFTS)
 
 
-@volunteering.route('/shift/<id>')
+@volunteer.route('/shift/<id>')
 def shift(id):
-    return render_template('volunteering/shift.html', id=id)
+    return render_template('volunteer/shift.html', id=id)
+

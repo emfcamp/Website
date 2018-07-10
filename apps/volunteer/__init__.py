@@ -10,4 +10,7 @@ v_admin_required = require_permission('volunteer:admin')
 v_manager_required = require_permission('volunteer:manager')
 
 from . import main  # noqa: F401
+from . import schedule  # noqa: F401
+from . import sign_up  # noqa: F401
 from . import venues  # noqa: F401
+

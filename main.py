@@ -57,6 +57,7 @@ login_manager = LoginManager()
 assets = Environment()
 toolbar = DebugToolbarExtension()
 gocardless_client = None
+volunteer_admin = None
 
 pyscss = get_filter('pyscss', style='compressed')
 assets.register('css_main', Bundle('css/main.scss',
@@ -67,8 +68,8 @@ assets.register('css_admin', Bundle('css/admin.scss',
                 output='gen/admin-packed.css',
                 depends='css/*.scss',
                 filters=pyscss))
-assets.register('css_volunteering', Bundle('css/volunteering.scss',
-                output='gen/volunteering-packed.css',
+assets.register('css_volunteer', Bundle('css/volunteer.scss',
+                output='gen/volunteer-packed.css',
                 depends='css/*.scss',
                 filters=pyscss))
 assets.register('css_invoice', Bundle('css/invoice.scss',
@@ -211,10 +212,21 @@ def create_app(dev_server=False):
     app.register_blueprint(arrivals, url_prefix='/arrivals')
 
     if app.config.get('VOLUNTEERS'):
-        from apps.volunteering import volunteering
-        app.register_blueprint(volunteering, url_prefix='/volunteering')
         from apps.volunteer import volunteer
         app.register_blueprint(volunteer, url_prefix='/volunteer')
+
+        from flask_admin import Admin
+        from apps.volunteer.flask_admin_base import VolunteerAdminIndexView
+
+        global volunteer_admin
+        volunteer_admin = Admin(url='/admin/volunteer', name='EMF Volunteers',
+                                template_mode='bootstrap3',
+                                index_view=VolunteerAdminIndexView(url='/volunteer/admin'),
+                                base_template='volunteer/admin/flask-admin-base.html')
+        volunteer_admin.endpoint_prefix = 'volunteer_admin'
+        volunteer_admin.init_app(app)
+
+        import apps.volunteer.admin  # noqa: F401
 
     from apps.admin import admin
     app.register_blueprint(admin, url_prefix='/admin')

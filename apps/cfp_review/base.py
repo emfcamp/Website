@@ -1,5 +1,4 @@
 from datetime import timedelta
-import warnings
 
 import dateutil
 from flask import (
@@ -8,7 +7,7 @@ from flask import (
 )
 from flask_login import current_user
 from flask_mail import Message
-from sqlalchemy import exc as sa_exc, func, exists
+from sqlalchemy import func, exists
 from sqlalchemy.orm import joinedload
 
 from main import db, mail, external_url
@@ -22,7 +21,7 @@ from models.purchase import Ticket
 from .forms import (
     UpdateTalkForm, UpdatePerformanceForm, UpdateWorkshopForm,
     UpdateYouthWorkshopForm, UpdateInstallationForm, UpdateVotesForm, SendMessageForm,
-    CloseRoundForm, AcceptanceForm
+    CloseRoundForm, AcceptanceForm, ConvertProposalForm,
 )
 from . import (
     cfp_review, admin_required, schedule_required, ordered_states,
@@ -145,20 +144,33 @@ def send_email_for_proposal(proposal, reason="still-considered"):
                 return False
 
 
+@cfp_review.route('/proposals/<int:proposal_id>/convert', methods=['GET', 'POST'])
+@admin_required
+def convert_proposal(proposal_id):
+    proposal = Proposal.query.get_or_404(proposal_id)
+
+    form = ConvertProposalForm()
+    types = {'talk', 'workshop', 'youthworkshop', 'performance', 'installation'}
+    form.new_type.choices = [(t, t.title()) for t in types if t != proposal.type]
+
+    if form.validate_on_submit():
+        proposal.type = form.new_type.data
+        db.session.commit()
+
+        proposal = Proposal.query.get_or_404(proposal_id)
+
+        return redirect(url_for('.update_proposal', proposal_id=proposal.id))
+
+    return render_template('cfp_review/convert_proposal.html', proposal=proposal, form=form)
+
 
 @cfp_review.route('/proposals/<int:proposal_id>', methods=['GET', 'POST'])
 @admin_required
 def update_proposal(proposal_id):
-    def log_and_close(msg, next_page, expunge_session=False, proposal_id=None):
+    def log_and_close(msg, next_page, proposal_id=None):
         flash(msg)
         app.logger.info(msg)
-        if expunge_session:
-            with warnings.catch_warnings():
-                warnings.simplefilter('ignore', category=sa_exc.SAWarning)
-                db.session.commit()
-                db.session.expunge_all()
-        else:
-            db.session.commit()
+        db.session.commit()
 
         return redirect(url_for(next_page, proposal_id=proposal_id))
 
@@ -185,19 +197,7 @@ def update_proposal(proposal_id):
             return render_template('cfp_review/update_proposal.html',
                                    proposal=prop, form=form, next_id=next_id)
 
-        expunge = False
-
-        if prop.type == 'talk' and form.make_performance.data:
-            prop.type = 'performance'
-            expunge = True
-            msg = '%s making a performance' % proposal_id
-
-        elif prop.type == 'performance' and form.make_talk.data:
-            prop.type = 'talk'
-            expunge = True
-            msg = '%s making a talk' % proposal_id
-
-        elif form.update.data:
+        if form.update.data:
             msg = 'Updating proposal %s' % proposal_id
             prop.state = form.state.data
 
@@ -224,7 +224,7 @@ def update_proposal(proposal_id):
             if not next_id:
                 return log_and_close(msg, '.proposals')
             return log_and_close(msg, '.update_proposal', proposal_id=next_id)
-        return log_and_close(msg, '.update_proposal', expunge_session=expunge, proposal_id=proposal_id)
+        return log_and_close(msg, '.update_proposal', proposal_id=proposal_id)
 
     form.state.data = prop.state
     form.title.data = prop.title
@@ -297,17 +297,19 @@ def get_all_messages_sort_dict(parameters, user):
 
 @cfp_review.route('/messages')
 @admin_required
-def all_messages(types=None):
-    # TODO add search
+def all_messages():
+    filter_type = request.args.get('type')
+
     # Query from the proposal because that's actually what we display
     proposal_with_message = Proposal.query\
         .join(CFPMessage)\
         .filter(Proposal.id == CFPMessage.proposal_id)\
         .order_by(CFPMessage.has_been_read, CFPMessage.created.desc())
 
-    # if 'all' not in request.args:
-    if not request.args.get('all'):
-        proposal_with_message = proposal_with_message.filter(Proposal.type != 'installation')
+    if filter_type:
+        proposal_with_message = proposal_with_message.filter(Proposal.type == filter_type)
+    else:
+        filter_type = 'all'
 
     proposal_with_message = proposal_with_message.all()
 
@@ -315,7 +317,7 @@ def all_messages(types=None):
     proposal_with_message.sort(**sort_dict)
 
     return render_template('cfp_review/all_messages.html',
-                           proposal_with_message=proposal_with_message, types=types)
+                           proposal_with_message=proposal_with_message, type=filter_type)
 
 
 @cfp_review.route('/proposals/<int:proposal_id>/message', methods=['GET', 'POST'])

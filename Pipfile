@@ -55,7 +55,8 @@ awesome-slugify = "*"
 faker = "*"
 pyyaml = "*"
 prometheus-client = "*"
-pyppeteer = "*"
+pyppeteer = "==0.0.18"
+flask-admin = "*"
 
 [dev-packages]
 pytest = "*"
