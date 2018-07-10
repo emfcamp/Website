@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "3d582172feca473f02d8cd380f66e1d101fa6d591bb9377bf4cd3fbdd210a8b7"
+            "sha256": "49acdffab70e8fb8135c28201b9238aa637815b630c96d96a052852f117696f6"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -110,6 +110,13 @@
             ],
             "index": "pypi",
             "version": "==0.12.2"
+        },
+        "flask-admin": {
+            "hashes": [
+                "sha256:e3a8268fdb6c271a44196de7f2a85faff886df18061d337e66b4b3c80e9c4f23"
+            ],
+            "index": "pypi",
+            "version": "==1.5.1"
         },
         "flask-assets": {
             "hashes": [
@@ -490,10 +497,10 @@
         },
         "pyppeteer": {
             "hashes": [
-                "sha256:c35cff5c3b4d3c391c10a85b1a56b9f39daf18c795b0d8f6e0b7eaeac1ad5be3"
+                "sha256:9393788739b944cbe44a861582b3883edfd39c93cfacd28db44b62fffa28f1c6"
             ],
             "index": "pypi",
-            "version": "==0.0.19"
+            "version": "==0.0.18"
         },
         "pyscss": {
             "hashes": [
