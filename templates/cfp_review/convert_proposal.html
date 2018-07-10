@@ -1,0 +1,22 @@
+{% from "_formhelpers.html" import render_field, render_dl_field %}
+{% extends "cfp_review/base.html" %}
+{% block title %}{{ proposal.title }}{% endblock %}
+{% block body %}
+
+<div class="col-md-12">
+    <h2>{{ proposal.title }}</h2>
+    <div>This is currently of type {{ proposal.human_type }}. To convert to another type, select below.</div>
+</div>
+
+<p>&nbsp;</p>
+
+<div class="col-md-12">
+<form method="post">
+    {{ form.hidden_tag() }}
+
+    {{ render_field(form.new_type) }}
+    {{ form.convert(class_="btn btn-primary debounce") }}
+</form>
+</div>
+
+{% endblock %}
