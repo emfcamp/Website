@@ -1,5 +1,4 @@
 from datetime import timedelta
-import warnings
 
 import dateutil
 from flask import (
@@ -8,7 +7,7 @@ from flask import (
 )
 from flask_login import current_user
 from flask_mail import Message
-from sqlalchemy import exc as sa_exc, func, exists
+from sqlalchemy import func, exists
 from sqlalchemy.orm import joinedload
 
 from main import db, mail, external_url
@@ -168,16 +167,10 @@ def convert_proposal(proposal_id):
 @cfp_review.route('/proposals/<int:proposal_id>', methods=['GET', 'POST'])
 @admin_required
 def update_proposal(proposal_id):
-    def log_and_close(msg, next_page, expunge_session=False, proposal_id=None):
+    def log_and_close(msg, next_page, proposal_id=None):
         flash(msg)
         app.logger.info(msg)
-        if expunge_session:
-            with warnings.catch_warnings():
-                warnings.simplefilter('ignore', category=sa_exc.SAWarning)
-                db.session.commit()
-                db.session.expunge_all()
-        else:
-            db.session.commit()
+        db.session.commit()
 
         return redirect(url_for(next_page, proposal_id=proposal_id))
 
@@ -204,19 +197,7 @@ def update_proposal(proposal_id):
             return render_template('cfp_review/update_proposal.html',
                                    proposal=prop, form=form, next_id=next_id)
 
-        expunge = False
-
-        if prop.type == 'talk' and form.make_performance.data:
-            prop.type = 'performance'
-            expunge = True
-            msg = '%s making a performance' % proposal_id
-
-        elif prop.type == 'performance' and form.make_talk.data:
-            prop.type = 'talk'
-            expunge = True
-            msg = '%s making a talk' % proposal_id
-
-        elif form.update.data:
+        if form.update.data:
             msg = 'Updating proposal %s' % proposal_id
             prop.state = form.state.data
 
@@ -243,7 +224,7 @@ def update_proposal(proposal_id):
             if not next_id:
                 return log_and_close(msg, '.proposals')
             return log_and_close(msg, '.update_proposal', proposal_id=next_id)
-        return log_and_close(msg, '.update_proposal', expunge_session=expunge, proposal_id=proposal_id)
+        return log_and_close(msg, '.update_proposal', proposal_id=proposal_id)
 
     form.state.data = prop.state
     form.title.data = prop.title
