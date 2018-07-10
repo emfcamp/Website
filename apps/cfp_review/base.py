@@ -22,7 +22,7 @@ from models.purchase import Ticket
 from .forms import (
     UpdateTalkForm, UpdatePerformanceForm, UpdateWorkshopForm,
     UpdateYouthWorkshopForm, UpdateInstallationForm, UpdateVotesForm, SendMessageForm,
-    CloseRoundForm, AcceptanceForm
+    CloseRoundForm, AcceptanceForm, ConvertProposalForm,
 )
 from . import (
     cfp_review, admin_required, schedule_required, ordered_states,
@@ -144,6 +144,25 @@ def send_email_for_proposal(proposal, reason="still-considered"):
                 app.logger.error('Failed to email proposal %s without title, ABORTING: %s', proposal.id, e)
                 return False
 
+
+@cfp_review.route('/proposals/<int:proposal_id>/convert', methods=['GET', 'POST'])
+@admin_required
+def convert_proposal(proposal_id):
+    proposal = Proposal.query.get_or_404(proposal_id)
+
+    form = ConvertProposalForm()
+    types = {'talk', 'workshop', 'youthworkshop', 'performance', 'installation'}
+    form.new_type.choices = [(t, t.title()) for t in types if t != proposal.type]
+
+    if form.validate_on_submit():
+        proposal.type = form.new_type.data
+        db.session.commit()
+
+        proposal = Proposal.query.get_or_404(proposal_id)
+
+        return redirect(url_for('.update_proposal', proposal_id=proposal.id))
+
+    return render_template('cfp_review/convert_proposal.html', proposal=proposal, form=form)
 
 
 @cfp_review.route('/proposals/<int:proposal_id>', methods=['GET', 'POST'])

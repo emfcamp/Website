@@ -103,12 +103,17 @@ class UpdateProposalForm(Form):
             proposal.get_allowed_venues()
 
 
+class ConvertProposalForm(Form):
+    new_type = SelectField("Destination type")
+    convert = SubmitField("Convert")
+
+
 class UpdateTalkForm(UpdateProposalForm):
-    make_performance = SubmitField('Convert to performance')
+    pass
 
 
 class UpdatePerformanceForm(UpdateProposalForm):
-    make_talk = SubmitField('Convert to talk')
+    pass
 
 
 class UpdateWorkshopForm(UpdateProposalForm):
