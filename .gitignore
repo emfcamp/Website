@@ -118,3 +118,6 @@ utils/databases.cfg
 .cache/
 exports/*/private
 .com.apple.timemachine.supported
+
+# ignore vscode settings
+.vscode
