@@ -7,6 +7,7 @@ from flask_admin.contrib.sqla import ModelView
 # This is annoying as there's no safe way to stop someone accidentally using a base class
 class FlaskVolunteerAdminAppMixin:
     def is_accessible(self):
+        app.logger.info("accessible")
         if current_user.is_authenticated:
             if current_user.has_permission('volunteer-admin'):
                 return True
