@@ -7,6 +7,9 @@ class VolunteerVenue(db.Model):
     name = db.Column(db.String, unique=True, index=True)
     mapref = db.Column(db.String)
 
+    def __repr__(self):
+        return '<VolunteerVenue {0}>'.format(self.name)
+
     @classmethod
     def get_all(cls):
         return cls.query.order_by(VolunteerVenue.id).all()
