@@ -10,6 +10,9 @@ class Role(db.Model):
     # Things to know for the shift
     role_notes = db.Column(db.String)
 
+    def __repr__(self):
+        return '<VolunteerRole {0}>'.format(self.name)
+
 
 class RolePermission(db.Model):
     __versioned__ = {}

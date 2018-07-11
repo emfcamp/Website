@@ -15,6 +15,13 @@ class Shift(db.Model):
     min_needed = db.Column(db.Integer, nullable=False, default=0)
     max_needed = db.Column(db.Integer, nullable=False, default=0)
 
+    role = db.relationship('Role', backref='shifts')
+    venue = db.relationship('VolunteerVenue', backref='shifts')
+
+    def __repr__(self):
+        return '<Shift {0}/{1}@{2}>'.format(self.role.name, self.venue.name, self.start)
+
+
 class ShiftEntry(db.Model):
     __tablename__ = 'volunteer_shift_entry'
     __versioned__ = {}
