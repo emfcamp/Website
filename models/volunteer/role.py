@@ -13,6 +13,10 @@ class Role(db.Model):
     def __repr__(self):
         return '<VolunteerRole {0}>'.format(self.name)
 
+    @classmethod
+    def get_by_name(cls, name):
+        return cls.query.filter_by(name=name).one_or_none()
+
 
 class RolePermission(db.Model):
     __versioned__ = {}
