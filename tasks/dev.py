@@ -9,6 +9,7 @@ from models.cfp import (TalkProposal, PerformanceProposal, WorkshopProposal,
 from models.user import User
 
 from models.volunteer.venue import VolunteerVenue
+from models.volunteer.shift import Shift
 from models.volunteer.role import Role
 
 def random_state(states):
@@ -134,10 +135,61 @@ class MakeVolunteerData(Command):
             {"name": "Entrance Steward", "description": "Check tickets and help people get on site.", "role_notes": ""},
         ]
 
+        shifts = {
+            "Bar": {
+                "Bar": [
+                    {"start": "2018-08-31 11:00:00", "end": "2018-08-31 12:00:00", "min_needed": 2, "max_needed": 3},
+                    {"start": "2018-08-31 12:00:00", "end": "2018-08-31 13:00:00", "min_needed": 2, "max_needed": 3},
+                    {"start": "2018-08-31 13:00:00", "end": "2018-08-31 14:00:00", "min_needed": 2, "max_needed": 3},
+                    {"start": "2018-08-31 14:00:00", "end": "2018-08-31 15:00:00", "min_needed": 2, "max_needed": 3},
+                    {"start": "2018-08-31 15:00:00", "end": "2018-08-31 16:00:00", "min_needed": 2, "max_needed": 3}
+                ]
+            },
+            "AV": {
+                "Stage A": [
+                    {"start": "2018-08-31 11:00:00", "end": "2018-08-31 12:00:00", "min_needed": 2, "max_needed": 3},
+                    {"start": "2018-08-31 12:00:00", "end": "2018-08-31 13:00:00", "min_needed": 2, "max_needed": 3},
+                    {"start": "2018-08-31 13:00:00", "end": "2018-08-31 14:00:00", "min_needed": 2, "max_needed": 3},
+                    {"start": "2018-08-31 14:00:00", "end": "2018-08-31 15:00:00", "min_needed": 2, "max_needed": 3},
+                    {"start": "2018-08-31 15:00:00", "end": "2018-08-31 16:00:00", "min_needed": 2, "max_needed": 3}
+                ],
+                "Stage B": [
+                    {"start": "2018-08-31 11:00:00", "end": "2018-08-31 12:00:00", "min_needed": 2, "max_needed": 3},
+                    {"start": "2018-08-31 12:00:00", "end": "2018-08-31 13:00:00", "min_needed": 2, "max_needed": 3},
+                    {"start": "2018-08-31 13:00:00", "end": "2018-08-31 14:00:00", "min_needed": 2, "max_needed": 3},
+                    {"start": "2018-08-31 14:00:00", "end": "2018-08-31 15:00:00", "min_needed": 2, "max_needed": 3},
+                    {"start": "2018-08-31 15:00:00", "end": "2018-08-31 16:00:00", "min_needed": 2, "max_needed": 3},
+                ],
+                "Stage C": [
+                    {"start": "2018-08-31 11:00:00", "end": "2018-08-31 12:00:00", "min_needed": 2, "max_needed": 3},
+                    {"start": "2018-08-31 12:00:00", "end": "2018-08-31 13:00:00", "min_needed": 2, "max_needed": 3},
+                    {"start": "2018-08-31 13:00:00", "end": "2018-08-31 14:00:00", "min_needed": 2, "max_needed": 3},
+                    {"start": "2018-08-31 14:00:00", "end": "2018-08-31 15:00:00", "min_needed": 2, "max_needed": 3},
+                    {"start": "2018-08-31 15:00:00", "end": "2018-08-31 16:00:00", "min_needed": 2, "max_needed": 3}
+                ]
+            },
+            "Entrance Steward": {
+                "Entrance": [
+                    {"start": "2018-08-31 11:00:00", "end": "2018-08-31 12:00:00", "min_needed": 2, "max_needed": 3},
+                    {"start": "2018-08-31 12:00:00", "end": "2018-08-31 13:00:00", "min_needed": 2, "max_needed": 3},
+                    {"start": "2018-08-31 13:00:00", "end": "2018-08-31 14:00:00", "min_needed": 2, "max_needed": 3},
+                    {"start": "2018-08-31 14:00:00", "end": "2018-08-31 15:00:00", "min_needed": 2, "max_needed": 3},
+                    {"start": "2018-08-31 15:00:00", "end": "2018-08-31 16:00:00", "min_needed": 2, "max_needed": 3},
+                ]
+            }
+        }
+
         for v in venues:
             db.session.add(VolunteerVenue(**v))
 
         for r in roles:
             db.session.add(Role(**r))
+
+        for shift_role in shifts:
+            role = Role.get_by_name(shift_role)
+            for shift_venue in shifts[shift_role]:
+                venue = VolunteerVenue.get_by_name(shift_venue)
+                for shift in shifts[shift_role][shift_venue]:
+                    db.session.add(Shift(venue=venue, role=role, **shift))
 
         db.session.commit()
