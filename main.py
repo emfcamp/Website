@@ -219,7 +219,7 @@ def create_app(dev_server=False):
         from apps.volunteer.flask_admin_base import VolunteerAdminIndexView
 
         global volunteer_admin
-        volunteer_admin = Admin(url='/admin/volunteer', name='EMF Volunteers',
+        volunteer_admin = Admin(url='/volunteer/admin', name='EMF Volunteers',
                                 template_mode='bootstrap3',
                                 index_view=VolunteerAdminIndexView(url='/volunteer/admin'),
                                 base_template='volunteer/admin/flask-admin-base.html')
