@@ -40,7 +40,7 @@ def invoice(payment_id):
 
     edit_company = bool(request.args.get('edit_company'))
     if request.args.get('js') == '0':
-        flash("Please use your browser's print feature")
+        flash("Please use your browser's print feature or download the PDF")
 
     invoice_lines = Purchase.query.filter_by(payment_id=payment_id).join(PriceTier, Product) \
         .with_entities(PriceTier, func.count(Purchase.price_tier_id)) \

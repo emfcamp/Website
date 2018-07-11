@@ -10,6 +10,7 @@ from urllib.parse import urljoin
 
 from flask import Markup, render_template, current_app as app
 from sqlalchemy import func
+from sqlalchemy.orm import joinedload
 from pyppeteer.browser import Browser
 from pyppeteer.connection import Connection
 from pyppeteer.launcher import launch
@@ -182,14 +183,11 @@ def attach_tickets(msg, user):
     url = external_url('tickets.receipt', user_id=user.id)
     pdf = render_pdf(url, page)
 
-    # Types of product groups we include on receipts
-    # TODO: `user.owned_tickets` has changed here, there's some oddness with type...
-    assert False
-    receipt_types = ['admissions', 'campervan', 'parking', 'tees']
-    tickets = user.owned_tickets.filter(
-        Purchase.type.in_(receipt_types),
-        Purchase.is_paid_for == True,  # noqa: E712
-    )
+    receipt_types = ['admissions', 'campervan', 'parking', 'merchandise']
+
+    tickets = Ticket.query.filter_by(owner_id=user.id, is_paid_for=True) \
+                    .options(joinedload(Ticket.product).joinedload(Product.parent)) \
+                    .filter(ProductGroup.type.in_(receipt_types))
 
     plural = (tickets.count() != 1 and 's' or '')
     msg.attach('Ticket%s.pdf' % plural, 'application/pdf', pdf.read())
