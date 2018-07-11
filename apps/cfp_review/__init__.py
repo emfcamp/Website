@@ -31,7 +31,7 @@ def get_proposal_sort_dict(parameters):
         'type': lambda p: (p.type, p.title),
         'user': lambda p: (p.user.name, p.title),
         'title': lambda p: p.title,
-        'ticket': lambda p: (p.user.tickets.count() > 0, p.title),
+        'ticket': lambda p: (len(p.user.owned_tickets) > 0, p.title),
         'notice': lambda p: (sort_by_notice(p.notice_required), p.title),
         'duration': lambda p: (p.scheduled_duration or 0)
     }
