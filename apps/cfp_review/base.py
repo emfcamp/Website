@@ -558,7 +558,6 @@ def rank():
 
     types = request.args.getlist('type')
     if types:
-        filtered = True
         proposals = proposals.filter(Proposal.type.in_(types))
 
     proposals = proposals.all()
