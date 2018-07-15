@@ -1,4 +1,5 @@
 from datetime import timedelta
+from collections import defaultdict
 
 import dateutil
 from flask import (
@@ -450,6 +451,7 @@ def proposal_votes(proposal_id):
             for vote in all_votes.values():
                 if vote.state in states_to_set:
                     vote.set_state('stale')
+                    vote.note = None
                     stale_count += 1
 
             if stale_count:
@@ -461,6 +463,7 @@ def proposal_votes(proposal_id):
                 vote = all_votes[form_vote['id'].data]
                 if form_vote.resolve.data and vote.state in ['blocked']:
                     vote.set_state('resolved')
+                    vote.note = None
                     update_count += 1
 
             if update_count:
@@ -471,6 +474,7 @@ def proposal_votes(proposal_id):
             for vote in all_votes.values():
                 if vote.state == 'blocked':
                     vote.set_state('resolved')
+                    vote.note = None
                     resolved_count += 1
 
         if msg:
@@ -550,8 +554,13 @@ def close_round():
 @admin_required
 def rank():
     proposals = Proposal.query\
-        .filter_by(state='reviewed').all()
+        .filter_by(state='reviewed')
 
+    types = request.args.getlist('type')
+    if types:
+        proposals = proposals.filter(Proposal.type.in_(types))
+
+    proposals = proposals.all()
     form = AcceptanceForm()
     scored_proposals = []
 
@@ -580,7 +589,7 @@ def rank():
                 db.session.commit()
 
             del session['min_score']
-            msg = "Accepted %s proposals; min score: %s" % (count, min_score)
+            msg = "Accepted %s %s proposals; min score: %s" % (count, types, min_score)
             app.logger.info(msg)
             flash(msg, 'info')
             return redirect(url_for('.proposals', state='accepted'))
@@ -593,14 +602,17 @@ def rank():
         elif form.cancel.data and 'min_score' in session:
             del session['min_score']
 
-    accepted_count = Proposal.query\
+    accepted_proposals = Proposal.query\
         .filter(
             Proposal.state.in_(['accepted', 'finished'])
-        ).count()
+        )
+    accepted_counts = defaultdict(int)
+    for proposal in accepted_proposals:
+        accepted_counts[proposal.type] += 1
 
     return render_template('cfp_review/rank.html', form=form, preview=preview,
-                           proposals=scored_proposals, accepted_count=accepted_count,
-                           min_score=session.get('min_score'))
+                           proposals=scored_proposals, accepted_counts=accepted_counts,
+                           min_score=session.get('min_score'), types=types)
 
 @cfp_review.route('/potential_schedule_changes', methods=['GET', 'POST'])
 @schedule_required

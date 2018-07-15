@@ -179,6 +179,7 @@ def review_proposal(proposal_id):
             vote.note = form.note.data
             vote.has_been_read = False
         else:
+            vote.note = None
             vote.has_been_read = True
 
         vote_value = 2 if form.vote_excellent.data else\
