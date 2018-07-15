@@ -450,6 +450,7 @@ def proposal_votes(proposal_id):
             for vote in all_votes.values():
                 if vote.state in states_to_set:
                     vote.set_state('stale')
+                    vote.note = None
                     stale_count += 1
 
             if stale_count:
@@ -461,6 +462,7 @@ def proposal_votes(proposal_id):
                 vote = all_votes[form_vote['id'].data]
                 if form_vote.resolve.data and vote.state in ['blocked']:
                     vote.set_state('resolved')
+                    vote.note = None
                     update_count += 1
 
             if update_count:
@@ -471,6 +473,7 @@ def proposal_votes(proposal_id):
             for vote in all_votes.values():
                 if vote.state == 'blocked':
                     vote.set_state('resolved')
+                    vote.note = None
                     resolved_count += 1
 
         if msg:
