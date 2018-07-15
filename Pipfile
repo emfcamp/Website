@@ -57,6 +57,7 @@ pyyaml = "*"
 prometheus-client = "*"
 pyppeteer = "==0.0.18"
 flask-admin = "*"
+pendulum = ">=2.0"
 
 [dev-packages]
 pytest = "*"
