@@ -11,13 +11,26 @@
     If there are proposals that shouldn't be rejected or accepted at this point,
     please set their state back to "anonymised" from "reviewed".
 </p>
+
+<p>Show 
+    <a href="{{ url_for('.rank') }}">all</a>,
+    <a href="{{ url_for('.rank', type='talk') }}">talks</a>,
+    <a href="{{ url_for('.rank', type='workshop') }}">workshops</a>,
+    <a href="{{ url_for('.rank', type='youthworkshop') }}">youth workshops</a>,
+    <a href="{{ url_for('.rank', type='installation') }}">installations</a>,
+    <a href="{{ url_for('.rank', type='performance') }}">performances</a>.
+</p>
+
 {% if preview %}
     <p>
-        <span class="bg-info">Proposals</span> will be accepted. Other proposals will be rejected.
+        <span class="bg-info">Proposals</span> will be accepted. Other proposals will be entered into the next round.
     </p>
 {% endif %}
 <p>
-    <strong>{{ accepted_count }}</strong> already accepted proposals.
+<strong>Already accepted: </strong>
+{% for type, count in accepted_counts.items() %}
+<i>{{type}}</i>: {{count}},
+{% endfor %}
 </p>
 
 <table class="table">

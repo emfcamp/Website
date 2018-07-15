@@ -1,4 +1,5 @@
 from datetime import timedelta
+from collections import defaultdict
 
 import dateutil
 from flask import (
@@ -550,8 +551,14 @@ def close_round():
 @admin_required
 def rank():
     proposals = Proposal.query\
-        .filter_by(state='reviewed').all()
+        .filter_by(state='reviewed')
 
+    types = request.args.getlist('type')
+    if types:
+        filtered = True
+        proposals = proposals.filter(Proposal.type.in_(types))
+
+    proposals = proposals.all()
     form = AcceptanceForm()
     scored_proposals = []
 
@@ -580,7 +587,7 @@ def rank():
                 db.session.commit()
 
             del session['min_score']
-            msg = "Accepted %s proposals; min score: %s" % (count, min_score)
+            msg = "Accepted %s %s proposals; min score: %s" % (count, types, min_score)
             app.logger.info(msg)
             flash(msg, 'info')
             return redirect(url_for('.proposals', state='accepted'))
@@ -593,14 +600,17 @@ def rank():
         elif form.cancel.data and 'min_score' in session:
             del session['min_score']
 
-    accepted_count = Proposal.query\
+    accepted_proposals = Proposal.query\
         .filter(
             Proposal.state.in_(['accepted', 'finished'])
-        ).count()
+        )
+    accepted_counts = defaultdict(int)
+    for proposal in accepted_proposals:
+        accepted_counts[proposal.type] += 1
 
     return render_template('cfp_review/rank.html', form=form, preview=preview,
-                           proposals=scored_proposals, accepted_count=accepted_count,
-                           min_score=session.get('min_score'))
+                           proposals=scored_proposals, accepted_counts=accepted_counts,
+                           min_score=session.get('min_score'), types=types)
 
 @cfp_review.route('/potential_schedule_changes', methods=['GET', 'POST'])
 @schedule_required
