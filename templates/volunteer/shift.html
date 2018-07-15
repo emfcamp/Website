@@ -7,10 +7,12 @@
 {% block body %}
 
     <div>
-        Some sort of info on the shift!
-        <strong>It's id is: {{ id }}.</strong>
+        <h2>{{shift.role.name}} <small>at {{shift.venue.name}}</small></h2>
     </div>
-    <button class="btn btn-primary">
-        Sign up to do the shift!
-    </button>
+    <div>Start: {{ shift.start.strftime('%A %H:%M') }}</div>
+    <div>Stop: {{ shift.end.strftime('%A %H:%M') }}</div>
+
+    <div><button class="btn btn-primary">
+            Sign up to do the shift!
+    </button></div>
 {% endblock %}

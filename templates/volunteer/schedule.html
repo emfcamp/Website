@@ -1,12 +1,12 @@
 {% extends 'volunteer/base.html' %}
 {% from "_formhelpers.html" import render_field %}
 
-{% macro shift_cell(col_name, shifts) -%}
+{% macro shift_cell(shift) -%}
 <td>
-    {% if col_name not in shifts %}
+    {% if not shift %}
         --
     {% else %}
-        <a href="{{ url_for('.shift', id=shifts[col_name]) }}">Do {{ col_name }} shift</a>
+        <a href="{{ url_for('.shift', id=shift.id) }}">Do {{ shift.venue.name }} shift</a>
     {% endif %}
 </td>
 {%- endmacro %}
@@ -33,22 +33,17 @@
         <table class="table table-bordered">
             <thead><tr>
                 <th>Time</th>
-                {# FIXME locations should be dynamic not hard-coded #}
-                {# FIXME make the locations reflect the filters #}
-                <th>Bar</th>
-                <th>Bar (secret)</th>
-                <th>Gate</th>
-                <th>Stage A</th>
-                <th>Stage B</th>
-                <th>Stage C</th>
+                {% for v in venues %}
+                    <th>{{ v.name }}</th>
+                {% endfor %}
             </tr></thead>
             <tbody>
-                {% for time_slot in all_shifts %}
+                {% for t in times %}
                     <tr>
-                        <th scope="row">{{ time_slot['time'] }}:00</th>
-                    {% for col_name in locations %}
-                        {{ shift_cell(col_name, time_slot['shifts']) }}
-                    {% endfor %}
+                        <td>{{ t }}</td>
+                        {% for v in venues %}
+                            {{ shift_cell(all_shifts.get(t, {}).get(v.id, False)) }}
+                        {% endfor %}
                     </tr>
                 {% endfor %}
             </tbody>
