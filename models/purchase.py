@@ -9,18 +9,16 @@ from main import db
 PRODUCT_TYPES = ["admission_ticket", "ticket", "merchandise"]
 
 # state: [allowed next state, ] pairs, see docs/ticket_states.md
-PURCHASE_STATES = {'reserved': ['payment-pending', 'expired', 'cancelled', 'paid'],
-                   'payment-pending': ['expired', 'paid', 'cancelled'],
-                   'expired': [],
+PURCHASE_STATES = {'reserved': ['payment-pending', 'paid', 'cancelled'],
+                   'payment-pending': ['paid', 'cancelled'],
                    'cancelled': [],
                    'paid': ['receipt-emailed', 'refunded', 'cancelled'],
                    'receipt-emailed': ['paid', 'refunded', 'cancelled'],
                    'refunded': [],
                    }
-# non_blocking_states are those states that don't contribute towards a user limit
-non_blocking_states = ('expired', 'refunded', 'cancelled')
-bought_states = ('paid', 'receipt-emailed')
-anon_states = ('reserved', 'cancelled', 'expired')
+
+bought_states = {'paid', 'receipt-emailed'}
+anon_states = {'reserved', 'cancelled'}
 allowed_states = set(PURCHASE_STATES.keys())
 
 class CheckinStateException(Exception):
@@ -127,7 +125,7 @@ class Purchase(db.Model):
         self.price = self.price_tier.get_price(currency)
 
     def transfer(self, from_user, to_user):
-        if self.state not in bought_states:
+        if not self.is_paid_for:
             # We don't allow reserved items to be transferred to prevent a rush
             raise PurchaseTransferException('Only paid items may be transferred.')
 

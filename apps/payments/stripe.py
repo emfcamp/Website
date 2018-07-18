@@ -334,8 +334,8 @@ def stripe_payment_refunded(payment):
         return
 
     logger.info('Setting payment %s to refunded', payment.id)
-    for ticket in payment.purchases:
-        ticket.state = 'refunded'
+    for purchase in payment.purchases:
+        purchase.state = 'refunded'
 
     payment.state = 'refunded'
     db.session.commit()
