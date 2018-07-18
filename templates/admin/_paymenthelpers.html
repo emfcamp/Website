@@ -6,7 +6,7 @@
 {%- if payment.provider == 'banktransfer' %}
 <dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
 {% elif payment.provider == 'gocardless' %}
-<dt>GoCardless ID</dt><dd><a href="https://manage.gocardless.com/payments/{{ payment.gcid }}">{{ payment.gcid }}</a></dd>
+<dt>GoCardless ID</dt><dd><a href="https://manage{% if config['GOCARDLESS_ENVIRONMENT'] == 'sandbox' %}-sandbox{% endif %}.gocardless.com/payments/{{ payment.gcid }}">{{ payment.gcid }}</a></dd>
 {% endif -%}
 {% if payment.expires %}
 <dt>Expires</dt><dd>{{ payment.expires.strftime('%Y-%m-%d %H:%M:%S') }}</dd>

@@ -410,7 +410,6 @@ def gocardless_webhook_payment_do_nothing(resource, action, event):
 
 @webhook('payments', 'failed')
 def gocardless_webhook_payment_failed(resource, action, event):
-
     gcid = event['links']['payment']
     payment = lock_payment_or_ignore(gcid)
 
@@ -422,6 +421,152 @@ def gocardless_webhook_payment_failed(resource, action, event):
         logger.error("Payment status is %s (should be failed), ignoring", gc_payment.status)
         return
 
+    gocardless_payment_failed(payment)
+
+
+@webhook('payments', 'resubmission_requested')
+def gocardless_webhook_payment_retried(resource, action, event):
+    gcid = event['links']['payment']
+    payment = lock_payment_or_ignore(gcid)
+
+    logger.info("Received resubmission action for gcid %s, payment %s",
+                gcid, payment.id)
+
+    gc_payment = gocardless_client.payments.get(payment.gcid)
+    logger.info("Payment status is %s", gc_payment.status)
+
+    gocardless_payment_pending(payment)
+
+
+@webhook('payments', 'cancelled')
+def gocardless_webhook_payment_cancelled(resource, action, event):
+    gcid = event['links']['payment']
+    payment = lock_payment_or_ignore(gcid)
+
+    logger.info("Received cancelled action for gcid %s, payment %s",
+                gcid, payment.id)
+
+    gc_payment = gocardless_client.payments.get(payment.gcid)
+    if gc_payment.status != 'cancelled':
+        logger.error("Payment status is %s (should be cancelled), ignoring", gc_payment.status)
+        return
+
+    gocardless_payment_cancelled(payment)
+
+
+@webhook('payments', 'confirmed')
+def gocardless_webhook_payment_confirmed(resource, action, event):
+    gcid = event['links']['payment']
+    payment = lock_payment_or_ignore(gcid)
+
+    logger.info("Received confirmed action for gcid %s, payment %s",
+                gcid, payment.id)
+
+    gc_payment = gocardless_client.payments.get(payment.gcid)
+    if gc_payment.status not in {'confirmed', 'paid_out'}:
+        logger.error("Payment status is %s (should be confirmed or paid_out), ignoring", gc_payment.status)
+        return
+
+    gocardless_payment_paid(payment)
+
+
+@webhook('payments', 'charged_back')
+def gocardless_webhook_payment_charged_back(resource, action, event):
+    gcid = event['links']['payment']
+    payment = lock_payment_or_ignore(gcid)
+
+    logger.info("Received charged_back action for gcid %s, payment %s",
+                gcid, payment.id)
+
+    gc_payment = gocardless_client.payments.get(payment.gcid)
+    if gc_payment.status != 'charged_back':
+        logger.error("Payment status is %s (should be charged_back, ignoring", gc_payment.status)
+        return
+
+    gocardless_payment_charged_back(payment)
+
+
+def gocardless_update_payment(payment):
+    # Assumes payment is already locked
+
+    gc_payment = gocardless_client.payments.get(payment.gcid)
+
+    if gc_payment.status == 'pending_submission':
+        return gocardless_payment_pending(payment)
+
+    elif gc_payment.status in {'confirmed', 'paid_out'}:
+        return gocardless_payment_paid(payment)
+
+    elif gc_payment.status == 'cancelled':
+        return gocardless_payment_cancelled(payment)
+
+    elif gc_payment.status == 'failed':
+        return gocardless_payment_failed(payment)
+
+    elif gc_payment.status == 'charged_back':
+        return gocardless_payment_charged_back(payment)
+
+    app.logger.warn('Unsupported payment status %s, ignoring', gc_payment.status)
+
+
+def gocardless_payment_pending(payment):
+    if payment.state == 'inprogress':
+        logger.info('Payment is already inprogress, skipping')
+        return
+
+    if payment.state != 'failed':
+        logger.error("Current payment state is %s (should be failed), ignoring", payment.state)
+        return
+
+    logger.info("Setting payment %s to inprogress", payment.id)
+    payment.state = 'inprogress'
+    db.session.commit()
+
+
+def gocardless_payment_paid(payment):
+    if payment.state == 'paid':
+        logger.info('Payment is already paid, ignoring')
+        return
+
+    if payment.state == 'partrefunded':
+        logger.info('Payment is already partially refunded, ignoring')
+        return
+
+    if payment.state != 'inprogress':
+        logger.error("Current payment state is %s (should be inprogress), ignoring", payment.state)
+        return
+
+    logger.info("Setting payment %s to paid", payment.id)
+    payment.paid()
+
+    msg = Message("Your EMF ticket payment has been confirmed",
+                  sender=app.config['TICKETS_EMAIL'],
+                  recipients=[payment.user.email])
+    msg.body = render_template('emails/tickets-paid-email-gocardless.txt',
+                               user=payment.user, payment=payment)
+
+    if feature_enabled('ISSUE_TICKETS'):
+        attach_tickets(msg, payment.user)
+
+    db.session.commit()
+    mail.send(msg)
+
+
+def gocardless_payment_cancelled(payment):
+    if payment.state == 'cancelled':
+        logger.info('Payment is already cancelled, ignoring')
+        return
+
+    if payment.state != 'inprogress':
+        logger.error("Current payment state is %s (should be inprogress), ignoring", payment.state)
+        return
+
+    logger.info("Setting payment %s to cancelled", payment.id)
+    payment.cancel()
+    db.session.commit()
+
+
+def gocardless_payment_failed(payment):
     if payment.state in {'failed', 'late-failed'}:
         logger.info('Payment is already failed, skipping')
         return
@@ -461,110 +606,6 @@ def gocardless_webhook_payment_failed(resource, action, event):
     mail.send(msg)
 
 
-
-@webhook('payments', 'resubmission_requested')
-def gocardless_webhook_payment_retried(resource, action, event):
-
-    gcid = event['links']['payment']
-    payment = lock_payment_or_ignore(gcid)
-
-    logger.info("Received resubmission action for gcid %s, payment %s",
-                gcid, payment.id)
-
-    gc_payment = gocardless_client.payments.get(payment.gcid)
-    logger.info("Payment status is %s", gc_payment.status)
-
-    if payment.state == 'inprogress':
-        logger.info('Payment is already inprogress, skipping')
-        return
-
-    if payment.state != 'failed':
-        logger.error("Current payment state is %s (should be failed), ignoring", payment.state)
-        return
-
-    logger.info("Setting payment %s to inprogress", payment.id)
-    payment.state = 'inprogress'
-    db.session.commit()
-
-
-
-@webhook('payments', 'cancelled')
-def gocardless_webhook_payment_cancelled(resource, action, event):
-
-    gcid = event['links']['payment']
-    payment = lock_payment_or_ignore(gcid)
-
-    logger.info("Received cancelled action for gcid %s, payment %s",
-                gcid, payment.id)
-
-    gc_payment = gocardless_client.payments.get(payment.gcid)
-    if gc_payment.status != 'cancelled':
-        logger.error("Payment status is %s (should be cancelled), ignoring", gc_payment.status)
-        return
-
-    if payment.state == 'cancelled':
-        logger.info('Payment is already cancelled, ignoring')
-        return
-
-    if payment.state != 'inprogress':
-        logger.error("Current payment state is %s (should be inprogress), ignoring", payment.state)
-        return
-
-    logger.info("Setting payment %s to cancelled", payment.id)
-    payment.cancel()
-    db.session.commit()
-
-
-@webhook('payments', 'confirmed')
-def gocardless_webhook_payment_confirmed(resource, action, event):
-
-    gcid = event['links']['payment']
-    payment = lock_payment_or_ignore(gcid)
-
-    logger.info("Received confirmed action for gcid %s, payment %s",
-                gcid, payment.id)
-
-    gc_payment = gocardless_client.payments.get(payment.gcid)
-    if gc_payment.status not in {'confirmed', 'paid_out'}:
-        logger.error("Payment status is %s (should be confirmed or paid_out), ignoring", gc_payment.status)
-        return
-
-    gocardless_payment_paid(payment)
-
-
-def gocardless_update_payment(payment):
-    gc_payment = gocardless_client.payments.get(payment.gcid)
-    if gc_payment.status in {'confirmed', 'paid_out'}:
-        return gocardless_payment_paid(payment)
-
-    app.logger.warn('Payment object is not paid, ignoring')
-
-
-def gocardless_payment_paid(payment):
-    if payment.state == 'paid':
-        logger.info('Payment is already paid, ignoring')
-        return
-
-    if payment.state == 'partrefunded':
-        logger.info('Payment is already partially refunded, ignoring')
-        return
-
-    if payment.state != 'inprogress':
-        logger.error("Current payment state is %s (should be inprogress), ignoring", payment.state)
-        return
-
-    logger.info("Setting payment %s to paid", payment.id)
-    payment.paid()
-
-    msg = Message("Your EMF ticket payment has been confirmed",
-                  sender=app.config['TICKETS_EMAIL'],
-                  recipients=[payment.user.email])
-    msg.body = render_template('emails/tickets-paid-email-gocardless.txt',
-                               user=payment.user, payment=payment)
-
-    if feature_enabled('ISSUE_TICKETS'):
-        attach_tickets(msg, payment.user)
-
-    db.session.commit()
-    mail.send(msg)
+def gocardless_payment_charged_back(payment):
+    raise NotImplementedError('Chargebacks not supported yet')
 

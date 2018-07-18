@@ -351,7 +351,7 @@ def stripe_payment_refunded(payment):
     mail.send(msg)
 
 
-def stripe_charge_failed(payment):
+def stripe_payment_failed(payment):
     # Stripe payments almost always fail during capture, but can be failed while charging.
     # Test with 4000 0000 0000 0341
     if payment.state == 'failed':
