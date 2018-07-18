@@ -1,0 +1,22 @@
+Hi {{ payment.user.name }},
+
+We've received notification that your payment for {{ payment.amount | price(payment.currency) }} has failed.
+
+{% if payment.purchases | count > 1 %}
+We've kept your reservations for now, but they will expire in a few
+days if not paid for.
+{% else %}
+We've kept your reservation for now, but it will expire in a few
+days if not paid for.
+{% endif %}
+
+If you don't want the purchases you can ignore this email. Otherwise,
+you can go to the EMF website:
+
+  {{ external_url('users.purchases') }}
+
+and complete the payment process again.
+
+Love,
+
+All the EMF team

@@ -30,6 +30,8 @@
           <a href="{{ url_for('payments.stripe_tryagain', payment_id=p.id) }}" class="btn btn-success">Pay</a>
         {%- elif p.state == "captured" and p.provider == "stripe" %}
           <a href="{{ url_for('payments.stripe_tryagain', payment_id=p.id) }}" class="btn btn-success">Charge</a>
+        {%- elif p.state == "failed" and p.provider == "stripe" %}
+          <a href="{{ url_for('payments.stripe_tryagain', payment_id=p.id) }}" class="btn btn-success">Try again</a>
         {% endif -%}
       </td>
       <td class="btn-group" role="group">
@@ -37,7 +39,7 @@
           <a href="{{ url_for('payments.gocardless_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
         {%- elif p.state in ["new", "inprogress"] and p.provider == "banktransfer" %}
           <a href="{{ url_for('payments.transfer_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
-        {%- elif p.state in ["new", "captured"] and p.provider == "stripe" %}
+        {%- elif p.state in ["new", "captured", "failed"] and p.provider == "stripe" %}
           <a href="{{ url_for('payments.stripe_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
       {% endif -%}
       <a href="{{ url_for('payments.invoice', payment_id=p.id) }}" class="btn btn-default">View Invoice</a>

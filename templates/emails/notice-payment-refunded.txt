@@ -1,5 +1,5 @@
 Payment {{ payment.id }} for {{ payment.amount | price(payment.currency) }} belonging to
-{{ user.name }} ({{ user.email }}) has just been refunded by Stripe.
+{{ payment.user.name }} ({{ payment.user.email }}) has just been refunded by Stripe.
 
 Ticket details:
 

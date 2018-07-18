@@ -422,17 +422,44 @@ def gocardless_webhook_payment_failed(resource, action, event):
         logger.error("Payment status is %s (should be failed), ignoring", gc_payment.status)
         return
 
-    if payment.state == 'failed':
+    if payment.state in {'failed', 'late-failed'}:
         logger.info('Payment is already failed, skipping')
         return
 
-    if payment.state != 'inprogress':
-        logger.error("Current payment state is %s (should be inprogress), ignoring", payment.state)
+    if payment.state == 'inprogress':
+        logger.info("Setting payment %s to failed", payment.id)
+        payment.state = 'failed'
+
+    elif payment.state == 'paid':
+        logger.info("Setting payment %s to late-failed", payment.id)
+        payment.state = 'late-failed'
+
+    else:
+        logger.error("Current payment state is %s (should be inprogress or paid), ignoring", payment.state)
         return
 
-    logger.info("Setting payment %s to failed", payment.id)
-    payment.state = 'failed'
+    payment.expires = datetime.utcnow() + timedelta(days=app.config['EXPIRY_DAYS_GOCARDLESS'])
+    for purchase in payment.purchases:
+        purchase.set_state('payment-pending')
+
+    msg = Message("Your EMF payment has failed",
+                  sender=app.config['TICKETS_EMAIL'],
+                  recipients=[payment.user.email])
+    msg.body = render_template("emails/payment-failed.txt", payment=payment)
+    mail.send(msg)
+
     db.session.commit()
+
+    if not app.config.get('TICKETS_NOTICE_EMAIL'):
+        app.logger.warning('No tickets notice email configured, not sending')
+        return
+
+    msg = Message('An EMF payment has failed',
+                  sender=app.config.get('TICKETS_EMAIL'),
+                  recipients=[app.config.get('TICKETS_NOTICE_EMAIL')[1]])
+    msg.body = render_template('emails/notice-payment-failed.txt', payment=payment)
+    mail.send(msg)
+
 
 
 @webhook('payments', 'resubmission_requested')

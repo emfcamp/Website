@@ -106,7 +106,7 @@ class Purchase(db.Model):
             return
 
         if new_state not in PURCHASE_STATES:
-            raise PurchaseStateException('"%s" is not a valid state.')
+            raise PurchaseStateException('"%s" is not a valid state.' % new_state)
 
         if new_state not in PURCHASE_STATES[self.state]:
             raise PurchaseStateException('"%s->%s" is not a valid transition' % (self.state, new_state))

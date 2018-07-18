@@ -291,7 +291,10 @@ def stripe_update_payment(payment):
     elif charge.paid:
         return stripe_payment_paid(payment)
 
-    app.logger.error('Charge object is not paid or refunded')
+    elif charge.failed:
+        return stripe_payment_failed(payment)
+
+    app.logger.error('Charge object is not paid, refunded or failed')
     raise StripeUpdateUnexpected()
 
 
@@ -312,7 +315,7 @@ def stripe_payment_paid(payment):
     payment.paid()
     db.session.commit()
 
-    msg = Message('Your EMF ticket payment has been confirmed',
+    msg = Message('Your EMF payment has been confirmed',
                   sender=app.config.get('TICKETS_EMAIL'),
                   recipients=[payment.user.email])
     msg.body = render_template('emails/tickets-paid-email-stripe.txt',
@@ -341,17 +344,38 @@ def stripe_payment_refunded(payment):
         app.logger.warning('No tickets notice email configured, not sending')
         return
 
-    msg = Message('An EMF ticket payment has been refunded',
+    msg = Message('An EMF payment has been refunded',
                   sender=app.config.get('TICKETS_EMAIL'),
                   recipients=[app.config.get('TICKETS_NOTICE_EMAIL')[1]])
-    msg.body = render_template('emails/tickets-refunded-email-stripe.txt',
-                               user=payment.user, payment=payment)
+    msg.body = render_template('emails/notice-payment-refunded.txt', payment=payment)
     mail.send(msg)
+
+
+def stripe_charge_failed(payment):
+    # Stripe payments almost always fail during capture, but can be failed while charging.
+    # Test with 4000 0000 0000 0341
+    if payment.state == 'failed':
+        logger.info('Payment is already failed, ignoring')
+        return
+
+    if payment.state == 'partrefunded':
+        logger.error('Payment is already partially refunded, so cannot be failed')
+        raise StripeUpdateConflict()
+
+    if payment.state != 'charged':
+        logger.error('Current payment state is %s (should be charged)', payment.state)
+        raise StripeUpdateConflict()
+
+    payment.state = 'failed'
+    db.session.commit()
+
+    # Charge can be retried, so nothing else to do.
 
 
 @webhook('charge.succeeded')
 @webhook('charge.refunded')
 @webhook('charge.updated')
+@webhook('charge.failed')
 def stripe_charge_updated(type, charge_data):
     payment = lock_payment_or_abort(charge_data['id'])
 
@@ -364,30 +388,6 @@ def stripe_charge_updated(type, charge_data):
     except StripeUpdateUnexpected:
         abort(501)
 
-    return ('', 200)
-
-
-@webhook('charge.failed')
-def stripe_charge_failed(type, charge_data):
-    # Test with 4000 0000 0000 0341
-    try:
-        payment = StripePayment.query.filter_by(chargeid=charge_data['id']).one()
-    except NoResultFound:
-        logger.warn('Payment for failed charge %s not found, ignoring', charge_data['id'])
-        return ('', 200)
-
-    logger.info('Received failed message for charge %s, payment %s', charge_data['id'], payment.id)
-
-    charge = stripe.Charge.retrieve(charge_data['id'])
-    if not charge.failed:
-        logger.error('Charge object is not failed')
-        abort(501)
-
-    if charge.paid:
-        logger.error('Charge object has already been paid')
-        abort(501)
-
-    # Payment can still be retried with a new charge - nothing to do
     return ('', 200)
 
 
