@@ -21,7 +21,6 @@ from models.product import (
     PriceTier, ProductView,
     ProductViewProduct, Product,
 )
-from models import bought_states
 from models.basket import Basket
 from models.payment import BankPayment, StripePayment, GoCardlessPayment
 from models.purchase import Ticket
@@ -418,13 +417,14 @@ def transfer(ticket_id):
     try:
         ticket = current_user.owned_purchases.filter_by(id=ticket_id).one()
     except NoResultFound:
+        abort(404)
+
+    if not ticket.is_paid_for:
+        flash("Unpaid tickets cannot be transferred")
         return redirect(url_for('users.purchases'))
 
-    # Currently we only deal with ticket transfers, but other
-    # items could be transferable in the future.
-    if (not ticket or
-            ticket.state not in bought_states or
-            not ticket.product.get_attribute('is_transferable')):
+    if not ticket.product.get_attribute('is_transferable'):
+        flash("This purchase cannot be transferred")
         return redirect(url_for('users.purchases'))
 
     form = TicketTransferForm()
