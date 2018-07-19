@@ -480,7 +480,7 @@ def gocardless_webhook_payment_charged_back(resource, action, event):
 
     gc_payment = gocardless_client.payments.get(payment.gcid)
     if gc_payment.status != 'charged_back':
-        logger.error("Payment status is %s (should be charged_back, ignoring", gc_payment.status)
+        logger.error("Payment status is %s (should be charged_back), ignoring", gc_payment.status)
         return
 
     gocardless_payment_charged_back(payment)
@@ -567,17 +567,13 @@ def gocardless_payment_cancelled(payment):
 
 
 def gocardless_payment_failed(payment):
-    if payment.state in {'failed', 'late-failed'}:
+    if payment.state == 'failed':
         logger.info('Payment is already failed, skipping')
         return
 
-    if payment.state == 'inprogress':
+    if payment.state in {'inprogress', 'paid'}:
         logger.info("Setting payment %s to failed", payment.id)
         payment.state = 'failed'
-
-    elif payment.state == 'paid':
-        logger.info("Setting payment %s to late-failed", payment.id)
-        payment.state = 'late-failed'
 
     else:
         logger.error("Current payment state is %s (should be inprogress or paid), ignoring", payment.state)
