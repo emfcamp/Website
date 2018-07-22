@@ -334,6 +334,10 @@ legend {
   text-decoration: none;
 }
 
+.intro-text {
+  font-size: 1.2em;
+}
+
 div#about-page {
   font-size: 1.2em;
 }
@@ -417,4 +421,8 @@ a.collapse-toggle:hover .glyphicon {
 .credit a:focus,
 .credit a:visited {
   tdext-decoration: none;
+}
+
+.about-volunteering .intro-text {
+  font-size: 1.2em;
 }
