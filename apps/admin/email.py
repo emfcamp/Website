@@ -18,7 +18,8 @@ from ..common.forms import Form
 
 
 def format_html_email(markdown_text, subject):
-    markdown_html = Markup(markdown.markdown(markdown_text))
+    extensions = ['markdown.extensions.nl2br', 'markdown.extensions.smarty']
+    markdown_html = Markup(markdown.markdown(markdown_text, extensions=extensions))
     return inline_css(render_template('admin/email/email_template.html',
                       subject=subject, content=markdown_html))
 
@@ -45,7 +46,7 @@ def email():
         job = EmailJob(form.subject.data, format_plaintext_email(form.text.data),
                        format_html_email(form.text.data, form.subject.data))
         db.session.add(job)
-        users = User.query.join(AdmissionTicket).filter_by(is_paid_for=True).group_by(User.id).all()
+        users = User.query.join(User.owned_purchases).filter_by(type='admission_ticket', is_paid_for=True).group_by(User.id).all()
         for user in users:
             db.session.add(EmailJobRecipient(job, user))
         db.session.commit()
