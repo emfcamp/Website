@@ -109,6 +109,23 @@ def create_app(dev_server=False):
         else:
             logging.root.setLevel(logging.DEBUG)
 
+    from apps.metrics import request_duration, request_total
+
+    # Must be run before crsf.init_app
+    @app.before_request
+    def before_request():
+        request._start_time = time.time()
+
+    @app.after_request
+    def after_request(response):
+        try:
+            request_duration.labels(request.endpoint, request.method).observe(
+                time.time() - request._start_time)
+        except AttributeError:
+            logging.exception("Request without _start_time - check app.before_request ordering")
+        request_total.labels(request.endpoint, request.method, response.status_code).inc()
+        return response
+
     for extension in (cdn, csrf, cache, db, mail, assets, toolbar):
         extension.init_app(app)
 
@@ -162,23 +179,6 @@ def create_app(dev_server=False):
         response.headers['X-Frame-Options'] = 'deny'
         response.headers['X-Content-Type-Options'] = 'nosniff'
 
-        return response
-
-    from apps.metrics import request_duration, request_total
-
-    @app.before_request
-    def before_request():
-        request._start_time = time.time()
-
-    @app.after_request
-    def after_request(response):
-        try:
-            request_duration.labels(request.endpoint, request.method).observe(
-                time.time() - request._start_time)
-        except AttributeError:
-            # In some cases this isn't present?
-            logging.exception("Request without _start_time")
-        request_total.labels(request.endpoint, request.method, response.status_code).inc()
         return response
 
     @app.errorhandler(404)
