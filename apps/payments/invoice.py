@@ -70,7 +70,7 @@ def invoice(payment_id):
 
     if request.args.get('pdf'):
         url = external_url('.invoice', payment_id=payment_id)
-        return send_file(render_pdf(url, page), mimetype='application/pdf')
+        return send_file(render_pdf(url, page), mimetype='application/pdf', cache_timeout=60)
 
     return page
 
