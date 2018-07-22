@@ -104,8 +104,8 @@ applypotentialschedule:
 shell:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py shell
 
-testemails:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py testemails
+sendemails:
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py sendemails
 
 admin:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makeadmin ${ARGS}
