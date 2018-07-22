@@ -279,10 +279,14 @@ class Proposal(db.Model):
         return admission_tickets > 0 or self.user.will_have_ticket
 
     def get_allowed_venues(self):
+        # FIXME: this should reference a foreign key instead
         if self.allowed_venues:
             venue_names = [ v.strip() for v in self.allowed_venues.split(',') ]
         else:
             venue_names = DEFAULT_VENUES[self.type]
+
+        if not venue_names:
+            return []
 
         found = Venue.query.filter(Venue.name.in_(venue_names)).all()
         # If we didn't actually find all the venues we're using, bail hard
