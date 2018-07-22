@@ -8,11 +8,13 @@
 </iframe>
 <form method="post">
 {{ form.hidden_tag() }}
-{{ form.subject(size=120) }}
-{{ form.text(cols=120, rows=30) }}
+{{ form.subject(size=100) }}
+{{ form.text(cols=100, rows=30) }}
 
 {{ form.preview(class_="btn btn-success pull-right") }}
 {{ form.send(class_="btn btn-danger pull-right") }}
+<br>
+<p>Preview Email Address: {{ form.send_preview_address(cols=30) }} {{ form.send_preview(class_="btn btn-success") }}</p>
 </form>
 {% else %}
 <h3>Compose</h3>
