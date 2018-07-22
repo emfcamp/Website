@@ -66,7 +66,7 @@ class Form(BaseForm):
     TIME_LIMIT = 3600 * 24 * 31
 
     def hidden_tag_without(self, *exclude_fields):
-        fields = [isinstance(f, string_types) and getattr(self, f) or f for f in exclude_fields]
+        fields = [getattr(self, f) if isinstance(f, string_types) else f for f in exclude_fields]
         keep_fields = [f for f in self if _is_hidden(f) and f not in fields]
         return BaseForm.hidden_tag(self, *keep_fields)
 
