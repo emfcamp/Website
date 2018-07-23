@@ -4,7 +4,7 @@
     <th>Type</th>
     <th>Amount</th>
     <th>Progress</th>
-    <th colspan="2"></th>
+    <th class="table-actions"></th>
 </tr>
 </thead>
   {% for p in payments %}
@@ -14,35 +14,34 @@
       </td>
       <td>{{ p.amount | price(p.currency) }}</td>
       <td>
-        {%- if p.state == "inprogress" and p.provider == "banktransfer" %}
-          <a href="{{ url_for('payments.transfer_waiting', payment_id=p.id) }}">Pending</a>
-        {%- else -%}
-          {{ {'new': 'Incomplete', 'inprogress': 'Pending', 'paid': 'Complete', 'captured': 'Not paid', 'charging': 'Charging', 'partrefunded': 'Partially refunded', 'refunded': 'Refunded', 'failed': 'Failed'}[p.state] -}}
-        {% endif -%}
-        {%- if p.provider == "banktransfer" %}, reference: {{ p.bankref | bankref }} {% endif %}
+        {{ {'new': 'Incomplete', 'inprogress': 'Pending', 'paid': 'Complete', 'captured': 'Not paid', 'charging': 'Charging', 'partrefunded': 'Partially refunded', 'refunded': 'Refunded', 'failed': 'Failed'}[p.state] -}}
       </td>
-      <td>
-        {%- if p.state in ["new", "captured"] and p.provider == "gocardless" %}
+      <td class="table-actions">
+        <div class="btn-group" role="group">
+          {%- if p.state == "inprogress" and p.provider == "banktransfer" %}
+          <a href="{{ url_for('payments.transfer_waiting', payment_id=p.id) }}" class="btn btn-success">Pay</a>
+          {%- elif p.state in ["new", "captured"] and p.provider == "gocardless" %}
           <a href="{{ url_for('payments.gocardless_tryagain', payment_id=p.id) }}" class="btn btn-success">Pay</a>
-        {%- elif p.state == "failed" and p.provider == "gocardless" %}
+          {%- elif p.state == "failed" and p.provider == "gocardless" %}
           <a href="{{ url_for('payments.gocardless_tryagain', payment_id=p.id) }}" class="btn btn-success">Try again</a>
-        {%- elif p.state == "new" and p.provider == "stripe" %}
+          {%- elif p.state == "new" and p.provider == "stripe" %}
           <a href="{{ url_for('payments.stripe_tryagain', payment_id=p.id) }}" class="btn btn-success">Pay</a>
-        {%- elif p.state == "captured" and p.provider == "stripe" %}
+          {%- elif p.state == "captured" and p.provider == "stripe" %}
           <a href="{{ url_for('payments.stripe_tryagain', payment_id=p.id) }}" class="btn btn-success">Charge</a>
-        {%- elif p.state == "failed" and p.provider == "stripe" %}
+          {%- elif p.state == "failed" and p.provider == "stripe" %}
           <a href="{{ url_for('payments.stripe_tryagain', payment_id=p.id) }}" class="btn btn-success">Try again</a>
-        {% endif -%}
-      </td>
-      <td class="btn-group" role="group">
-        {%- if p.state in ["new", "failed"] and p.provider == "gocardless" %}
+          {% endif -%}
+
+          {%- if p.state in ["new", "failed"] and p.provider == "gocardless" %}
           <a href="{{ url_for('payments.gocardless_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
-        {%- elif p.state in ["new", "inprogress"] and p.provider == "banktransfer" %}
+          {%- elif p.state in ["new", "inprogress"] and p.provider == "banktransfer" %}
           <a href="{{ url_for('payments.transfer_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
-        {%- elif p.state in ["new", "captured", "failed"] and p.provider == "stripe" %}
+          {%- elif p.state in ["new", "captured", "failed"] and p.provider == "stripe" %}
           <a href="{{ url_for('payments.stripe_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
-      {% endif -%}
-      <a href="{{ url_for('payments.invoice', payment_id=p.id) }}" class="btn btn-default">View Invoice</a>
+          {% endif -%}
+
+          <a href="{{ url_for('payments.invoice', payment_id=p.id) }}" class="btn btn-default">View Invoice</a>
+        </div>
       </td>
     </tr>
   {% endfor %}

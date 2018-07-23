@@ -72,3 +72,15 @@ tr.odd {
 .btns-table > tbody > tr > td .btn {
     margin: -7px 0px -6px;
 }
+
+.table-actions {
+    text-align: right;
+}
+
+@media print {
+    .table-actions {
+        display: none;
+    }
+
+}
+

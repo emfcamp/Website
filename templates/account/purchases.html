@@ -1,17 +1,19 @@
 {% extends "base.html" %}
+{% set main_class = 'account-purchases' %}
+
 {% block title %}Your tickets{% endblock %}
 {% block body %}
 
 {% if tickets %}
   <h3>Your tickets</h2>
-  <a id="your-tickets"></a>
+  <a id="tickets"></a>
   {% include "account/purchases/ticket-list.html" %}
   <div class="clearfix"></div>
 {% endif %}
 
 {% if other_items %}
   <h3>Your other purchases</h2>
-  <a id="your-tickets"></a>
+  <a id="other"></a>
   {% include "account/purchases/other-items-list.html" %}
   <div class="clearfix"></div>
 {% endif %}
@@ -19,7 +21,7 @@
 
 {% if payments %}
   <h3>Your payments</h2>
-  <a id="your-payments"></a>
+  <a id="payments"></a>
   {% include "account/purchases/payments.html" %}
   <div class="clearfix"></div>
 {% endif %}
@@ -38,7 +40,11 @@
   <div class="clearfix"></div>
 {% endif %}
 
-<div class="pull-right">
+<p class="terms-reminder">
+  Entrance to the festival is subject to our <a href="{{url_for('payments.terms')}}">Terms
+  and Conditions</a> and the <a href="{{url_for('base.code_of_conduct')}}">Code of Conduct</a>.
+</p>
+<div class="pull-right ticket-actions">
     <a href="{{ url_for('tickets.main') }}" class="btn btn-primary">Buy another ticket</a>
 </div>
 

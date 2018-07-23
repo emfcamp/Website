@@ -3,7 +3,7 @@
 <tr>
   <th>Type</th>
   <th>Status</th>
-  <th></th>
+  <th class="table-actions"></th>
 </tr>
 </thead>
 
@@ -27,7 +27,7 @@
     Reserved {% if item.payment.expires -%} until {{ item.payment.expires.day }} {{ '{:%B}'.format(item.payment.expires) }} {%- endif %}
     {% endif %}
 </td>
-<td>
+<td class="table-actions">
   {% if item.is_paid_for and item.is_transferable %}
     <a class="btn btn-default" href="{{ url_for('tickets.transfer', ticket_id=item.id) }}">Transfer</a>
   {% endif %}

@@ -1,5 +1,9 @@
 {% if show_receipt and feature_enabled('ISSUE_TICKETS') %}
-<p>
+<p class="login-details">
+  You are logged in as {{ current_user.name }} ({{ current_user.email }})</a>.
+</p>
+
+<p class="ticket-actions">
 <a class="btn btn-success" href="{{ url_for('tickets.receipt') }}">Printable ticket</a>
 <a class="btn btn-primary" href="{{ url_for('tickets.receipt') + '?pdf=1' }}">Download PDF</a>
 </p>
@@ -9,7 +13,7 @@
     <tr>
       <th>Type</th>
       <th>Status</th>
-      <th></th>
+      <th class="table-actions"></th>
     </tr>
   </thead>
   <tbody>
@@ -32,7 +36,7 @@
     Reserved {% if t.payment.expires -%} until {{ t.payment.expires.day }} {{ '{:%B}'.format(t.payment.expires) }} {%- endif %}
     {%- endif %}
 </td>
-<td>
+<td class="table-actions">
   {% if t.is_paid_for and t.is_transferable %}
     <a class="btn btn-default" href="{{ url_for('tickets.transfer', ticket_id=t.id) }}">Transfer</a>
   {% endif %}
