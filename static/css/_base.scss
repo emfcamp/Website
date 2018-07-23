@@ -468,6 +468,10 @@ a.collapse-toggle:hover .glyphicon {
 }
 
 @media print {
+  .account-purchases .push {
+    height: 100px;
+  }
+
   .account-purchases .ticket-actions {
     display: none;
   }
