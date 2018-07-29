@@ -64,6 +64,7 @@ class ImportCFP(Command):
         app.logger.info('Imported %s proposals' % count)
 
 
+# Slot confirmation
 class EmailSpeakersAboutSlot(Command):
 
     def run(self):
@@ -84,7 +85,7 @@ class EmailSpeakersAboutSlot(Command):
             mail.send(msg)
             db.session.commit()
 
-
+# Gathering information
 class EmailSpeakersAboutFinalising(Command):
 
     def run(self):
@@ -95,7 +96,7 @@ class EmailSpeakersAboutFinalising(Command):
         for proposal in proposals:
             user = proposal.user
 
-            msg = Message("We really need information about your EMF %s '%s'!" % (proposal.type, proposal.title),
+            msg = Message("We need more information about your EMF %s '%s'!" % (proposal.type, proposal.title),
                           sender=app.config['SPEAKERS_EMAIL'],
                           recipients=[user.email])
 

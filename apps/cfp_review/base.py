@@ -238,6 +238,8 @@ def update_proposal(proposal_id):
     form.one_day.data = prop.one_day
     form.will_have_ticket.data = prop.user.will_have_ticket
     form.published_names.data = prop.published_names
+    form.published_title.data = prop.published_title
+    form.published_description.data = prop.published_description
     form.arrival_period.data = prop.arrival_period
     form.departure_period.data = prop.departure_period
     form.telephone_number.data = prop.telephone_number

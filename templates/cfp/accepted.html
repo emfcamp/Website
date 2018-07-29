@@ -37,60 +37,47 @@
         {{ render_field(form.arrival_period, 9) }}
         {{ render_field(form.departure_period, 9) }}
 
-        {% if proposal.type in ('talk', 'workshop') %}
-          <p>Talks and workshops will be scheduled between <strong>10am and 8pm</strong> every day
-            <strong>except Friday</strong> when talks will start at <strong>1pm</strong>.</p>
-          <table class="table">
-            <thead>
-              <tr><th>Day</th><th>10am - 1pm</th><th>1pm - 4pm</th><th>4pm - 8pm</th></tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">Friday</th>
-                <td>n/a</td>
-                <td>{{ form.fri_13_16(class_='form-control') }}</td>
-                <td>{{ form.fri_16_20(class_='form-control') }}</td>
-              </tr>
-              <tr>
-                <th scope="row">Saturday</th>
-                <td>{{ form.sat_10_13(class_='form-control') }}</td>
-                <td>{{ form.sat_13_16(class_='form-control') }}</td>
-                <td>{{ form.sat_16_20(class_='form-control') }}</td>
-              </tr>
-              <tr>
-                <th scope="row">Sunday</th>
-                <td>{{ form.sun_10_13(class_='form-control') }}</td>
-                <td>{{ form.sun_13_16(class_='form-control') }}</td>
-                <td>{{ form.sun_16_20(class_='form-control') }}</td>
-              </tr>
-            </tbody>
-          </table>
-        {% elif proposal.type == 'performance' %}
-          <p>Performances will be scheduled between <strong>8pm and 12am</strong> (midnight)
-            every day. There is a 12am curfew on amplified music.</p>
-          <table class="table">
-            <thead>
-              <tr><th>Day</th><th>8pm - 10pm</th><th>10pm - 12am</th></tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="row">Friday</th>
-                <td>{{ form.fri_20_22(class_='form-control') }}</td>
-                <td>{{ form.fri_22_24(class_='form-control') }}</td>
-              </tr>
-              <tr>
-                <th scope="row">Saturday</th>
-                <td>{{ form.sat_20_22(class_='form-control') }}</td>
-                <td>{{ form.sat_22_24(class_='form-control') }}</td>
-              </tr>
-              <tr>
-                <th scope="row">Sunday</th>
-                <td>{{ form.sun_20_22(class_='form-control') }}</td>
-                <td>{{ form.sun_22_24(class_='form-control') }}</td>
-              </tr>
-            </tbody>
-          </table>
-        {% endif %}
+        {% if slot_times %}
+          {% if proposal.type == 'performance' %}
+            <p>Performances will be scheduled between <strong>8pm and 1:30am</strong> (midnight)
+              every day. There is a 1:30am curfew on amplified music.</p>
+            <table class="table">
+              <thead>
+                <tr><th>Day</th><th>8pm - 10pm</th><th>10pm - 1:30am</th></tr>
+              </thead>
+          {% else %}
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Day</th>
+                  {% for heading in slot_titles %}
+                  <th>{{ heading }}</th>
+                  {% endfor %}
+                </tr>
+              </thead>
+          {% endif %}
+              <tbody>
+                <tr>
+                  <th scope="row">Friday</th>
+                  {% for slot in slot_times %}
+                  <td>{{ day_form_slots['fri'].get(slot, 'n/a') }}</td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <th scope="row">Saturday</th>
+                  {% for slot in slot_times %}
+                  <td>{{ day_form_slots['sat'].get(slot, 'n/a') }}</td>
+                  {% endfor %}
+                </tr>
+                <tr>
+                  <th scope="row">Sunday</th>
+                  {% for slot in slot_times %}
+                  <td>{{ day_form_slots['sun'].get(slot, 'n/a') }}</td>
+                  {% endfor %}
+                </tr>
+              </tbody>
+            </table>
+          {% endif %}
 
     </fieldset>
 

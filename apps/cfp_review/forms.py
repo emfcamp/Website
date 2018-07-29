@@ -27,6 +27,8 @@ class UpdateProposalForm(Form):
     will_have_ticket = BooleanField('Will have a ticket')
 
     published_names = StringField('Published names')
+    published_title = StringField('Published title')
+    published_description = TextAreaField('Published description')
     arrival_period = StringField('Arrival time')
     departure_period = StringField('Departure time')
     telephone_number = StringField('Telephone')
