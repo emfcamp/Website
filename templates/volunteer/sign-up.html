@@ -8,20 +8,18 @@
     <h1>Sign up to volunteer at Electromagnetic Field</h1>
     <form class="form-horizontal" method="post">
         {{ form.hidden_tag() }}
-        {% if current_user.is_anonymous %}
-            {{ render_field(form.name) }}
-            {{ render_field(form.email) }}
-        {% else %}
-            <p>
-                Because you already have an account with us we'll use that.
-            </p>
+        {% if not current_user.is_anonymous %}
+            We've pre-filled some of your data from your existing profile.
+
+            If you would like to be contacted via a different email, or use a
+            different name feel free to update it here.
         {% endif %}
+        {{ render_field(form.name) }}
+        {{ render_field(form.email) }}
         {{ render_field(form.age) }}
         {{ render_field(form.phone_number) }}
-        <div class="pull-right">
-            <button type="submit" class="btn btn-success debounce">
-                Volunteer!
-            </button>
-        </div>
+        {{ render_field(form.arrival) }}
+        {{ render_field(form.departure) }}
+        {{ form.submit(class_="btn btn-default debounce") }}
     </form>
 {% endblock %}
