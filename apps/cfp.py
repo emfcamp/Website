@@ -24,6 +24,23 @@ from models.cfp import (
 from .common import feature_flag, create_current_user
 from .common.forms import Form, TelField
 
+import collections
+
+# This needs to go very far away
+proposal_timeslots = {
+    'talk':             ('fri_13_16', 'fri_16_20',
+                            'sat_10_13', 'sat_13_16', 'sat_16_20',
+                            'sun_10_13', 'sun_13_16', 'sun_16_20'),
+    'workshop':         ('fri_13_16', 'fri_16_20', 'fri_20_22', 'fri_22_24',
+                            'sat_10_13', 'sat_13_16', 'sat_16_20', 'sat_20_22', 'sat_22_24',
+                            'sun_10_13', 'sun_13_16', 'sun_16_20'),
+    'youthworkshop':    ('fri_13_16', 'fri_16_20',
+                            'sat_10_13', 'sat_13_16', 'sat_16_20',
+                            'sun_10_13', 'sun_13_16', 'sun_16_20'),
+    'performance':      ('fri_20_22', 'fri_22_24',
+                            'sat_20_22', 'sat_22_24',
+                            'sun_20_22', 'sun_22_24')
+}
 
 cfp = Blueprint('cfp', __name__)
 
@@ -355,8 +372,9 @@ class AcceptedForm(Form):
     may_record = BooleanField('I am happy for this to be recorded', default=True)
     needs_laptop = BooleanField('I will need to borrow a laptop for slides')
     requirements = TextAreaField('Requirements')
-    arrival_period = SelectField('Estimated arrival time', default='fri pm',
-                                choices=[('fri am', 'Friday am'),
+    arrival_period = SelectField('Estimated arrival time', default='fri am',
+                                choices=[('thu pm', 'Thursday pm (Only select this if you are arriving early)'),
+                                         ('fri am', 'Friday am'),
                                          ('fri pm', 'Friday pm'),
                                          ('sat am', 'Saturday am'),
                                          ('sat pm', 'Saturday pm'),
@@ -396,8 +414,8 @@ class AcceptedForm(Form):
         arr_day, arr_time = form.arrival_period.data.split()
         dep_day, dep_time = form.departure_period.data.split()
 
-        arr_val = {'fri': 0, 'sat': 1, 'sun': 2}[arr_day]
-        dep_val = {'fri': 0, 'sat': 1, 'sun': 2, 'mon': 3}[dep_day]
+        arr_val = {'thu': 0, 'fri': 1, 'sat': 2, 'sun': 3}[arr_day]
+        dep_val = {'thu': 0, 'fri': 1, 'sat': 2, 'sun': 3, 'mon': 4}[dep_day]
 
         # Arrival day is before departure day; we're done here.
         if arr_val < dep_val:
@@ -411,34 +429,6 @@ class AcceptedForm(Form):
         # so only error in case of time-travel
         if dep_time == 'am' and arr_time == 'pm':
             raise ValidationError('Departure must be after arrival')
-
-
-class DaytimeAcceptedForm(AcceptedForm):
-    # Availability times
-    fri_13_16 = BooleanField(default=True)
-    fri_16_20 = BooleanField(default=True)
-    sat_10_13 = BooleanField(default=True)
-    sat_13_16 = BooleanField(default=True)
-    sat_16_20 = BooleanField(default=True)
-    sun_10_13 = BooleanField(default=True)
-    sun_13_16 = BooleanField(default=True)
-    sun_16_20 = BooleanField(default=True)
-    _available_slots = ('fri_13_16', 'fri_16_20',
-                        'sat_10_13', 'sat_13_16', 'sat_16_20',
-                        'sun_10_13', 'sun_13_16', 'sun_16_20')
-
-
-class EveningAcceptedForm(AcceptedForm):
-    fri_20_22 = BooleanField(default=True)
-    fri_22_24 = BooleanField(default=True)
-    sat_20_22 = BooleanField(default=True)
-    sat_22_24 = BooleanField(default=True)
-    sun_20_22 = BooleanField(default=True)
-    sun_22_24 = BooleanField(default=True)
-    _available_slots = ('fri_20_22', 'fri_22_24',
-                        'sat_20_22', 'sat_22_24',
-                        'sun_20_22', 'sun_22_24')
-
 
 @cfp.route('/cfp/proposals/<int:proposal_id>/finalise', methods=['GET', 'POST'])
 @feature_flag('CFP')
@@ -455,17 +445,52 @@ def finalise_proposal(proposal_id):
     if proposal.state not in ('accepted', 'finished'):
         return redirect(url_for('.edit_proposal', proposal_id=proposal_id))
 
-    form = DaytimeAcceptedForm() if proposal.type in ('talk', 'workshop', 'youthworkshop') else \
-           EveningAcceptedForm() if proposal.type == 'performance' else \
-           AcceptedForm()
+    # This is horrendous, but is a lot cleaner than having shitloads of classes and fields
+    # http://wtforms.simplecodes.com/docs/1.0.1/specific_problems.html#dynamic-form-composition
+    slot_times = slot_titles = day_form_slots = None
+    form = AcceptedForm()
+    if proposal.type in ('talk', 'workshop', 'youthworkshop', 'performance'):
+        class F(AcceptedForm):
+            pass
+
+        F._available_slots = proposal_timeslots[proposal.type]
+        for timeslot in F._available_slots:
+            setattr(F, timeslot, BooleanField(default=True))
+        form = F()
+
+        # We do this here because we're about to generate form elements
+        if proposal.available_times:
+            form.set_from_availability_json(proposal.available_times)
+
+        # This just sorts out the headings / columns for the form
+        headings = {}
+        day_form_slots = collections.defaultdict(collections.OrderedDict)
+        for slot in F._available_slots:
+            day, start, end = slot.split('_')
+            slot_hour_str = "%s_%s" % (start, end)
+            day_form_slots[day][slot_hour_str] = getattr(form, slot)(class_='form-control')
+
+            start = int(start)
+            end = int(end)
+            start_ampm = end_ampm = 'am'
+            if start > 12:
+                start_ampm = 'pm'
+                start -= 12
+            if end > 12:
+                end_ampm = 'pm'
+                end -= 12
+            headings[slot_hour_str] = "%s%s - %s%s" % (start, start_ampm, end, end_ampm)
+
+        slot_times = sorted(headings.keys())
+        slot_titles = [headings[slot] for slot in slot_times]
 
     if proposal.scheduled_venue:
         proposal.scheduled_venue_name = proposal.scheduled_venue.name
 
     if form.validate_on_submit():
         proposal.published_names = form.name.data
-        proposal.title = form.title.data
-        proposal.description = form.description.data
+        proposal.published_title = form.title.data
+        proposal.published_description = form.description.data
         proposal.telephone_number = form.telephone_number.data
 
         proposal.may_record = form.may_record.data
@@ -485,14 +510,14 @@ def finalise_proposal(proposal_id):
         return redirect(url_for('.edit_proposal', proposal_id=proposal_id))
 
 
-    else:
+    elif proposal.state == 'finished':
         if proposal.published_names:
             form.name.data = proposal.published_names
         else:
             form.name.data = current_user.name
 
-        form.title.data = proposal.title
-        form.description.data = proposal.description
+        form.title.data = proposal.published_title
+        form.description.data = proposal.published_description
         form.telephone_number.data = proposal.telephone_number
 
         form.may_record.data = proposal.may_record
@@ -502,10 +527,13 @@ def finalise_proposal(proposal_id):
         form.arrival_period.data = proposal.arrival_period
         form.departure_period.data = proposal.departure_period
 
-        if proposal.available_times:
-            form.set_from_availability_json(proposal.available_times)
+    else:
+        form.name.data = current_user.name
+        form.title.data = proposal.title
+        form.description.data = proposal.description
 
-    return render_template('cfp/accepted.html', form=form, proposal=proposal)
+    return render_template('cfp/accepted.html',
+            form=form, proposal=proposal, slot_times=slot_times, slot_titles=slot_titles, day_form_slots=day_form_slots)
 
 
 class MessagesForm(Form):

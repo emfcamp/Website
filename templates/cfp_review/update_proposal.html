@@ -64,6 +64,8 @@
         <h4>User schedule details</h4>
             <dl class="dl-horizontal">
                 {{ render_dl_field(form.published_names) }}
+                {{ render_dl_field(form.published_title) }}
+                {{ render_dl_field(form.published_description, rows=4) }}
                 {{ render_dl_field(form.arrival_period) }}
                 {{ render_dl_field(form.departure_period) }}
                 {{ render_dl_field(form.telephone_number) }}

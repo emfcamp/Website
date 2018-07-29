@@ -125,6 +125,8 @@ class Proposal(db.Model):
 
     # Fields for finalised info
     published_names = db.Column(db.String)
+    published_title = db.Column(db.String)
+    published_description = db.Column(db.String)
     arrival_period = db.Column(db.String)
     departure_period = db.Column(db.String)
     telephone_number = db.Column(db.String)
@@ -157,7 +159,7 @@ class Proposal(db.Model):
         count_attrs = ['needs_help', 'needs_money', 'needs_laptop',
                        'one_day', 'notice_required', 'may_record', 'state']
 
-        edits_attrs = ['title', 'description', 'requirements', 'length',
+        edits_attrs = ['published_title', 'published_description', 'requirements', 'length',
                        'notice_required', 'needs_help', 'needs_money', 'one_day',
                        'has_rejected_email', 'published_names', 'arrival_period',
                        'departure_period', 'telephone_number', 'may_record',
@@ -204,7 +206,7 @@ class Proposal(db.Model):
         anon_favourites.sort()
 
         public_columns = (
-            cls.title, cls.description,
+            cls.published_title, cls.published_description,
             cls.published_names.label('names'), cls.may_record,
             cls.scheduled_time, cls.scheduled_duration, Venue.name.label('venue'),
         )
