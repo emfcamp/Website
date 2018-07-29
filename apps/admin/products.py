@@ -185,22 +185,24 @@ def purchase_transfers():
     return render_template('admin/products/purchase-transfers.html', transfers=transfer_logs)
 
 
-@admin.route('/furniture')
+@admin.route('/hire')
 def furniture():
-    purchases = ProductGroup.query.filter_by(name='furniture') \
-                            .join(Product, Purchase, Purchase.owner).group_by(User.id, Product.id) \
-                            .with_entities(User, Product, func.count(Purchase.id)) \
-                            .order_by(User.name)
+    purchases = (ProductGroup.query.filter_by(type='hire')
+                             .join(Product, Purchase, Purchase.owner).group_by(User.id, Product.id)
+                             .with_entities(User, Product, func.count(Purchase.id))
+                             .filter(Purchase.is_paid_for == True)  # noqa: E712
+                             .order_by(User.name, Product.name))
 
-    return render_template('admin/products/furniture-purchases.html', purchases=purchases)
+    return render_template('admin/products/hire-purchases.html', purchases=purchases)
 
 
 @admin.route('/tees')
 def tees():
-    purchases = ProductGroup.query.filter_by(name='tees') \
-                            .join(Product, Purchase, Purchase.owner).group_by(User.id, Product.id) \
-                            .with_entities(User, Product, func.count(Purchase.id)) \
-                            .order_by(User.name)
+    purchases = (ProductGroup.query.filter_by(type='tees')
+                             .join(Product, Purchase, Purchase.owner).group_by(User.id, Product.id)
+                             .with_entities(User, Product, func.count(Purchase.id))
+                             .filter(Purchase.is_paid_for == True)  # noqa: E712
+                             .order_by(User.name, Product.name))
 
     return render_template('admin/products/tee-purchases.html', purchases=purchases)
 
