@@ -1,4 +1,5 @@
 import random
+from pendulum import parse
 from faker import Faker
 from flask_script import Command
 
@@ -64,7 +65,7 @@ def fake_proposal(fake, reviewers):
             vote = CFPVote(reviewer, cfp)
             vote.state = random_state(vote_states)
             if vote.state in ('voted', 'stale', 'resolved'):
-                vote.vote = random.randint(0, 3)
+                vote.vote = random.randint(0, 2)
 
     if type(cfp) in (WorkshopProposal, YouthWorkshopProposal):
         cfp.attendees = int(round(random.uniform(5, 50)))
@@ -122,74 +123,68 @@ class MakeFakeData(Command):
 
 class MakeVolunteerData(Command):
     def run(self):
-        venues = [
+        venue_list = [
             {"name": "Bar", "mapref": "https://map.emfcamp.org/#19/52.0420157/-2.3770749"},
             {"name": "Stage A", "mapref": "https://map.emfcamp.org/#17/52.039601/-2.377759"},
             {"name": "Stage B", "mapref": "https://map.emfcamp.org/#17/52.041798/-2.376412"},
             {"name": "Stage C", "mapref": "https://map.emfcamp.org/#17/52.040482/-2.377432"},
             {"name": "Entrance", "mapref": "https://map.emfcamp.org/#18/52.039226/-2.378184"},
         ]
-        roles = [
+        role_list = [
             {"name": "Bar", "description": "Serve people booze", "role_notes": "Must be over 18 and complete online training first"},
             {"name": "AV", "description": "Make sure folks giving talks can be heard & their slides seen", "role_notes": ""},
             {"name": "Entrance Steward", "description": "Check tickets and help people get on site.", "role_notes": ""},
         ]
 
-        shifts = {
+        shift_list = {
             "Bar": {
                 "Bar": [
-                    {"start": "2018-08-31 11:00:00", "end": "2018-08-31 12:00:00", "min_needed": 2, "max_needed": 3},
-                    {"start": "2018-08-31 12:00:00", "end": "2018-08-31 13:00:00", "min_needed": 2, "max_needed": 3},
-                    {"start": "2018-08-31 13:00:00", "end": "2018-08-31 14:00:00", "min_needed": 2, "max_needed": 3},
-                    {"start": "2018-08-31 14:00:00", "end": "2018-08-31 15:00:00", "min_needed": 2, "max_needed": 3},
-                    {"start": "2018-08-31 15:00:00", "end": "2018-08-31 16:00:00", "min_needed": 2, "max_needed": 3}
+                    {"first": "2018-08-31 11:00:00", "final": "2018-09-01 01:00:00", "min": 2, "max": 5},
+                    {"first": "2018-09-01 11:00:00", "final": "2018-09-02 01:00:00", "min": 2, "max": 5},
+                    {"first": "2018-09-02 11:00:00", "final": "2018-09-03 00:00:00", "min": 2, "max": 5},
                 ]
             },
             "AV": {
                 "Stage A": [
-                    {"start": "2018-08-31 11:00:00", "end": "2018-08-31 12:00:00", "min_needed": 2, "max_needed": 3},
-                    {"start": "2018-08-31 12:00:00", "end": "2018-08-31 13:00:00", "min_needed": 2, "max_needed": 3},
-                    {"start": "2018-08-31 13:00:00", "end": "2018-08-31 14:00:00", "min_needed": 2, "max_needed": 3},
-                    {"start": "2018-08-31 14:00:00", "end": "2018-08-31 15:00:00", "min_needed": 2, "max_needed": 3},
-                    {"start": "2018-08-31 15:00:00", "end": "2018-08-31 16:00:00", "min_needed": 2, "max_needed": 3}
+                    {"first": "2018-08-31 12:00:00", "final": "2018-09-01 00:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 00:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 23:00:00", "min": 1, "max": 1},
                 ],
                 "Stage B": [
-                    {"start": "2018-08-31 11:00:00", "end": "2018-08-31 12:00:00", "min_needed": 2, "max_needed": 3},
-                    {"start": "2018-08-31 12:00:00", "end": "2018-08-31 13:00:00", "min_needed": 2, "max_needed": 3},
-                    {"start": "2018-08-31 13:00:00", "end": "2018-08-31 14:00:00", "min_needed": 2, "max_needed": 3},
-                    {"start": "2018-08-31 14:00:00", "end": "2018-08-31 15:00:00", "min_needed": 2, "max_needed": 3},
-                    {"start": "2018-08-31 15:00:00", "end": "2018-08-31 16:00:00", "min_needed": 2, "max_needed": 3},
+                    {"first": "2018-08-31 12:00:00", "final": "2018-09-01 00:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 00:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 23:00:00", "min": 1, "max": 1},
                 ],
                 "Stage C": [
-                    {"start": "2018-08-31 11:00:00", "end": "2018-08-31 12:00:00", "min_needed": 2, "max_needed": 3},
-                    {"start": "2018-08-31 12:00:00", "end": "2018-08-31 13:00:00", "min_needed": 2, "max_needed": 3},
-                    {"start": "2018-08-31 13:00:00", "end": "2018-08-31 14:00:00", "min_needed": 2, "max_needed": 3},
-                    {"start": "2018-08-31 14:00:00", "end": "2018-08-31 15:00:00", "min_needed": 2, "max_needed": 3},
-                    {"start": "2018-08-31 15:00:00", "end": "2018-08-31 16:00:00", "min_needed": 2, "max_needed": 3}
+                    {"first": "2018-08-31 12:00:00", "final": "2018-09-01 00:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 00:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 23:00:00", "min": 1, "max": 1},
                 ]
             },
             "Entrance Steward": {
                 "Entrance": [
-                    {"start": "2018-08-31 11:00:00", "end": "2018-08-31 12:00:00", "min_needed": 2, "max_needed": 3},
-                    {"start": "2018-08-31 12:00:00", "end": "2018-08-31 13:00:00", "min_needed": 2, "max_needed": 3},
-                    {"start": "2018-08-31 13:00:00", "end": "2018-08-31 14:00:00", "min_needed": 2, "max_needed": 3},
-                    {"start": "2018-08-31 14:00:00", "end": "2018-08-31 15:00:00", "min_needed": 2, "max_needed": 3},
-                    {"start": "2018-08-31 15:00:00", "end": "2018-08-31 16:00:00", "min_needed": 2, "max_needed": 3},
+                    {"first": "2018-08-31 08:00:00", "final": "2018-09-03 12:00:00", "min": 2, "max": 4},
                 ]
             }
         }
 
-        for v in venues:
+        for v in venue_list:
             db.session.add(VolunteerVenue(**v))
 
-        for r in roles:
+        for r in role_list:
             db.session.add(Role(**r))
 
-        for shift_role in shifts:
+        for shift_role in shift_list:
             role = Role.get_by_name(shift_role)
-            for shift_venue in shifts[shift_role]:
+            for shift_venue in shift_list[shift_role]:
                 venue = VolunteerVenue.get_by_name(shift_venue)
-                for shift in shifts[shift_role][shift_venue]:
-                    db.session.add(Shift(venue=venue, role=role, **shift))
+
+                for shift_ranges in shift_list[shift_role][shift_venue]:
+                    shifts = Shift.generate_for(role=role, venue=venue,
+                                                first=parse(shift_ranges["first"]),
+                                                final=parse(shift_ranges["final"]),
+                                                min=shift_ranges["min"], max=shift_ranges["max"])
+                    for s in shifts:
+                        db.session.add(s)
 
         db.session.commit()

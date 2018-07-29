@@ -17,6 +17,10 @@ class Role(db.Model):
     def get_by_name(cls, name):
         return cls.query.filter_by(name=name).one_or_none()
 
+    @classmethod
+    def get_all(cls):
+        return cls.query.order_by(Role.name).all()
+
 
 class RolePermission(db.Model):
     __versioned__ = {}

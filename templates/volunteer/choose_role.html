@@ -1,0 +1,27 @@
+{% extends 'volunteer/base.html' %}
+{% from "_formhelpers.html" import render_field %}
+
+{% block title %}
+    EMF Volunteer Choose Roles
+{% endblock %}
+{% block body %}
+    <h1>Which roles are you interested in?</h1>
+    <form method="post">
+        {{ form.hidden_tag() }}
+
+        {% for f in form.roles %}
+            <div class="form-group">
+                {{ f.hidden_tag_without('csrf_token') }}
+                <div class="checkbox {%- if f.signup.errors %} has-error {%- endif %}">
+                    <label for="{{ f.signup.name }}">
+                        {{ f.signup()| safe }}
+                        {{ f._role.name }} -- {{ f._role.description }}
+                    </label>
+                </div>
+            </div>
+        {% endfor %}
+        <div class="form-group">
+            {{ form.submit(class_="btn btn-default debounce") }}
+        </div>
+    </form>
+{% endblock %}
