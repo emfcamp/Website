@@ -28,7 +28,8 @@
 {% else %}
   <div class="well"><div class="row">
     {% if feature_enabled('CFP_FINALISE') and proposal.state in ['accepted', 'finished']  %}
-      <div>Your talk has been accepted! If you haven't already please visit
+      <div class="col-md-12">
+        Your {{ proposal.human_type }} has been accepted! If you haven't already, please
         <a href="{{ url_for('.finalise_proposal', proposal_id=proposal.id ) }}">finalise your details</a>.
       </div>
     {% elif proposal.state not in ['new', 'edit', 'rejected', 'cancelled'] %}

@@ -1,14 +1,14 @@
 Hi {{ proposal.user.name }},
 
-We need some final information about your {{ proposal.type }} '{{ proposal.title }}'!
+We need some final information about your {{ proposal.human_type }} '{{ proposal.title }}'!
 
 You have been allocated a {{ proposal.scheduled_duration }} minute slot - if this isn't suitable, please get in touch with us immediately. Please note that while you are allowed on-stage Q&A, we would prefer it if you told the audience to meet you somewhere after to discuss it.
 
-We need you to finalise the details for your {{ proposal.type }} on our website. Most importantly you should tell us when you're available so that we don't accidentally schedule a slot when you're not around!
+We need you to finalise the details for your {{ proposal.human_type }} on our website. Most importantly you should tell us when you're available so that we don't accidentally schedule a slot when you're not around!
 
   {{ external_url('cfp.finalise_proposal', proposal_id=proposal.id) }}
 
-Don't worry, you'll be able to update your {{ proposal.type }} title and description all the way up to the event - just make sure you set your availability now.
+Don't worry, you'll be able to update your {{ proposal.human_type }} title and description all the way up to the event - just make sure you set your availability now.
 
 To summarise, we urgently need you to:
 
@@ -17,7 +17,7 @@ To summarise, we urgently need you to:
 
 And less urgently:
 
-* Write a great description of your {{ proposal.type }} we can publish in the schedule!
+* Write a great description of your {{ proposal.human_type }} we can publish in the schedule!
 
 Looking forward to seeing you in the field,
 All the EMF team
