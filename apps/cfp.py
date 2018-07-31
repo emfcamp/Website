@@ -458,32 +458,6 @@ def finalise_proposal(proposal_id):
             setattr(F, timeslot, BooleanField(default=True))
         form = F()
 
-        # We do this here because we're about to generate form elements
-        if proposal.available_times:
-            form.set_from_availability_json(proposal.available_times)
-
-        # This just sorts out the headings / columns for the form
-        headings = {}
-        day_form_slots = collections.defaultdict(collections.OrderedDict)
-        for slot in F._available_slots:
-            day, start, end = slot.split('_')
-            slot_hour_str = "%s_%s" % (start, end)
-            day_form_slots[day][slot_hour_str] = getattr(form, slot)(class_='form-control')
-
-            start = int(start)
-            end = int(end)
-            start_ampm = end_ampm = 'am'
-            if start > 12:
-                start_ampm = 'pm'
-                start -= 12
-            if end > 12:
-                end_ampm = 'pm'
-                end -= 12
-            headings[slot_hour_str] = "%s%s - %s%s" % (start, start_ampm, end, end_ampm)
-
-        slot_times = sorted(headings.keys())
-        slot_titles = [headings[slot] for slot in slot_times]
-
     if proposal.scheduled_venue:
         proposal.scheduled_venue_name = proposal.scheduled_venue.name
 
@@ -524,6 +498,10 @@ def finalise_proposal(proposal_id):
         form.needs_laptop.data = proposal.needs_laptop
         form.requirements.data = proposal.requirements
 
+        # We do this here because we're about to generate form elements
+        if proposal.available_times:
+            form.set_from_availability_json(proposal.available_times)
+
         form.arrival_period.data = proposal.arrival_period
         form.departure_period.data = proposal.departure_period
 
@@ -531,6 +509,28 @@ def finalise_proposal(proposal_id):
         form.name.data = current_user.name
         form.title.data = proposal.title
         form.description.data = proposal.description
+
+    # This just sorts out the headings / columns for the form
+    headings = {}
+    day_form_slots = collections.defaultdict(collections.OrderedDict)
+    for slot in F._available_slots:
+        day, start, end = slot.split('_')
+        slot_hour_str = "%s_%s" % (start, end)
+        day_form_slots[day][slot_hour_str] = getattr(form, slot)(class_='form-control')
+
+        start = int(start)
+        end = int(end)
+        start_ampm = end_ampm = 'am'
+        if start > 12:
+            start_ampm = 'pm'
+            start -= 12
+        if end > 12:
+            end_ampm = 'pm'
+            end -= 12
+        headings[slot_hour_str] = "%s%s - %s%s" % (start, start_ampm, end, end_ampm)
+
+    slot_times = sorted(headings.keys())
+    slot_titles = [headings[slot] for slot in slot_times]
 
     return render_template('cfp/accepted.html',
             form=form, proposal=proposal, slot_times=slot_times, slot_titles=slot_titles, day_form_slots=day_form_slots)
