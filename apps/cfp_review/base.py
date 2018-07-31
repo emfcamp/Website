@@ -684,7 +684,7 @@ def scheduler():
 def scheduler_update():
     proposal = Proposal.query.filter_by(id=request.form['id']).one()
     proposal.potential_time = dateutil.parser.parse(request.form['time']).replace(tzinfo=None)
-    proposal.potential_venue = request.form['venue']
+    proposal.potential_venue_id = request.form['venue']
 
     changed = True
     if proposal.potential_time == proposal.scheduled_time and str(proposal.potential_venue_id) == str(proposal.scheduled_venue_id):

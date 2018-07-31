@@ -42,8 +42,8 @@
         var scheduleData = {{ schedule_data | tojson }},
             venues = {{ venues | tojson }},
             is_anonymous = {% if current_user.is_anonymous -%} true {%- else -%} false {%- endif %},
-            start_date = new Date(2016, 7, 5),
-            end_date = new Date(2016, 7, 8),
+            start_date = new Date(2018, 7, 31),
+            end_date = new Date(2018, 8, 2),
             venue_dict = {},
             day_format = "%D, %jth",   // e.g. Friday, 5th
             day_formatter = scheduler.date.date_to_str(day_format),
@@ -190,7 +190,7 @@
                     type: "POST",
                     data: {
                         id: ev.id,
-                        time: ev.start_date,
+                        time: ev.start_date.toISOString(),
                         venue: ev.venue
                     },
 					success: function (result) {

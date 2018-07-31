@@ -4,8 +4,8 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
     'use strict';
 
     var todays_date = new Date(),
-        start_date = new Date(2016, 7, 5),
-        end_date = new Date(2016, 7, 8),
+        start_date = new Date(2018, 7, 31),
+        end_date = new Date(2018, 8, 2),
         filter = {
             'venues': [],
             'is_favourite': false
@@ -173,7 +173,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
     };
 
     // There'll be no events outside the weekend so lock the view to it
-    scheduler.config.limit_view = true;
+    // scheduler.config.limit_view = true; // This seems to be broken right now
     scheduler.config.limit_start = start_date;
     scheduler.config.limit_end  = end_date;
 

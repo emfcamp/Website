@@ -8,7 +8,8 @@ from main import create_app
 from tasks.admin import MakeAdmin, CreatePermissions, SendEmails
 from tasks.banking import CreateBankAccounts, LoadOfx, Reconcile
 from tasks.cfp import (
-    ImportCFP, EmailSpeakersAboutSlot, EmailSpeakersAboutFinalising, RejectUnacceptedProposals
+    ImportCFP, EmailSpeakersAboutSlot, EmailSpeakersAboutFinalising,
+    RejectUnacceptedProposals, SetRoughDurations
 )
 from tasks.dev import MakeFakeData, MakeVolunteerData
 from tasks.external_calendars import (
@@ -52,6 +53,7 @@ if __name__ == "__main__":
 
     manager.add_command('importvenues', ImportVenues())
     manager.add_command('runscheduler', RunScheduler())
+    manager.add_command('setroughdurations', SetRoughDurations())
     manager.add_command('applypotentialschedule', ApplyPotentialSchedule())
 
     manager.add_command('createcalendars', CreateCalendars())
