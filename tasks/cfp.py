@@ -107,6 +107,26 @@ class EmailSpeakersAboutFinalising(Command):
             db.session.commit()
 
 
+class SetRoughDurations(Command):
+    def run(self):
+        print("WAT")
+        length_map = {
+            '> 45 mins': 60,
+            '25-45 mins': 30,
+            '10-25 mins': 15,
+            '< 10 mins': 15
+        }
+
+        proposals = Proposal.query.filter_by(scheduled_duration=None, type='talk').\
+            filter(Proposal.state.in_(['accepted', 'finished'])).all()
+
+        for proposal in proposals:
+            proposal.scheduled_duration = length_map[proposal.length]
+            app.logger.info('Setting duration for talk "%s" to "%s"' % (proposal.title, proposal.scheduled_duration))
+
+        db.session.commit()
+
+
 class RejectUnacceptedProposals(Command):
 
     def run(self):
