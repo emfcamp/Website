@@ -10,6 +10,10 @@ cd to the site directory:
 
     cd /var/www/www.emfcamp.org
 
+Update the code
+
+    sudo git pull
+
 Install/update the virtualenv:
 
     sudo make deploy
@@ -22,4 +26,4 @@ Restart gunicorn:
 
     systemctl restart gunicorn
 
-Monitor `/var/log/syslog` or `journalctl -fu gunicorn` for errors.
+Monitor `journalctl -fu gunicorn` for errors.
