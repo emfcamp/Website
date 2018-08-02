@@ -6,9 +6,11 @@
 
 <h2>Sponsors</h2>
 
+{#
 <div class="well">
     We're still accepting sponsors for this year's event. <a href="{{url_for('.sponsor')}}">Learn more about sponsoring Electromagnetic Field</a>.
 </div>
+#}
 
 {% macro sponsor(url, image) %}
 <div class="sponsor">
@@ -22,12 +24,15 @@
 
 <h3>Gold</h3>
 {{ sponsor("https://uk.mathworks.com/", "mathworks.svg") }}
+{{ sponsor("https://www.nexmo.com/", "nexmo.png") }}
 <h3>Silver</h3>
 {{ sponsor("https://www.codethink.co.uk/", "codethink.png") }}
 {{ sponsor("https://github.com", "github.png") }}
 {{ sponsor("https://mlab.com", "mlab.png") }}
 <h3>Bronze</h3>
+{{ sponsor("https://aaisp.net.uk/", "aaisp.png") }}
 {{ sponsor("https://amsat-uk.org/", "amsat-uk.jpg") }}
+{{ sponsor("http://www.medicalconnections.co.uk/", "medicalconnections.png") }}
 {{ sponsor("http://www.msraynsford.co.uk/", "msraynsford.svg") }}
 </div>
 <div class="clearfix col-xs-12">
@@ -44,6 +49,7 @@
     <a href="http://eventinfra.org">EventInfra</a>,
     <a href="http://helpmonks.com">Helpmonks</a>,
     <a href="http://irccloud.com">IRCCloud</a>,
+    the <a href="https://ccc.de">Chaos Computer Club</a>,
     and everyone who volunteered.
     </p>
 </div>
