@@ -583,10 +583,17 @@ def rank():
                 if score >= min_score:
                     count += 1
                     prop.set_state('accepted')
-                    send_email_for_proposal(prop, reason="accepted")
+                    if form.confirm_type.data in ('accepted_unaccepted', 'accepted', 'accepted_reject'):
+                        send_email_for_proposal(prop, reason="accepted")
 
                 else:
-                    send_email_for_proposal(prop, reason="still-considered")
+                    if form.confirm_type.data == 'accepted_unaccepted':
+                        send_email_for_proposal(prop, reason="still-considered")
+
+                    elif form.confirm_type.data == 'accepted_reject':
+                        prop.set_state('rejected')
+                        prop.has_rejected_email = True
+                        send_email_for_proposal(prop, reason="rejected")
 
                 db.session.commit()
 

@@ -7,9 +7,8 @@
 </p>
 
 <p>
-    Proposals listed below will be accepted or rejected, with an email sent to the proposer.
-    If there are proposals that shouldn't be rejected or accepted at this point,
-    please set their state back to "anonymised" from "reviewed".
+    Proposals listed below will be accepted. Notification or rejection is controlled by the dropdown selector.
+    If there are proposals that shouldn't be accepted at this point, please set their state back to "anonymised" from "reviewed".
 </p>
 
 <p>Show 
@@ -23,7 +22,7 @@
 
 {% if preview %}
     <p>
-        <span class="bg-info">Proposals</span> will be accepted. Other proposals will be entered into the next round.
+        <span class="bg-info">Proposals</span> will be accepted.
     </p>
 {% endif %}
 <p>
@@ -56,6 +55,7 @@
     {{ form.hidden_tag() }}
 
     {% if preview %}
+        {{ form.confirm_type() }}
         {{ form.confirm(class_='btn btn-success debounce') }}
         {{ form.cancel(class_='btn btn-danger debounce') }}
     {% else %}
