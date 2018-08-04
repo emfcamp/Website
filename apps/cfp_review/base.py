@@ -259,18 +259,17 @@ def update_proposal(proposal_id):
     if prop.potential_venue:
         form.potential_venue.data = prop.potential_venue.name
 
-    if prop.type == 'workshop':
+    if prop.type == 'workshop' or prop.type == 'youthworkshop':
         form.attendees.data = prop.attendees
         form.cost.data = prop.cost
         form.participant_equipment.data = prop.participant_equipment
         form.age_range.data = prop.age_range
+        form.published_age_range.data = prop.published_age_range
+        form.published_cost.data = prop.published_cost
+        form.published_participant_equipment.data = prop.published_participant_equipment
 
-    elif prop.type == 'youthworkshop':
-        form.attendees.data = prop.attendees
-        form.cost.data = prop.cost
-        form.participant_equipment.data = prop.participant_equipment
-        form.age_range.data = prop.age_range
-        form.valid_dbs.data = prop.valid_dbs
+        if prop.type == 'youthworkshop':
+            form.valid_dbs.data = prop.valid_dbs
 
     elif prop.type == 'installation':
         form.size.data = prop.size
