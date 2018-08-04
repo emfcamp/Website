@@ -43,22 +43,33 @@ LENGTH_OPTIONS = [('< 10 mins', "Shorter than 10 minutes"),
 
 # What we consider these as when scheduling
 ROUGH_LENGTHS = {'> 45 mins': 60,
-                 '25-45 mins': 30,
+                 '25-45 mins': 40,
                  '10-25 mins': 20,
                  '< 10 mins': 10
                 }
 
 # These are the time periods speakers can select as being available in the form
+# This needs to go very far away
+PROPOSAL_TIMESLOTS = {
+    'talk':             ('fri_13_16', 'fri_16_20',
+                            'sat_10_13', 'sat_13_16', 'sat_16_20',
+                            'sun_10_13', 'sun_13_16', 'sun_16_20'),
+    'workshop':         ('fri_13_16', 'fri_16_20', 'fri_20_22', 'fri_22_24',
+                            'sat_10_13', 'sat_13_16', 'sat_16_20', 'sat_20_22', 'sat_22_24',
+                            'sun_10_13', 'sun_13_16', 'sun_16_20'),
+    'youthworkshop':    ('fri_13_16', 'fri_16_20',
+                            'sat_10_13', 'sat_13_16', 'sat_16_20',
+                            'sun_10_13', 'sun_13_16', 'sun_16_20'),
+    'performance':      ('fri_20_22', 'fri_22_24',
+                            'sat_20_22', 'sat_22_24',
+                            'sun_20_22', 'sun_22_24')
+}
+
 period = namedtuple('Period', 'start end')
-TIME_PERIODS = {
-    'fri_13_16': period(datetime(2018, 8, 31, 14, 0), datetime(2018, 8, 31, 16, 0)),
-    'fri_16_20': period(datetime(2018, 8, 31, 16, 0), datetime(2018, 8, 31, 20, 0)),
-    'sat_10_13': period(datetime(2018, 9, 1, 10, 0), datetime(2018, 9, 1, 13, 0)),
-    'sat_13_16': period(datetime(2018, 9, 1, 13, 0), datetime(2018, 9, 1, 16, 0)),
-    'sat_16_20': period(datetime(2018, 9, 1, 16, 0), datetime(2018, 9, 1, 20, 0)),
-    'sun_10_13': period(datetime(2018, 9, 2, 10, 0), datetime(2018, 9, 2, 13, 0)),
-    'sun_13_16': period(datetime(2018, 9, 2, 13, 0), datetime(2018, 9, 2, 16, 0)),
-    'sun_16_20': period(datetime(2018, 9, 2, 16, 0), datetime(2018, 9, 2, 20, 0)),
+DAYS = {
+    'fri': datetime(2018, 8, 31),
+    'sat': datetime(2018, 9, 1),
+    'sun': datetime(2018, 9, 2),
 }
 
 # We may also have other venues in the DB, but these are the ones to be
@@ -300,6 +311,12 @@ class Proposal(db.Model):
     def get_allowed_venues_serialised(self):
         return ','.join([ v.name for v in self.get_allowed_venues() ])
 
+    def timeslot_to_period(self, slot_string):
+        day, start_h, end_h = slot_string.split(slot_string)
+        start = DAYS[day].replace(hour=start_h)
+        end = DAYS[day].replace(hour=end_h)
+        return period(start, end)
+
     # Reduces the time periods to the smallest contiguous set we can
     def make_periods_contiguous(self, time_periods):
         if not time_periods:
@@ -334,7 +351,7 @@ class Proposal(db.Model):
         if not time_periods and self.available_times:
             for p in self.available_times.split(','):
                 if p:
-                    time_periods.append(TIME_PERIODS[p.strip()])
+                    time_periods.append(self.timeslot_to_period(p.strip()))
         return self.make_periods_contiguous(time_periods)
 
     def get_allowed_time_periods_serialised(self):
@@ -343,7 +360,8 @@ class Proposal(db.Model):
     def get_allowed_time_periods_with_default(self):
         allowed_time_periods = self.get_allowed_time_periods()
         if not allowed_time_periods:
-            allowed_time_periods = list(TIME_PERIODS.values())
+            allowed_time_periods = [self.timeslot_to_period(ts) for ts in PROPOSAL_TIMESLOTS[proposal.type]]
+
         return self.make_periods_contiguous(allowed_time_periods)
 
     @property

@@ -19,28 +19,12 @@ from main import db, mail
 from models.user import User, UserDiversity
 from models.cfp import (
     TalkProposal, WorkshopProposal, YouthWorkshopProposal, PerformanceProposal,
-    InstallationProposal, Proposal, CFPMessage, LENGTH_OPTIONS
+    InstallationProposal, Proposal, CFPMessage, LENGTH_OPTIONS, PROPOSAL_TIMESLOTS
 )
 from .common import feature_flag, create_current_user
 from .common.forms import Form, TelField
 
 import collections
-
-# This needs to go very far away
-proposal_timeslots = {
-    'talk':             ('fri_13_16', 'fri_16_20',
-                            'sat_10_13', 'sat_13_16', 'sat_16_20',
-                            'sun_10_13', 'sun_13_16', 'sun_16_20'),
-    'workshop':         ('fri_13_16', 'fri_16_20', 'fri_20_22', 'fri_22_24',
-                            'sat_10_13', 'sat_13_16', 'sat_16_20', 'sat_20_22', 'sat_22_24',
-                            'sun_10_13', 'sun_13_16', 'sun_16_20'),
-    'youthworkshop':    ('fri_13_16', 'fri_16_20',
-                            'sat_10_13', 'sat_13_16', 'sat_16_20',
-                            'sun_10_13', 'sun_13_16', 'sun_16_20'),
-    'performance':      ('fri_20_22', 'fri_22_24',
-                            'sat_20_22', 'sat_22_24',
-                            'sun_20_22', 'sun_22_24')
-}
 
 cfp = Blueprint('cfp', __name__)
 
@@ -456,7 +440,7 @@ def finalise_proposal(proposal_id):
         class F(AcceptedForm):
             pass
 
-        F._available_slots = proposal_timeslots[proposal.type]
+        F._available_slots = PROPOSAL_TIMESLOTS[proposal.type]
         for timeslot in F._available_slots:
             setattr(F, timeslot, BooleanField(default=True))
         form = F()
