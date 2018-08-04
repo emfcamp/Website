@@ -35,7 +35,7 @@
 
 <form method="post" action="{{ url_for('.message_proposer', proposal_id=proposal.id) }}">
     {{ form.hidden_tag() }}
-    {{ render_field(form.message, tabindex=1) }}
+    {{ render_field(form.message, tabindex=1, rows=6) }}
     <div class="pull-right">
         {{ form.send(class_='btn btn-success debounce', tabindex=2) }}
         &nbsp;
