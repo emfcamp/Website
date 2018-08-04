@@ -220,7 +220,13 @@ class CloseRoundForm(Form):
 
 class AcceptanceForm(Form):
     min_score = FloatField('Minimum score for acceptance')
-    set_score = SubmitField('Accept Proposals...')
+    set_score = SubmitField('Preview proposals to be selected...')
+    confirm_type = SelectField('Messaging', choices=[
+        ('accepted_unaccepted', 'Email accepted, notify unaccepted about the next round'),
+        ('accepted', 'Email accepted, do not email unaccepted'),
+        ('nobody', 'Email nobody'),
+        ('accepted_reject', 'Email accepted, reject all unaccepted'),
+    ], default='accepted')
     confirm = SubmitField('Confirm')
     cancel = SubmitField('Cancel')
 
