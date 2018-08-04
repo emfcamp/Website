@@ -61,6 +61,8 @@ class UpdateProposalForm(Form):
         proposal.one_day = self.one_day.data
         proposal.user.will_have_ticket = self.will_have_ticket.data
         proposal.published_names = self.published_names.data
+        proposal.published_title = self.published_title.data
+        proposal.published_description = self.published_description.data
         proposal.arrival_period = self.arrival_period.data
         proposal.departure_period = self.departure_period.data
         proposal.telephone_number = self.telephone_number.data
@@ -123,19 +125,29 @@ class UpdateWorkshopForm(UpdateProposalForm):
     cost = StringField('Cost per attendee')
     participant_equipment = StringField('Attendee equipment')
     age_range = StringField('Age range')
+    published_cost = StringField('Attendee cost')
+    published_participant_equipment = StringField('Attendee equipment')
+    published_age_range = StringField('Attendee age range')
 
     def update_proposal(self, proposal):
         proposal.attendees = self.attendees.data
         proposal.cost = self.cost.data
         proposal.participant_equipment = self.participant_equipment.data
         proposal.age_range = self.age_range.data
+        proposal.published_cost = self.published_cost.data
+        proposal.published_participant_equipment = self.published_participant_equipment.data
+        proposal.published_age_range = self.published_age_range.data
         super(UpdateWorkshopForm, self).update_proposal(proposal)
+
 
 class UpdateYouthWorkshopForm(UpdateProposalForm):
     attendees = StringField('Attendees', [Required()])
     cost = StringField('Cost per attendee')
     participant_equipment = StringField('Attendee equipment')
     age_range = StringField('Age range')
+    published_cost = StringField('Attendee cost')
+    published_participant_equipment = StringField('Attendee equipment')
+    published_age_range = StringField('Attendee age range')
     valid_dbs = BooleanField('Has a valid DBS check')
 
     def update_proposal(self, proposal):
@@ -143,6 +155,9 @@ class UpdateYouthWorkshopForm(UpdateProposalForm):
         proposal.cost = self.cost.data
         proposal.participant_equipment = self.participant_equipment.data
         proposal.age_range = self.age_range.data
+        proposal.published_cost = self.published_cost.data
+        proposal.published_participant_equipment = self.published_participant_equipment.data
+        proposal.published_age_range = self.published_age_range.data
         proposal.valid_dbs = self.valid_dbs.data
         super(UpdateYouthWorkshopForm, self).update_proposal(proposal)
 

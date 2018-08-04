@@ -33,17 +33,14 @@
             {{ render_dl_field(form.needs_help) }}
             {{ render_dl_field(form.needs_money) }}
             {{ render_dl_field(form.one_day) }}
-            {% if proposal.type == 'workshop' %}
+            {% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}
                 {{ render_dl_field(form.attendees) }}
                 {{ render_dl_field(form.cost) }}
                 {{ render_dl_field(form.participant_equipment) }}
                 {{ render_dl_field(form.age_range) }}
-            {% elif proposal.type == 'youthworkshop' %}
-                {{ render_dl_field(form.attendees) }}
-                {{ render_dl_field(form.cost) }}
-                {{ render_dl_field(form.participant_equipment) }}
-                {{ render_dl_field(form.age_range) }}
-                {{ render_dl_field(form.valid_dbs) }}
+                {% if proposal.type == 'youthworkshop' %}
+                    {{ render_dl_field(form.valid_dbs) }}
+                {% endif %}
             {% elif proposal.type == 'installation' %}
                 {{ render_dl_field(form.size) }}
                 {{ render_dl_field(form.funds) }}
@@ -61,16 +58,26 @@
                 {{ render_dl_field(form.potential_venue) }}
                 {{ render_dl_field(form.potential_time) }}
             </dl>
-        <h4>User schedule details</h4>
+        <h4>User schedule published details</h4>
             <dl class="dl-horizontal">
                 {{ render_dl_field(form.published_names) }}
                 {{ render_dl_field(form.published_title) }}
                 {{ render_dl_field(form.published_description, rows=4) }}
+                {% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}
+                    {{ render_dl_field(form.published_age_range) }}
+                    {{ render_dl_field(form.published_cost) }}
+                    {{ render_dl_field(form.published_participant_equipment) }}
+                {% endif %}
+            </dl>
+        <h4>User scheduling information</h4>
+            <dl class="dl-horizontal">
+                {{ render_dl_field(form.telephone_number) }}
+                {% if proposal.type == 'talk' %}
+                    {{ render_dl_field(form.may_record) }}
+                    {{ render_dl_field(form.needs_laptop) }}
+                {% endif %}
                 {{ render_dl_field(form.arrival_period) }}
                 {{ render_dl_field(form.departure_period) }}
-                {{ render_dl_field(form.telephone_number) }}
-                {{ render_dl_field(form.may_record) }}
-                {{ render_dl_field(form.needs_laptop) }}
                 {{ render_dl_field(form.available_times) }}
             </dl>
         {% endif %}

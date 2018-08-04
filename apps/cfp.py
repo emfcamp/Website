@@ -367,6 +367,9 @@ class AcceptedForm(Form):
     name = StringField('Names for schedule', [Required()])
     title = StringField('Title', [Required()])
     description = TextAreaField('Description', [Required()])
+    age_range = StringField('Age Range')
+    cost = StringField('Cost Per Attendee')
+    participant_equipment = StringField('Attendee Equipment')
     telephone_number = TelField('Telephone')
 
     may_record = BooleanField('I am happy for this to be recorded', default=True)
@@ -474,6 +477,11 @@ def finalise_proposal(proposal_id):
         proposal.arrival_period = form.arrival_period.data
         proposal.departure_period = form.departure_period.data
 
+        if proposal.type == 'workshop' or proposal.type == 'youthworkshop':
+            proposal.published_age_range = form.age_range.data
+            proposal.published_cost = form.cost.data
+            proposal.published_participant_equipment = form.participant_equipment.data
+
         proposal.available_times = form.get_availability_json()
         proposal.set_state('finished')
 
@@ -498,6 +506,11 @@ def finalise_proposal(proposal_id):
         form.needs_laptop.data = proposal.needs_laptop
         form.requirements.data = proposal.requirements
 
+        if proposal.type == 'workshop' or proposal.type == 'youthworkshop':
+            form.age_range.data = proposal.published_age_range
+            form.cost.data = proposal.published_cost
+            form.participant_equipment.data = proposal.published_participant_equipment
+
         # We do this here because we're about to generate form elements
         if proposal.available_times:
             form.set_from_availability_json(proposal.available_times)
@@ -509,6 +522,11 @@ def finalise_proposal(proposal_id):
         form.name.data = current_user.name
         form.title.data = proposal.title
         form.description.data = proposal.description
+
+        if proposal.type == 'workshop' or proposal.type == 'youthworkshop':
+            form.age_range.data = proposal.age_range
+            form.cost.data = proposal.cost
+            form.participant_equipment.data = proposal.participant_equipment
 
     # This just sorts out the headings / columns for the form
     headings = {}

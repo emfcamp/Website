@@ -21,23 +21,34 @@
 
     <fieldset>
         <legend>Confirm Your {{proposal.human_type | title}}</legend>
-        <p>Please confirm how you would like your title and description to
-          appear in the schedule</p>
+        <p>Please confirm the details you would like to be publicly visible in the schedule</p>
         {{ render_field(form.title, 9) }}
         <div class="col-md-9 col-md-offset-3"><small>Your description should be about 100-150 words.</small></div>
         {{ render_field(form.description, 9) }}
+
+        {% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}
+        <div class="col-md-9 col-md-offset-3"><small>Please give the cost in pounds (£) per attendee, with any options.</small></div>
+        {{ render_field(form.cost, 9) }}
+        <div class="col-md-9 col-md-offset-3"><small>The age range this workshop is suitable for. If anybody can take part, say "All ages".</small></div>
+        {{ render_field(form.age_range, 9) }}
+        <div class="col-md-9 col-md-offset-3"><small>If workshop attendees should bring things, please detail them.</small></div>
+        {{ render_field(form.participant_equipment, 9) }}
+        {% endif %}
     </fieldset>
 
     <fieldset>
-        <legend>Your Availability</legend>
-        <p>When will you be on site, and when are you available to present?</p>
-        <p>We won't schedule you for any time when you're travelling and we'll
-          do our best to pick a time that you are comfortable with.</p>
+        <legend>Arrival &amp; Departure</legend>
+        <p>Please let us know when you will be arriving and leaving the festival. We won't schedule you for a time when you are likely to be travelling.</p>
 
         {{ render_field(form.arrival_period, 9) }}
         {{ render_field(form.departure_period, 9) }}
+    </fieldset>
 
-        {% if slot_times %}
+    {% if slot_times %}
+    <fieldset>
+        <legend>Your Availability</legend>
+        <p>When are you available to deliver your {{ proposal.human_type }}? We'll do our best to pick a time that you are comfortable with.</p>
+
           {% if proposal.type == 'performance' %}
             <p>Performances will be scheduled between <strong>8pm and 1:30am</strong> (midnight)
               every day. There is a 1:30am curfew on amplified music.</p>
@@ -77,21 +88,25 @@
                 </tr>
               </tbody>
             </table>
-          {% endif %}
-
     </fieldset>
+    {% endif %}
 
     <fieldset>
         <legend>Final Requirements</legend>
+        {% if proposal.type == 'talk' %}
         {{ render_field(form.may_record, 7) }}
         {{ render_field(form.needs_laptop, 7) }}
+        {% endif %}
         {% if proposal.type == 'installation' %}
           <p>In addition to any requirements (including being under cover, power
             and water) please let us know if special provisions are needed for
             moving your installation (e.g. if it is fragile, must be disarmed first).</p>
+        {% else %}
+          <div class="col-md-9 col-md-offset-3">
+            <small>Any equipment you might need, or other things you need us to provide.</small>
+          </div>
         {% endif %}
         {{ render_field(form.requirements, 9) }}
-
     </fieldset>
 
     {% if proposal.scheduled_duration and (proposal.type == 'talk' or proposal.type == 'workshop') %}

@@ -406,6 +406,9 @@ class WorkshopProposal(Proposal):
     cost = db.Column(db.String)
     age_range = db.Column(db.String)
     participant_equipment = db.Column(db.String)
+    published_age_range = db.Column(db.String)
+    published_cost = db.Column(db.String)
+    published_participant_equipment = db.Column(db.String)
 
 
 class YouthWorkshopProposal(WorkshopProposal):
