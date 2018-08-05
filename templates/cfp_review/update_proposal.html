@@ -47,7 +47,6 @@
             {% endif %}
             {{ render_dl_field(form.will_have_ticket) }}
         </dl>
-        {% if proposal.state in ('accepted', 'finished') %}
         <h4>Scheduling</h4>
             <dl class="dl-horizontal">
                 {{ render_dl_field(form.allowed_venues) }}
@@ -58,6 +57,7 @@
                 {{ render_dl_field(form.potential_venue) }}
                 {{ render_dl_field(form.potential_time) }}
             </dl>
+        {% if proposal.state in ('accepted', 'finished') %}
         <h4>User schedule published details</h4>
             <dl class="dl-horizontal">
                 {{ render_dl_field(form.published_names) }}
