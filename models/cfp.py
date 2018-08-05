@@ -78,7 +78,7 @@ DEFAULT_VENUES = {
     'talk': ['Stage A', 'Stage B', 'Stage C'],
     'workshop': ['Workshop 1', 'Workshop 2', 'Workshop 3', 'Workshop 4'],
     'youthworkshop': ['Youth Workshop'],
-    'performance': ['Stage A'],
+    'performance': ['Stage B'],
     'installation': [],
 }
 

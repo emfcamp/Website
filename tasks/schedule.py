@@ -11,12 +11,14 @@ from models.cfp import Proposal, Venue, ROUGH_LENGTHS
 
 class ImportVenues(Command):
     venues = [
-        ('Stage A', ['talk', 'performance'], 100),
-        ('Stage B', ['talk'], 99),
+        ('Stage A', ['talk'], 100),
+        ('Stage B', ['talk', 'performance'], 99),
         ('Stage C', ['talk'], 98),
         ('Workshop 1', ['workshop'], 97),
         ('Workshop 2', ['workshop'], 96),
-        ('Workshop 3', ['youthworkshop'], 95),
+        ('Workshop 3', ['workshop'], 95),
+        ('Workshop 4', ['workshop'], 94),
+        ('Youth Workshop', ['youthworkshop'], 93),
     ]
 
     def run(self):
