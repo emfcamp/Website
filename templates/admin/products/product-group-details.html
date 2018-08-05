@@ -70,6 +70,7 @@
     {% endif %}
     <a class="btn btn-primary" href="{{ url_for('.new_product', parent_id=group.id) }}">New Product</a>
     <a class="btn btn-default" href="{{ url_for('.product_group_edit', group_id=group.id) }}">Edit</a>
+    <a class="btn btn-default" href="{{ url_for('.product_group_copy', group_id=group.id) }}">Copy</a>
 </div>
 
 {% endblock %}

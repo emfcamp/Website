@@ -2,13 +2,12 @@
 from __future__ import division, absolute_import, print_function, unicode_literals
 import logging
 from datetime import datetime
-from dateutil.parser import parse
 
-from flask import current_app as app
 from sqlalchemy.orm.exc import MultipleResultsFound
 
 from main import cache, db
-from models.product import (
+from . import config_date
+from .product import (
     Product, ProductGroup, ProductView,
     ProductViewProduct, PriceTier,
 )
@@ -31,9 +30,6 @@ VALID_STATES = {
     'site_state': ["before-sales", "sales", "event", "after-event"],
     'sales_state': ["sold-out", "sales-ended", "unavailable", "available"],
 }
-
-def config_date(key):
-    return parse(app.config.get(key))
 
 def event_start():
     return config_date('EVENT_START')
@@ -108,4 +104,5 @@ def get_site_state():
 def get_sales_state():
     states = get_states()
     return states['sales_state']
+
 

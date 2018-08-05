@@ -11,6 +11,7 @@
 {{ render_field(form.name, horizontal=False) }}
 {{ render_field(form.type, horizontal=False) }}
 {{ render_field(form.token, horizontal=False) }}
+{{ render_field(form.cfp_accepted_only, horizontal=False) }}
 
 <table class="table table-condensed table-striped">
   <tr>
@@ -29,13 +30,14 @@
       {{ pvp._field.product_id() }}
       {{ pvp._field.order(class_="form-control") }}
     </td>
-    <td></td>
+    <td>{{ pvp._field.delete(class_="btn btn-danger") }}</td>
   </tr>
 
   {% endfor %}
 </table>
 
 {{ form.update(class_="btn btn-success debounce") }}
+<a href="{{ url_for('.product_view_add', view_id=view.id) }}" class="btn btn-default">Add products</a>
 
 </form>
 

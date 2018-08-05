@@ -1,4 +1,3 @@
-from datetime import datetime
 from decimal import Decimal
 import re
 from collections import OrderedDict
@@ -24,7 +23,7 @@ from models.product import (
 from models.basket import Basket
 from models.payment import BankPayment, StripePayment, GoCardlessPayment
 from models.purchase import Ticket
-from models.site_state import get_sales_state, config_date
+from models.site_state import get_sales_state
 
 from ..common import (
     CURRENCY_SYMBOLS, get_user_currency, set_user_currency,
@@ -106,17 +105,8 @@ def main(flow=None):
     if not view:
         abort(404)
 
-    if datetime.utcnow() < config_date('SALES_START') and not view.token:
-        # Allow us to set TICKET_SALES before sales start
+    if not view.is_accessible(current_user, session.get('ticket_token')):
         abort(404)
-
-    if view.token and session.get('ticket_token') != view.token:
-        # Visitors with the right tokens and admins can access token-based views
-        if current_user.is_anonymous:
-            abort(404)
-
-        elif not current_user.has_permission('admin'):
-            abort(404)
 
     sales_state = get_sales_state()
 

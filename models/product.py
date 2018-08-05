@@ -1,13 +1,15 @@
 from decimal import Decimal
 from collections import defaultdict
+from datetime import datetime
 
 from sqlalchemy.orm import validates
 from sqlalchemy import func, UniqueConstraint, inspect
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from main import db
-from .purchase import Purchase
 from .mixins import CapacityMixin, InheritedAttributesMixin
+from . import config_date
+from .purchase import Purchase
 
 
 class ProductGroupException(Exception):
@@ -142,7 +144,7 @@ class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
     display_name = db.Column(db.String)
     description = db.Column(db.String)
     price_tiers = db.relationship('PriceTier', backref='parent', cascade='all', order_by='PriceTier.id')
-    product_view_products = db.relationship('ProductViewProduct', backref='product')
+    product_view_products = db.relationship('ProductViewProduct', backref='product', cascade='all, delete-orphan')
 
     __table_args__ = (
         UniqueConstraint('name', 'group_id'),
@@ -310,13 +312,11 @@ class ProductView(db.Model):
     type = db.Column(db.String, nullable=False)
     name = db.Column(db.String, nullable=False, index=True)
     token = db.Column(db.String, nullable=True)
+    cfp_accepted_only = db.Column(db.Boolean, nullable=False, default=False)
 
-    product_view_products = db.relationship('ProductViewProduct', backref='view', order_by='ProductViewProduct.order')
+    product_view_products = db.relationship('ProductViewProduct', backref='view',
+                                            order_by='ProductViewProduct.order', cascade='all, delete-orphan')
     products = association_proxy('product_view_products', 'product')
-
-    def __init__(self, name, type):
-        self.name = name
-        self.type = type
 
     @classmethod
     def get_by_name(cls, name):
@@ -329,6 +329,24 @@ class ProductView(db.Model):
         if token is None:
             return None
         return ProductView.query.filter_by(token=token).one_or_none()
+
+    def is_accessible(self, user, user_token):
+        if user.is_authenticated and user.has_permission('admin'):
+            # Admins always have access
+            return True
+
+        if not self.token and datetime.utcnow() < config_date('SALES_START'):
+            # If TICKET_SALES is set, but sales haven't started, restrict access to token views
+            return False
+
+        if self.token and user_token == self.token:
+            return True
+
+        # cfp_accepted and token is an either-or thing currently
+        if self.cfp_accepted_only and user.is_authenticated and user.is_cfp_accepted:
+            return True
+
+        return False
 
     def __repr__(self):
         return "<ProductView: %s>" % self.name
@@ -353,4 +371,5 @@ class ProductViewProduct(db.Model):
     def __repr__(self):
         return '<ProductViewProduct: view {}, product {}, order {}>'.format(
             self.view_id, self.product_id, self.order)
+
 

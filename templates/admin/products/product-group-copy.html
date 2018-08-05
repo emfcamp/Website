@@ -1,0 +1,22 @@
+{% extends "admin/base.html" %}
+{% from "_formhelpers.html" import render_field, render_static %}
+{% set nav_active = 'products' %}
+{% block body %}
+
+<h2>Copy product group</h2>
+
+<form method="post" class="form-horizontal">
+{{ form.hidden_tag() }}
+
+{{ render_field(form.name, horizontal=8) }}
+{{ render_field(form.expires, horizontal=8, placeholder="YYYY-MM-DD") }}
+{% if group.capacity_max != None %}
+{{ render_field(form.capacity_max_required, horizontal=8) }}
+{% else %}
+{{ render_field(form.capacity_max, horizontal=8, disabled=True) }}
+{% endif %}
+{{ render_field(form.include_inactive, horizontal=8) }}
+<div class="pull-right">{{ form.copy(class_="btn btn-success debounce") }}</div>
+</form>
+
+{% endblock %}

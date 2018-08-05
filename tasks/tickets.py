@@ -42,7 +42,7 @@ def create_product_groups():
 
     view = ProductView.get_by_name('main')
     if not view:
-        view = ProductView('main', 'tickets')
+        view = ProductView(name='main', type='tickets')
         db.session.add(view)
 
     db.session.flush()

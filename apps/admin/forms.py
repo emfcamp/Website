@@ -3,7 +3,8 @@ from wtforms.widgets import TextArea
 from wtforms import (
     SubmitField, StringField, SelectField,
     DateField, IntegerField, DecimalField,
-    FieldList, FormField, HiddenField
+    FieldList, FormField, HiddenField,
+    BooleanField,
 )
 from wtforms.fields.html5 import EmailField
 
@@ -83,25 +84,53 @@ class EditProductGroupForm(ProductGroupForm):
         pg.expires = self.expires.data
         return pg
 
+class CopyProductGroupForm(ProductGroupForm):
+    copy = SubmitField('Copy')
+    capacity_max_required = IntegerField('Maximum to sell', [Required()])
+    include_inactive = BooleanField('Include inactive price tiers')
+
+
 class PriceTierForm(Form):
     name = StringField('Name')
+    personal_limit = IntegerField("Personal maximum")
+
+class NewPriceTierForm(PriceTierForm):
+    create = SubmitField('Create', [Required()])
     price_gbp = DecimalField('Price (GBP)')
     price_eur = DecimalField('Price (EUR)')
-    submit = SubmitField('Submit')
+
+class EditPriceTierForm(PriceTierForm):
+    update = SubmitField('Update', [Required()])
+
+class ModifyPriceTierForm(Form):
+    delete = SubmitField('Delete')
+    activate = SubmitField('Activate')
+    deactivate = SubmitField('Deactivate')
 
 
-class ProductViewProductOrderForm(Form):
+class ProductViewProductForm(Form):
     order = IntegerField('Order', [Required()])
     product_id = HiddenIntegerField('product_id', [Required()])
+    delete = SubmitField('Delete')
 
 
 class ProductViewForm(Form):
     name = StringField('Name')
-    type = StringField('Type')
+    type = StringField('Type', default="tickets")
     token = StringField('Token')
-    pvps = FieldList(FormField(ProductViewProductOrderForm))
+    cfp_accepted_only = BooleanField("Accepted CfP proposal (or token) required")
 
+class NewProductViewForm(ProductViewForm):
+    create = SubmitField('Create', [Required()])
+
+class EditProductViewForm(ProductViewForm):
     update = SubmitField('Update')
+    pvps = FieldList(FormField(ProductViewProductForm))
+
+
+class AddProductViewProductForm(Form):
+    add_all_products = SubmitField("Add all")
+    add_product = SubmitField("Add product")
 
 #
 # Forms for reserving/issuing tickets

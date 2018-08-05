@@ -21,8 +21,10 @@ from models.purchase import (
 
 from . import admin
 from .forms import (EditProductForm, NewProductForm,
-                    NewProductGroupForm, EditProductGroupForm, PriceTierForm,
-                    ProductViewForm)
+                    NewProductGroupForm, EditProductGroupForm, CopyProductGroupForm,
+                    NewPriceTierForm, EditPriceTierForm, ModifyPriceTierForm,
+                    NewProductViewForm, EditProductViewForm,
+                    AddProductViewProductForm)
 
 
 @admin.route('/products')
@@ -83,11 +85,11 @@ def product_details(product_id):
 
 @admin.route('/products/<int:product_id>/new-tier', methods=['GET', 'POST'])
 def new_price_tier(product_id):
-    form = PriceTierForm()
+    form = NewPriceTierForm()
     product = Product.query.get_or_404(product_id)
 
     if form.validate_on_submit():
-        pt = PriceTier(form.name.data)
+        pt = PriceTier(form.name.data, personal_limit=form.personal_limit.data)
         pt.prices = [Price('GBP', form.price_gbp.data),
                      Price('EUR', form.price_eur.data)]
 
@@ -103,34 +105,52 @@ def new_price_tier(product_id):
 @admin.route('/products/price-tiers/<int:tier_id>')
 def price_tier_details(tier_id):
     tier = PriceTier.query.get_or_404(tier_id)
-    return render_template('admin/products/price-tier-details.html', tier=tier)
+    form = ModifyPriceTierForm()
+    return render_template('admin/products/price-tier-details.html', tier=tier, form=form)
 
 
 @admin.route('/products/price-tiers/<int:tier_id>', methods=['POST'])
 def price_tier_modify(tier_id):
+    form = ModifyPriceTierForm()
     tier = PriceTier.query.get_or_404(tier_id)
-    if request.form.get('delete') and tier.unused:
-        db.session.delete(tier)
-        db.session.commit()
-        flash("Price tier deleted")
-        return redirect(url_for('.price_tier_details', tier_id=tier.id))
 
-    if request.form.get('activate'):
-        for t in tier.parent.price_tiers:
-            t.active = False
+    if form.validate_on_submit():
+        if form.delete.data and tier.unused:
+            db.session.delete(tier)
+            db.session.commit()
+            flash("Price tier deleted")
+            return redirect(url_for('.product_details', product_id=tier.product_id))
 
-        tier.active = True
-        db.session.commit()
-        flash("Price tier activated")
-        return redirect(url_for('.price_tier_details', tier_id=tier.id))
+        if form.activate.data:
+            for t in tier.parent.price_tiers:
+                t.active = False
 
-    if request.form.get('deactivate'):
-        tier.active = False
-        db.session.commit()
-        flash("Price tier deactivated")
-        return redirect(url_for('.price_tier_details', tier_id=tier.id))
+            tier.active = True
+            db.session.commit()
+            flash("Price tier activated")
+            return redirect(url_for('.price_tier_details', tier_id=tier.id))
+
+        if form.deactivate.data:
+            tier.active = False
+            db.session.commit()
+            flash("Price tier deactivated")
+            return redirect(url_for('.price_tier_details', tier_id=tier.id))
 
     return abort(401)
+
+@admin.route('/products/price-tiers/<int:tier_id>/edit', methods=['GET', 'POST'])
+def price_tier_edit(tier_id):
+    tier = PriceTier.query.get_or_404(tier_id)
+    form = EditPriceTierForm(obj=tier)
+
+    if form.validate_on_submit():
+        tier.name = form.name.data
+        tier.personal_limit = form.personal_limit.data
+        db.session.commit()
+
+        return redirect(url_for('.price_tier_details', tier_id=tier.id))
+
+    return render_template('admin/products/price-tier-edit.html', tier=tier, form=form)
 
 
 @admin.route('/products/group/<int:group_id>')
@@ -179,6 +199,56 @@ def product_group_edit(group_id):
                            method='edit', group=group, form=form)
 
 
+@admin.route('/products/group/<int:group_id>/copy', methods=['GET', 'POST'])
+def product_group_copy(group_id):
+    group = ProductGroup.query.get_or_404(group_id)
+    form = CopyProductGroupForm()
+
+    if group.children:
+        # No recursive copying
+        abort(404)
+
+    if request.method != 'POST':
+        form.name.data = group.name + ' (copy)'
+
+    if group.capacity_max is None:
+        del form.capacity_max_required
+
+    else:
+        del form.capacity_max
+
+    if form.validate_on_submit():
+        capacity_max = None
+        if group.capacity_max is not None:
+            capacity_max = form.capacity_max_required.data
+            group.capacity_max -= capacity_max
+
+        new_group = ProductGroup(type=group.type, name=form.name.data,
+                                 capacity_max=capacity_max, expires=form.expires.data)
+        for product in group.products:
+            new_product = Product(name=product.name, display_name=product.display_name,
+                                  description=product.description)
+            new_group.products.append(new_product)
+            for pt in product.price_tiers:
+                if not pt.active and not form.include_inactive.data:
+                    continue
+
+                new_pt = PriceTier(name=pt.name, personal_limit=pt.personal_limit,
+                                   active=pt.active)
+                new_product.price_tiers.append(new_pt)
+                for price in pt.prices:
+                    new_price = Price(price.currency, price.value)
+                    new_pt.prices.append(new_price)
+
+        new_group.parent = group.parent
+        db.session.add(new_group)
+        db.session.commit()
+        flash("ProductGroup copied")
+        return redirect(url_for('.product_group_details', group_id=new_group.id))
+
+    return render_template('admin/products/product-group-copy.html', group=group, form=form)
+
+
 @admin.route('/transfers')
 def purchase_transfers():
     transfer_logs = PurchaseTransfer.query.all()
@@ -210,18 +280,33 @@ def tees():
 
 @admin.route('/product_views')
 def product_views():
-    view_counts = ProductView.query.join(ProductView.product_view_products) \
-                             .with_entities(ProductView, func.count('*')) \
+    view_counts = ProductView.query.outerjoin(ProductView.product_view_products) \
+                             .with_entities(ProductView, func.count(ProductViewProduct.view_id)) \
                              .group_by(ProductView) \
                              .order_by(ProductView.id).all()
     return render_template('admin/products/views.html', view_counts=view_counts)
+
+@admin.route('/product_view/new', methods=['GET', 'POST'])
+def product_view_new():
+    form = NewProductViewForm()
+
+    if form.validate_on_submit():
+        view = ProductView(type=form.type.data, name=form.name.data,
+                           token=form.token.data, cfp_accepted_only=form.cfp_accepted_only.data)
+        app.logger.info('Adding new ProductView %s', view.name)
+        db.session.add(view)
+        db.session.commit()
+        flash("ProductView created")
+        return redirect(url_for('.product_view', view_id=view.id))
+
+    return render_template('admin/products/view-new.html', form=form)
 
 
 @admin.route('/product_view/<int:view_id>', methods=['GET', 'POST'])
 def product_view(view_id):
     view = ProductView.query.get_or_404(view_id)
 
-    form = ProductViewForm(obj=view)
+    form = EditProductViewForm(obj=view)
     if request.method != 'POST':
         # Empty form - populate pvps
         for pvp in view.product_view_products:
@@ -241,16 +326,54 @@ def product_view(view_id):
             view.name = form.name.data
             view.type = form.type.data
             view.token = form.token.data
+            view.cfp_accepted_only = form.cfp_accepted_only.data
 
             for f in form.pvps:
                 pvp_dict[f.product_id.data].order = f.order.data
 
         else:
-            ProductViewProduct()
-            pass
+            for f in form.pvps:
+                if f.delete.data:
+                    pvp = pvp_dict[f.product_id.data]
+                    db.session.delete(pvp)
 
         db.session.commit()
 
     return render_template('admin/products/view-edit.html', view=view, form=form)
 
+@admin.route('/product_view/<int:view_id>/add', methods=['GET', 'POST'])
+@admin.route('/product_view/<int:view_id>/add/<int:group_id>', methods=['GET', 'POST'])
+@admin.route('/product_view/<int:view_id>/add/<int:group_id>/<int:product_id>', methods=['GET', 'POST'])
+def product_view_add(view_id, group_id=None, product_id=None):
+    view = ProductView.query.get_or_404(view_id)
+    form = AddProductViewProductForm()
+
+    root_groups = ProductGroup.query.filter_by(parent_id=None).order_by(ProductGroup.id).all()
+
+    if product_id is not None:
+        product = Product.query.get(product_id)
+    else:
+        product = None
+        del form.add_product
+
+    if group_id is not None:
+        group = ProductGroup.query.get(group_id)
+    else:
+        group = None
+        del form.add_all_products
+
+    if form.validate_on_submit():
+        if form.add_all_products.data:
+            for product in group.products:
+                ProductViewProduct(view, product)
+            db.session.commit()
+
+        elif form.add_product.data:
+            ProductViewProduct(view, product)
+            db.session.commit()
+
+        return redirect(url_for('.product_view', view_id=view.id))
+
+    return render_template('admin/products/view-add-products.html', view=view, form=form,
+                           root_groups=root_groups, add_group=group, add_product=product)
 

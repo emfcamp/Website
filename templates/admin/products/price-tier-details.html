@@ -13,6 +13,7 @@
   <dt>Active</dt><dd>{{ tier.active }}</dd>
   <dt>Sold</dt><dd>{{ tier.capacity_used }}</dd>
   <dt>Maximum</dt><dd>{{ tier.capacity_max }}</dd>
+  <dt>Personal Maximum</dt><dd>{{ tier.personal_limit }}</dd>
   <dt>Expires</dt><dd>{{ format_expiry(tier) }}</dd>
 </dl>
 
@@ -29,7 +30,8 @@
 {% endif %}
 
 <form method="post" class="btn-group">
-<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+<a href="{{ url_for('.price_tier_edit', tier_id=tier.id) }}" class="btn btn-default">Edit</a>
+{{ form.hidden_tag() }}
 {% if tier.unused %}
     <button name="delete" value="1" class="btn btn-danger">Delete</button>
 {% endif %}

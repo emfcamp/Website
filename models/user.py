@@ -246,6 +246,13 @@ class User(db.Model, UserMixin):
 
         return User.query.filter_by(id=uid).one()
 
+    @property
+    def is_cfp_accepted(self):
+        for proposal in self.proposals:
+            if proposal.state in {'accepted', 'finished'}:
+                return True
+        return False
+
 Index('ix_user_email_tsearch', text("to_tsvector('simple', replace(email, '@', ' '))"), postgresql_using='gin')
 Index('ix_user_name_tsearch', text("to_tsvector('simple', name)"), postgresql_using='gin')
 

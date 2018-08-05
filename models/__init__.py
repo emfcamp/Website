@@ -2,6 +2,9 @@ from bisect import bisect
 from collections import OrderedDict
 from decimal import Decimal
 from itertools import groupby
+from dateutil.parser import parse
+
+from flask import current_app as app
 
 from main import db
 from sqlalchemy import true, inspect
@@ -123,6 +126,9 @@ def iter_attr_edits(cls, attrs, query=None):
 
         yield (pk, attr_times)
 
+
+def config_date(key):
+    return parse(app.config.get(key))
 
 from .user import *  # noqa: F401,F403
 from .payment import *  # noqa: F401,F403
