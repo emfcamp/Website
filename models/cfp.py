@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 from dateutil.parser import parse as parse_date
 import re
 from itertools import groupby
@@ -58,8 +58,8 @@ PROPOSAL_TIMESLOTS = {
                             'sat_10_13', 'sat_13_16', 'sat_16_20', 'sat_20_22', 'sat_22_24',
                             'sun_10_13', 'sun_13_16', 'sun_16_20'),
     'youthworkshop':    ('fri_13_16', 'fri_16_20',
-                            'sat_10_13', 'sat_13_16', 'sat_16_20',
-                            'sun_10_13', 'sun_13_16', 'sun_16_20'),
+                            'sat_9_13', 'sat_13_16', 'sat_16_20',
+                            'sun_9_13', 'sun_13_16', 'sun_16_20'),
     'performance':      ('fri_20_22', 'fri_22_24',
                             'sat_20_22', 'sat_22_24',
                             'sun_20_22', 'sun_22_24')
@@ -86,6 +86,36 @@ DEFAULT_VENUES = {
 # the anonymous review system.
 MANUAL_REVIEW_TYPES = ['youthworkshop', 'performance', 'installation']
 
+
+def timeslot_to_period(slot_string):
+    day, start_h, end_h = slot_string.split('_')
+    start = DAYS[day].replace(hour=int(start_h) - 1) # Because hour is 0..23
+    end = DAYS[day].replace(hour=int(end_h) - 1)
+    return period(start, end)
+
+# Reduces the time periods to the smallest contiguous set we can
+def make_periods_contiguous(time_periods):
+    if not time_periods:
+        return []
+
+    time_periods.sort(key=lambda x: x.start)
+    contiguous_periods = [time_periods.pop(0)]
+    for time_period in time_periods:
+        if time_period.start <= contiguous_periods[-1].end and\
+                contiguous_periods[-1].end < time_period.end:
+            contiguous_periods[-1] = period(contiguous_periods[-1].start, time_period.end)
+            continue
+
+        contiguous_periods.append(time_period)
+    return contiguous_periods
+
+def get_available_proposal_minutes():
+    minutes = defaultdict(int)
+    for type, slots in PROPOSAL_TIMESLOTS.items():
+        periods = make_periods_contiguous([timeslot_to_period(ts) for ts in slots])
+        for period in periods:
+            minutes[type] += int((period.end - period.start).total_seconds() / 60)
+    return minutes
 
 class CfpStateException(Exception):
     pass
@@ -311,28 +341,6 @@ class Proposal(db.Model):
     def get_allowed_venues_serialised(self):
         return ','.join([ v.name for v in self.get_allowed_venues() ])
 
-    def timeslot_to_period(self, slot_string):
-        day, start_h, end_h = slot_string.split(slot_string)
-        start = DAYS[day].replace(hour=start_h)
-        end = DAYS[day].replace(hour=end_h)
-        return period(start, end)
-
-    # Reduces the time periods to the smallest contiguous set we can
-    def make_periods_contiguous(self, time_periods):
-        if not time_periods:
-            return []
-
-        time_periods.sort(key=lambda x: x.start)
-        contiguous_periods = [time_periods.pop(0)]
-        for time_period in time_periods:
-            if time_period.start <= contiguous_periods[-1].end and\
-                    contiguous_periods[-1].end < time_period.end:
-                contiguous_periods[-1] = period(contiguous_periods[-1].start, time_period.end)
-                continue
-
-            contiguous_periods.append(time_period)
-        return contiguous_periods
-
     def get_allowed_time_periods(self):
         time_periods = []
 
@@ -351,8 +359,8 @@ class Proposal(db.Model):
         if not time_periods and self.available_times:
             for p in self.available_times.split(','):
                 if p:
-                    time_periods.append(self.timeslot_to_period(p.strip()))
-        return self.make_periods_contiguous(time_periods)
+                    time_periods.append(timeslot_to_period(p.strip()))
+        return make_periods_contiguous(time_periods)
 
     def get_allowed_time_periods_serialised(self):
         return '\n'.join([ "%s > %s" % (v.start, v.end) for v in self.get_allowed_time_periods() ])
@@ -360,9 +368,9 @@ class Proposal(db.Model):
     def get_allowed_time_periods_with_default(self):
         allowed_time_periods = self.get_allowed_time_periods()
         if not allowed_time_periods:
-            allowed_time_periods = [self.timeslot_to_period(ts) for ts in PROPOSAL_TIMESLOTS[proposal.type]]
+            allowed_time_periods = [timeslot_to_period(ts) for ts in PROPOSAL_TIMESLOTS[self.type]]
 
-        return self.make_periods_contiguous(allowed_time_periods)
+        return make_periods_contiguous(allowed_time_periods)
 
     @property
     def end_date(self):

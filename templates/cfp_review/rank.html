@@ -1,10 +1,52 @@
 {% extends "cfp_review/base.html" %}
 {% block body %}
-<h2>Ranked proposals</h2>
 
+<h2>Current allocations</h2>
+<table class="table table-condensed table-striped">
+    <th></th><th>Talk</th><th>Workshop</th><th>Youth Workshop</th><th>Performance</th>
+    <tr>
+        <td><strong>Num accepted</strong></td>
+        <td>{{accepted_counts.get('talk')}}</td>
+        <td>{{accepted_counts.get('workshop')}}</td>
+        <td>{{accepted_counts.get('youthworkshop')}}</td>
+        <td>{{accepted_counts.get('performance')}}</td>
+    </tr>
+    <tr>
+        <td><strong>Missing durations</strong></td>
+        <td>{{unknown_lengths.get('talk')}}</td>
+        <td>{{unknown_lengths.get('workshop')}}</td>
+        <td>{{unknown_lengths.get('youthworkshop')}}</td>
+        <td>{{unknown_lengths.get('performance')}}</td>
+    </tr>
+    <tr>
+        <td><strong>Available mins</strong></td>
+        <td>{{available_minutes.get('talk')}}</td>
+        <td>{{available_minutes.get('workshop')}}</td>
+        <td>{{available_minutes.get('youthworkshop')}}</td>
+        <td>{{available_minutes.get('performance')}}</td>
+    </tr>
+    <tr>
+        <td><strong>Allocated mins</strong></td>
+        <td>{{allocated_minutes.get('talk')}}</td>
+        <td>{{allocated_minutes.get('workshop')}}</td>
+        <td>{{allocated_minutes.get('youthworkshop')}}</td>
+        <td>{{allocated_minutes.get('performance')}}</td>
+    </tr>
+    <tr>
+        <td><strong>Remaining mins</strong></td>
+        <td>{{remaining_minutes.get('talk')}}</td>
+        <td>{{remaining_minutes.get('workshop')}}</td>
+        <td>{{remaining_minutes.get('youthworkshop')}}</td>
+        <td>{{remaining_minutes.get('performance')}}</td>
+    </tr>
+</table>
+
+<h2>Ranked proposals</h2>
+{% if not preview %}
 <p>
     Set the score to determine which proposals will be accepted this round.
 </p>
+{% endif %}
 
 <p>
     Proposals listed below will be accepted. Notification or rejection is controlled by the dropdown selector.
@@ -26,11 +68,7 @@
     </p>
 {% endif %}
 <p>
-<strong>Already accepted: </strong>
-{% for type, count in accepted_counts.items() %}
-<i>{{type}}</i>: {{count}},
-{% endfor %}
-</p>
+
 
 <table class="table">
     <tr>
