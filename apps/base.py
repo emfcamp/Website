@@ -300,6 +300,10 @@ def google_verification_mark():
     return "google-site-verification: google3189d9169f2faf7f.html"
 
 
+@base.route('/.well-known/security.txt')
+def security_txt():
+    return """Contact: security@emfcamp.org\n"""
+
 @base.route("/herald")
 def herald():
     return redirect('https://wiki.emfcamp.org/wiki/Herald')
