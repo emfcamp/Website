@@ -8,7 +8,7 @@ from flask_script import Command, Option
 
 from main import db, mail
 from models.cfp import (
-    Proposal, TalkProposal, WorkshopProposal, InstallationProposal
+    Proposal, TalkProposal, WorkshopProposal, InstallationProposal, ROUGH_LENGTHS
 )
 from models.user import User
 from apps.cfp_review.base import send_email_for_proposal
@@ -109,19 +109,11 @@ class EmailSpeakersAboutFinalising(Command):
 
 class SetRoughDurations(Command):
     def run(self):
-        print("WAT")
-        length_map = {
-            '> 45 mins': 60,
-            '25-45 mins': 30,
-            '10-25 mins': 15,
-            '< 10 mins': 15
-        }
-
         proposals = Proposal.query.filter_by(scheduled_duration=None, type='talk').\
             filter(Proposal.state.in_(['accepted', 'finished'])).all()
 
         for proposal in proposals:
-            proposal.scheduled_duration = length_map[proposal.length]
+            proposal.scheduled_duration = ROUGH_LENGTHS[proposal.length]
             app.logger.info('Setting duration for talk "%s" to "%s"' % (proposal.title, proposal.scheduled_duration))
 
         db.session.commit()

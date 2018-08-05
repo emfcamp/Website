@@ -42,7 +42,7 @@ LENGTH_OPTIONS = [('< 10 mins', "Shorter than 10 minutes"),
                   ('> 45 mins', "Longer than 45 minutes")]
 
 # What we consider these as when scheduling
-ROUGH_LENGTHS = {'> 45 mins': 60,
+ROUGH_LENGTHS = {'> 45 mins': 50,
                  '25-45 mins': 40,
                  '10-25 mins': 20,
                  '< 10 mins': 10
@@ -76,8 +76,8 @@ DAYS = {
 # returned by default if there are none
 DEFAULT_VENUES = {
     'talk': ['Stage A', 'Stage B', 'Stage C'],
-    'workshop': ['Workshop 1', 'Workshop 2'],
-    'youthworkshop': ['Workshop 3'],
+    'workshop': ['Workshop 1', 'Workshop 2', 'Workshop 3', 'Workshop 4'],
+    'youthworkshop': ['Youth Workshop'],
     'performance': ['Stage A'],
     'installation': [],
 }
@@ -114,7 +114,7 @@ def get_available_proposal_minutes():
     for type, slots in PROPOSAL_TIMESLOTS.items():
         periods = make_periods_contiguous([timeslot_to_period(ts) for ts in slots])
         for period in periods:
-            minutes[type] += int((period.end - period.start).total_seconds() / 60)
+            minutes[type] += int((period.end - period.start).total_seconds() / 60) * len(DEFAULT_VENUES[type])
     return minutes
 
 class CfpStateException(Exception):
