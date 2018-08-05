@@ -15,7 +15,8 @@ from main import db, mail, external_url
 from .majority_judgement import calculate_max_normalised_score
 from models.cfp import (
     Proposal, CFPMessage, CFPVote, Venue,
-    InvalidVenueException, MANUAL_REVIEW_TYPES
+    InvalidVenueException, MANUAL_REVIEW_TYPES,
+    get_available_proposal_minutes, ROUGH_LENGTHS
 )
 from models.user import User
 from models.purchase import Ticket
@@ -618,8 +619,32 @@ def rank():
     for proposal in accepted_proposals:
         accepted_counts[proposal.type] += 1
 
+    allocated_minutes = defaultdict(int)
+    unknown_lengths = defaultdict(int)
+
+    accepted_proposals = Proposal.query.\
+        filter(Proposal.state.in_(['accepted', 'finished'])).all()
+    for proposal in accepted_proposals:
+        length = None
+        if proposal.scheduled_duration:
+            length = proposal.scheduled_duration
+        else:
+            if proposal.length in ROUGH_LENGTHS:
+                length = ROUGH_LENGTHS[proposal.length]
+            else:
+                unknown_lengths[proposal.type] += 1
+                continue
+
+        # +10 for changeover period
+        allocated_minutes[proposal.type] += length + 10
+
+    available_minutes = get_available_proposal_minutes()
+    remaining_minutes = {type: available_minutes[type] - allocated_minutes[type] for type in allocated_minutes.keys()}
+
     return render_template('cfp_review/rank.html', form=form, preview=preview,
                            proposals=scored_proposals, accepted_counts=accepted_counts,
+                           available_minutes=available_minutes, remaining_minutes=remaining_minutes,
+                           allocated_minutes=allocated_minutes, unknown_lengths=unknown_lengths,
                            min_score=session.get('min_score'), types=types)
 
 @cfp_review.route('/potential_schedule_changes', methods=['GET', 'POST'])

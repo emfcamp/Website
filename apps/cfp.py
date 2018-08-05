@@ -519,9 +519,14 @@ def finalise_proposal(proposal_id):
         day, start, end = slot.split('_')
         slot_hour_str = "%s_%s" % (start, end)
         day_form_slots[day][slot_hour_str] = getattr(form, slot)(class_='form-control')
+        headings[int(start)] = (int(start), int(end))
 
-        start = int(start)
-        end = int(end)
+    slot_times = []
+    slot_titles = []
+    for start in sorted(headings.keys()):
+        start, end = headings[start]
+        slot_times.append("%s_%s" % (start, end))
+
         start_ampm = end_ampm = 'am'
         if start > 12:
             start_ampm = 'pm'
@@ -529,10 +534,7 @@ def finalise_proposal(proposal_id):
         if end > 12:
             end_ampm = 'pm'
             end -= 12
-        headings[slot_hour_str] = "%s%s - %s%s" % (start, start_ampm, end, end_ampm)
-
-    slot_times = sorted(headings.keys())
-    slot_titles = [headings[slot] for slot in slot_times]
+        slot_titles.append("%s%s - %s%s" % (start, start_ampm, end, end_ampm))
 
     return render_template('cfp/accepted.html',
             form=form, proposal=proposal, slot_times=slot_times, slot_titles=slot_titles, day_form_slots=day_form_slots)
