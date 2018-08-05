@@ -146,7 +146,6 @@ def main(flow=None):
                                           .joinedload(PriceTier.prices)
                                  )
 
-    ticket_view = False
     for product in products:
         pts = [tier for tier in product.price_tiers if tier.active]
         if len(pts) > 1:
@@ -156,8 +155,6 @@ def main(flow=None):
         pt = pts[0]
 
         tiers[pt.id] = pt
-        if product.parent.type == 'admissions':
-            ticket_view = True
 
     basket = Basket.from_session(current_user, get_user_currency())
 
@@ -173,6 +170,7 @@ def main(flow=None):
     - if the user hasn't submitted anything, we use their current reserved ticket counts
     - if the user has reserved tickets from exhausted tiers on this view, we still show them
     - if the user has reserved tickets from other views, don't show and don't mess with them
+    - this means the user can combine tickets from multiple views into a single basket
     - show the sold-out/unavailable states only when the user doesn't have reserved tickets
 
     We currently don't deal with multiple price tiers being available around the same time.
@@ -233,8 +231,10 @@ def main(flow=None):
 
             if not any(basket.values()):
                 empty_baskets.inc()
-                if ticket_view:
+                if view.type == 'tickets':
                     flash("Please select at least one ticket to buy.")
+                elif view.type == 'hire':
+                    flash("Please select at least one item to hire.")
                 else:
                     flash("Please select at least one item to buy.")
 
@@ -346,8 +346,10 @@ def pay(flow=None):
     basket = Basket.from_session(current_user, get_user_currency())
     if not any(basket.values()):
         empty_baskets.inc()
-        if flow == 'main':
+        if view.type == 'tickets':
             flash("Please select at least one ticket to buy.")
+        elif view.type == 'hire':
+            flash("Please select at least one item to hire.")
         else:
             flash("Please select at least one item to buy.")
         return redirect(url_for('tickets.main'))
@@ -357,8 +359,8 @@ def pay(flow=None):
             # Check that the user's basket approximately matches what we told them they were paying.
             price_changed.inc()
             app.logger.warn("User's basket has changed value %s -> %s", form.basket_total.data, basket.total)
-            flash("""The tickets you selected have changed, possibly because you had two windows open.
-                  Please verify that you've selected the correct tickets.""")
+            flash("""The items you selected have changed, possibly because you had two windows open.
+                  Please verify that you've selected the correct items.""")
             return redirect(url_for('tickets.pay', flow=flow))
 
         user = current_user
@@ -408,7 +410,7 @@ def pay(flow=None):
 
     return render_template('payment-choose.html', form=form,
                            basket=basket, total=basket.total,
-                           flow=flow)
+                           flow=flow, view=view)
 
 
 @tickets.route('/tickets/<ticket_id>/transfer', methods=['GET', 'POST'])

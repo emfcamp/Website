@@ -3,7 +3,7 @@
 {% block title %}Choose Payment{% endblock %}
 {% block body %}
 
-    {% if flow == 'main' %}
+    {% if view.type == 'tickets' %}
     You've selected the following {% if basket.purchases|count == 1 %}ticket{% else %}
     {{ basket.purchases|count }} tickets{% endif %}:
     {% else %}
@@ -20,7 +20,7 @@
     <form method="post">
     {{ form.hidden_tag() }}
     <div class="btn-group" role="group">
-        {% if flow == 'main' %}
+        {% if view.type == 'tickets' %}
         <a class="btn btn-default" href="{{url_for('tickets.tickets_clear')}}">Empty basket</a>
         <a class="btn btn-default" href="{{url_for('tickets.main')}}">Add more tickets</a>
         {% else %}
