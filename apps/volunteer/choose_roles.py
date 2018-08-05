@@ -9,7 +9,8 @@ from main import db
 from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer as VolunteerUser
 
-from . import volunteer
+from . import volunteer, v_user_required
+from ..common import feature_flag
 from ..common.forms import Form, HiddenIntegerField
 
 
@@ -41,7 +42,8 @@ class RoleSignupForm(Form):
                 r.signup.data = True
 
 # TODO need to actually implement permissions
-# @volunteer.v_user_required()
+@v_user_required
+@feature_flag('VOLUNTEERS_SIGNUP')
 @volunteer.route('/choose-roles', methods=['GET', 'POST'])
 def choose_role():
     form = RoleSignupForm()
@@ -61,13 +63,12 @@ def choose_role():
                 current_volunteer.roles.remove(r._role)
 
         db.session.commit()
-        flash("Updated your preferred roles")
+        flash("Saved", 'info')
         return redirect(url_for('.choose_role'))
 
     current_roles = current_volunteer.roles.all()
     if current_roles:
         role_ids = [r.id for r in current_roles]
         form.select_roles(role_ids)
-
 
     return render_template('volunteer/choose_role.html', form=form)

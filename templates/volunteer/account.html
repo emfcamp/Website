@@ -2,18 +2,12 @@
 {% from "_formhelpers.html" import render_field %}
 
 {% block title %}
-    EMF Volunteer Sign-Up
+    EMF Volunteer Account
 {% endblock %}
 {% block body %}
-    <h1>Sign up to volunteer at Electromagnetic Field</h1>
+    <h1>Update your account</h1>
     <form class="form-horizontal" method="post">
         {{ form.hidden_tag() }}
-        {% if not current_user.is_anonymous %}
-            We've pre-filled some of your data from your existing profile.
-
-            If you would like to be contacted via a different email, or use a
-            different name feel free to update it here.
-        {% endif %}
         {{ render_field(form.name) }}
         {{ render_field(form.email) }}
         {{ render_field(form.age) }}

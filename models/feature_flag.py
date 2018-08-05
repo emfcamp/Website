@@ -13,6 +13,8 @@ DB_FEATURE_FLAGS = [
     'SCHEDULE',
     'STRIPE',
     'TICKET_SALES',
+    'VOLUNTEERS_SIGNUP',
+    'VOLUNTEERS_SCHEDULE'
 ]
 
 class FeatureFlag(db.Model):

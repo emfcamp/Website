@@ -9,19 +9,27 @@
     <form method="post">
         {{ form.hidden_tag() }}
 
-        {% for f in form.roles %}
-            <div class="form-group">
-                {{ f.hidden_tag_without('csrf_token') }}
-                <div class="checkbox {%- if f.signup.errors %} has-error {%- endif %}">
-                    <label for="{{ f.signup.name }}">
-                        {{ f.signup()| safe }}
-                        {{ f._role.name }} -- {{ f._role.description }}
-                    </label>
-                </div>
-            </div>
-        {% endfor %}
+        <table class="table table-hover">
+            {% for f in form.roles %}
+                <tr class="form-group">
+                    <td class="col-sm-3">
+                        {{ f.hidden_tag_without('csrf_token') }}
+                        <div class="checkbox {%- if f.signup.errors %} has-error {%- endif %}">
+                            <label for="{{ f.signup.name }}">
+                                {{ f.signup()| safe }}
+                                <strong>{{ f._role.name }}</strong>
+                            </label>
+                        </div>
+                    </td>
+                    <td class="col-sm-9">
+                        {{ f._role.description }}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+
         <div class="form-group">
-            {{ form.submit(class_="btn btn-default debounce") }}
+            {{ form.submit(class_="btn btn-primary debounce") }}
         </div>
     </form>
 {% endblock %}

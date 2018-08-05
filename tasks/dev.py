@@ -128,18 +128,51 @@ class MakeFakeData(Command):
 class MakeVolunteerData(Command):
     def run(self):
         venue_list = [
-            {"name": "Bar", "mapref": "https://map.emfcamp.org/#19/52.0420157/-2.3770749"},
-            {"name": "Stage A", "mapref": "https://map.emfcamp.org/#17/52.039601/-2.377759"},
-            {"name": "Stage B", "mapref": "https://map.emfcamp.org/#17/52.041798/-2.376412"},
-            {"name": "Stage C", "mapref": "https://map.emfcamp.org/#17/52.040482/-2.377432"},
-            {"name": "Entrance", "mapref": "https://map.emfcamp.org/#18/52.039226/-2.378184"},
+            {"name": "Bar",            "mapref": "https://map.emfcamp.org/#19/52.0420157/-2.3770749"},
+            {"name": "Bar 2",          "mapref": "https://map.emfcamp.org/#19/52.0409755/-2.3786306"},
+            {"name": "Stage A",        "mapref": "https://map.emfcamp.org/#17/52.039601/-2.377759"},
+            {"name": "Stage B",        "mapref": "https://map.emfcamp.org/#17/52.041798/-2.376412"},
+            {"name": "Stage C",        "mapref": "https://map.emfcamp.org/#17/52.040482/-2.377432"},
+            {"name": "Green Room",     "mapref": "https://map.emfcamp.org/#20.72/52.0414959/-2.378016"},
+            {"name": "Entrance",       "mapref": "https://map.emfcamp.org/#18/52.039226/-2.378184"},
+            {"name": "Info Desk",      "mapref": "https://map.emfcamp.org/#21.49/52.0415113/-2.3776567"},
+            {"name": "Volunteer Tent", "mapref": "https://map.emfcamp.org/#20.82/52.0397817/-2.3767928"},
+            {"name": "Car Park",       "mapref": "https://map.emfcamp.org/#19.19/52.0389412/-2.3783488"},
         ]
         role_list = [
-            {"name": "Bar", "description": "Serve people booze", "role_notes": "Must be over 18 and complete online training first"},
-            {"name": "AV", "description": "Make sure folks giving talks can be heard & their slides seen", "role_notes": ""},
-            {"name": "Entrance Steward", "description": "Check tickets and help people get on site.", "role_notes": ""},
+            {"name": "Bar",              "description": "Help run the bar. Serve drinks, take payment, keep it clean.", "role_notes": "Over 18s only"},
+            {"name": "AV",               "description": "Run the audio/visual gear for a stage. Make sure mics are working and that presentations work."},
+            {"name": "VOC",              "description": "Film the talks and make sure its available for upload"},
+            {"name": "Herald",           "description": "Introduce talks and manage speakers at stage"},
+            {"name": "Entrance Steward", "description": "Greet people, check their tickets and help them get on site."},
+            {"name": "Youth Steward",    "description": "Help support our youth workshop leaders and participants."},
+            {"name": "Green Room",       "description": "Make sure speakers get where they need to be with what they need."},
+            {"name": "Car Parking",      "description": "Help park cars and get people on/off site."},
+            {"name": "Info Desk",        "description": "Be a point of contact for attendees. Either helping with finding things or just getting an idea for what's on"},
+            {"name": "Set Up",           "description": "Help build the event. This involves a lot of physical labour (moving chairs, setting out fence). Large parts of the infrastructure will not be in place."},
+            {"name": "Tear Down",        "description": "Help deconstruct the event. This involves a lot of physical labour (moving chairs, removing fence). Large parts of the infrastructure will not be in place."},
         ]
 
+        for v in venue_list:
+            venue = VolunteerVenue.get_by_name(v['name'])
+            if not venue:
+                db.session.add(VolunteerVenue(**v))
+            else:
+                venue.mapref = v['mapref']
+
+        for r in role_list:
+            role = Role.get_by_name(r['name'])
+            if not role:
+                db.session.add(Role(**r))
+            else:
+                role.description = r['description']
+                role.role_notes = r.get('role_notes', None)
+
+        db.session.commit()
+
+
+class MakeVolunteerShifts(Command):
+    def run(self):
         shift_list = {
             "Bar": {
                 "Bar": [
@@ -172,11 +205,6 @@ class MakeVolunteerData(Command):
             }
         }
 
-        for v in venue_list:
-            db.session.add(VolunteerVenue(**v))
-
-        for r in role_list:
-            db.session.add(Role(**r))
 
         for shift_role in shift_list:
             role = Role.get_by_name(shift_role)
