@@ -43,7 +43,7 @@ LENGTH_OPTIONS = [('< 10 mins', "Shorter than 10 minutes"),
 
 # What we consider these as when scheduling
 ROUGH_LENGTHS = {'> 45 mins': 50,
-                 '25-45 mins': 40,
+                 '25-45 mins': 30,
                  '10-25 mins': 20,
                  '< 10 mins': 10
                 }
