@@ -111,7 +111,7 @@ def main(flow=None):
         abort(404)
 
     if view.token and session.get('ticket_token') != view.token:
-        # Users with the right tokens and admins can access token-based views
+        # Visitors with the right tokens and admins can access token-based views
         if current_user.is_anonymous:
             abort(404)
 

@@ -70,7 +70,7 @@ class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
                 ProductGroup capacity.
         """
 
-        if self.capacity_used is not None and capacity_max < self.capacity_used:
+        if self.capacity_used is not None and capacity_max is not None and capacity_max < self.capacity_used:
             raise ValueError("capacity_max cannot be lower than capacity_used")
 
         if not self.parent or self.parent.capacity_max is None:
