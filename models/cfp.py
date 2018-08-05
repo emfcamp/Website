@@ -313,7 +313,6 @@ class Proposal(db.Model):
         messages = self.get_unread_messages(user)
         for msg in messages:
             msg.has_been_read = True
-        db.session.commit()
         return len(messages)
 
     def has_ticket(self):

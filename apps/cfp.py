@@ -545,6 +545,13 @@ class MessagesForm(Form):
     send = SubmitField('Send Message')
     mark_read = SubmitField('Mark all messages as read')
 
+    def validate_message(form, field):
+        if form.mark_read.data and field.data:
+            raise ValidationError("Cannot mark as read with a draft reply")
+
+        if form.send.data and not field.data:
+            raise ValidationError("Message is required")
+
 
 @cfp.route('/cfp/proposals/<int:proposal_id>/messages', methods=['GET', 'POST'])
 @feature_flag('CFP')
@@ -558,8 +565,8 @@ def proposal_messages(proposal_id):
 
     form = MessagesForm()
 
-    if request.method == 'POST':
-        if form.send.data and form.message.data:
+    if form.validate_on_submit():
+        if form.send.data:
             msg = CFPMessage()
             msg.is_to_admin = True
             msg.from_user_id = current_user.id
@@ -569,9 +576,9 @@ def proposal_messages(proposal_id):
             db.session.add(msg)
             db.session.commit()
 
-        if form.mark_read or form.send.data:
-            count = proposal.mark_messages_read(current_user)
-            app.logger.info('Marked %s messages to admin on proposal %s as read' % (count, proposal.id))
+        count = proposal.mark_messages_read(current_user)
+        db.session.commit()
+        app.logger.info('Marked %s messages to admin on proposal %s as read' % (count, proposal.id))
 
         return redirect(url_for('.proposal_messages', proposal_id=proposal_id))
 

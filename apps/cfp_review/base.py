@@ -329,8 +329,8 @@ def message_proposer(proposal_id):
     form = SendMessageForm()
     proposal = Proposal.query.get_or_404(proposal_id)
 
-    if request.method == 'POST':
-        if form.send.data and form.message.data:
+    if form.validate_on_submit():
+        if form.send.data:
             msg = CFPMessage()
             msg.is_to_admin = False
             msg.from_user_id = current_user.id
@@ -351,9 +351,9 @@ def message_proposer(proposal_id):
                                        proposal=proposal)
             mail.send(msg)
 
-        if form.mark_read.data or form.send.data:
-            count = proposal.mark_messages_read(current_user)
-            app.logger.info('Marked %s messages to admin on proposal %s as read' % (count, proposal.id))
+        count = proposal.mark_messages_read(current_user)
+        db.session.commit()
+        app.logger.info('Marked %s messages to admin on proposal %s as read' % (count, proposal.id))
 
         return redirect(url_for('.message_proposer', proposal_id=proposal_id))
 

@@ -241,4 +241,10 @@ class SendMessageForm(Form):
     send = SubmitField('Send Message')
     mark_read = SubmitField('Mark all as read')
 
+    def validate_message(form, field):
+        if form.mark_read.data and field.data:
+            raise ValidationError("Cannot mark as read with a draft reply")
+
+        if form.send.data and not field.data:
+            raise ValidationError("Message is required")
 
