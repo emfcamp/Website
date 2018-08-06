@@ -62,8 +62,8 @@ class Purchase(db.Model):
     owner = db.relationship('User', primaryjoin='Purchase.owner_id == User.id')
     purchaser = db.relationship('User', primaryjoin='Purchase.purchaser_id == User.id')
     price = db.relationship('Price', backref='purchases')
-    price_tier = db.relationship('PriceTier')
-    product = db.relationship('Product')
+    price_tier = db.relationship('PriceTier', backref='purchases')
+    product = db.relationship('Product', backref='purchases')
 
     __mapper_args__ = {
         'polymorphic_on': type,
