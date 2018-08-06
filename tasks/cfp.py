@@ -73,17 +73,7 @@ class EmailSpeakersAboutSlot(Command):
             filter(Proposal.type.in_(['talk', 'workshop'])).all()
 
         for proposal in proposals:
-            user = proposal.user
-
-            msg = Message("We need information about your EMF %s '%s'" % (proposal.type, proposal.title),
-                          sender=app.config['SPEAKERS_EMAIL'],
-                          recipients=[user.email])
-
-            msg.body = render_template("emails/cfp-check-your-slot.txt", user=user, proposal=proposal)
-
-            app.logger.info('Emailing %s about proposal %s', user.email, proposal.title)
-            mail.send(msg)
-            db.session.commit()
+            send_email_for_proposal(proposal, reason="check-your-slot", from_address=app.config['SPEAKERS_EMAIL'])
 
 # Gathering information
 class EmailSpeakersAboutFinalising(Command):
@@ -94,18 +84,7 @@ class EmailSpeakersAboutFinalising(Command):
             filter(Proposal.type.in_(['talk', 'workshop'])).all()
 
         for proposal in proposals:
-            user = proposal.user
-
-            msg = Message("We need more information about your EMF %s '%s'!" % (proposal.type, proposal.title),
-                          sender=app.config['SPEAKERS_EMAIL'],
-                          recipients=[user.email])
-
-            msg.body = render_template("emails/cfp-please-finalise.txt", user=user, proposal=proposal)
-
-            app.logger.info('Emailing %s about proposal %s', user.email, proposal.title)
-            mail.send(msg)
-            db.session.commit()
-
+            send_email_for_proposal(proposal, reason="please-finalise", from_address=app.config['SPEAKERS_EMAIL'])
 
 class SetRoughDurations(Command):
     def run(self):

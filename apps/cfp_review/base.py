@@ -102,7 +102,7 @@ def proposals():
                            filtered=filtered, total_proposals=Proposal.query.count())
 
 
-def send_email_for_proposal(proposal, reason="still-considered"):
+def send_email_for_proposal(proposal, reason="still-considered", from_address=None):
     proposal_title = proposal.title
 
     while True:
@@ -122,11 +122,24 @@ def send_email_for_proposal(proposal, reason="still-considered"):
             subject = 'Your EMF proposal "%s" was not accepted.' % proposal_title
             template = 'emails/cfp-rejected.txt'
 
+        elif reason == "check-your-slot":
+            app.logger.info('Sending check-your-slot email for proposal %s', proposal.id)
+            subject = "Your EMF proposal '%s' has been scheduled, please check your slot" % proposal_title
+            template = 'emails/cfp-check-your-slot.txt'
+
+        elif reason == "please-finalise":
+            app.logger.info('Sending please-finalise email for proposal %s', proposal.id)
+            subject = "We need information about your EMF proposal '%s'" % proposal_title
+            template = 'emails/cfp-please-finalise.txt'
+
         else:
             raise Exception("Unknown cfp proposal email type %s" % reason)
 
-        msg = Message(subject, sender=app.config['CONTENT_EMAIL'],
-                    recipients=[proposal.user.email])
+        send_from = app.config['CONTENT_EMAIL']
+        if from_address:
+            send_from = from_address
+
+        msg = Message(subject, sender=send_from, recipients=[proposal.user.email])
         msg.body = render_template(template, user=proposal.user, proposal=proposal)
 
         # Due to https://bugs.python.org/issue27240 heaader re-wrapping may
