@@ -19,5 +19,9 @@ And less urgently:
 
 * Write a great description of your {{ proposal.human_type }} we can publish in the schedule!
 
+If you don't yet have EMF tickets, you can get them on this page:
+
+  {{ external_url('tickets.main', flow='speakers') }}
+
 Looking forward to seeing you in the field,
 All the EMF team

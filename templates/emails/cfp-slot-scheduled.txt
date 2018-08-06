@@ -22,5 +22,9 @@ Things to note:
 
 * All this information and more is available on our speakers website page: https://wiki.emfcamp.org/wiki/Speaking
 
+If you don't yet have EMF tickets, you can get them on this page:
+
+  {{ external_url('tickets.main', flow='speakers') }}
+
 Looking forward to seeing you in the field,
 The EMF Speaker Ops Team
