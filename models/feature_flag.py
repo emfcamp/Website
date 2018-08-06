@@ -2,16 +2,17 @@ from main import db, cache
 
 # feature flags that can be overridden in the DB
 DB_FEATURE_FLAGS = [
-    'TICKET_SALES',
     'BANK_TRANSFER',
     'BANK_TRANSFER_EURO',
+    'CFP',
+    'CFP_FINALISE',
     'GOCARDLESS',
     'GOCARDLESS_EURO',
-    'STRIPE',
-    'CFP',
-    'VOLUNTEERS',
-    'RADIO',
     'ISSUE_TICKETS',
+    'RADIO',
+    'SCHEDULE',
+    'STRIPE',
+    'TICKET_SALES',
 ]
 
 class FeatureFlag(db.Model):
