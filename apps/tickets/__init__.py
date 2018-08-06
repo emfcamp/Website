@@ -105,6 +105,9 @@ def main(flow=None):
     if not view:
         abort(404)
 
+    if view.cfp_accepted_only and current_user.is_anonymous:
+        return redirect(url_for('users.login', next=url_for('.main', flow=flow)))
+
     if not view.is_accessible(current_user, session.get('ticket_token')):
         abort(404)
 
