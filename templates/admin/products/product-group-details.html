@@ -73,4 +73,6 @@
     <a class="btn btn-default" href="{{ url_for('.product_group_copy', group_id=group.id) }}">Copy</a>
 </div>
 
+{% include 'admin/products/_user_purchases.html' %}
+
 {% endblock %}

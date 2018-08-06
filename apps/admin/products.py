@@ -27,6 +27,14 @@ from .forms import (EditProductForm, NewProductForm,
                     AddProductViewProductForm)
 
 
+def get_user_purchases(query):
+    return query.join(Purchase).join(Purchase.owner) \
+                .filter(Purchase.is_paid_for) \
+                .with_entities(User, func.count('*')) \
+                .group_by(User) \
+                .order_by(User.id)
+
+
 @admin.route('/products')
 def products():
     root_groups = ProductGroup.query.filter_by(parent_id=None).order_by(ProductGroup.id).all()
@@ -80,7 +88,10 @@ def new_product(copy_id, parent_id):
 @admin.route('/products/<int:product_id>')
 def product_details(product_id):
     product = Product.query.get_or_404(product_id)
-    return render_template('admin/products/product-details.html', product=product)
+    user_purchases = get_user_purchases(PriceTier.query.filter_by(product_id=product_id))
+
+    return render_template('admin/products/product-details.html', product=product,
+                           user_purchases=user_purchases)
 
 
 @admin.route('/products/<int:product_id>/new-tier', methods=['GET', 'POST'])
@@ -106,7 +117,9 @@ def new_price_tier(product_id):
 def price_tier_details(tier_id):
     tier = PriceTier.query.get_or_404(tier_id)
     form = ModifyPriceTierForm()
-    return render_template('admin/products/price-tier-details.html', tier=tier, form=form)
+    user_purchases = get_user_purchases(PriceTier.query.filter_by(id=tier.id))
+    return render_template('admin/products/price-tier-details.html', tier=tier, form=form,
+                           user_purchases=user_purchases)
 
 
 @admin.route('/products/price-tiers/<int:tier_id>', methods=['POST'])
@@ -156,7 +169,15 @@ def price_tier_edit(tier_id):
 @admin.route('/products/group/<int:group_id>')
 def product_group_details(group_id):
     group = ProductGroup.query.get_or_404(group_id)
-    return render_template('admin/products/product-group-details.html', group=group)
+
+    def get_all_child_groups(group):
+        return [group] + [g for c in group.children for g in get_all_child_groups(c)]
+
+    group_ids = [g.id for g in get_all_child_groups(group)]
+    price_tiers = ProductGroup.query.filter(ProductGroup.id.in_(group_ids)).join(Product, PriceTier)
+    user_purchases = get_user_purchases(price_tiers)
+    return render_template('admin/products/product-group-details.html', group=group,
+                           user_purchases=user_purchases)
 
 
 @admin.route('/products/group/new', methods=['GET', 'POST'])

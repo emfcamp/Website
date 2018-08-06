@@ -1,0 +1,17 @@
+<div class="clearfix"></div>
+<h4>Purchases</h4>
+<table class="table table-condensed">
+    <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Items owned</th>
+    </tr>
+{% for user, count in user_purchases %}
+<tr class="{{ loop.cycle('odd', 'even') }}">
+    <td><a href="{{ url_for('.user', user_id=user.id) }}">{{ user.name }}</a></td>
+    <td><a href="{{ url_for('.user', user_id=user.id) }}">{{ user.email }}</a></td>
+    <td>{{ count }}</td>
+</tr>
+{% endfor %}
+</table>
+
