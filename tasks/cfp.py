@@ -2,11 +2,10 @@
 from unicodecsv import DictReader
 
 from faker import Faker
-from flask import render_template, current_app as app
-from flask_mail import Message
+from flask import current_app as app
 from flask_script import Command, Option
 
-from main import db, mail
+from main import db
 from models.cfp import (
     Proposal, TalkProposal, WorkshopProposal, InstallationProposal, ROUGH_LENGTHS
 )
