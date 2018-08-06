@@ -149,4 +149,7 @@ class InheritedAttributesMixin(object):
         return None
 
     def set_attribute(self, name, value):
-        self.attributes[name] = value
+        # SQLAlchemy can't recognise changes within JSON structures
+        attrs = self.attributes.copy()
+        attrs[name] = value
+        self.attributes = attrs
