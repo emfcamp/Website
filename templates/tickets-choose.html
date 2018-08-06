@@ -9,8 +9,10 @@ Buy Items
 {% endif %}
 {% endblock %}
 {% block body %}
-{% if flow in ['main', 'orga', 'volunteer', 'speakers'] %}
+{% if flow in ['main', 'orga', 'volunteer'] %}
   {% include 'purchase/tickets.html' %}
+{% elif flow in ['speakers'] %}
+  {% include 'purchase/speakers.html' %}
 {% elif flow in ['other'] %}
   {% include 'purchase/extra.html' %}
 {% elif flow in ['tees'] %}

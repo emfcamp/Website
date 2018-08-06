@@ -1,0 +1,47 @@
+{% if not available %}
+<div class="well">
+  <p class="emphasis">There are no tickets currently available for Electromagnetic Field {{ event_year }},
+                      but more will be on sale soon.
+  </p>
+  <p>Please follow us <a href="https://twitter.com/emfcamp">on Twitter</a> or
+  join our mailing list to be notified when more tickets are on sale:</p>
+  {% include "home/_mailchimp_form.html" %}
+  <p>We can't reserve any tickets, but if we accept your
+  {% if config['CFP'] %}
+  <a href="{{url_for('cfp.main')}}">talk, workshop, or installation proposal</a>,
+  {% else %}
+  talk, workshop, or installation proposal,
+  {% endif %}
+  you will be guaranteed <strong>two</strong> tickets to EMF.</p>
+</div>
+{% endif %}
+
+<h2>Speaker tickets to Electromagnetic Field</h2>
+<p>We're delighted that you're contibuting to EMF this year! This page allows you to get the tickets you're entitled to.</p>
+<p><strong>If you need more tickets than this, <a href="mailto:speakers@emfcamp.org">get in touch</a> and we'll see what we can do!</strong></p>
+
+<h4>Your ticket gets you:</h4>
+<ul>
+    <li>A secure place to camp for three days</li>
+    <li>Very fast internet access, both wired and wireless</li>
+    <li>Mains power</li>
+    <li>Access to running water and hot showers</li>
+    <li>A whole pile of awesome talks and workshops</li>
+    <li>Access to a well-stocked bar, and multiple food vendors</li>
+    <li>One fully programmable camp badge</a>, equipped with wireless communications and screen</li>
+    <li>A campsite filled with weird and wonderful things to see.</li>
+    <li>Free professional childcare &amp; youth activities</li>
+    <li>A weekend unlike any other in the UK</li>
+</ul>
+
+<p>
+  <strong>Accessibility:</strong> we're committed to making EMF as accessible as we can.
+  If you have any requirements or requests you would like to discuss with us please
+  feel free to email us on <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">{{ config['TICKETS_EMAIL'][1] }}</a>. We offer free tickets for carers; please drop us an email after you've bought your ticket.
+</p>
+
+<p>
+  By buying a ticket you are agreeing to our <a href="{{url_for('payments.terms')}}">Terms
+  and Conditions</a> and the <a href="{{url_for('base.code_of_conduct')}}">Code of Conduct</a>.
+</p>
+
