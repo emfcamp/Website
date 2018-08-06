@@ -330,7 +330,8 @@ class ProductView(db.Model):
             return None
         return ProductView.query.filter_by(token=token).one_or_none()
 
-    def is_accessible(self, user, user_token):
+    def is_accessible(self, user, user_token=None):
+        " Whether this ProductView is accessible to a user."
         if user.is_authenticated and user.has_permission('admin'):
             # Admins always have access
             return True
@@ -339,14 +340,15 @@ class ProductView(db.Model):
             # If TICKET_SALES is set, but sales haven't started, restrict access to token views
             return False
 
-        if self.token and user_token == self.token:
-            return True
+        if self.token and user_token != self.token:
+            # Invalid token
+            return False
 
-        # cfp_accepted and token is an either-or thing currently
-        if self.cfp_accepted_only and user.is_authenticated and user.is_cfp_accepted:
-            return True
+        if self.cfp_accepted_only and (not user.is_authenticated or not user.is_cfp_accepted):
+            # cfp_accepted and token is an either-or thing currently
+            return False
 
-        return False
+        return True
 
     def __repr__(self):
         return "<ProductView: %s>" % self.name
