@@ -118,7 +118,7 @@ class ProductViewForm(Form):
     name = StringField('Name')
     type = StringField('Type', default="tickets")
     token = StringField('Token')
-    cfp_accepted_only = BooleanField("Accepted CfP proposal (or token) required")
+    cfp_accepted_only = BooleanField("Accepted CfP proposal required")
 
 class NewProductViewForm(ProductViewForm):
     create = SubmitField('Create', [Required()])
