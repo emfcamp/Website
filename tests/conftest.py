@@ -3,6 +3,7 @@ import os
 import os.path
 import pytest
 import shutil
+from sqlalchemy import text
 from models.user import User
 from main import create_app, db as db_obj, Mail
 from utils import CreateBankAccounts, CreateTickets
@@ -38,6 +39,11 @@ def app():
             pass
 
         db_obj.drop_all()
+
+        # We're not using migrations here so we have to create the extension manually
+        db_obj.session.execute(text("CREATE EXTENSION IF NOT EXISTS postgis"))
+        db_obj.session.commit()
+        db_obj.session.close()
 
         db_obj.create_all()
         CreateBankAccounts().run()
