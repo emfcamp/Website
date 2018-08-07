@@ -14,7 +14,7 @@
       </td>
       <td>{{ p.amount | price(p.currency) }}</td>
       <td>
-        {{ {'new': 'Incomplete', 'inprogress': 'Pending', 'paid': 'Complete', 'captured': 'Not paid', 'charging': 'Charging', 'partrefunded': 'Partially refunded', 'refunded': 'Refunded', 'failed': 'Failed'}[p.state] -}}
+        {{ {'new': 'Incomplete', 'inprogress': 'Pending', 'paid': 'Complete', 'captured': 'Not paid', 'charging': 'Charging', 'partrefunded': 'Partially refunded', 'refunded': 'Refunded', 'failed': 'Failed', 'refund-requested': "Refund requested"}[p.state] -}}
       </td>
       <td class="table-actions">
         <div class="btn-group" role="group">
@@ -39,6 +39,10 @@
           {%- elif p.state in ["new", "captured", "failed"] and p.provider == "stripe" %}
           <a href="{{ url_for('payments.stripe_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
           {% endif -%}
+
+          {% if p.state == "paid" %}
+          <a href="{{ url_for('payments.payment_refund_request', payment_id=p.id) }}" class="btn btn-default">Request refund</a>
+          {% endif %}
 
           <a href="{{ url_for('payments.invoice', payment_id=p.id) }}" class="btn btn-default">View Invoice</a>
         </div>

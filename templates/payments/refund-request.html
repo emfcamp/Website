@@ -1,0 +1,26 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block body %}
+
+<div class="col-md-10">
+
+<h2>Refund your payment</h2>
+
+<p>You can request a full refund for your payment with this form.
+   Please provide the information below, and we'll let you know by email if it's approved.</p>
+
+<p>We can only refund in GBP (£) to a UK account or EUR (€) to a SEPA account. If this doesn't
+   work for you, please contact <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email us</a>
+   with your payment reference.</p>
+
+<form method="post" action="{{ url_for('.payment_refund_request', payment_id=payment.id) }}">
+{{ form.hidden_tag() }}
+{{ render_field(form.bank) }}
+{{ render_field(form.account) }}
+{{ form.submit(class_="btn btn-danger debounce") }}
+<a class="btn btn-info" href="{{ url_for('users.purchases') }}">Go back to my tickets</a>
+</form>
+
+
+</div>
+{% endblock %}

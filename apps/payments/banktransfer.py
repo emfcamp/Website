@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import logging
 
 from flask import (
-    render_template, redirect, request, flash,
+    render_template, redirect, flash,
     url_for, current_app as app
 )
 from flask_login import login_required, current_user
@@ -61,7 +61,7 @@ class TransferChangeCurrencyForm(Form):
 @payments.route("/pay/transfer/<int:payment_id>/waiting")
 @login_required
 def transfer_waiting(payment_id):
-    form = TransferChangeCurrencyForm(request.form)
+    form = TransferChangeCurrencyForm()
 
     payment = get_user_payment_or_abort(
         payment_id, 'banktransfer',
@@ -85,7 +85,7 @@ def transfer_change_currency(payment_id):
         valid_states=['inprogress'],
     )
 
-    form = TransferChangeCurrencyForm(request.form)
+    form = TransferChangeCurrencyForm()
     if form.validate_on_submit():
         if form.change.data:
             logger.info('Changing currency for bank transfer %s', payment.id)
@@ -124,7 +124,7 @@ def transfer_cancel(payment_id):
         flash('Payment has already been cancelled')
         return redirect(url_for('users.purchases'))
 
-    form = TransferCancelForm(request.form)
+    form = TransferCancelForm()
     if form.validate_on_submit():
         if form.yes.data:
             logger.info('Cancelling bank transfer %s', payment.id)
@@ -137,7 +137,6 @@ def transfer_cancel(payment_id):
         return redirect(url_for('users.purchases'))
 
     return render_template('transfer-cancel.html', payment=payment, form=form)
-
 
 def send_confirmation(payment):
     msg = Message("Electromagnetic Field ticket purchase update",

@@ -34,6 +34,7 @@ class Payment(db.Model):
 
     refunds = db.relationship('Refund', backref='payment', cascade='all')
     purchases = db.relationship('Purchase', backref='payment', cascade='all')
+    refund_requests = db.relationship('RefundRequest', backref='payment', cascade='all, delete-orphan')
 
     __mapper_args__ = {'polymorphic_on': provider}
 
@@ -456,3 +457,19 @@ class StripeRefund(Refund):
     __mapper_args__ = {'polymorphic_identity': 'stripe'}
 
     refundid = db.Column(db.String, unique=True)
+
+
+class RefundRequest(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
+    currency = db.Column(db.String, nullable=False)
+    bank = db.Column(db.String, nullable=False)
+    account = db.Column(db.String, nullable=False)
+
+    def __init__(self, payment, bank, account):
+        self.payment = payment
+        self.currency = payment.currency
+        self.bank = bank
+        self.account = account
+
+

@@ -134,7 +134,7 @@ def stripe_capture(payment_id):
         flash('Stripe is currently unavailable. Please try again later')
         return redirect(url_for('users.purchases'))
 
-    form = StripeAuthorizeForm(request.form)
+    form = StripeAuthorizeForm()
     if form.validate_on_submit():
         try:
             logger.info("Stripe payment %s captured, token %s", payment.id, payment.token)
@@ -204,7 +204,7 @@ def stripe_cancel(payment_id):
         valid_states=['new', 'captured'],
     )
 
-    form = StripeCancelForm(request.form)
+    form = StripeCancelForm()
     if form.validate_on_submit():
         if form.yes.data:
             logger.info('Cancelling Stripe payment %s', payment.id)
@@ -230,6 +230,41 @@ def stripe_waiting(payment_id):
         valid_states=['charged', 'paid'],
     )
     return render_template('stripe-waiting.html', payment=payment, days=app.config['EXPIRY_DAYS_STRIPE'])
+
+
+class StripeRefundForm(Form):
+    yes = SubmitField('Request refund')
+
+@payments.route('/pay/stripe/<int:payment_id>/refund', methods=['GET', 'POST'])
+@login_required
+def stripe_refund_start(payment_id):
+    payment = get_user_payment_or_abort(
+        payment_id, 'stripe',
+        valid_states=['paid'],
+    )
+
+    form = StripeRefundForm()
+
+    if form.validate_on_submit():
+        app.logger.info('Setting Stripe payment %s to refund-requested', payment.id)
+        payment.state = 'refund-requested'
+
+        if not app.config.get('TICKETS_NOTICE_EMAIL'):
+            app.logger.warning('No tickets notice email configured, not sending')
+
+        else:
+            msg = Message("An EMF refund request has been received",
+                          sender=app.config.get('TICKETS_EMAIL'),
+                          recipients=[app.config.get('TICKETS_NOTICE_EMAIL')[1]])
+            msg.body = render_template('emails/notice-refund-request.txt', payment=payment)
+            mail.send(msg)
+
+        db.session.commit()
+
+        flash("Your refund request has been sent")
+        return redirect(url_for('users.purchases'))
+
+    return render_template('payments/stripe-refund.html', payment=payment, form=form)
 
 
 @csrf.exempt
