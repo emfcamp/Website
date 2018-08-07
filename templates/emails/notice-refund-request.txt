@@ -1,0 +1,7 @@
+User {{ payment.user.name }} ({{ payment.user.email }})
+has just requested a refund of payment {{ payment.id }} for {{ payment.amount | price(payment.currency) }}.
+
+Ticket details:
+
+{% include "emails/email-tickets.txt" %}
+

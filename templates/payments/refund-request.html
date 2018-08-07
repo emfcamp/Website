@@ -10,7 +10,7 @@
    Please provide the information below, and we'll let you know by email if it's approved.</p>
 
 <p>We can only refund in GBP (£) to a UK account or EUR (€) to a SEPA account. If this doesn't
-   work for you, please contact <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email us</a>
+   work for you, please <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email us</a>
    with your payment reference.</p>
 
 <form method="post" action="{{ url_for('.payment_refund_request', payment_id=payment.id) }}">
