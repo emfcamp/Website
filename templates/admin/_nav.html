@@ -19,6 +19,8 @@
             <span class="caret"></span></a>
         <ul class="dropdown-menu">
             {{ menuitem("All", ".payments") }}
+            {{ menuitem("Refunds Requested", ".requested_refunds", requested_refund_count) }}
+            <li role="separator" class="divider"></li>
             {{ menuitem("Bank Transfer", ".transactions", unreconciled_count) }}
             {{ menuitem("Expiring", ".expiring", expiring_count) }}
             {{ menuitem("Suppressed Transactions", ".suppressed") }}

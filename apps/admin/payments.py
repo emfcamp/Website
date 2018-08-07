@@ -205,6 +205,20 @@ def cancel_payment(payment_id):
     return render_template('admin/payments/payment-cancel.html', payment=payment, form=form)
 
 
+@admin.route('/payment/requested-refunds')
+def requested_refunds():
+    payments = Payment.query.filter_by(state='refund-requested') \
+                            .join(Purchase) \
+                            .with_entities(Payment,
+                                func.count(Purchase.id).label('purchase_count'),
+                            ) \
+                            .group_by(Payment) \
+                            .order_by(Payment.id) \
+                            .all()
+
+    return render_template('admin/payments/requested_refunds.html', payments=payments)
+
+
 class ManualRefundForm(Form):
     refund = SubmitField("Refund payment")
 
@@ -215,6 +229,9 @@ def manual_refund(payment_id):
         Doesn't actually take any steps to return money to the user. """
 
     payment = Payment.query.get_or_404(payment_id)
+
+    if payment.refund_requests:
+        app.logger.warn('Showing refund requests for payment %s', payment.id)
 
     form = ManualRefundForm()
     if form.validate_on_submit():
@@ -254,7 +271,7 @@ class RefundForm(Form):
 def refund(payment_id):
     payment = Payment.query.get_or_404(payment_id)
 
-    valid_states = ['charged', 'paid', 'partrefunded']
+    valid_states = ['charged', 'paid', 'partrefunded', 'refund-requested']
     if payment.state not in valid_states:
         app.logger.warning("Payment %s is %s, not one of %s", payment_id, payment.state, valid_states)
         flash('Payment is not currently refundable')

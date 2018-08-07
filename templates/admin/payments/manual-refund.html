@@ -11,6 +11,13 @@
 
 {{ purchase_table(payment) }}
 
+{% for req in payment.refund_requests %}
+<dl class="dl-horizontal">
+<dt>Currency</dt><dd>{{ req.currency }}</dd>
+<dt>Sort Code/BIC</dt><dd>{{ req.bank }}</dd>
+<dt>Account/IBAN</dt><dd>{{ req.account }}</dd>
+{% endfor %}
+
 <form method="post" action="{{ url_for('.manual_refund', payment_id=payment.id) }}" class="shrink">
 {{ form.hidden_tag() }}
 {{ form.refund(class_="btn btn-danger pull-right") }}
