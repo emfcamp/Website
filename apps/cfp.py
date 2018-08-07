@@ -118,7 +118,12 @@ def get_cfp_type_form(cfp_type):
 @cfp.route('/cfp')
 @feature_flag('CFP')
 def main():
-    return render_template('cfp/main.html')
+    ignore_closed = 'closed' in request.args
+
+    if app.config.get('CFP_CLOSED') and not ignore_closed:
+        return render_template('cfp/closed.html')
+
+    return render_template('cfp/main.html', ignore_closed=ignore_closed)
 
 @cfp.route('/cfp/<string:cfp_type>', methods=['GET', 'POST'])
 @feature_flag('CFP')
@@ -130,7 +135,7 @@ def form(cfp_type='talk'):
     ignore_closed = 'closed' in request.args
 
     if app.config.get('CFP_CLOSED') and not ignore_closed:
-        return render_template('cfp/closed.html')
+        return render_template('cfp/closed.html', cfp_type=cfp_type)
 
     # If the user is already logged in set their name & email for the form
     if current_user.is_authenticated:

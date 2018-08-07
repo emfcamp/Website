@@ -43,11 +43,11 @@
     <h2>Submit a new proposal</h2>
     <p>Please select the type of proposal you want to submit:</p>
     <div class="list-group cfp-choose-type">
-        <a href="/cfp/talk" class="list-group-item"><strong>Talk</strong> &ndash; A presentation on a stage</a>
-        <a href="/cfp/workshop" class="list-group-item"><strong>Workshop</strong> &ndash; A workshop in an area with tables &amp; other equipment</a>
-        <a href="/cfp/youthworkshop" class="list-group-item"><strong>Youth Workshop</strong> &ndash; A workshop for attendees under 13</a>
-        <a href="/cfp/performance" class="list-group-item"><strong>Performance</strong> &ndash; A performance of music, art, dance, or film</a>
-        <a href="/cfp/installation" class="list-group-item"><strong>Installation</strong> &ndash; A creation for attendees to admire or interact with</a>
+        <a href="{{ url_for('cfp.form', cfp_type='talk') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Talk</strong> &ndash; A presentation on a stage</a>
+        <a href="{{ url_for('cfp.form', cfp_type='workshop') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Workshop</strong> &ndash; A workshop in an area with tables &amp; other equipment</a>
+        <a href="{{ url_for('cfp.form', cfp_type='youthworkshop') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Youth Workshop</strong> &ndash; A workshop for attendees under 13</a>
+        <a href="{{ url_for('cfp.form', cfp_type='performance') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Performance</strong> &ndash; A performance of music, art, dance, or film</a>
+        <a href="{{ url_for('cfp.form', cfp_type='installation') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Installation</strong> &ndash; A creation for attendees to admire or interact with</a>
     </div>
 
     {% if current_user.is_authenticated %}
