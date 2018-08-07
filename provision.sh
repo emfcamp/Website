@@ -1,6 +1,6 @@
 cd /vagrant
 sudo apt-get update
-sudo apt-get install -y python3-dev libxml2-dev libxslt1-dev libffi-dev postgresql-server-dev-9.6 postgresql-9.6 git glpk-utils python3-pip
+sudo apt-get install -y python3-dev libxml2-dev libxslt1-dev libffi-dev postgresql-server-dev-9.6 postgresql-9.6 postgis git glpk-utils python3-pip
 sudo pip3 install pipenv
 
 cat > /etc/postgresql/9.6/main/pg_hba.conf <<EOF

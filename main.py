@@ -21,6 +21,7 @@ from flask_cdn import CDN
 from flask_cache import Cache
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_wtf import CsrfProtect
+from flask_cors import CORS
 from loggingmanager import create_logging_manager, set_user_id
 import stripe
 import gocardless_pro
@@ -58,6 +59,7 @@ assets = Environment()
 toolbar = DebugToolbarExtension()
 gocardless_client = None
 volunteer_admin = None
+
 
 pyscss = get_filter('pyscss', style='compressed')
 assets.register('css_main', Bundle('css/main.scss',
@@ -128,6 +130,12 @@ def create_app(dev_server=False):
 
     for extension in (cdn, csrf, cache, db, mail, assets, toolbar):
         extension.init_app(app)
+
+
+    cors_origins = 'https://map.emfcamp.org'
+    if app.config.get('DEBUG'):
+        cors_origins = '*'
+    CORS(app, resources={r"/api/*": {"origins": cors_origins}})
 
     migrate.init_app(app, db)
 
@@ -201,6 +209,7 @@ def create_app(dev_server=False):
     from apps.cfp_review import cfp_review
     from apps.schedule import schedule
     from apps.arrivals import arrivals
+    from apps.api import api_bp
     app.register_blueprint(base)
     app.register_blueprint(users)
     app.register_blueprint(metrics)
@@ -210,6 +219,7 @@ def create_app(dev_server=False):
     app.register_blueprint(cfp_review, url_prefix='/cfp-review')
     app.register_blueprint(schedule)
     app.register_blueprint(arrivals, url_prefix='/arrivals')
+    app.register_blueprint(api_bp, url_prefix='/api')
 
     if app.config.get('VOLUNTEERS'):
         from apps.volunteer import volunteer
