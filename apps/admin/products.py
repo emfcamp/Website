@@ -277,7 +277,7 @@ def purchase_transfers():
 
 
 @admin.route('/hire')
-def furniture():
+def hire():
     purchases = (ProductGroup.query.filter_by(type='hire')
                              .join(Product, Purchase, Purchase.owner).group_by(User.id, Product.id)
                              .with_entities(User, Product, func.count(Purchase.id))
