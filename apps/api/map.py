@@ -4,7 +4,6 @@ from geoalchemy2.shape import to_shape
 import shapely.geometry
 
 from . import api
-from .user import UserInfo
 
 
 class Map(Resource):
@@ -17,7 +16,7 @@ class Map(Resource):
                 "properties": {
                     "name": obj.name,
                     "wiki_page": obj.wiki_page,
-                    "owner": api.url_for(UserInfo, user_id=obj.owner.id)
+                    "owner_name": obj.owner.name
                 }
             })
         return {"type": "FeatureCollection",
