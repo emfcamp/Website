@@ -85,6 +85,16 @@ class EmailSpeakersAboutFinalising(Command):
         for proposal in proposals:
             send_email_for_proposal(proposal, reason="please-finalise", from_address=app.config['SPEAKERS_EMAIL'])
 
+class EmailSpeakersAboutReserveList(Command):
+
+    def run(self):
+        proposals = Proposal.query.\
+            filter(Proposal.state.in_(['reviewed'])).\
+            filter(Proposal.type.in_(['talk', 'workshop'])).all()
+
+        for proposal in proposals:
+            send_email_for_proposal(proposal, reason="reserve-list", from_address=app.config['SPEAKERS_EMAIL'])
+
 class SetRoughDurations(Command):
     def run(self):
         proposals = Proposal.query.filter_by(scheduled_duration=None, type='talk').\
@@ -95,19 +105,3 @@ class SetRoughDurations(Command):
             app.logger.info('Setting duration for talk "%s" to "%s"' % (proposal.title, proposal.scheduled_duration))
 
         db.session.commit()
-
-
-class RejectUnacceptedProposals(Command):
-
-    def run(self):
-        proposals = Proposal.query.filter(Proposal.state.in_(['reviewed'])).all()
-
-        for proposal in proposals:
-            proposal.set_state('rejected')
-            proposal.has_rejected_email = True
-
-            user = proposal.user
-
-            app.logger.info('Emailing %s about rejecting proposal %s', user.email, proposal.title)
-            send_email_for_proposal(proposal, reason="rejected")
-            db.session.commit()
