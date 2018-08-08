@@ -350,10 +350,13 @@ class ProductView(db.Model):
 
             return False
 
-        if self.token and user_token == self.token:
-            return True
+        if self.token:
+            if user_token == self.token:
+                return True
 
-        return False
+            return False
+
+        return True
 
     def __repr__(self):
         return "<ProductView: %s>" % self.name
