@@ -14,7 +14,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from main import db, stripe, mail, csrf
 from models.payment import StripePayment
 from models.site_state import event_start
-from ..common import feature_enabled
+from ..common import feature_enabled, feature_flag
 from ..common.forms import Form
 from ..common.receipt import attach_tickets
 from . import get_user_payment_or_abort, lock_user_payment_or_abort
@@ -237,6 +237,7 @@ class StripeRefundForm(Form):
 
 @payments.route('/pay/stripe/<int:payment_id>/refund', methods=['GET', 'POST'])
 @login_required
+@feature_flag('REFUND_REQUESTS')
 def stripe_refund_start(payment_id):
     payment = get_user_payment_or_abort(
         payment_id, 'stripe',

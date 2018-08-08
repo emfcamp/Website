@@ -2,6 +2,7 @@ from flask import (
     render_template, redirect, request, flash,
     url_for, current_app as app,
 )
+from flask_login import login_required
 from flask_mail import Message
 from wtforms import StringField, SubmitField
 from wtforms.validators import ValidationError
@@ -9,6 +10,7 @@ import gocardless_pro.errors
 
 from . import payments
 from .common import get_user_payment_or_abort
+from ..common import feature_flag
 from ..common.forms import Form
 from main import db, mail, gocardless_client
 from models import RefundRequest
@@ -39,6 +41,8 @@ class RefundRequestForm(Form):
 
 @payments.route('/payment/<int:payment_id>/refund', methods=['GET', 'POST'])
 @payments.route('/payment/<int:payment_id>/refund/<currency>', methods=['GET', 'POST'])
+@login_required
+@feature_flag('REFUND_REQUESTS')
 def payment_refund_request(payment_id, currency='GBP'):
     payment = get_user_payment_or_abort(
         payment_id,
