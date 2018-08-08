@@ -440,15 +440,16 @@ def finalise_proposal(proposal_id):
     # This is horrendous, but is a lot cleaner than having shitloads of classes and fields
     # http://wtforms.simplecodes.com/docs/1.0.1/specific_problems.html#dynamic-form-composition
     slot_times = slot_titles = day_form_slots = None
-    form = AcceptedForm()
-    if proposal.type in ('talk', 'workshop', 'youthworkshop', 'performance'):
-        class F(AcceptedForm):
-            pass
 
+    class F(AcceptedForm):
+        pass
+
+    if proposal.type in ('talk', 'workshop', 'youthworkshop', 'performance'):
         F._available_slots = PROPOSAL_TIMESLOTS[proposal.type]
         for timeslot in F._available_slots:
             setattr(F, timeslot, BooleanField(default=True))
-        form = F()
+
+    form = F()
 
     if proposal.scheduled_venue:
         proposal.scheduled_venue_name = proposal.scheduled_venue.name
