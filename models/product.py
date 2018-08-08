@@ -340,18 +340,20 @@ class ProductView(db.Model):
             # If TICKET_SALES is set, but sales haven't started, restrict access to token views
             return False
 
-        # If a cfp_accepted_only view has a token, it's an optional override
-        if self.token and self.cfp_accepted_only and user_token == self.token:
+        if self.cfp_accepted_only:
+            # Token is an optional override
+            if self.token and user_token == self.token:
+                return True
+
+            if user.is_authenticated and user.is_cfp_accepted:
+                return True
+
+            return False
+
+        if self.token and user_token == self.token:
             return True
 
-        if self.token and user_token != self.token:
-            # Invalid token
-            return False
-
-        if self.cfp_accepted_only and (not user.is_authenticated or not user.is_cfp_accepted):
-            return False
-
-        return True
+        return False
 
     def __repr__(self):
         return "<ProductView: %s>" % self.name
