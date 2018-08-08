@@ -11,12 +11,19 @@
 
 {{ purchase_table(payment) }}
 
+{% if payment.refund_requests %}
+<p>The user has requested a refund using the following details:</p>
 {% for req in payment.refund_requests %}
 <dl class="dl-horizontal">
 <dt>Currency</dt><dd>{{ req.currency }}</dd>
-<dt>Sort Code/BIC</dt><dd>{{ req.bank }}</dd>
-<dt>Account/IBAN</dt><dd>{{ req.account }}</dd>
+{% if req.currency == 'GBP' %}
+<dt>Sort Code</dt><dd>{{ req.bank }}</dd>
+<dt>Account</dt><dd>{{ req.account }}</dd>
+{% else %}
+<dt>IBAN</dt><dd>{{ req.account }}</dd>
+{% endif %}
 {% endfor %}
+{% endif %}
 
 <form method="post" action="{{ url_for('.manual_refund', payment_id=payment.id) }}" class="shrink">
 {{ form.hidden_tag() }}

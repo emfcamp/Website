@@ -463,12 +463,12 @@ class RefundRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
     currency = db.Column(db.String, nullable=False)
-    bank = db.Column(db.String, nullable=False)
+    bank = db.Column(db.String)
     account = db.Column(db.String, nullable=False)
 
-    def __init__(self, payment, bank, account):
+    def __init__(self, payment, currency, bank, account):
         self.payment = payment
-        self.currency = payment.currency
+        self.currency = currency
         self.bank = bank
         self.account = account
 

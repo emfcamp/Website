@@ -13,11 +13,29 @@
    work for you, please <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email us</a>
    with your payment reference.</p>
 
-<form method="post" action="{{ url_for('.payment_refund_request', payment_id=payment.id) }}">
+<form method="post" action="{{ url_for('.payment_refund_request', payment_id=payment.id, currency=currency) + ('?no_stripe' if no_stripe else '') }}">
 {{ form.hidden_tag() }}
-{{ render_field(form.bank) }}
-{{ render_field(form.account) }}
+<div class="well">
+  <label>Refund currency:</label>
+  <div class="form-group">
+    <div class="btn-group">
+      <a href="{{ url_for('.payment_refund_request', payment_id=payment.id, currency='GBP') + ('?no_stripe' if no_stripe else '') }}" class="btn btn-primary {% if currency == 'GBP' -%} active {%- endif %}">£</a>
+      <a href="{{ url_for('.payment_refund_request', payment_id=payment.id, currency='EUR') + ('?no_stripe' if no_stripe else '') }}" class="btn btn-primary {% if currency == 'EUR' -%} active {%- endif %}">€</a>
+    </div>
+  </div>
+
+  {% if currency == 'GBP' %}
+  {{ render_field(form.bank) }}
+  {{ render_field(form.account) }}
+  {% else %}
+  {{ render_field(form.iban) }}
+  {% endif %}
+</div>
+{% if bank_validation_failed %}
+{{ form.really_submit(class_="btn btn-danger debounce") }}
+{% else %}
 {{ form.submit(class_="btn btn-danger debounce") }}
+{% endif %}
 <a class="btn btn-info" href="{{ url_for('users.purchases') }}">Go back to my tickets</a>
 </form>
 
