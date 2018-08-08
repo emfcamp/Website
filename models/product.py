@@ -341,7 +341,10 @@ class ProductView(db.Model):
             return False
 
         # If a cfp_accepted_only view has a token, it's an optional override
-        if self.token and (user_token != self.token or self.cfp_accepted_only):
+        if self.token and self.cfp_accepted_only and user_token == self.token:
+            return True
+
+        if self.token and user_token != self.token:
             # Invalid token
             return False
 
