@@ -1,4 +1,4 @@
-from wtforms.validators import Optional, Required, Email, ValidationError
+from wtforms.validators import Optional, Required, InputRequired, Email, ValidationError
 from wtforms.widgets import TextArea
 from wtforms import (
     SubmitField, StringField, SelectField,
@@ -110,7 +110,7 @@ class ModifyPriceTierForm(Form):
 
 class ProductViewProductForm(Form):
     order = IntegerField('Order', [Required()])
-    product_id = HiddenIntegerField('product_id', [Required()])
+    product_id = HiddenIntegerField('product_id', [InputRequired()])
     delete = SubmitField('Delete')
 
 
