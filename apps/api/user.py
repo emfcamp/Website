@@ -10,6 +10,7 @@ def user_info(user):
         "email": user.email,
         "name": user.name,
         "permissions": [p.name for p in user.permissions],
+        "id": "/api/user/{}".format(user.id)
     }
 
 
