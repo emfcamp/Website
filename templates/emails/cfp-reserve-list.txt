@@ -1,0 +1,14 @@
+Hi {{ proposal.user.name }},
+
+Your EMF {{ proposal.human_type }} proposal '{{ proposal.title }}' is currently on the reserve list and may be accepted closer than one month to the event - this is because we have last-minute drop-outs. Your proposal was very highly rated, but didn't quite make the main selection.
+
+Regardless of whether your proposal is selected, we'd like to offer you the chance to get tickets to EMF for you and a friend.
+
+You can buy those tickets here: {{ reserve_ticket_link }}
+
+The tickets will be available until Wednesday 15th August.
+
+If you'd like to cancel your proposal as it is too close to the event, or you can no longer attend, please let us know.
+
+Thanks,
+The EMF Team

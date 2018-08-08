@@ -132,6 +132,11 @@ def send_email_for_proposal(proposal, reason="still-considered", from_address=No
             subject = "We need information about your EMF proposal '%s'" % proposal_title
             template = 'emails/cfp-please-finalise.txt'
 
+        elif reason == "reserve-list":
+            app.logger.info('Sending reserve-list email for proposal %s', proposal.id)
+            subject = "Your EMF proposal '%s', and EMF tickets" % proposal_title
+            template = 'emails/cfp-reserve-list.txt'
+
         else:
             raise Exception("Unknown cfp proposal email type %s" % reason)
 
@@ -140,7 +145,7 @@ def send_email_for_proposal(proposal, reason="still-considered", from_address=No
             send_from = from_address
 
         msg = Message(subject, sender=send_from, recipients=[proposal.user.email])
-        msg.body = render_template(template, user=proposal.user, proposal=proposal)
+        msg.body = render_template(template, user=proposal.user, proposal=proposal, reserve_ticket_link=app.config['RESERVE_LIST_TICKET_LINK'])
 
         # Due to https://bugs.python.org/issue27240 heaader re-wrapping may
         # occasionally fail on arbitrary strings. We try and avoid this by

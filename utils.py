@@ -9,7 +9,7 @@ from tasks.admin import MakeAdmin, CreatePermissions, SendEmails
 from tasks.banking import CreateBankAccounts, LoadOfx, Reconcile
 from tasks.cfp import (
     ImportCFP, EmailSpeakersAboutSlot, EmailSpeakersAboutFinalising,
-    RejectUnacceptedProposals, SetRoughDurations
+    EmailSpeakersAboutReserveList, SetRoughDurations
 )
 from tasks.dev import MakeFakeData, MakeVolunteerData
 from tasks.external_calendars import (
@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
     manager.add_command('emailspeakersaboutslot', EmailSpeakersAboutSlot())
     manager.add_command('emailspeakersaboutfinalising', EmailSpeakersAboutFinalising())
-    manager.add_command('rejectunacceptedproposals', RejectUnacceptedProposals())
+    manager.add_command('emailspeakersaboutreservelist', EmailSpeakersAboutReserveList())
 
     manager.add_command('importvenues', ImportVenues())
     manager.add_command('runscheduler', RunScheduler())
