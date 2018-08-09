@@ -134,7 +134,7 @@ def create_app(dev_server=False):
 
     cors_origins = 'https://map.emfcamp.org'
     if app.config.get('DEBUG'):
-        cors_origins = 'http://localhost:8080'
+        cors_origins = ['http://localhost:8080', 'https://maputnik.github.io']
     CORS(app, resources={r"/api/*": {"origins": cors_origins}},
         supports_credentials=True)
 
