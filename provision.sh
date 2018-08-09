@@ -18,6 +18,7 @@ pg_ctlcluster 9.6 main reload
 su postgres -c 'createuser -s vagrant'
 su postgres -c 'createdb -O vagrant emf_site'
 su postgres -c 'createdb -O vagrant emf_site_test'
+su postgres -c 'psql emf_site -c "CREATE EXTENSION postgis"'
 
 touch .inside-vagrant
 
