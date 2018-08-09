@@ -345,7 +345,7 @@ def pay(flow=None):
             flash("Please select at least one item to hire.")
         else:
             flash("Please select at least one item to buy.")
-        return redirect(url_for('tickets.main'))
+        return redirect(url_for('tickets.main', flow=flow))
 
     if form.validate_on_submit():
         if Decimal(form.basket_total.data) != Decimal(basket.total):

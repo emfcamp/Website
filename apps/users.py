@@ -81,7 +81,7 @@ def login():
             session.permanent = True
             return redirect(request.args.get('next', url_for('.account')))
         else:
-            flash("Your login link was invalid. Please note that they expire after 6 hours.")
+            flash("Your login link was invalid. Please enter your email address below to receive a new link.")
 
     form = LoginForm(request.form, next=request.args.get('next'))
     if form.validate_on_submit():

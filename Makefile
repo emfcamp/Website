@@ -86,8 +86,8 @@ emailspeakersaboutslot:
 emailspeakersaboutfinalising:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py emailspeakersaboutfinalising
 
-rejectunacceptedproposals:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py rejectunacceptedproposals
+emailspeakersaboutreservelist:
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py emailspeakersaboutreservelist
 
 importvenues:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py importvenues

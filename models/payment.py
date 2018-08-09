@@ -223,8 +223,8 @@ class BankPayment(Payment):
         return "<BankPayment: %s %s>" % (self.state, self.bankref)
 
     def manual_refund(self):
-        if self.state != 'paid':
-            raise StateException('Only paid BankPayments can be marked as refunded')
+        if self.state not in {'paid', 'refund-requested'}:
+            raise StateException('Only BankPayments that have been paid can be marked as refunded')
 
         super(BankPayment, self).manual_refund()
 
@@ -371,8 +371,8 @@ class GoCardlessPayment(Payment):
     def manual_refund(self):
         # https://help.gocardless.com/customer/portal/articles/1580207
         # "At the moment, it isn't usually possible to refund a customer via GoCardless"
-        if self.state != 'paid':
-            raise StateException('Only paid GoCardless payments can be marked as refunded')
+        if self.state not in {'paid', 'refund-requested'}:
+            raise StateException('Only GoCardless payments that have been paid can be marked as refunded')
 
         super(GoCardlessPayment, self).manual_refund()
 
@@ -395,8 +395,8 @@ class StripePayment(Payment):
         return 'EMF {} purchase'.format(event_start().year)
 
     def manual_refund(self):
-        if self.state not in ['charged', 'paid']:
-            raise StateException('Only paid or charged StripePayments can be marked as refunded')
+        if self.state not in {'charged', 'paid', 'refund-requested'}:
+            raise StateException('Only StripePayments that have been paid or charged can be marked as refunded')
 
         super(StripePayment, self).manual_refund()
 
@@ -463,12 +463,12 @@ class RefundRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
     currency = db.Column(db.String, nullable=False)
-    bank = db.Column(db.String, nullable=False)
+    bank = db.Column(db.String)
     account = db.Column(db.String, nullable=False)
 
-    def __init__(self, payment, bank, account):
+    def __init__(self, payment, currency, bank, account):
         self.payment = payment
-        self.currency = payment.currency
+        self.currency = currency
         self.bank = bank
         self.account = account
 

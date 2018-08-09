@@ -34,5 +34,5 @@ def test_bad_login(user, client, outbox):
 
     bad_login_link = client.get(url + '&code=84400-1-Tqf88675CWYb2sge67b9')
     assert bad_login_link.status_code == 200
-    error_string = "Your login link was invalid. Please note that they expire after 6 hours."
+    error_string = "Your login link was invalid. Please enter your email address below to receive a new link."
     assert error_string in bad_login_link.data.decode('utf-8')

@@ -1,0 +1,35 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'admin_payments' %}
+{% block title %}Requested refunds{% endblock %}
+{% block body %}
+<h2>Payments</h2>
+
+<table class="table table-condensed table-striped">
+<thead><tr>
+  <th>Type</th>
+  <th>Name</th>
+  <th>Email</th>
+  <th>Purchases</th>
+  <th>Amount</th>
+  <th></th>
+</tr></thead>
+<tbody>
+{% for payment, purchase_count in payments %}
+<tr>
+  <td><a href="{{ url_for('.payment', payment_id=payment.id) }}">{{ payment.name }} {{ payment.id }}</a></td>
+  <td><a href="{{ url_for('.user', user_id=payment.user.id) }}">{{payment.user.name}}</a></td>
+  <td>{{ payment.user.email }}</td>
+  <td>{{ purchase_count }}</td>
+  <td><b>{{ payment.amount | price(payment.currency) }}</b></td>
+  <td>
+    {% if payment.provider == 'stripe' and not payment.refund_requests %}
+    <a href="{{ url_for('.refund', payment_id=payment.id) }}" class="btn btn-success">Refund</a>
+    {% endif %}
+    <a href="{{ url_for('.manual_refund', payment_id=payment.id) }}" class="btn btn-success">Manual refund</a>
+  </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+{% endblock %}

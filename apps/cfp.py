@@ -118,7 +118,12 @@ def get_cfp_type_form(cfp_type):
 @cfp.route('/cfp')
 @feature_flag('CFP')
 def main():
-    return render_template('cfp/main.html')
+    ignore_closed = 'closed' in request.args
+
+    if app.config.get('CFP_CLOSED') and not ignore_closed:
+        return render_template('cfp/closed.html')
+
+    return render_template('cfp/main.html', ignore_closed=ignore_closed)
 
 @cfp.route('/cfp/<string:cfp_type>', methods=['GET', 'POST'])
 @feature_flag('CFP')
@@ -130,7 +135,7 @@ def form(cfp_type='talk'):
     ignore_closed = 'closed' in request.args
 
     if app.config.get('CFP_CLOSED') and not ignore_closed:
-        return render_template('cfp/closed.html')
+        return render_template('cfp/closed.html', cfp_type=cfp_type)
 
     # If the user is already logged in set their name & email for the form
     if current_user.is_authenticated:
@@ -435,15 +440,16 @@ def finalise_proposal(proposal_id):
     # This is horrendous, but is a lot cleaner than having shitloads of classes and fields
     # http://wtforms.simplecodes.com/docs/1.0.1/specific_problems.html#dynamic-form-composition
     slot_times = slot_titles = day_form_slots = None
-    form = AcceptedForm()
-    if proposal.type in ('talk', 'workshop', 'youthworkshop', 'performance'):
-        class F(AcceptedForm):
-            pass
 
+    class F(AcceptedForm):
+        pass
+
+    if proposal.type in ('talk', 'workshop', 'youthworkshop', 'performance'):
         F._available_slots = PROPOSAL_TIMESLOTS[proposal.type]
         for timeslot in F._available_slots:
             setattr(F, timeslot, BooleanField(default=True))
-        form = F()
+
+    form = F()
 
     if proposal.scheduled_venue:
         proposal.scheduled_venue_name = proposal.scheduled_venue.name

@@ -17,7 +17,7 @@ from wtforms import (
 from wtforms.fields.html5 import EmailField
 
 from main import db
-from models.payment import BankPayment, BankTransaction
+from models.payment import Payment, BankPayment, BankTransaction
 from models.purchase import Purchase
 from models.ical import CalendarSource
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
@@ -44,6 +44,7 @@ def admin_variables():
     if not request.path.startswith('/admin'):
         return {}
 
+    requested_refund_count = Payment.query.filter_by(state='refund-requested').count()
     unreconciled_count = BankTransaction.query.filter_by(payment_id=None, suppressed=False).count()
 
     expiring_count = BankPayment.query.join(Purchase).filter(
@@ -51,7 +52,8 @@ def admin_variables():
         BankPayment.expires < datetime.utcnow() + timedelta(days=3),
     ).group_by(BankPayment.id).count()
 
-    return {'unreconciled_count': unreconciled_count,
+    return {'requested_refund_count': requested_refund_count,
+            'unreconciled_count': unreconciled_count,
             'expiring_count': expiring_count,
             'view_name': request.url_rule.endpoint.replace('admin.', '.')}
 
