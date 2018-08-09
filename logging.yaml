@@ -34,3 +34,7 @@ loggers:
     level: WARN
   websockets.protocol:
     level: WARN
+  faker:
+    level: WARN
+  shapely:
+    level: WARN
