@@ -63,6 +63,7 @@ class MapObjectResource(Resource):
 
         obj.name = data.get('name')
         obj.wiki_page = data.get('wiki_page')
+        obj.wiki_page = obj.wiki_page.replace('https://wiki.emfcamp.org/wiki/', '')
         obj.geom = "SRID=4326;POINT({} {})".format(*data["location"])
         db.session.commit()
 
