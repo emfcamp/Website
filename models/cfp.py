@@ -130,7 +130,7 @@ FavouriteProposal = db.Table('favourite_proposal', db.Model.metadata,
 )
 
 class Proposal(db.Model):
-    __versioned__ = {'exclude': ['favourites']}
+    __versioned__ = {'exclude': ['favourites', 'favourite_count']}
     __tablename__ = 'proposal'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -160,7 +160,7 @@ class Proposal(db.Model):
     favourites = db.relationship(User, secondary=FavouriteProposal, backref=db.backref('favourites'))
 
     # Convenience for individual objects. Use an outerjoin and groupby for more than a few records
-    column_property(select([func.count(FavouriteProposal.c.proposal_id)]).where(
+    favourite_count = column_property(select([func.count(FavouriteProposal.c.proposal_id)]).where(
         FavouriteProposal.c.proposal_id == id,
     ), deferred=True)
 

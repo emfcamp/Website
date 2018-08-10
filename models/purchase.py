@@ -28,7 +28,7 @@ class CheckinStateException(Exception):
 class Purchase(db.Model):
     """ A Purchase. This could be a ticket or an item of merchandise. """
     __tablename__ = 'purchase'
-    __versioned__ = {}
+    __versioned__ = {'exclude': ['is_ticket', 'is_paid_for']}
 
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String, nullable=False)
