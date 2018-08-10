@@ -150,7 +150,7 @@ class RunScheduler(Command):
             app.logger.error("No talks to schedule!")
             return
 
-        new_schedule = sm.schedule(app.config['EVENT_START'], data)
+        new_schedule = sm.schedule(data)
         self.apply_changes(new_schedule)
 
         if persist:
