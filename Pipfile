@@ -53,7 +53,7 @@ ofxparse = "==0.16"
 funcsigs = "==1.0.2"
 unicodecsv = "==0.14.1"
 python-dateutil = "*"
-slotmachine = {editable = true, git = "https://github.com/emfcamp/slotmachine.git"}
+slotmachine = {git = "https://github.com/emfcamp/slotmachine.git", editable = true}
 awesome-slugify = "*"
 faker = "*"
 pyyaml = "*"
