@@ -691,7 +691,8 @@ def potential_schedule_changes():
 @schedule_required
 def scheduler():
     proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
-        filter(Proposal.state.in_(['finished', 'accepted'])).all()
+        filter(Proposal.state.in_(['finished', 'accepted'])).\
+        filter(Proposal.type.in_(['talk', 'workshop', 'youthworkshop', 'performance'])).all()
 
     schedule_data = []
     for proposal in proposals:
