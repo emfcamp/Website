@@ -62,8 +62,7 @@ class MapObjectResource(Resource):
         validate_map_obj(data)
 
         obj.name = data.get('name')
-        obj.wiki_page = data.get('wiki_page')
-        obj.wiki_page = obj.wiki_page.replace('https://wiki.emfcamp.org/wiki/', '')
+        obj.wiki_page = data.get('wiki_page').replace('https://wiki.emfcamp.org/wiki/', '')
         obj.geom = "SRID=4326;POINT({} {})".format(*data["location"])
         db.session.commit()
 
@@ -92,7 +91,7 @@ class MapCreateResource(Resource):
 
         obj = MapObject(
             name=data["name"],
-            wiki_page=data.get("wiki_page"),
+            wiki_page=data.get("wiki_page").replace('https://wiki.emfcamp.org/wiki/', ''),
             geom="SRID=4326;POINT({} {})".format(*data["location"]),
             owner=current_user,
         )
