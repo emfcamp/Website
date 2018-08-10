@@ -17,7 +17,7 @@
       <td>{{ ticket.price_tier.parent.name }}</td>
       <td>{{ ticket.price_tier.parent.display_name }}</td>
       <td>
-        <a href="{{ url_for('.user', user_id=ticket.owner.id) }}">{{ ticket.owner.name }}</a>
+        <a href="{{ url_for('.user', user_id=ticket.owner.id) }}">{{ ticket.owner.email }}</a>
       </td>
       <td>
         <a class="btn btn-danger" href="{{ url_for('.cancel_free_ticket', ticket_id=ticket.id) }}">Cancel</a>

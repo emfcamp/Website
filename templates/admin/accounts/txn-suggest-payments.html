@@ -38,7 +38,7 @@ No suitable payments were found.
 {% for payment in payments %}
 <tr>
   <td><b>{{ payment.user.name }}</b></td>
-  <td>{{ payment.user.email }}</td>
+  <td><a href="{{ url_for('.user', user_id=payment.user.id) }}">{{ payment.user.email }}</a></td>
   <td><b>{{ payment.amount | price(payment.currency) }}</b></td>
   <td>{{ payment.bankref | bankref }}</td>
   <td>

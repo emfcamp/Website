@@ -18,8 +18,8 @@
 {% for payment, purchase_count in expiring %}
 <tr>
   <td><a href="{{ url_for('.payment', payment_id=payment.id) }}">{{ payment.name }}</a></td>
-  <td><a href="{{ url_for('.user', user_id=payment.user.id) }}">{{ payment.user.name }}</a></td>
-  <td>{{ payment.user.email }}</td>
+  <td>{{ payment.user.name }}</td>
+  <td><a href="{{ url_for('.user', user_id=payment.user.id) }}">{{ payment.user.email }}</a></td>
   <td>{{ purchase_count }}</td>
   <td><b>{{ payment.amount | price(payment.currency) }}</b></td>
   <td>{{ payment.user.get_owned_tickets(paid=True)|list|count }}</td>

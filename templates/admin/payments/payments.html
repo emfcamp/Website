@@ -18,8 +18,8 @@
 {% for payment, purchase_count in payments %}
 <tr>
   <td><a href="{{ url_for('.payment', payment_id=payment.id) }}">{{ payment.name }} {{ payment.id }}</a></td>
-  <td><a href="{{ url_for('.user', user_id=payment.user.id) }}">{{payment.user.name}}</a></td>
-  <td>{{ payment.user.email }}</td>
+  <td>{{ payment.user.name }}</td>
+  <td><a href="{{ url_for('.user', user_id=payment.user.id) }}">{{ payment.user.email }}</a></td>
   <td>{{ payment.state }}</td>
   <td>{{ purchase_count }}</td>
   <td><b>{{ payment.amount | price(payment.currency) }}</b></td>

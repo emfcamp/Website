@@ -13,7 +13,7 @@
   {% for user, product, count in purchases %}
   <tr>
     <td>{{ user.name }}</td>
-    <td>{{ user.email }}</td>
+    <td><a href="{{ url_for('.user', user_id=user.id) }}">{{ user.email }}</a></td>
     <td>{{ product.name }}</td>
     <td>{{ count }}</td>
   </tr>
