@@ -160,7 +160,7 @@ class Proposal(db.Model):
     favourites = db.relationship(User, secondary=FavouriteProposal, backref=db.backref('favourites'))
 
     # Convenience for individual objects. Use an outerjoin and groupby for more than a few records
-    favourite_count = column_property(select([func.count(FavouriteProposal.c.proposal_id)]).where(
+    column_property(select([func.count(FavouriteProposal.c.proposal_id)]).where(
         FavouriteProposal.c.proposal_id == id,
     ), deferred=True)
 
