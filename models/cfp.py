@@ -351,7 +351,7 @@ class Proposal(db.Model):
             for p in time_periods:
                 if p.start.hour <= HARD_START_LIMIT[self.type][0] and p.start.minute < HARD_START_LIMIT[self.type][1]:
                     p = period(
-                        p.start.replace(minute = HARD_START_LIMIT[self.type][1]),
+                        p.start.replace(minute=HARD_START_LIMIT[self.type][1]),
                         p.end
                     )
                 trimmed_periods.append(p)
@@ -377,7 +377,7 @@ class Proposal(db.Model):
             for p in self.available_times.split(','):
                 if p:
                     time_periods.append(timeslot_to_period(p.strip()))
-        
+
         time_periods = self.fix_hard_time_limits(time_periods)
         return make_periods_contiguous(time_periods)
 
