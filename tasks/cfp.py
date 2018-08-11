@@ -69,7 +69,7 @@ class EmailSpeakersAboutSlot(Command):
     def run(self):
         proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
             filter(Proposal.state.in_(['accepted', 'finished'])).\
-            filter(Proposal.type.in_(['talk', 'workshop'])).all()
+            filter(Proposal.type.in_(['talk', 'workshop', 'youthworkshop', 'performance'])).all()
 
         for proposal in proposals:
             send_email_for_proposal(proposal, reason="check-your-slot", from_address=app.config['SPEAKERS_EMAIL'])
@@ -80,7 +80,7 @@ class EmailSpeakersAboutFinalising(Command):
     def run(self):
         proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
             filter(Proposal.state.in_(['accepted'])).\
-            filter(Proposal.type.in_(['talk', 'workshop'])).all()
+            filter(Proposal.type.in_(['talk', 'workshop', 'youthworkshop', 'performance'])).all()
 
         for proposal in proposals:
             send_email_for_proposal(proposal, reason="please-finalise", from_address=app.config['SPEAKERS_EMAIL'])
@@ -90,7 +90,7 @@ class EmailSpeakersAboutReserveList(Command):
     def run(self):
         proposals = Proposal.query.\
             filter(Proposal.state.in_(['reviewed'])).\
-            filter(Proposal.type.in_(['talk', 'workshop'])).all()
+            filter(Proposal.type.in_(['talk', 'workshop', 'youthworkshop'])).all()
 
         for proposal in proposals:
             send_email_for_proposal(proposal, reason="reserve-list", from_address=app.config['SPEAKERS_EMAIL'])
