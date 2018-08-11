@@ -732,9 +732,13 @@ def scheduler():
 
         schedule_data.append(export)
 
-    venues = [{'key': v.id, 'label': v.name} for v in Venue.query.all()]
+    venues = [{'key': v.id, 'label': v.name} for v in Venue.query.order_by(Venue.priority.desc()).all()]
 
-    return render_template('cfp_review/scheduler.html', venues=venues, schedule_data=schedule_data)
+    venues_to_show = request.args.getlist('venue')
+    if venues_to_show:
+        venues = [venue for venue in venues if venue['label'] in venues_to_show]
+
+    return render_template('cfp_review/scheduler.html', venues=venues, schedule_data=schedule_data, default_venues=DEFAULT_VENUES)
 
 @cfp_review.route('/scheduler_update', methods=['GET', 'POST'])
 @admin_required
