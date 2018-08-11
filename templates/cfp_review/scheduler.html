@@ -47,190 +47,190 @@
 {% block foot %}
   <script src="{{ url_for('static', filename='js/dhtmlx_scheduler.js') }}"></script>
   <script>
-    var emf_scheduler = {};
-    (function(){
-        'use strict';
-        var scheduleData = {{ schedule_data | tojson }},
-            venues = {{ venues | tojson }},
-            is_anonymous = {% if current_user.is_anonymous -%} true {%- else -%} false {%- endif %},
-            start_date = new Date(2018, 7, 31),
-            end_date = new Date(2018, 8, 2),
-            venue_dict = {},
-            day_format = "%D, %jth",   // e.g. Friday, 5th
-            day_formatter = scheduler.date.date_to_str(day_format),
-            time_formatter = scheduler.date.date_to_str("%H:%i"), // e.g. 22:33
-            debounce = false;
+var emf_scheduler = {};
+(function(){
+  'use strict';
+  var scheduleData = {{ schedule_data | tojson }},
+    venues = {{ venues | tojson }},
+    is_anonymous = {% if current_user.is_anonymous -%} true {%- else -%} false {%- endif %},
+    start_date = new Date(2018, 7, 31),
+    end_date = new Date(2018, 8, 2),
+    venue_dict = {},
+    day_format = "%D, %jth",   // e.g. Friday, 5th
+    day_formatter = scheduler.date.date_to_str(day_format),
+    time_formatter = scheduler.date.date_to_str("%H:%i"), // e.g. 22:33
+    debounce = false;
 
 
-        // Easily retrieve venue name from its ID
-        for(var i = 0; i<venues.length; i++){
-            venue_dict[venues[i].key] = venues[i].label;
+  // Easily retrieve venue name from its ID
+  for(var i = 0; i<venues.length; i++){
+    venue_dict[venues[i].key] = venues[i].label;
+  }
+
+  /*
+   * Required config
+   */
+  // Make sure dates are parsed correctly
+  scheduler.config.api_date = "%Y-%m-%d %H:%i:%s";
+  scheduler.config.xml_date = "%Y-%m-%d %H:%i:%s";
+
+  // Nothing scheduled is multi-day so switch it off
+  scheduler.config.multi_day = false;
+
+  /*
+   * Views
+   */
+  // Configure venues view
+  scheduler.locale.labels.emf_day_tab = "Day"
+  scheduler.locale.labels.section_custom="Section";
+  scheduler.createUnitsView({
+    name: "emf_day",
+    property: "venue",
+    list: venues,
+    size: 5,
+    step: 3,
+  });
+
+  scheduler.locale.labels.emf_weekend_tab = "Weekend"
+  scheduler.createUnitsView({
+    name:"emf_weekend",
+    property:"venue",
+    list:venues,
+    days: 3,
+  });
+
+  scheduler.config.separate_short_events = true;
+
+  // Make sure in weekend view you can't scroll away
+  scheduler.date.add_emf_weekend = function (date,inc) {
+    return scheduler.date.add(start_date, venues.length*3 ,"day");
+  };
+
+  scheduler.date.get_emf_weekend_end = function (date) {
+    return scheduler.date.add(start_date, venues.length*3 ,"day");
+  };
+
+  scheduler.date.get_emf_weekend_start = function (date) {
+    return start_date;
+  };
+
+  scheduler._click.dhx_cal_tab = function () {
+    // Override the view toggle so that it always locks weekend view to
+    // Friday
+    var name = this.getAttribute("name"),
+      mode = name.substring(0, name.search("_tab")),
+      date = (mode === "emf_weekend" ) ? start_date : scheduler._date;
+    scheduler.setCurrentView(date, mode);
+  }
+
+  scheduler._click.dhx_second_scale_bar = function () {
+    console.log(arguments);
+    scheduler.setCurrentView(date, 'emf_day');
+  }
+
+  // There'll be no events outside the weekend so lock the view to it
+  scheduler.config.limit_view = true;
+  scheduler.config.limit_start = start_date;
+  scheduler.config.limit_end  = end_date;
+
+  /*
+   * Make it read-only
+   */
+  // This is read only so block all modifications
+  scheduler.config.details_on_dblclick = true;
+  scheduler.config.dblclick_create = false;
+
+  /*
+   * Styles
+   */
+  // Set the date format
+  scheduler.config.default_date = day_format;
+  // Make it show 10 min slots
+  scheduler.config.first_hour = 9;
+  scheduler.config.hour_size_px = 132;
+  scheduler.config.separate_short_events = true;
+
+  var get_ele = function (id) { return document.getElementById(id); }
+
+  function size_scheduler(){
+    var view_height = window.innerHeight||document.documentElement.clientHeight,
+      header_offset = get_ele('navbar').offsetTop,
+      header_height = get_ele('navbar').offsetHeight + header_offset,
+      schedule_height = view_height - header_height,
+      schedule = get_ele('scheduler_here');
+    schedule.style.height = schedule_height + 'px';
+  }
+
+  scheduler.attachEvent("onDblClick",function (id){
+    window.open('/cfp-review/proposals/' + id);
+    return false;// block further actions
+  });
+
+  scheduler.templates.event_class=function(start,end,event){
+    var res = [];
+    if (event.is_potential ) {
+      res.push('potential');
+    }
+    return res.join(' ');
+  }
+
+  scheduler.attachEvent("onBeforeEventChanged", function(ev, e, is_new, original) {
+    var offset = ev.start_date.getMinutes() % 10
+    if (offset) {
+      ev.start_date.setMinutes(ev.start_date.getMinutes() - offset)
+      ev.end_date.setMinutes(ev.end_date.getMinutes() - offset)
+    }
+
+    var range_valid = false;
+    for (let range of ev.valid_time_ranges) {
+      var start = new Date(range.start)
+      var end = new Date(range.end)
+
+      if (ev.start_date >= start && ev.end_date <= end) {
+        range_valid = true;
+      }
+    }
+
+    if (ev.valid_venues.indexOf(ev.venue) == -1) {
+      range_valid = false;
+    }
+
+    if (range_valid == true) {
+      jQuery.ajax({
+        url: "/cfp-review/scheduler_update",
+        type: "POST",
+        data: {
+          id: ev.id,
+          time: ev.start_date.toISOString(),
+          venue: ev.venue
+        },
+        success: function (result) {
+          if (result.changed) {
+            ev.is_potential = true;
+          } else {
+            ev.is_potential = false;
+          }
+        },
+        error: function (result) {
+          range_valid = false;
+        },
+        async: false,
+        beforeSend: function(xhr, settings) {
+          if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken)
+          }
         }
+      });
+    }
 
-        /*
-         * Required config
-         */
-        // Make sure dates are parsed correctly
-        scheduler.config.api_date = "%Y-%m-%d %H:%i:%s";
-        scheduler.config.xml_date = "%Y-%m-%d %H:%i:%s";
+    return range_valid;
+  });
 
-        // Nothing scheduled is multi-day so switch it off
-        scheduler.config.multi_day = false;
+  scheduler.attachEvent("onSchedulerReady", size_scheduler);
+  window.onresize = size_scheduler;
 
-        /*
-         * Views
-         */
-        // Configure venues view
-        scheduler.locale.labels.emf_day_tab = "Day"
-        scheduler.locale.labels.section_custom="Section";
-        scheduler.createUnitsView({
-            name: "emf_day",
-            property: "venue",
-            list: venues,
-            size: 5,
-            step: 3,
-        });
-
-        scheduler.locale.labels.emf_weekend_tab = "Weekend"
-        scheduler.createUnitsView({
-            name:"emf_weekend",
-            property:"venue",
-            list:venues,
-            days: 3,
-        });
-
-		scheduler.config.separate_short_events = true;
-
-        // Make sure in weekend view you can't scroll away
-        scheduler.date.add_emf_weekend = function (date,inc) {
-            return scheduler.date.add(start_date, venues.length*3 ,"day");
-        };
-
-        scheduler.date.get_emf_weekend_end = function (date) {
-            return scheduler.date.add(start_date, venues.length*3 ,"day");
-        };
-
-        scheduler.date.get_emf_weekend_start = function (date) {
-            return start_date;
-        };
-
-        scheduler._click.dhx_cal_tab = function () {
-            // Override the view toggle so that it always locks weekend view to
-            // Friday
-            var name = this.getAttribute("name"),
-                mode = name.substring(0, name.search("_tab")),
-                date = (mode === "emf_weekend" ) ? start_date : scheduler._date;
-            scheduler.setCurrentView(date, mode);
-        }
-
-        scheduler._click.dhx_second_scale_bar = function () {
-            console.log(arguments);
-            scheduler.setCurrentView(date, 'emf_day');
-        }
-
-        // There'll be no events outside the weekend so lock the view to it
-        scheduler.config.limit_view = true;
-        scheduler.config.limit_start = start_date;
-        scheduler.config.limit_end  = end_date;
-
-        /*
-         * Make it read-only
-         */
-        // This is read only so block all modifications
-        scheduler.config.details_on_dblclick = true;
-        scheduler.config.dblclick_create = false;
-
-        /*
-         * Styles
-         */
-        // Set the date format
-        scheduler.config.default_date = day_format;
-        // Make it show 10 min slots
-        scheduler.config.first_hour = 9;
-        scheduler.config.hour_size_px = 132;
-        scheduler.config.separate_short_events = true;
-
-        var get_ele = function (id) { return document.getElementById(id); }
-
-        function size_scheduler(){
-            var view_height = window.innerHeight||document.documentElement.clientHeight,
-                header_offset = get_ele('navbar').offsetTop,
-                header_height = get_ele('navbar').offsetHeight + header_offset,
-                schedule_height = view_height - header_height,
-                schedule = get_ele('scheduler_here');
-            schedule.style.height = schedule_height + 'px';
-        }
-
-        scheduler.attachEvent("onDblClick",function (id){
-            window.open('/cfp-review/proposals/' + id);
-            return false;// block further actions
-        });
-
-        scheduler.templates.event_class=function(start,end,event){
-            var res = [];
-            if (event.is_potential ) {
-                res.push('potential');
-            }
-            return res.join(' ');
-        }
-
-        scheduler.attachEvent("onBeforeEventChanged", function(ev, e, is_new, original) {
-            var offset = ev.start_date.getMinutes() % 10
-            if (offset) {
-                ev.start_date.setMinutes(ev.start_date.getMinutes() - offset)
-                ev.end_date.setMinutes(ev.end_date.getMinutes() - offset)
-            }
-
-            var range_valid = false;
-            for (let range of ev.valid_time_ranges) {
-                var start = new Date(range.start)
-                var end = new Date(range.end)
-
-                if (ev.start_date >= start && ev.end_date <= end) {
-                    range_valid = true;
-                }
-            }
-
-			if (ev.valid_venues.indexOf(ev.venue) == -1) {
-                range_valid = false;
-            }
-
-            if (range_valid == true) {
-				jQuery.ajax({
-					url: "/cfp-review/scheduler_update",
-                    type: "POST",
-                    data: {
-                        id: ev.id,
-                        time: ev.start_date.toISOString(),
-                        venue: ev.venue
-                    },
-					success: function (result) {
-                        if (result.changed) {
-                            ev.is_potential = true;
-                        } else {
-                            ev.is_potential = false;
-                        }
-					},
-                    error: function (result) {
-                        range_valid = false;
-                    },
-					async: false,
-					beforeSend: function(xhr, settings) {
-						if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-							xhr.setRequestHeader("X-CSRFToken", csrftoken)
-						}
-					}
-				});
-            }
-
-            return range_valid;
-        });
-
-        scheduler.attachEvent("onSchedulerReady", size_scheduler);
-        window.onresize = size_scheduler;
-
-        scheduler.init('scheduler_here', start_date, "emf_weekend");
-        scheduler.parse(scheduleData, 'json');
-    })();
+  scheduler.init('scheduler_here', start_date, "emf_weekend");
+  scheduler.parse(scheduleData, 'json');
+})();
   </script>
 {% endblock %}
