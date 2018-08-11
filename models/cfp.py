@@ -89,8 +89,8 @@ MANUAL_REVIEW_TYPES = ['youthworkshop', 'performance', 'installation']
 
 def timeslot_to_period(slot_string):
     day, start_h, end_h = slot_string.split('_')
-    start = DAYS[day].replace(hour=int(start_h) - 1) # Because hour is 0..23
-    end = DAYS[day].replace(hour=int(end_h) - 1)
+    start = DAYS[day] + timedelta(hours=int(start_h))
+    end = DAYS[day] + timedelta(hours=int(end_h))
     return period(start, end)
 
 # Reduces the time periods to the smallest contiguous set we can
