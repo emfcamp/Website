@@ -359,6 +359,20 @@ class Proposal(db.Model):
             for p in self.available_times.split(','):
                 if p:
                     time_periods.append(timeslot_to_period(p.strip()))
+
+        # Youth workshops should never start before 9:30am
+        # This should be fixed by the string periods being burned and replaced
+        if self.type == 'youthworkshop':
+            trimmed_periods = []
+            for p in time_periods:
+                if p.start.hour == 9 and p.start.minute < 30:
+                    p = period(
+                        p.start.replace(minute = 30),
+                        p.end
+                    )
+                trimmed_periods.append(p)
+            time_periods = trimmed_periods
+
         return make_periods_contiguous(time_periods)
 
     def get_allowed_time_periods_serialised(self):
