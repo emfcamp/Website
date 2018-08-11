@@ -65,6 +65,10 @@ PROPOSAL_TIMESLOTS = {
                             'sun_20_22', 'sun_22_24')
 }
 
+HARD_START_LIMIT = {
+    'youthworkshop': (9, 30),
+}
+
 period = namedtuple('Period', 'start end')
 DAYS = {
     'fri': datetime(2018, 8, 31),
@@ -340,6 +344,20 @@ class Proposal(db.Model):
     def get_allowed_venues_serialised(self):
         return ','.join([ v.name for v in self.get_allowed_venues() ])
 
+    def fix_hard_time_limits(self, time_periods):
+        # This should be fixed by the string periods being burned and replaced
+        if self.type in HARD_START_LIMIT:
+            trimmed_periods = []
+            for p in time_periods:
+                if p.start.hour <= HARD_START_LIMIT[self.type][0] and p.start.minute < HARD_START_LIMIT[self.type][1]:
+                    p = period(
+                        p.start.replace(minute = HARD_START_LIMIT[self.type][1]),
+                        p.end
+                    )
+                trimmed_periods.append(p)
+            time_periods = trimmed_periods
+        return time_periods
+
     def get_allowed_time_periods(self):
         time_periods = []
 
@@ -359,20 +377,8 @@ class Proposal(db.Model):
             for p in self.available_times.split(','):
                 if p:
                     time_periods.append(timeslot_to_period(p.strip()))
-
-        # Youth workshops should never start before 9:30am
-        # This should be fixed by the string periods being burned and replaced
-        if self.type == 'youthworkshop':
-            trimmed_periods = []
-            for p in time_periods:
-                if p.start.hour == 9 and p.start.minute < 30:
-                    p = period(
-                        p.start.replace(minute = 30),
-                        p.end
-                    )
-                trimmed_periods.append(p)
-            time_periods = trimmed_periods
-
+        
+        time_periods = self.fix_hard_time_limits(time_periods)
         return make_periods_contiguous(time_periods)
 
     def get_allowed_time_periods_serialised(self):
@@ -383,6 +389,7 @@ class Proposal(db.Model):
         if not allowed_time_periods:
             allowed_time_periods = [timeslot_to_period(ts) for ts in PROPOSAL_TIMESLOTS[self.type]]
 
+        allowed_time_periods = self.fix_hard_time_limits(allowed_time_periods)
         return make_periods_contiguous(allowed_time_periods)
 
     @property
