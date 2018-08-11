@@ -84,10 +84,10 @@ class UpdateProposalForm(Form):
             proposal.scheduled_time = None
 
         if self.scheduled_venue.data:
-            proposal.scheduled_venue_id = Venue.query.filter(
-                Venue.name == self.scheduled_venue.data.strip()).one().id
+            proposal.scheduled_venue = Venue.query.filter(
+                Venue.name == self.scheduled_venue.data.strip()).one()
         else:
-            proposal.scheduled_venue_id = None
+            proposal.scheduled_venue = None
 
         if self.potential_time.data:
             proposal.potential_time = dateutil.parser.parse(self.potential_time.data)
@@ -96,7 +96,7 @@ class UpdateProposalForm(Form):
 
         if self.potential_venue.data:
             proposal.potential_venue = Venue.query.filter(
-                Venue.name == self.potential_venue.data.strip()).one().id
+                Venue.name == self.potential_venue.data.strip()).one()
         else:
             proposal.potential_venue = None
 
