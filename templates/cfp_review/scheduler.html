@@ -54,7 +54,7 @@ var emf_scheduler = {};
     venues = {{ venues | tojson }},
     is_anonymous = {% if current_user.is_anonymous -%} true {%- else -%} false {%- endif %},
     start_date = new Date(2018, 7, 31),
-    end_date = new Date(2018, 8, 2),
+    end_date = new Date(2018, 8, 3),
     venue_dict = {},
     day_format = "%D, %jth",   // e.g. Friday, 5th
     day_formatter = scheduler.date.date_to_str(day_format),
@@ -124,14 +124,13 @@ var emf_scheduler = {};
   }
 
   scheduler._click.dhx_second_scale_bar = function () {
-    console.log(arguments);
     scheduler.setCurrentView(date, 'emf_day');
   }
 
   // There'll be no events outside the weekend so lock the view to it
   scheduler.config.limit_view = true;
   scheduler.config.limit_start = start_date;
-  scheduler.config.limit_end  = end_date;
+  scheduler.config.limit_end  = new Date(2018, 8, 2);
 
   /*
    * Make it read-only
@@ -196,12 +195,13 @@ var emf_scheduler = {};
     }
 
     if (range_valid == true) {
+      var isoDate = new Date(ev.start_date.getTime() - (ev.start_date.getTimezoneOffset() * 60000)).toISOString();
       jQuery.ajax({
         url: "/cfp-review/scheduler_update",
         type: "POST",
         data: {
           id: ev.id,
-          time: ev.start_date.toISOString(),
+          time: isoDate,
           venue: ev.venue
         },
         success: function (result) {
