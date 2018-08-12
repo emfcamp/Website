@@ -5,6 +5,12 @@ We've just received confirmation from GoCardless that your payment for
 
 {% if feature_enabled('ISSUE_TICKETS') -%}
 {% include 'emails/receipt-blurb.txt' %}
+{% else %}
+You can view your tickets and download the invoice here:
+
+  {{ url_for('users.account') }}
+
+We'll send e-tickets nearer the event.
 {% endif %}
 
 See you soon at Electromagnetic Field {{ event_year }}!

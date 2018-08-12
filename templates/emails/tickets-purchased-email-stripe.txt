@@ -10,6 +10,8 @@ Electromagnetic Field {{ event_year }}.
 Your tickets are:
 
 {% include "emails/email-tickets.txt" %}
+
+We'll send e-tickets nearer the event.
 {% endif %}
 
 Your charge ID from Stripe was {{ payment.chargeid }}.
