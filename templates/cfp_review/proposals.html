@@ -1,6 +1,9 @@
 {% extends "cfp_review/base.html" %}
 {% block title %}Proposals{% endblock %}
 {% block body %}
+<a role="button" class="btn btn-default pull-right" href="{{ url_for('.message_batch', **request.args) }}">
+    Message all {{ proposals | count }} proposals
+</a>
 <h2>Proposals</h2>
 
 <div class="panel panel-default">
