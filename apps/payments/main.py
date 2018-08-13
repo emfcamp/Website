@@ -71,7 +71,7 @@ def payment_refund_request(payment_id, currency='GBP'):
 
         try:
             result = gocardless_client.bank_details_lookups.create(params)
-            app.logger.info("Bank identified as %r", result.get('bank_name'))
+            app.logger.info("Bank identified as %r", result.attributes.get('bank_name'))
 
         except gocardless_pro.errors.ValidationFailedError as e:
             app.logger.warn("Error validating bank details: %s", e)
