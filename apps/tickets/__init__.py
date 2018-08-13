@@ -323,7 +323,9 @@ def pay(flow=None):
             abort(404)
 
     if request.form.get("change_currency") in ('GBP', 'EUR'):
-        set_user_currency(request.form.get("change_currency"))
+        currency = request.form.get("change_currency")
+        app.logger.info("Updating currency to %s", currency)
+        set_user_currency(currency)
         db.session.commit()
 
         return redirect(url_for('.pay', flow=flow))
@@ -338,6 +340,7 @@ def pay(flow=None):
 
     basket = Basket.from_session(current_user, get_user_currency())
     if not any(basket.values()):
+        app.logger.info("Basket is empty (cookies not saved?), redirecting back to choose tickets")
         empty_baskets.inc()
         if view.type == 'tickets':
             flash("Please select at least one ticket to buy.")
