@@ -56,10 +56,7 @@ def bool_qs(val):
         return False
     raise ValueError('Invalid querystring boolean')
 
-@cfp_review.route('/proposals')
-@admin_required
-def proposals():
-
+def filter_proposal_request():
     bool_names = ['one_day', 'needs_help', 'needs_money']
     bool_vals = [request.args.get(n, type=bool_qs) for n in bool_names]
     bool_dict = {n: v for n, v in zip(bool_names, bool_vals) if v is not None}
@@ -90,7 +87,12 @@ def proposals():
     proposals = proposals.options(joinedload(Proposal.user)).options(joinedload('user.owned_tickets'))
     proposals = proposals.all()
     proposals.sort(**sort_dict)
+    return proposals, filtered
 
+@cfp_review.route('/proposals')
+@admin_required
+def proposals():
+    proposals, filtered = filter_proposal_request()
     non_sort_query_string = dict(request.args)
     if 'sort_by' in non_sort_query_string:
         del non_sort_query_string['sort_by']
@@ -383,6 +385,41 @@ def message_proposer(proposal_id):
 
     return render_template('cfp_review/message_proposer.html',
                            form=form, messages=messages, proposal=proposal)
+
+@cfp_review.route('/message_batch', methods=['GET', 'POST'])
+@admin_required
+def message_batch():
+    proposals, filtered = filter_proposal_request()
+
+    form = SendMessageForm()
+    if form.validate_on_submit():
+        if form.send.data:
+            for proposal in proposals:
+                msg = CFPMessage()
+                msg.is_to_admin = False
+                msg.from_user_id = current_user.id
+                msg.proposal_id = proposal.id
+                msg.message = form.message.data
+
+                db.session.add(msg)
+                db.session.commit()
+
+                app.logger.info('Sending message from %s to %s', current_user.id, proposal.user_id)
+
+                msg_url = external_url('cfp.proposal_messages', proposal_id=proposal.id)
+                msg = Message('New message about your EMF proposal',
+                            sender=app.config['CONTENT_EMAIL'],
+                            recipients=[proposal.user.email])
+                msg.body = render_template('cfp_review/email/new_message.txt', url=msg_url,
+                                        to_user=proposal.user, from_user=current_user,
+                                        proposal=proposal)
+                mail.send(msg)
+
+            flash('Messaged %s proposals' % len(proposals), 'info')
+            return redirect(url_for('.proposals', **request.args))
+
+    return render_template('cfp_review/message_batch.html',
+                           form=form, proposals=proposals)
 
 def get_vote_summary_sort_args(parameters):
     sort_keys = {

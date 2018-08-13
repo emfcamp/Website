@@ -1,0 +1,60 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "cfp_review/base.html" %}
+{% block body %}
+{% set active='messages' %}
+
+<h3>Batch messaging {{ proposals | count }} proposals</h3>
+
+<div>
+    <form method="post" action="{{ url_for('.message_batch', **request.args) }}">
+        {{ form.hidden_tag() }}
+        {{ render_field(form.message, tabindex=1, rows=6) }}
+        <div class="pull-right">
+            {{ form.send(class_='btn btn-success debounce', tabindex=2) }}
+        </div>
+    </form>
+</div>
+
+<br>
+
+<div>
+    <h4>Proposals that will be messaged</h4>
+    <table class="table table-condensed">
+    <tr>
+        <th class="col-md-1">
+            Has ticket
+        </th>
+        <th>
+            State
+        </th>
+        <th>
+            Type
+        </th>
+        <th class="col-md-1">
+            Notice
+        </th>
+        <th>
+            User
+        </th>
+        <th>
+            Title
+        </th>
+    </tr>
+    {% for proposal in proposals %}
+        <tr>
+            <td>{% if proposal.has_ticket() %}Yes{% endif %}</td>
+            <td>{{proposal.state | capitalize}}</td>
+            <td>{{proposal.human_type | capitalize}}</td>
+            <td>{{proposal.notice_required or ''}}</td>
+            <td>
+                <a href="{{ url_for('admin.user', user_id=proposal.user.id ) }}">{{proposal.user.name}}</a>
+            </td>
+            <td>
+                <a href="{{ url_for('.update_proposal', proposal_id=proposal.id) }}">{{proposal.title}}</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </table>
+</div>
+
+{% endblock %}
