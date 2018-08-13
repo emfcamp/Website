@@ -7,7 +7,7 @@ from flask_mail import Message
 from slotmachine import SlotMachine
 
 from main import db, mail
-from models.cfp import Proposal, Venue, ROUGH_LENGTHS
+from models.cfp import Proposal, Venue, ROUGH_LENGTHS, EVENT_SPACING
 
 class ImportVenues(Command):
     venues = [
@@ -70,6 +70,7 @@ class RunScheduler(Command):
                 'time_ranges': [
                     {"start": str(p.start), "end": str(p.end)} for p in proposal.get_allowed_time_periods_with_default()
                 ],
+                'spacing_slots': EVENT_SPACING.get(proposal.type, 1),
             }
 
             if proposal.scheduled_venue:

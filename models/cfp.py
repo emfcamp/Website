@@ -69,6 +69,15 @@ HARD_START_LIMIT = {
     'youthworkshop': (9, 30),
 }
 
+# Number of slots (in 10min increments) that must be between proposals of this
+# type in the same venue
+EVENT_SPACING = {
+    'talk': 1,
+    'workshop': 2,
+    'performance': 3,
+    'youthworkshop': 2,
+}
+
 period = namedtuple('Period', 'start end')
 DAYS = {
     'fri': datetime(2018, 8, 31),
