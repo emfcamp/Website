@@ -132,7 +132,7 @@ def create_app(dev_server=False):
         extension.init_app(app)
 
 
-    cors_origins = 'https://map.emfcamp.org'
+    cors_origins = ['https://map.emfcamp.org', 'https://wiki.emfcamp.org']
     if app.config.get('DEBUG'):
         cors_origins = ['http://localhost:8080', 'https://maputnik.github.io']
     CORS(app, resources={r"/api/*": {"origins": cors_origins}},
