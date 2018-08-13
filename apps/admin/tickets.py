@@ -57,7 +57,7 @@ def tickets_issue():
 
 @admin.route('/tickets/issue-free/<email>', methods=['GET', 'POST'])
 def tickets_issue_free(email):
-    user = User.query.filter_by(email=email).one_or_none()
+    user = User.get_by_email(email)
 
     if user is None:
         form = IssueFreeTicketsNewUserForm()
@@ -159,7 +159,7 @@ def cancel_free_ticket(ticket_id):
 
 @admin.route('/tickets/reserve/<email>', methods=['GET', 'POST'])
 def tickets_reserve(email):
-    user = User.query.filter_by(email=email).one_or_none()
+    user = User.get_by_email(email)
 
     if user is None:
         form = ReserveTicketsNewUserForm()

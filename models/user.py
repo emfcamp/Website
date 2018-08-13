@@ -253,6 +253,7 @@ class User(db.Model, UserMixin):
                 return True
         return False
 
+Index('ix_user_email_lower', func.lower(User.email), unique=True)
 Index('ix_user_email_tsearch', text("to_tsvector('simple', replace(email, '@', ' '))"), postgresql_using='gin')
 Index('ix_user_name_tsearch', text("to_tsvector('simple', name)"), postgresql_using='gin')
 
