@@ -76,6 +76,7 @@ EVENT_SPACING = {
     'workshop': 2,
     'performance': 3,
     'youthworkshop': 2,
+    'installation': 0,
 }
 
 period = namedtuple('Period', 'start end')
