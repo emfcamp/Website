@@ -10,6 +10,7 @@ from flask_login import current_user
 from sqlalchemy.sql.functions import func
 
 from main import db
+from models.map import MapObject
 from models.user import User
 from models.product import (
     ProductGroup, Product, PriceTier, Price,
@@ -279,12 +280,30 @@ def purchase_transfers():
 @admin.route('/hire')
 def hire():
     purchases = (ProductGroup.query.filter_by(type='hire')
-                             .join(Product, Purchase, Purchase.owner).group_by(User.id, Product.id)
-                             .with_entities(User, Product, func.count(Purchase.id))
-                             .filter(Purchase.is_paid_for == True)  # noqa: E712
+                             .join(Product, Purchase, Purchase.owner)
+                             .group_by(User.id, Product.id, Purchase.state)
+                             .filter(Purchase.state.in_(['paid', 'payment-pending', 'receipt-emailed']))
+                             .with_entities(User, Product, Purchase.state, func.count(Purchase.id))
                              .order_by(User.name, Product.name))
 
-    return render_template('admin/products/hire-purchases.html', purchases=purchases)
+    hires_without_villages = (purchases.with_entities(User)
+                                       .group_by(User)
+                                       .from_self().outerjoin(User.map_objects)
+                                       .filter(MapObject.id.is_(None))
+                                       .group_by(User)
+                                       .with_entities(User))
+
+    purchase_users = (purchases.with_entities(User)
+                               .group_by(User)
+                               .subquery())
+
+    villages_without_hires = (MapObject.query.outerjoin(purchase_users)
+                                             .filter(purchase_users.c.id.is_(None))
+                                             .group_by(MapObject)
+                                             .with_entities(MapObject))
+
+    return render_template('admin/products/hire-purchases.html', purchases=purchases,
+                           hires_without_villages=hires_without_villages, villages_without_hires=villages_without_hires)
 
 
 @admin.route('/tees')
