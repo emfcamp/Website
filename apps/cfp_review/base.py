@@ -654,7 +654,7 @@ def rank():
                 continue
 
         # +10 for changeover period
-        allocated_minutes[proposal.type] += length + (10 * EVENT_SPACING[type])
+        allocated_minutes[proposal.type] += length + (10 * EVENT_SPACING[proposal.type])
 
     # Correct for changeover period not being needed at the end of the day
     num_days = len(DAYS.items())
