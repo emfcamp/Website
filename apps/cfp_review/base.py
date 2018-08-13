@@ -82,7 +82,8 @@ def proposals():
     if needs_ticket is True:
         filtered = True
         proposals = proposals.join(Proposal.user).filter_by(will_have_ticket=False).filter(
-            ~exists().where((Ticket.state == 'paid') & (Ticket.type == 'admission_ticket') &
+            ~exists().where((Ticket.state.in_('paid', 'payment-pending')) &
+                            (Ticket.type == 'admission_ticket') &
                             (Ticket.owner_id == User.id)))
 
     sort_dict = get_proposal_sort_dict(request.args)
