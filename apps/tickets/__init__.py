@@ -258,14 +258,19 @@ def main(flow=None):
                 # Send the user off to pay
                 return redirect(url_for('tickets.pay', flow=flow))
 
-            # We currently only sell one free ticket, which is to enforce capacity.
-            # We don't let people order an under-12 ticket on its own.
+            # Otherwise, the user is trying to buy free tickets.
+            # They must be authenticated for this.
             if not current_user.is_authenticated:
+                app.logger.warn("User is not authenticated, sending to login")
                 flash("You must be logged in to buy additional free tickets")
-                return redirect(url_for("tickets.main", flow=flow))
+                return redirect(url_for('users.login', next=url_for('tickets.main', flow=flow)))
 
+            # We sell under-12 tickets to non-CfP users, to enforce capacity.
+            # We don't let people order an under-12 ticket on its own.
+            # However, CfP users need to be able to buy day and parking tickets.
             admissions_tickets = current_user.get_owned_tickets(type='admission_ticket')
-            if not any(admissions_tickets):
+            if not any(admissions_tickets) and not view.cfp_accepted_only:
+                app.logger.warn("User trying to buy free add-ons without an admission ticket")
                 flash("You must have an admissions ticket to buy additional free tickets")
                 return redirect(url_for("tickets.main", flow=flow))
 
