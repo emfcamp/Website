@@ -20,7 +20,8 @@ def render_feature(obj):
             "id": api.url_for(MapObjectResource, obj_id=obj.id),
             "name": obj.name,
             "wiki_page": obj.wiki_page,
-            "owner_name": obj.owner.name,
+            # Need to get people to approve a name before showing it on the API
+            # "owner_name": obj.owner.name,
             "owner": "/api/user/{}".format(obj.owner.id)
         },
     }
