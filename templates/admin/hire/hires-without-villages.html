@@ -1,0 +1,20 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'hire' %}
+{% block body %}
+
+<h2>Hires without a village</h2>
+
+<table class="table table-condensed table-striped">
+  <tr>
+    <th>Name</th>
+    <th>Email</th>
+  </tr>
+  {% for user in hires %}
+  <tr>
+    <td>{{ user.name }}</td>
+    <td><a href="{{ url_for('.user', user_id=user.id) }}">{{ user.email }}</a></td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% endblock %}

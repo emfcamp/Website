@@ -1,0 +1,22 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'hire' %}
+{% block body %}
+
+<h2>Villages without a hire</h2>
+
+<table class="table table-condensed table-striped">
+  <tr>
+    <th>Village name</th>
+    <th>Owner name</th>
+    <th>Owner email</th>
+  </tr>
+  {% for map_object in villages %}
+  <tr>
+    <td>{{ map_object.name }}</td>
+    <td>{{ map_object.owner.name }}</td>
+    <td><a href="{{ url_for('.user', user_id=map_object.owner.id) }}">{{ map_object.owner.email }}</a></td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% endblock %}

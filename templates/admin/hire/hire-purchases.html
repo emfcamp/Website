@@ -1,0 +1,26 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'hire' %}
+{% block body %}
+
+<h2>Hire purchases</h2>
+<table class="table table-condensed table-striped hire-purchases">
+  <tr>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Product</th>
+    <th>State</th>
+    <th>Count</th>
+  </tr>
+  {% for user, product, purchase_state, count in purchases %}
+  <tr class="{{ purchase_state }}">
+    <td>{{ user.name }}</td>
+    <td><a href="{{ url_for('.user', user_id=user.id) }}">{{ user.email }}</a></td>
+    <td>{{ product.name }}</td>
+    <td>{{ purchase_state }}</td>
+    <td>{{ count }}</td>
+  </tr>
+
+  {% endfor %}
+</table>
+
+{% endblock %}
