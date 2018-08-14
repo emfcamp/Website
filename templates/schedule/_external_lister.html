@@ -1,6 +1,6 @@
 {% macro list_externals(externals) %}
     {% for type, type_events in externals | groupby('type') %}
-        <h2>{{ type | capitalize }}</h2>
+        <h2>{{ type | title }}</h2>
         <ul>
           {% for event in type_events | sort(attribute='title') %}
             <li>

@@ -13,18 +13,19 @@
   <p>Attendance of this workshop will cost: <strong>{{ proposal.cost }}</strong></p>
 {% endif %}
 
+<div class="well">
 <p class="multiline">{{ proposal.description | urlize }}</p>
 <hr>
 {% if current_user.is_authenticated %}
   <form method="POST">
   <input id="csrf_token" name=_csrf_token type=hidden value="{{ csrf_token() }}">
-  <button type="submit" class="btn btn-primary">
+  <button type="submit" class="btn btn-primary {% if is_fave %}active{% endif %}">
     {%- if is_fave -%}
       <i class="glyphicon glyphicon-star"></i>
     {%- else -%}
       <i class="glyphicon glyphicon-star-empty"></i>
     {%- endif -%}
-    Favourite
+    &nbsp;Favourite
   </button>
   </form>
 {% else %}
@@ -32,13 +33,16 @@
     <a href="{{ url_for('users.login', next=url_for('.line_up_proposal', proposal_id=proposal.id)) }}">login</a>.
   </p>
 {% endif %}
-<ul class='list-inline text-muted'>
+</div>
+
+<h4>Schedule</h4>
+<ul class='nav nav-pills'>
   <li>
-    <p><a type="btn btn-primary" href="{{ url_for('.line_up') }}">Line-up</a></p>
+    <a href="{{ url_for('.line_up') }}">Line-up</a>
   </li>
   {% if current_user.is_authenticated %}
     <li>
-      <a type="btn btn-primary" href="{{ url_for('.favourites') }}">Favourites</a>
+      <a href="{{ url_for('.favourites') }}">Favourites</a>
     </li>
   {% endif %}
 </ul>

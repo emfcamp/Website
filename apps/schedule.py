@@ -273,10 +273,15 @@ def favourites_ical():
 
 @schedule.route('/line-up')
 @feature_flag('SCHEDULE')
+def line_up_redirect():
+    return redirect(url_for('.line_up'))
+
+@schedule.route('/line-up/2018')
+@feature_flag('SCHEDULE')
 def line_up():
     proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
         filter(Proposal.state.in_(['accepted', 'finished'])).\
-        filter(Proposal.type.in_(['talk', 'workshop'])).all()
+        filter(Proposal.type.in_(['talk', 'workshop', 'youthworkshop'])).all()
 
     externals = CalendarSource.get_enabled_events()
 
@@ -296,8 +301,8 @@ def favourites():
 
     return render_template('schedule/favourites.html', proposals=proposals, externals=externals, token=token)
 
-@schedule.route('/line-up/2016/<int:proposal_id>', methods=['GET', 'POST'])
-@schedule.route('/line-up/2016/<int:proposal_id>-<slug>', methods=['GET', 'POST'])
+@schedule.route('/line-up/2018/<int:proposal_id>', methods=['GET', 'POST'])
+@schedule.route('/line-up/2018/<int:proposal_id>-<slug>', methods=['GET', 'POST'])
 @feature_flag('SCHEDULE')
 def line_up_proposal(proposal_id, slug=None):
     proposal = Proposal.query.get_or_404(proposal_id)
@@ -330,8 +335,8 @@ def line_up_proposal(proposal_id, slug=None):
     return render_template('schedule/line-up-proposal.html',
                            proposal=proposal, is_fave=is_fave, venue_name=venue_name)
 
-@schedule.route('/line-up/2016/<int:proposal_id>.json')
-@schedule.route('/line-up/2016/<int:proposal_id>-<slug>.json')
+@schedule.route('/line-up/2018/<int:proposal_id>.json')
+@schedule.route('/line-up/2018/<int:proposal_id>-<slug>.json')
 @json_response
 @feature_flag('SCHEDULE')
 def line_up_proposal_json(proposal_id, slug=None):
@@ -356,8 +361,8 @@ def line_up_proposal_json(proposal_id, slug=None):
     return data
 
 
-@schedule.route('/line-up/2016/external/<int:event_id>', methods=['GET', 'POST'])
-@schedule.route('/line-up/2016/external/<int:event_id>-<slug>', methods=['GET', 'POST'])
+@schedule.route('/line-up/2018/external/<int:event_id>', methods=['GET', 'POST'])
+@schedule.route('/line-up/2018/external/<int:event_id>-<slug>', methods=['GET', 'POST'])
 @feature_flag('SCHEDULE')
 def line_up_external(event_id, slug=None):
     event = CalendarEvent.query.get_or_404(event_id)

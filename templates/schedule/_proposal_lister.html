@@ -1,8 +1,8 @@
 {% macro list_proposals(proposals) %}
-    {% for type, type_proposals in proposals | groupby('type') %}
-        <h2>{{ type | capitalize }}</h2>
+    {% for human_type, human_type_proposals in proposals | groupby('human_type') %}
+        <h2>{{ human_type | title }}</h2>
         <ul>
-          {% for prop in type_proposals | sort(attribute='title') %}
+          {% for prop in human_type_proposals | sort(attribute='title') %}
             <li>
                 <a href="{{ url_for('.line_up_proposal', proposal_id=prop.id, slug=prop.slug) }}">
                     {{ prop.title }} &mdash; <em>{{ prop.published_names or prop.user.name }}</em>
