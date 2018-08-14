@@ -36,10 +36,10 @@ def _get_proposal_dict(proposal, favourites_ids):
         'venue': proposal.scheduled_venue.name,
         'latlon': proposal.latlon,
         'map_link': proposal.map_link,
-        'title': proposal.title,
+        'title': proposal.display_title,
         'speaker': proposal.published_names or proposal.user.name,
         'user_id': proposal.user.id,
-        'description': proposal.description,
+        'description': proposal.published_description or proposal.description,
         'type': proposal.type,
         'may_record': proposal.may_record,
         'is_fave': proposal.id in favourites_ids,
@@ -318,10 +318,10 @@ def line_up_proposal(proposal_id, slug=None):
     if (request.method == "POST") and not current_user.is_anonymous:
         if is_fave:
             current_user.favourites.remove(proposal)
-            msg = 'Removed "%s" from favourites' % proposal.title
+            msg = 'Removed "%s" from favourites' % proposal.display_title
         else:
             current_user.favourites.append(proposal)
-            msg = 'Added "%s" to favourites' % proposal.title
+            msg = 'Added "%s" to favourites' % proposal.display_title
         db.session.commit()
         flash(msg)
         return redirect(url_for('.line_up_proposal', proposal_id=proposal.id, slug=proposal.slug))
@@ -376,10 +376,10 @@ def line_up_external(event_id, slug=None):
     if (request.method == "POST") and not current_user.is_anonymous:
         if is_fave:
             current_user.calendar_favourites.remove(event)
-            msg = 'Removed "%s" from favourites' % event.title
+            msg = 'Removed "%s" from favourites' % event.display_title
         else:
             current_user.calendar_favourites.append(event)
-            msg = 'Added "%s" to favourites' % event.title
+            msg = 'Added "%s" to favourites' % event.display_title
         db.session.commit()
         flash(msg)
         return redirect(url_for('.line_up_external', event_id=event.id, slug=event.slug))

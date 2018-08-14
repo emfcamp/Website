@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block title %}{{ proposal.title }}{% endblock %}
+{% block title %}{{ proposal.display_title }}{% endblock %}
 {% block body %}
 
-<h1>{{ proposal.title }}</h1>
+<h1>{{ proposal.display_title }}</h1>
 <h2><small>{{ proposal.human_type | title }} by {{ proposal.published_names or proposal.user.name }}</small></h2>
 
 {% if proposal.scheduled_time and venue_name %}
@@ -15,12 +15,12 @@
 </p>
 {% endif %}
 
-{% if proposal.type == 'workshop' and proposal.cost != '' %}
-  <p>Attendance of this workshop will cost: <strong>{{ proposal.cost }}</strong></p>
+{% if proposal.type == 'workshop' and (proposal.published_cost or proposal.cost) %}
+  <p>Attendance of this workshop will cost: <strong>{{ proposal.published_cost or proposal.cost }}</strong></p>
 {% endif %}
 
 <div class="well">
-<p class="multiline">{{ proposal.description | urlize }}</p>
+<p class="multiline">{{ (proposal.published_description or proposal.description) | urlize }}</p>
 <hr>
 {% if current_user.is_authenticated %}
   <form method="POST">
