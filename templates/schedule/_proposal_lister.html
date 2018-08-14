@@ -2,7 +2,7 @@
     {% for human_type, human_type_proposals in proposals | groupby('human_type') %}
         <h2>{{ human_type | title }}</h2>
         <ul>
-          {% for prop in human_type_proposals | sort(attribute='display_title') %}
+          {% for prop in human_type_proposals %}
             <li>
                 <a href="{{ url_for('.line_up_proposal', proposal_id=prop.id, slug=prop.slug) }}">
                     {{ prop.display_title }} &mdash; <em>{{ prop.published_names or prop.user.name }}</em>
