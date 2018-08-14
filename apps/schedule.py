@@ -2,6 +2,7 @@
 import json
 import cgi
 import pytz
+import random
 
 from flask import (
     Blueprint, render_template, redirect, url_for, flash,
@@ -283,6 +284,10 @@ def line_up():
     proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
         filter(Proposal.state.in_(['accepted', 'finished'])).\
         filter(Proposal.type.in_(['talk', 'workshop', 'youthworkshop'])).all()
+
+    # Shuffle the order, but keep it fixed per-user
+    # (Because we don't want a bias in starring)
+    random.Random(current_user.get_id()).shuffle(proposals)
 
     externals = CalendarSource.get_enabled_events()
 
