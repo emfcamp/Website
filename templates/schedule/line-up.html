@@ -13,9 +13,11 @@
 {% else %}
 <p>This is a list of all the talks &amp; workshops that (should) be at Electromagnetic Field in {{ event_year }}.
    Not all stages and time-periods are announced yet, so check back frequently.</p>
+{% if config['SCHEDULE'] %}
 <p>You can also get this list as an <a href="{{ url_for('.schedule_ical') }}">iCal feed</a>
    for your calendar, and a <a href="{{ url_for('.schedule_json') }}">json feed</a> for your giant robot.
-   The feed will only contain talks or workshops once they've been scheduled.</p>
+</p>
+{% endif %}
 {% endif %}
 {% if current_user.is_authenticated %}
 <div><strong><a type="btn btn-primary" href="{{ url_for('.favourites') }}">View your favourited talks</a></strong></div>

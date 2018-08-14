@@ -7,7 +7,9 @@
 
 <p>You can also get this list as an <a href="{{ url_for('.favourites_ical') }}?token={{ token }}">iCal feed</a>
    for your calendar, and a <a href="{{ url_for('.favourites_json') }}?token={{ token }}">json feed</a> for your giant robot.
+   {% if not config.get('SCHEDULE') %}
    The feed will only contain talks or workshops once they've been scheduled.
+   {% endif %}
 </p>
 
 {{ list_proposals(proposals) }}

@@ -6,7 +6,13 @@
 <h2><small>{{ proposal.human_type | title }} by {{ proposal.published_names or proposal.user.name }}</small></h2>
 
 {% if proposal.scheduled_time and venue_name %}
-<p><strong>{{ proposal.scheduled_time.strftime('%A from %-I:%M %p') }}</strong> - <strong>{{ proposal.end_date.strftime('%-I:%M %p') }}</strong> in <strong><a href="{{ proposal.map_link }}" target="_blank">{{ venue_name }}</a></strong>
+<p><strong>{{ proposal.scheduled_time.strftime('%A from %-I:%M %p') }}</strong> - <strong>{{ proposal.end_date.strftime('%-I:%M %p') }}</strong>
+   {% if config['SCHEDULE'] %}
+   in <strong><a href="{{ proposal.map_link }}" target="_blank">{{ venue_name }}</a></strong>
+   {% else %}
+   in <strong>{{ venue_name }}</strong>
+   {% endif %}
+</p>
 {% endif %}
 
 {% if proposal.type == 'workshop' and proposal.cost != '' %}
