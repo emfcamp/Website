@@ -62,6 +62,9 @@ class MapObjectResource(Resource):
         data = request.get_json()
         validate_map_obj(data)
 
+        if data['name'] != obj.name and MapObject.query.filter_by(name=data['name']).one_or_none():
+            raise BadRequest("Duplicate Name: {}".format(data['name']))
+
         obj.name = data.get('name')
         obj.wiki_page = data.get('wiki_page').replace('https://wiki.emfcamp.org/wiki/', '')
         obj.geom = "SRID=4326;POINT({} {})".format(*data["location"])
