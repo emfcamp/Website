@@ -10,8 +10,8 @@ def test_generate_login_code():
     result = generate_login_code('abc', 84400, 1)
     assert expect == result
 
-    # Check that this will work with strings or bytes
-    result = generate_login_code(b'abc', 84400, b'1')
+    # Check that this will work with a key made of bytes
+    result = generate_login_code(b'abc', 84400, 1)
     assert expect == result
 
 def test_verify_login_code():

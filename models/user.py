@@ -23,88 +23,131 @@ CHECKIN_CODE_LEN = 16
 checkin_code_re = r'[0-9a-zA-Z_-]{%s}' % CHECKIN_CODE_LEN
 
 
-def generate_hmac_msg(prefix, key, timestamp, uid):
-    """ Note: this outputs bytes because you need to check it with hmac.compare_digest """
-    if isinstance(uid, bytes):
-        uid = uid.decode('utf-8')
+def _generate_hmac(prefix, key, msg):
+    """
+    Generate a keyed HMAC for a unique purpose. You don't want to call this directly.
 
+    This returns bytes because we don't want to assume the encoding of msg.
+    """
     if isinstance(key, str):
         key = key.encode('utf-8')
 
     if isinstance(prefix, str):
         prefix = prefix.encode('utf-8')
 
-    msg = ("%s-%s" % (int(timestamp), uid)).encode('utf-8')
+    if isinstance(msg, str):
+        msg = msg.encode('utf-8')
+
     mac = hmac.new(key, prefix + msg, digestmod=hashlib.sha256)
-    # Truncate the digest to 20 base64 bytes
+    # Truncate the digest to 20 base64 characters (120 bits)
     return msg + b"-" + base64.urlsafe_b64encode(mac.digest())[:20]
 
+def generate_timed_hmac(prefix, key, timestamp, uid):
+    """ Typical time-limited HMAC used for logins, etc """
+    timestamp = int(timestamp)  # to truncate floating point, not coerce strings
+    msg = "{}-{}".format(timestamp, uid)
+    return _generate_hmac(prefix, key, msg).decode('ascii')
 
-def verify_hmac_msg(prefix, key, current_timestamp, code, valid_hours):
-    if isinstance(code, str):
-        code = code.encode('utf-8')
+def generate_unlimited_hmac(prefix, key, uid):
+    """ Intended for user tokens, long-lived but low-importance """
+    msg = "{}".format(uid)
+    return _generate_hmac(prefix, key, msg).decode('ascii')
 
+
+def verify_timed_hmac(prefix, key, current_timestamp, code, valid_hours):
+    # FIXME: this should raise an exception instead of returning None on error
     try:
-        timestamp, uid, _ = code.split(b"-", 2)
+        timestamp, uid, _ = code.split("-", 2)
+        timestamp, uid = int(timestamp), int(uid)
     except ValueError:
         return None
 
-    expected_code = generate_hmac_msg(prefix, key, timestamp, uid)
+    expected_code = generate_timed_hmac(prefix, key, timestamp, uid)
     if hmac.compare_digest(expected_code, code):
-        age = datetime.fromtimestamp(current_timestamp) - datetime.fromtimestamp(int(timestamp))
+        age = datetime.fromtimestamp(current_timestamp) - datetime.fromtimestamp(timestamp)
         if age > timedelta(hours=valid_hours):
             return None
         else:
-            return int(uid)
+            return uid
+
+    return None
+
+def verify_unlimited_hmac(prefix, key, code):
+    # FIXME: this should raise an exception instead of returning None on error
+    try:
+        uid, _ = code.split('-', 1)
+        uid = int(uid)
+    except ValueError:
+        return None
+
+    expected_code = generate_unlimited_hmac(prefix, key, uid)
+    if hmac.compare_digest(expected_code, code):
+        return uid
     return None
 
 
-def generate_login_code(key, timestamp, uid):
-    """ Note: this outputs bytes because you need to check it with hmac.compare_digest"""
-    return generate_hmac_msg('login-', key, timestamp, uid)
-
-def generate_sso_code(key, timestamp, uid):
-    return generate_hmac_msg('sso-', key, timestamp, uid)
-
-def generate_signup_code(key, timestamp, uid):
-    return generate_hmac_msg('signup-', key, timestamp, uid)
-
-
-def verify_login_code(key, current_timestamp, code):
-    return verify_hmac_msg('login-', key, current_timestamp, code, valid_hours=6)
-
-def verify_signup_code(key, current_timestamp, code):
-    return verify_hmac_msg('signup-', key, current_timestamp, code, valid_hours=6)
-
-
-def generate_checkin_code(key, user_id, version=1):
+def generate_unlimited_short_hmac(prefix, key, user_id, version=1):
     if isinstance(key, str):
         key = key.encode('utf-8')
+
+    if isinstance(prefix, str):
+        prefix = prefix.encode('utf-8')
+
     # H = short (< 65536), B = byte (< 256)
     msg = struct.pack('HB', user_id, version)
-    mac = hmac.new(key, b'checkin-' + msg, digestmod=hashlib.sha256)
+    mac = hmac.new(key, prefix + msg, digestmod=hashlib.sha256)
+
     # An input length that's a multiple of 3 ensures no wasted output
     # 9 bytes (72 bits) won't resist offline attacks, so be careful
-    code = base64.urlsafe_b64encode(msg + mac.digest()[:9])
+    code = base64.urlsafe_b64encode(msg + mac.digest()[:9]).decode('ascii')
+
     # The output length should be (len(msg) + 9) / 3 * 4
     assert len(code) == CHECKIN_CODE_LEN
     return code
 
 
-def verify_checkin_code(key, code):
+def verify_unlimited_short_hmac(prefix, key, code):
     msg = base64.urlsafe_b64decode(code.encode('utf-8')[:4])
     user_id, version = struct.unpack('HB', msg)
     if version != 1:
         return None
 
-    expected_code = generate_checkin_code(key, user_id, version=version)
-    if isinstance(code, str):
-        code = code.encode('utf-8')
-
+    expected_code = generate_unlimited_short_hmac(prefix, key, user_id, version=version)
     if hmac.compare_digest(expected_code, code):
         return user_id
     return None
 
+
+""" Wrapper functions that you should actually call """
+def generate_login_code(key, timestamp, uid):
+    return generate_timed_hmac('login-', key, timestamp, uid)
+
+def generate_sso_code(key, timestamp, uid):
+    return generate_timed_hmac('sso-', key, timestamp, uid)
+
+def generate_signup_code(key, timestamp, uid):
+    return generate_timed_hmac('signup-', key, timestamp, uid)
+
+def generate_api_token(key, uid):
+    return generate_unlimited_hmac('api-', key, uid)
+
+def generate_checkin_code(key, uid, version=1):
+    return generate_unlimited_short_hmac('checkin-', key, uid, version=version)
+
+def verify_login_code(key, current_timestamp, code):
+    return verify_timed_hmac('login-', key, current_timestamp, code, valid_hours=6)
+
+def verify_sso_code(key, current_timestamp, code):
+    return verify_timed_hmac('sso-', key, current_timestamp, code, valid_hours=6)
+
+def verify_signup_code(key, current_timestamp, code):
+    return verify_timed_hmac('signup-', key, current_timestamp, code, valid_hours=6)
+
+def verify_api_token(key, uid):
+    return verify_unlimited_hmac('api-', key, uid)
+
+def verify_checkin_code(key, uid):
+    return verify_unlimited_short_hmac('checkin-', key, uid)
 
 
 class User(db.Model, UserMixin):
@@ -242,6 +285,15 @@ class User(db.Model, UserMixin):
     def get_by_checkin_code(cls, key, code):
         uid = verify_checkin_code(key, code)
         if uid is None:
+            return None
+
+        return User.query.filter_by(id=uid).one()
+
+    @classmethod
+    def get_by_api_token(cls, key, code):
+        uid = verify_api_token(key, code)
+        if uid is None:
+            # FIXME: raise an exception instead of returning None
             return None
 
         return User.query.filter_by(id=uid).one()

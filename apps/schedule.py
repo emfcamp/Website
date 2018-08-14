@@ -18,7 +18,7 @@ from main import db, external_url
 from .common import feature_flag, json_response
 from models.cfp import Proposal, Venue
 from models.ical import CalendarSource, CalendarEvent
-from models.user import User, generate_checkin_code
+from models.user import User, generate_api_token
 from models.site_state import event_start
 from .schedule_xml import export_frab
 
@@ -219,7 +219,7 @@ def favourites_json():
     code = request.args.get('token', None)
     user = None
     if code:
-        user = User.get_by_checkin_code(app.config.get('FEED_SECRET_KEY'), str(code))
+        user = User.get_by_api_token(app.config.get('SECRET_KEY'), str(code))
     if not current_user.is_anonymous:
         user = current_user
     if not user:
@@ -242,7 +242,7 @@ def favourites_ical():
     code = request.args.get('token', None)
     user = None
     if code:
-        user = User.get_by_checkin_code(app.config.get('FEED_SECRET_KEY'), str(code))
+        user = User.get_by_api_token(app.config.get('SECRET_KEY'), str(code))
     if not current_user.is_anonymous:
         user = current_user
     if not user:
@@ -292,7 +292,7 @@ def favourites():
     proposals = current_user.favourites
     externals = current_user.calendar_favourites
 
-    token = generate_checkin_code(app.config.get('FEED_SECRET_KEY'), current_user.id)
+    token = generate_api_token(app.config['SECRET_KEY'], current_user.id)
 
     return render_template('schedule/favourites.html', proposals=proposals, externals=externals, token=token)
 
