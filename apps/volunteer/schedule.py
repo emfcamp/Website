@@ -20,9 +20,9 @@ class ScheduleFilterForm(Form):
                                             ('stage-b', 'Stage B'),
                                             ('stage-c', 'Stage C')])
 
-@v_user_required
-@feature_flag('VOLUNTEERS_SCHEDULE')
 @volunteer.route('/schedule')
+@feature_flag('VOLUNTEERS_SCHEDULE')
+@v_user_required
 def schedule():
     # TODO redirect if not logged in
     form = ScheduleFilterForm()
@@ -43,9 +43,9 @@ def schedule():
     return render_template('volunteer/schedule.html', form=form,
                             venues=venues, times=times, all_shifts=all_shifts)
 
-@v_user_required
-@feature_flag('VOLUNTEERS_SCHEDULE')
 @volunteer.route('/shift/<id>')
+@feature_flag('VOLUNTEERS_SCHEDULE')
+@v_user_required
 def shift(id):
     return render_template('volunteer/shift.html', shift=Shift.query.get_or_404(id))
 

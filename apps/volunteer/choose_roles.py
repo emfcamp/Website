@@ -42,9 +42,9 @@ class RoleSignupForm(Form):
                 r.signup.data = True
 
 # TODO need to actually implement permissions
-@v_user_required
-@feature_flag('VOLUNTEERS_SIGNUP')
 @volunteer.route('/choose-roles', methods=['GET', 'POST'])
+@feature_flag('VOLUNTEERS_SIGNUP')
+@v_user_required
 def choose_role():
     form = RoleSignupForm()
 

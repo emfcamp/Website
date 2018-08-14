@@ -42,8 +42,8 @@ def update_volunteer_from_form(volunteer, form):
     volunteer.planned_departure = form.departure.data
     return volunteer
 
-@feature_flag('VOLUNTEERS_SIGNUP')
 @volunteer.route('/sign-up', methods=['GET', 'POST'])
+@feature_flag('VOLUNTEERS_SIGNUP')
 def sign_up():
     form = VolunteerSignUpForm()
     # On sign up give user 'volunteer' permission (+ managers etc.)
@@ -76,10 +76,9 @@ def sign_up():
                            user=current_user,
                            form=form)
 
-# TODO require volunteer user permission
-@v_user_required
-@feature_flag('VOLUNTEERS_SIGNUP')
 @volunteer.route('/account', methods=['GET', 'POST'])
+@feature_flag('VOLUNTEERS_SIGNUP')
+@v_user_required
 def account():
     if current_user.is_anonymous:
         return redirect(url_for('.sign_up'))
