@@ -2,8 +2,9 @@ from flask import render_template
 from wtforms import SelectMultipleField, BooleanField
 from pendulum import period
 
+from ..common import feature_flag
 from ..common.forms import Form
-from . import volunteer
+from . import volunteer, v_user_required
 
 from models.volunteer.shift import Shift
 
@@ -20,6 +21,8 @@ class ScheduleFilterForm(Form):
                                             ('stage-c', 'Stage C')])
 
 @volunteer.route('/schedule')
+@feature_flag('VOLUNTEERS_SCHEDULE')
+@v_user_required
 def schedule():
     # TODO redirect if not logged in
     form = ScheduleFilterForm()
@@ -41,6 +44,8 @@ def schedule():
                             venues=venues, times=times, all_shifts=all_shifts)
 
 @volunteer.route('/shift/<id>')
+@feature_flag('VOLUNTEERS_SCHEDULE')
+@v_user_required
 def shift(id):
     return render_template('volunteer/shift.html', shift=Shift.query.get_or_404(id))
 

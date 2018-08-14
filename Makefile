@@ -38,7 +38,7 @@ migrate:
 
 data: db perms tickets bankaccounts importvenues
 
-dev-data: volunteerdata fakedata
+dev-data: makevolunteershifts fakedata
 
 exportdb:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py exportdb
@@ -71,8 +71,11 @@ sendtickets:
 fakedata:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makefakedata
 
-volunteerdata:
+makevolunteerdata:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makevolunteerdata
+
+makevolunteershifts:
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makevolunteershifts
 
 lockproposals:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py lockproposals

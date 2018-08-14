@@ -1,5 +1,13 @@
+{% macro menuitem(text, view) %}
+<li {% if view_name == view -%} class="active" {%- endif %}>
+    <a href="{{url_for(view)}}">{{text}}</a>
+</li>
+{% endmacro %}
+
 <ul class="nav navbar-nav">
-    <li class="dropdown">Things</li>
-    <li class="dropdown">And</li>
-    <li class="dropdown">stuff</li>
+    {{ menuitem('Account', '.account') }}
+    {{ menuitem('Roles', '.choose_role') }}
+    <li>
+        <a>Shift sign-up <small>(coming soon)</small></a>
+    </li>
 </ul>

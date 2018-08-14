@@ -9,7 +9,7 @@ class FlaskVolunteerAdminAppMixin:
     def is_accessible(self):
         app.logger.info("accessible")
         if current_user.is_authenticated:
-            if current_user.has_permission('volunteer-admin'):
+            if current_user.has_permission('volunteer:admin'):
                 return True
         return False
 
