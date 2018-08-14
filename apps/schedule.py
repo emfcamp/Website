@@ -2,6 +2,7 @@
 import json
 import cgi
 import pytz
+import random
 
 from flask import (
     Blueprint, render_template, redirect, url_for, flash,
@@ -18,7 +19,7 @@ from main import db, external_url
 from .common import feature_flag, json_response
 from models.cfp import Proposal, Venue
 from models.ical import CalendarSource, CalendarEvent
-from models.user import User, generate_checkin_code
+from models.user import User, generate_api_token
 from models.site_state import event_start
 from .schedule_xml import export_frab
 
@@ -30,15 +31,16 @@ event_tz = pytz.timezone('Europe/London')
 def _get_proposal_dict(proposal, favourites_ids):
     res = {
         'id': proposal.id,
+        'slug': proposal.slug,
         'start_date': event_tz.localize(proposal.scheduled_time),
         'end_date': event_tz.localize(proposal.end_date),
         'venue': proposal.scheduled_venue.name,
         'latlon': proposal.latlon,
         'map_link': proposal.map_link,
-        'title': proposal.title,
+        'title': proposal.display_title,
         'speaker': proposal.published_names or proposal.user.name,
         'user_id': proposal.user.id,
-        'description': proposal.description,
+        'description': proposal.published_description or proposal.description,
         'type': proposal.type,
         'may_record': proposal.may_record,
         'is_fave': proposal.id in favourites_ids,
@@ -214,12 +216,12 @@ def schedule_ical():
     return Response(cal.to_ical(), mimetype='text/calendar')
 
 @schedule.route('/favourites.json')
-@feature_flag('SCHEDULE')
+@feature_flag('LINEUP')
 def favourites_json():
     code = request.args.get('token', None)
     user = None
     if code:
-        user = User.get_by_checkin_code(app.config.get('FEED_SECRET_KEY'), str(code))
+        user = User.get_by_api_token(app.config.get('SECRET_KEY'), str(code))
     if not current_user.is_anonymous:
         user = current_user
     if not user:
@@ -237,12 +239,12 @@ def favourites_json():
 
 @schedule.route('/favourites.ical')
 @schedule.route('/favourites.ics')
-@feature_flag('SCHEDULE')
+@feature_flag('LINEUP')
 def favourites_ical():
     code = request.args.get('token', None)
     user = None
     if code:
-        user = User.get_by_checkin_code(app.config.get('FEED_SECRET_KEY'), str(code))
+        user = User.get_by_api_token(app.config.get('SECRET_KEY'), str(code))
     if not current_user.is_anonymous:
         user = current_user
     if not user:
@@ -272,11 +274,20 @@ def favourites_ical():
     return Response(cal.to_ical(), mimetype='text/calendar')
 
 @schedule.route('/line-up')
-@feature_flag('SCHEDULE')
+@feature_flag('LINEUP')
+def line_up_redirect():
+    return redirect(url_for('.line_up'))
+
+@schedule.route('/line-up/2018')
+@feature_flag('LINEUP')
 def line_up():
     proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
         filter(Proposal.state.in_(['accepted', 'finished'])).\
-        filter(Proposal.type.in_(['talk', 'workshop'])).all()
+        filter(Proposal.type.in_(['talk', 'workshop', 'youthworkshop'])).all()
+
+    # Shuffle the order, but keep it fixed per-user
+    # (Because we don't want a bias in starring)
+    random.Random(current_user.get_id()).shuffle(proposals)
 
     externals = CalendarSource.get_enabled_events()
 
@@ -284,7 +295,7 @@ def line_up():
 
 
 @schedule.route('/favourites')
-@feature_flag('SCHEDULE')
+@feature_flag('LINEUP')
 def favourites():
     if current_user.is_anonymous:
         return redirect(url_for('users.login', next=url_for('.favourites')))
@@ -292,13 +303,13 @@ def favourites():
     proposals = current_user.favourites
     externals = current_user.calendar_favourites
 
-    token = generate_checkin_code(app.config.get('FEED_SECRET_KEY'), current_user.id)
+    token = generate_api_token(app.config['SECRET_KEY'], current_user.id)
 
     return render_template('schedule/favourites.html', proposals=proposals, externals=externals, token=token)
 
-@schedule.route('/line-up/2016/<int:proposal_id>', methods=['GET', 'POST'])
-@schedule.route('/line-up/2016/<int:proposal_id>-<slug>', methods=['GET', 'POST'])
-@feature_flag('SCHEDULE')
+@schedule.route('/line-up/2018/<int:proposal_id>', methods=['GET', 'POST'])
+@schedule.route('/line-up/2018/<int:proposal_id>-<slug>', methods=['GET', 'POST'])
+@feature_flag('LINEUP')
 def line_up_proposal(proposal_id, slug=None):
     proposal = Proposal.query.get_or_404(proposal_id)
     if proposal.state not in ('accepted', 'finished'):
@@ -312,10 +323,10 @@ def line_up_proposal(proposal_id, slug=None):
     if (request.method == "POST") and not current_user.is_anonymous:
         if is_fave:
             current_user.favourites.remove(proposal)
-            msg = 'Removed "%s" from favourites' % proposal.title
+            msg = 'Removed "%s" from favourites' % proposal.display_title
         else:
             current_user.favourites.append(proposal)
-            msg = 'Added "%s" to favourites' % proposal.title
+            msg = 'Added "%s" to favourites' % proposal.display_title
         db.session.commit()
         flash(msg)
         return redirect(url_for('.line_up_proposal', proposal_id=proposal.id, slug=proposal.slug))
@@ -330,10 +341,10 @@ def line_up_proposal(proposal_id, slug=None):
     return render_template('schedule/line-up-proposal.html',
                            proposal=proposal, is_fave=is_fave, venue_name=venue_name)
 
-@schedule.route('/line-up/2016/<int:proposal_id>.json')
-@schedule.route('/line-up/2016/<int:proposal_id>-<slug>.json')
+@schedule.route('/line-up/2018/<int:proposal_id>.json')
+@schedule.route('/line-up/2018/<int:proposal_id>-<slug>.json')
 @json_response
-@feature_flag('SCHEDULE')
+@feature_flag('LINEUP')
 def line_up_proposal_json(proposal_id, slug=None):
     proposal = Proposal.query.get_or_404(proposal_id)
     if proposal.state not in ('accepted', 'finished'):
@@ -356,9 +367,9 @@ def line_up_proposal_json(proposal_id, slug=None):
     return data
 
 
-@schedule.route('/line-up/2016/external/<int:event_id>', methods=['GET', 'POST'])
-@schedule.route('/line-up/2016/external/<int:event_id>-<slug>', methods=['GET', 'POST'])
-@feature_flag('SCHEDULE')
+@schedule.route('/line-up/2018/external/<int:event_id>', methods=['GET', 'POST'])
+@schedule.route('/line-up/2018/external/<int:event_id>-<slug>', methods=['GET', 'POST'])
+@feature_flag('LINEUP')
 def line_up_external(event_id, slug=None):
     event = CalendarEvent.query.get_or_404(event_id)
 
@@ -370,10 +381,10 @@ def line_up_external(event_id, slug=None):
     if (request.method == "POST") and not current_user.is_anonymous:
         if is_fave:
             current_user.calendar_favourites.remove(event)
-            msg = 'Removed "%s" from favourites' % event.title
+            msg = 'Removed "%s" from favourites' % event.display_title
         else:
             current_user.calendar_favourites.append(event)
-            msg = 'Added "%s" to favourites' % event.title
+            msg = 'Added "%s" to favourites' % event.display_title
         db.session.commit()
         flash(msg)
         return redirect(url_for('.line_up_external', event_id=event.id, slug=event.slug))

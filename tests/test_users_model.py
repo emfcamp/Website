@@ -1,18 +1,20 @@
 from models.user import User
 from models.user import (
-    generate_login_code, verify_login_code, generate_sso_code,
-    generate_checkin_code, verify_checkin_code
+    generate_login_code, verify_login_code,
+    generate_api_token,
+    generate_sso_code,
+    generate_checkin_code, verify_checkin_code,
 )
 
 
 def test_generate_login_code():
-    expect = b'84400-1-Tqf88675CWYb2sge67b9'
+    expected = '84400-1-Tqf88675CWYb2sge67b9'
     result = generate_login_code('abc', 84400, 1)
-    assert expect == result
+    assert expected == result
 
-    # Check that this will work with strings or bytes
-    result = generate_login_code(b'abc', 84400, b'1')
-    assert expect == result
+    # Check that this will work with a key made of bytes
+    result = generate_login_code(b'abc', 84400, 1)
+    assert expected == result
 
 def test_verify_login_code():
     uid = 1
@@ -24,7 +26,7 @@ def test_verify_login_code():
     good_result = verify_login_code('abc', good_time, code)
     assert good_result == uid
 
-    malformed_code_result = verify_login_code('abc', good_time, b'84400-1')
+    malformed_code_result = verify_login_code('abc', good_time, '84400-1')
     assert malformed_code_result is None
 
     # Timeout is currently 6 hours
@@ -35,25 +37,30 @@ def test_verify_login_code():
     assert bad_code_result is None
 
 def test_generate_sso_code():
-    expect = b'84400-1-NB7m7JbQQB4NxKUzFgsv'
+    expected = '84400-1-NB7m7JbQQB4NxKUzFgsv'
     result = generate_sso_code(b'abc', 84400, 1)
-    assert expect == result
+    assert expected == result
+
+def test_api_token():
+    expected = '1-LEvbdun5bP1yuOK9L_8K'
+    result = generate_api_token('abc', 1)
+    assert expected == result
 
 def test_generate_checkin_code():
-    expect = b'AQABZTmTZ7TfdSeh'
+    expected = 'AQABZTmTZ7TfdSeh'
     result = generate_checkin_code('abc', 1)
-    assert expect == result
+    assert expected == result
 
 def test_verify_checkin_code():
     uid = 1
     key = 'abc'
 
-    bad_version_code = generate_checkin_code(key, uid, version=255).decode('utf-8')
+    bad_version_code = generate_checkin_code(key, uid, version=255)
     bad_version_result = verify_checkin_code(key, bad_version_code)
 
     assert bad_version_result is None
 
-    good_code = generate_checkin_code(key, uid).decode('utf-8')
+    good_code = generate_checkin_code(key, uid)
     good_result = verify_checkin_code(key, good_code)
     assert uid == good_result
 

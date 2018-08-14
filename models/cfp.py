@@ -222,6 +222,7 @@ class Proposal(db.Model):
                        'attendees', 'cost', 'size', 'funds',
                        'age_range', 'participant_equipment']
 
+        # FIXME: include published_title
         proposals = cls.query.with_entities(
             cls.id, cls.title, cls.description,
             cls.favourite_count,  # don't care about performance here
@@ -412,9 +413,9 @@ class Proposal(db.Model):
 
     @property
     def slug(self):
-        slug = slugify_unicode(self.title).lower()
+        slug = slugify_unicode(self.display_title).lower()
         if len(slug) > 60:
-            words = re.split(' +|[,.;:!?]+', self.title)
+            words = re.split(' +|[,.;:!?]+', self.display_title)
             break_words = ['and', 'which', 'with', 'without', 'for', '-', '']
 
             for i, word in reversed(list(enumerate(words))):
@@ -444,6 +445,11 @@ class Proposal(db.Model):
         if latlon:
             return 'https://map.emfcamp.org/?lat=%s&lon=%s&title=%s#19/%s/%s' % (latlon[0], latlon[1], self.scheduled_venue.name, latlon[0], latlon[1])
         return None
+
+    @property
+    def display_title(self):
+        return self.published_title or self.title
+
 
 class PerformanceProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'performance'}

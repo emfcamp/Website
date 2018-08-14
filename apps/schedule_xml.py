@@ -3,7 +3,6 @@ from datetime import time, datetime, timedelta
 import pytz
 
 from lxml import etree
-from slugify import slugify_unicode
 
 from main import external_url
 from models.site_state import event_start, event_end
@@ -66,7 +65,7 @@ def add_room(day, name):
     return etree.SubElement(day, 'room', name=name)
 
 def add_event(room, event):
-    url = external_url('schedule.line_up_proposal', proposal_id=event['id'], slug=None)
+    url = external_url('schedule.line_up_proposal', proposal_id=event['id'], slug=event['slug'])
 
     event_node = etree.SubElement(room, 'event', id=str(event['id']),
                                                  guid=str(uuid5(NAMESPACE_URL, url)))
@@ -85,7 +84,7 @@ def add_event(room, event):
     _add_sub_with_text(event_node, 'abstract', event['description'])
     _add_sub_with_text(event_node, 'description', event['description'])
 
-    _add_sub_with_text(event_node, 'slug', 'emf%s-%s-%s' % (event_start().year, event['id'], slugify_unicode(event['title']).lower()))
+    _add_sub_with_text(event_node, 'slug', 'emf%s-%s-%s' % (event_start().year, event['id'], event['slug']))
 
     _add_sub_with_text(event_node, 'subtitle', '')
     _add_sub_with_text(event_node, 'track', '')

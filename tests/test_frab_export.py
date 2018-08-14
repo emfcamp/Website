@@ -45,6 +45,7 @@ def test_simple_event(frab_schema, request_context):
 
     event = {
         'id': 1,
+        'slug': 'the-foo-bar',
         'title': 'The foo bar',
         'description': 'The foo bar',
         'speaker': 'Someone',
@@ -62,6 +63,7 @@ def test_simple_event(frab_schema, request_context):
 def test_export_frab(frab_schema, request_context):
     events = [{
         'id': 1,
+        'slug': 'the-foo-bar',
         'title': 'The foo bar',
         'venue': 'here',
         'description': 'The foo bar',
@@ -71,6 +73,7 @@ def test_export_frab(frab_schema, request_context):
         'start_date': datetime(2016, 8, 5, 10, 30),
     }, {
         'id': 2,
+        'slug': 'the-foo-bartt',
         'title': 'The foo bartt',
         'venue': 'There',
         'description': 'The foo bar',
@@ -80,6 +83,7 @@ def test_export_frab(frab_schema, request_context):
         'start_date': datetime(2016, 8, 5, 10, 30),
     }, {
         'id': 3,
+        'slug': 'the-foo-bartt2',
         'title': 'The foo bartt2',
         'venue': 'here',
         'type': 'workshop',

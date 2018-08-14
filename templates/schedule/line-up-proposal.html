@@ -1,30 +1,37 @@
 {% extends "base.html" %}
-{% block title %}{{ proposal.title }}{% endblock %}
+{% block title %}{{ proposal.display_title }}{% endblock %}
 {% block body %}
 
-<h1>{{ proposal.title }}</h1>
+<h1>{{ proposal.display_title }}</h1>
 <h2><small>{{ proposal.human_type | title }} by {{ proposal.published_names or proposal.user.name }}</small></h2>
 
 {% if proposal.scheduled_time and venue_name %}
-<p><strong>{{ proposal.scheduled_time.strftime('%A from %-I:%M %p') }}</strong> - <strong>{{ proposal.end_date.strftime('%-I:%M %p') }}</strong> in <strong><a href="{{ proposal.map_link }}" target="_blank">{{ venue_name }}</a></strong>
+<p><strong>{{ proposal.scheduled_time.strftime('%A from %-I:%M %p') }}</strong> - <strong>{{ proposal.end_date.strftime('%-I:%M %p') }}</strong>
+   {% if config['SCHEDULE'] %}
+   in <strong><a href="{{ proposal.map_link }}" target="_blank">{{ venue_name }}</a></strong>
+   {% else %}
+   in <strong>{{ venue_name }}</strong>
+   {% endif %}
+</p>
 {% endif %}
 
-{% if proposal.type == 'workshop' and proposal.cost != '' %}
-  <p>Attendance of this workshop will cost: <strong>{{ proposal.cost }}</strong></p>
+{% if proposal.type == 'workshop' and (proposal.published_cost or proposal.cost) %}
+  <p>Attendance of this workshop will cost: <strong>{{ proposal.published_cost or proposal.cost }}</strong></p>
 {% endif %}
 
-<p class="multiline">{{ proposal.description | urlize }}</p>
+<div class="well">
+<p class="multiline">{{ (proposal.published_description or proposal.description) | urlize }}</p>
 <hr>
 {% if current_user.is_authenticated %}
   <form method="POST">
   <input id="csrf_token" name=_csrf_token type=hidden value="{{ csrf_token() }}">
-  <button type="submit" class="btn btn-primary">
+  <button type="submit" class="btn btn-primary {% if is_fave %}active{% endif %}">
     {%- if is_fave -%}
       <i class="glyphicon glyphicon-star"></i>
     {%- else -%}
       <i class="glyphicon glyphicon-star-empty"></i>
     {%- endif -%}
-    Favourite
+    &nbsp;Favourite
   </button>
   </form>
 {% else %}
@@ -32,13 +39,16 @@
     <a href="{{ url_for('users.login', next=url_for('.line_up_proposal', proposal_id=proposal.id)) }}">login</a>.
   </p>
 {% endif %}
-<ul class='list-inline text-muted'>
+</div>
+
+<h4>Schedule</h4>
+<ul class='nav nav-pills'>
   <li>
-    <p><a type="btn btn-primary" href="{{ url_for('.line_up') }}">Line-up</a></p>
+    <a href="{{ url_for('.line_up') }}">Line-up</a>
   </li>
   {% if current_user.is_authenticated %}
     <li>
-      <a type="btn btn-primary" href="{{ url_for('.favourites') }}">Favourites</a>
+      <a href="{{ url_for('.favourites') }}">Favourites</a>
     </li>
   {% endif %}
 </ul>
