@@ -30,6 +30,7 @@ event_tz = pytz.timezone('Europe/London')
 def _get_proposal_dict(proposal, favourites_ids):
     res = {
         'id': proposal.id,
+        'slug': proposal.slug,
         'start_date': event_tz.localize(proposal.scheduled_time),
         'end_date': event_tz.localize(proposal.end_date),
         'venue': proposal.scheduled_venue.name,
