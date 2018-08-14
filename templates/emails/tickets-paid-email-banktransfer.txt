@@ -8,7 +8,7 @@ you as payment for {% if payment.purchases | count > 1 %}{{ payment.purchases | 
 {% else %}
 You can view your tickets and download the invoice here:
 
-  {{ url_for('users.account') }}
+  {{ url_for('users.account', _external=True) }}
 
 We'll send e-tickets nearer the event.
 {% endif %}
