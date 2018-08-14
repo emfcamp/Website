@@ -198,6 +198,21 @@ def create_app(dev_server=False):
     def handle_500(e):
         return render_template('errors/500.html'), 500
 
+    @app.shell_context_processor
+    def shell_imports():
+        ctx = {}
+
+        # Import models and constants
+        import models
+        for attr in dir(models):
+            if attr[0].isupper():
+                ctx[attr] = getattr(models, attr)
+
+        # And just for convenience
+        ctx['db'] = db
+
+        return ctx
+
     from apps.common import load_utility_functions
     load_utility_functions(app)
 
