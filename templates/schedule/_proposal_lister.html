@@ -1,14 +1,31 @@
 {% macro list_proposals(proposals) %}
+<style type="text/css">
+</style>
     {% for human_type, human_type_proposals in proposals | groupby('human_type') %}
-        <h2>{{ human_type | title }}</h2>
-        <ul>
-          {% for prop in human_type_proposals %}
-            <li>
-                <a href="{{ url_for('.line_up_proposal', proposal_id=prop.id, slug=prop.slug) }}">
-                    {{ prop.display_title }} &mdash; <em>{{ prop.published_names or prop.user.name }}</em>
-                </a>
-            </li>
-          {% endfor %}
-        </ul>
+        <h2 class="proposal-type">{{ human_type | title }}</h2>
+        <div>
+            {% for prop in human_type_proposals %}
+            <a href="{{ url_for('.line_up_proposal', proposal_id=prop.id, slug=prop.slug) }}" class="proposal">
+            <div class="row">
+                <div class="col-xs-10">
+                    <div>
+                        <b>{{ prop.published_names or prop.user.name }}</b>
+                    </div>
+                    <div>
+                        {{ prop.display_title }}
+                    </div>
+                </div>
+                {% if current_user.is_authenticated %}
+                <div class="col-xs-2">
+                    <button class="btn btn-primary btn-transparent btn-hoverlabel favourite-button">
+                        <span class="glyphicon glyphicon-heart-empty favourite-icon" aria-hidden="true"></span>
+                        <span class="hoverlabel">Favourite</span>
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+            </a>
+            {% endfor %}
+        </div>
     {% endfor %}
 {% endmacro %}

@@ -1,0 +1,65 @@
+.line-up {
+  .btn-transparent {
+    background: transparent;
+    border-color: transparent;
+  }
+  .btn-hoverlabel .hoverlabel {
+    visibility: hidden;
+    display: block;
+  }
+  .btn-hoverlabel:hover .hoverlabel,
+  .btn-hoverlabel:focus .hoverlabel,
+  .btn-hoverlabel:active .hoverlabel {
+    visibility: visible;
+  }
+  .proposal {
+    text-decoration: none;
+  }
+  .proposal > div {
+    padding: 10px 4px;
+    border-bottom: 1px solid rgba(100, 100, 100, 0.4);
+    padding-top: 14px;
+  }
+  .proposal:first-child > div {
+    border-top: 1px solid rgba(100, 100, 100, 0.4);
+  }
+  .proposal:hover,
+  .proposal:focus,
+  .proposal:active,
+  .proposal:hover div,
+  .proposal:focus div,
+  .proposal:active div {
+    background-color: #33071c;
+    color: inherit;
+  }
+  h2.proposal-type {
+    padding-top: 40px;
+  }
+  .favourite-icon {
+    color: grey;
+  }
+}
+.favourite-icon {
+  font-size: 20px;
+  vertical-align: -4px;
+  padding-right: 2px;
+}
+.favourite-button:hover,
+.favourite-button:focus,
+.favourite-button:active {
+  color: rgba(255, 255, 255, 0.8);
+}
+.favourite-button:hover .favourite-icon,
+.favourite-button:focus .favourite-icon,
+.favourite-button:active .favourite-icon {
+  color: rgba(255, 255, 255, 0.7);
+}
+.favourite-button {
+  margin-right: -8px;
+  padding-left: 8px;
+  padding-right: 8px;
+  margin-top: -4px;
+  margin-bottom: 0px;
+  float: right;
+}
+

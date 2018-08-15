@@ -1,5 +1,5 @@
-{% from "schedule/_proposal_lister.html" import list_proposals %}
-{% from "schedule/_external_lister.html" import list_externals %}
+{% from "schedule/_proposal_lister.html" import list_proposals with context %}
+{% from "schedule/_external_lister.html" import list_externals with context %}
 {% extends "base.html" %}
 {% block title %}Favourites{% endblock %}
 {% block body %}
@@ -12,8 +12,12 @@
    {% endif %}
 </p>
 
+<div class="line-up">
 {{ list_proposals(proposals) }}
+</div>
+<div class="line-up">
 {{ list_externals(externals) }}
+</div>
 
 {% if proposals | count == 0 and externals | count == 0 %}
     <p>

@@ -27,9 +27,9 @@
   <input id="csrf_token" name=_csrf_token type=hidden value="{{ csrf_token() }}">
   <button type="submit" class="btn btn-primary {% if is_fave %}active{% endif %}">
     {%- if is_fave -%}
-      <i class="glyphicon glyphicon-star"></i>
+      <i class="glyphicon glyphicon-heart favourite-icon"></i>
     {%- else -%}
-      <i class="glyphicon glyphicon-star-empty"></i>
+      <i class="glyphicon glyphicon-heart-empty favourite-icon"></i>
     {%- endif -%}
     &nbsp;Favourite
   </button>
