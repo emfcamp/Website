@@ -39,7 +39,7 @@
     color: rgba(255, 255, 255, 0.4);
   }
   .favourite-icon.glyphicon-heart {
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 60, 80, 0.8);
   }
 }
 .favourite-icon {
@@ -56,6 +56,11 @@
 .favourite-button:focus .favourite-icon,
 .favourite-button:active .favourite-icon {
   color: rgba(255, 255, 255, 0.7);
+}
+.favourite-button:hover .favourite-icon.glyphicon-heart,
+.favourite-button:focus .favourite-icon.glyphicon-heart,
+.favourite-button:active .favourite-icon.glyphicon-heart {
+  color: rgba(255, 100, 120, 0.7);
 }
 .favourite-button {
   margin-right: -8px;
