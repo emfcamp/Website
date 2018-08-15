@@ -345,15 +345,26 @@ def pay(flow=None):
 
     basket = Basket.from_session(current_user, get_user_currency())
     if not any(basket.values()):
-        app.logger.info("Basket is empty (cookies not saved?), redirecting back to choose tickets")
         empty_baskets.inc()
-        if view.type == 'tickets':
-            flash("Please select at least one ticket to buy.")
-        elif view.type == 'hire':
-            flash("Please select at least one item to hire.")
+
+        if current_user.is_authenticated:
+            basket.load_purchases_from_db()
+
+        if any(basket.values()):
+            # We've lost the user's state, but we can still show them all
+            # tickets they've reserved and let them empty their basket.
+            flash("Your browser doesn't seem to be storing cookies. This may break some parts of the site.")
+            app.logger.warn("Basket is empty, so showing reserved tickets (%s)", request.headers.get('User-Agent'))
+
         else:
-            flash("Please select at least one item to buy.")
-        return redirect(url_for('tickets.main', flow=flow))
+            app.logger.info("Basket is empty, redirecting back to choose tickets")
+            if view.type == 'tickets':
+                flash("Please select at least one ticket to buy.")
+            elif view.type == 'hire':
+                flash("Please select at least one item to hire.")
+            else:
+                flash("Please select at least one item to buy.")
+            return redirect(url_for('tickets.main', flow=flow))
 
     if form.validate_on_submit():
         if Decimal(form.basket_total.data) != Decimal(basket.total):
