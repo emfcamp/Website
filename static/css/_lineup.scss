@@ -36,7 +36,10 @@
     padding-top: 40px;
   }
   .favourite-icon {
-    color: grey;
+    color: rgba(255, 255, 255, 0.4);
+  }
+  .favourite-icon.glyphicon-heart {
+    color: rgba(255, 255, 255, 0.8);
   }
 }
 .favourite-icon {

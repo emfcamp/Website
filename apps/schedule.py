@@ -278,9 +278,20 @@ def favourites_ical():
 def line_up_redirect():
     return redirect(url_for('.line_up'))
 
-@schedule.route('/line-up/2018')
+@schedule.route('/line-up/2018', methods=['GET', 'POST'])
 @feature_flag('LINEUP')
 def line_up():
+    if (request.method == 'POST') and current_user.is_authenticated:
+        proposal_id = int(request.form['fave'])
+        proposal = Proposal.query.get_or_404(proposal_id)
+        if proposal in current_user.favourites:
+            current_user.favourites.remove(proposal)
+        else:
+            current_user.favourites.append(proposal)
+
+        db.session.commit()
+        return redirect(url_for('.line_up') + '#proposal-{}'.format(proposal.id))
+
     proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
         filter(Proposal.state.in_(['accepted', 'finished'])).\
         filter(Proposal.type.in_(['talk', 'workshop', 'youthworkshop'])).all()
