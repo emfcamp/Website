@@ -35,6 +35,7 @@ class RefundRequestForm(Form):
     bank = StringField("Sort Code", [required_for('GBP')])
     account = StringField("Account Number", [required_for('GBP')])
     iban = StringField("IBAN", [required_for('EUR')])
+    note = StringField("Note")
     submit = SubmitField("Request refund")
     really_submit = SubmitField("These details are correct")
 
@@ -89,7 +90,9 @@ def payment_refund_request(payment_id, currency='GBP'):
             elif currency == 'EUR':
                 account = form.iban.data
 
-            req = RefundRequest(payment, currency, form.bank.data, account)
+            req = RefundRequest(payment=payment, currency=currency,
+                                bank=form.bank.data, account=account,
+                                note=form.note.data)
             db.session.add(req)
             payment.state = 'refund-requested'
 

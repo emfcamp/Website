@@ -465,11 +465,6 @@ class RefundRequest(db.Model):
     currency = db.Column(db.String, nullable=False)
     bank = db.Column(db.String)
     account = db.Column(db.String, nullable=False)
-
-    def __init__(self, payment, currency, bank, account):
-        self.payment = payment
-        self.currency = currency
-        self.bank = bank
-        self.account = account
+    note = db.Column(db.String)
 
 
