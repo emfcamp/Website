@@ -25,8 +25,8 @@
     </tr>
 {% for u in users %}
 <tr class="{{ loop.cycle('odd', 'even') }}">
-    <td><a href="{{ url_for('.user', user_id=u.id) }}">{{ u.name }}</a></td>
-    <td>{{ u.email }}</td>
+    <td>{{ u.name }}</td>
+    <td><a href="{{ url_for('.user', user_id=u.id) }}">{{ u.email }}</a></td>
     <td>{% for permission in u.permissions %}{{ permission.name }}&nbsp;{% endfor %}</td>
 </tr>
 {% endfor %}
