@@ -1,4 +1,4 @@
-"""
+"""Add promo_opt_in to User
 
 Revision ID: a8b7f5ca396f
 Revises: ce7241afadc2

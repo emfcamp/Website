@@ -47,9 +47,16 @@ naming_convention = {
 }
 db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
 
+def include_object(object, name, type_, reflected, compare_to):
+    if (type_, name, reflected) == ('table', 'spatial_ref_sys', True):
+        return False
+
+    return True
+
+
 cache = Cache()
 csrf = CsrfProtect()
-migrate = Migrate()
+migrate = Migrate(include_object=include_object)
 manager = VersioningManager(options={'strategy': 'subquery'})
 make_versioned(manager=manager, plugins=[FlaskPlugin()])
 mail = Mail()

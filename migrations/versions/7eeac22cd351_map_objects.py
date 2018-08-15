@@ -1,4 +1,4 @@
-"""
+"""Add map object (currently for villages)
 
 Revision ID: 7eeac22cd351
 Revises: 72fd33e56ab9
