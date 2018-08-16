@@ -5,6 +5,7 @@ $(function() {
         var proposal_id = $(this).attr('value');
         fetch('/api/proposal/' + proposal_id + '/favourite', {
             method: 'PUT',
+            credentials: 'include',
             headers: {
               'Content-Type': 'application/json; charset=utf-8',
             },
