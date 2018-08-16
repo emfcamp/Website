@@ -7,3 +7,4 @@ api = Api(api_bp, decorators=[csrf.exempt])
 
 from . import user  # noqa
 from . import map  # noqa
+from . import schedule  # noqa

@@ -97,7 +97,7 @@ assets.register('css_arrivals', Bundle('css/arrivals.scss',
                 output='gen/arrivals-packed.css',
                 depends='css/*.scss',
                 filters=pyscss))
-assets.register('js_main', Bundle('js/main.js',
+assets.register('js_main', Bundle('js/main.js', 'js/line-up.js',
                 output='gen/main-packed.js', filters='jsmin'))
 assets.register('js_schedule', Bundle('js/schedule.js',
                 output='gen/schedule-packed.js', filters='jsmin'))
