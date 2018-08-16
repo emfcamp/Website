@@ -24,7 +24,7 @@
     </td>
     <td class="col-sm-8">
         <p class="multiline">{{ msg.message | urlize }}</p>
-        <p class="pull-right"><small>Sent: {{ msg.created.strftime('%y-%m-%d %H:%M') }}</small></p>
+        <p class="pull-right"><small>Sent: {{ msg.created.strftime('%Y-%m-%d %H:%M') }}</small></p>
     </td>
     <td class="col-sm-2">{% if not msg.is_user_recipient(current_user) %}
         &lt; {{ msg.from_user.name }}
