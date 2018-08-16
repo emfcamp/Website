@@ -12,6 +12,9 @@
                 <div class="col-xs-10">
                     <div>
                         <b>{{ prop.published_names or prop.user.name }}</b>
+                        {% if not prop.may_record %}
+                          (will not be recorded)
+                        {% endif %}
                     </div>
                     <div>
                         {{ prop.display_title }}
