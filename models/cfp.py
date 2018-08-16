@@ -450,6 +450,12 @@ class Proposal(db.Model):
     def display_title(self):
         return self.published_title or self.title
 
+    @property
+    def display_cost(self):
+        if self.published_cost is not None:
+            return self.published_cost
+        return self.cost
+
 
 class PerformanceProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'performance'}

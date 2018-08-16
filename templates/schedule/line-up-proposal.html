@@ -15,8 +15,8 @@
 </p>
 {% endif %}
 
-{% if proposal.type == 'workshop' and (proposal.published_cost or proposal.cost) %}
-  <p>Attendance of this workshop will cost: <strong>{{ proposal.published_cost or proposal.cost }}</strong></p>
+{% if proposal.type == 'workshop' and proposal.display_cost and proposal.display_cost != '0' %}
+  <p>Attendance of this workshop will cost: <strong>{{ proposal.display_cost }}</strong></p>
 {% endif %}
 
 <div class="well">
