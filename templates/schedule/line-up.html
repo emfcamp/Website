@@ -6,21 +6,26 @@
 {% block body %}
 
 <h1>Line-up</h1>
-<div class="well">
+<div>
 {% if SITE_STATE == 'after-event' %}
-<p>This is a list of all the talks &amp; workshops that were at Electromagnetic Field in {{ event_year }}.</p>
-<p>You can find videos of talks on the <a href="https://media.ccc.de/c/emf16">CCC website</a> or <a href="https://www.youtube.com/ElectromagneticField">our YouTube channel</a>.
+  <p>This is a list of all the talks &amp; workshops that were at Electromagnetic Field in {{ event_year }}.</p>
+  <p>You can find videos of talks on the <a href="https://media.ccc.de/c/emf16">CCC website</a> or <a href="https://www.youtube.com/ElectromagneticField">our YouTube channel</a>.
 {% else %}
-<p>This is a list of all the talks &amp; workshops that (should) be at Electromagnetic Field in {{ event_year }}.
-   Not all stages and time-periods are announced yet, so check back frequently.</p>
-{% if config['SCHEDULE'] %}
-<p>You can also get this list as an <a href="{{ url_for('.schedule_ical') }}">iCal feed</a>
-   for your calendar, and a <a href="{{ url_for('.schedule_json') }}">json feed</a> for your giant robot.
-</p>
-{% endif %}
-{% endif %}
-{% if current_user.is_authenticated %}
-<div><strong><a type="btn btn-primary" href="{{ url_for('.favourites') }}">View your favourited talks</a></strong></div>
+  <p>This is a list of the talks &amp; workshops that should be at Electromagnetic Field in {{ event_year }}.
+     Not all stages and time-periods are announced yet, so check back frequently.</p>
+  {% if current_user.is_authenticated %}
+    {% if config['SCHEDULE'] %}
+    <p><strong><a class="btn btn-lg btn-primary" href="{{ url_for('.favourites') }}">View your favourites</a></strong></p>
+    <p>You can also get this list as an <a href="{{ url_for('.schedule_ical') }}">iCal feed</a>
+       for your calendar, and a <a href="{{ url_for('.schedule_json') }}">json feed</a> for your giant robot.
+    </p>
+    {% endif %}
+  {% else %}
+  <div class="alert alert-info">
+    Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('.line_up')) }}" target="_new">log in</a> to let us know your favourite talks or workshops.
+    You'll be able to download a calendar of these for the event.
+  </div>
+  {% endif %}
 {% endif %}
 </div>
 
