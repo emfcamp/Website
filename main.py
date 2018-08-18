@@ -7,7 +7,7 @@ from flask import (
     Flask, url_for, render_template,
     request,
 )
-from flask_mail import Mail
+from flask_mail import Mail, email_dispatched
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -138,6 +138,10 @@ def create_app(dev_server=False):
     for extension in (cdn, csrf, cache, db, mail, assets, toolbar):
         extension.init_app(app)
 
+    def log_email(message, app):
+        app.logger.info("Emailing %s: %r", message.recipients, message.subject)
+
+    email_dispatched.connect(log_email)
 
     cors_origins = ['https://map.emfcamp.org', 'https://wiki.emfcamp.org']
     if app.config.get('DEBUG'):
