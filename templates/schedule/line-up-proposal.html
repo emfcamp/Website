@@ -3,7 +3,15 @@
 {% block body %}
 
 <h2>{{ proposal.display_title }}</h2>
-<h2><small>{{ proposal.human_type | title }} by {{ proposal.published_names or proposal.user.name }}</small></h2>
+<h2>
+  <small>
+  {{ proposal.human_type | title }} by {{ proposal.published_names or proposal.user.name }}
+  {% if not proposal.may_record and proposal.type == 'talk' and proposal.state == 'finished' %}
+  <span style="padding-left: 10px;" title="This talk will not be recorded">🎦 🚫 </span>
+  {% endif %}
+  </small>
+</h2>
+
 
 {% if proposal.scheduled_time and venue_name %}
 <p><strong>{{ proposal.scheduled_time.strftime('%A from %-I:%M %p') }}</strong> - <strong>{{ proposal.end_date.strftime('%-I:%M %p') }}</strong>

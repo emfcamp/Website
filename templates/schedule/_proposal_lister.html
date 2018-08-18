@@ -12,8 +12,8 @@
                 <div class="col-xs-10">
                     <div>
                         <b>{{ prop.published_names or prop.user.name }}</b>
-                        {% if prop.type == 'talk' and prop.state == 'finished' and not prop.may_record %}
-                          (will not be recorded)
+                        {% if not prop.may_record and prop.type == 'talk' and prop.state == 'finished' %}
+                        <span style="padding-left: 10px;" title="This talk will not be recorded">🎦🚫</span>
                         {% endif %}
                     </div>
                     <div>
