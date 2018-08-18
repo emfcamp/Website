@@ -1,0 +1,63 @@
+<header role="banner">
+    <h1 aria-label="Electromagnetic Field">
+        <a href="/"><div id="logo" alt="Electromagnetic Field"></div></a>
+    </h1>
+    <div id="header-text">August 31<sup>st</sup>&ndash;September 2<sup>nd</sup> 2018<br/>
+         Eastnor, UK</div>
+
+    <div id="menu-container" role="navigation" aria-label="main navigation">
+        <ul class="menu" role="menu">
+            <li role="presentation">
+                <a role="menuitem" href="{{ url_for('base.about') }}">About</a>
+            </li>
+            {% if SITE_STATE == 'sales' and SALES_STATE in ['available', 'unavailable'] %}
+                <li role="presentation">
+                    <a role="menuitem" href="{{ url_for('tickets.main') }}">Tickets</a>
+                </li>
+            {% endif %}
+            {% if feature_enabled('CFP') and not config.get('CFP_CLOSED') %}
+                <li role="presentation">
+                    <a role="menuitem" href="{{ url_for('cfp.main') }}">Call for Participation</a>
+                </li>
+            {% endif %}
+            {% if feature_enabled('LINE_UP') %}
+                <li role="presentation">
+                    <a role="menuitem" href="{{ url_for('schedule.line_up') }}">Line-up</a>
+                </li>
+            {% endif %}
+            {% if feature_enabled('SCHEDULE') %}
+                <li role="presentation">
+                    <a role="menuitem" href="{{ url_for('schedule.main') }}">Schedule</a>
+                </li>
+            {% endif %}
+            {% if SITE_STATE == 'event' %}
+                <li role="presentation">
+                    <a role="menuitem" href="https://streaming.media.ccc.de/emf{{ event_year }}/">Live streams</a>
+                </li>
+                <li role="presentation">
+                    <a role="menuitem" href="https://map.emfcamp.org" target="_blank">Map</a>
+                </li>
+            {% else %}
+                <li role="presentation">
+                    <a href="https://www.youtube.com/ElectromagneticField">Videos</a>
+                </li>
+            {% endif %}
+                <li role="presentation">
+                    <a role="menuitem" href="{{ url_for('base.sponsors') }}">Sponsors</a>
+                </li>
+            {% if basket_count %}
+                <li role="presentation">
+                    <a role="menuitem" href="{{ url_for('tickets.pay', flow="main") }}">
+                        Basket ({{ basket_count }})
+                    </a>
+                </li>
+            {% endif %}
+            {#
+                <li role="presentation">
+                    <a target="_blank" href="http://blog.emfcamp.org">Blog</a>
+                </li>
+            #}
+        </ul>
+    </div>
+    <div style="clear:both"></div>
+</header>
