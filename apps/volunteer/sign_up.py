@@ -33,7 +33,8 @@ class VolunteerSignUpForm(Form):
     volunteer_phone = StringField("Phone Number", [Required()])
     arrival = SelectField("Arrival Day", choices=ARRIVAL_CHOICES)
     departure = SelectField("Departure Day", choices=DEPARTURE_CHOICES)
-    submit = SubmitField('Save')
+    sign_up = SubmitField('Sign Up')
+    save = SubmitField('Save')
 
     def validate_volunteer_email(form, field):
         if current_user.is_anonymous and User.does_user_exist(field.data):
@@ -107,7 +108,7 @@ def account():
     if form.validate_on_submit():
         update_volunteer_from_form(volunteer, form)
         db.session.commit()
-        flash('Saved', 'info')
+        flash('Your details have been updated', 'info')
         return redirect(url_for('.account'))
 
     form.arrival.data = volunteer.planned_arrival.strftime('%Y-%m-%d')

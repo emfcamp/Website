@@ -20,7 +20,7 @@ class RoleSelectForm(Form):
 
 class RoleSignupForm(Form):
     roles = FieldList(FormField(RoleSelectForm))
-    submit = SubmitField('Sign up for these roles.')
+    submit = SubmitField('Sign up for these roles')
 
     def add_roles(self, roles):
         # Don't add roles if some have already been set (this will get called
@@ -63,7 +63,7 @@ def choose_role():
                 current_volunteer.roles.remove(r._role)
 
         db.session.commit()
-        flash("Saved", 'info')
+        flash("Your role list has been updated", 'info')
         return redirect(url_for('.choose_role'))
 
     current_roles = current_volunteer.roles.all()

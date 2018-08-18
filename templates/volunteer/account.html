@@ -7,6 +7,8 @@
     EMF Volunteer Account
 {% endblock %}
 {% block body %}
+{% include "volunteer/_newnav.html" %}
+
 <h2>Update your volunteer details</h2>
 <div class="panel panel-default">
     <div class="panel-heading">
@@ -31,7 +33,7 @@
         {{ render_field(form.volunteer_phone, horizontal=10) }}
         {{ render_field(form.arrival, horizontal=10) }}
         {{ render_field(form.departure, horizontal=10) }}
-        {{ form.submit(class_="btn btn-primary debounce pull-right") }}
+        {{ form.save(class_="btn btn-primary debounce pull-right") }}
         </div>
         </fieldset>
         <p></p>{# FIXME #}

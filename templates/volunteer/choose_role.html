@@ -1,14 +1,20 @@
-{% extends 'volunteer/base.html' %}
+{% extends 'base.html' %}
 {% from "_formhelpers.html" import render_field %}
 
 {% block title %}
     EMF Volunteer Choose Roles
 {% endblock %}
 {% block body %}
-    <h2>Which roles are you interested in?</h2>
-    <form method="post">
-        {{ form.hidden_tag() }}
+{% include "volunteer/_newnav.html" %}
 
+<h2>Which roles are you interested in?</h2>
+<form method="post">
+{{ form.hidden_tag() }}
+
+    <div class="well">
+        <p>
+            Select the roles you're interested in. You can change this at any time.
+        </p>
         <table class="table table-hover">
             {% for f in form.roles %}
                 <tr class="form-group">
@@ -27,9 +33,10 @@
                 </tr>
             {% endfor %}
         </table>
+    </div>
 
-        <div class="form-group">
-            {{ form.submit(class_="btn btn-primary debounce") }}
-        </div>
-    </form>
+    <div class="form-group">
+        {{ form.submit(class_="btn btn-primary debounce") }}
+    </div>
+</form>
 {% endblock %}
