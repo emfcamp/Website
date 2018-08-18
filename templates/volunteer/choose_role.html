@@ -20,7 +20,7 @@
                 <tr class="form-group">
                     <td class="col-sm-3">
                         {{ f.hidden_tag_without('csrf_token') }}
-                        <div class="checkbox {%- if f.signup.errors %} has-error {%- endif %}">
+                        <div class="checkbox ">
                             <label for="{{ f.signup.name }}">
                                 {{ f.signup()| safe }}
                                 <strong>{{ f._role.name }}</strong>

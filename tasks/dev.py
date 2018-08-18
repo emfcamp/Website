@@ -138,6 +138,7 @@ class MakeVolunteerData(Command):
             {"name": "Info Desk",      "mapref": "https://map.emfcamp.org/#21.49/52.0415113/-2.3776567"},
             {"name": "Volunteer Tent", "mapref": "https://map.emfcamp.org/#20.82/52.0397817/-2.3767928"},
             {"name": "Car Park",       "mapref": "https://map.emfcamp.org/#19.19/52.0389412/-2.3783488"},
+            {"name": "Arcade",         "mapref": "https://map.emfcamp.org/#19.07/52.0408966/-2.3778662"},
         ]
         role_list = [
             {"name": "Bar",              "description": "Help run the bar. Serve drinks, take payment, keep it clean.", "role_notes": "Over 18s only"},
@@ -149,8 +150,7 @@ class MakeVolunteerData(Command):
             {"name": "Green Room",       "description": "Make sure speakers get where they need to be with what they need."},
             {"name": "Car Parking",      "description": "Help park cars and get people on/off site."},
             {"name": "Info Desk",        "description": "Be a point of contact for attendees. Either helping with finding things or just getting an idea for what's on"},
-            {"name": "Set Up",           "description": "Help build the event. This involves a lot of physical labour (moving chairs, setting out fence). Large parts of the infrastructure will not be in place."},
-            {"name": "Tear Down",        "description": "Help deconstruct the event. This involves a lot of physical labour (moving chairs, removing fence). Large parts of the infrastructure will not be in place."},
+            {"name": "Arcade Steward",   "description": "Make sure the machines stay safe and the people have fun."},
         ]
 
         for v in venue_list:

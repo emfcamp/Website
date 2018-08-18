@@ -1,0 +1,13 @@
+{% extends 'volunteer/base.html' %}
+
+{% block title %}
+    Select training
+{% endblock %}
+{% block body %}
+    <h1>Which role are you training for?</h1>
+    <ul>
+    {% for r in roles %}
+        <li><a href="{{ url_for('.train_users', role_id=r.id) }}">{{ r.name }}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}

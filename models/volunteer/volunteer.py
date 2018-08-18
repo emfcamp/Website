@@ -4,7 +4,14 @@ from flask_login import UserMixin
 from main import db
 
 
-VolunteerRole = db.Table('volunteer_role_mapping', db.Model.metadata,
+# This effectively records the roles that a volunteer is interested in
+VolunteerRoleInterest = db.Table('volunteer_role_interest', db.Model.metadata,
+    db.Column('volunteer_id', db.Integer, db.ForeignKey('volunteer.id'), primary_key=True),
+    db.Column('role_id', db.Integer, db.ForeignKey('volunteer_role.id'), primary_key=True))
+
+
+# Which roles has the volunteer been trained for
+VolunteerRoleTraining = db.Table('volunteer_role_training', db.Model.metadata,
     db.Column('volunteer_id', db.Integer, db.ForeignKey('volunteer.id'), primary_key=True),
     db.Column('role_id', db.Integer, db.ForeignKey('volunteer_role.id'), primary_key=True))
 
@@ -25,14 +32,23 @@ class Volunteer(db.Model, UserMixin):
     age = db.Column(db.Integer, nullable=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-
     user = db.relationship('User', backref='volunteer')
 
-    roles = db.relationship('Role', backref='users', secondary=VolunteerRole, lazy='dynamic')
+    interested_roles = db.relationship('Role', backref='interested_volunteers', secondary=VolunteerRoleInterest, lazy='dynamic')
+    trained_roles = db.relationship('Role', backref='trained_volunteers', secondary=VolunteerRoleTraining, lazy='dynamic')
+
+
+    @classmethod
+    def get_by_id(cls, id):
+        return cls.query.get_or_404(id)
 
     @classmethod
     def get_for_user(cls, user):
         return cls.query.filter_by(user_id=user.id).first()
+
+    @classmethod
+    def get_all(cls):
+        return cls.query.order_by(Volunteer.nickname).all()
 
 
 """

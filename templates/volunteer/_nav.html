@@ -10,4 +10,8 @@
     <li>
         <a>Shift sign-up <small>(coming soon)</small></a>
     </li>
+    {% if current_user.has_permission('volunter:admin') %}
+        {{ menuitem('Training', '.select_training') }}
+        {{ menuitem('Admin', 'volunteer_admin.index') }}
+    {% endif %}
 </ul>

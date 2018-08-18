@@ -18,8 +18,13 @@ class Role(db.Model):
         return cls.query.filter_by(name=name).one_or_none()
 
     @classmethod
+    def get_by_id(cls, id):
+        return cls.query.get_or_404(id)
+
+    @classmethod
     def get_all(cls):
         return cls.query.order_by(Role.name).all()
+
 
 
 class RolePermission(db.Model):
@@ -28,12 +33,6 @@ class RolePermission(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, index=True)
-
-
-class UserRole(db.Model):
-    __tablename__ = 'volunteer_user_role'
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    role_id = db.Column(db.Integer, db.ForeignKey('volunteer_role.id'), primary_key=True)
 
 
 """

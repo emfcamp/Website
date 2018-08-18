@@ -38,7 +38,7 @@ migrate:
 
 data: db perms tickets bankaccounts importvenues
 
-dev-data: volunteershifts fakedata
+dev-data: volunteerdata volunteershifts fakedata
 
 exportdb:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py exportdb
