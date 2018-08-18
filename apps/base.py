@@ -130,7 +130,7 @@ def branding():
 
 @base.route('/about/design-elements')
 def design_elements():
-    return render_template('about/design.html')
+    return render_template('design.html')
 
 
 @base.route("/about/company")
