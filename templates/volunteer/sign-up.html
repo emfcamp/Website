@@ -29,12 +29,19 @@
     <form class="form-horizontal" method="post">
         <fieldset>
         <p></p>{# FIXME #}
+        {% if form.volunteer_email.was_duplicate %}
+        <div class="alert alert-warning">
+            This email address already exists in our system.
+            Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('.main'), email=form.volunteer_email.data) }}" target="_new">click here</a> to log in.
+        </div>
+        {% endif %}
+
         <div class="col-sm-12">
         {{ form.hidden_tag() }}
-        {{ render_field(form.name, horizontal=10) }}
-        {{ render_field(form.email, horizontal=10) }}
+        {{ render_field(form.nickname, horizontal=10) }}
+        {{ render_field(form.volunteer_email, horizontal=10) }}
         {{ render_field(form.age, horizontal=10) }}
-        {{ render_field(form.phone_number, horizontal=10) }}
+        {{ render_field(form.volunteer_phone, horizontal=10) }}
         {{ render_field(form.arrival, horizontal=10) }}
         {{ render_field(form.departure, horizontal=10) }}
         {{ form.submit(class_="btn btn-primary debounce pull-right") }}

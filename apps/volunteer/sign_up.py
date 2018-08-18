@@ -27,15 +27,15 @@ ARRIVAL_CHOICES = generate_day_options('2018-08-27', '2018-09-02')
 DEPARTURE_CHOICES = generate_day_options('2018-08-31', '2018-09-05')
 
 class VolunteerSignUpForm(Form):
-    name = StringField("Name", [Required()])
-    email = StringField("Email", [Email(), Required()])
+    nickname = StringField("Name", [Required()])
+    volunteer_email = StringField("Email", [Email(), Required()])
     age = IntegerField("Age", [Required()])
-    phone_number = StringField("Phone Number", [Required()])
+    volunteer_phone = StringField("Phone Number", [Required()])
     arrival = SelectField("Arrival Day", choices=ARRIVAL_CHOICES)
     departure = SelectField("Departure Day", choices=DEPARTURE_CHOICES)
     submit = SubmitField('Save')
 
-    def validate_email(form, field):
+    def validate_volunteer_email(form, field):
         if current_user.is_anonymous and User.does_user_exist(field.data):
             field.was_duplicate = True
             volunteer_url = url_for('.sign_up')
@@ -48,9 +48,9 @@ class VolunteerSignUpForm(Form):
 
 
 def update_volunteer_from_form(volunteer, form):
-    volunteer.nickname = form.name.data
-    volunteer.volunteer_email = form.email.data
-    volunteer.volunteer_phone = form.phone_number.data
+    volunteer.nickname = form.nickname.data
+    volunteer.volunteer_email = form.volunteer_email.data
+    volunteer.volunteer_phone = form.volunteer_phone.data
     volunteer.age = form.age.data
     volunteer.planned_arrival = form.arrival.data
     volunteer.planned_departure = form.departure.data
@@ -66,14 +66,14 @@ def sign_up():
         return redirect(url_for('.account'))
 
     if request.method != 'POST' and current_user.is_authenticated:
-        form.email.data = current_user.email
-        form.name.data = current_user.name
-        form.phone_number.data = current_user.phone
+        form.volunteer_email.data = current_user.email
+        form.nickname.data = current_user.name
+        form.volunteer_phone.data = current_user.phone
         # Can't copy age, as that's only submitted as part of the outreach questions
 
     if form.validate_on_submit():
         if current_user.is_anonymous:
-            create_current_user(form.email.data, form.name.data)
+            create_current_user(form.volunteer_email.data, form.nickname.data)
 
         new_volunteer = VolunteerUser()
         new_volunteer.user_id = current_user.id

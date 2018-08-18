@@ -25,10 +25,10 @@
         <fieldset>
         <p></p>{# FIXME #}
         <div class="col-sm-12">
-        {{ render_field(form.name, horizontal=10) }}
-        {{ render_field(form.email, horizontal=10) }}
+        {{ render_field(form.nickname, horizontal=10) }}
+        {{ render_field(form.volunteer_email, horizontal=10) }}
         {{ render_field(form.age, horizontal=10) }}
-        {{ render_field(form.phone_number, horizontal=10) }}
+        {{ render_field(form.volunteer_phone, horizontal=10) }}
         {{ render_field(form.arrival, horizontal=10) }}
         {{ render_field(form.departure, horizontal=10) }}
         {{ form.submit(class_="btn btn-primary debounce pull-right") }}
