@@ -2,7 +2,7 @@
 {% block title %}{{ proposal.display_title }}{% endblock %}
 {% block body %}
 
-<h1>{{ proposal.display_title }}</h1>
+<h2>{{ proposal.display_title }}</h2>
 <h2><small>{{ proposal.human_type | title }} by {{ proposal.published_names or proposal.user.name }}</small></h2>
 
 {% if proposal.scheduled_time and venue_name %}
