@@ -8,10 +8,11 @@ from flask import (
 )
 from flask_login import login_required
 from flask_mail import Message
-from wtforms import SubmitField, HiddenField
+from wtforms import SubmitField, HiddenField, StringField
 from sqlalchemy.orm.exc import NoResultFound
 
 from main import db, stripe, mail, csrf
+from models import RefundRequest
 from models.payment import StripePayment
 from models.site_state import event_start
 from ..common import feature_enabled, feature_flag
@@ -233,6 +234,7 @@ def stripe_waiting(payment_id):
 
 
 class StripeRefundForm(Form):
+    note = StringField("Note")
     yes = SubmitField('Request refund')
 
 @payments.route('/pay/stripe/<int:payment_id>/refund', methods=['GET', 'POST'])
@@ -247,7 +249,9 @@ def stripe_refund_start(payment_id):
     form = StripeRefundForm()
 
     if form.validate_on_submit():
-        app.logger.info('Setting Stripe payment %s to refund-requested', payment.id)
+        app.logger.info('Creating refund request for Stripe payment %s', payment.id)
+        req = RefundRequest(payment=payment, note=form.note.data)
+        db.session.add(req)
         payment.state = 'refund-requested'
 
         if not app.config.get('TICKETS_NOTICE_EMAIL'):

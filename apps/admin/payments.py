@@ -280,6 +280,7 @@ def refund(payment_id):
     form = RefundForm(request.form)
 
     if payment.provider != 'stripe':
+        # Make sure the stripe_refund submit won't count as pressed
         form.stripe_refund.data = ''
 
     if request.method != 'POST':

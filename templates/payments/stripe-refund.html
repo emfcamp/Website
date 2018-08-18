@@ -1,3 +1,4 @@
+{% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block body %}
 
@@ -5,13 +6,17 @@
 
 <h2>Refund your Stripe payment</h2>
 
-<p>You can request a full refund for your payment through Stripe. We'll let you know by email if it's approved.</p>
+<p>You can request a refund for your payment through Stripe. We'll let you know by email if it's approved.</p>
 
-<p>If you know you can't be refunded through Stripe, please
+<p>If you know your card can't be refunded through Stripe, please
 <a href="{{ url_for('payments.payment_refund_request', payment_id=payment.id) }}?no_stripe=1">click here</a> to request a manual refund.
 
 <form method="post" action="{{ url_for('.stripe_refund_start', payment_id=payment.id) }}">
 {{ form.hidden_tag() }}
+{% call render_field(form.note) %}
+If you only want some of your purchases refunded, please say here
+{% endcall %}
+
 {{ form.yes(class_="btn btn-danger debounce") }}
 <a class="btn btn-info" href="{{ url_for('users.purchases') }}">Go back to my tickets</a>
 </form>

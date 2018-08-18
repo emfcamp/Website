@@ -462,9 +462,9 @@ class StripeRefund(Refund):
 class RefundRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
-    currency = db.Column(db.String, nullable=False)
+    currency = db.Column(db.String)
     bank = db.Column(db.String)
-    account = db.Column(db.String, nullable=False)
+    account = db.Column(db.String)
     note = db.Column(db.String)
 
 
