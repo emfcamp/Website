@@ -55,9 +55,11 @@
                       </li>
                       {% endif %}
                       {% endif %}
+                      {% if not feature_enabled('VOLUNTEERS') %}
                       <li role="presentation">
                           <a role="menuitem" href="{{ url_for('base.volunteering')}}">Volunteering</a>
                       </li>
+                      {% endif %}
                       <li role="presentation">
                         <a role="menuitem" href="https://wiki.emfcamp.org/wiki/Contact">Contact</a>
                       </li>

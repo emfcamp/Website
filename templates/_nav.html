@@ -15,6 +15,11 @@
                     <a role="menuitem" href="{{ url_for('tickets.main') }}">Tickets</a>
                 </li>
             {% endif %}
+            {% if feature_enabled('VOLUNTEERS') %}
+                <li role="presentation">
+                    <a role="menuitem" href="{{ url_for('volunteer.main') }}">Volunteer</a>
+                </li>
+            {% endif %}
             {% if feature_enabled('CFP') and not feature_enabled('CFP_CLOSED') %}
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('cfp.main') }}">Call for Participation</a>
