@@ -1,25 +1,47 @@
-{% extends 'volunteer/base.html' %}
+{% extends "base.html" %}
+{% set main_class = 'volunteer-signup' %}
+
 {% from "_formhelpers.html" import render_field %}
 
 {% block title %}
     EMF Volunteer Sign-Up
 {% endblock %}
 {% block body %}
-    <h1>Sign up to volunteer at Electromagnetic Field</h1>
-    <form class="form-horizontal" method="post">
-        {{ form.hidden_tag() }}
-        {% if not current_user.is_anonymous %}
-            We've pre-filled some of your data from your existing profile.
-
-            If you would like to be contacted via a different email, or use a
-            different name feel free to update it here.
+<h1>Sign Up to Volunteer</h1>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>Thank you for helping make Electromagnetic Field {{ event_year }} run smoothly!</h4>
+        <p>
+        {% if current_user.is_authenticated %}
+        We've pre-filled some of your data from your existing profile.
+        {% else %}
+        We need a little information about you first.
         {% endif %}
-        {{ render_field(form.name) }}
-        {{ render_field(form.email) }}
-        {{ render_field(form.age) }}
-        {{ render_field(form.phone_number) }}
-        {{ render_field(form.arrival) }}
-        {{ render_field(form.departure) }}
-        {{ form.submit(class_="btn btn-primary debounce") }}
+        This information will be made available to other volunteers on
+        adjacent shifts, and volunteer managers.
+        </p>
+        <div>
+        If you would like to be contacted via a different email, or use a
+        different name, feel free to update it here.
+        </div>
+    </div>
+
+    <form class="form-horizontal" method="post">
+        <fieldset>
+        <p></p>{# FIXME #}
+        <div class="col-sm-12">
+        {{ form.hidden_tag() }}
+        {{ render_field(form.name, horizontal=10) }}
+        {{ render_field(form.email, horizontal=10) }}
+        {{ render_field(form.age, horizontal=10) }}
+        {{ render_field(form.phone_number, horizontal=10) }}
+        {{ render_field(form.arrival, horizontal=10) }}
+        {{ render_field(form.departure, horizontal=10) }}
+        {{ form.submit(class_="btn btn-primary debounce pull-right") }}
+        </div>
+        </fieldset>
+        <p></p>{# FIXME #}
+        <p></p>{# FIXME #}
     </form>
+</div>
 {% endblock %}

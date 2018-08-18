@@ -1,5 +1,6 @@
 from flask import (
-    current_app as app, render_template, redirect, url_for, flash
+    current_app as app, render_template, redirect,
+    url_for, flash, request,
 )
 from flask_login import current_user
 from wtforms import (
@@ -19,7 +20,7 @@ from ..common import create_current_user, feature_flag
 
 def generate_day_options(start, stop):
     days = period(parse(start), parse(stop)).range('days', 1)
-    return list([(d.strftime('%Y-%m-%d'), d.strftime('%a %d %b')) for d in days])
+    return list([(d.strftime('%Y-%m-%d'), d.strftime('%A %-d %B')) for d in days])
 
 ARRIVAL_CHOICES = generate_day_options('2018-08-27', '2018-09-02')
 DEPARTURE_CHOICES = generate_day_options('2018-08-31', '2018-09-05')
@@ -48,13 +49,18 @@ def sign_up():
     form = VolunteerSignUpForm()
     # On sign up give user 'volunteer' permission (+ managers etc.)
 
-    if not current_user.is_anonymous and VolunteerUser.get_for_user(current_user):
+    if current_user.is_authenticated and VolunteerUser.get_for_user(current_user):
         return redirect(url_for('.account'))
 
-    if current_user.is_anonymous and form.validate_on_submit():
-        create_current_user(form.email.data, form.name.data)
+    if request.method != 'POST' and current_user.is_authenticated:
+        form.email.data = current_user.email
+        form.name.data = current_user.name
+        form.phone_number.data = current_user.phone
 
     if form.validate_on_submit():
+        if current_user.is_anonymous:
+            create_current_user(form.email.data, form.name.data)
+
         new_volunteer = VolunteerUser()
         new_volunteer.user_id = current_user.id
         new_volunteer = update_volunteer_from_form(new_volunteer, form)
@@ -66,11 +72,6 @@ def sign_up():
         app.logger.info('Add volunteer: %s', new_volunteer)
         flash('Thank you for signing up!', 'message')
         return redirect(url_for('.choose_role'))
-
-    elif not current_user.is_anonymous:
-        form.email.data = current_user.email
-        form.name.data = current_user.name
-        form.phone_number.data = current_user.phone
 
     return render_template('volunteer/sign-up.html',
                            user=current_user,
