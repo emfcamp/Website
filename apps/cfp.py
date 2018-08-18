@@ -21,7 +21,7 @@ from models.cfp import (
     TalkProposal, WorkshopProposal, YouthWorkshopProposal, PerformanceProposal,
     InstallationProposal, Proposal, CFPMessage, LENGTH_OPTIONS, PROPOSAL_TIMESLOTS
 )
-from .common import feature_flag, create_current_user
+from .common import feature_flag, feature_enabled, create_current_user
 from .common.forms import Form, TelField
 
 import collections
@@ -120,7 +120,7 @@ def get_cfp_type_form(cfp_type):
 def main():
     ignore_closed = 'closed' in request.args
 
-    if app.config.get('CFP_CLOSED') and not ignore_closed:
+    if feature_enabled('CFP_CLOSED') and not ignore_closed:
         return render_template('cfp/closed.html')
 
     return render_template('cfp/main.html', ignore_closed=ignore_closed)

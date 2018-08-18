@@ -11,6 +11,7 @@ DB_FEATURE_FLAGS = [
     'GOCARDLESS_EURO',
     'ISSUE_TICKETS',
     'RADIO',
+    'LINE_UP',
     'SCHEDULE',
     'STRIPE',
     'TICKET_SALES',
