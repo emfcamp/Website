@@ -216,7 +216,7 @@ def schedule_ical():
     return Response(cal.to_ical(), mimetype='text/calendar')
 
 @schedule.route('/favourites.json')
-@feature_flag('LINEUP')
+@feature_flag('LINE_UP')
 def favourites_json():
     code = request.args.get('token', None)
     user = None
@@ -239,7 +239,7 @@ def favourites_json():
 
 @schedule.route('/favourites.ical')
 @schedule.route('/favourites.ics')
-@feature_flag('LINEUP')
+@feature_flag('LINE_UP')
 def favourites_ical():
     code = request.args.get('token', None)
     user = None
@@ -274,12 +274,12 @@ def favourites_ical():
     return Response(cal.to_ical(), mimetype='text/calendar')
 
 @schedule.route('/line-up')
-@feature_flag('LINEUP')
+@feature_flag('LINE_UP')
 def line_up_redirect():
     return redirect(url_for('.line_up'))
 
 @schedule.route('/line-up/2018', methods=['GET', 'POST'])
-@feature_flag('LINEUP')
+@feature_flag('LINE_UP')
 def line_up():
     if (request.method == 'POST') and current_user.is_authenticated:
         proposal_id = int(request.form['fave'])
@@ -306,7 +306,7 @@ def line_up():
 
 
 @schedule.route('/favourites')
-@feature_flag('LINEUP')
+@feature_flag('LINE_UP')
 def favourites():
     if current_user.is_anonymous:
         return redirect(url_for('users.login', next=url_for('.favourites')))
@@ -320,7 +320,7 @@ def favourites():
 
 @schedule.route('/line-up/2018/<int:proposal_id>', methods=['GET', 'POST'])
 @schedule.route('/line-up/2018/<int:proposal_id>-<slug>', methods=['GET', 'POST'])
-@feature_flag('LINEUP')
+@feature_flag('LINE_UP')
 def line_up_proposal(proposal_id, slug=None):
     proposal = Proposal.query.get_or_404(proposal_id)
     if proposal.state not in ('accepted', 'finished'):
@@ -355,7 +355,7 @@ def line_up_proposal(proposal_id, slug=None):
 @schedule.route('/line-up/2018/<int:proposal_id>.json')
 @schedule.route('/line-up/2018/<int:proposal_id>-<slug>.json')
 @json_response
-@feature_flag('LINEUP')
+@feature_flag('LINE_UP')
 def line_up_proposal_json(proposal_id, slug=None):
     proposal = Proposal.query.get_or_404(proposal_id)
     if proposal.state not in ('accepted', 'finished'):
@@ -380,7 +380,7 @@ def line_up_proposal_json(proposal_id, slug=None):
 
 @schedule.route('/line-up/2018/external/<int:event_id>', methods=['GET', 'POST'])
 @schedule.route('/line-up/2018/external/<int:event_id>-<slug>', methods=['GET', 'POST'])
-@feature_flag('LINEUP')
+@feature_flag('LINE_UP')
 def line_up_external(event_id, slug=None):
     event = CalendarEvent.query.get_or_404(event_id)
 
