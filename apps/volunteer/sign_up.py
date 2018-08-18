@@ -1,17 +1,18 @@
 from flask import (
     current_app as app, render_template, redirect,
-    url_for, flash, request,
+    url_for, flash, request, Markup, render_template_string,
 )
 from flask_login import current_user
 from wtforms import (
     StringField, IntegerField, SelectField, SubmitField
 )
-from wtforms.validators import Required, Email
+from wtforms.validators import Required, Email, ValidationError
 
 from pendulum import parse, period
 
 from main import db
-from models.volunteer.volunteer import Volunteer as VolunteerUser
+from models.volunteer import Volunteer as VolunteerUser
+from models.user import User
 
 from . import volunteer, v_user_required
 from ..common.forms import Form
@@ -33,6 +34,18 @@ class VolunteerSignUpForm(Form):
     arrival = SelectField("Arrival Day", choices=ARRIVAL_CHOICES)
     departure = SelectField("Departure Day", choices=DEPARTURE_CHOICES)
     submit = SubmitField('Save')
+
+    def validate_email(form, field):
+        if current_user.is_anonymous and User.does_user_exist(field.data):
+            field.was_duplicate = True
+            volunteer_url = url_for('.sign_up')
+
+            msg = Markup(render_template_string('''You already have an account.
+                Please <a href="{{ url }}" target="_new">click here</a> to log in.''',
+                url=url_for('users.login', next=volunteer_url, email=field.data)))
+
+            raise ValidationError(msg)
+
 
 def update_volunteer_from_form(volunteer, form):
     volunteer.nickname = form.name.data
@@ -56,6 +69,7 @@ def sign_up():
         form.email.data = current_user.email
         form.name.data = current_user.name
         form.phone_number.data = current_user.phone
+        # Can't copy age, as that's only submitted as part of the outreach questions
 
     if form.validate_on_submit():
         if current_user.is_anonymous:
@@ -88,7 +102,7 @@ def account():
     if volunteer is None:
         return redirect(url_for('.sign_up'))
 
-    form = VolunteerSignUpForm()
+    form = VolunteerSignUpForm(obj=volunteer)
 
     if form.validate_on_submit():
         update_volunteer_from_form(volunteer, form)
@@ -96,11 +110,6 @@ def account():
         flash('Saved', 'info')
         return redirect(url_for('.account'))
 
-
-    form.name.data = volunteer.nickname
-    form.email.data = volunteer.volunteer_email
-    form.phone_number.data = volunteer.volunteer_phone
-    form.age.data = volunteer.age
     form.arrival.data = volunteer.planned_arrival.strftime('%Y-%m-%d')
     form.departure.data = volunteer.planned_departure.strftime('%Y-%m-%d')
 
