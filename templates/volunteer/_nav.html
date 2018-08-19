@@ -9,6 +9,8 @@
     <li>
         <a>Shift sign-up <small>(coming soon)</small></a>
     </li>
+    {{ menuitem('Safeguarding', '.safeguarding') }}
+    {{ menuitem('Useful info', '.info') }}
 
 
     {% if current_user.has_permission('volunter:admin') %}
