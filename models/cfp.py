@@ -452,9 +452,16 @@ class Proposal(db.Model):
 
     @property
     def display_cost(self):
+        cost = self.cost
         if self.published_cost is not None:
-            return self.published_cost
-        return self.cost
+            cost = self.published_cost
+
+        # Some people put in a string, some just put in a £ amount
+        try:
+            float(cost)
+            return "£" + cost
+        except ValueError:
+            return cost
 
     @property
     def display_age_range(self):

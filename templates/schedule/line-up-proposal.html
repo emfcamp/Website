@@ -31,7 +31,7 @@
   {% if proposal.display_cost and proposal.display_cost != '0' %}
   <tr>
     <td><b>Attendance of this workshop will cost</b></td>
-    <td>£{{ proposal.display_cost }}</td>
+    <td>{{ proposal.display_cost }}</td>
   <tr>
   {% endif %}
   {% if proposal.display_age_range %}
