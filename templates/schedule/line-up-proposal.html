@@ -28,12 +28,10 @@
 
 {% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}
   <table class="table">
-  {% if proposal.display_cost and proposal.display_cost != '0' %}
   <tr>
-    <td><b>Attendance of this workshop will cost</b></td>
-    <td>{{ proposal.display_cost }}</td>
+    <td><b>Attending this workshop will cost</b></td>
+    <td>{% if proposal.display_cost %}{{ proposal.display_cost }}{% else %}Free{% end %}</td>
   <tr>
-  {% endif %}
   {% if proposal.display_age_range %}
   <tr>
     <td><b>Suitable age range</b></td>

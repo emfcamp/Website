@@ -458,8 +458,12 @@ class Proposal(db.Model):
 
         # Some people put in a string, some just put in a £ amount
         try:
-            float(cost)
-            return "£" + cost
+            floaty = float(cost)
+            # We don't want to return anything if it doesn't cost anything
+            if floaty > 0:
+                return "£" + cost
+            else
+                return None
         except ValueError:
             return cost
 
