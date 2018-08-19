@@ -506,7 +506,7 @@ def receipt(user_id=None):
     else:
         user = current_user
 
-    if not user.owned_tickets.filter_by(is_paid_for=True).all():
+    if not user.owned_purchases.filter_by(is_paid_for=True).all():
         abort(404)
 
     png = bool(request.args.get('png'))

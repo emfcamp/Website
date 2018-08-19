@@ -14,7 +14,7 @@
         <img src="{{ url_for('tickets.tickets_qrcode', checkin_code=user.checkin_code) }}">
       {% else %}
         {# Preferred format is SVG because it scales and we don't pass the checkin code back #}
-        {{ format_inline_qr(config.get('CHECKIN_BASE') + user.checkin_code.decode('utf-8')) }}
+        {{ format_inline_qr(config.get('CHECKIN_BASE') + user.checkin_code) }}
       {% endif %}
     </div>
 
@@ -28,7 +28,7 @@
     <img src="{{ url_for('tickets.tickets_barcode', checkin_code=user.checkin_code) }}">
   {% else %}
     {# Preferred format is SVG because it scales and we don't pass the checkin code back #}
-    {{ format_inline_barcode(user.checkin_code.decode('utf-8')) }}
+    {{ format_inline_barcode(user.checkin_code) }}
   {% endif %}
 </div>
 {% endmacro -%}
