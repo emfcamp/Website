@@ -1,0 +1,26 @@
+{% extends 'volunteer/base.html' %}
+
+{% block title %}
+    Train users
+{% endblock %}
+{% block body %}
+    <h1>Who have you trained?</h1>
+    <form method="post">
+        {{ form.hidden_tag() }}
+
+        {% for field in form.volunteers %}
+            {{ field.hidden_tag_without('csrf_token') }}
+            <div class="checkbox">
+                <label for="{{ field.trained.name }}">
+                    {{ field.trained()| safe }}
+                    <strong>{{ field._volunteer.nickname }}</strong>
+                </label>
+            </div>
+        {% endfor %}
+
+
+        <div class="form-group">
+            {{ form.submit(class_="btn btn-primary debounce") }}
+        </div>
+    </form>
+{% endblock %}

@@ -52,21 +52,21 @@ def choose_role():
     current_volunteer = VolunteerUser.get_for_user(current_user)
 
     if form.validate_on_submit():
-        current_role_ids = [r.id for r in current_volunteer.roles]
+        current_role_ids = [r.id for r in current_volunteer.interested_roles]
 
         for r in form.roles:
             r_id = r._role.id
             if r.signup.data and r_id not in current_role_ids:
-                current_volunteer.roles.append(r._role)
+                current_volunteer.interested_roles.append(r._role)
 
             elif not r.signup.data and r_id in current_role_ids:
-                current_volunteer.roles.remove(r._role)
+                current_volunteer.interested_roles.remove(r._role)
 
         db.session.commit()
         flash("Your role list has been updated", 'info')
         return redirect(url_for('.choose_role'))
 
-    current_roles = current_volunteer.roles.all()
+    current_roles = current_volunteer.interested_roles.all()
     if current_roles:
         role_ids = [r.id for r in current_roles]
         form.select_roles(role_ids)

@@ -5,7 +5,7 @@
     EMF Volunteer Choose Roles
 {% endblock %}
 {% block body %}
-{% include "volunteer/_newnav.html" %}
+{% include "volunteer/_nav.html" %}
 
 <h2>Which roles are you interested in?</h2>
 <form method="post">
@@ -20,7 +20,7 @@
                 <tr class="form-group">
                     <td class="col-sm-3">
                         {{ f.hidden_tag_without('csrf_token') }}
-                        <div class="checkbox {%- if f.signup.errors %} has-error {%- endif %}">
+                        <div class="checkbox ">
                             <label for="{{ f.signup.name }}">
                                 {{ f.signup()| safe }}
                                 <strong>{{ f._role.name }}</strong>

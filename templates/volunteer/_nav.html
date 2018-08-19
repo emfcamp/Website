@@ -1,13 +1,19 @@
 {% macro menuitem(text, view) %}
-<li {% if view_name == view -%} class="active" {%- endif %}>
+<li {% if view_name == view -%} class="hidden" {%- endif %}>
     <a href="{{url_for(view)}}">{{text}}</a>
 </li>
 {% endmacro %}
-
-<ul class="nav navbar-nav">
+<div class="nav nav-pills">
     {{ menuitem('Account', '.account') }}
     {{ menuitem('Roles', '.choose_role') }}
     <li>
         <a>Shift sign-up <small>(coming soon)</small></a>
     </li>
-</ul>
+
+
+    {% if current_user.has_permission('volunter:admin') %}
+        {{ menuitem('Training', '.select_training') }}
+        {{ menuitem('Admin', 'volunteer_admin.index') }}
+    {% endif %}
+</div>
+
