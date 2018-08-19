@@ -1,6 +1,7 @@
 import random
 from pendulum import parse
 from faker import Faker
+from flask import current_app as app
 from flask_script import Command
 
 from main import db
@@ -139,18 +140,32 @@ class MakeVolunteerData(Command):
             {"name": "Volunteer Tent", "mapref": "https://map.emfcamp.org/#20.82/52.0397817/-2.3767928"},
             {"name": "Car Park",       "mapref": "https://map.emfcamp.org/#19.19/52.0389412/-2.3783488"},
             {"name": "Arcade",         "mapref": "https://map.emfcamp.org/#19.07/52.0408966/-2.3778662"},
+            {"name": "Lounge",         "mapref": "https://map.emfcamp.org/#20.04/52.0408087/-2.376803"},
+            {"name": "Youth Workshop", "mapref": "https://map.emfcamp.org/#19.46/52.0420979/-2.3753702"},
+            {"name": "Logistics",      "mapref": "https://map.emfcamp.org/#20.08/52.0397111/-2.3767611"},
+
+            {"name": "N/A",            "mapref": "https://map.emfcamp.org/#16/52.0411/-2.3784"}
         ]
         role_list = [
-            {"name": "Bar",              "description": "Help run the bar. Serve drinks, take payment, keep it clean.", "role_notes": "Over 18s only"},
-            {"name": "AV",               "description": "Run the audio/visual gear for a stage. Make sure mics are working and that presentations work."},
-            {"name": "VOC",              "description": "Film the talks and make sure its available for upload"},
-            {"name": "Herald",           "description": "Introduce talks and manage speakers at stage"},
-            {"name": "Entrance Steward", "description": "Greet people, check their tickets and help them get on site."},
-            {"name": "Youth Steward",    "description": "Help support our youth workshop leaders and participants."},
-            {"name": "Green Room",       "description": "Make sure speakers get where they need to be with what they need."},
-            {"name": "Car Parking",      "description": "Help park cars and get people on/off site."},
-            {"name": "Info Desk",        "description": "Be a point of contact for attendees. Either helping with finding things or just getting an idea for what's on"},
-            {"name": "Arcade Steward",   "description": "Make sure the machines stay safe and the people have fun."},
+            # Stage stuff
+            {"name": "AV",                    "description": "Run the audio for a stage. Make sure mics are working and that presentations work."},
+            {"name": "Herald",                "description": "Introduce talks and manage speakers at stage."},
+            {"name": "VOC Camera",            "description": "Point, focus and expose the camera, then lock off shot and monitor it."},
+            {"name": "VOC Mixer",             "description": "Vision mix the output to screen and to stream."},
+
+            # "Tent" roles
+            {"name": "Car Parking",           "description": "Help park cars and get people on/off site."},
+            {"name": "Entrance Steward",      "description": "Greet people, check their tickets and help them get on site."},
+            {"name": "Green Room",            "description": "Make sure speakers get where they need to be with what they need."},
+            {"name": "Info Desk",             "description": "Be a point of contact for attendees. Either helping with finding things or just getting an idea for what's on"},
+            {"name": "Logistics",             "description": "", "role_notes": ""},
+            {"name": "Tent Steward",          "description": "Check the various tents (e.g. Arcade, Lounge, Spillout) are clean and everything's OK."},
+            {"name": "Youth Workshop Helper", "description": "Help support our youth workshop leaders and participants."},
+
+            # Needs training
+            {"name": "NOC",                   "description": "Plug/Unplug DKs", "role_notes": "Requires training & the DK Key."},
+            {"name": "Bar",                   "description": "Help run the bar. Serve drinks, take payment, keep it clean.", "role_notes": "Requires training, over 18s only."},
+            {"name": "Volunteer Manager",     "description": "Help people sign up for volunteering. Make sure they know where to go. Run admin on the volunteer system.", "role_notes": "Must be trained."},
         ]
 
         for v in venue_list:
@@ -174,40 +189,159 @@ class MakeVolunteerData(Command):
 class MakeVolunteerShifts(Command):
     def run(self):
         shift_list = {
-            "Bar": {
-                "Bar": [
-                    {"first": "2018-08-31 11:00:00", "final": "2018-09-01 01:00:00", "min": 2, "max": 5},
-                    {"first": "2018-09-01 11:00:00", "final": "2018-09-02 01:00:00", "min": 2, "max": 5},
-                    {"first": "2018-09-02 11:00:00", "final": "2018-09-03 00:00:00", "min": 2, "max": 5},
-                ]
-            },
             "AV": {
                 "Stage A": [
-                    {"first": "2018-08-31 12:00:00", "final": "2018-09-01 00:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 00:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 23:00:00", "min": 1, "max": 1},
+                    {"first": "2018-08-31 12:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
                 ],
                 "Stage B": [
-                    {"first": "2018-08-31 12:00:00", "final": "2018-09-01 00:00:00", "min": 1, "max": 1},
+                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 00:00:00", "min": 1, "max": 1},
                     {"first": "2018-09-01 10:00:00", "final": "2018-09-02 00:00:00", "min": 1, "max": 1},
                     {"first": "2018-09-02 10:00:00", "final": "2018-09-02 23:00:00", "min": 1, "max": 1},
                 ],
                 "Stage C": [
-                    {"first": "2018-08-31 12:00:00", "final": "2018-09-01 00:00:00", "min": 1, "max": 1},
+                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 00:00:00", "min": 1, "max": 1},
                     {"first": "2018-09-01 10:00:00", "final": "2018-09-02 00:00:00", "min": 1, "max": 1},
                     {"first": "2018-09-02 10:00:00", "final": "2018-09-02 23:00:00", "min": 1, "max": 1},
+                ]
+            },
+            "Herald": {
+                "Stage A": [
+                    {"first": "2018-08-31 12:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                ],
+                "Stage B": [
+                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                ],
+                "Stage C": [
+                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                ],
+            },
+            "VOC Mixer": {
+                "Stage A": [
+                    {"first": "2018-08-31 12:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                ],
+                "Stage B": [
+                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                ],
+                "Stage C": [
+                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                ]
+            },
+            "VOC Camera": {
+                "Stage A": [
+                    {"first": "2018-08-31 12:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                ],
+                "Stage B": [
+                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 00:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 00:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 23:00:00", "min": 1, "max": 1},
+                ],
+                "Stage C": [
+                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                ]
+            },
+
+            # 'Tent' roles
+            "Car Parking": {
+                "Car Park": [
+                    {"first": "2018-08-31 08:00:00", "final": "2018-09-03 12:00:00", "min": 2, "max": 4},
                 ]
             },
             "Entrance Steward": {
                 "Entrance": [
                     {"first": "2018-08-31 08:00:00", "final": "2018-09-03 12:00:00", "min": 2, "max": 4},
                 ]
-            }
+            },
+            "Green Room": {
+                "Green Room": [
+                    {"first": "2018-08-31 12:00:00", "final": "2018-09-01 00:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 00:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                ]
+            },
+            "Info Desk": {
+                "Info Desk": [
+                    {"first": "2018-08-31 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                ]
+            },
+            "Logistics": {
+                "Logistics": [
+                    {"first": "2018-08-31 08:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 08:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 08:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                ]
+            },
+            "Tent Steward": {
+                "N/A": [
+                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 19:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 19:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 19:00:00", "min": 1, "max": 1},
+                ]
+            },
+            "Youth Workshop Helper": {
+                "Youth Workshop": [
+                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 2},
+                    {"first": "2018-09-01 09:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 2},
+                    {"first": "2018-09-02 09:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 2},
+                ]
+            },
+
+            # Require training
+            "Bar": {
+                "Bar": [
+                    {"first": "2018-08-31 11:00:00", "final": "2018-09-01 02:00:00", "min": 2, "max": 5},
+                    {"first": "2018-09-01 11:00:00", "final": "2018-09-02 02:00:00", "min": 2, "max": 5},
+                    {"first": "2018-09-02 11:00:00", "final": "2018-09-03 01:00:00", "min": 2, "max": 5},
+                ],
+                "Bar 2": [
+                    {"first": "2018-08-31 20:00:00", "final": "2018-09-01 01:00:00", "min": 1, "max": 2},
+                    {"first": "2018-09-01 17:00:00", "final": "2018-09-02 01:00:00", "min": 1, "max": 2},
+                    {"first": "2018-09-02 17:00:00", "final": "2018-09-03 00:00:00", "min": 1, "max": 2},
+                ]
+            },
+            "NOC": {
+                "N/A": [
+                    {"first": "2018-08-31 08:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 2},
+                    {"first": "2018-09-02 14:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 2},
+                    {"first": "2018-09-03 08:00:00", "final": "2018-09-02 12:00:00", "min": 1, "max": 2},
+                ]
+            },
+            "Volunteer Manager": {
+                "Volunteer Tent": [
+                    {"first": "2018-08-31 11:00:00", "final": "2018-08-31 21:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 09:00:00", "final": "2018-09-01 21:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 09:00:00", "final": "2018-09-02 21:00:00", "min": 1, "max": 1},
+                ]
+            },
         }
 
 
         for shift_role in shift_list:
             role = Role.get_by_name(shift_role)
+
+            if role.shifts:
+                app.logger.info("Skipping making shifts for role: %s" % role.name)
+                continue
+
             for shift_venue in shift_list[shift_role]:
                 venue = VolunteerVenue.get_by_name(shift_venue)
 
