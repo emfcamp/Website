@@ -452,9 +452,9 @@ class Proposal(db.Model):
 
     @property
     def display_cost(self):
-        cost = self.cost
+        cost = self.cost.strip()
         if self.published_cost is not None:
-            cost = self.published_cost
+            cost = self.published_cost.strip()
 
         # Some people put in a string, some just put in a £ amount
         try:
@@ -470,14 +470,14 @@ class Proposal(db.Model):
     @property
     def display_age_range(self):
         if self.published_age_range is not None:
-            return self.published_age_range
-        return self.age_range
+            return self.published_age_range.strip()
+        return self.age_range.strip()
 
     @property
     def display_participant_equipment(self):
         if self.published_participant_equipment is not None:
-            return self.published_participant_equipment
-        return self.participant_equipment
+            return self.published_participant_equipment.strip()
+        return self.participant_equipment.strip()
 
 class PerformanceProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'performance'}
