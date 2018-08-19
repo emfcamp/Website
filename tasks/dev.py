@@ -129,20 +129,21 @@ class MakeFakeData(Command):
 class MakeVolunteerData(Command):
     def run(self):
         venue_list = [
-            {"name": "Bar",            "mapref": "https://map.emfcamp.org/#19/52.0420157/-2.3770749"},
+            {"name": "Arcade",         "mapref": "https://map.emfcamp.org/#19.07/52.0408966/-2.3778662"},
+            {"name": "Badge Tent",     "mapref": "https://map.emfcamp.org/#20.24/52.0405486/-2.3781891"},
             {"name": "Bar 2",          "mapref": "https://map.emfcamp.org/#19/52.0409755/-2.3786306"},
+            {"name": "Bar",            "mapref": "https://map.emfcamp.org/#19/52.0420157/-2.3770749"},
+            {"name": "Car Park",       "mapref": "https://map.emfcamp.org/#19.19/52.0389412/-2.3783488"},
+            {"name": "Entrance",       "mapref": "https://map.emfcamp.org/#18/52.039226/-2.378184"},
+            {"name": "Green Room",     "mapref": "https://map.emfcamp.org/#20.72/52.0414959/-2.378016"},
+            {"name": "Info Desk",      "mapref": "https://map.emfcamp.org/#21.49/52.0415113/-2.3776567"},
+            {"name": "Logistics",      "mapref": "https://map.emfcamp.org/#20.08/52.0397111/-2.3767611"},
+            {"name": "Lounge",         "mapref": "https://map.emfcamp.org/#20.04/52.0408087/-2.376803"},
             {"name": "Stage A",        "mapref": "https://map.emfcamp.org/#17/52.039601/-2.377759"},
             {"name": "Stage B",        "mapref": "https://map.emfcamp.org/#17/52.041798/-2.376412"},
             {"name": "Stage C",        "mapref": "https://map.emfcamp.org/#17/52.040482/-2.377432"},
-            {"name": "Green Room",     "mapref": "https://map.emfcamp.org/#20.72/52.0414959/-2.378016"},
-            {"name": "Entrance",       "mapref": "https://map.emfcamp.org/#18/52.039226/-2.378184"},
-            {"name": "Info Desk",      "mapref": "https://map.emfcamp.org/#21.49/52.0415113/-2.3776567"},
             {"name": "Volunteer Tent", "mapref": "https://map.emfcamp.org/#20.82/52.0397817/-2.3767928"},
-            {"name": "Car Park",       "mapref": "https://map.emfcamp.org/#19.19/52.0389412/-2.3783488"},
-            {"name": "Arcade",         "mapref": "https://map.emfcamp.org/#19.07/52.0408966/-2.3778662"},
-            {"name": "Lounge",         "mapref": "https://map.emfcamp.org/#20.04/52.0408087/-2.376803"},
             {"name": "Youth Workshop", "mapref": "https://map.emfcamp.org/#19.46/52.0420979/-2.3753702"},
-            {"name": "Logistics",      "mapref": "https://map.emfcamp.org/#20.08/52.0397111/-2.3767611"},
 
             {"name": "N/A",            "mapref": "https://map.emfcamp.org/#16/52.0411/-2.3784"}
         ]
@@ -154,6 +155,7 @@ class MakeVolunteerData(Command):
             {"name": "VOC Mixer",             "description": "Vision mix the output to screen and to stream."},
 
             # "Tent" roles
+            {"name": "Badge Helper",          "description": "Help park cars and get people on/off site."},
             {"name": "Car Parking",           "description": "Help park cars and get people on/off site."},
             {"name": "Entrance Steward",      "description": "Greet people, check their tickets and help them get on site."},
             {"name": "Green Room",            "description": "Make sure speakers get where they need to be with what they need."},
@@ -191,8 +193,8 @@ class MakeVolunteerShifts(Command):
         shift_list = {
             "AV": {
                 "Stage A": [
-                    {"first": "2018-08-31 12:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-08-31 12:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
                     {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
                 ],
                 "Stage B": [
@@ -208,42 +210,42 @@ class MakeVolunteerShifts(Command):
             },
             "Herald": {
                 "Stage A": [
-                    {"first": "2018-08-31 12:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-08-31 12:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
                     {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
                 ],
                 "Stage B": [
-                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-08-31 13:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
                     {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
                 ],
                 "Stage C": [
-                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-08-31 13:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
                     {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
                 ],
             },
             "VOC Mixer": {
                 "Stage A": [
-                    {"first": "2018-08-31 12:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-08-31 12:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
                     {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
                 ],
                 "Stage B": [
-                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-08-31 13:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
                     {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
                 ],
                 "Stage C": [
-                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-08-31 13:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
                     {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
                 ]
             },
             "VOC Camera": {
                 "Stage A": [
-                    {"first": "2018-08-31 12:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-08-31 12:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
                     {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
                 ],
                 "Stage B": [
@@ -252,16 +254,25 @@ class MakeVolunteerShifts(Command):
                     {"first": "2018-09-02 10:00:00", "final": "2018-09-02 23:00:00", "min": 1, "max": 1},
                 ],
                 "Stage C": [
-                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-08-31 13:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
                     {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
                 ]
             },
 
             # 'Tent' roles
+            "Badge Helper": {
+                "Badge Tent": [
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 16:00:00", "min": 1, "max": 2},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 16:00:00", "min": 1, "max": 2},
+                ]
+            },
             "Car Parking": {
                 "Car Park": [
-                    {"first": "2018-08-31 08:00:00", "final": "2018-09-03 12:00:00", "min": 2, "max": 4},
+                    {"first": "2018-08-31 08:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 3},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 16:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 14:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-03 08:00:00", "final": "2018-09-03 12:00:00", "min": 1, "max": 3},
                 ]
             },
             "Entrance Steward": {
@@ -278,29 +289,29 @@ class MakeVolunteerShifts(Command):
             },
             "Info Desk": {
                 "Info Desk": [
-                    {"first": "2018-08-31 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-08-31 10:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
                     {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
                 ]
             },
             "Logistics": {
                 "Logistics": [
-                    {"first": "2018-08-31 08:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-01 08:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-02 08:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-08-31 10:00:00", "final": "2018-08-31 16:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 16:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 16:00:00", "min": 1, "max": 1},
                 ]
             },
             "Tent Steward": {
                 "N/A": [
-                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 19:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 19:00:00", "min": 1, "max": 1},
+                    {"first": "2018-08-31 13:00:00", "final": "2018-08-31 19:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 19:00:00", "min": 1, "max": 1},
                     {"first": "2018-09-02 10:00:00", "final": "2018-09-02 19:00:00", "min": 1, "max": 1},
                 ]
             },
             "Youth Workshop Helper": {
                 "Youth Workshop": [
-                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 2},
-                    {"first": "2018-09-01 09:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 2},
+                    {"first": "2018-08-31 13:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 2},
+                    {"first": "2018-09-01 09:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 2},
                     {"first": "2018-09-02 09:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 2},
                 ]
             },
@@ -320,8 +331,8 @@ class MakeVolunteerShifts(Command):
             },
             "NOC": {
                 "N/A": [
-                    {"first": "2018-08-31 08:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 2},
-                    {"first": "2018-09-02 14:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 2},
+                    {"first": "2018-08-31 08:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 2},
+                    {"first": "2018-09-02 14:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 2},
                     {"first": "2018-09-03 08:00:00", "final": "2018-09-02 12:00:00", "min": 1, "max": 2},
                 ]
             },
