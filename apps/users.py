@@ -263,8 +263,8 @@ def purchases():
     if not tickets and not payments:
         return redirect(url_for('tickets.main'))
 
-    transferred_to = current_user.transfers_to
-    transferred_from = current_user.transfers_from
+    transferred_to = current_user.transfers_to.all()
+    transferred_from = current_user.transfers_from.all()
 
     show_receipt = any([t for t in tickets if t.is_paid_for is True])
 
