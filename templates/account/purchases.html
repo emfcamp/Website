@@ -7,6 +7,17 @@
 {% if tickets %}
   <h3>Your tickets</h2>
   <a id="tickets"></a>
+  {% if not config['ISSUE_TICKETS'] %}
+  <p>We'll send you a scannable ticket by email shortly before the event.
+     This will include any <a href="{{ url_for('tickets.main', flow='other') }}">parking tickets</a>, which you need to print out
+     and leave on the dashboard.
+  </p>
+  {% else %}
+  <p>You can bring your entrance ticket on a mobile device. If you're coming
+     by car, you need to print out your <a href="{{ url_for('tickets.main', flow='other') }}">parking ticket</a>
+     and leave it on the dashboard.
+  </p>
+  {% endif %}
   {% include "account/purchases/ticket-list.html" %}
   <div class="clearfix"></div>
 {% endif %}
