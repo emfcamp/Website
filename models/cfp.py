@@ -462,7 +462,7 @@ class Proposal(db.Model):
             # We don't want to return anything if it doesn't cost anything
             if floaty > 0:
                 return "£" + cost
-            else
+            else:
                 return None
         except ValueError:
             return cost
