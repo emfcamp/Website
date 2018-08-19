@@ -1,0 +1,65 @@
+{% from "admin/products/_macros.html" import coalesce %}
+{% extends "admin/base.html" %}
+{% set nav_active = 'tickets' %}
+{% block body %}
+<h2>Convert ticket</h2>
+
+<dl class="dl-horizontal">
+<dt>Name</dt><dd>{{ ticket.owner.name }}</dd>
+<dt>Email</dt><dd>{{ ticket.owner.email }}</dd>
+<dt>Product</dt><dd>{{ ticket.price_tier.parent.display_name }}</dd>
+<dt>Price Tier</dt><dd>{{ ticket.price_tier.name }}</dd>
+</dl>
+
+{% if new_tier %}
+<h4>Converting to</h4>
+<dl class="dl-horizontal">
+<dt>Group</dt><dd>{{ new_tier.parent.parent.name }}</dd>
+<dt>Product</dt><dd>{{ new_tier.parent.display_name }}</dd>
+<dt>Price Tier</dt><dd>{{ new_tier.name }}</dd>
+<dt>Sold</dt><dd>{{ coalesce(new_tier.parent.capacity_used, '0') }}</dd>
+<dt>Capacity</dt><dd>{{ coalesce(new_tier.parent.capacity_max) }}</dd>
+</dl>
+
+<form method="post">
+{{ form.hidden_tag() }}
+{{ form.convert(class_="btn btn-primary debounce") }}
+</form>
+
+{% else %}
+<h4>Choose a price tier to convert to</h4>
+
+<table class="table table-condensed" id="product_overview">
+    <thead>
+        <tr>
+            <th>Group</th>
+            <th>Product</th>
+            <th>Display Name</th>
+            <th>Price</th>
+            <th>Sold</th>
+            <th>Capacity</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for tier in convertible_tiers %}
+        <tr class="{% if tier.parent.has_expired() or tier.has_expired() %}expired{% endif %}
+                   {%- if not tier.active %}inactive{% endif -%}">
+            <td>{{tier.parent.parent.name}}</td>
+            <td>{{tier.parent.name}}</td>
+            <td>{{tier.parent.display_name}}</td>
+            <td>{{tier.get_price('GBP')|price}}&nbsp;|&nbsp;{{tier.get_price('EUR')|price}}</td>
+            <td>{{coalesce(tier.parent.capacity_used, '0')}}</td>
+            <td>{{coalesce(tier.parent.capacity_max)}}</td>
+            <td>
+                {% if tier != ticket.price_tier %}
+                <a class="btn btn-default" href="{{ url_for('.convert_ticket', ticket_id=ticket.id, price_tier_id=tier.id)}}">Convert</a>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+
+    </tbody>
+</table>
+{% endif %}
+
+{% endblock %}

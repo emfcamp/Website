@@ -23,6 +23,7 @@
   <th>Price Tier</th>
   <th>Price</th>
   <th>State</th>
+  <th></th>
 </tr></thead>
 <tbody>
 {% for purchase in payment.purchases %}
@@ -33,6 +34,9 @@
   <td><a href="{{url_for('admin.price_tier_details', tier_id=purchase.price_tier.id)}}">{{ purchase.price_tier.name }}</a></td>
   <td>{{ purchase.price_tier.get_price(payment.currency) | price }}</td>
   <td>{{ purchase.state }}</td>
+  <td>
+    <a class="btn btn-default" href="{{ url_for('.convert_ticket', ticket_id=purchase.id) }}">Convert</a>
+  </td>
 </tr>
 {% endfor %}
 </tbody>

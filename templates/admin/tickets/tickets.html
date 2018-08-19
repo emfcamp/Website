@@ -10,6 +10,7 @@
     <th>Email</th>
     <th>Product</th>
     <th>Source</th>
+    <th></th>
   </tr>
 </thead>
 <tbody>
@@ -25,6 +26,9 @@
     {% else %}
     <td></td>
     {% endif %}
+    <td>
+    <a class="btn btn-default" href="{{ url_for('.convert_ticket', ticket_id=ticket.id) }}">Convert</a>
+    </td>
   </tr>
 {% endfor %}
 </tbody>

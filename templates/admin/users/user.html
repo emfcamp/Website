@@ -66,6 +66,7 @@
         <th>Name</th>
         <th>State</th>
         <th>Checked in?</th>
+        <th></th>
     </tr>
     {% for ticket in user.owned_tickets %}
         <tr>
@@ -73,6 +74,9 @@
             <td>{{ ticket.product.display_name }}</td>
             <td>{{ ticket.state }}</td>
             <td>{% if ticket.checkin %}Yes{% else %}No{% endif %}</td>
+            <td>
+              <a class="btn btn-default" href="{{ url_for('.convert_ticket', ticket_id=ticket.id) }}">Convert</a>
+            </td>
         </tr>
     {% endfor %}
 </table>

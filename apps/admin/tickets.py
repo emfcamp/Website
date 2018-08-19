@@ -20,7 +20,8 @@ from models.purchase import (
 
 from .forms import (
     IssueTicketsInitialForm, IssueTicketsForm, IssueFreeTicketsNewUserForm,
-    ReserveTicketsForm, ReserveTicketsNewUserForm, CancelTicketForm
+    ReserveTicketsForm, ReserveTicketsNewUserForm, CancelTicketForm,
+    ConvertTicketForm,
 )
 
 from ..common import feature_enabled
@@ -132,6 +133,7 @@ def list_free_tickets():
             ~PurchaseTransfer.query.filter(PurchaseTransfer.purchase.expression).exists(),
         ).order_by(
             Purchase.owner_id,
+            Purchase.id,
         ).all()
 
     return render_template('admin/tickets/tickets-list-free.html',
@@ -155,6 +157,50 @@ def cancel_free_ticket(ticket_id):
             return redirect(url_for('admin.list_free_tickets'))
 
     return render_template('admin/tickets/ticket-cancel-free.html', ticket=ticket, form=form)
+
+
+@admin.route('/ticket/<int:ticket_id>/convert')
+@admin.route('/ticket/<int:ticket_id>/convert/<int:price_tier_id>', methods=['GET', 'POST'])
+def convert_ticket(ticket_id, price_tier_id=None):
+    ticket = Purchase.query.get_or_404(ticket_id)
+
+    new_tier = None
+    if price_tier_id is not None:
+        new_tier = PriceTier.query.get(price_tier_id)
+
+    form = ConvertTicketForm()
+    if form.validate_on_submit():
+        if form.convert.data:
+            app.logger.info('Converting ticket %s to %s (tier %s, product %s)',
+                            ticket.id, new_tier.id, new_tier.parent.name)
+
+            assert ticket.price_tier != new_tier
+
+            with db.session.no_autoflush:
+                ticket.price_tier.return_instances(1)
+                new_tier.issue_instances(1)
+
+            db.session.flush()
+            if new_tier.get_total_remaining_capacity() < 0:
+                db.session.rollback()
+                flash("Insufficient capacity to convert ticket")
+                return redirect(url_for('.convert_ticket', ticket_id=ticket.id, price_tier_id=price_tier_id))
+
+            ticket.price = new_tier.get_price(ticket.price.currency)
+            ticket.price_tier = new_tier
+            ticket.product = new_tier.parent
+
+            db.session.commit()
+            flash('Ticket converted')
+            return redirect(url_for('.convert_ticket', ticket_id=ticket.id))
+
+    convertible_tiers = (Price.query.filter_by(currency=ticket.price.currency, price_int=ticket.price.price_int)
+                              .join(PriceTier)
+                              .with_entities(PriceTier)
+                              .order_by(PriceTier.id))
+
+    return render_template('admin/tickets/ticket-convert.html', ticket=ticket,
+                           form=form, convertible_tiers=convertible_tiers, new_tier=new_tier)
 
 
 @admin.route('/tickets/reserve/<email>', methods=['GET', 'POST'])

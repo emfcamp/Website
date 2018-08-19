@@ -194,3 +194,9 @@ class IssueFreeTicketsNewUserForm(IssueTicketsForm):
 
 class CancelTicketForm(Form):
     cancel = SubmitField("Cancel ticket")
+
+
+class ConvertTicketForm(Form):
+    convert = SubmitField("Convert ticket")
+
+
