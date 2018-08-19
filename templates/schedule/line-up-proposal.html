@@ -23,12 +23,31 @@
 </p>
 {% endif %}
 
-{% if proposal.type == 'workshop' and proposal.display_cost and proposal.display_cost != '0' %}
-  <p>Attendance of this workshop will cost: <strong>{{ proposal.display_cost }}</strong></p>
-{% endif %}
-
 <div class="well">
 <p class="multiline">{{ (proposal.published_description or proposal.description) | urlize }}</p>
+
+{% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}
+  <table class="table">
+  {% if proposal.display_cost and proposal.display_cost != '0' %}
+  <tr>
+    <td><b>Attendance of this workshop will cost</b></td>
+    <td>£{{ proposal.display_cost }}</td>
+  <tr>
+  {% endif %}
+  {% if proposal.display_age_range %}
+  <tr>
+    <td><b>Suitable age range</b></td>
+    <td>{{ proposal.display_age_range }}</td>
+  <tr>
+  {% endif %}
+  {% if proposal.display_participant_equipment %}
+  <tr>
+    <td><b>Attendees should bring</b></td>
+    <td>{{ proposal.display_participant_equipment }}</td>
+  <tr>
+  {% endif %}
+  </table>
+{% endif %}
 <hr>
 {% if current_user.is_authenticated %}
   <form method="POST">

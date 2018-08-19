@@ -456,6 +456,17 @@ class Proposal(db.Model):
             return self.published_cost
         return self.cost
 
+    @property
+    def display_age_range(self):
+        if self.published_age_range is not None:
+            return self.published_age_range
+        return self.age_range
+
+    @property
+    def display_participant_equipment(self):
+        if self.published_participant_equipment is not None:
+            return self.published_participant_equipment
+        return self.participant_equipment
 
 class PerformanceProposal(Proposal):
     __mapper_args__ = {'polymorphic_identity': 'performance'}
