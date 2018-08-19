@@ -3,7 +3,7 @@ from flask import render_template, redirect, url_for, flash
 from flask_login import current_user
 
 from wtforms import SubmitField, BooleanField, FormField, FieldList
-from wtforms.validators import Required
+from wtforms.validators import InputRequired
 
 from main import db
 from models.volunteer.role import Role
@@ -15,7 +15,7 @@ from ..common.forms import Form, HiddenIntegerField
 
 
 class RoleSelectForm(Form):
-    role_id = HiddenIntegerField('Role ID', [Required()])
+    role_id = HiddenIntegerField('Role ID', [InputRequired()])
     signup = BooleanField('Role')
 
 class RoleSignupForm(Form):

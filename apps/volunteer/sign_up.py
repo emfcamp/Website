@@ -6,7 +6,9 @@ from flask_login import current_user
 from wtforms import (
     StringField, IntegerField, SelectField, SubmitField
 )
-from wtforms.validators import Required, Email, ValidationError
+from wtforms.validators import (
+    Required, InputRequired, Email, ValidationError,
+)
 
 from pendulum import parse, period
 
@@ -29,7 +31,7 @@ DEPARTURE_CHOICES = generate_day_options('2018-08-31', '2018-09-05')
 class VolunteerSignUpForm(Form):
     nickname = StringField("Name", [Required()])
     volunteer_email = StringField("Email", [Email(), Required()])
-    age = IntegerField("Age", [Required()])
+    age = IntegerField("Age", [InputRequired()])
     volunteer_phone = StringField("Phone Number", [Required()])
     arrival = SelectField("Arrival Day", choices=ARRIVAL_CHOICES)
     departure = SelectField("Departure Day", choices=DEPARTURE_CHOICES)

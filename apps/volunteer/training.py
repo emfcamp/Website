@@ -3,7 +3,7 @@
 from flask import render_template, flash, current_app as app, redirect, url_for
 
 from wtforms import SubmitField, BooleanField, FormField, FieldList
-from wtforms.validators import Required
+from wtforms.validators import InputRequired
 
 from main import db
 
@@ -15,7 +15,7 @@ from ..common.forms import Form, HiddenIntegerField
 
 
 class VolunteerSelectForm(Form):
-    volunteer_id = HiddenIntegerField('Volunteer ID', [Required()])
+    volunteer_id = HiddenIntegerField('Volunteer ID', [InputRequired()])
     trained = BooleanField('Volunteer')
 
 

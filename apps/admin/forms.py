@@ -86,7 +86,7 @@ class EditProductGroupForm(ProductGroupForm):
 
 class CopyProductGroupForm(ProductGroupForm):
     copy = SubmitField('Copy')
-    capacity_max_required = IntegerField('Maximum to sell', [Required()])
+    capacity_max_required = IntegerField('Maximum to sell', [InputRequired()])
     include_inactive = BooleanField('Include inactive price tiers')
 
 
@@ -109,7 +109,7 @@ class ModifyPriceTierForm(Form):
 
 
 class ProductViewProductForm(Form):
-    order = IntegerField('Order', [Required()])
+    order = IntegerField('Order', [InputRequired()])
     product_id = HiddenIntegerField('product_id', [InputRequired()])
     delete = SubmitField('Delete')
 

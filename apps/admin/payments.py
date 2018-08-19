@@ -11,7 +11,7 @@ from flask import (
 from flask_login import current_user
 from flask_mail import Message
 
-from wtforms.validators import Required
+from wtforms.validators import InputRequired
 from wtforms import SubmitField, BooleanField, FieldList, FormField
 
 from sqlalchemy.sql.functions import func
@@ -257,7 +257,7 @@ def manual_refund(payment_id):
 
 
 class RefundPurchaseForm(Form):
-    purchase_id = HiddenIntegerField('Purchase ID', [Required()])
+    purchase_id = HiddenIntegerField('Purchase ID', [InputRequired()])
     refund = BooleanField('Refund purchase', default=True)
 
 

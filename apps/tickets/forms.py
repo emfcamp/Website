@@ -1,6 +1,8 @@
 from flask import Markup, render_template_string, url_for
 from flask_login import current_user
-from wtforms.validators import Required, Optional, Email, ValidationError
+from wtforms.validators import (
+    Required, InputRequired, Optional, Email, ValidationError,
+)
 from wtforms import (
     SubmitField, StringField, FieldList, FormField, HiddenField, BooleanField
 )
@@ -13,7 +15,7 @@ from ..common import CURRENCY_SYMBOLS
 
 class TicketAmountForm(Form):
     amount = IntegerSelectField('Number of tickets', [Optional()])
-    tier_id = HiddenIntegerField('Price tier', [Required()])
+    tier_id = HiddenIntegerField('Price tier', [InputRequired()])
 
 
 class TicketAmountsForm(Form):
