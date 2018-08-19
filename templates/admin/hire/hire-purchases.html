@@ -7,6 +7,7 @@
   <tr>
     <th>Name</th>
     <th>Email</th>
+    <th>Villages</th>
     <th>Product</th>
     <th>State</th>
     <th>Count</th>
@@ -15,6 +16,12 @@
   <tr class="{{ purchase_state }}">
     <td>{{ user.name }}</td>
     <td><a href="{{ url_for('.user', user_id=user.id) }}">{{ user.email }}</a></td>
+    <td>
+    {% for mapobj in user.map_objects %}
+    {{ mapobj.name }}
+    {% if not loop.last %}, {% endif %}
+    {% endfor %}
+    </td>
     <td>{{ product.name }}</td>
     <td>{{ purchase_state }}</td>
     <td>{{ count }}</td>
