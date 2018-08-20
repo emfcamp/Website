@@ -137,7 +137,6 @@ class MakeVolunteerData(Command):
             {"name": "Entrance",       "mapref": "https://map.emfcamp.org/#18/52.039226/-2.378184"},
             {"name": "Green Room",     "mapref": "https://map.emfcamp.org/#20.72/52.0414959/-2.378016"},
             {"name": "Info Desk",      "mapref": "https://map.emfcamp.org/#21.49/52.0415113/-2.3776567"},
-            {"name": "Logistics",      "mapref": "https://map.emfcamp.org/#20.08/52.0397111/-2.3767611"},
             {"name": "Lounge",         "mapref": "https://map.emfcamp.org/#20.04/52.0408087/-2.376803"},
             {"name": "Stage A",        "mapref": "https://map.emfcamp.org/#17/52.039601/-2.377759"},
             {"name": "Stage B",        "mapref": "https://map.emfcamp.org/#17/52.041798/-2.376412"},
@@ -160,7 +159,6 @@ class MakeVolunteerData(Command):
             {"name": "Entrance Steward",      "description": "Greet people, check their tickets and help them get on site."},
             {"name": "Green Room",            "description": "Make sure speakers get where they need to be with what they need."},
             {"name": "Info Desk",             "description": "Be a point of contact for attendees. Either helping with finding things or just getting an idea for what's on"},
-            {"name": "Logistics",             "description": "", "role_notes": ""},
             {"name": "Tent Steward",          "description": "Check the various tents (e.g. Arcade, Lounge, Spillout) are clean and everything's OK."},
             {"name": "Youth Workshop Helper", "description": "Help support our youth workshop leaders and participants."},
 
