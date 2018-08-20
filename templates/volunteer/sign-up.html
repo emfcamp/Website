@@ -22,8 +22,12 @@
         adjacent shifts, and volunteer managers.
         </p>
         <div>
+        {% if current_user.is_authenticated %}
         If you would like to be contacted via a different email, or use a
         different name, feel free to update it here.
+        {% else %}
+        If you already have an account, please <a href="{{ url_for('users.login', next=url_for('.main'), email=form.volunteer_email.data) }}" target="_new">log in</a> first.
+        {% endif %}
         </div>
     </div>
 
