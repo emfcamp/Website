@@ -155,7 +155,7 @@ class MakeVolunteerData(Command):
             {"name": "VOC Mixer",             "description": "Vision mix the output to screen and to stream."},
 
             # "Tent" roles
-            {"name": "Badge Helper",          "description": "Help park cars and get people on/off site."},
+            {"name": "Badge Helper",          "description": "Fix, replace and troubleshoot badges and their software."},
             {"name": "Car Parking",           "description": "Help park cars and get people on/off site."},
             {"name": "Entrance Steward",      "description": "Greet people, check their tickets and help them get on site."},
             {"name": "Green Room",            "description": "Make sure speakers get where they need to be with what they need."},
