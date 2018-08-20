@@ -25,16 +25,16 @@ def generate_day_options(start, stop):
     days = period(parse(start), parse(stop)).range('days', 1)
     return list([(d.strftime('%Y-%m-%d'), d.strftime('%A %-d %B')) for d in days])
 
-ARRIVAL_CHOICES = generate_day_options('2018-08-27', '2018-09-02')
-DEPARTURE_CHOICES = generate_day_options('2018-08-31', '2018-09-05')
+ARRIVAL_CHOICES = [('2018-08-29', 'Wednesday 29 August or earlier')] + generate_day_options('2018-08-30', '2018-09-02')
+DEPARTURE_CHOICES = generate_day_options('2018-08-31', '2018-09-03') + [('2018-09-04', 'Tuesday 4 September or later')]
 
 class VolunteerSignUpForm(Form):
     nickname = StringField("Name", [Required()])
     volunteer_email = StringField("Email", [Email(), Required()])
     age = IntegerField("Age", [InputRequired()])
     volunteer_phone = StringField("Phone Number", [Required()])
-    arrival = SelectField("Arrival Day", choices=ARRIVAL_CHOICES)
-    departure = SelectField("Departure Day", choices=DEPARTURE_CHOICES)
+    arrival = SelectField("Arrival Day", choices=ARRIVAL_CHOICES, default='2018-08-31')
+    departure = SelectField("Departure Day", choices=DEPARTURE_CHOICES, default='2018-09-03')
     sign_up = SubmitField('Sign Up')
     save = SubmitField('Save')
 
