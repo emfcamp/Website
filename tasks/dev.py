@@ -156,6 +156,7 @@ class MakeVolunteerData(Command):
             # "Tent" roles
             {"name": "Badge Helper",          "description": "Fix, replace and troubleshoot badges and their software."},
             {"name": "Car Parking",           "description": "Help park cars and get people on/off site."},
+            {"name": "Catering",              "description": "Help our excellent catering team provide food for all the volunteers."},
             {"name": "Entrance Steward",      "description": "Greet people, check their tickets and help them get on site."},
             {"name": "Green Room",            "description": "Make sure speakers get where they need to be with what they need."},
             {"name": "Info Desk",             "description": "Be a point of contact for attendees. Either helping with finding things or just getting an idea for what's on"},
