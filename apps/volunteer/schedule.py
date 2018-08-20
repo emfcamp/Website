@@ -1,6 +1,6 @@
 from flask import render_template
 from wtforms import SelectMultipleField, BooleanField
-from pendulum import period
+from collections import defaultdict
 
 from ..common import feature_flag
 from ..common.forms import Form
@@ -27,21 +27,15 @@ def schedule():
     # TODO redirect if not logged in
     form = ScheduleFilterForm()
     shifts = Shift.get_all()
-    venues = sorted(set([s.venue for s in shifts]), key=lambda v: v.name)
-    # times = sorted(set([s.start for s in shifts]))
-    start = min(shifts, key=lambda s: s.start).start
-    end = max(shifts, key=lambda s: s.end).end
-    times = [t.strftime('%a %H:%M') for t in period(start, end).range('minutes', 15)]
-    all_shifts = {}
+    all_shifts = defaultdict(lambda: defaultdict(list))
 
     for s in shifts:
-        t = all_shifts.get(s.start.strftime('%a %H:%M'), {})
+        day_key = s.start.strftime('%a').lower()
+        hour_key = s.start.strftime('%H:%M')
 
-        t[s.venue_id] = s
-        all_shifts[s.start.strftime('%a %H:%M')] = t
+        all_shifts[day_key][hour_key].append(s)
 
-    return render_template('volunteer/schedule.html', form=form,
-                            venues=venues, times=times, all_shifts=all_shifts)
+    return render_template('volunteer/schedule.html', form=form, all_shifts=all_shifts)
 
 @volunteer.route('/shift/<id>')
 @feature_flag('VOLUNTEERS_SCHEDULE')

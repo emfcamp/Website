@@ -1,14 +1,31 @@
 {% extends 'volunteer/base.html' %}
 {% from "_formhelpers.html" import render_field %}
 
-{% macro shift_cell(shift) -%}
-<td>
-    {% if not shift %}
-        --
-    {% else %}
-        <a href="{{ url_for('.shift', id=shift.id) }}">Do {{ shift.venue.name }} shift</a>
-    {% endif %}
-</td>
+{% macro days_shifts(day) %}
+    <table class="table table-bordered">
+        <thead><tr>
+            <th>Starts</th>
+            <th>Ends</th>
+            <th>Venue</th>
+            <th>Role</th>
+            <th>People</th>
+        </tr></thead>
+        <tbody>
+            {% for hour in all_shifts[day] | sort %}
+                {% for shift in all_shifts[day][hour] %}
+                    <tr>
+                        {% if loop.first %}
+                            <th rowspan="{{ all_shifts[day][hour] | length }}">{{ hour }}</td>
+                        {% endif %}
+                        <td>{{ shift.end.strftime("%H:%M") }}</td>
+                        <td>{{ shift.venue.name }}</td>
+                        <td>{{ shift.role.name }}</td>
+                        <td>{{ shift.entries | length }}/{{ shift.max_needed }}</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
 {%- endmacro %}
 
 {% block title %}
@@ -23,30 +40,17 @@
     </from>
 
     {# FIXME these tabs should work either via pure JS or server #}
-    <ul class="nav nav-tabs" role="navigation" role="menu">
-        <li role="presentation" class="active"><a href="#">Friday</a></li>
-        <li role="presentation"><a href="#">Saturday</a></li>
-        <li role="presentation"><a href="#">Sunday</a></li>
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#fri" aria-controls="fri" role="tab" data-toggle="tab">Friday</a></li>
+        <li role="presentation"><a href="#sat" aria-controls="sat" role="tab" data-toggle="tab">Saturday</a></li>
+        <li role="presentation"><a href="#sun" aria-controls="sun" role="tab" data-toggle="tab">Sunday</a></li>
+        <li role="presentation"><a href="#mon" aria-controls="mon" role="tab" data-toggle="tab">Monday</a></li>
     </ul>
     <div class="tab-content">
         {# FIXME oh gods we need another schedule viewer... #}
-        <table class="table table-bordered">
-            <thead><tr>
-                <th>Time</th>
-                {% for v in venues %}
-                    <th>{{ v.name }}</th>
-                {% endfor %}
-            </tr></thead>
-            <tbody>
-                {% for t in times %}
-                    <tr>
-                        <td>{{ t }}</td>
-                        {% for v in venues %}
-                            {{ shift_cell(all_shifts.get(t, {}).get(v.id, False)) }}
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div role="tabpanel" class="tab-pane active" id="fri">{{ days_shifts('fri') }}</div>
+        <div role="tabpanel" class="tab-pane" id="sat">{{ days_shifts('sat') }}</div>
+        <div role="tabpanel" class="tab-pane" id="sun">{{ days_shifts('sun') }}</div>
+        <div role="tabpanel" class="tab-pane" id="mon">{{ days_shifts('mon') }}</div>
     </div>
 {% endblock %}

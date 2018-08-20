@@ -189,6 +189,7 @@ class MakeVolunteerData(Command):
 
 class MakeVolunteerShifts(Command):
     def run(self):
+        # First = first start time. Final = end of last shift
         shift_list = {
             "AV": {
                 "Stage A": [
@@ -331,8 +332,8 @@ class MakeVolunteerShifts(Command):
             "NOC": {
                 "N/A": [
                     {"first": "2018-08-31 08:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 2},
-                    {"first": "2018-09-02 14:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 2},
-                    {"first": "2018-09-03 08:00:00", "final": "2018-09-02 12:00:00", "min": 1, "max": 2},
+                    {"first": "2018-09-02 14:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 2},
+                    {"first": "2018-09-03 08:00:00", "final": "2018-09-03 12:00:00", "min": 1, "max": 2},
                 ]
             },
             "Volunteer Manager": {
