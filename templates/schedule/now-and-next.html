@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if venues | length == 1 %}
+        {{ venues[0] }} -- Now &amp; Next
+    {% else %}
+        Now &amp; Next
+    {% endif %}
+{% endblock %}
+{% block body %}
+
+<h1>
+    {% if venues | length == 1 %}
+        {{ venues[0] }} -- Now &amp; Next
+    {% else %}
+        Now &amp; Next
+    {% endif %}
+</h1>
+
+<h2>Now</h2>
+{% for venue, proposals in proposals_by_venue|dictsort %}
+    {% set now=proposals[0] %}
+    <div id="now-{{ venue }}">
+        {% if venues | length != 1 -%}
+            <strong>{{ now['venue'] }}</strong>:
+        {%- endif %} {{ now['title'] }} <em>by {{ now['speaker'] }}</em>
+    </div>
+{% endfor %}
+
+<h2>Next</h2>
+{% for venue, proposals in proposals_by_venue|dictsort %}
+    {% set next=proposals[1] %}
+    <div id="next-{{ venue }}">
+        {% if venues | length != 1 -%}
+            <strong>{{ next['venue'] }}</strong>:
+        {%- endif %} {{ next['start_time'] }} {{ next['title'] }} <em>by {{ next['speaker'] }}</em>
+    </div>
+{% endfor %}
+{% endblock %}
+
+
+{% block foot %}
+    <script>
+        var now_and_next_data = {{ proposals_by_venue | tojson }};
+        // TODO clever JS things go here
+    </script>
+{% endblock %}
