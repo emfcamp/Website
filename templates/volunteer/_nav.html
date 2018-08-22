@@ -13,7 +13,7 @@
     {{ menuitem('Useful info', '.info') }}
 
 
-    {% if current_user.has_permission('volunter:admin') %}
+    {% if current_user.is_authenticated and current_user.has_permission('volunter:admin') %}
         {{ menuitem('Training', '.select_training') }}
         {{ menuitem('Admin', 'volunteer_admin.index') }}
     {% endif %}
