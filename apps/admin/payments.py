@@ -338,7 +338,7 @@ def refund(payment_id):
                 refund = BankRefund(payment, total)
 
             with db.session.no_autoflush:
-                for purchase in payment.purchases:
+                for purchase in purchases:
                     if purchase.is_paid_for:
                         purchase.price_tier.return_instances(1)
 
