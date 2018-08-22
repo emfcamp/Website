@@ -148,10 +148,10 @@ class MakeVolunteerData(Command):
         ]
         role_list = [
             # Stage stuff
-            {"name": "AV",                    "description": "Run the audio for a stage. Make sure mics are working and that presentations work."},
-            {"name": "Herald",                "description": "Introduce talks and manage speakers at stage."},
-            {"name": "VOC Camera",            "description": "Point, focus and expose the camera, then lock off shot and monitor it."},
-            {"name": "VOC Mixer",             "description": "Vision mix the output to screen and to stream."},
+            {"name": "Stage: Audio/Visual",    "description": "Run the audio for a stage. Make sure mics are working and that presentations work."},
+            {"name": "Herald",                 "description": "Introduce talks and manage speakers at stage."},
+            {"name": "Stage: Camera Operator", "description": "Point, focus and expose the camera, then lock off shot and monitor it."},
+            {"name": "Stage: Vision Mixer",    "description": "Vision mix the output to screen and to stream."},
 
             # "Tent" roles
             {"name": "Badge Helper",          "description": "Fix, replace and troubleshoot badges and their software."},
