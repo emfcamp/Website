@@ -337,9 +337,13 @@ def refund(payment_id):
                 payment.state = 'refunding'
                 refund = BankRefund(payment, total)
 
-            for purchase in purchases:
-                purchase.state = 'refunded'
-                purchase.refund = refund
+            with db.session.no_autoflush:
+                for purchase in payment.purchases:
+                    if purchase.is_paid_for:
+                        purchase.price_tier.return_instances(1)
+
+                    purchase.state = 'refunded'
+                    purchase.refund = refund
 
             priced_purchases = [p for p in payment.purchases if p.price_tier.get_price(payment.currency).value]
             unpriced_purchases = [p for p in payment.purchases if not p.price_tier.get_price(payment.currency).value]
@@ -391,7 +395,7 @@ def refund(payment_id):
             app.logger.info('Payment %s refund complete for a total of %s', payment.id, total)
             flash('Refund for %s %s complete' % (total, payment.currency))
 
-        return redirect(url_for('.payments'))
+        return redirect(url_for('.requested_refunds'))
 
     refunded_purchases = [p for p in payment.purchases if p.state == 'refunded']
     return render_template('admin/payments/refund.html', payment=payment, form=form,
