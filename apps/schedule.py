@@ -440,5 +440,10 @@ def now_and_next():
     arg_venues = request.args.getlist('venue', type=str)
     venues = [html.escape(v) for v in arg_venues]
 
-    return render_template('schedule/now-and-next.html', venues=venues,
-                                                         proposals_by_venue=proposals)
+
+    if request.args.get('fullscreen', default=False, type=bool):
+        template = 'schedule/now-and-next-fullscreen.html'
+    else:
+        template = 'schedule/now-and-next.html'
+
+    return render_template(template, venues=venues, proposals_by_venue=proposals)

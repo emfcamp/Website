@@ -36,6 +36,9 @@
         {%- endif %} {{ next['start_time'] }} {{ next['title'] }} <em>by {{ next['speaker'] }}</em>
     </div>
 {% endfor %}
+
+<div style="margin-top: 50px"><a href="{{ url_for('.now_and_next', fullscreen=True, venue=venues) }}">Fullscreen</a></div>
+
 {% endblock %}
 
 
