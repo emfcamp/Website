@@ -485,3 +485,15 @@ a.collapse-toggle:hover .glyphicon {
     content: none !important;
   }
 }
+
+input[type="checkbox"].big-checkbox {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+}
+label.big-checkbox {
+  /* Increase the target area */
+  padding: 11px 10px 10px 40px !important;
+  margin: -4px 0 -10px -40px !important;
+  vertical-align: 4px;
+}

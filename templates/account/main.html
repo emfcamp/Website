@@ -59,8 +59,8 @@
         {{ render_field(form.name, True) }}
         <div class="form-group">
           <div class="col-sm-10 col-sm-offset-2">
-            {{ form.allow_promo() }}
-            <label class="control-label" for="allow_promo">
+            {{ form.allow_promo(class_='big-checkbox') }}
+            <label class="control-label big-checkbox" for="allow_promo">
                 Send me occasional emails about future EMF events
             </label>
           </div>
