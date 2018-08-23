@@ -4,10 +4,10 @@ from flask import (
 )
 from flask_login import current_user
 from wtforms import (
-    StringField, IntegerField, SelectField, SubmitField
+    StringField, IntegerField, SelectField, SubmitField, BooleanField
 )
 from wtforms.validators import (
-    Required, InputRequired, Email, ValidationError,
+    Required, InputRequired, Email, ValidationError, Optional,
 )
 
 from pendulum import parse, period
@@ -35,6 +35,7 @@ class VolunteerSignUpForm(Form):
     volunteer_phone = StringField("Phone Number", [Required()])
     arrival = SelectField("Arrival Day", choices=ARRIVAL_CHOICES, default='2018-08-31')
     departure = SelectField("Departure Day", choices=DEPARTURE_CHOICES, default='2018-09-03')
+    allow_comms = BooleanField("May we send you messages during the event?", [Optional()])
     sign_up = SubmitField('Sign Up')
     save = SubmitField('Save')
 
@@ -57,6 +58,7 @@ def update_volunteer_from_form(volunteer, form):
     volunteer.age = form.age.data
     volunteer.planned_arrival = form.arrival.data
     volunteer.planned_departure = form.departure.data
+    volunteer.allow_comms_during_event = form.allow_comms
     return volunteer
 
 @volunteer.route('/sign-up', methods=['GET', 'POST'])

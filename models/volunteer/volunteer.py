@@ -30,6 +30,7 @@ class Volunteer(db.Model, UserMixin):
     volunteer_phone = db.Column(db.String, nullable=False)
     volunteer_email = db.Column(db.String)
     age = db.Column(db.Integer, nullable=False)
+    allow_comms_during_event = db.Column(db.Boolean, nullable=False, default=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', backref='volunteer')
