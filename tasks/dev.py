@@ -129,7 +129,6 @@ class MakeFakeData(Command):
 class MakeVolunteerData(Command):
     def run(self):
         venue_list = [
-            {"name": "Arcade",         "mapref": "https://map.emfcamp.org/#19.07/52.0408966/-2.3778662"},
             {"name": "Badge Tent",     "mapref": "https://map.emfcamp.org/#20.24/52.0405486/-2.3781891"},
             {"name": "Bar 2",          "mapref": "https://map.emfcamp.org/#19/52.0409755/-2.3786306"},
             {"name": "Bar",            "mapref": "https://map.emfcamp.org/#19/52.0420157/-2.3770749"},
@@ -137,7 +136,6 @@ class MakeVolunteerData(Command):
             {"name": "Entrance",       "mapref": "https://map.emfcamp.org/#18/52.039226/-2.378184"},
             {"name": "Green Room",     "mapref": "https://map.emfcamp.org/#20.72/52.0414959/-2.378016"},
             {"name": "Info Desk",      "mapref": "https://map.emfcamp.org/#21.49/52.0415113/-2.3776567"},
-            {"name": "Lounge",         "mapref": "https://map.emfcamp.org/#20.04/52.0408087/-2.376803"},
             {"name": "Stage A",        "mapref": "https://map.emfcamp.org/#17/52.039601/-2.377759"},
             {"name": "Stage B",        "mapref": "https://map.emfcamp.org/#17/52.041798/-2.376412"},
             {"name": "Stage C",        "mapref": "https://map.emfcamp.org/#17/52.040482/-2.377432"},
@@ -148,8 +146,8 @@ class MakeVolunteerData(Command):
         ]
         role_list = [
             # Stage stuff
-            {"name": "Stage: Audio/Visual",    "description": "Run the audio for a stage. Make sure mics are working and that presentations work."},
             {"name": "Herald",                 "description": "Introduce talks and manage speakers at stage."},
+            {"name": "Stage: Audio/Visual",    "description": "Run the audio for a stage. Make sure mics are working and that presentations work."},
             {"name": "Stage: Camera Operator", "description": "Point, focus and expose the camera, then lock off shot and monitor it."},
             {"name": "Stage: Vision Mixer",    "description": "Vision mix the output to screen and to stream."},
 
@@ -158,6 +156,7 @@ class MakeVolunteerData(Command):
             {"name": "Car Parking",           "description": "Help park cars and get people on/off site."},
             {"name": "Catering",              "description": "Help our excellent catering team provide food for all the volunteers."},
             {"name": "Entrance Steward",      "description": "Greet people, check their tickets and help them get on site."},
+            {"name": "Games Master",          "description": "Running Indie Games on the big screen in Stage A, and optionally Board Games"},
             {"name": "Green Room",            "description": "Make sure speakers get where they need to be with what they need."},
             {"name": "Info Desk",             "description": "Be a point of contact for attendees. Either helping with finding things or just getting an idea for what's on"},
             {"name": "Tent Steward",          "description": "Check the various tents (e.g. Arcade, Lounge, Spillout) are clean and everything's OK."},
@@ -191,23 +190,6 @@ class MakeVolunteerShifts(Command):
     def run(self):
         # First = first start time. Final = end of last shift
         shift_list = {
-            "AV": {
-                "Stage A": [
-                    {"first": "2018-08-31 12:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
-                ],
-                "Stage B": [
-                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 00:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 00:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 23:00:00", "min": 1, "max": 1},
-                ],
-                "Stage C": [
-                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 00:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 00:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 23:00:00", "min": 1, "max": 1},
-                ]
-            },
             "Herald": {
                 "Stage A": [
                     {"first": "2018-08-31 12:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
@@ -225,24 +207,7 @@ class MakeVolunteerShifts(Command):
                     {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
                 ],
             },
-            "VOC Mixer": {
-                "Stage A": [
-                    {"first": "2018-08-31 12:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
-                ],
-                "Stage B": [
-                    {"first": "2018-08-31 13:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
-                ],
-                "Stage C": [
-                    {"first": "2018-08-31 13:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
-                ]
-            },
-            "VOC Camera": {
+            "Stage: Audio/Visual": {
                 "Stage A": [
                     {"first": "2018-08-31 12:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
                     {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
@@ -252,6 +217,40 @@ class MakeVolunteerShifts(Command):
                     {"first": "2018-08-31 13:00:00", "final": "2018-09-01 00:00:00", "min": 1, "max": 1},
                     {"first": "2018-09-01 10:00:00", "final": "2018-09-02 00:00:00", "min": 1, "max": 1},
                     {"first": "2018-09-02 10:00:00", "final": "2018-09-02 23:00:00", "min": 1, "max": 1},
+                ],
+                "Stage C": [
+                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 00:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 00:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 23:00:00", "min": 1, "max": 1},
+                ]
+            },
+            "Stage: Camera Operator": {
+                "Stage A": [
+                    {"first": "2018-08-31 12:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                ],
+                "Stage B": [
+                    {"first": "2018-08-31 13:00:00", "final": "2018-09-01 00:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-02 00:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 23:00:00", "min": 1, "max": 1},
+                ],
+                "Stage C": [
+                    {"first": "2018-08-31 13:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                ]
+            },
+            "Stage: Vision Mixer": {
+                "Stage A": [
+                    {"first": "2018-08-31 12:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
+                ],
+                "Stage B": [
+                    {"first": "2018-08-31 13:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
+                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
                 ],
                 "Stage C": [
                     {"first": "2018-08-31 13:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
@@ -280,6 +279,13 @@ class MakeVolunteerShifts(Command):
                     {"first": "2018-08-31 08:00:00", "final": "2018-09-03 12:00:00", "min": 2, "max": 4},
                 ]
             },
+            "Games Master": {
+                "Stage A": [
+                    {"first": "2018-08-31 20:00:00", "final": "2018-08-31 23:00:00", "min": 1, "max": 3},
+                    {"first": "2018-09-01 20:00:00", "final": "2018-09-01 23:00:00", "min": 1, "max": 3},
+                    {"first": "2018-09-02 20:00:00", "final": "2018-09-02 23:00:00", "min": 1, "max": 3},
+                ]
+            },
             "Green Room": {
                 "Green Room": [
                     {"first": "2018-08-31 12:00:00", "final": "2018-09-01 00:00:00", "min": 1, "max": 1},
@@ -292,13 +298,6 @@ class MakeVolunteerShifts(Command):
                     {"first": "2018-08-31 10:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
                     {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
                     {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
-                ]
-            },
-            "Logistics": {
-                "Logistics": [
-                    {"first": "2018-08-31 10:00:00", "final": "2018-08-31 16:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-01 10:00:00", "final": "2018-09-01 16:00:00", "min": 1, "max": 1},
-                    {"first": "2018-09-02 10:00:00", "final": "2018-09-02 16:00:00", "min": 1, "max": 1},
                 ]
             },
             "Tent Steward": {
