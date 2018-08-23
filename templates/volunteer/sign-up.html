@@ -49,7 +49,14 @@
         {{ render_field(form.volunteer_phone, horizontal=10) }}
         {{ render_field(form.arrival, horizontal=10) }}
         {{ render_field(form.departure, horizontal=10) }}
-        {{ render_field(form.allow_comms, horizontal=10 )}}
+        <div class="form-group">
+          <div class="col-sm-10 col-sm-offset-2">
+            {{ form.allow_comms(class_='big-checkbox') }}
+            <label class="control-label big-checkbox" for="allow_comms">
+                I'm happy to receive messages during the event
+            </label>
+          </div>
+        </div>
         {{ form.sign_up(class_="btn btn-primary debounce pull-right") }}
         </div>
         </fieldset>
