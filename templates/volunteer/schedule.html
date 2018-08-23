@@ -32,13 +32,9 @@
     Volunteer Schedule
 {% endblock %}
 {% block body %}
-    <from class="form-horizontal" submit="POST">
-        <h2>Filters</h2>
-        {{ render_field(form.trained_for) }}
-        {{ render_field(form.roles) }}
-        {{ render_field(form.location) }}
-    </from>
-
+    <noscript>
+        This page requires Javascript.
+    </noscript>
     {# FIXME these tabs should work either via pure JS or server #}
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation" class="active"><a href="#fri" aria-controls="fri" role="tab" data-toggle="tab">Friday</a></li>
