@@ -59,7 +59,7 @@
 </tbody>
 </table>
 
-<h3>Tickets</h3>
+<h3>Owned Tickets</h3>
 <table class="table table-condensed">
     <tr>
         <th>Product Group</th>
@@ -75,6 +75,9 @@
             <td>{{ ticket.state }}</td>
             <td>{% if ticket.checkin %}Yes{% else %}No{% endif %}</td>
             <td>
+              {% if ticket.is_paid_for and ticket.is_transferable %}
+              <a class="btn btn-default" href="{{ url_for('.transfer_ticket', ticket_id=ticket.id) }}">Transfer</a>
+              {% endif %}
               <a class="btn btn-default" href="{{ url_for('.convert_ticket', ticket_id=ticket.id) }}">Convert</a>
             </td>
         </tr>

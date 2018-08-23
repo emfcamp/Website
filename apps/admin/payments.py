@@ -307,7 +307,7 @@ def refund(payment_id):
             total = sum(p.price_tier.get_price(payment.currency).value for p in purchases)
 
             if not total:
-                flash('Please select some non-free purchases to refund')
+                flash('Please select some purchases to refund. You cannot refund only free purchases from this page.')
                 return redirect(url_for('.refund', payment_id=payment.id))
 
             if any(p.owner != payment.user for p in purchases):

@@ -1,0 +1,16 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "admin/base.html" %}
+{% block title %}Transfer Ticket{% endblock %}
+{% block body %}
+<h2>Transfer Ticket</h2>
+
+<form method="post" class="form-horizontal">
+{{ form.hidden_tag() }}
+<p>Use this form to transfer a ticket from one user to another. Enter the recipient's email below:</p>
+{{ render_field(form.email, True) }}
+<div class="btn-group">
+    {{ form.transfer(class_="btn btn-default debounce") }}
+</div>
+</form>
+
+{% endblock %}

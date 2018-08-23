@@ -22,6 +22,7 @@ from .forms import (
     IssueTicketsInitialForm, IssueTicketsForm, IssueFreeTicketsNewUserForm,
     ReserveTicketsForm, ReserveTicketsNewUserForm, CancelTicketForm,
     ConvertTicketForm,
+    TransferTicketInitialForm, TransferTicketForm, TransferTicketNewUserForm,
 )
 
 from ..common import feature_enabled
@@ -260,5 +261,59 @@ def tickets_reserve(email):
 
     return render_template('admin/tickets/tickets-reserve.html',
                            form=form, pts=pts, user=user)
+
+@admin.route('/tickets/<int:ticket_id>/transfer', methods=['GET', 'POST'])
+def transfer_ticket(ticket_id):
+    form = TransferTicketInitialForm()
+    if form.validate_on_submit():
+        return redirect(url_for('.transfer_ticket_user', ticket_id=ticket_id, email=form.email.data))
+    return render_template('admin/tickets/transfer-ticket.html', form=form)
+
+@admin.route('/tickets/<int:ticket_id>/transfer/<email>', methods=['GET', 'POST'])
+def transfer_ticket_user(ticket_id, email):
+    ticket = Ticket.query.get_or_404(ticket_id)
+
+    if not ticket.is_paid_for:
+        flash("Unpaid tickets cannot be transferred")
+        return redirect(url_for('.user', user_id=ticket.owner_id))
+
+    if not ticket.product.get_attribute('is_transferable'):
+        flash("This purchase cannot be transferred")
+        return redirect(url_for('.user', user_id=ticket.owner_id))
+
+    user = User.get_by_email(email)
+
+    if user is None:
+        form = TransferTicketNewUserForm()
+    else:
+        form = TransferTicketForm()
+
+    if form.validate_on_submit():
+        if not user:
+            name = form.name.data
+
+            app.logger.info('Creating new user with email %s and name %s', email, name)
+            user = User(email, name)
+            flash('Created account for %s' % name)
+            db.session.add(user)
+
+        ticket = Ticket.query.with_for_update().get(ticket.id)
+
+        previous_owner = ticket.owner
+        # This contract is loopy
+        ticket.transfer(from_user=previous_owner, to_user=user)
+        db.session.commit()
+
+        app.logger.info('Ticket %s transferred from %s to %s', ticket,
+                        previous_owner, user)
+
+        # We don't send any emails because this is an admin operation
+
+        flash('Transferred ticket {}'.format(ticket.id))
+        return redirect(url_for('.user', user_id=user.id))
+
+    return render_template('admin/tickets/transfer-ticket-user.html',
+                           form=form, ticket=ticket, user=user)
+
 
 

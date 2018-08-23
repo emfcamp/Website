@@ -35,6 +35,9 @@
   <td>{{ purchase.price_tier.get_price(payment.currency) | price }}</td>
   <td>{{ purchase.state }}</td>
   <td>
+    {% if purchase.is_paid_for and purchase.is_transferable %}
+    <a class="btn btn-default" href="{{ url_for('.transfer_ticket', ticket_id=purchase.id) }}">Transfer</a>
+    {% endif %}
     <a class="btn btn-default" href="{{ url_for('.convert_ticket', ticket_id=purchase.id) }}">Convert</a>
   </td>
 </tr>

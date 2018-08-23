@@ -199,4 +199,14 @@ class CancelTicketForm(Form):
 class ConvertTicketForm(Form):
     convert = SubmitField("Convert ticket")
 
+class TransferTicketInitialForm(Form):
+    email = EmailField('Email', [Email(), Required()])
+    transfer = SubmitField("Choose user")
+
+class TransferTicketForm(Form):
+    transfer = SubmitField("Transfer ticket")
+
+class TransferTicketNewUserForm(TransferTicketForm):
+    name = StringField('Name')
+
 
