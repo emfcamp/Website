@@ -1,8 +1,11 @@
 # encoding=utf-8
 import json
-import cgi
+import html
 import pytz
 import random
+import pendulum  # preferred over datetime
+
+from collections import defaultdict
 
 from flask import (
     Blueprint, render_template, redirect, url_for, flash,
@@ -143,7 +146,7 @@ def _get_priority_sorted_venues(venues_to_allow):
 @feature_flag('SCHEDULE')
 def main():
     def add_event(event):
-        event['text'] = cgi.escape(event['title'])
+        event['text'] = html.escape(event['title'])
         event['description'] = urlize(event['description'])
         event['start_date'] = event['start_date'].strftime('%Y-%m-%d %H:%M:00')
         event['end_date'] = event['end_date'].strftime('%Y-%m-%d %H:%M:00')
@@ -161,16 +164,19 @@ def main():
     return render_template('schedule/user_schedule.html', venues=venues,
                             schedule_data=schedule_data)
 
+def _convert_time_to_str(event):
+    event['start_time'] = event['start_date'].strftime('%H:%M')
+    event['end_time'] = event['end_date'].strftime('%H:%M')
+
+    event['start_date'] = event['start_date'].strftime('%Y-%m-%d %H:%M:00')
+    event['end_date'] = event['end_date'].strftime('%Y-%m-%d %H:%M:00')
+    return event
 
 @schedule.route('/schedule.json')
 @feature_flag('SCHEDULE')
 def schedule_json():
-    def convert_time_to_str(event):
-        event['start_date'] = event['start_date'].strftime('%Y-%m-%d %H:%M:00')
-        event['end_date'] = event['end_date'].strftime('%Y-%m-%d %H:%M:00')
-        return event
 
-    schedule = [convert_time_to_str(p) for p in _get_scheduled_proposals(request.args)]
+    schedule = [_convert_time_to_str(p) for p in _get_scheduled_proposals(request.args)]
 
     # NB this is JSON in a top-level array (security issue for low-end browsers)
     return Response(json.dumps(schedule), mimetype='application/json')
@@ -227,12 +233,7 @@ def favourites_json():
     if not user:
         abort(404)
 
-    def convert_time_to_str(event):
-        event['start_date'] = event['start_date'].strftime('%Y-%m-%d %H:%M:00')
-        event['end_date'] = event['end_date'].strftime('%Y-%m-%d %H:%M:00')
-        return event
-
-    schedule = [convert_time_to_str(p) for p in _get_scheduled_proposals(request.args, override_user=user) if p['is_fave']]
+    schedule = [_convert_time_to_str(p) for p in _get_scheduled_proposals(request.args, override_user=user) if p['is_fave']]
 
     # NB this is JSON in a top-level array (security issue for low-end browsers)
     return Response(json.dumps(schedule), mimetype='application/json')
@@ -405,3 +406,44 @@ def line_up_external(event_id, slug=None):
 
     return render_template('schedule/line-up-external.html',
                            event=event, is_fave=is_fave, venue_name=event.venue)
+
+def _get_upcoming(filter_obj={}, override_user=None):
+    # now = pendulum.now(event_tz)
+    now = pendulum.datetime(2018, 8, 31, 13, 0, tz=event_tz)
+    proposals = _get_scheduled_proposals(filter_obj, override_user)
+    upcoming = [_convert_time_to_str(p) for p in proposals if p['end_date'] > now]
+
+    upcoming = sorted(upcoming, key=lambda p: p['start_date'])
+
+    limit = filter_obj.get('limit', default=2, type=int)
+
+    # Already filtered by venue in _get_scheduled_proposals
+    if limit <= 0:
+        return upcoming
+
+    by_venue = defaultdict(list)
+    for p in upcoming:
+        by_venue[p['venue']].append(p)
+
+    res = {slugify(k.lower()): v[:limit] for k, v in by_venue.items()}
+
+    return res
+
+@schedule.route('/now-and-next.json')
+@schedule.route('/upcoming.json')
+def upcoming():
+    return Response(json.dumps(_get_upcoming(request.args)), mimetype='application/json')
+
+@schedule.route('/now-and-next')
+def now_and_next():
+    proposals = _get_upcoming(request.args)
+    arg_venues = request.args.getlist('venue', type=str)
+    venues = [html.escape(v) for v in arg_venues]
+
+
+    if request.args.get('fullscreen', default=False, type=bool):
+        template = 'schedule/now-and-next-fullscreen.html'
+    else:
+        template = 'schedule/now-and-next.html'
+
+    return render_template(template, venues=venues, proposals_by_venue=proposals)

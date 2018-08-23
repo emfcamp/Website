@@ -26,7 +26,8 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
             {"key": "Stage-C", "label": "Stage C"},
             {"key": "Workshop-1", "label": "Workshop 1"},
             {"key": "Workshop-2", "label": "Workshop 2"},
-            {"key": "Workshop-3", "label": "Workshop 3"}
+            {"key": "Workshop-3", "label": "Workshop 3"},
+            {"key": "Workshop-4", "label": "Workshop 4"}
         ],
         id, ele, id_str, ven;
 
