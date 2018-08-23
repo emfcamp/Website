@@ -148,6 +148,11 @@ def network():
     return redirect('https://wiki.emfcamp.org/wiki/Network')
 
 
+@base.route("/phones")
+def phones():
+    return redirect('https://wiki.emfcamp.org/wiki/Phones')
+
+
 @base.route("/talks")
 @base.route("/talks/")
 @site_flag('TICKETS_SITE')
