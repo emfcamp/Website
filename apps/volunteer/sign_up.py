@@ -58,7 +58,7 @@ def update_volunteer_from_form(volunteer, form):
     volunteer.age = form.age.data
     volunteer.planned_arrival = form.arrival.data
     volunteer.planned_departure = form.departure.data
-    volunteer.allow_comms_during_event = form.allow_comms
+    volunteer.allow_comms_during_event = form.allow_comms.data
     return volunteer
 
 @volunteer.route('/sign-up', methods=['GET', 'POST'])
