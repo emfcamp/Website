@@ -378,10 +378,7 @@ def stripe_payment_refunded(payment):
     # Payment is already locked by the caller of stripe_update_payment
     with db.session.no_autoflush:
         for purchase in payment.purchases:
-            if purchase.is_paid_for:
-                purchase.price_tier.return_instances(1)
-
-            purchase.state = 'refunded'
+            purchase.refund_purchase()
 
     payment.state = 'refunded'
     db.session.commit()

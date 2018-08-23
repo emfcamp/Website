@@ -118,8 +118,21 @@ class Purchase(db.Model):
     def cancel(self):
         if self.state == 'cancelled':
             raise PurchaseStateException('{} is already cancelled'.format(self))
+
+        if self.is_paid_for:
+            self.price_tier.return_instances(1)
+
         self.set_state('cancelled')
-        self.price_tier.return_instances(1)
+
+    def refund_purchase(self, refund=None):
+        if self.state == 'refunded':
+            raise PurchaseStateException('{} is already refunded'.format(self))
+
+        if self.is_paid_for:
+            self.price_tier.return_instances(1)
+
+        self.state = 'refunded'
+        self.refund = refund
 
     def change_currency(self, currency):
         self.price = self.price_tier.get_price(currency)

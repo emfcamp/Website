@@ -250,7 +250,7 @@ def manual_refund(payment_id):
 
             db.session.commit()
 
-            flash("Payment refunded")
+            flash("Payment {} refunded".format(payment.id))
             return redirect(url_for('admin.payments'))
 
     return render_template('admin/payments/manual-refund.html', payment=payment, form=form)
@@ -339,11 +339,7 @@ def refund(payment_id):
 
             with db.session.no_autoflush:
                 for purchase in purchases:
-                    if purchase.is_paid_for:
-                        purchase.price_tier.return_instances(1)
-
-                    purchase.state = 'refunded'
-                    purchase.refund = refund
+                    purchase.refund_purchase(refund)
 
             priced_purchases = [p for p in payment.purchases if p.price_tier.get_price(payment.currency).value]
             unpriced_purchases = [p for p in payment.purchases if not p.price_tier.get_price(payment.currency).value]

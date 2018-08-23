@@ -169,17 +169,11 @@ class Payment(db.Model):
             for purchase in self.purchases:
                 if purchase.owner != self.user:
                     raise StateException('Cannot refund transferred purchase')
-                if purchase.state == 'refunded':
-                    raise StateException('Purchase is already refunded')
                 if purchase.price_tier.get_price(self.currency).value > 0 and not purchase.is_paid_for:
                     # This might turn out to be too strict
                     raise StateException('Purchase is not paid, so cannot be refunded')
 
-                if purchase.is_paid_for:
-                    purchase.price_tier.return_instances(1)
-
-                purchase.state = 'refunded'
-                purchase.refund = refund
+                purchase.refund_purchase(refund)
 
         self.state = 'refunded'
 
