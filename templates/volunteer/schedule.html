@@ -78,6 +78,24 @@
 {% endblock %}
 
 {% block foot %}
+    <!-- Modal -->
+    <div class="modal fade" id="signUp" tabindex="-1" role="dialog" aria-labelledby="signUpLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="signUpLabel">Modal title</h4>
+          </div>
+          <div class="modal-body">
+            ...
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Sign Up</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     {% assets "js_volunteer_schedule" -%}
         <script src="{{ ASSET_URL }}"></script>
@@ -94,7 +112,7 @@
             volunteer_roles = {{ roles | tojson }},
             is_admin = {% if current_user.has_permission('volunter:admin') -%} true {%- else -%} false {%- endif %};
 
-        init_volunteer_schedule(volunteer_shifts);
+        init_volunteer_schedule(volunteer_shifts, '{{ active_day }}');
 
     </script>
 {% endblock %}

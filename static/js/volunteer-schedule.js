@@ -1,10 +1,12 @@
 function init_volunteer_schedule(data, active_day) {
     var current_day = active_day;
 
-    function render_table(day, data){
-        var filters = get_filters();
-        var days_data = data[day];
-        var day_ele = $('#tbody-'+day);
+    function render(){
+        var filters = get_filters(),
+            days_data = data[current_day],
+            day_ele = $('#tbody-'+current_day);
+
+        day_ele.empty();
 
         $.each(days_data, function(hour, hours_shifts) {
             var n_shifts = hours_shifts.length,
@@ -32,8 +34,8 @@ function init_volunteer_schedule(data, active_day) {
     }
 
     function make_row(shift) {
-        var new_ele = $(document.createElement('tr'));
-        var cells = [
+        var new_ele = $(document.createElement('tr')),
+            cells = [
                 make_cell(shift.end_time),
                 make_cell(shift.venue.name),
                 make_cell(shift.role.name),
@@ -41,11 +43,39 @@ function init_volunteer_schedule(data, active_day) {
             ];
 
         new_ele.append(cells);
-        return $(new_ele);
+        new_ele.attr('id', 'shift-'+shift.id);
+        new_ele.click(function() {
+            $('#signUp .modal-title').html('Sign up for ' + shift.role.name + ' @ ' + shift.start_time);
+            $('#signUp .modal-body').empty();
+            $('#signUp .modal-body').append(make_modal_body(shift));
+            $('#signUp').modal();
+        });
+        return new_ele;
     }
 
     function make_cell(inner) {
-        var new_ele = document.createElement('td');
+        return make_ele('td', inner);
+    }
+
+    function make_modal_body(shift) {
+        var dl = $(document.createElement('dl')),
+            needed = (shift.min_needed === shift.max_needed)? shift.min_needed
+                                                            : shift.min_needed + ' - ' + shift.max_needed;
+        dl.addClass('dl-horizontal');
+        dl.append([
+            make_ele('dt', 'Role'), make_ele('dd', shift.role.name),
+            make_ele('dt', 'Venue'), make_ele('dd', shift.venue.name),
+            make_ele('dt', 'Start'), make_ele('dd', shift.start),
+            make_ele('dt', 'End'), make_ele('dd', shift.end),
+            make_ele('dt', 'Volunteers needed'),
+            make_ele('dd', needed),
+            make_ele('dt', 'Currently'),  make_ele('dd', shift.current_count)
+        ]);
+        return dl;
+    }
+
+    function make_ele(type, inner) {
+        var new_ele = document.createElement(type);
         new_ele.innerHTML = inner;
         return $(new_ele);
     }
@@ -54,11 +84,6 @@ function init_volunteer_schedule(data, active_day) {
         $('#role-select > option').each(function(_, ele) {
             $(ele).attr('selected', false);
         });
-    }
-
-    function apply_filters() {
-         $('#tbody-'+current_day).empty();
-        render_table(current_day, volunteer_shifts);
     }
 
     function fails_filters(filters, shift) {
@@ -106,17 +131,27 @@ function init_volunteer_schedule(data, active_day) {
         return res;
     }
 
+
+    ////////////////////////////////////
+    //
+    //
+    // Set up events
+    //
+    ////////////////////////////////////
+
     // On tab change
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         current_day = $(e.target).attr('data-day');
-        render_table(current_day, volunteer_shifts);
-
+        render();
 
         // Clear the old stuff
         var prev_day = $(e.relatedTarget).attr('data-day');
         $('#tbody-'+prev_day).empty();
     });
 
-    $('#filter-btn').click(apply_filters);
+    // Filter buttons
+    $('#filter-btn').click(render);
     $('#clear-btn').click(clear_filters);
+
+    render();
 }

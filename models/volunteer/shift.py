@@ -85,6 +85,7 @@ class ShiftEntry(db.Model):
     missing_others = db.Column(db.Boolean, nullable=False, default=False)
 
     shift_details = db.relationship('Shift', backref='entries')
+    user_details = db.relationship('Shift', backref='shift_entries')
 
 """
 class TrainingSession(Shift):
