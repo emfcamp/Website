@@ -18,6 +18,7 @@ from icalendar import Calendar, Event
 from slugify import slugify_unicode as slugify
 from wtforms import (
     StringField, IntegerField, SubmitField, BooleanField,
+    SelectField,
 )
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import Required, URL, Email, Optional
@@ -27,6 +28,7 @@ from .common import feature_flag, json_response
 from .common.forms import Form
 from models.cfp import Proposal, Venue
 from models.ical import CalendarSource, CalendarEvent
+from models.map import MapObject
 from models.user import User, generate_api_token
 from models.site_state import event_start
 from .schedule_xml import export_frab
@@ -478,6 +480,7 @@ class UpdateExternalFeedForm(Form):
     priority = IntegerField('Priority')
     contact_phone = StringField('Phone')
     contact_email = EmailField('Email', [Email(), Optional()])
+    location = SelectField('Location')
     enabled = BooleanField('Refresh automatically')
     displayed = BooleanField('Displayed')
     preview = SubmitField('Preview')
@@ -491,7 +494,18 @@ def external_feed(source_id):
     if calendar.user != current_user:
         abort(403)
 
+    choices = sorted([(str(mo.id), mo.name) for mo in MapObject.query])
+    choices = [('', '')] + choices
+
     form = UpdateExternalFeedForm(obj=calendar)
+    form.location.choices = choices
+
+    if request.method != 'POST':
+        if calendar.mapobj:
+            form.location.data = str(calendar.mapobj.id)
+        else:
+            form.location.data = ''
+
     if form.validate_on_submit():
         if form.save.data:
             calendar.url = form.url.data
@@ -502,6 +516,12 @@ def external_feed(source_id):
             calendar.contact_email = form.contact_email.data
             calendar.enabled = form.enabled.data
             calendar.displayed = form.displayed.data
+
+            if form.location.data:
+                map_obj_id = int(form.location.data)
+                calendar.mapobj = MapObject.query.get(map_obj_id)
+            else:
+                calendar.mapobj = None
 
             try:
                 calendar.refresh()
