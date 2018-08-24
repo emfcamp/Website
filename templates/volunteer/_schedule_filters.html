@@ -1,0 +1,49 @@
+{# Filter form on /volunteer/schedule #}
+<form class="row">
+    <fieldset class="form-horizontal col-sm-6">
+        <div class="form-group">
+            <label for="role" class="col-sm-2">Role</label>
+            <div class="col-sm-10">
+                <select id="role-select" name="role" multiple="multiple" class="form-control">
+                    {% for r in roles %}
+                        <option value="{{r.id}}">{{r.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </fieldset>
+    <fieldset class="form-horizontal col-sm-6">
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <input id="is_trained" type="checkbox" checked>
+                    I am trained for
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <input id="is_interested" type="checkbox" checked>
+                    I am interested in
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <input id="show_past" type="checkbox">
+                    Show finished shifts
+                </label>
+            </div>
+        </div>
+    <fieldset class="form-horizontal col-sm-6">
+        <div class="form-group">
+            <div class="btn-group">
+                <a id="filter-btn" class="btn btn-primary">Apply</a>
+                <a id="clear-btn" class="btn btn-default">Clear</a>
+            </div>
+        </div>
+    </fieldset>
+</form>
+

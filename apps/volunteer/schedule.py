@@ -1,9 +1,10 @@
-from flask import render_template
+from flask import render_template, request
 from collections import defaultdict
 
 from ..common import feature_flag
 from . import volunteer, v_user_required
 
+from models.volunteer.role import Role
 from models.volunteer.shift import Shift
 
 
@@ -12,15 +13,17 @@ from models.volunteer.shift import Shift
 @v_user_required
 def schedule():
     shifts = Shift.get_all()
-    all_shifts = defaultdict(lambda: defaultdict(list))
+    by_time = defaultdict(lambda: defaultdict(list))
 
     for s in shifts:
         day_key = s.start.strftime('%a').lower()
         hour_key = s.start.strftime('%H:%M')
 
-        all_shifts[day_key][hour_key].append(s.to_dict())
+        by_time[day_key][hour_key].append(s.to_dict())
 
-    return render_template('volunteer/schedule.html', all_shifts=all_shifts)
+    roles = [r.to_dict() for r in Role.get_all()]
+    return render_template('volunteer/schedule.html', roles=roles, all_shifts=by_time,
+                           active_day=request.args.get('day', default='fri'))
 
 
 @volunteer.route('/shift/<id>')
