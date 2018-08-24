@@ -1,4 +1,5 @@
 # coding=utf-8
+from collections import defaultdict
 from dateutil import parser
 from flask import render_template, current_app as app
 from flask_script import Command, Option
@@ -7,7 +8,7 @@ from flask_mail import Message
 from slotmachine import SlotMachine
 
 from main import db, mail
-from models.cfp import Proposal, Venue, ROUGH_LENGTHS, EVENT_SPACING
+from models.cfp import Proposal, Venue, ROUGH_LENGTHS, EVENT_SPACING, DEFAULT_VENUES, VENUE_CAPACITY
 
 class ImportVenues(Command):
     venues = [
@@ -57,33 +58,65 @@ class RunScheduler(Command):
     def get_scheduler_data(self):
         proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
             filter(Proposal.state.in_(['finished', 'accepted'])).\
-            filter(Proposal.type.in_(['talk', 'workshop', 'youthworkshop', 'performance'])).all()
+            filter(Proposal.type.in_(['talk', 'workshop', 'youthworkshop', 'performance'])).\
+            order_by(Proposal.favourite_count.desc()).all()
+
+        proposals_by_type = defaultdict(list)
+        for proposal in proposals:
+            proposals_by_type[proposal.type].append(proposal)
+
+        capacity_by_type = defaultdict(dict)
+        for type, venues in DEFAULT_VENUES.items():
+            for venue in venues:
+                venue_id = Venue.query.filter(Venue.name == venue).one().id
+                capacity_by_type[type][venue_id] = VENUE_CAPACITY[venue]
 
         proposal_data = []
-        for proposal in proposals:
-            export = {
-                'id': proposal.id,
-                'duration': proposal.scheduled_duration,
-                'speakers': [ proposal.user.id ],
-                'title': proposal.title,
-                'valid_venues': [ v.id for v in proposal.get_allowed_venues() ],
-                'time_ranges': [
-                    {"start": str(p.start), "end": str(p.end)} for p in proposal.get_allowed_time_periods_with_default()
-                ],
-                'spacing_slots': EVENT_SPACING.get(proposal.type, 1),
-            }
+        for type, proposals in proposals_by_type.items():
+            # We assign the largest venues as being preferred for the most popular talks
+            # Proposals are already sorted into popularity, so we just shift through the list
+            # of venues in order of size, equally split
+            ordered_venues = sorted(capacity_by_type[type], key=lambda k: capacity_by_type[type][k], reverse=True)
+            split_count = int(len(proposals_by_type[type]) / len(capacity_by_type[type]))
 
-            if proposal.scheduled_venue:
-                export['venue'] = proposal.scheduled_venue.id
-            if proposal.potential_venue:
-                export['venue'] = proposal.potential_venue.id
+            count = 0
+            for proposal in proposals:
+                preferred_venues = []
+                if ordered_venues:
+                    preferred_venues = [ordered_venues[0]]
 
-            if proposal.scheduled_time:
-                export['time'] = str(proposal.scheduled_time)
-            if proposal.potential_time:
-                export['time'] = str(proposal.potential_time)
+                export = {
+                    'id': proposal.id,
+                    'duration': proposal.scheduled_duration,
+                    'speakers': [ proposal.user.id ],
+                    'title': proposal.title,
+                    'valid_venues': [ v.id for v in proposal.get_allowed_venues() ],
+                    'preferred_venues': preferred_venues, # This supports a list, but we only want one for now
+                    'time_ranges': [
+                        {"start": str(p.start), "end": str(p.end)} for p in proposal.get_allowed_time_periods_with_default()
+                    ],
+                    'spacing_slots': EVENT_SPACING.get(proposal.type, 1),
+                }
 
-            proposal_data.append(export)
+                if proposal.scheduled_venue:
+                    export['venue'] = proposal.scheduled_venue.id
+                if proposal.potential_venue:
+                    export['venue'] = proposal.potential_venue.id
+
+                if proposal.scheduled_time:
+                    export['time'] = str(proposal.scheduled_time)
+                if proposal.potential_time:
+                    export['time'] = str(proposal.potential_time)
+
+                proposal_data.append(export)
+
+                # Shift to the next venue when we hit the division
+                if count > split_count:
+                    count = 0
+                    ordered_venues.pop(0)
+                else:
+                    count += 1
+
         return proposal_data
 
     def handle_schedule_change(self, proposal, venue, time):

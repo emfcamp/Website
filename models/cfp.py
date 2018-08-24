@@ -96,6 +96,17 @@ DEFAULT_VENUES = {
     'installation': [],
 }
 
+VENUE_CAPACITY = {
+    'Stage A': 600,
+    'Stage B': 400,
+    'Stage C': 400,
+    'Workshop 1': 30,
+    'Workshop 2': 30,
+    'Workshop 3': 35,
+    'Workshop 4': 35,
+    'Youth Workshop': 30,
+}
+
 # List of submission types which are manually reviewed rather than through
 # the anonymous review system.
 MANUAL_REVIEW_TYPES = ['youthworkshop', 'performance', 'installation']
