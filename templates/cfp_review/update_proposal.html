@@ -23,6 +23,8 @@
             {% if proposal.anonymiser_id %}
             <dt>Anoymised by</dt>
             <dd>{{ proposal.anonymiser.name }}</dd>
+            <dt>Num favourites</dt>
+            <dd>{{ proposal.favourite_count }}</dd>
             {% endif %}
             {{ render_dl_field(form.state) }}
             {{ render_dl_field(form.title) }}
