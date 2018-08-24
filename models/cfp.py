@@ -81,6 +81,11 @@ REMAP_SLOT_PERIODS = {
         'sat_16_20': ('sat', (16, 0), (20, 20)),
         'sun_16_20': ('sun', (16, 0), (19, 30)),
     },
+    'performance': {
+        'fri_22_24': ('fri', (22, 0), (25, 30)),
+        'sat_22_24': ('sat', (22, 0), (25, 30)),
+        'sun_22_24': ('sun', (22, 0), (25, 30)),
+    },
 }
 
 # Number of slots (in 10min increments) that must be between proposals of this
