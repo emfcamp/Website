@@ -494,6 +494,7 @@ def external_feed(source_id):
     form = UpdateExternalFeedForm(obj=calendar)
     if form.validate_on_submit():
         if form.save.data:
+            calendar.url = form.url.data
             calendar.name = form.name.data
             calendar.main_venue = form.main_venue.data
             calendar.priority = form.priority.data
@@ -502,14 +503,23 @@ def external_feed(source_id):
             calendar.enabled = form.enabled.data
             calendar.displayed = form.displayed.data
 
-            alerts = calendar.refresh()
+            try:
+                calendar.refresh()
+            except Exception:
+                pass
             db.session.commit()
             return redirect(url_for('.external_feed', source_id=calendar.id))
 
         calendar.url = form.url.data
 
-    alerts = calendar.refresh()
-    preview_events = list(calendar.events)
+    try:
+        alerts = calendar.refresh()
+    except Exception:
+        alerts = [('danger', "An error occurred trying to load the feed")]
+        preview_events = []
+    else:
+        preview_events = list(calendar.events)
+
     db.session.rollback()
 
     return render_template('schedule/external/feed.html', form=form, calendar=calendar,
