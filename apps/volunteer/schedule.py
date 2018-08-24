@@ -40,7 +40,7 @@ def _toggle_shift_entry(user, shift):
 
     if shift_entry:
         db.session.delete(shift_entry)
-        res['operation'] = 'deleted'
+        res['operation'] = 'delete'
         res['message'] = 'Cancelled %s shift' % shift.role.name
     else:
         for v_shift in user.shift_entries:

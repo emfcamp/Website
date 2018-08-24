@@ -65,9 +65,6 @@ function init_volunteer_schedule(data, active_day) {
             $('#signUp .modal-footer').empty();
             $('#signUp .modal-footer').append(make_modal_buttons(shift));
 
-            var btn = $('#sign-up-'+shift.id);
-            btn.click(make_sign_up_fn(btn, shift.sign_up_url));
-
             $('#signUp').modal();
         };
     }
@@ -96,6 +93,7 @@ function init_volunteer_schedule(data, active_day) {
         close_btn.attr('data-dismiss', 'modal');
         submit_btn.attr('id', 'sign-up-'+shift.id);
         submit_btn.addClass('debouce');
+        submit_btn.click(make_sign_up_fn(submit_btn, shift));
 
         return [close_btn, submit_btn];
     }
@@ -107,18 +105,18 @@ function init_volunteer_schedule(data, active_day) {
         return $(btn);
     }
 
-    function make_sign_up_fn(ele, url) {
+    function make_sign_up_fn(ele, shift) {
         return function (){
             var modal_body = $('#signUp .modal-body');
             ele.attr('disabled', true);
 
-            $.post(url+'.json')
-             .success(make_post_callback_fn(modal_body, ele, "Success!", "alert-info"))
-             .fail(make_post_callback_fn(modal_body, ele, "Something went wrong!", "alert-danger"));
+            $.post(shift.sign_up_url+'.json')
+             .success(make_post_callback_fn(modal_body, ele, shift.id, "alert-info"))
+             .fail(make_post_callback_fn(modal_body, ele, shift.id, "alert-danger"));
         };
     }
 
-    function make_post_callback_fn(append_ele, btn_ele, msg, alert_type) {
+    function make_post_callback_fn(append_ele, btn_ele, shift_id, alert_type) {
         return function(resp) {
             var alert = make_alert(alert_type, resp.message);
             append_ele.prepend(alert);
@@ -127,6 +125,16 @@ function init_volunteer_schedule(data, active_day) {
                 alert = make_alert('alert-warning', resp.warning);
                 append_ele.prepend(alert);
             }
+
+            shift = get_shift(shift_id);
+            if (resp.operation == 'add') {
+                shift.current_count++;
+                shift.is_user_shift = true;
+            } else if (resp.operation == 'delete') {
+                shift.current_count--;
+                shift.is_user_shift = false;
+            }
+            update_shift(shift_id, shift);
 
             btn_ele.attr('disabled', false);
         };
@@ -148,6 +156,36 @@ function init_volunteer_schedule(data, active_day) {
         var new_ele = document.createElement(type);
         new_ele.innerHTML = inner;
         return $(new_ele);
+    }
+
+    function get_shift(shift_id) {
+        var res;
+        $.each(data, function(_, day) {
+            $.each(day, function(_, hour) {
+                $.each(hour, function(_, shift) {
+                    if (shift_id === shift.id) {
+                        res = shift;
+                    }
+                });
+            });
+        });
+        return res;
+    }
+
+    function update_shift(shift_id, shift) {
+        var day_index, hour_index, arr_index;
+        $.each(data, function(day, day_shifts) {
+            $.each(day_shifts, function(hour, hour_shifts) {
+                $.each(hour_shifts, function(index, shift) {
+                    if (shift_id === shift.id) {
+                        day_index = day;
+                        hour_index = hour;
+                        arr_index = index;
+                    }
+                });
+            });
+        });
+        data[day_index][hour_index][arr_index] = shift;
     }
 
     function clear_filters() {
@@ -222,6 +260,8 @@ function init_volunteer_schedule(data, active_day) {
     // Filter buttons
     $('#filter-btn').click(render);
     $('#clear-btn').click(clear_filters);
+
+    $('#signUp').on('hide.bs.modal', render);
 
     render();
 }
