@@ -8,15 +8,20 @@ from flask import (
     Blueprint, render_template, redirect, url_for, flash,
     request, Response, abort,
 )
-from flask_login import current_user
+from flask_login import current_user, login_required
 from flask import current_app as app
 from jinja2.utils import urlize
 from icalendar import Calendar, Event
 from slugify import slugify_unicode as slugify
+from wtforms import (
+    StringField, IntegerField, SubmitField, BooleanField,
+)
+from wtforms.fields.html5 import EmailField
+from wtforms.validators import Required, URL, Email, Optional
 
 from main import db, external_url
-
 from .common import feature_flag, json_response
+from .common.forms import Form
 from models.cfp import Proposal, Venue
 from models.ical import CalendarSource, CalendarEvent
 from models.user import User, generate_api_token
@@ -282,15 +287,27 @@ def line_up_redirect():
 @feature_flag('LINE_UP')
 def line_up():
     if (request.method == 'POST') and current_user.is_authenticated:
-        proposal_id = int(request.form['fave'])
-        proposal = Proposal.query.get_or_404(proposal_id)
-        if proposal in current_user.favourites:
-            current_user.favourites.remove(proposal)
-        else:
-            current_user.favourites.append(proposal)
+        event_id = int(request.form['fave'])
+        event_type = request.form['event_type']
+        if event_type == 'proposal':
+            proposal = Proposal.query.get_or_404(event_id)
+            if proposal in current_user.favourites:
+                current_user.favourites.remove(proposal)
+            else:
+                current_user.favourites.append(proposal)
 
-        db.session.commit()
-        return redirect(url_for('.line_up') + '#proposal-{}'.format(proposal.id))
+            db.session.commit()
+            return redirect(url_for('.line_up') + '#proposal-{}'.format(proposal.id))
+
+        else:
+            event = CalendarEvent.query.get_or_404(event_id)
+            if event in current_user.calendar_favourites:
+                current_user.calendar_favourites.remove(event)
+            else:
+                current_user.calendar_favourites.append(event)
+
+            db.session.commit()
+            return redirect(url_for('.line_up') + '#event-{}'.format(event.id))
 
     proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
         filter(Proposal.state.in_(['accepted', 'finished'])).\
@@ -305,9 +322,32 @@ def line_up():
     return render_template('schedule/line-up.html', proposals=proposals, externals=externals)
 
 
-@schedule.route('/favourites')
+@schedule.route('/favourites', methods=['GET', 'POST'])
 @feature_flag('LINE_UP')
 def favourites():
+    if (request.method == 'POST') and current_user.is_authenticated:
+        event_id = int(request.form['fave'])
+        event_type = request.form['event_type']
+        if event_type == 'proposal':
+            proposal = Proposal.query.get_or_404(event_id)
+            if proposal in current_user.favourites:
+                current_user.favourites.remove(proposal)
+            else:
+                current_user.favourites.append(proposal)
+
+            db.session.commit()
+            return redirect(url_for('.favourites') + '#proposal-{}'.format(proposal.id))
+
+        else:
+            event = CalendarEvent.query.get_or_404(event_id)
+            if event in current_user.calendar_favourites:
+                current_user.calendar_favourites.remove(event)
+            else:
+                current_user.calendar_favourites.append(event)
+
+            db.session.commit()
+            return redirect(url_for('.favourites') + '#event-{}'.format(event.id))
+
     if current_user.is_anonymous:
         return redirect(url_for('users.login', next=url_for('.favourites')))
 
@@ -392,10 +432,10 @@ def line_up_external(event_id, slug=None):
     if (request.method == "POST") and not current_user.is_anonymous:
         if is_fave:
             current_user.calendar_favourites.remove(event)
-            msg = 'Removed "%s" from favourites' % event.display_title
+            msg = 'Removed "%s" from favourites' % event.title
         else:
             current_user.calendar_favourites.append(event)
-            msg = 'Added "%s" to favourites' % event.display_title
+            msg = 'Added "%s" to favourites' % event.title
         db.session.commit()
         flash(msg)
         return redirect(url_for('.line_up_external', event_id=event.id, slug=event.slug))
@@ -405,3 +445,69 @@ def line_up_external(event_id, slug=None):
 
     return render_template('schedule/line-up-external.html',
                            event=event, is_fave=is_fave, venue_name=event.venue)
+
+class AddExternalFeedForm(Form):
+    url = StringField('URL', [Required(), URL()])
+    preview = SubmitField('Preview')
+
+@schedule.route('/schedule/external/feeds', methods=['GET', 'POST'])
+@login_required
+@feature_flag('LINE_UP')
+def external_feeds():
+    form = AddExternalFeedForm()
+
+    if form.validate_on_submit():
+        url = form.url.data.strip()
+        source = CalendarSource.query.filter_by(user_id=current_user.id, url=url).one_or_none()
+
+        if not source:
+            source = CalendarSource(url=url, user=current_user)
+            db.session.commit()
+
+        return redirect(url_for('.external_feed', source_id=source.id))
+
+    calendars = current_user.calendar_sources
+    return render_template('schedule/external/feeds.html', form=form, calendars=calendars)
+
+class UpdateExternalFeedForm(Form):
+    url = StringField('URL', [Required(), URL()])
+    name = StringField('Name')
+    main_venue = StringField('Main venue')
+    priority = IntegerField('Priority')
+    contact_phone = StringField('Phone')
+    contact_email = EmailField('Email', [Email(), Optional()])
+    displayed = BooleanField('Displayed')
+    preview = SubmitField('Preview')
+    save = SubmitField('Save')
+
+@schedule.route('/schedule/external/feed/<int:source_id>', methods=['GET', 'POST'])
+@login_required
+@feature_flag('LINE_UP')
+def external_feed(source_id):
+    calendar = CalendarSource.query.get(source_id)
+    if calendar.user != current_user:
+        abort(403)
+
+    form = UpdateExternalFeedForm(obj=calendar)
+    if form.validate_on_submit():
+        if form.save.data:
+            calendar.name = form.name.data
+            calendar.main_venue = form.main_venue.data
+            calendar.priority = form.priority.data
+            calendar.contact_phone = form.contact_phone.data
+            calendar.contact_email = form.contact_email.data
+            calendar.displayed = form.displayed.data
+
+            alerts = calendar.refresh()
+            db.session.commit()
+
+        calendar.url = form.url.data
+
+    alerts = calendar.refresh()
+    preview_events = list(calendar.events)
+    db.session.rollback()
+
+    return render_template('schedule/external/feed.html', form=form, calendar=calendar,
+                           preview_events=preview_events, alerts=alerts, preview=True)
+
+

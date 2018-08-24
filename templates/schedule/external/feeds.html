@@ -1,0 +1,31 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block title %}Your Feeds{% endblock %}
+{% block body %}
+
+<h2>Your feeds</h2>
+<p>If you're running content in your village, or just want to arrange something
+   for people to turn up to, you can upload your schedules here.</p>
+
+<div class="well">
+<form class="form-horizontal" method="post">
+    <fieldset>
+    <div class="col-sm-12">
+    {{ form.hidden_tag() }}
+    {{ render_field(form.url, horizontal=11) }}
+    {{ form.preview(class_="btn btn-primary debounce pull-right") }}
+    </div>
+    </fieldset>
+</form>
+</div>
+
+<h4>Existing feeds</h4>
+{% for calendar in calendars %}
+<ul class="list-unstyled">
+<li>
+<a href="{{ url_for('.external_feed', source_id=calendar.id) }}">{{ calendar.name or calendar.url }}/ ({{ calendar.events|length }} events)<a>
+</li>
+</ul>
+{% endfor %}
+
+{% endblock %}

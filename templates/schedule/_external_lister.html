@@ -1,14 +1,51 @@
-{% macro list_externals(externals) %}
-    {% for type, type_events in externals | groupby('type') %}
-        <h2>{{ type | title }}</h2>
-        <ul>
-          {% for event in type_events | sort(attribute='title') %}
-            <li>
-                <a href="{{ url_for('.line_up_external', event_id=event.id, slug=event.slug) }}">
-                    {{ event.title }}
-                </a>
-            </li>
-          {% endfor %}
-        </ul>
+{% macro list_externals(events) %}
+    {% for type, type_events in events | groupby('type') %}
+        {#<h2 class="event-type">{{ type | title }}</h2>#}
+        <form method="post">
+        <input id="csrf_token" name=_csrf_token type=hidden value="{{ csrf_token() }}">
+        <input type="hidden" name="event_type" value="external">
+        <div>
+            {% for event in type_events | sort(attribute='start_dt') %}
+            {% if event.id == None %}
+            <a class="event external">
+            {% else %}
+            <a href="{{ url_for('.line_up_external', event_id=event.id, slug=event.slug) }}" class="event external" id="event-{{ event.id }}">
+            {% endif %}
+            <div class="row">
+                <div class="col-xs-10">
+                    <div>
+                        <b>{{ event.start_dt.strftime('%A') }}
+                           {% if event.start_dt < event_start or event.end_dt > event_end %}
+                           {{ event.start_dt.strftime('%-d %B %Y') }}
+                           {% endif %}
+                           {{ event.start_dt.strftime('%H:%M') }}&ndash;
+                           {%- if event.start_dt.day == event.end_dt.day %}
+                           {{- event.end_dt.strftime('%H:%M') }}
+                           {%- else %}
+                           {{- event.end_dt.strftime('%A') }}
+                           {% if event.start_dt < event_start or event.end_dt > event_end %}
+                           {{ event.start_dt.strftime('%-d %B %Y') }}
+                           {% endif %}
+                           {{- event.end_dt.strftime('%A %H:%M') }}
+                           {% endif %}
+                        </b>
+                    </div>
+                    <div>
+                        {{ event.title }}
+                    </div>
+                </div>
+                {% if current_user.is_authenticated %}
+                <div class="col-xs-2">
+                    <button name="fave" value="{{ event.id }}" type="submit" class="btn btn-primary btn-transparent btn-hoverlabel favourite-button {% if preview %}invisible{% endif %}">
+                        <span class="glyphicon glyphicon-heart{% if event not in current_user.calendar_favourites %}-empty{% endif %} favourite-icon" aria-hidden="true"></span>
+                        <span class="hoverlabel">Favourite</span>
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+            </a>
+            {% endfor %}
+        </div>
+        </form>
     {% endfor %}
 {% endmacro %}

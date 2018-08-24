@@ -12,27 +12,27 @@
   .btn-hoverlabel:active .hoverlabel {
     visibility: visible;
   }
-  .proposal {
+  .event {
     text-decoration: none;
   }
-  .proposal > div {
+  .event > div {
     padding: 10px 4px;
     border-bottom: 1px solid rgba(100, 100, 100, 0.4);
     padding-top: 14px;
   }
-  .proposal:first-child > div {
+  .event:first-child > div {
     border-top: 1px solid rgba(100, 100, 100, 0.4);
   }
-  .proposal:hover,
-  .proposal:focus,
-  .proposal:active,
-  .proposal:hover div,
-  .proposal:focus div,
-  .proposal:active div {
+  .event:hover,
+  .event:focus,
+  .event:active,
+  .event:hover div,
+  .event:focus div,
+  .event:active div {
     background-color: #33071c;
     color: inherit;
   }
-  h2.proposal-type {
+  h2.event-type {
     padding-top: 40px;
   }
   .favourite-icon {

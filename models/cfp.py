@@ -436,7 +436,7 @@ class Proposal(db.Model):
     @property
     def latlon(self):
         if self.scheduled_venue.lat and self.scheduled_venue.lon:
-            return [self.scheduled_venue.lat, self.scheduled_venue.lon]
+            return (self.scheduled_venue.lat, self.scheduled_venue.lon)
         return None
 
     @property

@@ -1,33 +1,39 @@
 import requests
-from icalendar import Calendar
-import pytz
+import re
 
-from main import db
-from flask import current_app as app
+from geoalchemy2.shape import to_shape
+from icalendar import Calendar
+import pendulum
+from shapely.geometry import Point
+from slugify import slugify_unicode
 from sqlalchemy import UniqueConstraint, func, select
 from sqlalchemy.orm import column_property
 from sqlalchemy.orm.exc import NoResultFound
 
-import re
-from slugify import slugify_unicode
+from main import db
+from models.site_state import event_start, event_end
 
 
 class CalendarSource(db.Model):
     __tablename__ = 'calendar_source'
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     url = db.Column(db.String, nullable=False)
-    enabled = db.Column(db.Boolean, nullable=False, default=True)
     name = db.Column(db.String)
     type = db.Column(db.String, default="Village")
+    priority = db.Column(db.Integer, default=0)
+    enabled = db.Column(db.Boolean, nullable=False, default=False)
+    refreshed_at = db.Column(db.DateTime())
+
+    displayed = db.Column(db.Boolean, nullable=False, default=False)
+    published = db.Column(db.Boolean, nullable=False, default=False)
     main_venue = db.Column(db.String)
+    map_obj_id = db.Column(db.Integer, db.ForeignKey('map_object.id'))
     contact_phone = db.Column(db.String)
     contact_email = db.Column(db.String)
-    lat = db.Column(db.Float)
-    lon = db.Column(db.Float)
-    priority = db.Column(db.Integer, default=0)
 
-    def __init__(self, url):
-        self.url = url
+    user = db.relationship('User', backref="calendar_sources")
+    mapobj = db.relationship('MapObject')
 
     # Make sure these are identifiable to the memoize cache
     def __repr__(self):
@@ -51,62 +57,90 @@ class CalendarSource(db.Model):
 
 
     def refresh(self):
-        request = requests.get(self.url.strip())
+        request = requests.get(self.url)
 
         cal = Calendar.from_ical(request.text)
-        uid_seen = []
-
         if self.name is None:
             self.name = cal.get('X-WR-CALNAME')
 
-        local_tz = pytz.timezone("Europe/London")
+        for event in self.events:
+            event.displayed = False
+
+        local_tz = pendulum.timezone('Europe/London')
+        alerts = []
+        uids_seen = set()
+        out_of_range_event = False
         for component in cal.walk():
             if component.name == 'VEVENT':
-                if 'rrule' in component:
-                    app.logger.warning('Event %s has rrule, which is not processed', component.get('Summary'))
+                summary = component.get('Summary')
+
+                # postgres converts to UTC if given an aware datetime, so strip it up front
+                start_dt = pendulum.instance(component.get('dtstart').dt)
+                start_dt = local_tz.convert(start_dt).naive()
+
+                end_dt = pendulum.instance(component.get('dtend').dt)
+                end_dt = local_tz.convert(end_dt).naive()
+
+                name = summary
+                if summary and start_dt:
+                    name = "'{}' at {}".format(summary, start_dt)
+                elif summary:
+                    name = "'{}'".format(summary)
+                elif start_dt:
+                    name = 'Event at {}'.format(start_dt)
+                else:
+                    name = len(self.events) + 1
 
                 if not component.get('uid'):
-                    app.logger.debug('Ignoring event %s as it has no UID', component.get('Summary'))
+                    alerts.append(('danger', "{} has no UID".format(name)))
                     continue
 
                 uid = str(component['uid'])
-                if uid in uid_seen:
-                    app.logger.debug('Ignoring event %s with duplicate UID', component.get('Summary'))
+                if uid in uids_seen:
+                    alerts.append(('danger', "{} has duplicate UID {}".format(name, uid)))
                     continue
+                uids_seen.add(uid)
 
-                uid_seen.append(uid)
+                if 'rrule' in component:
+                    alerts.append(('warning', "{} has rrule, which is not processed".format(uid)))
+
+                # Allow a bit of slop for build-up events
+                if start_dt < event_start() - pendulum.duration(days=2) and not out_of_range_event:
+                    alerts.append(('warning', "At least one event ({}) is before the start of the event".format(uid)))
+                    out_of_range_event = True
+
+                if end_dt > event_end() + pendulum.duration(days=1) and not out_of_range_event:
+                    alerts.append(('warning', "At least one event ({}) is after the end of the event".format(uid)))
+                    out_of_range_event = True
+
+                if start_dt > end_dt:
+                    alerts.append(('danger', "Start time for {} is after its end time".format(uid)))
+                    out_of_range_event = True
+
+
                 try:
                     event = CalendarEvent.query.filter_by(source_id=self.id, uid=uid).one()
 
                 except NoResultFound:
-                    event = CalendarEvent()
-                    event.uid = uid
-                    event.source_id = self.id
-                    db.session.add(event)
+                    event = CalendarEvent(uid=uid)
+                    self.events.append(event)
+                    if len(self.events) > 1000:
+                        raise Exception("Too many events in feed")
 
-                start_dt = component.get('dtstart').dt
-                if hasattr(start_dt, 'tzinfo') and start_dt.tzinfo is not None:
-                    start_dt = start_dt.astimezone(local_tz).replace(tzinfo=None)
                 event.start_dt = start_dt
-
-                end_dt = component.get('dtend').dt
-                if hasattr(end_dt, 'tzinfo') and end_dt.tzinfo is not None:
-                    end_dt = end_dt.astimezone(local_tz).replace(tzinfo=None)
                 event.end_dt = end_dt
-
                 event.summary = component.get('summary')
                 event.description = component.get('description')
                 event.location = component.get('location')
+                event.displayed = True
 
-        events = CalendarEvent.query.filter_by(source_id=self.id)
-        to_delete = [p for p in events if p.uid not in uid_seen]
+        self.refreshed_at = pendulum.now()
 
-        for e in to_delete:
-            db.session.delete(e)
+        return alerts
 
     @classmethod
     def get_enabled_events(self):
-        sources = CalendarSource.query.filter_by(enabled=True)
+        sources = CalendarSource.query.filter_by(published=True, displayed=True)
         events = []
         for source in sources:
             events.extend(source.events)
@@ -124,6 +158,7 @@ class CalendarEvent(db.Model):
     uid = db.Column(db.String)
     start_dt = db.Column(db.DateTime(), nullable=False)
     end_dt = db.Column(db.DateTime(), nullable=False)
+    displayed = db.Column(db.Boolean, nullable=False, default=True)
 
     source_id = db.Column(db.Integer, db.ForeignKey(CalendarSource.id),
                                       nullable=False, index=True)
@@ -196,8 +231,10 @@ class CalendarEvent(db.Model):
 
     @property
     def latlon(self):
-        if self.source.lat and self.source.lon:
-            return [self.source.lat, self.source.lon]
+        if self.source.mapobj:
+            obj = to_shape(self.source.mapobj)
+            if isinstance(obj, Point):
+                return (obj.x, obj.y)
         return None
 
     @property

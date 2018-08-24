@@ -2,8 +2,14 @@ $(function() {
     $('.favourite-button').click(function(event) {
         var fave_icon = $('.favourite-icon', this);
         var is_fave = fave_icon.hasClass('glyphicon-heart');
-        var proposal_id = $(this).attr('value');
-        fetch('/api/proposal/' + proposal_id + '/favourite', {
+        var event_type;
+        if ($(this).closest('.event').hasClass('proposal')) {
+            event_type = 'proposal';
+        } else {
+            event_type = 'external';
+        }
+        var event_id = $(this).attr('value');
+        fetch('/api/' + event_type + '/' + event_id + '/favourite', {
             method: 'PUT',
             credentials: 'include',
             headers: {
