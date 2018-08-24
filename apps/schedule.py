@@ -478,6 +478,7 @@ class UpdateExternalFeedForm(Form):
     priority = IntegerField('Priority')
     contact_phone = StringField('Phone')
     contact_email = EmailField('Email', [Email(), Optional()])
+    enabled = BooleanField('Refresh automatically')
     displayed = BooleanField('Displayed')
     preview = SubmitField('Preview')
     save = SubmitField('Save')
@@ -498,10 +499,12 @@ def external_feed(source_id):
             calendar.priority = form.priority.data
             calendar.contact_phone = form.contact_phone.data
             calendar.contact_email = form.contact_email.data
+            calendar.enabled = form.enabled.data
             calendar.displayed = form.displayed.data
 
             alerts = calendar.refresh()
             db.session.commit()
+            return redirect(url_for('.external_feed', source_id=calendar.id))
 
         calendar.url = form.url.data
 
