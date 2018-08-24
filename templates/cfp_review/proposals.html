@@ -29,8 +29,8 @@
         {% else %}
             {% set qs_reverse_new=None %}
         {% endif %}
-        <th class="col-md-1">
-            <a href="{{ url_for('.proposals', sort_by='ticket', reverse=qs_reverse_new, **new_qs) }}">Has ticket</a>
+        <th>
+            <a href="{{ url_for('.proposals', sort_by='ticket', reverse=qs_reverse_new, **new_qs) }}">Ticket?</a>
         </th>
         <th class="col-md-1">
             <a href="{{ url_for('.proposals', sort_by='date', reverse=qs_reverse_new, **new_qs) }}">Date</a>
@@ -38,14 +38,17 @@
         <th>
             <a href="{{ url_for('.proposals', sort_by='state', reverse=qs_reverse_new, **new_qs) }}">State</a>
         </th>
-        <th>
+        <th class="col-md-1">
             <a href="{{ url_for('.proposals', sort_by='type', reverse=qs_reverse_new, **new_qs) }}">Type</a>
         </th>
         <th class="col-md-1">
             <a href="{{ url_for('.proposals', sort_by='notice', reverse=qs_reverse_new, **new_qs) }}">Notice</a>
         </th>
-        <th class="">
+        <th>
             <a href="{{ url_for('.proposals', sort_by='duration', reverse=qs_reverse_new, **new_qs) }}">Duration</a>
+        </th>
+        <th>
+            <a href="{{ url_for('.proposals', sort_by='favourites', reverse=qs_reverse_new, **new_qs) }}">#Favs</a>
         </th>
         <th>
             <a href="{{ url_for('.proposals', sort_by='user', reverse=qs_reverse_new, **new_qs) }}">User</a>
@@ -62,6 +65,7 @@
         <td>{{proposal.human_type | capitalize}}</td>
         <td>{{proposal.notice_required or ''}}</td>
         <td>{{proposal.scheduled_duration or ''}}</td>
+        <td>{{proposal.favourite_count}}</td>
         <td>
             <a href="{{ url_for('admin.user', user_id=proposal.user.id ) }}">{{proposal.user.name}}</a>
         </td>

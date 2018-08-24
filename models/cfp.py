@@ -65,8 +65,22 @@ PROPOSAL_TIMESLOTS = {
                             'sun_20_22', 'sun_22_24')
 }
 
+PREFERRED_TIMESLOTS = {
+    'workshop':         ('fri_13_16', 'fri_16_20',
+                            'sat_10_13', 'sat_13_16', 'sat_16_20',
+                            'sun_10_13', 'sun_13_16', 'sun_16_20'),
+}
+
 HARD_START_LIMIT = {
     'youthworkshop': (9, 30),
+}
+
+REMAP_SLOT_PERIODS = {
+    'youthworkshop': {
+        'fri_16_20': ('fri', (16, 0), (20, 20)),
+        'sat_16_20': ('sat', (16, 0), (20, 20)),
+        'sun_16_20': ('sun', (16, 0), (19, 30)),
+    },
 }
 
 # Number of slots (in 10min increments) that must be between proposals of this
@@ -96,15 +110,35 @@ DEFAULT_VENUES = {
     'installation': [],
 }
 
+VENUE_CAPACITY = {
+    'Stage A': 600,
+    'Stage B': 400,
+    'Stage C': 400,
+    'Workshop 1': 30,
+    'Workshop 2': 30,
+    'Workshop 3': 35,
+    'Workshop 4': 35,
+    'Youth Workshop': 30,
+}
+
 # List of submission types which are manually reviewed rather than through
 # the anonymous review system.
 MANUAL_REVIEW_TYPES = ['youthworkshop', 'performance', 'installation']
 
 
-def timeslot_to_period(slot_string):
-    day, start_h, end_h = slot_string.split('_')
-    start = DAYS[day] + timedelta(hours=int(start_h))
-    end = DAYS[day] + timedelta(hours=int(end_h))
+def timeslot_to_period(slot_string, type=None):
+    start = end = None
+
+    if type in REMAP_SLOT_PERIODS and slot_string in REMAP_SLOT_PERIODS[type]:
+        day, start_time, end_time = REMAP_SLOT_PERIODS[type][slot_string]
+        start = DAYS[day] + timedelta(hours=start_time[0], minutes=start_time[1])
+        end = DAYS[day] + timedelta(hours=end_time[0], minutes=end_time[1])
+
+    else:
+        day, start_h, end_h = slot_string.split('_')
+        start = DAYS[day] + timedelta(hours=int(start_h))
+        end = DAYS[day] + timedelta(hours=int(end_h))
+
     return period(start, end)
 
 # Reduces the time periods to the smallest contiguous set we can
@@ -126,7 +160,7 @@ def make_periods_contiguous(time_periods):
 def get_available_proposal_minutes():
     minutes = defaultdict(int)
     for type, slots in PROPOSAL_TIMESLOTS.items():
-        periods = make_periods_contiguous([timeslot_to_period(ts) for ts in slots])
+        periods = make_periods_contiguous([timeslot_to_period(ts, type=type) for ts in slots])
         for period in periods:
             minutes[type] += int((period.end - period.start).total_seconds() / 60) * len(DEFAULT_VENUES[type])
     return minutes
@@ -387,7 +421,7 @@ class Proposal(db.Model):
         if not time_periods and self.available_times:
             for p in self.available_times.split(','):
                 if p:
-                    time_periods.append(timeslot_to_period(p.strip()))
+                    time_periods.append(timeslot_to_period(p.strip(), type=self.type))
 
         time_periods = self.fix_hard_time_limits(time_periods)
         return make_periods_contiguous(time_periods)
@@ -398,10 +432,16 @@ class Proposal(db.Model):
     def get_allowed_time_periods_with_default(self):
         allowed_time_periods = self.get_allowed_time_periods()
         if not allowed_time_periods:
-            allowed_time_periods = [timeslot_to_period(ts) for ts in PROPOSAL_TIMESLOTS[self.type]]
+            allowed_time_periods = [timeslot_to_period(ts, type=self.type) for ts in PROPOSAL_TIMESLOTS[self.type]]
 
         allowed_time_periods = self.fix_hard_time_limits(allowed_time_periods)
         return make_periods_contiguous(allowed_time_periods)
+
+    def get_preferred_time_periods_with_default(self):
+        preferred_time_periods = [timeslot_to_period(ts, type=self.type) for ts in PREFERRED_TIMESLOTS.get(self.type, [])]
+
+        preferred_time_periods = self.fix_hard_time_limits(preferred_time_periods)
+        return make_periods_contiguous(preferred_time_periods)
 
     @property
     def end_date(self):

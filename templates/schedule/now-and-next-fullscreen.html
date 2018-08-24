@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <style type="text/css">
+
+        .fullscreen {
+            background-image: url('{{ url_for('static', filename='images/brand/header.jpg')}}');
+
+            /* Full height */
+            height: 100%;
+            /* Center and scale the image nicely */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+
+            font-size: 40px;
+
+            padding: 250px;
+        }
+
+        .fullscreen h1 { font-size: 49px; }
+        .fullscreen div { margin-left: 50px; }
+        .fullscreen strong { margin-right: 15px; }
+        .fullscreen .time { margin-right: 15px; }
+        .fullscreen em { margin-left: 10px; }
+        .fullscreen em::before {content: "–"; margin-right: 10px;}
+        .now { margin-bottom: 50px; }
+
+
+    </style>
+{% endblock %}
+
+{% block document %}
+
+
+<div class="fullscreen">
+
+    <div class="now">
+        <h1>Now</h1>
+        {% for venue, proposals in proposals_by_venue|dictsort %}
+            {% set now=proposals[0] %}
+            <div id="now-{{ venue }}">
+                {% if venues | length != 1 -%}
+                    <strong>{{ now['venue'] }}</strong>
+                {%- endif %} {{ now['title'] }} <em> {{ now['speaker'] }}</em>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="next">
+        <h1>Next</h1>
+        {% for venue, proposals in proposals_by_venue|dictsort %}
+            {% set next=proposals[1] %}
+            <div id="next-{{ venue }}">
+                {% if venues | length != 1 -%}
+                    <strong>{{ next['venue'] }}</strong>
+                {%- endif %}
+                <span class="time">{{ next['start_time'] }}</span> {{ next['title'] }} <em> {{ next['speaker'] }}</em>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+{% endblock %}
