@@ -1,9 +1,13 @@
 # coding=utf-8
+import pytz
+
 from pendulum import period
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from main import db
+
+event_tz = pytz.timezone('Europe/London')
 
 class Shift(db.Model):
     __tablename__ = 'volunteer_shift'
@@ -42,16 +46,18 @@ class Shift(db.Model):
     def duration_in_minutes(self):
         return (self.start - self.end).total_seconds() // 60
 
-    def to_dict(self):
+    def to_localtime_dict(self):
+        start = event_tz.localize(self.start)
+        end = event_tz.localize(self.end)
         return {
             "id": self.id,
             "role_id": self.role_id,
             "venue_id": self.venue_id,
             "proposal_id": self.proposal_id,
-            "start": self.start,
-            "start_time": self.start.strftime("%H:%M"),
-            "end": self.end,
-            "end_time": self.end.strftime("%H:%M"),
+            "start": start.strftime('%Y-%m-%dT%H:%M:00'),
+            "start_time": start.strftime("%H:%M"),
+            "end": end.strftime('%Y-%m-%dT%H:%M:00'),
+            "end_time": end.strftime("%H:%M"),
             "min_needed": self.min_needed,
             "max_needed": self.max_needed,
             "role": self.role.to_dict(),

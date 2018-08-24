@@ -9,9 +9,29 @@ from main import db
 
 from models.volunteer.role import Role
 from models.volunteer.shift import Shift, ShiftEntry
+from models.volunteer.volunteer import Volunteer
 
 from ..common import feature_flag
 from . import volunteer, v_user_required
+
+
+def _get_interested_roles(user):
+    roles = Role.get_all()
+    volunteer = Volunteer.get_for_user(user)
+    res = []
+
+    for r in roles:
+        to_add = r.to_dict()
+
+        if r in volunteer.interested_roles:
+            to_add['is_interested'] = True
+
+        if r in volunteer.trained_roles:
+            to_add['is_trained'] = True
+
+        res.append(to_add)
+
+    return res
 
 @volunteer.route('/schedule')
 @feature_flag('VOLUNTEERS_SCHEDULE')
@@ -24,13 +44,13 @@ def schedule():
         day_key = s.start.strftime('%a').lower()
         hour_key = s.start.strftime('%H:%M')
 
-        to_add = s.to_dict()
+        to_add = s.to_localtime_dict()
         to_add['sign_up_url'] = url_for('.shift', shift_id=to_add['id'])
         to_add['is_user_shift'] = current_user in s.volunteers
 
         by_time[day_key][hour_key].append(to_add)
 
-    roles = [r.to_dict() for r in Role.get_all()]
+    roles = _get_interested_roles(current_user)
     return render_template('volunteer/schedule.html', roles=roles, all_shifts=by_time,
                            active_day=request.args.get('day', default='fri'))
 

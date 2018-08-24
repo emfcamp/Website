@@ -1,4 +1,4 @@
-function init_volunteer_schedule(data, active_day) {
+function init_volunteer_schedule(data, all_roles, active_day) {
     var current_day = active_day;
 
     function render(){
@@ -57,10 +57,7 @@ function init_volunteer_schedule(data, active_day) {
             $('#signUp .modal-title').html('Sign up for ' + shift.role.name + ' @ ' + shift.start_time);
 
             $('#signUp .modal-body').empty();
-            $('#signUp .modal-body').append([
-                make_modal_details(shift),
-                make_ele('p', '<a href="'+shift.sign_up_url +'">More details</a>')
-            ]);
+            $('#signUp .modal-body').append(make_modal_details(shift));
 
             $('#signUp .modal-footer').empty();
             $('#signUp .modal-footer').append(make_modal_buttons(shift));
@@ -71,8 +68,21 @@ function init_volunteer_schedule(data, active_day) {
 
     function make_modal_details(shift) {
         var dl = $(document.createElement('dl')),
-            needed = (shift.min_needed === shift.max_needed)? shift.min_needed
-                                                            : shift.min_needed + ' - ' + shift.max_needed;
+            res = [
+                dl,
+                make_ele('p', '<a href="'+shift.sign_up_url +'">More details</a>')],
+            needed;
+
+        if (shift.min_needed === shift.max_needed) {
+            needed = shift.min_needed;
+        } else {
+            needed = shift.min_needed + ' - ' + shift.max_needed;
+        }
+
+        if (shift.is_user_shift) {
+            res.unshift(make_ele('p', 'You are currently signed up to this shift'));
+        }
+
         dl.addClass('dl-horizontal');
         dl.append([
             make_ele('dt', 'Role'), make_ele('dd', shift.role.name),
@@ -83,12 +93,12 @@ function init_volunteer_schedule(data, active_day) {
             make_ele('dd', needed),
             make_ele('dt', 'Currently'), make_ele('dd', shift.current_count),
         ]);
-        return dl;
+        return res;
     }
 
     function make_modal_buttons(shift) {
         var close_btn = make_button('default', 'Close'),
-            submit_btn = make_button('primary', (shift.is_user_shift) ? 'Cancel': 'Sign up');
+            submit_btn = make_button('primary', (shift.is_user_shift) ? 'Cancel shift': 'Sign up');
 
         close_btn.attr('data-dismiss', 'modal');
         submit_btn.attr('id', 'sign-up-'+shift.id);
@@ -199,7 +209,11 @@ function init_volunteer_schedule(data, active_day) {
             return true;
         }
 
-        if (!filters.show_past && shift.end_time < new Date()) {
+        if (!filters.show_past && new Date(shift.end) < new Date()) {
+            return true;
+        }
+
+        if (filters.show_signed_up_only && !shift.is_user_shift) {
             return true;
         }
 
@@ -208,9 +222,10 @@ function init_volunteer_schedule(data, active_day) {
 
     function get_filters() {
         // TODO logic for trained/interested shifts
-        var show_past = $('#show_past').val() || false,
+        var show_past = $('#show_past').prop('checked'),
+            show_signed_up_only = $('#show_signed_up_only').prop('checked'),
             role_ids = [],
-            raw_role_ids = $('#role-select').val();
+            raw_role_ids = $('#role-select').val() || [];
 
         if (raw_role_ids) {
             $.each(raw_role_ids, function (_, val) {
@@ -220,7 +235,8 @@ function init_volunteer_schedule(data, active_day) {
 
         return {
             role_ids: role_ids,
-            show_past: show_past
+            show_past: show_past,
+            show_signed_up_only: show_signed_up_only
         };
     }
 
@@ -237,6 +253,23 @@ function init_volunteer_schedule(data, active_day) {
             }
         });
         return res;
+    }
+
+    function set_roles() {
+        var is_interested = $('#is_interested').prop('checked'),
+            is_trained = $('#is_trained').prop('checked');
+
+        $('#role-select').prop('selected', false);
+        $.each(all_roles, function(_, role) {
+            if (is_interested && !role.is_interested) {
+                return;
+            } else if (is_trained && !role.is_trained) {
+                return;
+            }
+
+            $('#role-opt-'+role.id).prop('selected', true);
+        });
+        render();
     }
 
 
@@ -262,6 +295,9 @@ function init_volunteer_schedule(data, active_day) {
     $('#clear-btn').click(clear_filters);
 
     $('#signUp').on('hide.bs.modal', render);
+
+    $('#is_interested').on('change', set_roles);
+    $('#is_trained').on('change', set_roles);
 
     render();
 }

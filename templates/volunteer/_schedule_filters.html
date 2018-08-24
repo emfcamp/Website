@@ -6,7 +6,7 @@
             <div class="col-sm-10">
                 <select id="role-select" name="role" multiple="multiple" class="form-control">
                     {% for r in roles %}
-                        <option value="{{r.id}}">{{r.name}}</option>
+                        <option id='role-opt-{{r.id}}' value="{{r.id}}">{{r.name}}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -16,7 +16,7 @@
         <div class="form-group">
             <div class="checkbox">
                 <label>
-                    <input id="is_trained" type="checkbox" checked>
+                    <input id="is_trained" type="checkbox">
                     I am trained for
                 </label>
             </div>
@@ -24,7 +24,7 @@
         <div class="form-group">
             <div class="checkbox">
                 <label>
-                    <input id="is_interested" type="checkbox" checked>
+                    <input id="is_interested" type="checkbox">
                     I am interested in
                 </label>
             </div>
@@ -34,6 +34,14 @@
                 <label>
                     <input id="show_past" type="checkbox">
                     Show finished shifts
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <input id="show_signed_up_only" type="checkbox">
+                    I'm signed up for
                 </label>
             </div>
         </div>
