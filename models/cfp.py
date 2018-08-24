@@ -65,6 +65,12 @@ PROPOSAL_TIMESLOTS = {
                             'sun_20_22', 'sun_22_24')
 }
 
+PREFERRED_TIMESLOTS = {
+    'workshop':         ('fri_13_16', 'fri_16_20',
+                            'sat_10_13', 'sat_13_16', 'sat_16_20',
+                            'sun_10_13', 'sun_13_16', 'sun_16_20'),
+}
+
 HARD_START_LIMIT = {
     'youthworkshop': (9, 30),
 }
@@ -413,6 +419,12 @@ class Proposal(db.Model):
 
         allowed_time_periods = self.fix_hard_time_limits(allowed_time_periods)
         return make_periods_contiguous(allowed_time_periods)
+
+    def get_preferred_time_periods_with_default(self):
+        preferred_time_periods = [timeslot_to_period(ts) for ts in PREFERRED_TIMESLOTS.get(self.type, [])]
+
+        preferred_time_periods = self.fix_hard_time_limits(preferred_time_periods)
+        return make_periods_contiguous(preferred_time_periods)
 
     @property
     def end_date(self):
