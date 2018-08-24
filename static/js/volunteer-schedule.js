@@ -55,17 +55,24 @@ function init_volunteer_schedule(data, active_day) {
     function make_open_modal_fn(shift) {
         return function open_modal() {
             $('#signUp .modal-title').html('Sign up for ' + shift.role.name + ' @ ' + shift.start_time);
+
             $('#signUp .modal-body').empty();
-            $('#signUp .modal-body').append(make_modal_body(shift));
-            $('#signUp').modal();
+            $('#signUp .modal-body').append([
+                make_modal_details(shift),
+                make_ele('p', '<a href="'+shift.sign_up_url +'">More details</a>')
+            ]);
 
-            var btn = $('#signUp #signUpBtn');
+            $('#signUp .modal-footer').empty();
+            $('#signUp .modal-footer').append(make_modal_buttons(shift));
 
+            var btn = $('#sign-up-'+shift.id);
             btn.click(make_sign_up_fn(btn, shift.sign_up_url));
+
+            $('#signUp').modal();
         };
     }
 
-    function make_modal_body(shift) {
+    function make_modal_details(shift) {
         var dl = $(document.createElement('dl')),
             needed = (shift.min_needed === shift.max_needed)? shift.min_needed
                                                             : shift.min_needed + ' - ' + shift.max_needed;
@@ -77,9 +84,27 @@ function init_volunteer_schedule(data, active_day) {
             make_ele('dt', 'End'), make_ele('dd', shift.end),
             make_ele('dt', 'Volunteers needed'),
             make_ele('dd', needed),
-            make_ele('dt', 'Currently'),  make_ele('dd', shift.current_count)
+            make_ele('dt', 'Currently'), make_ele('dd', shift.current_count),
         ]);
         return dl;
+    }
+
+    function make_modal_buttons(shift) {
+        var close_btn = make_button('default', 'Close'),
+            submit_btn = make_button('primary', (shift.is_user_shift) ? 'Cancel': 'Sign up');
+
+        close_btn.attr('data-dismiss', 'modal');
+        submit_btn.attr('id', 'sign-up-'+shift.id);
+        submit_btn.addClass('debouce');
+
+        return [close_btn, submit_btn];
+    }
+
+    function make_button(btn_class, inner) {
+        var btn = make_ele('btn', inner);
+        btn.addClass('btn btn-'+btn_class);
+        btn.attr('type', 'button');
+        return $(btn);
     }
 
     function make_sign_up_fn(ele, url) {
@@ -87,16 +112,22 @@ function init_volunteer_schedule(data, active_day) {
             var modal_body = $('#signUp .modal-body');
             ele.attr('disabled', true);
 
-            $.post(url)
+            $.post(url+'.json')
              .success(make_post_callback_fn(modal_body, ele, "Success!", "alert-info"))
              .fail(make_post_callback_fn(modal_body, ele, "Something went wrong!", "alert-danger"));
         };
     }
 
     function make_post_callback_fn(append_ele, btn_ele, msg, alert_type) {
-        return function() {
-            var alert = make_alert(alert_type, msg);
+        return function(resp) {
+            var alert = make_alert(alert_type, resp.message);
             append_ele.prepend(alert);
+
+            if (resp.warning) {
+                alert = make_alert('alert-warning', resp.warning);
+                append_ele.prepend(alert);
+            }
+
             btn_ele.attr('disabled', false);
         };
     }

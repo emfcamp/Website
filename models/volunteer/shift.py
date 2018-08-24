@@ -1,6 +1,7 @@
 # coding=utf-8
-from sqlalchemy.orm import validates
 from pendulum import period
+from sqlalchemy.orm import validates
+from sqlalchemy.ext.associationproxy import association_proxy
 
 from main import db
 
@@ -20,10 +21,20 @@ class Shift(db.Model):
     role = db.relationship('Role', backref='shifts')
     venue = db.relationship('VolunteerVenue', backref='shifts')
 
+    volunteers = association_proxy('entries', 'user')
+
     @validates('start', 'end')
     def validate_shift_times(self, key, datetime):
         assert (datetime.minute % 15 == 0), '%s datetimes must be quarter-hour aligned' % key
         return datetime
+
+    def is_clash(self, other):
+        """
+        If the venues and roles match then the shifts can overlap
+        """
+        return not (self.venue == other.venue and self.role == other.role) \
+               or other.start <= self.start <= other.end or \
+                  other.start <= self.end <= other.end
 
     def __repr__(self):
         return '<Shift {0}/{1}@{2}>'.format(self.role.name, self.venue.name, self.start)
@@ -84,8 +95,8 @@ class ShiftEntry(db.Model):
     checked_in = db.Column(db.Boolean, nullable=False, default=False)
     missing_others = db.Column(db.Boolean, nullable=False, default=False)
 
-    shift = db.relationship('Shift', backref='entries')
     user = db.relationship('User', backref='shift_entries')
+    shift = db.relationship('Shift', backref='entries')
 
 """
 class TrainingSession(Shift):
