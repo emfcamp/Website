@@ -44,17 +44,25 @@ function init_volunteer_schedule(data, active_day) {
 
         new_ele.append(cells);
         new_ele.attr('id', 'shift-'+shift.id);
-        new_ele.click(function() {
-            $('#signUp .modal-title').html('Sign up for ' + shift.role.name + ' @ ' + shift.start_time);
-            $('#signUp .modal-body').empty();
-            $('#signUp .modal-body').append(make_modal_body(shift));
-            $('#signUp').modal();
-        });
+        new_ele.click(make_open_modal_fn(shift));
         return new_ele;
     }
 
     function make_cell(inner) {
         return make_ele('td', inner);
+    }
+
+    function make_open_modal_fn(shift) {
+        return function open_modal() {
+            $('#signUp .modal-title').html('Sign up for ' + shift.role.name + ' @ ' + shift.start_time);
+            $('#signUp .modal-body').empty();
+            $('#signUp .modal-body').append(make_modal_body(shift));
+            $('#signUp').modal();
+
+            var btn = $('#signUp #signUpBtn');
+
+            btn.click(make_sign_up_fn(btn, shift.sign_up_url));
+        };
     }
 
     function make_modal_body(shift) {
@@ -72,6 +80,37 @@ function init_volunteer_schedule(data, active_day) {
             make_ele('dt', 'Currently'),  make_ele('dd', shift.current_count)
         ]);
         return dl;
+    }
+
+    function make_sign_up_fn(ele, url) {
+        return function (){
+            var modal_body = $('#signUp .modal-body');
+            ele.attr('disabled', true);
+
+            $.post(url)
+             .success(make_post_callback_fn(modal_body, ele, "Success!", "alert-info"))
+             .fail(make_post_callback_fn(modal_body, ele, "Something went wrong!", "alert-danger"));
+        };
+    }
+
+    function make_post_callback_fn(append_ele, btn_ele, msg, alert_type) {
+        return function() {
+            var alert = make_alert(alert_type, msg);
+            append_ele.prepend(alert);
+            btn_ele.attr('disabled', false);
+        };
+    }
+
+    function make_alert(alert_type, msg) {
+        var alert = $(document.createElement('div'));
+        alert.addClass('alert alert-dismissible fade in '+alert_type);
+        alert.attr('role', 'alert');
+        // Dismiss button must be the first child
+        alert.html('<button type="button" class="close" data-dismiss="alert" aria-label="Close">'+
+                        '<span aria-hidden="true">×</span>'+
+                    '</button>'+
+                    msg);
+        return $(alert);
     }
 
     function make_ele(type, inner) {
