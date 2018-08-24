@@ -95,6 +95,9 @@ class RunScheduler(Command):
                     'time_ranges': [
                         {"start": str(p.start), "end": str(p.end)} for p in proposal.get_allowed_time_periods_with_default()
                     ],
+                    'preferred_time_ranges': [
+                        {"start": str(p.start), "end": str(p.end)} for p in proposal.get_preferred_time_periods_with_default()
+                    ],
                     'spacing_slots': EVENT_SPACING.get(proposal.type, 1),
                 }
 
