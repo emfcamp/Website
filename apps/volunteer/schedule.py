@@ -18,9 +18,10 @@ def schedule():
         day_key = s.start.strftime('%a').lower()
         hour_key = s.start.strftime('%H:%M')
 
-        all_shifts[day_key][hour_key].append(s)
+        all_shifts[day_key][hour_key].append(s.to_dict())
 
-    return render_template('volunteer/schedule.html', form=form, all_shifts=all_shifts)
+    return render_template('volunteer/schedule.html', all_shifts=all_shifts)
+
 
 @volunteer.route('/shift/<id>')
 @feature_flag('VOLUNTEERS_SCHEDULE')

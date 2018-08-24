@@ -13,6 +13,14 @@ class Role(db.Model):
     def __repr__(self):
         return '<VolunteerRole {0}>'.format(self.name)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "role_notes": self.role_notes
+        }
+
     @classmethod
     def get_by_name(cls, name):
         return cls.query.filter_by(name=name).one_or_none()
@@ -24,7 +32,6 @@ class Role(db.Model):
     @classmethod
     def get_all(cls):
         return cls.query.order_by(Role.name).all()
-
 
 
 class RolePermission(db.Model):

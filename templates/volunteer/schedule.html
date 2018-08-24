@@ -2,7 +2,7 @@
 {% from "_formhelpers.html" import render_field %}
 
 {% macro days_shifts(day) %}
-    <table class="table table-bordered">
+    <table id="tab-{{ day }}" class="table table-bordered">
         <thead><tr>
             <th>Starts</th>
             <th>Ends</th>
@@ -10,7 +10,7 @@
             <th>Role</th>
             <th>People</th>
         </tr></thead>
-        <tbody>
+        <tbody id="tbody-{{ day }}">
             {% for hour in all_shifts[day] | sort %}
                 {% for shift in all_shifts[day][hour] %}
                     <tr>
@@ -33,20 +33,33 @@
 {% endblock %}
 {% block body %}
     <noscript>
-        This page requires Javascript.
+        <div class="well">
+            This page requires Javascript.
+        </div>
     </noscript>
-    {# FIXME these tabs should work either via pure JS or server #}
     <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="active"><a href="#fri" aria-controls="fri" role="tab" data-toggle="tab">Friday</a></li>
-        <li role="presentation"><a href="#sat" aria-controls="sat" role="tab" data-toggle="tab">Saturday</a></li>
-        <li role="presentation"><a href="#sun" aria-controls="sun" role="tab" data-toggle="tab">Sunday</a></li>
-        <li role="presentation"><a href="#mon" aria-controls="mon" role="tab" data-toggle="tab">Monday</a></li>
+        <li role="presentation" class="active"><a href="#fri" data-day="fri" aria-controls="fri" role="tab" data-toggle="tab">Friday</a></li>
+        <li role="presentation"><a href="#sat" data-day="sat" aria-controls="sat" role="tab" data-toggle="tab">Saturday</a></li>
+        <li role="presentation"><a href="#sun" data-day="sun" aria-controls="sun" role="tab" data-toggle="tab">Sunday</a></li>
+        <li role="presentation"><a href="#mon" data-day="mon" aria-controls="mon" role="tab" data-toggle="tab">Monday</a></li>
     </ul>
     <div class="tab-content">
-        {# FIXME oh gods we need another schedule viewer... #}
         <div role="tabpanel" class="tab-pane active" id="fri">{{ days_shifts('fri') }}</div>
         <div role="tabpanel" class="tab-pane" id="sat">{{ days_shifts('sat') }}</div>
         <div role="tabpanel" class="tab-pane" id="sun">{{ days_shifts('sun') }}</div>
         <div role="tabpanel" class="tab-pane" id="mon">{{ days_shifts('mon') }}</div>
     </div>
+{% endblock %}
+
+{% block foot %}
+
+    {% assets "js_volunteer_schedule" -%}
+        <script src="{{ ASSET_URL }}"></script>
+    {% endassets -%}
+    <script type="text/javascript">
+        var volunteer_shifts = {{ all_shifts | tojson }},
+            is_admin = {% if current_user.has_permission('volunter:admin') -%} true {%- else -%} false {%- endif %};
+
+        init_volunteer_schedule(volunteer_shifts);
+    </script>
 {% endblock %}

@@ -31,6 +31,23 @@ class Shift(db.Model):
     def duration_in_minutes(self):
         return (self.start - self.end).total_seconds() // 60
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "role_id": self.role_id,
+            "venue_id": self.venue_id,
+            "proposal_id": self.proposal_id,
+            "start": self.start,
+            "start_time": self.start.strftime("%H:%M"),
+            "end": self.end,
+            "end_time": self.end.strftime("%H:%M"),
+            "min_needed": self.min_needed,
+            "max_needed": self.max_needed,
+            "role": self.role.to_dict(),
+            "venue": self.venue.to_dict(),
+            "current_count": len(self.entries)
+        }
+
     @classmethod
     def get_all(cls):
         return cls.query.order_by(Shift.start, Shift.venue_id).all()
