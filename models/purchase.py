@@ -220,7 +220,7 @@ class PurchaseTransfer(db.Model):
 
     def __repr__(self):
         return "<Purchase Transfer: %s from %s to %s on %s>" % (
-            self.ticket_id, self.from_user_id, self.to_user_id, self.timestamp)
+            self.purchase_id, self.from_user_id, self.to_user_id, self.timestamp)
 
 
 class PurchaseStateException(Exception):
