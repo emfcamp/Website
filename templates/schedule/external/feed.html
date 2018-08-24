@@ -11,7 +11,7 @@
   </li>
 </ul>
 
-<h2>{{ calendar.name or calendar.url }}</h2>
+<h3>{{ calendar.name or calendar.url }}</h3>
 
 {% if preview_events and preview %}
 <p>We've loaded your feed below. If something doesn't look right, email <a href="mailto:{{ config['VILLAGECONTENT_EMAIL'][1] }}">{{ config['VILLAGECONTENT_EMAIL'][1] }}</a>.</p>
@@ -24,7 +24,7 @@
 
 {% if calendar.published %}
 {% if calendar.refreshed_at %}
-<p>Your feed was last refreshed at {{ calendar.refreshed_at }}.
+<p>Your feed was last refreshed at {{ calendar.refreshed_at.strftime('%Y-%m-%d %H:%M') }}.
 {% else %}
 <p>Your feed has been published.</p>
 {% endif %}
