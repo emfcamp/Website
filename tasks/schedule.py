@@ -85,6 +85,16 @@ class RunScheduler(Command):
                 if ordered_venues:
                     preferred_venues = [ordered_venues[0]]
 
+                # This is a terrible hack and needs removing
+                # If a talk is allowed to happen outside main content hours,
+                # don't require it to be spaced from other things - we often
+                # have talks and related performances back-to-back
+                spacing_slots = EVENT_SPACING.get(proposal.type, 1),
+                if proposal.type == 'talk':
+                    for p in proposal.get_allowed_time_periods_with_default():
+                        if p.start.hour < 9 or p.start.hour >= 20:
+                            spacing_slots = 0
+
                 export = {
                     'id': proposal.id,
                     'duration': proposal.scheduled_duration,
@@ -98,7 +108,7 @@ class RunScheduler(Command):
                     'preferred_time_ranges': [
                         {"start": str(p.start), "end": str(p.end)} for p in proposal.get_preferred_time_periods_with_default()
                     ],
-                    'spacing_slots': EVENT_SPACING.get(proposal.type, 1),
+                    'spacing_slots': spacing_slots,
                 }
 
                 if proposal.scheduled_venue:
