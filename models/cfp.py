@@ -93,7 +93,7 @@ REMAP_SLOT_PERIODS = {
 EVENT_SPACING = {
     'talk': 1,
     'workshop': 2,
-    'performance': 3,
+    'performance': 0,
     'youthworkshop': 2,
     'installation': 0,
 }
