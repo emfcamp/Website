@@ -58,7 +58,7 @@ class RunScheduler(Command):
     def get_scheduler_data(self):
         proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
             filter(Proposal.state.in_(['finished', 'accepted'])).\
-            filter(Proposal.type.in_(['talk', 'workshop', 'youthworkshop', 'performance'])).\
+            filter(Proposal.type.in_(['talk', 'workshop', 'youthworkshop'])).\
             order_by(Proposal.favourite_count.desc()).all()
 
         proposals_by_type = defaultdict(list)
