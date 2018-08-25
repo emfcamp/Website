@@ -415,12 +415,17 @@ class Proposal(db.Model):
             for p in self.allowed_times.split('\n'):
                 if p:
                     start, end = p.split(' > ')
-                    time_periods.append(
-                        period(
-                            parse_date(start),
-                            parse_date(end),
+                    try:
+                        time_periods.append(
+                            period(
+                                parse_date(start),
+                                parse_date(end),
+                            )
                         )
-                    )
+                    # If someone has entered garbage, dump the lot
+                    except ValueError as e:
+                        time_periods = []
+                        break
 
         # If we've not overridden it, use the user-specified periods
         if not time_periods and self.available_times:

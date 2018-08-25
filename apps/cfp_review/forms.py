@@ -9,6 +9,7 @@ from models.cfp import Venue
 from ..common.forms import Form, HiddenIntegerField
 from . import ordered_states
 
+from dateutil.parser import parse as parse_date
 
 class UpdateProposalForm(Form):
     # Admin can change anything
@@ -49,6 +50,16 @@ class UpdateProposalForm(Form):
     checked = SubmitField('Mark as checked')
     accept = SubmitField('Accept and send email')
     reject_with_message = SubmitField('Reject and send email')
+
+    def validate_allowed_times(self, field):
+        try:
+            for p in field.data.split('\n'):
+                if p:
+                    start, end = p.split(' > ')
+                    parse_date(start)
+                    parse_date(end)
+        except ValueError:
+            raise ValidationError('Unparsable Allowed Times. Fmt: datetime > datetime per line')
 
     def update_proposal(self, proposal):
         proposal.title = self.title.data
