@@ -89,7 +89,7 @@ class RunScheduler(Command):
                 # If a talk is allowed to happen outside main content hours,
                 # don't require it to be spaced from other things - we often
                 # have talks and related performances back-to-back
-                spacing_slots = EVENT_SPACING.get(proposal.type, 1),
+                spacing_slots = EVENT_SPACING.get(proposal.type, 1)
                 if proposal.type == 'talk':
                     for p in proposal.get_allowed_time_periods_with_default():
                         if p.start.hour < 9 or p.start.hour >= 20:
@@ -108,7 +108,7 @@ class RunScheduler(Command):
                     'preferred_time_ranges': [
                         {"start": str(p.start), "end": str(p.end)} for p in proposal.get_preferred_time_periods_with_default()
                     ],
-                    'spacing_slots': spacing_slots,
+                    'spacing_slots': spacing_slots
                 }
 
                 if proposal.scheduled_venue:
