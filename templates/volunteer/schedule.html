@@ -1,8 +1,9 @@
 {% extends 'volunteer/base.html' %}
 {% from "_formhelpers.html" import render_field %}
 
-{% macro days_shifts(day) %}
-    <table class="table table-bordered">
+{% macro days_shifts(day, active_day) %}
+<div role="tabpanel" class="tab-pane {%- if active_day == day %} active {%- endif %}" id="{{ day }}">
+    <table id="tab-{{ day }}" class="table table-bordered">
         <thead><tr>
             <th>Starts</th>
             <th>Ends</th>
@@ -10,8 +11,8 @@
             <th>Role</th>
             <th>People</th>
         </tr></thead>
-        <tbody>
-            {% for hour in all_shifts[day] | sort %}
+        <tbody id="tbody-{{ day }}">
+          {#   {% for hour in all_shifts[day] | sort %}
                 {% for shift in all_shifts[day][hour] %}
                     <tr>
                         {% if loop.first %}
@@ -23,34 +24,105 @@
                         <td>{{ shift.entries | length }}/{{ shift.max_needed }}</td>
                     </tr>
                 {% endfor %}
-            {% endfor %}
+            {% endfor %} #}
         </tbody>
     </table>
+    </div>
 {%- endmacro %}
+
+{% macro tabnav(day, full_day, active_day) %}
+    <li id="tabnav-{{day}}" role="presentation" {%- if active_day == day %} class="active" {% endif %}>
+        <a href="{{ url_for('.schedule', day=day) }}" data-day="{{ day }}" aria-controls="{{ day }}" role="tab" data-toggle="tab">{{ full_day }}</a>
+    </li>
+
+{% endmacro %}
 
 {% block title %}
     Volunteer Schedule
 {% endblock %}
 {% block body %}
-    <from class="form-horizontal" submit="POST">
-        <h2>Filters</h2>
-        {{ render_field(form.trained_for) }}
-        {{ render_field(form.roles) }}
-        {{ render_field(form.location) }}
-    </from>
+    <noscript>
+        <div class="well">
+            This page works best with Javascript.
+        </div>
+    </noscript>
 
-    {# FIXME these tabs should work either via pure JS or server #}
+    <div id="filter-panel" class="panel panel-default" style="display: none;">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a role="button" data-toggle="collapse" data-target="#searchPanel"
+                    aria-controls="searchPanel" aria-expanded="true">
+                    Filter
+                </a>
+            </h4>
+        </div>
+        <div class="panel-body collapse
+        {%- if filtered %}in{% endif %}
+            " id="searchPanel">
+            {% include "volunteer/_schedule_filters.html" %}
+        </div>
+    </div>
+
     <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="active"><a href="#fri" aria-controls="fri" role="tab" data-toggle="tab">Friday</a></li>
-        <li role="presentation"><a href="#sat" aria-controls="sat" role="tab" data-toggle="tab">Saturday</a></li>
-        <li role="presentation"><a href="#sun" aria-controls="sun" role="tab" data-toggle="tab">Sunday</a></li>
-        <li role="presentation"><a href="#mon" aria-controls="mon" role="tab" data-toggle="tab">Monday</a></li>
+        {{ tabnav('fri', 'Friday', active_day) }}
+        {{ tabnav('sat', 'Saturday', active_day) }}
+        {{ tabnav('sun', 'Sunday', active_day) }}
+        {{ tabnav('mon', 'Monday', active_day) }}
     </ul>
     <div class="tab-content">
-        {# FIXME oh gods we need another schedule viewer... #}
-        <div role="tabpanel" class="tab-pane active" id="fri">{{ days_shifts('fri') }}</div>
-        <div role="tabpanel" class="tab-pane" id="sat">{{ days_shifts('sat') }}</div>
-        <div role="tabpanel" class="tab-pane" id="sun">{{ days_shifts('sun') }}</div>
-        <div role="tabpanel" class="tab-pane" id="mon">{{ days_shifts('mon') }}</div>
+        {{ days_shifts('fri', active_day) }}
+        {{ days_shifts('sat', active_day) }}
+        {{ days_shifts('sun', active_day) }}
+        {{ days_shifts('mon', active_day) }}
     </div>
+{% endblock %}
+
+{% block foot %}
+    <!-- Modal -->
+    <div class="modal fade" id="signUp" tabindex="-1" role="dialog" aria-labelledby="signUpLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="signUpLabel">Modal title</h4>
+          </div>
+          <div class="modal-body">
+            ...
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button id='signUpBtn' type="button" class="btn btn-primary">Sign Up</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% assets "js_volunteer_schedule" -%}
+        <script src="{{ ASSET_URL }}"></script>
+    {% endassets -%}
+    <script type="text/javascript">
+        var csrf_token = "{{ csrf_token() }}";
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                }
+            }
+        });
+
+        $('#filter-panel').show();
+        // Set hrefs back for tabs if JS is enabled
+        $('#tabnav-fri a').attr('href', '#fri');
+        $('#tabnav-sat a').attr('href', '#sat');
+        $('#tabnav-sun a').attr('href', '#sun');
+        $('#tabnav-mon a').attr('href', '#mon');
+
+        var volunteer_shifts = {{ all_shifts | tojson }},
+            volunteer_roles = {{ roles | tojson }},
+            is_admin = {% if current_user.has_permission('volunter:admin') -%} true {%- else -%} false {%- endif %};
+
+        init_volunteer_schedule(volunteer_shifts, volunteer_roles, '{{ active_day }}');
+
+    </script>
 {% endblock %}

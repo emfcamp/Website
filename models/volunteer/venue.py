@@ -10,6 +10,13 @@ class VolunteerVenue(db.Model):
     def __repr__(self):
         return '<VolunteerVenue {0}>'.format(self.name)
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "mapref": self.mapref,
+        }
+
     @classmethod
     def get_all(cls):
         return cls.query.order_by(VolunteerVenue.id).all()

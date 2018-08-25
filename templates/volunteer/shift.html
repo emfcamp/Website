@@ -12,7 +12,16 @@
     <div>Start: {{ shift.start.strftime('%A %H:%M') }}</div>
     <div>Stop: {{ shift.end.strftime('%A %H:%M') }}</div>
 
-    <div><button class="btn btn-primary">
-            Sign up to do the shift!
-    </button></div>
+    <form method="POST" >
+        <input id="csrf_token" name=_csrf_token type=hidden value="{{ csrf_token() }}">
+        {% if shift in current_user.shift_entries %}
+            <button class="btn btn-warn">
+                Cancel this shift
+            </button>
+        {% else %}
+            <button class="btn btn-primary">
+                Sign up to do the shift!
+            </button>
+        {% endif %}
+    </form>
 {% endblock %}
