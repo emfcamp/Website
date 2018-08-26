@@ -119,7 +119,7 @@ class Purchase(db.Model):
         if self.state == 'cancelled':
             raise PurchaseStateException('{} is already cancelled'.format(self))
 
-        if self.is_paid_for:
+        if self.state in ['reserved', 'payment-pending', 'paid', 'receipt-emailed']:
             self.price_tier.return_instances(1)
 
         self.set_state('cancelled')
@@ -128,7 +128,7 @@ class Purchase(db.Model):
         if self.state == 'refunded':
             raise PurchaseStateException('{} is already refunded'.format(self))
 
-        if self.is_paid_for:
+        if self.state in ['reserved', 'payment-pending', 'paid', 'receipt-emailed']:
             self.price_tier.return_instances(1)
 
         self.state = 'refunded'
