@@ -1,9 +1,12 @@
 Hello {{ user.name }}!
 
 With Electromagnetic Field fast approaching, here are your tickets
-and some more details about the event. The gates will open at 9am on
-Friday 31st August, and (unless you're helping out with teardown) you
-should aim to leave by midday on Monday 3rd September.
+and some more details about the event. The gates will open at 4pm on
+Thursday 30th August for people who are travelling that day, and our
+programme of content kicks off at 12:30pm on Friday.
+
+Unless you're helping out with teardown) you should aim to leave by
+midday on Monday 3rd September.
 
 {% include 'emails/receipt-blurb.txt' %}
 
