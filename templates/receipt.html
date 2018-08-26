@@ -33,6 +33,7 @@
         <p>Once inside the camp, you can exchange this ticket at the <b>badge centre</b>
            for an Electromagnetic Field {{ event_year }} badge.
            {% if tees %} Prepaid t-shirts will be available at the entrance gate when announced. {% endif %}
+           {% if hires %} Village tents, furniture and straw bales may already be distributed when you arrive. If not, please go to the Logistics tent.{% endif %}
         </p>
 
         <div>&nbsp;</div>
@@ -40,7 +41,7 @@
 
         {% else %}
         <p>Your account has no associated entrance tickets. This ticket will not allow you to enter the event.</p>
-        <p>Once inside the camp, prepaid t-shirts will be available at the entrance gate when announced.</p>
+        {#<p>Once inside the camp, prepaid t-shirts will be available at the entrance gate when announced.</p>#}
 
         <div>&nbsp;</div>
         <center><h1>Not an entrance ticket</h1></center>
@@ -79,10 +80,20 @@
         <div>&nbsp;</div>
 
         <h4>Your purchase details</h4>
-        {% for product, ticket_count in tees %}
-        <div class="product">{{ ticket_count }} {{ product.display_name }}</div>
+        {% for product, purchase_count in tees %}
+        <div class="product">{{ purchase_count }} {{ product.display_name }}</div>
         {% endfor %}
         {% endif %}
+
+        {% if hires %}
+        <div>&nbsp;</div>
+
+        <h4>Your hired items</h4>
+        {% for product, purchase_count in hires %}
+        <div class="product">{{ purchase_count }} {{ product.display_name }}</div>
+        {% endfor %}
+        {% endif %}
+
     </div>
 
     {% if vehicle_tickets %}

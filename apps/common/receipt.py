@@ -38,11 +38,15 @@ def render_receipt(user, png=False, pdf=False):
 
     vehicle_tickets = purchases.filter(ProductGroup.type.in_(['parking', 'campervan'])).all()
 
-    # FIXME: should this be grouped by Product?
-    tees = purchases.filter(ProductGroup.name == 'tee') \
-                    .with_entities(PriceTier,
-                                   func.count(Purchase.id).label('ticket_count')) \
-                    .group_by(PriceTier).all()
+    tees = purchases.filter(ProductGroup.type == 'tee') \
+                    .with_entities(Product,
+                                   func.count(Purchase.id).label('purchase_count')) \
+                    .group_by(Product.id).all()
+
+    hires = purchases.filter(ProductGroup.type == 'hire') \
+                    .with_entities(Product,
+                                   func.count(Purchase.id).label('purchase_count')) \
+                    .group_by(Product.id).all()
 
     transferred_tickets = user.transfers_from \
                               .join(Purchase) \
@@ -57,7 +61,7 @@ def render_receipt(user, png=False, pdf=False):
                            admissions_total=admissions_total,
                            vehicle_tickets=vehicle_tickets,
                            transferred_tickets=transferred_tickets,
-                           tees=tees,
+                           tees=tees, hires=hires,
                            pdf=pdf, png=png)
 
 
