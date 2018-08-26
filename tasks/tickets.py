@@ -6,6 +6,7 @@ from flask_script import Command
 from sqlalchemy import func
 
 from main import db, mail
+from apps.common import feature_enabled
 from apps.common.receipt import attach_tickets, RECEIPT_TYPES
 from models.payment import Payment
 from models.product import ProductGroup, Product, PriceTier, Price, ProductView, ProductViewProduct
