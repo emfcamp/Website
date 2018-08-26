@@ -34,12 +34,13 @@ function init_volunteer_schedule(data, all_roles, active_day) {
     }
 
     function make_row(shift) {
-        var new_ele = $(document.createElement('tr')),
+        var new_ele = $(document.createElement('tr'));
             cells = [
                 make_cell(shift.end_time),
                 make_cell(shift.venue.name),
                 make_cell(shift.role.name),
-                make_cell(shift.current_count + '/' + shift.max_needed)
+                make_cell(shift.current_count + '/' + shift.max_needed),
+                make_cell(make_details_button(shift))
             ];
 
         new_ele.append(cells);
@@ -50,6 +51,13 @@ function init_volunteer_schedule(data, all_roles, active_day) {
 
     function make_cell(inner) {
         return make_ele('td', inner);
+    }
+
+    function make_details_button(shift) {
+        var content = shift.is_user_shift ? 'Cancel' : 'Sign Up';
+        var cls = shift.is_user_shift ? 'btn-danger' : 'btn-success';
+
+        return `<button id="shift-signup-${shift.id}" class="btn btn-block ${cls}">${content}</button>`;
     }
 
     function make_open_modal_fn(shift) {
