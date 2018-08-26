@@ -117,6 +117,7 @@ def account():
 
     form.arrival.data = volunteer.planned_arrival.strftime('%Y-%m-%d')
     form.departure.data = volunteer.planned_departure.strftime('%Y-%m-%d')
+    form.allow_comms.data = volunteer.allow_comms_during_event
 
     return render_template('volunteer/account.html',
                             user=current_user, form=form)
