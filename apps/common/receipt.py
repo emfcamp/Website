@@ -23,7 +23,6 @@ from main import external_url
 from models.product import Product, ProductGroup, PriceTier
 from models.purchase import PurchaseTransfer, Ticket
 from models.site_state import event_start
-from models.user import User
 from models import Purchase
 
 
