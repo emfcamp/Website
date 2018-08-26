@@ -87,10 +87,10 @@ class UpdateProposalForm(Form):
             proposal.scheduled_duration = None
 
         # Windows users :(
-        trimmed_allowed_times = self.allowed_times.data.trim().replace('\r\n', '\n')
-        if proposal.get_allowed_time_periods_serialised().trim() != trimmed_allowed_times:
-            if trimmed_allowed_times:
-                proposal.allowed_times = trimmed_allowed_times
+        stripmed_allowed_times = self.allowed_times.data.strip().replace('\r\n', '\n')
+        if proposal.get_allowed_time_periods_serialised().strip() != stripmed_allowed_times:
+            if stripmed_allowed_times:
+                proposal.allowed_times = stripmed_allowed_times
             else:
                 proposal.allowed_times = None
 

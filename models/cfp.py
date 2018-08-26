@@ -418,8 +418,8 @@ class Proposal(db.Model):
                     try:
                         time_periods.append(
                             period(
-                                parse_date(start.trim()),
-                                parse_date(end.trim()),
+                                parse_date(start.strip()),
+                                parse_date(end.strip()),
                             )
                         )
                     # If someone has entered garbage, dump the lot
