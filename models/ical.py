@@ -232,7 +232,7 @@ class CalendarEvent(db.Model):
     @property
     def latlon(self):
         if self.source.mapobj:
-            obj = to_shape(self.source.mapobj)
+            obj = to_shape(self.source.mapobj.geom)
             if isinstance(obj, Point):
                 return (obj.x, obj.y)
         return None
