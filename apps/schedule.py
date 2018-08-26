@@ -31,6 +31,7 @@ from models.ical import CalendarSource, CalendarEvent
 from models.map import MapObject
 from models.user import User, generate_api_token
 from models.site_state import event_start
+from models.admin_message import AdminMessage
 from .schedule_xml import export_frab
 
 schedule = Blueprint('schedule', __name__)
@@ -583,6 +584,10 @@ def now_and_next():
     arg_venues = request.args.getlist('venue', type=str)
     venues = [html.escape(v) for v in arg_venues]
 
+    admin_messages = AdminMessage.get_visible_messages()
+
+    for msg in admin_messages:
+        flash(msg.message)
 
     if request.args.get('fullscreen', default=False, type=bool):
         template = 'schedule/now-and-next-fullscreen.html'
