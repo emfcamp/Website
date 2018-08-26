@@ -65,6 +65,9 @@ reallyreconcile:
 cancelreservedtickets:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py cancelreservedtickets
 
+pyppeteer:
+	sudo -u www-data pipenv run ./pyppeteer-launcher.py
+
 sendtickets:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py sendtickets
 
