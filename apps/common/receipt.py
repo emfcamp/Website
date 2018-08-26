@@ -10,7 +10,6 @@ from urllib.parse import urljoin
 
 from flask import Markup, render_template, current_app as app
 from sqlalchemy import func
-from sqlalchemy.orm import joinedload
 from pyppeteer.browser import Browser
 from pyppeteer.connection import Connection
 from pyppeteer.launcher import launch
@@ -23,8 +22,12 @@ import requests
 from main import external_url
 from models.product import Product, ProductGroup, PriceTier
 from models.purchase import PurchaseTransfer, Ticket
+from models.site_state import event_start
+from models.user import User
 from models import Purchase
 
+
+RECEIPT_TYPES = ['admissions', 'parking', 'campervan', 'tees', 'hire']
 
 def render_receipt(user, png=False, pdf=False):
     purchases = user.owned_purchases.filter_by(is_paid_for=True) \
@@ -38,7 +41,7 @@ def render_receipt(user, png=False, pdf=False):
 
     vehicle_tickets = purchases.filter(ProductGroup.type.in_(['parking', 'campervan'])).all()
 
-    tees = purchases.filter(ProductGroup.type == 'tee') \
+    tees = purchases.filter(ProductGroup.type == 'tees') \
                     .with_entities(Product,
                                    func.count(Purchase.id).label('purchase_count')) \
                     .group_by(Product.id).all()
@@ -187,15 +190,15 @@ def attach_tickets(msg, user):
     url = external_url('tickets.receipt', user_id=user.id)
     pdf = render_pdf(url, page)
 
-    receipt_types = ['admissions', 'campervan', 'parking', 'merchandise']
+    msg.attach('EMF{}.pdf'.format(event_start().year), 'application/pdf', pdf.read())
 
-    tickets = Ticket.query.filter_by(owner_id=user.id, is_paid_for=True) \
-                    .options(joinedload(Ticket.product).joinedload(Product.parent)) \
-                    .filter(ProductGroup.type.in_(receipt_types))
+    purchases = user.owned_purchases.filter_by(is_paid_for=True, state='paid') \
+                                    .join(PriceTier, Product, ProductGroup) \
+                                    .filter(ProductGroup.type.in_(RECEIPT_TYPES)) \
+                                    .with_entities(Purchase) \
+                                    .group_by(Purchase) \
+                                    .order_by(Purchase.id)
 
-    plural = (tickets.count() != 1 and 's' or '')
-    msg.attach('Ticket%s.pdf' % plural, 'application/pdf', pdf.read())
-
-    for t in tickets:
-        t.set_state('receipt-emailed')
+    for p in purchases:
+        p.set_state('receipt-emailed')
 

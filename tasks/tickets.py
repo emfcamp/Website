@@ -1,13 +1,16 @@
-# coding=utf-8
-
 from datetime import datetime, timedelta
 
-from flask import current_app as app
+from flask import current_app as app, render_template
+from flask_mail import Message
 from flask_script import Command
-from main import db
+from sqlalchemy import func
+
+from main import db, mail
+from apps.common.receipt import attach_tickets, RECEIPT_TYPES
 from models.payment import Payment
 from models.product import ProductGroup, Product, PriceTier, Price, ProductView, ProductViewProduct
 from models.purchase import Purchase
+from models.user import User
 
 
 def create_product_groups():
@@ -187,30 +190,28 @@ class SendTransferReminder(Command):
 class SendTickets(Command):
 
     def run(self):
-        pass
-        # paid_items = Ticket.query.filter_by(paid=True).join(TicketType).filter(or_(
-        #     TicketType.admits.in_(['full', 'kid', 'car', 'campervan']),
-        #     TicketType.fixed_id.in_(range(14, 24))))
+        # We set state to receipt-emailed in attach_tickets
+        users_purchase_counts = Purchase.query.filter_by(is_paid_for=True, state='paid') \
+                                        .join(PriceTier, Product, ProductGroup) \
+                                        .filter(ProductGroup.type.in_(RECEIPT_TYPES)) \
+                                        .join(Purchase.owner) \
+                                        .with_entities(User, func.count(Purchase.id)) \
+                                        .group_by(User) \
+                                        .order_by(User.id)
 
-        # users = (paid_items.filter(Ticket.emailed == False).join(User)  # noqa: E712
-        #                    .group_by(User).with_entities(User).order_by(User.id))
+        for user, purchase_count in users_purchase_counts:
+            plural = (purchase_count != 1 and 's' or '')
 
-        # for user in users:
-        #     user_tickets = Ticket.query.filter_by(paid=True).join(TicketType, User).filter(
-        #         TicketType.admits.in_(['full', 'kid', 'car', 'campervan']),
-        #         User.id == user.id)
+            msg = Message("Your Electromagnetic Field Ticket%s" % plural,
+                          sender=app.config['TICKETS_EMAIL'],
+                          recipients=[user.email])
 
-        #     plural = (user_tickets.count() != 1 and 's' or '')
+            msg.body = render_template("emails/receipt.txt", user=user)
 
-        #     msg = Message("Your Electromagnetic Field Ticket%s" % plural,
-        #                   sender=app.config['TICKETS_EMAIL'],
-        #                   recipients=[user.email])
+            attach_tickets(msg, user)
 
-        #     msg.body = render_template("emails/receipt.txt", user=user)
+            app.logger.info('Emailing %s receipt for %s tickets', user.email, purchase_count)
+            mail.send(msg)
 
-        #     attach_tickets(msg, user)
+            db.session.commit()
 
-        #     app.logger.info('Emailing %s receipt for %s tickets', user.email, user_tickets.count())
-        #     mail.send(msg)
-
-        #     db.session.commit()

@@ -29,4 +29,6 @@ For some idea of what to bring take a look at our packing list:
 
 And lastly, EMF is entirely volunteer-run. Please consider
 contributing a few hours of your time at the festival to help the
-event run smoothly.
+event run smoothly. You can register your interest here:
+
+  {{ external_url('volunteer.sign_up') }}
