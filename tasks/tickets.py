@@ -137,10 +137,22 @@ class CreateTickets(Command):
 
 class CancelReservedTickets(Command):
     def run(self):
+
+        if (app.config['STRIPE']
+                and not app.config['BANK_TRANSFER'] and not app.config['BANK_TRANSFER_EUR']
+                and not app.config['GOCARDLESS'] and not app.config['GOCARDLESS_EURO']):
+            # Things are moving quickly now, only let people reserve tickets for an hour
+            grace_period = timedelta(hours=1)
+
+        else:
+            grace_period = timedelta(days=3)
+
+        app.logger.info("Cancelling reserved tickets with grace period %s", grace_period)
+
         # Payments where someone started the process but didn't complete
         payments = Purchase.query.filter(
             Purchase.state == 'reserved',
-            Purchase.modified < datetime.utcnow() - timedelta(days=3),
+            Purchase.modified < datetime.utcnow() - grace_period,
             ~Purchase.payment_id.is_(None),
         ).join(Payment).with_entities(Payment).group_by(Payment)
 
@@ -153,7 +165,7 @@ class CancelReservedTickets(Command):
         # Purchases that were added to baskets but not checked out
         purchases = Purchase.query.filter(
             Purchase.state == 'reserved',
-            Purchase.modified < datetime.utcnow() - timedelta(days=3),
+            Purchase.modified < datetime.utcnow() - grace_period,
             Purchase.payment_id.is_(None),
         )
         for purchase in purchases:
