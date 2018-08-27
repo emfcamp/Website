@@ -100,7 +100,7 @@ def _get_scheduled_proposals(filter_obj={}, override_user=None):
 
     schedule = [_get_proposal_dict(p, proposal_favourites) for p in schedule]
 
-    ical_sources = CalendarSource.query.filter_by(enabled=True)
+    ical_sources = CalendarSource.query.filter_by(enabled=True, published=True)
 
     for source in ical_sources:
         for e in source.events:
@@ -124,7 +124,7 @@ def _get_priority_sorted_venues(venues_to_allow):
     main_venues = Venue.query.filter().all()
     main_venue_names = [(v.name, 'main', v.priority) for v in main_venues]
 
-    ical_sources = CalendarSource.query.filter_by(enabled=True)
+    ical_sources = CalendarSource.query.filter_by(enabled=True, published=True)
     ical_source_names = [(v.main_venue, 'ical', v.priority) for v in ical_sources]
 
     # List event venues that are not overridden with zero priority
