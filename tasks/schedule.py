@@ -1,13 +1,12 @@
 # coding=utf-8
 from collections import defaultdict
 from dateutil import parser
-from flask import render_template, current_app as app
+from flask import current_app as app
 from flask_script import Command, Option
-from flask_mail import Message
 
 from slotmachine import SlotMachine
 
-from main import db, mail
+from main import db
 from models.cfp import Proposal, Venue, ROUGH_LENGTHS, EVENT_SPACING, DEFAULT_VENUES, VENUE_CAPACITY
 
 from apps.cfp_review.base import send_email_for_proposal
