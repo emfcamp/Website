@@ -73,7 +73,7 @@
             <td>{{ ticket.product.parent.name }}</td>
             <td>{{ ticket.product.display_name }}</td>
             <td>{{ ticket.state }}</td>
-            <td>{% if ticket.checkin %}Yes{% else %}No{% endif %}</td>
+            <td>{% if ticket.checked_in %}Yes{% else %}No{% endif %}</td>
             <td>
               {% if ticket.is_paid_for and ticket.is_transferable %}
               <a class="btn btn-default" href="{{ url_for('.transfer_ticket', ticket_id=ticket.id) }}">Transfer</a>

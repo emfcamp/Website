@@ -85,7 +85,7 @@ def users_from_query(query):
     starts = []
     contains = []
     query = query.lower()
-    words = map(escape, filter(None, query.split(' ')))
+    words = list(map(escape, filter(None, query.split(' '))))
 
     if ' ' in query:
         fulls += name_match('%{0}%', '%'.join(words))
@@ -134,14 +134,14 @@ def search(query=None):
     users_ordered = users_from_query(query)
     users = User.query.filter(User.id.in_([u.id for u in users_ordered]))
 
-    tickets = users.join(Purchase.owner).filter_by(is_valid_ticket=True) \
-                   .group_by(User).with_entities(User.id, func.count(User.id))
+    tickets = users.join(User.owned_purchases).filter_by(is_paid_for=True) \
+                   .group_by(User.id).with_entities(User.id, func.count(User.id))
     tickets = dict(tickets)
 
     if badge:
-        completes = users.join(Purchase.owner).filter_by(is_valid_ticket=True, state='badged-up')
+        completes = users.join(User.owned_purchases).filter_by(is_paid_for=True, state='badged-up')
     else:
-        completes = users.join(Purchase.owner).filter_by(is_valid_ticket=True, state='checked-in')
+        completes = users.join(User.owned_purchases).filter_by(is_paid_for=True, state='checked-in')
 
     completes = completes.group_by(User).with_entities(User.id, func.count(User.id))
     completes = dict(completes)
@@ -170,16 +170,16 @@ def checkin(user_id, source=None):
     badge = bool(session.get('badge'))
     user = User.query.get_or_404(user_id)
 
-    if source not in (None, 'typed', 'transfer', 'code'):
+    if source not in {None, 'typed', 'transfer', 'code'}:
         abort(404)
 
     if badge:
-        # TODO check this works as expected with transferred tickets
         # Ticket must be checked in to receive a badge
-        tickets = [t for t in user.owned_tickets if t.state == 'checked-in' and
-                                                  t.price_tier.allow_badge_up]
+        tickets = [t for t in user.owned_tickets
+                              if t.state == 'checked-in'
+                              and t.product.attributes.get('has_badge')]
     else:
-        tickets = user.products.filter_by(is_valid_ticket=True)
+        tickets = list(user.get_owned_tickets(paid=True))
 
     if request.method == 'POST':
         failed = []
@@ -197,7 +197,7 @@ def checkin(user_id, source=None):
 
         if failed:
             failed_str = ', '.join(str(t.id) for t in failed)
-            success_count = tickets.count() - len(failed)
+            success_count = len(tickets) - len(failed)
             if badge:
                 flash("Issued %s badges. Already issued: %s" % (success_count, failed_str))
             else:
@@ -206,15 +206,17 @@ def checkin(user_id, source=None):
             return redirect(url_for('.checkin', user_id=user.id))
 
         msg = Markup(render_template_string('''
-            {{ tickets.count() }} ticket {{- tickets.count() != 1 and 's' or '' }} checked in.
+            {{ tickets|count }} ticket {{- tickets|count != 1 and 's' or '' }} checked in.
             <a class="alert-link" href="{{ url_for('.checkin', user_id=user.id) }}">Show tickets</a>.''',
             user=user, tickets=tickets))
         flash(msg)
 
         return redirect(url_for('.main'))
 
+    transferred_tickets = [t.purchase for t in user.transfers_from]
+
     return render_template('arrivals/checkin.html', user=user,
-                           tickets=tickets, transferred_tickets=[], # FIXME
+                           tickets=tickets, transferred_tickets=transferred_tickets,
                            badge=badge, source=source)
 
 
@@ -222,7 +224,9 @@ def checkin(user_id, source=None):
 @arrivals_required
 def ticket_checkin(ticket_id):
     badge = bool(session.get('badge'))
-    ticket = Purchase.query.filter_by(is_valid_ticket=True).get_or_404(ticket_id)
+    ticket = Purchase.query.get_or_404(ticket_id)
+    if not ticket.is_paid_for:
+        abort(404)
 
     try:
         if badge:
@@ -234,13 +238,15 @@ def ticket_checkin(ticket_id):
 
     db.session.commit()
 
-    return redirect(url_for('.checkin', user_id=ticket.user.id))
+    return redirect(url_for('.checkin', user_id=ticket.owner.id))
 
 @arrivals.route('/checkin/ticket/<ticket_id>/undo', methods=['POST'])
 @arrivals_required
 def undo_ticket_checkin(ticket_id):
     badge = bool(session.get('badge'))
-    ticket = Purchase.query.filter_by(is_valid_ticket=True).get_or_404(ticket_id)
+    ticket = Purchase.query.get_or_404(ticket_id)
+    if not ticket.is_paid_for:
+        abort(404)
 
     try:
         if badge:
@@ -252,5 +258,5 @@ def undo_ticket_checkin(ticket_id):
 
     db.session.commit()
 
-    return redirect(url_for('.checkin', user_id=ticket.user.id))
+    return redirect(url_for('.checkin', user_id=ticket.owner.id))
 

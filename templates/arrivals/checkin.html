@@ -3,11 +3,11 @@
 {% if badge %}
 <h2>Issue badge</h2>
 
-<p>To issue {{ tickets.count() == 1 and 'this badge' or 'these badges' }}, please click below.</p>
+<p>To issue {{ tickets|count == 1 and 'this badge' or 'these badges' }}, please click below.</p>
 {% else %}
 <h2>Check in tickets</h2>
 
-<p>To check in {{ tickets.count() == 1 and 'this ticket' or 'these tickets' }}, please click below.</p>
+<p>To check in {{ tickets|count == 1 and 'this ticket' or 'these tickets' }}, please click below.</p>
 {% endif %}
 
 <dl class="dl-horizontal">
@@ -17,12 +17,12 @@
 
 {% if user.checkin_note and not badge %}
 <div class="alert alert-info">
-  <p><strong>Important instructions for this attendee:</strong></p>
+  <p><strong>Important instructions for processing this attendee's arrival:</strong></p>
   <p>{{ user.checkin_note }}</p>
 </div>
 {% endif %}
 
-{% if source not in (None, 'code') %}
+{% if source not in [None, 'code'] %}
 <div class="alert alert-warning">
   <div class="row" style="display: flex">
     <div class="col-sm-2 hidden-xs" style="display: flex">
@@ -36,14 +36,14 @@
 </div>
 {% endif %}
 
-{% if tickets.count() %}
+{% if tickets|count %}
 <table class="table table-condensed table-striped">
 <thead><tr>
   <th class="hidden-xs">ID</th>
   <th>Type</th>
   <th>Transferred from</th>
   <th>Status</th>
-  {% if tickets.count() > 1 %}
+  {% if tickets|count > 1 %}
   <th></th>
   {% endif %}
 </tr></thead>
@@ -51,7 +51,7 @@
 {% for ticket in tickets %}
 <tr>
   <td class="hidden-xs">{{ ticket.id }}</td>
-  <td>{{ ticket.type.name }}</td>
+  <td>{{ ticket.product.display_name }}</td>
   <td>
     {% if ticket.transfers %}
       {% set from_user = ticket.transfers[-1].from_user %}
@@ -60,25 +60,27 @@
   </td>
   <td>
     {% if badge %}
-      {%- if ticket.checkin.badged_up %}
-        Badge issued {{ ticket.checkin.versions[-1].transaction.issued_at.strftime('%A %H:%M') }}
-        by {{ ticket.checkin.versions[-1].transaction.user.name }}
+      {%- if ticket.badge_issued %}
+        {# FIXME this ain't necessarily so #}
+        Badge issued {{ ticket.versions[-1].transaction.issued_at.strftime('%A %H:%M') }}
+        by {{ ticket.versions[-1].transaction.user.name }}
       {% else %}
         Badge not issued
       {% endif -%}
     {% else %}
-      {%- if ticket.checkin.checked_in %}
-        Checked in {{ ticket.checkin.versions[-1].transaction.issued_at.strftime('%A %H:%M') }}
-        by {{ ticket.checkin.versions[-1].transaction.user.name }}
+      {%- if ticket.checked_in %}
+        {# FIXME this ain't necessarily so #}
+        Checked in {{ ticket.versions[-1].transaction.issued_at.strftime('%A %H:%M') }}
+        by {{ ticket.versions[-1].transaction.user.name }}
       {% else %}
         Not checked in
       {% endif -%}
     {% endif -%}
   </td>
-  {% if tickets.count() > 1 %}
+  {% if tickets|count > 1 or (badge and tickets[0].badge_issued) or (not badge and tickets[0].checked_in) %}
   <td>
     {% if badge %}
-      {%- if ticket.checkin.badged_up %}
+      {%- if ticket.badge_issued %}
         <form method="post" action="{{ url_for('arrivals.undo_ticket_checkin', ticket_id=ticket.id) }}">
         <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
         <input type="submit" class="btn btn-danger debounce" value="Return badge"/>
@@ -90,7 +92,7 @@
         </form>
       {% endif -%}
     {% else %}
-      {%- if ticket.checkin.checked_in %}
+      {%- if ticket.checked_in %}
         <form method="post" action="{{ url_for('arrivals.undo_ticket_checkin', ticket_id=ticket.id) }}">
         <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
         <input type="submit" class="btn btn-danger debounce" value="Undo check-in"/>
@@ -115,7 +117,7 @@
 </div>
 {% endif %}
 
-{% if tickets.count() %}
+{% if tickets|count %}
 <form method="post" action="{{ url_for('arrivals.checkin', user_id=user.id) }}" class="shrink">
 <div class="col-sm-5 col-sm-offset-7">
   <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
@@ -130,15 +132,16 @@
 
 <div>&nbsp;</div>
 
-{% if transferred_tickets.count() %}
+{% if transferred_tickets|count %}
 <h3>Transferred tickets</h3>
+<p>These tickets may have been sold. If in doubt, check the ID of the recipient before clicking through.</p>
 <table class="table table-condensed table-striped">
 <thead><tr>
   <th class="hidden-xs">ID</th>
   <th>Type</th>
   <th>Transferred to</th>
   <th>Status</th>
-  {% if transferred_tickets.count() > 1 %}
+  {% if transferred_tickets|count > 1 %}
   <th></th>
   {% endif %}
 </tr></thead>
@@ -147,28 +150,30 @@
 <tr>
   <td class="hidden-xs">{{ ticket.id }}</td>
   <td>{{ ticket.type.name }}</td>
-  <td><a href="{{ url_for('.checkin', user_id=ticket.user.id) }}">{{ ticket.user.name }}</a></td>
+  <td><a href="{{ url_for('.checkin', user_id=ticket.owner.id) }}">{{ ticket.owner.name }}</a></td>
   <td>
     {% if badge %}
-      {%- if ticket.checkin.badged_up %}
-        Badge issued {{ ticket.checkin.versions[-1].transaction.issued_at.strftime('%A %H:%M') }}
-        by {{ ticket.checkin.versions[-1].transaction.user.name }}
+      {%- if ticket.badge_issued %}
+        {# FIXME this ain't necessarily so #}
+        Badge issued {{ ticket.versions[-1].transaction.issued_at.strftime('%A %H:%M') }}
+        by {{ ticket.versions[-1].transaction.user.name }}
       {% else %}
         Badge not issued
       {% endif -%}
     {% else %}
-      {%- if ticket.checkin.checked_in %}
-        Checked in {{ ticket.checkin.versions[-1].transaction.issued_at.strftime('%A %H:%M') }}
-        by {{ ticket.checkin.versions[-1].transaction.user.name }}
+      {%- if ticket.checked_in %}
+        {# FIXME this ain't necessarily so #}
+        Checked in {{ ticket.versions[-1].transaction.issued_at.strftime('%A %H:%M') }}
+        by {{ ticket.versions[-1].transaction.user.name }}
       {% else %}
         Not checked in
       {% endif -%}
     {% endif -%}
   </td>
-  {% if transferred_tickets.count() > 1 %}
+  {% if transferred_tickets|count > 1 %}
   <td>
     {% if badge %}
-      {%- if ticket.checkin.badged_up %}
+      {%- if ticket.badge_issued %}
         <form method="post" action="{{ url_for('arrivals.undo_ticket_checkin', ticket_id=ticket.id) }}">
         <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
         <input type="submit" class="btn btn-danger debounce" value="Return badge"/>
@@ -180,7 +185,7 @@
         </form>
       {% endif -%}
     {% else %}
-      {%- if ticket.checkin.checked_in %}
+      {%- if ticket.checked_in %}
         <form method="post" action="{{ url_for('arrivals.undo_ticket_checkin', ticket_id=ticket.id) }}">
         <input name="csrf_token" type="hidden" value="{{ csrf_token() }}">
         <input type="submit" class="btn btn-danger debounce" value="Undo check-in"/>

@@ -25,6 +25,7 @@
 {% endblock %}
 
 {% block foot %}
+{{ super() }}
 <script type="text/javascript">
 if (typeof(EMF) != 'object'){ var EMF = {}; }
 EMF.isBadgeMode = {{ badge | tojson }};
