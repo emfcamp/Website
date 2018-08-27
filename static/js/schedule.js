@@ -15,7 +15,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
             {key:'main-schedule-items', label:'Main', open: true, children: []},
             {key:'village-schedule-items', label:'Villages', open: true, children: []},
         ],
-        day_format = "%D, %jth",   // e.g. Friday, 5th (FIXME: deal with 1st and 2nd)
+        day_format = "%D, %j %M",   // e.g. Friday, 5th (FIXME: deal with 1st and 2nd)
         day_formatter = scheduler.date.date_to_str(day_format),
         time_formatter = scheduler.date.date_to_str("%H:%i"), // e.g. 22:33
         debounce = false,
@@ -132,7 +132,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         x_step: 60,
         x_size: 15,
         x_start: 9,
-        x_length: 48,
+        x_length: 24,
         y_unit: scheduler.serverList('venues', timeline_venues),
         y_property: "venue",
         render: "tree",
@@ -157,26 +157,8 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
     }
     scheduler.filter_emf_day = _filter_events;
 
-    // Clamp day view
-    scheduler.date.add_emf_timeline = scheduler.date.add_emf_day = function (day, inc) {
-        var res = scheduler.date.add(day, inc, "day"),
-            last_day = new Date(end_date);
-
-        // end date is Monday (to set inclusive ranges) last day is Sunday
-        last_day.setDate(end_date.getDate() - 1);
-
-        // Test on the date value so we can compare using less/greater than
-        // or equals
-        if (res.getDate() <= start_date.getDate()) {
-            return start_date;
-        } else if (res.getDate() >= last_day.getDate()) {
-            return last_day;
-        }
-        return res;
-    };
-
     // There'll be no events outside the weekend so lock the view to it
-    // scheduler.config.limit_view = true; // This seems to be broken right now
+    scheduler.config.limit_view = true;
     scheduler.config.limit_start = start_date;
     scheduler.config.limit_end  = end_date;
 
