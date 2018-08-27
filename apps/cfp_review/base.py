@@ -751,7 +751,7 @@ def scheduler():
             'duration': proposal.scheduled_duration,
             'is_potential': False,
             'speakers': [ proposal.user.id ],
-            'text': proposal.published_title or proposal.title,
+            'text': proposal.display_title,
             'valid_venues': [ v.id for v in proposal.get_allowed_venues() ],
             'valid_time_ranges': [
                 {"start": str(p.start), "end": str(p.end)} for p in proposal.get_allowed_time_periods_with_default()
