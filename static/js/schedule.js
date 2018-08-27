@@ -5,7 +5,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
 
     var todays_date = new Date(),
         start_date = new Date(2018, 7, 31),
-        end_date = new Date(2018, 8, 2),
+        end_date = new Date(2018, 8, 3),
         filter = {
             'venues': [],
             'is_favourite': false
@@ -309,7 +309,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
     scheduler.config.show_loading = true;
     scheduler.config.default_date = day_format;
     // First hour to show
-    scheduler.config.first_hour = 9;
+    scheduler.config.scroll_hour = 9;
     // If there's enough space show hours with 10 minute divisions
     scheduler.config.hour_size_px = ($(window).width() <= 768) ? 88: 132; //132;
     // scheduler.config.hour_size_px = 132;
@@ -365,4 +365,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
 
     scheduler.init('scheduler_here', date_to_show, initial_view);
     scheduler.parse(schedule_data, 'json');
+
+    // Seems not to be happening on load
+    _sizeScheduler();
 }
