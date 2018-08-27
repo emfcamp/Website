@@ -33,22 +33,18 @@ def render_receipt(user, png=False, pdf=False):
                                     .join(PriceTier, Product, ProductGroup)
 
     admissions = purchases.filter(ProductGroup.type == 'admissions') \
-                          .with_entities(Product,
-                                         func.count(Purchase.id).label('ticket_count')) \
-                          .group_by(Product.id).all()
-    admissions_total = sum(c for p, c in admissions)
+                          .with_entities(Product) \
+                          .order_by(Purchase.id).all()
 
     vehicle_tickets = purchases.filter(ProductGroup.type.in_(['parking', 'campervan'])).all()
 
     tees = purchases.filter(ProductGroup.type == 'tees') \
-                    .with_entities(Product,
-                                   func.count(Purchase.id).label('purchase_count')) \
-                    .group_by(Product.id).all()
+                    .with_entities(Product) \
+                    .order_by(Purchase.id).all()
 
     hires = purchases.filter(ProductGroup.type == 'hire') \
-                    .with_entities(Product,
-                                   func.count(Purchase.id).label('purchase_count')) \
-                    .group_by(Product.id).all()
+                    .with_entities(Product) \
+                    .order_by(Purchase.id).all()
 
     transferred_tickets = user.transfers_from \
                               .join(Purchase) \
@@ -60,7 +56,6 @@ def render_receipt(user, png=False, pdf=False):
                            format_inline_qr=format_inline_qr,
                            format_inline_barcode=format_inline_barcode,
                            admissions=admissions,
-                           admissions_total=admissions_total,
                            vehicle_tickets=vehicle_tickets,
                            transferred_tickets=transferred_tickets,
                            tees=tees, hires=hires,

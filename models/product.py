@@ -1,6 +1,7 @@
 from decimal import Decimal
 from collections import defaultdict
 from datetime import datetime
+import re
 
 from sqlalchemy.orm import validates
 from sqlalchemy import func, UniqueConstraint, inspect
@@ -171,6 +172,10 @@ class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
                          .with_entities(Price) \
                          .order_by(Price.price_int).first()
         return price
+
+    @property
+    def checkin_display_name(self):
+        return re.sub(r' \(.*\)', '', self.display_name)
 
     def get_price_tier(self, name):
         tier = PriceTier.query.filter_by(product_id=self.id) \

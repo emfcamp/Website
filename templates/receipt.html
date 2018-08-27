@@ -22,11 +22,11 @@
     <h3>{{ user.name }} &ndash; {{ user.email }}</h3>
 
     {% if admissions %}
-    <h4>{{ admissions_total }} entrance ticket{{ admissions_total != 1 and 's' or '' }}</h4>
+    <h4>{{ admissions|count }} entrance ticket{{ admissions|count != 1 and 's' or '' }}</h4>
     {% endif %}
 
     <div class="entrance-tickets">
-        {% if admissions %}
+        {% if admissions|count %}
         <p>Present the code above to the volunteers at the <b>camp entrance gate</b> on your arrival.
            You will receive a wristband and booklet with site map.
         </p>
@@ -58,12 +58,12 @@
         <div>&nbsp;</div>
 
         <h4>Your ticket details</h4>
-        {% for product, ticket_count in admissions %}
-        <div class="product">{{ ticket_count }} {{ product.display_name }}</div>
+        {% for checkin_display_name, tickets in admissions|groupby('checkin_display_name') %}
+        <div class="product">{{ tickets|count }} {{ checkin_display_name }}</div>
         {% endfor %}
         {% endif %}
 
-        {% if transferred_tickets %}
+        {% if transferred_tickets|count %}
         <div>&nbsp;</div>
 
         <h4>Your transferred tickets</h4>
@@ -72,25 +72,25 @@
            If you&rsquo;re arriving at the entrance gate together, you only need this copy.
         </p>
         {% for t in transferred_tickets %}
-        <div class="ticket-transfer">{{ t.to_user.name }}: {{ t.purchase.product.display_name }}</div>
+        <div class="ticket-transfer">{{ t.to_user.name }}: {{ t.purchase.product.checkin_display_name }}</div>
         {% endfor %}
         {% endif %}
 
-        {% if tees %}
+        {% if tees|count %}
         <div>&nbsp;</div>
 
         <h4>Your purchase details</h4>
-        {% for product, purchase_count in tees %}
-        <div class="product">{{ purchase_count }} {{ product.display_name }}</div>
+        {% for checkin_display_name, purchases in tees|groupby('checkin_display_name') %}
+        <div class="product">{{ purchases|count }} {{ checkin_display_name }}</div>
         {% endfor %}
         {% endif %}
 
-        {% if hires %}
+        {% if hires|count %}
         <div>&nbsp;</div>
 
         <h4>Your hired items</h4>
-        {% for product, purchase_count in hires %}
-        <div class="product">{{ purchase_count }} {{ product.display_name }}</div>
+        {% for checkin_display_name, purchases in hires|groupby('checkin_display_name') %}
+        <div class="product">{{ purchases|count }} {{ checkin_display_name }}</div>
         {% endfor %}
         {% endif %}
 

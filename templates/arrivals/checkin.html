@@ -51,7 +51,7 @@
 {% for ticket in tickets %}
 <tr>
   <td class="hidden-xs">{{ ticket.id }}</td>
-  <td>{{ ticket.product.display_name }}</td>
+  <td>{{ ticket.product.checkin_display_name }}</td>
   <td>
     {% if ticket.transfers %}
       {% set from_user = ticket.transfers[-1].from_user %}
