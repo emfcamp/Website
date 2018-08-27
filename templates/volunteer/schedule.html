@@ -92,7 +92,7 @@
           <div class="modal-body">
             <strong>Start time:</strong> <span id="modal-start-time">18:00</span><br>
             <strong>End time:</strong> <span id="modal-end-time">21:00</span><br>
-            <strong>Location:</strong> <span id="modal-location">Volunteer Tent</span>
+            <strong>Location:</strong> <span id="modal-location">Volunteer Tent</span><br>
 
             <div id="modal-description">
             </div>
@@ -105,10 +105,11 @@
       </div>
     </div>
 
-    <div id="role-description-test">
-      <h2>What you'll be doing</h2>
-      <p>Testing things.</p>
-    </div>
+    {% for key, value in role_descriptions.items() %}
+      <div id="role-description-{{ key }}" class="role-description">
+        {{ value }}
+      </div>
+    {% endfor %}
 
     {% assets "js_volunteer_schedule" -%}
         <script src="{{ ASSET_URL }}"></script>

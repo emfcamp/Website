@@ -68,43 +68,13 @@ function init_volunteer_schedule(data, all_roles, active_day) {
             $('#modal-start-time').html(shift.start_time);
             $('#modal-end-time').html(shift.end_time);
             $('#modal-location').html(shift.location);
-            $('#modal-description').html($('#role-description-test'));
+            $('#modal-description').html($('#role-description-test').clone().show());
 
             $('#signUp .modal-footer').empty();
             $('#signUp .modal-footer').append(make_modal_buttons(shift));
 
             $('#signUp').modal();
         };
-    }
-
-    function make_modal_details(shift) {
-        var dl = $(document.createElement('dl')),
-            res = [
-                dl,
-                make_ele('p', '<a href="'+shift.sign_up_url +'">More details</a>')],
-            needed;
-
-        if (shift.min_needed === shift.max_needed) {
-            needed = shift.min_needed;
-        } else {
-            needed = shift.min_needed + ' - ' + shift.max_needed;
-        }
-
-        if (shift.is_user_shift) {
-            res.unshift(make_ele('p', 'You are currently signed up to this shift'));
-        }
-
-        dl.addClass('dl-horizontal');
-        dl.append([
-            make_ele('dt', 'Role'), make_ele('dd', shift.role.name),
-            make_ele('dt', 'Venue'), make_ele('dd', shift.venue.name),
-            make_ele('dt', 'Start'), make_ele('dd', shift.start),
-            make_ele('dt', 'End'), make_ele('dd', shift.end),
-            make_ele('dt', 'Volunteers needed'),
-            make_ele('dd', needed),
-            make_ele('dt', 'Currently'), make_ele('dd', shift.current_count),
-        ]);
-        return res;
     }
 
     function make_modal_buttons(shift) {

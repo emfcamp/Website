@@ -4,6 +4,9 @@ from flask import (
 )
 from collections import defaultdict
 from flask_login import current_user
+from flask import Markup
+import markdown
+from glob import glob
 
 from main import db
 
@@ -51,8 +54,11 @@ def schedule():
         by_time[day_key][hour_key].append(to_add)
 
     roles = _get_interested_roles(current_user)
+    role_descriptions = _format_role_descriptions()
+
     return render_template('volunteer/schedule.html', roles=roles, all_shifts=by_time,
-                           active_day=request.args.get('day', default='fri'))
+                           active_day=request.args.get('day', default='fri'),
+                           role_descriptions=role_descriptions)
 
 def _toggle_shift_entry(user, shift):
     res = {}
@@ -72,6 +78,17 @@ def _toggle_shift_entry(user, shift):
         res['message'] = 'Signed up for %s shift' % shift.role.name
 
     return res
+
+def _format_role_descriptions():
+    roles = {}
+    extensions = ["markdown.extensions.nl2br"]
+
+    for name in glob('apps/volunteer/role_descriptions/*.md'):
+        role_id = name.split('/')[-1].replace('.md', '')
+        content = open(name, "r").read()
+        roles[role_id] = Markup(markdown.markdown(content, extensions=extensions))
+
+    return roles
 
 @volunteer.route('/shift/<shift_id>', methods=['GET', 'POST'])
 @feature_flag('VOLUNTEERS_SCHEDULE')
