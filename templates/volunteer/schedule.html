@@ -1,4 +1,4 @@
-{% extends 'volunteer/base.html' %}
+{% extends "base.html" %}
 {% from "_formhelpers.html" import render_field %}
 
 {% macro days_shifts(day, active_day) %}
@@ -85,10 +85,17 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="signUpLabel">Modal title</h4>
+            <h4 class="modal-title">
+              <span id="modal-role">Role</span> at <span id="modal-time">18:00</span>
+            </h4>
           </div>
           <div class="modal-body">
-            ...
+            <strong>Start time:</strong> <span id="modal-start-time">18:00</span><br>
+            <strong>End time:</strong> <span id="modal-end-time">21:00</span><br>
+            <strong>Location:</strong> <span id="modal-location">Volunteer Tent</span>
+
+            <div id="modal-description">
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -96,6 +103,11 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <div id="role-description-test">
+      <h2>What you'll be doing</h2>
+      <p>Testing things.</p>
     </div>
 
     {% assets "js_volunteer_schedule" -%}

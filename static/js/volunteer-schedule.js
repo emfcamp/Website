@@ -62,10 +62,13 @@ function init_volunteer_schedule(data, all_roles, active_day) {
 
     function make_open_modal_fn(shift) {
         return function open_modal() {
-            $('#signUp .modal-title').html('Sign up for ' + shift.role.name + ' @ ' + shift.start_time);
+            $('#modal-role').html(shift.role.name);
+            $('#modal-time').html(shift.start_time);
 
-            $('#signUp .modal-body').empty();
-            $('#signUp .modal-body').append(make_modal_details(shift));
+            $('#modal-start-time').html(shift.start_time);
+            $('#modal-end-time').html(shift.end_time);
+            $('#modal-location').html(shift.location);
+            $('#modal-description').html($('#role-description-test'));
 
             $('#signUp .modal-footer').empty();
             $('#signUp .modal-footer').append(make_modal_buttons(shift));
