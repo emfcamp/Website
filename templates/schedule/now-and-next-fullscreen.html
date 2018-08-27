@@ -34,6 +34,9 @@
 
 
 <div class="fullscreen">
+    {% for message in get_flashed_messages() -%}
+        <div class="alert alert-info">{{ message }}</div>
+    {% endfor -%}
 
     <div class="now">
         <h1>Now</h1>

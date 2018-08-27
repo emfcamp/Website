@@ -1,0 +1,31 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'messages' %}
+{% block body %}
+
+
+<div>
+  <a href="{{ url_for('.new_message') }}" class="btn btn-primary">New</a>
+</div>
+
+<table class="table table-hover">
+  <thead><tr>
+    <th class="col-sm-8">Message</th>
+    <th class="col-sm-1">Is Visible?</th>
+    <th class="col-sm-1">Created</th>
+    <th class="col-sm-1">Visible until</th>
+    <th class="col-sm-1">Edit</th>
+  </tr></thead>
+  <tbody>
+  {% for m in messages %}
+    <tr>
+      <td>{{ m.message }}</td>
+      <td>{{ m.is_visible }}</td>
+      <td>{{ m.created.strftime('%a %H:%M') }}</td>
+      <td>{{ '--' if m.end == None else m.end.strftime('%a %H:%M') }}</td>
+      <td><a href="{{ url_for('.message', message_id=m.id) }}" class="btn btn-primary">Edit</a></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

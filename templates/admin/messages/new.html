@@ -1,0 +1,16 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "admin/base.html" %}
+{% set nav_active = 'messages' %}
+{% block body %}
+
+<form method="post" class="form-horizontal">
+  {{ form.hidden_tag() }}
+
+  {{ render_field(form.message, horizontal=12, rows="4", cols="50") }}
+  {{ render_field(form.show, horizontal=4) }}
+  {{ render_field(form.end, horizontal=4) }}
+
+  {{ form.submit(class_="btn btn-success debounce") }}
+</form>
+
+{% endblock %}
