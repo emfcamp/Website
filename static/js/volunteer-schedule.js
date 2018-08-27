@@ -68,7 +68,10 @@ function init_volunteer_schedule(data, all_roles, active_day) {
             $('#modal-start-time').html(shift.start_time);
             $('#modal-end-time').html(shift.end_time);
             $('#modal-location').html(shift.location);
-            $('#modal-description').html($('#role-description-test').clone().show());
+
+          var role_id = shift.role.name.toLowerCase().replace(/[^\w]+/g, '-');
+          console.log(role_id);
+            $('#modal-description').html($(`#role-description-${role_id}`).clone().show());
 
             $('#signUp .modal-footer').empty();
             $('#signUp .modal-footer').append(make_modal_buttons(shift));
