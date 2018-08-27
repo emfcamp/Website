@@ -4,12 +4,17 @@
 </li>
 {% endmacro %}
 <div class="nav nav-pills">
+    {% if current_user.is_authenticated %}
     {{ menuitem('Account', '.account') }}
     {{ menuitem('Roles', '.choose_role') }}
+    {% if config.get('VOLUNTEERS_SCHEDULE') %}
     {{ menuitem('Shift sign-up', '.schedule') }}
+    {% endif %}
+    {% else %}
+    {{ menuitem('Sign up', '.sign_up') }}
+    {% endif %}
     {{ menuitem('Safeguarding', '.safeguarding') }}
     {{ menuitem('Useful info', '.info') }}
-
 
     {% if current_user.is_authenticated and current_user.has_permission('volunter:admin') %}
         {{ menuitem('Training', '.select_training') }}
