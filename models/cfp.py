@@ -454,7 +454,7 @@ class Proposal(db.Model):
         return make_periods_contiguous(preferred_time_periods)
 
     def overlaps_with(self, other):
-        return self.end_date >= other.start_date and other.end_date >= self.start_date
+        return self.end_date > other.start_date and other.end_date > self.start_date
 
     @property
     def start_date(self):
