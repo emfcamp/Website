@@ -142,8 +142,18 @@ def send_email_for_proposal(proposal, reason="still-considered", from_address=No
             subject = "Your EMF proposal '%s', and EMF tickets" % proposal_title
             template = 'emails/cfp-reserve-list.txt'
 
+        elif reason == "scheduled":
+            subject = "Your EMF %s has been scheduled ('%s')" % (proposal.human_type, proposal_title)
+            template = 'emails/cfp-slot-scheduled.txt'
+
+        elif reason == "moved":
+            subject = "Your EMF %s slot has been moved ('%s')" % (proposal.human_type, proposal_title)
+            template = 'emails/cfp-slot-moved.txt'
+
         else:
             raise Exception("Unknown cfp proposal email type %s" % reason)
+
+        app.logger.info('Sending %s email for proposal %s', reason, proposal.id)
 
         send_from = app.config['CONTENT_EMAIL']
         if from_address:

@@ -2,29 +2,27 @@ Hi {{ proposal.user.name }},
 
 Your EMF {{ proposal.human_type }} '{{ proposal.title }}' has been scheduled!
 
-You have a {{ proposal.scheduled_duration }} minute slot in {{ venue_name }} on {{ proposal.scheduled_time.strftime('%A at %-I:%M %p') }}. If this is not suitable, please let us know as soon as possible.
+You have a {{ proposal.scheduled_duration }} minute slot in {{ proposal.scheduled_venue.name }} on {{ proposal.scheduled_time.strftime('%A at %-I:%M %p') }}. If this is not suitable, please let us know as soon as possible.
 
-If you'd like to share this with people, the public link to your {{ proposal.human_type }} is: https://www.emfcamp.org/line-up/2016/{{ proposal.id }}
+If you'd like to share this with people, the public link to your {{ proposal.human_type }} is: https://www.emfcamp.org/line-up/2018/{{ proposal.id }}
 
 Things to note:
 
 * If you have special requirements and have not spoken to our speaker ops team about them, please reply to this email.
 
-* Please report to the Green Room 30 minutes before your {{ proposal.human_type }} so that the speaker ops team can make sure everything is ready for you, and your {{ proposal.human_type}} will go as smoothly as possible!
+* Please report to the Green Room 30 minutes before your {{ proposal.human_type }} so that the speaker ops team can make sure everything is ready for you, and your {{ proposal.human_type }} will go as smoothly as possible!
 
-* It is possible that we may have to reschedule your {{ proposal.human_type }} before the event starts, so please make sure you've told us when you can speak in your final details:
+* It is possible that we may have to reschedule your {{ proposal.human_type }} before the event starts, so please make sure you've updated your availability:
 
   {{ external_url('cfp.finalise_proposal', proposal_id=proposal.id) }}
 
 * You can also update your {{ proposal.human_type }} title and description at any time using the link above, so make sure it sounds great!
 
+{% if proposal.type == 'talk' %}
 * While you are allowed on-stage Q&A within your slot, we would prefer it if you asked the audience to meet you somewhere afterwards to discuss it.
+{% endif %}
 
 * All this information and more is available on our speakers website page: https://wiki.emfcamp.org/wiki/Speaking
-
-If you don't yet have EMF tickets, you can get them on this page:
-
-  {{ external_url('tickets.main', flow='speakers') }}
 
 Looking forward to seeing you in the field,
 The EMF Speaker Ops Team

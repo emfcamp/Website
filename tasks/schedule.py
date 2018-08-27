@@ -10,6 +10,8 @@ from slotmachine import SlotMachine
 from main import db, mail
 from models.cfp import Proposal, Venue, ROUGH_LENGTHS, EVENT_SPACING, DEFAULT_VENUES, VENUE_CAPACITY
 
+from apps.cfp_review.base import send_email_for_proposal
+
 class ImportVenues(Command):
     venues = [
         ('Stage A', ['talk'], 100),
@@ -230,22 +232,15 @@ class ApplyPotentialSchedule(Command):
                 proposal.scheduled_time = proposal.potential_time
                 proposal.potential_time = None
 
-            venue_name = proposal.scheduled_venue.name
-
+            ok = False
             if previously_unscheduled:
-                msg = Message("Your EMF %s has been scheduled ('%s')" % (proposal.type, proposal.title),
-                              sender=app.config['SPEAKERS_EMAIL'],
-                              recipients=[user.email])
-
-                msg.body = render_template("emails/cfp-slot-scheduled.txt", user=user, proposal=proposal, venue_name=venue_name)
-                app.logger.info('Emailing %s about proposal %s being scheduled', user.email, proposal.title)
+                app.logger.info('Scheduling proposal "%s" by %s', proposal.title, user.email)
+                ok = send_email_for_proposal(proposal, reason="scheduled", from_address=app.config['SPEAKERS_EMAIL'])
             else:
-                msg = Message("Your EMF %s slot has been moved ('%s')" % (proposal.type, proposal.title),
-                              sender=app.config['SPEAKERS_EMAIL'],
-                              recipients=[user.email])
+                app.logger.info('Moving proposal "%s" by %s', proposal.title, user.email)
+                ok = send_email_for_proposal(proposal, reason="moved", from_address=app.config['SPEAKERS_EMAIL'])
 
-                msg.body = render_template("emails/cfp-slot-moved.txt", user=user, proposal=proposal, venue_name=venue_name)
-                app.logger.info('Emailing %s about proposal %s moving', user.email, proposal.title)
-
-            mail.send(msg)
-            db.session.commit()
+            if ok:
+                db.session.commit()
+            else:
+                raise Exception("Error when messaging user when applying schedule")
