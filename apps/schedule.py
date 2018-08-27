@@ -455,6 +455,10 @@ class AddExternalFeedForm(Form):
     preview = SubmitField('Preview')
 
 @schedule.route('/schedule/external/feeds', methods=['GET', 'POST'])
+def external_feeds_redirect():
+    return redirect(url_for('.external_feeds'))
+
+@schedule.route('/schedule/publish', methods=['GET', 'POST'])
 @login_required
 @feature_flag('LINE_UP')
 def external_feeds():
@@ -486,7 +490,7 @@ class UpdateExternalFeedForm(Form):
     preview = SubmitField('Preview')
     save = SubmitField('Save')
 
-@schedule.route('/schedule/external/feed/<int:source_id>', methods=['GET', 'POST'])
+@schedule.route('/schedule/publish/<int:source_id>', methods=['GET', 'POST'])
 @login_required
 @feature_flag('LINE_UP')
 def external_feed(source_id):
