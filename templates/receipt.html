@@ -58,7 +58,7 @@
         <div>&nbsp;</div>
 
         <h4>Your ticket details</h4>
-        {% for checkin_display_name, tickets in admissions|groupby('checkin_display_name') %}
+        {% for checkin_display_name, tickets in admissions|groupby('product.checkin_display_name') %}
         <div class="product">{{ tickets|count }} {{ checkin_display_name }}</div>
         {% endfor %}
         {% endif %}
@@ -80,7 +80,7 @@
         <div>&nbsp;</div>
 
         <h4>Your purchase details</h4>
-        {% for checkin_display_name, purchases in tees|groupby('checkin_display_name') %}
+        {% for checkin_display_name, purchases in tees|groupby('product.checkin_display_name') %}
         <div class="product">{{ purchases|count }} {{ checkin_display_name }}</div>
         {% endfor %}
         {% endif %}
@@ -89,7 +89,7 @@
         <div>&nbsp;</div>
 
         <h4>Your hired items</h4>
-        {% for checkin_display_name, purchases in hires|groupby('checkin_display_name') %}
+        {% for checkin_display_name, purchases in hires|groupby('product.checkin_display_name') %}
         <div class="product">{{ purchases|count }} {{ checkin_display_name }}</div>
         {% endfor %}
         {% endif %}

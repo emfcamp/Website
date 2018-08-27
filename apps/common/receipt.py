@@ -29,21 +29,16 @@ RECEIPT_TYPES = ['admissions', 'parking', 'campervan', 'tees', 'hire']
 
 def render_receipt(user, png=False, pdf=False):
     purchases = user.owned_purchases.filter_by(is_paid_for=True) \
-                                    .join(PriceTier, Product, ProductGroup)
+                                    .join(PriceTier, Product, ProductGroup) \
+                                    .with_entities(Purchase) \
+                                    .order_by(Purchase.id)
 
-    admissions = purchases.filter(ProductGroup.type == 'admissions') \
-                          .with_entities(Product) \
-                          .order_by(Purchase.id).all()
+    admissions = purchases.filter(ProductGroup.type == 'admissions').all()
 
     vehicle_tickets = purchases.filter(ProductGroup.type.in_(['parking', 'campervan'])).all()
 
-    tees = purchases.filter(ProductGroup.type == 'tees') \
-                    .with_entities(Product) \
-                    .order_by(Purchase.id).all()
-
-    hires = purchases.filter(ProductGroup.type == 'hire') \
-                    .with_entities(Product) \
-                    .order_by(Purchase.id).all()
+    tees = purchases.filter(ProductGroup.type == 'tees').all()
+    hires = purchases.filter(ProductGroup.type == 'hire').all()
 
     transferred_tickets = user.transfers_from \
                               .join(Purchase) \
