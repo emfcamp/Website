@@ -9,7 +9,6 @@ import asyncio
 from urllib.parse import urljoin
 
 from flask import Markup, render_template, current_app as app
-from sqlalchemy import func
 from pyppeteer.browser import Browser
 from pyppeteer.connection import Connection
 from pyppeteer.launcher import launch
