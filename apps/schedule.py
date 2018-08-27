@@ -42,7 +42,7 @@ def _get_proposal_dict(proposal, favourites_ids):
     res = {
         'id': proposal.id,
         'slug': proposal.slug,
-        'start_date': event_tz.localize(proposal.scheduled_time),
+        'start_date': event_tz.localize(proposal.start_date),
         'end_date': event_tz.localize(proposal.end_date),
         'venue': proposal.scheduled_venue.name,
         'latlon': proposal.latlon,
