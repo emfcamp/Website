@@ -178,6 +178,10 @@ class AdmissionTicket(Ticket):
         'polymorphic_identity': 'admission_ticket'
     }
 
+    @property
+    def is_transferable(self):
+        return self.product.get_attribute('is_transferable') and not self.checked_in
+
     def check_in(self):
         if self.checked_in is True:
             raise CheckinStateException("Ticket is already checked in.")
