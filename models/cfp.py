@@ -453,9 +453,16 @@ class Proposal(db.Model):
         preferred_time_periods = self.fix_hard_time_limits(preferred_time_periods)
         return make_periods_contiguous(preferred_time_periods)
 
+    def overlaps_with(self, other):
+        return self.end_date >= other.start_date and other.end_date >= self.start_date
+
+    @property
+    def start_date(self):
+        return self.potential_time or self.scheduled_time
+
     @property
     def end_date(self):
-        start = self.scheduled_time
+        start = self.start_date
         duration = self.scheduled_duration
         if start and duration:
             return start + timedelta(minutes=int(duration))

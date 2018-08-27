@@ -1,0 +1,38 @@
+{% extends "cfp_review/base.html" %}
+{% block title %}Clashfinder{% endblock %}
+{% block body %}
+<h2>Clashfinder</h2>
+
+<p>These are the clashes in the top 1000 proposals most commonly starred together. "Number" is how far down the 1000-list the clash is, "Count" is the number of people who starred both of these proposals.</p>
+
+<table class="table table-condensed">
+    <tr>
+        <th class="col-md-1">
+            Number
+        </th>
+        <th class="col-md-1">
+            Count
+        </th>
+        <th>
+            Proposal 1
+        </th>
+        <th>
+            Proposal 2
+        </th>
+    </tr>
+{% for clash in clashes %}
+    <tr>
+        <td><b>#{{clash.number}}</b></td>
+        <td>{{clash.favourites}}</td>
+        <td>
+            <a href="{{ url_for('.update_proposal', proposal_id=clash.proposal_1.id) }}">{{clash.proposal_1.title}}</a>
+        </td>
+        <td>
+            <a href="{{ url_for('.update_proposal', proposal_id=clash.proposal_2.id) }}">{{clash.proposal_2.title}}</a>
+        </td>
+    </tr>
+{% else %}
+    <tr><td colspan="5" class="text-center">No clashes found in the top-1000 favourite co-occurrances</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

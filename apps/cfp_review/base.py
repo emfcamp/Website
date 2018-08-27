@@ -1,5 +1,6 @@
 from datetime import timedelta
-from collections import defaultdict
+from collections import defaultdict, Counter
+from itertools import combinations
 
 import dateutil
 from flask import (
@@ -8,7 +9,7 @@ from flask import (
 )
 from flask_login import current_user
 from flask_mail import Message
-from sqlalchemy import func, exists
+from sqlalchemy import func, exists, select
 from sqlalchemy.orm import joinedload
 
 from main import db, mail, external_url
@@ -16,7 +17,8 @@ from .majority_judgement import calculate_max_normalised_score
 from models.cfp import (
     Proposal, CFPMessage, CFPVote, Venue,
     InvalidVenueException, MANUAL_REVIEW_TYPES,
-    get_available_proposal_minutes, ROUGH_LENGTHS, DAYS, DEFAULT_VENUES, EVENT_SPACING
+    get_available_proposal_minutes, ROUGH_LENGTHS, DAYS, DEFAULT_VENUES, EVENT_SPACING,
+    FavouriteProposal
 )
 from models.user import User
 from models.purchase import Ticket
@@ -793,3 +795,33 @@ def scheduler_update():
 
     db.session.commit()
     return jsonify({'changed': changed})
+
+@cfp_review.route('/clashfinder')
+@schedule_required
+def clashfinder():
+    select_st = select([FavouriteProposal])
+    res = db.session.execute(select_st)
+
+    user_counts = defaultdict(list)
+    popularity = Counter()
+    for user, proposal in res:
+        user_counts[user].append(proposal)
+
+    for proposals in user_counts.values():
+        popularity.update(combinations(proposals, 2))
+
+    clashes = []
+    offset = 0
+    for ((id1, id2), count) in popularity.most_common()[:1000]:
+        offset += 1
+        prop1 = Proposal.query.get(id1)
+        prop2 = Proposal.query.get(id2)
+        if prop1.overlaps_with(prop2):
+            clashes.append({
+                'proposal_1': prop1,
+                'proposal_2': prop2,
+                'favourites': count,
+                'number': offset
+            })
+
+    return render_template('cfp_review/clashfinder.html', clashes=clashes)
