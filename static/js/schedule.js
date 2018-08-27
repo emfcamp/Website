@@ -117,7 +117,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         name: "emf_day",
         property: "venue",
         list: scheduler.serverList('venues', venues),
-        size: 7,
+        size: 8,
         step: 1,
     });
 
