@@ -117,7 +117,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         name: "emf_day",
         property: "venue",
         list: scheduler.serverList('venues', venues),
-        size: 6,
+        size: 7,
         step: 1,
     });
 
@@ -361,7 +361,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         }
     };
 
-    var initial_view = ($(window).width() <= 768) ? 'emf_day': 'emf_timeline';
+    var initial_view = 'emf_day';
 
     scheduler.init('scheduler_here', date_to_show, initial_view);
     scheduler.parse(schedule_data, 'json');
