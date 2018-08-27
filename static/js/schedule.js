@@ -38,8 +38,10 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
     scheduler.config.api_date = "%Y-%m-%d %H:%i:%s";
     scheduler.config.xml_date = "%Y-%m-%d %H:%i:%s";
 
-    // Nothing scheduled is multi-day so switch it off
-    scheduler.config.multi_day = false;
+    // We used the all_timed extension to show events that cross the midnight
+    // event horizon
+    scheduler.config.multi_day = true;
+    scheduler.config.all_timed = true;
 
     /*
      * Views

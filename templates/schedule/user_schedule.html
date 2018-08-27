@@ -147,6 +147,7 @@ document.getElementById('enable-javascript').style.display = 'none';
 {% endblock %}
 {% block foot %}
     <script src="{{ url_for('static', filename='js/dhtmlx_scheduler.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dhtmlxscheduler_all_timed.js') }}"></script>
     {% assets "js_schedule" -%}
         <script src="{{ ASSET_URL }}"></script>
     {% endassets -%}
