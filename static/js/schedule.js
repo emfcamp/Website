@@ -109,17 +109,55 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         };
     }
     // Configure venues view
-    scheduler.locale.labels.emf_day_tab = "Day";
     scheduler.locale.labels.section_custom="Section";
+
+    scheduler.locale.labels.emf_talk_tab = "Talks";
     scheduler.createUnitsView({
-        name: "emf_day",
+        name: "emf_talk",
         property: "venue",
-        list: scheduler.serverList('venues', venues),
+        list: scheduler.serverList('venues', talk_venues),
         size: 6,
         step: 1,
     });
 
-    scheduler.locale.labels.emf_timeline_tab = "All Events";
+    scheduler.locale.labels.emf_workshop_tab = "Workshops";
+    scheduler.createUnitsView({
+        name: "emf_workshop",
+        property: "venue",
+        list: scheduler.serverList('venues', workshop_venues),
+        size: 6,
+        step: 1,
+    });
+
+    scheduler.locale.labels.emf_youth_tab = "Youth";
+    scheduler.createUnitsView({
+        name: "emf_youth",
+        property: "venue",
+        list: scheduler.serverList('venues', youth_venues),
+        size: 6,
+        step: 1,
+    });
+
+    scheduler.locale.labels.emf_village_tab = "Villages";
+    scheduler.createTimelineView({
+        section_autoheight: false,
+        name:"emf_village",
+        // Width of initial column
+        dx: 150,
+        x_unit: "minute",
+        x_date: "%H:%i",
+        x_step: 60,
+        x_size: 15,
+        x_start: 9,
+        x_length: 48,
+        y_unit: scheduler.serverList('venues', village_venues),
+        y_property: "venue",
+        render: "tree",
+        folder_dy:20,
+        dy:40
+    });
+
+    scheduler.locale.labels.emf_timeline_tab = "Everything";
     scheduler.createTimelineView({
         section_autoheight: false,
         name:"emf_timeline",
@@ -359,7 +397,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         }
     };
 
-    var initial_view = ($(window).width() <= 768) ? 'emf_day': 'emf_timeline';
+    var initial_view = 'emf_talk';
 
     scheduler.init('scheduler_here', date_to_show, initial_view);
     scheduler.parse(schedule_data, 'json');

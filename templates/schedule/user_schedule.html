@@ -111,11 +111,11 @@ document.getElementById('enable-javascript').style.display = 'none';
         <div class="dhx_cal_next_button">&nbsp;</div>
         <div class="dhx_cal_today_button"></div>
         <div class="dhx_cal_date"></div>
-        <div class="dhx_cal_tab" name="emf_day_tab" id="emf_day_tab"></div>
+        <div class="dhx_cal_tab" name="emf_talk_tab" id="emf_talk_tab"></div>
+        <div class="dhx_cal_tab" name="emf_workshop_tab" id="emf_workshop_tab"></div>
+        <div class="dhx_cal_tab" name="emf_youth_tab" id="emf_youth_tab"></div>
+        <div class="dhx_cal_tab" name="emf_village_tab" id="emf_village_tab"></div>
         <div class="dhx_cal_tab" name="emf_timeline_tab" id="emf_timeline_tab"></div>
-        <button type="button" id="filter_modal_btn" class="dhx_cal_tab" data-toggle="modal" data-target="#filter_modal" style="display: none;">
-            Filter
-        </button>
     </div>
     <div class="dhx_cal_header"></div>
     <div class="dhx_multi_day"><div class="dhx_multi_day_icon"></div></div>
@@ -151,7 +151,6 @@ document.getElementById('enable-javascript').style.display = 'none';
         <script src="{{ ASSET_URL }}"></script>
     {% endassets -%}
     <script>
-        $('#filter_modal_btn').show();
         $('#scheduler_here').show();
         var schedule_data = {{ schedule_data | tojson }},
             venues = {{ venues | tojson }},

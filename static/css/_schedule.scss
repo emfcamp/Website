@@ -191,14 +191,20 @@ html, body{
     .dhx_cal_today_button {
         display: none;
     }
-    #emf_day_tab {
+    #emf_talk_tab {
         left: 1px !important;
     }
-    #emf_timeline_tab {
-        left: 43px !important
+    #emf_workshop_tab {
+        left: 90px !important;
     }
-    #filter_modal_btn {
-        left: 109px !important
+    #emf_youth_tab {
+        left: 180px !important;
+    }
+    #emf_village_tab {
+        left: 270px !important;
+    }
+    #emf_timeline_tab {
+        left: 360px !important
     }
 }
 
@@ -207,14 +213,20 @@ html, body{
         width: 70px;
         font-size: 14px;
     }
-    #emf_day_tab {
-        left: 20px !important;
+    #emf_talk_tab {
+        left: 1px !important;
+    }
+    #emf_workshop_tab {
+        left: 90px !important;
+    }
+    #emf_youth_tab {
+        left: 180px !important;
+    }
+    #emf_village_tab {
+        left: 270px !important;
     }
     #emf_timeline_tab {
-        left: 110px !important
-    }
-    #filter_modal_btn {
-        left: 200px !important;
+        left: 360px !important
     }
 }
 
