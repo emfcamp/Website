@@ -70,7 +70,7 @@
             <a href="{{ url_for('admin.user', user_id=proposal.user.id ) }}">{{proposal.user.name}}</a>
         </td>
         <td>
-            <a href="{{ url_for('.update_proposal', proposal_id=proposal.id) }}">{{proposal.title}}</a>
+            <a href="{{ url_for('.update_proposal', proposal_id=proposal.id) }}">{{proposal.published_title or proposal.title}}</a>
         </td>
     </tr>
 {% else %}

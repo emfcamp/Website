@@ -7,7 +7,7 @@
 {% include "cfp_review/_propsal_tabs.html" %}
 
 <div class="col-md-12">
-    <h2>{{proposal.title}}<br>
+    <h2>{{proposal.published_title or proposal.title}}<br>
         <small>A {{proposal.human_type}} by 
             <a href="{{ url_for('admin.user', user_id=proposal.user.id) }}">{{proposal.user.name}}</small></a>
     </h2>
