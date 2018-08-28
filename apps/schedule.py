@@ -160,7 +160,7 @@ def _get_priority_sorted_venues(venues_to_allow):
 def _format_event_description(event):
     description = event['description']
     if event['type'] in ['workshop', 'youthworkshop']:
-        description += "\n\nAttending this workshop will cost: " + (event['cost'] or '')
+        description += "\n\nAttending this workshop will cost: " + event['cost']
         description += "\nSuitable age range: " + event['age_range']
         description += "\nAttendees should bring: " + event['equipment']
     if event['link']:
