@@ -156,9 +156,9 @@ class MakeVolunteerData(Command):
             {"name": "Car Parking",           "description": "Help park cars and get people on/off site."},
             {"name": "Catering",              "description": "Help our excellent catering team provide food for all the volunteers."},
             {"name": "Entrance Steward",      "description": "Greet people, check their tickets and help them get on site."},
-            {"name": "Games Master",          "description": "Running Indie Games on the big screen in Stage A, and optionally Board Games"},
+            {"name": "Games Master",          "description": "Running Indie Games on the big screen in Stage A, and optionally Board Games."},
             {"name": "Green Room",            "description": "Make sure speakers get where they need to be with what they need."},
-            {"name": "Info Desk",             "description": "Be a point of contact for attendees. Either helping with finding things or just getting an idea for what's on"},
+            {"name": "Info Desk",             "description": "Be a point of contact for attendees. Either helping with finding things or just getting an idea for what's on."},
             {"name": "Tent Steward",          "description": "Check the various tents (e.g. Arcade, Lounge, Spillout) are clean and everything's OK."},
             {"name": "Youth Workshop Helper", "description": "Help support our youth workshop leaders and participants."},
 
