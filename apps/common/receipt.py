@@ -20,9 +20,8 @@ import requests
 
 from main import external_url
 from models.product import Product, ProductGroup, PriceTier
-from models.purchase import PurchaseTransfer, Ticket
+from models.purchase import Purchase, PurchaseTransfer, Ticket
 from models.site_state import event_start
-from models import Purchase
 
 
 RECEIPT_TYPES = ['admissions', 'parking', 'campervan', 'tees', 'hire']
@@ -180,13 +179,22 @@ def attach_tickets(msg, user):
 
     msg.attach('EMF{}.pdf'.format(event_start().year), 'application/pdf', pdf.read())
 
-    purchases = user.owned_purchases.filter_by(is_paid_for=True, state='paid') \
+def set_tickets_emailed(user):
+    purchases = user.owned_purchases.filter_by(is_paid_for=True) \
+                                    .filter(Purchase.state.in_(['paid', 'receipt-emailed'])) \
                                     .join(PriceTier, Product, ProductGroup) \
                                     .filter(ProductGroup.type.in_(RECEIPT_TYPES)) \
                                     .with_entities(Purchase) \
                                     .group_by(Purchase) \
                                     .order_by(Purchase.id)
 
+    already_emailed = False
     for p in purchases:
+        if p.state == 'receipt-emailed':
+            already_emailed = True
+
         p.set_state('receipt-emailed')
+
+    return already_emailed
+
 

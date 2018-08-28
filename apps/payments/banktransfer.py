@@ -13,7 +13,7 @@ from wtforms.validators import Required, AnyOf
 from main import db, mail
 from ..common import get_user_currency, feature_enabled
 from ..common.forms import Form
-from ..common.receipt import attach_tickets
+from ..common.receipt import attach_tickets, set_tickets_emailed
 from . import get_user_payment_or_abort, lock_user_payment_or_abort
 from . import payments
 
@@ -142,8 +142,10 @@ def send_confirmation(payment):
     msg = Message("Electromagnetic Field ticket purchase update",
                   sender=app.config['TICKETS_EMAIL'],
                   recipients=[payment.user.email])
+
+    already_emailed = set_tickets_emailed(payment.user)
     msg.body = render_template("emails/tickets-paid-email-banktransfer.txt",
-                  user=payment.user, payment=payment)
+                  user=payment.user, payment=payment, already_emailed=already_emailed)
 
     if feature_enabled('ISSUE_TICKETS'):
         attach_tickets(msg, payment.user)

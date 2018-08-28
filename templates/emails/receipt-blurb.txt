@@ -1,4 +1,4 @@
-We've attached a PDF to this email. Admissions tickets can be shown
+We've attached {% if already_emailed %}an updated{% else %}a{% endif %} PDF to this email. Admissions tickets can be shown
 on your phone, but we recommend you print them out for convenience.
 
 {% if payment %}

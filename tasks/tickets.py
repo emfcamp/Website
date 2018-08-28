@@ -7,7 +7,7 @@ from sqlalchemy import func
 
 from main import db, mail
 from apps.common import feature_enabled
-from apps.common.receipt import attach_tickets, RECEIPT_TYPES
+from apps.common.receipt import attach_tickets, set_tickets_emailed, RECEIPT_TYPES
 from models.payment import Payment
 from models.product import ProductGroup, Product, PriceTier, Price, ProductView, ProductViewProduct
 from models.purchase import Purchase
@@ -219,7 +219,9 @@ class SendTickets(Command):
                           sender=app.config['TICKETS_EMAIL'],
                           recipients=[user.email])
 
-            msg.body = render_template("emails/receipt.txt", user=user)
+            already_emailed = set_tickets_emailed(user)
+            msg.body = render_template("emails/receipt.txt", user=user,
+                                       already_emailed=already_emailed)
 
             attach_tickets(msg, user)
 

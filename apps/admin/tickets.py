@@ -26,7 +26,7 @@ from .forms import (
 )
 
 from ..common import feature_enabled
-from ..common.receipt import attach_tickets
+from ..common.receipt import attach_tickets, set_tickets_emailed
 
 
 @admin.route('/tickets')
@@ -106,9 +106,10 @@ def tickets_issue_free(email):
                       sender=app.config['TICKETS_EMAIL'],
                       recipients=[user.email])
 
+        already_emailed = set_tickets_emailed(user)
         msg.body = render_template('emails/tickets-free.txt',
                             user=user, code=code, tickets=basket.purchases,
-                            new_user=new_user)
+                            new_user=new_user, already_emailed=already_emailed)
 
         if feature_enabled('ISSUE_TICKETS'):
             attach_tickets(msg, user)

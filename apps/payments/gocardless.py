@@ -18,7 +18,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from main import db, mail, external_url, gocardless_client, csrf
 from models.payment import GoCardlessPayment
 from ..common import feature_enabled
-from ..common.receipt import attach_tickets
+from ..common.receipt import attach_tickets, set_tickets_emailed
 from ..common.forms import Form
 from . import get_user_payment_or_abort, lock_user_payment_or_abort
 from . import payments
@@ -542,8 +542,11 @@ def gocardless_payment_paid(payment):
     msg = Message("Your EMF ticket payment has been confirmed",
                   sender=app.config['TICKETS_EMAIL'],
                   recipients=[payment.user.email])
+
+    already_emailed = set_tickets_emailed(payment.user)
     msg.body = render_template('emails/tickets-paid-email-gocardless.txt',
-                               user=payment.user, payment=payment)
+                               user=payment.user, payment=payment,
+                               already_emailed=already_emailed)
 
     if feature_enabled('ISSUE_TICKETS'):
         attach_tickets(msg, payment.user)

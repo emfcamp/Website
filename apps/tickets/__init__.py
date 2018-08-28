@@ -30,7 +30,8 @@ from ..common import (
     feature_flag, create_current_user, feature_enabled,
 )
 from ..common.receipt import (
-    make_qr_png, make_barcode_png, render_pdf, render_receipt, attach_tickets,
+    make_qr_png, make_barcode_png, render_pdf, render_receipt,
+    attach_tickets, set_tickets_emailed,
 )
 from ..payments.gocardless import gocardless_start
 from ..payments.banktransfer import transfer_start
@@ -283,8 +284,14 @@ def main(flow=None):
             msg = Message("Your EMF ticket order",
                           sender=app.config['TICKETS_EMAIL'],
                           recipients=[current_user.email])
+
+            already_emailed = set_tickets_emailed(current_user)
             msg.body = render_template("emails/tickets-ordered-email-free.txt",
-                                       user=current_user, basket=basket)
+                                       user=current_user, basket=basket,
+                                       already_emailed=already_emailed)
+            if feature_enabled('ISSUE_TICKETS'):
+                attach_tickets(msg, current_user)
+
             mail.send(msg)
 
             if len(basket.purchases) == 1:
@@ -473,9 +480,12 @@ def transfer(ticket_id):
         msg = Message("You've been sent a ticket to EMF!",
                       sender=app.config.get('TICKETS_EMAIL'),
                       recipients=[to_user.email])
+
+        already_emailed = set_tickets_emailed(to_user)
         msg.body = render_template('emails/ticket-transfer-new-owner.txt',
                                    to_user=to_user, from_user=current_user,
-                                   new_user=new_user, code=code)
+                                   new_user=new_user, code=code,
+                                   already_emailed=already_emailed)
 
         if feature_enabled('ISSUE_TICKETS'):
             attach_tickets(msg, to_user)

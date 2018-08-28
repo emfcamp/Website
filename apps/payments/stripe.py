@@ -17,7 +17,7 @@ from models.payment import StripePayment
 from models.site_state import event_start
 from ..common import feature_enabled, feature_flag
 from ..common.forms import Form
-from ..common.receipt import attach_tickets
+from ..common.receipt import attach_tickets, set_tickets_emailed
 from . import get_user_payment_or_abort, lock_user_payment_or_abort
 from . import payments
 
@@ -105,8 +105,11 @@ def charge_stripe(payment):
     msg = Message("Your EMF ticket purchase",
                   sender=app.config.get('TICKETS_EMAIL'),
                   recipients=[payment.user.email])
+
+    already_emailed = set_tickets_emailed(payment.user)
     msg.body = render_template("emails/tickets-purchased-email-stripe.txt",
-                               user=payment.user, payment=payment)
+                               user=payment.user, payment=payment,
+                               already_emailed=already_emailed)
 
     if feature_enabled('ISSUE_TICKETS') and charge.paid:
         attach_tickets(msg, payment.user)
@@ -358,8 +361,11 @@ def stripe_payment_paid(payment):
     msg = Message('Your EMF payment has been confirmed',
                   sender=app.config.get('TICKETS_EMAIL'),
                   recipients=[payment.user.email])
+
+    already_emailed = set_tickets_emailed(payment.user)
     msg.body = render_template('emails/tickets-paid-email-stripe.txt',
-                               user=payment.user, payment=payment)
+                               user=payment.user, payment=payment,
+                               already_emailed=already_emailed)
 
     if feature_enabled('ISSUE_TICKETS'):
         attach_tickets(msg, payment.user)
