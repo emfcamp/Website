@@ -535,7 +535,7 @@ class Proposal(db.Model):
             if floaty > 0:
                 return "£" + cost
             else:
-                return None
+                return ""
         except ValueError:
             return cost
 
