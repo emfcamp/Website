@@ -5,10 +5,11 @@ from . import admin
 from flask import (
     render_template, redirect, flash,
     url_for, current_app as app, abort,
+    send_file,
 )
 from flask_mail import Message
 
-from main import db, mail
+from main import db, mail, external_url
 from models.exc import CapacityException
 from models.user import User
 from models.product import (
@@ -27,6 +28,7 @@ from .forms import (
 
 from ..common import feature_enabled
 from ..common.receipt import attach_tickets, set_tickets_emailed
+from ..common.receipt import render_receipt, render_pdf
 
 
 @admin.route('/tickets')
@@ -317,4 +319,16 @@ def transfer_ticket_user(ticket_id, email):
                            form=form, ticket=ticket, user=user)
 
 
+@admin.route('/user/<int:user_id>/tickets')
+@admin.route('/user/<int:user_id>/tickets<ext>')
+def user_tickets(user_id, ext=None):
+    user = User.query.get_or_404(user_id)
+
+    receipt = render_receipt(user)
+
+    if ext == '.pdf':
+        url = external_url('.user_tickets', user_id=user_id)
+        return send_file(render_pdf(url, receipt), mimetype='application/pdf', cache_timeout=60)
+
+    return receipt
 

@@ -20,7 +20,7 @@ import requests
 
 from main import external_url
 from models.product import Product, ProductGroup, PriceTier
-from models.purchase import Purchase, PurchaseTransfer, Ticket
+from models.purchase import Purchase, PurchaseTransfer
 from models.site_state import event_start
 
 
@@ -52,20 +52,6 @@ def render_receipt(user, png=False, pdf=False):
                            vehicle_tickets=vehicle_tickets,
                            transferred_tickets=transferred_tickets,
                            tees=tees, hires=hires,
-                           pdf=pdf, png=png)
-
-
-def render_parking_receipts(png=False, pdf=False):
-    vehicle_tickets = Ticket.query.filter_by(is_paid_for=True) \
-        .join(PriceTier, Product, ProductGroup) \
-        .filter_by(type='parking')
-
-    users = [t.owner for t in vehicle_tickets]
-
-    return render_template('parking-receipts.html', users=users,
-                           format_inline_qr=format_inline_qr,
-                           format_inline_barcode=format_inline_barcode,
-                           vehicle_tickets=vehicle_tickets,
                            pdf=pdf, png=png)
 
 

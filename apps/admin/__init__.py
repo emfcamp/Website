@@ -24,7 +24,6 @@ from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
 from models.site_state import SiteState, VALID_STATES, refresh_states
 from ..common import require_permission
 from ..common.forms import Form, TelField
-from ..common.receipt import render_parking_receipts
 
 
 admin = Blueprint('admin', __name__)
@@ -242,10 +241,6 @@ def new_feed():
         app.logger.info(msg)
         return redirect(url_for('.feed', feed_id=feed.id))
     return render_template('admin/edit-feed.html', form=form)
-
-@admin.route('/parking-tickets', methods=['GET', 'POST'])
-def parking_tickets():
-    return render_parking_receipts()
 
 from . import accounts  # noqa: F401
 from . import payments  # noqa: F401
