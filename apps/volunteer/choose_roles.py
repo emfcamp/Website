@@ -1,5 +1,9 @@
-from flask import render_template, redirect, url_for, flash
+import markdown
+from os import path
 
+from flask import (
+    render_template, redirect, url_for, flash, Markup, abort, request
+)
 from flask_login import current_user
 
 from wtforms import SubmitField, BooleanField, FormField, FieldList
@@ -9,7 +13,7 @@ from main import db
 from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer as VolunteerUser
 
-from . import volunteer, v_user_required
+from . import volunteer, v_user_required, role_name_to_markdown_file
 from ..common import feature_flag
 from ..common.forms import Form, HiddenIntegerField
 
@@ -77,4 +81,30 @@ def choose_role():
         form.select_roles(role_ids)
 
     return render_template('volunteer/choose_role.html', form=form)
+
+
+@volunteer.route('/role/<role_id>', methods=["GET", "POST"])
+@feature_flag('VOLUNTEERS_SIGNUP')
+@v_user_required
+def role(role_id):
+    role = Role.query.get_or_404(role_id)
+    current_volunteer = VolunteerUser.get_for_user(current_user)
+
+    if request.method == "POST":
+        if role_id in current_volunteer.interested_roles:
+            current_volunteer.interested_roles.remove(role)
+        else:
+            current_volunteer.interested_roles.append(role)
+        db.session.commit()
+        flash("Your role list has been updated", "info")
+        return redirect(url_for('.choose_role'))
+
+    role_description_file = role_name_to_markdown_file(role.name)
+
+    if path.exists(role_description_file):
+        content = open(role_description_file, 'r').read()
+        description = Markup(markdown.markdown(content, extensions=["markdown.extensions.nl2br"]))
+
+    return render_template('volunteer/role.html', description=description,
+                           role=role, current_volunteer=current_volunteer)
 

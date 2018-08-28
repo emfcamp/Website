@@ -13,7 +13,7 @@
     <div>Stop: {{ shift.end.strftime('%A %H:%M') }}</div>
 
     <form method="POST" >
-        <input id="csrf_token" name=_csrf_token type=hidden value="{{ csrf_token() }}">
+        {# <input id="csrf_token" name=_csrf_token type=hidden value="{{ csrf_token() }}"> #}
         {% if shift in current_user.shift_entries %}
             <button class="btn btn-warn">
                 Cancel this shift
