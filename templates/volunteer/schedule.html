@@ -120,8 +120,24 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button id='signUpBtn' type="button" class="btn btn-primary">Sign Up</button>
+            {% if current_user.has_permission('volunteer:admin') %}
+
+                <div class="input-group">
+                    <select id="override-user" class="form-control">
+                        {% for volunteer in all_volunteers %}
+                        <option value="{{ volunteer.user_id }}">{{ volunteer.nickname }} &lt;{{ volunteer.volunteer_email }}&gt;</option>
+                        {% endfor %}
+                    </select>
+                    <span class="input-group-btn">
+                        <button id="override-sign-up-btn" class="btn btn-default debouce">Sign Up User</button>
+                    </span>
+
+                </div>
+            {% endif %}
+            <div id="signup-grp" class="input-group">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button id='signUpBtn' type="button" class="btn btn-primary">Sign Up</button>
+            </div>
           </div>
         </div>
       </div>
@@ -158,7 +174,7 @@
             volunteer_roles = {{ roles | tojson }},
             is_admin = {% if current_user.has_permission('volunter:admin') -%} true {%- else -%} false {%- endif %};
 
-        init_volunteer_schedule(volunteer_shifts, volunteer_roles, '{{ active_day }}');
+        init_volunteer_schedule(volunteer_shifts, volunteer_roles, '{{ active_day }}', is_admin);
 
     </script>
 {% endblock %}
