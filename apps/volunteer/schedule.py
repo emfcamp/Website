@@ -25,12 +25,8 @@ def _get_interested_roles(user):
 
     for r in roles:
         to_add = r.to_dict()
-
-        if r in volunteer.interested_roles:
-            to_add['is_interested'] = True
-
-        if r in volunteer.trained_roles:
-            to_add['is_trained'] = True
+        to_add['is_interested'] = (r in volunteer.interested_roles)
+        to_add['is_trained'] = (r in volunteer.trained_roles)
 
         res.append(to_add)
 
@@ -56,9 +52,11 @@ def schedule():
     roles = _get_interested_roles(current_user)
     role_descriptions = _format_role_descriptions()
 
+    untrained_roles = [r for r in roles if r['requires_training'] and not r['is_trained']]
+
     return render_template('volunteer/schedule.html', roles=roles, all_shifts=by_time,
                            active_day=request.args.get('day', default='fri'),
-                           role_descriptions=role_descriptions)
+                           role_descriptions=role_descriptions, untrained_roles=untrained_roles)
 
 def _toggle_shift_entry(user, shift):
     res = {}

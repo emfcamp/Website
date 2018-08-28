@@ -59,6 +59,17 @@
         </div>
     </noscript>
 
+    {% if untrained_roles %}
+    <div class="alert alert-info">
+    You still need training before starting a shift for the following roles:
+    <ul class="list-unstyle">
+    {% for role in untrained_roles %}
+    <li>{{ role.name }}</li>
+    {% endfor %}
+    </ul>
+    </div>
+    {% endif %}
+
     <div id="filter-panel" class="panel panel-default" style="display: none;">
         <div class="panel-heading">
             <h4 class="panel-title">
