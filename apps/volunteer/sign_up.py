@@ -4,10 +4,10 @@ from flask import (
 )
 from flask_login import current_user
 from wtforms import (
-    StringField, IntegerField, SelectField, SubmitField, BooleanField
+    StringField, SelectField, SubmitField, BooleanField
 )
 from wtforms.validators import (
-    Required, InputRequired, Email, ValidationError, Optional,
+    Required, Email, ValidationError, Optional,
 )
 
 from pendulum import parse, period
@@ -31,7 +31,7 @@ DEPARTURE_CHOICES = generate_day_options('2018-08-31', '2018-09-03') + [('2018-0
 class VolunteerSignUpForm(Form):
     nickname = StringField("Name", [Required()])
     volunteer_email = StringField("Email", [Email(), Required()])
-    age = IntegerField("Age", [InputRequired()])
+    over_18 = BooleanField("I'm at least 18 years old")
     volunteer_phone = StringField("Phone", [Required()])
     arrival = SelectField("Arrival", choices=ARRIVAL_CHOICES, default='2018-08-31')
     departure = SelectField("Departure", choices=DEPARTURE_CHOICES, default='2018-09-03')
@@ -55,7 +55,7 @@ def update_volunteer_from_form(volunteer, form):
     volunteer.nickname = form.nickname.data
     volunteer.volunteer_email = form.volunteer_email.data
     volunteer.volunteer_phone = form.volunteer_phone.data
-    volunteer.age = form.age.data
+    volunteer.over_18 = form.over_18.data
     volunteer.planned_arrival = form.arrival.data
     volunteer.planned_departure = form.departure.data
     volunteer.allow_comms_during_event = form.allow_comms.data
@@ -74,7 +74,7 @@ def sign_up():
         form.volunteer_email.data = current_user.email
         form.nickname.data = current_user.name
         form.volunteer_phone.data = current_user.phone
-        # Can't copy age, as that's only submitted as part of the outreach questions
+        # Can't try to process age, as that's only submitted as part of the outreach questions
 
     if form.validate_on_submit():
         if current_user.is_anonymous:

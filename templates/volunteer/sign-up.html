@@ -45,7 +45,14 @@
         {{ form.hidden_tag() }}
         {{ render_field(form.nickname, horizontal=10) }}
         {{ render_field(form.volunteer_email, horizontal=10) }}
-        {{ render_field(form.age, horizontal=10) }}
+        <div class="form-group">
+          <div class="col-sm-10 col-sm-offset-2">
+            {{ form.over_18(class_='big-checkbox') }}
+            <label class="control-label big-checkbox" for="over_18">
+                I'm at least 18 years old
+            </label>
+          </div>
+        </div>
         {{ render_field(form.volunteer_phone, horizontal=10) }}
         {{ render_field(form.arrival, horizontal=10) }}
         {{ render_field(form.departure, horizontal=10) }}
