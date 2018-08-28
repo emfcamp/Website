@@ -1,9 +1,12 @@
 {# Filter form on /volunteer/schedule #}
 <form class="row">
-    <fieldset class="form-horizontal col-sm-6">
+    <fieldset class="form-horizontal col-sm-8">
         <div class="form-group">
-            <label for="role" class="col-sm-2">Role</label>
-            <div class="col-sm-10">
+            <label for="role" class="col-sm-4">
+                Role<br>
+                <small>(ctrl/&#8984; or shift click for multiple)</small>
+            </label>
+            <div class="col-sm-8">
                 <select id="role-select" name="role" multiple="multiple" class="form-control">
                     {% for r in roles %}
                         <option id='role-opt-{{r.id}}' value="{{r.id}}">{{r.name}}</option>
@@ -12,7 +15,7 @@
             </div>
         </div>
     </fieldset>
-    <fieldset class="form-horizontal col-sm-6">
+    <fieldset class="form-horizontal col-sm-4">
         <div class="form-group">
             <div class="checkbox">
                 <label>
@@ -45,7 +48,31 @@
                 </label>
             </div>
         </div>
-    <fieldset class="form-horizontal col-sm-6">
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <input id="hide_full" type="checkbox">
+                    Hide full shifts
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <input id="is_understaffed" type="checkbox">
+                    Only understaffed shifts
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <input id="colourful_mode" type="checkbox">
+                    Colourful Mode
+                </label>
+            </div>
+        </div>
+    <fieldset class="form-horizontal col-sm-12">
         <div class="form-group">
             <div class="btn-group">
                 <a id="filter-btn" class="btn btn-primary">Apply</a>
