@@ -2,12 +2,27 @@
 import pytz
 
 from pendulum import period
+from sqlalchemy import select, func
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from main import db
 
 event_tz = pytz.timezone('Europe/London')
+
+
+class ShiftEntry(db.Model):
+    __tablename__ = 'volunteer_shift_entry'
+    __versioned__ = {}
+
+    shift_id = db.Column(db.Integer, db.ForeignKey('volunteer_shift.id'), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    checked_in = db.Column(db.Boolean, nullable=False, default=False)
+    missing_others = db.Column(db.Boolean, nullable=False, default=False)
+
+    user = db.relationship('User', backref='shift_entries')
+    shift = db.relationship('Shift', backref='entries')
+
 
 class Shift(db.Model):
     __tablename__ = 'volunteer_shift'
@@ -24,6 +39,11 @@ class Shift(db.Model):
 
     role = db.relationship('Role', backref='shifts')
     venue = db.relationship('VolunteerVenue', backref='shifts')
+
+    current_count = db.column_property(
+        select([func.count(ShiftEntry.shift_id)]).
+        where(ShiftEntry.shift_id == id)
+    )
 
     volunteers = association_proxy('entries', 'user')
 
@@ -62,7 +82,7 @@ class Shift(db.Model):
             "max_needed": self.max_needed,
             "role": self.role.to_dict(),
             "venue": self.venue.to_dict(),
-            "current_count": len(self.entries)
+            "current_count": self.current_count
         }
 
     @classmethod
@@ -90,19 +110,6 @@ class Shift(db.Model):
         return [Shift(role=role, venue=venue, min_needed=min, max_needed=max,
                       start=start(t), end=end(t))
                 for t in initial_start_times]
-
-
-class ShiftEntry(db.Model):
-    __tablename__ = 'volunteer_shift_entry'
-    __versioned__ = {}
-
-    shift_id = db.Column(db.Integer, db.ForeignKey('volunteer_shift.id'), primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    checked_in = db.Column(db.Boolean, nullable=False, default=False)
-    missing_others = db.Column(db.Boolean, nullable=False, default=False)
-
-    user = db.relationship('User', backref='shift_entries')
-    shift = db.relationship('Shift', backref='entries')
 
 """
 class TrainingSession(Shift):
