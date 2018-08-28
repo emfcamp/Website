@@ -58,12 +58,14 @@ def _get_proposal_dict(proposal, favourites_ids):
         'source': 'database',
         'link': external_url('.line_up_proposal', proposal_id=proposal.id),
     }
-    if proposal.type == 'workshop':
-        res['cost'] = proposal.cost
+    if proposal.type in ['workshop', 'youthworkshop']:
+        res['cost'] = event.display_cost
+        res['equipment'] = event.display_participant_equipment
+        res['age_range'] = event.display_age_range
     return res
 
 def _get_ical_dict(event, favourites_ids):
-    return {
+    res = {
         'id': -event.id,
         'start_date': event_tz.localize(event.start_dt),
         'end_date': event_tz.localize(event.end_dt),
@@ -80,6 +82,11 @@ def _get_ical_dict(event, favourites_ids):
         'source': 'external',
         'link': external_url('.line_up_external', event_id=event.id),
     }
+    if event.type in ['workshop', 'youthworkshop']:
+        res['cost'] = event.display_cost
+        res['equipment'] = event.display_participant_equipment
+        res['age_range'] = event.display_age_range
+    return res
 
 def _get_scheduled_proposals(filter_obj={}, override_user=None):
     if override_user:
@@ -149,6 +156,16 @@ def _get_priority_sorted_venues(venues_to_allow):
 
     res = sorted(res, key=lambda v: (v['source'] != 'ical', v['order']), reverse=True)
     return res
+
+def _format_event_description(event):
+    description = event['description']
+    if event['type'] in ['workshop', 'youthworkshop']:
+        description += "\n\nAttending this workshop will cost: " + event['cost']
+        description += "\nSuitable age range: " + event['age_range']
+        description += "\nAttendees should bring: " + event['equipment']
+    if event['link']:
+        description += "\n\nLink: " + event['link']
+    return description
 
 @schedule.route('/schedule')
 @feature_flag('SCHEDULE')
@@ -221,7 +238,7 @@ def schedule_ical():
         cal_event = Event()
         cal_event.add('uid', event['id'])
         cal_event.add('summary', event['title'])
-        cal_event.add('description', event['description'])
+        cal_event.add('description', _format_event_description(event))
         cal_event.add('location', event['venue'])
         cal_event.add('dtstart', event['start_date'])
         cal_event.add('dtend', event['end_date'])
@@ -274,7 +291,7 @@ def favourites_ical():
         cal_event = Event()
         cal_event.add('uid', event['id'])
         cal_event.add('summary', event['title'])
-        cal_event.add('description', event['description'])
+        cal_event.add('description', _format_event_description(event))
         cal_event.add('location', event['venue'])
         cal_event.add('dtstart', event['start_date'])
         cal_event.add('dtend', event['end_date'])
