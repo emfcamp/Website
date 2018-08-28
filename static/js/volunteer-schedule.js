@@ -200,6 +200,10 @@ function init_volunteer_schedule(data, all_roles, active_day) {
             return true;
         }
 
+        if (filters.show_understaffed_only && shift.current_count >= shift.min_needed) {
+            return true;
+        }
+
         return false;
     }
 
@@ -207,6 +211,7 @@ function init_volunteer_schedule(data, all_roles, active_day) {
         // TODO logic for trained/interested shifts
         var show_past = $('#show_past').prop('checked'),
             show_signed_up_only = $('#show_signed_up_only').prop('checked'),
+            show_understaffed_only = $('#is_understaffed').prop('checked'),
             role_ids = [],
             raw_role_ids = $('#role-select').val() || [];
 
@@ -219,7 +224,8 @@ function init_volunteer_schedule(data, all_roles, active_day) {
         return {
             role_ids: role_ids,
             show_past: show_past,
-            show_signed_up_only: show_signed_up_only
+            show_signed_up_only: show_signed_up_only,
+            show_understaffed_only: show_understaffed_only,
         };
     }
 
