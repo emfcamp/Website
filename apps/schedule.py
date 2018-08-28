@@ -59,9 +59,9 @@ def _get_proposal_dict(proposal, favourites_ids):
         'link': external_url('.line_up_proposal', proposal_id=proposal.id),
     }
     if proposal.type in ['workshop', 'youthworkshop']:
-        res['cost'] = proposal.cost
-        res['equipment'] = proposal.participant_equipment
-        res['age_range'] = proposal.age_range
+        res['cost'] = event.display_cost
+        res['equipment'] = event.display_participant_equipment
+        res['age_range'] = event.display_age_range
     return res
 
 def _get_ical_dict(event, favourites_ids):
@@ -83,9 +83,9 @@ def _get_ical_dict(event, favourites_ids):
         'link': external_url('.line_up_external', event_id=event.id),
     }
     if event.type in ['workshop', 'youthworkshop']:
-        res['cost'] = event.cost
-        res['equipment'] = event.participant_equipment
-        res['age_range'] = event.age_range
+        res['cost'] = event.display_cost
+        res['equipment'] = event.display_participant_equipment
+        res['age_range'] = event.display_age_range
     return res
 
 def _get_scheduled_proposals(filter_obj={}, override_user=None):
