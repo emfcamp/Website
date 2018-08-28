@@ -102,7 +102,7 @@ def render_pdf(url, html):
         await page.setRequestInterception(True)
 
         await page.goto(url)
-        pdf = await page.pdf()
+        pdf = await page.pdf(format='A4')
         await browser.close()
 
         if not app.config.get('CHROME_URL'):

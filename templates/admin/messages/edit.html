@@ -1,0 +1,27 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "admin/base.html" %}
+{% set nav_active = 'messages' %}
+{% block body %}
+
+<form method="post" class="form-horizontal">
+  {{ form.hidden_tag() }}
+
+  <div class="col-sm-6">
+    {{ render_field(form.message, horizontal=12, rows="4", cols="50") }}
+  </div>
+  <div class="col-sm-6">
+    {{ render_field(form.show, horizontal=4) }}
+    {{ render_field(form.end, horizontal=4) }}
+  </div>
+
+  <dl class="dl-horizontal">
+    <dt>Creator</dt><dd>{{ message.creator.name }}</dd>
+    <dt>At</dt><dd>{{ message.created }}</dd>
+    <dt>Last modified</dt><dd>{{ message.modified }}</dd>
+  </dl>
+
+
+  {{ form.submit(class_="btn btn-success debounce") }}
+</form>
+
+{% endblock %}
