@@ -59,9 +59,9 @@ def _get_proposal_dict(proposal, favourites_ids):
         'link': external_url('.line_up_proposal', proposal_id=proposal.id),
     }
     if proposal.type in ['workshop', 'youthworkshop']:
-        res['cost'] = event.display_cost
-        res['equipment'] = event.display_participant_equipment
-        res['age_range'] = event.display_age_range
+        res['cost'] = proposal.display_cost
+        res['equipment'] = proposal.display_participant_equipment
+        res['age_range'] = proposal.display_age_range
     return res
 
 def _get_ical_dict(event, favourites_ids):
@@ -160,7 +160,7 @@ def _get_priority_sorted_venues(venues_to_allow):
 def _format_event_description(event):
     description = event['description']
     if event['type'] in ['workshop', 'youthworkshop']:
-        description += "\n\nAttending this workshop will cost: " + event['cost']
+        description += "\n\nAttending this workshop will cost: {}" + (event['cost'] or '')
         description += "\nSuitable age range: " + event['age_range']
         description += "\nAttendees should bring: " + event['equipment']
     if event['link']:
