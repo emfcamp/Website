@@ -144,16 +144,20 @@ html, body{
     }
 }
 
-.dhx_cal_container .dhx_cal_data .dhx_scale_holder .dhx_cal_event {
+.dhx_cal_container .dhx_cal_data .dhx_scale_holder .dhx_cal_event,
+.dhx_cal_container .dhx_cal_data .dhx_matrix_line .dhx_cal_event_line {
+    &.past_event,
     &.past_event div {
         background-color: rgba($schedule-block, 60%);
     }
 
+    &.favourite,
     &.favourite div {
         color: #fff;
         background-color: lighten($schedule-block, 25%);
     }
 
+    &.favourite.past_event,
     &.favourite.past_event div {
         background-color: rgba(lighten($schedule-block, 25%), 70%);
     }
