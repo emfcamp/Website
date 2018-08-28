@@ -164,8 +164,8 @@ class MakeVolunteerData(Command):
 
             # Needs training
             {"name": "NOC",                   "description": "Plug/Unplug DKs", "role_notes": "Requires training & the DK Key."},
-            {"name": "Bar",                   "description": "Help run the bar. Serve drinks, take payment, keep it clean.", "role_notes": "Requires training, over 18s only."},
-            {"name": "Volunteer Manager",     "description": "Help people sign up for volunteering. Make sure they know where to go. Run admin on the volunteer system.", "role_notes": "Must be trained."},
+            {"name": "Bar",                   "description": "Help run the bar. Serve drinks, take payment, keep it clean.", "role_notes": "Requires training, over 18s only.", "over_18_only": True},
+            {"name": "Volunteer Manager",     "description": "Help people sign up for volunteering. Make sure they know where to go. Run admin on the volunteer system.", "role_notes": "Must be trained.", "over_18_only": True},
         ]
 
         for v in venue_list:
@@ -182,6 +182,7 @@ class MakeVolunteerData(Command):
             else:
                 role.description = r['description']
                 role.role_notes = r.get('role_notes', None)
+                role.over_18_only = r.get('over_18_only', False)
 
         db.session.commit()
 
