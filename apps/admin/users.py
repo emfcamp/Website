@@ -65,7 +65,7 @@ def user(user_id):
     permissions = Permission.query.all()
 
     class UserForm(Form):
-        note = StringField('Check-in note (will be shown to user)')
+        note = StringField('Check-in note (will be shown to check-in operator)')
         add_note = SubmitField('Save Note')
         change_permissions = SubmitField('Change')
 
