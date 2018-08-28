@@ -48,8 +48,13 @@ class RoleSignupForm(Form):
 def choose_role():
     form = RoleSignupForm()
 
-    form.add_roles(Role.get_all())
     current_volunteer = VolunteerUser.get_for_user(current_user)
+    if not current_volunteer.over_18:
+        roles = Role.query.filter_by(over_18_only=False)
+    else:
+        roles = Role.query
+
+    form.add_roles(roles.order_by(Role.name).all())
 
     if form.validate_on_submit():
         current_role_ids = [r.id for r in current_volunteer.interested_roles]
@@ -72,3 +77,4 @@ def choose_role():
         form.select_roles(role_ids)
 
     return render_template('volunteer/choose_role.html', form=form)
+

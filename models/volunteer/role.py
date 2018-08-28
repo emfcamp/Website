@@ -9,6 +9,7 @@ class Role(db.Model):
     description = db.Column(db.String)
     # Things to know for the shift
     role_notes = db.Column(db.String)
+    over_18_only = db.Column(db.Boolean, nullable=False, default=False)
 
     def __repr__(self):
         return '<VolunteerRole {0}>'.format(self.name)
