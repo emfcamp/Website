@@ -37,14 +37,14 @@ from .forms import (
 notify = Blueprint('notify', __name__)
 
 admin_required = require_permission('admin')  # Decorator to require admin permissions
-volunteer_admin_required = require_permission('volunteer_admin')  # Decorator to require admin permissions
+volunteer_admin_required = require_permission('volunteer:admin')  # Decorator to require admin permissions
 
 @notify.before_request
 def admin_require_permission():
     """ Require admin permission for everything under /admin """
     if (not current_user.is_authenticated 
         or not current_user.has_permission('admin')
-        or not current_user.has_permission('volunteer_admin')):
+        or not current_user.has_permission('volunteer:admin')):
         abort(404)
 
 @notify.route('')
