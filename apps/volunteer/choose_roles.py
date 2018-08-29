@@ -2,7 +2,7 @@ import markdown
 from os import path
 
 from flask import (
-    render_template, redirect, url_for, flash, Markup, abort, request
+    render_template, redirect, url_for, flash, Markup, request
 )
 from flask_login import current_user
 
