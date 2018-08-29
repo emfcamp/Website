@@ -1,34 +1,19 @@
 # coding=utf-8
 from __future__ import division, absolute_import, print_function, unicode_literals
-import time
 
 from flask import (
     render_template, redirect, request, flash,
-    url_for, current_app as app, Blueprint, abort,
-    abort, session, jsonify,
+    url_for, current_app as app, Blueprint,
+    abort
 )
 
-from flask_login import current_user
 from flask_mail import Message
-from sqlalchemy import func, exists, select
-from sqlalchemy.orm import joinedload
+from flask_login import current_user
 
-from wtforms.validators import Optional, Required, URL, Email
-from wtforms import (
-    SubmitField, BooleanField, HiddenField, StringField,
-    FieldList, FormField, SelectField, FloatField, IntegerField
-)
-from wtforms.validators import Required, Email, ValidationError
-
-from main import db, mail, external_url
-from models.volunteer import (
-    Volunteer, Role
-)
+from main import mail
+from models.volunteer import Volunteer, Role
 
 from ..common import require_permission
-from ..common.forms import Form
-
-from collections import defaultdict, Counter
 
 from .forms import (
     SendMessageForm,
@@ -42,9 +27,9 @@ volunteer_admin_required = require_permission('volunteer:admin')  # Decorator to
 @notify.before_request
 def admin_require_permission():
     """ Require admin permission for everything under /admin """
-    if (not current_user.is_authenticated 
-        or not current_user.has_permission('admin')
-        or not current_user.has_permission('volunteer:admin')):
+    if (not current_user.is_authenticated or
+            not current_user.has_permission('admin') or
+            not current_user.has_permission('volunteer:admin')):
         abort(404)
 
 @notify.route('')
@@ -72,7 +57,7 @@ def get_volunteer_sort_dict(parameters):
         'reverse': bool(parameters.get('reverse'))
     }
 
-def filter_volunteer_request():  
+def filter_volunteer_request():
     filtered = False
 
     desired_roles = request.args.getlist('role')
@@ -135,9 +120,9 @@ def message_batch():
 
 def notify_email(volunteer, subject, message):
     template = 'notification/email/volunteer_request.txt'
-    
+
     while True:
-        msg = Message(subject, 
+        msg = Message(subject,
                     sender=app.config['VOLUNTEER_EMAIL'],
                     recipients=[volunteer.volunteer_email])
         msg.body = render_template(template, message=message, volunteer=volunteer)

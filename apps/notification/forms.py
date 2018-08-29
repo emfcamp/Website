@@ -1,18 +1,14 @@
-import dateutil
-from wtforms import (
-    SubmitField, StringField, FieldList, FormField, SelectField, TextAreaField,
-    BooleanField, IntegerField, FloatField
-)
-from wtforms.validators import Required, NumberRange, ValidationError
+from wtforms import StringField, TextAreaField, SubmitField
+from wtforms.validators import ValidationError
 
-from ..common.forms import Form, HiddenIntegerField
+from ..common.forms import Form
 
 
 class SendMessageForm(Form):
     subject = StringField('Subject')
     message = TextAreaField('Message')
     send = SubmitField('Send Message')
-    
+
     def validate_message(form, field):
         if form.send.data and not field.data:
             raise ValidationError("Message is required")
