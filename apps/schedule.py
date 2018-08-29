@@ -332,7 +332,7 @@ def line_up():
 
     proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
         filter(Proposal.state.in_(['accepted', 'finished'])).\
-        filter(Proposal.type.in_(['talk', 'workshop', 'youthworkshop'])).all()
+        filter(Proposal.type.in_(['talk', 'workshop', 'youthworkshop', 'performance'])).all()
 
     # Shuffle the order, but keep it fixed per-user
     # (Because we don't want a bias in starring)
