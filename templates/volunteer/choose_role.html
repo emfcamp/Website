@@ -31,7 +31,7 @@
                         </div>
                     </td>
                     <td class="col-sm-9">
-                        {{ f._role.description }}
+                        {{ f._role.description }} &mdash; <a href="{{ url_for('.role', role_id=f._role.id) }}">More...</a>
                     </td>
                 </tr>
             {% endfor %}

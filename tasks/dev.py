@@ -144,6 +144,7 @@ class MakeVolunteerData(Command):
 
             {"name": "N/A",            "mapref": "https://map.emfcamp.org/#16/52.0411/-2.3784"}
         ]
+        # DO not change these names (each keys a description in apps/volunteer/role_descriptions/)
         role_list = [
             # Stage stuff
             {"name": "Herald",                 "description": "Introduce talks and manage speakers at stage."},

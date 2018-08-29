@@ -1,4 +1,4 @@
-function init_volunteer_schedule(data, all_roles, active_day) {
+function init_volunteer_schedule(data, all_roles, active_day, is_admin) {
     var current_day = active_day;
 
     function render(){
@@ -92,8 +92,13 @@ function init_volunteer_schedule(data, all_roles, active_day) {
             var role_id = shift.role.name.toLowerCase().replace(/[^\w]+/g, '-');
             $('#modal-description').html($(`#role-description-${role_id}`).clone().show());
 
-            $('#signUp .modal-footer').empty();
-            $('#signUp .modal-footer').append(make_modal_buttons(shift));
+            $('#signUp #signup-grp').empty();
+            $('#signUp #signup-grp').append(make_modal_buttons(shift));
+
+            if (is_admin) {
+                var override_btn = $('#signUp #override-sign-up-btn');
+                override_btn.click(make_override_signup_fn(override_btn, shift));
+            }
 
             $('#signUp').modal();
         };
@@ -129,9 +134,23 @@ function init_volunteer_schedule(data, all_roles, active_day) {
         };
     }
 
-    function make_post_callback_fn(append_ele, btn_ele, shift_id, alert_type) {
+    function make_override_signup_fn(btn_ele, shift) {
+        return function () {
+            var override_user = $('#override-user').val(),
+                modal_body = $('#signUp .modal-body');
+
+            btn_ele.attr('disabled', true);
+
+            $.post(shift.sign_up_url + '.json?override_user=' + override_user)
+             .success(make_post_callback_fn(modal_body, btn_ele, shift.id, "alert-info", true))
+             .fail(make_post_callback_fn(modal_body, btn_ele, shift.id, "alert-danger", true));
+        };
+    }
+
+    function make_post_callback_fn(append_ele, btn_ele, shift_id, alert_type, override_user) {
         return function(resp) {
-            var alert = make_alert(alert_type, resp.message);
+            var main_msg = (override_user ? resp.user: '') + resp.message,
+                alert = make_alert(alert_type, main_msg);
             append_ele.prepend(alert);
 
             if (resp.warning) {
@@ -142,10 +161,14 @@ function init_volunteer_schedule(data, all_roles, active_day) {
             shift = get_shift(shift_id);
             if (resp.operation == 'add') {
                 shift.current_count++;
-                shift.is_user_shift = true;
+                if (!override_user) {
+                    shift.is_user_shift = true;
+                }
             } else if (resp.operation == 'delete') {
                 shift.current_count--;
-                shift.is_user_shift = false;
+                if (!override_user) {
+                    shift.is_user_shift = false;
+                }
             }
             update_shift(shift_id, shift);
 
@@ -321,6 +344,7 @@ function init_volunteer_schedule(data, all_roles, active_day) {
 
     $('#is_interested').on('change', set_roles);
     $('#is_trained').on('change', set_roles);
+
 
     render();
 }

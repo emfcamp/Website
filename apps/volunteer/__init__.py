@@ -16,6 +16,9 @@ def volunteer_variables():
         'view_name': request.url_rule.endpoint.replace('volunteer.', '.')
     }
 
+def role_name_to_markdown_file(role_name):
+    res = role_name.lower().replace(' ', '-').replace('/', '-').replace(':', '')
+    return 'apps/volunteer/role_descriptions/' + res + '.md'
 
 from . import main  # noqa: F401
 from . import schedule  # noqa: F401

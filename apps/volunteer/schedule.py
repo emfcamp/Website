@@ -10,6 +10,7 @@ from glob import glob
 
 from main import db
 
+from models.user import User
 from models.volunteer.role import Role
 from models.volunteer.shift import Shift, ShiftEntry
 from models.volunteer.volunteer import Volunteer
@@ -39,6 +40,11 @@ def schedule():
     shifts = Shift.get_all()
     by_time = defaultdict(lambda: defaultdict(list))
 
+    if current_user.has_permission('volunteer:admin'):
+        all_volunteers = Volunteer.query.order_by(Volunteer.nickname).all()
+    else:
+        all_volunteers = []
+
     for s in shifts:
         day_key = s.start.strftime('%a').lower()
         hour_key = s.start.strftime('%H:%M')
@@ -56,7 +62,8 @@ def schedule():
 
     return render_template('volunteer/schedule.html', roles=roles, all_shifts=by_time,
                            active_day=request.args.get('day', default='fri'),
-                           role_descriptions=role_descriptions, untrained_roles=untrained_roles)
+                           role_descriptions=role_descriptions, all_volunteers=all_volunteers,
+                           untrained_roles=untrained_roles)
 
 def _toggle_shift_entry(user, shift):
     res = {}
@@ -111,7 +118,13 @@ def shift_json(shift_id):
     shift = Shift.query.get_or_404(shift_id)
 
     if request.method == 'POST':
-        msg = _toggle_shift_entry(current_user, shift)
+        override_user_id = request.args.get('override_user', default=None)
+        if current_user.has_permission('volunteer:admin') and override_user_id is not None:
+            override_user = User.query.get_or_404(override_user_id)
+            msg = _toggle_shift_entry(override_user, shift)
+            msg['user'] = Volunteer.get_for_user(override_user).nickname
+        else:
+            msg = _toggle_shift_entry(current_user, shift)
 
         db.session.commit()
         return jsonify(msg)
