@@ -139,9 +139,9 @@ def search(query=None):
     tickets = dict(tickets)
 
     if badge:
-        completes = users.join(User.owned_purchases).filter_by(is_paid_for=True, state='badged-up')
+        completes = users.join(User.owned_purchases).filter_by(is_paid_for=True, badge_issued=True)
     else:
-        completes = users.join(User.owned_purchases).filter_by(is_paid_for=True, state='checked-in')
+        completes = users.join(User.owned_purchases).filter_by(is_paid_for=True, checked_in=True)
 
     completes = completes.group_by(User).with_entities(User.id, func.count(User.id))
     completes = dict(completes)
@@ -176,10 +176,10 @@ def checkin(user_id, source=None):
     if badge:
         # Ticket must be checked in to receive a badge
         tickets = [t for t in user.owned_tickets
-                              if t.state == 'checked-in'
+                              if t.checked_in
                               and t.product.attributes.get('has_badge')]
     else:
-        tickets = list(user.get_owned_tickets(paid=True))
+        tickets = list(user.get_owned_tickets(paid=True, type='admission_ticket'))
 
     if request.method == 'POST':
         failed = []
