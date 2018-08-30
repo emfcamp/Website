@@ -1,3 +1,5 @@
+** Team Lead ** Steve Early
+
 You must be over 18, and will need to do a short online training course on how to serve on the bar.
 
 ## What you'll be doing

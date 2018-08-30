@@ -1,3 +1,5 @@
+** Team Lead ** Tim Reynolds
+
 Run the audio for a stage. Make sure mics are working and that presentations work.
 
 # What's involved

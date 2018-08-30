@@ -1,3 +1,5 @@
+** Team Lead ** Dominic GS
+
 Introducing talks, and making any announcements that are needed between talks.
 
 You'll be introducing speakers, and checking the wiki to make sure any announcements that need to happen are made between talks. If you have any talks you'd particularly like to see you can volunteer for a shift on the appropriate stage.
