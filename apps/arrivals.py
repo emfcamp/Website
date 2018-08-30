@@ -9,7 +9,7 @@ from flask import (
 from sqlalchemy import func
 
 from main import db
-from models.purchase import Purchase, CheckinStateException
+from models.purchase import Purchase, AdmissionTicket, CheckinStateException
 from models.user import User, checkin_code_re
 from .common import require_permission, json_response
 
@@ -141,7 +141,7 @@ def search(query=None):
     if badge:
         completes = users.join(User.owned_purchases).filter_by(is_paid_for=True, badge_issued=True)
     else:
-        completes = users.join(User.owned_purchases).filter_by(is_paid_for=True, checked_in=True)
+        completes = users.join(User.owned_tickets).filter_by(is_paid_for=True).filter(AdmissionTicket.checked_in == True)  # noqa
 
     completes = completes.group_by(User).with_entities(User.id, func.count(User.id))
     completes = dict(completes)
