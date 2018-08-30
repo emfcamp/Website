@@ -39,6 +39,7 @@ class Shift(db.Model):
 
     role = db.relationship('Role', backref='shifts')
     venue = db.relationship('VolunteerVenue', backref='shifts')
+    proposal = db.relationship('Proposal', backref='shift')
 
     current_count = db.column_property(
         select([func.count(ShiftEntry.shift_id)]).
@@ -46,11 +47,6 @@ class Shift(db.Model):
     )
 
     volunteers = association_proxy('entries', 'user')
-
-    @validates('start', 'end')
-    def validate_shift_times(self, key, datetime):
-        assert (datetime.minute % 15 == 0), '%s datetimes must be quarter-hour aligned' % key
-        return datetime
 
     def is_clash(self, other):
         """

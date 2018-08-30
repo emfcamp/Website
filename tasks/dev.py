@@ -1,5 +1,5 @@
 import random
-from pendulum import parse
+from pendulum import parse, instance
 from faker import Faker
 from flask import current_app as app
 from flask_script import Command
@@ -9,6 +9,7 @@ from models.cfp import (TalkProposal, PerformanceProposal, WorkshopProposal,
                         YouthWorkshopProposal, InstallationProposal, CFPVote,
                         LENGTH_OPTIONS)
 from models.user import User
+from models.cfp import Proposal, Venue
 
 from models.volunteer.venue import VolunteerVenue
 from models.volunteer.shift import Shift
@@ -193,63 +194,6 @@ class MakeVolunteerShifts(Command):
     def run(self):
         # First = first start time. Final = end of last shift
         shift_list = {
-            # "Herald": {
-            #     "Stage A": [
-            #         {"first": "2018-08-31 12:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
-            #         {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
-            #         {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
-            #     ],
-            #     "Stage B": [
-            #         {"first": "2018-08-31 13:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
-            #         {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
-            #         {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
-            #     ],
-            #     "Stage C": [
-            #         {"first": "2018-08-31 13:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
-            #         {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
-            #         {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
-            #     ],
-            # },
-            # "Stage: Audio/Visual": {
-            #     "Stage A": [
-            #         {"first": "2018-08-31 12:00:00", "final": "2018-08-31 20:00:00", "min": 1, "max": 1},
-            #         {"first": "2018-09-01 10:00:00", "final": "2018-09-01 20:00:00", "min": 1, "max": 1},
-            #         {"first": "2018-09-02 10:00:00", "final": "2018-09-02 20:00:00", "min": 1, "max": 1},
-            #     ],
-            #     "Stage B": [
-            #         {"first": "2018-08-31 13:00:00", "final": "2018-09-01 00:00:00", "min": 1, "max": 1},
-            #         {"first": "2018-09-01 10:00:00", "final": "2018-09-02 00:00:00", "min": 1, "max": 1},
-            #         {"first": "2018-09-02 10:00:00", "final": "2018-09-02 23:00:00", "min": 1, "max": 1},
-            #     ],
-            #     "Stage C": [
-            #         {"first": "2018-08-31 13:00:00", "final": "2018-09-01 00:00:00", "min": 1, "max": 1},
-            #         {"first": "2018-09-01 10:00:00", "final": "2018-09-02 00:00:00", "min": 1, "max": 1},
-            #         {"first": "2018-09-02 10:00:00", "final": "2018-09-02 23:00:00", "min": 1, "max": 1},
-            #     ]
-            # },
-            # "Stage: Camera Operator": {
-            #     "Stage A": [
-            #         {"from_schedule": True, "min": 1, "max": 1},
-            #     ],
-            #     "Stage B": [
-            #         {"from_schedule": True, "min": 1, "max": 1},
-            #     ],
-            #     "Stage C": [
-            #         {"from_schedule": True, "min": 1, "max": 1},
-            #     ]
-            # },
-            # "Stage: Vision Mixer": {
-            #     "Stage A": [
-            #         {"from_schedule": True, "min": 1, "max": 1},
-            #     ],
-            #     "Stage B": [
-            #         {"from_schedule": True, "min": 1, "max": 1},
-            #     ],
-            #     "Stage C": [
-            #         {"from_schedule": True, "min": 1, "max": 1},
-            #     ]
-            # },
-
             # 'Tent' roles
             "Badge Helper": {
                 "Badge Tent": [
@@ -355,6 +299,7 @@ class MakeVolunteerShifts(Command):
                 venue = VolunteerVenue.get_by_name(shift_venue)
 
                 for shift_ranges in shift_list[shift_role][shift_venue]:
+
                     shifts = Shift.generate_for(role=role, venue=venue,
                                                 first=parse(shift_ranges["first"]),
                                                 final=parse(shift_ranges["final"]),
@@ -362,4 +307,46 @@ class MakeVolunteerShifts(Command):
                     for s in shifts:
                         db.session.add(s)
 
+        db.session.commit()
+
+def get_end_time(proposal):
+    return instance(proposal.scheduled_time).add(minutes=proposal.scheduled_duration)
+
+def get_start_time(proposal):
+    return instance(proposal.scheduled_time).add(minutes=-15)
+
+class MakeShiftsFromProposals(Command):
+    def run(self):
+        roles_list = [
+            "Herald",
+            "Stage: Audio/Visual",
+            "Stage: Camera Operator",
+            "Stage: Vision Mixer",
+        ]
+
+        venue_list = ["Stage A", "Stage B", "Stage C"]
+
+        for role_name in roles_list:
+            role = Role.get_by_name(role_name)
+
+            if role.shifts:
+                for shift in role.shifts:
+                    p = shift.proposal
+                    app.logger.info('Updating shift')
+                    shift.start = get_start_time(p)
+                    shift.stop = get_end_time(p)
+                    shift.venue = VolunteerVenue.get_by_name(p.scheduled_venue.name)
+            else:
+                for venue_name in venue_list:
+                    venue = VolunteerVenue.get_by_name(venue_name)
+
+                    events = Proposal.query.join(Venue, Proposal.scheduled_venue_id == Venue.id)\
+                                           .filter(Venue.name == venue.name, Proposal.state == 'finished')\
+                                           .all()
+                    for e in events:
+                        start = get_start_time(e)
+                        stop = get_end_time(e)
+                        to_add = Shift(role=role, venue=venue, start=start,
+                                       end=stop, min_needed=1, max_needed=1, proposal=e)
+                        db.session.add(to_add)
         db.session.commit()
