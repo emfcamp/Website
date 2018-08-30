@@ -152,13 +152,15 @@ def network():
 def phones():
     return redirect('https://wiki.emfcamp.org/wiki/Phones')
 
+@base.route("/feedback")
+def feedback():
+    return render_template('feedback.html')
 
 @base.route("/talks")
 @base.route("/talks/")
 @site_flag('TICKETS_SITE')
 def talks():
     return redirect(url_for('schedule.line_up'))
-
 
 @base.route("/talks/2016")
 @site_flag('TICKETS_SITE')
