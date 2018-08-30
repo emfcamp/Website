@@ -1,0 +1,29 @@
+{# Filter form on /cfp-review/proposals #}
+<form method="get" class="row">
+    <fieldset class="form-horizontal col-md-6">
+        <div class="form-group">
+            <label for="role" class="col-sm-2">Role</label>
+            <div class="col-sm-10">
+                <select id="role" name="role" multiple class="form-control">
+                    {% for role in roles %}
+                        <option value="{{role}}" 
+                            {%-if role in request.args.getlist('role') %}
+                                selected
+                            {%-endif %}
+                        >{{role}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>        
+    </fieldset>
+    
+    <fieldset class="form-horizontal col-md-6">
+        <div class="form-group">
+            <div class="btn-group">
+                <button class="btn btn-primary">Apply</button>
+                <a href="{{url_for('.emailvolunteers')}}" class="btn btn-default">Clear</a>
+            </div>
+        </div>
+    </fieldset>
+</form>
+

@@ -270,6 +270,9 @@ def create_app(dev_server=False):
     from apps.admin import admin
     app.register_blueprint(admin, url_prefix='/admin')
 
+    from apps.notification import notify
+    app.register_blueprint(notify, url_prefix='/notify')
+
     return app
 
 

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block css %}
+    {% assets "css_admin" -%}
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
+        <link rel="stylesheet" href="{{ ASSET_URL }}">
+    {% endassets -%}
+{% endblock %}
+
+{% block document %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+        {% for message in get_flashed_messages() -%}
+            <div class="alert alert-danger">{{ message }}</div>
+        {% endfor -%}
+
+        {% block body -%}{% endblock -%}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block foot %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
+{% endblock %}

@@ -43,3 +43,8 @@ For more, see:
 * [Deployment](docs/deployment.md)
 * [Contributing](.github/CONTRIBUTING.md)
 
+
+### Additional Notes
+
+- `make migrate` to generate migration scripts when models have been updated.
+- `make db` to run any migration scripts you've generated.
