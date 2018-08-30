@@ -321,7 +321,8 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         var view_height = window.innerHeight||document.documentElement.clientHeight,
             header_offset = get_ele('header').offsetTop,
             header_height = get_ele('header').offsetHeight + header_offset,
-            schedule_height = view_height - header_height,
+            footer_height = 50,
+            schedule_height = view_height - header_height - footer_height,
             schedule = get_ele('scheduler_here');
 
         scheduler.config.hour_size_px = ($(window).width() <= 768) ? 88: 132; //132;
