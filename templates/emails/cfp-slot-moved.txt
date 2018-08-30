@@ -1,8 +1,8 @@
 Hi {{ proposal.user.name }},
 
-Unfortunately we have had to move your EMF {{ proposal.human_type }} '{{ proposal.title }}'. We've done our best to minimise the amount of hassle it will cause you.
+Unfortunately we have had to move your EMF {{ proposal.human_type }} '{{ proposal.title }}' due to the availability of other speakers. We've done our best to minimise the amount of hassle it will cause you.
 
-You have a {{ proposal.scheduled_duration }} minute slot in {{ proposal.scheduled_venue.name }} on {{ proposal.scheduled_time.strftime('%A at %-I:%M %p') }}. If this is not suitable, please let us know as soon as possible.
+You now have a {{ proposal.scheduled_duration }} minute slot in {{ proposal.scheduled_venue.name }} on {{ proposal.scheduled_time.strftime('%A at %-I:%M %p') }}. If this is not suitable, please let us know as soon as possible.
 
 If you'd like to share this with people, the public link to your {{ proposal.human_type }} is: https://www.emfcamp.org/line-up/2018/{{ proposal.id }}
 
