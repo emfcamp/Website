@@ -239,8 +239,8 @@ class CalendarEvent(db.Model):
 
     @property
     def latlon(self):
-        if self.source.mapobj:
-            return self.source.mapobj.latlon
+        if self.source.latlon:
+            return self.source.latlon
         return None
 
     @property
