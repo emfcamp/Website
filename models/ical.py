@@ -234,7 +234,7 @@ class CalendarEvent(db.Model):
         if self.source.mapobj:
             obj = to_shape(self.source.mapobj.geom)
             if isinstance(obj, Point):
-                return (obj.x, obj.y)
+                return (obj.y, obj.x)
         return None
 
     @property
