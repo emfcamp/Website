@@ -13,20 +13,27 @@ from apps.cfp_review.base import send_email_for_proposal
 
 class ImportVenues(Command):
     venues = [
-        ('Stage A', ['talk'], 100),
-        ('Stage B', ['talk', 'performance'], 99),
-        ('Stage C', ['talk'], 98),
-        ('Workshop 1', ['workshop'], 97),
-        ('Workshop 2', ['workshop'], 96),
-        ('Workshop 3', ['workshop'], 95),
-        ('Workshop 4', ['workshop'], 94),
-        ('Youth Workshop', ['youthworkshop'], 93),
+        ('Stage A', ['talk'], 100, (52.0396099, -2.377866)),
+        ('Stage B', ['talk', 'performance'], 99, (52.0418968, -2.3766391)),
+        ('Stage C', ['talk'], 98, (52.040485, -2.3776549)),
+        ('Workshop 1', ['workshop'], 97, (52.04161469, -2.37593613)),
+        ('Workshop 2', ['workshop'], 96, (52.04080079, -2.3780661)),
+        ('Workshop 3', ['workshop'], 95, (52.0406851, -2.3780847)),
+        ('Workshop 4', ['workshop'], 94, (52.0417884, -2.37586151)),
+        ('Youth Workshop', ['youthworkshop'], 93, (52.041997, -2.375533)),
     ]
 
     def run(self):
-        for name, type, priority in self.venues:
+        for name, type, priority, latlon in self.venues:
             type_str = ','.join(type)
-            if (Venue.query.filter_by(name=name, type=type_str).all()):
+            venue = Venue.query.filter_by(name=name, type=type_str).all()
+
+            if len(venue) == 1 and venue[0].lat is None:
+                venue[0].lat = latlon[0]
+                venue[0].lon = latlon[1]
+                app.logger.info('Updating venue %s with latlon' % name)
+                continue
+            elif venue:
                 continue
 
             venue = Venue()

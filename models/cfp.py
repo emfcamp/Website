@@ -515,7 +515,7 @@ class Proposal(db.Model):
     def map_link(self):
         latlon = self.latlon
         if latlon:
-            return 'https://map.emfcamp.org/?lat=%s&lon=%s&title=%s#19/%s/%s' % (latlon[0], latlon[1], self.scheduled_venue.name, latlon[0], latlon[1])
+            return 'https://map.emfcamp.org/#18.5/%s/%s' % (latlon[0], latlon[1])
         return None
 
     @property
