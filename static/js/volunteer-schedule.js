@@ -2,7 +2,8 @@ function init_volunteer_schedule(data, all_roles, active_day, is_admin) {
     var current_day = active_day;
 
     function render(){
-        var filters = get_filters(),
+        var _ = set_roles(),
+            filters = get_filters(),
             days_data = data[current_day],
             day_ele = $('#tbody-'+current_day);
 
@@ -315,7 +316,6 @@ function init_volunteer_schedule(data, all_roles, active_day, is_admin) {
 
             $('#role-opt-'+role.id).prop('selected', true);
         });
-        render();
     }
 
 

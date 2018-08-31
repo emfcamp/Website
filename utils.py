@@ -11,7 +11,9 @@ from tasks.cfp import (
     ImportCFP, EmailSpeakersAboutSlot, EmailSpeakersAboutFinalising,
     EmailSpeakersAboutReserveList, SetRoughDurations
 )
-from tasks.dev import MakeFakeData, MakeVolunteerData, MakeVolunteerShifts
+from tasks.dev import (
+    MakeFakeData, MakeVolunteerData, MakeVolunteerShifts, MakeShiftsFromProposals
+)
 from tasks.external_calendars import (
     CreateCalendars, RefreshCalendars, ExportCalendars
 )
@@ -46,6 +48,7 @@ if __name__ == "__main__":
 
     manager.add_command('makevolunteerdata', MakeVolunteerData())
     manager.add_command('makevolunteershifts', MakeVolunteerShifts())
+    manager.add_command('makeshiftsfromproposals', MakeShiftsFromProposals())
 
     manager.add_command('sendemails', SendEmails())
 
