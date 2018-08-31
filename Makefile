@@ -80,6 +80,9 @@ volunteerdata:
 volunteershifts:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makevolunteershifts
 
+shiftsfromproposals:
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makeshiftsfromproposals
+
 lockproposals:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py lockproposals
 

@@ -241,7 +241,7 @@ class CalendarEvent(db.Model):
     def map_link(self):
         latlon = self.latlon
         if latlon:
-            return 'https://map.emfcamp.org/?lat=%s&lon=%s&title=%s#19/%s/%s' % (latlon[0], latlon[1], self.source.main_venue, latlon[0], latlon[1])
+            return 'https://map.emfcamp.org/#20/%s/%s' % (latlon[0], latlon[1])
         return None
 
     __table_args__ = (
