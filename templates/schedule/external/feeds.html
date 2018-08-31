@@ -3,15 +3,16 @@
 {% block title %}Your Feeds{% endblock %}
 {% block body %}
 
-<h2>Your feeds</h2>
-<p>If you're running content in your village, or just want to arrange something
-   for people to turn up to, you can upload your schedules here.</p>
+<h2>Your event feeds</h2>
+<p>If you want to publish events into the official EMF schedule you can import them here. It's fine to use this for both village content and events you're running all over the site.</p>
+<p>Schedules should be published in iCal format and will be updated every ten minutes. If you're not sure what this means, <b><a href="https://wiki.emfcamp.org/wiki/Publishing_Village_Schedules">read our guidance on setting up a feed of events</a></b>.
 
 <div class="well">
 <form class="form-horizontal" method="post">
     <fieldset>
     <div class="col-sm-12">
     {{ form.hidden_tag() }}
+    <p>Please enter the URL of an iCal feed you'd like to import<p>
     {{ render_field(form.url, horizontal=11) }}
     {{ form.preview(class_="btn btn-primary debounce pull-right") }}
     </div>
@@ -19,7 +20,8 @@
 </form>
 </div>
 
-<h4>Existing feeds</h4>
+{% if calendars %}
+<h4>Existing iCal feeds</h4>
 {% for calendar in calendars %}
 <ul class="list-unstyled">
   <li>
@@ -34,5 +36,5 @@
   </li>
 </ul>
 {% endfor %}
-
+{% endif %}
 {% endblock %}

@@ -19,8 +19,7 @@ from slugify import slugify_unicode as slugify
 from wtforms import (
     StringField, SubmitField, BooleanField, SelectField,
 )
-from wtforms.fields.html5 import EmailField
-from wtforms.validators import Required, URL, Email, Optional
+from wtforms.validators import Required, URL
 
 from main import db, external_url
 from .common import feature_flag, json_response
@@ -487,6 +486,7 @@ def external_feeds():
 
         if not source:
             source = CalendarSource(url=url, user=current_user)
+            source.displayed = True
             db.session.commit()
 
         return redirect(url_for('.external_feed', source_id=source.id))
@@ -496,11 +496,9 @@ def external_feeds():
 
 class UpdateExternalFeedForm(Form):
     url = StringField('URL', [Required(), URL()])
-    name = StringField('Name')
-    contact_phone = StringField('Phone')
-    contact_email = EmailField('Email', [Email(), Optional()])
+    name = StringField('Feed Name', [Required()])
     location = SelectField('Location')
-    displayed = BooleanField('Displayed')
+    displayed = BooleanField('Publish events from this feed')
     preview = SubmitField('Preview')
     save = SubmitField('Save')
 
@@ -526,10 +524,7 @@ def external_feed(source_id):
 
     if form.validate_on_submit():
         if form.save.data:
-            calendar.url = form.url.data
             calendar.name = form.name.data
-            calendar.contact_phone = form.contact_phone.data
-            calendar.contact_email = form.contact_email.data
             calendar.enabled = True
             calendar.displayed = form.displayed.data
 
@@ -544,7 +539,7 @@ def external_feed(source_id):
             except Exception:
                 pass
             db.session.commit()
-            return redirect(url_for('.external_feed', source_id=calendar.id))
+            return redirect(url_for('.external_feeds'))
 
         calendar.url = form.url.data
 
@@ -555,6 +550,9 @@ def external_feed(source_id):
         preview_events = []
     else:
         preview_events = list(calendar.events)
+    
+    if not preview_events:
+        alerts = [('danger', "We could not load any events from this feed")]
 
     db.session.rollback()
 

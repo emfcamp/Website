@@ -11,7 +11,7 @@
   </li>
 </ul>
 
-<h3>{{ calendar.name or calendar.url }}</h3>
+<h3>{{ calendar.name}}</h3>
 
 {% if preview_events and preview %}
 <p>We've loaded your feed below. If something doesn't look right, email <a href="mailto:{{ config['VILLAGECONTENT_EMAIL'][1] }}">{{ config['VILLAGECONTENT_EMAIL'][1] }}</a>.</p>
@@ -37,8 +37,6 @@
     {{ form.hidden_tag() }}
     {{ render_field(form.url, horizontal=10) }}
     {{ render_field(form.name, horizontal=10) }}
-    {{ render_field(form.contact_phone, horizontal=10) }}
-    {{ render_field(form.contact_email, horizontal=10) }}
     {{ render_field(form.location, horizontal=10) }}
     <p class="col-sm-10 col-sm-offset-2">
       <a href="https://map.emfcamp.org/">Add a location</a>
