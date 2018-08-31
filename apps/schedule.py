@@ -17,8 +17,7 @@ from jinja2.utils import urlize
 from icalendar import Calendar, Event
 from slugify import slugify_unicode as slugify
 from wtforms import (
-    StringField, IntegerField, SubmitField, BooleanField,
-    SelectField,
+    StringField, SubmitField, BooleanField, SelectField,
 )
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import Required, URL, Email, Optional
