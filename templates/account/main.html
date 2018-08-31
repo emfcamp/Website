@@ -9,7 +9,7 @@
     {% if feature_enabled('TICKET_SALES') %}
       <li><a href="{{ url_for('users.purchases') }}">Your tickets</a></li>
     {% endif %}
-    {% if feature_enabled('LINE_UP') %}a
+    {% if feature_enabled('LINE_UP') %}
       <li><a href="{{ url_for('schedule.external_feeds') }}">Your event feeds</a></li>
     {% endif %}
     {% if feature_enabled('CFP') %}
