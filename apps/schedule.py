@@ -529,10 +529,9 @@ def external_feed(source_id):
         if form.save.data:
             calendar.url = form.url.data
             calendar.name = form.name.data
-            calendar.main_venue = form.main_venue.data
             calendar.contact_phone = form.contact_phone.data
             calendar.contact_email = form.contact_email.data
-            calendar.enabled = form.enabled.data
+            calendar.enabled = True
             calendar.displayed = form.displayed.data
 
             if form.location.data:
