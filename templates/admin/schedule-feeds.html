@@ -9,19 +9,23 @@
 <table class="table table-condensed">
     <thead>
         <tr>
+            <th>Id</th>
             <th>Name</th>
-            <th>Main Venue</th>
+            <th>Venue</th>
             <th>Email</th>
-            <th>Phone</th>
+            <th>Published</th>
+            <th>Enabled</th>
         </tr>
     </thead>
     <tbody>
         {% for f in feeds %}
         <tr>
-            <td><a href="{{ url_for('.schedule_feed', feed_id=f.id) }}">{{ f.name or f.url }}</a></td>
-            <td>{{ f.main_venue or '' }}</td>
-            <td>{{ f.contact_email or '' }}</td>
-            <td>{{ f.contact_phone or '' }}</td>
+            <td><a href="{{ url_for('.schedule_feed', feed_id=f.id) }}">{{ f.id }}</a></td>
+            <td><a href="{{ url_for('.schedule_feed', feed_id=f.id) }}">{{ f.name }}</a></td>
+            <td>{{ (f.mapobj and f.mapobj.name) or '' }}</td>
+            <td>{{ f.user.email }}</td>
+            <td>{{ f.published }}</td>
+            <td>{{ f.enabled }}</td>
         </tr>
         {% endfor %}
     </tbody>
