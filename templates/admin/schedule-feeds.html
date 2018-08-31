@@ -18,7 +18,7 @@
     <tbody>
         {% for f in feeds %}
         <tr>
-            <td><a href="{{ url_for('.feed', feed_id=f.id) }}">{{ f.name or f.url }}</a></td>
+            <td><a href="{{ url_for('.schedule_feed', feed_id=f.id) }}">{{ f.name or f.url }}</a></td>
             <td>{{ f.main_venue or '' }}</td>
             <td>{{ f.contact_email or '' }}</td>
             <td>{{ f.contact_phone or '' }}</td>
