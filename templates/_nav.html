@@ -25,7 +25,7 @@
                     <a role="menuitem" href="{{ url_for('cfp.main') }}">Call for Participation</a>
                 </li>
             {% endif %}
-            {% if feature_enabled('LINE_UP') %}
+            {% if feature_enabled('LINE_UP') and SITE_STATE == 'sales' %}
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('schedule.line_up') }}">Line-up</a>
                 </li>
