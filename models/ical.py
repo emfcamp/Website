@@ -138,6 +138,14 @@ class CalendarSource(db.Model):
 
         return alerts
 
+    @property
+    def latlon(self):
+        if self.source.mapobj:
+            obj = to_shape(self.source.mapobj.geom)
+            if isinstance(obj, Point):
+                return (obj.y, obj.x)
+        return None
+
     @classmethod
     def get_enabled_events(self):
         sources = CalendarSource.query.filter_by(published=True, displayed=True)
@@ -232,9 +240,7 @@ class CalendarEvent(db.Model):
     @property
     def latlon(self):
         if self.source.mapobj:
-            obj = to_shape(self.source.mapobj.geom)
-            if isinstance(obj, Point):
-                return (obj.y, obj.x)
+            return self.source.latlon
         return None
 
     @property
