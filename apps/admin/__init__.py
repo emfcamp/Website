@@ -200,7 +200,6 @@ class ScheduleForm(Form):
         self.feed_name.data = feed.name
         self.url.data = feed.url
         self.enabled.data = feed.enabled
-        self.location.data = feed.main_venue
         self.displayed.data = feed.displayed
         self.priority.data = feed.priority
 
