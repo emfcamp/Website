@@ -9,12 +9,11 @@ from flask import (
 
 from flask_login import current_user
 
-from wtforms.validators import Optional, Required, URL, Email
+from wtforms.validators import Optional, Required, URL
 from wtforms import (
     SubmitField, BooleanField, HiddenField, StringField,
-    FieldList, FormField, SelectField, FloatField, IntegerField
+    FieldList, FormField, SelectField, IntegerField
 )
-from wtforms.fields.html5 import EmailField
 
 from main import db
 from models.payment import Payment, BankPayment, BankTransaction
@@ -24,7 +23,7 @@ from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
 from models.site_state import SiteState, VALID_STATES, refresh_states
 from models.map import MapObject
 from ..common import require_permission
-from ..common.forms import Form, TelField
+from ..common.forms import Form
 
 admin = Blueprint('admin', __name__)
 
@@ -190,8 +189,8 @@ class ScheduleForm(Form):
         feed.displayed = self.displayed.data
         feed.priority = self.priority.data
 
-        if form.location.data:
-            map_obj_id = int(form.location.data)
+        if self.location.data:
+            map_obj_id = int(self.location.data)
             feed.mapobj = MapObject.query.get(map_obj_id)
         else:
             feed.mapobj = None
