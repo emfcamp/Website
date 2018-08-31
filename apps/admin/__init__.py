@@ -206,8 +206,8 @@ class ScheduleForm(Form):
         self.type.data = feed.type
         self.phone.data = feed.contact_phone
         self.email.data = feed.contact_email
-        self.lat.data = feed.latlon[0]
-        self.lon.data = feed.latlon[1]
+        self.lat.data = feed.latlon[0] if feed.latlon else 0.0
+        self.lon.data = feed.latlon[1] if feed.latlon else 0.0
         self.priority.data = feed.priority
 
 @admin.route('/schedule-feeds/<int:feed_id>', methods=['GET', 'POST'])
