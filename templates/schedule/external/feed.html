@@ -23,11 +23,13 @@
 {% endif %}
 
 {% if calendar.published %}
-{% if calendar.refreshed_at %}
-<p>Your feed was last refreshed at {{ calendar.refreshed_at.strftime('%Y-%m-%d %H:%M') }}.
+  {% if calendar.refreshed_at %}
+  <p>Your feed was last refreshed at {{ calendar.refreshed_at.strftime('%Y-%m-%d %H:%M') }}.
+  {% else %}
+  <p>Your feed has been published.</p>
+  {% endif %}
 {% else %}
-<p>Your feed has been published.</p>
-{% endif %}
+<h2>We are checking your feed and it will be published soon.</h2>
 {% endif %}
 
 <div class="well">
