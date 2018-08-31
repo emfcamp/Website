@@ -200,12 +200,7 @@ class ScheduleForm(Form):
         self.feed_name.data = feed.name
         self.url.data = feed.url
         self.enabled.data = feed.enabled
-        self.main_venue.data = feed.main_venue
-        self.type.data = feed.type
-        self.phone.data = feed.contact_phone
-        self.email.data = feed.contact_email
-        self.lat.data = feed.latlon[0] if feed.latlon else 0.0
-        self.lon.data = feed.latlon[1] if feed.latlon else 0.0
+        self.location.data = feed.main_venue
         self.displayed.data = feed.displayed
         self.priority.data = feed.priority
 
@@ -215,7 +210,7 @@ class ScheduleForm(Form):
             self.location.data = ''
 
 @admin.route('/schedule-feeds/<int:feed_id>', methods=['GET', 'POST'])
-def feed(feed_id):
+def schedule_feed(feed_id):
     feed = CalendarSource.query.get_or_404(feed_id)
     form = ScheduleForm()
 
@@ -225,17 +220,19 @@ def feed(feed_id):
 
     if form.validate_on_submit():
         if form.delete:
+            for event in feed.events:
+                db.session.delete(event)
             db.session.delete(feed)
             db.session.commit()
             flash("Feed deleted")
-            return redirect(url_for('.feeds', feed_id=feed_id))
+            return redirect(url_for('.schedule_feeds', feed_id=feed_id))
 
         form.update_feed(feed)
         db.session.commit()
         msg = "Updated feed %s" % feed.name
         flash(msg)
         app.logger.info(msg)
-        return redirect(url_for('.feed', feed_id=feed_id))
+        return redirect(url_for('.schedule_feed', feed_id=feed_id))
 
     form.init_from_feed(feed)
     return render_template('admin/edit-feed.html', feed=feed, form=form)
@@ -252,7 +249,7 @@ def new_feed():
         msg = "Created feed %s" % feed.name
         flash(msg)
         app.logger.info(msg)
-        return redirect(url_for('.feed', feed_id=feed.id))
+        return redirect(url_for('.schedule_feed', feed_id=feed.id))
     return render_template('admin/edit-feed.html', form=form)
 
 from . import accounts  # noqa: F401
