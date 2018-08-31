@@ -11,7 +11,9 @@
   </li>
 </ul>
 
-<h3>{{ calendar.name}}</h3>
+{% if calendar.name %}
+<h3>{{ calendar.name }}</h3>
+{% endif %}
 
 {% if preview_events and preview %}
 <p>We've loaded your feed below. If something doesn't look right, email <a href="mailto:{{ config['VILLAGECONTENT_EMAIL'][1] }}">{{ config['VILLAGECONTENT_EMAIL'][1] }}</a>.</p>
@@ -22,13 +24,13 @@
 <p>We successfully processed your feed, but we weren't able to find any events.</p>
 {% endif %}
 
-{% if calendar.published %}
+{% if calendar.enabled and calendar.published %}
   {% if calendar.refreshed_at %}
   <p>Your feed was last refreshed at {{ calendar.refreshed_at.strftime('%Y-%m-%d %H:%M') }}.
   {% else %}
   <p>Your feed has been published.</p>
   {% endif %}
-{% else %}
+{% elif calendar.published %}
 <h2>We are checking your feed and it will be published soon.</h2>
 {% endif %}
 
@@ -45,8 +47,8 @@
     </p>
     <div class="form-group">
       <div class="col-sm-10 col-sm-offset-2">
-        {{ form.displayed(class_='big-checkbox') }}
-        <label class="control-label big-checkbox" for="displayed">
+        {{ form.published(class_='big-checkbox') }}
+        <label class="control-label big-checkbox" for="published">
             Display on schedule
         </label>
       </div>

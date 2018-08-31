@@ -176,7 +176,7 @@ class ScheduleForm(Form):
     url = StringField('URL', [Required(), URL()])
     enabled = BooleanField('Feed Enabled')
     location = SelectField('Location')
-    displayed = BooleanField('Publish events from this feed')
+    published = BooleanField('Publish events from this feed')
     priority = IntegerField('Priority', [Optional()])
     preview = SubmitField('Preview')
     submit = SubmitField('Save')
@@ -186,7 +186,7 @@ class ScheduleForm(Form):
         feed.name = self.feed_name.data
         feed.url = self.url.data
         feed.enabled = self.enabled.data
-        feed.displayed = self.displayed.data
+        feed.published = self.published.data
         feed.priority = self.priority.data
 
         if self.location.data:
@@ -199,7 +199,7 @@ class ScheduleForm(Form):
         self.feed_name.data = feed.name
         self.url.data = feed.url
         self.enabled.data = feed.enabled
-        self.displayed.data = feed.displayed
+        self.published.data = feed.published
         self.priority.data = feed.priority
 
         if feed.mapobj:
@@ -217,7 +217,7 @@ def schedule_feed(feed_id):
     form.location.choices = choices
 
     if form.validate_on_submit():
-        if form.delete:
+        if form.delete.data:
             for event in feed.events:
                 db.session.delete(event)
             db.session.delete(feed)

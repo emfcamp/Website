@@ -111,11 +111,7 @@ def _get_scheduled_proposals(filter_obj={}, override_user=None):
     for source in ical_sources:
         for e in source.events:
             d = _get_ical_dict(e, external_favourites)
-            # Override venue if we have a venue set on the source
-            if source.main_venue:
-                d['venue'] = source.main_venue
-            else:
-                d['venue'] = e.location
+            d['venue'] = source.mapobj.name
             schedule.append(d)
 
     if 'is_favourite' in filter_obj and filter_obj['is_favourite']:
@@ -131,13 +127,7 @@ def _get_priority_sorted_venues(venues_to_allow):
     main_venue_names = [(v.name, 'main', v.priority) for v in main_venues]
 
     ical_sources = CalendarSource.query.filter_by(enabled=True, published=True)
-    ical_source_names = [(v.main_venue, 'ical', v.priority) for v in ical_sources]
-
-    # List event venues that are not overridden with zero priority
-    for source in ical_sources:
-        for e in source.events:
-            if not source.main_venue:
-                ical_source_names.append((e['location'], 'ical', source.priority))
+    ical_source_names = [(v.mapobj.name, 'ical', v.priority) for v in ical_sources if v.mapobj and v.events]
 
     res = []
     seen_names = []
@@ -148,7 +138,7 @@ def _get_priority_sorted_venues(venues_to_allow):
             res.append({
                 'key': slugify(name),
                 'label': name,
-                'source': 'main'if name == 'Workshop 3' else venue[1],
+                'source': venue[1],
                 'order': venue[2]
             })
 
@@ -486,7 +476,6 @@ def external_feeds():
 
         if not source:
             source = CalendarSource(url=url, user=current_user)
-            source.displayed = True
             db.session.commit()
 
         return redirect(url_for('.external_feed', source_id=source.id))
@@ -497,8 +486,8 @@ def external_feeds():
 class UpdateExternalFeedForm(Form):
     url = StringField('URL', [Required(), URL()])
     name = StringField('Feed Name', [Required()])
-    location = SelectField('Location')
-    displayed = BooleanField('Publish events from this feed')
+    location = SelectField('Location', [Required()])
+    published = BooleanField('Publish events from this feed')
     preview = SubmitField('Preview')
     save = SubmitField('Save')
 
@@ -525,8 +514,7 @@ def external_feed(source_id):
     if form.validate_on_submit():
         if form.save.data:
             calendar.name = form.name.data
-            calendar.enabled = True
-            calendar.displayed = form.displayed.data
+            calendar.published = form.published.data
 
             if form.location.data:
                 map_obj_id = int(form.location.data)
