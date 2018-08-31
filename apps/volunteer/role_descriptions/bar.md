@@ -1,6 +1,9 @@
 ** Team Lead ** Steve Early
 
-You must be over 18, and will need to do a short online training course on how to serve on the bar.
+You will not be able to sign up for this shift unless:
+
+* You are over 18
+* You have completed [this short online course](https://www.emfcamp.org/volunteer/bar-training)
 
 ## What you'll be doing
 
