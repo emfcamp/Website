@@ -498,12 +498,9 @@ def external_feeds():
 class UpdateExternalFeedForm(Form):
     url = StringField('URL', [Required(), URL()])
     name = StringField('Name')
-    main_venue = StringField('Main venue')
-    priority = IntegerField('Priority')
     contact_phone = StringField('Phone')
     contact_email = EmailField('Email', [Email(), Optional()])
     location = SelectField('Location')
-    enabled = BooleanField('Refresh automatically')
     displayed = BooleanField('Displayed')
     preview = SubmitField('Preview')
     save = SubmitField('Save')
@@ -533,7 +530,6 @@ def external_feed(source_id):
             calendar.url = form.url.data
             calendar.name = form.name.data
             calendar.main_venue = form.main_venue.data
-            calendar.priority = form.priority.data
             calendar.contact_phone = form.contact_phone.data
             calendar.contact_email = form.contact_email.data
             calendar.enabled = form.enabled.data
