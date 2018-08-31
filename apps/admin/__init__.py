@@ -22,9 +22,9 @@ from models.purchase import Purchase
 from models.ical import CalendarSource
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
 from models.site_state import SiteState, VALID_STATES, refresh_states
+from models.map import MapObject
 from ..common import require_permission
 from ..common.forms import Form, TelField
-
 
 admin = Blueprint('admin', __name__)
 
@@ -173,30 +173,28 @@ def schedule_feeds():
     return render_template('admin/schedule-feeds.html', feeds=feeds)
 
 class ScheduleForm(Form):
-    feed_name = StringField('Name', [Required()])
-    url = StringField('iCal URL', [Required(), URL()])
-    enabled = BooleanField('Enabled')
-    main_venue = StringField('Main Venue')
-    type = StringField('Type')
-    phone = TelField('Phone')
-    email = EmailField('Email', [Email()])
-    lat = FloatField('lat', [Optional()])
-    lon = FloatField('lon', [Optional()])
-    priority = IntegerField('priority', [Optional()])
-
+    feed_name = StringField('Feed Name', [Required()])
+    url = StringField('URL', [Required(), URL()])
+    enabled = BooleanField('Feed Enabled')
+    location = SelectField('Location')
+    displayed = BooleanField('Publish events from this feed')
+    priority = IntegerField('Priority', [Optional()])
+    preview = SubmitField('Preview')
     submit = SubmitField('Save')
+    delete = SubmitField('Delete')
 
     def update_feed(self, feed):
         feed.name = self.feed_name.data
         feed.url = self.url.data
         feed.enabled = self.enabled.data
-        feed.main_venue = self.main_venue.data
-        feed.type = self.type.data
-        feed.contact_phone = self.phone.data
-        feed.contact_email = self.email.data
-        feed.lat = self.lat.data
-        feed.lon = self.lon.data
+        feed.displayed = self.displayed.data
         feed.priority = self.priority.data
+
+        if form.location.data:
+            map_obj_id = int(form.location.data)
+            feed.mapobj = MapObject.query.get(map_obj_id)
+        else:
+            feed.mapobj = None
 
     def init_from_feed(self, feed):
         self.feed_name.data = feed.name
@@ -208,14 +206,30 @@ class ScheduleForm(Form):
         self.email.data = feed.contact_email
         self.lat.data = feed.latlon[0] if feed.latlon else 0.0
         self.lon.data = feed.latlon[1] if feed.latlon else 0.0
+        self.displayed.data = feed.displayed
         self.priority.data = feed.priority
+
+        if feed.mapobj:
+            self.location.data = str(feed.mapobj.id)
+        else:
+            self.location.data = ''
 
 @admin.route('/schedule-feeds/<int:feed_id>', methods=['GET', 'POST'])
 def feed(feed_id):
     feed = CalendarSource.query.get_or_404(feed_id)
     form = ScheduleForm()
 
+    choices = sorted([(str(mo.id), mo.name) for mo in MapObject.query])
+    choices = [('', '')] + choices
+    form.location.choices = choices
+
     if form.validate_on_submit():
+        if form.delete:
+            db.session.delete(feed)
+            db.session.commit()
+            flash("Feed deleted")
+            return redirect(url_for('.feeds', feed_id=feed_id))
+
         form.update_feed(feed)
         db.session.commit()
         msg = "Updated feed %s" % feed.name
@@ -224,7 +238,6 @@ def feed(feed_id):
         return redirect(url_for('.feed', feed_id=feed_id))
 
     form.init_from_feed(feed)
-
     return render_template('admin/edit-feed.html', feed=feed, form=form)
 
 @admin.route('/schedule-feeds/new', methods=['GET', 'POST'])
