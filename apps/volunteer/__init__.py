@@ -25,3 +25,4 @@ from . import schedule  # noqa: F401
 from . import sign_up  # noqa: F401
 from . import choose_roles  # noqa: F401
 from . import training  # noqa: F401
+from . import bar_training  # noqa: F401

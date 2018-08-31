@@ -550,7 +550,7 @@ def external_feed(source_id):
         preview_events = []
     else:
         preview_events = list(calendar.events)
-    
+
     if not preview_events:
         alerts = [('danger', "We could not load any events from this feed")]
 

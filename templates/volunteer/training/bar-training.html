@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Bar training
+{% endblock %}
+
+{% block body %}
+{% include "volunteer/_nav.html" %}
+
+<div id="training" class="{% if trained %}hidden{% endif %}" style="height: 780px">
+    <p></p>
+    <p></p>
+    Please wait while we load the training...
+</div>
+
+<div id="waiting" style="display: none">
+    <p></p>
+    <p></p>
+    Please wait while we check your answers. If you don't see any progress,
+    please <a href="{{ url_for('.bar_training') }}">try again</a>.
+</div>
+
+<div id="complete" class="{% if not trained %}hidden{% endif %}">
+<h1>Training complete</h1>
+<p>
+    You have completed your training for the bar. You can now <a href="{{ url_for('volunteer.schedule') }}">sign up</a> for bar shifts!
+</p>
+</div>
+
+
+{% endblock body %}
+
+{% block foot %}
+<script src="https://embed.typeform.com/embed.js"></script>
+<script type="text/javascript">
+$(() => {
+  var attempts = 0;
+  function check_bar_trained() {
+    fetch({{ url_for('volunteer.bar_training_check')|tojson }})
+    .then(response => response.json())
+    .then(function(result) {
+      if (result) {
+        $('#training').show();
+        $('#waiting').hide();
+      } else {
+        attempts++;
+        if (attempts < 10) setTimeout(check_bar_trained, 2000);
+      }
+    });
+  }
+
+  function show_training() {
+    typeformEmbed.makeWidget(
+      $('#training')[0],
+      {{ url|tojson }},
+      {
+        hideHeaders: true,
+        hideFooter: true,
+        onSubmit: () => {
+          $('#training').hide();
+          $('#waiting').show();
+          check_bar_trained();
+        }
+      }
+    )
+    $('#training').show();
+    $('#waiting').hide();
+  }
+
+  show_training();
+});
+</script>
+{% endblock %}

@@ -131,6 +131,9 @@ def generate_signup_code(key, timestamp, uid):
 def generate_api_token(key, uid):
     return generate_unlimited_hmac('api-', key, uid)
 
+def generate_bar_training_token(key, uid):
+    return generate_unlimited_hmac('bar-training-', key, uid)
+
 def generate_checkin_code(key, uid, version=1):
     return generate_unlimited_short_hmac('checkin-', key, uid, version=version)
 
@@ -145,6 +148,9 @@ def verify_signup_code(key, current_timestamp, code):
 
 def verify_api_token(key, uid):
     return verify_unlimited_hmac('api-', key, uid)
+
+def verify_bar_training_token(key, uid):
+    return verify_unlimited_hmac('bar-training-', key, uid)
 
 def verify_checkin_code(key, uid):
     return verify_unlimited_short_hmac('checkin-', key, uid)
@@ -238,6 +244,10 @@ class User(db.Model, UserMixin):
     def checkin_code(self):
         return generate_checkin_code(app.config['SECRET_KEY'], self.id)
 
+    @property
+    def bar_training_token(self):
+        return generate_bar_training_token(app.config['SECRET_KEY'], self.id)
+
     def has_permission(self, name, cascade=True):
         if cascade:
             if name != 'admin' and self.has_permission('admin'):
@@ -295,6 +305,14 @@ class User(db.Model, UserMixin):
         if uid is None:
             # FIXME: raise an exception instead of returning None
             return None
+
+        return User.query.filter_by(id=uid).one()
+
+    @classmethod
+    def get_by_bar_training_token(cls, code):
+        uid = verify_bar_training_token(app.config['SECRET_KEY'], code)
+        if uid is None:
+            raise ValueError("Invalid token")
 
         return User.query.filter_by(id=uid).one()
 
