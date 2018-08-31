@@ -69,6 +69,13 @@ def _toggle_shift_entry(user, shift):
     res = {}
     shift_entry = ShiftEntry.query.filter_by(user_id=user.id, shift_id=shift.id).first()
 
+    if shift.role == Role.get_by_name('Bar') and \
+      Role.get_by_name('Bar') not in Volunteer.get_for_user(current_user).trained_roles:
+        return {
+            'warning': 'Missing required training',
+            'message': 'You must complete bar training before you can sign up for this shift'
+        }
+
     if shift_entry:
         db.session.delete(shift_entry)
         res['operation'] = 'delete'
