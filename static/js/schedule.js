@@ -226,7 +226,7 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
         if (ev.type === 'workshop' && ev.cost.trim() !== '') {
             var cost = $('<span class="event-cost">').text(ev.cost);
             $('#workshop_cost').html('<strong>Cost:</strong> ' + cost.html());
-            $('#workshop_requirements').html('<strong>requirements:</strong> ' + ev.equipment.html());
+            $('#workshop_requirements').html('<strong>requirements:</strong> ' + ev.equipment);
         } else {
             $('#workshop_cost').html('');
             $('#workshop_requirements').html('');
