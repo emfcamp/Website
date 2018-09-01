@@ -82,7 +82,7 @@ def add_event(room, event):
     _add_sub_with_text(event_node, 'duration', duration)
 
     _add_sub_with_text(event_node, 'abstract', event['description'])
-    _add_sub_with_text(event_node, 'description', event['description'])
+    _add_sub_with_text(event_node, 'description', '')
 
     _add_sub_with_text(event_node, 'slug', 'emf%s-%s-%s' % (event_start().year, event['id'], event['slug']))
 
