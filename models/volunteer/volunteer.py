@@ -1,4 +1,5 @@
 # coding=utf-8
+from sqlalchemy.orm import backref
 from flask_login import UserMixin
 
 from main import db
@@ -33,7 +34,7 @@ class Volunteer(db.Model, UserMixin):
     allow_comms_during_event = db.Column(db.Boolean, nullable=False, default=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    user = db.relationship('User', backref='volunteer')
+    user = db.relationship('User', backref=backref('volunteer', uselist=False))
 
     interested_roles = db.relationship('Role', backref='interested_volunteers', secondary=VolunteerRoleInterest, lazy='dynamic')
     trained_roles = db.relationship('Role', backref='trained_volunteers', secondary=VolunteerRoleTraining, lazy='dynamic')

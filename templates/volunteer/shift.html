@@ -25,4 +25,13 @@
             </button>
         {% endif %}
     </form>
+
+    {% if current_user.has_permission('volunteer:manager') %}
+        <h2>These people are on this shift</h2>
+        <ul>
+            {% for user in shift.volunteers %}
+                <li>{{ user.volunteer.nickname }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 {% endblock %}
