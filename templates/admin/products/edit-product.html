@@ -13,6 +13,7 @@
 {{ render_field(form.capacity_max, horizontal=8) }}
 {{ render_field(form.expires, horizontal=8, placeholder="YYYY-MM-DD") }}
 {{ render_field(form.description, horizontal=8, rows="4", cols="50") }}
+{{ render_field(form.attributes, horizontal=8) }}
 
 <div class="pull-right">{{ form.submit(class_="btn btn-success debounce") }}</div>
 </form>

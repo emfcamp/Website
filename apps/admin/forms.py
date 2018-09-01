@@ -21,6 +21,7 @@ class ProductForm(Form):
     capacity_max = IntegerField('Maximum to sell (Optional)', [Optional()])
     expires = DateField('Expiry Date (Optional)', [Optional()])
     description = StringField('Description', [Optional()], widget=TextArea())
+    attributes = StringField('Attributes')
 
     def init_with_product(self, product):
         self.display_name.data = product.display_name
@@ -28,6 +29,7 @@ class ProductForm(Form):
         self.capacity_max.data = product.capacity_max
         self.expires.data = product.expires
         self.description.data = product.description
+        self.attributes.data = product.attributes
 
     def update_product(self, product):
         product.display_name = self.display_name.data
@@ -35,6 +37,7 @@ class ProductForm(Form):
         product.capacity_max = self.capacity_max.data
         product.expires = self.expires.data
         product.description = self.description.data
+        product.attributes.data = self.attributes.data
 
 
 class NewProductForm(ProductForm):
