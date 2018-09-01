@@ -200,7 +200,7 @@ class AdmissionTicket(Ticket):
     def undo_badge_up(self):
         if self.badge_issued is False:
             raise CheckinStateException("Ticket is not badged up.")
-        self.badge_issued = True
+        self.badge_issued = False
 
 
 
