@@ -12,7 +12,7 @@ from models.product import ProductGroup
 from models.basket import Basket
 
 from ..common import CURRENCY_SYMBOLS
-from ..common.forms import Form, IntegerSelectField, HiddenIntegerField
+from ..common.forms import Form, IntegerSelectField, HiddenIntegerField, JSONField
 
 
 class ProductForm(Form):
@@ -21,7 +21,7 @@ class ProductForm(Form):
     capacity_max = IntegerField('Maximum to sell (Optional)', [Optional()])
     expires = DateField('Expiry Date (Optional)', [Optional()])
     description = StringField('Description', [Optional()], widget=TextArea())
-    attributes = StringField('Attributes')
+    attributes = JSONField('Attributes')
 
     def init_with_product(self, product):
         self.display_name.data = product.display_name

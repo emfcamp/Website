@@ -1,9 +1,8 @@
-# encoding=utf-8
-from flask import Markup
+import json
 
+from flask import Markup
 from flask_wtf import Form as BaseForm
 from flask_wtf.form import _is_hidden
-
 from wtforms import (
     IntegerField, SelectField,
 )
@@ -40,6 +39,28 @@ class TelInput(Input):
 
 class TelField(StringField):
     widget = TelInput()
+
+
+class JSONField(StringField):
+    def _value(self):
+        return json.dumps(self.data) if self.data else ''
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            try:
+                self.data = json.loads(valuelist[0])
+            except ValueError:
+                raise ValueError('This field contains invalid JSON')
+        else:
+            self.data = None
+
+    def pre_validate(self, form):
+        super().pre_validate(form)
+        if self.data:
+            try:
+                json.dumps(self.data)
+            except TypeError:
+                raise ValueError('This field contains invalid JSON')
 
 
 class StaticWidget(object):
