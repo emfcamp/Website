@@ -99,6 +99,7 @@ function init_volunteer_schedule(data, all_roles, active_day, is_admin) {
             if (is_admin) {
                 var override_btn = $('#signUp #override-sign-up-btn');
                 override_btn.click(make_override_signup_fn(override_btn, shift));
+                $('#shift-link').attr('href', 'shift/'+shift.id);
             }
 
             $('#signUp').modal();
