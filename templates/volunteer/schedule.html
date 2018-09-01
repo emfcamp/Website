@@ -3,7 +3,7 @@
 
 {% macro days_shifts(day, active_day) %}
 <div role="tabpanel" class="tab-pane {%- if active_day == day %} active {%- endif %}" id="{{ day }}">
-    <table id="tab-{{ day }}" class="table table-bordered">
+    <table id="tab-{{ day }}" class="table table-bordered shifts-table">
         <thead><tr>
             <th>Starts</th>
             <th>Ends</th>
@@ -171,6 +171,7 @@
         $('#tabnav-sat a').attr('href', '#sat');
         $('#tabnav-sun a').attr('href', '#sun');
         $('#tabnav-mon a').attr('href', '#mon');
+        $('#is_interested').attr('checked', true);
 
         var volunteer_shifts = {{ all_shifts | tojson }},
             volunteer_roles = {{ roles | tojson }},
