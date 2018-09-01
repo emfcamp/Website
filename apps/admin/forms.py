@@ -37,7 +37,7 @@ class ProductForm(Form):
         product.capacity_max = self.capacity_max.data
         product.expires = self.expires.data
         product.description = self.description.data
-        product.attributes.data = self.attributes.data
+        product.attributes = self.attributes.data
 
 
 class NewProductForm(ProductForm):
