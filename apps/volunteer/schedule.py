@@ -1,4 +1,5 @@
 # coding=utf-8
+import pendulum
 from flask import (
     render_template, request, redirect, url_for, flash, jsonify
 )
@@ -60,8 +61,10 @@ def schedule():
 
     untrained_roles = [r for r in roles if r['requires_training'] and not r['is_trained']]
 
+    active_day = request.args.get('day', default=pendulum.now().strftime('%a').lower())
+
     return render_template('volunteer/schedule.html', roles=roles, all_shifts=by_time,
-                           active_day=request.args.get('day', default='fri'),
+                           active_day=active_day,
                            role_descriptions=role_descriptions, all_volunteers=all_volunteers,
                            untrained_roles=untrained_roles)
 
