@@ -104,6 +104,8 @@ def role(role_id):
     if path.exists(role_description_file):
         content = open(role_description_file, 'r').read()
         description = Markup(markdown.markdown(content, extensions=["markdown.extensions.nl2br"]))
+    else:
+        description = None
 
     return render_template('volunteer/role.html', description=description,
                            role=role, current_volunteer=current_volunteer)
