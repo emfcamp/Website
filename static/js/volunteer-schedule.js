@@ -88,7 +88,7 @@ function init_volunteer_schedule(data, all_roles, active_day, is_admin) {
 
             $('#modal-start-time').html(shift.start_time);
             $('#modal-end-time').html(shift.end_time);
-            $('#modal-location').html(shift.location);
+            $('#modal-location').html(shift.venue.name);
 
             var role_id = shift.role.name.toLowerCase().replace(/[^\w]+/g, '-');
             $('#modal-description').html($(`#role-description-${role_id}`).clone().show());
