@@ -35,7 +35,7 @@ class ExternalMetrics:
         # Strictly, we should include all possible combinations, with 0
 
         emf_purchases = GaugeMetricFamily('emf_purchases', "Tickets purchased",
-                                          labels=['product', 'state'])
+                                          labels=['product', 'state', 'type'])
         emf_payments = GaugeMetricFamily('emf_payments', "Payments received",
                                          labels=['provider', 'state'])
         emf_attendees = GaugeMetricFamily('emf_attendees', "Attendees",
@@ -44,7 +44,7 @@ class ExternalMetrics:
                                           labels=['type', 'state'])
 
         gauge_groups(emf_purchases, Purchase.query.join(Product),
-                     Product.name, Purchase.state)
+                     Product.name, Purchase.state, Purchase.type)
         gauge_groups(emf_payments, Payment.query,
                      Payment.provider, Payment.state)
         gauge_groups(emf_attendees, AdmissionTicket.query,
