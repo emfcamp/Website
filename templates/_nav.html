@@ -8,6 +8,9 @@
     <div id="menu-container" role="navigation" aria-label="main navigation">
         <ul class="menu" role="menu">
             <li role="presentation">
+                <a role="menuitem" href="{{ url_for('base.feedback') }}">Feedback</a>
+            </li>
+            <li role="presentation">
                 <a role="menuitem" href="{{ url_for('base.about') }}">About</a>
             </li>
             {% if SITE_STATE == 'sales' and SALES_STATE in ['available', 'unavailable'] %}
