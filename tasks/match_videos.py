@@ -76,10 +76,7 @@ class MatchYouTube(Command):
             if 'nextPageToken' not in result:
                 break
 
-            if data.get('nextPageToken') == result['nextPageToken']:
-                break
-
-            data['nextPageToken'] = result['nextPageToken']
+            data['pageToken'] = result['nextPageToken']
 
         db.session.commit()
         app.logger.info('Matching for playlist %s complete', playlist)
