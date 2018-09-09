@@ -174,7 +174,9 @@ def main():
 
     schedule_data = [add_event(e) for e in schedule_data]
 
-    token = generate_api_token(app.config['SECRET_KEY'], current_user.id)
+    token = None
+    if current_user.is_authenticated:
+        token = generate_api_token(app.config['SECRET_KEY'], current_user.id)
 
     return render_template('schedule/user_schedule.html', venues=venues,
                             schedule_data=schedule_data, token=token)

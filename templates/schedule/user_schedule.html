@@ -124,10 +124,12 @@ document.getElementById('enable-javascript').style.display = 'none';
 </div>
 <div id="feeds">
   <strong>Full schedule:</strong> <a href="/schedule.ics">iCal/ICS</a> | <a data-toggle="modal" data-target="#gigitty-qr" href="#">Giggity</a> | <a href="/schedule.json">JSON</a><br>
+  {% if current_user.is_authenticated %}
   <strong>Favourites only:</strong>
   <a href="{{ url_for('.favourites_ical') }}?token={{ token }}">iCal/ICS</a>
   |
   <a href="{{ url_for('.favourites_json') }}?token={{ token }}">JSON</a>
+  {% endif %}
 </div>
 
 
