@@ -24,6 +24,20 @@
 {% endif %}
 
 <div class="well">
+
+{% if proposal.youtube_url %}
+<div class="youtube-link">
+  {% if proposal.thumbnail_url %}
+  <a class="row" href="{{ proposal.youtube_url }}">
+  <img class="img-responsive xs-col-6" src="{{ proposal.thumbnail_url }}">
+  </a>
+  {% else %}
+  <a class="no-thumbnail" href="{{ proposal.youtube_url }}">
+  </a>
+  {% endif %}
+</div>
+{% endif %}
+
 <p class="multiline">{{ (proposal.published_description or proposal.description) | urlize }}</p>
 
 {% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}

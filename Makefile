@@ -134,6 +134,9 @@ exportcalendars:
 parkingtickets:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py createparkingtickets
 
+matchyoutube:
+	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py matchyoutube
+
 test:
 	SETTINGS_FILE=$(TEST_SETTINGS) pipenv run flake8 ./*.py ./models ./apps ./tasks ./utils.py
 	SETTINGS_FILE=$(TEST_SETTINGS) pipenv run pytest ./tests/ ./models/

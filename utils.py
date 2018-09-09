@@ -23,6 +23,7 @@ from tasks.schedule import (
 from tasks.tickets import (
     CreateTickets, SendTickets, SendTransferReminder, CancelReservedTickets,
 )
+from tasks.match_videos import MatchYouTube
 from tasks.exportdb import ExportDB
 
 
@@ -64,5 +65,7 @@ if __name__ == "__main__":
     manager.add_command('createcalendars', CreateCalendars())
     manager.add_command('refreshcalendars', RefreshCalendars())
     manager.add_command('exportcalendars', ExportCalendars())
+
+    manager.add_command('matchyoutube', MatchYouTube())
 
     manager.run()

@@ -242,6 +242,10 @@ class Proposal(db.Model):
     potential_venue = db.relationship('Venue',
                                       primaryjoin='Venue.id == Proposal.potential_venue_id')
 
+    c3voc_url = db.Column(db.String)
+    youtube_url = db.Column(db.String)
+    thumbnail_url = db.Column(db.String)
+
     __mapper_args__ = {'polymorphic_on': type}
 
     @classmethod
