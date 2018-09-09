@@ -1,12 +1,9 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
-
 decorator = "*"
 "iso8601" = "*"
 python-levenshtein = "==0.12.0"
@@ -66,9 +63,7 @@ flask-restful = "*"
 shapely = "*"
 flask-cors = "*"
 
-
 [dev-packages]
-
 pytest = "*"
 mock = "*"
 "flake8" = "*"
@@ -76,8 +71,7 @@ locustio = "*"
 ipdb = "*"
 hypothesis = "*"
 pytest-random-order = "*"
-
+flask-shell-ipython = "*"
 
 [requires]
-
 python_version = "3.5"

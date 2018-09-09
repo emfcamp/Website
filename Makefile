@@ -111,9 +111,6 @@ applypotentialschedule:
 	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py applypotentialschedule
 
 shell:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py shell
-
-newshell:
 	SETTINGS_FILE=$(SETTINGS) PYTHONPATH=. FLASK_APP=wsgi pipenv run flask shell
 
 sendemails:
