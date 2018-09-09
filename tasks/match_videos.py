@@ -62,7 +62,7 @@ class MatchYouTube(Command):
                     youtube_url = None
                     thumbnail_url = None
 
-                match = self.video_re.match(desc)
+                match = self.video_re.search(desc)
                 if match:
                     groups = match.groupdict()
                     proposal = Proposal.query.get(int(groups['id']))
