@@ -6,7 +6,7 @@
 <h2>
   <small>
   {{ proposal.human_type | title }} by {{ proposal.published_names or proposal.user.name }}
-  {% if not proposal.may_record and proposal.type == 'talk' and proposal.state == 'finished' %}
+  {% if not proposal.may_record and proposal.type == 'talk' and proposal.state in ['accepted', 'finished'] %}
   <span style="padding-left: 10px;" title="This talk will not be recorded">🎦 🚫 </span>
   {% endif %}
   </small>
