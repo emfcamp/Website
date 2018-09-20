@@ -18,7 +18,8 @@ table tr:last-child td:last-child {
     border-bottom-right-radius: 4px;
 }
 
-th {
+th,
+tfoot > tr > td {
     color: $highlight-background-text;
     font-family: $header-font-stack;
 }
@@ -26,11 +27,11 @@ th {
 .table > tfoot > tr > th,
 .table > tfoot > tr > td {
     border-top: 0px;
-    color: white;
 }
 
 .table > tbody > tr > td,
-.table > thead > tr > th {
+.table > thead > tr > th,
+.table > tfoot > tr > td {
     border-top: 1px solid #ddd;
     padding-left: 15px;
     padding-right: 15px;
@@ -52,16 +53,6 @@ tr.even {
 
 tr.odd {
     background-color: $highlight-2-background;
-}
-
-.well table,
-.well table a,
-.well thead tr,
-.well .table > tbody > tr > th,
-.well .table > tfoot > tr > th,
-.well .table > thead > tr > td,
-.well .table > tfoot > tr > td {
-  color: inherit;
 }
 
 .btns-table > tbody > tr > td {
