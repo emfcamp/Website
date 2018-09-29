@@ -253,6 +253,7 @@ def new_feed():
 from . import accounts  # noqa: F401
 from . import payments  # noqa: F401
 from . import products  # noqa: F401
+from . import reports  # noqa: F401
 from . import tickets  # noqa: F401
 from . import users  # noqa: F401
 from . import email  # noqa: F401
