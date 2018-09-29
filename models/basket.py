@@ -164,7 +164,7 @@ class Basket(MutableMapping):
 
                     # user_limit takes into account existing purchases
                     if issue_count > line.tier.user_limit():
-                        raise CapacityException('Insufficient capacity.')
+                        raise CapacityException('Insufficient capacity for tier %s.' % line.tier)
 
                     line.tier.issue_instances(issue_count)
 
