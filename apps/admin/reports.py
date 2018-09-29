@@ -11,6 +11,8 @@ from . import admin
 def report_reconcile():
     data = {}
     for pg in ProductGroup.query.all():
+        if not pg.products:
+            continue
         paid = defaultdict(Decimal)
         pending = defaultdict(Decimal)
         q = (
