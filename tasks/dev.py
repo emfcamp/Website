@@ -10,6 +10,9 @@ from models.cfp import (TalkProposal, PerformanceProposal, WorkshopProposal,
                         LENGTH_OPTIONS)
 from models.user import User
 from models.cfp import Proposal, Venue
+from models.basket import Basket
+from models.product import PriceTier
+from models.payment import GoCardlessPayment, StripePayment, BankPayment
 
 from models.volunteer.venue import VolunteerVenue
 from models.volunteer.shift import Shift
@@ -111,8 +114,7 @@ class MakeFakeData(Command):
             user_arrivals.grant_permission('arrivals')
             db.session.add(user_arrivals)
 
-
-        for i in range(0, 500):
+        for i in range(0, 160):
             email = fake.safe_email()
             if User.get_by_email(email):
                 continue
@@ -123,8 +125,46 @@ class MakeFakeData(Command):
                 cfp.user = user
 
             db.session.add(user)
+            self.create_fake_tickets(user)
 
         db.session.commit()
+
+    def create_fake_tickets(self, user):
+        if random.random() < 0.3:
+            return
+
+        if random.random() < 0.2:
+            currency = 'EUR'
+        else:
+            currency = 'GBP'
+        b = Basket(user, currency)
+
+        pt = PriceTier.query.filter_by(name='full-std').one()
+        b[pt] = int(round(random.uniform(1, 4)))
+
+        if random.random() < 0.5:
+            pt = PriceTier.query.filter_by(name='parking').one()
+            b[pt] = 1
+
+        b.create_purchases()
+        b.ensure_purchase_capacity()
+
+        payment_type = {
+            'gc': GoCardlessPayment,
+            'bank': BankPayment,
+            'stripe': StripePayment
+        }.get(random_state({
+            'gc': 0.3,
+            'bank': 0.2,
+            'stripe': 0.5
+        }))
+
+        payment = b.create_payment(payment_type)
+
+        if random.random() < 0.8:
+            payment.paid()
+        else:
+            payment.cancel()
 
 
 class MakeVolunteerData(Command):

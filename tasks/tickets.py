@@ -17,10 +17,10 @@ from models.user import User
 def create_product_groups():
     top_level_groups = [
         # name, capacity, expires
-        ('admissions', datetime(2018, 9, 3), app.config.get('MAXIMUM_ADMISSIONS')),
-        ('parking', datetime(2018, 9, 3), None),
-        ('campervan', datetime(2018, 9, 3), None),
-        ('merchandise', datetime(2018, 8, 12), None),
+        ('admissions', None, 2500),
+        ('parking', None, None),
+        ('campervan', None, None),
+        ('merchandise', None, None),
     ]
     for name, expires, capacity in top_level_groups:
         if ProductGroup.get_by_name(name):
@@ -35,7 +35,7 @@ def create_product_groups():
         ('vendors', 100),
         ('sponsors', 200),
         ('speakers', 100),
-        ('general', 800),
+        ('general', 1800),
     ]
 
     admissions = ProductGroup.get_by_name('admissions')
