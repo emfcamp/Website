@@ -204,8 +204,6 @@ def account():
     if form.validate_on_submit():
         if not current_user.diversity:
             current_user.diversity = UserDiversity()
-            current_user.diversity.user_id = current_user.id
-            db.session.add(current_user.diversity)
 
         current_user.name = form.name.data
         current_user.promo_opt_in = form.allow_promo.data

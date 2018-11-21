@@ -62,3 +62,13 @@ class TicketPaymentForm(Form):
                                        'Please <a href="{{ url }}">click here</a> to log in.',
                                        url=url_for('users.login', next=pay_url, email=field.data)))
             raise ValidationError(msg)
+
+
+class TicketPaymentShippingForm(TicketPaymentForm):
+    address_1 = StringField("Address", [Required()])
+    address_2 = StringField("Address", [])
+    town = StringField("Town", [Required()])
+    postcode = StringField("Postal code", [Required()])
+    country = StringField("Country", [Required()])
+
+

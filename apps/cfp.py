@@ -232,8 +232,6 @@ def complete():
     if form.validate_on_submit():
         if not current_user.diversity:
             current_user.diversity = UserDiversity()
-            current_user.diversity.user_id = current_user.id
-            db.session.add(current_user.diversity)
 
         current_user.diversity.age = form.age.data
         current_user.diversity.gender = form.gender.data

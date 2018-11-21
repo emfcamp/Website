@@ -276,3 +276,13 @@ class Basket(MutableMapping):
         return payment
 
 
+    @property
+    def requires_shipping(self):
+        for line in self._lines:
+            product = line.tier.parent
+            if product.attributes.get('requires_shipping'):
+                return True
+
+        return False
+
+

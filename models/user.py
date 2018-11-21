@@ -171,6 +171,7 @@ class User(db.Model, UserMixin):
     promo_opt_in = db.Column(db.Boolean, nullable=False, default=False)
 
     diversity = db.relationship('UserDiversity', uselist=False, backref='user', cascade='all, delete-orphan')
+    shipping = db.relationship('UserShipping', uselist=False, backref='user', cascade='all, delete-orphan')
     payments = db.relationship('Payment', lazy='dynamic', backref='user', cascade='all')
     permissions = db.relationship('Permission', backref='user', cascade='all', secondary=UserPermission)
     votes = db.relationship('CFPVote', backref='user', lazy='dynamic')
@@ -395,6 +396,17 @@ class UserDiversity(db.Model):
         }
 
         return data
+
+
+class UserShipping(db.Model):
+    __tablename__ = 'shipping'
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, primary_key=True)
+    name = db.Column(db.String)
+    address_1 = db.Column(db.String)
+    address_2 = db.Column(db.String)
+    town = db.Column(db.String)
+    post_code = db.Column(db.String)
+    country = db.Column(db.String)
 
 
 class AnonymousUser(AnonymousUserMixin):

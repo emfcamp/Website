@@ -15,7 +15,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from main import db, mail, external_url
 from models.exc import CapacityException
-from models.user import User, checkin_code_re
+from models.user import User, UserShipping, checkin_code_re
 from models.product import (
     PriceTier, ProductView,
     ProductViewProduct, Product,
@@ -37,7 +37,10 @@ from ..payments.gocardless import gocardless_start
 from ..payments.banktransfer import transfer_start
 from ..payments.stripe import stripe_start
 
-from .forms import TicketAmountsForm, TicketTransferForm, TicketPaymentForm
+from .forms import (
+    TicketAmountsForm, TicketTransferForm, TicketPaymentForm,
+    TicketPaymentShippingForm,
+)
 
 tickets = Blueprint('tickets', __name__)
 
@@ -342,14 +345,6 @@ def pay(flow=None):
 
         return redirect(url_for('.pay', flow=flow))
 
-    form = TicketPaymentForm()
-    form.flow = flow
-
-    if not current_user.is_anonymous:
-        del form.email
-        if current_user.name != current_user.email:
-            del form.name
-
     basket = Basket.from_session(current_user, get_user_currency())
     if not any(basket.values()):
         empty_baskets.inc()
@@ -372,6 +367,26 @@ def pay(flow=None):
             else:
                 flash("Please select at least one item to buy.")
             return redirect(url_for('tickets.main', flow=flow))
+
+    if basket.requires_shipping:
+        if current_user.is_authenticated:
+            shipping = current_user.shipping
+        else:
+            shipping = None
+
+        form = TicketPaymentShippingForm(obj=shipping)
+
+    else:
+        form = TicketPaymentForm()
+
+    form.flow = flow
+
+    if current_user.is_authenticated:
+        form.name.data = current_user.name
+        del form.email
+        if current_user.name != current_user.email and not basket.requires_shipping:
+            # FIXME: is this helpful?
+            del form.name
 
     if form.validate_on_submit():
         if Decimal(form.basket_total.data) != Decimal(basket.total):
@@ -397,6 +412,16 @@ def pay(flow=None):
 
         if form.allow_promo.data:
             user.promo_opt_in = True
+
+        if basket.requires_shipping:
+            if not user.shipping:
+                user.shipping = UserShipping()
+
+            user.shipping.address_1 = form.address_1.data
+            user.shipping.address_2 = form.address_2.data
+            user.shipping.town = form.town.data
+            user.shipping.postcode = form.postcode.data
+            user.shipping.country = form.country.data
 
         if form.gocardless.data:
             payment_type = GoCardlessPayment

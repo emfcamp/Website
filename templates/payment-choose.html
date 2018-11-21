@@ -35,18 +35,24 @@
 <form method="post" class="pay-method">
 {{ form.hidden_tag() }}
 
-{% if current_user.is_anonymous or current_user.name == current_user.email %}
-<h3>Your Details</h3>
+{% if current_user.is_anonymous or current_user.name == current_user.email or basket.requires_shipping %}
 
-{% if form.email.was_duplicate %}
-<div class="alert alert-warning">
-    This email address already exists in our system, possibly because you previously tried to buy a ticket and
-    we automatically created an account for you.
-    Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('tickets.pay', flow=flow), email=form.email.data) }}">click here</a> to log in.
-</div>
-{% endif %}
+  <h3>Your Details</h3>
 
-{% include "user-signup.html" %}
+  {% if form.email.was_duplicate %}
+  <div class="alert alert-warning">
+      This email address already exists in our system, possibly because you previously tried to buy a ticket and
+      we automatically created an account for you.
+      Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('tickets.pay', flow=flow), email=form.email.data) }}">click here</a> to log in.
+  </div>
+  {% endif %}
+
+  {% if basket.requires_shipping %}
+  {% include "user-shipping.html" %}
+  {% else %}
+  {% include "user-signup.html" %}
+  {% endif %}
+
 {% endif %}
 
 <h3>Choose a Payment Method</h3>
