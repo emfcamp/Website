@@ -17,6 +17,10 @@
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('tickets.main') }}">Tickets</a>
                 </li>
+            {% elif config.get('DEFAULT_FLOW') == 'tees' and SALES_STATE in ['available'] %}
+                <li role="presentation">
+                    <a role="menuitem" href="{{ url_for('tickets.main', flow='tees') }}">T-shirts</a>
+                </li>
             {% endif %}
             {% if feature_enabled('VOLUNTEERS') %}
                 <li role="presentation">
@@ -55,7 +59,7 @@
                 </li>
             {% if basket_count %}
                 <li role="presentation">
-                    <a role="menuitem" href="{{ url_for('tickets.pay', flow="main") }}">
+                    <a role="menuitem" href="{{ url_for('tickets.pay', flow=config.get('DEFAULT_FLOW', 'main')) }}">
                         Basket ({{ basket_count }})
                     </a>
                 </li>
