@@ -22,7 +22,7 @@
           </label>
           </div>
         </div>
-        <div class="col-sm-12">
+        <div>
         <p><small>Your name and email are used to manage your purchase and shipment.
             Unless you choose to receive emails in future,
             we will delete your personal data after fulfilment.
@@ -36,5 +36,8 @@
         {{ render_field(form.town, horizontal=True) }}
         {{ render_field(form.postcode, horizontal=True) }}
         {{ render_field(form.country, horizontal=True) }}
+        <div><small>We can currently ship to UK and EU. If you live elsewhere and would like
+        to place an order, please drop us an email at <a href="mailto:{{ config['CONTACT_EMAIL'][1] }}">{{ config['CONTACT_EMAIL'][1] }}</a>.
+        </small></div>
       </div>
 </div>
