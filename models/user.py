@@ -405,7 +405,7 @@ class UserShipping(db.Model):
     address_1 = db.Column(db.String)
     address_2 = db.Column(db.String)
     town = db.Column(db.String)
-    post_code = db.Column(db.String)
+    postcode = db.Column(db.String)
     country = db.Column(db.String)
 
 
