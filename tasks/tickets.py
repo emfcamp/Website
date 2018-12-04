@@ -140,7 +140,7 @@ class CancelReservedTickets(Command):
     def run(self):
 
         if (feature_enabled('STRIPE')
-                and not feature_enabled('BANK_TRANSFER') and not feature_enabled('BANK_TRANSFER_EUR')
+                and not feature_enabled('BANK_TRANSFER') and not feature_enabled('BANK_TRANSFER_EURO')
                 and not feature_enabled('GOCARDLESS') and not feature_enabled('GOCARDLESS_EURO')):
             # Things are moving quickly now, only let people reserve tickets for an hour
             grace_period = timedelta(hours=1)
