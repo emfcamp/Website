@@ -62,8 +62,9 @@ def charge_stripe(payment):
         valid_states=['charging'],
     )
 
-    # max 15 chars, appended to company name
-    description = 'Tickets {}'.format(event_start().year)
+    # Stripe say it's max 15 chars, appended to company name,
+    # but it looks like only 10 chars is reliable.
+    description = 'EMF {}'.format(event_start().year)
     try:
         try:
             charge = stripe.Charge.create(
