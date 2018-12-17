@@ -162,6 +162,7 @@ def feedback():
 def talks():
     return redirect(url_for('schedule.line_up'))
 
+@base.route("/line-up/2016")
 @base.route("/talks/2016")
 @site_flag('TICKETS_SITE')
 def talks_2016():
@@ -204,6 +205,7 @@ def talks_2016():
     return render_template('talks-2016.html', venues=venues)
 
 
+@base.route("/line-up/2014")
 @base.route("/talks/2014")
 @site_flag('TICKETS_SITE')
 def talks_2014():
@@ -221,6 +223,7 @@ def talks_2014():
     return render_template('talks-2014.html', talks=talks)
 
 
+@base.route("/line-up/2012")
 @base.route("/talks/2012")
 @site_flag('TICKETS_SITE')
 def talks_2012():
