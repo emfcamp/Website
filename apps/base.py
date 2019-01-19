@@ -321,3 +321,7 @@ def herald():
 @base.route("/subscribe")
 def subscribe():
     return render_template('subscribe.html')
+
+@base.route("/emp")
+def emp():
+    return render_template('emp.html')
