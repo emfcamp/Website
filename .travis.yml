@@ -1,29 +1,30 @@
-language: python
-cache: pip
-sudo: false
-python:
-  - 3.5
-addons:
-  apt:
-    packages:
-    - glpk-utils
-    - postgresql-9.6-postgis-2.3
-  postgresql: "9.6"
+language: minimal
+sudo: required
 services:
-  - postgresql
+  - docker
+
 env:
-  matrix:
-    - TEST_SETTINGS=./config/travis.cfg
+  COMPOSE_VERSION: 1.23.2
+
+before_install:
+   - curl -L https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+   - chmod +x docker-compose
+   - sudo mv docker-compose /usr/local/bin
+
 install:
-  - pip install pipenv
-  - pipenv install --dev --deploy
+  - docker-compose build
+  - docker-compose up -d postgres
+
 before_script:
-  - psql -c 'create database emf_site_test;' -U postgres
+  - ./prepare_db.sh
+
 script:
-  - make test
+  - docker-compose run app make test
+
 branches:
   only:
   - master
+
 notifications:
   irc:
     channels:
