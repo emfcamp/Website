@@ -1,11 +1,3 @@
-ifeq ("$(SETTINGS)", "")
-	ifeq ("$(wildcard ./config/live.cfg)", "")
-		SETTINGS=./config/development.cfg
-	else
-		SETTINGS=./config/live.cfg
-	endif
-endif
-
 ifeq ("$(TEST_SETTINGS)", "")
 	TEST_SETTINGS=./config/test.cfg
 endif
@@ -13,7 +5,7 @@ endif
 .PHONY: run update outdated listdepends clean
 
 run:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./dev_server.py
+	python ./dev_server.py
 
 update:
 	PIPENV_MAX_SUBPROCESS=$$(($$(nproc)+1)) pipenv sync --dev
@@ -31,116 +23,116 @@ clean:
 
 
 db:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py db upgrade
+	python ./utils.py db upgrade
 
 migrate:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py db migrate -m '$(msg)'
+	python ./utils.py db migrate -m '$(msg)'
 
 data: db perms tickets bankaccounts importvenues
 
 dev-data: volunteerdata volunteershifts fakedata
 
 exportdb:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py exportdb
+	python ./utils.py exportdb
 
 perms:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py createperms
+	python ./utils.py createperms
 
 tickets:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py createtickets
+	python ./utils.py createtickets
 
 bankaccounts:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py createbankaccounts
+	python ./utils.py createbankaccounts
 
 loadofx:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py loadofx -f var/data.ofx
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py loadofx -f var/data-eur.ofx
+	python ./utils.py loadofx -f var/data.ofx
+	python ./utils.py loadofx -f var/data-eur.ofx
 
 checkreconcile:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py reconcile
+	python ./utils.py reconcile
 
 reallyreconcile:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py reconcile -d
+	python ./utils.py reconcile -d
 
 cancelreservedtickets:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py cancelreservedtickets
+	python ./utils.py cancelreservedtickets
 
 pyppeteer:
 	sudo -u www-data pipenv run ./pyppeteer-launcher.py
 
 sendtickets:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py sendtickets
+	python ./utils.py sendtickets
 
 fakedata:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makefakedata
+	python ./utils.py makefakedata
 
 volunteerdata:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makevolunteerdata
+	python ./utils.py makevolunteerdata
 
 volunteershifts:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makevolunteershifts
+	python ./utils.py makevolunteershifts
 
 shiftsfromproposals:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makeshiftsfromproposals
+	python ./utils.py makeshiftsfromproposals
 
 lockproposals:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py lockproposals
+	python ./utils.py lockproposals
 
 importcfp:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py importcfp
+	python ./utils.py importcfp
 
 emailspeakersaboutslot:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py emailspeakersaboutslot
+	python ./utils.py emailspeakersaboutslot
 
 emailspeakersaboutfinalising:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py emailspeakersaboutfinalising
+	python ./utils.py emailspeakersaboutfinalising
 
 emailspeakersaboutreservelist:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py emailspeakersaboutreservelist
+	python ./utils.py emailspeakersaboutreservelist
 
 importvenues:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py importvenues
+	python ./utils.py importvenues
 
 setroughdurations:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py setroughdurations
+	python ./utils.py setroughdurations
 
 runscheduler:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py runscheduler -p
+	python ./utils.py runscheduler -p
 
 applypotentialschedule:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py applypotentialschedule
+	python ./utils.py applypotentialschedule
 
 shell:
-	SETTINGS_FILE=$(SETTINGS) PYTHONPATH=. FLASK_APP=wsgi pipenv run flask shell
+	PYTHONPATH=. FLASK_APP=wsgi flask shell
 
 sendemails:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py sendemails
+	python ./utils.py sendemails
 
 admin:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makeadmin ${ARGS}
+	python ./utils.py makeadmin ${ARGS}
 
 arrivals:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py makearrivals
+	python ./utils.py makearrivals
 
 calendars:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py createcalendars
+	python ./utils.py createcalendars
 
 refreshcalendars:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py refreshcalendars
+	python ./utils.py refreshcalendars
 
 exportcalendars:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py exportcalendars
+	python ./utils.py exportcalendars
 
 parkingtickets:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py createparkingtickets
+	python ./utils.py createparkingtickets
 
 matchyoutube:
-	SETTINGS_FILE=$(SETTINGS) pipenv run python ./utils.py matchyoutube
+	python ./utils.py matchyoutube
 
 test:
-	SETTINGS_FILE=$(TEST_SETTINGS) pipenv run flake8 ./*.py ./models ./apps ./tasks ./utils.py
-	SETTINGS_FILE=$(TEST_SETTINGS) pipenv run pytest ./tests/ ./models/
+	SETTINGS_FILE=$(TEST_SETTINGS) flake8 ./*.py ./models ./apps ./tasks ./utils.py
+	SETTINGS_FILE=$(TEST_SETTINGS) pytest ./tests/ ./models/
 
 testdb:
-	SETTINGS_FILE=$(TEST_SETTINGS) pipenv run python ./utils.py db upgrade
+	SETTINGS_FILE=$(TEST_SETTINGS) python ./utils.py db upgrade
 
