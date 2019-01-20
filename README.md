@@ -13,23 +13,24 @@ Join with IRCCloud: <a href="https://www.irccloud.com/invite?channel=%23emfcamp-
 Getting Started
 ===============
 
-The easiest way is to install [Vagrant](https://www.vagrantup.com/) and
-[VirtualBox](https://www.virtualbox.org/).
+The easiest way is to install [Docker](https://docker.com/) and use Docker Compose.
 
 ```
-vagrant up --provider virtualbox
-vagrant ssh
+docker-compose up -d postgres
+./prepare_db.sh
+docker-compose run app make db data dev-data
+docker-compose up app
 ```
 
-This installs the necessary packages and dependencies for you. Then run:
-
-```
-make update
-make data
-make dev-data
-make
-```
 You should then be able to view your development server on http://localhost:5000.
+
+On subsequent runs it should be enough to just run `docker-compose up app`. To run commands within
+the application's Docker container use `docker-compose run app command`. You may want
+to start a shell within the container with `docker-compose run app bash`, which will
+allow you to use commands mentioned elsewhere in the documentation without prefixing them
+with the `docker-compose run ...` noise.
+
+To delete all data and start over fresh you can use `docker-compose down`.
 
 Once you've created an account, you can use `make admin` to make your user an administrator.
 Or, you can create an account and simultaneously make it an admin by using `make admin ARGS="-e email@domain.tld"`
