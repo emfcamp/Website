@@ -96,7 +96,7 @@ def email():
             for user in users:
                 db.session.add(EmailJobRecipient(job, user))
             db.session.commit()
-            flash("Email queued for sending to %s users" % len(users))
+            flash("Email queued for sending to %s users" % len(users.count()))
             return redirect(url_for(".email"))
 
     return render_template("admin/email.html", form=form)
