@@ -120,6 +120,16 @@ header #header-text {
   }
 }
 
+@media(max-width: 550px) {
+  header #header-text {
+    text-align: left;
+    float: none;
+    display: block;
+    font-size: 20px;
+    margin-bottom: 1em;
+  }
+}
+
 @media print {
   header #header-text {
     font-size: 1.3em;
@@ -166,6 +176,21 @@ ul.menu a {
   font-size: 1.5em;
 }
 
+@media(max-width: 550px) {
+  header #menu-container {
+    float: none;
+  }
+
+  ul.menu li {
+    display: block;
+    padding-left: 0;
+  }
+
+  #menu-container a {
+    font-size: 1.2em;
+  }
+}
+
 footer {
   background: url('../images/brand/footer.jpg') no-repeat left top;
   clear:both;
@@ -205,6 +230,27 @@ footer #credits {
   float: right;
 }
 
+@media(max-width: 550px) {
+  footer {
+    position: initial;
+    bottom: initial;
+    right: initial;
+  }
+
+  #bottom-menu-container {
+    padding: 0;
+  }
+
+  #bottom-menu-container .menu {
+    float: none;
+    clear: both;
+  }
+
+  #bottom-menu-container ul.menu li {
+    display: block;
+  }
+}
+
 .main-column {
   min-height: 100%;
   height: auto !important;
@@ -240,9 +286,11 @@ footer #credits {
   padding-top: 15px;
 }
 
-.push {
-  height: 130px;
-  clear: both;
+@media(min-width: 550px) {
+  .push {
+    height: 130px;
+    clear: both;
+  }
 }
 
 .flash {
