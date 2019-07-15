@@ -49,14 +49,8 @@ if __name__ == "__main__":
                 request.environ['wsgi.url_scheme'] = 'https'
                 _request_ctx_stack.top.url_adapter.url_scheme = 'https'
 
-    if os.path.exists('.inside-vagrant'):
-        # Make it easier to access from host machine
-        default_host = '0.0.0.0'
-        default_port = 5000
-    else:
-        # Safe defaults mapped by flask.app.Flask.run
-        default_host = None  # i.e. 127.0.0.1
-        default_port = None  # i.e. 5000 unless specified in SERVER_NAME
+    default_host = '0.0.0.0'  # i.e. 127.0.0.1
+    default_port = 5000       # i.e. 5000 unless specified in SERVER_NAME
 
     config_options = {
         'HOST': 'host',
