@@ -43,7 +43,7 @@ class CalendarSource(db.Model):
     def get_export_data(cls):
         sources = cls.query.with_entities(
             cls.id, cls.name, cls.type, cls.enabled, cls.url,
-            cls.main_venue, cls.lat, cls.lon, cls.priority,
+            cls.main_venue, cls.priority, cls.map_obj_id
         ).order_by(cls.id)
 
         data = {

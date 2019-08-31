@@ -18,6 +18,7 @@ from main import db
 from loggingmanager import set_user_id
 from . import bucketise
 from .permission import UserPermission, Permission
+from .volunteer.shift import ShiftEntry
 
 CHECKIN_CODE_LEN = 16
 checkin_code_re = r'[0-9a-zA-Z_-]{%s}' % CHECKIN_CODE_LEN
@@ -221,6 +222,12 @@ class User(db.Model, UserMixin):
                 },
             },
             'tables': ['user'],
+            'private': {
+                # Volunteer and speaker emails are exported here in order to issue vouchers for the next event
+                'volunteer_emails': [u.email for u in User.query.join(ShiftEntry)],
+                'speaker_emails': [u.email for u in User.query.join(Proposal, Proposal.user_id == User.id).
+                                    filter(Proposal.state.in_(('accepted', 'finished')))]
+            }
         }
 
         return data
@@ -435,3 +442,5 @@ def load_anonymous_user():
 
     set_user_id(au.get_id())
     return au
+
+from .cfp import Proposal # noqa
