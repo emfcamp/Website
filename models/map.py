@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from geoalchemy2 import Geometry
+from geoalchemy2.functions import ST_AsEWKT
 from sqlalchemy import Index
 
 from main import db
@@ -21,5 +22,21 @@ class MapObject(db.Model):
 
     owner = db.relationship('User', backref='map_objects')
 
-Index('ix_map_object_geom', MapObject.geom, postgresql_using='gist')
+    @classmethod
+    def get_export_data(cls):
+        objects = cls.query.with_entities(
+            cls.name, cls.wiki_page, ST_AsEWKT(cls.geom)
+        )
+        data = {
+            'public': [
+                {
+                    'name': obj[0],
+                    'wiki_page': obj[1],
+                    'location': obj[2]
+                }
+                for obj in objects
+            ]
+        }
+        return data
 
+Index('ix_map_object_geom', MapObject.geom, postgresql_using='gist')
