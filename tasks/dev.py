@@ -18,6 +18,7 @@ from models.volunteer.volunteer import Volunteer
 from models.volunteer.venue import VolunteerVenue
 from models.volunteer.shift import Shift
 from models.volunteer.role import Role
+from models.map import MapObject
 
 def random_state(states):
     cumulative = []
@@ -25,7 +26,7 @@ def random_state(states):
     for state, prob in states.items():
         cumulative.append((state, p + prob))
         p += prob
-    assert p == 1
+    assert round(p, 3) == 1
 
     r = random.random()
     for state, prob in cumulative:
@@ -36,6 +37,15 @@ def random_state(states):
 
 def randombool(probability):
     return random.random() < probability
+
+
+def fake_location():
+    # Rough Lat and Lon ranges of Eastnor
+    lon_range = (-2.37509, -2.38056)
+    lat_range = (52.0391, 52.0438)
+    return "SRID=4326;POINT({lon} {lat})".format(
+        lon=random.uniform(*lon_range),
+        lat=random.uniform(*lat_range))
 
 
 def fake_proposal(fake, reviewers):
@@ -135,10 +145,22 @@ class MakeFakeData(Command):
             if randombool(0.2):
                 self.create_volunteer_data(user)
 
+            if randombool(0.2):
+                self.create_map_object(user)
+
             db.session.add(user)
             self.create_fake_tickets(user)
 
         db.session.commit()
+
+    def create_map_object(self, user):
+        obj = MapObject()
+        obj.owner = user
+        obj.name = self.fake.text(max_nb_chars=20)
+        obj.geom = fake_location()
+        obj.wiki_page = "Village:Fake Village"
+        db.session.add(obj)
+
 
     def create_volunteer_data(self, user):
         vol = Volunteer()
