@@ -14,6 +14,7 @@ from models.basket import Basket
 from models.product import PriceTier
 from models.payment import GoCardlessPayment, StripePayment, BankPayment
 
+from models.volunteer.volunteer import Volunteer
 from models.volunteer.venue import VolunteerVenue
 from models.volunteer.shift import Shift
 from models.volunteer.role import Role
@@ -31,6 +32,10 @@ def random_state(states):
         if r <= prob:
             return state
     assert False
+
+
+def randombool(probability):
+    return random.random() < probability
 
 
 def fake_proposal(fake, reviewers):
@@ -82,8 +87,11 @@ def fake_proposal(fake, reviewers):
 
 
 class MakeFakeData(Command):
+
+    def __init__(self):
+        self.fake = Faker('en_GB')
+
     def run(self):
-        fake = Faker()
         if not User.query.filter_by(email='admin@test.invalid').first():
             user_admin = User('admin@test.invalid', 'Test Admin')
             user_admin.grant_permission('admin')
@@ -115,19 +123,32 @@ class MakeFakeData(Command):
             db.session.add(user_arrivals)
 
         for i in range(0, 160):
-            email = fake.safe_email()
+            email = self.fake.safe_email()
             if User.get_by_email(email):
                 continue
-            user = User(email, fake.name())
+            user = User(email, self.fake.name())
 
             for i in range(0, int(round(random.uniform(0, 2)))):
-                cfp = fake_proposal(fake, reviewers)
+                cfp = fake_proposal(self.fake, reviewers)
                 cfp.user = user
+
+            if randombool(0.2):
+                self.create_volunteer_data(user)
 
             db.session.add(user)
             self.create_fake_tickets(user)
 
         db.session.commit()
+
+    def create_volunteer_data(self, user):
+        vol = Volunteer()
+        vol.user = user
+        vol.missing_shifts_opt_in = randombool(0.5)
+        vol.banned = randombool(0.05)
+        vol.volunteer_phone = self.fake.phone_number()
+        vol.over_18 = randombool(0.2)
+        vol.allow_comms_during_event = randombool(0.8)
+        db.session.add(vol)
 
     def create_fake_tickets(self, user):
         if random.random() < 0.3:
