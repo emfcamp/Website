@@ -16,7 +16,7 @@ install:
   - docker-compose up -d
 
 script:
-  - docker-compose exec app make test
+  - docker-compose exec app pipenv run make test
 
 branches:
   only:
