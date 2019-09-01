@@ -13,13 +13,10 @@ before_install:
 
 install:
   - docker-compose build
-  - docker-compose up -d postgres
-
-before_script:
-  - ./prepare_db.sh
+  - docker-compose up -d
 
 script:
-  - docker-compose run app make test
+  - docker-compose exec app make test
 
 branches:
   only:
