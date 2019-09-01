@@ -10,28 +10,31 @@ If you want to get involved, the best way is to join us on IRC, on #emfcamp-web 
 
 Join with IRCCloud: <a href="https://www.irccloud.com/invite?channel=%23emfcamp-web&amp;hostname=irc.freenode.net&amp;port=6697&amp;ssl=1" target="_blank"><img src="https://www.irccloud.com/invite-svg?channel=%23emfcamp-web&amp;hostname=irc.freenode.net&amp;port=6697&amp;ssl=1" height="18"></a>
 
-Getting Started
-===============
+### Getting Started
 
-The easiest way is to install [Vagrant](https://www.vagrantup.com/) and
-[VirtualBox](https://www.virtualbox.org/).
+The only supported way to develop is to use [Docker](https://docker.com/) with Docker Compose (on Linux you'll need to install the latest Docker Compose separately).
 
+[Lazydocker](https://github.com/jesseduffield/lazydocker) is highly recommended
+to monitor the containers.
+
+To start all containers (and rebuild any which may have changed):
 ```
-vagrant up --provider virtualbox
-vagrant ssh
+docker-compose up --build
 ```
+You should then be able to view your development server on [http://localhost:5000](http://localhost:5000).
 
-This installs the necessary packages and dependencies for you. Then run:
-
+To create some fake data in your DB, run:
 ```
-make update
-make data
-make dev-data
-make
+docker-compose exec app pipenv run make dev-data
 ```
-You should then be able to view your development server on http://localhost:5000.
+To stop all containers, use `docker-compose stop`
+To delete all data and start over fresh you can use `docker-compose down`.
 
-Once you've created an account, you can use `make admin` to make your user an administrator.
+To run management commands, prefix them with `docker-compose exec app pipenv run`.
+
+### Adding accounts
+
+Once you've created an account on the website, you can use `make admin` to make your user an administrator.
 Or, you can create an account and simultaneously make it an admin by using `make admin ARGS="-e email@domain.tld"`
 
 E-mail sending is disabled in development (but is printed out on the console). You can also login directly by setting BYPASS_LOGIN=True in config/development.cfg and then using a URL of the form e.g. `/login/admin@test.invalid` and navigate to `/admin/`.
