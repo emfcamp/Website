@@ -7,7 +7,7 @@ addons:
   apt:
     packages:
     - glpk-utils
-    - postgresql-9.6-postgis-2.3
+    - postgresql-9.6-postgis-2.4
   postgresql: "9.6"
 services:
   - postgresql
