@@ -1,0 +1,1247 @@
+{
+    "favourites": {
+        "counts": {
+            "0": 0,
+            "1-9": 0,
+            "10-19": 0,
+            "20-29": 0,
+            "30-39": 0,
+            "40-49": 0,
+            "50-99": 0,
+            "100-199": 0,
+            "200+": 0
+        }
+    },
+    "proposals": {
+        "accepted": [
+            {
+                "published_title": "BRAAAAAAAINS: Archaeology and Philosophy of Zombies in Games",
+                "published_description": "These are not the zombies you've fragged! A bioarchaeologist and an applied philosopher will take you on a historical zombie adventure beyond Romero's shambling hordes and stories about Haitian Voodoo. Did you know that the D&D wondrous item: Hand of Glory was inspired by real artefacts? Or that miasmic \"zombification\" in some video games reflects medieval ideas about contagion? What do past ideas about zombies tell us about zombies now? And how do video game zombies reflect current ideas about ethics? Also, find out how zombies play a role in cutting-edge neuroscience and ICT research!",
+                "names": "Dr. Tyr Fothergill",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 19:20:00",
+                "scheduled_duration": 40,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Do you really want a robot in your old age?",
+                "published_description": "Technology seeks to ease our aging years with humanoid resources to replace care workers and improve our quality of life. But is that the answer for our 'golden' years? How do we plan and prepare for what's ahead? Depending on our genes and our jeans, we could live into our 100s but a lot rides on our perception of ageing and whether we want to do what our parents have done. \r\n\r\nEdye is a social anthropologist who works embedded with our older and oldest generations as they manage the challenges of ageing. Together, they witness success and failure; and they're circumspect about the power of Pepper and whether we even know what we want in our 80s, 90s, 100s and beyond.",
+                "names": "Edye Hoffmann",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 14:20:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "What makes processors fail - and how to prevent it",
+                "published_description": "Modern processors are amazing devices: small, fast, low power and getting better with every generation.\r\nBut the most amazing things about modern microprocessors is that they work so incredibly reliably despite all their incredible complexity.\r\n\r\nThis talk is about the battle between complexity and correctness and about how new formal verification tools can be used to help you design higher performance processors that actually work.  I will describe the common optimisations, the bugs that these often introduce and how open source tools such as SAT solvers and bounded model checkers can be used to find these bugs.",
+                "names": "Alastair Reid",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 16:00:00",
+                "scheduled_duration": 50,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Making And Understanding Real Cider",
+                "published_description": "A comprehensive description of good and bad ciders from a technical, simple flavour chemistry, and hardware viewpoint. What different apples do for the taste of a cider, what goes into a real cider, how real cider is made, and then by contrast how cheap cider is made. This talk is based upon four decades of cider making experience growing up on a British small farm.",
+                "names": "Jenny List",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 14:00:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "10 years building self-balancing ride on robots",
+                "published_description": "The first self-balancing skateboard was made by Ben Smithers in Norfolk around 2007. This inspired me to build my own in 2008 and along the way I discovered how to program in C, Arduino's, IMU fusion algorithms, not realising this would be as hard as it turned out to be. A gyro was \u00a3160 back then, a 3 axis IMU is now about \u00a35, how things have changed.\r\n\r\nSince then I have built one and two wheeled boards, 2 wheeled wheelchair prototype and many others, documented on YT and Instructables, long before such gadgets came out from China, culminating in a 3000W hubmotor 1 wheeled motorcycle which I plan to bring to the camp and demonstrate. I test these on Pembrey and the famous Pendine Sands beaches in Wales, with video clips I can present.\r\n\r\nImposter credentials: I am a hospital doctor not an engineer. Electronic hobbyist. Until I started this sequence of machines I had only coded in BASIC aged 14 on my Sinclair ZX81 (built from a kit obviously).",
+                "names": "John Dingley",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 17:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Making the Mini.Mu, a sewable, codeable instrument for kids",
+                "published_description": "Imogen Heap's MI.MU glove is a gesture based midi instrument. The prototypes have been used by artists across the world including megastar Ariana Grande. Earlier this year Imogen and I met to talk about how inspire the next generation of creative technologists and the result was the Mini.Mu, a glove kit that gets children sewing, wiring, coding and playing a gesture based instrument. \r\n\r\nIn my talk I'll be chatting about maker education, music tech and the importance of smushing up art and technology. I'll be sharing my experience of taking a rough and ready prototype made in my makerspace through to a real product that you can find in real shops. There will also be a short performance with the glove.",
+                "names": "Helen Leigh",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 19:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "How the Internet has changed emergencies",
+                "published_description": "The Internet, mobile telephony and mobile have radically changed the way people behave in emergencies and disasters across the world. In particular they have given people new tools and opportunities to find and help each other. From the Humanitarian OpenStreetMap team building maps on the fly in the developing world, through mobile charging stations for refugees to self organised responses to natural and man-made disasters. Communities across the globe are becoming more resilient and with the application of AI, robotics and drone technologies the outlook is, surprisingly for such a depressing subject, positive. ",
+                "names": "Ben Proctor",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 18:10:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Lesson 101: Making Fashion Tech & Human Organs ",
+                "published_description": "This talk  will discuss getting started with 1) wearable fashion technology, 2) engineering of human organs and 3) why i choose to do both.",
+                "names": "Rachel Konichiwakitty",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 16:10:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Falling Faster Straight Down, or How Taking 3D Printing to New Heights ",
+                "published_description": "Falling generally is consider bad. It hurts at best, sometimes fatally. However some folks like to jump out of planes and actively seek to fall even faster. Earlier this year, CBBC wanted to accelerate a TV presenter to the speed of a diving peregrine for the series \u201cBeyond Bionic\u201d, this required extra speed and thus the \u201cJet Boot\u201d project was born. This talk will cover the technologies we used to help Andy Torbert fall even faster, specifically the use of 3D printing to make the final system a reality, whilst covering some of the challenges of trying to attach jet engines to the human body, not setting anyone on fire, and the potential of jet packs, jet boots and other flying platforms for future transportation (sensible or otherwise!)",
+                "names": "Mike Curtis-Rouse",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 10:40:00",
+                "scheduled_duration": 20,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Algorithmic Light Art: How To Not Suck",
+                "published_description": "Everybody loves blinky LEDs, but what do you do with them once you've got them to not catch fire? A veteran LED addict presents a selection of tips, tricks, and cheats (oh god so many cheats) for getting your project to, well, shine.\r\n\r\n- LED types (RGB, RGBW, RGBWW, WWA, WTF?)\r\n- Getting away with the bare minimum (six sine waves and a bitmap)\r\n- Gamma correction, why and how?\r\n- Easing functions\r\n- Optimisation (cheating)\r\n- Geometry and localisation\r\n- When to random\r\n- How not to random\r\n- An exclusive collection of my personal fuckups",
+                "names": "Cass May",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 16:10:00",
+                "scheduled_duration": 50,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "How does railway signalling work?",
+                "published_description": "Almost everyone has traveled on a train, many commute on them every day, but surprisingly few know how signalling and control systems work.\r\n\r\nThe speaker will cover (at a very high level), train detection, train signalling across UK mainline and metro (tube) systems. As the UK mostly invented a lot of this stuff, it's applicable worldwide :)\r\n\r\nCome and be surprised how not-boring railways actually are (and how you could in theory implement a lot of it with arduinos and raspberry pis)!\r\n\r\nIncludes stories such as 'You could basically still repeat the great train robbery today, here's how' and 'Can you stop trains with only an ISM band radio?'. The speaker highly recommends none of this is applied in the real world. It would definitely not be a good idea. Please don't. But it's nice to know some technical details at least.\r\n\r\nThe speaker will assume no previous knowledge and the content is appropriate for all. It would mostly appeal to those who are interested in railways, transport and infrastructure. ",
+                "names": "Paul",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 16:50:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Actually, it's about ethics in software engineering",
+                "published_description": "Contemporary software engineering is at a crucial juncture in the evolution as a discipline. We\u2019re professionalising and expanding our abilities, but in doing so we\u2019re encountering dramatic new risks and venturing into new ethical territory. In this way, we share similarities with the expansion of traditional civil engineering during the industrial revolution. In this talk I\u2019ll discuss what lessons can we learn from that industry, and how we can try to avoid making some of the same mistakes. I\u2019ll also give a basic introduction to engineering ethics, discuss some examples of ethical problems from my own career, and explore how we can try to improve our ethical decision-making by incorporating ethical reasoning into the different stages of our work.",
+                "names": "Richard Westenra",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 11:50:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "The Singularity: dance, digital ethics and datavis",
+                "published_description": "How can classical ballet be used a medium for computer science theory, digital ethics and visualisation biometric data including EEG? What will the future hold for the human body and communication when we boldly go into space? What ethical consideration must we take to ensure that it is the many who control their personal data?\r\n\r\nWe\u2019ve been making educational, technologically exciting ballets and performance workshops for five years now. As artists we want to do collaborative learning with our audiences, to help them express their own ideas within a collaborative artistic technological framework. It is not just a performance to sit down and watch. Art and performance can break down the traditional barriers to audiences that consider themselves non-technical. We like to release as much of our performance and learning materials as possible as open source.\r\n\r\nOur project is long-running, and has tackled subjects from chronic pain to sorting algorithms. Now we are looking to space, brain hacking, and unashamed futurism. How can we begin to live in the future while increasing accessibility and inclusivity? What are the ethical concerns surrounding things that might seem abstract at first glance - like brainwave data?\r\n\r\nClassical ballet might sound like a strange way to learn about technology, ethics and medicine, but we hope to change the way you think about education/learning. Combining the algorithmic nature of classical ballet with futuristic thinking, breaking down artificial cultural barriers and fostering personal creative ownership for all. \r\n\r\nMay contain duct tape.",
+                "names": "Genevieve Smith-Nunes",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 12:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Beehive monitor based on Raspberry Pi",
+                "published_description": "Weight and temperature measurement for non-intrusive monitoring of a beehive. Total cost well under \u00a3100.\r\n\r\nData transimission every 15 minutes via wifi link to Thingspeak for generating realtime data curves on a browser on a PC or mobile phone.\r\n\r\nBenefits of curves throughout the year will be described\r\neg. swarm detection, advance warning of swarm preparation, need to feed colony, colony collapse, presence of brood, time to harvest honey\r\n\r\nFuture work - audio & video\r\n\r\nPresentation will cover R-Pi hardware and software plus construction details of plinth with load cell.\r\n\r\nRealtime data from submitter's website shown on the day (assuming internet access)\r\n\r\n ",
+                "names": "Geo Meadows",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 15:40:00",
+                "scheduled_duration": 20,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "WHY DID YOU MAKE THAT?",
+                "published_description": "Over a ten year period the sculptor James Capper has investigated methods to combine engineering and technology with sculpture to create machines. \r\n\r\nKnown as 'Mobile Sculptures', they record and challenge what we recognise in daily life as machines, in a world that relies heavily on engineering.\r\n\r\nThe talk will cover all areas of the sculptors practice along a slide presentation.\r\n\r\nThe sculpture MOUNTAINEER PROTOTYPE, an 800kg four legged hydraulic prototype walking machine will be at EMF, Capper looks for collaborators in system control software to give the machine a life of its own!\r\n\r\ninstagram\r\n@jamescappersculpture  \r\n",
+                "names": "James Capper",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 13:10:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Open Bionics: Turning children with limb differences into bionic superheroes ",
+                "published_description": "Open Bionics is a robotics startup developing assistive devices that enhance the human body. They work with Disney and the team behind Deus Ex to create bionic limbs for amputees from films and games! They bring science fiction to life! Sammy, the co founder, will talk you through how they\u2019re using 3D tech like scanning, modelling, and printing to change lives.",
+                "names": "Sammy",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 12:20:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Spider Silk: Hacking Nature's Strongest Fibre",
+                "published_description": "Spider silk is the strongest natural fibre known to man - stronger than steel, tougher than Kevlar, spider silks act as natural glues, cements, elastic capture webs and physical gills, all to enable spiders to survive and hunt on 6 out of 7 continents on Earth (the exception being icy Antarctica). \r\n\r\nI've spent the last 4 years researching spider silk at the University of Nottingham, learning how spiders have spent the last 386 million years adapting their silk to perform in a massive range of tasks. But now, scientists and industry professionals are looking into how we can adapt spider silk for our own purposes. Want a giant net that can catch falling Jumbos? We're on it. How about a biocompatible silk scaffold to help regrow that broken bone? We're on that too. \r\n\r\nThis is a 30 minute talk on the subject of spider silk aimed at those with an interest in, but no specialist knowledge of, science. There will be some pictures of spiders at the start but should otherwise be friendly for those who are interested but wary of things with eight legs. ",
+                "names": "Michelle Strickland",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 11:20:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "From Idiot to Imposter: how to get started in a new field",
+                "published_description": "At EMF it's easy to see lots of cool things and think you \"that's awesome, but I couldn't possibly do that!\": this talk is about how to overcome that feeling and get started in a new domain.\r\n\r\nTwo years ago, despite having not done any woodwork since high school, I decided to turn my hand at building electric guitars; with success enough that people are now commissioning me to make them for them. But to keep such an ambitious project manageable I had to create structure and tools around how I approached getting started and continuing to develop, and find ways to keep myself motivated in the days when it all goes wrong. This talk will review those methods so that you can try and apply them when you go to head off in a new direction yourself.",
+                "names": "Michael Dales",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 15:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Orbs Game Explained",
+                "published_description": "Orbs are located all over the site, hung in lots of locations (aiming for 30). Players use an RFID card to capture the orb for their team, changing the orbs colour. A website shows which team hold which orbs and tracks who is winning, with a live scoreboard in the null sector.\r\n\r\nThis talk is a breakdown of how it all works, the orbs themselves and the game architecture. The hardware inside the orbs, why those parts were selected, and how they interact with each other.  The software design and game architecture, and how all of that flows together.  This will also cover the trials and tribulations of making the game work and building the finished products.",
+                "names": "Michael Turner",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 11:10:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "The Battle of Mosul: what does it mean to live in a post-Geneva Convention world",
+                "published_description": "The Battle of Mosul in 2017 was a turning point in world history, even though we think of it as just another one of the awful events of today's wars.  Not since its founding in 1863, has the International Committee of the Red Cross been unable to provide a neutral source of protection and assistance to the victims of war and therefore declined to provide a presence on the battlefield.  What does this mean for all citizens of the world, especially those living under the shadow of continuing, chaotic conflict?",
+                "names": "Emily Mayhew",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 18:10:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Why volunteers are unsung heroes of science ",
+                "published_description": "A almost entirely factually accurate comedy set about the difficulties of getting people to experiment on when you're studying pain and fear, covering how utterly essential volunteers/willing subjects are to all human science and the perils and pitfalls of studying cognition in small children and babies, (and how they\u2019re much smarter than we think). ",
+                "names": "Charvy Narain",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 14:00:00",
+                "scheduled_duration": 20,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Banned from encrypting",
+                "published_description": "We were legally banned from using encryption on our computers, and were required to email the police every time we purchased a new computer, due to a \u201cSerious Crime Prevention Order\u201d lasting 5 years, which expired recently. Additionally, we had to email the police our exact whereabouts, and initially they tried to put in a condition that we had to send them a letter every time we used \"the cloud\". The order was given to us by a Crown Court judge after we were sentenced in a hacking case in the UK. We will discuss the experience, and our interactions with the police during these 5 years.",
+                "names": "Mustafa Al-Bassam and Jake Davis",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 14:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Pi Wars - Challenging kids (and adults) to build competitive robots",
+                "published_description": "As Pi Wars approaches its 5th year, we want to tell you why and how we put on a two day competitive event that challenges teams of school children, their teachers, families and adults to make robots. The robots are all built with the Raspberry Pi as the main controller, but apart from a size limit, teams can do whatever they like.  And what they do even surprises us! Come and find out how robots are more than just radio controlled cars; they are art and engineering combined! ",
+                "names": "GeekyTim",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 14:20:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Project Awesome - Two Men, A Pipe Organ and A Russian Army Lorry.",
+                "published_description": "One of us had a shed full of antique pipe organ parts, the other had a Zil-131 dumped in a hedge at the bottom of his garden.\r\n\r\nWe decided to start building a portable, fully playable musical instrument with a variety of audio-visual effects including singing Tesla coils, propane cannons and fog horns. Because why not?\r\n\r\nIt is still very much a work in progress, but in this talk we will explain and demonstrate some of the technical challenges we have faced so far in bringing the project, including its bewildering array of ancient and modern control systems, to life. \r\nWe hope to share our experiences of some of the challenges from our journey so far and hopefully encourage other hobbyists who are considering taking on larger than average projects to just get out there and do it!\r\n",
+                "names": "Maximus Ironthumper & Mark Tanner",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 16:20:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Building a robot with MATLAB and Simulink",
+                "published_description": "The talk gives an overview and describes the built-in support for prototyping, testing, and running Simulink models on Raspberry Pi\u00ae. It covers how to build a basic robot that demonstrates autonomous behaviour based on vision from the ground up. The Simulink built-in support for hardware enables hobbyist, engineers and students to access the hardware capabilities of the popular credit-card sized, ARM11 based Raspberry Pi\u00ae computer, from within Simulink environment, and deploy for embedded implementation.",
+                "names": "Building a robot with MATLAB and Simulink",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 17:20:00",
+                "scheduled_duration": 20,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Using Machine Learning for Humanitarian Aims",
+                "published_description": "At the beginning of 2017 I joined a volunteer Data Science community called Data for Democracy and became involved in a project focused on putting together a submission for a worldwide competition run by UNITE ideas (part of the United Nations) on behalf of the Internal Displacement Monitoring Center (IDMC) in Geneva.\r\n\r\nThe main aim of this challenge was to build a machine learning-driven tool that can automatically identify news and other written articles about \u2018Internally Displaced Persons\u2019 (people who have been forced from their homes by conflict or disaster). The platform also had to be able to extract key facts about the underlying events mentioned in the articles.\r\n\r\nI would like share the story of how our team, that had never met in person, put together a platform using almost 100% open source tools, and ultimately won the competition. We were subsequently invited to Geneva to help implement our platform, and we presented it to the broader non-profit community at an event at the International Red Cross museum.\r\n\r\nDuring my talk the areas I would like to address are:\r\n1. My experience of learning & getting involved in data science/programming/machine learning as a non-professional programmer\r\n2. What it was like to work on something constructive with a team from around the world that had never met each other\r\n3. The motivation behind needing this platform and how we put together a winning solution using open source tools",
+                "names": "Simon Bedford",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 15:00:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Dark-Dark Dark-Matter Matter-Matter",
+                "published_description": "Everything we see in the Universe makes up only a paltry 4% of the total sum. The rest is \u2018dark\u2019 \u2013 we know remarkably little about it other than what we call \u2018Dark Energy\u2019 is causing the expansion of the Universe to accelerate, and \u2018Dark Matter\u2019 is holding galaxies like our own Milky Way together. Scientists think that Dark Matter is everywhere, streaming through you as you read this right now! Understanding the nature of Dark Matter is one of the most important scientific missions of our time. In this talk, I will present what evidence we have for the existence of Dark Matter, what we know, and how we go about finding out more about it. Finally, I will entertain the idea of a Dark-Matter-inclusive universe and imagine what having access to such a resource  would imply for humanity. ",
+                "names": "Nicolas Angelides",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 17:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Lightning Talks Friday",
+                "published_description": "Quick <10min talks, on anything, from anybody who would like to get on the stage!\r\n\r\nIf you'd like to give a lightning talk, please email lightning@emfcamp.org, or try your luck and show up to a session.",
+                "names": "Lightning Talks",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 13:40:00",
+                "scheduled_duration": 60,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "The 1949 EDSAC Computer Rebuild",
+                "published_description": "A personal account of getting involved in the recreation at The National Museum of Computing at Bletchley Park of EDSAC.  This was the first fully programmable general purpose computer built from 1946 to 1949 at Cambridge University. It has 3000 valves and takes 12kW of power.\r\nI am on the commissioning team finding how difficult it is to use valves (tubes) as logic circuits.\r\n\r\nYou can find out more here:\r\n\r\nhttp://www.tnmoc.org/special-projects/edsac",
+                "names": "Tony Abbey",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 19:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "LGBTQIA+ Behaviour in Animals ",
+                "published_description": "\"It's not natural!\"\r\n\r\nThis phrase is often used to try and justify bigotry and prejudice, especially against people who are LGBTQIA+, polyamorous, or women who don't fit traditional gender roles. But is it true? What do we mean by \"natural\"?\r\n\r\nAs a bisexual, polyamorous biologist and science presenter, Antonia Forster is keen to set the record straight (no pun intended). What behaviours do we see in nature? What's the difference between gender and sex? Can animals be gay, bi or trans? Are there organisms with more, or fewer, than two sexes? Prepare to see the animal kingdom as you've never seen it before...\r\n\r\nThis talk has previously been delivered to 2,000 people at TEDxBristol, and watched by over 14,000 online. Antonia has also spoken at Wilderness Festival, Kew Gardens, the Royal Society, Stanford University, Bristol Pride, the OvalHouse Theatre, BCFm Radio, and BBC Radio Bristol. Antonia has been nominated for the John Maddox prize for \"promoting scientific understanding in the face of hostility\"; and continues to campaign for under-represented groups, especially LGBTQIA+ and women in STEM and science media.",
+                "names": "Antonia Forster",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 13:30:00",
+                "scheduled_duration": 20,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "From making to maintaining ",
+                "published_description": "Making is cool, but we talk and think a lot less about maintenance. Everything we make - software, hardware, communities - needs to be looked after, if it is useful. Sadly, maintaining, repairing and sustaining can be challenging in a fast-moving era, where this work can be seen as boring and low value, compared to the excitement around inventing or making new things. It is easy to forget that apps, data and connected systems need maintenance too, if they are to realise their potential and be useful or fun for more than a brief moment. \r\n\r\nAnd it\u2019s not always easy. It can be hard to find good resourcing models for long-lasting products, or for looking after new forms of shared infrastructure (such as open source software libraries). Strong commons models, where groups share and steward resources (whether the knowledge in Wikipedia or open hardware designs) are scarce or difficult to replicate. \r\n\r\nWe\u2019ll talk about maintenance, good and bad examples of it, and what we are doing to recognise the work done in repair, custodianship, stewardship, tending and caring for things that matter.  \r\n",
+                "names": "Laura James",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 17:50:00",
+                "scheduled_duration": 20,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Sex Robots! The Truth Behind the Headlines",
+                "published_description": "The past few years have seen a cascade of headlines about sex robots. It's a shame these are generally completely inaccurate, as behind them there are fascinating stories of intimacy and technology, computers and psychology. Throw in some science-fiction utopias and dystopias, loneliness and companionship, law and ethics, privacy and community and there is so much to be learned about our future with machines that could care for us and about us. The speaker has spent the past four years learning all about this topic: from 30,000 year old dildos to the world's first commercially-available sex robot (on sale now). Content warning: terrible puns; NSFW.       ",
+                "names": "Kate Devlin",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 19:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "A Magical Time To Be Alive",
+                "published_description": "A critically hopeful perspective on the magical technology of the 21st Century, Dr. Lydia Kostopoulos takes the listeners on a journey of how technology is transforming the human experience all the way from birth to death.\r\n\r\nHer talk unpacks the potential benefits and consequences of DNA Editing, Artificially Intelligent Companions, Brain Computer Interface, 3D Printing of Body Parts, and Whole Brain Emulation after Death.",
+                "names": "Lydia Kostopoulos",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 11:10:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Taming Terrain: Sculpting geoscapes from LiDAR",
+                "published_description": "Governments and organisations the world over are releasing free LiDAR data - capturing the globe in 3D down to the metre. But how can you take this data and make into something tangible? And how can you do it at both the small scale of cities and the enormous scale of mountain ranges?\r\n\r\nWe'll look at three different methods of making 3D terrain models via both 3D printing and CNC machining - examining where the data comes from and LiDAR technology; the challenges of LiDAR data and how to shape it into 3D models; and how to take these highly detailed models and successfully print or machine them.",
+                "names": "Andrew Godwin",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 18:10:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Adventures in Undertent Heating",
+                "published_description": "A talk explaining how and why I built an undertent heating system, and possible future improvements, with jokes, based on my 2017 Edinburgh show \"Renegade Plumber\" ",
+                "names": "simon munnery",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 15:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Taking Over The World with Scratch",
+                "published_description": "Scratch is a popular language/IDE for teaching children to code. It is possible to extend the offline version of Scratch 2 with a Python module that communicates with Scratch via a web service.\r\n\r\nI have extended Scratch to control Midi instruments and Arduino projects, including controlling Lego Power Functions motors, having reverse engineered the infrared protocol they use.\r\n\r\nIn addition, and perhaps most scarily, I have implemented a TCP/IP sockets extension with which I have exploited vulnerabilities in network services and gained remote code execution.  It is literally possible to create 0day exploits with Scratch!\r\n\r\nI will discuss the framework and the format of the extensions, and I will demonstrate my projects, including hacking a target virtual machine, controlling Lego motors and making noises with a Midi instrument.",
+                "names": "Kev Sheldrake",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 13:00:00",
+                "scheduled_duration": 50,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 18:20:00",
+                "scheduled_duration": 20,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Shooting Lasers at the Countryside: An Introduction to Mobile Mapping",
+                "published_description": "I'm James, and I'm responsible for firing literally hundreds of billions of (low power) laser pulses at the countryside in the UK through my work at Gigaclear, a rural FTTH ISP. We're using mobile mapping technologies to make better maps of the country for our network planners.\r\n\r\nIn this talk I'll provide an overview of Mobile Mapping technologies, precision location (and the technology to achieve it), and share some open source workflows and tools for LiDAR data. I'll also talk a little about running a large-scale survey project, and some interesting challenges we've faced in both capture and data management.",
+                "names": "James Harrison",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 10:40:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Gravity Synth",
+                "published_description": "Chromatouch & Coral will showcase new research in collaboration with Gravitational Wave researchers at University of Birmingham, with a synth connected a Michelson interferometer; not sonifying data, but using direct control voltage information to make music.\r\n\r\nChromatouch [Leon Trimble] is a digital artist who works in audio visual performance, specialising in immersive video and audio synthesis. Coral Manton is an interdisciplinary artist, technologist and researcher at I-Dat.Org For this piece she has visualised a ripple in spacetime/gravitywave which she will modulate live in Touchdesigner to complete the immersive audio visual performance.",
+                "names": "Chromatouch",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 11:50:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "The (Connected) House of Horrors",
+                "published_description": "You should be afraid of your smart home. Really afraid!\r\n\r\nI've wired up my house with dozens of Internet of Things gadgets. Some spy on me, some let in hackers, some send all my data back to China, some give me electric shocks, some betray my medical information to the police.\r\n\r\nFind out how I've ruined my domestic bliss and made my vacuum cleaner self-aware.\r\n\r\nLearn how to protect yourself and how to critically evaluate what you buy for your home.\r\n\r\nContent Warning. This talk contains frank discussion about sex and death. ",
+                "names": "Terence Eden",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 12:40:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Augmented Hilarity",
+                "published_description": "Standup comedy from scientists and technologist and futurists who work at the cutting edge of tech. Jokes and stories from comedians who know their graphene from their gravity beams, their innovation policy from interstellar probes. Lydia Nicholas, Scary Boots, Cerys Bradley and Anna Ploszajski will light up your night with no crossed wires.",
+                "names": "Lydia Nicholas",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 17:00:00",
+                "scheduled_duration": 40,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Shaping sound",
+                "published_description": "Light is managed using lenses, objectives, telescopes. In theatre or TV, it is common to see spotlights following characters and laser lights creating special effects. Similar control on sound is difficult: you need expensive sets of speakers, like the ones in musical festivals, in ultrasound scanners, and in haptic devices.\r\n\r\nIn this talk, I will introduce another way: using 3D-printed materials, specially-engineered to manipulate sound. Using tractor beams, levitation pods (for polystyrene beads) and other demos, I will guide the audience towards a (not-so-far) future where what we see in science fiction movies like Iron Man or Minority Report is real. A world where two people will be able to listen at two different programs from the same radio or to receive personalised sound messages without headphones. A world where music at outdoor festivals and in beer gardens will be managed while preserving airflow. A world where sound control is a DIY task.",
+                "names": "Gianluca Memoli",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 10:00:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Why and How you should start using Onion Networking",
+                "published_description": "The internet began as a network before firewalls, where any computer could communicate with any other computer without intermediation; but today there are host firewalls, perimeter firewalls, content filters, NATs, DNS limitations, BGP hijacks and all manner of other mechanisms which limit you and your computer's ability to communicate \u2014 and what is a network if not for communication?\r\n\r\nThe Tor \"Onion\" networking protocol is a return to this simpler, \"disintermediated\" state - you don't need anyone's permission to communicate from/to a well-known address, and you gain a host of security & operational benefits for free. We investigate these.",
+                "names": "Alec Muffett",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 18:10:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Power to the people: liberating online communication with Matrix.org",
+                "published_description": "Matrix.org is an ambitious open source project which defines a new protocol for open, decentralised, encrypted communication: adding a common denominator to the internet for securely publishing and subscribing to data (especially IM and VoIP) in realtime; liberating communication from being trapped in silos like WhatsApp, Slack, Discord and similar.\r\n\r\nWe maintain the specification for Matrix as well as release open source reference implementations of servers, clients, SDKs, bots and bridges to support the wider Matrix ecosystem.  As of Aug 2018 Matrix has around 5.5M reachable users and over 8000 server instances, ranging from individual personal servers through to massive deployments for governments and telcos - and a huge community of open source contributors building alternative clients, bots,  bridges, servers etc.\r\n\r\nToday Matrix is in late beta, but as of the end of 2017 the protocol is feature frozen as we converge on a 1.0 release later in 2018.  In this talk we'll give an overview of the Matrix protocol, the ecosystem, the road to 1.0 and show off all the latest clients and capabilities - including some of the more exciting non-IM usages, such as VR communication!",
+                "names": "Matthew Hodgson",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 15:50:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "A Failure Enthusiast",
+                "published_description": "Failure is a great teacher, but we do not often talk openly about failure in a public setting. As a scientist (and failure enthusiast), I am trying to encourage my community to talk more about failure, which is difficult since the path to success is to publish about successes and to hide failures. Let's do more to talk about failure as a Maker community. Let's be honest about the dead-ends and dumb mistakes that got us to that early prototype. Rather than ridiculing 'fails', let's instead celebrate them, since they're what we learn from and allows us to become better than we are.\r\n\r\nInstead of teaching people that failure is bad, let's teach them how to be resilient to failure - give them a safe space to fail in, and provide them the encouragement to keep working towards success. \r\n\r\nAs a social experiment, I will setup a slackline at EMF Camp and invite you to come and try to slackline for the first time and *livestream you failure* with the tag #EMFailure. If you want help for any reason, get in touch with me (@grajohnt).",
+                "names": "John Thurmond",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 10:40:00",
+                "scheduled_duration": 20,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "A Tour Through the Visualization Jungle",
+                "published_description": "Often we use graphs and charts ('visualizations') to display information in a way which makes understanding the data they show seem intuitive. They are used by well dressed individuals to show their projected quarterly earnings, by primary school teachers introducing exciting new ideas to wide eyed children, and by news organisations trying to explain that it's definitely ok to drink that 5th cup of coffee. But all's not fair in charts and graphs, intentionally or not they are not always faithful to the data. How can you spot a misleading chart, and what happens when what they don't reflect the truth? \r\n\r\nIn this talk we'll tour the visualization jungles, looking at some of the scariest, most dangerous, and weirdest visualizations out there. You'll learn some of the tricks used to change what a visualization shows and see examples of some previous weird and wonderful visualizations. By the end of our tour you'll know what to watch out for in your future visualization adventures, and how to make you own visualizations a little less intimidating or misleading to fellow adventurers.",
+                "names": "Fearn Bishop",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 16:50:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Numbers vs Resources: The History of Banking",
+                "published_description": "Tagline: \"I almost wish there were a conspiracy, but I'm afraid it's much worse than that.\"\r\n\r\nIt is a widely, but vaguely, appreciated fact that banks and banking are powerful and important aspects of modern history, which affect almost all aspects of politics and society. Most thoughtful people, reflecting on the present trajectory of history, get the uncomfortable feeling that we are all being driven toward economic, political and ecological disaster, and that international banking has something to do with it.\r\n\r\nThis has made banking the focus of numerous conspiracy theories, most of which contain useful and verifiable information, but all of which fail in one key respect: they all subordinate the banking system to the agency of secretive groups of people who supposedly control the whole system across generations.\r\n\r\nThe conspiracy scenario, bad as it is, holds out the comforting thought that if we could just identify and take out the shadowy figures who are really in control, then everything could be put right. But what if the truth is even more terrible? What if the system has its own internal logic, like a virus or an algorithm, which needs no human hand to guide it?\r\n\r\nThis talk goes back to the basic principles, and the medieval Italian and English origins, of the banking system to explore its algorithmic properties. I will argue that credit systems are not only a powerful tool in the hands of human and organizations like governments and corporations, but also that they have revolutionary effects on the priorities and and agendas of those organizations. That the tool, in other words - like Elric of Melnibone's 'Stormbringer' or Faust's 'Mephistopheles' - guides the hand that seek to wield it.",
+                "names": "Patrick O'Connor",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 17:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Lightning Talks Sunday",
+                "published_description": "Quick <10min talks, on anything, from anybody who would like to get on the stage!\r\n\r\nIf you'd like to give a lightning talk, please email lightning@emfcamp.org, or try your luck and show up to a session.",
+                "names": "Lightning Talks",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 10:00:00",
+                "scheduled_duration": 60,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Never Mind the Molluscs: (Mis)Adventures in \"Aggro-Rhythmic Composition\"",
+                "published_description": "Hear vicious venomous molluscs and baroque bifurcation diagrams!\r\n\r\nYou could already buy knitted scarves of elementary cellular automata and simulated sea shells, now you can listen to what passes for tunes!\r\n\r\nFabienne Serriere's generative knitting patterns drew attention to Hans Meinhardt's book \"The Algorithmic Beauty of Sea Shells\", the code that came with it is being slowly resurrected. Abuse of inverse short-time Fourier transforms in Python turns shell patterns into sounds.\r\n\r\nWe'll also stop worrying and learn to love the digital by exploring reasonably analogue chaotic attractor sounds with a Raspberry Pi and some cheap digital to analogue converters. Somewhere between a talk and a performance, this follows on from appearances at EMF 2016 and SHA 2017 where noises were caused to happen on stage and some people clapped afterwards. (Well, it counts as a performance if New Order pressing \"Start\" on their sequencer counts as an encore.) ",
+                "names": "Giles Greenway",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 10:30:00",
+                "scheduled_duration": 40,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Newsveillance",
+                "published_description": "News and media outlets on the web are silos of information designed to be taken at face value and are resistant to aggregation and side-by-side analysis because - after all - they're really just vehicles to sell ads.\r\n\r\nWhere aggregation is available to the average user (usually on social media), news feeds are customized on behalf of the user with algorithms they can't understand or control.\r\n\r\nTo try and solve this problem for myself, I attempted to aggregate web content via RSS feeds, but found most article bodies are just click-through links and no actual content.\r\n\r\nThat's why I wrote a RSS/Atom reconstitutor, web scraper and search indexer - to be able to get feeds of news, blogs and reports I could read and analyze without the filter bubble.\r\n\r\nBut this talk is only a *bit* about that - it's the technical backbone around which we will explore surveillance, news as data, the ethics of advertising, and subverting some hilariously paper thin content protections.\r\n\r\nIn a talk for all levels of technical ability, I'd like to share the things I learned along the way and encourage everyone to question how they can use their own skills to take back control of information on the web and overcome the status quo.",
+                "names": "Matt Carroll",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 16:40:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "The making of TiLDA Mk4",
+                "published_description": "A short summary of how this year's EMF Badge came to be, the challenges we faced this time and some of the amazing things people have done with it in only three days.\r\n\r\n[alternative title, depending on circumstances: \"why you don't have a badge this year\"]",
+                "names": "Marek Ventur",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 12:00:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Document & quantify informal learning ",
+                "published_description": "Tudor Tarlev is an ex-nomad and university dropout turned researcher of lifelong human learning, with a Degree from the Center for Research and Interdisciplinarity in Paris.\r\n\r\nIn 2015 Tudor visited maker spaces across the globe (http://bit.ly/2KWnqT9) to document how people learn by doing. That trip inspired the launch of experimentQ.org podcast - a show about rebel teachers, scientists, and entrepreneurs reshaping our education systems.\r\n\r\nAt EMF Tudor will deliver a talk about the state of informal education and ways to document, visualize and get validations for learning experiences gained outside the schooling system. ",
+                "names": "Tudor Tarlev",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 17:00:00",
+                "scheduled_duration": 20,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "A brief history of Leap Seconds",
+                "published_description": "Our ability to measure time has become so good that we've run into a problem. The Earth isn't very accurate. Which is awkward. Leap Seconds are our current best effort to bridge the widening gap between Atomic Time and the actual rotation of the Earth. But the addition of a leap second causes no-end of headaches for technology systems that often prefer to ignore it. In this talk I'd like to trace the history of Leap Seconds, how we deal with them and the ongoing debate about their future.",
+                "names": "John Dalziel",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 12:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "BrightSign: Gesture Recognition and Talking Gloves",
+                "published_description": "BrightSign is an assistive wearable technology designed to translate custom hand gestures to text and speech by employing advanced machine learning software. It aims to give people who are non-verbal full control over how they communicate. Sign language and speech can be personalised to a chosen voice, accent or language, making BrightSign applicable on a global level. ",
+                "names": "Rehana Al-Soltane & Ed Hill",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 17:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Hacking using SAT and SMT solvers",
+                "published_description": "For both SW and HW hacking, SAT and SMT solvers and their associated toolchains could be used to automate a lot of boring tasks for you, getting you to the next stage of that exploit chain you have been working on, or just helping you make sure there are no exploitable bugs in your soft- or hardware. In this talk I will go into what SAT and SMT solvers are, what kind of solvers are out there and give some practical examples in using them both to find, e.g. crack codes or bugs in systems. In particular, I will showcase some interesting use-cases of SAT solvers for cryptography, SMT solvers for puzzle-solving, and concolic execution (using SMT solvers) for automated bug-finding.\r\n\r\nMate Soos has been developing the CryptoMiniSat SAT solver for over 7 years that has is used in many places both in academia and industry and he helps maintain the SMT solver STP that is widely used in both industry and research. ",
+                "names": "Mate Soos",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 13:40:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Hunting for (un)known particles",
+                "published_description": "The Large Hadron Collider is the latest step in the continuing endeavour of particle physicists to understand our universe. Colliding hydrogen nuclei 40 million times every second the LHC is a powerful microscope looking into the world of the microcosm.  Experiments like ATLAS are detecting the products of these collisions. The large amount of data generated by these detectors are analysed by an international collaboration of physicists and have led already to important insights.\r\nWhere are we going next after the Nobel Prize winning discovery of the Higgs Boson?\r\nI will talk about current particle physics research, the ongoing hunt for Dark Matter and some of the technical challenges phased by experiments operating at this amazing machine.\r\n\r\n",
+                "names": "Andreas Korn",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 15:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "101 Hacks for Late Soviet Water Towers",
+                "published_description": "When I learned the news that I had somewhat accidentally become the owner of a Decommissioned, 12 Storey High, Late Soviet Era, Water Tower in Latvia: naturally my first question was 'Could I use it to prop up a Buran?' (The USSR's equivalent of the US Space Shuttle)...  and If I'd have asked that question to Woking District council, then I'm guessing the answer would be a list of regulations that would contravene - but in Latvia, the answer was 'Yes, it is your tower so you can do what you like with it...'\r\n\r\nAnd so I had a challenge to work out what could and should be done with the tower and in very British tradition a list of 101 Hacks for a Water Tower was started, which was very rapidly joined by a sister list of 101 Ways to Kill Yourself on Water Tower.\r\n\r\nIn this talk I share some of the journey of exploration into the wonderful world of Water Towers, Soviet Engineering, the Baltics, and a bit of family history. This takes us from the British Water Tower Appreciation Society to Siberia and the SS, whilst taking part in a documentary, getting involved in an Olympic bid, making music, setting up an amateur radio station, breaking records (and a drone) on the tower on the way and much more.\r\n\r\nThe talk is generally light hearted, with a balance of education and amusement. ",
+                "names": "Ben Fitzgerald",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 13:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "An Introduction to Software-Defined Radio (SDR)",
+                "published_description": "This talk will provide an introduction to software-defined radio and start by asking why we need SDR, before proceeding to taking take a look at the key components. The open hardware LimeSDR platform \u2014 which is being used to provide a GSM network at EMF Camp \u2014 will be covered in some detail as we explore its high level architecture. \r\n\r\nDetails of example applications will be provided and there will be short demonstrations of transmitting an LTE signal, and DVB-S transmit and receive.",
+                "names": "Dr Danny Webster ",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 16:10:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Life after Robot Wars",
+                "published_description": "We spent thousands of pounds and hundreds of hours building the most awesome 110kg combat robot ever to be dreamt up and then the BBC goes and cancels Robot Wars. Here's the story how Deadlock was thought up, designed and made by 3 people in a garage as well as what our plans are now.",
+                "names": "Robert Karpinski",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 10:00:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "AI Safety",
+                "published_description": "Everyone's familiar with the science fiction scenarios of \"AI gone wrong\", but what's the reality of the situation? This talk introduces AI Safety, a field of research which analyses the actual problems we're likely to face with powerful AI systems, and tries to find technical solutions to them, so we can ensure that artificial general intelligence is safe and beneficial for humanity.",
+                "names": "Rob Miles",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 14:50:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Poetoid Lyricam: A Camera That Takes Poems",
+                "published_description": "Poetoid Lyricam is a Raspberry Pi, camera, thermal printer and batteries housed in the body of a 1970s Polaroid camera. The pictures it takes are fed to a neural net which generates captions, these are then mangled and reformatted to resemble a poem, which emerges from the printer on the back.\r\n\r\nThis talk will cover how it works and why it exists. With a look at my past and present experiences with text generation, Twitter bots, AI, and possibly going back as far as Dadaism and the cut-up technique. There will likely be a demonstration, and poetry readings.",
+                "names": "Barney Livingston",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 18:50:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "The Truth, Post-Truth & Nothing Like The Truth",
+                "published_description": "How does social media mess with our relationship to reality?\r\nWhat the hell happened to the truth?\r\nCan you manufacture authenticity?\r\nShould I be scared of the bots?\r\nCan we believe our eyes any more?\r\nWill Twitter destroy the world?\r\n\r\nArtist Eric Drass (aka shardcore) may or may not answer these questions.",
+                "names": "Eric Drass aka shardcore",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 19:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Bricolage: a makers podcast LIVE",
+                "published_description": "An episode of the Bricolage Podcast, interviewing interesting people LIVE on stage.\r\n\r\nhttps://www.bricolage.run",
+                "names": "Dominic Morrow",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 14:40:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Animatronics and robots in the movies with Matt Denton",
+                "published_description": "The talk will follow Matt\u2019s progress through his career designing, developing and deploying animatronic control systems from the mid 1990's to present day, with the goal to make animatronic performances more lifelike and simpler for the puppeteer.\r\n\r\nIncluding creations from films such as: Lost In Space, Harry Potter, The Worlds End and the latest Star Wars episodes including The Force Awakens, Rogue One, The Last Jedi and Solo.\r\n\r\nPossible Q&A to follow??",
+                "names": "Matt Denton",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 18:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "SHA2017 - Behind the scenes of a hacker conference",
+                "published_description": "Everyone has visited a hacker conference, but not many have seen it through the eyes of an organizer. As someone who has worked hard behind the scenes to make SHA2017 one of the more awesome events, I am giving you a firsthand experience on the good, the bad and the ugly of event organisation.",
+                "names": "Julius ter Pelkwijk",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 16:50:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "ArduTouch music synthesizer -- music generation for newbies",
+                "published_description": "ArduTouch makes way cool sound, music, and noise!  It is an open hardware, Arduino-compatible musical instrument with a touch keyboard, amp, and speaker.  It is easy to build -- designed for total beginners to learn to solder together.  It provides a very low cost, yet powerful, method for making music/sound/noise, and a fun way to learn Digital Signal Processing (DSP) for generating music/sound/noise. This talk will show beginners how the ArduTouch music synthesizer kit makes use of DSP to create its large diversity of music/sound/noise. Mitch will also explain how the touch keyboard works, as well as the cheap amplifier/speaker built into the board. The ArduTouch Arduino library works on any Arduino board and Mitch will demonstrate how to make use of this library to create your own unique synthesizers -- both by hacking some of the many examples it comes with, and by making use of its high-level functions. This talk will also include a demo of some of the music the ArduTouch can make, as well as some wonderful nasty noise!\r\n\r\nA workshop for soldering together ArduTouch music synthesizer kits will be held before the talk on Sunday at 1pm at the Hardware Hacking Area (Camp: G).",
+                "names": "Mitch Altman",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 16:10:00",
+                "scheduled_duration": 60,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "WaveNet, what's behind Google's voice",
+                "published_description": "As a member of the team who brought WaveNet into production, I would like to give an insight into the technical challenges and the technology which powers Google's voice, and how this type of algorithms could be used to solve other interesting problems.\r\n\r\nWaveNet is a machine learning algorithm developed at (Google) DeepMind which was the first to obtain human-like quality of voice directly modeling waveforms. You can read more about it here: \r\n\r\nhttps://deepmind.com/blog/wavenet-generative-model-raw-audio/ \r\nhttps://en.wikipedia.org/wiki/WaveNet\r\n\r\nSince the original paper was published, there has been several developments to substantially speed up audio generation (several order of magnitude) in order to put it into production, and it is now powering Google's assistant voice in several languages. See also: \r\n\r\nhttps://deepmind.com/blog/wavenet-launches-google-assistant/ \r\nhttps://deepmind.com/blog/high-fidelity-speech-synthesis-wavenet/ \r\nhttps://arxiv.org/abs/1802.08435\r\n\r\nNote that the technology is not limited to audio and can pretty much work with any signal, but this is so new that we're just scratching the surface of the potential applications.\r\n\r\nIn my talk I will be talking about the basic tech, what it took to get it into production and the more recent developments. I would also like to give a few suggestions and hints on how to reproduce these results: the latest version (WaveRNN) is rather simple to implement and yet very powerful.",
+                "names": "Norman Casagrande",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 18:50:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Out daemons, out! Exploring depression through sweary automata.",
+                "published_description": "A while ago, I started building a robot that would find the developer who'd broken the build and call them a cock. Because of depression, I never finished it, and the robot came out weird anyway. More recently I started on a cuckoo clock that calls you a pillock, among other things. This talk will be an attempt to explore why I keep building abusive machines. There will also be live demonstrations and fulmination about ESP8266 hardware.",
+                "names": "J. Hawkes-Reed",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 18:50:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Things That Go Bump On The Net",
+                "published_description": "A brief history of folklore and technology.\r\n\r\nAt EMF2016, I talked about numbers stations - mysterious, Cold War shortwave radio stations. After doing that talk, I realised that the thing that I find most interesting about the numbers stations is how they became an urban myth, a living legend of the networked age.\r\n\r\nFor EMF2018, I'll examine the intersections of technology and folklore. I'll have a look at examples of our old folklore and superstitions following us into the spaces created by new technologies, and I'll also be looking at new folk tales that arise from our technologies, from World War II gremlins to Slenderman and the new cults of AI and Big Data.",
+                "names": "Henry Cooke",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 17:50:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Richard Feynman: Dick.",
+                "published_description": "Nobel-prize winning Professor Richard Feynman is known not only for his dramatic contributions to theoretical physics, his teaching of physics and his testimony on the Challenger disaster, but also for his unconventional life. Noted for picking locks, questioning authority, and unapologetic playing of bongos, the physics superstar also dabbled in life drawing and testified to the acceptability of sexwork in the community. \r\n\r\nIn this talk, I'll mix comedy, physics and biographical details to explain why Feynman is famous (in a way suitable for people who haven't studied physics past school)  and also why we should beware of buying into his personality cult. ",
+                "names": "Scary Boots",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 18:50:00",
+                "scheduled_duration": 20,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Maths and Video Games",
+                "published_description": "In this talk, I will talk about some interesting applications of maths to video games, including how the find the shortest possible route to complete Pac-Man and the 3- and 4-dimensional shapes that 2D video game characters spend their time on.",
+                "names": "Matthew Scroggs",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 17:10:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "How to Use Digital Tools to Make Clothes and Shoes",
+                "published_description": "High Street clothing brands are developing digital machines to replace mass production with mass customisation. They aim to give customers more choice, but still as consumers rather than makers. We will explore how makerspaces could adapt these tools for DIY clothes making and show some of the tools that are accessible now.\r\n\r\nUsing new technologies, you no longer need to be a specialist to design clothes and shoes that fit perfectly. We will bring examples, including 3D printed sandals, a shoe last and insole, laser cut fabric and 3D printed accessories.\r\n\r\nWe will also highlight textile related developments in makerspaces including the raspberry pi 3D body scanner scanner we helped design at BuildBrighton, and hope to inspire more people to get involved in shaping new DIY technology.\r\n\r\n",
+                "names": "Poppy and Jan Mosbacher",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 14:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Full communism and free pickles - life lessons from Ursula K Le Guin",
+                "published_description": "This year we lost Ursula K Le Guin, a writer whose work began to shape my worldview when I first read her Earthsea books as a child. Here I attempt to pay tribute to the many ways Le Guin's work continued to change my life and discuss with examples how her writing has challenged and informed me as a reader, writer, scholar and activist, how she used the tools of science fiction and fantasy to great effect to inspire us to look at and describe the very real societies in which we live and where you might want to start if you are new to her work. There may be free pickles and almost certainly there will be spoilers (I would advise attendees to read Those Who Walk Away From Omelas as preparation: http://www.mccc.edu/pdf/eng102/Week%209/Text_LeGuin%20Ursula_Ones%20Who%20Walk%20Away%20From%20Omelas.pdf).",
+                "names": "Jane Charlesworth",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 18:10:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Who watches the watchers in Web PKI?",
+                "published_description": "Since the dawn of time (well, Web PKI) certificates have been used to ensure that internet users are actually talking to the websites they think they are.  Since civilisation began (well, the mid-90s) Certificate Authorities have been trusted to Do The Right Thing\u2122 when issuing these certificates, and watch out for baddies trying to get their hands on certificates for domains they don\u2019t own.  But what if a CA makes issuance mistakes?  What if a CA is hacked?  What if a CA is run by the baddies themselves?!  Who watches the watchers?\r\n\r\nEnter Certificate Transparency.\r\n\r\nCertificate Transparency is the latest internet security superhero.  Power: detecting certificate misissuance and certificate authority misbehaviour (oooh yeah).\r\n\r\nBut seriously, capes and undies-over-skin-tight-lycra aside, what exactly is Certificate Transparency?  How does it work?  Why should you care?  Is it even helping?  Come along to this talk and find out!",
+                "names": "Kat Joyce",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 15:40:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Computational Creativity",
+                "published_description": "Machine learning is now ubiquitous in modern society. It's often used to solve problems such as spam email detection, natural language translation, to find images matching certain search criteria, or to make music recommendations. This talk will turn the problem around and examine the extent to which neural networks can emulate human creativity. We'll start by thinking about what it means for an algorithmic system to be creative. Then through examples we'll look at how techniques in machine learning can be used to compose original music and generate art. During the talk, we'll see how changing the algorithms and modifying the inputs to the neural networks affect the music and art created. We'll conclude by discussing future directions in the field of computational creativity, and thinking about whether computers will ever be able to match human levels of performance in this area.",
+                "names": "Matthew Ireland",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 19:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "The use and abuse of CT scanners",
+                "published_description": "When you share an office with a CT scanner you start to look at the world differently, it's like having X-Ray vision (because it is X-ray vision really); you know you can look inside just about anything you like (as long as it is dead and will fit in a Pringles can.)\r\n\r\nOver the last 10 years or so I've been developing different types of CT scanner and finding uses for them that are not just the usual day-to-day teeth & bone scanning that is expected of them.\r\n\r\nFrom watching teeth dissolve in real time in fizzy drinks, determining if there is a maggot in my lunchtime apple, and discovering inaccessible text in a 14th century parchment roll, to recovering a lost episode of Morecambe and Wise and X-Raying my lunch. These are just some of the uses and, arguably abuses, of the equipment I get to play with.",
+                "names": "David Mills",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 13:20:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Codes of Ethics for tech: the hip old thing",
+                "published_description": "Codes of Ethics are back in fashion - mostly driven by AI and other scary technology. What's in a code of ethics, and why should you care about it? Go behind the scenes with an ethicist and co-author of the Association of Computing Machinery's (ACM) new code of ethics that affects hundreds of thousands of computing professionals and get some answers to the following: What is a Code of Ethics? Why bother updating the old code, or having one at all? What's the code asking me to do, and why? How can I practically use the code? How did you decide whether something is good or bad, or whether something should be included in the code? What if my boss thinks codes of ethics are for losers? What if I work in the military/security/etc. domain? How is this code different from all the other codes out there? What happens if I break the Code of Ethics?\r\n\r\nBonus, time permitting (or talk to the speaker afterwards): Feel free to bring along an ethical dilemma and see how you might interpret it according to the new Code!",
+                "names": "Catherine Flick",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 18:50:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Everything you never wanted to know about smart lightbulbs",
+                "published_description": "Smart connected lightbulbs are common, cheap, and come in a bewildering array of styles and functionality. Bulbs that change colour? Certainly. Bulbs that have a built in speaker? Yes. Bulbs that connect to a command and control network in a foreign state and potentially leak network security information? Of course.\r\n\r\nCome and learn what's actually inside one of these bulbs, what it does, whether it's trustworthy, alternatives that are potentially good actually. Leave depressed about the state of the world.",
+                "names": "Matthew Garrett",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 18:50:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Sunny with a Mild Chance of Catastrophe",
+                "published_description": "The impact of major space weather events are currently being discussed at the highest level of governments and is an active area of research. The potential damage of a solar superstorm to our national economy, communications network and electricity grid is a real threat and must be taken seriously. Such storms can cause the loss of GPS (with many more consequences than just not being able to find the way to EMF Camp), alter the orbits of satellites and could cripple the electricity grids around the world. \r\n\r\nCome along to join Dr. Sean Elvidge from the University of Birmingham to explore the causes of space weather, the potential repercussions (and likelihood) of a superstorm and an explanation of the work that is currently being undertaken to understand and mitigate these risks.",
+                "names": "Sean Elvidge",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 15:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "The Story of Elmer McCurdy",
+                "published_description": "In 1976, in an amusement park in Southern California, the crew of The Six Million Dollar Man were setting up a scene in a fun house.  They moved a waxwork dummy, accidentally broke off its arm, and discovered that rather than being made of wax, it was made of a real dead guy.\r\n\r\nWith a bit of investigation, the coroner discovered it was Elmer McCurdy, a failed bank robber who died in 1911.  Between his death and his discovery, he visited sideshows, hung out at Niagra Falls, rode on rollerskates, became a drug addict, and inspired the look of Skeletor from the He-Man cartoons and toys.\r\n\r\nWe'll get into Elmer's actual life, his adventures after his death, and where he's residing now.  FUN TIMES HAD BY ALL",
+                "names": "Kate Bolin",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 19:00:00",
+                "scheduled_duration": 20,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Car Hacking - Back to the future 1970\u2019s style Part II",
+                "published_description": "Sequel for the EMF\u201916 talk on hacking modern automotive tech into a 1974 Ford Escort Mk1.\r\nAn updated journey on; connecting the car to the cloud using AWS for GPS tracking and remote engine start, 3D printing prototype engine parts and reverse engineering CAN signals to test a home-brew digital cluster built using a Raspberry Pi running a custom Linux image.",
+                "names": "Dan Smith & Laura Hyatt",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 15:10:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Why automated number plate recognition systems suck",
+                "published_description": "Earlier in the year i was confronted with an ANPR system at the garage at my house so i started playing with it. \r\n\r\nThe talk covers methods legal in the Netherlands where the PoC was made. I focus on the technology, on the implementation as Parking Garage access control.\r\n\r\nThe topic does cover areas of speed control and other forms of law enforcement. I have not attacked those but assume that the attack would also work there. I even suspect that truck drivers have found the same and do the attack on a large scale. ",
+                "names": "mc.fly",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 14:00:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "The TIM Project: Building a relay computer from scrap",
+                "published_description": "As with many young people interested in computing, I could never work out how a computer could turn 1's and 0's flowing through logic gates into what you see before you. You learn that this magic box can be programmed to do all sorts of amazing things, but are never really given the details as to how it does it. I wanted to know more, and after some research I started making logic gates with the one bit of electronics I knew how to use: Electric relays. I scrounged parts from cars, microwaves, scrap change machines, etc and put them together into increasingly complex contraptions. Two years later, I had TIM 8: a fully programmable 8 bit relay computer. This is the story of how TIM 8 came about, what I learnt along the way, and how relay computers are a fantastic way to demonstrate how a computer really works.\r\n\r\nFor the talk I would bring a presentation and TIM 8 (the size of a small suitcase).",
+                "names": "Rory Mangles",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 13:00:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Iain Softley in conversation with Jake Davis",
+                "published_description": "Immediately after the screening of Hackers, we are honoured to be joined by Hackers director Iain Softley in conversation with Jake Davis (AKA Topiary), sharing stories and answering your questions.",
+                "names": "Jake Davis & Iain Softley",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 22:20:00",
+                "scheduled_duration": 40,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Antiparticles and Geiger counters",
+                "published_description": "Geiger counters are interesting and surprisingly useful devices, and you can build one for less than the price of a video game. They can monitor background radiation levels, check household items such as smoke alarms and gas mantles, and provide information about medical treatments. I designed and built my own unit having been diagnosed with cancer in 2017, and it has provided some fascinating insights.\r\n\r\nThis talk describes the design and construction of a simple Geiger counter with an OLED display and a recording facility, and illustrates some of the science behind medical procedures involving radiation, such as PET scans (Positron Emission Tomography) and radiotherapy.",
+                "names": "Chris Taylor",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 10:00:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Hello World: How to be Human in the Age of the Machine",
+                "published_description": "Hannah Fry will explain the inner workings of algorithms: their power, their limitations, and whether they really are an improvement on the humans they replace. With algorithms making important decisions in healthcare, transport, finance, security, even what we watch, how much should we rely on them? What kind of future do we want?\r\n\r\nYou are accused of a crime. Who would you rather determine your fate \u2013 a human or an algorithm? An algorithm is more consistent and less prone to error of judgement. Yet a human can look you in the eye before passing sentence.\r\n\r\nYou need a liver transplant to save your life. Who would you want in charge of organ allocation? An algorithm can match organ donors with patients, potentially saving many more lives. But it may send you to the back of the queue.\r\n\r\nYou\u2019re buying a (driverless) car. One vehicle is programmed to save as many lives as possible in a collision. Another promises to prioritize the lives of its passengers. Which do you choose?",
+                "names": "Hannah Fry",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 19:10:00",
+                "scheduled_duration": 50,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Attacking Websites for Educational Purposes Only",
+                "published_description": "Information security is a big deal nowadays as more and more people start to take their privacy online very seriously. But what's the point of protecting yourself if the web services you use are vulnerable to big scary hackers?\r\n\r\nIf you want to catch a glimpse of penetration testing, come along and learn about concepts such as discovering vulnerabilities, running through them, exploiting and patching them.\r\n\r\nThis talk will be based around a University coursework project, where an older version of web forum software \"phpBB\" is examined, exploited and patched. The technologies that phpBB was built on were quite simple, so the main focus of the talk will be the process of penetration testing.\r\n\r\nSome of the topics covered will include sanitising user input, as well as enforcing file and variable scopes. You will familiarise yourself with concepts such as never trusting user input and get to see exploits such as cross-site scripting and remote code execution.\r\n\r\nLastly, we will wrap up by patching out these vulnerabilities and hopefully learn a thing or two about building more secure software.",
+                "names": "Andrejus Kostarevas",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 10:00:00",
+                "scheduled_duration": 20,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Boiling Nemo - Make your own Internet of Things",
+                "published_description": "In recent history, fish have been relatively untroubled by the Internet of Things, but it was time for that to change. Armed only with a soldering iron, a Raspberry Pi, some JavaScript and ideas above my station, I set about connecting my aquarium to the Internet. Soon, armed with delusions of grandeur, things inevitably spiralled about of control and now my garage door has an API.\r\n\r\nThis talk is equal parts tutorial, inspiration and lunacy as I take the audience through my projects and hopefully dispel some of the mystery of IoT devices, showing how it can be easy to learn and a lot of fun to build.\r\n\r\nHighlights include a Scottish toilet emergency, an aquarium featuring military-grade security and an extinction-level event in the suburbs of Milton Keynes.\r\n",
+                "names": "PJ Evans",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 14:10:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Developing Games for the Casino/Gaming Industry",
+                "published_description": "Some of you may have seen them in a pub, betting shop or even a casino. What I'm referring to are video slot machines, and they are the most popular item at any one of these places as well as the gaming expos where players can put money in and spin the reels in the hopes of getting a combination that will get the big rewards.\r\n\r\nBut how easy is it to develop games for these machines? What goes into making a video slot game for a dedicated machine? Are there any differences between each country in how these operate? And are these games made to take all your money?",
+                "names": "Tim Stoddard",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 15:10:00",
+                "scheduled_duration": 20,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Adventures in retrocomputing",
+                "published_description": "The 20-year mission to make an old game run properly on a new computer, with many side quests along the way. Woven together are threads of reverse-engineering (of both hardware and software), 1980s computers (in particular the original IBM PC from 1981), emulator coding, game design, electronics, microcontrollers, web services, the demoscene, test-driven development and even a bit of pure mathematics.",
+                "names": "Andrew Jenner",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 19:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Tweet My Wedding Dress",
+                "published_description": "After attending the last EMF camp, I fell in love with the tweetable LED inflatable bunny. I wondered if it would be possible to take the idea of LEDs controlled by twitter and put them all over something wearable, in this case my wedding dress.\r\n\r\nMy talk will go over the tech I used (suitable for absolute beginners), the mistakes that I made and the lessons I learnt along the way. From learning to use the twitter API, writing my own API, coding for an arduino and wiring the whole thing up to the worst bit, THE SEWING. I aim to spread the message that it is ok to f**k up, that everyone does it and that if you keep trying and keep asking for help, you can make silly things too. ",
+                "names": "jo franchetti",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 15:00:00",
+                "scheduled_duration": 20,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Bootstrapping a hackerspace",
+                "published_description": "What are the tools to effectively manage a hackerspace? In this talk I\u2019ll walk you through the infrastructure and services that we chose to set up at our lab, as well as the rationale behind the choice. We\u2019ll explore how can people communicate better with the right tools, and what is needed to maximize collaboration potential.\r\n\r\nThe talk starts with what is in our experience needed to communicate effectively in a medium sized group (50-100 people), and then illustrates the tools and open source software that can be used to achieve that. There will be details on how to set up Discourse, Gitlab, Dokuwiki with central authentication via SAML and how FreeIPA can be used to manage hackerspace members\u2019 access to both external (public) services and internal (wifi and computer login).",
+                "names": "g5pw",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 18:10:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Why does \ud83c\udf55 mean \"I love you\" : The ways that we use and misuse emoji",
+                "published_description": "There are a number of emoji that, when used in digital communications, don't always refer to their original meaning. The peach emoji, for example, has been found through research conducted by emojipedia to refer most often not to the fruit, but to buttocks. Other fruit and vegetables emoji have suffered a similar fate.\r\n\r\nIn this talk I will explore the ways that emoji are frequently misunderstood or misused - referring to some of the leading research conducted by academics in the area. I will conclude with peer reviewed research that I have conducted looking at the ways we assign new meaning to emoji when communicating with a single other person. Why do we do this and how do we choose the emoji we use. Why is it that despite there being a heart emoji available, some of us choose to use \ud83c\udf55 to say \"I love you\"?\r\n\r\nThe set is presented in a stand up comedy-style and despite discussing academic research is very accessible to any range of audience. Although parental guidance may be advised.",
+                "names": "Sarah Wiseman",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 14:40:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "The secret powers of podcasting",
+                "published_description": "Podcasting has been a quiet revolution. Most people didn't get it at first and some are still surprised it's not going away. But podcasting has not only survived three global hype cycles it's also one of the most resilient and unique media forms on the Internet. So far, Podcasting has successfully resisted being sucked up by a single YouTube-style platform that looks helpful in the beginning but would set the rules of its community in the future.\r\n\r\nInstead Podcasting is very much alive and has proven to be able to create new and serve to existing communities, communicate effectively to its audience and establish a following other media types haven't seen yet. Podcasts are sexy and you really want to know why.\r\n\r\nThis talk will explain in detail why podcasts matter, what makes podcasts magical when combined with community, why almost everybody should consider starting a podcast, which infrastructure on the net is actually useful, what kind of hardware is actually needed and what open source and free-ish tools exist to publish high quality audio content on the web today.",
+                "names": "Tim Pritlove",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 11:20:00",
+                "scheduled_duration": 50,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "The Future of Invention",
+                "published_description": "Advances in NLP and machine learning are allowing automatic processing of knowledge. An untapped potential of this revolution is the augmentation and possible automation of the invention process. \r\n\r\nEveryone has a perception of an inventor as a crazy guy in a shed who is somehow, suddenly inspired. I would like to challenge this view by exploring the process of famous historical inventors to present day inventors and disruptors to give an understanding of how novel ideas come about, before moving onto what invention might look like in the future.\r\n\r\nIn particular, I would like to share a vision of AI augmented inventors and what this will mean for the democratisation of invention, drawing on my experience as a modern inventor with example patents and progress that has been made so far using new approaches.  \r\n",
+                "names": "Chris Wright",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 16:00:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Adventures in somatosensory music, body hacking & beyond",
+                "published_description": "A talk on my recent works involving the physical sensation of sound, and how we can trick the senses to create the perception of a \"loud\" environment for one person at a time. Let's create music equipment that is accessible for a DJ who is profoundly deaf. Let's create VR experiences that let us feel the vibrations of the virtual world around us. Join me down a polymathic rabbit-hole where we can explore the worlds of augmented sonic reality, haptics, biofeedback & electrical nerve stimulation to understand why everyone is all about that bass.",
+                "names": "Chemical Adam",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 13:00:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "How to dispose of a body: a dead interesting talk",
+                "published_description": "Most people know that you can have your ashes launched into space, or made into a diamond once you\u2019ve been cremated, but being cremated is far from your only option. From alkaline hydrolysis to freeze-drying, there are many (legal) ways to dispose of a body. Whether you want to nourish fungi, roses, a coral reef or the minds of trainee doctors, your remains could make the world a better place. Why be scattered, when you can leave behind something way more interesting?\r\n\r\nThis session will look at what actually happens in a crematorium and a burial (both traditional and green) as well as some of the more unusual alternatives that are now available to dispose of a body and the controversies that surround them.\r\n\r\nPlease note: if you just can\u2019t live with your spouse any more, or you have a life-long vendetta against someone, this session won\u2019t help you get that sorted out. Seek counselling. Buy a pet. Get out more. But don\u2019t kill them.\r\n",
+                "names": "Sophie Lovejoy",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 15:20:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Open-Source Modular Tech Jewelry",
+                "published_description": "I've designed a series of PCB modules that can be wired in series to form wearable circuits: necklaces, bracelets, or even epaulets and other accessories.\r\nEach small PCB has solderable pads for large SMD or through-hole components \u2013 including LEDs, resistors, coin battery holders, and so forth.\r\nEach holds one component, except for a few which are decorative (such as LED diffusers), and I plan to expand with more.\r\nThe PCBs also include strain-relief features; they are connected with wires to form \"ropes\" of circuitry, supported by a braided hemp sheath.\r\n\r\nThe project expands on a current trend in approachable tech: enabling people to build circuits with crafts such as stickers (Chibitronics), painting (Bare Conductive), and Lego (Crazy Circuits / Leguino). I want to do the same with jewelry-making.\r\n\r\nI'll have some prototypes and demos, and I'd like to talk about how to use them, how they help me visualize the flow of electricity, and how to contribute. I'll also bring a few kits to give out! ",
+                "names": "merlin",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 13:10:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "5 things we can all learn from Flaming Pianos ",
+                "published_description": "Along with my friend Sawn, I run a Youtube channel where we build kids' invention ideas. From jam firing rockets to flaming pianos, from the last year and a half we have brought to life a different kids' invention ever month. We never know what we are building or what might go wrong until the last minute, so we've learnt to embrace failure, not take ourselves too seriously and cause havoc in public places. I talk about the five things I\u2019ve learnt from this that I think all us makers should remember.",
+                "names": "Ruth Amos",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 16:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Why The World Needs A Vagina Museum",
+                "published_description": "There is a penis museum, but no vagina equivalent. There's only one way to change that: Make one. Join the Vagina Museum as they talk about why we need one, their experiences researching vaginas, vulvas and all parts related, what would go in a museum about the gynaecological anatomy and the wonderful and strange reactions encountered whilst making the world's first physical vagina museum.\r\n\r\nThe museum will have four permanent galleries: science, culture, society and history. The science section will cover topics from the anatomy to health, menstruation to menopause, contraception to consent, sexuality to gender identity. The culture collection will showcase the anatomy in the arts and their contribution to the discourse about our genitals, for example The Great Wall of Vagina or The Handmaid\u2019s Tale. The society gallery will explore genitals\u2019 place in society, e.g. religious rites surrounding menstruation, the practises of FGM, of which over 200 million people are living today suffering from, sexual violence and how these cases are dealt with in court. The history gallery will contain objects relating to the history of gynaecological medicine, contraception, menstrual products and sex work.",
+                "names": "Florence Schechter",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 17:20:00",
+                "scheduled_duration": 40,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Urban Beekeeping: How to get started",
+                "published_description": "A talk on helping new beekeepers start up in urban environments.\r\n\r\nThe talk will include location selection, equipment choice, purchasing bees, an introduction to local and national associations, the legality of keeping bees, the difference between urban and rural beekeeping, the costs associated with the hobby and a walkthrough of the first year and what to expect.\r\n\r\n",
+                "names": "Henry Sands",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 12:40:00",
+                "scheduled_duration": 40,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Designing Custom Chips and Sensors and Lab-in-a-Pill Technology",
+                "published_description": "Ever wondered how the chips in your electronic devices are designed and fabricated? This talk looks at chip fabrication technologies, the process of designing, vaildating and testing analog, digital and mixed-signal chips. Several chip design projects the speaker has worked on, including prototype miniaturised capsules for fluorescence and ultrasound imaging within the human intestine, are also covered.\r\n",
+                "names": "Dr. James Beeley",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 15:20:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "How to make a humanoid using a 3D printer, wheelchair, and ROS!",
+                "published_description": "During my PhD, I spent my free time building an InMoov, which is a life-size 3D printed humanoid robot. I tweaked the original designs a bit to make it run on the Robot Operating System (ROS) and added a powered wheelchair base to give it mobility. Kermit, as it was named by the first human who saw it, now lives in fizzPOP in Birmingham and aspires to be the world's first 3D printed robot butler*.\r\n\r\nIn this talk, I'll present the story and future plans for Kermit as a how to guide to printing the robot's mechanisms, choosing actuators, and adapting a powered wheeled base to give the robot mobility. I will also talk about using ROS to operate the robot, enable it to perceive the environment and navigate autonomously, and execute useful tasks.",
+                "names": "Muhammad Sayed",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 18:50:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Lightning Talks Saturday",
+                "published_description": "Quick <10min talks, on anything, from anybody who would like to get on the stage!\r\n\r\nIf you'd like to give a lightning talk, please email lightning@emfcamp.org, or try your luck and show up to a session.",
+                "names": "Lightning Talks",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 11:50:00",
+                "scheduled_duration": 60,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Don't Feed Them After Midnight: Reverse-Engineering the Furby Connect",
+                "published_description": "Furby is a cute little guy, but what exactly is going on beneath that lurid neon fluff? In this talk, we'll take you on a deep dive into IoT reverse engineering, walking you through the story of our work on the Furby Connect, and offering up a set of broadly-applicable reversing tips and approaches that you can try out against your favourite toy or embedded device. We'll also demonstrate live how you can use your smartphone to hijack the update mechanism of your Furby (or your friend's!) and take control of its audio and video playback at range.\r\n\r\n",
+                "names": "Ed Locard",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 10:30:00",
+                "scheduled_duration": 40,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "A cheap, remotely posable presence robot using a Raspberry Pi, webRTC and a few servos",
+                "published_description": "This talk is about an Open Source robot version of me that I use instead of commuting. It uses web technologies and cheap, off the shelf hardware to give good quality audio and video, and also allows me to move around a bit. It's particularly good for small meetings where manifesting in a laptop or phone doesn't give me enough physical presence to participate fully. \r\n\r\nI'll run through the technologies involved, the advantages and pitfalls of using one, and some of the 10 experiments and mistakes that have culminated in its current format: an Ikea lamp. I'll also do a demo!",
+                "names": "Libby Miller",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 13:00:00",
+                "scheduled_duration": 20,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Closing Ceremony",
+                "published_description": "Closing Ceremony",
+                "names": "Jonty Wareing",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 20:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Deploying a LoRaWAN network",
+                "published_description": "LoRaWAN is a long-range and low-power communication system used to connect physical devices to servers. It is a set of physical and logical protocols used to connect ultra low bandwidth devices across a large area.\r\n\r\nThis talk first gives an overview the technology used, why you would use it, and giving some examples of where it is being used today. It then follows the challenges of rolling out a regional LoRaWAN network.\r\n\r\nThis is an accessible technical talk. It contains technical information of interest to those wanting to work with this technology, but it should be understandable by those who are less technical.\r\n\r\nThe speaker has been connecting hardware to the internet for over two decades and is a member of the team rolling out of a regional LoRaWAN network.",
+                "names": "Alistair MacDonald",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 11:20:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Smart Materials",
+                "published_description": "You\u2019ve heard of smart phones, smart meters, smart watches\u2026 even smart fridges. Well now it\u2019s the turn of smart materials.\r\n\r\nThis is a show about the future of stuff. Within our lifetimes, solid objects will react, sense, change and move according to their surroundings. This won\u2019t be a result of fancy robotics or cunning electronics, but rather the fundamental properties of the materials themselves. Inspired by Leonardo da Vinci\u2019s flying machine, drawn over 500 year ago, smart materials will make our aeroplanes of the future adapting, sensing and morphing, so that they fly like birds or bats. In years to come, we will be living in self-regulating houses, riding self-fixing bicycles, and driving on self-illuminating roads, all thanks to smart materials. These are metals, plastics, fabrics and fluids that react to the outside world without any human involvement, and they promise to change the way we live our lives forever.\r\n\r\nIn this one hour show, an award-winning materials scientist and engineer will be your guide on the smart material safari. There will be demonstrations of the smart materials that exist today, and exploration on how they will make the material world around us smarter tomorrow. Expect to see matter doing things you\u2019ve never seen it do before!\r\n",
+                "names": "Anna Ploszajski",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 13:50:00",
+                "scheduled_duration": 50,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "The Art And Science Of The Motivational Corporate Anthem",
+                "published_description": "Throughout history, music has often been employed as a morale boosting device. From wartime rallying songs to football terraces to \"If you're happy and you know it\", we sing to encourage the troops; to celebrate epic victories; to cheer on our favourite team.\r\n\r\nWhose battles are more epic, whose victories more heroically won than global corporations with enough spare marketing budget to commission their own soundtrack? \r\n\r\nIn this talk I will take my audience through the history of the corporate song, from IBM's rousing classic 1937 songbook \"Songs Of The IBM\" to modern masterpieces such as \"We Built This Starbucks (On Heart And Soul)\" (it's exactly what it sounds like from the title) and \"Symantec Revolution\", hailed by the Observer as \"The worst song in the history of music (with added sinister corporate overtones)\".\r\n\r\nI'll explore a number of different musical styles (or at least, attempts at those styles) and try my best to answer the question, \"Why? Just...why?\"",
+                "names": "Kate Tolley",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 10:00:00",
+                "scheduled_duration": 20,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Cracking HiTag2 Crypto",
+                "published_description": "HiTag2 is an RFID technology operating at 125KHz. It is distinguished from many others in the same field by its use of 2-way communications for authentication and its use of encryption to protect the data transmissions - the majority of RFID technologies at 125KHz feature no authentication or encryption at all. As a result it has been widely used to provide secure building access and has also been used as the technology that implements car immobilisers.\r\n\r\nIn 2012, academic researchers Roel Verdult, Flavio D. Garcia and Josep Balasch published the seminal paper, \u2018Gone in 360 Seconds: Hijacking with Hitag2\u2019 that presented three attacks on the encryption system used in HiTag2. They implemented their attacks on the Proxmark 3 device (an RFID research and hacking tool) and gave several high-profile demonstrations, but didn\u2019t release any of their code or tools. Since then, the forums supporting Proxmark 3 and RFIDler (another RFID hacking tool) have received many requests for implementations of these attacks, but until recently none had been forthcoming. Garcia et al went on to produce a fast correlation attack in the 2016 paper, \u2018Lock It and Still Lose It\u2019.\r\n\r\nIn this talk I will explain how HiTag2 RFID works in detail, including the PRNG and the authentication and encryption protocols, and will present my own implementations of the attacks, written for RFIDler and supported by desktop computers. The first attack uses a nonce replay to misuse the integrity protection of the comms in order to allow access to the readable RFID tag pages without needing to know the key. The second, third and fourth attacks use time/memory trade-off brute force, cryptanalytic attacks and a fast correlation attack to recover the key, such that the contents of the read-protected pages can also be accessed. The attacks are weaponised and permit cloning of tags, which I will demonstrate.",
+                "names": "Kev Sheldrake",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 17:10:00",
+                "scheduled_duration": 50,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Making music in the free and open-source world",
+                "published_description": "Have you ever wondered how to make music without buying into the world of commercial software? Are you a musician who wants to get into multitrack recording? Are you an electronic artist looking to build a digital studio? Or just curious about the tools people use to make music?\r\n\r\nThe free and open-source world contains a rich selection of music software, from synths to sequencers, drum machines to DJ decks, MIDI to mastering. Take a tour of this colourful world as we touch on a number of important musical tools and see and hear how they fit together into your toolbox. Whether you're interested in making a recording studio, creating your own digital sounds, performing live or just understanding a bit more about the creative process, there's something here for you.",
+                "names": "Gavan Fantom",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 14:50:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Adventures in DIY Electronic Instruments",
+                "published_description": "A talk which will appeal to anyone who has an interest in making their own electronic music instruments and noise makers. Starting simply, with creating your own contact mics and spring reverbs, progressing all the way to creating your own midi controllers and fully programmable digital audio effects. The concept is to show you how easy it is to get started (I had no formal electronics background, and just learnt from experimenting) and inspire you to get started making NOISE.\r\n\r\nThe talk will cover my personal journey through DIY instrument building, which I embarked on initially to build a simple item I needed for my live performance, and rapidly spiralled out of control!\r\n\r\nHere are some examples:\r\nhttps://youtu.be/sdTysy3dD84\r\nhttps://youtu.be/gib-URplJxI\r\nhttps://youtu.be/xWpq3soblYY\r\nhttps://youtu.be/5j84GfI8yQM\r\n\r\nAbout the artist:\r\nCutlasses is the solo project of musician and DIY electronic instrument maker, Scott Pitkethly.  \r\n\r\nHe has given a number of of talks on the subject of DIY instrument building, as well as talks on other programming related subjects.  His electronic instruments won the Music Hackspace DIY Instrument award, and have featured on sites such as Hackaday and Create Digital Music. The homemade instruments combine both analogue and digital electronics to manipulate and deconstruct audio.\r\n",
+                "names": "Scott Pitkethly",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 13:40:00",
+                "scheduled_duration": 40,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Burnout and Your Meat Computer",
+                "published_description": "Maybe you've been doing too much for too long. And if you have, there's the very real possibility that this is going to hurt you. Occupational burnout is the too common outcome of extended, seemingly-inescapable stress. In this talk we'll look at the impact of burnout, how to manage your way through it and a potential, unexpected upside. Come along to learn more about burnout, cognitive psychology and all the ways that your brain is (fascinatingly) terrible.",
+                "names": "Jessica Rose",
+                "may_record": true,
+                "scheduled_time": "2018-09-01 12:00:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "How to Climb a Mountain.",
+                "published_description": "Its difficult to say how many mountains in the world have never been climbed - probably thousands. Breaking new ground is always exciting, whether in mountaineering or mathematics. We'll talk about our experiences making several first ascents of unclimbed peaks in the Indian Himalaya and the Kyrgyz Tien Shan, and some of the surprising similarities to our other lives in research and development. We'll cover some of the specifics of pulling off a climbing trip further afield than the Alps, and also talk generally about big projects in unknown territory.",
+                "names": "Andy Vine",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 16:10:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Science Magic...Magic Science",
+                "published_description": "The show that works like magic to spell bind the audience, make them gasp, gape, wonder and laugh. \r\n\r\nFeaturing all demonstrations,  strange and wonderful noises, levitating objects, flash bang and big sparks and the occasional funny smell, all done with some fantastic and rare equipment. You won't believe your eyes. ",
+                "names": "Ian B Dunne",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 14:50:00",
+                "scheduled_duration": 30,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "How To Make a Movie at EMF",
+                "published_description": "Want to make a movie? Alia Sheikh did, putting together a team at Electromagnetic Field in 2014 to create \u2018Tentman\u2019. Tonight, before the premiere of her work, Alia discusses the skills and knowledge she acquired to get started in filmmaking and shares some anecdotes from the Tentman project.",
+                "names": "Alia Sheikh",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 20:20:00",
+                "scheduled_duration": 20,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Opening Ceremony",
+                "published_description": "Opening Ceremony",
+                "names": "Jonty Wareing",
+                "may_record": true,
+                "scheduled_time": "2018-08-31 12:30:00",
+                "scheduled_duration": 20,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "The Knitting Network Printer",
+                "published_description": "I hacked a domestic knitting machine from the 1980s and turned it into a network printer. I'll show you how I did it using a Raspberry Pi, an Arduino compatible board, Python and a PHP/MySQL web interface. I share my source code. I'll also take you through a brief showcase of what I've done with my printer since automating it, including Stargazing: a knitted tapestry on show for the first time here at EMF!",
+                "names": "Sarah Spencer",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 11:10:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "EMF 2018 Infrastructure Review",
+                "published_description": "Members of the EMF infrastructure teams (network, power, video, telephony) will give some insight into how we delivered these services this year. We'll explain particularly some of the new challenges faced at Eastnor, and the new services we've delivered, along with sharing some statistics on how they were used. This year we'll also talk about some of the automation we've developed over the last few events to ease our workload and ensure consistency.",
+                "names": "David Croft, Will Hargrave",
+                "may_record": true,
+                "scheduled_time": "2018-09-02 17:50:00",
+                "scheduled_duration": 50,
+                "venue": "Stage A"
+            }
+        ],
+        "counts": {
+            "needs_help": {
+                "false": 188,
+                "true": 86
+            },
+            "needs_money": {
+                "false": 274
+            },
+            "needs_laptop": {
+                "false": 259,
+                "true": 15
+            },
+            "one_day": {
+                "false": 274
+            },
+            "notice_required": {
+                "> 1 month": 25,
+                "1 month": 101,
+                "1 week": 148
+            },
+            "may_record": {
+                "false": 153,
+                "true": 121
+            },
+            "state": {
+                "accepted": 1,
+                "cancelled": 38,
+                "finished": 119,
+                "rejected": 116
+            },
+            "created_week": {
+                "2018-03-12": 28,
+                "2018-03-19": 7,
+                "2018-03-26": 6,
+                "2018-04-02": 12,
+                "2018-04-09": 27,
+                "2018-04-16": 23,
+                "2018-04-23": 18,
+                "2018-04-30": 8,
+                "2018-05-07": 8,
+                "2018-05-14": 10,
+                "2018-05-21": 13,
+                "2018-05-28": 12,
+                "2018-06-04": 4,
+                "2018-06-11": 4,
+                "2018-06-18": 6,
+                "2018-06-25": 14,
+                "2018-07-02": 10,
+                "2018-07-09": 3,
+                "2018-07-16": 7,
+                "2018-07-23": 18,
+                "2018-07-30": 8,
+                "2018-08-06": 14,
+                "2018-08-13": 5,
+                "2018-08-20": 7,
+                "2018-08-27": 2
+            }
+        },
+        "edits": {
+            "published_title": {
+                "avg": 2.22,
+                "max": 11
+            },
+            "published_description": {
+                "avg": 2.39,
+                "max": 12
+            },
+            "requirements": {
+                "avg": 1.38,
+                "max": 5
+            },
+            "length": {
+                "avg": 1.02,
+                "max": 2
+            },
+            "notice_required": {
+                "avg": 1.03,
+                "max": 2
+            },
+            "needs_help": {
+                "avg": 1.01,
+                "max": 2
+            },
+            "needs_money": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "one_day": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "has_rejected_email": {
+                "avg": 1.42,
+                "max": 2
+            },
+            "published_names": {
+                "avg": 2.60,
+                "max": 11
+            },
+            "arrival_period": {
+                "avg": 2.59,
+                "max": 11
+            },
+            "departure_period": {
+                "avg": 2.58,
+                "max": 11
+            },
+            "telephone_number": {
+                "avg": 2.41,
+                "max": 5
+            },
+            "may_record": {
+                "avg": 2.60,
+                "max": 11
+            },
+            "needs_laptop": {
+                "avg": 2.06,
+                "max": 5
+            },
+            "available_times": {
+                "avg": 2.70,
+                "max": 13
+            },
+            "attendees": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "cost": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "size": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "funds": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "age_range": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "participant_equipment": {
+                "avg": 1.00,
+                "max": 1
+            }
+        }
+    }
+}

@@ -1,0 +1,214 @@
+{
+    "sources": [
+        {
+            "id": 4,
+            "name": "Hardware Hacking Area",
+            "type": "Village",
+            "enabled": true,
+            "url": "https://calendar.google.com/calendar/ical/1r3jiednv8lofllbavpolu8ed4%40group.calendar.google.com/public/basic.ics",
+            "main_venue": "",
+            "priority": 0,
+            "map_obj_id": 23
+        },
+        {
+            "id": 5,
+            "name": "Food Hacking Base Events List",
+            "type": "Village",
+            "enabled": true,
+            "url": "https://calendar.google.com/calendar/ical/b9gv6rh1t6u3mt1nhtf2ct9kqk%40group.calendar.google.com/public/basic.ics",
+            "main_venue": "Food Hacking Base",
+            "priority": 0,
+            "map_obj_id": 90
+        },
+        {
+            "id": 14,
+            "name": "Embassy of Nowhere",
+            "type": "Village",
+            "enabled": true,
+            "url": "https://mail.gaselec.tv/ical/simon@gaselec.tv/Embassy%20of%20Nowhere",
+            "main_venue": "",
+            "priority": 0,
+            "map_obj_id": 112
+        },
+        {
+            "id": 15,
+            "name": "EMF Hams",
+            "type": "Village",
+            "enabled": true,
+            "url": "https://calendar.google.com/calendar/ical/rjpk1big22qlhbdu10n4ru1m9s%40group.calendar.google.com/public/basic.ics",
+            "main_venue": "Amateur Radio Village",
+            "priority": 0,
+            "map_obj_id": 12
+        },
+        {
+            "id": 16,
+            "name": "Board Gamers",
+            "type": "Village",
+            "enabled": true,
+            "url": "https://calendar.google.com/calendar/ical/3abu9ncd5gjp8dsco32pbe6stc%40group.calendar.google.com/public/basic.ics",
+            "main_venue": "Board Gamers Village",
+            "priority": 0,
+            "map_obj_id": 47
+        },
+        {
+            "id": 19,
+            "name": "Sense without sight: a crash course on blind navigation (talk + workshop)",
+            "type": "Village",
+            "enabled": true,
+            "url": "https://calendar.google.com/calendar/ical/0hb3qpkppd7il5v9cn4upqq9rg%40group.calendar.google.com/public/basic.ics",
+            "main_venue": null,
+            "priority": 0,
+            "map_obj_id": 118
+        },
+        {
+            "id": 20,
+            "name": "Maths Village",
+            "type": "Village",
+            "enabled": true,
+            "url": "https://calendar.google.com/calendar/ical/kbp34pdve0rdrr9b7npt1v1deg%40group.calendar.google.com/public/basic.ics",
+            "main_venue": null,
+            "priority": 0,
+            "map_obj_id": 11
+        },
+        {
+            "id": 22,
+            "name": "Puzzlehunt: Dreamcatcher",
+            "type": "Village",
+            "enabled": true,
+            "url": "https://calendar.google.com/calendar/ical/dreamcatcher.puzzle%40gmail.com/public/basic.ics",
+            "main_venue": null,
+            "priority": 0,
+            "map_obj_id": 69
+        },
+        {
+            "id": 24,
+            "name": "Holistic Howler Workshops",
+            "type": "Village",
+            "enabled": true,
+            "url": "https://msilas.net/howling-workshops.ics",
+            "main_venue": null,
+            "priority": 0,
+            "map_obj_id": 62
+        },
+        {
+            "id": 27,
+            "name": "Pewter casting workshop",
+            "type": "Village",
+            "enabled": true,
+            "url": "https://calendar.google.com/calendar/ical/yorkshireandfriends%40gmail.com/public/basic.ics",
+            "main_venue": null,
+            "priority": 0,
+            "map_obj_id": 71
+        },
+        {
+            "id": 28,
+            "name": "Owl City",
+            "type": "Village",
+            "enabled": true,
+            "url": "https://calendar.google.com/calendar/ical/mi1pucnqhpmlt2flo2t4ji50g4%40group.calendar.google.com/public/basic.ics",
+            "main_venue": null,
+            "priority": 0,
+            "map_obj_id": 37
+        },
+        {
+            "id": 31,
+            "name": "Null Sector DJs",
+            "type": "Village",
+            "enabled": true,
+            "url": "https://calendar.google.com/calendar/ical/2689eni9javb2c1smbcq5jr7io%40group.calendar.google.com/public/basic.ics",
+            "main_venue": null,
+            "priority": 0,
+            "map_obj_id": 123
+        },
+        {
+            "id": 34,
+            "name": "C Y B A R - N U L L S E C T O R",
+            "type": "Village",
+            "enabled": true,
+            "url": "https://calendar.google.com/calendar/ical/0ik2vmren834suke1212f5ev8c%40group.calendar.google.com/public/basic.ics",
+            "main_venue": null,
+            "priority": 0,
+            "map_obj_id": 123
+        },
+        {
+            "id": 35,
+            "name": "Hebocon",
+            "type": "Village",
+            "enabled": true,
+            "url": "https://calendar.google.com/calendar/ical/08s6uhai2oe96fprrj4m1f2jl4%40group.calendar.google.com/public/basic.ics",
+            "main_venue": null,
+            "priority": 0,
+            "map_obj_id": 124
+        },
+        {
+            "id": 36,
+            "name": "Hacky Racers",
+            "type": "Village",
+            "enabled": true,
+            "url": "https://calendar.google.com/calendar/ical/m2hftu56stu2469so1uaoscs8o%40group.calendar.google.com/public/basic.ics",
+            "main_venue": null,
+            "priority": 0,
+            "map_obj_id": 125
+        },
+        {
+            "id": 37,
+            "name": "Habville launches",
+            "type": "Village",
+            "enabled": true,
+            "url": "https://calendar.google.com/calendar/ical/aqppc2kljl25aeadm9abnli6l4%40group.calendar.google.com/public/basic.ics",
+            "main_venue": null,
+            "priority": 0,
+            "map_obj_id": 2
+        },
+        {
+            "id": 39,
+            "name": "Sourdough Bread Workshop",
+            "type": "Village",
+            "enabled": true,
+            "url": "http://pratie.com/lab/icalendar/output/event-18911083.ics",
+            "main_venue": null,
+            "priority": 0,
+            "map_obj_id": 30
+        },
+        {
+            "id": 41,
+            "name": "Mountaineer",
+            "type": "Village",
+            "enabled": true,
+            "url": "https://calendar.google.com/calendar/ical/abgk0jdatt2p5ndjur938ij6ik%40group.calendar.google.com/public/basic.ics",
+            "main_venue": null,
+            "priority": 0,
+            "map_obj_id": 127
+        },
+        {
+            "id": 42,
+            "name": "Smoke & Mirrors Laser Cutters",
+            "type": "Village",
+            "enabled": true,
+            "url": "https://calendar.google.com/calendar/ical/ublklsm8g031s6mtjv8ds08k4k%40group.calendar.google.com/public/basic.ics",
+            "main_venue": null,
+            "priority": 0,
+            "map_obj_id": 67
+        },
+        {
+            "id": 43,
+            "name": "Hardware Swap Shop",
+            "type": "Village",
+            "enabled": true,
+            "url": "https://calendar.google.com/calendar/ical/h1q35f553pbcodb7sfhdsr5gus%40group.calendar.google.com/public/basic.ics",
+            "main_venue": null,
+            "priority": 0,
+            "map_obj_id": 129
+        },
+        {
+            "id": 44,
+            "name": "Tildr - Speed Dating",
+            "type": "Village",
+            "enabled": true,
+            "url": "https://calendar.google.com/calendar/ical/86r1gqsog55esbujs5j81t77rg%40group.calendar.google.com/private-94c2c6fdee7e9e48bbf4d6075984fe1c/basic.ics",
+            "main_venue": null,
+            "priority": 0,
+            "map_obj_id": 2
+        }
+    ]
+}

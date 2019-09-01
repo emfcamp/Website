@@ -1,0 +1,653 @@
+{
+    "favourites": {
+        "counts": {
+            "0": 77,
+            "1-9": 0,
+            "10-19": 0,
+            "20-29": 0,
+            "30-39": 0,
+            "40-49": 0,
+            "50-99": 0,
+            "100-199": 0,
+            "200+": 0
+        }
+    },
+    "proposals": {
+        "accepted": [
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "RobotMad",
+                "published_description": "RobotMad is a small team of robotics enthusiasts that will be showcasing previous creations and the brand new AutoBot. A Interactive semi-autonomous all-terrain robot covered with hundreds of super bright LEDs. Hand-built from scratch including: Open Beam, 3D printing, custom Electronics PCBs, custom FPGAs and custom Software.  Very much a work in progress, so exactly how it will respond to people is constantly evolving - what will it make of you?  Will it try to follow you, run away or give you a wink?\r\n\r\nDesigned and built by 17 year old Lead Roboteer of RobotMad this project is his first venture into larger scale robotics previously having cut his teeth on Antweight fighting robots.",
+                "names": "Lincoln & Chris Barnes",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "Dogbot",
+                "published_description": "Created by: Charles Galambos,  Gregory Epps, and Nic Greenway\r\nFrom React Robotics. https://reactrobotics.com\r\n\r\nMade: 2016-2018\r\n\r\nDogBot is a super-light, torque-controlled, low-latency robot that is purpose built for machine learning approaches that embody Artificial Intelligence in robots. The goal is to progress robots towards to the capability and efficiency of natural walking gaits, so we can benefit from their ability to navigate human habitats and emulate similar functions to a person.\r\n\r\n",
+                "names": "Charles Galambos",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "F\u00dcLLER",
+                "published_description": "5.6 meters\r\n4V\r\nGeodesic Dome.\r\nWith: hammocks, far too many addressable LEDs.\r\nShiny user programmable patterns, reactive to sound..\r\nIf we can finish it, an IPv6 address for every LED (because IPv6 deserves love).\r\nAnd maybe a few EMF badge games.\r\n\r\nIf you like, ask us about falling through beds and tripping all the spot checks in IKEA. De-lamination,  the wrong way to do load testing, strange manufacturing tolerances, and why you should never have 500 Amps of 5V power supplies.",
+                "names": "Mike Chislett, Robert Walker, @swlcx",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "Sneakernet - Send your mail!",
+                "published_description": "When people come to events, they never have the chance to send a postcard to their loved ones at home. To make this possible, we have several letter boxes scattered over the field, where people can drop a postcard or letter that will get shipped by \"Camp Postal\"/\"Royal Mail\" all over the field. Villages who have a clearly marked mailbox next to the road, and written on the wiki that they are accepting mail, will be able to receive postcards.",
+                "names": "Julius ter Pelkwijk",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "T-Shirts 2.0: Hack Your Shirt",
+                "published_description": "Got a bunch of old conference T-shirts you don\u2019t know what to do with? Bring them to EMF Camp and turn them into haute couture with our straightforward T-shirt hacks. We\u2019ll provide sewing machines, some basic supplies, and a variety of designs. You bring your T-shirts and your imagination. We have some no-sew designs that simply involve cutting and tying, some intermediate designs that involve a bit of straight sewing on a sewing machine, and some complex designs that combine more than one shirt into a single, final masterpiece. The workshop is held in a drop-in format: stop by when you have some time (minimum 30 minutes, complex designs might take an hour). The projects are suitable for adults, teens, and older children with some adult help.\r\n\r\nNo-sew hacks you can try: Infinity Scarf, Fringed Scarf, Knotted Scarf, T-Shirt Yarn, Bracelet made from T-Shirt yarn.\r\n\r\nMinimal Sewing Hacks: Beanie hat, Convertible neck warmer/hat, Wrist warmers\r\n\r\nIntermediate Sewing Hacks: Laptop sleeve, Cushion Covers",
+                "names": "Rebecca and Paco Hope",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": 60,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "Interactive Flip-Dot Billboard",
+                "published_description": "The Swansea Hackspace has been working on an installation for EMF. We are building a billboard of flip-dot displays from old busses. The display will have a resolution of 96*32, containing over 3000 electromechanical dots. Each display in the panel will have it's own controller, and the whole billboard will be driven by a raspberry pi.\r\n\r\nWe aim to make the display as interactive as possible, and are working on programming games and apps that EMF visitors can interact with.\r\n\r\nThe board will be about 2m wide, and will be raised to eye-level on wooden supports. We will aim to run it 24/7 throughout the weekend.\r\n\r\nFor more information, get in touch or go to https://swansea.hackspace.org.uk/Main/Projects\r\n\r\nWe can put on the display without funding, but some extra money will allow us to create a more professional exhibition with full Swansea Hackspace and EMF branding!",
+                "names": "Peter Barnes",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "ZX Spectrum bouncy castle",
+                "published_description": "A giant (4 x 2.5m) Sinclair ZX Spectrum with fully working keys that visitors can jump on to play games (or write BASIC programs if they're particularly patient).",
+                "names": "Matt Westcott",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": 120,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "Hydrotechnic - Interactive water show",
+                "published_description": "Inspired by the fountains of Bellagio, Burj Khalifa and shows such as Spectra in Singapore - just on a slightly smaller scale.\r\nMultiple individually controlled vertical jets of water with variable height and RGB illumination can be orchestrated through software to dance to music or other stimuli. \r\nEndless possibilities with network control opened up to the internet for others to create imaginative uses.",
+                "names": "Adam Catley",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "Single LED on a stick",
+                "published_description": "With so many LEDs, what harm can just one more do? Other installations may have thousands. Ours will not.\r\n\r\nCompared to the age of the universe, human life has been around for but a moment. This installation captures and illustrates this truth. One LED, in the entire campsite, shining once, at random, for a blink of an eye, before being extinguished forever. A brief example of our own existence.\r\n\r\nThe audience is encouraged to interact (or not interact) with the piece however they choose.\r\n\r\nSo, to recap:\r\nOne LED.\r\nOne stick.\r\nOne random time.\r\nThe end.",
+                "names": "Michael Chislett",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "Yarm Atey",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            }
+        ],
+        "counts": {
+            "needs_help": {
+                "false": 41,
+                "true": 36
+            },
+            "needs_money": {
+                "false": 77
+            },
+            "needs_laptop": {
+                "false": 77
+            },
+            "one_day": {
+                "false": 77
+            },
+            "notice_required": {
+                "> 1 month": 17,
+                "1 month": 29,
+                "1 week": 31
+            },
+            "may_record": {
+                "false": 77
+            },
+            "state": {
+                "accepted": 46,
+                "cancelled": 11,
+                "finished": 9,
+                "rejected": 11
+            },
+            "created_week": {
+                "2018-03-12": 13,
+                "2018-03-19": 2,
+                "2018-03-26": 2,
+                "2018-04-09": 6,
+                "2018-04-16": 5,
+                "2018-04-23": 6,
+                "2018-04-30": 3,
+                "2018-05-21": 2,
+                "2018-05-28": 2,
+                "2018-06-04": 1,
+                "2018-06-11": 1,
+                "2018-06-18": 6,
+                "2018-06-25": 3,
+                "2018-07-02": 1,
+                "2018-07-16": 8,
+                "2018-07-23": 8,
+                "2018-07-30": 5,
+                "2018-08-13": 3
+            }
+        },
+        "edits": {
+            "published_title": {
+                "avg": 1.40,
+                "max": 3
+            },
+            "published_description": {
+                "avg": 1.40,
+                "max": 3
+            },
+            "requirements": {
+                "avg": 1.14,
+                "max": 4
+            },
+            "length": {
+                "avg": 1.94,
+                "max": 2
+            },
+            "notice_required": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "needs_help": {
+                "avg": 1.01,
+                "max": 2
+            },
+            "needs_money": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "one_day": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "has_rejected_email": {
+                "avg": 1.10,
+                "max": 2
+            },
+            "published_names": {
+                "avg": 2.09,
+                "max": 4
+            },
+            "arrival_period": {
+                "avg": 2.05,
+                "max": 3
+            },
+            "departure_period": {
+                "avg": 2.05,
+                "max": 3
+            },
+            "telephone_number": {
+                "avg": 2.03,
+                "max": 3
+            },
+            "may_record": {
+                "avg": 1.94,
+                "max": 2
+            },
+            "needs_laptop": {
+                "avg": 1.94,
+                "max": 2
+            },
+            "available_times": {
+                "avg": 1.94,
+                "max": 2
+            },
+            "attendees": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "cost": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "size": {
+                "avg": 1.08,
+                "max": 2
+            },
+            "funds": {
+                "avg": 1.06,
+                "max": 2
+            },
+            "age_range": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "participant_equipment": {
+                "avg": 1.00,
+                "max": 1
+            }
+        }
+    }
+}

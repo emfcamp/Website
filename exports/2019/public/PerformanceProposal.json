@@ -1,0 +1,439 @@
+{
+    "favourites": {
+        "counts": {
+            "0": 0,
+            "1-9": 0,
+            "10-19": 0,
+            "20-29": 0,
+            "30-39": 0,
+            "40-49": 0,
+            "50-99": 0,
+            "100-199": 0,
+            "200+": 0
+        }
+    },
+    "proposals": {
+        "accepted": [
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "Coraline (PG) - With supporting short 'The Present'",
+                "published_description": "While exploring her new home, a girl named Coraline discovers a secret door, behind which lies an alternate world that closely mirrors her own but, in many ways, is better. She rejoices in her discovery, until Other Mother and the rest of her parallel family try to keep her there forever. Coraline must use all her resources and bravery to make it back to her own family and life.\r\n\r\nThis beautifully animated piece takes Neil Gaiman\u2019s source material and spins it into a fun and sometimes creepy fairy tale. Director Henry Selick (The Nightmare Before Christmas) creates a series of stop-motion set pieces that equally bewilder and delight. A delicious alternative to saccharine-sweet Hollywood standards.\r\n\r\nMay be unsuitable for younger children.",
+                "names": "EMF Film Festival",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 21:30:00",
+                "scheduled_duration": 103,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "Sam2AA VS Gasman",
+                "published_description": "The traditional ending to EMF.",
+                "names": "Sam2AA, Gasman",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 22:30:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Gasman's ZX Spectrum Chiptune Odyssey",
+                "published_description": "The world's number one ZX Spectrum rock star returns to EMF with his trademark blend of bleeps, bloops, keytar solos, power pop, robotic vocals, key changes and unexpected Disney singalongs to transport you back to the 80s in full force. (Tory government and looming dread of nuclear war supplied separately.)",
+                "names": "Gasman",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 22:00:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "Professor Elemental",
+                "published_description": "Chap Hop Performance featuring: off the hoof rapping, horses, tea, trousers...",
+                "names": "Professor Elemental",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 21:00:00",
+                "scheduled_duration": 50,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Hidden Figures (PG)",
+                "published_description": "During the build up to the Apollo space programme, mathematically gifted women, typically African-American, worked in high-pressure \u2018pools\u2019 churning out answers to NASA\u2019s seemingly impossible questions. They were known as \u2018computers\u2019.\r\n\r\nThree women challenged the status quo, demanding recognition, authority and respect. Katherine Johnson rose through the ranks to become one of NASA\u2019s most respected mathematicians, Mary Jackson became the first qualified African-American female engineer in the USA and Dorothy Vaughan saw the coming of machine-based computers, becoming one of the world\u2019s leading experts on programming.\r\n\r\nThis incredible true story charts the rise of these formidable scientists against the odds. Even today they are yet to receive the recognition they deserve and Hidden Figures takes great strides in correcting this.",
+                "names": "EMF Film Festival",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 21:00:00",
+                "scheduled_duration": 120,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Special Presentation: Hackers (12)",
+                "published_description": "Celebrating the first UK release of Hackers in blu-ray format, we are proud to present this classic on the big screen in full HD.\r\n\r\nJake Davis, now having left his alter-ego hacktivist \u2018Topiary\u2019 behind, will introduce the film, discussing the impressions it made on him and his peers as the lines between technology fact and fiction became ever more blurred.\r\n\r\n1995 cult-classic Hackers has gained a loyal following over the years, emerging as the best amongst the glut of 1990s hacker-culture movies. Its influences may not be immediately apparent, but characters such as Zero Cool and Acid Burn left a lasting impression on young minds.\r\n\r\nCostumes are encouraged, although rollerblading in a field can be challenging.",
+                "names": "EMF Film Festival",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 20:20:00",
+                "scheduled_duration": 120,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Digital Immigrant // Unapologetic Other // Creative Gypsy",
+                "published_description": "Sub-Saharan Eritrean by way of London, Lula is a creative enigma, who is carving out a career for herself as a multidisciplinary artist. \r\n\r\nAn unconventional thinker using technology as her enabler, Lula is breaking through \u201cthe norm\u201d and liberating artistic expression as a sensory experience.\r\n \r\nLula\u2019s personal project is an immersive live performance within an audio/visual installation that takes you on a journey of illegal migration.Lula sings about a lived experience of the past, present and future. Her soulful timbre, which carries the weight of her heritage, enables intergalactic travel. With the support of cutting edge technology, known as MiMu Gloves, she makes levitation through sound waves possible.\r\n\r\nSee her performance at TEDxTeen London August 2017 here:: https://bit.ly/2ix1lkL",
+                "names": "Lula XYZ",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 22:00:00",
+                "scheduled_duration": 50,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "Multiplayer Indie Computer and Board Games",
+                "published_description": "Come to Stage A this Friday night to hangout and play multiplayer games on the big screen. We're going to to put on a selection of games and create a small space where people can sit down, chill out, watch and play some games.\r\n\r\nThere will be tables and seats for those who want to bring their boardgames too!",
+                "names": "Amran",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 22:00:00",
+                "scheduled_duration": 180,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "Vieon - an audio-visual electronica experience",
+                "published_description": "VIEON is the electronic musical project of Matt Wild, based in Coventry, UK. Expanding to a live three-piece including sound engineer Stephen Dorphin and VJ Adrian Brian Thompson, their sound is inspired heavily by the 70s and 80s European art electronica pioneers (Jarre, Moroder, Kraftwerk), combined with the more recent influences of contemporary synthpop artists (Royksopp, Justice) as well as infusing aspects of dance, post-rock and ambient music.\r\n\r\nThe VIEON live show is a complete audio-visual event, using not only banks of synthesizers and samplers but also unusual visual instrumentation including vocoder, keytar, theremin and live projected technology and science-fiction inspired visuals including live webcam feeds of what's happening onstage.\r\n\r\nVIEON have raised their profile dramatically throughout 2015-17 with a series of engaging live audio-visual shows famed for their ambitious scope across the UK and beyond, playing their first overseas gig to a rapturous reception in Copenhagen in September 2017.",
+                "names": "Vieon",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 00:00:00",
+                "scheduled_duration": 50,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Illusion O (Chiptunes + FX)",
+                "published_description": "Solo chiptune/electronics. \r\nLive mixes using Nintendo DS and FX pedals..\r\n\r\nhttps://soundcloud.com/illusion_o\r\n",
+                "names": "Illusion O",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 22:00:00",
+                "scheduled_duration": 25,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Capybara Funk & Jazz",
+                "published_description": "Capybara plays \"music for your ears & for your rears\" - some jazzy stuff, some funky stuff. Some crude videos here: \r\n      https://www.facebook.com/capybarajazz/ \r\n     https://www.facebook.com/pg/capybarajazz/videos\r\n\r\nCreative funk influenced by John Scofield, Serge Gainsbourg, Snarky Puppy, Wayne Shorter and more. ",
+                "names": "Capybara",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 21:00:00",
+                "scheduled_duration": 45,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "Multiplayer Indie Computer and Board Games",
+                "published_description": "Come to Stage A this Saturday night to hangout and play multiplayer games on the big screen. We're going to to put on a selection of games and create a small space where people can sit down, chill out, watch and play some games.\r\n\r\nThere will be tables and seats for those who want to play their boardgames too! Please remember to bring your own board games as EMF are unable to supply any!",
+                "names": "Indie Games",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 22:00:00",
+                "scheduled_duration": 180,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Powerpoint Karaoke",
+                "published_description": "An audience interactive event; where willing guinea pigs and unwilling volunteers present an informative, intellectual and light-hearted presentation to a receptive crowd. Unfortunately, they won't see the presentation before they talk about it!\r\n\r\nPowerpoint Karaoke will feature a selection of decks for attendees to present to the crowd, with only a moment to see what they\u2019re about to discuss. The presentations will be interesting, but it can\u2019t be said for sure how informative they may be. \r\n\r\nWith the rise of blockchain cardgames, paper cryptocurrency and washing machines being bricked by ransomware, never has there been a better time for people to take the stage and attempt to convince everyone that they too understand the nonsense on the projector.\r\n\r\nWinners will be rewarded with a suitably terrible trophy for display on their office cubicle of choice, praised highly for their public speaking skills, and potentially get a promotion by listing \u2018Ideation and Blue Sky Thinktalking\u2019 on LinkedIn*. (*promotion opportunities not guaranteed)\r\n\r\nPowerpoint Karaoke has a background at many hacker events, so why not come and enjoy a pint and a sensible chuckle?\r\n",
+                "names": "Adam Froggatt ",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 20:30:00",
+                "scheduled_duration": 60,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Lai Power",
+                "published_description": "Aspiring superstar DJ Lai Power hails from the motor city of Birmingham, UK. Uploading echoes of Chicago/Detroit into your cyberbrain. Future sounds from the ninth dimension. HI-NRG anti-capitalist dance music for the working class.\r\n\r\nhttps://soundcloud.com/laipower",
+                "names": "Lai Power",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 00:15:00",
+                "scheduled_duration": 45,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Multiplayer Indie Computer and Board Games",
+                "published_description": "Come to Stage A this Sunday night to hangout and play multiplayer games on the big screen. We're going to to put on a selection of games and create a small space where people can sit down, chill out, watch and play some games.\r\n\r\nThere will be tables and seats for those who want to play their boardgames too! Please remember to bring your own board games as EMF are unable to supply any!",
+                "names": "Indie Games",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 21:30:00",
+                "scheduled_duration": 210,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Adventures in DIY Electronic Instruments - Cutlasses performance",
+                "published_description": "A companion performance to accompany my \u2018Adventures in DIY Electronic Instruments\u2019 talk. This semi-improvised ambient performance, composed especially for EMF Camp, will last around 20 minutes, and will be made using only instruments and effects I have built myself. \r\n\r\nThe piece will employ mechanical, contact mic based, noise makers, DIY digital effects running algorithms designed by myself and analogue sound sources and combine them into a mini DIY orchestra, which will serve to demonstrate the nature of my DIY instruments, as well as being an artistic piece in it\u2019s own right.\r\n\r\nHere are some links showing a selection of devices I've built\r\nhttps://youtu.be/sdTysy3dD84\r\nhttps://youtu.be/gib-URplJxI\r\nhttps://youtu.be/xWpq3soblYY\r\nhttps://youtu.be/5j84GfI8yQM\r\n\r\nHere's my website, click Music for streaming links\r\nhttp://www.cutlasses.co.uk\r\n",
+                "names": "Scott Pitkethly",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 21:00:00",
+                "scheduled_duration": 20,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "Polyop: An Audio-Visual Voyage",
+                "published_description": "Continuing in the tradition of sonic-fiction, POLYOP fuse live electronic music performance with sci-fi mythologies to create an immersive audio-visual voyage. Follow the omnipotent Creator on his pilgrimage through distant reaches of an alternate polyhedral universe, occupied by psychedelic soundscapes, rhythmical acid entities and uncharted electro artefacts. \r\n\r\nPOLYOP have developed their live show alongside their own open-source visual performance engine 'Hedron'. Their sound fuses the DNA of funk, and electro with techno and modern sound design; whilst the visuals combine sci-fi aesthetics with polyhedral graphics popularised by early 3D graphics engines.\r\n\r\nVids & Projects: \r\nhttp://polyop.uk/",
+                "names": "Polyop",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 23:25:00",
+                "scheduled_duration": 40,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Tentman: World Premiere",
+                "published_description": "The film made at Electromagnetic Field! Meet Tentman, a tent that escapes the bonds of his pegs and roams free to experience EMF first hand. He dances, drinks, flirts with other tents and shares his strong views on mallets. A fun, kid-friendly 30 minute snapshot of the uniqueness that is EMF.\r\n\r\nFrom the director:\r\n\r\nTent. Man. Which is it? Tentman is a film created at Electromagnetic Field 2014/2016 by festival attendees. Written by Pascoe Foxell and directed by Alia Sheikh. Edward Linard (Vikings, Madness in the Method) leads a cast of thousands (EMF attendees) for the world premiere of a film that Jonty has described as \"WTF?\".\r\n\r\nTentman Q&A\r\n\r\nWant to get into filmmaking? Inspired by Tentman? Here\u2019s your chance to put your questions to the makers and cast. Immediately follows the screening.",
+                "names": "EMF Film Festival",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 20:40:00",
+                "scheduled_duration": 30,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Murmurmur",
+                "published_description": "Murmurmur is a London based producer_beat maker_drummer, with a background in jazz/fusion and experimental art/rock bands. \r\nHis sound is influenced by world music, hip hop, jazz and the electronic scene in general. The music is a \"collage\" of soundscapes, field recordings, vinyls, toys, synths, lo-tech Instruments with a live set powered by drum grooves.",
+                "names": "murmurmur",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 22:35:00",
+                "scheduled_duration": 35,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "2xAA [electronic music crafted using Game Boys]",
+                "published_description": "2xAA (aka Sam Wray) harnesses the low-fi power of the Nintendo Game Boy and various other portable hardwares to create a flowing electro-house set.",
+                "names": "2xAA",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 21:25:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            }
+        ],
+        "counts": {
+            "needs_help": {
+                "false": 32,
+                "true": 17
+            },
+            "needs_money": {
+                "false": 49
+            },
+            "needs_laptop": {
+                "false": 49
+            },
+            "one_day": {
+                "false": 48,
+                "true": 1
+            },
+            "notice_required": {
+                "> 1 month": 4,
+                "1 month": 14,
+                "1 week": 31
+            },
+            "may_record": {
+                "false": 49
+            },
+            "state": {
+                "accepted": 10,
+                "cancelled": 5,
+                "finished": 21,
+                "rejected": 13
+            },
+            "created_week": {
+                "2018-03-12": 5,
+                "2018-04-02": 2,
+                "2018-04-09": 4,
+                "2018-04-16": 3,
+                "2018-04-23": 1,
+                "2018-04-30": 1,
+                "2018-05-07": 1,
+                "2018-05-21": 1,
+                "2018-05-28": 1,
+                "2018-06-04": 6,
+                "2018-06-11": 1,
+                "2018-06-25": 1,
+                "2018-07-16": 2,
+                "2018-07-23": 1,
+                "2018-07-30": 1,
+                "2018-08-06": 2,
+                "2018-08-13": 4,
+                "2018-08-20": 11,
+                "2018-08-27": 1
+            }
+        },
+        "edits": {
+            "published_title": {
+                "avg": 2.50,
+                "max": 6
+            },
+            "published_description": {
+                "avg": 2.56,
+                "max": 7
+            },
+            "requirements": {
+                "avg": 1.30,
+                "max": 3
+            },
+            "length": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "notice_required": {
+                "avg": 1.02,
+                "max": 2
+            },
+            "needs_help": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "needs_money": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "one_day": {
+                "avg": 1.02,
+                "max": 2
+            },
+            "has_rejected_email": {
+                "avg": 1.24,
+                "max": 2
+            },
+            "published_names": {
+                "avg": 2.46,
+                "max": 4
+            },
+            "arrival_period": {
+                "avg": 2.28,
+                "max": 4
+            },
+            "departure_period": {
+                "avg": 2.26,
+                "max": 3
+            },
+            "telephone_number": {
+                "avg": 2.12,
+                "max": 3
+            },
+            "may_record": {
+                "avg": 1.98,
+                "max": 2
+            },
+            "needs_laptop": {
+                "avg": 1.98,
+                "max": 2
+            },
+            "available_times": {
+                "avg": 2.38,
+                "max": 6
+            },
+            "attendees": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "cost": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "size": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "funds": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "age_range": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "participant_equipment": {
+                "avg": 1.00,
+                "max": 1
+            }
+        }
+    }
+}

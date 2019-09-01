@@ -1,0 +1,1414 @@
+{
+    "events": [
+        {
+            "source_id": 4,
+            "uid": "2ntj55u3g6h2s3ntqiqmq9roe4@google.com",
+            "start_dt": "2018-09-02 10:30:00",
+            "end_dt": "2018-09-02 12:30:00",
+            "summary": "Router workshop",
+            "description": "",
+            "location": "Hardware Hacking Area",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "7i0bqfrd2mloi5oalh494kh2kq@google.com",
+            "start_dt": "2018-09-01 14:00:00",
+            "end_dt": "2018-09-01 17:30:00",
+            "summary": "Arduino for Total Newbies (workshop)",
+            "description": "\nArduino is an amazingly powerful tool that is very simple to learn to use. It was designed so that artists and non-geeks can start from nothing, and make something cool happen in less than 90 minutes. Yet, it is powerful enough so that uber-geeks can use it for their projects as well.\n\nThis workshop is easy enough for total newbies to learn all you need to know to get going on an Arduino.\n\nTaught by Mitch Altman. Participants will make their own Arduino clone, and set it up on solderless breadboards to make their own TV-B-Gone remote control to turn off TVs in public places -- a fun way to learn Arduino (and electronics) basics. Bring your laptop, if you can. \n\nWho: Anyone and everyone can have fun learning Arduino. Ages 10 to 100\n     Max #: 50 participants -- This workshop will fill up, so please arrive early!\n           -- No need to register -- just show up early and get a kit to take the workshop\n     Cost: \u00a330 for materials -- includes everything you need to make your Arduino TV-B-Gone (and to play and experiment at home)!\n          And you get to bring your Arduino TV-B-Gone home with you.\n\nMore info: https://wiki.emfcamp.org/wiki/ArduinoForTotalNewbies",
+            "location": "Hardware Hacking Area",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "2bg7pf4vk3dnf2tp7qe2tj9l46@google.com",
+            "start_dt": "2018-09-02 13:00:00",
+            "end_dt": "2018-09-02 15:30:00",
+            "summary": "ArduTouch music synthesizer (workshop)",
+            "description": "\nArduTouch is an Arduino-compatible music synthesizer kit with a built-in touch keyboard, and with built-in speaker/amplifier.\n\nThis workshop is for total newbies to learn to solder and make their own ArduTouch music synthesizer.\n\nThe ArduTouch comes pre-programmed with a way cool synthesizer. And I will show you how to re-program it with other way cool (and totally different) synthesizers.\n\n     Who: Anyone and everyone can have fun making the ArduTouch music synthesizer Ages 10 to 100\n     Max #: 50 participants\n           -- No need to register -- just show up early and get a kit to take the workshop\n     Cost: \u00a325 for materials -- (\u00a330 if you also want a USB-Serial cable for re-programming the ArduTouch)\n\n     Instructor: Mitch\nMore info: https://wiki.emfcamp.org/wiki/ArduTouchMusicSynthesizerWorkshop",
+            "location": "Hardware Hacking Area",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "7oshge2d3ag2fkcokjkla2be5l@google.com",
+            "start_dt": "2018-09-01 18:00:00",
+            "end_dt": "2018-09-01 20:00:00",
+            "summary": "Poundshop Electronics (workshop)",
+            "description": "This workshop will take attendees through converting pound shop battery powered LED light strings to solar power, using the innards from pound shop solar garden lights. The finished item can be decorated by adding little handmade paper/card lanterns to cover the LEDs, which attendees can also make on the day (templates provided). \n\nA little soldering is required, as is an average level of manual dexterity. \n\nIf you feel like brightening up the house, tent, garden, or even yourself with some lovely LEDs, this little project is definitely for you :) \nAttending this workshop will cost     \u00a33 per person (LED string, solar light, heatshrink, wire possibly, glue possibly)\nSuitable age range     probably adult or older responsible supervised child\nAttendees should bring     some experience of basic soldering would help a bit",
+            "location": "Hardware Hacking Area",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "23mbmh59b0qkloq1gtd3ddd37g@google.com",
+            "start_dt": "2018-09-02 16:00:00",
+            "end_dt": "2018-09-02 18:00:00",
+            "summary": "Surface Mount Electronics Assembly for Terrified Beginners",
+            "description": "Modern electronic components tend to only come in surface mount, but most people interested in doing electronics as a hobby seem to be afraid of those. This is a workshop designed to remove your fear of working with (soldering, reworking) surface mount components. You will go through a scaled-down and de-automated version of the industrial electronics assembly process, including solder paste application, pick and place (with tweezers), reflow (on a hotplate), inspection (visual), testing (electric and functional) and rework. In the end, you will have assembled a working DC/DC converter board using minimal equipment and skills you didn't know you had. So far, every participant has discovered they can successfully place 0402 passives and 0.5mm pitch QFNs with no issues. No prior knowledge or skills required. This workshop is suitable for people who have never done anything with electronics before.\n\nThis workshop will cost: 20GBP or 20EUR, whichever you prefer",
+            "location": "Hardware Hacking Area",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "14bohhbqr3u1d5f8ilqmlg8k3o@google.com",
+            "start_dt": "2018-09-01 20:30:00",
+            "end_dt": "2018-09-01 22:30:00",
+            "summary": "Surface Mount Electronics Assembly for Terrified Beginners",
+            "description": "Modern electronic components tend to only come in surface mount, but most people interested in doing electronics as a hobby seem to be afraid of those. This is a workshop designed to remove your fear of working with (soldering, reworking) surface mount components. You will go through a scaled-down and de-automated version of the industrial electronics assembly process, including solder paste application, pick and place (with tweezers), reflow (on a hotplate), inspection (visual), testing (electric and functional) and rework. In the end, you will have assembled a working DC/DC converter board using minimal equipment and skills you didn't know you had. So far, every participant has discovered they can successfully place 0402 passives and 0.5mm pitch QFNs with no issues. No prior knowledge or skills required. This workshop is suitable for people who have never done anything with electronics before.\n\nThis workshop will cost: 20GBP or 20EUR, whichever you prefer",
+            "location": "Hardware Hacking Area",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "62pn1r65b3823nsjjlkd6n7sc3@google.com",
+            "start_dt": "2018-08-31 20:30:00",
+            "end_dt": "2018-08-31 22:30:00",
+            "summary": "Surface Mount Electronics Assembly for Terrified Beginners",
+            "description": "Modern electronic components tend to only come in surface mount, but most people interested in doing electronics as a hobby seem to be afraid of those. This is a workshop designed to remove your fear of working with (soldering, reworking) surface mount components. You will go through a scaled-down and de-automated version of the industrial electronics assembly process, including solder paste application, pick and place (with tweezers), reflow (on a hotplate), inspection (visual), testing (electric and functional) and rework. In the end, you will have assembled a working DC/DC converter board using minimal equipment and skills you didn't know you had. So far, every participant has discovered they can successfully place 0402 passives and 0.5mm pitch QFNs with no issues. No prior knowledge or skills required. This workshop is suitable for people who have never done anything with electronics before.\n\nThis workshop will cost: 20GBP or 20EUR, whichever you prefer",
+            "location": "Hardware Hacking Area",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "1tfikfk44v6kg4k2mo4dh6ts56@google.com",
+            "start_dt": "2018-08-31 14:00:00",
+            "end_dt": "2018-08-31 16:00:00",
+            "summary": "Surface Mount Electronics Assembly for Terrified Beginners",
+            "description": "\nModern electronic components tend to only come in surface mount, but most people interested in doing electronics as a hobby seem to be afraid of those. This is a workshop designed to remove your fear of working with (soldering, reworking) surface mount components. You will go through a scaled-down and de-automated version of the industrial electronics assembly process, including solder paste application, pick and place (with tweezers), reflow (on a hotplate), inspection (visual), testing (electric and functional) and rework. In the end, you will have assembled a working DC/DC converter board using minimal equipment and skills you didn't know you had. So far, every participant has discovered they can successfully place 0402 passives and 0.5mm pitch QFNs with no issues. No prior knowledge or skills required. This workshop is suitable for people who have never done anything with electronics before.\n\nThis workshop will cost: 20GBP or 20EUR, whichever you prefer",
+            "location": "Hardware Hacking Area",
+            "favourite_count": 1
+        },
+        {
+            "source_id": 4,
+            "uid": "2ouq4083ipb1vjkdn204f3bpmt@google.com",
+            "start_dt": "2018-09-01 11:30:00",
+            "end_dt": "2018-09-01 13:30:00",
+            "summary": "Designing and building your own accessibility accessories (workshop)",
+            "description": "I'm a wheelchair user that was unhappy with how wheelchair accessories are expensive, boring, clinical, and not fit for purpose. My partner and I built some custom wheelchair accessories together and modified existing products for our own use, and would like to teach others to do the same. We think that people with additional requirements should have the same access to technology as everyone else and people in wheelchairs and users of accessibility equipment should be seen and be seen with. We want accessible designs to be modern, funky and useful.\n\nThe accessible pixel modules are programmable coloured LED strips used as indicators, illumination, and decoration of a wheelchair, accessibility accessory, backpack or anything you might think of. powered with a 5 volt powerbank and connected to a convenient control panel. They are designed to adapt to a user\u2019s needs.\n\nThis is a workshop for other wheelchair users and their friends where they have the opportunity to make their own accessible pixel modules and also design and build their own accessories. We will bring kits for people to purchase and build their first accessible pixel module and provide a list of parts should they wish to build more on their own. We will also have parts and tools available for prototyping other accessories. We will show the basics of writing code for Arduino and how to create a finished product adapted to your needs. We will also cover basic soldering techniques and open a discussion around what other people with additional requirements need and how they can solve their own problems by creating technology.\n\nAttending this workshop will cost     \u00a320 per kit (10 Spaces Available)\nSuitable age range     Any, but with parents if under 13\nAttendees should bring     Laptop (preferable)",
+            "location": "Hardware Hacking Area",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "7rfe98q76l0n2vq088g9uh64do@google.com",
+            "start_dt": "2018-09-02 20:30:00",
+            "end_dt": "2018-09-02 21:30:00",
+            "summary": "ObscureCon",
+            "description": "Welcome to ObscureCon, where no one knows what's going on and nothing matters!\n\nObscureCon was born out of the discussion of very obscure and specialised talks, where nobody except the speaker knows what they are on about. A series of 5 minute talks on some very obscure subjects, you are welcome to join us to be thoroughly baffled, confused and bewildered by our line up of speakers!\n\nContact WSPR in the EMFcamp IRC channel for more information on putting your talk forward for ObscureCon! Or if you're feeling brave, just jump straight into #ObscureCon on Freenode!\n\nProxy speaker available on request.",
+            "location": "Hardware Hacking Area",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "1e6d17olt9spkmorcq81vlkch2@google.com",
+            "start_dt": "2018-09-02 18:30:00",
+            "end_dt": "2018-09-02 19:00:00",
+            "summary": "Reliably joining square profiles without welding (demo)",
+            "description": "",
+            "location": "Hardware Hacking Area",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 4,
+            "uid": "0s332va9nn6g7op0319dneenvm@google.com",
+            "start_dt": "2018-09-02 16:00:00",
+            "end_dt": "2018-09-02 19:00:00",
+            "summary": "CANCELED!!!!!! Geiger Counter Radiation Detectors",
+            "description": "\nTHIS WORKSHOP HAS BEEN CANCELED! (blame Ukrainian post)\nSorry!\n\n\n\n\nRadioactivity is as fascinating as it is frightening because humans cannot sense it, and it can be dangerous in high doses. In this workshop, Yannick Verbelen from the University of Bristol introduces radioactivity and ionizing radiation detection principles on a level suitable for all ages. After a brief introduction, participants build their own radiation detector based on a Soviet era SBM-20 Geiger-M\u00fcller tube, and test it by measuring various radioactive materials. Basic soldering skills and understanding of electronics are recommended but not necessary. Following this workshop does not guarantee mutations, superpowers, or survival. Children younger than 12 should be accompanied by adults.\n\nTHIS WORKSHOP HAS BEEN CANCELED! (blame Ukrainian post)\nSorry!",
+            "location": "Hardware Hacking Area",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 5,
+            "uid": "4jtf0qfhlul5c3kmojgeu61118@google.com",
+            "start_dt": "2018-09-01 14:00:00",
+            "end_dt": "2018-09-01 16:00:00",
+            "summary": "Kefir Making",
+            "description": "At this workshop you will learn how to take care about your milk kefir culture but also you will be given tips on how to prepare fermented beverages like ginger beer, spreads or desserts, tasting is part of the event. Of course you will get your own kefir grain culture to play with. The event is based on donation at your will no one turned away for lack of funds, you will also get your manual. For more information please check dedicated page on our fhb wiki\n\nhttps://foodhackingbase.org/wiki/Fhb_kefir_making_emf2018",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 5,
+            "uid": "304rkb8co79oucm3sf3slq2qc2@google.com",
+            "start_dt": "2018-09-01 22:00:00",
+            "end_dt": "2018-09-02 00:00:00",
+            "summary": "FHB Cidre Flows Session II.",
+            "description": "Cidre Flows is now our traditional event focused on cidre tasting. The session II. will be more about British ciders, concerning more info about the event and booking your spot please check dedicated page at fhb wiki\n\nhttps://foodhackingbase.org/wiki/Fhb_cidre_flows_emf2018",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 5,
+            "uid": "0ra415ljkif03tctn360hrgiud@google.com",
+            "start_dt": "2018-08-31 22:00:00",
+            "end_dt": "2018-09-01 00:00:00",
+            "summary": "FHB Cidre Flows Session I.",
+            "description": "Cidre Flows is now our traditional event focused on cidre tasting. The session I. will be more about French ciders, concerning more info about the event and booking your spot please check dedicated page at fhb wiki\n\nhttps://foodhackingbase.org/wiki/Fhb_cidre_flows_emf2018",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 5,
+            "uid": "3mtclusocph2r3531e7ji5ler8@google.com",
+            "start_dt": "2018-09-01 20:00:00",
+            "end_dt": "2018-09-01 22:00:00",
+            "summary": "FHB Cheese Rendezvous Session II.",
+            "description": "Description:Description:FHB cheese rendezvous is a traditional event which we started on 28c3 and it goes on and on. We come together from all the corners of the world bringing lovely cheese delights with us or at least the passion to taste them. The happening is based on donation at your will, more we get in, better for fhb budget. We ask especially for home made cheeses by you, good special local cheeses and high quality internationally renowned  master pieces. There is a list on our wiki of some of the cheeses which will be base of the selection but it is not a full one for sure. Think about bringing plus minus 400 g so it it is enough for 20-25 people for two cheese sessions.",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 5,
+            "uid": "107fmhbqq4lir97ncu76m7pomo@google.com",
+            "start_dt": "2018-08-31 20:00:00",
+            "end_dt": "2018-08-31 22:00:00",
+            "summary": "FHB Cheese Rendezvous Session I.",
+            "description": "Description:FHB cheese rendezvous is a traditional event which we started on 28c3 and it goes on and on. We come together from all the corners of the world bringing lovely cheese delights with us or at least the passion to taste them. The happening is based on donation at your will, more we get in, better for fhb budget. We ask especially for home made cheeses by you, good special local cheeses and high quality internationally renowned  master pieces. There is a list on our wiki of some of the cheeses which will be base of the selection but it is not a full one for sure. Think about bringing plus minus 400 g so it it is enough for 20-25 people for two cheese sessions.",
+            "location": "",
+            "favourite_count": 4
+        },
+        {
+            "source_id": 14,
+            "uid": "41F515DC-93FF-4922-8B83-2AF01B426707",
+            "start_dt": "2018-09-01 16:20:00",
+            "end_dt": "2018-09-01 17:20:00",
+            "summary": "The Ambassadors Party",
+            "description": "The Ambassador cordially invites you to the Embassy party. Formal dress preferred. Bring your own mug, the Ambassador doesn't provide drinking vessels, just the drink.",
+            "location": "Embassy of Nowhere",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "B5F7F3C5-5075-4A04-9461-84E64E7526F5",
+            "start_dt": "2018-09-01 15:00:00",
+            "end_dt": "2018-09-01 16:00:00",
+            "summary": "Measurement error in Epidemiology: a hands-on demonstration of the problem and an introduction to the solutions",
+            "description": null,
+            "location": null,
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "088B18C8-F835-4A90-9836-8F35F292A496",
+            "start_dt": "2018-09-01 11:00:00",
+            "end_dt": "2018-09-01 12:00:00",
+            "summary": "Pancakes",
+            "description": "Bring your own plate. Radical self reliance! They last as long as they last..",
+            "location": null,
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "50600B80-67D6-453B-BBDF-E4E0D5ACD795",
+            "start_dt": "2018-09-02 06:00:00",
+            "end_dt": "2018-09-02 08:00:00",
+            "summary": "Live from Burning Man - the Man burns.",
+            "description": "this will be live on screen providing someone is awake.",
+            "location": null,
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "5ECA9DF2-2E22-474C-896A-0CBC14C408F9",
+            "start_dt": "2018-09-01 21:00:00",
+            "end_dt": "2018-09-01 22:00:00",
+            "summary": "Introduction to Burning",
+            "description": "at which we may burn some small art.\n",
+            "location": null,
+            "favourite_count": 0
+        },
+        {
+            "source_id": 14,
+            "uid": "FB2C9286-6CB9-4F43-8CE4-C1C89811A1CD",
+            "start_dt": "2018-08-31 14:45:00",
+            "end_dt": "2018-08-31 15:45:00",
+            "summary": "Create tiny art",
+            "description": "in which tiny pieces of art may be created to be burnt on Saturday at the tiny Burn.",
+            "location": null,
+            "favourite_count": 0
+        },
+        {
+            "source_id": 15,
+            "uid": "08iqgknlof0ole3bkiamcupac7@google.com",
+            "start_dt": "2018-09-02 13:00:00",
+            "end_dt": "2018-09-02 14:30:00",
+            "summary": "On the air: amateur radio 2m contest",
+            "description": "Around 1pm we'll be joining in with an ongoing radio contest, probably from the Eastnor Obelisk (up the hill, east of the camp site) with a small portable setup.\n\nIf you're interested in what an amateur radio contest involves, come along and have a listen - or join in if you're licensed and would like to. The aim is to make as many contacts, as far away as possible!\n\nWe'll have a 9-element 2m beam/Yagi antenna on a small pole. I think we'll be setting off from the amateur radio village at around 12:30/40, so you can also meet us there.\n\n\nMore info from the RSGB: https://www.rsgbcc.org/cgi-bin/contest_rules.pl?year=2018&contest=144trophy",
+            "location": "Eastnor Obelisk, Eastnor, Ledbury HR8 1ES, UK",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 15,
+            "uid": "4b60a75dl6fm8m3d2msl7dd0uc@google.com",
+            "start_dt": "2018-09-01 18:00:00",
+            "end_dt": "2018-09-01 19:00:00",
+            "summary": "On the air: amateur radio 2m contest",
+            "description": "Around 6pm we'll be joining in with an ongoing radio contest, probably from the Eastnor Obelisk (up the hill, east of the camp site) with a small portable setup.\n\nIf you're interested in what an amateur radio contest involves, come along and have a listen - or join in if you're licensed and would like to. The aim is to make as many contacts, as far away as possible!\n\nWe'll have a 9-element 2m beam/Yagi antenna on a small pole. I think we'll be setting off from the amateur radio village at around 17:30/40, so you can also meet us there.\n\n\nMore info from the RSGB: https://www.rsgbcc.org/cgi-bin/contest_rules.pl?year=2018&contest=144trophy",
+            "location": "Eastnor Obelisk, Eastnor, Ledbury HR8 1ES, UK",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 16,
+            "uid": "6827b56q2u5vuu8lshl6qj370c@google.com",
+            "start_dt": "2018-09-02 21:30:00",
+            "end_dt": "2018-09-02 22:30:00",
+            "summary": "Two Rooms and a Boom at Stage A",
+            "description": "Meet at Stage A.\n\nTwo Rooms and a Boom is a social deduction game, full hidden roles and deduction, for large groups (10+ players). Players are divided into 2 different rooms, from that point, find your teammates, establish trust, and exchange hostages before time runs out and the bomb explodes!\n\nThe board gamers village is organising a few rounds of two rooms and a boom. It lasts roughly 15 minutes per game (plus 5 minutes of rules) and we'll likely play two games. We'll need a minimum of 10 people, so bring some friends along, if we don't hit 10, we can try a few similar games such as Secret Hitler that work well with lower player counts.\n\n\nCheck our wiki page for the latest info: https://wiki.emfcamp.org/wiki/Village:Board_Gamers\nOr contact Pez: https://wiki.emfcamp.org/wiki/User:Pez",
+            "location": "Stage A",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 16,
+            "uid": "5q6jab5h9io7ectnel776o6i17@google.com",
+            "start_dt": "2018-09-01 18:00:00",
+            "end_dt": "2018-09-01 19:00:00",
+            "summary": "Two Rooms and a Boom",
+            "description": "Meet at the board gamers village, check our wiki page for the latest info: https://wiki.emfcamp.org/wiki/Village:Board_Gamers\n\nTwo Rooms and a Boom is a social deduction game, full hidden roles and deduction, for large groups (10+ players). Players are divided into 2 different rooms, from that point, find your teammates, establish trust, and exchange hostages before time runs out and the bomb explodes!\n\nThe board gamers village is organising a few rounds of two rooms and a boom. It lasts roughly 15 minutes per game (plus 5 minutes of rules) and we'll likely play two games. We'll need a minimum of 10 people, so bring some friends along, if we don't hit 10, we can try a few similar games such as Secret Hitler that work well with lower player counts.",
+            "location": "Board Gamers Village",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 16,
+            "uid": "154gbqmehb9s3jopdtr81a1jud@google.com",
+            "start_dt": "2018-08-31 18:00:00",
+            "end_dt": "2018-08-31 19:00:00",
+            "summary": "Two Rooms and a Boom",
+            "description": "Meet at the board gamers village.\n\nTwo Rooms and a Boom is a social deduction game, full hidden roles and deduction, for large groups (10+ players). Players are divided into 2 different rooms, from that point, find your teammates, establish trust, and exchange hostages before time runs out and the bomb explodes!\n\nThe board gamers village is organising a few rounds of two rooms and a boom. It lasts roughly 15 minutes per game (plus 5 minutes of rules) and we'll likely play two games. We'll need a minimum of 10 people, so bring some friends along, if we don't hit 10, we can try a few similar games such as Secret Hitler that work well with lower player counts.\n\nCheck our wiki page for the latest info: https://wiki.emfcamp.org/wiki/Village:Board_Gamers\nOr contact Pez: https://wiki.emfcamp.org/wiki/User:Pez",
+            "location": "Board Gamers Village",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "6cqgeitidro1n9jo2tv4rmjbaf@google.com",
+            "start_dt": "2018-09-02 21:10:00",
+            "end_dt": "2018-09-02 22:10:00",
+            "summary": "Sense without sight (workshop)",
+            "description": "If you're interested, please fill out the form: https://s.ai/emf/ws",
+            "location": "Sai's Tent",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "1onv6c08g2liql3ud9n43g2h6e@google.com",
+            "start_dt": "2018-09-02 19:20:00",
+            "end_dt": "2018-09-02 20:20:00",
+            "summary": "Sense without sight (workshop)",
+            "description": "If you're interested, please fill out the form: https://s.ai/emf/ws",
+            "location": "Sai's Tent",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "6pb34po283maob2namtnb1qsgh@google.com",
+            "start_dt": "2018-09-01 10:00:00",
+            "end_dt": "2018-09-01 11:00:00",
+            "summary": "Sense without sight (workshop)",
+            "description": "If you're interested, please fill out the form: https://s.ai/emf/ws",
+            "location": "Sai's Tent",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "4ephco106ujfjsks7j1c62ieur@google.com",
+            "start_dt": "2018-09-01 20:30:00",
+            "end_dt": "2018-09-01 21:30:00",
+            "summary": "Sense without sight (workshop)",
+            "description": "If you're interested, please fill out the form: https://s.ai/emf/ws",
+            "location": "Sai's Tent",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "68csf11mk5rf78u07ugtotmf30@google.com",
+            "start_dt": "2018-09-01 19:30:00",
+            "end_dt": "2018-09-01 20:30:00",
+            "summary": "Sense without sight (workshop)",
+            "description": "If you're interested, please fill out the form: https://s.ai/emf/ws",
+            "location": "Sai's Tent",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "78p7bcrsaoqse0j5jg0l2ap3n6@google.com",
+            "start_dt": "2018-08-31 16:15:00",
+            "end_dt": "2018-08-31 17:15:00",
+            "summary": "Sense without sight - TALK",
+            "description": "Learn what it's like to see the world without using your eyes.\n\nThis is from a blind perspective, but not solely. The vast majority of the cues discussed are sensory input that you already have, and you simply don\u2019t realize or pay attention to. \n\nHopefully you'll come away from the talk not just more informed about what walking around actually is like for blind people, but with a noticeable qualitative improvement in how you perceive the world around you.\n\nThis will also (briefly) cover how and how not to interact with a blind person on the street, cognitive shifts from perceiving the world as a blind person, real vs myth difficulties, etc.\n\nThis talk is specifically focused on navigation and sensory experience. It won't cover Braille, computers, general life skills, medical/legal issues, or the like.\n\n\nThe talk will try to cover as much as can be done without direct experience.\n\nHowever, there's a huge qualitative difference between simply hearing me talk about it (or show you), and experiencing it for yourself.  \n\n\nTherefore, I am also running hands-on, 1-hour workshops (2 per day). \n\nWorkshop participants will be blindfolded, given a guide cane, and led through a crash course in how to use and perceive the cues that are discussed in the talk, and an additional Q&A / debriefing session afterwards. This starts from simply walking parallel to a road, and quickly escalates to hearing corridors, feeling walls at a (short) distance, etc.\n\n\nIf you're interested, please fill out the form: https://s.ai/emf/ws",
+            "location": "Sai's Tent - Center area between Arcade, Lounge, Outdoor Lounge, & Stage C",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "62gq98fr21881rh749cpoeee95@google.com",
+            "start_dt": "2018-08-31 20:30:00",
+            "end_dt": "2018-08-31 21:30:00",
+            "summary": "Sense without sight (workshop)",
+            "description": "If you're interested, please fill out the form: https://s.ai/emf/ws",
+            "location": "Sai's Tent",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "3pu736j7vetm92lemc8mug3lso@google.com",
+            "start_dt": "2018-08-31 19:30:00",
+            "end_dt": "2018-08-31 20:30:00",
+            "summary": "Sense without sight (workshop)",
+            "description": "If you're interested, please fill out the form: https://s.ai/emf/ws",
+            "location": "Sai's Tent",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "65hjed1h68rm8b9m75h64b9k6so34b9o64rj8b9j64ojidpo6or38d9n70@google.com",
+            "start_dt": "2018-09-02 12:00:00",
+            "end_dt": "2018-09-02 13:00:00",
+            "summary": "Blind navigation workshop",
+            "description": "",
+            "location": "Sai's Tent",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 19,
+            "uid": "6ko3ip1o6or38b9l74rjeb9k74o38bb1cdgm6bb175ij0pb16dhj4e9mco@google.com",
+            "start_dt": "2018-09-02 11:00:00",
+            "end_dt": "2018-09-02 12:00:00",
+            "summary": "Blind navigation workshop",
+            "description": "",
+            "location": "Sai's Tent",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 20,
+            "uid": "7jvpkvths00c899575l227frcg@google.com",
+            "start_dt": "2018-08-31 16:00:00",
+            "end_dt": "2018-08-31 18:00:00",
+            "summary": "Mathematical Crochet (and & continuing to build five tetrahedra) ",
+            "description": "Many interesting mathematical objects can be made using crochet. We have some yarn and a small number of hooks, and we know some websites with good patterns - come along and make something if you like crochet!",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 20,
+            "uid": "2jqh43f1k35s1nv4stograkq63@google.com",
+            "start_dt": "2018-08-31 15:00:00",
+            "end_dt": "2018-08-31 16:00:00",
+            "summary": "Building five intersecting tetrahedra out of wood",
+            "description": "It is possible to combine five tetrahedra so that none of their edges intersect. Help Matt Parker build a massive compound of five tetrahedra out of wood and LEDs. He has not really thought this through.",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 20,
+            "uid": "45uiliboi2m96dutse4letmmvb@google.com",
+            "start_dt": "2018-08-31 14:00:00",
+            "end_dt": "2018-08-31 15:00:00",
+            "summary": "Project Euler open session",
+            "description": "Project Euler is a series of challenging mathematical/computer programming problems which can be completed using a language of your choice. Come and join us to try and work through some of them, and we can all help each other if we get stuck.",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 20,
+            "uid": "55r51k8tv359vh0n0a8kqks1dn@google.com",
+            "start_dt": "2018-08-31 19:00:00",
+            "end_dt": "2018-08-31 22:30:00",
+            "summary": "MathsJam",
+            "description": "MathsJam is an opportunity for like-minded self-confessed maths enthusiasts to get together in a pub and share stuff they like. Puzzles, games, problems, or just anything they think is cool or interesting. We'll turn our workshop antiprism into a pub for the evening - BYOB/maths.",
+            "location": "",
+            "favourite_count": 3
+        },
+        {
+            "source_id": 20,
+            "uid": "26skjjuus1oihhiuoanncb1l6r@google.com",
+            "start_dt": "2018-08-31 11:00:00",
+            "end_dt": "2018-08-31 13:00:00",
+            "summary": "Building the heptagram antiprism",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 20,
+            "uid": "6teu078nn40r3l0mf1pdkhnfk6@google.com",
+            "start_dt": "2018-09-02 17:00:00",
+            "end_dt": "2018-09-02 18:00:00",
+            "summary": "17.00 - 18.00: Binary Keyrings (if there is still demand; \u00a33.50 materials charge)",
+            "description": "Make a laser cut keyring encoding your name in binary! Activity takes around 15 minutes, drop in any time during the hour. \u00a32.50 materials cost (card payments accepted).",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 20,
+            "uid": "7gf7e9krj805cgliqmbge59tmh@google.com",
+            "start_dt": "2018-09-02 16:00:00",
+            "end_dt": "2018-09-02 17:00:00",
+            "summary": "Project Euler open session",
+            "description": "Project Euler is a series of challenging mathematical/computer programming problems which can be completed using a language of your choice. Come and join us to try and work through some of them, and we can all help each other if we get stuck.",
+            "location": "",
+            "favourite_count": 1
+        },
+        {
+            "source_id": 20,
+            "uid": "1tqi10u79llqvj8ksuc28khvau@google.com",
+            "start_dt": "2018-09-02 14:15:00",
+            "end_dt": "2018-09-02 14:45:00",
+            "summary": "Braiding with braids",
+            "description": "Come and make a braided friendship bracelet/keyring, and while you're doing it, learn about the mathematical theory of braids.",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 20,
+            "uid": "7tkemu4gg77k6pnkjc52sm7jnd@google.com",
+            "start_dt": "2018-09-02 12:00:00",
+            "end_dt": "2018-09-02 13:00:00",
+            "summary": "Maths Origami - open session",
+            "description": "There are many paper folding and origami activities which are mathematical. Come along and fold some paper while exercising your mathematical thinking skills - we have a selection of different activities to try.",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 20,
+            "uid": "0lkkikgf359p9s3bi67v50a9b5@google.com",
+            "start_dt": "2018-09-02 10:00:00",
+            "end_dt": "2018-09-02 11:00:00",
+            "summary": "Binary Keyrings (\u00a33.50 materials charge)",
+            "description": "Make a laser cut keyring encoding your name in binary! Activity takes around 15 minutes, drop in any time during the hour. \u00a32.50 materials cost (card payments accepted).",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 20,
+            "uid": "79lm0bsbau4s5afbjrj67pv1ai@google.com",
+            "start_dt": "2018-09-02 09:00:00",
+            "end_dt": "2018-09-02 10:00:00",
+            "summary": "Crap yoga",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 20,
+            "uid": "4knptsludrt5mvnae8gdkk3e90@google.com",
+            "start_dt": "2018-09-01 17:50:00",
+            "end_dt": "2018-09-01 18:20:00",
+            "summary": "Pre-talk Q&A with Hannah Fry",
+            "description": "Before their main programme talk finishes, the speaker will join us in the Maths Village Antiprism for a Q&A and further chat.",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 20,
+            "uid": "35utcmiufekmifktnrlmiva2fs@google.com",
+            "start_dt": "2018-09-01 17:40:00",
+            "end_dt": "2018-09-01 18:10:00",
+            "summary": "Post-talk Q&A with Matthew Scroggs",
+            "description": "After their main programme talk finishes, the speaker will join us in the Maths Village Antiprism for a Q&A and further chat.",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 20,
+            "uid": "1tpcdmnipbmd12vi6ei613cf4n@google.com",
+            "start_dt": "2018-09-01 16:00:00",
+            "end_dt": "2018-09-01 17:00:00",
+            "summary": "Binary Keyrings (\u00a33.50 materials charge)",
+            "description": "Make a laser cut keyring encoding your name in binary! Activity takes around 15 minutes, drop in any time during the hour. \u00a32.50 materials cost (card payments accepted).",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 20,
+            "uid": "7m6vhjl7rkdlpfputurlj2mo53@google.com",
+            "start_dt": "2018-09-01 14:00:00",
+            "end_dt": "2018-09-01 15:00:00",
+            "summary": "Anamorphic perspective activity",
+            "description": "Anamorphism is a way of distorting images so that they can only be viewed from a particular spot. Come and make an anamorphic image using our projector, and see how it changes as you walk around.",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 20,
+            "uid": "6imo0l4p05ptr8avo8douin9rl@google.com",
+            "start_dt": "2018-09-01 12:00:00",
+            "end_dt": "2018-09-01 13:00:00",
+            "summary": "Maths Origami - making five intersecting tetrahedra",
+            "description": "It is possible to combine five tetrahedra so that none of their edges intersect. Inspired by Matt's large wooden light-up version, let's make small ones out of paper!",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 20,
+            "uid": "2adb82l2ihr88sml3n3n4oi2pq@google.com",
+            "start_dt": "2018-09-01 11:00:00",
+            "end_dt": "2018-09-01 12:00:00",
+            "summary": "Bird Walk - meet at the antiprism",
+            "description": "Join Adam for a birdwatching walk. BYO Binoculars, but not essential. We'll be recording sightings on a whiteboard and on EMFFAX (like Ceefax, but at EMF).",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 20,
+            "uid": "4hrsvi0obdund79s62clpnq0pc@google.com",
+            "start_dt": "2018-09-01 10:15:00",
+            "end_dt": "2018-09-01 10:45:00",
+            "summary": "Braiding with braids",
+            "description": "Come and make a braided friendship bracelet/keyring, and while you're doing it, learn about the mathematical theory of braids.",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 22,
+            "uid": "1sv0eaomj3cuib22dgk751rcmu@google.com",
+            "start_dt": "2018-08-31 20:00:00",
+            "end_dt": "2018-09-02 15:00:00",
+            "summary": "Puzzlehunt: Dreamcatcher",
+            "description": "\nWhat is this?\n==========\n\nIt's a puzzlehunt. Think of it as a cross between a treasure hunt and an escape room.\n\n\nWhere?\n======\nWe are based in a shipping container in the Null Sector area of the campsite. \n\n\nWhen?\n=====\nYou can start at any time. We'll be running from Friday 8pm until Sunday 3pm. The hunt will take 1 - 3 hours if done all at once, but can be completed at your leisure.\n\n\nSurely there's some kind of story?\n===========================\nThe Professor is dead, her laboratory has been ransacked, her PhD students are accusing each other of murder, and something is watching from the other side of the Dreamcatcher...\n\nProfessor Alia Gold had a dream: to build the world's first truly imaginative machine. But for reasons unknown, just before her death, she split her research into ten fragments and hid them all around the EMF campsite.\n\nYour quest: to retrieve all ten shards - and solve the mystery of her death... but watch out. Nothing is as it seems, and your choices may affect the very course of human history. \n\n===========================\n\n\nFor more information, see:\nhttps://dreamcatcherpuzzle.xyz \n\n\nContact us at:\n\ndreamcatcher.puzzle@gmail.com\nor talk to us -- we're in the tent with the flamingo on top, near the quiet area (a bit east of our location on the map.)",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 24,
+            "uid": "3c4v9ojuqq4nuqu7n85ad2b05n@google.com",
+            "start_dt": "2018-08-31 23:23:00",
+            "end_dt": "2018-09-01 00:23:00",
+            "summary": "Late nite disco howls",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 24,
+            "uid": "4efmuup0so7evbml7lg7nq43e7@google.com",
+            "start_dt": "2018-09-01 00:23:00",
+            "end_dt": "2018-09-01 01:23:00",
+            "summary": "Currency burning 101",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 24,
+            "uid": "3h9041pf08hefori2jhh4ijpd0@google.com",
+            "start_dt": "2018-09-01 13:37:00",
+            "end_dt": "2018-09-01 14:37:00",
+            "summary": "Advanced elite howling",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 24,
+            "uid": "1cs5q0729e2ktcpgkjm3lr7qp7@google.com",
+            "start_dt": "2018-09-01 10:23:00",
+            "end_dt": "2018-09-01 11:23:00",
+            "summary": "Morning Call to Howls",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 24,
+            "uid": "77tfuc3tnmqk7lvkrhn6u2l8bq@google.com",
+            "start_dt": "2018-09-01 23:23:00",
+            "end_dt": "2018-09-02 00:23:00",
+            "summary": "Late nite disco howls",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 24,
+            "uid": "5ir9ob2if2ns7l1uonig1vpqce@google.com",
+            "start_dt": "2018-09-02 13:37:00",
+            "end_dt": "2018-09-02 14:37:00",
+            "summary": "Advanced elite howling",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 24,
+            "uid": "4mk1lla6knrij5d3o8vbg1t271@google.com",
+            "start_dt": "2018-09-02 10:23:00",
+            "end_dt": "2018-09-02 11:23:00",
+            "summary": "Morning Call to Howls",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 24,
+            "uid": "3va7pm9ikakd9vqmqg82mibc6f@google.com",
+            "start_dt": "2018-09-02 00:23:00",
+            "end_dt": "2018-09-02 01:23:00",
+            "summary": "Currency burning 101",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 24,
+            "uid": "717se1n6ukrb4va7a8f9itb0gu@google.com",
+            "start_dt": "2018-09-02 23:23:00",
+            "end_dt": "2018-09-03 00:23:00",
+            "summary": "Late nite disco howls",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 27,
+            "uid": "1gg8lfh7dq0l6nsf28t5cjjida@google.com",
+            "start_dt": "2018-09-02 10:00:00",
+            "end_dt": "2018-09-02 14:00:00",
+            "summary": "Pewter Casting Workshop - \u00a325 - every hour",
+            "description": "Join us at Yorkshire and friends village for a traditional pewter casting workshop by carving your design in soft stone. Full tuition is provided and takes around 2 to 3 hours however there isn\u2019t really a timescale you just need to be finished by 2pm to allow time to cast your design.\n\nAll the materials are provided for you to sketch your design onto the stone or trace your pattern. Once you\u2019ve carved your design, you can do a test impression by using salt dough. Once you are happy with it we\u2019ll cast it in Pewter. It\u2019s really easy to do and if you would prefer to take you stone away and carve it at your leisure, then pop back for advice or when you are ready to cast it.\n\nSessions start at 10am and 11am and costs \u00a325 to cover materials\n\nhttps://pewtercasting.wordpress.com/2018/08/24/the-journey-begins/\n\nFollow #EMFyaf for updates",
+            "location": "Yorkshire and friends village",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 27,
+            "uid": "2rttgnk9mj8jad9bjdq1l93gqo@google.com",
+            "start_dt": "2018-09-01 10:00:00",
+            "end_dt": "2018-09-01 16:00:00",
+            "summary": "Pewter Casting Workshop - \u00a325 - every hour",
+            "description": "Join us at Yorkshire and friends village for a traditional pewter casting workshop by carving your design in soft stone. Full tuition is provided and takes around 2 to 3 hours however there isn\u2019t really a timescale you just need to be finished by 4pm to allow time to cast your design.\n\nAll the materials are provided for you to sketch your design onto the stone or trace your pattern. Once you\u2019ve carved your design, you can do a test impression by using salt dough. Once you are happy with it we\u2019ll cast it in Pewter. It\u2019s really easy to do and if you would prefer to take you stone away and carve it at your leisure, then pop back for advice or when you are ready to cast it.\n\nEach session begins on the hour and costs \u00a325 to cover material costs.\n\nhttps://pewtercasting.wordpress.com/2018/08/24/the-journey-begins/\n\nFollow #EMFyaf for updates",
+            "location": "Yorkshire and Friends Village",
+            "favourite_count": 1
+        },
+        {
+            "source_id": 28,
+            "uid": "1ciniq3aib9c0fqpgtu2duma2v@google.com",
+            "start_dt": "2018-09-02 11:00:00",
+            "end_dt": "2018-09-02 12:00:00",
+            "summary": "Laser Tag Game",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 28,
+            "uid": "5n40l2n39sl6g4flrr9sd1mf2j@google.com",
+            "start_dt": "2018-09-01 11:00:00",
+            "end_dt": "2018-09-01 12:00:00",
+            "summary": "Laser Tag Game",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 28,
+            "uid": "334l8furq0p6u1dgmf2e7ggki6@google.com",
+            "start_dt": "2018-09-02 16:00:00",
+            "end_dt": "2018-09-02 17:00:00",
+            "summary": "Laser Tag Game",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 28,
+            "uid": "50kolk4m1gegkpng96i4i26v09@google.com",
+            "start_dt": "2018-09-01 16:00:00",
+            "end_dt": "2018-09-01 17:00:00",
+            "summary": "Laser Tag Game",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 28,
+            "uid": "14i4196s33he651hvaq8b6k1de@google.com",
+            "start_dt": "2018-08-31 16:00:00",
+            "end_dt": "2018-08-31 17:00:00",
+            "summary": "Laser Tag Game",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "7u98ktir8mrl65icfcl2dc32op@google.com",
+            "start_dt": "2018-08-31 19:00:00",
+            "end_dt": "2018-08-31 20:00:00",
+            "summary": "DJ Perfect",
+            "description": "house music",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "4uur72ae3oe8240un38al7os1p@google.com",
+            "start_dt": "2018-09-01 18:00:00",
+            "end_dt": "2018-09-01 19:00:00",
+            "summary": "Dixie Flatline",
+            "description": "playing some liquid DnB",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "57mth7e5ia10gdn0hkfqf6uu6u@google.com",
+            "start_dt": "2018-09-01 17:00:00",
+            "end_dt": "2018-09-01 18:00:00",
+            "summary": "Det",
+            "description": "playing some liquid DnB",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "4gfif8ri356837dnoqdeh1fd0g@google.com",
+            "start_dt": "2018-08-31 00:30:00",
+            "end_dt": "2018-08-31 01:00:00",
+            "summary": "Det",
+            "description": "moar dnb",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "1ah5dn32aipcm1k6v12q35e63s@google.com",
+            "start_dt": "2018-08-31 00:00:00",
+            "end_dt": "2018-08-31 00:30:00",
+            "summary": "Chipko",
+            "description": "dnb",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "5753tfihngnleffu1ebiu9v6mv@google.com",
+            "start_dt": "2018-09-02 16:00:00",
+            "end_dt": "2018-09-02 17:00:00",
+            "summary": "MrJoshua",
+            "description": "is playing some Ibiza house",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "0cn9ajileg12denm90oa2574d5@google.com",
+            "start_dt": "2018-09-01 23:00:00",
+            "end_dt": "2018-09-02 00:00:00",
+            "summary": "Cynic b2b Lambdaix b2b Det",
+            "description": "are rinsing even more dnb",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "34qlg4qk9gntrss8342nlemoc2@google.com",
+            "start_dt": "2018-09-01 22:00:00",
+            "end_dt": "2018-09-01 23:00:00",
+            "summary": "Lambdaix",
+            "description": "playing some more DnB",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "1lse3pt3jiv2b7scua0dn1r2kn@google.com",
+            "start_dt": "2018-09-01 21:00:00",
+            "end_dt": "2018-09-01 22:00:00",
+            "summary": "Cynic",
+            "description": "playing some DnB",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "78st6qvf5qe49q8lssvk6glrhl@google.com",
+            "start_dt": "2018-09-02 15:00:00",
+            "end_dt": "2018-09-02 16:00:00",
+            "summary": "Chipko",
+            "description": "playing some downtempo, ambient, chill",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "34a10ospl9lk0p9mho8dion1o0@google.com",
+            "start_dt": "2018-09-02 18:30:00",
+            "end_dt": "2018-09-02 20:00:00",
+            "summary": "Juli Jane",
+            "description": "playing electro house",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "0egasun2bu0n12oeufgdd3l7ti@google.com",
+            "start_dt": "2018-09-02 17:00:00",
+            "end_dt": "2018-09-02 18:30:00",
+            "summary": "DJ LastKnight",
+            "description": "playing geek anthems, DnB, bouncy house and glitch",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "26s2q71ralf0hupmendqun7kbi@google.com",
+            "start_dt": "2018-09-02 20:00:00",
+            "end_dt": "2018-09-02 21:00:00",
+            "summary": "Ben XO",
+            "description": "DnB / Electro House",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "3tketqcr72f6tkpcmf4gqb2gej@google.com",
+            "start_dt": "2018-08-31 23:00:00",
+            "end_dt": "2018-09-01 00:00:00",
+            "summary": "Shroombab",
+            "description": "playing breaks, DnB, and dystopian-themed music",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "5e6b3v4608aanhc8l2h6729co3@google.com",
+            "start_dt": "2018-08-31 22:00:00",
+            "end_dt": "2018-08-31 23:00:00",
+            "summary": "Dixie Flatline",
+            "description": "playing liquid DnB",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "1a8l9d4jia0kj22260f3r3jm08@google.com",
+            "start_dt": "2018-08-31 21:00:00",
+            "end_dt": "2018-08-31 22:00:00",
+            "summary": "Ben XO",
+            "description": "playing DnB and electro house",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "74n6umhsh8v4ec8ab203c2m4vu@google.com",
+            "start_dt": "2018-08-31 20:00:00",
+            "end_dt": "2018-08-31 21:00:00",
+            "summary": "DJ LastKnight",
+            "description": "playing geek anthems, DnB, bouncy house and glitch",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "16106qksoubqkoutnhgoqs2m4l@google.com",
+            "start_dt": "2018-09-01 20:00:00",
+            "end_dt": "2018-09-01 21:00:00",
+            "summary": "Lummox",
+            "description": "playing dystopian grooves for Astral Cats",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "4j9gv21o9r1g7alcvqdgocrtm0@google.com",
+            "start_dt": "2018-09-01 19:00:00",
+            "end_dt": "2018-09-01 20:00:00",
+            "summary": "Alfie Pates",
+            "description": "playing some improvised hardware-driven techno",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "1ee691n99pupuapvqpccghjpej@google.com",
+            "start_dt": "2018-09-01 18:00:00",
+            "end_dt": "2018-09-01 19:00:00",
+            "summary": "DJ Perfect",
+            "description": "playing House",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "5at40mt8aja6irhov8tdv2uudn@google.com",
+            "start_dt": "2018-09-01 15:00:00",
+            "end_dt": "2018-09-01 16:00:00",
+            "summary": "Lummox",
+            "description": "playing some summery chill, disco-infusion",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "58t5th3702mp0to8be7vrsj058@google.com",
+            "start_dt": "2018-09-02 22:00:00",
+            "end_dt": "2018-09-02 23:00:00",
+            "summary": "Chemical Adam",
+            "description": "DnB / Dystopian",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "3tb8m3k22rg7d7fustuo7710fd@google.com",
+            "start_dt": "2018-09-02 21:00:00",
+            "end_dt": "2018-09-02 22:00:00",
+            "summary": "Alfie Pates",
+            "description": "Improvised hardware-driven techno. ",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "37tafm8kqu3704raro7hpp0fbq@google.com",
+            "start_dt": "2018-09-02 00:00:00",
+            "end_dt": "2018-09-02 01:00:00",
+            "summary": "Lummox",
+            "description": "Lummox's Rinse-out Session.",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 31,
+            "uid": "2tp303trkfs38cb54ic88jnsb7@google.com",
+            "start_dt": "2018-09-01 00:00:00",
+            "end_dt": "2018-09-01 01:00:00",
+            "summary": "Chipko",
+            "description": "Techno",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 34,
+            "uid": "5dr4akbaju08mn2cvh8darbeod@google.com",
+            "start_dt": "2018-08-31 19:00:00",
+            "end_dt": "2018-08-31 21:00:00",
+            "summary": "Night Market",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 34,
+            "uid": "02o3vnd26kb0mjlvb1571drl88@google.com",
+            "start_dt": "2018-09-01 14:00:00",
+            "end_dt": "2018-09-01 19:00:00",
+            "summary": "GPS Tarot",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 34,
+            "uid": "2k9a4lo9s4v3n1r35lcqmqjvum@google.com",
+            "start_dt": "2018-08-31 19:00:00",
+            "end_dt": "2018-08-31 21:00:00",
+            "summary": "GPS Tarot",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 35,
+            "uid": "47tlal3an2rtqund884d2ato81@google.com",
+            "start_dt": "2018-09-01 19:00:00",
+            "end_dt": "2018-09-01 20:00:00",
+            "summary": "HeboCon",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 36,
+            "uid": "1f27u9lvliq57vdj571hj53c3j@google.com",
+            "start_dt": "2018-09-02 17:00:00",
+            "end_dt": "2018-09-02 17:30:00",
+            "summary": "Day 3 - Race 2 With Moxie!",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 36,
+            "uid": "2g2q4csd371eb752a57m2iqlui@google.com",
+            "start_dt": "2018-09-02 20:00:00",
+            "end_dt": "2018-09-02 20:30:00",
+            "summary": "Day 3 - Night Race!",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 36,
+            "uid": "3ooda9ggvd9rpm6iiuo7er2o70@google.com",
+            "start_dt": "2018-09-02 14:15:00",
+            "end_dt": "2018-09-02 15:15:00",
+            "summary": "Time Trails",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 36,
+            "uid": "76407nqjn8acob0u9bqqgaq6uk@google.com",
+            "start_dt": "2018-09-02 11:00:00",
+            "end_dt": "2018-09-02 11:30:00",
+            "summary": "Day 3 - Race 1",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 36,
+            "uid": "376kklob2o7vr07d1ijidpjprf@google.com",
+            "start_dt": "2018-09-01 21:00:00",
+            "end_dt": "2018-09-01 21:30:00",
+            "summary": "Hacky Racers - Night Race!",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 36,
+            "uid": "4asjtoq4opge7mctgub3b3cffc@google.com",
+            "start_dt": "2018-09-01 18:00:00",
+            "end_dt": "2018-09-01 18:30:00",
+            "summary": "Hacky Racers - Race 2",
+            "description": "Hacky Racers race two!",
+            "location": "Near the Bar",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 36,
+            "uid": "6gu1kbbnqrb7a19ranl184t7fj@google.com",
+            "start_dt": "2018-09-01 14:00:00",
+            "end_dt": "2018-09-01 15:30:00",
+            "summary": "Hack Racers - Time Trials",
+            "description": "Time trials for Hacky Racers",
+            "location": "Near the Bar",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 37,
+            "uid": "4rv6dktshhqe6sltgct3qfm429@google.com",
+            "start_dt": "2018-09-01 15:00:00",
+            "end_dt": "2018-09-01 16:00:00",
+            "summary": "Habville Saturday launch",
+            "description": "We will be launching a high altitude balloon. Please stop by to see what it's all about!\nCome to habville at 3PM, we will then all walk to another location to launch!",
+            "location": "habville",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 41,
+            "uid": "62c109m032ik648l6b7htf9q5g@google.com",
+            "start_dt": "2018-09-02 20:00:00",
+            "end_dt": "2018-09-02 20:45:00",
+            "summary": "Mountaineer Demonstration",
+            "description": "",
+            "location": "In front of Null Sector",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 41,
+            "uid": "0r6mq5aotbcutuaavi1ht3ne0p@google.com",
+            "start_dt": "2018-09-02 15:00:00",
+            "end_dt": "2018-09-02 15:45:00",
+            "summary": "Mountaineer Demonstration",
+            "description": "",
+            "location": "In front of Null Sector",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 41,
+            "uid": "770bbee2hh0jutveh5jpmq9c2d@google.com",
+            "start_dt": "2018-09-02 10:00:00",
+            "end_dt": "2018-09-02 10:45:00",
+            "summary": "Mountaineer Demonstration",
+            "description": "",
+            "location": "In front of Null Sector",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 41,
+            "uid": "6ngb1su175ie3gft4kpmvn594e@google.com",
+            "start_dt": "2018-09-01 20:00:00",
+            "end_dt": "2018-09-01 20:45:00",
+            "summary": "Mountaineer Demonstration",
+            "description": "",
+            "location": "In front of Null Sector",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "1qskifjo7k1nd8eppg1flr81er@google.com",
+            "start_dt": "2018-09-01 19:00:00",
+            "end_dt": "2018-09-01 20:00:00",
+            "summary": "Intro to Lightburn Software for Laser Cutters",
+            "description": "Come and try Lightburn for laser cutters one on one at the Guild of Makers village in the Northwest Corner of the site. One on one means first come first served and please be patient. ",
+            "location": "Guild of Makers Village NW corner",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "jpg3d43qcgsf158v67gi4qjgvk@google.com",
+            "start_dt": "2016-08-07 17:30:00",
+            "end_dt": "2016-08-07 19:00:00",
+            "summary": "Surface-mount electronics (SMD) assembly for terrified beginners",
+            "description": "",
+            "location": "Hack Centre",
+            "favourite_count": 4
+        },
+        {
+            "source_id": 42,
+            "uid": "0ohv8fg1kvu4fcj9b8epkd9tjg@google.com",
+            "start_dt": "2016-08-07 10:00:00",
+            "end_dt": "2016-08-07 16:00:00",
+            "summary": "RC2014 Z80 Homebrew Computer ",
+            "description": "Join Spencer to make the RC2014 a retro computer kit you can build yourself! ",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "jd6vmeboual3h6m07e51vjbegc@google.com",
+            "start_dt": "2016-08-07 15:00:00",
+            "end_dt": "2016-08-07 16:00:00",
+            "summary": "Rock Drill 4069 Touch Synthesizer Build ",
+            "description": "Join Iain Sharp for a simple single board Touch Synthesizer Build ... make amazing noise... or horrible sound you decide? Suitable for beginners. \u00a312",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "hmmfpncan5ni4td7hqisdpq6b4@google.com",
+            "start_dt": "2016-08-06 15:30:00",
+            "end_dt": "2016-08-06 16:30:00",
+            "summary": "Curious Electric Company",
+            "description": "Matt Little will be available selling kits from The Curious Electric Company in the Hack Centre inc. Bat Listener kit, Mousebot and more. Tweet @CuriousElectric",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "b3r8k9l4n7skuf74edcct5k7ms@google.com",
+            "start_dt": "2016-08-07 10:30:00",
+            "end_dt": "2016-08-07 17:30:00",
+            "summary": "MeArm & MiRobot kits & Instruction with Dr Ben Gray",
+            "description": "Why not try your hand at making a robot arm? Get 20% regular prices on robot kits from MiRobot & MeArm with Ben Grey kits from \u00a330 up. ",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "fl0enuldqhbp5uspdn96air56s@google.com",
+            "start_dt": "2016-08-06 14:00:00",
+            "end_dt": "2016-08-06 18:00:00",
+            "summary": "MeArm & MiRobot kits & Instruction with Dr Ben Gray",
+            "description": "Why not try your hand at making a robot arm? Get 20% regular prices on robot kits from MiRobot & MeArm with Ben Grey kits from \u00a330 up. ",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "j906sda53cfloe5vf3q21kl8e8@google.com",
+            "start_dt": "2016-08-06 17:00:00",
+            "end_dt": "2016-08-06 18:30:00",
+            "summary": "Surface-mount electronics (SMD) assembly for terrified beginners",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "rnh4dr6sou6mmjduhl7ngikbas@google.com",
+            "start_dt": "2016-08-06 19:00:00",
+            "end_dt": "2016-08-06 20:30:00",
+            "summary": "Skull Radio Bone Conduction Kit with Jeffrey Roe ",
+            "description": "Redirected from Workshop 1\nCome and make a radio you can only hear in your head (no drugs required). TOG founder and prime-hacker-of-eire Jeffrey Roe will be conducting an electronics workshop to make a Skull Radio bone conduction kit. \u00a310 per person. All tools provided. Long live TOG. ",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "goq0ijtlp6j00l4hrjh3sa3dr4@google.com",
+            "start_dt": "2016-08-06 12:00:00",
+            "end_dt": "2016-08-06 13:00:00",
+            "summary": "TiLDA Mk.3 Redirected from the BOC",
+            "description": "ALREADY ADVERTISED ELSEWHERE MAY BE OVER SUBSCRIBED.",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "6j9p83e2lt85rn2heekgd7o51g@google.com",
+            "start_dt": "2016-08-06 10:00:00",
+            "end_dt": "2016-08-06 18:00:00",
+            "summary": "MSRaynsford's Laser Cut Machines",
+            "description": "Martin will be selling his amazing Marble Machine kits as well as his famous Useless Machine. Martin will be available to talk all things laser cutting as well as helping you to make your laser cut kits! ",
+            "location": "Hack Centre \u2666 (Just Add Sharks Tent) ",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "tek0trt0lccm0ik5f6o7ar6d4s@google.com",
+            "start_dt": "2016-08-05 21:00:00",
+            "end_dt": "2016-08-05 23:30:00",
+            "summary": "Just Add Sharks Customer Party!",
+            "description": "The sharks (Dominic, Martin, Kirsty and Spencer) invite their customers (current and future) to join them at the Just Add Sharks Tent for the finest Nottingham craft ale from Totally Brewed (the team's neighbour in Nottingham) for their award winning \"Punch in the Face\".  ",
+            "location": "Just Add Sharks Tent (next to Hack Centre) ",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "9ldtiuc41qecekmjq3jgt04o90@google.com",
+            "start_dt": "2016-08-06 19:00:00",
+            "end_dt": "2016-08-06 20:30:00",
+            "summary": "Surface-mount electronics (SMD) assembly for terrified beginners",
+            "description": "",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "4thjurvilf4b9ctncunogra8h8@google.com",
+            "start_dt": "2016-08-06 13:00:00",
+            "end_dt": "2016-08-06 16:30:00",
+            "summary": "Arduino for total newbies with Mitch Altman",
+            "description": "Join Mitch in the Hack Centre for Arduino for total newbies, \u00a330 for materials! Limited to 15 so first come first served! ",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "t7b4n9sfst6nlc3q73hle21ejg@google.com",
+            "start_dt": "2016-08-07 13:00:00",
+            "end_dt": "2016-08-07 16:30:00",
+            "summary": "Arduino for total newbies with Mitch Altman",
+            "description": "Join Mitch in the Hack Centre for Arduino for total newbies, \u00a330 for materials! Limited to 15 so first come first served! ",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "su05v613487rh17eov83591rp4@google.com",
+            "start_dt": "2016-08-07 10:00:00",
+            "end_dt": "2016-08-07 18:00:00",
+            "summary": "MSRaynsford's Laser Cut Machines",
+            "description": "Martin will be selling his amazing Marble Machine kits as well as his famous Useless Machine. Martin will be available to talk all things laser cutting as well as helping you to make your laser cut kits! ",
+            "location": "Hack Centre \u2666 (Just Add Sharks Tent) ",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "3pp3a0mjhki7au3a3f390fu288@google.com",
+            "start_dt": "2016-08-06 10:00:00",
+            "end_dt": "2016-08-06 16:00:00",
+            "summary": "RC2014 Z80 Homebrew Computer ",
+            "description": "Join Spencer to make the RC2014 a retro computer kit you can build yourself! ",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "df555fs6q0tth7cfdvj9ri7uoc@google.com",
+            "start_dt": "2016-08-07 14:00:00",
+            "end_dt": "2016-08-07 15:00:00",
+            "summary": "Part Fusion - Wearables Electronics",
+            "description": "Robert Fitzsimons will be selling & instructing on wearable electronics kits and learn to solder badges",
+            "location": "Hack Centre",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "an57kqdctdcirbd4m2qqjrl6qk@google.com",
+            "start_dt": "2016-08-07 15:00:00",
+            "end_dt": "2016-08-07 16:00:00",
+            "summary": "The Curious Electric Company",
+            "description": "Matt Little will be vending electronics kits and sundries from the Curious Electric Company range and and on hand to help and advise on your environmentally focused projects in the Hack Centre. ",
+            "location": "Hack Centre \u2666",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "oomcb6ktktkl9chjqjnv1uhq20@google.com",
+            "start_dt": "2016-08-06 15:00:00",
+            "end_dt": "2016-08-06 16:00:00",
+            "summary": "Rock Drill 4069 Touch Synthesizer Build ",
+            "description": "Join Iain Sharp for a simple single board Touch Synthesizer Build ... make amazing noise... or horrible sound you decide? Suitable for beginners. \u00a312",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "dlhuegl05ffamdqqdbdtb6ifds@google.com",
+            "start_dt": "2016-08-05 15:00:00",
+            "end_dt": "2016-08-05 16:30:00",
+            "summary": "Surface-mount electronics (SMD) assembly for terrified beginners",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "dksg7c37u0iibodnrhedbf54cs@google.com",
+            "start_dt": "2016-08-06 15:00:00",
+            "end_dt": "2016-08-06 16:30:00",
+            "summary": "Surface-mount electronics (SMD) assembly for terrified beginners",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "mnnhn03slfkf5c6kjd4t104lng@google.com",
+            "start_dt": "2016-08-06 09:00:00",
+            "end_dt": "2016-08-06 11:00:00",
+            "summary": "Hack-N-Swap-O-Rama\u2122",
+            "description": "Bring a shoe box of crap to trade, swap, sell, barter, borrow - but definatel",
+            "location": "Hack Centre \u2666",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "4k3ni9c1rpf0jv794lan8o6kuc@google.com",
+            "start_dt": "2018-09-02 18:00:00",
+            "end_dt": "2018-09-02 19:00:00",
+            "summary": "LASER SOFTWARE - Get hands on with Lightburn for laser cutters",
+            "description": "Come and get hands on with Lightburn for laser cutters one on one with Robert Nixdorf of Smoke & Mirrors over in the Guild of Makers village. NW corner of the site. (Quiet Zone... near the ducks).",
+            "location": "Guild of Makers",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 42,
+            "uid": "19bhkosuu08hj90naglmfv8s4s@google.com",
+            "start_dt": "2018-09-02 16:00:00",
+            "end_dt": "2018-09-02 18:00:00",
+            "summary": "Laser Etch a Carpenters Pencil with Tanya",
+            "description": "Come to the \"quiet zone\" and find the Smoke & Mirrors laser cutter and engrave a carpenters pencil with Tanya Fish. ",
+            "location": "Guild of Makers Village EMF Camp 2018 NW Corner of site",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 43,
+            "uid": "0h7114p1prrcuhskecsfrkra2s@google.com",
+            "start_dt": "2018-09-02 15:00:00",
+            "end_dt": "2018-09-02 16:00:00",
+            "summary": "Hardware swap shop! \u26a1\ud83d\udd27\ud83d\udca1",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        },
+        {
+            "source_id": 44,
+            "uid": "2hfqu711m8mbkeohngm3np2cda@google.com",
+            "start_dt": "2018-09-02 20:00:00",
+            "end_dt": "2018-09-02 21:00:00",
+            "summary": "TILDR: Speed Dating",
+            "description": "",
+            "location": "",
+            "favourite_count": 0
+        }
+    ]
+}
