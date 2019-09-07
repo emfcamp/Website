@@ -18,7 +18,7 @@ from sqlalchemy_continuum.plugins import FlaskPlugin
 from flask_assets import Environment, Bundle
 from webassets.filter import get_filter
 from flask_cdn import CDN
-from flask_cache import Cache
+from flask_caching import Cache
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_wtf import CsrfProtect
 from flask_cors import CORS
