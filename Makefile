@@ -131,7 +131,7 @@ matchyoutube:
 
 test:
 	SETTINGS_FILE=$(TEST_SETTINGS) flake8 ./*.py ./models ./apps ./tasks ./utils.py
-	SETTINGS_FILE=$(TEST_SETTINGS) pytest ./tests/ ./models/
+	SETTINGS_FILE=$(TEST_SETTINGS) pytest --random-order ./tests/ ./models/
 
 testdb:
 	SETTINGS_FILE=$(TEST_SETTINGS) python ./utils.py db upgrade
