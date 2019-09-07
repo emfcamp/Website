@@ -153,7 +153,7 @@ def create_app(dev_server=False):
 
     migrate.init_app(app, db)
 
-    login_manager.setup_app(app, add_context_processor=True)
+    login_manager.init_app(app, add_context_processor=True)
     app.login_manager.login_view = 'users.login'
 
     from models.user import User, load_anonymous_user
