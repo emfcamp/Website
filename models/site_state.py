@@ -7,16 +7,13 @@ from sqlalchemy.orm.exc import MultipleResultsFound
 
 from main import cache, db
 from . import config_date
-from .product import (
-    Product, ProductGroup, ProductView,
-    ProductViewProduct, PriceTier,
-)
+from .product import Product, ProductGroup, ProductView, ProductViewProduct, PriceTier
 
 log = logging.getLogger(__name__)
 
 
 class SiteState(db.Model):
-    __tablename__ = 'site_state'
+    __tablename__ = "site_state"
     __export_data__ = False
     name = db.Column(db.String, primary_key=True)
     state = db.Column(db.String)
@@ -27,48 +24,56 @@ class SiteState(db.Model):
 
 
 VALID_STATES = {
-    'site_state': ["before-sales", "sales", "event", "after-event"],
-    'sales_state': ["sold-out", "sales-ended", "unavailable", "available"],
+    "site_state": ["before-sales", "sales", "event", "after-event"],
+    "sales_state": ["sold-out", "sales-ended", "unavailable", "available"],
 }
 
+
 def event_start():
-    return config_date('EVENT_START')
+    return config_date("EVENT_START")
+
 
 def event_end():
-    return config_date('EVENT_END')
+    return config_date("EVENT_END")
+
 
 def calc_site_state(date):
     """ Logic to set the state of the homepage based on date. """
-    if date < config_date('SALES_START'):
+    if date < config_date("SALES_START"):
         return "before-sales"
-    elif date < config_date('EVENT_START'):
+    elif date < config_date("EVENT_START"):
         return "sales"
-    elif date < config_date('EVENT_END'):
+    elif date < config_date("EVENT_END"):
         return "event"
     else:
         return "after-event"
 
+
 def calc_sales_state(date):
-    site_capacity = ProductGroup.get_by_name('admissions')
+    site_capacity = ProductGroup.get_by_name("admissions")
     if site_capacity is None:
         return "unavailable"
 
     if site_capacity.get_total_remaining_capacity() < 1:
         # We've hit capacity - no more tickets will be sold
         return "sold-out"
-    elif date > config_date('EVENT_END'):
+    elif date > config_date("EVENT_END"):
         return "sales-ended"
 
     # Active price tier for the full ticket product in the main flow.
-    view = ProductView.query.filter_by(name='main')
-    product = view.join(ProductViewProduct, Product).filter_by(name='full')
+    view = ProductView.query.filter_by(name="main")
+    product = view.join(ProductViewProduct, Product).filter_by(name="full")
     try:
-        tier = product.join(Product.price_tiers) \
-                      .filter_by(active=True) \
-                      .with_entities(PriceTier) \
-                      .one_or_none()
+        tier = (
+            product.join(Product.price_tiers)
+            .filter_by(active=True)
+            .with_entities(PriceTier)
+            .one_or_none()
+        )
     except MultipleResultsFound:
-        log.error("Multiple active PriceTiers found. Forcing sales state to unavailable.")
+        log.error(
+            "Multiple active PriceTiers found. Forcing sales state to unavailable."
+        )
         return "unavailable"
 
     if tier is None or tier.has_expired() or tier.get_total_remaining_capacity() <= 0:
@@ -78,31 +83,32 @@ def calc_sales_state(date):
     return "available"
 
 
-@cache.cached(timeout=60, key_prefix='get_states')
+@cache.cached(timeout=60, key_prefix="get_states")
 def get_states():
     states = SiteState.query.all()
     states = {s.name: s.state for s in states}
 
     date = datetime.utcnow()
 
-    if states.get('site_state') is None:
-        states['site_state'] = calc_site_state(date)
+    if states.get("site_state") is None:
+        states["site_state"] = calc_site_state(date)
 
-    if states.get('sales_state') is None:
-        states['sales_state'] = calc_sales_state(date)
+    if states.get("sales_state") is None:
+        states["sales_state"] = calc_sales_state(date)
 
     return states
+
 
 def refresh_states():
     key = get_states.make_cache_key()
     cache.delete(key)
 
+
 def get_site_state():
     states = get_states()
-    return states['site_state']
+    return states["site_state"]
+
 
 def get_sales_state():
     states = get_states()
-    return states['sales_state']
-
-
+    return states["sales_state"]

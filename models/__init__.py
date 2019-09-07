@@ -12,14 +12,26 @@ from sqlalchemy.orm.base import NO_VALUE
 from sqlalchemy.sql.functions import func
 from sqlalchemy_continuum.utils import version_class, transaction_class
 
+
 def exists(query):
     return db.session.query(true()).filter(query.exists()).scalar()
 
+
 def to_dict(obj):
-    return OrderedDict((a.key, getattr(obj, a.key)) for a in inspect(obj).attrs if a.loaded_value != NO_VALUE)
+    return OrderedDict(
+        (a.key, getattr(obj, a.key))
+        for a in inspect(obj).attrs
+        if a.loaded_value != NO_VALUE
+    )
+
 
 def count_groups(query, *entities):
-    return query.with_entities(func.count().label('count'), *entities).group_by(*entities).order_by(*entities)
+    return (
+        query.with_entities(func.count().label("count"), *entities)
+        .group_by(*entities)
+        .order_by(*entities)
+    )
+
 
 def nest_count_keys(rows):
     """ For JSON's sake, because it doesn't support tuples as keys """
@@ -32,10 +44,14 @@ def nest_count_keys(rows):
 
     return tree
 
+
 def bucketise(vals, boundaries):
     """ Sort values into bins, like pandas.cut """
-    ranges = ['%s-%s' % (a, b - 1) if isinstance(b, int) and b - 1 > a else str(a) for a, b in zip(boundaries[:-1], boundaries[1:])]
-    ranges.append('%s+' % boundaries[-1])
+    ranges = [
+        "%s-%s" % (a, b - 1) if isinstance(b, int) and b - 1 > a else str(a)
+        for a, b in zip(boundaries[:-1], boundaries[1:])
+    ]
+    ranges.append("%s+" % boundaries[-1])
     counts = OrderedDict.fromkeys(ranges, 0)
 
     for val in vals:
@@ -45,14 +61,19 @@ def bucketise(vals, boundaries):
 
         i = bisect(boundaries, val)
         if i == 0:
-            raise IndexError('{} is below the lowest boundary {}'.format(
-                             val, boundaries[0]))
+            raise IndexError(
+                "{} is below the lowest boundary {}".format(val, boundaries[0])
+            )
         counts[ranges[i - 1]] += 1
 
     return counts
 
+
 def export_intervals(query, date_entity, interval, fmt):
-    return nest_count_keys(count_groups(query, func.to_char(func.date_trunc(interval, date_entity), fmt)))
+    return nest_count_keys(
+        count_groups(query, func.to_char(func.date_trunc(interval, date_entity), fmt))
+    )
+
 
 def export_counts(query, cols):
     counts = OrderedDict()
@@ -61,9 +82,11 @@ def export_counts(query, cols):
 
     return counts
 
+
 def export_attr_counts(cls, attrs):
     cols = [getattr(cls, a) for a in attrs]
     return export_counts(cls.query, cols)
+
 
 def export_attr_edits(cls, attrs):
     edits_iter = iter_attr_edits(cls, attrs)
@@ -80,19 +103,14 @@ def export_attr_edits(cls, attrs):
     edits = OrderedDict()
     for a in attrs:
         if count == 0:
-            edits[a] = {
-                'max': 0,
-                'avg': Decimal('0.00'),
-            }
+            edits[a] = {"max": 0, "avg": Decimal("0.00")}
 
         else:
             avg = Decimal(totals[a]) / count
-            edits[a] = {
-                'max': maxes[a],
-                'avg': avg.quantize(Decimal('0.01')),
-            }
+            edits[a] = {"max": maxes[a], "avg": avg.quantize(Decimal("0.01"))}
 
     return edits
+
 
 def iter_attr_edits(cls, attrs, query=None):
     pk_cols = [k for k in inspect(cls).primary_key]
@@ -105,9 +123,11 @@ def iter_attr_edits(cls, attrs, query=None):
     if query is None:
         query = cls_version.query
 
-    all_versions = query.join(cls_version.transaction) \
-                        .with_entities(*pk_cols_version + attrs_version + [cls_transaction.issued_at]) \
-                        .order_by(*pk_cols_version + [cls_version.transaction_id])
+    all_versions = (
+        query.join(cls_version.transaction)
+        .with_entities(*pk_cols_version + attrs_version + [cls_transaction.issued_at])
+        .order_by(*pk_cols_version + [cls_version.transaction_id])
+    )
 
     def get_pk(row):
         return [getattr(row, k.name) for k in pk_cols_version]
@@ -130,16 +150,17 @@ def iter_attr_edits(cls, attrs, query=None):
 def config_date(key):
     return parse(app.config.get(key))
 
+
 from .user import *  # noqa: F401,F403
 from .payment import *  # noqa: F401,F403
 from .cfp import *  # noqa: F401,F403
 from .permission import *  # noqa: F401,F403
 from .email import *  # noqa: F401,F403
 from .ical import *  # noqa: F401,F403
-from .product import * # noqa: F401,F403
-from .purchase import * # noqa: F401,F403
-from .basket import * # noqa: F401,F403
-from .map import * # noqa: F401,F403
+from .product import *  # noqa: F401,F403
+from .purchase import *  # noqa: F401,F403
+from .basket import *  # noqa: F401,F403
+from .map import *  # noqa: F401,F403
 from .admin_message import *  # noqa: F401,F403
 from .volunteer import *  # noqa: F401,F403
 

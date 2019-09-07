@@ -3,6 +3,7 @@ from datetime import datetime
 
 from main import db
 
+
 class AdminMessage(db.Model):
     __tablename__ = "admin_message"
     __versioned__ = {}
@@ -13,12 +14,14 @@ class AdminMessage(db.Model):
 
     end = db.Column(db.DateTime)
 
-    created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    modified = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, onupdate=datetime.utcnow)
+    modified = db.Column(
+        db.DateTime, default=datetime.utcnow, nullable=False, onupdate=datetime.utcnow
+    )
 
-    creator = db.relationship('User', backref='admin_messages')
+    creator = db.relationship("User", backref="admin_messages")
 
     @property
     def is_visible(self):

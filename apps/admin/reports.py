@@ -29,11 +29,13 @@ def report_reconcile():
 
         data[pg.name] = {"paid": paid, "pending": pending}
 
-    gt = {'paid': {'GBP': Decimal(), 'EUR': Decimal()},
-          'pending': {'GBP': Decimal(), 'EUR': Decimal()}}
+    gt = {
+        "paid": {"GBP": Decimal(), "EUR": Decimal()},
+        "pending": {"GBP": Decimal(), "EUR": Decimal()},
+    }
     for pg, totals in data.items():
-        for typ in ('paid', 'pending'):
-            gt[typ]['GBP'] += totals[typ]['GBP']
-            gt[typ]['EUR'] += totals[typ]['EUR']
+        for typ in ("paid", "pending"):
+            gt[typ]["GBP"] += totals[typ]["GBP"]
+            gt[typ]["EUR"] += totals[typ]["EUR"]
 
     return render_template("admin/reports/reconcile.html", data=data, gt=gt)

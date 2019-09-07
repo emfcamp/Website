@@ -130,7 +130,8 @@ matchyoutube:
 	python ./utils.py matchyoutube
 
 test:
-	SETTINGS_FILE=$(TEST_SETTINGS) flake8 ./*.py ./models ./apps ./tasks ./utils.py
+	black --check ./apps ./models ./tasks ./tests
+	flake8 ./*.py ./models ./apps ./tasks ./utils.py
 	SETTINGS_FILE=$(TEST_SETTINGS) pytest --random-order ./tests/ ./models/
 
 testdb:

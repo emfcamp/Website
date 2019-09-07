@@ -15,13 +15,13 @@ from ..common.forms import Form, HiddenIntegerField
 
 
 class VolunteerSelectForm(Form):
-    volunteer_id = HiddenIntegerField('Volunteer ID', [InputRequired()])
-    trained = BooleanField('Volunteer')
+    volunteer_id = HiddenIntegerField("Volunteer ID", [InputRequired()])
+    trained = BooleanField("Volunteer")
 
 
 class TrainingForm(Form):
     volunteers = FieldList(FormField(VolunteerSelectForm))
-    submit = SubmitField('Train these volunteers.')
+    submit = SubmitField("Train these volunteers.")
 
     def add_volunteers(self, volunteers):
         # Don't add roles if some have already been set (this will get called
@@ -38,13 +38,15 @@ class TrainingForm(Form):
             field.label = field._volunteer.nickname
 
 
-@volunteer.route('/train-users')
+@volunteer.route("/train-users")
 @v_admin_required
 def select_training():
-    return render_template('volunteer/training/select_training.html', roles=Role.get_all())
+    return render_template(
+        "volunteer/training/select_training.html", roles=Role.get_all()
+    )
 
 
-@volunteer.route('/train-users/<role_id>', methods=['GET', 'POST'])
+@volunteer.route("/train-users/<role_id>", methods=["GET", "POST"])
 @v_admin_required
 def train_users(role_id):
     role = Role.get_by_id(role_id)
@@ -64,10 +66,10 @@ def train_users(role_id):
                 role.trained_volunteers.remove(v._volunteer)
 
         db.session.commit()
-        flash('Trained %d volunteers' % changes)
-        app.logger.info('Trained %d volunteers' % changes)
+        flash("Trained %d volunteers" % changes)
+        app.logger.info("Trained %d volunteers" % changes)
 
-        return redirect(url_for('.train_users', role_id=role_id))
+        return redirect(url_for(".train_users", role_id=role_id))
 
     for v in role.trained_volunteers:
         for f in form.volunteers:
@@ -76,7 +78,9 @@ def train_users(role_id):
                 break
 
     # Sort people who've been trained to the top then by nickname
-    form.volunteers = sorted(form.volunteers, key=lambda f: (-1 if f.trained.data else 1, f._volunteer.nickname))
+    form.volunteers = sorted(
+        form.volunteers,
+        key=lambda f: (-1 if f.trained.data else 1, f._volunteer.nickname),
+    )
 
-    return render_template('volunteer/training/train_users.html', role=role, form=form)
-
+    return render_template("volunteer/training/train_users.html", role=role, form=form)

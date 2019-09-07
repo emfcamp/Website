@@ -4,8 +4,15 @@ from itertools import combinations
 
 import dateutil
 from flask import (
-    redirect, url_for, request, abort, render_template,
-    flash, session, jsonify, current_app as app
+    redirect,
+    url_for,
+    request,
+    abort,
+    render_template,
+    flash,
+    session,
+    jsonify,
+    current_app as app,
 )
 from flask_login import current_user
 from flask_mail import Message
@@ -15,51 +22,71 @@ from sqlalchemy.orm import joinedload
 from main import db, mail, external_url
 from .majority_judgement import calculate_max_normalised_score
 from models.cfp import (
-    Proposal, CFPMessage, CFPVote, Venue,
-    InvalidVenueException, MANUAL_REVIEW_TYPES,
-    get_available_proposal_minutes, ROUGH_LENGTHS, DAYS, DEFAULT_VENUES, EVENT_SPACING,
-    FavouriteProposal
+    Proposal,
+    CFPMessage,
+    CFPVote,
+    Venue,
+    InvalidVenueException,
+    MANUAL_REVIEW_TYPES,
+    get_available_proposal_minutes,
+    ROUGH_LENGTHS,
+    DAYS,
+    DEFAULT_VENUES,
+    EVENT_SPACING,
+    FavouriteProposal,
 )
 from models.user import User
 from models.purchase import Ticket
 from .forms import (
-    UpdateTalkForm, UpdatePerformanceForm, UpdateWorkshopForm,
-    UpdateYouthWorkshopForm, UpdateInstallationForm, UpdateVotesForm, SendMessageForm,
-    CloseRoundForm, AcceptanceForm, ConvertProposalForm,
+    UpdateTalkForm,
+    UpdatePerformanceForm,
+    UpdateWorkshopForm,
+    UpdateYouthWorkshopForm,
+    UpdateInstallationForm,
+    UpdateVotesForm,
+    SendMessageForm,
+    CloseRoundForm,
+    AcceptanceForm,
+    ConvertProposalForm,
 )
 from . import (
-    cfp_review, admin_required, schedule_required, ordered_states,
-    get_proposal_sort_dict, get_next_proposal_to
+    cfp_review,
+    admin_required,
+    schedule_required,
+    ordered_states,
+    get_proposal_sort_dict,
+    get_next_proposal_to,
 )
 
 
-@cfp_review.route('')
+@cfp_review.route("")
 def main():
     if current_user.is_anonymous:
-        return redirect(url_for('users.login', next=url_for('.main')))
+        return redirect(url_for("users.login", next=url_for(".main")))
 
-    if current_user.has_permission('cfp_admin'):
-        return redirect(url_for('.proposals'))
+    if current_user.has_permission("cfp_admin"):
+        return redirect(url_for(".proposals"))
 
-    if current_user.has_permission('cfp_anonymiser'):
-        return redirect(url_for('.anonymisation'))
+    if current_user.has_permission("cfp_anonymiser"):
+        return redirect(url_for(".anonymisation"))
 
-    if current_user.has_permission('cfp_reviewer'):
-        return redirect(url_for('.review_list'))
+    if current_user.has_permission("cfp_reviewer"):
+        return redirect(url_for(".review_list"))
 
     abort(404)
 
 
 def bool_qs(val):
     # Explicit true/false values are better than the implicit notset=&set=anything that bool does
-    if val in ['True', '1']:
+    if val in ["True", "1"]:
         return True
-    elif val in ['False', '0']:
+    elif val in ["False", "0"]:
         return False
-    raise ValueError('Invalid querystring boolean')
+    raise ValueError("Invalid querystring boolean")
+
 
 def filter_proposal_request():
-    bool_names = ['one_day', 'needs_help', 'needs_money']
+    bool_names = ["one_day", "needs_help", "needs_money"]
     bool_vals = [request.args.get(n, type=bool_qs) for n in bool_names]
     bool_dict = {n: v for n, v in zip(bool_names, bool_vals) if v is not None}
 
@@ -67,44 +94,59 @@ def filter_proposal_request():
 
     filtered = False
 
-    types = request.args.getlist('type')
+    types = request.args.getlist("type")
     if types:
         filtered = True
         proposals = proposals.filter(Proposal.type.in_(types))
 
-    states = request.args.getlist('state')
+    states = request.args.getlist("state")
     if states:
         filtered = True
         proposals = proposals.filter(Proposal.state.in_(states))
 
-    needs_ticket = request.args.get('needs_ticket', type=bool_qs)
+    needs_ticket = request.args.get("needs_ticket", type=bool_qs)
     if needs_ticket is True:
         filtered = True
-        proposals = proposals.join(Proposal.user).filter_by(will_have_ticket=False).filter(
-            ~exists().where(Ticket.state.in_(('paid', 'payment-pending')) &
-                            (Ticket.type == 'admission_ticket') &
-                            (Ticket.owner_id == User.id)))
+        proposals = (
+            proposals.join(Proposal.user)
+            .filter_by(will_have_ticket=False)
+            .filter(
+                ~exists().where(
+                    Ticket.state.in_(("paid", "payment-pending"))
+                    & (Ticket.type == "admission_ticket")
+                    & (Ticket.owner_id == User.id)
+                )
+            )
+        )
 
     sort_dict = get_proposal_sort_dict(request.args)
-    proposals = proposals.options(joinedload(Proposal.user)).options(joinedload('user.owned_tickets'))
+    proposals = proposals.options(joinedload(Proposal.user)).options(
+        joinedload("user.owned_tickets")
+    )
     proposals = proposals.all()
     proposals.sort(**sort_dict)
     return proposals, filtered
 
-@cfp_review.route('/proposals')
+
+@cfp_review.route("/proposals")
 @admin_required
 def proposals():
     proposals, filtered = filter_proposal_request()
     non_sort_query_string = dict(request.args)
-    if 'sort_by' in non_sort_query_string:
-        del non_sort_query_string['sort_by']
+    if "sort_by" in non_sort_query_string:
+        del non_sort_query_string["sort_by"]
 
-    if 'reverse' in non_sort_query_string:
-        del non_sort_query_string['reverse']
+    if "reverse" in non_sort_query_string:
+        del non_sort_query_string["reverse"]
 
-    return render_template('cfp_review/proposals.html', proposals=proposals,
-                           new_qs=non_sort_query_string, states=ordered_states,
-                           filtered=filtered, total_proposals=Proposal.query.count())
+    return render_template(
+        "cfp_review/proposals.html",
+        proposals=proposals,
+        new_qs=non_sort_query_string,
+        states=ordered_states,
+        filtered=filtered,
+        total_proposals=Proposal.query.count(),
+    )
 
 
 def send_email_for_proposal(proposal, reason="still-considered", from_address=None):
@@ -112,55 +154,77 @@ def send_email_for_proposal(proposal, reason="still-considered", from_address=No
 
     while True:
         if reason == "accepted":
-            app.logger.info('Sending accepted email for proposal %s', proposal.id)
+            app.logger.info("Sending accepted email for proposal %s", proposal.id)
             subject = 'Your EMF proposal "%s" has been accepted!' % proposal_title
-            template = 'cfp_review/email/accepted_msg.txt'
+            template = "cfp_review/email/accepted_msg.txt"
 
         elif reason == "still-considered":
-            app.logger.info('Sending still-considered email for proposal %s', proposal.id)
+            app.logger.info(
+                "Sending still-considered email for proposal %s", proposal.id
+            )
             subject = 'We\'re still considering your EMF proposal "%s"' % proposal_title
-            template = 'cfp_review/email/not_accepted_msg.txt'
+            template = "cfp_review/email/not_accepted_msg.txt"
 
         elif reason == "rejected":
-            app.logger.info('Sending rejected email for proposal %s', proposal.id)
+            app.logger.info("Sending rejected email for proposal %s", proposal.id)
             proposal.has_rejected_email = True
             subject = 'Your EMF proposal "%s" was not accepted.' % proposal_title
-            template = 'emails/cfp-rejected.txt'
+            template = "emails/cfp-rejected.txt"
 
         elif reason == "check-your-slot":
-            app.logger.info('Sending check-your-slot email for proposal %s', proposal.id)
-            subject = "Your EMF proposal '%s' has been scheduled, please check your slot" % proposal_title
-            template = 'emails/cfp-check-your-slot.txt'
+            app.logger.info(
+                "Sending check-your-slot email for proposal %s", proposal.id
+            )
+            subject = (
+                "Your EMF proposal '%s' has been scheduled, please check your slot"
+                % proposal_title
+            )
+            template = "emails/cfp-check-your-slot.txt"
 
         elif reason == "please-finalise":
-            app.logger.info('Sending please-finalise email for proposal %s', proposal.id)
-            subject = "We need information about your EMF proposal '%s'" % proposal_title
-            template = 'emails/cfp-please-finalise.txt'
+            app.logger.info(
+                "Sending please-finalise email for proposal %s", proposal.id
+            )
+            subject = (
+                "We need information about your EMF proposal '%s'" % proposal_title
+            )
+            template = "emails/cfp-please-finalise.txt"
 
         elif reason == "reserve-list":
-            app.logger.info('Sending reserve-list email for proposal %s', proposal.id)
+            app.logger.info("Sending reserve-list email for proposal %s", proposal.id)
             subject = "Your EMF proposal '%s', and EMF tickets" % proposal_title
-            template = 'emails/cfp-reserve-list.txt'
+            template = "emails/cfp-reserve-list.txt"
 
         elif reason == "scheduled":
-            subject = "Your EMF %s has been scheduled ('%s')" % (proposal.human_type, proposal_title)
-            template = 'emails/cfp-slot-scheduled.txt'
+            subject = "Your EMF %s has been scheduled ('%s')" % (
+                proposal.human_type,
+                proposal_title,
+            )
+            template = "emails/cfp-slot-scheduled.txt"
 
         elif reason == "moved":
-            subject = "Your EMF %s slot has been moved ('%s')" % (proposal.human_type, proposal_title)
-            template = 'emails/cfp-slot-moved.txt'
+            subject = "Your EMF %s slot has been moved ('%s')" % (
+                proposal.human_type,
+                proposal_title,
+            )
+            template = "emails/cfp-slot-moved.txt"
 
         else:
             raise Exception("Unknown cfp proposal email type %s" % reason)
 
-        app.logger.info('Sending %s email for proposal %s', reason, proposal.id)
+        app.logger.info("Sending %s email for proposal %s", reason, proposal.id)
 
-        send_from = app.config['CONTENT_EMAIL']
+        send_from = app.config["CONTENT_EMAIL"]
         if from_address:
             send_from = from_address
 
         msg = Message(subject, sender=send_from, recipients=[proposal.user.email])
-        msg.body = render_template(template, user=proposal.user, proposal=proposal, reserve_ticket_link=app.config['RESERVE_LIST_TICKET_LINK'])
+        msg.body = render_template(
+            template,
+            user=proposal.user,
+            proposal=proposal,
+            reserve_ticket_link=app.config["RESERVE_LIST_TICKET_LINK"],
+        )
 
         # Due to https://bugs.python.org/issue27240 heaader re-wrapping may
         # occasionally fail on arbitrary strings. We try and avoid this by
@@ -172,20 +236,28 @@ def send_email_for_proposal(proposal, reason="still-considered", from_address=No
             return True
         except AttributeError as e:
             if proposal_title:
-                app.logger.error('Failed to email proposal %s, with title, retrying: %s', proposal.id, e)
+                app.logger.error(
+                    "Failed to email proposal %s, with title, retrying: %s",
+                    proposal.id,
+                    e,
+                )
                 proposal_title = ""
             else:
-                app.logger.error('Failed to email proposal %s without title, ABORTING: %s', proposal.id, e)
+                app.logger.error(
+                    "Failed to email proposal %s without title, ABORTING: %s",
+                    proposal.id,
+                    e,
+                )
                 return False
 
 
-@cfp_review.route('/proposals/<int:proposal_id>/convert', methods=['GET', 'POST'])
+@cfp_review.route("/proposals/<int:proposal_id>/convert", methods=["GET", "POST"])
 @admin_required
 def convert_proposal(proposal_id):
     proposal = Proposal.query.get_or_404(proposal_id)
 
     form = ConvertProposalForm()
-    types = {'talk', 'workshop', 'youthworkshop', 'performance', 'installation'}
+    types = {"talk", "workshop", "youthworkshop", "performance", "installation"}
     form.new_type.choices = [(t, t.title()) for t in types if t != proposal.type]
 
     if form.validate_on_submit():
@@ -194,12 +266,14 @@ def convert_proposal(proposal_id):
 
         proposal = Proposal.query.get_or_404(proposal_id)
 
-        return redirect(url_for('.update_proposal', proposal_id=proposal.id))
+        return redirect(url_for(".update_proposal", proposal_id=proposal.id))
 
-    return render_template('cfp_review/convert_proposal.html', proposal=proposal, form=form)
+    return render_template(
+        "cfp_review/convert_proposal.html", proposal=proposal, form=form
+    )
 
 
-@cfp_review.route('/proposals/<int:proposal_id>', methods=['GET', 'POST'])
+@cfp_review.route("/proposals/<int:proposal_id>", methods=["GET", "POST"])
 @admin_required
 def update_proposal(proposal_id):
     def log_and_close(msg, next_page, proposal_id=None):
@@ -214,11 +288,17 @@ def update_proposal(proposal_id):
 
     next_id = next_prop.id if next_prop else None
 
-    form = UpdateTalkForm() if prop.type == 'talk' else \
-           UpdateWorkshopForm() if prop.type == 'workshop' else \
-           UpdateYouthWorkshopForm() if prop.type == 'youthworkshop' else \
-           UpdatePerformanceForm() if prop.type == 'performance' else \
-           UpdateInstallationForm()
+    form = (
+        UpdateTalkForm()
+        if prop.type == "talk"
+        else UpdateWorkshopForm()
+        if prop.type == "workshop"
+        else UpdateYouthWorkshopForm()
+        if prop.type == "youthworkshop"
+        else UpdatePerformanceForm()
+        if prop.type == "performance"
+        else UpdateInstallationForm()
+    )
 
     # Process the POST
     if form.validate_on_submit():
@@ -228,38 +308,42 @@ def update_proposal(proposal_id):
             # FIXME: this should just be standard field validator,
             # e.g. validate_allowed_venues. That way it'll show up
             # in the form where the error is.
-            flash('Invalid venue')
-            return render_template('cfp_review/update_proposal.html',
-                                   proposal=prop, form=form, next_id=next_id)
+            flash("Invalid venue")
+            return render_template(
+                "cfp_review/update_proposal.html",
+                proposal=prop,
+                form=form,
+                next_id=next_id,
+            )
 
         if form.update.data:
-            msg = 'Updating proposal %s' % proposal_id
+            msg = "Updating proposal %s" % proposal_id
             prop.state = form.state.data
 
         elif form.reject.data or form.reject_with_message.data:
-            msg = 'Rejecting proposal %s' % proposal_id
-            prop.set_state('rejected')
+            msg = "Rejecting proposal %s" % proposal_id
+            prop.set_state("rejected")
 
             if form.reject_with_message.data:
                 send_email_for_proposal(prop, reason="rejected")
 
         elif form.accept.data:
-            msg = 'Manually accepting proposal %s' % proposal_id
-            prop.set_state('accepted')
+            msg = "Manually accepting proposal %s" % proposal_id
+            prop.set_state("accepted")
             send_email_for_proposal(prop, reason="accepted")
 
         elif form.checked.data:
             if prop.type in MANUAL_REVIEW_TYPES:
-                msg = 'Sending proposal %s for manual review' % proposal_id
-                prop.set_state('manual-review')
+                msg = "Sending proposal %s for manual review" % proposal_id
+                prop.set_state("manual-review")
             else:
-                msg = 'Sending proposal %s for anonymisation' % proposal_id
-                prop.set_state('checked')
+                msg = "Sending proposal %s for anonymisation" % proposal_id
+                prop.set_state("checked")
 
             if not next_id:
-                return log_and_close(msg, '.proposals')
-            return log_and_close(msg, '.update_proposal', proposal_id=next_id)
-        return log_and_close(msg, '.update_proposal', proposal_id=proposal_id)
+                return log_and_close(msg, ".proposals")
+            return log_and_close(msg, ".update_proposal", proposal_id=next_id)
+        return log_and_close(msg, ".update_proposal", proposal_id=proposal_id)
 
     form.state.data = prop.state
     form.title.data = prop.title
@@ -293,7 +377,7 @@ def update_proposal(proposal_id):
     if prop.potential_venue:
         form.potential_venue.data = prop.potential_venue.name
 
-    if prop.type == 'workshop' or prop.type == 'youthworkshop':
+    if prop.type == "workshop" or prop.type == "youthworkshop":
         form.attendees.data = prop.attendees
         form.cost.data = prop.cost
         form.participant_equipment.data = prop.participant_equipment
@@ -302,61 +386,70 @@ def update_proposal(proposal_id):
         form.published_cost.data = prop.published_cost
         form.published_participant_equipment.data = prop.published_participant_equipment
 
-        if prop.type == 'youthworkshop':
+        if prop.type == "youthworkshop":
             form.valid_dbs.data = prop.valid_dbs
 
-    elif prop.type == 'installation':
+    elif prop.type == "installation":
         form.size.data = prop.size
         form.funds.data = prop.funds
 
-    return render_template('cfp_review/update_proposal.html',
-                            proposal=prop, form=form, next_id=next_id)
+    return render_template(
+        "cfp_review/update_proposal.html", proposal=prop, form=form, next_id=next_id
+    )
+
 
 def get_all_messages_sort_dict(parameters, user):
     sort_keys = {
-        'unread': lambda p: (p.get_unread_count(user) > 0, p.messages[-1].created),
-        'date': lambda p: p.messages[-1].created,
-        'from': lambda p: p.user.name,
-        'title': lambda p: p.title,
-        'count': lambda p: len(p.messages),
+        "unread": lambda p: (p.get_unread_count(user) > 0, p.messages[-1].created),
+        "date": lambda p: p.messages[-1].created,
+        "from": lambda p: p.user.name,
+        "title": lambda p: p.title,
+        "count": lambda p: len(p.messages),
     }
 
-    sort_by_key = parameters.get('sort_by')
-    reverse = parameters.get('reverse')
+    sort_by_key = parameters.get("sort_by")
+    reverse = parameters.get("reverse")
     # If unread sort order we have to have unread on top which means reverse sort
-    if sort_by_key is None or sort_by_key == 'unread':
+    if sort_by_key is None or sort_by_key == "unread":
         reverse = True
     return {
-        'key': sort_keys.get(sort_by_key, sort_keys['unread']),
-        'reverse': bool(reverse)
+        "key": sort_keys.get(sort_by_key, sort_keys["unread"]),
+        "reverse": bool(reverse),
     }
 
-@cfp_review.route('/messages')
+
+@cfp_review.route("/messages")
 @admin_required
 def all_messages():
-    filter_type = request.args.get('type')
+    filter_type = request.args.get("type")
 
     # Query from the proposal because that's actually what we display
-    proposal_with_message = Proposal.query\
-        .join(CFPMessage)\
-        .filter(Proposal.id == CFPMessage.proposal_id)\
+    proposal_with_message = (
+        Proposal.query.join(CFPMessage)
+        .filter(Proposal.id == CFPMessage.proposal_id)
         .order_by(CFPMessage.has_been_read, CFPMessage.created.desc())
+    )
 
     if filter_type:
-        proposal_with_message = proposal_with_message.filter(Proposal.type == filter_type)
+        proposal_with_message = proposal_with_message.filter(
+            Proposal.type == filter_type
+        )
     else:
-        filter_type = 'all'
+        filter_type = "all"
 
     proposal_with_message = proposal_with_message.all()
 
     sort_dict = get_all_messages_sort_dict(request.args, current_user)
     proposal_with_message.sort(**sort_dict)
 
-    return render_template('cfp_review/all_messages.html',
-                           proposal_with_message=proposal_with_message, type=filter_type)
+    return render_template(
+        "cfp_review/all_messages.html",
+        proposal_with_message=proposal_with_message,
+        type=filter_type,
+    )
 
 
-@cfp_review.route('/proposals/<int:proposal_id>/message', methods=['GET', 'POST'])
+@cfp_review.route("/proposals/<int:proposal_id>/message", methods=["GET", "POST"])
 @admin_required
 def message_proposer(proposal_id):
     form = SendMessageForm()
@@ -373,32 +466,47 @@ def message_proposer(proposal_id):
             db.session.add(msg)
             db.session.commit()
 
-            app.logger.info('Sending message from %s to %s', current_user.id, proposal.user_id)
+            app.logger.info(
+                "Sending message from %s to %s", current_user.id, proposal.user_id
+            )
 
-            msg_url = external_url('cfp.proposal_messages', proposal_id=proposal_id)
-            msg = Message('New message about your EMF proposal',
-                          sender=app.config['CONTENT_EMAIL'],
-                          recipients=[proposal.user.email])
-            msg.body = render_template('cfp_review/email/new_message.txt', url=msg_url,
-                                       to_user=proposal.user, from_user=current_user,
-                                       proposal=proposal)
+            msg_url = external_url("cfp.proposal_messages", proposal_id=proposal_id)
+            msg = Message(
+                "New message about your EMF proposal",
+                sender=app.config["CONTENT_EMAIL"],
+                recipients=[proposal.user.email],
+            )
+            msg.body = render_template(
+                "cfp_review/email/new_message.txt",
+                url=msg_url,
+                to_user=proposal.user,
+                from_user=current_user,
+                proposal=proposal,
+            )
             mail.send(msg)
 
         count = proposal.mark_messages_read(current_user)
         db.session.commit()
-        app.logger.info('Marked %s messages to admin on proposal %s as read' % (count, proposal.id))
+        app.logger.info(
+            "Marked %s messages to admin on proposal %s as read" % (count, proposal.id)
+        )
 
-        return redirect(url_for('.message_proposer', proposal_id=proposal_id))
+        return redirect(url_for(".message_proposer", proposal_id=proposal_id))
 
     # Admin can see all messages sent in relation to a proposal
-    messages = CFPMessage.query.filter_by(
-        proposal_id=proposal_id
-    ).order_by('created').all()
+    messages = (
+        CFPMessage.query.filter_by(proposal_id=proposal_id).order_by("created").all()
+    )
 
-    return render_template('cfp_review/message_proposer.html',
-                           form=form, messages=messages, proposal=proposal)
+    return render_template(
+        "cfp_review/message_proposer.html",
+        form=form,
+        messages=messages,
+        proposal=proposal,
+    )
 
-@cfp_review.route('/message_batch', methods=['GET', 'POST'])
+
+@cfp_review.route("/message_batch", methods=["GET", "POST"])
 @admin_required
 def message_batch():
     proposals, filtered = filter_proposal_request()
@@ -416,68 +524,85 @@ def message_batch():
                 db.session.add(msg)
                 db.session.commit()
 
-                app.logger.info('Sending message from %s to %s', current_user.id, proposal.user_id)
+                app.logger.info(
+                    "Sending message from %s to %s", current_user.id, proposal.user_id
+                )
 
-                msg_url = external_url('cfp.proposal_messages', proposal_id=proposal.id)
-                msg = Message('New message about your EMF proposal',
-                            sender=app.config['CONTENT_EMAIL'],
-                            recipients=[proposal.user.email])
-                msg.body = render_template('cfp_review/email/new_message.txt', url=msg_url,
-                                        to_user=proposal.user, from_user=current_user,
-                                        proposal=proposal)
+                msg_url = external_url("cfp.proposal_messages", proposal_id=proposal.id)
+                msg = Message(
+                    "New message about your EMF proposal",
+                    sender=app.config["CONTENT_EMAIL"],
+                    recipients=[proposal.user.email],
+                )
+                msg.body = render_template(
+                    "cfp_review/email/new_message.txt",
+                    url=msg_url,
+                    to_user=proposal.user,
+                    from_user=current_user,
+                    proposal=proposal,
+                )
                 mail.send(msg)
 
-            flash('Messaged %s proposals' % len(proposals), 'info')
-            return redirect(url_for('.proposals', **request.args))
+            flash("Messaged %s proposals" % len(proposals), "info")
+            return redirect(url_for(".proposals", **request.args))
 
-    return render_template('cfp_review/message_batch.html',
-                           form=form, proposals=proposals)
+    return render_template(
+        "cfp_review/message_batch.html", form=form, proposals=proposals
+    )
+
 
 def get_vote_summary_sort_args(parameters):
     sort_keys = {
         # Notes == unread first then by date
-        'notes': lambda p: (p[0].get_unread_vote_note_count() > 0,
-                            p[0].get_total_note_count()),
-        'date': lambda p: p[0].created,
-        'title': lambda p: p[0].title.lower(),
-        'votes': lambda p: p[1].get('voted', 0),
-        'blocked': lambda p: p[1].get('blocked', 0),
-        'recused': lambda p: p[1].get('recused', 0),
+        "notes": lambda p: (
+            p[0].get_unread_vote_note_count() > 0,
+            p[0].get_total_note_count(),
+        ),
+        "date": lambda p: p[0].created,
+        "title": lambda p: p[0].title.lower(),
+        "votes": lambda p: p[1].get("voted", 0),
+        "blocked": lambda p: p[1].get("blocked", 0),
+        "recused": lambda p: p[1].get("recused", 0),
     }
 
-    sort_by_key = parameters.get('sort_by')
+    sort_by_key = parameters.get("sort_by")
     return {
-        'key': sort_keys.get(sort_by_key, sort_keys['notes']),
-        'reverse': bool(parameters.get('reverse'))
+        "key": sort_keys.get(sort_by_key, sort_keys["notes"]),
+        "reverse": bool(parameters.get("reverse")),
     }
 
-@cfp_review.route('/votes')
+
+@cfp_review.route("/votes")
 @admin_required
 def vote_summary():
-    proposal_query = Proposal.query if request.args.get('all', None) else Proposal.query.filter_by(state='anonymised')
+    proposal_query = (
+        Proposal.query
+        if request.args.get("all", None)
+        else Proposal.query.filter_by(state="anonymised")
+    )
 
-    proposals = proposal_query.order_by('modified').all()
+    proposals = proposal_query.order_by("modified").all()
 
     proposals_with_counts = []
     summary = {
-        'notes_total': 0,
-        'notes_unread': 0,
-        'blocked_total': 0,
-        'recused_total': 0,
-        'voted_total': 0,
-        'min_votes': None,
-        'max_votes': 0,
+        "notes_total": 0,
+        "notes_unread": 0,
+        "blocked_total": 0,
+        "recused_total": 0,
+        "voted_total": 0,
+        "min_votes": None,
+        "max_votes": 0,
     }
 
     for prop in proposals:
         state_counts = {}
-        vote_count = len([v for v in prop.votes if v.state == 'voted'])
+        vote_count = len([v for v in prop.votes if v.state == "voted"])
 
-        if summary['min_votes'] is None or summary['min_votes'] > vote_count:
-            summary['min_votes'] = vote_count
+        if summary["min_votes"] is None or summary["min_votes"] > vote_count:
+            summary["min_votes"] = vote_count
 
-        if summary['max_votes'] < vote_count:
-            summary['max_votes'] = vote_count
+        if summary["max_votes"] < vote_count:
+            summary["max_votes"] = vote_count
 
         for v in prop.votes:
             # Update proposal values
@@ -486,14 +611,14 @@ def vote_summary():
 
             # Update note stats
             if v.note is not None:
-                summary['notes_total'] += 1
+                summary["notes_total"] += 1
 
             if v.note is not None and not v.has_been_read:
-                summary['notes_unread'] += 1
+                summary["notes_unread"] += 1
 
             # State stats
-            if v.state in ('voted', 'blocked', 'recused'):
-                summary[v.state + '_total'] += 1
+            if v.state in ("voted", "blocked", "recused"):
+                summary[v.state + "_total"] += 1
 
         proposals_with_counts.append((prop, state_counts))
 
@@ -501,11 +626,14 @@ def vote_summary():
     sort_args = get_vote_summary_sort_args(request.args)
     proposals_with_counts.sort(**sort_args)
 
-    return render_template('cfp_review/vote_summary.html', summary=summary,
-                            proposals_with_counts=proposals_with_counts)
+    return render_template(
+        "cfp_review/vote_summary.html",
+        summary=summary,
+        proposals_with_counts=proposals_with_counts,
+    )
 
 
-@cfp_review.route('/proposals/<int:proposal_id>/votes', methods=['GET', 'POST'])
+@cfp_review.route("/proposals/<int:proposal_id>/votes", methods=["GET", "POST"])
 @admin_required
 def proposal_votes(proposal_id):
     form = UpdateVotesForm()
@@ -513,37 +641,40 @@ def proposal_votes(proposal_id):
     all_votes = {v.id: v for v in proposal.votes}
 
     if form.validate_on_submit():
-        msg = ''
+        msg = ""
         if form.set_all_stale.data:
             stale_count = 0
-            states_to_set = ['voted', 'blocked', 'recused'] if form.include_recused.data\
-                                                            else ['voted', 'blocked']
+            states_to_set = (
+                ["voted", "blocked", "recused"]
+                if form.include_recused.data
+                else ["voted", "blocked"]
+            )
             for vote in all_votes.values():
                 if vote.state in states_to_set:
-                    vote.set_state('stale')
+                    vote.set_state("stale")
                     vote.note = None
                     stale_count += 1
 
             if stale_count:
-                msg = 'Set %s votes to stale' % stale_count
+                msg = "Set %s votes to stale" % stale_count
 
         elif form.update.data:
             update_count = 0
             for form_vote in form.votes_to_resolve:
-                vote = all_votes[form_vote['id'].data]
-                if form_vote.resolve.data and vote.state in ['blocked']:
-                    vote.set_state('resolved')
+                vote = all_votes[form_vote["id"].data]
+                if form_vote.resolve.data and vote.state in ["blocked"]:
+                    vote.set_state("resolved")
                     vote.note = None
                     update_count += 1
 
             if update_count:
-                msg = 'Set %s votes to resolved' % update_count
+                msg = "Set %s votes to resolved" % update_count
 
         elif form.resolve_all.data:
             resolved_count = 0
             for vote in all_votes.values():
-                if vote.state == 'blocked':
-                    vote.set_state('resolved')
+                if vote.state == "blocked":
+                    vote.set_state("resolved")
                     vote.note = None
                     resolved_count += 1
 
@@ -556,77 +687,79 @@ def proposal_votes(proposal_id):
             v.has_been_read = True
 
         db.session.commit()
-        return redirect(url_for('.proposal_votes', proposal_id=proposal_id))
+        return redirect(url_for(".proposal_votes", proposal_id=proposal_id))
 
     for v_id in all_votes:
         form.votes_to_resolve.append_entry()
-        form.votes_to_resolve[-1]['id'].data = v_id
+        form.votes_to_resolve[-1]["id"].data = v_id
 
-    return render_template('cfp_review/proposal_votes.html',
-                           proposal=proposal, form=form, votes=all_votes)
+    return render_template(
+        "cfp_review/proposal_votes.html", proposal=proposal, form=form, votes=all_votes
+    )
 
 
-@cfp_review.route('/close-round', methods=['GET', 'POST'])
+@cfp_review.route("/close-round", methods=["GET", "POST"])
 @admin_required
 def close_round():
     form = CloseRoundForm()
     min_votes = 0
 
-    vote_subquery = CFPVote.query\
-        .with_entities(
-            CFPVote.proposal_id,
-            func.count('*').label('count')
-        )\
-        .filter(CFPVote.state == 'voted')\
-        .group_by('proposal_id')\
+    vote_subquery = (
+        CFPVote.query.with_entities(CFPVote.proposal_id, func.count("*").label("count"))
+        .filter(CFPVote.state == "voted")
+        .group_by("proposal_id")
         .subquery()
+    )
 
-    proposals = Proposal.query\
-        .with_entities(Proposal, vote_subquery.c.count)\
-        .join(
-            vote_subquery,
-            Proposal.id == vote_subquery.c.proposal_id
-        )\
-        .filter(
-            Proposal.state.in_(['anonymised', 'reviewed'])
-        ).order_by(vote_subquery.c.count.desc()).all()
+    proposals = (
+        Proposal.query.with_entities(Proposal, vote_subquery.c.count)
+        .join(vote_subquery, Proposal.id == vote_subquery.c.proposal_id)
+        .filter(Proposal.state.in_(["anonymised", "reviewed"]))
+        .order_by(vote_subquery.c.count.desc())
+        .all()
+    )
 
     preview = False
     if form.validate_on_submit():
         if form.confirm.data:
-            min_votes = session['min_votes']
+            min_votes = session["min_votes"]
             for (prop, vote_count) in proposals:
-                if vote_count >= min_votes and prop.state != 'reviewed':
-                    prop.set_state('reviewed')
+                if vote_count >= min_votes and prop.state != "reviewed":
+                    prop.set_state("reviewed")
 
             db.session.commit()
-            del session['min_votes']
-            app.logger.info("CFP Round closed. Set %s proposals to 'reviewed'" % len(proposals))
+            del session["min_votes"]
+            app.logger.info(
+                "CFP Round closed. Set %s proposals to 'reviewed'" % len(proposals)
+            )
 
-            return redirect(url_for('.rank'))
+            return redirect(url_for(".rank"))
 
         elif form.close_round.data:
             preview = True
-            session['min_votes'] = form.min_votes.data
+            session["min_votes"] = form.min_votes.data
             flash('Blue proposals will be marked as "reviewed"')
 
         elif form.cancel.data:
             form.min_votes.data = form.min_votes.default
-            if 'min_votes' in session:
-                del session['min_votes']
+            if "min_votes" in session:
+                del session["min_votes"]
 
-    return render_template('cfp_review/close-round.html', form=form,
-                           proposals=proposals, preview=preview,
-                           min_votes=session.get('min_votes'))
+    return render_template(
+        "cfp_review/close-round.html",
+        form=form,
+        proposals=proposals,
+        preview=preview,
+        min_votes=session.get("min_votes"),
+    )
 
 
-@cfp_review.route('/rank', methods=['GET', 'POST'])
+@cfp_review.route("/rank", methods=["GET", "POST"])
 @admin_required
 def rank():
-    proposals = Proposal.query\
-        .filter_by(state='reviewed')
+    proposals = Proposal.query.filter_by(state="reviewed")
 
-    types = request.args.getlist('type')
+    types = request.args.getlist("type")
     if types:
         proposals = proposals.filter(Proposal.type.in_(types))
 
@@ -635,7 +768,7 @@ def rank():
     scored_proposals = []
 
     for prop in proposals:
-        score_list = [v.vote for v in prop.votes if v.state == 'voted']
+        score_list = [v.vote for v in prop.votes if v.state == "voted"]
         score = calculate_max_normalised_score(score_list)
         scored_proposals.append((prop, score))
 
@@ -644,45 +777,48 @@ def rank():
     preview = False
     if form.validate_on_submit():
         if form.confirm.data:
-            min_score = session['min_score']
+            min_score = session["min_score"]
             count = 0
             for (prop, score) in scored_proposals:
 
                 if score >= min_score:
                     count += 1
-                    prop.set_state('accepted')
-                    if form.confirm_type.data in ('accepted_unaccepted', 'accepted', 'accepted_reject'):
+                    prop.set_state("accepted")
+                    if form.confirm_type.data in (
+                        "accepted_unaccepted",
+                        "accepted",
+                        "accepted_reject",
+                    ):
                         send_email_for_proposal(prop, reason="accepted")
 
                 else:
-                    if form.confirm_type.data == 'accepted_unaccepted':
+                    if form.confirm_type.data == "accepted_unaccepted":
                         send_email_for_proposal(prop, reason="still-considered")
 
-                    elif form.confirm_type.data == 'accepted_reject':
-                        prop.set_state('rejected')
+                    elif form.confirm_type.data == "accepted_reject":
+                        prop.set_state("rejected")
                         prop.has_rejected_email = True
                         send_email_for_proposal(prop, reason="rejected")
 
                 db.session.commit()
 
-            del session['min_score']
+            del session["min_score"]
             msg = "Accepted %s %s proposals; min score: %s" % (count, types, min_score)
             app.logger.info(msg)
-            flash(msg, 'info')
-            return redirect(url_for('.proposals', state='accepted'))
+            flash(msg, "info")
+            return redirect(url_for(".proposals", state="accepted"))
 
         elif form.set_score.data:
             preview = True
-            session['min_score'] = form.min_score.data
-            flash('Blue proposals will be accepted', 'info')
+            session["min_score"] = form.min_score.data
+            flash("Blue proposals will be accepted", "info")
 
-        elif form.cancel.data and 'min_score' in session:
-            del session['min_score']
+        elif form.cancel.data and "min_score" in session:
+            del session["min_score"]
 
-    accepted_proposals = Proposal.query\
-        .filter(
-            Proposal.state.in_(['accepted', 'finished'])
-        )
+    accepted_proposals = Proposal.query.filter(
+        Proposal.state.in_(["accepted", "finished"])
+    )
     accepted_counts = defaultdict(int)
     for proposal in accepted_proposals:
         accepted_counts[proposal.type] += 1
@@ -690,8 +826,9 @@ def rank():
     allocated_minutes = defaultdict(int)
     unknown_lengths = defaultdict(int)
 
-    accepted_proposals = Proposal.query.\
-        filter(Proposal.state.in_(['accepted', 'finished'])).all()
+    accepted_proposals = Proposal.query.filter(
+        Proposal.state.in_(["accepted", "finished"])
+    ).all()
     for proposal in accepted_proposals:
         length = None
         if proposal.scheduled_duration:
@@ -711,23 +848,42 @@ def rank():
     for type, amount in allocated_minutes.items():
         num_venues = len(DEFAULT_VENUES[type])
         # Amount of minutes per venue * number of venues - (slot changeover period) from the end
-        allocated_minutes[type] = amount - ((10 * EVENT_SPACING[type]) * num_days * num_venues)
+        allocated_minutes[type] = amount - (
+            (10 * EVENT_SPACING[type]) * num_days * num_venues
+        )
 
     available_minutes = get_available_proposal_minutes()
-    remaining_minutes = {type: available_minutes[type] - allocated_minutes[type] for type in allocated_minutes.keys()}
+    remaining_minutes = {
+        type: available_minutes[type] - allocated_minutes[type]
+        for type in allocated_minutes.keys()
+    }
 
-    return render_template('cfp_review/rank.html', form=form, preview=preview,
-                           proposals=scored_proposals, accepted_counts=accepted_counts,
-                           available_minutes=available_minutes, remaining_minutes=remaining_minutes,
-                           allocated_minutes=allocated_minutes, unknown_lengths=unknown_lengths,
-                           min_score=session.get('min_score'), types=types)
+    return render_template(
+        "cfp_review/rank.html",
+        form=form,
+        preview=preview,
+        proposals=scored_proposals,
+        accepted_counts=accepted_counts,
+        available_minutes=available_minutes,
+        remaining_minutes=remaining_minutes,
+        allocated_minutes=allocated_minutes,
+        unknown_lengths=unknown_lengths,
+        min_score=session.get("min_score"),
+        types=types,
+    )
 
-@cfp_review.route('/potential_schedule_changes', methods=['GET', 'POST'])
+
+@cfp_review.route("/potential_schedule_changes", methods=["GET", "POST"])
 @schedule_required
 def potential_schedule_changes():
-    proposals = Proposal.query.filter(
-        (Proposal.potential_venue != None) | (Proposal.potential_time != None)  # noqa
-    ).filter(Proposal.scheduled_duration.isnot(None)).all()
+    proposals = (
+        Proposal.query.filter(
+            (Proposal.potential_venue != None)
+            | (Proposal.potential_time != None)  # noqa
+        )
+        .filter(Proposal.scheduled_duration.isnot(None))
+        .all()
+    )
 
     for proposal in proposals:
         if proposal.scheduled_venue:
@@ -735,78 +891,101 @@ def potential_schedule_changes():
         if proposal.potential_venue:
             proposal.potential_venue_name = proposal.potential_venue.name
 
-    return render_template('cfp_review/potential_schedule_changes.html', proposals=proposals)
+    return render_template(
+        "cfp_review/potential_schedule_changes.html", proposals=proposals
+    )
 
-@cfp_review.route('/scheduler')
+
+@cfp_review.route("/scheduler")
 @schedule_required
 def scheduler():
-    proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
-        filter(Proposal.state.in_(['finished', 'accepted'])).\
-        filter(Proposal.type.in_(['talk', 'workshop', 'youthworkshop', 'performance'])).all()
+    proposals = (
+        Proposal.query.filter(Proposal.scheduled_duration.isnot(None))
+        .filter(Proposal.state.in_(["finished", "accepted"]))
+        .filter(Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]))
+        .all()
+    )
 
     schedule_data = []
     for proposal in proposals:
         export = {
-            'id': proposal.id,
-            'duration': proposal.scheduled_duration,
-            'is_potential': False,
-            'speakers': [ proposal.user.id ],
-            'text': proposal.display_title,
-            'valid_venues': [ v.id for v in proposal.get_allowed_venues() ],
-            'valid_time_ranges': [
-                {"start": str(p.start), "end": str(p.end)} for p in proposal.get_allowed_time_periods_with_default()
+            "id": proposal.id,
+            "duration": proposal.scheduled_duration,
+            "is_potential": False,
+            "speakers": [proposal.user.id],
+            "text": proposal.display_title,
+            "valid_venues": [v.id for v in proposal.get_allowed_venues()],
+            "valid_time_ranges": [
+                {"start": str(p.start), "end": str(p.end)}
+                for p in proposal.get_allowed_time_periods_with_default()
             ],
         }
 
         if proposal.scheduled_venue:
-            export['venue'] = proposal.scheduled_venue_id
+            export["venue"] = proposal.scheduled_venue_id
         if proposal.potential_venue:
-            export['venue'] = proposal.potential_venue_id
-            export['is_potential'] = True
+            export["venue"] = proposal.potential_venue_id
+            export["is_potential"] = True
 
         if proposal.scheduled_time:
-            export['start_date'] = proposal.scheduled_time
+            export["start_date"] = proposal.scheduled_time
         if proposal.potential_time:
-            export['start_date'] = proposal.potential_time
-            export['is_potential'] = True
+            export["start_date"] = proposal.potential_time
+            export["is_potential"] = True
 
-        if 'start_date' in export:
-            export['end_date'] = export['start_date'] + timedelta(minutes=proposal.scheduled_duration)
-            export['start_date'] = str(export['start_date'])
-            export['end_date'] = str(export['end_date'])
+        if "start_date" in export:
+            export["end_date"] = export["start_date"] + timedelta(
+                minutes=proposal.scheduled_duration
+            )
+            export["start_date"] = str(export["start_date"])
+            export["end_date"] = str(export["end_date"])
 
         # We can't show things that are not yet in a slot!
         # FIXME: Show them somewhere
-        if 'venue' not in export or 'start_date' not in export:
+        if "venue" not in export or "start_date" not in export:
             continue
 
         schedule_data.append(export)
 
-    venues = [{'key': v.id, 'label': v.name} for v in Venue.query.order_by(Venue.priority.desc()).all()]
+    venues = [
+        {"key": v.id, "label": v.name}
+        for v in Venue.query.order_by(Venue.priority.desc()).all()
+    ]
 
-    venues_to_show = request.args.getlist('venue')
+    venues_to_show = request.args.getlist("venue")
     if venues_to_show:
-        venues = [venue for venue in venues if venue['label'] in venues_to_show]
+        venues = [venue for venue in venues if venue["label"] in venues_to_show]
 
-    return render_template('cfp_review/scheduler.html', venues=venues, schedule_data=schedule_data, default_venues=DEFAULT_VENUES)
+    return render_template(
+        "cfp_review/scheduler.html",
+        venues=venues,
+        schedule_data=schedule_data,
+        default_venues=DEFAULT_VENUES,
+    )
 
-@cfp_review.route('/scheduler_update', methods=['GET', 'POST'])
+
+@cfp_review.route("/scheduler_update", methods=["GET", "POST"])
 @admin_required
 def scheduler_update():
-    proposal = Proposal.query.filter_by(id=request.form['id']).one()
-    proposal.potential_time = dateutil.parser.parse(request.form['time']).replace(tzinfo=None)
-    proposal.potential_venue_id = request.form['venue']
+    proposal = Proposal.query.filter_by(id=request.form["id"]).one()
+    proposal.potential_time = dateutil.parser.parse(request.form["time"]).replace(
+        tzinfo=None
+    )
+    proposal.potential_venue_id = request.form["venue"]
 
     changed = True
-    if proposal.potential_time == proposal.scheduled_time and str(proposal.potential_venue_id) == str(proposal.scheduled_venue_id):
+    if proposal.potential_time == proposal.scheduled_time and str(
+        proposal.potential_venue_id
+    ) == str(proposal.scheduled_venue_id):
         proposal.potential_time = None
         proposal.potential_venue = None
         changed = False
 
     db.session.commit()
-    return jsonify({'changed': changed})
+    return jsonify({"changed": changed})
 
-@cfp_review.route('/clashfinder')
+
+@cfp_review.route("/clashfinder")
 @schedule_required
 def clashfinder():
     select_st = select([FavouriteProposal])
@@ -827,11 +1006,13 @@ def clashfinder():
         prop1 = Proposal.query.get(id1)
         prop2 = Proposal.query.get(id2)
         if prop1.overlaps_with(prop2):
-            clashes.append({
-                'proposal_1': prop1,
-                'proposal_2': prop2,
-                'favourites': count,
-                'number': offset
-            })
+            clashes.append(
+                {
+                    "proposal_1": prop1,
+                    "proposal_2": prop2,
+                    "favourites": count,
+                    "number": offset,
+                }
+            )
 
-    return render_template('cfp_review/clashfinder.html', clashes=clashes)
+    return render_template("cfp_review/clashfinder.html", clashes=clashes)

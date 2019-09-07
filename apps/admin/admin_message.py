@@ -14,11 +14,11 @@ from .forms import Form
 
 
 class AdminMessageForm(Form):
-    message = StringField('Message', widget=TextArea())
-    show = BooleanField('Show message')
-    end = DateField('Hide message after', [Optional()])
+    message = StringField("Message", widget=TextArea())
+    show = BooleanField("Show message")
+    end = DateField("Hide message after", [Optional()])
 
-    submit = SubmitField('Publish')
+    submit = SubmitField("Publish")
 
     def init_with_message(self, message):
         self.message.data = message.message
@@ -31,7 +31,7 @@ class AdminMessageForm(Form):
         message.end = self.end.data
 
 
-@admin.route('/message/<message_id>', methods=['GET', 'POST'])
+@admin.route("/message/<message_id>", methods=["GET", "POST"])
 def message(message_id):
     msg = AdminMessage.get_by_id(message_id)
     form = AdminMessageForm()
@@ -40,19 +40,20 @@ def message(message_id):
         form.update_message(msg)
         db.session.commit()
 
-        flash('Updated message')
-        return redirect(url_for('.all_messages'))
+        flash("Updated message")
+        return redirect(url_for(".all_messages"))
 
     form.init_with_message(msg)
-    return render_template('admin/messages/edit.html', message=msg, form=form)
+    return render_template("admin/messages/edit.html", message=msg, form=form)
 
 
-@admin.route('/message')
-@admin.route('/message/all')
+@admin.route("/message")
+@admin.route("/message/all")
 def all_messages():
-    return render_template('admin/messages/all.html', messages=AdminMessage.get_all())
+    return render_template("admin/messages/all.html", messages=AdminMessage.get_all())
 
-@admin.route('/message/new', methods=['GET', 'POST'])
+
+@admin.route("/message/new", methods=["GET", "POST"])
 def new_message():
     form = AdminMessageForm()
 
@@ -63,8 +64,7 @@ def new_message():
         db.session.add(msg)
         db.session.commit()
 
-        flash('Created new message')
-        return redirect(url_for('.all_messages'))
+        flash("Created new message")
+        return redirect(url_for(".all_messages"))
 
-
-    return render_template('admin/messages/new.html', form=form)
+    return render_template("admin/messages/new.html", form=form)

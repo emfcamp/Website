@@ -20,23 +20,18 @@ class MapObject(db.Model):
     wiki_page = db.Column(db.String)
     geom = db.Column(Geometry("POINT", srid=4326, spatial_index=False))
 
-    owner = db.relationship('User', backref='map_objects')
+    owner = db.relationship("User", backref="map_objects")
 
     @classmethod
     def get_export_data(cls):
-        objects = cls.query.with_entities(
-            cls.name, cls.wiki_page, ST_AsEWKT(cls.geom)
-        )
+        objects = cls.query.with_entities(cls.name, cls.wiki_page, ST_AsEWKT(cls.geom))
         data = {
-            'public': [
-                {
-                    'name': obj[0],
-                    'wiki_page': obj[1],
-                    'location': obj[2]
-                }
+            "public": [
+                {"name": obj[0], "wiki_page": obj[1], "location": obj[2]}
                 for obj in objects
             ]
         }
         return data
 
-Index('ix_map_object_geom', MapObject.geom, postgresql_using='gist')
+
+Index("ix_map_object_geom", MapObject.geom, postgresql_using="gist")

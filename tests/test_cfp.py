@@ -22,9 +22,9 @@ def test_cfp(db, app, user, outbox, title, description, requirements):
     db.session.add(proposal)
     db.session.commit()
 
-    proposal.set_state('accepted')
-    with app.test_request_context('/'):
-        send_email_for_proposal(proposal, reason='accepted')
+    proposal.set_state("accepted")
+    with app.test_request_context("/"):
+        send_email_for_proposal(proposal, reason="accepted")
 
     assert len(outbox) == 1
     del outbox[:]

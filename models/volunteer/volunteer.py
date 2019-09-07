@@ -6,19 +6,33 @@ from main import db
 
 
 # This effectively records the roles that a volunteer is interested in
-VolunteerRoleInterest = db.Table('volunteer_role_interest', db.Model.metadata,
-    db.Column('volunteer_id', db.Integer, db.ForeignKey('volunteer.id'), primary_key=True),
-    db.Column('role_id', db.Integer, db.ForeignKey('volunteer_role.id'), primary_key=True))
+VolunteerRoleInterest = db.Table(
+    "volunteer_role_interest",
+    db.Model.metadata,
+    db.Column(
+        "volunteer_id", db.Integer, db.ForeignKey("volunteer.id"), primary_key=True
+    ),
+    db.Column(
+        "role_id", db.Integer, db.ForeignKey("volunteer_role.id"), primary_key=True
+    ),
+)
 
 
 # Which roles has the volunteer been trained for
-VolunteerRoleTraining = db.Table('volunteer_role_training', db.Model.metadata,
-    db.Column('volunteer_id', db.Integer, db.ForeignKey('volunteer.id'), primary_key=True),
-    db.Column('role_id', db.Integer, db.ForeignKey('volunteer_role.id'), primary_key=True))
+VolunteerRoleTraining = db.Table(
+    "volunteer_role_training",
+    db.Model.metadata,
+    db.Column(
+        "volunteer_id", db.Integer, db.ForeignKey("volunteer.id"), primary_key=True
+    ),
+    db.Column(
+        "role_id", db.Integer, db.ForeignKey("volunteer_role.id"), primary_key=True
+    ),
+)
 
 
 class Volunteer(db.Model, UserMixin):
-    __table_name__ = 'volunteer'
+    __table_name__ = "volunteer"
 
     __versioned__ = {}
 
@@ -33,12 +47,21 @@ class Volunteer(db.Model, UserMixin):
     over_18 = db.Column(db.Boolean, nullable=False, default=False)
     allow_comms_during_event = db.Column(db.Boolean, nullable=False, default=False)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    user = db.relationship('User', backref=backref('volunteer', uselist=False))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    user = db.relationship("User", backref=backref("volunteer", uselist=False))
 
-    interested_roles = db.relationship('Role', backref='interested_volunteers', secondary=VolunteerRoleInterest, lazy='dynamic')
-    trained_roles = db.relationship('Role', backref='trained_volunteers', secondary=VolunteerRoleTraining, lazy='dynamic')
-
+    interested_roles = db.relationship(
+        "Role",
+        backref="interested_volunteers",
+        secondary=VolunteerRoleInterest,
+        lazy="dynamic",
+    )
+    trained_roles = db.relationship(
+        "Role",
+        backref="trained_volunteers",
+        secondary=VolunteerRoleTraining,
+        lazy="dynamic",
+    )
 
     @classmethod
     def get_by_id(cls, id):
@@ -62,4 +85,3 @@ class Messages(db.Model):
     is_read = db.Column(db.Boolean, nullable=False, default=False)
     shift_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
 """
-

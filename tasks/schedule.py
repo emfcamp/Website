@@ -7,31 +7,39 @@ from flask_script import Command, Option
 from slotmachine import SlotMachine
 
 from main import db
-from models.cfp import Proposal, Venue, ROUGH_LENGTHS, EVENT_SPACING, DEFAULT_VENUES, VENUE_CAPACITY
+from models.cfp import (
+    Proposal,
+    Venue,
+    ROUGH_LENGTHS,
+    EVENT_SPACING,
+    DEFAULT_VENUES,
+    VENUE_CAPACITY,
+)
 
 from apps.cfp_review.base import send_email_for_proposal
 
+
 class ImportVenues(Command):
     venues = [
-        ('Stage A', ['talk'], 100, (52.0396099, -2.377866)),
-        ('Stage B', ['talk', 'performance'], 99, (52.0418968, -2.3766391)),
-        ('Stage C', ['talk'], 98, (52.040485, -2.3776549)),
-        ('Workshop 1', ['workshop'], 97, (52.04161469, -2.37593613)),
-        ('Workshop 2', ['workshop'], 96, (52.04080079, -2.3780661)),
-        ('Workshop 3', ['workshop'], 95, (52.0406851, -2.3780847)),
-        ('Workshop 4', ['workshop'], 94, (52.0417884, -2.37586151)),
-        ('Youth Workshop', ['youthworkshop'], 93, (52.041997, -2.375533)),
+        ("Stage A", ["talk"], 100, (52.0396099, -2.377866)),
+        ("Stage B", ["talk", "performance"], 99, (52.0418968, -2.3766391)),
+        ("Stage C", ["talk"], 98, (52.040485, -2.3776549)),
+        ("Workshop 1", ["workshop"], 97, (52.04161469, -2.37593613)),
+        ("Workshop 2", ["workshop"], 96, (52.04080079, -2.3780661)),
+        ("Workshop 3", ["workshop"], 95, (52.0406851, -2.3780847)),
+        ("Workshop 4", ["workshop"], 94, (52.0417884, -2.37586151)),
+        ("Youth Workshop", ["youthworkshop"], 93, (52.041997, -2.375533)),
     ]
 
     def run(self):
         for name, type, priority, latlon in self.venues:
-            type_str = ','.join(type)
+            type_str = ",".join(type)
             venue = Venue.query.filter_by(name=name, type=type_str).all()
 
             if len(venue) == 1 and venue[0].lat is None:
                 venue[0].lat = latlon[0]
                 venue[0].lon = latlon[1]
-                app.logger.info('Updating venue %s with latlon' % name)
+                app.logger.info("Updating venue %s with latlon" % name)
                 continue
             elif venue:
                 continue
@@ -48,26 +56,39 @@ class ImportVenues(Command):
 
 class RunScheduler(Command):
     option_list = [
-        Option('-p', '--persist', dest='persist', action='store_true',
-            help='Persist the changes rather than doing a dry run')
+        Option(
+            "-p",
+            "--persist",
+            dest="persist",
+            action="store_true",
+            help="Persist the changes rather than doing a dry run",
+        )
     ]
 
     def set_rough_durations(self):
-        proposals = Proposal.query.filter_by(scheduled_duration=None, type='talk').\
-            filter(Proposal.state.in_(['accepted', 'finished'])).all()
+        proposals = (
+            Proposal.query.filter_by(scheduled_duration=None, type="talk")
+            .filter(Proposal.state.in_(["accepted", "finished"]))
+            .all()
+        )
 
         for proposal in proposals:
             proposal.scheduled_duration = ROUGH_LENGTHS[proposal.length]
-            app.logger.info('Setting duration for talk "%s" to "%s"' %
-                            (proposal.title, proposal.scheduled_duration))
+            app.logger.info(
+                'Setting duration for talk "%s" to "%s"'
+                % (proposal.title, proposal.scheduled_duration)
+            )
 
         db.session.commit()
 
     def get_scheduler_data(self):
-        proposals = Proposal.query.filter(Proposal.scheduled_duration.isnot(None)).\
-            filter(Proposal.state.in_(['finished', 'accepted'])).\
-            filter(Proposal.type.in_(['talk', 'workshop', 'youthworkshop'])).\
-            order_by(Proposal.favourite_count.desc()).all()
+        proposals = (
+            Proposal.query.filter(Proposal.scheduled_duration.isnot(None))
+            .filter(Proposal.state.in_(["finished", "accepted"]))
+            .filter(Proposal.type.in_(["talk", "workshop", "youthworkshop"]))
+            .order_by(Proposal.favourite_count.desc())
+            .all()
+        )
 
         proposals_by_type = defaultdict(list)
         for proposal in proposals:
@@ -84,8 +105,14 @@ class RunScheduler(Command):
             # We assign the largest venues as being preferred for the most popular talks
             # Proposals are already sorted into popularity, so we just shift through the list
             # of venues in order of size, equally split
-            ordered_venues = sorted(capacity_by_type[type], key=lambda k: capacity_by_type[type][k], reverse=True)
-            split_count = int(len(proposals_by_type[type]) / len(capacity_by_type[type]))
+            ordered_venues = sorted(
+                capacity_by_type[type],
+                key=lambda k: capacity_by_type[type][k],
+                reverse=True,
+            )
+            split_count = int(
+                len(proposals_by_type[type]) / len(capacity_by_type[type])
+            )
 
             count = 0
             for proposal in proposals:
@@ -98,36 +125,38 @@ class RunScheduler(Command):
                 # don't require it to be spaced from other things - we often
                 # have talks and related performances back-to-back
                 spacing_slots = EVENT_SPACING.get(proposal.type, 1)
-                if proposal.type == 'talk':
+                if proposal.type == "talk":
                     for p in proposal.get_allowed_time_periods_with_default():
                         if p.start.hour < 9 or p.start.hour >= 20:
                             spacing_slots = 0
 
                 export = {
-                    'id': proposal.id,
-                    'duration': proposal.scheduled_duration,
-                    'speakers': [ proposal.user.id ],
-                    'title': proposal.title,
-                    'valid_venues': [ v.id for v in proposal.get_allowed_venues() ],
-                    'preferred_venues': preferred_venues, # This supports a list, but we only want one for now
-                    'time_ranges': [
-                        {"start": str(p.start), "end": str(p.end)} for p in proposal.get_allowed_time_periods_with_default()
+                    "id": proposal.id,
+                    "duration": proposal.scheduled_duration,
+                    "speakers": [proposal.user.id],
+                    "title": proposal.title,
+                    "valid_venues": [v.id for v in proposal.get_allowed_venues()],
+                    "preferred_venues": preferred_venues,  # This supports a list, but we only want one for now
+                    "time_ranges": [
+                        {"start": str(p.start), "end": str(p.end)}
+                        for p in proposal.get_allowed_time_periods_with_default()
                     ],
-                    'preferred_time_ranges': [
-                        {"start": str(p.start), "end": str(p.end)} for p in proposal.get_preferred_time_periods_with_default()
+                    "preferred_time_ranges": [
+                        {"start": str(p.start), "end": str(p.end)}
+                        for p in proposal.get_preferred_time_periods_with_default()
                     ],
-                    'spacing_slots': spacing_slots
+                    "spacing_slots": spacing_slots,
                 }
 
                 if proposal.scheduled_venue:
-                    export['venue'] = proposal.scheduled_venue.id
+                    export["venue"] = proposal.scheduled_venue.id
                 if proposal.potential_venue:
-                    export['venue'] = proposal.potential_venue.id
+                    export["venue"] = proposal.potential_venue.id
 
                 if proposal.scheduled_time:
-                    export['time'] = str(proposal.scheduled_time)
+                    export["time"] = str(proposal.scheduled_time)
                 if proposal.potential_time:
-                    export['time'] = str(proposal.potential_time)
+                    export["time"] = str(proposal.potential_time)
 
                 proposal_data.append(export)
 
@@ -159,8 +188,10 @@ class RunScheduler(Command):
         if proposal.potential_time == proposal.scheduled_time:
             proposal.potential_time = None
 
-        if (str(proposal.potential_venue) == str(previous_potential_venue) and
-                proposal.potential_time == previous_potential_time):
+        if (
+            str(proposal.potential_venue) == str(previous_potential_venue)
+            and proposal.potential_time == previous_potential_time
+        ):
             # Nothing changed
             return False
 
@@ -175,26 +206,32 @@ class RunScheduler(Command):
             proposal.potential_time = proposal.scheduled_time
         if proposal.potential_time and not proposal.potential_venue:
             proposal.potential_venue = proposal.scheduled_venue
-        app.logger.info('Moved "%s": "%s" at "%s" -> "%s" at "%s"' %
-                        (proposal.title, previous_venue_name, previous_potential_time,
-                         new_venue_name, proposal.potential_time))
+        app.logger.info(
+            'Moved "%s": "%s" at "%s" -> "%s" at "%s"'
+            % (
+                proposal.title,
+                previous_venue_name,
+                previous_potential_time,
+                new_venue_name,
+                proposal.potential_time,
+            )
+        )
         return True
 
     def apply_changes(self, schedule):
         changes = False
         for event in schedule:
-            if 'time' not in event or not event['time']:
+            if "time" not in event or not event["time"]:
                 continue
-            if 'venue' not in event or not event['venue']:
+            if "venue" not in event or not event["venue"]:
                 continue
 
-            proposal = Proposal.query.filter_by(id=event['id']).one()
-            venue = Venue.query.get(event['venue'])
-            changes |= self.handle_schedule_change(proposal, venue, event['time'])
+            proposal = Proposal.query.filter_by(id=event["id"]).one()
+            venue = Venue.query.get(event["venue"])
+            changes |= self.handle_schedule_change(proposal, venue, event["time"])
 
         if not changes:
             app.logger.info("No schedule changes generated")
-
 
     def run(self, persist):
         self.set_rough_durations()
@@ -217,11 +254,14 @@ class RunScheduler(Command):
 
 class ApplyPotentialSchedule(Command):
     def run(self):
-        proposals = Proposal.query.filter(
-            (Proposal.potential_venue != None) | (Proposal.potential_time != None)).\
-            filter(Proposal.scheduled_duration.isnot(None)).\
-            filter(Proposal.state.in_(['accepted', 'finished'])).\
-            all()  # noqa
+        proposals = (
+            Proposal.query.filter(
+                (Proposal.potential_venue != None) | (Proposal.potential_time != None)
+            )
+            .filter(Proposal.scheduled_duration.isnot(None))
+            .filter(Proposal.state.in_(["accepted", "finished"]))
+            .all()
+        )  # noqa
 
         for proposal in proposals:
             user = proposal.user
@@ -240,11 +280,21 @@ class ApplyPotentialSchedule(Command):
 
             ok = False
             if previously_unscheduled:
-                app.logger.info('Scheduling proposal "%s" by %s', proposal.title, user.email)
-                ok = send_email_for_proposal(proposal, reason="scheduled", from_address=app.config['SPEAKERS_EMAIL'])
+                app.logger.info(
+                    'Scheduling proposal "%s" by %s', proposal.title, user.email
+                )
+                ok = send_email_for_proposal(
+                    proposal,
+                    reason="scheduled",
+                    from_address=app.config["SPEAKERS_EMAIL"],
+                )
             else:
-                app.logger.info('Moving proposal "%s" by %s', proposal.title, user.email)
-                ok = send_email_for_proposal(proposal, reason="moved", from_address=app.config['SPEAKERS_EMAIL'])
+                app.logger.info(
+                    'Moving proposal "%s" by %s', proposal.title, user.email
+                )
+                ok = send_email_for_proposal(
+                    proposal, reason="moved", from_address=app.config["SPEAKERS_EMAIL"]
+                )
 
             if ok:
                 db.session.commit()

@@ -50,7 +50,7 @@ ofxparse = "==0.16"
 funcsigs = "==1.0.2"
 unicodecsv = "==0.14.1"
 python-dateutil = "*"
-slotmachine = {git = "https://github.com/emfcamp/slotmachine.git", editable = true}
+slotmachine = {git = "https://github.com/emfcamp/slotmachine.git",editable = true}
 awesome-slugify = "*"
 faker = "*"
 pyyaml = "*"
@@ -67,6 +67,7 @@ flask-cors = "*"
 pytest = "*"
 mock = "*"
 "flake8" = "*"
+black = "*"
 locustio = "*"
 ipdb = "*"
 hypothesis = "*"
@@ -75,3 +76,6 @@ flask-shell-ipython = "*"
 
 [requires]
 python_version = "3.7"
+
+[pipenv]
+allow_prereleases = true

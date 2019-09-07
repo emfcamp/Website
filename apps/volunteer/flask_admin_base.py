@@ -8,7 +8,7 @@ from flask_admin.contrib.sqla import ModelView
 class FlaskVolunteerAdminAppMixin:
     def is_accessible(self):
         if current_user.is_authenticated:
-            if current_user.has_permission('volunteer:admin'):
+            if current_user.has_permission("volunteer:admin"):
                 return True
         return False
 
@@ -17,8 +17,8 @@ class FlaskVolunteerAdminAppMixin:
 
     def get_url(self, endpoint, **kwargs):
         # Hack to use some of the stuff set up for admin
-        if (endpoint == 'volunteer_admin.static') or (endpoint == 'admin.static'):
-            endpoint = 'volunteer_admin.static'
+        if (endpoint == "volunteer_admin.static") or (endpoint == "admin.static"):
+            endpoint = "volunteer_admin.static"
         return super().get_url(endpoint, **kwargs)
 
     def create_blueprint(self, admin):
@@ -26,15 +26,17 @@ class FlaskVolunteerAdminAppMixin:
             self.endpoint = admin.endpoint_prefix
         else:
             self.url = self._get_view_url(admin, self.url)
-            self.endpoint = '{}.{}'.format(admin.endpoint_prefix, self.endpoint)
+            self.endpoint = "{}.{}".format(admin.endpoint_prefix, self.endpoint)
         return super().create_blueprint(admin)
+
 
 class VolunteerBaseView(FlaskVolunteerAdminAppMixin, BaseView):
     pass
 
+
 class VolunteerAdminIndexView(FlaskVolunteerAdminAppMixin, AdminIndexView):
     pass
 
+
 class VolunteerModelView(FlaskVolunteerAdminAppMixin, ModelView):
     pass
-

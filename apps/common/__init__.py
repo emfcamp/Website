@@ -23,15 +23,13 @@ class Currency(object):
         self.code = code
         self.symbol = symbol
 
-CURRENCIES = [
-    Currency('GBP', u'£'),
-    Currency('EUR', u'€'),
-]
+
+CURRENCIES = [Currency("GBP", u"£"), Currency("EUR", u"€")]
 CURRENCY_SYMBOLS = {c.code: c.symbol for c in CURRENCIES}
 
 
 def load_utility_functions(app_obj):
-    @app_obj.template_filter('price')
+    @app_obj.template_filter("price")
     def format_price(price, currency=None, after=False):
         if isinstance(price, Price):
             currency = price.currency
@@ -39,20 +37,20 @@ def load_utility_functions(app_obj):
             # TODO: look up after from CURRENCIES
         else:
             amount = price
-        amount = '{0:.2f}'.format(amount)
+        amount = "{0:.2f}".format(amount)
         symbol = CURRENCY_SYMBOLS[currency]
         if after:
             return amount + symbol
         return symbol + amount
 
-    @app_obj.template_filter('bankref')
+    @app_obj.template_filter("bankref")
     def format_bankref(bankref):
-        return '%s-%s' % (bankref[:4], bankref[4:])
+        return "%s-%s" % (bankref[:4], bankref[4:])
 
-    @app_obj.template_filter('gcid')
+    @app_obj.template_filter("gcid")
     def format_gcid(gcid):
         if len(gcid) > 14:
-            return 'ending %s' % gcid[-14:]
+            return "ending %s" % gcid[-14:]
         return gcid
 
     @app_obj.context_processor
@@ -60,11 +58,11 @@ def load_utility_functions(app_obj):
         SALES_STATE = get_sales_state()
         SITE_STATE = get_site_state()
 
-        if app.config.get('DEBUG'):
+        if app.config.get("DEBUG"):
             SITE_STATE = request.args.get("site_state", SITE_STATE)
             SALES_STATE = request.args.get("sales_state", SALES_STATE)
 
-        basket_count = len(session.get('basket_purchase_ids', []))
+        basket_count = len(session.get("basket_purchase_ids", []))
 
         return dict(
             SALES_STATE=SALES_STATE,
@@ -79,63 +77,75 @@ def load_utility_functions(app_obj):
     @app_obj.context_processor
     def currency_processor():
         currency = get_user_currency()
-        return {'user_currency': currency}
+        return {"user_currency": currency}
 
     @app_obj.context_processor
     def now_processor():
         now = datetime.utcnow()
-        return {'year': now.year}
+        return {"year": now.year}
 
     @app_obj.context_processor
     def event_date_processor():
         def suffix(d):
-            return 'th' if 11 <= d <= 13 else {1: 'st', 2: 'nd', 3: 'rd'}.get(d % 10, 'th')
+            return (
+                "th" if 11 <= d <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(d % 10, "th")
+            )
 
         s = event_start()
         e = event_end()
         assert s.year == e.year
         if s.month == e.month:
-            fancy_dates = '{s_month} ' \
-                '<span style="white-space: nowrap">' \
-                '{s.day}<sup>{s_suff}</sup>&mdash;' \
-                '{e.day}<sup>{e_suff}</sup>' \
-                '</span>' \
-                .format(s=s, s_suff=suffix(s.day),
-                        s_month=s.strftime('%B'),
-                        e=e, e_suff=suffix(e.day))
+            fancy_dates = (
+                "{s_month} "
+                '<span style="white-space: nowrap">'
+                "{s.day}<sup>{s_suff}</sup>&mdash;"
+                "{e.day}<sup>{e_suff}</sup>"
+                "</span>".format(
+                    s=s,
+                    s_suff=suffix(s.day),
+                    s_month=s.strftime("%B"),
+                    e=e,
+                    e_suff=suffix(e.day),
+                )
+            )
 
-            simple_dates = '{s.day}&mdash;' \
-                '{e.day} ' \
-                '{s_month}' \
-                .format(s=s, s_month=s.strftime('%B'),
-                        e=e)
+            simple_dates = (
+                "{s.day}&mdash;"
+                "{e.day} "
+                "{s_month}".format(s=s, s_month=s.strftime("%B"), e=e)
+            )
 
         else:
-            fancy_dates = '{s_month} ' \
-                '{s.day}<sup>{s_suff}</sup>&ndash;' \
-                '{e_month} ' \
-                '{e.day}<sup>{e_suff}</sup>' \
-                .format(s=s, s_suff=suffix(s.day),
-                        s_month=s.strftime('%B'),
-                        e=e, e_suff=suffix(e.day),
-                        e_month=e.strftime('%B'))
+            fancy_dates = (
+                "{s_month} "
+                "{s.day}<sup>{s_suff}</sup>&ndash;"
+                "{e_month} "
+                "{e.day}<sup>{e_suff}</sup>".format(
+                    s=s,
+                    s_suff=suffix(s.day),
+                    s_month=s.strftime("%B"),
+                    e=e,
+                    e_suff=suffix(e.day),
+                    e_month=e.strftime("%B"),
+                )
+            )
 
-            simple_dates = '{s.day} ' \
-                '{s_month}&ndash;' \
-                '{e.day} ' \
-                '{e_month}' \
-                .format(s=s, s_month=s.strftime('%B'),
-                        e=e, e_month=e.strftime('%B'))
-
+            simple_dates = (
+                "{s.day} "
+                "{s_month}&ndash;"
+                "{e.day} "
+                "{e_month}".format(
+                    s=s, s_month=s.strftime("%B"), e=e, e_month=e.strftime("%B")
+                )
+            )
 
         return {
-            'fancy_dates': Markup(fancy_dates),
-            'simple_dates': Markup(simple_dates),
-            'event_start': s,
-            'event_end': e,
-            'event_year': s.year,
+            "fancy_dates": Markup(fancy_dates),
+            "simple_dates": Markup(simple_dates),
+            "event_start": s,
+            "event_end": e,
+            "event_year": s.year,
         }
-
 
 
 def send_template_email(subject, to, sender, template, **kwargs):
@@ -149,7 +159,7 @@ def create_current_user(email, name):
 
     db.session.add(user)
     db.session.commit()
-    app.logger.info('Created new user with email %s and id: %s', email, user.id)
+    app.logger.info("Created new user with email %s and id: %s", email, user.id)
 
     # Login & make sure everything's set correctly
     login_user(user)
@@ -159,14 +169,14 @@ def create_current_user(email, name):
     return user
 
 
-def get_user_currency(default='GBP'):
-    return session.get('currency', default)
+def get_user_currency(default="GBP"):
+    return session.get("currency", default)
 
 
 def set_user_currency(currency):
     basket = Basket.from_session(current_user, get_user_currency())
     basket.set_currency(currency)
-    session['currency'] = currency
+    session["currency"] = currency
 
 
 def feature_flag(feature):
@@ -175,10 +185,12 @@ def feature_flag(feature):
 
     For now, returns a 404 if the feature is disabled.
     """
+
     def call(f, *args, **kw):
         if feature_enabled(feature):
             return f(*args, **kw)
         return abort(404)
+
     return decorator(call)
 
 
@@ -187,11 +199,14 @@ def site_flag(site):
     Used currently for toggling off features
     that haven't been separated by blueprint
     """
+
     def call(f, *args, **kw):
         if app.config.get(site):
             return f(*args, **kw)
         return abort(404)
+
     return decorator(call)
+
 
 def require_permission(permission):
     def call(f, *args, **kwargs):
@@ -200,7 +215,9 @@ def require_permission(permission):
                 return f(*args, **kwargs)
             abort(404)
         return app.login_manager.unauthorized()
+
     return decorator(call)
+
 
 @decorator
 def json_response(f, *args, **kwargs):
@@ -208,19 +225,18 @@ def json_response(f, *args, **kwargs):
         response = f(*args, **kwargs)
 
     except HTTPException as e:
-        data = {'error': str(e),
-                'description': e.description}
+        data = {"error": str(e), "description": e.description}
         return jsonify(data), e.code
 
     except Exception as e:
-        app.logger.error('Exception during json request: %r', e)
+        app.logger.error("Exception during json request: %r", e)
         # Werkzeug sends the response and then logs, which is fiddly
         from werkzeug.debug.tbtools import get_current_traceback
-        traceback = get_current_traceback(ignore_system_exceptions=True)
-        app.logger.info('Traceback %s', traceback.plaintext)
 
-        data = {'error': e.__class__.__name__,
-                'description': str(e)}
+        traceback = get_current_traceback(ignore_system_exceptions=True)
+        app.logger.info("Traceback %s", traceback.plaintext)
+
+        data = {"error": e.__class__.__name__, "description": str(e)}
         return jsonify(data), 500
 
     else:
@@ -228,6 +244,7 @@ def json_response(f, *args, **kwargs):
             return response
 
         return jsonify(response), 200
+
 
 def feature_enabled(feature):
     """
@@ -240,4 +257,3 @@ def feature_enabled(feature):
         return db_flags[feature]
 
     return app.config.get(feature, False)
-

@@ -20,6 +20,6 @@ def test_product_view_accessible(db, user):
     proposal.user = user
     db.session.add(proposal)
     db.session.commit()
-    proposal.set_state('accepted')
+    proposal.set_state("accepted")
 
     assert product_view.is_accessible(user)

@@ -16,10 +16,7 @@ class FavouriteProposal(Resource):
         proposal = Proposal.query.get_or_404(proposal_id)
         current_state = proposal in current_user.favourites
 
-        return {
-            "is_favourite": current_state,
-        }
-
+        return {"is_favourite": current_state}
 
     def put(self, proposal_id):
         """ Put with no data to toggle """
@@ -30,8 +27,8 @@ class FavouriteProposal(Resource):
         current_state = proposal in current_user.favourites
 
         data = request.get_json()
-        if data.get('state') is not None:
-            new_state = bool(data['state'])
+        if data.get("state") is not None:
+            new_state = bool(data["state"])
         else:
             new_state = not current_state
 
@@ -42,9 +39,8 @@ class FavouriteProposal(Resource):
 
         db.session.commit()
 
-        return {
-            "is_favourite": new_state,
-        }
+        return {"is_favourite": new_state}
+
 
 class FavouriteExternal(Resource):
     def get(self, event_id):
@@ -54,10 +50,7 @@ class FavouriteExternal(Resource):
         event = CalendarEvent.query.get_or_404(event_id)
         current_state = event in current_user.calendar_favourites
 
-        return {
-            "is_favourite": current_state,
-        }
-
+        return {"is_favourite": current_state}
 
     def put(self, event_id):
         """ Put with no data to toggle """
@@ -68,8 +61,8 @@ class FavouriteExternal(Resource):
         current_state = event in current_user.calendar_favourites
 
         data = request.get_json()
-        if data.get('state') is not None:
-            new_state = bool(data['state'])
+        if data.get("state") is not None:
+            new_state = bool(data["state"])
         else:
             new_state = not current_state
 
@@ -80,11 +73,8 @@ class FavouriteExternal(Resource):
 
         db.session.commit()
 
-        return {
-            "is_favourite": new_state,
-        }
+        return {"is_favourite": new_state}
 
 
 api.add_resource(FavouriteProposal, "/proposal/<int:proposal_id>/favourite")
 api.add_resource(FavouriteExternal, "/external/<int:event_id>/favourite")
-

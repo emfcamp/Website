@@ -7,11 +7,10 @@ import string
 from models.basket import Basket
 from models.exc import CapacityException
 from models.payment import BankPayment
-from models.product import (
-    Product, ProductGroup, PriceTier, Price
-)
+from models.product import Product, ProductGroup, PriceTier, Price
 from models.purchase import (
-    PurchaseStateException, PurchaseTransferException,
+    PurchaseStateException,
+    PurchaseTransferException,
     PURCHASE_STATES,
 )
 from models.user import User
@@ -20,9 +19,11 @@ from main import db
 
 @pytest.fixture()
 def tent(db):
-    item_template = 'killer_tent{}'
+    item_template = "killer_tent{}"
     item_name = item_template.format(random_string(8))
-    item = ProductGroup(type='tent', name=item_name, capacity_max=1, expires=datetime(2012, 8, 31))
+    item = ProductGroup(
+        type="tent", name=item_name, capacity_max=1, expires=datetime(2012, 8, 31)
+    )
     db.session.add(item)
     db.session.commit()
     yield item
@@ -32,9 +33,9 @@ def tent(db):
 
 @pytest.fixture()
 def parent_group(db):
-    parent_group_template = 'parent_group{}'
+    parent_group_template = "parent_group{}"
     group_name = parent_group_template.format(random_string(8))
-    group = ProductGroup(type='admissions', name=group_name, capacity_max=10)
+    group = ProductGroup(type="admissions", name=group_name, capacity_max=10)
     db.session.add(group)
     db.session.commit()
     yield group
@@ -43,7 +44,7 @@ def parent_group(db):
 
 
 def create_purchases(tier, count, user):
-    basket = Basket(user, 'GBP')
+    basket = Basket(user, "GBP")
     basket[tier] = count
     basket.create_purchases()
     basket.ensure_purchase_capacity()
@@ -56,8 +57,9 @@ def create_purchases(tier, count, user):
 
 
 def random_string(length):
-    return ''.join(random.choice(string.ascii_lowercase + string.digits)
-                   for _ in range(length))
+    return "".join(
+        random.choice(string.ascii_lowercase + string.digits) for _ in range(length)
+    )
 
 
 def test_has_capacity(tent):
@@ -78,10 +80,10 @@ def test_capacity_remaining(tent, db):
 
 
 def test_validate_capacity_max(db, parent_group):
-    group_template = 'group{}'
+    group_template = "group{}"
     group_name = group_template.format(random_string(8))
     # Create a product group without a parent so validate_capacity_max returns early
-    group = ProductGroup(type='test')
+    group = ProductGroup(type="test")
     assert group.name is None
     assert group.id is None
 
@@ -98,18 +100,18 @@ def test_validate_capacity_max(db, parent_group):
 
 
 def test_capacity_propagation(db, parent_group, user):
-    product1 = Product(name='product', parent=parent_group, capacity_max=3)
-    tier1_1 = PriceTier(name='tier1', parent=product1)
-    Price(price_tier=tier1_1, currency='GBP', price_int=10)
+    product1 = Product(name="product", parent=parent_group, capacity_max=3)
+    tier1_1 = PriceTier(name="tier1", parent=product1)
+    Price(price_tier=tier1_1, currency="GBP", price_int=10)
     db.session.add(tier1_1)
 
-    tier1_2 = PriceTier(name='tier2', parent=product1)
-    Price(price_tier=tier1_2, currency='GBP', price_int=20)
+    tier1_2 = PriceTier(name="tier2", parent=product1)
+    Price(price_tier=tier1_2, currency="GBP", price_int=20)
     db.session.add(tier1_2)
 
-    product2 = Product(name='product2', parent=parent_group)
-    tier3 = PriceTier(name='tier3', parent=product2)
-    Price(price_tier=tier3, currency='GBP', price_int=30)
+    product2 = Product(name="product2", parent=parent_group)
+    tier3 = PriceTier(name="tier3", parent=product2)
+    Price(price_tier=tier3, currency="GBP", price_int=30)
     db.session.commit()
 
     # Check all our items have the correct initial capacity
@@ -144,20 +146,20 @@ def test_capacity_propagation(db, parent_group, user):
     assert product2.get_total_remaining_capacity() == 7
     assert tier3.get_total_remaining_capacity() == 7
 
-    price1 = Price(price_tier=tier1_1, currency='GBP', price_int=5)
-    price2 = Price(price_tier=tier1_2, currency='GBP', price_int=500)
+    price1 = Price(price_tier=tier1_1, currency="GBP", price_int=5)
+    price2 = Price(price_tier=tier1_2, currency="GBP", price_int=500)
 
     db.session.add(price1)
     db.session.add(price2)
     db.session.commit()
 
-    assert price1 == product1.get_cheapest_price('GBP')
+    assert price1 == product1.get_cheapest_price("GBP")
 
 
 def test_create_purchases(db, parent_group, user):
-    product = Product(name='product', capacity_max=3, parent=parent_group)
-    tier = PriceTier(name='tier', parent=product)
-    price = Price(price_tier=tier, currency='GBP', price_int=666)
+    product = Product(name="product", capacity_max=3, parent=parent_group)
+    tier = PriceTier(name="tier", parent=product)
+    price = Price(price_tier=tier, currency="GBP", price_int=666)
     db.session.add(price)
     db.session.commit()
 
@@ -170,7 +172,7 @@ def test_create_purchases(db, parent_group, user):
     assert product.capacity_used == 1
 
     # NB: Decimal('6.66') != Decimal(6.66) == Decimal(float(6.66)) ~= 6.6600000000000001
-    assert purchase.price.value == Decimal('6.66')
+    assert purchase.price.value == Decimal("6.66")
 
     # Test issuing multiple instances works
     new_purchases = create_purchases(tier, 2, user)
@@ -181,6 +183,7 @@ def test_create_purchases(db, parent_group, user):
     with pytest.raises(CapacityException):
         create_purchases(tier, 1, user)
 
+
 def test_purchase_state_machine():
     states_dict = PURCHASE_STATES
 
@@ -188,9 +191,9 @@ def test_purchase_state_machine():
     # exist as the next_state of some state.
     # e.g. "payment-pending" and "paid" are next states for
     # "reserved" and "payment-pending" respectively.
-    assert 'reserved' in states_dict
+    assert "reserved" in states_dict
     seen_in_next_states = list(states_dict.keys())
-    seen_in_next_states.remove('reserved')
+    seen_in_next_states.remove("reserved")
 
     for state in states_dict:
         next_states = states_dict[state]
@@ -202,10 +205,11 @@ def test_purchase_state_machine():
 
     assert len(seen_in_next_states) == 0
 
+
 def test_set_state(db, parent_group, user):
-    product = Product(name='product', capacity_max=3, parent=parent_group)
-    tier = PriceTier(name='tier', parent=product)
-    price = Price(price_tier=tier, currency='GBP', price_int=666)
+    product = Product(name="product", capacity_max=3, parent=parent_group)
+    tier = PriceTier(name="tier", parent=product)
+    price = Price(price_tier=tier, currency="GBP", price_int=666)
     db.session.add(price)
     db.session.commit()
 
@@ -213,20 +217,20 @@ def test_set_state(db, parent_group, user):
     purchase = purchases[0]
 
     with pytest.raises(PurchaseStateException):
-        purchase.set_state('disallowed-state')
+        purchase.set_state("disallowed-state")
 
     with pytest.raises(PurchaseStateException):
-        purchase.set_state('receipt-emailed')
+        purchase.set_state("receipt-emailed")
 
-    purchase.set_state('payment-pending')
+    purchase.set_state("payment-pending")
 
-    assert purchase.state == 'payment-pending', purchase.state
+    assert purchase.state == "payment-pending", purchase.state
 
 
 def test_product_group_get_counts_by_state(db, parent_group, user):
-    product = Product(name='product', capacity_max=3, parent=parent_group)
-    tier = PriceTier(name='tier', parent=product)
-    price = Price(price_tier=tier, currency='GBP', price_int=666)
+    product = Product(name="product", capacity_max=3, parent=parent_group)
+    tier = PriceTier(name="tier", parent=product)
+    price = Price(price_tier=tier, currency="GBP", price_int=666)
     db.session.add(price)
     db.session.commit()
 
@@ -234,53 +238,47 @@ def test_product_group_get_counts_by_state(db, parent_group, user):
     purchases = create_purchases(tier, 1, user)
     purchase1 = purchases[0]
 
-    expected = {
-        'reserved': 1,
-    }
+    expected = {"reserved": 1}
 
     assert tier.purchase_count_by_state == expected
     assert product.purchase_count_by_state == expected
     assert parent_group.purchase_count_by_state == expected
 
     # Test that other states show up
-    purchase1.set_state('payment-pending')
+    purchase1.set_state("payment-pending")
     db.session.commit()
 
-    expected = {
-        'payment-pending': 1,
-    }
+    expected = {"payment-pending": 1}
 
     assert tier.purchase_count_by_state == expected
     assert product.purchase_count_by_state == expected
     assert parent_group.purchase_count_by_state == expected
 
     # Add another purchase in another tier
-    tier2 = PriceTier(name='2', parent=product)
-    price = Price(price_tier=tier2, currency='GBP', price_int=666)
+    tier2 = PriceTier(name="2", parent=product)
+    price = Price(price_tier=tier2, currency="GBP", price_int=666)
     db.session.commit()
     create_purchases(tier2, 1, user)
 
     assert tier.purchase_count_by_state == expected
 
-    expected = {
-        'payment-pending': 1,
-        'reserved': 1,
-    }
+    expected = {"payment-pending": 1, "reserved": 1}
 
     assert product.purchase_count_by_state == expected
     assert parent_group.purchase_count_by_state == expected
 
+
 def test_check_in(db, parent_group, user):
-    product = Product(name='product', capacity_max=3, parent=parent_group)
-    tier = PriceTier(name='tier', parent=product)
-    price = Price(price_tier=tier, currency='GBP', price_int=666)
+    product = Product(name="product", capacity_max=3, parent=parent_group)
+    tier = PriceTier(name="tier", parent=product)
+    price = Price(price_tier=tier, currency="GBP", price_int=666)
     db.session.add(price)
     db.session.commit()
 
     purchases = create_purchases(tier, 1, user)
     purchase = purchases[0]
 
-    purchase.state = 'receipt-emailed'
+    purchase.state = "receipt-emailed"
     assert purchase.checked_in is False
     purchase.check_in()
     assert purchase.checked_in is True
@@ -288,12 +286,12 @@ def test_check_in(db, parent_group, user):
 
 def test_transfer(db, user, parent_group):
     user1 = user
-    user2 = User("test_user_{}@test.invalid".format(random_string(8)), 'test_user2')
+    user2 = User("test_user_{}@test.invalid".format(random_string(8)), "test_user2")
     db.session.add(user2)
 
-    product = Product(name='product', parent=parent_group)
-    tier = PriceTier(name='tier', parent=product)
-    price = Price(price_tier=tier, currency='GBP', price_int=666)
+    product = Product(name="product", parent=parent_group)
+    tier = PriceTier(name="tier", parent=product)
+    price = Price(price_tier=tier, currency="GBP", price_int=666)
     db.session.add(price)
     db.session.commit()
 
@@ -306,25 +304,25 @@ def test_transfer(db, user, parent_group):
 
     with pytest.raises(PurchaseTransferException) as e:
         item.transfer(user1, user2)
-        assert 'Only paid items may be transferred.' in e.args[0]
+        assert "Only paid items may be transferred." in e.args[0]
 
-    item.state = 'paid'
+    item.state = "paid"
     db.session.commit()
 
     with pytest.raises(PurchaseTransferException) as e:
         item.transfer(user1, user2)
-        assert 'not transferable' in e.args[0]
+        assert "not transferable" in e.args[0]
 
     with pytest.raises(PurchaseTransferException) as e:
         item.transfer(user2, user1)
-        assert 'does not own this item' in e.args[0]
+        assert "does not own this item" in e.args[0]
 
     db.session.commit()
-    item.price_tier.parent.set_attribute('is_transferable', True)
+    item.price_tier.parent.set_attribute("is_transferable", True)
 
     with pytest.raises(PurchaseTransferException) as e:
         item.transfer(user1, user1)
-        assert 'users must be different' in e.args[0]
+        assert "users must be different" in e.args[0]
 
     item.transfer(user1, user2)
     db.session.commit()
