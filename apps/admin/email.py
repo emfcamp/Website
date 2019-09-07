@@ -7,7 +7,7 @@ from flask import render_template, redirect, flash, url_for, Markup
 from flask import current_app as app
 from flask_mail import Message
 from wtforms import SubmitField, StringField, SelectField
-from wtforms.validators import Required
+from wtforms.validators import DataRequired
 from wtforms.widgets import TextArea
 from main import db, mail
 from models.user import User
@@ -31,8 +31,8 @@ def format_plaintext_email(markdown_text):
 
 
 class EmailComposeForm(Form):
-    subject = StringField("Subject", [Required()])
-    text = StringField("Text", [Required()], widget=TextArea())
+    subject = StringField("Subject", [DataRequired()])
+    text = StringField("Text", [DataRequired()], widget=TextArea())
     destination = SelectField(
         "Send to:", choices=[("all", "All Ticketholders"), ("cfp", "All Accepted CfP")]
     )

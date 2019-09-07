@@ -1,4 +1,4 @@
-from wtforms.validators import Optional, Required, InputRequired, Email, ValidationError
+from wtforms.validators import Optional, DataRequired, InputRequired, Email, ValidationError
 from wtforms.widgets import TextArea
 from wtforms import (
     SubmitField, StringField, SelectField,
@@ -98,12 +98,12 @@ class PriceTierForm(Form):
     personal_limit = IntegerField("Personal maximum")
 
 class NewPriceTierForm(PriceTierForm):
-    create = SubmitField('Create', [Required()])
+    create = SubmitField('Create', [DataRequired()])
     price_gbp = DecimalField('Price (GBP)')
     price_eur = DecimalField('Price (EUR)')
 
 class EditPriceTierForm(PriceTierForm):
-    update = SubmitField('Update', [Required()])
+    update = SubmitField('Update', [DataRequired()])
 
 class ModifyPriceTierForm(Form):
     delete = SubmitField('Delete')
@@ -124,7 +124,7 @@ class ProductViewForm(Form):
     cfp_accepted_only = BooleanField("Accepted CfP proposal required")
 
 class NewProductViewForm(ProductViewForm):
-    create = SubmitField('Create', [Required()])
+    create = SubmitField('Create', [DataRequired()])
 
 class EditProductViewForm(ProductViewForm):
     update = SubmitField('Update')
@@ -141,7 +141,7 @@ class AddProductViewProductForm(Form):
 
 class IssueTicketsInitialForm(Form):
     " Initial form to ask for email "
-    email = EmailField('Email address', [Email(), Required()])
+    email = EmailField('Email address', [Email(), DataRequired()])
     issue_free = SubmitField('Issue Free Ticket')
     reserve = SubmitField('Reserve Ticket for Payment')
 
@@ -149,7 +149,7 @@ class IssueTicketsInitialForm(Form):
 class TicketAmountForm(Form):
     " Sub-form for selecting the number for a specific ticket"
     amount = IntegerSelectField('Number of tickets', [Optional()])
-    tier_id = HiddenIntegerField('Price tier', [Required()])
+    tier_id = HiddenIntegerField('Price tier', [DataRequired()])
 
 
 class IssueTicketsForm(Form):
@@ -203,7 +203,7 @@ class ConvertTicketForm(Form):
     convert = SubmitField("Convert ticket")
 
 class TransferTicketInitialForm(Form):
-    email = EmailField('Email', [Email(), Required()])
+    email = EmailField('Email', [Email(), DataRequired()])
     transfer = SubmitField("Choose user")
 
 class TransferTicketForm(Form):

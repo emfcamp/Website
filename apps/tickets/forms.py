@@ -1,7 +1,7 @@
 from flask import Markup, render_template_string, url_for
 from flask_login import current_user
 from wtforms.validators import (
-    Required, InputRequired, Optional, Email, ValidationError,
+    DataRequired, InputRequired, Optional, Email, ValidationError,
 )
 from wtforms import (
     SubmitField, StringField, FieldList, FormField, HiddenField, BooleanField
@@ -32,8 +32,8 @@ class TicketAmountsForm(Form):
 
 
 class TicketTransferForm(Form):
-    name = StringField('Name', [Required()])
-    email = EmailField('Email', [Required()])
+    name = StringField('Name', [DataRequired()])
+    email = EmailField('Email', [DataRequired()])
 
     transfer = SubmitField('Transfer Ticket')
 
@@ -43,8 +43,8 @@ class TicketTransferForm(Form):
 
 
 class TicketPaymentForm(Form):
-    email = EmailField('Email', [Email(), Required()])
-    name = StringField('Name', [Required()])
+    email = EmailField('Email', [Email(), DataRequired()])
+    name = StringField('Name', [DataRequired()])
     allow_promo = BooleanField('Send me occasional emails about future EMF events')
     basket_total = HiddenField('basket total')
 
@@ -65,10 +65,10 @@ class TicketPaymentForm(Form):
 
 
 class TicketPaymentShippingForm(TicketPaymentForm):
-    address_1 = StringField("Address", [Required()])
+    address_1 = StringField("Address", [DataRequired()])
     address_2 = StringField("Address", [])
-    town = StringField("Town", [Required()])
-    postcode = StringField("Postal code", [Required()])
-    country = StringField("Country", [Required()])
+    town = StringField("Town", [DataRequired()])
+    postcode = StringField("Postal code", [DataRequired()])
+    country = StringField("Country", [DataRequired()])
 
 

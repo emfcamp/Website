@@ -9,7 +9,7 @@ from flask import (
 
 from flask_login import current_user
 
-from wtforms.validators import Optional, Required, URL
+from wtforms.validators import Optional, DataRequired, URL
 from wtforms import (
     SubmitField, BooleanField, HiddenField, StringField,
     FieldList, FormField, SelectField, IntegerField
@@ -63,7 +63,7 @@ def home():
 
 class UpdateFeatureFlagForm(Form):
     # We don't allow changing feature flag names
-    feature = HiddenField('Feature name', [Required()])
+    feature = HiddenField('Feature name', [DataRequired()])
     enabled = BooleanField('Enabled')
 
 
@@ -172,8 +172,8 @@ def schedule_feeds():
     return render_template('admin/schedule-feeds.html', feeds=feeds)
 
 class ScheduleForm(Form):
-    feed_name = StringField('Feed Name', [Required()])
-    url = StringField('URL', [Required(), URL()])
+    feed_name = StringField('Feed Name', [DataRequired()])
+    url = StringField('URL', [DataRequired(), URL()])
     enabled = BooleanField('Feed Enabled')
     location = SelectField('Location')
     published = BooleanField('Publish events from this feed')

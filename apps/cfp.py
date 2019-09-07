@@ -6,7 +6,7 @@ from flask import (
 )
 from flask_login import current_user
 from flask_mail import Message
-from wtforms.validators import Required, Email, ValidationError
+from wtforms.validators import DataRequired, Email, ValidationError
 from wtforms import (
     BooleanField, StringField, SubmitField,
     TextAreaField, SelectField,
@@ -29,10 +29,10 @@ import collections
 cfp = Blueprint('cfp', __name__)
 
 class ProposalForm(Form):
-    name = StringField("Name", [Required()])
-    email = EmailField("Email", [Email(), Required()])
-    title = StringField("Title", [Required()])
-    description = TextAreaField("Description", [Required()])
+    name = StringField("Name", [DataRequired()])
+    email = EmailField("Email", [Email(), DataRequired()])
+    title = StringField("Title", [DataRequired()])
+    description = TextAreaField("Description", [DataRequired()])
     requirements = StringField("Requirements")
     needs_help = BooleanField("Needs help")
     notice_required = SelectField("Required notice", default="1 week",
@@ -60,8 +60,8 @@ class TalkProposalForm(ProposalForm):
 
 class WorkshopProposalForm(ProposalForm):
     model = WorkshopProposal
-    length = StringField("Duration", [Required()])
-    attendees = StringField("Attendees", [Required()])
+    length = StringField("Duration", [DataRequired()])
+    attendees = StringField("Attendees", [DataRequired()])
     cost = StringField("Cost per attendee")
     participant_equipment = StringField("Attendee equipment")
     age_range = StringField("Age range")
@@ -69,8 +69,8 @@ class WorkshopProposalForm(ProposalForm):
 
 class YouthWorkshopProposalForm(ProposalForm):
     model = YouthWorkshopProposal
-    length = StringField("Duration", [Required()])
-    attendees = StringField("Attendees", [Required()])
+    length = StringField("Duration", [DataRequired()])
+    attendees = StringField("Attendees", [DataRequired()])
     cost = StringField("Cost per attendee")
     participant_equipment = StringField("Attendee equipment")
     age_range = StringField("Age range")
@@ -351,9 +351,9 @@ def edit_proposal(proposal_id):
 
 
 class AcceptedForm(Form):
-    name = StringField('Names for schedule', [Required()])
-    title = StringField('Title', [Required()])
-    description = TextAreaField('Description', [Required()])
+    name = StringField('Names for schedule', [DataRequired()])
+    title = StringField('Title', [DataRequired()])
+    description = TextAreaField('Description', [DataRequired()])
     age_range = StringField('Age Range')
     cost = StringField('Cost Per Attendee')
     participant_equipment = StringField('Attendee Equipment')

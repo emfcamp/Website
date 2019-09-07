@@ -11,7 +11,7 @@ from flask_mail import Message
 from sqlalchemy.orm import joinedload
 from wtforms import SubmitField, BooleanField, StringField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import Required, Email, ValidationError
+from wtforms.validators import DataRequired, Email, ValidationError
 
 from . import admin
 from main import db, mail
@@ -21,8 +21,8 @@ from ..common.forms import Form
 
 
 class NewUserForm(Form):
-    name = StringField('Name', [Required()])
-    email = EmailField('Email', [Email(), Required()])
+    name = StringField('Name', [DataRequired()])
+    email = EmailField('Email', [Email(), DataRequired()])
     add = SubmitField('Add User')
 
     def validate_email(form, field):

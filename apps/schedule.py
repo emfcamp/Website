@@ -19,7 +19,7 @@ from slugify import slugify_unicode as slugify
 from wtforms import (
     StringField, SubmitField, BooleanField, SelectField,
 )
-from wtforms.validators import Required, URL
+from wtforms.validators import DataRequired, URL
 
 from main import db, external_url
 from .common import feature_flag, json_response
@@ -461,7 +461,7 @@ def line_up_external(event_id, slug=None):
 
 
 class AddExternalFeedForm(Form):
-    url = StringField('URL', [Required(), URL()])
+    url = StringField('URL', [DataRequired(), URL()])
     preview = SubmitField('Preview')
 
 @schedule.route('/schedule/external/feeds', methods=['GET', 'POST'])
@@ -488,9 +488,9 @@ def external_feeds():
     return render_template('schedule/external/feeds.html', form=form, calendars=calendars)
 
 class UpdateExternalFeedForm(Form):
-    url = StringField('URL', [Required(), URL()])
-    name = StringField('Feed Name', [Required()])
-    location = SelectField('Location', [Required()])
+    url = StringField('URL', [DataRequired(), URL()])
+    name = StringField('Feed Name', [DataRequired()])
+    location = SelectField('Location', [DataRequired()])
     published = BooleanField('Publish events from this feed')
     preview = SubmitField('Preview')
     save = SubmitField('Save')

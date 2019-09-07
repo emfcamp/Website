@@ -13,7 +13,7 @@ from flask_mail import Message
 from sqlalchemy import or_
 from wtforms import StringField, HiddenField, SubmitField, BooleanField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import Required, Email, ValidationError
+from wtforms.validators import DataRequired, Email, ValidationError
 
 from main import db, mail
 from models.user import User, UserDiversity, verify_signup_code
@@ -43,7 +43,7 @@ class NextURLField(HiddenField):
 
 
 class LoginForm(Form):
-    email = EmailField('Email', [Email(), Required()])
+    email = EmailField('Email', [Email(), DataRequired()])
     next = NextURLField('Next')
 
     def validate_email(form, field):
@@ -112,8 +112,8 @@ def logout():
 
 
 class SignupForm(Form):
-    email = EmailField('Email', [Email(), Required()])
-    name = StringField('Name', [Required()])
+    email = EmailField('Email', [Email(), DataRequired()])
+    name = StringField('Name', [DataRequired()])
     allow_promo = BooleanField('Send me occasional emails about future EMF events')
     signup = SubmitField('Sign up')
 
@@ -187,7 +187,7 @@ def set_currency():
 
 
 class AccountForm(Form):
-    name = StringField('Name', [Required()])
+    name = StringField('Name', [DataRequired()])
     allow_promo = BooleanField('Send me occasional emails about future EMF events')
 
     age = StringField('Age')
