@@ -12,6 +12,11 @@ $PSQL emf_site -c 'CREATE EXTENSION postgis' || true
 $PSQL -c 'CREATE DATABASE emf_site_test' || true
 $PSQL emf_site_test -c 'CREATE EXTENSION postgis' || true
 
-pipenv run make db
-pipenv run make data
-exec pipenv run make run
+
+while :
+do
+	pipenv run make db || true
+	pipenv run make data || true
+	pipenv run make run || true
+	sleep 5
+done;
