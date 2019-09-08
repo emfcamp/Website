@@ -33,7 +33,7 @@ import gocardless_pro
 if len(logging.root.handlers) == 0:
     install_logging = True
     with open('logging.yaml', 'r') as f:
-        conf = yaml.load(f)
+        conf = yaml.load(f, Loader=yaml.FullLoader)
         logging.config.dictConfig(conf)
 else:
     install_logging = False
