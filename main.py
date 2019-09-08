@@ -20,7 +20,7 @@ from webassets.filter import get_filter
 from flask_cdn import CDN
 from flask_caching import Cache
 from flask_debugtoolbar import DebugToolbarExtension
-from flask_wtf import CsrfProtect
+from flask_wtf import CSRFProtect
 from flask_cors import CORS
 from loggingmanager import create_logging_manager, set_user_id
 import stripe
@@ -55,7 +55,7 @@ def include_object(object, name, type_, reflected, compare_to):
 
 
 cache = Cache()
-csrf = CsrfProtect()
+csrf = CSRFProtect()
 migrate = Migrate(include_object=include_object)
 manager = VersioningManager(options={'strategy': 'subquery'})
 make_versioned(manager=manager, plugins=[FlaskPlugin()])

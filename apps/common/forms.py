@@ -1,8 +1,7 @@
 import json
 
 from flask import Markup
-from flask_wtf import Form as BaseForm
-from flask_wtf.form import _is_hidden
+from flask_wtf import FlaskForm
 from wtforms import IntegerField, SelectField
 from wtforms.widgets import Input, HiddenInput
 from wtforms.fields import StringField
@@ -82,14 +81,22 @@ class StaticField(StringField):
     widget = StaticWidget()
 
 
-class Form(BaseForm):
+class Form(FlaskForm):
     # CsrfProtect token limit, to match the flask permanent session expiry of 31 days.
     TIME_LIMIT = 3600 * 24 * 31
 
     def hidden_tag_without(self, *exclude_fields):
+        """ Return the hidden fields for this form, excluding the fields listed in
+            `exclude_fields`
+
+            We use this to render all the hidden fields in the form except for the
+            CSRF token, for reasons which are currently unclear to me.
+        """
         fields = [
             getattr(self, f) if isinstance(f, string_types) else f
             for f in exclude_fields
         ]
-        keep_fields = [f for f in self if _is_hidden(f) and f not in fields]
-        return BaseForm.hidden_tag(self, *keep_fields)
+        keep_fields = [
+            f for f in self if isinstance(f.widget, HiddenInput) and f not in fields
+        ]
+        return FlaskForm.hidden_tag(self, *keep_fields)
