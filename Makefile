@@ -5,7 +5,7 @@ endif
 .PHONY: run update outdated listdepends clean
 
 run:
-	python ./dev_server.py
+	FLASK_APP=dev_server.py FLASK_ENV=development flask run --extra-files ./config/development.cfg:./logging.yaml -h 0.0.0.0
 
 update:
 	PIPENV_MAX_SUBPROCESS=$$(($$(nproc)+1)) pipenv sync --dev
