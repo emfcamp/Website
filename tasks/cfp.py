@@ -1,5 +1,4 @@
-# coding=utf-8
-from unicodecsv import DictReader
+from csv import DictReader
 
 from faker import Faker
 from flask import current_app as app

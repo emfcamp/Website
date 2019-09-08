@@ -48,7 +48,6 @@ gocardless-pro = "==1.2.0"
 stripe = "==1.66.0"
 ofxparse = "==0.16"
 funcsigs = "==1.0.2"
-unicodecsv = "==0.14.1"
 python-dateutil = "*"
 slotmachine = {git = "https://github.com/emfcamp/slotmachine.git",editable = true}
 awesome-slugify = "*"
