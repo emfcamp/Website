@@ -15,3 +15,5 @@ jobs:
         COMPOSE_INTERACTIVE_NO_CLI: 1
     - name: Test
       run: docker-compose exec app pipenv run make test
+      env:
+        COMPOSE_INTERACTIVE_NO_CLI: 1
