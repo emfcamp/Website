@@ -11,5 +11,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Start environment
       run: docker-compose up --build -d
+      env:
+        COMPOSE_INTERACTIVE_NO_CLI: 1
     - name: Test
       run: docker-compose exec app pipenv run make test
