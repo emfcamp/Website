@@ -1,0 +1,15 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Start environment
+      run: docker-compose up --build -d
+    - name: Test
+      run: docker-compose exec app pipenv run make test
