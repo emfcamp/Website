@@ -10,4 +10,4 @@ done
 $PSQL -c 'CREATE DATABASE emf_site' || true
 $PSQL emf_site -c 'CREATE EXTENSION postgis' || true
 
-exec pipenv run gunicorn -k eventlet -c gunicorn.py -w 3 wsgi:app
+exec pipenv run gunicorn -k eventlet -c gunicorn.py -w 3 -b '0.0.0.0:8000' wsgi:app

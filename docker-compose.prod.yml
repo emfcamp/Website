@@ -4,8 +4,10 @@ services:
     build:
       context: "./"
       dockerfile: Dockerfile.prod
+    volumes:
+      - /etc/emf-site.cfg:/app/config/production.cfg
     environment:
-      SETTINGS_FILE: ./config/development.cfg
+      SETTINGS_FILE: ./config/production.cfg
       PROMETHEUS_MULTIPROC_DIR: /var/prometheus
 
   postgres:
