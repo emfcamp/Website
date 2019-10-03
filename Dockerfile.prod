@@ -7,10 +7,10 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     pip3 install pipenv
 
-COPY Pipfile Pipfile.lock Makefile /app/
+COPY . /app/
 WORKDIR /app
 
-RUN make update
+RUN pipenv sync
 
 ENV SHELL=/bin/bash
-ENTRYPOINT ["./docker/dev_entrypoint.sh"]
+ENTRYPOINT ["./docker/prod_entrypoint.sh"]

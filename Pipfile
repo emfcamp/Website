@@ -59,6 +59,7 @@ pendulum = ">=2.0"
 flask-restful = "*"
 shapely = "*"
 flask-cors = "*"
+flask-shell-ipython = "*"
 
 [dev-packages]
 pytest = "*"
@@ -69,7 +70,6 @@ locustio = "*"
 ipdb = "*"
 hypothesis = "*"
 pytest-random-order = "*"
-flask-shell-ipython = "*"
 
 [requires]
 python_version = "3.7"
