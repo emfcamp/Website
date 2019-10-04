@@ -6,7 +6,6 @@
 
 <nav>
   <ul class="nav nav-pills">
-    <li><a href="https://goo.gl/forms/A95IOqit035CGeBd2">I didn't get a badge</a></li>
     {% if feature_enabled('TICKET_SALES') %}
       <li><a href="{{ url_for('users.purchases') }}">Your tickets</a></li>
     {% endif %}
