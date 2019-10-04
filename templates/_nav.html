@@ -6,10 +6,12 @@
          Eastnor, UK</div>
 
     <div id="menu-container" role="navigation" aria-label="main navigation">
-        <ul class="menu" role="menu">
+      <ul class="menu" role="menu">
+            {#
             <li role="presentation">
                 <a role="menuitem" href="{{ url_for('base.feedback') }}">Feedback</a>
             </li>
+            #}
             <li role="presentation">
                 <a role="menuitem" href="{{ url_for('base.about') }}">About</a>
             </li>
@@ -20,11 +22,13 @@
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('tickets.main') }}">Tickets</a>
                 </li>
+            {% endif %}
+            {#
             {% elif config.get('DEFAULT_FLOW') == 'tees' and SALES_STATE in ['available'] %}
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('tickets.main', flow='tees') }}">T-shirts</a>
                 </li>
-            {% endif %}
+            #}
             {% if feature_enabled('VOLUNTEERS') %}
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('volunteer.main') }}">Volunteer</a>
@@ -56,10 +60,12 @@
                 <li role="presentation">
                     <a href="https://www.youtube.com/ElectromagneticField">Videos</a>
                 </li>
-            {% endif %}
+              {% endif %}
+              {#
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('base.sponsors') }}">Sponsors</a>
                 </li>
+              #}
             {% if basket_count %}
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('tickets.pay', flow=config.get('DEFAULT_FLOW', 'main')) }}">
