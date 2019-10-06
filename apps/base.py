@@ -18,7 +18,7 @@ from flask import (
 )
 
 from main import cache
-from .common import feature_flag, site_flag
+from .common import feature_flag
 from models.product import Product, ProductView, ProductViewProduct, PriceTier
 from models.site_state import get_site_state
 
@@ -53,7 +53,6 @@ def main():
 
 
 @base.route("/", methods=["POST"])
-@site_flag("TICKETS_SITE")
 def main_post():
     # mc_user will be removed in v2.1.0
     mc = MailChimp(mc_secret=app.config["MAILCHIMP_KEY"], mc_user="python-mailchimp")
@@ -187,14 +186,12 @@ def feedback():
 
 @base.route("/talks")
 @base.route("/talks/")
-@site_flag("TICKETS_SITE")
 def talks():
     return redirect(url_for("schedule.line_up"))
 
 
 @base.route("/line-up/2016")
 @base.route("/talks/2016")
-@site_flag("TICKETS_SITE")
 def talks_2016():
     talk_path = os.path.abspath(
         os.path.join(__file__, "..", "..", "exports", "2016", "public")
@@ -243,7 +240,6 @@ def talks_2016():
 
 @base.route("/line-up/2014")
 @base.route("/talks/2014")
-@site_flag("TICKETS_SITE")
 def talks_2014():
     talks = []
     talk_path = os.path.abspath(os.path.join(__file__, "..", "..", "talks", "2014"))
@@ -266,7 +262,6 @@ def talks_2014():
 
 @base.route("/line-up/2012")
 @base.route("/talks/2012")
-@site_flag("TICKETS_SITE")
 def talks_2012():
     days = {}
     talk_path = os.path.abspath(os.path.join(__file__, "..", "..", "talks", "2012"))
