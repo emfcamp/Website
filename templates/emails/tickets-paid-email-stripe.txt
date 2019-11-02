@@ -5,7 +5,7 @@ We've just received confirmation from Stripe that your payment for
 
 {% if feature_enabled('ISSUE_TICKETS') -%}
 {% include 'emails/receipt-blurb.txt' %}
-{% else %}
+{% elif SITE_STATE != 'after-event' %}
 You can view your tickets and download the invoice here:
 
   {{ url_for('users.account', _external=True) }}
@@ -13,8 +13,10 @@ You can view your tickets and download the invoice here:
 We'll send e-tickets nearer the event.
 {% endif %}
 
+{% if SITE_STATE != 'after-event' %}
 See you soon at Electromagnetic Field {{ event_year }}!
 
+{% endif %}
 Love,
 
 All the EMF team

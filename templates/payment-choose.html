@@ -35,18 +35,24 @@
 <form method="post" class="pay-method">
 {{ form.hidden_tag() }}
 
-{% if current_user.is_anonymous or current_user.name == current_user.email %}
-<h3>Your Details</h3>
+{% if current_user.is_anonymous or current_user.name == current_user.email or basket.requires_shipping %}
 
-{% if form.email.was_duplicate %}
-<div class="alert alert-warning">
-    This email address already exists in our system, possibly because you previously tried to buy a ticket and
-    we automatically created an account for you.
-    Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('tickets.pay', flow=flow), email=form.email.data) }}">click here</a> to log in.
-</div>
-{% endif %}
+  <h3>Your Details</h3>
 
-{% include "user-signup.html" %}
+  {% if form.email.was_duplicate %}
+  <div class="alert alert-warning">
+      This email address already exists in our system, possibly because you previously tried to buy a ticket and
+      we automatically created an account for you.
+      Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('tickets.pay', flow=flow), email=form.email.data) }}">click here</a> to log in.
+  </div>
+  {% endif %}
+
+  {% if basket.requires_shipping %}
+  {% include "user-shipping.html" %}
+  {% else %}
+  {% include "user-signup.html" %}
+  {% endif %}
+
 {% endif %}
 
 <h3>Choose a Payment Method</h3>
@@ -83,7 +89,7 @@
     </div>
 </div>
 {% endif %}
-{% else %}
+{% elif feature_enabled('BANK_TRANSFER') %}
 <div class="panel panel-default panel--payment">
     <div class="panel-heading"><h3 class="panel-title">Direct Debit</h3></div>
     <div class="panel-body">
@@ -97,7 +103,7 @@
 <div class="panel panel-default panel--payment">
     <div class="panel-heading"><h3 class="panel-title">Bank Transfer</h3></div>
     <div class="panel-body">
-        <p>Ask your bank to send money to us directly. You can do this online, or with cash in a branch.</p>
+        <p>Ask your bank to send money to us directly. You can do this online, or sometimes with cash in a branch.</p>
     </div>
     <div class="panel-footer panel-footer-center">
         <input type="submit" name="{{form.banktransfer.name}}" value="{{form.banktransfer.label.text}}" class="btn btn-lg btn-success debounce"/>
@@ -111,6 +117,7 @@
 <div class="row">
     <div class="col-sm-12">
     <div class="panel panel-default">
+        {% if feature_enabled('GOCARDLESS') or feature_enabled('BANK_TRANSFER') %}
         <div class="panel-body">
             <p>If you can't use another payment method, we accept card payments.
             These cost us more, and we'd rather you used another method if you can.
@@ -119,6 +126,15 @@
             <p>We accept Visa, Visa Debit, Mastercard or American Express.</p>
             <input type="submit" name="{{form.stripe.name}}" value="{{form.stripe.label.text}}" class="btn btn-small btn-default debounce"/>
         </div>
+        {% else %}
+        <div class="panel-heading"><h3 class="panel-title">Stripe</h3></div>
+        <div class="panel-body">
+            <p>We accept Visa, Visa Debit, Mastercard or American Express.</p>
+        </div>
+        <div class="panel-footer panel-footer-center">
+            <input type="submit" name="{{form.stripe.name}}" value="{{form.stripe.label.text}}" class="btn btn-lg btn-success debounce"/>
+        </div>
+        {% endif %}
     </div>
     </div>
 </div>
@@ -131,9 +147,12 @@
 {% endblock %}
 
 {% block foot %}
+{# If the preferred methods of payment are active, don't let the form respond to Enter #}
+{% if feature_enabled('GOCARDLESS') or feature_enabled('BANK_TRANSFER') %}
 <script type="text/javascript">
     $('form.pay-method').on('keypress', function(e) {
         if (e.which == 13 && !$(e.target).is('.btn')) e.preventDefault();
     });
 </script>
+{% endif %}
 {% endblock %}

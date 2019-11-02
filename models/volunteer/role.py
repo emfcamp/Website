@@ -3,7 +3,7 @@ from main import db
 
 
 class Role(db.Model):
-    __tablename__ = 'volunteer_role'
+    __tablename__ = "volunteer_role"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False, unique=True, index=True)
     description = db.Column(db.String)
@@ -13,7 +13,7 @@ class Role(db.Model):
     requires_training = db.Column(db.Boolean, nullable=False, default=False)
 
     def __repr__(self):
-        return '<VolunteerRole {0}>'.format(self.name)
+        return "<VolunteerRole {0}>".format(self.name)
 
     def to_dict(self):
         return {
@@ -39,7 +39,7 @@ class Role(db.Model):
 
 class RolePermission(db.Model):
     __versioned__ = {}
-    __tablename__ = 'volunteer_role_permission'
+    __tablename__ = "volunteer_role_permission"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, index=True)
@@ -71,5 +71,3 @@ class UserQuals(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     qual_id = db.Column(db.Integer, db.ForeignKey('qual.id'), primary_key=True)
 """
-
-

@@ -4,7 +4,7 @@
 <div class="col-md-10">
 
 <h2>Thank you!</h2>
-<p>Your tickets have been reserved {% if payment.expires -%} until {{ payment.expires.strftime('%-d %B %Y') }}{% endif %}
+<p>Your order has been reserved {% if payment.expires -%} until {{ payment.expires.strftime('%-d %B %Y') }}{% endif %}
   while you pay by bank transfer. We'll email you when we receive your payment.</p>
 
 <h2>How to Pay</h2>
@@ -38,7 +38,9 @@
 
 <p>
 
+{% if SITE_STATE != 'after-event' %}
 <p>See you at Electromagnetic Field!</p>
+{% endif %}
 
 <a class="btn btn-info" href="{{ url_for('users.purchases') }}">Show my tickets</a>
 

@@ -1,10 +1,4 @@
-URLS = [
-    '/',
-    '/about',
-    '/cfp',
-    '/login',
-    '/metrics'
-]
+URLS = ["/", "/about", "/cfp", "/login", "/metrics"]
 
 
 def test_url(client):

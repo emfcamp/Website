@@ -1,0 +1,33 @@
+{% extends "admin/base.html" %}
+{% from "_formhelpers.html" import render_field, render_static %}
+{% block title %}Reconciliation Report{% endblock %}
+{% block body %}
+
+<h2>Reconciliation Report</h2>
+
+<table class="table">
+	<thead><tr>
+			<th>Product Group</th>
+			<th>Paid (GBP)</th>
+			<th>Pending (GBP)</th>
+			<th>Paid (EUR)</th>
+			<th>Pending (EUR)</th>
+	</thead>
+	{% for pg, totals in data.items() %}
+		<tr><td>{{pg}}</td>
+		    <td>{{totals['paid']['GBP']|price('GBP')}}</td>
+		    <td>{{totals['pending']['GBP']|price('GBP')}}</td>
+		    <td>{{totals['paid']['EUR']|price('EUR')}}</td>
+		    <td>{{totals['pending']['EUR']|price('EUR')}}</td>
+		</tr>
+	{% endfor %}
+	<tr>
+		<th>Total</th>
+		<td>{{gt['paid']['GBP']|price('GBP')}}</td>
+		<td>{{gt['pending']['GBP']|price('GBP')}}</td>
+		<td>{{gt['paid']['EUR']|price('EUR')}}</td>
+		<td>{{gt['pending']['EUR']|price('EUR')}}</td>
+	</tr>
+</table>
+
+{% endblock %}

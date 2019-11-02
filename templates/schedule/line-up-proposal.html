@@ -6,7 +6,7 @@
 <h2>
   <small>
   {{ proposal.human_type | title }} by {{ proposal.published_names or proposal.user.name }}
-  {% if not proposal.may_record and proposal.type == 'talk' and proposal.state == 'finished' %}
+  {% if not proposal.may_record and proposal.type == 'talk' and proposal.state in ['accepted', 'finished'] %}
   <span style="padding-left: 10px;" title="This talk will not be recorded">🎦 🚫 </span>
   {% endif %}
   </small>
@@ -24,6 +24,20 @@
 {% endif %}
 
 <div class="well">
+
+{% if proposal.youtube_url %}
+<div class="youtube-link">
+  {% if proposal.thumbnail_url %}
+  <a class="row" href="{{ proposal.youtube_url }}">
+  <img class="img-responsive xs-col-6" src="{{ proposal.thumbnail_url }}">
+  </a>
+  {% else %}
+  <a class="no-thumbnail" href="{{ proposal.youtube_url }}">
+  </a>
+  {% endif %}
+</div>
+{% endif %}
+
 <p class="multiline">{{ (proposal.published_description or proposal.description) | urlize }}</p>
 
 {% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}

@@ -1,12 +1,19 @@
 Hi, {{ user.name }},
 
+{# FIXME: this should be done by basket contents #}
+{% if SITE_STATE != 'after-event' %}
 This is to confirm that you've bought
 {%- if payment.purchases | count == 1 %} a ticket {%- else %} {{ payment.purchases | count }} tickets {%- endif %} for
 Electromagnetic Field {{ event_year }}.
+{% else %}
+This is to confirm that you've bought
+{%- if payment.purchases | count == 1 %} a t-shirt {%- else %} {{ payment.purchases | count }} t-shirts {%- endif %} for
+Electromagnetic Field {{ event_year }}.
+{% endif %}
 
 {% if payment.state == 'paid' and feature_enabled('ISSUE_TICKETS') -%}
 {% include 'emails/receipt-blurb.txt' %}
-{% else %}
+{% elif SITE_STATE != 'after-event' %}
 Your tickets are:
 
 {% include "emails/email-tickets.txt" %}

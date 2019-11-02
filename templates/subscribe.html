@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Subscribe to EMF event emails{% endblock %}
+{% block body %}
+<div class="col-md-10">
+    <h2>Subscribe to EMF event emails</h2>
+
+    <p>If you'd like to be infrequently notified about EMF events, please sign up to our newsletter.</p>
+
+    <div class="well">
+        {% include "home/_mailchimp_form.html" %}
+    </div>
+</div>
+{% endblock %}

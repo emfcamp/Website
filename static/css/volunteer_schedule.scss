@@ -5,3 +5,11 @@
 #role-select {
     height: 260px;
 }
+
+table.shifts-table tr,
+table.shifts-table th,
+table.shifts-table td
+{
+    // !important because I'm a terrible (and very lazy) person
+    border-color: #630047 !important;
+}

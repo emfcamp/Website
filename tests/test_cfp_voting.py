@@ -2,9 +2,11 @@ import pytest
 from hypothesis import given
 from hypothesis.strategies import integers, lists, data
 from apps.cfp_review.majority_judgement import (
-    get_floor_median, calculate_score, calculate_normalised_score,
+    get_floor_median,
+    calculate_score,
+    calculate_normalised_score,
     calculate_max_normalised_score,
-    MajorityJudgementException
+    MajorityJudgementException,
 )
 
 
@@ -16,6 +18,7 @@ def test_get_floor_median():
     assert get_floor_median([1, 2, 3, 4, 5]) == 3
     with pytest.raises(Exception):
         get_floor_median([])
+
 
 @given(lists(integers(), min_size=1))
 def test_get_floor_median_2(values):
@@ -51,11 +54,13 @@ def test_calculate_score():
     with pytest.raises(MajorityJudgementException):
         calculate_score([-1])
 
+
 @given(data())
 def test_calculate_score_2(data):
     base = data.draw(integers(min_value=2, max_value=36))
     score_list = data.draw(lists(integers(min_value=0, max_value=base - 1)))
     calculate_score(score_list, base)
+
 
 def test_calculate_normalised_score():
     # Basic tests
@@ -79,27 +84,27 @@ def test_calculate_normalised_score():
     with pytest.raises(MajorityJudgementException):
         calculate_normalised_score([2, 2], 1, default_vote=-1)
 
+
 def test_calculate_max_normalised_score():
     def assert_within_delta(test, expected):
         result = calculate_max_normalised_score(test)
         assert -0.01 < result - expected < 0.01
 
     assert calculate_max_normalised_score([]) == 0
-    assert_within_delta([0, ], 0.0)
-    assert_within_delta([2, ], 1.0)
+    assert_within_delta([0], 0.0)
+    assert_within_delta([2], 1.0)
 
     assert_within_delta([0, 1], 0.125)
     assert_within_delta([2, 1], 0.625)
     assert_within_delta([2, 2, 1], 0.885)
     assert_within_delta([1, 2, 2, 1], 0.625)
 
+
 def test_ordering():
     expected = [[2, 1], [1, 2, 2, 0], [1, 1], [2, 1, 0], [0, 2, 0]]
     test = [[0, 2, 0], [1, 2, 2, 0], [2, 1, 0], [2, 1], [1, 1]]
 
     # Sort test using the max normalised score
-    result = sorted(test, key=lambda x: calculate_max_normalised_score(x),
-                    reverse=True)
+    result = sorted(test, key=lambda x: calculate_max_normalised_score(x), reverse=True)
 
     assert expected == result
-

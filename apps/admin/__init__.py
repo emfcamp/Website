@@ -3,16 +3,28 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 from datetime import datetime, timedelta
 
 from flask import (
-    render_template, redirect, request, flash,
-    url_for, current_app as app, Blueprint, abort
+    render_template,
+    redirect,
+    request,
+    flash,
+    url_for,
+    current_app as app,
+    Blueprint,
+    abort,
 )
 
 from flask_login import current_user
 
-from wtforms.validators import Optional, Required, URL
+from wtforms.validators import Optional, DataRequired, URL
 from wtforms import (
-    SubmitField, BooleanField, HiddenField, StringField,
-    FieldList, FormField, SelectField, IntegerField
+    SubmitField,
+    BooleanField,
+    HiddenField,
+    StringField,
+    FieldList,
+    FormField,
+    SelectField,
+    IntegerField,
 )
 
 from main import db
@@ -25,58 +37,70 @@ from models.map import MapObject
 from ..common import require_permission
 from ..common.forms import Form
 
-admin = Blueprint('admin', __name__)
+admin = Blueprint("admin", __name__)
 
-admin_required = require_permission('admin')  # Decorator to require admin permissions
+admin_required = require_permission("admin")  # Decorator to require admin permissions
 
 
 @admin.before_request
 def admin_require_permission():
     """ Require admin permission for everything under /admin """
-    if not current_user.is_authenticated or not current_user.has_permission('admin'):
+    if not current_user.is_authenticated or not current_user.has_permission("admin"):
         abort(404)
 
 
 @admin.context_processor
 def admin_variables():
-    if not request.path.startswith('/admin'):
+    if not request.path.startswith("/admin"):
         return {}
 
-    requested_refund_count = Payment.query.filter_by(state='refund-requested').count()
-    unreconciled_count = BankTransaction.query.filter_by(payment_id=None, suppressed=False).count()
+    requested_refund_count = Payment.query.filter_by(state="refund-requested").count()
+    unreconciled_count = BankTransaction.query.filter_by(
+        payment_id=None, suppressed=False
+    ).count()
 
-    expiring_count = BankPayment.query.join(Purchase).filter(
-        BankPayment.state == 'inprogress',
-        BankPayment.expires < datetime.utcnow() + timedelta(days=3),
-    ).group_by(BankPayment.id).count()
+    expiring_count = (
+        BankPayment.query.join(Purchase)
+        .filter(
+            BankPayment.state == "inprogress",
+            BankPayment.expires < datetime.utcnow() + timedelta(days=3),
+        )
+        .group_by(BankPayment.id)
+        .count()
+    )
 
-    return {'requested_refund_count': requested_refund_count,
-            'unreconciled_count': unreconciled_count,
-            'expiring_count': expiring_count,
-            'view_name': request.url_rule.endpoint.replace('admin.', '.')}
+    return {
+        "requested_refund_count": requested_refund_count,
+        "unreconciled_count": unreconciled_count,
+        "expiring_count": expiring_count,
+        "view_name": request.url_rule.endpoint.replace("admin.", "."),
+    }
 
 
-@admin.route('/')
+@admin.route("/")
 def home():
-    return render_template('admin/admin.html')
+    return render_template("admin/admin.html")
 
 
 class UpdateFeatureFlagForm(Form):
     # We don't allow changing feature flag names
-    feature = HiddenField('Feature name', [Required()])
-    enabled = BooleanField('Enabled')
+    feature = HiddenField("Feature name", [DataRequired()])
+    enabled = BooleanField("Enabled")
 
 
 class FeatureFlagForm(Form):
     flags = FieldList(FormField(UpdateFeatureFlagForm))
-    new_feature = SelectField('New feature name', [Optional()],
-                              choices=[('', 'Add a new flag')] +
-                              list(zip(DB_FEATURE_FLAGS, DB_FEATURE_FLAGS)))
-    new_enabled = BooleanField('New feature enabled', [Optional()])
-    update = SubmitField('Update flags')
+    new_feature = SelectField(
+        "New feature name",
+        [Optional()],
+        choices=[("", "Add a new flag")]
+        + list(zip(DB_FEATURE_FLAGS, DB_FEATURE_FLAGS)),
+    )
+    new_enabled = BooleanField("New feature enabled", [Optional()])
+    update = SubmitField("Update flags")
 
 
-@admin.route('/feature-flags', methods=['GET', 'POST'])
+@admin.route("/feature-flags", methods=["GET", "POST"])
 def feature_flags():
     form = FeatureFlagForm()
     db_flags = FeatureFlag.query.all()
@@ -89,17 +113,20 @@ def feature_flags():
 
             # Update the db and clear the cache if there's a change
             if db_flag_dict[feature].enabled != flg.enabled.data:
-                app.logger.info('Updating flag %s to %s', feature, flg.enabled.data)
+                app.logger.info("Updating flag %s to %s", feature, flg.enabled.data)
                 db_flag_dict[feature].enabled = flg.enabled.data
                 db.session.commit()
                 refresh_flags()
 
         # Add new flags if required
         if form.new_feature.data:
-            new_flag = FeatureFlag(feature=form.new_feature.data,
-                                   enabled=form.new_enabled.data)
+            new_flag = FeatureFlag(
+                feature=form.new_feature.data, enabled=form.new_enabled.data
+            )
 
-            app.logger.info('Overriding new flag %s to %s', new_flag.feature, new_flag.enabled)
+            app.logger.info(
+                "Overriding new flag %s to %s", new_flag.feature, new_flag.enabled
+            )
             db.session.add(new_flag)
             db.session.commit()
             refresh_flags()
@@ -107,8 +134,8 @@ def feature_flags():
             db_flags = FeatureFlag.query.all()
 
             # Unset previous form values
-            form.new_feature.data = ''
-            form.new_enabled.data = ''
+            form.new_feature.data = ""
+            form.new_enabled.data = ""
 
     # Clear the list of flags (which may be stale)
     for old_field in range(len(form.flags)):
@@ -120,25 +147,31 @@ def feature_flags():
         form.flags[-1].feature.data = flg.feature
         form.flags[-1].enabled.data = flg.enabled
 
-    return render_template('admin/feature-flags.html', form=form)
+    return render_template("admin/feature-flags.html", form=form)
 
 
 class SiteStateForm(Form):
-    site_state = SelectField('Site', choices=[('', '(automatic)')] +
-                             list(zip(VALID_STATES['site_state'], VALID_STATES['site_state'])))
-    sales_state = SelectField('Sales', choices=[('', '(automatic)')] +
-                              list(zip(VALID_STATES['sales_state'], VALID_STATES['sales_state'])))
-    update = SubmitField('Update states')
+    site_state = SelectField(
+        "Site",
+        choices=[("", "(automatic)")]
+        + list(zip(VALID_STATES["site_state"], VALID_STATES["site_state"])),
+    )
+    sales_state = SelectField(
+        "Sales",
+        choices=[("", "(automatic)")]
+        + list(zip(VALID_STATES["sales_state"], VALID_STATES["sales_state"])),
+    )
+    update = SubmitField("Update states")
 
 
-@admin.route('/site-states', methods=['GET', 'POST'])
+@admin.route("/site-states", methods=["GET", "POST"])
 def site_states():
     form = SiteStateForm()
 
     db_states = SiteState.query.all()
     db_states = {s.name: s for s in db_states}
 
-    if request.method != 'POST':
+    if request.method != "POST":
         # Empty form
         for name in VALID_STATES.keys():
             if name in db_states:
@@ -147,12 +180,12 @@ def site_states():
     if form.validate_on_submit():
         for name in VALID_STATES.keys():
             state_form = getattr(form, name)
-            if state_form.data == '':
+            if state_form.data == "":
                 state_form.data = None
 
             if name in db_states:
                 if db_states[name].state != state_form.data:
-                    app.logger.info('Updating state %s to %s', name, state_form.data)
+                    app.logger.info("Updating state %s to %s", name, state_form.data)
                     db_states[name].state = state_form.data
 
             else:
@@ -162,25 +195,27 @@ def site_states():
 
         db.session.commit()
         refresh_states()
-        return redirect(url_for('.site_states'))
+        return redirect(url_for(".site_states"))
 
-    return render_template('admin/site-states.html', form=form)
+    return render_template("admin/site-states.html", form=form)
 
-@admin.route('/schedule-feeds')
+
+@admin.route("/schedule-feeds")
 def schedule_feeds():
     feeds = CalendarSource.query.all()
-    return render_template('admin/schedule-feeds.html', feeds=feeds)
+    return render_template("admin/schedule-feeds.html", feeds=feeds)
+
 
 class ScheduleForm(Form):
-    feed_name = StringField('Feed Name', [Required()])
-    url = StringField('URL', [Required(), URL()])
-    enabled = BooleanField('Feed Enabled')
-    location = SelectField('Location')
-    published = BooleanField('Publish events from this feed')
-    priority = IntegerField('Priority', [Optional()])
-    preview = SubmitField('Preview')
-    submit = SubmitField('Save')
-    delete = SubmitField('Delete')
+    feed_name = StringField("Feed Name", [DataRequired()])
+    url = StringField("URL", [DataRequired(), URL()])
+    enabled = BooleanField("Feed Enabled")
+    location = SelectField("Location")
+    published = BooleanField("Publish events from this feed")
+    priority = IntegerField("Priority", [Optional()])
+    preview = SubmitField("Preview")
+    submit = SubmitField("Save")
+    delete = SubmitField("Delete")
 
     def update_feed(self, feed):
         feed.name = self.feed_name.data
@@ -205,15 +240,16 @@ class ScheduleForm(Form):
         if feed.mapobj:
             self.location.data = str(feed.mapobj.id)
         else:
-            self.location.data = ''
+            self.location.data = ""
 
-@admin.route('/schedule-feeds/<int:feed_id>', methods=['GET', 'POST'])
+
+@admin.route("/schedule-feeds/<int:feed_id>", methods=["GET", "POST"])
 def schedule_feed(feed_id):
     feed = CalendarSource.query.get_or_404(feed_id)
     form = ScheduleForm()
 
     choices = sorted([(str(mo.id), mo.name) for mo in MapObject.query])
-    choices = [('', '')] + choices
+    choices = [("", "")] + choices
     form.location.choices = choices
 
     if form.validate_on_submit():
@@ -223,36 +259,39 @@ def schedule_feed(feed_id):
             db.session.delete(feed)
             db.session.commit()
             flash("Feed deleted")
-            return redirect(url_for('.schedule_feeds', feed_id=feed_id))
+            return redirect(url_for(".schedule_feeds", feed_id=feed_id))
 
         form.update_feed(feed)
         db.session.commit()
         msg = "Updated feed %s" % feed.name
         flash(msg)
         app.logger.info(msg)
-        return redirect(url_for('.schedule_feed', feed_id=feed_id))
+        return redirect(url_for(".schedule_feed", feed_id=feed_id))
 
     form.init_from_feed(feed)
-    return render_template('admin/edit-feed.html', feed=feed, form=form)
+    return render_template("admin/edit-feed.html", feed=feed, form=form)
 
-@admin.route('/schedule-feeds/new', methods=['GET', 'POST'])
+
+@admin.route("/schedule-feeds/new", methods=["GET", "POST"])
 def new_feed():
     form = ScheduleForm()
 
     if form.validate_on_submit():
-        feed = CalendarSource('')
+        feed = CalendarSource("")
         form.update_feed(feed)
         db.session.add(feed)
         db.session.commit()
         msg = "Created feed %s" % feed.name
         flash(msg)
         app.logger.info(msg)
-        return redirect(url_for('.schedule_feed', feed_id=feed.id))
-    return render_template('admin/edit-feed.html', form=form)
+        return redirect(url_for(".schedule_feed", feed_id=feed.id))
+    return render_template("admin/edit-feed.html", form=form)
+
 
 from . import accounts  # noqa: F401
 from . import payments  # noqa: F401
 from . import products  # noqa: F401
+from . import reports  # noqa: F401
 from . import tickets  # noqa: F401
 from . import users  # noqa: F401
 from . import email  # noqa: F401

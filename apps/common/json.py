@@ -5,17 +5,18 @@ from collections import OrderedDict
 from main import db
 from models import to_dict
 
+
 class ExportEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime):
-            return obj.isoformat(' ')
+            return obj.isoformat(" ")
 
         return JSONEncoder.default(self, obj)
 
     def iterencode(self, obj):
         def _iterconvert(obj):
             # namedtuple/sqlalchemy result
-            if isinstance(obj, tuple) and hasattr(obj, '_asdict'):
+            if isinstance(obj, tuple) and hasattr(obj, "_asdict"):
                 # this doesn't include any columns without label()s
                 dct = obj._asdict()
                 # sqlalchemy result's asdict has broken ordering
@@ -39,4 +40,3 @@ class ExportEncoder(JSONEncoder):
             return obj
 
         return JSONEncoder.iterencode(self, _iterconvert(obj))
-

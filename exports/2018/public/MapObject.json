@@ -1,0 +1,537 @@
+[
+    {
+        "location": "SRID=4326;POINT(-2.37543856055782 52.0417423692199)",
+        "name": "SHM",
+        "wiki_page": "Village:SHM"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37585917115211 52.0402513146791)",
+        "name": "ECS",
+        "wiki_page": "Village:"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37608903880002 52.0396290628996)",
+        "name": "Russ's Test Village",
+        "wiki_page": "Team:Admin"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37735849103885 52.0417656198749)",
+        "name": "HeboCon",
+        "wiki_page": ""
+    },
+    {
+        "location": "SRID=4326;POINT(-2.3784402445981 52.0420991876686)",
+        "name": "Test Village Please Ignore",
+        "wiki_page": "Village:Test_village_please_ignore"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37572964528229 52.0429205748376)",
+        "name": "Puzzlers",
+        "wiki_page": "Village:Puzzlers"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37582431516611 52.0413011464368)",
+        "name": "London Hackspace",
+        "wiki_page": "Village:London_Hackspace"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37607998960007 52.0403162990605)",
+        "name": "POC",
+        "wiki_page": "Village:POC"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37661267791299 52.0421037618811)",
+        "name": "Mk Makerspace",
+        "wiki_page": "Village:MK_Makerspace"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37518494054927 52.0425658104687)",
+        "name": "Board Gamers",
+        "wiki_page": "Village:Board_Gamers"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37545516341925 52.0411292311603)",
+        "name": ":(",
+        "wiki_page": "Village:ECS"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37841475212801 52.0407502375673)",
+        "name": "James Capper",
+        "wiki_page": ""
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37667446818784 52.042345153782)",
+        "name": "Field-FX",
+        "wiki_page": "Village:Field-FX"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37583273327587 52.0400993005921)",
+        "name": "London Aerospace",
+        "wiki_page": "Village:London_Aerospace"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37566299379262 52.0430767763477)",
+        "name": "Edinburgh Hacklab",
+        "wiki_page": "Village:Edinburgh_Hacklab"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37480295928717 52.0426279504335)",
+        "name": "Motley Crew",
+        "wiki_page": "Village:Motley_Crew"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37585481256247 52.0408182399322)",
+        "name": "Swansea Hackspace",
+        "wiki_page": "Village:Swansea_Hackspace"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.376428656895 52.0428731136531)",
+        "name": "Bristol Hackspace",
+        "wiki_page": "Village:Bristol_Hackspace"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37603924918812 52.043741751193)",
+        "name": "The Hacking Hamlet",
+        "wiki_page": "Village:The_Hacking_Hamlet"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37621223021202 52.04303362028)",
+        "name": "TermiTown",
+        "wiki_page": "Village:TermiTown"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37565310837508 52.0418203839868)",
+        "name": "Cam Makespace",
+        "wiki_page": "Village:Cambridge_Makespace"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.3757841782062 52.0409424206975)",
+        "name": "CU Spaceflight",
+        "wiki_page": "Village:CU_Spaceflight"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37581008978233 52.0404522601246)",
+        "name": "Amateur Radio",
+        "wiki_page": "Village:Amateur_Radio"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37563904168431 52.041580899433)",
+        "name": "Oxhack",
+        "wiki_page": "Village:Oxhack"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37557092434582 52.0416450620281)",
+        "name": "Hackaday Readers",
+        "wiki_page": "Village:Hackaday_Readers"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37575510790413 52.0414825461131)",
+        "name": "EMF-IX",
+        "wiki_page": "Village:EMF-IX"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37557462846468 52.042900555906)",
+        "name": "Maidstone Hackspace",
+        "wiki_page": "Village:Maidstone_Hackspace"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37606310893855 52.0428948932281)",
+        "name": "Introverted Engineering Task Force",
+        "wiki_page": "Village:Introverted_Engineering_Task_Force"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.3760413150074 52.0421278753646)",
+        "name": "Ipswich Makerspace",
+        "wiki_page": "Village:Ipswich_Makerspace"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37670929131747 52.0428256172701)",
+        "name": "femcamp",
+        "wiki_page": "Village:Femcamp"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37702018435277 52.0438243263087)",
+        "name": "Guild of Makers",
+        "wiki_page": "Village:Guild_of_Makers"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37622641999181 52.041043204974)",
+        "name": "Cyber Vikings",
+        "wiki_page": "Village:Cyber_Vikings"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37478277684897 52.0431833589732)",
+        "name": "OSSO Family Village",
+        "wiki_page": "Village:The_Osso_Family_Village"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37709667533636 52.0433375572304)",
+        "name": "Swan'); DROP TABLE Villages; --",
+        "wiki_page": "Village:Swan%27);_DROP_TABLE_Villages;_--"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37621731549896 52.0406722346341)",
+        "name": "Belgian Embassy",
+        "wiki_page": "Village:Belgian_Embassy"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37554132938385 52.0409151671386)",
+        "name": "HABville \ud83c\udf88",
+        "wiki_page": "Village:HABville"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37526614931627 52.0431769324406)",
+        "name": "SeriousCamp",
+        "wiki_page": "Village:SeriousCamp"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37570192664862 52.0406780044531)",
+        "name": "AMSAT Village & Station \ud83d\udce1 \ud83d\udef0",
+        "wiki_page": "Village:AMSAT"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37690209215032 52.0423538427023)",
+        "name": "Scottish Consulate",
+        "wiki_page": "Village:Scottish_Consulate"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37573396624265 52.0427170337994)",
+        "name": "The Northern Quarter",
+        "wiki_page": "Village:The_Northern_Quarter"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37712871509714 52.0431463737389)",
+        "name": "Maths Village",
+        "wiki_page": "Village:Maths_Village"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37669697253133 52.042516516675)",
+        "name": "milliways",
+        "wiki_page": "Village:Milliways"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37590715335645 52.0422378750128)",
+        "name": "West London Hackers",
+        "wiki_page": "Village:West_London_Hackers"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37582514062524 52.0413992844536)",
+        "name": "\u26fa Camp Holland \ud83e\udde1\ud83e\udde1\ud83e\udde1",
+        "wiki_page": "Village:CampHolland"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37631221308141 52.0400602168015)",
+        "name": "Swiss Village",
+        "wiki_page": "Village:Swiss_Village"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37544265763239 52.0430053208288)",
+        "name": "Opendigitalradio",
+        "wiki_page": "Village:Opendigitalradio"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37622204606316 52.0399616126332)",
+        "name": "Sheffield Hackspace",
+        "wiki_page": ""
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37610875782278 52.0399571207915)",
+        "name": "SHH&M (Sheffield Hackspace)",
+        "wiki_page": "Village:Sheffield_Hackspace"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37583983153414 52.0411206227008)",
+        "name": "ICAH",
+        "wiki_page": "Village:ICAH"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37612303346395 52.0412678154138)",
+        "name": "Hacks 'r' Us",
+        "wiki_page": "Village:Hacks_'R'_Us"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37640105768577 52.0403867146159)",
+        "name": "Camp Postal",
+        "wiki_page": "Village:Camp_Postal"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37669374549455 52.0430971945211)",
+        "name": "Irish Embassy",
+        "wiki_page": "Village:Irish_Embassy"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37649158781929 52.0425128405078)",
+        "name": "Enter-TENT-ment",
+        "wiki_page": "Village:Enter-TENT-ment"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37673587047371 52.0403235342397)",
+        "name": "Holistic Howlers",
+        "wiki_page": "Village:Holistic_Howlers"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37697676960531 52.0429717075689)",
+        "name": "Nottinghack",
+        "wiki_page": "Village:Nottinghack"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37624485875614 52.0405895158975)",
+        "name": "Goldsmithing",
+        "wiki_page": "Village:Goldsmithing"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37612811163706 52.0434526935776)",
+        "name": "Moose",
+        "wiki_page": "Village:Moose"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37708035319639 52.0422510724116)",
+        "name": "Hacky Racers",
+        "wiki_page": "Village:Hacky_Racers"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37699083827724 52.0403662414203)",
+        "name": "fizzPop - The Birmingham Makerspace",
+        "wiki_page": "fizzPOP"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37619460920121 52.040302509517)",
+        "name": "Nexmo & Friends",
+        "wiki_page": "Villages"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37615639343858 52.040767817079)",
+        "name": "Hardware Hacking Area",
+        "wiki_page": "Village:Hardware_Hacking_Area"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37655963138801 52.0405510320104)",
+        "name": "Owl City ",
+        "wiki_page": "Village:Owl_City"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.3760852534916 52.0395408965947)",
+        "name": "Mark's Tent",
+        "wiki_page": "User:Ms7821"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37518375465069 52.0420086461239)",
+        "name": "Hat Village \ud83c\udfa9 ",
+        "wiki_page": "Village:Hat_Village"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37623712821338 52.040172651216)",
+        "name": "MEGA",
+        "wiki_page": "Village:MEGA"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37654984722104 52.040408354727)",
+        "name": "The Disorganisation",
+        "wiki_page": "Village:The_Disorganisation"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37529208980709 52.0419416816678)",
+        "name": "DuckAndPals",
+        "wiki_page": "Village:DuckAndPals"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37700168321143 52.0423046359369)",
+        "name": "Hitchin Hackspace",
+        "wiki_page": "Village:Hitchin_Hackspace"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37598455487438 52.0398933790631)",
+        "name": "Newbury Hackspace",
+        "wiki_page": "Village:Newbury_and_District_Hackspace"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37638488411903 52.0399223751229)",
+        "name": "C3VOC",
+        "wiki_page": "Village:C3VOC"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37634999976635 52.0408824870205)",
+        "name": "Foodhackingbase",
+        "wiki_page": "Village:Foodhackingbase"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37627723359967 52.0433048736878)",
+        "name": "NorthSouth",
+        "wiki_page": ""
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37706219563782 52.0428704003409)",
+        "name": "Yorkshire And Friends (Leeds Hackspace et al) ",
+        "wiki_page": "Village:Yorkshire_and_Friends"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37534991322801 52.0434159751555)",
+        "name": "codebar",
+        "wiki_page": "Village:codebar"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37480583991194 52.0429378574241)",
+        "name": "Cheltenham Hackspace",
+        "wiki_page": "Village:Cheltenham_Hackspace"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37596229783804 52.0419107068046)",
+        "name": "Mega Pi Noon",
+        "wiki_page": "Village:Mega_Pi_Noon"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37724968826049 52.0430117015942)",
+        "name": "lainchan",
+        "wiki_page": "Village:lainchan"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37666943167429 52.0429243425454)",
+        "name": "POTS Sub-exchange",
+        "wiki_page": "Village:POTS_Sub-exchange"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37545331126205 52.0427587304176)",
+        "name": "Octogenarians",
+        "wiki_page": "Village:Octogenarians"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37629849300535 52.040464245623)",
+        "name": "ZB45 Makerspace Amsterdam - mobile version",
+        "wiki_page": ""
+    },
+    {
+        "location": "SRID=4326;POINT(-2.3773409708279 52.0436957388582)",
+        "name": "Node Bots",
+        "wiki_page": ""
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37684700095068 52.0423934371594)",
+        "name": "r4nger5 villiage",
+        "wiki_page": "Village:r4nger5_Villiage"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37687136977911 52.0436208980762)",
+        "name": "Untitled Campers",
+        "wiki_page": "Village:Untitled_Campers"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37481828613355 52.0433520302579)",
+        "name": "LaserLlamas",
+        "wiki_page": "Village:LaserLlamas"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37600377677941 52.0411907169018)",
+        "name": "South London Makerspace",
+        "wiki_page": "Village:South_London_Makerspace"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37479209555957 52.042806446062)",
+        "name": "EOF Hackspace",
+        "wiki_page": "Village:EOF_Hackspace"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37711059698759 52.0435638711603)",
+        "name": "Davids Place",
+        "wiki_page": ""
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37548564866972 52.0414895733316)",
+        "name": "ShedDC\u2122",
+        "wiki_page": "Village:ShedDC\u2122"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37524534343856 52.0414601346274)",
+        "name": "Room 11 - The rabbit hole",
+        "wiki_page": "Village:Room_11_-_The_rabbit_hole"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37615272469674 52.0426084656947)",
+        "name": "The Rummery",
+        "wiki_page": ""
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37667858600616 52.0421578790383)",
+        "name": "MK Makerspace Village",
+        "wiki_page": "Village:MK_Makerspace"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37694087828109 52.0401892921849)",
+        "name": "Threat-centric",
+        "wiki_page": "Village:Threat-centric"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.3769301494344 52.0404268699241)",
+        "name": "Team Alpaca",
+        "wiki_page": "Village:Team_Alpaca"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37641000646721 52.0437859609073)",
+        "name": "Newbury & District Hackspace",
+        "wiki_page": "Village:Newbury_and_District_Hackspace"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37673977389932 52.0436214136146)",
+        "name": "tree stump village",
+        "wiki_page": "Village:Tree_Stump_Village"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37513899776772 52.0426883561669)",
+        "name": "Gothic Valley",
+        "wiki_page": "Village:Gothic_Valley"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.376188228057 52.0408217383332)",
+        "name": "Hardware Swap Shop",
+        "wiki_page": "Village:Hardware_Swap_Shop"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37604082704732 52.0428296024238)",
+        "name": "Serendipity Camp",
+        "wiki_page": "Village:Serendipity_Camp"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37668462097645 52.0405348813193)",
+        "name": "Sai's Tent",
+        "wiki_page": "Village:Sai's_Tent"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37573185289159 52.0419162167937)",
+        "name": "Embassy of Nowhere",
+        "wiki_page": "Village:Embassy_of_Nowhere"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37671880840102 52.0429782890844)",
+        "name": "North-West Tenting",
+        "wiki_page": "Village:North-West_Tenting"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37874332277727 52.0396629870024)",
+        "name": "Chemical Adam & co.",
+        "wiki_page": ""
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37598801098576 52.043333279956)",
+        "name": "Trowbridge men's shed",
+        "wiki_page": "Village:Trowbridge_Mens_Shed"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37597528306532 52.0407700355467)",
+        "name": "Team Dogsbody",
+        "wiki_page": "Village:Team_Dogsbody"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37889889093822 52.0408244798582)",
+        "name": "Null Sector",
+        "wiki_page": ""
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37836770713329 52.0417565689495)",
+        "name": "Hacky Racers Track",
+        "wiki_page": "Village:Hacky_Racers"
+    },
+    {
+        "location": "SRID=4326;POINT(-2.37518948355913 52.0427551924153)",
+        "name": "STAGE A relay",
+        "wiki_page": ""
+    }
+]

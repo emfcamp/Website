@@ -1,0 +1,43 @@
+{% from "_formhelpers.html" import render_field %}
+<div class="panel panel-default">
+    <div class="panel-body form-horizontal">
+        <p>We'll need your name and address to ship to,
+           so please make sure they're correct:</p>
+        {{ render_field(form.name, horizontal=True) }}
+        {% if current_user.is_anonymous %}
+        {{ render_field(form.email, horizontal=True) }}
+        {% else %}
+        <div class="form-group">
+          <label class="col-sm-2 control-label">Email</label>
+          <div class="col-sm-10">
+            <div class="form-control-static">{{ current_user.email }}</div>
+          </div>
+        </div>
+        {% endif %}
+        <div class="form-group">
+          <div class="col-sm-offset-1">
+          {{ form.allow_promo() }}
+          <label class="control-label" for="allow_promo">
+              Send me occasional emails about future EMF events
+          </label>
+          </div>
+        </div>
+        <div>
+        <p><small>Your name and email are used to manage your purchase and shipment.
+            Unless you choose to receive emails in future,
+            we will delete your personal data after fulfilment.
+            We don't send your personal data to anyone else.
+            <a href="{{ url_for('base.privacy') }}" target="_blank">More privacy info</a>.</small></p>
+        </div>
+        {{ render_field(form.address_1, horizontal=True) }}
+        <div class="address-2">
+        {{ render_field(form.address_2, horizontal=True) }}
+        </div>
+        {{ render_field(form.town, horizontal=True) }}
+        {{ render_field(form.postcode, horizontal=True) }}
+        {{ render_field(form.country, horizontal=True) }}
+        <div><small>We can currently ship to UK and EU. If you live elsewhere and would like
+        to place an order, please drop us an email at <a href="mailto:{{ config['CONTACT_EMAIL'][1] }}">{{ config['CONTACT_EMAIL'][1] }}</a>.
+        </small></div>
+      </div>
+</div>

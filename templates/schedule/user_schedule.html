@@ -77,6 +77,7 @@
     <div><strong>Time:</strong> <span id="event_day"></span> at <span id="event_time"></span>
     </div>
     <div><span id="workshop_cost"></span></div>
+    <div><span id="workshop_requirements"></span></div>
 
     <div class="scroll_box" id="scroll_box" style=""><span id="event_description" class="multiline"></span></div>
 
@@ -123,7 +124,12 @@ document.getElementById('enable-javascript').style.display = 'none';
 </div>
 <div id="feeds">
   <strong>Full schedule:</strong> <a href="/schedule.ics">iCal/ICS</a> | <a data-toggle="modal" data-target="#gigitty-qr" href="#">Giggity</a> | <a href="/schedule.json">JSON</a><br>
-  <strong>Favourites only:</strong> <a href="/favourites.ics">iCal/ICS</a> | <a href="/favourites.json">JSON</a>
+  {% if current_user.is_authenticated %}
+  <strong>Favourites only:</strong>
+  <a href="{{ url_for('.favourites_ical') }}?token={{ token }}">iCal/ICS</a>
+  |
+  <a href="{{ url_for('.favourites_json') }}?token={{ token }}">JSON</a>
+  {% endif %}
 </div>
 
 

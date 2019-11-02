@@ -22,7 +22,7 @@ def render_feature(obj):
             "wiki_page": obj.wiki_page,
             # Need to get people to approve a name before showing it on the API
             # "owner_name": obj.owner.name,
-            "owner": "/api/user/{}".format(obj.owner.id)
+            "owner": "/api/user/{}".format(obj.owner.id),
         },
     }
 
@@ -32,7 +32,7 @@ def validate_map_obj(data):
         if field not in data:
             raise BadRequest("{} must be provided".format(field))
 
-    if data['name'].strip() == '':
+    if data["name"].strip() == "":
         raise BadRequest("Name must not be blank")
 
 
@@ -62,11 +62,16 @@ class MapObjectResource(Resource):
         data = request.get_json()
         validate_map_obj(data)
 
-        if data['name'] != obj.name and MapObject.query.filter_by(name=data['name']).one_or_none():
-            raise BadRequest("Duplicate Name: {}".format(data['name']))
+        if (
+            data["name"] != obj.name
+            and MapObject.query.filter_by(name=data["name"]).one_or_none()
+        ):
+            raise BadRequest("Duplicate Name: {}".format(data["name"]))
 
-        obj.name = data.get('name')
-        obj.wiki_page = data.get('wiki_page').replace('https://wiki.emfcamp.org/wiki/', '')
+        obj.name = data.get("name")
+        obj.wiki_page = data.get("wiki_page").replace(
+            "https://wiki.emfcamp.org/wiki/", ""
+        )
         obj.geom = "SRID=4326;POINT({} {})".format(*data["location"])
         db.session.commit()
 
@@ -90,12 +95,14 @@ class MapCreateResource(Resource):
         data = request.get_json()
         validate_map_obj(data)
 
-        if MapObject.query.filter_by(name=data['name']).one_or_none():
-            raise BadRequest("Duplicate Name: {}".format(data['name']))
+        if MapObject.query.filter_by(name=data["name"]).one_or_none():
+            raise BadRequest("Duplicate Name: {}".format(data["name"]))
 
         obj = MapObject(
             name=data["name"],
-            wiki_page=data.get("wiki_page").replace('https://wiki.emfcamp.org/wiki/', ''),
+            wiki_page=data.get("wiki_page").replace(
+                "https://wiki.emfcamp.org/wiki/", ""
+            ),
             geom="SRID=4326;POINT({} {})".format(*data["location"]),
             owner=current_user,
         )

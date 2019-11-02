@@ -7,7 +7,7 @@ from lxml import etree
 from main import external_url
 from models.site_state import event_start, event_end
 
-event_tz = pytz.timezone('Europe/London')
+event_tz = pytz.timezone("Europe/London")
 
 
 def get_duration(start_time, end_time):
@@ -15,7 +15,8 @@ def get_duration(start_time, end_time):
     duration = (end_time - start_time).total_seconds() / 60
     hours = int(duration // 60)
     minutes = int(duration % 60)
-    return '{0:01d}:{1:02d}'.format(hours, minutes)
+    return "{0:01d}:{1:02d}".format(hours, minutes)
+
 
 def get_day_start_end(dt, start_time=time(4, 0)):
     # A day changeover of 4am allows us to have late events.
@@ -34,76 +35,100 @@ def get_day_start_end(dt, start_time=time(4, 0)):
 
     return start_dt, end_dt
 
+
 def _add_sub_with_text(parent, element, text, **extra):
     node = etree.SubElement(parent, element, **extra)
     node.text = text
     return node
 
+
 def make_root():
-    root = etree.Element('schedule')
+    root = etree.Element("schedule")
 
-    _add_sub_with_text(root, 'version', '1.0-public')
+    _add_sub_with_text(root, "version", "1.0-public")
 
-    conference = etree.SubElement(root, 'conference')
+    conference = etree.SubElement(root, "conference")
 
-    _add_sub_with_text(conference, 'title', 'Electromagnetic Field {}'.format(event_start().year))
-    _add_sub_with_text(conference, 'acronym', 'emf{}'.format(event_start().year))
-    _add_sub_with_text(conference, 'start', event_start().strftime('%Y-%m-%d'))
-    _add_sub_with_text(conference, 'end', event_end().strftime('%Y-%m-%d'))
-    _add_sub_with_text(conference, 'days', '3')
-    _add_sub_with_text(conference, 'timeslot_duration', '00:10')
+    _add_sub_with_text(
+        conference, "title", "Electromagnetic Field {}".format(event_start().year)
+    )
+    _add_sub_with_text(conference, "acronym", "emf{}".format(event_start().year))
+    _add_sub_with_text(conference, "start", event_start().strftime("%Y-%m-%d"))
+    _add_sub_with_text(conference, "end", event_end().strftime("%Y-%m-%d"))
+    _add_sub_with_text(conference, "days", "3")
+    _add_sub_with_text(conference, "timeslot_duration", "00:10")
 
     return root
 
+
 def add_day(root, index, start, end):
     # Don't include start because it's not needed
-    return etree.SubElement(root, 'day', index=str(index),
-                                         date=start.strftime('%Y-%m-%d'),
-                                         end=end.isoformat())
+    return etree.SubElement(
+        root,
+        "day",
+        index=str(index),
+        date=start.strftime("%Y-%m-%d"),
+        end=end.isoformat(),
+    )
+
 
 def add_room(day, name):
-    return etree.SubElement(day, 'room', name=name)
+    return etree.SubElement(day, "room", name=name)
+
 
 def add_event(room, event):
-    url = external_url('schedule.line_up_proposal', proposal_id=event['id'], slug=event['slug'])
+    url = external_url(
+        "schedule.line_up_proposal", proposal_id=event["id"], slug=event["slug"]
+    )
 
-    event_node = etree.SubElement(room, 'event', id=str(event['id']),
-                                                 guid=str(uuid5(NAMESPACE_URL, url)))
+    event_node = etree.SubElement(
+        room, "event", id=str(event["id"]), guid=str(uuid5(NAMESPACE_URL, url))
+    )
 
-    _add_sub_with_text(event_node, 'room', room.attrib['name'])
-    _add_sub_with_text(event_node, 'title', event['title'])
-    _add_sub_with_text(event_node, 'type', event.get('type', 'talk'))
-    _add_sub_with_text(event_node, 'date', event['start_date'].isoformat())
+    _add_sub_with_text(event_node, "room", room.attrib["name"])
+    _add_sub_with_text(event_node, "title", event["title"])
+    _add_sub_with_text(event_node, "type", event.get("type", "talk"))
+    _add_sub_with_text(event_node, "date", event["start_date"].isoformat())
 
     # Start time
-    _add_sub_with_text(event_node, 'start', event['start_date'].strftime('%H:%M'))
+    _add_sub_with_text(event_node, "start", event["start_date"].strftime("%H:%M"))
 
-    duration = get_duration(event['start_date'], event['end_date'])
-    _add_sub_with_text(event_node, 'duration', duration)
+    duration = get_duration(event["start_date"], event["end_date"])
+    _add_sub_with_text(event_node, "duration", duration)
 
-    _add_sub_with_text(event_node, 'abstract', event['description'])
-    _add_sub_with_text(event_node, 'description', event['description'])
+    _add_sub_with_text(event_node, "abstract", event["description"])
+    _add_sub_with_text(event_node, "description", "")
 
-    _add_sub_with_text(event_node, 'slug', 'emf%s-%s-%s' % (event_start().year, event['id'], event['slug']))
+    _add_sub_with_text(
+        event_node,
+        "slug",
+        "emf%s-%s-%s" % (event_start().year, event["id"], event["slug"]),
+    )
 
-    _add_sub_with_text(event_node, 'subtitle', '')
-    _add_sub_with_text(event_node, 'track', '')
+    _add_sub_with_text(event_node, "subtitle", "")
+    _add_sub_with_text(event_node, "track", "")
 
     add_persons(event_node, event)
     add_recording(event_node, event)
 
+
 def add_persons(event_node, event):
 
-    persons_node = etree.SubElement(event_node, 'persons')
+    persons_node = etree.SubElement(event_node, "persons")
 
-    _add_sub_with_text(persons_node, 'person', event['speaker'], id=str(event['user_id']))
+    _add_sub_with_text(
+        persons_node, "person", event["speaker"], id=str(event["user_id"])
+    )
+
 
 def add_recording(event_node, event):
 
-    recording_node = etree.SubElement(event_node, 'recording')
+    recording_node = etree.SubElement(event_node, "recording")
 
-    _add_sub_with_text(recording_node, 'license', 'CC BY-SA 3.0')
-    _add_sub_with_text(recording_node, 'optout', 'false' if event.get('may_record') else 'true')
+    _add_sub_with_text(recording_node, "license", "CC BY-SA 3.0")
+    _add_sub_with_text(
+        recording_node, "optout", "false" if event.get("may_record") else "true"
+    )
 
 
 def export_frab(schedule):
@@ -112,25 +137,20 @@ def export_frab(schedule):
     index = 0
 
     for event in schedule:
-        day_start, day_end = get_day_start_end(event['start_date'])
-        day_key = day_start.strftime('%Y-%m-%d')
-        venue_key = event['venue']
+        day_start, day_end = get_day_start_end(event["start_date"])
+        day_key = day_start.strftime("%Y-%m-%d")
+        venue_key = event["venue"]
 
         if day_key not in days_dict:
             index += 1
             node = add_day(root, index, day_start, day_end)
-            days_dict[day_key] = {
-                'node': node,
-                'rooms': {}
-            }
+            days_dict[day_key] = {"node": node, "rooms": {}}
 
         day = days_dict[day_key]
 
-        if venue_key not in day['rooms']:
-            day['rooms'][venue_key] = add_room(day['node'], venue_key)
+        if venue_key not in day["rooms"]:
+            day["rooms"][venue_key] = add_room(day["node"], venue_key)
 
-        add_event(day['rooms'][venue_key], event)
+        add_event(day["rooms"][venue_key], event)
 
     return etree.tostring(root)
-
-

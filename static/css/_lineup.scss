@@ -71,3 +71,51 @@
   float: right;
 }
 
+.youtube-link {
+  img {
+    width: 50%;
+    /* margin: 0px auto; */
+  }
+  .no-thumbnail {
+    background-color: rgb(128, 128, 128);
+    display: block;
+    color: #fff;
+    font-size: 1.5em;
+    height: 3em;
+    width: 4em;
+    margin: 60px auto;
+    position: relative;
+    text-align: center;
+    border-radius: 50% / 10%;
+    transition: all 150ms ease-out;
+  }
+
+  .no-thumbnail::before {
+    content: '';
+    background: inherit;
+    border-radius: 5% / 50%;
+    bottom: 9%;
+    left: -5%;
+    position: absolute;
+    right: -5%;
+    top: 9%;
+  }
+
+  .no-thumbnail::after {
+    content: ' ';
+    border-style: solid;
+    border-width: 1em 0 1em 1.7em;
+    border-color: transparent;
+    border-left-color: rgba(255, 255, 255, 0.8);
+    font-size: 0.7em;
+    margin: -1em 0 0 -0.6em;
+    top: 50%;
+    position: absolute;
+  }
+
+  .no-thumbnail:hover,
+  .no-thumbnail:active,
+  .no-thumbnail:focus {
+    background: rgba(200, 0, 0, 1);
+  }
+}

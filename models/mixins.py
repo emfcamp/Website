@@ -19,7 +19,9 @@ class CapacityMixin(object):
 
     # A max capacity of None implies no max (or use parent's if set)
     capacity_max = db.Column(db.Integer, default=None)
-    capacity_used = db.Column(db.Integer, default=0, nullable=False, server_onupdate=FetchedValue())
+    capacity_used = db.Column(
+        db.Integer, default=0, nullable=False, server_onupdate=FetchedValue()
+    )
 
     expires = db.Column(db.DateTime)
 
@@ -55,9 +57,10 @@ class CapacityMixin(object):
         so this adds a `before_event` event handler to every subclass and swaps
         out capacity_used with the appropriate expression.
         """
-        @event.listens_for(cls, 'before_update')
+
+        @event.listens_for(cls, "before_update")
         def before_update(mapper, connection, target):
-            history = get_history(target, 'capacity_used')
+            history = get_history(target, "capacity_used")
             delta = sum(history.added) - sum(history.deleted)
             target.capacity_used = target.__class__.capacity_used + delta
 
@@ -80,7 +83,7 @@ class CapacityMixin(object):
         capacity_max is not set (i.e. None).
         """
         if self.capacity_max is None:
-            return float('inf')
+            return float("inf")
         return self.capacity_max - self.capacity_used
 
     def get_total_remaining_capacity(self):

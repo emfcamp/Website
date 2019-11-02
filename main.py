@@ -18,9 +18,9 @@ from sqlalchemy_continuum.plugins import FlaskPlugin
 from flask_assets import Environment, Bundle
 from webassets.filter import get_filter
 from flask_cdn import CDN
-from flask_cache import Cache
+from flask_caching import Cache
 from flask_debugtoolbar import DebugToolbarExtension
-from flask_wtf import CsrfProtect
+from flask_wtf import CSRFProtect
 from flask_cors import CORS
 from loggingmanager import create_logging_manager, set_user_id
 import stripe
@@ -33,7 +33,7 @@ import gocardless_pro
 if len(logging.root.handlers) == 0:
     install_logging = True
     with open('logging.yaml', 'r') as f:
-        conf = yaml.load(f)
+        conf = yaml.load(f, Loader=yaml.FullLoader)
         logging.config.dictConfig(conf)
 else:
     install_logging = False
@@ -55,7 +55,7 @@ def include_object(object, name, type_, reflected, compare_to):
 
 
 cache = Cache()
-csrf = CsrfProtect()
+csrf = CSRFProtect()
 migrate = Migrate(include_object=include_object)
 manager = VersioningManager(options={'strategy': 'subquery'})
 make_versioned(manager=manager, plugins=[FlaskPlugin()])
@@ -153,7 +153,7 @@ def create_app(dev_server=False):
 
     migrate.init_app(app, db)
 
-    login_manager.setup_app(app, add_context_processor=True)
+    login_manager.init_app(app, add_context_processor=True)
     app.login_manager.login_view = 'users.login'
 
     from models.user import User, load_anonymous_user

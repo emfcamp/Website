@@ -22,7 +22,7 @@ Buy Items
 {% elif flow in ['bales'] %}
   {% include 'purchase/bales.html' %}
 {% endif %}
-{% if not current_user.is_authenticated %}
+{% if not current_user.is_authenticated and SITE_STATE != 'after-event' %}
     <p>If you've already bought a ticket this year, <a href="{{url_for('users.login')}}">log in</a> to view your ticket status.</p>
 {% endif %}
 

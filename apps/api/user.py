@@ -1,5 +1,6 @@
 from flask_login import current_user
 from flask_restful import Resource, abort
+
 # from models.user import User
 from . import api
 
@@ -10,7 +11,7 @@ def user_info(user):
         "email": user.email,
         "name": user.name,
         "permissions": [p.name for p in user.permissions],
-        "id": "/api/user/{}".format(user.id)
+        "id": "/api/user/{}".format(user.id),
     }
 
 

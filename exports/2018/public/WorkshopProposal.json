@@ -1,0 +1,831 @@
+{
+    "favourites": {
+        "counts": {
+            "0": 0,
+            "1-9": 0,
+            "10-19": 0,
+            "20-29": 0,
+            "30-39": 0,
+            "40-49": 0,
+            "50-99": 0,
+            "100-199": 0,
+            "200+": 0
+        }
+    },
+    "proposals": {
+        "accepted": [
+            {
+                "published_title": "We Built a Phone Network at EMF - AMA",
+                "published_description": "Come and ask the Eventphone & GSM teams anything about the phone network, how they built it, what challenges they had, why X doesn't work or generally ask then stuff about telecoms, GSM SMS and Phone Numbers.\r\n",
+                "names": "Sam Machin",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 21:10:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Let's monitor the government - UK Edition",
+                "published_description": "The goal of this workshop is to create a comprehensive overview of the UK government and their online services. Ultimately pushing them to better secure their services and thus protecting your privacy.\r\n\r\nAfter a short introduction you'll be surfing the web, finding names, addresses and urls of the UK government and adding them to the map. They will automatically be scanned for basic security. If all is well, they are shown green, otherwise orange or red. Expect a lot of red.\r\n\r\nThe results of our work will be sent to various press agencies in the UK. We hope they start asking questions about the sad state of security. This causes responsible organizations to wake up and adopt better practices, securing your data and privacy. We've seen this work in the Netherlands.\r\n\r\nYou can expect: It's a lot of fun to see the amount of data grow, and more terribleness appear. Club Mate will be provided. The hunt is on!\r\n\r\nRequirements: This workshop is suitable for anyone with basic computer knowledge. Bring your own laptop / tablet / smartphone.\r\n\r\nAll data gathered is published publicly in easy to consume formats. The software running this is fully open source and available on gitlab. You can see an example of the Netherlands: https://faalkaart.nl.",
+                "names": "Elger / \"Stitch\"",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 16:40:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "The Art of the Taco",
+                "published_description": "Mexican food is becoming more and more popular in the UK and the range of restaurant options is expanding, particularly in large cities. However, it is almost certainly true that most people have never had the life-changing experience of tasting a truly authentic Mexican taco. Furthermore, I would imagine that most people would never think of attempting to make one at home, despite the fact that it is such a simple dish.\r\n\r\nAs a keen home-cook, who has lived in Mexico for the past 10 years, I am hoping to share this experience with people with a passion for trying new things.\r\n\r\nI will explain a little behind the theory of what makes a good taco, as well as introduce people to the core elements and constituents.\r\n\r\nThis will primarily be a sensory experience where people will be able to compare \"good\" vs. \"bad\" ingredients, and learn the basics of putting together a simple but delicious taco.",
+                "names": "Simon Bedford",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 19:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Carve your own Viking Drinking Horn!",
+                "published_description": "Alcohol should be consumed sensibly, and the most sensible way I know how to drink is from a horn!\r\n\r\nA drinking horn is a great natural and individual drinking vessel, but can be made even more personal with a hand carved symbol or decoration to make it truly unique.\r\n\r\nIn this workshop, you will be selecting the design you will put on your horn, transfer it onto the horn, use a traditional Viking Dremel to carve the design, then polish and paint it to finish off the horn.\r\n\r\nAfter this workshop, you'll have your horn to enjoy your beer and mead with for the rest of the festival. So try not to make any holes in it!\r\n\r\nIf you really want to go full Viking, then more Viking stuff will be available from SkullVikings at the Cyber Viking village.",
+                "names": "Steve Samuels",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 10:00:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Be a Computer! Demystifying assembly language and CPUs",
+                "published_description": "How does a computer like the BBC micro:bit work? Find out by becoming part of the processor for a few hours! In this workshop, all the participants will be able to be part of a giant micro:bit - teams will race against each other to run different programs, each attendee being a part of the machine. There\u2019ll be a small workshop at the beginning and the end so that we demystify the way computers work and understand what we're all doing.\r\n\r\nThis is a good companion to other programming workshops because it turns the concept on its head, with the participants running, not writing, programs.\r\n\r\nIt isn't just about *being* a CPU though, our aim is to optimise one. After running the first program, your team will be able to make changes to the CPU's arrangement and operation to optimise yourselves. If you've ever asked yourself \"what does it mean to be part of a 5-stage pipeline?\" or thought \"Can I try branch prediction today?\" then this is definitely the workshop for you. If you don't know what those things are, then this is the place to learn what it means and have some fun.",
+                "names": "Jonny Austin",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 18:50:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 19:30:00",
+                "scheduled_duration": 45,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "An Impostor's Clay Workshop (and firing!)",
+                "published_description": "A hands on workshop (and short presentation) on making clay objects focused mostly on basic hand building methods -\r\nPinch pots, slab building, coiling\r\nParticipants will be given all necessary materials (i.e. clay) and equipment, no prior knowledge required\r\nThere will be opportunity to continue making after the workshop at Nottinghack village and to join there if the workshop becomes full\r\nObjects will be fired in a sawdust firing in a modified metal bin on site during the festival, if you're leaving early it might be possible to arrange to send finished pieces to you\r\nRegister interest (so I know how much clay/sawdust to bring) and find out more via:\r\nhttps://bit.ly/2MoHGOa",
+                "names": "James",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 14:50:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Dorset Buttons",
+                "published_description": "Ever wondered how to make a Dorset button?  Come and make your own wearable art button from a ring, embroidery thread and a pin.  Participants will receive a kit to make a couple of buttons.",
+                "names": "Cara McIntosh",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 16:40:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Papercraft Spectrometer",
+                "published_description": "Using simple recycled materials such as cardboards, old CD-ROMs, pencils and scissors, we will build an hand made Spectrometer that works with any smartphone.  We will \u201cextract\u201d the electromagnetic spectrum of known sources, commenting it together.\r\nTo build the Spectrometer and process the acquired data, we will use the instructions and the web based software made available by http://publiclab.org/about [1,2].\r\nWe will complement the experience with various scientific details behind the working principles of such device and what could be investigated with it.\r\nParticipants will learn what is light, what is a \"color\", how a color is associated to the actual light spectrum by the human visual system, details about the color filters embedded in cameras and in particular the physics behind the generation of light from light sources.\r\nWe are part of a group founded in 2013 and we studied different STEM subjects and share a common passion for science, technology and dissemination. We recently founded a nonprofit association named NOVA, offering innovative workshops and learning experiences.\r\n\r\n[1] https://publiclab.org/notes/abdul/10-19-2016/foldable-paper-spectrometer-instructions\r\n[2] https://spectralworkbench.org/\r\n",
+                "names": "Linda Polastri, Francesco Forastieri, Enrico Calore, Valentina Rolando",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 18:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Speculative design of health and wellbeing in space (and other extreme environments) for future adventurers",
+                "published_description": "What does health and wellbeing looks like for the future space travellers? There are less than 600  people who have been to space to date. But would space adventures be restricted to the very strictly health screened forward going? Will there be medical autonomy? In this workshop, we co-design the future of health and wellbeing space (and other extreme environments) using speculative design research methods and play tools. This workshop will involve hands-on activities: making and sketching scrappy prototypes/concepts. You do not have to have prior knowledge of anything, we do ask you to park judgements at the front of the tent before you enter the world...",
+                "names": "Stephanie Pau",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 20:20:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 21:40:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Carve your own Viking Drinking Horn!",
+                "published_description": "Alcohol should be consumed sensibly, and the most sensible way I know how to drink is from a horn!\r\n\r\nA drinking horn is a great natural and individual drinking vessel, but can be made even more personal with a hand carved symbol or decoration to make it truly unique.\r\n\r\nIn this workshop, you will be selecting the design you will put on your horn, transfer it onto the horn, use a traditional Viking Dremel to carve the design, then polish and paint it to finish off the horn.\r\n\r\nAfter this workshop, you'll have your horn to enjoy your beer and mead with for the rest of the festival. So try not to make any holes in it!\r\n\r\nIf you really want to go full Viking, then more Viking stuff will be available from SkullVikings at the Cyber Viking village.",
+                "names": "Steve Samuels",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 10:00:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Software-Defined Radio Techniques for DAB Reception and Transmission",
+                "published_description": "Bring your PC and (if possible) an SDR device (RTL-SDR, HackRF, CCC Camp rad1o badge, LimeSDR, USRP) and use it to receive and/or transmit Digital Audio Broadcasting using free and open source software. Big discussions with lots of acronyms about the math behind the modulation are also welcome!\r\n\r\nDAB isn't your fancy and you want to experiment with other broadcasting standards, like FM, DVB, Digital Radio Mondiale? Come instead to the Opendigitalradio village and we can hack something up.",
+                "names": "Matthias Braendli",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 16:40:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Intro to Basic Electronics",
+                "published_description": "I'm a software developer and anthousiastic volunteer with the\r\n Restart Project, co-organising Rosie the Restarter skill shares for women\r\n to learn how to tinker and repair things. \r\n\r\nI want to share a session I run for the Rosies, where we go through some of the basic skills for fixing household electronic appliances with the aim of building up our skills and confidence to actually start fixing.\r\nWe will be looking into safety issues; how to use a multimeter ; and how to wire a plug, or change a fuse.\r\n\r\nIf you are a female or non-binary person and want to share your skills please come forward and help out.\r\nPlease note, this is a very beginners workshop and is aimed at making people feel comfortable learning; not a place for dudes to brag about their knowledge.",
+                "names": "Haly",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 10:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Hacking Unicorns - Intro to programming/3D printing",
+                "published_description": "In this workshop, get hands on with basic programming and 3D printing by hacking together a colour changing unicorn themed headpiece using Adafruit Circuit Playground Express boards and MakeCode.\r\nThe workshop will explore 3D printing, followed by getting attendees programming with the graphical drag and drop environment, Microsoft Makecode.\r\nYou will program their own light sequences using onboard RGB LEDs (Neopixels) and use onboard sensors to trigger these to light up the 3D printed unicorn horn (attached to a cap on your head).\r\n\r\nThis workshop has been run numerous times at the Northern Ireland Raspberry Jam and is one of our most popular workshops - https://twitter.com/NIRaspJam/status/977562610437632001",
+                "names": "Andrew Mulholland",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 11:50:00",
+                "scheduled_duration": 70,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Air quality sensor devices: Build, program and test.",
+                "published_description": "Air is what keeps us alive, we breath air every second of our lives but air pollution threatens our health. Know what you breath, come build a monitoring device and visualise your results while learning about sensor hardware.\r\n\t\r\nAttendees\u00a0require no prior knowledge or skills, other than enthusiasm and a positive attitude!  \r\n\t\u00a0\r\nWe will run 3 workshops during this session (75min each). \r\n\r\nThe plan of the workshop is as follows:\r\n1. Introduction: Air quality sensors, programming, building a device\r\n2. Presentation of the different components of the air quality device \r\n3. Program it in Python.\r\n4. Retrieve the data from you and your friends\u2019 devices.\r\n5. Visualise and compare your data with others at the camp.\r\n6. Have fun!\r\n\t\u00a0\r\nAt the end of the day, we will offer 5 lucky participants the opportunity to take an entire sensor device away with them so they can experiment at home.  \r\n\t\u00a0\r\nWe will generate and make public all the workshop plans, notes, code and hardware sources via GitHub (public) so the workshop is repeatable. ",
+                "names": "University of Southampton - Computational Engineering and Design",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 13:00:00",
+                "scheduled_duration": 250,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "How to use a moddable hacking game as a tool for digital activism: a modding workshop",
+                "published_description": "Following on from Rich Metson's 2016 talk 'Off Grid:  a game about circumvention tech and hacking,' this workshop is for anyone who wants to come and learn how to mod 'Off Grid' - a hacking game about surveillance and data privacy - and make their own levels and hacks!\r\n\r\nWe'll go over how to useLevelKit to build levels and how to mod or create your own Lua scripts to make your own righteous hacks, devices with abhorrent vulnerabilities, or data types that will alter space-time.\r\n\r\nThe idea being that players, modders and hackers (many of whom caught the hacking bug by messing around with games in the first place) will be able to use the game to tell new and interesting stories about hacking and surveillance, use the platform to build a dialogue around digital activism through play, create new hacking tools in the game, and who knows even drop a 0day or leak a massive political conspiracy or two for real ;P\r\n\r\nCome with a laptop and some unique hacking ideas and Rich will help you with the rest. No previous knowledge of Lua or game development required :D\r\n\r\n**If you want to get a jump start on things before the workshop, please download Unity, Steam, and have a read of 'Getting Started with Levelkit' on our wiki:. http://wiki.offgridthegame.com/index.php?title=Getting_Started_with_the_LevelKit\r\n\r\nYou can watch the 2016 EMF talk here:  https://m.youtube.com/watch?v=suEXrMO6rQo#\r\n\r\nRead what Eurogamer has to say about Off Grid here:  https://www.eurogamer.net/articles/2018-01-15-off-grid-is-about-the-principles-of-hacking\r\n",
+                "names": "Rich Metson",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 20:50:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "How long will it take the beat The Tomb of Horrors?",
+                "published_description": "The Tomb of Horrors is a Dungeons & Dragons adventure designed to be almost impossible and a distinct challenge for D&D players. https://en.wikipedia.org/wiki/Tomb_of_Horrors I am going to run a developing session for 5 players at a time. It will continue until all the characters die. Then we'll start again with the next group! It\u2019s likely that the first few groups won\u2019t take too long, and if they stick around to watch further groups they\u2019ll learn more ways of getting to the end. \r\n\r\nIt will be fun for novice and veteran D&D players, but likely not beginners.\r\n\r\nIt is thoroughly recommended that you bring some good time spirits, as crowd participation will be encouraged. Booing, Cheering and Drinking are all advised.\r\n",
+                "names": "graham kitteridge",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 20:20:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Art meets Light",
+                "published_description": "Come along and create a fabulous piece of artwork - whatever you can imagine! Draw, colour, decorate and add glitter to a creation making it as fabulous as you want. Then we're going to add the lights. Using a Crumble controller board, program lights which are going to be added to your artwork to make it even better. Make volcanoes looks like they're exploring, police cars with lights flashing around or a magical unicorn with a horn that glows. Some simple programming transforms your artwork from the same old stuff you've done before to a unique combination of art and light.",
+                "names": "Sway Grantham",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 13:20:00",
+                "scheduled_duration": 70,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Pom Poms",
+                "published_description": "Learn how to make Pom Poms of different sizes and colours!\r\nMake them into garlands to decorate your tent or bedroom or tie onto hair bands as a pretty hair accessory.\r\nYou can make any design you like and is fun for all the family!\r\n\r\nInstructions will be given and there will be some ready made Pom Poms available to you to use \r\n\r\n\r\n",
+                "names": "Sarah Purdie",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 09:30:00",
+                "scheduled_duration": 120,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Making Maths with Modular Origami",
+                "published_description": "Starting with a single sheet of paper, make a triangle, turn it\r\n into a hexagon or a star. Learn to make modules from paper and join them to\r\n make cubes, dodecahedra, stellated shapes. Prove that there are only five platonic solids, explore regular and semi-regular tessellations, and find out what happens if you try to fit more than six triangles around a point.",
+                "names": "Alison Kiddle",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 18:30:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Paper Circuits Workshop ",
+                "published_description": "Learn about electronics whilst crafting with LEDs, card and copper tape. Build what your imagination desires. Experimentation is easy and encouraged.",
+                "names": "Peter Jackson",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 15:20:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Hebocon: Crappy Robot Workshop for Beginners",
+                "published_description": "Hebocon is Robot Wars for those who are not technically gifted. Crappy robots that can just barely move will somehow manage to engage in odd, awkward battles. \r\n\r\nHebocon requires absolutely no prior skill, and that's what makes it fun. We'll be running a beginner-level electronics workshop and will provide all basic materials to get some motors moving back and forward. We'll be providing a kit for every 2 people, but you are welcome to work in teams. \r\n\r\nAt the end of the session, whatever Heboi robots will fight in our arena for a shameful-proud victory. ",
+                "names": "Kevin Lewis",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 12:20:00",
+                "scheduled_duration": 220,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Yarn Making",
+                "published_description": "The drop spindle is a simple, handheld device, used to turn raw fibres into useable yarns and strings. In use since before recorded history, and still in use today, the drop spindle is portable, lightweight and versatile. It can be used to make a variety of yarns, from simple and practical, to bold and creative.\r\n\r\nYou'll learn the basics of how to turn soft, non-scratchy, merino wool fibre into a useable yarn. How to tweak your spinning to make yarns suitable for different purpose, and how to finish your yarns ready for use. We'll also cover the different kinds of plant and animal fibres, and their properties in spinning. There will be an oppourtunity to see a variety of different fibres, but wool will be the only fibre availiable to work with, as it is by far the simplest for beginners.\r\n\r\nThe kit is yours to take home, and includes 100g of wool fibre. Enough to make a full sized ball of yarn.",
+                "names": "Vicki Winter",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 14:20:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Fun Balloon Hats that Glow",
+                "published_description": "Funky headgear made from long sculptural balloons in various colours.\r\nWe start off by making a basic hat to to fit your head, then \r\nthe fun part starts by adding more balloons to decorate it as you want.\r\nTo finish, we add the LED (and battery provided) to make it glow at night!\r\n",
+                "names": "Stewart Dunn",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 20:20:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Build a rocket",
+                "published_description": "Build a simple solid-fuelled model rocket from scratch!\r\n\r\nWe'll provide paper templates and all required materials, you cut and stick the rocket together and then decorate it to taste.\r\n\r\nAssembling the rocket is straightforward and as they're all made from white card/paper there are plenty of options for decoration or modification. We'll provide some stickers, felt tips, glitter, etc, but feel free to bring your own too! You can also customise the build to your heart's content and we'll be on hand to advise.\r\n\r\nAlso suitable for young children with some supervision. The build involves mostly scissors and tape, one step involves hot glue which requires adult supervision. Feel free to contact us beforehand if you want to check suitability: emf@adamgreig.com / extension 2440. This workshop is also running as a youth workshop on Friday.",
+                "names": "Adam Greig",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 15:10:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 13:00:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Build a Z80 Retro Computer Kit",
+                "published_description": "The RC2014 is a Z80 based computer kit that runs Microsoft BASIC, and introduces you to the cutting edge world of computing in the late 1970s!\r\n\r\nIn this workshop you will get a RC2014 Mini kit and I will take you through the steps involved in building it, explaining how it works, what you can do with it, and, how to troubleshoot it if necessary.  By the end of the workshop you will have a working retro computer to take away that can be plugged in to a laptop & FTDI cable or a Raspberry Pi Zero with keyboard and monitor\r\n\r\nBeginners soldering experience is assumed",
+                "names": "Spencer owen",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 17:10:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Introduction to Dungeons and Dragons (and other RPGs and board games)! ",
+                "published_description": "It's adventure time! Come and try out Dungeons and Dragons (or other, similar, roleplaying games) with a selection of the finest, experienced Dungeon Masters! Don't worry if you've never seen anything but a 6-sided die, or if you don't know what a Xorn is, there's space for you at the table*! \r\n\r\nThese games will be newbie friendly, so if you've never played before and want to find out what it's all about, please come along! (And if you're one of the finest DMs in the land, let me know if you'd like to help out!)\r\n\r\nA selection of exciting and different board games will be provided as well for those who miss out on gaming with a DM. \r\n\r\n* space not guaranteed - first come first serve until the space is full!",
+                "names": "Catherine Flick",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 20:00:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Light Painting / Light Writing",
+                "published_description": "A practical voyage into the art of light painting and light writing photography. We will start with an initial meet and greet where we will go over the basics and establish everyone's skill level. This will be followed up after dark with a practical lesson where we will walk around the site looking for subjects and learning what can be achieved. This would be followed up the next day with a review of the nights photography as well as a show and tell of the groups best images.",
+                "names": "Dan Nightingale",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 20:20:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Making paracord people",
+                "published_description": "Learn some knotting techniques and create your own 15cm paracord person.  You'll be able to to add swords and shields,helmets and hairy bits, tails and other trappings as you see fit.  I'll be running this workshop with the support of 2 experienced toy crafters aged 12 and 14. ",
+                "names": "Fiona French",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 16:40:00",
+                "scheduled_duration": 80,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Titanium spork workshop",
+                "published_description": "Make your own titanium spork, to your own design. You\u2019ll cutting it from sheet and hammer it to shape. No experience is required, and you\u2019ll end up learning some basic sheet-metal technique.\r\n\r\nSee http://www.jarkman.co.uk/catalog/random/emf2016sporks.htm for a previous iteration.",
+                "names": "Richard Sewell",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 10:00:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Make a stove out of a recycled drinks can! ",
+                "published_description": "In less than an hour, learn how to make a super-efficient alcohol burning stove that can cook an entire meal from a single recycled drinks can. (Bring your own can!) \r\n\r\nThis is a skill you can use anywhere, works with materials that are cheap or free, and once you know how can be repeated in minutes so you'll have the ability to cook your own food or boil water wherever you are.",
+                "names": "Maxine Green",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 16:40:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Build a 'Stranger Things' Light Board",
+                "published_description": "Harness the full power of the upside down (and the ESP8266) to build a working version of the fairy light messaging system as seen in \"Stranger things\". \r\nThe light board is driven by the ESP8266 which allows a connection through WiFi so that you can update the messages from your mobile devices.\r\nBring a laptop to set up your own Arduino environment for programming or simply assemble the provided kit with help. Involves gluing, soldering, and programming, beginners are welcome.",
+                "names": "MSRaynsford",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 13:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Introduction to web accessibility",
+                "published_description": "How do people with disabilities use the internet? Accessibility and inclusive design have gained popularity recently, but a lot of web developers are still unaware of what they can do to make their sites and apps work for everyone. Even with a lot of goodwill, practical knowledge is needed: it can be overwhelming to try to use a screen reader, use the internet without a mouse, get notifications with no audio or empathise with reading and cognitive impairments. Things like ARIA and tab order logic can also be intimidating and may lead developers to make experiences worse when they think they are improving it.\r\n \r\nThis workshop will be part-talk, part-practical, to demystify accessibility: why it matters, what are the things to consider, how to test and find issues, and most importantly what you can do to fix them. Participants will have hands-on exercises of using a screen reader on their own devices, navigating using just a keyboard, and identify what's a good and a terrible experience. We will work on hands-on exercises with HTML and JavaScript to fix custom components, understand the logic, and for more experienced developers we will cover ARIA components and building accessible custom elements like accordions and tab panels.",
+                "names": "Victor Loux",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 13:20:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Bridge Building",
+                "published_description": "A family workshop where we gather in teams to build bridges out of lollipop sticks and using hot glue guns. The format of the sessions is a short talk about the engineering principles in bridge design. Then we split up into team and work together to make a bridge that spans 35cm.\r\nAfter an hour we all come together to test each bridge by hanging weights off its center. Each bridge is tested to destruction. The bridge that holds the most weight is the winner and they receive a small token prize. ",
+                "names": "Jeffrey Roe / Christian Kortenhorst",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 11:00:00",
+                "scheduled_duration": 90,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Hackspaces round table",
+                "published_description": "Are you a current or former trustee or director of a hackspace? Are you running a fledgling hackspace dealing with growth issues? Or do you have knowledge and insight to pass on? Let's meet up for a round table discussion!",
+                "names": "Iulian Arcus",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 18:30:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Knots, Ropes and Splices 101 ",
+                "published_description": "What makes a good knot?\r\nTying the 5 most usefull knots, what they are good for, what is dangerous about them and how to untie them. \r\nHands-on-display of different types of rope and their applications.\r\nSplicing layed rope. \r\nSplicing techniques for modern style dyneema ropes. \r\n\r\nAll material and tools will be provided as a kit.",
+                "names": "Robert Nixdorf",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 13:20:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "The Singularity: dance, digital ethics and datavis coding workshop",
+                "published_description": "Create a live dance performance using brainwave data and coding! A 1.5 hour workshop using scratch and OSC data (prerecorded) from the EEG emotiv headset. The participants will manipulate the data to create their own data visualisations in Scratch v3 (due to be released Aug 2018) or Music using Sonic Pi. We will focus on creativity, play, and community with the underlying theme of digital ethics. Each participant will be given the opportunity to wear the headset and see their own data by signing a disclaimer during the workshop [explain why]. We will take the visualisations created during the workshops and combine these into a short live performance to end the workshop.\r\n\r\nDBS: I have an enhanced DBS",
+                "names": "Genevieve Smith-Nunes",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 18:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Bookbinding and Boxmaking Techniques for Hackers",
+                "published_description": "Bookbinding and boxmaking (making slipcases, hinged boxes for books etc) use a small set of common materials and tools to make some interesting, useful and beautiful structures.\r\n\r\nThere are some really simple and accessible but interesting techniques in the craft that I think maker folks may not have come across, and are really handy for (for example) rapidly prototyping enclosures with nothing but a scalpel, some PVA and cardboard.\r\n\r\nBookbinding involves some beautiful materials as well - it's not so hard to make your Maplin (RIP) plastic enclosures look less beige if you know how to put them together.\r\n\r\nPlease note: I'm also running and introduction to bookbinding workshop over the weekend that will cross over with this - probably come to one or the other.",
+                "names": "Ben Dornan",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 13:10:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Soldering, beginner to intermediate synth kit workshop",
+                "published_description": "A soldering workshop with well-established and tested kits that I design and sell myself. I am a qualified electronic engineer with programming, PCB layout and electronic prototyping experience. This will enable me to help attendees with soldering and troubleshooting during the workshop. \r\nAttendees will be able to follow fully featured step-by-step instructions, including hi-res build photos accessible through the internet on any browser. Care has been taken to make the PCBs easy to assemble.\r\nDuring the workshop I would like to point out:\r\n-\tWhat is a PCB anyway?\r\n-\tSolder, why are there so many different types? What should I use?\r\n-\tSoldering best practices and handy tips i.e. how to apply heat and solder to a joint.\r\n-\tVariations in components and the distinctions between polarised and unpolarised parts.\r\n\r\nDuring the workshop I would like to have attendees assemble one easy kit and one intermediate kit. The easy kit is a classic noisemaker/synth circuit, the mini APC (Atari Punk Console) including a small speaker. \r\nThe intermediate kit, which most beginners can handle after soldering the mini APC is a simple 8 step sequencer. The sequencer is able to sequence the mini APC by way of control voltages and gate signals, if all goes well the tent would be filled with people making 8 step musical loops.",
+                "names": "Darren Blaxcell - rakits.co.uk",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 10:00:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Introduction to Cryptic Crosswords",
+                "published_description": "To anyone without an understanding of how they work, cryptic crossword clues can be completely impenetrable. Two enthusiastic crossword solvers (and setters) will initiate you in the mysterious ways of how cryptic clues work, provide some practise examples and get you solving in no time!",
+                "names": "Katie Steckles",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 19:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Let's build!",
+                "published_description": "What can you build with straws and building blocks? Let your imagination run free with this creative drop in workshop where you can play and build anything from rockets to trees, obstacle courses to hats and whatever else takes your fancy.  ",
+                "names": "Kate Davis",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 13:20:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Swing dancing for engineers",
+                "published_description": "Learn to dance with Oli and Jo, your resident dancing engineers, in a friendly, fun, judgement free environment. \r\n\r\nWe'll teach a beginner's Lindy hop lesson with some excellent (spurious) engineering analogies thrown in for good measure.\r\n\r\nNo experience necessary all experience welcome!",
+                "names": "jo franchetti",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 20:30:00",
+                "scheduled_duration": 60,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "Building inclusive makerspaces",
+                "published_description": "Makerspaces are awesome! But unfortunately it's not always easy for people to access them. Women, BME (Black and minority ethnic) people, people with disabilities, older people, and people on low incomes are often under-represented in makerspaces. In the first part of this workshop I\u2019ll share some of the ways that makerspaces are managing to include people from these groups. Then I'd love to hear your stories about any successes and challenges you've experienced with building inclusive and diverse makerspace communities. Even if you don't have any success stories, if your makerspace hasn't been able to spend much time on engagement, or if you're not even involved in makerspaces but are curious about technology engagement issues, you're welcome to come along!\r\n\r\nAfter EMF I\u2019ll turn the information crowdsourced during the workshop into a zine so that other makerspaces can benefit from this advice :)",
+                "names": "Em O'Sullivan",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 10:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Beginners guide to modular sound synthesizers using VCV Rack",
+                "published_description": "In recent years there has been massive renewed interest in electronic modular synthesizers among enthusiasts who want to get back to the roots of electronic music and enjoy their creative freedom and opportunities for experimentation. However, beginners are often prevented from getting started with modular synths by their costs and apparent complexity. This workshop will be a hands-on introduction to making interesting sounds from modular synthesizers for complete beginners. We will use the open source simulated modular synthesizer \"VCV Rack\" to allow the participants to get the feel of working with a real modular synthesizer on their computer.",
+                "names": "Iain Sharp",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 11:20:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Adorable electronics: craft-based making",
+                "published_description": "Learn how to sew with electricity in this beginner and child friendly workshop. \r\n\r\nWe'll make squishable Sparkle Heart emoji badges adorned with LEDs and learn the about basics of electronics. We'll also get inspired by learning about some of the coolest makers, artists and electrical engineers working in the exciting field of e textiles.\r\n\r\nHelen Leigh is a maker, book author and lecturer. ",
+                "names": "Helen Leigh",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 17:30:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Age Appropriate Design Online  \u2014 a new UK Code of Practice is coming",
+                "published_description": "What does the future of the Internet look like in the UK? The Age Appropriate Design Code of Practice in the new Data Protection Act could have implications for online anonymity, biometric IDs and age verification, automated profiling and geolocation, and using personal data for marketing. What are we missing, and what are the risks? Find out how to contribute to the consultation closing September 19.",
+                "names": "Pippa King and Jen Persson",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 17:30:00",
+                "scheduled_duration": 40,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "NFC Nail Art",
+                "published_description": "This workshop puts the pretty and the geeky together by combining UV gel nail art with NFC technology. NFC (Near Field Communication) is a peer-to-peer radio communication method which allows devices up to 4cm away from each other to communicate (more: https://en.wikipedia.org/wiki/Near-field_communication). Its uses vary from contactless payments to smart cards, access fobs and file sharing, making it a vital communication tool.\r\nThe workshop will include:\r\n- introduction to gel manicure\r\n- brief introduction to the NFC technology\r\n- programming NFC data tags\r\n- placing NFC LEDs and data tags on nails and incorporating them into a nail art composition\r\nThe end result is a happy participant with a creative gel manicure involving NFC activated LEDs and a custom programmed nail which can perform various things: unlock a phone, open a browser and navigate to a link, open a specific application, link to a business card, etc.\r\n\r\nThis workshop would be open to all ages and genders, with an option to paint a fake plastic nails instead of own nails if that\u2019s preferred; each data tag and diode stickers are around 8mm wide so that can be useful if someone has smaller nails.",
+                "names": "Kinga Kieczkowska",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 13:20:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Fun Balloon Hats that Glow",
+                "published_description": "Funky headgear made from long sculptural balloons in various colours.\r\nWe start off by making a basic hat to to fit your head, then \r\nthe fun part starts by adding more balloons to decorate it as you want.\r\nTo finish, we add the LED (and battery provided) to make it glow at night!",
+                "names": "Stewart Dunn",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 17:00:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Willow wand making ",
+                "published_description": "A Forest School inspired activity. This would appeal to all ages of children as the wands can be as simple or complex as each individual sees fit.  Initially I would set the scene with some tree folklore or story relating to willow and dogwood.  Then, I would show how to bend the willow or dogwood into a wand shape and secure it.  The youngest children could then decorate their wand with natural resources, (or I could provide some coloured string, ribbon, feathers etc).  The older children could use basic woodcrafting tools such as potato peelers to strip the wands and whiltting knives to add carving notches for decoration, in addition.   I would imagine the younger children finishing earlier, but for older children this taking about an hour.  I would prefer all children to be accompanied by an adult, especially if they are hoping to use the tools.  I am a teacher, so CRB checked and Level 3 Qualified Forest School Leader.",
+                "names": "Sarah Montague ",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 09:30:00",
+                "scheduled_duration": 70,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Build a Wearable with Paper Circuitry and Bela Mini",
+                "published_description": "In this workshop you will make a functioning, interactive wearable tech project using Bela Mini and paper circuitry. Bela is an embedded computing platform for interactive audio projects that can be programmed using Pure Data, a visual language designed for audio. You will learn how to program in Pure Data and work with circuits using paper craft to realise their own wearable project ideas.\r\n\r\nNo previous experience with coding or electronics will be necessary. We will teach the basics of working with Pure Data and the Bela Mini drawing from our open-source collection of Pure Data code and paper circuitry and sensor designs.\r\n\r\nThis workshop is part of a Queen Mary University of London research project looking at what digital physical tools best support creative physical computing projects. We will provide all materials and Bela Mini kits for use during the workshops. ",
+                "names": "Becky Stewart",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 10:00:00",
+                "scheduled_duration": 240,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Tell stories in pixels and games",
+                "published_description": "Like small poems or short stories, tiny narrative games are valuable creative works. They can be used as a way of expressing feelings, explore simple emotions and tell points of view.\r\n\r\nBitsy is a tiny tool made especially for creating games which are based on exploration and narrative. Its pixel art minimalistic visual style makes it perfect to just sit down and make a game in a short period of time.\r\n\r\nThe output is a simple HTML file, so the game is not only playable almost everywhere, it\u2019s also really easy to distribute and opens chances of hacking and tinkering.\r\n\r\nWe will learn how to create games with Bitsy, both from a technical point of view and from a narrative point of view. We will explore space layout, dialogues, rhythm.\r\n\r\nAt the end of the workshop you\u2019ll be able to create small narrative experience to enjoy with your friends, to deliver powerful messages and to dip your toe in the crazy world of game making. So, come on over with your laptop. It\u2019s going to be great fun!",
+                "names": "Federico Fasce",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 14:20:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Drawing for techies",
+                "published_description": "As a person that practices both art & computer science, I have found there can be an interaction between the two, where ideas and patterns from one discipline can be transferred in a new form into the other.\r\n\r\nI have created a workshop that introduces ideas about what is important in drawing and what are the steps to creating a picture using terminology familiar to people in tech.The workshop consists of some theoretical parts and engaging hands-on exercises, aided by a custom tool. Exercises include drawing cylinders from several angles while being aware of the 3d shape of the object, using a custom grid to copy a sketch and doing several iterations of thumbnails to explore an idea for a drawing. All the while, feedback and suggestions are offered to the participants.\r\n\r\nThe end outcome is that participants gain more confidence in their drawing abilities, go deeper into drawing even simple forms and understand that the underlying process for drawing is not a magical fuzzy path, but consists of many sequential and \u2018deterministic\u2019 steps.",
+                "names": "Karolina Alexiou",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 10:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Bookbinding for Kids",
+                "published_description": "Making books is really fun, and a useful skill to have. It's also really easy to do at home. In this workshop I'll show you everything you need to get started, and you'll go away with at least one simple book that you've made yourself.",
+                "names": "Ben Dornan",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 14:40:00",
+                "scheduled_duration": 90,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "An introduction to leather stiching and embossing",
+                "published_description": "A leather sewing workshop which will give you a chance to sew and emboss your own EMF leather keyring and card wallet to keep. If you take part, you will be able to try using traditional saddle stitching to sew leather as well as personalise it using embossing.\r\n \r\nYou will get a pre-laser cut pieces of leather which they can then sew together using a choice of threads and customise by embossing to make your owne personal items and learn a thing or two about working with leather.",
+                "names": "Florian Heine",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 13:00:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Learn to knit",
+                "published_description": "I will teach you to knit from creating the right number of stitches (casting on), knitting enough rows to make a square then finishing the pieces (casting off).\r\nI love knitting, and know that when you star some interesting things happen turning what should be a square or rectangle into a distorted triangle. I enjoyed it, so managed to get myself out of this mess to making jumpers, mittens and scarves.\r\nIf you want to learn to knit book one of my sessions. Each session is for 14 people, and children under 12 need to have an adult with them.",
+                "names": "Clare Yarnold",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 16:10:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Chainmailling for beginners",
+                "published_description": "A.K.A Man Knitting 101\r\n\r\nFrom a length of wire into some hand crafted jewellery/belt/strap, chainmaille shouldn't be difficult, or elitist. There are many resources out there, and many things to try. It does take a long time to produce a piece, so it's not a cheap thing to purchase, but it should be cheap and easy to practice.\r\n\r\nIn a couple of hours, I will teach how to make rings from wire, explain aspect ratios for rings, and some basic sheet weaves (E4 in 1, J12 in 2). We will then move on to some chains using the basics of these weaves (Box chain, Byzantine Chain, Helm Chain).\r\n\r\nIf there is time and/or interest after this, I'd welcome some time looking at specific projects and helping to start those projects off. (Whether it's an idea in advance with a pattern found online, or an idea from someone on the day).",
+                "names": "Christopher Wells",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 15:30:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "UX your CV",
+                "published_description": "It's natural to hate writing your CV, but this often means they can be difficult for an employer to read.\r\n\r\nDespite how important CVs can be when job hunting, you probably put more thought into the user experience of your first To Do List app than into your current CV, right? ;)\r\n\r\nThis workshop will give you tips to optimise your CV, and make a great impression on the next employer you apply to!",
+                "names": "Matt Rose",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 16:40:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Who is my phone talking to (setting up a man-in-the-middle attack)",
+                "published_description": "Want to see what unencrypted data your devices are sending? What about encrypted? Can you change that data?\r\n\r\nWhether you're reverse engineering an app, want to annoy people (who gave you the permission for this!), or are just curious about data exchanged with your device, this might be useful for you.\r\n\r\nAfter a short introduction to networking, we'll create a basic MITM (man-in-the-middle) setup with your laptop. Your laptop will become a WiFi access point and target devices will connect to it. Network traffic will be inspected (wireshark) and also changed (dnsmasq, mitmproxy). We'll also install a custom CA on the phone to see HTTPS packets.\r\n\r\nYou will need a laptop with WiFi and Ethernet interfaces, and it needs to run Linux non-virtualised.\r\nYou should be comfortable doing basic admin on your Linux machine.\r\nTools we will use: wireshark, mitmproxy, dnsmasq.\r\n\r\nAfter the workshop, try it out yourself at home on a TV, toaster, or other networked device.",
+                "names": "Domen Puncer Kugler",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 15:20:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Slime Workshop",
+                "published_description": "introduction to slime, which animals make slime and basic explanation of the chemistry involved. We then get hands on and make our own slime! \r\n",
+                "names": "Emma Markham",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 14:50:00",
+                "scheduled_duration": 90,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Get started with Virtual Reality!",
+                "published_description": "This is a 2 hour workshop to introduce making Virtual Reality experiences you can use immediately using your smart phone. \r\n\r\nBy the end of the workshop you would have built a VR experience that works in your phone's web browser which you can show your friends.\r\n\r\nMake sure you bring your computer! ",
+                "names": "Ada Rose Cannon",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 14:40:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Build a rocket",
+                "published_description": "Build a simple solid-fuelled model rocket from scratch!\r\n\r\nWe'll provide card templates and all required materials, you cut and stick the rocket together and then decorate it to taste.\r\n\r\nAssembling the rocket is straightforward and as they're all made from white card/paper there are plenty of options for decoration or modification. We'll provide some stickers, felt tips, glitter, etc, but feel free to bring your own too!\r\n\r\nSuitable for young children with some supervision. The build involves mostly scissors and tape, one step involves hot glue which requires adult supervision. Feel free to contact us beforehand if you want to check suitability: emf@adamgreig.com / extension 2440.\r\n\r\nThis workshop is also running as a main workshop on Saturday if you can't attend the youth workshop on Friday.",
+                "names": "Adam Greig",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 16:30:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 20:40:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "icibici workshop: a \u00a320 brain-computer interface for your phone/tablet/etc.",
+                "published_description": "Build and use the world's first \u00a320 brain-smartphone interface to enter text on your phone by thinking (well, we're getting there...)! This project drops the cost of brain-computer interfaces by using your smartphone, tin foil and a bathing cap in the hope of doing what Google Cardboard did for VR. We explain the theory (steady-state visually evoked potential) behind the text entry app. Now in eight colours!\r\n\r\nEach icibici workshop is stand-alone: come to one to buy and build your kit; come back to work on the software.\r\n\r\niOS users need to register on Testflight.\r\n\r\nSee https://icibici.github.io/site/ for more details.",
+                "names": "Colin Rowat",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 13:20:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Paper Circuits Workshop",
+                "published_description": "Learn about electronics by crafting LEDs with card and copper strip. No previous experience of  circuit making required. ",
+                "names": "Peter Jackson",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 15:40:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Lego Mindstorms workshop",
+                "published_description": "This is an introduction to robotica for children age 10 - 15.\r\nWe will start with the basics and end up with a maze, or a line finder.\r\n\r\nWe will try to set up workshop tent our selves, so that throughout the event people can fumble around with the sets.\r\n\r\nAt other hackerevents we also did a contest on the Sunday, where the robot has to follow a parcours, and of course the best robot will win.",
+                "names": "Harm Boertien",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 17:50:00",
+                "scheduled_duration": 150,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Introduction to Japanese Bookbinding",
+                "published_description": "Because who doesn't love stationery and making things. It's super easy to get started with making books at home, and there's loads to explore once you get going. Here, we're going to make a simple book using a Japanese 3 hole binding structure. You should come away from the workshop with a book, some basic theory and technique, and some pointers on next projects to think about.\r\n\r\nPlease note: This workshop was delivered at EMF 2016, so if you came last time around you won't find anything new here. I'm also running a Bookbinding and Boxmaking Techniques for Hackers session over the weekend which will cross over heavily with this - probably come to one or the other.",
+                "names": "Ben Dornan",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 15:40:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Accessible Music Instruments",
+                "published_description": "Learn how to code musical notes and how to play them \u2013 by tilting, spinning, shaking or touching the buttons on the micro:bit. Using these new skills, design and make a bit of moveable musical tech that can be controlled with your own body. Inspired by Imogen Heap's mi.mu gloves, we empower individuals to interact with music in ways they've never done before. We will bring makeymakeys, micro:bits, speakers, battery packs, alligator clips, laptops, and any other resources you may need. The micro:bits can be coded using the block editor, javascript, and/or python, and we will bring resources for each. All code will be shared on GitHub.\r\n\r\nThe MyNormal project at ArkT Centre and members of ScienceOxford have collaborated to give a voice to those underrepresented in the music industry. Over several months of workshops, we sought to give disabled youth high quality music and technology opportunities. We will share these results and encourage other youth",
+                "names": "Noelle Aly",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 18:20:00",
+                "scheduled_duration": 120,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Circuit Bending",
+                "published_description": "Dip your toes into the weird and wonderful world of circuit bending. Opening up old battery powered musical toys and connecting different parts of the circuit to make new noises...and then jamming with them!\r\n\r\n\r\n\r\nI will provide a selection of battery powered noisy toys for participants to experiment with, but they're also welcome to bring their own too. We'll begin with a short introduction, which will also cover a safety briefing (always avoid capacitors) and some top tips e.g Do not bend anything that you are dearly attached to, or is difficult to replace. Usually circuit bending does not harm your targets, but sometimes things go wrong and you might accidentally fry the piece you are working on.\r\n\r\nAfter everybody has the chance to find the noises within the toy we'll all connect up to the PA system and get everybody jamming together - collaborating through music and digital creativity.",
+                "names": "Frazer Merrick",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 18:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Making Maths with Modular Origami",
+                "published_description": "Starting with a single sheet of paper, make a triangle, turn it into a hexagon or a star. Learn to make modules from paper and join them to make cubes, dodecahedra, stellated shapes. Learn about the platonic solids, tessellations, and what happens if you try to fit more than six triangles around a point.",
+                "names": "Alison Kiddle",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 14:20:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Web Design for absolute beginners",
+                "published_description": "Suitable for complete beginners, this workshop will teach the absolute fundamentals of building web pages with HTML and CSS. By the end, participants will understand enough terminology, theory and application to build a simple standards-compliant website.",
+                "names": "Kevin Lewis",
+                "may_record": false,
+                "scheduled_time": "2018-08-31 18:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Design Fiction \u2013 Using Science Fiction for invention",
+                "published_description": "If you love Science Fiction, Technology, Model Making, 3D Printing and Design, then this is the perfect workshop for you, and even if you are new to any of these things, its still definitely worth giving it a go!  \r\n\r\nWe will be exploring how Science Fiction can teach us a few things about the creation of new technologies. We will be focusing on the future of 3D Printing, but the process I will guide you through can be applied to anything and everything. This will provide a great opportunity to flex your creative muscles and question how we want to use technology in the future. We will be using a combination of sketching, drawing, sketch modelling, illustrating, doodling\u2026pretty much anything you want to create your 3D Printers of the future.  \r\n\r\nSome materials will be provided for you to rip, tear, cut, stick and glue, but do bring along any materials you think could be useful.",
+                "names": "Matthew Pilling",
+                "may_record": false,
+                "scheduled_time": "2018-09-02 17:00:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Build a DIY EMF detector",
+                "published_description": "Detect the Electro Magnetic Fields at EMF camp!\r\nYou will build and take away a simple EMF detector with this simple soldering kit.\r\nThe unit included everything you need including case and headphones.\r\nIts also a good workshop to learn to solder.\r\n20 people maximum.",
+                "names": "Matthew Little",
+                "may_record": false,
+                "scheduled_time": "2018-09-01 11:20:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 3"
+            }
+        ],
+        "counts": {
+            "needs_help": {
+                "false": 101,
+                "true": 44
+            },
+            "needs_money": {
+                "false": 145
+            },
+            "needs_laptop": {
+                "false": 145
+            },
+            "one_day": {
+                "false": 145
+            },
+            "notice_required": {
+                "> 1 month": 16,
+                "1 month": 56,
+                "1 week": 73
+            },
+            "may_record": {
+                "false": 145
+            },
+            "state": {
+                "accepted": 4,
+                "cancelled": 29,
+                "edit": 1,
+                "finished": 70,
+                "rejected": 35,
+                "reviewed": 6
+            },
+            "created_week": {
+                "2018-03-12": 10,
+                "2018-03-19": 2,
+                "2018-03-26": 1,
+                "2018-04-02": 7,
+                "2018-04-09": 14,
+                "2018-04-16": 18,
+                "2018-04-23": 6,
+                "2018-04-30": 11,
+                "2018-05-07": 6,
+                "2018-05-14": 4,
+                "2018-05-21": 9,
+                "2018-05-28": 4,
+                "2018-06-04": 3,
+                "2018-06-11": 2,
+                "2018-06-18": 2,
+                "2018-06-25": 6,
+                "2018-07-02": 8,
+                "2018-07-16": 2,
+                "2018-07-23": 13,
+                "2018-07-30": 2,
+                "2018-08-06": 6,
+                "2018-08-13": 5,
+                "2018-08-27": 4
+            }
+        },
+        "edits": {
+            "published_title": {
+                "avg": 2.48,
+                "max": 5
+            },
+            "published_description": {
+                "avg": 2.64,
+                "max": 7
+            },
+            "requirements": {
+                "avg": 1.60,
+                "max": 4
+            },
+            "length": {
+                "avg": 1.05,
+                "max": 3
+            },
+            "notice_required": {
+                "avg": 1.03,
+                "max": 2
+            },
+            "needs_help": {
+                "avg": 1.02,
+                "max": 2
+            },
+            "needs_money": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "one_day": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "has_rejected_email": {
+                "avg": 1.22,
+                "max": 2
+            },
+            "published_names": {
+                "avg": 2.55,
+                "max": 4
+            },
+            "arrival_period": {
+                "avg": 2.51,
+                "max": 4
+            },
+            "departure_period": {
+                "avg": 2.52,
+                "max": 4
+            },
+            "telephone_number": {
+                "avg": 2.40,
+                "max": 4
+            },
+            "may_record": {
+                "avg": 1.99,
+                "max": 2
+            },
+            "needs_laptop": {
+                "avg": 1.99,
+                "max": 2
+            },
+            "available_times": {
+                "avg": 2.66,
+                "max": 7
+            },
+            "attendees": {
+                "avg": 1.07,
+                "max": 3
+            },
+            "cost": {
+                "avg": 1.09,
+                "max": 4
+            },
+            "size": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "funds": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "age_range": {
+                "avg": 1.08,
+                "max": 3
+            },
+            "participant_equipment": {
+                "avg": 1.06,
+                "max": 3
+            }
+        }
+    }
+}

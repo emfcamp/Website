@@ -2,19 +2,33 @@
     <h1 aria-label="Electromagnetic Field">
         <a href="/"><div id="logo" alt="Electromagnetic Field"></div></a>
     </h1>
-    <div id="header-text">August 31<sup>st</sup>&ndash;September 2<sup>nd</sup> 2018<br/>
+    <div id="header-text">July 24<sup>th</sup>&ndash; 26<sup>th</sup> 2020<br/>
          Eastnor, UK</div>
 
     <div id="menu-container" role="navigation" aria-label="main navigation">
-        <ul class="menu" role="menu">
+      <ul class="menu" role="menu">
+            {#
+            <li role="presentation">
+                <a role="menuitem" href="{{ url_for('base.feedback') }}">Feedback</a>
+            </li>
+            #}
             <li role="presentation">
                 <a role="menuitem" href="{{ url_for('base.about') }}">About</a>
+            </li>
+            <li role="presentation">
+                <a role="menuitem" href="{{ url_for('base.emp') }}">EMP</a>
             </li>
             {% if SITE_STATE == 'sales' and SALES_STATE in ['available', 'unavailable'] %}
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('tickets.main') }}">Tickets</a>
                 </li>
             {% endif %}
+            {#
+            {% elif config.get('DEFAULT_FLOW') == 'tees' and SALES_STATE in ['available'] %}
+                <li role="presentation">
+                    <a role="menuitem" href="{{ url_for('tickets.main', flow='tees') }}">T-shirts</a>
+                </li>
+            #}
             {% if feature_enabled('VOLUNTEERS') %}
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('volunteer.main') }}">Volunteer</a>
@@ -46,13 +60,15 @@
                 <li role="presentation">
                     <a href="https://www.youtube.com/ElectromagneticField">Videos</a>
                 </li>
-            {% endif %}
+              {% endif %}
+              {#
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('base.sponsors') }}">Sponsors</a>
                 </li>
+              #}
             {% if basket_count %}
                 <li role="presentation">
-                    <a role="menuitem" href="{{ url_for('tickets.pay', flow="main") }}">
+                    <a role="menuitem" href="{{ url_for('tickets.pay', flow=config.get('DEFAULT_FLOW', 'main')) }}">
                         Basket ({{ basket_count }})
                     </a>
                 </li>

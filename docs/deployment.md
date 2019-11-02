@@ -1,29 +1,17 @@
 How to deploy to production
 
+TODO: make this nicer
+
 # First install
+```
+docker-compose -f ./docker-compose.yml -f ./docker-compose.prod.yml up --build -d
+docker-compose -f ./docker-compose.yml -f ./docker-compose.prod.yml exec app pipenv run make data
+```
 
-    PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy
-
-# Updating
-
-cd to the site directory:
-
-    cd /var/www/www.emfcamp.org
-
-Update the code
-
-    sudo git pull
-
-Install/update the virtualenv:
-
-    sudo make deploy
-
-Update the DB:
-
-    sudo make db
-
-Restart gunicorn:
-
-    systemctl restart gunicorn
-
-Monitor `journalctl -fu gunicorn` for errors.
+# To update
+```
+git pull
+docker-compose -f ./docker-compose.yml -f ./docker-compose.prod.yml build app
+docker-compose -f ./docker-compose.yml -f ./docker-compose.prod.yml stop app
+docker-compose -f ./docker-compose.yml -f ./docker-compose.prod.yml up -d app
+```
