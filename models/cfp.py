@@ -167,6 +167,28 @@ VENUE_CAPACITY = {
 MANUAL_REVIEW_TYPES = ["youthworkshop", "performance", "installation"]
 
 
+def proposal_slug(title):
+    slug = slugify_unicode(title).lower()
+    if len(slug) > 60:
+        words = re.split(" +|[,.;:!?]+", title)
+        break_words = ["and", "which", "with", "without", "for", "-", ""]
+
+        for i, word in reversed(list(enumerate(words))):
+            new_slug = slugify_unicode(" ".join(words[:i])).lower()
+            if word in break_words:
+                if len(new_slug) > 10 and not len(new_slug) > 60:
+                    slug = new_slug
+                    break
+
+            elif len(slug) > 60 and len(new_slug) > 10:
+                slug = new_slug
+
+    if len(slug) > 60:
+        slug = slug[:60] + "-"
+
+    return slug
+
+
 def timeslot_to_period(slot_string, type=None):
     start = end = None
 
@@ -626,25 +648,7 @@ class Proposal(db.Model):
 
     @property
     def slug(self):
-        slug = slugify_unicode(self.display_title).lower()
-        if len(slug) > 60:
-            words = re.split(" +|[,.;:!?]+", self.display_title)
-            break_words = ["and", "which", "with", "without", "for", "-", ""]
-
-            for i, word in reversed(list(enumerate(words))):
-                new_slug = slugify_unicode(" ".join(words[:i])).lower()
-                if word in break_words:
-                    if len(new_slug) > 10 and not len(new_slug) > 60:
-                        slug = new_slug
-                        break
-
-                elif len(slug) > 60 and len(new_slug) > 10:
-                    slug = new_slug
-
-        if len(slug) > 60:
-            slug = slug[:60] + "-"
-
-        return slug
+        return proposal_slug(self.display_title)
 
     @property
     def latlon(self):

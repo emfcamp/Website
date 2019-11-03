@@ -39,12 +39,7 @@
                     <a role="menuitem" href="{{ url_for('cfp.main') }}">Call for Participation</a>
                 </li>
             {% endif %}
-            {% if feature_enabled('LINE_UP') and SITE_STATE == 'sales' %}
-                <li role="presentation">
-                    <a role="menuitem" href="{{ url_for('schedule.line_up') }}">Line-up</a>
-                </li>
-            {% endif %}
-            {% if feature_enabled('SCHEDULE') %}
+            {% if feature_enabled('LINE_UP') or feature_enabled('SCHEDULE') %}
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('schedule.main') }}">Schedule</a>
                 </li>

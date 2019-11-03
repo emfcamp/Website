@@ -1,6 +1,4 @@
 import os
-import csv
-import json
 from mailchimp3 import MailChimp
 from mailchimp3.helpers import get_subscriber_hash
 from requests import HTTPError
@@ -182,110 +180,6 @@ def phones():
 @base.route("/feedback")
 def feedback():
     return render_template("feedback.html")
-
-
-@base.route("/talks")
-@base.route("/talks/")
-def talks():
-    return redirect(url_for("schedule.line_up"))
-
-
-@base.route("/line-up/<int:year>")
-def lineup_redirect(year):
-    return redirect("talks/{}".format(year))
-
-
-@base.route("/line-up/<int:year>/<string:talk>")
-def lineup_talk_redirect(year, talk):
-    return redirect("talks/{}/{}".format(year, talk))
-
-
-@base.route("/talks/2014")
-def talks_2014():
-    talks = []
-    talk_path = os.path.abspath(os.path.join(__file__, "..", "..", "talks", "2014"))
-    data = json.load(open(os.path.join(talk_path, "events.json"), "r"))
-    for event in data["conference_events"]["events"]:
-        if event["type"] not in ("lecture", "workshop", "other"):
-            continue
-        talks.append(
-            (
-                ", ".join(
-                    map(lambda speaker: speaker["full_public_name"], event["speakers"])
-                ),
-                event["title"],
-                event["abstract"],
-            )
-        )
-
-    return render_template("talks-2014.html", talks=talks)
-
-
-@base.route("/talks/2012")
-def talks_2012():
-    days = {}
-    talk_path = os.path.abspath(os.path.join(__file__, "..", "..", "talks", "2012"))
-    for day in ("friday", "saturday", "sunday"):
-        reader = csv.reader(open(os.path.join(talk_path, "%s.csv" % day), "r"))
-        rows = []
-        for row in reader:
-            cells = ["" if c == '"' else c for c in row]
-            app.logger.debug(cells)
-            rows.append(cells)
-
-        days[day] = rows
-
-    return render_template("talks-2012.html", **days)
-
-
-@base.route("/talks/<int:year>")
-def talks_previous(year):
-    talk_path = os.path.abspath(
-        os.path.join(__file__, "..", "..", "exports", str(year), "public")
-    )
-    if not os.path.exists(talk_path):
-        abort(404)
-
-    data = json.load(open(os.path.join(talk_path, "schedule.json"), "r"))
-
-    stage_venues = ["Stage A", "Stage B", "Stage C"]
-    workshop_venues = ["Workshop 1", "Workshop 2", "Workshop 3"]
-
-    stage_events = []
-    workshop_events = []
-
-    for event in data:
-        if event["source"] == "external":
-            continue
-
-        # Hack to remove Stitch's "hilarious" failed <script>
-        if "<script>" in event["speaker"]:
-            event["speaker"] = event["speaker"][
-                0 : event["speaker"].find("<script>")
-            ]  # "Some idiot"
-
-        # All official (non-external) content is on a stage or workshop, so we don't care about anything that isn't
-        if event["venue"] in stage_venues:
-            events_list = stage_events
-        elif event["venue"] in workshop_venues:
-            events_list = workshop_events
-        else:
-            continue
-
-        # Make sure it's not already in the list (basically repeated workshops)
-        if not any(e["title"] == event["title"] for e in events_list):
-            events_list.append(event)
-
-    # Sort should avoid leading punctuation and whitespace and be case-insensitive
-    stage_events.sort(key=lambda event: event["title"].strip().strip("'").upper())
-    workshop_events.sort(key=lambda event: event["title"].strip().strip("'").upper())
-
-    venues = [
-        {"name": "Main Stages", "events": stage_events},
-        {"name": "Workshops", "events": workshop_events},
-    ]
-
-    return render_template("talks-previous.html", venues=venues, year=year)
 
 
 @base.route("/sponsors")

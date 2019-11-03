@@ -1,0 +1,22 @@
+{% from "schedule/_proposal_lister.html" import list_proposals with context %}
+{% from "schedule/_external_lister.html" import list_externals with context %}
+
+{% extends "base.html" %}
+{% block title %}Schedule{% endblock %}
+{% block body %}
+
+<h2>Schedule</h2>
+<div>
+  <p>The talks for Electromagnetic Field {{ event_year }} haven't been announced yet, please
+  check back soon.</p>
+  <p>You can check out the talks and workshops from previous EMF events here:</p>
+  <ul>
+    {% for year in [2018, 2016, 2014] %}
+      <li><a href="{{url_for("schedule.main_year", year=year)}}">Electromagnetic Field {{year}}</a></li>
+    {% endfor %}
+      <li><a href="{{url_for("schedule.main_year", year=2013)}}">Electromagnetic Wave 2013</a></li>
+      <li><a href="{{url_for("schedule.main_year", year=2012)}}">Electromagnetic Field 2012</a></li>
+  </ul>
+</div>
+
+{% endblock %}

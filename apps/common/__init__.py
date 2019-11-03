@@ -1,6 +1,7 @@
-# encoding=utf-8
 from decorator import decorator
 from datetime import datetime
+import json
+import os.path
 
 from main import db, mail, external_url
 from flask import session, render_template, abort, current_app as app, request, Markup
@@ -257,3 +258,15 @@ def feature_enabled(feature):
         return db_flags[feature]
 
     return app.config.get(feature, False)
+
+
+def load_archive_file(year: int, *path):
+    """ Load the contents of a JSON file from the archive, and abort with
+        a 404 if it doesn't exist.
+    """
+    json_path = os.path.abspath(
+        os.path.join(__file__, "..", "..", "..", "exports", str(year), *path)
+    )
+    if not os.path.exists(json_path):
+        abort(404)
+    return json.load(open(json_path, "r"))

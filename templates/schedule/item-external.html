@@ -46,7 +46,7 @@
   </form>
 {% else %}
   <p>If you would like to mark this as a favourite please
-    <a href="{{ url_for('users.login', next=url_for('.line_up_external', event_id=event.id)) }}">log in</a>.
+    <a href="{{ url_for('users.login', next=url_for('.item_external', year=event_year, event_id=event.id)) }}">log in</a>.
   </p>
 {% endif %}
 </div>

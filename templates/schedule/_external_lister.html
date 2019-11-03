@@ -9,7 +9,7 @@
             {% if event.id == None %}
             <a class="event external">
             {% else %}
-            <a href="{{ url_for('schedule.line_up_external', event_id=event.id, slug=event.slug) }}" class="event external" id="event-{{ event.id }}">
+            <a href="{{ url_for('schedule.item_external', year=event_year, event_id=event.id, slug=event.slug) }}" class="event external" id="event-{{ event.id }}">
             {% endif %}
             <div class="row">
                 <div class="col-xs-10">

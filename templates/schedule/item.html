@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ proposal.title }}{% endblock %}
+{% block body %}
+
+<h2>{{ proposal.title }}</h2>
+<h2>
+  <small>
+  {{ proposal.type | title }} by {{ proposal.speaker }}
+  </small>
+</h2>
+
+
+<p><strong>{{ proposal.start_date.strftime('%A from %-I:%M %p') }}</strong> - <strong>{{ proposal.end_date.strftime('%-I:%M %p') }}</strong>
+   in <strong>{{ proposal.venue }}</strong>
+</p>
+{% endif %}
+
+<div class="well">
+
+<p class="multiline">{{ proposal.description | urlize }}</p>
+{% endblock %}

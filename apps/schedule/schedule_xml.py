@@ -1,13 +1,15 @@
+""" Utils to format schedule in the de facto standard Frab XML format.
+
+    Frab XML is consumed by a number of external tools such as C3VOC.
+"""
 from uuid import uuid5, NAMESPACE_URL
 from datetime import time, datetime, timedelta
-import pytz
-
 from lxml import etree
 
 from main import external_url
 from models.site_state import event_start, event_end
 
-event_tz = pytz.timezone("Europe/London")
+from . import event_tz
 
 
 def get_duration(start_time, end_time):
