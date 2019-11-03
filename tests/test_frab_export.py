@@ -2,7 +2,7 @@ import pytest
 from datetime import datetime
 from lxml import etree
 
-from apps.schedule_xml import (
+from apps.schedule.schedule_xml import (
     make_root,
     add_day,
     add_room,

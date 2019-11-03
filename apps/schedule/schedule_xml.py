@@ -9,7 +9,7 @@ from lxml import etree
 from main import external_url
 from models.site_state import event_start, event_end
 
-from . import event_tz
+from . import event_tz, event_year
 
 
 def get_duration(start_time, end_time):
@@ -80,7 +80,7 @@ def add_room(day, name):
 
 def add_event(room, event):
     url = external_url(
-        "schedule.line_up_proposal", proposal_id=event["id"], slug=event["slug"]
+        "schedule.item", year=event_year(), proposal_id=event["id"], slug=event["slug"]
     )
 
     event_node = etree.SubElement(
