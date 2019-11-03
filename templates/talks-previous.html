@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% block title %}2016 Programme{% endblock %}
+{% block title %}EMF {{year}} Talks{% endblock %}
 {% block body %}
-<h2>EMF 2016 Programme</h2>
-<p>These were the talks and workshops which happened at Electromagnetic Field 2016.
-You can find videos of many of the talks on the <a href="https://media.ccc.de/c/emf16">CCC website</a> or <a href="https://www.youtube.com/ElectromagneticField">our YouTube channel</a>.</p>
+<h2>EMF {{year}} Talks</h2>
+<p>These were the talks and workshops which happened at Electromagnetic Field {{year}}.
+You can find videos of many of the talks on the <a href="https://media.ccc.de/b/conferences/emf">CCC website</a> or <a href="https://www.youtube.com/ElectromagneticField">our YouTube channel</a>.</p>
 
 {% for venue in venues %}
 {% set venue_loop = loop %}

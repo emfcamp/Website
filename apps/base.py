@@ -190,12 +190,62 @@ def talks():
     return redirect(url_for("schedule.line_up"))
 
 
-@base.route("/line-up/2016")
-@base.route("/talks/2016")
-def talks_2016():
+@base.route("/line-up/<int:year>")
+def lineup_redirect(year):
+    return redirect("talks/{}".format(year))
+
+
+@base.route("/line-up/<int:year>/<string:talk>")
+def lineup_talk_redirect(year, talk):
+    return redirect("talks/{}/{}".format(year, talk))
+
+
+@base.route("/talks/2014")
+def talks_2014():
+    talks = []
+    talk_path = os.path.abspath(os.path.join(__file__, "..", "..", "talks", "2014"))
+    data = json.load(open(os.path.join(talk_path, "events.json"), "r"))
+    for event in data["conference_events"]["events"]:
+        if event["type"] not in ("lecture", "workshop", "other"):
+            continue
+        talks.append(
+            (
+                ", ".join(
+                    map(lambda speaker: speaker["full_public_name"], event["speakers"])
+                ),
+                event["title"],
+                event["abstract"],
+            )
+        )
+
+    return render_template("talks-2014.html", talks=talks)
+
+
+@base.route("/talks/2012")
+def talks_2012():
+    days = {}
+    talk_path = os.path.abspath(os.path.join(__file__, "..", "..", "talks", "2012"))
+    for day in ("friday", "saturday", "sunday"):
+        reader = csv.reader(open(os.path.join(talk_path, "%s.csv" % day), "r"))
+        rows = []
+        for row in reader:
+            cells = ["" if c == '"' else c for c in row]
+            app.logger.debug(cells)
+            rows.append(cells)
+
+        days[day] = rows
+
+    return render_template("talks-2012.html", **days)
+
+
+@base.route("/talks/<int:year>")
+def talks_previous(year):
     talk_path = os.path.abspath(
-        os.path.join(__file__, "..", "..", "exports", "2016", "public")
+        os.path.join(__file__, "..", "..", "exports", str(year), "public")
     )
+    if not os.path.exists(talk_path):
+        abort(404)
+
     data = json.load(open(os.path.join(talk_path, "schedule.json"), "r"))
 
     stage_venues = ["Stage A", "Stage B", "Stage C"]
@@ -235,47 +285,7 @@ def talks_2016():
         {"name": "Workshops", "events": workshop_events},
     ]
 
-    return render_template("talks-2016.html", venues=venues)
-
-
-@base.route("/line-up/2014")
-@base.route("/talks/2014")
-def talks_2014():
-    talks = []
-    talk_path = os.path.abspath(os.path.join(__file__, "..", "..", "talks", "2014"))
-    data = json.load(open(os.path.join(talk_path, "events.json"), "r"))
-    for event in data["conference_events"]["events"]:
-        if event["type"] not in ("lecture", "workshop", "other"):
-            continue
-        talks.append(
-            (
-                ", ".join(
-                    map(lambda speaker: speaker["full_public_name"], event["speakers"])
-                ),
-                event["title"],
-                event["abstract"],
-            )
-        )
-
-    return render_template("talks-2014.html", talks=talks)
-
-
-@base.route("/line-up/2012")
-@base.route("/talks/2012")
-def talks_2012():
-    days = {}
-    talk_path = os.path.abspath(os.path.join(__file__, "..", "..", "talks", "2012"))
-    for day in ("friday", "saturday", "sunday"):
-        reader = csv.reader(open(os.path.join(talk_path, "%s.csv" % day), "r"))
-        rows = []
-        for row in reader:
-            cells = ["" if c == '"' else c for c in row]
-            app.logger.debug(cells)
-            rows.append(cells)
-
-        days[day] = rows
-
-    return render_template("talks-2012.html", **days)
+    return render_template("talks-previous.html", venues=venues, year=year)
 
 
 @base.route("/sponsors")
