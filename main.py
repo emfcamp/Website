@@ -168,16 +168,15 @@ def create_app(dev_server=False):
 
     login_manager.anonymous_user = load_anonymous_user
 
-    if app.config.get('TICKETS_SITE'):
-        global gocardless_client
-        gocardless_client = gocardless_pro.Client(access_token=app.config['GOCARDLESS_ACCESS_TOKEN'],
-                                                  environment=app.config['GOCARDLESS_ENVIRONMENT'])
-        stripe.api_key = app.config['STRIPE_SECRET_KEY']
+    global gocardless_client
+    gocardless_client = gocardless_pro.Client(access_token=app.config['GOCARDLESS_ACCESS_TOKEN'],
+                                              environment=app.config['GOCARDLESS_ENVIRONMENT'])
+    stripe.api_key = app.config['STRIPE_SECRET_KEY']
 
-        @app.before_request
-        def load_per_request_state():
-            site_state.get_states()
-            feature_flag.get_db_flags()
+    @app.before_request
+    def load_per_request_state():
+        site_state.get_states()
+        feature_flag.get_db_flags()
 
     if app.config.get('NO_INDEX'):
         # Prevent staging site from being displayed on Google

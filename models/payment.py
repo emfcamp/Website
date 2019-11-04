@@ -425,8 +425,8 @@ class StripePayment(Payment):
     name = "Stripe payment"
 
     __mapper_args__ = {"polymorphic_identity": "stripe"}
-    chargeid = db.Column(db.String, unique=True)
-    token = db.Column(db.String)
+    intent_id = db.Column(db.String, unique=True)
+    charge_id = db.Column(db.String, unique=True)
 
     def cancel(self):
         if self.state in ["charged", "paid"]:

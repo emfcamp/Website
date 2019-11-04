@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Credit Card Payment{% endblock %}
+{% block body %}
+
+<div class="col-md-10">
+
+<h2>Card Payment Details</h2>
+
+<div class="well" id="payment-info">
+  Please enter your card details below to complete your order for <strong>{{ payment.amount | price(payment.currency) }}</strong>.<br>
+  <small>Your card details are processed securely by Stripe and are not handled or stored by EMF.</small>
+</div>
+
+<noscript>
+    <div class="alert alert-info">
+        <p>You must have Javascript enabled to use our card payment provider Stripe.
+            Please enable Javascript and click below to reload the page.</p>
+            <a class="btn btn-primary"
+                href="{{ url_for('payments.stripe_tryagain', payment_id=payment.id) }}">
+                Reload page</a>
+    </div>
+</noscript>
+
+<form class="form well" role="form" id="stripe-form">
+  <div class="form-group">
+    <label class="control-label" for="cardholder-name">Cardholder Name</label>
+    <input class="form-control" id="cardholder-name" value="{{ current_user.name }}">
+  </div>
+  <div class="form-group" id="stripe-group">
+    <label class="control-label" for="stripe-card">Card Details</label>
+    <div class="controls">
+      <div class="form-control" id="stripe-card"></div>
+    </div>
+    <span id="stripe-error" class="help-block"></span>
+  </div>
+  <button class="btn btn-default debounce" id="card-pay" disabled="true">Make Payment</button>
+</form>
+
+<form method="post" action="{{ url_for('payments.stripe_capture', payment_id=payment.id) }}" id="stripe_capture" class="hidden">
+  <input id="csrf_token" name="_csrf_token" type="hidden" value="{{ csrf_token() }}">
+</form>
+
+</div>
+{% endblock %}
+{% block foot -%}
+<script src="https://js.stripe.com/v3/"></script>
+
+<script type="text/javascript">
+  var PUBLIC_KEY = {{ config['STRIPE_PUBLIC_KEY']|tojson }};
+  var CLIENT_SECRET = {{ client_secret|tojson }};
+
+  var stripe = Stripe(PUBLIC_KEY);
+  var elements = stripe.elements();
+  var cardElement = elements.create('card');
+
+  cardElement.on('change', function(event) {
+    if (event.error) {
+      $('#stripe-error').text(event.error.message);
+      $('#stripe-group').addClass('has-error');
+    } else {
+      $('#stripe-error').text('');
+      $('#stripe-group').removeClass('has-error');
+    }
+
+    if (event.complete) {
+      $('#card-pay').prop('disabled', false);
+    } else {
+      $('#card-pay').prop('disabled', true);
+    }
+  });
+  cardElement.mount('#stripe-card');
+
+  $('#card-pay').on('click', function(event) {
+    event.preventDefault();
+    stripe.handleCardPayment(
+      CLIENT_SECRET,
+      cardElement, {
+        payment_method_data: {
+          billing_details: {
+            name: $('#cardholder-name').val(),
+            email: {{current_user.email|tojson}}
+          }
+        }
+      }
+    ).then(function(result) {
+      if (result.error) {
+        $('#stripe-error').text(result.error.message);
+        $('#stripe-group').addClass('has-error');
+      } else {
+        $('#stripe_capture').submit();
+      }
+    })
+  });
+</script>
+{% endblock -%}

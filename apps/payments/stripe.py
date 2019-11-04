@@ -1,6 +1,10 @@
-import simplejson
+""" Payment handler for Stripe credit card payments.
+
+    This takes credit card payments using Stripe's
+    [Payment Intents](https://stripe.com/docs/payments/payment-intents) API.
+
+"""
 import logging
-from datetime import datetime, timedelta
 
 from flask import (
     render_template,
@@ -11,15 +15,14 @@ from flask import (
     abort,
     current_app as app,
 )
-from flask_login import login_required
+from flask_login import login_required, current_user
 from flask_mail import Message
-from wtforms import SubmitField, HiddenField, StringField
+from wtforms import SubmitField, StringField
 from sqlalchemy.orm.exc import NoResultFound
 
 from main import db, stripe, mail, csrf
 from models import RefundRequest
 from models.payment import StripePayment
-from models.site_state import event_start
 from ..common import feature_enabled, feature_flag
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
@@ -55,122 +58,51 @@ def stripe_start(payment):
     return redirect(url_for("payments.stripe_capture", payment_id=payment.id))
 
 
-def charge_stripe(payment):
-    logger.info("Charging Stripe payment %s, token %s", payment.id, payment.token)
-    # If we fail to go from charging to charged, we won't have the charge ID,
-    # so can't process the webhook. The payment will need to be manually resolved.
-    # Test this with 4000000000000341.
-
-    payment.state = "charging"
-    db.session.commit()
-    payment = get_user_payment_or_abort(payment.id, "stripe", valid_states=["charging"])
-
-    # Stripe say it's max 15 chars, appended to company name,
-    # but it looks like only 10 chars is reliable.
-    description = "EMF {}".format(event_start().year)
-    try:
-        try:
-            charge = stripe.Charge.create(
-                amount=payment.amount_int,
-                currency=payment.currency.lower(),
-                card=payment.token,
-                description=payment.description,
-                statement_description=description,
-            )
-        except stripe.CardError as e:
-            error = e.json_body["error"]
-            logger.warn('Card payment failed with exception "%s"', e)
-            flash(
-                "Unfortunately your card payment failed with the error: %s"
-                % (error["message"])
-            )
-            raise
-
-        except Exception as e:
-            logger.warn("Exception %r confirming payment", e)
-            flash("An error occurred with your payment, please try again")
-            raise
-
-    except Exception:
-        # Allow trying again
-        payment.state = "captured"
-        db.session.commit()
-        return redirect(url_for(".stripe_tryagain", payment_id=payment.id))
-
-    payment.chargeid = charge.id
-    if charge.paid:
-        payment.paid()
-    else:
-        payment.state = "charged"
-        payment.expires = datetime.utcnow() + timedelta(
-            days=app.config["EXPIRY_DAYS_STRIPE"]
-        )
-
-    db.session.commit()
-
-    logger.info("Payment %s completed OK (state %s)", payment.id, payment.state)
-
-    # FIXME: determine whether these are tickets or generic products
-    msg = Message(
-        "Your EMF ticket purchase",
-        sender=app.config.get("TICKETS_EMAIL"),
-        recipients=[payment.user.email],
-    )
-
-    already_emailed = set_tickets_emailed(payment.user)
-    msg.body = render_template(
-        "emails/tickets-purchased-email-stripe.txt",
-        user=payment.user,
-        payment=payment,
-        already_emailed=already_emailed,
-    )
-
-    if feature_enabled("ISSUE_TICKETS") and charge.paid:
-        attach_tickets(msg, payment.user)
-
-    mail.send(msg)
-    db.session.commit()
-
-    return redirect(url_for(".stripe_waiting", payment_id=payment.id))
-
-
-class StripeAuthorizeForm(Form):
-    token = HiddenField("Stripe token")
-    forward = SubmitField("Continue")
-
-
-@payments.route("/pay/stripe/<int:payment_id>/capture", methods=["GET", "POST"])
+@payments.route("/pay/stripe/<int:payment_id>/capture")
 @login_required
 def stripe_capture(payment_id):
+    """ This endpoint displays the card payment form, including the Stripe payment element.
+        Card details are validated and submitted to Stripe by XHR, and if it succeeds
+        a POST is sent back, which is received by the next endpoint.
+    """
     payment = lock_user_payment_or_abort(payment_id, "stripe", valid_states=["new"])
 
     if not feature_enabled("STRIPE"):
         logger.warn("Unable to capture payment as Stripe is disabled")
-        flash("Stripe is currently unavailable. Please try again later")
+        flash("Card payments are currently unavailable. Please try again later")
         return redirect(url_for("users.purchases"))
 
-    form = StripeAuthorizeForm()
-    if form.validate_on_submit():
-        try:
-            logger.info(
-                "Stripe payment %s captured, token %s", payment.id, payment.token
-            )
-            payment.token = form.token.data
-            payment.state = "captured"
-            db.session.commit()
+    if payment.intent_id is None:
+        intent = stripe.PaymentIntent.create(
+            amount=payment.amount_int,
+            currency=payment.currency.upper(),
+            statement_descriptor_suffix=payment.description,
+            metadata={"user_id": current_user.id, "payment_id": payment.id},
+        )
+        payment.intent_id = intent.id
+        db.session.commit()
+    else:
+        # Reuse a previously-created payment intent
+        intent = stripe.PaymentIntent.retrieve(payment.intent_id)
 
-            payment = lock_user_payment_or_abort(
-                payment_id, "stripe", valid_states=["captured"]
-            )
-        except Exception as e:
-            logger.warn("Exception %r updating payment", e)
-            flash("An error occurred with your payment, please try again")
-            return redirect(url_for(".stripe_tryagain", payment_id=payment.id))
+    logger.info(
+        "Starting checkout for payment %s with intent %s", payment.id, payment.intent_id
+    )
+    return render_template(
+        "payments/stripe-checkout.html",
+        payment=payment,
+        client_secret=intent.client_secret,
+    )
 
-        return charge_stripe(payment)
 
-    logger.info("Trying to check out payment %s", payment.id)
-    return render_template("stripe-checkout.html", payment=payment, form=form)
+@payments.route("/pay/stripe/<int:payment_id>/capture", methods=["POST"])
+@login_required
+def stripe_capture_post(payment_id):
+    payment = lock_user_payment_or_abort(payment_id, "stripe")
+    if payment.state == "new":
+        payment.state = "charged"
+        db.session.commit()
+    return redirect(url_for(".stripe_waiting", payment_id=payment_id))
 
 
 class StripeChargeAgainForm(Form):
@@ -199,14 +131,14 @@ def stripe_tryagain(payment_id):
     if form.validate_on_submit():
         if form.tryagain.data:
             logger.info("Trying to charge payment %s again", payment.id)
-            return charge_stripe(payment)
+            return redirect(url_for(".stripe_waiting", payment_id=payment.id))
         elif form.cancel.data:
             payment.cancel()
             db.session.commit()
             flash("Your payment has been cancelled. Please place your order again.")
             return redirect(url_for("tickets.main"))
 
-    return render_template("stripe-tryagain.html", payment=payment, form=form)
+    return render_template("payments/stripe-tryagain.html", payment=payment, form=form)
 
 
 class StripeCancelForm(Form):
@@ -217,7 +149,7 @@ class StripeCancelForm(Form):
 @login_required
 def stripe_cancel(payment_id):
     payment = lock_user_payment_or_abort(
-        payment_id, "stripe", valid_states=["new", "captured"]
+        payment_id, "stripe", valid_states=["new", "captured", "failed"]
     )
 
     form = StripeCancelForm()
@@ -227,15 +159,12 @@ def stripe_cancel(payment_id):
             payment.cancel()
             db.session.commit()
 
-            if payment.token:
-                logger.warn("Stripe payment has outstanding token %s", payment.token)
-
             logger.info("Payment %s cancelled", payment.id)
             flash("Payment cancelled")
 
         return redirect(url_for("users.purchases"))
 
-    return render_template("stripe-cancel.html", payment=payment, form=form)
+    return render_template("payments/stripe-cancel.html", payment=payment, form=form)
 
 
 @payments.route("/pay/stripe/<int:payment_id>/waiting")
@@ -245,7 +174,9 @@ def stripe_waiting(payment_id):
         payment_id, "stripe", valid_states=["charged", "paid"]
     )
     return render_template(
-        "stripe-waiting.html", payment=payment, days=app.config["EXPIRY_DAYS_STRIPE"]
+        "payments/stripe-waiting.html",
+        payment=payment,
+        days=app.config["EXPIRY_DAYS_STRIPE"],
     )
 
 
@@ -293,31 +224,29 @@ def stripe_refund_start(payment_id):
 @csrf.exempt
 @payments.route("/stripe-webhook", methods=["POST"])
 def stripe_webhook():
-    logger.debug("Stripe webhook called with %s", request.data)
-    json_data = simplejson.loads(request.data)
+    try:
+        event = stripe.Webhook.construct_event(
+            request.data,
+            request.headers["STRIPE_SIGNATURE"],
+            app.config.get("STRIPE_WEBHOOK_KEY"),
+        )
+    except (ValueError, stripe.error.SignatureVerificationError):
+        abort(400)
 
     try:
-        if json_data["object"] != "event":
-            logger.warning("Unrecognised callback object: %s", json_data["object"])
-            abort(501)
-
         livemode = not app.config.get("DEBUG")
-        if json_data["livemode"] != livemode:
-            logger.error(
-                "Unexpected livemode status %s, failing", json_data["livemode"]
-            )
+        if event.livemode != livemode:
+            logger.error("Unexpected livemode status %s, failing", event.livemode)
             abort(409)
 
-        obj_data = json_data["data"]["object"]
-        type = json_data["type"]
         try:
-            handler = webhook_handlers[type]
+            handler = webhook_handlers[event.type]
         except KeyError as e:
             handler = webhook_handlers[None]
 
-        return handler(type, obj_data)
+        return handler(event.type, event.data.object)
     except Exception as e:
-        logger.error("Unexcepted exception during webhook: %r", e)
+        logger.exception("Unhandled exception during Stripe webhook")
         logger.info("Webhook data: %s", request.data)
         abort(500)
 
@@ -325,7 +254,6 @@ def stripe_webhook():
 @webhook()
 def stripe_default(type, obj_data):
     # We can fetch events with Event.all for 30 days
-    logger.warn("Default handler called for %s: %s", type, obj_data)
     return ("", 200)
 
 
@@ -334,30 +262,43 @@ def stripe_ping(type, ping_data):
     return ("", 200)
 
 
-def lock_payment_or_abort(charge_id):
-    try:
-        return StripePayment.query.filter_by(chargeid=charge_id).with_for_update().one()
-    except NoResultFound:
-        logger.error("Payment for charge %s not found", charge_id)
-        abort(409)
+def stripe_update_payment(payment: StripePayment, intent: stripe.PaymentIntent = None):
+    """ Update a Stripe payment.
+        If a PaymentIntent object is not passed in, this will fetch the payment details from the Stripe API.
+    """
+    if intent is None:
+        intent = stripe.PaymentIntent.retrieve(payment.intent_id)
 
+    if len(intent.charges) == 0:
+        # Intent does not have a charge (yet?), do nothing
+        return
+    elif len(intent.charges) > 1:
+        app.logger.error(f"Payment intent #{intent['id']} has more than one charge")
+        raise StripeUpdateUnexpected()
 
-def stripe_update_payment(payment):
-    charge = stripe.Charge.retrieve(payment.chargeid)
+    charge = intent.charges.data[0]
+
+    if payment.charge_id is None:
+        payment.charge_id = charge["id"]
+
+    if payment.charge_id != charge["id"]:
+        app.logger.error(
+            f"Charge ID for intent #{intent['id']} has changed from #{payment.charge_id} to #{charge['id']}"
+        )
+        raise StripeUpdateUnexpected()
+
     if charge.refunded:
         return stripe_payment_refunded(payment)
-
-    elif charge.paid:
+    elif charge.status == "succeeded":
         return stripe_payment_paid(payment)
-
-    elif charge.failed:
+    elif charge.status == "failed":
         return stripe_payment_failed(payment)
 
     app.logger.error("Charge object is not paid, refunded or failed")
     raise StripeUpdateUnexpected()
 
 
-def stripe_payment_paid(payment):
+def stripe_payment_paid(payment: StripePayment):
     if payment.state == "paid":
         logger.info("Payment is already paid, ignoring")
         return
@@ -365,10 +306,6 @@ def stripe_payment_paid(payment):
     if payment.state == "partrefunded":
         logger.info("Payment is already partially refunded, ignoring")
         return
-
-    if payment.state != "charged":
-        logger.error("Current payment state is %s (should be charged)", payment.state)
-        raise StripeUpdateConflict()
 
     logger.info("Setting payment %s to paid", payment.id)
     payment.paid()
@@ -395,7 +332,7 @@ def stripe_payment_paid(payment):
     db.session.commit()
 
 
-def stripe_payment_refunded(payment):
+def stripe_payment_refunded(payment: StripePayment):
     if payment.state == "refunded":
         logger.info("Payment is already refunded, ignoring")
         return
@@ -427,59 +364,46 @@ def stripe_payment_failed(payment):
     # Stripe payments almost always fail during capture, but can be failed while charging.
     # Test with 4000 0000 0000 0341
     if payment.state == "failed":
-        logger.info("Payment is already failed, ignoring")
         return
 
     if payment.state == "partrefunded":
         logger.error("Payment is already partially refunded, so cannot be failed")
         raise StripeUpdateConflict()
 
-    if payment.state != "charged":
-        logger.error("Current payment state is %s (should be charged)", payment.state)
+    if payment.state == "paid":
+        logger.error("Failed notification for paid charge")
         raise StripeUpdateConflict()
 
-    payment.state = "failed"
-    db.session.commit()
-
-    # Charge can be retried, so nothing else to do.
+    # A failed payment can be retried by revisiting the capture page, so we don't want
+    # to set the payment state to failed here.
 
 
-@webhook("charge.succeeded")
-@webhook("charge.refunded")
-@webhook("charge.updated")
-@webhook("charge.failed")
-def stripe_charge_updated(type, charge_data):
-    payment = lock_payment_or_abort(charge_data["id"])
+def lock_payment_or_abort(intent_id):
+    try:
+        return (
+            StripePayment.query.filter_by(intent_id=intent_id).with_for_update().one()
+        )
+    except NoResultFound:
+        logger.error("Payment for intent %s not found", intent_id)
+        abort(409)
+
+
+@webhook("payment_intent.canceled")
+@webhook("payment_intent.created")
+@webhook("payment_intent.payment_failed")
+@webhook("payment_intent.succeeded")
+def stripe_payment_intent_updated(type, intent):
+    payment = lock_payment_or_abort(intent.id)
 
     logger.info(
-        "Received %s message for charge %s, payment %s",
-        type,
-        charge_data["id"],
-        payment.id,
+        "Received %s message for intent %s, payment %s", type, intent.id, payment.id
     )
 
     try:
-        stripe_update_payment(payment)
+        stripe_update_payment(payment, intent)
     except StripeUpdateConflict:
         abort(409)
     except StripeUpdateUnexpected:
         abort(501)
 
-    return ("", 200)
-
-
-@webhook("charge.dispute.created")
-@webhook("charge.dispute.updated")
-@webhook("charge.dispute.closed")
-def stripe_dispute_update(type, dispute_data):
-    payment = lock_payment_or_abort(dispute_data["charge"])
-    logger.critical(
-        "Unexpected charge dispute event %s for payment %s: %s",
-        type,
-        payment.id,
-        dispute_data,
-    )
-
-    db.session.rollback()
-    # Don't block other events
     return ("", 200)
