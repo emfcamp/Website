@@ -36,6 +36,16 @@ Or, you can create an account and simultaneously make it an admin by using `make
 
 E-mail sending is disabled in development (but is printed out on the console). You can also login directly by setting BYPASS_LOGIN=True in config/development.cfg and then using a URL of the form e.g. `/login/admin@test.invalid` and navigate to `/admin/`.
 
+### Database Migrations
+
+- `./flask db migrate -m 'Migration name'` to generate migration scripts when models have been updated.
+- `./flask db upgrade` to run any migration scripts you've generated.
+- `./flask db downgrade` to undo the last migration.
+
+For more migration commands, see the [flask-migrate docs](https://flask-migrate.readthedocs.io/en/latest/).
+
+### More Docs 
+
 For more, see:
 
 * [Documentation](docs/documentation.md)
@@ -44,7 +54,4 @@ For more, see:
 * [Contributing](.github/CONTRIBUTING.md)
 
 
-### Additional Notes
 
-- `make migrate` to generate migration scripts when models have been updated.
-- `make db` to run any migration scripts you've generated.
