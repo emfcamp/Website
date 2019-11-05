@@ -12,6 +12,7 @@ from models.purchase import (
     PurchaseStateException,
     PurchaseTransferException,
     PURCHASE_STATES,
+    CheckinStateException,
 )
 from models.user import User
 from main import db
@@ -219,9 +220,6 @@ def test_set_state(db, parent_group, user):
     with pytest.raises(PurchaseStateException):
         purchase.set_state("disallowed-state")
 
-    with pytest.raises(PurchaseStateException):
-        purchase.set_state("receipt-emailed")
-
     purchase.set_state("payment-pending")
 
     assert purchase.state == "payment-pending", purchase.state
@@ -278,7 +276,18 @@ def test_check_in(db, parent_group, user):
     purchases = create_purchases(tier, 1, user)
     purchase = purchases[0]
 
-    purchase.state = "receipt-emailed"
+    with pytest.raises(PurchaseStateException):
+        # Issuing tickets should fail if the purchase hasn't been paid for
+        purchase.ticket_issued = True
+
+    with pytest.raises(CheckinStateException):
+        # Likewise, checking in should fail.
+        purchase.check_in()
+
+    purchase.state = "paid"
+    db.session.commit()
+
+    purchase.ticket_issued = True
     assert purchase.checked_in is False
     purchase.check_in()
     assert purchase.checked_in is True

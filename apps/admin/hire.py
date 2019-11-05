@@ -15,7 +15,7 @@ def get_hires():
         ProductGroup.query.filter_by(type="hire")
         .join(Product, Purchase, Purchase.owner)
         .group_by(User.id, Product.id, Purchase.state)
-        .filter(Purchase.state.in_(["paid", "payment-pending", "receipt-emailed"]))
+        .filter(Purchase.state.in_(["paid", "payment-pending"]))
         .with_entities(User, Product, Purchase.state, func.count(Purchase.id))
         .order_by(User.name, Product.name)
     )

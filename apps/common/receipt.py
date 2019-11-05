@@ -183,7 +183,7 @@ def attach_tickets(msg, user):
 def set_tickets_emailed(user):
     purchases = (
         user.owned_purchases.filter_by(is_paid_for=True)
-        .filter(Purchase.state.in_(["paid", "receipt-emailed"]))
+        .filter(Purchase.state.in_(["paid"]))
         .join(PriceTier, Product, ProductGroup)
         .filter(ProductGroup.type.in_(RECEIPT_TYPES))
         .with_entities(Purchase)
@@ -193,9 +193,9 @@ def set_tickets_emailed(user):
 
     already_emailed = False
     for p in purchases:
-        if p.state == "receipt-emailed":
+        if p.ticket_issued:
             already_emailed = True
 
-        p.set_state("receipt-emailed")
+        p.ticket_issued = True
 
     return already_emailed

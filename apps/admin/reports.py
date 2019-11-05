@@ -21,7 +21,7 @@ def report_reconcile():
             .filter(ProductGroup.id == pg.id)
         )
 
-        for purchase in q.filter(Purchase.state.in_(("paid", "receipt-emailed"))):
+        for purchase in q.filter(Purchase.state == "paid"):
             paid[purchase.price.currency] += purchase.price.value
 
         for purchase in q.filter(Purchase.state == "payment-pending"):

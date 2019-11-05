@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy.orm import column_property
+from sqlalchemy.orm import column_property, validates
 from main import db
 
 # The type of a product determines how we handle it after purchase.
@@ -13,12 +13,11 @@ PURCHASE_STATES = {
     "reserved": ["payment-pending", "paid", "cancelled"],
     "payment-pending": ["paid", "cancelled"],
     "cancelled": [],
-    "paid": ["receipt-emailed", "refunded", "cancelled"],
-    "receipt-emailed": ["paid", "refunded", "cancelled"],
+    "paid": ["refunded", "cancelled"],
     "refunded": [],
 }
 
-bought_states = {"paid", "receipt-emailed"}
+bought_states = {"paid"}
 anon_states = {"reserved", "cancelled"}
 allowed_states = set(PURCHASE_STATES.keys())
 
@@ -64,6 +63,8 @@ class Purchase(db.Model):
     # State tracking info
     state = db.Column(db.String, default="reserved", nullable=False)
     is_paid_for = column_property(state.in_(bought_states))
+    # Whether an e-ticket has been issued for this item
+    ticket_issued = db.Column(db.Boolean, default=False, nullable=False)
 
     # Relationships
     owner = db.relationship("User", primaryjoin="Purchase.owner_id == User.id")
@@ -98,6 +99,14 @@ class Purchase(db.Model):
     @property
     def is_transferable(self):
         return self.product.get_attribute("is_transferable")
+
+    @validates("ticket_issued")
+    def validate_ticket_issued(self, _key, issued):
+        if not self.is_paid_for:
+            raise PurchaseStateException(
+                "Ticket cannot be issued for a purchase which hasn't been paid for"
+            )
+        return issued
 
     def set_user(self, user):
         if (
@@ -139,7 +148,7 @@ class Purchase(db.Model):
         if self.state == "cancelled":
             raise PurchaseStateException("{} is already cancelled".format(self))
 
-        if self.state in ["reserved", "payment-pending", "paid", "receipt-emailed"]:
+        if self.state in ["reserved", "payment-pending", "paid"]:
             self.price_tier.return_instances(1)
 
         self.set_state("cancelled")
@@ -148,7 +157,7 @@ class Purchase(db.Model):
         if self.state == "refunded":
             raise PurchaseStateException("{} is already refunded".format(self))
 
-        if self.state in ["reserved", "payment-pending", "paid", "receipt-emailed"]:
+        if self.state in ["reserved", "payment-pending", "paid"]:
             self.price_tier.return_instances(1)
 
         self.state = "refunded"
@@ -169,9 +178,7 @@ class Purchase(db.Model):
             raise PurchaseTransferException("%s does not own this item" % from_user)
 
         # The ticket will need to be re-issued via email
-        if self.state == "receipt-emailed":
-            self.set_state("paid")
-
+        self.ticket_issued = False
         self.owner = to_user
 
         PurchaseTransfer(purchase=self, to_user=to_user, from_user=from_user)
@@ -199,6 +206,10 @@ class AdmissionTicket(Ticket):
         return self.product.get_attribute("is_transferable") and not self.checked_in
 
     def check_in(self):
+        if self.is_paid_for is False:
+            raise CheckinStateException(
+                "Trying to check in a ticket which hasn't been paid for."
+            )
         if self.checked_in is True:
             raise CheckinStateException("Ticket is already checked in.")
         self.checked_in = True
@@ -209,6 +220,10 @@ class AdmissionTicket(Ticket):
         self.checked_in = False
 
     def badge_up(self):
+        if self.is_paid_for is False:
+            raise CheckinStateException(
+                "Trying to issue a badge for a ticket which hasn't been paid for."
+            )
         if self.badge_issued is True:
             raise CheckinStateException("Ticket is already badged up.")
         self.badge_issued = True

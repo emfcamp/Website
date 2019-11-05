@@ -290,7 +290,6 @@ class SendTransferReminder(Command):
 
 class SendTickets(Command):
     def run(self):
-        # We set state to receipt-emailed in attach_tickets
         users_purchase_counts = (
             Purchase.query.filter_by(is_paid_for=True, state="paid")
             .join(PriceTier, Product, ProductGroup)
