@@ -3,6 +3,7 @@ from icalendar import Calendar, Event
 from flask import request, abort, app, Response
 from flask_login import current_user
 
+from models import event_year
 from models.user import User
 from models.site_state import event_start
 from models.cfp import Proposal
@@ -15,7 +16,7 @@ from .data import (
     _convert_time_to_str,
     _get_upcoming,
 )
-from . import schedule, event_year
+from . import schedule
 
 
 def _format_event_description(event):

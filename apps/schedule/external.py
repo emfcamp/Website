@@ -7,12 +7,13 @@ from flask_login import login_required, current_user
 from flask import render_template, redirect, url_for, flash, request, abort
 
 from main import db
+from models import event_year
 from models.ical import CalendarSource, CalendarEvent
 
 from ..common.forms import Form
 from ..common import feature_flag
 
-from . import schedule, event_year
+from . import schedule
 
 
 @schedule.route("/schedule/<int:year>/external/<int:event_id>", methods=["GET", "POST"])

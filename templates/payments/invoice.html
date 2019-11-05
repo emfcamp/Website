@@ -14,7 +14,7 @@
             <div class="navbar-brand">Payment {{ payment.id }}</div>
         </div>
         <ul class="nav navbar-nav">
-            <li><a href="?js=0" class="print-invoice">Print Invoice</a></li>
+            <li><a href="?js=0" class="print-invoice">Print</a></li>
             <li><a href="?pdf=1">Download PDF</a></li>
         </ul>
     </div>
@@ -43,7 +43,7 @@
 
 <div class="sender-row">
   <div class="title">
-    <h2>Invoice</h2>
+    <h2>{% if mode == 'invoice' %}Invoice{% else %}Receipt{% endif %}</h2>
   </div>
 
   <div class="sender">
@@ -58,8 +58,9 @@
       </div>
     </div>
   </div>
-
+  
 <div class="recipient-row">
+{% if mode == 'invoice' %}
   <div class="recipient">
     <div>{{ payment.user.name }}</div>
     {% if payment.user.company %}
@@ -76,12 +77,13 @@
     {% endif %}
     <div>{{ payment.user.email }}</div>
   </div>
+  {% endif %}
 
   <div class="invoice-details">
     <dl class="dl-horizontal">
-      <dt>Invoice date</dt><dd>{{ payment.versions[0].transaction.issued_at.strftime('%d %b %Y') }}</dd>
-      <dt>Invoice number</dt><dd>{{ payment.invoice_number() }}</dd>
-      <dt>VAT number</dt><dd>188170679</dd>
+      <dt>Date</dt><dd>{{ payment.versions[0].transaction.issued_at.strftime('%d %b %Y') }}</dd>
+      <dt>Order number</dt><dd>{{ payment.order_number() }}</dd>
+      {% if mode == 'invoice' %}<dt>VAT number</dt><dd>188170679</dd>{% endif %}
     </dl>
   </div>
 </div>
@@ -174,14 +176,14 @@
 </div>
 {% endif %}
 
-<div>For terms and conditions, see {{ external_url('payments.terms') }}</div>
+<p>For terms and conditions, see {{ external_url('payments.terms') }}</p>
+{% if mode != 'invoice' %}<p><strong>This is not a VAT invoice.</strong></p>{% endif %}
 
 {% endblock %}
 
       </div>
 
       <footer>
-        {# We don't really need this but people expect it, and it hints that it's printable #}
         <dl class="company-info">
           <dt>Company Registration No</dt><dd>07788466</dd>
           <dt>Registered Office</dt><dd>2 Ockendon Mews, London, N1 3JL, United Kingdom</dd>

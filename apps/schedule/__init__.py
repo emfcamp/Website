@@ -24,15 +24,8 @@
 import pytz
 from flask import Blueprint, redirect, url_for
 
-from models import config_date
-
 schedule = Blueprint("schedule", __name__)
 event_tz = pytz.timezone("Europe/London")
-
-
-def event_year():
-    """ Year of the current event """
-    return config_date("EVENT_START").year
 
 
 # The routes below are here to redirect from various ill-thought-through old URL schemes

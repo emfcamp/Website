@@ -9,7 +9,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy_continuum.utils import version_class, transaction_class
 
 from main import db
-from . import export_attr_counts, export_intervals, bucketise
+from . import export_attr_counts, export_intervals, bucketise, event_year
 import models
 from models.site_state import event_start
 
@@ -218,8 +218,9 @@ class Payment(db.Model):
         self.user.payments.append(other)
         return other
 
-    def invoice_number(self):
-        return "WEB-%05d" % self.id
+    def order_number(self):
+        """ Note this is not a VAT invoice number. """
+        return "WEB-%s-%05d" % (event_year(), self.id)
 
     @property
     def expires_in(self):

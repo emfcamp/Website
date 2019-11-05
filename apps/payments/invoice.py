@@ -27,7 +27,7 @@ class InvoiceForm(Form):
     update = SubmitField("Update")
 
 
-@payments.route("/payment/<int:payment_id>/invoice", methods=["GET", "POST"])
+@payments.route("/payment/<int:payment_id>/receipt", methods=["GET", "POST"])
 @login_required
 def invoice(payment_id):
     payment = get_user_payment_or_abort(payment_id, allow_admin=True)
@@ -68,7 +68,6 @@ def invoice(payment_id):
 
     subtotal = ticket_sum + premium
     vat = subtotal * Decimal("0.2")
-    app.logger.debug("Invoice subtotal %s + %s = %s", ticket_sum, premium, subtotal)
 
     # FIXME: we should use a currency-specific quantization here (or rounder numbers)
     if subtotal + vat - payment.amount > Decimal("0.01"):
@@ -82,10 +81,9 @@ def invoice(payment_id):
         flash("Your invoice cannot currently be displayed")
         return redirect(url_for("users.purchases"))
 
-    app.logger.debug("Invoice total: %s + %s = %s", subtotal, vat, payment.amount)
-
     page = render_template(
-        "invoice.html",
+        "payments/invoice.html",
+        mode="receipt",
         payment=payment,
         invoice_lines=invoice_lines,
         form=form,

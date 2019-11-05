@@ -13,6 +13,11 @@ from sqlalchemy.sql.functions import func
 from sqlalchemy_continuum.utils import version_class, transaction_class
 
 
+def event_year():
+    """ Year of the current event """
+    return config_date("EVENT_START").year
+
+
 def exists(query):
     return db.session.query(true()).filter(query.exists()).scalar()
 

@@ -7,9 +7,10 @@ from datetime import time, datetime, timedelta
 from lxml import etree
 
 from main import external_url
+from models import event_year
 from models.site_state import event_start, event_end
 
-from . import event_tz, event_year
+from . import event_tz
 
 
 def get_duration(start_time, end_time):

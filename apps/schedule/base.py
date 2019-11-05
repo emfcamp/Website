@@ -8,6 +8,7 @@ from jinja2.utils import urlize
 from slugify import slugify_unicode as slugify
 
 from main import db
+from models import event_year
 from models.cfp import Proposal
 from models.ical import CalendarSource, CalendarEvent
 from models.user import generate_api_token
@@ -15,7 +16,7 @@ from models.admin_message import AdminMessage
 
 from ..common import feature_flag
 
-from . import schedule, event_year
+from . import schedule
 from .historic import talks_historic, item_historic
 from .data import _get_scheduled_proposals, _get_upcoming, _get_priority_sorted_venues
 
