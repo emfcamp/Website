@@ -16,7 +16,7 @@
         <p>You must have Javascript enabled to use our card payment provider Stripe.
             Please enable Javascript and click below to reload the page.</p>
             <a class="btn btn-primary"
-                href="{{ url_for('payments.stripe_tryagain', payment_id=payment.id) }}">
+                href="{{ url_for('payments.stripe_capture', payment_id=payment.id) }}">
                 Reload page</a>
     </div>
 </noscript>
@@ -33,7 +33,7 @@
     </div>
     <span id="stripe-error" class="help-block"></span>
   </div>
-  <button class="btn btn-default debounce" id="card-pay" disabled="true">Make Payment</button>
+  <button class="btn btn-default" id="card-pay" disabled="true">Make Payment</button>
 </form>
 
 <form method="post" action="{{ url_for('payments.stripe_capture', payment_id=payment.id) }}" id="stripe_capture" class="hidden">
@@ -72,6 +72,7 @@
 
   $('#card-pay').on('click', function(event) {
     event.preventDefault();
+    $('#card-pay').prop('disabled', true);
     stripe.handleCardPayment(
       CLIENT_SECRET,
       cardElement, {
@@ -86,6 +87,7 @@
       if (result.error) {
         $('#stripe-error').text(result.error.message);
         $('#stripe-group').addClass('has-error');
+        $('#card-pay').prop('disabled', false);
       } else {
         $('#stripe_capture').submit();
       }

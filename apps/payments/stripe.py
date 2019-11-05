@@ -52,7 +52,9 @@ def webhook(type=None):
 
 
 def stripe_start(payment):
-    logger.info("Created Stripe payment %s", payment.id)
+    """ This is called by the ticket flow to initialise the payment and
+        redirect to the capture page. We don't need to do anything here."""
+    logger.info("Starting Stripe payment %s", payment.id)
     db.session.commit()
 
     return redirect(url_for("payments.stripe_capture", payment_id=payment.id))
@@ -73,6 +75,7 @@ def stripe_capture(payment_id):
         return redirect(url_for("users.purchases"))
 
     if payment.intent_id is None:
+        # Create the payment intent with Stripe. This intent will persist across retries.
         intent = stripe.PaymentIntent.create(
             amount=payment.amount_int,
             currency=payment.currency.upper(),
@@ -86,7 +89,9 @@ def stripe_capture(payment_id):
         intent = stripe.PaymentIntent.retrieve(payment.intent_id)
 
     logger.info(
-        "Starting checkout for payment %s with intent %s", payment.id, payment.intent_id
+        "Starting checkout for Stripe payment %s with intent %s",
+        payment.id,
+        payment.intent_id,
     )
     return render_template(
         "payments/stripe-checkout.html",
@@ -98,47 +103,15 @@ def stripe_capture(payment_id):
 @payments.route("/pay/stripe/<int:payment_id>/capture", methods=["POST"])
 @login_required
 def stripe_capture_post(payment_id):
+    """ The user is sent here after the payment has succeeded in the browser.
+        We set the payment state to charging, but we're expecting a webhook to
+        set it to "paid" almost immediately.
+    """
     payment = lock_user_payment_or_abort(payment_id, "stripe")
     if payment.state == "new":
-        payment.state = "charged"
+        payment.state = "charging"
         db.session.commit()
     return redirect(url_for(".stripe_waiting", payment_id=payment_id))
-
-
-class StripeChargeAgainForm(Form):
-    tryagain = SubmitField("Try again")
-    cancel = SubmitField("Cancel")
-
-
-@payments.route("/pay/stripe/<int:payment_id>/tryagain", methods=["GET", "POST"])
-@login_required
-def stripe_tryagain(payment_id):
-    payment = lock_user_payment_or_abort(
-        payment_id,
-        "stripe",
-        valid_states=["new", "captured"],  # once it's charging/charged it's too late
-    )
-
-    if not feature_enabled("STRIPE"):
-        logger.warn("Unable to retry payment as Stripe is disabled")
-        flash("Stripe is currently unavailable. Please try again later")
-        return redirect(url_for("users.purchases"))
-
-    if payment.state == "new":
-        return redirect(url_for(".stripe_capture", payment_id=payment.id))
-
-    form = StripeChargeAgainForm()
-    if form.validate_on_submit():
-        if form.tryagain.data:
-            logger.info("Trying to charge payment %s again", payment.id)
-            return redirect(url_for(".stripe_waiting", payment_id=payment.id))
-        elif form.cancel.data:
-            payment.cancel()
-            db.session.commit()
-            flash("Your payment has been cancelled. Please place your order again.")
-            return redirect(url_for("tickets.main"))
-
-    return render_template("payments/stripe-tryagain.html", payment=payment, form=form)
 
 
 class StripeCancelForm(Form):
@@ -171,7 +144,7 @@ def stripe_cancel(payment_id):
 @login_required
 def stripe_waiting(payment_id):
     payment = get_user_payment_or_abort(
-        payment_id, "stripe", valid_states=["charged", "paid"]
+        payment_id, "stripe", valid_states=["charging", "paid"]
     )
     return render_template(
         "payments/stripe-waiting.html",
@@ -230,7 +203,11 @@ def stripe_webhook():
             request.headers["STRIPE_SIGNATURE"],
             app.config.get("STRIPE_WEBHOOK_KEY"),
         )
-    except (ValueError, stripe.error.SignatureVerificationError):
+    except ValueError:
+        logger.exception("Error decoding Stripe webhook")
+        abort(400)
+    except stripe.error.SignatureVerificationError:
+        logger.exception("Error verifying Stripe webhook signature")
         abort(400)
 
     try:
@@ -363,9 +340,6 @@ def stripe_payment_refunded(payment: StripePayment):
 def stripe_payment_failed(payment):
     # Stripe payments almost always fail during capture, but can be failed while charging.
     # Test with 4000 0000 0000 0341
-    if payment.state == "failed":
-        return
-
     if payment.state == "partrefunded":
         logger.error("Payment is already partially refunded, so cannot be failed")
         raise StripeUpdateConflict()

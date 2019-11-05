@@ -169,7 +169,7 @@
   {% elif payment.provider == 'gocardless' and payment.state != 'inprogress' %}
   <div>Payment to be made online at {{ external_url('payments.gocardless_tryagain', payment_id=payment.id) }}</div>
   {% elif payment.provider == 'stripe' %}
-  <div>Payment to be made online at {{ external_url('payments.stripe_tryagain', payment_id=payment.id) }}</div>
+  <div>Payment to be made online at {{ external_url('payments.stripe_capture', payment_id=payment.id) }}</div>
   {% endif %}
 </div>
 {% endif %}

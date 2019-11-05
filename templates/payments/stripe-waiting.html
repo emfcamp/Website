@@ -14,9 +14,9 @@
 
     {% else %}
     <p>Your Stripe payment for {{ payment.amount | price(payment.currency) }}
-       has been set up and your order will be reserved {% if payment.expires -%} until {{ payment.expires.strftime('%-d %B %Y') }}{% endif %}
-       to allow for your payment to arrive.
-       We will email you when the transaction has been completed.</p>
+       has been accepted and your order has been reserved {% if payment.expires -%} until {{ payment.expires.strftime('%-d %B %Y') }}{% endif %}
+       to allow for confirmation to arrive.
+       We'll email you with a confirmation when the transaction has been completed.</p>
     {% endif %}
 
     {% if SITE_STATE != 'after-event' %}

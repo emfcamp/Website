@@ -24,12 +24,8 @@
           <a href="{{ url_for('payments.gocardless_tryagain', payment_id=p.id) }}" class="btn btn-success">Pay</a>
           {%- elif p.state == "failed" and p.provider == "gocardless" %}
           <a href="{{ url_for('payments.gocardless_tryagain', payment_id=p.id) }}" class="btn btn-success">Try again</a>
-          {%- elif p.state == "new" and p.provider == "stripe" %}
-          <a href="{{ url_for('payments.stripe_tryagain', payment_id=p.id) }}" class="btn btn-success">Pay</a>
-          {%- elif p.state == "captured" and p.provider == "stripe" %}
-          <a href="{{ url_for('payments.stripe_tryagain', payment_id=p.id) }}" class="btn btn-success">Charge</a>
-          {%- elif p.state == "failed" and p.provider == "stripe" %}
-          <a href="{{ url_for('payments.stripe_tryagain', payment_id=p.id) }}" class="btn btn-success">Try again</a>
+          {%- elif p.state in ["new", "failed"] and p.provider == "stripe" %}
+          <a href="{{ url_for('payments.stripe_capture', payment_id=p.id) }}" class="btn btn-success">Pay</a>
           {% endif -%}
 
           {%- if p.state in ["new", "failed"] and p.provider == "gocardless" %}
