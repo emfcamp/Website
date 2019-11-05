@@ -33,6 +33,9 @@ class Payment(db.Model):
     reminder_sent = db.Column(db.Boolean, nullable=False, default=False)
     expires = db.Column(db.DateTime, nullable=True)
 
+    # VAT invoice number, if issued
+    vat_invoice_number = db.Column(db.Integer, nullable=True)
+
     refunds = db.relationship("Refund", backref="payment", cascade="all")
     purchases = db.relationship("Purchase", backref="payment", cascade="all")
     refund_requests = db.relationship(
@@ -221,6 +224,25 @@ class Payment(db.Model):
     def order_number(self):
         """ Note this is not a VAT invoice number. """
         return "WEB-%s-%05d" % (event_year(), self.id)
+
+    def issue_vat_invoice_number(self):
+        if not self.vat_invoice_number:
+            sequence_name = "vat_invoice"
+            try:
+                seq = (
+                    PaymentSequence.query.filter_by(name=sequence_name)
+                    .with_for_update()
+                    .one()
+                )
+                seq.value += 1
+            except NoResultFound:
+                seq = PaymentSequence()
+                seq.name = sequence_name
+                seq.value = 1
+                db.session.add(seq)
+
+            self.vat_invoice_number = seq.value
+        return "WEBV-%s-%05d" % (event_year(), self.vat_invoice_number)
 
     @property
     def expires_in(self):
@@ -524,3 +546,12 @@ class RefundRequest(db.Model):
     bank = db.Column(db.String)
     account = db.Column(db.String)
     note = db.Column(db.String)
+
+
+class PaymentSequence(db.Model):
+    """ Table for storing sequence numbers.
+        Currently used for storing VAT invoice sequences, which must be monotonic.
+    """
+
+    name = db.Column(db.String, primary_key=True)
+    value = db.Column(db.Integer, nullable=False)

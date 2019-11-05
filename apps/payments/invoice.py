@@ -1,4 +1,7 @@
 from decimal import Decimal
+import logging
+import shutil
+import os.path
 
 from flask import (
     current_app as app,
@@ -21,6 +24,8 @@ from ..common.forms import Form
 from . import get_user_payment_or_abort
 from . import payments
 
+logger = logging.getLogger(__name__)
+
 
 class InvoiceForm(Form):
     company = TextAreaField("Company name")
@@ -36,6 +41,7 @@ def invoice(payment_id):
 
     if form.validate_on_submit():
         current_user.company = form.company.data
+        payment.issue_vat_invoice_number()
         db.session.commit()
 
         flash("Company name updated")
@@ -81,9 +87,16 @@ def invoice(payment_id):
         flash("Your invoice cannot currently be displayed")
         return redirect(url_for("users.purchases"))
 
+    if payment.vat_invoice_number:
+        mode = "invoice"
+        invoice_number = payment.issue_vat_invoice_number()
+    else:
+        mode = "receipt"
+        invoice_number = None
+
     page = render_template(
         "payments/invoice.html",
-        mode="receipt",
+        mode=mode,
         payment=payment,
         invoice_lines=invoice_lines,
         form=form,
@@ -91,12 +104,26 @@ def invoice(payment_id):
         subtotal=subtotal,
         vat=vat,
         edit_company=edit_company,
+        invoice_number=invoice_number,
     )
 
+    url = external_url(".invoice", payment_id=payment_id)
+
     if request.args.get("pdf"):
-        url = external_url(".invoice", payment_id=payment_id)
         return send_file(
             render_pdf(url, page), mimetype="application/pdf", cache_timeout=60
         )
+
+    if mode == "invoice":
+        invoice_dir = "/vat_invoices"
+        if not os.path.exists(invoice_dir):
+            logger.warn(
+                "Not exporting VAT invoice as directory (%s) does not exist",
+                invoice_dir,
+            )
+            return page
+
+        with open(os.path.join(invoice_dir, f"{invoice_number}.pdf"), "wb") as f:
+            shutil.copyfileobj(render_pdf(url, page), f)
 
     return page

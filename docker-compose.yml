@@ -9,6 +9,7 @@ services:
       - postgres
     volumes:
       - .:/app
+      - ./var/vat_invoices:/vat_invoices
     ports:
       - "5000:5000"
     environment:

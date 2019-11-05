@@ -8,6 +8,7 @@ services:
       - "127.0.0.1:8000:8000"
     volumes:
       - /etc/emf-site.cfg:/app/config/production.cfg
+      - /var/lib/emf_vat_invoices:/vat_invoices
     environment:
       SETTINGS_FILE: ./config/production.cfg
       PROMETHEUS_MULTIPROC_DIR: /var/prometheus

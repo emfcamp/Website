@@ -1,22 +1,15 @@
 # coding=utf-8
 from __future__ import division, absolute_import, print_function, unicode_literals
 import io
-import os
-import tempfile
-import shutil
 from lxml import etree
 import asyncio
-from urllib.parse import urljoin
 
 from flask import Markup, render_template, current_app as app
-from pyppeteer.browser import Browser
-from pyppeteer.connection import Connection
 from pyppeteer.launcher import launch
 import qrcode
 from qrcode.image.svg import SvgPathImage
 import barcode
 from barcode.writer import ImageWriter, SVGWriter
-import requests
 
 from main import external_url
 from models.product import Product, ProductGroup, PriceTier
@@ -72,22 +65,14 @@ def render_pdf(url, html):
     # you're running a dev server, use app.run(processes=2)
 
     async def to_pdf():
-        if app.config.get("CHROME_URL"):
-            version_url = urljoin(app.config["CHROME_URL"], "json/version")
-            data = requests.get(version_url).json()
-            con = Connection(data["webSocketDebuggerUrl"])
-            browser = await Browser.create(con)
-
-        else:
-            chrome_dir = "var/pyppeteer"
-            if not os.path.exists(chrome_dir):
-                os.mkdir(chrome_dir)
-
-            tmp_chrome_dir = tempfile.mkdtemp(dir=chrome_dir)
-            browser = await launch(
-                executablePath="google-chrome", userDataDir=tmp_chrome_dir
-            )
-
+        browser = await launch(
+            # Handlers don't work as we're not in the main thread.
+            handleSIGINT=False,
+            handleSIGTERM=False,
+            handleSIGHUP=False,
+            # --no-sandbox is necessary as we're running as root (in docker!)
+            args=["--no-sandbox"],
+        )
         page = await browser.newPage()
 
         async def request_intercepted(request):
@@ -103,10 +88,6 @@ def render_pdf(url, html):
         await page.goto(url)
         pdf = await page.pdf(format="A4")
         await browser.close()
-
-        if not app.config.get("CHROME_URL"):
-            shutil.rmtree(tmp_chrome_dir)
-
         return pdf
 
     loop = asyncio.new_event_loop()

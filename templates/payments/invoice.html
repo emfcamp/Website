@@ -16,6 +16,7 @@
         <ul class="nav navbar-nav">
             <li><a href="?js=0" class="print-invoice">Print</a></li>
             <li><a href="?pdf=1">Download PDF</a></li>
+            <li><a href="#" id="vat-invoice">VAT Invoice</a></li>
         </ul>
     </div>
 </nav>
@@ -23,8 +24,10 @@
 <div class="top-form">
     <form method="post" action="{{ url_for('.invoice', payment_id=payment.id) }}"
             id="edit-company" class="form {% if not edit_company -%} hidden {%- endif %}">
+      <p>Please enter your company name and address to generate a VAT invoice.
+          By requesting a VAT invoice, your data will be stored for six years in accordance with UK law.</p>
         {{ form.hidden_tag() }}
-        {{ form.company(class_="form-control", placeholder="Company name") }}
+        {{ form.company(class_="form-control", placeholder="Company name and address") }}
         {{ form.update(class_="btn btn-info debounce") }}
     </form>
 </div>
@@ -43,7 +46,7 @@
 
 <div class="sender-row">
   <div class="title">
-    <h2>{% if mode == 'invoice' %}Invoice{% else %}Receipt{% endif %}</h2>
+    <h2>{% if mode == 'invoice' %}VAT Invoice{% else %}Receipt{% endif %}</h2>
   </div>
 
   <div class="sender">
@@ -82,8 +85,11 @@
   <div class="invoice-details">
     <dl class="dl-horizontal">
       <dt>Date</dt><dd>{{ payment.versions[0].transaction.issued_at.strftime('%d %b %Y') }}</dd>
-      <dt>Order number</dt><dd>{{ payment.order_number() }}</dd>
-      {% if mode == 'invoice' %}<dt>VAT number</dt><dd>188170679</dd>{% endif %}
+      {% if mode != 'invoice' %}<dt>Order number</dt><dd>{{ payment.order_number() }}</dd>{% endif %}
+      {% if mode == 'invoice' %}
+        <dt>Invoice number</dt><dd>{{invoice_number}}</dd>
+        <dt>VAT number</dt><dd>188170679</dd>
+      {% endif %}
     </dl>
   </div>
 </div>
@@ -197,7 +203,7 @@
 {% block foot %}
 <script type="text/javascript">
 $(function() {
-  $('.edit-company-link').on('click', function(e) {
+  $('#vat-invoice').on('click', function(e) {
       $('#edit-company').removeClass('hidden').on('keydown', function(e) {
         if (e.keyCode == 27) {
             $('#edit-company').addClass('hidden');
