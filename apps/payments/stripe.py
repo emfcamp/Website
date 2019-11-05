@@ -229,13 +229,13 @@ def stripe_webhook():
 
 
 @webhook()
-def stripe_default(type, obj_data):
-    # We can fetch events with Event.all for 30 days
+def stripe_default(_type, _obj):
+    """ Default webhook handler """
     return ("", 200)
 
 
 @webhook("ping")
-def stripe_ping(type, ping_data):
+def stripe_ping(_type, _obj):
     return ("", 200)
 
 
@@ -250,19 +250,18 @@ def stripe_update_payment(payment: StripePayment, intent: stripe.PaymentIntent =
         # Intent does not have a charge (yet?), do nothing
         return
     elif len(intent.charges) > 1:
-        app.logger.error(f"Payment intent #{intent['id']} has more than one charge")
-        raise StripeUpdateUnexpected()
+        raise StripeUpdateUnexpected(
+            f"Payment intent #{intent['id']} has more than one charge"
+        )
 
     charge = intent.charges.data[0]
 
-    if payment.charge_id is None:
-        payment.charge_id = charge["id"]
-
-    if payment.charge_id != charge["id"]:
-        app.logger.error(
-            f"Charge ID for intent #{intent['id']} has changed from #{payment.charge_id} to #{charge['id']}"
+    if payment.charge_id is not None and payment.charge_id != charge["id"]:
+        logging.warn(
+            f"Charge ID for intent {intent['id']} has changed from {payment.charge_id} to {charge['id']}"
         )
-        raise StripeUpdateUnexpected()
+
+    payment.charge_id = charge["id"]
 
     if charge.refunded:
         return stripe_payment_refunded(payment)
@@ -271,8 +270,7 @@ def stripe_update_payment(payment: StripePayment, intent: stripe.PaymentIntent =
     elif charge.status == "failed":
         return stripe_payment_failed(payment)
 
-    app.logger.error("Charge object is not paid, refunded or failed")
-    raise StripeUpdateUnexpected()
+    raise StripeUpdateUnexpected("Charge object is not paid, refunded or failed")
 
 
 def stripe_payment_paid(payment: StripePayment):
@@ -352,7 +350,7 @@ def stripe_payment_failed(payment):
     # to set the payment state to failed here.
 
 
-def lock_payment_or_abort(intent_id):
+def lock_payment_or_abort_by_intent(intent_id):
     try:
         return (
             StripePayment.query.filter_by(intent_id=intent_id).with_for_update().one()
@@ -362,15 +360,28 @@ def lock_payment_or_abort(intent_id):
         abort(409)
 
 
+def lock_payment_or_abort_by_charge(charge_id):
+    try:
+        return (
+            StripePayment.query.filter_by(charge_id=charge_id).with_for_update().one()
+        )
+    except NoResultFound:
+        logger.error("Payment for charge %s not found", charge_id)
+        abort(409)
+
+
 @webhook("payment_intent.canceled")
 @webhook("payment_intent.created")
 @webhook("payment_intent.payment_failed")
 @webhook("payment_intent.succeeded")
-def stripe_payment_intent_updated(type, intent):
-    payment = lock_payment_or_abort(intent.id)
+def stripe_payment_intent_updated(hook_type, intent):
+    payment = lock_payment_or_abort_by_intent(intent.id)
 
     logger.info(
-        "Received %s message for intent %s, payment %s", type, intent.id, payment.id
+        "Received %s message for intent %s, payment %s",
+        hook_type,
+        intent.id,
+        payment.id,
     )
 
     try:
@@ -379,5 +390,28 @@ def stripe_payment_intent_updated(type, intent):
         abort(409)
     except StripeUpdateUnexpected:
         abort(501)
+
+    return ("", 200)
+
+
+@webhook("charge.refunded")
+def stripe_charge_refunded(_type, charge):
+    payment = lock_payment_or_abort_by_charge(charge.id)
+
+    logger.info(
+        "Received charge.refunded message for charge %s, payment %s",
+        charge.id,
+        payment.id,
+    )
+
+    if charge.amount == charge.amount_refunded:
+        # Full refund
+        stripe_payment_refunded(payment)
+    else:
+        # Part refund
+        # TODO: Handle part-refunds better?
+        logger.warn(
+            "Payment part-refunded for charge %s, payment %s. Not making changes."
+        )
 
     return ("", 200)
