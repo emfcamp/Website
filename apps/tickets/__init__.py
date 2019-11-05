@@ -156,7 +156,7 @@ def main(flow=None):
     elif not current_user.is_anonymous and current_user.has_permission("admin"):
         pass
     else:
-        return render_template("tickets-cutoff.html")
+        return render_template("tickets/cutoff.html")
 
     tiers = OrderedDict()
     products = (
@@ -362,7 +362,7 @@ def main(flow=None):
 
     form.currency_code.data = get_user_currency()
     return render_template(
-        "tickets-choose.html", form=form, flow=flow, view=view, available=available
+        "tickets/choose.html", form=form, flow=flow, view=view, available=available
     )
 
 
@@ -509,7 +509,7 @@ def pay(flow=None):
     form.basket_total.data = basket.total
 
     return render_template(
-        "payment-choose.html",
+        "tickets/payment-choose.html",
         form=form,
         basket=basket,
         total=basket.total,
@@ -602,7 +602,7 @@ def transfer(ticket_id):
         flash("Your ticket was transferred.")
         return redirect(url_for("users.purchases"))
 
-    return render_template("ticket-transfer.html", ticket=ticket, form=form)
+    return render_template("tickets/transfer.html", ticket=ticket, form=form)
 
 
 @tickets.route("/tickets/receipt")

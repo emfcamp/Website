@@ -3,34 +3,7 @@
 {% block title %}Choose Payment{% endblock %}
 {% block body %}
 
-    {% if view.type == 'tickets' %}
-    You've selected the following {% if basket.purchases|count == 1 %}ticket{% else %}
-    {{ basket.purchases|count }} tickets{% endif %}:
-    {% else %}
-    You've selected the following {% if basket.purchases|count == 1 %}item{% else %}
-    {{ basket.purchases|count }} items{% endif %}:
-    {% endif %}
-    <ul>
-        {% for purchase in basket.purchases %}
-        <li>{{purchase.price_tier.parent.display_name}}</li>
-        {% endfor %}
-    </ul>
-    <p>The total price is <b>{{ basket.total | price(user_currency) }}</b>.
-    If this isn't right, you can:</p>
-    <form method="post">
-    {{ form.hidden_tag() }}
-    <div class="btn-group" role="group">
-        {% if flow == 'main' %}
-        <a class="btn btn-default" href="{{url_for('tickets.tickets_clear')}}">Empty basket</a>
-        <a class="btn btn-default" href="{{url_for('tickets.main')}}">Add more tickets</a>
-        {% else %}
-        <a class="btn btn-default" href="{{url_for('tickets.tickets_clear', flow=flow)}}">Empty basket</a>
-        <a class="btn btn-default" href="{{url_for('tickets.main', flow=flow)}}">Change items</a>
-        {% endif %}
-        <button name="change_currency" value="{% if user_currency == 'GBP' %}EUR{% else %}GBP{% endif %}"
-            class="btn btn-default">Pay in {% if user_currency == 'GBP' %}Euros (€){% else %}Pounds (£){% endif %}</button>
-    </div>
-</form>
+{% include "tickets/_basket.html" %}
 
 <form method="post" class="pay-method">
 {{ form.hidden_tag() }}
@@ -48,7 +21,7 @@
   {% endif %}
 
   {% if basket.requires_shipping %}
-  {% include "user-shipping.html" %}
+  {% include "tickets/_shipping.html" %}
   {% else %}
   {% include "user-signup.html" %}
   {% endif %}
