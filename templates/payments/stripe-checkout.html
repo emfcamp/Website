@@ -7,7 +7,8 @@
 <h2>Card Payment Details</h2>
 
 <div class="well" id="payment-info">
-  Please enter your card details below to complete your order for <strong>{{ payment.amount | price(payment.currency) }}</strong>.<br>
+  Please enter your card details below to complete your order for 
+  <strong>{{ payment.amount | price(payment.currency) }}</strong>.<br>
   <small>Your card details are processed securely by Stripe and are not handled or stored by EMF.</small>
 </div>
 
@@ -33,7 +34,7 @@
     </div>
     <span id="stripe-error" class="help-block"></span>
   </div>
-  <button class="btn btn-default" id="card-pay" disabled="true">Make Payment</button>
+  <button class="btn btn-default" id="stripe-pay" disabled="true">Make Payment</button>
 </form>
 
 <form method="post" action="{{ url_for('payments.stripe_capture', payment_id=payment.id) }}" id="stripe_capture" class="hidden">
@@ -48,50 +49,68 @@
 <script type="text/javascript">
   var PUBLIC_KEY = {{ config['STRIPE_PUBLIC_KEY']|tojson }};
   var CLIENT_SECRET = {{ client_secret|tojson }};
+  var EMAIL = {{ current_user.email|tojson }};
+  var METHOD = 'card';
 
   var stripe = Stripe(PUBLIC_KEY);
   var elements = stripe.elements();
-  var cardElement = elements.create('card');
 
-  cardElement.on('change', function(event) {
-    if (event.error) {
-      $('#stripe-error').text(event.error.message);
+  var pay_button = $('#stripe-pay');
+
+  function set_error(error) {
+    if (error) {
+      $('#stripe-error').text(error);
       $('#stripe-group').addClass('has-error');
+      pay_button.prop('disabled', true);
     } else {
-      $('#stripe-error').text('');
+      $('#stripe-error').text("");
       $('#stripe-group').removeClass('has-error');
+    }
+  }
+
+  function stripe_validate(event) {
+    if (event.error) {
+      set_error(event.error.message);
+    } else {
+      set_error('');
     }
 
     if (event.complete) {
-      $('#card-pay').prop('disabled', false);
+      pay_button.prop('disabled', false);
     } else {
-      $('#card-pay').prop('disabled', true);
+      pay_button.prop('disabled', true);
     }
-  });
-  cardElement.mount('#stripe-card');
+  }
 
-  $('#card-pay').on('click', function(event) {
-    event.preventDefault();
-    $('#card-pay').prop('disabled', true);
-    stripe.handleCardPayment(
-      CLIENT_SECRET,
-      cardElement, {
-        payment_method_data: {
-          billing_details: {
-            name: $('#cardholder-name').val(),
-            email: {{current_user.email|tojson}}
+
+  if (METHOD == 'card') {
+    var cardElement = elements.create('card');
+
+    cardElement.on('change', stripe_validate);
+    cardElement.mount('#stripe-card');
+
+    pay_button.on('click', function(event) {
+      event.preventDefault();
+      pay_button.prop('disabled', true);
+      stripe.confirmCardPayment(
+        CLIENT_SECRET,
+        {
+          payment_method: {
+            card: cardElement,
+            billing_details: {
+              name: $('#cardholder-name').val(),
+              email: EMAIL
+            }
           }
         }
-      }
-    ).then(function(result) {
-      if (result.error) {
-        $('#stripe-error').text(result.error.message);
-        $('#stripe-group').addClass('has-error');
-        $('#card-pay').prop('disabled', false);
-      } else {
-        $('#stripe_capture').submit();
-      }
-    })
-  });
+      ).then(function(result) {
+        if (result.error) {
+          set_error(result.error.message);
+        } else {
+          $('#stripe_capture').submit();
+        }
+      })
+    });
+  }
 </script>
 {% endblock -%}

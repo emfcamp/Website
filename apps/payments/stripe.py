@@ -3,6 +3,10 @@
     This takes credit card payments using Stripe's
     [Payment Intents](https://stripe.com/docs/payments/payment-intents) API.
 
+    In theory we could use this handler to take payments for other methods which
+    Stripe supports, such as iDEAL. However, Payment Intents doesn't support these
+    (as of Nov 2019), so it would involve using a different flow which would
+    complicate this code.
 """
 import logging
 
