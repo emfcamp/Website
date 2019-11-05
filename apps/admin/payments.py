@@ -398,7 +398,7 @@ def refund(payment_id):
 
             if form.stripe_refund.data:
                 app.logger.info("Refunding using Stripe")
-                charge = stripe.Charge.retrieve(payment.chargeid)
+                charge = stripe.Charge.retrieve(payment.charge_id)
 
                 if charge.refunded:
                     # This happened unexpectedly - send the email as usual
@@ -457,7 +457,7 @@ def refund(payment_id):
             if form.stripe_refund.data:
                 try:
                     stripe_refund = stripe.Refund.create(
-                        charge=payment.chargeid, amount=refund.amount_int
+                        charge=payment.charge_id, amount=refund.amount_int
                     )
 
                 except Exception as e:
