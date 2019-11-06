@@ -12,8 +12,7 @@ RUN apt-get update && \
 COPY . /app/
 WORKDIR /app
 
-RUN pipenv sync
-RUN pipenv run pyppeteer-install
+RUN pipenv sync && pipenv run pyppeteer-install && mkdir /var/prometheus
 
 ENV SHELL=/bin/bash
 ENTRYPOINT ["./docker/prod_entrypoint.sh"]
