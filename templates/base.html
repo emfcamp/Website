@@ -20,6 +20,9 @@
             <script src="//oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
         <link rel="shortcut icon" href="/favicon.ico">
+        {# Set the canonical URL to the base URL without parameters.
+           We shouldn't be using parameters for anything important. #}
+        <link rel="canonical" href="{{request.base_url}}">
     </head>
 <body itemscope itemtype="http://schema.org/WebPage">
 {% block document %}
