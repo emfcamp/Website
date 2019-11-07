@@ -1,0 +1,88 @@
+/**
+ * Gulpfile for building static assets.
+ *
+ * This handles JS/CSS transpilation, minification, and other such
+ * horrors. While it would be nice to do this in Python, it's just
+ * not practical any more, so here we embrace the JS, god help us all.
+ */
+
+// Gulp and core plugins
+const gulp = require('gulp');
+const sourcemaps = require('gulp-sourcemaps');
+const rename = require('gulp-rename');
+const util = require('gulp-util');
+const gulpif = require('gulp-if');
+const buffer = require('gulp-buffer');
+const tap = require('gulp-tap');
+const log = require('gulplog');
+
+// JS processors
+const browserify = require('browserify');
+const uglify = require('gulp-uglify');
+
+// CSS processors
+const postcss = require('gulp-postcss');
+const postcssPresetEnv = require('postcss-preset-env');
+const sass = require('gulp-sass');
+const cleancss = require('gulp-clean-css');
+
+const production = !!util.env.production;
+
+function js(cb) {
+  gulp
+    .src([
+      'js/main.js',
+      'js/line-up.js',
+      'js/schedule.js',
+      'js/volunteer-schedule.js',
+    ])
+    .pipe(
+      tap(function(file) {
+        log.info('Bundling ' + file.path);
+        file.contents = browserify(file.path, {debug: true})
+          .transform('babelify', {presets: ['@babel/env']})
+          .bundle();
+      }),
+    )
+    .pipe(buffer())
+    .pipe(gulpif(!production, sourcemaps.init({loadMaps: true})))
+    .pipe(gulpif(production, uglify()))
+    .pipe(gulpif(!production, sourcemaps.write()))
+    .pipe(gulp.dest('static/js/'));
+  cb();
+}
+
+function css(cb) {
+  gulp
+    .src([
+      'css/admin.scss',
+      'css/arrivals.scss',
+      'css/invoice.scss',
+      'css/main.scss',
+      'css/receipt.scss',
+      'css/schedule.scss',
+      'css/volunteer_schedule.scss',
+    ])
+    .pipe(gulpif(!production, sourcemaps.init()))
+    .pipe(
+      postcss([require('postcss-easy-import'), postcssPresetEnv()], {
+        syntax: require('postcss-scss'),
+      }),
+    )
+    .pipe(sass().on('error', sass.logError))
+    .pipe(gulpif(production, cleancss()))
+    .pipe(rename({extname: '.css'}))
+    .pipe(gulpif(!production, sourcemaps.write()))
+    .pipe(gulp.dest('static/css'));
+  cb();
+}
+
+function watch() {
+  gulp.watch('css/*.scss', {ignoreInitial: false}, css);
+  gulp.watch('js/*.js', {ignoreInitial: false}, js);
+}
+
+exports.js = js;
+exports.css = css;
+exports.watch = watch;
+exports.default = gulp.parallel(css, js);

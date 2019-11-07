@@ -104,13 +104,15 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# ignore vscode settings
+.vscode
+
 *.DS_Store
 var/*.db
 var/*.ofx
 var/*.log
 var/prometheus
 static/.webassets-cache/
-static/gen
 config/live.cfg*
 .inside-vagrant
 .vagrant
@@ -118,6 +120,7 @@ utils/databases.cfg
 .cache/
 exports/*/private
 .com.apple.timemachine.supported
-
-# ignore vscode settings
-.vscode
+node_modules
+# Compiled JS and CSS
+static/js
+static/css

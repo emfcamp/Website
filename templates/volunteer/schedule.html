@@ -151,9 +151,7 @@
       </div>
     {% endfor %}
 
-    {% assets "js_volunteer_schedule" -%}
-        <script src="{{ ASSET_URL }}"></script>
-    {% endassets -%}
+    <script src="{{ static_url_for('static', filename='js/volunteer_schedule.js') }}"></script>
     <script type="text/javascript">
         var csrf_token = "{{ csrf_token() }}";
 

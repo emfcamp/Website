@@ -3,9 +3,7 @@
 {% extends 'base.html' %}
 
 {% block css %}
-{% assets "css_receipt" -%}
-<link rel="stylesheet" href="{{ ASSET_URL }}">
-{% endassets -%}
+<link rel="stylesheet" href="{{ static_url_for('static', filename='css/receipt.css') }}">
 {% endblock %}
 
 {% block document %}

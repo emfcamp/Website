@@ -1,9 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Schedule{% endblock %}
 {% block head %}
-    {% assets 'css_schedule' %}
-    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
-    {% endassets %}
+    <link rel="stylesheet" type="text/css" href="{{ static_url_for('static', filename='css/schedule.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dhtmlxscheduler_flat.css' ) }}">
 {% endblock %}
 {% block document %}
@@ -170,9 +168,7 @@ document.getElementById('enable-javascript').style.display = 'none';
 {% block foot %}
     <script src="{{ url_for('static', filename='js/dhtmlx_scheduler.js') }}"></script>
     <script src="{{ url_for('static', filename='js/dhtmlxscheduler_all_timed.js') }}"></script>
-    {% assets "js_schedule" -%}
-        <script src="{{ ASSET_URL }}"></script>
-    {% endassets -%}
+    <script src="{{ static_url_for('static', filename='js/schedule.js') }}"></script>
     <script>
         $('#filter_modal_btn').show();
         $('#scheduler_here').show();

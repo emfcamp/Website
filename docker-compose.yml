@@ -15,6 +15,12 @@ services:
     environment:
       SETTINGS_FILE: ./config/development.cfg
 
+  gulp:
+    build:
+      context: "./docker/gulp"
+    volumes:
+      - .:/app
+
   postgres:
     image: 'mdillon/postgis:10'
     networks:

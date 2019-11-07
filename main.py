@@ -15,8 +15,7 @@ from sqlalchemy import MetaData
 from sqlalchemy_continuum import make_versioned
 from sqlalchemy_continuum.manager import VersioningManager
 from sqlalchemy_continuum.plugins import FlaskPlugin
-from flask_assets import Environment, Bundle
-from webassets.filter import get_filter
+from flask_static_digest import FlaskStaticDigest
 from flask_cdn import CDN
 from flask_caching import Cache
 from flask_debugtoolbar import DebugToolbarExtension
@@ -62,47 +61,10 @@ make_versioned(manager=manager, plugins=[FlaskPlugin()])
 mail = Mail()
 cdn = CDN()
 login_manager = LoginManager()
-assets = Environment()
+static_digest = FlaskStaticDigest()
 toolbar = DebugToolbarExtension()
 gocardless_client = None
 volunteer_admin = None
-
-
-pyscss = get_filter('pyscss', style='compressed')
-assets.register('css_main', Bundle('css/main.scss',
-                output='gen/main-packed.css',
-                depends='css/*.scss',
-                filters=pyscss))
-assets.register('css_admin', Bundle('css/admin.scss',
-                output='gen/admin-packed.css',
-                depends='css/*.scss',
-                filters=pyscss))
-assets.register('css_volunteer', Bundle('css/volunteer.scss',
-                output='gen/volunteer-packed.css',
-                depends='css/*.scss',
-                filters=pyscss))
-assets.register('css_invoice', Bundle('css/invoice.scss',
-                output='gen/invoice-packed.css',
-                depends='css/*.scss',
-                filters=pyscss))
-assets.register('css_receipt', Bundle('css/receipt.scss',
-                output='gen/receipt-packed.css',
-                depends='css/*.scss',
-                filters=pyscss))
-assets.register('css_schedule', Bundle('css/schedule.scss',
-                output='gen/schedule-packed.css',
-                depends='css/*.scss',
-                filters=pyscss))
-assets.register('css_arrivals', Bundle('css/arrivals.scss',
-                output='gen/arrivals-packed.css',
-                depends='css/*.scss',
-                filters=pyscss))
-assets.register('js_main', Bundle('js/main.js', 'js/line-up.js',
-                output='gen/main-packed.js', filters='jsmin'))
-assets.register('js_schedule', Bundle('js/schedule.js',
-                output='gen/schedule-packed.js', filters='jsmin'))
-assets.register('js_volunteer_schedule', Bundle('js/volunteer-schedule.js',
-                output='gen/schedule-packed.js', filters='jsmin'))
 
 
 def create_app(dev_server=False):
@@ -137,7 +99,7 @@ def create_app(dev_server=False):
         request_total.labels(request.endpoint, request.method, response.status_code).inc()
         return response
 
-    for extension in (cdn, csrf, cache, db, mail, assets, toolbar):
+    for extension in (cdn, csrf, cache, db, mail, static_digest, toolbar):
         extension.init_app(app)
 
     def log_email(message, app):
