@@ -3,8 +3,8 @@ from datetime import datetime
 import json
 import os.path
 
-from main import db, mail, external_url
-from flask import session, render_template, abort, current_app as app, request, Markup
+from main import db, mail, external_url, static_digest
+from flask import session, render_template, abort, current_app as app, request, Markup, g
 from flask.json import jsonify
 from flask_login import login_user, current_user
 from werkzeug import BaseResponse
@@ -84,6 +84,41 @@ def load_utility_functions(app_obj):
     def now_processor():
         now = datetime.utcnow()
         return {"year": now.year}
+
+    @app_obj.context_processor
+    def static_url_for_processor():
+        """ Intercept static_url_for calls and store them in the
+            request context to allow preload header to be added for HTTP/2 push.
+        """
+        def static_url_for(endpoint, **values):
+            if 'static_urls' not in g:
+                g.static_urls = []
+            g.static_urls.append((endpoint, values))
+            return static_digest.static_url_for(endpoint, **values)
+        return {"static_url_for": static_url_for}
+
+    @app_obj.after_request
+    def static_urls_to_preload(response):
+        """ Collect static URLs and send in Link header for preloading/HTTP/2 push """
+        if 'static_urls' not in g:
+            return response
+
+        links = []
+        for u in g.static_urls:
+            url = '/' + u[0] + '/' + u[1]['filename']
+            if url.endswith('.css'):
+                link_as = 'style'
+            elif url.endswith('.js'):
+                link_as = 'script'
+            else:
+                continue
+
+            links.append(f"<{url}>; as={link_as}; rel=preload")
+
+        if len(links) > 0:
+            response.headers.add("Link", ", ".join(links))
+
+        return response
 
     @app_obj.context_processor
     def event_date_processor():
