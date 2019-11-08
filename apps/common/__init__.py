@@ -102,8 +102,9 @@ def load_utility_functions(app_obj):
         def static_url_for(endpoint, **values):
             if "static_urls" not in g:
                 g.static_urls = []
-            g.static_urls.append((endpoint, values))
-            return static_digest.static_url_for(endpoint, **values)
+            result = static_digest.static_url_for(endpoint, **values)
+            g.static_urls.append(result)
+            return result
 
         return {"static_url_for": static_url_for}
 
@@ -114,8 +115,7 @@ def load_utility_functions(app_obj):
             return response
 
         links = []
-        for u in g.static_urls:
-            url = "/" + u[0] + "/" + u[1]["filename"]
+        for url in g.static_urls:
             if url.endswith(".css"):
                 link_as = "style"
             elif url.endswith(".js"):
