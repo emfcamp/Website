@@ -1,0 +1,27 @@
+name: Base Image
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'docker/Dockerfile.base'
+      - 'Pipfile'
+      - 'Pipfile.lock'
+  schedule:
+    - cron:  '30 5 */14 * *'
+
+env:
+  DOCKER_BUILDKIT: 1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Login
+        run: echo '${{ secrets.DOCKER_PASSWORD }}' | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+      - name: Build image
+        run: docker build -t emfcamp/website-base:latest -f ./docker/Dockerfile.base .
+      - name: Publish image
+        run: docker push emfcamp/website-base:latest
