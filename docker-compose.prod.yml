@@ -2,6 +2,10 @@ version: "3.7"
 services:
   app:
     image: "emfcamp/website:latest"
+    networks:
+      - emfweb
+    depends_on:
+      - postgres
     ports:
       - "127.0.0.1:8000:8000"
     volumes:
@@ -12,5 +16,11 @@ services:
       PROMETHEUS_MULTIPROC_DIR: /var/prometheus
 
   postgres:
+    image: 'mdillon/postgis:10'
     volumes: 
       - /var/lib/emfweb-postgres:/var/lib/postgresql/data
+    networks:
+      - emfweb
+
+networks:
+  emfweb:
