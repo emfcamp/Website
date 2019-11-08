@@ -4,7 +4,15 @@ import json
 import os.path
 
 from main import db, mail, external_url, static_digest
-from flask import session, render_template, abort, current_app as app, request, Markup, g
+from flask import (
+    session,
+    render_template,
+    abort,
+    current_app as app,
+    request,
+    Markup,
+    g,
+)
 from flask.json import jsonify
 from flask_login import login_user, current_user
 from werkzeug import BaseResponse
@@ -25,7 +33,7 @@ class Currency(object):
         self.symbol = symbol
 
 
-CURRENCIES = [Currency("GBP", u"£"), Currency("EUR", u"€")]
+CURRENCIES = [Currency("GBP", "£"), Currency("EUR", "€")]
 CURRENCY_SYMBOLS = {c.code: c.symbol for c in CURRENCIES}
 
 
@@ -90,26 +98,28 @@ def load_utility_functions(app_obj):
         """ Intercept static_url_for calls and store them in the
             request context to allow preload header to be added for HTTP/2 push.
         """
+
         def static_url_for(endpoint, **values):
-            if 'static_urls' not in g:
+            if "static_urls" not in g:
                 g.static_urls = []
             g.static_urls.append((endpoint, values))
             return static_digest.static_url_for(endpoint, **values)
+
         return {"static_url_for": static_url_for}
 
     @app_obj.after_request
     def static_urls_to_preload(response):
         """ Collect static URLs and send in Link header for preloading/HTTP/2 push """
-        if 'static_urls' not in g:
+        if "static_urls" not in g:
             return response
 
         links = []
         for u in g.static_urls:
-            url = '/' + u[0] + '/' + u[1]['filename']
-            if url.endswith('.css'):
-                link_as = 'style'
-            elif url.endswith('.js'):
-                link_as = 'script'
+            url = "/" + u[0] + "/" + u[1]["filename"]
+            if url.endswith(".css"):
+                link_as = "style"
+            elif url.endswith(".js"):
+                link_as = "script"
             else:
                 continue
 
