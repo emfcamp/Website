@@ -16,7 +16,6 @@ from sqlalchemy_continuum import make_versioned
 from sqlalchemy_continuum.manager import VersioningManager
 from sqlalchemy_continuum.plugins import FlaskPlugin
 from flask_static_digest import FlaskStaticDigest
-from flask_cdn import CDN
 from flask_caching import Cache
 from flask_debugtoolbar import DebugToolbarExtension
 from flask_wtf import CSRFProtect
@@ -59,7 +58,6 @@ migrate = Migrate(include_object=include_object)
 manager = VersioningManager(options={'strategy': 'subquery'})
 make_versioned(manager=manager, plugins=[FlaskPlugin()])
 mail = Mail()
-cdn = CDN()
 login_manager = LoginManager()
 static_digest = FlaskStaticDigest()
 toolbar = DebugToolbarExtension()
@@ -99,7 +97,7 @@ def create_app(dev_server=False):
         request_total.labels(request.endpoint, request.method, response.status_code).inc()
         return response
 
-    for extension in (cdn, csrf, cache, db, mail, static_digest, toolbar):
+    for extension in (csrf, cache, db, mail, static_digest, toolbar):
         extension.init_app(app)
 
     def log_email(message, app):
