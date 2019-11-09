@@ -6,15 +6,15 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{% block title %}{% endblock %}{% if self.title() %} - {% endif %}Electromagnetic Field</title>
         <meta property="fb:admins" content="286100493">
-        {% if self.description() %}
+        {% if self.description() -%}
         <meta name="description" content="{% block description %}{% endblock %}">
-        {% endif %}
-        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
-        {% block css %}
+        {% endif -%}
+        <meta name="theme-color" content="#171123">
+        <link rel="shortcut icon" type="image/x-icon" href="{{ static_url_for('static', filename='images/favicon.ico') }}">
+        {% block css -%}
         <link rel="stylesheet" href="{{ static_url_for('static', filename="css/main.css") }}">
-        {% endblock %}
+        {% endblock -%}
         {% block head -%}{% endblock -%}
-        <link rel="shortcut icon" href="/favicon.ico">
         {# Set the canonical URL to the base URL without parameters.
            We shouldn't be using parameters for anything important. #}
         <link rel="canonical" href="{{request.base_url}}">
