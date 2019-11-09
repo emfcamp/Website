@@ -11,9 +11,8 @@ docker-compose -f ./docker-compose.prod.yml exec app pipenv run make data
 ```
 
 # To update
+
+As root:
 ```
-cd /root/Website
-git pull
-docker pull emfcamp/website:latest
-docker-compose -f ./docker-compose.prod.yml up -d app
+/root/deploy.sh
 ```
