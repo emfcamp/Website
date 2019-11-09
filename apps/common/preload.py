@@ -68,9 +68,9 @@ def init_preload(app_obj):
             if link_as is None:
                 continue
 
-            nopush = ''
+            nopush = ""
             if do_push is False:
-                nopush = '; nopush'
+                nopush = "; nopush"
 
             links.append(f"<{url}>; as={link_as}; rel=preload{nopush}")
 
