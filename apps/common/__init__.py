@@ -3,7 +3,7 @@ from datetime import datetime
 import json
 import os.path
 
-from main import db, mail, external_url, static_digest
+from main import db, mail, external_url
 from flask import (
     session,
     render_template,
@@ -11,7 +11,6 @@ from flask import (
     current_app as app,
     request,
     Markup,
-    g,
 )
 from flask.json import jsonify
 from flask_login import login_user, current_user
@@ -26,6 +25,8 @@ from models import User
 
 from flask_mail import Message
 
+from .preload import init_preload
+
 
 class Currency(object):
     def __init__(self, code, symbol):
@@ -38,6 +39,8 @@ CURRENCY_SYMBOLS = {c.code: c.symbol for c in CURRENCIES}
 
 
 def load_utility_functions(app_obj):
+    init_preload(app_obj)
+
     @app_obj.template_filter("price")
     def format_price(price, currency=None, after=False):
         if isinstance(price, Price):
@@ -92,43 +95,6 @@ def load_utility_functions(app_obj):
     def now_processor():
         now = datetime.utcnow()
         return {"year": now.year}
-
-    @app_obj.context_processor
-    def static_url_for_processor():
-        """ Intercept static_url_for calls and store them in the
-            request context to allow preload header to be added for HTTP/2 push.
-        """
-
-        def static_url_for(endpoint, **values):
-            if "static_urls" not in g:
-                g.static_urls = []
-            result = static_digest.static_url_for(endpoint, **values)
-            g.static_urls.append(result)
-            return result
-
-        return {"static_url_for": static_url_for}
-
-    @app_obj.after_request
-    def static_urls_to_preload(response):
-        """ Collect static URLs and send in Link header for preloading/HTTP/2 push """
-        if "static_urls" not in g:
-            return response
-
-        links = []
-        for url in g.static_urls:
-            if url.endswith(".css"):
-                link_as = "style"
-            elif url.endswith(".js"):
-                link_as = "script"
-            else:
-                continue
-
-            links.append(f"<{url}>; as={link_as}; rel=preload")
-
-        if len(links) > 0:
-            response.headers.add("Link", ", ".join(links))
-
-        return response
 
     @app_obj.context_processor
     def event_date_processor():
