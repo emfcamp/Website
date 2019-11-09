@@ -22,5 +22,10 @@ services:
     networks:
       - emfweb
 
+  static:
+    image: "emfcamp/website-static:latest"
+    ports:
+      - "127.0.0.1:8080:80" 
+
 networks:
   emfweb:
