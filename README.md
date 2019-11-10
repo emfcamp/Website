@@ -22,17 +22,18 @@ You should then be able to view your development server on [http://localhost:500
 
 To create some fake data in your DB, run:
 ```
-docker-compose exec app pipenv run make dev-data
+./flask dev data
 ```
 To stop all containers, use `docker-compose stop`
 To delete all data and start over fresh you can use `docker-compose down`.
 
-To run management commands, prefix them with `docker-compose exec app pipenv run`.
+Management commands can be listed and run using the `./flask` command, which
+forwards them to the flask command line within the container.
 
 ### Adding accounts
 
-Once you've created an account on the website, you can use `make admin` to make your user an administrator.
-Or, you can create an account and simultaneously make it an admin by using `make admin ARGS="-e email@domain.tld"`
+Once you've created an account on the website, you can use `./flask make_admin` to make your user an administrator.
+Or, you can create an account and simultaneously make it an admin by usinag `./flask make_admin -e email@domain.tld`
 
 E-mail sending is disabled in development (but is printed out on the console). You can also login directly by setting BYPASS_LOGIN=True in config/development.cfg and then using a URL of the form e.g. `/login/admin@test.invalid` and navigate to `/admin/`.
 

@@ -652,3 +652,6 @@ def tickets_barcode(checkin_code):
 
     barcodefile = make_barcode_png(checkin_code)
     return send_file(barcodefile, mimetype="image/png")
+
+
+from . import tasks  # noqa

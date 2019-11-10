@@ -54,3 +54,4 @@ def lineup_talk_redirect(year, proposal_id, slug=None):
 from . import base  # noqa
 from . import feeds  # noqa
 from . import external  # noqa
+from . import tasks  # noqa

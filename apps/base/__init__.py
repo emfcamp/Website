@@ -16,12 +16,12 @@ from flask import (
 )
 
 from main import cache
-from .common import feature_flag
+from ..common import feature_flag
 from models.product import Product, ProductView, ProductViewProduct, PriceTier
 from models.site_state import get_site_state
 
 
-base = Blueprint("base", __name__)
+base = Blueprint("base", __name__, cli_group=None)
 
 
 @cache.cached(timeout=60, key_prefix="get_full_price")
@@ -272,3 +272,10 @@ def subscribe():
 @base.route("/emp")
 def emp():
     return render_template("emp.html")
+
+
+from . import tasks_admin  # noqa
+from . import tasks_banking  # noqa
+from . import tasks_export  # noqa
+from . import tasks_videos  # noqa
+from . import dev  # noqa

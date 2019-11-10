@@ -2,13 +2,19 @@ import re
 import requests
 
 from flask import current_app as app
-from flask_script import Command
 
 from main import db
 from models.cfp import Proposal
 
+from . import base
 
-class MatchYouTube(Command):
+
+@base.cli.command("match_youtube")
+def match_youtube():
+    MatchYouTube().run()
+
+
+class MatchYouTube(object):
     yt_url = "https://www.googleapis.com/youtube/v3/"
 
     # https://developers.google.com/youtube/v3/docs/playlistItems/list

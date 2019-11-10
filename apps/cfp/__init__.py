@@ -1,4 +1,3 @@
-# encoding=utf-8
 from flask import (
     render_template,
     redirect,
@@ -32,8 +31,8 @@ from models.cfp import (
     LENGTH_OPTIONS,
     PROPOSAL_TIMESLOTS,
 )
-from .common import feature_flag, feature_enabled, create_current_user
-from .common.forms import Form, TelField
+from ..common import feature_flag, feature_enabled, create_current_user
+from ..common.forms import Form, TelField
 
 import collections
 
@@ -691,3 +690,7 @@ def all_messages():
 @cfp.route("/cfp/guidance")
 def guidance():
     return render_template("cfp/guidance.html")
+
+
+from . import tasks  # noqa
+from . import schedule_tasks  # noqa

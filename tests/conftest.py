@@ -6,7 +6,8 @@ import shutil
 from sqlalchemy import text
 from models.user import User
 from main import create_app, db as db_obj, Mail
-from utils import CreateBankAccounts, CreateTickets
+from apps.base.tasks_banking import create_bank_accounts
+from apps.tickets.tasks import create_product_groups
 
 
 @pytest.fixture(scope="module")
@@ -46,8 +47,8 @@ def app():
         db_obj.session.close()
 
         db_obj.create_all()
-        CreateBankAccounts().run()
-        CreateTickets().run()
+        create_bank_accounts()
+        create_product_groups()
 
         yield app
 

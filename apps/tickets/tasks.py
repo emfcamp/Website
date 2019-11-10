@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 
 from flask import current_app as app, render_template
 from flask_mail import Message
-from flask_script import Command
 from sqlalchemy import func
 
 from main import db, mail
@@ -19,6 +18,8 @@ from models.product import (
 )
 from models.purchase import Purchase
 from models.user import User
+
+from . import tickets
 
 
 def create_product_groups():
@@ -205,120 +206,117 @@ def create_product_groups():
     # ('t-shirt', 'T-Shirt', 200, 10, 10, 12, "Pre-order the official Electromagnetic Field t-shirt. T-shirts will be available to collect during the event."),
 
 
-class CreateTickets(Command):
-    def run(self):
-        create_product_groups()
+@tickets.cli.command("create")
+def create():
+    """ Create tickets structure from hardcoded data """
+    create_product_groups()
 
 
-class CancelReservedTickets(Command):
-    def run(self):
+@tickets.cli.command("expire_reserved")
+def expire_reserved():
+    """ Expire reserved tickets """
+    if (
+        feature_enabled("STRIPE")
+        and not feature_enabled("BANK_TRANSFER")
+        and not feature_enabled("BANK_TRANSFER_EURO")
+        and not feature_enabled("GOCARDLESS")
+        and not feature_enabled("GOCARDLESS_EURO")
+    ):
+        # Things are moving quickly now, only let people reserve tickets for an hour
+        grace_period = timedelta(hours=1)
 
-        if (
-            feature_enabled("STRIPE")
-            and not feature_enabled("BANK_TRANSFER")
-            and not feature_enabled("BANK_TRANSFER_EURO")
-            and not feature_enabled("GOCARDLESS")
-            and not feature_enabled("GOCARDLESS_EURO")
-        ):
-            # Things are moving quickly now, only let people reserve tickets for an hour
-            grace_period = timedelta(hours=1)
+    else:
+        grace_period = timedelta(days=3)
 
-        else:
-            grace_period = timedelta(days=3)
+    app.logger.info("Cancelling reserved tickets with grace period %s", grace_period)
 
-        app.logger.info(
-            "Cancelling reserved tickets with grace period %s", grace_period
-        )
-
-        # Payments where someone started the process but didn't complete
-        payments = (
-            Purchase.query.filter(
-                Purchase.state == "reserved",
-                Purchase.modified < datetime.utcnow() - grace_period,
-                ~Purchase.payment_id.is_(None),
-            )
-            .join(Payment)
-            .with_entities(Payment)
-            .group_by(Payment)
-        )
-
-        for payment in payments:
-            payment.lock()
-            app.logger.info("Cancelling payment %s", payment.id)
-            assert payment.state == "new" and payment.provider in {
-                "gocardless",
-                "stripe",
-            }
-            payment.cancel()
-
-        # Purchases that were added to baskets but not checked out
-        purchases = Purchase.query.filter(
+    # Payments where someone started the process but didn't complete
+    payments = (
+        Purchase.query.filter(
             Purchase.state == "reserved",
             Purchase.modified < datetime.utcnow() - grace_period,
-            Purchase.payment_id.is_(None),
+            ~Purchase.payment_id.is_(None),
         )
-        for purchase in purchases:
-            app.logger.info("Cancelling purchase %s", purchase.id)
-            purchase.cancel()
+        .join(Payment)
+        .with_entities(Payment)
+        .group_by(Payment)
+    )
+
+    for payment in payments:
+        payment.lock()
+        app.logger.info("Cancelling payment %s", payment.id)
+        assert payment.state == "new" and payment.provider in {"gocardless", "stripe"}
+        payment.cancel()
+
+    # Purchases that were added to baskets but not checked out
+    purchases = Purchase.query.filter(
+        Purchase.state == "reserved",
+        Purchase.modified < datetime.utcnow() - grace_period,
+        Purchase.payment_id.is_(None),
+    )
+    for purchase in purchases:
+        app.logger.info("Cancelling purchase %s", purchase.id)
+        purchase.cancel()
+
+    db.session.commit()
+
+
+@tickets.cli.command("email_transfer_reminders")
+def email_transfer_reminders():
+    pass
+    # users_to_email = User.query.join(Ticket, TicketType).filter(
+    #     TicketType.admits == 'full',
+    #     Ticket.paid == True,  # noqa: E712
+    #     Ticket.transfer_reminder_sent == False,
+    # ).group_by(User).having(func.count() > 1)
+
+    # for user in users_to_email:
+    #     msg = Message("Your Electromagnetic Field Tickets",
+    #                   sender=app.config['TICKETS_EMAIL'],
+    #                   recipients=[user.email])
+
+    #     msg.body = render_template("emails/transfer-reminder.txt", user=user)
+
+    #     app.logger.info('Emailing %s transfer reminder', user.email)
+    #     mail.send(msg)
+
+    #     for ticket in user.tickets:
+    #         ticket.transfer_reminder_sent = True
+    #     db.session.commit()
+
+
+@tickets.cli.command("email_tickets")
+def email_tickets():
+    """ Email tickets to those who haven't received them """
+    users_purchase_counts = (
+        Purchase.query.filter_by(is_paid_for=True, state="paid")
+        .join(PriceTier, Product, ProductGroup)
+        .filter(ProductGroup.type.in_(RECEIPT_TYPES))
+        .join(Purchase.owner)
+        .with_entities(User, func.count(Purchase.id))
+        .group_by(User)
+        .order_by(User.id)
+    )
+
+    for user, purchase_count in users_purchase_counts:
+        plural = purchase_count != 1 and "s" or ""
+
+        msg = Message(
+            "Your Electromagnetic Field Ticket%s" % plural,
+            sender=app.config["TICKETS_EMAIL"],
+            recipients=[user.email],
+        )
+
+        already_emailed = set_tickets_emailed(user)
+        msg.body = render_template(
+            "emails/receipt.txt", user=user, already_emailed=already_emailed
+        )
+
+        attach_tickets(msg, user)
+
+        app.logger.info(
+            "Emailing %s receipt for %s tickets", user.email, purchase_count
+        )
+        mail.send(msg)
 
         db.session.commit()
-
-
-class SendTransferReminder(Command):
-    def run(self):
-        pass
-        # users_to_email = User.query.join(Ticket, TicketType).filter(
-        #     TicketType.admits == 'full',
-        #     Ticket.paid == True,  # noqa: E712
-        #     Ticket.transfer_reminder_sent == False,
-        # ).group_by(User).having(func.count() > 1)
-
-        # for user in users_to_email:
-        #     msg = Message("Your Electromagnetic Field Tickets",
-        #                   sender=app.config['TICKETS_EMAIL'],
-        #                   recipients=[user.email])
-
-        #     msg.body = render_template("emails/transfer-reminder.txt", user=user)
-
-        #     app.logger.info('Emailing %s transfer reminder', user.email)
-        #     mail.send(msg)
-
-        #     for ticket in user.tickets:
-        #         ticket.transfer_reminder_sent = True
-        #     db.session.commit()
-
-
-class SendTickets(Command):
-    def run(self):
-        users_purchase_counts = (
-            Purchase.query.filter_by(is_paid_for=True, state="paid")
-            .join(PriceTier, Product, ProductGroup)
-            .filter(ProductGroup.type.in_(RECEIPT_TYPES))
-            .join(Purchase.owner)
-            .with_entities(User, func.count(Purchase.id))
-            .group_by(User)
-            .order_by(User.id)
-        )
-
-        for user, purchase_count in users_purchase_counts:
-            plural = purchase_count != 1 and "s" or ""
-
-            msg = Message(
-                "Your Electromagnetic Field Ticket%s" % plural,
-                sender=app.config["TICKETS_EMAIL"],
-                recipients=[user.email],
-            )
-
-            already_emailed = set_tickets_emailed(user)
-            msg.body = render_template(
-                "emails/receipt.txt", user=user, already_emailed=already_emailed
-            )
-
-            attach_tickets(msg, user)
-
-            app.logger.info(
-                "Emailing %s receipt for %s tickets", user.email, purchase_count
-            )
-            mail.send(msg)
-
-            db.session.commit()

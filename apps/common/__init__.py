@@ -4,14 +4,7 @@ import json
 import os.path
 
 from main import db, mail, external_url
-from flask import (
-    session,
-    render_template,
-    abort,
-    current_app as app,
-    request,
-    Markup,
-)
+from flask import session, render_template, abort, current_app as app, request, Markup
 from flask.json import jsonify
 from flask_login import login_user, current_user
 from werkzeug import BaseResponse

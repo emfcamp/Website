@@ -14,6 +14,8 @@ services:
       - "5000:5000"
     environment:
       SETTINGS_FILE: ./config/development.cfg
+      FLASK_APP: dev_server.py
+      FLASK_ENV: development
 
   gulp:
     build:
