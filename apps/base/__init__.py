@@ -274,6 +274,7 @@ def emp():
     return render_template("emp.html")
 
 
+from . import scheduled_tasks  # noqa
 from . import tasks_admin  # noqa
 from . import tasks_banking  # noqa
 from . import tasks_export  # noqa

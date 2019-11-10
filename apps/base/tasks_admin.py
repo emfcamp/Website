@@ -1,11 +1,16 @@
 import click
-from flask_mail import Message
 
-from main import mail, db
+from main import db
 from apps.base import base as app
 from models.user import User
 from models.permission import Permission
-from models.email import EmailJobRecipient
+from models.scheduled_task import execute_scheduled_tasks
+
+
+@app.cli.command("periodic")
+def periodic():
+    """ Execute periodic scheduled tasks """
+    execute_scheduled_tasks()
 
 
 @app.cli.command("make_admin")
@@ -52,24 +57,4 @@ def create_perms():
         if not Permission.query.filter_by(name=permission).first():
             db.session.add(Permission(permission))
 
-    db.session.commit()
-
-
-@app.cli.command("send_emails")
-def send_emails():
-    with mail.connect() as conn:
-        for rec in EmailJobRecipient.query.filter(
-            EmailJobRecipient.sent == False
-        ):  # noqa: E712
-            send_email(conn, rec)
-
-
-def send_email(conn, rec):
-    msg = Message(rec.job.subject, sender=app.config["CONTACT_EMAIL"])
-    msg.add_recipient(rec.user.email)
-    msg.body = rec.job.text_body
-    msg.html = rec.job.html_body
-    conn.send(msg)
-    rec.sent = True
-    db.session.add(rec)
     db.session.commit()
