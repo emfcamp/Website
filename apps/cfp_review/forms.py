@@ -10,7 +10,7 @@ from wtforms import (
     IntegerField,
     FloatField,
 )
-from wtforms.validators import Required, NumberRange, ValidationError
+from wtforms.validators import DataRequired, NumberRange, ValidationError
 
 from models.cfp import Venue
 from ..common.forms import Form, HiddenIntegerField
@@ -22,8 +22,8 @@ from dateutil.parser import parse as parse_date
 class UpdateProposalForm(Form):
     # Admin can change anything
     state = SelectField("State", choices=[(s, s) for s in ordered_states])
-    title = StringField("Title", [Required()])
-    description = TextAreaField("Description", [Required()])
+    title = StringField("Title", [DataRequired()])
+    description = TextAreaField("Description", [DataRequired()])
     requirements = TextAreaField("Requirements")
     length = StringField("Length")
     notice_required = SelectField(
@@ -159,7 +159,7 @@ class UpdatePerformanceForm(UpdateProposalForm):
 
 
 class UpdateWorkshopForm(UpdateProposalForm):
-    attendees = StringField("Attendees", [Required()])
+    attendees = StringField("Attendees", [DataRequired()])
     cost = StringField("Cost per attendee")
     participant_equipment = StringField("Attendee equipment")
     age_range = StringField("Age range")
@@ -181,7 +181,7 @@ class UpdateWorkshopForm(UpdateProposalForm):
 
 
 class UpdateYouthWorkshopForm(UpdateProposalForm):
-    attendees = StringField("Attendees", [Required()])
+    attendees = StringField("Attendees", [DataRequired()])
     cost = StringField("Cost per attendee")
     participant_equipment = StringField("Attendee equipment")
     age_range = StringField("Age range")
@@ -206,7 +206,7 @@ class UpdateYouthWorkshopForm(UpdateProposalForm):
 
 class UpdateInstallationForm(UpdateProposalForm):
     funds = StringField("Funds")
-    size = StringField("Size", [Required()])
+    size = StringField("Size", [DataRequired()])
 
     def update_proposal(self, proposal):
         proposal.size = self.size.data
@@ -229,8 +229,8 @@ class UpdateVotesForm(Form):
 
 
 class AnonymiseProposalForm(Form):
-    title = StringField("Title", [Required()])
-    description = TextAreaField("Description", [Required()])
+    title = StringField("Title", [DataRequired()])
+    description = TextAreaField("Description", [DataRequired()])
     anonymise = SubmitField("Send to review and go to next")
     reject = SubmitField("I cannot anonymise this proposal")
 
