@@ -2,9 +2,9 @@
 {% block description %}Electromagnetic Field is a non-profit UK camping festival for those with an inquisitive mind or an interest in making things.{% endblock %}
 {% block body %}
 {% include "home/gallery_block.html" %}
-<div class="row">
+<div class="row" itemscope itemtype="http://schema.org/Festival">
     <div class="col-md-6">
-        <p class="emphasis">
+        <p class="emphasis" itemprop="description">
           Electromagnetic Field is a non-profit UK camping festival for those with an inquisitive mind or an
           interest in making things: hackers, artists, geeks, crafters, scientists, and engineers.
         </p>
@@ -20,7 +20,7 @@
           <strong>amazing installations</strong>, entirely organised by a dedicated team of volunteers.
         </p>
     </div>
-    <div class="col-md-6" itemscope itemtype="http://schema.org/Festival">
+    <div class="col-md-6">
         {% include "home/event-data.html" %}
         <div class="well">
             {% include "home/sales_block.html" %}
