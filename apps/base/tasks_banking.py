@@ -130,7 +130,7 @@ def load_ofx(ofx_file):
 
 @base.cli.command("reconcile")
 @click.option("-d", "--doit", is_flag=True, help="set this to actually change the db")
-def reconcile(self, doit):
+def reconcile(doit):
     txns = BankTransaction.query.filter_by(payment_id=None, suppressed=False)
 
     paid = 0
