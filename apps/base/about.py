@@ -1,6 +1,7 @@
 from flask import render_template
 from . import base
 
+
 @base.route("/about")
 def about():
     return render_template("about/index.html")
@@ -29,5 +30,3 @@ def company():
 @base.route("/about/volunteering")
 def volunteering():
     return render_template("about/volunteering.html")
-
-
