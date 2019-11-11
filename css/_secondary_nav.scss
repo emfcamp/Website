@@ -1,10 +1,32 @@
 .secondary-nav {
-	background-color: $main-background;
-	color: red;
-	height: 100%;
-	min-width: 158px;
+  background-color: $main-background;
+  min-width: $main-content-width / 6;
+  padding: 15px 0px 15px 10px;
+  border-right: 1px solid $body-background-shadow;
 }
 
-.secondary-nav ul {
-	//width: 100%;
+.secondary-nav > ul {
+  border: solid $highlight-background;
+  border-width: 1px 0px 1px 1px;
+  border-radius: 5px 0px 0px 5px;
+  list-style: none;
+  padding: 0px;
+  font-size: 18px;
+  font-family: $header-font-stack;
+}
+
+.secondary-nav > ul li {
+  padding: 5px;
+  margin: 0px;
+  a {
+    text-decoration: none;
+  }
+}
+
+.secondary-nav > ul li.active {
+  background-color: $highlight-background;
+  font-weight: bold;
+  a {
+    color: $highlight-background-text;
+  }
 }

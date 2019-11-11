@@ -137,36 +137,6 @@ def raise_500():
     abort(500)
 
 
-@base.route("/about")
-def about():
-    return render_template("about/index.html")
-
-
-@base.route("/about/privacy")
-def privacy():
-    return render_template("about/privacy.html")
-
-
-@base.route("/about/branding")
-def branding():
-    return render_template("branding.html")
-
-
-@base.route("/about/design-elements")
-def design_elements():
-    return render_template("design.html")
-
-
-@base.route("/about/company")
-def company():
-    return render_template("about/company.html")
-
-
-@base.route("/about/volunteering")
-def volunteering():
-    return render_template("about/volunteering.html")
-
-
 @base.route("/network")
 def network():
     return redirect("https://wiki.emfcamp.org/wiki/Network")
@@ -196,7 +166,6 @@ def sponsor():
 @base.route("/get_involved")
 @base.route("/contact")
 @base.route("/location")
-@base.route("/about")
 def old_urls_2012():
     return redirect(url_for(".main"))
 
@@ -274,6 +243,7 @@ def emp():
     return render_template("emp.html")
 
 
+from . import about  # noqa
 from . import scheduled_tasks  # noqa
 from . import tasks_admin  # noqa
 from . import tasks_banking  # noqa

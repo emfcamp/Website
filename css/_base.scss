@@ -121,14 +121,13 @@ ul.menu a {
 }
 
 #gallery {
-  margin-top: -15px;
   padding-bottom: 15px;
 }
 
 #main-content {
   height: 100%;
   min-height: 100%;
-  padding: 15px;
+  padding: 0px 15px 15px 15px;
 }
 
 @media(min-width: 550px) {
@@ -348,10 +347,6 @@ a.collapse-toggle:hover .glyphicon {
   #credits a:after {
     content: none !important;
   }
-}
-
-.about-volunteering .intro-text {
-  font-size: 1.2em;
 }
 
 /* print-only */

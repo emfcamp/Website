@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Volunteering{% endblock %}
-{% set main_class = 'about-volunteering' %}
+{% block secondary_nav %}
+  {% include "about/_nav.html" %}
+{% endblock %}
+{% set main_class = 'about' %}
 {% block body %}
 <h2 id="volunteering-at-emf">Volunteering at EMF</h2>
 <div class="intro-text">
