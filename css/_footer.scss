@@ -1,0 +1,52 @@
+footer {
+  background: url('../images/brand/footer.jpg') no-repeat left top;
+  overflow: hidden;
+}
+
+footer #credits {
+  font-size: 0.75em;
+  float: right;
+  clear: both;
+  margin-top: 5px;
+  padding-right:15px;
+}
+
+#bottom-menu-container {
+  font-family: $header-font-stack;
+  padding: 10px 15px 0px 15px;
+  width: 100%;
+}
+
+#bottom-menu-container .menu {
+  float: left;
+}
+
+#bottom-menu-container ul.menu li{
+  display:inline-block;
+  padding-left: 0;
+  padding-right: 1em;
+}
+
+
+#bottom-menu-container .share {
+  float: right;
+}
+
+@media(max-width: 550px) {
+  footer {
+    position: initial;
+    bottom: initial;
+    right: initial;
+  }
+
+  #bottom-menu-container .menu {
+    float: none;
+    clear: both;
+  }
+
+  #bottom-menu-container ul.menu li {
+    display: block;
+    margin-bottom: 0.25em;
+  }
+}
+

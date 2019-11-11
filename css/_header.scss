@@ -1,0 +1,70 @@
+header {
+  background-image: url('../images/brand/header.jpg');
+  padding: 10px 15px 0px 15px;
+}
+
+header h1 {
+  display: block;
+  float: left;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+#logo {
+  background: url('../images/brand/logo.png') no-repeat left top;
+  background-size: 350px 125px;
+  width: 350px;
+  height: 125px;
+}
+
+@media print {
+  h1 a[href]:after {
+    content: none !important;
+  }
+  #logo {
+    height: 0;
+  }
+  #logo:after {
+    content: url('../images/logo-black-text.svg');
+  }
+}
+
+header #header-text {
+  float: right;
+  text-align: right;
+  font-size: 1.5em;
+  margin-top: 25px;
+}
+
+@media(max-width: $fluid-max-width) {
+  header #header-text {
+    display:none;
+  }
+}
+
+@media print {
+  header #header-text {
+    font-size: 1.3em;
+    margin-bottom: 20px;
+  }
+}
+
+header #menu-container {
+  clear: both;
+  float:right;
+}
+
+@media(max-width: 550px) {
+  header #menu-container {
+    float: none;
+  }
+
+  ul.menu li {
+    display: block;
+    padding-left: 0;
+  }
+
+  #menu-container a {
+    font-size: 1.2em;
+  }
+}

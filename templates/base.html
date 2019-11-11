@@ -21,64 +21,23 @@
     </head>
 <body itemscope itemtype="http://schema.org/WebPage">
 {% block document %}
-<div class="container">
-    <div class="main-row">
-        <div class="col-md-10 col-md-offset-1 main-column">
-            {% include "_nav.html" %}
-            <div id="main-content" class="{{ main_class }}" role="main">
-                {% for message in get_flashed_messages() -%}
-                    <div class="alert alert-warning">{{ message }}</div>
-                {% endfor -%}
-                {% block body -%}{% endblock -%}
-                <div class="push"></div>
-            </div>
-            <footer role="contentinfo">
-                <div id="bottom-menu-container">
-                    <ul class="menu" role="menu">
-                        <li role="presentation">
-                            <a role="menuitem" rel="noopener" target="_blank" href="https://wiki.emfcamp.org">Wiki</a>
-                        </li>
-                        <li role="presentation">
-                            <a role="menuitem" target="_blank" href="{{ url_for('base.code_of_conduct') }}">
-                                Code of Conduct</a>
-                        </li>
-                      {% if feature_enabled('TICKET_SALES') %}
-                      {% if current_user.is_authenticated %}
-                      <li role="presentation">
-                        <a role="menuitem" href="{{ url_for('users.account') }}">My account</a>
-                      </li>
-                      {% else %}
-                      <li role="presentation">
-                        <a role="menuitem" href="{{ url_for('users.login') }}">Log in</a>
-                      </li>
-                      {% endif %}
-                      {% endif %}
-                      {% if not feature_enabled('VOLUNTEERS') %}
-                      <li role="presentation">
-                          <a role="menuitem" href="{{ url_for('base.volunteering')}}">Volunteering</a>
-                      </li>
-                      {% endif %}
-                      <li role="presentation">
-                        <a role="menuitem" href="{{ url_for('base.feedback') }}">Feedback</a>
-                      </li>
-                      <li role="presentation">
-                        <a role="menuitem" href="https://wiki.emfcamp.org/wiki/Contact">Contact</a>
-                      </li>
-                    </ul>
-                    <div class="share">
-                      <a rel="noreferrer" target="_blank" href="https://twitter.com/emfcamp">@emfcamp</a>
-                    </div>
-                    <div style="clear: both"></div>
-                </div>
-                <div id="credits">
-                    <p>&copy; {{ year }} <a href="{{url_for('base.company')}}">Electromagnetic Field</a> |
-                        <a href="{{url_for('base.privacy')}}">Privacy</a> |
-                        Kindly hosted by <a href="http://www.sargasso.co.uk/from/emfcamp">Sargasso Networks</a></p>
-                </div>
-            </footer>
+  <div id="emf-container">
+    {% include "_nav.html" %}
+    <div class="main-row emf-row">
+        {% if self.secondary_nav() %}
+        <div class="secondary-nav emf-col">
+          {% block secondary_nav %}{% endblock %}
+        </div>
+        {% endif %}
+        <div id="main-content" class="emf-col {{ main_class }}" role="main">
+            {% for message in get_flashed_messages() -%}
+                <div class="alert alert-warning">{{ message }}</div>
+            {% endfor -%}
+            {% block body -%}{% endblock -%}
         </div>
     </div>
-</div>
+    {% include "_footer.html" %}
+  </div>
 {% endblock %}
 <script src="{{static_url_for('static', filename="js/main.js")}}"></script>
 {% block foot -%}{% endblock -%}

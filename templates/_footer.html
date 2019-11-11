@@ -1,0 +1,44 @@
+<footer role="contentinfo">
+    <div id="bottom-menu-container">
+        <ul class="menu" role="menu">
+            <li role="presentation">
+                <a role="menuitem" rel="noopener" target="_blank" href="https://wiki.emfcamp.org">Wiki</a>
+            </li>
+            <li role="presentation">
+                <a role="menuitem" target="_blank" href="{{ url_for('base.code_of_conduct') }}">
+                    Code of Conduct</a>
+            </li>
+          {% if feature_enabled('TICKET_SALES') %}
+          {% if current_user.is_authenticated %}
+          <li role="presentation">
+            <a role="menuitem" href="{{ url_for('users.account') }}">My account</a>
+          </li>
+          {% else %}
+          <li role="presentation">
+            <a role="menuitem" href="{{ url_for('users.login') }}">Log in</a>
+          </li>
+          {% endif %}
+          {% endif %}
+          {% if not feature_enabled('VOLUNTEERS') %}
+          <li role="presentation">
+              <a role="menuitem" href="{{ url_for('base.volunteering')}}">Volunteering</a>
+          </li>
+          {% endif %}
+          <li role="presentation">
+            <a role="menuitem" href="{{ url_for('base.feedback') }}">Feedback</a>
+          </li>
+          <li role="presentation">
+            <a role="menuitem" href="https://wiki.emfcamp.org/wiki/Contact">Contact</a>
+          </li>
+        </ul>
+        <div class="share">
+          <a rel="noreferrer" target="_blank" href="https://twitter.com/emfcamp">@emfcamp</a>
+        </div>
+        <div style="clear: both"></div>
+    </div>
+    <div id="credits">
+        <p>&copy; {{ year }} <a href="{{url_for('base.company')}}">Electromagnetic Field</a> |
+            <a href="{{url_for('base.privacy')}}">Privacy</a> |
+            Kindly hosted by <a href="http://www.sargasso.co.uk/from/emfcamp">Sargasso Networks</a></p>
+    </div>
+</footer>

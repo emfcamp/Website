@@ -1,0 +1,33 @@
+/** 
+ * A simple flexbox-based grid for the main layout. This is fixed-width when the
+ * window is larger than $main-content-width, and fluid below.
+ */
+
+#emf-container {
+  @media (min-width: $main-content-width + 14) {
+    width: $main-content-width;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: 5px 5px 15px $body-background-shadow,
+      -5px 5px 15px $body-background-shadow;
+  }
+  @media (max-width: $main-content-width + 14) {
+    width: 100%;
+    min-width: $fluid-max-width;
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+  }
+  background-color: $main-background;
+}
+
+.emf-row {
+  display: flex;
+  flex-flow: row;
+  @media(max-width: $main-content-width) {
+    flex-flow: column;
+  }
+}
+
+.emf-col {
+  flex: auto;
+}
