@@ -1,6 +1,7 @@
 .secondary-nav {
   background-color: $main-background;
   min-width: $main-content-width / 6;
+  max-width: $main-content-width / 6;
   padding: 15px 0px 15px 10px;
   border-right: 1px solid $body-background-shadow;
 }

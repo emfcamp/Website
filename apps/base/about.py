@@ -6,6 +6,9 @@ from . import base
 def about():
     return render_template("about/index.html")
 
+@base.route("/about/travel")
+def travel():
+    return render_template("about/getting-there.html")
 
 @base.route("/about/privacy")
 def privacy():
