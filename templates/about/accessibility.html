@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Accessibility{% endblock %}
+{% block secondary_nav %}
+  {% include "about/_nav.html" %}
+{% endblock %}
+{% block body %}
+<h2>Accessibility</h2>
+<p>We try and do everything we can to make EMF as accessible as possible, however it is
+    ultimately a camping event in a field, and we can't work miracles.</p>
+
+<p>The site will be well-lit during the event, and we will aim to cover access to the stages
+    with trackway. Travelling between stages may take some time, and the site is quite hilly.</p>
+
+<h3>Parking and Camping</h3>
+<p>There is a designated accessible parking area just outside the main gate. Please let the stewards
+    know where you're heading and they can direct you there.</p>
+
+<p>The accessible camping area is located at the quiet end of the site, close to the parking area,
+    and close to accessible toilets and showers.</p>
+
+<p>As with everywhere on site, <a href="{{url_for('.power')}}">power will be available</a>.
+    However, we're unable to guarantee the 24/7
+    availability of power for medical devices such as CPAP machines.</p>
+
+<h3>Carer Tickets</h3>
+<p>If you require a ticket for a carer to come to EMF with you, we are happy to provide these for free.
+    Once you've bought your ticket, please <a href="mailto:tickets@emfcamp.org">email us</a> with the
+    name and email address of your carer, and we will issue them a ticket.</p>
+{% endblock %}

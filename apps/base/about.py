@@ -6,13 +6,30 @@ from . import base
 def about():
     return render_template("about/index.html")
 
+
 @base.route("/about/travel")
 def travel():
     return render_template("about/getting-there.html")
 
+
 @base.route("/about/privacy")
 def privacy():
     return render_template("about/privacy.html")
+
+
+@base.route("/about/power")
+def power():
+    return render_template("about/power.html")
+
+
+# @base.route("/about/internet")
+# def internet():
+#     return render_template("about/internet.html")
+
+
+@base.route("/about/accessibility")
+def accessibility():
+    return render_template("about/accessibility.html")
 
 
 @base.route("/about/branding")
