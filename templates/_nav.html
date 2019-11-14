@@ -58,11 +58,9 @@
                     <a href="https://www.youtube.com/ElectromagneticField">Videos</a>
                 </li>
               {% endif %}
-              {#
                 <li role="presentation">
-                    <a role="menuitem" href="{{ url_for('base.sponsors') }}">Sponsors</a>
+                    <a role="menuitem" href="{{ url_for('base.sponsor') }}">Sponsor</a>
                 </li>
-              #}
             {% if basket_count %}
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('tickets.pay', flow=config.get('DEFAULT_FLOW', 'main')) }}">
