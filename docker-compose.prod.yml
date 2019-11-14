@@ -1,6 +1,7 @@
 version: "3.7"
 services:
   app:
+    restart: unless-stopped
     image: "emfcamp/website:latest"
     networks:
       - emfweb
@@ -16,6 +17,7 @@ services:
       PROMETHEUS_MULTIPROC_DIR: /var/prometheus
 
   postgres:
+    restart: unless-stopped
     image: 'mdillon/postgis:10'
     volumes: 
       - /var/lib/emfweb-postgres:/var/lib/postgresql/data
@@ -23,6 +25,7 @@ services:
       - emfweb
 
   static:
+    restart: unless-stopped
     image: "emfcamp/website-static:latest"
     ports:
       - "127.0.0.1:8080:80" 
