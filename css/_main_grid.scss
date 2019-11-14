@@ -3,6 +3,7 @@
  * window is larger than $main-content-width, and fluid below.
  */
 
+
 #emf-container {
   @media (min-width: $main-content-width + 14) {
     width: $main-content-width;
@@ -10,6 +11,7 @@
     margin-right: auto;
     box-shadow: 5px 5px 15px $body-background-shadow,
       -5px 5px 15px $body-background-shadow;
+    margin-bottom: 20px;
   }
   @media (max-width: $main-content-width + 14) {
     width: 100%;
@@ -26,6 +28,10 @@
   @media(max-width: $main-content-width) {
     flex-flow: column;
   }
+}
+
+.main-row {
+  min-height: 600px;
 }
 
 .emf-col {
