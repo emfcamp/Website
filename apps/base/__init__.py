@@ -52,8 +52,7 @@ def main():
 
 @base.route("/", methods=["POST"])
 def main_post():
-    # mc_user will be removed in v2.1.0
-    mc = MailChimp(mc_secret=app.config["MAILCHIMP_KEY"], mc_user="python-mailchimp")
+    mc = MailChimp(mc_api=app.config["MAILCHIMP_KEY"])
     try:
         email = request.form.get("email")
 
@@ -163,14 +162,6 @@ def sponsor():
     return render_template("sponsors/sponsor.html")
 
 
-@base.route("/participating")
-@base.route("/get_involved")
-@base.route("/contact")
-@base.route("/location")
-def old_urls_2012():
-    return redirect(url_for(".main"))
-
-
 @base.route("/badge")
 def badge():
     return redirect("https://wiki-archive.emfcamp.org/2012/wiki/TiLDA")
@@ -184,28 +175,6 @@ def code_of_conduct():
 @base.route("/diversity")
 def diversity():
     return render_template("diversity.html")
-
-
-@base.route("/wave")
-def wave():
-    return redirect(
-        "https://web.archive.org/web/20130627201413/https://www.emfcamp.org/wave"
-    )
-
-
-@base.route("/wave-talks")
-@base.route("/wave/talks")
-def wave_talks():
-    return redirect(
-        "https://web.archive.org/web/20130627201413/https://www.emfcamp.org/wave/talks"
-    )
-
-
-@base.route("/sine")
-@base.route("/wave/sine")
-@base.route("/wave/SiNE")
-def sine():
-    return redirect("https://wiki-archive.emfcamp.org/2014/wiki/SiNE")
 
 
 @base.route("/radio", methods=["GET"])
@@ -244,6 +213,7 @@ def emp():
     return render_template("emp.html")
 
 
+from . import redirects  # noqa
 from . import about  # noqa
 from . import scheduled_tasks  # noqa
 from . import tasks_admin  # noqa

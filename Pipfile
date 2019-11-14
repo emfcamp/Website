@@ -34,7 +34,7 @@ pybarcode = {git = "https://github.com/emfcamp/python-barcode"}
 pillow = "*"
 icalendar = "==3.11.7"
 pytz = "*"
-"mailchimp3" = "==2.0.17"
+"mailchimp3" = "*"
 gocardless-pro = "==1.2.0"
 stripe = "~=2.38.0"
 ofxparse = "==0.16"
