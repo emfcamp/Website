@@ -1,19 +1,23 @@
 .secondary-nav {
   background-color: $main-background;
-  min-width: $main-content-width / 6;
-  max-width: $main-content-width / 6;
+  @media (min-width: $main-content-width) {
+    min-width: $main-content-width / 6;
+    max-width: $main-content-width / 6;
+  }
   padding: 15px 0px 15px 10px;
   border-right: 1px solid $body-background-shadow;
 }
 
 .secondary-nav > ul {
-  border: solid $highlight-background;
-  border-width: 1px 0px 1px 1px;
-  border-radius: 5px 0px 0px 5px;
   list-style: none;
   padding: 0px;
   font-size: 18px;
   font-family: $header-font-stack;
+  @media (min-width: $main-content-width) {
+    border: solid $highlight-background;
+    border-width: 1px 0px 1px 1px;
+    border-radius: 5px 0px 0px 5px;
+  }
 }
 
 .secondary-nav > ul li {
@@ -21,6 +25,10 @@
   margin: 0px;
   a {
     text-decoration: none;
+  }
+
+  @media (max-width: $main-content-width) {
+    float:left;
   }
 }
 
