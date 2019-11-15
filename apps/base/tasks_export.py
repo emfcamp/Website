@@ -6,7 +6,7 @@ from flask import current_app as app
 from sqlalchemy_continuum.utils import version_class, is_versioned
 
 from main import db
-from apps.common.json import ExportEncoder
+from apps.common.json_export import ExportEncoder
 from . import base
 
 
