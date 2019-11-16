@@ -1,6 +1,7 @@
-# Override for CI to pass COVERALLS_REPO_TOKEN through
+# Override for CI to pass coveralls variables through
 version: "3.7"
 services:
   app:
     environment:
       COVERALLS_REPO_TOKEN: ${COVERALLS_REPO_TOKEN}
+      COVERALLS_GIT_BRANCH: ${COVERALLS_GIT_BRANCH}
