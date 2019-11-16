@@ -1,4 +1,4 @@
-{% macro render_field(field, horizontal=False, glyphicon_before=None, glyphicon_after=None) %}
+{% macro render_field(field, horizontal=False, glyphicon_before=None, glyphicon_after=None, word_limit=None) %}
 
 {% if caller %}
     {% set help_text = caller() %}
@@ -16,6 +16,10 @@
 {% if help_text or field.errors %}
     {# If we have help text, add an aria-describedby attribute to the field. #}
     {% do kwargs.update({'aria-describedby': "help-block-" + field.name}) %}
+{% endif %}
+
+{% if word_limit %}
+  {% do kwargs.update({'data-word-limit': word_limit}) %}
 {% endif %}
 
 <div class="form-group {%- if field.errors %} has-error {%- endif %}">
@@ -43,6 +47,9 @@
         {% elif help_text %}
             <p class="help-block" id="help-block-{{field.name}}">{{ help_text }}</p>
         {% endif -%}
+        {% if word_limit %}
+          <p class="help-block" id="word-limit-{{field.name}}"></p>
+        {% endif %}
     </div>
 </div>
 {% endmacro %}

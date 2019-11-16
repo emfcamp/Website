@@ -45,18 +45,18 @@
 
       <fieldset>
           <legend>About your {{form.model.human_type}}</legend>
+          <p>The title and description of your {{form.model.human_type}} will be made public.
+            You'll be able to tweak these later, but please provide as much detail as you can so we
+            can review your submission.
+          </p>
           {% if cfp_type in ('talk', 'workshop') %}
-              <p>These fields will be anonymised before being sent to our reviewers. Please
+              <p>We have to anonymise these fields before sending them to our reviewers, so please
                 try to avoid including personally identifiable information.
             </p>
         {% endif %}
-        <p>You'll be able to tweak the title and description before we publish them in
-           the schedule.</p>
           {{render_field(form.title, horizontal=9, placeholder="A short summary")}}
-          {% call render_field(form.description, horizontal=9,
-                         placeholder="A fuller description of your proposal") %}
-            Please keep this shorter than 250 words.
-          {% endcall %}
+          {{ render_field(form.description, horizontal=9, word_limit=250,
+          placeholder="A full description of your proposal, in no more than 250 words") }}
      </fieldset>
 
      <fieldset>
@@ -64,7 +64,7 @@
          <p>We'll use these details to help us schedule your {{form.model.human_type}}.</p>
       {% if cfp_type in ('talk', 'performance', 'workshop', 'youthworkshop') %}
         {% call render_field(form.requirements, horizontal=9,
-                            placeholder="Such as tools, assistants, or other non-standard things") %}
+                            placeholder="Additional equipment required, or anything else you want us to know") %}
           {% if cfp_type in ('talk', 'performance', 'workshop', 'youthworkshop') %}
             We'll provide a sound system and projector or screen.
           {% endif %}
