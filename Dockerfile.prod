@@ -16,7 +16,7 @@ COPY --from=static /app/static/js /app/static/js
 
 # The settings file doesn't matter for the purposes of the below command,
 # but it's needed for it to run.
-RUN SETTINGS_FILE=/app/config/development.cfg pipenv run flask digest compile
+RUN SETTINGS_FILE=/app/config/test.cfg pipenv run flask digest compile
 
 ENV SHELL=/bin/bash
 ENTRYPOINT ["./docker/prod_entrypoint.sh"]
