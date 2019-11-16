@@ -1,6 +1,9 @@
 This is the www.emfcamp.org web site, built with Flask & Postgres by the 
 EMF web team.
 
+[![CI Status](https://github.com/emfcamp/Website/workflows/CI/badge.svg)](https://github.com/emfcamp/Website/actions?query=workflow%3ACI)
+[![Coverage Status](https://coveralls.io/repos/github/emfcamp/Website/badge.svg?branch=master)](https://coveralls.io/github/emfcamp/Website?branch=master)
+
 ## Get Involved
 
 If you want to get involved, the best way is to join us on IRC, on #emfcamp-web on chat.freenode.net.

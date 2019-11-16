@@ -11,9 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Start environment
-        run: docker-compose up --build -d
+        run: docker-compose -f ./docker-compose.yml -f ./docker-compose.ci.yml up --build -d
       - name: Test
-        run: docker-compose exec -T app pipenv run make test
+        run: docker-compose -f ./docker-compose.yml -f ./docker-compose.ci.yml exec -T app pipenv run make test
   build:
     runs-on: ubuntu-latest
     needs: test
