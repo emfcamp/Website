@@ -33,6 +33,10 @@ To delete all data and start over fresh you can use `docker-compose down`.
 Management commands can be listed and run using the `./flask` command, which
 forwards them to the flask command line within the container.
 
+### Tests
+
+Tests are run using the `./run_tests` script.
+
 ### Adding accounts
 
 Once you've created an account on the website, you can use `./flask make_admin` to make your user an administrator.

@@ -1,0 +1,25 @@
+#!/bin/bash
+# Run the tests
+
+function usage(){
+    echo -e "USAGE: $0 [TEST_ARGS]"
+    echo -e "Either run the test task from the Makefile or pytest \"TEST_ARGS\" "
+    echo -e "\n-h/--help\tPrint this message"
+}
+
+if [[ "${1}" == "-h" ||  "${1}" == "--help"  ]];
+then
+    usage;
+    exit 0;
+fi
+
+if [[ -n "${1}" ]];
+then
+    if [[ -z "${TEST_SETTINGS}" ]];
+    then
+        TEST_SETTINGS=./config/test.cfg
+    fi
+    docker-compose exec --env SETTINGS_FILE="${TEST_SETTINGS}" app pipenv run pytest "${1}"
+else
+    docker-compose exec app pipenv run make test
+fi

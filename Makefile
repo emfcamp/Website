@@ -1,3 +1,7 @@
+#
+# These are run via the './run_tests' script
+#
+
 ifeq ("$(TEST_SETTINGS)", "")
 	TEST_SETTINGS=./config/test.cfg
 endif
