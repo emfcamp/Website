@@ -37,7 +37,7 @@ forwards them to the flask command line within the container.
 
 Tests are run using the `./run_tests` script.
 
-### Code Style
+### Code Style
 
 For Python we currently use [Black](https://github.com/psf/black) and
 [flake8](https://github.com/PyCQA/flake8) to enforce code style. These checks
@@ -74,6 +74,3 @@ For more, see:
 * [Testing](docs/testing.md)
 * [Deployment](docs/deployment.md)
 * [Contributing](.github/CONTRIBUTING.md)
-
-
-
