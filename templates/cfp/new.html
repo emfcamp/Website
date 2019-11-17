@@ -119,12 +119,14 @@
           {% endfor %}
         </div>
       </fieldset>
-      <p>&nbsp;</p>
-
+      <fieldset>
+      <p>By submitting this proposal, you accept that you will not be paid a fee for your
+          {{form.model.human_type}} and you will still be expected to purchase a ticket,
+          which will be guaranteed for you if your {{form.model.human_type}} is accepted.</p>
       <div class="form-actions">
         <button type="submit" name="Create" class="btn btn-primary btn-lg pull-right debounce">Submit proposal</button>
       </div>
-      <div class="clearfix"></div>
+      </fieldset>
     </form>
 </div>
 
