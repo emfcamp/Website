@@ -15,8 +15,9 @@ local_manager = LocalManager([local])
 class ContextFormatter(logging.Formatter):
     """ A logging formatter which inserts the user ID
         into the logging record. """
+
     def format(self, record):
-        record.user = getattr(local, 'user_id', None)
+        record.user = getattr(local, "user_id", None)
         return logging.Formatter.format(self, record)
 
 

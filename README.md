@@ -37,6 +37,20 @@ forwards them to the flask command line within the container.
 
 Tests are run using the `./run_tests` script.
 
+### Code Style
+
+For Python we currently use [Black](https://github.com/psf/black) and
+[flake8](https://github.com/PyCQA/flake8) to enforce code style. These checks
+are run by `./run_tests`.
+
+However, it's easy to forget these checks, so you can also run them as a git
+pre-commit hook using [pre-commit](https://pre-commit.com/). To set this up on
+the host where you'll be using git:
+```
+pip3 install pre-commit
+pre-commit install
+```
+
 ### Adding accounts
 
 Once you've created an account on the website, you can use `./flask make_admin` to make your user an administrator.

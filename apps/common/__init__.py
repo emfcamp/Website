@@ -112,7 +112,9 @@ def load_utility_functions(app_obj):
                 {s.day}<sup>{suffix(s.day)}</sup>&ndash;{e.strftime("%B")}
                 {e.day}<sup>{suffix(e.day)}</sup>"""
 
-            simple_dates = f"""{s.day} {s.strftime("%B")}&ndash;{e.day} {e.strftime("%B")}"""
+            simple_dates = (
+                f"""{s.day} {s.strftime("%B")}&ndash;{e.day} {e.strftime("%B")}"""
+            )
 
         return {
             "fancy_dates": Markup(fancy_dates),
