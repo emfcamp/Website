@@ -100,49 +100,19 @@ def load_utility_functions(app_obj):
         e = event_end()
         assert s.year == e.year
         if s.month == e.month:
-            fancy_dates = (
-                "{s_month} "
-                '<span style="white-space: nowrap">'
-                "{s.day}<sup>{s_suff}</sup>&mdash;"
-                "{e.day}<sup>{e_suff}</sup>"
-                "</span>".format(
-                    s=s,
-                    s_suff=suffix(s.day),
-                    s_month=s.strftime("%B"),
-                    e=e,
-                    e_suff=suffix(e.day),
-                )
-            )
+            fancy_dates = f"""{s.strftime('%B')}<span style="white-space: nowrap">
+                {s.day}<sup>{suffix(s.day)}</sup>&ndash;{e.day}<sup>{suffix(e.day)}</sup>
+                {s.year}
+                </span>"""
 
-            simple_dates = (
-                "{s.day}&mdash;"
-                "{e.day} "
-                "{s_month}".format(s=s, s_month=s.strftime("%B"), e=e)
-            )
+            simple_dates = f"{s.day}&ndash;{e.day} {s.strftime('%B')}"
 
         else:
-            fancy_dates = (
-                "{s_month} "
-                "{s.day}<sup>{s_suff}</sup>&ndash;"
-                "{e_month} "
-                "{e.day}<sup>{e_suff}</sup>".format(
-                    s=s,
-                    s_suff=suffix(s.day),
-                    s_month=s.strftime("%B"),
-                    e=e,
-                    e_suff=suffix(e.day),
-                    e_month=e.strftime("%B"),
-                )
-            )
+            fancy_dates = f"""{s.strftime("%B")}
+                {s.day}<sup>{suffix(s.day)}</sup>&ndash;{e.strftime("%B")}
+                {e.day}<sup>{suffix(e.day)}</sup>"""
 
-            simple_dates = (
-                "{s.day} "
-                "{s_month}&ndash;"
-                "{e.day} "
-                "{e_month}".format(
-                    s=s, s_month=s.strftime("%B"), e=e, e_month=e.strftime("%B")
-                )
-            )
+            simple_dates = f"""{s.day} {s.strftime("%B")}&ndash;{e.day} {e.strftime("%B")}"""
 
         return {
             "fancy_dates": Markup(fancy_dates),
