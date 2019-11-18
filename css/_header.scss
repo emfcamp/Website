@@ -14,6 +14,9 @@ header h1 {
   background: url('../images/brand/logo.png') no-repeat left top;
   background-size: 350px 125px;
   width: 350px;
+  @media (max-width: $min-width) {
+    width:$min-width - 20;
+  }
   height: 125px;
 }
 
@@ -36,7 +39,7 @@ header #header-text {
   margin-top: 25px;
 }
 
-@media(max-width: $fluid-max-width) {
+@media(max-width: $min-width) {
   header #header-text {
     display:none;
   }
@@ -54,7 +57,7 @@ header #menu-container {
   float:right;
 }
 
-@media(max-width: 550px) {
+@media(max-width: $min-width) {
   header #menu-container {
     float: none;
   }
