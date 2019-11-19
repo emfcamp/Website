@@ -7,8 +7,7 @@
 {% endif %}
 {% block body %}
 <h2>{{event_name}} Talks</h2>
-<p>These were the talks and workshops which happened at {{event_name}}.
-You can find videos of many of the talks on the <a href="https://media.ccc.de/b/conferences/emf">CCC website</a> or <a href="https://www.youtube.com/ElectromagneticField">our YouTube channel</a>.</p>
+<p>These were the talks and workshops which happened at {{event_name}}.</p>
 
 {% for venue in venues %}
 {% set venue_loop = loop %}
@@ -24,18 +23,10 @@ You can find videos of many of the talks on the <a href="https://media.ccc.de/b/
 </thead><tbody>
 {% for row in venue.events %}
   <tr class="{{- loop.cycle('odd', 'even') }}"><td>
-    <a class="collapse-toggle" role="button" data-toggle="collapse" href="#event{{ venue_loop.index }}-{{ loop.index }}" aria-expanded="true" aria-controls="#event{{ venue_loop.index }}-{{ loop.index }}">
+    <a href="{{url_for('schedule.item', year=year, proposal_id=row.id)}}" >
         <div class="col-sm-3"><strong>{{ row.speaker }}</strong></div>
         <div class="col-sm-8">{{ row.title }}</div>
-        <div class="col-sm-1 pull-right">
-            <small class="glyphicon glyphicon-chevron-down"></small>
-        </div>
     </a>
-    <div id="event{{ venue_loop.index }}-{{ loop.index }}" class="collapse col-sm-12">
-      <p></p>
-      {{ row.description }}
-      <p></p>
-    </div>
   </td></tr>
 {% endfor %}
 </tbody>

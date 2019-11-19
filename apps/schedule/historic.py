@@ -2,32 +2,15 @@
 
     These are served from static files in this repository as the database is wiped every year.
 """
-import os
-import csv
 from flask import render_template, abort, redirect, url_for
 
 from models.cfp import proposal_slug
 from ..common import load_archive_file
 
 
-def talks_historic(year):
-    """ Handler to dispatch to the correct function.
-
-        Archived schedules from 2012 - 2013 are in a different format and we haven't
-        had the energy to convert them yet.
-    """
-    if year < 2012:
-        abort(404)
-    elif year == 2012:
-        return talks_2012()
-    else:
-        return talks_previous(year)
-
-
 def item_historic(year, proposal_id, slug):
     """ Handler to display a detail page for a schedule item."""
-    if year < 2013:
-        # Not showing details for old-format schedules at this time.
+    if year < 2012:
         abort(404)
 
     #  We might want to look at performance here but I'm not sure it's a huge issue at the moment
@@ -44,10 +27,12 @@ def item_historic(year, proposal_id, slug):
             url_for(".item", year=year, proposal_id=proposal_id, slug=correct_slug)
         )
 
-    return render_template("schedule/historic/item.html", proposal=item)
+    return render_template("schedule/historic/item.html", proposal=item, year=year)
 
 
-def talks_previous(year):
+def talks_historic(year):
+    if year < 2012:
+        abort(404)
     data = load_archive_file(year, "public", "schedule.json")
 
     stage_events = []
@@ -85,25 +70,3 @@ def talks_previous(year):
     ]
 
     return render_template("schedule/historic/talks.html", venues=venues, year=year)
-
-
-def talks_2013():
-    data = load_archive_file(2013, "emw-talks.json")
-    return render_template("schedule/historic/talks-2013.html", venues=data["stages"])
-
-
-def talks_2012():
-    days = {}
-    talk_path = os.path.abspath(
-        os.path.join(__file__, "..", "..", "..", "exports", "2012")
-    )
-    for day in ("friday", "saturday", "sunday"):
-        reader = csv.reader(open(os.path.join(talk_path, "%s.csv" % day), "r"))
-        rows = []
-        for row in reader:
-            cells = ["" if c == '"' else c for c in row]
-            rows.append(cells)
-
-        days[day] = rows
-
-    return render_template("schedule/historic/talks-2012.html", **days)
