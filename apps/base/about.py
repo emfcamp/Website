@@ -32,6 +32,11 @@ def accessibility():
     return render_template("about/accessibility.html")
 
 
+@base.route("/about/childcare")
+def childcare():
+    return render_template("about/childcare.html")
+
+
 @base.route("/about/branding")
 def branding():
     return render_template("branding.html")
