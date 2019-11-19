@@ -124,6 +124,21 @@ def load_utility_functions(app_obj):
             "event_year": s.year,
         }
 
+    @app_obj.context_processor
+    def octicons_processor():
+        def octicon(name, **kwargs):
+            cls_list = kwargs.get("class", [])
+            if type(cls_list) != list:
+                cls_list = list(cls_list)
+            classes = " ".join(cls_list)
+
+            alt = kwargs.get("alt", name)
+            return Markup(
+                f'<img src="/static/icons/{name}.svg" class="octicon {classes}" alt="{alt}">'
+            )
+
+        return {"octicon": octicon}
+
 
 def send_template_email(subject, to, sender, template, **kwargs):
     msg = Message(subject, recipients=[to], sender=sender)

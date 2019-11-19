@@ -27,6 +27,9 @@
         <div class="col-sm-3"><strong>{{ row.speaker }}</strong></div>
         <div class="col-sm-8">{{ row.title }}</div>
     </a>
+    {% if row.video %}
+      {{octicon('device-camera-video', alt="Has video")}}
+    {% endif %}
   </td></tr>
 {% endfor %}
 </tbody>

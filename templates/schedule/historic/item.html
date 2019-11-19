@@ -4,11 +4,12 @@
 
 <h2>{{ proposal.title }}</h2>
 <p>
-  A {{ proposal.type }} from <a href="{{url_for("schedule.main_year", year=year)}}">EMF {{year}}</a> by {{ proposal.speaker }}
+  A {{ proposal.type }} from <a href="{{url_for("schedule.main_year", year=year)}}">EMF {{year}}</a>
+  by <strong>{{ proposal.speaker }}</strong>
 </p>
 
-<p><strong>{{ proposal.start_date }}</strong>{% if proposal.end_date %} - <strong>{{ proposal.end_date }}</strong>{% endif %}
-   in <strong>{{ proposal.venue }}</strong>
+<p>{{ proposal.start_date }}{% if proposal.end_date %} - {{ proposal.end_date }}{% endif %}
+   in {{ proposal.venue }}
 </p>
 
 {% if proposal.description %}
