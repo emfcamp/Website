@@ -1,8 +1,13 @@
 {% extends "base.html" %}
 {% block title %}EMF {{year}} Talks{% endblock %}
+{% if year == 2013 %}
+  {% set event_name = "Electromagnetic Wave %s" % year %}
+{% else %}
+  {% set event_name = "Electromagnetic Field %s" % year %}
+{% endif %}
 {% block body %}
-<h2>Electromagnetic Field {{year}} Talks</h2>
-<p>These were the talks and workshops which happened at Electromagnetic Field {{year}}.
+<h2>{{event_name}} Talks</h2>
+<p>These were the talks and workshops which happened at {{event_name}}.
 You can find videos of many of the talks on the <a href="https://media.ccc.de/b/conferences/emf">CCC website</a> or <a href="https://www.youtube.com/ElectromagneticField">our YouTube channel</a>.</p>
 
 {% for venue in venues %}

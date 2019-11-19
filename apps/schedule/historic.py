@@ -20,15 +20,13 @@ def talks_historic(year):
         abort(404)
     elif year == 2012:
         return talks_2012()
-    elif year == 2013:
-        return talks_2013()
     else:
         return talks_previous(year)
 
 
 def item_historic(year, proposal_id, slug):
     """ Handler to display a detail page for a schedule item."""
-    if year < 2014:
+    if year < 2013:
         # Not showing details for old-format schedules at this time.
         abort(404)
 
@@ -60,7 +58,7 @@ def talks_previous(year):
             continue
 
         # Hack to remove Stitch's "hilarious" failed <script>
-        if "<script>" in event["speaker"]:
+        if "<script>" in event.get("speaker", ""):
             event["speaker"] = event["speaker"][
                 0 : event["speaker"].find("<script>")
             ]  # "Some idiot"
