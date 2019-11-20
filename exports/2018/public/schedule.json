@@ -1625,7 +1625,11 @@
     "latlon": [
       52.040485,
       -2.3776549
-    ]
+    ],
+    "video": {
+	"ccc": "https://media.ccc.de/v/emf2018-74-taking-over-the-world-with-scratch",
+	"youtube": "https://www.youtube.com/watch?v=NSdlVRgtX2s"
+    }
   },
   {
     "id": 541,
@@ -2694,7 +2698,11 @@
     "latlon": [
       52.0418968,
       -2.3766391
-    ]
+    ],
+    "video": {
+	"ccc": "https://media.ccc.de/v/emf2018-159-ai-safety",
+	"youtube": "https://www.youtube.com/watch?v=_Slxi82xy5c"
+    }
   },
   {
     "id": 293,
@@ -3004,13 +3012,17 @@
     "user_id": 501,
     "map_link": "https://map.emfcamp.org/#18.5/52.0418968/-2.3766391",
     "may_record": true,
-    "speaker": "J. Hawkes-Reed",
+    "speaker": "Julia Hawkes-Reed",
     "end_time": "19:20",
     "end_date": "2018-09-02 19:20:00",
     "latlon": [
       52.0418968,
       -2.3766391
-    ]
+    ],
+    "video": {
+	"ccc": "https://media.ccc.de/v/emf2018-97-out-daemons-out-exploring-depression-through-sweary-automata",
+	"youtube": "https://www.youtube.com/watch?v=gDdrmNLhl24"
+    }
   },
   {
     "id": 517,

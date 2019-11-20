@@ -155,7 +155,11 @@
     "user_id": 1009,
     "end_date": "2016-08-05 17:00:00",
     "is_fave": false,
-    "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757"
+    "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
+    "video": {
+	"ccc": "https://media.ccc.de/v/emf2016-182-osmocom-open-source-mobile-communications",
+	"youtube": "https://www.youtube.com/watch?v=vq4zXOk3Qpg"
+    }
   },
   {
     "description": "This workshop premiers the world's first \u00a320 brain-smartphone interface, and describes the theory behind it (especially SSVEP).  This is v0.1: we finished soldering the boards on Thursday; we don't know how well they work; the code (currently only for Android) continues to be developed as of Friday.  The workshop's goal is to open the project to a larger community, spurring further development.  At worst, you'll get to walk around wearing tin foil, a bathing cap and electrodes; at best, you'll be able to identify various EEG signals on your phone.  If you can, please bring a POCKET KNIFE, a SMALL SCREWDRIVER, and a PAPER NAPKIN/SERVIETTE.  See http://bit.ly/2axdWku for hardware, software, etc.  (Colin and his sons have run Google Cardboard workshops at EMF 2014, CCC 2015, Tokyo Hackerspace, the Okinawa Institute of Science and Technology and Maker Festival Toronto).",
@@ -265,7 +269,11 @@
     "user_id": 893,
     "end_date": "2016-08-05 20:00:00",
     "is_fave": false,
-    "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838"
+    "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
+    "video": {
+	"ccc": "https://media.ccc.de/v/emf2016-112-numbers-stations-cold-war-short-waves",
+	"youtube": "https://www.youtube.com/watch?v=Qrt1pN4CFCA"
+    }
   },
   {
     "description": "A light hearted rundown of how I used to social engineer my way into banks and other secure facilities, interspersed with tales from the field over a long career.",
@@ -392,7 +400,11 @@
     "user_id": 449,
     "end_date": "2016-08-05 15:20:00",
     "is_fave": false,
-    "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757"
+    "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
+    "video": {
+	"ccc": "https://media.ccc.de/v/emf2016-141-hacking-your-head-managing-information-overload",
+	"youtube": "https://www.youtube.com/watch?v=q2tZHsvz3_U"
+    }
   },
   {
     "description": "I will give a short, informative and fun talk about the science of hlaughter, from it's evolution and acoustics, to the neural basis for laughter and its use in social interactions.",
@@ -412,7 +424,11 @@
     "user_id": 1428,
     "end_date": "2016-08-05 15:20:00",
     "is_fave": false,
-    "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068"
+    "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
+    "video": {
+	"ccc": "https://media.ccc.de/v/emf2016-336-the-science-of-laughter",
+	"youtube": "https://www.youtube.com/watch?v=vWRV8okfnAg"
+    }
   },
   {
     "description": "We would like to give talk and live demo of 'Off Grid', a stealth game about a mishap antihero who falls into the world of hacking. Off Grid forgoes weapons in favour of ingenuity, resourcefulness, and problem solving with gameplay utilising unique mechanics that allow you to manipulate the world and people around you with the data they unwittingly leave behind. The contemporary storyline follows real-world events surrounding data privacy, and the game has been developed to be heavily moddable, allowing players to create their own levels and stories, and even their own hacking tools for within the game.\r\n\r\nWe plan on demoing the game, talking about the mechanics and the world it is set in, and then expanding on the modding tools and what we are hoping players will be able to create. If there is time we would finish up with a short Q & A.",
@@ -521,7 +537,10 @@
     "user_id": 231,
     "end_date": "2016-08-06 10:20:00",
     "is_fave": false,
-    "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838"
+    "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
+    "video": {
+	"ccc": "https://media.ccc.de/v/emf2016-63-connecting-computers-together-over-1-000s-miles-without-using-the-internet"
+    }
   },
   {
     "description": "While we all like to make, modify and re-appropriate technology, some of us like to break it for, um, fun and profit.  As a professional penetration tester (my job is to break my employer's devices before they release them) I will explain how I go about finding vulnerabilities in IoT devices. I will look at hardware, software and cryptographic attacks that can give us root on our toys.\r\nRather than focus on specific bugs in particular devices, this talk will describe a number of generic attacks that can be attempted against a wide variety of networked 'things'.  The attacks range from the trivial that anyone with a soldering iron and a few bits and bobs could attempt, through those that require moderate linux knowledge, to those that require a disassembler and a knowledge of reverse engineering.\r\nIt should be of interest to anyone who would like to root their own shiny, IoT devices.",
@@ -565,7 +584,11 @@
     "user_id": 94,
     "end_date": "2016-08-05 16:00:00",
     "is_fave": false,
-    "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757"
+    "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
+    "video": {
+	"ccc": "https://media.ccc.de/v/emf2016-159-biological-computation",
+	"youtube": "https://www.youtube.com/watch?v=QptQ446_Kvs"
+    }
   },
   {
     "description": "There are several mathematical results and theorems concerning electoral processes. I'll cover the two most important theorems in voting theory: May's theorem, which shows the strength of first-past-the-post in the setting of a two-candidate election, and Arrow's theorem, which shows a weakness of all voting systems for elections with more than two candidates. I'll discuss some applications of the theory to two voting systems: First-Past-The-Post and the Alternative Vote, discussing their strengths and weaknesses.",
@@ -601,15 +624,19 @@
       51.21304,
       -0.60838
     ],
-    "title": "CANUTE, The worlds first working refreshable multiline braille display.",
-    "speaker": "Russell Couper ",
+    "title": "CANUTE, The worlds first working refreshable multiline braille display",
+    "speaker": "Russell Couper",
     "source": "database",
     "id": 176,
     "may_record": true,
     "user_id": 242,
     "end_date": "2016-08-05 19:10:00",
     "is_fave": false,
-    "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838"
+    "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
+    "video": {
+	"ccc": "https://media.ccc.de/v/emf2016-176-canute-the-worlds-first-working-refreshable-multiline-braille-display",
+	"youtube": "https://www.youtube.com/watch?v=i_OUSBkLjkk"
+    }
   },
   {
     "description": "Come to this talk if you want to see how I built my own wearable camera out of a raspberry pi and a backpack and how I took it on holiday when travelling through Europe. I'll focus on the the building process of hacking it together along with the various pitfalls which comes along with every project.\r\n\r\nThe project eventually became a pretty big success with it floating around on the first page of HackerNews for a weekend and being featured on various blogs.",
@@ -679,7 +706,7 @@
     "is_fave": false,
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
-      "ccc": "https://media.ccc.de/v/emf2016-208-tentman-the-story-so-far",
+      "ccc": "https://media.ccc.de/v/emf2016-208-world-premiere-of-tentman",
       "youtube": "https://www.youtube.com/watch?v=K7AHN4g2faA"
     }
   },
@@ -1245,7 +1272,10 @@
     "user_id": 1297,
     "end_date": "2016-08-07 12:40:00",
     "is_fave": false,
-    "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068"
+    "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
+    "video": {
+	"ccc": "https://media.ccc.de/v/emf2016-269-beer-for-everyone"
+    }
   },
   {
     "description": "Members of the EMF infrastructure and NOC teams will speak about how we brought power and Internet to the field, explain some of the challenges faced, and share some statistics.",
@@ -1417,7 +1447,11 @@
     "user_id": 223,
     "end_date": "2016-08-05 14:20:00",
     "is_fave": false,
-    "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838"
+    "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
+    "video": {
+	"ccc": "https://media.ccc.de/v/emf2016-49-the-history-and-future-of-books",
+	"youtube": "https://www.youtube.com/watch?v=XkBUcGxhCYk"
+    }
   },
   {
     "description": "How fast is it possible to complete a game like Super Mario World, if you could control every frame of input to ensure a perfect run?  Tool-assisted speedruns are recorded frame-by-frame using emulators which allow slow-motion gameplay, going back and undoing mistakes, and even using bots to search through many possible combinations of inputs. By removing human limitations, these speedruns get closer and closer to the theoretically perfect play.\r\n\r\nThis talk presents highlights from the last 15 years: frame-perfect movements, exploiting bugs and oversights, and manipulating randomness to get miraculously good fortune. There will be videos of speed runs, including both popular and obscure games, and even a game completed in less than 0.3 seconds of gameplay time.\r\n\r\nThere are many techniques which are used in making a speedrun. Sometimes people will disassemble the game's code to understand how it works, in order to find new ways of beating it. Sometimes people will find and exploit bugs, allowing them to move through walls, go faster than normally possible, or skip whole sections of the game. In extreme cases, bugs allow players to execute arbitrary code, allowing them to take complete control of the console.\r\n\r\nIn short, this talk is about taking games to their very limits.\r\n\r\n",
@@ -1878,7 +1912,11 @@
     "user_id": 774,
     "end_date": "2016-08-05 19:10:00",
     "is_fave": false,
-    "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068"
+    "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
+    "video": {
+	"ccc": "https://media.ccc.de/v/emf2016-120-scientifically-ruining-the-interfaces-in-movies",
+	"youtube": "https://www.youtube.com/watch?v=IkAbvZzUNMg"
+    }
   },
   {
     "description": "This workshop will demonstrate how to use OsmoBTS, OpenBSC, OsmoNITB, OsmoSGSN and OpenGGSN to run a small, private GSM/GPRS network for research and experimentation purpose.\r\n\r\nUsing such a small/private network you can learn first hand about cellular technology, its protocols, interfaces, network elements and security.\r\n\r\nThe above-mentioned free software is far from new, and has been presented many times at other events before. However, a tutorial with hands-on experience with setting up your own cellular network is still something out of reach of most hackers. Let's try to change that!",
@@ -1988,7 +2026,11 @@
     "user_id": 1398,
     "end_date": "2016-08-05 14:40:00",
     "is_fave": false,
-    "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068"
+    "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
+    "video": {
+	"ccc": "https://media.ccc.de/v/emf2016-325-micropython-what-is-it-what-does-it-do-why-is-it-suddenly-everywhere",
+	"youtube": "https://www.youtube.com/watch?v=j2x1li6XcJQ"
+    }
   },
   {
     "description": "I had one question for Larry Ellison. ''In 20 years, do you think the global database is going to exist, and will it be run by Oracle?\u2019' ''I do think it will exist, and I think it is going to be an Oracle database,'' he replied. ''And we're going to track everything.''  Jeffrey Rosen, NY Times Magazine, 2002.\r\n \r\nIt\u2019s 2022 and only the genomic England children get into university. Country of birth and ethnicity information stops Outsiders getting into school. Prospective employers screen applicants\u2019 lifetime web browsing history pre-interview. Who controls your personal data controls your future. Fact or fiction? ",
@@ -2055,7 +2097,7 @@
     "is_fave": false,
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
-      "ccc": "https://media.ccc.de/v/emf2016-341-design-for-consumer-rights-now",
+      "ccc": "https://media.ccc.de/v/emf2016-341-designing-for-data",
       "youtube": "https://www.youtube.com/watch?v=9lq9ZIgtxu0"
     }
   },
@@ -2570,7 +2612,11 @@
     "user_id": 217,
     "end_date": "2016-08-06 11:30:00",
     "is_fave": false,
-    "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068"
+    "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
+    "video": {
+	"ccc": "https://media.ccc.de/v/emf2016-35-lego-punk-silly-things-to-do-with-lego",
+	"youtube": "https://www.youtube.com/watch?v=XNQhUtUajkM"
+    }
   },
   {
     "description": "A workshop for people afraid of surface mount assembly/rework. You know those tiny little components in modern electronic devices? It's both possible and easy to assemble those by hand. You can do it, and I'll teach you how. Think you don't have the tools? Think you can't manually place 0402s? Everything is possible with patience and practice. The equipment is minimal and you probably already have it. We're going to build two switch-mode power supplies (one step-up, one step-down) using tiny SMD parts. They're going to work. We'll learn the answer to THERE'S A SHORT ON A TINY PART OMG WHAT NOW? After this, you'll no longer need to be scared of SMD. Avoid caffeine immediately before the workshop, because shaky hands are a disadvantage.",
@@ -2817,7 +2863,11 @@
     "user_id": 63,
     "end_date": "2016-08-05 13:20:00",
     "is_fave": false,
-    "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068"
+    "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
+    "video": {
+	"ccc": "https://media.ccc.de/v/emf2016-332-emf-2016-opening-ceremony",
+	"youtube": "https://www.youtube.com/watch?v=kuG9ftLFUak"
+    }
   },
   {
     "description": "*Notice: this workshop will only run if there is sufficient wind*\r\n\r\nSuitable for ages 5 and up, young children to be accompanied by parents or older siblings.\r\n\r\nPlease bring gloves (sailing/cycling/gardening gloves or any other strong gloves). if you have a large kite (delta kite or similar) you can bring your own.\r\n\r\nQuick introductions and brief sharing of interest in aerial mapping. Brief introduction of  Public Lab, materials, online tool, and the concept of civic science as a kind of science that questions what and how things are. Kite flying basics and safety incl. walking to site. Camera basics incl. attaching to rig . Aerial mapping. Debrief and overview of next steps.",
