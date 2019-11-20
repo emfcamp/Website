@@ -1,22 +1,23 @@
 from decorator import decorator
 from datetime import datetime
 import json
+import re
 import os.path
 
 from main import db, mail, external_url
 from flask import session, render_template, abort, current_app as app, request, Markup
 from flask.json import jsonify
 from flask_login import login_user, current_user
+from flask_mail import Message
 from werkzeug import BaseResponse
 from werkzeug.exceptions import HTTPException
+from jinja2.utils import urlize
 
 from models.basket import Basket
 from models.product import Price
 from models.site_state import get_site_state, get_sales_state, event_start, event_end
 from models.feature_flag import get_db_flags
 from models import User
-
-from flask_mail import Message
 
 from .preload import init_preload
 
@@ -138,6 +139,13 @@ def load_utility_functions(app_obj):
             )
 
         return {"octicon": octicon}
+
+    @app_obj.template_filter("pretty_text")
+    def pretty_text(text):
+        text = text.strip(" \n\r")
+        text = urlize(text, trim_url_limit=40)
+        text = "\n".join(f"<p>{para}</p>" for para in re.split(r"[\r\n]+", text))
+        return Markup(text)
 
 
 def send_template_email(subject, to, sender, template, **kwargs):

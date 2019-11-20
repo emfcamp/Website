@@ -20,8 +20,8 @@
 </p>
 
 {% if event.description %}
-<div class="well">
-  <p class="multiline" itemprop="description">{{ event.description | urlize }}</p>
+<div class="well" itemprop="description">
+  {{ event.description | pretty_text }}
 </div>
 {% endif %}
 
