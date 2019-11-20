@@ -42,24 +42,33 @@
 {% set venue_loop = loop %}
 
 <h3>{{ venue.name }}</h3>
-
 <table class="table">
 <thead>
-  <tr><th>
-    <div class="col-sm-3">Name</div>
-    <div class="col-sm-9">Title</div>
-  </th></tr>
-</thead><tbody>
+  <tr>
+    <th>Name</th>
+    <th>Title</th>
+    <th></th>
+  </tr>
+</thead>
+<tbody>
 {% for row in venue.events %}
-  <tr class="{{- loop.cycle('odd', 'even') }}"><td>
-    <a href="{{url_for('schedule.item', year=year, proposal_id=row.id)}}">
-        <div class="col-sm-3"><strong>{{ row.speaker }}</strong></div>
-        <div class="col-sm-8">{{ row.title }}</div>
-    </a>
+  <tr class="{{- loop.cycle('odd', 'even') }}">
+    <td>
+      <a href="{{url_for('schedule.item', year=year, proposal_id=row.id)}}">
+          <strong>{{ row.speaker }}</strong>
+      </a>
+    </td>
+    <td>
+      <a href="{{url_for('schedule.item', year=year, proposal_id=row.id)}}">
+        {{ row.title }}
+      </a>
+    </td>
+    <td>
     {% if row.video %}
       {{octicon('device-camera-video', alt="Has video")}}
     {% endif %}
-  </td></tr>
+    </td>
+</tr>
 {% endfor %}
 </tbody>
 </table>
