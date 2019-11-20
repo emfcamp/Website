@@ -80,6 +80,9 @@ function css(cb) {
 function images(cb) {
   gulp.src('./node_modules/@primer/octicons/build/svg/**/*.svg')
     .pipe(gulp.dest('static/icons'));
+
+  gulp.src('./images/**/*')
+    .pipe(gulp.dest('static/images'));
   cb();
 }
 
