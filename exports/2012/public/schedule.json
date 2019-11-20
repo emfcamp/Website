@@ -121,9 +121,9 @@
   {
     "id": 12,
     "source": "database",
-    "title": "Two-fisted tales of DevOps - beards vs. process - John Hawkes-Reed",
+    "title": "Two-fisted tales of DevOps - beards vs. process",
     "venue": "Stage Beta",
-    "speaker": "",
+    "speaker": "John Hawkes-Reed",
     "type": "talk",
     "start_date": "2012-08-31T19:00:00",
     "start_time": "19:00"
