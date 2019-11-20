@@ -3,9 +3,20 @@
     These are served from static files in this repository as the database is wiped every year.
 """
 from flask import render_template, abort, redirect, url_for
+from dateutil.parser import parse as date_parse
 
 from models.cfp import proposal_slug
 from ..common import load_archive_file
+
+
+def parse_event(event):
+    if "start_date" in event:
+        event["start_date"] = date_parse(event["start_date"])
+
+    if "end_date" in event:
+        event["end_date"] = date_parse(event["end_date"])
+
+    return event
 
 
 def item_historic(year, proposal_id, slug):
@@ -27,18 +38,22 @@ def item_historic(year, proposal_id, slug):
             url_for(".item", year=year, proposal_id=proposal_id, slug=correct_slug)
         )
 
-    return render_template("schedule/historic/item.html", proposal=item, year=year)
+    return render_template(
+        "schedule/historic/item.html", event=parse_event(item), year=year
+    )
 
 
 def talks_historic(year):
     if year < 2012:
         abort(404)
-    data = load_archive_file(year, "public", "schedule.json")
+
+    schedule = load_archive_file(year, "public", "schedule.json")
+    event_data = load_archive_file(year, "event.json", raise_404=False)
 
     stage_events = []
     workshop_events = []
 
-    for event in data:
+    for event in [parse_event(event) for event in schedule]:
         if event["source"] == "external":
             continue
 
@@ -60,13 +75,18 @@ def talks_historic(year):
         if not any(e["title"] == event["title"] for e in events_list):
             events_list.append(event)
 
-    # Sort should avoid leading punctuation and whitespace and be case-insensitive
-    stage_events.sort(key=lambda event: event["title"].strip().strip("'").upper())
-    workshop_events.sort(key=lambda event: event["title"].strip().strip("'").upper())
+    def sort_key(event):
+        # Sort should avoid leading punctuation and whitespace and be case-insensitive
+        return event["title"].strip().strip("'").upper()
+
+    stage_events.sort(key=sort_key)
+    workshop_events.sort(key=sort_key)
 
     venues = [
         {"name": "Main Stages", "events": stage_events},
         {"name": "Workshops", "events": workshop_events},
     ]
 
-    return render_template("schedule/historic/talks.html", venues=venues, year=year)
+    return render_template(
+        "schedule/historic/talks.html", venues=venues, year=year, event=event_data
+    )

@@ -1,13 +1,36 @@
 {% extends "base.html" %}
-{% block title %}EMF {{year}} Talks{% endblock %}
+{# Microdata note: 
+  After an event has happened, this page acts as the canonical page for the event.
+#}
+{% block content_scope %}http://schema.org/Event{% endblock %}
 {% if year == 2013 %}
   {% set event_name = "Electromagnetic Wave %s" % year %}
+  {% set short_name = "EMW %s" % year %}
 {% else %}
   {% set event_name = "Electromagnetic Field %s" % year %}
+  {% set short_name = "EMF %s" % year %}
 {% endif %}
+{% block title %}{{event_name}}{% endblock %}
 {% block body %}
-<h2>{{event_name}} Talks</h2>
-<p>These were the talks and workshops which happened at {{event_name}}.</p>
+<h2 itemprop="name">{{event_name}}</h2>
+<meta itemprop="alternateName" content="{{ short_name }}">
+{% if event %}
+<div class="well">
+  <p>{{short_name}} was held between
+      <time itemprop="startDate">{{event.start_date}}</time> and
+      <time itemprop="endDate">{{event.end_date}}</time>
+      at <span itemprop="location" itemscope itemtype="http://schema.org/Place">
+          <span itemprop="name">{{event.location.name}}</span>,
+            <span itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
+              <span itemprop="addressLocality">{{event.location.locality}}</span>,
+              <span itemprop="addressRegion">{{event.location.region}}</span>,
+              <span itemprop="addressCountry">UK</span>.
+            </span>
+        </span>
+  </p>
+  <p>Below you can find a list of talks and workshops.</p>
+</div>
+{% endif %}
 
 {% for venue in venues %}
 {% set venue_loop = loop %}
@@ -23,7 +46,7 @@
 </thead><tbody>
 {% for row in venue.events %}
   <tr class="{{- loop.cycle('odd', 'even') }}"><td>
-    <a href="{{url_for('schedule.item', year=year, proposal_id=row.id)}}" >
+    <a href="{{url_for('schedule.item', year=year, proposal_id=row.id)}}">
         <div class="col-sm-3"><strong>{{ row.speaker }}</strong></div>
         <div class="col-sm-8">{{ row.title }}</div>
     </a>

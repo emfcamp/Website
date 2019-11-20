@@ -29,7 +29,10 @@
           {% block secondary_nav %}{% endblock %}
         </div>
         {% endif %}
-        <div id="main-content" class="emf-col {{ main_class }}" role="main">
+        <div id="main-content" class="emf-col {{ main_class }}" role="main"
+          {%- if self.content_scope() -%}
+              itemscope itemtype="{% block content_scope %}{% endblock %}"
+          {%- endif %}>
             {% for message in get_flashed_messages() -%}
                 <div class="alert alert-warning">{{ message }}</div>
             {% endfor -%}
