@@ -22,7 +22,9 @@
     events.
 """
 import pytz
-from flask import Blueprint, redirect, url_for
+from flask import Blueprint, redirect, url_for, abort
+
+from models import event_year
 
 schedule = Blueprint("schedule", __name__)
 event_tz = pytz.timezone("Europe/London")
@@ -49,6 +51,20 @@ def lineup_talk_redirect(year, proposal_id, slug=None):
     return redirect(
         url_for(".item", year=year, proposal_id=proposal_id, slug=slug), 301
     )
+
+
+@schedule.route("/schedule.<string:fmt>")
+def feed_redirect(fmt):
+    routes = {
+        "json": "schedule.schedule_json",
+        "frab": "schedule.schedule_frab",
+        "ical": "schedule.schedule_ical",
+        "ics": "schedule.schedule_ical",
+    }
+
+    if fmt not in routes:
+        abort(404)
+    return redirect(url_for(routes[fmt], year=event_year()))
 
 
 from . import base  # noqa

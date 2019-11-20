@@ -10,6 +10,7 @@ from models.cfp import Proposal
 
 from ..common import feature_flag, json_response
 from .schedule_xml import export_frab
+from .historic import feed_historic
 from .data import (
     _get_scheduled_proposals,
     _get_proposal_dict,
@@ -30,9 +31,10 @@ def _format_event_description(event):
     return description
 
 
-@schedule.route("/schedule.json")
-@feature_flag("SCHEDULE")
-def schedule_json():
+@schedule.route("/schedule/<int:year>.json")
+def schedule_json(year):
+    if year != event_year():
+        return feed_historic(year, "json")
 
     schedule = [_convert_time_to_str(p) for p in _get_scheduled_proposals(request.args)]
 
@@ -40,9 +42,11 @@ def schedule_json():
     return Response(json.dumps(schedule), mimetype="application/json")
 
 
-@schedule.route("/schedule.frab")
-@feature_flag("SCHEDULE")
-def schedule_frab():
+@schedule.route("/schedule/<int:year>.frab")
+def schedule_frab(year):
+    if year != event_year():
+        return feed_historic(year, "frab")
+
     schedule = (
         Proposal.query.filter(
             Proposal.state.in_(["accepted", "finished"]),
@@ -61,10 +65,12 @@ def schedule_frab():
     return Response(frab, mimetype="application/xml")
 
 
-@schedule.route("/schedule.ical")
-@schedule.route("/schedule.ics")
-@feature_flag("SCHEDULE")
-def schedule_ical():
+@schedule.route("/schedule/<int:year>.ical")
+@schedule.route("/schedule/<int:year>.ics")
+def schedule_ical(year):
+    if year != event_year():
+        return feed_historic(year, "ics")
+
     schedule = _get_scheduled_proposals(request.args)
     title = "EMF {}".format(event_start().year)
 

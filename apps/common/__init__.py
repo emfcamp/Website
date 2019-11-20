@@ -251,17 +251,28 @@ def feature_enabled(feature):
     return app.config.get(feature, False)
 
 
-def load_archive_file(year: int, *path, raise_404=True):
-    """ Load the contents of a JSON file from the archive, and abort with
-        a 404 if it doesn't exist.
+def archive_file(year, *path, raise_404=True):
+    """ Return the path to a given file within the archive.
+        Optionally raise 404 if it doesn't exist.
     """
-    json_path = os.path.abspath(
+    file_path = os.path.abspath(
         os.path.join(__file__, "..", "..", "..", "exports", str(year), *path)
     )
-    if not os.path.exists(json_path):
+
+    if not os.path.exists(file_path):
         if raise_404:
             abort(404)
         else:
             return None
 
+    return file_path
+
+
+def load_archive_file(year: int, *path, raise_404=True):
+    """ Load the contents of a JSON file from the archive, and optionally
+        abort with a 404 if it doesn't exist.
+    """
+    json_path = archive_file(year, *path, raise_404=raise_404)
+    if json_path is None:
+        return None
     return json.load(open(json_path, "r"))

@@ -2,11 +2,17 @@
 
     These are served from static files in this repository as the database is wiped every year.
 """
-from flask import render_template, abort, redirect, url_for
+from flask import render_template, abort, redirect, url_for, send_file
 from dateutil.parser import parse as date_parse
 
+from models import event_year
 from models.cfp import proposal_slug
-from ..common import load_archive_file
+from ..common import load_archive_file, archive_file
+
+
+def abort_if_invalid_year(year):
+    if not 2012 <= year < event_year():
+        abort(404)
 
 
 def parse_event(event):
@@ -21,8 +27,7 @@ def parse_event(event):
 
 def item_historic(year, proposal_id, slug):
     """ Handler to display a detail page for a schedule item."""
-    if year < 2012:
-        abort(404)
+    abort_if_invalid_year(year)
 
     #  We might want to look at performance here but I'm not sure it's a huge issue at the moment
     data = load_archive_file(year, "public", "schedule.json")
@@ -44,8 +49,7 @@ def item_historic(year, proposal_id, slug):
 
 
 def talks_historic(year):
-    if year < 2012:
-        abort(404)
+    abort_if_invalid_year(year)
 
     schedule = load_archive_file(year, "public", "schedule.json")
     event_data = load_archive_file(year, "event.json", raise_404=False)
@@ -90,3 +94,10 @@ def talks_historic(year):
     return render_template(
         "schedule/historic/talks.html", venues=venues, year=year, event=event_data
     )
+
+
+def feed_historic(year, fmt):
+    """ Serve a historic feed if it's available. """
+    abort_if_invalid_year(year)
+    file_path = archive_file(year, "public", f"schedule.{fmt}")
+    return send_file(file_path)

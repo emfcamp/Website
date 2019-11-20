@@ -2,7 +2,7 @@
 {# Microdata note: 
   After an event has happened, this page acts as the canonical page for the event.
 #}
-{% block content_scope %}http://schema.org/Event{% endblock %}
+
 {% if year == 2013 %}
   {% set event_name = "Electromagnetic Wave %s" % year %}
   {% set short_name = "EMW %s" % year %}
@@ -10,7 +10,13 @@
   {% set event_name = "Electromagnetic Field %s" % year %}
   {% set short_name = "EMF %s" % year %}
 {% endif %}
+{% block content_scope %}http://schema.org/Event{% endblock %}
 {% block title %}{{event_name}}{% endblock %}
+{% block head -%}
+    <link rel="alternate" type="application/json" href="{{url_for('schedule.schedule_json', year=year)}}"
+          title="JSON Feed">
+{%- endblock %}
+
 {% block body %}
 <h2 itemprop="name">{{event_name}}</h2>
 <meta itemprop="alternateName" content="{{ short_name }}">
