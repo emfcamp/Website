@@ -857,7 +857,10 @@
     "latlon": [
       52.0396099,
       -2.377866
-    ]
+    ],
+    "video": {
+	"ccc": "https://media.ccc.de/v/emf2018-445-why-volunteers-are-unsung-heroes-of-science"
+    }
   },
   {
     "id": 393,
@@ -1543,7 +1546,11 @@
     "latlon": [
       52.0396099,
       -2.377866
-    ]
+    ],
+    "video": {
+	"youtube": "https://www.youtube.com/watch?v=8WPSm7oOARM",
+	"ccc": "https://media.ccc.de/v/emf2018-493-adventures-in-undertent-heating"
+    }
   },
   {
     "id": 179,
@@ -2580,7 +2587,11 @@
     "latlon": [
       52.0396099,
       -2.377866
-    ]
+    ],
+    "video": {
+	"youtube": "https://www.youtube.com/watch?v=cM5nUDeIMjo",
+	"ccc": "https://media.ccc.de/v/emf2018-229-101-hacks-for-late-soviet-water-towers"
+    }
   },
   {
     "id": 505,
@@ -3882,7 +3893,11 @@
     "latlon": [
       52.0396099,
       -2.377866
-    ]
+    ],
+    "video": {
+	"ccc": "https://media.ccc.de/v/emf2018-145-boiling-nemo-make-your-own-internet-of-things",
+	"youtube": "https://www.youtube.com/watch?v=vRiHtzXLEn4"
+    }
   },
   {
     "id": 130,
@@ -4690,7 +4705,11 @@
     "latlon": [
       52.0396099,
       -2.377866
-    ]
+    ],
+    "video": {
+	"ccc": "https://media.ccc.de/v/emf2018-456-a-cheap-remotely-posable-presence-robot-using-a-raspberry-pi",
+	"youtube": "https://www.youtube.com/watch?v=KY_g_APnqiA"
+    }
   },
   {
     "id": 527,
@@ -5275,7 +5294,11 @@
     "latlon": [
       52.0396099,
       -2.377866
-    ]
+    ],
+    "video": {
+	"youtube": "https://www.youtube.com/watch?v=tiQP8nEVkcc",
+	"ccc": "https://media.ccc.de/v/emf2018-267-science-magic-magic-science"
+    }
   },
   {
     "id": 41,
@@ -5348,7 +5371,10 @@
     "latlon": [
       52.0396099,
       -2.377866
-    ]
+    ],
+    "video": {
+	"ccc": "https://media.ccc.de/v/emf2018-486-opening-ceremony"
+    }
   },
   {
     "id": 187,
