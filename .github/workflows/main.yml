@@ -16,7 +16,7 @@ jobs:
       - name: Start environment
         run: docker-compose -f ./docker-compose.yml -f ./docker-compose.ci.yml up --build -d
       - name: Test
-        run: docker-compose -f ./docker-compose.yml -f ./docker-compose.ci.yml exec -T app pipenv run make test
+        run: docker-compose -f ./docker-compose.yml -f ./docker-compose.ci.yml exec -T app poetry run make test
   build:
     runs-on: ubuntu-latest
     needs: test
