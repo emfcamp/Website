@@ -6,8 +6,9 @@ on:
       - master
     paths:
       - 'docker/Dockerfile.base'
-      - 'Pipfile'
-      - 'Pipfile.lock'
+      - 'docker/Dockerfile.base.dockerignore'
+      - 'pyproject.toml'
+      - 'poetry.lock'
   schedule:
     - cron:  '30 5 */14 * *'
 
