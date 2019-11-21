@@ -15,7 +15,6 @@ COPY pyproject.toml poetry.lock /app/
 # packages, however this complicates upgrading packages which require compilation.
 # Additionally, Pipenv appears to reinstall all packages when running pipenv install,
 # which is suboptimal.
-#
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       python3-dev libxml2-dev libxslt1-dev libffi-dev git glpk-utils \
