@@ -163,7 +163,7 @@ def create_app(dev_server=False):
     def send_security_headers(response):
         use_hsts = app.config.get("HSTS", False)
         if use_hsts:
-            max_age = app.config.get("HSTS_MAX_AGE", 3600 * 24 * 7 * 4)
+            max_age = app.config.get("HSTS_MAX_AGE", 3600 * 24 * 30 * 6)
             response.headers["Strict-Transport-Security"] = "max-age=%s" % max_age
 
         response.headers["X-Frame-Options"] = "deny"
