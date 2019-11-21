@@ -56,6 +56,7 @@ def talks_historic(year):
 
     stage_events = []
     workshop_events = []
+    youth_events = []
 
     for event in [parse_event(event) for event in schedule]:
         if event["source"] == "external":
@@ -72,6 +73,8 @@ def talks_historic(year):
             events_list = stage_events
         elif event["type"] == "workshop":
             events_list = workshop_events
+        elif event["type"] == "youthworkshop":
+            events_list = youth_events
         else:
             continue
 
@@ -85,11 +88,15 @@ def talks_historic(year):
 
     stage_events.sort(key=sort_key)
     workshop_events.sort(key=sort_key)
+    youth_events.sort(key=sort_key)
 
     venues = [
         {"name": "Main Stages", "events": stage_events},
         {"name": "Workshops", "events": workshop_events},
     ]
+
+    if len(youth_events) > 0:
+        venues.append({"name": "Youth Workshops", "events": youth_events})
 
     return render_template(
         "schedule/historic/talks.html", venues=venues, year=year, event=event_data
