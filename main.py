@@ -267,5 +267,6 @@ def create_app(dev_server=False):
 
 def external_url(endpoint, **values):
     """ Generate an absolute external URL. If you need to override this,
-        you're probably doing something wrong. """
+        you're probably doing something wrong.
+    """
     return url_for(endpoint, _external=True, **values)
