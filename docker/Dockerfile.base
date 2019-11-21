@@ -6,7 +6,7 @@
 FROM python:3.7-slim-buster
 
 WORKDIR /app
-COPY Pipfile Pipfile.lock /app/
+COPY pyproject.toml poetry.lock /app/
 
 # All the X11 packages are required for chromium/pyppetteer which we use for
 # generating PDFs.
@@ -23,6 +23,6 @@ RUN apt-get update && \
       libx11-xcb1 libxcomposite1 libxss1 \
       libxcursor1 libxdamage1 libxi6 libxtst6 libnss3 libcups2 \
       libxrandr2 libasound2 libatk1.0-0 libatk-bridge2.0-0 libgtk-3-0 && \
-    pip3 install pipenv && \
-    pipenv sync && pipenv run pyppeteer-install && \
+    pip3 install poetry && \
+    poetry install --no-dev && poetry run pyppeteer-install && \
     rm -rf /var/lib/apt/lists/*
