@@ -20,7 +20,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-16-3d-printing-the-worlds-most-pointless-desk-fan",
-      "youtube": "https://www.youtube.com/watch?v=_2_p2xgAN7U"
+      "youtube": "https://www.youtube.com/watch?v=_2_p2xgAN7U",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/16-hd_preview.jpg"
     }
   },
   {
@@ -65,7 +66,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-352-how-we-created-a-hackathon-with-50-50-female-and-male-participants",
-      "youtube": "https://www.youtube.com/watch?v=GYGqYn6lZpU"
+      "youtube": "https://www.youtube.com/watch?v=GYGqYn6lZpU",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/352-hd_preview.jpg"
     }
   },
   {
@@ -89,7 +91,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-33-the-automated-sheet-music-librarian",
-      "youtube": "https://www.youtube.com/watch?v=CKUmsGKdNqQ"
+      "youtube": "https://www.youtube.com/watch?v=CKUmsGKdNqQ",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/33-hd_preview.jpg"
     }
   },
   {
@@ -113,7 +116,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-164-digital-medical-imaging-from-scanner-to-screen",
-      "youtube": "https://www.youtube.com/watch?v=t8b1tHlmRZI"
+      "youtube": "https://www.youtube.com/watch?v=t8b1tHlmRZI",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/164-hd_preview.jpg"
     }
   },
   {
@@ -157,8 +161,9 @@
     "is_fave": false,
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
-	"ccc": "https://media.ccc.de/v/emf2016-182-osmocom-open-source-mobile-communications",
-	"youtube": "https://www.youtube.com/watch?v=vq4zXOk3Qpg"
+      "ccc": "https://media.ccc.de/v/emf2016-182-osmocom-open-source-mobile-communications",
+      "youtube": "https://www.youtube.com/watch?v=vq4zXOk3Qpg",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/182-hd_preview.jpg"
     }
   },
   {
@@ -203,7 +208,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-100-shape-changing-in-nature-and-puny-human-efforts-to-emulate-it",
-      "youtube": "https://www.youtube.com/watch?v=aVE0O3xUhCE"
+      "youtube": "https://www.youtube.com/watch?v=aVE0O3xUhCE",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/100-hd_preview.jpg"
     }
   },
   {
@@ -248,7 +254,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-119-morality-in-video-games-when-its-not-just-a-game",
-      "youtube": "https://www.youtube.com/watch?v=_WazG8sM3bc"
+      "youtube": "https://www.youtube.com/watch?v=_WazG8sM3bc",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/119-hd_preview.jpg"
     }
   },
   {
@@ -271,8 +278,9 @@
     "is_fave": false,
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
-	"ccc": "https://media.ccc.de/v/emf2016-112-numbers-stations-cold-war-short-waves",
-	"youtube": "https://www.youtube.com/watch?v=Qrt1pN4CFCA"
+      "ccc": "https://media.ccc.de/v/emf2016-112-numbers-stations-cold-war-short-waves",
+      "youtube": "https://www.youtube.com/watch?v=Qrt1pN4CFCA",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/112-hd_preview.jpg"
     }
   },
   {
@@ -358,7 +366,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-140-how-is-the-universe-like-a-lightbulb",
-      "youtube": "https://www.youtube.com/watch?v=p-56R9BFNK8"
+      "youtube": "https://www.youtube.com/watch?v=p-56R9BFNK8",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/140-hd_preview.jpg"
     }
   },
   {
@@ -402,8 +411,9 @@
     "is_fave": false,
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
-	"ccc": "https://media.ccc.de/v/emf2016-141-hacking-your-head-managing-information-overload",
-	"youtube": "https://www.youtube.com/watch?v=q2tZHsvz3_U"
+      "ccc": "https://media.ccc.de/v/emf2016-141-hacking-your-head-managing-information-overload",
+      "youtube": "https://www.youtube.com/watch?v=q2tZHsvz3_U",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/141-hd_preview.jpg"
     }
   },
   {
@@ -426,8 +436,9 @@
     "is_fave": false,
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
-	"ccc": "https://media.ccc.de/v/emf2016-336-the-science-of-laughter",
-	"youtube": "https://www.youtube.com/watch?v=vWRV8okfnAg"
+      "ccc": "https://media.ccc.de/v/emf2016-336-the-science-of-laughter",
+      "youtube": "https://www.youtube.com/watch?v=vWRV8okfnAg",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/336-hd_preview.jpg"
     }
   },
   {
@@ -451,7 +462,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-144-off-grid-a-game-about-circumvention-tech-and-hacking",
-      "youtube": "https://www.youtube.com/watch?v=suEXrMO6rQo"
+      "youtube": "https://www.youtube.com/watch?v=suEXrMO6rQo",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/144-hd_preview.jpg"
     }
   },
   {
@@ -516,7 +528,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-240-getting-the-kids-on-board-tales-from-10-years-of-schools-outreach-in-technology",
-      "youtube": "https://www.youtube.com/watch?v=k9Qq_R03m8Y"
+      "youtube": "https://www.youtube.com/watch?v=k9Qq_R03m8Y",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/240-hd_preview.jpg"
     }
   },
   {
@@ -539,7 +552,8 @@
     "is_fave": false,
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
-	"ccc": "https://media.ccc.de/v/emf2016-63-connecting-computers-together-over-1-000s-miles-without-using-the-internet"
+      "ccc": "https://media.ccc.de/v/emf2016-63-connecting-computers-together-over-1-000s-miles-without-using-the-internet",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/63-hd_preview.jpg"
     }
   },
   {
@@ -563,7 +577,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-242-inside-our-toys-how-to-hack-into-an-embedded-device",
-      "youtube": "https://www.youtube.com/watch?v=bv1RwZVXcdY"
+      "youtube": "https://www.youtube.com/watch?v=bv1RwZVXcdY",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/242-hd_preview.jpg"
     }
   },
   {
@@ -586,8 +601,9 @@
     "is_fave": false,
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
-	"ccc": "https://media.ccc.de/v/emf2016-159-biological-computation",
-	"youtube": "https://www.youtube.com/watch?v=QptQ446_Kvs"
+      "ccc": "https://media.ccc.de/v/emf2016-159-biological-computation",
+      "youtube": "https://www.youtube.com/watch?v=QptQ446_Kvs",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/159-hd_preview.jpg"
     }
   },
   {
@@ -611,7 +627,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-305-a-mathematical-view-of-voting-systems",
-      "youtube": "https://www.youtube.com/watch?v=FEPzLlHqonk"
+      "youtube": "https://www.youtube.com/watch?v=FEPzLlHqonk",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/305-hd_preview.jpg"
     }
   },
   {
@@ -634,8 +651,9 @@
     "is_fave": false,
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
-	"ccc": "https://media.ccc.de/v/emf2016-176-canute-the-worlds-first-working-refreshable-multiline-braille-display",
-	"youtube": "https://www.youtube.com/watch?v=i_OUSBkLjkk"
+      "ccc": "https://media.ccc.de/v/emf2016-176-canute-the-worlds-first-working-refreshable-multiline-braille-display",
+      "youtube": "https://www.youtube.com/watch?v=i_OUSBkLjkk",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/176-hd_preview.jpg"
     }
   },
   {
@@ -659,7 +677,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-203-building-a-wearable-camera",
-      "youtube": "https://www.youtube.com/watch?v=oW2MMU7S_-o"
+      "youtube": "https://www.youtube.com/watch?v=oW2MMU7S_-o",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/203-hd_preview.jpg"
     }
   },
   {
@@ -683,7 +702,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-196-receiving-live-video-from-the-space-station",
-      "youtube": "https://www.youtube.com/watch?v=7dP3daw8gNI"
+      "youtube": "https://www.youtube.com/watch?v=7dP3daw8gNI",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/196-hd_preview.jpg"
     }
   },
   {
@@ -707,7 +727,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-208-world-premiere-of-tentman",
-      "youtube": "https://www.youtube.com/watch?v=K7AHN4g2faA"
+      "youtube": "https://www.youtube.com/watch?v=K7AHN4g2faA",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/208-hd_preview.jpg"
     }
   },
   {
@@ -731,7 +752,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-145-hobby-electronics-like-a-pro",
-      "youtube": "https://www.youtube.com/watch?v=fLe79RaZAXQ"
+      "youtube": "https://www.youtube.com/watch?v=fLe79RaZAXQ",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/145-hd_preview.jpg"
     }
   },
   {
@@ -775,7 +797,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-236-freifunk-free-and-open-wireless-community-networks",
-      "youtube": "https://www.youtube.com/watch?v=pC2atv_ZPOc"
+      "youtube": "https://www.youtube.com/watch?v=pC2atv_ZPOc",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/236-hd_preview.jpg"
     }
   },
   {
@@ -799,7 +822,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-222-socio-technical-evolution-for-hackers",
-      "youtube": "https://www.youtube.com/watch?v=KjdBjFxL1u4"
+      "youtube": "https://www.youtube.com/watch?v=KjdBjFxL1u4",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/222-hd_preview.jpg"
     }
   },
   {
@@ -843,7 +867,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-315-key-impressioning",
-      "youtube": "https://www.youtube.com/watch?v=AcuwrU_bmUI"
+      "youtube": "https://www.youtube.com/watch?v=AcuwrU_bmUI",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/315-hd_preview.jpg"
     }
   },
   {
@@ -867,7 +892,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-277-sustainable-open-source",
-      "youtube": "https://www.youtube.com/watch?v=gn51odVlCR0"
+      "youtube": "https://www.youtube.com/watch?v=gn51odVlCR0",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/277-hd_preview.jpg"
     }
   },
   {
@@ -954,7 +980,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-282-this-is-where-we-are-a-tiwwa-tate-modern-postmortem",
-      "youtube": "https://www.youtube.com/watch?v=cWZ0ki2RqA4"
+      "youtube": "https://www.youtube.com/watch?v=cWZ0ki2RqA4",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/282-hd_preview.jpg"
     }
   },
   {
@@ -998,7 +1025,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-209-car-hacking-back-to-the-future-1970-s-style",
-      "youtube": "https://www.youtube.com/watch?v=NChXuxwQ_lE"
+      "youtube": "https://www.youtube.com/watch?v=NChXuxwQ_lE",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/209-hd_preview.jpg"
     }
   },
   {
@@ -1022,7 +1050,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-293-from-transistor-to-processor",
-      "youtube": "https://www.youtube.com/watch?v=Y_gi-KyIDFg"
+      "youtube": "https://www.youtube.com/watch?v=Y_gi-KyIDFg",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/293-hd_preview.jpg"
     }
   },
   {
@@ -1046,7 +1075,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-306-using-printed-circuit-boards-to-make-snowflakes",
-      "youtube": "https://www.youtube.com/watch?v=ojfXOPazrKA"
+      "youtube": "https://www.youtube.com/watch?v=ojfXOPazrKA",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/306-hd_preview.jpg"
     }
   },
   {
@@ -1070,7 +1100,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-299-a-brief-history-of-effects-in-film",
-      "youtube": "https://www.youtube.com/watch?v=ZrFwu-baYVo"
+      "youtube": "https://www.youtube.com/watch?v=ZrFwu-baYVo",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/299-hd_preview.jpg"
     }
   },
   {
@@ -1094,7 +1125,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-123-100-years-of-shannon-the-man-his-work-and-his-legacy",
-      "youtube": "https://www.youtube.com/watch?v=95OI2TQkspQ"
+      "youtube": "https://www.youtube.com/watch?v=95OI2TQkspQ",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/123-hd_preview.jpg"
     }
   },
   {
@@ -1118,7 +1150,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-235-hacking-robot-dinosaurs",
-      "youtube": "https://www.youtube.com/watch?v=wueRcp8QdBM"
+      "youtube": "https://www.youtube.com/watch?v=wueRcp8QdBM",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/235-hd_preview.jpg"
     }
   },
   {
@@ -1162,7 +1195,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-307-designing-and-performing-future-instruments",
-      "youtube": "https://www.youtube.com/watch?v=TeD3RhHDv1A"
+      "youtube": "https://www.youtube.com/watch?v=TeD3RhHDv1A",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/307-hd_preview.jpg"
     }
   },
   {
@@ -1206,7 +1240,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-314-smashing-physics-latest-news-from-cerns-large-hadron-collider",
-      "youtube": "https://www.youtube.com/watch?v=eMbnGGJS4E0"
+      "youtube": "https://www.youtube.com/watch?v=eMbnGGJS4E0",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/314-hd_preview.jpg"
     }
   },
   {
@@ -1230,7 +1265,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-272-fail-map-visualizing-security-fail-at-trusted-parties-for-your-protection",
-      "youtube": "https://www.youtube.com/watch?v=y4l39cGi8UI"
+      "youtube": "https://www.youtube.com/watch?v=y4l39cGi8UI",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/272-hd_preview.jpg"
     }
   },
   {
@@ -1274,7 +1310,8 @@
     "is_fave": false,
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
-	"ccc": "https://media.ccc.de/v/emf2016-269-beer-for-everyone"
+      "ccc": "https://media.ccc.de/v/emf2016-269-beer-for-everyone",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/269-hd_preview.jpg"
     }
   },
   {
@@ -1298,7 +1335,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-3-emf-2016-infrastructure-review",
-      "youtube": "https://www.youtube.com/watch?v=TO8vWj6WYgk"
+      "youtube": "https://www.youtube.com/watch?v=TO8vWj6WYgk",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/3-hd_preview.jpg"
     }
   },
   {
@@ -1342,7 +1380,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-160-3d-printed-sculptures-of-4d-things",
-      "youtube": "https://www.youtube.com/watch?v=iqTLQ0T-MxU"
+      "youtube": "https://www.youtube.com/watch?v=iqTLQ0T-MxU",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/160-hd_preview.jpg"
     }
   },
   {
@@ -1406,7 +1445,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-296-cyber-security-and-the-joy-of-the-false-positive",
-      "youtube": "https://www.youtube.com/watch?v=mG90eewy-Us"
+      "youtube": "https://www.youtube.com/watch?v=mG90eewy-Us",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/296-hd_preview.jpg"
     }
   },
   {
@@ -1449,8 +1489,9 @@
     "is_fave": false,
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
-	"ccc": "https://media.ccc.de/v/emf2016-49-the-history-and-future-of-books",
-	"youtube": "https://www.youtube.com/watch?v=XkBUcGxhCYk"
+      "ccc": "https://media.ccc.de/v/emf2016-49-the-history-and-future-of-books",
+      "youtube": "https://www.youtube.com/watch?v=XkBUcGxhCYk",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/49-hd_preview.jpg"
     }
   },
   {
@@ -1474,7 +1515,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-200-saving-milliseconds-and-wasting-hours-a-survey-of-tool-assisted-speedrunning",
-      "youtube": "https://www.youtube.com/watch?v=6uzWxLuXg7Y"
+      "youtube": "https://www.youtube.com/watch?v=6uzWxLuXg7Y",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/200-hd_preview.jpg"
     }
   },
   {
@@ -1498,7 +1540,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-333-emf-2016-closing-ceremony",
-      "youtube": "https://www.youtube.com/watch?v=rsdpAhxklMU"
+      "youtube": "https://www.youtube.com/watch?v=rsdpAhxklMU",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/333-hd_preview.jpg"
     }
   },
   {
@@ -1522,7 +1565,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-284-whitespace",
-      "youtube": "https://www.youtube.com/watch?v=Y0YW7KUdwFY"
+      "youtube": "https://www.youtube.com/watch?v=Y0YW7KUdwFY",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/284-hd_preview.jpg"
     }
   },
   {
@@ -1546,7 +1590,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-214-getting-physical-with-web-bluetooth-in-the-browser",
-      "youtube": "https://www.youtube.com/watch?v=ocWEAmiDWJs"
+      "youtube": "https://www.youtube.com/watch?v=ocWEAmiDWJs",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/214-hd_preview.jpg"
     }
   },
   {
@@ -1570,7 +1615,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-343-mars-the-bringer-of-wub",
-      "youtube": "https://www.youtube.com/watch?v=iIUK2S-H4XQ"
+      "youtube": "https://www.youtube.com/watch?v=iIUK2S-H4XQ",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/343-hd_preview.jpg"
     }
   },
   {
@@ -1594,7 +1640,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-309-riddles-on-rails",
-      "youtube": "https://www.youtube.com/watch?v=fiBpcKIs8x8"
+      "youtube": "https://www.youtube.com/watch?v=fiBpcKIs8x8",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/309-hd_preview.jpg"
     }
   },
   {
@@ -1618,7 +1665,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-302-here-hear-sound-based-illusions",
-      "youtube": "https://www.youtube.com/watch?v=Xb1lGEUdPn8"
+      "youtube": "https://www.youtube.com/watch?v=Xb1lGEUdPn8",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/302-hd_preview.jpg"
     }
   },
   {
@@ -1703,7 +1751,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-88-apocalypse-later",
-      "youtube": "https://www.youtube.com/watch?v=U3gTL-XJcgs"
+      "youtube": "https://www.youtube.com/watch?v=U3gTL-XJcgs",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/88-hd_preview.jpg"
     }
   },
   {
@@ -1727,7 +1776,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-270-mind-control-what-is-really-possible-with-technology-and-the-power-of-your-mind",
-      "youtube": "https://www.youtube.com/watch?v=A8yDnU1iGyE"
+      "youtube": "https://www.youtube.com/watch?v=A8yDnU1iGyE",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/270-hd_preview.jpg"
     }
   },
   {
@@ -1751,7 +1801,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-233-meatspace-surveillance",
-      "youtube": "https://www.youtube.com/watch?v=LLvtNQgY78I"
+      "youtube": "https://www.youtube.com/watch?v=LLvtNQgY78I",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/233-hd_preview.jpg"
     }
   },
   {
@@ -1795,7 +1846,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-331-lightning-talks",
-      "youtube": "https://www.youtube.com/watch?v=ANO4zB6kSCs"
+      "youtube": "https://www.youtube.com/watch?v=ANO4zB6kSCs",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/331-hd_preview.jpg"
     }
   },
   {
@@ -1819,7 +1871,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-359-acoustic-cosmology",
-      "youtube": "https://www.youtube.com/watch?v=daJSPMoGrJs"
+      "youtube": "https://www.youtube.com/watch?v=daJSPMoGrJs",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/359-hd_preview.jpg"
     }
   },
   {
@@ -1843,7 +1896,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-36-photons-to-electrons-how-imaging-sensors-work-from-quantum-mechanics-up",
-      "youtube": "https://www.youtube.com/watch?v=-1gmvIcdIcA"
+      "youtube": "https://www.youtube.com/watch?v=-1gmvIcdIcA",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/36-hd_preview.jpg"
     }
   },
   {
@@ -1867,7 +1921,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-69-cyber-security-myths-and-monsters-how-to-change-behaviours-for-the-better",
-      "youtube": "https://www.youtube.com/watch?v=XC1UZklQKWA"
+      "youtube": "https://www.youtube.com/watch?v=XC1UZklQKWA",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/69-hd_preview.jpg"
     }
   },
   {
@@ -1891,7 +1946,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-83-rebooting-a-hobby-how-modern-digital-comms-are-reviving-amateur-radio",
-      "youtube": "https://www.youtube.com/watch?v=QFMvPyb7MdE"
+      "youtube": "https://www.youtube.com/watch?v=QFMvPyb7MdE",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/83-hd_preview.jpg"
     }
   },
   {
@@ -1914,8 +1970,9 @@
     "is_fave": false,
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
-	"ccc": "https://media.ccc.de/v/emf2016-120-scientifically-ruining-the-interfaces-in-movies",
-	"youtube": "https://www.youtube.com/watch?v=IkAbvZzUNMg"
+      "ccc": "https://media.ccc.de/v/emf2016-120-scientifically-ruining-the-interfaces-in-movies",
+      "youtube": "https://www.youtube.com/watch?v=IkAbvZzUNMg",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/120-hd_preview.jpg"
     }
   },
   {
@@ -1981,7 +2038,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-292-zebro-building-a-six-legged-robot",
-      "youtube": "https://www.youtube.com/watch?v=hmKxw0YBxeQ"
+      "youtube": "https://www.youtube.com/watch?v=hmKxw0YBxeQ",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/292-hd_preview.jpg"
     }
   },
   {
@@ -2005,7 +2063,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-37-a-call-to-arms-lets-hack-usb-devices-its-mostly-easier-than-you-think",
-      "youtube": "https://www.youtube.com/watch?v=K7Glcep_iGc"
+      "youtube": "https://www.youtube.com/watch?v=K7Glcep_iGc",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/37-hd_preview.jpg"
     }
   },
   {
@@ -2028,8 +2087,9 @@
     "is_fave": false,
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
-	"ccc": "https://media.ccc.de/v/emf2016-325-micropython-what-is-it-what-does-it-do-why-is-it-suddenly-everywhere",
-	"youtube": "https://www.youtube.com/watch?v=j2x1li6XcJQ"
+      "ccc": "https://media.ccc.de/v/emf2016-325-micropython-what-is-it-what-does-it-do-why-is-it-suddenly-everywhere",
+      "youtube": "https://www.youtube.com/watch?v=j2x1li6XcJQ",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/325-hd_preview.jpg"
     }
   },
   {
@@ -2053,7 +2113,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-153-come-and-play-collect-em-all-tech-fundamental-rights-and-framing-our-future-fact-or-fiction",
-      "youtube": "https://www.youtube.com/watch?v=BWak-vbrqEs"
+      "youtube": "https://www.youtube.com/watch?v=BWak-vbrqEs",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/153-hd_preview.jpg"
     }
   },
   {
@@ -2098,7 +2159,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-341-designing-for-data",
-      "youtube": "https://www.youtube.com/watch?v=9lq9ZIgtxu0"
+      "youtube": "https://www.youtube.com/watch?v=9lq9ZIgtxu0",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/341-hd_preview.jpg"
     }
   },
   {
@@ -2122,7 +2184,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-319-ragequit-game-design-principles-for-better-online-communities",
-      "youtube": "https://www.youtube.com/watch?v=GPY53c9X4A0"
+      "youtube": "https://www.youtube.com/watch?v=GPY53c9X4A0",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/319-hd_preview.jpg"
     }
   },
   {
@@ -2146,7 +2209,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-349-a-hackers-guide-to-satellites",
-      "youtube": "https://www.youtube.com/watch?v=weK97F9ZbnI"
+      "youtube": "https://www.youtube.com/watch?v=weK97F9ZbnI",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/349-hd_preview.jpg"
     }
   },
   {
@@ -2211,7 +2275,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-78-how-i-built-my-diesel-powered-motorcycle",
-      "youtube": "https://www.youtube.com/watch?v=MfeCGdbILEU"
+      "youtube": "https://www.youtube.com/watch?v=MfeCGdbILEU",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/78-hd_preview.jpg"
     }
   },
   {
@@ -2340,7 +2405,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-47-impostor-syndrome-and-individual-competence",
-      "youtube": "https://www.youtube.com/watch?v=Li9cT95uBhY"
+      "youtube": "https://www.youtube.com/watch?v=Li9cT95uBhY",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/47-hd_preview.jpg"
     }
   },
   {
@@ -2385,7 +2451,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-276-the-red-string",
-      "youtube": "https://www.youtube.com/watch?v=zt_7IWBn9NE"
+      "youtube": "https://www.youtube.com/watch?v=zt_7IWBn9NE",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/276-hd_preview.jpg"
     }
   },
   {
@@ -2409,7 +2476,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-101-the-story-behind-50sat-a-new-approach-to-amateur-satellite-design-which-became-the-world-s-smallest-operational-satellite-built-for-125-in-a-garden-shed",
-      "youtube": "https://www.youtube.com/watch?v=q00Fm-ij02M"
+      "youtube": "https://www.youtube.com/watch?v=q00Fm-ij02M",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/101-hd_preview.jpg"
     }
   },
   {
@@ -2454,7 +2522,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-291-blood-sweat-carbon-our-solar-car",
-      "youtube": "https://www.youtube.com/watch?v=4u-g1QHDNoo"
+      "youtube": "https://www.youtube.com/watch?v=4u-g1QHDNoo",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/291-hd_preview.jpg"
     }
   },
   {
@@ -2478,7 +2547,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-198-my-ubertooth-year",
-      "youtube": "https://www.youtube.com/watch?v=8lGCKO13zuo"
+      "youtube": "https://www.youtube.com/watch?v=8lGCKO13zuo",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/198-hd_preview.jpg"
     }
   },
   {
@@ -2502,7 +2572,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-224-the-coming-of-age-of-plastic-electronics",
-      "youtube": "https://www.youtube.com/watch?v=4HWxfenwoek"
+      "youtube": "https://www.youtube.com/watch?v=4HWxfenwoek",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/224-hd_preview.jpg"
     }
   },
   {
@@ -2546,7 +2617,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-281-how-to-make-your-own-wearable-color-organ-dress",
-      "youtube": "https://www.youtube.com/watch?v=MnEQV53SEHQ"
+      "youtube": "https://www.youtube.com/watch?v=MnEQV53SEHQ",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/281-hd_preview.jpg"
     }
   },
   {
@@ -2570,7 +2642,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-265-katie-steckles-does-some-maths",
-      "youtube": "https://www.youtube.com/watch?v=cF5uE7ktDOc"
+      "youtube": "https://www.youtube.com/watch?v=cF5uE7ktDOc",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/265-hd_preview.jpg"
     }
   },
   {
@@ -2614,8 +2687,9 @@
     "is_fave": false,
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
-	"ccc": "https://media.ccc.de/v/emf2016-35-lego-punk-silly-things-to-do-with-lego",
-	"youtube": "https://www.youtube.com/watch?v=XNQhUtUajkM"
+      "ccc": "https://media.ccc.de/v/emf2016-35-lego-punk-silly-things-to-do-with-lego",
+      "youtube": "https://www.youtube.com/watch?v=XNQhUtUajkM",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/35-hd_preview.jpg"
     }
   },
   {
@@ -2660,7 +2734,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-11-holonomic-robots-and-why-you-should-build-one",
-      "youtube": "https://www.youtube.com/watch?v=iPyNHQEKuiM"
+      "youtube": "https://www.youtube.com/watch?v=iPyNHQEKuiM",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/11-hd_preview.jpg"
     }
   },
   {
@@ -2684,7 +2759,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-334-the-emf-2016-badge",
-      "youtube": "https://www.youtube.com/watch?v=Uva2PU3aXhw"
+      "youtube": "https://www.youtube.com/watch?v=Uva2PU3aXhw",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/334-hd_preview.jpg"
     }
   },
   {
@@ -2729,7 +2805,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-30-a-brief-incomplete-slightly-biased-and-mostly-fact-checked-history-of-the-uk-computer-industry",
-      "youtube": "https://www.youtube.com/watch?v=qqcysNG-2HQ"
+      "youtube": "https://www.youtube.com/watch?v=qqcysNG-2HQ",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/30-hd_preview.jpg"
     }
   },
   {
@@ -2773,7 +2850,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-225-2fa-wtf",
-      "youtube": "https://www.youtube.com/watch?v=MGKSFi81F8Q"
+      "youtube": "https://www.youtube.com/watch?v=MGKSFi81F8Q",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/225-hd_preview.jpg"
     }
   },
   {
@@ -2797,7 +2875,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-228-chaotic-music-oblique-strategies-against-humanity",
-      "youtube": "https://www.youtube.com/watch?v=b03P4eaeUzE"
+      "youtube": "https://www.youtube.com/watch?v=b03P4eaeUzE",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/228-hd_preview.jpg"
     }
   },
   {
@@ -2821,7 +2900,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-312-i-never-knew-sms-could-do-that",
-      "youtube": "https://www.youtube.com/watch?v=WbIXEoipoA0"
+      "youtube": "https://www.youtube.com/watch?v=WbIXEoipoA0",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/312-hd_preview.jpg"
     }
   },
   {
@@ -2865,8 +2945,9 @@
     "is_fave": false,
     "map_link": "https://map.emfcamp.org/?lat=51.21191&lon=-0.6068&title=Stage A#19/51.21191/-0.6068",
     "video": {
-	"ccc": "https://media.ccc.de/v/emf2016-332-emf-2016-opening-ceremony",
-	"youtube": "https://www.youtube.com/watch?v=kuG9ftLFUak"
+      "ccc": "https://media.ccc.de/v/emf2016-332-emf-2016-opening-ceremony",
+      "youtube": "https://www.youtube.com/watch?v=kuG9ftLFUak",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/332-hd_preview.jpg"
     }
   },
   {
@@ -2911,7 +2992,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-326-black-hat-locksmithing",
-      "youtube": "https://www.youtube.com/watch?v=mrzXPKp4xh8"
+      "youtube": "https://www.youtube.com/watch?v=mrzXPKp4xh8",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/326-hd_preview.jpg"
     }
   },
   {
@@ -2956,7 +3038,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21214&lon=-0.60757&title=Stage C#19/51.21214/-0.60757",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-65-my-self-built-eco-house",
-      "youtube": "https://www.youtube.com/watch?v=pYrp3Ye64Ag"
+      "youtube": "https://www.youtube.com/watch?v=pYrp3Ye64Ag",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/65-hd_preview.jpg"
     }
   },
   {
@@ -3022,7 +3105,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-267-apis-for-cyborgs",
-      "youtube": "https://www.youtube.com/watch?v=EmeB8FPsDdw"
+      "youtube": "https://www.youtube.com/watch?v=EmeB8FPsDdw",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/267-hd_preview.jpg"
     }
   },
   {
@@ -3066,7 +3150,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-237-four-stories-about-recreational-maths",
-      "youtube": "https://www.youtube.com/watch?v=JNi02hVxigo"
+      "youtube": "https://www.youtube.com/watch?v=JNi02hVxigo",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/237-hd_preview.jpg"
     }
   },
   {
@@ -3090,7 +3175,8 @@
     "map_link": "https://map.emfcamp.org/?lat=51.21304&lon=-0.60838&title=Stage B#19/51.21304/-0.60838",
     "video": {
       "ccc": "https://media.ccc.de/v/emf2016-330-lightning-talks",
-      "youtube": "https://www.youtube.com/watch?v=Dyg5tzi-H4s"
+      "youtube": "https://www.youtube.com/watch?v=Dyg5tzi-H4s",
+      "preview_image": "https://static.media.ccc.de/media/events/emf/2016/330-hd_preview.jpg"
     }
   },
   {

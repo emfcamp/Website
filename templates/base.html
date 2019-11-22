@@ -5,10 +5,19 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{% block title %}{% endblock %}{% if self.title() %} - {% endif %}Electromagnetic Field</title>
-        <meta property="fb:admins" content="286100493">
-        {% if self.description() -%}
-        <meta name="description" content="{% block description %}{% endblock %}">
+        {% if self.title() -%}
+          <meta property="og:title" content="{{self.title()}}">
         {% endif -%}
+        <meta property="fb:admins" content="286100493">
+        <meta property="og:site_name" content="Electromagnetic Field" />
+        <meta property="og:locale" content="en_GB" />
+        {% if self.description() -%}
+        <meta property="og:type" content="website">
+        <meta property="og:description" content="{{ self.description() }}">
+        <meta name="description" content="{% block description %}{% endblock %}">
+        <meta name="twitter:card" content="summary">
+        {% endif -%}
+        <meta name="twitter:site" content="@emfcamp">
         <meta name="theme-color" content="#171123">
         <link rel="shortcut icon" type="image/x-icon" href="{{ static_url_for('static', filename='images/favicon.ico') }}">
         {% block css -%}
