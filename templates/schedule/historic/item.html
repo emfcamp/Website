@@ -3,7 +3,7 @@
 {% block title %}{{ event.title }}{% endblock %}
 {% block description %}{{ event.description|truncate(200) }}{% endblock %}
 {% block head -%}
-  {%- if event.video.preview_image -%}
+  {%- if event.video and event.video.preview_image -%}
     <meta property="og:image" content="{{event.video.preview_image}}">
     <meta property="og:image:alt" content="A preview of the video from this EMF {{ event.type }}">
   {%- endif -%}
