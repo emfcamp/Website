@@ -12,7 +12,7 @@
         height: 131px !important;
     }
   </style>
-  <script type="text/javascript">
+  <script type="text/javascript" nonce="{{csp_nonce}}">
       var csrftoken = "{{ csrf_token() }}"
   </script>
 {% endblock %}
@@ -47,7 +47,7 @@
 {% block foot %}
   <script src="{{ url_for('static', filename='js/dhtmlx_scheduler.js') }}"></script>
   <script src="{{ url_for('static', filename='js/dhtmlxscheduler_all_timed.js') }}"></script>
-  <script>
+  <script nonce="{{csp_nonce}}">
 var emf_scheduler = {};
 (function(){
   'use strict';

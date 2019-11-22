@@ -78,17 +78,9 @@ def load_utility_functions(app_obj):
             external_url=external_url,
             feature_enabled=feature_enabled,
             basket_count=basket_count,
+            user_currency=get_user_currency(),
+            year=datetime.utcnow().year,
         )
-
-    @app_obj.context_processor
-    def currency_processor():
-        currency = get_user_currency()
-        return {"user_currency": currency}
-
-    @app_obj.context_processor
-    def now_processor():
-        now = datetime.utcnow()
-        return {"year": now.year}
 
     @app_obj.context_processor
     def event_date_processor():

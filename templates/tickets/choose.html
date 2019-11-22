@@ -128,7 +128,7 @@ Buy Items
 {% endblock %}
 
 {% block foot %}
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{csp_nonce}}">
 if (typeof(EMF) != 'object') var EMF = Object();
 
 EMF.CURRENCY_SYMBOLS = {{ CURRENCY_SYMBOLS|tojson }};
