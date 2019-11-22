@@ -2,6 +2,7 @@
 {% block content_scope %}http://schema.org/Event{% endblock %}
 {% block title %}{{ event.title }}{% endblock %}
 {% block description %}{{ event.description|truncate(200) }}{% endblock %}
+{% block twitter_card %}summary_large_image{% endblock %}
 {% block head -%}
   {%- if event.video and event.video.preview_image -%}
     <meta property="og:image" content="{{event.video.preview_image}}">
