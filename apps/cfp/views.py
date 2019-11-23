@@ -11,9 +11,8 @@ from flask import (
 )
 from flask_login import current_user
 from flask_mail import Message
-from wtforms.validators import DataRequired, Email, ValidationError
+from wtforms.validators import DataRequired, ValidationError
 from wtforms import BooleanField, StringField, SubmitField, TextAreaField, SelectField
-from wtforms.fields.html5 import EmailField
 import collections
 
 from sqlalchemy.exc import IntegrityError
@@ -32,14 +31,14 @@ from models.cfp import (
     PROPOSAL_TIMESLOTS,
 )
 from ..common import feature_flag, feature_enabled, create_current_user
-from ..common.forms import Form, TelField
+from ..common.forms import Form, TelField, EmailField
 
 from . import cfp
 
 
 class ProposalForm(Form):
     name = StringField("Name", [DataRequired()])
-    email = EmailField("Email", [Email(), DataRequired()])
+    email = EmailField("Email")
     title = StringField("Title", [DataRequired()])
     description = TextAreaField("Description", [DataRequired()])
     requirements = TextAreaField("Additional Info")

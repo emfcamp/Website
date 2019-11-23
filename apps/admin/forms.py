@@ -2,7 +2,6 @@ from wtforms.validators import (
     Optional,
     DataRequired,
     InputRequired,
-    Email,
     ValidationError,
 )
 from wtforms.widgets import TextArea
@@ -18,13 +17,18 @@ from wtforms import (
     HiddenField,
     BooleanField,
 )
-from wtforms.fields.html5 import EmailField
 
 from models.product import ProductGroup
 from models.basket import Basket
 
 from ..common import CURRENCY_SYMBOLS
-from ..common.forms import Form, IntegerSelectField, HiddenIntegerField, JSONField
+from ..common.forms import (
+    Form,
+    IntegerSelectField,
+    HiddenIntegerField,
+    JSONField,
+    EmailField,
+)
 
 
 class ProductForm(Form):
@@ -161,7 +165,7 @@ class AddProductViewProductForm(Form):
 
 class IssueTicketsInitialForm(Form):
     " Initial form to ask for email "
-    email = EmailField("Email address", [Email(), DataRequired()])
+    email = EmailField("Email address")
     issue_free = SubmitField("Issue Free Ticket")
     reserve = SubmitField("Reserve Ticket for Payment")
 
@@ -226,7 +230,7 @@ class ConvertTicketForm(Form):
 
 
 class TransferTicketInitialForm(Form):
-    email = EmailField("Email", [Email(), DataRequired()])
+    email = EmailField("Email")
     transfer = SubmitField("Choose user")
 
 

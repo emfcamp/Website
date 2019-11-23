@@ -18,8 +18,7 @@ from flask_login import login_user, login_required, logout_user, current_user
 from flask_mail import Message
 from sqlalchemy import or_
 from wtforms import StringField, HiddenField, SubmitField, BooleanField
-from wtforms.fields.html5 import EmailField
-from wtforms.validators import DataRequired, Email, ValidationError
+from wtforms.validators import DataRequired, ValidationError
 
 from main import db, mail
 from models.user import User, UserDiversity, verify_signup_code
@@ -29,7 +28,7 @@ from models.payment import Payment
 from models.basket import Basket
 
 from .common import set_user_currency, feature_flag
-from .common.forms import Form
+from .common.forms import Form, EmailField
 
 
 users = Blueprint("users", __name__)
@@ -47,7 +46,7 @@ class NextURLField(HiddenField):
 
 
 class LoginForm(Form):
-    email = EmailField("Email", [Email(), DataRequired()])
+    email = EmailField("Email")
     next = NextURLField("Next")
 
     def validate_email(form, field):
@@ -127,7 +126,7 @@ def logout():
 
 
 class SignupForm(Form):
-    email = EmailField("Email", [Email(), DataRequired()])
+    email = EmailField("Email")
     name = StringField("Name", [DataRequired()])
     allow_promo = BooleanField("Send me occasional emails about future EMF events")
     signup = SubmitField("Sign up")

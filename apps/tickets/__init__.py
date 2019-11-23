@@ -457,7 +457,7 @@ def pay(flow=None):
                 new_user = create_current_user(form.email.data, form.name.data)
             except IntegrityError as e:
                 app.logger.warn("Adding user raised %r, possible double-click", e)
-                return None
+                return redirect(url_for("tickets.pay", flow=flow))
 
             user = new_user
 

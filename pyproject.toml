@@ -53,6 +53,7 @@ shapely = "*"
 flask-cors = "*"
 flask-shell-ipython = "*"
 Flask-Static-Digest = "*"
+email_validator = "^1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"

@@ -146,7 +146,7 @@ def send_template_email(subject, to, sender, template, **kwargs):
     mail.send(msg)
 
 
-def create_current_user(email, name):
+def create_current_user(email: str, name: str):
     user = User(email, name)
 
     db.session.add(user)

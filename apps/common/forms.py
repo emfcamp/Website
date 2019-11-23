@@ -2,11 +2,30 @@ import json
 
 from flask import Markup
 from flask_wtf import FlaskForm
-from wtforms import IntegerField, SelectField
+from wtforms import IntegerField, SelectField, StringField, ValidationError
 from wtforms.widgets import Input, HiddenInput
-from wtforms.fields import StringField
+from wtforms.widgets.html5 import EmailInput
 from wtforms.compat import string_types
 from wtforms.widgets.core import html_params
+from email_validator import validate_email, EmailNotValidError
+
+
+class EmailField(StringField):
+    """ HTML5 email field using the email_validator package to perform
+        enhanced email validation.
+
+        You don't need to provide additional validators to this field.
+    """
+
+    widget = EmailInput()
+
+    def pre_validate(self, form):
+        try:
+            result = validate_email(self.data)
+            # Replace data with normalised version of email
+            self.data = result["email"]
+        except EmailNotValidError as e:
+            raise ValidationError(str(e))
 
 
 class IntegerSelectField(SelectField):

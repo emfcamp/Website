@@ -4,7 +4,6 @@ from wtforms.validators import (
     DataRequired,
     InputRequired,
     Optional,
-    Email,
     ValidationError,
 )
 from wtforms import (
@@ -15,10 +14,9 @@ from wtforms import (
     HiddenField,
     BooleanField,
 )
-from wtforms.fields.html5 import EmailField
 
 from models.user import User
-from ..common.forms import IntegerSelectField, HiddenIntegerField, Form
+from ..common.forms import IntegerSelectField, HiddenIntegerField, Form, EmailField
 from ..common import CURRENCY_SYMBOLS
 
 
@@ -42,7 +40,7 @@ class TicketAmountsForm(Form):
 
 class TicketTransferForm(Form):
     name = StringField("Name", [DataRequired()])
-    email = EmailField("Email", [DataRequired()])
+    email = EmailField("Email")
 
     transfer = SubmitField("Transfer Ticket")
 
@@ -52,7 +50,7 @@ class TicketTransferForm(Form):
 
 
 class TicketPaymentForm(Form):
-    email = EmailField("Email", [Email(), DataRequired()])
+    email = EmailField("Email")
     name = StringField("Name", [DataRequired()])
     allow_promo = BooleanField("Send me occasional emails about future EMF events")
     basket_total = HiddenField("basket total")
