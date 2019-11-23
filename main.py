@@ -179,8 +179,10 @@ def create_app(dev_server=False):
 
         csp = {
             "script-src": ["'self'", "https://js.stripe.com"],
-            "style-src": ["'self'", "https://fonts.googleapis.com"],
-            "style-src-attr": ["'unsafe-inline'"],
+            "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+            # Note: the below is more strict as it only allows inline styles in style=
+            # attributes, however it's unsupported by Safari at this time...
+            #  "style-src-attr": ["'unsafe-inline'"],
             "font-src": ["'self'", "https://fonts.gstatic.com"],
             "frame-src": [
                 "https://js.stripe.com/",
