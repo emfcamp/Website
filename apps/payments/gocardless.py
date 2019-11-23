@@ -707,3 +707,36 @@ def gocardless_payment_failed(payment):
 
 def gocardless_payment_charged_back(payment):
     raise NotImplementedError("Chargebacks not supported yet")
+
+
+def gocardless_validate():
+    """ Validate that GoCardless is configured and operational"""
+    result = []
+
+    env = app.config.get("GOCARDLESS_ENVIRONMENT")
+    if env == "sandbox":
+        result.append((True, "Sandbox environment being used"))
+    elif env == "live":
+        result.append((True, "Live environment being used"))
+    else:
+        result.append((False, "No environment configured"))
+
+    val = app.config.get("GOCARDLESS_ACCESS_TOKEN", "")
+    if len(val) > 9:
+        result.append((True, "Access token set"))
+    else:
+        result.append((False, "Access token not set"))
+
+    secret = app.config.get("GOCARDLESS_WEBHOOK_SECRET", "")
+    if len(secret) > 5:
+        result.append((True, "Webhook secret set"))
+    else:
+        result.append((False, "Webhook secret not set"))
+
+    try:
+        gocardless_client.events.list().records
+        result.append((True, f"Connection to GoCardless API succeeded"))
+    except gocardless_pro.errors.InvalidApiUsageError as e:
+        result.append((False, f"Unable to connect to GoCardless: {e}"))
+
+    return result

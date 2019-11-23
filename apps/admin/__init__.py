@@ -34,6 +34,8 @@ from models.ical import CalendarSource
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
 from models.site_state import SiteState, VALID_STATES, refresh_states
 from models.map import MapObject
+from ..payments.stripe import stripe_validate
+from ..payments.gocardless import gocardless_validate
 from ..common import require_permission
 from ..common.forms import Form
 
@@ -198,6 +200,18 @@ def site_states():
         return redirect(url_for(".site_states"))
 
     return render_template("admin/site-states.html", form=form)
+
+
+@admin.route("/payment-config-verify")
+def payment_config_verify():
+    return render_template(
+        "admin/payment-config-verify.html",
+        stripe=stripe_validate(),
+        gocardless=gocardless_validate(),
+        last_bank_payment=BankTransaction.query.order_by(
+            BankTransaction.id.desc()
+        ).first(),
+    )
 
 
 @admin.route("/schedule-feeds")

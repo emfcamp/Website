@@ -23,6 +23,7 @@ from flask_login import login_required, current_user
 from flask_mail import Message
 from wtforms import SubmitField, StringField
 from sqlalchemy.orm.exc import NoResultFound
+from stripe.error import AuthenticationError
 
 from main import db, stripe, mail, csrf
 from models import RefundRequest
@@ -419,3 +420,51 @@ def stripe_charge_refunded(_type, charge):
         )
 
     return ("", 200)
+
+
+def stripe_validate():
+    """ Validate Stripe is configured and operational """
+    result = []
+    sk = app.config.get("STRIPE_SECRET_KEY", "")
+    if len(sk) > 15 and sk.startswith("sk_"):
+        if sk.startswith("sk_test"):
+            result.append((True, "Secret key configured (TEST MODE)"))
+        else:
+            result.append((True, "Secret key configured"))
+    else:
+        result.append((False, "Secret key not configured"))
+
+    pk = app.config.get("STRIPE_PUBLIC_KEY", "")
+    if len(pk) > 15 and pk.startswith("pk_"):
+        if pk.startswith("pk_test"):
+            result.append((True, "Public key configured (TEST MODE)"))
+        else:
+            result.append((True, "Public key configured"))
+    else:
+        result.append((False, "Public key not configured"))
+
+    whk = app.config.get("STRIPE_WEBHOOK_KEY", "")
+    if len(whk) > 15 and whk.startswith("whsec_"):
+        result.append((True, "Webhook key configured"))
+    else:
+        result.append((False, "Webhook key not configured"))
+
+    try:
+        webhooks = stripe.WebhookEndpoint.list()
+        result.append((True, "Connection to Stripe API succeeded"))
+    except AuthenticationError as e:
+        result.append((False, f"Connecting to Stripe failed: {e}"))
+        return result
+
+    if len(webhooks) > 0:
+        webhook_urls = " ".join(webhook["url"] for webhook in webhooks)
+        result.append((True, f"{len(webhooks)} webhook(s) configured: {webhook_urls}"))
+        for webhook in webhooks:
+            if webhook["status"] != "enabled":
+                result.append(
+                    (False, f"Webhook {webhook['url']} is {webhook['status']}")
+                )
+    else:
+        result.append((False, "No webhooks configured"))
+
+    return result
