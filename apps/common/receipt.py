@@ -12,9 +12,9 @@ import barcode
 from barcode.writer import ImageWriter, SVGWriter
 
 from main import external_url
+from models import event_year
 from models.product import Product, ProductGroup, PriceTier
 from models.purchase import Purchase, PurchaseTransfer
-from models.site_state import event_start
 
 
 RECEIPT_TYPES = ["admissions", "parking", "campervan", "tees", "hire"]
@@ -158,7 +158,7 @@ def attach_tickets(msg, user):
     url = external_url("tickets.receipt", user_id=user.id)
     pdf = render_pdf(url, page)
 
-    msg.attach("EMF{}.pdf".format(event_start().year), "application/pdf", pdf.read())
+    msg.attach("EMF{}.pdf".format(event_year()), "application/pdf", pdf.read())
 
 
 def set_tickets_emailed(user):

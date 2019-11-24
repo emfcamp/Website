@@ -15,9 +15,9 @@ from jinja2.utils import urlize
 
 from models.basket import Basket
 from models.product import Price
-from models.site_state import get_site_state, get_sales_state, event_start, event_end
+from models.site_state import get_site_state, get_sales_state
 from models.feature_flag import get_db_flags
-from models import User
+from models import User, event_start, event_end
 
 from .preload import init_preload
 

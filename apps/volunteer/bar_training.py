@@ -8,10 +8,10 @@ from flask_login import current_user
 import requests
 
 from main import csrf, db, external_url
+from models import event_year
+from models.user import User
 from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer
-from models.site_state import event_start
-from models.user import User
 from . import v_user_required, volunteer
 
 
@@ -109,7 +109,7 @@ def bar_training_webhook(tag):
 
 
 def get_auth_tag():
-    tag = "emf-{}-".format(event_start().year)
+    tag = "emf-{}-".format(event_year())
     msg = b"bar-training-" + tag.encode("utf-8")
     tag += hmac.new(
         app.config["SECRET_KEY"].encode("utf-8"), msg, digestmod=sha256
