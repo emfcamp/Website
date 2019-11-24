@@ -10,8 +10,7 @@ from sqlalchemy_continuum.utils import version_class, transaction_class
 
 from main import db
 from . import export_attr_counts, export_intervals, bucketise, event_year
-import models
-from models.site_state import event_start
+from .purchase import Ticket
 
 safechars = "2346789BCDFGHJKMPQRTVWXY"
 
@@ -63,7 +62,7 @@ class Payment(db.Model):
         purchase_counts = (
             cls.query.outerjoin(cls.purchases)
             .group_by(cls.id)
-            .with_entities(func.count(models.Ticket.id))
+            .with_entities(func.count(Ticket.id))
         )
         refund_counts = (
             cls.query.outerjoin(cls.refunds)
@@ -467,7 +466,7 @@ class StripePayment(Payment):
 
     @property
     def description(self):
-        return "EMF {} purchase".format(event_start().year)
+        return "EMF {} purchase".format(event_year())
 
     def manual_refund(self):
         if self.state not in {"charged", "paid", "refund-requested"}:

@@ -13,9 +13,17 @@ from sqlalchemy.sql.functions import func
 from sqlalchemy_continuum.utils import version_class, transaction_class
 
 
+def event_start():
+    return config_date("EVENT_START")
+
+
 def event_year():
     """ Year of the current event """
-    return config_date("EVENT_START").year
+    return event_start().year
+
+
+def event_end():
+    return config_date("EVENT_END")
 
 
 def exists(query):

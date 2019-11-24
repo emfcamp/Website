@@ -5,7 +5,6 @@ from flask_login import current_user
 
 from models import event_year
 from models.user import User
-from models.site_state import event_start
 from models.cfp import Proposal
 
 from ..common import feature_flag, json_response
@@ -72,7 +71,7 @@ def schedule_ical(year):
         return feed_historic(year, "ics")
 
     schedule = _get_scheduled_proposals(request.args)
-    title = "EMF {}".format(event_start().year)
+    title = "EMF {}".format(event_year())
 
     cal = Calendar()
     cal.add("summary", title)
@@ -129,7 +128,7 @@ def favourites_ical():
         abort(404)
 
     schedule = _get_scheduled_proposals(request.args, override_user=user)
-    title = "EMF {} Favourites for {}".format(event_start().year, user.name)
+    title = "EMF {} Favourites for {}".format(event_year(), user.name)
 
     cal = Calendar()
     cal.add("summary", title)
