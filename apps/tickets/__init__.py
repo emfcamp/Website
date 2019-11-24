@@ -24,7 +24,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from main import db, mail, external_url
 from models.exc import CapacityException
 from models.user import User, UserShipping, checkin_code_re
-from models.product import PriceTier, ProductView, ProductViewProduct, Product
+from models.product import PriceTier, ProductView, ProductViewProduct, Product, Voucher
 from models.basket import Basket
 from models.payment import BankPayment, StripePayment, GoCardlessPayment
 from models.purchase import Ticket
@@ -75,7 +75,8 @@ price_changed = Counter(
 @tickets.route("/tickets/token/")
 @tickets.route("/tickets/token/<token>")
 def tickets_token(token=None):
-    view = ProductView.get_by_token(token)
+    # view = ProductView.get_by_token(token)
+    view = Voucher.get_by_token(token)
     if view:
         session["ticket_token"] = token
         return redirect(url_for("tickets.main", flow=view.name))
@@ -376,9 +377,8 @@ def pay(flow=None):
     if not view:
         abort(404)
 
-    if view.token and session.get("ticket_token") != view.token:
-        if not current_user.is_anonymous and current_user.has_permission("admin"):
-            abort(404)
+    if not view.is_accessible(current_user, session.get("ticket_token")):
+        abort(404)
 
     if request.form.get("change_currency") in ("GBP", "EUR"):
         currency = request.form.get("change_currency")
