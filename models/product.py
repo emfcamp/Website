@@ -370,6 +370,12 @@ class Voucher(db.Model):
     expiry = db.Column(db.DateTime, nullable=True)
     product_view_id = db.Column(db.Integer, db.ForeignKey("product_view.id"))
 
+    @classmethod
+    def get_by_token(cls, token):
+        if not token:
+            return None
+        return Voucher.query.filter_by(token=token).one_or_none().view
+
     def __init__(self, view, token=None, expiry=None):
         super(Voucher, self).__init__()
         self.view = view
@@ -432,12 +438,6 @@ class ProductView(db.Model):
         if name is None:
             return None
         return ProductView.query.filter_by(name=name).one_or_none()
-
-    @classmethod
-    def get_by_token(cls, token):
-        if token is None:
-            return None
-        return ProductView.query.filter_by(token=token).one_or_none()
 
     def is_accessible(self, user, user_token=None):
         " Whether this ProductView is accessible to a user."

@@ -140,7 +140,7 @@ class ProductViewProductForm(Form):
 class ProductViewForm(Form):
     name = StringField("Name")
     type = StringField("Type", default="tickets")
-    token = StringField("Token")
+    # token = StringField("Token")
     cfp_accepted_only = BooleanField("Accepted CfP proposal required")
 
 

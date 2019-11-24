@@ -374,7 +374,7 @@ def product_views():
     return render_template("admin/products/views.html", view_counts=view_counts)
 
 
-@admin.route("/product_view/new", methods=["GET", "POST"])
+@admin.route("/product_views/new", methods=["GET", "POST"])
 def product_view_new():
     form = NewProductViewForm()
 
@@ -382,7 +382,7 @@ def product_view_new():
         view = ProductView(
             type=form.type.data,
             name=form.name.data,
-            token=form.token.data,
+            # token=form.token.data,
             cfp_accepted_only=form.cfp_accepted_only.data,
         )
         app.logger.info("Adding new ProductView %s", view.name)
@@ -394,7 +394,7 @@ def product_view_new():
     return render_template("admin/products/view-new.html", form=form)
 
 
-@admin.route("/product_view/<int:view_id>", methods=["GET", "POST"])
+@admin.route("/product_views/<int:view_id>", methods=["GET", "POST"])
 def product_view(view_id):
     view = ProductView.query.get_or_404(view_id)
 
@@ -417,7 +417,7 @@ def product_view(view_id):
         if form.update.data:
             view.name = form.name.data
             view.type = form.type.data
-            view.token = form.token.data
+            # view.token = form.token.data
             view.cfp_accepted_only = form.cfp_accepted_only.data
 
             for f in form.pvps:
@@ -434,10 +434,10 @@ def product_view(view_id):
     return render_template("admin/products/view-edit.html", view=view, form=form)
 
 
-@admin.route("/product_view/<int:view_id>/add", methods=["GET", "POST"])
-@admin.route("/product_view/<int:view_id>/add/<int:group_id>", methods=["GET", "POST"])
+@admin.route("/product_views/<int:view_id>/add", methods=["GET", "POST"])
+@admin.route("/product_views/<int:view_id>/add/<int:group_id>", methods=["GET", "POST"])
 @admin.route(
-    "/product_view/<int:view_id>/add/<int:group_id>/<int:product_id>",
+    "/product_views/<int:view_id>/add/<int:group_id>/<int:product_id>",
     methods=["GET", "POST"],
 )
 def product_view_add(view_id, group_id=None, product_id=None):
