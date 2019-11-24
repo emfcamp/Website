@@ -13,6 +13,7 @@
 {# {{ render_field(form.token, horizontal=False) }} #}
 {{ render_field(form.cfp_accepted_only, horizontal=False) }}
 
+<h3>Products</h3>
 <table class="table table-condensed table-striped">
   <tr>
     <th>Group</th>
@@ -36,8 +37,26 @@
   {% endfor %}
 </table>
 
+<h3>Vouchers</h3>
+<table class="table table-condensed table-striped">
+  <tr>
+    <th>Token</th>
+    <th>Expiry</th>
+    <th>Used?</th>
+  </tr>
+  {% for vchr in view.tokens %}
+    <tr>
+      {# FIXME add a "copy URL" link? #}
+      <td>{{ vchr.token }}</td>
+      <td>{{ vchr.expiry }}</td>
+      <td>#FIXME</td>
+    </tr>
+  {% endfor %}
+</table>
+
 {{ form.update(class_="btn btn-success debounce") }}
 <a href="{{ url_for('.product_view_add', view_id=view.id) }}" class="btn btn-default">Add products</a>
+<a href="{{ url_for('.product_view_add_voucher', view_id=view.id) }}" class="btn btn-default">Add voucher</a>
 
 </form>
 

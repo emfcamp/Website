@@ -23,6 +23,7 @@ from models.product import (
     Price,
     ProductView,
     ProductViewProduct,
+    Voucher,
 )
 from models.purchase import Purchase, PurchaseTransfer
 
@@ -39,6 +40,8 @@ from .forms import (
     NewProductViewForm,
     EditProductViewForm,
     AddProductViewProductForm,
+    NewVoucherForm,
+    # BulkNewVoucherForm,
 )
 
 
@@ -480,3 +483,17 @@ def product_view_add(view_id, group_id=None, product_id=None):
         add_group=group,
         add_product=product,
     )
+
+
+@admin.route("/product_views/<int:view_id>/tokens/add", methods=["GET", "POST"])
+def product_view_add_voucher(view_id):
+    view = ProductView.query.get_or_404(view_id)
+    form = NewVoucherForm()
+
+    if form.validate_on_submit():
+        Voucher(view, token=form.token.data)
+        db.session.commit()
+
+        return redirect(url_for(".product_view", view_id=view_id))
+
+    return render_template("admin/products/view-add-voucher.html", view=view, form=form)

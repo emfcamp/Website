@@ -140,7 +140,6 @@ class ProductViewProductForm(Form):
 class ProductViewForm(Form):
     name = StringField("Name")
     type = StringField("Type", default="tickets")
-    # token = StringField("Token")
     cfp_accepted_only = BooleanField("Accepted CfP proposal required")
 
 
@@ -156,6 +155,18 @@ class EditProductViewForm(ProductViewForm):
 class AddProductViewProductForm(Form):
     add_all_products = SubmitField("Add all")
     add_product = SubmitField("Add product")
+
+
+class NewVoucherForm(Form):
+    token = StringField("Token", [Optional()])  # Maybe auto-generated
+    # expires = DateField("Expiry Date (Optional)", [Optional()])
+    create = SubmitField("Create")
+
+
+# class BulkNewVoucherForm(Form):
+#     count = IntegerField("How many")
+#     expires = DateField("Expiry Date (Optional)", [Optional()])
+#     create = SubmitField("Create")
 
 
 #
