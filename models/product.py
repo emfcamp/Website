@@ -370,6 +370,8 @@ class Voucher(db.Model):
     expiry = db.Column(db.DateTime, nullable=True)
     product_view_id = db.Column(db.Integer, db.ForeignKey("product_view.id"))
 
+    payment = db.relationship("Payment", backref="voucher")
+
     @classmethod
     def get_by_token(cls, token):
         if not token:
