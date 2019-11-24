@@ -5,14 +5,15 @@ import re
 import random
 import string
 
-from sqlalchemy.orm import validates
-from sqlalchemy import func, UniqueConstraint, inspect
+from sqlalchemy import func, UniqueConstraint, inspect, select
+from sqlalchemy.orm import validates, column_property
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from main import db
 from .mixins import CapacityMixin, InheritedAttributesMixin
 from . import config_date
 from .purchase import Purchase
+from .payment import Payment
 
 
 class ProductGroupException(Exception):
@@ -372,6 +373,10 @@ class Voucher(db.Model):
 
     payment = db.relationship("Payment", backref="voucher")
 
+    is_used = column_property(
+        select([True]).where(Payment.voucher_token == token), deferred=True
+    )
+
     @classmethod
     def get_by_token(cls, token):
         if not token:
@@ -408,6 +413,9 @@ class Voucher(db.Model):
             return False
 
         if self.token != user_token:
+            return False
+
+        if self.is_used:
             return False
 
         return True

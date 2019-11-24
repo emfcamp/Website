@@ -10,7 +10,6 @@
 
 {{ render_field(form.name, horizontal=False) }}
 {{ render_field(form.type, horizontal=False) }}
-{# {{ render_field(form.token, horizontal=False) }} #}
 {{ render_field(form.cfp_accepted_only, horizontal=False) }}
 
 <h3>Products</h3>
@@ -49,7 +48,8 @@
       {# FIXME add a "copy URL" link? #}
       <td>{{ vchr.token }}</td>
       <td>{{ vchr.expiry }}</td>
-      <td>#FIXME</td>
+      <td>{% if vchr.is_used %}Yes{% else %}No{% endif %}</td>
+      }
     </tr>
   {% endfor %}
 </table>
