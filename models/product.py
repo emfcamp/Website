@@ -51,6 +51,7 @@ class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     parent_id = db.Column(db.Integer, db.ForeignKey("product_group.id"))
+    # Whether this is a ticket or hire item.
     type = db.Column(db.String, nullable=False)
     name = db.Column(db.String, unique=True, nullable=False)
 

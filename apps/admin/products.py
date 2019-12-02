@@ -11,18 +11,20 @@ from flask import (
     current_app as app,
 )
 from flask_login import current_user
+from flask_mail import Message
 
 from sqlalchemy.sql.functions import func
 
-from main import db
+from main import db, mail
 from models.user import User
 from models.product import (
     ProductGroup,
-    Product,
-    PriceTier,
     Price,
+    PriceTier,
+    Product,
     ProductView,
     ProductViewProduct,
+    random_voucher,
     Voucher,
 )
 from models.purchase import Purchase, PurchaseTransfer
@@ -41,7 +43,7 @@ from .forms import (
     EditProductViewForm,
     AddProductViewProductForm,
     NewVoucherForm,
-    # BulkNewVoucherForm,
+    BulkVoucherEmailForm,
 )
 
 
@@ -497,3 +499,34 @@ def product_view_add_voucher(view_id):
         return redirect(url_for(".product_view", view_id=view_id))
 
     return render_template("admin/products/view-add-voucher.html", view=view, form=form)
+
+
+@admin.route("/product_views/<int:view_id>/bulk_add", methods=["GET", "POST"])
+def bulk_create_vouchers_by_email(view_id):
+    view = ProductView.query.get_or_404(view_id)
+    form = BulkVoucherEmailForm()
+
+    if form.validate_on_submit():
+        for email in form.emails.data:
+            voucher = Voucher(view, token=random_voucher())
+
+            msg = Message(
+                "Volunteer voucher for Electromagnetic Field",
+                sender=app.config["TICKETS_EMAIL"],
+                recipients=[email],
+            )
+
+            msg.body = render_template(
+                "emails/volunteer-voucher.txt", voucher=voucher.token
+            )
+
+            app.logger.info("Emailing %s volunteer voucher: %s", email, voucher.token)
+            mail.send(msg)
+
+            db.session.commit()
+
+        return redirect(url_for(".product_view", view_id=view_id))
+
+    return render_template(
+        "admin/products/view-bulk-add-voucher.html", view=view, form=form
+    )

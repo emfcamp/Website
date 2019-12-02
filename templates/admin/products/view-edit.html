@@ -57,6 +57,7 @@
 {{ form.update(class_="btn btn-success debounce") }}
 <a href="{{ url_for('.product_view_add', view_id=view.id) }}" class="btn btn-default">Add products</a>
 <a href="{{ url_for('.product_view_add_voucher', view_id=view.id) }}" class="btn btn-default">Add voucher</a>
+<a href="{{ url_for('.bulk_create_vouchers_by_email', view_id=view.id) }}" class="btn btn-default">Bulk create vouchers</a>
 
 </form>
 

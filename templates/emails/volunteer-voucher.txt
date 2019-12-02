@@ -1,0 +1,13 @@
+Hey!
+
+Thank you for helping out at Electromagnetic Field 2018. As a thank you we would like to offer you the chance to buy tickets for next year's event before they go on general release. All you need to do is click on this link:
+
+{{ external_url('tickets.tickets_token', token=voucher) }}
+
+This link is only valid for one purchase of up to 2 full tickets and any number of under-18s/under-16s tickets. If you don't need this voucher though, please share it.
+
+Again, thank you so much for helping last year, without you it wouldn't have happened. Here's to seeing you at the next one.
+
+Love,
+
+Everyone at Electromagnetic Field 
