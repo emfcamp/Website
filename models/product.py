@@ -368,33 +368,33 @@ class Voucher(db.Model):
     __tablename__ = "voucher"
     """A voucher enables a specific productView"""
 
-    token = db.Column(db.String, primary_key=True)
+    code = db.Column(db.String, primary_key=True)
     expiry = db.Column(db.DateTime, nullable=True)
     product_view_id = db.Column(db.Integer, db.ForeignKey("product_view.id"))
 
     payment = db.relationship("Payment", backref="voucher")
 
     is_used = column_property(
-        select([True]).where(Payment.voucher_token == token), deferred=True
+        select([True]).where(Payment.voucher_code == code), deferred=True
     )
 
     @classmethod
-    def get_by_token(cls, token):
-        if not token:
+    def get_by_code(cls, code):
+        if not code:
             return None
-        return Voucher.query.filter_by(token=token).one_or_none().view
+        return Voucher.query.filter_by(code=code).one_or_none().view
 
-    def __init__(self, view, token=None, expiry=None):
+    def __init__(self, view, code=None, expiry=None):
         super(Voucher, self).__init__()
         self.view = view
 
-        # Creation may fail if token has already been used. This isn't ideal
+        # Creation may fail if code has already been used. This isn't ideal
         # but a 12 ascii character random string is unlikely to clash and
-        # selected tokens will need to be done with care.
-        if token:
-            self.token = token
+        # selected codes will need to be done with care.
+        if code:
+            self.code = code
         else:
-            self.token = random_voucher()
+            self.code = random_voucher()
 
         if expiry is not None:
             self.expiry = expiry
@@ -402,18 +402,18 @@ class Voucher(db.Model):
     def __repr__(self):
         if self.expiry:
             return "<Voucher: %s, view: %s, expiry: %s>" % (
-                self.token,
+                self.code,
                 self.product_view_id,
                 self.expiry,
             )
-        return "<Voucher: %s, view: %s>" % (self.token, self.product_view_id)
+        return "<Voucher: %s, view: %s>" % (self.code, self.product_view_id)
 
-    def is_accessible(self, user_token):
+    def is_accessible(self, voucher):
         # voucher expired
         if self.expiry and datetime.utcnow() > self.expiry:
             return False
 
-        if self.token != user_token:
+        if self.code != voucher:
             return False
 
         if self.is_used:
@@ -438,7 +438,7 @@ class ProductView(db.Model):
         cascade="all, delete-orphan",
     )
 
-    tokens = db.relationship(
+    vouchers = db.relationship(
         "Voucher", backref="view", cascade="all, delete-orphan", lazy=True
     )
 
@@ -450,13 +450,13 @@ class ProductView(db.Model):
             return None
         return ProductView.query.filter_by(name=name).one_or_none()
 
-    def is_accessible(self, user, user_token=None):
+    def is_accessible(self, user, voucher=None):
         " Whether this ProductView is accessible to a user."
         if user.is_authenticated and user.has_permission("admin"):
             # Admins always have access
             return True
 
-        if not self.tokens and datetime.utcnow() < config_date("SALES_START"):
+        if not self.vouchers and datetime.utcnow() < config_date("SALES_START"):
             return False
 
         # CfP voucher
@@ -465,12 +465,12 @@ class ProductView(db.Model):
                 return True
             return False
 
-        if self.tokens:
-            if not user_token:
+        if self.vouchers:
+            if not voucher:
                 return False
 
-            for token in self.tokens:
-                if token.is_accessible(user_token):
+            for vchr in self.vouchers:
+                if vchr.is_accessible(voucher):
                     return True
 
             return False
@@ -478,8 +478,8 @@ class ProductView(db.Model):
         return True
 
     def __repr__(self):
-        if self.tokens:
-            return "<ProductView: %s tokens=%s>" % (self.name, self.tokens)
+        if self.vouchers:
+            return "<ProductView: %s vouchers=%s>" % (self.name, self.vouchers)
         return "<ProductView: %s>" % self.name
 
     def __str__(self):

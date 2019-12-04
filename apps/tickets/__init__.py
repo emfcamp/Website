@@ -59,7 +59,7 @@ from .forms import (
 
 tickets = Blueprint("tickets", __name__)
 
-invalid_tokens = Counter("emf_invalid_token_total", "Invalid ticket tokens")
+invalid_vouchers = Counter("emf_invalid_vouchers_total", "Invalid ticket vouchers")
 empty_baskets = Counter(
     "emf_basket_empty_total", "Attempted purchases of empty baskets"
 )
@@ -72,20 +72,19 @@ price_changed = Counter(
 )
 
 
-@tickets.route("/tickets/token/")
-@tickets.route("/tickets/token/<token>")
-def tickets_token(token=None):
-    # view = ProductView.get_by_token(token)
-    view = Voucher.get_by_token(token)
+@tickets.route("/tickets/voucher/")
+@tickets.route("/tickets/voucher/<voucher>")
+def tickets_voucher(voucher=None):
+    view = Voucher.get_by_code(voucher)
     if view:
-        session["ticket_token"] = token
+        session["ticket_voucher"] = voucher
         return redirect(url_for("tickets.main", flow=view.name))
 
-    if "ticket_token" in session:
-        del session["ticket_token"]
+    if "ticket_voucher" in session:
+        del session["ticket_voucher"]
 
-    invalid_tokens.inc()
-    flash("Ticket token was invalid")
+    invalid_vouchers.inc()
+    flash("Ticket voucher was invalid")
     return redirect(url_for("tickets.main"))
 
 
@@ -137,7 +136,7 @@ def main(flow=None):
     if view.cfp_accepted_only and current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for(".main", flow=flow)))
 
-    if not view.is_accessible(current_user, session.get("ticket_token")):
+    if not view.is_accessible(current_user, session.get("ticket_voucher")):
         abort(404)
 
     sales_state = get_sales_state()
@@ -145,7 +144,7 @@ def main(flow=None):
     if sales_state in ["unavailable", "sold-out"]:
         # For the main entry point, we assume people want admissions tickets,
         # but we still need to sell people parking tickets, tents or tickets
-        # from tokens until the final cutoff (sales-ended).
+        # from vouchers until the final cutoff (sales-ended).
         if flow != "main":
             sales_state = "available"
 
@@ -377,7 +376,7 @@ def pay(flow=None):
     if not view:
         abort(404)
 
-    if not view.is_accessible(current_user, session.get("ticket_token")):
+    if not view.is_accessible(current_user, session.get("ticket_voucher")):
         abort(404)
 
     if request.form.get("change_currency") in ("GBP", "EUR"):

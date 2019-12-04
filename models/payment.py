@@ -31,8 +31,8 @@ class Payment(db.Model):
     state = db.Column(db.String, nullable=False, default="new")
     reminder_sent = db.Column(db.Boolean, nullable=False, default=False)
     expires = db.Column(db.DateTime, nullable=True)
-    voucher_token = db.Column(
-        db.String, db.ForeignKey("voucher.token"), nullable=True, default=None
+    voucher_code = db.Column(
+        db.String, db.ForeignKey("voucher.code"), nullable=True, default=None
     )
 
     # VAT invoice number, if issued
@@ -46,12 +46,12 @@ class Payment(db.Model):
 
     __mapper_args__ = {"polymorphic_on": provider}
 
-    def __init__(self, currency, amount, token=None):
+    def __init__(self, currency, amount, voucher_code=None):
         self.currency = currency
         self.amount = amount
 
-        if token:
-            self.voucher_token = token
+        if voucher_code:
+            self.voucher_code = voucher_code
 
     @classmethod
     def get_export_data(cls):
@@ -270,8 +270,8 @@ class BankPayment(Payment):
     __mapper_args__ = {"polymorphic_identity": "banktransfer"}
     bankref = db.Column(db.String, unique=True)
 
-    def __init__(self, currency, amount, token):
-        Payment.__init__(self, currency, amount, token)
+    def __init__(self, currency, amount, voucher_code=None):
+        Payment.__init__(self, currency, amount, voucher_code)
 
         # not cryptographic
         self.bankref = "".join(random.sample(safechars, 8))

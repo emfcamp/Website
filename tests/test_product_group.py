@@ -45,7 +45,7 @@ def parent_group(db):
 
 
 def create_purchases(tier, count, user):
-    basket = Basket(user, "GBP")
+    basket = Basket(user, "GBP", None)
     basket[tier] = count
     basket.create_purchases()
     basket.ensure_purchase_capacity()

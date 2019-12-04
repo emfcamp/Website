@@ -8,23 +8,29 @@ TOMORROW = datetime.utcnow() + timedelta(days=1)
 
 
 def test_product_view_accessible(db, user):
-    product_view = ProductView(name="other")
+    product_view = ProductView(name="other", type="ticket")
     assert product_view.is_accessible(user), "Default view should be visible"
 
-    product_view = ProductView(name="other")
-
+    product_view = ProductView(name="another-other", type="ticket")
     voucher = Voucher(view=product_view)
+
+    db.session.add(product_view)
+    db.session.add(voucher)
+    db.session.commit()
+
     assert product_view.is_accessible(
-        user, voucher.token
-    ), "Product should be visible with token"
+        user, voucher.code
+    ), "Product should be visible with voucher"
+
     assert not product_view.is_accessible(
         user
-    ), "Product should be inaccessible without token"
+    ), "Product should be inaccessible without voucher"
+
     assert not product_view.is_accessible(
         user, "wrong"
-    ), "Product should be inaccessible with incorrect token"
+    ), "Product should be inaccessible with incorrect voucher"
 
-    product_view = ProductView(name="cfp", cfp_accepted_only=True)
+    product_view = ProductView(name="cfp", cfp_accepted_only=True, type="ticket")
     assert not product_view.is_accessible(
         user
     ), "CfP products should not be visible without accepted proposal"
@@ -78,13 +84,13 @@ def test_product_view_accessible_voucher_expiry(db, user, monkeypatch):
     monkeypatch.setattr("models.product.config_date", sales_start_mock_future)
 
     product_view = ProductView(name="other")
-    voucher = Voucher(view=product_view, token="test1", expiry=YESTERDAY)
-    voucher = Voucher(view=product_view, token="test2", expiry=TOMORROW)
+    voucher = Voucher(view=product_view, code="test1", expiry=YESTERDAY)
+    voucher = Voucher(view=product_view, code="test2", expiry=TOMORROW)
 
     assert not product_view.is_accessible(
-        user, user_token="test1"
+        user, voucher="test1"
     ), "View should be inaccessible with expired voucher"
 
     assert product_view.is_accessible(
-        user, user_token="test2"
+        user, voucher="test2"
     ), "View should be accessible with in-date voucher"
