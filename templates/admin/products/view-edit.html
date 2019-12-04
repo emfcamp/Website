@@ -39,17 +39,16 @@
 <h3>Vouchers</h3>
 <table class="table table-condensed table-striped">
   <tr>
-    <th>Token</th>
+    <th>Code</th>
     <th>Expiry</th>
     <th>Used?</th>
   </tr>
-  {% for vchr in view.tokens %}
+  {% for vchr in view.vouchers %}
     <tr>
       {# FIXME add a "copy URL" link? #}
-      <td>{{ vchr.token }}</td>
+      <td>{{ vchr.code }}</td>
       <td>{{ vchr.expiry }}</td>
       <td>{% if vchr.is_used %}Yes{% else %}No{% endif %}</td>
-      }
     </tr>
   {% endfor %}
 </table>
@@ -57,7 +56,7 @@
 {{ form.update(class_="btn btn-success debounce") }}
 <a href="{{ url_for('.product_view_add', view_id=view.id) }}" class="btn btn-default">Add products</a>
 <a href="{{ url_for('.product_view_add_voucher', view_id=view.id) }}" class="btn btn-default">Add voucher</a>
-<a href="{{ url_for('.bulk_create_vouchers_by_email', view_id=view.id) }}" class="btn btn-default">Bulk create vouchers</a>
+<a href="{{ url_for('.product_view_bulk_add_vouchers_by_email', view_id=view.id) }}" class="btn btn-default">Bulk create vouchers</a>
 
 </form>
 

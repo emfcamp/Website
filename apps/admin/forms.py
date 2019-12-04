@@ -160,8 +160,10 @@ class AddProductViewProductForm(Form):
 
 
 class NewVoucherForm(Form):
-    token = StringField("Token", [Optional()])  # Maybe auto-generated
-    # expires = DateField("Expiry Date (Optional)", [Optional()])
+    voucher = StringField(
+        "Voucher code (Optional)", [Optional()]
+    )  # Maybe auto-generated
+    expires = DateField("Expiry Date (Optional)", [Optional()])
     create = SubmitField("Create")
 
 

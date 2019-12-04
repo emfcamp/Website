@@ -26,24 +26,22 @@ class Basket(MutableMapping):
     ids should be trustworthy (e.g. stored in flask.session)
     """
 
-    def __init__(self, user, currency, token):
+    def __init__(self, user, currency, voucher=None):
         self.user = user
         # Due to the Price, reserved Purchases have an implicit currency,
         # but this shouldn't be relied on until they're attached to a Payment.
         # Totals should be calculated based on the basket's currency.
         self.currency = currency
         self._lines = []
-
-        if token:
-            self.token = token
+        self.voucher = voucher
 
     @classmethod
     def from_session(self, user, currency):
         purchases = session.get("basket_purchase_ids", [])
         surplus_purchases = session.get("basket_surplus_purchase_ids", [])
-        token = session.get("ticket_token", None)
+        voucher = session.get("ticket_voucher", None)
 
-        basket = Basket(user, currency, token)
+        basket = Basket(user, currency, voucher)
         basket.load_purchases_from_ids(purchases, surplus_purchases)
         return basket
 
@@ -276,7 +274,10 @@ class Basket(MutableMapping):
             if purchase.payment_id is not None:
                 raise Exception("Purchase {} has a payment already".format(purchase.id))
 
-        payment = payment_cls(self.currency, self.total, self.token)
+        if self.voucher:
+            payment = payment_cls(self.currency, self.total, self.voucher)
+        else:
+            payment = payment_cls(self.currency, self.total)
 
         # This is where you'd add the premium if it existed
 

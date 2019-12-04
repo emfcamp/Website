@@ -387,7 +387,6 @@ def product_view_new():
         view = ProductView(
             type=form.type.data,
             name=form.name.data,
-            # token=form.token.data,
             cfp_accepted_only=form.cfp_accepted_only.data,
         )
         app.logger.info("Adding new ProductView %s", view.name)
@@ -422,7 +421,6 @@ def product_view(view_id):
         if form.update.data:
             view.name = form.name.data
             view.type = form.type.data
-            # view.token = form.token.data
             view.cfp_accepted_only = form.cfp_accepted_only.data
 
             for f in form.pvps:
@@ -487,13 +485,13 @@ def product_view_add(view_id, group_id=None, product_id=None):
     )
 
 
-@admin.route("/product_views/<int:view_id>/tokens/add", methods=["GET", "POST"])
+@admin.route("/product_views/<int:view_id>/voucher/add", methods=["GET", "POST"])
 def product_view_add_voucher(view_id):
     view = ProductView.query.get_or_404(view_id)
     form = NewVoucherForm()
 
     if form.validate_on_submit():
-        Voucher(view, token=form.token.data)
+        Voucher(view, code=form.voucher.data)
         db.session.commit()
 
         return redirect(url_for(".product_view", view_id=view_id))
@@ -501,14 +499,14 @@ def product_view_add_voucher(view_id):
     return render_template("admin/products/view-add-voucher.html", view=view, form=form)
 
 
-@admin.route("/product_views/<int:view_id>/bulk_add", methods=["GET", "POST"])
-def bulk_create_vouchers_by_email(view_id):
+@admin.route("/product_views/<int:view_id>/voucher/bulk_add", methods=["GET", "POST"])
+def product_view_bulk_add_vouchers_by_email(view_id):
     view = ProductView.query.get_or_404(view_id)
     form = BulkVoucherEmailForm()
 
     if form.validate_on_submit():
         for email in form.emails.data:
-            voucher = Voucher(view, token=random_voucher())
+            voucher = Voucher(view, code=random_voucher())
 
             msg = Message(
                 "Volunteer voucher for Electromagnetic Field",
@@ -517,10 +515,10 @@ def bulk_create_vouchers_by_email(view_id):
             )
 
             msg.body = render_template(
-                "emails/volunteer-voucher.txt", voucher=voucher.token
+                "emails/volunteer-voucher.txt", voucher=voucher.code
             )
 
-            app.logger.info("Emailing %s volunteer voucher: %s", email, voucher.token)
+            app.logger.info("Emailing %s volunteer voucher: %s", email, voucher.code)
             mail.send(msg)
 
             db.session.commit()
