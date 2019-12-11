@@ -13,8 +13,10 @@ jobs:
       COVERALLS_GIT_BRANCH: ${{ github.ref }}
     steps:
       - uses: actions/checkout@v1
+      - name: Build containers
+        run: docker-compose -f ./docker-compose.yml -f ./docker-compose.ci.yml build --parallel
       - name: Start environment
-        run: docker-compose -f ./docker-compose.yml -f ./docker-compose.ci.yml up --build -d
+        run: docker-compose -f ./docker-compose.yml -f ./docker-compose.ci.yml up -d
       - name: Test
         run: docker-compose -f ./docker-compose.yml -f ./docker-compose.ci.yml exec -T app poetry run make test
   build:
