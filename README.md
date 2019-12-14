@@ -19,7 +19,8 @@ to monitor the containers.
 
 To start all containers (and rebuild any which may have changed):
 ```
-docker-compose up --build
+docker-compose build --parallel
+docker-compose up
 ```
 You should then be able to view your development server on [http://localhost:5000](http://localhost:5000).
 
