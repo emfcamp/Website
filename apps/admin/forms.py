@@ -1,3 +1,4 @@
+import re
 from wtforms.validators import (
     Optional,
     DataRequired,
@@ -9,7 +10,6 @@ from wtforms import (
     SubmitField,
     StringField,
     SelectField,
-    DateField,
     IntegerField,
     DecimalField,
     FieldList,
@@ -18,7 +18,7 @@ from wtforms import (
     BooleanField,
     TextAreaField,
 )
-from email_validator import validate_email, EmailNotValidError
+from wtforms.fields.html5 import DateField
 
 from models.product import ProductGroup
 from models.basket import Basket
@@ -168,24 +168,13 @@ class NewVoucherForm(Form):
 
 
 class BulkVoucherEmailForm(Form):
-    emails = TextAreaField("Comma separated list of emails")
+    emails = TextAreaField("Email Addresses")
     expires = DateField("Expiry Date (Optional)", [Optional()])
     create = SubmitField("Create All")
 
     def validate_emails(form, field):
-        emails = form.emails.data.split(",")
-        emails = [e.strip() for e in emails if e.strip()]
-
-        good_emails = []
-        for e in emails:
-            try:
-                result = validate_email(e)
-                # Replace data with normalised version of email
-                good_emails.append(result["email"])
-            except EmailNotValidError as e:
-                raise ValidationError(str(e))
-        # If everything's ok replace the field with cleaned data
-        form.emails.data = good_emails
+        emails = re.split(r"[\s,]+", form.emails.data, re.MULTILINE)
+        form.emails.data = [e.strip() for e in emails if e.strip()]
 
 
 #
