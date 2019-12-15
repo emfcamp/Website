@@ -388,6 +388,7 @@ def product_view_new():
             type=form.type.data,
             name=form.name.data,
             cfp_accepted_only=form.cfp_accepted_only.data,
+            vouchers_only=form.vouchers_only.data,
         )
         app.logger.info("Adding new ProductView %s", view.name)
         db.session.add(view)
@@ -422,6 +423,7 @@ def product_view(view_id):
             view.name = form.name.data
             view.type = form.type.data
             view.cfp_accepted_only = form.cfp_accepted_only.data
+            view.vouchers_only = form.vouchers_only.data
 
             for f in form.pvps:
                 pvp_dict[f.product_id.data].order = f.order.data
@@ -506,7 +508,7 @@ def product_view_bulk_add_vouchers_by_email(view_id):
 
     if form.validate_on_submit():
         for email in form.emails.data:
-            voucher = Voucher(view, code=random_voucher())
+            voucher = Voucher(view, code=random_voucher(), email=email)
 
             msg = Message(
                 "Volunteer voucher for Electromagnetic Field",

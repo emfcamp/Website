@@ -5,7 +5,7 @@ import re
 import random
 import string
 
-from sqlalchemy import func, UniqueConstraint, inspect, select
+from sqlalchemy import func, UniqueConstraint, inspect
 from sqlalchemy.orm import validates, column_property
 from sqlalchemy.ext.associationproxy import association_proxy
 
@@ -13,7 +13,6 @@ from main import db
 from .mixins import CapacityMixin, InheritedAttributesMixin
 from . import config_date
 from .purchase import Purchase
-from .payment import Payment
 
 
 class ProductGroupException(Exception):
@@ -370,23 +369,25 @@ class Voucher(db.Model):
 
     code = db.Column(db.String, primary_key=True)
     expiry = db.Column(db.DateTime, nullable=True)
+    email = db.Column(db.String, nullable=True, index=True)
+
     product_view_id = db.Column(db.Integer, db.ForeignKey("product_view.id"))
 
     payment = db.relationship("Payment", backref="voucher")
+    purchases_remaining = db.Column(db.Integer, nullable=False, server_default="1")
 
-    is_used = column_property(
-        select([True]).where(Payment.voucher_code == code), deferred=True
-    )
+    is_used = column_property(purchases_remaining == 0)
 
     @classmethod
     def get_by_code(cls, code):
         if not code:
             return None
-        return Voucher.query.filter_by(code=code).one_or_none().view
+        return Voucher.query.filter_by(code=code).one_or_none()
 
-    def __init__(self, view, code=None, expiry=None):
+    def __init__(self, view, code=None, expiry=None, email=None):
         super(Voucher, self).__init__()
         self.view = view
+        self.email = email
 
         # Creation may fail if code has already been used. This isn't ideal
         # but a 12 ascii character random string is unlikely to clash and
@@ -430,6 +431,9 @@ class ProductView(db.Model):
     type = db.Column(db.String, nullable=False)
     name = db.Column(db.String, nullable=False, index=True)
     cfp_accepted_only = db.Column(db.Boolean, nullable=False, default=False)
+    vouchers_only = db.Column(
+        db.Boolean, nullable=False, default=False, server_default="False"
+    )
 
     product_view_products = db.relationship(
         "ProductViewProduct",
@@ -456,24 +460,25 @@ class ProductView(db.Model):
             # Admins always have access
             return True
 
-        if not self.vouchers and datetime.utcnow() < config_date("SALES_START"):
-            return False
-
         # CfP voucher
         if self.cfp_accepted_only:
             if user and user.is_authenticated and user.is_cfp_accepted:
                 return True
             return False
 
-        if self.vouchers:
+        if not self.vouchers_only and datetime.utcnow() < config_date("SALES_START"):
+            return False
+
+        if self.vouchers_only:
             if not voucher:
                 return False
 
-            for vchr in self.vouchers:
-                if vchr.is_accessible(voucher):
-                    return True
+            voucher_obj = Voucher.query.filter_by(view=self, code=voucher).one_or_none()
 
-            return False
+            if not voucher_obj:
+                return False
+
+            return voucher_obj.is_accessible(voucher)
 
         return True
 

@@ -7,11 +7,11 @@ YESTERDAY = datetime.utcnow() - timedelta(days=1)
 TOMORROW = datetime.utcnow() + timedelta(days=1)
 
 
-def test_product_view_accessible(db, user):
+def test_product_view_accessible(db, user, monkeypatch):
     product_view = ProductView(name="other", type="ticket")
     assert product_view.is_accessible(user), "Default view should be visible"
 
-    product_view = ProductView(name="another-other", type="ticket")
+    product_view = ProductView(name="another-other", type="ticket", vouchers_only=True)
     voucher = Voucher(view=product_view)
 
     db.session.add(product_view)
@@ -83,9 +83,11 @@ def test_product_view_accessible_voucher_expiry(db, user, monkeypatch):
     # Patch config_date rather than utcnow as apparently you can't patch builtins
     monkeypatch.setattr("models.product.config_date", sales_start_mock_future)
 
-    product_view = ProductView(name="other")
-    voucher = Voucher(view=product_view, code="test1", expiry=YESTERDAY)
-    voucher = Voucher(view=product_view, code="test2", expiry=TOMORROW)
+    product_view = ProductView(name="other", type="ticket", vouchers_only=True)
+    db.session.add(product_view)
+    db.session.add(Voucher(view=product_view, code="test1", expiry=YESTERDAY))
+    db.session.add(Voucher(view=product_view, code="test2", expiry=TOMORROW))
+    db.session.commit()
 
     assert not product_view.is_accessible(
         user, voucher="test1"

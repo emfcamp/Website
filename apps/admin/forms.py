@@ -143,6 +143,7 @@ class ProductViewForm(Form):
     name = StringField("Name")
     type = StringField("Type", default="tickets")
     cfp_accepted_only = BooleanField("Accepted CfP proposal required")
+    vouchers_only = BooleanField("Voucher required")
 
 
 class NewProductViewForm(ProductViewForm):

@@ -73,11 +73,15 @@ price_changed = Counter(
 
 
 @tickets.route("/tickets/voucher/")
-@tickets.route("/tickets/voucher/<voucher>")
-def tickets_voucher(voucher=None):
-    view = Voucher.get_by_code(voucher)
+@tickets.route("/tickets/voucher/<voucher_code>")
+def tickets_voucher(voucher_code=None):
+    voucher = Voucher.get_by_code(voucher_code)
+    if voucher is None:
+        return abort(404)
+
+    view = voucher.view
     if view:
-        session["ticket_voucher"] = voucher
+        session["ticket_voucher"] = voucher_code
         return redirect(url_for("tickets.main", flow=view.name))
 
     if "ticket_voucher" in session:
