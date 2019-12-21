@@ -2,7 +2,7 @@ Hey!
 
 Thank you for helping out at Electromagnetic Field 2018. We would like to give you the chance to buy tickets for EMF 2020 before they go on general sale. All you need to do is click on this link:
 
-{{ external_url('tickets.tickets_voucher', voucher=voucher.code) }}
+{{ external_url('tickets.tickets_voucher', voucher_code=voucher.code) }}
 
 This link is valid for one purchase of up to two full tickets and any number of under-18 or under-12 tickets. 
 
