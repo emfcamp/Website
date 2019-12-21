@@ -27,6 +27,7 @@ from models.product import (
 )
 from models.purchase import Purchase, PurchaseTransfer
 
+from models import event_year
 from . import admin
 from .forms import (
     EditProductForm,
@@ -547,7 +548,7 @@ def product_view_bulk_add_vouchers_by_email(view_id):
             )
 
             msg = Message(
-                "Volunteer voucher for Electromagnetic Field",
+                f"Your voucher for Electromagnetic Field {event_year()}",
                 sender=app.config["TICKETS_EMAIL"],
                 recipients=[email],
             )
