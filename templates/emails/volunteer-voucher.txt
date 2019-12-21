@@ -1,12 +1,20 @@
 Hey!
 
-Thank you for helping out at Electromagnetic Field 2018. As a thank you we would like to offer you the chance to buy tickets for next year's event before they go on general release. All you need to do is click on this link:
+Thank you for helping out at Electromagnetic Field 2018. We would like to give you the chance to buy tickets for EMF 2020 before they go on general sale. All you need to do is click on this link:
 
-{{ external_url('tickets.tickets_voucher', voucher=voucher) }}
+{{ external_url('tickets.tickets_voucher', voucher=voucher.code) }}
 
-This link is only valid for one purchase of up to 2 full tickets and any number of under-18s/under-12s tickets. If you don't need this voucher though, please share it.
+This link is valid for one purchase of up to two full tickets and any number of under-18 or under-12 tickets. 
 
-Again, thank you so much for helping last year, without you it wouldn't have happened. Here's to seeing you at the next one.
+{%- if voucher.expiry %}
+
+You are guaranteed these tickets until your voucher expires on {{voucher.expiry}}, so please buy your ticket before then.
+
+{% endif -%}
+
+If you don't need this voucher, you are welcome to share it with someone else.
+
+Again, thank you so much for helping last year. Without you it wouldn't have happened. Here's to seeing you at the next one.
 
 Love,
 
