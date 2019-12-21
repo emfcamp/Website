@@ -1,8 +1,6 @@
 {% if not available %}
 <div class="well">
-  <p class="emphasis">There are no tickets currently available for Electromagnetic Field {{ event_year }},
-                      but more will be on sale soon.
-  </p>
+  <p class="emphasis">There are no tickets currently available, but more will be on sale soon.</p>
   <p>Please follow us <a href="https://twitter.com/emfcamp">on Twitter</a> or
   join our mailing list to be notified when more tickets are on sale:</p>
   {% include "home/_mailchimp_form.html" %}
@@ -16,23 +14,20 @@
 </div>
 {% endif %}
 
-<h4>A ticket to Electromagnetic Field will get you:</h4>
+<h4>A ticket to Electromagnetic Field {{event_year}} will get you:</h4>
 <ul>
-    <li>A secure place to camp for three days</li>
+    <li>A secure place to camp from Thursday July 23<sup>rd</sup> until Monday July 27<sup>th</sup></li>
     <li>Very fast internet access, both wired and wireless</li>
     <li>Mains power</li>
-    <li>Access to running water and hot showers</li>
+    <li>Access to running water, hot showers, a well-stocked bar, and a variety of food vendors</li>
     <li>A whole pile of awesome talks and workshops</li>
-    <li>Access to a well-stocked bar, and multiple food vendors</li>
-    {# <li>One <a href="http://blog.emfcamp.org/post/94157161753/announcing-tilda-mke-the-incredible-emf-2014-camp">fully programmable camp badge</a>, equipped with wireless communications and screen</li> #}
-    <li>A campsite filled with weird and wonderful things to see.</li>
-    {# <li><a href="http://blog.emfcamp.org/post/94368735073/emf-2014-childcare-welcoming-the-nanotechs">Free childcare</a></li> #}
+    <li>A campsite filled with weird and wonderful things to see</li>
+    <li>Free childcare</li>
     <li>A weekend unlike any other in the UK</li>
 </ul>
 
 <p>
-  <b>Still not sure?</b> <a href="{{url_for('base.about')}}">Learn more</a> or check out our
-  <a href="https://wiki.emfcamp.org/wiki/FAQ">FAQ</a> for more details.
+  <b>Still not sure?</b> <a href="{{url_for('base.about')}}">Learn more</a>.
 </p>
 
 <p>
