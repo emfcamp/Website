@@ -1,10 +1,14 @@
 {% extends "admin/base.html" %}
 {% from "_formhelpers.html" import render_field  %}
+{% block title %}Product View "{{view.name}}"{% endblock %}
 
 {% set nav_active = 'product_views' %}
 {% block body %}
+<ol class="breadcrumb">
+  <li><a href="{{url_for('.product_views')}}">Product Views</a></li>
+  <li class="active">Product View "{{ view.name }}"</li>
+</ol>
 
-<h2>Product View {{ view.name }}</h2>
 <form action="" method="post">
 {{ form.hidden_tag() }}
 
@@ -12,6 +16,9 @@
 {{ render_field(form.type, horizontal=False) }}
 {{ render_field(form.cfp_accepted_only, horizontal=False) }}
 {{ render_field(form.vouchers_only, horizontal=False) }}
+
+{{ form.update(class_="btn btn-success debounce") }}
+</form>
 
 <h3>Products</h3>
 <table class="table table-condensed table-striped">
@@ -36,29 +43,17 @@
 
   {% endfor %}
 </table>
-
-<h3>Vouchers</h3>
-<table class="table table-condensed table-striped">
-  <tr>
-    <th>Code</th>
-    <th>Expiry</th>
-    <th>Used?</th>
-  </tr>
-  {% for vchr in view.vouchers %}
-    <tr>
-      {# FIXME add a "copy URL" link? #}
-      <td>{{ vchr.code }}</td>
-      <td>{{ vchr.expiry }}</td>
-      <td>{% if vchr.is_used %}Yes{% else %}No{% endif %}</td>
-    </tr>
-  {% endfor %}
-</table>
-
-{{ form.update(class_="btn btn-success debounce") }}
 <a href="{{ url_for('.product_view_add', view_id=view.id) }}" class="btn btn-default">Add products</a>
-<a href="{{ url_for('.product_view_add_voucher', view_id=view.id) }}" class="btn btn-default">Add voucher</a>
-<a href="{{ url_for('.product_view_bulk_add_vouchers_by_email', view_id=view.id) }}" class="btn btn-default">Bulk create vouchers</a>
 
-</form>
+{% if view.vouchers_only %}
+<h3>Vouchers</h3>
+<p>{{view.vouchers|length}} vouchers issued for this view.</p>
+
+<div class="btn-group">
+<a href="{{ url_for('.product_view_add_voucher', view_id=view.id) }}" class="btn btn-default">Create custom voucher code</a>
+<a href="{{ url_for('.product_view_bulk_add_vouchers_by_email', view_id=view.id) }}" class="btn btn-default">Email Vouchers</a>
+<a href="{{ url_for('.product_view_voucher_list', view_id=view.id) }}" class="btn btn-default">List vouchers</a>
+</div>
+{% endif %}
 
 {% endblock %}
