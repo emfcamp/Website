@@ -526,7 +526,9 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 existing += 1
                 continue
 
-            voucher = Voucher(view, code=random_voucher(), email=email)
+            voucher = Voucher(
+                view, code=random_voucher(), email=email, expiry=form.expires.data
+            )
 
             msg = Message(
                 "Volunteer voucher for Electromagnetic Field",
@@ -534,9 +536,7 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 recipients=[email],
             )
 
-            msg.body = render_template(
-                "emails/volunteer-voucher.txt", voucher=voucher.code
-            )
+            msg.body = render_template("emails/volunteer-voucher.txt", voucher=voucher)
 
             app.logger.info("Emailing %s volunteer voucher: %s", email, voucher.code)
             db.session.commit()
