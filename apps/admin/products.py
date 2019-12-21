@@ -210,10 +210,26 @@ def price_tier_edit(tier_id):
     if form.validate_on_submit():
         tier.name = form.name.data
         tier.personal_limit = form.personal_limit.data
+
+        # Update prices but only if price tier is unused.
+        price_gbp = tier.get_price("GBP")
+        price_eur = tier.get_price("EUR")
+
+        if tier.unused:
+            if form.price_gbp.data != price_gbp.value:
+                db.session.delete(price_gbp)
+                tier.prices.append(Price("GBP", form.price_gbp.data))
+
+            if form.price_eur.data != price_eur.value:
+                db.session.delete(price_eur)
+                tier.prices.append(Price("EUR", form.price_eur.data))
+
         db.session.commit()
 
         return redirect(url_for(".price_tier_details", tier_id=tier.id))
 
+    form.price_gbp.data = tier.get_price("GBP").value
+    form.price_eur.data = tier.get_price("EUR").value
     return render_template("admin/products/price-tier-edit.html", tier=tier, form=form)
 
 

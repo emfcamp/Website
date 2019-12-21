@@ -114,12 +114,12 @@ class CopyProductGroupForm(ProductGroupForm):
 class PriceTierForm(Form):
     name = StringField("Name")
     personal_limit = IntegerField("Personal maximum")
+    price_gbp = DecimalField("Price (GBP)")
+    price_eur = DecimalField("Price (EUR)")
 
 
 class NewPriceTierForm(PriceTierForm):
     create = SubmitField("Create", [DataRequired()])
-    price_gbp = DecimalField("Price (GBP)")
-    price_eur = DecimalField("Price (EUR)")
 
 
 class EditPriceTierForm(PriceTierForm):
