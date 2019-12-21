@@ -17,8 +17,6 @@
 {{ render_field(form.cfp_accepted_only, horizontal=False) }}
 {{ render_field(form.vouchers_only, horizontal=False) }}
 
-{{ form.update(class_="btn btn-success debounce") }}
-</form>
 
 <h3>Products</h3>
 <table class="table table-condensed table-striped">
@@ -43,7 +41,11 @@
 
   {% endfor %}
 </table>
+<div class="btn-group">
+{{ form.update(class_="btn btn-success debounce") }}
 <a href="{{ url_for('.product_view_add', view_id=view.id) }}" class="btn btn-default">Add products</a>
+</div>
+</form>
 
 {% if view.vouchers_only %}
 <h3>Vouchers</h3>
