@@ -93,14 +93,13 @@
         {% if feature_enabled('GOCARDLESS') or feature_enabled('BANK_TRANSFER') %}
         <div class="panel-body">
             <p>If you can't use another payment method, we accept card payments.
-            These cost us more, and we'd rather you used another method if you can.
-            Recent changes in the law mean we're no longer allowed to pass this cost on to you.</p>
+            These cost us more, and we'd rather you used another method if you can.</p>
 
             <p>We accept Visa, Visa Debit, Mastercard or American Express.</p>
-            <input type="submit" name="{{form.stripe.name}}" value="{{form.stripe.label.text}}" class="btn btn-small btn-default debounce"/>
+            <input type="submit" name="{{form.stripe.name}}" value="{{form.stripe.label.text}}" class="btn btn-small btn-success debounce"/>
         </div>
         {% else %}
-        <div class="panel-heading"><h3 class="panel-title">Stripe</h3></div>
+        <div class="panel-heading"><h3 class="panel-title">Card</h3></div>
         <div class="panel-body">
             <p>We accept Visa, Visa Debit, Mastercard or American Express.</p>
         </div>
