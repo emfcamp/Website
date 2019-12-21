@@ -521,7 +521,7 @@ def product_view_bulk_add_vouchers_by_email(view_id):
 
         added = existing = 0
 
-        for email in set(form.emails.data):
+        for email in emails:
             if Voucher.query.filter_by(email=email).first():
                 existing += 1
                 continue
