@@ -1,4 +1,3 @@
-import re
 from wtforms.validators import (
     Optional,
     DataRequired,
@@ -170,12 +169,8 @@ class NewVoucherForm(Form):
 
 class BulkVoucherEmailForm(Form):
     emails = TextAreaField("Email Addresses")
-    expires = DateField("Expiry Date (Optional)", [Optional()])
+    expires = DateField("Expiry Date")
     create = SubmitField("Create All")
-
-    def validate_emails(form, field):
-        emails = re.split(r"[\s,]+", form.emails.data, re.MULTILINE)
-        form.emails.data = [e.strip() for e in emails if e.strip()]
 
 
 #

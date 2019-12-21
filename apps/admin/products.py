@@ -1,6 +1,4 @@
-# coding=utf-8
-from __future__ import division, absolute_import, print_function, unicode_literals
-
+import re
 from flask import (
     render_template,
     redirect,
@@ -513,7 +511,9 @@ def product_view_bulk_add_vouchers_by_email(view_id):
     form = BulkVoucherEmailForm()
 
     if form.validate_on_submit():
-        if len(form.emails.data) > 250:
+        emails = set(e.strip() for e in re.split(r"[\s,]+", form.emails.data))
+
+        if len(emails) > 250:
             flash("More than 250 emails provided. Please submit <250 at a time.")
             return redirect(
                 url_for(".product_view_bulk_add_vouchers_by_email", view_id=view_id)
@@ -539,11 +539,10 @@ def product_view_bulk_add_vouchers_by_email(view_id):
             )
 
             app.logger.info("Emailing %s volunteer voucher: %s", email, voucher.code)
+            db.session.commit()
             mail.send(msg)
-
             added += 1
 
-        db.session.commit()
         flash(f"{added} vouchers added, {existing} duplicates skipped.")
 
         return redirect(
