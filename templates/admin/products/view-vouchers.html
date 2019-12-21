@@ -1,0 +1,34 @@
+{% extends "admin/base.html" %}
+{% from "_formhelpers.html" import render_field  %}
+{% block title %}Vouchers for "{{view.name}}"{% endblock %}
+
+{% set nav_active = 'product_views' %}
+{% block body %}
+<ol class="breadcrumb">
+  <li><a href="{{url_for('.product_views')}}">Product Views</a></li>
+  <li><a href="{{url_for('.product_view', view_id=view.id)}}">Product View "{{ view.name }}"</a></li>
+  <li class="active">Vouchers</li>
+</ol>
+{% if view.vouchers_only %}
+<table class="table table-condensed table-striped">
+  <tr>
+    <th>Code</th>
+    <th>Email</th>
+    <th>Expiry</th>
+    <th>Used?</th>
+  </tr>
+  {% for vchr in view.vouchers %}
+    <tr>
+      {# FIXME add a "copy URL" link? #}
+      <td>{{ vchr.code }}</td>
+      <td>{{ vchr.email }}</td>
+      <td>{{ vchr.expiry }}</td>
+      <td>{% if vchr.is_used %}Yes{% else %}No{% endif %}</td>
+    </tr>
+  {% endfor %}
+</table>
+
+<a href="{{ url_for('.product_view_add_voucher', view_id=view.id) }}" class="btn btn-default">Create custom voucher code</a>
+<a href="{{ url_for('.product_view_bulk_add_vouchers_by_email', view_id=view.id) }}" class="btn btn-default">Email Vouchers</a>
+{% endif %}
+{% endblock %}

@@ -487,6 +487,12 @@ def product_view_add(view_id, group_id=None, product_id=None):
     )
 
 
+@admin.route("/product_views/<int:view_id>/voucher")
+def product_view_voucher_list(view_id):
+    view = ProductView.query.get_or_404(view_id)
+    return render_template("admin/products/view-vouchers.html", view=view)
+
+
 @admin.route("/product_views/<int:view_id>/voucher/add", methods=["GET", "POST"])
 def product_view_add_voucher(view_id):
     view = ProductView.query.get_or_404(view_id)
