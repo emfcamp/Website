@@ -75,7 +75,7 @@ price_changed = Counter(
 @tickets.route("/tickets/voucher/<voucher_code>")
 def tickets_voucher(voucher_code=None):
     voucher = Voucher.get_by_code(voucher_code)
-    if voucher is None:
+    if voucher is None or voucher.is_used:
         return abort(404)
 
     view = voucher.view
