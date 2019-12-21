@@ -16,6 +16,7 @@ services:
       SETTINGS_FILE: ./config/development.cfg
       FLASK_APP: dev_server.py
       FLASK_ENV: development
+      PYTHONUNBUFFERED: 1
 
   gulp:
     build:
