@@ -11,7 +11,7 @@
 
 {{ render_field(form.name, horizontal=8) }}
 {{ render_field(form.personal_limit, horizontal=8) }}
-{% if tier.unused %}
+{% if tier.purchase_count == 0 %}
 {{ render_field(form.price_gbp, horizontal=8) }}
 {{ render_field(form.price_eur, horizontal=8) }}
 {% else %}

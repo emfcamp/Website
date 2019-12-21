@@ -211,11 +211,11 @@ def price_tier_edit(tier_id):
         tier.name = form.name.data
         tier.personal_limit = form.personal_limit.data
 
-        # Update prices but only if price tier is unused.
+        # Update prices but only if price tier has no purchases.
         price_gbp = tier.get_price("GBP")
         price_eur = tier.get_price("EUR")
 
-        if tier.unused:
+        if tier.purchase_count == 0:
             if form.price_gbp.data != price_gbp.value:
                 db.session.delete(price_gbp)
                 tier.prices.append(Price("GBP", form.price_gbp.data))
