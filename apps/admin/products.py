@@ -513,7 +513,19 @@ def product_view_bulk_add_vouchers_by_email(view_id):
     form = BulkVoucherEmailForm()
 
     if form.validate_on_submit():
-        for email in form.emails.data:
+        if len(form.emails.data) > 250:
+            flash("More than 250 emails provided. Please submit <250 at a time.")
+            return redirect(
+                url_for(".product_view_bulk_add_vouchers_by_email", view_id=view_id)
+            )
+
+        added = existing = 0
+
+        for email in set(form.emails.data):
+            if Voucher.query.filter_by(email=email).first():
+                existing += 1
+                continue
+
             voucher = Voucher(view, code=random_voucher(), email=email)
 
             msg = Message(
@@ -529,9 +541,14 @@ def product_view_bulk_add_vouchers_by_email(view_id):
             app.logger.info("Emailing %s volunteer voucher: %s", email, voucher.code)
             mail.send(msg)
 
-            db.session.commit()
+            added += 1
 
-        return redirect(url_for(".product_view", view_id=view_id))
+        db.session.commit()
+        flash(f"{added} vouchers added, {existing} duplicates skipped.")
+
+        return redirect(
+            url_for(".product_view_bulk_add_vouchers_by_email", view_id=view_id)
+        )
 
     return render_template(
         "admin/products/view-bulk-add-voucher.html", view=view, form=form
