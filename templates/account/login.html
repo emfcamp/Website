@@ -10,17 +10,8 @@
     <div class="panel panel-default">
     <div class="panel-body">
         <p>
-        {% if feature_enabled('TICKET_SALES') and feature_enabled('CFP') %}
           If you've already bought a ticket to EMF, or submitted a proposal, you can
           log into your account here.
-        {% elif feature_enabled('TICKET_SALES') %}
-          If you've already bought a ticket to EMF you can log into your account here.
-        {% elif feature_enabled('CFP') %}
-          If you've already submitted a proposal you can log into your account here.
-        {% else %}
-          You can log into your account here. Although both ticket sales and the call
-          for participation are currently closed.
-        {% endif %}
         </p>
 
         <p>Enter your email address and we'll email you a login link:</p>

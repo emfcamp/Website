@@ -34,7 +34,6 @@ from ..common import (
     CURRENCY_SYMBOLS,
     get_user_currency,
     set_user_currency,
-    feature_flag,
     create_current_user,
     feature_enabled,
 )
@@ -94,7 +93,6 @@ def tickets_voucher(voucher_code=None):
 
 @tickets.route("/tickets/clear")
 @tickets.route("/tickets/<flow>/clear")
-@feature_flag("TICKET_SALES")
 def tickets_clear(flow=None):
     basket = Basket.from_session(current_user, get_user_currency())
     basket.cancel_purchases()
@@ -108,7 +106,6 @@ def tickets_clear(flow=None):
 @tickets.route("/tickets/reserved/<currency>")
 @tickets.route("/tickets/<flow>/reserved")
 @tickets.route("/tickets/<flow>/reserved/<currency>")
-@feature_flag("TICKET_SALES")
 def tickets_reserved(flow=None, currency=None):
     if current_user.is_anonymous:
         return redirect(
@@ -127,7 +124,6 @@ def tickets_reserved(flow=None, currency=None):
 
 @tickets.route("/tickets", methods=["GET", "POST"])
 @tickets.route("/tickets/<flow>", methods=["GET", "POST"])
-@feature_flag("TICKET_SALES")
 def main(flow=None):
     if flow is None:
         flow = "main"
