@@ -4,15 +4,14 @@ Hi {{ user.name }},
 Hi,
 {%- endif %}
 
-Here's your link to log into the Electromagnetic Field web site. It will
-expire in 6 hours:
+Here's your link to log into the Electromagnetic Field web site. It will expire in 6 hours:
 
   {{ external_url('users.login', code=code, next=next_url) }}
 
-{% if SITE_STATE in ['before-sales', 'sales'] %}
+{%- if SITE_STATE in ['before-sales', 'sales'] %}
 See you soon at Electromagnetic Field {{ event_year }}!
 
-{% endif %}
+{%- endif %}
 Love,
 
 All the EMF team
