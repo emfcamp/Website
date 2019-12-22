@@ -28,7 +28,13 @@ RANDOM_VOUCHER_LENGTH = 12
 
 def random_voucher():
     return "".join(
-        [random.choice(string.ascii_lowercase) for i in range(RANDOM_VOUCHER_LENGTH)]
+        random.choices(
+            list(
+                set(string.ascii_lowercase) - {"a", "e", "i", "o", "u"}
+                | set(string.digits)
+            ),
+            k=RANDOM_VOUCHER_LENGTH,
+        )
     )
 
 
