@@ -124,9 +124,9 @@ utils/databases.cfg
 exports/*/private
 .com.apple.timemachine.supported
 node_modules
-# Compiled JS and CSS
-static/js
-static/css
+
+# Compiled static assets
+static/
 
 # Hashed files created by flask-static-digest
 static/**/*-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].*

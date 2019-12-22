@@ -7,19 +7,18 @@ from flask_login import current_user
 from flask_mail import Message
 from sqlalchemy.orm import joinedload
 from wtforms import SubmitField, BooleanField, StringField
-from wtforms.fields.html5 import EmailField
-from wtforms.validators import DataRequired, Email, ValidationError
+from wtforms.validators import DataRequired, ValidationError
 
 from . import admin
 from main import db, mail
 from models.user import User, generate_signup_code
 from models.permission import Permission
-from ..common.forms import Form
+from ..common.forms import Form, EmailField
 
 
 class NewUserForm(Form):
     name = StringField("Name", [DataRequired()])
-    email = EmailField("Email", [Email(), DataRequired()])
+    email = EmailField("Email")
     add = SubmitField("Add User")
 
     def validate_email(form, field):

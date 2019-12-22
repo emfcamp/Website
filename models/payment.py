@@ -10,8 +10,7 @@ from sqlalchemy_continuum.utils import version_class, transaction_class
 
 from main import db
 from . import export_attr_counts, export_intervals, bucketise, event_year
-import models
-from models.site_state import event_start
+from .purchase import Ticket
 
 safechars = "2346789BCDFGHJKMPQRTVWXY"
 
@@ -32,6 +31,9 @@ class Payment(db.Model):
     state = db.Column(db.String, nullable=False, default="new")
     reminder_sent = db.Column(db.Boolean, nullable=False, default=False)
     expires = db.Column(db.DateTime, nullable=True)
+    voucher_code = db.Column(
+        db.String, db.ForeignKey("voucher.code"), nullable=True, default=None
+    )
 
     # VAT invoice number, if issued
     vat_invoice_number = db.Column(db.Integer, nullable=True)
@@ -44,9 +46,12 @@ class Payment(db.Model):
 
     __mapper_args__ = {"polymorphic_on": provider}
 
-    def __init__(self, currency, amount):
+    def __init__(self, currency, amount, voucher_code=None):
         self.currency = currency
         self.amount = amount
+
+        if voucher_code:
+            self.voucher_code = voucher_code
 
     @classmethod
     def get_export_data(cls):
@@ -57,7 +62,7 @@ class Payment(db.Model):
         purchase_counts = (
             cls.query.outerjoin(cls.purchases)
             .group_by(cls.id)
-            .with_entities(func.count(models.Ticket.id))
+            .with_entities(func.count(Ticket.id))
         )
         refund_counts = (
             cls.query.outerjoin(cls.refunds)
@@ -265,8 +270,8 @@ class BankPayment(Payment):
     __mapper_args__ = {"polymorphic_identity": "banktransfer"}
     bankref = db.Column(db.String, unique=True)
 
-    def __init__(self, currency, amount):
-        Payment.__init__(self, currency, amount)
+    def __init__(self, currency, amount, voucher_code=None):
+        Payment.__init__(self, currency, amount, voucher_code)
 
         # not cryptographic
         self.bankref = "".join(random.sample(safechars, 8))
@@ -461,7 +466,7 @@ class StripePayment(Payment):
 
     @property
     def description(self):
-        return "EMF {} purchase".format(event_start().year)
+        return "EMF {} purchase".format(event_year())
 
     def manual_refund(self):
         if self.state not in {"charged", "paid", "refund-requested"}:

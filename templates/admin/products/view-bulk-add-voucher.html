@@ -1,0 +1,28 @@
+{% extends "admin/base.html" %}
+{% from "_formhelpers.html" import render_field  %}
+{% block title %}Generate Vouchers for "{{view.name}}"{% endblock %}
+
+{% set nav_active = 'product_views' %}
+{% block body %}
+<ol class="breadcrumb">
+  <li><a href="{{url_for('.product_views')}}">Product Views</a></li>
+  <li><a href="{{url_for('.product_view', view_id=view.id)}}">Product View "{{ view.name }}"</a></li>
+  <li class="active">Bulk Add Vouchers</li>
+</ol>
+
+<p>This will generate a random voucher code and email it to everyone listed.</p>
+
+<p>Email addresses can be separated by comma or newline.
+   Please submit fewer than 250 emails in each batch.</p>
+
+<p>If an email address has already been sent a voucher for this view, it will be skipped.</p>
+<form action="" method="post">
+{{ form.hidden_tag() }}
+
+{{ render_field(form.emails, horizontal=False) }}
+{{ render_field(form.expires, horizontal=False) }}
+
+{{ form.create(class_="btn btn-success debounce") }}
+</form>
+
+{% endblock %}

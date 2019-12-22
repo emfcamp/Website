@@ -12,7 +12,7 @@ notes on tickets_choose
 		check number of full tickets
 		if full tickets >= prepays prepays = 0 (all prepays bought)
 	else prepays= fulls = 0
-	get any tokens for the session
+	get any vouchers for the session
 	for all the sub forms  
 		set _type to the ticket type 
 		set limit
@@ -24,7 +24,7 @@ notes on tickets_choose
 		set basket to empty
 		for all subforms
 			if the subform has a value for "amount" (i.e. it's not "[]")
-				check validity of tokens
+				check validity of vouchers
 				append amount number of the ticket id to the basket
 		set session['basket'] to basket
 		if authorised user:

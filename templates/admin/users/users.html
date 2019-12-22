@@ -19,9 +19,9 @@
 <h4>User List</h4>
 <table class="table table-condensed">
     <tr>
-        <th><i class="glyphicon glyphicon-user"></i> Name</th>
-        <th><i class="glyphicon glyphicon-envelope"></i> email</th>
-        <th><i class="glyphicon glyphicon-lock"></i> Permissions</th>
+      <th>{{octicon('person')}} Name</th>
+      <th>{{octicon('mail')}} email</th>
+      <th>{{octicon('lock') }} Permissions</th>
     </tr>
 {% for u in users %}
 <tr class="{{ loop.cycle('odd', 'even') }}">

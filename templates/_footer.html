@@ -8,7 +8,7 @@
                 <a role="menuitem" target="_blank" href="{{ url_for('base.code_of_conduct') }}">
                     Code of Conduct</a>
             </li>
-          {% if feature_enabled('TICKET_SALES') %}
+          {% if SITE_STATE != 'before-sales' %}
           {% if current_user.is_authenticated %}
           <li role="presentation">
             <a role="menuitem" href="{{ url_for('users.account') }}">My account</a>
@@ -41,4 +41,5 @@
             <a href="{{url_for('base.privacy')}}">Privacy</a> |
             Kindly hosted by <a href="http://www.sargasso.co.uk/from/emfcamp">Sargasso Networks</a></p>
     </div>
+    <div style="clear:both"></div>
 </footer>

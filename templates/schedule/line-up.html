@@ -12,8 +12,8 @@
   {% if current_user.is_authenticated %}
     <p><strong><a class="btn btn-lg btn-primary" href="{{ url_for('.favourites') }}">View your favourites</a></strong></p>
     {% if config['SCHEDULE'] %}
-    <p>You can also get this list as an <a href="{{ url_for('.schedule_ical') }}">iCal feed</a>
-       for your calendar, and a <a href="{{ url_for('.schedule_json') }}">json feed</a> for your giant robot.
+    <p>You can also get this list as an <a href="{{ url_for('.schedule_ical', year=event_year) }}">iCal feed</a>
+       for your calendar, and a <a href="{{ url_for('.schedule_json', year=event_year) }}">json feed</a> for your giant robot.
     </p>
     {% endif %}
   {% else %}

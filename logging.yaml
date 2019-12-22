@@ -38,3 +38,5 @@ loggers:
     level: WARN
   shapely:
     level: WARN
+  parso:
+    level: WARN

@@ -19,7 +19,8 @@ to monitor the containers.
 
 To start all containers (and rebuild any which may have changed):
 ```
-docker-compose up --build
+docker-compose build --parallel
+docker-compose up
 ```
 You should then be able to view your development server on [http://localhost:5000](http://localhost:5000).
 
@@ -36,6 +37,20 @@ forwards them to the flask command line within the container.
 ### Tests
 
 Tests are run using the `./run_tests` script.
+
+### Code Style
+
+For Python we currently use [Black](https://github.com/psf/black) and
+[flake8](https://github.com/PyCQA/flake8) to enforce code style. These checks
+are run by `./run_tests`.
+
+However, it's easy to forget these checks, so you can also run them as a git
+pre-commit hook using [pre-commit](https://pre-commit.com/). To set this up on
+the host where you'll be using git:
+```
+pip3 install pre-commit
+pre-commit install
+```
 
 ### Adding accounts
 
@@ -60,6 +75,3 @@ For more, see:
 * [Testing](docs/testing.md)
 * [Deployment](docs/deployment.md)
 * [Contributing](.github/CONTRIBUTING.md)
-
-
-

@@ -1,9 +1,11 @@
 import time
 import yaml
+import secrets
 import logging
 import logging.config
+from email import charset
 
-from flask import Flask, url_for, render_template, request
+from flask import Flask, url_for, render_template, request, g
 from flask_mail import Mail, email_dispatched
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
@@ -50,6 +52,12 @@ def include_object(object, name, type_, reflected, compare_to):
 
     return True
 
+
+# Force Quoted-Printable encoding for emails.
+# The flask-mail package sets the header encoding to "SHORTEST" and the body encoding
+# to None. Somehow this, combined with Postmark, results in the email body being wrapped
+# twice, which results in ugly plaintext emails.
+charset.add_charset("utf-8", charset.QP, charset.QP, "utf-8")
 
 cache = Cache()
 csrf = CSRFProtect()
@@ -159,16 +167,61 @@ def create_app(dev_server=False):
                 "Per-process cache being used outside dev server - refreshing will not work"
             )
 
+    @app.context_processor
+    def add_csp_nonce():
+        g.csp_nonce = secrets.token_urlsafe(16)
+        return {"csp_nonce": g.csp_nonce}
+
     @app.after_request
     def send_security_headers(response):
         use_hsts = app.config.get("HSTS", False)
         if use_hsts:
-            max_age = app.config.get("HSTS_MAX_AGE", 3600 * 24 * 7 * 4)
+            max_age = app.config.get("HSTS_MAX_AGE", 3600 * 24 * 30 * 6)
             response.headers["Strict-Transport-Security"] = "max-age=%s" % max_age
 
         response.headers["X-Frame-Options"] = "deny"
         response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
 
+        csp = {
+            "script-src": ["'self'", "https://js.stripe.com"],
+            "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+            # Note: the below is more strict as it only allows inline styles in style=
+            # attributes, however it's unsupported by Safari at this time...
+            #  "style-src-attr": ["'unsafe-inline'"],
+            "font-src": ["'self'", "https://fonts.gstatic.com"],
+            "frame-src": [
+                "https://js.stripe.com/",
+                "https://media.ccc.de",
+                "https://www.youtube.com",
+                "https://archive.org",
+            ],
+        }
+
+        if app.config.get("DEBUG_TB_ENABLED"):
+            # This hash is for the flask debug toolbar. It may break once they upgrade it.
+            csp["script-src"].append(
+                "'sha256-zWl5GfUhAzM8qz2mveQVnvu/VPnCS6QL7Niu6uLmoWU='"
+            )
+
+        if "csp_nonce" in g:
+            csp["script-src"].append(f"'nonce-{g.csp_nonce}'")
+
+        value = "; ".join(k + " " + " ".join(v) for k, v in csp.items())
+
+        if app.config.get("DEBUG"):
+            response.headers["Content-Security-Policy"] = value
+        else:
+            response.headers["Content-Security-Policy-Report-Only"] = (
+                value + "; report-uri https://emfcamp.report-uri.com/r/d/csp/reportOnly"
+            )
+            response.headers[
+                "Report-To"
+            ] = '{"group":"default","max_age":31536000,"endpoints":[{"url":"https://emfcamp.report-uri.com/a/d/g"}],"include_subdomains":false}'
+            response.headers[
+                "NEL"
+            ] = '{"report_to":"default","max_age":31536000,"include_subdomains":false}'
         return response
 
     if not app.debug:
@@ -267,5 +320,6 @@ def create_app(dev_server=False):
 
 def external_url(endpoint, **values):
     """ Generate an absolute external URL. If you need to override this,
-        you're probably doing something wrong. """
+        you're probably doing something wrong.
+    """
     return url_for(endpoint, _external=True, **values)

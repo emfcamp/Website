@@ -172,11 +172,6 @@ def code_of_conduct():
     return render_template("code-of-conduct.html")
 
 
-@base.route("/diversity")
-def diversity():
-    return render_template("diversity.html")
-
-
 @base.route("/radio", methods=["GET"])
 @feature_flag("RADIO")
 def radio():

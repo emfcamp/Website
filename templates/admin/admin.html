@@ -1,2 +1,21 @@
 {% extends 'admin/base.html' %}
 {% block title %}Admin{% endblock %}
+{% block body %}
+<p>Welcome to the EMF website admin</p>
+<div style="width: 200px">
+  <h3>Site State</h3>
+  <table class="table">
+    <tr><td>Site state</td><td><strong>{{SITE_STATE}}</strong></td></tr>
+    <tr><td>Sales state</td><td><strong>{{SALES_STATE}}</strong></td></tr>
+  </table>
+  <a class="btn btn-default" href="{{url_for(".site_states")}}">Edit State</a>
+</div>
+
+<div>
+  <h3>Quick Links</h3>
+{% if SITE_STATE == 'before-sales' %}
+  <a class="btn btn-default" href="{{url_for(".payment_config_verify")}}">Verify Payment Config</a>
+{% endif %}
+  <a class="btn btn-default" href="{{url_for(".products")}}">Product Overview</a>
+</div>
+{% endblock %}

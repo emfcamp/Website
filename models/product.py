@@ -2,9 +2,11 @@ from decimal import Decimal
 from collections import defaultdict
 from datetime import datetime
 import re
+import random
+import string
 
-from sqlalchemy.orm import validates
 from sqlalchemy import func, UniqueConstraint, inspect
+from sqlalchemy.orm import validates, column_property
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from main import db
@@ -19,6 +21,21 @@ class ProductGroupException(Exception):
 
 class MultipleLoadedResultsFound(Exception):
     pass
+
+
+RANDOM_VOUCHER_LENGTH = 12
+
+
+def random_voucher():
+    return "".join(
+        random.choices(
+            list(
+                set(string.ascii_lowercase) - {"a", "e", "i", "o", "u"}
+                | set(string.digits)
+            ),
+            k=RANDOM_VOUCHER_LENGTH,
+        )
+    )
 
 
 def one_or_none(result):
@@ -39,6 +56,7 @@ class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     parent_id = db.Column(db.Integer, db.ForeignKey("product_group.id"))
+    # Whether this is a ticket or hire item.
     type = db.Column(db.String, nullable=False)
     name = db.Column(db.String, unique=True, nullable=False)
 
@@ -351,6 +369,66 @@ class Price(db.Model):
         return "%0.2f %s" % (self.value, self.currency)
 
 
+class Voucher(db.Model):
+    __tablename__ = "voucher"
+    """A voucher enables a specific productView"""
+
+    code = db.Column(db.String, primary_key=True)
+    expiry = db.Column(db.DateTime, nullable=True)
+    email = db.Column(db.String, nullable=True, index=True)
+
+    product_view_id = db.Column(db.Integer, db.ForeignKey("product_view.id"))
+
+    payment = db.relationship("Payment", backref="voucher")
+    purchases_remaining = db.Column(db.Integer, nullable=False, server_default="1")
+
+    is_used = column_property(purchases_remaining == 0)
+
+    @classmethod
+    def get_by_code(cls, code):
+        if not code:
+            return None
+        return Voucher.query.filter_by(code=code).one_or_none()
+
+    def __init__(self, view, code=None, expiry=None, email=None):
+        super(Voucher, self).__init__()
+        self.view = view
+        self.email = email
+
+        # Creation may fail if code has already been used. This isn't ideal
+        # but a 12 ascii character random string is unlikely to clash and
+        # selected codes will need to be done with care.
+        if code:
+            self.code = code
+        else:
+            self.code = random_voucher()
+
+        if expiry is not None:
+            self.expiry = expiry
+
+    def __repr__(self):
+        if self.expiry:
+            return "<Voucher: %s, view: %s, expiry: %s>" % (
+                self.code,
+                self.product_view_id,
+                self.expiry,
+            )
+        return "<Voucher: %s, view: %s>" % (self.code, self.product_view_id)
+
+    def is_accessible(self, voucher):
+        # voucher expired
+        if self.expiry and datetime.utcnow() > self.expiry:
+            return False
+
+        if self.code != voucher:
+            return False
+
+        if self.is_used:
+            return False
+
+        return True
+
+
 class ProductView(db.Model):
     __table_name__ = "product_view"
 
@@ -358,8 +436,10 @@ class ProductView(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String, nullable=False)
     name = db.Column(db.String, nullable=False, index=True)
-    token = db.Column(db.String, nullable=True)
     cfp_accepted_only = db.Column(db.Boolean, nullable=False, default=False)
+    vouchers_only = db.Column(
+        db.Boolean, nullable=False, default=False, server_default="False"
+    )
 
     product_view_products = db.relationship(
         "ProductViewProduct",
@@ -367,6 +447,11 @@ class ProductView(db.Model):
         order_by="ProductViewProduct.order",
         cascade="all, delete-orphan",
     )
+
+    vouchers = db.relationship(
+        "Voucher", backref="view", cascade="all, delete-orphan", lazy=True
+    )
+
     products = association_proxy("product_view_products", "product")
 
     @classmethod
@@ -375,41 +460,37 @@ class ProductView(db.Model):
             return None
         return ProductView.query.filter_by(name=name).one_or_none()
 
-    @classmethod
-    def get_by_token(cls, token):
-        if token is None:
-            return None
-        return ProductView.query.filter_by(token=token).one_or_none()
-
-    def is_accessible(self, user, user_token=None):
+    def is_accessible(self, user, voucher=None):
         " Whether this ProductView is accessible to a user."
         if user.is_authenticated and user.has_permission("admin"):
             # Admins always have access
             return True
 
-        if not self.token and datetime.utcnow() < config_date("SALES_START"):
-            # If TICKET_SALES is set, but sales haven't started, restrict access to token views
-            return False
-
+        # CfP voucher
         if self.cfp_accepted_only:
-            # Token is an optional override
-            if self.token and user_token == self.token:
+            if user and user.is_authenticated and user.is_cfp_accepted:
                 return True
-
-            if user.is_authenticated and user.is_cfp_accepted:
-                return True
-
             return False
 
-        if self.token:
-            if user_token == self.token:
-                return True
-
+        if not self.vouchers_only and datetime.utcnow() < config_date("SALES_START"):
             return False
+
+        if self.vouchers_only:
+            if not voucher:
+                return False
+
+            voucher_obj = Voucher.query.filter_by(view=self, code=voucher).one_or_none()
+
+            if not voucher_obj:
+                return False
+
+            return voucher_obj.is_accessible(voucher)
 
         return True
 
     def __repr__(self):
+        if self.vouchers:
+            return "<ProductView: %s vouchers=%s>" % (self.name, self.vouchers)
         return "<ProductView: %s>" % self.name
 
     def __str__(self):

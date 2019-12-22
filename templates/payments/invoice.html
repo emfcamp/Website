@@ -13,7 +13,7 @@
         </div>
         <ul class="nav navbar-nav">
             <li><a href="?js=0" class="print-invoice">Print</a></li>
-            <li><a href="?pdf=1">Download PDF</a></li>
+            <li><a href="{{url_for('.invoice', payment_id=payment.id, fmt='pdf')}}">Download PDF</a></li>
             <li><a href="#" id="vat-invoice">VAT Invoice</a></li>
         </ul>
     </div>
@@ -199,7 +199,7 @@
 {% endblock %}
 
 {% block foot %}
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{csp_nonce}}">
 $(function() {
   $('#vat-invoice').on('click', function(e) {
       $('#edit-company').removeClass('hidden').on('keydown', function(e) {

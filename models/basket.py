@@ -6,6 +6,7 @@ from sqlalchemy.orm import joinedload
 
 from main import db
 from .exc import CapacityException
+from .product import Voucher
 from .purchase import Purchase, Ticket, AdmissionTicket
 
 
@@ -26,20 +27,28 @@ class Basket(MutableMapping):
     ids should be trustworthy (e.g. stored in flask.session)
     """
 
-    def __init__(self, user, currency):
+    def __init__(self, user, currency, voucher=None):
         self.user = user
         # Due to the Price, reserved Purchases have an implicit currency,
         # but this shouldn't be relied on until they're attached to a Payment.
         # Totals should be calculated based on the basket's currency.
         self.currency = currency
         self._lines = []
+        self.voucher = voucher
 
     @classmethod
     def from_session(self, user, currency):
         purchases = session.get("basket_purchase_ids", [])
         surplus_purchases = session.get("basket_surplus_purchase_ids", [])
+        voucher = session.get("ticket_voucher", None)
+        if voucher:
+            voucher_obj = Voucher.get_by_code(voucher)
+            if voucher_obj.purchases_remaining < 1:
+                raise ValueError(
+                    "Attempting to use voucher with no remaining purchases: " + voucher
+                )
 
-        basket = Basket(user, currency)
+        basket = Basket(user, currency, voucher)
         basket.load_purchases_from_ids(purchases, surplus_purchases)
         return basket
 
@@ -272,7 +281,15 @@ class Basket(MutableMapping):
             if purchase.payment_id is not None:
                 raise Exception("Purchase {} has a payment already".format(purchase.id))
 
-        payment = payment_cls(self.currency, self.total)
+        if self.voucher:
+            voucher_obj = Voucher.get_by_code(self.voucher)
+            voucher_obj.purchases_remaining -= 1
+            db.session.add(voucher_obj)
+            del session["ticket_voucher"]
+
+            payment = payment_cls(self.currency, self.total, self.voucher)
+        else:
+            payment = payment_cls(self.currency, self.total)
 
         # This is where you'd add the premium if it existed
 

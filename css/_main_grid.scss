@@ -15,11 +15,12 @@
   }
   @media (max-width: $main-content-width + 14) {
     width: 100%;
-    min-width: $fluid-max-width;
+    min-width: $min-width;
     margin: 0 0 0 0;
     padding: 0 0 0 0;
   }
   background-color: $main-background;
+  overflow:hidden;
 }
 
 .emf-row {

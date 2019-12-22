@@ -29,7 +29,7 @@
     <div class="row">
       <div class="col-sm-6">
         {% if msg.is_user_recipient(current_user) and not msg.has_been_read %}
-        <small><span class="glyphicon glyphicon-envelope"></span></small>
+        <small>{{octicon('mail')}}</small>
         {% endif %}
         {% if msg.is_user_recipient(current_user) %}
         {{ msg.from_user.name }}

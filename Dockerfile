@@ -1,9 +1,9 @@
-FROM emfcamp/website-base:latest
+FROM emfcamp/website-base-dev:latest
 
-COPY Pipfile Pipfile.lock Makefile /app/
+COPY pyproject.toml poetry.lock Makefile /app/
 WORKDIR /app
 
-RUN pipenv sync --dev && pipenv run pyppeteer-install
+RUN poetry install && poetry run pyppeteer-install
 
 ENV SHELL=/bin/bash
 ENTRYPOINT ["./docker/dev_entrypoint.sh"]

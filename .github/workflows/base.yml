@@ -6,8 +6,11 @@ on:
       - master
     paths:
       - 'docker/Dockerfile.base'
-      - 'Pipfile'
-      - 'Pipfile.lock'
+      - 'docker/Dockerfile.base.dockerignore'
+      - 'docker/Dockerfile.base-dev'
+      - 'docker/Dockerfile.base-dev.dockerignore'
+      - 'pyproject.toml'
+      - 'poetry.lock'
   schedule:
     - cron:  '30 5 */14 * *'
 
@@ -21,7 +24,11 @@ jobs:
       - uses: actions/checkout@v1
       - name: Login
         run: echo '${{ secrets.DOCKER_PASSWORD }}' | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-      - name: Build image
+      - name: Build base image
         run: docker build -t emfcamp/website-base:latest -f ./docker/Dockerfile.base .
-      - name: Publish image
+      - name: Publish base image
         run: docker push emfcamp/website-base:latest
+      - name: Build base-dev image
+        run: docker build -t emfcamp/website-base-dev:latest -f ./docker/Dockerfile.base-dev .
+      - name: Publish base-dev image
+        run: docker push emfcamp/website-base-dev:latest

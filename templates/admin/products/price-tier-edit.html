@@ -1,6 +1,7 @@
 {% extends "admin/base.html" %}
 {% from "_formhelpers.html" import render_field, render_static %}
 {% set nav_active = 'products' %}
+{% block title %}Edit price tier "{{tier}}"{% endblock %}
 {% block body %}
 
 <h2>Update price tier: {{ tier }}</h2>
@@ -10,6 +11,13 @@
 
 {{ render_field(form.name, horizontal=8) }}
 {{ render_field(form.personal_limit, horizontal=8) }}
+{% if tier.purchase_count == 0 %}
+{{ render_field(form.price_gbp, horizontal=8) }}
+{{ render_field(form.price_eur, horizontal=8) }}
+{% else %}
+<p>The prices of this tier cannot be edited as purchases have been made at this price.
+   Please create a new price tier to sell at a different price.</p>
+{% endif %}
 
 <div class="pull-right">{{ form.update(class_="btn btn-success debounce") }}</div>
 </form>

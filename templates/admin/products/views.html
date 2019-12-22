@@ -8,12 +8,16 @@
     <th>Name</th>
     <th>Type</th>
     <th>Products</th>
+    <th>Accepted CfP Only</th>
+    <th>Vouchers Only</th>
   </tr>
   {% for view, count in view_counts %}
   <tr>
     <td><a href="{{ url_for('admin.product_view', view_id=view.id) }}">{{ view.name }}</a></td>
     <td>{{ view.type }}</td>
     <td>{{ count }}</td>
+    <td>{% if view.cfp_accepted_only %}✔️{%endif%}</td>
+    <td>{% if view.vouchers_only %}✔️{%endif%}</td>
   </tr>
 
   {% endfor %}

@@ -1,6 +1,4 @@
-# coding=utf-8
-from __future__ import division, absolute_import, print_function, unicode_literals
-
+import re
 from flask import (
     render_template,
     redirect,
@@ -11,21 +9,25 @@ from flask import (
     current_app as app,
 )
 from flask_login import current_user
+from flask_mail import Message
 
 from sqlalchemy.sql.functions import func
 
-from main import db
+from main import db, mail
 from models.user import User
 from models.product import (
     ProductGroup,
-    Product,
-    PriceTier,
     Price,
+    PriceTier,
+    Product,
     ProductView,
     ProductViewProduct,
+    random_voucher,
+    Voucher,
 )
 from models.purchase import Purchase, PurchaseTransfer
 
+from models import event_year
 from . import admin
 from .forms import (
     EditProductForm,
@@ -39,6 +41,8 @@ from .forms import (
     NewProductViewForm,
     EditProductViewForm,
     AddProductViewProductForm,
+    NewVoucherForm,
+    BulkVoucherEmailForm,
 )
 
 
@@ -207,10 +211,26 @@ def price_tier_edit(tier_id):
     if form.validate_on_submit():
         tier.name = form.name.data
         tier.personal_limit = form.personal_limit.data
+
+        # Update prices but only if price tier has no purchases.
+        price_gbp = tier.get_price("GBP")
+        price_eur = tier.get_price("EUR")
+
+        if tier.purchase_count == 0:
+            if form.price_gbp.data != price_gbp.value:
+                db.session.delete(price_gbp)
+                tier.prices.append(Price("GBP", form.price_gbp.data))
+
+            if form.price_eur.data != price_eur.value:
+                db.session.delete(price_eur)
+                tier.prices.append(Price("EUR", form.price_eur.data))
+
         db.session.commit()
 
         return redirect(url_for(".price_tier_details", tier_id=tier.id))
 
+    form.price_gbp.data = tier.get_price("GBP").value
+    form.price_eur.data = tier.get_price("EUR").value
     return render_template("admin/products/price-tier-edit.html", tier=tier, form=form)
 
 
@@ -374,7 +394,7 @@ def product_views():
     return render_template("admin/products/views.html", view_counts=view_counts)
 
 
-@admin.route("/product_view/new", methods=["GET", "POST"])
+@admin.route("/product_views/new", methods=["GET", "POST"])
 def product_view_new():
     form = NewProductViewForm()
 
@@ -382,8 +402,8 @@ def product_view_new():
         view = ProductView(
             type=form.type.data,
             name=form.name.data,
-            token=form.token.data,
             cfp_accepted_only=form.cfp_accepted_only.data,
+            vouchers_only=form.vouchers_only.data,
         )
         app.logger.info("Adding new ProductView %s", view.name)
         db.session.add(view)
@@ -394,7 +414,7 @@ def product_view_new():
     return render_template("admin/products/view-new.html", form=form)
 
 
-@admin.route("/product_view/<int:view_id>", methods=["GET", "POST"])
+@admin.route("/product_views/<int:view_id>", methods=["GET", "POST"])
 def product_view(view_id):
     view = ProductView.query.get_or_404(view_id)
 
@@ -417,8 +437,8 @@ def product_view(view_id):
         if form.update.data:
             view.name = form.name.data
             view.type = form.type.data
-            view.token = form.token.data
             view.cfp_accepted_only = form.cfp_accepted_only.data
+            view.vouchers_only = form.vouchers_only.data
 
             for f in form.pvps:
                 pvp_dict[f.product_id.data].order = f.order.data
@@ -434,10 +454,10 @@ def product_view(view_id):
     return render_template("admin/products/view-edit.html", view=view, form=form)
 
 
-@admin.route("/product_view/<int:view_id>/add", methods=["GET", "POST"])
-@admin.route("/product_view/<int:view_id>/add/<int:group_id>", methods=["GET", "POST"])
+@admin.route("/product_views/<int:view_id>/add", methods=["GET", "POST"])
+@admin.route("/product_views/<int:view_id>/add/<int:group_id>", methods=["GET", "POST"])
 @admin.route(
-    "/product_view/<int:view_id>/add/<int:group_id>/<int:product_id>",
+    "/product_views/<int:view_id>/add/<int:group_id>/<int:product_id>",
     methods=["GET", "POST"],
 )
 def product_view_add(view_id, group_id=None, product_id=None):
@@ -479,4 +499,73 @@ def product_view_add(view_id, group_id=None, product_id=None):
         root_groups=root_groups,
         add_group=group,
         add_product=product,
+    )
+
+
+@admin.route("/product_views/<int:view_id>/voucher")
+def product_view_voucher_list(view_id):
+    view = ProductView.query.get_or_404(view_id)
+    return render_template("admin/products/view-vouchers.html", view=view)
+
+
+@admin.route("/product_views/<int:view_id>/voucher/add", methods=["GET", "POST"])
+def product_view_add_voucher(view_id):
+    view = ProductView.query.get_or_404(view_id)
+    form = NewVoucherForm()
+
+    if form.validate_on_submit():
+        Voucher(view, code=form.voucher.data)
+        db.session.commit()
+
+        return redirect(url_for(".product_view", view_id=view_id))
+
+    return render_template("admin/products/view-add-voucher.html", view=view, form=form)
+
+
+@admin.route("/product_views/<int:view_id>/voucher/bulk_add", methods=["GET", "POST"])
+def product_view_bulk_add_vouchers_by_email(view_id):
+    view = ProductView.query.get_or_404(view_id)
+    form = BulkVoucherEmailForm()
+
+    if form.validate_on_submit():
+        emails = set(e.strip() for e in re.split(r"[\s,]+", form.emails.data))
+
+        if len(emails) > 250:
+            flash("More than 250 emails provided. Please submit <250 at a time.")
+            return redirect(
+                url_for(".product_view_bulk_add_vouchers_by_email", view_id=view_id)
+            )
+
+        added = existing = 0
+
+        for email in emails:
+            if Voucher.query.filter_by(email=email).first():
+                existing += 1
+                continue
+
+            voucher = Voucher(
+                view, code=random_voucher(), email=email, expiry=form.expires.data
+            )
+
+            msg = Message(
+                f"Your voucher for Electromagnetic Field {event_year()}",
+                sender=app.config["TICKETS_EMAIL"],
+                recipients=[email],
+            )
+
+            msg.body = render_template("emails/volunteer-voucher.txt", voucher=voucher)
+
+            app.logger.info("Emailing %s volunteer voucher: %s", email, voucher.code)
+            db.session.commit()
+            mail.send(msg)
+            added += 1
+
+        flash(f"{added} vouchers added, {existing} duplicates skipped.")
+
+        return redirect(
+            url_for(".product_view_bulk_add_vouchers_by_email", view_id=view_id)
+        )
+
+    return render_template(
+        "admin/products/view-bulk-add-voucher.html", view=view, form=form
     )

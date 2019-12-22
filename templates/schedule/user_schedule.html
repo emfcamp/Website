@@ -99,7 +99,7 @@
         <p>Please enable Javascript to view the schedule.</p>
     </div>
 </div>
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{csp_nonce}}">
 document.getElementById('enable-javascript').style.display = 'none';
 </script>
 
@@ -169,7 +169,7 @@ document.getElementById('enable-javascript').style.display = 'none';
     <script src="{{ url_for('static', filename='js/dhtmlx_scheduler.js') }}"></script>
     <script src="{{ url_for('static', filename='js/dhtmlxscheduler_all_timed.js') }}"></script>
     <script src="{{ static_url_for('static', filename='js/schedule.js') }}"></script>
-    <script>
+    <script nonce="{{csp_nonce}}">
         $('#filter_modal_btn').show();
         $('#scheduler_here').show();
         var schedule_data = {{ schedule_data | tojson }},

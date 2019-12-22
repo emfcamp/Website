@@ -2,6 +2,7 @@
     Surrounding scope needs the following attributes:
     itemscope itemtype="http://schema.org/Festival"
 #}
+<meta itemprop="alternateName" content="EMF {{ event_year }}">
 <meta itemprop="startDate" content="{{ event_start.strftime('%Y-%m-%d') }}T08:00">
 <meta itemprop="endDate" content="{{ event_end.strftime('%Y-%m-%d') }}T23:30">
 <meta itemprop="url" content="https://www.emfcamp.org/">
@@ -14,7 +15,7 @@
             <a href="https://eastnorcastle.com/visit-eastnor-castle/eastnor-deer-park/">
                 <span itemprop="name" style="font-weight: bold">Eastnor Castle Deer Park</span></a>,
             <span itemprop="address" itemscope itemtype="http://schema.org/PostalAddress">
-                <span itemprop="addressLocality" style="font-weight: bold">Ledbury</span>.
+                <span itemprop="addressLocality" style="font-weight: bold">Eastnor</span>.
                 <meta itemprop="addressRegion" content="Herefordshire">
                 <meta itemprop="addressCountry" content="UK">
             </span>

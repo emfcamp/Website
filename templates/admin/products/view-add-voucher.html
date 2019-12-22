@@ -1,0 +1,17 @@
+{% extends "admin/base.html" %}
+{% from "_formhelpers.html" import render_field  %}
+
+{% set nav_active = 'product_views' %}
+{% block body %}
+
+<h2>Add voucher to product view</h2>
+<form action="" method="post">
+{{ form.hidden_tag() }}
+
+{{ render_field(form.voucher, horizontal=False) }}
+
+{{ form.create(class_="btn btn-success debounce") }}
+
+</form>
+
+{% endblock %}

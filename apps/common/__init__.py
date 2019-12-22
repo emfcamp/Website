@@ -1,22 +1,23 @@
 from decorator import decorator
 from datetime import datetime
 import json
+import re
 import os.path
 
 from main import db, mail, external_url
 from flask import session, render_template, abort, current_app as app, request, Markup
 from flask.json import jsonify
 from flask_login import login_user, current_user
+from flask_mail import Message
 from werkzeug import BaseResponse
 from werkzeug.exceptions import HTTPException
+from jinja2.utils import urlize
 
 from models.basket import Basket
 from models.product import Price
-from models.site_state import get_site_state, get_sales_state, event_start, event_end
+from models.site_state import get_site_state, get_sales_state
 from models.feature_flag import get_db_flags
-from models import User
-
-from flask_mail import Message
+from models import User, event_start, event_end
 
 from .preload import init_preload
 
@@ -77,17 +78,9 @@ def load_utility_functions(app_obj):
             external_url=external_url,
             feature_enabled=feature_enabled,
             basket_count=basket_count,
+            user_currency=get_user_currency(),
+            year=datetime.utcnow().year,
         )
-
-    @app_obj.context_processor
-    def currency_processor():
-        currency = get_user_currency()
-        return {"user_currency": currency}
-
-    @app_obj.context_processor
-    def now_processor():
-        now = datetime.utcnow()
-        return {"year": now.year}
 
     @app_obj.context_processor
     def event_date_processor():
@@ -100,48 +93,20 @@ def load_utility_functions(app_obj):
         e = event_end()
         assert s.year == e.year
         if s.month == e.month:
-            fancy_dates = (
-                "{s_month} "
-                '<span style="white-space: nowrap">'
-                "{s.day}<sup>{s_suff}</sup>&mdash;"
-                "{e.day}<sup>{e_suff}</sup>"
-                "</span>".format(
-                    s=s,
-                    s_suff=suffix(s.day),
-                    s_month=s.strftime("%B"),
-                    e=e,
-                    e_suff=suffix(e.day),
-                )
-            )
+            fancy_dates = f"""{s.strftime('%B')}<span style="white-space: nowrap">
+                {s.day}<sup>{suffix(s.day)}</sup>&ndash;{e.day}<sup>{suffix(e.day)}</sup>
+                {s.year}
+                </span>"""
 
-            simple_dates = (
-                "{s.day}&mdash;"
-                "{e.day} "
-                "{s_month}".format(s=s, s_month=s.strftime("%B"), e=e)
-            )
+            simple_dates = f"{s.day}&ndash;{e.day} {s.strftime('%B')}"
 
         else:
-            fancy_dates = (
-                "{s_month} "
-                "{s.day}<sup>{s_suff}</sup>&ndash;"
-                "{e_month} "
-                "{e.day}<sup>{e_suff}</sup>".format(
-                    s=s,
-                    s_suff=suffix(s.day),
-                    s_month=s.strftime("%B"),
-                    e=e,
-                    e_suff=suffix(e.day),
-                    e_month=e.strftime("%B"),
-                )
-            )
+            fancy_dates = f"""{s.strftime("%B")}
+                {s.day}<sup>{suffix(s.day)}</sup>&ndash;{e.strftime("%B")}
+                {e.day}<sup>{suffix(e.day)}</sup>"""
 
             simple_dates = (
-                "{s.day} "
-                "{s_month}&ndash;"
-                "{e.day} "
-                "{e_month}".format(
-                    s=s, s_month=s.strftime("%B"), e=e, e_month=e.strftime("%B")
-                )
+                f"""{s.day} {s.strftime("%B")}&ndash;{e.day} {e.strftime("%B")}"""
             )
 
         return {
@@ -152,6 +117,28 @@ def load_utility_functions(app_obj):
             "event_year": s.year,
         }
 
+    @app_obj.context_processor
+    def octicons_processor():
+        def octicon(name, **kwargs):
+            cls_list = kwargs.get("class", [])
+            if type(cls_list) != list:
+                cls_list = list(cls_list)
+            classes = " ".join(cls_list)
+
+            alt = kwargs.get("alt", name)
+            return Markup(
+                f'<img src="/static/icons/{name}.svg" class="octicon {classes}" alt="{alt}">'
+            )
+
+        return {"octicon": octicon}
+
+    @app_obj.template_filter("pretty_text")
+    def pretty_text(text):
+        text = text.strip(" \n\r")
+        text = urlize(text, trim_url_limit=40)
+        text = "\n".join(f"<p>{para}</p>" for para in re.split(r"[\r\n]+", text))
+        return Markup(text)
+
 
 def send_template_email(subject, to, sender, template, **kwargs):
     msg = Message(subject, recipients=[to], sender=sender)
@@ -159,7 +146,7 @@ def send_template_email(subject, to, sender, template, **kwargs):
     mail.send(msg)
 
 
-def create_current_user(email, name):
+def create_current_user(email: str, name: str):
     user = User(email, name)
 
     db.session.add(user)
@@ -264,13 +251,28 @@ def feature_enabled(feature):
     return app.config.get(feature, False)
 
 
-def load_archive_file(year: int, *path):
-    """ Load the contents of a JSON file from the archive, and abort with
-        a 404 if it doesn't exist.
+def archive_file(year, *path, raise_404=True):
+    """ Return the path to a given file within the archive.
+        Optionally raise 404 if it doesn't exist.
     """
-    json_path = os.path.abspath(
+    file_path = os.path.abspath(
         os.path.join(__file__, "..", "..", "..", "exports", str(year), *path)
     )
-    if not os.path.exists(json_path):
-        abort(404)
+
+    if not os.path.exists(file_path):
+        if raise_404:
+            abort(404)
+        else:
+            return None
+
+    return file_path
+
+
+def load_archive_file(year: int, *path, raise_404=True):
+    """ Load the contents of a JSON file from the archive, and optionally
+        abort with a 404 if it doesn't exist.
+    """
+    json_path = archive_file(year, *path, raise_404=raise_404)
+    if json_path is None:
+        return None
     return json.load(open(json_path, "r"))

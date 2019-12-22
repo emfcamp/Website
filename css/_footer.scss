@@ -1,6 +1,7 @@
 footer {
   background: url('../images/brand/footer.jpg') no-repeat left top;
   overflow: hidden;
+  padding: 10px 15px 0px 15px;
 }
 
 footer #credits {
@@ -13,7 +14,6 @@ footer #credits {
 
 #bottom-menu-container {
   font-family: $header-font-stack;
-  padding: 10px 15px 0px 15px;
   width: 100%;
 }
 

@@ -24,7 +24,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from main import db, mail, external_url
 from models.exc import CapacityException
 from models.user import User, UserShipping, checkin_code_re
-from models.product import PriceTier, ProductView, ProductViewProduct, Product
+from models.product import PriceTier, ProductView, ProductViewProduct, Product, Voucher
 from models.basket import Basket
 from models.payment import BankPayment, StripePayment, GoCardlessPayment
 from models.purchase import Ticket
@@ -34,7 +34,6 @@ from ..common import (
     CURRENCY_SYMBOLS,
     get_user_currency,
     set_user_currency,
-    feature_flag,
     create_current_user,
     feature_enabled,
 )
@@ -59,7 +58,7 @@ from .forms import (
 
 tickets = Blueprint("tickets", __name__)
 
-invalid_tokens = Counter("emf_invalid_token_total", "Invalid ticket tokens")
+invalid_vouchers = Counter("emf_invalid_vouchers_total", "Invalid ticket vouchers")
 empty_baskets = Counter(
     "emf_basket_empty_total", "Attempted purchases of empty baskets"
 )
@@ -72,25 +71,28 @@ price_changed = Counter(
 )
 
 
-@tickets.route("/tickets/token/")
-@tickets.route("/tickets/token/<token>")
-def tickets_token(token=None):
-    view = ProductView.get_by_token(token)
+@tickets.route("/tickets/voucher/")
+@tickets.route("/tickets/voucher/<voucher_code>")
+def tickets_voucher(voucher_code=None):
+    voucher = Voucher.get_by_code(voucher_code)
+    if voucher is None or voucher.is_used:
+        return abort(404)
+
+    view = voucher.view
     if view:
-        session["ticket_token"] = token
+        session["ticket_voucher"] = voucher_code
         return redirect(url_for("tickets.main", flow=view.name))
 
-    if "ticket_token" in session:
-        del session["ticket_token"]
+    if "ticket_voucher" in session:
+        del session["ticket_voucher"]
 
-    invalid_tokens.inc()
-    flash("Ticket token was invalid")
+    invalid_vouchers.inc()
+    flash("Ticket voucher was invalid")
     return redirect(url_for("tickets.main"))
 
 
 @tickets.route("/tickets/clear")
 @tickets.route("/tickets/<flow>/clear")
-@feature_flag("TICKET_SALES")
 def tickets_clear(flow=None):
     basket = Basket.from_session(current_user, get_user_currency())
     basket.cancel_purchases()
@@ -104,7 +106,6 @@ def tickets_clear(flow=None):
 @tickets.route("/tickets/reserved/<currency>")
 @tickets.route("/tickets/<flow>/reserved")
 @tickets.route("/tickets/<flow>/reserved/<currency>")
-@feature_flag("TICKET_SALES")
 def tickets_reserved(flow=None, currency=None):
     if current_user.is_anonymous:
         return redirect(
@@ -123,7 +124,6 @@ def tickets_reserved(flow=None, currency=None):
 
 @tickets.route("/tickets", methods=["GET", "POST"])
 @tickets.route("/tickets/<flow>", methods=["GET", "POST"])
-@feature_flag("TICKET_SALES")
 def main(flow=None):
     if flow is None:
         flow = "main"
@@ -136,7 +136,7 @@ def main(flow=None):
     if view.cfp_accepted_only and current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for(".main", flow=flow)))
 
-    if not view.is_accessible(current_user, session.get("ticket_token")):
+    if not view.is_accessible(current_user, session.get("ticket_voucher")):
         abort(404)
 
     sales_state = get_sales_state()
@@ -144,7 +144,7 @@ def main(flow=None):
     if sales_state in ["unavailable", "sold-out"]:
         # For the main entry point, we assume people want admissions tickets,
         # but we still need to sell people parking tickets, tents or tickets
-        # from tokens until the final cutoff (sales-ended).
+        # from vouchers until the final cutoff (sales-ended).
         if flow != "main":
             sales_state = "available"
 
@@ -376,9 +376,8 @@ def pay(flow=None):
     if not view:
         abort(404)
 
-    if view.token and session.get("ticket_token") != view.token:
-        if not current_user.is_anonymous and current_user.has_permission("admin"):
-            abort(404)
+    if not view.is_accessible(current_user, session.get("ticket_voucher")):
+        abort(404)
 
     if request.form.get("change_currency") in ("GBP", "EUR"):
         currency = request.form.get("change_currency")
@@ -457,7 +456,7 @@ def pay(flow=None):
                 new_user = create_current_user(form.email.data, form.name.data)
             except IntegrityError as e:
                 app.logger.warn("Adding user raised %r, possible double-click", e)
-                return None
+                return redirect(url_for("tickets.pay", flow=flow))
 
             user = new_user
 

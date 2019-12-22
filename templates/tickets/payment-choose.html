@@ -76,7 +76,7 @@
 <div class="panel panel-default panel--payment">
     <div class="panel-heading"><h3 class="panel-title">Bank Transfer</h3></div>
     <div class="panel-body">
-        <p>Ask your bank to send money to us directly. You can do this online, or sometimes with cash in a branch.</p>
+        <p>Ask your bank to send money to us directly.</p>
     </div>
     <div class="panel-footer panel-footer-center">
         <input type="submit" name="{{form.banktransfer.name}}" value="{{form.banktransfer.label.text}}" class="btn btn-lg btn-success debounce"/>
@@ -93,14 +93,13 @@
         {% if feature_enabled('GOCARDLESS') or feature_enabled('BANK_TRANSFER') %}
         <div class="panel-body">
             <p>If you can't use another payment method, we accept card payments.
-            These cost us more, and we'd rather you used another method if you can.
-            Recent changes in the law mean we're no longer allowed to pass this cost on to you.</p>
+            These cost us more, and we'd rather you used another method if you can.</p>
 
             <p>We accept Visa, Visa Debit, Mastercard or American Express.</p>
-            <input type="submit" name="{{form.stripe.name}}" value="{{form.stripe.label.text}}" class="btn btn-small btn-default debounce"/>
+            <input type="submit" name="{{form.stripe.name}}" value="{{form.stripe.label.text}}" class="btn btn-small btn-success debounce"/>
         </div>
         {% else %}
-        <div class="panel-heading"><h3 class="panel-title">Stripe</h3></div>
+        <div class="panel-heading"><h3 class="panel-title">Card</h3></div>
         <div class="panel-body">
             <p>We accept Visa, Visa Debit, Mastercard or American Express.</p>
         </div>
@@ -122,7 +121,7 @@
 {% block foot %}
 {# If the preferred methods of payment are active, don't let the form respond to Enter #}
 {% if feature_enabled('GOCARDLESS') or feature_enabled('BANK_TRANSFER') %}
-<script type="text/javascript">
+<script type="text/javascript" nonce="{{csp_nonce}}">
     $('form.pay-method').on('keypress', function(e) {
         if (e.which == 13 && !$(e.target).is('.btn')) e.preventDefault();
     });

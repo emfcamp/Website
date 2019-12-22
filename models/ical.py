@@ -11,7 +11,7 @@ from sqlalchemy.orm import column_property
 from sqlalchemy.orm.exc import NoResultFound
 
 from main import db
-from models.site_state import event_start, event_end
+from models import event_start, event_end
 
 
 class CalendarSource(db.Model):

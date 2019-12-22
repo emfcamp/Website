@@ -77,12 +77,26 @@ function css(cb) {
   cb();
 }
 
+function images(cb) {
+  gulp
+    .src('./node_modules/@primer/octicons/build/svg/**/*.svg')
+    .pipe(gulp.dest('static/icons'));
+
+  gulp.src('./images/**/*').pipe(gulp.dest('static/images'));
+  cb();
+}
+
 function watch() {
   gulp.watch('css/*.scss', {ignoreInitial: false}, css);
   gulp.watch('js/*.js', {ignoreInitial: false}, js);
+  gulp.watch(
+    ['./node_modules/@primer/octicons/build/svg/**/*.svg', './images/**/*'],
+    {ignoreInitial: false},
+    images,
+  );
 }
 
 exports.js = js;
 exports.css = css;
 exports.watch = watch;
-exports.default = gulp.parallel(css, js);
+exports.default = gulp.parallel(css, js, images);

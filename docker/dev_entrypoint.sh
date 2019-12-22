@@ -24,11 +24,11 @@ then
 fi;
 
 echo "Initialising database..."
-pipenv run flask db upgrade
+poetry run flask db upgrade
 echo "Creating base data..."
-pipenv run flask create_perms
-pipenv run flask createbankaccounts
-pipenv run flask cfp create_venues
-pipenv run flask tickets create
+poetry run flask create_perms
+poetry run flask createbankaccounts
+poetry run flask cfp create_venues
+poetry run flask tickets create
 echo "Starting dev server..."
-exec pipenv run flask run --extra-files ./config/development.cfg:./logging.yaml -h 0.0.0.0
+exec poetry run flask run --extra-files ./config/development.cfg:./logging.yaml -h 0.0.0.0

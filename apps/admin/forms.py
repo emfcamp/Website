@@ -2,7 +2,6 @@ from wtforms.validators import (
     Optional,
     DataRequired,
     InputRequired,
-    Email,
     ValidationError,
 )
 from wtforms.widgets import TextArea
@@ -10,21 +9,27 @@ from wtforms import (
     SubmitField,
     StringField,
     SelectField,
-    DateField,
     IntegerField,
     DecimalField,
     FieldList,
     FormField,
     HiddenField,
     BooleanField,
+    TextAreaField,
 )
-from wtforms.fields.html5 import EmailField
+from wtforms.fields.html5 import DateField
 
 from models.product import ProductGroup
 from models.basket import Basket
 
 from ..common import CURRENCY_SYMBOLS
-from ..common.forms import Form, IntegerSelectField, HiddenIntegerField, JSONField
+from ..common.forms import (
+    Form,
+    IntegerSelectField,
+    HiddenIntegerField,
+    JSONField,
+    EmailField,
+)
 
 
 class ProductForm(Form):
@@ -109,12 +114,12 @@ class CopyProductGroupForm(ProductGroupForm):
 class PriceTierForm(Form):
     name = StringField("Name")
     personal_limit = IntegerField("Personal maximum")
+    price_gbp = DecimalField("Price (GBP)")
+    price_eur = DecimalField("Price (EUR)")
 
 
 class NewPriceTierForm(PriceTierForm):
     create = SubmitField("Create", [DataRequired()])
-    price_gbp = DecimalField("Price (GBP)")
-    price_eur = DecimalField("Price (EUR)")
 
 
 class EditPriceTierForm(PriceTierForm):
@@ -136,8 +141,8 @@ class ProductViewProductForm(Form):
 class ProductViewForm(Form):
     name = StringField("Name")
     type = StringField("Type", default="tickets")
-    token = StringField("Token")
     cfp_accepted_only = BooleanField("Accepted CfP proposal required")
+    vouchers_only = BooleanField("Voucher required")
 
 
 class NewProductViewForm(ProductViewForm):
@@ -154,6 +159,20 @@ class AddProductViewProductForm(Form):
     add_product = SubmitField("Add product")
 
 
+class NewVoucherForm(Form):
+    voucher = StringField(
+        "Voucher code (Optional)", [Optional()]
+    )  # Maybe auto-generated
+    expires = DateField("Expiry Date (Optional)", [Optional()])
+    create = SubmitField("Create")
+
+
+class BulkVoucherEmailForm(Form):
+    emails = TextAreaField("Email Addresses")
+    expires = DateField("Expiry Date")
+    create = SubmitField("Create All")
+
+
 #
 # Forms for reserving/issuing tickets
 #
@@ -161,7 +180,7 @@ class AddProductViewProductForm(Form):
 
 class IssueTicketsInitialForm(Form):
     " Initial form to ask for email "
-    email = EmailField("Email address", [Email(), DataRequired()])
+    email = EmailField("Email address")
     issue_free = SubmitField("Issue Free Ticket")
     reserve = SubmitField("Reserve Ticket for Payment")
 
@@ -226,7 +245,7 @@ class ConvertTicketForm(Form):
 
 
 class TransferTicketInitialForm(Form):
-    email = EmailField("Email", [Email(), DataRequired()])
+    email = EmailField("Email")
     transfer = SubmitField("Choose user")
 
 

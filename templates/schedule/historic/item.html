@@ -1,20 +1,55 @@
 {% extends "base.html" %}
-{% block title %}{{ proposal.title }}{% endblock %}
+{% block content_scope %}http://schema.org/Event{% endblock %}
+{% block title %}{{ event.title }}{% endblock %}
+{% block description %}{{ event.description|truncate(200) }}{% endblock %}
+{% block twitter_card %}summary_large_image{% endblock %}
+{% block head -%}
+  {%- if event.video and event.video.preview_image -%}
+    <meta property="og:image" content="{{event.video.preview_image}}">
+    <meta property="og:image:alt" content="A preview of the video from this EMF {{ event.type }}">
+  {%- endif -%}
+{%- endblock %}
 {% block body %}
 
-<h2>{{ proposal.title }}</h2>
-<h2>
-  <small>
-  {{ proposal.type | title }} by {{ proposal.speaker }}
-  </small>
-</h2>
-
-
-<p><strong>{{ proposal.start_date }}</strong> - <strong>{{ proposal.end_date }}</strong>
-   in <strong>{{ proposal.venue }}</strong>
+<h2 itemprop="name">{{ event.title }}</h2>
+<p>
+  A {{ event.type }} from
+  <a href="{{url_for("schedule.main_year", year=year)}}" itemprop="superEvent">EMF {{year}}</a>
+  by <strong itemprop="performer">{{ event.speaker }}</strong>
 </p>
 
-<div class="well">
-  <p class="multiline">{{ proposal.description | urlize }}</p>
+<p>On
+{{ event.start_date.strftime('%A %B %-d, %Y') }} at
+<time datetime="{{event.start_date.isoformat()}}" itemprop="startDate">{{ event.start_date.strftime('%H:%M') }}</time>
+{%- if event.end_date -%}
+&ndash;<time datetime="{{event.end_date.isoformat()}}" itemprop="endDate">{{ event.end_date.strftime('%H:%M') }}</time>
+{%- endif %}
+  in <span itemprop="Location">{{ event.venue }}</span>
+</p>
+
+{% if event.description %}
+<div class="well" itemprop="description">
+  {{ event.description | pretty_text }}
 </div>
+{% endif %}
+
+{% if event.video %}
+<h3>Video</h3>
+  <div class="well">
+    {% if event.video.ccc %}
+      <iframe src="{{event.video.ccc}}/oembed" width="100%" height="500px"
+          frameborder="0" allowfullscreen></iframe>
+    {% elif event.video.archiveorg %}
+      <iframe src="{{event.video.archiveorg|replace('archive.org/details', 'archive.org/embed')}}"
+        width="100%" height="500px" frameborder="0" webkitallowfullscreen="true"
+        mozallowfullscreen="true" allowfullscreen></iframe>
+      <p>View this video <a href="{{ event.video.archiveorg }}">on the Internet Archive</a>.</p>
+    {% elif event.video.youtube %}
+      <iframe src="{{event.video.youtube|replace('youtube.com/watch?v=', 'youtube.com/embed/')}}"
+          width="100%" height="500px" frameborder="0" 
+          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <p>View this video <a href="{{ event.video.youtube }}">on YouTube</a>.</p>
+    {% endif %}
+  </div>
+{% endif %}
 {% endblock %}

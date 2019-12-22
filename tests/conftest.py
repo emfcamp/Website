@@ -78,7 +78,7 @@ def request_context(app):
 @pytest.fixture
 def user(db):
     " Yield a test user. Note that this user will be identical across all tests in a module. "
-    email = "test_user@test.invalid"
+    email = "test_user@example.com"
     user = User.query.filter(User.email == email).one_or_none()
     if not user:
         user = User(email, "Test User")

@@ -2,37 +2,32 @@
 
     These are served from static files in this repository as the database is wiped every year.
 """
-import os
-import csv
-from flask import render_template, abort, redirect, url_for
+from flask import render_template, abort, redirect, url_for, send_file
+from dateutil.parser import parse as date_parse
 
+from models import event_year
 from models.cfp import proposal_slug
-from ..common import load_archive_file
+from ..common import load_archive_file, archive_file
 
 
-def talks_historic(year):
-    """ Handler to dispatch to the correct function.
-
-        Archived schedules from 2012 - 2014 are in a different format and we haven't
-        had the energy to convert them yet.
-    """
-    if year < 2012:
+def abort_if_invalid_year(year):
+    if not 2012 <= year < event_year():
         abort(404)
-    elif year == 2012:
-        return talks_2012()
-    elif year == 2013:
-        return talks_2013()
-    elif year == 2014:
-        return talks_2014()
-    else:
-        return talks_previous(year)
+
+
+def parse_event(event):
+    if "start_date" in event:
+        event["start_date"] = date_parse(event["start_date"])
+
+    if "end_date" in event:
+        event["end_date"] = date_parse(event["end_date"])
+
+    return event
 
 
 def item_historic(year, proposal_id, slug):
     """ Handler to display a detail page for a schedule item."""
-    if year < 2016:
-        # Not showing details for old-format schedules at this time.
-        abort(404)
+    abort_if_invalid_year(year)
 
     #  We might want to look at performance here but I'm not sure it's a huge issue at the moment
     data = load_archive_file(year, "public", "schedule.json")
@@ -48,32 +43,38 @@ def item_historic(year, proposal_id, slug):
             url_for(".item", year=year, proposal_id=proposal_id, slug=correct_slug)
         )
 
-    return render_template("schedule/historic/item.html", proposal=item)
+    return render_template(
+        "schedule/historic/item.html", event=parse_event(item), year=year
+    )
 
 
-def talks_previous(year):
-    data = load_archive_file(year, "public", "schedule.json")
-    stage_venues = ["Stage A", "Stage B", "Stage C"]
-    workshop_venues = ["Workshop 1", "Workshop 2", "Workshop 3"]
+def talks_historic(year):
+    abort_if_invalid_year(year)
+
+    schedule = load_archive_file(year, "public", "schedule.json")
+    event_data = load_archive_file(year, "event.json", raise_404=False)
 
     stage_events = []
     workshop_events = []
+    youth_events = []
 
-    for event in data:
+    for event in [parse_event(event) for event in schedule]:
         if event["source"] == "external":
             continue
 
         # Hack to remove Stitch's "hilarious" failed <script>
-        if "<script>" in event["speaker"]:
+        if "<script>" in event.get("speaker", ""):
             event["speaker"] = event["speaker"][
                 0 : event["speaker"].find("<script>")
             ]  # "Some idiot"
 
         # All official (non-external) content is on a stage or workshop, so we don't care about anything that isn't
-        if event["venue"] in stage_venues:
+        if event["type"] in ("talk", "performance"):
             events_list = stage_events
-        elif event["venue"] in workshop_venues:
+        elif event["type"] == "workshop":
             events_list = workshop_events
+        elif event["type"] == "youthworkshop":
+            events_list = youth_events
         else:
             continue
 
@@ -81,54 +82,29 @@ def talks_previous(year):
         if not any(e["title"] == event["title"] for e in events_list):
             events_list.append(event)
 
-    # Sort should avoid leading punctuation and whitespace and be case-insensitive
-    stage_events.sort(key=lambda event: event["title"].strip().strip("'").upper())
-    workshop_events.sort(key=lambda event: event["title"].strip().strip("'").upper())
+    def sort_key(event):
+        # Sort should avoid leading punctuation and whitespace and be case-insensitive
+        return event["title"].strip().strip("'").upper()
+
+    stage_events.sort(key=sort_key)
+    workshop_events.sort(key=sort_key)
+    youth_events.sort(key=sort_key)
 
     venues = [
         {"name": "Main Stages", "events": stage_events},
         {"name": "Workshops", "events": workshop_events},
     ]
 
-    return render_template("schedule/historic/talks.html", venues=venues, year=year)
+    if len(youth_events) > 0:
+        venues.append({"name": "Youth Workshops", "events": youth_events})
 
-
-def talks_2014():
-    data = load_archive_file(2014, "events.json")
-    talks = []
-    for event in data["conference_events"]["events"]:
-        if event["type"] not in ("lecture", "workshop", "other"):
-            continue
-        talks.append(
-            (
-                ", ".join(
-                    map(lambda speaker: speaker["full_public_name"], event["speakers"])
-                ),
-                event["title"],
-                event["abstract"],
-            )
-        )
-
-    return render_template("schedule/historic/talks-2014.html", talks=talks)
-
-
-def talks_2013():
-    data = load_archive_file(2013, "emw-talks.json")
-    return render_template("schedule/historic/talks-2013.html", venues=data["stages"])
-
-
-def talks_2012():
-    days = {}
-    talk_path = os.path.abspath(
-        os.path.join(__file__, "..", "..", "..", "exports", "2012")
+    return render_template(
+        "schedule/historic/talks.html", venues=venues, year=year, event=event_data
     )
-    for day in ("friday", "saturday", "sunday"):
-        reader = csv.reader(open(os.path.join(talk_path, "%s.csv" % day), "r"))
-        rows = []
-        for row in reader:
-            cells = ["" if c == '"' else c for c in row]
-            rows.append(cells)
 
-        days[day] = rows
 
-    return render_template("schedule/historic/talks-2012.html", **days)
+def feed_historic(year, fmt):
+    """ Serve a historic feed if it's available. """
+    abort_if_invalid_year(year)
+    file_path = archive_file(year, "public", f"schedule.{fmt}")
+    return send_file(file_path)

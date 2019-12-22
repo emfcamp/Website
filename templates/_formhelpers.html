@@ -1,4 +1,4 @@
-{% macro render_field(field, horizontal=False, glyphicon_before=None, glyphicon_after=None, word_limit=None) %}
+{% macro render_field(field, horizontal=False, word_limit=None) %}
 
 {% if caller %}
     {% set help_text = caller() %}
@@ -27,19 +27,7 @@
         {{ field.label.text }}
     </label>
     <div class="{% if horizontal -%} col-sm-{{fieldw}} {% endif -%} controls">
-        {%- if glyphicon_before or glyphicon_after %}
-        <div class="input-group">
-            {%- if glyphicon_before%}
-            <span class="glyphicon glyphicon-{{ glyphicon_before }} input-group-addon"></span>
-            {%- endif %}
-            {{ field(class_='form-control', **kwargs)|safe }}
-            {%- if glyphicon_after %}
-            <span class="glyphicon glyphicon-{{ glyphicon_after }} input-group-addon"></span>
-            {%- endif %}
-        </div>
-        {% else %}
-            {{ field(class_='form-control', **kwargs)|safe }}
-            {%- endif %}
+        {{ field(class_='form-control', **kwargs)|safe }}
         {% if field.errors %}
             {% for error in field.errors %}
             <p class="help-block" id="help-block-{{field.name}}">{{ error }}</pa>

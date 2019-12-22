@@ -7,8 +7,7 @@ from datetime import time, datetime, timedelta
 from lxml import etree
 
 from main import external_url
-from models import event_year
-from models.site_state import event_start, event_end
+from models import event_year, event_start, event_end
 
 from . import event_tz
 
@@ -53,9 +52,9 @@ def make_root():
     conference = etree.SubElement(root, "conference")
 
     _add_sub_with_text(
-        conference, "title", "Electromagnetic Field {}".format(event_start().year)
+        conference, "title", "Electromagnetic Field {}".format(event_year())
     )
-    _add_sub_with_text(conference, "acronym", "emf{}".format(event_start().year))
+    _add_sub_with_text(conference, "acronym", "emf{}".format(event_year()))
     _add_sub_with_text(conference, "start", event_start().strftime("%Y-%m-%d"))
     _add_sub_with_text(conference, "end", event_end().strftime("%Y-%m-%d"))
     _add_sub_with_text(conference, "days", "3")
@@ -103,9 +102,7 @@ def add_event(room, event):
     _add_sub_with_text(event_node, "description", "")
 
     _add_sub_with_text(
-        event_node,
-        "slug",
-        "emf%s-%s-%s" % (event_start().year, event["id"], event["slug"]),
+        event_node, "slug", "emf%s-%s-%s" % (event_year(), event["id"], event["slug"]),
     )
 
     _add_sub_with_text(event_node, "subtitle", "")

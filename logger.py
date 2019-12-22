@@ -1,7 +1,7 @@
 import logging
 
 # Ansi color codes
-CSI = '\x1b['
+CSI = "\x1b["
 RESET = 0
 BOLD = 1
 BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE = range(30, 38)
@@ -9,7 +9,7 @@ BACKGROUND = 40 - 30
 
 
 def sgr(*codes):
-    return CSI + ';'.join(map(str, codes)) + 'm'
+    return CSI + ";".join(map(str, codes)) + "m"
 
 
 # modified from http://plumberjack.blogspot.co.uk/2010/12/colorizing-logging-output-in-terminals.html
@@ -22,13 +22,13 @@ class ColorizingStreamHandler(logging.StreamHandler):
 
     @property
     def is_tty(self):
-        isatty = getattr(self.stream, 'isatty', None)
+        isatty = getattr(self.stream, "isatty", None)
         return isatty and isatty()
 
     def emit(self, record):
         try:
             message = self.format(record)
-            self.stream.write(message + '\n')
+            self.stream.write(message + "\n")
             self.flush()
         except Exception:
             self.handleError(record)
@@ -51,7 +51,7 @@ class GreenStreamHandler(ColorizingStreamHandler):
 
 
 def mail_logging(message, app):
-    msg = u'''
+    msg = u"""
 +++++ SENDING MAIL +++++
 TO:  {0.recipients}
 FROM:  {0.sender}
@@ -59,5 +59,7 @@ SUBJECT:  {0.subject}
 ---------
 {0.body}
 ++++++++++
-    '''.format(message)
+    """.format(
+        message
+    )
     app.logger.info(msg)

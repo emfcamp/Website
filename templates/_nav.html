@@ -4,7 +4,7 @@
           <div id="logo" alt="Electromagnetic Field"></div>
         </a>
     </h1>
-    <div id="header-text">July 24<sup>th</sup>&ndash; 26<sup>th</sup> 2020<br/>
+    <div id="header-text">{{fancy_dates}}<br/>
          Eastnor, UK</div>
 
     <div id="menu-container" role="navigation" aria-label="Main">
@@ -45,6 +45,10 @@
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('schedule.main') }}">Schedule</a>
                 </li>
+            {% else %}
+                <li role="presentation">
+                    <a role="menuitem" href="{{ url_for('schedule.main') }}">Talks</a>
+                </li>
             {% endif %}
             {% if SITE_STATE == 'event' %}
                 <li role="presentation">
@@ -53,11 +57,7 @@
                 <li role="presentation">
                     <a role="menuitem" href="https://map.emfcamp.org" target="_blank">Map</a>
                 </li>
-            {% else %}
-                <li role="presentation">
-                    <a href="https://www.youtube.com/ElectromagneticField">Videos</a>
-                </li>
-              {% endif %}
+            {% endif %}
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('base.sponsor') }}">Sponsor</a>
                 </li>
