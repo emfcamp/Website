@@ -122,7 +122,7 @@ def logout():
     session.permanent = False
     Basket.clear_from_session()
     logout_user()
-    return redirect(url_for("base.main"))
+    return redirect(request.args.get("next", url_for("base.main")))
 
 
 class SignupForm(Form):
