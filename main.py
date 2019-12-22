@@ -3,6 +3,7 @@ import yaml
 import secrets
 import logging
 import logging.config
+from email import charset
 
 from flask import Flask, url_for, render_template, request, g
 from flask_mail import Mail, email_dispatched
@@ -51,6 +52,12 @@ def include_object(object, name, type_, reflected, compare_to):
 
     return True
 
+
+# Force Quoted-Printable encoding for emails.
+# The flask-mail package sets the header encoding to "SHORTEST" and the body encoding
+# to None. Somehow this, combined with Postmark, results in the email body being wrapped
+# twice, which results in ugly plaintext emails.
+charset.add_charset("utf-8", charset.QP, charset.QP, "utf-8")
 
 cache = Cache()
 csrf = CSRFProtect()
