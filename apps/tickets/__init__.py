@@ -377,7 +377,14 @@ def pay(flow=None):
         abort(404)
 
     if not view.is_accessible(current_user, session.get("ticket_voucher")):
-        abort(404)
+        # It's likely the user had a voucher which has been used
+        # This happens if they press the back button while at the payment stage.
+        if current_user.is_authenticated:
+            # Redirect user to their purchases page so they can see their
+            # unpaid payment and retry it.
+            return redirect(url_for("users.purchases"))
+        else:
+            abort(404)
 
     if request.form.get("change_currency") in ("GBP", "EUR"):
         currency = request.form.get("change_currency")
