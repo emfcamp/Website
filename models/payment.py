@@ -11,6 +11,7 @@ from sqlalchemy_continuum.utils import version_class, transaction_class
 from main import db
 from . import export_attr_counts, export_intervals, bucketise, event_year
 from .purchase import Ticket
+from .product import Voucher
 
 safechars = "2346789BCDFGHJKMPQRTVWXY"
 
@@ -185,6 +186,13 @@ class Payment(db.Model):
                 purchase.cancel()
 
         self.state = "cancelled"
+
+        if self.voucher_code:
+            # Restore capacity to the voucher
+            voucher = Voucher.get_by_code(self.voucher_code)
+            if voucher is not None:
+                voucher.purchases_remaining += 1
+
         db.session.flush()
 
     def manual_refund(self):
