@@ -75,8 +75,20 @@ price_changed = Counter(
 @tickets.route("/tickets/voucher/<voucher_code>")
 def tickets_voucher(voucher_code=None):
     voucher = Voucher.get_by_code(voucher_code)
-    if voucher is None or voucher.is_used:
+    if voucher is None:
         return abort(404)
+
+    if voucher.is_used:
+        if current_user.is_authenticated:
+            flash(
+                """The voucher you have supplied has been used.
+                   If it was you who used it, the status of your purchase is below.
+                   Cancelling the payment made with the voucher will reactivate it so you can try again.
+                """
+            )
+            return redirect(url_for("users.purchases"))
+        else:
+            abort(404)
 
     view = voucher.view
     if view:
