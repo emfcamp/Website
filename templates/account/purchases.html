@@ -58,7 +58,8 @@
 <div class="pull-right ticket-actions">
     <a href="{{ url_for('tickets.main') }}" class="btn btn-primary">Buy another ticket</a>
 </div>
-
+<div class="clearfix"></div>
+<p>If you have any problems with your tickets, please contact us at <a href="{{config['TICKETS_EMAIL'][1]}}">{{config['TICKETS_EMAIL'][1]}}</a>.</p>
 {% endblock %}
 {% block foot %}
 <script type="text/javascript" nonce="{{csp_nonce}}">
