@@ -4,6 +4,7 @@ import shutil
 import os.path
 
 from flask import (
+    abort,
     current_app as app,
     request,
     render_template,
@@ -33,8 +34,15 @@ class InvoiceForm(Form):
 
 
 @payments.route("/payment/<int:payment_id>/receipt", methods=["GET", "POST"])
+@payments.route("/payment/<int:payment_id>/receipt.<string:fmt>")
 @login_required
-def invoice(payment_id):
+def invoice(payment_id, fmt=None):
+    pdf = False
+    if fmt == "pdf":
+        pdf = True
+    elif fmt:
+        abort(404)
+
     payment = get_user_payment_or_abort(payment_id, allow_admin=True)
 
     form = InvoiceForm()
@@ -109,9 +117,13 @@ def invoice(payment_id):
 
     url = external_url(".invoice", payment_id=payment_id)
 
-    if request.args.get("pdf"):
+    if pdf:
         return send_file(
-            render_pdf(url, page), mimetype="application/pdf", cache_timeout=60
+            render_pdf(url, page),
+            mimetype="application/pdf",
+            cache_timeout=60,
+            attachment_filename=f"emf_{mode}.pdf",
+            as_attachment=True,
         )
 
     if mode == "invoice":

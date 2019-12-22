@@ -13,7 +13,7 @@
         </div>
         <ul class="nav navbar-nav">
             <li><a href="?js=0" class="print-invoice">Print</a></li>
-            <li><a href="?pdf=1">Download PDF</a></li>
+            <li><a href="{{url_for('.invoice', payment_id=payment.id, fmt='pdf')}}">Download PDF</a></li>
             <li><a href="#" id="vat-invoice">VAT Invoice</a></li>
         </ul>
     </div>
