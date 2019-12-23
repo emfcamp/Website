@@ -5,7 +5,12 @@
 <h2>Scheduled Tasks</h2>
 {% for task in data %}
 <h3>{{task.task.name}}</h3>
-<p>Runs every {{task.task.duration}}. Last ran {{task.results[0].start_time|time_ago}}.
+<p>Runs every {{task.task.duration}}. 
+    {% if task.results|length > 0 %}
+      Last ran {{task.results[0].start_time|time_ago}}
+    {% else %}
+      <strong>Has never run.</strong>
+    {% endif %}.
 <table class="table">
   <thead>
     <th>Time</th>
