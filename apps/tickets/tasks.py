@@ -16,6 +16,7 @@ from models.product import (
     ProductView,
     ProductViewProduct,
 )
+from models.scheduled_task import scheduled_task
 from models.purchase import Purchase
 from models.user import User
 
@@ -212,7 +213,7 @@ def create():
     create_product_groups()
 
 
-@tickets.cli.command("expire_reserved")
+@scheduled_task(minutes=30)
 def expire_reserved():
     """ Expire reserved tickets """
     if (
