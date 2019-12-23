@@ -1,7 +1,6 @@
-Hi, {{ user.name }},
+Hi {{ user.name }},
 
-We've just received confirmation from Stripe that your payment for
-{{ payment.amount | price(payment.currency) }} has cleared.
+We've just received confirmation from Stripe that your payment for {{ payment.amount | price(payment.currency) }} has cleared.
 
 {% if feature_enabled('ISSUE_TICKETS') -%}
 {% include 'emails/receipt-blurb.txt' %}
@@ -10,13 +9,14 @@ You can view your tickets and download the invoice here:
 
   {{ url_for('users.account', _external=True) }}
 
-We'll send e-tickets nearer the event.
+We'll send your e-tickets to this address nearer the event.
 {% endif %}
 
-{% if SITE_STATE != 'after-event' %}
+{%- if SITE_STATE != 'after-event' %}
 See you soon at Electromagnetic Field {{ event_year }}!
 
-{% endif %}
+{%- endif %}
+
 Love,
 
 All the EMF team

@@ -1,0 +1,21 @@
+{%- if user.name != user.email -%}
+Hi {{ user.name }},
+{%- else -%}
+Hi,
+{%- endif %}
+
+{% if not partrefund %}
+Your EMF payment of {{ payment.amount|price(payment.currency) }} has been refunded back to your payment card.
+
+Any tickets paid for with this payment have been cancelled.
+{% else %}
+We have sent a partial refund of {{partrefund|price(payment.currency)}} to your payment card.
+{%- endif %}
+
+Refunds may take up to ten business days to show up on your statement.
+
+If you have any questions, please reply to this email.
+
+Love,
+
+All the EMF team

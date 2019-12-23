@@ -32,7 +32,7 @@ from ..common import feature_enabled, feature_flag
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
 from . import get_user_payment_or_abort, lock_user_payment_or_abort
-from . import payments
+from . import payments, ticket_admin_email
 
 logger = logging.getLogger(__name__)
 
@@ -176,21 +176,11 @@ def stripe_refund_start(payment_id):
         req = RefundRequest(payment=payment, note=form.note.data)
         db.session.add(req)
         payment.state = "refund-requested"
-
-        if not app.config.get("TICKETS_NOTICE_EMAIL"):
-            app.logger.warning("No tickets notice email configured, not sending")
-
-        else:
-            msg = Message(
-                "An EMF refund request has been received",
-                sender=app.config.get("TICKETS_EMAIL"),
-                recipients=[app.config.get("TICKETS_NOTICE_EMAIL")[1]],
-            )
-            msg.body = render_template(
-                "emails/notice-refund-request.txt", payment=payment
-            )
-            mail.send(msg)
-
+        ticket_admin_email(
+            "An EMF refund request has been received",
+            "emails/notice-refund-request.txt",
+            payment=payment,
+        )
         db.session.commit()
 
         flash("Your refund request has been sent")
@@ -313,6 +303,17 @@ def stripe_payment_paid(payment: StripePayment):
 
 
 def stripe_payment_refunded(payment: StripePayment):
+    # Email user
+    msg = Message(
+        "You have received a refund from EMF",
+        sender=app.config.get("TICKETS_EMAIL"),
+        recipients=[payment.user.email],
+    )
+    msg.body = render_template(
+        "emails/stripe-refund-sent.txt", user=payment.user, payment=payment
+    )
+    mail.send(msg)
+
     if payment.state == "refunded":
         logger.info("Payment is already refunded, ignoring")
         return
@@ -327,17 +328,37 @@ def stripe_payment_refunded(payment: StripePayment):
     payment.state = "refunded"
     db.session.commit()
 
-    if not app.config.get("TICKETS_NOTICE_EMAIL"):
-        app.logger.warning("No tickets notice email configured, not sending")
+    ticket_admin_email(
+        "Unexpected Stripe refund received",
+        "emails/notice-payment-refunded.txt",
+        payment=payment,
+    )
+
+
+def stripe_payment_part_refunded(payment: StripePayment, charge):
+    # Email user
+    msg = Message(
+        "You have received a refund from EMF",
+        sender=app.config.get("TICKETS_EMAIL"),
+        recipients=[payment.user.email],
+    )
+    msg.body = render_template(
+        "emails/stripe-refund-sent.txt",
+        user=payment.user,
+        payment=payment,
+        partrefund=charge.amount_refunded / 100,
+    )
+    mail.send(msg)
+
+    if payment.state == "partrefunded":
+        logger.info("Part-refund received, assuming we have processed this")
         return
 
-    msg = Message(
-        "An EMF payment has been refunded",
-        sender=app.config.get("TICKETS_EMAIL"),
-        recipients=[app.config.get("TICKETS_NOTICE_EMAIL")[1]],
+    ticket_admin_email(
+        "Unexpected Stripe part-refund received",
+        "emails/notice-payment-refunded.txt",
+        payment=payment,
     )
-    msg.body = render_template("emails/notice-payment-refunded.txt", payment=payment)
-    mail.send(msg)
 
 
 def stripe_payment_failed(payment):
@@ -413,11 +434,7 @@ def stripe_charge_refunded(_type, charge):
         # Full refund
         stripe_payment_refunded(payment)
     else:
-        # Part refund
-        # TODO: Handle part-refunds better?
-        logger.warn(
-            "Payment part-refunded for charge %s, payment %s. Not making changes."
-        )
+        stripe_payment_part_refunded(payment, charge)
 
     return ("", 200)
 
