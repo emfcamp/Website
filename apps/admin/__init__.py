@@ -34,6 +34,7 @@ from models.ical import CalendarSource
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
 from models.site_state import SiteState, VALID_STATES, refresh_states
 from models.map import MapObject
+from models.scheduled_task import tasks, ScheduledTaskResult
 from ..payments.stripe import stripe_validate
 from ..payments.gocardless import gocardless_validate
 from ..common import require_permission
@@ -300,6 +301,19 @@ def new_feed():
         app.logger.info(msg)
         return redirect(url_for(".schedule_feed", feed_id=feed.id))
     return render_template("admin/edit-feed.html", form=form)
+
+
+@admin.route("/scheduled-tasks")
+def scheduled_tasks():
+    data = []
+    for task in tasks:
+        results = list(
+            ScheduledTaskResult.query.filter_by(name=task.name)
+            .order_by(ScheduledTaskResult.start_time.desc())
+            .limit(10)
+        )
+        data.append({"task": task, "results": results})
+    return render_template("admin/scheduled-tasks.html", data=data)
 
 
 from . import accounts  # noqa: F401

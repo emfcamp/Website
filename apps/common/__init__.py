@@ -3,6 +3,7 @@ from datetime import datetime
 import json
 import re
 import os.path
+import pendulum
 
 from main import db, mail, external_url
 from flask import session, render_template, abort, current_app as app, request, Markup
@@ -34,6 +35,10 @@ CURRENCY_SYMBOLS = {c.code: c.symbol for c in CURRENCIES}
 
 def load_utility_functions(app_obj):
     init_preload(app_obj)
+
+    @app_obj.template_filter("time_ago")
+    def time_ago(date):
+        return pendulum.instance(date).diff_for_humans()
 
     @app_obj.template_filter("price")
     def format_price(price, currency=None, after=False):

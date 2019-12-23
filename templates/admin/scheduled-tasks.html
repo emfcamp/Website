@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+{% set nav_active = 'scheduled_tasks' %}
+{% block title %}Scheduled Tasks{% endblock %}
+{% block body %}
+<h2>Scheduled Tasks</h2>
+{% for task in data %}
+<h3>{{task.task.name}}</h3>
+<p>Runs every {{task.task.duration}}. Last ran {{task.results[0].start_time|time_ago}}.
+<table class="table">
+  <thead>
+    <th>Time</th>
+    <th>Return Value</th>
+    <th>Exception</th>
+  </thead>
+{% for result in task.results %}
+  <tr>
+    <td>
+      {{result.start_time}}
+    </td>
+    <td>
+      {{result.result.returnval}}
+    </td>
+    <td>
+      {{result.result.exception}}
+    </td>
+  <tr>
+{% endfor %}
+</table>
+{% endfor %}
+{% endblock %}
