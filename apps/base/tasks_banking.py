@@ -204,9 +204,11 @@ def reconcile(doit):
         if doit:
             txn.payment = payment
             payment.paid()
-            db.session.commit()
 
-            banktransfer.send_confirmation(payment)
+            with app.app_context():
+                banktransfer.send_confirmation(payment)
+
+            db.session.commit()
 
         app.logger.info("Payment reconciled")
         paid += 1
