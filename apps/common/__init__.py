@@ -6,7 +6,7 @@ import os.path
 import pendulum
 
 from main import db, mail, external_url
-from flask import session, render_template, abort, current_app as app, request, Markup
+from flask import session, render_template, abort, current_app as app, Markup
 from flask.json import jsonify
 from flask_login import login_user, current_user
 from flask_mail import Message
@@ -34,6 +34,11 @@ CURRENCY_SYMBOLS = {c.code: c.symbol for c in CURRENCIES}
 
 
 def load_utility_functions(app_obj):
+    # NOTE: do not reference the session, request, or g objects in
+    # template functions. It will raise an error when called outside
+    # of a request context (for example when sending emails from a
+    # command line job)
+
     init_preload(app_obj)
 
     @app_obj.template_filter("time_ago")
@@ -69,12 +74,6 @@ def load_utility_functions(app_obj):
         SALES_STATE = get_sales_state()
         SITE_STATE = get_site_state()
 
-        if app.config.get("DEBUG"):
-            SITE_STATE = request.args.get("site_state", SITE_STATE)
-            SALES_STATE = request.args.get("sales_state", SALES_STATE)
-
-        basket_count = len(session.get("basket_purchase_ids", []))
-
         return dict(
             SALES_STATE=SALES_STATE,
             SITE_STATE=SITE_STATE,
@@ -82,7 +81,6 @@ def load_utility_functions(app_obj):
             CURRENCY_SYMBOLS=CURRENCY_SYMBOLS,
             external_url=external_url,
             feature_enabled=feature_enabled,
-            basket_count=basket_count,
             user_currency=get_user_currency(),
             year=datetime.utcnow().year,
         )
