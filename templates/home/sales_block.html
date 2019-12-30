@@ -1,15 +1,17 @@
 {% if SALES_STATE == 'available' %}
-<div itemprop="offers" itemscope itemtype="http://schema.org/AggregateOffer">
-  <p class="emphasis">Tickets for EMF are now on sale for <span itemprop="lowPrice">£{{ full_price.value }}</span>!<p>
-  <a class="btn btn-lg btn-block btn-primary" itemprop="url" href="{{url_for('tickets.main')}}">Buy your ticket now</a>
-</div>
+  <div itemprop="offers" itemscope itemtype="http://schema.org/AggregateOffer">
+    <p class="emphasis">Tickets for EMF are now on sale for <span itemprop="lowPrice">£{{ full_price.value }}</span>!<p>
+    <a class="btn btn-lg btn-block btn-primary" itemprop="url" href="{{url_for('tickets.main')}}">Buy your ticket now</a>
+  </div>
+
 {% elif SALES_STATE == 'unavailable' %}
-  <p class="emphasis">Tickets for EMF are currently unavailable, but more will be on sale soon.</p>
+  <p class="emphasis">Ticket sales dates will be announced in February 2020.</p>
   <p>Keep an eye on
       <a href="https://www.twitter.com/emfcamp">Twitter</a> or join our
       mailing list for an update when more tickets are released:
   </p>
   {% include "home/_mailchimp_form.html" %}
+
 {% elif SALES_STATE == 'sold-out' %}
   <p>We&rsquo;re sorry to say EMF is sold out!
   {% if feature_enabled('CFP') and not feature_enabled('CFP_CLOSED') and not feature_enabled('LINE_UP') %}
@@ -17,6 +19,7 @@
   {% else %}
   If you submitted something to our Call For Participation and it's accepted, we can guarantee you a ticket.</p>
   {% endif %}
+
 {% elif SALES_STATE == 'sales-ended' %}
   <p>Ticket sales have now ended.</p>
 {% endif %}
