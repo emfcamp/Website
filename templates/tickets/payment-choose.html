@@ -2,7 +2,7 @@
 {% extends "base.html" %}
 {% block title %}Choose Payment{% endblock %}
 {% block body %}
-
+{% set user_currency = get_user_currency() %}
 {% include "tickets/_basket.html" %}
 
 <form method="post" class="pay-method">

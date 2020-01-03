@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% set user_currency = get_user_currency() %}
 {% block title %}
 {% if view.type == 'tickets' %}
 Buy Tickets
