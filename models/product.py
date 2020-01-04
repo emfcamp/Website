@@ -380,9 +380,14 @@ class Voucher(db.Model):
     product_view_id = db.Column(db.Integer, db.ForeignKey("product_view.id"))
 
     payment = db.relationship("Payment", backref="voucher")
+
+    # The number of purchases remaining on this voucher
     purchases_remaining = db.Column(db.Integer, nullable=False, server_default="1")
 
-    is_used = column_property(purchases_remaining == 0)
+    # The number of adult tickets remaining to purchase on this voucher
+    tickets_remaining = db.Column(db.Integer, nullable=False, server_default="2")
+
+    is_used = column_property((purchases_remaining == 0) | (tickets_remaining == 0))
 
     @classmethod
     def get_by_code(cls, code):
@@ -390,10 +395,21 @@ class Voucher(db.Model):
             return None
         return Voucher.query.filter_by(code=code).one_or_none()
 
-    def __init__(self, view, code=None, expiry=None, email=None):
+    def __init__(
+        self,
+        view,
+        code=None,
+        expiry=None,
+        email=None,
+        purchases_remaining=1,
+        tickets_remaining=2,
+    ):
         super(Voucher, self).__init__()
         self.view = view
         self.email = email
+        self.purchases_remaining = purchases_remaining
+        self.tickets_remaining = tickets_remaining
+        self.expiry = expiry
 
         # Creation may fail if code has already been used. This isn't ideal
         # but a 12 ascii character random string is unlikely to clash and
@@ -402,9 +418,6 @@ class Voucher(db.Model):
             self.code = code
         else:
             self.code = random_voucher()
-
-        if expiry is not None:
-            self.expiry = expiry
 
     def __repr__(self):
         if self.expiry:
@@ -430,13 +443,18 @@ class Voucher(db.Model):
 
 
 class ProductView(db.Model):
+    """ A selection of products to be shown together for sale. """
+
     __table_name__ = "product_view"
 
-    """ A selection of products to be shown together for sale. """
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String, nullable=False)
     name = db.Column(db.String, nullable=False, index=True)
+
+    # Whether this productview is only accessible to users with an accepted CfP proposal
     cfp_accepted_only = db.Column(db.Boolean, nullable=False, default=False)
+
+    # Whether this productview is only accessible with a voucher associated with this productview
     vouchers_only = db.Column(
         db.Boolean, nullable=False, default=False, server_default="False"
     )
