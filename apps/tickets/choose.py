@@ -35,9 +35,10 @@ def main(flow="main"):
         to enter their user details and choose a payment method.
 
         The `flow` parameter dictates which ProductView to display on this page,
-        and allows us to have different categories of items on sale, for example tickets
+        allowing us to have different categories of items on sale, for example tickets
         on one page, and t-shirts on a separate page.
     """
+    # Fetch the ProductView and determine if this user is allowed to view it.
     view = get_product_view(flow)
 
     if view.cfp_accepted_only and current_user.is_anonymous:
@@ -46,6 +47,7 @@ def main(flow="main"):
     if not view.is_accessible(current_user, session.get("ticket_voucher")):
         abort(404)
 
+    # The sales state controls whether admission tickets are on sale.
     sales_state = get_sales_state()
 
     if sales_state in {"unavailable", "sold-out"}:
@@ -63,6 +65,7 @@ def main(flow="main"):
     elif not current_user.is_anonymous and current_user.has_permission("admin"):
         pass
     else:
+        # User is prevented from buying by the sales state.
         return render_template("tickets/cutoff.html")
 
     # OK, looks like we can try and sell the user some stuff.
@@ -99,7 +102,7 @@ def main(flow="main"):
 
     if request.method == "POST" and form.set_currency.data:
         # User has changed their currency but they don't have javascript enabled,
-        # so a page reload is required.
+        # so a page reload has been caused.
         if form.set_currency.validate(form):
             app.logger.info(
                 "Updating currency to %s (no-JS path)", form.set_currency.data
@@ -111,6 +114,7 @@ def main(flow="main"):
                 field.errors = []
 
     if capacity_gone:
+        # We're not able to provide the number of tickets the user has selected.
         no_capacity.inc()
         flash(
             "We're sorry, but there is not enough capacity available to "
@@ -174,6 +178,7 @@ def handle_ticket_selection(form, view, flow, basket):
     app.logger.info("Saving basket %s", basket)
 
     try:
+        # Convert the user's basket into a purchase.
         basket.create_purchases()
         basket.ensure_purchase_capacity()
         db.session.commit()
