@@ -16,6 +16,8 @@ from wtforms import (
 )
 
 from models.user import User
+from models.payment import BankPayment, StripePayment, GoCardlessPayment
+
 from ..common.forms import IntegerSelectField, HiddenIntegerField, Form, EmailField
 from ..common import CURRENCY_SYMBOLS
 
@@ -72,6 +74,14 @@ class TicketPaymentForm(Form):
                 )
             )
             raise ValidationError(msg)
+
+    def get_payment_class(form):
+        if form.gocardless.data:
+            return GoCardlessPayment
+        elif form.banktransfer.data:
+            return BankPayment
+        elif form.stripe.data:
+            return StripePayment
 
 
 class TicketPaymentShippingForm(TicketPaymentForm):

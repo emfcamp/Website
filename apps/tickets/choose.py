@@ -16,7 +16,7 @@ from sqlalchemy.orm import joinedload
 
 from main import db, mail
 from models.exc import CapacityException
-from models.product import PriceTier, ProductView, ProductViewProduct, Product, Voucher
+from models.product import PriceTier, ProductViewProduct, Product, Voucher
 from models.basket import Basket
 from models.site_state import get_sales_state
 
@@ -24,12 +24,12 @@ from ..common import get_user_currency, set_user_currency, feature_enabled
 from ..common.receipt import attach_tickets, set_tickets_emailed
 
 from .forms import TicketAmountsForm
-from . import tickets, empty_baskets, no_capacity, invalid_vouchers
+from . import tickets, empty_baskets, no_capacity, invalid_vouchers, get_product_view
 
 
 @tickets.route("/tickets", methods=["GET", "POST"])
 @tickets.route("/tickets/<flow>", methods=["GET", "POST"])
-def main(flow=None):
+def main(flow="main"):
     """ The main tickets page. This lets the user choose which tickets to buy,
         creates a basket for them and then adds the tickets to their basket.
 
@@ -40,13 +40,7 @@ def main(flow=None):
         and allows us to have different categories of items on sale, for example tickets
         on one page, and t-shirts on a separate page.
     """
-    if flow is None:
-        flow = "main"
-
-    # For now, use the flow name as a view name. This might change.
-    view = ProductView.get_by_name(flow)
-    if not view:
-        abort(404)
+    view = get_product_view(flow)
 
     if view.cfp_accepted_only and current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for(".main", flow=flow)))
@@ -210,9 +204,7 @@ def handle_ticket_selection(form, view, flow, available, basket):
     try:
         basket.create_purchases()
         basket.ensure_purchase_capacity()
-
         db.session.commit()
-
     except CapacityException as e:
         # Damn, capacity's gone since we created the purchases
         # Redirect back to show what's currently in the basket

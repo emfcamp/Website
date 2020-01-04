@@ -15,36 +15,27 @@ from sqlalchemy.exc import IntegrityError
 
 from main import db
 from models.user import UserShipping
-from models.product import ProductView
 from models.basket import Basket
 from models.payment import BankPayment, StripePayment, GoCardlessPayment
 
-from ..common import (
-    get_user_currency,
-    set_user_currency,
-    create_current_user,
-)
+from ..common import get_user_currency, set_user_currency, create_current_user
 from ..payments.gocardless import gocardless_start
 from ..payments.banktransfer import transfer_start
 from ..payments.stripe import stripe_start
 
-from .forms import (
-    TicketPaymentForm,
-    TicketPaymentShippingForm,
-)
-
-from . import tickets, price_changed, empty_baskets
+from .forms import TicketPaymentForm, TicketPaymentShippingForm
+from . import tickets, price_changed, empty_baskets, get_product_view
 
 
 @tickets.route("/tickets/pay", methods=["GET", "POST"])
 @tickets.route("/tickets/pay/<flow>", methods=["GET", "POST"])
-def pay(flow=None):
-    if flow is None:
-        flow = "main"
-
-    view = ProductView.get_by_name(flow)
-    if not view:
-        abort(404)
+def pay(flow="main"):
+    """
+        The user is sent here once they've added tickets to their basket.
+        This view collects users details, offers payment options, and then
+        starts the correct payment flow in the payment app.
+    """
+    view = get_product_view(flow)
 
     if not view.is_accessible(current_user, session.get("ticket_voucher")):
         # It's likely the user had a voucher which has been used
@@ -99,7 +90,6 @@ def pay(flow=None):
             shipping = None
 
         form = TicketPaymentShippingForm(obj=shipping)
-
     else:
         form = TicketPaymentForm()
 
@@ -113,74 +103,8 @@ def pay(flow=None):
             del form.name
 
     if form.validate_on_submit():
-        if Decimal(form.basket_total.data) != Decimal(basket.total):
-            # Check that the user's basket approximately matches what we told them they were paying.
-            price_changed.inc()
-            app.logger.warn(
-                "User's basket has changed value %s -> %s",
-                form.basket_total.data,
-                basket.total,
-            )
-            flash(
-                """The items you selected have changed, possibly because you had two windows open.
-                  Please verify that you've selected the correct items."""
-            )
-            return redirect(url_for("tickets.pay", flow=flow))
-
-        user = current_user
-        if user.is_anonymous:
-            try:
-                new_user = create_current_user(form.email.data, form.name.data)
-            except IntegrityError as e:
-                app.logger.warn("Adding user raised %r, possible double-click", e)
-                return redirect(url_for("tickets.pay", flow=flow))
-
-            user = new_user
-
-        elif user.name == user.email:
-            user.name = form.name.data
-
-        if form.allow_promo.data:
-            user.promo_opt_in = True
-
-        if basket.requires_shipping:
-            if not user.shipping:
-                user.shipping = UserShipping()
-
-            user.shipping.address_1 = form.address_1.data
-            user.shipping.address_2 = form.address_2.data
-            user.shipping.town = form.town.data
-            user.shipping.postcode = form.postcode.data
-            user.shipping.country = form.country.data
-
-        if form.gocardless.data:
-            payment_type = GoCardlessPayment
-        elif form.banktransfer.data:
-            payment_type = BankPayment
-        elif form.stripe.data:
-            payment_type = StripePayment
-
-        basket.user = user
-        payment = basket.create_payment(payment_type)
-        basket.cancel_surplus_purchases()
-        db.session.commit()
-
-        Basket.clear_from_session()
-
-        if not payment:
-            empty_baskets.inc()
-            app.logger.warn("User tried to pay for empty basket")
-            flash(
-                "We're sorry, your session information has been lost. Please try ordering again."
-            )
-            return redirect(url_for("tickets.main", flow=flow))
-
-        if payment_type == GoCardlessPayment:
-            return gocardless_start(payment)
-        elif payment_type == BankPayment:
-            return transfer_start(payment)
-        elif payment_type == StripePayment:
-            return stripe_start(payment)
+        # Valid form submitted, process it
+        return start_payment(form, basket, flow)
 
     form.basket_total.data = basket.total
 
@@ -192,3 +116,69 @@ def pay(flow=None):
         flow=flow,
         view=view,
     )
+
+
+def start_payment(form, basket, flow):
+    if Decimal(form.basket_total.data) != Decimal(basket.total):
+        # Check that the user's basket approximately matches what we told them they were paying.
+        price_changed.inc()
+        app.logger.warn(
+            "User's basket has changed value %s -> %s",
+            form.basket_total.data,
+            basket.total,
+        )
+        flash(
+            """The items you selected have changed, possibly because you had two windows open.
+              Please verify that you've selected the correct items."""
+        )
+        return redirect(url_for("tickets.pay", flow=flow))
+
+    user = current_user
+
+    if user.is_anonymous:
+        try:
+            new_user = create_current_user(form.email.data, form.name.data)
+        except IntegrityError as e:
+            app.logger.warn("Adding user raised %r, possible double-click", e)
+            return redirect(url_for("tickets.pay", flow=flow))
+
+        user = new_user
+    elif user.name == user.email:
+        user.name = form.name.data
+
+    if form.allow_promo.data:
+        user.promo_opt_in = True
+
+    if basket.requires_shipping:
+        if not user.shipping:
+            user.shipping = UserShipping()
+
+        user.shipping.address_1 = form.address_1.data
+        user.shipping.address_2 = form.address_2.data
+        user.shipping.town = form.town.data
+        user.shipping.postcode = form.postcode.data
+        user.shipping.country = form.country.data
+
+    payment_type = form.get_payment_class()
+
+    basket.user = user
+    payment = basket.create_payment(payment_type)
+    basket.cancel_surplus_purchases()
+    db.session.commit()
+
+    Basket.clear_from_session()
+
+    if not payment:
+        empty_baskets.inc()
+        app.logger.warn("User tried to pay for empty basket")
+        flash(
+            "We're sorry, your session information has been lost. Please try ordering again."
+        )
+        return redirect(url_for("tickets.main", flow=flow))
+
+    if payment_type == GoCardlessPayment:
+        return gocardless_start(payment)
+    elif payment_type == BankPayment:
+        return transfer_start(payment)
+    elif payment_type == StripePayment:
+        return stripe_start(payment)

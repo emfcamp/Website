@@ -26,6 +26,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from main import db, mail, external_url
 from models.user import User, checkin_code_re
+from models.product import ProductView
 from models.basket import Basket
 from models.purchase import Ticket
 
@@ -217,6 +218,13 @@ def tickets_barcode(checkin_code):
 
     barcodefile = make_barcode_png(checkin_code)
     return send_file(barcodefile, mimetype="image/png")
+
+
+def get_product_view(flow):
+    view = ProductView.get_by_name(flow)
+    if not view:
+        abort(404)
+    return view
 
 
 from . import tasks  # noqa
