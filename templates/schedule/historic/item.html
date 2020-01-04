@@ -18,13 +18,17 @@
   by <strong itemprop="performer">{{ event.speaker }}</strong>
 </p>
 
-<p>On
-{{ event.start_date.strftime('%A %B %-d, %Y') }} at
-<time datetime="{{event.start_date.isoformat()}}" itemprop="startDate">{{ event.start_date.strftime('%H:%M') }}</time>
-{%- if event.end_date -%}
-&ndash;<time datetime="{{event.end_date.isoformat()}}" itemprop="endDate">{{ event.end_date.strftime('%H:%M') }}</time>
+<p>
+{%- if event.start_date %}
+  On {{ event.start_date.strftime('%A %B %-d, %Y') }} at
+  <time datetime="{{event.start_date.isoformat()}}" itemprop="startDate">{{ event.start_date.strftime('%H:%M') }}</time>
+  {%- if event.end_date -%}
+  &ndash;<time datetime="{{event.end_date.isoformat()}}" itemprop="endDate">{{ event.end_date.strftime('%H:%M') }}</time>
+  {%- endif %}
 {%- endif %}
+{%- if event.venue %}
   in <span itemprop="Location">{{ event.venue }}</span>
+{%- endif %}
 </p>
 
 {% if event.description %}
