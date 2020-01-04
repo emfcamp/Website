@@ -514,7 +514,13 @@ def product_view_add_voucher(view_id):
     form = NewVoucherForm()
 
     if form.validate_on_submit():
-        Voucher(view, code=form.voucher.data)
+        Voucher(
+            view,
+            code=form.voucher.data,
+            expiry=form.expires.data,
+            purchases_remaining=form.num_purchases.data,
+            tickets_remaining=form.num_tickets.data,
+        )
         db.session.commit()
 
         return redirect(url_for(".product_view", view_id=view_id))
@@ -544,7 +550,12 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 continue
 
             voucher = Voucher(
-                view, code=random_voucher(), email=email, expiry=form.expires.data
+                view,
+                code=random_voucher(),
+                email=email,
+                expiry=form.expires.data,
+                purchases_remaining=form.num_purchases.data,
+                tickets_remaining=form.num_tickets.data,
             )
 
             msg = Message(

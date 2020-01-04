@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from wtforms.validators import (
     Optional,
     DataRequired,
@@ -163,13 +164,17 @@ class NewVoucherForm(Form):
     voucher = StringField(
         "Voucher code (Optional)", [Optional()]
     )  # Maybe auto-generated
-    expires = DateField("Expiry Date (Optional)", [Optional()])
+    expires = DateField("Expiry Date", default=datetime.now() + timedelta(days=30))
+    num_purchases = IntegerField("Max Purchases", [InputRequired()], default=1)
+    num_tickets = IntegerField("Max Adult Tickets", [InputRequired()], default=2)
     create = SubmitField("Create")
 
 
 class BulkVoucherEmailForm(Form):
     emails = TextAreaField("Email Addresses")
-    expires = DateField("Expiry Date")
+    expires = DateField("Expiry Date", default=datetime.now() + timedelta(days=30))
+    num_purchases = IntegerField("Max Purchases", [InputRequired()], default=1)
+    num_tickets = IntegerField("Max Adult Tickets", [InputRequired()], default=2)
     create = SubmitField("Create All")
 
 
