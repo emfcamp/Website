@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from flask import (
     render_template,
     redirect,
@@ -50,7 +48,7 @@ def main(flow="main"):
 
     sales_state = get_sales_state()
 
-    if sales_state in ["unavailable", "sold-out"]:
+    if sales_state in {"unavailable", "sold-out"}:
         # For the main entry point, we assume people want admissions tickets,
         # but we still need to sell people parking tickets, tents or tickets
         # from vouchers until the final cutoff (sales-ended).
@@ -67,88 +65,45 @@ def main(flow="main"):
     else:
         return render_template("tickets/cutoff.html")
 
-    tiers = OrderedDict()
-    products = (
-        ProductViewProduct.query.filter_by(view_id=view.id)
-        .join(ProductViewProduct.product)
-        .with_entities(Product)
-        .order_by(ProductViewProduct.order)
-        .options(joinedload(Product.price_tiers).joinedload(PriceTier.prices))
-    )
+    # OK, looks like we can try and sell the user some stuff.
 
-    for product in products:
-        pts = [tier for tier in product.price_tiers if tier.active]
-        if len(pts) > 1:
-            app.logger.error(
-                "Multiple active PriceTiers found for %s. Excluding product.", product
-            )
-            continue
-
-        pt = pts[0]
-
-        tiers[pt.id] = pt
-
+    products = products_for_view(view)
+    form = TicketAmountsForm(products)
     basket = Basket.from_session(current_user, get_user_currency())
 
-    form = TicketAmountsForm()
-
-    """
-    For consistency and to avoid surprises, we try to ensure a few things here:
-    - if the user successfully submits a form with no errors, their basket is updated
-    - if they don't, the basket is left untouched
-    - the basket is updated to match what was submitted, even if they added tickets in another tab
-    - if they already have tickets in their basket, only reserve the extra tickets as necessary
-    - don't unreserve surplus tickets until the payment is created
-    - if the user hasn't submitted anything, we use their current reserved ticket counts
-    - if the user has reserved tickets from exhausted tiers on this view, we still show them
-    - if the user has reserved tickets from other views, don't show and don't mess with them
-    - this means the user can combine tickets from multiple views into a single basket
-    - show the sold-out/unavailable states only when the user doesn't have reserved tickets
-
-    We currently don't deal with multiple price tiers being available around the same time.
-    Reserved tickets from a previous tier should be cancelled before activating a new one.
-    """
     if request.method != "POST":
-        # Empty form - populate products
-        for pt_id, tier in tiers.items():
-            form.tiers.append_entry()
-            f = form.tiers[-1]
-            f.tier_id.data = pt_id
+        # Empty form - populate products with any amounts already in basket
+        form.populate(basket)
 
-            f.amount.data = basket.get(tier, 0)
-
-    # Whether submitted or not, update the allowed amounts before validating
-    capacity_gone = False
-    for f in form.tiers:
-        pt_id = f.tier_id.data
-        tier = tiers[pt_id]
-        f._tier = tier
-
-        # If they've already got reserved tickets, let them keep them
-        user_limit = max(tier.user_limit(), basket.get(tier, 0))
-        if f.amount.data and f.amount.data > user_limit:
-            capacity_gone = True
-        values = range(user_limit + 1)
-        f.amount.values = values
-        f._any = any(values)
+    # Validate the capacity in the form, setting the maximum limits where available.
+    capacity_gone = form.ensure_capacity(basket)
 
     available = True
     if sales_state == "unavailable":
-        if not any(p.product in products for p in basket.purchases):
-            # If they have any reservations, they bypass the unavailable state.
-            # This means someone can use another view to get access to this one
-            # again. I'm not sure what to do about this. It usually won't matter.
-            available = False
+        # If the user has any reservations, they bypass the unavailable state.
+        # This means someone can use another view to get access to this one
+        # again. I'm not sure what to do about this. It usually won't matter.
+        available = any(p.product in products for p in basket.purchases)
 
     if form.validate_on_submit() and (
         form.buy_tickets.data or form.buy_hire.data or form.buy_other.data
     ):
         # User has selected some tickets to buy.
-        return handle_ticket_selection(form, view, flow, available, basket)
+        if not available:
+            # Tickets are out :(
+            app.logger.warn("User has no reservations, enforcing unavailable state")
+            basket.save_to_session()
+            return redirect(url_for("tickets.main", flow=flow))
+
+        return handle_ticket_selection(form, view, flow, basket)
 
     if request.method == "POST" and form.set_currency.data:
+        # User has changed their currency but they don't have javascript enabled,
+        # so a page reload is required.
         if form.set_currency.validate(form):
-            app.logger.info("Updating currency to %s only", form.set_currency.data)
+            app.logger.info(
+                "Updating currency to %s (no-JS path)", form.set_currency.data
+            )
             set_user_currency(form.set_currency.data)
             db.session.commit()
 
@@ -168,7 +123,33 @@ def main(flow="main"):
     )
 
 
-def handle_ticket_selection(form, view, flow, available, basket):
+def products_for_view(product_view):
+    return (
+        ProductViewProduct.query.filter_by(view_id=product_view.id)
+        .join(ProductViewProduct.product)
+        .with_entities(Product)
+        .order_by(ProductViewProduct.order)
+        .options(joinedload(Product.price_tiers).joinedload(PriceTier.prices))
+    )
+
+
+def handle_ticket_selection(form, view, flow, basket):
+    """
+    For consistency and to avoid surprises, we try to ensure a few things here:
+    - if the user successfully submits a form with no errors, their basket is updated
+    - if they don't, the basket is left untouched
+    - the basket is updated to match what was submitted, even if they added tickets in another tab
+    - if they already have tickets in their basket, only reserve the extra tickets as necessary
+    - don't unreserve surplus tickets until the payment is created
+    - if the user hasn't submitted anything, we use their current reserved ticket counts
+    - if the user has reserved tickets from exhausted tiers on this view, we still show them
+    - if the user has reserved tickets from other views, don't show and don't mess with them
+    - this means the user can combine tickets from multiple views into a single basket
+    - show the sold-out/unavailable states only when the user doesn't have reserved tickets
+
+    We currently don't deal with multiple price tiers being available around the same time.
+    Reserved tickets from a previous tier should be cancelled before activating a new one.
+    """
     if form.currency_code.data != get_user_currency():
         set_user_currency(form.currency_code.data)
         # Commit so we don't lose the currency change if an error occurs
@@ -176,16 +157,7 @@ def handle_ticket_selection(form, view, flow, available, basket):
         # Reload the basket because set_user_currency has changed it under us
         basket = Basket.from_session(current_user, get_user_currency())
 
-    for f in form.tiers:
-        pt = f._tier
-        if f.amount.data != basket.get(pt, 0):
-            app.logger.info("Adding %s %s tickets to basket", f.amount.data, pt.name)
-            basket[pt] = f.amount.data
-
-    if not available:
-        app.logger.warn("User has no reservations, enforcing unavailable state")
-        basket.save_to_session()
-        return redirect(url_for("tickets.main", flow=flow))
+    form.add_to_basket(basket)
 
     if not any(basket.values()):
         empty_baskets.inc()
@@ -199,7 +171,7 @@ def handle_ticket_selection(form, view, flow, available, basket):
         basket.save_to_session()
         return redirect(url_for("tickets.main", flow=flow))
 
-    app.logger.info("Basket %s", basket)
+    app.logger.info("Saving basket %s", basket)
 
     try:
         basket.create_purchases()
@@ -223,11 +195,15 @@ def handle_ticket_selection(form, view, flow, available, basket):
         # Send the user off to pay
         return redirect(url_for("tickets.pay", flow=flow))
     else:
-        return handle_free_tickets(form, flow, view, basket)
+        return handle_free_tickets(flow, view, basket)
 
 
-def handle_free_tickets(form, flow, view, basket):
-    # The user is trying to "buy" free tickets.
+def handle_free_tickets(flow, view, basket):
+    """ The user is trying to "buy" only free tickets.
+
+        This is effectively a payment stage, handled differently
+        from the rest of the flow.
+    """
     # They must be authenticated for this.
     if not current_user.is_authenticated:
         app.logger.warn("User is not authenticated, sending to login")
