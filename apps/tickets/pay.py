@@ -16,6 +16,7 @@ from sqlalchemy.exc import IntegrityError
 from main import db
 from models.user import UserShipping
 from models.basket import Basket
+from models.product import VoucherUsedError
 from models.payment import BankPayment, StripePayment, GoCardlessPayment
 
 from ..common import get_user_currency, set_user_currency, create_current_user
@@ -162,9 +163,23 @@ def start_payment(form, basket, flow):
     payment_type = form.get_payment_class()
 
     basket.user = user
-    payment = basket.create_payment(payment_type)
+    try:
+        payment = basket.create_payment(payment_type)
+    except VoucherUsedError as e:
+        # Voucher has been used since we last checked it at the "choose" stage.
+        app.logger.exception("Voucher used at payment stage")
+        flash(
+            "The voucher you've used does not allow you to buy this many adult tickets. "
+            "Please choose fewer tickets."
+        )
+        db.session.rollback()
+        return redirect(url_for("tickets.main", flow=flow))
+
     basket.cancel_surplus_purchases()
     db.session.commit()
+
+    # Remove voucher ID from session.
+    del session["ticket_voucher"]
 
     Basket.clear_from_session()
 
