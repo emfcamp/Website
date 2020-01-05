@@ -178,8 +178,11 @@ def start_payment(form, basket, flow):
     basket.cancel_surplus_purchases()
     db.session.commit()
 
-    # Remove voucher ID from session.
-    del session["ticket_voucher"]
+    # Remove voucher ID from session, if it exists.
+    try:
+        del session["ticket_voucher"]
+    except KeyError:
+        pass
 
     Basket.clear_from_session()
 
