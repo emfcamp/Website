@@ -1,5 +1,3 @@
-# coding=utf-8
-from __future__ import division, absolute_import, print_function, unicode_literals
 import unittest
 from .user import generate_login_code, verify_login_code
 
