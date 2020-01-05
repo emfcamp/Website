@@ -82,4 +82,18 @@
     </fieldset>
   </form>
 </div>
+
+{% if current_user.village %}
+<h3>Your Village</h3>
+<div class="panel panel-default">
+  <div class="panel-body">
+    You're a member of the <strong>{{current_user.village.village.name}}</strong> village. 
+    {% if current_user.village.admin %}
+      <a href="{{url_for('villages.edit', year=event_year, village_id=current_user.village.village.id)}}">
+        Edit this village
+      </a>.
+    {% endif %}
+  </div>
+</div>
+{% endif %}
 {% endblock %}

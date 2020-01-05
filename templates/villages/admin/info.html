@@ -1,0 +1,13 @@
+{% extends "villages/admin/base.html" %}
+{% block title %}Village Info: {{village.name}}{% endblock %}
+{% block body %}
+<h3>Village Info: {{village.name}}</h3>
+<dl class="dl-horizontal">
+  <dt>Admins:</dt><dd>{% for admin in village.admins() %}{{admin.name}}, {% endfor %}</dd>
+  <dt>Description:</dt><dd>{{village.description}}</dd>
+  <dt>Attendees:</dt><dd>{{village.requirements.num_attendees}}</dd>
+  <dt>Size (m<sup>2</sup>):</dt><dd>{{village.requirements.size_sqm}}</dd>
+  <dt>Noise:</dt><dd>{{village.requirements.noise}}</dd>
+  <dt>Power:</dt><dd>{{village.requirements.power_requirements}}</dd>
+</dl>
+{% endblock %}

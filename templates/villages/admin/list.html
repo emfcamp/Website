@@ -1,0 +1,23 @@
+{% extends "villages/admin/base.html" %}
+{% block title %}Village Admin{% endblock %}
+{% block body %}
+<h3>Villages List</h3>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Attendees</th>
+      <th>Size</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for village in villages %}
+      <tr>
+        <td><a href="{{url_for('.admin_village', village_id=village.id)}}">{{ village.name }}</a></td>
+        <td>{{ village.requirements.num_attendees }}</td>
+        <td>{% if village.requirements.size_sqm %}{{village.requirements.size_sqm}}m<sup>2</sup>{% endif %}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

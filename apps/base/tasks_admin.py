@@ -53,6 +53,7 @@ def create_perms():
         "cfp_reviewer",
         "cfp_anonymiser",
         "cfp_schedule",
+        "villages",
     ):
         if not Permission.query.filter_by(name=permission).first():
             db.session.add(Permission(permission))

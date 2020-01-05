@@ -275,6 +275,7 @@ def create_app(dev_server=False):
     from apps.schedule import schedule
     from apps.arrivals import arrivals
     from apps.api import api_bp
+    from apps.villages import villages
 
     app.register_blueprint(base)
     app.register_blueprint(users)
@@ -286,6 +287,7 @@ def create_app(dev_server=False):
     app.register_blueprint(schedule)
     app.register_blueprint(arrivals, url_prefix="/arrivals")
     app.register_blueprint(api_bp, url_prefix="/api")
+    app.register_blueprint(villages, url_prefix="/villages")
 
     if app.config.get("VOLUNTEERS"):
         from apps.volunteer import volunteer

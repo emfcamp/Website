@@ -1,0 +1,40 @@
+<div class="well">
+  <form method="post" class="form-horizontal" role="form">
+    {{ form.hidden_tag() }}
+    <fieldset>
+      <legend>Basic Details</legend>
+      <p>Everything you enter in this section will be publicly displayed.</p>
+      {{ render_field(form.name, horizontal=9, placeholder="My Village") }}
+      {{ render_field(form.description, horizontal=9,
+            placeholder="A description of your village. Who are you, what cool things will you be doing?") }}
+    </fieldset>
+    <fieldset>
+      <legend>Requirements</legend>
+      <p>These will help the villages team decide where best to place your village. Please provide either an
+          approximate number of attendees or a size in square meters so we can make sure you're not placed
+          too close to other villages.
+      </p>
+      {{ render_field(form.num_attendees, horizontal=9) }}
+      {{ render_field(form.size_sqm, horizontal=9) }}
+      {{ render_field(form.noise, horizontal=9) }}
+    </fieldset>
+    <fieldset>
+      <legend>Structures</legend>
+      <p>If you're bringing any tents or other structures which are larger than 25m<sup>2</sup> in area, or taller than 4m high, we need to know about these for fire safety reasons. Please let us know the size and type of these.</p>
+      <p>We may ask you to provide us with a plan of your village before you can bring these.</p>
+      {{ render_field(form.structures, horizontal=9) }}
+    </fieldset>
+    <fieldset>
+      <legend>Power</legend>
+      <p>Power at EMF is normally provided as 16A single-phase "ceeform" connectors. If your village requires more
+      than a 16A single-phase supply, let us know your requirements and we'll try to accommodate.
+          <a href="{{url_for("base.power")}}" target="_blank">More info about power at EMF</a>.</p>
+      {{ render_field(form.power_requirements, horizontal=9) }}
+    </fieldset>
+    <fieldset>
+    <div class="form-actions">
+      <button type="submit" name="Create" class="btn btn-primary btn-lg pull-right debounce">Register Village</button>
+    </div>
+    </fieldset>
+  </form>
+</div>
