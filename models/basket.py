@@ -255,6 +255,9 @@ class Basket(MutableMapping):
         Insert payment and purchases from session data into DB.
 
         This must be done after creating the purchases.
+
+        This function may raise a VoucherUsedError if the user's
+        voucher does not allow this purchase.
         """
 
         if not self.purchases:
@@ -276,7 +279,6 @@ class Basket(MutableMapping):
                 raise Exception("Purchase {} has a payment already".format(purchase.id))
 
         payment = payment_cls(self.currency, self.total, self.voucher)
-        del session["ticket_voucher"]
 
         # This is where you'd add the premium if it existed
 
