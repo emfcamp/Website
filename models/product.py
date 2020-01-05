@@ -1,6 +1,7 @@
 from decimal import Decimal
 from collections import defaultdict
 from datetime import datetime
+import logging
 import re
 import random
 import string
@@ -14,12 +15,18 @@ from .mixins import CapacityMixin, InheritedAttributesMixin
 from . import config_date
 from .purchase import Purchase
 
+log = logging.getLogger(__name__)
+
 
 class ProductGroupException(Exception):
     pass
 
 
 class MultipleLoadedResultsFound(Exception):
+    pass
+
+
+class VoucherUsedError(ValueError):
     pass
 
 
@@ -223,6 +230,13 @@ class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
         )
         return price
 
+    def is_adult_ticket(self):
+        """ Whether this is an adult ticket.
+            We use this for vouchers.
+        """
+        # FIXME: Make this less awful, we need a less brittle way of detecting this
+        return self.parent.type == "admissions" and self.name.startswith("full")
+
     @property
     def checkin_display_name(self):
         return re.sub(r" \(.*\)", "", self.display_name)
@@ -418,6 +432,51 @@ class Voucher(db.Model):
             self.code = code
         else:
             self.code = random_voucher()
+
+    def check_capacity(self, basket):
+        if self.purchases_remaining < 1:
+            return False
+        adult_tickets = len([tier for tier in basket if tier.parent.is_adult_ticket()])
+        if self.tickets_remaining < adult_tickets:
+            return False
+        return True
+
+    def consume_capacity(self, payment):
+        """ Decrease the voucher's capacity based on tickets in a payment. """
+        if self.purchases_remaining < 1:
+            raise VoucherUsedError(
+                f"Attempting to use voucher with no remaining purchases: {self}"
+            )
+
+        adult_tickets = len(
+            [
+                purchase
+                for purchase in payment.purchases
+                if purchase.product.is_adult_ticket()
+            ]
+        )
+
+        if self.tickets_remaining < adult_tickets:
+            raise VoucherUsedError(
+                f"Attempting to purchase more adult tickets than allowed by voucher: {self}"
+            )
+
+        log.info("Consuming 1 purchase and %s tickets from %s", adult_tickets, self)
+        self.purchases_remaining -= 1
+        self.tickets_remaining -= adult_tickets
+
+    def return_capacity(self, payment):
+        """ Return capacity to this voucher based on tickets in a payment. """
+        adult_tickets = len(
+            [
+                purchase
+                for purchase in payment.purchases
+                if purchase.product.is_adult_ticket()
+            ]
+        )
+        log.info("Returning 1 purchase and %s tickets to %s", adult_tickets, self)
+        self.tickets_remaining += adult_tickets
+        self.purchases_remaining += 1
 
     def __repr__(self):
         if self.expiry:

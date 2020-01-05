@@ -191,7 +191,7 @@ class Payment(db.Model):
             # Restore capacity to the voucher
             voucher = Voucher.get_by_code(self.voucher_code)
             if voucher is not None:
-                voucher.purchases_remaining += 1
+                voucher.return_capacity(self)
 
         db.session.flush()
 
