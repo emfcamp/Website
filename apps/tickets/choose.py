@@ -45,6 +45,8 @@ def main(flow="main"):
         return redirect(url_for("users.login", next=url_for(".main", flow=flow)))
 
     if not view.is_accessible(current_user, session.get("ticket_voucher")):
+        # User isn't allowed to see this ProductView, either because it's
+        # CfP-restricted or because they don't have an active voucher.
         abort(404)
 
     # The sales state controls whether admission tickets are on sale.
@@ -61,15 +63,16 @@ def main(flow="main"):
         sales_state = request.args.get("sales_state", sales_state)
 
     if sales_state in {"available", "unavailable"}:
+        # Tickets are on sale, or they're unavailable but we're still showing prices.
         pass
     elif not current_user.is_anonymous and current_user.has_permission("admin"):
+        # Admins always have access
         pass
     else:
         # User is prevented from buying by the sales state.
         return render_template("tickets/cutoff.html")
 
     # OK, looks like we can try and sell the user some stuff.
-
     products = products_for_view(view)
     form = TicketAmountsForm(products)
     basket = Basket.from_session(current_user, get_user_currency())
@@ -173,6 +176,19 @@ def handle_ticket_selection(form, view, flow, basket):
             flash("Please select at least one item to buy.")
 
         basket.save_to_session()
+        return redirect(url_for("tickets.main", flow=flow))
+
+    # Ensure this purchase is valid for this voucher.
+    voucher = Voucher.get_by_code(basket.voucher)
+    if voucher and not voucher.check_capacity(basket):
+        basket.save_to_session()
+        if voucher.is_used:
+            flash("Your voucher has been used by someone else.")
+        else:
+            flash(
+                f"You can only purchase {voucher.tickets_remaining} adult "
+                "tickets with this voucher. Please select fewer tickets."
+            )
         return redirect(url_for("tickets.main", flow=flow))
 
     app.logger.info("Saving basket %s", basket)
