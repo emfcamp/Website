@@ -41,12 +41,6 @@ class Basket(MutableMapping):
         purchases = session.get("basket_purchase_ids", [])
         surplus_purchases = session.get("basket_surplus_purchase_ids", [])
         voucher = session.get("ticket_voucher", None)
-        if voucher:
-            voucher_obj = Voucher.get_by_code(voucher)
-            if voucher_obj.purchases_remaining < 1:
-                raise ValueError(
-                    "Attempting to use voucher with no remaining purchases: " + voucher
-                )
 
         basket = Basket(user, currency, voucher)
         basket.load_purchases_from_ids(purchases, surplus_purchases)
@@ -281,15 +275,8 @@ class Basket(MutableMapping):
             if purchase.payment_id is not None:
                 raise Exception("Purchase {} has a payment already".format(purchase.id))
 
-        if self.voucher:
-            voucher_obj = Voucher.get_by_code(self.voucher)
-            voucher_obj.purchases_remaining -= 1
-            db.session.add(voucher_obj)
-            del session["ticket_voucher"]
-
-            payment = payment_cls(self.currency, self.total, self.voucher)
-        else:
-            payment = payment_cls(self.currency, self.total)
+        payment = payment_cls(self.currency, self.total, self.voucher)
+        del session["ticket_voucher"]
 
         # This is where you'd add the premium if it existed
 
@@ -308,6 +295,12 @@ class Basket(MutableMapping):
             purchase.payment = payment
             if purchase.purchaser_id is None:
                 purchase.set_user(self.user)
+
+        if self.voucher:
+            # Reduce the capacity of the voucher based on this payment.
+            voucher_obj = Voucher.get_by_code(self.voucher)
+            voucher_obj.consume_capacity(payment)
+            db.session.add(voucher_obj)
 
         return payment
 
