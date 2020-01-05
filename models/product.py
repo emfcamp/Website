@@ -434,9 +434,16 @@ class Voucher(db.Model):
             self.code = random_voucher()
 
     def check_capacity(self, basket):
+        """ Check if there is enough capacity in this voucher to buy
+            the tickets in the provided basket.
+        """
         if self.purchases_remaining < 1:
             return False
-        adult_tickets = len([tier for tier in basket if tier.parent.is_adult_ticket()])
+
+        adult_tickets = sum(
+            line.count for line in basket._lines if line.tier.parent.is_adult_ticket()
+        )
+
         if self.tickets_remaining < adult_tickets:
             return False
         return True
