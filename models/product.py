@@ -469,8 +469,8 @@ class Voucher(db.Model):
             )
 
         log.info("Consuming 1 purchase and %s tickets from %s", adult_tickets, self)
-        self.purchases_remaining -= 1
-        self.tickets_remaining -= adult_tickets
+        self.purchases_remaining = Voucher.purchases_remaining - 1
+        self.tickets_remaining = Voucher.tickets_remaining - adult_tickets
 
     def return_capacity(self, payment):
         """ Return capacity to this voucher based on tickets in a payment. """
@@ -482,8 +482,8 @@ class Voucher(db.Model):
             ]
         )
         log.info("Returning 1 purchase and %s tickets to %s", adult_tickets, self)
-        self.tickets_remaining += adult_tickets
-        self.purchases_remaining += 1
+        self.purchases_remaining = Voucher.purchases_remaining + 1
+        self.tickets_remaining = Voucher.tickets_remaining + adult_tickets
 
     def __repr__(self):
         if self.expiry:
