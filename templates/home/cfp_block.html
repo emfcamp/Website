@@ -1,10 +1,10 @@
 {% if feature_enabled('CFP_CLOSED') %}
-  <p>The Call For Participation is closed.</p>
+  <p class="emphasis">The Call For Participation is closed.</p>
 
 {% elif feature_enabled('CFP') %}
-  <p><a href="{{url_for('cfp.main')}}">The Call For Participation is open.</a></p>
+  <p class="emphasis"><a href="{{url_for('cfp.main')}}">The Call For Participation is open.</a></p>
 
 {% else %}
-  <p>The Call For Participation will open soon.</p>
+  <p class="emphasis">The Call For Participation will open soon.</p>
 
 {% endif %}
