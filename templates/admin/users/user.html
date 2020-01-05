@@ -74,7 +74,12 @@
             <td>{{ ticket.product.parent.name }}</td>
             <td>{{ ticket.product.display_name }}</td>
 	    <td>{{ ticket.state }}</td>
-	    <td><a href="{{ url_for('.payment', payment_id=ticket.payment.id) }}">{{ ticket.payment.name }}</a></td>
+            <td>{% if ticket.payment %}
+                  <a href="{{ url_for('.payment', payment_id=ticket.payment.id) }}">{{ ticket.payment.name }}</a>
+              {% else %}
+                  No payment
+              {% endif %}
+            </td>
             <td>{% if ticket.checked_in %}Yes{% else %}No{% endif %}</td>
             <td>
               {% if ticket.is_paid_for and ticket.is_transferable %}

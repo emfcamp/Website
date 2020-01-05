@@ -1,3 +1,4 @@
+{% set user_currency = get_user_currency() %}
 <div class="well basket">
   {% if view.type == 'tickets' %}
   You've selected the following {% if basket.purchases|count == 1 %}ticket{% else %}

@@ -81,7 +81,7 @@ def load_utility_functions(app_obj):
             CURRENCY_SYMBOLS=CURRENCY_SYMBOLS,
             external_url=external_url,
             feature_enabled=feature_enabled,
-            user_currency=get_user_currency(),
+            get_user_currency=get_user_currency,
             year=datetime.utcnow().year,
         )
 

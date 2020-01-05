@@ -21,6 +21,7 @@ import gocardless_pro.errors
 from sqlalchemy.orm.exc import NoResultFound
 
 from main import db, mail, external_url, gocardless_client, csrf
+from models import event_year
 from models.payment import GoCardlessPayment
 from ..common import feature_enabled
 from ..common.receipt import attach_tickets, set_tickets_emailed
@@ -168,14 +169,25 @@ def gocardless_waiting(payment_id):
 def create_gc_payment(payment):
     try:
         logger.info("Creating GC payment for %s (%s)", payment.id, payment.mandate)
+
+        # The idempotency key identifies a unique payment to GoCardless.
+        # In production this is the event year and payment ID but in dev, payment
+        # IDs get reused when the DB is reset, so don't use idempotency keys in dev.
+        headers = {"Idempotency-Key": f"{event_year()}-{payment.id}"}
+        if app.config.get("DEBUG"):
+            headers = {}
+
         gc_payment = gocardless_client.payments.create(
             params={
                 "amount": payment.amount_int,
                 "currency": payment.currency,
                 "links": {"mandate": payment.mandate},
-                "metadata": {"payment_id": str(payment.id)},
+                "metadata": {
+                    "payment_id": str(payment.id),
+                    "event_year": str(event_year()),
+                },
             },
-            headers={"Idempotency-Key": str(payment.id)},
+            headers=headers,
         )
 
         payment.gcid = gc_payment.id

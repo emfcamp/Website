@@ -219,9 +219,10 @@ def create_app(dev_server=False):
             response.headers[
                 "Report-To"
             ] = '{"group":"default","max_age":31536000,"endpoints":[{"url":"https://emfcamp.report-uri.com/a/d/g"}],"include_subdomains":false}'
-            response.headers[
-                "NEL"
-            ] = '{"report_to":"default","max_age":31536000,"include_subdomains":false}'
+
+            # Disable Network Error Logging.
+            # This doesn't seem to be very useful and it's using up our report-uri quota.
+            response.headers["NEL"] = '{"max_age":0}'
         return response
 
     if not app.debug:
