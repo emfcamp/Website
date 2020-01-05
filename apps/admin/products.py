@@ -508,13 +508,24 @@ def product_view_voucher_list(view_id):
     return render_template("admin/products/view-vouchers.html", view=view)
 
 
+@admin.route("/product_views/<int:view_id>/voucher/<string:voucher_code>")
+def product_view_voucher_detail(view_id, voucher_code):
+    view = ProductView.query.get_or_404(view_id)
+    voucher = Voucher.get_by_code(voucher_code)
+    if voucher is None:
+        abort(404)
+    return render_template(
+        "admin/products/view-voucher.html", view=view, voucher=voucher
+    )
+
+
 @admin.route("/product_views/<int:view_id>/voucher/add", methods=["GET", "POST"])
 def product_view_add_voucher(view_id):
     view = ProductView.query.get_or_404(view_id)
     form = NewVoucherForm()
 
     if form.validate_on_submit():
-        Voucher(
+        voucher = Voucher(
             view,
             code=form.voucher.data,
             expiry=form.expires.data,
@@ -522,8 +533,14 @@ def product_view_add_voucher(view_id):
             tickets_remaining=form.num_tickets.data,
         )
         db.session.commit()
-
-        return redirect(url_for(".product_view", view_id=view_id))
+        flash("Voucher successfully created")
+        return redirect(
+            url_for(
+                ".product_view_voucher_detail",
+                view_id=view_id,
+                voucher_code=voucher.code,
+            )
+        )
 
     return render_template("admin/products/view-add-voucher.html", view=view, form=form)
 

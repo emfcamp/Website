@@ -1,0 +1,22 @@
+{% extends "admin/base.html" %}
+{% from "_formhelpers.html" import render_field  %}
+{% block title %}Voucher{% endblock %}
+
+{% set nav_active = 'product_views' %}
+{% block body %}
+<ol class="breadcrumb">
+  <li><a href="{{url_for('.product_views')}}">Product Views</a></li>
+  <li><a href="{{url_for('.product_view', view_id=view.id)}}">Product View "{{ view.name }}"</a></li>
+  <li><a href="{{url_for('.product_view_voucher_list', view_id=view.id)}}">Vouchers</a></li>
+  <li class="active">Voucher "{{voucher.code}}"</li>
+</ol>
+
+<table class="table">
+  <tr><th>Voucher URL</th><td>{{external_url('tickets.tickets_voucher', voucher_code=voucher.code)}}</td></tr>
+  <tr><th>Sent to email</th><td>{{voucher.email}}</td></tr>
+  <tr><th>Expires</th><td>{{voucher.expiry}}</td></tr>
+  <tr><th>Purchases Remaining</th><td>{{voucher.purchases_remaining}}</td></tr>
+  <tr><th>Adult Tickets Remaining</th><td>{{voucher.tickets_remaining}}</td></tr>
+</table>
+
+{% endblock %}

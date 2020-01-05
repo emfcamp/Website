@@ -22,8 +22,8 @@
   {% for vchr in view.vouchers %}
     <tr>
       {# FIXME add a "copy URL" link? #}
-      <td>{{ vchr.code }}</td>
-      <td>{{ vchr.email }}</td>
+      <td><a href="{{url_for('.product_view_voucher_detail', view_id=view.id, voucher_code=vchr.code)}}">{{ vchr.code }}</a></td>
+      <td>{% if vchr.email %}{{ vchr.email }}{% endif %}</td>
       <td>{{ vchr.expiry }}</td>
       <td>{{ vchr.purchases_remaining }}</td>
       <td>{{ vchr.tickets_remaining }}</td>
