@@ -101,9 +101,6 @@ class StaticField(StringField):
 
 
 class Form(FlaskForm):
-    # CsrfProtect token limit, to match the flask permanent session expiry of 31 days.
-    TIME_LIMIT = 3600 * 24 * 31
-
     def hidden_tag_without(self, *exclude_fields):
         """ Return the hidden fields for this form, excluding the fields listed in
             `exclude_fields`
