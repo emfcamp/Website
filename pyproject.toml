@@ -1,5 +1,6 @@
 [tool.poetry]
 name = "website"
+description = "The Electromagnetic Field web site"
 version = "0.1"
 authors = []
 
