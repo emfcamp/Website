@@ -1,0 +1,24 @@
+{% extends "admin/base.html" %}
+{% from "_formhelpers.html" import render_field, render_static %}
+{% block title %}Voucher{% endblock %}
+
+{% set nav_active = 'product_views' %}
+{% block body %}
+<ol class="breadcrumb">
+  <li><a href="{{url_for('.product_views')}}">Product Views</a></li>
+  <li><a href="{{url_for('.product_view', view_id=view.id)}}">Product View "{{ view.name }}"</a></li>
+  <li><a href="{{url_for('.product_view_voucher_list', view_id=view.id)}}">Vouchers</a></li>
+  <li class="active">Voucher "{{voucher.code}}"</li>
+</ol>
+
+<form action="" method="post">
+{{ form.hidden_tag() }}
+
+{{ render_field(form.expiry, horizontal=False) }}
+
+{{ form.submit(class_="btn btn-success debounce") }}
+
+</form>
+
+{% endblock %}
+

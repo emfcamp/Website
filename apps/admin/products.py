@@ -42,6 +42,7 @@ from .forms import (
     EditProductViewForm,
     AddProductViewProductForm,
     NewVoucherForm,
+    EditVoucherForm,
     BulkVoucherEmailForm,
 )
 
@@ -543,6 +544,36 @@ def product_view_add_voucher(view_id):
         )
 
     return render_template("admin/products/view-add-voucher.html", view=view, form=form)
+
+
+@admin.route(
+    "/product_views/<int:view_id>/voucher/<string:voucher_code>/edit",
+    methods=["GET", "POST"],
+)
+def product_view_edit_voucher(view_id, voucher_code):
+    view = ProductView.query.get_or_404(view_id)
+    voucher = Voucher.get_by_code(voucher_code)
+    if voucher is None:
+        abort(404)
+
+    form = EditVoucherForm()
+    if form.validate_on_submit():
+        form.update_voucher(voucher)
+        db.session.commit()
+        flash("Voucher updated")
+        return redirect(
+            url_for(
+                ".product_view_voucher_detail",
+                view_id=view_id,
+                voucher_code=voucher_code,
+            )
+        )
+
+    form.init_with_voucher(voucher)
+
+    return render_template(
+        "admin/products/view-edit-voucher.html", view=view, voucher=voucher, form=form
+    )
 
 
 @admin.route("/product_views/<int:view_id>/voucher/bulk_add", methods=["GET", "POST"])

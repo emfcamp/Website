@@ -19,4 +19,10 @@
   <tr><th>Adult Tickets Remaining</th><td>{{voucher.tickets_remaining}}</td></tr>
 </table>
 
+<div class="pull-right btn-group">
+    <a class="btn btn-warning" href="{{ url_for('.product_view_edit_voucher', view_id=view.id, voucher_code=voucher.code) }}">
+        Edit
+    </a>
+</div>
+
 {% endblock %}

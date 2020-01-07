@@ -170,6 +170,17 @@ class NewVoucherForm(Form):
     create = SubmitField("Create")
 
 
+class EditVoucherForm(Form):
+    expiry = DateField("Expiry Date")
+    submit = SubmitField("Save")
+
+    def init_with_voucher(self, voucher):
+        self.expiry.data = voucher.expiry
+
+    def update_voucher(self, voucher):
+        voucher.expiry = self.expiry.data
+
+
 class BulkVoucherEmailForm(Form):
     emails = TextAreaField("Email Addresses")
     expires = DateField("Expiry Date", default=datetime.now() + timedelta(days=30))
