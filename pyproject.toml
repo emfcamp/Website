@@ -40,7 +40,7 @@ gocardless-pro = "==1.2.0"
 stripe = "~=2.38.0"
 ofxparse = "==0.16"
 python-dateutil = "*"
-slotmachine = {git = "https://github.com/emfcamp/slotmachine.git",editable = true}
+slotmachine = {git = "https://github.com/emfcamp/slotmachine.git"}
 awesome-slugify = "*"
 faker = "*"
 pyyaml = "*"
