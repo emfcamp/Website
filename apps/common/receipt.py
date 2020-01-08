@@ -95,11 +95,16 @@ def render_pdf(url, html):
     return pdffile
 
 
-def format_inline_qr(data):
+def make_qrfile(data, **kwargs):
     qrfile = io.BytesIO()
     qr = segno.make_qr(data)
-    qr.save(qrfile, kind="svg", svgclass=None)
+    qr.save(qrfile, **kwargs)
     qrfile.seek(0)
+    return qrfile
+
+
+def format_inline_qr(data):
+    qrfile = make_qrfile(data, kind="svg", svgclass=None)
 
     root = etree.XML(qrfile.read())
     # Allow us to scale it with CSS
@@ -112,13 +117,7 @@ def format_inline_qr(data):
 
 
 def make_qr_png(url):
-    qrfile = io.BytesIO()
-
-    qr = segno.make_qr(url)
-    qr.save(qrfile, kind="png", scale=3)
-    qrfile.seek(0)
-
-    return qrfile
+    return make_qrfile(url, kind="png", scale=3)
 
 
 def format_inline_barcode(data):
