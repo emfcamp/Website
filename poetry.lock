@@ -1255,17 +1255,6 @@ version = "18.1.1"
 
 [[package]]
 category = "main"
-description = "QR Code image generator"
-name = "qrcode"
-optional = false
-python-versions = "*"
-version = "5.3"
-
-[package.dependencies]
-six = "*"
-
-[[package]]
-category = "main"
 description = "Alternative regular expression module, to replace re."
 name = "regex"
 optional = false
@@ -1594,7 +1583,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "contextlib2", "unittest2"]
 
 [metadata]
-content-hash = "e7fac21ade734a4c9079aea2f6ff962d7f5c76a4055b2cec379f9cb04e671da9"
+content-hash = "af8f74f8724668a7b15f604b6e9105795fb6c7a612b202c22edab6590b7ca8e7"
 python-versions = "~3.7"
 
 [metadata.files]
@@ -2240,10 +2229,6 @@ pyzmq = [
     {file = "pyzmq-18.1.1-pp271-pypy_41-macosx_10_15_x86_64.whl", hash = "sha256:e6549dd80de7b23b637f586217a4280facd14ac01e9410a037a13854a6977299"},
     {file = "pyzmq-18.1.1-pp371-pypy3_71-macosx_10_15_x86_64.whl", hash = "sha256:a6c9c42bbdba3f9c73aedbb7671815af1943ae8073e532c2b66efb72f39f4165"},
     {file = "pyzmq-18.1.1.tar.gz", hash = "sha256:8c69a6cbfa94da29a34f6b16193e7c15f5d3220cb772d6d17425ff3faa063a6d"},
-]
-qrcode = [
-    {file = "qrcode-5.3-py2.py3-none-any.whl", hash = "sha256:60222a612b83231ed99e6cb36e55311227c395d0d0f62e41bb51ebbb84a9a22b"},
-    {file = "qrcode-5.3.tar.gz", hash = "sha256:4115ccee832620df16b659d4653568331015c718a754855caf5930805d76924e"},
 ]
 regex = [
     {file = "regex-2020.1.8-cp27-cp27m-win32.whl", hash = "sha256:4e8f02d3d72ca94efc8396f8036c0d3bcc812aefc28ec70f35bb888c74a25161"},

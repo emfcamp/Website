@@ -30,7 +30,6 @@ wtforms = "~=2.2"
 flask-login = "~=0.4"
 flask-debugtoolbar = "*"
 gunicorn = "*"
-qrcode = "==5.3"
 pybarcode = {git = "https://github.com/emfcamp/python-barcode"}
 pillow = "*"
 icalendar = "==3.11.7"
