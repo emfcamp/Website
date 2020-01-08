@@ -111,10 +111,10 @@ def format_inline_qr(data):
     return Markup(etree.tostring(root).decode("utf-8"))
 
 
-def make_qr_png(*args, **kwargs):
+def make_qr_png(url):
     qrfile = io.BytesIO()
 
-    qr = qrcode.make(*args, **kwargs)
+    qr = qrcode.make(url, box_size=3)
     qr.save(qrfile, "PNG")
     qrfile.seek(0)
 

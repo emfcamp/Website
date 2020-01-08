@@ -207,7 +207,7 @@ def tickets_qrcode(checkin_code):
 
     url = app.config.get("CHECKIN_BASE") + checkin_code
 
-    qrfile = make_qr_png(url, box_size=3)
+    qrfile = make_qr_png(url)
     return send_file(qrfile, mimetype="image/png")
 
 
