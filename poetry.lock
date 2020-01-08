@@ -1292,6 +1292,14 @@ socks = ["PySocks (>=1.5.6,<1.5.7 || >1.5.7)", "win-inet-pton"]
 
 [[package]]
 category = "main"
+description = "QR Code and Micro QR Code generator for Python 2 and Python 3"
+name = "segno"
+optional = false
+python-versions = "*"
+version = "0.3.6"
+
+[[package]]
+category = "main"
 description = "Geometric objects, predicates, and operations"
 name = "shapely"
 optional = false
@@ -1586,7 +1594,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "contextlib2", "unittest2"]
 
 [metadata]
-content-hash = "808e4f056b80c6aa53b6b438cfa76ae33908a14866d3b639b22e9650ee64f991"
+content-hash = "e7fac21ade734a4c9079aea2f6ff962d7f5c76a4055b2cec379f9cb04e671da9"
 python-versions = "~3.7"
 
 [metadata.files]
@@ -2263,6 +2271,10 @@ regex = [
 requests = [
     {file = "requests-2.22.0-py2.py3-none-any.whl", hash = "sha256:9cf5292fcd0f598c671cfc1e0d7d1a7f13bb8085e9a590f48c010551dc6c4b31"},
     {file = "requests-2.22.0.tar.gz", hash = "sha256:11e007a8a2aa0323f5a921e9e6a2d7e4e67d9877e85773fba9ba6419025cbeb4"},
+]
+segno = [
+    {file = "segno-0.3.6-py2.py3-none-any.whl", hash = "sha256:70874273682e1e1cbd9cb51b49ac4b7878c85a833905e3453f0198633fe73622"},
+    {file = "segno-0.3.6.tar.gz", hash = "sha256:ea819094049b48fcc2b4a671c92ea626d4302092f9070e420761d3ed6ba38d01"},
 ]
 shapely = [
     {file = "Shapely-1.6.4.post2-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:3ca69d4b12e2b05b549465822744b6a3a1095d8488cc27b2728a06d3c07d0eee"},

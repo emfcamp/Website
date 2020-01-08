@@ -55,6 +55,7 @@ flask-cors = "*"
 flask-shell-ipython = "*"
 Flask-Static-Digest = "*"
 email_validator = "^1.0"
+segno = "^0.3.6"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
