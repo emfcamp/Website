@@ -80,7 +80,7 @@
 {% endmacro %}
 
 
-{% macro render_dl_field(field, class_='form-control') %}
+{% macro render_dl_field(field) %}
 {% if field.errors %}
     {# If we have help text, add an aria-describedby attribute to the field. #}
     {% do kwargs.update({'aria-describedby': "help-block-" + field.name}) %}
@@ -90,7 +90,34 @@
     {{ field.label.text }}
 </label></dt>
 <dd {%- if field.errors %} class="has-error" {%- endif %}>
-    {{ field(class_=class_, **kwargs) | safe }}
+    {{ field(class_='form-control', **kwargs) | safe }}
+    {% if field.errors %}
+        {% for error in field.errors %}
+            <p class="help-block" id="help-block-{{ field.name }}">{{ error }}</p>
+        {% endfor %}
+    {% endif %}
+</dd>
+
+{% endmacro %}
+
+
+{% macro render_radio_field(field) %}
+{% if field.errors %}
+    {# If we have help text, add an aria-describedby attribute to the field. #}
+    {% do kwargs.update({'aria-describedby': "help-block-" + field.name}) %}
+{% endif %}
+
+<dt><label for="{{ field.name }}" class="control-label">
+    {{ field.label.text }}
+</label></dt>
+<dd {%- if field.errors %} class="has-error" {%- endif %}>
+    <div class="btn-group-vertical" data-toggle="buttons">
+    {% for option in field %}
+        <label class="btn btn-primary{% if option.data == field.data %} active{% endif %}">
+            <input type="radio" name="{{ field.name }}" value="{{ option.data | int }}"{% if option.data == field.data %}checked{% endif %}>{{ option.label }}</input>
+        </label>
+    {% endfor %}
+    </div>
     {% if field.errors %}
         {% for error in field.errors %}
             <p class="help-block" id="help-block-{{ field.name }}">{{ error }}</p>
