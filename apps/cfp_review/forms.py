@@ -4,6 +4,7 @@ from wtforms import (
     StringField,
     FieldList,
     FormField,
+    RadioField,
     SelectField,
     TextAreaField,
     BooleanField,
@@ -46,7 +47,13 @@ class UpdateProposalForm(Form):
     departure_period = StringField("Departure time")
     telephone_number = StringField("Telephone")
     may_record = BooleanField("May record")
-    needs_laptop = BooleanField("Needs laptop")
+    needs_laptop = RadioField(
+        "Needs laptop",
+        choices=[
+            (True, "Needs to borrow a laptop for the talk"),
+            (False, "Is providing their own laptop"),
+        ]
+    )
     available_times = StringField("Available times")
 
     allowed_venues = StringField("Allowed Venues")
