@@ -59,7 +59,7 @@ class UpdateProposalForm(Form):
             (1, "Needs to borrow a laptop for the talk"),
         ],
         coerce=int,
-        validators=[InputRequired()]
+        validators=[InputRequired()],
     )
     available_times = StringField("Available times")
 
