@@ -52,7 +52,8 @@ class UpdateProposalForm(Form):
         choices=[
             (True, "Needs to borrow a laptop for the talk"),
             (False, "Is providing their own laptop"),
-        ]
+        ],
+        validators=[DataRequired()]
     )
     available_times = StringField("Available times")
 
