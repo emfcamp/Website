@@ -76,7 +76,7 @@
                 {{ render_dl_field(form.telephone_number) }}
                 {% if proposal.type == 'talk' %}
                     {{ render_dl_field(form.may_record) }}
-                    {{ render_dl_field(form.needs_laptop) }}
+                    {{ render_dl_field(form.needs_laptop, class_="") }}
                 {% endif %}
                 {{ render_dl_field(form.arrival_period) }}
                 {{ render_dl_field(form.departure_period) }}

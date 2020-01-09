@@ -80,7 +80,7 @@
 {% endmacro %}
 
 
-{% macro render_dl_field(field) %}
+{% macro render_dl_field(field, class_='form-control') %}
 {% if field.errors %}
     {# If we have help text, add an aria-describedby attribute to the field. #}
     {% do kwargs.update({'aria-describedby': "help-block-" + field.name}) %}
@@ -90,7 +90,7 @@
     {{ field.label.text }}
 </label></dt>
 <dd {%- if field.errors %} class="has-error" {%- endif %}>
-    {{ field(class_='form-control', **kwargs) | safe }}
+    {{ field(class_=class_, **kwargs) | safe }}
     {% if field.errors %}
         {% for error in field.errors %}
             <p class="help-block" id="help-block-{{ field.name }}">{{ error }}</p>
