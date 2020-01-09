@@ -11,7 +11,12 @@ from wtforms import (
     IntegerField,
     FloatField,
 )
-from wtforms.validators import DataRequired, NumberRange, ValidationError
+from wtforms.validators import (
+    DataRequired,
+    InputRequired,
+    NumberRange,
+    ValidationError,
+)
 
 from models.cfp import Venue
 from ..common.forms import Form, HiddenIntegerField
@@ -50,10 +55,11 @@ class UpdateProposalForm(Form):
     needs_laptop = RadioField(
         "Needs laptop",
         choices=[
-            (True, "Needs to borrow a laptop for the talk"),
-            (False, "Is providing their own laptop"),
+            (0, "Is providing their own laptop"),
+            (1, "Needs to borrow a laptop for the talk"),
         ],
-        validators=[DataRequired()]
+        coerce=int,
+        validators=[InputRequired()]
     )
     available_times = StringField("Available times")
 
