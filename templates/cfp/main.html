@@ -9,7 +9,7 @@
         href="https://wiki.emfcamp.org/wiki/Location">Eastnor
         Castle Deer Park</a>, Ledbury.</p>
 
-    <p>We're looking for talks, performances, installations, and workshops for
+    <p>We're looking for talks, performances, and workshops for
     all ages.  We're especially keen to hear from people with
       different backgrounds than you'd expect to find at a technology conference.</p>
 
@@ -47,7 +47,9 @@
         <a href="{{ url_for('cfp.form', cfp_type='workshop') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Workshop</strong> &ndash; A workshop in an area with tables &amp; other equipment</a>
         <a href="{{ url_for('cfp.form', cfp_type='youthworkshop') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Youth Workshop</strong> &ndash; A workshop for attendees under 13</a>
         <a href="{{ url_for('cfp.form', cfp_type='performance') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Performance</strong> &ndash; A performance of music, art, dance, or film</a>
+        {#
         <a href="{{ url_for('cfp.form', cfp_type='installation') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Installation</strong> &ndash; A creation for attendees to admire or interact with</a>
+        #}
     </div>
 
     {% if current_user.is_authenticated %}
