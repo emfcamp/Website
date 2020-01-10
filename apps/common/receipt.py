@@ -4,10 +4,9 @@ import asyncio
 
 from flask import Markup, render_template, current_app as app
 from pyppeteer.launcher import launch
-import qrcode
-from qrcode.image.svg import SvgPathImage
 import barcode
 from barcode.writer import ImageWriter, SVGWriter
+import segno
 
 from main import external_url
 from models import event_year
@@ -96,14 +95,20 @@ def render_pdf(url, html):
     return pdffile
 
 
-def format_inline_qr(data):
+def make_qrfile(data, **kwargs):
     qrfile = io.BytesIO()
-    qr = qrcode.make(data, image_factory=SvgPathImage)
-    qr.save(qrfile, "SVG")
+    qr = segno.make_qr(data)
+    qr.save(qrfile, **kwargs)
     qrfile.seek(0)
+    return qrfile
+
+
+def format_inline_qr(data):
+    qrfile = make_qrfile(data, kind="svg", svgclass=None)
 
     root = etree.XML(qrfile.read())
     # Allow us to scale it with CSS
+    root.attrib["viewBox"] = "0 0 %s %s" % (root.attrib["width"], root.attrib["height"])
     del root.attrib["width"]
     del root.attrib["height"]
     root.attrib["preserveAspectRatio"] = "none"
@@ -111,14 +116,8 @@ def format_inline_qr(data):
     return Markup(etree.tostring(root).decode("utf-8"))
 
 
-def make_qr_png(*args, **kwargs):
-    qrfile = io.BytesIO()
-
-    qr = qrcode.make(*args, **kwargs)
-    qr.save(qrfile, "PNG")
-    qrfile.seek(0)
-
-    return qrfile
+def make_qr_png(url):
+    return make_qrfile(url, kind="png", scale=3)
 
 
 def format_inline_barcode(data):
