@@ -10,7 +10,7 @@
 const gulp = require('gulp');
 const sourcemaps = require('gulp-sourcemaps');
 const rename = require('gulp-rename');
-const util = require('gulp-util');
+const minimist = require('minimist');
 const gulpif = require('gulp-if');
 const buffer = require('gulp-buffer');
 const tap = require('gulp-tap');
@@ -26,7 +26,8 @@ const postcssPresetEnv = require('postcss-preset-env');
 const sass = require('gulp-sass');
 const cleancss = require('gulp-clean-css');
 
-const production = !!util.env.production;
+const argv = minimist(process.argv.slice(2));
+const production = !!argv.production;
 
 function js(cb) {
   gulp
