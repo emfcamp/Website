@@ -65,8 +65,10 @@
       {% if cfp_type in ('talk', 'performance', 'workshop', 'youthworkshop') %}
         {% call render_field(form.requirements, horizontal=9,
                             placeholder="Additional equipment required, or anything else you want us to know") %}
-          {% if cfp_type in ('talk', 'performance', 'workshop', 'youthworkshop') %}
+          {% if cfp_type in ('talk', 'performance') %}
             We'll provide a sound system and projector or screen.
+          {% elif cfp_type in ('workshop', 'youthworkshop') %}
+            Please let us know if you need a sound system or projector.
           {% endif %}
         {% endcall %}
         {{ render_field(form.length, horizontal=9, placeholder="Your best guess, whether in minutes or days") }}

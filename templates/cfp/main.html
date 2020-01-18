@@ -17,8 +17,7 @@
       to electronics, blacksmithing to high-energy physics, reverse engineering
       to lock picking, computer security to crocheting, and quadcopters to brewing.
       If you're enthusiastic about it, we are too! You don't need to consider yourself a
-      professional or an expert to present: <strong>impostors are
-      welcome</strong>.</p>
+      professional or an expert to present.</p>
 
     <h3>Money</h3>
     <p>EMF is a non-profit community event, entirely run by unpaid volunteers. All of
@@ -29,11 +28,11 @@
         some budget to subsidise travel within the UK for those who could not otherwise afford
         it.</p>
 
-    <p>You will be guaranteed <strong>two</strong> tickets to EMF if your
-        proposal is accepted: one for you at a 33% discount, and one for a friend or partner at full
-        price. If you only wish to attend for the day of your talk, we can offer you a free day
-        ticket.
-    </p>
+    <p>You will be guaranteed <strong>two</strong> adult tickets to EMF if your
+    proposal is accepted: one for you at a 33% discount, and one for a friend
+    or partner at full price. You are also guaranteed as many child tickets as
+    you need. If you only wish to attend for the day of your talk, we can offer
+    you a free day ticket.</p>
 
     <h3>Selection</h3>
     <p>After you submit a proposal, it will be considered by a diverse
@@ -47,6 +46,7 @@
         <a href="{{ url_for('cfp.form', cfp_type='workshop') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Workshop</strong> &ndash; A workshop in an area with tables &amp; other equipment</a>
         <a href="{{ url_for('cfp.form', cfp_type='youthworkshop') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Youth Workshop</strong> &ndash; A workshop for attendees under 13</a>
         <a href="{{ url_for('cfp.form', cfp_type='performance') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Performance</strong> &ndash; A performance of music, art, dance, or film</a>
+        <span class="list-group-item"><strong>Installation</strong> &ndash; The CFP for installations will open soon</span>
         {#
         <a href="{{ url_for('cfp.form', cfp_type='installation') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Installation</strong> &ndash; A creation for attendees to admire or interact with</a>
         #}

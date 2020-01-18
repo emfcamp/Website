@@ -38,6 +38,7 @@ class UpdateProposalForm(Form):
             ("1 week", "1 week"),
             ("1 month", "1 month"),
             ("> 1 month", "Longer than 1 month"),
+            ("> 3 months", "Longer than 3 months"),
         ],
     )
     needs_help = BooleanField("Needs Help")
