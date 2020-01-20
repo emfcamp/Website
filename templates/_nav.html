@@ -37,11 +37,9 @@
                 </li>
             {% endif %}
             {% if feature_enabled('CFP') and not feature_enabled('CFP_CLOSED') %}
-            {#
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('cfp.main') }}">Call for Participation</a>
                 </li>
-              #}
             {% endif %}
             {% if feature_enabled('LINE_UP') or feature_enabled('SCHEDULE') %}
                 <li role="presentation">
