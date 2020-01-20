@@ -159,7 +159,7 @@ def form(cfp_type="talk"):
 
     ignore_closed = "closed" in request.args
 
-    if app.config.get("CFP_CLOSED") and not ignore_closed:
+    if feature_enabled("CFP_CLOSED") and not ignore_closed:
         return render_template("cfp/closed.html", cfp_type=cfp_type)
 
     # If the user is already logged in set their name & email for the form
