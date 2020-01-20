@@ -160,25 +160,31 @@ class AddProductViewProductForm(Form):
     add_product = SubmitField("Add product")
 
 
-class NewVoucherForm(Form):
-    voucher = StringField(
-        "Voucher code (Optional)", [Optional()]
-    )  # Maybe auto-generated
+class VoucherForm(Form):
     expires = DateField("Expiry Date", default=datetime.now() + timedelta(days=30))
     num_purchases = IntegerField("Max Purchases", [InputRequired()], default=1)
     num_tickets = IntegerField("Max Adult Tickets", [InputRequired()], default=2)
+
+
+class NewVoucherForm(VoucherForm):
+    voucher = StringField(
+        "Voucher code (Optional)", [Optional()]
+    )  # Maybe auto-generated
     create = SubmitField("Create")
 
 
-class EditVoucherForm(Form):
-    expiry = DateField("Expiry Date")
+class EditVoucherForm(VoucherForm):
     submit = SubmitField("Save")
 
     def init_with_voucher(self, voucher):
-        self.expiry.data = voucher.expiry
+        self.expires.data = voucher.expiry
+        self.num_purchases.data = voucher.purchases_remaining
+        self.num_tickets.data = voucher.tickets_remaining
 
     def update_voucher(self, voucher):
-        voucher.expiry = self.expiry.data
+        voucher.expiry = self.expires.data
+        voucher.purchases_remaining = self.num_purchases.data
+        voucher.tickets_remaining = self.num_tickets.data
 
 
 class BulkVoucherEmailForm(Form):
