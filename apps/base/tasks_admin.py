@@ -50,6 +50,7 @@ def create_perms():
     for permission in (
         "admin",
         "arrivals",
+        "cfp_admin",
         "cfp_reviewer",
         "cfp_anonymiser",
         "cfp_schedule",
