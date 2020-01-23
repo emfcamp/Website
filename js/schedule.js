@@ -1,4 +1,6 @@
+import React from 'react';
 
+let Thing = <h1>Hello</h1>;
 var emf_scheduler = {};
 function init_emf_scheduler(schedule_data, venues, is_anonymous){
     'use strict';

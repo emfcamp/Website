@@ -39,6 +39,7 @@
     "gulp-tap": "^2.0.0",
     "gulp-uglify": "^3.0.2",
     "gulplog": "^1.0.0",
+    "jsx-transform": "^2.4.0",
     "minimist": "^1.2.0",
     "node-sass": "^4.13.0",
     "postcss-easy-import": "^3.0.0",
@@ -49,6 +50,8 @@
     "@primer/octicons": "^9.2.0",
     "bootstrap": "^3.4.1",
     "bootstrap-sass": "^3.4.1",
-    "jquery": "^3.4.1"
+    "jquery": "^3.4.1",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0"
   }
 }
