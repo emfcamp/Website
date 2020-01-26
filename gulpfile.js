@@ -18,7 +18,6 @@ const log = require('gulplog');
 
 // JS processors
 const browserify = require('browserify');
-const jsxify = require('jsx-transform').browserifyTransform;
 const uglify = require('gulp-uglify');
 
 // CSS processors
@@ -42,8 +41,7 @@ function js(cb) {
       tap(function(file) {
         log.info('Bundling ' + file.path);
         file.contents = browserify(file.path, {debug: true})
-          .transform(jsxify, { factory: "React.createElement" })
-          .transform('babelify', {presets: ['@babel/env']})
+          .transform('babelify', {presets: ['@babel/env', '@babel/preset-react']})
           .bundle();
       }),
     )
@@ -91,7 +89,7 @@ function images(cb) {
 
 function watch() {
   gulp.watch('css/*.scss', {ignoreInitial: false}, css);
-  gulp.watch('js/*.js', {ignoreInitial: false}, js);
+  gulp.watch('js/**/*.js', {ignoreInitial: false}, js);
   gulp.watch(
     ['./node_modules/@primer/octicons/build/svg/**/*.svg', './images/**/*'],
     {ignoreInitial: false},

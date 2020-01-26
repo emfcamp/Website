@@ -24,6 +24,7 @@
   "devDependencies": {
     "@babel/core": "^7.7.2",
     "@babel/preset-env": "^7.7.1",
+    "@babel/preset-react": "^7.8.3",
     "autoprefixer": "^9.7.1",
     "babelify": "^10.0.0",
     "browserify": "^16.5.0",
@@ -39,7 +40,6 @@
     "gulp-tap": "^2.0.0",
     "gulp-uglify": "^3.0.2",
     "gulplog": "^1.0.0",
-    "jsx-transform": "^2.4.0",
     "minimist": "^1.2.0",
     "node-sass": "^4.13.0",
     "postcss-easy-import": "^3.0.0",
