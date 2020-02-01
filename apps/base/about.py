@@ -56,9 +56,11 @@ def company():
 def volunteering():
     return render_template("about/volunteering.html")
 
+
 @base.route("/about/what_to_bring")
 def what_to_bring():
     return render_template("about/what-to-bring.html")
+
 
 @base.route("/about/food")
 def food():
