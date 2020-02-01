@@ -12,6 +12,8 @@ docker-compose -f ./docker-compose.prod.yml exec app poetry run make data
 
 # To update
 
+First, make sure the [build has completed successfully](https://github.com/emfcamp/Website/actions).
+
 As root:
 ```
 /root/deploy.sh
