@@ -30,45 +30,30 @@ function Checkbox({ checked, onChange, children }) {
   );
 }
 
-function VenueSelector({ venues, selectedVenues, onChange }) {
-  function venueToggled(name, value) {
+function CheckboxGroup({ options, labels, selectedOptions, onChange, children }) {
+  if (labels === undefined) {
+    labels = options;
+  }
+
+  function toggle(option, value) {
     if (value) {
-      onChange([...selectedVenues, name]);
+      onChange([...options, option]);
     } else {
-      onChange(selectedVenues.filter(v => v !== name));
+      onChange(selectedOptions.filter(o => o !== option));
     }
   }
 
-  function selectOfficialVenues(ev) {
-    ev.preventDefault();
-    onChange(venues.filter(v => v.official).map(v => v.name));
-  }
-
-  function selectAll(ev) {
-    ev.preventDefault();
-    onChange([...venues.map(v => v.name)]);
-  }
-
-  function selectNone(ev) {
-    ev.preventDefault();
-    onChange([]);
-  }
-
   function checkboxes() {
-    return venues.map(venue => {
-      return <Checkbox checked={ selectedVenues.indexOf(venue.name) !== -1 } key={ venue.name } onChange={ value => venueToggled(venue.name, value) }>{ venue.name }</Checkbox>;
+    return options.map((option, index) => {
+      return <Checkbox checked={ selectedOptions.indexOf(option) !== -1 } key={ option } onChange={ value => toggle(option, value) }>{ labels[index] }</Checkbox>;
     });
   }
 
   return (
-    <>
-      <p>
-        <a href="#" onClick={ selectOfficialVenues }>Official Venues Only</a> | <a href="#" onClick={ selectAll }>Select All</a> | <a href="#" onClick={ selectNone }>Select None</a>
-      </p>
-      <div className="form-group form-inline">
-        { checkboxes() }
-      </div>
-    </>
+    <div className="form-group form-inline">
+      { children }
+      { checkboxes() }
+    </div>
   );
 }
 
@@ -107,6 +92,7 @@ function App() {
   const [abbreviateTitles, setAbbreviateTitles] = useState(false);
   const [currentTime, setCurrentTime] = useState(DateTime.fromSQL('2018-08-31 09:00:00').setZone('Europe/London'));
   const [selectedVenues, setSelectedVenues] = useState([]);
+  const [selectedEventTypes, setSelectedEventTypes] = useState([]);
 
   const [rawSchedule, setRawSchedule] = useState(null);
   const [schedule, setSchedule] = useState(null);
@@ -120,7 +106,9 @@ function App() {
 
         let newSchedule = new ScheduleData(body, { currentTime });
         setSchedule(newSchedule);
+
         setSelectedVenues(newSchedule.venues.map(v => v.name));
+        setSelectedEventTypes([...newSchedule.eventTypes.map(t => t.id)]);
       });
   }, [year]);
 
@@ -128,9 +116,10 @@ function App() {
   useEffect(() => {
     if (rawSchedule == null) { return };
 
-    let newSchedule = new ScheduleData(rawSchedule, { currentTime, selectedVenues });
+    console.log(selectedEventTypes);
+    let newSchedule = new ScheduleData(rawSchedule, { currentTime, selectedVenues, selectedEventTypes });
     setSchedule(newSchedule);
-  }, [currentTime, selectedVenues]);
+  }, [currentTime, selectedVenues, selectedEventTypes]);
 
   if (schedule === null) {
     return <p>Loading...</p>;
@@ -144,11 +133,57 @@ function App() {
     setCurrentTime(newValue);
   }
 
+
+  function selectOfficialVenues(ev) {
+    ev.preventDefault();
+    setSelectedVenues(schedule.venues.filter(v => v.official).map(v => v.name));
+  }
+
+  function selectAllVenues(ev) {
+    ev.preventDefault();
+    setSelectedVenues([...schedule.venues.map(v => v.name)]);
+  }
+
+  function selectNoVenues(ev) {
+    ev.preventDefault();
+    setSelectedVenues([]);
+  }
+
+  function selectAllEventTypes(ev) {
+    ev.preventDefault();
+    setSelectedEventTypes([...schedule.eventTypes.map(t => t.id)]);
+  }
+
+  function selectNoEventTypes(ev) {
+    ev.preventDefault();
+    setSelectedEventTypes([]);
+  }
+
   return (
     <>
       <h1>Schedule</h1>
       <h3>Venues</h3>
-      <VenueSelector venues={ schedule.venues } selectedVenues={ selectedVenues } onChange={ setSelectedVenues } />
+      <CheckboxGroup
+        options={ schedule.venues.map(v => v.name) }
+        selectedOptions={ selectedVenues }
+        onChange={ setSelectedVenues }>
+
+        <p>
+          <a href="#" onClick={ selectOfficialVenues }>Official Venues Only</a> | <a href="#" onClick={ selectAllVenues }>Select All</a> | <a href="#" onClick={ selectNoVenues }>Select None</a>
+        </p>
+      </CheckboxGroup>
+
+      <h3>Event Types</h3>
+      <CheckboxGroup
+        options={ schedule.eventTypes.map(t => t.id) }
+        selectedOptions={ selectedEventTypes }
+        labels={ schedule.eventTypes.map(t => t.name) }
+        onChange={ setSelectedEventTypes }>
+
+        <p>
+          <a href="#" onClick={ selectAllEventTypes }>Select All</a> | <a href="#" onClick={ selectNoEventTypes }>Select None</a>
+        </p>
+      </CheckboxGroup>
 
       <div className="form-group form-inline">
         <label htmlFor="scheduleYear">Year:</label>

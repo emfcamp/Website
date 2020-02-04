@@ -6,8 +6,12 @@ class ScheduleData {
     this.options = options;
     this.hoursWithContent = [];
     this.scheduleByHour = {};
+
     this.venues = [];
     this.venuesSeen = new Set();
+
+    this.eventTypes = [];
+    this.eventTypesSeen = new Set();
 
     this.rawSchedule.forEach(row => {
       let e = this.parseEvent(row);
@@ -15,14 +19,11 @@ class ScheduleData {
       if (e.endTime <= options.currentTime) { return null; }
 
       this.addVenue(e.venue, e.officialEvent);
-      this.venues = this.venues.sort((a,b) => {
-        if (a.official && !b.official) { return -1; }
-        if (!a.official && b.official) { return 1; }
 
-        return a.name.localeCompare(b.name);
-      });
+      this.addEventType(e.type);
 
       if (options.selectedVenues && options.selectedVenues.indexOf(e.venue) === -1) { return null; }
+      if (options.selectedEventTypes && options.selectedEventTypes.indexOf(e.type) === -1) { return null; }
 
       let startHour = e.startTime.startOf('hour');
       if (e.startTime <= options.currentTime) {
@@ -37,6 +38,15 @@ class ScheduleData {
       this.scheduleByHour[isoHour].push(e);
     });
 
+    this.venues = this.venues.sort((a,b) => {
+      if (a.official && !b.official) { return -1; }
+      if (!a.official && b.official) { return 1; }
+
+      return a.name.localeCompare(b.name);
+    });
+
+    this.eventTypes = this.eventTypes.sort((a,b) => a.name.localeCompare(b.name));
+
     Object.keys(this.scheduleByHour).forEach(hour => {
       this.scheduleByHour[hour] = this.scheduleByHour[hour].sort((a,b) => a.start_date.localeCompare(b.start_date));
     });
@@ -49,6 +59,20 @@ class ScheduleData {
 
     this.venuesSeen.add(name);
     this.venues.push({ name: name, official: official });
+  }
+
+  addEventType(type) {
+    if (this.eventTypesSeen.has(type)) { return null; }
+
+    let name = type;
+    if (type === 'youthworkshop') {
+      name = 'Youth Workshop'
+    } else {
+      name = name.charAt(0).toUpperCase() + name.slice(1);
+    };
+
+    this.eventTypesSeen.add(type);
+    this.eventTypes.push({ id: type, name });
   }
 
   contentForHour(hour) {
