@@ -49,7 +49,7 @@ function CheckboxGroup({ options, labels, selectedOptions, onChange, children, f
 
   function toggle(option, value) {
     if (value) {
-      onChange([...options, option]);
+      onChange([...selectedOptions, option]);
     } else {
       onChange(selectedOptions.filter(o => o !== option));
     }
