@@ -1,95 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { DateTime } from 'luxon';
+import { Checkbox, CheckboxGroup, DateTimePicker } from './Controls.js';
 import ScheduleData from './ScheduleData.js';
 
-function DateTimePicker({ value, onChange }) {
-  let date = value.toISODate();
-  let time = value.toFormat('HH:mm');
-
-  function dateChanged(ev) {
-    let newValue = DateTime.fromISO(`${ev.target.value}T${time}`)
-    onChange(newValue);
-  }
-
-  function timeChanged(ev) {
-    let newValue = DateTime.fromISO(`${date}T${ev.target.value}`)
-    onChange(newValue);
-  }
-
-  return (
-    <>
-      <input type="date" value={date} onChange={dateChanged} />
-      <input type="time" value={time} onChange={timeChanged} />
-    </>
-  );
-}
-
-function Checkbox({ checked, onChange, children }) {
-  return (
-    <label className="checkbox"><input type="checkbox" checked={checked} onChange={ ev => onChange(ev.target.checked) } /> { children }</label>
-  );
-}
-
-function CheckboxGroup({ options, labels, selectedOptions, onChange, children }) {
-  if (labels === undefined) {
-    labels = options;
-  }
-
-  function toggle(option, value) {
-    if (value) {
-      onChange([...options, option]);
-    } else {
-      onChange(selectedOptions.filter(o => o !== option));
-    }
-  }
-
-  function checkboxes() {
-    return options.map((option, index) => {
-      return <Checkbox checked={ selectedOptions.indexOf(option) !== -1 } key={ option } onChange={ value => toggle(option, value) }>{ labels[index] }</Checkbox>;
-    });
-  }
-
-  return (
-    <div className="form-group form-inline">
-      { children }
-      { checkboxes() }
-    </div>
-  );
-}
-
-function Event({ event, abbreviateTitles }) {
+function Event({ event }) {
   return (
     <div className="schedule-event">
-      <h3 title={ event.title } className={ abbreviateTitles ? 'abbreviate-titles' : null }>{ event.title }</h3>
+      <h3 title={ event.title }>{ event.title }</h3>
       <p>{ event.startTime.toFormat('HH:mm') } to { event.endTime.toFormat('HH:mm') } | { event.venue }</p>
     </div>
   );
 }
 
-function Hour({ hour, content, abbreviateTitles }) {
+function Hour({ hour, content }) {
   if (content.length === 0) { return null; }
 
   return (
     <div className="schedule-hour">
       <h2>{hour.toFormat('HH:mm')}</h2>
       <div className="schedule-events-container">
-        { content.map(event => <Event key={event.id} event={event} abbreviateTitles={abbreviateTitles} />) }
+        { content.map(event => <Event key={event.id} event={event} />) }
       </div>
     </div>
   );
 }
 
-function Calendar({ schedule, abbreviateTitles }) {
+function Calendar({ schedule }) {
   return schedule.hoursWithContent.map(hour => {
     return (
-      <Hour key={hour.toISO()} hour={hour} content={schedule.contentForHour(hour)} abbreviateTitles={abbreviateTitles} />
+      <Hour key={hour.toISO()} hour={hour} content={schedule.contentForHour(hour)} />
     );
   });
 }
 
 function App() {
   const [year, setYear] = useState(2018);
-  const [abbreviateTitles, setAbbreviateTitles] = useState(false);
   const [currentTime, setCurrentTime] = useState(DateTime.fromSQL('2018-08-31 09:00:00').setZone('Europe/London'));
   const [selectedVenues, setSelectedVenues] = useState([]);
   const [selectedEventTypes, setSelectedEventTypes] = useState([]);
@@ -102,7 +47,7 @@ function App() {
     fetch(`/schedule/${year}.json`)
       .then(response => response.json())
       .then(body => {
-        setRawSchedule(body)
+        setRawSchedule(body);
 
         let newSchedule = new ScheduleData(body, { currentTime });
         setSchedule(newSchedule);
@@ -116,47 +61,21 @@ function App() {
   useEffect(() => {
     if (rawSchedule == null) { return };
 
-    console.log(selectedEventTypes);
     let newSchedule = new ScheduleData(rawSchedule, { currentTime, selectedVenues, selectedEventTypes });
     setSchedule(newSchedule);
   }, [currentTime, selectedVenues, selectedEventTypes]);
-
-  if (schedule === null) {
-    return <p>Loading...</p>;
-  }
-
-  function yearChanged(ev) {
-    setYear(ev.target.value);
-  }
-
-  function currentTimeChanged(newValue) {
-    setCurrentTime(newValue);
-  }
-
 
   function selectOfficialVenues(ev) {
     ev.preventDefault();
     setSelectedVenues(schedule.venues.filter(v => v.official).map(v => v.name));
   }
 
-  function selectAllVenues(ev) {
-    ev.preventDefault();
-    setSelectedVenues([...schedule.venues.map(v => v.name)]);
-  }
+  let venueFilters = [
+    { name: 'Official Venues Only', callback: selectOfficialVenues }
+  ];
 
-  function selectNoVenues(ev) {
-    ev.preventDefault();
-    setSelectedVenues([]);
-  }
-
-  function selectAllEventTypes(ev) {
-    ev.preventDefault();
-    setSelectedEventTypes([...schedule.eventTypes.map(t => t.id)]);
-  }
-
-  function selectNoEventTypes(ev) {
-    ev.preventDefault();
-    setSelectedEventTypes([]);
+  if (schedule === null) {
+    return <p>Loading...</p>;
   }
 
   return (
@@ -166,28 +85,19 @@ function App() {
       <CheckboxGroup
         options={ schedule.venues.map(v => v.name) }
         selectedOptions={ selectedVenues }
-        onChange={ setSelectedVenues }>
-
-        <p>
-          <a href="#" onClick={ selectOfficialVenues }>Official Venues Only</a> | <a href="#" onClick={ selectAllVenues }>Select All</a> | <a href="#" onClick={ selectNoVenues }>Select None</a>
-        </p>
-      </CheckboxGroup>
+        onChange={ setSelectedVenues }
+        filters={ venueFilters } />
 
       <h3>Event Types</h3>
       <CheckboxGroup
         options={ schedule.eventTypes.map(t => t.id) }
         selectedOptions={ selectedEventTypes }
         labels={ schedule.eventTypes.map(t => t.name) }
-        onChange={ setSelectedEventTypes }>
-
-        <p>
-          <a href="#" onClick={ selectAllEventTypes }>Select All</a> | <a href="#" onClick={ selectNoEventTypes }>Select None</a>
-        </p>
-      </CheckboxGroup>
+        onChange={ setSelectedEventTypes } />
 
       <div className="form-group form-inline">
         <label htmlFor="scheduleYear">Year:</label>
-        <select onChange={yearChanged} id="scheduleYear" value={year} className="form-control">
+        <select onChange={ ev => setYear(ev.target.value) } id="scheduleYear" value={year} className="form-control">
           <option>2012</option>
           <option>2014</option>
           <option>2016</option>
@@ -195,12 +105,10 @@ function App() {
         </select>
       </div>
 
-      <div className="form-group form-inline">
-        <Checkbox checked={ abbreviateTitles } onChange={ setAbbreviateTitles }>Abbreviate titles</Checkbox>
-      </div>
+      <h3>Debug Nonsense</h3>
       <p>
         <label>Current time:</label>
-        <DateTimePicker value={currentTime} onChange={currentTimeChanged} />
+        <DateTimePicker value={currentTime} onChange={setCurrentTime} />
       </p>
 
       <Calendar schedule={ schedule } />
