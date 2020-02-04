@@ -70,7 +70,7 @@ function CheckboxGroup({ options, labels, selectedOptions, onChange, children, f
   return (
     <div className="form-group form-inline">
       <p>
-        { filters.map(f => <a href="#" onClick={ f.callback }>{ f.name }</a>) }
+        { filters.map(f => <a className="checkbox-filter" href="#" key={ f.name } onClick={ f.callback }>{ f.name }</a>) }
       </p>
       { checkboxes() }
     </div>
