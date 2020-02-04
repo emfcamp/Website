@@ -1,5 +1,10 @@
 @import "./_variables.scss";
 
+.form-inline .checkbox {
+  margin-right: 0.75em;
+  margin-bottom: 0.5em;
+}
+
 .schedule-events-container {
   display: flex;
   flex-wrap: wrap;
