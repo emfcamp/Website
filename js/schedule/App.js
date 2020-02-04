@@ -81,6 +81,7 @@ function App() {
   return (
     <>
       <h1>Schedule</h1>
+
       <h3>Venues</h3>
       <CheckboxGroup
         options={ schedule.venues.map(v => v.name) }
@@ -95,6 +96,7 @@ function App() {
         labels={ schedule.eventTypes.map(t => t.name) }
         onChange={ setSelectedEventTypes } />
 
+      <h3>Debug Nonsense</h3>
       <div className="form-group form-inline">
         <label htmlFor="scheduleYear">Year:</label>
         <select onChange={ ev => setYear(ev.target.value) } id="scheduleYear" value={year} className="form-control">
@@ -104,8 +106,6 @@ function App() {
           <option>2018</option>
         </select>
       </div>
-
-      <h3>Debug Nonsense</h3>
       <p>
         <label>Current time:</label>
         <DateTimePicker value={currentTime} onChange={setCurrentTime} />
