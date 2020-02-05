@@ -1,5 +1,13 @@
 @import "./_variables.scss";
 
+.filters {
+  h3 {
+    color: black;
+    margin-top: 0;
+    font-size: 1.2em;
+  }
+}
+
 .form-inline .checkbox {
   margin-right: 0.75em;
   margin-bottom: 0.5em;

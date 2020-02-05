@@ -82,38 +82,46 @@ function App() {
     <>
       <h1>Schedule</h1>
 
-      <h3>Venues</h3>
-      <CheckboxGroup
-        options={ schedule.venues.map(v => v.name) }
-        selectedOptions={ selectedVenues }
-        onChange={ setSelectedVenues }
-        filters={ venueFilters } />
+      <div className="panel panel-default filters">
+        <div className="panel-heading">
+          <h2 className="panel-title">Filtering options</h2>
+        </div>
 
-      <h3>Event Types</h3>
-      <CheckboxGroup
-        options={ schedule.eventTypes.map(t => t.id) }
-        selectedOptions={ selectedEventTypes }
-        labels={ schedule.eventTypes.map(t => t.name) }
-        onChange={ setSelectedEventTypes } />
+        <div className="panel-body">
+          <h3>Venues</h3>
+          <CheckboxGroup
+            options={ schedule.venues.map(v => v.name) }
+            selectedOptions={ selectedVenues }
+            onChange={ setSelectedVenues }
+            filters={ venueFilters } />
 
-      <h3>Debug Nonsense</h3>
-      <div className="form-group form-inline">
-        <label htmlFor="scheduleYear">Year:</label>
-        <select onChange={ ev => setYear(ev.target.value) } id="scheduleYear" value={year} className="form-control">
-          <option>2012</option>
-          <option>2014</option>
-          <option>2016</option>
-          <option>2018</option>
-        </select>
+          <h3>Event Types</h3>
+          <CheckboxGroup
+            options={ schedule.eventTypes.map(t => t.id) }
+            selectedOptions={ selectedEventTypes }
+            labels={ schedule.eventTypes.map(t => t.name) }
+            onChange={ setSelectedEventTypes } />
+
+          <h3>Debug Nonsense</h3>
+          <div className="form-group form-inline">
+            <label htmlFor="scheduleYear">Year:</label>
+            <select onChange={ ev => setYear(ev.target.value) } id="scheduleYear" value={year} className="form-control">
+              <option>2012</option>
+              <option>2014</option>
+              <option>2016</option>
+              <option>2018</option>
+            </select>
+          </div>
+          <p>
+            <label>Current time:</label>
+            <DateTimePicker value={currentTime} onChange={setCurrentTime} />
+          </p>
+        </div>
       </div>
-      <p>
-        <label>Current time:</label>
-        <DateTimePicker value={currentTime} onChange={setCurrentTime} />
-      </p>
 
       <Calendar schedule={ schedule } />
     </>
-  )
+  );
 }
 
 export default App;
