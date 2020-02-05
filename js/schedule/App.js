@@ -47,8 +47,6 @@ function App() {
 
   return (
     <>
-      <h1>Schedule</h1>
-
       <Filters {...filterProps} />
       <Calendar schedule={ schedule } />
     </>
