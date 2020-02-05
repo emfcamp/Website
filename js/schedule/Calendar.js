@@ -20,7 +20,7 @@ function Hour({ hour, content, newDay }) {
 
   return (
     <div className="schedule-hour">
-      <h3>{ newDay && `${hour.toFormat('DD')} - ` }{hour.toFormat('HH:mm')}</h3>
+      <h2>{ newDay && `${hour.toFormat('DD')} - ` }{hour.toFormat('HH:mm')}</h2>
       <div className="schedule-events-container">
         { content.map(event => <Event key={event.id} event={event} />) }
       </div>

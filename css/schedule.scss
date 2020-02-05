@@ -54,3 +54,17 @@
     padding-bottom: 0;
   }
 }
+
+@media(max-width: 550px) {
+  .schedule-event {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .form-inline .checkbox input {
+    position: static;
+    margin-left: 0;
+    margin-right: 0em;
+    margin-bottom: 0.5em;
+  }
+}
