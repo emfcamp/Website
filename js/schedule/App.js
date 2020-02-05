@@ -4,10 +4,16 @@ import { Checkbox, CheckboxGroup, DateTimePicker } from './Controls.js';
 import ScheduleData from './ScheduleData.js';
 
 function Event({ event }) {
+  let metadata = [
+    `${event.startTime.toFormat('HH:mm')} to ${event.endTime.toFormat('HH:mm')}`,
+    event.venue,
+    event.speaker,
+  ].filter(i => { return i !== null && i !== '' }).join(' | ');
+
   return (
     <div className="schedule-event">
       <h3 title={ event.title }>{ event.title }</h3>
-      <p>{ event.startTime.toFormat('HH:mm') } to { event.endTime.toFormat('HH:mm') } | { event.venue }</p>
+      <p>{ metadata }</p>
     </div>
   );
 }
