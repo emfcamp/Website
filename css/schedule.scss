@@ -6,6 +6,11 @@
     margin-top: 0;
     font-size: 1.2em;
   }
+
+  .panel-title {
+    display: flex;
+    justify-content: space-between;
+  }
 }
 
 .form-inline .checkbox {

@@ -18,12 +18,12 @@ function Event({ event }) {
   );
 }
 
-function Hour({ hour, content }) {
+function Hour({ hour, content, newDay }) {
   if (content.length === 0) { return null; }
 
   return (
     <div className="schedule-hour">
-      <h2>{hour.toFormat('HH:mm')}</h2>
+      <h3>{ newDay && `${hour.toFormat('DD')} - ` }{hour.toFormat('HH:mm')}</h3>
       <div className="schedule-events-container">
         { content.map(event => <Event key={event.id} event={event} />) }
       </div>
@@ -32,25 +32,84 @@ function Hour({ hour, content }) {
 }
 
 function Calendar({ schedule }) {
+  let currentDay = null;
+  let previousDay = null;
+  let newDay = false;
+
   return schedule.hoursWithContent.map(hour => {
+    currentDay = hour.toFormat('DD');
+    newDay = currentDay != previousDay;
+    previousDay = currentDay;
+
     return (
-      <Hour key={hour.toISO()} hour={hour} content={schedule.contentForHour(hour)} />
+      <Hour key={hour.toISO()} hour={hour} newDay={ newDay } content={schedule.contentForHour(hour)} />
     );
   });
 }
 
+function Filters({ schedule, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, currentTime, setCurrentTime }) {
+  const [visible, setVisible] = useState(false);
+
+  function selectOfficialVenues(ev) {
+    ev.preventDefault();
+    setSelectedVenues(schedule.venues.filter(v => v.official).map(v => v.name));
+  }
+
+  function renderBody() {
+    let venueFilters = [
+      { name: 'Official Venues Only', callback: selectOfficialVenues }
+    ];
+
+    return (
+      <div className="panel-body">
+        <h3>Venues</h3>
+        <CheckboxGroup
+          options={ schedule.venues.map(v => v.name) }
+          selectedOptions={ selectedVenues }
+          onChange={ setSelectedVenues }
+          filters={ venueFilters } />
+
+        <h3>Event Types</h3>
+        <CheckboxGroup
+          options={ schedule.eventTypes.map(t => t.id) }
+          selectedOptions={ selectedEventTypes }
+          labels={ schedule.eventTypes.map(t => t.name) }
+          onChange={ setSelectedEventTypes } />
+
+          <h3>Debug Nonsense</h3>
+          <p>
+            <label>Current time:</label>
+            <DateTimePicker value={currentTime} onChange={setCurrentTime} />
+          </p>
+        </div>
+    );
+  }
+
+  return (
+    <div className="panel panel-default filters">
+      <div className="panel-heading">
+        <h2 className="panel-title">
+          <span className="title">Filtering options</span>
+          <span className="toggle"><a href="#" onClick={ (ev) => { ev.preventDefault(); setVisible(!visible) } }>{ visible ? 'Hide' : 'Show' }</a></span>
+        </h2>
+      </div>
+
+      { visible && renderBody() }
+    </div>
+  );
+}
+
 function App() {
-  const [year, setYear] = useState(2018);
   const [currentTime, setCurrentTime] = useState(DateTime.fromSQL('2018-08-31 09:00:00').setZone('Europe/London'));
   const [selectedVenues, setSelectedVenues] = useState([]);
-  const [selectedEventTypes, setSelectedEventTypes] = useState([]);
+  const [selectedEventTypes, setSelectedEventTypes] = useState([])
 
   const [rawSchedule, setRawSchedule] = useState(null);
   const [schedule, setSchedule] = useState(null);
 
   // Pull the correct year's schedule if the year changes.
   useEffect(() => {
-    fetch(`/schedule/${year}.json`)
+    fetch(`/schedule/2018.json`)
       .then(response => response.json())
       .then(body => {
         setRawSchedule(body);
@@ -61,7 +120,7 @@ function App() {
         setSelectedVenues(newSchedule.venues.map(v => v.name));
         setSelectedEventTypes([...newSchedule.eventTypes.map(t => t.id)]);
       });
-  }, [year]);
+  }, []);
 
   // Refilter the schedule if options change.
   useEffect(() => {
@@ -71,60 +130,19 @@ function App() {
     setSchedule(newSchedule);
   }, [currentTime, selectedVenues, selectedEventTypes]);
 
-  function selectOfficialVenues(ev) {
-    ev.preventDefault();
-    setSelectedVenues(schedule.venues.filter(v => v.official).map(v => v.name));
-  }
-
-  let venueFilters = [
-    { name: 'Official Venues Only', callback: selectOfficialVenues }
-  ];
-
   if (schedule === null) {
     return <p>Loading...</p>;
+  }
+
+  let filterProps = {
+    schedule, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, currentTime, setCurrentTime
   }
 
   return (
     <>
       <h1>Schedule</h1>
 
-      <div className="panel panel-default filters">
-        <div className="panel-heading">
-          <h2 className="panel-title">Filtering options</h2>
-        </div>
-
-        <div className="panel-body">
-          <h3>Venues</h3>
-          <CheckboxGroup
-            options={ schedule.venues.map(v => v.name) }
-            selectedOptions={ selectedVenues }
-            onChange={ setSelectedVenues }
-            filters={ venueFilters } />
-
-          <h3>Event Types</h3>
-          <CheckboxGroup
-            options={ schedule.eventTypes.map(t => t.id) }
-            selectedOptions={ selectedEventTypes }
-            labels={ schedule.eventTypes.map(t => t.name) }
-            onChange={ setSelectedEventTypes } />
-
-          <h3>Debug Nonsense</h3>
-          <div className="form-group form-inline">
-            <label htmlFor="scheduleYear">Year:</label>
-            <select onChange={ ev => setYear(ev.target.value) } id="scheduleYear" value={year} className="form-control">
-              <option>2012</option>
-              <option>2014</option>
-              <option>2016</option>
-              <option>2018</option>
-            </select>
-          </div>
-          <p>
-            <label>Current time:</label>
-            <DateTimePicker value={currentTime} onChange={setCurrentTime} />
-          </p>
-        </div>
-      </div>
-
+      <Filters {...filterProps} />
       <Calendar schedule={ schedule } />
     </>
   );
