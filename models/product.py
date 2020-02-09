@@ -402,6 +402,7 @@ class Voucher(db.Model):
     tickets_remaining = db.Column(db.Integer, nullable=False, server_default="2")
 
     is_used = column_property((purchases_remaining == 0) | (tickets_remaining == 0))
+    is_expired = column_property(expiry.isnot(None) & (expiry < datetime.now()))
 
     @classmethod
     def get_by_code(cls, code):
@@ -496,7 +497,7 @@ class Voucher(db.Model):
 
     def is_accessible(self, voucher):
         # voucher expired
-        if self.expiry and datetime.utcnow() > self.expiry:
+        if self.is_expired:
             return False
 
         if self.code != voucher:

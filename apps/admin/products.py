@@ -12,6 +12,7 @@ from flask_login import current_user
 from flask_mail import Message
 
 from sqlalchemy.sql.functions import func
+from sqlalchemy import not_
 
 from main import db, mail
 from models.user import User
@@ -452,7 +453,19 @@ def product_view(view_id):
 
         db.session.commit()
 
-    return render_template("admin/products/view-edit.html", view=view, form=form)
+    active_vouchers = Voucher.query.filter_by(view=view).filter(
+        not_(Voucher.is_expired) & not_(Voucher.is_used)
+    )
+    stats = {
+        "active": active_vouchers.count(),
+        "total_tickets": active_vouchers.with_entities(
+            func.sum(Voucher.tickets_remaining)
+        ).scalar(),
+    }
+
+    return render_template(
+        "admin/products/view-edit.html", view=view, form=form, voucher_stats=stats
+    )
 
 
 @admin.route("/product_views/<int:view_id>/add", methods=["GET", "POST"])
@@ -506,7 +519,17 @@ def product_view_add(view_id, group_id=None, product_id=None):
 @admin.route("/product_views/<int:view_id>/voucher")
 def product_view_voucher_list(view_id):
     view = ProductView.query.get_or_404(view_id)
-    return render_template("admin/products/view-vouchers.html", view=view)
+    vouchers = Voucher.query.filter_by(view=view)
+
+    if not request.args.get("used"):
+        vouchers = vouchers.filter(not_(Voucher.is_used))
+
+    if not request.args.get("expired"):
+        vouchers = vouchers.filter(not_(Voucher.is_expired))
+
+    return render_template(
+        "admin/products/view-vouchers.html", view=view, vouchers=vouchers
+    )
 
 
 @admin.route("/product_views/<int:view_id>/voucher/<string:voucher_code>")

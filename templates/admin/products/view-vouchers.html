@@ -10,6 +10,24 @@
   <li class="active">Vouchers</li>
 </ol>
 {% if view.vouchers_only %}
+<form method="get" class="form-inline">
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" id="used" name="used" class="form-control"
+        {% if request.args.get('used') %}checked{% endif %}>
+      Show used
+    </label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" id="expired" name="expired" class="form-control"
+        {% if request.args.get('expired') %}checked{% endif %}>
+      Show expired
+    </label>
+  </div>
+  <button class="btn btn-default">Apply</button>
+</form>
+
 <table class="table table-condensed table-striped">
   <tr>
     <th>Code</th>
@@ -18,8 +36,9 @@
     <th>Purchases left</th>
     <th>Tickets left</th>
     <th>Used?</th>
+    <th>Expired?</th>
   </tr>
-  {% for vchr in view.vouchers %}
+  {% for vchr in vouchers %}
     <tr>
       {# FIXME add a "copy URL" link? #}
       <td><a href="{{url_for('.product_view_voucher_detail', view_id=view.id, voucher_code=vchr.code)}}">{{ vchr.code }}</a></td>
@@ -28,6 +47,7 @@
       <td>{{ vchr.purchases_remaining }}</td>
       <td>{{ vchr.tickets_remaining }}</td>
       <td>{% if vchr.is_used %}<strong>Yes</strong>{% else %}No{% endif %}</td>
+      <td>{% if vchr.is_expired %}<strong>Yes</strong>{% else %}No{% endif %}</td>
     </tr>
   {% endfor %}
 </table>
