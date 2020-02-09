@@ -89,6 +89,10 @@ class ScheduleData {
     e.endTime = DateTime.fromSQL(e.end_date, { locale: 'en-GB' });
     e.officialEvent = e.source === 'database';
 
+    // HACK: We don't have any favourites yet, so throw a few in so I can
+    // see how the icon looks.
+    e.isFavourite = Math.random() > 0.8;
+
     return e;
   }
 }

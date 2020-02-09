@@ -15,6 +15,29 @@
   }
 }
 
+.no-recording {
+  position: relative;
+  width: 32px;
+  height: 32px;
+
+  .camera {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+  }
+
+  .slash {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: red;
+  }
+}
+
+.favourite {
+  color: yellow;
+}
+
 .form-inline .checkbox {
   margin-right: 0.75em;
   margin-bottom: 0.5em;
@@ -36,6 +59,19 @@
   border-radius: 5px;
   margin-right: 1em;
   margin-bottom: 1em;
+
+  display: flex;
+  justify-content: space-between;
+
+  .event-icons {
+    margin-left: 0.5em;
+    margin-top: 0.25em;
+    display: flex;
+
+    &:empty {
+      display: none;
+    }
+  }
 
   h3 {
     margin-top: 0;

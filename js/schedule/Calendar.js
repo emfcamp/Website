@@ -1,4 +1,36 @@
 import React from 'react';
+import octicons from '@primer/octicons';
+
+function Icon({ name, className, size, label }) {
+  let svg = octicons[name].toSVG({ 'aria-label': label, width: size, height: size });
+  return <span className={ className } dangerouslySetInnerHTML={ { __html: svg } } />;
+}
+
+function NoRecordingIcon({ mayRecord }) {
+  if (mayRecord) { return null; }
+
+  return (
+    <div className="no-recording">
+      <Icon name="device-camera" className="camera" label="Not recorded" size="16" />
+      <Icon name="circle-slash" className="slash" size="32" />
+    </div>
+  );
+}
+
+function FavouriteIcon({ isFavourite }) {
+  if (!isFavourite) { return null; }
+
+  return <Icon name="star" className="favourite" size="32" label="Favourite" />;
+}
+
+function EventIcons({ mayRecord, isFavourite }) {
+  return (
+    <div className="event-icons">
+      <NoRecordingIcon key='no-recording' mayRecord={ mayRecord } />
+      <FavouriteIcon key='favourite' isFavourite={ isFavourite } />
+    </div>
+  );
+}
 
 function Event({ event }) {
   let metadata = [
@@ -9,8 +41,11 @@ function Event({ event }) {
 
   return (
     <div className="schedule-event">
-      <h3 title={ event.title }>{ event.title }</h3>
-      <p>{ metadata }</p>
+      <div className="event-data">
+        <h3 title={ event.title }>{ event.title }</h3>
+        <p>{ metadata }</p>
+      </div>
+      <EventIcons mayRecord={ event.may_record } isFavourite={ event.isFavourite } />
     </div>
   );
 }
