@@ -20,7 +20,7 @@ class ScheduleData {
 
       this.addVenue(e.venue, e.officialEvent);
 
-      this.addEventType(e.type);
+      this.addEventType(e.type, e.humanReadableType);
 
       if (options.selectedVenues && options.selectedVenues.indexOf(e.venue) === -1) { return null; }
       if (options.selectedEventTypes && options.selectedEventTypes.indexOf(e.type) === -1) { return null; }
@@ -61,15 +61,8 @@ class ScheduleData {
     this.venues.push({ name: name, official: official });
   }
 
-  addEventType(type) {
+  addEventType(type, name) {
     if (this.eventTypesSeen.has(type)) { return null; }
-
-    let name = type;
-    if (type === 'youthworkshop') {
-      name = 'Youth Workshop'
-    } else {
-      name = name.charAt(0).toUpperCase() + name.slice(1);
-    };
 
     this.eventTypesSeen.add(type);
     this.eventTypes.push({ id: type, name });
@@ -93,6 +86,12 @@ class ScheduleData {
     // see how the icon looks.
     e.isFavourite = Math.random() > 0.8;
     e.noRecording = !e.may_record && e.officialEvent && e.type === 'talk';
+
+    if (e.type === 'youthworkshop') {
+      e.humanReadableType = 'Youth Workshop'
+    } else {
+      e.humanReadableType = e.type.charAt(0).toUpperCase() + e.type.slice(1);
+    };
 
     return e;
   }

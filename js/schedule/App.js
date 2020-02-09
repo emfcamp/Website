@@ -5,7 +5,6 @@ import Calendar from './Calendar.js';
 import Filters from './Filters.js';
 import ScheduleData from './ScheduleData.js';
 
-
 function App() {
   const [currentTime, setCurrentTime] = useState(DateTime.fromSQL('2018-08-31 09:00:00').setZone('Europe/London'));
   const [selectedVenues, setSelectedVenues] = useState([]);

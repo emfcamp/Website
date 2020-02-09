@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import octicons from '@primer/octicons';
+import nl2br from 'react-nl2br';
 
 function Icon({ name, className, size, label }) {
   let svg = octicons[name].toSVG({ 'aria-label': label, width: size, height: size });
@@ -33,37 +34,56 @@ function EventIcons({ noRecording, isFavourite }) {
 }
 
 function Event({ event }) {
+  let [expanded, setExpanded] = useState(false);
   let metadata = [
     `${event.startTime.toFormat('HH:mm')} to ${event.endTime.toFormat('HH:mm')}`,
     event.venue,
     event.speaker,
   ].filter(i => { return i !== null && i !== '' }).join(' | ');
 
+  function eventDetails() {
+    if (!expanded) { return null; }
+
+    return (
+      <div className="event-details">
+        <p>{ nl2br(event.description) }</p>
+        <button className="btn btn-warning">Add to Favourites</button>
+      </div>
+    );
+  }
+
+  function toggleExpanded() {
+    setExpanded(!expanded);
+  }
+
   return (
     <div className="schedule-event">
-      <div className="event-data">
-        <h3 title={ event.title }>{ event.title }</h3>
-        <p>{ metadata }</p>
+      <div className="event-synopsis" onClick={ toggleExpanded }>
+        <div className="event-data">
+          <h3 title={ event.title }>{ event.title }</h3>
+          <p>{ metadata }</p>
+        </div>
+        <EventIcons noRecording={ event.noRecording } isFavourite={ event.isFavourite } />
       </div>
-      <EventIcons noRecording={ event.noRecording } isFavourite={ event.isFavourite } />
+      { eventDetails() }
     </div>
   );
 }
 
-function Hour({ hour, content, newDay }) {
+function Hour({ hour, content, newDay, eventSelected }) {
   if (content.length === 0) { return null; }
 
   return (
     <div className="schedule-hour">
-      <h2>{ newDay && `${hour.toFormat('DD')} - ` }{hour.toFormat('HH:mm')}</h2>
+      <h2 id={hour.toISO()}>{ newDay && `${hour.toFormat('DD')} - ` }{hour.toFormat('HH:mm')}</h2>
       <div className="schedule-events-container">
-        { content.map(event => <Event key={event.id} event={event} />) }
+        { content.map(event => <Event key={event.id} event={event} onClick={ eventSelected } />) }
       </div>
     </div>
   );
 }
 
-function Calendar({ schedule }) {
+function Calendar({ schedule, eventSelected }) {
   let currentDay = null;
   let previousDay = null;
   let newDay = false;
@@ -74,7 +94,7 @@ function Calendar({ schedule }) {
     previousDay = currentDay;
 
     return (
-      <Hour key={hour.toISO()} hour={hour} newDay={ newDay } content={schedule.contentForHour(hour)} />
+      <Hour key={hour.toISO()} hour={hour} newDay={ newDay } content={schedule.contentForHour(hour)} eventSelected={ eventSelected } />
     );
   });
 }
