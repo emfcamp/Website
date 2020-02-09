@@ -92,6 +92,7 @@ class ScheduleData {
     // HACK: We don't have any favourites yet, so throw a few in so I can
     // see how the icon looks.
     e.isFavourite = Math.random() > 0.8;
+    e.noRecording = !e.may_record && e.officialEvent && e.type === 'talk';
 
     return e;
   }

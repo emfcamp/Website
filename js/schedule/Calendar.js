@@ -6,8 +6,8 @@ function Icon({ name, className, size, label }) {
   return <span className={ className } dangerouslySetInnerHTML={ { __html: svg } } />;
 }
 
-function NoRecordingIcon({ mayRecord }) {
-  if (mayRecord) { return null; }
+function NoRecordingIcon({ noRecording }) {
+  if (!noRecording) { return null; }
 
   return (
     <div className="no-recording">
@@ -23,10 +23,10 @@ function FavouriteIcon({ isFavourite }) {
   return <Icon name="star" className="favourite" size="32" label="Favourite" />;
 }
 
-function EventIcons({ mayRecord, isFavourite }) {
+function EventIcons({ noRecording, isFavourite }) {
   return (
     <div className="event-icons">
-      <NoRecordingIcon key='no-recording' mayRecord={ mayRecord } />
+      <NoRecordingIcon key='no-recording' noRecording={ noRecording } />
       <FavouriteIcon key='favourite' isFavourite={ isFavourite } />
     </div>
   );
@@ -45,7 +45,7 @@ function Event({ event }) {
         <h3 title={ event.title }>{ event.title }</h3>
         <p>{ metadata }</p>
       </div>
-      <EventIcons mayRecord={ event.may_record } isFavourite={ event.isFavourite } />
+      <EventIcons noRecording={ event.noRecording } isFavourite={ event.isFavourite } />
     </div>
   );
 }
