@@ -45,7 +45,7 @@ faker = "*"
 pyyaml = "*"
 prometheus-client = "*"
 pyppeteer = "*"
-flask-admin = "*"
+flask-admin = {git = "https://github.com/marksteward/flask-admin"}
 pendulum = ">=2.0"
 "geoalchemy2" = "*"
 flask-restful = "*"
