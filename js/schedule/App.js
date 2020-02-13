@@ -15,7 +15,7 @@ function App() {
 
   // Pull the correct year's schedule if the year changes.
   useEffect(() => {
-    fetch(`/schedule/2018.json`)
+    fetch(`/schedule.json`)
       .then(response => response.json())
       .then(body => {
         setRawSchedule(body);
