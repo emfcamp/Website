@@ -136,9 +136,9 @@ EVENT_SPACING = {
 
 period = namedtuple("Period", "start end")
 DAYS = {
-    "fri": datetime(2018, 8, 31),
-    "sat": datetime(2018, 9, 1),
-    "sun": datetime(2018, 9, 2),
+    "fri": datetime(2020, 7, 24),
+    "sat": datetime(2020, 7, 25),
+    "sun": datetime(2020, 7, 26),
 }
 
 # We may also have other venues in the DB, but these are the ones to be
