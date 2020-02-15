@@ -28,7 +28,7 @@ def _get_proposal_dict(proposal, favourites_ids):
         "may_record": proposal.may_record,
         "is_fave": proposal.id in favourites_ids,
         "source": "database",
-        "link": external_url(".line_up_proposal", proposal_id=proposal.id),
+        "link": external_url(".line_up_redirect", year=event_year(), slug=proposal.slug, proposal_id=proposal.id),
     }
     if proposal.type in ["workshop", "youthworkshop"]:
         res["cost"] = proposal.display_cost
