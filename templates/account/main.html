@@ -21,9 +21,10 @@
     </div>
   {% else %}
     <div class="panel-body">
-      Village registration is open! If you're planning on camping with a group of people,
+      <p>Village registration is open! If you're planning on camping with a group of people,
       you can let us know about it by <a href="{{ url_for("villages.register") }}">registering your village</a>.
-      This will help us try to make sure you have the space and facilities you need.
+      This will help us try to make sure you have the space and facilities you need.</p>
+      <p>You can also see a <a href="{{url_for("villages.main", year=event_year)}}">list of registered villages</a>.</p>
     </div>
   {% endif %}
     </div>

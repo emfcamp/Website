@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, abort
 from flask_login import login_required, current_user
 
 from models import event_year
@@ -49,6 +49,20 @@ def register():
         return redirect(url_for(".edit", year=event_year(), village_id=village.id))
 
     return render_template("villages/register.html", form=form)
+
+
+@villages.route("/")
+def villages_redirect():
+    return redirect(url_for(".main", year=event_year()))
+
+
+@villages.route("/<int:year>")
+def main(year):
+    if year != event_year():
+        abort(404)
+
+    villages = Village.query.all()
+    return render_template("villages/villages.html", villages=villages)
 
 
 @villages.route("/<int:year>/<int:village_id>/edit", methods=["GET", "POST"])

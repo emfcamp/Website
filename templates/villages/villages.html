@@ -1,0 +1,31 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block title %}Villages{% endblock %}
+{% block body %}
+<h2>Villages</h2>
+<p>For more information on villages, see our <a href="https://wiki.emfcamp.org/wiki/Villages">villages guide</a>.
+{% if current_user.is_authenticated %}
+  If you want to create a village, you can
+      <a href="{{url_for('.register')}}">register it here</a>.
+{% else %}
+If you have a ticket, you can <a href="{{url_for('users.login', next=url_for('.register'))}}">log in to register a village</a>.
+{% endif %}
+</p>
+<h3>List of Villages</h3>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for village in villages %}
+    <tr>
+      <td>{{village.name}}</td>
+      <td>{{village.description}}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
