@@ -33,8 +33,21 @@ function EventIcons({ noRecording, isFavourite }) {
   );
 }
 
-function Event({ event }) {
+function FavouriteButton({ event, toggleFavourite, authenticated }) {
+  if (!authenticated) {
+    return <p><strong>Log in to add favourites</strong></p>;
+  }
+
+  let label = event.is_fave ? 'Remove From Favourites' : 'Add to Favourites';
+
+  return (
+    <button className="btn btn-warning" onClick={ () => toggleFavourite(event) }>{ label }</button>
+  );
+}
+
+function Event({ event, toggleFavourite, authenticated }) {
   let [expanded, setExpanded] = useState(false);
+
   let metadata = [
     `${event.startTime.toFormat('HH:mm')} to ${event.endTime.toFormat('HH:mm')}`,
     event.venue,
@@ -47,7 +60,7 @@ function Event({ event }) {
     return (
       <div className="event-details">
         <p>{ nl2br(event.description) }</p>
-        <button className="btn btn-warning">Add to Favourites</button>
+        <FavouriteButton event={ event } toggleFavourite={ toggleFavourite } authenticated={ authenticated } />
       </div>
     );
   }
@@ -63,27 +76,27 @@ function Event({ event }) {
           <h3 title={ event.title }>{ event.title }</h3>
           <p>{ metadata }</p>
         </div>
-        <EventIcons noRecording={ event.noRecording } isFavourite={ event.isFavourite } />
+        <EventIcons noRecording={ event.noRecording } isFavourite={ event.is_fave } />
       </div>
       { eventDetails() }
     </div>
   );
 }
 
-function Hour({ hour, content, newDay, eventSelected }) {
+function Hour({ hour, content, newDay, toggleFavourite, authenticated }) {
   if (content.length === 0) { return null; }
 
   return (
     <div className="schedule-hour">
-      <h2 id={hour.toISO()}>{ newDay && `${hour.toFormat('DD')} - ` }{hour.toFormat('HH:mm')}</h2>
+      <h2 id={hour.toISO()}>{ newDay && `${hour.weekdayLong} - ` }{hour.toFormat('HH:mm')}</h2>
       <div className="schedule-events-container">
-        { content.map(event => <Event key={event.id} event={event} onClick={ eventSelected } />) }
+        { content.map(event => <Event key={event.id} event={event} toggleFavourite={ toggleFavourite } authenticated={ authenticated } />) }
       </div>
     </div>
   );
 }
 
-function Calendar({ schedule, eventSelected }) {
+function Calendar({ schedule, toggleFavourite, authenticated }) {
   let currentDay = null;
   let previousDay = null;
   let newDay = false;
@@ -94,7 +107,7 @@ function Calendar({ schedule, eventSelected }) {
     previousDay = currentDay;
 
     return (
-      <Hour key={hour.toISO()} hour={hour} newDay={ newDay } content={schedule.contentForHour(hour)} eventSelected={ eventSelected } />
+      <Hour key={hour.toISO()} hour={hour} newDay={ newDay } content={schedule.contentForHour(hour)} toggleFavourite={ toggleFavourite } authenticated={ authenticated } />
     );
   });
 }

@@ -13,6 +13,16 @@ function App() {
   const [rawSchedule, setRawSchedule] = useState(null);
   const [schedule, setSchedule] = useState(null);
 
+  const [apiToken, setApiToken] = useState(null);
+
+  // Get the user's API token
+  useEffect(() => {
+    let container = document.getElementById('schedule-app');
+    let token = container.getAttribute('data-api-token');
+
+    if (token !== 'None') { setApiToken(token); }
+  }, []);
+
   // Pull the correct year's schedule if the year changes.
   useEffect(() => {
     fetch(`/schedule.json`)
@@ -34,7 +44,27 @@ function App() {
 
     let newSchedule = new ScheduleData(rawSchedule, { currentTime, selectedVenues, selectedEventTypes });
     setSchedule(newSchedule);
-  }, [currentTime, selectedVenues, selectedEventTypes]);
+  }, [currentTime, selectedVenues, selectedEventTypes, rawSchedule]);
+
+  function toggleFavourite(event) {
+    console.log("Setting favourite");
+    console.log(event);
+
+    let endpoint = event.source === 'database' ? `/api/proposal/${event.id}/favourite` : `/api/external/${Math.abs(event.id)}/favourite`;
+    fetch(endpoint, { headers: { 'Authorization': apiToken, 'Content-Type': 'application/json' }, method: 'put', body: '{}' })
+      .then((response) => response.json())
+      .then((data) => {
+        let schedule = JSON.parse(JSON.stringify(rawSchedule))
+        let idx = schedule.findIndex(e => e.id === event.id);
+        schedule[idx].is_fave = data.is_favourite;
+
+        setRawSchedule(schedule);
+      })
+      .catch((error) => {
+        console.log("Error toggling favourite:", event, error);
+      });
+  }
+
 
   if (schedule === null) {
     return <p>Loading...</p>;
@@ -47,7 +77,7 @@ function App() {
   return (
     <>
       <Filters {...filterProps} />
-      <Calendar schedule={ schedule } />
+      <Calendar schedule={ schedule } toggleFavourite={ toggleFavourite } authenticated={ apiToken !== null } />
     </>
   );
 }
