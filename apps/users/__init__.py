@@ -36,18 +36,21 @@ users = Blueprint("users", __name__)
 
 @users.context_processor
 def users_variables():
-    unread_count = (
-        CFPMessage.query.join(Proposal)
-        .filter(
-            Proposal.user_id == current_user.id,
-            Proposal.id == CFPMessage.proposal_id,
-            CFPMessage.is_to_admin.is_(False),
-            or_(
-                CFPMessage.has_been_read.is_(False), CFPMessage.has_been_read.is_(None)
-            ),
+    unread_count = 0
+    if current_user.is_authenticated:
+        unread_count = (
+            CFPMessage.query.join(Proposal)
+            .filter(
+                Proposal.user_id == current_user.id,
+                Proposal.id == CFPMessage.proposal_id,
+                CFPMessage.is_to_admin.is_(False),
+                or_(
+                    CFPMessage.has_been_read.is_(False),
+                    CFPMessage.has_been_read.is_(None),
+                ),
+            )
+            .count()
         )
-        .count()
-    )
 
     return {
         "unread_count": unread_count,
