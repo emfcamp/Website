@@ -27,11 +27,32 @@ from models.purchase import Purchase
 from models.payment import Payment
 from models.basket import Basket
 
-from .common import set_user_currency, feature_flag
-from .common.forms import Form, EmailField
+from ..common import set_user_currency, feature_flag
+from ..common.forms import Form, EmailField
 
 
 users = Blueprint("users", __name__)
+
+
+@users.context_processor
+def users_variables():
+    unread_count = (
+        CFPMessage.query.join(Proposal)
+        .filter(
+            Proposal.user_id == current_user.id,
+            Proposal.id == CFPMessage.proposal_id,
+            CFPMessage.is_to_admin.is_(False),
+            or_(
+                CFPMessage.has_been_read.is_(False), CFPMessage.has_been_read.is_(None)
+            ),
+        )
+        .count()
+    )
+
+    return {
+        "unread_count": unread_count,
+        "view_name": request.url_rule.endpoint.replace("users.", "."),
+    }
 
 
 class NextURLField(HiddenField):
@@ -222,6 +243,17 @@ class AccountForm(Form):
 @users.route("/account", methods=["GET", "POST"])
 @login_required
 def account():
+    if not current_user.diversity:
+        flash(
+            "Please check that your user details are correct. "
+            "We'd also appreciate it if you could fill in our diversity survey."
+        )
+        return redirect(url_for(".details"))
+    return render_template("account/main.html")
+
+
+@users.route("/account/details", methods=["GET", "POST"])
+def details():
     form = AccountForm()
 
     if form.validate_on_submit():
@@ -251,20 +283,7 @@ def account():
             form.gender.data = current_user.diversity.gender
             form.ethnicity.data = current_user.diversity.ethnicity
 
-    unread_count = (
-        CFPMessage.query.join(Proposal)
-        .filter(
-            Proposal.user_id == current_user.id,
-            Proposal.id == CFPMessage.proposal_id,
-            CFPMessage.is_to_admin.is_(False),
-            or_(
-                CFPMessage.has_been_read.is_(False), CFPMessage.has_been_read.is_(None)
-            ),
-        )
-        .count()
-    )
-
-    return render_template("account/main.html", form=form, unread_count=unread_count)
+    return render_template("account/details.html", form=form)
 
 
 @users.route("/account/tickets")

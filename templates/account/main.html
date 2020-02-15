@@ -2,98 +2,60 @@
 {% extends "base.html" %}
 {% block title %}My Account{% endblock %}
 {% block body %}
-<h2>Account</h2>
-
-<nav>
-  <ul class="nav nav-pills">
-    <li><a href="{{ url_for('users.purchases') }}">Your tickets</a></li>
-    {% if feature_enabled('LINE_UP') %}
-      <li><a href="{{ url_for('schedule.external_feeds') }}">Your event feeds</a></li>
-    {% endif %}
-    {% if feature_enabled('CFP') %}
-      <li><a href="{{ url_for('cfp.proposals') }}">Your proposals</a></li>
-      <li><a href="{{ url_for('cfp.all_messages') }}">
-        Your messages
-        {% if unread_count > 0 %}
-          <span class="badge">{{ unread_count }}</span>
-        {% endif %}
-      </a></li>
-      {% if current_user.has_permission('admin') %}
-      <li><a href="{{ url_for('admin.home') }}">Admin</a></li>
-      {% elif current_user.has_permission('cfp_admin') %}
-      <li><a href="{{ url_for('cfp_review.proposals') }}">CFP Admin</a></li>
-      {% else %}
-        {% if current_user.has_permission('cfp_anonymiser') %}
-        <li><a href="{{ url_for('cfp_review.anonymisation') }}">Anonymise proposals</a></li>
-        {% endif %}
-        {% if current_user.has_permission('cfp_reviewer') %}
-        <li><a href="{{ url_for('cfp_review.review_list') }}">Review proposals</a></li>
-        {% endif %}
+{% include "account/_nav.html" %}
+<p>You're logged in as <strong>{{current_user.name}}</strong> (<strong>{{ current_user.email }}</strong>).
+    <a href="{{url_for('.details')}}">Edit your account details</a>.</p>
+<div class="row">
+  <div class="col-md-6">
+    <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">Villages</h3>
+    </div>
+  {% if current_user.village %}
+    <div class="panel-body">
+      You're a member of the <strong>{{current_user.village.village.name}}</strong> village. 
+      {% if current_user.village.admin %}
+        <a href="{{url_for('villages.edit', year=event_year, village_id=current_user.village.village.id)}}">
+          Edit this village</a>.
       {% endif %}
-    {% endif %}
-  </ul>
-  <ul class="nav nav-pills">
-    <li><a href="{{ url_for('users.logout') }}">Log out</a></li>
-  </ul>
-</nav>
-<h3>Your details</h3>
-
-<div class="panel panel-default">
-  <div class="panel-heading">
-    {% if feature_enabled('CFP') %}
-      <div>If you've made a submission to the CfP then your name (as it's set here) will be used
-           in the schedule.</div>
-    {% endif %}
+    </div>
+  {% else %}
+    <div class="panel-body">
+      Village registration is open! If you're planning on camping with a group of people,
+      you can let us know about it by <a href="{{ url_for("villages.register") }}">registering your village</a>.
+      This will help us try to make sure you have the space and facilities you need.
+    </div>
+  {% endif %}
+    </div>
   </div>
-  <form method="post" class="form-horizontal">
-    {{ form.hidden_tag() }}
-    <fieldset>
-      <p></p>
-      <div class="col-sm-12">
-        <div class="form-group">
-          <label class="col-sm-2 control-label">Email</label>
-          <div class="col-sm-10">
-            <div class="form-control-static">{{ current_user.email }}</div>
-          </div>
-        </div>
-        {{ render_field(form.name, True) }}
-        <div class="form-group">
-          <div class="col-sm-10 col-sm-offset-2">
-            {{ form.allow_promo(class_='big-checkbox') }}
-            <label class="control-label big-checkbox" for="allow_promo">
-                Send me occasional emails about future EMF events
-            </label>
-          </div>
-        </div>
-      </div>
-    </fieldset>
-    <fieldset>
-      <div class="col-sm-12">
-        If you're comfortable telling us a little bit about yourself, we'd appreciate it.
-        This information will only be summarised and compared with previous years, to find out how well we're doing with outreach.
-      </div>
-      <div class="col-sm-12">
-        <p></p>
-        {{ render_field(form.age, True, placeholder="Optional") }}
-        {{ render_field(form.gender, True, placeholder="Optional") }}
-        {{ render_field(form.ethnicity, True, placeholder="Optional") }}
-        {{ form.forward(class_="btn btn-default pull-right", style="margin-bottom: 15px;") }}
-      </div>
-    </fieldset>
-  </form>
-</div>
 
-{% if current_user.village %}
-<h3>Your Village</h3>
-<div class="panel panel-default">
-  <div class="panel-body">
-    You're a member of the <strong>{{current_user.village.village.name}}</strong> village. 
-    {% if current_user.village.admin %}
-      <a href="{{url_for('villages.edit', year=event_year, village_id=current_user.village.village.id)}}">
-        Edit this village
-      </a>.
-    {% endif %}
+  {% if feature_enabled('CFP') and not feature_enabled('CFP_CLOSED') %}
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Call for Participation</h3>
+      </div>
+      <div class="panel-body">
+        Our Call for Participation is now open!<br>
+        If you want to give a talk, workshop, or performance at EMF {{event_year}},
+        you can now <a href="{{url_for('cfp.main')}}">submit your proposal</a>.
+      </div>
+    </div>
   </div>
+  {% endif %}
+  
+  {% if current_user.owned_tickets|length > 1 %}
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Transfer Tickets</h3>
+      </div>
+      <div class="panel-body">
+        You have more than one ticket assigned to you. We recommend you <a href="{{ url_for(".purchases") }}">transfer tickets</a> to
+        whoever will be using them, so they can receive updates from us and log in.
+      </div>
+    </div>
+  </div>
+  {% endif %}
 </div>
-{% endif %}
 {% endblock %}

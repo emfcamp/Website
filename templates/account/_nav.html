@@ -1,0 +1,39 @@
+{% macro badge(count) %}
+    {% if count > 0 %}
+        <span class="badge">{{count}}</span>
+    {% endif %}
+{% endmacro %}
+
+{% macro menuitem(text, view, badge_count=0) %}
+<li{% if view_name == view %} class="active"{% endif %}>
+    <a href="{{ url_for(view) }}">{{text}}</a>
+    {{badge(badge_count)}}
+  </li>
+{% endmacro %}
+
+<nav>
+  <ul class="nav nav-tabs">
+    {{ menuitem("Account", ".account") }}
+    {{ menuitem("Tickets", ".purchases") }}
+    {% if feature_enabled('LINE_UP') %}
+      {{ menuitem("Event feeds", ".external_feeds") }}
+    {% endif %}
+    {% if feature_enabled('CFP') %}
+      {{ menuitem("Proposals", "cfp.proposals") }}
+      {{ menuitem("Messages", "cfp.all_messages", unread_count) }}
+      {% if current_user.has_permission('admin') %}
+        {{ menuitem("Admin", "admin.home") }}
+      {% elif current_user.has_permission('cfp_admin') %}
+        {{ menuitem("CfP Admin", "cfp_review.proposals") }}
+      {% else %}
+        {% if current_user.has_permission('cfp_anonymiser') %}
+          {{ menuitem("Anonymise proposals", "cfp_review.anonymisation") }}
+        {% elif current_user.has_permission('cfp_reviewer') %}
+          {{ menuitem("Review proposals", "cfp_review.review_list") }}
+        {% endif %}
+      {% endif %}
+    {% endif %}
+    {{ menuitem("Log Out", "users.logout") }}
+  </ul>
+</nav>
+
