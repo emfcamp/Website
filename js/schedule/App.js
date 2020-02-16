@@ -5,8 +5,12 @@ import Calendar from './Calendar.js';
 import Filters from './Filters.js';
 import ScheduleData from './ScheduleData.js';
 
+function now() {
+  return DateTime.fromMillis(Date.now(), { zone: 'Europe/London' });
+}
+
 function App() {
-  const [currentTime, setCurrentTime] = useState(DateTime.fromSQL('2018-08-31 09:00:00').setZone('Europe/London'));
+  const [currentTime, setCurrentTime] = useState(now());
   const [selectedVenues, setSelectedVenues] = useState([]);
   const [selectedEventTypes, setSelectedEventTypes] = useState([])
   const [onlyFavourites, setOnlyFavourites] = useState(false);
@@ -49,6 +53,18 @@ function App() {
     let newSchedule = new ScheduleData(rawSchedule, { currentTime, onlyFavourites, selectedVenues, selectedEventTypes });
     setSchedule(newSchedule);
   }, [currentTime, onlyFavourites, selectedVenues, selectedEventTypes, rawSchedule]);
+
+  // Update time once a minute
+  useEffect(() => {
+    // In debug mode we want to be able to manually control time.
+    if (!debug) {
+      let timeout = setTimeout(() => {
+        setCurrentTime(now());
+      }, 60000);
+
+      return () => clearTimeout(timeout);
+    }
+  });
 
   function toggleFavourite(event) {
     console.log("Setting favourite");
