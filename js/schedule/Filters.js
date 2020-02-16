@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DateTime } from 'luxon';
 import { Checkbox, CheckboxGroup, DateTimePicker } from './Controls.js';
 
-function Filters({ schedule, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, currentTime, setCurrentTime }) {
+function Filters({ schedule, onlyFavourites, setOnlyFavourites, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, currentTime, setCurrentTime }) {
   const [visible, setVisible] = useState(false);
 
   function selectOfficialVenues(ev) {
@@ -17,6 +17,13 @@ function Filters({ schedule, selectedVenues, setSelectedVenues, selectedEventTyp
 
     return (
       <div className="panel-body">
+        <h3>Favourites</h3>
+        <div className="form-group form-inline">
+          <Checkbox checked={ onlyFavourites } onChange={ setOnlyFavourites }>
+            Favourites only
+          </Checkbox>
+        </div>
+
         <h3>Venues</h3>
         <CheckboxGroup
           options={ schedule.venues.map(v => v.name) }

@@ -9,6 +9,7 @@ function App() {
   const [currentTime, setCurrentTime] = useState(DateTime.fromSQL('2018-08-31 09:00:00').setZone('Europe/London'));
   const [selectedVenues, setSelectedVenues] = useState([]);
   const [selectedEventTypes, setSelectedEventTypes] = useState([])
+  const [onlyFavourites, setOnlyFavourites] = useState(false);
 
   const [rawSchedule, setRawSchedule] = useState(null);
   const [schedule, setSchedule] = useState(null);
@@ -42,9 +43,9 @@ function App() {
   useEffect(() => {
     if (rawSchedule == null) { return };
 
-    let newSchedule = new ScheduleData(rawSchedule, { currentTime, selectedVenues, selectedEventTypes });
+    let newSchedule = new ScheduleData(rawSchedule, { currentTime, onlyFavourites, selectedVenues, selectedEventTypes });
     setSchedule(newSchedule);
-  }, [currentTime, selectedVenues, selectedEventTypes, rawSchedule]);
+  }, [currentTime, onlyFavourites, selectedVenues, selectedEventTypes, rawSchedule]);
 
   function toggleFavourite(event) {
     console.log("Setting favourite");
@@ -71,7 +72,7 @@ function App() {
   }
 
   let filterProps = {
-    schedule, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, currentTime, setCurrentTime
+    schedule, onlyFavourites, setOnlyFavourites, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, currentTime, setCurrentTime
   }
 
   return (
