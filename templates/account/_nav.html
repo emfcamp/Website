@@ -16,7 +16,7 @@
     {{ menuitem("Account", ".account") }}
     {{ menuitem("Tickets", ".purchases") }}
     {% if feature_enabled('LINE_UP') %}
-      {{ menuitem("Event feeds", ".external_feeds") }}
+      {{ menuitem("Event feeds", "schedule.external_feeds") }}
     {% endif %}
     {% if feature_enabled('CFP') %}
       {{ menuitem("Proposals", "cfp.proposals") }}
