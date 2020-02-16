@@ -67,9 +67,6 @@ function App() {
   });
 
   function toggleFavourite(event) {
-    console.log("Setting favourite");
-    console.log(event);
-
     let endpoint = event.source === 'database' ? `/api/proposal/${event.id}/favourite` : `/api/external/${Math.abs(event.id)}/favourite`;
     fetch(endpoint, { headers: { 'Authorization': apiToken, 'Content-Type': 'application/json' }, method: 'put', body: '{}' })
       .then((response) => response.json())
@@ -81,7 +78,7 @@ function App() {
         setRawSchedule(schedule);
       })
       .catch((error) => {
-        console.log("Error toggling favourite:", event, error);
+        console.error("Error toggling favourite:", event, error);
       });
   }
 
