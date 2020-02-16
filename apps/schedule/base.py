@@ -45,30 +45,12 @@ def main_year(year):
 
 
 def schedule_current():
-    def add_event(event):
-        event["text"] = html.escape(event["title"])
-        event["description"] = urlize(event["description"])
-        event["start_date"] = event["start_date"].strftime("%Y-%m-%d %H:%M:00")
-        event["end_date"] = event["end_date"].strftime("%Y-%m-%d %H:%M:00")
-        event["venue"] = slugify(event["venue"])
-        return event
-
-    # {id:1, text:"Meeting",   start_date:"04/11/2013 14:00",end_date:"04/11/2013 17:00"}
-    schedule_data = _get_scheduled_proposals()
-
-    venues_with_events = set([e["venue"] for e in schedule_data])
-    venues = _get_priority_sorted_venues(venues_with_events)
-
-    schedule_data = [add_event(e) for e in schedule_data]
-
     token = None
     if current_user.is_authenticated:
         token = generate_api_token(app.config["SECRET_KEY"], current_user.id)
 
     return render_template(
         "schedule/user_schedule.html",
-        venues=venues,
-        schedule_data=schedule_data,
         token=token,
         debug=app.config.get("DEBUG"),
     )
