@@ -70,6 +70,7 @@ def schedule_current():
         venues=venues,
         schedule_data=schedule_data,
         token=token,
+        debug=app.config.get("DEBUG"),
     )
 
 

@@ -10,6 +10,7 @@ function App() {
   const [selectedVenues, setSelectedVenues] = useState([]);
   const [selectedEventTypes, setSelectedEventTypes] = useState([])
   const [onlyFavourites, setOnlyFavourites] = useState(false);
+  const [debug, setDebug] = useState(false);
 
   const [rawSchedule, setRawSchedule] = useState(null);
   const [schedule, setSchedule] = useState(null);
@@ -20,8 +21,10 @@ function App() {
   useEffect(() => {
     let container = document.getElementById('schedule-app');
     let token = container.getAttribute('data-api-token');
+    let debug = container.getAttribute('data-debug');
 
     if (token !== 'None') { setApiToken(token); }
+    if (debug === 'True') { setDebug(true); }
   }, []);
 
   // Pull the correct year's schedule if the year changes.
@@ -72,7 +75,7 @@ function App() {
   }
 
   let filterProps = {
-    schedule, onlyFavourites, setOnlyFavourites, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, currentTime, setCurrentTime
+    schedule, onlyFavourites, setOnlyFavourites, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, debug, currentTime, setCurrentTime
   }
 
   return (

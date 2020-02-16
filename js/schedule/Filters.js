@@ -2,12 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { DateTime } from 'luxon';
 import { Checkbox, CheckboxGroup, DateTimePicker } from './Controls.js';
 
-function Filters({ schedule, onlyFavourites, setOnlyFavourites, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, currentTime, setCurrentTime }) {
+function DebugOptions({ debug, currentTime, setCurrentTime }) {
+  if (!debug) { return null; }
+
+  return (
+    <>
+      <h3>Debug Nonsense</h3>
+      <p>
+        <label>Current time:</label>
+        <DateTimePicker value={currentTime} onChange={setCurrentTime} />
+      </p>
+    </>
+  );
+}
+
+function Filters({ schedule, onlyFavourites, setOnlyFavourites, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, debug, currentTime, setCurrentTime }) {
   const [visible, setVisible] = useState(false);
 
   function selectOfficialVenues(ev) {
     ev.preventDefault();
     setSelectedVenues(schedule.venues.filter(v => v.official).map(v => v.name));
+  }
+
+  function renderDebugOptions() {
   }
 
   function renderBody() {
@@ -38,12 +55,8 @@ function Filters({ schedule, onlyFavourites, setOnlyFavourites, selectedVenues, 
           labels={ schedule.eventTypes.map(t => t.name) }
           onChange={ setSelectedEventTypes } />
 
-          <h3>Debug Nonsense</h3>
-          <p>
-            <label>Current time:</label>
-            <DateTimePicker value={currentTime} onChange={setCurrentTime} />
-          </p>
-        </div>
+        <DebugOptions debug={ debug } currentTime={ currentTime } setCurrentTime={ setCurrentTime } />
+      </div>
     );
   }
 

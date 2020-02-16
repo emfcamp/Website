@@ -4,7 +4,7 @@
     <link rel="stylesheet" type="text/css" href="{{ static_url_for('static', filename='css/schedule.css') }}">
 {% endblock %}
 {% block body %}
-  <div id="schedule-app" data-api-token="{{ token }}"></div>
+  <div id="schedule-app" data-api-token="{{ token }}" data-debug="{{ debug }}"></div>
 {% endblock %}
 {% block foot %}
   <script src="{{ static_url_for('static', filename='js/schedule.js') }}"></script>
