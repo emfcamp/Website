@@ -8,6 +8,8 @@ from flask import (
     Markup,
     render_template_string,
 )
+
+from datetime import timedelta
 from flask_login import current_user
 from wtforms import StringField, SelectField, SubmitField, BooleanField
 from wtforms.validators import Required, Email, ValidationError, Optional
@@ -15,6 +17,7 @@ from wtforms.validators import Required, Email, ValidationError, Optional
 from pendulum import parse, period
 
 from main import db
+from models import event_start, event_end
 from models.volunteer import Volunteer as VolunteerUser
 from models.user import User
 
@@ -23,28 +26,13 @@ from ..common.forms import Form
 from ..common import create_current_user, feature_flag
 
 
-def generate_day_options(start, stop):
-    days = period(parse(start), parse(stop)).range("days", 1)
-    return list([(d.strftime("%Y-%m-%d"), d.strftime("%A %-d %B")) for d in days])
-
-
-ARRIVAL_CHOICES = [
-    ("2018-08-29", "Wednesday 29 August or earlier")
-] + generate_day_options("2018-08-30", "2018-09-02")
-DEPARTURE_CHOICES = generate_day_options("2018-08-31", "2018-09-03") + [
-    ("2018-09-04", "Tuesday 4 September or later")
-]
-
-
 class VolunteerSignUpForm(Form):
     nickname = StringField("Name", [Required()])
     volunteer_email = StringField("Email", [Email(), Required()])
     over_18 = BooleanField("I'm at least 18 years old")
     volunteer_phone = StringField("Phone", [Required()])
-    arrival = SelectField("Arrival", choices=ARRIVAL_CHOICES, default="2018-08-31")
-    departure = SelectField(
-        "Departure", choices=DEPARTURE_CHOICES, default="2018-09-03"
-    )
+    arrival = SelectField("Arrival")
+    departure = SelectField("Departure")
     allow_comms = BooleanField(
         "May we send you messages during the event?", [Optional()]
     )
@@ -82,8 +70,12 @@ def update_volunteer_from_form(volunteer, form):
 @feature_flag("VOLUNTEERS_SIGNUP")
 def sign_up():
     form = VolunteerSignUpForm()
-    # On sign up give user 'volunteer' permission (+ managers etc.)
+    form.arrival.choices = generate_arrival_options()
+    form.arrival.data = event_start().strftime("%F")
+    form.departure.choices = generate_departure_options()
+    form.departure.data = event_end().strftime("%F")
 
+    # On sign up give user 'volunteer' permission (+ managers etc.)
     if current_user.is_authenticated and VolunteerUser.get_for_user(current_user):
         return redirect(url_for(".account"))
 
@@ -124,6 +116,8 @@ def account():
         return redirect(url_for(".sign_up"))
 
     form = VolunteerSignUpForm(obj=volunteer)
+    form.arrival.choices = generate_arrival_options()
+    form.departure.choices = generate_departure_options()
 
     if form.validate_on_submit():
         update_volunteer_from_form(volunteer, form)
@@ -136,3 +130,56 @@ def account():
     form.allow_comms.data = volunteer.allow_comms_during_event
 
     return render_template("volunteer/account.html", user=current_user, form=form)
+
+
+def generate_arrival_options():
+    choices = []
+
+    # Work out our first arrival based on config
+    first_arrival = event_start() - timedelta(app.config["ARRIVAL_DAYS"])
+
+    # Add the first date to the list with or earlier
+    choices.append((
+        first_arrival.strftime("%F"),
+        first_arrival.strftime("%A %-d %B or earlier")
+    ))
+
+    # Work out dates between first arrival and end of the event
+    days = period(
+        first_arrival + timedelta(days=1),
+        event_end()).range("days", 1)
+
+    # Add each date to the list
+    for d in days:
+        choices.append((
+            d.strftime("%F"),
+            d.strftime("%A %-d %B")
+        ))
+
+    return choices
+
+def generate_departure_options():
+    choices = []
+
+    # Work out our last arrival based on config
+    last_departure = event_end() + timedelta(app.config["DEPARTURE_DAYS"])
+
+    # Work out dates between start of the event and last departure
+    days = period(
+        event_start(),
+        last_departure - timedelta(days=1)).range("days", 1)
+
+    # Add each date to the list
+    for d in days:
+        choices.append((
+            d.strftime("%F"),
+            d.strftime("%A %-d %B")
+        ))
+
+    # Add last departure day with or later
+    choices.append((
+        last_departure.strftime("%F"),
+        last_departure.strftime("%A %-d %B or later")
+    ))
+
+    return choices
