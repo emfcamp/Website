@@ -18,7 +18,7 @@ from sqlalchemy.sql.functions import func
 from wtforms import TextAreaField, SubmitField
 
 from main import external_url, db
-from ..common.receipt import render_pdf
+from ..common.receipt import format_inline_epc_qr, render_pdf
 from models.product import Product, PriceTier
 from models.purchase import Purchase
 from ..common.forms import Form
@@ -114,6 +114,7 @@ def invoice(payment_id, fmt=None):
         vat=vat,
         edit_company=edit_company,
         invoice_number=invoice_number,
+        format_inline_epc_qr=format_inline_epc_qr,
     )
 
     url = external_url(".invoice", payment_id=payment_id)
