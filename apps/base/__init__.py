@@ -17,6 +17,7 @@ from flask import (
 
 from main import cache
 from ..common import feature_flag
+from models import next_sales_date, next_sales_date_timezone
 from models.product import Product, ProductView, ProductViewProduct, PriceTier
 from models.site_state import get_site_state
 
@@ -47,7 +48,7 @@ def main():
     if app.config.get("DEBUG"):
         state = request.args.get("site_state", state)
 
-    return render_template("home/%s.html" % state, full_price=get_full_price())
+    return render_template("home/%s.html" % state, full_price=get_full_price(), next_sales_date=next_sales_date(), next_sales_date_timezone=next_sales_date_timezone())
 
 
 @base.route("/", methods=["POST"])

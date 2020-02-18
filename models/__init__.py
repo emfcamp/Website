@@ -3,6 +3,9 @@ from collections import OrderedDict
 from decimal import Decimal
 from itertools import groupby
 from dateutil.parser import parse
+from dateutil.tz import gettz
+from datetime import datetime, timedelta
+from builtins import map as python_map # models.map overwrites the built in
 
 from flask import current_app as app
 
@@ -25,6 +28,31 @@ def event_year():
 def event_end():
     return config_date("EVENT_END")
 
+
+def sales_dates():
+    return list(python_map(parse, app.config.get("SALES_DATES")))
+
+
+def next_sales_date():
+    # Leave a bit of time for people to forget to activate sales
+    now = datetime.now() + timedelta(minutes=5)
+
+    for sales_time in sales_dates():
+        if (sales_time > now):
+            return sales_time
+
+    return None
+
+def next_sales_date_timezone():
+    date = next_sales_date()
+
+    if (not date):
+        return None
+
+    if (date.month >= 3 and date.day >= 29 and date.month <= 10 and date.day <= 25):
+        return "BST"
+    else:
+        return "GMT"
 
 def exists(query):
     return db.session.query(true()).filter(query.exists()).scalar()

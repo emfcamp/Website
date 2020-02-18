@@ -13,6 +13,7 @@ from flask_mail import Message
 from sqlalchemy.orm import joinedload
 
 from main import db, mail
+from models import next_sales_date, next_sales_date_timezone
 from models.exc import CapacityException
 from models.product import PriceTier, ProductViewProduct, Product, Voucher
 from models.basket import Basket
@@ -126,7 +127,7 @@ def main(flow="main"):
 
     form.currency_code.data = get_user_currency()
     return render_template(
-        "tickets/choose.html", form=form, flow=flow, view=view, available=available
+        "tickets/choose.html", form=form, flow=flow, view=view, available=available, next_sales_date=next_sales_date(), next_sales_date_timezone=next_sales_date_timezone()
     )
 
 

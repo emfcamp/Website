@@ -1,7 +1,11 @@
 {% if not available %}
 <div class="well">
-  <p class="emphasis">There are no tickets currently available. The next public ticket sale will be on
-    Wednesday 19 February at 19:00 GMT.</p>
+  <p class="emphasis">
+    There are no tickets currently available.
+    {% if next_sales_date %}
+      The next public ticket sale will be on {{next_sales_date.strftime("%A %-d %B at %H:%M")}} {{ next_sales_date_timezone }}.
+    {% endif %}
+  </p>
   <p>Please follow us <a href="https://twitter.com/emfcamp">on Twitter</a> or
   join our mailing list to be notified when more tickets are on sale:</p>
   {% include "home/_mailchimp_form.html" %}
