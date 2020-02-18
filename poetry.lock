@@ -1021,7 +1021,7 @@ version = "2.8.4"
 [[package]]
 category = "main"
 description = "Run a subprocess in a pseudo terminal"
-marker = "python_version >= \"3.4\" and sys_platform != \"win32\" or sys_platform != \"win32\""
+marker = "python_version >= \"3.4\" and sys_platform != \"win32\" or sys_platform != \"win32\" or python_version >= \"3.4\" and sys_platform != \"win32\" and (python_version >= \"3.4\" and sys_platform != \"win32\" or sys_platform != \"win32\")"
 name = "ptyprocess"
 optional = false
 python-versions = "*"
@@ -1058,6 +1058,7 @@ version = "0.8b1"
 reference = "2a99ee91d98519f8f296aa42cfea1fde37f80823"
 type = "git"
 url = "https://github.com/emfcamp/python-barcode"
+
 [[package]]
 category = "dev"
 description = "Python style guide checker"
@@ -1285,7 +1286,7 @@ description = "QR Code and Micro QR Code generator for Python 2 and Python 3"
 name = "segno"
 optional = false
 python-versions = "*"
-version = "0.3.6"
+version = "1.0.0"
 
 [[package]]
 category = "main"
@@ -1332,6 +1333,7 @@ python-dateutil = ">=2.5.3"
 reference = "0357627746d827d275d09bc54433aec8dd851fc0"
 type = "git"
 url = "https://github.com/emfcamp/slotmachine.git"
+
 [[package]]
 category = "dev"
 description = "Sorted Containers -- Sorted List, Sorted Dict, Sorted Set"
@@ -1583,7 +1585,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "contextlib2", "unittest2"]
 
 [metadata]
-content-hash = "af8f74f8724668a7b15f604b6e9105795fb6c7a612b202c22edab6590b7ca8e7"
+content-hash = "a9170edfbf4b649ac916413b1e8543f4ed14af753eed7233666ad2291ad0826d"
 python-versions = "~3.7"
 
 [metadata.files]
@@ -2258,8 +2260,8 @@ requests = [
     {file = "requests-2.22.0.tar.gz", hash = "sha256:11e007a8a2aa0323f5a921e9e6a2d7e4e67d9877e85773fba9ba6419025cbeb4"},
 ]
 segno = [
-    {file = "segno-0.3.6-py2.py3-none-any.whl", hash = "sha256:70874273682e1e1cbd9cb51b49ac4b7878c85a833905e3453f0198633fe73622"},
-    {file = "segno-0.3.6.tar.gz", hash = "sha256:ea819094049b48fcc2b4a671c92ea626d4302092f9070e420761d3ed6ba38d01"},
+    {file = "segno-1.0.0-py2.py3-none-any.whl", hash = "sha256:a2bd4b58851335e8e652ce34641d7b6c590f0c7347aa45cf7237bcc83de4cdb9"},
+    {file = "segno-1.0.0.tar.gz", hash = "sha256:9f6abc90f10d56b8ef29b6655bff5122dae37c37647bc04098a5ae4a5900db84"},
 ]
 shapely = [
     {file = "Shapely-1.6.4.post2-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:3ca69d4b12e2b05b549465822744b6a3a1095d8488cc27b2728a06d3c07d0eee"},
