@@ -110,7 +110,7 @@ def make_epc_qrfile(payment, **kwargs):
         name="Electromagnetic Field Ltd",
         iban="GB21BARC20716472954433",
         amount=payment.amount,
-        text=payment.bankref,
+        reference=payment.bankref,
     )
     qr.save(qrfile, **kwargs)
     qrfile.seek(0)
