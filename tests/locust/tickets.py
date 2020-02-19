@@ -1,4 +1,4 @@
-from locust import HttpLocust, TaskSet, task
+from locust import HttpLocust, TaskSet, task, between
 from locust.exception import StopLocust
 
 import lxml.html
@@ -88,11 +88,9 @@ class ReserveTickets(EMFTaskSet):
 
 class CheckTicketsLocust(HttpLocust):
     task_set = CheckTickets
-    min_wait = 1000
-    max_wait = 2000
+    wait_time = between(1, 2)
 
 
 class ReserveTicketsLocust(HttpLocust):
     task_set = ReserveTickets
-    min_wait = 0
-    max_wait = 1000
+    wait_time = between(0, 1)
