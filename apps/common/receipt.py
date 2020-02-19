@@ -119,8 +119,7 @@ def make_epc_qrfile(payment, **kwargs):
 
 
 def qrfile_to_svg(qrfile):
-    root = etree.XML(qrfile.read())
-    return Markup(etree.tostring(root).decode("utf-8"))
+    return Markup(qrfile.getvalue().decode("utf-8"))
 
 
 def format_inline_qr(data):
