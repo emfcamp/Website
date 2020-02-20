@@ -131,13 +131,18 @@ def main(flow="main"):
 
 
 def products_for_view(product_view):
+    # Note that this function is performance-critical. It should load all the product data
+    # necessary for the high-traffic tickets page to render in a single query. If you change
+    # this, make sure that you monitor the number of queries emitted by the tickets page.
     return (
         ProductViewProduct.query.filter_by(view_id=product_view.id)
         .join(ProductViewProduct.product)
         .with_entities(Product)
         .order_by(ProductViewProduct.order)
         .options(joinedload(Product.price_tiers).joinedload(PriceTier.prices))
-    )
+        .options(joinedload(Product.parent))
+        .options(joinedload("parent.parent"))
+    ).all()
 
 
 def handle_ticket_selection(form, view, flow, basket):
