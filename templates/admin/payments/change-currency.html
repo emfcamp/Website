@@ -1,0 +1,18 @@
+{% extends "admin/base.html" %}
+{% block title %}Change Currency{% endblock %}
+{% from "_formhelpers.html" import render_field %}
+{% set nav_active = 'admin_payments' %}
+{% block body %}
+<h2>Change Currency</h2>
+
+<p>The currency for payment {{payment.id}} is currently {{payment.currency}}. Do you want to change it to {{new_currency}}?</p>
+
+<form method="post">
+{{ form.hidden_tag() }}
+<div class="btn-group">
+{{ form.change(class_="btn btn-warning") }}
+<a class="btn btn-default" href="{{url_for('.payment', payment_id=payment.id)}}">Cancel</a>
+</div>
+</form>
+
+{% endblock %}

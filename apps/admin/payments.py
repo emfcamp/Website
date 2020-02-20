@@ -497,3 +497,36 @@ def refund(payment_id):
         form=form,
         refunded_purchases=refunded_purchases,
     )
+
+
+class ChangeCurrencyForm(Form):
+    change = SubmitField("Change Currency")
+
+
+@admin.route("/payment/<int:payment_id>/change_currency", methods=["GET", "POST"])
+def change_currency(payment_id):
+    payment = Payment.query.get_or_404(payment_id)
+    if not (
+        payment.state == "new"
+        or (payment.provider == "banktransfer" and payment.state == "inprogress")
+    ):
+        return abort(400)
+
+    if payment.currency == "GBP":
+        new_currency = "EUR"
+    else:
+        new_currency = "GBP"
+
+    form = ChangeCurrencyForm(request.form)
+    if form.validate_on_submit():
+        payment.change_currency(new_currency)
+        db.session.commit()
+        flash(f"Currency successfully changed to {new_currency}")
+        return redirect(url_for(".payment", payment_id=payment.id))
+
+    return render_template(
+        "admin/payments/change-currency.html",
+        payment=payment,
+        form=form,
+        new_currency=new_currency,
+    )
