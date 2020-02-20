@@ -1,3 +1,5 @@
+import pytest
+
 URLS = [
     "/",
     "/about",
@@ -14,7 +16,7 @@ URLS = [
 ]
 
 
-def test_url(client):
-    for url in URLS:
-        rv = client.get(url)
-        assert rv.status_code == 200, "Fetching %s results in HTTP 200" % url
+@pytest.mark.parametrize("url", URLS)
+def test_url(client, url):
+    rv = client.get(url)
+    assert rv.status_code == 200, "Fetching %s results in HTTP 200" % url
