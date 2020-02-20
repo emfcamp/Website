@@ -78,7 +78,7 @@ class TicketAmountsForm(Form):
             so it will fail to validate if the requested ticket capacity is now unavailable.
         """
         # Whether submitted or not, update the allowed amounts before validating
-        capacity_gone = False
+        capacity_available = True
         for f in form.tiers:
             pt_id = f.tier_id.data
             tier = form._tiers[pt_id]
@@ -89,11 +89,13 @@ class TicketAmountsForm(Form):
             user_limit = max(tier.user_limit(), basket.get(tier, 0))
 
             if f.amount.data and f.amount.data > user_limit:
-                capacity_gone = True
+                f.amount.data = user_limit
+                capacity_available = False
+
             values = range(user_limit + 1)
             f.amount.values = values
             f._any = any(values)
-        return capacity_gone
+        return capacity_available
 
     def add_to_basket(form, basket):
         """ Add selected tickets to the provided basket. """

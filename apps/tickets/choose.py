@@ -82,7 +82,13 @@ def main(flow="main"):
         form.populate(basket)
 
     # Validate the capacity in the form, setting the maximum limits where available.
-    capacity_gone = form.ensure_capacity(basket)
+    if not form.ensure_capacity(basket):
+        # We're not able to provide the number of tickets the user has selected.
+        no_capacity.inc()
+        flash(
+            "We're sorry, but there weren't enough tickets remaining to give "
+            "you all the tickets you requested. We've reserved as many as we can for you."
+        )
 
     available = True
     if sales_state == "unavailable":
@@ -115,14 +121,6 @@ def main(flow="main"):
 
             for field in form:
                 field.errors = []
-
-    if capacity_gone:
-        # We're not able to provide the number of tickets the user has selected.
-        no_capacity.inc()
-        flash(
-            "We're sorry, but there is not enough capacity available to "
-            "allocate these tickets. You may be able to try again with a smaller amount."
-        )
 
     form.currency_code.data = get_user_currency()
     return render_template(
