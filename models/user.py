@@ -199,7 +199,11 @@ class User(db.Model, UserMixin):
     )
     payments = db.relationship("Payment", lazy="dynamic", backref="user", cascade="all")
     permissions = db.relationship(
-        "Permission", backref="user", cascade="all", secondary=UserPermission
+        "Permission",
+        backref="user",
+        cascade="all",
+        secondary=UserPermission,
+        lazy="joined",
     )
     votes = db.relationship("CFPVote", backref="user", lazy="dynamic")
 
