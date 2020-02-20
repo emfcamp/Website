@@ -3,11 +3,27 @@
 {% block title %}Choose Payment{% endblock %}
 {% block body %}
 {% set user_currency = get_user_currency() %}
+<h3>Your tickets are reserved</h3>
 {% include "tickets/_basket.html" %}
-
+<h3>Confirm your currency</h3>
+<div class="well">
+  <form method="post">
+  {{ form.hidden_tag() }}
+  {% if user_currency == 'GBP' %}
+    <p>You're currently buying tickets in Pounds. If you're paying from a Euro account, please change your currency to Euros,
+    so we can show you the available payment options.</p>
+  {% else %}
+    <p>You're currently buying tickets in Euros. If you're paying from a UK account, please change your currency to Pounds,
+    so we can show you the available payment options.</p>
+  {% endif %}
+  <div class="btn-group" role="group">
+      <button name="change_currency" value="{% if user_currency == 'GBP' %}EUR{% else %}GBP{% endif %}"
+          class="btn btn-default">Pay in {% if user_currency == 'GBP' %}Euros (€){% else %}Pounds (£){% endif %}</button>
+  </div>
+  </form>
+</div>
 <form method="post" class="pay-method">
 {{ form.hidden_tag() }}
-
 {% if current_user.is_anonymous or current_user.name == current_user.email or basket.requires_shipping %}
 
   <h3>Your Details</h3>
@@ -28,7 +44,8 @@
 
 {% endif %}
 
-<h3>Choose a Payment Method</h3>
+<h3>Choose a payment method</h3>
+
 <div class="row row-equal">
 <div class="col-sm-6">
 {% if feature_enabled('GOCARDLESS') %}
@@ -39,14 +56,14 @@
 
         {% if user_currency != 'EUR' %}
         <p>You can create a one-off direct debit payment 
-           from your bank account. This is easy for you and cheap for us.</p>
+           from your UK bank account. This is easy for you and cheap for us.</p>
 
         <p>Payments are protected by the
         <a href="http://www.directdebit.co.uk/DirectDebitExplained/Pages/DirectDebitGuarantee.aspx">Direct Debit
             Guarantee</a>.</p>
         {% else %}
         <p>You can create a one-off SEPA direct debit payment 
-           from your bank account. This is easy for you and cheap for us.</p>
+           from your Euro bank account. This is easy for you and cheap for us.</p>
         {% endif %}
     </div>
     <div class="panel-footer panel-footer-center">
@@ -76,7 +93,11 @@
 <div class="panel panel-default panel--payment">
     <div class="panel-heading"><h3 class="panel-title">Bank Transfer</h3></div>
     <div class="panel-body">
-        <p>Ask your bank to send money to us directly.</p>
+        {% if user_currency != 'EUR' %}
+        <p>Ask your UK bank to send money to us directly. We'll give you our account number and sort code to send the money to.</p>
+        {% else %}
+        <p>Ask your bank to send money to us directly. We'll give you our IBAN to send the money to.</p>
+        {% endif %}
     </div>
     <div class="panel-footer panel-footer-center">
         <input type="submit" name="{{form.banktransfer.name}}" value="{{form.banktransfer.label.text}}" class="btn btn-lg btn-success debounce"/>

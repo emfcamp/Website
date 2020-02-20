@@ -109,7 +109,7 @@ class Form(FlaskForm):
             CSRF token, for reasons which are currently unclear to me.
         """
         fields = [
-            getattr(self, f) if isinstance(f, string_types) else f
+            getattr(self, f) if isinstance(f, string_types) and hasattr(self, f) else f
             for f in exclude_fields
         ]
         keep_fields = [
