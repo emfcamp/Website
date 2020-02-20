@@ -111,6 +111,7 @@ def make_epc_qrfile(payment, **kwargs):
         iban="GB21BARC20716472954433",
         amount=payment.amount,
         reference=payment.bankref,
+        encoding=1,
     )
     qr.save(qrfile, **kwargs)
     qrfile.seek(0)
