@@ -1,3 +1,4 @@
+import os
 import time
 import yaml
 import secrets
@@ -75,6 +76,8 @@ volunteer_admin = None
 def create_app(dev_server=False):
     app = Flask(__name__)
     app.config.from_envvar("SETTINGS_FILE")
+    if os.environ.get("FLASK_CACHE_TYPE"):
+        app.config["CACHE_TYPE"] = os.environ["FLASK_CACHE_TYPE"]
     app.jinja_options["extensions"].append("jinja2.ext.do")
 
     if install_logging:
