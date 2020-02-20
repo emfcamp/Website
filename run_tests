@@ -19,7 +19,7 @@ then
     then
         TEST_SETTINGS=./config/test.cfg
     fi
-    docker-compose exec --env SETTINGS_FILE="${TEST_SETTINGS}" app poetry run pytest "${1}"
+    docker-compose exec --env SETTINGS_FILE="${TEST_SETTINGS}" app poetry run pytest "$@"
 else
     docker-compose exec app poetry run make test
 fi

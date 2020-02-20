@@ -10,7 +10,7 @@ from flask import session, render_template, abort, current_app as app, Markup
 from flask.json import jsonify
 from flask_login import login_user, current_user
 from flask_mail import Message
-from werkzeug import BaseResponse
+from werkzeug.wrappers import BaseResponse
 from werkzeug.exceptions import HTTPException
 from jinja2.utils import urlize
 
