@@ -3,6 +3,7 @@ import os
 import os.path
 import pytest
 import shutil
+import datetime
 from sqlalchemy import text
 from models.user import User
 from main import create_app, db as db_obj, Mail
@@ -40,12 +41,19 @@ def app_factory(cache):
     if not os.path.exists(prometheus_dir):
         os.mkdir(prometheus_dir)
 
+    #  For test purposes we're perpetually 2 weeks into ticket sales and 10 weeks before the event.
+    fake_event_start = datetime.datetime.now() + datetime.timedelta(weeks=10)
+    config_override = {
+        "SALES_START": (
+            datetime.datetime.now() - datetime.timedelta(weeks=2)
+        ).isoformat(),
+        "EVENT_START": fake_event_start.isoformat(),
+        "EVENT_END": (fake_event_start + datetime.timedelta(days=4)).isoformat(),
+    }
     if cache:
-        os.environ["FLASK_CACHE_TYPE"] = "simple"
-    else:
-        os.environ["FLASK_CACHE_TYPE"] = "null"
+        config_override["CACHE_TYPE"] = "simple"
 
-    app = create_app(True)
+    app = create_app(dev_server=True, config_override=config_override)
 
     with app.app_context():
         try:
