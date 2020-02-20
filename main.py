@@ -166,7 +166,7 @@ def create_app(dev_server=False):
     @app.before_request
     def simple_cache_warning():
         if not dev_server and app.config.get("CACHE_TYPE", "null") == "simple":
-            logging.warn(
+            logging.warning(
                 "Per-process cache being used outside dev server - refreshing will not work"
             )
 
