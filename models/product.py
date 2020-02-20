@@ -574,8 +574,6 @@ class ProductView(db.Model):
         return True
 
     def __repr__(self):
-        if self.vouchers:
-            return "<ProductView: %s vouchers=%s>" % (self.name, self.vouchers)
         return "<ProductView: %s>" % self.name
 
     def __str__(self):
