@@ -5,9 +5,6 @@
 {% set user_currency = get_user_currency() %}
 <h3>Your tickets are reserved</h3>
 {% include "tickets/_basket.html" %}
-<form method="post" class="pay-method">
-{{ form.hidden_tag() }}
-
 {% if current_user.is_anonymous or current_user.name == current_user.email or basket.requires_shipping %}
 
   <h3>Your Details</h3>
@@ -43,6 +40,9 @@
   </div>
   </form>
 </div>
+
+<form method="post" class="pay-method">
+{{ form.hidden_tag() }}
 <div class="row row-equal">
 <div class="col-sm-6">
 {% if feature_enabled('GOCARDLESS') %}
