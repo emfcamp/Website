@@ -5,6 +5,25 @@
 {% set user_currency = get_user_currency() %}
 <h3>Your tickets are reserved</h3>
 {% include "tickets/_basket.html" %}
+<h3>Confirm your currency</h3>
+<div class="well">
+  <form method="post">
+  {{ form.hidden_tag() }}
+  {% if user_currency == 'GBP' %}
+    <p>You're currently buying tickets in Pounds. If you're paying from a Euro account, please change your currency to Euros,
+    so we can show you the available payment options.</p>
+  {% else %}
+    <p>You're currently buying tickets in Euros. If you're paying from a UK account, please change your currency to Pounds,
+    so we can show you the available payment options.</p>
+  {% endif %}
+  <div class="btn-group" role="group">
+      <button name="change_currency" value="{% if user_currency == 'GBP' %}EUR{% else %}GBP{% endif %}"
+          class="btn btn-default">Pay in {% if user_currency == 'GBP' %}Euros (€){% else %}Pounds (£){% endif %}</button>
+  </div>
+  </form>
+</div>
+<form method="post" class="pay-method">
+{{ form.hidden_tag() }}
 {% if current_user.is_anonymous or current_user.name == current_user.email or basket.requires_shipping %}
 
   <h3>Your Details</h3>
@@ -26,23 +45,7 @@
 {% endif %}
 
 <h3>Choose a payment method</h3>
-<div class="well">
-  <form method="post">
-  {{ form.hidden_tag() }}
-  {% if user_currency == 'GBP' %}
-    <p>You're currently buying tickets in Pounds. If you're paying from a Euro account, please change your currency to Euros.</p>
-  {% else %}
-    <p>You're currently buying tickets in Euros. If you're paying from a UK account, please change your currency to Pounds.</p>
-  {% endif %}
-  <div class="btn-group" role="group">
-      <button name="change_currency" value="{% if user_currency == 'GBP' %}EUR{% else %}GBP{% endif %}"
-          class="btn btn-default">Pay in {% if user_currency == 'GBP' %}Euros (€){% else %}Pounds (£){% endif %}</button>
-  </div>
-  </form>
-</div>
 
-<form method="post" class="pay-method">
-{{ form.hidden_tag() }}
 <div class="row row-equal">
 <div class="col-sm-6">
 {% if feature_enabled('GOCARDLESS') %}
