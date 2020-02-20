@@ -18,6 +18,15 @@ def app():
         This fixture is scoped to the module level to avoid too much
         Postgres teardown/creation activity which is slow.
     """
+    yield from app_factory(False)
+
+
+@pytest.fixture(scope="module")
+def app_with_cache():
+    yield from app_factory(True)
+
+
+def app_factory(cache):
     if "SETTINGS_FILE" not in os.environ:
         root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
         os.environ["SETTINGS_FILE"] = os.path.join(root, "config", "test.cfg")
@@ -31,7 +40,12 @@ def app():
     if not os.path.exists(prometheus_dir):
         os.mkdir(prometheus_dir)
 
-    app = create_app()
+    if cache:
+        os.environ["FLASK_CACHE_TYPE"] = "simple"
+    else:
+        os.environ["FLASK_CACHE_TYPE"] = "null"
+
+    app = create_app(True)
 
     with app.app_context():
         try:

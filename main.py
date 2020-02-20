@@ -1,3 +1,4 @@
+import os
 import time
 import yaml
 import secrets
@@ -75,6 +76,8 @@ volunteer_admin = None
 def create_app(dev_server=False):
     app = Flask(__name__)
     app.config.from_envvar("SETTINGS_FILE")
+    if os.environ.get("FLASK_CACHE_TYPE"):
+        app.config["CACHE_TYPE"] = os.environ["FLASK_CACHE_TYPE"]
     app.jinja_options["extensions"].append("jinja2.ext.do")
 
     if install_logging:
@@ -163,7 +166,7 @@ def create_app(dev_server=False):
     @app.before_request
     def simple_cache_warning():
         if not dev_server and app.config.get("CACHE_TYPE", "null") == "simple":
-            logging.warn(
+            logging.warning(
                 "Per-process cache being used outside dev server - refreshing will not work"
             )
 
