@@ -48,7 +48,7 @@ def test_format_inline_epc_qr():
     expected = [
         "BCD",
         "002",
-        "2",
+        "1",
         "SCT",
         "",
         "Electromagnetic Field Ltd",
