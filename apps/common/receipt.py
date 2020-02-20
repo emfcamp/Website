@@ -123,12 +123,28 @@ def qrfile_to_svg(qrfile):
 
 
 def format_inline_qr(data):
-    qrfile = make_qrfile(data, kind="svg", svgclass=None, omitsize=True)
+    qrfile = make_qrfile(
+        data,
+        kind="svg",
+        svgclass=None,
+        omitsize=True,
+        xmldecl=False,
+        svgns=False,
+        nl=False,
+    )
     return qrfile_to_svg(qrfile)
 
 
 def format_inline_epc_qr(payment):
-    qrfile = make_epc_qrfile(payment, kind="svg", svgclass=None, omitsize=True)
+    qrfile = make_epc_qrfile(
+        payment,
+        kind="svg",
+        svgclass=None,
+        omitsize=True,
+        xmldecl=False,
+        svgns=False,
+        nl=False,
+    )
     return qrfile_to_svg(qrfile)
 
 
