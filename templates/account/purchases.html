@@ -62,7 +62,7 @@
 <p>If you have any problems with your tickets, please contact us at <a href="{{config['TICKETS_EMAIL'][1]}}">{{config['TICKETS_EMAIL'][1]}}</a>.</p>
 {% endblock %}
 {% block foot %}
-<script type="text/javascript" nonce="{{csp_nonce}}">
+<script nonce="{{csp_nonce}}">
 $(function() {
   $('#summary').children().toggle();
 });
