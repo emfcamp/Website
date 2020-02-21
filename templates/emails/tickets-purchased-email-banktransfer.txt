@@ -6,7 +6,7 @@ This is to confirm that you've reserved a ticket for Electromagnetic Field {{ ev
 This is to confirm that you've reserved {{ payment.purchases | count }} tickets for Electromagnetic Field {{ event_year }}!
 {%- endif %}
 
-You've chosen to pay by bank transfer. To see a more details of your order, and the bank details to send your transfer to, please click here:
+You've chosen to pay by bank transfer. To see more details of your order, and the bank details to send your transfer to, please click here:
 
 {{external_url('payments.transfer_waiting', payment_id=payment.id) }}
 
