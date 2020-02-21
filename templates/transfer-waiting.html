@@ -4,21 +4,18 @@
 <div class="col-md-10">
 
 <h2>Thank you!</h2>
-<p>Your order has been reserved {% if payment.expires -%} until {{ payment.expires.strftime('%-d %B %Y') }}{% endif %}
-  while you pay by bank transfer. We'll email you when we receive your payment.</p>
-
-<h2>How to Pay</h2>
-
-<p>You can pay by bank transfer, or by paying cash into our account.</p>
-<p>We will use the reference to identify the payment as yours, so please ensure it's included in full.</p>
-
-<form action={{ url_for('payments.transfer_change_currency', payment_id=payment.id) }} method="post" class="form-horizontal" role="form">
-{{ form.hidden_tag() }}
-<button type="submit" name="change" class="btn btn-danger debounce" value="1">Pay in {% if payment.currency == 'GBP' %}Euros (€){% else %}Pounds (£){% endif %}</button>
-</form>
-<p>
-</p>
-
+<div class="well">
+  <p>Your order has been reserved {% if payment.expires -%} until {{ payment.expires.strftime('%-d %B %Y') }}{% endif %}
+    while you pay by bank transfer. The bank details to use are below. We'll email you when we receive your payment.</p>
+  <p>If you have selected the incorrect currency, you can change it:</p>
+  <div class="button-group">
+  <form action={{ url_for('payments.transfer_change_currency', payment_id=payment.id) }} method="post" role="form">
+  {{ form.hidden_tag() }}
+  <button type="submit" name="change" class="btn btn-default debounce" value="1">Change currency to {% if payment.currency == 'GBP' %}Euros (€){% else %}Pounds (£){% endif %}</button>
+  </form>
+  </div>
+</div>
+<p>We will use the reference below to identify the payment as yours, so please ensure it's included in full. (Don't worry about the hyphen, or if the payee name doesn't quite fit.)</p>
 <dl class="dl-horizontal">
 <dt>Bank</dt><dd>Barclays</dd>
 <dt>Payee</dt><dd>Electromagnetic Field Ltd</dd>
@@ -33,10 +30,6 @@
 <dt>Amount</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
 <dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
 </dl>
-
-<p>(Don't worry about the hyphen, or if the payee name doesn't quite fit.)</p>
-
-<p>
 
 {% if SITE_STATE != 'after-event' %}
 <p>See you at Electromagnetic Field!</p>

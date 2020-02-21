@@ -10,15 +10,15 @@
   <form method="post">
   {{ form.hidden_tag() }}
   {% if user_currency == 'GBP' %}
-    <p>You're currently buying tickets in Pounds. If you're paying from a Euro account, please change your currency to Euros,
-    so we can show you the available payment options.</p>
+  <p>You're currently buying tickets in <strong>Pounds</strong>. If you're paying from a Euro account, please change your currency to Euros,
+    so we can show you the appropriate payment options.</p>
   {% else %}
-    <p>You're currently buying tickets in Euros. If you're paying from a UK account, please change your currency to Pounds,
-    so we can show you the available payment options.</p>
+  <p>You're currently buying tickets in <strong>Euros</strong>. If you're paying from a UK account, please change your currency to Pounds,
+    so we can show you the appropriate payment options.</p>
   {% endif %}
   <div class="btn-group" role="group">
       <button name="change_currency" value="{% if user_currency == 'GBP' %}EUR{% else %}GBP{% endif %}"
-          class="btn btn-default">Pay in {% if user_currency == 'GBP' %}Euros (€){% else %}Pounds (£){% endif %}</button>
+          class="btn btn-default">Change currency to {% if user_currency == 'GBP' %}Euros (€){% else %}Pounds (£){% endif %}</button>
   </div>
   </form>
 </div>
