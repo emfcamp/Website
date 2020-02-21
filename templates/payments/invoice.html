@@ -201,7 +201,7 @@
 {% endblock %}
 
 {% block foot %}
-<script type="text/javascript" nonce="{{csp_nonce}}">
+<script nonce="{{csp_nonce}}">
 $(function() {
   $('#vat-invoice').on('click', function(e) {
       $('#edit-company').removeClass('hidden').on('keydown', function(e) {
