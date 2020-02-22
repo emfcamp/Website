@@ -179,6 +179,8 @@ class FakeDataGenerator(object):
         vol.volunteer_phone = self.fake.phone_number()
         vol.over_18 = randombool(0.2)
         vol.allow_comms_during_event = randombool(0.8)
+        vol.volunteer_email = user.email
+        vol.nickname = user.name
         db.session.add(vol)
 
     def create_fake_tickets(self, user):
