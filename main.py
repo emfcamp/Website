@@ -201,6 +201,12 @@ def create_app(dev_server=False, config_override=None):
             ],
         }
 
+        # Edit record hash to support the modal dialogues in flask-admin
+        csp["script-src"].append("'sha256-Jxve8bBSodQplIZw4Y1walBJ0hFTx8sZ5xr+Pjr/78Y='")
+
+        # View record hash to support the modal dialogues in flask-admin
+        csp["script-src"].append("'sha256-XOlW2U5UiDeV2S/HgKqbp++Fo1I5uiUT2thFRUeFW/g='")
+
         if app.config.get("DEBUG_TB_ENABLED"):
             # This hash is for the flask debug toolbar. It may break once they upgrade it.
             csp["script-src"].append(
