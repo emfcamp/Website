@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, jsonify
 from flask_login import current_user
 from flask_restful import Resource, abort
 
@@ -6,6 +6,7 @@ from . import api
 from main import db
 from models.cfp import Proposal
 from models.ical import CalendarEvent
+from models.admin_message import AdminMessage
 
 
 class FavouriteProposal(Resource):
@@ -76,5 +77,13 @@ class FavouriteExternal(Resource):
         return {"is_favourite": new_state}
 
 
+class ScheduleMessage(Resource):
+    def get(self):
+        records = AdminMessage.get_visible_messages()
+        messages = list(map(getattr, records, ['message']))
+
+        return messages
+
 api.add_resource(FavouriteProposal, "/proposal/<int:proposal_id>/favourite")
 api.add_resource(FavouriteExternal, "/external/<int:event_id>/favourite")
+api.add_resource(ScheduleMessage, "/schedule_messages")

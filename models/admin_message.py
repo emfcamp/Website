@@ -3,7 +3,6 @@ from datetime import datetime
 
 from main import db
 
-
 class AdminMessage(db.Model):
     __tablename__ = "admin_message"
     __versioned__ = {}
