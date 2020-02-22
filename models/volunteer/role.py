@@ -15,6 +15,9 @@ class Role(db.Model):
     def __repr__(self):
         return "<VolunteerRole {0}>".format(self.name)
 
+    def __str__(self):
+        return self.name
+
     def to_dict(self):
         return {
             "id": self.id,
