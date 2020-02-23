@@ -161,7 +161,7 @@ class FakeDataGenerator(object):
             db.session.add(user)
             self.create_fake_tickets(user)
 
-        db.session.commit()
+            db.session.commit()
 
     def create_map_object(self, user):
         obj = MapObject()
