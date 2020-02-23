@@ -14,7 +14,7 @@ from flask_login import current_user
 from wtforms import StringField, SelectField, SubmitField, BooleanField
 from wtforms.validators import Required, Email, ValidationError, Optional
 
-from pendulum import parse, period
+from pendulum import period
 
 from main import db
 from models import event_start, event_end
@@ -139,24 +139,19 @@ def generate_arrival_options():
     first_arrival = event_start() - timedelta(app.config["ARRIVAL_DAYS"])
 
     # Add the first date to the list with or earlier
-    choices.append((
-        first_arrival.strftime("%F"),
-        first_arrival.strftime("%A %-d %B or earlier")
-    ))
+    choices.append(
+        (first_arrival.strftime("%F"), first_arrival.strftime("%A %-d %B or earlier"))
+    )
 
     # Work out dates between first arrival and end of the event
-    days = period(
-        first_arrival + timedelta(days=1),
-        event_end()).range("days", 1)
+    days = period(first_arrival + timedelta(days=1), event_end()).range("days", 1)
 
     # Add each date to the list
     for d in days:
-        choices.append((
-            d.strftime("%F"),
-            d.strftime("%A %-d %B")
-        ))
+        choices.append((d.strftime("%F"), d.strftime("%A %-d %B")))
 
     return choices
+
 
 def generate_departure_options():
     choices = []
@@ -165,21 +160,15 @@ def generate_departure_options():
     last_departure = event_end() + timedelta(app.config["DEPARTURE_DAYS"])
 
     # Work out dates between start of the event and last departure
-    days = period(
-        event_start(),
-        last_departure - timedelta(days=1)).range("days", 1)
+    days = period(event_start(), last_departure - timedelta(days=1)).range("days", 1)
 
     # Add each date to the list
     for d in days:
-        choices.append((
-            d.strftime("%F"),
-            d.strftime("%A %-d %B")
-        ))
+        choices.append((d.strftime("%F"), d.strftime("%A %-d %B")))
 
     # Add last departure day with or later
-    choices.append((
-        last_departure.strftime("%F"),
-        last_departure.strftime("%A %-d %B or later")
-    ))
+    choices.append(
+        (last_departure.strftime("%F"), last_departure.strftime("%A %-d %B or later"))
+    )
 
     return choices
