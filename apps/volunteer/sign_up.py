@@ -140,17 +140,14 @@ def generate_arrival_options():
     # Work out our first arrival based on config
     first_arrival = event_start() - timedelta(app.config["ARRIVAL_DAYS"])
 
-    # Add the first date to the list with or earlier
-    choices.append(
-        (first_arrival.strftime("%F"), first_arrival.strftime("%A %-d %B or earlier"))
-    )
-
     # Work out dates between first arrival and end of the event
-    days = period(first_arrival + timedelta(days=1), event_end()).range("days", 1)
+    choices = generate_day_options(first_arrival, event_end())
 
-    # Add each date to the list
-    for d in days:
-        choices.append((d.strftime("%F"), d.strftime("%A %-d %B")))
+    # Replace first array element with first date and 'or earlier'
+    choices[0] = (
+        first_arrival.strftime("%F"),
+        first_arrival.strftime("%A %-d %B or earlier"),
+    )
 
     return choices
 
@@ -162,15 +159,25 @@ def generate_departure_options():
     last_departure = event_end() + timedelta(app.config["DEPARTURE_DAYS"])
 
     # Work out dates between start of the event and last departure
-    days = period(event_start(), last_departure - timedelta(days=1)).range("days", 1)
+    choices = generate_day_options(event_start(), last_departure)
+
+    # Replace last array element with the last date and 'or later'
+    choices[len(choices) - 1] = (
+        last_departure.strftime("%F"),
+        last_departure.strftime("%A %-d %B or later"),
+    )
+
+    return choices
+
+
+def generate_day_options(start, stop):
+    choices = []
+
+    # Work out dates between start and stop
+    days = period(start, stop)
 
     # Add each date to the list
     for d in days:
         choices.append((d.strftime("%F"), d.strftime("%A %-d %B")))
-
-    # Add last departure day with or later
-    choices.append(
-        (last_departure.strftime("%F"), last_departure.strftime("%A %-d %B or later"))
-    )
 
     return choices
