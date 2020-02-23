@@ -71,9 +71,7 @@ def update_volunteer_from_form(volunteer, form):
 def sign_up():
     form = VolunteerSignUpForm()
     form.arrival.choices = generate_arrival_options()
-    form.arrival.data = event_start().strftime("%F")
     form.departure.choices = generate_departure_options()
-    form.departure.data = event_end().strftime("%F")
 
     if current_user.is_authenticated and VolunteerUser.get_for_user(current_user):
         return redirect(url_for(".account"))
@@ -100,6 +98,10 @@ def sign_up():
         app.logger.info("Add volunteer: %s", new_volunteer)
         flash("Thank you for signing up!", "message")
         return redirect(url_for(".choose_role"))
+
+    # Set form default arrival and departure dates to be start and end
+    form.arrival.data = event_start().strftime("%F")
+    form.departure.data = event_end().strftime("%F")
 
     return render_template("volunteer/sign-up.html", user=current_user, form=form)
 
