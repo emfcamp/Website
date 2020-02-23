@@ -9,10 +9,5 @@ class ShiftModelView(VolunteerModelView):
 
 
 volunteer_admin.add_view(
-    ShiftModelView(
-        Shift,
-        db.session,
-        category="Settings",
-        name="Shifts",
-    )
+    ShiftModelView(Shift, db.session, category="Settings", name="Shifts",)
 )

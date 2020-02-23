@@ -38,10 +38,8 @@ class VolunteerUserModelView(VolunteerModelView):
         "volunteer_phone",
         "planned_arrival",
         "planned_departure",
-
         "interested_roles",
         "trained_roles",
-
         "missing_shifts_opt_in",
         "over_18",
         "allow_comms_during_event",
@@ -53,9 +51,5 @@ class VolunteerUserModelView(VolunteerModelView):
 
 # Add menu item Volunteers
 volunteer_admin.add_view(
-    VolunteerUserModelView(
-        Volunteer,
-        db.session,
-        name="Volunteers"
-    )
+    VolunteerUserModelView(Volunteer, db.session, name="Volunteers")
 )
