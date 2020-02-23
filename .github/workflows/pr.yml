@@ -1,0 +1,20 @@
+name: Test
+
+on: [pull_request]
+
+env:
+  COMPOSE_INTERACTIVE_NO_CLI: 1
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Fetch latest docker-compose
+        run: sudo curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+      - name: Build containers
+        run: docker-compose -f ./docker-compose.yml -f ./docker-compose.ci.yml build --parallel
+      - name: Start environment
+        run: docker-compose -f ./docker-compose.yml -f ./docker-compose.ci.yml up -d
+      - name: Test
+        run: docker-compose -f ./docker-compose.yml -f ./docker-compose.ci.yml exec -T app poetry run make test
