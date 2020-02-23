@@ -75,7 +75,6 @@ def sign_up():
     form.departure.choices = generate_departure_options()
     form.departure.data = event_end().strftime("%F")
 
-    # On sign up give user 'volunteer' permission (+ managers etc.)
     if current_user.is_authenticated and VolunteerUser.get_for_user(current_user):
         return redirect(url_for(".account"))
 
@@ -94,6 +93,7 @@ def sign_up():
         new_volunteer = update_volunteer_from_form(new_volunteer, form)
         db.session.add(new_volunteer)
 
+        # On sign up give user 'volunteer' permission (+ managers etc.)
         current_user.grant_permission("volunteer:user")
 
         db.session.commit()
