@@ -4,6 +4,7 @@ import { DateTime } from 'luxon';
 import Calendar from './Calendar.js';
 import Filters from './Filters.js';
 import ScheduleData from './ScheduleData.js';
+import Messages from './Messages.js';
 
 function now() {
   return DateTime.fromMillis(Date.now(), { zone: 'Europe/London' });
@@ -93,6 +94,7 @@ function App() {
 
   return (
     <>
+      <Messages />
       <Filters {...filterProps} />
       <Calendar schedule={ schedule } toggleFavourite={ toggleFavourite } authenticated={ apiToken !== null } />
     </>
