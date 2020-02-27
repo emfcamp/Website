@@ -13,7 +13,7 @@ from wtforms import (
 )
 from wtforms.validators import (
     DataRequired,
-    InputRequired,
+    Optional,
     NumberRange,
     ValidationError,
 )
@@ -60,7 +60,7 @@ class UpdateProposalForm(Form):
             (1, "Needs to borrow a laptop for the talk"),
         ],
         coerce=int,
-        validators=[InputRequired()],
+        validators=[Optional()],
     )
     available_times = StringField("Available times")
 

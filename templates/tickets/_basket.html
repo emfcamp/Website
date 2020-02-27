@@ -12,19 +12,20 @@
       <li>{{purchase.price_tier.parent.display_name}}</li>
       {% endfor %}
   </ul>
-  <p>The total price is <b>{{ basket.total | price(user_currency) }}</b>.
+  <p>The total price is <b>{{ basket.total | price(user_currency) }}</b>.</p>
+  <p>These tickets have been reserved for you for the next hour, so there's no rush to complete the payment process.</p>
+  <p><small>     If you need to change the number of tickets, you can click &ldquo;Change tickets&rdquo; &mdash; your tickets will remain
+    reserved while you do this. If you don't want to buy these tickets, please click &ldquo;Empty basket&rdquo; to release your reservation.</small></p>
   <form method="post">
   {{ form.hidden_tag() }}
   <div class="btn-group" role="group">
       {% if flow == 'main' %}
-      <a class="btn btn-default" href="{{url_for('tickets.tickets_clear')}}">Empty basket</a>
-      <a class="btn btn-default" href="{{url_for('tickets.main')}}">Add more tickets</a>
+      <a class="btn btn-danger" href="{{url_for('tickets.tickets_clear')}}">Empty basket</a>
+      <a class="btn btn-default" href="{{url_for('tickets.main')}}">Change tickets</a>
       {% else %}
-      <a class="btn btn-default" href="{{url_for('tickets.tickets_clear', flow=flow)}}">Empty basket</a>
+      <a class="btn btn-danger" href="{{url_for('tickets.tickets_clear', flow=flow)}}">Empty basket</a>
       <a class="btn btn-default" href="{{url_for('tickets.main', flow=flow)}}">Change items</a>
       {% endif %}
-      <button name="change_currency" value="{% if user_currency == 'GBP' %}EUR{% else %}GBP{% endif %}"
-          class="btn btn-default">Pay in {% if user_currency == 'GBP' %}Euros (€){% else %}Pounds (£){% endif %}</button>
   </div>
   </form>
 </div>

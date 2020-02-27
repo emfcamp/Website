@@ -1,4 +1,3 @@
-import os
 import time
 import yaml
 import secrets
@@ -73,11 +72,11 @@ gocardless_client = None
 volunteer_admin = None
 
 
-def create_app(dev_server=False):
+def create_app(dev_server=False, config_override=None):
     app = Flask(__name__)
     app.config.from_envvar("SETTINGS_FILE")
-    if os.environ.get("FLASK_CACHE_TYPE"):
-        app.config["CACHE_TYPE"] = os.environ["FLASK_CACHE_TYPE"]
+    if config_override:
+        app.config.from_mapping(config_override)
     app.jinja_options["extensions"].append("jinja2.ext.do")
 
     if install_logging:
@@ -201,6 +200,16 @@ def create_app(dev_server=False):
                 "https://archive.org",
             ],
         }
+
+        # Edit record hash to support the modal dialogues in flask-admin
+        csp["script-src"].append(
+            "'sha256-Jxve8bBSodQplIZw4Y1walBJ0hFTx8sZ5xr+Pjr/78Y='"
+        )
+
+        # View record hash to support the modal dialogues in flask-admin
+        csp["script-src"].append(
+            "'sha256-XOlW2U5UiDeV2S/HgKqbp++Fo1I5uiUT2thFRUeFW/g='"
+        )
 
         if app.config.get("DEBUG_TB_ENABLED"):
             # This hash is for the flask debug toolbar. It may break once they upgrade it.

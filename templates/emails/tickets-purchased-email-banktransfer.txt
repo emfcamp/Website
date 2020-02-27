@@ -1,61 +1,16 @@
 Hi {{ user.name }},
 
 {% if payment.purchases | count == 1 -%}
-This is to confirm that you've reserved a ticket for {{ payment.amount | price(payment.currency) }} for
-Electromagnetic Field {{ event_year }}!
-
-This ticket will be reserved for you for 10 days while you send the money
-by bank transfer. We'll let you know by email when your payment has been
-received.
+This is to confirm that you've reserved a ticket for Electromagnetic Field {{ event_year }}!
 {%- else -%}
-This is to confirm that you've reserved {{ payment.purchases | count }} tickets for {{ payment.amount | price(payment.currency) }}
-for Electromagnetic Field {{ event_year }}!
+This is to confirm that you've reserved {{ payment.purchases | count }} tickets for Electromagnetic Field {{ event_year }}!
+{%- endif %}
 
-These tickets will be reserved for you for 10 days while you send the money
-by bank transfer. We'll let you know by email when your payment has been
-received.
-{%- endif -%}
+You've chosen to pay by bank transfer. To see more details of your order, and the bank details to send your transfer to, please click here:
 
-Your tickets are:
+{{external_url('payments.transfer_waiting', payment_id=payment.id) }}
 
-{% include "emails/email-tickets.txt" %}
-
-How to Pay
-----------
-
-You can pay by bank transfer, or by paying cash into our account.
-
-We will use the reference to identify the payment as yours, so please
-ensure it's included in full.
-
-Bank:           Barclays
-Payee:          Electromagnetic Field Ltd
-{% if payment.currency == 'GBP' -%}
-Sort code:      20-71-64
-Account number: 73590526
-{% elif payment.currency == 'EUR' -%}
-SWIFT:          BARCGB22
-IBAN:           GB21 BARC 2071 6472 9544 33
-{% endif -%}
-Amount:         {{ payment.amount | price(payment.currency) }}
-Reference:      {{ payment.bankref | bankref }}
-
-(Don't worry about the hyphen, or if the payee name doesn't quite fit.)
-
-Company Details
----------------
-
-Electromagnetic Field Ltd. is a company limited by guarantee,
-registered in England and Wales with company number 07788466.
-
-Registered office: 2 Ockendon Mews, London N1 3JL
-
-Your tickets will be held in your name for 10 days, so please remember to
-pay promptly.
-
-We will send another email when we've received your payment.
-
-See you soon,
+Please ensure your payment reaches us by {{payment.expires.strftime('%-d %B %Y')}}, or your reservation may be cancelled.
 
 Love,
 

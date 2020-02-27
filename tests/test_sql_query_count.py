@@ -23,8 +23,11 @@ class QueryLog:
             db.engine, "before_cursor_execute", self._query_callback
         )
 
+    def __repr__(self):
+        return "<SQLAlchemy Query Logger>"
 
-@pytest.mark.parametrize("url,queries", [("/tickets", 1), ("/", 0)])
+
+@pytest.mark.parametrize("url,queries", [("/tickets", 2), ("/", 0)])
 def test_query_count(app_with_cache, url, queries):
     """ Test how many SQL queries a page generates. """
     client = app_with_cache.test_client()
