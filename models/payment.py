@@ -304,10 +304,10 @@ class BankAccount(db.Model):
     acct_id = db.Column(db.String)
     currency = db.Column(db.String, nullable=False)
     active = db.Column(db.Boolean)
-    institution = db.Column(db.String, nullable=False, server_default="Barclays Bank PLC")
-    address = db.Column(db.String, nullable=False, server_default="19 Fleet Street, London EC4Y 1AA, UK")
-    swift = db.Column(db.String, nullable=False, server_default="BARCGB22")
-    iban = db.Column(db.String, nullable=False, server_default="BARCGB22")
+    institution = db.Column(db.String, nullable=False)
+    address = db.Column(db.String, nullable=False)
+    swift = db.Column(db.String, nullable=False)
+    iban = db.Column(db.String, nullable=False)
 
     def __init__(self, sort_code, acct_id, currency, institution, address, swift, iban):
         self.sort_code = sort_code
