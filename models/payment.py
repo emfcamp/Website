@@ -295,6 +295,14 @@ class BankPayment(Payment):
 
         super(BankPayment, self).manual_refund()
 
+    @property
+    def recommended_destination(self):
+        for currency in [self.currency, "GBP"]:
+            try:
+                return BankAccount.query.filter_by(currency=currency, active=True).one()
+            except:
+                continue
+
 
 class BankAccount(db.Model):
     __tablename__ = "bank_account"

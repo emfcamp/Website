@@ -146,7 +146,11 @@ def send_reminder(payment_id):
                 sender=app.config["TICKETS_EMAIL"],
                 recipients=[payment.user.email],
             )
-            msg.body = render_template("emails/tickets-reminder.txt", payment=payment)
+            msg.body = render_template(
+                "emails/tickets-reminder.txt",
+                payment=payment,
+                account=payment.recommended_destination,
+            )
             mail.send(msg)
 
             payment.reminder_sent = True
@@ -156,7 +160,10 @@ def send_reminder(payment_id):
             return redirect(url_for("admin.expiring"))
 
     return render_template(
-        "admin/payments/payment-send-reminder.html", payment=payment, form=form
+        "admin/payments/payment-send-reminder.html",
+        payment=payment,
+        account=payment.recommended_destination,
+        form=form,
     )
 
 

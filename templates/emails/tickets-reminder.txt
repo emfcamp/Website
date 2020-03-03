@@ -24,21 +24,21 @@ ensure it's included in full.
 
 Bank:           Barclays
 Payee:          Electromagnetic Field Ltd
-Sort code:      20-71-64
-Account number: 73590526
+Sort code:      {{ account.sort_code }}
+Account number: {{ account.acct_id }}
 Amount:         {{ payment.amount | price('GBP') }}
 Reference:      {{ payment.bankref | bankref }}
 
 (Don't worry if the payee name doesn't quite fit)
 
-{% elif payment.currency == 'EUR' %}
+{% else %}
 
-You can pay into our Euro bank account:
+You can pay into our {{ account.currency }} bank account:
 
 Payee:     Electromagnetic Field Ltd
-SWIFT:     BARCGB22
-IBAN:      GB21 BARC 2071 6472 9544 33
-Amount:    {{ payment.amount | price('EUR') }}
+SWIFT:     {{ account.swift }}
+IBAN:      {{ account.iban }}
+Amount:    {{ payment.amount | price(payment.currency) }}
 Reference: {{ payment.bankref | bankref }}
 
 (Don't worry if the payee name doesn't quite fit)

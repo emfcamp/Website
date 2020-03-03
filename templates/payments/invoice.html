@@ -160,15 +160,14 @@
   {% endif %}
   {% if payment.provider == 'banktransfer' %}
   <dl class="bank-info dl-horizontal">
-    <dt>Bank</dt><dd>Barclays Bank PLC, 19 Fleet Street, London EC4Y 1AA, UK</dd>
+    <dt>Bank</dt><dd>{{ account.institution }}, {{ account.address }}</dd>
     <dt>Payee</dt><dd>Electromagnetic Field Ltd</dd>
     {% if payment.currency == 'GBP' %}
-    <dt>Sort code</dt><dd>20-71-64</dd>
-    <dt>Account number</dt><dd>73590526</dd>
-    <!--<dt>IBAN</dt><dd>GB39 BARC 2071 6473 5905 26</dd>-->
-    {% elif payment.currency == 'EUR' %}
-    <dt>SWIFT</dt><dd>BARCGB22</dd>
-    <dt>IBAN</dt><dd>GB21 BARC 2071 6472 9544 33</dd>
+    <dt>Sort code</dt><dd>{{ account.sort_code }}</dd>
+    <dt>Account number</dt><dd>{{ account.acct_id }}</dd>
+    {% else %}
+    <dt>SWIFT</dt><dd>{{ account.swift }}</dd>
+    <dt>IBAN</dt><dd>{{ account.iban }}</dd>
     {% endif %}
     <dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
   </dl>
