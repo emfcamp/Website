@@ -22,6 +22,7 @@ from flask_cors import CORS
 from loggingmanager import create_logging_manager, set_user_id
 from werkzeug.exceptions import HTTPException
 import stripe
+import pytransferwise
 import gocardless_pro
 
 
@@ -149,6 +150,8 @@ def create_app(dev_server=False, config_override=None):
         environment=app.config["GOCARDLESS_ENVIRONMENT"],
     )
     stripe.api_key = app.config["STRIPE_SECRET_KEY"]
+    pytransferwise.environment = app.config["TRANSFERWISE_ENVIRONMENT"]
+    pytransferwise.api_key = app.config["TRANSFERWISE_API_TOKEN"]
 
     @app.before_request
     def load_per_request_state():
