@@ -3,35 +3,11 @@ import ofxparse
 from datetime import datetime
 
 from flask import current_app as app
-from sqlalchemy.orm.exc import NoResultFound
 
 from main import db
 from apps.base import base
 from apps.payments import banktransfer
 from models.payment import BankAccount, BankTransaction
-
-
-@base.cli.command("createbankaccounts")
-def create_bank_accounts_cmd():
-    create_bank_accounts()
-
-
-def create_bank_accounts():
-    """ Create bank accounts if they don't exist """
-    gbp = BankAccount("492900", "20716473590526", "GBP")
-    eur = BankAccount("492900", "20716472954433", "EUR")
-    for acct in [gbp, eur]:
-        try:
-            BankAccount.query.filter_by(
-                acct_id=acct.acct_id, sort_code=acct.sort_code
-            ).one()
-        except NoResultFound:
-            app.logger.info(
-                "Adding %s account %s %s", acct.currency, acct.sort_code, acct.acct_id
-            )
-            db.session.add(acct)
-
-    db.session.commit()
 
 
 @base.cli.command("loadofx")

@@ -27,7 +27,6 @@ echo "Initialising database..."
 poetry run flask db upgrade
 echo "Creating base data..."
 poetry run flask create_perms
-poetry run flask createbankaccounts
 poetry run flask cfp create_venues
 poetry run flask tickets create
 echo "Starting dev server..."
