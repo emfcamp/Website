@@ -300,14 +300,23 @@ class BankAccount(db.Model):
     __tablename__ = "bank_account"
     __export_data__ = False
     id = db.Column(db.Integer, primary_key=True)
-    sort_code = db.Column(db.String, nullable=False)
-    acct_id = db.Column(db.String, nullable=False)
+    sort_code = db.Column(db.String)
+    acct_id = db.Column(db.String)
     currency = db.Column(db.String, nullable=False)
+    active = db.Column(db.Boolean)
+    institution = db.Column(db.String, nullable=False, server_default="Barclays Bank PLC")
+    address = db.Column(db.String, nullable=False, server_default="19 Fleet Street, London EC4Y 1AA, UK")
+    swift = db.Column(db.String, nullable=False, server_default="BARCGB22")
+    iban = db.Column(db.String, nullable=False, server_default="BARCGB22")
 
-    def __init__(self, sort_code, acct_id, currency="GBP"):
+    def __init__(self, sort_code, acct_id, currency, institution, address, swift, iban):
         self.sort_code = sort_code
         self.acct_id = acct_id
         self.currency = currency
+        self.institution = institution
+        self.address = address
+        self.swift = swift
+        self.iban = iban
 
     @classmethod
     def get(cls, sort_code, acct_id):
@@ -318,6 +327,13 @@ db.Index(
     "ix_bank_account_sort_code_acct_id",
     BankAccount.sort_code,
     BankAccount.acct_id,
+    unique=True,
+)
+
+db.Index(
+    "ix_bank_account_currency_active",
+    BankAccount.currency,
+    BankAccount.active,
     unique=True,
 )
 
