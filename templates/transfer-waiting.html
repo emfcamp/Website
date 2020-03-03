@@ -24,7 +24,7 @@
 <dt>Account number</dt><dd>{{ account.acct_id }}</dd>
 {% else %}
 <dt>SWIFT</dt><dd>{{ account.swift }}</dd>
-<dt>IBAN</dt><dd>{{ account.iban }}</dd>
+<dt>IBAN</dt><dd>{{ account.iban | iban }}</dd>
 {% endif %}
 <dt>Amount</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
 <dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>

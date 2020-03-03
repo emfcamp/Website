@@ -37,7 +37,7 @@ You can pay into our {{ account.currency }} bank account:
 
 Payee:     Electromagnetic Field Ltd
 SWIFT:     {{ account.swift }}
-IBAN:      {{ account.iban }}
+IBAN:      {{ account.iban | iban }}
 Amount:    {{ payment.amount | price(payment.currency) }}
 Reference: {{ payment.bankref | bankref }}
 

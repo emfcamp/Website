@@ -3,6 +3,7 @@ from datetime import datetime
 import json
 import re
 import os.path
+from textwrap import wrap
 import pendulum
 
 from main import db, mail, external_url
@@ -44,6 +45,10 @@ def load_utility_functions(app_obj):
     @app_obj.template_filter("time_ago")
     def time_ago(date):
         return pendulum.instance(date).diff_for_humans()
+
+    @app_obj.template_filter("iban")
+    def format_iban(iban):
+        return " ".join(wrap(iban, 4))
 
     @app_obj.template_filter("price")
     def format_price(price, currency=None, after=False):
