@@ -24,7 +24,7 @@ ensure it's included in full.
 
 Bank:           Barclays
 Payee:          Electromagnetic Field Ltd
-Sort code:      {{ account.sort_code }}
+Sort code:      {{ account.sort_code | sort_code }}
 Account number: {{ account.acct_id }}
 Amount:         {{ payment.amount | price('GBP') }}
 Reference:      {{ payment.bankref | bankref }}

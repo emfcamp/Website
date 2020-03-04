@@ -163,7 +163,7 @@
     <dt>Bank</dt><dd>{{ account.institution }}, {{ account.address }}</dd>
     <dt>Payee</dt><dd>Electromagnetic Field Ltd</dd>
     {% if payment.currency == 'GBP' %}
-    <dt>Sort code</dt><dd>{{ account.sort_code }}</dd>
+    <dt>Sort code</dt><dd>{{ account.sort_code | sort_code }}</dd>
     <dt>Account number</dt><dd>{{ account.acct_id }}</dd>
     {% else %}
     <dt>SWIFT</dt><dd>{{ account.swift }}</dd>

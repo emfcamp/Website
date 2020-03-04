@@ -50,6 +50,10 @@ def load_utility_functions(app_obj):
     def format_iban(iban):
         return " ".join(wrap(iban, 4))
 
+    @app_obj.template_filter("sort_code")
+    def format_sort_code(sort_code):
+        return "-".join(wrap(sort_code, 2))
+
     @app_obj.template_filter("price")
     def format_price(price, currency=None, after=False):
         if isinstance(price, Price):
