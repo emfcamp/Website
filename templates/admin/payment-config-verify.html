@@ -36,6 +36,30 @@
   <li>Ensure bank statement reference in GoCardless settings is set correctly (it has the year in).</li>
 </ul>
 
+<h3>Bank Accounts</h3>
+<table class="table table-condensed">
+  <tr>
+    <th>Institution</th>
+    <th>Currency</th>
+    <th>Active</th>
+    <th>SWIFT</th>
+    <th>IBAN</th>
+    <th>Sort Code</th>
+    <th>Account Number</th>
+  </tr>
+{% for bank_account in bank_accounts %}
+  <tr>
+    <td>{{ bank_account.institution }}</td>
+    <td>{{ bank_account.currency }}</td>
+    <td>{% if bank_account.active %}✅{% else %}❌{% endif %}</td>
+    <td>{{ bank_account.swift }}</td>
+    <td>{{ bank_account.iban | iban }}</td>
+    <td>{{ bank_account.sort_code | sort_code }}</td>
+    <td>{{ bank_account.acct_id }}</td>
+  </tr>
+{% endfor %}
+</table>
+
 <h3>Bank Transfer</h3>
 <ul>
   {% if last_bank_payment %}
