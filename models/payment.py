@@ -317,10 +317,13 @@ class BankAccount(db.Model):
     swift = db.Column(db.String, nullable=False)
     iban = db.Column(db.String, nullable=False)
 
-    def __init__(self, sort_code, acct_id, currency, institution, address, swift, iban):
+    def __init__(
+        self, sort_code, acct_id, currency, active, institution, address, swift, iban
+    ):
         self.sort_code = sort_code
         self.acct_id = acct_id
         self.currency = currency
+        self.active = active
         self.institution = institution
         self.address = address
         self.swift = swift

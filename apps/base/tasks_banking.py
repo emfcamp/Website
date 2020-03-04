@@ -31,6 +31,7 @@ def create_bank_accounts():
         sort_code="112131",
         acct_id="41516171",
         currency="EUR",
+        active=True,
         institution="London Bank",
         address="13 Bartlett Place, London, WC1B 4NM",
         iban="GB47LOND11213141516171",
@@ -45,7 +46,6 @@ def create_bank_accounts():
             app.logger.info(
                 "Adding %s account %s %s", acct.currency, acct.sort_code, acct.acct_id
             )
-            acct.active = True
             db.session.add(acct)
 
     db.session.commit()
