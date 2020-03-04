@@ -144,8 +144,8 @@ class Payment(db.Model):
 
     @classmethod
     def premium(cls, currency, amount):
-        """ Used to be used for credit card premiums, which now aren't allowed.
-            TODO: cut this out entirely.
+        """Used to be used for credit card premiums, which now aren't allowed.
+        TODO: cut this out entirely.
         """
         return Decimal(0)
 
@@ -235,7 +235,7 @@ class Payment(db.Model):
         return other
 
     def order_number(self):
-        """ Note this is not a VAT invoice number. """
+        """Note this is not a VAT invoice number."""
         return "WEB-%s-%05d" % (event_year(), self.id)
 
     def issue_vat_invoice_number(self):
@@ -314,8 +314,9 @@ class BankAccount(db.Model):
     active = db.Column(db.Boolean)
     institution = db.Column(db.String, nullable=False)
     address = db.Column(db.String, nullable=False)
-    swift = db.Column(db.String)
-    iban = db.Column(db.String)
+    swift = db.Column(db.String, nullable=False)
+    iban = db.Column(db.String, nullable=False)
+    borderless_account_id = db.Column(db.String)
 
     def __init__(
         self, sort_code, acct_id, currency, active, institution, address, swift, iban
@@ -593,10 +594,10 @@ class RefundRequest(db.Model):
 
     @property
     def method(self):
-        """ The method we use to refund this request.
+        """The method we use to refund this request.
 
-            This will be "stripe" if the payment can be refunded through Stripe,
-            and "banktransfer" otherwise.
+        This will be "stripe" if the payment can be refunded through Stripe,
+        and "banktransfer" otherwise.
         """
         if (
             type(self.payment) is StripePayment
@@ -608,8 +609,8 @@ class RefundRequest(db.Model):
 
 
 class PaymentSequence(db.Model):
-    """ Table for storing sequence numbers.
-        Currently used for storing VAT invoice sequences, which must be monotonic.
+    """Table for storing sequence numbers.
+    Currently used for storing VAT invoice sequences, which must be monotonic.
     """
 
     name = db.Column(db.String, primary_key=True)
