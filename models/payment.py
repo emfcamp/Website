@@ -328,7 +328,7 @@ class BankAccount(db.Model):
         address,
         swift,
         iban,
-        borderless_account_id,
+        borderless_account_id=None,
     ):
         self.sort_code = sort_code
         self.acct_id = acct_id
