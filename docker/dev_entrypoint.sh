@@ -25,6 +25,13 @@ fi;
 
 echo "Initialising database..."
 poetry run flask db upgrade
+
+if [ ! -z "$TESTS_ONLY" ]; then
+  # This container is just being used to host the tests
+  sleep infinity
+  exit 1
+fi
+
 echo "Creating base data..."
 poetry run flask create_perms
 poetry run flask createbankaccounts
