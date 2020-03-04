@@ -319,7 +319,16 @@ class BankAccount(db.Model):
     borderless_account_id = db.Column(db.String)
 
     def __init__(
-        self, sort_code, acct_id, currency, active, institution, address, swift, iban
+        self,
+        sort_code,
+        acct_id,
+        currency,
+        active,
+        institution,
+        address,
+        swift,
+        iban,
+        borderless_account_id,
     ):
         self.sort_code = sort_code
         self.acct_id = acct_id
@@ -329,6 +338,7 @@ class BankAccount(db.Model):
         self.address = address
         self.swift = swift
         self.iban = iban
+        self.borderless_account_id = borderless_account_id
 
     @classmethod
     def get(cls, sort_code, acct_id):
