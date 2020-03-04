@@ -55,9 +55,13 @@ flask-shell-ipython = "*"
 Flask-Static-Digest = "*"
 email_validator = "^1.0"
 segno = "^1.0.0"
+<<<<<<< HEAD
 pytest-vcr = "^1.0.2"
 pywisetransfer = "^0.1.5"
 freezegun = "^1.1.0"
+=======
+pytransferwise = "^0.1.2"
+>>>>>>> be70304a... Upgrade pytransferwise to 0.1.2
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
