@@ -40,7 +40,10 @@ from models.map import MapObject
 from models.scheduled_task import tasks, ScheduledTaskResult
 from ..payments.stripe import stripe_validate
 from ..payments.gocardless import gocardless_validate
-from ..payments.transferwise import transferwise_validate
+from ..payments.transferwise import (
+    transferwise_validate,
+    transferwise_retrieve_accounts,
+)
 from ..common import require_permission
 from ..common.forms import Form
 
@@ -207,14 +210,35 @@ def site_states():
     return render_template("admin/site-states.html", form=form)
 
 
-@admin.route("/payment-config-verify")
+class BankAccountRefreshForm(Form):
+    import_accounts = SubmitField("Import new TransferWise accounts")
+
+
+@admin.route("/payment-config-verify", methods=["GET", "POST"])
 def payment_config_verify():
+    form = BankAccountRefreshForm()
+
+    if form.validate_on_submit():
+        tw_accounts = transferwise_retrieve_accounts()
+        for tw_account in tw_accounts:
+            existing_account = BankAccount.query.filter_by(iban=tw_account.iban).first()
+            if existing_account:
+                continue
+            db.session.add(tw_account)
+
+        if db.session.dirty:
+            db.session.commit()
+            flash("New TransferWise bank accounts have been imported")
+        else:
+            flash("No new TransferWise bank accounts have been imported")
+
     return render_template(
         "admin/payment-config-verify.html",
         stripe=stripe_validate(),
         gocardless=gocardless_validate(),
         transferwise=transferwise_validate(),
         bank_accounts=BankAccount.query.all(),
+        form=form,
         last_bank_payment=BankTransaction.query.order_by(
             BankTransaction.id.desc()
         ).first(),

@@ -1,6 +1,54 @@
 from flask import current_app as app
 import pywisetransfer
 
+from models.payment import BankAccount
+
+
+def transferwise_business_profile():
+    client = pytransferwise.Client()
+    profiles = client.profiles.list(type="business")
+    return next(profiles, None)
+
+
+def _collect_bank_accounts(borderless_account):
+    for balance in borderless_account.balances:
+        if not balance.bankDetails:
+            continue
+
+        address = ", ".join(
+            [
+                balance.bankAddress.addressFirstLine,
+                balance.bankAddress.city,
+                balance.bankAddress.postCode,
+                balance.bankAddress.country,
+            ]
+        )
+        yield BankAccount(
+            sort_code=None,
+            acct_id=None,
+            currency=balance.bankDetails.currency,
+            active=False,
+            institution=balance.bankName,
+            address=address,
+            swift=balance.bankDetails.swift,
+            iban=balance.bankDetails.iban,
+            borderless_account_id=balance.id,
+        )
+
+
+def transferwise_retrieve_accounts():
+    business_profile = transferwise_business_profile()
+    if not business_profile:
+        return
+
+    client = pytransferwise.Client()
+    borderless_accounts = client.borderless_accounts.list(
+        profile_id=business_profile.id
+    )
+    for borderless_account in borderless_accounts:
+        for bank_account in _collect_bank_accounts(borderless_account):
+            yield bank_account
+
 
 def transferwise_validate():
     """ Validate that TransferWise is configured and operational"""
@@ -27,8 +75,7 @@ def transferwise_validate():
     except Exception as e:
         result.append((False, f"Unable to connect to TransferWise: {e}"))
 
-    profiles = client.profiles.list()
-    business_profile = next(filter(lambda p: p.type == "business", profiles), None)
+    business_profile = transferwise_business_profile()
     if business_profile:
         result.append((True, "TransferWise business profile exists"))
     else:
