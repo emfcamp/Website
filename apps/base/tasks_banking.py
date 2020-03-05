@@ -22,7 +22,6 @@ def create_bank_accounts():
         sort_code="102030",
         acct_id="40506070",
         currency="GBP",
-        active=True,
         institution="London Bank",
         address="13 Bartlett Place, London, WC1B 4NM",
         iban="GB44LOND10203040506070",
