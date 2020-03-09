@@ -314,8 +314,8 @@ class BankAccount(db.Model):
     active = db.Column(db.Boolean)
     institution = db.Column(db.String, nullable=False)
     address = db.Column(db.String, nullable=False)
-    swift = db.Column(db.String, nullable=False)
-    iban = db.Column(db.String, nullable=False)
+    swift = db.Column(db.String)
+    iban = db.Column(db.String)
 
     def __init__(
         self, sort_code, acct_id, currency, active, institution, address, swift, iban
