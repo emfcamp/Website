@@ -29,8 +29,8 @@ def create_bank_accounts():
         swift=None,
     )
     eur = BankAccount(
-        sort_code="112131",
-        acct_id="41516171",
+        sort_code=None,
+        acct_id=None,
         currency="EUR",
         active=True,
         institution="London Bank",
@@ -45,7 +45,10 @@ def create_bank_accounts():
             ).one()
         except NoResultFound:
             app.logger.info(
-                "Adding %s account %s %s", acct.currency, acct.sort_code, acct.acct_id
+                "Adding %s account %s %s",
+                acct.currency,
+                acct.sort_code or acct.swift,
+                acct.acct_id or acct.iban,
             )
             db.session.add(acct)
 
