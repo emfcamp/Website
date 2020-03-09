@@ -25,8 +25,8 @@ def create_bank_accounts():
         active=True,
         institution="London Bank",
         address="13 Bartlett Place, London, WC1B 4NM",
-        iban="GB44LOND10203040506070",
-        swift="GB44LOND",
+        iban=None,
+        swift=None,
     )
     eur = BankAccount(
         sort_code="112131",
