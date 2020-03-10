@@ -1,7 +1,53 @@
-from flask import current_app as app
+from flask import abort, current_app as app, request
 import pywisetransfer
+from pywisetransfer.webhooks import verify_signature
+import logging
 
+from main import csrf
 from models.payment import BankAccount
+from . import payments
+
+logger = logging.getLogger(__name__)
+
+
+webhook_handlers = {}
+
+
+def webhook(type=None):
+    def inner(f):
+        webhook_handlers[type] = f
+        return f
+
+    return inner
+
+
+@csrf.exempt
+@payments.route("/transferwise-webhook", methods=["POST"])
+def transferwise_webhook():
+    valid_signature = verify_signature(
+        request.data,
+        request.headers["X-Signature"],
+    )
+    if not valid_signature:
+        logger.exception("Error verifying TransferWise webhook signature")
+        abort(400)
+
+    event_type = request.json.get("event_type")
+    try:
+        try:
+            handler = webhook_handlers[event_type]
+        except KeyError as e:
+            handler = webhook_handlers[None]
+        return handler(event_type, request.json)
+    except Exception as e:
+        logger.exception("Unhandled exception during TransferWise webhook")
+        logger.info("Webhook data: %s", request.data)
+        abort(500)
+
+
+@webhook("balances#credit")
+def transferwise_balance_credit(event_type, event):
+    return ("", 204)
 
 
 def transferwise_business_profile():
