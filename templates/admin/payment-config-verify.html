@@ -53,10 +53,10 @@
     <td>{{ bank_account.institution }}</td>
     <td>{{ bank_account.currency }}</td>
     <td>{% if bank_account.active %}✅{% else %}❌{% endif %}</td>
-    <td>{{ bank_account.swift }}</td>
-    <td>{{ bank_account.iban | iban }}</td>
-    <td>{{ bank_account.sort_code | sort_code }}</td>
-    <td>{{ bank_account.acct_id }}</td>
+    <td>{{ bank_account.swift or '' }}</td>
+    <td>{{ bank_account.iban or '' | iban }}</td>
+    <td>{{ bank_account.sort_code or '' | sort_code }}</td>
+    <td>{{ bank_account.acct_id or '' }}</td>
   </tr>
 {% endfor %}
 </table>
