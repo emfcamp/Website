@@ -1,10 +1,11 @@
+from datetime import datetime, timedelta
 from flask import abort, current_app as app, request
+import logging
 import pywisetransfer
 from pywisetransfer.webhooks import verify_signature
-import logging
 
 from main import csrf
-from models.payment import BankAccount
+from models.payment import BankAccount, BankTransaction
 from . import payments
 
 logger = logging.getLogger(__name__)
@@ -47,6 +48,71 @@ def transferwise_webhook():
 
 @webhook("balances#credit")
 def transferwise_balance_credit(event_type, event):
+    profile_id = event.get("data", {}).get("resource", {}).get("profile_id")
+    if profile_id is None:
+        logger.exception("Missing profile_id in TransferWise webhook")
+        logger.info("Webhook data: %s", request.data)
+        abort(400)
+
+    borderless_account_id = event.get("data", {}).get("resource", {}).get("id")
+    if borderless_account_id is None:
+        logger.exception("Missing borderless_account_id in TransferWise webhook")
+        logger.info("Webhook data: %s", request.data)
+        abort(400)
+
+    currency = event.get("data", {}).get("currency")
+    if currency is None:
+        logger.exception("Missing currency in TransferWise webhook")
+        logger.info("Webhook data: %s", request.data)
+        abort(400)
+
+    # Find the TransferWise bank account in the application database
+    bank_account = BankAccount.query.filter_by(
+        borderless_account_id=borderless_account_id, active=True
+    ).first()
+    if not bank_account:
+        logger.exception("Could not find bank account for borderless_account_id")
+        logger.info("Webhook data: %s", request.data)
+        abort(400)
+
+    # Retrieve an account transaction statement for the past week
+    client = pytransferwise.Client()
+    interval_end = datetime.now()
+    interval_start = interval_end - timedelta(days=7)
+    statement = client.borderless_accounts.statement(
+        profile_id=profile_id,
+        account_id=borderless_account_id,
+        currency=currency,
+        interval_start=interval_start.isoformat() + "Z",
+        interval_end=interval_end.isoformat() + "Z",
+    )
+
+    # Retrieve or construct transactions for each credit in the statement
+    txns = []
+    for transaction in statement.transactions:
+        if transaction.type != "CREDIT":
+            continue
+
+        # Attempt to find transaction in the application database
+        txn = BankTransaction.query.filter(
+            account_id=bank_account.id,
+            posted=transaction.date,
+            type=transaction.details.type.lower(),
+            payee=transaction.details.paymentReference,
+        ).first()
+
+        # Construct a transaction record if not found
+        txn = txn or BankTransaction(
+            account_id=bank_account.id,
+            posted=transaction.date,
+            type=transaction.details.type.lower(),
+            amount=transaction.amount.value,
+            payee=transaction.details.paymentReference,
+        )
+        txns.append(txn)
+
+    # TODO: Reconcile txns <-> payments
+
     return ("", 204)
 
 
