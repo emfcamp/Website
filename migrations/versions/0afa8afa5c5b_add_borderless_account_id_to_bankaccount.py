@@ -1,14 +1,14 @@
 """Add borderless_account_id to BankAccount
 
 Revision ID: 0afa8afa5c5b
-Revises: fa044cbcbf79
+Revises: d01b87ff85d2
 Create Date: 2020-03-04 13:54:43.683627
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '0afa8afa5c5b'
-down_revision = 'fa044cbcbf79'
+down_revision = 'd01b87ff85d2'
 
 from alembic import op
 import sqlalchemy as sa
