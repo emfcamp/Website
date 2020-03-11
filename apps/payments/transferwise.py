@@ -14,13 +14,15 @@ def _collect_bank_accounts(borderless_account):
     for balance in borderless_account.balances:
         if not balance.bankDetails:
             continue
+        if not balance.bankDetails.bankAddress:
+            continue
 
         address = ", ".join(
             [
-                balance.bankAddress.addressFirstLine,
-                balance.bankAddress.city,
-                balance.bankAddress.postCode,
-                balance.bankAddress.country,
+                balance.bankDetails.bankAddress.addressFirstLine,
+                balance.bankDetails.bankAddress.city,
+                balance.bankDetails.bankAddress.postCode,
+                balance.bankDetails.bankAddress.country,
             ]
         )
         yield BankAccount(
