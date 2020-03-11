@@ -228,9 +228,9 @@ def payment_config_verify():
 
         if db.session.new:
             db.session.commit()
-            flash("New TransferWise bank accounts have been imported")
+            flash("New TransferWise bank accounts have been imported", "info")
         else:
-            flash("No new TransferWise bank accounts have been imported")
+            flash("No new TransferWise bank accounts have been imported", "warning")
 
     return render_template(
         "admin/payment-config-verify.html",
