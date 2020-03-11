@@ -12,9 +12,16 @@ def transferwise_business_profile():
 
 def _collect_bank_accounts(borderless_account):
     for balance in borderless_account.balances:
-        if not balance.bankDetails:
-            continue
-        if not balance.bankDetails.bankAddress:
+        try:
+            if not balance.bankDetails:
+                continue
+            if not balance.bankDetails.bankAddress:
+                continue
+            if not balance.bankDetails.swift:
+                continue
+            if not balance.bankDetails.iban:
+                continue
+        except AttributeError:
             continue
 
         address = ", ".join(
