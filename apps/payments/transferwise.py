@@ -31,7 +31,7 @@ def _collect_bank_accounts(borderless_account):
             acct_id=None,
             currency=balance.bankDetails.currency,
             active=False,
-            institution=balance.bankName,
+            institution=balance.bankDetails.bankName,
             address=address,
             swift=balance.bankDetails.swift,
             iban=balance.bankDetails.iban,
