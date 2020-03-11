@@ -226,7 +226,7 @@ def payment_config_verify():
                 continue
             db.session.add(tw_account)
 
-        if db.session.dirty:
+        if db.session.new:
             db.session.commit()
             flash("New TransferWise bank accounts have been imported")
         else:
