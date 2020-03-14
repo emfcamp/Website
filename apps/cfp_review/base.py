@@ -89,25 +89,25 @@ def filter_proposal_request():
     bool_vals = [request.args.get(n, type=bool_qs) for n in bool_names]
     bool_dict = {n: v for n, v in zip(bool_names, bool_vals) if v is not None}
 
-    proposals = Proposal.query.filter_by(**bool_dict)
+    proposal_query = Proposal.query.filter_by(**bool_dict)
 
     filtered = False
 
     types = request.args.getlist("type")
     if types:
         filtered = True
-        proposals = proposals.filter(Proposal.type.in_(types))
+        proposal_query = proposal_query.filter(Proposal.type.in_(types))
 
     states = request.args.getlist("state")
     if states:
         filtered = True
-        proposals = proposals.filter(Proposal.state.in_(states))
+        proposal_query = proposal_query.filter(Proposal.state.in_(states))
 
     needs_ticket = request.args.get("needs_ticket", type=bool_qs)
     if needs_ticket is True:
         filtered = True
-        proposals = (
-            proposals.join(Proposal.user)
+        proposal_query = (
+            proposal_query.join(Proposal.user)
             .filter_by(will_have_ticket=False)
             .filter(
                 ~exists().where(
@@ -119,10 +119,10 @@ def filter_proposal_request():
         )
 
     sort_dict = get_proposal_sort_dict(request.args)
-    proposals = proposals.options(joinedload(Proposal.user)).options(
+    proposal_query = proposal_query.options(joinedload(Proposal.user)).options(
         joinedload("user.owned_tickets")
     )
-    proposals = proposals.all()
+    proposals = proposal_query.all()
     proposals.sort(**sort_dict)
     return proposals, filtered
 
