@@ -53,7 +53,6 @@ from . import (
     cfp_review,
     admin_required,
     schedule_required,
-    ordered_states,
     get_proposal_sort_dict,
     get_next_proposal_to,
 )
@@ -143,7 +142,6 @@ def proposals():
         "cfp_review/proposals.html",
         proposals=proposals,
         new_qs=non_sort_query_string,
-        states=ordered_states,
         filtered=filtered,
         total_proposals=Proposal.query.count(),
     )

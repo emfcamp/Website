@@ -1,7 +1,14 @@
 from flask import Blueprint, request
 from sqlalchemy import func, or_
 
-from models.cfp import Proposal, CFPMessage, CFPVote, CFP_STATES
+from models.cfp import (
+    Proposal,
+    CFPMessage,
+    CFPVote,
+    CFP_STATES,
+    ORDERED_STATES,
+    HUMAN_CFP_TYPES,
+)
 from ..common import require_permission
 
 cfp_review = Blueprint("cfp_review", __name__)
@@ -11,21 +18,6 @@ admin_required = require_permission(
 anon_required = require_permission("cfp_anonymiser")
 review_required = require_permission("cfp_reviewer")
 schedule_required = require_permission("cfp_schedule")
-
-ordered_states = [
-    "edit",
-    "new",
-    "locked",
-    "checked",
-    "rejected",
-    "cancelled",
-    "anonymised",
-    "anon-blocked",
-    "manual-review",
-    "reviewed",
-    "accepted",
-    "finished",
-]
 
 
 def sort_by_notice(notice):
@@ -90,7 +82,8 @@ def cfp_review_variables():
     )
 
     return {
-        "ordered_states": ordered_states,
+        "ordered_states": ORDERED_STATES,
+        "cfp_types": HUMAN_CFP_TYPES,
         "unread_count": unread_count,
         "proposal_counts": proposal_counts,
         "unread_reviewer_notes": unread_reviewer_notes,
