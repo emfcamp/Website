@@ -12,6 +12,14 @@ from models import export_attr_counts, export_attr_edits, export_intervals, buck
 from main import db
 from .user import User
 
+HUMAN_CFP_TYPES = {
+    "performance": "performance",
+    "talk": "talk",
+    "workshop": "workshop",
+    "youthworkshop": "youth workshop",
+    "installation": "installation",
+}
+
 # state: [allowed next state, ] pairs
 CFP_STATES = {
     "edit": ["accepted", "rejected", "new"],
@@ -26,6 +34,21 @@ CFP_STATES = {
     "accepted": ["accepted", "rejected", "finished"],
     "finished": ["rejected", "finished"],
 }
+
+ORDERED_STATES = [
+    "edit",
+    "new",
+    "locked",
+    "checked",
+    "rejected",
+    "cancelled",
+    "anonymised",
+    "anon-blocked",
+    "manual-review",
+    "reviewed",
+    "accepted",
+    "finished",
+]
 
 # Most of these states are the same they're kept distinct for semantic reasons
 # and because I'm lazy
@@ -699,17 +722,17 @@ class Proposal(db.Model):
 
 class PerformanceProposal(Proposal):
     __mapper_args__ = {"polymorphic_identity": "performance"}
-    human_type = "performance"
+    human_type = HUMAN_CFP_TYPES["performance"]
 
 
 class TalkProposal(Proposal):
     __mapper_args__ = {"polymorphic_identity": "talk"}
-    human_type = "talk"
+    human_type = HUMAN_CFP_TYPES["talk"]
 
 
 class WorkshopProposal(Proposal):
     __mapper_args__ = {"polymorphic_identity": "workshop"}
-    human_type = "workshop"
+    human_type = HUMAN_CFP_TYPES["workshop"]
     attendees = db.Column(db.String)
     cost = db.Column(db.String)
     age_range = db.Column(db.String)
@@ -721,13 +744,13 @@ class WorkshopProposal(Proposal):
 
 class YouthWorkshopProposal(WorkshopProposal):
     __mapper_args__ = {"polymorphic_identity": "youthworkshop"}
-    human_type = "youth workshop"
+    human_type = HUMAN_CFP_TYPES["youthworkshop"]
     valid_dbs = db.Column(db.Boolean, nullable=False, default=False)
 
 
 class InstallationProposal(Proposal):
     __mapper_args__ = {"polymorphic_identity": "installation"}
-    human_type = "installation"
+    human_type = HUMAN_CFP_TYPES["installation"]
     size = db.Column(db.String)
     funds = db.Column(db.String, nullable=True)
 
