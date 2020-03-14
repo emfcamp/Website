@@ -127,11 +127,21 @@ def filter_proposal_request():
     return proposals, filtered
 
 
+def safe_copy_request_args(args):
+    """
+    Request args is an ImmutableMultiDict which allow multiple entries for a
+    single key. This converts one back into a normal dict with lists for keys
+    so that they can be re-used for request args.
+    """
+    return {k: args.getlist(k) for k in args}
+
+
 @cfp_review.route("/proposals")
 @admin_required
 def proposals():
     proposals, filtered = filter_proposal_request()
-    non_sort_query_string = dict(request.args)
+    non_sort_query_string = safe_copy_request_args(request.args)
+
     if "sort_by" in non_sort_query_string:
         del non_sort_query_string["sort_by"]
 
@@ -144,6 +154,7 @@ def proposals():
         new_qs=non_sort_query_string,
         filtered=filtered,
         total_proposals=Proposal.query.count(),
+        full_qs=safe_copy_request_args(request.args),
     )
 
 
