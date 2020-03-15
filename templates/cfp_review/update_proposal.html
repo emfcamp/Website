@@ -103,12 +103,12 @@
             {% if next_id %}
                 <a href="{{ url_for('.update_proposal', proposal_id=next_id, **full_qs) }}"
                     class="btn btn-default">
-                    Next {{proposal.state}} proposal
+                    Next proposal
                 </a>
             {% else %}
-                <a href="{{ url_for('.proposals', state=proposal.state) }}"
+                <a href="{{ url_for('.proposals', **full_qs) }}"
                     class="btn btn-default">
-                    All remaining {{proposal.state}} proposals
+                    All proposals
                 </a>
             {% endif %}
         </div>

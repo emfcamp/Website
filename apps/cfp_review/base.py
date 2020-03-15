@@ -55,6 +55,7 @@ from . import (
     schedule_required,
     get_proposal_sort_dict,
     get_next_proposal_to,
+    copy_request_args,
 )
 
 
@@ -127,15 +128,6 @@ def filter_proposal_request():
     return proposals, filtered
 
 
-def copy_request_args(args):
-    """
-    Request args is an ImmutableMultiDict which allow multiple entries for a
-    single key. This converts one back into a normal dict with lists for keys
-    so that they can be re-used for request args.
-    """
-    return {k: args.getlist(k) for k in args}
-
-
 @cfp_review.route("/proposals")
 @admin_required
 def proposals():
@@ -154,7 +146,6 @@ def proposals():
         new_qs=non_sort_query_string,
         filtered=filtered,
         total_proposals=Proposal.query.count(),
-        full_qs=copy_request_args(request.args),
     )
 
 
@@ -414,11 +405,7 @@ def update_proposal(proposal_id):
         form.funds.data = prop.funds
 
     return render_template(
-        "cfp_review/update_proposal.html",
-        proposal=prop,
-        form=form,
-        next_id=next_id,
-        full_qs=copy_request_args(request.args),
+        "cfp_review/update_proposal.html", proposal=prop, form=form, next_id=next_id
     )
 
 
