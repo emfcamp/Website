@@ -282,6 +282,19 @@ def convert_proposal(proposal_id):
     )
 
 
+def find_next_proposal_id(prop):
+    if not request.args:
+        res = get_next_proposal_to(prop, prop.state)
+        return res.id if res else None
+
+    proposals, _ = filter_proposal_request()
+
+    idx = proposals.index(prop) + 1
+    if len(proposals) <= idx:
+        return None
+    return proposals[idx].id
+
+
 @cfp_review.route("/proposals/<int:proposal_id>", methods=["GET", "POST"])
 @admin_required
 def update_proposal(proposal_id):
@@ -293,9 +306,7 @@ def update_proposal(proposal_id):
         return redirect(url_for(next_page, proposal_id=proposal_id))
 
     prop = Proposal.query.get_or_404(proposal_id)
-    next_prop = get_next_proposal_to(prop, prop.state)
-
-    next_id = next_prop.id if next_prop else None
+    next_id = find_next_proposal_id(prop)
 
     form = (
         UpdateTalkForm()
@@ -403,7 +414,11 @@ def update_proposal(proposal_id):
         form.funds.data = prop.funds
 
     return render_template(
-        "cfp_review/update_proposal.html", proposal=prop, form=form, next_id=next_id
+        "cfp_review/update_proposal.html",
+        proposal=prop,
+        form=form,
+        next_id=next_id,
+        full_qs=safe_copy_request_args(request.args),
     )
 
 
