@@ -56,6 +56,15 @@ def get_next_proposal_to(prop, state):
     )
 
 
+def copy_request_args(args):
+    """
+    Request args is an ImmutableMultiDict which allow multiple entries for a
+    single key. This converts one back into a normal dict with lists for keys
+    so that they can be re-used for request args.
+    """
+    return {k: args.getlist(k) for k in args}
+
+
 @cfp_review.context_processor
 def cfp_review_variables():
     unread_count = CFPMessage.query.filter(
@@ -82,6 +91,7 @@ def cfp_review_variables():
     )
 
     return {
+        "full_qs": copy_request_args(request.args),
         "ordered_states": ORDERED_STATES,
         "cfp_types": HUMAN_CFP_TYPES,
         "unread_count": unread_count,
