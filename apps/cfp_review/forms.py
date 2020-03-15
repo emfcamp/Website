@@ -158,6 +158,39 @@ class UpdateProposalForm(Form):
             # Validates the new data. Bit nasty.
             proposal.get_allowed_venues()
 
+    def init_with_proposal(self, proposal):
+        self.state.data = proposal.state
+        self.title.data = proposal.title
+        self.description.data = proposal.description
+        self.requirements.data = proposal.requirements
+        self.length.data = proposal.length
+        self.notice_required.data = proposal.notice_required
+        self.needs_help.data = proposal.needs_help
+        self.needs_money.data = proposal.needs_money
+        self.one_day.data = proposal.one_day
+        self.will_have_ticket.data = proposal.user.will_have_ticket
+        self.published_names.data = proposal.published_names
+        self.published_title.data = proposal.published_title
+        self.published_description.data = proposal.published_description
+        self.arrival_period.data = proposal.arrival_period
+        self.departure_period.data = proposal.departure_period
+        self.telephone_number.data = proposal.telephone_number
+        self.may_record.data = proposal.may_record
+        self.needs_laptop.data = proposal.needs_laptop
+        self.available_times.data = proposal.available_times
+
+        self.allowed_venues.data = proposal.get_allowed_venues_serialised()
+        self.allowed_times.data = proposal.get_allowed_time_periods_serialised()
+        self.scheduled_time.data = proposal.scheduled_time
+        self.scheduled_duration.data = proposal.scheduled_duration
+        self.potential_time.data = proposal.potential_time
+
+        if proposal.scheduled_venue:
+            self.scheduled_venue.data = proposal.scheduled_venue.name
+
+        if proposal.potential_venue:
+            self.potential_venue.data = proposal.potential_venue.name
+
 
 class ConvertProposalForm(Form):
     new_type = SelectField("Destination type")
@@ -193,29 +226,29 @@ class UpdateWorkshopForm(UpdateProposalForm):
         proposal.published_age_range = self.published_age_range.data
         super(UpdateWorkshopForm, self).update_proposal(proposal)
 
+    def init_with_proposal(self, proposal):
+        self.attendees.data = proposal.attendees
+        self.cost.data = proposal.cost
+        self.participant_equipment.data = proposal.participant_equipment
+        self.age_range.data = proposal.age_range
+        self.published_age_range.data = proposal.published_age_range
+        self.published_cost.data = proposal.published_cost
+        self.published_participant_equipment.data = (
+            proposal.published_participant_equipment
+        )
+        super(UpdateWorkshopForm, self).init_with_proposal(proposal)
 
-class UpdateYouthWorkshopForm(UpdateProposalForm):
-    attendees = StringField("Attendees", [DataRequired()])
-    cost = StringField("Cost per attendee")
-    participant_equipment = StringField("Attendee equipment")
-    age_range = StringField("Age range")
-    published_cost = StringField("Attendee cost")
-    published_participant_equipment = StringField("Attendee equipment")
-    published_age_range = StringField("Attendee age range")
+
+class UpdateYouthWorkshopForm(UpdateWorkshopForm):
     valid_dbs = BooleanField("Has a valid DBS check")
 
     def update_proposal(self, proposal):
-        proposal.attendees = self.attendees.data
-        proposal.cost = self.cost.data
-        proposal.participant_equipment = self.participant_equipment.data
-        proposal.age_range = self.age_range.data
-        proposal.published_cost = self.published_cost.data
-        proposal.published_participant_equipment = (
-            self.published_participant_equipment.data
-        )
-        proposal.published_age_range = self.published_age_range.data
         proposal.valid_dbs = self.valid_dbs.data
         super(UpdateYouthWorkshopForm, self).update_proposal(proposal)
+
+    def init_with_proposal(self, proposal):
+        self.valid_dbs.data = proposal.valid_dbs
+        super(UpdateYouthWorkshopForm, self).init_with_proposal(proposal)
 
 
 class UpdateInstallationForm(UpdateProposalForm):
@@ -226,6 +259,11 @@ class UpdateInstallationForm(UpdateProposalForm):
         proposal.size = self.size.data
         proposal.funds = self.funds.data
         super(UpdateInstallationForm, self).update_proposal(proposal)
+
+    def init_with_proposal(self, proposal):
+        self.size.data = proposal.size
+        self.funds.data = proposal.funds
+        super(UpdateInstallationForm, self).init_with_proposal(proposal)
 
 
 class ResolveVoteForm(Form):

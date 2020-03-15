@@ -356,53 +356,7 @@ def update_proposal(proposal_id):
             return log_and_close(msg, ".update_proposal", proposal_id=next_id)
         return log_and_close(msg, ".update_proposal", proposal_id=proposal_id)
 
-    form.state.data = prop.state
-    form.title.data = prop.title
-    form.description.data = prop.description
-    form.requirements.data = prop.requirements
-    form.length.data = prop.length
-    form.notice_required.data = prop.notice_required
-    form.needs_help.data = prop.needs_help
-    form.needs_money.data = prop.needs_money
-    form.one_day.data = prop.one_day
-    form.will_have_ticket.data = prop.user.will_have_ticket
-    form.published_names.data = prop.published_names
-    form.published_title.data = prop.published_title
-    form.published_description.data = prop.published_description
-    form.arrival_period.data = prop.arrival_period
-    form.departure_period.data = prop.departure_period
-    form.telephone_number.data = prop.telephone_number
-    form.may_record.data = prop.may_record
-    form.needs_laptop.data = prop.needs_laptop
-    form.available_times.data = prop.available_times
-
-    form.allowed_venues.data = prop.get_allowed_venues_serialised()
-    form.allowed_times.data = prop.get_allowed_time_periods_serialised()
-    form.scheduled_time.data = prop.scheduled_time
-    form.scheduled_duration.data = prop.scheduled_duration
-    form.potential_time.data = prop.potential_time
-
-    if prop.scheduled_venue:
-        form.scheduled_venue.data = prop.scheduled_venue.name
-
-    if prop.potential_venue:
-        form.potential_venue.data = prop.potential_venue.name
-
-    if prop.type == "workshop" or prop.type == "youthworkshop":
-        form.attendees.data = prop.attendees
-        form.cost.data = prop.cost
-        form.participant_equipment.data = prop.participant_equipment
-        form.age_range.data = prop.age_range
-        form.published_age_range.data = prop.published_age_range
-        form.published_cost.data = prop.published_cost
-        form.published_participant_equipment.data = prop.published_participant_equipment
-
-        if prop.type == "youthworkshop":
-            form.valid_dbs.data = prop.valid_dbs
-
-    elif prop.type == "installation":
-        form.size.data = prop.size
-        form.funds.data = prop.funds
+    form.init_with_proposal(prop)
 
     return render_template(
         "cfp_review/update_proposal.html", proposal=prop, form=form, next_id=next_id
