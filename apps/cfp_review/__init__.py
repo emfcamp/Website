@@ -24,6 +24,14 @@ def sort_by_notice(notice):
     return {"1 week": 0, "1 month": 1, "> 1 month": 2}.get(notice, -1)
 
 
+def get_permission_namespace(user, permission):
+    for perm in user.permissions:
+        perm_name = perm.name
+        if perm_name.startswith(permission) and ":" in perm_name:
+            _, res = perm_name.split(":")
+            return res
+
+
 def get_proposal_sort_dict(parameters):
     sort_keys = {
         "state": lambda p: (p.state, p.modified, p.title),
@@ -44,7 +52,18 @@ def get_proposal_sort_dict(parameters):
     }
 
 
-def get_next_proposal_to(prop, state):
+def get_next_proposal_to(prop, state, type=None):
+    if type:
+        return (
+            Proposal.query.filter(
+                Proposal.id != prop.id,
+                Proposal.type == type,
+                Proposal.state == state,
+                Proposal.modified >= prop.modified,  # ie find something after this one
+            )
+            .order_by("modified", "id")
+            .first()
+        )
     return (
         Proposal.query.filter(
             Proposal.id != prop.id,

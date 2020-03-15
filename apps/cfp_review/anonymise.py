@@ -3,14 +3,25 @@ from flask_login import current_user
 from models.cfp import Proposal
 
 from main import db
-from . import cfp_review, anon_required, get_proposal_sort_dict, get_next_proposal_to
+from . import (
+    cfp_review,
+    anon_required,
+    get_proposal_sort_dict,
+    get_next_proposal_to,
+    get_permission_namespace,
+)
 from .forms import AnonymiseProposalForm
 
 
 @cfp_review.route("/anonymisation")
 @anon_required
 def anonymisation():
-    proposals = Proposal.query.filter_by(state="checked").all()
+    type_ns = get_permission_namespace(current_user, "cfp_anonymiser")
+
+    if type_ns:
+        proposals = Proposal.query.filter_by(state="checked", type=type_ns).all()
+    else:
+        proposals = Proposal.query.filter_by(state="checked").all()
 
     sort_dict = get_proposal_sort_dict(request.args)
     proposals.sort(**sort_dict)
@@ -32,12 +43,13 @@ def anonymisation():
 @cfp_review.route("/anonymisation/<int:proposal_id>", methods=["GET", "POST"])
 @anon_required
 def anonymise_proposal(proposal_id):
+    type_ns = get_permission_namespace(current_user, "cfp_anonymiser")
     prop = Proposal.query.get_or_404(proposal_id)
-    if prop.state in ["new", "edit", "locked"]:
+    if prop.state != "checked" or (type_ns and type_ns != prop.type):
         # Make sure people only see proposals that are ready
         return abort(404)
 
-    next_prop = get_next_proposal_to(prop, "checked")
+    next_prop = get_next_proposal_to(prop, "checked", type_ns)
     form = AnonymiseProposalForm()
 
     if prop.state == "checked" and form.validate_on_submit():
