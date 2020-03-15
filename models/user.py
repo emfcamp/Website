@@ -317,9 +317,17 @@ class User(db.Model, UserMixin):
                 and self.has_permission("cfp_admin")
             ):
                 return True
+
         for permission in self.permissions:
-            if permission.name == name:
+            perm_name = permission.name
+            if perm_name == name:
                 return True
+            # Some cfp permissions have type-namespacing. The type namespace
+            # is not handled by this function.
+            if perm_name.startswith("cfp_") and ":" in perm_name:
+                effective_perm, _ = perm_name.split(":")
+                if effective_perm == name:
+                    return True
         return False
 
     def grant_permission(self, name):
