@@ -39,7 +39,7 @@
     "gulp-tap": "^2.0.0",
     "gulp-uglify": "^3.0.2",
     "gulplog": "^1.0.0",
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.5",
     "node-sass": "^4.13.0",
     "postcss-easy-import": "^3.0.0",
     "postcss-preset-env": "^6.7.0",
