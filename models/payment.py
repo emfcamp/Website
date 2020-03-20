@@ -558,6 +558,7 @@ class RefundRequest(db.Model):
     currency = db.Column(db.String)
     bank = db.Column(db.String)
     account = db.Column(db.String)
+    payee_name = db.Column(db.String)
     note = db.Column(db.String)
 
 

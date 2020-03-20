@@ -2,7 +2,7 @@ from flask import render_template, redirect, request, flash, url_for, current_ap
 from flask_login import login_required
 from flask_mail import Message
 from wtforms import StringField, SubmitField
-from wtforms.validators import ValidationError
+from wtforms.validators import ValidationError, DataRequired
 import gocardless_pro.errors
 
 from . import payments
@@ -34,6 +34,7 @@ class RefundRequestForm(Form):
     bank = StringField("Sort Code", [required_for("GBP")])
     account = StringField("Account Number", [required_for("GBP")])
     iban = StringField("IBAN", [required_for("EUR")])
+    payee_name = StringField("Name of Account Holder", [DataRequired()])
     note = StringField("Note")
     submit = SubmitField("Request refund")
     really_submit = SubmitField("These details are correct")
@@ -43,8 +44,10 @@ class RefundRequestForm(Form):
 @payments.route("/payment/<int:payment_id>/refund/<currency>", methods=["GET", "POST"])
 @login_required
 @feature_flag("REFUND_REQUESTS")
-def payment_refund_request(payment_id, currency="GBP"):
+def payment_refund_request(payment_id, currency=None):
     payment = get_user_payment_or_abort(payment_id, valid_states=["paid"])
+    if currency is None:
+        currency = payment.currency
 
     no_stripe = "no_stripe" in request.args
     if payment.provider == "stripe" and not no_stripe:
@@ -73,7 +76,7 @@ def payment_refund_request(payment_id, currency="GBP"):
         except gocardless_pro.errors.ValidationFailedError as e:
             app.logger.warn("Error validating bank details: %s", e)
             if not form.really_submit.data:
-                msg = "This doesn't look right. Please check and click below if you're sure."
+                msg = "Your bank details don't appear to be valid, please check them. Submit the form again if you're sure they're correct."
                 bank_validation_failed = True
                 form.bank.errors.append(msg)
                 form.account.errors.append(msg)
@@ -92,6 +95,7 @@ def payment_refund_request(payment_id, currency="GBP"):
                 bank=form.bank.data,
                 account=account,
                 note=form.note.data,
+                payee_name=form.payee_name.data,
             )
             db.session.add(req)
             payment.state = "refund-requested"
