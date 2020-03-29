@@ -405,3 +405,43 @@ label.big-checkbox {
 }
 
 .role-description { display: none; }
+
+/* Form tweakery */
+
+fieldset legend {
+  margin-bottom: 10px;
+}
+
+input[type=range] {
+  appearance: none;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  margin-bottom: 6px;
+}
+
+input[type=range]::range-track {
+  appearance: none;
+  height: 8.4px;
+  cursor: pointer;
+  background: $main-link-hover;
+  border-radius: 3px;
+}
+
+input[type=range]:focus::range-track {
+  background: lighten($main-link-hover, 5%);
+}
+
+input[type=range]::range-thumb {
+  appearance: none;
+  box-shadow: 1px 1px 1px lighten($main-background, 50%);
+  border: 1px solid $main-background;
+  height: 30px;
+  width: 16px;
+  border-radius: 3px;
+  background: $highlight-3-background;
+  cursor: pointer;
+  margin-top: -11px;
+}
+
+

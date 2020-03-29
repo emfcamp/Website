@@ -21,14 +21,13 @@ from flask import (
 )
 from flask_login import login_required, current_user
 from flask_mail import Message
-from wtforms import SubmitField, StringField
+from wtforms import SubmitField
 from sqlalchemy.orm.exc import NoResultFound
 from stripe.error import AuthenticationError
 
 from main import db, stripe, mail, csrf
-from models import RefundRequest
 from models.payment import StripePayment
-from ..common import feature_enabled, feature_flag
+from ..common import feature_enabled
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
 from . import get_user_payment_or_abort, lock_user_payment_or_abort
@@ -156,37 +155,6 @@ def stripe_waiting(payment_id):
         payment=payment,
         days=app.config["EXPIRY_DAYS_STRIPE"],
     )
-
-
-class StripeRefundForm(Form):
-    note = StringField("Note")
-    yes = SubmitField("Request refund")
-
-
-@payments.route("/pay/stripe/<int:payment_id>/refund", methods=["GET", "POST"])
-@login_required
-@feature_flag("REFUND_REQUESTS")
-def stripe_refund_start(payment_id):
-    payment = get_user_payment_or_abort(payment_id, "stripe", valid_states=["paid"])
-
-    form = StripeRefundForm()
-
-    if form.validate_on_submit():
-        app.logger.info("Creating refund request for Stripe payment %s", payment.id)
-        req = RefundRequest(payment=payment, note=form.note.data)
-        db.session.add(req)
-        payment.state = "refund-requested"
-        ticket_admin_email(
-            "An EMF refund request has been received",
-            "emails/notice-refund-request.txt",
-            payment=payment,
-        )
-        db.session.commit()
-
-        flash("Your refund request has been sent")
-        return redirect(url_for("users.purchases"))
-
-    return render_template("payments/stripe-refund.html", payment=payment, form=form)
 
 
 @csrf.exempt

@@ -362,6 +362,7 @@ def refund(payment_id):
             f._disabled = False
         else:
             f._disabled = True
+            f.refund.data = False
 
     if form.validate_on_submit():
         if form.refund.data or form.stripe_refund.data:
