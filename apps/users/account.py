@@ -115,3 +115,15 @@ def purchases():
         transferred_to=transferred_to,
         transferred_from=transferred_from,
     )
+
+
+@users.route("/account/cancellation-refund")
+@login_required
+def cancellation_refund():
+    payments = (
+        current_user.payments.filter(~Payment.state.in_(("cancelled", "reserved")))
+        .order_by(Payment.id)
+        .all()
+    )
+
+    return render_template("account/cancellation-refund.html", payments=payments)
