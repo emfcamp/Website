@@ -68,6 +68,14 @@ $(() => {
       amountText.innerHTML = `<span style="float:left">Donation: <strong>${symbol}&thinsp;${el.value}</strong></span>
           <span style="float:right">Refund: <strong>${symbol}&thinsp;${amount-el.value}</strong></span>
           <span style="clear:both">&nbsp;</span>`;
+
+      if (amount == el.value) {
+        $('#bank-details input').each((_, el) => el.setAttribute('disabled', 'true'));
+        $('#bank-details')[0].style.opacity = '0.5';
+      } else {
+        $('#bank-details input').each((_, el) => el.removeAttribute('disabled'));
+        $('#bank-details')[0].style.opacity = '1';
+      }
     }
     updateDonationRange(el);
 

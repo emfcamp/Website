@@ -21,6 +21,8 @@ def terms():
 
 def required_for(currency=None, providers=None):
     def validate(form, field):
+        if form._total_amount == form.donation_amount.data:
+            return
         if providers is not None and form._provider not in providers:
             return
         if currency is not None and form._currency != currency:
@@ -106,12 +108,14 @@ def payment_refund_request(payment_id, currency=None):
     form = RefundRequestForm()
     form._currency = currency
     form._provider = payment.provider
+    form._total_amount = payment.amount
 
     bank_validation_failed = False
 
     if form.validate_on_submit():
         if (
             payment.provider in ("banktransfer", "gocardless")
+            and payment.amount != form.donation_amount.data
             and not form.really_submit.data
             and not validate_bank_details(form, currency)
         ):
