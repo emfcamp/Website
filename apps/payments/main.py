@@ -1,3 +1,4 @@
+import requests
 from flask import render_template, redirect, flash, url_for, current_app as app
 from flask_login import login_required
 from wtforms import StringField, SubmitField
@@ -59,6 +60,10 @@ class RefundRequestForm(Form):
 
 
 def validate_bank_details(form, currency):
+    """ Transferwise can't validate sort code and account number.
+        GoCardless can't validate BIC and IBAN.
+        Use both.
+    """
     app.logger.info("Validating bank details")
     if currency == "GBP":
         params = {
@@ -66,22 +71,26 @@ def validate_bank_details(form, currency):
             "branch_code": form.sort_code.data,
             "account_number": form.account.data,
         }
+        try:
+            result = gocardless_client.bank_details_lookups.create(params)
+            app.logger.info(
+                "GBP bank identified as %r", result.attributes.get("bank_name")
+            )
+        except gocardless_pro.errors.ValidationFailedError as e:
+            app.logger.warn("Error validating GBP bank details: %s", e)
+            return False
     elif currency == "EUR":
         params = {"iban": form.iban.data}
+        res = requests.get(
+            "https://api.transferwise.com/v1/validators/bic?"
+            f"bic={form.swiftbic.data}&iban={form.iban.data}"
+        )
 
-    try:
-        result = gocardless_client.bank_details_lookups.create(params)
-
-        bic = result.attributes.get("bic")
-        if currency == "EUR" and bic != form.swiftbic.data:
-            app.logger.warn(f"Invalid BIC: {bic} != {form.swiftbic.data}")
+        result = res.json()
+        if result.get("validation") != "success":
             return False
 
-        app.logger.info("Bank identified as %r", result.attributes.get("bank_name"))
-    except gocardless_pro.errors.ValidationFailedError as e:
-        app.logger.warn("Error validating bank details: %s", e)
-        return False
-
+    app.logger.info("Bank validation succeeded")
     return True
 
 
