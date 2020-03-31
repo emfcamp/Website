@@ -145,7 +145,9 @@ def payment_refund_request(payment_id, currency=None):
             payment.state = "refund-requested"
             db.session.commit()
 
-            flash("Your refund request has been sent")
+            flash(
+                "Your refund request has been submitted. We will email you when it's processed."
+            )
             return redirect(url_for("users.purchases"))
 
     return render_template(

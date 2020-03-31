@@ -14,6 +14,7 @@ from main import db
 from models.user import UserDiversity
 from models.purchase import Purchase
 from models.payment import Payment
+from models.site_state import get_site_state
 
 from ..common.forms import Form
 
@@ -34,6 +35,9 @@ class AccountForm(Form):
 @users.route("/account", methods=["GET", "POST"])
 @login_required
 def account():
+    if get_site_state() == "cancelled":
+        return redirect(url_for(".cancellation_refund"))
+
     if not current_user.diversity:
         flash(
             "Please check that your user details are correct. "
@@ -85,6 +89,9 @@ def purchases_redirect():
 @users.route("/account/purchases", methods=["GET", "POST"])
 @login_required
 def purchases():
+    if get_site_state() == "cancelled":
+        return redirect(url_for(".cancellation_refund"))
+
     purchases = current_user.owned_purchases.filter(
         ~Purchase.state.in_(["cancelled", "reserved"])
     ).order_by(Purchase.id)
@@ -94,7 +101,7 @@ def purchases():
 
     payments = (
         current_user.payments.filter(Payment.state != "cancelled")
-        .order_by(Payment.id)
+        .order_by(Payment.state)
         .all()
     )
 
@@ -122,7 +129,7 @@ def purchases():
 def cancellation_refund():
     payments = (
         current_user.payments.filter(~Payment.state.in_(("cancelled", "reserved")))
-        .order_by(Payment.id)
+        .order_by(Payment.state)
         .all()
     )
 
