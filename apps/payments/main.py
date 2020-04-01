@@ -58,7 +58,6 @@ class RefundRequestForm(Form):
     )
     note = StringField("Note")
     submit = SubmitField("Request refund")
-    really_submit = SubmitField("These details are correct")
 
 
 def validate_bank_details(form, currency):
@@ -116,13 +115,14 @@ def payment_refund_request(payment_id, currency=None):
         if (
             payment.provider in ("banktransfer", "gocardless")
             and payment.amount != form.donation_amount.data
-            and not form.really_submit.data
             and not validate_bank_details(form, currency)
         ):
-            msg = (
-                "Your bank details don't appear to be valid, please check them. "
-                "Please submit the form again if you're sure they're correct."
-            )
+
+            if payment.currency == "GBP":
+                bank_type = "UK"
+            else:
+                bank_type = "Euro"
+            msg = f"Your {bank_type} bank details don't appear to be valid, please check them."
             form.sort_code.errors.append(msg)
             form.account.errors.append(msg)
             form.iban.errors.append(msg)
