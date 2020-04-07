@@ -24,7 +24,7 @@ def payment_type(name):
 
 @payments.cli.command("bulkrefund")
 @click.option("-y", "--yes", is_flag=True, help="actually do refunds")
-@click.option("-n", "--number", help="number of refunds to process")
+@click.option("-n", "--number", type=int, help="number of refunds to process")
 @click.option("--provider", default="stripe")
 def bulk_refund(yes, number, provider):
     """ Fully refund all pending refund requests """
@@ -40,13 +40,14 @@ def bulk_refund(yes, number, provider):
     for request in query:
         if type(request.payment) is not payment_type(provider):
             continue
+
+        if count == number:
+            break
+
         if not yes:
             count += 1
             app.logger.info("Would process refund %s", request)
             continue
-
-        if count == number:
-            break
 
         app.logger.info("Processing refund %s", request)
         try:
