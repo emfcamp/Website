@@ -34,7 +34,7 @@ def create_stripe_refund(
     except StripeError as e:
         raise RefundException("Error creating Stripe refund") from e
 
-    if stripe_refund.status != "succeeded":
+    if stripe_refund.status not in ("succeeded", "pending"):
         raise RefundException("Stripe refund failed")
 
     refund.refundid = stripe_refund.id
