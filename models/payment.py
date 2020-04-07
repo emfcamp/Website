@@ -564,6 +564,21 @@ class RefundRequest(db.Model):
     payee_name = db.Column(db.String)
     note = db.Column(db.String)
 
+    @property
+    def method(self):
+        """ The method we use to refund this request.
+
+            This will be "stripe" if the payment can be refunded through Stripe,
+            and "banktransfer" otherwise.
+        """
+        if (
+            type(self.payment) is StripePayment
+            and self.payment.currency == self.currency
+        ):
+            return "stripe"
+        else:
+            return "banktransfer"
+
 
 class PaymentSequence(db.Model):
     """ Table for storing sequence numbers.

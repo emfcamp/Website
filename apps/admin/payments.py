@@ -282,6 +282,8 @@ def manual_refund(payment_id):
     """ Mark an entire payment as refunded for book-keeping purposes.
         Doesn't actually take any steps to return money to the user. """
 
+    # TODO: this is old! We should move manual refund handling to the other refund endpoint for consistency.
+
     payment = Payment.query.get_or_404(payment_id)
 
     if payment.refund_requests:
@@ -325,6 +327,9 @@ class RefundForm(Form):
 
 @admin.route("/payment/<int:payment_id>/refund", methods=["GET", "POST"])
 def refund(payment_id):
+    # TODO: This is all old and needs fixing
+    # For partial refunds, we need to let users select which tickets they want to refund (see ticket #900)
+    # Refund business logic needs moving to apps.payments.refund module, some is already there.
     payment = Payment.query.get_or_404(payment_id)
 
     valid_states = ["charged", "paid", "partrefunded", "refund-requested"]

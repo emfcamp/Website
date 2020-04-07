@@ -271,17 +271,6 @@ def stripe_payment_paid(payment: StripePayment):
 
 
 def stripe_payment_refunded(payment: StripePayment):
-    # Email user
-    msg = Message(
-        "You have received a refund from EMF",
-        sender=app.config.get("TICKETS_EMAIL"),
-        recipients=[payment.user.email],
-    )
-    msg.body = render_template(
-        "emails/stripe-refund-sent.txt", user=payment.user, payment=payment
-    )
-    mail.send(msg)
-
     if payment.state == "refunded":
         logger.info("Payment is already refunded, ignoring")
         return
@@ -304,20 +293,6 @@ def stripe_payment_refunded(payment: StripePayment):
 
 
 def stripe_payment_part_refunded(payment: StripePayment, charge):
-    # Email user
-    msg = Message(
-        "You have received a refund from EMF",
-        sender=app.config.get("TICKETS_EMAIL"),
-        recipients=[payment.user.email],
-    )
-    msg.body = render_template(
-        "emails/stripe-refund-sent.txt",
-        user=payment.user,
-        payment=payment,
-        partrefund=charge.amount_refunded / 100,
-    )
-    mail.send(msg)
-
     if payment.state == "partrefunded":
         logger.info("Part-refund received, assuming we have processed this")
         return
