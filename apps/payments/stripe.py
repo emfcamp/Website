@@ -293,8 +293,10 @@ def stripe_payment_refunded(payment: StripePayment):
 
 
 def stripe_payment_part_refunded(payment: StripePayment, charge):
-    if payment.state == "partrefunded":
-        logger.info("Part-refund received, assuming we have processed this")
+    if payment.state in ("partrefunded", "refunding"):
+        logger.info(
+            f"Payment {payment.id} is {payment.state}, ignoring part-refund webhook"
+        )
         return
 
     ticket_admin_email(
