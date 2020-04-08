@@ -89,6 +89,7 @@ def handle_refund_request(request: RefundRequest) -> None:
         f"Refund amount {refund_amount} {payment.currency}"
     )
 
+    refund = None
     if refund_amount > 0:
         refund = create_stripe_refund(
             payment, refund_amount, metadata={"refund_request": request.id}
