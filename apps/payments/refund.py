@@ -91,7 +91,8 @@ def handle_refund_request(request: RefundRequest) -> None:
 
     app.logger.info(
         f"Handling refund request {request.id} for payment {payment.id}. "
-        f"Refund amount {refund_amount} {payment.currency}"
+        f"Refund amount {refund_amount} {payment.currency}. "
+        f"Donation amount {request.donation} {payment.currency}. "
     )
 
     refund = None
