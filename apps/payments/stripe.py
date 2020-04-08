@@ -293,7 +293,9 @@ def stripe_payment_refunded(payment: StripePayment):
 
 
 def stripe_payment_part_refunded(payment: StripePayment, charge):
-    if payment.state in ("partrefunded", "refunding"):
+    # Payments can be marked as "refunded" if the user has requested a full refund with
+    # donation. This is a part-refund on Stripe's end.
+    if payment.state in ("partrefunded", "refunded", "refunding"):
         logger.info(
             f"Payment {payment.id} is {payment.state}, ignoring part-refund webhook"
         )
