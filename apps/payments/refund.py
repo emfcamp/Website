@@ -79,6 +79,11 @@ def handle_refund_request(request: RefundRequest) -> None:
     if request.note is not None and request.note != "":
         raise ManualRefundRequired("Refund request has note")
 
+    # Mark payment as "refunding" - this allows us to ignore refund webhooks which arrive before
+    # we're finished here. Stripe's webhooks can be very quick.
+    payment.state = "refunding"
+    db.session.commit()
+
     payment.lock()
 
     total = sum(purchase.price.value for purchase in payment.purchases)

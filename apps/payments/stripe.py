@@ -271,8 +271,8 @@ def stripe_payment_paid(payment: StripePayment):
 
 
 def stripe_payment_refunded(payment: StripePayment):
-    if payment.state == "refunded":
-        logger.info("Payment is already refunded, ignoring")
+    if payment.state in ("refunded", "refunding"):
+        logger.info(f"Payment {payment.id} is {payment.state}, ignoring refund webhook")
         return
 
     logger.info("Setting payment %s to refunded", payment.id)
