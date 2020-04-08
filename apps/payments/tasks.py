@@ -29,8 +29,10 @@ def payment_type(name):
 def bulk_refund(yes, number, provider):
     """ Fully refund all pending refund requests """
 
-    query = RefundRequest.query.join(Payment).filter(
-        Payment.state == "refund-requested"
+    query = (
+        RefundRequest.query.join(Payment)
+        .filter(Payment.state == "refund-requested")
+        .order_by(RefundRequest.id)
     )
 
     if number is not None:
