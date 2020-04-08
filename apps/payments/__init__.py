@@ -14,7 +14,7 @@ def ticket_admin_email(title, template, **kwargs):
         return
 
     msg = Message(
-        "An EMF refund request has been received",
+        title,
         sender=app.config.get("TICKETS_EMAIL"),
         recipients=[app.config.get("TICKETS_NOTICE_EMAIL")[1]],
     )
