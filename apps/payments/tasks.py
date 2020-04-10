@@ -1,25 +1,17 @@
 import click
+import csv
+from io import StringIO
 
 from flask import current_app as app
-from models.payment import (
-    RefundRequest,
-    Payment,
-    StripePayment,
-    BankPayment,
-    GoCardlessPayment,
-)
+from models.payment import RefundRequest, Payment
 
 from . import payments
-from .refund import handle_refund_request, ManualRefundRequired, RefundException
-
-
-def payment_type(name):
-    if name == "stripe":
-        return StripePayment
-    elif name == "bank":
-        return BankPayment
-    elif name == "gocardless":
-        return GoCardlessPayment
+from .refund import (
+    handle_refund_request,
+    manual_bank_refund,
+    ManualRefundRequired,
+    RefundException,
+)
 
 
 @payments.cli.command("bulkrefund")
@@ -27,7 +19,7 @@ def payment_type(name):
 @click.option("-n", "--number", type=int, help="number of refunds to process")
 @click.option("--provider", default="stripe")
 def bulk_refund(yes, number, provider):
-    """ Fully refund all pending refund requests """
+    """ Automatically refund all pending refund requests where possible """
 
     query = (
         RefundRequest.query.join(Payment)
@@ -40,7 +32,7 @@ def bulk_refund(yes, number, provider):
 
     count = 0
     for request in query:
-        if type(request.payment) is not payment_type(provider):
+        if request.method != "stripe":
             continue
 
         if count == number:
@@ -67,3 +59,85 @@ def bulk_refund(yes, number, provider):
         app.logger.info(
             f"{count} refunds would be processed. Pass the -y option to refund these for real."
         )
+
+
+@payments.cli.command("transferwise_refund")
+@click.option("-n", "--number", type=int, help="number of refunds to export")
+def transferwise_refund(number):
+    """ Emit a CSV file for refunding with Transferwise"""
+    query = (
+        RefundRequest.query.join(Payment)
+        .filter(Payment.state == "refund-requested")
+        .order_by(RefundRequest.id)
+    )
+
+    io = StringIO()
+    writer = csv.writer(io)
+    writer.writerow(
+        [
+            "name",
+            "paymentReference",
+            "receiverType",
+            "amountCurrency",
+            "amount",
+            "sourceCurrency",
+            "targetCurrency",
+            "sortCode",
+            "accountNumber",
+            "IBAN",
+            "BIC",
+        ]
+    )
+
+    count = 0
+    max_id = 0
+    for request in query:
+        if request.method != "banktransfer":
+            continue
+
+        if count == number:
+            break
+
+        payment = request.payment
+        if request.currency != payment.currency:
+            continue
+
+        refund_amount = payment.amount - request.donation
+        if refund_amount > 0:
+            writer.writerow(
+                [
+                    request.payee_name,
+                    "EMF Ticket Refund",
+                    "PERSONAL",
+                    request.currency,
+                    refund_amount,
+                    request.currency,
+                    request.currency,
+                    request.sort_code,
+                    request.account,
+                    request.iban,
+                    request.swiftbic,
+                ]
+            )
+            count += 1
+        max_id = request.id
+
+    print(io.getvalue())
+    app.logger.info(f"Refunds produced up to id {max_id}")
+
+
+@payments.cli.command("transferwise_refund_complete")
+@click.argument("max_id", type=int)
+def transferwise_refund_complete(max_id):
+    """ Mark Transferwise bulk refunds as completed """
+    query = (
+        RefundRequest.query.join(Payment)
+        .filter(Payment.state == "refund-requested")
+        .filter(RefundRequest.id <= max_id)
+        .order_by(RefundRequest.id)
+    )
+
+    for request in query:
+        if request.method != "banktransfer":
+            continue
+        manual_bank_refund(request)

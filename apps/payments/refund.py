@@ -3,7 +3,7 @@ from stripe.error import StripeError
 from flask import current_app as app, render_template
 from flask_mail import Message
 
-from models.payment import RefundRequest, StripePayment, StripeRefund
+from models.payment import RefundRequest, StripePayment, StripeRefund, BankRefund
 from main import stripe, db, mail
 
 
@@ -42,6 +42,10 @@ def create_stripe_refund(
 
 
 def send_refund_email(request: RefundRequest, amount: Decimal) -> None:
+    # Don't send an email if the entire refund is a donation.
+    if amount == 0:
+        return
+
     payment = request.payment
     msg = Message(
         "Your refund request has been processed",
@@ -86,11 +90,10 @@ def handle_refund_request(request: RefundRequest) -> None:
 
     payment.lock()
 
-    total = sum(purchase.price.value for purchase in payment.purchases)
-    refund_amount = total - request.donation
+    refund_amount = payment.amount - request.donation
 
     app.logger.info(
-        f"Handling refund request {request.id} for payment {payment.id}. "
+        f"Handling automatic refund request {request.id} for {payment.provider} {payment.id}. "
         f"Refund amount {refund_amount} {payment.currency}. "
         f"Donation amount {request.donation} {payment.currency}. "
     )
@@ -109,7 +112,28 @@ def handle_refund_request(request: RefundRequest) -> None:
     payment.state = "refunded"
 
     db.session.commit()
+    send_refund_email(request, refund_amount)
 
-    # Don't send an email if the entire refund amount is donated.
-    if refund_amount > 0:
-        send_refund_email(request, refund_amount)
+
+def manual_bank_refund(request: RefundRequest) -> None:
+    """ Mark a refund request as manually refunded by bank transfer. """
+    payment = request.payment
+
+    payment.lock()
+    refund_amount = payment.amount - request.donation
+    refund = BankRefund(payment, refund_amount)
+
+    app.logger.info(
+        f"Handling manual refund request {request.id} for {payment.provider} {payment.id}. "
+        f"Refund amount {refund_amount} {payment.currency}. "
+        f"Donation amount {request.donation} {payment.currency}. "
+    )
+
+    with db.session.no_autoflush:
+        for purchase in payment.purchases:
+            purchase.refund_purchase(refund)
+
+    payment.state = "refunded"
+
+    db.session.commit()
+    send_refund_email(request, refund_amount)
