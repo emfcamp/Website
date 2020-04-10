@@ -63,8 +63,9 @@ def bulk_refund(yes, number, provider):
 
 @payments.cli.command("transferwise_refund")
 @click.option("-n", "--number", type=int, help="number of refunds to export")
+@click.option("-a", "--amount", type=int, help="value of refunds to export")
 @click.argument("currency", type=click.Choice(["GBP", "EUR"]))
-def transferwise_refund(number, currency):
+def transferwise_refund(number, amount, currency):
     """ Emit a CSV file for refunding with Transferwise"""
     query = (
         RefundRequest.query.join(Payment)
@@ -76,6 +77,7 @@ def transferwise_refund(number, currency):
     writer = csv.writer(io)
     writer.writerow(
         [
+            "refund_id",
             "name",
             "paymentReference",
             "receiverType",
@@ -91,6 +93,7 @@ def transferwise_refund(number, currency):
     )
 
     count = 0
+    total_amount = 0
     max_id = 0
     for request in query:
         if request.method != "banktransfer":
@@ -104,9 +107,15 @@ def transferwise_refund(number, currency):
             continue
 
         refund_amount = payment.amount - request.donation
+
+        total_amount += refund_amount
+        if total_amount > amount:
+            break
+
         if refund_amount > 0:
             writer.writerow(
                 [
+                    request.id,
                     request.payee_name,
                     "EMF Ticket Refund",
                     "PRIVATE",
