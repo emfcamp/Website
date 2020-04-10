@@ -6,10 +6,10 @@ Hi,
 
 We have processed your Electromagnetic Field ticket refund. A total of {{amount|price(currency)}}
 has been sent back to your {% if request.method == "stripe" %}card{% else %}bank account{% endif %}.
-
 {% if request.donation > 0 %}
+
 You asked that we keep {{request.donation|price(currency)}} of your payment as a donation. Thank you!
-{%- endif -%}
+{%- endif %}
 
 Refunds may take up to ten business days to appear in your account.
 
