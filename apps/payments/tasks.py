@@ -108,7 +108,7 @@ def transferwise_refund(number):
                 [
                     request.payee_name,
                     "EMF Ticket Refund",
-                    "PERSONAL",
+                    "PRIVATE",
                     request.currency,
                     refund_amount,
                     request.currency,
