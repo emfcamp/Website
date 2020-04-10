@@ -140,4 +140,8 @@ def transferwise_refund_complete(max_id):
     for request in query:
         if request.method != "banktransfer":
             continue
+
+        if request.currency != request.payment.currency:
+            continue
+
         manual_bank_refund(request)
