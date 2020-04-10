@@ -63,7 +63,8 @@ def bulk_refund(yes, number, provider):
 
 @payments.cli.command("transferwise_refund")
 @click.option("-n", "--number", type=int, help="number of refunds to export")
-def transferwise_refund(number):
+@click.argument("currency", type=click.Choice(["GBP", "EUR"]))
+def transferwise_refund(number, currency):
     """ Emit a CSV file for refunding with Transferwise"""
     query = (
         RefundRequest.query.join(Payment)
@@ -99,7 +100,7 @@ def transferwise_refund(number):
             break
 
         payment = request.payment
-        if request.currency != payment.currency:
+        if request.currency != payment.currency or request.currency != currency:
             continue
 
         refund_amount = payment.amount - request.donation
@@ -123,12 +124,13 @@ def transferwise_refund(number):
         max_id = request.id
 
     print(io.getvalue())
-    app.logger.info(f"Refunds produced up to id {max_id}")
+    app.logger.info(f"Refunds produced for currency {currency} up to id {max_id}")
 
 
 @payments.cli.command("transferwise_refund_complete")
+@click.argument("currency", type=click.Choice(["GBP", "EUR"]))
 @click.argument("max_id", type=int)
-def transferwise_refund_complete(max_id):
+def transferwise_refund_complete(max_id, currency):
     """ Mark Transferwise bulk refunds as completed """
     query = (
         RefundRequest.query.join(Payment)
@@ -141,7 +143,7 @@ def transferwise_refund_complete(max_id):
         if request.method != "banktransfer":
             continue
 
-        if request.currency != request.payment.currency:
+        if request.currency != request.payment.currency or request.currency != currency:
             continue
 
         manual_bank_refund(request)
