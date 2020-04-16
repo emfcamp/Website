@@ -42,10 +42,6 @@ def create_stripe_refund(
 
 
 def send_refund_email(request: RefundRequest, amount: Decimal) -> None:
-    # Don't send an email if the entire refund is a donation.
-    if amount == 0:
-        return
-
     payment = request.payment
     msg = Message(
         "Your refund request has been processed",
