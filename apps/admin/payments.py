@@ -23,6 +23,7 @@ import gocardless_pro.errors
 from main import db, mail, stripe, gocardless_client
 from models.payment import (
     Payment,
+    RefundRequest,
     BankPayment,
     BankRefund,
     StripeRefund,
@@ -261,16 +262,20 @@ def cancel_payment(payment_id):
 
 @admin.route("/payment/requested-refunds")
 def requested_refunds():
-    payments = (
-        Payment.query.filter_by(state="refund-requested")
+    state = request.args.get("state", "refund-requested")
+    requests = (
+        RefundRequest.query.join(Payment)
         .join(Purchase)
-        .with_entities(Payment, func.count(Purchase.id).label("purchase_count"))
-        .group_by(Payment)
-        .order_by(Payment.id)
+        .filter(Payment.state == state)
+        .with_entities(RefundRequest, func.count(Purchase.id).label("purchase_count"))
+        .order_by(RefundRequest.id)
+        .group_by(RefundRequest.id, Payment.id)
         .all()
     )
 
-    return render_template("admin/payments/requested_refunds.html", payments=payments)
+    return render_template(
+        "admin/payments/requested_refunds.html", requests=requests, state=state
+    )
 
 
 class ManualRefundForm(Form):
