@@ -278,6 +278,42 @@ def requested_refunds():
     )
 
 
+class DeleteRefundRequestForm(Form):
+    refund = SubmitField("Delete refund request")
+
+
+@admin.route("/payment/requested-refunds/<int:req_id>/delete", methods=["GET", "POST"])
+def delete_refund_request(req_id):
+    """ Delete a refund request. This can only be called if the payment is in the
+        refund-requested state, or if it's "refunded" but with a 100% donation. """
+    req = RefundRequest.query.get_or_404(req_id)
+
+    # TODO: this does not handle partial refunds!
+    # It can also fail if there's insufficient capacity to return the ticket state.
+    if not (
+        req.payment.state == "refund-requested"
+        or (req.payment.state == "refunded" and req.donation == req.payment.amount)
+    ):
+        return abort(400)
+
+    form = DeleteRefundRequestForm()
+    if form.validate_on_submit():
+        for purchase in req.payment.purchases:
+            if purchase.state == "refunded":
+                purchase.un_refund()
+
+        req.payment.state = "paid"
+        db.session.delete(req)
+        db.session.commit()
+
+        flash("Refund request deleted")
+        return redirect(url_for(".requested_refunds"))
+
+    return render_template(
+        "admin/payments/refund_request_delete.html", req=req, form=form
+    )
+
+
 class ManualRefundForm(Form):
     refund = SubmitField("Refund payment")
 

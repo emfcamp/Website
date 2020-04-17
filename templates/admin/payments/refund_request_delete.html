@@ -1,0 +1,13 @@
+{% extends "admin/base.html" %}
+{% from "_formhelpers.html" import render_field %}
+{% block title %}Delete refund request{% endblock%}
+{% set nav_active = 'admin_payments' %}
+{% block body %}
+<h2>Delete refund request</h2>
+<p>This will delete the user's refund request and reset the payment to paid.</p>
+<form method="post" action="{{ url_for('.delete_refund_request', req_id=req.id) }}" class="form-horizontal" role="form">
+{{ form.hidden_tag() }}
+{{ form.refund(class_="btn btn-warning pull-right") }}
+</form>
+
+{% endblock %}
