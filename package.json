@@ -50,6 +50,6 @@
     "@primer/octicons": "^9.2.0",
     "bootstrap": "^3.4.1",
     "bootstrap-sass": "^3.4.1",
-    "jquery": "^3.4.1"
+    "jquery": "^3.5.0"
   }
 }
