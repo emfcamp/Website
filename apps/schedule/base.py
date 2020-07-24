@@ -271,6 +271,7 @@ def time_machine():
             if talk["start_date"].time() <= now_time:
                 talks_now[year][talk["venue"]].append(talk)
             else:
+                talk["starts_in"] = talk["start_date"].time() - now_time
                 talks_next[year][talk["venue"]].append(talk)
 
     return render_template(

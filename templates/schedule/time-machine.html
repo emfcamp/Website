@@ -79,7 +79,7 @@
         <table class="table">
         <thead>
         <tr>
-            <th>Stage</th>
+            <th>Starts in</th>
             <th>Speaker</th>
             <th>Title</th>
             <th></th>
@@ -91,7 +91,12 @@
                 {% set talk=talks[0] %}
                 <tr class="{{- loop.cycle('odd', 'even') }}">
                     <td>
-                        <strong>{{ venue_name }}</strong>
+                        {% if talk.starts_in.hours >= 1 %}
+                            {{ talk.starts_in.hours }}h
+                        {% endif %}
+                        {% if talk.starts_in.minutes >= 1 %}
+                            {{ talk.starts_in.minutes }}m
+                        {% endif %}
                     </td>
                     <td>
                     <a href="{{url_for('schedule.item', year=year, proposal_id=talk.id)}}">
