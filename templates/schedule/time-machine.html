@@ -50,13 +50,7 @@
                     </td>
                     <td>
                     {% if talk.video %}
-                    {% if talk.video.ccc %}
-                    <a href="{{ talk.video.ccc }}" title="View this video on CCC Media">
-                    {% elif talk.video.archiveorg %}
-                    <a href="{{ talk.video.archiveorg }}" title="View this video on the Internet Archive">
-                    {% elif talk.video.youtube %}
-                    <a href="{{ talk.video.youtube }}" title="View this video on YouTube">
-                    {% endif %}
+                    <a href="{{url_for('schedule.item', year=year, proposal_id=talk.id)}}">
                     {{octicon('device-camera-video', alt="Has video")}}
                     </a>
                     {% endif %}
@@ -91,12 +85,7 @@
                 {% set talk=talks[0] %}
                 <tr class="{{- loop.cycle('odd', 'even') }}">
                     <td>
-                        {% if talk.starts_in.hours >= 1 %}
-                            {{ talk.starts_in.hours }}h
-                        {% endif %}
-                        {% if talk.starts_in.minutes >= 1 %}
-                            {{ talk.starts_in.minutes }}m
-                        {% endif %}
+                        {% if talk.starts_in.hours >= 1 %}{{ talk.starts_in.hours }}h&nbsp;{% endif %}{% if talk.starts_in.minutes >= 1 %}{{ talk.starts_in.minutes }}m{% endif %}
                     </td>
                     <td>
                     <a href="{{url_for('schedule.item', year=year, proposal_id=talk.id)}}">
@@ -110,13 +99,7 @@
                     </td>
                     <td>
                     {% if talk.video %}
-                    {% if talk.video.ccc %}
-                    <a href="{{ talk.video.ccc }}" title="View this video on CCC Media">
-                    {% elif talk.video.archiveorg %}
-                    <a href="{{ talk.video.archiveorg }}" title="View this video on the Internet Archive">
-                    {% elif talk.video.youtube %}
-                    <a href="{{ talk.video.youtube }}" title="View this video on YouTube">
-                    {% endif %}
+                    <a href="{{url_for('schedule.item', year=year, proposal_id=talk.id)}}">
                     {{octicon('device-camera-video', alt="Has video")}}
                     </a>
                     {% endif %}
