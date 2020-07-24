@@ -21,7 +21,7 @@
 
     {% for year, venue in talks_now|dictsort %}
         <h3>{{ year }}</h3>
-        <table class="table">
+        <table class="table" id="time-machine-now">
         <thead>
         <tr>
             <th>Stage</th>
@@ -70,7 +70,7 @@
 
     {% for year, venue in talks_next|dictsort %}
         <h3>{{ year }}</h3>
-        <table class="table">
+        <table class="table" id="time-machine-later">
         <thead>
         <tr>
             <th>Starts in</th>

@@ -1,0 +1,63 @@
+/* Time Machine responsive table */
+@media (max-width: 768px) {
+  table#time-machine-now,
+  table#time-machine-later {
+    /* Force table to not be like tables anymore */
+    &, thead, tbody, th, td, tr {
+      display: block;
+    }
+
+    /* Hide table headers (but not display: none;, for accessibility) */
+    thead tr {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+
+    tbody > tr {
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+
+    tbody > tr > td {
+      position: relative;
+      padding-left: 30%;
+      border-top: none;
+    }
+
+    tbody > tr.even,
+    tbody > tr.even > td {
+      background-color: #c8c8c8;
+    }
+
+    tbody > tr.odd,
+    tbody > tr.odd > td {
+      background-color: #ddd;
+    }
+
+    tbody > tr > td:before {
+      /* Now like a table header */
+      position: absolute;
+      /* Top/left values mimic padding */
+      top: 6px;
+      left: 6px;
+      width: 30%;
+      padding-right: 10px;
+      padding-top: 4px;
+      white-space: nowrap;
+    }
+  }
+
+  table#time-machine-now {
+    td:nth-of-type(1):before { content: "Stage"; }
+    td:nth-of-type(2):before { content: "Speaker"; }
+    td:nth-of-type(3):before { content: "Title"; }
+  }
+
+  table#time-machine-later {
+    td:nth-of-type(1):before { content: "Starts in"; }
+    td:nth-of-type(2):before { content: "Speaker"; }
+    td:nth-of-type(3):before { content: "Title"; }
+  }
+}
+
