@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!--Aw yeah-->
+    <meta http-equiv="refresh" content="300">
+{% endblock %}
+
+{% block title %}
+    Electromagnetic Field Time Machine
+{% endblock %}
+
+{% block body %}
+<h1>
+    EMF Time Machine
+</h1>
+<h4>Current time: <strong>{{ now.strftime('%A at %-I:%M %p') }}</strong></h4>
+
+{% if talks_now | length > 0 %}
+    <h3>Right now, these were the talks on-stage at EMF in...</h3>
+
+    {% for year, venue in talks_now|dictsort %}
+        <h3>{{ year }}</h3>
+        <table class="table">
+        <thead>
+        <tr>
+            <th>Stage</th>
+            <th>Speaker</th>
+            <th>Title</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for venue_name, talks in venue|dictsort %}
+            {% if talks | length > 0 -%}
+                {% set talk=talks[0] %}
+                <tr class="{{- loop.cycle('odd', 'even') }}">
+                    <td>
+                    <a>
+                        <strong>{{ venue_name }}</strong>
+                    </a>
+                    </td>
+                    <td>
+                    <a href="{{url_for('schedule.item', year=year, proposal_id=talk.id)}}">
+                        <strong>{{ talk.speaker }}</strong>
+                    </a>
+                    </td>
+                    <td>
+                    <a href="{{url_for('schedule.item', year=year, proposal_id=talk.id)}}">
+                        {{ talk.title }}
+                    </a>
+                    </td>
+                    <td>
+                    {% if talk.video %}
+                    {{octicon('device-camera-video', alt="Has video")}}
+                    {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+        </table>
+    {% endfor %}
+    <br>
+{% endif %}
+
+{% if talks_next | length > 0 %}
+    <h3>Right now, these were the talks next on-stage at EMF in...</h3>
+
+    {% for year, venue in talks_next|dictsort %}
+        <h3>{{ year }}</h3>
+        <table class="table">
+        <thead>
+        <tr>
+            <th>Stage</th>
+            <th>Speaker</th>
+            <th>Title</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for venue_name, talks in venue|dictsort %}
+            {% if talks | length > 0 -%}
+                {% set talk=talks[0] %}
+                <tr class="{{- loop.cycle('odd', 'even') }}">
+                    <td>
+                    <a>
+                        <strong>{{ venue_name }}</strong>
+                    </a>
+                    </td>
+                    <td>
+                    <a href="{{url_for('schedule.item', year=year, proposal_id=talk.id)}}">
+                        <strong>{{ talk.speaker }}</strong>
+                    </a>
+                    </td>
+                    <td>
+                    <a href="{{url_for('schedule.item', year=year, proposal_id=talk.id)}}">
+                        {{ talk.title }}
+                    </a>
+                    </td>
+                    <td>
+                    {% if talk.video %}
+                    {{octicon('device-camera-video', alt="Has video")}}
+                    {% endif %}
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+        </table>
+    {% endfor %}
+    <br>
+{% endif %}
+
+{% if talks_now | length == 0 and talks_next | length == 0 %}
+    <h3>Talks are over for today, come back tomorrow!</h3>
+{% endif %}
+
+<small>We're not listing talks from Electromagnetic Wave, as all video footage was lost in a shipping accident.</small>
+{% endblock %}

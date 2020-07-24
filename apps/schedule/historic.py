@@ -48,9 +48,7 @@ def item_historic(year, proposal_id, slug):
     )
 
 
-def talks_historic(year):
-    abort_if_invalid_year(year)
-
+def historic_talk_data(year):
     schedule = load_archive_file(year, "public", "schedule.json")
     event_data = load_archive_file(year, "event.json", raise_404=False)
 
@@ -98,8 +96,18 @@ def talks_historic(year):
     if len(youth_events) > 0:
         venues.append({"name": "Youth Workshops", "events": youth_events})
 
+    return {"year": year, "venues": venues, "event": event_data}
+
+
+def talks_historic(year):
+    abort_if_invalid_year(year)
+
+    data = historic_talk_data(year)
     return render_template(
-        "schedule/historic/talks.html", venues=venues, year=year, event=event_data
+        "schedule/historic/talks.html",
+        venues=data["venues"],
+        year=data["year"],
+        event=data["event"],
     )
 
 
