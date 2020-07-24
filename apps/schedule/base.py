@@ -18,7 +18,7 @@ from models.admin_message import AdminMessage
 
 from ..common import feature_flag
 
-from . import schedule  # , event_tz
+from . import schedule, event_tz
 from .historic import talks_historic, item_historic, historic_talk_data
 from .data import _get_scheduled_proposals, _get_upcoming, _get_priority_sorted_venues
 
@@ -237,7 +237,7 @@ def now_and_next():
 @schedule.route("/time-machine")
 def time_machine():
     # now = pendulum.datetime(2018, 8, 31, 12, 00, tz=event_tz)
-    now = pendulum.now()
+    now = pendulum.now(event_tz)
     now_time = now.time()
     now_weekday = now.weekday()
 
