@@ -1,893 +1,1055 @@
 [
-  {
-    "id": 1,
-    "source": "database",
-    "title": "EMF Opening",
-    "venue": "Stage Alpha",
-    "speaker": "",
-    "type": "talk",
-    "start_date": "2012-08-31T15:30:00",
-    "start_time": "15:30",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_opening_ceremony"
+    {
+        "end_date": "2012-08-31T18:00:00", 
+        "end_time": "18:00", 
+        "id": 5, 
+        "source": "database", 
+        "speaker": "Peter Jackson", 
+        "start_date": "2012-08-31T17:00:00", 
+        "start_time": "17:00", 
+        "title": "Postal Tracking, or, Where do all those Royal Mail vans go?", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-08-31T19:00:00", 
+        "end_time": "19:00", 
+        "id": 9, 
+        "source": "database", 
+        "speaker": "Jez", 
+        "start_date": "2012-08-31T18:00:00", 
+        "start_time": "18:00", 
+        "title": "The Future is Right Here", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-08-31T20:00:00", 
+        "end_time": "20:00", 
+        "id": 12, 
+        "source": "database", 
+        "speaker": "John Hawkes-Reed", 
+        "start_date": "2012-08-31T19:00:00", 
+        "start_time": "19:00", 
+        "title": "Two-fisted tales of DevOps - beards vs. process", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-08-31T20:30:00", 
+        "end_time": "20:30", 
+        "id": 15, 
+        "source": "database", 
+        "speaker": "Jasper Wallace", 
+        "start_date": "2012-08-31T20:00:00", 
+        "start_time": "20:00", 
+        "title": "DNSSEC, What it is and why you need it", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-08-31T21:00:00", 
+        "end_time": "21:00", 
+        "id": 17, 
+        "source": "database", 
+        "speaker": "Jos\u00e9 D\u00edez", 
+        "start_date": "2012-08-31T20:30:00", 
+        "start_time": "20:30", 
+        "title": "The current state of affairs in the DCPU world", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-08-31T22:00:00", 
+        "end_time": "22:00", 
+        "id": 19, 
+        "source": "database", 
+        "speaker": "", 
+        "start_date": "2012-08-31T21:00:00", 
+        "start_time": "21:00", 
+        "title": "Lightning Talks", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-08-31T17:00:00", 
+        "end_time": "17:00", 
+        "id": 3, 
+        "source": "database", 
+        "speaker": "", 
+        "start_date": "2012-08-31T16:00:00", 
+        "start_time": "16:00", 
+        "title": "Learn to Solder (Properly)", 
+        "type": "workshop", 
+        "venue": "Workshop"
+    }, 
+    {
+        "end_date": "2012-08-31T17:30:00", 
+        "end_time": "17:30", 
+        "id": 6, 
+        "source": "database", 
+        "speaker": "Sam Lindenrathen", 
+        "start_date": "2012-08-31T17:00:00", 
+        "start_time": "17:00", 
+        "title": "Crochet at Scale", 
+        "type": "workshop", 
+        "venue": "Workshop"
+    }, 
+    {
+        "end_date": "2012-08-31T18:00:00", 
+        "end_time": "18:00", 
+        "id": 7, 
+        "source": "database", 
+        "speaker": "Steven Gravell", 
+        "start_date": "2012-08-31T17:30:00", 
+        "start_time": "17:30", 
+        "title": "The Game of Go (Workshop)", 
+        "type": "workshop", 
+        "venue": "Workshop"
+    }, 
+    {
+        "end_date": "2012-08-31T19:00:00", 
+        "end_time": "19:00", 
+        "id": 10, 
+        "source": "database", 
+        "speaker": "Universal Air", 
+        "start_date": "2012-08-31T18:00:00", 
+        "start_time": "18:00", 
+        "title": "Drones & Quadcopters", 
+        "type": "workshop", 
+        "venue": "Workshop"
+    }, 
+    {
+        "end_date": "2012-08-31T20:00:00", 
+        "end_time": "20:00", 
+        "id": 13, 
+        "source": "database", 
+        "speaker": "", 
+        "start_date": "2012-08-31T19:00:00", 
+        "start_time": "19:00", 
+        "title": "Programming TiLDA (Daily)", 
+        "type": "workshop", 
+        "venue": "Workshop"
+    }, 
+    {
+        "end_date": "2012-08-31T21:00:00", 
+        "end_time": "21:00", 
+        "id": 16, 
+        "source": "database", 
+        "speaker": "Andrew Sleigh", 
+        "start_date": "2012-08-31T20:00:00", 
+        "start_time": "20:00", 
+        "title": "Camping stoves from beer cans", 
+        "type": "workshop", 
+        "venue": "Workshop"
+    }, 
+    {
+        "end_date": "2012-08-31T22:00:00", 
+        "end_time": "22:00", 
+        "id": 20, 
+        "source": "database", 
+        "speaker": "Dave Ingram", 
+        "start_date": "2012-08-31T21:00:00", 
+        "start_time": "21:00", 
+        "title": "Hypnosis Workshop", 
+        "type": "workshop", 
+        "venue": "Workshop"
+    }, 
+    {
+        "end_date": "2012-08-31T16:00:00", 
+        "end_time": "16:00", 
+        "id": 1, 
+        "source": "database", 
+        "speaker": "Jonty Wareing", 
+        "start_date": "2012-08-31T15:30:00", 
+        "start_time": "15:30", 
+        "title": "EMF Opening", 
+        "type": "talk", 
+        "venue": "Stage Alpha", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_opening_ceremony"
+        }
+    }, 
+    {
+        "end_date": "2012-08-31T17:00:00", 
+        "end_time": "17:00", 
+        "id": 2, 
+        "source": "database", 
+        "speaker": "Jim MacArthur", 
+        "start_date": "2012-08-31T16:00:00", 
+        "start_time": "16:00", 
+        "title": "Making a Mechanical Turing Machine", 
+        "type": "talk", 
+        "venue": "Stage Alpha", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_mechanical_turing_machine"
+        }
+    }, 
+    {
+        "end_date": "2012-08-31T18:00:00", 
+        "end_time": "18:00", 
+        "id": 4, 
+        "source": "database", 
+        "speaker": "Universal Air", 
+        "start_date": "2012-08-31T17:00:00", 
+        "start_time": "17:00", 
+        "title": "Drones & Quadcopters", 
+        "type": "talk", 
+        "venue": "Stage Alpha"
+    }, 
+    {
+        "end_date": "2012-08-31T19:00:00", 
+        "end_time": "19:00", 
+        "id": 8, 
+        "source": "database", 
+        "speaker": "Martin Dittus", 
+        "start_date": "2012-08-31T18:00:00", 
+        "start_time": "18:00", 
+        "title": "Communal Sensor Networks, A review of global DIY environmental monitoring activities", 
+        "type": "talk", 
+        "venue": "Stage Alpha"
+    }, 
+    {
+        "end_date": "2012-08-31T20:00:00", 
+        "end_time": "20:00", 
+        "id": 11, 
+        "source": "database", 
+        "speaker": "Ben Blundell", 
+        "start_date": "2012-08-31T19:00:00", 
+        "start_time": "19:00", 
+        "title": "Mapping internal body parts in 3D using lasers", 
+        "type": "talk", 
+        "venue": "Stage Alpha", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_mapping_body_3d"
+        }
+    }, 
+    {
+        "end_date": "2012-08-31T21:00:00", 
+        "end_time": "21:00", 
+        "id": 14, 
+        "source": "database", 
+        "speaker": "Tom Doran", 
+        "start_date": "2012-08-31T20:00:00", 
+        "start_time": "20:00", 
+        "title": "Fundamentals of web application security & security testing", 
+        "type": "talk", 
+        "venue": "Stage Alpha"
+    }, 
+    {
+        "end_date": "2012-08-31T22:00:00", 
+        "end_time": "22:00", 
+        "id": 18, 
+        "source": "database", 
+        "speaker": "Matthew Westcott", 
+        "start_date": "2012-08-31T21:00:00", 
+        "start_time": "21:00", 
+        "title": "The demo scene: the biggest digital art movement you've never heard of", 
+        "type": "talk", 
+        "venue": "Stage Alpha", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_demoscene"
+        }
+    }, 
+    {
+        "end_date": "2012-09-01T11:30:00", 
+        "end_time": "11:30", 
+        "id": 22, 
+        "source": "database", 
+        "speaker": "Clare Greenhalgh", 
+        "start_date": "2012-09-01T11:00:00", 
+        "start_time": "11:00", 
+        "title": "Knitting for non-knitters", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-09-01T12:00:00", 
+        "end_time": "12:00", 
+        "id": 24, 
+        "source": "database", 
+        "speaker": "Charles Yarnold", 
+        "start_date": "2012-09-01T11:30:00", 
+        "start_time": "11:30", 
+        "title": "TiLDA", 
+        "type": "talk", 
+        "venue": "Stage Beta", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_tilda"
+        }
+    }, 
+    {
+        "end_date": "2012-09-01T12:30:00", 
+        "end_time": "12:30", 
+        "id": 27, 
+        "source": "database", 
+        "speaker": "Paul Dart", 
+        "start_date": "2012-09-01T12:00:00", 
+        "start_time": "12:00", 
+        "title": "GSM Basics", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-09-01T13:00:00", 
+        "end_time": "13:00", 
+        "id": 29, 
+        "source": "database", 
+        "speaker": "Adam Greig (UKHAS & CUSF)", 
+        "start_date": "2012-09-01T12:30:00", 
+        "start_time": "12:30", 
+        "title": "High Altitude Ballooning", 
+        "type": "talk", 
+        "venue": "Stage Beta", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_high_altitude_ballooning"
+        }
+    }, 
+    {
+        "end_date": "2012-09-01T13:30:00", 
+        "end_time": "13:30", 
+        "id": 32, 
+        "source": "database", 
+        "speaker": "Locksport International", 
+        "start_date": "2012-09-01T13:00:00", 
+        "start_time": "13:00", 
+        "title": "Introduction to Locksport", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-09-01T14:00:00", 
+        "end_time": "14:00", 
+        "id": 34, 
+        "source": "database", 
+        "speaker": "Adam Greig (UKHAS & CUSF)", 
+        "start_date": "2012-09-01T13:30:00", 
+        "start_time": "13:30", 
+        "title": "High Altitude Balloon Launch & Tracking", 
+        "type": "talk", 
+        "venue": "Stage Beta", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_high_altitude_balloon_launch"
+        }
+    }, 
+    {
+        "end_date": "2012-09-01T14:30:00", 
+        "end_time": "14:30", 
+        "id": 36, 
+        "source": "database", 
+        "speaker": "Niloy Mitra", 
+        "start_date": "2012-09-01T14:00:00", 
+        "start_time": "14:00", 
+        "title": "Fun with 3D Geometry", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-09-01T15:00:00", 
+        "end_time": "15:00", 
+        "id": 38, 
+        "source": "database", 
+        "speaker": "Chris Roberts", 
+        "start_date": "2012-09-01T14:30:00", 
+        "start_time": "14:30", 
+        "title": "EMFM, how to make a radio station in a field", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-09-01T16:00:00", 
+        "end_time": "16:00", 
+        "id": 40, 
+        "source": "database", 
+        "speaker": "Kenneth Tong", 
+        "start_date": "2012-09-01T15:00:00", 
+        "start_time": "15:00", 
+        "title": "Vodafone repeater umbrella, and antenna design", 
+        "type": "talk", 
+        "venue": "Stage Beta", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_repeater_umbrella"
+        }
+    }, 
+    {
+        "end_date": "2012-09-01T18:00:00", 
+        "end_time": "18:00", 
+        "id": 43, 
+        "source": "database", 
+        "speaker": "Hannah Dee", 
+        "start_date": "2012-09-01T16:00:00", 
+        "start_time": "16:00", 
+        "title": "Where have all the women gone? (Women in computing: what\u2019s the problem, why should you be bothered, and what can we do about it?)", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-09-01T18:30:00", 
+        "end_time": "18:30", 
+        "id": 47, 
+        "source": "database", 
+        "speaker": "Carl Reynolds", 
+        "start_date": "2012-09-01T18:00:00", 
+        "start_time": "18:00", 
+        "title": "Making NHS IT less bad", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-09-01T19:30:00", 
+        "end_time": "19:30", 
+        "id": 49, 
+        "source": "database", 
+        "speaker": "Hackerspace People", 
+        "start_date": "2012-09-01T18:30:00", 
+        "start_time": "18:30", 
+        "title": "Hackerspace Panel Discussion", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-09-01T20:30:00", 
+        "end_time": "20:30", 
+        "id": 51, 
+        "source": "database", 
+        "speaker": "", 
+        "start_date": "2012-09-01T19:30:00", 
+        "start_time": "19:30", 
+        "title": "Lightning Talks", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-09-01T21:30:00", 
+        "end_time": "21:30", 
+        "id": 52, 
+        "source": "database", 
+        "speaker": "Tef", 
+        "start_date": "2012-09-01T20:30:00", 
+        "start_time": "20:30", 
+        "title": "Programming is terrible. Lessons learned from a life wasted", 
+        "type": "talk", 
+        "venue": "Stage Beta", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_programming_is_terrible"
+        }
+    }, 
+    {
+        "end_date": "2012-09-01T22:30:00", 
+        "end_time": "22:30", 
+        "id": 54, 
+        "source": "database", 
+        "speaker": "Warren Rockley", 
+        "start_date": "2012-09-01T21:30:00", 
+        "start_time": "21:30", 
+        "title": "Safe cracking from back in the day to the present day", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-09-01T11:30:00", 
+        "end_time": "11:30", 
+        "id": 23, 
+        "source": "database", 
+        "speaker": "Al Razi Masri", 
+        "start_date": "2012-09-01T11:00:00", 
+        "start_time": "11:00", 
+        "title": "Hexayurt", 
+        "type": "workshop", 
+        "venue": "Workshop", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_hexayurt"
+        }
+    }, 
+    {
+        "end_date": "2012-09-01T12:00:00", 
+        "end_time": "12:00", 
+        "id": 25, 
+        "source": "database", 
+        "speaker": "", 
+        "start_date": "2012-09-01T11:30:00", 
+        "start_time": "11:30", 
+        "title": "Learn to Solder (Properly)", 
+        "type": "workshop", 
+        "venue": "Workshop"
+    }, 
+    {
+        "end_date": "2012-09-01T12:30:00", 
+        "end_time": "12:30", 
+        "id": 28, 
+        "source": "database", 
+        "speaker": "", 
+        "start_date": "2012-09-01T12:00:00", 
+        "start_time": "12:00", 
+        "title": "Programming TiLDA", 
+        "type": "workshop", 
+        "venue": "Workshop"
+    }, 
+    {
+        "end_date": "2012-09-01T13:00:00", 
+        "end_time": "13:00", 
+        "id": 30, 
+        "source": "database", 
+        "speaker": "Steven Gravell", 
+        "start_date": "2012-09-01T12:30:00", 
+        "start_time": "12:30", 
+        "title": "The Game of Go", 
+        "type": "workshop", 
+        "venue": "Workshop"
+    }, 
+    {
+        "end_date": "2012-09-01T14:00:00", 
+        "end_time": "14:00", 
+        "id": 33, 
+        "source": "database", 
+        "speaker": "Matthias Stevens", 
+        "start_date": "2012-09-01T13:00:00", 
+        "start_time": "13:00", 
+        "title": "DIY Decibel Loggers for Heathrow", 
+        "type": "workshop", 
+        "venue": "Workshop"
+    }, 
+    {
+        "end_date": "2012-09-01T15:00:00", 
+        "end_time": "15:00", 
+        "id": 37, 
+        "source": "database", 
+        "speaker": "Lea Nicholson", 
+        "start_date": "2012-09-01T14:00:00", 
+        "start_time": "14:00", 
+        "title": "SuperCollider", 
+        "type": "workshop", 
+        "venue": "Workshop"
+    }, 
+    {
+        "end_date": "2012-09-01T16:00:00", 
+        "end_time": "16:00", 
+        "id": 41, 
+        "source": "database", 
+        "speaker": "Locksport International", 
+        "start_date": "2012-09-01T15:00:00", 
+        "start_time": "15:00", 
+        "title": "Lockpicking", 
+        "type": "workshop", 
+        "venue": "Workshop"
+    }, 
+    {
+        "end_date": "2012-09-01T18:00:00", 
+        "end_time": "18:00", 
+        "id": 44, 
+        "source": "database", 
+        "speaker": "Kate Oliver", 
+        "start_date": "2012-09-01T16:00:00", 
+        "start_time": "16:00", 
+        "title": "Make Yourself into a Zombie", 
+        "type": "workshop", 
+        "venue": "Workshop"
+    }, 
+    {
+        "end_date": "2012-09-01T19:00:00", 
+        "end_time": "19:00", 
+        "id": 48, 
+        "source": "database", 
+        "speaker": "Harry Eakins", 
+        "start_date": "2012-09-01T18:00:00", 
+        "start_time": "18:00", 
+        "title": "Arduino Workshop for the Curious", 
+        "type": "workshop", 
+        "venue": "Workshop"
+    }, 
+    {
+        "end_date": "2012-09-01T12:00:00", 
+        "end_time": "12:00", 
+        "id": 21, 
+        "source": "database", 
+        "speaker": "Biohackers", 
+        "start_date": "2012-09-01T11:00:00", 
+        "start_time": "11:00", 
+        "title": "How a group of computer scientists formed a biohacking group", 
+        "type": "talk", 
+        "venue": "Stage Alpha"
+    }, 
+    {
+        "end_date": "2012-09-01T13:00:00", 
+        "end_time": "13:00", 
+        "id": 26, 
+        "source": "database", 
+        "speaker": "Matthias Stevens", 
+        "start_date": "2012-09-01T12:00:00", 
+        "start_time": "12:00", 
+        "title": "DIY Decibel Loggers for Heathrow", 
+        "type": "talk", 
+        "venue": "Stage Alpha", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_diy_decibel_loggers"
+        }
+    }, 
+    {
+        "end_date": "2012-09-01T14:00:00", 
+        "end_time": "14:00", 
+        "id": 31, 
+        "source": "database", 
+        "speaker": "Ben Fields", 
+        "start_date": "2012-09-01T13:00:00", 
+        "start_time": "13:00", 
+        "title": "This Pilsner Tastes of Doom Metal \u2013 Music Recommender Systems and Beer", 
+        "type": "talk", 
+        "venue": "Stage Alpha", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_music_recommender_systems_and_beer"
+        }
+    }, 
+    {
+        "end_date": "2012-09-01T15:00:00", 
+        "end_time": "15:00", 
+        "id": 35, 
+        "source": "database", 
+        "speaker": "Eireann Leverett", 
+        "start_date": "2012-09-01T14:00:00", 
+        "start_time": "14:00", 
+        "title": "Denial of Surface, Finding Industrial System devices with SHODAN", 
+        "type": "talk", 
+        "venue": "Stage Alpha", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_denial_of_surface"
+        }
+    }, 
+    {
+        "end_date": "2012-09-01T16:00:00", 
+        "end_time": "16:00", 
+        "id": 39, 
+        "source": "database", 
+        "speaker": "Al Razi Masri", 
+        "start_date": "2012-09-01T15:00:00", 
+        "start_time": "15:00", 
+        "title": "Hexayurt: Free hardware housing for the world", 
+        "type": "talk", 
+        "venue": "Stage Alpha"
+    }, 
+    {
+        "end_date": "2012-09-01T17:00:00", 
+        "end_time": "17:00", 
+        "id": 42, 
+        "source": "database", 
+        "speaker": "Suwan Jayasinghe", 
+        "start_date": "2012-09-01T16:00:00", 
+        "start_time": "16:00", 
+        "title": "Engineering tomorrow's healthcare, synthetic tissue generation", 
+        "type": "talk", 
+        "venue": "Stage Alpha", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_engineering_heathcare"
+        }
+    }, 
+    {
+        "end_date": "2012-09-01T18:00:00", 
+        "end_time": "18:00", 
+        "id": 45, 
+        "source": "database", 
+        "speaker": "Ben Goldacre", 
+        "start_date": "2012-09-01T17:00:00", 
+        "start_time": "17:00", 
+        "title": "Big Pharma", 
+        "type": "talk", 
+        "venue": "Stage Alpha"
+    }, 
+    {
+        "end_date": "2012-09-01T19:00:00", 
+        "end_time": "19:00", 
+        "id": 46, 
+        "source": "database", 
+        "speaker": "Sam Lindenrathen", 
+        "start_date": "2012-09-01T18:00:00", 
+        "start_time": "18:00", 
+        "title": "Particle Physics beyond the LHC", 
+        "type": "talk", 
+        "venue": "Stage Alpha", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_particle_physics_beyond_lhc"
+        }
+    }, 
+    {
+        "end_date": "2012-09-01T21:30:00", 
+        "end_time": "21:30", 
+        "id": 50, 
+        "source": "database", 
+        "speaker": "Music Hackspace", 
+        "start_date": "2012-09-01T19:00:00", 
+        "start_time": "19:00", 
+        "title": "A series of live music performances", 
+        "type": "talk", 
+        "venue": "Stage Alpha"
+    }, 
+    {
+        "end_date": "2012-09-01T22:30:00", 
+        "end_time": "22:30", 
+        "id": 53, 
+        "source": "database", 
+        "speaker": "Dave Ingram", 
+        "start_date": "2012-09-01T21:30:00", 
+        "start_time": "21:30", 
+        "title": "Mindhacker Hypnoshow", 
+        "type": "talk", 
+        "venue": "Stage Alpha"
+    }, 
+    {
+        "end_date": "2012-09-02T11:30:00", 
+        "end_time": "11:30", 
+        "id": 57, 
+        "source": "database", 
+        "speaker": "Spencer", 
+        "start_date": "2012-09-02T11:00:00", 
+        "start_time": "11:00", 
+        "title": "Freebase, god, and the semantic web", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-09-02T12:00:00", 
+        "end_time": "12:00", 
+        "id": 59, 
+        "source": "database", 
+        "speaker": "Tef", 
+        "start_date": "2012-09-02T11:30:00", 
+        "start_time": "11:30", 
+        "title": "Hypermedia RPC", 
+        "type": "talk", 
+        "venue": "Stage Beta", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_hypermedia_rpc"
+        }
+    }, 
+    {
+        "end_date": "2012-09-02T12:30:00", 
+        "end_time": "12:30", 
+        "id": 61, 
+        "source": "database", 
+        "speaker": "Nat Morris", 
+        "start_date": "2012-09-02T12:00:00", 
+        "start_time": "12:00", 
+        "title": "Feed Toby! What happens when 93,000 people feed your dog over the internet", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-09-02T13:00:00", 
+        "end_time": "13:00", 
+        "id": 63, 
+        "source": "database", 
+        "speaker": "Dominic Morrow", 
+        "start_date": "2012-09-02T12:30:00", 
+        "start_time": "12:30", 
+        "title": "So you think you want to start a hackerspace? (Q&A)", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-09-02T14:00:00", 
+        "end_time": "14:00", 
+        "id": 65, 
+        "source": "database", 
+        "speaker": "Adrien Kunysz", 
+        "start_date": "2012-09-02T13:00:00", 
+        "start_time": "13:00", 
+        "title": "Datamining a cloud that wasn't meant to be public", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-09-02T14:30:00", 
+        "end_time": "14:30", 
+        "id": 68, 
+        "source": "database", 
+        "speaker": "Gavan Fantom", 
+        "start_date": "2012-09-02T14:00:00", 
+        "start_time": "14:00", 
+        "title": "Introduction to Esperanto", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-09-02T15:00:00", 
+        "end_time": "15:00", 
+        "id": 70, 
+        "source": "database", 
+        "speaker": "Jonty Wareing", 
+        "start_date": "2012-09-02T14:30:00", 
+        "start_time": "14:30", 
+        "title": "Everything you never wanted to know about bees", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-09-02T16:00:00", 
+        "end_time": "16:00", 
+        "id": 72, 
+        "source": "database", 
+        "speaker": "Tom Scott & Charles Yarnold", 
+        "start_date": "2012-09-02T15:00:00", 
+        "start_time": "15:00", 
+        "title": "Techies vs Television: How to deal with TV and emerge relatively unscathed", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-09-02T16:30:00", 
+        "end_time": "16:30", 
+        "id": 75, 
+        "source": "database", 
+        "speaker": "Russ Garrett (Moved to the bar area)", 
+        "start_date": "2012-09-02T16:00:00", 
+        "start_time": "16:00", 
+        "title": "A rant about the Space Shuttle", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-09-02T18:00:00", 
+        "end_time": "18:00", 
+        "id": 76, 
+        "source": "database", 
+        "speaker": "Nat Morris", 
+        "start_date": "2012-09-02T16:30:00", 
+        "start_time": "16:30", 
+        "title": "Internet to a field, the EMF network", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-09-02T19:00:00", 
+        "end_time": "19:00", 
+        "id": 79, 
+        "source": "database", 
+        "speaker": "", 
+        "start_date": "2012-09-02T18:00:00", 
+        "start_time": "18:00", 
+        "title": "Lightning Talks", 
+        "type": "talk", 
+        "venue": "Stage Beta"
+    }, 
+    {
+        "end_date": "2012-09-02T11:00:00", 
+        "end_time": "11:00", 
+        "id": 55, 
+        "source": "database", 
+        "speaker": "Gausie and Nartandyou", 
+        "start_date": "2012-09-02T09:00:00", 
+        "start_time": "09:00", 
+        "title": "Geocaching Walk (3km)", 
+        "type": "workshop", 
+        "venue": "Workshop"
+    }, 
+    {
+        "end_date": "2012-09-02T12:00:00", 
+        "end_time": "12:00", 
+        "id": 58, 
+        "source": "database", 
+        "speaker": "Clare Greenhalgh", 
+        "start_date": "2012-09-02T11:00:00", 
+        "start_time": "11:00", 
+        "title": "Knitting for non-knitters", 
+        "type": "workshop", 
+        "venue": "Workshop", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_knitting_for_non_knitters"
+        }
+    }, 
+    {
+        "end_date": "2012-09-02T13:00:00", 
+        "end_time": "13:00", 
+        "id": 62, 
+        "source": "database", 
+        "speaker": "", 
+        "start_date": "2012-09-02T12:00:00", 
+        "start_time": "12:00", 
+        "title": "Learn to Solder (Properly)", 
+        "type": "workshop", 
+        "venue": "Workshop"
+    }, 
+    {
+        "end_date": "2012-09-02T14:00:00", 
+        "end_time": "14:00", 
+        "id": 66, 
+        "source": "database", 
+        "speaker": "Robert Fitzsimons", 
+        "start_date": "2012-09-02T13:00:00", 
+        "start_time": "13:00", 
+        "title": "SMD Soldering Workshop", 
+        "type": "workshop", 
+        "venue": "Workshop"
+    }, 
+    {
+        "end_date": "2012-09-02T15:00:00", 
+        "end_time": "15:00", 
+        "id": 69, 
+        "source": "database", 
+        "speaker": "Tom Doran", 
+        "start_date": "2012-09-02T14:00:00", 
+        "start_time": "14:00", 
+        "title": "Fundamentals of web application security & security testing", 
+        "type": "workshop", 
+        "venue": "Workshop", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_fundamentals_web_security"
+        }
+    }, 
+    {
+        "end_date": "2012-09-02T18:00:00", 
+        "end_time": "18:00", 
+        "id": 73, 
+        "source": "database", 
+        "speaker": "Jasper Wallace", 
+        "start_date": "2012-09-02T15:00:00", 
+        "start_time": "15:00", 
+        "title": "Deploying and managing DNSSEC zones", 
+        "type": "workshop", 
+        "venue": "Workshop"
+    }, 
+    {
+        "end_date": "2012-09-02T19:00:00", 
+        "end_time": "19:00", 
+        "id": 80, 
+        "source": "database", 
+        "speaker": "Morag Hickman", 
+        "start_date": "2012-09-02T18:00:00", 
+        "start_time": "18:00", 
+        "title": "Hammock making", 
+        "type": "workshop", 
+        "venue": "Workshop"
+    }, 
+    {
+        "end_date": "2012-09-02T12:00:00", 
+        "end_time": "12:00", 
+        "id": 56, 
+        "source": "database", 
+        "speaker": "Kate Miltner", 
+        "start_date": "2012-09-02T11:00:00", 
+        "start_time": "11:00", 
+        "title": "The Deeper Meaning Of LOLCats: Learnings From The Academic Study Of The Internet's Favorite Meme", 
+        "type": "talk", 
+        "venue": "Stage Alpha", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_lolcats"
+        }
+    }, 
+    {
+        "end_date": "2012-09-02T13:00:00", 
+        "end_time": "13:00", 
+        "id": 60, 
+        "source": "database", 
+        "speaker": "Aimee Maree Forsstrom", 
+        "start_date": "2012-09-02T12:00:00", 
+        "start_time": "12:00", 
+        "title": "What changes to the UK Communications Bill mean for you", 
+        "type": "talk", 
+        "venue": "Stage Alpha", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_comms_bill"
+        }
+    }, 
+    {
+        "end_date": "2012-09-02T14:00:00", 
+        "end_time": "14:00", 
+        "id": 64, 
+        "source": "database", 
+        "speaker": "Erik Bosman", 
+        "start_date": "2012-09-02T13:00:00", 
+        "start_time": "13:00", 
+        "title": "Minemu: Protecting buggy binaries from memory corruption attacks", 
+        "type": "talk", 
+        "venue": "Stage Alpha", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_minemu"
+        }
+    }, 
+    {
+        "end_date": "2012-09-02T15:00:00", 
+        "end_time": "15:00", 
+        "id": 67, 
+        "source": "database", 
+        "speaker": "Lea Nicholson", 
+        "start_date": "2012-09-02T14:00:00", 
+        "start_time": "14:00", 
+        "title": "SuperCollider", 
+        "type": "talk", 
+        "venue": "Stage Alpha", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_supercollider"
+        }
+    }, 
+    {
+        "end_date": "2012-09-02T16:00:00", 
+        "end_time": "16:00", 
+        "id": 71, 
+        "source": "database", 
+        "speaker": "Jos Weyers", 
+        "start_date": "2012-09-02T15:00:00", 
+        "start_time": "15:00", 
+        "title": "Key Impressioning", 
+        "type": "talk", 
+        "venue": "Stage Alpha", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_key_impressioning"
+        }
+    }, 
+    {
+        "end_date": "2012-09-02T17:00:00", 
+        "end_time": "17:00", 
+        "id": 74, 
+        "source": "database", 
+        "speaker": "Alexandra Glowaski", 
+        "start_date": "2012-09-02T16:00:00", 
+        "start_time": "16:00", 
+        "title": "Cyborgs, wearable, implantable, and mobile personal technology", 
+        "type": "talk", 
+        "venue": "Stage Alpha", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_cyborgs"
+        }
+    }, 
+    {
+        "end_date": "2012-09-02T18:00:00", 
+        "end_time": "18:00", 
+        "id": 77, 
+        "source": "database", 
+        "speaker": "", 
+        "start_date": "2012-09-02T17:00:00", 
+        "start_time": "17:00", 
+        "title": "EMF Retrospective, how can it be better", 
+        "type": "talk", 
+        "venue": "Stage Alpha", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_retrospective"
+        }
+    }, 
+    {
+        "end_date": "2012-09-02T19:00:00", 
+        "end_time": "19:00", 
+        "id": 78, 
+        "source": "database", 
+        "speaker": "Toby Cole", 
+        "start_date": "2012-09-02T18:00:00", 
+        "start_time": "18:00", 
+        "title": "The 55th Flotilla - TiLDA badge synced nautical rave up. Bring your badge for the last dance!", 
+        "type": "talk", 
+        "venue": "Stage Alpha", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_55_flotilla"
+        }
+    }, 
+    {
+        "end_date": "2012-09-02T20:00:00", 
+        "end_time": "20:00", 
+        "id": 81, 
+        "source": "database", 
+        "speaker": "Jonty Wareing", 
+        "start_date": "2012-09-02T19:00:00", 
+        "start_time": "19:00", 
+        "title": "EMF Closing", 
+        "type": "talk", 
+        "venue": "Stage Alpha", 
+        "video": {
+            "archiveorg": "https://archive.org/details/emfcamp_2012_closing"
+        }
     }
-  },
-  {
-    "id": 2,
-    "source": "database",
-    "title": "Making a Mechanical Turing Machine",
-    "venue": "Stage Alpha",
-    "speaker": "Jim MacArthur",
-    "type": "talk",
-    "start_date": "2012-08-31T16:00:00",
-    "start_time": "16:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_mechanical_turing_machine"
-    }
-  },
-  {
-    "id": 3,
-    "source": "database",
-    "title": "Learn to Solder (Properly)",
-    "venue": "Workshop",
-    "speaker": "",
-    "type": "workshop",
-    "start_date": "2012-08-31T16:00:00",
-    "start_time": "16:00"
-  },
-  {
-    "id": 4,
-    "source": "database",
-    "title": "Drones & Quadcopters",
-    "venue": "Stage Alpha",
-    "speaker": "Universal Air",
-    "type": "talk",
-    "start_date": "2012-08-31T17:00:00",
-    "start_time": "17:00"
-  },
-  {
-    "id": 5,
-    "source": "database",
-    "title": "Postal Tracking, or, Where do all those Royal Mail vans go?",
-    "venue": "Stage Beta",
-    "speaker": "Peter Jackson",
-    "type": "talk",
-    "start_date": "2012-08-31T17:00:00",
-    "start_time": "17:00"
-  },
-  {
-    "id": 6,
-    "source": "database",
-    "title": "Crochet at Scale",
-    "venue": "Workshop",
-    "speaker": "Sam Lindenrathen",
-    "type": "workshop",
-    "start_date": "2012-08-31T17:00:00",
-    "start_time": "17:00"
-  },
-  {
-    "id": 7,
-    "source": "database",
-    "title": "The Game of Go (Workshop)",
-    "venue": "Workshop",
-    "speaker": "Steven Gravell",
-    "type": "workshop",
-    "start_date": "2012-08-31T17:30:00",
-    "start_time": "17:30"
-  },
-  {
-    "id": 8,
-    "source": "database",
-    "title": "Communal Sensor Networks, A review of global DIY environmental monitoring activities",
-    "venue": "Stage Alpha",
-    "speaker": "Martin Dittus",
-    "type": "talk",
-    "start_date": "2012-08-31T18:00:00",
-    "start_time": "18:00"
-  },
-  {
-    "id": 9,
-    "source": "database",
-    "title": "The Future is Right Here",
-    "venue": "Stage Beta",
-    "speaker": "Jez",
-    "type": "talk",
-    "start_date": "2012-08-31T18:00:00",
-    "start_time": "18:00"
-  },
-  {
-    "id": 10,
-    "source": "database",
-    "title": "Drones & Quadcopters",
-    "venue": "Workshop",
-    "speaker": "Universal Air",
-    "type": "workshop",
-    "start_date": "2012-08-31T18:00:00",
-    "start_time": "18:00"
-  },
-  {
-    "id": 11,
-    "source": "database",
-    "title": "Mapping internal body parts in 3D using lasers",
-    "venue": "Stage Alpha",
-    "speaker": "Ben Blundell",
-    "type": "talk",
-    "start_date": "2012-08-31T19:00:00",
-    "start_time": "19:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_mapping_body_3d"
-    }
-  },
-  {
-    "id": 12,
-    "source": "database",
-    "title": "Two-fisted tales of DevOps - beards vs. process",
-    "venue": "Stage Beta",
-    "speaker": "John Hawkes-Reed",
-    "type": "talk",
-    "start_date": "2012-08-31T19:00:00",
-    "start_time": "19:00"
-  },
-  {
-    "id": 13,
-    "source": "database",
-    "title": "Programming TiLDA (Daily)",
-    "venue": "Workshop",
-    "speaker": "",
-    "type": "workshop",
-    "start_date": "2012-08-31T19:00:00",
-    "start_time": "19:00"
-  },
-  {
-    "id": 14,
-    "source": "database",
-    "title": "Fundamentals of web application security & security testing",
-    "venue": "Stage Alpha",
-    "speaker": "Tom Doran",
-    "type": "talk",
-    "start_date": "2012-08-31T20:00:00",
-    "start_time": "20:00"
-  },
-  {
-    "id": 15,
-    "source": "database",
-    "title": "DNSSEC, What it is and why you need it",
-    "venue": "Stage Beta",
-    "speaker": "Jasper Wallace",
-    "type": "talk",
-    "start_date": "2012-08-31T20:00:00",
-    "start_time": "20:00"
-  },
-  {
-    "id": 16,
-    "source": "database",
-    "title": "Camping stoves from beer cans",
-    "venue": "Workshop",
-    "speaker": "Andrew Sleigh",
-    "type": "workshop",
-    "start_date": "2012-08-31T20:00:00",
-    "start_time": "20:00"
-  },
-  {
-    "id": 17,
-    "source": "database",
-    "title": "The current state of affairs in the DCPU world",
-    "venue": "Stage Beta",
-    "speaker": "Jos\u00e9 D\u00edez",
-    "type": "talk",
-    "start_date": "2012-08-31T20:30:00",
-    "start_time": "20:30"
-  },
-  {
-    "id": 18,
-    "source": "database",
-    "title": "The demo scene: the biggest digital art movement you've never heard of",
-    "venue": "Stage Alpha",
-    "speaker": "Matthew Westcott",
-    "type": "talk",
-    "start_date": "2012-08-31T21:00:00",
-    "start_time": "21:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_demoscene"
-    }
-  },
-  {
-    "id": 19,
-    "source": "database",
-    "title": "Lightning Talks",
-    "venue": "Stage Beta",
-    "speaker": "",
-    "type": "talk",
-    "start_date": "2012-08-31T21:00:00",
-    "start_time": "21:00"
-  },
-  {
-    "id": 20,
-    "source": "database",
-    "title": "Hypnosis Workshop",
-    "venue": "Workshop",
-    "speaker": "Dave Ingram",
-    "type": "workshop",
-    "start_date": "2012-08-31T21:00:00",
-    "start_time": "21:00"
-  },
-  {
-    "id": 21,
-    "source": "database",
-    "title": "How a group of computer scientists formed a biohacking group",
-    "venue": "Stage Alpha",
-    "speaker": "Biohackers",
-    "type": "talk",
-    "start_date": "2012-09-01T11:00:00",
-    "start_time": "11:00"
-  },
-  {
-    "id": 22,
-    "source": "database",
-    "title": "Knitting for non-knitters",
-    "venue": "Stage Beta",
-    "speaker": "Clare Greenhalgh",
-    "type": "talk",
-    "start_date": "2012-09-01T11:00:00",
-    "start_time": "11:00"
-  },
-  {
-    "id": 23,
-    "source": "database",
-    "title": "Hexayurt",
-    "venue": "Workshop",
-    "speaker": "Al Razi Masri",
-    "type": "workshop",
-    "start_date": "2012-09-01T11:00:00",
-    "start_time": "11:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_hexayurt"
-    }
-  },
-  {
-    "id": 24,
-    "source": "database",
-    "title": "TiLDA",
-    "venue": "Stage Beta",
-    "speaker": "Charles Yarnold",
-    "type": "talk",
-    "start_date": "2012-09-01T11:30:00",
-    "start_time": "11:30",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_tilda"
-    }
-  },
-  {
-    "id": 25,
-    "source": "database",
-    "title": "Learn to Solder (Properly)",
-    "venue": "Workshop",
-    "speaker": "",
-    "type": "workshop",
-    "start_date": "2012-09-01T11:30:00",
-    "start_time": "11:30"
-  },
-  {
-    "id": 26,
-    "source": "database",
-    "title": "DIY Decibel Loggers for Heathrow",
-    "venue": "Stage Alpha",
-    "speaker": "Matthias Stevens",
-    "type": "talk",
-    "start_date": "2012-09-01T12:00:00",
-    "start_time": "12:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_diy_decibel_loggers"
-    }
-  },
-  {
-    "id": 27,
-    "source": "database",
-    "title": "GSM Basics",
-    "venue": "Stage Beta",
-    "speaker": "Paul Dart",
-    "type": "talk",
-    "start_date": "2012-09-01T12:00:00",
-    "start_time": "12:00"
-  },
-  {
-    "id": 28,
-    "source": "database",
-    "title": "Programming TiLDA",
-    "venue": "Workshop",
-    "speaker": "",
-    "type": "workshop",
-    "start_date": "2012-09-01T12:00:00",
-    "start_time": "12:00"
-  },
-  {
-    "id": 29,
-    "source": "database",
-    "title": "High Altitude Ballooning",
-    "venue": "Stage Beta",
-    "speaker": "Adam Greig (UKHAS & CUSF)",
-    "type": "talk",
-    "start_date": "2012-09-01T12:30:00",
-    "start_time": "12:30",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_high_altitude_ballooning"
-    }
-  },
-  {
-    "id": 30,
-    "source": "database",
-    "title": "The Game of Go",
-    "venue": "Workshop",
-    "speaker": "Steven Gravell",
-    "type": "workshop",
-    "start_date": "2012-09-01T12:30:00",
-    "start_time": "12:30"
-  },
-  {
-    "id": 31,
-    "source": "database",
-    "title": "This Pilsner Tastes of Doom Metal \u2013 Music Recommender Systems and Beer",
-    "venue": "Stage Alpha",
-    "speaker": "Ben Fields",
-    "type": "talk",
-    "start_date": "2012-09-01T13:00:00",
-    "start_time": "13:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_music_recommender_systems_and_beer"
-    }
-  },
-  {
-    "id": 32,
-    "source": "database",
-    "title": "Introduction to Locksport",
-    "venue": "Stage Beta",
-    "speaker": "Locksport International",
-    "type": "talk",
-    "start_date": "2012-09-01T13:00:00",
-    "start_time": "13:00"
-  },
-  {
-    "id": 33,
-    "source": "database",
-    "title": "DIY Decibel Loggers for Heathrow",
-    "venue": "Workshop",
-    "speaker": "Matthias Stevens",
-    "type": "workshop",
-    "start_date": "2012-09-01T13:00:00",
-    "start_time": "13:00"
-  },
-  {
-    "id": 34,
-    "source": "database",
-    "title": "High Altitude Balloon Launch & Tracking",
-    "venue": "Stage Beta",
-    "speaker": "Adam Greig (UKHAS & CUSF)",
-    "type": "talk",
-    "start_date": "2012-09-01T13:30:00",
-    "start_time": "13:30",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_high_altitude_balloon_launch"
-    }
-  },
-  {
-    "id": 35,
-    "source": "database",
-    "title": "Denial of Surface, Finding Industrial System devices with SHODAN",
-    "venue": "Stage Alpha",
-    "speaker": "Eireann Leverett",
-    "type": "talk",
-    "start_date": "2012-09-01T14:00:00",
-    "start_time": "14:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_denial_of_surface"
-    }
-  },
-  {
-    "id": 36,
-    "source": "database",
-    "title": "Fun with 3D Geometry",
-    "venue": "Stage Beta",
-    "speaker": "Niloy Mitra",
-    "type": "talk",
-    "start_date": "2012-09-01T14:00:00",
-    "start_time": "14:00"
-  },
-  {
-    "id": 37,
-    "source": "database",
-    "title": "SuperCollider",
-    "venue": "Workshop",
-    "speaker": "Lea Nicholson",
-    "type": "workshop",
-    "start_date": "2012-09-01T14:00:00",
-    "start_time": "14:00"
-  },
-  {
-    "id": 38,
-    "source": "database",
-    "title": "EMFM, how to make a radio station in a field",
-    "venue": "Stage Beta",
-    "speaker": "Chris Roberts",
-    "type": "talk",
-    "start_date": "2012-09-01T14:30:00",
-    "start_time": "14:30"
-  },
-  {
-    "id": 39,
-    "source": "database",
-    "title": "Hexayurt: Free hardware housing for the world",
-    "venue": "Stage Alpha",
-    "speaker": "Al Razi Masri",
-    "type": "talk",
-    "start_date": "2012-09-01T15:00:00",
-    "start_time": "15:00"
-  },
-  {
-    "id": 40,
-    "source": "database",
-    "title": "Vodafone repeater umbrella, and antenna design",
-    "venue": "Stage Beta",
-    "speaker": "Kenneth Tong",
-    "type": "talk",
-    "start_date": "2012-09-01T15:00:00",
-    "start_time": "15:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_repeater_umbrella"
-    }
-  },
-  {
-    "id": 41,
-    "source": "database",
-    "title": "Lockpicking",
-    "venue": "Workshop",
-    "speaker": "Locksport International",
-    "type": "workshop",
-    "start_date": "2012-09-01T15:00:00",
-    "start_time": "15:00"
-  },
-  {
-    "id": 42,
-    "source": "database",
-    "title": "Engineering tomorrow's healthcare, synthetic tissue generation",
-    "venue": "Stage Alpha",
-    "speaker": "Suwan Jayasinghe",
-    "type": "talk",
-    "start_date": "2012-09-01T16:00:00",
-    "start_time": "16:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_engineering_heathcare"
-    }
-  },
-  {
-    "id": 43,
-    "source": "database",
-    "title": "Where have all the women gone? (Women in computing: what\u2019s the problem, why should you be bothered, and what can we do about it?)",
-    "venue": "Stage Beta",
-    "speaker": "Hannah Dee",
-    "type": "talk",
-    "start_date": "2012-09-01T16:00:00",
-    "start_time": "16:00"
-  },
-  {
-    "id": 44,
-    "source": "database",
-    "title": "Make Yourself into a Zombie",
-    "venue": "Workshop",
-    "speaker": "Kate Oliver",
-    "type": "workshop",
-    "start_date": "2012-09-01T16:00:00",
-    "start_time": "16:00"
-  },
-  {
-    "id": 45,
-    "source": "database",
-    "title": "Big Pharma",
-    "venue": "Stage Alpha",
-    "speaker": "Ben Goldacre",
-    "type": "talk",
-    "start_date": "2012-09-01T17:00:00",
-    "start_time": "17:00"
-  },
-  {
-    "id": 46,
-    "source": "database",
-    "title": "Particle Physics beyond the LHC",
-    "venue": "Stage Alpha",
-    "speaker": "Sam Lindenrathen",
-    "type": "talk",
-    "start_date": "2012-09-01T18:00:00",
-    "start_time": "18:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_particle_physics_beyond_lhc"
-    }
-  },
-  {
-    "id": 47,
-    "source": "database",
-    "title": "Making NHS IT less bad",
-    "venue": "Stage Beta",
-    "speaker": "Carl Reynolds",
-    "type": "talk",
-    "start_date": "2012-09-01T18:00:00",
-    "start_time": "18:00"
-  },
-  {
-    "id": 48,
-    "source": "database",
-    "title": "Arduino Workshop for the Curious",
-    "venue": "Workshop",
-    "speaker": "Harry Eakins",
-    "type": "workshop",
-    "start_date": "2012-09-01T18:00:00",
-    "start_time": "18:00"
-  },
-  {
-    "id": 49,
-    "source": "database",
-    "title": "Hackerspace Panel Discussion",
-    "venue": "Stage Beta",
-    "speaker": "Hackerspace People",
-    "type": "talk",
-    "start_date": "2012-09-01T18:30:00",
-    "start_time": "18:30"
-  },
-  {
-    "id": 50,
-    "source": "database",
-    "title": "A series of live music performances",
-    "venue": "Stage Alpha",
-    "speaker": "Music Hackspace",
-    "type": "talk",
-    "start_date": "2012-09-01T19:00:00",
-    "start_time": "19:00"
-  },
-  {
-    "id": 51,
-    "source": "database",
-    "title": "Lightning Talks",
-    "venue": "Stage Beta",
-    "speaker": "",
-    "type": "talk",
-    "start_date": "2012-09-01T19:30:00",
-    "start_time": "19:30"
-  },
-  {
-    "id": 52,
-    "source": "database",
-    "title": "Programming is terrible. Lessons learned from a life wasted",
-    "venue": "Stage Beta",
-    "speaker": "Tef",
-    "type": "talk",
-    "start_date": "2012-09-01T20:30:00",
-    "start_time": "20:30",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_programming_is_terrible"
-    }
-  },
-  {
-    "id": 53,
-    "source": "database",
-    "title": "Mindhacker Hypnoshow",
-    "venue": "Stage Alpha",
-    "speaker": "Dave Ingram",
-    "type": "talk",
-    "start_date": "2012-09-01T21:30:00",
-    "start_time": "21:30"
-  },
-  {
-    "id": 54,
-    "source": "database",
-    "title": "Safe cracking from back in the day to the present day",
-    "venue": "Stage Beta",
-    "speaker": "Warren Rockley",
-    "type": "talk",
-    "start_date": "2012-09-01T21:30:00",
-    "start_time": "21:30"
-  },
-  {
-    "id": 55,
-    "source": "database",
-    "title": "Geocaching Walk (3km)",
-    "venue": "Workshop",
-    "speaker": "Gausie and Nartandyou",
-    "type": "workshop",
-    "start_date": "2012-09-02T09:00:00",
-    "start_time": "09:00"
-  },
-  {
-    "id": 56,
-    "source": "database",
-    "title": "The Deeper Meaning Of LOLCats: Learnings From The Academic Study Of The Internet's Favorite Meme",
-    "venue": "Stage Alpha",
-    "speaker": "Kate Miltner",
-    "type": "talk",
-    "start_date": "2012-09-02T11:00:00",
-    "start_time": "11:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_lolcats"
-    }
-  },
-  {
-    "id": 57,
-    "source": "database",
-    "title": "Freebase, god, and the semantic web",
-    "venue": "Stage Beta",
-    "speaker": "Spencer",
-    "type": "talk",
-    "start_date": "2012-09-02T11:00:00",
-    "start_time": "11:00"
-  },
-  {
-    "id": 58,
-    "source": "database",
-    "title": "Knitting for non-knitters",
-    "venue": "Workshop",
-    "speaker": "Clare Greenhalgh",
-    "type": "workshop",
-    "start_date": "2012-09-02T11:00:00",
-    "start_time": "11:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_knitting_for_non_knitters"
-    }
-  },
-  {
-    "id": 59,
-    "source": "database",
-    "title": "Hypermedia RPC",
-    "venue": "Stage Beta",
-    "speaker": "Tef",
-    "type": "talk",
-    "start_date": "2012-09-02T11:30:00",
-    "start_time": "11:30",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_hypermedia_rpc"
-    }
-  },
-  {
-    "id": 60,
-    "source": "database",
-    "title": "What changes to the UK Communications Bill mean for you",
-    "venue": "Stage Alpha",
-    "speaker": "Aimee Maree Forsstrom",
-    "type": "talk",
-    "start_date": "2012-09-02T12:00:00",
-    "start_time": "12:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_comms_bill"
-    }
-  },
-  {
-    "id": 61,
-    "source": "database",
-    "title": "Feed Toby! What happens when 93,000 people feed your dog over the internet",
-    "venue": "Stage Beta",
-    "speaker": "Nat Morris",
-    "type": "talk",
-    "start_date": "2012-09-02T12:00:00",
-    "start_time": "12:00"
-  },
-  {
-    "id": 62,
-    "source": "database",
-    "title": "Learn to Solder (Properly)",
-    "venue": "Workshop",
-    "speaker": "",
-    "type": "workshop",
-    "start_date": "2012-09-02T12:00:00",
-    "start_time": "12:00"
-  },
-  {
-    "id": 63,
-    "source": "database",
-    "title": "So you think you want to start a hackerspace? (Q&A)",
-    "venue": "Stage Beta",
-    "speaker": "Dominic Morrow",
-    "type": "talk",
-    "start_date": "2012-09-02T12:30:00",
-    "start_time": "12:30"
-  },
-  {
-    "id": 64,
-    "source": "database",
-    "title": "Minemu: Protecting buggy binaries from memory corruption attacks",
-    "venue": "Stage Alpha",
-    "speaker": "Erik Bosman",
-    "type": "talk",
-    "start_date": "2012-09-02T13:00:00",
-    "start_time": "13:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_minemu"
-    }
-  },
-  {
-    "id": 65,
-    "source": "database",
-    "title": "Datamining a cloud that wasn't meant to be public",
-    "venue": "Stage Beta",
-    "speaker": "Adrien Kunysz",
-    "type": "talk",
-    "start_date": "2012-09-02T13:00:00",
-    "start_time": "13:00"
-  },
-  {
-    "id": 66,
-    "source": "database",
-    "title": "SMD Soldering Workshop",
-    "venue": "Workshop",
-    "speaker": "Robert Fitzsimons",
-    "type": "workshop",
-    "start_date": "2012-09-02T13:00:00",
-    "start_time": "13:00"
-  },
-  {
-    "id": 67,
-    "source": "database",
-    "title": "SuperCollider",
-    "venue": "Stage Alpha",
-    "speaker": "Lea Nicholson",
-    "type": "talk",
-    "start_date": "2012-09-02T14:00:00",
-    "start_time": "14:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_supercollider"
-    }
-  },
-  {
-    "id": 68,
-    "source": "database",
-    "title": "Introduction to Esperanto",
-    "venue": "Stage Beta",
-    "speaker": "Gavan Fantom",
-    "type": "talk",
-    "start_date": "2012-09-02T14:00:00",
-    "start_time": "14:00"
-  },
-  {
-    "id": 69,
-    "source": "database",
-    "title": "Fundamentals of web application security & security testing",
-    "venue": "Workshop",
-    "speaker": "Tom Doran",
-    "type": "workshop",
-    "start_date": "2012-09-02T14:00:00",
-    "start_time": "14:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_fundamentals_web_security"
-    }
-  },
-  {
-    "id": 70,
-    "source": "database",
-    "title": "Everything you never wanted to know about bees",
-    "venue": "Stage Beta",
-    "speaker": "Jonty Wareing",
-    "type": "talk",
-    "start_date": "2012-09-02T14:30:00",
-    "start_time": "14:30"
-  },
-  {
-    "id": 71,
-    "source": "database",
-    "title": "Key Impressioning",
-    "venue": "Stage Alpha",
-    "speaker": "Jos Weyers",
-    "type": "talk",
-    "start_date": "2012-09-02T15:00:00",
-    "start_time": "15:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_key_impressioning"
-    }
-  },
-  {
-    "id": 72,
-    "source": "database",
-    "title": "Techies vs Television: How to deal with TV and emerge relatively unscathed",
-    "venue": "Stage Beta",
-    "speaker": "Tom Scott & Charles Yarnold",
-    "type": "talk",
-    "start_date": "2012-09-02T15:00:00",
-    "start_time": "15:00"
-  },
-  {
-    "id": 73,
-    "source": "database",
-    "title": "Deploying and managing DNSSEC zones",
-    "venue": "Workshop",
-    "speaker": "Jasper Wallace",
-    "type": "workshop",
-    "start_date": "2012-09-02T15:00:00",
-    "start_time": "15:00"
-  },
-  {
-    "id": 74,
-    "source": "database",
-    "title": "Cyborgs, wearable, implantable, and mobile personal technology",
-    "venue": "Stage Alpha",
-    "speaker": "Alexandra Glowaski",
-    "type": "talk",
-    "start_date": "2012-09-02T16:00:00",
-    "start_time": "16:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_cyborgs"
-    }
-  },
-  {
-    "id": 75,
-    "source": "database",
-    "title": "A rant about the Space Shuttle",
-    "venue": "Stage Beta",
-    "speaker": "Russ Garrett (Moved to the bar area)",
-    "type": "talk",
-    "start_date": "2012-09-02T16:00:00",
-    "start_time": "16:00"
-  },
-  {
-    "id": 76,
-    "source": "database",
-    "title": "Internet to a field, the EMF network",
-    "venue": "Stage Beta",
-    "speaker": "Nat Morris",
-    "type": "talk",
-    "start_date": "2012-09-02T16:30:00",
-    "start_time": "16:30"
-  },
-  {
-    "id": 77,
-    "source": "database",
-    "title": "EMF Retrospective, how can it be better",
-    "venue": "Stage Alpha",
-    "speaker": "",
-    "type": "talk",
-    "start_date": "2012-09-02T17:00:00",
-    "start_time": "17:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_retrospective"
-    }
-  },
-  {
-    "id": 78,
-    "source": "database",
-    "title": "The 55th Flotilla - TiLDA badge synced nautical rave up. Bring your badge for the last dance!",
-    "venue": "Stage Alpha",
-    "speaker": "Toby Cole",
-    "type": "talk",
-    "start_date": "2012-09-02T18:00:00",
-    "start_time": "18:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_55_flotilla"
-    }
-  },
-  {
-    "id": 79,
-    "source": "database",
-    "title": "Lightning Talks",
-    "venue": "Stage Beta",
-    "speaker": "",
-    "type": "talk",
-    "start_date": "2012-09-02T18:00:00",
-    "start_time": "18:00"
-  },
-  {
-    "id": 80,
-    "source": "database",
-    "title": "Hammock making",
-    "venue": "Workshop",
-    "speaker": "Morag Hickman",
-    "type": "workshop",
-    "start_date": "2012-09-02T18:00:00",
-    "start_time": "18:00"
-  },
-  {
-    "id": 81,
-    "source": "database",
-    "title": "EMF Closing",
-    "venue": "Stage Alpha",
-    "speaker": "",
-    "type": "talk",
-    "start_date": "2012-09-02T19:00:00",
-    "start_time": "19:00",
-    "video": {
-	"archiveorg": "https://archive.org/details/emfcamp_2012_closing"
-    }
-  }
 ]
