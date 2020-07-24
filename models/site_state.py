@@ -22,7 +22,14 @@ class SiteState(db.Model):
 
 
 VALID_STATES = {
-    "site_state": ["before-sales", "sales", "event", "after-event", "cancelled"],
+    "site_state": [
+        "before-sales",
+        "sales",
+        "event",
+        "after-event",
+        "cancelled",
+        "cancelled-time-machine",
+    ],
     "sales_state": ["sold-out", "sales-ended", "unavailable", "available"],
 }
 
