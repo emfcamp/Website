@@ -50,7 +50,15 @@
                     </td>
                     <td>
                     {% if talk.video %}
+                    {% if talk.video.ccc %}
+                    <a href="{{ talk.video.ccc }}" title="View this video on CCC Media">
+                    {% elif talk.video.archiveorg %}
+                    <a href="{{ talk.video.archiveorg }}" title="View this video on the Internet Archive">
+                    {% elif talk.video.youtube %}
+                    <a href="{{ talk.video.youtube }}" title="View this video on YouTube">
+                    {% endif %}
                     {{octicon('device-camera-video', alt="Has video")}}
+                    </a>
                     {% endif %}
                     </td>
                 </tr>
@@ -97,7 +105,15 @@
                     </td>
                     <td>
                     {% if talk.video %}
+                    {% if talk.video.ccc %}
+                    <a href="{{ talk.video.ccc }}" title="View this video on CCC Media">
+                    {% elif talk.video.archiveorg %}
+                    <a href="{{ talk.video.archiveorg }}" title="View this video on the Internet Archive">
+                    {% elif talk.video.youtube %}
+                    <a href="{{ talk.video.youtube }}" title="View this video on YouTube">
+                    {% endif %}
                     {{octicon('device-camera-video', alt="Has video")}}
+                    </a>
                     {% endif %}
                     </td>
                 </tr>
