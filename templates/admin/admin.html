@@ -13,9 +13,12 @@
 
 <div>
   <h3>Quick Links</h3>
-{% if SITE_STATE == 'before-sales' %}
-  <a class="btn btn-default" href="{{url_for(".payment_config_verify")}}">Verify Payment Config</a>
-{% endif %}
-  <a class="btn btn-default" href="{{url_for(".products")}}">Product Overview</a>
+  <div class="btn-group">
+  {% if SITE_STATE == 'before-sales' %}
+    <a class="btn btn-default" href="{{url_for(".payment_config_verify")}}">Verify Payment Config</a>
+  {% endif %}
+    <a class="btn btn-default" href="{{url_for(".products")}}">Product Overview</a>
+    <a class="btn btn-default" href="{{url_for(".email")}}">Email Users</a>
+  </div>
 </div>
 {% endblock %}

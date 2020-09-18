@@ -3,6 +3,18 @@
 {% block body %}
 <div class="row">
   <div class="well">
+    <center>
+      <p class="emphasis"><strong>We built a time machine for the cancelled EMF weekend</strong></p>
+      <p>Follow along in real-time, watching talks given over the last eight years.
+      <br><br>
+      <a href="{{ url_for('schedule.time_machine') }}" style="font-size: 200%; padding: 1em; font-weight: bold; white-space: normal;" class="btn btn-danger">
+        ENGAGE TIME MACHINE
+      </a>
+    </center>
+  </div>
+</div>
+<div class="row">
+  <div class="well">
     <p><strong>Electromagnetic Field 2020 has been cancelled due to the COVID-19 pandemic.</strong></p>
     <p>We will return as scheduled in summer 2022. For more information, please see <a href="https://blog.emfcamp.org/2020/03/25/emf-2020-cancelled/">our blog post</a>.</p>
     <p>If you've bought a ticket, you must <a href="{{url_for('users.cancellation_refund')}}">request a refund</a> by 30 September.</p>

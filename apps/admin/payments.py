@@ -23,6 +23,7 @@ import gocardless_pro.errors
 from main import db, mail, stripe, gocardless_client
 from models.payment import (
     Payment,
+    RefundRequest,
     BankPayment,
     BankRefund,
     StripeRefund,
@@ -261,16 +262,56 @@ def cancel_payment(payment_id):
 
 @admin.route("/payment/requested-refunds")
 def requested_refunds():
-    payments = (
-        Payment.query.filter_by(state="refund-requested")
+    state = request.args.get("state", "refund-requested")
+    requests = (
+        RefundRequest.query.join(Payment)
         .join(Purchase)
-        .with_entities(Payment, func.count(Purchase.id).label("purchase_count"))
-        .group_by(Payment)
-        .order_by(Payment.id)
+        .filter(Payment.state == state)
+        .with_entities(RefundRequest, func.count(Purchase.id).label("purchase_count"))
+        .order_by(RefundRequest.id)
+        .group_by(RefundRequest.id, Payment.id)
         .all()
     )
 
-    return render_template("admin/payments/requested_refunds.html", payments=payments)
+    return render_template(
+        "admin/payments/requested_refunds.html", requests=requests, state=state
+    )
+
+
+class DeleteRefundRequestForm(Form):
+    refund = SubmitField("Delete refund request")
+
+
+@admin.route("/payment/requested-refunds/<int:req_id>/delete", methods=["GET", "POST"])
+def delete_refund_request(req_id):
+    """ Delete a refund request. This can only be called if the payment is in the
+        refund-requested state, or if it's "refunded" but with a 100% donation. """
+    req = RefundRequest.query.get_or_404(req_id)
+
+    # TODO: this does not handle partial refunds!
+    # It can also fail if there's insufficient capacity to return the ticket state.
+    if not (
+        req.payment.state == "refund-requested"
+        or (req.payment.state == "refunded" and req.donation == req.payment.amount)
+    ):
+        return abort(400)
+
+    form = DeleteRefundRequestForm()
+    if form.validate_on_submit():
+        for purchase in req.payment.purchases:
+            if purchase.state == "refunded":
+                purchase.un_refund()
+
+        req.payment.state = "paid"
+        db.session.delete(req)
+        db.session.commit()
+
+        flash("Refund request deleted")
+        return redirect(url_for(".requested_refunds"))
+
+    return render_template(
+        "admin/payments/refund_request_delete.html", req=req, form=form
+    )
 
 
 class ManualRefundForm(Form):
@@ -281,6 +322,8 @@ class ManualRefundForm(Form):
 def manual_refund(payment_id):
     """ Mark an entire payment as refunded for book-keeping purposes.
         Doesn't actually take any steps to return money to the user. """
+
+    # TODO: this is old! We should move manual refund handling to the other refund endpoint for consistency.
 
     payment = Payment.query.get_or_404(payment_id)
 
@@ -325,6 +368,9 @@ class RefundForm(Form):
 
 @admin.route("/payment/<int:payment_id>/refund", methods=["GET", "POST"])
 def refund(payment_id):
+    # TODO: This is all old and needs fixing
+    # For partial refunds, we need to let users select which tickets they want to refund (see ticket #900)
+    # Refund business logic needs moving to apps.payments.refund module, some is already there.
     payment = Payment.query.get_or_404(payment_id)
 
     valid_states = ["charged", "paid", "partrefunded", "refund-requested"]
@@ -362,6 +408,7 @@ def refund(payment_id):
             f._disabled = False
         else:
             f._disabled = True
+            f.refund.data = False
 
     if form.validate_on_submit():
         if form.refund.data or form.stripe_refund.data:

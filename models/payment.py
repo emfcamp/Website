@@ -555,11 +555,29 @@ class StripeRefund(Refund):
 class RefundRequest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     payment_id = db.Column(db.Integer, db.ForeignKey("payment.id"))
+    donation = db.Column(db.Numeric, server_default="0", nullable=False)
     currency = db.Column(db.String)
-    bank = db.Column(db.String)
+    sort_code = db.Column(db.String)
     account = db.Column(db.String)
+    swiftbic = db.Column(db.String)
+    iban = db.Column(db.String)
     payee_name = db.Column(db.String)
     note = db.Column(db.String)
+
+    @property
+    def method(self):
+        """ The method we use to refund this request.
+
+            This will be "stripe" if the payment can be refunded through Stripe,
+            and "banktransfer" otherwise.
+        """
+        if (
+            type(self.payment) is StripePayment
+            and self.payment.currency == self.currency
+        ):
+            return "stripe"
+        else:
+            return "banktransfer"
 
 
 class PaymentSequence(db.Model):

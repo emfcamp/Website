@@ -1,0 +1,69 @@
+/* Responsive Tables
+
+   For any responsive table you'll need to hack about with it a bit
+   for margins/label spacing, and to attach table headers to each row
+   see the #time-machine-now table below for an example. */
+@media (max-width: 768px) {
+  table.responsive-table {
+    /* Force table to not be like tables anymore */
+    &, thead, tbody, th, td, tr {
+      display: block;
+    }
+
+    /* Hide table headers (but not display: none;, for accessibility) */
+    thead tr {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+
+    tbody > tr {
+      margin-bottom: 20px;
+    }
+
+    tbody > tr > td {
+      position: relative;
+      border-top: none;
+    }
+
+    tbody > tr.even,
+    tbody > tr.even > td {
+      background-color: #c8c8c8;
+    }
+
+    tbody > tr.odd,
+    tbody > tr.odd > td {
+      background-color: #ddd;
+    }
+
+    tbody > tr > td:before {
+      /* Now like a table header */
+      position: absolute;
+      /* Top/left values mimic padding */
+      top: 6px;
+      left: 6px;
+      padding-right: 10px;
+      padding-top: 4px;
+      white-space: nowrap;
+    }
+  }
+
+  table#time-machine-now {
+    td:before { width: 30%; }
+    td { padding-left: 30%; }
+
+    td:nth-of-type(1):before { content: "Stage"; }
+    td:nth-of-type(2):before { content: "Speaker"; }
+    td:nth-of-type(3):before { content: "Title"; }
+  }
+
+  table#time-machine-later {
+    td:before { width: 30%; }
+    td { padding-left: 30%; }
+
+    td:nth-of-type(1):before { content: "Starts in"; }
+    td:nth-of-type(2):before { content: "Speaker"; }
+    td:nth-of-type(3):before { content: "Title"; }
+  }
+}
+
