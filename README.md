@@ -40,7 +40,7 @@ Tests are run using the `./run_tests` script.
 
 ### Code Style
 
-For Python we currently use [Black](https://github.com/psf/black) and
+For Python, we currently use [Black](https://github.com/psf/black) and
 [flake8](https://github.com/PyCQA/flake8) to enforce code style. These checks
 are run by `./run_tests`.
 
@@ -55,9 +55,9 @@ pre-commit install
 ### Adding accounts
 
 Once you've created an account on the website, you can use `./flask make_admin` to make your user an administrator.
-Or, you can create an account and simultaneously make it an admin by usinag `./flask make_admin -e email@domain.tld`
+Or, you can create an account and simultaneously make it an admin by using `./flask make_admin -e email@domain.tld`
 
-E-mail sending is disabled in development (but is printed out on the console). You can also login directly by setting BYPASS_LOGIN=True in config/development.cfg and then using a URL of the form e.g. `/login/admin@test.invalid` and navigate to `/admin/`.
+E-mail sending is disabled in development (but is printed out on the console). You can also log in directly by setting BYPASS_LOGIN=True in config/development.cfg and then using a URL of the form e.g. `/login/admin@test.invalid` and navigate to `/admin/`.
 
 ### Database Migrations
 
