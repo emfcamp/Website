@@ -1,3 +1,4 @@
+This is an amazing project.
 This is the www.emfcamp.org web site, built with Flask & Postgres by the 
 EMF web team.
 
