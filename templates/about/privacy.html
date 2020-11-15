@@ -4,7 +4,8 @@
 <h2>Privacy</h2>
 
 <p>This policy describes how <a href="{{ url_for('.company') }}">Electromagnetic Field Ltd</a> (EMF)
-stores and processes your data when you use our websites and attend our events.</p>
+stores and processes your data when you use our websites and attend our events. This policy was
+last updated on 14 November 2020.</p>
 
 <p>We will never sell your data to anyone, and we will never share it
 with any other organisation except as detailed below. Unless
@@ -13,7 +14,7 @@ be deleted no later than 12 months after the end of the event it relates to.</p>
 
 <h3>Email</h3>
 <p>If you have purchased a ticket, we will send you emails for the legitimate
-interest of providing you information about the event.</p>
+interest of providing you necesssary information about the event.</p>
 
 <p>If you are a speaker or a volunteer, we will save your email address in order
 to email you about guaranteed tickets for the next event.</p>
@@ -31,7 +32,7 @@ unsubscribe at any time.</p>
 <a href="https://helpmonks.com/">Helpmonks</a>, our email ticketing software. This
 data is stored indefinitely so we can refer to it when running future events.</p>
 
-<h3>Online payments</h3>
+<h3>Online ticket sales</h3>
 <p>If you pay us through our payment providers 
 <a href="https://stripe.com">Stripe</a> or
 <a href="https://gocardless.com/">GoCardless</a>,
@@ -41,8 +42,12 @@ privacy policies. EMF does not handle your online payment data in any form.</p>
 <p>If you pay us by bank transfer, your name or bank details may appear on our
 bank statements, and in our online accounting service
 (<a href="https://www.xero.com">Xero</a>). We are required by UK law to retain
-these for six years, and our bank
-(<a href="https://www.home.barclays/">Barclays</a>) may retain them for longer.</p>
+these for six years, and our banks
+(<a href="https://www.home.barclays/">Barclays</a> and
+<a href="https://transferwise.com">Transferwise</a>) may retain them for longer.</p>
+
+<p>If you request an invoice for your payment, we are required by law to retain a
+copy, which includes your personal details, for six years.</p>
 
 <h3>In-person payments</h3>
 <p>When we accept card payments at our events, we store receipts and any
@@ -112,7 +117,7 @@ These logs will be kept for the shortest time possible, but never later than
 
 <h3>Conduct reports</h3>
 <p>If we receive a report about your behaviour under our
-<a href="{{ url_for('.code_of_conduct') }}">Code of Conduct</a>, we will keep
+<a href="{{ url_for('.code_of_conduct') }}">Code of Conduct</a>, we may keep
 the report, as well as any other observations, indefinitely. This allows us
 to carry out our legitimate interests of keeping the event safe for our
 attendees.</p>
@@ -121,7 +126,7 @@ attendees.</p>
 the conduct team as well as the Directors of EMF.</p>
 
 <h3>First aid</h3>
-<p>If you seek first aid at one of our events, your details will be recorded on
+<p>If you require first aid at one of our events, your details will be recorded on
 our electronic patient record system.<p>
 
 <p>These records are encrypted and only accessible to members of the first aid
@@ -134,5 +139,12 @@ accordance with UK and EU rules.</p>
 
 <p>Data sent to Stripe, MailChimp, and Helpmonks is processed in the USA
 under the EU-US Privacy Shield scheme.</p>
+
+<h3>Recourse</h3>
+<p>If you have any requests or questions regarding this policy, please email us at
+<a href="mailto:{{ config['CONTACT_EMAIL'][1] }}">{{ config['CONTACT_EMAIL'][1] }}</a>.</p>
+
+<p>If you are unsatisfied with our response, you may contact the
+<a href="https://ico.org.uk/">Information Commissioner's Office</a>.</p>
 
 {% endblock %}
