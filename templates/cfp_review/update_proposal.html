@@ -8,7 +8,7 @@
 
 <div class="col-md-12">
     <h2>{{proposal.published_title or proposal.title}}<br>
-        <small>A {{proposal.human_type}} by 
+        <small>A {{proposal.human_type}} by
             <a href="{{ url_for('admin.user', user_id=proposal.user.id) }}">{{proposal.user.name}}</small></a>
     </h2>
 </div>
@@ -101,14 +101,14 @@
             </a>
 
             {% if next_id %}
-                <a href="{{ url_for('.update_proposal', proposal_id=next_id) }}"
+                <a href="{{ url_for('.update_proposal', proposal_id=next_id, **full_qs) }}"
                     class="btn btn-default">
-                    Next {{proposal.state}} proposal
+                    Next proposal
                 </a>
             {% else %}
-                <a href="{{ url_for('.proposals', state=proposal.state) }}"
+                <a href="{{ url_for('.proposals', **full_qs) }}"
                     class="btn btn-default">
-                    All remaining {{proposal.state}} proposals
+                    All proposals
                 </a>
             {% endif %}
         </div>

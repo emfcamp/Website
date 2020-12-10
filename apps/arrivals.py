@@ -167,14 +167,14 @@ def search(query=None):
         completes = (
             users.join(User.owned_tickets)
             .filter_by(is_paid_for=True)
-            .filter(AdmissionTicket.badge_issued == True)
-        )  # noqa: E712
+            .filter(AdmissionTicket.badge_issued == True)  # noqa: E712
+        )
     else:
         completes = (
             users.join(User.owned_tickets)
             .filter_by(is_paid_for=True)
-            .filter(AdmissionTicket.checked_in == True)
-        )  # noqa: E712
+            .filter(AdmissionTicket.checked_in == True)  # noqa: E712
+        )
 
     completes = completes.group_by(User).with_entities(User.id, func.count(User.id))
     completes = dict(completes)

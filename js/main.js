@@ -58,6 +58,31 @@ $(() => {
   });
 });
 
+$(() => {
+  $('*[data-range-payment-amount]').each((_idx, el) => {
+    let amount = parseFloat(el.getAttribute('data-range-payment-amount'));
+    let symbol = el.getAttribute('data-range-payment-currency');
+    let amountText = $('#donation-range-' + el.getAttribute('name'))[0];
+
+    function updateDonationRange(el) {
+      amountText.innerHTML = `<span style="float:left">Donation: <strong>${symbol}&thinsp;${el.value}</strong></span>
+          <span style="float:right">Refund: <strong>${symbol}&thinsp;${amount-el.value}</strong></span>
+          <span style="clear:both">&nbsp;</span>`;
+
+      if (amount == el.value) {
+        $('#bank-details input').each((_, el) => el.setAttribute('disabled', 'true'));
+        $('#bank-details')[0].style.opacity = '0.5';
+      } else {
+        $('#bank-details input').each((_, el) => el.removeAttribute('disabled'));
+        $('#bank-details')[0].style.opacity = '1';
+      }
+    }
+    updateDonationRange(el);
+
+    $(el).on('input', e => updateDonationRange(el));
+  });
+});
+
 $(function() {
   $('.debounce').on('click', EMF.debounce_submit);
 });

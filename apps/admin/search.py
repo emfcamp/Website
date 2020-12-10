@@ -23,7 +23,9 @@ def search():
     if gc_exact:
         return redirect(url_for(".payment", payment_id=gc_exact.id))
 
-    stripe_exact = StripePayment.query.filter(StripePayment.chargeid == q).one_or_none()
+    stripe_exact = StripePayment.query.filter(
+        (StripePayment.charge_id == q) | (StripePayment.intent_id == q)
+    ).one_or_none()
     if stripe_exact:
         return redirect(url_for(".payment", payment_id=stripe_exact.id))
 

@@ -9,7 +9,7 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         <h4 class="panel-title">
-            <a role="button" data-toggle="collapse" data-target="#searchPanel" 
+            <a role="button" data-toggle="collapse" data-target="#searchPanel"
                 aria-controls="searchPanel" aria-expanded="true">
                 Filter <small>(showing {{ proposals | count }}/{{total_proposals}})</small>
             </a>
@@ -70,7 +70,7 @@
             <a href="{{ url_for('admin.user', user_id=proposal.user.id ) }}">{{proposal.user.name}}</a>
         </td>
         <td>
-            <a href="{{ url_for('.update_proposal', proposal_id=proposal.id) }}">{{proposal.published_title or proposal.title}}</a>
+            <a href="{{ url_for('.update_proposal', proposal_id=proposal.id, **full_qs) }}">{{proposal.published_title or proposal.title}}</a>
         </td>
     </tr>
 {% else %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% set main_class = 'account-purchases' %}
+{% block title %}Cancellation Refund{% endblock %}
+{% block body %}
+<h2>Cancellation refund</h2>
+
+<p>Below is the status of all of your payments. Please use the "request refund" button to
+  request a refund for any which are paid.</p>
+
+<p>If you want, you can donate some or all of your ticket money to EMF, but please submit the
+  refund form so we know how to process your money.</p>
+
+{% if payments %}
+  <h3>Your payments</h2>
+  <a id="payments"></a>
+  {% include "account/purchases/payments.html" %}
+  <div class="clearfix"></div>
+{% else %}
+  <p><strong>You have no payments to refund.</strong>
+      All money will be refunded to the person who originally paid for the tickets.</p>
+{% endif %}
+
+<p>If you have any questions,
+   please <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}?subject=Refund Query">drop us an email</a>.</p>
+
+{% endblock %}
