@@ -18,16 +18,15 @@ from wtforms.validators import (
     ValidationError,
 )
 
-from models.cfp import Venue
+from models.cfp import Venue, ORDERED_STATES
 from ..common.forms import Form, HiddenIntegerField
-from . import ordered_states
 
 from dateutil.parser import parse as parse_date
 
 
 class UpdateProposalForm(Form):
     # Admin can change anything
-    state = SelectField("State", choices=[(s, s) for s in ordered_states])
+    state = SelectField("State", choices=[(s, s) for s in ORDERED_STATES])
     title = StringField("Title", [DataRequired()])
     description = TextAreaField("Description", [DataRequired()])
     requirements = TextAreaField("Requirements")

@@ -163,6 +163,14 @@ class Purchase(db.Model):
         self.state = "refunded"
         self.refund = refund
 
+    def un_refund(self):
+        if self.state != "refunded":
+            raise PurchaseStateException("{} is not refunded".format(self))
+
+        self.price_tier.issue_instances(1)
+        self.state = "paid"
+        self.refund = None
+
     def change_currency(self, currency):
         self.price = self.price_tier.get_price(currency)
 

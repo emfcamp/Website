@@ -67,12 +67,13 @@ def run_schedule(persist):
 def apply_potential_schedule():
     proposals = (
         Proposal.query.filter(
-            (Proposal.potential_venue != None) | (Proposal.potential_time != None)
+            (Proposal.potential_venue != None)  # noqa: E711
+            | (Proposal.potential_time != None)  # noqa: E711
         )
         .filter(Proposal.scheduled_duration.isnot(None))
         .filter(Proposal.state.in_(["accepted", "finished"]))
         .all()
-    )  # noqa
+    )
 
     for proposal in proposals:
         user = proposal.user

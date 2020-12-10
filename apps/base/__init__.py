@@ -210,6 +210,7 @@ def emp():
 
 from . import redirects  # noqa
 from . import about  # noqa
+from . import organisation  # noqa
 from . import scheduled_tasks  # noqa
 from . import tasks_admin  # noqa
 from . import tasks_banking  # noqa

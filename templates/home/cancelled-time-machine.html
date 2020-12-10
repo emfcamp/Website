@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block description %}Electromagnetic Field is a non-profit UK camping festival for those with an inquisitive mind or an interest in making things.{% endblock %}
+{% block body %}
+<div class="row">
+  <div class="well">
+    <center>
+      <p class="emphasis"><strong>We built a time machine for the cancelled EMF weekend</strong></p>
+      <p>Follow along in real-time, watching talks given over the last eight years.
+      <br><br>
+      <a href="{{ url_for('schedule.time_machine') }}" style="font-size: 200%; padding: 1em; font-weight: bold; white-space: normal;" class="btn btn-danger">
+        ENGAGE TIME MACHINE
+      </a>
+    </center>
+  </div>
+</div>
+<div class="row">
+  <div class="well">
+    <p><strong>Electromagnetic Field 2020 has been cancelled due to the COVID-19 pandemic.</strong></p>
+    <p>We will return as scheduled in summer 2022. For more information, please see <a href="https://blog.emfcamp.org/2020/03/25/emf-2020-cancelled/">our blog post</a>.</p>
+    <p>If you've bought a ticket, you must <a href="{{url_for('users.cancellation_refund')}}">request a refund</a> by 30 September.</p>
+    <p>To commemorate the EMF that didn't happen, we have <a href="https://merch.emfcamp.org/">EMF 2020 t-shirts, hoodies, vests and mugs on sale</a>.</p>
+  </div>
+</div>
+{% include "home/gallery_block.html" %}
+<div class="row" itemscope itemtype="http://schema.org/Festival">
+    <div class="col-md-6">
+        <p class="emphasis" itemprop="description">
+          Electromagnetic Field is a non-profit UK camping festival for those with an inquisitive mind or an
+          interest in making things: hackers, artists, geeks, crafters, scientists, and engineers.
+        </p>
+        <p>A temporary town of more than a two thousand like-minded people enjoying a long weekend of talks, performances,
+        and workshops on everything from <strong>blacksmithing</strong> to <strong>biometrics</strong>,
+        <strong>chiptunes</strong> to <strong>computer security</strong>,
+        <strong>high altitude ballooning</strong> to <strong>lockpicking</strong>,
+        <strong>origami</strong> to <strong>democracy</strong>,
+        and <strong>online privacy</strong> to <strong>knitting</strong>.
+        </p>
+        <p>To help matters along, we provide <strong>fast internet</strong>,
+           <strong>power to the tent</strong>, <strong>good beer</strong>, and
+          <strong>amazing installations</strong>, entirely organised by a dedicated team of volunteers.
+        </p>
+    </div>
+    <div class="col-md-6">
+       <div class="well">
+          <p>If you're interested in updates about the next EMF event, follow us on
+          <a href="https://www.twitter.com/emfcamp">Twitter</a> or join our mailing list:</p>
+          {% include "home/_mailchimp_form.html" %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{%- if user.name != user.email -%}
+Hi {{ user.name }},
+{%- else -%}
+Hi,
+{%- endif %}
+
+We have processed your Electromagnetic Field ticket refund.
+
+{% if amount > 0 %}
+A total of {{amount|price(currency)}} has been sent back to your {% if request.method == "stripe" %}card{% else %}bank account{% endif %}.
+{% if request.donation > 0 %}
+
+You asked that we keep {{request.donation|price(currency)}} of your payment as a donation. Thank you!
+{%- endif %}
+
+Refunds may take up to ten business days to appear in your account.
+{% else %}
+You asked to donate your entire payment of {{request.donation|price(currency)}} to us, so no repayment
+is due. Thank you!
+{% endif %}
+
+If this is incorrect, or you have any questions, just reply to this email.
+
+Love,
+
+All the EMF team
+
+[Refund Request ID: {{request.id}}]

@@ -1,3 +1,10 @@
+"""
+    Pages under /about - content about the event.
+
+    Content about EMF the organisation should go in /organisation (organisation.py),
+    although some legacy content remains here.
+"""
+
 from flask import render_template
 from . import base
 

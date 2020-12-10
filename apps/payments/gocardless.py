@@ -747,7 +747,7 @@ def gocardless_validate():
 
     try:
         gocardless_client.events.list().records
-        result.append((True, f"Connection to GoCardless API succeeded"))
+        result.append((True, "Connection to GoCardless API succeeded"))
     except gocardless_pro.errors.InvalidApiUsageError as e:
         result.append((False, f"Unable to connect to GoCardless: {e}"))
 

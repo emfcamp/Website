@@ -1,48 +1,60 @@
 {% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
+{% block title %}Refund Request{% endblock %}
 {% block body %}
 
 <div class="col-md-10">
 
 <h2>Refund your payment</h2>
 
-<p>You can request a full refund for your payment with this form.
-   Please provide the information below, and we'll let you know by email if it's approved.</p>
+<p>You can request a refund for your payment with this form. We'll let you know by email when it's approved.</p>
 
-<p>We can only refund in GBP (£) to a UK account or EUR (€) to a SEPA account. If this doesn't
-   work for you, please <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email us</a>
-   with your payment reference.</p>
+<p>If you have any questions,
+   please <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}?subject=Refund Query (WEB-{{payment.id}})">drop us an email</a>.</p>
 
-<form method="post" action="{{ url_for('.payment_refund_request', payment_id=payment.id, currency=currency) + ('?no_stripe' if no_stripe else '') }}">
-{{ form.hidden_tag() }}
 <div class="well">
-  <label>Refund currency:</label>
-  <div class="form-group">
-    <div class="btn-group">
-      <a href="{{ url_for('.payment_refund_request', payment_id=payment.id, currency='GBP') + ('?no_stripe' if no_stripe else '') }}" class="btn btn-primary {% if currency == 'GBP' -%} active {%- endif %}">£</a>
-      <a href="{{ url_for('.payment_refund_request', payment_id=payment.id, currency='EUR') + ('?no_stripe' if no_stripe else '') }}" class="btn btn-primary {% if currency == 'EUR' -%} active {%- endif %}">€</a>
-    </div>
-  </div>
+<form method="post" action="{{ url_for('.payment_refund_request', payment_id=payment.id, currency=currency) }}">
+{{ form.hidden_tag() }}
+  <fieldset>
+    <legend>Donation</legend>
+    <p>If you want, you can donate some of your payment to help us recoup our losses for this year
+        and fund our next event. This is completely optional &mdash; we have enough money in the bank
+        to survive until 2022.</p>
+    {{ render_field(form.donation_amount, min=0, max=payment.amount, value=0,
+          donation_range_payment=payment, donation_range_currency=CURRENCY_SYMBOLS[currency]) 
+    }}
+  </fieldset>
 
-  {% if currency == 'GBP' %}
-  {{ render_field(form.bank) }}
-  {{ render_field(form.account) }}
-  {% else %}
-  {{ render_field(form.iban) }}
+  {% if payment.provider in ('banktransfer', 'gocardless') %}
+    <fieldset id="bank-details">
+      <legend>Bank details</legend>
+      <p>We'll need your {% if payment.currency == 'GBP' %}UK{% else %}Euro{% endif %} bank account
+          details to send your money back to.</p>
+      {% if currency == 'GBP' %}
+      {{ render_field(form.sort_code) }}
+      {{ render_field(form.account) }}
+      {% else %}
+      {{ render_field(form.iban)}}
+      {{ render_field(form.swiftbic) }}
+      {% endif %}
+      {% call render_field(form.payee_name) %}
+        Please enter the account holder name exactly as it appears on your account.
+      {% endcall %}
+      <p>Your payment will be refunded to your bank account within four weeks.</p>
+    </fieldset>
+  {% elif payment.provider == 'stripe' %}
+    <p id="bank-details">Your payment will be refunded back to your card within three weeks.</p>
   {% endif %}
 
+  {#
   {% call render_field(form.note) %}
-  If you only want part of your payment refunded, please say here
+  If you only want part of your payment refunded, please say here.
   {% endcall %}
-</div>
-{% if bank_validation_failed %}
-{{ form.really_submit(class_="btn btn-danger debounce") }}
-{% else %}
+  #}
 {{ form.submit(class_="btn btn-danger debounce") }}
-{% endif %}
-<a class="btn btn-info" href="{{ url_for('users.purchases') }}">Go back to my tickets</a>
 </form>
+</div>
 
-
+<a class="btn btn-default" href="{{ url_for('users.purchases') }}">Back to my tickets</a>
 </div>
 {% endblock %}

@@ -23,7 +23,7 @@ def transferwise_validate():
     try:
         client = pytransferwise.Client()
         user = client.users.me()
-        result.append((True, f"Connection to TransferWise API succeeded"))
+        result.append((True, "Connection to TransferWise API succeeded"))
     except Exception as e:
         result.append((False, f"Unable to connect to TransferWise: {e}"))
 

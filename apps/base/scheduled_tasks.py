@@ -12,8 +12,8 @@ def send_emails():
     count = 0
     with mail.connect() as conn:
         for rec in EmailJobRecipient.query.filter(
-            EmailJobRecipient.sent == False
-        ):  # noqa: E712
+            EmailJobRecipient.sent == False  # noqa: E712
+        ):
             count += 1
             send_email(conn, rec)
     return count

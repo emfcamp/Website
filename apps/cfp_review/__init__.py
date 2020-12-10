@@ -1,7 +1,14 @@
 from flask import Blueprint, request
 from sqlalchemy import func, or_
 
-from models.cfp import Proposal, CFPMessage, CFPVote, CFP_STATES
+from models.cfp import (
+    Proposal,
+    CFPMessage,
+    CFPVote,
+    CFP_STATES,
+    ORDERED_STATES,
+    HUMAN_CFP_TYPES,
+)
 from ..common import require_permission
 
 cfp_review = Blueprint("cfp_review", __name__)
@@ -11,21 +18,6 @@ admin_required = require_permission(
 anon_required = require_permission("cfp_anonymiser")
 review_required = require_permission("cfp_reviewer")
 schedule_required = require_permission("cfp_schedule")
-
-ordered_states = [
-    "edit",
-    "new",
-    "locked",
-    "checked",
-    "rejected",
-    "cancelled",
-    "anonymised",
-    "anon-blocked",
-    "manual-review",
-    "reviewed",
-    "accepted",
-    "finished",
-]
 
 
 def sort_by_notice(notice):
@@ -64,6 +56,15 @@ def get_next_proposal_to(prop, state):
     )
 
 
+def copy_request_args(args):
+    """
+    Request args is an ImmutableMultiDict which allow multiple entries for a
+    single key. This converts one back into a normal dict with lists for keys
+    so that they can be re-used for request args.
+    """
+    return {k: args.getlist(k) for k in args}
+
+
 @cfp_review.context_processor
 def cfp_review_variables():
     unread_count = CFPMessage.query.filter(
@@ -90,7 +91,9 @@ def cfp_review_variables():
     )
 
     return {
-        "ordered_states": ordered_states,
+        "full_qs": copy_request_args(request.args),
+        "ordered_states": ORDERED_STATES,
+        "cfp_types": HUMAN_CFP_TYPES,
         "unread_count": unread_count,
         "proposal_counts": proposal_counts,
         "unread_reviewer_notes": unread_reviewer_notes,
