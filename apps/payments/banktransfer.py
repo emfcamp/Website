@@ -78,6 +78,7 @@ def transfer_waiting(payment_id):
     return render_template(
         "transfer-waiting.html",
         payment=payment,
+        account=payment.recommended_destination,
         form=form,
         days=app.config["EXPIRY_DAYS_TRANSFER"],
     )
