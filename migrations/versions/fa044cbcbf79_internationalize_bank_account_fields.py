@@ -1,14 +1,14 @@
 """Internationalize bank account fields
 
 Revision ID: fa044cbcbf79
-Revises: 111954b830d9
+Revises: 3d5c2328fb77
 Create Date: 2020-03-09 15:43:35.607233
 
 """
 
 # revision identifiers, used by Alembic.
 revision = 'fa044cbcbf79'
-down_revision = '111954b830d9'
+down_revision = '3d5c2328fb77'
 
 from alembic import op
 import sqlalchemy as sa
