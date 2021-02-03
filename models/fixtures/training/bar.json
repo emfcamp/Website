@@ -1,0 +1,93 @@
+{
+  "training": [
+    {
+      "role": "Bar",
+      "pass_auto": true,
+      "pass_mark": 100,
+      "url": "",
+      "questions": [
+        {
+          "question": "A proof of age document is reliable if it has",
+          "answers": [
+            {
+              "answer": "Local authority logo",
+              "correct": false
+            },
+            {
+              "answer": "PASS hologram",
+              "correct": true
+            },
+            {
+              "answer": "Police authority stamp",
+              "correct": false
+            }
+          ]
+        },
+        {
+          "question": "What is the on-the-spot fine for selling alcohol to someone who is under 18?",
+          "answers": [
+            {
+              "answer": "£60",
+              "correct": false
+            },
+            {
+              "answer": "£90",
+              "correct": true
+            },
+            {
+              "answer": "£120",
+              "correct": false
+            }
+          ]
+        },
+        {
+          "question": "I think someone may be under 18, but the bar manager has told me to serve them. Should I?",
+          "answers": [
+            {
+              "answer": "Yes",
+              "correct": false
+            },
+            {
+              "answer": "No",
+              "correct": true
+            }
+          ]
+        },
+        {
+          "question": "Cigarettes must not be sold to persons aged under?",
+          "answers": [
+            {
+              "answer": "18",
+              "correct": true
+            },
+            {
+              "answer": "21",
+              "correct": false
+            },
+            {
+              "answer": "25",
+              "correct": false
+            }
+          ]
+        },
+        {
+          "question": "Which of these is considered a common sign of drunkenness?",
+          "answers": [
+            {
+              "answer": "Becoming particularly hungry",
+              "correct": false
+            },
+            {
+              "answer": "Being very depressed",
+              "correct": false
+            },
+            {
+              "answer": "Staggering or an inability to walk",
+              "correct": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
