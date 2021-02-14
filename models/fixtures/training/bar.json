@@ -7,6 +7,125 @@
       "url": "",
       "questions": [
         {
+          "question": "At what percentage of abv is a drink legally classed as alcohol?",
+          "answers": [
+            {
+              "answer": "More than 0.1%",
+              "correct": false
+            },
+            {
+              "answer": "More than 0.3%",
+              "correct": false
+            },
+            {
+              "answer": "More than 0.5%",
+              "correct": true
+            }
+          ]
+        },
+        {
+          "question": "How long does it take the body to remove one unit of alcohol?",
+          "answers": [
+            {
+              "answer": "30 minutes",
+              "correct": false
+            },
+            {
+              "answer": "60 minutes",
+              "correct": true
+            },
+            {
+              "answer": "90 minutes",
+              "correct": false
+            }
+          ]
+        },
+        {
+          "question": "How many units of alcohol are in a 50ml measure of spirit that has an ABV of 40%?",
+          "answers": [
+            {
+              "answer": "1",
+              "correct": false
+            },
+            {
+              "answer": "2",
+              "correct": true
+            },
+            {
+              "answer": "3",
+              "correct": false
+            }
+          ]
+        },
+        {
+          "question": "Which of these is <strong>not</strong> a licensing objective?",
+          "answers": [
+            {
+              "answer": "Prevention of crime and disorder",
+              "correct": false
+            },
+            {
+              "answer": "Protection of the environment",
+              "correct": true
+            },
+            {
+              "answer": "Public safety",
+              "correct": false
+            }
+          ]
+        },
+        {
+          "question": "On licensed premises, a designated premises supervisor is someone who is:",
+          "answers": [
+            {
+              "answer": "Always required to be present on particular licensed premises",
+              "correct": false
+            },
+            {
+              "answer": "In day-to-day control of a particular licensed premises",
+              "correct": true
+            },
+            {
+              "answer": "Required to personally supervise every sale of alcohol on licensed premises",
+              "correct": false
+            }
+          ]
+        },
+        {
+          "question": "What must an operating schedule include?",
+          "answers": [
+            {
+              "answer": "Addresses and telephone numbers of all staff at the premises",
+              "correct": false
+            },
+            {
+              "answer": "Details of the licensable activities to be held at the premises",
+              "correct": true
+            },
+            {
+              "answer": "Names of all suppliers of alcohol and food to the premises",
+              "correct": false
+            }
+          ]
+        },
+        {
+          "question": "When is it <strong>illegal</strong> to sell alcohol?",
+          "answers": [
+            {
+              "answer": "Outside the times stated in the premises licence",
+              "correct": true
+            },
+            {
+              "answer": "Under the terms of a temporary event notice",
+              "correct": false
+            },
+            {
+              "answer": "When the designated premises supervisor is not present",
+              "correct": false
+            }
+          ]
+        },
+        {
           "question": "A proof of age document is reliable if it has",
           "answers": [
             {
