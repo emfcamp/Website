@@ -56,7 +56,7 @@ Flask-Static-Digest = "*"
 email_validator = "^1.0"
 segno = "^1.0.0"
 pytest-vcr = "^1.0.2"
-pywisetransfer = "^0.1.4"
+pywisetransfer = "^0.1.5"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
