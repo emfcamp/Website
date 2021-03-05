@@ -1,5 +1,5 @@
 from flask import current_app as app
-import pytransferwise
+import pywisetransfer
 
 
 def transferwise_validate():
@@ -21,7 +21,7 @@ def transferwise_validate():
         result.append((False, "Access token not set"))
 
     try:
-        client = pytransferwise.Client()
+        client = pywisetransfer.Client()
         user = client.users.me()
         result.append((True, "Connection to TransferWise API succeeded"))
     except Exception as e:
