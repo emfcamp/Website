@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Contact{% endblock %}
+{% block secondary_nav %}
+  {% include "about/_nav.html" %}
+{% endblock %}
+{% block body %}
+  <h2>Contact</h2>
+  <p>If you need to get in touch with us, first see if your query is best directed to one of the teams below:</p>
+
+  <ul>
+    <li><a href="mailto:content@emfcamp.org">Content</a>, for talks, workshops, and installations</li>
+    <li><a href="mailto:volunteers@emfcamp.org">Volunteering</a></li>
+    <li><a href="mailto:sponsors@emfcamp.org">Sponsorship</a></li>
+    <li><a href="mailto:vendors@emfcamp.org">Food/drink vendors</a></li>
+    <li><a href="mailto:villages@emfcamp.org">Villages</a></li>
+  </ul>
+
+  <p>For general questions or if you're not sure which team is most appropriate, please email <a href="mailto:contact@emfcamp.org">contact@emfcamp.org</a>.</p>
+
+  <p>We make take a while to respond, especially if you're contacting us when we're not actively planning an event
+      &mdash; we're all volunteers!</p>
+
+  <h3>Community</h3>
+
+  <p>The main communications channel for the EMF community is IRC. You can find us on the
+      <a href="https://libera.chat/">Libera.Chat</a> network in the <a href="ircs://irc.libera.chat/#emfcamp">#emfcamp</a> channel.
+  </p>
+  <p>You'll need an IRC client to connect &mdash; for more info see <a href="https://libera.chat/guides/clients">this guide</a>.</p>
+
+{% endblock %}

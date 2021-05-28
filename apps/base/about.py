@@ -72,3 +72,8 @@ def what_to_bring():
 @base.route("/about/food")
 def food():
     return render_template("about/food.html")
+
+
+@base.route("/about/contact")
+def contact():
+    return render_template("about/contact.html")
