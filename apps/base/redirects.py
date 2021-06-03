@@ -7,10 +7,12 @@ from . import base
 @base.route("/participating")
 @base.route("/get_involved")
 @base.route("/location")
-@base.route("/contact")
 def old_urls_2012():
     return redirect(url_for(".main"))
 
+@base.route("/contact")
+def contact_redirect():
+    return redirect(url_for('.contact'))
 
 @base.route("/wave")
 def wave():
