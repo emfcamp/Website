@@ -10,9 +10,11 @@ from . import base
 def old_urls_2012():
     return redirect(url_for(".main"))
 
+
 @base.route("/contact")
 def contact_redirect():
-    return redirect(url_for('.contact'))
+    return redirect(url_for(".contact"))
+
 
 @base.route("/wave")
 def wave():
