@@ -22,5 +22,6 @@
         {{ menuitem('Admin', 'volunteer_admin.index') }}        
         <li><a href="{{ url_for('notify.main') }}">Email Volunteers</a></li>
     {% endif %}
+    {{ menuitem("Log Out", "users.logout") }}
 </div>
 
