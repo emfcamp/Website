@@ -64,10 +64,10 @@ class Volunteer(db.Model, UserMixin):
     )
 
     def __repr__(self):
-        return "<Volunteer {0}<{1}>>".format(self.user.name, self.user.email)
+        return f"<Volunteer {self.self.__str__()}>"
 
     def __str__(self):
-        return "{0} <{1}>".format(self.user.name, self.user.email)
+        return f"{self.user.name} <{self.user.email}>"
 
     @classmethod
     def get_by_id(cls, id):
