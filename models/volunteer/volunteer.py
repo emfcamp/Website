@@ -64,7 +64,7 @@ class Volunteer(db.Model, UserMixin):
     )
 
     def __repr__(self):
-        return f"<Volunteer {self.self.__str__()}>"
+        return f"<Volunteer {self.__str__()}>"
 
     def __str__(self):
         return f"{self.user.name} <{self.user.email}>"
