@@ -151,8 +151,8 @@
       </div>
     {% endfor %}
 
-    <script src="{{ static_url_for('static', filename='js/volunteer_schedule.js') }}"></script>
-    <script type="text/javascript">
+    <script src="{{ static_url_for('static', filename='js/volunteer-schedule.js') }}"></script>
+    <script type="text/javascript" nonce="{{csp_nonce}}">
         var csrf_token = "{{ csrf_token() }}";
 
         $.ajaxSetup({
