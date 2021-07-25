@@ -1,4 +1,4 @@
-function init_volunteer_schedule(data, all_roles, active_day, is_admin) {
+window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
     var current_day = active_day;
 
     function render(){
@@ -348,4 +348,4 @@ function init_volunteer_schedule(data, all_roles, active_day, is_admin) {
 
 
     render();
-}
+};
