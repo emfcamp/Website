@@ -247,7 +247,7 @@ def time_machine():
         6,  # Sunday
     ]
 
-    years = [2012, 2014, 2016, 2018]
+    years = [2012, 2014, 2016, 2018, 2022]
 
     # Year -> Stage -> Talks
     talks_now = defaultdict(lambda: defaultdict(list))
