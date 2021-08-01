@@ -7,6 +7,7 @@ from sqlalchemy_continuum.utils import version_class, is_versioned
 
 from main import db
 from apps.common.json_export import ExportEncoder
+from models import event_year
 from . import base
 
 
@@ -46,7 +47,7 @@ def export_db():
     seen_model_classes = set()
     remaining_tables = set(db.metadata.tables)
 
-    year = datetime.utcnow().year
+    year = event_year()
     path = os.path.join("exports", str(year))
     for dirname in ["public", "private"]:
         os.makedirs(os.path.join(path, dirname), exist_ok=True)
