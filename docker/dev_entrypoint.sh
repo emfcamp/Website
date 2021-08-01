@@ -3,6 +3,8 @@
 # Entrypoint script used by development app docker image
 #
 set -e
+
+export PGPASSWORD=postgres
 PSQL="/usr/bin/psql -h postgres -U postgres"
 
 until $PSQL -c '\q'; do
