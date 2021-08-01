@@ -1,0 +1,150 @@
+{
+    "favourites": {
+        "counts": {
+            "0": 174,
+            "1-9": 0,
+            "10-19": 0,
+            "20-29": 0,
+            "30-39": 0,
+            "40-49": 0,
+            "50-99": 0,
+            "100-199": 0,
+            "200+": 0
+        }
+    },
+    "proposals": {
+        "accepted": [],
+        "counts": {
+            "needs_help": {
+                "false": 118,
+                "true": 56
+            },
+            "needs_money": {
+                "false": 174
+            },
+            "needs_laptop": {
+                "null": 174
+            },
+            "one_day": {
+                "false": 174
+            },
+            "notice_required": {
+                "> 1 month": 29,
+                "1 month": 60,
+                "1 week": 75,
+                "> 3 months": 10
+            },
+            "may_record": {
+                "false": 25,
+                "null": 149
+            },
+            "state": {
+                "anonymised": 23,
+                "manual-review": 1,
+                "new": 149,
+                "rejected": 1
+            },
+            "created_week": {
+                "2020-01-20": 33,
+                "2020-01-27": 29,
+                "2020-02-03": 16,
+                "2020-02-10": 26,
+                "2020-02-17": 40,
+                "2020-02-24": 10,
+                "2020-03-02": 7,
+                "2020-03-09": 12,
+                "2020-03-16": 1
+            }
+        },
+        "edits": {
+            "published_title": {
+                "avg": 1.14,
+                "max": 2
+            },
+            "published_description": {
+                "avg": 1.14,
+                "max": 2
+            },
+            "requirements": {
+                "avg": 1.05,
+                "max": 2
+            },
+            "length": {
+                "avg": 1.02,
+                "max": 2
+            },
+            "notice_required": {
+                "avg": 1.03,
+                "max": 2
+            },
+            "needs_help": {
+                "avg": 1.03,
+                "max": 2
+            },
+            "needs_money": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "one_day": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "has_rejected_email": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "published_names": {
+                "avg": 1.14,
+                "max": 2
+            },
+            "arrival_period": {
+                "avg": 1.14,
+                "max": 2
+            },
+            "departure_period": {
+                "avg": 1.14,
+                "max": 2
+            },
+            "telephone_number": {
+                "avg": 1.14,
+                "max": 2
+            },
+            "may_record": {
+                "avg": 1.14,
+                "max": 2
+            },
+            "needs_laptop": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "available_times": {
+                "avg": 1.14,
+                "max": 2
+            },
+            "attendees": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "cost": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "size": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "funds": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "age_range": {
+                "avg": 1.00,
+                "max": 1
+            },
+            "participant_equipment": {
+                "avg": 1.00,
+                "max": 1
+            }
+        }
+    }
+}
