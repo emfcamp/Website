@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+PGPASSWORD=postgres
 PSQL="/usr/bin/psql -h postgres -U postgres"
 
 until $PSQL -c '\q'; do
