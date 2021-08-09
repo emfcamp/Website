@@ -1,0 +1,118 @@
+{
+    "favourites": {
+        "counts": {
+            "0": 0,
+            "1-9": 0,
+            "10-19": 0,
+            "20-29": 0,
+            "30-39": 0,
+            "40-49": 0,
+            "50-99": 0,
+            "100-199": 0,
+            "200+": 0
+        }
+    },
+    "proposals": {
+        "accepted": [],
+        "counts": {
+            "needs_help": {},
+            "needs_money": {},
+            "needs_laptop": {},
+            "one_day": {},
+            "notice_required": {},
+            "may_record": {},
+            "state": {},
+            "created_week": {}
+        },
+        "edits": {
+            "published_title": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "published_description": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "requirements": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "length": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "notice_required": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "needs_help": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "needs_money": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "one_day": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "has_rejected_email": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "published_names": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "arrival_period": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "departure_period": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "telephone_number": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "may_record": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "needs_laptop": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "available_times": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "attendees": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "cost": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "size": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "funds": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "age_range": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "participant_equipment": {
+                "avg": 0.00,
+                "max": 0
+            }
+        }
+    }
+}

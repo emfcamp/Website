@@ -1,6 +1,5 @@
-
 var emf_scheduler = {};
-function init_emf_scheduler(schedule_data, venues, is_anonymous){
+window.init_emf_scheduler = (schedule_data, venues, is_anonymous) => {
     'use strict';
 
     var todays_date = new Date(),
@@ -353,4 +352,4 @@ function init_emf_scheduler(schedule_data, venues, is_anonymous){
 
     // Seems not to be happening on load
     _sizeScheduler();
-}
+};
