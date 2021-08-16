@@ -30,7 +30,7 @@ class VolunteerSignUpForm(Form):
     nickname = StringField("Name", [Required()])
     volunteer_email = StringField("Email", [Email(), Required()])
     over_18 = BooleanField("I'm at least 18 years old")
-    volunteer_phone = TelField("Phone", [Required()])
+    volunteer_phone = TelField("Phone")
     arrival = SelectField("Arrival")
     departure = SelectField("Departure")
     allow_comms = BooleanField(
