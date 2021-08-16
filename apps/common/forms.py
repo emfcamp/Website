@@ -8,6 +8,7 @@ from wtforms.widgets.html5 import EmailInput
 from wtforms.compat import string_types
 from wtforms.widgets.core import html_params
 from email_validator import validate_email, EmailNotValidError
+import re
 
 
 class EmailField(StringField):
@@ -55,6 +56,19 @@ class TelInput(Input):
 
 class TelField(StringField):
     widget = TelInput()
+
+    def pre_validate(form, field):
+        if re.search(r"^\s*$", form.data):
+            # Allow empty field or only whitespace in field, this can be handled by Required()
+            return
+
+        if not re.search(r"^\+?[0-9 \-]+$", form.data):
+            raise ValidationError(
+                "A telephone number may only contain numbers, spaces or dashes."
+            )
+
+        if not 7 < len(form.data) < 21:
+            raise ValidationError("A telephone number must be between 8 and 20 digits.")
 
 
 class JSONField(StringField):

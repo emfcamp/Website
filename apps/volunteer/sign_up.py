@@ -22,7 +22,7 @@ from models.volunteer import Volunteer as VolunteerUser
 from models.user import User
 
 from . import volunteer, v_user_required
-from ..common.forms import Form
+from ..common.forms import Form, TelField
 from ..common import create_current_user, feature_flag
 
 
@@ -30,7 +30,7 @@ class VolunteerSignUpForm(Form):
     nickname = StringField("Name", [Required()])
     volunteer_email = StringField("Email", [Email(), Required()])
     over_18 = BooleanField("I'm at least 18 years old")
-    volunteer_phone = StringField("Phone", [Required()])
+    volunteer_phone = TelField("Phone", [Required()])
     arrival = SelectField("Arrival")
     departure = SelectField("Departure")
     allow_comms = BooleanField(
