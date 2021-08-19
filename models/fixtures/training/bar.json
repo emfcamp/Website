@@ -1,10 +1,17 @@
 {
-  "training": [
+  "role": "Bar",
+  "pass_auto": true,
+  "pass_mark": 100,
+  "url": "https://usercontent.irccloud-cdn.com/file/3LYiO0Er/Training%20outline.pdf",
+  "pages": [
     {
-      "role": "Bar",
-      "pass_auto": true,
-      "pass_mark": 100,
-      "url": "https://usercontent.irccloud-cdn.com/file/3LYiO0Er/Training%20outline.pdf",
+      "page": 1,
+      "content": "models/fixtures/training/bar-training-intro.md",
+      "questions": []
+    },
+    {
+      "page": 2,
+      "content": "models/fixtures/training/bar-training-alcohol.md",
       "questions": [
         {
           "question": "At what percentage of abv is a drink legally classed as alcohol?",
@@ -56,7 +63,13 @@
               "correct": false
             }
           ]
-        },
+        }
+      ]
+    },
+    {
+      "page": 3,
+      "content": "models/fixtures/training/bar-training-licensing.md",
+      "questions": [
         {
           "question": "Which of these is <strong>not</strong> a licensing objective?",
           "answers": [
@@ -124,7 +137,13 @@
               "correct": false
             }
           ]
-        },
+        }
+      ]
+    },
+    {
+      "page": 4,
+      "content": "models/fixtures/training/bar-training-age-restrictions.md",
+      "questions": [
         {
           "question": "A proof of age document is reliable if it has",
           "answers": [
@@ -188,7 +207,13 @@
               "correct": false
             }
           ]
-        },
+        }
+      ]
+    },
+    {
+      "page": 5,
+      "content": "models/fixtures/training/bar-training-drunkenness.md",
+      "questions": [
         {
           "question": "Which of these is considered a common sign of drunkenness?",
           "answers": [
@@ -207,6 +232,16 @@
           ]
         }
       ]
+    },
+    {
+      "page": 6,
+      "content": "models/fixtures/training/bar-training-safety.md",
+      "questions": []
+    },
+    {
+      "page": 7,
+      "content": "models/fixtures/training/bar-training-weights-and-measures.md",
+      "questions": []
     }
   ]
 }

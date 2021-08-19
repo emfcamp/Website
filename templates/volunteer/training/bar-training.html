@@ -7,67 +7,88 @@
 {% block body %}
 {% include "volunteer/_nav.html" %}
 
-<div id="training" class="{% if trained %}hidden{% endif %}" style="height: 780px">
-    <p></p>
-    <p></p>
-    Please wait while we load the training...
-</div>
+{% if not volunteer.over_18 %}
 
-<div id="waiting" style="display: none">
-    <p></p>
-    <p></p>
-    Please wait while we check your answers. If you don't see any progress,
-    please <a href="{{ url_for('.bar_training') }}">try again</a>.
-</div>
-
-<div id="complete" class="{% if not trained %}hidden{% endif %}">
-<h2>Training complete</h2>
+<h2>Bar training</h2>
 <p>
-    You have completed your training for the bar. You can now <a href="{{ url_for('volunteer.schedule') }}">sign up</a> for bar shifts!
+    Thank you for your interest in working behind the bar. Unfortunately, this role is only available to those
+    over the age of 18. If your age setting is incorrect, please update it on the 
+    <a href="{{ url_for('volunteer.account') }}">volunteer account page</a>.
 </p>
-</div>
 
+{% else %}
 
-{% endblock body %}
+{% if trained %}
 
-{% block foot %}
-<script src="https://embed.typeform.com/embed.js"></script>
-<script type="text/javascript">
-$(() => {
-  var attempts = 0;
-  function check_bar_trained() {
-    fetch({{ url_for('volunteer.bar_training_check')|tojson }})
-    .then(response => response.json())
-    .then(function(result) {
-      if (result) {
-        $('#training').show();
-        $('#waiting').hide();
-      } else {
-        attempts++;
-        if (attempts < 10) setTimeout(check_bar_trained, 2000);
-      }
-    });
-  }
+<h2>You have completed this training!</h2>
+<p>
+    <strong>Congratulations - you have completed your training for working in the bar.</strong>
+    You can now <a href="{{ url_for('volunteer.schedule') }}">sign up</a> for bar shifts.
+</p>
+<p>
+    You are welcome to review the training material again to boost your knowledge, or even
+    complete the questions again - however you are not required to.
+</p>
+<hr />
 
-  function show_training() {
-    typeformEmbed.makeWidget(
-      $('#training')[0],
-      {{ url|tojson }},
-      {
-        hideHeaders: true,
-        hideFooter: true,
-        onSubmit: () => {
-          $('#training').hide();
-          $('#waiting').show();
-          check_bar_trained();
-        }
-      }
-    )
-    $('#training').show();
-    $('#waiting').hide();
-  }
+{% endif %}
 
-  show_training();
-});
-</script>
+<form method="post">
+    {% if form.errors %}
+        <div class="alert alert-warning">Some of your answers are incorrect or incomplete, please review them below.</div>
+    {% endif %}
+
+    {% for page in pages %}
+        <div id="page-{{ page['number'] }}" class="paged-content">
+            {% if page['number'] != 1 %}<hr />{% endif %}
+
+            {{ page.content|safe }}
+
+            {% if page.questions %}
+                <h3>Questions</h3>
+                {% for q in form.questions %}
+                    {% if page['number'] == q.page %}
+
+                        {% if q.answers.errors %}
+                            <p>
+                                <mark>
+                                    {{q.question_id.data + 1}}. {{ q.question|safe }}
+                                    <strong class="pull-right" style="color: red">{{ ', '.join(q.answers.errors) }}</strong>
+                                </mark>
+                            </p>
+                        {% else %}
+                            <p>{{q.question_id.data + 1}}. {{ q.question|safe }}</p>
+                        {% endif %}
+
+                        {{ q.answers(class_="no-list-style") }}
+                        {{ q.hidden_tag_without('csrf_token') }}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            {% if page['number'] == last_page %}
+                {{ form.hidden_tag() }}
+                {{ form.submit(class_="btn btn-primary") }}
+            {% endif %}
+
+        </div>
+    {% endfor %}
+</form>
+
+<script>$('html, body').animate({ scrollTop: 0 }, 'fast');</script>
+<style type="text/css">
+label {
+    font-weight: normal;
+}
+
+.no-list-style li{ 
+    list-style-type: none;
+}
+</style>
+{% endif %}
+
 {% endblock %}
+
+{% block footer %}
+{% endblock %}
+
