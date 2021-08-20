@@ -328,6 +328,7 @@ def test_transfer(db, user, parent_group):
 
     db.session.commit()
     item.price_tier.parent.set_attribute("is_transferable", True)
+    db.session.commit()
 
     with pytest.raises(PurchaseTransferException) as e:
         item.transfer(user1, user1)

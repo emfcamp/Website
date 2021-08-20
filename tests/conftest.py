@@ -84,7 +84,7 @@ def client(app):
     yield app.test_client()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def db(app):
     " Yield the DB object "
     yield db_obj
@@ -97,7 +97,7 @@ def request_context(app):
         yield c
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def user(db):
     " Yield a test user. Note that this user will be identical across all tests in a module. "
     email = "test_user@example.com"
