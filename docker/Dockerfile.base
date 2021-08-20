@@ -2,7 +2,7 @@
 # 
 # This image is used as a base image for both production and development builds.
 # It's built separately to speed up build times.
-#
+
 FROM python:3.9-slim-buster
 
 WORKDIR /app
