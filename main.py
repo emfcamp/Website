@@ -78,7 +78,7 @@ def create_app(dev_server=False, config_override=None):
     app.config.from_envvar("SETTINGS_FILE")
     if config_override:
         app.config.from_mapping(config_override)
-    app.jinja_options["extensions"].append("jinja2.ext.do")
+    app.jinja_env.add_extension("jinja2.ext.do")
 
     if install_logging:
         create_logging_manager(app)
