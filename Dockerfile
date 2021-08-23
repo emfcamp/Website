@@ -1,4 +1,4 @@
-FROM emfcamp/website-base-dev:latest
+FROM ghcr.io/emfcamp/website-base-dev:latest
 
 COPY pyproject.toml poetry.lock Makefile /app/
 WORKDIR /app
