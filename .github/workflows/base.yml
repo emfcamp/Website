@@ -5,6 +5,7 @@ on:
     branches:
       - master
     paths:
+      - '.github/workflows/base.yml'
       - 'docker/Dockerfile.base'
       - 'docker/Dockerfile.base.dockerignore'
       - 'docker/Dockerfile.base-dev'
