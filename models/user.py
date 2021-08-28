@@ -256,6 +256,13 @@ class User(db.Model, UserMixin):
         cascade="all, delete-orphan",
     )
 
+    village_memberships = db.relationship(
+        "VillageMember",
+        lazy="dynamic",
+        primaryjoin="VillageMember.user_id == User.id",
+        cascade="all, delete-orphan",
+    )
+
     def __init__(self, email, name):
         self.email = email
         self.name = name
