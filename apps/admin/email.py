@@ -12,6 +12,7 @@ from models.user import User
 from models.cfp import Proposal
 from models.email import EmailJob, EmailJobRecipient
 from models.payment import Payment
+from models.village import VillageMember
 from ..common.forms import Form
 
 
@@ -39,6 +40,7 @@ class EmailComposeForm(Form):
             ("ticket", "Ticketholders"),
             ("purchasers", "Users who made payments"),
             ("cfp", "Accepted CfP"),
+            ("villages", "Village owners"),
         ],
     )
     preview = SubmitField("Preview Email")
@@ -62,6 +64,8 @@ def get_query(dest):
         return User.query.join(User.proposals).filter(
             Proposal.state.in_(("accepted", "finished"))
         )
+    elif dest == "villages":
+        return User.query.join(User.village_memberships).filter(VillageMember.admin)
 
 
 @admin.route("/email", methods=["GET", "POST"])
