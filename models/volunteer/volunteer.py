@@ -63,6 +63,12 @@ class Volunteer(db.Model, UserMixin):
         lazy="dynamic",
     )
 
+    def __repr__(self):
+        return f"<Volunteer {self.__str__()}>"
+
+    def __str__(self):
+        return f"{self.user.name} <{self.user.email}>"
+
     @classmethod
     def get_by_id(cls, id):
         return cls.query.get_or_404(id)

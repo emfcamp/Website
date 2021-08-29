@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/emfcamp/Website.svg?branch=master)](https://travis-ci.org/emfcamp/Website)
+[![CI Status](https://github.com/emfcamp/Website/workflows/CI/badge.svg)](https://github.com/emfcamp/Website/actions?query=workflow%3ACI)
+[![Coverage Status](https://coveralls.io/repos/github/emfcamp/Website/badge.svg?branch=master)](https://coveralls.io/github/emfcamp/Website?branch=master)
 
 #### Bank Transfer
 These are manually resolved via scripts and the admin panel.
@@ -58,9 +59,9 @@ You can force different results based on the first name. For more, check [their 
 Test users
 ==========
 
-Create three test users with:
+Create test users with:
 
-```make users```
+```./flask dev cfp_data```
 
 and enable `BYPASS_LOGIN` in config. You can then log in using, e.g. `/login/admin@test.invalid` and navigate to `/admin/`.
 

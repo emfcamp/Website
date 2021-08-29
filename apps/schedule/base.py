@@ -1,5 +1,7 @@
 import html
 import random
+import pendulum
+from collections import defaultdict
 
 from flask import render_template, redirect, url_for, flash, request, abort
 from flask_login import current_user
@@ -16,8 +18,8 @@ from models.admin_message import AdminMessage
 
 from ..common import feature_flag
 
-from . import schedule
-from .historic import talks_historic, item_historic
+from . import schedule, event_tz
+from .historic import talks_historic, item_historic, historic_talk_data
 from .data import _get_scheduled_proposals, _get_upcoming, _get_priority_sorted_venues
 
 
@@ -213,3 +215,51 @@ def now_and_next():
         template = "schedule/now-and-next.html"
 
     return render_template(template, venues=venues, proposals_by_venue=proposals)
+
+
+@schedule.route("/time-machine")
+def time_machine():
+    # now = pendulum.datetime(2018, 8, 31, 12, 00, tz=event_tz)
+    now = pendulum.now(event_tz)
+    now_time = now.time()
+    now_weekday = now.weekday()
+
+    days = [
+        4,  # Friday
+        5,  # Saturday
+        6,  # Sunday
+    ]
+
+    years = [2012, 2014, 2016, 2018, 2022]
+
+    # Year -> Stage -> Talks
+    talks_now = defaultdict(lambda: defaultdict(list))
+    talks_next = defaultdict(lambda: defaultdict(list))
+
+    for year in years:
+        talks = None
+        for venues in historic_talk_data(year)["venues"]:
+            if venues["name"] == "Main Stages":
+                talks = venues["events"]
+                break
+
+        filtered_talks = [
+            t
+            for t in talks
+            if t["end_date"].weekday() == now_weekday
+            and t["end_date"].time() >= now_time
+        ]
+
+        for talk in sorted(filtered_talks, key=lambda v: v["start_date"]):
+            if talk["start_date"].time() <= now_time:
+                talks_now[year][talk["venue"]].append(talk)
+            else:
+                talk["starts_in"] = talk["start_date"].time() - now_time
+                talks_next[year][talk["venue"]].append(talk)
+
+    return render_template(
+        "schedule/time-machine.html",
+        talks_now=talks_now,
+        talks_next=talks_next,
+        now=now,
+    )

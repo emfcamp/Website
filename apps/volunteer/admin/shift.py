@@ -8,4 +8,6 @@ class ShiftModelView(VolunteerModelView):
     column_filters = ["role", "venue", "start", "end"]
 
 
-volunteer_admin.add_view(ShiftModelView(Shift, db.session, category="shifts"))
+volunteer_admin.add_view(
+    ShiftModelView(Shift, db.session, category="Settings", name="Shifts",)
+)

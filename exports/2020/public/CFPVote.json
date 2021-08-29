@@ -1,0 +1,24 @@
+{
+    "votes": {
+        "counts": {
+            "state": {},
+            "has_been_read": {},
+            "vote": {},
+            "created_day": {}
+        },
+        "edits": {
+            "state": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "vote": {
+                "avg": 0.00,
+                "max": 0
+            },
+            "note": {
+                "avg": 0.00,
+                "max": 0
+            }
+        }
+    }
+}

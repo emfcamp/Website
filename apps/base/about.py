@@ -1,3 +1,10 @@
+"""
+    Pages under /about - content about the event.
+
+    Content about EMF the organisation should go in /organisation (organisation.py),
+    although some legacy content remains here.
+"""
+
 from flask import render_template
 from . import base
 
@@ -65,3 +72,8 @@ def what_to_bring():
 @base.route("/about/food")
 def food():
     return render_template("about/food.html")
+
+
+@base.route("/about/contact")
+def contact():
+    return render_template("about/contact.html")

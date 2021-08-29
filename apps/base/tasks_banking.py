@@ -18,8 +18,26 @@ def create_bank_accounts_cmd():
 
 def create_bank_accounts():
     """ Create bank accounts if they don't exist """
-    gbp = BankAccount("492900", "20716473590526", "GBP")
-    eur = BankAccount("492900", "20716472954433", "EUR")
+    gbp = BankAccount(
+        sort_code="102030",
+        acct_id="40506070",
+        currency="GBP",
+        active=True,
+        institution="London Bank",
+        address="13 Bartlett Place, London, WC1B 4NM",
+        iban=None,
+        swift=None,
+    )
+    eur = BankAccount(
+        sort_code=None,
+        acct_id=None,
+        currency="EUR",
+        active=True,
+        institution="London Bank",
+        address="13 Bartlett Place, London, WC1B 4NM",
+        iban="GB47LOND11213141516171",
+        swift="GB47LOND",
+    )
     for acct in [gbp, eur]:
         try:
             BankAccount.query.filter_by(
@@ -27,7 +45,10 @@ def create_bank_accounts():
             ).one()
         except NoResultFound:
             app.logger.info(
-                "Adding %s account %s %s", acct.currency, acct.sort_code, acct.acct_id
+                "Adding %s account %s %s",
+                acct.currency,
+                acct.sort_code or acct.swift,
+                acct.acct_id or acct.iban,
             )
             db.session.add(acct)
 

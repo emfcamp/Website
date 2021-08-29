@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Finances{% endblock %}
+{% macro event_row(year, events='') -%}
+  <tr>
+    <td>{{year}}</td>
+    <td>{{events}}</td>
+    <td>
+      <a href="{{url_for('static', filename="financial-statements/"+year|string+"-profit-and-loss.pdf")}}" target="_blank">
+        P&amp;L
+      </a>
+    </td>
+    <td>
+      <a href="{{url_for('static', filename="financial-statements/"+year|string+"-balance-sheet.pdf")}}" target="_blank">
+        Balance Sheet
+      </a>
+    </td>
+  </tr>
+{%- endmacro %}
+{% block body %}
+  <h2>Finances</h2>
+
+  <p>In the interests of transparency, to both our attendees and to others who may be interested in running their own events,
+      the full financial statements for Electromagnetic Field Ltd are available here.
+  </p>
+
+  <p>Electromagnetic Field is a non-profit event, and every penny of surplus we make goes back to the community, either
+      by making future events better or by donations to other worthy causes. The events business is risky, so we aim to keep
+      a substantial cash reserve so that we can deal with unforeseen circumstances.</p>
+
+  <h3>Financial Statements</h3>
+  <p>These financial statements have been very lightly summarised for clarity and to suppress internal organisational
+      details, but they otherwise contain a detailed breakdown of our finances.
+  </p>
+  <p>
+    Although EMF's financial year ends in September and hence should cover the majority of transactions
+    for each event, accounting rules sometimes require that we recognise expenses in the year they are incurred, rather than
+    the year of the event they relate to. Consequently, the numbers for an event year may not completely represent the
+    full profit or loss made on the event.
+  </p>
+  <p>If you have any questions, please <a href="mailto:russ@emfcamp.org">drop Russ an email</a> or ask in IRC.</p>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Year</th>
+        <th>Event</th>
+        <th colspan="2">Statements</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{event_row(2020, "EMF 2020 (cancelled due to COVID-19)")}}
+      {{event_row(2019)}}
+      {{event_row(2018, "EMF 2018")}}
+      {{event_row(2017)}}
+      {{event_row(2016, "EMF 2016")}}
+      {{event_row(2015)}}
+      {{event_row(2014, "EMF 2014")}}
+      {{event_row(2013, "Electromagnetic Wave")}}
+      {{event_row(2012, "EMF 2012")}}
+    </tbody>
+  </table>
+
+{% endblock %}

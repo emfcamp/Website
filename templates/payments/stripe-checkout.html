@@ -45,7 +45,7 @@
 {% endblock %}
 {% block foot -%}
 <script src="https://js.stripe.com/v3/"></script>
-<script type="text/javascript" nonce="{{csp_nonce}}">
+<script nonce="{{csp_nonce}}">
   var PUBLIC_KEY = {{ config['STRIPE_PUBLIC_KEY']|tojson }};
   var CLIENT_SECRET = {{ client_secret|tojson }};
   var EMAIL = {{ current_user.email|tojson }};

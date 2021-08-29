@@ -66,9 +66,16 @@ function css(cb) {
     ])
     .pipe(gulpif(!production, sourcemaps.init()))
     .pipe(
-      postcss([require('postcss-easy-import'), postcssPresetEnv()], {
-        syntax: require('postcss-scss'),
-      }),
+      postcss(
+        [
+          require('postcss-easy-import'),
+          require('postcss-input-range')(),
+          postcssPresetEnv(),
+        ],
+        {
+          syntax: require('postcss-scss'),
+        },
+      ),
     )
     .pipe(sass().on('error', sass.logError))
     .pipe(gulpif(production, cleancss()))

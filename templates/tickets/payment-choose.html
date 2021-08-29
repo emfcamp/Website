@@ -142,7 +142,7 @@
 {% block foot %}
 {# If the preferred methods of payment are active, don't let the form respond to Enter #}
 {% if feature_enabled('GOCARDLESS') or feature_enabled('BANK_TRANSFER') %}
-<script type="text/javascript" nonce="{{csp_nonce}}">
+<script nonce="{{csp_nonce}}">
     $('form.pay-method').on('keypress', function(e) {
         if (e.which == 13 && !$(e.target).is('.btn')) e.preventDefault();
     });

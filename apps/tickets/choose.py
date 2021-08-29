@@ -278,6 +278,7 @@ def handle_free_tickets(flow, view, basket):
 @tickets.route("/tickets/clear")
 @tickets.route("/tickets/<flow>/clear")
 def tickets_clear(flow=None):
+    app.logger.info("Clearing basket")
     basket = Basket.from_session(current_user, get_user_currency())
     basket.cancel_purchases()
     db.session.commit()

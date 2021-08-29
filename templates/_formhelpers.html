@@ -1,4 +1,5 @@
-{% macro render_field(field, horizontal=False, word_limit=None) %}
+{% macro render_field(field, horizontal=False, word_limit=None,
+                        donation_range_payment=None, donation_range_currency=None) %}
 
 {% if caller %}
     {% set help_text = caller() %}
@@ -22,6 +23,14 @@
   {% do kwargs.update({'data-word-limit': word_limit}) %}
 {% endif %}
 
+{% if donation_range_payment %}
+  {% do kwargs.update({
+    'data-range-payment-amount': donation_range_payment.amount,
+    'data-range-payment-currency': donation_range_currency
+  })
+  %}
+{% endif %}
+
 <div class="form-group {%- if field.errors %} has-error {%- endif %}">
     <label for="{{ field.name }}" class="{% if horizontal -%} col-sm-{{labelw}} {% endif -%} control-label">
         {{ field.label.text }}
@@ -37,6 +46,9 @@
         {% endif -%}
         {% if word_limit %}
           <p class="help-block" id="word-limit-{{field.name}}"></p>
+        {% endif %}
+        {% if donation_range_payment %}
+          <p id="donation-range-{{field.name}}"></p>
         {% endif %}
     </div>
 </div>

@@ -22,11 +22,44 @@
       {{message}}{% if not success %}</strong>{% endif %}</li>
 {% endfor %}
 </ul>
+
 <h4>Manual tasks:</h4>
 <ul>
   <li>Ensure a webhook is configured for the URL <code>{{external_url('payments.gocardless_webhook')}}</code> and the secret matches the <code>GOCARDLESS_WEBHOOK_SECRET</code> config variable.</li>
   <li>Ensure bank statement reference in GoCardless settings is set correctly (it has the year in).</li>
 </ul>
+
+<h3>TransferWise</h3>
+<ul>
+{% for success, message in transferwise %}
+  <li>{% if success %}✅{% else %}❌<strong>{% endif %}
+      {{message}}{% if not success %}</strong>{% endif %}</li>
+{% endfor %}
+</ul>
+
+<h3>Bank Accounts</h3>
+<table class="table table-condensed">
+  <tr>
+    <th>Institution</th>
+    <th>Currency</th>
+    <th>Active</th>
+    <th>SWIFT</th>
+    <th>IBAN</th>
+    <th>Sort Code</th>
+    <th>Account Number</th>
+  </tr>
+{% for bank_account in bank_accounts %}
+  <tr>
+    <td>{{ bank_account.institution }}</td>
+    <td>{{ bank_account.currency }}</td>
+    <td>{% if bank_account.active %}✅{% else %}❌{% endif %}</td>
+    <td>{{ bank_account.swift or '' }}</td>
+    <td>{{ bank_account.iban or '' | iban }}</td>
+    <td>{{ bank_account.sort_code or '' | sort_code }}</td>
+    <td>{{ bank_account.acct_id or '' }}</td>
+  </tr>
+{% endfor %}
+</table>
 
 <h3>Bank Transfer</h3>
 <ul>

@@ -5,9 +5,11 @@ TODO: make this nicer
 Production is on maxwell.emfcamp.org.
 
 # First install
+
+This is done after each event, following a clear of the database:
 ```
 docker-compose -f ./docker-compose.prod.yml up -d
-docker-compose -f ./docker-compose.prod.yml exec app poetry run make data
+docker-compose -f ./docker-compose.prod.yml exec app flask db upgrade
 ```
 
 # To update

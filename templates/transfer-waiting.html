@@ -17,15 +17,14 @@
 </div>
 <p>We will use the reference below to identify the payment as yours, so please ensure it's included in full. (Don't worry about the hyphen, or if the payee name doesn't quite fit.)</p>
 <dl class="dl-horizontal">
-<dt>Bank</dt><dd>Barclays</dd>
+<dt>Bank</dt><dd>{{ account.institution }}, {{ account.address }}</dd>
 <dt>Payee</dt><dd>Electromagnetic Field Ltd</dd>
 {% if payment.currency == 'GBP' %}
-<dt>Sort code</dt><dd>20-71-64</dd>
-<dt>Account number</dt><dd>73590526</dd>
-{% elif payment.currency == 'EUR' %}
-<dt>SWIFT</dt> <dd>BARCGB22</dd>
-<dt>IBAN</dt> <dd>GB21 BARC 2071 6472 9544 33</dd>
-<dt>City</dt> <dd>London</dd>
+<dt>Sort code</dt><dd>{{ account.sort_code | sort_code }}</dd>
+<dt>Account number</dt><dd>{{ account.acct_id }}</dd>
+{% else %}
+<dt>SWIFT</dt><dd>{{ account.swift }}</dd>
+<dt>IBAN</dt><dd>{{ account.iban | iban }}</dd>
 {% endif %}
 <dt>Amount</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
 <dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>

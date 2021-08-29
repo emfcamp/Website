@@ -1,0 +1,13 @@
+{
+    "messages": {
+        "counts": {
+            "has_been_read": {
+                "false": 3
+            },
+            "created_day": {
+                "2020-02-09": 2,
+                "2020-03-16": 1
+            }
+        }
+    }
+}

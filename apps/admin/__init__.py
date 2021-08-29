@@ -26,7 +26,12 @@ from wtforms import (
 )
 
 from main import db
-from models.payment import Payment, BankPayment, BankTransaction
+from models.payment import (
+    Payment,
+    BankAccount,
+    BankPayment,
+    BankTransaction,
+)
 from models.purchase import Purchase
 from models.ical import CalendarSource
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
@@ -35,6 +40,7 @@ from models.map import MapObject
 from models.scheduled_task import tasks, ScheduledTaskResult
 from ..payments.stripe import stripe_validate
 from ..payments.gocardless import gocardless_validate
+from ..payments.transferwise import transferwise_validate
 from ..common import require_permission
 from ..common.forms import Form
 
@@ -207,6 +213,8 @@ def payment_config_verify():
         "admin/payment-config-verify.html",
         stripe=stripe_validate(),
         gocardless=gocardless_validate(),
+        transferwise=transferwise_validate(),
+        bank_accounts=BankAccount.query.all(),
         last_bank_payment=BankTransaction.query.order_by(
             BankTransaction.id.desc()
         ).first(),

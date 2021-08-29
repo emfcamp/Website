@@ -11,6 +11,7 @@ from main import db, mail
 from models.user import User
 from models.cfp import Proposal
 from models.email import EmailJob, EmailJobRecipient
+from models.payment import Payment
 from ..common.forms import Form
 
 
@@ -32,7 +33,13 @@ class EmailComposeForm(Form):
     subject = StringField("Subject", [DataRequired()])
     text = StringField("Text", [DataRequired()], widget=TextArea())
     destination = SelectField(
-        "Send to:", choices=[("all", "All Ticketholders"), ("cfp", "All Accepted CfP")]
+        "Send to:",
+        choices=[
+            ("all", "Registered users"),
+            ("ticket", "Ticketholders"),
+            ("purchasers", "Users who made payments"),
+            ("cfp", "Accepted CfP"),
+        ],
     )
     preview = SubmitField("Preview Email")
     send_preview_address = StringField("Preview Email Address")
@@ -42,11 +49,15 @@ class EmailComposeForm(Form):
 
 def get_query(dest):
     if dest == "all":
+        return User.query
+    elif dest == "tickets":
         return (
             User.query.join(User.owned_purchases)
             .filter_by(type="admission_ticket", is_paid_for=True)
             .group_by(User.id)
         )
+    elif dest == "purchasers":
+        return User.query.join(User.payments).filter(Payment.state == "paid")
     elif dest == "cfp":
         return User.query.join(User.proposals).filter(
             Proposal.state.in_(("accepted", "finished"))
@@ -57,7 +68,7 @@ def get_query(dest):
 def email():
     form = EmailComposeForm()
     if form.validate_on_submit():
-        users = get_query(form.destination.data)
+        users = get_query(form.destination.data).distinct()
         if form.preview.data is True:
             return render_template(
                 "admin/email.html",
@@ -94,7 +105,7 @@ def email():
             for user in users:
                 db.session.add(EmailJobRecipient(job, user))
             db.session.commit()
-            flash("Email queued for sending to %s users" % len(users.count()))
+            flash("Email queued for sending to %s users" % users.count())
             return redirect(url_for(".email"))
 
     return render_template("admin/email.html", form=form)

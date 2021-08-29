@@ -48,17 +48,18 @@
   </div>
 
   <div class="sender">
-    <img class="logo" src="{{ url_for('static', filename='images/logomark-black.svg') }}" height="80"/>
+    <img class="logo" src="{{ url_for('static', filename='images/logomark-black.svg') }}" height="80" alt="Electromagnetic Field" />
     <div class="vcard">
       <div class="fn org">Electromagnetic Field Ltd.</div>
       <div class="adr">
-        <span class="street-address">2 Ockendon Mews</span>
+        <span class="street-address">483 Green Lanes</span>
         <span class="locality">London</span>
-        <span class="postal-code">N1 3JL</span>
+        <span class="postal-code">N13 4BS</span>
         <span class="country-name">UNITED KINGDOM</span>
       </div>
     </div>
   </div>
+</div>
   
 <div class="recipient-row">
 {% if mode == 'invoice' %}
@@ -146,12 +147,21 @@
 <td>{{ payment.amount | price(payment.currency) }}</td>
 </tr>
 
+{% for refund in payment.refunds %}
+<tr class="{{ line_class.next() }}">
+  <td colspan=2></td>
+  <td>Refunded ({{refund.provider}}) on {{refund.timestamp.date()}} </td>
+  <td>-{{refund.amount|price(payment.currency)}}</td>
+</tr>
+{% endfor %}
 </tfoot>
 
 </table>
 
-{% if payment.state == 'paid' %}
+{% if payment.state in ('paid', 'refund-requested') %}
 <div class="paid">Payment already received - thank you!</div>
+{% elif payment.state == 'refunded' %}
+<div class="paid">Payment refunded.</div>
 {% else %}
 <div class="payment-terms">
   {% if payment.expires %}
@@ -159,16 +169,14 @@
   {% endif %}
   {% if payment.provider == 'banktransfer' %}
   <dl class="bank-info dl-horizontal">
-  <dl class="dl-horizontal">
-    <dt>Bank</dt><dd>Barclays Bank PLC, 19 Fleet Street, London EC4Y 1AA, UK</dd>
+    <dt>Bank</dt><dd>{{ account.institution }}, {{ account.address }}</dd>
     <dt>Payee</dt><dd>Electromagnetic Field Ltd</dd>
     {% if payment.currency == 'GBP' %}
-    <dt>Sort code</dt><dd>20-71-64</dd>
-    <dt>Account number</dt><dd>73590526</dd>
-    <!--<dt>IBAN</dt><dd>GB39 BARC 2071 6473 5905 26</dd>-->
-    {% elif payment.currency == 'EUR' %}
-    <dt>SWIFT</dt><dd>BARCGB22</dd>
-    <dt>IBAN</dt><dd>GB21 BARC 2071 6472 9544 33</dd>
+    <dt>Sort code</dt><dd>{{ account.sort_code | sort_code }}</dd>
+    <dt>Account number</dt><dd>{{ account.acct_id }}</dd>
+    {% else %}
+    <dt>SWIFT</dt><dd>{{ account.swift }}</dd>
+    <dt>IBAN</dt><dd>{{ account.iban | iban }}</dd>
     {% endif %}
     <dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
   </dl>
@@ -190,8 +198,8 @@
       <footer>
         <dl class="company-info">
           <dt>Company Registration No</dt><dd>07788466</dd>
-          <dt>Registered Office</dt><dd>2 Ockendon Mews, London, N1 3JL, United Kingdom</dd>
-        </div>
+          <dt>Registered Office</dt><dd>483 Green Lanes, London, N13 4BS</dd>
+        </dl>
       </footer>
     </div>
   </div>
@@ -199,7 +207,7 @@
 {% endblock %}
 
 {% block foot %}
-<script type="text/javascript" nonce="{{csp_nonce}}">
+<script nonce="{{csp_nonce}}">
 $(function() {
   $('#vat-invoice').on('click', function(e) {
       $('#edit-company').removeClass('hidden').on('keydown', function(e) {

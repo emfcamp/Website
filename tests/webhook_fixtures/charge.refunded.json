@@ -1,0 +1,114 @@
+{
+  "id": "ch_1GUslxIcI91cWsde5jePBfRQ",
+  "object": "charge",
+  "amount": 23000,
+  "amount_refunded": 21000,
+  "application": null,
+  "application_fee": null,
+  "application_fee_amount": null,
+  "balance_transaction": "txn_1GUslxIcI91cWsdenOKhyR4i",
+  "billing_details": {
+    "address": {
+      "city": null,
+      "country": null,
+      "line1": null,
+      "line2": null,
+      "postal_code": "42424",
+      "state": null
+    },
+    "email": "test@example.com",
+    "name": "Name",
+    "phone": null
+  },
+  "calculated_statement_descriptor": "EMFCAMP EMF 2020 P",
+  "captured": true,
+  "created": 1586171145,
+  "currency": "gbp",
+  "customer": null,
+  "description": null,
+  "destination": null,
+  "dispute": null,
+  "disputed": false,
+  "failure_code": null,
+  "failure_message": null,
+  "fraud_details": {},
+  "invoice": null,
+  "livemode": false,
+  "metadata": {
+    "user_id": "1",
+    "payment_id": "2"
+  },
+  "on_behalf_of": null,
+  "order": null,
+  "outcome": {
+    "network_status": "approved_by_network",
+    "reason": null,
+    "risk_level": "normal",
+    "risk_score": 55,
+    "seller_message": "Payment complete.",
+    "type": "authorized"
+  },
+  "paid": true,
+  "payment_intent": "pi_1GUslpIcI91cWsdeheAuRsyg",
+  "payment_method": "pm_1GUslxIcI91cWsdeBYozsFYU",
+  "payment_method_details": {
+    "card": {
+      "brand": "visa",
+      "checks": {
+        "address_line1_check": null,
+        "address_postal_code_check": "pass",
+        "cvc_check": "pass"
+      },
+      "country": "US",
+      "exp_month": 4,
+      "exp_year": 2024,
+      "fingerprint": "VKnD4kq2Jm2zibNl",
+      "funding": "credit",
+      "installments": null,
+      "last4": "4242",
+      "network": "visa",
+      "three_d_secure": null,
+      "wallet": null
+    },
+    "type": "card"
+  },
+  "receipt_email": null,
+  "receipt_number": null,
+  "receipt_url": "https://pay.stripe.com/receipts/acct_14i5G7IcI91cWsde/ch_1GUslxIcI91cWsde5jePBfRQ/rcpt_H2yjkWzJc46LbnTbSqH7RdXWbbaVDSU",
+  "refunded": false,
+  "refunds": {
+    "object": "list",
+    "data": [
+      {
+        "id": "re_1GVEloIcI91cWsdemdIEKjOK",
+        "object": "refund",
+        "amount": 21000,
+        "balance_transaction": "txn_1GVEloIcI91cWsdeWsmUp4Fr",
+        "charge": "ch_1GUslxIcI91cWsde5jePBfRQ",
+        "created": 1586255704,
+        "currency": "gbp",
+        "metadata": {
+          "refund_request": "1"
+        },
+        "payment_intent": "pi_1GUslpIcI91cWsdeheAuRsyg",
+        "reason": null,
+        "receipt_number": null,
+        "source_transfer_reversal": null,
+        "status": "succeeded",
+        "transfer_reversal": null
+      }
+    ],
+    "has_more": false,
+    "total_count": 1,
+    "url": "/v1/charges/ch_1GUslxIcI91cWsde5jePBfRQ/refunds"
+  },
+  "review": null,
+  "shipping": null,
+  "source": null,
+  "source_transfer": null,
+  "statement_descriptor": null,
+  "statement_descriptor_suffix": "EMF 2020 purchase",
+  "status": "succeeded",
+  "transfer_data": null,
+  "transfer_group": null
+}
