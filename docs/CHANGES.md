@@ -22,7 +22,7 @@ git fetch origin --prune
 Postgres has been updated. Modify your `development.cfg` to contain:
 
 ```
-SQLALCHEMY_DATABASE_URI = "postgresql://postgres@postgres/emf_site
+SQLALCHEMY_DATABASE_URI = "postgresql://postgres:postgres@postgres/emf_site
 ```
 
 and then run:
