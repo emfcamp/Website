@@ -1,0 +1,49 @@
+version: "3.7"
+services:
+  app:
+    restart: unless-stopped
+    image: "emfcamp/website:latest"
+    networks:
+      - emfweb
+    depends_on:
+      - postgres
+    ports:
+      - "127.0.0.1:8001:8000"
+    volumes:
+      - ./config/kelvin.cfg:/app/config/kelvin.cfg
+      - ./var/emf_vat_invoices:/vat_invoices
+    environment:
+      SETTINGS_FILE: ./config/kelvin.cfg
+    logging:
+      driver: journald
+
+  postgres:
+    restart: unless-stopped
+    image: 'mdillon/postgis:10'
+    volumes:
+      - /var/lib/emfweb-postgres:/var/lib/postgresql/data
+    networks:
+      - emfweb
+
+  postgres_exporter:
+    restart: unless-stopped
+    image: 'wrouesnel/postgres_exporter:v0.8.0'
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres@postgres:5432/emf_site?sslmode=disable"
+    networks:
+      - emfweb
+    ports:
+      - "9187:9187"
+
+  static:
+    restart: unless-stopped
+    image: "emfcamp/website-static:latest"
+    ports:
+      - "127.0.0.1:8081:80"
+
+networks:
+  emfweb:
+    ipam:
+      config:
+        - subnet: 172.31.0.0/16
+
