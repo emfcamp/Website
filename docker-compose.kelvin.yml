@@ -2,7 +2,7 @@ version: "3.7"
 services:
   app:
     restart: unless-stopped
-    image: "emfcamp/website:latest"
+    image: "ghcr.io/emfcamp/website:latest"
     networks:
       - emfweb
     depends_on:
@@ -37,7 +37,7 @@ services:
 
   static:
     restart: unless-stopped
-    image: "emfcamp/website-static:latest"
+    image: "ghcr.io/emfcamp/website-static:latest"
     ports:
       - "127.0.0.1:8081:80"
 
