@@ -29,6 +29,7 @@ and then run:
 
 ```
 docker-compose pull postgres
-docker-compose restart postgres
+docker-compose down -v postgres
+docker-compose up -d
 ```
 
