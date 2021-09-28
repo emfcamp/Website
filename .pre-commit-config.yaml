@@ -8,3 +8,9 @@ repos:
     rev: 3.7.9
     hooks:
       - id: flake8
+
+  - repo: git://github.com/pre-commit/pre-commit-hooks
+    rev: v3.4.0
+    hooks:
+      - id: no-commit-to-branch
+        args: ['--branch', 'master']
