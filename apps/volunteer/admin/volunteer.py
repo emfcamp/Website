@@ -5,7 +5,7 @@ from models.volunteer.volunteer import Volunteer
 
 
 class VolunteerUserModelView(VolunteerModelView):
-    can_create = True
+    can_create = False
     can_delete = False
     can_set_page_size = True
     can_view_details = True
