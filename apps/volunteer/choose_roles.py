@@ -89,14 +89,20 @@ def choose_role():
 def role(role_id):
     role = Role.query.get_or_404(role_id)
     current_volunteer = VolunteerUser.get_for_user(current_user)
+    current_role_ids = [r.id for r in current_volunteer.interested_roles]
 
     if request.method == "POST":
-        if role_id in current_volunteer.interested_roles:
-            current_volunteer.interested_roles.remove(role)
+        if int(role_id) in current_role_ids:
+            role_name = Role.query.get(role_id).name
+            flash(
+                f"You are already signed up to the {role_name} role. If you "
+                "would like to remove it, please use the form below."
+            )
         else:
             current_volunteer.interested_roles.append(role)
-        db.session.commit()
-        flash("Your role list has been updated", "info")
+            db.session.commit()
+            flash("Your role list has been updated", "info")
+
         return redirect(url_for(".choose_role"))
 
     role_description_file = role_name_to_markdown_file(role.name)
