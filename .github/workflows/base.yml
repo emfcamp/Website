@@ -5,6 +5,7 @@ on:
     branches:
       - master
     paths:
+      - '.github/workflows/base.yml'
       - 'docker/Dockerfile.base'
       - 'docker/Dockerfile.base.dockerignore'
       - 'docker/Dockerfile.base-dev'
@@ -22,13 +23,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Login
-        run: echo '${{ secrets.DOCKER_PASSWORD }}' | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build base image
-        run: docker build -t emfcamp/website-base:latest -f ./docker/Dockerfile.base .
+        run: docker build -t ghcr.io/emfcamp/website-base:latest -f ./docker/Dockerfile.base .
       - name: Publish base image
-        run: docker push emfcamp/website-base:latest
+        run: docker push ghcr.io/emfcamp/website-base:latest
       - name: Build base-dev image
-        run: docker build -t emfcamp/website-base-dev:latest -f ./docker/Dockerfile.base-dev .
+        run: docker build -t ghcr.io/emfcamp/website-base-dev:latest -f ./docker/Dockerfile.base-dev .
       - name: Publish base-dev image
-        run: docker push emfcamp/website-base-dev:latest
+        run: docker push ghcr.io/emfcamp/website-base-dev:latest
