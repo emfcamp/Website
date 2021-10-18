@@ -36,7 +36,7 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
 
     function make_row(shift) {
         var row_ele = $(document.createElement('tr'));
-            cells = [
+        const cells = [
                 make_cell(shift.end_time),
                 make_cell(shift.venue.name),
                 make_cell(shift.role.name),
@@ -131,7 +131,7 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
             ele.attr('disabled', true);
 
             $.post(shift.sign_up_url+'.json')
-             .success(make_post_callback_fn(modal_body, ele, shift.id, "alert-info"))
+             .done(make_post_callback_fn(modal_body, ele, shift.id, "alert-info"))
              .fail(make_post_callback_fn(modal_body, ele, shift.id, "alert-danger"));
         };
     }
@@ -144,7 +144,7 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
             btn_ele.attr('disabled', true);
 
             $.post(shift.sign_up_url + '.json?override_user=' + override_user)
-             .success(make_post_callback_fn(modal_body, btn_ele, shift.id, "alert-info", true))
+             .done(make_post_callback_fn(modal_body, btn_ele, shift.id, "alert-info", true))
              .fail(make_post_callback_fn(modal_body, btn_ele, shift.id, "alert-danger", true));
         };
     }
@@ -160,7 +160,7 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
                 append_ele.prepend(alert);
             }
 
-            shift = get_shift(shift_id);
+            var shift = get_shift(shift_id);
             if (resp.operation == 'add') {
                 shift.current_count++;
                 if (!override_user) {
