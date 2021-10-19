@@ -35,9 +35,11 @@
 {% endblock %}
 
 {% block foot %}
-{% assets 'https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js',
-          'https://bartaz.github.io/sandbox.js/jquery.highlight.js',
-          'https://cdn.datatables.net/plug-ins/1.10.12/features/searchHighlight/dataTables.searchHighlight.min.js' %}
-<script type="text/javascript" src="{{ ASSET_URL }}"></script>
-{% endassets %}
+
+
+<script src="{{static_url_for('static', filename="js/main.js")}}"></script>
+<script src="{{static_url_for('static', filename="js/jquery.dataTables.min.js")}}"></script>
+<script src="{{static_url_for('static', filename="js/jquery.highlight.js")}}"></script>
+<script src="{{static_url_for('static', filename="js/dataTables.searchHighlight.min.js")}}"></script>
+
 {% endblock -%}
