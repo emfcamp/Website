@@ -13,11 +13,11 @@ from apps.tickets.tasks import create_product_groups
 
 @pytest.fixture(scope="module")
 def app():
-    """ Fixture to provide an instance of the app.
-        This will also create a Flask app_context and tear it down.
+    """Fixture to provide an instance of the app.
+    This will also create a Flask app_context and tear it down.
 
-        This fixture is scoped to the module level to avoid too much
-        Postgres teardown/creation activity which is slow.
+    This fixture is scoped to the module level to avoid too much
+    Postgres teardown/creation activity which is slow.
     """
     yield from app_factory(False)
 
@@ -42,11 +42,10 @@ def app_factory(cache):
         os.mkdir(prometheus_dir)
 
     #  For test purposes we're perpetually 2 weeks into ticket sales and 10 weeks before the event.
-    fake_event_start = datetime.datetime.now() + datetime.timedelta(weeks=10)
+    now = datetime.datetime.now()
+    fake_event_start = datetime.datetime(year=now.year + 1, month=6, day=2)
     config_override = {
-        "SALES_START": (
-            datetime.datetime.now() - datetime.timedelta(weeks=2)
-        ).isoformat(),
+        "SALES_START": (fake_event_start - datetime.timedelta(weeks=12)).isoformat(),
         "EVENT_START": fake_event_start.isoformat(),
         "EVENT_END": (fake_event_start + datetime.timedelta(days=4)).isoformat(),
     }
@@ -80,26 +79,26 @@ def app_factory(cache):
 
 @pytest.fixture
 def client(app):
-    " Yield a test HTTP client for the app "
+    "Yield a test HTTP client for the app"
     yield app.test_client()
 
 
 @pytest.fixture(scope="module")
 def db(app):
-    " Yield the DB object "
+    "Yield the DB object"
     yield db_obj
 
 
 @pytest.fixture
 def request_context(app):
-    " Run the test in an app request context "
+    "Run the test in an app request context"
     with app.test_request_context("/") as c:
         yield c
 
 
 @pytest.fixture(scope="module")
 def user(db):
-    " Yield a test user. Note that this user will be identical across all tests in a module. "
+    "Yield a test user. Note that this user will be identical across all tests in a module."
     email = "test_user@example.com"
     user = User.query.filter(User.email == email).one_or_none()
     if not user:
@@ -112,7 +111,7 @@ def user(db):
 
 @pytest.fixture
 def outbox(app):
-    " Capture mail and yield the outbox. "
+    "Capture mail and yield the outbox."
     mail_obj = Mail()
     with mail_obj.record_messages() as outbox:
         yield outbox
