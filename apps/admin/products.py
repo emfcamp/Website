@@ -454,7 +454,8 @@ def product_view(view_id):
         db.session.commit()
 
     active_vouchers = Voucher.query.filter_by(view=view).filter(
-        not_(Voucher.is_expired) & not_(Voucher.is_used)
+        not_(Voucher.expiry.isnot(None) & (Voucher.expiry < func.now()))
+        & not_(Voucher.is_used)
     )
     stats = {
         "active": active_vouchers.count(),
@@ -525,7 +526,9 @@ def product_view_voucher_list(view_id):
         vouchers = vouchers.filter(not_(Voucher.is_used))
 
     if not request.args.get("expired"):
-        vouchers = vouchers.filter(not_(Voucher.is_expired))
+        vouchers = vouchers.filter(
+            not_(Voucher.expiry.isnot(None) & (Voucher.expiry < func.now()))
+        )
 
     return render_template(
         "admin/products/view-vouchers.html", view=view, vouchers=vouchers
