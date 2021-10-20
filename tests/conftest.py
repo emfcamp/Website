@@ -4,6 +4,7 @@ import os.path
 import pytest
 import shutil
 import datetime
+from freezegun import freeze_time
 from sqlalchemy import text
 from models.user import User
 from main import create_app, db as db_obj, Mail
@@ -41,19 +42,26 @@ def app_factory(cache):
     if not os.path.exists(prometheus_dir):
         os.mkdir(prometheus_dir)
 
-    #  For test purposes we're perpetually 2 weeks into ticket sales and 10 weeks before the event.
+    # For test purposes we're perpetually 2 weeks into ticket sales and 10 weeks before the event.
+    # We don't support events which span the year-end, so generate a date next year.
     now = datetime.datetime.now()
-    fake_event_start = datetime.datetime(year=now.year + 1, month=6, day=2)
+    fake_event_start = datetime.datetime(year=now.year + 1, month=6, day=2, hour=8)
     config_override = {
         "SALES_START": (fake_event_start - datetime.timedelta(weeks=12)).isoformat(),
         "EVENT_START": fake_event_start.isoformat(),
         "EVENT_END": (fake_event_start + datetime.timedelta(days=4)).isoformat(),
     }
+
+    fake_now = fake_event_start - datetime.timedelta(weeks=10)
+
     if cache:
         config_override["CACHE_TYPE"] = "simple"
 
     app = create_app(dev_server=True, config_override=config_override)
 
+    # Freeze time at fake_now
+    freezer = freeze_time(fake_now)
+    freezer.start()
     with app.app_context():
         try:
             db_obj.session.close()
@@ -75,6 +83,7 @@ def app_factory(cache):
 
         db_obj.session.close()
         db_obj.drop_all()
+    freezer.stop()
 
 
 @pytest.fixture

@@ -575,6 +575,17 @@ WTForms = "*"
 email = ["email-validator"]
 
 [[package]]
+name = "freezegun"
+version = "1.1.0"
+description = "Let your Python tests travel through time"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[package.dependencies]
+python-dateutil = ">=2.7"
+
+[[package]]
 name = "geoalchemy2"
 version = "0.9.3"
 description = "Using SQLAlchemy with Spatial Databases"
@@ -1782,7 +1793,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.9"
-content-hash = "50b1c4c33b612dbb7b2077f02dfd8a608f9db6297e8af3f09905839c1ebab376"
+content-hash = "cb7b9d6284e5be8afa0f2b7973a169ccb2436c10f3b35937d3f94f3e40a802f6"
 
 [metadata.files]
 alembic = [
@@ -2066,6 +2077,10 @@ flask-static-digest = [
 flask-wtf = [
     {file = "Flask-WTF-0.15.1.tar.gz", hash = "sha256:ff177185f891302dc253437fe63081e7a46a4e99aca61dfe086fb23e54fff2dc"},
     {file = "Flask_WTF-0.15.1-py2.py3-none-any.whl", hash = "sha256:6ff7af73458f182180906a37a783e290bdc8a3817fe4ad17227563137ca285bf"},
+]
+freezegun = [
+    {file = "freezegun-1.1.0-py2.py3-none-any.whl", hash = "sha256:2ae695f7eb96c62529f03a038461afe3c692db3465e215355e1bb4b0ab408712"},
+    {file = "freezegun-1.1.0.tar.gz", hash = "sha256:177f9dd59861d871e27a484c3332f35a6e3f5d14626f2bf91be37891f18927f3"},
 ]
 geoalchemy2 = [
     {file = "GeoAlchemy2-0.9.3-py2.py3-none-any.whl", hash = "sha256:c4bd303539a756651baff4c5a3094f7cf1f3e990a1f0bc977ff12d040fb71d08"},
