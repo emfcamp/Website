@@ -1,10 +1,8 @@
 from datetime import datetime, timedelta
 
+from models import config_date
 from models.product import ProductView, Voucher
 from models.cfp import TalkProposal
-
-YESTERDAY = datetime.utcnow() - timedelta(days=1)
-TOMORROW = datetime.utcnow() + timedelta(days=1)
 
 
 def test_product_view_accessible(db, user, monkeypatch):
@@ -50,49 +48,44 @@ def test_product_view_accessible(db, user, monkeypatch):
 
 
 def test_product_view_accessible_wrt_sales_start(db, user, monkeypatch):
-    # force SALES_START into the future
-    def sales_start_mock_future(key):
-        return TOMORROW
-
-    # Patch config_date rather than utcnow as apparently you can't patch builtins
-    monkeypatch.setattr("models.product.config_date", sales_start_mock_future)
+    sales_start = config_date("SALES_START")
 
     product_view = ProductView(name="other")
-    assert not product_view.is_accessible(
-        user
+    assert not product_view.is_accessible_at(
+        user, sales_start - timedelta(hours=1)
     ), "Default view should not be visible before SALES_START"
-
-    # force sales start into the future
-    def sales_start_mock_past(key):
-        return YESTERDAY
-
-    # Patch config_date rather than utcnow as apparently you can't patch builtins
-    monkeypatch.setattr("models.product.config_date", sales_start_mock_past)
 
     product_view = ProductView(name="other")
     assert product_view.is_accessible(
-        user
+        user, sales_start + timedelta(hours=1)
     ), "Default view should be visible after SALES_START"
 
 
 def test_product_view_accessible_voucher_expiry(db, user, monkeypatch):
-    # Vouchers should work regardless of SALES_START so set it into the future
-    def sales_start_mock_future(key):
-        return TOMORROW
-
-    # Patch config_date rather than utcnow as apparently you can't patch builtins
-    monkeypatch.setattr("models.product.config_date", sales_start_mock_future)
-
+    EXPIRED_YESTERDAY = "test1"
+    EXPIRES_TOMORROW = "test2"
     product_view = ProductView(name="other", type="ticket", vouchers_only=True)
     db.session.add(product_view)
-    db.session.add(Voucher(view=product_view, code="test1", expiry=YESTERDAY))
-    db.session.add(Voucher(view=product_view, code="test2", expiry=TOMORROW))
+    db.session.add(
+        Voucher(
+            view=product_view,
+            code=EXPIRED_YESTERDAY,
+            expiry=datetime.utcnow() - timedelta(days=1),
+        )
+    )
+    db.session.add(
+        Voucher(
+            view=product_view,
+            code=EXPIRES_TOMORROW,
+            expiry=datetime.utcnow() + timedelta(days=1),
+        )
+    )
     db.session.commit()
 
     assert not product_view.is_accessible(
-        user, voucher="test1"
+        user, voucher=EXPIRED_YESTERDAY
     ), "View should be inaccessible with expired voucher"
 
     assert product_view.is_accessible(
-        user, voucher="test2"
+        user, voucher=EXPIRES_TOMORROW
     ), "View should be accessible with in-date voucher"

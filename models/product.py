@@ -402,7 +402,6 @@ class Voucher(db.Model):
     tickets_remaining = db.Column(db.Integer, nullable=False, server_default="2")
 
     is_used = column_property((purchases_remaining == 0) | (tickets_remaining == 0))
-    is_expired = column_property(expiry.isnot(None) & (expiry < datetime.now()))
 
     @classmethod
     def get_by_code(cls, code):
@@ -433,6 +432,10 @@ class Voucher(db.Model):
             self.code = code
         else:
             self.code = random_voucher()
+
+    @property
+    def is_expired(self):
+        return self.expiry is not None and self.expiry < datetime.utcnow()
 
     def check_capacity(self, basket):
         """ Check if there is enough capacity in this voucher to buy
@@ -545,7 +548,7 @@ class ProductView(db.Model):
             return None
         return ProductView.query.filter_by(name=name).one_or_none()
 
-    def is_accessible(self, user, voucher=None):
+    def is_accessible_at(self, user, dt, voucher=None):
         " Whether this ProductView is accessible to a user."
         if user.is_authenticated and user.has_permission("admin"):
             # Admins always have access
@@ -557,7 +560,7 @@ class ProductView(db.Model):
                 return True
             return False
 
-        if not self.vouchers_only and datetime.utcnow() < config_date("SALES_START"):
+        if not self.vouchers_only and dt < config_date("SALES_START"):
             return False
 
         if self.vouchers_only:
@@ -572,6 +575,9 @@ class ProductView(db.Model):
             return voucher_obj.is_accessible(voucher)
 
         return True
+
+    def is_accessible(self, user, voucher=None):
+        return self.is_accessible_at(user, datetime.utcnow(), voucher=voucher)
 
     def __repr__(self):
         return "<ProductView: %s>" % self.name
