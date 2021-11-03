@@ -25,7 +25,10 @@ def webhook(type=None):
 @csrf.exempt
 @payments.route("/transferwise-webhook", methods=["POST"])
 def transferwise_webhook():
-    valid_signature = verify_signature(request.data, request.headers["X-Signature"],)
+    valid_signature = verify_signature(
+        request.data,
+        request.headers["X-Signature"],
+    )
     if not valid_signature:
         logger.exception("Error verifying TransferWise webhook signature")
         abort(400)

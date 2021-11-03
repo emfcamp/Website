@@ -56,8 +56,8 @@ def webhook(type=None):
 
 
 def stripe_start(payment):
-    """ This is called by the ticket flow to initialise the payment and
-        redirect to the capture page. We don't need to do anything here."""
+    """This is called by the ticket flow to initialise the payment and
+    redirect to the capture page. We don't need to do anything here."""
     logger.info("Starting Stripe payment %s", payment.id)
     db.session.commit()
 
@@ -67,9 +67,9 @@ def stripe_start(payment):
 @payments.route("/pay/stripe/<int:payment_id>/capture")
 @login_required
 def stripe_capture(payment_id):
-    """ This endpoint displays the card payment form, including the Stripe payment element.
-        Card details are validated and submitted to Stripe by XHR, and if it succeeds
-        a POST is sent back, which is received by the next endpoint.
+    """This endpoint displays the card payment form, including the Stripe payment element.
+    Card details are validated and submitted to Stripe by XHR, and if it succeeds
+    a POST is sent back, which is received by the next endpoint.
     """
     payment = lock_user_payment_or_abort(payment_id, "stripe", valid_states=["new"])
 
@@ -107,9 +107,9 @@ def stripe_capture(payment_id):
 @payments.route("/pay/stripe/<int:payment_id>/capture", methods=["POST"])
 @login_required
 def stripe_capture_post(payment_id):
-    """ The user is sent here after the payment has succeeded in the browser.
-        We set the payment state to charging, but we're expecting a webhook to
-        set it to "paid" almost immediately.
+    """The user is sent here after the payment has succeeded in the browser.
+    We set the payment state to charging, but we're expecting a webhook to
+    set it to "paid" almost immediately.
     """
     payment = lock_user_payment_or_abort(payment_id, "stripe")
     if payment.state == "new":
@@ -193,7 +193,7 @@ def stripe_webhook():
 
 @webhook()
 def stripe_default(_type, _obj):
-    """ Default webhook handler """
+    """Default webhook handler"""
     return ("", 200)
 
 
@@ -203,8 +203,8 @@ def stripe_ping(_type, _obj):
 
 
 def stripe_update_payment(payment: StripePayment, intent: stripe.PaymentIntent = None):
-    """ Update a Stripe payment.
-        If a PaymentIntent object is not passed in, this will fetch the payment details from the Stripe API.
+    """Update a Stripe payment.
+    If a PaymentIntent object is not passed in, this will fetch the payment details from the Stripe API.
     """
     if intent is None:
         intent = stripe.PaymentIntent.retrieve(payment.intent_id)
@@ -387,7 +387,7 @@ def stripe_charge_refunded(_type, charge):
 
 
 def stripe_validate():
-    """ Validate Stripe is configured and operational """
+    """Validate Stripe is configured and operational"""
     result = []
     sk = app.config.get("STRIPE_SECRET_KEY", "")
     if len(sk) > 15 and sk.startswith("sk_"):

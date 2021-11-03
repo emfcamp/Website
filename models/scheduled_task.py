@@ -65,7 +65,7 @@ class ScheduledTaskResult(db.Model):
 
     @classmethod
     def cleanup(cls):
-        """ Delete results older than a week """
+        """Delete results older than a week"""
         cls.query.filter(
             cls.start_time < pendulum.now() - pendulum.duration(days=7)
         ).delete()

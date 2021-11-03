@@ -201,14 +201,14 @@ class BulkVoucherEmailForm(Form):
 
 
 class IssueTicketsInitialForm(Form):
-    " Initial form to ask for email "
+    "Initial form to ask for email"
     email = EmailField("Email address")
     issue_free = SubmitField("Issue Free Ticket")
     reserve = SubmitField("Reserve Ticket for Payment")
 
 
 class TicketAmountForm(Form):
-    " Sub-form for selecting the number for a specific ticket"
+    "Sub-form for selecting the number for a specific ticket"
     amount = IntegerSelectField("Number of tickets", [Optional()])
     tier_id = HiddenIntegerField("Price tier", [DataRequired()])
 

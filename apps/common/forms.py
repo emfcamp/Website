@@ -12,10 +12,10 @@ import re
 
 
 class EmailField(StringField):
-    """ HTML5 email field using the email_validator package to perform
-        enhanced email validation.
+    """HTML5 email field using the email_validator package to perform
+    enhanced email validation.
 
-        You don't need to provide additional validators to this field.
+    You don't need to provide additional validators to this field.
     """
 
     widget = EmailInput()
@@ -116,11 +116,11 @@ class StaticField(StringField):
 
 class Form(FlaskForm):
     def hidden_tag_without(self, *exclude_fields):
-        """ Return the hidden fields for this form, excluding the fields listed in
-            `exclude_fields`
+        """Return the hidden fields for this form, excluding the fields listed in
+        `exclude_fields`
 
-            We use this to render all the hidden fields in the form except for the
-            CSRF token, for reasons which are currently unclear to me.
+        We use this to render all the hidden fields in the form except for the
+        CSRF token, for reasons which are currently unclear to me.
         """
         fields = [
             getattr(self, f) if isinstance(f, string_types) and hasattr(self, f) else f

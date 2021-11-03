@@ -54,7 +54,7 @@ admin_required = require_permission("admin")  # Decorator to require admin permi
 
 @admin.before_request
 def admin_require_permission():
-    """ Require admin permission for everything under /admin """
+    """Require admin permission for everything under /admin"""
     if not current_user.is_authenticated or not current_user.has_permission("admin"):
         abort(404)
 

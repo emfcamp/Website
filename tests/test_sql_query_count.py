@@ -29,7 +29,7 @@ class QueryLog:
 
 @pytest.mark.parametrize("url,queries", [("/tickets", 2), ("/", 0)])
 def test_query_count(app_with_cache, url, queries):
-    """ Test how many SQL queries a page generates. """
+    """Test how many SQL queries a page generates."""
     client = app_with_cache.test_client()
     client.get(url)  # Initial fetch to fill caches
 

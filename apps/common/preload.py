@@ -29,8 +29,8 @@ def get_link_type(url):
 
 
 def static_url_for(endpoint, **values):
-    """ Intercept static_url_for calls and store them in the
-        request context to allow preload header to be added for HTTP/2 push.
+    """Intercept static_url_for calls and store them in the
+    request context to allow preload header to be added for HTTP/2 push.
     """
     if "static_urls" not in g:
         g.static_urls = {}
@@ -49,7 +49,7 @@ def init_preload(app_obj):
 
     @app_obj.after_request
     def static_urls_to_preload(response):
-        """ Collect static URLs and send in Link header for preloading and HTTP/2 push """
+        """Collect static URLs and send in Link header for preloading and HTTP/2 push"""
         if "static_urls" not in g:
             return response
 

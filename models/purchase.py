@@ -27,7 +27,7 @@ class CheckinStateException(Exception):
 
 
 class Purchase(db.Model):
-    """ A Purchase. This could be a ticket or an item of merchandise. """
+    """A Purchase. This could be a ticket or an item of merchandise."""
 
     __tablename__ = "purchase"
     __versioned__ = {"exclude": ["is_ticket", "is_paid_for"]}
@@ -193,16 +193,16 @@ class Purchase(db.Model):
 
 
 class Ticket(Purchase):
-    """ A ticket, which is a specific type of purchase, but with different vocabulary.
+    """A ticket, which is a specific type of purchase, but with different vocabulary.
 
-        This can either be an admission ticket or a parking/camping ticket.
+    This can either be an admission ticket or a parking/camping ticket.
     """
 
     __mapper_args__ = {"polymorphic_identity": "ticket"}
 
 
 class AdmissionTicket(Ticket):
-    """ A ticket that can contribute to the licensed capacity and be issued a badge. """
+    """A ticket that can contribute to the licensed capacity and be issued a badge."""
 
     checked_in = db.Column(db.Boolean, default=False)
     badge_issued = db.Column(db.Boolean, default=False)
@@ -243,7 +243,7 @@ class AdmissionTicket(Ticket):
 
 
 class PurchaseTransfer(db.Model):
-    """ A record of a purchase being transferred from one user to another. """
+    """A record of a purchase being transferred from one user to another."""
 
     __tablename__ = "purchase_transfer"
     id = db.Column(db.Integer, primary_key=True)

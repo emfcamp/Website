@@ -8,7 +8,7 @@ from models.scheduled_task import scheduled_task
 
 @scheduled_task(minutes=1)
 def send_emails():
-    """ Send queued emails """
+    """Send queued emails"""
     count = 0
     with mail.connect() as conn:
         for rec in EmailJobRecipient.query.filter(

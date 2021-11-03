@@ -544,7 +544,7 @@ class Proposal(db.Model):
         return len(messages)
 
     def has_ticket(self):
-        " Does the submitter have a ticket? "
+        "Does the submitter have a ticket?"
         admission_tickets = len(
             list(self.user.get_owned_tickets(paid=True, type="admission_ticket"))
         )

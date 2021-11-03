@@ -54,9 +54,9 @@ def one_or_none(result):
 
 
 class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
-    """ Represents a logical group of products.
+    """Represents a logical group of products.
 
-        Capacity and attributes on a ProductGroup cascade down to the products within it.
+    Capacity and attributes on a ProductGroup cascade down to the products within it.
     """
 
     __tablename__ = "product_group"
@@ -97,14 +97,14 @@ class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
 
     @validates("capacity_max")
     def validate_capacity_max(self, _, capacity_max):
-        """ Validate the following rules for ProductGroup capacity on allocation-level
-            ProductGroups:
+        """Validate the following rules for ProductGroup capacity on allocation-level
+        ProductGroups:
 
-            - If a parent ProductGroup has a max capacity set, either all child ProductGroups
-                must have it set, or they must all be None.
+        - If a parent ProductGroup has a max capacity set, either all child ProductGroups
+            must have it set, or they must all be None.
 
-            - The sum of child ProductGroup capacities cannot exceed the parent
-                ProductGroup capacity.
+        - The sum of child ProductGroup capacities cannot exceed the parent
+            ProductGroup capacity.
         """
 
         if (
@@ -147,10 +147,10 @@ class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
 
     @property
     def unallocated_capacity(self):
-        """ If this is an allocation-level ProductGroup (i.e. it has a capacity_max
-            set, and all childen also do), return the total unallocated capacity.
+        """If this is an allocation-level ProductGroup (i.e. it has a capacity_max
+        set, and all childen also do), return the total unallocated capacity.
 
-            Otherwise, return None.
+        Otherwise, return None.
         """
 
         if (
@@ -184,7 +184,7 @@ class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
 
 
 class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
-    """ A product (ticket or other item) which is for sale. """
+    """A product (ticket or other item) which is for sale."""
 
     id = db.Column(db.Integer, primary_key=True)
     group_id = db.Column(db.Integer, db.ForeignKey(ProductGroup.id), nullable=False)
@@ -231,8 +231,8 @@ class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
         return price
 
     def is_adult_ticket(self):
-        """ Whether this is an adult ticket.
-            We use this for vouchers.
+        """Whether this is an adult ticket.
+        We use this for vouchers.
         """
         # FIXME: Make this less awful, we need a less brittle way of detecting this
         return self.parent.type == "admissions" and self.name.startswith("full")
@@ -255,12 +255,12 @@ class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
 class PriceTier(db.Model, CapacityMixin):
     """A pricing level for a Product.
 
-        PriceTiers have a capacity and an expiry through the CapacityMixin.
-        They have one Price object per currency.
+    PriceTiers have a capacity and an expiry through the CapacityMixin.
+    They have one Price object per currency.
 
-        In theory PriceTiers could cascade based on price, but this is problematic
-        with popular products as we need to update the customer each time.
-        For now, only one PriceTier is active (unexpired) per Product at once.
+    In theory PriceTiers could cascade based on price, but this is problematic
+    with popular products as we need to update the customer each time.
+    For now, only one PriceTier is active (unexpired) per Product at once.
     """
 
     id = db.Column(db.Integer, primary_key=True)
@@ -306,7 +306,7 @@ class PriceTier(db.Model, CapacityMixin):
 
     @property
     def unused(self):
-        """ Whether this tier is unused and can be safely deleted. """
+        """Whether this tier is unused and can be safely deleted."""
         return self.purchase_count == 0 and not self.active
 
     def get_price(self, currency):
@@ -341,9 +341,9 @@ class PriceTier(db.Model, CapacityMixin):
 
 
 class Price(db.Model):
-    """ Represents the price of a product, at a given price tier, in a given currency.
+    """Represents the price of a product, at a given price tier, in a given currency.
 
-        Prices are immutable and should not be changed. We expire the PriceTier instead.
+    Prices are immutable and should not be changed. We expire the PriceTier instead.
     """
 
     __tablename__ = "price"
@@ -438,8 +438,8 @@ class Voucher(db.Model):
         return self.expiry is not None and self.expiry < datetime.utcnow()
 
     def check_capacity(self, basket):
-        """ Check if there is enough capacity in this voucher to buy
-            the tickets in the provided basket.
+        """Check if there is enough capacity in this voucher to buy
+        the tickets in the provided basket.
         """
         if self.purchases_remaining < 1:
             return False
@@ -453,7 +453,7 @@ class Voucher(db.Model):
         return True
 
     def consume_capacity(self, payment):
-        """ Decrease the voucher's capacity based on tickets in a payment. """
+        """Decrease the voucher's capacity based on tickets in a payment."""
         if self.purchases_remaining < 1:
             raise VoucherUsedError(
                 f"Attempting to use voucher with no remaining purchases: {self}"
@@ -477,7 +477,7 @@ class Voucher(db.Model):
         self.tickets_remaining = Voucher.tickets_remaining - adult_tickets
 
     def return_capacity(self, payment):
-        """ Return capacity to this voucher based on tickets in a payment. """
+        """Return capacity to this voucher based on tickets in a payment."""
         adult_tickets = len(
             [
                 purchase
@@ -513,7 +513,7 @@ class Voucher(db.Model):
 
 
 class ProductView(db.Model):
-    """ A selection of products to be shown together for sale. """
+    """A selection of products to be shown together for sale."""
 
     __table_name__ = "product_view"
 
@@ -549,7 +549,7 @@ class ProductView(db.Model):
         return ProductView.query.filter_by(name=name).one_or_none()
 
     def is_accessible_at(self, user, dt, voucher=None):
-        " Whether this ProductView is accessible to a user."
+        "Whether this ProductView is accessible to a user."
         if user.is_authenticated and user.has_permission("admin"):
             # Admins always have access
             return True

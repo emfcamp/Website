@@ -28,15 +28,15 @@ from . import tickets, empty_baskets, no_capacity, invalid_vouchers, get_product
 @tickets.route("/tickets", methods=["GET", "POST"])
 @tickets.route("/tickets/<flow>", methods=["GET", "POST"])
 def main(flow="main"):
-    """ The main tickets page. This lets the user choose which tickets to buy,
-        creates a basket for them and then adds the tickets to their basket.
+    """The main tickets page. This lets the user choose which tickets to buy,
+    creates a basket for them and then adds the tickets to their basket.
 
-        At this point tickets are reserved, and the user is passed on to `/tickets/pay`
-        to enter their user details and choose a payment method.
+    At this point tickets are reserved, and the user is passed on to `/tickets/pay`
+    to enter their user details and choose a payment method.
 
-        The `flow` parameter dictates which ProductView to display on this page,
-        allowing us to have different categories of items on sale, for example tickets
-        on one page, and t-shirts on a separate page.
+    The `flow` parameter dictates which ProductView to display on this page,
+    allowing us to have different categories of items on sale, for example tickets
+    on one page, and t-shirts on a separate page.
     """
     # Fetch the ProductView and determine if this user is allowed to view it.
     view = get_product_view(flow)
@@ -223,10 +223,10 @@ def handle_ticket_selection(form, view, flow, basket):
 
 
 def handle_free_tickets(flow, view, basket):
-    """ The user is trying to "buy" only free tickets.
+    """The user is trying to "buy" only free tickets.
 
-        This is effectively a payment stage, handled differently
-        from the rest of the flow.
+    This is effectively a payment stage, handled differently
+    from the rest of the flow.
     """
     # They must be authenticated for this.
     if not current_user.is_authenticated:
@@ -291,8 +291,8 @@ def tickets_clear(flow=None):
 @tickets.route("/tickets/voucher/<voucher_code>")
 def tickets_voucher(voucher_code=None):
     """
-        A user reaches this endpoint if they're sent a voucher code by email.
-        Set up the voucher details in the session and redirect them to choose their tickets.
+    A user reaches this endpoint if they're sent a voucher code by email.
+    Set up the voucher details in the session and redirect them to choose their tickets.
     """
     voucher = Voucher.get_by_code(voucher_code)
     if voucher is None:

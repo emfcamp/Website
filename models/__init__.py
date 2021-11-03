@@ -18,7 +18,7 @@ def event_start():
 
 
 def event_year():
-    """ Year of the current event """
+    """Year of the current event"""
     return event_start().year
 
 
@@ -47,7 +47,7 @@ def count_groups(query, *entities):
 
 
 def nest_count_keys(rows):
-    """ For JSON's sake, because it doesn't support tuples as keys """
+    """For JSON's sake, because it doesn't support tuples as keys"""
     tree = OrderedDict()
     for c, *key in rows:
         node = tree
@@ -59,7 +59,7 @@ def nest_count_keys(rows):
 
 
 def bucketise(vals, boundaries):
-    """ Sort values into bins, like pandas.cut """
+    """Sort values into bins, like pandas.cut"""
     ranges = [
         "%s-%s" % (a, b - 1) if isinstance(b, int) and b - 1 > a else str(a)
         for a, b in zip(boundaries[:-1], boundaries[1:])

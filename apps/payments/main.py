@@ -61,9 +61,9 @@ class RefundRequestForm(Form):
 
 
 def validate_bank_details(form, currency):
-    """ Transferwise can't validate sort code and account number.
-        GoCardless can't validate BIC and IBAN.
-        Use both.
+    """Transferwise can't validate sort code and account number.
+    GoCardless can't validate BIC and IBAN.
+    Use both.
     """
     app.logger.info("Validating bank details")
     if currency == "GBP":

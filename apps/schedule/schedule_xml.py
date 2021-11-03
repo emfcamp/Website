@@ -102,7 +102,9 @@ def add_event(room, event):
     _add_sub_with_text(event_node, "description", "")
 
     _add_sub_with_text(
-        event_node, "slug", "emf%s-%s-%s" % (event_year(), event["id"], event["slug"]),
+        event_node,
+        "slug",
+        "emf%s-%s-%s" % (event_year(), event["id"], event["slug"]),
     )
 
     _add_sub_with_text(event_node, "subtitle", "")

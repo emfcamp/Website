@@ -28,7 +28,7 @@ class TicketAmountForm(Form):
 
 
 class TicketAmountsForm(Form):
-    """ The main ticket selection form """
+    """The main ticket selection form"""
 
     tiers = FieldList(FormField(TicketAmountForm))
     buy_tickets = SubmitField("Buy Tickets")
@@ -42,7 +42,7 @@ class TicketAmountsForm(Form):
         super().__init__()
 
     def _get_price_tiers(_self, products):
-        """ Get the price tiers we want to show in this form """
+        """Get the price tiers we want to show in this form"""
         # Order of tiers is important, but dict is ordered these days
         tiers = {}
         for product in products:
@@ -59,11 +59,11 @@ class TicketAmountsForm(Form):
         return tiers
 
     def populate(form, basket):
-        """ Populate the form with price tiers, with the amount pre-filled from
-            the user's basket.
+        """Populate the form with price tiers, with the amount pre-filled from
+        the user's basket.
 
-            This is only called when the form is initially generated, not when it's
-            submitted (as the tiers in the form already exist then).
+        This is only called when the form is initially generated, not when it's
+        submitted (as the tiers in the form already exist then).
         """
         for pt_id, tier in form._tiers.items():
             form.tiers.append_entry()
@@ -74,8 +74,8 @@ class TicketAmountsForm(Form):
 
     def ensure_capacity(form, basket):
         """
-            This function updates the products on the form based on the current capacity
-            so it will fail to validate if the requested ticket capacity is now unavailable.
+        This function updates the products on the form based on the current capacity
+        so it will fail to validate if the requested ticket capacity is now unavailable.
         """
         # Whether submitted or not, update the allowed amounts before validating
         capacity_available = True
@@ -98,7 +98,7 @@ class TicketAmountsForm(Form):
         return capacity_available
 
     def add_to_basket(form, basket):
-        """ Add selected tickets to the provided basket. """
+        """Add selected tickets to the provided basket."""
         for f in form.tiers:
             pt = f._tier
             if f.amount.data != basket.get(pt, 0):

@@ -16,7 +16,7 @@ from .fake import FakeDataGenerator
 @dev_cli.command("data")
 @click.pass_context
 def dev_data(ctx):
-    """ Make all categories of fake data for dev"""
+    """Make all categories of fake data for dev"""
     ctx.invoke(fake_data)
     ctx.invoke(volunteer_data)
     ctx.invoke(volunteer_shifts)
@@ -24,14 +24,14 @@ def dev_data(ctx):
 
 @dev_cli.command("cfp_data")
 def fake_data():
-    """ Make fake users, proposals, locations, etc """
+    """Make fake users, proposals, locations, etc"""
     fdg = FakeDataGenerator()
     fdg.run()
 
 
 @dev_cli.command("volunteer_data")
 def volunteer_data():
-    """ Make fake volunteer system data """
+    """Make fake volunteer system data"""
     venue_list = [
         {
             "name": "Badge Tent",
@@ -181,7 +181,7 @@ def volunteer_data():
 
 @dev_cli.command("volunteer_shifts")
 def volunteer_shifts():
-    """ Make fake volunteer shifts """
+    """Make fake volunteer shifts"""
     # First = first start time. Final = end of last shift
     shift_list = {
         # 'Tent' roles

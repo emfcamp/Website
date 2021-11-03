@@ -9,7 +9,7 @@ from models.scheduled_task import execute_scheduled_tasks
 
 @app.cli.command("periodic")
 def periodic():
-    """ Execute periodic scheduled tasks """
+    """Execute periodic scheduled tasks"""
     execute_scheduled_tasks()
 
 
@@ -24,7 +24,7 @@ def periodic():
     help="Create a new user with this e-mail and make them an admin",
 )
 def make_admin(user_id, email):
-    """ Make a user in the DB an admin """
+    """Make a user in the DB an admin"""
     if email:
         user = User(email, "Initial Admin User")
         db.session.add(user)
@@ -46,7 +46,7 @@ def make_admin(user_id, email):
 
 @app.cli.command("create_perms")
 def create_perms():
-    """ Create permissions in DB if they don't exist """
+    """Create permissions in DB if they don't exist"""
     for permission in (
         "admin",
         "arrivals",

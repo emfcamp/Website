@@ -35,7 +35,7 @@ VALID_STATES = {
 
 
 def calc_site_state(date):
-    """ Logic to set the state of the homepage based on date. """
+    """Logic to set the state of the homepage based on date."""
     if date < config_date("SALES_START"):
         return "before-sales"
     elif date < config_date("EVENT_START"):

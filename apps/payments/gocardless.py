@@ -462,8 +462,8 @@ def gocardless_webhook_default(resource, action, event):
 @webhook("mandates", "expired")
 @webhook("mandates", "replaced")
 def gocardless_webhook_mandate_ignore(resource, action, event):
-    """ Ignore mandate-related noise
-        https://developer.gocardless.com/api-reference/#events-mandate-actions
+    """Ignore mandate-related noise
+    https://developer.gocardless.com/api-reference/#events-mandate-actions
     """
     mandate = event["links"]["mandate"]
     logger.info("Received %s action for mandate %s", action, mandate)
@@ -722,7 +722,7 @@ def gocardless_payment_charged_back(payment):
 
 
 def gocardless_validate():
-    """ Validate that GoCardless is configured and operational"""
+    """Validate that GoCardless is configured and operational"""
     result = []
 
     env = app.config.get("GOCARDLESS_ENVIRONMENT")

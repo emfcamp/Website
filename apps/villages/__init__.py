@@ -12,7 +12,7 @@ villages = Blueprint("villages", __name__)
 
 
 def load_village(year, village_id, require_admin=False):
-    """ Helper to return village or 404 """
+    """Helper to return village or 404"""
     if year != event_year():
         abort(404)
 

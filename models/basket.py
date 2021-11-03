@@ -158,8 +158,8 @@ class Basket(MutableMapping):
         self.load_purchases(purchases)
 
     def create_purchases(self):
-        """ Generate the necessary Purchases for this basket,
-            checking capacity from when the objects were loaded. """
+        """Generate the necessary Purchases for this basket,
+        checking capacity from when the objects were loaded."""
 
         user = self.user
         if user.is_anonymous:
