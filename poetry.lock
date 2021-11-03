@@ -1326,7 +1326,7 @@ version = "1.58"
 description = "Pure python memcached client"
 category = "main"
 optional = false
-python-versions = ">=3.7,<4.0"
+python-versions = "*"
 
 [package.dependencies]
 six = ">=1.4.0"
@@ -1785,8 +1785,9 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
-content-hash = "817da5c7c910d77d3d75219642f4cdb970cd127c3d47c51aa16187067c7e65ec"
-python-versions = "~3.7"
+lock-version = "1.1"
+python-versions = "~3.9"
+content-hash = "cb7b9d6284e5be8afa0f2b7973a169ccb2436c10f3b35937d3f94f3e40a802f6"
 
 [metadata.files]
 alembic = [
@@ -2794,10 +2795,6 @@ python-levenshtein = [
 ]
 python-memcached = [
     {file = "python-memcached-1.58.tar.gz", hash = "sha256:2775829cb54b9e4c5b3bbd8028680f0c0ab695db154b9c46f0f074ff97540eb6"},
-]
-pytransferwise = [
-    {file = "pytransferwise-0.1.2-py3-none-any.whl", hash = "sha256:470ce035c099cdb9287ba8ae9e9ee7653b9fc803516935e5eed8a38083ca5ee4"},
-    {file = "pytransferwise-0.1.2.tar.gz", hash = "sha256:637977809a7492965fcd1febbca7920a6b48794bb9e88d3f3adfd46c52dd5350"},
 ]
 pytz = [
     {file = "pytz-2021.3-py2.py3-none-any.whl", hash = "sha256:3672058bc3453457b622aab7a1c3bfd5ab0bdae451512f6cf25f64ed37f5b87c"},
