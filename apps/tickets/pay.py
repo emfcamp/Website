@@ -32,9 +32,9 @@ from . import tickets, price_changed, empty_baskets, get_product_view
 @tickets.route("/tickets/pay/<flow>", methods=["GET", "POST"])
 def pay(flow="main"):
     """
-        The user is sent here once they've added tickets to their basket.
-        This view collects users details, offers payment options, and then
-        starts the correct payment flow in the payment app.
+    The user is sent here once they've added tickets to their basket.
+    This view collects users details, offers payment options, and then
+    starts the correct payment flow in the payment app.
     """
     view = get_product_view(flow)
 

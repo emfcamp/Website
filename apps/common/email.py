@@ -37,7 +37,9 @@ def preview_email(preview_address, subject, body):
 
 def enqueue_emails(users, subject, body):
     job = EmailJob(
-        subject, format_plaintext_email(body), format_html_email(body, subject),
+        subject,
+        format_plaintext_email(body),
+        format_html_email(body, subject),
     )
     db.session.add(job)
 

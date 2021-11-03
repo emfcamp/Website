@@ -13,7 +13,7 @@ from . import cfp
 
 @cfp.cli.command("create_venues")
 def create_venues():
-    """ Create venues defined in code """
+    """Create venues defined in code"""
     venues = [
         ("Stage A", ["talk"], 100, (52.0396099, -2.377866)),
         ("Stage B", ["talk", "performance"], 99, (52.0418968, -2.3766391)),
@@ -48,7 +48,7 @@ def create_venues():
 
 @cfp.cli.command("set_rough_durations")
 def set_rough_durations():
-    """ Assign durations to proposals based on the proposed length. """
+    """Assign durations to proposals based on the proposed length."""
     scheduler = Scheduler()
     scheduler.set_rough_durations()
 
@@ -58,7 +58,7 @@ def set_rough_durations():
     "-p", "--persist", is_flag=True, help="Persist changes rather than doing a dry run"
 )
 def run_schedule(persist):
-    """ Run the schedule constraint solver. This can take a while. """
+    """Run the schedule constraint solver. This can take a while."""
     scheduler = Scheduler()
     scheduler.run(persist)
 

@@ -291,8 +291,8 @@ class DeleteRefundRequestForm(Form):
 
 @admin.route("/payment/requested-refunds/<int:req_id>/delete", methods=["GET", "POST"])
 def delete_refund_request(req_id):
-    """ Delete a refund request. This can only be called if the payment is in the
-        refund-requested state, or if it's "refunded" but with a 100% donation. """
+    """Delete a refund request. This can only be called if the payment is in the
+    refund-requested state, or if it's "refunded" but with a 100% donation."""
     req = RefundRequest.query.get_or_404(req_id)
 
     # TODO: this does not handle partial refunds!
@@ -327,8 +327,8 @@ class ManualRefundForm(Form):
 
 @admin.route("/payment/<int:payment_id>/manual-refund", methods=["GET", "POST"])
 def manual_refund(payment_id):
-    """ Mark an entire payment as refunded for book-keeping purposes.
-        Doesn't actually take any steps to return money to the user. """
+    """Mark an entire payment as refunded for book-keeping purposes.
+    Doesn't actually take any steps to return money to the user."""
 
     # TODO: this is old! We should move manual refund handling to the other refund endpoint for consistency.
 

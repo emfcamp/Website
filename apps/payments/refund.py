@@ -18,7 +18,7 @@ class ManualRefundRequired(RefundException):
 def create_stripe_refund(
     payment: StripePayment, amount: Decimal, metadata: dict = {}
 ) -> StripeRefund:
-    """ Initiate a stripe refund, and return the StripeRefund object. """
+    """Initiate a stripe refund, and return the StripeRefund object."""
     # TODO: This should probably live in the stripe module.
     assert amount > 0
     charge = stripe.Charge.retrieve(payment.charge_id)
@@ -60,16 +60,16 @@ def send_refund_email(request: RefundRequest, amount: Decimal) -> None:
 
 
 def handle_refund_request(request: RefundRequest) -> None:
-    """ Automatically process a refund request if possible.
+    """Automatically process a refund request if possible.
 
-        Current limitations:
-            - Only supports Stripe (so far)
-            - Issues a full refund (minus donation) for every refund request without a note.
-              We need to add a way for people to request which tickets to partially refund.
-              (issue #900)
-            - Only refunds in the currency of payment.
+    Current limitations:
+        - Only supports Stripe (so far)
+        - Issues a full refund (minus donation) for every refund request without a note.
+          We need to add a way for people to request which tickets to partially refund.
+          (issue #900)
+        - Only refunds in the currency of payment.
 
-        Will raise a ManualRefundRequired exception if a payment cannot be automatically refunded.
+    Will raise a ManualRefundRequired exception if a payment cannot be automatically refunded.
     """
     payment = request.payment
 
@@ -112,7 +112,7 @@ def handle_refund_request(request: RefundRequest) -> None:
 
 
 def manual_bank_refund(request: RefundRequest) -> None:
-    """ Mark a refund request as manually refunded by bank transfer. """
+    """Mark a refund request as manually refunded by bank transfer."""
     payment = request.payment
 
     payment.lock()

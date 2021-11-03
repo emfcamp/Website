@@ -174,7 +174,7 @@ def favourites():
     "/schedule/<int:year>/<int:proposal_id>-<slug>", methods=["GET", "POST"]
 )
 def item(year, proposal_id, slug=None):
-    """ Display a detail page for a schedule item """
+    """Display a detail page for a schedule item"""
     if year == event_year():
         return item_current(year, proposal_id, slug)
     else:
@@ -182,7 +182,7 @@ def item(year, proposal_id, slug=None):
 
 
 def item_current(year, proposal_id, slug=None):
-    """ Display a detail page for a talk from the current event """
+    """Display a detail page for a talk from the current event"""
     proposal = Proposal.query.get_or_404(proposal_id)
     if proposal.state not in ("accepted", "finished"):
         abort(404)

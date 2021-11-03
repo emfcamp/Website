@@ -16,9 +16,9 @@ from models.cfp import (
 
 
 class Scheduler(object):
-    """ Automatic Scheduler
+    """Automatic Scheduler
 
-        This class handles scheduling operations by using the SlotMachine constraint solving scheduler.
+    This class handles scheduling operations by using the SlotMachine constraint solving scheduler.
     """
 
     def set_rough_durations(self):

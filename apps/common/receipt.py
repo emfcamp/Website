@@ -7,6 +7,7 @@ from pyppeteer.launcher import launch
 import barcode
 from barcode.writer import ImageWriter, SVGWriter
 import segno
+from segno import helpers
 
 from main import external_url
 from models import event_year
@@ -103,17 +104,48 @@ def make_qrfile(data, **kwargs):
     return qrfile
 
 
+def make_epc_qrfile(payment, **kwargs):
+    qrfile = io.BytesIO()
+    qr = helpers.make_epc_qr(
+        name="Electromagnetic Field Ltd",
+        iban="GB21BARC20716472954433",
+        amount=payment.amount,
+        reference=payment.bankref,
+        encoding=1,
+    )
+    qr.save(qrfile, **kwargs)
+    qrfile.seek(0)
+    return qrfile
+
+
+def qrfile_to_svg(qrfile):
+    return Markup(qrfile.getvalue().decode("utf-8"))
+
+
 def format_inline_qr(data):
-    qrfile = make_qrfile(data, kind="svg", svgclass=None)
+    qrfile = make_qrfile(
+        data,
+        kind="svg",
+        svgclass=None,
+        omitsize=True,
+        xmldecl=False,
+        svgns=False,
+        nl=False,
+    )
+    return qrfile_to_svg(qrfile)
 
-    root = etree.XML(qrfile.read())
-    # Allow us to scale it with CSS
-    root.attrib["viewBox"] = "0 0 %s %s" % (root.attrib["width"], root.attrib["height"])
-    del root.attrib["width"]
-    del root.attrib["height"]
-    root.attrib["preserveAspectRatio"] = "none"
 
-    return Markup(etree.tostring(root).decode("utf-8"))
+def format_inline_epc_qr(payment):
+    qrfile = make_epc_qrfile(
+        payment,
+        kind="svg",
+        svgclass=None,
+        omitsize=True,
+        xmldecl=False,
+        svgns=False,
+        nl=False,
+    )
+    return qrfile_to_svg(qrfile)
 
 
 def make_qr_png(url):

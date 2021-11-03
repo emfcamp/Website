@@ -17,7 +17,7 @@ def create_bank_accounts_cmd():
 
 
 def create_bank_accounts():
-    """ Create bank accounts if they don't exist """
+    """Create bank accounts if they don't exist"""
     gbp = BankAccount(
         sort_code="102030",
         acct_id="40506070",
@@ -58,7 +58,7 @@ def create_bank_accounts():
 @base.cli.command("loadofx")
 @click.argument("ofx_file", type=click.File("r"))
 def load_ofx(ofx_file):
-    """ Import an OFX bank statement file """
+    """Import an OFX bank statement file"""
     ofx = ofxparse.OfxParser.parse(ofx_file)
 
     acct_id = ofx.account.account_id

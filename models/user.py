@@ -45,14 +45,14 @@ def _generate_hmac(prefix, key, msg):
 
 
 def generate_timed_hmac(prefix, key, timestamp, uid):
-    """ Typical time-limited HMAC used for logins, etc """
+    """Typical time-limited HMAC used for logins, etc"""
     timestamp = int(timestamp)  # to truncate floating point, not coerce strings
     msg = "{}-{}".format(timestamp, uid)
     return _generate_hmac(prefix, key, msg).decode("ascii")
 
 
 def generate_unlimited_hmac(prefix, key, uid):
-    """ Intended for user tokens, long-lived but low-importance """
+    """Intended for user tokens, long-lived but low-importance"""
     msg = "{}".format(uid)
     return _generate_hmac(prefix, key, msg).decode("ascii")
 
@@ -287,7 +287,7 @@ class User(db.Model, UserMixin):
         return data
 
     def get_owned_tickets(self, paid=None, type=None):
-        " Get tickets owned by a user, filtered by type and payment state. "
+        "Get tickets owned by a user, filtered by type and payment state."
         for ticket in self.owned_tickets:
             if (
                 paid is True
@@ -494,8 +494,8 @@ class UserShipping(db.Model):
 
 
 class AnonymousUser(AnonymousUserMixin):
-    """ An anonymous user - the only persistent item here is the ID
-        which is stored in the session.
+    """An anonymous user - the only persistent item here is the ID
+    which is stored in the session.
     """
 
     def __init__(self, id):
@@ -506,9 +506,9 @@ class AnonymousUser(AnonymousUserMixin):
 
 
 def load_anonymous_user():
-    """ Factory method for anonymous users which stores a user ID in
-        the session. This is assigned to `login_manager.anonymous_user`
-        in main.py.
+    """Factory method for anonymous users which stores a user ID in
+    the session. This is assigned to `login_manager.anonymous_user`
+    in main.py.
     """
     if "anon_id" in session:
         au = AnonymousUser(session["anon_id"])

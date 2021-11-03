@@ -57,6 +57,8 @@ email_validator = "^1.0"
 segno = "^1.0.0"
 pytest-vcr = "^1.0.2"
 pywisetransfer = "^0.1.5"
+freezegun = "^1.1.0"
+
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
@@ -68,6 +70,6 @@ hypothesis = "*"
 pytest-random-order = "*"
 pytest-cov = "*"
 coveralls = "*"
-black = "=19.10b0"
+black = "=21.10b0"
 pyzbar = "^0.1.8"
 cairosvg = "^2.4.2"

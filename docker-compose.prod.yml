@@ -12,6 +12,8 @@ services:
     volumes:
       - /etc/emf-site.cfg:/app/config/production.cfg
       - /var/lib/emf_vat_invoices:/vat_invoices
+    labels:
+      com.centurylinklabs.watchtower.enable: true
     environment:
       SETTINGS_FILE: ./config/production.cfg
     logging:
@@ -27,7 +29,6 @@ services:
     networks:
       - emfweb
 
-
   postgres_exporter:
     restart: unless-stopped
     image: 'wrouesnel/postgres_exporter:v0.8.0'
@@ -41,8 +42,17 @@ services:
   static:
     restart: unless-stopped
     image: "ghcr.io/emfcamp/website-static:latest"
+    labels:
+      com.centurylinklabs.watchtower.enable: true
     ports:
       - "127.0.0.1:8080:80" 
+
+  watchtower:
+    restart: unless-stopped
+    image: "containrrr/watchtower"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30 --label-enable
 
 networks:
   emfweb:

@@ -209,13 +209,13 @@ def create_product_groups():
 
 @tickets.cli.command("create")
 def create():
-    """ Create tickets structure from hardcoded data """
+    """Create tickets structure from hardcoded data"""
     create_product_groups()
 
 
 @scheduled_task(minutes=30)
 def expire_reserved():
-    """ Expire reserved tickets """
+    """Expire reserved tickets"""
     if (
         feature_enabled("STRIPE")
         and not feature_enabled("BANK_TRANSFER")
@@ -288,7 +288,7 @@ def email_transfer_reminders():
 
 @tickets.cli.command("email_tickets")
 def email_tickets():
-    """ Email tickets to those who haven't received them """
+    """Email tickets to those who haven't received them"""
     users_purchase_counts = (
         Purchase.query.filter_by(is_paid_for=True, state="paid")
         .join(PriceTier, Product, ProductGroup)

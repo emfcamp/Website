@@ -13,7 +13,7 @@ from . import base
 
 @base.cli.command("export")
 def export_db():
-    """ Export data from the DB to disk.
+    """Export data from the DB to disk.
 
     This command is run as a last step before wiping the DB after an event, to export
     all the data we want to save. It saves a private and a public export to the

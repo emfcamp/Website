@@ -19,7 +19,7 @@ from .refund import (
 @click.option("-n", "--number", type=int, help="number of refunds to process")
 @click.option("--provider", default="stripe")
 def bulk_refund(yes, number, provider):
-    """ Automatically refund all pending refund requests where possible """
+    """Automatically refund all pending refund requests where possible"""
 
     query = (
         RefundRequest.query.join(Payment)
@@ -66,7 +66,7 @@ def bulk_refund(yes, number, provider):
 @click.option("-a", "--amount", type=int, help="value of refunds to export")
 @click.argument("currency", type=click.Choice(["GBP", "EUR"]))
 def transferwise_refund(number, amount, currency):
-    """ Emit a CSV file for refunding with Transferwise"""
+    """Emit a CSV file for refunding with Transferwise"""
     query = (
         RefundRequest.query.join(Payment)
         .filter(Payment.state == "refund-requested")
@@ -140,7 +140,7 @@ def transferwise_refund(number, amount, currency):
 @click.argument("currency", type=click.Choice(["GBP", "EUR"]))
 @click.argument("max_id", type=int)
 def transferwise_refund_complete(max_id, currency):
-    """ Mark Transferwise bulk refunds as completed """
+    """Mark Transferwise bulk refunds as completed"""
     query = (
         RefundRequest.query.join(Payment)
         .filter(Payment.state == "refund-requested")

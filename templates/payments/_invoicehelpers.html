@@ -1,0 +1,7 @@
+{% macro render_epc_qr(payment) %}
+<div class="qrcode">
+  {# Preferred format is SVG because it scales #}
+  {{ format_inline_epc_qr(payment) }}
+</div>
+{% endmacro -%}
+

@@ -244,7 +244,7 @@ def create_app(dev_server=False, config_override=None):
 
         @app.errorhandler(Exception)
         def handle_exception(e):
-            """ Generic exception handler to catch and log unhandled exceptions in production. """
+            """Generic exception handler to catch and log unhandled exceptions in production."""
             if isinstance(e, HTTPException):
                 # HTTPException is used to implement flask's HTTP errors so pass it through.
                 return e
@@ -337,7 +337,7 @@ def create_app(dev_server=False, config_override=None):
 
 
 def external_url(endpoint, **values):
-    """ Generate an absolute external URL. If you need to override this,
-        you're probably doing something wrong.
+    """Generate an absolute external URL. If you need to override this,
+    you're probably doing something wrong.
     """
     return url_for(endpoint, _external=True, **values)

@@ -61,6 +61,11 @@
 {% endfor %}
 </table>
 
+<form method="post">
+{{ form.hidden_tag() }}
+{{ form.import_accounts(class_="btn btn-success") }}
+</form>
+
 <h3>Bank Transfer</h3>
 <ul>
   {% if last_bank_payment %}
