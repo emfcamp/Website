@@ -5,7 +5,7 @@ from models.payment import BankAccount
 
 
 def transferwise_business_profile():
-    client = pytransferwise.Client()
+    client = pywisetransfer.Client()
     profiles = client.profiles.list(type="business")
     return next(profiles, None)
 
@@ -51,7 +51,7 @@ def transferwise_retrieve_accounts():
     if not business_profile:
         return
 
-    client = pytransferwise.Client()
+    client = pywisetransfer.Client()
     borderless_accounts = client.borderless_accounts.list(
         profile_id=business_profile.id
     )
@@ -61,7 +61,7 @@ def transferwise_retrieve_accounts():
 
 
 def transferwise_validate():
-    """ Validate that TransferWise is configured and operational"""
+    """Validate that TransferWise is configured and operational"""
     result = []
 
     env = app.config.get("TRANSFERWISE_ENVIRONMENT")
