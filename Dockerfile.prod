@@ -3,7 +3,7 @@ WORKDIR "/app"
 COPY . /app
 RUN npm install --no-audit && npx gulp --production
 
-FROM emfcamp/website-base:latest
+FROM ghcr.io/emfcamp/website-base:latest
 
 COPY . /app/
 WORKDIR /app

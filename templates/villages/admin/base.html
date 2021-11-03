@@ -3,6 +3,12 @@
     <link rel="stylesheet" href="{{ static_url_for('static', filename='css/admin.css') }}">
 {% endblock %}
 
+{% macro menuitem(text, view) %}
+<li {% if view_name==view -%} class="active" {%- endif %}>
+    <a href="{{url_for(view)}}">{{text}}</a>
+</li>
+{% endmacro %}
+
 {% block document %}
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
@@ -16,6 +22,10 @@
             <a class="navbar-brand" href="{{ url_for('villages.admin') }}">Villages Admin</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                {{ menuitem("List", "villages.admin") }}
+                {{ menuitem("Email", "villages.admin_email_owners") }}
+            </ul>
         </div>
     </div>
 </nav>

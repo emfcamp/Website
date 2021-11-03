@@ -14,7 +14,7 @@
     <div><a href="{{ url_for('.role', role_id=shift.role.id) }}">More info on {{ shift.role.name }}</a></div>
 
     <form method="POST" >
-        {# <input id="csrf_token" name=_csrf_token type=hidden value="{{ csrf_token() }}"> #}
+        <input id="csrf_token" name=_csrf_token type=hidden value="{{ csrf_token() }}">
         {% if shift in current_user.shift_entries %}
             <button class="btn btn-warn">
                 Cancel this shift

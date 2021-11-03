@@ -4,7 +4,7 @@
 # It primarily exists to speed up CI test builds so dev packages
 # don't have to be installed on every run.
 #
-FROM emfcamp/website-base:latest
+FROM ghcr.io/emfcamp/website-base:latest
 
 WORKDIR /app
 COPY pyproject.toml poetry.lock /app/

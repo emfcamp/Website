@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -e
+
+export PGPASSWORD=postgres
 PSQL="/usr/bin/psql -h postgres -U postgres"
 
 until $PSQL -c '\q'; do

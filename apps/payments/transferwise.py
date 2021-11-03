@@ -1,9 +1,67 @@
 from flask import current_app as app
-import pytransferwise
+import pywisetransfer
+
+from models.payment import BankAccount
+
+
+def transferwise_business_profile():
+    client = pywisetransfer.Client()
+    profiles = client.profiles.list(type="business")
+    return next(profiles, None)
+
+
+def _collect_bank_accounts(borderless_account):
+    for balance in borderless_account.balances:
+        try:
+            if not balance.bankDetails:
+                continue
+            if not balance.bankDetails.bankAddress:
+                continue
+            if not balance.bankDetails.swift:
+                continue
+            if not balance.bankDetails.iban:
+                continue
+        except AttributeError:
+            continue
+
+        address = ", ".join(
+            [
+                balance.bankDetails.bankAddress.addressFirstLine,
+                balance.bankDetails.bankAddress.city
+                + " "
+                + (balance.bankDetails.bankAddress.postCode or ""),
+                balance.bankDetails.bankAddress.country,
+            ]
+        )
+        yield BankAccount(
+            sort_code=None,
+            acct_id=None,
+            currency=balance.bankDetails.currency,
+            active=False,
+            institution=balance.bankDetails.bankName,
+            address=address,
+            swift=balance.bankDetails.swift,
+            iban=balance.bankDetails.iban,
+            borderless_account_id=balance.id,
+        )
+
+
+def transferwise_retrieve_accounts():
+    business_profile = transferwise_business_profile()
+    if not business_profile:
+        return
+
+    client = pywisetransfer.Client()
+    borderless_accounts = client.borderless_accounts.list(
+        profile_id=business_profile.id
+    )
+    for borderless_account in borderless_accounts:
+        for bank_account in _collect_bank_accounts(borderless_account):
+            yield bank_account
 
 
 def transferwise_validate():
-    """ Validate that TransferWise is configured and operational"""
+    """Validate that TransferWise is configured and operational"""
     result = []
 
     env = app.config.get("TRANSFERWISE_ENVIRONMENT")
@@ -21,14 +79,13 @@ def transferwise_validate():
         result.append((False, "Access token not set"))
 
     try:
-        client = pytransferwise.Client()
+        client = pywisetransfer.Client()
         user = client.users.me()
         result.append((True, "Connection to TransferWise API succeeded"))
     except Exception as e:
         result.append((False, f"Unable to connect to TransferWise: {e}"))
 
-    profiles = client.profiles.list()
-    business_profile = next(filter(lambda p: p.type == "business", profiles), None)
+    business_profile = transferwise_business_profile()
     if business_profile:
         result.append((True, "TransferWise business profile exists"))
     else:

@@ -2,7 +2,7 @@ version: "3.7"
 services:
   app:
     restart: unless-stopped
-    image: "emfcamp/website:latest"
+    image: "ghcr.io/emfcamp/website:latest"
     networks:
       - emfweb
     depends_on:
@@ -12,6 +12,8 @@ services:
     volumes:
       - /etc/emf-site.cfg:/app/config/production.cfg
       - /var/lib/emf_vat_invoices:/vat_invoices
+    labels:
+      com.centurylinklabs.watchtower.enable: true
     environment:
       SETTINGS_FILE: ./config/production.cfg
     logging:
@@ -19,9 +21,11 @@ services:
 
   postgres:
     restart: unless-stopped
-    image: 'mdillon/postgis:10'
+    image: 'postgis/postgis:13-3.1-alpine'
     volumes: 
       - /var/lib/emfweb-postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: postgres
     networks:
       - emfweb
 
@@ -29,7 +33,7 @@ services:
     restart: unless-stopped
     image: 'wrouesnel/postgres_exporter:v0.8.0'
     environment:
-      DATA_SOURCE_NAME: "postgresql://postgres@postgres:5432/emf_site?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://postgres:postgres@postgres:5432/emf_site?sslmode=disable"
     networks:
       - emfweb
     ports:
@@ -37,9 +41,18 @@ services:
 
   static:
     restart: unless-stopped
-    image: "emfcamp/website-static:latest"
+    image: "ghcr.io/emfcamp/website-static:latest"
+    labels:
+      com.centurylinklabs.watchtower.enable: true
     ports:
       - "127.0.0.1:8080:80" 
+
+  watchtower:
+    restart: unless-stopped
+    image: "containrrr/watchtower"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30 --label-enable
 
 networks:
   emfweb:

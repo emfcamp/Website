@@ -4,7 +4,7 @@
 # by the host nginx on prod.
 #
 
-FROM emfcamp/website:latest AS website
+FROM ghcr.io/emfcamp/website:latest AS website
 FROM nginx:1.17-alpine
 
 COPY --from=website /app/static /usr/share/nginx/emf-static/static
