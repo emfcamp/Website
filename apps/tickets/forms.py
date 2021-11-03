@@ -1,11 +1,6 @@
 from flask import Markup, render_template_string, url_for, current_app as app
 from flask_login import current_user
-from wtforms.validators import (
-    DataRequired,
-    InputRequired,
-    Optional,
-    ValidationError,
-)
+from wtforms.validators import DataRequired, InputRequired, Optional, ValidationError
 from wtforms import (
     SubmitField,
     StringField,
@@ -16,7 +11,7 @@ from wtforms import (
 )
 
 from models.user import User
-from models.payment import BankPayment, StripePayment, GoCardlessPayment
+from models.payment import BankPayment, StripePayment
 
 from ..common.forms import IntegerSelectField, HiddenIntegerField, Form, EmailField
 from ..common import CURRENCY_SYMBOLS
@@ -129,7 +124,6 @@ class TicketPaymentForm(Form):
     allow_promo = BooleanField("Send me occasional emails about future EMF events")
     basket_total = HiddenField("basket total")
 
-    gocardless = SubmitField("Pay by Direct Debit")
     banktransfer = SubmitField("Pay by Bank Transfer")
     stripe = SubmitField("Pay by card")
 
@@ -148,12 +142,11 @@ class TicketPaymentForm(Form):
             raise ValidationError(msg)
 
     def get_payment_class(form):
-        if form.gocardless.data:
-            return GoCardlessPayment
-        elif form.banktransfer.data:
+        if form.banktransfer.data:
             return BankPayment
-        elif form.stripe.data:
+        if form.stripe.data:
             return StripePayment
+        raise ValueError("Cannot identify payment form type")
 
 
 class TicketPaymentShippingForm(TicketPaymentForm):

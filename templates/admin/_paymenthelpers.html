@@ -6,8 +6,6 @@
 <dt>Provider</dt><dd>{{payment.provider}}</dd>
 {%- if payment.provider == 'banktransfer' %}
 <dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
-{% elif payment.provider == 'gocardless' %}
-<dt>GoCardless ID</dt><dd><a href="https://manage{% if config['GOCARDLESS_ENVIRONMENT'] == 'sandbox' %}-sandbox{% endif %}.gocardless.com/payments/{{ payment.gcid }}">{{ payment.gcid }}</a></dd>
 {% elif payment.provider == 'stripe' %}
 <dt>Charge ID</dt><dd><a href="https://dashboard.stripe.com/search?query={{payment.charge_id}}">{{payment.charge_id}}</a></dd>
 <dt>Intent ID</dt><dd><a href="https://dashboard.stripe.com/search?query={{payment.intent_id}}">{{payment.intent_id}}</a></dd>

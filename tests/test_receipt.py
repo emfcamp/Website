@@ -5,11 +5,7 @@ from cairosvg import svg2png
 from PIL import Image
 from pyzbar.pyzbar import decode
 
-from apps.common.receipt import (
-    format_inline_qr,
-    format_inline_epc_qr,
-    make_qr_png,
-)
+from apps.common.receipt import format_inline_qr, format_inline_epc_qr, make_qr_png
 from models.payment import BankPayment
 
 

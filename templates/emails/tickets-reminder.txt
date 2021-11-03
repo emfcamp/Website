@@ -5,7 +5,7 @@ reserved for Electromagnetic Field {{ event_year }}.
 
 The tickets will expire in a few days if not paid for.
 
-If you don't want the tickets you can ignore this email. {% if payment.provider in ['gocardless', 'banktransfer'] -%} Otherwise,
+If you don't want the tickets you can ignore this email. {% if payment.provider == 'banktransfer' -%} Otherwise,
 if you wish to pay for the tickets, you can go to the EMF website:
 
   {{ external_url('users.purchases') }}

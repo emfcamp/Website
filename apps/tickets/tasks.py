@@ -220,8 +220,6 @@ def expire_reserved():
         feature_enabled("STRIPE")
         and not feature_enabled("BANK_TRANSFER")
         and not feature_enabled("BANK_TRANSFER_EURO")
-        and not feature_enabled("GOCARDLESS")
-        and not feature_enabled("GOCARDLESS_EURO")
     ):
         # Things are moving quickly now, only let people reserve tickets for an hour
         grace_period = timedelta(hours=1)
@@ -246,7 +244,7 @@ def expire_reserved():
     for payment in payments:
         payment.lock()
         app.logger.info("Cancelling payment %s", payment.id)
-        assert payment.state == "new" and payment.provider in {"gocardless", "stripe"}
+        assert payment.state == "new" and payment.provider in {"stripe"}
         payment.cancel()
 
     # Purchases that were added to baskets but not checked out

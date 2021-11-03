@@ -33,3 +33,17 @@ docker-compose down postgres
 docker-compose up -d
 ```
 
+2021-11-03
+==========
+
+GoCardless has been removed. Delete references to GOCARDLESS in your config files:
+
+```
+GOCARDLESS_ENVIRONMENT
+GOCARDLESS_ACCESS_TOKEN
+GOCARDLESS_WEBHOOK_SECRET
+GOCARDLESS
+GOCARDLESS_EURO
+EXPIRY_DAYS_GOCARDLESS
+```
+

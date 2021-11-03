@@ -72,12 +72,6 @@ def load_utility_functions(app_obj):
     def format_bankref(bankref):
         return "%s-%s" % (bankref[:4], bankref[4:])
 
-    @app_obj.template_filter("gcid")
-    def format_gcid(gcid):
-        if len(gcid) > 14:
-            return "ending %s" % gcid[-14:]
-        return gcid
-
     @app_obj.context_processor
     def utility_processor():
         SALES_STATE = get_sales_state()

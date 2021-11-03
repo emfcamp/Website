@@ -18,10 +18,10 @@
 <a class="btn btn-primary" href="{{ url_for('.reset_expiry', payment_id=payment.id) }}">Reset expiry</a>
 <a class="btn btn-warning {% if payment.reminder_sent -%} disabled {%- endif %}" href="{{ url_for('.send_reminder', payment_id=payment.id) }}">Remind</a>
 {% endif %}
-{% if payment.provider in ['stripe', 'gocardless'] %}
+{% if payment.provider == 'stripe' %}
 <a class="btn btn-success" href="{{ url_for('.update_payment', payment_id=payment.id) }}">Update</a>
 {% endif %}
-{% if payment.provider in ['gocardless', 'banktransfer'] and payment.state not in ['cancelled', 'paid', 'refunded'] %}
+{% if payment.provider == 'banktransfer' and payment.state not in ['cancelled', 'paid', 'refunded'] %}
 <a class="btn btn-danger" href="{{ url_for('.cancel_payment', payment_id=payment.id) }}">Cancel</a>
 {% endif %}
 {% if payment.state in ['charged', 'paid', 'partrefunded'] %}

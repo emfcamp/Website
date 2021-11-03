@@ -15,9 +15,9 @@
 {% endfor %}
 </ul>
 
-<h3>GoCardless</h3>
+<h3>TransferWise</h3>
 <ul>
-{% for success, message in gocardless %}
+{% for success, message in transferwise %}
   <li>{% if success %}✅{% else %}❌<strong>{% endif %}
       {{message}}{% if not success %}</strong>{% endif %}</li>
 {% endfor %}
@@ -25,16 +25,7 @@
 
 <h4>Manual tasks:</h4>
 <ul>
-  <li>Ensure a webhook is configured for the URL <code>{{external_url('payments.gocardless_webhook')}}</code> and the secret matches the <code>GOCARDLESS_WEBHOOK_SECRET</code> config variable.</li>
-  <li>Ensure bank statement reference in GoCardless settings is set correctly (it has the year in).</li>
-</ul>
-
-<h3>TransferWise</h3>
-<ul>
-{% for success, message in transferwise %}
-  <li>{% if success %}✅{% else %}❌<strong>{% endif %}
-      {{message}}{% if not success %}</strong>{% endif %}</li>
-{% endfor %}
+  <li>Ensure a webhook is configured for the URL <code>{{external_url('payments.transferwise_webhook')}}</code></li>
 </ul>
 
 <h3>Bank Accounts</h3>

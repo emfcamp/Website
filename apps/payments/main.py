@@ -4,13 +4,12 @@ from flask_login import login_required
 from wtforms import StringField, SubmitField
 from wtforms.validators import ValidationError
 from wtforms.fields.html5 import IntegerRangeField
-import gocardless_pro.errors
 
 from . import payments
 from .common import get_user_payment_or_abort
 from ..common import feature_flag
 from ..common.forms import Form
-from main import db, gocardless_client
+from main import db
 from models import RefundRequest
 
 
@@ -34,61 +33,50 @@ def required_for(currency=None, providers=None):
 
 
 class RefundRequestForm(Form):
-    # https://developer.gocardless.com/api-reference/#appendix-local-bank-details
     # We only support UK and international (Euros)
     sort_code = StringField(
-        "Sort code",
-        [required_for(currency="GBP", providers=["banktransfer", "gocardless"])],
+        "Sort code", [required_for(currency="GBP", providers=["banktransfer"])]
     )
     account = StringField(
-        "Account number",
-        [required_for(currency="GBP", providers=["banktransfer", "gocardless"])],
+        "Account number", [required_for(currency="GBP", providers=["banktransfer"])]
     )
     iban = StringField(
-        "IBAN", [required_for(currency="EUR", providers=["banktransfer", "gocardless"])]
+        "IBAN", [required_for(currency="EUR", providers=["banktransfer"])]
     )
     swiftbic = StringField(
-        "SWIFT BIC",
-        [required_for(currency="EUR", providers=["banktransfer", "gocardless"])],
+        "SWIFT BIC", [required_for(currency="EUR", providers=["banktransfer"])]
     )
     donation_amount = IntegerRangeField("Donation amount")
     payee_name = StringField(
-        "Name of account holder",
-        [required_for(providers=["banktransfer", "gocardless"])],
+        "Name of account holder", [required_for(providers=["banktransfer"])]
     )
     note = StringField("Note")
     submit = SubmitField("Request refund")
 
 
+def wise_validate(endpoint, **args):
+    res = requests.get(f"https://api.transferwise.com/v1/validators/{endpoint}", args)
+    data = res.json()
+    if data.get("validation") != "success":
+        app.logger.info(f"Bank validation for {endpoint} failed: {repr(data)}")
+        return False
+
+    return True
+
+
 def validate_bank_details(form, currency):
-    """Transferwise can't validate sort code and account number.
-    GoCardless can't validate BIC and IBAN.
-    Use both.
-    """
     app.logger.info("Validating bank details")
     if currency == "GBP":
-        params = {
-            "country_code": "GB",
-            "branch_code": form.sort_code.data,
-            "account_number": form.account.data,
-        }
-        try:
-            result = gocardless_client.bank_details_lookups.create(params)
-            app.logger.info(
-                "GBP bank identified as %r", result.attributes.get("bank_name")
-            )
-        except gocardless_pro.errors.ValidationFailedError as e:
-            app.logger.warn("Error validating GBP bank details: %s", e)
+        if not wise_validate("sort-code", sortCode=form.sort_code.data):
             return False
-    elif currency == "EUR":
-        params = {"iban": form.iban.data}
-        res = requests.get(
-            "https://api.transferwise.com/v1/validators/bic?"
-            f"bic={form.swiftbic.data}&iban={form.iban.data}"
-        )
 
-        result = res.json()
-        if result.get("validation") != "success":
+        if not wise_validate(
+            "sort-code-account-number", accountNumber=form.account.data
+        ):
+            return False
+
+    elif currency == "EUR":
+        if not wise_validate("bic", bic=form.swiftbic.data, iban=form.iban.data):
             return False
 
     app.logger.info("Bank validation succeeded")
@@ -113,7 +101,7 @@ def payment_refund_request(payment_id, currency=None):
 
     if form.validate_on_submit():
         if (
-            payment.provider in ("banktransfer", "gocardless")
+            payment.provider in {"banktransfer"}
             and payment.amount != form.donation_amount.data
             and not validate_bank_details(form, currency)
         ):
