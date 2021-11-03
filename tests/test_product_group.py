@@ -293,6 +293,9 @@ def test_check_in(db, parent_group, user):
     assert purchase.checked_in is True
 
 
+@pytest.mark.skip(
+    reason="Intermittently fails on Github Actions with PurchaseTransferException"
+)
 def test_transfer(db, user, parent_group):
     user1 = user
     user2 = User("test_user_{}@test.invalid".format(random_string(8)), "test_user2")
