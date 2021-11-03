@@ -20,17 +20,11 @@
         <div class="btn-group" role="group">
           {%- if p.state == "inprogress" and p.provider == "banktransfer" %}
           <a href="{{ url_for('payments.transfer_waiting', payment_id=p.id) }}" class="btn btn-success">Pay</a>
-          {%- elif p.state in ["new", "captured"] and p.provider == "gocardless" %}
-          <a href="{{ url_for('payments.gocardless_tryagain', payment_id=p.id) }}" class="btn btn-success">Pay</a>
-          {%- elif p.state == "failed" and p.provider == "gocardless" %}
-          <a href="{{ url_for('payments.gocardless_tryagain', payment_id=p.id) }}" class="btn btn-success">Try again</a>
           {%- elif p.state in ["new", "failed"] and p.provider == "stripe" %}
           <a href="{{ url_for('payments.stripe_capture', payment_id=p.id) }}" class="btn btn-success">Pay</a>
           {% endif -%}
 
-          {%- if p.state in ["new", "failed"] and p.provider == "gocardless" %}
-          <a href="{{ url_for('payments.gocardless_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
-          {%- elif p.state in ["new", "inprogress"] and p.provider == "banktransfer" %}
+          {%- if p.state in ["new", "inprogress"] and p.provider == "banktransfer" %}
           <a href="{{ url_for('payments.transfer_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
           {%- elif p.state in ["new", "captured", "failed"] and p.provider == "stripe" %}
           <a href="{{ url_for('payments.stripe_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>

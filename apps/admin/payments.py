@@ -18,9 +18,8 @@ from wtforms.validators import InputRequired
 from wtforms import SubmitField, BooleanField, FieldList, FormField
 
 from sqlalchemy.sql.functions import func
-import gocardless_pro.errors
 
-from main import db, mail, stripe, gocardless_client
+from main import db, mail, stripe
 from models.payment import (
     Payment,
     RefundRequest,
@@ -37,7 +36,6 @@ from ..payments.stripe import (
     stripe_update_payment,
     stripe_payment_refunded,
 )
-from ..payments.gocardless import gocardless_update_payment
 
 
 @admin.route("/payments")
@@ -176,7 +174,7 @@ class UpdatePaymentForm(Form):
 def update_payment(payment_id):
     payment = Payment.query.get_or_404(payment_id)
 
-    if payment.provider not in {"gocardless", "stripe"}:
+    if payment.provider not in {"stripe"}:
         abort(404)
 
     form = UpdatePaymentForm()
@@ -190,10 +188,7 @@ def update_payment(payment_id):
 
             payment.lock()
 
-            if payment.provider == "gocardless":
-                gocardless_update_payment(payment)
-
-            elif payment.provider == "stripe":
+            if payment.provider == "stripe":
                 try:
                     stripe_update_payment(payment)
                 except StripeUpdateConflict:
@@ -231,23 +226,12 @@ def cancel_payment(payment_id):
 
     form = CancelPaymentForm()
     if form.validate_on_submit():
-        if form.cancel.data and (payment.provider in ["banktransfer", "gocardless"]):
+        if form.cancel.data and (payment.provider in {"banktransfer"}):
             app.logger.info(
                 "%s manually cancelling payment %s", current_user.name, payment.id
             )
 
             payment.lock()
-
-            if payment.provider == "gocardless" and payment.gcid is not None:
-                try:
-                    gocardless_client.payments.cancel(payment.gcid)
-
-                except gocardless_pro.errors.InvalidStateError as e:
-                    app.logger.error(
-                        "InvalidStateError from GoCardless cancelling payment: %s",
-                        e.message,
-                    )
-                    flash("Error cancelling with GoCardless")
 
             try:
                 payment.cancel()

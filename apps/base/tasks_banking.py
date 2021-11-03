@@ -161,6 +161,7 @@ def reconcile(doit):
         if txn.type.lower() not in ("other", "directdep"):
             raise ValueError("Unexpected transaction type for %s: %s", txn.id, txn.type)
 
+        # TODO: remove this after 2022
         if txn.payee.startswith("GOCARDLESS ") or txn.payee.startswith("GC C1 EMF"):
             app.logger.info("Suppressing GoCardless transfer %s", txn.id)
             if doit:

@@ -5,7 +5,7 @@ from main import db
 from models.user import User
 from models.basket import Basket
 from models.product import PriceTier
-from models.payment import GoCardlessPayment, StripePayment, BankPayment
+from models.payment import StripePayment, BankPayment
 from models.cfp import (
     TalkProposal,
     PerformanceProposal,
@@ -203,11 +203,9 @@ class FakeDataGenerator(object):
         b.create_purchases()
         b.ensure_purchase_capacity()
 
-        payment_type = {
-            "gc": GoCardlessPayment,
-            "bank": BankPayment,
-            "stripe": StripePayment,
-        }.get(random_state({"gc": 0.3, "bank": 0.2, "stripe": 0.5}))
+        payment_type = {"bank": BankPayment, "stripe": StripePayment}.get(
+            random_state({"bank": 0.2, "stripe": 0.8})
+        )
 
         payment = b.create_payment(payment_type)
 

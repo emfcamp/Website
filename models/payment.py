@@ -469,32 +469,6 @@ db.Index(
 )
 
 
-class GoCardlessPayment(Payment):
-    name = "GoCardless payment"
-
-    __mapper_args__ = {"polymorphic_identity": "gocardless"}
-    session_token = db.Column(db.String, unique=True)
-    redirect_id = db.Column(db.String, unique=True)
-    mandate = db.Column(db.String, unique=True)
-    gcid = db.Column(db.String, unique=True)
-
-    def cancel(self):
-        if self.state in ["cancelled", "refunded"]:
-            raise StateException("Payment has already been {}".format(self.state))
-
-        super(GoCardlessPayment, self).cancel()
-
-    def manual_refund(self):
-        # https://help.gocardless.com/customer/portal/articles/1580207
-        # "At the moment, it isn't usually possible to refund a customer via GoCardless"
-        if self.state not in {"paid", "refund-requested"}:
-            raise StateException(
-                "Only GoCardless payments that have been paid can be marked as refunded"
-            )
-
-        super(GoCardlessPayment, self).manual_refund()
-
-
 class StripePayment(Payment):
     name = "Stripe payment"
 

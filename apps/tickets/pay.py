@@ -17,10 +17,9 @@ from main import db
 from models.user import UserShipping
 from models.basket import Basket
 from models.product import VoucherUsedError
-from models.payment import BankPayment, StripePayment, GoCardlessPayment
+from models.payment import BankPayment, StripePayment
 
 from ..common import get_user_currency, set_user_currency, create_current_user
-from ..payments.gocardless import gocardless_start
 from ..payments.banktransfer import transfer_start
 from ..payments.stripe import stripe_start
 
@@ -194,9 +193,11 @@ def start_payment(form, basket, flow):
         )
         return redirect(url_for("tickets.main", flow=flow))
 
-    if payment_type == GoCardlessPayment:
-        return gocardless_start(payment)
-    elif payment_type == BankPayment:
+    if payment_type == BankPayment:
         return transfer_start(payment)
-    elif payment_type == StripePayment:
+    if payment_type == StripePayment:
         return stripe_start(payment)
+
+    app.logger.exception(f"Unexpected payment_type: {repr(payment_type)}")
+    flash("We're sorry, an unexpected error occurred. Please try ordering again.")
+    return redirect(url_for("tickets.main", flow=flow))

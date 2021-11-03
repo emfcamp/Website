@@ -23,7 +23,6 @@ from loggingmanager import create_logging_manager, set_user_id
 from werkzeug.exceptions import HTTPException
 import stripe
 import pywisetransfer
-import gocardless_pro
 
 
 # If we have logging handlers set up here, don't touch them.
@@ -69,7 +68,6 @@ mail = Mail()
 login_manager = LoginManager()
 static_digest = FlaskStaticDigest()
 toolbar = DebugToolbarExtension()
-gocardless_client = None
 volunteer_admin = None
 
 
@@ -144,11 +142,6 @@ def create_app(dev_server=False, config_override=None):
 
     login_manager.anonymous_user = load_anonymous_user
 
-    global gocardless_client
-    gocardless_client = gocardless_pro.Client(
-        access_token=app.config["GOCARDLESS_ACCESS_TOKEN"],
-        environment=app.config["GOCARDLESS_ENVIRONMENT"],
-    )
     stripe.api_key = app.config["STRIPE_SECRET_KEY"]
     pywisetransfer.environment = app.config["TRANSFERWISE_ENVIRONMENT"]
     pywisetransfer.api_key = app.config["TRANSFERWISE_API_TOKEN"]

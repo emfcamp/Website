@@ -25,7 +25,7 @@
     }}
   </fieldset>
 
-  {% if payment.provider in ('banktransfer', 'gocardless') %}
+  {% if payment.provider == 'banktransfer' %}
     <fieldset id="bank-details">
       <legend>Bank details</legend>
       <p>We'll need your {% if payment.currency == 'GBP' %}UK{% else %}Euro{% endif %} bank account

@@ -7,8 +7,6 @@ DB_FEATURE_FLAGS = [
     "CFP",
     "CFP_CLOSED",
     "CFP_FINALISE",
-    "GOCARDLESS",
-    "GOCARDLESS_EURO",
     "ISSUE_TICKETS",
     "RADIO",
     "LINE_UP",

@@ -1,10 +1,5 @@
 from datetime import datetime, timedelta
-from wtforms.validators import (
-    Optional,
-    DataRequired,
-    InputRequired,
-    ValidationError,
-)
+from wtforms.validators import Optional, DataRequired, InputRequired, ValidationError
 from wtforms.widgets import TextArea
 from wtforms import (
     SubmitField,
