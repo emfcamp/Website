@@ -25,10 +25,7 @@ def webhook(type=None):
 @csrf.exempt
 @payments.route("/transferwise-webhook", methods=["POST"])
 def transferwise_webhook():
-    valid_signature = verify_signature(
-        request.data,
-        request.headers["X-Signature"],
-    )
+    valid_signature = verify_signature(request.data, request.headers["X-Signature"],)
     if not valid_signature:
         logger.exception("Error verifying TransferWise webhook signature")
         abort(400)
@@ -76,7 +73,7 @@ def transferwise_balance_credit(event_type, event):
         abort(400)
 
     # Retrieve an account transaction statement for the past week
-    client = pytransferwise.Client()
+    client = pywisetransfer.Client()
     interval_end = datetime.now()
     interval_start = interval_end - timedelta(days=7)
     statement = client.borderless_accounts.statement(
