@@ -34,7 +34,6 @@
 <hr>
 {% if current_user.is_authenticated %}
   <form method="POST">
-  <input id="csrf_token" name=_csrf_token type=hidden value="{{ csrf_token() }}">
   <button type="submit" class="btn btn-primary {% if is_fave %}active{% endif %}">
     {%- if is_fave -%}
       <i class="glyphicon glyphicon-heart favourite-icon"></i>

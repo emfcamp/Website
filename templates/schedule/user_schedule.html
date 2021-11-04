@@ -81,7 +81,6 @@
 
     <button class="btn pull-right" onClick="emf_scheduler.close_popup()">Close</button>
     <form id="favourite_form" method="post" action="">
-        <input id="csrf_token" name=_csrf_token type=hidden value="{{ csrf_token() }}">
         <button id="favourite_btn" class="btn btn-primary pull-right debouncel" onClick="emf_scheduler.favourite(); return false;">
             <i id="favourite_icon" class="glyphicon"></i>
             Favourite

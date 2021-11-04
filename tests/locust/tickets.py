@@ -5,9 +5,7 @@ import lxml.html
 
 
 class EMFTaskSet(TaskSet):
-    def on_start(self):
-        # We need a referer to pass the CSRF protection
-        self.client.headers["Referer"] = self.client.base_url
+    pass
 
 
 class CheckTickets(EMFTaskSet):

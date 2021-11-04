@@ -14,7 +14,7 @@
 <tbody>
 {% for flg in form.flags %}
 <tr>
-  <td>{{ flg.hidden_tag_without('csrf_token') }}{{ flg.feature.data }}</td>
+  <td>{{ flg.hidden_tag() }}{{ flg.feature.data }}</td>
   <td>{{ flg.enabled }}</td>
 </tr>
 {% endfor %}

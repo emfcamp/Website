@@ -25,7 +25,7 @@ from wtforms import SubmitField
 from sqlalchemy.orm.exc import NoResultFound
 from stripe.error import AuthenticationError
 
-from main import db, stripe, mail, csrf
+from main import db, stripe, mail
 from models.payment import StripePayment
 from ..common import feature_enabled
 from ..common.forms import Form
@@ -157,7 +157,6 @@ def stripe_waiting(payment_id):
     )
 
 
-@csrf.exempt
 @payments.route("/stripe-webhook", methods=["POST"])
 def stripe_webhook():
     try:

@@ -47,3 +47,13 @@ GOCARDLESS_EURO
 EXPIRY_DAYS_GOCARDLESS
 ```
 
+This includes database changes, so remember to run `./flask db upgrade`
+
+CSRF protection has also been removed. Delete references to WTF_CSRF in your config files:
+
+```
+WTF_CSRF_TIME_LIMIT
+WTF_CSRF_SSL_STRICT
+WTF_CSRF_ENABLED
+```
+

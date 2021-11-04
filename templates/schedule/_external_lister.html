@@ -2,7 +2,6 @@
     {% for type, type_events in events | groupby('type') %}
         {#<h2 class="event-type">{{ type | title }}</h2>#}
         <form method="post">
-        <input id="csrf_token" name=_csrf_token type=hidden value="{{ csrf_token() }}">
         <input type="hidden" name="event_type" value="external">
         <div>
             {% for event in type_events | sort(attribute='start_dt') %}

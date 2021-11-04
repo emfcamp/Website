@@ -17,7 +17,6 @@ from sqlalchemy_continuum.plugins import FlaskPlugin
 from flask_static_digest import FlaskStaticDigest
 from flask_caching import Cache
 from flask_debugtoolbar import DebugToolbarExtension
-from flask_wtf import CSRFProtect
 from flask_cors import CORS
 from loggingmanager import create_logging_manager, set_user_id
 from werkzeug.exceptions import HTTPException
@@ -60,7 +59,6 @@ def include_object(object, name, type_, reflected, compare_to):
 charset.add_charset("utf-8", charset.QP, charset.QP, "utf-8")
 
 cache = Cache()
-csrf = CSRFProtect()
 migrate = Migrate(include_object=include_object)
 manager = VersioningManager(options={"strategy": "subquery"})
 make_versioned(manager=manager, plugins=[FlaskPlugin()])
@@ -110,7 +108,7 @@ def create_app(dev_server=False, config_override=None):
         ).inc()
         return response
 
-    for extension in (csrf, cache, db, mail, static_digest, toolbar):
+    for extension in (cache, db, mail, static_digest, toolbar):
         extension.init_app(app)
 
     def log_email(message, app):

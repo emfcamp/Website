@@ -38,7 +38,6 @@
 </form>
 
 <form method="post" action="{{ url_for('payments.stripe_capture', payment_id=payment.id) }}" id="stripe_capture" class="hidden">
-  <input id="csrf_token" name="_csrf_token" type="hidden" value="{{ csrf_token() }}">
 </form>
 
 </div>

@@ -30,8 +30,6 @@
     {% if role.over_18_only %}
         {% if current_volunteer.over_18 %}
             <form class="form-inline" method="POST">
-                <input id="csrf_token" name=_csrf_token type=hidden value="{{ csrf_token() }}">
-
                 <button class="btn btn-primary debounce">
                     Sign up for this role
                 </button>
@@ -39,8 +37,6 @@
         {% endif %}
     {% else %}
         <form class="form-inline" method="POST">
-            <input id="csrf_token" name=_csrf_token type=hidden value="{{ csrf_token() }}">
-
             <button class="btn btn-primary debounce">
                 Sign up for this role
             </button>

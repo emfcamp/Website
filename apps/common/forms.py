@@ -5,7 +5,6 @@ from flask_wtf import FlaskForm
 from wtforms import IntegerField, SelectField, StringField, ValidationError
 from wtforms.widgets import Input, HiddenInput
 from wtforms.widgets.html5 import EmailInput
-from wtforms.compat import string_types
 from wtforms.widgets.core import html_params
 from email_validator import validate_email, EmailNotValidError
 import re
@@ -115,18 +114,11 @@ class StaticField(StringField):
 
 
 class Form(FlaskForm):
-    def hidden_tag_without(self, *exclude_fields):
-        """Return the hidden fields for this form, excluding the fields listed in
-        `exclude_fields`
+    """
+    Re-override these back to their wtforms defaults
+    """
 
-        We use this to render all the hidden fields in the form except for the
-        CSRF token, for reasons which are currently unclear to me.
-        """
-        fields = [
-            getattr(self, f) if isinstance(f, string_types) and hasattr(self, f) else f
-            for f in exclude_fields
-        ]
-        keep_fields = [
-            f for f in self if isinstance(f.widget, HiddenInput) and f not in fields
-        ]
-        return FlaskForm.hidden_tag(self, *keep_fields)
+    class Meta(FlaskForm.Meta):
+        csrf = False
+        csrf_class = None
+        csrf_context = None

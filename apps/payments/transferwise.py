@@ -4,7 +4,6 @@ import logging
 import pywisetransfer
 from pywisetransfer.webhooks import verify_signature
 
-from main import csrf
 from models.payment import BankAccount, BankTransaction
 from . import payments
 
@@ -22,7 +21,6 @@ def webhook(type=None):
     return inner
 
 
-@csrf.exempt
 @payments.route("/transferwise-webhook", methods=["POST"])
 def transferwise_webhook():
     valid_signature = verify_signature(

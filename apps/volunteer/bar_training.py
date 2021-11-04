@@ -7,7 +7,7 @@ from flask import request, current_app as app, abort, render_template
 from flask_login import current_user
 import requests
 
-from main import csrf, db, external_url
+from main import db, external_url
 from models import event_year
 from models.user import User
 from models.volunteer.role import Role
@@ -41,7 +41,6 @@ def bar_training_check():
     return json.dumps(bar in volunteer.trained_roles)
 
 
-@csrf.exempt
 @volunteer.route("/bar-training/webhook/<tag>", methods=["GET", "POST"])
 def bar_training_webhook(tag):
     if not hmac.compare_digest(get_auth_tag(), tag):

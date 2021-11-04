@@ -259,15 +259,13 @@ window.init_emf_scheduler = (schedule_data, venues, is_anonymous) => {
 
         var http = new XMLHttpRequest(),
             form = get_ele('favourite_form'),
-            csrf = get_ele('csrf_token'),
             fave = get_ele('favourite_icon'),
             event = popup_event.id;
 
         http.open("POST", form.action, true);
         http.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 
-        var params = csrf.name + '=' + csrf.value;
-        http.send(params);
+        http.send();
         debounce = true;
         setTimeout(function() {
             debounce = false;

@@ -22,7 +22,7 @@
             {% for f in form.roles %}
                 <tr class="form-group">
                     <td class="col-sm-3">
-                        {{ f.hidden_tag_without('csrf_token') }}
+                        {{ f.hidden_tag() }}
                         <div class="checkbox ">
                             <label for="{{ f.signup.name }}">
                                 {{ f.signup()| safe }}
