@@ -50,6 +50,8 @@
     "@primer/octicons": "^9.6.0",
     "bootstrap": "^3.4.1",
     "bootstrap-sass": "^3.4.1",
-    "jquery": "^3.5.0"
+    "datatables.net": "^1.11.3",
+    "jquery": "^3.5.0",
+    "jquery-highlight": "^3.5.0"
   }
 }

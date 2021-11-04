@@ -36,6 +36,7 @@ function js(cb) {
       'js/line-up.js',
       'js/schedule.js',
       'js/volunteer-schedule.js',
+      'js/arrivals.js'
     ])
     .pipe(
       tap(function(file) {
