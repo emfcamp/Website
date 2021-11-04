@@ -23,7 +23,7 @@ const uglify = require('gulp-uglify');
 // CSS processors
 const postcss = require('gulp-postcss');
 const postcssPresetEnv = require('postcss-preset-env');
-const sass = require('gulp-sass');
+const sass = require('gulp-dart-sass');
 const cleancss = require('gulp-clean-css');
 
 const argv = minimist(process.argv.slice(2));
@@ -66,19 +66,15 @@ function css(cb) {
       'css/volunteer_schedule.scss',
     ])
     .pipe(gulpif(!production, sourcemaps.init()))
+    .pipe(sass({includePaths: ['../node_modules']}).on('error', sass.logError))
     .pipe(
       postcss(
         [
-          require('postcss-easy-import'),
           require('postcss-input-range')(),
           postcssPresetEnv(),
         ],
-        {
-          syntax: require('postcss-scss'),
-        },
       ),
     )
-    .pipe(sass().on('error', sass.logError))
     .pipe(gulpif(production, cleancss()))
     .pipe(rename({extname: '.css'}))
     .pipe(gulpif(!production, sourcemaps.write()))

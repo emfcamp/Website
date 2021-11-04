@@ -1,4 +1,5 @@
 /* Show the hover borders by default to avoid bleeding */
+@use "./_variables.scss" as *;
 .btn-primary {
     background-color: #7c1243;
     border: 1px solid #33071C;

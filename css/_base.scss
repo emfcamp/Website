@@ -5,6 +5,8 @@
  *   - 1200px
  */
 
+@use "./_variables.scss" as *;
+
 body {
   font-size: 16px;
   color: $main-background-text;
