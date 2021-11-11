@@ -1,24 +1,28 @@
 {% extends "base.html" %}
 {% block title %}Company Details{% endblock %}
 {% block body %}
+<div class="col-md-10">
   <h2>Company Details</h2>
   <p>Electromagnetic Field is operated by <strong>EMF Festivals Ltd</strong>, a wholly-owned subsidiary of <strong>Electromagnetic Field Ltd</strong>. We are a non-profit event with no paid employees.</p>
 
   <p>When you purchase a ticket or sponsor EMF, your contract is with EMF Festivals Ltd.</p>
 
   <h3>EMF Festivals Ltd</h3>
-  <p><a href="https://find-and-update.company-information.service.gov.uk/company/13085232">EMF Festivals Ltd</a> is a company registered in England and Wales with company number 13085232.</p>
+  <p><a href="https://find-and-update.company-information.service.gov.uk/company/13085232">EMF Festivals Ltd</a> is a company registered in England and Wales.</p>
   <dl class="dl-horizontal">
+    <dt>Company number</dt><dd>13085232</dd>
     <dt>VAT number</dt><dd>(GB)387001308</dd>
     <dt>Registered office</dt><dd>483 Green Lanes, London, N13 4BS</dd>
   </dl>
 
   <h3>Electromagnetic Field Ltd</h3>
-  <p><a href="https://find-and-update.company-information.service.gov.uk/company/07788466">Electromagnetic Field Ltd</a> is a company limited by guarantee, registered in England and Wales with company number 07788466.</p>
+  <p><a href="https://find-and-update.company-information.service.gov.uk/company/07788466">Electromagnetic Field Ltd</a> is a company limited by guarantee, registered in England and Wales.</p>
   <dl class="dl-horizontal">
+    <dt>Company number</dt><dd>07788466</dd>
     <dt>Registered office</dt><dd>483 Green Lanes, London, N13 4BS</dd>
   </dl>
   <p>Electromagnetic Field is a <a href="https://trademarks.ipo.gov.uk/ipo-tmcase/page/Results/1/UK00003567259">registered trademark</a> of Electromagnetic Field Ltd.</p>
 
-<p>If you have a question, please check out our <a href="https://wiki.emfcamp.org/wiki/Contact">contact details</a>, or email us at <a href="mailto:{{ config['CONTACT_EMAIL'][1] }}">{{ config['CONTACT_EMAIL'][1] }}</a>.</p>
+  <p>If you have a question, please check out our <a href="https://wiki.emfcamp.org/wiki/Contact">contact details</a>, or email us at <a href="mailto:{{ config['CONTACT_EMAIL'][1] }}">{{ config['CONTACT_EMAIL'][1] }}</a>.</p>
+</div>
 {% endblock %}
