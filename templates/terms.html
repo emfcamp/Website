@@ -1,46 +1,72 @@
 {% extends "base.html" %}
+{% block title %}Terms and Conditions of Ticket Sales{% endblock %}
 {% block body %}
 
 <div class="col-md-10">
 
-<h2>Terms and Conditions of Ticket Purchase</h2>
+  <h2>Terms and Conditions of Ticket Sales</h2>
+
+  <p>By purchasing a ticket you are entering into a contract with <a href="{{url_for('base.company')}}">EMF Festivals Ltd</a> ("EMF"),
+  and you agree to the following terms.</p>
+<h3>1. Ticket sale and refunds</h3>
 <ol>
-<li>Tickets may not be resold for more than the purchase price. The organiser reserves the right to
-  cancel tickets resold in such a manner without notice.</li>
-<li>Tickets may not be purchased with any automated software. Tickets suspected to have purchased in
-  such a way may be cancelled without notice.</li>
-<li>Tickets may not be returned for a refund unless the event is cancelled. The organiser may, at its
+  <li>Tickets may be resold, but they must not be resold for more than the purchase price.
+    EMF reserves the right to cancel tickets resold in such a manner without notice.</li>
+  <li>Tickets must not be purchased with automated software. Tickets suspected to have purchased in
+    such a way may be cancelled without notice.</li>
+  <li>Tickets may not be returned for a refund unless the event is cancelled. EMF may, at its
     sole discretion, refund tickets before the event begins.</li>
-<li>You will not receive a physical ticket; you will be sent an e-ticket
-  which must be presented on arrival.</li>
-<li>Proof of age may be requested at the point of entry and at the bars.</li>
-<li>The event schedule may be amended at any time.</li>
-<li>The organiser may, at its sole discretion,
-    refuse admission or eject a ticket holder without refund for unreasonable or dangerous behaviour,
-    for violation of the <a href="{{url_for('base.code_of_conduct')}}">Code of Conduct</a>, or for any
-    other reason.</li>
-<li>Attendees younger than 16 must be accompanied by an adult who accepts full responsibility for all
-    under 16s attending under their supervision.</li>
-<li>Camping in the festival grounds is included in the ticket price.</li>
-<li>All vehicles are parked at the owner's risk.</li>
-<li>Car parking tickets must be pre-purchased before arrival.</li>
-<li>No animals (except assistance animals) are permitted into the festival site.</li>
-<li>Please avoid bringing glass into the festival site where possible.</li>
-<li>No fires are permitted on the ground, except in designated areas.</li>
-<li>Fireworks, smoke canisters, sky lanterns, and other similar articles are not permitted within the festival site.</li>
-<li>Weapons and illegal drugs are not permitted anywhere on the festival site, including car parks.</li>
-<li>Discharge-type strobe lights are not permitted on the festival site.</li>
-<li>While we endeavour to provide all attendees with a TiLDA electronic badge,
-  it is provided on a best-effort basis and your ticket does not guarantee you a badge.</li>
-<li>Rented tents and furniture will be available for use no later than 12:00 on the Friday
-  of the event, although we expect them to be available earlier.
-  Refunds will be issued pro rata if they are unavailable after that that time.</li>
-<li>You must seek explicit permission to operate any amplified music equipment with a power of over 50W.</li>
-<li>No stalls or market sales without permission of the organisers - please ask!</li>
+  <li>You will not receive a physical ticket; you will be sent an e-ticket
+    which must be presented on arrival.</li>
+  <li>The event schedule may be amended at any time.</li>
+</ol>
+<h3>2. Admission</h3>
+<ol>
+  <li>No animals, except assistance animals, are permitted into the festival site.</li>
+  <li>Proof of age may be requested at the point of entry and at the bars.</li>
+  <li>EMF may, at its sole discretion,
+      refuse admission or eject a ticket holder without refund for unreasonable or dangerous behaviour,
+      for violation of the <a href="{{url_for('base.code_of_conduct')}}">Code of Conduct</a>, or for any
+      other reason.</li>
+  <li>Attendees younger than 16 must be accompanied by an adult who accepts full responsibility for all
+      under 16s attending under their supervision.</li>
+  <li>All vehicles and personal property brought onto the site are left at the owner's risk.</li>
+  <li>Cars, caravans, and camper vans require a separate ticket which must be purchased before arrival.</li>
+  <li>While we endeavour to provide all attendees with a TiLDA electronic badge,
+    it is provided on a best-effort basis and your ticket does not guarantee you a badge.</li>
+</ol>
+<h3>3. Site rules</h3>
+<ol>
+  <li>Please avoid bringing glass into the festival site where possible.</li>
+  <li>No fires are permitted on the ground, except in designated areas.</li>
+  <li>The following items are prohibited anywhere on the festival site:
+    <ol type="a">
+      <li>Weapons</li>
+      <li>Illegal drugs</li>
+      <li>Fireworks and other explosive pyrotechnics</li>
+      <li>Sky lanterns</li>
+      <li>Discharge-type strobe lights</li>
+      <li>Generators</li>
+    </ol>
+  </li>
+  <li>You must have written permission from EMF to operate any of the following on the festival site (please ask!):
+    <ol type="a">
+      <li>Amplified music equipment with a power of over 50W</li>
+      <li>Laser equipment rated higher than class 1</li>
+      <li>Flame effects</li>
+      <li>Market stalls or commercial sales of any kind</li>
+    </ol>
+  </li>
+</ol>
+<h3>4. Rental</h3>
+<ol>
+  <li>Rented tents and furniture will be available for use no later than 12:00 on the Friday
+    of the event, although we expect them to be available earlier.
+    Refunds will be issued pro rata if they are unavailable after that that time.</li>
 </ol>
 
 <p>For ticket enquiries, please contact us at <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">{{ config['TICKETS_EMAIL'][1] }}</a>.</p>
 
-<p>These terms were last revised on <strong>2020-02-21</strong> and apply to all tickets sold after that date.</p>
+<p>These terms were last revised on <strong>2021-11-11</strong> and apply to all tickets sold after that date.</p>
 </div>
 {% endblock %}
