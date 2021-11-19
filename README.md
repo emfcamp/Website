@@ -22,7 +22,7 @@ To start all containers (and rebuild any which may have changed):
 docker-compose build --parallel
 docker-compose up
 ```
-You should then be able to view your development server on [http://localhost:5000](http://localhost:5000).
+You should then be able to view your development server on [http://localhost:2342](http://localhost:2342).
 
 To create some fake data in your DB, run:
 ```
@@ -67,7 +67,7 @@ E-mail sending is disabled in development (but is printed out on the console). Y
 
 For more migration commands, see the [flask-migrate docs](https://flask-migrate.readthedocs.io/en/latest/).
 
-### More Docs 
+### More Docs
 
 For more, see:
 
