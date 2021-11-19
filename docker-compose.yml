@@ -11,7 +11,7 @@ services:
       - .:/app
       - ./var/vat_invoices:/vat_invoices
     ports:
-      - "5000:5000"
+      - "2342:2342"
     environment:
       SETTINGS_FILE: ./config/development.cfg
       FLASK_APP: dev_server.py
