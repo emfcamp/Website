@@ -19,8 +19,8 @@ to monitor the containers.
 
 To start all containers (and rebuild any which may have changed):
 ```
-docker-compose build --parallel
-docker-compose up
+docker compose build --parallel
+docker compose up
 ```
 You should then be able to view your development server on [http://localhost:2342](http://localhost:2342).
 
@@ -28,8 +28,8 @@ To create some fake data in your DB, run:
 ```
 ./flask dev data
 ```
-To stop all containers, use `docker-compose stop`
-To delete all data and start over fresh you can use `docker-compose down`.
+To stop all containers, use `docker compose stop`
+To delete all data and start over fresh you can use `docker compose down`.
 
 Management commands can be listed and run using the `./flask` command, which
 forwards them to the flask command line within the container.
