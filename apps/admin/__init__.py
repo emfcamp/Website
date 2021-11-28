@@ -34,9 +34,9 @@ from models.site_state import SiteState, VALID_STATES, refresh_states
 from models.map import MapObject
 from models.scheduled_task import tasks, ScheduledTaskResult
 from ..payments.stripe import stripe_validate
-from ..payments.transferwise import (
-    transferwise_validate,
-    transferwise_retrieve_accounts,
+from ..payments.wise import (
+    wise_validate,
+    wise_retrieve_accounts,
 )
 from ..common import require_permission
 from ..common.forms import Form
@@ -213,7 +213,7 @@ def payment_config_verify():
     form = BankAccountRefreshForm()
 
     if form.validate_on_submit():
-        tw_accounts = transferwise_retrieve_accounts()
+        tw_accounts = wise_retrieve_accounts()
         for tw_account in tw_accounts:
             existing_account = BankAccount.query.filter_by(iban=tw_account.iban).first()
             if existing_account:
@@ -229,7 +229,7 @@ def payment_config_verify():
     return render_template(
         "admin/payment-config-verify.html",
         stripe=stripe_validate(),
-        transferwise=transferwise_validate(),
+        transferwise=wise_validate(),
         bank_accounts=BankAccount.query.all(),
         form=form,
         last_bank_payment=BankTransaction.query.order_by(

@@ -21,14 +21,14 @@ def webhook(type=None):
     return inner
 
 
-@payments.route("/transferwise-webhook", methods=["POST"])
-def transferwise_webhook():
+@payments.route("/wise-webhook", methods=["POST"])
+def wise_webhook():
     valid_signature = verify_signature(
         request.data,
         request.headers["X-Signature"],
     )
     if not valid_signature:
-        logger.exception("Error verifying TransferWise webhook signature")
+        logger.exception("Error verifying Wise webhook signature")
         abort(400)
 
     event_type = request.json.get("event_type")
@@ -39,32 +39,32 @@ def transferwise_webhook():
             handler = webhook_handlers[None]
         return handler(event_type, request.json)
     except Exception as e:
-        logger.exception("Unhandled exception during TransferWise webhook")
+        logger.exception("Unhandled exception during Wise webhook")
         logger.info("Webhook data: %s", request.data)
         abort(500)
 
 
 @webhook("balances#credit")
-def transferwise_balance_credit(event_type, event):
+def wise_balance_credit(event_type, event):
     profile_id = event.get("data", {}).get("resource", {}).get("profile_id")
     if profile_id is None:
-        logger.exception("Missing profile_id in TransferWise webhook")
+        logger.exception("Missing profile_id in Wise webhook")
         logger.info("Webhook data: %s", request.data)
         abort(400)
 
     borderless_account_id = event.get("data", {}).get("resource", {}).get("id")
     if borderless_account_id is None:
-        logger.exception("Missing borderless_account_id in TransferWise webhook")
+        logger.exception("Missing borderless_account_id in Wise webhook")
         logger.info("Webhook data: %s", request.data)
         abort(400)
 
     currency = event.get("data", {}).get("currency")
     if currency is None:
-        logger.exception("Missing currency in TransferWise webhook")
+        logger.exception("Missing currency in Wise webhook")
         logger.info("Webhook data: %s", request.data)
         abort(400)
 
-    # Find the TransferWise bank account in the application database
+    # Find the Wise bank account in the application database
     bank_account = BankAccount.query.filter_by(
         borderless_account_id=borderless_account_id, active=True
     ).first()
@@ -114,7 +114,7 @@ def transferwise_balance_credit(event_type, event):
     return ("", 204)
 
 
-def transferwise_business_profile():
+def wise_business_profile():
     client = pywisetransfer.Client()
     profiles = client.profiles.list(type="business")
     return next(profiles, None)
@@ -156,8 +156,8 @@ def _collect_bank_accounts(borderless_account):
         )
 
 
-def transferwise_retrieve_accounts():
-    business_profile = transferwise_business_profile()
+def wise_retrieve_accounts():
+    business_profile = wise_business_profile()
     if not business_profile:
         return
 
@@ -170,8 +170,8 @@ def transferwise_retrieve_accounts():
             yield bank_account
 
 
-def transferwise_validate():
-    """Validate that TransferWise is configured and operational"""
+def wise_validate():
+    """Validate that Wise is configured and operational"""
     result = []
 
     env = app.config.get("TRANSFERWISE_ENVIRONMENT")
@@ -181,25 +181,28 @@ def transferwise_validate():
         result.append((True, "Live environment being used"))
     else:
         result.append((False, "No environment configured"))
+        return result
 
     val = app.config.get("TRANSFERWISE_API_TOKEN", "")
     if len(val) == 36:
         result.append((True, "Access token set"))
     else:
         result.append((False, "Access token not set"))
+        return result
 
     try:
         client = pywisetransfer.Client()
-        user = client.users.me()
-        result.append((True, "Connection to TransferWise API succeeded"))
+        client.users.me()
+        result.append((True, "Connection to Wise API succeeded"))
     except Exception as e:
-        result.append((False, f"Unable to connect to TransferWise: {e}"))
+        result.append((False, f"Unable to connect to Wise: {e}"))
+        return result
 
-    business_profile = transferwise_business_profile()
+    business_profile = wise_business_profile()
     if business_profile:
-        result.append((True, "TransferWise business profile exists"))
+        result.append((True, "Wise business profile exists"))
     else:
-        result.append((False, "TransferWise business profile does not exist"))
+        result.append((False, "Wise business profile does not exist"))
 
     webhooks = client.subscriptions.list(profile_id=business_profile.id)
     if webhooks:

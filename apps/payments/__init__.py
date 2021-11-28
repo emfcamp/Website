@@ -27,3 +27,4 @@ from . import banktransfer  # noqa: F401
 from . import stripe  # noqa: F401
 from . import invoice  # noqa: F401
 from . import tasks  # noqa: F401
+from . import wise  # noqa: F401

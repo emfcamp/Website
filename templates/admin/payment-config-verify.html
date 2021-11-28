@@ -15,7 +15,7 @@
 {% endfor %}
 </ul>
 
-<h3>TransferWise</h3>
+<h3>Wise</h3>
 <ul>
 {% for success, message in transferwise %}
   <li>{% if success %}✅{% else %}❌<strong>{% endif %}
@@ -25,7 +25,7 @@
 
 <h4>Manual tasks:</h4>
 <ul>
-  <li>Ensure a webhook is configured for the URL <code>{{external_url('payments.transferwise_webhook')}}</code></li>
+  <li>Ensure a webhook is configured for the URL <code>{{external_url('payments.wise_webhook')}}</code></li>
 </ul>
 
 <h3>Bank Accounts</h3>
