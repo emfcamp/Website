@@ -38,6 +38,7 @@ from ..payments.wise import (
     wise_validate,
     wise_retrieve_accounts,
 )
+from sqlalchemy import update
 from ..common import require_permission
 from ..common.forms import Form
 
@@ -208,7 +209,20 @@ class BankAccountRefreshForm(Form):
     import_accounts = SubmitField("Import new TransferWise accounts")
 
 
-@admin.route("/payment-config-verify", methods=["GET", "POST"])
+@admin.route("/payment-config/activate", methods=["POST"])
+def activate_payment_config():
+    if request.form.get("activate"):
+        to_activate = BankAccount.query.filter_by(id=request.form["activate"]).first()
+        for account in BankAccount.query.filter_by(currency=to_activate.currency):
+            if account.id != to_activate.id:
+                account.active = False
+        to_activate.active = True
+        db.session.commit()
+
+    return redirect(url_for(".payment_config_verify"), 303)
+
+
+@admin.route("/payment-config", methods=["GET", "POST"])
 def payment_config_verify():
     form = BankAccountRefreshForm()
 
@@ -232,7 +246,9 @@ def payment_config_verify():
         "admin/payment-config-verify.html",
         stripe=stripe_validate(),
         transferwise=wise_validate(),
-        bank_accounts=BankAccount.query.all(),
+        bank_accounts=BankAccount.query.order_by(
+            BankAccount.active.desc(), BankAccount.currency.desc()
+        ).all(),
         form=form,
         last_bank_payment=BankTransaction.query.order_by(
             BankTransaction.id.desc()

@@ -1,8 +1,9 @@
 {% extends "admin/base.html" %}
 {% set nav_active = 'payment_config_verify' %}
+{% block title %}Payment Config{% endblock %}
 {% block body %}
 
-<h2>Payment Config Check</h2>
+<h2>Payment Config</h2>
 
 <p>Please find enclosed the results of a cursory check of payment system functionality.</p>
 <p>If you see any emoji crosses you should probably fix them before attempting to sell tickets.</p>
@@ -29,7 +30,8 @@
 </ul>
 
 <h3>Bank Accounts</h3>
-<table class="table table-condensed">
+<form method="post" action="{{url_for('.activate_payment_config')}}">
+  <table class="table table-condensed">
   <tr>
     <th>Institution</th>
     <th>Currency</th>
@@ -38,6 +40,7 @@
     <th>IBAN</th>
     <th>Sort Code</th>
     <th>Account Number</th>
+    <th></th>
   </tr>
 {% for bank_account in bank_accounts %}
   <tr>
@@ -48,9 +51,11 @@
     <td>{{ bank_account.iban or '' | iban }}</td>
     <td>{{ bank_account.sort_code or '' | sort_code }}</td>
     <td>{{ bank_account.acct_id or '' }}</td>
+    <td>{% if not bank_account.active %}<button class="btn btn-small btn-default" name="activate" value="{{bank_account.id}}">Activate</button>{% endif %}</td>
   </tr>
 {% endfor %}
 </table>
+</form>
 
 <form method="post">
 {{ form.hidden_tag() }}
