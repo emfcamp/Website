@@ -352,13 +352,6 @@ db.Index(
     unique=True,
 )
 
-db.Index(
-    "ix_bank_account_currency_active",
-    BankAccount.currency,
-    BankAccount.active,
-    unique=True,
-)
-
 
 class BankTransaction(db.Model):
     __tablename__ = "bank_transaction"

@@ -215,7 +215,9 @@ def payment_config_verify():
     if form.validate_on_submit():
         tw_accounts = wise_retrieve_accounts()
         for tw_account in tw_accounts:
-            existing_account = BankAccount.query.filter_by(iban=tw_account.iban).first()
+            existing_account = BankAccount.query.filter_by(
+                borderless_account_id=tw_account.borderless_account_id
+            ).first()
             if existing_account:
                 continue
             db.session.add(tw_account)

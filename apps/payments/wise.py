@@ -116,55 +116,83 @@ def wise_balance_credit(event_type, event):
 
 def wise_business_profile():
     client = pywisetransfer.Client()
-    profiles = client.profiles.list(type="business")
-    return next(profiles, None)
+
+    if app.config.get("TRANSFERWISE_PROFILE_ID"):
+        id = int(app.config["TRANSFERWISE_PROFILE_ID"])
+        borderless_accounts = list(client.borderless_accounts.list(profile_id=id))
+        if len(borderless_accounts) == 0:
+            raise Exception("Provided TRANSFERWISE_PROFILE_ID has no accoutns")
+    else:
+        # Wise bug:
+        # As of 11-2021, this endpoint only returns one random business profile.
+        # So if you have multiple business profiles (as we do in production),
+        # you'll need to set it manually as above.
+        profiles = client.profiles.list(type="business")
+        profiles = list(filter(lambda p: p.type == "business", profiles))
+
+        if len(profiles) > 1:
+            raise Exception("Multiple business profiles found")
+        id = profiles[0].id
+    return id
 
 
 def _collect_bank_accounts(borderless_account):
-    for balance in borderless_account.balances:
+    for account in borderless_account.balances:
+        print(account)
         try:
-            if not balance.bankDetails:
+            if not account.bankDetails:
                 continue
-            if not balance.bankDetails.bankAddress:
-                continue
-            if not balance.bankDetails.swift:
-                continue
-            if not balance.bankDetails.iban:
+            if not account.bankDetails.bankAddress:
                 continue
         except AttributeError:
             continue
 
         address = ", ".join(
             [
-                balance.bankDetails.bankAddress.addressFirstLine,
-                balance.bankDetails.bankAddress.city
+                account.bankDetails.bankAddress.addressFirstLine,
+                account.bankDetails.bankAddress.city
                 + " "
-                + (balance.bankDetails.bankAddress.postCode or ""),
-                balance.bankDetails.bankAddress.country,
+                + (account.bankDetails.bankAddress.postCode or ""),
+                account.bankDetails.bankAddress.country,
             ]
         )
+
+        sort_code = account_number = None
+
+        if account.bankDetails.currency == "GBP":
+            # bankCode is the SWIFT code for non-GBP accounts.
+            sort_code = account.bankDetails.bankCode
+
+            if len(account.bankDetails.accountNumber) == 8:
+                account_number = account.bankDetails.accountNumber
+            else:
+                # Wise bug:
+                # accountNumber is sometimes erroneously the IBAN for GBP accounts.
+                # Extract the account number from the IBAN.
+                account_number = account.bankDetails.accountNumber.replace(" ", "")[-8:]
+
         yield BankAccount(
-            sort_code=None,
-            acct_id=None,
-            currency=balance.bankDetails.currency,
+            sort_code=sort_code,
+            acct_id=account_number,
+            currency=account.bankDetails.currency,
             active=False,
-            institution=balance.bankDetails.bankName,
+            institution=account.bankDetails.bankName,
             address=address,
-            swift=balance.bankDetails.swift,
-            iban=balance.bankDetails.iban,
-            borderless_account_id=balance.id,
+            swift=account.bankDetails.get("swift"),
+            iban=account.bankDetails.get("iban"),
+            borderless_account_id=account.id,
         )
 
 
 def wise_retrieve_accounts():
     business_profile = wise_business_profile()
+
     if not business_profile:
         return
 
     client = pywisetransfer.Client()
-    borderless_accounts = client.borderless_accounts.list(
-        profile_id=business_profile.id
-    )
+    borderless_accounts = client.borderless_accounts.list(profile_id=business_profile)
+
     for borderless_account in borderless_accounts:
         for bank_account in _collect_bank_accounts(borderless_account):
             yield bank_account
@@ -204,7 +232,7 @@ def wise_validate():
     else:
         result.append((False, "Wise business profile does not exist"))
 
-    webhooks = client.subscriptions.list(profile_id=business_profile.id)
+    webhooks = client.subscriptions.list(profile_id=business_profile)
     if webhooks:
         result.append((True, "Webhook event subscriptions are present"))
     else:
