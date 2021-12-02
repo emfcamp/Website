@@ -35,13 +35,13 @@ def make_admin(user_id, email):
         user = User.query.order_by(User.id).first()
 
     if not user:
-        print("No user exists or matches the search.")
+        click.echo("No user exists or matches the search.")
         return
 
     user.grant_permission("admin")
     db.session.commit()
 
-    print("%r is now an admin" % user.name)
+    click.echo("%r is now an admin" % user.name)
 
 
 @app.cli.command("create_perms")

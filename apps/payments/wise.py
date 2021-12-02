@@ -138,7 +138,6 @@ def wise_business_profile():
 
 def _collect_bank_accounts(borderless_account):
     for account in borderless_account.balances:
-        print(account)
         try:
             if not account.bankDetails:
                 continue

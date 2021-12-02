@@ -132,7 +132,7 @@ def transferwise_refund(number, amount, currency):
             count += 1
         max_id = request.id
 
-    print(io.getvalue())
+    click.echo(io.getvalue())
     app.logger.info(f"Refunds produced for currency {currency} up to id {max_id}")
 
 

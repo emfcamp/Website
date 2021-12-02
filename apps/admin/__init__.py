@@ -38,7 +38,6 @@ from ..payments.wise import (
     wise_validate,
     wise_retrieve_accounts,
 )
-from sqlalchemy import update
 from ..common import require_permission
 from ..common.forms import Form
 
