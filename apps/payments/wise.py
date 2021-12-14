@@ -58,6 +58,10 @@ def wise_balance_credit(event_type, event):
         logger.info("Webhook data: %s", request.data)
         abort(400)
 
+    if borderless_account_id == 0:
+        # A credit event with an account ID of 0 is sent when webhook connections are configured.
+        return ("", 204)
+
     currency = event.get("data", {}).get("currency")
     if currency is None:
         logger.exception("Missing currency in Wise webhook")
@@ -69,9 +73,11 @@ def wise_balance_credit(event_type, event):
         borderless_account_id=borderless_account_id, active=True
     ).first()
     if not bank_account:
-        logger.exception("Could not find bank account for borderless_account_id")
-        logger.info("Webhook data: %s", request.data)
-        abort(400)
+        logger.warn(
+            "Could not find bank account for borderless_account_id %s",
+            borderless_account_id,
+        )
+        return ("", 204)
 
     # Retrieve an account transaction statement for the past week
     client = pywisetransfer.Client()
