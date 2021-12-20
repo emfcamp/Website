@@ -1,3 +1,5 @@
+{% extends "emails/base.txt" %}
+{% block body %}
 Hi {{ proposal.user.name }},
 
 Unfortunately we have had to move your EMF {{ proposal.human_type }} '{{ proposal.title }}' due to the availability of other speakers. We've done our best to minimise the amount of hassle it will cause you.
@@ -26,3 +28,4 @@ Things to note:
 
 Looking forward to seeing you in the field,
 The EMF Speaker Ops Team
+{% endblock %}

@@ -1,4 +1,5 @@
 @use "../node_modules/bootstrap/dist/css/bootstrap.css";
+@use "./_non_prod_banner.scss" as *;
 
 body {
   padding-top: 70px;
@@ -41,3 +42,8 @@ header h1 > * {
 table.hire-purchases tr.payment-pending td {
     color: #999;
 }
+
+.non-prod-banner {
+  margin-top: -20px; /* To match navbar's margin-bottom */
+}
+

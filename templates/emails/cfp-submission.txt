@@ -1,3 +1,5 @@
+{% extends "emails/base.txt" %}
+{% block body %}
 Hi {{ proposal.user.name }},
 
 This is to confirm your submission to our call for participation. We'll try to process your submission as quickly as possible. Here's a summary of your submission:
@@ -28,3 +30,4 @@ Any problems please contact us.
 Love,
 
 All the EMF team
+{% endblock %}

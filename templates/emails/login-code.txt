@@ -1,3 +1,5 @@
+{% extends "emails/base.txt" %}
+{% block body %}
 {%- if user.name != user.email %}
 Hi {{ user.name }},
 {%- else %}
@@ -15,3 +17,4 @@ See you soon at Electromagnetic Field {{ event_year }}!
 Love,
 
 All the EMF team
+{% endblock %}

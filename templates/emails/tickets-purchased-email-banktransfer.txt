@@ -1,3 +1,5 @@
+{% extends "emails/base.txt" %}
+{% block body %}
 Hi {{ user.name }},
 
 {% if payment.purchases | count == 1 -%}
@@ -15,3 +17,4 @@ Please ensure your payment reaches us by {{payment.expires.strftime('%-d %B %Y')
 Love,
 
 All the EMF team
+{% endblock %}

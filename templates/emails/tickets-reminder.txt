@@ -1,3 +1,5 @@
+{% extends "emails/base.txt" %}
+{% block body %}
 Hi {{ payment.user.name }},
 
 Just to warn you that we have not yet received payment for the tickets you
@@ -53,3 +55,4 @@ Your tickets are:
 Love,
 
 All the EMF team
+{% endblock %}

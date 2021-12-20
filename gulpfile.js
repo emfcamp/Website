@@ -64,6 +64,7 @@ function css(cb) {
       'css/receipt.scss',
       'css/schedule.scss',
       'css/volunteer_schedule.scss',
+      'css/flask-admin.scss',
     ])
     .pipe(gulpif(!production, sourcemaps.init()))
     .pipe(sass({includePaths: ['../node_modules']}).on('error', sass.logError))

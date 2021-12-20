@@ -35,7 +35,8 @@ class VolunteerBaseView(FlaskVolunteerAdminAppMixin, BaseView):
 
 
 class VolunteerAdminIndexView(FlaskVolunteerAdminAppMixin, AdminIndexView):
-    pass
+    # Yes this is should use url_for, but apparently this code's on the way out
+    extra_css = ["/static/css/flask-admin.css"]
 
 
 class VolunteerModelView(FlaskVolunteerAdminAppMixin, ModelView):

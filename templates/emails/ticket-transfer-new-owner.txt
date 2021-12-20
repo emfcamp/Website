@@ -1,3 +1,5 @@
+{% extends "emails/base.txt" %}
+{% block body %}
 Hi {{ to_user.name }},
 
 Your friend {{ from_user.name }} has transferred a ticket to you for
@@ -20,3 +22,4 @@ Love,
 
 All the EMF team
 
+{% endblock %}

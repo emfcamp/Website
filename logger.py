@@ -51,15 +51,17 @@ class GreenStreamHandler(ColorizingStreamHandler):
 
 
 def mail_logging(message, app):
-    msg = u"""
-+++++ SENDING MAIL +++++
-TO:  {0.recipients}
-FROM:  {0.sender}
-SUBJECT:  {0.subject}
+    if app.config.get("MAIL_SUPPRESS_SEND"):
+      title = 'WOULD SEND MAIL'
+    else:
+      title = 'SENDING_MAIL'
+    msg = f"""
++++++ {title} +++++
+TO:  {message.recipients}
+FROM:  {message.sender}
+SUBJECT:  {message.subject}
 ---------
-{0.body}
+{message.body}
 ++++++++++
-    """.format(
-        message
-    )
+    """
     app.logger.info(msg)

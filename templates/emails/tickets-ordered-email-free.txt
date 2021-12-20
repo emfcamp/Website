@@ -1,3 +1,5 @@
+{% extends "emails/base.txt" %}
+{% block body %}
 Hi, {{ user.name }},
 
 This is to confirm that you've ordered
@@ -19,3 +21,4 @@ See you soon,
 Love,
 
 All the EMF team
+{% endblock %}

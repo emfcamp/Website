@@ -1,3 +1,5 @@
+{% extends "emails/base.txt" %}
+{% block body %}
 Hello!
 
 Thank you for helping out with Electromagnetic Field 2018. As a token of our gratitude, we'd like to give you the chance to buy your tickets for EMF 2020 before they go on general sale.
@@ -21,3 +23,4 @@ Again, thank you so much for helping last year. Without you it wouldn't have hap
 Love,
 
 Everyone at Electromagnetic Field
+{% endblock %}

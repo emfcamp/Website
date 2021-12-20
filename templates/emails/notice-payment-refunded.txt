@@ -1,3 +1,5 @@
+{% extends "emails/base.txt" %}
+{% block body %}
 Payment {{ payment.id }} for {{ payment.amount | price(payment.currency) }} belonging to
 {{ payment.user.name }} ({{ payment.user.email }}) has just been (part-)refunded unexpectedly by Stripe.
 
@@ -6,3 +8,4 @@ Please check the Stripe console for more details - action may be required. Speci
 Ticket details:
 
 {% include "emails/email-tickets.txt" %}
+{% endblock %}

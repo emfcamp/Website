@@ -1,3 +1,5 @@
+{% extends "emails/base.txt" %}
+{% block body %}
 Hi {{ proposal.user.name }},
 
 Your EMF {{ proposal.human_type }} proposal '{{ proposal.title }}' is currently on the reserve list and may be accepted closer than one month to the event - this is because we have last-minute drop-outs. Your proposal was very highly rated, but didn't quite make the main selection.
@@ -12,3 +14,4 @@ If you'd like to cancel your proposal as it is too close to the event, or you ca
 
 Thanks,
 The EMF Team
+{% endblock %}
