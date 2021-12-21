@@ -1,11 +1,19 @@
+from base64 import b64decode, b64encode
+import logging
+
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from datetime import datetime, timedelta
 from flask import abort, current_app as app, request
-import logging
+from munch import munchify
 import pywisetransfer
 from pywisetransfer.webhooks import verify_signature
+import requests
 
 from models.payment import BankAccount, BankTransaction
 from . import payments
+from main import db
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +31,21 @@ def webhook(type=None):
 
 @payments.route("/wise-webhook", methods=["POST"])
 def wise_webhook():
+    # Wise doesn't have the ability to resend webhooks, so log them out in case something goes wrong
+    logger.info(
+        "Received Wise webhook request: data=%r headers=%r",
+        request.data,
+        request.headers,
+    )
+
+    try:
+        b64decode(request.headers["X-Signature"])
+        if request.json is None:
+            raise ValueError("Request does not contain JSON")
+    except Exception as e:
+        logger.exception("Unable to parse Wise webhook request")
+        abort(400)
+
     valid_signature = verify_signature(
         request.data,
         request.headers["X-Signature"],
@@ -31,16 +54,24 @@ def wise_webhook():
         logger.exception("Error verifying Wise webhook signature")
         abort(400)
 
+    schema_version = request.json.get("schema_version")
+    if schema_version != "2.0.0":
+        logger.warning("Unsupported Wise schema version %s", schema_version)
+        abort(500)
+
     event_type = request.json.get("event_type")
     try:
-        try:
-            handler = webhook_handlers[event_type]
-        except KeyError as e:
-            handler = webhook_handlers[None]
+        handler = webhook_handlers[event_type]
+    except KeyError as e:
+        logger.warning("Unhandled Wise webhook event type %s", event_type)
+        # logger.info("Webhook data: %s", request.data)
+        abort(500)
+
+    try:
         return handler(event_type, request.json)
     except Exception as e:
         logger.exception("Unhandled exception during Wise webhook")
-        logger.info("Webhook data: %s", request.data)
+        # logger.info("Webhook data: %s", request.data)
         abort(500)
 
 
@@ -49,13 +80,13 @@ def wise_balance_credit(event_type, event):
     profile_id = event.get("data", {}).get("resource", {}).get("profile_id")
     if profile_id is None:
         logger.exception("Missing profile_id in Wise webhook")
-        logger.info("Webhook data: %s", request.data)
+        # logger.info("Webhook data: %s", request.data)
         abort(400)
 
     borderless_account_id = event.get("data", {}).get("resource", {}).get("id")
     if borderless_account_id is None:
         logger.exception("Missing borderless_account_id in Wise webhook")
-        logger.info("Webhook data: %s", request.data)
+        # logger.info("Webhook data: %s", request.data)
         abort(400)
 
     if borderless_account_id == 0:
@@ -65,31 +96,43 @@ def wise_balance_credit(event_type, event):
     currency = event.get("data", {}).get("currency")
     if currency is None:
         logger.exception("Missing currency in Wise webhook")
-        logger.info("Webhook data: %s", request.data)
+        #        logger.info("Webhook data: %s", request.data)
         abort(400)
 
+    logger.info(
+        "Checking Wise details for borderless_account_id %s and currency %s",
+        borderless_account_id,
+        currency,
+    )
     # Find the Wise bank account in the application database
     bank_account = BankAccount.query.filter_by(
-        borderless_account_id=borderless_account_id, active=True
+        borderless_account_id=borderless_account_id,
+        currency=currency,
+        active=True,
     ).first()
     if not bank_account:
-        logger.warn(
-            "Could not find bank account for borderless_account_id %s",
-            borderless_account_id,
-        )
+        logger.warning("Could not find bank account")
         return ("", 204)
 
     # Retrieve an account transaction statement for the past week
-    client = pywisetransfer.Client()
     interval_end = datetime.now()
     interval_start = interval_end - timedelta(days=7)
-    statement = client.borderless_accounts.statement(
-        profile_id=profile_id,
-        account_id=borderless_account_id,
-        currency=currency,
-        interval_start=interval_start.isoformat() + "Z",
-        interval_end=interval_end.isoformat() + "Z",
-    )
+    try:
+        statement = wise_statement(
+            profile_id,
+            borderless_account_id,
+            currency,
+            interval_start.isoformat() + "Z",
+            interval_end.isoformat() + "Z",
+        )
+    except Exception as e:
+        # TODO: send an email?
+        logger.exception("Could not fetch statement")
+        return ("", 204)
+
+    # Lock the bank account as BankTransactions don't have an external unique ID
+    # TODO: we could include referenceNumber to prevent this or at least detect issues
+    BankAccount.query.with_for_update().get(bank_account.id)
 
     # Retrieve or construct transactions for each credit in the statement
     txns = []
@@ -98,7 +141,8 @@ def wise_balance_credit(event_type, event):
             continue
 
         # Attempt to find transaction in the application database
-        txn = BankTransaction.query.filter(
+        # TODO: we should probably check the amount_int, too
+        txn = BankTransaction.query.filter_by(
             account_id=bank_account.id,
             posted=transaction.date,
             type=transaction.details.type.lower(),
@@ -106,18 +150,53 @@ def wise_balance_credit(event_type, event):
         ).first()
 
         # Construct a transaction record if not found
-        txn = txn or BankTransaction(
+        if txn:
+            continue
+
+        txn = BankTransaction(
             account_id=bank_account.id,
             posted=transaction.date,
             type=transaction.details.type.lower(),
             amount=transaction.amount.value,
             payee=transaction.details.paymentReference,
         )
+        db.session.add(txn)
         txns.append(txn)
 
-    # TODO: Reconcile txns <-> payments
+    logging.info("Imported %s transactions", len(txns))
+    db.session.commit()
 
     return ("", 204)
+
+
+def wise_statement(profile_id, account_id, currency, interval_start, interval_end):
+    client = pywisetransfer.Client()
+    domain = client.borderless_accounts.service.domain
+    headers = client.borderless_accounts.service.required_headers
+    params = {
+        "currency": currency,
+        "intervalStart": interval_start,
+        "intervalEnd": interval_end,
+    }
+    url = f"{domain}/v3/profiles/{profile_id}/borderless-accounts/{account_id}/statement.json"
+    resp = requests.get(url, params=params, headers=headers)
+
+    if resp.status_code == 403 and resp.headers["X-2FA-Approval-Result"] == "REJECTED":
+        challenge = resp.headers["X-2FA-Approval"]
+        key_file = open(app.config["TRANSFERWISE_PRIVATE_KEY"], "rb")
+        key = load_pem_private_key(key_file.read(), None)
+        signature = key.sign(
+            challenge.encode("ascii"), padding.PKCS1v15(), hashes.SHA256()
+        )
+        headers["X-Signature"] = b64encode(signature).decode("ascii")
+        headers["X-2FA-Approval"] = challenge
+
+        resp = requests.get(url, params=params, headers=headers)
+
+    if resp.status_code != 200 or resp.headers["X-2FA-Approval-Result"] != "APPROVED":
+        raise Exception("Error fetching statement")
+
+    return munchify(resp.json())
 
 
 def wise_business_profile():
@@ -143,6 +222,10 @@ def wise_business_profile():
 
 
 def _collect_bank_accounts(borderless_account):
+    # Wise creates the concept of a multi-currency account by calling normal
+    # bank accounts "balances", and collecting them into a "borderless account",
+    # one balance per currency. As far as we're concerned, "balances" are bank
+    # accounts, as that's what people will be sending money to.
     for account in borderless_account.balances:
         try:
             if not account.bankDetails:
@@ -185,7 +268,8 @@ def _collect_bank_accounts(borderless_account):
             address=address,
             swift=account.bankDetails.get("swift"),
             iban=account.bankDetails.get("iban"),
-            borderless_account_id=account.id,
+            # Webhooks only include the borderlessAccountId
+            borderless_account_id=borderless_account.id,
         )
 
 

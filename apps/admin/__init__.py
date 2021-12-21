@@ -212,6 +212,7 @@ class BankAccountRefreshForm(Form):
 def activate_payment_config():
     if request.form.get("activate"):
         to_activate = BankAccount.query.filter_by(id=request.form["activate"]).first()
+        # Deactivate other accounts with this currency
         for account in BankAccount.query.filter_by(currency=to_activate.currency):
             if account.id != to_activate.id:
                 account.active = False
@@ -229,7 +230,8 @@ def payment_config_verify():
         tw_accounts = wise_retrieve_accounts()
         for tw_account in tw_accounts:
             existing_account = BankAccount.query.filter_by(
-                borderless_account_id=tw_account.borderless_account_id
+                borderless_account_id=tw_account.borderless_account_id,
+                currency=tw_account.currency,
             ).first()
             if existing_account:
                 continue
@@ -240,6 +242,8 @@ def payment_config_verify():
             flash("New TransferWise bank accounts have been imported", "info")
         else:
             flash("No new TransferWise bank accounts have been imported", "warning")
+
+        return redirect(url_for(".payment_config_verify"), 303)
 
     return render_template(
         "admin/payment-config-verify.html",
