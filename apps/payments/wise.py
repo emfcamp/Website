@@ -96,7 +96,7 @@ def wise_balance_credit(event_type, event):
     currency = event.get("data", {}).get("currency")
     if currency is None:
         logger.exception("Missing currency in Wise webhook")
-        #        logger.info("Webhook data: %s", request.data)
+        # logger.info("Webhook data: %s", request.data)
         abort(400)
 
     logger.info(
