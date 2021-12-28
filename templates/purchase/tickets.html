@@ -1,13 +1,13 @@
 {% if not available %}
 <div class="well">
-  <p class="emphasis">There are no tickets currently available. Future ticket sales dates are
-  <a href="https://blog.emfcamp.org">on our blog</a>.</p>
+  <p class="emphasis">There are no tickets currently available. See
+  <a href="https://blog.emfcamp.org/2021/12/28/emf-2022-ticket-sales/">our blog</a> for
+  details on ticket sales.</p>
 
-  {# - We don't want to show this at the moment as we won't be sending emails for the next sales.
   <p>Please follow us <a href="https://twitter.com/emfcamp">on Twitter</a> or
   join our mailing list to be notified when more tickets are on sale:</p>
   {% include "home/_mailchimp_form.html" %}
-  #}
+
   <p>We can't reserve any tickets, but if we accept your
   {% if config['CFP'] %}
   <a href="{{url_for('cfp.main')}}">talk, workshop, or installation proposal</a>,
