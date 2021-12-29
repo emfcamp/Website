@@ -2,7 +2,6 @@ import os
 from mailchimp3 import MailChimp
 from mailchimp3.helpers import get_subscriber_hash
 from mailchimp3.mailchimpclient import MailChimpError
-from requests import HTTPError
 
 from flask import (
     render_template,
