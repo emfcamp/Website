@@ -115,7 +115,7 @@ def wise_balance_credit(event_type, event):
         return ("", 204)
 
     # Retrieve an account transaction statement for the past week
-    interval_end = datetime.now()
+    interval_end = datetime.utcnow()
     interval_start = interval_end - timedelta(days=7)
     try:
         statement = wise_statement(
