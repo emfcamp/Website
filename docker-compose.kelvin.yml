@@ -19,9 +19,11 @@ services:
 
   postgres:
     restart: unless-stopped
-    image: 'mdillon/postgis:10'
+    image: 'postgis/postgis:13-3.1-alpine'
     volumes:
-      - /var/lib/emfweb-postgres:/var/lib/postgresql/data
+      - ./emfweb-postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: postgres
     networks:
       - emfweb
 
@@ -29,7 +31,7 @@ services:
     restart: unless-stopped
     image: 'wrouesnel/postgres_exporter:v0.8.0'
     environment:
-      DATA_SOURCE_NAME: "postgresql://postgres@postgres:5432/emf_site?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://postgres:postgres@postgres:5432/emf_site?sslmode=disable"
     networks:
       - emfweb
     ports:
