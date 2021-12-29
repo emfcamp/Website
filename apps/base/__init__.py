@@ -1,6 +1,7 @@
 import os
 from mailchimp3 import MailChimp
 from mailchimp3.helpers import get_subscriber_hash
+from mailchimp3.mailchimpclient import MailChimpError
 from requests import HTTPError
 
 from flask import (
@@ -83,12 +84,12 @@ def main_post():
             )
             flash("Your email address was not accepted - please check and try again.")
 
-        # should also be changed to exceptions in v2.1.0
-        except HTTPError as e:
-            if e.response.status_code != 400:
+        except MailChimpError as e:
+            # Either the JSON, or a dictionary containing the response
+            (data,) = e.args
+            if data.get("status") != 400:
                 raise
 
-            data = e.response.json()
             title = data.get("title")
             if title == "Member In Compliance State":
                 app.logger.info("Member in compliance state: %r", email)
@@ -100,10 +101,12 @@ def main_post():
 
             elif title == "Invalid Resource":
                 app.logger.warn(
-                    "Invalid Resource from MailChimp, assuming bad email: %r", email
+                    "Invalid Resource from MailChimp, likely bad email or rate limited: %r",
+                    email,
                 )
                 flash(
-                    "Your email address was not accepted - please check and try again."
+                    """Your email address was not accepted - please check and try again.
+                       If you've signed up to other lists recently, please wait 48 hours."""
                 )
 
             else:
