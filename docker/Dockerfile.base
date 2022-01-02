@@ -21,6 +21,6 @@ RUN apt-get update && \
       libxcursor1 libxdamage1 libxi6 libxtst6 libnss3 libcups2 \
       libxrandr2 libasound2 libatk1.0-0 libatk-bridge2.0-0 libgtk-3-0 libzbar0 \
       coinor-cbc && \
-    pip3 install poetry==1.1.8 && \
+    pip3 install poetry==1.1.12 && \
     poetry install && poetry run pyppeteer-install && \
     rm -rf /var/lib/apt/lists/*
