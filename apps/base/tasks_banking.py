@@ -8,6 +8,11 @@ from sqlalchemy.orm.exc import NoResultFound
 from main import db
 from apps.base import base
 from apps.payments import banktransfer
+from apps.payments.wise import (
+    wise_retrieve_accounts,
+    wise_business_profile,
+    sync_wise_statement,
+)
 from models.payment import BankAccount, BankTransaction
 
 
@@ -147,6 +152,21 @@ def load_ofx(ofx_file):
     app.logger.info(
         "Import complete: %s new, %s duplicate, %s dubious", added, duplicate, dubious
     )
+
+
+@base.cli.command("sync_wisetransfer")
+@click.argument("profile_id", type=click.INT, required=False)
+def sync_wisetransfer(profile_id):
+    """Sync transactions from all accounts associated with a Wise profile"""
+    if profile_id is None:
+        profile_id = wise_business_profile()
+
+    tw_accounts = wise_retrieve_accounts(profile_id)
+    for tw_account in tw_accounts:
+        # Each sync is performed in a separate transaction
+        sync_wise_statement(
+            profile_id, tw_account.borderless_account_id, tw_account.currency
+        )
 
 
 @base.cli.command("reconcile")
