@@ -251,13 +251,8 @@ def _collect_bank_accounts(borderless_account):
         )
 
 
-def wise_retrieve_accounts():
-    business_profile = wise_business_profile()
-
-    if not business_profile:
-        return
-
-    borderless_accounts = wise.borderless_accounts.list(profile_id=business_profile)
+def wise_retrieve_accounts(profile_id):
+    borderless_accounts = wise.borderless_accounts.list(profile_id=profile_id)
 
     for borderless_account in borderless_accounts:
         for bank_account in _collect_bank_accounts(borderless_account):

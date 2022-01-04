@@ -36,6 +36,7 @@ from models.scheduled_task import tasks, ScheduledTaskResult
 from ..payments.stripe import stripe_validate
 from ..payments.wise import (
     wise_validate,
+    wise_business_profile,
     wise_retrieve_accounts,
 )
 from ..common import require_permission
@@ -227,7 +228,13 @@ def payment_config_verify():
     form = BankAccountRefreshForm()
 
     if form.validate_on_submit():
-        tw_accounts = wise_retrieve_accounts()
+        profile_id = wise_business_profile()
+
+        if not profile_id:
+            flash("Cannot identify Wise profile", "warning")
+            return redirect(url_for(".payment_config_verify"), 303)
+
+        tw_accounts = wise_retrieve_accounts(profile_id)
         for tw_account in tw_accounts:
             existing_account = BankAccount.query.filter_by(
                 borderless_account_id=tw_account.borderless_account_id,
