@@ -1,19 +1,14 @@
-from base64 import b64decode, b64encode
+from base64 import b64decode
 import logging
 
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.asymmetric import padding
-from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from datetime import datetime, timedelta
 from flask import abort, current_app as app, request
-from munch import munchify
-import pywisetransfer
 from pywisetransfer.webhooks import verify_signature
-import requests
+from pywisetransfer.exceptions import WiseException
 
 from models.payment import BankAccount, BankTransaction
 from . import payments
-from main import db
+from main import db, wise
 
 logger = logging.getLogger(__name__)
 
@@ -114,25 +109,42 @@ def wise_balance_credit(event_type, event):
         logger.warning("Could not find bank account")
         return ("", 204)
 
+    sync_wise_statement(profile_id, borderless_account_id, currency)
+
+    return ("", 204)
+
+
+def sync_wise_statement(profile_id, borderless_account_id, currency):
     # Retrieve an account transaction statement for the past week
     interval_end = datetime.utcnow()
     interval_start = interval_end - timedelta(days=7)
     try:
-        statement = wise_statement(
+        statement = wise.borderless_accounts.statement(
             profile_id,
             borderless_account_id,
             currency,
             interval_start.isoformat() + "Z",
             interval_end.isoformat() + "Z",
         )
-    except Exception as e:
+    except WiseException as e:
         # TODO: send an email?
         logger.exception("Could not fetch statement")
         return ("", 204)
+    except Exception as e:
+        logger.exception("Error fetching statement")
+        return ("", 500)
 
     # Lock the bank account as BankTransactions don't have an external unique ID
     # TODO: we could include referenceNumber to prevent this or at least detect issues
-    BankAccount.query.with_for_update().get(bank_account.id)
+    bank_account = (
+        BankAccount.query.with_for_update()
+        .filter_by(
+            borderless_account_id=borderless_account_id,
+            currency=currency,
+            active=True,
+        )
+        .one()
+    )
 
     # Retrieve or construct transactions for each credit in the statement
     txns = []
@@ -166,45 +178,11 @@ def wise_balance_credit(event_type, event):
     logging.info("Imported %s transactions", len(txns))
     db.session.commit()
 
-    return ("", 204)
-
-
-def wise_statement(profile_id, account_id, currency, interval_start, interval_end):
-    client = pywisetransfer.Client()
-    domain = client.borderless_accounts.service.domain
-    headers = client.borderless_accounts.service.required_headers
-    params = {
-        "currency": currency,
-        "intervalStart": interval_start,
-        "intervalEnd": interval_end,
-    }
-    url = f"{domain}/v3/profiles/{profile_id}/borderless-accounts/{account_id}/statement.json"
-    resp = requests.get(url, params=params, headers=headers)
-
-    if resp.status_code == 403 and resp.headers["X-2FA-Approval-Result"] == "REJECTED":
-        challenge = resp.headers["X-2FA-Approval"]
-        key_file = open(app.config["TRANSFERWISE_PRIVATE_KEY"], "rb")
-        key = load_pem_private_key(key_file.read(), None)
-        signature = key.sign(
-            challenge.encode("ascii"), padding.PKCS1v15(), hashes.SHA256()
-        )
-        headers["X-Signature"] = b64encode(signature).decode("ascii")
-        headers["X-2FA-Approval"] = challenge
-
-        resp = requests.get(url, params=params, headers=headers)
-
-    if resp.status_code != 200 or resp.headers["X-2FA-Approval-Result"] != "APPROVED":
-        raise Exception("Error fetching statement")
-
-    return munchify(resp.json())
-
 
 def wise_business_profile():
-    client = pywisetransfer.Client()
-
     if app.config.get("TRANSFERWISE_PROFILE_ID"):
         id = int(app.config["TRANSFERWISE_PROFILE_ID"])
-        borderless_accounts = list(client.borderless_accounts.list(profile_id=id))
+        borderless_accounts = list(wise.borderless_accounts.list(profile_id=id))
         if len(borderless_accounts) == 0:
             raise Exception("Provided TRANSFERWISE_PROFILE_ID has no accoutns")
     else:
@@ -212,7 +190,7 @@ def wise_business_profile():
         # As of 11-2021, this endpoint only returns one random business profile.
         # So if you have multiple business profiles (as we do in production),
         # you'll need to set it manually as above.
-        profiles = client.profiles.list(type="business")
+        profiles = wise.profiles.list(type="business")
         profiles = list(filter(lambda p: p.type == "business", profiles))
 
         if len(profiles) > 1:
@@ -279,8 +257,7 @@ def wise_retrieve_accounts():
     if not business_profile:
         return
 
-    client = pywisetransfer.Client()
-    borderless_accounts = client.borderless_accounts.list(profile_id=business_profile)
+    borderless_accounts = wise.borderless_accounts.list(profile_id=business_profile)
 
     for borderless_account in borderless_accounts:
         for bank_account in _collect_bank_accounts(borderless_account):
@@ -308,8 +285,7 @@ def wise_validate():
         return result
 
     try:
-        client = pywisetransfer.Client()
-        client.users.me()
+        wise.users.me()
         result.append((True, "Connection to Wise API succeeded"))
     except Exception as e:
         result.append((False, f"Unable to connect to Wise: {e}"))
@@ -321,7 +297,7 @@ def wise_validate():
     else:
         result.append((False, "Wise business profile does not exist"))
 
-    webhooks = client.subscriptions.list(profile_id=business_profile)
+    webhooks = wise.subscriptions.list(profile_id=business_profile)
     if webhooks:
         result.append((True, "Webhook event subscriptions are present"))
     else:
