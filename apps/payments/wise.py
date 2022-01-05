@@ -4,7 +4,6 @@ import logging
 from datetime import datetime, timedelta
 from flask import abort, current_app as app, request
 from pywisetransfer.webhooks import verify_signature
-from pywisetransfer.exceptions import WiseException
 
 from models.payment import BankAccount, BankTransaction
 from . import payments
@@ -44,6 +43,7 @@ def wise_webhook():
     valid_signature = verify_signature(
         request.data,
         request.headers["X-Signature"],
+        app.config["TRANSFERWISE_ENVIRONMENT"],
     )
     if not valid_signature:
         logger.exception("Error verifying Wise webhook signature")
@@ -126,10 +126,6 @@ def sync_wise_statement(profile_id, borderless_account_id, currency):
             interval_start.isoformat() + "Z",
             interval_end.isoformat() + "Z",
         )
-    except WiseException as e:
-        # TODO: send an email?
-        logger.exception("Could not fetch statement")
-        return ("", 204)
     except Exception as e:
         logger.exception("Error fetching statement")
         return ("", 500)
@@ -141,10 +137,15 @@ def sync_wise_statement(profile_id, borderless_account_id, currency):
         .filter_by(
             borderless_account_id=borderless_account_id,
             currency=currency,
-            active=True,
         )
         .one()
     )
+    if not bank_account.active:
+        logger.info(
+            f"BankAccount for borderless account {borderless_account_id} and {currency} is not active, not syncing"
+        )
+        db.session.commit()
+        return
 
     # Retrieve or construct transactions for each credit in the statement
     txns = []
@@ -227,7 +228,7 @@ def _collect_bank_accounts(borderless_account):
 
         if account.bankDetails.currency == "GBP":
             # bankCode is the SWIFT code for non-GBP accounts.
-            sort_code = account.bankDetails.bankCode
+            sort_code = account.bankDetails.bankCode.replace("-", "")
 
             if len(account.bankDetails.accountNumber) == 8:
                 account_number = account.bankDetails.accountNumber

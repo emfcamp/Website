@@ -344,6 +344,9 @@ class BankAccount(db.Model):
     def get(cls, sort_code, acct_id):
         return cls.query.filter_by(acct_id=acct_id, sort_code=sort_code).one()
 
+    def __repr__(self):
+        return "<BankAccount: %s %s>" % (self.sort_code, self.acct_id)
+
 
 db.Index(
     "ix_bank_account_sort_code_acct_id",
