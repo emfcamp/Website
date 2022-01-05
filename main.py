@@ -66,6 +66,7 @@ mail = Mail()
 login_manager = LoginManager()
 static_digest = FlaskStaticDigest()
 toolbar = DebugToolbarExtension()
+wise = None
 volunteer_admin = None
 
 
@@ -141,8 +142,9 @@ def create_app(dev_server=False, config_override=None):
     login_manager.anonymous_user = load_anonymous_user
 
     stripe.api_key = app.config["STRIPE_SECRET_KEY"]
-    wise = pywisetransfer.client(
-        api_token=app.config["TRANSFERWISE_API_TOKEN"],
+    global wise
+    wise = pywisetransfer.Client(
+        api_key=app.config["TRANSFERWISE_API_TOKEN"],
         environment=app.config["TRANSFERWISE_ENVIRONMENT"],
         private_key_file=app.config.get("TRANSFERWISE_PRIVATE_KEY_FILE"),
     )

@@ -1382,7 +1382,7 @@ python-versions = "*"
 
 [[package]]
 name = "pywisetransfer"
-version = "0.1.5"
+version = "0.1.9"
 description = "Python library for the TransferWise API"
 category = "main"
 optional = false
@@ -1820,7 +1820,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.9"
-content-hash = "a2e60bcafe0288252e5502566ebea0a6e75ff4e73a813fb526ce1b2e270194b0"
+content-hash = "877a975b517dd91bb03e7f7e30484c10c2bf96d24a49f219b15b779d46ca8dc5"
 
 [metadata.files]
 alembic = [
@@ -2864,7 +2864,8 @@ pywin32 = [
     {file = "pywin32-302-cp39-cp39-win_amd64.whl", hash = "sha256:af5aea18167a31efcacc9f98a2ca932c6b6a6d91ebe31f007509e293dea12580"},
 ]
 pywisetransfer = [
-    {file = "pywisetransfer-0.1.5.tar.gz", hash = "sha256:ad2003b8054f049dd1b2323d18adf7748ed0513e163956aa18c8071fc2d2d3ff"},
+    {file = "pywisetransfer-0.1.9-py3-none-any.whl", hash = "sha256:78713e39e22d47fb9ca976c68d87dbe61b57ae80c9f26dfce3866edca9dac8f7"},
+    {file = "pywisetransfer-0.1.9.tar.gz", hash = "sha256:d8f515964c235abd12dc17b9cd215edab6fdfd76abf690063158167e15a4c8a9"},
 ]
 pyyaml = [
     {file = "PyYAML-6.0-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:d4db7c7aef085872ef65a8fd7d6d09a14ae91f691dec3e87ee5ee0539d516f53"},
