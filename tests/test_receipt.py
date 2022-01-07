@@ -1,5 +1,4 @@
 import io
-import pytest
 
 from cairosvg import svg2png
 from PIL import Image
