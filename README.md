@@ -1,7 +1,7 @@
 This is the www.emfcamp.org web site, built with Flask & Postgres by the 
 EMF web team.
 
-[![CI Status](https://github.com/emfcamp/Website/workflows/CI/badge.svg)](https://github.com/emfcamp/Website/actions?query=workflow%3ACI)
+[![Deploy Status](https://github.com/emfcamp/Website/workflows/Deploy/badge.svg)](https://github.com/emfcamp/Website/actions?query=workflow%3ADeploy)
 [![Coverage Status](https://coveralls.io/repos/github/emfcamp/Website/badge.svg?branch=main)](https://coveralls.io/github/emfcamp/Website?branch=main)
 
 ## Get Involved
@@ -57,12 +57,12 @@ pre-commit install
 Once you've created an account on the website, you can use `./flask make_admin` to make your user an administrator.
 Or, you can create an account and simultaneously make it an admin by using `./flask make_admin -e email@domain.tld`
 
-E-mail sending is disabled in development (but is printed out on the console). You can also log in directly by setting BYPASS_LOGIN=True in config/development.cfg and then using a URL of the form e.g. `/login/admin@test.invalid` and navigate to `/admin/`.
+E-mail sending is disabled in development (but is printed out on the console). You can also log in directly by setting `BYPASS_LOGIN=True` in `config/development.cfg` and then using a URL of the form e.g. `/login/admin@test.invalid`.
 
 ### Database Migrations
 
 - `./flask db migrate -m 'Migration name'` to generate migration scripts when models have been updated.
-- `./flask db upgrade` to run any migration scripts you've generated.
+- `./flask db upgrade` to run any migration scripts you've generated (or populate a fresh DB).
 - `./flask db downgrade` to undo the last migration.
 
 For more migration commands, see the [flask-migrate docs](https://flask-migrate.readthedocs.io/en/latest/).
