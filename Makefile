@@ -10,7 +10,7 @@ endif
 
 test:
 	black --check ./main.py ./apps ./models ./tests
-	flake8 ./*.py ./models ./apps
+	flake8 ./*.py ./apps ./models ./tests
 	SETTINGS_FILE=$(TEST_SETTINGS) pytest --random-order --cov=apps --cov=models ./tests/ ./models/
 ifdef COVERALLS_REPO_TOKEN
 	coveralls
