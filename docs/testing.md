@@ -1,5 +1,5 @@
 [![CI Status](https://github.com/emfcamp/Website/workflows/CI/badge.svg)](https://github.com/emfcamp/Website/actions?query=workflow%3ACI)
-[![Coverage Status](https://coveralls.io/repos/github/emfcamp/Website/badge.svg?branch=master)](https://coveralls.io/github/emfcamp/Website?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/emfcamp/Website/badge.svg?branch=main)](https://coveralls.io/github/emfcamp/Website?branch=main)
 
 #### Bank Transfer
 These are manually resolved via scripts and the admin panel.
@@ -7,7 +7,7 @@ These are manually resolved via scripts and the admin panel.
 This is the easiest way to get unpaid tickets into the system, but there's currently no easy way to test reconciliation.
 
 #### Wise
-TODO
+This can only be tested with their live environment. See `docs/wise.md` for details.
 
 #### Stripe
 This is the easiest method to "pay" for a ticket when you're developing. The details for a successful payment are:

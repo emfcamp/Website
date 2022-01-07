@@ -57,3 +57,18 @@ WTF_CSRF_SSL_STRICT
 WTF_CSRF_ENABLED
 ```
 
+2022-01-07
+==========
+
+- We've moved from `master` to `main`. See above for instructions to fix your local repo.
+- The dev port has moved to `:2342` instead of `:5000`.
+- We're using `docker compose` instead of `docker-compose`. Please update your docker and scripts.
+- We're now using Wise for bank transfers, because we can get webhooks and immediate statements. See `docs/wise.md` for instructions.
+
+If you're not testing Wise, make sure you've copied across these config items from the example:
+
+```
+TRANSFERWISE_ENVIRONMENT
+TRANSFERWISE_API_TOKEN
+```
+
