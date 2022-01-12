@@ -40,3 +40,5 @@ loggers:
     level: WARN
   parso:
     level: WARN
+  apiron:
+    level: WARN
