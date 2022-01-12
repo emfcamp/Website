@@ -8,6 +8,7 @@ DB_FEATURE_FLAGS = [
     "CFP_CLOSED",
     "CFP_FINALISE",
     "ISSUE_TICKETS",
+    "RECONCILE_IN_WEBHOOK",
     "RADIO",
     "LINE_UP",
     "SCHEDULE",
