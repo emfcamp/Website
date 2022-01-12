@@ -300,7 +300,7 @@ class BankPayment(Payment):
         for currency in [self.currency, "GBP"]:
             try:
                 return BankAccount.query.filter_by(currency=currency, active=True).one()
-            except MultipleResultsFound:
+            except (MultipleResultsFound, NoResultFound):
                 continue
 
 
