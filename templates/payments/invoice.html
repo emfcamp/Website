@@ -171,6 +171,7 @@
   {% endif %}
   {% if payment.provider == 'banktransfer' %}
   <dl class="bank-info dl-horizontal">
+    {% set account = payment.recommended_destination %}
     <dt>Bank</dt><dd>{{ account.institution }}, {{ account.address }}</dd>
     <dt>Payee</dt><dd>EMF Festivals Ltd</dd>
     {% if payment.currency == 'GBP' %}
