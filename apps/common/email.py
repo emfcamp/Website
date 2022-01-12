@@ -1,6 +1,6 @@
 import markdown
 from inlinestyler.utils import inline_css
-from flask import render_template, Markup
+from flask import render_template, render_template_string, Markup
 from flask import current_app as app
 from flask_mail import Message
 
@@ -8,9 +8,15 @@ from models.email import EmailJob, EmailJobRecipient
 from main import db, mail
 
 
-def format_html_email(markdown_text, subject):
+def format_html_email(markdown_text, subject, **kwargs):
+    """Render a Markdown-formatted string to an HTML email.
+
+    **kwargs are used to substitute variables in the Markdown string.
+    """
     extensions = ["markdown.extensions.nl2br", "markdown.extensions.smarty"]
+    markdown_text = render_template_string(markdown_text, **kwargs)
     markdown_html = Markup(markdown.markdown(markdown_text, extensions=extensions))
+
     return inline_css(
         render_template(
             "admin/email/email_template.html", subject=subject, content=markdown_html
@@ -18,8 +24,8 @@ def format_html_email(markdown_text, subject):
     )
 
 
-def format_plaintext_email(markdown_text):
-    return markdown_text
+def format_plaintext_email(markdown_text, **kwargs):
+    return render_template_string(markdown_text, **kwargs)
 
 
 def preview_email(preview_address, subject, body):
@@ -35,14 +41,16 @@ def preview_email(preview_address, subject, body):
         conn.send(msg)
 
 
-def enqueue_emails(users, subject, body):
+def enqueue_emails(users, subject, body, **kwargs):
+    """Queue an email for sending by the background email worker."""
     job = EmailJob(
         subject,
-        format_plaintext_email(body),
-        format_html_email(body, subject),
+        format_plaintext_email(body, **kwargs),
+        format_html_email(body, subject, **kwargs),
     )
     db.session.add(job)
 
     for user in users:
         db.session.add(EmailJobRecipient(job, user))
+
     db.session.commit()
