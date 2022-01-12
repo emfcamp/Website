@@ -15,4 +15,4 @@ repos:
     rev: v3.4.0
     hooks:
       - id: no-commit-to-branch
-        args: ['--branch', 'master']
+        args: ['--branch', 'main']
