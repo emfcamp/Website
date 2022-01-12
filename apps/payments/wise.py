@@ -7,6 +7,8 @@ from pywisetransfer.webhooks import verify_signature
 
 from models.payment import BankAccount, BankTransaction
 from . import payments
+from .banktransfer import reconcile_txns
+from ..common import feature_enabled
 from main import db, wise
 
 logger = logging.getLogger(__name__)
@@ -176,8 +178,12 @@ def sync_wise_statement(profile_id, borderless_account_id, currency):
         db.session.add(txn)
         txns.append(txn)
 
-    logging.info("Imported %s transactions", len(txns))
+    logger.info("Imported %s transactions", len(txns))
     db.session.commit()
+
+    if feature_enabled("RECONCILE_IN_WEBHOOK"):
+        logger.info("Attempting reconciliation")
+        reconcile_txns(txns, doit=True)
 
 
 def wise_business_profile():

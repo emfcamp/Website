@@ -146,6 +146,90 @@ def transfer_cancel(payment_id):
     return render_template("transfer-cancel.html", payment=payment, form=form)
 
 
+def reconcile_txns(txns, doit=False):
+    paid = 0
+    failed = 0
+
+    for txn in txns:
+        if txn.type.lower() not in ("other", "directdep", "deposit"):
+            raise ValueError("Unexpected transaction type for %s: %s", txn.id, txn.type)
+
+        # TODO: remove this after 2022
+        if txn.payee.startswith("GOCARDLESS ") or txn.payee.startswith("GC C1 EMF"):
+            app.logger.info("Suppressing GoCardless transfer %s", txn.id)
+            if doit:
+                txn.suppressed = True
+                db.session.commit()
+            continue
+
+        if txn.payee.startswith("STRIPE PAYMENTS EU ") or txn.payee.startswith(
+            "STRIPE STRIPE"
+        ):
+            app.logger.info("Suppressing Stripe transfer %s", txn.id)
+            if doit:
+                txn.suppressed = True
+                db.session.commit()
+            continue
+
+        app.logger.info("Processing txn %s: %s", txn.id, txn.payee)
+
+        payment = txn.match_payment()
+        if not payment:
+            app.logger.warn("Could not match payee, skipping")
+            failed += 1
+            continue
+
+        app.logger.info(
+            "Matched to payment %s by %s for %s %s",
+            payment.id,
+            payment.user.name,
+            payment.amount,
+            payment.currency,
+        )
+
+        if doit:
+            payment.lock()
+
+        if txn.amount != payment.amount:
+            app.logger.warn(
+                "Transaction amount %s doesn't match %s, skipping",
+                txn.amount,
+                payment.amount,
+            )
+            failed += 1
+            db.session.rollback()
+            continue
+
+        if txn.account.currency != payment.currency:
+            app.logger.warn(
+                "Transaction currency %s doesn't match %s, skipping",
+                txn.account.currency,
+                payment.currency,
+            )
+            failed += 1
+            db.session.rollback()
+            continue
+
+        if payment.state == "paid":
+            app.logger.error("Payment %s has already been paid", payment.id)
+            failed += 1
+            db.session.rollback()
+            continue
+
+        if doit:
+            txn.payment = payment
+            payment.paid()
+
+            send_confirmation(payment)
+
+            db.session.commit()
+
+        app.logger.info("Payment reconciled")
+        paid += 1
+
+    app.logger.info("Reconciliation complete: %s paid, %s failed", paid, failed)
+
+
 def send_confirmation(payment):
     msg = Message(
         "Electromagnetic Field ticket purchase update",
