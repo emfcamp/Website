@@ -25,7 +25,7 @@ We will use the reference to identify the payment as yours, so please
 ensure it's included in full.
 
 Bank:           Barclays
-Payee:          Electromagnetic Field Ltd
+Payee:          EMF Festivals Ltd
 Sort code:      {{ account.sort_code | sort_code }}
 Account number: {{ account.acct_id }}
 Amount:         {{ payment.amount | price('GBP') }}
@@ -37,7 +37,7 @@ Reference:      {{ payment.bankref | bankref }}
 
 You can pay into our {{ account.currency }} bank account:
 
-Payee:     Electromagnetic Field Ltd
+Payee:     EMF Festivals Ltd
 SWIFT:     {{ account.swift }}
 IBAN:      {{ account.iban | iban }}
 Amount:    {{ payment.amount | price(payment.currency) }}
