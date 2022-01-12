@@ -11,6 +11,7 @@ services:
       - "127.0.0.1:8000:8000"
     volumes:
       - /etc/emf-site.cfg:/app/config/production.cfg
+      - /etc/emf:/etc/emf
       - /var/lib/emf_vat_invoices:/vat_invoices
     labels:
       com.centurylinklabs.watchtower.enable: true
