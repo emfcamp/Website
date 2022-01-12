@@ -9,11 +9,11 @@
 
     <div id="menu-container" role="navigation" aria-label="Main">
       <ul class="menu" role="menu">
-            {#
+        {#
             <li role="presentation">
                 <a role="menuitem" href="{{ url_for('base.feedback') }}">Feedback</a>
             </li>
-            #}
+        #}
             <li role="presentation">
                 <a role="menuitem" href="{{ url_for('base.about') }}">About</a>
             </li>
@@ -25,12 +25,12 @@
                     <a role="menuitem" href="{{ url_for('tickets.main') }}">Tickets</a>
                 </li>
             {% endif %}
-            {#
+        {#
             {% elif config.get('DEFAULT_FLOW') == 'tees' and SALES_STATE in ['available'] %}
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('tickets.main', flow='tees') }}">T-shirts</a>
                 </li>
-            #}
+        #}
             {% if feature_enabled('VOLUNTEERS') %}
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('volunteer.main') }}">Volunteer</a>
