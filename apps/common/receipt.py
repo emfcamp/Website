@@ -80,7 +80,7 @@ def render_pdf(url, html):
             else:
                 await request.continue_()
 
-        page.on("request", request_intercepted)
+        page.on("request", lambda r: asyncio.ensure_future(request_intercepted(r)))
         await page.setRequestInterception(True)
 
         await page.goto(url)
