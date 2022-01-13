@@ -4,11 +4,12 @@ from flask import render_template, render_template_string, Markup
 from flask import current_app as app
 from flask_mail import Message
 
+from models import event_year
 from models.email import EmailJob, EmailJobRecipient
 from main import db, mail
 
 
-def format_html_email(markdown_text, subject, **kwargs):
+def format_html_email(markdown_text, subject, reason=None, **kwargs):
     """Render a Markdown-formatted string to an HTML email.
 
     **kwargs are used to substitute variables in the Markdown string.
@@ -17,9 +18,15 @@ def format_html_email(markdown_text, subject, **kwargs):
     markdown_text = render_template_string(markdown_text, **kwargs)
     markdown_html = Markup(markdown.markdown(markdown_text, extensions=extensions))
 
+    if not reason:
+        reason = f"You're receiving this email because you have a ticket for Electromagnetic Field {event_year()}."
+
     return inline_css(
         render_template(
-            "admin/email/email_template.html", subject=subject, content=markdown_html
+            "admin/email/email_template.html",
+            subject=subject,
+            content=markdown_html,
+            reason=reason,
         )
     )
 

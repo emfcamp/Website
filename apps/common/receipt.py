@@ -106,9 +106,11 @@ def make_qrfile(data, **kwargs):
 
 def make_epc_qrfile(payment, **kwargs):
     qrfile = io.BytesIO()
+    # TODO: this isn't currently used. Need to fetch IBAN from payment.recommended_destination
+    # and name from somewhere - maybe config rather than hard-coding.
     qr = helpers.make_epc_qr(
-        name="Electromagnetic Field Ltd",
-        iban="GB21BARC20716472954433",
+        name="FIXME FIXME FIXME",
+        iban="FIXME FIXME FIXME",
         amount=payment.amount,
         reference=payment.bankref,
         encoding=1,
