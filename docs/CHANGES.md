@@ -72,3 +72,12 @@ TRANSFERWISE_ENVIRONMENT
 TRANSFERWISE_API_TOKEN
 ```
 
+2022-01-12
+==========
+
+We can now attempt to reconcile inside the Wise webhook. Turn it on with the following feature flag:
+
+```
+RECONCILE_IN_WEBHOOK = True
+```
+
