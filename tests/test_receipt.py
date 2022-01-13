@@ -1,3 +1,4 @@
+import pytest
 import io
 
 from cairosvg import svg2png
@@ -34,6 +35,7 @@ def test_format_inline_qr():
     assert content == data
 
 
+@pytest.mark.skip
 def test_format_inline_epc_qr():
     payment = BankPayment(currency="EUR", amount=10)
 
