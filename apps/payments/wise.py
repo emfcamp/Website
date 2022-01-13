@@ -39,7 +39,7 @@ def wise_webhook():
         if request.json is None:
             raise ValueError("Request does not contain JSON")
     except Exception as e:
-        logger.exception("Unable to parse Wise webhook request")
+        logger.info("Unable to parse Wise webhook request")
         abort(400)
 
     valid_signature = verify_signature(

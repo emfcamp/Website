@@ -182,9 +182,11 @@
     <dt>IBAN</dt><dd>{{ account.iban | iban }}</dd>
     {% endif %}
     <dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
-    {% if payment.provider == 'banktransfer' and payment.currency == 'EUR' and payment.state == 'inprogress' %}
-    <dt>EPC QR Code</dt><dd>{{ render_epc_qr(payment) }}</dd>
-    {% endif %}
+    {#
+      {% if payment.provider == 'banktransfer' and payment.currency == 'EUR' and payment.state == 'inprogress' %}
+      <dt>EPC QR Code</dt><dd>{{ render_epc_qr(payment) }}</dd>
+      {% endif %}
+    #}
   </dl>
   {% elif payment.provider == 'stripe' %}
   <div>Payment to be made online at {{ external_url('payments.stripe_capture', payment_id=payment.id) }}</div>

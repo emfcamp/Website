@@ -18,7 +18,7 @@ openssl rsa -pubout -in wise-sca.pem -out wise-sca.pub.pem
 ```
 
 - Point `TRANSFERWISE_PRIVATE_KEY_FILE` to the private key
-- Add the public key at https://sandbox.transferwise.tech/public-keys/ and enable SCA
+- Add the public key at https://wise.com/public-keys/ and enable SCA
 - Set `TRANSFERWISE_ENVIRONMENT` to `live`
 - If you're using a personal account (or have multiple business accounts), set `TRANSFERWISE_PROFILE_ID`
 

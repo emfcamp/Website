@@ -107,7 +107,7 @@ def transfer_change_currency(payment_id):
             payment.change_currency(currency)
             db.session.commit()
 
-            logging.info("Payment %s changed to %s", payment.id, currency)
+            logger.info("Payment %s changed to %s", payment.id, currency)
             flash("Currency changed to {}".format(currency))
 
         return redirect(url_for("payments.transfer_waiting", payment_id=payment.id))
@@ -138,7 +138,7 @@ def transfer_cancel(payment_id):
             payment.cancel()
             db.session.commit()
 
-            logging.info("Payment %s cancelled", payment.id)
+            logger.info("Payment %s cancelled", payment.id)
             flash("Payment cancelled")
 
         return redirect(url_for("users.purchases"))
