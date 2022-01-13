@@ -201,6 +201,11 @@ Love,
 Everyone at Electromagnetic Field
     """,
     )
+    reason = StringField(
+        "Email reason",
+        [DataRequired()],
+        default="You're receiving this email because you participated in a previous EMF event.",
+    )
     emails = TextAreaField("Email Addresses", [DataRequired()])
     expires = DateField("Expiry Date", default=datetime.now() + timedelta(days=30))
     num_purchases = IntegerField("Max Purchases", [InputRequired()], default=1)

@@ -615,6 +615,7 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 form.subject.data,
                 voucher_url="http://VOUCHER_URL_PLACEHOLDER",
                 expiry=form.expires.data,
+                reason=form.reason.data,
             )
 
         return render_template(
@@ -663,6 +664,7 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 form.subject.data,
                 voucher_url=voucher_url,
                 expiry=form.expires.data,
+                reason=form.reason.data,
             )
 
             app.logger.info("Emailing %s volunteer voucher: %s", email, voucher.code)
