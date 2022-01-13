@@ -14,7 +14,7 @@ from flask_mail import Message
 from sqlalchemy.sql.functions import func
 from sqlalchemy import not_
 
-from main import db, mail
+from main import db, mail, external_url
 from models.user import User
 from models.product import (
     ProductGroup,
@@ -28,7 +28,7 @@ from models.product import (
 )
 from models.purchase import Purchase, PurchaseTransfer
 
-from models import event_year
+from ..common.email import format_html_email, format_plaintext_email
 from . import admin
 from .forms import (
     EditProductForm,
@@ -607,17 +607,34 @@ def product_view_bulk_add_vouchers_by_email(view_id):
     view = ProductView.query.get_or_404(view_id)
     form = BulkVoucherEmailForm()
 
-    if form.validate_on_submit():
-        emails = set(e.strip() for e in re.split(r"[\s,]+", form.emails.data))
-
-        if len(emails) > 250:
-            flash("More than 250 emails provided. Please submit <250 at a time.")
-            return redirect(
-                url_for(".product_view_bulk_add_vouchers_by_email", view_id=view_id)
+    if not form.validate_on_submit() or form.preview.data:
+        preview = None
+        if form.preview.data:
+            preview = format_html_email(
+                form.text.data,
+                form.subject.data,
+                voucher_url="http://VOUCHER_URL_PLACEHOLDER",
+                expiry=form.expires.data,
             )
 
-        added = existing = 0
+        return render_template(
+            "admin/products/view-bulk-add-voucher.html",
+            view=view,
+            form=form,
+            preview=preview,
+        )
 
+    emails = set(e.strip() for e in re.split(r"[\s,]+", form.emails.data))
+
+    if len(emails) >= 250:
+        flash("More than 250 emails provided. Please submit <250 at a time.")
+        return redirect(
+            url_for(".product_view_bulk_add_vouchers_by_email", view_id=view_id)
+        )
+
+    added = existing = 0
+
+    with mail.connect() as conn:
         for email in emails:
             if Voucher.query.filter_by(email=email).first():
                 existing += 1
@@ -632,25 +649,29 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 tickets_remaining=form.num_tickets.data,
             )
 
-            msg = Message(
-                f"Your voucher for Electromagnetic Field {event_year()}",
-                sender=app.config["TICKETS_EMAIL"],
-                recipients=[email],
+            voucher_url = external_url(
+                "tickets.tickets_voucher", voucher_code=voucher.code
             )
 
-            msg.body = render_template("emails/volunteer-voucher.txt", voucher=voucher)
+            msg = Message(form.subject.data, sender=app.config["TICKETS_EMAIL"])
+            msg.add_recipient(email)
+            msg.body = format_plaintext_email(
+                form.text.data, voucher_url=voucher_url, expiry=form.expires.data
+            )
+            msg.html = format_html_email(
+                form.text.data,
+                form.subject.data,
+                voucher_url=voucher_url,
+                expiry=form.expires.data,
+            )
 
             app.logger.info("Emailing %s volunteer voucher: %s", email, voucher.code)
+            conn.send(msg)
             db.session.commit()
-            mail.send(msg)
             added += 1
 
-        flash(f"{added} vouchers added, {existing} duplicates skipped.")
+    flash(f"{added} vouchers added, {existing} duplicates skipped.")
 
-        return redirect(
-            url_for(".product_view_bulk_add_vouchers_by_email", view_id=view_id)
-        )
-
-    return render_template(
-        "admin/products/view-bulk-add-voucher.html", view=view, form=form
+    return redirect(
+        url_for(".product_view_bulk_add_vouchers_by_email", view_id=view_id)
     )

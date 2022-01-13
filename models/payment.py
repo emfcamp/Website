@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy import event, func, column
 from sqlalchemy.orm import Session, aliased
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy_continuum.utils import version_class, transaction_class
 
 from main import db
@@ -300,7 +300,7 @@ class BankPayment(Payment):
         for currency in [self.currency, "GBP"]:
             try:
                 return BankAccount.query.filter_by(currency=currency, active=True).one()
-            except:
+            except (MultipleResultsFound, NoResultFound):
                 continue
 
 

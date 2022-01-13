@@ -384,8 +384,9 @@ class Price(db.Model):
 
 
 class Voucher(db.Model):
+    """A short code which allows a user to access a restricted ProductView"""
+
     __tablename__ = "voucher"
-    """A voucher enables a specific productView"""
 
     code = db.Column(db.String, primary_key=True)
     expiry = db.Column(db.DateTime, nullable=True)

@@ -106,7 +106,6 @@ def invoice(payment_id, fmt=None):
         "payments/invoice.html",
         mode=mode,
         payment=payment,
-        account=payment.recommended_destination,
         invoice_lines=invoice_lines,
         form=form,
         premium=premium,

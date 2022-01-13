@@ -183,11 +183,30 @@ class EditVoucherForm(VoucherForm):
 
 
 class BulkVoucherEmailForm(Form):
-    emails = TextAreaField("Email Addresses")
+    subject = StringField(
+        "Subject", [DataRequired()], default="Your Electromagnetic Field Voucher"
+    )
+    text = StringField(
+        "Message",
+        [DataRequired()],
+        widget=TextArea(),
+        default="""Hello,
+
+You can now buy your Electromagnetic Field ticket through [this link]({{voucher_url}}).
+
+You are guaranteed these tickets until {{expiry}}, so please make sure you use your voucher before then.
+
+Love,
+
+Everyone at Electromagnetic Field
+    """,
+    )
+    emails = TextAreaField("Email Addresses", [DataRequired()])
     expires = DateField("Expiry Date", default=datetime.now() + timedelta(days=30))
     num_purchases = IntegerField("Max Purchases", [InputRequired()], default=1)
     num_tickets = IntegerField("Max Adult Tickets", [InputRequired()], default=2)
-    create = SubmitField("Create All")
+    preview = SubmitField("Preview")
+    create = SubmitField("Send")
 
 
 #

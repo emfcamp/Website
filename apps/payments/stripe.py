@@ -219,7 +219,7 @@ def stripe_update_payment(payment: StripePayment, intent: stripe.PaymentIntent =
     charge = intent.charges.data[0]
 
     if payment.charge_id is not None and payment.charge_id != charge["id"]:
-        logging.warn(
+        logger.warn(
             f"Charge ID for intent {intent['id']} has changed from {payment.charge_id} to {charge['id']}"
         )
 

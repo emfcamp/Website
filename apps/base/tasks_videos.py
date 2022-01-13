@@ -47,7 +47,7 @@ class MatchYouTube(object):
         while True:
             result = requests.get(self.yt_url + "playlistItems", data).json()
             if result.get("error"):
-                app.logging.error("Error fetching playlist: %s", result["error"])
+                app.logger.error("Error fetching playlist: %s", result["error"])
                 raise Exception("Error fetching playlist")
 
             for video in result["items"]:
