@@ -9,10 +9,17 @@ from models.email import EmailJob, EmailJobRecipient
 from main import db, mail
 
 
-def format_html_email(markdown_text, subject, reason=None, **kwargs):
+def format_trusted_html_email(markdown_text, subject, reason=None, **kwargs):
     """Render a Markdown-formatted string to an HTML email.
 
-    **kwargs are used to substitute variables in the Markdown string.
+    markdown_text is rendered as a template, so is considered trusted.
+    Do not pass user-controlled templates in, unless you're happy for
+    that user to run code on the server.
+
+    **kwargs are used to substitute variables in the Markdown string,
+    and are considered trusted. Do not pass user-controlled data in,
+    unless you're happy for that user to insert arbitrary HTML into
+    the email.
     """
     extensions = ["markdown.extensions.nl2br", "markdown.extensions.smarty"]
     markdown_text = render_template_string(markdown_text, **kwargs)
@@ -31,29 +38,34 @@ def format_html_email(markdown_text, subject, reason=None, **kwargs):
     )
 
 
-def format_plaintext_email(markdown_text, **kwargs):
+def format_trusted_plaintext_email(markdown_text, **kwargs):
+    """Render a Markdown-formatted string to a plaintext email.
+
+    markdown_text is rendered as a template, so is considered trusted.
+    Do not pass user-controlled templates in, unless you're happy for
+    that user to run code on the server.
+    """
     return render_template_string(markdown_text, **kwargs)
 
 
-def preview_email(preview_address, subject, body):
+def preview_trusted_email(preview_address, subject, body):
     subject = "[PREVIEW] " + subject
-    formatted_html = format_html_email(body, subject)
-    preview_email = preview_address
+    formatted_html = format_trusted_html_email(body, subject)
 
     with mail.connect() as conn:
         msg = Message(subject, sender=app.config["CONTACT_EMAIL"])
-        msg.add_recipient(preview_email)
-        msg.body = format_plaintext_email(body)
+        msg.add_recipient(preview_address)
+        msg.body = format_trusted_plaintext_email(body)
         msg.html = formatted_html
         conn.send(msg)
 
 
-def enqueue_emails(users, subject, body, **kwargs):
+def enqueue_trusted_emails(users, subject, body, **kwargs):
     """Queue an email for sending by the background email worker."""
     job = EmailJob(
         subject,
-        format_plaintext_email(body, **kwargs),
-        format_html_email(body, subject, **kwargs),
+        format_trusted_plaintext_email(body, **kwargs),
+        format_trusted_html_email(body, subject, **kwargs),
     )
     db.session.add(job)
 

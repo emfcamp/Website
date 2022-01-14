@@ -8,7 +8,11 @@ from models.cfp import Proposal
 from models.payment import Payment
 from models.village import VillageMember
 from ..common.forms import Form
-from ..common.email import format_html_email, enqueue_emails, preview_email
+from ..common.email import (
+    format_trusted_html_email,
+    enqueue_trusted_emails,
+    preview_trusted_email,
+)
 
 
 class EmailComposeForm(Form):
@@ -57,26 +61,26 @@ def email():
         if form.preview.data is True:
             return render_template(
                 "admin/email.html",
-                html=format_html_email(form.text.data, form.subject.data),
+                html=format_trusted_html_email(form.text.data, form.subject.data),
                 form=form,
                 count=users.count(),
             )
 
         if form.send_preview.data is True:
-            preview_email(
+            preview_trusted_email(
                 form.send_preview_address.data, form.subject.data, form.text.data
             )
 
             flash("Email preview sent to %s" % form.send_preview_address.data)
             return render_template(
                 "admin/email.html",
-                html=format_html_email(form.text.data, form.subject.data),
+                html=format_trusted_html_email(form.text.data, form.subject.data),
                 form=form,
                 count=users.count(),
             )
 
         if form.send.data is True:
-            enqueue_emails(users, form.subject.data, form.text.data)
+            enqueue_trusted_emails(users, form.subject.data, form.text.data)
             flash("Email queued for sending to %s users" % users.count())
             return redirect(url_for(".email"))
 

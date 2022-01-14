@@ -28,7 +28,7 @@ from models.product import (
 )
 from models.purchase import Purchase, PurchaseTransfer
 
-from ..common.email import format_html_email, format_plaintext_email
+from ..common.email import format_trusted_html_email, format_trusted_plaintext_email
 from . import admin
 from .forms import (
     EditProductForm,
@@ -610,7 +610,7 @@ def product_view_bulk_add_vouchers_by_email(view_id):
     if not form.validate_on_submit() or form.preview.data:
         preview = None
         if form.preview.data:
-            preview = format_html_email(
+            preview = format_trusted_html_email(
                 form.text.data,
                 form.subject.data,
                 voucher_url="http://VOUCHER_URL_PLACEHOLDER",
@@ -656,10 +656,10 @@ def product_view_bulk_add_vouchers_by_email(view_id):
 
             msg = Message(form.subject.data, sender=app.config["TICKETS_EMAIL"])
             msg.add_recipient(email)
-            msg.body = format_plaintext_email(
+            msg.body = format_trusted_plaintext_email(
                 form.text.data, voucher_url=voucher_url, expiry=form.expires.data
             )
-            msg.html = format_html_email(
+            msg.html = format_trusted_html_email(
                 form.text.data,
                 form.subject.data,
                 voucher_url=voucher_url,
