@@ -102,7 +102,9 @@ def wise_balance_credit(event_type, event):
     )
     # Find the Wise bank account in the application database
     bank_account = BankAccount.query.filter_by(
-        borderless_account_id=borderless_account_id, currency=currency, active=True,
+        borderless_account_id=borderless_account_id,
+        currency=currency,
+        active=True,
     ).first()
     if not bank_account:
         logger.warning("Could not find bank account")
@@ -133,7 +135,10 @@ def sync_wise_statement(profile_id, borderless_account_id, currency):
     # TODO: we could include referenceNumber to prevent this or at least detect issues
     bank_account = (
         BankAccount.query.with_for_update()
-        .filter_by(borderless_account_id=borderless_account_id, currency=currency,)
+        .filter_by(
+            borderless_account_id=borderless_account_id,
+            currency=currency,
+        )
         .one()
     )
     if not bank_account.active:
