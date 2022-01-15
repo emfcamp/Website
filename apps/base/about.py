@@ -69,6 +69,11 @@ def volunteering():
     return render_template("about/volunteering.html")
 
 
+@base.route("/about/volunteer-roles")
+def volunteer_roles():
+    return render_template("about/volunteer-roles.html")
+
+
 @base.route("/about/what_to_bring")
 def what_to_bring():
     return render_template("about/what-to-bring.html")
