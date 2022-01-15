@@ -1,0 +1,104 @@
+{% set main_class = 'cfp-guidance' %}
+{% extends "base.html" %}
+{% block title %}Installation Support Service{% endblock %}
+{% block body %}
+<div class="cfp-guidance well">
+
+<h1>Installation Support Service</h1>
+
+<p>One of the fabulous things about EMF is the things people bring - strange structures, art objects, confusing robots, phone networks, DJ booths, cocktail contraptions, new games, giant ducks, and LEDs. So many LEDs.</p>
+
+<p>We want there to be even more things, so we want to help you make them. We can’t come and help with the soldering and coding, but we can provide advice, support, and enthusiasm. And sometimes even help pay for materials.</p>
+
+<p>EMF has always done this, but we’d like to do it on a larger scale and in a more open way. We don’t plan to be gatekeepers, and you don’t need our approval in order to bring things along (but see notes about safety below). We just want to make it easier and even more awesome.</p>
+
+<p>We’re calling this ‘installations’ because many of them are - but to us this includes roaming robots, one-off games, and anything else you can invent and practically bring to a field.</p>
+
+<p>So, this is what the Installation Support Service can do for you:</p>
+<ul>
+  <li>Help you work out if you need to involve us
+  <li>Provide advice on the practicalities of installations
+  <li>Matchmake between people with ideas &amp; people who want to build them
+  <li>Provide inspiration
+  <li>Help with funding
+  <li>Help people find your thing at the event
+</ul>
+<br>
+
+<h2 id="contact">Contact us</h2>
+<p>Email <a href="mailto:installations@emfcamp.org">installations@emfcamp.org</a> and we'll get back to you as soon as possible</p>
+<br>
+
+<h2 id="help">When do you <strong>need</strong> to talk to us?</h2> 
+
+<h3>Safety</h3>
+<p>If your installation has significant safety questions, we need to talk.</p>
+<p>If it uses fire, lasers, a lot of power, strange rituals, is very loud, or has people inside it - anything that might present some hazard, please <a href="#contact">contact us</a>. If in doubt, contact us anyway.</p>
+<p>Anything with any kind of safety concern will probably need its own public liability insurance - don't panic, this is easier and cheaper to obtain than you might think. We can help point you at friendly insurers, such as <a href="https://www.axisweb.org/membership/network-associate-with-insurance/">Axis</a>.</p>
+
+<h3>Transport</h3>
+<p>We expect you to bring and set up your thing without our help. If you absolutely need support or specialist equipment, let us know <strong>now</strong> (not a week before) and we’ll see what assistance we can provide. Without that, you should assume that you’ll be doing it all yourself.</p>
+
+<h3>Power</h3>
+<p>You should bring your own cabling to plug into 13A or Ceeform (ideally bring both) sockets, which may be a long way from your installation. If you need more power than that, you need to <a href="#contact">talk to us</a>.</p>
+<br>
+
+<h2 id="matchmaking">Matchmaking</h2>
+<p>We know that there are people who have brilliant ideas, and other people who would like to help build those ideas - we'd like to help put them together. We’ll shortly be publishing a page listing projects needing makers and makers needing projects.</p>
+<p><a href="#contact">Contact us</a> if you'd like us to publicise your project, or you'd like to get in touch with a listed project.</p>
+<br>
+
+<h2 id="inspiration">Inspiration</h2>
+<p>If you're stuck and need inspiration, the EMF theme is <strong>'2022 Leagues Under The Sea'</strong>. Think Jules Verne, think steampunk, ...but cyber.</p>
+<p>If that doesn’t do it for you, we have <a href="https://wiki.emfcamp.org/wiki/Installation_Inspiration">a list of attendee-suggested projects</a> that might spark an idea - they're meant to be interpreted loosely!</p>
+<p>If you have half an idea, <a href="#contact">contact us</a>. Maybe we can match you up with someone.</p>
+<br>
+
+<h2 id="funding">Funding</h2>
+<p>We have a limited amount of funding available for installations - if you can't afford to make your idea happen, we may be able to help!</p>
+<p>We’re expecting grants to be in the range £100-£500, but larger grants may be possible for exceptional projects.</p>
+<p>If you'd like to apply for funding, please submit your installation to the <a href="{{ url_for('cfp.form', cfp_type='installation') + ('?closed' if ignore_closed else '') }}">Call For Participation</a>.</p>
+<br>
+
+
+<h2 id="tickets">Tickets</h2>
+<p>Bringing an installation does not automatically guaranteed you the opportunity to buy an EMF ticket, unless we’ve funded it. We have a limited number of reserved tickets for exceptional installations available.</p>
+<p>The guarantee is for <strong>two</strong> adult tickets: one for you at a 33% discount, and one for a friend or partner at full price. You are also guaranteed as many child tickets as you need.
+<p>If you'd like to apply for a guaranteed EMF ticket, please submit your installation to the <a href="{{ url_for('cfp.form', cfp_type='installation') + ('?closed' if ignore_closed else '') }}">Call For Participation</a>.</p>
+<br>
+
+
+<h2>FAQ</h2>
+
+<h4>I’ve already got a thing, can I just bring it?</h4>
+<p>Yes! You don’t need our agreement, just bring it along. But <a href="#contact">we’d really like to know about it</a>, if only so we can ensure people can find it on-site. And if there is any question at all about safety or logistics, please get in touch.</p>
+
+<h4>How do I apply?</h4>
+<p>Fill in the <a href="{{ url_for('cfp.form', cfp_type='installation') + ('?closed' if ignore_closed else '') }}">Call for Participation</a>, and you have any questions about the application process, please <a href="#contact">get in touch</a>.</p>
+
+<h4>When can I expect a decision?</h4>
+<p>We’ll be reviewing submissions every few weeks. Funded projects will be awarded on April 4th. If you need money further in advance, please <a href="#contact">contact us</a>.
+
+<h4>What if my thing needs to be indoors?</h4>
+<p>We can host a limited number of installations in the Lounge, the Arcade, and Null Sector. <a href="#contact">Get in touch</a> and we’ll see if we can make it work.</p>
+
+<h4>What if it doesn’t work / isn’t lovely / I don’t finish it?</h4>
+<p>We'd like to see enough evidence that the idea is feasible and you can built it before we commit to funding. But if things go wrong, or if you run out of time to build it - don't worry. Just make sure you let us know so we can re-allocate the funding to someone who can use it.</p>
+
+<h4>Safety</h4>
+<p>If your thing could potentially be dangerous we'll be asking questions to ensure that it can safely be hosted at EMF. If it cannot be covered by our event insurance we'll also ask you to obtain your own Public Liability Insurance - don't worry, this is easier than it sounds.</p>
+
+<h4>How much support can I have on-site at EMF?</h4>
+<p>We’re going to rely on you to bring everything you need to make your thing go. For installations, we can help you find a nice spot for it, but after that you are on your own. Think about power supply, wind &amp; weather, and any signage/labelling/credits.</p>
+
+<h4>What if I have an idea but not the skills to make it?</h4>
+<p>We’d love to <a href="#matchmaking">help match you up</a> with other people who can help make your project happen!</p>
+
+<h4>What if I want to help make stuff but don’t have a strong idea?</h4>
+<p>See above!<p>
+
+<h4>What happens to my installation at the end of the event?</h4>
+<p>You take it away! Please leave no trace on the site - we do not have the ability to dispose of it for you. After the event you can do whatever you like with your installation!</p>
+
+</div>
+{% endblock %}
