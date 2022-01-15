@@ -173,6 +173,7 @@ def sync_wise_statement(profile_id, borderless_account_id, currency):
             type=transaction.details.type.lower(),
             amount=transaction.amount.value,
             payee=transaction.details.paymentReference,
+            wise_id=transaction.referenceNumber,
         )
         db.session.add(txn)
         txns.append(txn)

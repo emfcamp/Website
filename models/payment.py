@@ -366,19 +366,25 @@ class BankTransaction(db.Model):
     type = db.Column(db.String, nullable=False)
     amount_int = db.Column(db.Integer, nullable=False)
     fit_id = db.Column(db.String, index=True)  # allegedly unique, but don't trust it
-    payee = db.Column(db.String, nullable=False)
+    wise_id = db.Column(db.String, index=True)
+    payee = db.Column(
+        db.String, nullable=False
+    )  # this is what OFX calls it. it's really description
     payment_id = db.Column(db.Integer, db.ForeignKey("payment.id"))
     suppressed = db.Column(db.Boolean, nullable=False, default=False)
     account = db.relationship(BankAccount, backref="transactions")
     payment = db.relationship(BankPayment, backref="transactions")
 
-    def __init__(self, account_id, posted, type, amount, payee, fit_id=None):
+    def __init__(
+        self, account_id, posted, type, amount, payee, fit_id=None, wise_id=None
+    ):
         self.account_id = account_id
         self.posted = posted
         self.type = type
         self.amount = amount
         self.payee = payee
         self.fit_id = fit_id
+        self.wise_id = wise_id
 
     def __repr__(self):
         return "<BankTransaction: %s, %s>" % (self.amount, self.payee)
