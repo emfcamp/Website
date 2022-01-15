@@ -688,3 +688,8 @@ def all_messages():
 @cfp.route("/cfp/guidance")
 def guidance():
     return render_template("cfp/guidance.html")
+
+
+@cfp.route("/cfp/installation-support")
+def installation_support():
+    return render_template("cfp/installation_support.html")
