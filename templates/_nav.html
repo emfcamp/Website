@@ -35,6 +35,10 @@
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('volunteer.main') }}">Volunteer</a>
                 </li>
+            {% else %}
+                <li role="presentation">
+                    <a role="menuitem" href="{{ url_for('base.volunteering') }}">Volunteer</a>
+                </li>
             {% endif %}
             {% if feature_enabled('CFP') and not feature_enabled('CFP_CLOSED') %}
                 <li role="presentation">
