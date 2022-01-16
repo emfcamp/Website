@@ -154,6 +154,9 @@ def sync_wise_statement(profile_id, borderless_account_id, currency):
         if transaction.type != "CREDIT":
             continue
 
+        if transaction.details.type != "DEPOSIT":
+            continue
+
         # Attempt to find transaction in the application database
         # TODO: we should probably check the amount_int, too
         txn = BankTransaction.query.filter_by(

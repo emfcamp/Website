@@ -209,6 +209,9 @@ def check_wisetransfer_ids(profile_id):
             if transaction.type != "CREDIT":
                 continue
 
+            if transaction.details.type != "DEPOSIT":
+                continue
+
             txns = BankTransaction.query.filter_by(
                 account_id=bank_account.id,
                 posted=transaction.date,
