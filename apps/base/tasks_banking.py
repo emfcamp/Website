@@ -3,7 +3,7 @@ import ofxparse
 from datetime import datetime, timedelta
 
 from flask import current_app as app
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 from main import db, wise
 from apps.base import base
@@ -56,6 +56,8 @@ def create_bank_accounts():
                 acct.acct_id or acct.iban,
             )
             db.session.add(acct)
+        except MultipleResultsFound:
+            pass
 
     db.session.commit()
 
