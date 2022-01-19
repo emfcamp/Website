@@ -41,6 +41,7 @@ def account():
 
 
 @users.route("/account/details", methods=["GET", "POST"])
+@login_required
 def details():
     form = AccountForm()
 
