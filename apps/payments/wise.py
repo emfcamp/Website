@@ -110,7 +110,11 @@ def wise_balance_credit(event_type, event):
         logger.warning("Could not find bank account")
         return ("", 204)
 
-    sync_wise_statement(profile_id, borderless_account_id, currency)
+    try:
+        sync_wise_statement(profile_id, borderless_account_id, currency)
+    except Exception as e:
+        logger.exception("Error fetching statement")
+        return ("", 500)
 
     return ("", 204)
 
@@ -119,17 +123,13 @@ def sync_wise_statement(profile_id, borderless_account_id, currency):
     # Retrieve an account transaction statement for the past week
     interval_end = datetime.utcnow()
     interval_start = interval_end - timedelta(days=7)
-    try:
-        statement = wise.borderless_accounts.statement(
-            profile_id,
-            borderless_account_id,
-            currency,
-            interval_start.isoformat() + "Z",
-            interval_end.isoformat() + "Z",
-        )
-    except Exception as e:
-        logger.exception("Error fetching statement")
-        return ("", 500)
+    statement = wise.borderless_accounts.statement(
+        profile_id,
+        borderless_account_id,
+        currency,
+        interval_start.isoformat() + "Z",
+        interval_end.isoformat() + "Z",
+    )
 
     # Lock the bank account as BankTransactions don't have an external unique ID
     # TODO: we could include referenceNumber to prevent this or at least detect issues
@@ -154,6 +154,9 @@ def sync_wise_statement(profile_id, borderless_account_id, currency):
         if transaction.type != "CREDIT":
             continue
 
+        if transaction.details.type != "DEPOSIT":
+            continue
+
         # Attempt to find transaction in the application database
         # TODO: we should probably check the amount_int, too
         txn = BankTransaction.query.filter_by(
@@ -173,6 +176,7 @@ def sync_wise_statement(profile_id, borderless_account_id, currency):
             type=transaction.details.type.lower(),
             amount=transaction.amount.value,
             payee=transaction.details.paymentReference,
+            wise_id=transaction.referenceNumber,
         )
         db.session.add(txn)
         txns.append(txn)

@@ -6,6 +6,7 @@
 """
 
 import logging
+import os
 from werkzeug.local import Local, LocalManager
 
 local = Local()
@@ -18,6 +19,7 @@ class ContextFormatter(logging.Formatter):
 
     def format(self, record):
         record.user = getattr(local, "user_id", None)
+        record.pid = os.getpid()
         return logging.Formatter.format(self, record)
 
 

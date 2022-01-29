@@ -1,11 +1,11 @@
 import click
 import ofxparse
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import current_app as app
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
-from main import db
+from main import db, wise
 from apps.base import base
 from apps.payments.banktransfer import reconcile_txns
 from apps.payments.wise import (
@@ -56,6 +56,8 @@ def create_bank_accounts():
                 acct.acct_id or acct.iban,
             )
             db.session.add(acct)
+        except MultipleResultsFound:
+            pass
 
     db.session.commit()
 
@@ -167,6 +169,77 @@ def sync_wisetransfer(profile_id):
         sync_wise_statement(
             profile_id, tw_account.borderless_account_id, tw_account.currency
         )
+
+
+@base.cli.command("check_wisetransfer_ids")
+@click.argument("profile_id", type=click.INT, required=False)
+def check_wisetransfer_ids(profile_id):
+    """Store referenceNumbers or check them if already stored"""
+    if profile_id is None:
+        profile_id = wise_business_profile()
+
+    tw_accounts = wise_retrieve_accounts(profile_id)
+    for tw_account in tw_accounts:
+        interval_end = datetime.utcnow()
+        interval_start = interval_end - timedelta(days=120)
+        statement = wise.borderless_accounts.statement(
+            profile_id,
+            tw_account.borderless_account_id,
+            tw_account.currency,
+            interval_start.isoformat() + "Z",
+            interval_end.isoformat() + "Z",
+        )
+
+        bank_account = (
+            BankAccount.query.with_for_update()
+            .filter_by(
+                borderless_account_id=tw_account.borderless_account_id,
+                currency=tw_account.currency,
+            )
+            .one()
+        )
+        if not bank_account.active:
+            app.logger.info(
+                f"BankAccount for borderless account {tw_account.borderless_account_id} and {tw_account.currency} is not active, not checking"
+            )
+            db.session.commit()
+            continue
+
+        for transaction in statement.transactions:
+            if transaction.type != "CREDIT":
+                continue
+
+            if transaction.details.type != "DEPOSIT":
+                continue
+
+            txns = BankTransaction.query.filter_by(
+                account_id=bank_account.id,
+                posted=transaction.date,
+                type=transaction.details.type.lower(),
+                payee=transaction.details.paymentReference,
+            ).all()
+            if len(txns) == 0:
+                app.logger.error(
+                    f"Could not find transaction (did you run sync first?): {transaction}"
+                )
+                continue
+            if len(txns) > 1:
+                app.logger.error(
+                    f"Found matching {len(txns)} matching transactions for: {transaction}"
+                )
+                continue
+
+            txn = txns[0]
+            if txn.wise_id is None:
+                txn.wise_id = transaction.referenceNumber
+                continue
+            if txn.wise_id != transaction.referenceNumber:
+                app.logger.error(
+                    f"referenceNumber has changed from {txn.wise_id}: {transaction}"
+                )
+                continue
+
+        db.session.commit()
 
 
 @base.cli.command("reconcile")

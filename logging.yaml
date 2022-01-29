@@ -14,7 +14,7 @@ handlers:
 formatters:
   formatter:
     class: loggingmanager.ContextFormatter
-    format: "%(asctime)s %(name)-12s %(levelname)-8s %(user)-12s %(message)s"
+    format: "%(asctime)s %(name)-12s %(levelname)-8s %(pid)s %(user)-12s %(message)s"
 
 root:
   level: NOTSET
