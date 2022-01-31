@@ -21,6 +21,7 @@ services:
   gulp:
     build:
       context: "./docker/gulp"
+    init: true
     volumes:
       - .:/app
 
