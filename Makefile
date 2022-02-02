@@ -6,7 +6,7 @@ ifeq ("$(TEST_SETTINGS)", "")
 	TEST_SETTINGS=./config/test.cfg
 endif
 
-.PHONY: test
+.PHONY: test check-syntax
 
 test:
 	black --check ./main.py ./apps ./models ./tests
@@ -15,3 +15,8 @@ test:
 ifdef COVERALLS_REPO_TOKEN
 	coveralls
 endif
+
+check-syntax:
+	black --check ./main.py ./apps ./models ./tests
+	flake8 ./*.py ./apps ./models ./tests
+
