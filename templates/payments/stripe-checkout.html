@@ -80,6 +80,28 @@
     }
   }
 
+  function stripe_submit(event) {
+    event.preventDefault();
+    pay_button.prop('disabled', true);
+    stripe.confirmCardPayment(
+      CLIENT_SECRET,
+      {
+        payment_method: {
+          card: cardElement,
+          billing_details: {
+            name: $('#cardholder-name').val(),
+            email: EMAIL,
+          }
+        }
+      }
+    ).then(function(result) {
+      if (result.error) {
+        set_error(result.error.message);
+      } else {
+        $('#stripe_capture').submit();
+      }
+    });
+  }
 
   if (METHOD == 'card') {
     var cardElement = elements.create('card');
@@ -87,28 +109,8 @@
     cardElement.on('change', stripe_validate);
     cardElement.mount('#stripe-card');
 
-    pay_button.on('click', function(event) {
-      event.preventDefault();
-      pay_button.prop('disabled', true);
-      stripe.confirmCardPayment(
-        CLIENT_SECRET,
-        {
-          payment_method: {
-            card: cardElement,
-            billing_details: {
-              name: $('#cardholder-name').val(),
-              email: EMAIL
-            }
-          }
-        }
-      ).then(function(result) {
-        if (result.error) {
-          set_error(result.error.message);
-        } else {
-          $('#stripe_capture').submit();
-        }
-      })
-    });
+    pay_button.on('click', stripe_submit);
+    $('#stripe-form').on('submit', stripe_submit);
   }
 </script>
 {% endblock -%}
