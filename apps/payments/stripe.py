@@ -91,6 +91,16 @@ def stripe_capture(payment_id):
     else:
         # Reuse a previously-created payment intent
         intent = stripe.PaymentIntent.retrieve(payment.intent_id)
+        if intent.status == "succeeded":
+            logger.warn(f"Intent already succeeded, not capturing again")
+            payment.state = "charging"
+            db.session.commit()
+            return redirect(url_for(".stripe_waiting", payment_id=payment_id))
+
+        if intent.payment_method:
+            logger.warn(
+                f"Intent already has payment method {intent.payment_method}, this will likely fail"
+            )
 
     logger.info(
         "Starting checkout for Stripe payment %s with intent %s",
