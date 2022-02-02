@@ -46,8 +46,8 @@
 <script src="https://js.stripe.com/v3/"></script>
 <script nonce="{{csp_nonce}}">
   var PUBLIC_KEY = {{ config['STRIPE_PUBLIC_KEY']|tojson }};
-  var CLIENT_SECRET = {{ client_secret|tojson }};
-  var EMAIL = {{ current_user.email|tojson }};
+  var client_secret = {{ client_secret|tojson }};
+  var email = {{ current_user.email|tojson }};
   var METHOD = 'card';
 
   var stripe = Stripe(PUBLIC_KEY);
@@ -84,13 +84,13 @@
     event.preventDefault();
     pay_button.prop('disabled', true);
     stripe.confirmCardPayment(
-      CLIENT_SECRET,
+      client_secret,
       {
         payment_method: {
           card: cardElement,
           billing_details: {
             name: $('#cardholder-name').val(),
-            email: EMAIL,
+            email: email,
           }
         }
       }
