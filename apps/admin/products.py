@@ -17,6 +17,7 @@ from sqlalchemy import not_
 from main import db, mail, external_url
 from models.user import User
 from models.product import (
+    VOUCHER_GRACE_PERIOD,
     ProductGroup,
     Price,
     PriceTier,
@@ -527,7 +528,10 @@ def product_view_voucher_list(view_id):
 
     if not request.args.get("expired"):
         vouchers = vouchers.filter(
-            not_(Voucher.expiry.isnot(None) & (Voucher.expiry < func.now()))
+            not_(
+                Voucher.expiry.isnot(None)
+                & (Voucher.expiry < func.now() - VOUCHER_GRACE_PERIOD)
+            )
         )
 
     return render_template(

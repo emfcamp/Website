@@ -1,6 +1,6 @@
 from decimal import Decimal
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 import re
 import random
@@ -31,6 +31,11 @@ class VoucherUsedError(ValueError):
 
 
 RANDOM_VOUCHER_LENGTH = 12
+
+# Voucher expiry has a 36 hour grace period after the quoted expiry date, because the
+# expiry date is 00:00 on the selected day and we want to make provision for different
+# time zones.
+VOUCHER_GRACE_PERIOD = timedelta(hours=36)
 
 
 def random_voucher():
@@ -436,7 +441,9 @@ class Voucher(db.Model):
 
     @property
     def is_expired(self):
-        return self.expiry is not None and self.expiry < datetime.utcnow()
+        return self.expiry is not None and self.expiry < (
+            datetime.utcnow() - VOUCHER_GRACE_PERIOD
+        )
 
     def check_capacity(self, basket):
         """Check if there is enough capacity in this voucher to buy
