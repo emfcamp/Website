@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 from models import config_date
-from models.product import ProductView, Voucher
+from models.product import VOUCHER_GRACE_PERIOD, ProductView, Voucher
 from models.cfp import TalkProposal
 
 
@@ -70,7 +70,7 @@ def test_product_view_accessible_voucher_expiry(db, user, monkeypatch):
         Voucher(
             view=product_view,
             code=EXPIRED_YESTERDAY,
-            expiry=datetime.utcnow() - timedelta(days=1),
+            expiry=datetime.utcnow() - timedelta(days=1) - VOUCHER_GRACE_PERIOD,
         )
     )
     db.session.add(
