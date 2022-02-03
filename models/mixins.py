@@ -144,12 +144,12 @@ class InheritedAttributesMixin(object):
 
     attributes = db.Column(db.JSON, default={})
 
-    def get_attribute(self, name):
+    def get_attribute(self, name, default=None):
         if name in self.attributes:
             return self.attributes[name]
         if self.parent:
-            return self.parent.get_attribute(name)
-        return None
+            return self.parent.get_attribute(name, default)
+        return default
 
     def set_attribute(self, name, value):
         # SQLAlchemy can't recognise changes within JSON structures

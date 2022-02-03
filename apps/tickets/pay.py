@@ -108,6 +108,22 @@ def pay(flow="main"):
 
     form.basket_total.data = basket.total
 
+    # Whether the user has an admission ticket in their basket or already purchased.
+    # FIXME: this is rather ugly
+    has_admission_ticket = any(
+        (
+            p.product.is_adult_ticket()
+            and p.state not in ("cancelled", "refunded", "reserved")
+        )
+        for p in current_user.owned_tickets
+    ) or any(p.product.is_adult_ticket() for p in basket.purchases)
+
+    # Whether the user has any purchases in their basket which require an admission ticket,
+    # such as parking or live-in vehicle tickets.
+    requires_admission_ticket = any(
+        p.parent.get_attribute("requires_admission_ticket", True) for p in basket.keys()
+    )
+
     return render_template(
         "tickets/payment-choose.html",
         form=form,
@@ -115,6 +131,7 @@ def pay(flow="main"):
         total=basket.total,
         flow=flow,
         view=view,
+        admission_ticket_needed=requires_admission_ticket and not has_admission_ticket,
     )
 
 
