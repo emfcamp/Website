@@ -67,7 +67,14 @@ function css(cb) {
       'css/flask-admin.scss',
     ])
     .pipe(gulpif(!production, sourcemaps.init()))
-    .pipe(sass({includePaths: ['../node_modules']}).on('error', sass.logError))
+    .pipe(sass({includePaths: ['../node_modules']}).on('error', function(err)  {
+      var message = err.messageFormatted;
+      if (production) {
+        throw message;
+      }
+      process.stderr.write(message + "\n");
+      this.emit('end');
+    }))
     .pipe(
       postcss(
         [

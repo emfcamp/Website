@@ -1,4 +1,3 @@
-
 @use "../node_modules/bootstrap/dist/css/bootstrap.css";
 @use "../node_modules/@primer/octicons";
 @use "./_main_grid.scss";
@@ -20,4 +19,23 @@
 @use "./_sponsorship.scss";
 @use "./_volunteer.scss";
 @use "./volunteer_schedule.scss";
-@import url('https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap');
+
+@font-face {
+  font-family: "Raleway";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local(""),
+    url("../fonts/raleway-v22-latin-ext_latin-regular.woff2") format("woff2"),
+    url("../fonts/raleway-v22-latin-ext_latin-regular.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Raleway";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local(""),
+    url("../fonts/raleway-v22-latin-ext_latin-700.woff2") format("woff2"),
+    url("../fonts/raleway-v22-latin-ext_latin-700.woff") format("woff");
+}

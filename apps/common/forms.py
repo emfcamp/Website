@@ -75,13 +75,13 @@ class JSONField(StringField):
         return json.dumps(self.data) if self.data else ""
 
     def process_formdata(self, valuelist):
-        if valuelist:
+        if valuelist and valuelist[0] != "":
             try:
                 self.data = json.loads(valuelist[0])
             except ValueError:
                 raise ValueError("This field contains invalid JSON")
         else:
-            self.data = None
+            self.data = {}
 
     def pre_validate(self, form):
         super().pre_validate(form)
