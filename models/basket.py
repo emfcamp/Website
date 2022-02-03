@@ -23,6 +23,14 @@ class Basket(MutableMapping):
     """
     Helper class for basket-related operations. Tied to a user, and maps PriceTiers to counts.
 
+    A basket contains "purchases", which are what the user is buying, and "surplus purchases",
+    which are items which the user has tried to buy and subsequently removed from their basket. These
+    surplus purchases are reserved until the user completes the checkout in case the user wants to re-add
+    them.
+
+    Iterating over the basket will return purchases and surplus purchases - use the `purchases` accessor
+    to get what's currently in the basket.
+
     Created either from Purchases in the DB, or a list of PriceTiers and counts.
     ids should be trustworthy (e.g. stored in flask.session)
     """
