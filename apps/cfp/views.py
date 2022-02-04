@@ -115,11 +115,11 @@ class InstallationProposalForm(ProposalForm):
         "Funding",
         choices=[
             ("0", "No money needed"),
-            (u"< £50", u"Less than £50"),
-            (u"< £100", u"Less than £100"),
-            (u"< £300", u"Less than £300"),
-            (u"< £500", u"Less than £500"),
-            (u"> £500", u"More than £500"),
+            ("< £50", "Less than £50"),
+            ("< £100", "Less than £100"),
+            ("< £300", "Less than £300"),
+            ("< £500", "Less than £500"),
+            ("> £500", "More than £500"),
         ],
     )
 

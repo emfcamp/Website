@@ -37,9 +37,9 @@ def csv_import(csv_file, state):
 
         proposal = (
             TalkProposal()
-            if row["type"] == u"talk"
+            if row["type"] == "talk"
             else WorkshopProposal()
-            if row["type"] == u"workshop"
+            if row["type"] == "workshop"
             else InstallationProposal()
         )
 
