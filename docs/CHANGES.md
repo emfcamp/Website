@@ -81,3 +81,8 @@ We can now attempt to reconcile inside the Wise webhook. Turn it on with the fol
 RECONCILE_IN_WEBHOOK = True
 ```
 
+2022-02-04
+==========
+
+* Flask version has been updated - you may need to run `docker compose up --build` in your dev environment.
+* Black version is now 22.1.0 - if your editor auto-formats you might have to update your local version.
