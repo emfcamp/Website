@@ -50,6 +50,7 @@ class VolunteerUserModelView(VolunteerModelView):
 
 
 # Add menu item Volunteers
-volunteer_admin.add_view(
-    VolunteerUserModelView(Volunteer, db.session, name="Volunteers")
-)
+if volunteer_admin:
+    volunteer_admin.add_view(
+        VolunteerUserModelView(Volunteer, db.session, name="Volunteers")
+    )

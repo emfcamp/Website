@@ -1,4 +1,3 @@
-# coding=utf-8
 import pytz
 
 from pendulum import period
@@ -6,13 +5,14 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from main import db
+from .. import BaseModel
 
 event_tz = pytz.timezone("Europe/London")
 
 
-class ShiftEntry(db.Model):
+class ShiftEntry(BaseModel):
     __tablename__ = "volunteer_shift_entry"
-    __versioned__ = {}
+    __versioned__: dict = {}
 
     shift_id = db.Column(
         db.Integer, db.ForeignKey("volunteer_shift.id"), primary_key=True
@@ -25,9 +25,9 @@ class ShiftEntry(db.Model):
     shift = db.relationship("Shift", backref="entries")
 
 
-class Shift(db.Model):
+class Shift(BaseModel):
     __tablename__ = "volunteer_shift"
-    __versioned__ = {}
+    __versioned__: dict = {}
 
     id = db.Column(db.Integer, primary_key=True)
     role_id = db.Column(db.Integer, db.ForeignKey("volunteer_role.id"), nullable=False)

@@ -11,6 +11,12 @@ from sqlalchemy import true, inspect
 from sqlalchemy.orm.base import NO_VALUE
 from sqlalchemy.sql.functions import func
 from sqlalchemy_continuum.utils import version_class, transaction_class
+from sqlalchemy.ext.declarative import DeclarativeMeta
+
+# This alias is required to apply type annotations to the model objects.
+# MyPy raises errors when inheriting directly from db.Model. Once flask-sqlalchemy has
+# type annotations this should become unnecessary.
+BaseModel: DeclarativeMeta = db.Model
 
 
 def event_start():

@@ -11,6 +11,8 @@ from models import export_attr_counts, export_attr_edits, export_intervals, buck
 
 from main import db
 from .user import User
+from . import BaseModel
+
 
 HUMAN_CFP_TYPES = {
     "performance": "performance",
@@ -157,7 +159,7 @@ EVENT_SPACING = {
     "installation": 0,
 }
 
-period = namedtuple("Period", "start end")
+cfp_period = namedtuple("cfp_period", "start end")
 DAYS = {
     "fri": datetime(2018, 8, 31),
     "sat": datetime(2018, 9, 1),
@@ -225,7 +227,7 @@ def timeslot_to_period(slot_string, type=None):
         start = DAYS[day] + timedelta(hours=int(start_h))
         end = DAYS[day] + timedelta(hours=int(end_h))
 
-    return period(start, end)
+    return cfp_period(start, end)
 
 
 # Reduces the time periods to the smallest contiguous set we can
@@ -240,7 +242,7 @@ def make_periods_contiguous(time_periods):
             time_period.start <= contiguous_periods[-1].end
             and contiguous_periods[-1].end < time_period.end
         ):
-            contiguous_periods[-1] = period(
+            contiguous_periods[-1] = cfp_period(
                 contiguous_periods[-1].start, time_period.end
             )
             continue
@@ -272,7 +274,7 @@ class InvalidVenueException(Exception):
 
 FavouriteProposal = db.Table(
     "favourite_proposal",
-    db.Model.metadata,
+    BaseModel.metadata,
     db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
     db.Column(
         "proposal_id", db.Integer, db.ForeignKey("proposal.id"), primary_key=True
@@ -280,7 +282,7 @@ FavouriteProposal = db.Table(
 )
 
 
-class Proposal(db.Model):
+class Proposal(BaseModel):
     __versioned__ = {"exclude": ["favourites", "favourite_count"]}
     __tablename__ = "proposal"
 
@@ -579,7 +581,7 @@ class Proposal(db.Model):
                     p.start.hour <= HARD_START_LIMIT[self.type][0]
                     and p.start.minute < HARD_START_LIMIT[self.type][1]
                 ):
-                    p = period(
+                    p = cfp_period(
                         p.start.replace(minute=HARD_START_LIMIT[self.type][1]), p.end
                     )
                 trimmed_periods.append(p)
@@ -595,7 +597,9 @@ class Proposal(db.Model):
                     start, end = p.split(" > ")
                     try:
                         time_periods.append(
-                            period(parse_date(start.strip()), parse_date(end.strip()))
+                            cfp_period(
+                                parse_date(start.strip()), parse_date(end.strip())
+                            )
                         )
                     # If someone has entered garbage, dump the lot
                     except ValueError as e:
@@ -755,7 +759,7 @@ class InstallationProposal(Proposal):
     funds = db.Column(db.String, nullable=True)
 
 
-class CFPMessage(db.Model):
+class CFPMessage(BaseModel):
     __tablename__ = "cfp_message"
     id = db.Column(db.Integer, primary_key=True)
     created = db.Column(db.DateTime, default=datetime.utcnow)
@@ -816,8 +820,8 @@ class CFPMessage(db.Model):
         return data
 
 
-class CFPVote(db.Model):
-    __versioned__ = {}
+class CFPVote(BaseModel):
+    __versioned__: dict = {}
     __tablename__ = "cfp_vote"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
@@ -871,7 +875,7 @@ class CFPVote(db.Model):
         return data
 
 
-class Venue(db.Model):
+class Venue(BaseModel):
     __tablename__ = "venue"
     __export_data__ = False
 

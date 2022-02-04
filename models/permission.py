@@ -1,9 +1,11 @@
 from main import db
+from . import BaseModel
+import sqlalchemy
 
 import models
 
 
-class Permission(db.Model):
+class Permission(BaseModel):
     __tablename__ = "permission"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, index=True)
@@ -27,9 +29,9 @@ class Permission(db.Model):
         return data
 
 
-UserPermission = db.Table(
+UserPermission: sqlalchemy.Table = db.Table(
     "user_permission",
-    db.Model.metadata,
+    BaseModel.metadata,
     db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
     db.Column(
         "permission_id", db.Integer, db.ForeignKey("permission.id"), primary_key=True

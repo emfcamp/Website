@@ -1,6 +1,8 @@
 from datetime import datetime
 from sqlalchemy.orm import column_property, validates
 from main import db
+from . import BaseModel
+
 
 # The type of a product determines how we handle it after purchase.
 #
@@ -26,7 +28,7 @@ class CheckinStateException(Exception):
     pass
 
 
-class Purchase(db.Model):
+class Purchase(BaseModel):
     """A Purchase. This could be a ticket or an item of merchandise."""
 
     __tablename__ = "purchase"
@@ -242,7 +244,7 @@ class AdmissionTicket(Ticket):
         self.badge_issued = False
 
 
-class PurchaseTransfer(db.Model):
+class PurchaseTransfer(BaseModel):
     """A record of a purchase being transferred from one user to another."""
 
     __tablename__ = "purchase_transfer"

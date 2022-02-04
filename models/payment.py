@@ -9,7 +9,7 @@ from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy_continuum.utils import version_class, transaction_class
 
 from main import db
-from . import export_attr_counts, export_intervals, bucketise, event_year
+from . import export_attr_counts, export_intervals, bucketise, event_year, BaseModel
 from .purchase import Ticket
 from .product import Voucher
 
@@ -20,9 +20,9 @@ class StateException(Exception):
     pass
 
 
-class Payment(db.Model):
+class Payment(BaseModel):
     __tablename__ = "payment"
-    __versioned__ = {}
+    __versioned__: dict = {}
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
@@ -304,7 +304,7 @@ class BankPayment(Payment):
                 continue
 
 
-class BankAccount(db.Model):
+class BankAccount(BaseModel):
     __tablename__ = "bank_account"
     __export_data__ = False
     id = db.Column(db.Integer, primary_key=True)
@@ -356,7 +356,7 @@ db.Index(
 )
 
 
-class BankTransaction(db.Model):
+class BankTransaction(BaseModel):
     __tablename__ = "bank_transaction"
     __export_data__ = False
 
@@ -499,8 +499,8 @@ class StripePayment(Payment):
         super(StripePayment, self).manual_refund()
 
 
-class Refund(db.Model):
-    __versioned__ = {}
+class Refund(BaseModel):
+    __versioned__: dict = {}
     __tablename__ = "refund"
     id = db.Column(db.Integer, primary_key=True)
     payment_id = db.Column(db.Integer, db.ForeignKey("payment.id"), nullable=False)
@@ -566,7 +566,7 @@ class StripeRefund(Refund):
     refundid = db.Column(db.String, unique=True)
 
 
-class RefundRequest(db.Model):
+class RefundRequest(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     payment_id = db.Column(db.Integer, db.ForeignKey("payment.id"))
     donation = db.Column(db.Numeric, server_default="0", nullable=False)
@@ -594,7 +594,7 @@ class RefundRequest(db.Model):
             return "banktransfer"
 
 
-class PaymentSequence(db.Model):
+class PaymentSequence(BaseModel):
     """Table for storing sequence numbers.
     Currently used for storing VAT invoice sequences, which must be monotonic.
     """

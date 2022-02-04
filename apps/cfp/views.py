@@ -429,7 +429,7 @@ class AcceptedForm(Form):
             ("mon am", "Monday am"),
         ],
     )
-    _available_slots = tuple()
+    _available_slots: tuple = tuple()
 
     def get_availability_json(self):
         res = []
