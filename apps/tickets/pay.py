@@ -110,13 +110,15 @@ def pay(flow="main"):
 
     # Whether the user has an admission ticket in their basket or already purchased.
     # FIXME: this is rather ugly
-    has_admission_ticket = any(
-        (
-            p.product.is_adult_ticket()
-            and p.state not in ("cancelled", "refunded", "reserved")
+    has_admission_ticket = any(p.product.is_adult_ticket() for p in basket.purchases)
+    if current_user.is_authenticated:
+        has_admission_ticket |= any(
+            (
+                p.product.is_adult_ticket()
+                and p.state not in ("cancelled", "refunded", "reserved")
+            )
+            for p in current_user.owned_tickets
         )
-        for p in current_user.owned_tickets
-    ) or any(p.product.is_adult_ticket() for p in basket.purchases)
 
     # Whether the user has any purchases in their basket which require an admission ticket,
     # such as parking or live-in vehicle tickets.
