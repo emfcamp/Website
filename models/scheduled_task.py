@@ -20,6 +20,7 @@ import logging
 from functools import wraps
 
 from main import db
+from . import BaseModel
 
 tasks = []
 log = logging.getLogger(__name__)
@@ -38,7 +39,7 @@ class ScheduledTask(object):
         return f"<ScheduledTask: {self.name}, every {self.duration}>"
 
 
-class ScheduledTaskResult(db.Model):
+class ScheduledTaskResult(BaseModel):
     __tablename__ = "scheduled_task_result"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)

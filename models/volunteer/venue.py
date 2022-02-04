@@ -1,8 +1,8 @@
-# coding=utf-8
 from main import db
+from .. import BaseModel
 
 
-class VolunteerVenue(db.Model):
+class VolunteerVenue(BaseModel):
     __tablename__ = "volunteer_venue"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, index=True)

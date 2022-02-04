@@ -1,8 +1,9 @@
-# coding=utf-8
 from main import db
 
+from .. import BaseModel
 
-class Role(db.Model):
+
+class Role(BaseModel):
     __tablename__ = "volunteer_role"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False, unique=True, index=True)
@@ -40,8 +41,8 @@ class Role(db.Model):
         return cls.query.order_by(Role.name).all()
 
 
-class RolePermission(db.Model):
-    __versioned__ = {}
+class RolePermission(BaseModel):
+    __versioned__: dict = {}
     __tablename__ = "volunteer_role_permission"
 
     id = db.Column(db.Integer, primary_key=True)

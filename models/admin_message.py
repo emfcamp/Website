@@ -1,12 +1,12 @@
-# coding=utf-8
 from datetime import datetime
 
 from main import db
+from . import BaseModel
 
 
-class AdminMessage(db.Model):
+class AdminMessage(BaseModel):
     __tablename__ = "admin_message"
-    __versioned__ = {}
+    __versioned__: dict = {}
 
     id = db.Column(db.Integer, primary_key=True)
     message = db.Column(db.String, nullable=False)

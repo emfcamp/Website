@@ -1,7 +1,8 @@
 from main import db
+from . import BaseModel
 
 
-class Village(db.Model):
+class Village(BaseModel):
     __tablename__ = "village"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -24,7 +25,7 @@ class Village(db.Model):
         return f"<Village '{self.name}' (id: {self.id})>"
 
 
-class VillageMember(db.Model):
+class VillageMember(BaseModel):
     __tablename__ = "village_member"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -41,7 +42,7 @@ class VillageMember(db.Model):
         return f"<VillageMember {self.user} member of {self.village}>"
 
 
-class VillageRequirements(db.Model):
+class VillageRequirements(BaseModel):
     __tablename__ = "village_requirements"
 
     village_id = db.Column(db.Integer, db.ForeignKey("village.id"), primary_key=True)

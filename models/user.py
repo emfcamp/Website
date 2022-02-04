@@ -16,7 +16,7 @@ from flask_login import UserMixin, AnonymousUserMixin
 
 from main import db
 from loggingmanager import set_user_id
-from . import bucketise
+from . import bucketise, BaseModel
 from .permission import UserPermission, Permission
 from .volunteer.shift import ShiftEntry
 
@@ -175,7 +175,7 @@ def verify_checkin_code(key, uid):
     return verify_unlimited_short_hmac("checkin-", key, uid)
 
 
-class User(db.Model, UserMixin):
+class User(BaseModel, UserMixin):
     __tablename__ = "user"
     __versioned__ = {"exclude": ["favourites", "calendar_favourites"]}
 
@@ -407,7 +407,7 @@ Index(
 )
 
 
-class UserDiversity(db.Model):
+class UserDiversity(BaseModel):
     __tablename__ = "diversity"
     user_id = db.Column(
         db.Integer, db.ForeignKey("user.id"), nullable=False, primary_key=True
@@ -480,7 +480,7 @@ class UserDiversity(db.Model):
         return data
 
 
-class UserShipping(db.Model):
+class UserShipping(BaseModel):
     __tablename__ = "shipping"
     user_id = db.Column(
         db.Integer, db.ForeignKey("user.id"), nullable=False, primary_key=True

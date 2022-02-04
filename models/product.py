@@ -12,7 +12,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 
 from main import db
 from .mixins import CapacityMixin, InheritedAttributesMixin
-from . import config_date
+from . import config_date, BaseModel
 from .purchase import Purchase
 
 log = logging.getLogger(__name__)
@@ -58,7 +58,7 @@ def one_or_none(result):
     raise MultipleLoadedResultsFound()
 
 
-class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
+class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
     """Represents a logical group of products.
 
     Capacity and attributes on a ProductGroup cascade down to the products within it.
@@ -188,7 +188,7 @@ class ProductGroup(db.Model, CapacityMixin, InheritedAttributesMixin):
         return self.name
 
 
-class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
+class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
     """A product (ticket or other item) which is for sale."""
 
     id = db.Column(db.Integer, primary_key=True)
@@ -257,7 +257,7 @@ class Product(db.Model, CapacityMixin, InheritedAttributesMixin):
         return self.name
 
 
-class PriceTier(db.Model, CapacityMixin):
+class PriceTier(BaseModel, CapacityMixin):
     """A pricing level for a Product.
 
     PriceTiers have a capacity and an expiry through the CapacityMixin.
@@ -345,7 +345,7 @@ class PriceTier(db.Model, CapacityMixin):
         return self.id < other.id
 
 
-class Price(db.Model):
+class Price(BaseModel):
     """Represents the price of a product, at a given price tier, in a given currency.
 
     Prices are immutable and should not be changed. We expire the PriceTier instead.
@@ -388,7 +388,7 @@ class Price(db.Model):
         return "%0.2f %s" % (self.value, self.currency)
 
 
-class Voucher(db.Model):
+class Voucher(BaseModel):
     """A short code which allows a user to access a restricted ProductView"""
 
     __tablename__ = "voucher"
@@ -520,7 +520,7 @@ class Voucher(db.Model):
         return True
 
 
-class ProductView(db.Model):
+class ProductView(BaseModel):
     """A selection of products to be shown together for sale."""
 
     __table_name__ = "product_view"
@@ -594,7 +594,7 @@ class ProductView(db.Model):
         return self.name
 
 
-class ProductViewProduct(db.Model):
+class ProductViewProduct(BaseModel):
     __table_name__ = "product_view_product"
 
     view_id = db.Column(db.Integer, db.ForeignKey(ProductView.id), primary_key=True)
