@@ -128,7 +128,7 @@ def main(flow="main"):
     )
 
 
-def products_for_view(product_view):
+def products_for_view(product_view) -> list[ProductViewProduct]:
     # Note that this function is performance-critical. It should load all the product data
     # necessary for the high-traffic tickets page to render in a single query. If you change
     # this, make sure that you monitor the number of queries emitted by the tickets page.

@@ -1,7 +1,8 @@
 from datetime import datetime
 from sqlalchemy.orm import column_property, validates
 from main import db
-from . import BaseModel
+from .user import User
+from . import BaseModel, Currency
 
 
 # The type of a product determines how we handle it after purchase.
@@ -110,7 +111,7 @@ class Purchase(BaseModel):
             )
         return issued
 
-    def set_user(self, user):
+    def set_user(self, user: User):
         if (
             self.state != "reserved"
             or self.owner_id is not None
@@ -173,7 +174,7 @@ class Purchase(BaseModel):
         self.state = "paid"
         self.refund = None
 
-    def change_currency(self, currency):
+    def change_currency(self, currency: Currency):
         self.price = self.price_tier.get_price(currency)
 
     def transfer(self, from_user, to_user):

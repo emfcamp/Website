@@ -1,3 +1,4 @@
+from __future__ import annotations
 from decimal import Decimal
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -5,6 +6,7 @@ import logging
 import re
 import random
 import string
+from typing import Optional, TYPE_CHECKING
 
 from sqlalchemy import func, UniqueConstraint, inspect
 from sqlalchemy.orm import validates, column_property
@@ -14,6 +16,12 @@ from main import db
 from .mixins import CapacityMixin, InheritedAttributesMixin
 from . import config_date, BaseModel
 from .purchase import Purchase
+from .payment import Currency
+
+if TYPE_CHECKING:
+    # Imports used only in type hints, can't be imported normally due to circular references.
+    from .basket import Basket
+    from .payment import Payment
 
 log = logging.getLogger(__name__)
 
@@ -97,7 +105,7 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
         super().__init__(type=type, parent=parent, parent_id=parent_id, **kwargs)
 
     @classmethod
-    def get_by_name(cls, group_name):
+    def get_by_name(cls, group_name) -> Optional[ProductGroup]:
         return ProductGroup.query.filter_by(name=group_name).one_or_none()
 
     @validates("capacity_max")
@@ -151,7 +159,7 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
         return capacity_max
 
     @property
-    def unallocated_capacity(self):
+    def unallocated_capacity(self) -> Optional[int]:
         """If this is an allocation-level ProductGroup (i.e. it has a capacity_max
         set, and all childen also do), return the total unallocated capacity.
 
@@ -206,7 +214,7 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
     __table_args__ = (UniqueConstraint("name", "group_id"),)
 
     @classmethod
-    def get_by_name(cls, group_name, product_name):
+    def get_by_name(cls, group_name, product_name) -> Optional[Product]:
         group = ProductGroup.query.filter_by(name=group_name)
         product = (
             group.join(Product).filter_by(name=product_name).with_entities(Product)
@@ -224,7 +232,7 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
 
         return dict(states)
 
-    def get_cheapest_price(self, currency="GBP"):
+    def get_cheapest_price(self, currency="GBP") -> "Price":
         price = (
             PriceTier.query.filter_by(product_id=self.id)
             .join(Price)
@@ -235,7 +243,7 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
         )
         return price
 
-    def is_adult_ticket(self):
+    def is_adult_ticket(self) -> bool:
         """Whether this is an adult ticket.
         We use this for vouchers.
         """
@@ -284,7 +292,7 @@ class PriceTier(BaseModel, CapacityMixin):
         super().__init__(name=name, **kwargs)
 
     @classmethod
-    def get_by_name(cls, group_name, product_name, tier_name):
+    def get_by_name(cls, group_name, product_name, tier_name) -> Optional[PriceTier]:
         group = ProductGroup.query.filter_by(name=group_name)
         product = (
             group.join(Product).filter_by(name=product_name).with_entities(Product)
@@ -306,29 +314,29 @@ class PriceTier(BaseModel, CapacityMixin):
         return dict(states)
 
     @property
-    def purchase_count(self):
+    def purchase_count(self) -> int:
         return Purchase.query.join(PriceTier).filter(PriceTier.id == self.id).count()
 
     @property
-    def unused(self):
+    def unused(self) -> bool:
         """Whether this tier is unused and can be safely deleted."""
         return self.purchase_count == 0 and not self.active
 
-    def get_price(self, currency):
+    def get_price(self, currency: Currency) -> Optional["Price"]:
         if "prices" in inspect(self).unloaded:
             return self.get_price_unloaded(currency)
         else:
             return self.get_price_loaded(currency)
 
-    def get_price_unloaded(self, currency):
+    def get_price_unloaded(self, currency: Currency) -> Optional[Price]:
         price = Price.query.filter_by(price_tier_id=self.id, currency=currency)
         return price.one_or_none()
 
-    def get_price_loaded(self, currency):
+    def get_price_loaded(self, currency: Currency) -> Optional[Price]:
         prices = [p for p in self.prices if p.currency == currency]
         return one_or_none(prices)
 
-    def user_limit(self):
+    def user_limit(self) -> int:
         if self.has_expired():
             return 0
 
@@ -357,7 +365,7 @@ class Price(BaseModel):
     price_tier_id = db.Column(
         db.Integer, db.ForeignKey("price_tier.id"), nullable=False
     )
-    currency = db.Column(db.String, nullable=False)
+    currency: Currency = db.Column(db.String, nullable=False)
     price_int = db.Column(db.Integer, nullable=False)
 
     def __init__(self, currency, value=None, **kwargs):
@@ -410,7 +418,7 @@ class Voucher(BaseModel):
     is_used = column_property((purchases_remaining == 0) | (tickets_remaining == 0))
 
     @classmethod
-    def get_by_code(cls, code):
+    def get_by_code(cls, code: str) -> Optional["Voucher"]:
         if not code:
             return None
         return Voucher.query.filter_by(code=code).one_or_none()
@@ -418,11 +426,11 @@ class Voucher(BaseModel):
     def __init__(
         self,
         view,
-        code=None,
+        code: str = None,
         expiry=None,
-        email=None,
-        purchases_remaining=1,
-        tickets_remaining=2,
+        email: str = None,
+        purchases_remaining: int = 1,
+        tickets_remaining: int = 2,
     ):
         super(Voucher, self).__init__()
         self.view = view
@@ -440,12 +448,12 @@ class Voucher(BaseModel):
             self.code = random_voucher()
 
     @property
-    def is_expired(self):
+    def is_expired(self) -> bool:
         return self.expiry is not None and self.expiry < (
             datetime.utcnow() - VOUCHER_GRACE_PERIOD
         )
 
-    def check_capacity(self, basket):
+    def check_capacity(self, basket: Basket):
         """Check if there is enough capacity in this voucher to buy
         the tickets in the provided basket.
         """
@@ -460,7 +468,7 @@ class Voucher(BaseModel):
             return False
         return True
 
-    def consume_capacity(self, payment):
+    def consume_capacity(self, payment: Payment):
         """Decrease the voucher's capacity based on tickets in a payment."""
         if self.purchases_remaining < 1:
             raise VoucherUsedError(
@@ -484,7 +492,7 @@ class Voucher(BaseModel):
         self.purchases_remaining = Voucher.purchases_remaining - 1
         self.tickets_remaining = Voucher.tickets_remaining - adult_tickets
 
-    def return_capacity(self, payment):
+    def return_capacity(self, payment: Payment):
         """Return capacity to this voucher based on tickets in a payment."""
         adult_tickets = len(
             [
@@ -551,12 +559,12 @@ class ProductView(BaseModel):
     products = association_proxy("product_view_products", "product")
 
     @classmethod
-    def get_by_name(cls, name):
+    def get_by_name(cls, name) -> Optional[ProductView]:
         if name is None:
             return None
         return ProductView.query.filter_by(name=name).one_or_none()
 
-    def is_accessible_at(self, user, dt, voucher=None):
+    def is_accessible_at(self, user, dt, voucher=None) -> bool:
         "Whether this ProductView is accessible to a user."
         if user.is_authenticated and user.has_permission("admin"):
             # Admins always have access

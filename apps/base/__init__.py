@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 from mailchimp3 import MailChimp
 from mailchimp3.helpers import get_subscriber_hash
 from mailchimp3.mailchimpclient import MailChimpError
@@ -17,7 +18,7 @@ from flask import (
 
 from main import cache
 from ..common import feature_flag
-from models.product import Product, ProductView, ProductViewProduct, PriceTier
+from models.product import Price, Product, ProductView, ProductViewProduct, PriceTier
 from models.site_state import get_site_state
 
 
@@ -25,7 +26,7 @@ base = Blueprint("base", __name__, cli_group=None)
 
 
 @cache.cached(timeout=60, key_prefix="get_full_price")
-def get_full_price():
+def get_full_price() -> Optional[Price]:
     full = (
         ProductView.query.filter_by(name="main")
         .join(ProductViewProduct, Product, PriceTier)

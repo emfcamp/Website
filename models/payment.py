@@ -2,14 +2,20 @@ import random
 import re
 from decimal import Decimal
 from datetime import datetime, timedelta
-
 from sqlalchemy import event, func, column
 from sqlalchemy.orm import Session, aliased
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy_continuum.utils import version_class, transaction_class
 
 from main import db
-from . import export_attr_counts, export_intervals, bucketise, event_year, BaseModel
+from . import (
+    export_attr_counts,
+    export_intervals,
+    bucketise,
+    event_year,
+    BaseModel,
+    Currency,
+)
 from .purchase import Ticket
 from .product import Voucher
 
@@ -47,7 +53,7 @@ class Payment(BaseModel):
 
     __mapper_args__ = {"polymorphic_on": provider}
 
-    def __init__(self, currency, amount, voucher_code=None):
+    def __init__(self, currency: Currency, amount, voucher_code: str = None):
         self.currency = currency
         self.amount = amount
 
@@ -149,7 +155,7 @@ class Payment(BaseModel):
         """
         return Decimal(0)
 
-    def change_currency(self, currency):
+    def change_currency(self, currency: Currency):
         if self.state in {"paid", "partrefunded", "refunded"}:
             raise StateException("Cannot change currency after payment is reconciled")
 
@@ -278,7 +284,7 @@ class BankPayment(Payment):
     __mapper_args__ = {"polymorphic_identity": "banktransfer"}
     bankref = db.Column(db.String, unique=True)
 
-    def __init__(self, currency, amount, voucher_code=None):
+    def __init__(self, currency: Currency, amount, voucher_code: str = None):
         Payment.__init__(self, currency, amount, voucher_code)
 
         # not cryptographic

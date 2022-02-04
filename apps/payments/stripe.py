@@ -332,7 +332,7 @@ def stripe_payment_failed(payment):
     # to set the payment state to failed here.
 
 
-def lock_payment_or_abort_by_intent(intent_id):
+def lock_payment_or_abort_by_intent(intent_id: str) -> StripePayment:
     try:
         return (
             StripePayment.query.filter_by(intent_id=intent_id).with_for_update().one()
@@ -342,7 +342,7 @@ def lock_payment_or_abort_by_intent(intent_id):
         abort(409)
 
 
-def lock_payment_or_abort_by_charge(charge_id):
+def lock_payment_or_abort_by_charge(charge_id: str) -> StripePayment:
     try:
         return (
             StripePayment.query.filter_by(charge_id=charge_id).with_for_update().one()

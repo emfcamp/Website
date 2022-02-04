@@ -81,7 +81,7 @@ def calc_sales_state(date):
 
 
 @cache.cached(timeout=60, key_prefix="get_states")
-def get_states():
+def get_states() -> dict[str, str]:
     states = SiteState.query.all()
     states = {s.name: s.state for s in states}
 

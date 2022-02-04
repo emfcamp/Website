@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from collections import namedtuple, defaultdict
+from typing import Optional
 from dateutil.parser import parse as parse_date
 import re
 from itertools import groupby
@@ -168,7 +169,7 @@ DAYS = {
 
 # We may also have other venues in the DB, but these are the ones to be
 # returned by default if there are none
-DEFAULT_VENUES = {
+DEFAULT_VENUES: dict[str, list[str]] = {
     "talk": ["Stage A", "Stage B", "Stage C"],
     "workshop": ["Workshop 1", "Workshop 2", "Workshop 3", "Workshop 4"],
     "youthworkshop": ["Youth Workshop"],
@@ -192,7 +193,7 @@ VENUE_CAPACITY = {
 MANUAL_REVIEW_TYPES = ["youthworkshop", "performance", "installation"]
 
 
-def proposal_slug(title):
+def proposal_slug(title) -> str:
     slug = slugify_unicode(title).lower()
     if len(slug) > 60:
         words = re.split(" +|[,.;:!?]+", title)
@@ -339,9 +340,9 @@ class Proposal(BaseModel):
     allowed_venues = db.Column(db.String, nullable=True)
     allowed_times = db.Column(db.String, nullable=True)
     scheduled_duration = db.Column(db.Integer, nullable=True)
-    scheduled_time = db.Column(db.DateTime, nullable=True)
+    scheduled_time: datetime = db.Column(db.DateTime, nullable=True)
     scheduled_venue_id = db.Column(db.Integer, db.ForeignKey("venue.id"))
-    potential_time = db.Column(db.DateTime, nullable=True)
+    potential_time: datetime = db.Column(db.DateTime, nullable=True)
     potential_venue_id = db.Column(db.Integer, db.ForeignKey("venue.id"))
 
     scheduled_venue = db.relationship(
@@ -507,7 +508,7 @@ class Proposal(BaseModel):
 
         return data
 
-    def get_user_vote(self, user):
+    def get_user_vote(self, user) -> "CFPVote":
         # there can't be more than one vote per user per proposal
         return CFPVote.query.filter_by(proposal_id=self.id, user_id=user.id).first()
 
@@ -545,14 +546,14 @@ class Proposal(BaseModel):
             msg.has_been_read = True
         return len(messages)
 
-    def has_ticket(self):
+    def has_ticket(self) -> bool:
         "Does the submitter have a ticket?"
         admission_tickets = len(
             list(self.user.get_owned_tickets(paid=True, type="admission_ticket"))
         )
         return admission_tickets > 0 or self.user.will_have_ticket
 
-    def get_allowed_venues(self):
+    def get_allowed_venues(self) -> list["Venue"]:
         # FIXME: this should reference a foreign key instead
         if self.allowed_venues:
             venue_names = [v.strip() for v in self.allowed_venues.split(",")]
@@ -640,7 +641,7 @@ class Proposal(BaseModel):
         preferred_time_periods = self.fix_hard_time_limits(preferred_time_periods)
         return make_periods_contiguous(preferred_time_periods)
 
-    def overlaps_with(self, other):
+    def overlaps_with(self, other) -> bool:
         if self.potential_start_date:
             return (
                 self.potential_end_date > other.potential_start_date
@@ -658,7 +659,7 @@ class Proposal(BaseModel):
         return self.potential_time
 
     @property
-    def end_date(self):
+    def end_date(self) -> Optional[datetime]:
         start = self.start_date
         duration = self.scheduled_duration
         if start and duration:
@@ -666,7 +667,7 @@ class Proposal(BaseModel):
         return None
 
     @property
-    def potential_end_date(self):
+    def potential_end_date(self) -> Optional[datetime]:
         start = self.start_date
         duration = self.scheduled_duration
         if start and duration:
@@ -684,18 +685,18 @@ class Proposal(BaseModel):
         return None
 
     @property
-    def map_link(self):
+    def map_link(self) -> Optional[str]:
         latlon = self.latlon
         if latlon:
             return "https://map.emfcamp.org/#18.5/%s/%s" % (latlon[0], latlon[1])
         return None
 
     @property
-    def display_title(self):
+    def display_title(self) -> str:
         return self.published_title or self.title
 
     @property
-    def display_cost(self):
+    def display_cost(self) -> str:
         cost = self.cost.strip()
         if self.published_cost is not None:
             cost = self.published_cost.strip()
@@ -837,7 +838,7 @@ class CFPVote(BaseModel):
     vote = db.Column(db.Integer)  # Vote can be null for abstentions
     note = db.Column(db.String)
 
-    def __init__(self, user, proposal):
+    def __init__(self, user: User, proposal: Proposal):
         self.user = user
         self.proposal = proposal
         self.state = "new"

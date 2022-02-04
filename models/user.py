@@ -1,3 +1,4 @@
+from __future__ import annotations
 import base64
 import hmac
 import hashlib
@@ -8,6 +9,7 @@ import time
 import struct
 import re
 from collections import defaultdict
+from typing import Optional
 
 from sqlalchemy import func, Index, text
 from sqlalchemy.orm.exc import NoResultFound
@@ -263,7 +265,7 @@ class User(BaseModel, UserMixin):
         cascade="all, delete-orphan",
     )
 
-    def __init__(self, email, name):
+    def __init__(self, email: str, name: str):
         self.email = email
         self.name = name
 
@@ -314,7 +316,7 @@ class User(BaseModel, UserMixin):
     def bar_training_token(self):
         return generate_bar_training_token(app.config["SECRET_KEY"], self.id)
 
-    def has_permission(self, name, cascade=True):
+    def has_permission(self, name, cascade=True) -> bool:
         if cascade:
             if name != "admin" and self.has_permission("admin"):
                 return True
@@ -329,7 +331,7 @@ class User(BaseModel, UserMixin):
                 return True
         return False
 
-    def grant_permission(self, name):
+    def grant_permission(self, name: str):
         try:
             perm = Permission.query.filter_by(name=name).one()
         except NoResultFound:
@@ -337,7 +339,7 @@ class User(BaseModel, UserMixin):
             db.session.add(perm)
         self.permissions.append(perm)
 
-    def revoke_permission(self, name):
+    def revoke_permission(self, name: str):
         for user_perm in self.permissions:
             if user_perm.name == name:
                 self.permissions.remove(user_perm)
@@ -346,7 +348,7 @@ class User(BaseModel, UserMixin):
         return "<User %s>" % self.email
 
     @classmethod
-    def get_by_email(cls, email):
+    def get_by_email(cls, email) -> Optional[User]:
         return User.query.filter(
             func.lower(User.email) == func.lower(email)
         ).one_or_none()
@@ -356,7 +358,7 @@ class User(BaseModel, UserMixin):
         return bool(User.get_by_email(email))
 
     @classmethod
-    def get_by_code(cls, key, code):
+    def get_by_code(cls, key, code) -> Optional[User]:
         uid = verify_login_code(key, time.time(), code)
         if uid is None:
             return None
@@ -364,7 +366,7 @@ class User(BaseModel, UserMixin):
         return User.query.filter_by(id=uid).one()
 
     @classmethod
-    def get_by_checkin_code(cls, key, code):
+    def get_by_checkin_code(cls, key, code) -> Optional[User]:
         uid = verify_checkin_code(key, code)
         if uid is None:
             return None
@@ -372,7 +374,7 @@ class User(BaseModel, UserMixin):
         return User.query.filter_by(id=uid).one()
 
     @classmethod
-    def get_by_api_token(cls, key, code):
+    def get_by_api_token(cls, key, code) -> Optional[User]:
         uid = verify_api_token(key, code)
         if uid is None:
             # FIXME: raise an exception instead of returning None
@@ -381,7 +383,7 @@ class User(BaseModel, UserMixin):
         return User.query.filter_by(id=uid).one()
 
     @classmethod
-    def get_by_bar_training_token(cls, code):
+    def get_by_bar_training_token(cls, code) -> User:
         uid = verify_bar_training_token(app.config["SECRET_KEY"], code)
         if uid is None:
             raise ValueError("Invalid token")

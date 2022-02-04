@@ -3,6 +3,7 @@ from collections import OrderedDict
 from decimal import Decimal
 from itertools import groupby
 from dateutil.parser import parse
+from typing import Literal
 
 from flask import current_app as app
 
@@ -17,6 +18,9 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 # MyPy raises errors when inheriting directly from db.Model. Once flask-sqlalchemy has
 # type annotations this should become unnecessary.
 BaseModel: DeclarativeMeta = db.Model
+
+""" Type alias for ISO currency (GBP or EUR currently). """
+Currency = Literal["GBP", "EUR"]
 
 
 def event_start():

@@ -244,7 +244,7 @@ def json_response(f, *args, **kwargs):
         return jsonify(response), 200
 
 
-def feature_enabled(feature):
+def feature_enabled(feature) -> bool:
     """
     If a feature flag is defined in the database return that,
     otherwise fall back to the config setting.

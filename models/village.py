@@ -1,4 +1,7 @@
+from __future__ import annotations
+from typing import Optional
 from main import db
+from models.user import User
 from . import BaseModel
 
 
@@ -11,14 +14,14 @@ class Village(BaseModel):
     description = db.Column(db.String)
 
     @classmethod
-    def get_by_name(cls, name):
+    def get_by_name(cls, name) -> Optional[Village]:
         return cls.query.filter_by(name=name).one_or_none()
 
     @classmethod
-    def get_by_id(cls, id):
+    def get_by_id(cls, id) -> Optional[Village]:
         return cls.query.filter_by(id=id).one_or_none()
 
-    def admins(self):
+    def admins(self) -> list[User]:
         return [mem.user for mem in self.members if mem.admin]
 
     def __repr__(self):

@@ -10,7 +10,7 @@ class Permission(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, index=True)
 
-    def __init__(self, name):
+    def __init__(self, name: str):
         self.name = name
 
     @classmethod
