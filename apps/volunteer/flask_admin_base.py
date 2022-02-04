@@ -26,7 +26,7 @@ class FlaskVolunteerAdminAppMixin:
             self.endpoint = admin.endpoint_prefix
         else:
             self.url = self._get_view_url(admin, self.url)
-            self.endpoint = "{}.{}".format(admin.endpoint_prefix, self.endpoint)
+            self.endpoint = "{}_{}".format(admin.endpoint_prefix, self.endpoint)
         return super().create_blueprint(admin)
 
 
