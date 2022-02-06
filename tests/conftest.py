@@ -35,7 +35,7 @@ def app_factory(cache):
 
     tmpdir = os.environ.get("TMPDIR", "/tmp")
     prometheus_dir = os.path.join(tmpdir, "emf_test_prometheus")
-    os.environ["prometheus_multiproc_dir"] = prometheus_dir
+    os.environ["PROMETHEUS_MULTIPROC_DIR"] = prometheus_dir
 
     if os.path.exists(prometheus_dir):
         shutil.rmtree(prometheus_dir)
