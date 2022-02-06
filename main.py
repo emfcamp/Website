@@ -163,7 +163,11 @@ def create_app(dev_server=False, config_override=None):
 
     @app.before_request
     def simple_cache_warning():
-        if not dev_server and app.config.get("CACHE_TYPE", "null") == "simple":
+        if (
+            not dev_server
+            and app.config.get("CACHE_TYPE", "null")
+            == "flask_caching.backends.SimpleCache"
+        ):
             logging.warning(
                 "Per-process cache being used outside dev server - refreshing will not work"
             )

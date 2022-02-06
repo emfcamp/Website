@@ -55,7 +55,7 @@ def app_factory(cache):
     fake_now = fake_event_start - datetime.timedelta(weeks=10)
 
     if cache:
-        config_override["CACHE_TYPE"] = "simple"
+        config_override["CACHE_TYPE"] = "flask_caching.backends.SimpleCache"
 
     app = create_app(dev_server=True, config_override=config_override)
 
