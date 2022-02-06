@@ -3,7 +3,6 @@ from collections import OrderedDict
 from decimal import Decimal
 from itertools import groupby
 from dateutil.parser import parse
-from typing import Literal
 
 from flask import current_app as app
 
@@ -20,7 +19,12 @@ from sqlalchemy.ext.declarative import DeclarativeMeta
 BaseModel: DeclarativeMeta = db.Model
 
 """ Type alias for ISO currency (GBP or EUR currently). """
-Currency = Literal["GBP", "EUR"]
+# Note: A better type for this would be Union[Literal['GBP'], Literal['EUR']] but setting this
+# results in a world of pain currently.
+#
+# Ideally needs to be unified with the Currency class in app/common/__init__.py, but this is
+# non-trivial.
+Currency = str
 
 
 def event_start():

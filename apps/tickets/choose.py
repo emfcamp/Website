@@ -14,7 +14,7 @@ from sqlalchemy.orm import joinedload
 
 from main import db, mail
 from models.exc import CapacityException
-from models.product import PriceTier, ProductViewProduct, Product, Voucher
+from models.product import PriceTier, ProductView, ProductViewProduct, Product, Voucher
 from models.basket import Basket
 from models.site_state import get_sales_state
 
@@ -143,7 +143,7 @@ def products_for_view(product_view) -> list[ProductViewProduct]:
     ).all()
 
 
-def handle_ticket_selection(form, view, flow, basket):
+def handle_ticket_selection(form, view: ProductView, flow: str, basket: Basket):
     """
     For consistency and to avoid surprises, we try to ensure a few things here:
     - if the user successfully submits a form with no errors, their basket is updated
@@ -222,7 +222,7 @@ def handle_ticket_selection(form, view, flow, basket):
         return handle_free_tickets(flow, view, basket)
 
 
-def handle_free_tickets(flow, view, basket):
+def handle_free_tickets(flow: str, view: ProductView, basket: Basket):
     """The user is trying to "buy" only free tickets.
 
     This is effectively a payment stage, handled differently
@@ -277,7 +277,7 @@ def handle_free_tickets(flow, view, basket):
 
 @tickets.route("/tickets/clear")
 @tickets.route("/tickets/<flow>/clear")
-def tickets_clear(flow=None):
+def tickets_clear(flow: str = None):
     app.logger.info("Clearing basket")
     basket = Basket.from_session(current_user, get_user_currency())
     basket.cancel_purchases()
@@ -289,11 +289,14 @@ def tickets_clear(flow=None):
 
 @tickets.route("/tickets/voucher/")
 @tickets.route("/tickets/voucher/<voucher_code>")
-def tickets_voucher(voucher_code=None):
+def tickets_voucher(voucher_code: str = None):
     """
     A user reaches this endpoint if they're sent a voucher code by email.
     Set up the voucher details in the session and redirect them to choose their tickets.
     """
+    if voucher_code is None:
+        return abort(404)
+
     voucher = Voucher.get_by_code(voucher_code)
     if voucher is None:
         return abort(404)

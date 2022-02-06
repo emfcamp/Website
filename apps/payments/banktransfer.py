@@ -8,6 +8,7 @@ from wtforms import SubmitField, HiddenField
 from wtforms.validators import Required, AnyOf
 
 from main import db, mail
+from models.payment import BankPayment
 from ..common import get_user_currency, feature_enabled
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
@@ -17,7 +18,7 @@ from . import payments
 logger = logging.getLogger(__name__)
 
 
-def transfer_start(payment):
+def transfer_start(payment: BankPayment):
     if not feature_enabled("BANK_TRANSFER"):
         return redirect(url_for("tickets.pay"))
 
@@ -32,6 +33,9 @@ def transfer_start(payment):
         days = app.config.get("EXPIRY_DAYS_TRANSFER")
     elif payment.currency == "EUR":
         days = app.config.get("EXPIRY_DAYS_TRANSFER_EURO")
+
+    if days is None:
+        raise Exception("EXPIRY_DAYS_TRANSFER(_EURO) not set")
 
     payment.expires = datetime.utcnow() + timedelta(days=days)
     payment.state = "inprogress"

@@ -137,7 +137,7 @@ def pay(flow="main"):
     )
 
 
-def start_payment(form, basket, flow):
+def start_payment(form: TicketPaymentForm, basket: Basket, flow: str):
     if Decimal(form.basket_total.data) != Decimal(basket.total):
         # Check that the user's basket approximately matches what we told them they were paying.
         price_changed.inc()

@@ -55,7 +55,7 @@ def webhook(type=None):
     return inner
 
 
-def stripe_start(payment):
+def stripe_start(payment: StripePayment):
     """This is called by the ticket flow to initialise the payment and
     redirect to the capture page. We don't need to do anything here."""
     logger.info("Starting Stripe payment %s", payment.id)
