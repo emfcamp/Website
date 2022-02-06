@@ -7,6 +7,7 @@ services:
       - emfweb
     depends_on:
       - postgres
+      - memcached
     ports:
       - "127.0.0.1:8000:8000"
     volumes:
@@ -39,6 +40,24 @@ services:
       - emfweb
     ports:
       - "9187:9187"
+
+  memcached:
+    restart: unless-stopped
+    image: 'memcached:1.6.13-alpine'
+    networks:
+      - emfweb
+    command: memcached -m 64
+
+  memcached_exporter:
+    restart: unless-stopped
+    image: 'prom/memcached-exporter:v0.9.0'
+    depends_on:
+      - memcached
+    networks:
+      - emfweb
+    ports:
+      - "9150:9150"
+    command: --memcached.address memcached:11211
 
   static:
     restart: unless-stopped
