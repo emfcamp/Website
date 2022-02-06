@@ -26,7 +26,9 @@ import pywisetransfer
 
 # If we have logging handlers set up here, don't touch them.
 # This is especially problematic during testing as we don't
-# want to overwrite nosetests' handlers
+# want to overwrite nosetests' handlers. Note: if anything
+# logs before this point, logging.basicConfig will install
+# a default stderr StreamHandler.
 if len(logging.root.handlers) == 0:
     install_logging = True
     with open("logging.yaml", "r") as f:
