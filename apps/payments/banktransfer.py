@@ -5,7 +5,7 @@ from flask import render_template, redirect, flash, url_for, current_app as app
 from flask_login import login_required, current_user
 from flask_mail import Message
 from wtforms import SubmitField, HiddenField
-from wtforms.validators import Required, AnyOf
+from wtforms.validators import DataRequired, AnyOf
 
 from main import db, mail
 from models.payment import BankPayment
@@ -61,7 +61,7 @@ def transfer_start(payment: BankPayment):
 
 
 class TransferChangeCurrencyForm(Form):
-    currency = HiddenField("New currency", [Required(), AnyOf(["EUR", "GBP"])])
+    currency = HiddenField("New currency", [DataRequired(), AnyOf(["EUR", "GBP"])])
     change = SubmitField("Change currency")
 
 
