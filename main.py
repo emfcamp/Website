@@ -70,6 +70,22 @@ wise = None
 volunteer_admin = None
 
 
+def check_cache_configuration():
+    """Check the cache configuration is appropriate for production"""
+    if cache.cache.__class__.__name__ == "SimpleCache":
+        # SimpleCache is per-process, not appropriate for prod
+        logging.warning(
+            "Per-process cache being used outside dev server - refreshing will not work"
+        )
+
+    TEST_CACHE_KEY = "emf_test_cache_key"
+    cache.set(TEST_CACHE_KEY, "exists")
+    if cache.get(TEST_CACHE_KEY) != "exists":
+        logging.warning(
+            "Flask-Caching backend does not appear to be working. Performance may be affected."
+        )
+
+
 def create_app(dev_server=False, config_override=None):
     app = Flask(__name__)
     app.config.from_envvar("SETTINGS_FILE")
@@ -161,17 +177,6 @@ def create_app(dev_server=False, config_override=None):
             response.headers["X-Robots-Tag"] = "noindex, nofollow"
             return response
 
-    @app.before_request
-    def simple_cache_warning():
-        if (
-            not dev_server
-            and app.config.get("CACHE_TYPE", "null")
-            == "flask_caching.backends.SimpleCache"
-        ):
-            logging.warning(
-                "Per-process cache being used outside dev server - refreshing will not work"
-            )
-
     @app.context_processor
     def add_csp_nonce():
         g.csp_nonce = secrets.token_urlsafe(16)
@@ -241,6 +246,7 @@ def create_app(dev_server=False, config_override=None):
         return response
 
     if not app.debug:
+        check_cache_configuration()
 
         @app.errorhandler(Exception)
         def handle_exception(e):
