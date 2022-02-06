@@ -43,3 +43,5 @@ loggers:
     level: WARN
   apiron:
     level: WARN
+  flask_caching:
+    level: INFO
