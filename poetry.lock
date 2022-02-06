@@ -908,6 +908,14 @@ typing-extensions = ">=3.7.4.3"
 Werkzeug = ">=2.0.0"
 
 [[package]]
+name = "logging-tree"
+version = "1.9"
+description = "Introspect and display the logger tree inside \"logging\""
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "lxml"
 version = "4.7.1"
 description = "Powerful and Pythonic XML processing library combining libxml2/libxslt with the ElementTree API."
@@ -1973,7 +1981,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.9"
-content-hash = "a63082b81e827b7dd8c9e1d3ebc35f15c7ec8303dd105a76105fe9ad239c994a"
+content-hash = "88e2192d0eceb6a51d84c4a3000c2ad7fac2ac5530045a5a93c36626969b2aaa"
 
 [metadata.files]
 alembic = [
@@ -2551,6 +2559,10 @@ jinja2 = [
 locust = [
     {file = "locust-2.7.2-py3-none-any.whl", hash = "sha256:6a2988678a41510a6bf06c99faa34506e42a773494b1ea099c46a68615d0521f"},
     {file = "locust-2.7.2.tar.gz", hash = "sha256:6123af7d115e90e364a9b26b186ebbeeb28d4d2bc80a0c35ff05ad5dde5084da"},
+]
+logging-tree = [
+    {file = "logging_tree-1.9-py2.py3-none-any.whl", hash = "sha256:1aa4c74f9ae0a86d14bb1d36b2e3066324e22132e6e55200d4ecf009dba4c536"},
+    {file = "logging_tree-1.9.tar.gz", hash = "sha256:fe78b28788c249b515d12a50417e4a96ba095582927b3601a0573886bffc1ff0"},
 ]
 lxml = [
     {file = "lxml-4.7.1-cp27-cp27m-macosx_10_14_x86_64.whl", hash = "sha256:d546431636edb1d6a608b348dd58cc9841b81f4116745857b6cb9f8dadb2725f"},

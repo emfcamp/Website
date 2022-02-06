@@ -9,6 +9,7 @@ from flask import (
     current_app as app,
     Blueprint,
     abort,
+    make_response,
 )
 
 from flask_login import current_user
@@ -24,6 +25,7 @@ from wtforms import (
     SelectField,
     IntegerField,
 )
+import logging_tree
 
 from main import db
 from models.payment import Payment, BankAccount, BankPayment, BankTransaction
@@ -365,6 +367,13 @@ def scheduled_tasks():
         )
         data.append({"task": task, "results": results})
     return render_template("admin/scheduled-tasks.html", data=data)
+
+
+@admin.route("/logging-config")
+def logging_config():
+    response = make_response(logging_tree.format.build_description())
+    response.headers["Content-Type"] = "text/plain"
+    return response
 
 
 from . import accounts  # noqa: F401
