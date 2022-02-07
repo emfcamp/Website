@@ -311,7 +311,13 @@ def tickets_voucher(voucher_code: str = None):
             )
             return redirect(url_for("users.purchases"))
         else:
-            abort(404)
+            flash(
+                """The voucher you have supplied has been used.
+                   If it was you who used it, please log in to view your purchases.
+                   Cancelling the payment made with the voucher will reactivate it so you can try again.
+                """
+            )
+            return redirect(url_for("users.purchases"))
 
     view = voucher.view
     if view:
