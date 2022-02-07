@@ -11,9 +11,24 @@ from main import db, mail
 
 
 def create_sandbox_env():
+    """Build an safe environment for rendering emails
+
+    We want non-developers to be able to write emails, but using the main
+    templating system would grant them access to secrets as well as the
+    ability to run arbitrary code. ImmutableSandboxedEnvironment gets us
+    most of the way there, but doesn't know which config is sensitive,
+    or whether globals can be safely accessed.
+
+    To avoid being annoyingly different, we try to match what Flask
+    does in `create_jinja_environment`, but with a pared-down set of
+    config and globals.
+    """
+
     default_jinja_options = {}
     if app.jinja_options != default_jinja_options:
-        # This code doesn't support any unusual options (yet)
+        # This code doesn't support any unusual options yet. If we've
+        # (say) added an extension to the main template system, it should
+        # be allowed or ignored here.
         raise NotImplementedError
 
     # Don't autoescape because this is used to generate plaintext output
@@ -34,6 +49,12 @@ def create_sandbox_env():
 
 
 def build_template_context():
+    """Generate context for email templates
+
+    As with the environment, we want a clean context for constructing
+    emails. Most context processors just don't make sense in email.
+    """
+
     ctx = {}
     for func in app.template_context_processors[None]:
         ctx.update(func())
