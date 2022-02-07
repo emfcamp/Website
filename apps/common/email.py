@@ -11,9 +11,7 @@ from main import db, mail
 
 
 def create_sandbox_env():
-    default_jinja_options = {
-        "extensions": ["jinja2.ext.autoescape", "jinja2.ext.with_"]
-    }
+    default_jinja_options = {}
     if app.jinja_options != default_jinja_options:
         # This code doesn't support any unusual options (yet)
         raise NotImplementedError
