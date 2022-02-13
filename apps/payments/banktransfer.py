@@ -80,7 +80,7 @@ def transfer_waiting(payment_id):
         form.currency.data = "GBP"
 
     return render_template(
-        "transfer-waiting.html",
+        "payments/transfer-waiting.html",
         payment=payment,
         account=payment.recommended_destination,
         form=form,
@@ -147,7 +147,7 @@ def transfer_cancel(payment_id):
 
         return redirect(url_for("users.purchases"))
 
-    return render_template("transfer-cancel.html", payment=payment, form=form)
+    return render_template("payments/transfer-cancel.html", payment=payment, form=form)
 
 
 def reconcile_txns(txns, doit=False):
