@@ -71,7 +71,7 @@ def transfer_waiting(payment_id):
     form = TransferChangeCurrencyForm()
 
     payment = get_user_payment_or_abort(
-        payment_id, "banktransfer", valid_states=["inprogress"]
+        payment_id, "banktransfer", valid_states=["inprogress", "paid"]
     )
 
     if payment.currency == "GBP":
