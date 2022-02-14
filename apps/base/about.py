@@ -44,6 +44,11 @@ def accessibility():
     return render_template("about/accessibility.html")
 
 
+@base.route("/about/villages")
+def villages():
+    return render_template("about/villages.html")
+
+
 @base.route("/about/childcare")
 def childcare():
     return render_template("about/childcare.html")

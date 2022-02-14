@@ -1,0 +1,41 @@
+
+{% extends "base.html" %}
+{% block title %}Villages{% endblock %}
+{% block secondary_nav %}
+  {% include "about/_nav.html" %}
+{% endblock %}
+{% set main_class = 'about' %}
+{% block body %}
+<h2 id="villages">Villages</h2>
+<p>A village is a group of friends, like minded people, colleagues or even families. Maybe your village is a collection of sub villages, or maybe it’s just your hackerspace. We also see villages based around themes, shared passions and existing communities - great places in the past have been the Maths village, the HAB Village and groups like Milliways and the Scottish Consulate.</p>
+<p>If there is a village based around something you are interested in, then you should definitely visit that village during the event to see what's going on. Or you could even join that village to help make more things go on. If there's not a village based around your interests, then you can start your own village and others will probably join you.</p>
+<p>There is no requirement to be part of a village, so if you'd rather camp on your own and just visit some villages this is fine.</p>
+<p>If you're planning to bring something especially big or in need of lots of power to your village, please let us know beforehand so we can provide you with what you need.</p>
+
+<h3 id="what_to_do">What can we do as a village?</h3>
+<p>Villages are great as you can share ideas, equipment and space! The sharing doesn’t stop there - it lets you share resources too. You can come up with a cooking and cleaning rota as a group to reduce waste, make the camp cheaper and interrupt your day with a change of activity. Some people spend all their time cooking for others!</p>
+<p>Maybe you are working on a group project and want to show off the final result, or you want to spend the weekend building something. Doing this as a village is good fun, and you often find that new friends will appear to share their ideas, opinions and time with you.</p>
+<p>Some villages bring pre-made games and activities for other people to take part in, and some run events and parties during the weekend!</p>
+<p>If you have a good space, you could run a workshop, a series of lectures or even your own mini-conference, entirely separate from our main program! Some of our favourites from previous years include:</p>
+<ul>
+    <li><a href="https://wiki-archive.emfcamp.org/2018/w/index.php/Village:Goldsmithing" target="_blank">Ring Making Workshop</a></li>
+    <li><a href="https://wiki-archive.emfcamp.org/2018/w/index.php/Village:ObscureCon" target="_blank">OscureCon</a></li>
+    <li><a href="https://wiki-archive.emfcamp.org/2018/w/index.php/Village:Hardware_Hacking_Area" target="_blank">The Hardware Hacking Area</a></li>
+    <li><a href="https://wiki-archive.emfcamp.org/2018/w/index.php/Village:HABville" target="_blank">Launching high alititude balloons</a></li>
+</ul>
+
+<h3 id="village_people">The Village People</h3>
+<p>You're welcome to run events in your village. If you have a cool idea, but need help with planning or logistics of doing things on site, please contact us before hand. The earlier you let us know your plans, the better we can help you.</p>
+<p>There is also limited funding available for villages that want to put on content. Please <a href="mailto:villages@emfcamp.org">email the Village People</a> and we will be very happy to discuss anything you might come up with!</p>
+<p>Some areas we'd love to expand are:</p>
+<ul>
+    <li>Technical presentations</li>
+    <li>Skill shares</li>
+    <li>Workshops</li>
+    <li>Roundtables</li>
+</ul>
+
+<h3 id="register">Register a Village</h3>
+<p>By <a href="{{ url_for("villages.villages_redirect") }}">registering your village</a> you'll be making the Village People aware of the fact you plan to arrive, and how much space your likely to need. That means you'll be assigned some space, your village will appear on the map, and you'll be able to publish any events your running on the main schedule.</p>
+<p>Before arriving please take a look at the <a href="https://wiki.emfcamp.org/wiki/Good_Village_Guide">Good Village Guide</a>, which includes advice on how to make your village its best.</p>
+{% endblock %}
