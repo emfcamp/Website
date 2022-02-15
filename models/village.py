@@ -7,6 +7,7 @@ from . import BaseModel
 
 class Village(BaseModel):
     __tablename__ = "village"
+    __versioned__: dict = {}
 
     id = db.Column(db.Integer, primary_key=True)
 
