@@ -138,6 +138,8 @@ def create_app(dev_server=False, config_override=None):
     cors_origins = ["https://map.emfcamp.org", "https://wiki.emfcamp.org"]
     if app.config.get("DEBUG"):
         cors_origins = ["http://localhost:8080", "https://maputnik.github.io"]
+
+    # NOTE: static files are served by nginx in production, so CORS headers must also be set there.
     CORS(
         app,
         resources={
