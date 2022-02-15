@@ -22,7 +22,11 @@ If you have a ticket, you can <a href="{{url_for('users.login', next=url_for('.r
   <tbody>
   {% for village in villages %}
     <tr>
-      <td>{{village.name}}</td>
+      {% if village.url %}
+        <td><a href="{{ village.url }}" rel="nofollow" target="_blank">{{village.name}}</a></td>
+      {% else %}
+        <td>{{village.name}}</td>
+      {% endif %}
       <td>{{village.description}}</td>
     </tr>
   {% endfor %}

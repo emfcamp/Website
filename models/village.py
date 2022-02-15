@@ -12,6 +12,7 @@ class Village(BaseModel):
 
     name = db.Column(db.String, nullable=False, unique=True)
     description = db.Column(db.String)
+    url = db.Column(db.String)
 
     @classmethod
     def get_by_name(cls, name) -> Optional[Village]:

@@ -4,7 +4,9 @@
     <fieldset>
       <legend>Basic Details</legend>
       <p>Everything you enter in this section will be publicly displayed.</p>
+      <p>If you don't have a URL for your village feel free to create a page for it <a href="https://wiki.emfcamp.org/wiki/Category:Villages" rel="nofollow" target="_blank">on the wiki</a>.</p>
       {{ render_field(form.name, horizontal=9, placeholder="My Village") }}
+      {{ render_field(form.url, horizontal=9, placeholder="https://wiki.emfcamp.org/wiki/Village:MyVillage") }}
       {{ render_field(form.description, horizontal=9,
             placeholder="A description of your village. Who are you, what cool things will you be doing?") }}
     </fieldset>
