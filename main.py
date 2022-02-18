@@ -202,6 +202,7 @@ def create_app(dev_server=False, config_override=None):
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
 
         csp = {
             "script-src": ["'self'", "https://js.stripe.com"],

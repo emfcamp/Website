@@ -7,11 +7,13 @@ from . import BaseModel
 
 class Village(BaseModel):
     __tablename__ = "village"
+    __versioned__: dict = {}
 
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String, nullable=False, unique=True)
     description = db.Column(db.String)
+    url = db.Column(db.String)
 
     @classmethod
     def get_by_name(cls, name) -> Optional[Village]:
