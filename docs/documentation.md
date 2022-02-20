@@ -3,7 +3,6 @@ Links to Documentation
 ## Flask
 
 * [Flask](http://flask.pocoo.org/docs/)
-* [Flask-Script](http://packages.python.org/Flask-Script/)
 
 ## Templates
 
