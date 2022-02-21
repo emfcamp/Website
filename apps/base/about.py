@@ -19,6 +19,11 @@ def travel():
     return render_template("about/getting-there.html")
 
 
+@base.route("/about/arrival-times")
+def arrival():
+    return render_template("about/arrival-times.html")
+
+
 @base.route("/about/covid")
 def covid():
     return render_template("about/covid.html")
