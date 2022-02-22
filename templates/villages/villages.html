@@ -3,7 +3,7 @@
 {% block title %}Villages{% endblock %}
 {% block body %}
 <h2>Villages</h2>
-<p>For more information on villages, see our <a href="https://wiki.emfcamp.org/wiki/Villages">villages guide</a>.
+<p>For more information on villages, see the <a href="{{ url_for("base.villages") }}">villages page</a>.
 {% if current_user.is_authenticated %}
   If you want to create a village, you can
       <a href="{{url_for('.register')}}">register it here</a>.

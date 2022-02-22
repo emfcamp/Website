@@ -9,7 +9,11 @@ Staging (https://www.emfcamp-test.org) is on kelvin.emfcamp.org.
 This is done after each event, following a clear of the database:
 ```
 docker compose -f ./docker-compose.environment.yml up -d
-docker compose -f ./docker-compose.environment.yml exec app flask db upgrade
+docker compose -f ./docker-compose.environment.yml exec app poetry run flask db upgrade
+docker compose -f ./docker-compose.environment.yml exec app poetry run flask create_perms
+docker compose -f ./docker-compose.environment.yml exec app poetry run flask createbankaccounts
+docker compose -f ./docker-compose.environment.yml exec app poetry run flask cfp create_venues
+docker compose -f ./docker-compose.environment.yml exec app poetry run flask tickets create
 ```
 
 # Deployments

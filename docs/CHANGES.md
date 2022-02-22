@@ -86,3 +86,13 @@ RECONCILE_IN_WEBHOOK = True
 
 * Flask version has been updated - you may need to run `docker compose up --build` in your dev environment.
 * Black version is now 22.1.0 - if your editor auto-formats you might have to update your local version.
+
+2022-02-07
+==========
+
+Flask-Caching has been updated, change your config:
+
+```
+CACHE_TYPE = "flask_caching.backends.SimpleCache"
+```
+

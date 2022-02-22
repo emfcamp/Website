@@ -542,14 +542,14 @@ Flask = "*"
 
 [[package]]
 name = "flask-migrate"
-version = "2.1.1"
-description = "SQLAlchemy database migrations for Flask applications using Alembic"
+version = "3.1.0"
+description = "SQLAlchemy database migrations for Flask applications using Alembic."
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.6"
 
 [package.dependencies]
-alembic = ">=0.6"
+alembic = ">=0.7"
 Flask = ">=0.9"
 Flask-SQLAlchemy = ">=1.0"
 
@@ -1575,7 +1575,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 
 [[package]]
 name = "slotmachine"
-version = "0.0.5"
+version = "0.0.6"
 description = ""
 category = "main"
 optional = false
@@ -1590,7 +1590,7 @@ python-dateutil = ">=2.5.3"
 type = "git"
 url = "https://github.com/emfcamp/slotmachine.git"
 reference = "master"
-resolved_reference = "c39bcb2380b93e406425c05126b8d646f46b58ae"
+resolved_reference = "8ab12eff673ffbb517b5813ce90b2b1b60fc1d33"
 
 [[package]]
 name = "sortedcontainers"
@@ -1981,7 +1981,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.9"
-content-hash = "88e2192d0eceb6a51d84c4a3000c2ad7fac2ac5530045a5a93c36626969b2aaa"
+content-hash = "468d60dc52364375d8697e8cc1847a5447ffbf6d3624bf4b22c9c952c43f5fb1"
 
 [metadata.files]
 alembic = [
@@ -2339,8 +2339,8 @@ flask-mail = [
     {file = "Flask-Mail-0.9.1.tar.gz", hash = "sha256:22e5eb9a940bf407bcf30410ecc3708f3c56cc44b29c34e1726fe85006935f41"},
 ]
 flask-migrate = [
-    {file = "Flask-Migrate-2.1.1.tar.gz", hash = "sha256:b709ca8642559c3c5a81a33ab10839fa052177accd5ba821047a99db635255ed"},
-    {file = "Flask_Migrate-2.1.1-py2.py3-none-any.whl", hash = "sha256:493f9b3795985b9b4915bf3b7d16946697f027b73545384e7d9e3a79f989d2fe"},
+    {file = "Flask-Migrate-3.1.0.tar.gz", hash = "sha256:57d6060839e3a7f150eaab6fe4e726d9e3e7cffe2150fb223d73f92421c6d1d9"},
+    {file = "Flask_Migrate-3.1.0-py3-none-any.whl", hash = "sha256:a6498706241aba6be7a251078de9cf166d74307bca41a4ca3e403c9d39e2f897"},
 ]
 flask-restful = [
     {file = "Flask-RESTful-0.3.9.tar.gz", hash = "sha256:ccec650b835d48192138c85329ae03735e6ced58e9b2d9c2146d6c84c06fa53e"},
