@@ -15,11 +15,7 @@ db_head=$(poetry run flask db current)
 heads=$(poetry run flask db heads)
 git_head=$(git rev-parse HEAD|cut -c -8)
 
-SGR_BOLD=$'\x1b[1m'
-SGR_GREEN=$'\x1b[32m'
-SGR_RESET=$'\x1b[0m'
-
-msg="${SGR_BOLD}Website${SGR_RESET} starting (${SGR_GREEN}${git_head}${SGR_RESET}),"
+msg="%BOLDWebsite%NORMAL starting (%DGREEN${git_head}%NORMAL),"
 if [[ "$db_head" == "$heads" ]]; then
   send "$msg no DB changes"
   exit
@@ -32,6 +28,6 @@ db_head=$(poetry run flask db current)
 heads=$(poetry run flask db heads)
 
 if [[ "$db_head" != "$heads" ]]; then
-  send "${SGR_BOLD}Website${SGR_RESET} DB migration ${SGR_BOLD}not complete${SGR_RESET} after $MIGRATION_GRACE_SECS seconds"
+  send "%BOLDWebsite%NORMAL DB migration %BOLDnot complete%NORMAL after $MIGRATION_GRACE_SECS seconds"
 fi
 
