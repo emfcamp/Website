@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+docker/startup-irc-notify.sh &
+
 export PGPASSWORD=postgres
 PSQL="/usr/bin/psql -h postgres -U postgres"
 

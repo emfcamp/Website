@@ -18,6 +18,7 @@ services:
       com.centurylinklabs.watchtower.enable: true
     environment:
       SETTINGS_FILE: ./config/production.cfg
+      IRCCAT: 78.158.65.100:12345
     logging:
       driver: journald
 
