@@ -8,7 +8,7 @@ MIGRATION_GRACE_SECS=${MIGRATION_GRACE_SECS:-90}
 
 send() {
   echo "Sending IRC notification: $1"
-  echo "$1" | curl -s -m5 telnet://$IRCCAT ||:
+  echo "#emfcamp-web $1" | curl -s -m5 telnet://$IRCCAT ||:
 }
 
 db_head=$(poetry run flask db current)
