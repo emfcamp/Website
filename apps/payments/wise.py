@@ -34,7 +34,7 @@ def wise_webhook():
     )
 
     try:
-        b64decode(request.headers["X-Signature"])
+        b64decode(request.headers["X-Signature-SHA256"])
         if request.json is None:
             raise ValueError("Request does not contain JSON")
     except Exception as e:
@@ -43,7 +43,7 @@ def wise_webhook():
 
     valid_signature = verify_signature(
         request.data,
-        request.headers["X-Signature"],
+        request.headers["X-Signature-SHA256"],
         app.config["TRANSFERWISE_ENVIRONMENT"],
     )
     if not valid_signature:
