@@ -1,9 +1,6 @@
 {% extends "base.html" %}
 {% block css %}
-    {% assets "css_admin" -%}
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
-        <link rel="stylesheet" href="{{ ASSET_URL }}">
-    {% endassets -%}
+    <link rel="stylesheet" href="{{ static_url_for('static', filename="css/admin.css") }}">
 {% endblock %}
 
 {% block document %}
