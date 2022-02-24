@@ -75,7 +75,7 @@ def pay(flow="main"):
             )
 
         elif current_user.is_authenticated:
-            # This might happen if the user click back and then refresh in their browser
+            # This might happen if the user clicks back and then refresh in their browser
             app.logger.info("Empty basket, redirecting back to purchases page")
             flash("Your basket was empty. Please check your purchases below.")
             return redirect(url_for("users.purchases"))
@@ -86,12 +86,14 @@ def pay(flow="main"):
             app.logger.info(
                 "Empty basket for anonymous user, redirecting back to choose tickets"
             )
-            noun = "item"
+            phrase = "item to buy"
             if view.type == "tickets":
-                noun = "ticket"
+                phrase = "ticket to buy"
+            elif view.type == "hire":
+                phrase = "item to hire"
             msg = Markup(
                 f"""
-                Please select at least one {noun} to buy, or <a href="{url_for("users.login")}">log in</a> to view your purchases.
+                Please select at least one {phrase}, or <a href="{url_for("users.login")}">log in</a> to view your orders.
                 """
             )
             flash(msg)
