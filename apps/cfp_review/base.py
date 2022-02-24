@@ -75,11 +75,13 @@ def main():
 
     abort(404)
 
+
 @cfp_review.route("help")
 def help():
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for(".main")))
     return render_template("cfp_review/help.html")
+
 
 def bool_qs(val):
     # Explicit true/false values are better than the implicit notset=&set=anything that bool does
