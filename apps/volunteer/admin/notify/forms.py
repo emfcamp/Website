@@ -1,7 +1,7 @@
 from wtforms import StringField, TextAreaField, SubmitField
 from wtforms.validators import ValidationError
 
-from ..common.forms import Form
+from apps.common.forms import Form
 
 
 class SendMessageForm(Form):

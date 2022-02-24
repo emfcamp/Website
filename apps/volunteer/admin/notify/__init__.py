@@ -15,11 +15,11 @@ from flask_login import current_user
 from main import mail
 from models.volunteer import Volunteer, Role
 
-from ..common import require_permission
+from apps.common import require_permission
 
 from .forms import SendMessageForm
 
-notify = Blueprint("notify", __name__)
+notify = Blueprint("volunteer/admin/notify", __name__)
 
 admin_required = require_permission("admin")  # Decorator to require admin permissions
 volunteer_admin_required = require_permission(
@@ -38,7 +38,7 @@ def admin_require_permission():
         abort(404)
 
 
-@notify.route("")
+@notify.route("/")
 def main():
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for(".main")))
@@ -102,7 +102,7 @@ def emailvolunteers():
         del non_sort_query_string["reverse"]
 
     return render_template(
-        "notification/email_volunteers.html",
+        "volunteer/admin/notify/email_volunteers.html",
         volunteers=volunteers,
         new_qs=non_sort_query_string,
         roles=ordered_roles,
@@ -128,12 +128,12 @@ def message_batch():
             flash("Subject and Message required.")
 
     return render_template(
-        "notification/message_batch.html", form=form, volunteers=volunteers
+        "volunteer/admin/notify/message_batch.html", form=form, volunteers=volunteers
     )
 
 
 def notify_email(volunteer, subject, message):
-    template = "notification/email/volunteer_request.txt"
+    template = "volunteer/admin/notify/email/volunteer_request.txt"
 
     while True:
         msg = Message(
