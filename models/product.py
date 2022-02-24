@@ -14,7 +14,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 
 from main import db
 from .mixins import CapacityMixin, InheritedAttributesMixin
-from . import config_date, BaseModel
+from . import BaseModel
 from .purchase import Purchase
 from .payment import Currency
 
@@ -574,9 +574,6 @@ class ProductView(BaseModel):
         if self.cfp_accepted_only:
             if user and user.is_authenticated and user.is_cfp_accepted:
                 return True
-            return False
-
-        if not self.vouchers_only and dt < config_date("SALES_START"):
             return False
 
         if self.vouchers_only:
