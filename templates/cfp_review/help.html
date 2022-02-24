@@ -5,7 +5,7 @@
 <p>This covers technical notes on how the CfP system works. If you're after guidance on how the CfP process works as a submitter you want <a href="{{ url_for('cfp.guidance') }}">the guidance page.</a>
 <p>It mostly covers the process for submitted talks. Installations, workshops, youth workshops etc. etc. are organised by the relevant teams and are reviewed by them.
 
-<h2>The process (for talks)</h2>
+<h2 id="how-to-review">The process (for talks)</h2>
 <ol>
   <li>Submitted
   <li>Content check
@@ -26,12 +26,12 @@
   <ul>
   <li>Vote (the three green buttons). The options are:
     <ol>
-      <li>"Bad" something you don't think we should host that you wouldn't go to.
-      <li>"OK" something interesting but not amazing that you might go to.
-      <li>"Excellent" something amazing that you would definitely go to
+      <li><button class="btn btn-success btn-sm">Bad</button> something you don't think we should host that you wouldn't go to.
+      <li><button class="btn btn-success btn-sm">OK</button> something interesting but not amazing that you might go to.
+      <li><button class="btn btn-success btn-sm">Excellent</button> something amazing that you would definitely go to
     </ol>
-  <li>"I can identify the submitter (do not vote)" (the red button) If you think you can identify the submitter please write who you think it is in the message box and click this button. This proposal will no longer be shown to you.
-  <li>"I need more information" (the blue button) - if something in the proposal is unclear you can request clarification by filling in the message box and clicking the button.
+  <li><button class="btn btn-danger btn-sm">I can identify the submitter (do not vote)</button> If you think you can identify the submitter please write who you think it is in the message box and click this button. This proposal will no longer be shown to you.
+  <li><button class="btn btn-info btn-sm">I need more information</button> - if something in the proposal is unclear you can request clarification by filling in the message box and clicking the button.
 </ul>
 <p>While you're reviewing you'll be auto-advanced through this list so it's recommended to start from the top but not essential.
 
@@ -41,7 +41,25 @@
 <h3>Feedback/Questions</h3>
 <p>One final note: if you have any problems, comments and/or suggestions please <a href="mailto:{{ config['CONTENT_EMAIL'][1] }}">email</a>
 
-<h2>How to anonymise</h2>
-<p>The key
+<hr>
+
+<h2 id="how-to-anonymise">How to anonymise</h2>
+
+<p>There are two key things we want to know from this stage:
+
+<ol>
+  <li>Is there any identifying information?
+  <li>Does the description (once identifying information is removed) seem to give enough information to know what the talk will be about?
+</ol>
+
+<p>The most common identifying information are:
+
+<ul>
+  <li>short bios "My name is Jane and I'm...."
+  <li>social media links (e.g. Twitter, LinkedIn)
+  <li>youTube links to previous versions of the talk
+</ul>
+
+<p>If you can, feel free to delete these bits but if it'll require re-writing (and especially if it means the description stops giving enough information to answer question 2, above) click the <button class="btn btn-danger btn-sm">I cannot anonymise this proposal</button> and we'll help the submitter improve it.
 
 {% endblock %}
