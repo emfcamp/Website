@@ -23,9 +23,9 @@ def review_list():
         session["review_order_dt"] = datetime.utcnow()
         return redirect(url_for(".review_list"))
 
-    review_order_dt = session.get("review_order_dt")
+    review_order_dt = session.get("review_order_dt").replace(tzinfo=None)
 
-    last_visit = session.get("review_visit_dt")
+    last_visit = session.get("review_visit_dt").replace(tzinfo=None)
     if not last_visit:
         last_vote_cast = (
             CFPVote.query.filter_by(user_id=current_user.id)
