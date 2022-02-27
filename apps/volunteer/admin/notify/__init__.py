@@ -19,7 +19,7 @@ from apps.common import require_permission
 
 from .forms import SendMessageForm
 
-notify = Blueprint("volunteer/admin/notify", __name__)
+notify = Blueprint("volunteer_admin_notify", __name__)
 
 admin_required = require_permission("admin")  # Decorator to require admin permissions
 volunteer_admin_required = require_permission(
