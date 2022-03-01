@@ -12,7 +12,7 @@ from flask import (
 from datetime import timedelta
 from flask_login import current_user
 from wtforms import StringField, SelectField, SubmitField, BooleanField
-from wtforms.validators import Required, Email, ValidationError, Optional
+from wtforms.validators import DataRequired, Email, ValidationError, Optional
 
 from pendulum import period
 
@@ -27,8 +27,8 @@ from ..common import create_current_user, feature_flag
 
 
 class VolunteerSignUpForm(Form):
-    nickname = StringField("Name", [Required()])
-    volunteer_email = StringField("Email", [Email(), Required()])
+    nickname = StringField("Name", [DataRequired()])
+    volunteer_email = StringField("Email", [Email(), DataRequired()])
     over_18 = BooleanField("I'm at least 18 years old")
     volunteer_phone = TelField("Phone")
     arrival = SelectField("Arrival")
