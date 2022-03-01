@@ -8,7 +8,7 @@ from wtforms import SubmitField, HiddenField
 from wtforms.validators import DataRequired, AnyOf
 
 from main import db, mail
-from models.payment import BankPayment
+from models.payment import BankPayment, BankTransaction
 from ..common import get_user_currency, feature_enabled
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
@@ -150,7 +150,7 @@ def transfer_cancel(payment_id):
     return render_template("payments/transfer-cancel.html", payment=payment, form=form)
 
 
-def reconcile_txns(txns, doit=False):
+def reconcile_txns(txns: list[BankTransaction], doit: bool = False):
     paid = 0
     failed = 0
 
@@ -234,7 +234,7 @@ def reconcile_txns(txns, doit=False):
     app.logger.info("Reconciliation complete: %s paid, %s failed", paid, failed)
 
 
-def send_confirmation(payment):
+def send_confirmation(payment: BankPayment):
     msg = Message(
         "Electromagnetic Field ticket purchase update",
         sender=app.config["TICKETS_EMAIL"],

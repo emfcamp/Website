@@ -2,6 +2,7 @@ import random
 import re
 from decimal import Decimal
 from datetime import datetime, timedelta
+from typing import Optional
 from sqlalchemy import event, func, column
 from sqlalchemy.orm import Session, aliased
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -414,7 +415,7 @@ class BankTransaction(BaseModel):
         )
         return matching
 
-    def match_payment(self):
+    def match_payment(self) -> Optional[BankPayment]:
         """
         We need to deal with human error and character deletion without colliding.
         Unless we use some sort of coding, the minimum length of a bankref should
