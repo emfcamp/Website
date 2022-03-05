@@ -4,7 +4,9 @@ Your Electromagnetic Field {{ event_year }} {{ proposal.human_type }} "{{ propos
 
 We'll be in contact shortly to check how you'd like it to be listed in the schedule as well as to confirm some other details with you.
 
-If you don't yet have EMF tickets please email {{ config['CONTENT_EMAIL'][1] }}
+If you don't yet have EMF tickets, you can now get them on this page:
+
+  {{ external_url('tickets.main', flow='speakers') }}
 
 Don't hesitate to get in touch if you have any questions:
 
