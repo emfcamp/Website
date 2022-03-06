@@ -307,7 +307,6 @@ def create_app(dev_server=False, config_override=None):
     from apps.arrivals import arrivals
     from apps.api import api_bp
     from apps.villages import villages
-    from apps.volunteer.admin.notify import notify
 
     app.register_blueprint(base)
     app.register_blueprint(users)
@@ -320,7 +319,6 @@ def create_app(dev_server=False, config_override=None):
     app.register_blueprint(arrivals, url_prefix="/arrivals")
     app.register_blueprint(api_bp, url_prefix="/api")
     app.register_blueprint(villages, url_prefix="/villages")
-    app.register_blueprint(notify, url_prefix="/volunteer/admin/notify")
 
     if app.config.get("VOLUNTEERS"):
         from apps.volunteer import volunteer
@@ -346,6 +344,10 @@ def create_app(dev_server=False, config_override=None):
     from apps.admin import admin
 
     app.register_blueprint(admin, url_prefix="/admin")
+
+    from apps.volunteer.admin.notify import notify
+
+    app.register_blueprint(notify, url_prefix="/volunteer/admin/notify")
 
     return app
 
