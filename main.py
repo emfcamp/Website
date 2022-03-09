@@ -69,7 +69,6 @@ login_manager = LoginManager()
 static_digest = FlaskStaticDigest()
 toolbar = DebugToolbarExtension()
 wise = None
-volunteer_admin = None
 
 
 def check_cache_configuration():
@@ -307,6 +306,10 @@ def create_app(dev_server=False, config_override=None):
     from apps.arrivals import arrivals
     from apps.api import api_bp
     from apps.villages import villages
+    from apps.admin import admin
+    from apps.volunteer import volunteer
+    from apps.volunteer.admin import volunteer_admin
+    from apps.volunteer.admin.notify import notify
 
     app.register_blueprint(base)
     app.register_blueprint(users)
@@ -319,35 +322,11 @@ def create_app(dev_server=False, config_override=None):
     app.register_blueprint(arrivals, url_prefix="/arrivals")
     app.register_blueprint(api_bp, url_prefix="/api")
     app.register_blueprint(villages, url_prefix="/villages")
-
-    if app.config.get("VOLUNTEERS"):
-        from apps.volunteer import volunteer
-
-        app.register_blueprint(volunteer, url_prefix="/volunteer")
-
-        from flask_admin import Admin
-        from apps.volunteer.flask_admin_base import VolunteerAdminIndexView
-
-        global volunteer_admin
-        volunteer_admin = Admin(
-            url="/volunteer/admin",
-            name="EMF Volunteers",
-            template_mode="bootstrap3",
-            index_view=VolunteerAdminIndexView(url="/volunteer/admin"),
-            base_template="volunteer/admin/flask-admin-base.html",
-        )
-        volunteer_admin.endpoint_prefix = "volunteer_admin"
-        volunteer_admin.init_app(app)
-
-        import apps.volunteer.admin  # noqa: F401
-
-    from apps.admin import admin
-
     app.register_blueprint(admin, url_prefix="/admin")
-
-    from apps.volunteer.admin.notify import notify
-
+    app.register_blueprint(volunteer, url_prefix="/volunteer")
     app.register_blueprint(notify, url_prefix="/volunteer/admin/notify")
+
+    volunteer_admin.init_app(app)
 
     return app
 
