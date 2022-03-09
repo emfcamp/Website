@@ -14,7 +14,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 
 from main import db
 from .mixins import CapacityMixin, InheritedAttributesMixin
-from . import config_date, BaseModel
+from . import BaseModel
 from .purchase import Purchase
 from .payment import Currency
 
@@ -244,11 +244,19 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
         return price
 
     def is_adult_ticket(self) -> bool:
-        """Whether this is an adult ticket.
-        We use this for vouchers.
+        """Whether this is an "adult" ticket.
+
+        This is used for two purposes:
+            * Voucher capacity is only decremented by adult tickets
+            * At least one adult ticket is needed in order to purchase other types of ticket.
+
+        We have to consider under-18 tickets as adult tickets because 16-18 year olds may attend
+        the event without an adult.
         """
         # FIXME: Make this less awful, we need a less brittle way of detecting this
-        return self.parent.type == "admissions" and self.name.startswith("full")
+        return self.parent.type == "admissions" and (
+            self.name.startswith("full") or self.name.startswith("u18")
+        )
 
     @property
     def checkin_display_name(self):
@@ -574,9 +582,6 @@ class ProductView(BaseModel):
         if self.cfp_accepted_only:
             if user and user.is_authenticated and user.is_cfp_accepted:
                 return True
-            return False
-
-        if not self.vouchers_only and dt < config_date("SALES_START"):
             return False
 
         if self.vouchers_only:

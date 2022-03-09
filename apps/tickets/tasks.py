@@ -216,24 +216,27 @@ def create():
 @scheduled_task(minutes=30)
 def expire_reserved():
     """Expire reserved tickets"""
+
     if (
         feature_enabled("STRIPE")
         and not feature_enabled("BANK_TRANSFER")
         and not feature_enabled("BANK_TRANSFER_EURO")
     ):
         # Things are moving quickly now, only let people reserve tickets for an hour
-        grace_period = timedelta(hours=1)
+        stalled_payment_grace_period = timedelta(hours=1)
 
     else:
-        grace_period = timedelta(days=3)
+        stalled_payment_grace_period = timedelta(days=3)
 
-    app.logger.info("Cancelling reserved tickets with grace period %s", grace_period)
+    app.logger.info(
+        "Cancelling reserved tickets with grace period %s", stalled_payment_grace_period
+    )
 
     # Payments where someone started the process but didn't complete
     payments = (
         Purchase.query.filter(
             Purchase.state == "reserved",
-            Purchase.modified < datetime.utcnow() - grace_period,
+            Purchase.modified < datetime.utcnow() - stalled_payment_grace_period,
             ~Purchase.payment_id.is_(None),
         )
         .join(Payment)
@@ -248,9 +251,12 @@ def expire_reserved():
         payment.cancel()
 
     # Purchases that were added to baskets but not checked out
+    # This should match the wording in templates/tickets/_basket.html
+    incomplete_purchase_grace_period = timedelta(hours=1)
+
     purchases = Purchase.query.filter(
         Purchase.state == "reserved",
-        Purchase.modified < datetime.utcnow() - grace_period,
+        Purchase.modified < datetime.utcnow() - incomplete_purchase_grace_period,
         Purchase.payment_id.is_(None),
     )
     for purchase in purchases:

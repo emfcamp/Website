@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from flask import (
+    Markup,
     render_template,
     redirect,
     request,
@@ -73,14 +74,29 @@ def pay(flow="main"):
                 request.headers.get("User-Agent"),
             )
 
+        elif current_user.is_authenticated:
+            # This might happen if the user clicks back and then refresh in their browser
+            app.logger.info("Empty basket, redirecting back to purchases page")
+            flash("Your basket was empty. Please check your purchases below.")
+            return redirect(url_for("users.purchases"))
+
         else:
-            app.logger.info("Basket is empty, redirecting back to choose tickets")
+            # This should never normally happen. The user wants to pay
+            # for something, but we have no handle on them. Give up.
+            app.logger.info(
+                "Empty basket for anonymous user, redirecting back to choose tickets"
+            )
+            phrase = "item to buy"
             if view.type == "tickets":
-                flash("Please select at least one ticket to buy.")
+                phrase = "ticket to buy"
             elif view.type == "hire":
-                flash("Please select at least one item to hire.")
-            else:
-                flash("Please select at least one item to buy.")
+                phrase = "item to hire"
+            msg = Markup(
+                f"""
+                Please select at least one {phrase}, or <a href="{url_for("users.login")}">log in</a> to view your orders.
+                """
+            )
+            flash(msg)
             return redirect(url_for("tickets.main", flow=flow))
 
     if basket.requires_shipping:

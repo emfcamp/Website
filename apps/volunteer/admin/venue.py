@@ -1,9 +1,7 @@
 from ..flask_admin_base import VolunteerModelView
 
-from main import volunteer_admin, db
+from . import volunteer_admin
+from main import db
 from models.volunteer.venue import VolunteerVenue
 
-if volunteer_admin:
-    volunteer_admin.add_view(
-        VolunteerModelView(VolunteerVenue, db.session, name="Venues")
-    )
+volunteer_admin.add_view(VolunteerModelView(VolunteerVenue, db.session, name="Venues"))

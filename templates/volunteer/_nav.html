@@ -20,7 +20,7 @@
     {% if current_user.is_authenticated and current_user.has_permission('volunter:admin') %}
         {{ menuitem('Manage Training', '.select_training') }}
         {{ menuitem('Admin', 'volunteer_admin.index') }}        
-        <li><a href="{{ url_for('notify.main') }}">Email Volunteers</a></li>
+        <li><a href="{{ url_for('volunteer_admin_notify.main') }}">Email Volunteers</a></li>
     {% endif %}
     {{ menuitem("Log Out", "users.logout") }}
 </div>

@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-from models import config_date
 from models.product import VOUCHER_GRACE_PERIOD, ProductView, Voucher
 from models.cfp import TalkProposal
 
@@ -45,20 +44,6 @@ def test_product_view_accessible(db, user, monkeypatch):
     assert product_view.is_accessible(
         user
     ), "CfP products should be visible with accepted proposal"
-
-
-def test_product_view_accessible_wrt_sales_start(db, user, monkeypatch):
-    sales_start = config_date("SALES_START")
-
-    product_view = ProductView(name="other")
-    assert not product_view.is_accessible_at(
-        user, sales_start - timedelta(hours=1)
-    ), "Default view should not be visible before SALES_START"
-
-    product_view = ProductView(name="other")
-    assert product_view.is_accessible(
-        user, sales_start + timedelta(hours=1)
-    ), "Default view should be visible after SALES_START"
 
 
 def test_product_view_accessible_voucher_expiry(db, user, monkeypatch):
