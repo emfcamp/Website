@@ -107,6 +107,7 @@ venv.bak/
 # ignore vscode settings
 .vscode
 
+.*.swp
 *.DS_Store
 var/*.db
 var/*.ofx
@@ -134,3 +135,4 @@ static/*
 static/**/*-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].*
 static/**/*.gz
 static/cache_manifest.json
+
