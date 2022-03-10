@@ -1,4 +1,10 @@
-from wtforms import SubmitField, StringField, SelectField, TextAreaField, IntegerField
+from wtforms import (
+    SubmitField,
+    StringField,
+    SelectField,
+    TextAreaField,
+    IntegerField,
+)
 from wtforms.validators import Optional, Length, URL
 
 from ..common.forms import Form
