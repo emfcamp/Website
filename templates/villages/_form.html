@@ -34,6 +34,13 @@
       {{ render_field(form.power_requirements, horizontal=9) }}
     </fieldset>
     <fieldset>
+      <legend>Workshop villages</legend>
+      <p>At EMF, some of the villages will be workshop villages. These villages will run their own
+      workshops and provide space for workshops submitted to the CFP to be run.
+          <a href="{{url_for("base.villages")}}#workshop_villages" target="_blank">More info about workshop villages</a>.</p>
+      {{ render_field(form.workshop) }}
+    </fieldset>
+    <fieldset>
     <div class="form-actions">
       <button type="submit" name="Create" class="btn btn-primary btn-lg pull-right debounce">Register Village</button>
     </div>
