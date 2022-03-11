@@ -1,5 +1,5 @@
-import re
 import time
+from urllib.parse import urlparse, urljoin
 
 from flask import (
     render_template,
@@ -17,7 +17,7 @@ from flask import (
 from flask_login import login_user, login_required, logout_user, current_user
 from flask_mail import Message
 from sqlalchemy import or_
-from wtforms import StringField, HiddenField, SubmitField, BooleanField
+from wtforms import StringField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, ValidationError
 
 from main import db, mail
@@ -56,20 +56,24 @@ def users_variables():
     }
 
 
-class NextURLField(HiddenField):
-    def _value(self):
-        # Cheap way of ensuring we don't get absolute URLs
-        if not self.data or "//" in self.data:
-            return ""
-        if not re.match("^[-_0-9a-zA-Z/?=&]+$", self.data):
-            app.logger.error("Dropping next URL %s", repr(self.data))
-            return ""
-        return self.data
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc
+
+
+def get_next_url(default=None):
+    next_url = request.args.get("next")
+    if is_safe_url(next_url):
+        return next_url
+    app.logger.error(f"Dropping unsafe next URL {repr(next_url)}")
+    if default is None:
+        default = url_for(".account")
+    return default
 
 
 class LoginForm(Form):
     email = EmailField("Email")
-    next = NextURLField("Next")
 
     def validate_email(form, field):
         user = User.get_by_email(form.email.data)
@@ -92,26 +96,26 @@ def login_by_email(email):
         login_user(user)
         session.permanent = True
 
-    return redirect(request.args.get("next", url_for(".account")))
+    return redirect(get_next_url())
 
 
 @users.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        return redirect(request.args.get("next", url_for(".account")))
+        return redirect(get_next_url())
 
     if request.args.get("code"):
         user = User.get_by_code(app.config["SECRET_KEY"], request.args.get("code"))
         if user is not None:
             login_user(user)
             session.permanent = True
-            return redirect(request.args.get("next", url_for(".account")))
+            return redirect(get_next_url())
         else:
             flash(
                 "Your login link was invalid. Please enter your email address below to receive a new link."
             )
 
-    form = LoginForm(request.form, next=request.args.get("next"))
+    form = LoginForm(request.form)
     if form.validate_on_submit():
         code = form._user.login_code(app.config["SECRET_KEY"])
 
@@ -124,7 +128,7 @@ def login():
             "emails/login-code.txt",
             user=form._user,
             code=code,
-            next_url=request.args.get("next"),
+            next_url=get_next_url(),
         )
         mail.send(msg)
 
@@ -134,7 +138,9 @@ def login():
         form.email.data = request.args.get("email")
 
     return render_template(
-        "account/login.html", form=form, next=request.args.get("next")
+        "account/login.html",
+        form=form,
+        next=get_next_url(),
     )
 
 
@@ -144,7 +150,7 @@ def logout():
     session.permanent = False
     Basket.clear_from_session()
     logout_user()
-    return redirect(request.args.get("next", url_for("base.main")))
+    return redirect(get_next_url(default=url_for("base.main")))
 
 
 class SignupForm(Form):
