@@ -64,9 +64,10 @@ def is_safe_url(target):
 
 def get_next_url(default=None):
     next_url = request.args.get("next")
-    if is_safe_url(next_url):
-        return next_url
-    app.logger.error(f"Dropping unsafe next URL {repr(next_url)}")
+    if next_url:
+        if is_safe_url(next_url):
+            return next_url
+        app.logger.error(f"Dropping unsafe next URL {repr(next_url)}")
     if default is None:
         default = url_for(".account")
     return default
