@@ -1,5 +1,5 @@
 {% macro menuitem(text, view) %}
-<li {% if view_name == view -%} class="hidden" {%- endif %}>
+<li {% if view_name == view -%} class="active" {%- endif %}>
     <a href="{{url_for(view)}}">{{text}}</a>
 </li>
 {% endmacro %}
