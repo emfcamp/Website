@@ -88,12 +88,14 @@
     </div>
 
     <ul class="nav nav-tabs" role="tablist">
+        {{ tabnav('thu', 'Thursday', active_day) }}
         {{ tabnav('fri', 'Friday', active_day) }}
         {{ tabnav('sat', 'Saturday', active_day) }}
         {{ tabnav('sun', 'Sunday', active_day) }}
         {{ tabnav('mon', 'Monday', active_day) }}
     </ul>
     <div class="tab-content">
+        {{ days_shifts('thu', active_day) }}
         {{ days_shifts('fri', active_day) }}
         {{ days_shifts('sat', active_day) }}
         {{ days_shifts('sun', active_day) }}
@@ -155,6 +157,7 @@
     <script type="text/javascript" nonce="{{csp_nonce}}">
         $('#filter-panel').show();
         // Set hrefs back for tabs if JS is enabled
+        $('#tabnav-thu a').attr('href', '#thu');
         $('#tabnav-fri a').attr('href', '#fri');
         $('#tabnav-sat a').attr('href', '#sat');
         $('#tabnav-sun a').attr('href', '#sun');
