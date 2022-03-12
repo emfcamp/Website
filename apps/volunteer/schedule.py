@@ -1,5 +1,6 @@
 # coding=utf-8
 import pendulum
+from datetime import datetime
 from flask import render_template, request, redirect, url_for, flash, jsonify
 from collections import defaultdict
 from flask_login import current_user
@@ -13,6 +14,7 @@ from models.user import User
 from models.volunteer.role import Role
 from models.volunteer.shift import Shift, ShiftEntry
 from models.volunteer.volunteer import Volunteer
+from models import config_date
 
 from ..common import feature_flag
 from . import volunteer, v_user_required
@@ -61,8 +63,11 @@ def schedule():
     untrained_roles = [
         r for r in roles if r["requires_training"] and not r["is_trained"]
     ]
-
-    active_day = request.args.get("day", default=pendulum.now().strftime("%a").lower())
+    if datetime.utcnow() < config_date("EVENT_START"):
+        def_day = "thu"
+    else:
+        def_day = pendulum.now().strftime("%a").lower()
+    active_day = request.args.get("day", default=def_day)
 
     return render_template(
         "volunteer/schedule.html",
