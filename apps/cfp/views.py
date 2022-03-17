@@ -31,6 +31,7 @@ from models.cfp import (
     PROPOSAL_TIMESLOTS,
 )
 from ..common import feature_flag, feature_enabled, create_current_user
+from ..common.email import from_email
 from ..common.forms import Form, TelField, EmailField
 
 from . import cfp
@@ -236,7 +237,7 @@ def form(cfp_type="talk"):
         # Send confirmation message
         msg = EmailMessage(
             "Electromagnetic Field CFP Submission",
-            from_email=app.config["CONTENT_EMAIL"],
+            from_email=from_email("CONTENT_EMAIL"),
             to=[current_user.email],
         )
 

@@ -28,6 +28,7 @@ from stripe.error import AuthenticationError
 from main import db, stripe
 from models.payment import StripePayment
 from ..common import feature_enabled
+from ..common.email import from_email
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
 from . import get_user_payment_or_abort, lock_user_payment_or_abort
@@ -260,7 +261,7 @@ def stripe_payment_paid(payment: StripePayment):
 
     msg = EmailMessage(
         "Your EMF payment has been confirmed",
-        from_email=app.config.get("TICKETS_EMAIL"),
+        from_email=from_email("TICKETS_EMAIL"),
         to=[payment.user.email],
     )
 

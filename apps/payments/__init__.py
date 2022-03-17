@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, current_app as app
 from flask_mailman import EmailMessage
 
 from .common import get_user_payment_or_abort, lock_user_payment_or_abort  # noqa: F401
+from ..common.email import from_email
 
 payments = Blueprint("payments", __name__)
 
@@ -13,8 +14,8 @@ def ticket_admin_email(title, template, **kwargs):
 
     msg = EmailMessage(
         title,
-        from_email=app.config.get("TICKETS_EMAIL"),
-        to=[app.config.get("TICKETS_NOTICE_EMAIL")[1]],
+        from_email=from_email("TICKETS_EMAIL"),
+        to=[app.config["TICKETS_NOTICE_EMAIL"][1]],
     )
     msg.body = render_template(template, **kwargs)
     msg.send()

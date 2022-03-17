@@ -29,6 +29,7 @@ from models.payment import (
     StateException,
 )
 from models.purchase import Purchase
+from ..common.email import from_email
 from ..common.forms import Form, HiddenIntegerField
 from ..payments.stripe import (
     StripeUpdateUnexpected,
@@ -142,7 +143,7 @@ def send_reminder(payment_id):
 
             msg = EmailMessage(
                 "Electromagnetic Field: Ticket payment not received",
-                from_email=app.config["TICKETS_EMAIL"],
+                from_email=from_email("TICKETS_EMAIL"),
                 to=[payment.user.email],
             )
             msg.body = render_template(

@@ -26,6 +26,7 @@ from models.cfp import Proposal, CFPMessage
 from models.basket import Basket
 
 from ..common import set_user_currency, feature_flag
+from ..common.email import from_email
 from ..common.forms import Form, EmailField
 
 
@@ -122,7 +123,7 @@ def login():
 
         msg = EmailMessage(
             "Electromagnetic Field: Login details",
-            from_email=app.config["TICKETS_EMAIL"],
+            from_email=from_email("TICKETS_EMAIL"),
             to=[form._user.email],
         )
         msg.body = render_template(
@@ -211,7 +212,7 @@ def signup():
 
         msg = EmailMessage(
             "Welcome to the EMF website",
-            from_email=app.config["CONTACT_EMAIL"],
+            from_email=from_email("CONTACT_EMAIL"),
             to=[email],
         )
         msg.body = render_template("emails/signup-user.txt", user=user)

@@ -58,6 +58,7 @@ from . import (
     get_next_proposal_to,
     copy_request_args,
 )
+from ..common.email import from_email
 
 
 @cfp_review.route("")
@@ -222,7 +223,7 @@ def send_email_for_proposal(proposal, reason="still-considered", from_address=No
 
         app.logger.info("Sending %s email for proposal %s", reason, proposal.id)
 
-        send_from = app.config["CONTENT_EMAIL"]
+        send_from = from_email("CONTENT_EMAIL")
         if from_address:
             send_from = from_address
 
@@ -493,7 +494,7 @@ def message_proposer(proposal_id):
             msg_url = external_url("cfp.proposal_messages", proposal_id=proposal_id)
             msg = EmailMessage(
                 "New message about your EMF proposal",
-                from_email=app.config["CONTENT_EMAIL"],
+                from_email=from_email("CONTENT_EMAIL"),
                 to=[proposal.user.email],
             )
             msg.body = render_template(
@@ -551,7 +552,7 @@ def message_batch():
                 msg_url = external_url("cfp.proposal_messages", proposal_id=proposal.id)
                 msg = EmailMessage(
                     "New message about your EMF proposal",
-                    from_email=app.config["CONTENT_EMAIL"],
+                    from_email=from_email("CONTENT_EMAIL"),
                     to=[proposal.user.email],
                 )
                 msg.body = render_template(

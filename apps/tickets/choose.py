@@ -19,6 +19,7 @@ from models.basket import Basket
 from models.site_state import get_sales_state
 
 from ..common import get_user_currency, set_user_currency, feature_enabled
+from ..common.email import from_email
 from ..common.receipt import attach_tickets, set_tickets_emailed
 
 from .forms import TicketAmountsForm
@@ -251,7 +252,7 @@ def handle_free_tickets(flow: str, view: ProductView, basket: Basket):
 
     msg = EmailMessage(
         "Your EMF ticket order",
-        from_email=app.config["TICKETS_EMAIL"],
+        from_email=from_email("TICKETS_EMAIL"),
         to=[current_user.email],
     )
 

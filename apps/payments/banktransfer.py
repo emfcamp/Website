@@ -10,6 +10,7 @@ from wtforms.validators import DataRequired, AnyOf
 from main import db
 from models.payment import BankPayment, BankTransaction
 from ..common import get_user_currency, feature_enabled
+from ..common.email import from_email
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
 from . import get_user_payment_or_abort, lock_user_payment_or_abort
@@ -47,7 +48,7 @@ def transfer_start(payment: BankPayment):
 
     msg = EmailMessage(
         "Your EMF ticket purchase",
-        from_email=app.config["TICKETS_EMAIL"],
+        from_email=from_email("TICKETS_EMAIL"),
         to=[current_user.email],
     )
     msg.body = render_template(
@@ -237,7 +238,7 @@ def reconcile_txns(txns: list[BankTransaction], doit: bool = False):
 def send_confirmation(payment: BankPayment):
     msg = EmailMessage(
         "Electromagnetic Field ticket purchase update",
-        from_email=app.config["TICKETS_EMAIL"],
+        from_email=from_email("TICKETS_EMAIL"),
         to=[payment.user.email],
     )
 

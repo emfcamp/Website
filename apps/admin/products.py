@@ -28,7 +28,11 @@ from models.product import (
 )
 from models.purchase import Purchase, PurchaseTransfer
 
-from ..common.email import format_trusted_html_email, format_trusted_plaintext_email
+from ..common.email import (
+    format_trusted_html_email,
+    format_trusted_plaintext_email,
+    from_email,
+)
 from . import admin
 from .forms import (
     EditProductForm,
@@ -672,8 +676,9 @@ def product_view_bulk_add_vouchers_by_email(view_id):
             sent_count = mail.send_mail(
                 subject=form.subject.data,
                 message=plaintext,
-                from_email=app.config["TICKETS_EMAIL"],
+                from_email=from_email("TICKETS_EMAIL"),
                 recipient_list=[email],
+                fail_silently=True,
                 connection=conn,
                 html_message=html,
             )

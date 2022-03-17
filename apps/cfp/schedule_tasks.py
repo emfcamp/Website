@@ -9,6 +9,7 @@ from models.cfp import Proposal, Venue
 from apps.cfp_review.base import send_email_for_proposal
 from .scheduler import Scheduler
 from . import cfp
+from ..common.email import from_email
 
 
 @cfp.cli.command("create_venues")
@@ -96,12 +97,12 @@ def apply_potential_schedule():
                 'Scheduling proposal "%s" by %s', proposal.title, user.email
             )
             ok = send_email_for_proposal(
-                proposal, reason="scheduled", from_address=app.config["SPEAKERS_EMAIL"]
+                proposal, reason="scheduled", from_address=from_email("SPEAKERS_EMAIL")
             )
         else:
             app.logger.info('Moving proposal "%s" by %s', proposal.title, user.email)
             ok = send_email_for_proposal(
-                proposal, reason="moved", from_address=app.config["SPEAKERS_EMAIL"]
+                proposal, reason="moved", from_address=from_email("SPEAKERS_EMAIL")
             )
 
         if ok:

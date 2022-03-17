@@ -36,6 +36,7 @@ from ..common import (
     set_user_currency,
     feature_enabled,
 )
+from ..common.email import from_email
 from ..common.receipt import (
     make_qr_png,
     make_barcode_png,
@@ -132,7 +133,7 @@ def transfer(ticket_id):
 
         msg = EmailMessage(
             "You've been sent a ticket to EMF!",
-            from_email=app.config.get("TICKETS_EMAIL"),
+            from_email=from_email("TICKETS_EMAIL"),
             to=[to_user.email],
         )
 
@@ -154,7 +155,7 @@ def transfer(ticket_id):
 
         msg = EmailMessage(
             "You sent someone an EMF ticket",
-            from_email=app.config.get("TICKETS_EMAIL"),
+            from_email=from_email("TICKETS_EMAIL"),
             to=[current_user.email],
         )
         msg.body = render_template(

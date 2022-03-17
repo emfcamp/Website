@@ -6,6 +6,7 @@ from typing import Optional
 
 from models.payment import RefundRequest, StripePayment, StripeRefund, BankRefund
 from main import stripe, db
+from ..common.email import from_email
 
 
 class RefundException(Exception):
@@ -46,7 +47,7 @@ def send_refund_email(request: RefundRequest, amount: Decimal) -> None:
     payment = request.payment
     msg = EmailMessage(
         "Your refund request has been processed",
-        from_email=app.config.get("TICKETS_EMAIL"),
+        from_email=from_email("TICKETS_EMAIL"),
         to=[payment.user.email],
     )
     # TODO: handle situation where currency of refund is different from currency of payment.

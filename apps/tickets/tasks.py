@@ -6,6 +6,7 @@ from sqlalchemy import func
 
 from main import db
 from apps.common import feature_enabled
+from ..common.email import from_email
 from apps.common.receipt import attach_tickets, set_tickets_emailed, RECEIPT_TYPES
 from models.payment import Payment
 from models.product import (
@@ -283,7 +284,7 @@ def email_transfer_reminders():
 
     # for user in users_to_email:
     #     msg = EmailMessage("Your Electromagnetic Field Tickets",
-    #         from_email=app.config['TICKETS_EMAIL'],
+    #         from_email=from_email('TICKETS_EMAIL'),
     #         to=[user.email]
     #     )
 
@@ -315,7 +316,7 @@ def email_tickets():
 
         msg = EmailMessage(
             "Your Electromagnetic Field Ticket%s" % plural,
-            from_email=app.config["TICKETS_EMAIL"],
+            from_email=from_email("TICKETS_EMAIL"),
             to=[user.email],
         )
 

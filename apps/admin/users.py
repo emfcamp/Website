@@ -11,6 +11,7 @@ from . import admin
 from main import db
 from models.user import User, generate_signup_code
 from models.permission import Permission
+from ..common.email import from_email
 from ..common.forms import Form, EmailField
 
 
@@ -45,7 +46,7 @@ def users():
         code = user.login_code(app.config["SECRET_KEY"])
         msg = EmailMessage(
             "Welcome to the EMF website",
-            from_email=app.config["CONTACT_EMAIL"],
+            from_email=from_email("CONTACT_EMAIL"),
             to=[email],
         )
         msg.body = render_template(

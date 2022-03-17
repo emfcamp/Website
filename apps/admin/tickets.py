@@ -31,6 +31,7 @@ from .forms import (
 )
 
 from ..common import feature_enabled
+from ..common.email import from_email
 from ..common.receipt import attach_tickets, set_tickets_emailed
 from ..common.receipt import render_receipt, render_pdf
 
@@ -117,7 +118,7 @@ def tickets_issue_free(email):
         code = user.login_code(app.config["SECRET_KEY"])
         msg = EmailMessage(
             "Your complimentary tickets to Electromagnetic Field",
-            from_email=app.config["TICKETS_EMAIL"],
+            from_email=from_email("TICKETS_EMAIL"),
             to=[user.email],
         )
 
@@ -299,7 +300,7 @@ def tickets_reserve(email):
         code = user.login_code(app.config["SECRET_KEY"])
         msg = EmailMessage(
             "Your reserved tickets to EMF",
-            from_email=app.config["TICKETS_EMAIL"],
+            from_email=from_email("TICKETS_EMAIL"),
             to=[user.email],
         )
 

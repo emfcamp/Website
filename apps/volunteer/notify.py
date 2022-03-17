@@ -1,7 +1,11 @@
 from models import event_year
 from models.volunteer.notify import VolunteerNotifyJob, VolunteerNotifyRecipient
 from main import db, mail
-from apps.common.email import format_trusted_html_email, format_trusted_plaintext_email
+from apps.common.email import (
+    format_trusted_html_email,
+    format_trusted_plaintext_email,
+    from_email,
+)
 
 
 def preview_trusted_notify(preview_address, subject, body):
@@ -13,7 +17,7 @@ def preview_trusted_notify(preview_address, subject, body):
     mail.send_mail(
         subject=subject,
         message=formatted_plaintext,
-        from_email=app.config["VOLUNTEER_EMAIL"],
+        from_email=from_email("VOLUNTEER_EMAIL"),
         recipient_list=[preview_address],
         html_message=formatted_html,
     )

@@ -125,7 +125,7 @@ def preview_trusted_email(preview_address, subject, body):
     mail.send_mail(
         subject=subject,
         message=formatted_plaintext,
-        from_email=app.config["CONTACT_EMAIL"],
+        from_email=from_email("CONTACT_EMAIL"),
         recipient_list=[preview_address],
         html_message=formatted_html,
     )
@@ -144,3 +144,8 @@ def enqueue_trusted_emails(users, subject, body, **kwargs):
         db.session.add(EmailJobRecipient(job, user))
 
     db.session.commit()
+
+
+def from_email(name):
+    email = app.config[name][1]
+    return f"Electromagnetic Field <{email}>"
