@@ -20,11 +20,11 @@ from flask import (
     current_app as app,
 )
 from flask_login import login_required, current_user
-from flask_mail import Message
+from flask_mailman import EmailMessage
 from prometheus_client import Counter
 from sqlalchemy.orm.exc import NoResultFound
 
-from main import db, mail, external_url
+from main import db, external_url
 from models.user import User, checkin_code_re
 from models.product import ProductView
 from models.basket import Basket
@@ -130,10 +130,10 @@ def transfer(ticket_id):
         # Alert the users via email
         code = to_user.login_code(app.config["SECRET_KEY"])
 
-        msg = Message(
+        msg = EmailMessage(
             "You've been sent a ticket to EMF!",
-            sender=app.config.get("TICKETS_EMAIL"),
-            recipients=[to_user.email],
+            from_email=app.config.get("TICKETS_EMAIL"),
+            to=[to_user.email],
         )
 
         already_emailed = set_tickets_emailed(to_user)
@@ -149,13 +149,13 @@ def transfer(ticket_id):
         if feature_enabled("ISSUE_TICKETS"):
             attach_tickets(msg, to_user)
 
-        mail.send(msg)
+        msg.send()
         db.session.commit()
 
-        msg = Message(
+        msg = EmailMessage(
             "You sent someone an EMF ticket",
-            sender=app.config.get("TICKETS_EMAIL"),
-            recipients=[current_user.email],
+            from_email=app.config.get("TICKETS_EMAIL"),
+            to=[current_user.email],
         )
         msg.body = render_template(
             "emails/ticket-transfer-original-owner.txt",
@@ -163,7 +163,7 @@ def transfer(ticket_id):
             from_user=current_user,
         )
 
-        mail.send(msg)
+        msg.send()
 
         flash("Your ticket was transferred.")
         return redirect(url_for("users.purchases"))

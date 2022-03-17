@@ -2,7 +2,6 @@ import markdown
 from inlinestyler.utils import inline_css
 from flask import render_template, Markup, url_for
 from flask import current_app as app
-from flask_mail import Message
 from jinja2.sandbox import ImmutableSandboxedEnvironment
 
 from models import event_year
@@ -120,14 +119,16 @@ def format_trusted_plaintext_email(markdown_text, **kwargs):
 
 def preview_trusted_email(preview_address, subject, body):
     subject = "[PREVIEW] " + subject
+    formatted_plaintext = format_trusted_plaintext_email(body)
     formatted_html = format_trusted_html_email(body, subject)
 
-    with mail.connect() as conn:
-        msg = Message(subject, sender=app.config["CONTACT_EMAIL"])
-        msg.add_recipient(preview_address)
-        msg.body = format_trusted_plaintext_email(body)
-        msg.html = formatted_html
-        conn.send(msg)
+    mail.send_mail(
+        subject=subject,
+        message=formatted_plaintext,
+        from_email=app.config["CONTACT_EMAIL"],
+        recipient_list=[preview_address],
+        html_message=formatted_html,
+    )
 
 
 def enqueue_trusted_emails(users, subject, body, **kwargs):

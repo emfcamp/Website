@@ -15,11 +15,11 @@ from flask import (
     current_app as app,
 )
 from flask_login import current_user
-from flask_mail import Message
+from flask_mailman import EmailMessage
 from sqlalchemy import func, exists, select
 from sqlalchemy.orm import joinedload
 
-from main import db, mail, external_url
+from main import db, external_url
 from .majority_judgement import calculate_max_normalised_score
 from models.cfp import (
     Proposal,
@@ -226,7 +226,7 @@ def send_email_for_proposal(proposal, reason="still-considered", from_address=No
         if from_address:
             send_from = from_address
 
-        msg = Message(subject, sender=send_from, recipients=[proposal.user.email])
+        msg = EmailMessage(subject, from_email=send_from, to=[proposal.user.email])
         msg.body = render_template(
             template,
             user=proposal.user,
@@ -240,7 +240,7 @@ def send_email_for_proposal(proposal, reason="still-considered", from_address=No
         # FIXME: This is disgusting and we should remove it when we're on a
         # fixed version of python.
         try:
-            mail.send(msg)
+            msg.send()
             return True
         except AttributeError as e:
             if proposal_title:
@@ -491,10 +491,10 @@ def message_proposer(proposal_id):
             )
 
             msg_url = external_url("cfp.proposal_messages", proposal_id=proposal_id)
-            msg = Message(
+            msg = EmailMessage(
                 "New message about your EMF proposal",
-                sender=app.config["CONTENT_EMAIL"],
-                recipients=[proposal.user.email],
+                from_email=app.config["CONTENT_EMAIL"],
+                to=[proposal.user.email],
             )
             msg.body = render_template(
                 "cfp_review/email/new_message.txt",
@@ -503,7 +503,7 @@ def message_proposer(proposal_id):
                 from_user=current_user,
                 proposal=proposal,
             )
-            mail.send(msg)
+            msg.send()
 
         count = proposal.mark_messages_read(current_user)
         db.session.commit()
@@ -549,10 +549,10 @@ def message_batch():
                 )
 
                 msg_url = external_url("cfp.proposal_messages", proposal_id=proposal.id)
-                msg = Message(
+                msg = EmailMessage(
                     "New message about your EMF proposal",
-                    sender=app.config["CONTENT_EMAIL"],
-                    recipients=[proposal.user.email],
+                    from_email=app.config["CONTENT_EMAIL"],
+                    to=[proposal.user.email],
                 )
                 msg.body = render_template(
                     "cfp_review/email/new_message.txt",
@@ -561,7 +561,7 @@ def message_batch():
                     from_user=current_user,
                     proposal=proposal,
                 )
-                mail.send(msg)
+                msg.send()
 
             flash("Messaged %s proposals" % len(proposals), "info")
             return redirect(url_for(".proposals", **request.args))

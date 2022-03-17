@@ -1,11 +1,9 @@
 import os
-import logger
 import random
 import shutil
 
 from main import create_app, db
 from flask import request, _request_ctx_stack
-from flask_mail import email_dispatched
 
 
 prometheus_dir = "var/prometheus"
@@ -38,9 +36,6 @@ def prometheus_cleanup(response):
     prometheus_client.multiprocess.mark_process_dead(os.getpid())
     return response
 
-
-if app.config.get("DEBUG") or app.config.get("MAIL_SUPPRESS_SEND"):
-    email_dispatched.connect(logger.mail_logging)
 
 if app.config.get("FIX_URL_SCHEME"):
     # The Flask debug server doesn't process _FORWARDED_ headers,

@@ -12,14 +12,14 @@ from flask import (
     current_app as app,
 )
 from flask_login import current_user
-from flask_mail import Message
+from flask_mailman import EmailMessage
 
 from wtforms.validators import InputRequired
 from wtforms import SubmitField, BooleanField, FieldList, FormField
 
 from sqlalchemy.sql.functions import func
 
-from main import db, mail, stripe
+from main import db, stripe
 from models.payment import (
     Payment,
     RefundRequest,
@@ -140,17 +140,17 @@ def send_reminder(payment_id):
                 )
                 return redirect(url_for("admin.expiring"))
 
-            msg = Message(
+            msg = EmailMessage(
                 "Electromagnetic Field: Ticket payment not received",
-                sender=app.config["TICKETS_EMAIL"],
-                recipients=[payment.user.email],
+                from_email=app.config["TICKETS_EMAIL"],
+                to=[payment.user.email],
             )
             msg.body = render_template(
                 "emails/tickets-reminder.txt",
                 payment=payment,
                 account=payment.recommended_destination,
             )
-            mail.send(msg)
+            msg.send()
 
             payment.reminder_sent = True
             db.session.commit()

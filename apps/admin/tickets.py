@@ -9,9 +9,9 @@ from flask import (
     abort,
     send_file,
 )
-from flask_mail import Message
+from flask_mailman import EmailMessage
 
-from main import db, mail, external_url
+from main import db, external_url
 from models.exc import CapacityException
 from models.user import User
 from models.product import ProductGroup, Product, PriceTier, Price
@@ -115,10 +115,10 @@ def tickets_issue_free(email):
         db.session.commit()
 
         code = user.login_code(app.config["SECRET_KEY"])
-        msg = Message(
+        msg = EmailMessage(
             "Your complimentary tickets to Electromagnetic Field",
-            sender=app.config["TICKETS_EMAIL"],
-            recipients=[user.email],
+            from_email=app.config["TICKETS_EMAIL"],
+            to=[user.email],
         )
 
         already_emailed = set_tickets_emailed(user)
@@ -134,7 +134,7 @@ def tickets_issue_free(email):
         if feature_enabled("ISSUE_TICKETS"):
             attach_tickets(msg, user)
 
-        mail.send(msg)
+        msg.send()
         db.session.commit()
 
         flash("Allocated %s ticket(s)" % len(basket.purchases))
@@ -297,10 +297,10 @@ def tickets_reserve(email):
             return redirect(url_for(".tickets_reserve", email=email))
 
         code = user.login_code(app.config["SECRET_KEY"])
-        msg = Message(
+        msg = EmailMessage(
             "Your reserved tickets to EMF",
-            sender=app.config["TICKETS_EMAIL"],
-            recipients=[user.email],
+            from_email=app.config["TICKETS_EMAIL"],
+            to=[user.email],
         )
 
         msg.body = render_template(
@@ -312,7 +312,7 @@ def tickets_reserve(email):
             currency=form.currency.data,
         )
 
-        mail.send(msg)
+        msg.send()
         db.session.commit()
 
         flash("Reserved tickets and emailed {}".format(user.email))

@@ -10,14 +10,14 @@ from flask import (
     render_template_string,
 )
 from flask_login import current_user
-from flask_mail import Message
+from flask_mailman import EmailMessage
 from wtforms.validators import DataRequired, ValidationError
 from wtforms import BooleanField, StringField, SubmitField, TextAreaField, SelectField
 import collections
 
 from sqlalchemy.exc import IntegrityError
 
-from main import db, mail
+from main import db
 from models.user import User, UserDiversity
 from models.cfp import (
     TalkProposal,
@@ -234,16 +234,16 @@ def form(cfp_type="talk"):
         db.session.commit()
 
         # Send confirmation message
-        msg = Message(
+        msg = EmailMessage(
             "Electromagnetic Field CFP Submission",
-            sender=app.config["CONTENT_EMAIL"],
-            recipients=[current_user.email],
+            from_email=app.config["CONTENT_EMAIL"],
+            to=[current_user.email],
         )
 
         msg.body = render_template(
             "emails/cfp-submission.txt", proposal=cfp, new_user=new_user
         )
-        mail.send(msg)
+        msg.send()
 
         return redirect(url_for(".complete"))
 

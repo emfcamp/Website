@@ -3,10 +3,9 @@ import yaml
 import secrets
 import logging
 import logging.config
-from email import charset
 
 from flask import Flask, url_for, render_template, request, g
-from flask_mail import Mail, email_dispatched
+from flask_mailman import Mail
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -53,12 +52,6 @@ def include_object(object, name, type_, reflected, compare_to):
 
     return True
 
-
-# Force Quoted-Printable encoding for emails.
-# The flask-mail package sets the header encoding to "SHORTEST" and the body encoding
-# to None. Somehow this, combined with Postmark, results in the email body being wrapped
-# twice, which results in ugly plaintext emails.
-charset.add_charset("utf-8", charset.QP, charset.QP, "utf-8")
 
 cache = Cache()
 migrate = Migrate(include_object=include_object)
@@ -128,11 +121,6 @@ def create_app(dev_server=False, config_override=None):
 
     for extension in (cache, db, mail, static_digest, toolbar):
         extension.init_app(app)
-
-    def log_email(message, app):
-        app.logger.info("Emailing %s: %r", message.recipients, message.subject)
-
-    email_dispatched.connect(log_email)
 
     cors_origins = ["https://map.emfcamp.org", "https://wiki.emfcamp.org"]
     if app.config.get("DEBUG"):

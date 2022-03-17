@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
 
 from flask import current_app as app, render_template
-from flask_mail import Message
+from flask_mailman import EmailMessage
 from sqlalchemy import func
 
-from main import db, mail
+from main import db
 from apps.common import feature_enabled
 from apps.common.receipt import attach_tickets, set_tickets_emailed, RECEIPT_TYPES
 from models.payment import Payment
@@ -282,14 +282,15 @@ def email_transfer_reminders():
     # ).group_by(User).having(func.count() > 1)
 
     # for user in users_to_email:
-    #     msg = Message("Your Electromagnetic Field Tickets",
-    #                   sender=app.config['TICKETS_EMAIL'],
-    #                   recipients=[user.email])
+    #     msg = EmailMessage("Your Electromagnetic Field Tickets",
+    #         from_email=app.config['TICKETS_EMAIL'],
+    #         to=[user.email]
+    #     )
 
     #     msg.body = render_template("emails/transfer-reminder.txt", user=user)
 
     #     app.logger.info('Emailing %s transfer reminder', user.email)
-    #     mail.send(msg)
+    #     msg.send()
 
     #     for ticket in user.tickets:
     #         ticket.transfer_reminder_sent = True
@@ -312,10 +313,10 @@ def email_tickets():
     for user, purchase_count in users_purchase_counts:
         plural = purchase_count != 1 and "s" or ""
 
-        msg = Message(
+        msg = EmailMessage(
             "Your Electromagnetic Field Ticket%s" % plural,
-            sender=app.config["TICKETS_EMAIL"],
-            recipients=[user.email],
+            from_email=app.config["TICKETS_EMAIL"],
+            to=[user.email],
         )
 
         already_emailed = set_tickets_emailed(user)
@@ -328,6 +329,6 @@ def email_tickets():
         app.logger.info(
             "Emailing %s receipt for %s tickets", user.email, purchase_count
         )
-        mail.send(msg)
+        msg.send()
 
         db.session.commit()

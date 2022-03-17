@@ -1,11 +1,11 @@
 from decimal import Decimal
 from stripe.error import StripeError
 from flask import current_app as app, render_template
-from flask_mail import Message
+from flask_mailman import EmailMessage
 from typing import Optional
 
 from models.payment import RefundRequest, StripePayment, StripeRefund, BankRefund
-from main import stripe, db, mail
+from main import stripe, db
 
 
 class RefundException(Exception):
@@ -44,10 +44,10 @@ def create_stripe_refund(
 
 def send_refund_email(request: RefundRequest, amount: Decimal) -> None:
     payment = request.payment
-    msg = Message(
+    msg = EmailMessage(
         "Your refund request has been processed",
-        sender=app.config.get("TICKETS_EMAIL"),
-        recipients=[payment.user.email],
+        from_email=app.config.get("TICKETS_EMAIL"),
+        to=[payment.user.email],
     )
     # TODO: handle situation where currency of refund is different from currency of payment.
     msg.body = render_template(
@@ -57,7 +57,7 @@ def send_refund_email(request: RefundRequest, amount: Decimal) -> None:
         request=request,
         currency=payment.currency,
     )
-    mail.send(msg)
+    msg.send()
 
 
 def handle_refund_request(request: RefundRequest) -> None:

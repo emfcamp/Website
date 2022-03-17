@@ -527,16 +527,21 @@ python-versions = "*"
 Flask = "*"
 
 [[package]]
-name = "flask-mail"
-version = "0.9.1"
-description = "Flask extension for sending email"
+name = "flask-mailman"
+version = "0.3.0"
+description = "Porting Django's email implementation to your Flask applications."
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.6.2,<4.0.0"
 
 [package.dependencies]
-blinker = "*"
-Flask = "*"
+flask = ">=1.0"
+mkdocs-material-extensions = ">=1.0.1,<2.0.0"
+
+[package.extras]
+test = ["black (>=21.5b2,<22.0)", "flake8 (>=3.9.2,<4.0.0)", "isort (>=5.8.0,<6.0.0)", "pytest (>=6.2.4,<7.0.0)", "pytest-cov (>=2.12.0,<3.0.0)"]
+dev = ["bump2version (>=1.0.1,<2.0.0)", "pip (>=20.3.1,<21.0.0)", "pre-commit (>=2.12.0,<3.0.0)", "toml (>=0.10.2,<0.11.0)", "tox (>=3.20.1,<4.0.0)", "twine (>=3.3.0,<4.0.0)", "virtualenv (>=20.2.2,<21.0.0)"]
+doc = ["mkdocs (>=1.1.2,<2.0.0)", "mkdocs-autorefs (>=0.2.1,<0.3.0)", "mkdocs-include-markdown-plugin (>=1.0.0,<2.0.0)", "mkdocs-material (>=6.1.7,<7.0.0)", "mkdocstrings (>=0.15.2,<0.16.0)"]
 
 [[package]]
 name = "flask-migrate"
@@ -1004,6 +1009,14 @@ description = "McCabe checker, plugin for flake8"
 category = "dev"
 optional = false
 python-versions = "*"
+
+[[package]]
+name = "mkdocs-material-extensions"
+version = "1.0.3"
+description = "Extension pack for Python Markdown."
+category = "main"
+optional = false
+python-versions = ">=3.6"
 
 [[package]]
 name = "mock"
@@ -1982,7 +1995,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.9"
-content-hash = "eb9f70f46679e184db26c9a9ecd8d8cab14e50b978a4d44252b91e5048e3167d"
+content-hash = "db329529604347302ab5989724369c1b0bec1f43a11115e49eb346ec51f6fa69"
 
 [metadata.files]
 alembic = [
@@ -2337,8 +2350,9 @@ flask-login = [
     {file = "Flask-Login-0.5.0.tar.gz", hash = "sha256:6d33aef15b5bcead780acc339464aae8a6e28f13c90d8b1cf9de8b549d1c0b4b"},
     {file = "Flask_Login-0.5.0-py2.py3-none-any.whl", hash = "sha256:7451b5001e17837ba58945aead261ba425fdf7b4f0448777e597ddab39f4fba0"},
 ]
-flask-mail = [
-    {file = "Flask-Mail-0.9.1.tar.gz", hash = "sha256:22e5eb9a940bf407bcf30410ecc3708f3c56cc44b29c34e1726fe85006935f41"},
+flask-mailman = [
+    {file = "Flask-Mailman-0.3.0.tar.gz", hash = "sha256:faa945585a985e475393f83b210b32b3577400233b0584dd9a32f1d13e152ba8"},
+    {file = "Flask_Mailman-0.3.0-py3-none-any.whl", hash = "sha256:323700baff52ad3ab27c49f8bf38ca63d4f436dce89ff307a3ef0a65e084b25d"},
 ]
 flask-migrate = [
     {file = "Flask-Migrate-3.1.0.tar.gz", hash = "sha256:57d6060839e3a7f150eaab6fe4e726d9e3e7cffe2150fb223d73f92421c6d1d9"},
@@ -2722,6 +2736,10 @@ matplotlib-inline = [
 mccabe = [
     {file = "mccabe-0.6.1-py2.py3-none-any.whl", hash = "sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42"},
     {file = "mccabe-0.6.1.tar.gz", hash = "sha256:dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f"},
+]
+mkdocs-material-extensions = [
+    {file = "mkdocs-material-extensions-1.0.3.tar.gz", hash = "sha256:bfd24dfdef7b41c312ede42648f9eb83476ea168ec163b613f9abd12bbfddba2"},
+    {file = "mkdocs_material_extensions-1.0.3-py3-none-any.whl", hash = "sha256:a82b70e533ce060b2a5d9eb2bc2e1be201cf61f901f93704b4acf6e3d5983a44"},
 ]
 mock = [
     {file = "mock-4.0.3-py3-none-any.whl", hash = "sha256:122fcb64ee37cfad5b3f48d7a7d51875d7031aaf3d8be7c42e2bee25044eee62"},

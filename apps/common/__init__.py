@@ -6,11 +6,11 @@ import os.path
 from textwrap import wrap
 import pendulum
 
-from main import db, mail, external_url
+from main import db, external_url
 from flask import session, render_template, abort, current_app as app, Markup
 from flask.json import jsonify
 from flask_login import login_user, current_user
-from flask_mail import Message
+from flask_mailman import EmailMessage
 from werkzeug.wrappers import BaseResponse
 from werkzeug.exceptions import HTTPException
 from jinja2.utils import urlize
@@ -147,9 +147,9 @@ def load_utility_functions(app_obj):
 
 
 def send_template_email(subject, to, sender, template, **kwargs):
-    msg = Message(subject, recipients=[to], sender=sender)
+    msg = EmailMessage(subject, to=[to], from_email=sender)
     msg.body = render_template(template, **kwargs)
-    mail.send(msg)
+    msg.send()
 
 
 def create_current_user(email: str, name: str):

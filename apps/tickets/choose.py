@@ -9,10 +9,10 @@ from flask import (
     current_app as app,
 )
 from flask_login import current_user
-from flask_mail import Message
+from flask_mailman import EmailMessage
 from sqlalchemy.orm import joinedload
 
-from main import db, mail
+from main import db
 from models.exc import CapacityException
 from models.product import PriceTier, ProductView, ProductViewProduct, Product, Voucher
 from models.basket import Basket
@@ -249,10 +249,10 @@ def handle_free_tickets(flow: str, view: ProductView, basket: Basket):
 
     Basket.clear_from_session()
 
-    msg = Message(
+    msg = EmailMessage(
         "Your EMF ticket order",
-        sender=app.config["TICKETS_EMAIL"],
-        recipients=[current_user.email],
+        from_email=app.config["TICKETS_EMAIL"],
+        to=[current_user.email],
     )
 
     already_emailed = set_tickets_emailed(current_user)
@@ -265,7 +265,7 @@ def handle_free_tickets(flow: str, view: ProductView, basket: Basket):
     if feature_enabled("ISSUE_TICKETS"):
         attach_tickets(msg, current_user)
 
-    mail.send(msg)
+    msg.send()
 
     if len(basket.purchases) == 1:
         flash("Your ticket has been confirmed")
