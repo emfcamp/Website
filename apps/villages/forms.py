@@ -4,7 +4,6 @@ from wtforms import (
     SelectField,
     TextAreaField,
     IntegerField,
-    BooleanField,
 )
 from wtforms.validators import Optional, Length, URL
 
@@ -37,8 +36,6 @@ class VillageForm(Form):
     structures = TextAreaField("Large structures", [Optional()])
 
     submit = SubmitField("Submit")
-
-    workshop = BooleanField("We would like to be a workshop village", default=False)
 
     def populate(self, village):
         self.name.data = village.name
