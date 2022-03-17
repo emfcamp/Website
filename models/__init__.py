@@ -191,5 +191,9 @@ from .map import *  # noqa: F401,F403
 from .admin_message import *  # noqa: F401,F403
 from .volunteer import *  # noqa: F401,F403
 from .village import *  # noqa: F401,F403
+from .scheduled_task import *  # noqa: F401,F403
+from .feature_flag import *  # noqa: F401,F403
+from .site_state import *  # noqa: F401,F403
+
 
 db.configure_mappers()

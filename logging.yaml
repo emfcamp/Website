@@ -47,3 +47,5 @@ loggers:
     level: WARN
   flask_caching:
     level: INFO
+  blib2to3.pgen2.driver:
+    level: INFO
