@@ -120,7 +120,7 @@ def user(db):
 
 @pytest.fixture
 def outbox(app):
-    "Capture mail and yield the outbox."
-    mail_obj = Mail()
-    with mail_obj.record_messages() as outbox:
-        yield outbox
+    "Yield the outbox"
+    mail = Mail(app)
+    mail.get_connection()
+    yield mail.outbox
