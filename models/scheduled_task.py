@@ -56,18 +56,23 @@ class ScheduledTaskResult(BaseModel):
         self.duration = pendulum.now() - self.start_time
 
     @classmethod
-    def get_latest_run(cls, name):
+    def get_latest_run(cls, name, session=None):
+        if session is None:
+            session = db.session
         return (
-            cls.query.filter_by(name=name)
+            session.query(cls)
+            .filter_by(name=name)
             .order_by(ScheduledTaskResult.start_time.desc())
             .limit(1)
             .one_or_none()
         )
 
     @classmethod
-    def cleanup(cls):
+    def cleanup(cls, session=None):
         """Delete results older than a week"""
-        cls.query.filter(
+        if session is None:
+            session = db.session
+        session.query(cls).filter(
             cls.start_time < pendulum.now() - pendulum.duration(days=7)
         ).delete()
 
@@ -89,13 +94,15 @@ def scheduled_task(**kwargs):
 
 
 def execute_scheduled_tasks():
+    # Create a new session, so tasks calling commit don't free our lock
+    session = db.create_scoped_session()
+
     # Take an exclusive lock on the ScheduledTaskResult table to prevent tasks colliding
-    db.session.execute(
-        f"LOCK TABLE {ScheduledTaskResult.__tablename__} IN EXCLUSIVE MODE"
-    )
+    session.execute(f"LOCK TABLE {ScheduledTaskResult.__tablename__} IN EXCLUSIVE MODE")
+
     tasks_to_run = []
     for task in tasks:
-        res = ScheduledTaskResult.get_latest_run(task.name)
+        res = ScheduledTaskResult.get_latest_run(task.name, session)
         if res is None or res.start_time + task.duration < pendulum.now():
             tasks_to_run.append(task)
 
@@ -105,11 +112,17 @@ def execute_scheduled_tasks():
         result = ScheduledTaskResult(task.name)
         try:
             result.result["returnval"] = task.func()
-        except Exception as e:
-            result.result["exception"] = repr(e)
-        result.finish()
-        db.session.add(result)
 
-    ScheduledTaskResult.cleanup()
-    db.session.commit()
+        except Exception as e:
+            log.error(f"Exception in {task.name}: {repr(e)}")
+            result.result["exception"] = repr(e)
+
+        # Clean up the main session whatever happens
+        db.session.rollback()
+
+        result.finish()
+        session.add(result)
+
+    ScheduledTaskResult.cleanup(session)
+    session.commit()
     log.info("Tasks complete.")
