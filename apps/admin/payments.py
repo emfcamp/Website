@@ -141,7 +141,7 @@ def send_reminder(payment_id):
                 return redirect(url_for("admin.expiring"))
 
             msg = Message(
-                "Electromagnetic Field ticket purchase update",
+                "Electromagnetic Field: Ticket payment not received",
                 sender=app.config["TICKETS_EMAIL"],
                 recipients=[payment.user.email],
             )
