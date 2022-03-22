@@ -72,6 +72,7 @@
 
 <table class="table">
     <tr>
+        <th></th>
         <th>Rank</th>
         <th>Type</th>
         <th>Submitter</th>
@@ -79,6 +80,7 @@
     </tr>
 {% for (prop, score) in proposals %}
     <tr {% if preview and score >= min_score %} class="info" {% endif %}>
+        <td><small>{{ loop.index }}.</small></td>
         <td>{{ score }}</td>
         <td>{{prop.human_type | capitalize}}</td>
         <td>{{prop.user.name}}</td>
