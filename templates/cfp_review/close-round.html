@@ -13,6 +13,43 @@
         Proposals to be set as 'reviewed' are like <span class="bg-info">this.</span>
     </p>
 {% endif %}
+
+{% if duplicates %}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a role="button" data-toggle="collapse" data-target="#duplicatesPanel"
+                aria-controls="duplicatesPanel" aria-expanded="true">
+                These users have other proposals
+            </a>
+        </h4>
+    </div>
+    <div class="panel-body collapse" id="duplicatesPanel">
+        <table class="table">
+            <tr>
+                <th>User</th>
+                <th>Type</th>
+                <th>State</th>
+                <th>Title</th>
+            </tr>
+            {% for (user, proposals) in duplicates.items() %}
+                <tr>
+                    <td rowspan="{{ proposals.count() }}">{{ user.name }}</td>
+                {% for prop in proposals %}
+                    {% if not loop.first %}
+                    <tr>
+                    {% endif %}
+                    <td>{{ prop.type }}</td>
+                    <td>{{ prop.state }}</td>
+                    <td><a href="{{ url_for('.update_proposal', proposal_id=prop.id) }}">{{prop.title}}</a></td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endif %}
+
 <br>
 <table class="table">
     <tr>

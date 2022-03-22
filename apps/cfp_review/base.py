@@ -764,10 +764,20 @@ def close_round():
             if "min_votes" in session:
                 del session["min_votes"]
 
+    # Find proposals where the submitter has already had an accepted proposal
+    # or another proposal in this list
+    duplicates = {}
+    for (prop, _) in proposals:
+        if prop.user.proposals.count() > 1:
+            # Only add each proposal once
+            if prop.user not in duplicates:
+                duplicates[prop.user] = prop.user.proposals
+
     return render_template(
         "cfp_review/close-round.html",
         form=form,
         proposals=proposals,
+        duplicates=duplicates,
         preview=preview,
         min_votes=session.get("min_votes"),
     )
