@@ -46,6 +46,15 @@ a:hover {
     }
 }
 
+.content-well {
+  background-color: $content-well-background;
+  color: $main-background-text;
+  
+  h3 {
+    margin-top: 0;
+  }
+}
+
 .panel {
     display: block;
 }
