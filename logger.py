@@ -2,6 +2,7 @@ from enum import Enum
 import logging
 import os
 
+
 class AnsiColors(Enum):
     RESET = 0
     BOLD = 1
@@ -19,16 +20,22 @@ class AnsiColors(Enum):
 
     @classmethod
     def sgr(cls, *codes):
-        return AnsiColors.CSI.value + ";".join([str(AnsiColors[c].value) for c in codes]) + "m"
+        return (
+            AnsiColors.CSI.value
+            + ";".join([str(AnsiColors[c].value) for c in codes])
+            + "m"
+        )
+
 
 # modified from http://plumberjack.blogspot.co.uk/2010/12/colorizing-logging-output-in-terminals.html
 
+
 class ColorizingStreamHandler(logging.StreamHandler):
     DEFAULT_COLORS = {
-        'DEBUG': 'BLUE',
-        'WARNING': 'YELLOW',
-        'ERROR': 'RED',
-        'CRITICAL': ['RED', 'BOLD'],
+        "DEBUG": "BLUE",
+        "WARNING": "YELLOW",
+        "ERROR": "RED",
+        "CRITICAL": ["RED", "BOLD"],
     }
 
     def __init__(self, stream=None, colors=None):
@@ -43,7 +50,7 @@ class ColorizingStreamHandler(logging.StreamHandler):
                 v = [v]
             self.colors[k] = AnsiColors.sgr(*v)
 
-        self.should_colorize = self.is_tty or os.getenv('COLORIZE_LOGS') == 'always'
+        self.should_colorize = self.is_tty or os.getenv("COLORIZE_LOGS") == "always"
 
     @property
     def is_tty(self):
@@ -62,8 +69,8 @@ class ColorizingStreamHandler(logging.StreamHandler):
         color = self.colors.get(record.levelname)
         if color:
             lines = message.splitlines()
-            lines_colorized = [color + line + AnsiColors.sgr('RESET') for line in lines]
-            message = '\n'.join(lines_colorized)
+            lines_colorized = [color + line + AnsiColors.sgr("RESET") for line in lines]
+            message = "\n".join(lines_colorized)
         return message
 
     def format(self, record):
