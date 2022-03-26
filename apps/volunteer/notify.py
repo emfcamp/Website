@@ -1,7 +1,7 @@
 from flask import current_app as app
 from flask_mail import Message
 
-from models.notify import VolunteerNotifyJob, VolunteerNotifyRecipient
+from models.volunteer.notify import VolunteerNotifyJob, VolunteerNotifyRecipient
 from main import db, mail
 from apps.common.email import format_trusted_html_email, format_trusted_plaintext_email
 

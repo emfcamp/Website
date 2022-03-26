@@ -8,7 +8,7 @@ from apps.common.forms import Form
 from apps.common.email import (
     format_trusted_html_email,
 )
-from apps.common.notify import preview_trusted_notify, enqueue_trusted_notify
+from apps.volunteer.notify import preview_trusted_notify, enqueue_trusted_notify
 from apps.common import require_permission
 
 notify = Blueprint("volunteer_admin_notify", __name__)
