@@ -7,7 +7,7 @@
                 <small>(ctrl/&#8984; or shift click for multiple)</small>
             </label>
             <div class="col-sm-8">
-                <select id="role-select" name="role" multiple="multiple" class="form-control">
+                <select id="role-select" name="role" multiple="multiple" class="form-control shift-filter">
                     {% for r in roles %}
                         <option id='role-opt-{{r.id}}' value="{{r.id}}">{{r.name}}</option>
                     {% endfor %}
@@ -19,7 +19,7 @@
         <div class="form-group">
             <div class="checkbox">
                 <label>
-                    <input id="is_trained" type="checkbox">
+                    <input id="is_trained" type="checkbox" class="role-filter">
                     I am trained for
                 </label>
             </div>
@@ -27,7 +27,7 @@
         <div class="form-group">
             <div class="checkbox">
                 <label>
-                    <input id="is_interested" type="checkbox">
+                    <input id="is_interested" type="checkbox" class="role-filter">
                     I am interested in
                 </label>
             </div>
@@ -35,7 +35,7 @@
         <div class="form-group">
             <div class="checkbox">
                 <label>
-                    <input id="show_past" type="checkbox">
+                    <input id="show_past" type="checkbox" class="shift-filter">
                     Show finished shifts
                 </label>
             </div>
@@ -43,7 +43,7 @@
         <div class="form-group">
             <div class="checkbox">
                 <label>
-                    <input id="show_signed_up_only" type="checkbox">
+                    <input id="show_signed_up_only" type="checkbox" class="shift-filter">
                     I'm signed up for
                 </label>
             </div>
@@ -51,7 +51,7 @@
         <div class="form-group">
             <div class="checkbox">
                 <label>
-                    <input id="hide_full" type="checkbox">
+                    <input id="hide_full" type="checkbox" class="shift-filter">
                     Hide full shifts
                 </label>
             </div>
@@ -59,7 +59,7 @@
         <div class="form-group">
             <div class="checkbox">
                 <label>
-                    <input id="is_understaffed" type="checkbox">
+                    <input id="is_understaffed" type="checkbox" class="shift-filter">
                     Only understaffed shifts
                 </label>
             </div>
@@ -75,7 +75,6 @@
     <fieldset class="form-horizontal col-sm-12">
         <div class="form-group">
             <div class="btn-group">
-                <a id="filter-btn" class="btn btn-primary">Apply</a>
                 <a id="clear-btn" class="btn btn-default">Clear</a>
             </div>
         </div>

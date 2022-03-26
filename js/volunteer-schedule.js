@@ -24,6 +24,8 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
                 day_ele.append(rows);
             }
         });
+
+        save_filters();
     }
 
     function prepend_hour_cell(row, hour, rowspan) {
@@ -226,7 +228,9 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
     }
 
     function fails_filters(filters, shift) {
-        if (filters.role_ids.length > 0 && !is_in(filters.role_ids, shift.role_id)) {
+        let role_ids = filters.role_ids.map(id => parseInt(id));
+
+        if (role_ids.length > 0 && role_ids.indexOf(shift.role_id) != -1) {
             return true;
         }
 
@@ -250,19 +254,11 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
     }
 
     function get_filters() {
-        // TODO logic for trained/interested shifts
         var show_past = $('#show_past').prop('checked'),
             show_signed_up_only = $('#show_signed_up_only').prop('checked'),
             hide_full = $('#hide_full').prop('checked'),
             understaffed_only = $('#is_understaffed').prop('checked'),
-            role_ids = [],
-            raw_role_ids = $('#role-select').val() || [];
-
-        if (raw_role_ids) {
-            $.each(raw_role_ids, function (_, val) {
-                role_ids.push(parseInt(val));
-            });
-        }
+            role_ids = $('#role-select').val() || [];
 
         return {
             role_ids: role_ids,
@@ -290,6 +286,8 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
 
             $('#role-opt-'+role.id).prop('selected', selected);
         });
+
+        render();
     }
 
     function clear_filters() {
@@ -301,24 +299,46 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
         $('#show_signed_up_only').prop('checked', false);
         $('#is_interested').prop('checked', false);
         $('#is_trained').prop('checked', false);
-        $('#colourful_mode').prop('checked', false);
         $('#is_understaffed').prop('checked', false);
+        $('#colourful_mode').prop('checked', false);
         render();
     }
 
-    function is_in(arr, test){
-        var res = false;
-
-        if (!arr || !test) {
-            return false;
+    function save_filters() {
+        let filters = {
+            role_ids: $('#role-select').val(),
+            show_past: $('#show_past').prop('checked'),
+            hide_full: $('#hide_full').prop('checked'),
+            show_signed_up_only: $('#show_signed_up_only').prop('checked'),
+            is_trained: $('#is_trained').prop('checked'),
+            is_interested: $('#is_interested').prop('checked'),
+            is_understaffed: $('#is_understaffed').prop('checked'),
+            colourful_mode: $('#colourful_mode').prop('checked'),
         }
 
-        $.each(arr, function(_, val){
-            if (test === val) {
-                res = true;
-            }
-        });
-        return res;
+        localStorage.setItem('volunteer-filters:v1', JSON.stringify(filters));
+    }
+
+    function load_filters() {
+        let raw_saved_filters = localStorage.getItem('volunteer-filters:v1');
+        if (raw_saved_filters == null) { return; }
+        let filters = JSON.parse(raw_saved_filters);
+
+        $('#role-select').val(filters.role_ids);
+        $('#show_past').prop('checked', filters.show_past);
+        $('#hide_full').prop('checked', filters.hide_full);
+        $('#show_signed_up_only').prop('checked', filters.show_signed_up_only);
+        $('#is_interested').prop('checked', filters.is_interested);
+        $('#is_trained').prop('checked', filters.is_trained);
+        $('#is_understaffed').prop('checked', filters.is_understaffed);
+        $('#colourful_mode').prop('checked', filters.colourful_mode);
+    }
+
+    // When explicitly selecting roles turn off the filters that would override
+    // that selection.
+    function roles_selected() {
+        $('#is_interested').prop('checked', false);
+        $('#is_trained').prop('checked', false);
     }
 
 
@@ -340,14 +360,14 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
     });
 
     // Filter buttons
-    $('#filter-btn').click(render);
     $('#clear-btn').click(clear_filters);
 
     $('#signUp').on('hide.bs.modal', render);
 
-    $('#is_interested').on('change', set_roles);
-    $('#is_trained').on('change', set_roles);
-
-    set_roles();
+    load_filters();
     render();
+    
+    $('#role-select').on('change', roles_selected);
+    $('.shift-filter').on('change', render);
+    $('.role-filter').on('change', set_roles);
 };
