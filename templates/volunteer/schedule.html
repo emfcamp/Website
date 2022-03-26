@@ -124,9 +124,13 @@
             </div>
           </div>
           <div class="modal-footer">
+            <div id="signup-grp" class="input-group">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button id='signUpBtn' type="button" class="btn btn-primary">Sign Up</button>
+            </div>
             {% if current_user.has_permission('volunteer:admin') %}
-
-                <div class="input-group">
+              
+                <div class="input-group" id="shift-admin">
                     <select id="override-user" class="form-control">
                         {% for volunteer in all_volunteers %}
                         <option value="{{ volunteer.user_id }}">{{ volunteer.nickname }} &lt;{{ volunteer.volunteer_email }}&gt;</option>
@@ -138,10 +142,7 @@
 
                 </div>
             {% endif %}
-            <div id="signup-grp" class="input-group">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button id='signUpBtn' type="button" class="btn btn-primary">Sign Up</button>
-            </div>
+
           </div>
         </div>
       </div>
@@ -162,7 +163,12 @@
         $('#tabnav-sat a').attr('href', '#sat');
         $('#tabnav-sun a').attr('href', '#sun');
         $('#tabnav-mon a').attr('href', '#mon');
-        $('#is_interested').attr('checked', true);
+      $('#is_interested').attr('checked', true);
+      $('#signUp').on('hidden.bs.modal', function(e) {
+        // clear messages
+        console.log('Close callback triggered.');
+        $('.alert').remove();
+      });
 
         var volunteer_shifts = {{ all_shifts | tojson }},
             volunteer_roles = {{ roles | tojson }},
