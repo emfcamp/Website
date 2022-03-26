@@ -225,20 +225,6 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
         data[day_index][hour_index][arr_index] = shift;
     }
 
-    function clear_filters() {
-        $('#role-select > option').each(function(_, ele) {
-            $(ele).attr('selected', false);
-        });
-        $('#show_past').prop('checked', false);
-        $('#hide_full').prop('checked', false);
-        $('#show_signed_up_only').prop('checked', false);
-        $('#is_interested').prop('checked', false);
-        $('#is_trained').prop('checked', false);
-        $('#colourful_mode').prop('checked', false);
-        $('#is_understaffed').prop('checked', false);
-        render();
-    }
-
     function fails_filters(filters, shift) {
         if (filters.role_ids.length > 0 && !is_in(filters.role_ids, shift.role_id)) {
             return true;
@@ -287,6 +273,39 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
         };
     }
 
+    function set_roles() {
+        var is_interested = $('#is_interested').prop('checked'),
+            is_trained = $('#is_trained').prop('checked');
+
+        $.each(all_roles, function(_, role) {
+            let selected = true;
+
+            if (is_interested && !role.is_interested) {
+                selected = false;
+            }
+
+            if (is_trained && (role.requires_training && !role.is_trained)) {
+                selected = false;
+            }
+
+            $('#role-opt-'+role.id).prop('selected', selected);
+        });
+    }
+
+    function clear_filters() {
+        $('#role-select > option').each(function(_, ele) {
+            $(ele).attr('selected', false);
+        });
+        $('#show_past').prop('checked', false);
+        $('#hide_full').prop('checked', false);
+        $('#show_signed_up_only').prop('checked', false);
+        $('#is_interested').prop('checked', false);
+        $('#is_trained').prop('checked', false);
+        $('#colourful_mode').prop('checked', false);
+        $('#is_understaffed').prop('checked', false);
+        render();
+    }
+
     function is_in(arr, test){
         var res = false;
 
@@ -300,23 +319,6 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
             }
         });
         return res;
-    }
-
-    function set_roles() {
-        var is_interested = $('#is_interested').prop('checked'),
-            is_trained = $('#is_trained').prop('checked');
-
-        $.each(all_roles, function(_, role) {
-            $('#role-opt-'+role.id).prop('selected', false);
-        });
-        $.each(all_roles, function(_, role) {
-            if (is_interested && !role.is_interested) {
-                return;
-            } else if (is_trained && (role.is_trained || role.requires_training)) {
-                return;
-            }
-            $('#role-opt-'+role.id).prop('selected', true);
-        });
     }
 
 

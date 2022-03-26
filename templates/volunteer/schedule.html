@@ -15,7 +15,7 @@
         <tbody id="tbody-{{ day }}">
             {% for hour in all_shifts[day] | sort %}
                 {% for shift in all_shifts[day][hour] %}
-                    <tr>
+                    <tr style="display: none">
                         {% if loop.first %}
                             <td rowspan="{{ all_shifts[day][hour] | length }}">{{ hour }}</td>
                         {% endif %}
