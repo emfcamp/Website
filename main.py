@@ -224,6 +224,7 @@ def create_app(dev_server=False, config_override=None):
             "'sha256-XOlW2U5UiDeV2S/HgKqbp++Fo1I5uiUT2thFRUeFW/g='",  # View record
             "'unsafe-hashes'",
             "'sha256-2rvfFrggTCtyF5WOiTri1gDS8Boibj4Njn0e+VCBmDI='",  # return false;
+            "'sha256-gC0PN/M+TSxp9oNdolzpqpAA+ZRrv9qe1EnAbUuDmk8='",  # return modelActions.execute('notify');
         ]
 
         if app.config.get("DEBUG_TB_ENABLED"):
