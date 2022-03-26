@@ -229,8 +229,7 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
 
     function fails_filters(filters, shift) {
         let role_ids = filters.role_ids.map(id => parseInt(id));
-
-        if (role_ids.length > 0 && role_ids.indexOf(shift.role_id) != -1) {
+        if (role_ids.length > 0 && role_ids.indexOf(shift.role_id) == -1) {
             return true;
         }
 
