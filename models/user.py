@@ -184,7 +184,6 @@ class User(BaseModel, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, unique=True, index=True)
     name = db.Column(db.String, nullable=False, index=True)
-    phone = db.Column(db.String, nullable=True)
     company = db.Column(db.String)
     will_have_ticket = db.Column(
         db.Boolean, nullable=False, default=False
