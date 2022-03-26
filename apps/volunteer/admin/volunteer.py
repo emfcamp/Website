@@ -1,6 +1,8 @@
 from ..flask_admin_base import VolunteerModelView
 
 from . import volunteer_admin
+from flask import redirect, session, url_for
+from flask_admin.actions import action
 from main import db
 from models.volunteer.volunteer import Volunteer
 
@@ -48,6 +50,11 @@ class VolunteerUserModelView(VolunteerModelView):
     )
     form_excluded_columns = ("user", "versions")
     page_size = 50  # the number of entries to display on the list view
+
+    @action("notify", "Notify")
+    def action_notify(self, ids):
+        session["recipients"] = list(ids)
+        return redirect(url_for("volunteer_admin_notify.main"))
 
 
 # Add menu item Volunteers
