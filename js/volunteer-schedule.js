@@ -307,14 +307,15 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
         var is_interested = $('#is_interested').prop('checked'),
             is_trained = $('#is_trained').prop('checked');
 
-        $('#role-select').prop('selected', false);
+        $.each(all_roles, function(_, role) {
+            $('#role-opt-'+role.id).prop('selected', false);
+        });
         $.each(all_roles, function(_, role) {
             if (is_interested && !role.is_interested) {
                 return;
-            } else if (is_trained && !role.is_trained) {
+            } else if (is_trained && (role.is_trained || role.requires_training)) {
                 return;
             }
-
             $('#role-opt-'+role.id).prop('selected', true);
         });
     }
