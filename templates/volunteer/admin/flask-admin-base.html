@@ -36,38 +36,45 @@
     <div class="non-prod-banner alert-warning">This is not the production site. Please <a href="https://www.emfcamp.org/">click here</a> to learn more about Electromagnetic Field.</div>
     {% endif %}
     {% block page_body %}
+
+    <nav class="navbar navbar-default" role="navigation">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#admin-navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        {% block brand %}
+        <a class="navbar-brand" href="{{ admin_view.admin.url }}">{{ admin_view.admin.name }}</a>
+        {% endblock %}
+      </div>
+      <!-- navbar content -->
+      <div class="collapse navbar-collapse" id="admin-navbar-collapse">
+        {% block main_menu %}
+        <ul class="nav navbar-nav">
+          {{ layout.menu() }}
+          <li>
+              <a href="{{url_for('volunteer_admin_notify.main')}}">Notifications</a>
+          </li>
+        </ul>
+        {% endblock %}
+
+        {% block menu_links %}
+        <ul class="nav navbar-nav navbar-right">
+          {{ layout.menu_links() }}
+          <li>
+              <a href="{{url_for('admin.home')}}">Back to admin</a>
+          </li>
+        </ul>
+        {% endblock %}
+        {% block access_control %}
+        {% endblock %}
+      </div>
+    </nav>
+
     <div class="container">
-      <nav class="navbar navbar-default" role="navigation">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#admin-navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          {% block brand %}
-          <a class="navbar-brand" href="{{ admin_view.admin.url }}">{{ admin_view.admin.name }}</a>
-          {% endblock %}
-        </div>
-        <!-- navbar content -->
-        <div class="collapse navbar-collapse" id="admin-navbar-collapse">
-          {% block main_menu %}
-          <ul class="nav navbar-nav">
-            {{ layout.menu() }}
-          </ul>
-          {% endblock %}
-
-          {% block menu_links %}
-          <ul class="nav navbar-nav navbar-right">
-            {{ layout.menu_links() }}
-          </ul>
-          {% endblock %}
-          {% block access_control %}
-          {% endblock %}
-        </div>
-      </nav>
-
       {% block messages %}
       {{ layout.messages() }}
       {% endblock %}
