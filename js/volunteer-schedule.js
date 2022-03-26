@@ -237,6 +237,33 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
         $('#is_trained').prop('checked', false);
         $('#colourful_mode').prop('checked', false);
         $('#is_understaffed').prop('checked', false);
+
+        localStorage.removeItem('volunteer-schedule-filters');
+        render();
+    }
+
+    function load_filters() {
+        let saved_filters = localStorage.getItem('volunteer-schedule-filters');
+        if (saved_filters === null) {
+            return;
+        }
+
+        let filters = JSON.parse(saved_filters);
+        $('#role-select > option').each(function(_, ele) {
+            let e = $(ele);
+            let role_id = parseInt(e.attr('value'));
+            let selected = filters.role_ids.indexOf(role_id) != -1;
+
+            e.attr('selected', selected);
+        });
+        $('#show_past').prop('checked', filters.show_past);
+        $('#hide_full').prop('checked', filters.hide_full);
+        $('#show_signed_up_only').prop('checked', filters.show_signed_up_only);
+        $('#is_interested').prop('checked', filters.is_interested);
+        $('#is_trained').prop('checked', filters.is_trained);
+        $('#colourful_mode').prop('checked', filters.colourful_mode);
+        $('#is_understaffed').prop('checked', filters.understaffed_only); 
+
         render();
     }
 
@@ -271,7 +298,11 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
             hide_full = $('#hide_full').prop('checked'),
             understaffed_only = $('#is_understaffed').prop('checked'),
             role_ids = [],
-            raw_role_ids = $('#role-select').val() || [];
+            raw_role_ids = $('#role-select').val() || [],
+            colourful_mode = $('#colourful_mode').prop('checked'),
+            is_intereseted = $('#is_interested').prop('checked'),
+            is_trained = $('#is_trained').prop('checked'),
+            is_understaffed = $('#is_understaffed').prop('checked');
 
         if (raw_role_ids) {
             $.each(raw_role_ids, function (_, val) {
@@ -279,13 +310,20 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
             });
         }
 
-        return {
+        let filters = {
             role_ids: role_ids,
             show_past: show_past,
             hide_full: hide_full,
             understaffed_only: understaffed_only,
             show_signed_up_only: show_signed_up_only,
-        };
+            is_intereseted: is_intereseted,
+            is_trained: is_trained,
+            is_understaffed: is_understaffed,
+            colourful_mode: colourful_mode,
+        }
+
+        localStorage.setItem('volunteer-schedule-filters', JSON.stringify(filters));
+        return filters;
     }
 
     function is_in(arr, test){
@@ -346,6 +384,7 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
     $('#is_interested').on('change', set_roles);
     $('#is_trained').on('change', set_roles);
 
+    load_filters();
 
     render();
 };
