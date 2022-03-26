@@ -163,11 +163,12 @@
         $('#tabnav-sat a').attr('href', '#sat');
         $('#tabnav-sun a').attr('href', '#sun');
         $('#tabnav-mon a').attr('href', '#mon');
-      $('#is_interested').attr('checked', true);
-      $('#signUp').on('hidden.bs.modal', function(e) {
-        // clear messages
-        $('.alert').remove();
-      });
+        $('#is_trained').attr('checked', true);
+        $('#colourful_mode').attr('checked', true);
+        $('#signUp').on('hidden.bs.modal', function(e) {
+          // clear messages
+          $('.alert').remove();
+        });
 
         var volunteer_shifts = {{ all_shifts | tojson }},
             volunteer_roles = {{ roles | tojson }},
