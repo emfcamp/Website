@@ -1,4 +1,4 @@
-from flask import current_app as app
+from flask import abort
 from flask_login import current_user
 from flask_admin import BaseView, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
@@ -13,7 +13,7 @@ class FlaskVolunteerAdminAppMixin:
         return False
 
     def inaccessible_callback(self, name, **kwargs):
-        return app.login_manager.unauthorized()
+        abort(404)
 
     def get_url(self, endpoint, **kwargs):
         # Hack to use some of the stuff set up for admin
