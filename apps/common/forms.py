@@ -1,6 +1,6 @@
 import json
 
-from flask import Markup
+from flask import Markup, current_app as app
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, SelectField, StringField, ValidationError
 from wtforms.widgets import Input, HiddenInput
@@ -20,8 +20,13 @@ class EmailField(StringField):
     widget = EmailInput()
 
     def pre_validate(self, form):
+        check_deliverability = True
+        if app.config.get("DEBUG"):
+            check_deliverability = False
         try:
-            result = validate_email(self.data)
+            result = validate_email(
+                self.data, check_deliverability=check_deliverability
+            )
             # Replace data with normalised version of email
             self.data = result["email"]
         except EmailNotValidError as e:
