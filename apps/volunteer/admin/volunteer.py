@@ -15,8 +15,6 @@ class VolunteerUserModelView(VolunteerModelView):
         "nickname",
         "volunteer_email",
         "volunteer_phone",
-        "planned_arrival",
-        "planned_departure",
         "missing_shifts_opt_in",
         "over_18",
         "allow_comms_during_event",
@@ -26,8 +24,6 @@ class VolunteerUserModelView(VolunteerModelView):
     column_list = (
         "nickname",
         "volunteer_email",
-        "planned_arrival",
-        "planned_departure",
         "banned",
     )
     column_searchable_list = ("nickname", "volunteer_email")
@@ -37,8 +33,6 @@ class VolunteerUserModelView(VolunteerModelView):
         "nickname",
         "volunteer_email",
         "volunteer_phone",
-        "planned_arrival",
-        "planned_departure",
         "interested_roles",
         "trained_roles",
         "missing_shifts_opt_in",

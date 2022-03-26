@@ -36,8 +36,6 @@ class Volunteer(BaseModel, UserMixin):
     __versioned__: dict = {}
 
     id = db.Column(db.Integer, primary_key=True)
-    planned_arrival = db.Column(db.DateTime)
-    planned_departure = db.Column(db.DateTime)
     nickname = db.Column(db.String)
     missing_shifts_opt_in = db.Column(db.Boolean, nullable=False, default=False)
     banned = db.Column(db.Boolean, nullable=False, default=False)
