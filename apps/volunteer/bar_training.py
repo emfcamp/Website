@@ -16,13 +16,6 @@ from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer
 
 
-# TODO: Make template (bar-training.html) pretty
-# TODO: Paginate template using JavaScript
-# TODO: Add proper validation (using JavaScript?), at a minimum ensure that
-# the user can clearly see which questions are invalid.
-# TODO: Implement Jinja tags in Markdown content so that static images can be served
-
-
 def build_questions(training_json):
     """
     Assigns specific IDs to questions and answers so that we can determine which
@@ -132,10 +125,13 @@ def bar_training():
     volunteer = Volunteer.get_for_user(current_user)
     trained = bar in volunteer.trained_roles
 
-    training_json = load_training_json(app.config.get("BAR_TRAINING_JSON"))
+    training_json_path = app.config.get(
+        "BAR_TRAINING_JSON", "models/fixtures/training/bar.json"
+    )
+    training_json = load_training_json(training_json_path)
     if training_json is None:  # Error loading training data
         app.logger.error(
-            f"Bar training failed -- unable to load JSON: '{app.config.get('BAR_TRAINING_JSON')}'"
+            f"Bar training failed -- unable to load JSON: '{training_json_path}'"
         )
         abort(404)
 
