@@ -2,8 +2,7 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
     var current_day = active_day;
 
     function render(){
-        var _ = set_roles(),
-            filters = get_filters(),
+        var filters = get_filters(),
             days_data = data[current_day],
             day_ele = $('#tbody-'+current_day);
 
@@ -347,6 +346,6 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
     $('#is_interested').on('change', set_roles);
     $('#is_trained').on('change', set_roles);
 
-
+    set_roles();
     render();
 };
