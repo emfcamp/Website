@@ -37,7 +37,6 @@ class Volunteer(BaseModel, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     nickname = db.Column(db.String)
-    missing_shifts_opt_in = db.Column(db.Boolean, nullable=False, default=False)
     banned = db.Column(db.Boolean, nullable=False, default=False)
     volunteer_phone = db.Column(db.String, nullable=False)
     volunteer_email = db.Column(db.String)
