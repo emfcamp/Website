@@ -69,7 +69,6 @@ def sign_up():
     if request.method != "POST" and current_user.is_authenticated:
         form.volunteer_email.data = current_user.email
         form.nickname.data = current_user.name
-        form.volunteer_phone.data = current_user.phone
         # Can't try to process age, as that's only submitted as part of the outreach questions
 
     if form.validate_on_submit():
