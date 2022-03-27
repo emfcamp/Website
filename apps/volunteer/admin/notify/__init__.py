@@ -1,26 +1,37 @@
-from flask import abort, Blueprint, render_template, redirect, session, flash, url_for
+from flask import (
+    abort,
+    Blueprint,
+    render_template,
+    redirect,
+    session,
+    flash,
+    url_for,
+    request,
+)
 from flask_login import current_user
 from wtforms import SubmitField, StringField
 from wtforms.validators import DataRequired
 from wtforms.widgets import TextArea
-from models.volunteer import Volunteer
+
+from apps.common import require_permission
 from apps.common.forms import Form
 from apps.common.email import (
     format_trusted_html_email,
 )
+from apps.volunteer.admin import volunteer_admin
 from apps.volunteer.notify import preview_trusted_notify, enqueue_trusted_notify
-from apps.common import require_permission
+from models.volunteer import Volunteer
+
 
 notify = Blueprint("volunteer_admin_notify", __name__)
 
-admin_required = require_permission("admin")  # Decorator to require admin permissions
-volunteer_admin_required = require_permission(
-    "volunteer:admin"
-)  # Decorator to require admin permissions
+# Decorators to require admin permissions
+admin_required = require_permission("admin")
+volunteer_admin_required = require_permission("volunteer:admin")
 
 
 @notify.before_request
-def admin_require_permission():
+def notify_require_permission():
     """Require admin permission for everything under /volunteer/admin"""
     if (
         not current_user.is_authenticated
@@ -28,6 +39,17 @@ def admin_require_permission():
         or not current_user.has_permission("volunteer:admin")
     ):
         abort(404)
+
+
+@notify.context_processor
+def notify_variables():
+    if not request.path.startswith("/volunteer/admin"):
+        return {}
+
+    return {
+        "admin_view": volunteer_admin.index_view,
+        "view_name": request.url_rule.endpoint.replace("volunteer_admin.", "."),
+    }
 
 
 class EmailComposeForm(Form):
@@ -41,9 +63,13 @@ class EmailComposeForm(Form):
 
 @notify.route("/", methods=["GET", "POST"])
 def main():
+    if not session.get("recipients"):
+        return redirect(url_for("volunteer_admin.volunteers"))
+
+    volunteers = Volunteer.query.filter(Volunteer.id.in_(session["recipients"]))
+
     form = EmailComposeForm()
     if form.validate_on_submit():
-        volunteers = Volunteer.query.filter(Volunteer.id.in_(session["recipients"]))
         if form.preview.data is True:
             return render_template(
                 "volunteer/admin/notify.html",
@@ -70,4 +96,8 @@ def main():
             flash("Email queued for sending to %s volunteers" % volunteers.count())
             return redirect(url_for("volunteer_admin_notify.main"))
 
-    return render_template("volunteer/admin/notify.html", form=form)
+    return render_template(
+        "volunteer/admin/notify.html",
+        form=form,
+        count=volunteers.count(),
+    )

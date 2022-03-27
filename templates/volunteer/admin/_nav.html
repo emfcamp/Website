@@ -1,0 +1,45 @@
+{% from "admin/layout.html" import menu_icon %}
+
+{% macro badge(count) %}
+    {% if count > 0 %}
+        <span class="badge">{{count}}</span>
+    {% endif %}
+{% endmacro %}
+
+{% macro menuitem(text, view, badge_count=0) %}
+<li {% if view_name == view -%} class="active" {%- endif %}>
+    <a href="{{url_for(view)}}">{{text}}{{badge(badge_count)}}</a>
+</li>
+{% endmacro %}
+
+{% block main_menu %}
+<ul class="nav navbar-nav">
+    {% if current_user.has_permission('volunteer:admin') %}
+    {%- for item in admin_view.admin.menu() %}
+        {%- if item.is_accessible() and item.is_visible() -%}
+            {% set class_name = item.get_class_name() %}
+            {%- if item.is_active(admin_view) %}
+            <li class="active{% if class_name %} {{class_name}}{% endif %}">
+            {%- else %}
+            <li{% if class_name %} class="{{class_name}}"{% endif %}>
+            {%- endif %}
+              <a href="{{ item.get_url() }}"{% if item.target %} target="{{ item.target }}"{% endif %}>{{ menu_icon(item) }}{{ item.name }}</a>
+            </li>
+        {% endif -%}
+    {% endfor %}
+    {{ menuitem("Notifications", "volunteer_admin_notify.main") }}
+
+    {% endif %}
+</ul>
+{% endblock %}
+
+{% block menu_links %}
+{% if current_user.has_permission('admin') %}
+<ul class="nav navbar-nav navbar-right">
+    {{ menuitem("Back to admin", "admin.home") }}
+    {{ menuitem("CfP", "cfp_review.main") }}
+    {{ menuitem("Villages", "villages.admin") }}
+</ul>
+{% endif %}
+{% endblock %}
+

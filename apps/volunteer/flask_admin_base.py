@@ -38,6 +38,9 @@ class VolunteerAdminIndexView(FlaskVolunteerAdminAppMixin, AdminIndexView):
     # Yes this is should use url_for, but apparently this code's on the way out
     extra_css = ["/static/css/flask-admin.css"]
 
+    def is_visible(self):
+        return False
+
 
 class VolunteerModelView(FlaskVolunteerAdminAppMixin, ModelView):
     pass

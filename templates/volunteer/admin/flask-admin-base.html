@@ -52,23 +52,7 @@
       </div>
       <!-- navbar content -->
       <div class="collapse navbar-collapse" id="admin-navbar-collapse">
-        {% block main_menu %}
-        <ul class="nav navbar-nav">
-          {{ layout.menu() }}
-          <li>
-              <a href="{{url_for('volunteer_admin_notify.main')}}">Notifications</a>
-          </li>
-        </ul>
-        {% endblock %}
-
-        {% block menu_links %}
-        <ul class="nav navbar-nav navbar-right">
-          {{ layout.menu_links() }}
-          <li>
-              <a href="{{url_for('admin.home')}}">Back to admin</a>
-          </li>
-        </ul>
-        {% endblock %}
+        {% include "volunteer/admin/_nav.html" %}
         {% block access_control %}
         {% endblock %}
       </div>

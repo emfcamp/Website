@@ -1,15 +1,15 @@
-{% extends "base.html" %}
+{% extends "volunteer/admin/base.html" %}
 {% block title %}Compose email{% endblock %}
 {% block body %}
 <h2>Send Email</h2>
 
 {% if html %}
     <h3>Preview</h3>
-    <p>To send to {{count}} users.</p>
     <iframe width="640px" height="960px" srcdoc="{{html}}">
     </iframe>
 {% endif %}
 <h3>Compose</h3>
+<p>To send to {{count}} user{% if count != 1 %}s{% endif %}.</p>
 <form method="post">
     {{ form.hidden_tag() }}
     <div class="form-group">
