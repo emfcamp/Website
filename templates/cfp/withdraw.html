@@ -1,3 +1,4 @@
+{% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block title %}Withdraw proposal -- {{ proposal.title }}{% endblock %}
 {% block body %}
@@ -12,8 +13,10 @@
   <dt>Description</dt><dd>{{ proposal.description }}</dd>
 </dl>
 
-<form method="post" action="{{ url_for('.withdraw_proposal', proposal_id=proposal.id) }}" class="shrink pull-right">
+<form method="post" action="{{ url_for('.withdraw_proposal', proposal_id=proposal.id) }}">
   {{ form.hidden_tag() }}
+
+  {{ render_field(form.message, tabindex=1, rows=6) }}
   {{ form.confirm_withdrawal(class_="btn btn-danger") }}
   <a href="{{ url_for('.proposals') }}" class="btn btn-default">Back</a>
 </form>
