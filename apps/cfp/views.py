@@ -392,6 +392,36 @@ def edit_proposal(proposal_id):
     return render_template("cfp/edit.html", proposal=proposal, form=form)
 
 
+class WithdrawalForm(Form):
+    confirm_withdrawal = SubmitField("Confirm proposal withdrawal")
+
+
+@cfp.route("/cfp/proposals/<int:proposal_id>/withdraw", methods=["GET", "POST"])
+@feature_flag("CFP")
+def withdraw_proposal(proposal_id):
+    if current_user.is_anonymous:
+        return redirect(
+            url_for(
+                "users.login", next=url_for(".edit_proposal", proposal_id=proposal_id)
+            )
+        )
+
+    proposal = Proposal.query.get_or_404(proposal_id)
+    if proposal.user != current_user:
+        abort(404)
+
+    form = WithdrawalForm()
+    if form.validate_on_submit():
+        if form.confirm_withdrawal.data:
+            app.logger.info("Proposal %s is being withdrawn.", proposal_id)
+            proposal.set_state("withdrawn")
+            db.session.commit()
+            flash("We've withdrawn your {0.type}, {0.title}.".format(proposal))
+            return redirect(url_for("cfp.proposals"))
+
+    return render_template("cfp/withdraw.html", form=form, proposal=proposal)
+
+
 class AcceptedForm(Form):
     name = StringField("Names for schedule", [DataRequired()])
     title = StringField("Title", [DataRequired()])
