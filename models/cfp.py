@@ -25,17 +25,25 @@ HUMAN_CFP_TYPES = {
 
 # state: [allowed next state, ] pairs
 CFP_STATES = {
-    "edit": ["accepted", "rejected", "new"],
-    "new": ["accepted", "rejected", "checked", "manual-review"],
-    "checked": ["accepted", "rejected", "anonymised", "anon-blocked", "edit"],
-    "rejected": ["accepted", "rejected", "edit"],
-    "cancelled": ["accepted", "rejected", "edit"],
-    "anonymised": ["accepted", "rejected", "reviewed", "edit"],
-    "anon-blocked": ["accepted", "rejected", "reviewed", "edit"],
-    "reviewed": ["accepted", "rejected", "edit", "anonymised"],
-    "manual-review": ["accepted", "rejected", "edit"],
-    "accepted": ["accepted", "rejected", "finished"],
-    "finished": ["rejected", "finished"],
+    "edit": ["accepted", "rejected", "withdrawn", "new"],
+    "new": ["accepted", "rejected", "withdrawn", "checked", "manual-review"],
+    "checked": [
+        "accepted",
+        "rejected",
+        "withdrawn",
+        "anonymised",
+        "anon-blocked",
+        "edit",
+    ],
+    "rejected": ["accepted", "rejected", "withdrawn", "edit"],
+    "cancelled": ["accepted", "rejected", "withdrawn", "edit"],
+    "anonymised": ["accepted", "rejected", "withdrawn", "reviewed", "edit"],
+    "anon-blocked": ["accepted", "rejected", "withdrawn", "reviewed", "edit"],
+    "reviewed": ["accepted", "rejected", "withdrawn", "edit", "anonymised"],
+    "manual-review": ["accepted", "rejected", "withdrawn", "edit"],
+    "accepted": ["accepted", "rejected", "withdrawn", "finished"],
+    "finished": ["rejected", "withdrawn", "finished"],
+    "withdrawn": ["accepted", "rejected", "withdrawn", "edit"],
 }
 
 ORDERED_STATES = [
@@ -51,6 +59,7 @@ ORDERED_STATES = [
     "reviewed",
     "accepted",
     "finished",
+    "withdrawn",
 ]
 
 # Most of these states are the same they're kept distinct for semantic reasons
