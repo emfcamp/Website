@@ -64,7 +64,7 @@ class EmailComposeForm(Form):
 @notify.route("/", methods=["GET", "POST"])
 def main():
     if not session.get("recipients"):
-        return redirect(url_for("volunteer_admin.volunteers"))
+        return redirect(url_for("volunteer_admin_volunteer.index_view"))
 
     volunteers = Volunteer.query.filter(Volunteer.id.in_(session["recipients"]))
 
