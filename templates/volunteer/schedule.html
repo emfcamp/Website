@@ -86,6 +86,7 @@
     </div>
 
     <ul class="nav nav-tabs" role="tablist">
+        {{ tabnav('wed', 'Wednesday', active_day) }}
         {{ tabnav('thu', 'Thursday', active_day) }}
         {{ tabnav('fri', 'Friday', active_day) }}
         {{ tabnav('sat', 'Saturday', active_day) }}
@@ -93,6 +94,7 @@
         {{ tabnav('mon', 'Monday', active_day) }}
     </ul>
     <div class="tab-content">
+        {{ days_shifts('wed', active_day) }}
         {{ days_shifts('thu', active_day) }}
         {{ days_shifts('fri', active_day) }}
         {{ days_shifts('sat', active_day) }}
@@ -155,14 +157,11 @@
     <script src="{{ static_url_for('static', filename='js/volunteer-schedule.js') }}"></script>
     <script type="text/javascript" nonce="{{csp_nonce}}">
         $('#filter-panel').show();
+
         // Set hrefs back for tabs if JS is enabled
-        $('#tabnav-thu a').attr('href', '#thu');
-        $('#tabnav-fri a').attr('href', '#fri');
-        $('#tabnav-sat a').attr('href', '#sat');
-        $('#tabnav-sun a').attr('href', '#sun');
-        $('#tabnav-mon a').attr('href', '#mon');
-        $('#is_trained').attr('checked', true);
-        $('#colourful_mode').attr('checked', true);
+        $('a[data-day').each((_, e) => {
+            $(e).attr('href', '#' + $(e).attr('data-day'));
+        });
         $('#signUp').on('hidden.bs.modal', function(e) {
           // clear messages
           $('.alert').remove();
