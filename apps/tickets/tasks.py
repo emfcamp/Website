@@ -246,6 +246,12 @@ def expire_reserved():
 
     for payment in payments:
         payment.lock()
+
+        if payment.state == "charging":
+            # This should only happen if webhooks aren't getting through
+            app.logger.error("Not cancelling payment %s", payment.id)
+            continue
+
         app.logger.info("Cancelling payment %s", payment.id)
         assert payment.state == "new" and payment.provider in {"stripe"}
         payment.cancel()
