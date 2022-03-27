@@ -393,6 +393,9 @@ def edit_proposal(proposal_id):
 
 
 class WithdrawalForm(Form):
+    message = TextAreaField(
+        "If you're comfortable, please tell us why you're withdrawing"
+    )
     confirm_withdrawal = SubmitField("Confirm proposal withdrawal")
 
 
@@ -413,10 +416,20 @@ def withdraw_proposal(proposal_id):
     form = WithdrawalForm()
     if form.validate_on_submit():
         if form.confirm_withdrawal.data:
+
             app.logger.info("Proposal %s is being withdrawn.", proposal_id)
             proposal.set_state("withdrawn")
+
+            msg = CFPMessage()
+            msg.is_to_admin = True
+            msg.from_user_id = current_user.id
+            msg.proposal_id = proposal_id
+            msg.message = form.message.data
+
+            db.session.add(msg)
             db.session.commit()
             flash("We've withdrawn your {0.type}, {0.title}.".format(proposal))
+
             return redirect(url_for("cfp.proposals"))
 
     return render_template("cfp/withdraw.html", form=form, proposal=proposal)
