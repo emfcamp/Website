@@ -1,14 +1,14 @@
 """remove unused fields
 
 Revision ID: 16c933cc8c28
-Revises: c01161e8f44b
+Revises: 3a3f1d9d6ff0
 Create Date: 2022-03-26 19:21:45.410814
 
 """
 
 # revision identifiers, used by Alembic.
 revision = '16c933cc8c28'
-down_revision = 'c01161e8f44b'
+down_revision = '3a3f1d9d6ff0'
 
 from alembic import op
 import sqlalchemy as sa

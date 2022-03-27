@@ -1,4 +1,4 @@
-"""Add NotificationJobvim
+"""Add NotificationJob
 
 Revision ID: 3a3f1d9d6ff0
 Revises: c01161e8f44b
