@@ -821,6 +821,7 @@ def rank():
                         send_email_for_proposal(prop, reason="accepted")
 
                 else:
+                    prop.set_state("anonymised")
                     if form.confirm_type.data == "accepted_unaccepted":
                         send_email_for_proposal(prop, reason="still-considered")
 

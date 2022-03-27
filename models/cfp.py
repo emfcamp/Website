@@ -32,7 +32,7 @@ CFP_STATES = {
     "cancelled": ["accepted", "rejected", "edit"],
     "anonymised": ["accepted", "rejected", "reviewed", "edit"],
     "anon-blocked": ["accepted", "rejected", "reviewed", "edit"],
-    "reviewed": ["accepted", "rejected", "edit"],
+    "reviewed": ["accepted", "rejected", "edit", "anonymised"],
     "manual-review": ["accepted", "rejected", "edit"],
     "accepted": ["accepted", "rejected", "finished"],
     "finished": ["rejected", "finished"],
