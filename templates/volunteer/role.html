@@ -13,19 +13,7 @@
         <p><strong>You must be over 18 to do this.</strong></p>
     {% endif %}
 
-    {# {% if role.training_required %}
-        <p><strong>Requires training</strong></p>
-    {% endif %} #}
-
-    {% if role.role_notes %}
-        <p><strong>Other notes</strong> {{ role.role_notes }}</p>
-    {% endif %}
-
-    <p>{{ role.description }}</p>
-
-    {% if description %}
-        {{ description }}
-    {% endif %}
+    <p>{{ role.full_description() }}</p>
 
     {% if role.over_18_only %}
         {% if current_volunteer.over_18 %}
