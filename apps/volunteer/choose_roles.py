@@ -11,7 +11,7 @@ from main import db
 from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer as VolunteerUser
 
-from . import volunteer, v_user_required, role_name_to_markdown_file
+from . import volunteer, v_user_required
 from ..common import feature_flag
 from ..common.forms import Form, HiddenIntegerField
 
@@ -105,19 +105,9 @@ def role(role_id):
 
         return redirect(url_for(".choose_role"))
 
-    role_description_file = role_name_to_markdown_file(role.name)
-
-    if path.exists(role_description_file):
-        content = open(role_description_file, "r").read()
-        description = Markup(
-            markdown.markdown(content, extensions=["markdown.extensions.nl2br"])
-        )
-    else:
-        description = None
-
     return render_template(
         "volunteer/role.html",
-        description=description,
+        description=role.full_description,
         role=role,
         current_volunteer=current_volunteer,
     )
