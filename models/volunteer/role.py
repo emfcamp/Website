@@ -5,9 +5,11 @@ from os import path
 
 from .. import BaseModel
 
+
 def role_name_to_markdown_file(role_name):
     res = role_name.lower().replace(" ", "-").replace("/", "-").replace(":", "")
     return "apps/volunteer/role_descriptions/" + res + ".md"
+
 
 class Role(BaseModel):
     __tablename__ = "volunteer_role"
@@ -36,13 +38,11 @@ class Role(BaseModel):
 
     def full_description(self):
         role_description_file = role_name_to_markdown_file(self.name)
-        if (not path.exists(role_description_file)):
+        if not path.exists(role_description_file):
             return self.description
 
         content = open(role_description_file, "r").read()
-        return Markup(
-            markdown(content, extensions=["markdown.extensions.nl2br"])
-        )
+        return Markup(markdown(content, extensions=["markdown.extensions.nl2br"]))
 
     @classmethod
     def get_by_name(cls, name):
