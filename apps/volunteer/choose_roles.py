@@ -1,7 +1,4 @@
-import markdown
-from os import path
-
-from flask import render_template, redirect, url_for, flash, Markup, request
+from flask import render_template, redirect, url_for, flash, request
 from flask_login import current_user
 
 from wtforms import SubmitField, BooleanField, FormField, FieldList
