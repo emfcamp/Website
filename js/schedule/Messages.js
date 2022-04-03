@@ -20,6 +20,8 @@ function Messages() {
     return () => { clearInterval(intervalHandle) }
   }, []);
 
+  if (messages.length === 0) { return null; }
+
   return (
     <div className="messages panel panel-primary">
       <div className="panel-heading">
