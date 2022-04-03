@@ -309,3 +309,8 @@ class SendMessageForm(Form):
 
         if form.send.data and not field.data:
             raise ValidationError("Message is required")
+
+
+class AddNoteForm(Form):
+    notes = TextAreaField("Notes")
+    send = SubmitField("Update notes")
