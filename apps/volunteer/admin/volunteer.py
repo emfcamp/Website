@@ -76,6 +76,7 @@ class VolunteerUserModelView(VolunteerModelView):
 
         # Set the user for the new volunteer record
         model.user = user
+        user.grant_permission("volunteer:user")
         pass
 
 
