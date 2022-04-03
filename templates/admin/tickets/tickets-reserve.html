@@ -36,7 +36,7 @@
     <tr class="{{ loop.cycle('odd', 'even') }}
                {% if f.amount.errors -%} has-error {%- endif %}">
         <td>
-            {{ f.hidden_tag_without('csrf_token') }}
+            {{ f.hidden_tag() }}
             {{ f._tier.parent.parent.name }}
         </td>
         <td>

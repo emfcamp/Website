@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Arrival &amp; Departure Times{% endblock %}
+{% block secondary_nav %}
+  {% include "about/_nav.html" %}
+{% endblock %}
+{# FIXME: EVENT_START, EVENT_END, if you're updating them you need to set times here too! #}
+{% block body %}
+<h2>Arrival &amp; Departure Times</h2>
+
+<ul id="opening-times" class="well">
+  <li>The site is open to the public from: <strong>Thursday 2nd June 10am</strong></li>
+  <li>It closes at: <strong>Monday 6th June 12pm (midday)</strong></li>
+</ul>
+
+<h3>More detailed times</h3>
+
+<p><strong>Thursday 2nd June 10am</strong> -- Gates open. You can be on site from now; it's intended for folks to have a chance to set up their tents, find one another and get comfortable. This is a bank holiday in the UK.
+<p><strong>Friday 3rd June 12pm (midday)</strong> -- Talks start on our stages. This is also a bank holiday in the UK.
+<p><strong>Saturday 4th June</strong> -- Talks continue all day.
+<p><strong>Sunday 5th June (evening)</strong> -- Last talks on our stages, exact time TBC.
+<p><strong>Sunday 5th June (late)</strong> -- Music finishes on our stages, exact time TBC.
+<p><strong>Monday 6th June 12pm (midday)</strong> -- Sites closes to the public.
+
+<h3>Set up &amp; tear down</h3>
+
+<p>The site is not open before <strong>Thursday 10am</strong>. A number of people will be on-site before then setting things up (e.g. volunteers, villages and installations). To be on site during the set-up you must have organised it with us, and received confirmation, before you arrive. Please, do not turn up before Thursday unless we're expecting you.</p>
+
+<p>Similarly, from <strong>Monday 6th midday</strong> we will be tearing down the site and if you're still on-site, you will need to have arranged this with us.</p>
+
+{% endblock %}
+

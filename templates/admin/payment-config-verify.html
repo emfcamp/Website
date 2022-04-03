@@ -1,8 +1,9 @@
 {% extends "admin/base.html" %}
 {% set nav_active = 'payment_config_verify' %}
+{% block title %}Payment Config{% endblock %}
 {% block body %}
 
-<h2>Payment Config Check</h2>
+<h2>Payment Config</h2>
 
 <p>Please find enclosed the results of a cursory check of payment system functionality.</p>
 <p>If you see any emoji crosses you should probably fix them before attempting to sell tickets.</p>
@@ -15,21 +16,7 @@
 {% endfor %}
 </ul>
 
-<h3>GoCardless</h3>
-<ul>
-{% for success, message in gocardless %}
-  <li>{% if success %}✅{% else %}❌<strong>{% endif %}
-      {{message}}{% if not success %}</strong>{% endif %}</li>
-{% endfor %}
-</ul>
-
-<h4>Manual tasks:</h4>
-<ul>
-  <li>Ensure a webhook is configured for the URL <code>{{external_url('payments.gocardless_webhook')}}</code> and the secret matches the <code>GOCARDLESS_WEBHOOK_SECRET</code> config variable.</li>
-  <li>Ensure bank statement reference in GoCardless settings is set correctly (it has the year in).</li>
-</ul>
-
-<h3>TransferWise</h3>
+<h3>Wise</h3>
 <ul>
 {% for success, message in transferwise %}
   <li>{% if success %}✅{% else %}❌<strong>{% endif %}
@@ -37,8 +24,14 @@
 {% endfor %}
 </ul>
 
+<h4>Manual tasks:</h4>
+<ul>
+  <li>Ensure a webhook is configured for the URL <code>{{external_url('payments.wise_webhook')}}</code></li>
+</ul>
+
 <h3>Bank Accounts</h3>
-<table class="table table-condensed">
+<form method="post" action="{{url_for('.activate_payment_config')}}">
+  <table class="table table-condensed">
   <tr>
     <th>Institution</th>
     <th>Currency</th>
@@ -47,6 +40,7 @@
     <th>IBAN</th>
     <th>Sort Code</th>
     <th>Account Number</th>
+    <th></th>
   </tr>
 {% for bank_account in bank_accounts %}
   <tr>
@@ -57,9 +51,16 @@
     <td>{{ bank_account.iban or '' | iban }}</td>
     <td>{{ bank_account.sort_code or '' | sort_code }}</td>
     <td>{{ bank_account.acct_id or '' }}</td>
+    <td>{% if not bank_account.active %}<button class="btn btn-small btn-default" name="activate" value="{{bank_account.id}}">Activate</button>{% endif %}</td>
   </tr>
 {% endfor %}
 </table>
+</form>
+
+<form method="post">
+{{ form.hidden_tag() }}
+{{ form.import_accounts(class_="btn btn-success") }}
+</form>
 
 <h3>Bank Transfer</h3>
 <ul>

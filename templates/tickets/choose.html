@@ -73,7 +73,7 @@ Buy Items
         {% if f.amount.errors -%} has-error {%- endif %}
         {{ row_class.next() }}">
     <td>
-        {{ f.hidden_tag_without('csrf_token') }}
+        {{ f.hidden_tag() }}
         <label for="{{ f.amount.id }}"><b>{{ f._tier.parent.display_name }}</b></label>
         {% if f._tier.parent.description %}<p class="description">{{ f._tier.parent.description }}</p>{% endif %}
     </td>

@@ -5,9 +5,10 @@ from flask import render_template, redirect, flash, url_for, current_app as app
 from flask_login import login_required, current_user
 from flask_mail import Message
 from wtforms import SubmitField, HiddenField
-from wtforms.validators import Required, AnyOf
+from wtforms.validators import DataRequired, AnyOf
 
 from main import db, mail
+from models.payment import BankPayment, BankTransaction
 from ..common import get_user_currency, feature_enabled
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
@@ -17,7 +18,7 @@ from . import payments
 logger = logging.getLogger(__name__)
 
 
-def transfer_start(payment):
+def transfer_start(payment: BankPayment):
     if not feature_enabled("BANK_TRANSFER"):
         return redirect(url_for("tickets.pay"))
 
@@ -32,6 +33,9 @@ def transfer_start(payment):
         days = app.config.get("EXPIRY_DAYS_TRANSFER")
     elif payment.currency == "EUR":
         days = app.config.get("EXPIRY_DAYS_TRANSFER_EURO")
+
+    if days is None:
+        raise Exception("EXPIRY_DAYS_TRANSFER(_EURO) not set")
 
     payment.expires = datetime.utcnow() + timedelta(days=days)
     payment.state = "inprogress"
@@ -57,7 +61,7 @@ def transfer_start(payment):
 
 
 class TransferChangeCurrencyForm(Form):
-    currency = HiddenField("New currency", [Required(), AnyOf(["EUR", "GBP"])])
+    currency = HiddenField("New currency", [DataRequired(), AnyOf(["EUR", "GBP"])])
     change = SubmitField("Change currency")
 
 
@@ -67,7 +71,7 @@ def transfer_waiting(payment_id):
     form = TransferChangeCurrencyForm()
 
     payment = get_user_payment_or_abort(
-        payment_id, "banktransfer", valid_states=["inprogress"]
+        payment_id, "banktransfer", valid_states=["inprogress", "paid"]
     )
 
     if payment.currency == "GBP":
@@ -76,7 +80,7 @@ def transfer_waiting(payment_id):
         form.currency.data = "GBP"
 
     return render_template(
-        "transfer-waiting.html",
+        "payments/transfer-waiting.html",
         payment=payment,
         account=payment.recommended_destination,
         form=form,
@@ -107,7 +111,7 @@ def transfer_change_currency(payment_id):
             payment.change_currency(currency)
             db.session.commit()
 
-            logging.info("Payment %s changed to %s", payment.id, currency)
+            logger.info("Payment %s changed to %s", payment.id, currency)
             flash("Currency changed to {}".format(currency))
 
         return redirect(url_for("payments.transfer_waiting", payment_id=payment.id))
@@ -138,15 +142,99 @@ def transfer_cancel(payment_id):
             payment.cancel()
             db.session.commit()
 
-            logging.info("Payment %s cancelled", payment.id)
+            logger.info("Payment %s cancelled", payment.id)
             flash("Payment cancelled")
 
         return redirect(url_for("users.purchases"))
 
-    return render_template("transfer-cancel.html", payment=payment, form=form)
+    return render_template("payments/transfer-cancel.html", payment=payment, form=form)
 
 
-def send_confirmation(payment):
+def reconcile_txns(txns: list[BankTransaction], doit: bool = False):
+    paid = 0
+    failed = 0
+
+    for txn in txns:
+        if txn.type.lower() not in ("other", "directdep", "deposit"):
+            raise ValueError("Unexpected transaction type for %s: %s", txn.id, txn.type)
+
+        # TODO: remove this after 2022
+        if txn.payee.startswith("GOCARDLESS ") or txn.payee.startswith("GC C1 EMF"):
+            app.logger.info("Suppressing GoCardless transfer %s", txn.id)
+            if doit:
+                txn.suppressed = True
+                db.session.commit()
+            continue
+
+        if txn.payee.startswith("STRIPE PAYMENTS EU ") or txn.payee.startswith(
+            "STRIPE STRIPE"
+        ):
+            app.logger.info("Suppressing Stripe transfer %s", txn.id)
+            if doit:
+                txn.suppressed = True
+                db.session.commit()
+            continue
+
+        app.logger.info("Processing txn %s: %s", txn.id, txn.payee)
+
+        payment = txn.match_payment()
+        if not payment:
+            app.logger.warn("Could not match payee, skipping")
+            failed += 1
+            continue
+
+        app.logger.info(
+            "Matched to payment %s by %s for %s %s",
+            payment.id,
+            payment.user.name,
+            payment.amount,
+            payment.currency,
+        )
+
+        if doit:
+            payment.lock()
+
+        if txn.amount != payment.amount:
+            app.logger.warn(
+                "Transaction amount %s doesn't match %s, skipping",
+                txn.amount,
+                payment.amount,
+            )
+            failed += 1
+            db.session.rollback()
+            continue
+
+        if txn.account.currency != payment.currency:
+            app.logger.warn(
+                "Transaction currency %s doesn't match %s, skipping",
+                txn.account.currency,
+                payment.currency,
+            )
+            failed += 1
+            db.session.rollback()
+            continue
+
+        if payment.state == "paid":
+            app.logger.error("Payment %s has already been paid", payment.id)
+            failed += 1
+            db.session.rollback()
+            continue
+
+        if doit:
+            txn.payment = payment
+            payment.paid()
+
+            send_confirmation(payment)
+
+            db.session.commit()
+
+        app.logger.info("Payment reconciled")
+        paid += 1
+
+    app.logger.info("Reconciliation complete: %s paid, %s failed", paid, failed)
+
+
+def send_confirmation(payment: BankPayment):
     msg = Message(
         "Electromagnetic Field ticket purchase update",
         sender=app.config["TICKETS_EMAIL"],

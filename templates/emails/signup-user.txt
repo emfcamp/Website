@@ -1,3 +1,5 @@
+{% extends "emails/base.txt" %}
+{% block body %}
 Hi {{ user.name }},
 
 This is to let you know that you now have an account on our website for
@@ -9,3 +11,4 @@ to this email.
 Love,
 
 All the EMF team
+{% endblock %}

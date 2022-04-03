@@ -4,6 +4,7 @@
 {% endblock %}
 
 {% block document %}
+{% block nav %}
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
         <div class="navbar-header">
@@ -20,11 +21,15 @@
         </div>
     </div>
 </nav>
+{% endblock %}
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-        {% for message in get_flashed_messages() -%}
-            <div class="alert alert-danger">{{ message }}</div>
+        {% for category, message in get_flashed_messages(with_categories=True) -%}
+            {% if category == "message" %}
+                {% set category = "info" %}
+            {% endif %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
         {% endfor -%}
 
         {% block body -%}{% endblock -%}

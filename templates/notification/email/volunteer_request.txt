@@ -1,3 +1,0 @@
-Hi {{volunteer.nickname}},
-
-{{ message }}

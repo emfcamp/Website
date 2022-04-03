@@ -42,7 +42,7 @@
         <td>{{ f._tier.capacity_used }}</td>
         <td>{{ remaining(f._tier) }}</td>
         <td>
-            {{ f.hidden_tag_without('csrf_token') }}
+            {{ f.hidden_tag() }}
             <div class="controls">{{ f.amount(class_="amount") | safe }}
             {% if f.amount.errors %}
                 {% for error in f.amount.errors %}

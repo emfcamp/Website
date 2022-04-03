@@ -23,7 +23,7 @@ const uglify = require('gulp-uglify');
 // CSS processors
 const postcss = require('gulp-postcss');
 const postcssPresetEnv = require('postcss-preset-env');
-const sass = require('gulp-sass');
+const sass = require('gulp-dart-sass');
 const cleancss = require('gulp-clean-css');
 
 const argv = minimist(process.argv.slice(2));
@@ -36,6 +36,7 @@ function js(cb) {
       'js/line-up.js',
       'js/schedule.js',
       'js/volunteer-schedule.js',
+      'js/arrivals.js'
     ])
     .pipe(
       tap(function(file) {
@@ -63,21 +64,25 @@ function css(cb) {
       'css/receipt.scss',
       'css/schedule.scss',
       'css/volunteer_schedule.scss',
+      'css/flask-admin.scss',
     ])
     .pipe(gulpif(!production, sourcemaps.init()))
+    .pipe(sass({includePaths: ['../node_modules']}).on('error', function(err)  {
+      var message = err.messageFormatted;
+      if (production) {
+        throw message;
+      }
+      process.stderr.write(message + "\n");
+      this.emit('end');
+    }))
     .pipe(
       postcss(
         [
-          require('postcss-easy-import'),
           require('postcss-input-range')(),
           postcssPresetEnv(),
         ],
-        {
-          syntax: require('postcss-scss'),
-        },
       ),
     )
-    .pipe(sass().on('error', sass.logError))
     .pipe(gulpif(production, cleancss()))
     .pipe(rename({extname: '.css'}))
     .pipe(gulpif(!production, sourcemaps.write()))

@@ -1,3 +1,4 @@
+from __future__ import annotations
 import base64
 import hmac
 import hashlib
@@ -8,6 +9,7 @@ import time
 import struct
 import re
 from collections import defaultdict
+from typing import Optional
 
 from sqlalchemy import func, Index, text
 from sqlalchemy.orm.exc import NoResultFound
@@ -16,7 +18,7 @@ from flask_login import UserMixin, AnonymousUserMixin
 
 from main import db
 from loggingmanager import set_user_id
-from . import bucketise
+from . import bucketise, BaseModel
 from .permission import UserPermission, Permission
 from .volunteer.shift import ShiftEntry
 
@@ -45,14 +47,14 @@ def _generate_hmac(prefix, key, msg):
 
 
 def generate_timed_hmac(prefix, key, timestamp, uid):
-    """ Typical time-limited HMAC used for logins, etc """
+    """Typical time-limited HMAC used for logins, etc"""
     timestamp = int(timestamp)  # to truncate floating point, not coerce strings
     msg = "{}-{}".format(timestamp, uid)
     return _generate_hmac(prefix, key, msg).decode("ascii")
 
 
 def generate_unlimited_hmac(prefix, key, uid):
-    """ Intended for user tokens, long-lived but low-importance """
+    """Intended for user tokens, long-lived but low-importance"""
     msg = "{}".format(uid)
     return _generate_hmac(prefix, key, msg).decode("ascii")
 
@@ -175,14 +177,13 @@ def verify_checkin_code(key, uid):
     return verify_unlimited_short_hmac("checkin-", key, uid)
 
 
-class User(db.Model, UserMixin):
+class User(BaseModel, UserMixin):
     __tablename__ = "user"
     __versioned__ = {"exclude": ["favourites", "calendar_favourites"]}
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, unique=True, index=True)
     name = db.Column(db.String, nullable=False, index=True)
-    phone = db.Column(db.String, nullable=True)
     company = db.Column(db.String)
     will_have_ticket = db.Column(
         db.Boolean, nullable=False, default=False
@@ -256,7 +257,14 @@ class User(db.Model, UserMixin):
         cascade="all, delete-orphan",
     )
 
-    def __init__(self, email, name):
+    village_memberships = db.relationship(
+        "VillageMember",
+        lazy="dynamic",
+        primaryjoin="VillageMember.user_id == User.id",
+        cascade="all, delete-orphan",
+    )
+
+    def __init__(self, email: str, name: str):
         self.email = email
         self.name = name
 
@@ -280,7 +288,7 @@ class User(db.Model, UserMixin):
         return data
 
     def get_owned_tickets(self, paid=None, type=None):
-        " Get tickets owned by a user, filtered by type and payment state. "
+        "Get tickets owned by a user, filtered by type and payment state."
         for ticket in self.owned_tickets:
             if (
                 paid is True
@@ -307,7 +315,7 @@ class User(db.Model, UserMixin):
     def bar_training_token(self):
         return generate_bar_training_token(app.config["SECRET_KEY"], self.id)
 
-    def has_permission(self, name, cascade=True):
+    def has_permission(self, name, cascade=True) -> bool:
         if cascade:
             if name != "admin" and self.has_permission("admin"):
                 return True
@@ -322,7 +330,7 @@ class User(db.Model, UserMixin):
                 return True
         return False
 
-    def grant_permission(self, name):
+    def grant_permission(self, name: str):
         try:
             perm = Permission.query.filter_by(name=name).one()
         except NoResultFound:
@@ -330,7 +338,7 @@ class User(db.Model, UserMixin):
             db.session.add(perm)
         self.permissions.append(perm)
 
-    def revoke_permission(self, name):
+    def revoke_permission(self, name: str):
         for user_perm in self.permissions:
             if user_perm.name == name:
                 self.permissions.remove(user_perm)
@@ -339,7 +347,7 @@ class User(db.Model, UserMixin):
         return "<User %s>" % self.email
 
     @classmethod
-    def get_by_email(cls, email):
+    def get_by_email(cls, email) -> Optional[User]:
         return User.query.filter(
             func.lower(User.email) == func.lower(email)
         ).one_or_none()
@@ -349,7 +357,7 @@ class User(db.Model, UserMixin):
         return bool(User.get_by_email(email))
 
     @classmethod
-    def get_by_code(cls, key, code):
+    def get_by_code(cls, key, code) -> Optional[User]:
         uid = verify_login_code(key, time.time(), code)
         if uid is None:
             return None
@@ -357,7 +365,7 @@ class User(db.Model, UserMixin):
         return User.query.filter_by(id=uid).one()
 
     @classmethod
-    def get_by_checkin_code(cls, key, code):
+    def get_by_checkin_code(cls, key, code) -> Optional[User]:
         uid = verify_checkin_code(key, code)
         if uid is None:
             return None
@@ -365,7 +373,7 @@ class User(db.Model, UserMixin):
         return User.query.filter_by(id=uid).one()
 
     @classmethod
-    def get_by_api_token(cls, key, code):
+    def get_by_api_token(cls, key, code) -> Optional[User]:
         uid = verify_api_token(key, code)
         if uid is None:
             # FIXME: raise an exception instead of returning None
@@ -374,7 +382,7 @@ class User(db.Model, UserMixin):
         return User.query.filter_by(id=uid).one()
 
     @classmethod
-    def get_by_bar_training_token(cls, code):
+    def get_by_bar_training_token(cls, code) -> User:
         uid = verify_bar_training_token(app.config["SECRET_KEY"], code)
         if uid is None:
             raise ValueError("Invalid token")
@@ -400,7 +408,7 @@ Index(
 )
 
 
-class UserDiversity(db.Model):
+class UserDiversity(BaseModel):
     __tablename__ = "diversity"
     user_id = db.Column(
         db.Integer, db.ForeignKey("user.id"), nullable=False, primary_key=True
@@ -473,7 +481,7 @@ class UserDiversity(db.Model):
         return data
 
 
-class UserShipping(db.Model):
+class UserShipping(BaseModel):
     __tablename__ = "shipping"
     user_id = db.Column(
         db.Integer, db.ForeignKey("user.id"), nullable=False, primary_key=True
@@ -487,8 +495,8 @@ class UserShipping(db.Model):
 
 
 class AnonymousUser(AnonymousUserMixin):
-    """ An anonymous user - the only persistent item here is the ID
-        which is stored in the session.
+    """An anonymous user - the only persistent item here is the ID
+    which is stored in the session.
     """
 
     def __init__(self, id):
@@ -499,9 +507,9 @@ class AnonymousUser(AnonymousUserMixin):
 
 
 def load_anonymous_user():
-    """ Factory method for anonymous users which stores a user ID in
-        the session. This is assigned to `login_manager.anonymous_user`
-        in main.py.
+    """Factory method for anonymous users which stores a user ID in
+    the session. This is assigned to `login_manager.anonymous_user`
+    in main.py.
     """
     if "anon_id" in session:
         au = AnonymousUser(session["anon_id"])

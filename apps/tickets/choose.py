@@ -14,7 +14,7 @@ from sqlalchemy.orm import joinedload
 
 from main import db, mail
 from models.exc import CapacityException
-from models.product import PriceTier, ProductViewProduct, Product, Voucher
+from models.product import PriceTier, ProductView, ProductViewProduct, Product, Voucher
 from models.basket import Basket
 from models.site_state import get_sales_state
 
@@ -28,15 +28,15 @@ from . import tickets, empty_baskets, no_capacity, invalid_vouchers, get_product
 @tickets.route("/tickets", methods=["GET", "POST"])
 @tickets.route("/tickets/<flow>", methods=["GET", "POST"])
 def main(flow="main"):
-    """ The main tickets page. This lets the user choose which tickets to buy,
-        creates a basket for them and then adds the tickets to their basket.
+    """The main tickets page. This lets the user choose which tickets to buy,
+    creates a basket for them and then adds the tickets to their basket.
 
-        At this point tickets are reserved, and the user is passed on to `/tickets/pay`
-        to enter their user details and choose a payment method.
+    At this point tickets are reserved, and the user is passed on to `/tickets/pay`
+    to enter their user details and choose a payment method.
 
-        The `flow` parameter dictates which ProductView to display on this page,
-        allowing us to have different categories of items on sale, for example tickets
-        on one page, and t-shirts on a separate page.
+    The `flow` parameter dictates which ProductView to display on this page,
+    allowing us to have different categories of items on sale, for example tickets
+    on one page, and t-shirts on a separate page.
     """
     # Fetch the ProductView and determine if this user is allowed to view it.
     view = get_product_view(flow)
@@ -128,7 +128,7 @@ def main(flow="main"):
     )
 
 
-def products_for_view(product_view):
+def products_for_view(product_view) -> list[ProductViewProduct]:
     # Note that this function is performance-critical. It should load all the product data
     # necessary for the high-traffic tickets page to render in a single query. If you change
     # this, make sure that you monitor the number of queries emitted by the tickets page.
@@ -143,7 +143,7 @@ def products_for_view(product_view):
     ).all()
 
 
-def handle_ticket_selection(form, view, flow, basket):
+def handle_ticket_selection(form, view: ProductView, flow: str, basket: Basket):
     """
     For consistency and to avoid surprises, we try to ensure a few things here:
     - if the user successfully submits a form with no errors, their basket is updated
@@ -222,11 +222,11 @@ def handle_ticket_selection(form, view, flow, basket):
         return handle_free_tickets(flow, view, basket)
 
 
-def handle_free_tickets(flow, view, basket):
-    """ The user is trying to "buy" only free tickets.
+def handle_free_tickets(flow: str, view: ProductView, basket: Basket):
+    """The user is trying to "buy" only free tickets.
 
-        This is effectively a payment stage, handled differently
-        from the rest of the flow.
+    This is effectively a payment stage, handled differently
+    from the rest of the flow.
     """
     # They must be authenticated for this.
     if not current_user.is_authenticated:
@@ -277,7 +277,7 @@ def handle_free_tickets(flow, view, basket):
 
 @tickets.route("/tickets/clear")
 @tickets.route("/tickets/<flow>/clear")
-def tickets_clear(flow=None):
+def tickets_clear(flow: str = None):
     app.logger.info("Clearing basket")
     basket = Basket.from_session(current_user, get_user_currency())
     basket.cancel_purchases()
@@ -289,11 +289,14 @@ def tickets_clear(flow=None):
 
 @tickets.route("/tickets/voucher/")
 @tickets.route("/tickets/voucher/<voucher_code>")
-def tickets_voucher(voucher_code=None):
+def tickets_voucher(voucher_code: str = None):
     """
-        A user reaches this endpoint if they're sent a voucher code by email.
-        Set up the voucher details in the session and redirect them to choose their tickets.
+    A user reaches this endpoint if they're sent a voucher code by email.
+    Set up the voucher details in the session and redirect them to choose their tickets.
     """
+    if voucher_code is None:
+        return abort(404)
+
     voucher = Voucher.get_by_code(voucher_code)
     if voucher is None:
         return abort(404)
@@ -308,7 +311,13 @@ def tickets_voucher(voucher_code=None):
             )
             return redirect(url_for("users.purchases"))
         else:
-            abort(404)
+            flash(
+                """The voucher you have supplied has been used.
+                   If it was you who used it, please log in to view your purchases.
+                   Cancelling the payment made with the voucher will reactivate it so you can try again.
+                """
+            )
+            return redirect(url_for("users.purchases"))
 
     view = voucher.view
     if view:

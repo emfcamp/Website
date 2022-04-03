@@ -1,4 +1,4 @@
-from flask import current_app as app
+from flask import abort
 from flask_login import current_user
 from flask_admin import BaseView, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
@@ -13,7 +13,7 @@ class FlaskVolunteerAdminAppMixin:
         return False
 
     def inaccessible_callback(self, name, **kwargs):
-        return app.login_manager.unauthorized()
+        abort(404)
 
     def get_url(self, endpoint, **kwargs):
         # Hack to use some of the stuff set up for admin
@@ -26,7 +26,7 @@ class FlaskVolunteerAdminAppMixin:
             self.endpoint = admin.endpoint_prefix
         else:
             self.url = self._get_view_url(admin, self.url)
-            self.endpoint = "{}.{}".format(admin.endpoint_prefix, self.endpoint)
+            self.endpoint = "{}_{}".format(admin.endpoint_prefix, self.endpoint)
         return super().create_blueprint(admin)
 
 
@@ -35,7 +35,11 @@ class VolunteerBaseView(FlaskVolunteerAdminAppMixin, BaseView):
 
 
 class VolunteerAdminIndexView(FlaskVolunteerAdminAppMixin, AdminIndexView):
-    pass
+    # Yes this is should use url_for, but apparently this code's on the way out
+    extra_css = ["/static/css/flask-admin.css"]
+
+    def is_visible(self):
+        return False
 
 
 class VolunteerModelView(FlaskVolunteerAdminAppMixin, ModelView):

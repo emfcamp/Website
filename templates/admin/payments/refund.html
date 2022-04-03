@@ -36,7 +36,7 @@
 {{ form.hidden_tag() }}
 
 {% for f in form.purchases %}
-  {{ f.hidden_tag_without('csrf_token') }}
+  {{ f.hidden_tag() }}
   <div class="col-sm-11 col-sm-offset-1">
     <label class="checkbox">
       {{ f.refund(disabled=f._disabled) }} {{ f.refund.label.text }} ({{ f._purchase.price_tier.get_price(payment.currency) | price(payment.currency) }})

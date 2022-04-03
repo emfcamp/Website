@@ -5,134 +5,116 @@
 {% set user_currency = get_user_currency() %}
 <h3>Your tickets are reserved</h3>
 {% include "tickets/_basket.html" %}
-<h3>Confirm your currency</h3>
-<div class="well">
-  <form method="post">
-  {{ form.hidden_tag() }}
-  {% if user_currency == 'GBP' %}
-  <p>You're currently buying tickets in <strong>Pounds</strong>. If you're paying from a Euro account, please change your currency to Euros,
-    so we can show you the appropriate payment options.</p>
-  {% else %}
-  <p>You're currently buying tickets in <strong>Euros</strong>. If you're paying from a UK account, please change your currency to Pounds,
-    so we can show you the appropriate payment options.</p>
-  {% endif %}
-  <div class="btn-group" role="group">
-      <button name="change_currency" value="{% if user_currency == 'GBP' %}EUR{% else %}GBP{% endif %}"
-          class="btn btn-default">Change currency to {% if user_currency == 'GBP' %}Euros (€){% else %}Pounds (£){% endif %}</button>
-  </div>
-  </form>
-</div>
-<form method="post" class="pay-method">
-{{ form.hidden_tag() }}
-{% if current_user.is_anonymous or current_user.name == current_user.email or basket.requires_shipping %}
+{% if admission_ticket_needed %}
+<div class="alert alert-warning">
+    <h4>Admission Ticket Needed</h4>
+    <p>You don't have an admission ticket in your basket or associated with your account, and the items
+        you're trying to purchase require an admission ticket.</p>
 
-  <h3>Your Details</h3>
+    <p>Please add an admission ticket to your basket to continue. If someone else has purchased your admission
+        ticket for you, ask them to transfer it to you.</p>
 
-  {% if form.email.was_duplicate %}
-  <div class="alert alert-warning">
-      This email address already exists in our system, possibly because you previously tried to buy a ticket and
-      we automatically created an account for you.
-      Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('tickets.pay', flow=flow), email=form.email.data) }}">click here</a> to log in.
-  </div>
-  {% endif %}
-
-  {% if basket.requires_shipping %}
-  {% include "tickets/_shipping.html" %}
-  {% else %}
-  {% include "user-signup.html" %}
-  {% endif %}
-
-{% endif %}
-
-<h3>Choose a payment method</h3>
-
-<div class="row row-equal">
-<div class="col-sm-6">
-{% if feature_enabled('GOCARDLESS') %}
-{% if user_currency != 'EUR' or feature_enabled('GOCARDLESS_EURO') %}
-<div class="panel panel-default panel--payment">
-    <div class="panel-heading"><h3 class="panel-title">Direct Debit</h3></div>
-    <div class="panel-body">
-
-        {% if user_currency != 'EUR' %}
-        <p>You can create a one-off direct debit payment 
-           from your UK bank account. This is easy for you and cheap for us.</p>
-
-        <p>Payments are protected by the
-        <a href="http://www.directdebit.co.uk/DirectDebitExplained/Pages/DirectDebitGuarantee.aspx">Direct Debit
-            Guarantee</a>.</p>
-        {% else %}
-        <p>You can create a one-off SEPA direct debit payment 
-           from your Euro bank account. This is easy for you and cheap for us.</p>
-        {% endif %}
-    </div>
-    <div class="panel-footer panel-footer-center">
-        <input type="submit" name="{{form.gocardless.name}}" value="{{form.gocardless.label.text}}" class="btn btn-lg btn-success debounce"/>
-    </div>
-</div>
-{% else %}
-<div class="panel panel-default panel--payment">
-    <div class="panel-heading"><h3 class="panel-title">Direct Debit (preferred)</h3></div>
-    <div class="panel-body">
-        <p>GoCardless is not currently available for Euros.</p>
-        <p>Please try again later or choose another option.</p>
-    </div>
+    <a class="btn btn-default" href="{{url_for('tickets.main', flow=flow)}}">Change tickets</a>
 </div>
 {% endif %}
-{% elif feature_enabled('BANK_TRANSFER') %}
-<div class="panel panel-default panel--payment">
-    <div class="panel-heading"><h3 class="panel-title">Direct Debit</h3></div>
-    <div class="panel-body">
-        <p>GoCardless is not currently available. Please choose another option.</p>
-    </div>
-</div>
-{% endif %}
-</div>
-<div class="col-sm-6">
-{% if feature_enabled('BANK_TRANSFER') %}
-<div class="panel panel-default panel--payment">
-    <div class="panel-heading"><h3 class="panel-title">Bank Transfer</h3></div>
-    <div class="panel-body">
-        {% if user_currency != 'EUR' %}
-        <p>Ask your UK bank to send money to us directly. We'll give you our account number and sort code to send the money to.</p>
-        {% else %}
-        <p>Ask your bank to send money to us directly. We'll give you our IBAN to send the money to.</p>
-        {% endif %}
-    </div>
-    <div class="panel-footer panel-footer-center">
-        <input type="submit" name="{{form.banktransfer.name}}" value="{{form.banktransfer.label.text}}" class="btn btn-lg btn-success debounce"/>
-    </div>
-</div>
-{% endif %}
-</div>
-</div>
 
-{% if feature_enabled('STRIPE') %}
-<div class="row">
-    <div class="col-sm-12">
-    <div class="panel panel-default">
-        {% if feature_enabled('GOCARDLESS') or feature_enabled('BANK_TRANSFER') %}
-        <div class="panel-body">
-            <p>If you can't use another payment method, we accept card payments.
-            These cost us more, and we'd rather you used another method if you can.</p>
+{% if not admission_ticket_needed %}
+    <h3>Confirm your currency</h3>
+    <div class="well">
+    <form method="post">
+    {{ form.hidden_tag() }}
+    {% if user_currency == 'GBP' %}
+    <p>You're currently buying tickets in <strong>Pounds</strong>. If you're paying from a Euro account, please change your currency to Euros,
+        so we can show you the appropriate payment options.</p>
+    {% else %}
+    <p>You're currently buying tickets in <strong>Euros</strong>. If you're paying from a UK account, please change your currency to Pounds,
+        so we can show you the appropriate payment options.</p>
+    {% endif %}
+    <div class="btn-group" role="group">
+        <button name="change_currency" value="{% if user_currency == 'GBP' %}EUR{% else %}GBP{% endif %}"
+            class="btn btn-default">Change currency to {% if user_currency == 'GBP' %}Euros (€){% else %}Pounds (£){% endif %}</button>
+    </div>
+    </form>
+    </div>
+    <form method="post" class="pay-method">
+    {{ form.hidden_tag() }}
+    {% if current_user.is_anonymous or current_user.name == current_user.email or basket.requires_shipping %}
 
-            <p>We accept Visa, Visa Debit, Mastercard or American Express.</p>
-            <input type="submit" name="{{form.stripe.name}}" value="{{form.stripe.label.text}}" class="btn btn-small btn-success debounce"/>
+    <h3>Your Details</h3>
+
+    {% if form.email.was_duplicate %}
+    <div class="alert alert-warning">
+        This email address already exists in our system, possibly because you previously tried to buy a ticket and
+        we automatically created an account for you.
+        Please <a class="alert-link" href="{{ url_for('users.login', next=url_for('tickets.pay', flow=flow), email=form.email.data) }}">click here</a> to log in.
+    </div>
+    {% endif %}
+
+    {% if basket.requires_shipping %}
+    {% include "tickets/_shipping.html" %}
+    {% else %}
+    {% include "user-signup.html" %}
+    {% endif %}
+
+    {% endif %}
+
+    <h3>Choose a payment method</h3>
+
+    <div class="row row-equal">
+
+        <div class="col-sm-6">
+            <div class="panel panel-default panel--payment">
+                {% if feature_enabled('BANK_TRANSFER') %}
+                <div class="panel-heading"><h3 class="panel-title">Bank Transfer</h3></div>
+                <div class="panel-body">
+                    {% if user_currency != 'EUR' %}
+                    <p>Ask your UK bank to send money to us directly. We'll give you our account number and sort code to send the money to.</p>
+                    {% else %}
+                    <p>Ask your bank to send money to us directly. We'll give you our IBAN to send the money to.</p>
+                    {% endif %}
+                </div>
+                <div class="panel-footer panel-footer-center">
+                    <input type="submit" name="{{form.banktransfer.name}}" value="{{form.banktransfer.label.text}}" class="btn btn-lg btn-success debounce"/>
+                </div>
+                {% else %}
+                <div class="panel-heading"><h3 class="panel-title">Bank Transfer</h3></div>
+                <div class="panel-body">
+                    <p>Bank transfers are not currently available. Please choose another option.</p>
+                </div>
+                {% endif %}
+            </div>
         </div>
-        {% else %}
-        <div class="panel-heading"><h3 class="panel-title">Card</h3></div>
-        <div class="panel-body">
-            <p>We accept Visa, Visa Debit, Mastercard or American Express.</p>
+
+        <div class="col-sm-6">
+            <div class="panel panel-default panel--payment">
+                {% if feature_enabled('STRIPE') and feature_enabled('BANKTRANSFER') %}
+                <div class="panel-body">
+                    <p>If you can't use another payment method, we accept card payments.
+                    These cost us more, and we'd rather you used another method if you can.</p>
+
+                    <p>We accept Visa, Visa Debit, Mastercard or American Express.</p>
+                    <input type="submit" name="{{form.stripe.name}}" value="{{form.stripe.label.text}}" class="btn btn-small btn-success debounce"/>
+                </div>
+                {% elif feature_enabled('STRIPE') %}
+                <div class="panel-heading"><h3 class="panel-title">Card</h3></div>
+                <div class="panel-body">
+                    <p>We accept Visa, Visa Debit, Mastercard or American Express.</p>
+                </div>
+                <div class="panel-footer panel-footer-center">
+                    <input type="submit" name="{{form.stripe.name}}" value="{{form.stripe.label.text}}" class="btn btn-lg btn-success debounce"/>
+                </div>
+                {% else %}
+                <div class="panel-body">
+                    <p>Credit card payments are not currently available. Please choose another option.</p>
+                </div>
+                {% endif %}
+            </div>
         </div>
-        <div class="panel-footer panel-footer-center">
-            <input type="submit" name="{{form.stripe.name}}" value="{{form.stripe.label.text}}" class="btn btn-lg btn-success debounce"/>
-        </div>
-        {% endif %}
+
     </div>
-    </div>
-</div>
-{% endif %}
-</form>
+    </form>
+{% endif %} {# not admission_ticket_needed #}
+
     <div class="well">If you're unsure about anything, please check out our <a href="https://wiki.emfcamp.org/wiki/FAQ#Ticket_Sales">FAQ</a>
         or drop us an <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">email</a>.
     </div>

@@ -1,28 +1,32 @@
 import json
 
-from flask import Markup
+from flask import Markup, current_app as app
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, SelectField, StringField, ValidationError
 from wtforms.widgets import Input, HiddenInput
 from wtforms.widgets.html5 import EmailInput
-from wtforms.compat import string_types
 from wtforms.widgets.core import html_params
 from email_validator import validate_email, EmailNotValidError
 import re
 
 
 class EmailField(StringField):
-    """ HTML5 email field using the email_validator package to perform
-        enhanced email validation.
+    """HTML5 email field using the email_validator package to perform
+    enhanced email validation.
 
-        You don't need to provide additional validators to this field.
+    You don't need to provide additional validators to this field.
     """
 
     widget = EmailInput()
 
     def pre_validate(self, form):
+        check_deliverability = True
+        if app.config.get("DEBUG"):
+            check_deliverability = False
         try:
-            result = validate_email(self.data)
+            result = validate_email(
+                self.data, check_deliverability=check_deliverability
+            )
             # Replace data with normalised version of email
             self.data = result["email"]
         except EmailNotValidError as e:
@@ -76,13 +80,13 @@ class JSONField(StringField):
         return json.dumps(self.data) if self.data else ""
 
     def process_formdata(self, valuelist):
-        if valuelist:
+        if valuelist and valuelist[0] != "":
             try:
                 self.data = json.loads(valuelist[0])
             except ValueError:
                 raise ValueError("This field contains invalid JSON")
         else:
-            self.data = None
+            self.data = {}
 
     def pre_validate(self, form):
         super().pre_validate(form)
@@ -115,18 +119,11 @@ class StaticField(StringField):
 
 
 class Form(FlaskForm):
-    def hidden_tag_without(self, *exclude_fields):
-        """ Return the hidden fields for this form, excluding the fields listed in
-            `exclude_fields`
+    """
+    Re-override these back to their wtforms defaults
+    """
 
-            We use this to render all the hidden fields in the form except for the
-            CSRF token, for reasons which are currently unclear to me.
-        """
-        fields = [
-            getattr(self, f) if isinstance(f, string_types) and hasattr(self, f) else f
-            for f in exclude_fields
-        ]
-        keep_fields = [
-            f for f in self if isinstance(f.widget, HiddenInput) and f not in fields
-        ]
-        return FlaskForm.hidden_tag(self, *keep_fields)
+    class Meta(FlaskForm.Meta):
+        csrf = False
+        csrf_class = None
+        csrf_context = None

@@ -9,6 +9,7 @@ from flask import (
     current_app as app,
     Blueprint,
     abort,
+    make_response,
 )
 
 from flask_login import current_user
@@ -24,14 +25,10 @@ from wtforms import (
     SelectField,
     IntegerField,
 )
+import logging_tree
 
 from main import db
-from models.payment import (
-    Payment,
-    BankAccount,
-    BankPayment,
-    BankTransaction,
-)
+from models.payment import Payment, BankAccount, BankPayment, BankTransaction
 from models.purchase import Purchase
 from models.ical import CalendarSource
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
@@ -39,8 +36,11 @@ from models.site_state import SiteState, VALID_STATES, refresh_states
 from models.map import MapObject
 from models.scheduled_task import tasks, ScheduledTaskResult
 from ..payments.stripe import stripe_validate
-from ..payments.gocardless import gocardless_validate
-from ..payments.transferwise import transferwise_validate
+from ..payments.wise import (
+    wise_validate,
+    wise_business_profile,
+    wise_retrieve_accounts,
+)
 from ..common import require_permission
 from ..common.forms import Form
 
@@ -51,7 +51,7 @@ admin_required = require_permission("admin")  # Decorator to require admin permi
 
 @admin.before_request
 def admin_require_permission():
-    """ Require admin permission for everything under /admin """
+    """Require admin permission for everything under /admin"""
     if not current_user.is_authenticated or not current_user.has_permission("admin"):
         abort(404)
 
@@ -207,14 +207,61 @@ def site_states():
     return render_template("admin/site-states.html", form=form)
 
 
-@admin.route("/payment-config-verify")
+class BankAccountRefreshForm(Form):
+    import_accounts = SubmitField("Import new TransferWise accounts")
+
+
+@admin.route("/payment-config/activate", methods=["POST"])
+def activate_payment_config():
+    if request.form.get("activate"):
+        to_activate = BankAccount.query.filter_by(id=request.form["activate"]).first()
+        # Deactivate other accounts with this currency
+        for account in BankAccount.query.filter_by(currency=to_activate.currency):
+            if account.id != to_activate.id:
+                account.active = False
+        to_activate.active = True
+        db.session.commit()
+
+    return redirect(url_for(".payment_config_verify"), 303)
+
+
+@admin.route("/payment-config", methods=["GET", "POST"])
 def payment_config_verify():
+    form = BankAccountRefreshForm()
+
+    if form.validate_on_submit():
+        profile_id = wise_business_profile()
+
+        if not profile_id:
+            flash("Cannot identify Wise profile", "warning")
+            return redirect(url_for(".payment_config_verify"), 303)
+
+        tw_accounts = wise_retrieve_accounts(profile_id)
+        for tw_account in tw_accounts:
+            existing_account = BankAccount.query.filter_by(
+                borderless_account_id=tw_account.borderless_account_id,
+                currency=tw_account.currency,
+            ).first()
+            if existing_account:
+                continue
+            db.session.add(tw_account)
+
+        if db.session.new:
+            db.session.commit()
+            flash("New TransferWise bank accounts have been imported", "info")
+        else:
+            flash("No new TransferWise bank accounts have been imported", "warning")
+
+        return redirect(url_for(".payment_config_verify"), 303)
+
     return render_template(
         "admin/payment-config-verify.html",
         stripe=stripe_validate(),
-        gocardless=gocardless_validate(),
-        transferwise=transferwise_validate(),
-        bank_accounts=BankAccount.query.all(),
+        transferwise=wise_validate(),
+        bank_accounts=BankAccount.query.order_by(
+            BankAccount.active.desc(), BankAccount.currency.desc()
+        ).all(),
+        form=form,
         last_bank_payment=BankTransaction.query.order_by(
             BankTransaction.id.desc()
         ).first(),
@@ -320,6 +367,13 @@ def scheduled_tasks():
         )
         data.append({"task": task, "results": results})
     return render_template("admin/scheduled-tasks.html", data=data)
+
+
+@admin.route("/logging-config")
+def logging_config():
+    response = make_response(logging_tree.format.build_description())
+    response.headers["Content-Type"] = "text/plain"
+    return response
 
 
 from . import accounts  # noqa: F401

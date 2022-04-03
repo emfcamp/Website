@@ -1,13 +1,18 @@
 import click
 import ofxparse
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import current_app as app
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
-from main import db
+from main import db, wise
 from apps.base import base
-from apps.payments import banktransfer
+from apps.payments.banktransfer import reconcile_txns
+from apps.payments.wise import (
+    wise_retrieve_accounts,
+    wise_business_profile,
+    sync_wise_statement,
+)
 from models.payment import BankAccount, BankTransaction
 
 
@@ -17,7 +22,7 @@ def create_bank_accounts_cmd():
 
 
 def create_bank_accounts():
-    """ Create bank accounts if they don't exist """
+    """Create bank accounts if they don't exist"""
     gbp = BankAccount(
         sort_code="102030",
         acct_id="40506070",
@@ -51,6 +56,8 @@ def create_bank_accounts():
                 acct.acct_id or acct.iban,
             )
             db.session.add(acct)
+        except MultipleResultsFound:
+            pass
 
     db.session.commit()
 
@@ -58,7 +65,7 @@ def create_bank_accounts():
 @base.cli.command("loadofx")
 @click.argument("ofx_file", type=click.File("r"))
 def load_ofx(ofx_file):
-    """ Import an OFX bank statement file """
+    """Import an OFX bank statement file"""
     ofx = ofxparse.OfxParser.parse(ofx_file)
 
     acct_id = ofx.account.account_id
@@ -149,88 +156,96 @@ def load_ofx(ofx_file):
     )
 
 
+@base.cli.command("sync_wisetransfer")
+@click.argument("profile_id", type=click.INT, required=False)
+def sync_wisetransfer(profile_id):
+    """Sync transactions from all accounts associated with a Wise profile"""
+    if profile_id is None:
+        profile_id = wise_business_profile()
+
+    tw_accounts = wise_retrieve_accounts(profile_id)
+    for tw_account in tw_accounts:
+        # Each sync is performed in a separate transaction
+        sync_wise_statement(
+            profile_id, tw_account.borderless_account_id, tw_account.currency
+        )
+
+
+@base.cli.command("check_wisetransfer_ids")
+@click.argument("profile_id", type=click.INT, required=False)
+def check_wisetransfer_ids(profile_id):
+    """Store referenceNumbers or check them if already stored"""
+    if profile_id is None:
+        profile_id = wise_business_profile()
+
+    tw_accounts = wise_retrieve_accounts(profile_id)
+    for tw_account in tw_accounts:
+        interval_end = datetime.utcnow()
+        interval_start = interval_end - timedelta(days=120)
+        statement = wise.borderless_accounts.statement(
+            profile_id,
+            tw_account.borderless_account_id,
+            tw_account.currency,
+            interval_start.isoformat() + "Z",
+            interval_end.isoformat() + "Z",
+        )
+
+        bank_account = (
+            BankAccount.query.with_for_update()
+            .filter_by(
+                borderless_account_id=tw_account.borderless_account_id,
+                currency=tw_account.currency,
+            )
+            .one()
+        )
+        if not bank_account.active:
+            app.logger.info(
+                f"BankAccount for borderless account {tw_account.borderless_account_id} and {tw_account.currency} is not active, not checking"
+            )
+            db.session.commit()
+            continue
+
+        for transaction in statement.transactions:
+            if transaction.type != "CREDIT":
+                continue
+
+            if transaction.details.type != "DEPOSIT":
+                continue
+
+            txns = BankTransaction.query.filter_by(
+                account_id=bank_account.id,
+                posted=transaction.date,
+                type=transaction.details.type.lower(),
+                payee=transaction.details.paymentReference,
+            ).all()
+            if len(txns) == 0:
+                app.logger.error(
+                    f"Could not find transaction (did you run sync first?): {transaction}"
+                )
+                continue
+            if len(txns) > 1:
+                app.logger.error(
+                    f"Found matching {len(txns)} matching transactions for: {transaction}"
+                )
+                continue
+
+            txn = txns[0]
+            if txn.wise_id is None:
+                txn.wise_id = transaction.referenceNumber
+                continue
+            if txn.wise_id != transaction.referenceNumber:
+                app.logger.error(
+                    f"referenceNumber has changed from {txn.wise_id}: {transaction}"
+                )
+                continue
+
+        db.session.commit()
+
+
 @base.cli.command("reconcile")
 @click.option("-d", "--doit", is_flag=True, help="set this to actually change the db")
 def reconcile(doit):
-    txns = BankTransaction.query.filter_by(payment_id=None, suppressed=False)
-
-    paid = 0
-    failed = 0
-
-    for txn in txns:
-        if txn.type.lower() not in ("other", "directdep"):
-            raise ValueError("Unexpected transaction type for %s: %s", txn.id, txn.type)
-
-        if txn.payee.startswith("GOCARDLESS ") or txn.payee.startswith("GC C1 EMF"):
-            app.logger.info("Suppressing GoCardless transfer %s", txn.id)
-            if doit:
-                txn.suppressed = True
-                db.session.commit()
-            continue
-
-        if txn.payee.startswith("STRIPE PAYMENTS EU ") or txn.payee.startswith(
-            "STRIPE STRIPE"
-        ):
-            app.logger.info("Suppressing Stripe transfer %s", txn.id)
-            if doit:
-                txn.suppressed = True
-                db.session.commit()
-            continue
-
-        app.logger.info("Processing txn %s: %s", txn.id, txn.payee)
-
-        payment = txn.match_payment()
-        if not payment:
-            app.logger.warn("Could not match payee, skipping")
-            failed += 1
-            continue
-
-        app.logger.info(
-            "Matched to payment %s by %s for %s %s",
-            payment.id,
-            payment.user.name,
-            payment.amount,
-            payment.currency,
-        )
-
-        if doit:
-            payment.lock()
-
-        if txn.amount != payment.amount:
-            app.logger.warn(
-                "Transaction amount %s doesn't match %s, skipping",
-                txn.amount,
-                payment.amount,
-            )
-            failed += 1
-            db.session.rollback()
-            continue
-
-        if txn.account.currency != payment.currency:
-            app.logger.warn(
-                "Transaction currency %s doesn't match %s, skipping",
-                txn.account.currency,
-                payment.currency,
-            )
-            failed += 1
-            db.session.rollback()
-            continue
-
-        if payment.state == "paid":
-            app.logger.error("Payment %s has already been paid", payment.id)
-            failed += 1
-            db.session.rollback()
-            continue
-
-        if doit:
-            txn.payment = payment
-            payment.paid()
-
-            banktransfer.send_confirmation(payment)
-
-            db.session.commit()
-
-        app.logger.info("Payment reconciled")
-        paid += 1
-
-    app.logger.info("Reconciliation complete: %s paid, %s failed", paid, failed)
+    outstanding_txns = BankTransaction.query.filter_by(
+        payment_id=None, suppressed=False
+    )
+    reconcile_txns(outstanding_txns, doit)

@@ -1,4 +1,4 @@
-{% extends 'volunteer/base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}
     Train users
@@ -9,7 +9,7 @@
         {{ form.hidden_tag() }}
 
         {% for field in form.volunteers %}
-            {{ field.hidden_tag_without('csrf_token') }}
+            {{ field.hidden_tag() }}
             <div class="checkbox">
                 <label for="{{ field.trained.name }}">
                     {{ field.trained()| safe }}

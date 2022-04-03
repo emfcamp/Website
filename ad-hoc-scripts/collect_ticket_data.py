@@ -20,10 +20,6 @@ for key, admits in [("full", "full"), ("kids", "kid")]:
     )
 
 submission.append(
-    "tickets,type=full,status=gocardless_unpaid value=%s"
-    % (data["full_gocardless_unexpired"])
-)
-submission.append(
     "tickets,type=full,status=banktransfer_unpaid value=%s"
     % (data["full_banktransfer_unexpired"])
 )

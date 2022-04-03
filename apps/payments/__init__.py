@@ -24,7 +24,7 @@ def ticket_admin_email(title, template, **kwargs):
 
 from . import main  # noqa: F401
 from . import banktransfer  # noqa: F401
-from . import gocardless  # noqa: F401
 from . import stripe  # noqa: F401
 from . import invoice  # noqa: F401
 from . import tasks  # noqa: F401
+from . import wise  # noqa: F401

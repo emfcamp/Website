@@ -11,12 +11,7 @@ from wtforms import (
     IntegerField,
     FloatField,
 )
-from wtforms.validators import (
-    DataRequired,
-    Optional,
-    NumberRange,
-    ValidationError,
-)
+from wtforms.validators import DataRequired, Optional, NumberRange, ValidationError
 
 from models.cfp import Venue, ORDERED_STATES
 from ..common.forms import Form, HiddenIntegerField

@@ -11,6 +11,20 @@ from sqlalchemy import true, inspect
 from sqlalchemy.orm.base import NO_VALUE
 from sqlalchemy.sql.functions import func
 from sqlalchemy_continuum.utils import version_class, transaction_class
+from sqlalchemy.ext.declarative import DeclarativeMeta
+
+# This alias is required to apply type annotations to the model objects.
+# MyPy raises errors when inheriting directly from db.Model. Once flask-sqlalchemy has
+# type annotations this should become unnecessary.
+BaseModel: DeclarativeMeta = db.Model
+
+""" Type alias for ISO currency (GBP or EUR currently). """
+# Note: A better type for this would be Union[Literal['GBP'], Literal['EUR']] but setting this
+# results in a world of pain currently.
+#
+# Ideally needs to be unified with the Currency class in app/common/__init__.py, but this is
+# non-trivial.
+Currency = str
 
 
 def event_start():
@@ -18,7 +32,7 @@ def event_start():
 
 
 def event_year():
-    """ Year of the current event """
+    """Year of the current event"""
     return event_start().year
 
 
@@ -47,7 +61,7 @@ def count_groups(query, *entities):
 
 
 def nest_count_keys(rows):
-    """ For JSON's sake, because it doesn't support tuples as keys """
+    """For JSON's sake, because it doesn't support tuples as keys"""
     tree = OrderedDict()
     for c, *key in rows:
         node = tree
@@ -59,7 +73,7 @@ def nest_count_keys(rows):
 
 
 def bucketise(vals, boundaries):
-    """ Sort values into bins, like pandas.cut """
+    """Sort values into bins, like pandas.cut"""
     ranges = [
         "%s-%s" % (a, b - 1) if isinstance(b, int) and b - 1 > a else str(a)
         for a, b in zip(boundaries[:-1], boundaries[1:])
@@ -177,5 +191,9 @@ from .map import *  # noqa: F401,F403
 from .admin_message import *  # noqa: F401,F403
 from .volunteer import *  # noqa: F401,F403
 from .village import *  # noqa: F401,F403
+from .scheduled_task import *  # noqa: F401,F403
+from .feature_flag import *  # noqa: F401,F403
+from .site_state import *  # noqa: F401,F403
+
 
 db.configure_mappers()

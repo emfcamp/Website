@@ -1,8 +1,8 @@
-# coding=utf-8
 from sqlalchemy.orm import backref
 from flask_login import UserMixin
 
 from main import db
+from .. import BaseModel
 
 
 # This effectively records the roles that a volunteer is interested in
@@ -31,16 +31,12 @@ VolunteerRoleTraining = db.Table(
 )
 
 
-class Volunteer(db.Model, UserMixin):
+class Volunteer(BaseModel, UserMixin):
     __table_name__ = "volunteer"
-
-    __versioned__ = {}
+    __versioned__: dict = {}
 
     id = db.Column(db.Integer, primary_key=True)
-    planned_arrival = db.Column(db.DateTime)
-    planned_departure = db.Column(db.DateTime)
     nickname = db.Column(db.String)
-    missing_shifts_opt_in = db.Column(db.Boolean, nullable=False, default=False)
     banned = db.Column(db.Boolean, nullable=False, default=False)
     volunteer_phone = db.Column(db.String, nullable=False)
     volunteer_email = db.Column(db.String)

@@ -209,33 +209,34 @@ def create_product_groups():
 
 @tickets.cli.command("create")
 def create():
-    """ Create tickets structure from hardcoded data """
+    """Create tickets structure from hardcoded data"""
     create_product_groups()
 
 
 @scheduled_task(minutes=30)
 def expire_reserved():
-    """ Expire reserved tickets """
+    """Expire reserved tickets"""
+
     if (
         feature_enabled("STRIPE")
         and not feature_enabled("BANK_TRANSFER")
         and not feature_enabled("BANK_TRANSFER_EURO")
-        and not feature_enabled("GOCARDLESS")
-        and not feature_enabled("GOCARDLESS_EURO")
     ):
         # Things are moving quickly now, only let people reserve tickets for an hour
-        grace_period = timedelta(hours=1)
+        stalled_payment_grace_period = timedelta(hours=1)
 
     else:
-        grace_period = timedelta(days=3)
+        stalled_payment_grace_period = timedelta(days=3)
 
-    app.logger.info("Cancelling reserved tickets with grace period %s", grace_period)
+    app.logger.info(
+        "Cancelling reserved tickets with grace period %s", stalled_payment_grace_period
+    )
 
     # Payments where someone started the process but didn't complete
     payments = (
         Purchase.query.filter(
             Purchase.state == "reserved",
-            Purchase.modified < datetime.utcnow() - grace_period,
+            Purchase.modified < datetime.utcnow() - stalled_payment_grace_period,
             ~Purchase.payment_id.is_(None),
         )
         .join(Payment)
@@ -245,14 +246,23 @@ def expire_reserved():
 
     for payment in payments:
         payment.lock()
+
+        if payment.state == "charging":
+            # This should only happen if webhooks aren't getting through
+            app.logger.error("Not cancelling payment %s", payment.id)
+            continue
+
         app.logger.info("Cancelling payment %s", payment.id)
-        assert payment.state == "new" and payment.provider in {"gocardless", "stripe"}
+        assert payment.state == "new" and payment.provider in {"stripe"}
         payment.cancel()
 
     # Purchases that were added to baskets but not checked out
+    # This should match the wording in templates/tickets/_basket.html
+    incomplete_purchase_grace_period = timedelta(hours=1)
+
     purchases = Purchase.query.filter(
         Purchase.state == "reserved",
-        Purchase.modified < datetime.utcnow() - grace_period,
+        Purchase.modified < datetime.utcnow() - incomplete_purchase_grace_period,
         Purchase.payment_id.is_(None),
     )
     for purchase in purchases:
@@ -288,7 +298,7 @@ def email_transfer_reminders():
 
 @tickets.cli.command("email_tickets")
 def email_tickets():
-    """ Email tickets to those who haven't received them """
+    """Email tickets to those who haven't received them"""
     users_purchase_counts = (
         Purchase.query.filter_by(is_paid_for=True, state="paid")
         .join(PriceTier, Product, ProductGroup)

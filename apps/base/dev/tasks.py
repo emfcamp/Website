@@ -16,7 +16,7 @@ from .fake import FakeDataGenerator
 @dev_cli.command("data")
 @click.pass_context
 def dev_data(ctx):
-    """ Make all categories of fake data for dev"""
+    """Make all categories of fake data for dev"""
     ctx.invoke(fake_data)
     ctx.invoke(volunteer_data)
     ctx.invoke(volunteer_shifts)
@@ -24,14 +24,14 @@ def dev_data(ctx):
 
 @dev_cli.command("cfp_data")
 def fake_data():
-    """ Make fake users, proposals, locations, etc """
+    """Make fake users, proposals, locations, etc"""
     fdg = FakeDataGenerator()
     fdg.run()
 
 
 @dev_cli.command("volunteer_data")
 def volunteer_data():
-    """ Make fake volunteer system data """
+    """Make fake volunteer system data"""
     venue_list = [
         {
             "name": "Badge Tent",
@@ -181,7 +181,7 @@ def volunteer_data():
 
 @dev_cli.command("volunteer_shifts")
 def volunteer_shifts():
-    """ Make fake volunteer shifts """
+    """Make fake volunteer shifts"""
     # First = first start time. Final = end of last shift
     shift_list = {
         # 'Tent' roles
@@ -203,6 +203,12 @@ def volunteer_shifts():
         },
         "Car Parking": {
             "Car Park": [
+                {
+                    "first": "2022-06-02 08:00:00",
+                    "final": "2022-06-02 20:00:00",
+                    "min": 1,
+                    "max": 3,
+                },
                 {
                     "first": "2022-06-03 08:00:00",
                     "final": "2022-06-03 20:00:00",
@@ -232,6 +238,12 @@ def volunteer_shifts():
         "Catering": {
             "Volunteer Tent": [
                 {
+                    "first": "2022-06-02 07:00:00",
+                    "final": "2022-06-02 20:00:00",
+                    "min": 2,
+                    "max": 5,
+                },
+                {
                     "first": "2022-06-03 07:00:00",
                     "final": "2022-06-03 20:00:00",
                     "min": 2,
@@ -260,7 +272,7 @@ def volunteer_shifts():
         "Entrance Steward": {
             "Entrance": [
                 {
-                    "first": "2022-06-03 08:00:00",
+                    "first": "2022-06-02 08:00:00",
                     "final": "2022-06-06 12:00:00",
                     "min": 2,
                     "max": 4,
@@ -269,6 +281,12 @@ def volunteer_shifts():
         },
         "Games Master": {
             "Stage A": [
+                {
+                    "first": "2022-06-02 20:00:00",
+                    "final": "2022-06-02 23:00:00",
+                    "min": 1,
+                    "max": 3,
+                },
                 {
                     "first": "2022-06-03 20:00:00",
                     "final": "2022-06-03 23:00:00",
@@ -314,6 +332,18 @@ def volunteer_shifts():
         "Info Desk": {
             "Info Desk": [
                 {
+                    "first": "2022-06-02 10:00:00",
+                    "final": "2022-06-02 20:00:00",
+                    "min": 1,
+                    "max": 1,
+                },
+                {
+                    "first": "2022-06-03 10:00:00",
+                    "final": "2022-06-03 20:00:00",
+                    "min": 1,
+                    "max": 1,
+                },
+                {
                     "first": "2022-06-03 10:00:00",
                     "final": "2022-06-03 20:00:00",
                     "min": 1,
@@ -335,6 +365,12 @@ def volunteer_shifts():
         },
         "Tent Steward": {
             "N/A": [
+                {
+                    "first": "2022-06-02 13:00:00",
+                    "final": "2022-06-02 19:00:00",
+                    "min": 1,
+                    "max": 1,
+                },
                 {
                     "first": "2022-06-03 13:00:00",
                     "final": "2022-06-03 19:00:00",
@@ -358,6 +394,12 @@ def volunteer_shifts():
         "Youth Workshop Helper": {
             "Youth Workshop": [
                 {
+                    "first": "2022-06-02 13:00:00",
+                    "final": "2022-06-02 20:00:00",
+                    "min": 1,
+                    "max": 2,
+                },
+                {
                     "first": "2022-06-03 13:00:00",
                     "final": "2022-06-03 20:00:00",
                     "min": 1,
@@ -380,6 +422,12 @@ def volunteer_shifts():
         # Require training
         "Bar": {
             "Bar": [
+                {
+                    "first": "2022-06-02 11:00:00",
+                    "final": "2022-06-03 02:00:00",
+                    "min": 2,
+                    "max": 5,
+                },
                 {
                     "first": "2022-06-03 11:00:00",
                     "final": "2022-06-04 02:00:00",
@@ -423,6 +471,12 @@ def volunteer_shifts():
         "NOC": {
             "N/A": [
                 {
+                    "first": "2022-06-02 08:00:00",
+                    "final": "2022-06-02 20:00:00",
+                    "min": 1,
+                    "max": 2,
+                },
+                {
                     "first": "2022-06-03 08:00:00",
                     "final": "2022-06-03 20:00:00",
                     "min": 1,
@@ -444,6 +498,12 @@ def volunteer_shifts():
         },
         "Volunteer Manager": {
             "Volunteer Tent": [
+                {
+                    "first": "2022-06-02 11:00:00",
+                    "final": "2022-06-02 21:00:00",
+                    "min": 1,
+                    "max": 1,
+                },
                 {
                     "first": "2022-06-03 11:00:00",
                     "final": "2022-06-03 21:00:00",

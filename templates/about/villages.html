@@ -1,0 +1,53 @@
+
+{% extends "base.html" %}
+{% block title %}Villages{% endblock %}
+{% block secondary_nav %}
+  {% include "about/_nav.html" %}
+{% endblock %}
+{% set main_class = 'about' %}
+{% block body %}
+<h2 id="villages">Villages</h2>
+<p>A village is a group of friends, like minded people, colleagues or even families. Maybe your village is a collection of sub villages, or maybe it’s just your hackerspace. We also see villages based around themes, shared passions and existing communities - great places in the past have been the Maths village, the HAB Village and groups like Milliways and the Scottish Consulate.</p>
+<p>If there is a village based around something you are interested in, then you should definitely visit that village during the event to see what's going on. Or you could even join that village to help make more things go on. If there's not a village based around your interests, then you can start your own village and others will probably join you.</p>
+<p>There is no requirement to be part of a village, so if you'd rather camp on your own and just visit some villages this is fine.</p>
+<p>If you're planning to bring something especially big or in need of lots of power to your village, please let us know beforehand so we can provide you with what you need.</p>
+
+<h3 id="what_to_do">What can we do as a village?</h3>
+<p>Villages are great as you can share ideas, equipment and space! The sharing doesn’t stop there - it lets you share resources too. You can come up with a cooking and cleaning rota as a group to reduce waste, make the camp cheaper and interrupt your day with a change of activity. Some people spend all their time cooking for others!</p>
+<p>Maybe you are working on a group project and want to show off the final result, or you want to spend the weekend building something. Doing this as a village is good fun, and you often find that new friends will appear to share their ideas, opinions and time with you.</p>
+<p>Some villages bring pre-made games and activities for other people to take part in, and some run events and parties during the weekend! This year, we're also designating some villages as <a href="#workshop_villages">workshop villages</a>, who will be provided with a workshop tent to run their own workshops and host others.</p>
+<p>Some of our favourite village activities from previous years include:</p>
+<ul>
+    <li><a href="https://wiki-archive.emfcamp.org/2018/w/index.php/Village:Goldsmithing" target="_blank">Ring Making Workshop</a></li>
+    <li><a href="https://wiki-archive.emfcamp.org/2018/w/index.php/Village:ObscureCon" target="_blank">OscureCon</a></li>
+    <li><a href="https://wiki-archive.emfcamp.org/2018/w/index.php/Village:Hardware_Hacking_Area" target="_blank">The Hardware Hacking Area</a></li>
+    <li><a href="https://wiki-archive.emfcamp.org/2018/w/index.php/Village:HABville" target="_blank">Launching high alititude balloons</a></li>
+</ul>
+
+<h3 id="workshop_villages">Workshop villages</h3>
+<p>This year, we’re moving away from workshops hosted in centralised tents and asking individual villages to run and host workshops in their village. If your village is designated a workshop village, you will be provided with a workshop tent (and some furniture/equipment as needed), in which you will be able to run your own workshops and host workshops submitted by others as part of the CFP (subject to your agreement). We will contact the teams running workshop villages to find what kinds of external workshops would fit in with the kinds of activities you would like in your villages, and try to pair you up with appropriate workshops.</p>
+<p>If you are a workshop village, we will require a minimum amount of activity to take place in your workshop tent - at least two hours per day (on Friday, Saturday and Sunday) of workshops organised and run internally by members of your village, and the capacity to host at least another two hours of other workshops each day - for which you’ll need to make sure the space is ready and tidy, and if you like you can provide a short introductory chat about your village for anyone attending the workshops. It may be that some villages host much more than the minimum, and workshops may range in length from half an hour to several hours, at any time of day. The definition of ‘a workshop’ admits some flexibility, and could include things like:</p>
+<ul>
+    <li>Technical presentations or lectures</li>
+    <li>Skill shares</li>
+    <li>Drop-in sessions</li>
+    <li>Q&As</li>
+    <li>Roundtables</li>
+    <li>Informal 'jam' sessions (not necessarily musical!)</li>
+</ul>
+<p>Of course, if your village is not officially a workshop village, that won't stop you from running events like this - you can do things outside, set up your own space, or even run things in other workshop tents outside your village. If you have any questions about being a workshop village and what it entails, you can <a href="mailto:villages@emfcamp.org">email the Village People</a>.</p>
+
+<h3 id="village_people">The Village People</h3>
+<p>The Village People are available to support making things happen in your village. If you have a cool idea, but need help with planning or logistics of doing things on site, please contact us before hand. The earlier you let us know your plans, the better we can help you.</p>
+<p>There is also limited funding available for villages that want to put on content. Please <a href="mailto:villages@emfcamp.org">email the Village People</a> and we will be very happy to discuss anything you might come up with!</p>
+
+<h3 id="register">Register a Village</h3>
+<p>By <a href="{{ url_for("villages.villages_redirect") }}">registering your village</a> you'll be making the Village People aware of the fact you plan to arrive, and how much space you're likely to need. That means you'll be assigned some space, your village will appear on the map, and you'll be able to publish any events your running on the main schedule.</p>
+<p>Before arriving please take a look at the <a href="https://wiki.emfcamp.org/wiki/Good_Village_Guide">Good Village Guide</a>, which includes advice on how to make your village its best.</p>
+
+<h3 id="marquees">Village Furniture</h3>
+<p>To make things easier for villages, we offer the opportunity to book a marquee and furniture through us, which will be set up and ready for when you arrive on site.</p>
+
+<p>If you wish to book one of these, please use the <a href="https://www.emfcamp.org/tickets/hire">web shop</a>.</p>
+
+{% endblock %}

@@ -10,6 +10,7 @@ from prometheus_client.multiprocess import MultiProcessCollector
 from sqlalchemy import cast, String
 
 from models import count_groups
+from models.email import EmailJobRecipient
 from models.payment import Payment
 from models.product import Product
 from models.purchase import Purchase, AdmissionTicket
@@ -50,6 +51,9 @@ class ExternalMetrics:
         emf_proposals = GaugeMetricFamily(
             "emf_proposals", "CfP Submissions", labels=["type", "state"]
         )
+        emf_email_jobs = GaugeMetricFamily(
+            "emf_emails", "Email recipients", labels=["sent"]
+        )
 
         gauge_groups(
             emf_purchases,
@@ -66,8 +70,19 @@ class ExternalMetrics:
             cast(AdmissionTicket.badge_issued, String),
         )
         gauge_groups(emf_proposals, Proposal.query, Proposal.type, Proposal.state)
+        gauge_groups(
+            emf_email_jobs,
+            EmailJobRecipient.query,
+            cast(EmailJobRecipient.sent, String),
+        )
 
-        return [emf_purchases, emf_payments, emf_attendees, emf_proposals]
+        return [
+            emf_purchases,
+            emf_payments,
+            emf_attendees,
+            emf_proposals,
+            emf_email_jobs,
+        ]
 
 
 @metrics.route("/metrics")

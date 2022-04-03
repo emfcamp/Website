@@ -4,7 +4,7 @@ import prometheus_client.multiprocess
 
 
 def on_starting(server):
-    prometheus_dir = os.environ.get("prometheus_multiproc_dir")
+    prometheus_dir = os.environ.get("PROMETHEUS_MULTIPROC_DIR")
 
     if os.path.exists(prometheus_dir):
         shutil.rmtree(prometheus_dir)

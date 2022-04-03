@@ -1,5 +1,11 @@
-from wtforms import SubmitField, StringField, SelectField, TextAreaField, IntegerField
-from wtforms.validators import Optional, Length
+from wtforms import (
+    SubmitField,
+    StringField,
+    SelectField,
+    TextAreaField,
+    IntegerField,
+)
+from wtforms.validators import Optional, Length, URL
 
 from ..common.forms import Form
 
@@ -7,6 +13,7 @@ from ..common.forms import Form
 class VillageForm(Form):
     name = StringField("Village Name", [Length(2, 25)])
     description = TextAreaField("Description", [Optional()])
+    url = StringField("URL", [URL(), Optional()])
 
     num_attendees = IntegerField("Number of People", [Optional()])
     size_sqm = IntegerField("Size (square metres)", [Optional()])

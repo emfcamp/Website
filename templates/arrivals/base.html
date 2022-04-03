@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block css %}
-  <link rel="stylesheet" href="{{ static_url_for('static', filename='css/arrivals.css') }}">
+  <link rel="stylesheet" href="{{ static_url_for('static', filename='css/main.css') }}">
+  <link rel="stylesheet" href="{{ static_url_for('static', filename='css/admin.css') }}">
 {% endblock %}
 
 {% block document %}
@@ -35,9 +36,6 @@
 {% endblock %}
 
 {% block foot %}
-{% assets 'https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js',
-          'https://bartaz.github.io/sandbox.js/jquery.highlight.js',
-          'https://cdn.datatables.net/plug-ins/1.10.12/features/searchHighlight/dataTables.searchHighlight.min.js' %}
-<script type="text/javascript" src="{{ ASSET_URL }}"></script>
-{% endassets %}
+  <script type="text/javascript" src="{{static_url_for('static', filename="js/main.js")}}"></script>
+  <script type="text/javascript" src="{{static_url_for('static', filename="js/arrivals.js")}}"></script>
 {% endblock -%}

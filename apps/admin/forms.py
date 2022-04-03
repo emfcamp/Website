@@ -1,10 +1,5 @@
 from datetime import datetime, timedelta
-from wtforms.validators import (
-    Optional,
-    DataRequired,
-    InputRequired,
-    ValidationError,
-)
+from wtforms.validators import Optional, DataRequired, InputRequired, ValidationError
 from wtforms.widgets import TextArea
 from wtforms import (
     SubmitField,
@@ -188,11 +183,35 @@ class EditVoucherForm(VoucherForm):
 
 
 class BulkVoucherEmailForm(Form):
-    emails = TextAreaField("Email Addresses")
+    subject = StringField(
+        "Subject", [DataRequired()], default="Your Electromagnetic Field Voucher"
+    )
+    text = StringField(
+        "Message",
+        [DataRequired()],
+        widget=TextArea(),
+        default="""Hello,
+
+You can now buy your Electromagnetic Field ticket through [this link]({{voucher_url}}).
+
+You are guaranteed these tickets until {{expiry}}, so please make sure you use your voucher before then.
+
+Love,
+
+Everyone at Electromagnetic Field
+    """,
+    )
+    reason = StringField(
+        "Email reason",
+        [DataRequired()],
+        default="You're receiving this email because you participated in a previous EMF event.",
+    )
+    emails = TextAreaField("Email Addresses", [DataRequired()])
     expires = DateField("Expiry Date", default=datetime.now() + timedelta(days=30))
     num_purchases = IntegerField("Max Purchases", [InputRequired()], default=1)
     num_tickets = IntegerField("Max Adult Tickets", [InputRequired()], default=2)
-    create = SubmitField("Create All")
+    preview = SubmitField("Preview")
+    create = SubmitField("Send")
 
 
 #
@@ -201,14 +220,14 @@ class BulkVoucherEmailForm(Form):
 
 
 class IssueTicketsInitialForm(Form):
-    " Initial form to ask for email "
+    "Initial form to ask for email"
     email = EmailField("Email address")
     issue_free = SubmitField("Issue Free Ticket")
     reserve = SubmitField("Reserve Ticket for Payment")
 
 
 class TicketAmountForm(Form):
-    " Sub-form for selecting the number for a specific ticket"
+    "Sub-form for selecting the number for a specific ticket"
     amount = IntegerSelectField("Number of tickets", [Optional()])
     tier_id = HiddenIntegerField("Price tier", [DataRequired()])
 

@@ -1,11 +1,4 @@
-from flask import (
-    render_template,
-    redirect,
-    request,
-    flash,
-    url_for,
-    current_app as app,
-)
+from flask import render_template, redirect, request, flash, url_for, current_app as app
 from flask_login import login_required, current_user
 from wtforms import StringField, SubmitField, BooleanField
 from wtforms.validators import DataRequired
@@ -48,6 +41,7 @@ def account():
 
 
 @users.route("/account/details", methods=["GET", "POST"])
+@login_required
 def details():
     form = AccountForm()
 

@@ -5,6 +5,9 @@
  *   - 1200px
  */
 
+@use "./_variables.scss" as *;
+@use "./_non_prod_banner.scss" as *;
+
 body {
   font-size: 16px;
   color: $main-background-text;
@@ -25,17 +28,34 @@ a:hover {
 }
 
 
-.well, .jumbotron, .panel {
-  background-color: $highlight-background;
-  color: $highlight-background-text;
+.well, .panel {
+    background-color: $highlight-background;
+    color: $highlight-background-text;
+    border: none;
+
+    a {
+        color: inherit;
+    }
+
+    .has-error .help-block a {
+        color: inherit;
+    }
+
+    header, h2, h3, h4, h5, h6 {
+        color: inherit;
+    }
 }
 
-.well, .jumbotron, .panel {
-  border: none;
+.content-well {
+  background-color: $content-well-background;
+  color: $main-background-text;
+  
+  h3 {
+    margin-top: 0;
+  }
 }
 
 .panel {
-    color: $highlight-background-text;
     display: block;
 }
 
@@ -183,11 +203,6 @@ p.summary {
   font-weight: bold;
 }
 
-.jumbotron p.small {
-    line-height: 14px;
-    font-weight: normal;
-}
-
 form.shrink {
     margin: 0;
 }
@@ -242,20 +257,13 @@ legend {
 }
 
 /* Restore link colours */
-.alert-success a {
-  color: #3c763d;
-}
-
-.alert-info a {
-  color: #31708f;
-}
-
-.alert-warning a {
-  color: #8a6d3b;
-}
-
-.alert-danger a {
-  color: #a94442;
+.alert-success,
+.alert-info,
+.alert-warning,
+.alert-danger {
+    a {
+        color: inherit;
+    }
 }
 
 .alert-link {
@@ -402,7 +410,7 @@ label.big-checkbox {
   vertical-align: 4px;
 }
 
-/* Modals */
+/* Modals for the schedules */
 .modal {
   color: black;
 

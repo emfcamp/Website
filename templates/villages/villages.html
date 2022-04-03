@@ -3,7 +3,7 @@
 {% block title %}Villages{% endblock %}
 {% block body %}
 <h2>Villages</h2>
-<p>For more information on villages, see our <a href="https://wiki.emfcamp.org/wiki/Villages">villages guide</a>.
+<p>For more information on villages, see the <a href="{{ url_for("base.villages") }}">villages page</a>.
 {% if current_user.is_authenticated %}
   If you want to create a village, you can
       <a href="{{url_for('.register')}}">register it here</a>.
@@ -22,7 +22,11 @@ If you have a ticket, you can <a href="{{url_for('users.login', next=url_for('.r
   <tbody>
   {% for village in villages %}
     <tr>
-      <td>{{village.name}}</td>
+      {% if village.url %}
+        <td><a href="{{ village.url }}" rel="nofollow" target="_blank">{{village.name}}</a></td>
+      {% else %}
+        <td>{{village.name}}</td>
+      {% endif %}
       <td>{{village.description}}</td>
     </tr>
   {% endfor %}

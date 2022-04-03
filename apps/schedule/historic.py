@@ -26,7 +26,7 @@ def parse_event(event):
 
 
 def item_historic(year, proposal_id, slug):
-    """ Handler to display a detail page for a schedule item."""
+    """Handler to display a detail page for a schedule item."""
     abort_if_invalid_year(year)
 
     #  We might want to look at performance here but I'm not sure it's a huge issue at the moment
@@ -112,7 +112,7 @@ def talks_historic(year):
 
 
 def feed_historic(year, fmt):
-    """ Serve a historic feed if it's available. """
+    """Serve a historic feed if it's available."""
     abort_if_invalid_year(year)
     file_path = archive_file(year, "public", f"schedule.{fmt}")
     return send_file(file_path)

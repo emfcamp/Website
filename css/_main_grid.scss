@@ -3,6 +3,7 @@
  * window is larger than $main-content-width, and fluid below.
  */
 
+@use "./_variables.scss" as *;
 
 #emf-container {
   @media (min-width: $main-content-width + 14) {

@@ -1,8 +1,17 @@
-# coding=utf-8
 from main import db
+from markdown import markdown
+from flask import Markup
+from os import path
+
+from .. import BaseModel
 
 
-class Role(db.Model):
+def role_name_to_markdown_file(role_name):
+    res = role_name.lower().replace(" ", "-").replace("/", "-").replace(":", "")
+    return "apps/volunteer/role_descriptions/" + res + ".md"
+
+
+class Role(BaseModel):
     __tablename__ = "volunteer_role"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False, unique=True, index=True)
@@ -27,6 +36,14 @@ class Role(db.Model):
             "requires_training": self.requires_training,
         }
 
+    def full_description(self):
+        role_description_file = role_name_to_markdown_file(self.name)
+        if not path.exists(role_description_file):
+            return self.description
+
+        content = open(role_description_file, "r").read()
+        return Markup(markdown(content, extensions=["markdown.extensions.nl2br"]))
+
     @classmethod
     def get_by_name(cls, name):
         return cls.query.filter_by(name=name).one_or_none()
@@ -40,8 +57,8 @@ class Role(db.Model):
         return cls.query.order_by(Role.name).all()
 
 
-class RolePermission(db.Model):
-    __versioned__ = {}
+class RolePermission(BaseModel):
+    __versioned__: dict = {}
     __tablename__ = "volunteer_role_permission"
 
     id = db.Column(db.Integer, primary_key=True)

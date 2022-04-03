@@ -1,0 +1,11 @@
+@use "./_variables.scss" as *;
+
+.non-prod-banner {
+  text-align: center;
+  z-index: 1001;
+  position: relative;
+  box-shadow: 0 2px 5px -2px $body-background-shadow;
+  padding: 0.5ex 0;
+  margin-bottom: 1ex;
+}
+

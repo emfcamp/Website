@@ -6,6 +6,7 @@
 """
 
 import logging
+import os
 from werkzeug.local import Local, LocalManager
 
 local = Local()
@@ -13,16 +14,17 @@ local_manager = LocalManager([local])
 
 
 class ContextFormatter(logging.Formatter):
-    """ A logging formatter which inserts the user ID
-        into the logging record. """
+    """A logging formatter which inserts the user ID
+    into the logging record."""
 
     def format(self, record):
         record.user = getattr(local, "user_id", None)
+        record.pid = os.getpid()
         return logging.Formatter.format(self, record)
 
 
 def set_user_id(uid):
-    """ Set the user ID for later use in logging. """
+    """Set the user ID for later use in logging."""
     local.user_id = uid
 
 

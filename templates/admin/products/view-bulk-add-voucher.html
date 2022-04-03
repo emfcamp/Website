@@ -16,15 +16,25 @@
    Please submit fewer than 250 emails in each batch.</p>
 
 <p>If an email address has already been sent a voucher for this view, it will be skipped.</p>
+
+{% if preview %}
+    <h3>Message Preview</h3>
+    <iframe width="700px" height="800px" srcdoc="{{preview}}">
+    </iframe>
+{% endif %}
 <form action="" method="post">
 {{ form.hidden_tag() }}
 
+{{ render_field(form.subject) }}
+{{ render_field(form.text, horizontal=False, cols=120, rows=20) }}
+{{ render_field(form.reason) }}
 {{ render_field(form.emails, horizontal=False) }}
 {{ render_field(form.expires, horizontal=False) }}
 {{ render_field(form.num_purchases, horizontal=False) }}
 {{ render_field(form.num_tickets, horizontal=False) }}
 
-{{ form.create(class_="btn btn-success debounce") }}
+{{ form.preview(class_="btn btn-success debounce") }}
+{{ form.create(class_="btn debounce") }}
 </form>
 
 {% endblock %}

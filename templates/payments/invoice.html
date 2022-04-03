@@ -1,3 +1,5 @@
+{% from 'payments/_invoicehelpers.html' import render_epc_qr with context %}
+
 {% extends 'base.html' %}
 
 {% block css %}
@@ -50,7 +52,7 @@
   <div class="sender">
     <img class="logo" src="{{ url_for('static', filename='images/logomark-black.svg') }}" height="80" alt="Electromagnetic Field" />
     <div class="vcard">
-      <div class="fn org">Electromagnetic Field Ltd.</div>
+      <div class="fn org">EMF Festivals Ltd.</div>
       <div class="adr">
         <span class="street-address">483 Green Lanes</span>
         <span class="locality">London</span>
@@ -87,7 +89,7 @@
       {% if mode != 'invoice' %}<dt>Order number</dt><dd>{{ payment.order_number() }}</dd>{% endif %}
       {% if mode == 'invoice' %}
         <dt>Invoice number</dt><dd>{{invoice_number}}</dd>
-        <dt>VAT number</dt><dd>188170679</dd>
+        <dt>VAT number</dt><dd>387001308</dd>
       {% endif %}
     </dl>
   </div>
@@ -169,8 +171,9 @@
   {% endif %}
   {% if payment.provider == 'banktransfer' %}
   <dl class="bank-info dl-horizontal">
+    {% set account = payment.recommended_destination %}
     <dt>Bank</dt><dd>{{ account.institution }}, {{ account.address }}</dd>
-    <dt>Payee</dt><dd>Electromagnetic Field Ltd</dd>
+    <dt>Payee</dt><dd>EMF Festivals Ltd</dd>
     {% if payment.currency == 'GBP' %}
     <dt>Sort code</dt><dd>{{ account.sort_code | sort_code }}</dd>
     <dt>Account number</dt><dd>{{ account.acct_id }}</dd>
@@ -179,9 +182,12 @@
     <dt>IBAN</dt><dd>{{ account.iban | iban }}</dd>
     {% endif %}
     <dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
+    {#
+      {% if payment.provider == 'banktransfer' and payment.currency == 'EUR' and payment.state == 'inprogress' %}
+      <dt>EPC QR Code</dt><dd>{{ render_epc_qr(payment) }}</dd>
+      {% endif %}
+    #}
   </dl>
-  {% elif payment.provider == 'gocardless' and payment.state != 'inprogress' %}
-  <div>Payment to be made online at {{ external_url('payments.gocardless_tryagain', payment_id=payment.id) }}</div>
   {% elif payment.provider == 'stripe' %}
   <div>Payment to be made online at {{ external_url('payments.stripe_capture', payment_id=payment.id) }}</div>
   {% endif %}
@@ -197,7 +203,7 @@
 
       <footer>
         <dl class="company-info">
-          <dt>Company Registration No</dt><dd>07788466</dd>
+          <dt>Company Registration No</dt><dd>13085232</dd>
           <dt>Registered Office</dt><dd>483 Green Lanes, London, N13 4BS</dd>
         </dl>
       </footer>

@@ -24,6 +24,8 @@ def review_list():
         return redirect(url_for(".review_list"))
 
     review_order_dt = session.get("review_order_dt")
+    if review_order_dt:
+        review_order_dt = review_order_dt.replace(tzinfo=None)
 
     last_visit = session.get("review_visit_dt")
     if not last_visit:
@@ -36,6 +38,8 @@ def review_list():
         if last_vote_cast:
             last_visit = last_vote_cast.modified
             review_order_dt = last_vote_cast.modified
+    else:
+        last_visit = last_visit.replace(tzinfo=None)
 
     proposal_query = Proposal.query.filter(Proposal.state == "anonymised")
 

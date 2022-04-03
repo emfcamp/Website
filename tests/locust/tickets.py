@@ -1,16 +1,20 @@
-from locust import HttpLocust, TaskSet, task, between
-from locust.exception import StopLocust
+from locust import HttpUser, task, between
+from locust.exception import StopUser
 
 import lxml.html
 
 
-class EMFTaskSet(TaskSet):
-    def on_start(self):
-        # We need a referer to pass the CSRF protection
-        self.client.headers["Referer"] = self.client.base_url
+"""
+Run this with e.g.:
+
+    run locust -f tests/locust/tickets.py --headless -u 1000 -r 100 --host https://www.emfcamp-test.org
+
+"""
 
 
-class CheckTickets(EMFTaskSet):
+class CheckTicketsUser(HttpUser):
+    wait_time = between(1, 2)
+
     @task
     def index(self):
         self.client.get("/")
@@ -20,7 +24,9 @@ class CheckTickets(EMFTaskSet):
         self.client.get("/tickets")
 
 
-class ReserveTickets(EMFTaskSet):
+class ReserveTicketsUser(HttpUser):
+    wait_time = between(0, 1)
+
     """
     These numbers are based on the first round of 2018.
     Supporter tickets and campervans are the same as full tickets and parking
@@ -83,14 +89,4 @@ class ReserveTickets(EMFTaskSet):
 
         self.client.post("/tickets", data)
 
-        raise StopLocust()
-
-
-class CheckTicketsLocust(HttpLocust):
-    task_set = CheckTickets
-    wait_time = between(1, 2)
-
-
-class ReserveTicketsLocust(HttpLocust):
-    task_set = ReserveTickets
-    wait_time = between(0, 1)
+        raise StopUser()

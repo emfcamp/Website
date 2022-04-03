@@ -25,7 +25,7 @@ from wtforms import SubmitField
 from sqlalchemy.orm.exc import NoResultFound
 from stripe.error import AuthenticationError
 
-from main import db, stripe, mail, csrf
+from main import db, stripe, mail
 from models.payment import StripePayment
 from ..common import feature_enabled
 from ..common.forms import Form
@@ -55,9 +55,9 @@ def webhook(type=None):
     return inner
 
 
-def stripe_start(payment):
-    """ This is called by the ticket flow to initialise the payment and
-        redirect to the capture page. We don't need to do anything here."""
+def stripe_start(payment: StripePayment):
+    """This is called by the ticket flow to initialise the payment and
+    redirect to the capture page. We don't need to do anything here."""
     logger.info("Starting Stripe payment %s", payment.id)
     db.session.commit()
 
@@ -67,9 +67,9 @@ def stripe_start(payment):
 @payments.route("/pay/stripe/<int:payment_id>/capture")
 @login_required
 def stripe_capture(payment_id):
-    """ This endpoint displays the card payment form, including the Stripe payment element.
-        Card details are validated and submitted to Stripe by XHR, and if it succeeds
-        a POST is sent back, which is received by the next endpoint.
+    """This endpoint displays the card payment form, including the Stripe payment element.
+    Card details are validated and submitted to Stripe by XHR, and if it succeeds
+    a POST is sent back, which is received by the next endpoint.
     """
     payment = lock_user_payment_or_abort(payment_id, "stripe", valid_states=["new"])
 
@@ -91,6 +91,16 @@ def stripe_capture(payment_id):
     else:
         # Reuse a previously-created payment intent
         intent = stripe.PaymentIntent.retrieve(payment.intent_id)
+        if intent.status == "succeeded":
+            logger.warn(f"Intent already succeeded, not capturing again")
+            payment.state = "charging"
+            db.session.commit()
+            return redirect(url_for(".stripe_waiting", payment_id=payment_id))
+
+        if intent.payment_method:
+            logger.warn(
+                f"Intent already has payment method {intent.payment_method}, this will likely fail"
+            )
 
     logger.info(
         "Starting checkout for Stripe payment %s with intent %s",
@@ -107,9 +117,9 @@ def stripe_capture(payment_id):
 @payments.route("/pay/stripe/<int:payment_id>/capture", methods=["POST"])
 @login_required
 def stripe_capture_post(payment_id):
-    """ The user is sent here after the payment has succeeded in the browser.
-        We set the payment state to charging, but we're expecting a webhook to
-        set it to "paid" almost immediately.
+    """The user is sent here after the payment has succeeded in the browser.
+    We set the payment state to charging, but we're expecting a webhook to
+    set it to "paid" almost immediately.
     """
     payment = lock_user_payment_or_abort(payment_id, "stripe")
     if payment.state == "new":
@@ -157,7 +167,6 @@ def stripe_waiting(payment_id):
     )
 
 
-@csrf.exempt
 @payments.route("/stripe-webhook", methods=["POST"])
 def stripe_webhook():
     try:
@@ -193,7 +202,7 @@ def stripe_webhook():
 
 @webhook()
 def stripe_default(_type, _obj):
-    """ Default webhook handler """
+    """Default webhook handler"""
     return ("", 200)
 
 
@@ -203,8 +212,8 @@ def stripe_ping(_type, _obj):
 
 
 def stripe_update_payment(payment: StripePayment, intent: stripe.PaymentIntent = None):
-    """ Update a Stripe payment.
-        If a PaymentIntent object is not passed in, this will fetch the payment details from the Stripe API.
+    """Update a Stripe payment.
+    If a PaymentIntent object is not passed in, this will fetch the payment details from the Stripe API.
     """
     if intent is None:
         intent = stripe.PaymentIntent.retrieve(payment.intent_id)
@@ -220,7 +229,7 @@ def stripe_update_payment(payment: StripePayment, intent: stripe.PaymentIntent =
     charge = intent.charges.data[0]
 
     if payment.charge_id is not None and payment.charge_id != charge["id"]:
-        logging.warn(
+        logger.warn(
             f"Charge ID for intent {intent['id']} has changed from {payment.charge_id} to {charge['id']}"
         )
 
@@ -323,7 +332,7 @@ def stripe_payment_failed(payment):
     # to set the payment state to failed here.
 
 
-def lock_payment_or_abort_by_intent(intent_id):
+def lock_payment_or_abort_by_intent(intent_id: str) -> StripePayment:
     try:
         return (
             StripePayment.query.filter_by(intent_id=intent_id).with_for_update().one()
@@ -333,7 +342,7 @@ def lock_payment_or_abort_by_intent(intent_id):
         abort(409)
 
 
-def lock_payment_or_abort_by_charge(charge_id):
+def lock_payment_or_abort_by_charge(charge_id: str) -> StripePayment:
     try:
         return (
             StripePayment.query.filter_by(charge_id=charge_id).with_for_update().one()
@@ -387,7 +396,7 @@ def stripe_charge_refunded(_type, charge):
 
 
 def stripe_validate():
-    """ Validate Stripe is configured and operational """
+    """Validate Stripe is configured and operational"""
     result = []
     sk = app.config.get("STRIPE_SECRET_KEY", "")
     if len(sk) > 15 and sk.startswith("sk_"):

@@ -1,4 +1,4 @@
-@import "./_variables.scss";
+@use "./_variables.scss" as *;
 
 .filters {
   margin-top: 1em;

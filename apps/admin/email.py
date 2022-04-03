@@ -1,32 +1,18 @@
 from . import admin
-import markdown
-from inlinestyler.utils import inline_css
-from flask import render_template, redirect, flash, url_for, Markup
-from flask import current_app as app
-from flask_mail import Message
+from flask import render_template, redirect, flash, url_for
 from wtforms import SubmitField, StringField, SelectField
 from wtforms.validators import DataRequired
 from wtforms.widgets import TextArea
-from main import db, mail
 from models.user import User
 from models.cfp import Proposal
-from models.email import EmailJob, EmailJobRecipient
 from models.payment import Payment
+from models.village import VillageMember
 from ..common.forms import Form
-
-
-def format_html_email(markdown_text, subject):
-    extensions = ["markdown.extensions.nl2br", "markdown.extensions.smarty"]
-    markdown_html = Markup(markdown.markdown(markdown_text, extensions=extensions))
-    return inline_css(
-        render_template(
-            "admin/email/email_template.html", subject=subject, content=markdown_html
-        )
-    )
-
-
-def format_plaintext_email(markdown_text):
-    return markdown_text
+from ..common.email import (
+    format_trusted_html_email,
+    enqueue_trusted_emails,
+    preview_trusted_email,
+)
 
 
 class EmailComposeForm(Form):
@@ -39,6 +25,7 @@ class EmailComposeForm(Form):
             ("ticket", "Ticketholders"),
             ("purchasers", "Users who made payments"),
             ("cfp", "Accepted CfP"),
+            ("villages", "Village owners"),
         ],
     )
     preview = SubmitField("Preview Email")
@@ -62,6 +49,8 @@ def get_query(dest):
         return User.query.join(User.proposals).filter(
             Proposal.state.in_(("accepted", "finished"))
         )
+    elif dest == "villages":
+        return User.query.join(User.village_memberships).filter(VillageMember.admin)
 
 
 @admin.route("/email", methods=["GET", "POST"])
@@ -72,39 +61,26 @@ def email():
         if form.preview.data is True:
             return render_template(
                 "admin/email.html",
-                html=format_html_email(form.text.data, form.subject.data),
+                html=format_trusted_html_email(form.text.data, form.subject.data),
                 form=form,
                 count=users.count(),
             )
 
         if form.send_preview.data is True:
-            subject = "[PREVIEW] " + form.subject.data
-            formatted_html = format_html_email(form.text.data, subject)
-            preview_email = form.send_preview_address.data
+            preview_trusted_email(
+                form.send_preview_address.data, form.subject.data, form.text.data
+            )
 
-            with mail.connect() as conn:
-                msg = Message(subject, sender=app.config["CONTACT_EMAIL"])
-                msg.add_recipient(preview_email)
-                msg.body = format_plaintext_email(form.text.data)
-                msg.html = formatted_html
-                conn.send(msg)
-
-            flash("Email preview sent to %s" % preview_email)
+            flash("Email preview sent to %s" % form.send_preview_address.data)
             return render_template(
-                "admin/email.html", html=formatted_html, form=form, count=users.count()
+                "admin/email.html",
+                html=format_trusted_html_email(form.text.data, form.subject.data),
+                form=form,
+                count=users.count(),
             )
 
         if form.send.data is True:
-            job = EmailJob(
-                form.subject.data,
-                format_plaintext_email(form.text.data),
-                format_html_email(form.text.data, form.subject.data),
-            )
-            db.session.add(job)
-
-            for user in users:
-                db.session.add(EmailJobRecipient(job, user))
-            db.session.commit()
+            enqueue_trusted_emails(users, form.subject.data, form.text.data)
             flash("Email queued for sending to %s users" % users.count())
             return redirect(url_for(".email"))
 

@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from flask import (
+    Markup,
     render_template,
     redirect,
     request,
@@ -17,10 +18,9 @@ from main import db
 from models.user import UserShipping
 from models.basket import Basket
 from models.product import VoucherUsedError
-from models.payment import BankPayment, StripePayment, GoCardlessPayment
+from models.payment import BankPayment, StripePayment
 
 from ..common import get_user_currency, set_user_currency, create_current_user
-from ..payments.gocardless import gocardless_start
 from ..payments.banktransfer import transfer_start
 from ..payments.stripe import stripe_start
 
@@ -32,9 +32,9 @@ from . import tickets, price_changed, empty_baskets, get_product_view
 @tickets.route("/tickets/pay/<flow>", methods=["GET", "POST"])
 def pay(flow="main"):
     """
-        The user is sent here once they've added tickets to their basket.
-        This view collects users details, offers payment options, and then
-        starts the correct payment flow in the payment app.
+    The user is sent here once they've added tickets to their basket.
+    This view collects users details, offers payment options, and then
+    starts the correct payment flow in the payment app.
     """
     view = get_product_view(flow)
 
@@ -74,14 +74,29 @@ def pay(flow="main"):
                 request.headers.get("User-Agent"),
             )
 
+        elif current_user.is_authenticated:
+            # This might happen if the user clicks back and then refresh in their browser
+            app.logger.info("Empty basket, redirecting back to purchases page")
+            flash("Your basket was empty. Please check your purchases below.")
+            return redirect(url_for("users.purchases"))
+
         else:
-            app.logger.info("Basket is empty, redirecting back to choose tickets")
+            # This should never normally happen. The user wants to pay
+            # for something, but we have no handle on them. Give up.
+            app.logger.info(
+                "Empty basket for anonymous user, redirecting back to choose tickets"
+            )
+            phrase = "item to buy"
             if view.type == "tickets":
-                flash("Please select at least one ticket to buy.")
+                phrase = "ticket to buy"
             elif view.type == "hire":
-                flash("Please select at least one item to hire.")
-            else:
-                flash("Please select at least one item to buy.")
+                phrase = "item to hire"
+            msg = Markup(
+                f"""
+                Please select at least one {phrase}, or <a href="{url_for("users.login")}">log in</a> to view your orders.
+                """
+            )
+            flash(msg)
             return redirect(url_for("tickets.main", flow=flow))
 
     if basket.requires_shipping:
@@ -109,6 +124,24 @@ def pay(flow="main"):
 
     form.basket_total.data = basket.total
 
+    # Whether the user has an admission ticket in their basket or already purchased.
+    # FIXME: this is rather ugly
+    has_admission_ticket = any(p.product.is_adult_ticket() for p in basket.purchases)
+    if current_user.is_authenticated:
+        has_admission_ticket |= any(
+            (
+                p.product.is_adult_ticket()
+                and p.state not in ("cancelled", "refunded", "reserved")
+            )
+            for p in current_user.owned_tickets
+        )
+
+    # Whether the user has any purchases in their basket which require an admission ticket,
+    # such as parking or live-in vehicle tickets.
+    requires_admission_ticket = any(
+        p.parent.get_attribute("requires_admission_ticket", True) for p in basket.keys()
+    )
+
     return render_template(
         "tickets/payment-choose.html",
         form=form,
@@ -116,10 +149,11 @@ def pay(flow="main"):
         total=basket.total,
         flow=flow,
         view=view,
+        admission_ticket_needed=requires_admission_ticket and not has_admission_ticket,
     )
 
 
-def start_payment(form, basket, flow):
+def start_payment(form: TicketPaymentForm, basket: Basket, flow: str):
     if Decimal(form.basket_total.data) != Decimal(basket.total):
         # Check that the user's basket approximately matches what we told them they were paying.
         price_changed.inc()
@@ -194,9 +228,11 @@ def start_payment(form, basket, flow):
         )
         return redirect(url_for("tickets.main", flow=flow))
 
-    if payment_type == GoCardlessPayment:
-        return gocardless_start(payment)
-    elif payment_type == BankPayment:
+    if payment_type == BankPayment:
         return transfer_start(payment)
-    elif payment_type == StripePayment:
+    if payment_type == StripePayment:
         return stripe_start(payment)
+
+    app.logger.exception(f"Unexpected payment_type: {repr(payment_type)}")
+    flash("We're sorry, an unexpected error occurred. Please try ordering again.")
+    return redirect(url_for("tickets.main", flow=flow))

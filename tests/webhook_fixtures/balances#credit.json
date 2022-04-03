@@ -1,0 +1,1 @@
+{"data":{"resource":{"id":0,"profile_id":0,"type":"balance-account"},"amount":0.01,"currency":"EUR","post_transaction_balance_amount":0.01,"occurred_at":"2022-02-24T02:48:21Z","transaction_type":"credit"},"subscription_id":"00000000-0000-0000-0000-000000000000","event_type":"balances#credit","schema_version":"2.0.0","sent_at":"2022-02-24T02:48:21Z"}

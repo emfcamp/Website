@@ -2,7 +2,6 @@
     {% for human_type, human_type_proposals in proposals | groupby('human_type') %}
         <h2 class="event-type">{{ human_type | title }}</h2>
         <form method="post" action="{{url_for(".add_favourite")}}">
-        <input id="csrf_token" name=_csrf_token type=hidden value="{{ csrf_token() }}">
         <input type="hidden" name="event_type" value="proposal">
         <div>
             {% for prop in human_type_proposals %}

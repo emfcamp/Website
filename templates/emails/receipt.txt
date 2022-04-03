@@ -1,3 +1,5 @@
+{% extends "emails/base.txt" %}
+{% block body %}
 Hello {{ user.name }}!
 
 With Electromagnetic Field fast approaching, here are your tickets
@@ -14,3 +16,4 @@ Cheers and see you soon!
 
 The EMF Team
 
+{% endblock %}

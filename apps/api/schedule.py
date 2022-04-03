@@ -20,7 +20,7 @@ class FavouriteProposal(Resource):
         return {"is_favourite": current_state}
 
     def put(self, proposal_id):
-        """ Put with no data to toggle """
+        """Put with no data to toggle"""
         if not current_user.is_authenticated:
             abort(401)
 
@@ -54,7 +54,7 @@ class FavouriteExternal(Resource):
         return {"is_favourite": current_state}
 
     def put(self, event_id):
-        """ Put with no data to toggle """
+        """Put with no data to toggle"""
         if not current_user.is_authenticated:
             abort(401)
 

@@ -1,3 +1,5 @@
+{% extends "emails/base.txt" %}
+{% block body %}
 Hi {{ proposal.user.name }},
 
 We're very sorry but your EMF {{ proposal.human_type }} proposal '{{ proposal.title }}' was not selected by our review panel.
@@ -12,3 +14,4 @@ This year we've had many more high-quality applications than we could possibly h
 
 Thanks,
 The EMF team
+{% endblock %}

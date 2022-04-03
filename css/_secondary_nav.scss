@@ -1,8 +1,11 @@
+@use "sass:math";
+@use "./_variables.scss" as *;
+
 .secondary-nav {
   background-color: $main-background;
   @media (min-width: $main-content-width) {
-    min-width: $main-content-width / 6;
-    max-width: $main-content-width / 6;
+    min-width: math.div($main-content-width, 6);
+    max-width: math.div($main-content-width, 6);
   }
   padding: 15px 0px 15px 10px;
   border-right: 1px solid $body-background-shadow;

@@ -107,6 +107,7 @@ venv.bak/
 # ignore vscode settings
 .vscode
 
+.*.swp
 *.DS_Store
 var/*.db
 var/*.ofx
@@ -128,8 +129,10 @@ node_modules
 # Compiled static assets
 static/*
 !static/financial-statements
+!static/fonts
 
 # Hashed files created by flask-static-digest
 static/**/*-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f].*
 static/**/*.gz
 static/cache_manifest.json
+

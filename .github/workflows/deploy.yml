@@ -3,7 +3,7 @@ name: Deploy
 on: 
   push:
     branches:
-      - master
+      - main
 
 env:
   COMPOSE_INTERACTIVE_NO_CLI: 1

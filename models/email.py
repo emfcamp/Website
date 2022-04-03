@@ -4,8 +4,10 @@ from main import db
 from sqlalchemy import func, select
 from sqlalchemy.orm import column_property
 
+from . import BaseModel
 
-class EmailJob(db.Model):
+
+class EmailJob(BaseModel):
     __tablename__ = "email_job"
     id = db.Column(db.Integer, primary_key=True)
     subject = db.Column(db.String, nullable=False)
@@ -28,7 +30,7 @@ class EmailJob(db.Model):
         return data
 
 
-class EmailJobRecipient(db.Model):
+class EmailJobRecipient(BaseModel):
     __tablename__ = "email_recipient"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)

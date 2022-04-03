@@ -8,13 +8,13 @@ from .exc import CapacityException
 
 
 class CapacityMixin(object):
-    """ Defines a database object which has an optional maximum capacity and an optional parent
-        (which must also inherit CapacityMixin). Objects also have an expiry date.
+    """Defines a database object which has an optional maximum capacity and an optional parent
+    (which must also inherit CapacityMixin). Objects also have an expiry date.
 
-        An object's capacity is the lower of its own capacity (if set) and its parent's
-        capacity.
+    An object's capacity is the lower of its own capacity (if set) and its parent's
+    capacity.
 
-        Objects which inherit this mixin must have a "parent" relationship.
+    Objects which inherit this mixin must have a "parent" relationship.
     """
 
     # A max capacity of None implies no max (or use parent's if set)
@@ -128,7 +128,7 @@ class CapacityMixin(object):
         self.capacity_used += count
 
     def return_instances(self, count):
-        " Reintroduce previously used capacity "
+        "Reintroduce previously used capacity"
         if self.parent:
             self.parent.return_instances(count)
 
@@ -136,20 +136,20 @@ class CapacityMixin(object):
 
 
 class InheritedAttributesMixin(object):
-    """ Create a JSON column to store arbitrary attributes. When fetching attributes, cascade up to the parent (which
-        must also inherit this mixin).
+    """Create a JSON column to store arbitrary attributes. When fetching attributes, cascade up to the parent (which
+    must also inherit this mixin).
 
-        Objects which inherit this mixin must have a "parent" relationship.
+    Objects which inherit this mixin must have a "parent" relationship.
     """
 
     attributes = db.Column(db.JSON, default={})
 
-    def get_attribute(self, name):
+    def get_attribute(self, name, default=None):
         if name in self.attributes:
             return self.attributes[name]
         if self.parent:
-            return self.parent.get_attribute(name)
-        return None
+            return self.parent.get_attribute(name, default)
+        return default
 
     def set_attribute(self, name, value):
         # SQLAlchemy can't recognise changes within JSON structures

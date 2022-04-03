@@ -1,3 +1,5 @@
+{% extends "emails/base.txt" %}
+{% block body %}
 Hi {{ proposal.user.name }},
 
 Your EMF {{ proposal.human_type }} '{{ proposal.title }}' has been scheduled!
@@ -26,3 +28,4 @@ Things to note:
 
 Looking forward to seeing you in the field,
 The EMF Speaker Ops Team
+{% endblock %}

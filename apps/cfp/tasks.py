@@ -22,7 +22,7 @@ from . import cfp
     help="The state to import the proposals as",
 )
 def csv_import(csv_file, state):
-    """ Import a previous schedule for testing"""
+    """Import a previous schedule for testing"""
     faker = Faker()
     # id, title, description, length, need_finance,
     # one_day, type, experience, attendees, size
@@ -37,9 +37,9 @@ def csv_import(csv_file, state):
 
         proposal = (
             TalkProposal()
-            if row["type"] == u"talk"
+            if row["type"] == "talk"
             else WorkshopProposal()
-            if row["type"] == u"workshop"
+            if row["type"] == "workshop"
             else InstallationProposal()
         )
 
@@ -71,7 +71,7 @@ def csv_import(csv_file, state):
 
 @cfp.cli.command("email_check")
 def email_check():
-    """ Email speakers about their slot """
+    """Email speakers about their slot"""
     proposals = (
         Proposal.query.filter(Proposal.scheduled_duration.isnot(None))
         .filter(Proposal.state.in_(["accepted", "finished"]))
@@ -89,7 +89,7 @@ def email_check():
 
 @cfp.cli.command("email_finalise")
 def email_finalise():
-    """ Email speakers about finalising their talk """
+    """Email speakers about finalising their talk"""
     proposals = (
         Proposal.query.filter(Proposal.scheduled_duration.isnot(None))
         .filter(Proposal.state.in_(["accepted"]))
@@ -107,7 +107,7 @@ def email_finalise():
 
 @cfp.cli.command("email_reserve")
 def email_reserve():
-    """ Email speakers about reserve list """
+    """Email speakers about reserve list"""
     proposals = (
         Proposal.query.filter(Proposal.state.in_(["reviewed"]))
         .filter(Proposal.type.in_(["talk", "workshop", "youthworkshop"]))

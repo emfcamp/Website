@@ -19,6 +19,16 @@ def travel():
     return render_template("about/getting-there.html")
 
 
+@base.route("/about/arrival-times")
+def arrival():
+    return render_template("about/arrival-times.html")
+
+
+@base.route("/about/covid")
+def covid():
+    return render_template("about/covid.html")
+
+
 @base.route("/about/privacy")
 def privacy():
     return render_template("about/privacy.html")
@@ -37,6 +47,11 @@ def power():
 @base.route("/about/accessibility")
 def accessibility():
     return render_template("about/accessibility.html")
+
+
+@base.route("/about/villages")
+def villages():
+    return render_template("about/villages.html")
 
 
 @base.route("/about/childcare")
@@ -62,6 +77,11 @@ def company():
 @base.route("/about/volunteering")
 def volunteering():
     return render_template("about/volunteering.html")
+
+
+@base.route("/about/volunteer-roles")
+def volunteer_roles():
+    return render_template("about/volunteer-roles.html")
 
 
 @base.route("/about/what_to_bring")

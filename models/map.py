@@ -5,9 +5,10 @@ from geoalchemy2.functions import ST_AsEWKT
 from sqlalchemy import Index
 
 from main import db
+from . import BaseModel
 
 
-class MapObject(db.Model):
+class MapObject(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
 

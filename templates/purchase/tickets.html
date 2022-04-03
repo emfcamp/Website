@@ -1,13 +1,13 @@
 {% if not available %}
 <div class="well">
-  <p class="emphasis">There are no tickets currently available. Future ticket sales dates are
-  <a href="https://blog.emfcamp.org/2020/02/14/ticket-sales-dates/">on our blog</a></p>
+  <p class="emphasis">There are no tickets currently available. See
+  <a href="https://blog.emfcamp.org/2022/02/16/emf-2022-ticket-sale-dates-and-cfp/">our blog</a> for
+  details on ticket sales.</p>
 
-  {# - We don't want to show this at the moment as we won't be sending emails for the next sales.
   <p>Please follow us <a href="https://twitter.com/emfcamp">on Twitter</a> or
   join our mailing list to be notified when more tickets are on sale:</p>
   {% include "home/_mailchimp_form.html" %}
-  #}
+
   <p>We can't reserve any tickets, but if we accept your
   {% if config['CFP'] %}
   <a href="{{url_for('cfp.main')}}">talk, workshop, or installation proposal</a>,
@@ -20,7 +20,7 @@
 
 <h4>A ticket to Electromagnetic Field {{event_year}} will get you:</h4>
 <ul>
-    <li>A secure place to camp from Thursday July 23<sup>rd</sup> until Monday July 27<sup>th</sup></li>
+    <li>A secure place to camp from Thursday June 2<sup>nd</sup> until Monday June 6<sup>th</sup></li>
     <li>Very fast internet access, both wired and wireless</li>
     <li>Mains power</li>
     <li>Access to running water, hot showers, a well-stocked bar, and a variety of food vendors</li>

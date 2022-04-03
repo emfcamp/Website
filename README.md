@@ -1,8 +1,8 @@
 This is the www.emfcamp.org web site, built with Flask & Postgres by the 
 EMF web team.
 
-[![CI Status](https://github.com/emfcamp/Website/workflows/CI/badge.svg)](https://github.com/emfcamp/Website/actions?query=workflow%3ACI)
-[![Coverage Status](https://coveralls.io/repos/github/emfcamp/Website/badge.svg?branch=master)](https://coveralls.io/github/emfcamp/Website?branch=master)
+[![Deploy Status](https://github.com/emfcamp/Website/workflows/Deploy/badge.svg)](https://github.com/emfcamp/Website/actions?query=workflow%3ADeploy)
+[![Coverage Status](https://coveralls.io/repos/github/emfcamp/Website/badge.svg?branch=main)](https://coveralls.io/github/emfcamp/Website?branch=main)
 
 ## Get Involved
 
@@ -19,17 +19,17 @@ to monitor the containers.
 
 To start all containers (and rebuild any which may have changed):
 ```
-docker-compose build --parallel
-docker-compose up
+docker compose build --parallel
+docker compose up
 ```
-You should then be able to view your development server on [http://localhost:5000](http://localhost:5000).
+You should then be able to view your development server on [http://localhost:2342](http://localhost:2342).
 
 To create some fake data in your DB, run:
 ```
 ./flask dev data
 ```
-To stop all containers, use `docker-compose stop`
-To delete all data and start over fresh you can use `docker-compose down`.
+To stop all containers, use `docker compose stop`
+To delete all data and start over fresh you can use `docker compose down`.
 
 Management commands can be listed and run using the `./flask` command, which
 forwards them to the flask command line within the container.
@@ -57,17 +57,17 @@ pre-commit install
 Once you've created an account on the website, you can use `./flask make_admin` to make your user an administrator.
 Or, you can create an account and simultaneously make it an admin by using `./flask make_admin -e email@domain.tld`
 
-E-mail sending is disabled in development (but is printed out on the console). You can also log in directly by setting BYPASS_LOGIN=True in config/development.cfg and then using a URL of the form e.g. `/login/admin@test.invalid` and navigate to `/admin/`.
+E-mail sending is disabled in development (but is printed out on the console). You can also log in directly by setting `BYPASS_LOGIN=True` in `config/development.cfg` and then using a URL of the form e.g. `/login/admin@test.invalid`.
 
 ### Database Migrations
 
 - `./flask db migrate -m 'Migration name'` to generate migration scripts when models have been updated.
-- `./flask db upgrade` to run any migration scripts you've generated.
+- `./flask db upgrade` to run any migration scripts you've generated (or populate a fresh DB).
 - `./flask db downgrade` to undo the last migration.
 
 For more migration commands, see the [flask-migrate docs](https://flask-migrate.readthedocs.io/en/latest/).
 
-### More Docs 
+### More Docs
 
 For more, see:
 

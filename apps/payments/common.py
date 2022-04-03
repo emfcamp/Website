@@ -6,7 +6,7 @@ from models.payment import Payment
 
 def get_user_payment_or_abort(
     payment_id, provider=None, valid_states=None, allow_admin=False
-):
+) -> Payment:
     try:
         payment = Payment.query.get(payment_id)
     except Exception as e:
@@ -41,7 +41,7 @@ def get_user_payment_or_abort(
 
 def lock_user_payment_or_abort(
     payment_id, provider=None, valid_states=None, allow_admin=False
-):
+) -> Payment:
 
     # This does an unlocked check on state, which is handy if it's invalid
     payment = get_user_payment_or_abort(payment_id, provider, valid_states, allow_admin)

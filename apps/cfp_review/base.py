@@ -76,6 +76,13 @@ def main():
     abort(404)
 
 
+@cfp_review.route("help")
+def help():
+    if current_user.is_anonymous:
+        return redirect(url_for("users.login", next=url_for(".main")))
+    return render_template("cfp_review/help.html")
+
+
 def bool_qs(val):
     # Explicit true/false values are better than the implicit notset=&set=anything that bool does
     if val in ["True", "1"]:
@@ -280,6 +287,7 @@ def find_next_proposal_id(prop):
 
     proposals, _ = filter_proposal_request()
 
+    # FIXME: index might fail
     idx = proposals.index(prop) + 1
     if len(proposals) <= idx:
         return None
@@ -756,10 +764,20 @@ def close_round():
             if "min_votes" in session:
                 del session["min_votes"]
 
+    # Find proposals where the submitter has already had an accepted proposal
+    # or another proposal in this list
+    duplicates = {}
+    for (prop, _) in proposals:
+        if prop.user.proposals.count() > 1:
+            # Only add each proposal once
+            if prop.user not in duplicates:
+                duplicates[prop.user] = prop.user.proposals
+
     return render_template(
         "cfp_review/close-round.html",
         form=form,
         proposals=proposals,
+        duplicates=duplicates,
         preview=preview,
         min_votes=session.get("min_votes"),
     )
@@ -803,6 +821,7 @@ def rank():
                         send_email_for_proposal(prop, reason="accepted")
 
                 else:
+                    prop.set_state("anonymised")
                     if form.confirm_type.data == "accepted_unaccepted":
                         send_email_for_proposal(prop, reason="still-considered")
 

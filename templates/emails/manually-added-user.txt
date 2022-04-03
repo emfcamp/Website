@@ -1,3 +1,5 @@
+{% extends "emails/base.txt" %}
+{% block body %}
 Hi {{ user.name }},
 
 This is to let you know that you now have an account on our website for Electromagnetic Field {{ event_year }}!
@@ -11,3 +13,4 @@ If you think you've been added in error, please let us know by replying to this 
 Love,
 
 All the EMF team
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block body %}
+
+<div class="col-md-10">
+
+<h2>Thank you!</h2>
+
+<div class="well">
+    {% if payment.state == 'paid' %}
+    <p>Your payment for {{ payment.amount | price(payment.currency) }}
+        has been confirmed. You should receive a receipt by email to the
+        address you provided.</p>
+
+    {% if SITE_STATE != 'after-event' %}
+    <div>See you at Electromagnetic Field!</div>
+    {% endif %}
+
+    {% else %}
+    <p>Your order has been reserved {% if payment.expires -%} until {{ payment.expires.strftime('%-d %B %Y') }}{% endif %}
+        while you pay by bank transfer. The bank details to use are below. We'll email you when we receive your payment.</p>
+
+    <p>If you have selected the incorrect currency, you can change it:</p>
+    <div class="button-group">
+        <form action={{ url_for('payments.transfer_change_currency', payment_id=payment.id) }} method="post" role="form">
+            {{ form.hidden_tag() }}
+            <button type="submit" name="change" class="btn btn-default debounce" value="1">Change currency to {% if payment.currency == 'GBP' %}Euros (€){% else %}Pounds (£){% endif %}</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+
+{% if payment.state == 'inprogress' %}
+<p>We will use the reference below to identify the payment as yours, so please ensure it's included in full. (Don't worry about the hyphen, or if the payee name doesn't quite fit.)</p>
+<dl class="dl-horizontal">
+<dt>Bank</dt><dd>{{ account.institution }}, {{ account.address }}</dd>
+<dt>Payee</dt><dd>EMF Festivals Ltd</dd>
+{% if payment.currency == 'GBP' %}
+<dt>Sort code</dt><dd>{{ account.sort_code | sort_code }}</dd>
+<dt>Account number</dt><dd>{{ account.acct_id }}</dd>
+{% else %}
+<dt>SWIFT</dt><dd>{{ account.swift }}</dd>
+<dt>IBAN</dt><dd>{{ account.iban | iban }}</dd>
+{% endif %}
+<dt>Amount</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
+<dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
+</dl>
+
+{% if SITE_STATE != 'after-event' %}
+<p>See you at Electromagnetic Field!</p>
+{% endif %}
+{% endif %}
+
+<a class="btn btn-info" href="{{ url_for('users.purchases') }}">Show my tickets</a>
+
+</div>
+{% endblock %}

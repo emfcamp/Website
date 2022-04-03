@@ -76,6 +76,7 @@
                 {{ menuitem("Clashfinder", ".clashfinder") }}
             </ul>
         </li>
+        {{ menuitem("Help", ".help") }}
     {% endif %}
     {# Hide these menus from admin as they're in the misc dropdown #}
     {% if current_user.has_permission('cfp_anonymiser') and not current_user.has_permission('cfp_admin') %}

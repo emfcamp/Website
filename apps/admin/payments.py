@@ -18,9 +18,8 @@ from wtforms.validators import InputRequired
 from wtforms import SubmitField, BooleanField, FieldList, FormField
 
 from sqlalchemy.sql.functions import func
-import gocardless_pro.errors
 
-from main import db, mail, stripe, gocardless_client
+from main import db, mail, stripe
 from models.payment import (
     Payment,
     RefundRequest,
@@ -37,7 +36,6 @@ from ..payments.stripe import (
     stripe_update_payment,
     stripe_payment_refunded,
 )
-from ..payments.gocardless import gocardless_update_payment
 
 
 @admin.route("/payments")
@@ -143,7 +141,7 @@ def send_reminder(payment_id):
                 return redirect(url_for("admin.expiring"))
 
             msg = Message(
-                "Electromagnetic Field ticket purchase update",
+                "Electromagnetic Field: Ticket payment not received",
                 sender=app.config["TICKETS_EMAIL"],
                 recipients=[payment.user.email],
             )
@@ -176,7 +174,7 @@ class UpdatePaymentForm(Form):
 def update_payment(payment_id):
     payment = Payment.query.get_or_404(payment_id)
 
-    if payment.provider not in {"gocardless", "stripe"}:
+    if payment.provider not in {"stripe"}:
         abort(404)
 
     form = UpdatePaymentForm()
@@ -190,10 +188,7 @@ def update_payment(payment_id):
 
             payment.lock()
 
-            if payment.provider == "gocardless":
-                gocardless_update_payment(payment)
-
-            elif payment.provider == "stripe":
+            if payment.provider == "stripe":
                 try:
                     stripe_update_payment(payment)
                 except StripeUpdateConflict:
@@ -231,23 +226,12 @@ def cancel_payment(payment_id):
 
     form = CancelPaymentForm()
     if form.validate_on_submit():
-        if form.cancel.data and (payment.provider in ["banktransfer", "gocardless"]):
+        if form.cancel.data and (payment.provider in {"banktransfer"}):
             app.logger.info(
                 "%s manually cancelling payment %s", current_user.name, payment.id
             )
 
             payment.lock()
-
-            if payment.provider == "gocardless" and payment.gcid is not None:
-                try:
-                    gocardless_client.payments.cancel(payment.gcid)
-
-                except gocardless_pro.errors.InvalidStateError as e:
-                    app.logger.error(
-                        "InvalidStateError from GoCardless cancelling payment: %s",
-                        e.message,
-                    )
-                    flash("Error cancelling with GoCardless")
 
             try:
                 payment.cancel()
@@ -291,8 +275,8 @@ class DeleteRefundRequestForm(Form):
 
 @admin.route("/payment/requested-refunds/<int:req_id>/delete", methods=["GET", "POST"])
 def delete_refund_request(req_id):
-    """ Delete a refund request. This can only be called if the payment is in the
-        refund-requested state, or if it's "refunded" but with a 100% donation. """
+    """Delete a refund request. This can only be called if the payment is in the
+    refund-requested state, or if it's "refunded" but with a 100% donation."""
     req = RefundRequest.query.get_or_404(req_id)
 
     # TODO: this does not handle partial refunds!
@@ -327,8 +311,8 @@ class ManualRefundForm(Form):
 
 @admin.route("/payment/<int:payment_id>/manual-refund", methods=["GET", "POST"])
 def manual_refund(payment_id):
-    """ Mark an entire payment as refunded for book-keeping purposes.
-        Doesn't actually take any steps to return money to the user. """
+    """Mark an entire payment as refunded for book-keeping purposes.
+    Doesn't actually take any steps to return money to the user."""
 
     # TODO: this is old! We should move manual refund handling to the other refund endpoint for consistency.
 

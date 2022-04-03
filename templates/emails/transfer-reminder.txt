@@ -1,3 +1,5 @@
+{% extends "emails/base.txt" %}
+{% block body %}
 Hello {{ user.name }}!
 
 You've currently got more than one adult EMF ticket registered against
@@ -20,3 +22,4 @@ following page, along with a "transfer" button:
 
 Looking forward to seeing you all in the field,
 The EMF team
+{% endblock %}

@@ -1,4 +1,5 @@
 from main import db, cache
+from . import BaseModel
 
 # feature flags that can be overridden in the DB
 DB_FEATURE_FLAGS = [
@@ -7,9 +8,8 @@ DB_FEATURE_FLAGS = [
     "CFP",
     "CFP_CLOSED",
     "CFP_FINALISE",
-    "GOCARDLESS",
-    "GOCARDLESS_EURO",
     "ISSUE_TICKETS",
+    "RECONCILE_IN_WEBHOOK",
     "RADIO",
     "LINE_UP",
     "SCHEDULE",
@@ -21,7 +21,7 @@ DB_FEATURE_FLAGS = [
 ]
 
 
-class FeatureFlag(db.Model):
+class FeatureFlag(BaseModel):
     __tablename__ = "feature_flag"
     __export_data__ = False
     feature = db.Column(db.String, primary_key=True)

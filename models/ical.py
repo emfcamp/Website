@@ -11,10 +11,10 @@ from sqlalchemy.orm import column_property
 from sqlalchemy.orm.exc import NoResultFound
 
 from main import db
-from models import event_start, event_end
+from . import BaseModel, event_start, event_end
 
 
-class CalendarSource(db.Model):
+class CalendarSource(BaseModel):
     __tablename__ = "calendar_source"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), index=True)
@@ -187,7 +187,7 @@ class CalendarSource(db.Model):
 
 FavouriteCalendarEvent = db.Table(
     "favourite_calendar_event",
-    db.Model.metadata,
+    BaseModel.metadata,
     db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
     db.Column(
         "event_id", db.Integer, db.ForeignKey("calendar_event.id"), primary_key=True
@@ -195,7 +195,7 @@ FavouriteCalendarEvent = db.Table(
 )
 
 
-class CalendarEvent(db.Model):
+class CalendarEvent(BaseModel):
     __tablename__ = "calendar_event"
 
     id = db.Column(db.Integer, primary_key=True)

@@ -3,7 +3,7 @@ name: Base Image
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - '.github/workflows/base.yml'
       - 'docker/Dockerfile.base'

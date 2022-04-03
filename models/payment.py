@@ -2,14 +2,21 @@ import random
 import re
 from decimal import Decimal
 from datetime import datetime, timedelta
-
+from typing import Optional
 from sqlalchemy import event, func, column
 from sqlalchemy.orm import Session, aliased
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy_continuum.utils import version_class, transaction_class
 
 from main import db
-from . import export_attr_counts, export_intervals, bucketise, event_year
+from . import (
+    export_attr_counts,
+    export_intervals,
+    bucketise,
+    event_year,
+    BaseModel,
+    Currency,
+)
 from .purchase import Ticket
 from .product import Voucher
 
@@ -20,9 +27,9 @@ class StateException(Exception):
     pass
 
 
-class Payment(db.Model):
+class Payment(BaseModel):
     __tablename__ = "payment"
-    __versioned__ = {}
+    __versioned__: dict = {}
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
@@ -47,7 +54,7 @@ class Payment(db.Model):
 
     __mapper_args__ = {"polymorphic_on": provider}
 
-    def __init__(self, currency, amount, voucher_code=None):
+    def __init__(self, currency: Currency, amount, voucher_code: str = None):
         self.currency = currency
         self.amount = amount
 
@@ -144,12 +151,12 @@ class Payment(db.Model):
 
     @classmethod
     def premium(cls, currency, amount):
-        """ Used to be used for credit card premiums, which now aren't allowed.
-            TODO: cut this out entirely.
+        """Used to be used for credit card premiums, which now aren't allowed.
+        TODO: cut this out entirely.
         """
         return Decimal(0)
 
-    def change_currency(self, currency):
+    def change_currency(self, currency: Currency):
         if self.state in {"paid", "partrefunded", "refunded"}:
             raise StateException("Cannot change currency after payment is reconciled")
 
@@ -235,7 +242,7 @@ class Payment(db.Model):
         return other
 
     def order_number(self):
-        """ Note this is not a VAT invoice number. """
+        """Note this is not a VAT invoice number."""
         return "WEB-%s-%05d" % (event_year(), self.id)
 
     def issue_vat_invoice_number(self):
@@ -278,7 +285,7 @@ class BankPayment(Payment):
     __mapper_args__ = {"polymorphic_identity": "banktransfer"}
     bankref = db.Column(db.String, unique=True)
 
-    def __init__(self, currency, amount, voucher_code=None):
+    def __init__(self, currency: Currency, amount, voucher_code: str = None):
         Payment.__init__(self, currency, amount, voucher_code)
 
         # not cryptographic
@@ -300,11 +307,11 @@ class BankPayment(Payment):
         for currency in [self.currency, "GBP"]:
             try:
                 return BankAccount.query.filter_by(currency=currency, active=True).one()
-            except:
+            except (MultipleResultsFound, NoResultFound):
                 continue
 
 
-class BankAccount(db.Model):
+class BankAccount(BaseModel):
     __tablename__ = "bank_account"
     __export_data__ = False
     id = db.Column(db.Integer, primary_key=True)
@@ -316,9 +323,19 @@ class BankAccount(db.Model):
     address = db.Column(db.String, nullable=False)
     swift = db.Column(db.String)
     iban = db.Column(db.String)
+    borderless_account_id = db.Column(db.Integer)
 
     def __init__(
-        self, sort_code, acct_id, currency, active, institution, address, swift, iban
+        self,
+        sort_code,
+        acct_id,
+        currency,
+        active,
+        institution,
+        address,
+        swift,
+        iban,
+        borderless_account_id=None,
     ):
         self.sort_code = sort_code
         self.acct_id = acct_id
@@ -328,10 +345,14 @@ class BankAccount(db.Model):
         self.address = address
         self.swift = swift
         self.iban = iban
+        self.borderless_account_id = borderless_account_id
 
     @classmethod
     def get(cls, sort_code, acct_id):
         return cls.query.filter_by(acct_id=acct_id, sort_code=sort_code).one()
+
+    def __repr__(self):
+        return "<BankAccount: %s %s>" % (self.sort_code, self.acct_id)
 
 
 db.Index(
@@ -341,15 +362,8 @@ db.Index(
     unique=True,
 )
 
-db.Index(
-    "ix_bank_account_currency_active",
-    BankAccount.currency,
-    BankAccount.active,
-    unique=True,
-)
 
-
-class BankTransaction(db.Model):
+class BankTransaction(BaseModel):
     __tablename__ = "bank_transaction"
     __export_data__ = False
 
@@ -359,19 +373,25 @@ class BankTransaction(db.Model):
     type = db.Column(db.String, nullable=False)
     amount_int = db.Column(db.Integer, nullable=False)
     fit_id = db.Column(db.String, index=True)  # allegedly unique, but don't trust it
-    payee = db.Column(db.String, nullable=False)
+    wise_id = db.Column(db.String, index=True)
+    payee = db.Column(
+        db.String, nullable=False
+    )  # this is what OFX calls it. it's really description
     payment_id = db.Column(db.Integer, db.ForeignKey("payment.id"))
     suppressed = db.Column(db.Boolean, nullable=False, default=False)
     account = db.relationship(BankAccount, backref="transactions")
     payment = db.relationship(BankPayment, backref="transactions")
 
-    def __init__(self, account_id, posted, type, amount, payee, fit_id=None):
+    def __init__(
+        self, account_id, posted, type, amount, payee, fit_id=None, wise_id=None
+    ):
         self.account_id = account_id
         self.posted = posted
         self.type = type
         self.amount = amount
         self.payee = payee
         self.fit_id = fit_id
+        self.wise_id = wise_id
 
     def __repr__(self):
         return "<BankTransaction: %s, %s>" % (self.amount, self.payee)
@@ -395,7 +415,7 @@ class BankTransaction(db.Model):
         )
         return matching
 
-    def match_payment(self):
+    def match_payment(self) -> Optional[BankPayment]:
         """
         We need to deal with human error and character deletion without colliding.
         Unless we use some sort of coding, the minimum length of a bankref should
@@ -458,32 +478,6 @@ db.Index(
 )
 
 
-class GoCardlessPayment(Payment):
-    name = "GoCardless payment"
-
-    __mapper_args__ = {"polymorphic_identity": "gocardless"}
-    session_token = db.Column(db.String, unique=True)
-    redirect_id = db.Column(db.String, unique=True)
-    mandate = db.Column(db.String, unique=True)
-    gcid = db.Column(db.String, unique=True)
-
-    def cancel(self):
-        if self.state in ["cancelled", "refunded"]:
-            raise StateException("Payment has already been {}".format(self.state))
-
-        super(GoCardlessPayment, self).cancel()
-
-    def manual_refund(self):
-        # https://help.gocardless.com/customer/portal/articles/1580207
-        # "At the moment, it isn't usually possible to refund a customer via GoCardless"
-        if self.state not in {"paid", "refund-requested"}:
-            raise StateException(
-                "Only GoCardless payments that have been paid can be marked as refunded"
-            )
-
-        super(GoCardlessPayment, self).manual_refund()
-
-
 class StripePayment(Payment):
     name = "Stripe payment"
 
@@ -512,8 +506,8 @@ class StripePayment(Payment):
         super(StripePayment, self).manual_refund()
 
 
-class Refund(db.Model):
-    __versioned__ = {}
+class Refund(BaseModel):
+    __versioned__: dict = {}
     __tablename__ = "refund"
     id = db.Column(db.Integer, primary_key=True)
     payment_id = db.Column(db.Integer, db.ForeignKey("payment.id"), nullable=False)
@@ -579,7 +573,7 @@ class StripeRefund(Refund):
     refundid = db.Column(db.String, unique=True)
 
 
-class RefundRequest(db.Model):
+class RefundRequest(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     payment_id = db.Column(db.Integer, db.ForeignKey("payment.id"))
     donation = db.Column(db.Numeric, server_default="0", nullable=False)
@@ -593,10 +587,10 @@ class RefundRequest(db.Model):
 
     @property
     def method(self):
-        """ The method we use to refund this request.
+        """The method we use to refund this request.
 
-            This will be "stripe" if the payment can be refunded through Stripe,
-            and "banktransfer" otherwise.
+        This will be "stripe" if the payment can be refunded through Stripe,
+        and "banktransfer" otherwise.
         """
         if (
             type(self.payment) is StripePayment
@@ -607,9 +601,9 @@ class RefundRequest(db.Model):
             return "banktransfer"
 
 
-class PaymentSequence(db.Model):
-    """ Table for storing sequence numbers.
-        Currently used for storing VAT invoice sequences, which must be monotonic.
+class PaymentSequence(BaseModel):
+    """Table for storing sequence numbers.
+    Currently used for storing VAT invoice sequences, which must be monotonic.
     """
 
     name = db.Column(db.String, primary_key=True)

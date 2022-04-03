@@ -9,7 +9,7 @@ from flask_mail import email_dispatched
 
 
 prometheus_dir = "var/prometheus"
-os.environ["prometheus_multiproc_dir"] = prometheus_dir
+os.environ["PROMETHEUS_MULTIPROC_DIR"] = prometheus_dir
 
 if os.path.exists(prometheus_dir):
     shutil.rmtree(prometheus_dir, True)

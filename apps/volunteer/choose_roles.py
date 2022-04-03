@@ -1,7 +1,4 @@
-import markdown
-from os import path
-
-from flask import render_template, redirect, url_for, flash, Markup, request
+from flask import render_template, redirect, url_for, flash, request
 from flask_login import current_user
 
 from wtforms import SubmitField, BooleanField, FormField, FieldList
@@ -11,7 +8,7 @@ from main import db
 from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer as VolunteerUser
 
-from . import volunteer, v_user_required, role_name_to_markdown_file
+from . import volunteer, v_user_required
 from ..common import feature_flag
 from ..common.forms import Form, HiddenIntegerField
 
@@ -89,29 +86,25 @@ def choose_role():
 def role(role_id):
     role = Role.query.get_or_404(role_id)
     current_volunteer = VolunteerUser.get_for_user(current_user)
+    current_role_ids = [r.id for r in current_volunteer.interested_roles]
 
     if request.method == "POST":
-        if role_id in current_volunteer.interested_roles:
-            current_volunteer.interested_roles.remove(role)
+        if int(role_id) in current_role_ids:
+            role_name = Role.query.get(role_id).name
+            flash(
+                f"You are already signed up to the {role_name} role. If you "
+                "would like to remove it, please use the form below."
+            )
         else:
             current_volunteer.interested_roles.append(role)
-        db.session.commit()
-        flash("Your role list has been updated", "info")
+            db.session.commit()
+            flash("Your role list has been updated", "info")
+
         return redirect(url_for(".choose_role"))
-
-    role_description_file = role_name_to_markdown_file(role.name)
-
-    if path.exists(role_description_file):
-        content = open(role_description_file, "r").read()
-        description = Markup(
-            markdown.markdown(content, extensions=["markdown.extensions.nl2br"])
-        )
-    else:
-        description = None
 
     return render_template(
         "volunteer/role.html",
-        description=description,
+        description=role.full_description,
         role=role,
         current_volunteer=current_volunteer,
     )

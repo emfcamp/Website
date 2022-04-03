@@ -1,6 +1,9 @@
 from datetime import datetime
 from sqlalchemy.orm import column_property, validates
 from main import db
+from .user import User
+from . import BaseModel, Currency
+
 
 # The type of a product determines how we handle it after purchase.
 #
@@ -26,8 +29,8 @@ class CheckinStateException(Exception):
     pass
 
 
-class Purchase(db.Model):
-    """ A Purchase. This could be a ticket or an item of merchandise. """
+class Purchase(BaseModel):
+    """A Purchase. This could be a ticket or an item of merchandise."""
 
     __tablename__ = "purchase"
     __versioned__ = {"exclude": ["is_ticket", "is_paid_for"]}
@@ -108,7 +111,7 @@ class Purchase(db.Model):
             )
         return issued
 
-    def set_user(self, user):
+    def set_user(self, user: User):
         if (
             self.state != "reserved"
             or self.owner_id is not None
@@ -171,7 +174,7 @@ class Purchase(db.Model):
         self.state = "paid"
         self.refund = None
 
-    def change_currency(self, currency):
+    def change_currency(self, currency: Currency):
         self.price = self.price_tier.get_price(currency)
 
     def transfer(self, from_user, to_user):
@@ -193,16 +196,16 @@ class Purchase(db.Model):
 
 
 class Ticket(Purchase):
-    """ A ticket, which is a specific type of purchase, but with different vocabulary.
+    """A ticket, which is a specific type of purchase, but with different vocabulary.
 
-        This can either be an admission ticket or a parking/camping ticket.
+    This can either be an admission ticket or a parking/camping ticket.
     """
 
     __mapper_args__ = {"polymorphic_identity": "ticket"}
 
 
 class AdmissionTicket(Ticket):
-    """ A ticket that can contribute to the licensed capacity and be issued a badge. """
+    """A ticket that can contribute to the licensed capacity and be issued a badge."""
 
     checked_in = db.Column(db.Boolean, default=False)
     badge_issued = db.Column(db.Boolean, default=False)
@@ -242,8 +245,8 @@ class AdmissionTicket(Ticket):
         self.badge_issued = False
 
 
-class PurchaseTransfer(db.Model):
-    """ A record of a purchase being transferred from one user to another. """
+class PurchaseTransfer(BaseModel):
+    """A record of a purchase being transferred from one user to another."""
 
     __tablename__ = "purchase_transfer"
     id = db.Column(db.Integer, primary_key=True)

@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from collections import namedtuple, defaultdict
+from typing import Optional
 from dateutil.parser import parse as parse_date
 import re
 from itertools import groupby
@@ -11,6 +12,8 @@ from models import export_attr_counts, export_attr_edits, export_intervals, buck
 
 from main import db
 from .user import User
+from . import BaseModel
+
 
 HUMAN_CFP_TYPES = {
     "performance": "performance",
@@ -22,17 +25,25 @@ HUMAN_CFP_TYPES = {
 
 # state: [allowed next state, ] pairs
 CFP_STATES = {
-    "edit": ["accepted", "rejected", "new"],
-    "new": ["accepted", "rejected", "checked", "manual-review"],
-    "checked": ["accepted", "rejected", "anonymised", "anon-blocked", "edit"],
-    "rejected": ["accepted", "rejected", "edit"],
-    "cancelled": ["accepted", "rejected", "edit"],
-    "anonymised": ["accepted", "rejected", "reviewed", "edit"],
-    "anon-blocked": ["accepted", "rejected", "reviewed", "edit"],
-    "reviewed": ["accepted", "rejected", "edit"],
-    "manual-review": ["accepted", "rejected", "edit"],
-    "accepted": ["accepted", "rejected", "finished"],
-    "finished": ["rejected", "finished"],
+    "edit": ["accepted", "rejected", "withdrawn", "new"],
+    "new": ["accepted", "rejected", "withdrawn", "checked", "manual-review"],
+    "checked": [
+        "accepted",
+        "rejected",
+        "withdrawn",
+        "anonymised",
+        "anon-blocked",
+        "edit",
+    ],
+    "rejected": ["accepted", "rejected", "withdrawn", "edit"],
+    "cancelled": ["accepted", "rejected", "withdrawn", "edit"],
+    "anonymised": ["accepted", "rejected", "withdrawn", "reviewed", "edit"],
+    "anon-blocked": ["accepted", "rejected", "withdrawn", "reviewed", "edit"],
+    "reviewed": ["accepted", "rejected", "withdrawn", "edit", "anonymised"],
+    "manual-review": ["accepted", "rejected", "withdrawn", "edit"],
+    "accepted": ["accepted", "rejected", "withdrawn", "finished"],
+    "finished": ["rejected", "withdrawn", "finished"],
+    "withdrawn": ["accepted", "rejected", "withdrawn", "edit"],
 }
 
 ORDERED_STATES = [
@@ -48,6 +59,7 @@ ORDERED_STATES = [
     "reviewed",
     "accepted",
     "finished",
+    "withdrawn",
 ]
 
 # Most of these states are the same they're kept distinct for semantic reasons
@@ -157,7 +169,7 @@ EVENT_SPACING = {
     "installation": 0,
 }
 
-period = namedtuple("Period", "start end")
+cfp_period = namedtuple("cfp_period", "start end")
 DAYS = {
     "fri": datetime(2020, 7, 24),
     "sat": datetime(2020, 7, 25),
@@ -166,7 +178,7 @@ DAYS = {
 
 # We may also have other venues in the DB, but these are the ones to be
 # returned by default if there are none
-DEFAULT_VENUES = {
+DEFAULT_VENUES: dict[str, list[str]] = {
     "talk": ["Stage A", "Stage B", "Stage C"],
     "workshop": ["Workshop 1", "Workshop 2", "Workshop 3", "Workshop 4"],
     "youthworkshop": ["Youth Workshop"],
@@ -190,7 +202,7 @@ VENUE_CAPACITY = {
 MANUAL_REVIEW_TYPES = ["youthworkshop", "performance", "installation"]
 
 
-def proposal_slug(title):
+def proposal_slug(title) -> str:
     slug = slugify_unicode(title).lower()
     if len(slug) > 60:
         words = re.split(" +|[,.;:!?]+", title)
@@ -225,7 +237,7 @@ def timeslot_to_period(slot_string, type=None):
         start = DAYS[day] + timedelta(hours=int(start_h))
         end = DAYS[day] + timedelta(hours=int(end_h))
 
-    return period(start, end)
+    return cfp_period(start, end)
 
 
 # Reduces the time periods to the smallest contiguous set we can
@@ -240,7 +252,7 @@ def make_periods_contiguous(time_periods):
             time_period.start <= contiguous_periods[-1].end
             and contiguous_periods[-1].end < time_period.end
         ):
-            contiguous_periods[-1] = period(
+            contiguous_periods[-1] = cfp_period(
                 contiguous_periods[-1].start, time_period.end
             )
             continue
@@ -272,7 +284,7 @@ class InvalidVenueException(Exception):
 
 FavouriteProposal = db.Table(
     "favourite_proposal",
-    db.Model.metadata,
+    BaseModel.metadata,
     db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
     db.Column(
         "proposal_id", db.Integer, db.ForeignKey("proposal.id"), primary_key=True
@@ -280,7 +292,7 @@ FavouriteProposal = db.Table(
 )
 
 
-class Proposal(db.Model):
+class Proposal(BaseModel):
     __versioned__ = {"exclude": ["favourites", "favourite_count"]}
     __tablename__ = "proposal"
 
@@ -337,9 +349,9 @@ class Proposal(db.Model):
     allowed_venues = db.Column(db.String, nullable=True)
     allowed_times = db.Column(db.String, nullable=True)
     scheduled_duration = db.Column(db.Integer, nullable=True)
-    scheduled_time = db.Column(db.DateTime, nullable=True)
+    scheduled_time: datetime = db.Column(db.DateTime, nullable=True)
     scheduled_venue_id = db.Column(db.Integer, db.ForeignKey("venue.id"))
-    potential_time = db.Column(db.DateTime, nullable=True)
+    potential_time: datetime = db.Column(db.DateTime, nullable=True)
     potential_venue_id = db.Column(db.Integer, db.ForeignKey("venue.id"))
 
     scheduled_venue = db.relationship(
@@ -505,7 +517,7 @@ class Proposal(db.Model):
 
         return data
 
-    def get_user_vote(self, user):
+    def get_user_vote(self, user) -> "CFPVote":
         # there can't be more than one vote per user per proposal
         return CFPVote.query.filter_by(proposal_id=self.id, user_id=user.id).first()
 
@@ -543,14 +555,14 @@ class Proposal(db.Model):
             msg.has_been_read = True
         return len(messages)
 
-    def has_ticket(self):
-        " Does the submitter have a ticket? "
+    def has_ticket(self) -> bool:
+        "Does the submitter have a ticket?"
         admission_tickets = len(
             list(self.user.get_owned_tickets(paid=True, type="admission_ticket"))
         )
         return admission_tickets > 0 or self.user.will_have_ticket
 
-    def get_allowed_venues(self):
+    def get_allowed_venues(self) -> list["Venue"]:
         # FIXME: this should reference a foreign key instead
         if self.allowed_venues:
             venue_names = [v.strip() for v in self.allowed_venues.split(",")]
@@ -579,7 +591,7 @@ class Proposal(db.Model):
                     p.start.hour <= HARD_START_LIMIT[self.type][0]
                     and p.start.minute < HARD_START_LIMIT[self.type][1]
                 ):
-                    p = period(
+                    p = cfp_period(
                         p.start.replace(minute=HARD_START_LIMIT[self.type][1]), p.end
                     )
                 trimmed_periods.append(p)
@@ -595,7 +607,9 @@ class Proposal(db.Model):
                     start, end = p.split(" > ")
                     try:
                         time_periods.append(
-                            period(parse_date(start.strip()), parse_date(end.strip()))
+                            cfp_period(
+                                parse_date(start.strip()), parse_date(end.strip())
+                            )
                         )
                     # If someone has entered garbage, dump the lot
                     except ValueError as e:
@@ -636,7 +650,7 @@ class Proposal(db.Model):
         preferred_time_periods = self.fix_hard_time_limits(preferred_time_periods)
         return make_periods_contiguous(preferred_time_periods)
 
-    def overlaps_with(self, other):
+    def overlaps_with(self, other) -> bool:
         if self.potential_start_date:
             return (
                 self.potential_end_date > other.potential_start_date
@@ -654,7 +668,7 @@ class Proposal(db.Model):
         return self.potential_time
 
     @property
-    def end_date(self):
+    def end_date(self) -> Optional[datetime]:
         start = self.start_date
         duration = self.scheduled_duration
         if start and duration:
@@ -662,7 +676,7 @@ class Proposal(db.Model):
         return None
 
     @property
-    def potential_end_date(self):
+    def potential_end_date(self) -> Optional[datetime]:
         start = self.start_date
         duration = self.scheduled_duration
         if start and duration:
@@ -680,18 +694,18 @@ class Proposal(db.Model):
         return None
 
     @property
-    def map_link(self):
+    def map_link(self) -> Optional[str]:
         latlon = self.latlon
         if latlon:
             return "https://map.emfcamp.org/#18.5/%s/%s" % (latlon[0], latlon[1])
         return None
 
     @property
-    def display_title(self):
+    def display_title(self) -> str:
         return self.published_title or self.title
 
     @property
-    def display_cost(self):
+    def display_cost(self) -> str:
         cost = self.cost.strip()
         if self.published_cost is not None:
             cost = self.published_cost.strip()
@@ -755,7 +769,7 @@ class InstallationProposal(Proposal):
     funds = db.Column(db.String, nullable=True)
 
 
-class CFPMessage(db.Model):
+class CFPMessage(BaseModel):
     __tablename__ = "cfp_message"
     id = db.Column(db.Integer, primary_key=True)
     created = db.Column(db.DateTime, default=datetime.utcnow)
@@ -816,8 +830,8 @@ class CFPMessage(db.Model):
         return data
 
 
-class CFPVote(db.Model):
-    __versioned__ = {}
+class CFPVote(BaseModel):
+    __versioned__: dict = {}
     __tablename__ = "cfp_vote"
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
@@ -833,7 +847,7 @@ class CFPVote(db.Model):
     vote = db.Column(db.Integer)  # Vote can be null for abstentions
     note = db.Column(db.String)
 
-    def __init__(self, user, proposal):
+    def __init__(self, user: User, proposal: Proposal):
         self.user = user
         self.proposal = proposal
         self.state = "new"
@@ -871,7 +885,7 @@ class CFPVote(db.Model):
         return data
 
 
-class Venue(db.Model):
+class Venue(BaseModel):
     __tablename__ = "venue"
     __export_data__ = False
 

@@ -62,7 +62,6 @@
                         {% if loop.first and vote.state in ['blocked', 'recused'] %}
                             {# The actual form bit... #}
                             <td class="text-center">
-                                {{ vote_form.hidden_tag_without('csrf_token') }}
                                 <div class="checkbox">{{ vote_form.resolve() }}</div>
                             </td>
                         {% else %}

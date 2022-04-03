@@ -157,7 +157,7 @@ def favourites():
     "/schedule/<int:year>/<int:proposal_id>-<slug>", methods=["GET", "POST"]
 )
 def item(year, proposal_id, slug=None):
-    """ Display a detail page for a schedule item """
+    """Display a detail page for a schedule item"""
     if year == event_year():
         return item_current(year, proposal_id, slug)
     else:
@@ -165,7 +165,7 @@ def item(year, proposal_id, slug=None):
 
 
 def item_current(year, proposal_id, slug=None):
-    """ Display a detail page for a talk from the current event """
+    """Display a detail page for a talk from the current event"""
     proposal = Proposal.query.get_or_404(proposal_id)
     if proposal.state not in ("accepted", "finished"):
         abort(404)
@@ -224,11 +224,7 @@ def time_machine():
     now_time = now.time()
     now_weekday = now.weekday()
 
-    days = [
-        4,  # Friday
-        5,  # Saturday
-        6,  # Sunday
-    ]
+    days = [4, 5, 6]  # Friday  # Saturday  # Sunday
 
     years = [2012, 2014, 2016, 2018, 2022]
 

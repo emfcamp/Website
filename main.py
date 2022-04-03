@@ -17,18 +17,18 @@ from sqlalchemy_continuum.plugins import FlaskPlugin
 from flask_static_digest import FlaskStaticDigest
 from flask_caching import Cache
 from flask_debugtoolbar import DebugToolbarExtension
-from flask_wtf import CSRFProtect
 from flask_cors import CORS
 from loggingmanager import create_logging_manager, set_user_id
 from werkzeug.exceptions import HTTPException
 import stripe
 import pywisetransfer
-import gocardless_pro
 
 
 # If we have logging handlers set up here, don't touch them.
 # This is especially problematic during testing as we don't
-# want to overwrite nosetests' handlers
+# want to overwrite nosetests' handlers. Note: if anything
+# logs before this point, logging.basicConfig will install
+# a default stderr StreamHandler.
 if len(logging.root.handlers) == 0:
     install_logging = True
     with open("logging.yaml", "r") as f:
@@ -61,7 +61,6 @@ def include_object(object, name, type_, reflected, compare_to):
 charset.add_charset("utf-8", charset.QP, charset.QP, "utf-8")
 
 cache = Cache()
-csrf = CSRFProtect()
 migrate = Migrate(include_object=include_object)
 manager = VersioningManager(options={"strategy": "subquery"})
 make_versioned(manager=manager, plugins=[FlaskPlugin()])
@@ -69,8 +68,23 @@ mail = Mail()
 login_manager = LoginManager()
 static_digest = FlaskStaticDigest()
 toolbar = DebugToolbarExtension()
-gocardless_client = None
-volunteer_admin = None
+wise = None
+
+
+def check_cache_configuration():
+    """Check the cache configuration is appropriate for production"""
+    if cache.cache.__class__.__name__ == "SimpleCache":
+        # SimpleCache is per-process, not appropriate for prod
+        logging.warning(
+            "Per-process cache being used outside dev server - refreshing will not work"
+        )
+
+    TEST_CACHE_KEY = "emf_test_cache_key"
+    cache.set(TEST_CACHE_KEY, "exists")
+    if cache.get(TEST_CACHE_KEY) != "exists":
+        logging.warning(
+            "Flask-Caching backend does not appear to be working. Performance may be affected."
+        )
 
 
 def create_app(dev_server=False, config_override=None):
@@ -112,7 +126,7 @@ def create_app(dev_server=False, config_override=None):
         ).inc()
         return response
 
-    for extension in (csrf, cache, db, mail, static_digest, toolbar):
+    for extension in (cache, db, mail, static_digest, toolbar):
         extension.init_app(app)
 
     def log_email(message, app):
@@ -123,8 +137,15 @@ def create_app(dev_server=False, config_override=None):
     cors_origins = ["https://map.emfcamp.org", "https://wiki.emfcamp.org"]
     if app.config.get("DEBUG"):
         cors_origins = ["http://localhost:8080", "https://maputnik.github.io"]
+
+    # NOTE: static files are served by nginx in production, so CORS headers must also be set there.
     CORS(
-        app, resources={r"/api/*": {"origins": cors_origins}}, supports_credentials=True
+        app,
+        resources={
+            r"/api/*": {"origins": cors_origins},
+            r"/static/*": {"origins": cors_origins},
+        },
+        supports_credentials=True,
     )
 
     migrate.init_app(app, db)
@@ -144,14 +165,13 @@ def create_app(dev_server=False, config_override=None):
 
     login_manager.anonymous_user = load_anonymous_user
 
-    global gocardless_client
-    gocardless_client = gocardless_pro.Client(
-        access_token=app.config["GOCARDLESS_ACCESS_TOKEN"],
-        environment=app.config["GOCARDLESS_ENVIRONMENT"],
-    )
     stripe.api_key = app.config["STRIPE_SECRET_KEY"]
-    pywisetransfer.environment = app.config["TRANSFERWISE_ENVIRONMENT"]
-    pywisetransfer.api_key = app.config["TRANSFERWISE_API_TOKEN"]
+    global wise
+    wise = pywisetransfer.Client(
+        api_key=app.config["TRANSFERWISE_API_TOKEN"],
+        environment=app.config["TRANSFERWISE_ENVIRONMENT"],
+        private_key_file=app.config.get("TRANSFERWISE_PRIVATE_KEY_FILE"),
+    )
 
     @app.before_request
     def load_per_request_state():
@@ -164,13 +184,6 @@ def create_app(dev_server=False, config_override=None):
         def send_noindex_header(response):
             response.headers["X-Robots-Tag"] = "noindex, nofollow"
             return response
-
-    @app.before_request
-    def simple_cache_warning():
-        if not dev_server and app.config.get("CACHE_TYPE", "null") == "simple":
-            logging.warning(
-                "Per-process cache being used outside dev server - refreshing will not work"
-            )
 
     @app.context_processor
     def add_csp_nonce():
@@ -188,6 +201,7 @@ def create_app(dev_server=False, config_override=None):
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
 
         csp = {
             "script-src": ["'self'", "https://js.stripe.com"],
@@ -204,15 +218,14 @@ def create_app(dev_server=False, config_override=None):
             ],
         }
 
-        # Edit record hash to support the modal dialogues in flask-admin
-        csp["script-src"].append(
-            "'sha256-Jxve8bBSodQplIZw4Y1walBJ0hFTx8sZ5xr+Pjr/78Y='"
-        )
-
-        # View record hash to support the modal dialogues in flask-admin
-        csp["script-src"].append(
-            "'sha256-XOlW2U5UiDeV2S/HgKqbp++Fo1I5uiUT2thFRUeFW/g='"
-        )
+        # Fixups for flask-admin which includes lots of nasty inline JS
+        csp["script-src"] += [
+            "'sha256-Jxve8bBSodQplIZw4Y1walBJ0hFTx8sZ5xr+Pjr/78Y='",  # Edit record
+            "'sha256-XOlW2U5UiDeV2S/HgKqbp++Fo1I5uiUT2thFRUeFW/g='",  # View record
+            "'unsafe-hashes'",
+            "'sha256-2rvfFrggTCtyF5WOiTri1gDS8Boibj4Njn0e+VCBmDI='",  # return false;
+            "'sha256-gC0PN/M+TSxp9oNdolzpqpAA+ZRrv9qe1EnAbUuDmk8='",  # return modelActions.execute('notify');
+        ]
 
         if app.config.get("DEBUG_TB_ENABLED"):
             # This hash is for the flask debug toolbar. It may break once they upgrade it.
@@ -241,10 +254,11 @@ def create_app(dev_server=False, config_override=None):
         return response
 
     if not app.debug:
+        check_cache_configuration()
 
         @app.errorhandler(Exception)
         def handle_exception(e):
-            """ Generic exception handler to catch and log unhandled exceptions in production. """
+            """Generic exception handler to catch and log unhandled exceptions in production."""
             if isinstance(e, HTTPException):
                 # HTTPException is used to implement flask's HTTP errors so pass it through.
                 return e
@@ -291,6 +305,10 @@ def create_app(dev_server=False, config_override=None):
     from apps.arrivals import arrivals
     from apps.api import api_bp
     from apps.villages import villages
+    from apps.admin import admin
+    from apps.volunteer import volunteer
+    from apps.volunteer.admin import volunteer_admin
+    from apps.volunteer.admin.notify import notify
 
     app.register_blueprint(base)
     app.register_blueprint(users)
@@ -303,41 +321,17 @@ def create_app(dev_server=False, config_override=None):
     app.register_blueprint(arrivals, url_prefix="/arrivals")
     app.register_blueprint(api_bp, url_prefix="/api")
     app.register_blueprint(villages, url_prefix="/villages")
-
-    if app.config.get("VOLUNTEERS"):
-        from apps.volunteer import volunteer
-
-        app.register_blueprint(volunteer, url_prefix="/volunteer")
-
-        from flask_admin import Admin
-        from apps.volunteer.flask_admin_base import VolunteerAdminIndexView
-
-        global volunteer_admin
-        volunteer_admin = Admin(
-            url="/volunteer/admin",
-            name="EMF Volunteers",
-            template_mode="bootstrap3",
-            index_view=VolunteerAdminIndexView(url="/volunteer/admin"),
-            base_template="volunteer/admin/flask-admin-base.html",
-        )
-        volunteer_admin.endpoint_prefix = "volunteer_admin"
-        volunteer_admin.init_app(app)
-
-        import apps.volunteer.admin  # noqa: F401
-
-    from apps.admin import admin
-
     app.register_blueprint(admin, url_prefix="/admin")
+    app.register_blueprint(volunteer, url_prefix="/volunteer")
+    app.register_blueprint(notify, url_prefix="/volunteer/admin/notify")
 
-    from apps.notification import notify
-
-    app.register_blueprint(notify, url_prefix="/notify")
+    volunteer_admin.init_app(app)
 
     return app
 
 
 def external_url(endpoint, **values):
-    """ Generate an absolute external URL. If you need to override this,
-        you're probably doing something wrong.
+    """Generate an absolute external URL. If you need to override this,
+    you're probably doing something wrong.
     """
     return url_for(endpoint, _external=True, **values)

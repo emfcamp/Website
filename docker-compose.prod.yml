@@ -7,13 +7,18 @@ services:
       - emfweb
     depends_on:
       - postgres
+      - memcached
     ports:
       - "127.0.0.1:8000:8000"
     volumes:
       - /etc/emf-site.cfg:/app/config/production.cfg
+      - /etc/emf:/etc/emf
       - /var/lib/emf_vat_invoices:/vat_invoices
+    labels:
+      com.centurylinklabs.watchtower.enable: true
     environment:
       SETTINGS_FILE: ./config/production.cfg
+      IRCCAT: 78.158.65.100:12345
     logging:
       driver: journald
 
@@ -27,7 +32,6 @@ services:
     networks:
       - emfweb
 
-
   postgres_exporter:
     restart: unless-stopped
     image: 'wrouesnel/postgres_exporter:v0.8.0'
@@ -38,11 +42,38 @@ services:
     ports:
       - "9187:9187"
 
+  memcached:
+    restart: unless-stopped
+    image: 'memcached:1.6.13-alpine'
+    networks:
+      - emfweb
+    command: memcached -m 64
+
+  memcached_exporter:
+    restart: unless-stopped
+    image: 'prom/memcached-exporter:v0.9.0'
+    depends_on:
+      - memcached
+    networks:
+      - emfweb
+    ports:
+      - "9150:9150"
+    command: --memcached.address memcached:11211
+
   static:
     restart: unless-stopped
     image: "ghcr.io/emfcamp/website-static:latest"
+    labels:
+      com.centurylinklabs.watchtower.enable: true
     ports:
       - "127.0.0.1:8080:80" 
+
+  watchtower:
+    restart: unless-stopped
+    image: "containrrr/watchtower"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30 --label-enable
 
 networks:
   emfweb:

@@ -1,3 +1,5 @@
+{% extends "emails/base.txt" %}
+{% block body %}
 Hi {{ proposal.user.name }},
 
 We need some final information about your {{ proposal.human_type }} '{{ proposal.title }}'.
@@ -25,3 +27,4 @@ If you don't yet have EMF tickets, you can get them on this page:
 
 Looking forward to seeing you in the field,
 All the EMF team
+{%- endblock -%}

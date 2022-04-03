@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+docker/startup-irc-notify.sh &
+
 export PGPASSWORD=postgres
 PSQL="/usr/bin/psql -h postgres -U postgres"
 
@@ -12,5 +14,5 @@ done
 $PSQL -c 'CREATE DATABASE emf_site' || true
 $PSQL emf_site -c 'CREATE EXTENSION postgis' || true
 
-export prometheus_multiproc_dir=/var/prometheus
-exec poetry run gunicorn -k gthread -c gunicorn.py -w 3 -b '0.0.0.0:8000' --preload wsgi:app
+export PROMETHEUS_MULTIPROC_DIR=/var/prometheus
+exec poetry run gunicorn -k gthread -c gunicorn.py -w 6 -b '0.0.0.0:8000' --preload wsgi:app

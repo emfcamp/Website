@@ -9,31 +9,32 @@
 
     <div id="menu-container" role="navigation" aria-label="Main">
       <ul class="menu" role="menu">
-            {#
+        {#
             <li role="presentation">
                 <a role="menuitem" href="{{ url_for('base.feedback') }}">Feedback</a>
             </li>
-            #}
+        #}
             <li role="presentation">
                 <a role="menuitem" href="{{ url_for('base.about') }}">About</a>
-            </li>
-            <li role="presentation">
-                <a role="menuitem" href="{{ url_for('base.emp') }}">EMP</a>
             </li>
             {% if SITE_STATE == 'sales' and SALES_STATE in ['available', 'unavailable'] %}
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('tickets.main') }}">Tickets</a>
                 </li>
             {% endif %}
-            {#
+        {#
             {% elif config.get('DEFAULT_FLOW') == 'tees' and SALES_STATE in ['available'] %}
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('tickets.main', flow='tees') }}">T-shirts</a>
                 </li>
-            #}
+        #}
             {% if feature_enabled('VOLUNTEERS') %}
                 <li role="presentation">
                     <a role="menuitem" href="{{ url_for('volunteer.main') }}">Volunteer</a>
+                </li>
+            {% else %}
+                <li role="presentation">
+                    <a role="menuitem" href="{{ url_for('base.volunteering') }}">Volunteer</a>
                 </li>
             {% endif %}
             {% if feature_enabled('CFP') and not feature_enabled('CFP_CLOSED') %}

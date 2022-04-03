@@ -1,3 +1,5 @@
+{% extends "emails/base.txt" %}
+{% block body %}
 {%- if user.name != user.email -%}
 Hi {{ user.name }},
 {%- else -%}
@@ -26,3 +28,4 @@ Love,
 All the EMF team
 
 [Refund Request ID: {{request.id}}]
+{% endblock %}

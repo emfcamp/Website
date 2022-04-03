@@ -15,7 +15,7 @@
         <tbody id="tbody-{{ day }}">
             {% for hour in all_shifts[day] | sort %}
                 {% for shift in all_shifts[day][hour] %}
-                    <tr>
+                    <tr style="display: none">
                         {% if loop.first %}
                             <td rowspan="{{ all_shifts[day][hour] | length }}">{{ hour }}</td>
                         {% endif %}
@@ -80,20 +80,22 @@
                 </a>
             </h4>
         </div>
-        <div class="panel-body collapse
-        {%- if filtered %}in{% endif %}
-            " id="searchPanel">
+        <div class="panel-body collapse" id="searchPanel">
             {% include "volunteer/_schedule_filters.html" %}
         </div>
     </div>
 
     <ul class="nav nav-tabs" role="tablist">
+        {{ tabnav('wed', 'Wednesday', active_day) }}
+        {{ tabnav('thu', 'Thursday', active_day) }}
         {{ tabnav('fri', 'Friday', active_day) }}
         {{ tabnav('sat', 'Saturday', active_day) }}
         {{ tabnav('sun', 'Sunday', active_day) }}
         {{ tabnav('mon', 'Monday', active_day) }}
     </ul>
     <div class="tab-content">
+        {{ days_shifts('wed', active_day) }}
+        {{ days_shifts('thu', active_day) }}
         {{ days_shifts('fri', active_day) }}
         {{ days_shifts('sat', active_day) }}
         {{ days_shifts('sun', active_day) }}
@@ -122,9 +124,13 @@
             </div>
           </div>
           <div class="modal-footer">
+            <div id="signup-grp" class="input-group">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button id='signUpBtn' type="button" class="btn btn-primary">Sign Up</button>
+            </div>
             {% if current_user.has_permission('volunteer:admin') %}
-
-                <div class="input-group">
+              
+                <div class="input-group" id="shift-admin">
                     <select id="override-user" class="form-control">
                         {% for volunteer in all_volunteers %}
                         <option value="{{ volunteer.user_id }}">{{ volunteer.nickname }} &lt;{{ volunteer.volunteer_email }}&gt;</option>
@@ -136,10 +142,7 @@
 
                 </div>
             {% endif %}
-            <div id="signup-grp" class="input-group">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button id='signUpBtn' type="button" class="btn btn-primary">Sign Up</button>
-            </div>
+
           </div>
         </div>
       </div>
@@ -153,23 +156,16 @@
 
     <script src="{{ static_url_for('static', filename='js/volunteer-schedule.js') }}"></script>
     <script type="text/javascript" nonce="{{csp_nonce}}">
-        var csrf_token = "{{ csrf_token() }}";
-
-        $.ajaxSetup({
-            beforeSend: function(xhr, settings) {
-                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                    xhr.setRequestHeader("X-CSRFToken", csrf_token);
-                }
-            }
-        });
-
         $('#filter-panel').show();
+
         // Set hrefs back for tabs if JS is enabled
-        $('#tabnav-fri a').attr('href', '#fri');
-        $('#tabnav-sat a').attr('href', '#sat');
-        $('#tabnav-sun a').attr('href', '#sun');
-        $('#tabnav-mon a').attr('href', '#mon');
-        $('#is_interested').attr('checked', true);
+        $('a[data-day').each((_, e) => {
+            $(e).attr('href', '#' + $(e).attr('data-day'));
+        });
+        $('#signUp').on('hidden.bs.modal', function(e) {
+          // clear messages
+          $('.alert').remove();
+        });
 
         var volunteer_shifts = {{ all_shifts | tojson }},
             volunteer_roles = {{ roles | tojson }},

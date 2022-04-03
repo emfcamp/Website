@@ -1,3 +1,5 @@
+{% extends "emails/base.txt" %}
+{% block body %}
 Hi {{ payment.user.name }},
 
 We've received notification that your payment for {{ payment.amount | price(payment.currency) }} has failed.
@@ -20,3 +22,4 @@ and complete the payment process again.
 Love,
 
 All the EMF team
+{% endblock %}

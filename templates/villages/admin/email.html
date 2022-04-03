@@ -1,0 +1,32 @@
+{% extends "villages/admin/base.html" %}
+{% block title %}Compose email{% endblock %}
+{% block body %}
+<h2>Send Email</h2>
+
+{% if html %}
+    <h3>Preview</h3>
+    <p>To send to {{count}} users.</p>
+    <iframe width="640px" height="960px" srcdoc="{{html}}">
+    </iframe>
+{% endif %}
+<h3>Compose</h3>
+<form method="post">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        <label>Subject</label>
+        {{ form.subject(size=120, class="form-control") }}
+    </div>
+    <div class="form-group">
+        <label>Body</label>
+        <p>Use Markdown formatting here.</p>
+        {{ form.text(cols=120, rows=30, class="form-control") }}
+    </div>
+
+    {{ form.preview(class_="btn btn-success pull-right") }}
+    {% if html %}
+    {{ form.send(class_="btn btn-danger pull-right") }}
+    <p>Preview Email Address: {{ form.send_preview_address(cols=30) }} {{ form.send_preview(class_="btn btn-success") }}
+    </p>
+    {% endif %}
+</form>
+{% endblock %}

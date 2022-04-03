@@ -1,24 +1,41 @@
-@import url('https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap');
+@use "../node_modules/bootstrap/dist/css/bootstrap.css";
+@use "../node_modules/@primer/octicons";
+@use "./_main_grid.scss";
+@use "./_base.scss";
+@use "./_header.scss";
+@use "./_footer.scss";
+@use "./_secondary_nav.scss";
 
-@import "bootstrap";
-@import "@primer/octicons";
-@import "./_variables.scss";
-@import "./_main_grid.scss";
-@import "./_base.scss";
-@import "./_header.scss";
-@import "./_footer.scss";
-@import "./_secondary_nav.scss";
+@use "./_compat_bootstrap_4.scss";
+@use "./_tables.scss";
+@use "./_buttons.scss";
+@use "./_video.scss";
 
-@import "./_compat_bootstrap_4.scss";
-@import "./_tables.scss";
-@import "./_buttons.scss";
-@import "./_video.scss";
+@use "./_about.scss";
+@use "./_cfp.scss";
+@use "./_lineup.scss";
+@use "./_tickets.scss";
+@use "./_responsive_table.scss";
+@use "./_sponsorship.scss";
+@use "./_volunteer.scss";
+@use "./volunteer_schedule.scss";
 
-@import "./_about.scss";
-@import "./_cfp.scss";
-@import "./_lineup.scss";
-@import "./_tickets.scss";
-@import "./_responsive_table.scss";
-@import "./_sponsorship.scss";
-@import "./_volunteer.scss";
-@import "./volunteer_schedule.scss";
+@font-face {
+  font-family: "Raleway";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local(""),
+    url("../fonts/raleway-v22-latin-ext_latin-regular.woff2") format("woff2"),
+    url("../fonts/raleway-v22-latin-ext_latin-regular.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Raleway";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local(""),
+    url("../fonts/raleway-v22-latin-ext_latin-700.woff2") format("woff2"),
+    url("../fonts/raleway-v22-latin-ext_latin-700.woff") format("woff");
+}

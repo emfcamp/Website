@@ -14,8 +14,6 @@
 {%- if payment.provider == 'banktransfer' %}
 <dt>Bank</dt><dd>{{ account.institution }} ({{ account.currency }})</dd>
 <dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
-{% elif payment.provider == 'gocardless' %}
-<dt>GoCardless ID</dt><dd>{{ payment.gcid }}</dd>
 {% endif -%}
 <dt>Expires</dt><dd>{{ payment.expires and payment.expires.strftime('%Y-%m-%d %H:%M:%S') }}</dd>
 <dt>Already bought</dt><dd>{{ payment.user.get_owned_tickets(paid=True) | list | count }}</dd>

@@ -115,11 +115,11 @@ class InstallationProposalForm(ProposalForm):
         "Funding",
         choices=[
             ("0", "No money needed"),
-            (u"< £50", u"Less than £50"),
-            (u"< £100", u"Less than £100"),
-            (u"< £300", u"Less than £300"),
-            (u"< £500", u"Less than £500"),
-            (u"> £500", u"More than £500"),
+            ("< £50", "Less than £50"),
+            ("< £100", "Less than £100"),
+            ("< £300", "Less than £300"),
+            ("< £500", "Less than £500"),
+            ("> £500", "More than £500"),
         ],
     )
 
@@ -392,6 +392,49 @@ def edit_proposal(proposal_id):
     return render_template("cfp/edit.html", proposal=proposal, form=form)
 
 
+class WithdrawalForm(Form):
+    message = TextAreaField(
+        "If you're comfortable, please tell us why you're withdrawing"
+    )
+    confirm_withdrawal = SubmitField("Confirm proposal withdrawal")
+
+
+@cfp.route("/cfp/proposals/<int:proposal_id>/withdraw", methods=["GET", "POST"])
+@feature_flag("CFP")
+def withdraw_proposal(proposal_id):
+    if current_user.is_anonymous:
+        return redirect(
+            url_for(
+                "users.login", next=url_for(".edit_proposal", proposal_id=proposal_id)
+            )
+        )
+
+    proposal = Proposal.query.get_or_404(proposal_id)
+    if proposal.user != current_user:
+        abort(404)
+
+    form = WithdrawalForm()
+    if form.validate_on_submit():
+        if form.confirm_withdrawal.data:
+
+            app.logger.info("Proposal %s is being withdrawn.", proposal_id)
+            proposal.set_state("withdrawn")
+
+            msg = CFPMessage()
+            msg.is_to_admin = True
+            msg.from_user_id = current_user.id
+            msg.proposal_id = proposal_id
+            msg.message = form.message.data
+
+            db.session.add(msg)
+            db.session.commit()
+            flash("We've withdrawn your {0.type}, {0.title}.".format(proposal))
+
+            return redirect(url_for("cfp.proposals"))
+
+    return render_template("cfp/withdraw.html", form=form, proposal=proposal)
+
+
 class AcceptedForm(Form):
     name = StringField("Names for schedule", [DataRequired()])
     title = StringField("Title", [DataRequired()])
@@ -429,7 +472,7 @@ class AcceptedForm(Form):
             ("mon am", "Monday am"),
         ],
     )
-    _available_slots = tuple()
+    _available_slots: tuple = tuple()
 
     def get_availability_json(self):
         res = []
@@ -688,3 +731,8 @@ def all_messages():
 @cfp.route("/cfp/guidance")
 def guidance():
     return render_template("cfp/guidance.html")
+
+
+@cfp.route("/cfp/installation-support")
+def installation_support():
+    return render_template("cfp/installation_support.html")

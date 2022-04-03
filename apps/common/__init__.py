@@ -72,12 +72,6 @@ def load_utility_functions(app_obj):
     def format_bankref(bankref):
         return "%s-%s" % (bankref[:4], bankref[4:])
 
-    @app_obj.template_filter("gcid")
-    def format_gcid(gcid):
-        if len(gcid) > 14:
-            return "ending %s" % gcid[-14:]
-        return gcid
-
     @app_obj.context_processor
     def utility_processor():
         SALES_STATE = get_sales_state()
@@ -250,7 +244,7 @@ def json_response(f, *args, **kwargs):
         return jsonify(response), 200
 
 
-def feature_enabled(feature):
+def feature_enabled(feature) -> bool:
     """
     If a feature flag is defined in the database return that,
     otherwise fall back to the config setting.
@@ -264,8 +258,8 @@ def feature_enabled(feature):
 
 
 def archive_file(year, *path, raise_404=True):
-    """ Return the path to a given file within the archive.
-        Optionally raise 404 if it doesn't exist.
+    """Return the path to a given file within the archive.
+    Optionally raise 404 if it doesn't exist.
     """
     file_path = os.path.abspath(
         os.path.join(__file__, "..", "..", "..", "exports", str(year), *path)
@@ -281,8 +275,8 @@ def archive_file(year, *path, raise_404=True):
 
 
 def load_archive_file(year: int, *path, raise_404=True):
-    """ Load the contents of a JSON file from the archive, and optionally
-        abort with a 404 if it doesn't exist.
+    """Load the contents of a JSON file from the archive, and optionally
+    abort with a 404 if it doesn't exist.
     """
     json_path = archive_file(year, *path, raise_404=raise_404)
     if json_path is None:

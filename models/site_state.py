@@ -4,13 +4,13 @@ from datetime import datetime
 from sqlalchemy.orm.exc import MultipleResultsFound
 
 from main import cache, db
-from . import config_date
+from . import config_date, BaseModel
 from .product import Product, ProductGroup, ProductView, ProductViewProduct, PriceTier
 
 log = logging.getLogger(__name__)
 
 
-class SiteState(db.Model):
+class SiteState(BaseModel):
     __tablename__ = "site_state"
     __export_data__ = False
     name = db.Column(db.String, primary_key=True)
@@ -35,7 +35,7 @@ VALID_STATES = {
 
 
 def calc_site_state(date):
-    """ Logic to set the state of the homepage based on date. """
+    """Logic to set the state of the homepage based on date."""
     if date < config_date("SALES_START"):
         return "before-sales"
     elif date < config_date("EVENT_START"):
@@ -81,7 +81,7 @@ def calc_sales_state(date):
 
 
 @cache.cached(timeout=60, key_prefix="get_states")
-def get_states():
+def get_states() -> dict[str, str]:
     states = SiteState.query.all()
     states = {s.name: s.state for s in states}
 
