@@ -4,8 +4,8 @@
     {% endif %}
 {% endmacro %}
 
-{% macro menuitem(text, view, badge_count=0) %}
-<li{% if view_name == view %} class="active"{% endif %}>
+{% macro menuitem(text, view, badge_count=0, classes="") %}
+<li class="{% if view_name == view %}active{% endif %} {{classes}}">
     <a href="{{ url_for(view) }}">{{text}}</a>
     {{badge(badge_count)}}
   </li>
@@ -18,22 +18,36 @@
     {% if feature_enabled('LINE_UP') %}
       {{ menuitem("Event feeds", "schedule.external_feeds") }}
     {% endif %}
+
     {% if feature_enabled('CFP') %}
       {{ menuitem("Proposals", "cfp.proposals") }}
       {{ menuitem("Messages", "cfp.all_messages", unread_count) }}
-      {% if current_user.has_permission('admin') %}
-        {{ menuitem("Admin", "admin.home") }}
-      {% elif current_user.has_permission('cfp_admin') %}
+
+      {% if current_user.has_permission('cfp_admin') %}
         {{ menuitem("CfP Admin", "cfp_review.proposals") }}
-      {% else %}
-        {% if current_user.has_permission('cfp_anonymiser') %}
-          {{ menuitem("Anonymise proposals", "cfp_review.anonymisation") }}
-        {% elif current_user.has_permission('cfp_reviewer') %}
-          {{ menuitem("Review proposals", "cfp_review.review_list") }}
-        {% endif %}
+
+      {% elif current_user.has_permission('cfp_anonymiser') %}
+        {{ menuitem("Anonymise proposals", "cfp_review.anonymisation") }}
+
+      {% elif current_user.has_permission('cfp_reviewer') %}
+        {{ menuitem("Review proposals", "cfp_review.review_list") }}
+
       {% endif %}
     {% endif %}
-    {{ menuitem("Log Out", "users.logout") }}
+
+    {% if current_user.has_permission('villages') %}
+      {{ menuitem("Villages Admin", "villages.admin") }}
+    {% endif %}
+
+    {% if current_user.has_permission('volunteer:admin') %}
+      {{ menuitem("Volunteer Admin", "volunteer_admin.index") }}
+    {% endif %}
+
+    {% if current_user.has_permission('admin') %}
+      {{ menuitem("Admin", "admin.home") }}
+    {% endif %}
+
+    {{ menuitem("Log Out", "users.logout", classes="pull-right") }}
   </ul>
 </nav>
 
