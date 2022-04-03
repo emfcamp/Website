@@ -1,0 +1,20 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "cfp_review/base.html" %}
+{% block body %}
+
+{% set active='notes' %}
+{% include "cfp_review/_propsal_tabs.html" %}
+
+<h4>{{ proposal.title }} <small>by <a href="{{ url_for('admin.user', user_id=proposal.user.id) }}">{{proposal.user.name}}</a></small></h4>
+<p class="multiline">{{ proposal.description | urlize }}</p>
+<p>&nbsp;</p>
+
+<form method="post" action="{{ url_for('.proposal_notes', proposal_id=proposal.id) }}">
+    {{ form.hidden_tag() }}
+    {{ render_field(form.notes, tabindex=1, rows=6) }}
+    <div class="pull-right">
+        {{ form.send(class_='btn btn-success debounce', tabindex=2) }}
+    </div>
+</form>
+
+{% endblock %}

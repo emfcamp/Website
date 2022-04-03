@@ -48,6 +48,7 @@ from .forms import (
     CloseRoundForm,
     AcceptanceForm,
     ConvertProposalForm,
+    AddNoteForm,
 )
 from . import (
     cfp_review,
@@ -714,6 +715,32 @@ def proposal_votes(proposal_id):
 
     return render_template(
         "cfp_review/proposal_votes.html", proposal=proposal, form=form, votes=all_votes
+    )
+
+
+@cfp_review.route("/proposals/<int:proposal_id>/notes", methods=["GET", "POST"])
+@admin_required
+def proposal_notes(proposal_id):
+    form = AddNoteForm()
+    proposal = Proposal.query.get_or_404(proposal_id)
+
+    if form.validate_on_submit():
+        if form.send.data:
+            proposal.private_notes = form.notes.data
+
+            db.session.commit()
+
+            flash("Updated notes")
+
+        return redirect(url_for(".proposal_notes", proposal_id=proposal_id))
+
+    if proposal.private_notes:
+        form.notes.data = proposal.private_notes
+
+    return render_template(
+        "cfp_review/proposal_notes.html",
+        form=form,
+        proposal=proposal,
     )
 
 
