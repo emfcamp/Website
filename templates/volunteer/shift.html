@@ -32,5 +32,6 @@
                 <li>{{ user.volunteer.nickname }}</li>
             {% endfor %}
         </ul>
+        <a href="{{ url_for('.shift_contact', shift_id=shift.id) }}">Contact signed up volunteers</a>
     {% endif %}
 {% endblock %}
