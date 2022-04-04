@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Bring &amp; Donate{% endblock %}
+{% block secondary_nav %}
+  {% include "about/_nav.html" %}
+{% endblock %}
+{% block body %}
+<h2>Red Cross Bring &amp; Donate</h2>
+<p>The Old Curie-osity Shoppe is a way for you to get rid of those parts you bought for a project that never went 
+   anywhere, get new parts for a future project that might go somewhere, and donate money to the Red Cross while
+   you’re doing it.</p>
+
+<h3>Buying</h3>
+<p>There’ll be a selection of crates containing stuff that people have brought with them: take a look around, pick up 
+   anything that takes your fancy and leave a donation in return. Make a note of the number on any crates you took
+   items from so we can let the person who brought them how much they’ve raised.</p>
+<p>We will be performing age verification for any items that are age-restricted, such as blades or flammables.</p>
+
+<h3>Donating</h3>
+<p>Bring your items to EMF with you, and then bring them to the Shoppe. You’ll be given a numbered crate to place your items
+   in, and we’ll take a name and some contact information &mdash; this will allow us to keep track of how much your donation
+   raised, and to get in touch with you if anything is left over.</p>
+<p><strong>You will be expected to take any items that people didn’t want home with you</strong>, think of this like a
+   car boot sale rather than a recycling service.</p>
+
+<h4>What to bring</h4>
+<p>Things likely to appeal to EMF attendees that you wouldn't typically find in a local charity shop:</p>
+<ul>
+    <li>Specialist books</li>
+    <li>Tools</li>
+    <li>Electronic &amp; mechanical components</li>
+    <li>Construction materials (think wood, not bricks)</li>
+    <li>Other craft/hobby materials</li>
+</ul>
+<p>Items don't necessarily have to be working, but should pass the test of "it's reasonable to imagine someone
+   salvaging/repurposing/reusing this item"</p>
+
+<h4>What not to bring</h4>
+<ul>
+    <li>Items that are illegal in the UK</li>
+    <li>Weapons</li>
+    <li>Anything with non-obvious hazards (for example asbestos, chemical, or explosive hazards)</li>
+    <li>Anything that would be in breach of the <a href="{{ url_for("base.code_of_conduct") }}">EMF code of conduct</a></li>
+</ul>
+{% endblock %}
