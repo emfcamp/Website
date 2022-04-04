@@ -89,6 +89,11 @@ def what_to_bring():
     return render_template("about/what-to-bring.html")
 
 
+@base.route("/about/bring-and-donate")
+def bring_and_donate():
+    return render_template("about/bring-and-donate.html")
+
+
 @base.route("/about/food")
 def food():
     return render_template("about/food.html")
