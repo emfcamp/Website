@@ -220,12 +220,7 @@ def json_response(f, *args, **kwargs):
         return jsonify(data), e.code
 
     except Exception as e:
-        app.logger.error("Exception during json request: %r", e)
-        # Werkzeug sends the response and then logs, which is fiddly
-        from werkzeug.debug.tbtools import get_current_traceback
-
-        traceback = get_current_traceback(ignore_system_exceptions=True)
-        app.logger.info("Traceback %s", traceback.plaintext)
+        app.logger.exception("Exception during json request: %r", e)
 
         data = {"error": e.__class__.__name__, "description": str(e)}
         return jsonify(data), 500

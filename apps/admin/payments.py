@@ -498,7 +498,7 @@ def refund(payment_id):
                     )
 
                 except Exception as e:
-                    app.logger.warn("Exception %r refunding payment", e)
+                    app.logger.exception("Exception %r refunding payment", e)
                     flash(
                         "An error occurred refunding with Stripe. Please check the state of the payment."
                     )
