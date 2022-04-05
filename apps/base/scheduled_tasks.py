@@ -1,3 +1,5 @@
+from flask import current_app as app
+
 from main import mail, db
 from models.email import EmailJobRecipient
 from models.volunteer.notify import VolunteerNotifyRecipient
@@ -9,7 +11,8 @@ from ..common.email import from_email
 def send_emails():
     """Send queued emails, allowing for failure"""
     count = 0
-    with mail.get_connection() as conn:
+
+    with mail.get_connection(app.config.get("BULK_MAIL_BACKEND")) as conn:
         for rec in EmailJobRecipient.query.filter(
             EmailJobRecipient.sent == False  # noqa: E712
         ):
