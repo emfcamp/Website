@@ -24,7 +24,7 @@ class VolunteerUserModelView(VolunteerModelView):
         "allow_comms_during_event",
         "banned",
     )
-    column_filters = ["trained_roles", "allow_comms_during_event"]
+    column_filters = ["interested_roles", "allow_comms_during_event"]
     column_list = (
         "nickname",
         "volunteer_email",
