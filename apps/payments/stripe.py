@@ -238,12 +238,13 @@ def stripe_update_payment(payment: StripePayment, intent: stripe.PaymentIntent =
 
     if charge.refunded:
         return stripe_payment_refunded(payment)
-    elif charge.status == "succeeded":
+    elif charge.paid:
         return stripe_payment_paid(payment)
     elif charge.status == "failed":
         return stripe_payment_failed(payment)
 
-    raise StripeUpdateUnexpected("Charge object is not paid, refunded or failed")
+    logger.error(f"Charge is {charge.status}, expected refunded, paid or failed")
+    raise StripeUpdateUnexpected("Charge object is not refunded, paid or failed")
 
 
 def stripe_payment_paid(payment: StripePayment):
