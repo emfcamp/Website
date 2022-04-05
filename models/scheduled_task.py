@@ -114,7 +114,7 @@ def execute_scheduled_tasks():
             result.result["returnval"] = task.func()
 
         except Exception as e:
-            log.error(f"Exception in {task.name}: {repr(e)}")
+            log.exception(f"Exception in {task.name}: {repr(e)}")
             result.result["exception"] = repr(e)
 
         # Clean up the main session whatever happens
