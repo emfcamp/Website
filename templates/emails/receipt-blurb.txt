@@ -1,5 +1,3 @@
-{% extends "emails/base.txt" %}
-{% block body %}
 We've attached {% if already_emailed %}an updated{% else %}a{% endif %} PDF to this email. Admissions tickets can be shown
 on your phone, but we recommend you print them out for convenience.
 
@@ -34,4 +32,3 @@ contributing a few hours of your time at the festival to help the
 event run smoothly. You can register your interest here:
 
   {{ external_url('volunteer.sign_up') }}
-{% endblock %}
