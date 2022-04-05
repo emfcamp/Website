@@ -116,8 +116,9 @@ def tickets_issue_free(email):
         db.session.commit()
 
         code = user.login_code(app.config["SECRET_KEY"])
+        ticket_noun = "tickets" if len(basket.purchases) > 1 else "ticket"
         msg = EmailMessage(
-            "Your complimentary tickets to Electromagnetic Field",
+            f"Your complimentary {ticket_noun} to Electromagnetic Field",
             from_email=from_email("TICKETS_EMAIL"),
             to=[user.email],
         )
@@ -138,7 +139,7 @@ def tickets_issue_free(email):
         msg.send()
         db.session.commit()
 
-        flash("Allocated %s ticket(s)" % len(basket.purchases))
+        flash(f"Allocated {len(basket.purchases)} {ticket_noun}")
         return redirect(url_for(".tickets_issue"))
     return render_template(
         "admin/tickets/tickets-issue-free.html", form=form, user=user, email=email
@@ -298,8 +299,9 @@ def tickets_reserve(email):
             return redirect(url_for(".tickets_reserve", email=email))
 
         code = user.login_code(app.config["SECRET_KEY"])
+        ticket_noun = "tickets" if len(basket.purchases) > 1 else "ticket"
         msg = EmailMessage(
-            "Your reserved tickets to EMF",
+            f"Your reserved {ticket_noun} to EMF",
             from_email=from_email("TICKETS_EMAIL"),
             to=[user.email],
         )
@@ -316,7 +318,7 @@ def tickets_reserve(email):
         msg.send()
         db.session.commit()
 
-        flash("Reserved tickets and emailed {}".format(user.email))
+        flash(f"Reserved {ticket_noun} and emailed {user.email}")
         return redirect(url_for(".tickets_issue"))
 
     return render_template(
