@@ -159,105 +159,72 @@ def proposals():
 
 
 def send_email_for_proposal(proposal, reason="still-considered", from_address=None):
-    proposal_title = proposal.title
+    if reason == "accepted":
+        app.logger.info("Sending accepted email for proposal %s", proposal.id)
+        subject = 'Your EMF proposal "%s" has been accepted!' % proposal.title
+        template = "cfp_review/email/accepted_msg.txt"
 
-    while True:
-        if reason == "accepted":
-            app.logger.info("Sending accepted email for proposal %s", proposal.id)
-            subject = 'Your EMF proposal "%s" has been accepted!' % proposal_title
-            template = "cfp_review/email/accepted_msg.txt"
+    elif reason == "still-considered":
+        app.logger.info("Sending still-considered email for proposal %s", proposal.id)
+        subject = 'We\'re still considering your EMF proposal "%s"' % proposal.title
+        template = "cfp_review/email/not_accepted_msg.txt"
 
-        elif reason == "still-considered":
-            app.logger.info(
-                "Sending still-considered email for proposal %s", proposal.id
-            )
-            subject = 'We\'re still considering your EMF proposal "%s"' % proposal_title
-            template = "cfp_review/email/not_accepted_msg.txt"
+    elif reason == "rejected":
+        app.logger.info("Sending rejected email for proposal %s", proposal.id)
+        proposal.has_rejected_email = True
+        subject = 'Your EMF proposal "%s" was not accepted.' % proposal.title
+        template = "emails/cfp-rejected.txt"
 
-        elif reason == "rejected":
-            app.logger.info("Sending rejected email for proposal %s", proposal.id)
-            proposal.has_rejected_email = True
-            subject = 'Your EMF proposal "%s" was not accepted.' % proposal_title
-            template = "emails/cfp-rejected.txt"
-
-        elif reason == "check-your-slot":
-            app.logger.info(
-                "Sending check-your-slot email for proposal %s", proposal.id
-            )
-            subject = (
-                "Your EMF proposal '%s' has been scheduled, please check your slot"
-                % proposal_title
-            )
-            template = "emails/cfp-check-your-slot.txt"
-
-        elif reason == "please-finalise":
-            app.logger.info(
-                "Sending please-finalise email for proposal %s", proposal.id
-            )
-            subject = (
-                "We need information about your EMF proposal '%s'" % proposal_title
-            )
-            template = "emails/cfp-please-finalise.txt"
-
-        elif reason == "reserve-list":
-            app.logger.info("Sending reserve-list email for proposal %s", proposal.id)
-            subject = "Your EMF proposal '%s', and EMF tickets" % proposal_title
-            template = "emails/cfp-reserve-list.txt"
-
-        elif reason == "scheduled":
-            subject = "Your EMF %s has been scheduled ('%s')" % (
-                proposal.human_type,
-                proposal_title,
-            )
-            template = "emails/cfp-slot-scheduled.txt"
-
-        elif reason == "moved":
-            subject = "Your EMF %s slot has been moved ('%s')" % (
-                proposal.human_type,
-                proposal_title,
-            )
-            template = "emails/cfp-slot-moved.txt"
-
-        else:
-            raise Exception("Unknown cfp proposal email type %s" % reason)
-
-        app.logger.info("Sending %s email for proposal %s", reason, proposal.id)
-
-        send_from = from_email("CONTENT_EMAIL")
-        if from_address:
-            send_from = from_address
-
-        msg = EmailMessage(subject, from_email=send_from, to=[proposal.user.email])
-        msg.body = render_template(
-            template,
-            user=proposal.user,
-            proposal=proposal,
-            reserve_ticket_link=app.config["RESERVE_LIST_TICKET_LINK"],
+    elif reason == "check-your-slot":
+        app.logger.info("Sending check-your-slot email for proposal %s", proposal.id)
+        subject = (
+            "Your EMF proposal '%s' has been scheduled, please check your slot"
+            % proposal.title
         )
+        template = "emails/cfp-check-your-slot.txt"
 
-        # Due to https://bugs.python.org/issue27240 heaader re-wrapping may
-        # occasionally fail on arbitrary strings. We try and avoid this by
-        # removing the talk title in the subject when the error occurrs.
-        # FIXME: This is disgusting and we should remove it when we're on a
-        # fixed version of python.
-        try:
-            msg.send()
-            return True
-        except AttributeError as e:
-            if proposal_title:
-                app.logger.error(
-                    "Failed to email proposal %s, with title, retrying: %s",
-                    proposal.id,
-                    e,
-                )
-                proposal_title = ""
-            else:
-                app.logger.error(
-                    "Failed to email proposal %s without title, ABORTING: %s",
-                    proposal.id,
-                    e,
-                )
-                return False
+    elif reason == "please-finalise":
+        app.logger.info("Sending please-finalise email for proposal %s", proposal.id)
+        subject = "We need information about your EMF proposal '%s'" % proposal.title
+        template = "emails/cfp-please-finalise.txt"
+
+    elif reason == "reserve-list":
+        app.logger.info("Sending reserve-list email for proposal %s", proposal.id)
+        subject = "Your EMF proposal '%s', and EMF tickets" % proposal.title
+        template = "emails/cfp-reserve-list.txt"
+
+    elif reason == "scheduled":
+        subject = "Your EMF %s has been scheduled ('%s')" % (
+            proposal.human_type,
+            proposal.title,
+        )
+        template = "emails/cfp-slot-scheduled.txt"
+
+    elif reason == "moved":
+        subject = "Your EMF %s slot has been moved ('%s')" % (
+            proposal.human_type,
+            proposal.title,
+        )
+        template = "emails/cfp-slot-moved.txt"
+
+    else:
+        raise Exception("Unknown cfp proposal email type %s" % reason)
+
+    app.logger.info("Sending %s email for proposal %s", reason, proposal.id)
+
+    send_from = from_email("CONTENT_EMAIL")
+    if from_address:
+        send_from = from_address
+
+    msg = EmailMessage(subject, from_email=send_from, to=[proposal.user.email])
+    msg.body = render_template(
+        template,
+        user=proposal.user,
+        proposal=proposal,
+        reserve_ticket_link=app.config["RESERVE_LIST_TICKET_LINK"],
+    )
+
+    msg.send()
 
 
 @cfp_review.route("/proposals/<int:proposal_id>/convert", methods=["GET", "POST"])
