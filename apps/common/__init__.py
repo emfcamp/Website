@@ -7,10 +7,9 @@ from textwrap import wrap
 import pendulum
 
 from main import db, external_url
-from flask import session, render_template, abort, current_app as app, Markup
+from flask import session, abort, current_app as app, Markup
 from flask.json import jsonify
 from flask_login import login_user, current_user
-from flask_mailman import EmailMessage
 from werkzeug.wrappers import BaseResponse
 from werkzeug.exceptions import HTTPException
 from jinja2.utils import urlize
@@ -144,12 +143,6 @@ def load_utility_functions(app_obj):
         text = urlize(text, trim_url_limit=40)
         text = "\n".join(f"<p>{para}</p>" for para in re.split(r"[\r\n]+", text))
         return Markup(text)
-
-
-def send_template_email(subject, to, sender, template, **kwargs):
-    msg = EmailMessage(subject, to=[to], from_email=sender)
-    msg.body = render_template(template, **kwargs)
-    msg.send()
 
 
 def create_current_user(email: str, name: str):
