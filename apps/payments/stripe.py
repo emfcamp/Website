@@ -184,7 +184,7 @@ def stripe_webhook():
         abort(400)
 
     try:
-        livemode = not app.config.get("DEBUG")
+        livemode = app.config.get("STRIPE_LIVEMODE", not app.config["DEBUG"])
         if event.livemode != livemode:
             logger.error("Unexpected livemode status %s, failing", event.livemode)
             abort(409)
