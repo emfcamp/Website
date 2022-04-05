@@ -37,7 +37,7 @@ class EmailComposeForm(Form):
 def get_query(dest):
     if dest == "all":
         return User.query
-    elif dest == "tickets":
+    elif dest == "ticket":
         return (
             User.query.join(User.owned_purchases)
             .filter_by(type="admission_ticket", is_paid_for=True)
