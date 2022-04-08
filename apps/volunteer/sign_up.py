@@ -20,6 +20,7 @@ from models.user import User
 from . import volunteer, v_user_required
 from ..common.forms import Form, TelField
 from ..common import create_current_user, feature_flag
+from ..common.irc import irc_send
 
 
 class VolunteerSignUpForm(Form):
@@ -86,6 +87,8 @@ def sign_up():
         db.session.commit()
         app.logger.info("Add volunteer: %s", new_volunteer)
         flash("Thank you for signing up!", "message")
+        if channel := app.config.get("VOL_IRC"):
+            irc_send(f"{channel} New volunteer: {new_volunteer}")
         return redirect(url_for(".choose_role"))
 
     return render_template("volunteer/sign-up.html", user=current_user, form=form)
