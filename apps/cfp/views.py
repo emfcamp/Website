@@ -17,7 +17,7 @@ import collections
 
 from sqlalchemy.exc import IntegrityError
 
-from main import db
+from main import db, external_url
 from models.user import User, UserDiversity
 from models.cfp import (
     TalkProposal,
@@ -33,6 +33,7 @@ from models.cfp import (
 from ..common import feature_flag, feature_enabled, create_current_user
 from ..common.email import from_email
 from ..common.forms import Form, TelField, EmailField
+from ..common.irc import irc_send
 
 from . import cfp
 
@@ -246,6 +247,10 @@ def form(cfp_type="talk"):
         )
         msg.send()
 
+        if channel := app.config.get("CONTENT_IRC_CHANNEL"):
+            irc_send(
+                f"{channel} New CfP submission: {external_url('cfp_review.update_proposal', proposal_id=cfp.id)}"
+            )
         return redirect(url_for(".complete"))
 
     return render_template(
@@ -687,6 +692,10 @@ def proposal_messages(proposal_id):
 
             db.session.add(msg)
             db.session.commit()
+            if channel := app.config.get("CONTENT_IRC_CHANNEL"):
+                irc_send(
+                    f"{channel} New CfP message: {external_url('cfp_review.message_proposer', proposal_id=proposal_id)}"
+                )
 
         count = proposal.mark_messages_read(current_user)
         db.session.commit()
