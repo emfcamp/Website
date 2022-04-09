@@ -14,5 +14,7 @@ def irc_send(message):
         s.connect((host, port))
         s.sendall(message.encode() + b"\n")
         s.close()
+    except socket.timeout:
+        app.logger.warn("Timeout connecting to irccat")
     except socket.error as e:
         app.logger.warn("Error sending IRC message (%s): %s", message, e)
