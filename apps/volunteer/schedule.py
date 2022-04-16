@@ -1,7 +1,7 @@
 # coding=utf-8
 import pendulum
 from datetime import datetime
-from flask import render_template, request, redirect, url_for, flash, jsonify
+from flask import render_template, request, redirect, url_for, flash, jsonify, session
 from collections import defaultdict
 from flask_login import current_user
 from flask import Markup
@@ -17,7 +17,7 @@ from models.volunteer.volunteer import Volunteer
 from models import config_date
 
 from ..common import feature_flag
-from . import volunteer, v_user_required
+from . import volunteer, v_user_required, v_admin_required
 
 
 def _get_interested_roles(user):
@@ -160,3 +160,12 @@ def shift_json(shift_id):
         return jsonify(msg)
 
     return jsonify(shift)
+
+
+@volunteer.route("/shift/<shift_id>/contact", methods=["GET"])
+@feature_flag("VOLUNTEERS_SCHEDULE")
+@v_admin_required
+def shift_contact(shift_id):
+    shift = Shift.query.get_or_404(shift_id)
+    session["recipients"] = [u.volunteer.id for u in shift.volunteers]
+    return redirect(url_for("volunteer_admin_notify.main"))

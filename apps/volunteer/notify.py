@@ -1,25 +1,26 @@
-from flask import current_app as app
-from flask_mail import Message
-
+from models import event_year
 from models.volunteer.notify import VolunteerNotifyJob, VolunteerNotifyRecipient
 from main import db, mail
-from apps.common.email import format_trusted_html_email, format_trusted_plaintext_email
+from apps.common.email import (
+    format_trusted_html_email,
+    format_trusted_plaintext_email,
+    from_email,
+)
 
 
 def preview_trusted_notify(preview_address, subject, body):
     subject = "[PREVIEW] " + subject
-    formatted_html = format_trusted_html_email(
-        body,
-        subject,
-        "You're receiving this notification because you have volunteered to help at Electromagnetic Field {event_year()}.",
-    )
+    reason = f"You're receiving this notification because you have volunteered to help at Electromagnetic Field {event_year()}."
+    formatted_plaintext = format_trusted_plaintext_email(body)
+    formatted_html = format_trusted_html_email(body, subject, reason)
 
-    with mail.connect() as conn:
-        msg = Message(subject, sender=app.config["VOLUNTEER_EMAIL"])
-        msg.add_recipient(preview_address)
-        msg.body = format_trusted_plaintext_email(body)
-        msg.html = formatted_html
-        conn.send(msg)
+    mail.send_mail(
+        subject=subject,
+        message=formatted_plaintext,
+        from_email=from_email("VOLUNTEER_EMAIL"),
+        recipient_list=[preview_address],
+        html_message=formatted_html,
+    )
 
 
 def enqueue_trusted_notify(volunteers, subject, body, **kwargs):

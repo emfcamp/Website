@@ -20,14 +20,15 @@ from flask import (
     current_app as app,
 )
 from flask_login import login_required, current_user
-from flask_mail import Message
+from flask_mailman import EmailMessage
 from wtforms import SubmitField
 from sqlalchemy.orm.exc import NoResultFound
 from stripe.error import AuthenticationError
 
-from main import db, stripe, mail
+from main import db, stripe
 from models.payment import StripePayment
 from ..common import feature_enabled
+from ..common.email import from_email
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
 from . import get_user_payment_or_abort, lock_user_payment_or_abort
@@ -183,7 +184,7 @@ def stripe_webhook():
         abort(400)
 
     try:
-        livemode = not app.config.get("DEBUG")
+        livemode = app.config.get("STRIPE_LIVEMODE", not app.config["DEBUG"])
         if event.livemode != livemode:
             logger.error("Unexpected livemode status %s, failing", event.livemode)
             abort(409)
@@ -258,10 +259,10 @@ def stripe_payment_paid(payment: StripePayment):
     payment.paid()
     db.session.commit()
 
-    msg = Message(
+    msg = EmailMessage(
         "Your EMF payment has been confirmed",
-        sender=app.config.get("TICKETS_EMAIL"),
-        recipients=[payment.user.email],
+        from_email=from_email("TICKETS_EMAIL"),
+        to=[payment.user.email],
     )
 
     already_emailed = set_tickets_emailed(payment.user)
@@ -275,7 +276,7 @@ def stripe_payment_paid(payment: StripePayment):
     if feature_enabled("ISSUE_TICKETS"):
         attach_tickets(msg, payment.user)
 
-    mail.send(msg)
+    msg.send()
     db.session.commit()
 
 

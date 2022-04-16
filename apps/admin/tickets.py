@@ -9,9 +9,9 @@ from flask import (
     abort,
     send_file,
 )
-from flask_mail import Message
+from flask_mailman import EmailMessage
 
-from main import db, mail, external_url
+from main import db, external_url
 from models.exc import CapacityException
 from models.user import User
 from models.product import ProductGroup, Product, PriceTier, Price
@@ -31,6 +31,7 @@ from .forms import (
 )
 
 from ..common import feature_enabled
+from ..common.email import from_email
 from ..common.receipt import attach_tickets, set_tickets_emailed
 from ..common.receipt import render_receipt, render_pdf
 
@@ -115,10 +116,11 @@ def tickets_issue_free(email):
         db.session.commit()
 
         code = user.login_code(app.config["SECRET_KEY"])
-        msg = Message(
-            "Your complimentary tickets to Electromagnetic Field",
-            sender=app.config["TICKETS_EMAIL"],
-            recipients=[user.email],
+        ticket_noun = "tickets" if len(basket.purchases) > 1 else "ticket"
+        msg = EmailMessage(
+            f"Your complimentary {ticket_noun} to Electromagnetic Field",
+            from_email=from_email("TICKETS_EMAIL"),
+            to=[user.email],
         )
 
         already_emailed = set_tickets_emailed(user)
@@ -134,10 +136,10 @@ def tickets_issue_free(email):
         if feature_enabled("ISSUE_TICKETS"):
             attach_tickets(msg, user)
 
-        mail.send(msg)
+        msg.send()
         db.session.commit()
 
-        flash("Allocated %s ticket(s)" % len(basket.purchases))
+        flash(f"Allocated {len(basket.purchases)} {ticket_noun}")
         return redirect(url_for(".tickets_issue"))
     return render_template(
         "admin/tickets/tickets-issue-free.html", form=form, user=user, email=email
@@ -297,10 +299,11 @@ def tickets_reserve(email):
             return redirect(url_for(".tickets_reserve", email=email))
 
         code = user.login_code(app.config["SECRET_KEY"])
-        msg = Message(
-            "Your reserved tickets to EMF",
-            sender=app.config["TICKETS_EMAIL"],
-            recipients=[user.email],
+        ticket_noun = "tickets" if len(basket.purchases) > 1 else "ticket"
+        msg = EmailMessage(
+            f"Your reserved {ticket_noun} to EMF",
+            from_email=from_email("TICKETS_EMAIL"),
+            to=[user.email],
         )
 
         msg.body = render_template(
@@ -312,10 +315,10 @@ def tickets_reserve(email):
             currency=form.currency.data,
         )
 
-        mail.send(msg)
+        msg.send()
         db.session.commit()
 
-        flash("Reserved tickets and emailed {}".format(user.email))
+        flash(f"Reserved {ticket_noun} and emailed {user.email}")
         return redirect(url_for(".tickets_issue"))
 
     return render_template(

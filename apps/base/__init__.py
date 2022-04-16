@@ -114,7 +114,7 @@ def main_post():
                 flash("Sorry, an error occurred: %s." % (title or "unknown"))
 
     except Exception as e:
-        app.logger.error("Error subscribing: %r", e)
+        app.logger.exception("Error subscribing: %r", e)
         flash("Sorry, an error occurred.")
 
     return redirect(url_for(".main"))

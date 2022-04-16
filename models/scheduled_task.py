@@ -93,7 +93,7 @@ def scheduled_task(**kwargs):
     return decorator
 
 
-def execute_scheduled_tasks():
+def execute_scheduled_tasks(force=False):
     # Create a new session, so tasks calling commit don't free our lock
     session = db.create_scoped_session()
 
@@ -101,10 +101,13 @@ def execute_scheduled_tasks():
     session.execute(f"LOCK TABLE {ScheduledTaskResult.__tablename__} IN EXCLUSIVE MODE")
 
     tasks_to_run = []
-    for task in tasks:
-        res = ScheduledTaskResult.get_latest_run(task.name, session)
-        if res is None or res.start_time + task.duration < pendulum.now():
-            tasks_to_run.append(task)
+    if force:
+        tasks_to_run += tasks
+    else:
+        for task in tasks:
+            res = ScheduledTaskResult.get_latest_run(task.name, session)
+            if res is None or res.start_time + task.duration < pendulum.now():
+                tasks_to_run.append(task)
 
     log.info("Running %s periodic tasks...", len(tasks_to_run))
     for task in tasks_to_run:
@@ -114,7 +117,7 @@ def execute_scheduled_tasks():
             result.result["returnval"] = task.func()
 
         except Exception as e:
-            log.error(f"Exception in {task.name}: {repr(e)}")
+            log.exception(f"Exception in {task.name}: {repr(e)}")
             result.result["exception"] = repr(e)
 
         # Clean up the main session whatever happens

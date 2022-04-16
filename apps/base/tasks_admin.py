@@ -8,9 +8,15 @@ from models.scheduled_task import execute_scheduled_tasks
 
 
 @app.cli.command("periodic")
-def periodic():
+@click.option(
+    "-f",
+    "--force/--no-force",
+    default=False,
+    help="Run all tasks regardless of schedule",
+)
+def periodic(force):
     """Execute periodic scheduled tasks"""
-    execute_scheduled_tasks()
+    execute_scheduled_tasks(force)
 
 
 @app.cli.command("make_admin")

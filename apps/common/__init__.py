@@ -6,11 +6,10 @@ import os.path
 from textwrap import wrap
 import pendulum
 
-from main import db, mail, external_url
-from flask import session, render_template, abort, current_app as app, Markup
+from main import db, external_url
+from flask import session, abort, current_app as app, Markup
 from flask.json import jsonify
 from flask_login import login_user, current_user
-from flask_mail import Message
 from werkzeug.wrappers import BaseResponse
 from werkzeug.exceptions import HTTPException
 from jinja2.utils import urlize
@@ -146,12 +145,6 @@ def load_utility_functions(app_obj):
         return Markup(text)
 
 
-def send_template_email(subject, to, sender, template, **kwargs):
-    msg = Message(subject, recipients=[to], sender=sender)
-    msg.body = render_template(template, **kwargs)
-    mail.send(msg)
-
-
 def create_current_user(email: str, name: str):
     user = User(email, name)
 
@@ -227,12 +220,7 @@ def json_response(f, *args, **kwargs):
         return jsonify(data), e.code
 
     except Exception as e:
-        app.logger.error("Exception during json request: %r", e)
-        # Werkzeug sends the response and then logs, which is fiddly
-        from werkzeug.debug.tbtools import get_current_traceback
-
-        traceback = get_current_traceback(ignore_system_exceptions=True)
-        app.logger.info("Traceback %s", traceback.plaintext)
+        app.logger.exception("Exception during json request: %r", e)
 
         data = {"error": e.__class__.__name__, "description": str(e)}
         return jsonify(data), 500

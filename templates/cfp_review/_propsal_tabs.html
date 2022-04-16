@@ -9,6 +9,11 @@
             Messages ({{ proposal.get_unread_count(current_user) }}/{{ proposal.messages | length }})
         </a>
     </li>
+    <li role="presentation" {% if active == 'notes' %} class="active" {% endif %}>
+        <a href="{{ url_for('.proposal_notes', proposal_id=proposal.id, **full_qs) }}">
+            Notes
+        </a>
+    </li>
     <li role="presentation" {% if active == 'votes' %} class="active" {% endif %}>
         <a href="{{ url_for('.proposal_votes', proposal_id=proposal.id, **full_qs) }}">
             Votes/Reviewer Notes ({{ proposal.get_unread_vote_note_count() }}/{{ proposal.votes | length }})

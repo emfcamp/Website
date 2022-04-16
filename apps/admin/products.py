@@ -9,7 +9,6 @@ from flask import (
     current_app as app,
 )
 from flask_login import current_user
-from flask_mail import Message
 
 from sqlalchemy.sql.functions import func
 from sqlalchemy import not_
@@ -29,7 +28,11 @@ from models.product import (
 )
 from models.purchase import Purchase, PurchaseTransfer
 
-from ..common.email import format_trusted_html_email, format_trusted_plaintext_email
+from ..common.email import (
+    format_trusted_html_email,
+    format_trusted_plaintext_email,
+    from_email,
+)
 from . import admin
 from .forms import (
     EditProductForm,
@@ -637,9 +640,9 @@ def product_view_bulk_add_vouchers_by_email(view_id):
             url_for(".product_view_bulk_add_vouchers_by_email", view_id=view_id)
         )
 
-    added = existing = 0
+    added = existing = sent_total = 0
 
-    with mail.connect() as conn:
+    with mail.get_connection() as conn:
         for email in emails:
             if Voucher.query.filter_by(email=email).first():
                 existing += 1
@@ -658,12 +661,10 @@ def product_view_bulk_add_vouchers_by_email(view_id):
                 "tickets.tickets_voucher", voucher_code=voucher.code
             )
 
-            msg = Message(form.subject.data, sender=app.config["TICKETS_EMAIL"])
-            msg.add_recipient(email)
-            msg.body = format_trusted_plaintext_email(
+            plaintext = format_trusted_plaintext_email(
                 form.text.data, voucher_url=voucher_url, expiry=form.expires.data
             )
-            msg.html = format_trusted_html_email(
+            html = format_trusted_html_email(
                 form.text.data,
                 form.subject.data,
                 voucher_url=voucher_url,
@@ -672,11 +673,22 @@ def product_view_bulk_add_vouchers_by_email(view_id):
             )
 
             app.logger.info("Emailing %s volunteer voucher: %s", email, voucher.code)
-            conn.send(msg)
+            sent_count = mail.send_mail(
+                subject=form.subject.data,
+                message=plaintext,
+                from_email=from_email("TICKETS_EMAIL"),
+                recipient_list=[email],
+                fail_silently=True,
+                connection=conn,
+                html_message=html,
+            )
             db.session.commit()
+            sent_total += sent_count
             added += 1
 
-    flash(f"{added} vouchers added, {existing} duplicates skipped.")
+    flash(
+        f"{added} vouchers added, {sent_total} emails sent, {existing} duplicates skipped."
+    )
 
     return redirect(
         url_for(".product_view_bulk_add_vouchers_by_email", view_id=view_id)

@@ -312,6 +312,7 @@ class Proposal(BaseModel):
     requirements = db.Column(db.String)
     length = db.Column(db.String)  # only used for talks and workshops
     notice_required = db.Column(db.String)
+    private_notes = db.Column(db.String)
 
     # Flags
     needs_help = db.Column(db.Boolean, nullable=False, default=False)

@@ -10,14 +10,14 @@ from flask import (
     render_template_string,
 )
 from flask_login import current_user
-from flask_mail import Message
+from flask_mailman import EmailMessage
 from wtforms.validators import DataRequired, ValidationError
 from wtforms import BooleanField, StringField, SubmitField, TextAreaField, SelectField
 import collections
 
 from sqlalchemy.exc import IntegrityError
 
-from main import db, mail
+from main import db, external_url
 from models.user import User, UserDiversity
 from models.cfp import (
     TalkProposal,
@@ -31,7 +31,9 @@ from models.cfp import (
     PROPOSAL_TIMESLOTS,
 )
 from ..common import feature_flag, feature_enabled, create_current_user
+from ..common.email import from_email
 from ..common.forms import Form, TelField, EmailField
+from ..common.irc import irc_send
 
 from . import cfp
 
@@ -234,17 +236,21 @@ def form(cfp_type="talk"):
         db.session.commit()
 
         # Send confirmation message
-        msg = Message(
+        msg = EmailMessage(
             "Electromagnetic Field CFP Submission",
-            sender=app.config["CONTENT_EMAIL"],
-            recipients=[current_user.email],
+            from_email=from_email("CONTENT_EMAIL"),
+            to=[current_user.email],
         )
 
         msg.body = render_template(
             "emails/cfp-submission.txt", proposal=cfp, new_user=new_user
         )
-        mail.send(msg)
+        msg.send()
 
+        if channel := app.config.get("CONTENT_IRC_CHANNEL"):
+            irc_send(
+                f"{channel} New CfP submission: {external_url('cfp_review.update_proposal', proposal_id=cfp.id)}"
+            )
         return redirect(url_for(".complete"))
 
     return render_template(
@@ -686,6 +692,10 @@ def proposal_messages(proposal_id):
 
             db.session.add(msg)
             db.session.commit()
+            if channel := app.config.get("CONTENT_IRC_CHANNEL"):
+                irc_send(
+                    f"{channel} New CfP message: {external_url('cfp_review.message_proposer', proposal_id=proposal_id)}"
+                )
 
         count = proposal.mark_messages_read(current_user)
         db.session.commit()

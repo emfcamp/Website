@@ -3,13 +3,14 @@ import logging
 
 from flask import render_template, redirect, flash, url_for, current_app as app
 from flask_login import login_required, current_user
-from flask_mail import Message
+from flask_mailman import EmailMessage
 from wtforms import SubmitField, HiddenField
 from wtforms.validators import DataRequired, AnyOf
 
-from main import db, mail
+from main import db
 from models.payment import BankPayment, BankTransaction
 from ..common import get_user_currency, feature_enabled
+from ..common.email import from_email
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
 from . import get_user_payment_or_abort, lock_user_payment_or_abort
@@ -45,17 +46,17 @@ def transfer_start(payment: BankPayment):
 
     db.session.commit()
 
-    msg = Message(
+    msg = EmailMessage(
         "Your EMF ticket purchase",
-        sender=app.config["TICKETS_EMAIL"],
-        recipients=[current_user.email],
+        from_email=from_email("TICKETS_EMAIL"),
+        to=[current_user.email],
     )
     msg.body = render_template(
         "emails/tickets-purchased-email-banktransfer.txt",
         user=current_user,
         payment=payment,
     )
-    mail.send(msg)
+    msg.send()
 
     return redirect(url_for("payments.transfer_waiting", payment_id=payment.id))
 
@@ -235,10 +236,10 @@ def reconcile_txns(txns: list[BankTransaction], doit: bool = False):
 
 
 def send_confirmation(payment: BankPayment):
-    msg = Message(
+    msg = EmailMessage(
         "Electromagnetic Field ticket purchase update",
-        sender=app.config["TICKETS_EMAIL"],
-        recipients=[payment.user.email],
+        from_email=from_email("TICKETS_EMAIL"),
+        to=[payment.user.email],
     )
 
     already_emailed = set_tickets_emailed(payment.user)
@@ -252,5 +253,5 @@ def send_confirmation(payment: BankPayment):
     if feature_enabled("ISSUE_TICKETS"):
         attach_tickets(msg, payment.user)
 
-    mail.send(msg)
+    msg.send()
     db.session.commit()

@@ -1,9 +1,8 @@
 from flask import Blueprint, render_template, current_app as app
-from flask_mail import Message
-
-from main import mail
+from flask_mailman import EmailMessage
 
 from .common import get_user_payment_or_abort, lock_user_payment_or_abort  # noqa: F401
+from ..common.email import from_email
 
 payments = Blueprint("payments", __name__)
 
@@ -13,13 +12,13 @@ def ticket_admin_email(title, template, **kwargs):
         app.logger.warning("No tickets notice email configured, not sending")
         return
 
-    msg = Message(
+    msg = EmailMessage(
         title,
-        sender=app.config.get("TICKETS_EMAIL"),
-        recipients=[app.config.get("TICKETS_NOTICE_EMAIL")[1]],
+        from_email=from_email("TICKETS_EMAIL"),
+        to=[app.config["TICKETS_NOTICE_EMAIL"][1]],
     )
     msg.body = render_template(template, **kwargs)
-    mail.send(msg)
+    msg.send()
 
 
 from . import main  # noqa: F401

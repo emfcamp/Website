@@ -2,6 +2,7 @@ from ..flask_admin_base import VolunteerModelView
 
 from . import volunteer_admin
 from flask import redirect, session, url_for
+from flask import current_app as app
 from flask_admin.actions import action
 from main import db
 from models.user import User
@@ -23,7 +24,7 @@ class VolunteerUserModelView(VolunteerModelView):
         "allow_comms_during_event",
         "banned",
     )
-    column_filters = ["trained_roles", "allow_comms_during_event"]
+    column_filters = ["interested_roles", "allow_comms_during_event"]
     column_list = (
         "nickname",
         "volunteer_email",
@@ -65,7 +66,8 @@ class VolunteerUserModelView(VolunteerModelView):
             user = User.get_by_email(email)
 
         # If the user doesn't exist go and create one
-        if user is False:
+        if user is None:
+            app.logger.info("No user record found for '%s', creating one", email)
             user = User(email, name)
 
         # If the volunteer exists already, error
@@ -74,6 +76,7 @@ class VolunteerUserModelView(VolunteerModelView):
 
         # Set the user for the new volunteer record
         model.user = user
+        user.grant_permission("volunteer:user")
         pass
 
 

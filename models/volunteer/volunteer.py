@@ -38,7 +38,7 @@ class Volunteer(BaseModel, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     nickname = db.Column(db.String)
     banned = db.Column(db.Boolean, nullable=False, default=False)
-    volunteer_phone = db.Column(db.String, nullable=False)
+    volunteer_phone = db.Column(db.String)
     volunteer_email = db.Column(db.String)
     over_18 = db.Column(db.Boolean, nullable=False, default=False)
     allow_comms_during_event = db.Column(db.Boolean, nullable=False, default=False)

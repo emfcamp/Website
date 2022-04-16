@@ -96,3 +96,20 @@ Flask-Caching has been updated, change your config:
 CACHE_TYPE = "flask_caching.backends.SimpleCache"
 ```
 
+2022-03-17
+==========
+
+Flask-Mail has been replaced with Flask-Mailman, add the following to your config:
+
+```
+MAIL_BACKEND = "console"
+```
+
+and delete references to:
+
+```
+MAIL_SUPPRESS_SEND
+```
+
+For an example of production-like config, see `config/kelvin.cfg`.
+

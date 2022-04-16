@@ -2,15 +2,16 @@ import time
 
 from flask import render_template, redirect, flash, url_for, current_app as app
 from flask_login import current_user
-from flask_mail import Message
+from flask_mailman import EmailMessage
 from sqlalchemy.orm import joinedload
 from wtforms import SubmitField, BooleanField, StringField
 from wtforms.validators import DataRequired, ValidationError
 
 from . import admin
-from main import db, mail
+from main import db
 from models.user import User, generate_signup_code
 from models.permission import Permission
+from ..common.email import from_email
 from ..common.forms import Form, EmailField
 
 
@@ -43,15 +44,15 @@ def users():
         )
 
         code = user.login_code(app.config["SECRET_KEY"])
-        msg = Message(
+        msg = EmailMessage(
             "Welcome to the EMF website",
-            sender=app.config["CONTACT_EMAIL"],
-            recipients=[email],
+            from_email=from_email("CONTACT_EMAIL"),
+            to=[email],
         )
         msg.body = render_template(
             "emails/manually-added-user.txt", user=user, code=code
         )
-        mail.send(msg)
+        msg.send()
 
         flash("Created account for: %s" % name)
         return redirect(url_for(".users"))

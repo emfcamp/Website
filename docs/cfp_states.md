@@ -12,3 +12,4 @@
 * reviewed - People have begun reviewing this talk and there are ratings.
 * accepted - We accepted the talk.
 * finished - All information we need about the talk has been obtained, it's totally happening.
+* withdrawn - The user has withdrawn this proposal

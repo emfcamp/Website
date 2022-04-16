@@ -15,17 +15,18 @@ from flask import (
     render_template_string,
 )
 from flask_login import login_user, login_required, logout_user, current_user
-from flask_mail import Message
+from flask_mailman import EmailMessage
 from sqlalchemy import or_
 from wtforms import StringField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, ValidationError
 
-from main import db, mail
+from main import db
 from models.user import User, verify_signup_code
 from models.cfp import Proposal, CFPMessage
 from models.basket import Basket
 
 from ..common import set_user_currency, feature_flag
+from ..common.email import from_email
 from ..common.forms import Form, EmailField
 
 
@@ -120,10 +121,10 @@ def login():
     if form.validate_on_submit():
         code = form._user.login_code(app.config["SECRET_KEY"])
 
-        msg = Message(
+        msg = EmailMessage(
             "Electromagnetic Field: Login details",
-            sender=app.config["TICKETS_EMAIL"],
-            recipients=[form._user.email],
+            from_email=from_email("TICKETS_EMAIL"),
+            to=[form._user.email],
         )
         msg.body = render_template(
             "emails/login-code.txt",
@@ -131,7 +132,7 @@ def login():
             code=code,
             next_url=get_next_url(),
         )
-        mail.send(msg)
+        msg.send()
 
         flash("We've sent you an email with your login link")
 
@@ -209,13 +210,13 @@ def signup():
         db.session.commit()
         app.logger.info("Signed up new user with email %s and id %s", email, user.id)
 
-        msg = Message(
+        msg = EmailMessage(
             "Welcome to the EMF website",
-            sender=app.config["CONTACT_EMAIL"],
-            recipients=[email],
+            from_email=from_email("CONTACT_EMAIL"),
+            to=[email],
         )
         msg.body = render_template("emails/signup-user.txt", user=user)
-        mail.send(msg)
+        msg.send()
 
         login_user(user)
 

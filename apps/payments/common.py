@@ -10,7 +10,7 @@ def get_user_payment_or_abort(
     try:
         payment = Payment.query.get(payment_id)
     except Exception as e:
-        app.logger.warning("Exception %r getting payment %s", e, payment_id)
+        app.logger.exception("Exception %r getting payment %s", e, payment_id)
         abort(404)
 
     if not payment:

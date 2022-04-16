@@ -4,14 +4,15 @@ import re
 from Levenshtein import ratio, jaro
 from flask import render_template, redirect, flash, url_for, current_app as app
 from flask_login import current_user
-from flask_mail import Message
+from flask_mailman import EmailMessage
 
 from wtforms import SubmitField
 
-from main import db, mail
+from main import db
 from models.payment import BankPayment, BankTransaction
 
 from ..common import feature_enabled
+from ..common.email import from_email
 from ..common.forms import Form
 from ..common.receipt import attach_tickets, set_tickets_emailed
 
@@ -138,10 +139,10 @@ def transaction_reconcile(txn_id, payment_id):
             payment.paid()
             db.session.commit()
 
-            msg = Message(
+            msg = EmailMessage(
                 "Electromagnetic Field ticket purchase update",
-                sender=app.config["TICKETS_EMAIL"],
-                recipients=[payment.user.email],
+                from_email=from_email("TICKETS_EMAIL"),
+                to=[payment.user.email],
             )
 
             already_emailed = set_tickets_emailed(payment.user)
@@ -155,7 +156,7 @@ def transaction_reconcile(txn_id, payment_id):
             if feature_enabled("ISSUE_TICKETS"):
                 attach_tickets(msg, payment.user)
 
-            mail.send(msg)
+            msg.send()
 
             flash("Payment ID %s marked as paid" % payment.id)
             return redirect(url_for("admin.transactions"))

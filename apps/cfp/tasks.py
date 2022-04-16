@@ -8,6 +8,7 @@ from main import db
 from models.cfp import Proposal, TalkProposal, WorkshopProposal, InstallationProposal
 from models.user import User
 from apps.cfp_review.base import send_email_for_proposal
+from ..common.email import from_email
 
 from . import cfp
 
@@ -83,7 +84,7 @@ def email_check():
         send_email_for_proposal(
             proposal,
             reason="check-your-slot",
-            from_address=app.config["SPEAKERS_EMAIL"],
+            from_address=from_email("SPEAKERS_EMAIL"),
         )
 
 
@@ -101,7 +102,7 @@ def email_finalise():
         send_email_for_proposal(
             proposal,
             reason="please-finalise",
-            from_address=app.config["SPEAKERS_EMAIL"],
+            from_address=from_email("SPEAKERS_EMAIL"),
         )
 
 
@@ -116,5 +117,5 @@ def email_reserve():
 
     for proposal in proposals:
         send_email_for_proposal(
-            proposal, reason="reserve-list", from_address=app.config["SPEAKERS_EMAIL"]
+            proposal, reason="reserve-list", from_address=from_email("SPEAKERS_EMAIL")
         )

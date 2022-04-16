@@ -12,14 +12,14 @@ from flask import (
     current_app as app,
 )
 from flask_login import current_user
-from flask_mail import Message
+from flask_mailman import EmailMessage
 
 from wtforms.validators import InputRequired
 from wtforms import SubmitField, BooleanField, FieldList, FormField
 
 from sqlalchemy.sql.functions import func
 
-from main import db, mail, stripe
+from main import db, stripe
 from models.payment import (
     Payment,
     RefundRequest,
@@ -29,6 +29,7 @@ from models.payment import (
     StateException,
 )
 from models.purchase import Purchase
+from ..common.email import from_email
 from ..common.forms import Form, HiddenIntegerField
 from ..payments.stripe import (
     StripeUpdateUnexpected,
@@ -140,17 +141,17 @@ def send_reminder(payment_id):
                 )
                 return redirect(url_for("admin.expiring"))
 
-            msg = Message(
+            msg = EmailMessage(
                 "Electromagnetic Field: Ticket payment not received",
-                sender=app.config["TICKETS_EMAIL"],
-                recipients=[payment.user.email],
+                from_email=from_email("TICKETS_EMAIL"),
+                to=[payment.user.email],
             )
             msg.body = render_template(
                 "emails/tickets-reminder.txt",
                 payment=payment,
                 account=payment.recommended_destination,
             )
-            mail.send(msg)
+            msg.send()
 
             payment.reminder_sent = True
             db.session.commit()
@@ -497,7 +498,7 @@ def refund(payment_id):
                     )
 
                 except Exception as e:
-                    app.logger.warn("Exception %r refunding payment", e)
+                    app.logger.exception("Exception %r refunding payment", e)
                     flash(
                         "An error occurred refunding with Stripe. Please check the state of the payment."
                     )
