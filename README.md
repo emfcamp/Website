@@ -1,4 +1,4 @@
-This is the www.emfcamp.org web site, built with Flask & Postgres by the 
+This is the www.emfcamp.org web site, built with Flask & Postgres by the
 EMF web team.
 
 [![Deploy Status](https://github.com/emfcamp/Website/workflows/Deploy/badge.svg)](https://github.com/emfcamp/Website/actions?query=workflow%3ADeploy)
@@ -18,21 +18,32 @@ The only supported way to develop is to use [Docker](https://docker.com/) with D
 to monitor the containers.
 
 To start all containers (and rebuild any which may have changed):
+
 ```
 docker compose build --parallel
 docker compose up
 ```
+
 You should then be able to view your development server on [http://localhost:2342](http://localhost:2342).
 
 To create some fake data in your DB, run:
+
 ```
 ./flask dev data
 ```
+
 To stop all containers, use `docker compose stop`
 To delete all data and start over fresh you can use `docker compose down`.
 
 Management commands can be listed and run using the `./flask` command, which
 forwards them to the flask command line within the container.
+
+### Errors starting the dev server
+
+If you've just updated and you're seeing errors when starting the dev server, first make sure you
+try:
+
+        docker compose up --build
 
 ### Tests
 
@@ -47,6 +58,7 @@ are run by `./run_tests`.
 However, it's easy to forget these checks, so you can also run them as a git
 pre-commit hook using [pre-commit](https://pre-commit.com/). To set this up on
 the host where you'll be using git:
+
 ```
 pip3 install pre-commit
 pre-commit install
@@ -71,7 +83,7 @@ For more migration commands, see the [flask-migrate docs](https://flask-migrate.
 
 For more, see:
 
-* [Documentation](docs/documentation.md)
-* [Testing](docs/testing.md)
-* [Deployment](docs/deployment.md)
-* [Contributing](.github/CONTRIBUTING.md)
+- [Documentation](docs/documentation.md)
+- [Testing](docs/testing.md)
+- [Deployment](docs/deployment.md)
+- [Contributing](.github/CONTRIBUTING.md)
