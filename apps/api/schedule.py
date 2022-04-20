@@ -80,12 +80,14 @@ class FavouriteExternal(Resource):
 def renderScheduleMessage(message):
     return {"id": message.id, "body": message.message}
 
+
 class ScheduleMessage(Resource):
     def get(self):
         records = AdminMessage.get_visible_messages()
         messages = list(map(renderScheduleMessage, records))
 
         return messages
+
 
 api.add_resource(FavouriteProposal, "/proposal/<int:proposal_id>/favourite")
 api.add_resource(FavouriteExternal, "/external/<int:event_id>/favourite")
