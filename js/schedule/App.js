@@ -95,11 +95,11 @@ function App() {
   }
 
   return (
-    <>
+    <React.StrictMode>
       <Messages />
       <Filters {...filterProps} />
       <Calendar schedule={ schedule } toggleFavourite={ toggleFavourite } authenticated={ apiToken !== null } />
-    </>
+    </React.StrictMode>
   );
 }
 
