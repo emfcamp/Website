@@ -13,17 +13,22 @@ class ScheduleData {
     this.eventTypes = [];
     this.eventTypesSeen = new Set();
 
+    this.ageRanges = [];
+    this.ageRangesSeen = new Set();
+
     this.rawSchedule.forEach(row => {
       let e = this.parseEvent(row);
 
       if (e.endTime <= options.currentTime) { return null; }
+      if (e.age_range === undefined || e.age_range == "") { e.age_range = "Unspecified" }
 
       this.addVenue(e.venue, e.officialEvent);
-
       this.addEventType(e.type, e.humanReadableType);
+      this.addAgeRange(e.age_range);
 
       if (options.selectedVenues && options.selectedVenues.indexOf(e.venue) === -1) { return null; }
       if (options.selectedEventTypes && options.selectedEventTypes.indexOf(e.type) === -1) { return null; }
+      if (options.selectedAgeRanges && options.selectedAgeRanges.indexOf(e.age_range) === -1) { return null; }
       if (options.onlyFavourites && !e.is_fave) { return null; }
 
       let startHour = e.startTime.startOf('hour');
@@ -67,6 +72,13 @@ class ScheduleData {
 
     this.eventTypesSeen.add(type);
     this.eventTypes.push({ id: type, name });
+  }
+
+  addAgeRange(value) {
+    if (this.ageRangesSeen.has(value)) { return null; }
+
+    this.ageRangesSeen.add(value);
+    this.ageRanges.push(value);
   }
 
   contentForHour(hour) {

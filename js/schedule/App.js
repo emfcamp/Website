@@ -13,7 +13,8 @@ function now() {
 function App() {
   const [currentTime, setCurrentTime] = useState(now());
   const [selectedVenues, setSelectedVenues] = useState([]);
-  const [selectedEventTypes, setSelectedEventTypes] = useState([])
+  const [selectedEventTypes, setSelectedEventTypes] = useState([]);
+  const [selectedAgeRanges, setSelectedAgeRanges] = useState([]);
   const [onlyFavourites, setOnlyFavourites] = useState(false);
   const [debug, setDebug] = useState(false);
 
@@ -44,6 +45,7 @@ function App() {
 
         setSelectedVenues(newSchedule.venues.map(v => v.name));
         setSelectedEventTypes([...newSchedule.eventTypes.map(t => t.id)]);
+        setSelectedAgeRanges([...newSchedule.ageRanges]);
       });
   }, []);
 
@@ -51,9 +53,9 @@ function App() {
   useEffect(() => {
     if (rawSchedule == null) { return };
 
-    let newSchedule = new ScheduleData(rawSchedule, { currentTime, onlyFavourites, selectedVenues, selectedEventTypes });
+    let newSchedule = new ScheduleData(rawSchedule, { currentTime, onlyFavourites, selectedVenues, selectedEventTypes, selectedAgeRanges });
     setSchedule(newSchedule);
-  }, [currentTime, onlyFavourites, selectedVenues, selectedEventTypes, rawSchedule]);
+  }, [currentTime, onlyFavourites, selectedVenues, selectedEventTypes, selectedAgeRanges, rawSchedule]);
 
   // Update time once a minute
   useEffect(() => {
@@ -89,7 +91,7 @@ function App() {
   }
 
   let filterProps = {
-    schedule, onlyFavourites, setOnlyFavourites, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, debug, currentTime, setCurrentTime
+    schedule, onlyFavourites, setOnlyFavourites, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, selectedAgeRanges, setSelectedAgeRanges, debug, currentTime, setCurrentTime
   }
 
   return (
