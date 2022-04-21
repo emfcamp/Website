@@ -45,6 +45,12 @@ function FavouriteButton({ event, toggleFavourite, authenticated }) {
   );
 }
 
+function AdditionalInformation({ label, value }) {
+  if (value === null || value == "") { return null; }
+
+  return <p className="additional-information"><strong>{ label }:</strong> { value }</p>
+}
+
 function Event({ event, toggleFavourite, authenticated }) {
   let [expanded, setExpanded] = useState(false);
 
@@ -59,6 +65,10 @@ function Event({ event, toggleFavourite, authenticated }) {
 
     return (
       <div className="event-details">
+        <AdditionalInformation label="Age range" value={ event.age_range } />
+        <AdditionalInformation label="Cost" value={ event.cost } />
+        <AdditionalInformation label="Required equipment" value={ event.equipment } />
+
         <p>{ nl2br(event.description) }</p>
         <FavouriteButton event={ event } toggleFavourite={ toggleFavourite } authenticated={ authenticated } />
       </div>
