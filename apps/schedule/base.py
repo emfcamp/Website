@@ -6,8 +6,6 @@ from collections import defaultdict
 from flask import render_template, redirect, url_for, flash, request, abort
 from flask_login import current_user
 from flask import current_app as app
-from jinja2.utils import urlize
-from slugify import slugify_unicode as slugify
 
 from main import db
 from models import event_year
@@ -20,7 +18,7 @@ from ..common import feature_flag
 
 from . import schedule, event_tz
 from .historic import talks_historic, item_historic, historic_talk_data
-from .data import _get_scheduled_proposals, _get_upcoming, _get_priority_sorted_venues
+from .data import _get_upcoming
 
 
 @schedule.route("/schedule/")
