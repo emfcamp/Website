@@ -46,7 +46,7 @@ function FavouriteButton({ event, toggleFavourite, authenticated }) {
 }
 
 function AdditionalInformation({ label, value }) {
-  if (value === null || value == "") { return null; }
+  if (value === null || value === undefined || value == "") { return null; }
 
   return <p className="additional-information"><strong>{ label }:</strong> { value }</p>
 }
