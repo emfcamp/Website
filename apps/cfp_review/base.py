@@ -49,6 +49,7 @@ from .forms import (
     AcceptanceForm,
     ConvertProposalForm,
     AddNoteForm,
+    ChangeProposalOwner,
 )
 from . import (
     cfp_review,
@@ -707,6 +708,45 @@ def proposal_notes(proposal_id):
 
     return render_template(
         "cfp_review/proposal_notes.html",
+        form=form,
+        proposal=proposal,
+    )
+
+
+@cfp_review.route("/proposals/<int:proposal_id>/change_owner", methods=["GET", "POST"])
+@admin_required
+def proposal_change_owner(proposal_id):
+    form = ChangeProposalOwner()
+    proposal = Proposal.query.get_or_404(proposal_id)
+
+    if form.validate_on_submit and form.submit.data:
+        user = User.get_by_email(form.user_email.data)
+
+        if user and form.user_name.data:
+            flash("User, '%s', already exists" % form.user_email.data)
+            return redirect(url_for(".proposal_change_owner", proposal_id=proposal_id))
+
+        elif not user and not form.user_name.data:
+            flash("New user, %s, needs a name" % form.user_email.data)
+            return redirect(url_for(".proposal_change_owner", proposal_id=proposal_id))
+
+        elif not user:
+            user = User(form.user_email.data, form.user_name.data)
+            db.session.add(user)
+            app.logger.info("%s created a new user: %s", current_user.name, user.email)
+            flash("Created new user %s" % user.email)
+
+        proposal.user = user
+        db.session.commit()
+        app.logger.info(
+            "Transferred ownership of proposal %i to %s", proposal_id, user.name
+        )
+        flash("Transferred ownership of proposal %i to %s" % (proposal_id, user.name))
+
+        return redirect(url_for(".update_proposal", proposal_id=proposal_id))
+
+    return render_template(
+        "cfp_review/change_proposal_owner.html",
         form=form,
         proposal=proposal,
     )

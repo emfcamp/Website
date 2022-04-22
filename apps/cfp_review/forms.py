@@ -14,7 +14,7 @@ from wtforms import (
 from wtforms.validators import DataRequired, Optional, NumberRange, ValidationError
 
 from models.cfp import Venue, ORDERED_STATES
-from ..common.forms import Form, HiddenIntegerField
+from ..common.forms import Form, HiddenIntegerField, EmailField
 
 from dateutil.parser import parse as parse_date
 
@@ -314,3 +314,11 @@ class SendMessageForm(Form):
 class AddNoteForm(Form):
     notes = TextAreaField("Notes")
     send = SubmitField("Update notes")
+
+
+class ChangeProposalOwner(Form):
+    user_email = EmailField(
+        "Which email address to associate this proposal with", [DataRequired()]
+    )
+    user_name = StringField("User name (if creating new user)")
+    submit = SubmitField("Change proposal owner")
