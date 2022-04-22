@@ -99,6 +99,10 @@
                     class="btn btn-warning">
                 Convert proposal
             </a>
+            <a href="{{ url_for('.proposal_change_owner', proposal_id=proposal.id) }}"
+                    class="btn btn-warning">
+                Change proposal owner
+            </a>
 
             {% if next_id %}
                 <a href="{{ url_for('.update_proposal', proposal_id=next_id, **full_qs) }}"
