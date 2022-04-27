@@ -274,7 +274,7 @@ class ReserveTicketsNewUserForm(ReserveTicketsForm):
 
 
 class IssueFreeTicketsNewUserForm(IssueTicketsForm):
-    name = StringField("Name")
+    name = StringField("Name", [InputRequired()])
 
 
 class CancelTicketForm(Form):
