@@ -5,7 +5,7 @@
     although some legacy content remains here.
 """
 
-from flask import render_template
+from flask import redirect, render_template, url_for
 from . import base
 
 
@@ -26,7 +26,12 @@ def arrival():
 
 @base.route("/about/covid")
 def covid():
-    return render_template("about/covid.html")
+    return redirect(url_for(".health"))
+
+
+@base.route("/about/health")
+def health():
+    return render_template("about/health.html")
 
 
 @base.route("/about/privacy")
