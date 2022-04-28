@@ -1,66 +1,79 @@
-{% set main_class='sponsors' %}
-{% extends "base.html" %}
-{% block title %}Sponsors{% endblock %}
-
-{% block body %}
+{% set main_class='sponsors' %} {% extends "base.html" %} {% block title
+%}Sponsors{% endblock %} {% block body %}
 
 <h2>Sponsors</h2>
 
-{#
 <div class="well">
-    We're still accepting sponsors for this year's event. <a href="{{url_for('.sponsor')}}">Learn more about sponsoring Electromagnetic Field</a>.
+  We're still accepting sponsors for this year's event.
+  <a href="{{url_for('.sponsor')}}"
+    >Learn more about sponsoring Electromagnetic Field</a
+  >.
 </div>
-#}
 
 {% macro sponsor(url, image) %}
 <div class="sponsor">
-<a class="clearfix" href="{{ url }}">
-  <img class="img-responsive col-xs-12 img-sponsor" src="{{ url_for('static', filename='images/sponsors/' + image) }}"/>
-</a>
+  <a class="clearfix" href="{{ url }}">
+    <img
+      class="img-responsive col-xs-12 img-sponsor"
+      src="{{ url_for('static', filename='images/sponsors/' + image) }}"
+    />
+  </a>
 </div>
 {% endmacro %}
 
 <div class="col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3">
-
-<h3>Youth Workshops</h3>
-{{ sponsor("https://luc.id/", "lucid.png") }}
-<h3>Gold</h3>
-{{ sponsor("https://uk.mathworks.com/", "mathworks.svg") }}
-{{ sponsor("https://www.nexmo.com/", "nexmo.png") }}
-{{ sponsor("https://www.privateinternetaccess.com/", "pia.png") }}
-{{ sponsor("https://www.lyst.co.uk/", "lyst.svg") }}
-<h3>Badge</h3>
-{{ sponsor("http://www.ti.com/", "ti.png") }}
-{{ sponsor("http://www.hcduk.com/", "hcd.jpg") }}
-{{ sponsor("https://limemicro.com/", "lime.png") }}
-{{ sponsor("https://hologram.io/", "hologram.svg") }}
-<h3>Silver</h3>
-{{ sponsor("https://www.codethink.co.uk/", "codethink.png") }}
-{{ sponsor("https://github.com", "github.png") }}
-{{ sponsor("https://mlab.com", "mlab.png") }}
-<h3>Bronze</h3>
-{{ sponsor("https://aaisp.net.uk/", "aaisp.png") }}
-{{ sponsor("https://amsat-uk.org/", "amsat-uk.jpg") }}
-{{ sponsor("http://www.medicalconnections.co.uk/", "medicalconnections.png") }}
-{{ sponsor("http://www.msraynsford.co.uk/", "msraynsford.svg") }}
-{{ sponsor("https://www.onega.net/", "onega.jpg") }}
-{{ sponsor("https://smokeandmirrors.store/", "smokeandmirrors.svg") }}
-{#
-<h3>Supported by</h3>
-{{ sponsor("https://www.artscouncil.org.uk/", "artscouncil.jpg") }}
-#}
+  {#
+    <h3>Youth Workshops</h3>
+  #}
+  {#
+    <h3>Arcade</h3>
+    {{ sponsor("https://twilio.com", "twilio.png") }}
+  #}
+  <h3>Gold</h3>
+  {{ sponsor("https://opensource.google/", "google.png") }}
+  {{ sponsor("http://www.sargasso.co.uk/", "sargasso.svg") }}
+  {{ sponsor("https://sosintel.co.uk/", "sos.png") }}
+  {#
+    {{ sponsor("https://luc.id/", "lucid.png") }}
+    {{ sponsor("https://www.mathworks.com/", "mathworks.png") }}
+  #}
+  {#
+    <h3>Badge</h3>
+  #}
+  <h3>Silver</h3>
+  {{ sponsor("https://www.iluli.eu/", "iluli.png") }}
+  {#
+    {{ sponsor("https://www.onega.net/", "onega.png") }}
+  #}
+  <h3>Bronze</h3>
+  {{ sponsor("https://uberspace.de/", "uberspace.svg") }}
+  {{ sponsor("https://www.codethink.co.uk/", "codethink.svg") }}
+  {#
+    {{ sponsor("http://ingeniunda.eu/", "ingeniunda.png") }}
+  #}
+  {#
+    <h3>Supported by</h3>
+    {{ sponsor("https://www.artscouncil.org.uk/", "artscouncil.jpg")}}
+  #}
 </div>
+{#
 <div class="clearfix col-xs-12">
-    <h3>Special Thanks</h3>
-    <p>We'd like to extend special thanks to the following people and organisations
-    who have been instrumental in making EMF happen:</p>
-    <div class="sponsor" style="width: 150px">
-    <a href="https://samsunginter.net"><img class="img-responsive img-sponsor" src="{{ url_for('static', filename='images/sponsors/samsung.svg') }}"></a>
+  <h3>Special Thanks</h3>
+  <p>
+    We'd like to extend special thanks to the following people and organisations
+    who have been instrumental in making EMF happen:
+  </p>
+  <div class="sponsor" style="width: 150px">
+    <a href="https://samsunginter.net"
+      ><img
+        class="img-responsive img-sponsor"
+        src="{{ url_for('static', filename='images/sponsors/samsung.svg') }}"
+    /></a>
     <p></p>
-    </div>
-    <p>
-    <a href="http://bitfolk.com">Bitfolk</a>,
-    the <a href="https://ccc.de">Chaos Computer Club</a>,
+  </div>
+  <p>
+    <a href="http://bitfolk.com">Bitfolk</a>, the
+    <a href="https://ccc.de">Chaos Computer Club</a>,
     <a href="https://www.comtec.com">Comtec Enterprises</a>,
     <a href="https://eventinfra.org">EventInfra</a>,
     <a href="https://www.flexoptix.net">Flexoptix</a>,
@@ -69,8 +82,9 @@
     <a href="https://www.irccloud.com">IRCCloud</a>,
     <a href="https://www.lonap.net">LONAP</a>,
     <a href="https://www.seeedstudio.com/">Seeedstudio</a>,
-    <a href="https://business.sky.com/">Sky for Business</a>,
-    and everyone who volunteered.
-    </p>
+    <a href="https://business.sky.com/">Sky for Business</a>, and everyone who
+    volunteered.
+  </p>
 </div>
+#}
 {% endblock %}

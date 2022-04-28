@@ -156,8 +156,8 @@ def feedback():
 
 @base.route("/sponsors")
 def sponsors():
-    return abort(404)
-    #  return render_template("sponsors/sponsors.html")
+    # return abort(404)
+    return render_template("sponsors/sponsors.html")
 
 
 @base.route("/sponsor")

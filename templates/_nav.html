@@ -1,80 +1,94 @@
 <header role="banner">
-    <h1>
-        <a aria-label="Electromagnetic Field" href="/">
-          <div id="logo" alt="Electromagnetic Field"></div>
-        </a>
-    </h1>
-    <div id="header-text">{{fancy_dates}}<br/>
-         Eastnor, UK</div>
+  <h1>
+    <a aria-label="Electromagnetic Field" href="/">
+      <div id="logo" alt="Electromagnetic Field"></div>
+    </a>
+  </h1>
+  <div id="header-text">
+    {{fancy_dates}}<br />
+    Eastnor, UK
+  </div>
 
-    <div id="menu-container" role="navigation" aria-label="Main">
-      <ul class="menu" role="menu">
-        {#
-            <li role="presentation">
-                <a role="menuitem" href="{{ url_for('base.feedback') }}">Feedback</a>
-            </li>
-        #}
-            <li role="presentation">
-                <a role="menuitem" href="{{ url_for('base.about') }}">About</a>
-            </li>
-            {% if SITE_STATE == 'sales' and SALES_STATE in ['available', 'unavailable'] %}
-                <li role="presentation">
-                    <a role="menuitem" href="{{ url_for('tickets.main') }}">Tickets</a>
-                </li>
-            {% endif %}
-        {#
-            {% elif config.get('DEFAULT_FLOW') == 'tees' and SALES_STATE in ['available'] %}
-                <li role="presentation">
-                    <a role="menuitem" href="{{ url_for('tickets.main', flow='tees') }}">T-shirts</a>
-                </li>
-        #}
-            {% if feature_enabled('VOLUNTEERS') %}
-                <li role="presentation">
-                    <a role="menuitem" href="{{ url_for('volunteer.main') }}">Volunteer</a>
-                </li>
-            {% else %}
-                <li role="presentation">
-                    <a role="menuitem" href="{{ url_for('base.volunteering') }}">Volunteer</a>
-                </li>
-            {% endif %}
-            {% if feature_enabled('CFP') and not feature_enabled('CFP_CLOSED') %}
-                <li role="presentation">
-                    <a role="menuitem" href="{{ url_for('cfp.main') }}">Call for Participation</a>
-                </li>
-            {% endif %}
-            {% if feature_enabled('LINE_UP') or feature_enabled('SCHEDULE') %}
-                <li role="presentation">
-                    <a role="menuitem" href="{{ url_for('schedule.main') }}">Schedule</a>
-                </li>
-            {% else %}
-                <li role="presentation">
-                    <a role="menuitem" href="{{ url_for('schedule.main') }}">Talks</a>
-                </li>
-            {% endif %}
-            {% if SITE_STATE == 'event' %}
-                <li role="presentation">
-                    <a role="menuitem" href="https://streaming.media.ccc.de/emf{{ event_year }}/">Live streams</a>
-                </li>
-                <li role="presentation">
-                    <a role="menuitem" href="https://map.emfcamp.org" target="_blank">Map</a>
-                </li>
-            {% endif %}
-                <li role="presentation">
-                    <a role="menuitem" href="{{ url_for('base.sponsor') }}">Sponsor</a>
-                </li>
-            {% if session.basket_purchase_ids %}
-                <li role="presentation">
-                    <a role="menuitem" href="{{ url_for('tickets.pay', flow=config.get('DEFAULT_FLOW', 'main')) }}">
-                        Basket ({{ session.basket_purchase_ids|length }})
-                    </a>
-                </li>
-            {% endif %}
-            {#
-                <li role="presentation">
-                    <a target="_blank" href="http://blog.emfcamp.org">Blog</a>
-                </li>
-            #}
-        </ul>
-    </div>
-    <div style="clear:both"></div>
+  <div id="menu-container" role="navigation" aria-label="Main">
+    <ul class="menu" role="menu">
+      {#
+      <li role="presentation">
+        <a role="menuitem" href="{{ url_for('base.feedback') }}">Feedback</a>
+      </li>
+      #}
+      <li role="presentation">
+        <a role="menuitem" href="{{ url_for('base.about') }}">About</a>
+      </li>
+      {% if SITE_STATE == 'sales' and SALES_STATE in ['available',
+      'unavailable'] %}
+      <li role="presentation">
+        <a role="menuitem" href="{{ url_for('tickets.main') }}">Tickets</a>
+      </li>
+      {% endif %} {# {% elif config.get('DEFAULT_FLOW') == 'tees' and
+      SALES_STATE in ['available'] %}
+      <li role="presentation">
+        <a role="menuitem" href="{{ url_for('tickets.main', flow='tees') }}"
+          >T-shirts</a
+        >
+      </li>
+      #} {% if feature_enabled('VOLUNTEERS') %}
+      <li role="presentation">
+        <a role="menuitem" href="{{ url_for('volunteer.main') }}">Volunteer</a>
+      </li>
+      {% else %}
+      <li role="presentation">
+        <a role="menuitem" href="{{ url_for('base.volunteering') }}"
+          >Volunteer</a
+        >
+      </li>
+      {% endif %} {% if feature_enabled('CFP') and not
+      feature_enabled('CFP_CLOSED') %}
+      <li role="presentation">
+        <a role="menuitem" href="{{ url_for('cfp.main') }}"
+          >Call for Participation</a
+        >
+      </li>
+      {% endif %} {% if feature_enabled('LINE_UP') or
+      feature_enabled('SCHEDULE') %}
+      <li role="presentation">
+        <a role="menuitem" href="{{ url_for('schedule.main') }}">Schedule</a>
+      </li>
+      {% else %}
+      <li role="presentation">
+        <a role="menuitem" href="{{ url_for('schedule.main') }}">Talks</a>
+      </li>
+      {% endif %} {% if SITE_STATE == 'event' %}
+      <li role="presentation">
+        <a
+          role="menuitem"
+          href="https://streaming.media.ccc.de/emf{{ event_year }}/"
+          >Live streams</a
+        >
+      </li>
+      <li role="presentation">
+        <a role="menuitem" href="https://map.emfcamp.org" target="_blank"
+          >Map</a
+        >
+      </li>
+      {% endif %}
+      <li role="presentation">
+        <a role="menuitem" href="{{ url_for('base.sponsors') }}">Sponsors</a>
+      </li>
+      {% if session.basket_purchase_ids %}
+      <li role="presentation">
+        <a
+          role="menuitem"
+          href="{{ url_for('tickets.pay', flow=config.get('DEFAULT_FLOW', 'main')) }}"
+        >
+          Basket ({{ session.basket_purchase_ids|length }})
+        </a>
+      </li>
+      {% endif %} {#
+      <li role="presentation">
+        <a target="_blank" href="http://blog.emfcamp.org">Blog</a>
+      </li>
+      #}
+    </ul>
+  </div>
+  <div style="clear: both"></div>
 </header>
