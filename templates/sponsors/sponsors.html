@@ -11,7 +11,7 @@
 </div>
 
 {% macro sponsor(url, image, dark=False) %}
-<div class="sponsor{% if dark %}sponsor-dark{% endif %}">
+<div class="sponsor{% if dark %} sponsor-dark{% endif %}">
   <a class="clearfix" href="{{ url }}">
     <img
       class="img-responsive col-xs-12 img-sponsor"
@@ -56,35 +56,22 @@
     {{ sponsor("https://www.artscouncil.org.uk/", "artscouncil.jpg")}}
   #}
 </div>
-{#
 <div class="clearfix col-xs-12">
   <h3>Special Thanks</h3>
   <p>
     We'd like to extend special thanks to the following people and organisations
     who have been instrumental in making EMF happen:
   </p>
-  <div class="sponsor" style="width: 150px">
-    <a href="https://samsunginter.net"
-      ><img
-        class="img-responsive img-sponsor"
-        src="{{ url_for('static', filename='images/sponsors/samsung.svg') }}"
-    /></a>
-    <p></p>
-  </div>
   <p>
     <a href="http://bitfolk.com">Bitfolk</a>, the
     <a href="https://ccc.de">Chaos Computer Club</a>,
-    <a href="https://www.comtec.com">Comtec Enterprises</a>,
     <a href="https://eventinfra.org">EventInfra</a>,
-    <a href="https://www.flexoptix.net">Flexoptix</a>,
+  {#  <a href="https://www.flexoptix.net">Flexoptix</a>,#}
     <a href="https://helpmonks.com">Helpmonks</a>,
-    <a href="https://hologram.io/">Hologram</a>,
     <a href="https://www.irccloud.com">IRCCloud</a>,
     <a href="https://www.lonap.net">LONAP</a>,
-    <a href="https://www.seeedstudio.com/">Seeedstudio</a>,
     <a href="https://business.sky.com/">Sky for Business</a>, and everyone who
     volunteered.
   </p>
 </div>
-#}
 {% endblock %}
