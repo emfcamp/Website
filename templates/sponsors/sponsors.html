@@ -10,8 +10,8 @@
   >.
 </div>
 
-{% macro sponsor(url, image) %}
-<div class="sponsor">
+{% macro sponsor(url, image, dark=False) %}
+<div class="sponsor{% if dark %}sponsor-dark{% endif %}">
   <a class="clearfix" href="{{ url }}">
     <img
       class="img-responsive col-xs-12 img-sponsor"
@@ -32,7 +32,7 @@
   <h3>Gold</h3>
   {{ sponsor("https://opensource.google/", "google.png") }}
   {{ sponsor("http://www.sargasso.co.uk/", "sargasso.svg") }}
-  {{ sponsor("https://sosintel.co.uk/", "sos.png") }}
+  {{ sponsor("https://sosintel.co.uk/", "sos.png", True) }}
   {#
     {{ sponsor("https://luc.id/", "lucid.png") }}
     {{ sponsor("https://www.mathworks.com/", "mathworks.png") }}
