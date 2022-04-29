@@ -10,11 +10,12 @@
   >.
 </div>
 
-{% macro sponsor(url, image, dark=False) %}
+{% macro sponsor(url, image, alt, dark=False) %}
 <div class="sponsor{% if dark %} sponsor-dark{% endif %}">
   <a class="clearfix" href="{{ url }}">
     <img
       class="img-responsive col-xs-12 img-sponsor"
+      alt="{{alt}}"
       src="{{ url_for('static', filename='images/sponsors/' + image) }}"
     />
   </a>
@@ -25,41 +26,45 @@
   {#
     <h3>Youth Workshops</h3>
   #}
+  <h3>Childcare</h3>
+  {{ sponsor("https://opensource.google/", "google.png", "Google Open Source") }}
+  {#
+  <h3>Live Transcription</h3>
+  {{ sponsor("https://luc.id/", "lucid.png", "Lucid") }}
+  #}
   {#
     <h3>Arcade</h3>
-    {{ sponsor("https://twilio.com", "twilio.png") }}
+    {{ sponsor("https://twilio.com", "twilio.png", "Twilio") }}
   #}
   <h3>Gold</h3>
-  {{ sponsor("https://opensource.google/", "google.png") }}
-  {{ sponsor("http://www.sargasso.co.uk/", "sargasso.svg") }}
-  {{ sponsor("https://sosintel.co.uk/", "sos.png", True) }}
+  {{ sponsor("http://www.sargasso.co.uk/", "sargasso.svg", "Sargasso") }}
+  {{ sponsor("https://sosintel.co.uk/", "sos.png", "SOS Intelligence", True) }}
   {#
-    {{ sponsor("https://luc.id/", "lucid.png") }}
-    {{ sponsor("https://www.mathworks.com/", "mathworks.png") }}
+    {{ sponsor("https://www.mathworks.com/", "mathworks.png", "Mathworks") }}
   #}
   {#
     <h3>Badge</h3>
   #}
   <h3>Silver</h3>
-  {{ sponsor("https://www.iluli.eu/", "iluli.png") }}
+  {{ sponsor("https://www.iluli.eu/", "iluli.png", "Iluli by Mike Lamb") }}
   {#
-    {{ sponsor("https://www.onega.net/", "onega.png") }}
+    {{ sponsor("https://www.onega.net/", "onega.png", "Onega") }}
   #}
   <h3>Bronze</h3>
-  {{ sponsor("https://uberspace.de/", "uberspace.svg") }}
-  {{ sponsor("https://www.codethink.co.uk/", "codethink.svg") }}
+  {{ sponsor("https://uberspace.de/", "uberspace.svg", "Uber Space") }}
+  {{ sponsor("https://www.codethink.co.uk/", "codethink.svg", "Codethink") }}
   {#
-    {{ sponsor("http://ingeniunda.eu/", "ingeniunda.png") }}
+    {{ sponsor("http://ingeniunda.eu/", "ingeniunda.png", "Ingeniunda") }}
   #}
   {#
     <h3>Supported by</h3>
-    {{ sponsor("https://www.artscouncil.org.uk/", "artscouncil.jpg")}}
+    {{ sponsor("https://www.artscouncil.org.uk/", "artscouncil.jpg", "The Arts Council")}}
   #}
 </div>
 <div class="clearfix col-xs-12">
   <h3>Special Thanks</h3>
   <p>
-    We'd like to extend special thanks to the following people and organisations
+    We'd like to extend special thanks to the following organisations
     who have been instrumental in making EMF happen:
   </p>
   <p>
@@ -70,7 +75,10 @@
     <a href="https://helpmonks.com">Helpmonks</a>,
     <a href="https://www.irccloud.com">IRCCloud</a>,
     <a href="https://www.lonap.net">LONAP</a>,
-    <a href="https://business.sky.com/">Sky for Business</a>, and everyone who
+    <a href="https://www.nitrokey.com/">Nitrokey</a>,
+    <a href="https://business.sky.com/">Sky for Business</a>,
+    <a href="https://www.templant.co.uk/">Templant</a>,
+    and everyone who
     volunteered.
   </p>
 </div>
