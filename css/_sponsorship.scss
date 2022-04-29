@@ -1,3 +1,22 @@
+.sponsor a {
+    text-decoration: none;
+}
+
+.sponsors .sponsor {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.sponsor img {
+    padding: 15px;
+    background-color: #f3f3f3;
+    border-radius: 6px;
+}
+
+.sponsor-dark img {
+    background-color: #222;
+}
+
 #sponsorship-row {
     flex-wrap: wrap;
 }

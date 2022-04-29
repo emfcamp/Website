@@ -275,22 +275,6 @@ td.checkbox-cell label {
   padding: 8px;
 }
 
-.sponsor a {
-  text-decoration: none;
-}
-
-.sponsors .sponsor {
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
-
-.sponsor img {
-  padding: 15px;
-  background-color: white;
-  border-radius: 6px;
-}
-
-
 @media (min-width: 768px) {
     .row-equal, .row-equal > div[class*='col-'] {
         display: -webkit-flex;
@@ -298,7 +282,6 @@ td.checkbox-cell label {
         flex:1 1 auto;
     }
 }
-
 
 /* Make sure that focused elements don't change colour etc. unless also hovered */
 a.collapse-toggle:focus,
