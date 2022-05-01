@@ -33,11 +33,7 @@ volunteer_admin_required = require_permission("volunteer:admin")
 @notify.before_request
 def notify_require_permission():
     """Require admin permission for everything under /volunteer/admin"""
-    if (
-        not current_user.is_authenticated
-        or not current_user.has_permission("admin")
-        or not current_user.has_permission("volunteer:admin")
-    ):
+    if not current_user.has_permission("volunteer:admin"):
         abort(404)
 
 
@@ -64,6 +60,9 @@ class EmailComposeForm(Form):
 @notify.route("/", methods=["GET", "POST"])
 def main():
     if not session.get("recipients"):
+        flash(
+            "No volunteers selected to notify. Please select from list of volunteers or use defined filters."
+        )
         return redirect(url_for("volunteer_admin_volunteer.index_view"))
 
     volunteers = Volunteer.query.filter(Volunteer.id.in_(session["recipients"]))
@@ -93,8 +92,9 @@ def main():
 
         if form.send.data is True:
             enqueue_trusted_notify(volunteers, form.subject.data, form.text.data)
+            del session["recipients"]
             flash("Email queued for sending to %s volunteers" % volunteers.count())
-            return redirect(url_for("volunteer_admin_notify.main"))
+            return redirect(url_for("volunteer.main"))
 
     return render_template(
         "volunteer/admin/notify.html",
