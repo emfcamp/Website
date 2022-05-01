@@ -169,7 +169,7 @@
 
         var volunteer_shifts = {{ all_shifts | tojson }},
             volunteer_roles = {{ roles | tojson }},
-            is_admin = {% if current_user.has_permission('volunter:admin') -%} true {%- else -%} false {%- endif %};
+            is_admin = {% if current_user.has_permission('volunteer:admin') -%} true {%- else -%} false {%- endif %};
 
         init_volunteer_schedule(volunteer_shifts, volunteer_roles, '{{ active_day }}', is_admin);
 
