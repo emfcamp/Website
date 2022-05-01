@@ -33,11 +33,7 @@ volunteer_admin_required = require_permission("volunteer:admin")
 @notify.before_request
 def notify_require_permission():
     """Require admin permission for everything under /volunteer/admin"""
-    if (
-        not current_user.is_authenticated
-        or not current_user.has_permission("admin")
-        or not current_user.has_permission("volunteer:admin")
-    ):
+    if not current_user.has_permission("volunteer:admin"):
         abort(404)
 
 
