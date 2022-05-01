@@ -60,6 +60,9 @@ class EmailComposeForm(Form):
 @notify.route("/", methods=["GET", "POST"])
 def main():
     if not session.get("recipients"):
+        flash(
+            "No volunteers selected to notify. Please select from list of volunteers or use defined filters."
+        )
         return redirect(url_for("volunteer_admin_volunteer.index_view"))
 
     volunteers = Volunteer.query.filter(Volunteer.id.in_(session["recipients"]))
