@@ -92,8 +92,9 @@ def main():
 
         if form.send.data is True:
             enqueue_trusted_notify(volunteers, form.subject.data, form.text.data)
+            del session["recipients"]
             flash("Email queued for sending to %s volunteers" % volunteers.count())
-            return redirect(url_for("volunteer_admin_notify.main"))
+            return redirect(url_for("volunteer.main"))
 
     return render_template(
         "volunteer/admin/notify.html",
