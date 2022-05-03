@@ -35,8 +35,12 @@
                 </div>
                 {% if current_user.is_authenticated %}
                 <div class="col-xs-2">
-                    <button name="fave" value="{{ event.id }}" type="submit" class="btn btn-primary btn-transparent btn-hoverlabel favourite-button {% if preview %}invisible{% endif %}">
-                        <span class="glyphicon glyphicon-heart{% if event not in current_user.calendar_favourites %}-empty{% endif %} favourite-icon" aria-hidden="true"></span>
+                    <button name="fave" value="{{ event.id }}" type="submit" class="btn btn-primary btn-transparent btn-hoverlabel favourite-button favourite-button-{{ 'faved' if event in current_user.calendar_favourites else 'unfaved' }} {% if preview %}invisible{% endif %}">
+                        {% if event in current_user.calendar_favourites %}
+                          {{ faved() }}
+                        {% else %}
+                          {{ unfaved() }}
+                        {% endif %}
                         <span class="hoverlabel">Favourite</span>
                     </button>
                 </div>

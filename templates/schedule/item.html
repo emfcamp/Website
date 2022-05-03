@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "schedule/_faves.html" import faved, unfaved %}
 {% block title %}{{ proposal.display_title }}{% endblock %}
 {% block body %}
 
@@ -63,11 +64,11 @@
 <hr>
 {% if current_user.is_authenticated %}
   <form method="POST">
-  <button type="submit" class="btn btn-primary {% if is_fave %}active{% endif %}">
+  <button type="submit" class="btn btn-primary favourite-button {% if is_fave %}active{% endif %}">
     {%- if is_fave -%}
-      <i class="glyphicon glyphicon-heart favourite-icon"></i>
+    {{ faved() }}
     {%- else -%}
-      <i class="glyphicon glyphicon-heart-empty favourite-icon"></i>
+    {{ unfaved() }}
     {%- endif -%}
     &nbsp;Favourite
   </button>
