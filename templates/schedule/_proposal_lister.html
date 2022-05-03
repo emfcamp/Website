@@ -6,7 +6,7 @@
         <input type="hidden" name="event_type" value="proposal">
         <div>
             {% for prop in human_type_proposals %}
-            <a href="{{ url_for('.item', proposal_id=prop.id, slug=prop.slug, year=event_year) }}" class="event proposal" id="proposal-{{ prop.id }}">
+            <a href="{{ url_for('.item', year=event_year, proposal_id=prop.id, slug=prop.slug) }}" class="event proposal" id="proposal-{{ prop.id }}">
             <div class="row">
                 <div class="col-xs-10">
                     <div>

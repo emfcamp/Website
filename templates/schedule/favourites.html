@@ -11,7 +11,7 @@
 {% if not config.get('SCHEDULE') %}
 <p>The feed will only contain talks or workshops once they've been scheduled.</p>
 {% endif %}
-<p><strong><a class="btn btn-lg btn-primary" href="{{ url_for('.line_up') }}">View line-up</a></strong></p>
+<p><strong><a class="btn btn-lg btn-primary" href="{{ url_for('schedule.main_year', year=event_year) }}">View line-up</a></strong></p>
 
 <div class="line-up">
 {{ list_proposals(proposals) }}

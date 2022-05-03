@@ -201,10 +201,14 @@ def item_current(year, proposal_id, slug=None):
             msg = 'Added "%s" to favourites' % proposal.display_title
         db.session.commit()
         flash(msg)
-        return redirect(url_for(".item", proposal_id=proposal.id, slug=proposal.slug))
+        return redirect(
+            url_for(".item", year=year, proposal_id=proposal.id, slug=proposal.slug)
+        )
 
     if slug != proposal.slug:
-        return redirect(url_for(".item", proposal_id=proposal.id, slug=proposal.slug))
+        return redirect(
+            url_for(".item", year=year, proposal_id=proposal.id, slug=proposal.slug)
+        )
 
     venue_name = None
     if proposal.scheduled_venue:

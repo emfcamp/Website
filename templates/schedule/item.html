@@ -1,21 +1,81 @@
 {% extends "base.html" %}
-{% block title %}{{ proposal.title }}{% endblock %}
+{% block title %}{{ proposal.display_title }}{% endblock %}
 {% block body %}
 
-<h2>{{ proposal.title }}</h2>
+<h2>{{ proposal.display_title }}</h2>
 <h2>
   <small>
-  {{ proposal.type | title }} by {{ proposal.speaker }}
+  {{ proposal.human_type | title }} by {{ proposal.published_names or proposal.user.name }}
+  {% if not proposal.may_record and proposal.type == 'talk' and proposal.state in ['accepted', 'finished'] %}
+  <span style="padding-left: 10px;" title="This talk will not be recorded">🎦 🚫 </span>
+  {% endif %}
   </small>
 </h2>
 
 
-<p><strong>{{ proposal.start_date.strftime('%A from %-I:%M %p') }}</strong> - <strong>{{ proposal.end_date.strftime('%-I:%M %p') }}</strong>
-   in <strong>{{ proposal.venue }}</strong>
+{% if proposal.scheduled_time and venue_name %}
+<p><strong>{{ proposal.scheduled_time.strftime('%A from %-I:%M %p') }}</strong> - <strong>{{ proposal.end_date.strftime('%-I:%M %p') }}</strong>
+   {% if config['SCHEDULE'] %}
+   in <strong><a href="{{ proposal.map_link }}" target="_blank">{{ venue_name }}</a></strong>
+   {% else %}
+   in <strong>{{ venue_name }}</strong>
+   {% endif %}
 </p>
 {% endif %}
 
 <div class="well">
 
-<p class="multiline">{{ proposal.description | urlize }}</p>
+{% if proposal.youtube_url %}
+<div class="youtube-link">
+  {% if proposal.thumbnail_url %}
+  <a class="row" href="{{ proposal.youtube_url }}">
+  <img class="img-responsive xs-col-6" src="{{ proposal.thumbnail_url }}">
+  </a>
+  {% else %}
+  <a class="no-thumbnail" href="{{ proposal.youtube_url }}">
+  </a>
+  {% endif %}
+</div>
+{% endif %}
+
+<p class="multiline">{{ (proposal.published_description or proposal.description) | urlize }}</p>
+
+{% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}
+  <table class="table">
+  <tr>
+    <td><b>Attending this workshop will cost</b></td>
+    <td>{% if proposal.display_cost %}{{ proposal.display_cost }}{% else %}Free{% endif %}</td>
+  <tr>
+  {% if proposal.display_age_range %}
+  <tr>
+    <td><b>Suitable age range</b></td>
+    <td>{{ proposal.display_age_range }}</td>
+  <tr>
+  {% endif %}
+  {% if proposal.display_participant_equipment %}
+  <tr>
+    <td><b>Attendees should bring</b></td>
+    <td>{{ proposal.display_participant_equipment }}</td>
+  <tr>
+  {% endif %}
+  </table>
+{% endif %}
+<hr>
+{% if current_user.is_authenticated %}
+  <form method="POST">
+  <button type="submit" class="btn btn-primary {% if is_fave %}active{% endif %}">
+    {%- if is_fave -%}
+      <i class="glyphicon glyphicon-heart favourite-icon"></i>
+    {%- else -%}
+      <i class="glyphicon glyphicon-heart-empty favourite-icon"></i>
+    {%- endif -%}
+    &nbsp;Favourite
+  </button>
+  </form>
+{% else %}
+  <p>If you would like to mark this as a favourite please
+    <a href="{{ url_for('users.login', next=url_for('.item', year=event_year, proposal_id=proposal.id, slug=proposal.slug)) }}">log in</a>.
+  </p>
+{% endif %}
+</div>
 {% endblock %}
