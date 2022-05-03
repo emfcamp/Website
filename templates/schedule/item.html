@@ -79,4 +79,16 @@
   </p>
 {% endif %}
 </div>
+
+<h4>Return to:</h4>
+<ul class='nav nav-pills'>
+  <li>
+    <a href="{{ url_for('schedule.main_year', year=event_year) }}">Line-up</a>
+  </li>
+  {% if current_user.is_authenticated %}
+    <li>
+      <a href="{{ url_for('.favourites') }}">Favourites</a>
+    </li>
+  {% endif %}
+</ul>
 {% endblock %}
