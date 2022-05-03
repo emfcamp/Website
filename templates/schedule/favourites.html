@@ -14,7 +14,7 @@
 <p><strong><a class="btn btn-lg btn-primary" href="{{ url_for('.line_up') }}">View line-up</a></strong></p>
 
 <div class="line-up">
-{{ list_proposals(proposals) }}
+{{ list_proposals(proposals, year=event_year) }}
 </div>
 <div class="line-up">
 <h2 class="event-type">Other Events</h2>
