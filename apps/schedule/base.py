@@ -16,7 +16,7 @@ from models.ical import CalendarSource, CalendarEvent
 from models.user import generate_api_token
 from models.admin_message import AdminMessage
 
-from ..common import feature_flag
+from ..common import feature_flag, feature_enabled
 
 from . import schedule, event_tz
 from .historic import talks_historic, item_historic, historic_talk_data
@@ -36,7 +36,7 @@ def main_year(year):
         if app.config.get("SCHEDULE"):
             # Schedule is ready, show it
             return schedule_current()
-        elif app.config.get("LINE_UP"):
+        elif feature_enabled("LINE_UP"):
             # Show the lineup (list of talks without times/venues)
             return line_up()
         else:
