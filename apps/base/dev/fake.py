@@ -1,6 +1,7 @@
 import random
 from faker import Faker
 
+from apps.cfp.scheduler import Scheduler
 from main import db
 from models.user import User
 from models.basket import Basket
@@ -162,6 +163,9 @@ class FakeDataGenerator(object):
             self.create_fake_tickets(user)
 
             db.session.commit()
+
+        scheduler = Scheduler()
+        scheduler.set_rough_durations()
 
     def create_map_object(self, user):
         obj = MapObject()
