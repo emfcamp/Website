@@ -29,9 +29,16 @@ class Scheduler(object):
         )
 
         for proposal in proposals:
-            proposal.scheduled_duration = ROUGH_LENGTHS[proposal.length]
+            try:
+                proposal.scheduled_duration = ROUGH_LENGTHS[proposal.length]
+            except KeyError:
+                app.logger.warn(
+                    f"Invalid proposal length {repr(proposal.length)} for {proposal}, ignoring"
+                )
+                continue
+
             app.logger.info(
-                'Setting duration for talk "%s" to "%s"'
+                'Set duration for talk "%s" to "%s"'
                 % (proposal.title, proposal.scheduled_duration)
             )
 
