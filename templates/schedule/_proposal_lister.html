@@ -1,11 +1,12 @@
-{% macro list_proposals(proposals, year) %}
+{# List proposals - works for the current event year only #}
+{% macro list_proposals(proposals) %}ß
     {% for human_type, human_type_proposals in proposals | groupby('human_type') %}
         <h2 class="event-type">{{ human_type | title }}</h2>
         <form method="post" action="{{url_for(".add_favourite")}}">
         <input type="hidden" name="event_type" value="proposal">
         <div>
             {% for prop in human_type_proposals %}
-            <a href="{{ url_for('.item', proposal_id=prop.id, slug=prop.slug, year=year) }}" class="event proposal" id="proposal-{{ prop.id }}">
+            <a href="{{ url_for('.item', proposal_id=prop.id, slug=prop.slug, year=event_year) }}" class="event proposal" id="proposal-{{ prop.id }}">
             <div class="row">
                 <div class="col-xs-10">
                     <div>
