@@ -24,7 +24,7 @@
 {% if proposals | count == 0 and externals | count == 0 %}
     <p>
         You currently don't have any favourites, add some by going to our
-        <a href="{{ url_for('.line_up') }}">line-up</a>, clicking anything
+        <a href="{{ url_for('schedule.main_year', year=event_year) }}">line-up</a>, clicking anything
         that interests, you then clicking the &lsquo;Favourite&rsquo; button.
     </p>
 {% endif %}
