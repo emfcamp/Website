@@ -7,9 +7,12 @@
 
 <h2>Line-up</h2>
 <div>
-  <p>This is a list of the talks &amp; workshops that should be at Electromagnetic Field in {{ event_year }}.
-     Not all stages and time-periods are announced yet, so check back frequently.</p>
+  <p>This is a list of the talks &amp; workshops that we're planning at EMF {{ event_year }}.
+     Not all of them are announced yet, so check back frequently.</p>
   {% if current_user.is_authenticated %}
+    <p>You can favourite talks which sound interesting, which will let you keep track of them, and help
+        our scheduling algorithm place them in the best slot.
+    </p>
     <p><strong><a class="btn btn-lg btn-primary" href="{{ url_for('.favourites') }}">View your favourites</a></strong></p>
     {% if config['SCHEDULE'] %}
     <p>You can also get this list as an <a href="{{ url_for('.schedule_ical', year=event_year) }}">iCal feed</a>
@@ -28,9 +31,11 @@
 {{ list_proposals(proposals) }}
 </div>
 
+{% if externals|length > 0 %}
 <div class="line-up">
 <h2 class="event-type">Other Events</h2>
 {{ list_externals(externals) }}
 </div>
+{% endif %}
 
 {% endblock %}
