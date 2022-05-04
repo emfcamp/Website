@@ -1,6 +1,6 @@
 import json
 from icalendar import Calendar, Event
-from flask import request, abort, app, Response
+from flask import request, abort, current_app as app, Response
 from flask_login import current_user
 
 from models import event_year
