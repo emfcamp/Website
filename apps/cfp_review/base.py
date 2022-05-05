@@ -354,6 +354,7 @@ def update_proposal(proposal_id):
     form.needs_laptop.data = prop.needs_laptop
     form.available_times.data = prop.available_times
 
+    form.hide_from_schedule.data = prop.hide_from_schedule
     form.allowed_venues.data = prop.get_allowed_venues_serialised()
     form.allowed_times.data = prop.get_allowed_time_periods_serialised()
     form.scheduled_time.data = prop.scheduled_time

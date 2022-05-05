@@ -364,6 +364,7 @@ class Proposal(BaseModel):
     available_times = db.Column(db.String)
 
     # Fields for scheduling
+    hide_from_schedule = db.Column(db.Boolean, default=False)
     allowed_venues = db.Column(db.String, nullable=True)
     allowed_times = db.Column(db.String, nullable=True)
     scheduled_duration = db.Column(db.Integer, nullable=True)

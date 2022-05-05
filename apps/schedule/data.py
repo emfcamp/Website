@@ -86,6 +86,7 @@ def _get_scheduled_proposals(filter_obj={}, override_user=None):
         Proposal.scheduled_time.isnot(None),
         Proposal.scheduled_venue_id.isnot(None),
         Proposal.scheduled_duration.isnot(None),
+        Proposal.hide_from_schedule.isnot(True),
     ).all()
 
     schedule = [_get_proposal_dict(p, proposal_favourites) for p in schedule]
