@@ -6,6 +6,7 @@ from . import api
 from main import db
 from models.cfp import Proposal
 from models.ical import CalendarEvent
+from models.admin_message import AdminMessage
 
 
 class FavouriteProposal(Resource):
@@ -76,5 +77,18 @@ class FavouriteExternal(Resource):
         return {"is_favourite": new_state}
 
 
+def renderScheduleMessage(message):
+    return {"id": message.id, "body": message.message}
+
+
+class ScheduleMessage(Resource):
+    def get(self):
+        records = AdminMessage.get_visible_messages()
+        messages = list(map(renderScheduleMessage, records))
+
+        return messages
+
+
 api.add_resource(FavouriteProposal, "/proposal/<int:proposal_id>/favourite")
 api.add_resource(FavouriteExternal, "/external/<int:event_id>/favourite")
+api.add_resource(ScheduleMessage, "/schedule_messages")

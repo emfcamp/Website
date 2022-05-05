@@ -3,6 +3,7 @@ from collections import defaultdict
 from flask_login import current_user
 from slugify import slugify_unicode as slugify
 
+from models import event_year
 from models.cfp import Proposal, Venue
 from models.ical import CalendarSource
 
@@ -27,7 +28,12 @@ def _get_proposal_dict(proposal, favourites_ids):
         "may_record": proposal.may_record,
         "is_fave": proposal.id in favourites_ids,
         "source": "database",
-        "link": external_url(".line_up_proposal", proposal_id=proposal.id),
+        "link": external_url(
+            ".line_up_redirect",
+            year=event_year(),
+            slug=proposal.slug,
+            proposal_id=proposal.id,
+        ),
     }
     if proposal.type in ["workshop", "youthworkshop"]:
         res["cost"] = proposal.display_cost
@@ -52,7 +58,9 @@ def _get_ical_dict(event, favourites_ids):
         "may_record": False,
         "is_fave": event.id in favourites_ids,
         "source": "external",
-        "link": external_url(".line_up_external", event_id=event.id),
+        "link": external_url(
+            ".item_external", year=event_year(), slug=event.slug, event_id=event.id
+        ),
     }
     if event.type in ["workshop", "youthworkshop"]:
         res["cost"] = event.display_cost

@@ -24,6 +24,7 @@
   "devDependencies": {
     "@babel/core": "^7.9.6",
     "@babel/preset-env": "^7.9.6",
+    "@babel/preset-react": "^7.8.3",
     "autoprefixer": "^9.7.6",
     "babelify": "^10.0.0",
     "browserify": "^16.5.1",
@@ -48,6 +49,10 @@
     "@primer/octicons": "^9.6.0",
     "bootstrap": "^3.4.1",
     "bootstrap-sass": "^3.4.1",
+    "luxon": "^1.22.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-nl2br": "^0.6.0",
     "datatables.net": "^1.11.3",
     "jquery": "^3.5.0",
     "jquery-highlight": "^3.5.0"

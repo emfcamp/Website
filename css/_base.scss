@@ -76,6 +76,26 @@ a:hover {
     background-color: $highlight-background;
 }
 
+.panel-primary > .panel-heading,
+.panel-primary > .panel-footer,
+.panel-primary > .list-group li {
+    background-color: $highlight-3-background;
+    border-color: $highlight-3-border;
+}
+
+.panel-primary > .panel-heading > * {
+    color: $highlight-background-text;
+}
+
+.well a, .panel a {
+  color: $highlight-background-link;
+}
+
+.well .has-error .help-block a,
+.panel .has-error .help-block a {
+  color: inherit;
+}
+
 .panel-footer-center {
     display: flex;
     flex-direction: row;

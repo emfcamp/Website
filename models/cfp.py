@@ -171,9 +171,9 @@ EVENT_SPACING = {
 
 cfp_period = namedtuple("cfp_period", "start end")
 DAYS = {
-    "fri": datetime(2018, 8, 31),
-    "sat": datetime(2018, 9, 1),
-    "sun": datetime(2018, 9, 2),
+    "fri": datetime(2022, 6, 3),
+    "sat": datetime(2022, 6, 4),
+    "sun": datetime(2022, 6, 5),
 }
 
 # We may also have other venues in the DB, but these are the ones to be

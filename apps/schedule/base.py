@@ -6,8 +6,6 @@ from collections import defaultdict
 from flask import render_template, redirect, url_for, flash, request, abort
 from flask_login import current_user
 from flask import current_app as app
-from jinja2.utils import urlize
-from slugify import slugify_unicode as slugify
 
 from main import db
 from models import event_year
@@ -20,7 +18,7 @@ from ..common import feature_flag, feature_enabled
 
 from . import schedule, event_tz
 from .historic import talks_historic, item_historic, historic_talk_data
-from .data import _get_scheduled_proposals, _get_upcoming, _get_priority_sorted_venues
+from .data import _get_upcoming
 
 
 @schedule.route("/schedule/")
@@ -47,31 +45,14 @@ def main_year(year):
 
 
 def schedule_current():
-    def add_event(event):
-        event["text"] = html.escape(event["title"])
-        event["description"] = urlize(event["description"])
-        event["start_date"] = event["start_date"].strftime("%Y-%m-%d %H:%M:00")
-        event["end_date"] = event["end_date"].strftime("%Y-%m-%d %H:%M:00")
-        event["venue"] = slugify(event["venue"])
-        return event
-
-    # {id:1, text:"Meeting",   start_date:"04/11/2013 14:00",end_date:"04/11/2013 17:00"}
-    schedule_data = _get_scheduled_proposals()
-
-    venues_with_events = set([e["venue"] for e in schedule_data])
-    venues = _get_priority_sorted_venues(venues_with_events)
-
-    schedule_data = [add_event(e) for e in schedule_data]
-
     token = None
     if current_user.is_authenticated:
         token = generate_api_token(app.config["SECRET_KEY"], current_user.id)
 
     return render_template(
         "schedule/user_schedule.html",
-        venues=venues,
-        schedule_data=schedule_data,
         token=token,
+        debug=app.config.get("DEBUG"),
     )
 
 

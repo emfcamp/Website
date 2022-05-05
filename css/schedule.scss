@@ -1,262 +1,124 @@
 @use "./_variables.scss" as *;
 
-html, body{
-    margin:0px;
-    padding:0px;
-    height:100%;
-    overflow:hidden;
-}
+.filters {
+  margin-top: 1em;
 
-.event_popup {
-    position: absolute;
-    z-index: 100001;
-    display: none;
-    color: $main-background;
-    background-color: white;
-    border: 2px outset gray;
-    h3 {
-        color: $main-background;
-    }
-    .scroll_box {
-        overflow-y: scroll;
-        margin-top: 10px;
-        margin-bottom: 10px;
-    }
-}
+  h3 {
+    color: black;
+    margin-top: 0;
+    font-size: 1.2em;
+  }
 
-// By default put the popup at the very top
-.event_popup {
-    top: 75px;
-    left: 75px;
-    right: 75px;
-    padding: 15px;
-    font-size: 14pt;
-}
-
-@media (min-width: 768px) and (min-height: 800px) {
-.event_popup {
-    top: 325px;
-    left: 150px;
-    right: 150px;
-    padding: 20px;
-    font-size: 14pt;
-}
-}
-
-.schedule-banner {
-    margin-bottom: 0;
-    .banner-text {
-        padding-right: 20px;
-    }
-
-    .navbar-header { width: 100%; }
-    .alert {
-        z-index: 10;
-        position: fixed;
-        padding: 0;
-        top: 1px;
-        left: 1px;
-        right: 1px;
-        font-size: 14px;
-
-        .close {
-            top: 8px;
-            right: 10px;
-            width: 25px;
-            height: 25px;
-            text-align: center;
-        }
-
-        .alert-body {
-            padding: 10px;
-            padding-right: 30px;
-        }
-
-        @media (min-width: 768px) {
-            width: 768px;
-            left: 50%;
-            margin-left: -384px;
-        }
-    }
-
-    // Please forgive me for all the !importants /o\
-    // On large enough screens (width & height) show the full header
-    @media (min-width: 768px) and (min-height: 800px) {
-        .navbar-toggle { display: none; }
-        .navbar-collapse.collapse {
-            display: block !important;
-            height: auto!important;
-            padding-bottom: 0;
-            overflow: visible!important;
-        }
-    }
-
-    // On more limited screens only show the header if the toggle is clicked
-    @media (max-width: 768px), (max-height: 800px) {
-        .navbar-toggle {
-            float: right !important;
-            display: block !important;
-        }
-        .navbar-collapse.collapse {
-            display: none !important;
-            &.in {
-                display: block !important;
-                overflow-y: visible;
-            }
-        }
-    }
-}
-// Override the scale hour setting to force it to align with the
-// background image horizontal bars.
-.dhx_scale_hour {
-    height: 131px !important;
-}
-
-@media (max-width: 768px) {
-    .dhx_scale_hour {
-        height: 87px !important;
-    }
-}
-
-.dhx_matrix_line .dhx_cal_event_line,
-.dhx_cal_container .dhx_cal_data .dhx_scale_holder .dhx_cal_event div {
-    color: $schedule-text;
-    background-color: rgba($schedule-block, 85%);
-}
-
-// Style the 'scroll venue' next/previous buttons to draw attention to them
-.dhx_scale_bar .dhx_cal_next_button {
-    background: url(/static/images/scheduler/arrow_right_white.png) center center no-repeat;
-}
-.dhx_scale_bar .dhx_cal_prev_button {
-    background: url(/static/images/scheduler/arrow_left_white.png) center center no-repeat;
-}
-.dhx_scale_bar .dhx_cal_prev_button,
-.dhx_scale_bar .dhx_cal_next_button {
-    background-color: #2c4fd0;
-}
-
-// @media (max-width: 768px) {
-@media (max-width: 768px), (max-height: 800px) {
-    .dhx_cal_navline .dhx_cal_prev_button {
-        right: 30px !important;
-    }
-    .dhx_cal_navline .dhx_cal_next_button {
-        right: 0px !important;
-    }
-}
-
-.dhx_cal_container .dhx_cal_data .dhx_scale_holder .dhx_cal_event,
-.dhx_cal_container .dhx_cal_data .dhx_matrix_line .dhx_cal_event_line {
-    &.past_event,
-    &.past_event div {
-        background-color: rgba($schedule-block, 60%);
-    }
-
-    &.favourite,
-    &.favourite div {
-        color: #fff;
-        background-color: lighten($schedule-block, 25%);
-    }
-
-    &.favourite.past_event,
-    &.favourite.past_event div {
-        background-color: rgba(lighten($schedule-block, 25%), 70%);
-    }
-}
-#filter_modal_btn {
-    top: 14px;
-    position: absolute;
-}
-// @media (max-width: 768px) {
-@media (max-width: 768px), (max-height: 800px) {
-    .dhx_cal_navline .dhx_cal_tab {
-        width: auto;
-        padding-left: 10px;
-        padding-right: 10px;
-        font-size: 12px;
-    }
-    .dhx_cal_navline {
-        height: 31px !important;
-    }
-    .dhx_cal_date,
-    .dhx_cal_next_button,
-    .dhx_cal_prev_button,
-    .dhx_cal_tab {
-        top: -1px !important;
-    }
-    .dhx_cal_header {
-        top: 35px !important;
-    }
-    .dhx_cal_data {
-        top: 71px !important;
-    }
-    .dhx_cal_container .dhx_cal_navline .dhx_cal_date {
-        font-size: 15px;
-    }
-    .dhx_cal_today_button {
-        display: none;
-    }
-    #emf_day_tab {
-        left: 1px !important;
-    }
-    #emf_timeline_tab {
-        left: 43px !important
-    }
-    #filter_modal_btn {
-        left: 109px !important
-    }
-}
-
-@media (min-width: 768px) {
-    .dhx_cal_navline .dhx_cal_tab {
-        width: 70px;
-        font-size: 14px;
-    }
-    #emf_day_tab {
-        left: 20px !important;
-    }
-    #emf_timeline_tab {
-        left: 110px !important
-    }
-    #filter_modal_btn {
-        left: 200px !important;
-    }
-}
-
-.schedule.modal {
-    color: #888;
-    margin: 50px;
-
-    .modal-header h4 {
-        color: #888;
-    }
-}
-
-#gigitty-qr {
-  width: 320px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 40px;
-  text-align: center;
-
-  p {
-    margin-top: 1em;
+  .panel-title {
+    display: flex;
+    justify-content: space-between;
   }
 }
 
-.dhx_cal_container .dhx_cal_tab,
-.dhx_cal_container .dhx_cal_prev_button,
-.dhx_cal_container .dhx_cal_next_button,
-.dhx_cal_container .dhx_cal_today_button {
-    color: $schedule-block;
-    &.active {
-        color: $schedule-text;
-        background-color: $schedule-block;
-    }
+.no-recording {
+  position: relative;
+  width: 32px;
+  height: 32px;
+
+  .camera {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+  }
+
+  .slash {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: #d9534f;
+  }
 }
 
-#feeds {
+.favourite {
+  color: #f0ad4e;
+}
+
+.form-inline .checkbox {
+  margin-right: 0.75em;
+  margin-bottom: 0.5em;
+}
+
+.checkbox-filter {
+  margin-right: 0.5em;
+}
+
+.schedule-events-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.schedule-event {
+  background-color: $schedule-block;
+  color: $schedule-text;
   padding: 0.5em;
-  font-size: 0.8em;
+  border-radius: 5px;
+  margin-right: 1em;
+  margin-bottom: 1em;
+
+  .event-synopsis {
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+
+    .event-icons {
+      margin-left: 0.5em;
+      margin-top: 0.25em;
+      display: flex;
+
+      &:empty {
+        display: none;
+      }
+    }
+
+    h3 {
+      margin-top: 0;
+      margin-bottom: 0;
+      font-size: 20px;
+
+      &.abbreviate-titles {
+        max-width: 400px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    p {
+      font-size: 16px;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+  }
+
+  .event-details {
+    margin-top: 1em;
+
+    p {
+      margin: 0;
+      margin-bottom: 1em;
+    }
+
+    p.additional-information {
+      margin-bottom: 0;
+    }
+  }
+}
+
+@media(max-width: 550px) {
+  .schedule-event {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .form-inline .checkbox input {
+    position: static;
+    margin-left: 0;
+    margin-right: 0em;
+    margin-bottom: 0.5em;
+  }
 }
