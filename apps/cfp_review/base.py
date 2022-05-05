@@ -30,7 +30,7 @@ from models.cfp import (
     MANUAL_REVIEW_TYPES,
     get_available_proposal_minutes,
     ROUGH_LENGTHS,
-    DAYS,
+    get_days_map,
     DEFAULT_VENUES,
     EVENT_SPACING,
     FavouriteProposal,
@@ -909,7 +909,7 @@ def rank():
         allocated_minutes[proposal.type] += length + (10 * EVENT_SPACING[proposal.type])
 
     # Correct for changeover period not being needed at the end of the day
-    num_days = len(DAYS.items())
+    num_days = len(get_days_map().items())
     for type, amount in allocated_minutes.items():
         num_venues = len(DEFAULT_VENUES[type])
         # Amount of minutes per venue * number of venues - (slot changeover period) from the end

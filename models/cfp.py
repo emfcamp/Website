@@ -8,7 +8,14 @@ from itertools import groupby
 from sqlalchemy import UniqueConstraint, func, select
 from sqlalchemy.orm import column_property
 from slugify import slugify_unicode
-from models import export_attr_counts, export_attr_edits, export_intervals, bucketise
+from models import (
+    export_attr_counts,
+    export_attr_edits,
+    export_intervals,
+    bucketise,
+    event_start,
+    event_end,
+)
 
 from main import db
 from .user import User
@@ -174,11 +181,6 @@ EVENT_SPACING = {
 }
 
 cfp_period = namedtuple("cfp_period", "start end")
-DAYS = {
-    "fri": datetime(2022, 6, 3),
-    "sat": datetime(2022, 6, 4),
-    "sun": datetime(2022, 6, 5),
-}
 
 # We may also have other venues in the DB, but these are the ones to be
 # returned by default if there are none
@@ -206,6 +208,16 @@ VENUE_CAPACITY = {
 MANUAL_REVIEW_TYPES = ["youthworkshop", "performance", "installation"]
 
 
+# This is a function rather than a constant so we can lean on the configuration
+# for event start & end times rather than hard coding stuff
+def get_days_map():
+    event_days = [
+        (event_start() + timedelta(days=day_idx))
+        for day_idx in range((event_end() - event_start()).days + 1)
+    ]
+    return {ed.strftime("%a").lower(): ed for ed in event_days}
+
+
 def proposal_slug(title) -> str:
     slug = slugify_unicode(title).lower()
     if len(slug) > 60:
@@ -230,16 +242,17 @@ def proposal_slug(title) -> str:
 
 def timeslot_to_period(slot_string, type=None):
     start = end = None
+    days_map = get_days_map()
 
     if type in REMAP_SLOT_PERIODS and slot_string in REMAP_SLOT_PERIODS[type]:
         day, start_time, end_time = REMAP_SLOT_PERIODS[type][slot_string]
-        start = DAYS[day] + timedelta(hours=start_time[0], minutes=start_time[1])
-        end = DAYS[day] + timedelta(hours=end_time[0], minutes=end_time[1])
+        start = days_map[day] + timedelta(hours=start_time[0], minutes=start_time[1])
+        end = days_map[day] + timedelta(hours=end_time[0], minutes=end_time[1])
 
     else:
         day, start_h, end_h = slot_string.split("_")
-        start = DAYS[day] + timedelta(hours=int(start_h))
-        end = DAYS[day] + timedelta(hours=int(end_h))
+        start = days_map[day] + timedelta(hours=int(start_h))
+        end = days_map[day] + timedelta(hours=int(end_h))
 
     return cfp_period(start, end)
 
