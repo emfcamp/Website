@@ -58,6 +58,7 @@ class UpdateProposalForm(Form):
     )
     available_times = StringField("Available times")
 
+    hide_from_schedule = BooleanField("Hide from schedule")
     allowed_venues = StringField("Allowed Venues")
     allowed_times = TextAreaField("Allowed Time Periods")
     scheduled_duration = StringField("Duration")
@@ -109,6 +110,7 @@ class UpdateProposalForm(Form):
         else:
             proposal.scheduled_duration = None
 
+        proposal.hide_from_schedule = self.hide_from_schedule.data
         # Windows users :(
         stripped_allowed_times = self.allowed_times.data.strip().replace("\r\n", "\n")
         if (

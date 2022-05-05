@@ -28,8 +28,8 @@ def main():
 
 @schedule.route("/schedule/<int:year>")
 def main_year(year):
-    #  Do we want to show the current year's schedule from the DB,
-    #  or a previous year's from the static archive?
+    # Do we want to show the current year's schedule from the DB,
+    # or a previous year's from the static archive?
     if year == event_year():
         if app.config.get("SCHEDULE"):
             # Schedule is ready, show it
@@ -57,12 +57,12 @@ def schedule_current():
 
 
 def line_up():
-    proposals = (
-        Proposal.query.filter(Proposal.scheduled_duration.isnot(None))
-        .filter(Proposal.state.in_(["accepted", "finished"]))
-        .filter(Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]))
-        .all()
-    )
+    proposals = Proposal.query.filter(
+        Proposal.scheduled_duration.isnot(None),
+        Proposal.state.in_(["accepted", "finished"]),
+        Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]),
+        Proposal.hide_from_schedule.isnot(True),
+    ).all()
 
     # Shuffle the order, but keep it fixed per-user
     # (Because we don't want a bias in starring)
@@ -165,7 +165,7 @@ def item(year, proposal_id, slug=None):
 def item_current(year, proposal_id, slug=None):
     """Display a detail page for a talk from the current event"""
     proposal = Proposal.query.get_or_404(proposal_id)
-    if proposal.state not in ("accepted", "finished"):
+    if proposal.state not in ("accepted", "finished") or proposal.hide_from_schedule:
         abort(404)
 
     if not current_user.is_anonymous:
