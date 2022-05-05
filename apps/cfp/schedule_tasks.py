@@ -91,21 +91,17 @@ def apply_potential_schedule():
             proposal.scheduled_time = proposal.potential_time
             proposal.potential_time = None
 
-        ok = False
         if previously_unscheduled:
             app.logger.info(
                 'Scheduling proposal "%s" by %s', proposal.title, user.email
             )
-            ok = send_email_for_proposal(
+            send_email_for_proposal(
                 proposal, reason="scheduled", from_address=from_email("SPEAKERS_EMAIL")
             )
         else:
             app.logger.info('Moving proposal "%s" by %s', proposal.title, user.email)
-            ok = send_email_for_proposal(
+            send_email_for_proposal(
                 proposal, reason="moved", from_address=from_email("SPEAKERS_EMAIL")
             )
 
-        if ok:
-            db.session.commit()
-        else:
-            raise Exception("Error when messaging user when applying schedule")
+        db.session.commit()
