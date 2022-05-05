@@ -101,7 +101,7 @@ def fake_proposal(fake, reviewers):
                 vote.vote = random.randint(0, 2)
 
     if cfp.state == "finished" and type(cfp) is TalkProposal:
-        cfp.available_times = "fri_13_16,fri_16_20,sat_10_13,sat_13_16,sat_16_20,sun_10_13,sun_13_16,sun_16_20"
+        cfp.available_times = "fri_10_13,fri_13_16,fri_16_20,sat_10_13,sat_13_16,sat_16_20,sun_10_13,sun_13_16,sun_16_20"
 
     if type(cfp) in (WorkshopProposal, YouthWorkshopProposal):
         cfp.attendees = int(round(random.uniform(5, 50)))

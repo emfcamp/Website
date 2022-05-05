@@ -88,6 +88,7 @@ ROUGH_LENGTHS = {"> 45 mins": 50, "25-45 mins": 30, "10-25 mins": 20, "< 10 mins
 # This needs to go very far away
 PROPOSAL_TIMESLOTS = {
     "talk": (
+        "fri_10_13",
         "fri_13_16",
         "fri_16_20",
         "sat_10_13",
@@ -98,6 +99,7 @@ PROPOSAL_TIMESLOTS = {
         "sun_16_20",
     ),
     "workshop": (
+        "fri_10_13",
         "fri_13_16",
         "fri_16_20",
         "fri_20_22",
@@ -112,6 +114,7 @@ PROPOSAL_TIMESLOTS = {
         "sun_16_20",
     ),
     "youthworkshop": (
+        "fri_9_13",
         "fri_13_16",
         "fri_16_20",
         "sat_9_13",
@@ -133,6 +136,7 @@ PROPOSAL_TIMESLOTS = {
 
 PREFERRED_TIMESLOTS = {
     "workshop": (
+        "fri_10_13",
         "fri_13_16",
         "fri_16_20",
         "sat_10_13",
