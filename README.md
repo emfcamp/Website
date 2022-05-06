@@ -40,6 +40,8 @@ forwards them to the flask command line within the container.
 
 ### Errors starting the dev server
 
+e.g. `Error: While importing 'dev_server', an ImportError was raised.`
+
 If you've just updated and you're seeing errors when starting the dev server, first make sure you
 try:
 
