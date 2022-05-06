@@ -15,6 +15,7 @@ const gulpif = require('gulp-if');
 const buffer = require('gulp-buffer');
 const tap = require('gulp-tap');
 const log = require('gulplog');
+const pump = require('pump');
 
 // JS processors
 const browserify = require('browserify');
@@ -30,33 +31,33 @@ const argv = minimist(process.argv.slice(2));
 const production = !!argv.production;
 
 function js(cb) {
-  gulp
-    .src([
+  pump([
+    gulp.src([
       'js/main.js',
       'js/line-up.js',
       'js/schedule.js',
       'js/volunteer-schedule.js',
       'js/arrivals.js'
-    ])
-    .pipe(
-      tap(function(file) {
-        log.info('Bundling ' + file.path);
-        file.contents = browserify(file.path, {debug: true})
-          .transform('babelify', {presets: ['@babel/env', '@babel/preset-react']})
-          .bundle();
-      }),
-    )
-    .pipe(buffer())
-    .pipe(gulpif(!production, sourcemaps.init({loadMaps: true})))
-    .pipe(gulpif(production, uglify()))
-    .pipe(gulpif(!production, sourcemaps.write()))
-    .pipe(gulp.dest('static/js/'));
-  cb();
+    ]),
+    tap(function(file) {
+      log.info('Bundling ' + file.path);
+      file.contents = browserify(file.path, {debug: true})
+        .transform('babelify', {presets: [
+          ['@babel/env', {useBuiltIns: 'usage', corejs: 3}],
+          '@babel/preset-react'
+        ]}).bundle();
+    }),
+    buffer(),
+    gulpif(!production, sourcemaps.init({loadMaps: true})),
+    gulpif(production, uglify()),
+    gulpif(!production, sourcemaps.write()),
+    gulp.dest('static/js/'),
+  ], cb);
 }
 
 function css(cb) {
-  gulp
-    .src([
+  pump([
+    gulp.src([
       'css/admin.scss',
       'css/arrivals.scss',
       'css/invoice.scss',
@@ -65,38 +66,41 @@ function css(cb) {
       'css/schedule.scss',
       'css/volunteer_schedule.scss',
       'css/flask-admin.scss',
-    ])
-    .pipe(gulpif(!production, sourcemaps.init()))
-    .pipe(sass({includePaths: ['../node_modules']}).on('error', function(err)  {
+    ]),
+    gulpif(!production, sourcemaps.init()),
+    sass({includePaths: ['../node_modules']}).on('error', function(err)  {
       var message = err.messageFormatted;
       if (production) {
         throw message;
       }
       process.stderr.write(message + "\n");
       this.emit('end');
-    }))
-    .pipe(
-      postcss(
-        [
-          require('postcss-input-range')(),
-          postcssPresetEnv(),
-        ],
-      ),
-    )
-    .pipe(gulpif(production, cleancss()))
-    .pipe(rename({extname: '.css'}))
-    .pipe(gulpif(!production, sourcemaps.write()))
-    .pipe(gulp.dest('static/css'));
-  cb();
+    }),
+    postcss(
+      [
+        require('postcss-input-range')(),
+        postcssPresetEnv(),
+      ],
+    ),
+    gulpif(production, cleancss()),
+    rename({extname: '.css'}),
+    gulpif(!production, sourcemaps.write()),
+    gulp.dest('static/css'),
+  ], cb);
+}
+
+function icons(cb) {
+  pump([
+    gulp.src('./images/**/*'),
+    gulp.dest('static/images'),
+  ], cb);
 }
 
 function images(cb) {
-  gulp
-    .src('./node_modules/@primer/octicons/build/svg/**/*.svg')
-    .pipe(gulp.dest('static/icons'));
-
-  gulp.src('./images/**/*').pipe(gulp.dest('static/images'));
-  cb();
+  pump([
+    gulp.src('./node_modules/@primer/octicons/build/svg/**/*.svg'),
+    gulp.dest('static/icons'),
+  ], cb);
 }
 
 function watch() {
@@ -105,11 +109,11 @@ function watch() {
   gulp.watch(
     ['./node_modules/@primer/octicons/build/svg/**/*.svg', './images/**/*'],
     {ignoreInitial: false},
-    images,
+    gulp.parallel(icons, images),
   );
 }
 
 exports.js = js;
 exports.css = css;
 exports.watch = watch;
-exports.default = gulp.parallel(css, js, images);
+exports.default = gulp.parallel(css, js, icons, images);

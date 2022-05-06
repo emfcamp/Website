@@ -65,7 +65,10 @@ def run_schedule(persist):
 
 
 @cfp.cli.command("apply_potential_schedule")
-def apply_potential_schedule():
+@click.option(
+    "--email/--no-email", default=True, help="Send update emails to proposers"
+)
+def apply_potential_schedule(email):
     proposals = (
         Proposal.query.filter(
             (Proposal.potential_venue != None)  # noqa: E711
@@ -95,13 +98,17 @@ def apply_potential_schedule():
             app.logger.info(
                 'Scheduling proposal "%s" by %s', proposal.title, user.email
             )
-            send_email_for_proposal(
-                proposal, reason="scheduled", from_address=from_email("SPEAKERS_EMAIL")
-            )
+            if email:
+                send_email_for_proposal(
+                    proposal,
+                    reason="scheduled",
+                    from_address=from_email("SPEAKERS_EMAIL"),
+                )
         else:
             app.logger.info('Moving proposal "%s" by %s', proposal.title, user.email)
-            send_email_for_proposal(
-                proposal, reason="moved", from_address=from_email("SPEAKERS_EMAIL")
-            )
+            if email:
+                send_email_for_proposal(
+                    proposal, reason="moved", from_address=from_email("SPEAKERS_EMAIL")
+                )
 
         db.session.commit()

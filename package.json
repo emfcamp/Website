@@ -49,12 +49,13 @@
     "@primer/octicons": "^9.6.0",
     "bootstrap": "^3.4.1",
     "bootstrap-sass": "^3.4.1",
+    "core-js": "^3.22.4",
+    "datatables.net": "^1.11.3",
+    "jquery": "^3.5.0",
+    "jquery-highlight": "^3.5.0",
     "luxon": "^1.22.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "react-nl2br": "^0.6.0",
-    "datatables.net": "^1.11.3",
-    "jquery": "^3.5.0",
-    "jquery-highlight": "^3.5.0"
+    "react-nl2br": "^0.6.0"
   }
 }

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "schedule/_faves.html" import faved, unfaved %}
+{% from "schedule/_faves.html" import favourite_icons %}
 {% block title %}{{ proposal.display_title }}{% endblock %}
 {% block body %}
 
@@ -61,15 +61,11 @@
   {% endif %}
   </table>
 {% endif %}
-<hr>
+</div>
 {% if current_user.is_authenticated %}
-  <form method="POST">
-  <button type="submit" class="btn btn-primary favourite-button {% if is_fave %}active{% endif %}">
-    {%- if is_fave -%}
-    {{ faved() }}
-    {%- else -%}
-    {{ unfaved() }}
-    {%- endif -%}
+  <form method="post">
+  <button value="{{ proposal.id }}" class="btn btn-primary favourite-button favourite-button-{{ 'faved' if is_fave else 'unfaved' }}">
+    {{ favourite_icons() }}
     &nbsp;Favourite
   </button>
   </form>
@@ -78,7 +74,7 @@
     <a href="{{ url_for('users.login', next=url_for('.item', year=event_year, proposal_id=proposal.id, slug=proposal.slug)) }}">log in</a>.
   </p>
 {% endif %}
-</div>
+<p>&nbsp;</p>
 
 <h4>Return to:</h4>
 <ul class='nav nav-pills'>
@@ -91,4 +87,8 @@
     </li>
   {% endif %}
 </ul>
+{% endblock %}
+
+{% block foot %}
+<script src="{{static_url_for('static', filename="js/line-up.js")}}"></script>
 {% endblock %}
