@@ -64,7 +64,6 @@ Buy Items
 <tbody>
 {% set row_class = cycler('odd', 'even') %} {# required as we skip rows #}
 {% for f in form.tiers %}
-{% if f._any or f.amount.errors or not available %}
 <tr data-price="{{ f._tier.get_price(user_currency).value }}"
     {% for price in f._tier.prices -%}
         data-price-{{ price.currency }}="{{ price.value }}"
@@ -73,7 +72,6 @@ Buy Items
         {% if f.amount.errors -%} has-error {%- endif %}
         {{ row_class.next() }}">
     <td>
-        {{ f.hidden_tag() }}
         <label for="{{ f.amount.id }}"><b>{{ f._tier.parent.display_name }}</b></label>
         {% if f._tier.parent.description %}<p class="description">{{ f._tier.parent.description }}</p>{% endif %}
     </td>
@@ -81,7 +79,8 @@ Buy Items
         <span class="price">{{ f._tier.get_price(user_currency) | price(user_currency) }}</span>
     </td>
     <td>
-        {% if available %}
+        {% if available and f._any %}
+        {{ f.hidden_tag() }}
         <div class="controls">{{ f.amount(class_="amount")|safe }}
         {% if f.amount.errors %}
             {% for error in f.amount.errors %}
@@ -89,10 +88,11 @@ Buy Items
             {% endfor %}
         {% endif %}
         </div>
+        {% elif available %}
+        <span class="sold-out">sold out</span>
         {% endif %}
     </td>
 </tr>
-{% endif %}
 {% endfor %}
 </tbody>
 {% if available %}
