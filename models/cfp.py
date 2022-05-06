@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from collections import namedtuple, defaultdict
 from typing import Optional
 from dateutil.parser import parse as parse_date
@@ -212,7 +212,7 @@ MANUAL_REVIEW_TYPES = ["youthworkshop", "performance", "installation"]
 # for event start & end times rather than hard coding stuff
 def get_days_map():
     event_days = [
-        (event_start() + timedelta(days=day_idx))
+        datetime.combine(event_start() + timedelta(days=day_idx), time.min)
         for day_idx in range((event_end() - event_start()).days + 1)
     ]
     return {ed.strftime("%a").lower(): ed for ed in event_days}
@@ -925,3 +925,36 @@ class Venue(BaseModel):
 db.Index(
     "ix_cfp_vote_user_id_proposal_id", CFPVote.user_id, CFPVote.proposal_id, unique=True
 )
+
+__all__ = [
+    "HUMAN_CFP_TYPES",
+    "CFP_STATES",
+    "ORDERED_STATES",
+    "VOTE_STATES",
+    "LENGTH_OPTIONS",
+    "ROUGH_LENGTHS",
+    "PROPOSAL_TIMESLOTS",
+    "PREFERRED_TIMESLOTS",
+    "HARD_START_LIMIT",
+    "REMAP_SLOT_PERIODS",
+    "EVENT_SPACING",
+    "cfp_period",
+    "DEFAULT_VENUES",
+    "VENUE_CAPACITY",
+    "proposal_slug",
+    "timeslot_to_period",
+    "make_periods_contiguous",
+    "get_available_proposal_minutes",
+    "CfpStateException",
+    "InvalidVenueException",
+    "FavouriteProposal",
+    "Proposal",
+    "PerformanceProposal",
+    "TalkProposal",
+    "WorkshopProposal",
+    "YouthWorkshopProposal",
+    "InstallationProposal",
+    "CFPMessage",
+    "CFPVote",
+    "Venue",
+]
