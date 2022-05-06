@@ -1,8 +1,4 @@
 .line-up {
-  .btn-transparent {
-    background: transparent;
-    border-color: transparent;
-  }
   .btn-hoverlabel .hoverlabel {
     visibility: hidden;
     display: block;
@@ -46,27 +42,37 @@
   .favourite-button svg {
     width: 24px;
   }
-  .favourite-button-unfaved {
-    color: rgba(255, 255, 255, 0.4);
+  .favourite-button:hover,
+  .favourite-button:focus,
+  .favourite-button:active {
+    color: rgba(255, 255, 255, 0.8);
   }
-  .favourite-button-faved {
-    color: rgba(255, 60, 80, 0.8);
+  .favourite-button {
+    background-color: transparent;
+    border-color: transparent;
   }
+}
+.favourite-button-faved .favourite-icon-unfaved {
+  display: none;
+}
+.favourite-button-unfaved .favourite-icon-faved {
+  display: none;
 }
 .favourite-button svg {
   width: 20px;
   vertical-align: -7px;
   padding-right: 3px;
 }
-.favourite-button:hover,
-.favourite-button:focus,
-.favourite-button:active {
-  color: rgba(255, 255, 255, 0.8);
+.favourite-button-unfaved svg {
+  color: rgba(255, 255, 255, 0.4);
 }
-.favourite-button-unfaved:hover svg,
-.favourite-button-unfaved:focus svg,
-.favourite-button-unfaved:active svg {
+.favourite-button-unfaved:hover,
+.favourite-button-unfaved:focus,
+.favourite-button-unfaved:active {
   color: rgba(255, 255, 255, 0.7);
+}
+.favourite-button-faved svg {
+  color: rgba(255, 60, 80, 0.8);
 }
 .favourite-button-faved:hover svg,
 .favourite-button-faved:focus svg,

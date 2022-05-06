@@ -42,8 +42,10 @@ function js(cb) {
     tap(function(file) {
       log.info('Bundling ' + file.path);
       file.contents = browserify(file.path, {debug: true})
-        .transform('babelify', {presets: ['@babel/env', '@babel/preset-react']})
-        .bundle();
+        .transform('babelify', {presets: [
+          ['@babel/env', {useBuiltIns: 'usage', corejs: 3}],
+          '@babel/preset-react'
+        ]}).bundle();
     }),
     buffer(),
     gulpif(!production, sourcemaps.init({loadMaps: true})),

@@ -1,4 +1,4 @@
-{% from "schedule/_faves.html" import faved, unfaved %}
+{% from "schedule/_faves.html" import favourite_icons %}
 {# List proposals - works for the current event year only #}
 {% macro list_proposals(proposals) %}
     {% for human_type, human_type_proposals in proposals | groupby('human_type') %}
@@ -22,12 +22,8 @@
                 </div>
                 {% if current_user.is_authenticated %}
                 <div class="col-xs-2">
-                    <button name="fave" value="{{ prop.id }}" type="submit" class="btn btn-primary btn-transparent btn-hoverlabel favourite-button favourite-button-{{ 'faved' if prop in current_user.favourites else 'unfaved' }}">
-                        {% if prop in current_user.favourites %}
-                          {{ faved() }}
-                        {% else %}
-                          {{ unfaved() }}
-                        {% endif %}
+                    <button value="{{ prop.id }}" type="submit" class="btn btn-primary btn-transparent btn-hoverlabel favourite-button favourite-button-{{ 'faved' if prop in current_user.favourites else 'unfaved' }}">
+                        {{ favourite_icons() }}
                         <span class="hoverlabel">Favourite</span>
                     </button>
                 </div>

@@ -1,29 +1,22 @@
 $(function() {
-    $('.favourite-button').click(function(event) {
-        var fave_icon = $('.favourite-icon', this);
-        var is_fave = fave_icon.hasClass('glyphicon-heart');
-        var event_type;
-        if ($(this).closest('.event').hasClass('proposal')) {
-            event_type = 'proposal';
-        } else {
+    $('.favourite-button').click(async (event) => {
+        event.preventDefault();
+        const btn = event.target.closest('.favourite-button');
+        let event_type = 'proposal';
+        if (btn.closest('.event')?.classList?.contains('external')) {
             event_type = 'external';
         }
-        var event_id = $(this).attr('value');
-        fetch('/api/' + event_type + '/' + event_id + '/favourite', {
+        const event_id = btn.value;
+        const response = await fetch(`/api/${event_type}/${event_id}/favourite`, {
             method: 'PUT',
             credentials: 'include',
             headers: {
               'Content-Type': 'application/json; charset=utf-8',
             },
-            body: '{}'
-        }).then(response => response.json()).then(function(result) {
-            if (result.is_favourite) {
-                fave_icon.removeClass('glyphicon-heart-empty').addClass('glyphicon-heart');
-            } else {
-                fave_icon.removeClass('glyphicon-heart').addClass('glyphicon-heart-empty');
-            }
+            body: '{}',
         });
-        event.preventDefault();
+        const result = await response.json();
+        btn.classList.toggle('favourite-button-faved', result.is_favourite);
+        btn.classList.toggle('favourite-button-unfaved', !result.is_favourite);
     });
-
 });
