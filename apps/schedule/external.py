@@ -123,6 +123,7 @@ def external_feed(source_id):
 
     if form.validate_on_submit():
         if form.save.data:
+            calendar.url = form.url.data
             calendar.name = form.name.data
             calendar.published = form.published.data
 
@@ -138,8 +139,6 @@ def external_feed(source_id):
                 pass
             db.session.commit()
             return redirect(url_for(".external_feeds"))
-
-        calendar.url = form.url.data
 
     try:
         alerts = calendar.refresh()
