@@ -126,4 +126,4 @@ function watch() {
 exports.js = js;
 exports.css = css;
 exports.watch = watch;
-exports.default = gulp.parallel(css, js, icons, images);
+exports.default = gulp.parallel(css, js, icons, images, manifest);
