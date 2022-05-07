@@ -20,7 +20,8 @@
         <meta name="twitter:site" content="@emfcamp">
         <meta name="theme-color" content="#171123">
         <link rel="shortcut icon" type="image/x-icon" href="{{ static_url_for('static', filename='images/favicon.ico') }}">
-        <link rel="manifest" href="static/manifest.json">
+        <link rel="manifest" href="{{ static_url_for('static', filename='manifest.json') }}">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ static_url_for('static', filename='images/pwa/icon.png') }}">
         {% block css -%}
         <link rel="stylesheet" href="{{ static_url_for('static', filename="css/main.css") }}">
         {% endblock -%}
