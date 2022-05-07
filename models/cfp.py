@@ -913,11 +913,19 @@ class Venue(BaseModel):
     __export_data__ = False
 
     id = db.Column(db.Integer, primary_key=True)
+    village_id = db.Column(db.Integer, db.ForeignKey("village.id"), nullable=True, default=None)
     name = db.Column(db.String, nullable=False)
     type = db.Column(db.String, nullable=True)
     priority = db.Column(db.Integer, nullable=True, default=0)
     lat = db.Column(db.Float)
     lon = db.Column(db.Float)
+    scheduled_content_only = db.Column(db.Boolean)
+    village = db.relationship(
+        "Village",
+        backref="venues",
+        cascade="all",
+        primaryjoin="Village.id == Venue.village_id"
+    )
 
     __table_args__ = (UniqueConstraint("name", name="_venue_name_uniq"),)
 
