@@ -39,16 +39,18 @@ function js(cb) {
       'js/volunteer-schedule.js',
       'js/arrivals.js'
     ]),
-    tap(function(file) {
+    tap(function (file) {
       log.info('Bundling ' + file.path);
-      file.contents = browserify(file.path, {debug: true})
-        .transform('babelify', {presets: [
-          ['@babel/env', {useBuiltIns: 'usage', corejs: 3}],
-          '@babel/preset-react'
-        ]}).bundle();
+      file.contents = browserify(file.path, { debug: true })
+        .transform('babelify', {
+          presets: [
+            ['@babel/env', { useBuiltIns: 'usage', corejs: 3 }],
+            '@babel/preset-react'
+          ]
+        }).bundle();
     }),
     buffer(),
-    gulpif(!production, sourcemaps.init({loadMaps: true})),
+    gulpif(!production, sourcemaps.init({ loadMaps: true })),
     gulpif(production, uglify()),
     gulpif(!production, sourcemaps.write()),
     gulp.dest('static/js/'),
@@ -68,7 +70,7 @@ function css(cb) {
       'css/flask-admin.scss',
     ]),
     gulpif(!production, sourcemaps.init()),
-    sass({includePaths: ['../node_modules']}).on('error', function(err)  {
+    sass({ includePaths: ['../node_modules'] }).on('error', function (err) {
       var message = err.messageFormatted;
       if (production) {
         throw message;
@@ -83,7 +85,7 @@ function css(cb) {
       ],
     ),
     gulpif(production, cleancss()),
-    rename({extname: '.css'}),
+    rename({ extname: '.css' }),
     gulpif(!production, sourcemaps.write()),
     gulp.dest('static/css'),
   ], cb);
@@ -103,14 +105,22 @@ function images(cb) {
   ], cb);
 }
 
+function manifest(cb) {
+  pump([
+    gulp.src('./manifest.json'),
+    gulp.dest('static'),
+  ], cb);
+}
+
 function watch() {
-  gulp.watch('css/*.scss', {ignoreInitial: false}, css);
-  gulp.watch('js/**/*.js', {ignoreInitial: false}, js);
+  gulp.watch('css/*.scss', { ignoreInitial: false }, css);
+  gulp.watch('js/**/*.js', { ignoreInitial: false }, js);
   gulp.watch(
     ['./node_modules/@primer/octicons/build/svg/**/*.svg', './images/**/*'],
-    {ignoreInitial: false},
+    { ignoreInitial: false },
     gulp.parallel(icons, images),
   );
+  gulp.watch('./manifest.json', { ignoreInitial: false }, manifest);
 }
 
 exports.js = js;

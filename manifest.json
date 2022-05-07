@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
+  "id": "emfcamp-web",
+  "name": "Electromagnetic Field",
+  "short_name": "EMF",
+  "lang": "en-GB",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#171123",
+  "orientation": "portrait-primary",
+  "description": "A non-profit UK camping festival for those with an inquisitive mind or an interest in making things",
+  "icons": [
+    {
+      "src": "images/pwa/icon.svg",
+      "sizes": "any",
+      "purpose": "maskable"
+    },
+    {
+      "src": "images/pwa/icon.png",
+      "type": "image/png",
+      "sizes": "180x180",
+      "purpose": "any"
+    },
+    {
+      "src": "images/pwa/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    },
+    {
+      "src": "images/pwa/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "images/pwa/icon-180.png",
+      "type": "image/png",
+      "sizes": "180x180",
+      "purpose": "maskable"
+    },
+    {
+      "src": "images/pwa/icon-144.png",
+      "type": "image/png",
+      "sizes": "144x144",
+      "purpose": "maskable"
+    },
+    {
+      "src": "images/pwa/icon-96.png",
+      "type": "image/png",
+      "sizes": "96x96",
+      "purpose": "maskable"
+    },
+    {
+      "src": "images/pwa/icon-72.png",
+      "type": "image/png",
+      "sizes": "72x72",
+      "purpose": "maskable"
+    },
+    {
+      "src": "images/pwa/icon-48.png",
+      "type": "image/png",
+      "sizes": "48x48",
+      "purpose": "maskable"
+    },
+    {
+      "src": "images/pwa/icon-36.png",
+      "type": "image/png",
+      "sizes": "36x36",
+      "purpose": "maskable"
+    }
+  ]
+}
