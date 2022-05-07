@@ -336,6 +336,7 @@ class Proposal(BaseModel):
     needs_money = db.Column(db.Boolean, nullable=False, default=False)
     one_day = db.Column(db.Boolean, nullable=False, default=False)
     has_rejected_email = db.Column(db.Boolean, nullable=False, default=False)
+    user_scheduled = db.Column(db.Boolean, nullable=False, default=False)
 
     # References to this table
     messages = db.relationship("CFPMessage", backref="proposal")
