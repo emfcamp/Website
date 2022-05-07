@@ -54,10 +54,12 @@ class Shift(BaseModel):
         """
         If the venues and roles match then the shifts can overlap
         """
+
+        if self.venue == other.venue and self.role == other.role:
+            return False
         return (
-            not (self.venue == other.venue and self.role == other.role)
-            or other.start <= self.start <= other.end
-            or other.start <= self.end <= other.end
+            other.start <= self.start <= other.end
+            or self.start <= other.start <= self.end
         )
 
     def __repr__(self):
