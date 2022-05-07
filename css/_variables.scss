@@ -1,7 +1,10 @@
 // Maximum content width
 $main-content-width: 		950px;
 // Minimum content width: horizontal scrolling below this.
-$min-width:                     370px;
+$min-width:                     380px;
+
+// Width at which header menu is hidden.
+$header-collapse-width:         500px;
 
 $header-font-stack:             "Raleway","Helvetica Neue",Helvetica,Arial,sans-serif;
 

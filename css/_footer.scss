@@ -34,7 +34,7 @@ footer #credits {
   float: right;
 }
 
-@media(max-width: 550px) {
+@media(max-width: $header-collapse-width) {
   footer {
     position: initial;
     bottom: initial;
@@ -43,12 +43,12 @@ footer #credits {
 
   #bottom-menu-container .menu {
     float: none;
-    clear: both;
+    clear: both
   }
 
   #bottom-menu-container ul.menu li {
-    display: block;
     margin-bottom: 0.25em;
+    font-size: 14px;
   }
 }
 

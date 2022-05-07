@@ -107,40 +107,6 @@ header, h2, h3, h4, h5, h6 {
     font-family: $header-font-stack;
 }
 
-ul.menu a {
-    color: white;
-}
-
-ul.menu a:hover {
-  color: $main-link-hover;
-}
-
-ul.menu {
-  margin-top: 0px;
-  padding-left: 0px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-}
-
-@media print {
-  ul.menu {
-    display: none;
-  }
-}
-
-ul.menu li{
-  display:inline-block;
-  padding-left: 1.5em;
-}
-
-ul.menu a {
-  text-decoration: none;
-}
-
-#menu-container a {
-  font-size: 1.5em;
-}
-
 .container {
   height: auto !important;
   min-height: 100%;
@@ -322,9 +288,6 @@ a.collapse-toggle .glyphicon {
 
 a.collapse-toggle:hover            { text-decoration: underline; }
 a.collapse-toggle:hover .glyphicon { text-decoration: none; }
-
-a.collapse-toggle:hover .glyphicon {
-}
 
 .multiline { white-space: pre-wrap }
 

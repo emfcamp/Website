@@ -10,11 +10,11 @@ require('bootstrap');
 
 if (typeof EMF != 'object') var EMF = Object();
 
-EMF.debounce_submit = function() {
+EMF.debounce_submit = function () {
   var $t = $(this);
-  setTimeout(function() {
+  setTimeout(function () {
     $t.prop('disabled', true);
-    setTimeout(function() {
+    setTimeout(function () {
       $t.prop('disabled', false);
     }, 2000);
   }, 0);
@@ -26,11 +26,11 @@ $(() => {
     let limitText = $('#word-limit-' + el.getAttribute('name'));
 
     function updateWordLimit(el) {
-        let currentLength = el.value.trim().split(/\s+/).length;
-        if (el.value == '') {
-          currentLength = 0;
-        }
-        limitText.innerHTML = currentLength + "/" + limit + " words";
+      let currentLength = el.value.trim().split(/\s+/).length;
+      if (el.value == '') {
+        currentLength = 0;
+      }
+      limitText.innerHTML = currentLength + "/" + limit + " words";
     }
 
     if (!limitText) {
@@ -66,7 +66,7 @@ $(() => {
 
     function updateDonationRange(el) {
       amountText.innerHTML = `<span style="float:left">Donation: <strong>${symbol}&thinsp;${el.value}</strong></span>
-          <span style="float:right">Refund: <strong>${symbol}&thinsp;${amount-el.value}</strong></span>
+          <span style="float:right">Refund: <strong>${symbol}&thinsp;${amount - el.value}</strong></span>
           <span style="clear:both">&nbsp;</span>`;
 
       if (amount == el.value) {
@@ -83,6 +83,14 @@ $(() => {
   });
 });
 
-$(function() {
+$(function () {
   $('.debounce').on('click', EMF.debounce_submit);
+});
+
+$(() => {
+  $('button[data-toggle]').on('click', (ev) => {
+    let toggle_el = ev.currentTarget.getAttribute("data-toggle");
+    $(`#${toggle_el}`).toggle();
+    ev.stopPropagation();
+  });
 });
