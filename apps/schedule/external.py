@@ -140,6 +140,8 @@ def external_feed(source_id):
             db.session.commit()
             return redirect(url_for(".external_feeds"))
 
+        calendar.url = form.url.data
+
     try:
         alerts = calendar.refresh()
     except Exception:
