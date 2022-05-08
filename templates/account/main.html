@@ -8,7 +8,7 @@
     <a href="{{url_for('.details')}}">Edit your account details</a>.
 </p>
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-md-6">
     <div class="panel panel-default">
         <div class="panel-heading">
           <h3 class="panel-title">Villages</h3>
@@ -29,11 +29,9 @@
         </div>
     </div>
   </div>
-</div>
 
-{% if feature_enabled('CFP') and not feature_enabled('CFP_CLOSED') %}
-  <div class="row">
-    <div class="col-md-12">
+  {% if feature_enabled('CFP') and not feature_enabled('CFP_CLOSED') %}
+    <div class="col-md-6">
       <div class="panel panel-default">
         <div class="panel-heading">
           <h3 class="panel-title">Call for Participation</h3>
@@ -45,50 +43,23 @@
         </div>
       </div>
     </div>
-  </div>
-{% endif %}
+  {% endif %}
 
-{% if feature_enabled('LINE_UP') %}
-  <div class="row">
-    <div class="col-md-12">
+  {% if feature_enabled('LINE_UP') %}
+    <div class="col-md-6">
       <div class="panel panel-default">
         <div class="panel-heading">
           <h3 class="panel-title">Your Content</h3>
         </div>
         <div class="panel-body">
           <p>[Insert some nice words about people doing their own content]</p>
-          {% if user_content|length > 0 %}
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Type</th>
-                  <th>Start</th>
-                  <th>End</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for p in user_content %}
-                  <tr>
-                    <td>{{ p.display_title }}</td>
-                    <td>{{ p.human_type | capitalize }}</td>
-                    <td>{{ p.start_date.strftime("%a %H:%M") }}</td>
-                    <td>{{ p.end_date.strftime("%a %H:%M") }}</td>
-                    <td><a href="#">Edit</a></td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          {% endif %}
+          <p><a href="{{url_for('schedule.attendee_content')}}">Manage your content</a></p>
         </div>
       </div>
     </div>
-  </div>
-{% endif %}
+  {% endif %}
 
-{% if current_user.owned_tickets|length > 1 %}
-  <div class="row">
+  {% if current_user.owned_tickets|length > 1 %}
     <div class="col-md-6">
       <div class="panel panel-default">
         <div class="panel-heading">
@@ -100,6 +71,6 @@
         </div>
       </div>
     </div>
+  {% endif %}
   </div>
-{% endif %}
 {% endblock %}

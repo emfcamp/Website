@@ -38,8 +38,7 @@ def account():
         )
         return redirect(url_for(".details"))
     
-    user_content = Proposal.query.filter_by(user_id=current_user.id, user_scheduled=True).all()
-    return render_template("account/main.html", user_content=user_content)
+    return render_template("account/main.html")
 
 
 @users.route("/account/details", methods=["GET", "POST"])
