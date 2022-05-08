@@ -22,7 +22,7 @@
                 </div>
                 {% if current_user.is_authenticated %}
                 <div class="col-xs-2">
-                    <button value="{{ prop.id }}" type="submit" class="btn btn-primary btn-transparent btn-hoverlabel favourite-button favourite-button-{{ 'faved' if prop in current_user.favourites else 'unfaved' }}">
+                    <button name="fave" value="{{ prop.id }}" type="submit" class="btn btn-primary btn-transparent btn-hoverlabel favourite-button favourite-button-{{ 'faved' if prop in current_user.favourites else 'unfaved' }}">
                         {{ favourite_icons() }}
                         <span class="hoverlabel">Favourite</span>
                     </button>
