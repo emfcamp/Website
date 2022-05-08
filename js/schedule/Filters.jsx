@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { DateTime } from 'luxon';
-import { Checkbox, CheckboxGroup, DateTimePicker } from './Controls.js';
+import { Checkbox, CheckboxGroup, DateTimePicker } from './Controls.jsx';
 
 function DebugOptions({ debug, currentTime, setCurrentTime }) {
   if (!debug) { return null; }
