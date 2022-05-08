@@ -298,7 +298,6 @@ def get_available_proposal_minutes():
             ) * len(DEFAULT_VENUES[type])
     return minutes
 
-
 class CfpStateException(Exception):
     pass
 
@@ -738,6 +737,9 @@ class Proposal(BaseModel):
 
     @property
     def display_cost(self) -> str:
+        if self.cost is None and self.published_cost is None:
+            return ""
+
         cost = self.cost.strip()
         if self.published_cost is not None:
             cost = self.published_cost.strip()
@@ -754,16 +756,22 @@ class Proposal(BaseModel):
             return cost
 
     @property
-    def display_age_range(self):
+    def display_age_range(self) -> str:
         if self.published_age_range is not None:
             return self.published_age_range.strip()
-        return self.age_range.strip()
+        if self.age_range is not None:
+            return self.age_range.strip()
+
+        return ""
 
     @property
-    def display_participant_equipment(self):
+    def display_participant_equipment(self) -> str:
         if self.published_participant_equipment is not None:
             return self.published_participant_equipment.strip()
-        return self.participant_equipment.strip()
+        if self.participant_equipment is not None:
+            return self.participant_equipment.strip()
+
+        return ""
 
 
 class PerformanceProposal(Proposal):
