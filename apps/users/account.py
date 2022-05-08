@@ -4,6 +4,7 @@ from wtforms import StringField, SubmitField, BooleanField
 from wtforms.validators import DataRequired
 
 from main import db
+from models.cfp import Proposal
 from models.user import UserDiversity
 from models.purchase import Purchase
 from models.payment import Payment
@@ -24,7 +25,6 @@ class AccountForm(Form):
 
     forward = SubmitField("Update")
 
-
 @users.route("/account", methods=["GET", "POST"])
 @login_required
 def account():
@@ -37,7 +37,9 @@ def account():
             "We'd also appreciate it if you could fill in our diversity survey."
         )
         return redirect(url_for(".details"))
-    return render_template("account/main.html")
+    
+    user_content = Proposal.query.filter_by(user_id=current_user.id, user_scheduled=True).all()
+    return render_template("account/main.html", user_content=user_content)
 
 
 @users.route("/account/details", methods=["GET", "POST"])
