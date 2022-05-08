@@ -1,23 +1,19 @@
 """ Views for attendees to manage their own content."""
 
 from models.cfp import PYTHON_CFP_TYPES, Proposal, Venue, AGE_RANGE_OPTIONS
-from models.map import MapObject
 from flask_login import login_required, current_user
 from flask import (
     current_app as app,
     render_template,
     redirect,
     url_for,
-    flash,
     request,
-    abort,
 )
 from wtforms import StringField, TextAreaField, SelectField, IntegerField, DecimalField
 from wtforms.validators import DataRequired, Optional, NumberRange
 from datetime import date, datetime, timedelta
 
 from main import db
-from models import event_year
 
 from ..common.forms import Form
 from ..common import feature_flag

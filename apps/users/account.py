@@ -4,7 +4,6 @@ from wtforms import StringField, SubmitField, BooleanField
 from wtforms.validators import DataRequired
 
 from main import db
-from models.cfp import Proposal
 from models.user import UserDiversity
 from models.purchase import Purchase
 from models.payment import Payment
