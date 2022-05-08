@@ -25,6 +25,7 @@ class AccountForm(Form):
 
     forward = SubmitField("Update")
 
+
 @users.route("/account", methods=["GET", "POST"])
 @login_required
 def account():
@@ -37,7 +38,7 @@ def account():
             "We'd also appreciate it if you could fill in our diversity survey."
         )
         return redirect(url_for(".details"))
-    
+
     return render_template("account/main.html")
 
 

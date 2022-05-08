@@ -298,6 +298,7 @@ def get_available_proposal_minutes():
             ) * len(DEFAULT_VENUES[type])
     return minutes
 
+
 class CfpStateException(Exception):
     pass
 
@@ -808,6 +809,7 @@ class InstallationProposal(Proposal):
     size = db.Column(db.String)
     funds = db.Column(db.String, nullable=True)
 
+
 PYTHON_CFP_TYPES = {
     "performance": PerformanceProposal,
     "talk": TalkProposal,
@@ -815,6 +817,7 @@ PYTHON_CFP_TYPES = {
     "youthworkshop": YouthWorkshopProposal,
     "installation": InstallationProposal,
 }
+
 
 class CFPMessage(BaseModel):
     __tablename__ = "cfp_message"
@@ -937,7 +940,9 @@ class Venue(BaseModel):
     __export_data__ = False
 
     id = db.Column(db.Integer, primary_key=True)
-    village_id = db.Column(db.Integer, db.ForeignKey("village.id"), nullable=True, default=None)
+    village_id = db.Column(
+        db.Integer, db.ForeignKey("village.id"), nullable=True, default=None
+    )
     name = db.Column(db.String, nullable=False)
     type = db.Column(db.String, nullable=True)
     priority = db.Column(db.Integer, nullable=True, default=0)
@@ -948,7 +953,7 @@ class Venue(BaseModel):
         "Village",
         backref="venues",
         cascade="all",
-        primaryjoin="Village.id == Venue.village_id"
+        primaryjoin="Village.id == Venue.village_id",
     )
 
     __table_args__ = (UniqueConstraint("name", name="_venue_name_uniq"),)

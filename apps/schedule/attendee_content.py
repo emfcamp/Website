@@ -1,4 +1,3 @@
-
 """ Views for attendees to manage their own content."""
 
 from models.cfp import PYTHON_CFP_TYPES, Proposal, Venue, AGE_RANGE_OPTIONS
@@ -11,7 +10,7 @@ from flask import (
     url_for,
     flash,
     request,
-    abort
+    abort,
 )
 from wtforms import StringField, TextAreaField, SelectField, IntegerField, DecimalField
 from wtforms.validators import DataRequired, Optional, NumberRange
@@ -25,11 +24,12 @@ from ..common import feature_flag
 
 from . import schedule
 
+
 class ContentForm(Form):
     def day_choices(self):
         d = date.fromisoformat(app.config["EVENT_START"].split(" ")[0])
         end_date = date.fromisoformat(app.config["EVENT_END"].split(" ")[0])
-        
+
         choices = []
         while d <= end_date:
             choices.append((d.isoformat(), d.strftime("%A - %d-%m-%Y")))
@@ -44,10 +44,12 @@ class ContentForm(Form):
             private_venues = Venue.query.filter_by(village_id=user.village.id).all()
             venues.extend(private_venues)
 
-        public_venues = Venue.query.filter_by(village_id=None, scheduled_content_only=False).all()
+        public_venues = Venue.query.filter_by(
+            village_id=None, scheduled_content_only=False
+        ).all()
         venues.extend(public_venues)
-        
-        return [ (v.id, v.name) for v in venues ]
+
+        return [(v.id, v.name) for v in venues]
 
     type = SelectField(
         "Type of content",
@@ -56,8 +58,8 @@ class ContentForm(Form):
             ("workshop", "Workshop"),
             ("youthworkshop", "Youth Workshop"),
             ("talk", "Talk"),
-            ("performance", "Performance")
-        ]
+            ("performance", "Performance"),
+        ],
     )
     venue = SelectField("Venue", [DataRequired()], coerce=int)
     name = StringField("Name", [DataRequired()])
@@ -71,16 +73,16 @@ class ContentForm(Form):
     attendees = IntegerField("Attendees", [Optional(), NumberRange(min=0)])
     cost = DecimalField("Cost per attendee", [Optional(), NumberRange(min=0)], places=2)
     participant_equipment = StringField("Attendee equipment")
-    age_range = SelectField(
-        "Age range",
-        choices=AGE_RANGE_OPTIONS
-    )
+    age_range = SelectField("Age range", choices=AGE_RANGE_OPTIONS)
+
 
 @schedule.route("/attendee_content", methods=["GET", "POST"])
 @login_required
 @feature_flag("LINE_UP")
 def attendee_content():
-    content = Proposal.query.filter_by(user_id=current_user.id, user_scheduled=True).all()
+    content = Proposal.query.filter_by(
+        user_id=current_user.id, user_scheduled=True
+    ).all()
 
     form = ContentForm()
     form.day.choices = form.day_choices()
@@ -97,12 +99,16 @@ def attendee_content():
             p.published_names = form.name.data
             p.title = p.published_title = form.title.data
             p.description = p.published_description = form.description.data
-            p.scheduled_time = datetime.fromisoformat("{}T{}".format(form.day.data, form.start_time.data))
+            p.scheduled_time = datetime.fromisoformat(
+                "{}T{}".format(form.day.data, form.start_time.data)
+            )
             p.length = p.scheduled_duration = form.length.data
             p.attendees = form.attendees.data
             p.cost = p.published_cost = form.cost.data
             p.age_range = p.published_age_range = form.age_range.data
-            p.participant_equipment = p.published_participant_equipment = form.participant_equipment.data
+            p.participant_equipment = (
+                p.published_participant_equipment
+            ) = form.participant_equipment.data
 
             db.session.add(p)
             db.session.commit()
