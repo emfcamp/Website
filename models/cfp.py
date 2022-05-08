@@ -88,6 +88,14 @@ LENGTH_OPTIONS = [
     ("> 45 mins", "Longer than 45 minutes"),
 ]
 
+# Options for age range displayed to the user
+AGE_RANGE_OPTIONS = [
+    ("All ages", "All ages"),
+    ("Children (0-12)", "Children (0-12)"),
+    ("Teens (13-18)", "Teens (13-18)"),
+    ("Adult Content (18+)", "Adult Content (18+)"),
+]
+
 # What we consider these as when scheduling
 ROUGH_LENGTHS = {"> 45 mins": 50, "25-45 mins": 30, "10-25 mins": 20, "< 10 mins": 10}
 
