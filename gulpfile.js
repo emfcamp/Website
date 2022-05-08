@@ -7,93 +7,54 @@
  */
 
 // Gulp and core plugins
-import gulp from 'gulp';
-import rename from 'gulp-rename';
-import minimist from 'minimist';
-import gulpif from 'gulp-if';
-import buffer from 'vinyl-buffer';
-import pump from 'pump';
-import source from 'vinyl-source-stream';
+const gulp = require('gulp');
+const sourcemaps = require('gulp-sourcemaps');
+const rename = require('gulp-rename');
+const minimist = require('minimist');
+const gulpif = require('gulp-if');
+const buffer = require('gulp-buffer');
+const tap = require('gulp-tap');
+const log = require('gulplog');
+const pump = require('pump');
 
 // JS processors
-import sourcemaps from 'gulp-sourcemaps';
-import rollup from '@rollup/stream';
-import { babel } from '@rollup/plugin-babel';
-import commonjs from '@rollup/plugin-commonjs';
-import json from '@rollup/plugin-json';
-import { nodeResolve } from '@rollup/plugin-node-resolve';
-import replace from '@rollup/plugin-replace';
-import uglify from 'gulp-uglify';
+const browserify = require('browserify');
+const uglify = require('gulp-uglify');
 
 // CSS processors
-import postcss from 'gulp-postcss';
-import postcssPresetEnv from 'postcss-preset-env';
-import postcssInputRange from 'postcss-input-range';
-import sass from 'gulp-dart-sass';
-import cleancss from 'gulp-clean-css';
+const postcss = require('gulp-postcss');
+const postcssPresetEnv = require('postcss-preset-env');
+const sass = require('gulp-dart-sass');
+const cleancss = require('gulp-clean-css');
 
 const argv = minimist(process.argv.slice(2));
 const production = !!argv.production;
 
-// Cache for Rollup bundles to speed up rebuilds.
-let rollup_cache = {};
-
-function jsBuild(filename) {
-  // Javascript file build pipeline.
-  // This is called once per target file. You can pass multiple files into Rollup but
-  // it does something clever with them, which we don't (currently) want.
-  return [
-    // Rollup.js collects all the Javascript dependencies and combines them into a single
-    // bundle (we previously used browserify here).
-    rollup({
-      input: `js/${filename}`,
-      output: {
-        // The "iife" format is the most compatible one for browsers, but we should try
-        // moving to ES6 modules here soon.
-        format: "iife",
-        sourcemap: true,
-        name: filename.replace(/\.js$/, '').replace(/-/g, '_'),
-      },
-      cache: rollup_cache[filename],
-      plugins: [
-        nodeResolve(), // Resolve NPM modules
-        json(), // Convert JSON imports to JS
-        commonjs(), // Convert commonJS (old-style) imports into ES6 imports which Rollup understands.
-        replace({ // Replace strings in JS
-          // NODE_ENV is used by React to determine whether to use production or development
-          'process.env.NODE_ENV': JSON.stringify(production ? 'production' : 'development'),
-          // Keys below are options to the replace plugin rather than variables to replace.
-          'preventAssignment': true,
-        }),
-        babel({ // Transpiles JS/JSX to a format hopefully understood by browsers.
-          presets: ["@babel/preset-env", "@babel/preset-react"],
-          babelHelpers: "bundled"
-        }),
-      ]
-    }).on('bundle',
-      (bundle) => {
-        rollup_cache[filename] = bundle;
-      }
-    ),
-    source(filename),
+function js(cb) {
+  pump([
+    gulp.src([
+      'js/main.js',
+      'js/line-up.js',
+      'js/schedule.js',
+      'js/volunteer-schedule.js',
+      'js/arrivals.js'
+    ]),
+    tap(function (file) {
+      log.info('Bundling ' + file.path);
+      file.contents = browserify(file.path, { debug: true })
+        .transform('babelify', {
+          presets: [
+            ['@babel/env', { useBuiltIns: 'usage', corejs: 3 }],
+            '@babel/preset-react'
+          ]
+        }).bundle();
+    }),
     buffer(),
     gulpif(!production, sourcemaps.init({ loadMaps: true })),
     gulpif(production, uglify()),
     gulpif(!production, sourcemaps.write()),
     gulp.dest('static/js/'),
-  ];
-}
-
-// This is the list of all the JS files we want to output.
-// We need to name these functions to get gulp to put sensible names in the CLI output.
-const main_js = (cb) => pump(jsBuild('main.js'), cb),
-  line_up_js = (cb) => pump(jsBuild('line-up.js'), cb),
-  schedule_js = (cb) => pump(jsBuild('schedule.js'), cb),
-  volunteer_schedule_js = (cb) => pump(jsBuild('volunteer-schedule.js'), cb),
-  arrivals_js = (cb) => pump(jsBuild('arrivals.js'), cb);
-
-function js(cb) {
-  gulp.parallel(main_js, line_up_js, schedule_js, volunteer_schedule_js, arrivals_js)(cb);
+  ], cb);
 }
 
 function css(cb) {
@@ -119,7 +80,7 @@ function css(cb) {
     }),
     postcss(
       [
-        postcssInputRange(),
+        require('postcss-input-range')(),
         postcssPresetEnv(),
       ],
     ),
@@ -162,5 +123,7 @@ function watch() {
   gulp.watch('./manifest.json', { ignoreInitial: false }, manifest);
 }
 
-export { js, css, watch };
-export default gulp.parallel(css, js, icons, images, manifest);
+exports.js = js;
+exports.css = css;
+exports.watch = watch;
+exports.default = gulp.parallel(css, js, icons, images, manifest);
