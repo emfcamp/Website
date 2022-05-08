@@ -792,6 +792,13 @@ class InstallationProposal(Proposal):
     size = db.Column(db.String)
     funds = db.Column(db.String, nullable=True)
 
+PYTHON_CFP_TYPES = {
+    "performance": PerformanceProposal,
+    "talk": TalkProposal,
+    "workshop": WorkshopProposal,
+    "youthworkshop": YouthWorkshopProposal,
+    "installation": InstallationProposal,
+}
 
 class CFPMessage(BaseModel):
     __tablename__ = "cfp_message"
@@ -941,6 +948,7 @@ db.Index(
 
 __all__ = [
     "HUMAN_CFP_TYPES",
+    "PYTHON_CFP_TYPES",
     "CFP_STATES",
     "ORDERED_STATES",
     "VOTE_STATES",
