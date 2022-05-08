@@ -1,6 +1,7 @@
 import json
 from icalendar import Calendar, Event
 from flask import request, abort, current_app as app, Response
+from flask_cors import cross_origin
 from flask_login import current_user
 
 from models import event_year
@@ -31,6 +32,7 @@ def _format_event_description(event):
 
 
 @schedule.route("/schedule/<int:year>.json")
+@cross_origin(methods=["GET"])
 def schedule_json(year):
     if year != event_year():
         return feed_historic(year, "json")
