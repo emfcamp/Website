@@ -1,0 +1,135 @@
+<form method="post" action="{{ action }}" id="user_content_form">
+    <div class="form-group {%- if form.type.errors %} has-error {%- endif %}">
+        <label for="type">Type</label>
+        <select class="form-control" id="type" name="type">
+            {% for choice in form.type.choices %}
+                <option value="{{ choice[0] }}" {%- if form.data.type == choice[0] %}selected{%- endif %}>{{ choice[1] }}</option>
+            {% endfor %}
+        </select>
+        {% if form.type.errors %}
+            {% for error in form.type.errors %}
+                <p class="help-block" id="help-block-type">{{ error }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="form-group {%- if form.title.errors %} has-error {%- endif %}">
+        <label for="title">Title</label>
+        <input type="text" class="form-control" id="title" name="title" value="{%- if form.data.title %}{{ form.data.title }}{%- endif %}">
+        {% if form.title.errors %}
+            {% for error in form.title.errors %}
+                <p class="help-block" id="help-block-title">{{ error }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="row">
+        <div class="form-group col-md-4 {%- if form.day.errors %} has-error {%- endif %}">
+            <label for="date">Date</label>
+            <select class="form-control" id="day" name="day">
+                {% for choice in form.day.choices %}
+                    <option value="{{ choice[0] }}" {%- if form.data.day == choice[0] %}selected{%- endif %}>{{ choice[1] }}</option>
+                {% endfor %}
+            </select>
+            {% if form.day.errors %}
+                {% for error in form.day.errors %}
+                    <p class="help-block" id="help-block-day">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="form-group col-md-4 {%- if form.scheduled_time.errors %} has-error {%- endif %}">
+            <label for="scheduled_time">Start Time</label>
+            <input type="time" class="form-control" id="scheduled_time" name="scheduled_time" value="{%- if form.data.scheduled_time %}{{ form.data.scheduled_time.strftime("%H:%M") }}{%- endif %}">
+            {% if form.scheduled_time.errors %}
+                {% for error in form.scheduled_time.errors %}
+                    <p class="help-block" id="help-block-scheduled_time">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="form-group col-md-4 {%- if form.scheduled_duration.errors %} has-error {%- endif %}">
+            <label for="scheduled_duration">Duration (in minutes)</label>
+            <input type="number" class="form-control" id="scheduled_duration" name="scheduled_duration" value="{%- if form.data.scheduled_duration %}{{ form.data.scheduled_duration }}{%- endif %}">
+            {% if form.scheduled_duration.errors %}
+                {% for error in form.scheduled_duration.errors %}
+                    <p class="help-block" id="help-block-scheduled_duration">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+    <div class="form-group {%- if form.venue.errors %} has-error {%- endif %}">
+        <label for="venue">Venue</label>
+        <select class="form-control" id="venue" name="venue">
+            {% for choice in form.venue.choices %}
+                <option value="{{ choice[0] }}" {%- if form.data.venue == choice[0] %}selected{%- endif %}>{{ choice[1] }}</option>
+            {% endfor %}
+        </select>
+        {% if form.venue.errors %}
+            {% for error in form.venue.errors %}
+                <p class="help-block" id="help-block-venue">{{ error }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="form-group {%- if form.published_names.errors %} has-error {%- endif %}">
+        <label for="published_names">Name</label>
+        <input type="text" class="form-control" id="published_names" name="published_names" value="{%- if form.data.published_names %}{{ form.data.published_names }}{%- endif %}">
+        <p>The speaker name to show in the schedule.</p>
+        {% if form.published_names.errors %}
+            {% for error in form.published_names.errors %}
+                <p class="help-block" id="help-block-published_names">{{ error }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="form-group {%- if form.description.errors %} has-error {%- endif %}">
+        <label for="description">Description</label>
+        <textarea class="form-control" id="description" name="description">{%- if form.data.description %}{{ form.data.description }}{%- endif %}</textarea>
+        {% if form.description.errors %}
+            {% for error in form.description.errors %}
+                <p class="help-block" id="help-block-description">{{ error }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="form-group row workshop-fields">
+        <div class="form-group col-md-4 {%- if form.attendees.errors %} has-error {%- endif %}">
+            <label for="attendees">Maximum Attendees</label>
+            <input class="form-control" id="attendees" name="attendees" value="{%- if form.data.attendees %}{{ form.data.attendees }}{%- endif %}">
+            {% if form.attendees.errors %}
+                {% for error in form.attendees.errors %}
+                    <p class="help-block" id="help-block-attendees">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="form-group col-md-4 {%- if form.cost.errors %} has-error {%- endif %}">
+            <label for="cost">Cost (per attendee, in £)</label>
+            <input class="form-control" id="cost" name="cost" value="{%- if form.data.cost %}{{ form.data.cost }}{%- endif %}">
+            {% if form.cost.errors %}
+                {% for error in form.cost.errors %}
+                    <p class="help-block" id="help-block-cost">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div class="form-group col-md-4 {%- if form.age_range.errors %} has-error {%- endif %}">
+            <label for="age_range">Age Range</label>
+            <select class="form-control" id="age_range" name="age_range">
+                {% for choice in form.age_range.choices %}
+                    <option value="{{ choice[0] }}" {%- if form.data.age_range == choice[0] %}selected{%- endif %}>{{ choice[1] }}</option>
+                {% endfor %}
+            </select>
+            {% if form.age_range.errors %}
+                {% for error in form.age_range.errors %}
+                    <p class="help-block" id="help-block-age_range">{{ error }}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+    <div class="form-group workshop-fields {%- if form.participant_equipment.errors %} has-error {%- endif %}">
+        <label for="participant_equipment">Attendee Equipment</label>
+        <textarea class="form-control" id="participant_equipment" name="participant_equipment">{%- if form.data.participant_equipment %}{{ form.data.participant_equipment }}{%- endif %}</textarea>
+        {% if form.participant_equipment.errors %}
+            {% for error in form.participant_equipment.errors %}
+                <p class="help-block" id="help-block-participant_equipment">{{ error }}</p>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="form-actions">
+    {{ form.obj }}
+        <button type="submit" class="btn btn-primary">{%- if proposal %}Update{%- else %}Add{%- endif %} Content</button>
+    </div>
+</form>

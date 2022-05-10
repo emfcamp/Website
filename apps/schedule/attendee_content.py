@@ -9,7 +9,14 @@ from flask import (
     url_for,
     request,
 )
-from wtforms import StringField, TextAreaField, SelectField, IntegerField, DecimalField
+from wtforms import (
+    StringField,
+    TextAreaField,
+    SelectField,
+    IntegerField,
+    DecimalField,
+    TimeField,
+)
 from wtforms.validators import DataRequired, Optional, NumberRange
 from datetime import date, datetime, timedelta
 
@@ -47,6 +54,10 @@ class ContentForm(Form):
 
         return [(v.id, v.name) for v in venues]
 
+    def populate_choices(self, user):
+        self.day.choices = self.day_choices()
+        self.venue.choices = self.venues_for_user(user)
+
     type = SelectField(
         "Type of content",
         default="workshop",
@@ -58,18 +69,36 @@ class ContentForm(Form):
         ],
     )
     venue = SelectField("Venue", [DataRequired()], coerce=int)
-    name = StringField("Name", [DataRequired()])
+    published_names = StringField("Name", [DataRequired()])
     title = StringField("Title", [DataRequired()])
     description = TextAreaField("Description", [DataRequired()])
     day = SelectField(
         "Day",
     )
-    start_time = StringField("Start time", [DataRequired()])
-    length = IntegerField("Length", [DataRequired(), NumberRange(min=1)])
+    scheduled_time = TimeField("Start time", [DataRequired()])
+    scheduled_duration = IntegerField("Length", [DataRequired(), NumberRange(min=1)])
     attendees = IntegerField("Attendees", [Optional(), NumberRange(min=0)])
     cost = DecimalField("Cost per attendee", [Optional(), NumberRange(min=0)], places=2)
     participant_equipment = StringField("Attendee equipment")
     age_range = SelectField("Age range", choices=AGE_RANGE_OPTIONS)
+
+
+def populate(proposal, form):
+    proposal.type = form.type.data
+    proposal.scheduled_venue_id = form.venue.data
+    proposal.published_names = form.published_names.data
+    proposal.title = proposal.published_title = form.title.data
+    proposal.description = proposal.published_description = form.description.data
+    proposal.scheduled_time = datetime.fromisoformat(
+        "{}T{}".format(form.day.data, form.scheduled_time.data.strftime("%H:%M"))
+    )
+    proposal.length = proposal.scheduled_duration = form.scheduled_duration.data
+    proposal.attendees = form.attendees.data
+    proposal.cost = proposal.published_cost = form.cost.data
+    proposal.age_range = proposal.published_age_range = form.age_range.data
+    proposal.participant_equipment = (
+        proposal.published_participant_equipment
+    ) = form.participant_equipment.data
 
 
 @schedule.route("/attendee_content", methods=["GET", "POST"])
@@ -81,38 +110,48 @@ def attendee_content():
     ).all()
 
     form = ContentForm()
-    form.day.choices = form.day_choices()
-    form.venue.choices = form.venues_for_user(current_user)
+    form.populate_choices(current_user)
 
-    if request.method == "POST":
-        if form.validate_on_submit():
-            p = PYTHON_CFP_TYPES[form.type.data]()
-            p.user_id = current_user.id
-            p.user_scheduled = True
-            p.state = "finished"
-            p.type = form.type.data
-            p.scheduled_venue_id = form.venue.data
-            p.published_names = form.name.data
-            p.title = p.published_title = form.title.data
-            p.description = p.published_description = form.description.data
-            p.scheduled_time = datetime.fromisoformat(
-                "{}T{}".format(form.day.data, form.start_time.data)
-            )
-            p.length = p.scheduled_duration = form.length.data
-            p.attendees = form.attendees.data
-            p.cost = p.published_cost = form.cost.data
-            p.age_range = p.published_age_range = form.age_range.data
-            p.participant_equipment = (
-                p.published_participant_equipment
-            ) = form.participant_equipment.data
+    if request.method == "POST" and form.validate():
+        proposal = PYTHON_CFP_TYPES[form.type.data]()
+        proposal.user_id = current_user.id
+        proposal.user_scheduled = True
+        proposal.state = "finished"
+        populate(proposal, form)
 
-            db.session.add(p)
-            db.session.commit()
+        db.session.add(proposal)
+        db.session.commit()
 
-            return redirect(url_for("schedule.attendee_content"))
+        return redirect(url_for("schedule.attendee_content"))
 
     return render_template(
         "schedule/attendee_content/index.html",
         content=content,
         form=form,
+        action=url_for("schedule.attendee_content"),
+    )
+
+
+@schedule.route("/attendee_content/<int:id>/edit", methods=["GET", "POST"])
+@login_required
+@feature_flag("LINE_UP")
+def attendee_content_edit(id):
+    proposal = Proposal.query.filter_by(id=id).first()
+    if not proposal or proposal.user_id != current_user.id:
+        return redirect(url_for("schedule.attendee_content"))
+
+    form = ContentForm(obj=proposal)
+    form.populate_choices(current_user)
+    if request.method == "POST" and form.validate():
+        populate(proposal, form)
+        db.session.add(proposal)
+        db.session.commit()
+
+        return redirect(url_for("schedule.attendee_content"))
+
+    return render_template(
+        "schedule/attendee_content/edit.html",
+        proposal=proposal,
+        form=form,
+        action=url_for("schedule.attendee_content_edit", id=id),
     )

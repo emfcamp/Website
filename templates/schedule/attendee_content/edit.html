@@ -1,0 +1,7 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block title %}Your Content{% endblock %}
+{% block body %}
+    <h2>Editing {{ proposal.title }}</h2>
+    {% include "schedule/attendee_content/_form.html" %}
+{% endblock %}

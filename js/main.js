@@ -90,12 +90,20 @@ $(() => {
 });
 
 $(() => {
-  $('#user_content_form #type').on('change', (ev) => {
-    let value = $(ev.target).val();
+  function isWorkshop(type) {
+    return type == 'workshop' || type == 'youthworkshop';
+  }
+
+  function displayWorkshopFieldsIfRequired() {
+    let value = $('#user_content_form #type').val();
+
     if (value == 'workshop' || value == 'youthworkshop') {
       $('.workshop-fields').show();
     } else {
       $('.workshop-fields').hide();
     }
-  });
+  }
+
+  $('#user_content_form #type').on('change', displayWorkshopFieldsIfRequired);
+  displayWorkshopFieldsIfRequired();
 });
