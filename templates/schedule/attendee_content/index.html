@@ -35,7 +35,7 @@
           <h3 class="panel-title">Add Content</h3>
         </div>
         <div class="panel-body">
-            <form method="post" action="{{ url_for('schedule.attendee_content') }}">
+            <form method="post" action="{{ url_for('schedule.attendee_content') }}" id="user_content_form">
                 <div class="form-group {%- if form.type.errors %} has-error {%- endif %}">
                     <label for="type">Type</label>
                     <select class="form-control" id="type" name="type">

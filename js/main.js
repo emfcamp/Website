@@ -88,3 +88,14 @@ $(() => {
     ev.stopPropagation();
   });
 });
+
+$(() => {
+  $('#user_content_form #type').on('change', (ev) => {
+    let value = $(ev.target).val();
+    if (value == 'workshop' || value == 'youthworkshop') {
+      $('.workshop-fields').show();
+    } else {
+      $('.workshop-fields').hide();
+    }
+  });
+});
