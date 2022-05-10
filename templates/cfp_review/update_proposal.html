@@ -65,6 +65,7 @@
         <h4>User schedule published details</h4>
             <dl class="dl-horizontal">
                 {{ render_dl_field(form.published_names) }}
+                {{ render_dl_field(form.published_pronouns) }}
                 {{ render_dl_field(form.published_title) }}
                 {{ render_dl_field(form.published_description, rows=4) }}
                 {% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}

@@ -443,6 +443,7 @@ def withdraw_proposal(proposal_id):
 
 class AcceptedForm(Form):
     name = StringField("Names for schedule", [DataRequired()])
+    pronouns = StringField("Preferred pronouns")
     title = StringField("Title", [DataRequired()])
     description = TextAreaField("Description", [DataRequired()])
     age_range = StringField("Age Range")
@@ -558,6 +559,7 @@ def finalise_proposal(proposal_id):
 
     if form.validate_on_submit():
         proposal.published_names = form.name.data
+        proposal.published_pronouns = form.pronouns.data
         proposal.published_title = form.title.data
         proposal.published_description = form.description.data
         proposal.telephone_number = form.telephone_number.data
@@ -589,6 +591,7 @@ def finalise_proposal(proposal_id):
         else:
             form.name.data = current_user.name
 
+        form.pronouns.data = proposal.published_pronouns
         form.title.data = proposal.published_title
         form.description.data = proposal.published_description
         form.telephone_number.data = proposal.telephone_number

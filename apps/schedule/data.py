@@ -22,6 +22,7 @@ def _get_proposal_dict(proposal, favourites_ids):
         "map_link": proposal.map_link,
         "title": proposal.display_title,
         "speaker": proposal.published_names or proposal.user.name,
+        "pronouns": proposal.published_pronouns,
         "user_id": proposal.user.id,
         "description": proposal.published_description or proposal.description,
         "type": proposal.type,

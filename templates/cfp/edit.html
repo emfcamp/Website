@@ -44,6 +44,7 @@
       <dl class="dl-vertical">
         {% if feature_enabled('CFP_FINALISE') and proposal.state in ['finished']  %}
         <dt>Names</dt><dd>{{proposal.published_names}}</dd>
+        <dt>Pronouns</dt><dd>{{proposal.published_pronouns}}</dd>
         <dt>Title</dt><dd>{{proposal.published_title}}</dd>
         <dt>Status</dt><dd>{{proposal.state|capitalize}}</dd>
         <dt>Description</dt><dd class="multiline">{{ proposal.published_description | urlize }}</dd>

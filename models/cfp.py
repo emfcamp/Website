@@ -354,6 +354,7 @@ class Proposal(BaseModel):
 
     # Fields for finalised info
     published_names = db.Column(db.String)
+    published_pronouns = db.Column(db.String)
     published_title = db.Column(db.String)
     published_description = db.Column(db.String)
     arrival_period = db.Column(db.String)
@@ -416,6 +417,7 @@ class Proposal(BaseModel):
             "one_day",
             "has_rejected_email",
             "published_names",
+            "published_pronouns",
             "arrival_period",
             "departure_period",
             "telephone_number",
@@ -461,6 +463,7 @@ class Proposal(BaseModel):
             User.name,
             User.email,
             cls.published_names,
+            cls.published_pronouns,
             cls.scheduled_time,
             cls.scheduled_duration,
             Venue.name,
@@ -490,6 +493,7 @@ class Proposal(BaseModel):
             cls.published_title,
             cls.published_description,
             cls.published_names.label("names"),
+            cls.published_pronouns.label("pronouns"),
             cls.may_record,
             cls.scheduled_time,
             cls.scheduled_duration,

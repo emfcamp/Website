@@ -41,6 +41,7 @@ class UpdateProposalForm(Form):
     will_have_ticket = BooleanField("Will have a ticket")
 
     published_names = StringField("Published names")
+    published_pronouns = StringField("Published pronouns")
     published_title = StringField("Published title")
     published_description = TextAreaField("Published description")
     arrival_period = StringField("Arrival time")
@@ -96,6 +97,7 @@ class UpdateProposalForm(Form):
         proposal.one_day = self.one_day.data
         proposal.user.will_have_ticket = self.will_have_ticket.data
         proposal.published_names = self.published_names.data
+        proposal.published_pronouns = self.published_pronouns.data
         proposal.published_title = self.published_title.data
         proposal.published_description = self.published_description.data
         proposal.arrival_period = self.arrival_period.data
