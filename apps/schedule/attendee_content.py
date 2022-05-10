@@ -44,7 +44,9 @@ class ContentForm(Form):
         venues = []
 
         if user.village:
-            private_venues = Venue.query.filter_by(village_id=user.village.id).all()
+            private_venues = Venue.query.filter_by(
+                village_id=user.village.village.id
+            ).all()
             venues.extend(private_venues)
 
         public_venues = Venue.query.filter_by(
@@ -155,3 +157,16 @@ def attendee_content_edit(id):
         form=form,
         action=url_for("schedule.attendee_content_edit", id=id),
     )
+
+
+@schedule.route("/attendee_content/<int:id>/delete", methods=["GET"])
+@login_required
+@feature_flag("LINE_UP")
+def attendee_content_delete(id):
+    proposal = Proposal.query.filter_by(id=id).first()
+    if not proposal or proposal.user_id != current_user.id:
+        return redirect(url_for("schedule.attendee_content"))
+
+    db.session.delete(proposal)
+    db.session.commit()
+    return redirect(url_for("schedule.attendee_content"))

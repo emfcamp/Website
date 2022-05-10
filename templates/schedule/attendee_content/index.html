@@ -13,6 +13,7 @@
                 <th>Start</th>
                 <th>End</th>
                 <th></th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -24,10 +25,13 @@
                 <td>{{ p.start_date.strftime("%a %H:%M") }}</td>
                 <td>{{ p.end_date.strftime("%a %H:%M") }}</td>
                 <td><a href="{{ url_for("schedule.attendee_content_edit", id=p.id) }}">Edit</a></td>
+                <td><a href="{{ url_for("schedule.attendee_content_delete", id=p.id) }}">Delete</a></td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <p>You haven't posted any content yet.</p>
     {% endif %}
 
     <div class="panel panel-default">

@@ -952,7 +952,6 @@ class Venue(BaseModel):
     village = db.relationship(
         "Village",
         backref="venues",
-        cascade="all",
         primaryjoin="Village.id == Venue.village_id",
     )
 
