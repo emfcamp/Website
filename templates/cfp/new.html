@@ -50,10 +50,14 @@
             can review your submission.
           </p>
           {% if cfp_type in ('talk', 'workshop') %}
-              <p>We have to anonymise these fields before sending them to our reviewers, so please
+              <p>We will anonymise these fields before sending them to our reviewers, so please
                 try to avoid including personally identifiable information.
             </p>
-        {% endif %}
+          {% endif %}
+          {% if cfp_type == 'talk' %}
+            <p>If you are employed by or affiliated with an organisation which is related to the topic
+                of your talk, you should disclose this in the description.</p>
+          {% endif %}
           {{render_field(form.title, horizontal=9, placeholder="A short summary")}}
           {{ render_field(form.description, horizontal=9, word_limit=250,
           placeholder="A full description of your proposal, in no more than 250 words") }}
