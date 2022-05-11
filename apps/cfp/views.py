@@ -250,7 +250,7 @@ def form(cfp_type="talk"):
         if channel := app.config.get("CONTENT_IRC_CHANNEL"):
             # WARNING: don't send personal information via this (the channel is public)
             irc_send(
-                f"{channel} New CfP {cfp.type} submission: {external_url('cfp_review.update_proposal', proposal_id=cfp.id)}"
+                f"{channel} New CfP {cfp.human_type} submission: {external_url('cfp_review.update_proposal', proposal_id=cfp.id)}"
             )
         return redirect(url_for(".complete"))
 
@@ -699,7 +699,7 @@ def proposal_messages(proposal_id):
             if channel := app.config.get("CONTENT_IRC_CHANNEL"):
                 # WARNING: don't send personal information via this (the channel is public)
                 irc_send(
-                    f"{channel} New CfP message for {cfp.type}: {external_url('cfp_review.message_proposer', proposal_id=proposal_id)}"
+                    f"{channel} New CfP message for {proposal.human_type}: {external_url('cfp_review.message_proposer', proposal_id=proposal_id)}"
                 )
 
         count = proposal.mark_messages_read(current_user)
