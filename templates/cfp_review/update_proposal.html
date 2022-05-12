@@ -8,7 +8,12 @@
 
 <div class="col-md-12">
     <h2>{{proposal.published_title or proposal.title}}<br>
-        <small>A {{proposal.human_type}} by
+        <small>
+            {% if proposal.user_scheduled %}
+                An attendee {{proposal.human_type}} by
+            {% else %}
+                A {{proposal.human_type}} by
+            {% endif %}
             <a href="{{ url_for('admin.user', user_id=proposal.user.id) }}">{{proposal.user.name}}</small></a>
     </h2>
 </div>

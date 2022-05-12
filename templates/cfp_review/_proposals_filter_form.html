@@ -58,6 +58,15 @@
                 </label>
             </div>
         </div>
+        <div class="form-group">
+            <div class="checkbox">
+                <label>
+                    <input name="show_user_scheduled" id="show_user_scheduled" type="checkbox" value="True"
+                           {%- if request.args.get('show_user_scheduled', False) %}checked{% endif %}>
+                    Show Attendee Scheduled Content
+                </label>
+            </div>
+        </div>
     </fieldset>
     <fieldset class="form-horizontal col-md-6">
         <div class="form-group">

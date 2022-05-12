@@ -129,6 +129,11 @@ def filter_proposal_request():
             )
         )
 
+    show_user_scheduled = request.args.get("show_user_scheduled", type=bool_qs)
+    if show_user_scheduled is None or show_user_scheduled is False:
+        filtered = False
+        proposal_query = proposal_query.filter_by(user_scheduled=False)
+
     sort_dict = get_proposal_sort_dict(request.args)
     proposal_query = proposal_query.options(joinedload(Proposal.user)).options(
         joinedload("user.owned_tickets")
