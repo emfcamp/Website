@@ -444,7 +444,7 @@ def withdraw_proposal(proposal_id):
 
 class AcceptedForm(Form):
     name = StringField("Names for schedule", [DataRequired()])
-    pronouns = StringField("Preferred pronouns")
+    pronouns = StringField("Pronouns")
     title = StringField("Title", [DataRequired()])
     description = TextAreaField("Description", [DataRequired()])
     age_range = StringField("Age Range")
