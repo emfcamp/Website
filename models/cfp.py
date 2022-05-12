@@ -596,7 +596,9 @@ class Proposal(BaseModel):
 
     def get_allowed_venues(self) -> list["Venue"]:
         # FIXME: this should reference a foreign key instead
-        if self.allowed_venues:
+        if self.user_scheduled:
+            venue_names = [self.venue.name]
+        elif self.allowed_venues:
             venue_names = [v.strip() for v in self.allowed_venues.split(",")]
         else:
             venue_names = DEFAULT_VENUES[self.type]
@@ -663,6 +665,9 @@ class Proposal(BaseModel):
         )
 
     def get_allowed_time_periods_with_default(self):
+        if self.user_scheduled:
+            return cfp_period(self.start_date, self.end_date)
+
         allowed_time_periods = self.get_allowed_time_periods()
         if not allowed_time_periods:
             allowed_time_periods = [
