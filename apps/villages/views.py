@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 
 from models import event_year
 from models.village import Village, VillageMember, VillageRequirements
+from models.cfp import Venue
 
 from main import db
 
@@ -30,6 +31,8 @@ def register():
 
         member = VillageMember(village=village, user=current_user, admin=True)
 
+        venue = Venue(village=village, name=village.name)
+
         requirements = VillageRequirements(
             village=village,
             num_attendees=form.num_attendees.data,
@@ -41,6 +44,7 @@ def register():
         db.session.add(village)
         db.session.add(member)
         db.session.add(requirements)
+        db.session.add(venue)
         db.session.commit()
 
         flash(
