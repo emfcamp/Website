@@ -39,6 +39,7 @@ class UpdateProposalForm(Form):
     needs_money = BooleanField("Needs Money")
     one_day = BooleanField("One day only")
     will_have_ticket = BooleanField("Will have a ticket")
+    user_scheduled = BooleanField("User Scheduled")
 
     published_names = StringField("Published names")
     published_pronouns = StringField("Published pronouns")
@@ -96,6 +97,7 @@ class UpdateProposalForm(Form):
         proposal.needs_money = self.needs_money.data
         proposal.one_day = self.one_day.data
         proposal.user.will_have_ticket = self.will_have_ticket.data
+        proposal.user_scheduled = self.user_scheduled.data
         proposal.published_names = self.published_names.data
         proposal.published_pronouns = self.published_pronouns.data
         proposal.published_title = self.published_title.data

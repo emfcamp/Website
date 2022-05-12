@@ -52,6 +52,7 @@
         </dl>
         <h4>Scheduling</h4>
             <dl class="dl-horizontal">
+                {{ render_dl_field(form.user_scheduled) }}
                 {{ render_dl_field(form.hide_from_schedule) }}
                 {{ render_dl_field(form.allowed_venues) }}
                 {{ render_dl_field(form.allowed_times) }}
