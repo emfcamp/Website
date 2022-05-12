@@ -6,7 +6,7 @@ ifeq ("$(TEST_SETTINGS)", "")
 	TEST_SETTINGS=./config/test.cfg
 endif
 
-.PHONY: test check-syntax
+.PHONY: test check-syntax fix-syntax
 
 test:
 	black --check ./main.py ./apps ./models ./tests
@@ -22,3 +22,7 @@ check-syntax:
 	flake8 ./*.py ./apps ./models ./tests
 	mypy ./*.py ./apps ./models
 
+fix-syntax:
+	black ./main.py ./apps ./models ./tests
+	flake8 ./*.py ./apps ./models ./tests
+	mypy ./*.py ./apps ./models
