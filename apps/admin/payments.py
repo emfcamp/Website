@@ -192,12 +192,14 @@ def update_payment(payment_id):
             if payment.provider == "stripe":
                 try:
                     stripe_update_payment(payment)
-                except StripeUpdateConflict:
+                except StripeUpdateConflict as e:
+                    app.logger.warn(f"StripeUpdateConflict updating payment: {e}")
                     flash("Unable to update due to a status conflict")
                     return redirect(
                         url_for("admin.update_payment", payment_id=payment.id)
                     )
-                except StripeUpdateUnexpected:
+                except StripeUpdateUnexpected as e:
+                    app.logger.warn(f"StripeUpdateUnexpected updating payment: {e}")
                     flash("Unable to update due to an unexpected response from Stripe")
                     return redirect(
                         url_for("admin.update_payment", payment_id=payment.id)
