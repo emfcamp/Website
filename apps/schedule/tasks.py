@@ -6,6 +6,8 @@ from flask import current_app as app
 
 from main import db
 from models.ical import CalendarSource
+from models.cfp import Venue
+from models.village import Village
 
 from . import schedule
 
@@ -70,3 +72,26 @@ def export_calendars(self):
         data.append(source_data)
 
     json.dump(data, open("calendars.json", "w"), indent=4, separators=(",", ": "))
+
+
+def create_venue_if_not_existing(venue):
+    existing_venue = Venue.query.filter_by(name=venue.name).first()
+    if not existing_venue:
+        app.logger.info("Adding new venue {}".format(venue.name))
+        db.session.add(venue)
+        db.session.commit()
+    else:
+        app.logger.info("Venue already exists for {}".format(venue.name))
+
+
+@schedule.cli.command("create_venues")
+def create_venues():
+    core_venues = ["Main Bar", "Lounge"]
+    for venue in core_venues:
+        create_venue_if_not_existing(Venue(name=venue, scheduled_content_only=False))
+
+    for village in Village.query.all():
+        venue = Venue(
+            name=village.name, village_id=village.id, scheduled_content_only=False
+        )
+        create_venue_if_not_existing(venue)
