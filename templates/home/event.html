@@ -1,43 +1,49 @@
-{% extends "base.html" %}
-{% block description %}Electromagnetic Field is a non-profit UK camping festival for those with an inquisitive mind or an interest in making things.{% endblock %}
-{% block body %}
-{% include "home/gallery_block.html" %}
+{% extends "base.html" %} {% block description %}Electromagnetic Field is a
+non-profit UK camping festival for those with an inquisitive mind or an interest
+in making things.{% endblock %} {% block body %} {% include
+"home/gallery_block.html" %}
 <div class="row">
-    <div class="col-md-6">
-        <p class="emphasis">
-          Electromagnetic Field is a non-profit UK camping festival for those with an inquisitive mind or an
-          interest in making things: hackers, artists, geeks, crafters, scientists, and engineers.
-        </p>
-        <p>A temporary town of more than two thousand like-minded people enjoying a long weekend of talks, performances,
-        and workshops on everything from <strong>blacksmithing</strong> to <strong>biometrics</strong>,
-        <strong>chiptunes</strong> to <strong>computer security</strong>,
-        <strong>high altitude ballooning</strong> to <strong>lockpicking</strong>,
-        <strong>origami</strong> to <strong>democracy</strong>,
-        and <strong>online privacy</strong> to <strong>knitting</strong>.
-        </p>
-        <p>To help matters along, we provide <strong>fast internet</strong>,
-           <strong>power to the tent</strong>, <strong>good beer</strong>, and
-          <strong>amazing installations</strong>, entirely organised by a dedicated team of volunteers.
-        </p>
-    </div>
-    <div class="col-md-6">
-        <p class="emphasis">Electromagnetic Field {{ event_year }} will be held on
-                             <strong>{{ simple_dates }} {{ event_year }}</strong>
-                             at <strong><a href="https://eastnorcastle.com/visit-eastnor-castle/eastnor-deer-park/">Eastnor Castle</a>, Ledbury</strong>.</p>
-        <p>More details to be announced soon.</p>
-       <div class="well">
-          <p>If you're interested in updates about EMF {{ event_year }}, follow us on
-          <a href="https://www.twitter.com/emfcamp">Twitter</a> or join our mailing list:</p>
-          <form method="post" class="form-inline" role="form">
-            <div class="input-group">
-              <input id="email-field" type="text" class="form-control" placeholder="Enter email address" name="email"/>
-              <span class="input-group-btn">
-                <button type="submit" class="btn btn-default debounce">Join</button>
-              </span>
-            </div>
-          </form>
-          <p><small>(We'll only use your details to contact you about future events)</small></p>
+  {% include "home/_emf_blurb.html" %}
+  <div class="col-md-6">
+    <p class="emphasis">
+      Electromagnetic Field {{ event_year }} will be held on
+      <strong>{{ simple_dates }} {{ event_year }}</strong>
+      at
+      <strong
+        ><a
+          href="https://eastnorcastle.com/visit-eastnor-castle/eastnor-deer-park/"
+          >Eastnor Castle</a
+        >, Ledbury</strong
+      >.
+    </p>
+    <p>More details to be announced soon.</p>
+    <div class="well">
+      <p>
+        If you're interested in updates about EMF {{ event_year }}, follow us on
+        <a href="https://www.twitter.com/emfcamp">Twitter</a> or join our
+        mailing list:
+      </p>
+      <form method="post" class="form-inline" role="form">
+        <div class="input-group">
+          <input
+            id="email-field"
+            type="text"
+            class="form-control"
+            placeholder="Enter email address"
+            name="email"
+          />
+          <span class="input-group-btn">
+            <button type="submit" class="btn btn-default debounce">Join</button>
+          </span>
         </div>
+      </form>
+      <p>
+        <small
+          >(We'll only use your details to contact you about future
+          events)</small
+        >
+      </p>
     </div>
+  </div>
 </div>
 {% endblock %}

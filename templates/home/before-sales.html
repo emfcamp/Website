@@ -1,36 +1,24 @@
-{% extends "base.html" %}
-{% block description %}Electromagnetic Field is a non-profit UK camping festival for those with an inquisitive mind or an interest in making things.{% endblock %}
-{% block body %}
-{% include "home/gallery_block.html" %}
+{% extends "base.html" %} {% block description %}Electromagnetic Field is a
+non-profit UK camping festival for those with an inquisitive mind or an interest
+in making things.{% endblock %} {% block body %} {% include
+"home/gallery_block.html" %}
 <div class="row" itemscope itemtype="http://schema.org/Festival">
-    <div class="col-md-6">
-        <p class="emphasis" itemprop="description">
-          Electromagnetic Field is a non-profit UK camping festival for those with an inquisitive mind or an
-          interest in making things: hackers, artists, geeks, crafters, scientists, and engineers.
-        </p>
-        <p>A temporary town of more than two thousand like-minded people enjoying a long weekend of talks, performances,
-        and workshops on everything from <strong>blacksmithing</strong> to <strong>biometrics</strong>,
-        <strong>chiptunes</strong> to <strong>computer security</strong>,
-        <strong>high altitude ballooning</strong> to <strong>lockpicking</strong>,
-        <strong>origami</strong> to <strong>democracy</strong>,
-        and <strong>online privacy</strong> to <strong>knitting</strong>.
-        </p>
-        <p>To help matters along, we provide <strong>fast internet</strong>,
-           <strong>power to the tent</strong>, <strong>good beer</strong>, and
-          <strong>amazing installations</strong>, entirely organised by a dedicated team of volunteers.
-        </p>
+  {% include "home/_emf_blurb.html" %}
+  <div class="col-md-6">
+    {% include "home/event-data.html" %} {#
+    <p>
+      The first batch of tickets will go on sale on
+      <strong>Monday the 29th of January 2018 at 19:00</strong> (UK time).
+    </p>
+    #}
+    <div class="well">
+      <p>
+        If you're interested in updates about EMF {{ event_start.year }}, follow
+        us on <a href="https://www.twitter.com/emfcamp">Twitter</a> or join our
+        mailing list:
+      </p>
+      {% include "home/_mailchimp_form.html" %}
     </div>
-    <div class="col-md-6">
-      {% include "home/event-data.html" %}
-      {#
-       <p>The first batch of tickets will go on sale on <strong>Monday the 29th of
-         January 2018 at 19:00</strong> (UK time).</p>
-      #}
-       <div class="well">
-          <p>If you're interested in updates about EMF {{ event_start.year }}, follow us on
-          <a href="https://www.twitter.com/emfcamp">Twitter</a> or join our mailing list:</p>
-          {% include "home/_mailchimp_form.html" %}
-        </div>
-    </div>
+  </div>
 </div>
 {% endblock %}
