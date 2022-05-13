@@ -1,3 +1,7 @@
+@use "../node_modules/bootstrap/dist/css/bootstrap.css";
+@use "../node_modules/@primer/octicons";
+@use "./_main_grid.scss";
+
 .nextpage {
   margin-top: 50px;
   border-top: dashed 1px;
@@ -17,6 +21,10 @@
 
   .nextpage {
     border: none;
+  }
+
+  #flDebugToolbarHandle {
+    display: none;
   }
 }
 
