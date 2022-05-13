@@ -1,4 +1,21 @@
 <form method="post" action="{{ action }}" id="user_content_form">
+    {% if conflicts %}
+        <div class="alert alert-danger conflicts">
+            <p><strong>
+                The following other content is scheduled during this period in the same venue. If you're
+                sure that isn't going to be a problem tick the box below to save anyway.
+            </strong></p>
+            <ul>
+                {% for conflict in conflicts %}
+                    <li>{{ conflict.title }} - {{ conflict.start_date.strftime("%H:%M") }} to {{ conflict.end_date.strftime("%H:%M") }}</li>
+                {% endfor %}
+            </ul>
+            <p>
+                <input type="checkbox" name="acknowledge_conflicts" id="acknowledge_conflicts" value="1" />
+                <label for="acknowledge_conflicts">Acknowledge conflicts</label>
+            </p>
+        </div>
+    {% endif %}
     <div class="form-group {%- if form.type.errors %} has-error {%- endif %}">
         <label for="type">Type</label>
         <select class="form-control" id="type" name="type">

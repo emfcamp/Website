@@ -16,6 +16,7 @@ from wtforms import (
     IntegerField,
     DecimalField,
     TimeField,
+    BooleanField,
 )
 from wtforms.validators import DataRequired, Optional, NumberRange
 from datetime import date, datetime, timedelta
@@ -83,6 +84,7 @@ class ContentForm(Form):
     cost = DecimalField("Cost per attendee", [Optional(), NumberRange(min=0)], places=2)
     participant_equipment = StringField("Attendee equipment")
     age_range = SelectField("Age range", choices=AGE_RANGE_OPTIONS)
+    acknowledge_conflicts = BooleanField("Acknowledge conflicts")
 
 
 def populate(proposal, form):
@@ -121,6 +123,15 @@ def attendee_content():
         proposal.state = "finished"
         populate(proposal, form)
 
+        conflicts = proposal.get_conflicting_content()
+        if len(conflicts) > 0 and form.acknowledge_conflicts.data is not True:
+            return render_template(
+                "schedule/attendee_content/index.html",
+                content=content,
+                form=form,
+                conflicts=conflicts,
+            )
+
         db.session.add(proposal)
         db.session.commit()
 
@@ -146,6 +157,15 @@ def attendee_content_edit(id):
     form.populate_choices(current_user)
     if request.method == "POST" and form.validate():
         populate(proposal, form)
+
+        conflicts = proposal.get_conflicting_content()
+        if len(conflicts) > 0 and form.acknowledge_conflicts.data is not True:
+            return render_template(
+                "schedule/attendee_content/index.html",
+                form=form,
+                conflicts=conflicts,
+            )
+
         db.session.add(proposal)
         db.session.commit()
 
