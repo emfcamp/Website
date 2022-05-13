@@ -78,6 +78,11 @@
                 <option value="{{ choice[0] }}" {%- if form.data.venue == choice[0] %}selected{%- endif %}>{{ choice[1] }}</option>
             {% endfor %}
         </select>
+        <p class="help-block">
+            To schedule content in villages please contact that village. If there's a venue you think should be here,
+            or if you're part of a village with multiple venues and would like them added please send an email to
+            <a href="mailto:contact@emfcamp.org">contact@emfcamp.org</a>.
+        </p>
         {% if form.venue.errors %}
             {% for error in form.venue.errors %}
                 <p class="help-block" id="help-block-venue">{{ error }}</p>
@@ -87,7 +92,7 @@
     <div class="form-group {%- if form.published_names.errors %} has-error {%- endif %}">
         <label for="published_names">Name</label>
         <input type="text" class="form-control" id="published_names" name="published_names" value="{%- if form.data.published_names %}{{ form.data.published_names }}{%- endif %}">
-        <p>The speaker name to show in the schedule.</p>
+        <p class="help-block">The speaker name to show in the schedule.</p>
         {% if form.published_names.errors %}
             {% for error in form.published_names.errors %}
                 <p class="help-block" id="help-block-published_names">{{ error }}</p>
