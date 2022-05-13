@@ -90,6 +90,11 @@ def volunteer_roles():
 
 
 @base.route("/about/what_to_bring")
+def what_to_bring_redirect():
+    return redirect(url_for(".what_to_bring"))
+
+
+@base.route("/about/what-to-bring")
 def what_to_bring():
     return render_template("about/what-to-bring.html")
 
