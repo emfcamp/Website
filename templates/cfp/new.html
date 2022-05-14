@@ -63,6 +63,19 @@
           placeholder="A full description of your proposal, in no more than 250 words") }}
      </fieldset>
 
+     {% if cfp_type == "lightning" %}
+     <fieldset>
+        {{ render_field(form.slide_link, horizontal=9, placeholder="https://example.com/my-slides.pdf") }}
+        {% if full_lightning_sessions %}
+          The lightning talk sessions for {% if (full_lightning_sessions | length) > 1 -%}
+            {{ full_lightning_sessions[:-1] | join(', ') }} and {{ full_lightning_sessions[-1] }}
+          {%- else -%}
+            {{ full_lightning_sessions[0] }}
+          {% endif %} are now full.
+        {% endif %}
+        {{ render_field(form.session, horizontal=9) }}
+     </fieldset>
+     {% else %}
      <fieldset>
          <legend>More details</legend>
          <p>We'll use these details to help us schedule your {{form.model.human_type}}.</p>
@@ -124,7 +137,9 @@
           <div class="help-block">{{ error }}</div>
           {% endfor %}
         </div>
+        <!-- More details -->
       </fieldset>
+      {% endif %}
       <fieldset>
       <div class="form-actions">
         <button type="submit" name="Create" class="btn btn-primary btn-lg pull-right debounce">Submit proposal</button>
