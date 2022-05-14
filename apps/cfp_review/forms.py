@@ -171,6 +171,16 @@ class UpdatePerformanceForm(UpdateProposalForm):
     pass
 
 
+class UpdateLightningTalkForm(UpdateProposalForm):
+    session = StringField("Day")
+    slide_link = StringField("Link")
+
+    def update_proposal(self, proposal):
+        proposal.session = self.session.data
+        proposal.slide_link = self.slide_link.data
+        super(UpdateLightningTalkForm, self).update_proposal(proposal)
+
+
 class UpdateWorkshopForm(UpdateProposalForm):
     attendees = StringField("Attendees", [DataRequired()])
     cost = StringField("Cost per attendee")
