@@ -57,6 +57,11 @@
         <a href="{{ url_for('cfp.form', cfp_type='performance') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Performance</strong> &ndash; A performance of music, art, dance, or film</a>
         {#<span class="list-group-item"><strong>Installation</strong> &ndash; The CFP for installations will open soon</span>#}
         <a href="{{ url_for('cfp.form', cfp_type='installation') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Installation</strong> &ndash; A creation for attendees to admire or interact with</a>
+        {%- if feature_enabled('LIGHTNING_TALKS') and not lightning_talks_closed %}
+          <a href="{{ url_for('cfp.form', cfp_type='lightning') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Lightning Talk</strong> &ndash; A quick-fire (less than 10m) presentation</a>
+        {%- elif feature_enabled('LIGHTNING_TALKS') and lightning_talks_closed %}
+          <span class="list-group-item"><strong>Lightning Talk</strong> &ndash; A quick-fire (less than 10m) presentation. These are now full.</span>
+        {% endif %}
     </div>
 
     {% if current_user.is_authenticated %}

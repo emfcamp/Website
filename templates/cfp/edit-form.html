@@ -38,6 +38,17 @@
           We have a limited amount of funding available to make the EMF site look great.
           If you'd like to apply for a grant, let us know how much you'll need.
       {% endcall %}
+
+    {% elif proposal.type == 'lightning' %}
+      {{ render_field(form.slide_link, 9) }}
+        {% if full_lightning_sessions %}
+          The lightning talk sessions for {% if (full_lightning_sessions | length) > 1 -%}
+            {{ full_lightning_sessions[:-1] | join(', ') }} and {{ full_lightning_sessions[-1] }}
+          {%- else -%}
+            {{ full_lightning_sessions[0] }}
+          {% endif %} are now full.
+        {% endif %}
+      {{ render_field(form.session, 9) }}
     {% endif %}
 
     <div class="col-md-9 col-sm-offset-3 {% if proposal.state != 'new' -%} hidden {%- endif %}">
