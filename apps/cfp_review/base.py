@@ -23,6 +23,7 @@ from main import db, external_url
 from .majority_judgement import calculate_max_normalised_score
 from models.cfp import (
     Proposal,
+    LightningTalkProposal,
     CFPMessage,
     CFPVote,
     Venue,
@@ -43,6 +44,7 @@ from .forms import (
     UpdateWorkshopForm,
     UpdateYouthWorkshopForm,
     UpdateInstallationForm,
+    UpdateLightningTalkForm,
     UpdateVotesForm,
     SendMessageForm,
     CloseRoundForm,
@@ -277,17 +279,20 @@ def update_proposal(proposal_id):
     prop = Proposal.query.get_or_404(proposal_id)
     next_id = find_next_proposal_id(prop)
 
-    form = (
-        UpdateTalkForm()
-        if prop.type == "talk"
-        else UpdateWorkshopForm()
-        if prop.type == "workshop"
-        else UpdateYouthWorkshopForm()
-        if prop.type == "youthworkshop"
-        else UpdatePerformanceForm()
-        if prop.type == "performance"
-        else UpdateInstallationForm()
-    )
+    if prop.type == "talk":
+        form = UpdateTalkForm()
+    elif prop.type == "workshop":
+        form = UpdateWorkshopForm()
+    elif prop.type == "youthworkshop":
+        form = UpdateYouthWorkshopForm()
+    elif prop.type == "performance":
+        form = UpdatePerformanceForm()
+    elif prop.type == "installation":
+        form = UpdateInstallationForm()
+    elif prop.type == "lightning":
+        form = UpdateLightningTalkForm()
+    else:
+        raise Exception("Unknown cfp type {}".format(prop.type))
 
     # Process the POST
     if form.validate_on_submit():
@@ -383,6 +388,10 @@ def update_proposal(proposal_id):
     elif prop.type == "installation":
         form.size.data = prop.size
         form.funds.data = prop.funds
+
+    elif prop.type == "lightning":
+        form.session.data = prop.session
+        form.slide_link.data = prop.slide_link
 
     return render_template(
         "cfp_review/update_proposal.html", proposal=prop, form=form, next_id=next_id
@@ -1083,3 +1092,15 @@ def clashfinder():
             )
 
     return render_template("cfp_review/clashfinder.html", clashes=clashes)
+
+
+@cfp_review.route("/lightning-talks")
+@schedule_required
+def lightning_talks():
+    filter_query = {"type": "lightning"}
+    if "day" in request.args:
+        filter_query["session"] = request.args["day"]
+
+    proposals = LightningTalkProposal.query.filter_by(**filter_query).all()
+
+    return render_template("cfp_review/lightning_talks_list.html", proposals=proposals)

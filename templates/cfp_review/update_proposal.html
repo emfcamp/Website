@@ -52,14 +52,19 @@
         </dl>
         <h4>Scheduling</h4>
             <dl class="dl-horizontal">
-                {{ render_dl_field(form.hide_from_schedule) }}
-                {{ render_dl_field(form.allowed_venues) }}
-                {{ render_dl_field(form.allowed_times) }}
-                {{ render_dl_field(form.scheduled_duration) }}
-                {{ render_dl_field(form.scheduled_venue) }}
-                {{ render_dl_field(form.scheduled_time) }}
-                {{ render_dl_field(form.potential_venue) }}
-                {{ render_dl_field(form.potential_time) }}
+                {% if proposal.type == "lightning" %}
+                    {{ render_dl_field(form.session) }}
+                    {{ render_dl_field(form.slide_link) }}
+                {% else %}
+                    {{ render_dl_field(form.hide_from_schedule) }}
+                    {{ render_dl_field(form.allowed_venues) }}
+                    {{ render_dl_field(form.allowed_times) }}
+                    {{ render_dl_field(form.scheduled_duration) }}
+                    {{ render_dl_field(form.scheduled_venue) }}
+                    {{ render_dl_field(form.scheduled_time) }}
+                    {{ render_dl_field(form.potential_venue) }}
+                    {{ render_dl_field(form.potential_time) }}
+                {% endif %}
             </dl>
         {% if proposal.state in ('accepted', 'finished') %}
         <h4>User schedule published details</h4>
