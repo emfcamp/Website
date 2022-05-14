@@ -28,6 +28,7 @@ HUMAN_CFP_TYPES = {
     "workshop": "workshop",
     "youthworkshop": "youth workshop",
     "installation": "installation",
+    "lightning": "lightning talk",
 }
 
 # state: [allowed next state, ] pairs
@@ -190,6 +191,7 @@ DEFAULT_VENUES: dict[str, list[str]] = {
     "youthworkshop": ["Youth Workshop"],
     "performance": ["Stage B"],
     "installation": [],
+    "lightning": ["Stage B", "Stage C"],
 }
 
 VENUE_CAPACITY = {
@@ -790,6 +792,13 @@ class InstallationProposal(Proposal):
     human_type = HUMAN_CFP_TYPES["installation"]
     size = db.Column(db.String)
     funds = db.Column(db.String, nullable=True)
+
+
+class LightningTalkProposal(Proposal):
+    __mapper_args__ = {"polymorphic_identity": "lightning"}
+    human_type = HUMAN_CFP_TYPES["lightning"]
+    slide_link = db.Column(db.String, nullable=True)
+    session = db.Column(db.String, default="fri")
 
 
 class CFPMessage(BaseModel):
