@@ -541,6 +541,8 @@ class AcceptedForm(Form):
     pronouns = StringField("Pronouns")
     title = StringField("Title", [DataRequired()])
     description = TextAreaField("Description", [DataRequired()])
+    content_note = TextAreaField("Content Note(s)")
+    family_friendly = BooleanField("Family Friendly")
     age_range = StringField("Age Range")
     cost = StringField("Cost Per Attendee")
     participant_equipment = StringField("Attendee Equipment")
@@ -658,6 +660,8 @@ def finalise_proposal(proposal_id):
         proposal.published_pronouns = form.pronouns.data
         proposal.published_title = form.title.data
         proposal.published_description = form.description.data
+        proposal.content_note = form.content_note.data
+        proposal.family_friendly = form.family_friendly.data
         proposal.telephone_number = form.telephone_number.data
         proposal.eventphone_number = form.eventphone_number.data
 
@@ -693,6 +697,9 @@ def finalise_proposal(proposal_id):
         form.description.data = proposal.published_description
         form.telephone_number.data = proposal.telephone_number
         form.eventphone_number.data = proposal.eventphone_number
+
+        form.content_note.data = proposal.content_note
+        form.family_friendly.data = proposal.family_friendly
 
         form.may_record.data = proposal.may_record
         form.needs_laptop.data = proposal.needs_laptop
