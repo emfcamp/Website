@@ -382,6 +382,8 @@ class Proposal(BaseModel):
     may_record = db.Column(db.Boolean)
     needs_laptop = db.Column(db.Boolean)
     available_times = db.Column(db.String)
+    family_friendly = db.Column(db.Boolean, default=False)
+    content_note = db.Column(db.String, nullable=True)
 
     # Fields for scheduling
     hide_from_schedule = db.Column(db.Boolean, default=False, nullable=False)
