@@ -24,6 +24,7 @@ from .majority_judgement import calculate_max_normalised_score
 from models.cfp import (
     Proposal,
     LightningTalkProposal,
+    LIGHTNING_TALK_N_SLOTS,
     CFPMessage,
     CFPVote,
     Venue,
@@ -1101,6 +1102,17 @@ def lightning_talks():
     if "day" in request.args:
         filter_query["session"] = request.args["day"]
 
-    proposals = LightningTalkProposal.query.filter_by(**filter_query).all()
+    proposals = (
+        LightningTalkProposal.query.filter_by(**filter_query)
+        .filter(LightningTalkProposal.state != "withdrawn")
+        .all()
+    )
 
-    return render_template("cfp_review/lightning_talks_list.html", proposals=proposals)
+    remaining_lightning_slots = LightningTalkProposal.get_remaining_lightning_slots()
+
+    return render_template(
+        "cfp_review/lightning_talks_list.html",
+        proposals=proposals,
+        remaining_lightning_slots=remaining_lightning_slots,
+        total_slots=LIGHTNING_TALK_N_SLOTS,
+    )
