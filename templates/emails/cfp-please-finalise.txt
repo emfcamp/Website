@@ -4,7 +4,7 @@ Hi {{ proposal.user.name }},
 
 We still need some final information about your {{ proposal.human_type }} '{{ proposal.title }}'!
 
-You have been allocated a {{ proposal.scheduled_duration }} minute slot - if this isn't suitable, please get in touch with us immediately.{% if proposal.type == 'talk' %} Please note that while you are allowed on-stage Q&A, we would prefer it if you told the audience to meet you somewhere after to discuss it.{% endif %}
+You have been allocated a {{ proposal.scheduled_duration }} minute slot - if this isn't suitable, please get in touch with us immediately.{% if proposal.type == 'talk' %} Please note that we don't do on-stage Q&A - please ask the audience to meet you somewhere afterwards.{% endif %}
 
 We need you to finalise the details for your {{ proposal.human_type }} on our website. Most importantly you should tell us when you're available so that we don't accidentally schedule a slot when you're not around!
 
@@ -16,9 +16,6 @@ To summarise, we urgently need you to:
 
 * Let us know if a {{ proposal.scheduled_duration }} minute slot isn't suitable.
 * Fill in the form with your availability so we can schedule you.
-
-And less urgently:
-
 * Write a great description of your {{ proposal.human_type }} we can publish in the schedule!
 
 If you don't yet have EMF tickets, you can get them on this page:
