@@ -90,8 +90,7 @@ LENGTH_OPTIONS = [
 ]
 
 
-# LIGHTNING_TALK_N_SLOTS = 120 / 5  # 120 minutes in 5 minute segments
-LIGHTNING_TALK_N_SLOTS = 2  # FIXME£
+LIGHTNING_TALK_LENGTH = 5
 LIGHTNING_TALK_SESSIONS = {
     "fri": "Friday",
     "sat": "Saturday",
@@ -813,6 +812,9 @@ class LightningTalkProposal(Proposal):
     @classmethod
     def get_remaining_lightning_slots(cls):
         # Find which day's sessions still have spaces
+
+        slots = cls.get_total_lightning_talk_slots()
+
         day_counts = {
             day: count
             for (day, count) in cls.query.with_entities(
@@ -824,9 +826,26 @@ class LightningTalkProposal(Proposal):
             .all()
         }
         return {
-            day: (LIGHTNING_TALK_N_SLOTS - day_counts.get(day, 0))
+            day: (slots[day] - day_counts.get(day, 0))
             for day in LIGHTNING_TALK_SESSIONS.keys()
         }
+
+    @classmethod
+    def get_total_lightning_talk_slots(cls):
+        sessions = TalkProposal.query.filter(
+            TalkProposal.title.startswith("Lightning Talk"),
+            TalkProposal.state.in_(["accepted", "finished"]),
+        ).all()
+
+        slots = {}
+        for sess in sessions:
+            short_day = (
+                parse_date(sess.allowed_times.split(">")[0]).strftime("%a").lower()
+            )
+            # - 1 for slack
+            slots[short_day] = (sess.scheduled_duration / LIGHTNING_TALK_LENGTH) - 1
+
+        return slots
 
 
 class CFPMessage(BaseModel):

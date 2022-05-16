@@ -8,7 +8,7 @@
         <h4 class="panel-title">
             <a role="button" data-toggle="collapse" data-target="#searchPanel"
                 aria-controls="searchPanel" aria-expanded="true">
-                Filter by day ({{ remaining_lightning_slots.values() | sum }} of {{ 3*total_slots }} slots remain)
+                Filter by day ({{ remaining_lightning_slots.values() | sum | int }} of {{ total_slots.values() | sum | int }} slots remain)
             </a>
         </h4>
     </div>
@@ -16,9 +16,9 @@
     {%- if filtered %}in{% endif %}
         " id="searchPanel">
         <ul>
-            <li><a href="{{ url_for('.lightning_talks', day='fri') }}">Friday ({{ remaining_lightning_slots['fri'] }} slots remain)</a></li>
-            <li><a href="{{ url_for('.lightning_talks', day='sat') }}">Saturday ({{ remaining_lightning_slots['sat'] }} slots remain)</a></li>
-            <li><a href="{{ url_for('.lightning_talks', day='sun') }}">Sunday ({{ remaining_lightning_slots['sun'] }} slots remain)</a></li>
+            <li><a href="{{ url_for('.lightning_talks', day='fri') }}">Friday ({{ remaining_lightning_slots['fri'] | int }} slots remain)</a></li>
+            <li><a href="{{ url_for('.lightning_talks', day='sat') }}">Saturday ({{ remaining_lightning_slots['sat'] | int}} slots remain)</a></li>
+            <li><a href="{{ url_for('.lightning_talks', day='sun') }}">Sunday ({{ remaining_lightning_slots['sun'] | int}} slots remain)</a></li>
         </ul>
     </div>
 </div>
