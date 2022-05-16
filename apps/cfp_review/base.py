@@ -24,7 +24,6 @@ from .majority_judgement import calculate_max_normalised_score
 from models.cfp import (
     Proposal,
     LightningTalkProposal,
-    LIGHTNING_TALK_N_SLOTS,
     CFPMessage,
     CFPVote,
     Venue,
@@ -1114,5 +1113,5 @@ def lightning_talks():
         "cfp_review/lightning_talks_list.html",
         proposals=proposals,
         remaining_lightning_slots=remaining_lightning_slots,
-        total_slots=LIGHTNING_TALK_N_SLOTS,
+        total_slots=LightningTalkProposal.get_total_lightning_talk_slots(),
     )
