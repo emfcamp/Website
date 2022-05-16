@@ -826,7 +826,9 @@ class LightningTalkProposal(Proposal):
             .all()
         }
         return {
-            day: (slots[day] - day_counts.get(day, 0))
+            day: (
+                slots.get(day, (120 / LIGHTNING_TALK_LENGTH)) - day_counts.get(day, 0)
+            )
             for day in LIGHTNING_TALK_SESSIONS.keys()
         }
 
