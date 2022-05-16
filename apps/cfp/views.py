@@ -15,7 +15,6 @@ from wtforms.validators import DataRequired, ValidationError, URL
 from wtforms import BooleanField, StringField, SubmitField, TextAreaField, SelectField
 import collections
 
-from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
 from main import db, external_url
@@ -31,6 +30,7 @@ from models.cfp import (
     CFPMessage,
     LENGTH_OPTIONS,
     PROPOSAL_TIMESLOTS,
+    LIGHTNING_TALK_SESSIONS,
 )
 from ..common import feature_flag, feature_enabled, create_current_user
 from ..common.email import from_email
@@ -38,13 +38,6 @@ from ..common.forms import Form, TelField, EmailField
 from ..common.irc import irc_send
 
 from . import cfp
-
-LIGHTNING_TALK_N_SLOTS = 120 / 5  # 120 minutes in 5 minute segments
-LIGHTNING_TALK_SESSIONS = {
-    "fri": "Friday",
-    "sat": "Saturday",
-    "sun": "Sunday",
-}
 
 
 class ProposalForm(Form):
@@ -166,23 +159,6 @@ def get_cfp_type_form(cfp_type):
     return form
 
 
-def get_remaining_lightning_slots():
-    # Find which day's sessions still have spaces
-    day_counts = {
-        day: count
-        for (day, count) in LightningTalkProposal.query.with_entities(
-            LightningTalkProposal.session,
-            func.count(LightningTalkProposal.id),
-        )
-        .group_by(LightningTalkProposal.session)
-        .all()
-    }
-    return {
-        day: (LIGHTNING_TALK_N_SLOTS - day_counts.get(day, 0))
-        for day in LIGHTNING_TALK_SESSIONS.keys()
-    }
-
-
 @cfp.route("/cfp")
 @feature_flag("CFP")
 def main():
@@ -191,9 +167,10 @@ def main():
     if feature_enabled("CFP_CLOSED") and not ignore_closed:
         return render_template("cfp/closed.html")
 
-    lightning_talks_closed = (
-        all([i <= 0 for i in get_remaining_lightning_slots().values()]),
+    lightning_talks_closed = all(
+        [i <= 0 for i in LightningTalkProposal.get_remaining_lightning_slots().values()]
     )
+
     return render_template(
         "cfp/main.html",
         ignore_closed=ignore_closed,
@@ -217,14 +194,19 @@ def form(cfp_type="talk"):
         flash("We're not currently accepting Lightning Talks.")
         return redirect(url_for(".main"))
 
-    remaining_lightning_slots = get_remaining_lightning_slots()
+    remaining_lightning_slots = LightningTalkProposal.get_remaining_lightning_slots()
     # Require logged in users as you have to have a ticket to lightning talk
     if cfp_type == "lightning" and current_user.is_anonymous:
         return redirect(
             url_for("users.login", next=url_for(".form", cfp_type="lightning"))
         )
     elif cfp_type == "lightning":
-        if all([i <= 0 for i in get_remaining_lightning_slots().values()]):
+        if all(
+            [
+                i <= 0
+                for i in LightningTalkProposal.get_remaining_lightning_slots().values()
+            ]
+        ):
             flash("All lightning talk sessions are now full, sorry")
             return redirect(url_for(".main"))
         form.set_session_choices(remaining_lightning_slots)
@@ -485,7 +467,9 @@ def edit_proposal(proposal_id):
         elif proposal.type == "lightning":
             form.slide_link.data = proposal.slide_link
 
-            remaining_lightning_slots = get_remaining_lightning_slots()
+            remaining_lightning_slots = (
+                LightningTalkProposal.get_remaining_lightning_slots()
+            )
             # Make sure that their previously selected session is a choice
             if remaining_lightning_slots[proposal.session] <= 0:
                 remaining_lightning_slots[proposal.session] = 1

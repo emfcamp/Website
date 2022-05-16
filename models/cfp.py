@@ -89,6 +89,16 @@ LENGTH_OPTIONS = [
     ("> 45 mins", "Longer than 45 minutes"),
 ]
 
+
+# LIGHTNING_TALK_N_SLOTS = 120 / 5  # 120 minutes in 5 minute segments
+LIGHTNING_TALK_N_SLOTS = 2  # FIXME£
+LIGHTNING_TALK_SESSIONS = {
+    "fri": "Friday",
+    "sat": "Saturday",
+    "sun": "Sunday",
+}
+
+
 # What we consider these as when scheduling
 ROUGH_LENGTHS = {"> 45 mins": 50, "25-45 mins": 30, "10-25 mins": 20, "< 10 mins": 10}
 
@@ -799,6 +809,24 @@ class LightningTalkProposal(Proposal):
     human_type = HUMAN_CFP_TYPES["lightning"]
     slide_link = db.Column(db.String, nullable=True)
     session = db.Column(db.String, default="fri")
+
+    @classmethod
+    def get_remaining_lightning_slots(cls):
+        # Find which day's sessions still have spaces
+        day_counts = {
+            day: count
+            for (day, count) in cls.query.with_entities(
+                cls.session,
+                func.count(cls.id),
+            )
+            .filter(cls.state != "withdrawn")
+            .group_by(cls.session)
+            .all()
+        }
+        return {
+            day: (LIGHTNING_TALK_N_SLOTS - day_counts.get(day, 0))
+            for day in LIGHTNING_TALK_SESSIONS.keys()
+        }
 
 
 class CFPMessage(BaseModel):
