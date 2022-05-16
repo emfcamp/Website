@@ -10,7 +10,7 @@ from main import db, external_url
 from flask import session, abort, current_app as app, Markup
 from flask.json import jsonify
 from flask_login import login_user, current_user
-from werkzeug.wrappers import BaseResponse
+from werkzeug.wrappers import Response
 from werkzeug.exceptions import HTTPException
 from jinja2.utils import urlize
 
@@ -226,7 +226,7 @@ def json_response(f, *args, **kwargs):
         return jsonify(data), 500
 
     else:
-        if isinstance(response, (app.response_class, BaseResponse)):
+        if isinstance(response, (app.response_class, Response)):
             return response
 
         return jsonify(response), 200
