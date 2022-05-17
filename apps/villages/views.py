@@ -48,7 +48,7 @@ def register():
         db.session.commit()
 
         flash(
-            "Your village registration has been received, thanks! You can edit it here."
+            "Your village registration has been received, thanks! You can edit it below."
         )
         return redirect(url_for(".edit", year=event_year(), village_id=village.id))
 
