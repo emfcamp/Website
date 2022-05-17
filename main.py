@@ -192,8 +192,9 @@ def create_app(dev_server=False, config_override=None):
         response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
 
         csp = {
-            "script-src": ["'self'", "https://js.stripe.com"],
-            "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+            # unsafe-eval is required by the dhtmlx scheduler on the admin interface currently.
+            "script-src": ["'self'", "https://js.stripe.com", "'unsafe-eval'"],
+            "style-src": ["'self'", "'unsafe-inline'"],
             # Note: the below is more strict as it only allows inline styles in style=
             # attributes, however it's unsupported by Safari at this time...
             #  "style-src-attr": ["'unsafe-inline'"],
