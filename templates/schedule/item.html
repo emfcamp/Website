@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% from "schedule/_faves.html" import favourite_icons %}
+{% from "schedule/_proposal_icons.html" import proposal_icons %}
 {% block title %}{{ proposal.display_title }}{% endblock %}
 {% block body %}
 
@@ -7,9 +8,7 @@
 <h2>
   <small>
   {{ proposal.human_type | title }} by {{ proposal.published_names or proposal.user.name }} {% if proposal.published_pronouns %}({{proposal.published_pronouns}}){% endif %}
-  {% if not proposal.may_record and proposal.type == 'talk' and proposal.state == 'finished' %}
-  <span style="padding-left: 10px;" title="This talk will not be recorded">🎦 🚫 </span>
-  {% endif %}
+  {{ proposal_icons(proposal) }}
   </small>
 </h2>
 
@@ -22,6 +21,11 @@
    in <strong>{{ venue_name }}</strong>
    {% endif %}
 </p>
+{% endif %}
+
+{% if proposal.content_note %}
+<p><strong>This {{ proposal.human_type }} has the following content notes:</strong><br>
+  {{ proposal.content_note }} </p>
 {% endif %}
 
 <div class="well">
