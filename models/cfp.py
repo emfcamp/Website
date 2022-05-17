@@ -841,6 +841,8 @@ class LightningTalkProposal(Proposal):
 
         slots = {}
         for sess in sessions:
+            if not sess.allowed_times:
+                continue
             short_day = (
                 parse_date(sess.allowed_times.split(">")[0]).strftime("%a").lower()
             )
