@@ -42,8 +42,8 @@
 
 {% endblock %}
 {% block foot %}
-  <script src="{{ url_for('static', filename='js/dhtmlx_scheduler.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/dhtmlxscheduler_all_timed.js') }}"></script>
+  <script src="{{ url_for('static', filename='dhtmlx_scheduler.js') }}"></script>
+  <script src="{{ url_for('static', filename='dhtmlxscheduler_all_timed.js') }}"></script>
   <script nonce="{{csp_nonce}}">
 var emf_scheduler = {};
 (function(){

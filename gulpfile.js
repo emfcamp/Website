@@ -91,13 +91,11 @@ const main_js = (cb) => pump(jsBuild('main.js'), cb),
   line_up_js = (cb) => pump(jsBuild('line-up.js'), cb),
   schedule_js = (cb) => pump(jsBuild('schedule.js'), cb),
   volunteer_schedule_js = (cb) => pump(jsBuild('volunteer-schedule.js'), cb),
-  arrivals_js = (cb) => pump(jsBuild('arrivals.js'), cb),
-  dhtmlx_scheduler_js = (cb) => pump(jsBuild('dhtmlx_scheduler.js'), cb),
-  dhtmlxscheduler_all_timed = (cb) => pump(jsBuild('dhtmlxscheduler_all_timed.js'), cb);
+  arrivals_js = (cb) => pump(jsBuild('arrivals.js'), cb);
 
 
 function js(cb) {
-  gulp.parallel(main_js, line_up_js, schedule_js, volunteer_schedule_js, arrivals_js, dhtmlx_scheduler_js, dhtmlxscheduler_all_timed)(cb);
+  gulp.parallel(main_js, line_up_js, schedule_js, volunteer_schedule_js, arrivals_js)(cb);
 }
 
 function css(cb) {
