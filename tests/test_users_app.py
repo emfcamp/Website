@@ -4,7 +4,7 @@ login_link_re = r"(https?://[^\s/]*/login[^\s]*)"
 
 
 def test_login(user, client, outbox):
-    url = "/login?next=test"
+    url = "/login?next=/test"
     login_get = client.get(url)
     form_string = "Enter your email address and we'll email you a login link"
     assert form_string in login_get.data.decode("utf-8")
@@ -23,7 +23,7 @@ def test_login(user, client, outbox):
 
 
 def test_bad_login(user, client, outbox):
-    url = "/login?next=test"
+    url = "/login?next=/test"
 
     # Trying to login with an arbitrary email should look the same
     # as doing so with a valid email.
