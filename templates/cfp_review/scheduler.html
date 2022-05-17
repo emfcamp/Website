@@ -51,8 +51,10 @@ var emf_scheduler = {};
   var scheduleData = {{ schedule_data | tojson }},
     venues = {{ venues | tojson }},
     is_anonymous = {% if current_user.is_anonymous -%} true {%- else -%} false {%- endif %},
-    start_date = new Date(2022, 6, 2),
-    end_date = new Date(2022, 6, 5),
+    // THE MONTH ON THESE DATE OBJECTS IS OFFSET BY ONE
+    // WHAT THE FUCK
+    start_date = new Date(2022, 5, 2),
+    end_date = new Date(2022, 5, 5),
     venue_dict = {},
     day_format = "%D, %j",   // e.g. Friday, 5th
     day_formatter = scheduler.date.date_to_str(day_format),
