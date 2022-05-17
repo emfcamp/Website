@@ -361,6 +361,7 @@ def update_proposal(proposal_id):
     form.arrival_period.data = prop.arrival_period
     form.departure_period.data = prop.departure_period
     form.telephone_number.data = prop.telephone_number
+    form.eventphone_number.data = prop.eventphone_number
     form.may_record.data = prop.may_record
     form.needs_laptop.data = prop.needs_laptop
     form.available_times.data = prop.available_times

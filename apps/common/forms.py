@@ -61,6 +61,11 @@ class TelInput(Input):
 class TelField(StringField):
     widget = TelInput()
 
+    def __init__(self, *args, **kwargs):
+        self.min_length = kwargs.pop("min_length", 8)
+        self.max_length = kwargs.pop("max_length", 20)
+        StringField.__init__(self, *args, **kwargs)
+
     def pre_validate(form, field):
         if re.search(r"^\s*$", form.data):
             # Allow empty field or only whitespace in field, this can be handled by Required()
@@ -71,8 +76,10 @@ class TelField(StringField):
                 "A telephone number may only contain numbers, spaces or dashes."
             )
 
-        if not 7 < len(form.data) < 21:
-            raise ValidationError("A telephone number must be between 8 and 20 digits.")
+        if not form.min_length <= len(form.data) <= form.max_length:
+            raise ValidationError(
+                f"Must be between {form.min_length} and {form.max_length} digits."
+            )
 
 
 class JSONField(StringField):

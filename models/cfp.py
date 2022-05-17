@@ -378,6 +378,7 @@ class Proposal(BaseModel):
     arrival_period = db.Column(db.String)
     departure_period = db.Column(db.String)
     telephone_number = db.Column(db.String)
+    eventphone_number = db.Column(db.String)
     may_record = db.Column(db.Boolean)
     needs_laptop = db.Column(db.Boolean)
     available_times = db.Column(db.String)
@@ -438,6 +439,7 @@ class Proposal(BaseModel):
             "published_pronouns",
             "arrival_period",
             "departure_period",
+            "eventphone_number",
             "telephone_number",
             "may_record",
             "needs_laptop",

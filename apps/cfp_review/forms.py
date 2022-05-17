@@ -48,6 +48,7 @@ class UpdateProposalForm(Form):
     arrival_period = StringField("Arrival time")
     departure_period = StringField("Departure time")
     telephone_number = StringField("Telephone")
+    eventphone_number = StringField("On-site extension")
     may_record = BooleanField("May record")
     needs_laptop = RadioField(
         "Needs laptop",
@@ -105,6 +106,7 @@ class UpdateProposalForm(Form):
         proposal.arrival_period = self.arrival_period.data
         proposal.departure_period = self.departure_period.data
         proposal.telephone_number = self.telephone_number.data
+        proposal.eventphone_number = self.eventphone_number.data
         proposal.may_record = self.may_record.data
         proposal.needs_laptop = self.needs_laptop.data
         proposal.available_times = self.available_times.data

@@ -88,6 +88,7 @@
         <h4>User scheduling information</h4>
             <dl class="dl-horizontal">
                 {{ render_dl_field(form.telephone_number) }}
+                {{ render_dl_field(form.eventphone_number) }}
                 {% if proposal.type == 'talk' %}
                     {{ render_dl_field(form.may_record) }}
                     {{ render_radio_field(form.needs_laptop) }}

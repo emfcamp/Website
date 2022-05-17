@@ -545,6 +545,7 @@ class AcceptedForm(Form):
     cost = StringField("Cost Per Attendee")
     participant_equipment = StringField("Attendee Equipment")
     telephone_number = TelField("Telephone")
+    eventphone_number = TelField("On-site extension", min_length=3, max_length=5)
 
     may_record = BooleanField("I am happy for this to be recorded", default=True)
     needs_laptop = BooleanField("I will need to borrow a laptop for slides")
@@ -658,6 +659,7 @@ def finalise_proposal(proposal_id):
         proposal.published_title = form.title.data
         proposal.published_description = form.description.data
         proposal.telephone_number = form.telephone_number.data
+        proposal.eventphone_number = form.eventphone_number.data
 
         proposal.may_record = form.may_record.data
         proposal.needs_laptop = form.needs_laptop.data
@@ -690,6 +692,7 @@ def finalise_proposal(proposal_id):
         form.title.data = proposal.published_title
         form.description.data = proposal.published_description
         form.telephone_number.data = proposal.telephone_number
+        form.eventphone_number.data = proposal.eventphone_number
 
         form.may_record.data = proposal.may_record
         form.needs_laptop.data = proposal.needs_laptop
