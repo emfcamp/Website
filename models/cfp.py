@@ -89,7 +89,6 @@ LENGTH_OPTIONS = [
     ("> 45 mins", "Longer than 45 minutes"),
 ]
 
-
 LIGHTNING_TALK_LENGTH = 5
 LIGHTNING_TALK_SESSIONS = {
     "fri": "Friday",
@@ -97,6 +96,13 @@ LIGHTNING_TALK_SESSIONS = {
     "sun": "Sunday",
 }
 
+# Options for age range displayed to the user
+AGE_RANGE_OPTIONS = [
+    ("All ages", "All ages"),
+    ("Children (0-12)", "Children (0-12)"),
+    ("Teens (13-18)", "Teens (13-18)"),
+    ("Adult Content (18+)", "Adult Content (18+)"),
+]
 
 # What we consider these as when scheduling
 ROUGH_LENGTHS = {"> 45 mins": 50, "25-45 mins": 30, "10-25 mins": 20, "< 10 mins": 10}
@@ -347,6 +353,7 @@ class Proposal(BaseModel):
     needs_money = db.Column(db.Boolean, nullable=False, default=False)
     one_day = db.Column(db.Boolean, nullable=False, default=False)
     has_rejected_email = db.Column(db.Boolean, nullable=False, default=False)
+    user_scheduled = db.Column(db.Boolean, nullable=False, default=False)
 
     # References to this table
     messages = db.relationship("CFPMessage", backref="proposal")
@@ -598,7 +605,9 @@ class Proposal(BaseModel):
 
     def get_allowed_venues(self) -> list["Venue"]:
         # FIXME: this should reference a foreign key instead
-        if self.allowed_venues:
+        if self.user_scheduled:
+            venue_names = [self.venue.name]
+        elif self.allowed_venues:
             venue_names = [v.strip() for v in self.allowed_venues.split(",")]
         else:
             venue_names = DEFAULT_VENUES[self.type]
@@ -665,6 +674,9 @@ class Proposal(BaseModel):
         )
 
     def get_allowed_time_periods_with_default(self):
+        if self.user_scheduled:
+            return cfp_period(self.start_date, self.end_date)
+
         allowed_time_periods = self.get_allowed_time_periods()
         if not allowed_time_periods:
             allowed_time_periods = [
@@ -692,6 +704,18 @@ class Proposal(BaseModel):
             )
         else:
             return self.end_date > other.start_date and other.end_date > self.start_date
+
+    def get_conflicting_content(self) -> list["Proposal"]:
+        # I gave up trying to do this as SQL via SQLAlchemy's filter expressions.
+        return [
+            p
+            for p in Proposal.query.filter(
+                Proposal.id != self.id,
+                Proposal.scheduled_venue_id == self.scheduled_venue_id,
+                Proposal.scheduled_time >= self.start_date,
+            ).all()
+            if p.overlaps_with(self)
+        ]
 
     @property
     def start_date(self):
@@ -740,6 +764,9 @@ class Proposal(BaseModel):
 
     @property
     def display_cost(self) -> str:
+        if self.cost is None and self.published_cost is None:
+            return ""
+
         cost = self.cost.strip()
         if self.published_cost is not None:
             cost = self.published_cost.strip()
@@ -756,16 +783,22 @@ class Proposal(BaseModel):
             return cost
 
     @property
-    def display_age_range(self):
+    def display_age_range(self) -> str:
         if self.published_age_range is not None:
             return self.published_age_range.strip()
-        return self.age_range.strip()
+        if self.age_range is not None:
+            return self.age_range.strip()
+
+        return ""
 
     @property
-    def display_participant_equipment(self):
+    def display_participant_equipment(self) -> str:
         if self.published_participant_equipment is not None:
             return self.published_participant_equipment.strip()
-        return self.participant_equipment.strip()
+        if self.participant_equipment is not None:
+            return self.participant_equipment.strip()
+
+        return ""
 
 
 class PerformanceProposal(Proposal):
@@ -850,6 +883,15 @@ class LightningTalkProposal(Proposal):
             slots[short_day] = (sess.scheduled_duration / LIGHTNING_TALK_LENGTH) - 1
 
         return slots
+
+
+PYTHON_CFP_TYPES = {
+    "performance": PerformanceProposal,
+    "talk": TalkProposal,
+    "workshop": WorkshopProposal,
+    "youthworkshop": YouthWorkshopProposal,
+    "installation": InstallationProposal,
+}
 
 
 class CFPMessage(BaseModel):
@@ -973,11 +1015,20 @@ class Venue(BaseModel):
     __export_data__ = False
 
     id = db.Column(db.Integer, primary_key=True)
+    village_id = db.Column(
+        db.Integer, db.ForeignKey("village.id"), nullable=True, default=None
+    )
     name = db.Column(db.String, nullable=False)
     type = db.Column(db.String, nullable=True)
     priority = db.Column(db.Integer, nullable=True, default=0)
     lat = db.Column(db.Float)
     lon = db.Column(db.Float)
+    scheduled_content_only = db.Column(db.Boolean)
+    village = db.relationship(
+        "Village",
+        backref="venues",
+        primaryjoin="Village.id == Venue.village_id",
+    )
 
     __table_args__ = (UniqueConstraint("name", name="_venue_name_uniq"),)
 
@@ -992,6 +1043,7 @@ db.Index(
 
 __all__ = [
     "HUMAN_CFP_TYPES",
+    "PYTHON_CFP_TYPES",
     "CFP_STATES",
     "ORDERED_STATES",
     "VOTE_STATES",

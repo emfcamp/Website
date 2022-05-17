@@ -3,60 +3,78 @@
 {% block title %}My Account{% endblock %}
 {% block body %}
 {% include "account/_nav.html" %}
-<p>You're logged in as <strong>{{current_user.name}}</strong> (<strong>{{ current_user.email }}</strong>).
-    <a href="{{url_for('.details')}}">Edit your account details</a>.</p>
+<p>
+  You're logged in as <strong>{{current_user.name}}</strong> (<strong>{{ current_user.email }}</strong>).
+    <a href="{{url_for('.details')}}">Edit your account details</a>.
+</p>
 <div class="row">
   <div class="col-md-6">
     <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">Villages</h3>
-    </div>
-  {% if current_user.village %}
-    <div class="panel-body">
-      You're a member of the <strong>{{current_user.village.village.name}}</strong> village. 
-      {% if current_user.village.admin %}
-        <a href="{{url_for('villages.edit', year=event_year, village_id=current_user.village.village.id)}}">
-          Edit this village</a>.
-      {% endif %}
-    </div>
-  {% else %}
-    <div class="panel-body">
-      <p>Village registration is open! If you're planning on camping with a group of people,
-      you can let us know about it by <a href="{{ url_for("villages.register") }}">registering your village</a>.
-      This will help us try to make sure you have the space and facilities you need.</p>
-      <p>You can also see a <a href="{{url_for("villages.main", year=event_year)}}">list of registered villages</a>.</p>
-    </div>
-  {% endif %}
+        <div class="panel-heading">
+          <h3 class="panel-title">Villages</h3>
+        </div>
+        <div class="panel-body">
+          {% if current_user.village %}
+            You're a member of the <strong>{{current_user.village.village.name}}</strong> village. 
+            {% if current_user.village.admin %}
+              <a href="{{url_for('villages.edit', year=event_year, village_id=current_user.village.village.id)}}">
+                Edit this village</a>.
+            {% endif %}
+          {% else %}
+            <p>Village registration is open! If you're planning on camping with a group of people,
+            you can let us know about it by <a href="{{ url_for("villages.register") }}">registering your village</a>.
+            This will help us try to make sure you have the space and facilities you need.</p>
+            <p>You can also see a <a href="{{url_for("villages.main", year=event_year)}}">list of registered villages</a>.</p>
+          {% endif %}
+        </div>
     </div>
   </div>
 
   {% if feature_enabled('CFP') and not feature_enabled('CFP_CLOSED') %}
-  <div class="col-md-6">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3 class="panel-title">Call for Participation</h3>
-      </div>
-      <div class="panel-body">
-        Our Call for Participation is now open!<br>
-        If you want to give a talk, workshop, or performance at EMF {{event_year}},
-        you can now <a href="{{url_for('cfp.main')}}">submit your proposal</a>.
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Call for Participation</h3>
+        </div>
+        <div class="panel-body">
+          Our Call for Participation is now open!<br>
+          If you want to give a talk, workshop, or performance at EMF {{event_year}},
+          you can now <a href="{{url_for('cfp.main')}}">submit your proposal</a>.
+        </div>
       </div>
     </div>
-  </div>
   {% endif %}
-  
+
+  {% if feature_enabled('LINE_UP') %}
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Your Content</h3>
+        </div>
+        <div class="panel-body">
+          <p>
+            You can help other people find you or your village's talks, workshops, installations, and gatherings by
+            adding them to the schedule. If you're part of a village you'll be able to schedule content occuring their,
+            and anyone can arrange gatherings in the main bar or lounge.
+          </p>
+          <p><a href="{{url_for('schedule.attendee_content')}}">Manage your content</a></p>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
   {% if current_user.owned_tickets|length > 1 %}
-  <div class="col-md-6">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3 class="panel-title">Transfer Tickets</h3>
-      </div>
-      <div class="panel-body">
-        You have more than one ticket assigned to you. We recommend you <a href="{{ url_for(".purchases") }}">transfer tickets</a> to
-        whoever will be using them, so they can receive updates from us and log in.
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Transfer Tickets</h3>
+        </div>
+        <div class="panel-body">
+          You have more than one ticket assigned to you. We recommend you <a href="{{ url_for(".purchases") }}">transfer tickets</a> to
+          whoever will be using them, so they can receive updates from us and log in.
+        </div>
       </div>
     </div>
-  </div>
   {% endif %}
-</div>
+  </div>
 {% endblock %}

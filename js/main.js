@@ -88,3 +88,31 @@ $(() => {
     ev.stopPropagation();
   });
 });
+
+$(() => {
+  function displayBarHelpIfRequired() {
+    let value = $('#user_content_form #venue option:selected').text();
+    let flaggedVenues = ['Main Bar', 'Lounge'];
+    if (flaggedVenues.includes(value)) {
+      $('.bar-content').show();
+    } else {
+      $('.bar-content').hide();
+    }
+  }
+
+  $('#user_content_form #venue').on('change', displayBarHelpIfRequired);
+  displayBarHelpIfRequired();
+
+  function displayWorkshopFieldsIfRequired() {
+    let value = $('#user_content_form #type').val();
+
+    if (value == 'workshop' || value == 'youthworkshop') {
+      $('.workshop-fields').show();
+    } else {
+      $('.workshop-fields').hide();
+    }
+  }
+
+  $('#user_content_form #type').on('change', displayWorkshopFieldsIfRequired);
+  displayWorkshopFieldsIfRequired();
+});

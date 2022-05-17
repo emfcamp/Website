@@ -1,0 +1,45 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block title %}Your Content{% endblock %}
+{% block body %}
+    <h2>Your Content</h2>
+    {% if content|length > 0 %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Type</th>
+                <th>Location</th>
+                <th>Start</th>
+                <th>End</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in content %}
+            <tr>
+                <td>{{ p.display_title }}</td>
+                <td>{{ p.human_type | capitalize }}</td>
+                <td>{{ p.scheduled_venue.name }}</td>
+                <td>{{ p.start_date.strftime("%a %H:%M") }}</td>
+                <td>{{ p.end_date.strftime("%a %H:%M") }}</td>
+                <td><a href="{{ url_for("schedule.attendee_content_edit", id=p.id) }}">Edit</a></td>
+                <td><a href="{{ url_for("schedule.attendee_content_delete", id=p.id) }}">Delete</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>You haven't posted any content yet.</p>
+    {% endif %}
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Add Content</h3>
+        </div>
+        <div class="panel-body">
+            {% include "schedule/attendee_content/_form.html" %}
+        </div>
+    </div>
+{% endblock %}

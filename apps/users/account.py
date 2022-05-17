@@ -37,6 +37,7 @@ def account():
             "We'd also appreciate it if you could fill in our diversity survey."
         )
         return redirect(url_for(".details"))
+
     return render_template("account/main.html")
 
 

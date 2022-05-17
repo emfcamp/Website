@@ -131,6 +131,11 @@ def filter_proposal_request():
             )
         )
 
+    show_user_scheduled = request.args.get("show_user_scheduled", type=bool_qs)
+    if show_user_scheduled is None or show_user_scheduled is False:
+        filtered = False
+        proposal_query = proposal_query.filter_by(user_scheduled=False)
+
     sort_dict = get_proposal_sort_dict(request.args)
     proposal_query = proposal_query.options(joinedload(Proposal.user)).options(
         joinedload("user.owned_tickets")
@@ -360,6 +365,7 @@ def update_proposal(proposal_id):
     form.needs_laptop.data = prop.needs_laptop
     form.available_times.data = prop.available_times
 
+    form.user_scheduled.data = prop.user_scheduled
     form.hide_from_schedule.data = prop.hide_from_schedule
     form.allowed_venues.data = prop.get_allowed_venues_serialised()
     form.allowed_times.data = prop.get_allowed_time_periods_serialised()

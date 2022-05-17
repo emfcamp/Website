@@ -47,6 +47,7 @@ class ProposalForm(Form):
     description = TextAreaField("Description", [DataRequired()])
     requirements = TextAreaField("Additional Info")
     needs_help = BooleanField("Needs help")
+    user_scheduled = BooleanField("User scheduled")
     notice_required = SelectField(
         "Required notice",
         default="1 week",
