@@ -53,7 +53,7 @@ var emf_scheduler = {};
     is_anonymous = {% if current_user.is_anonymous -%} true {%- else -%} false {%- endif %},
     // THE MONTH ON THESE DATE OBJECTS IS OFFSET BY ONE
     // WHAT THE FUCK
-    start_date = new Date(2022, 5, 2),
+    start_date = new Date(2022, 5, 3),
     end_date = new Date(2022, 5, 5),
     venue_dict = {},
     day_format = "%D, %j",   // e.g. Friday, 5th
@@ -96,7 +96,7 @@ var emf_scheduler = {};
     name:"emf_weekend",
     property:"venue",
     list:venues,
-    days: 4,
+    days: 3,
   });
 
   scheduler.config.separate_short_events = true;
