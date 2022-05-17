@@ -168,23 +168,19 @@ def proposals():
 
 def send_email_for_proposal(proposal, reason="still-considered", from_address=None):
     if reason == "accepted":
-        app.logger.info("Sending accepted email for proposal %s", proposal.id)
         subject = 'Your EMF proposal "%s" has been accepted!' % proposal.title
         template = "cfp_review/email/accepted_msg.txt"
 
     elif reason == "still-considered":
-        app.logger.info("Sending still-considered email for proposal %s", proposal.id)
         subject = 'We\'re still considering your EMF proposal "%s"' % proposal.title
         template = "cfp_review/email/not_accepted_msg.txt"
 
     elif reason == "rejected":
-        app.logger.info("Sending rejected email for proposal %s", proposal.id)
         proposal.has_rejected_email = True
         subject = 'Your EMF proposal "%s" was not accepted.' % proposal.title
         template = "emails/cfp-rejected.txt"
 
     elif reason == "check-your-slot":
-        app.logger.info("Sending check-your-slot email for proposal %s", proposal.id)
         subject = (
             "Your EMF proposal '%s' has been scheduled, please check your slot"
             % proposal.title
@@ -192,12 +188,10 @@ def send_email_for_proposal(proposal, reason="still-considered", from_address=No
         template = "emails/cfp-check-your-slot.txt"
 
     elif reason == "please-finalise":
-        app.logger.info("Sending please-finalise email for proposal %s", proposal.id)
         subject = "We need information about your EMF proposal '%s'" % proposal.title
         template = "emails/cfp-please-finalise.txt"
 
     elif reason == "reserve-list":
-        app.logger.info("Sending reserve-list email for proposal %s", proposal.id)
         subject = "Your EMF proposal '%s', and EMF tickets" % proposal.title
         template = "emails/cfp-reserve-list.txt"
 
