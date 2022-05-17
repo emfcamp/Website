@@ -365,6 +365,8 @@ def update_proposal(proposal_id):
     form.may_record.data = prop.may_record
     form.needs_laptop.data = prop.needs_laptop
     form.available_times.data = prop.available_times
+    form.content_note.data = prop.content_note
+    form.family_friendly.data = prop.family_friendly
 
     form.user_scheduled.data = prop.user_scheduled
     form.hide_from_schedule.data = prop.hide_from_schedule

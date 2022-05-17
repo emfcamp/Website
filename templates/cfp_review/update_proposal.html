@@ -79,6 +79,8 @@
                 {{ render_dl_field(form.published_pronouns) }}
                 {{ render_dl_field(form.published_title) }}
                 {{ render_dl_field(form.published_description, rows=4) }}
+                {{ render_dl_field(form.content_note) }}
+                {{ render_dl_field(form.family_friendly, rows=4) }}
                 {% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}
                     {{ render_dl_field(form.published_age_range) }}
                     {{ render_dl_field(form.published_cost) }}

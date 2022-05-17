@@ -61,6 +61,9 @@ class UpdateProposalForm(Form):
     )
     available_times = StringField("Available times")
 
+    content_note = StringField("Content note")
+    family_friendly = BooleanField("Family Friendly")
+
     hide_from_schedule = BooleanField("Hide from schedule")
     allowed_venues = StringField("Allowed Venues")
     allowed_times = TextAreaField("Allowed Time Periods")
@@ -110,6 +113,8 @@ class UpdateProposalForm(Form):
         proposal.may_record = self.may_record.data
         proposal.needs_laptop = self.needs_laptop.data
         proposal.available_times = self.available_times.data
+        proposal.content_note = self.content_note.data
+        proposal.family_friendly = self.family_friendly.data
 
         if self.scheduled_duration.data:
             proposal.scheduled_duration = self.scheduled_duration.data
