@@ -28,6 +28,7 @@ HUMAN_CFP_TYPES = {
     "workshop": "workshop",
     "youthworkshop": "youth workshop",
     "installation": "installation",
+    "lightning": "lightning talk",
 }
 
 # state: [allowed next state, ] pairs
@@ -87,6 +88,15 @@ LENGTH_OPTIONS = [
     ("25-45 mins", "25-45 minutes"),
     ("> 45 mins", "Longer than 45 minutes"),
 ]
+
+
+LIGHTNING_TALK_LENGTH = 5
+LIGHTNING_TALK_SESSIONS = {
+    "fri": "Friday",
+    "sat": "Saturday",
+    "sun": "Sunday",
+}
+
 
 # What we consider these as when scheduling
 ROUGH_LENGTHS = {"> 45 mins": 50, "25-45 mins": 30, "10-25 mins": 20, "< 10 mins": 10}
@@ -190,6 +200,7 @@ DEFAULT_VENUES: dict[str, list[str]] = {
     "youthworkshop": ["Youth Workshop"],
     "performance": ["Stage B"],
     "installation": [],
+    "lightning": ["Stage B", "Stage C"],
 }
 
 VENUE_CAPACITY = {
@@ -790,6 +801,53 @@ class InstallationProposal(Proposal):
     human_type = HUMAN_CFP_TYPES["installation"]
     size = db.Column(db.String)
     funds = db.Column(db.String, nullable=True)
+
+
+class LightningTalkProposal(Proposal):
+    __mapper_args__ = {"polymorphic_identity": "lightning"}
+    human_type = HUMAN_CFP_TYPES["lightning"]
+    slide_link = db.Column(db.String, nullable=True)
+    session = db.Column(db.String, default="fri")
+
+    @classmethod
+    def get_remaining_lightning_slots(cls):
+        # Find which day's sessions still have spaces
+
+        slots = cls.get_total_lightning_talk_slots()
+
+        day_counts = {
+            day: count
+            for (day, count) in cls.query.with_entities(
+                cls.session,
+                func.count(cls.id),
+            )
+            .filter(cls.state != "withdrawn")
+            .group_by(cls.session)
+            .all()
+        }
+        return {
+            day: (
+                slots.get(day, (120 / LIGHTNING_TALK_LENGTH)) - day_counts.get(day, 0)
+            )
+            for day in LIGHTNING_TALK_SESSIONS.keys()
+        }
+
+    @classmethod
+    def get_total_lightning_talk_slots(cls):
+        sessions = TalkProposal.query.filter(
+            TalkProposal.title.startswith("Lightning Talk"),
+            TalkProposal.state.in_(["accepted", "finished"]),
+        ).all()
+
+        slots = {}
+        for sess in sessions:
+            short_day = (
+                parse_date(sess.allowed_times.split(">")[0]).strftime("%a").lower()
+            )
+            # - 1 for slack
+            slots[short_day] = (sess.scheduled_duration / LIGHTNING_TALK_LENGTH) - 1
+
+        return slots
 
 
 class CFPMessage(BaseModel):

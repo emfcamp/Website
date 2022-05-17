@@ -1,0 +1,54 @@
+{% extends "cfp_review/base.html" %}
+{% block title %}Lightning Talks{% endblock %}
+{% block body %}
+<h2>Lightning Talks</h2>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a role="button" data-toggle="collapse" data-target="#searchPanel"
+                aria-controls="searchPanel" aria-expanded="true">
+                Filter by day ({{ remaining_lightning_slots.values() | sum | int }} of {{ total_slots.values() | sum | int }} slots remain)
+            </a>
+        </h4>
+    </div>
+    <div class="panel-body collapse
+    {%- if filtered %}in{% endif %}
+        " id="searchPanel">
+        <ul>
+            <li><a href="{{ url_for('.lightning_talks', day='fri') }}">Friday ({{ remaining_lightning_slots['fri'] | int }} slots remain)</a></li>
+            <li><a href="{{ url_for('.lightning_talks', day='sat') }}">Saturday ({{ remaining_lightning_slots['sat'] | int}} slots remain)</a></li>
+            <li><a href="{{ url_for('.lightning_talks', day='sun') }}">Sunday ({{ remaining_lightning_slots['sun'] | int}} slots remain)</a></li>
+        </ul>
+    </div>
+</div>
+<div>
+    There may be withdrawn lightning talks, you can see them <a href="{{ url_for('.proposals', state='withdrawn', type='lightning') }}">here</a>
+</div>
+<div>&nbsp;</div>
+
+
+<table class="table table-condensed">
+    <tr>
+        {% if not request.args.get('reverse') %}
+            {% set qs_reverse_new=True %}
+        {% else %}
+            {% set qs_reverse_new=None %}
+        {% endif %}
+        <th class="col-md-1">Date</th>
+        <th>User</th>
+        <th>Title</th>
+        <th>Slides</th>
+    </tr>
+    {% for prop in proposals | sort(attribute='session,user.name')%}
+        <tr>
+            <td>{{ prop.session }}</td>
+            <td><a href="{{ url_for('admin.user', user_id=prop.user.id ) }}">{{prop.user.name}}</a></td>
+            <td><a href="{{ url_for('.update_proposal', proposal_id=prop.id, **full_qs) }}">{{prop.published_title or prop.title}}</a></td>
+            <td><a href="{{ prop.slide_link }}">{{ prop.slide_link }}</a></td>
+        </tr>
+    {% else %}
+        <tr><td colspan="5" class="text-center">No proposals found</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

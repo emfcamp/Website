@@ -11,7 +11,7 @@ from flask import (
 )
 from flask_login import current_user
 from flask_mailman import EmailMessage
-from wtforms.validators import DataRequired, ValidationError
+from wtforms.validators import DataRequired, ValidationError, URL
 from wtforms import BooleanField, StringField, SubmitField, TextAreaField, SelectField
 import collections
 
@@ -25,10 +25,12 @@ from models.cfp import (
     YouthWorkshopProposal,
     PerformanceProposal,
     InstallationProposal,
+    LightningTalkProposal,
     Proposal,
     CFPMessage,
     LENGTH_OPTIONS,
     PROPOSAL_TIMESLOTS,
+    LIGHTNING_TALK_SESSIONS,
 )
 from ..common import feature_flag, feature_enabled, create_current_user
 from ..common.email import from_email
@@ -126,6 +128,20 @@ class InstallationProposalForm(ProposalForm):
     )
 
 
+class LightningTalkProposalForm(ProposalForm):
+    model = LightningTalkProposal
+    slide_link = StringField("Link to your slides (PDF only)", [DataRequired(), URL()])
+    # Choices for session field generated in line
+    session = SelectField("Choose the session you'd like to present at")
+
+    def set_session_choices(self, remaining_lightning_slots):
+        self.session.choices = []
+        for (day_id, day_count) in remaining_lightning_slots.items():
+            if day_count <= 0:
+                continue
+            self.session.choices.append((day_id, LIGHTNING_TALK_SESSIONS[day_id]))
+
+
 def get_cfp_type_form(cfp_type):
     form = None
     if cfp_type == "talk":
@@ -138,6 +154,8 @@ def get_cfp_type_form(cfp_type):
         form = YouthWorkshopProposalForm()
     elif cfp_type == "installation":
         form = InstallationProposalForm()
+    elif cfp_type == "lightning":
+        form = LightningTalkProposalForm()
     return form
 
 
@@ -149,7 +167,15 @@ def main():
     if feature_enabled("CFP_CLOSED") and not ignore_closed:
         return render_template("cfp/closed.html")
 
-    return render_template("cfp/main.html", ignore_closed=ignore_closed)
+    lightning_talks_closed = all(
+        [i <= 0 for i in LightningTalkProposal.get_remaining_lightning_slots().values()]
+    )
+
+    return render_template(
+        "cfp/main.html",
+        ignore_closed=ignore_closed,
+        lightning_talks_closed=lightning_talks_closed,
+    )
 
 
 @cfp.route("/cfp/<string:cfp_type>", methods=["GET", "POST"])
@@ -163,6 +189,31 @@ def form(cfp_type="talk"):
 
     if feature_enabled("CFP_CLOSED") and not ignore_closed:
         return render_template("cfp/closed.html", cfp_type=cfp_type)
+
+    if (
+        cfp_type == "lightning"
+        and not feature_enabled("LIGHTNING_TALKS")
+        and not current_user.has_permission("cfp_admin")
+    ):
+        flash("We're not currently accepting Lightning Talks.")
+        return redirect(url_for(".main"))
+
+    remaining_lightning_slots = LightningTalkProposal.get_remaining_lightning_slots()
+    # Require logged in users as you have to have a ticket to lightning talk
+    if cfp_type == "lightning" and current_user.is_anonymous:
+        return redirect(
+            url_for("users.login", next=url_for(".form", cfp_type="lightning"))
+        )
+    elif cfp_type == "lightning":
+        if all(
+            [
+                i <= 0
+                for i in LightningTalkProposal.get_remaining_lightning_slots().values()
+            ]
+        ):
+            flash("All lightning talk sessions are now full, sorry")
+            return redirect(url_for(".main"))
+        form.set_session_choices(remaining_lightning_slots)
 
     # If the user is already logged in set their name & email for the form
     if current_user.is_authenticated:
@@ -224,6 +275,25 @@ def form(cfp_type="talk"):
             cfp.size = form.size.data
             cfp.funds = form.funds.data
 
+        elif cfp_type == "lightning":
+            if remaining_lightning_slots[form.session.data] <= 0:
+                # Manually set this because otherwise we need to pass the
+                # remaining_lightning_slots object to validate
+                form.errors[
+                    "sessions"
+                ] = "That session is now full, sorry. Please select a different day"
+                return render_template(
+                    "cfp/new.html",
+                    cfp_type=cfp_type,
+                    form=form,
+                    has_errors=bool(form.errors),
+                    ignore_closed=ignore_closed,
+                )
+
+            cfp = LightningTalkProposal()
+            cfp.slide_link = form.slide_link.data
+            cfp.session = form.session.data
+
         cfp.user_id = current_user.id
 
         cfp.title = form.title.data
@@ -254,12 +324,19 @@ def form(cfp_type="talk"):
             )
         return redirect(url_for(".complete"))
 
+    full_lightning_sessions = [
+        LIGHTNING_TALK_SESSIONS[day]
+        for (day, remaining) in remaining_lightning_slots.items()
+        if remaining <= 0
+    ]
+
     return render_template(
         "cfp/new.html",
         cfp_type=cfp_type,
         form=form,
         has_errors=bool(form.errors),
         ignore_closed=ignore_closed,
+        full_lightning_sessions=full_lightning_sessions,
     )
 
 
@@ -353,6 +430,10 @@ def edit_proposal(proposal_id):
             proposal.size = form.size.data
             proposal.funds = form.funds.data
 
+        elif proposal.type == "lightning":
+            proposal.slide_link = form.slide_link.data
+            proposal.allowed_times = form.session.data
+
         proposal.title = form.title.data
         proposal.description = form.description.data
         proposal.requirements = form.requirements.data
@@ -386,6 +467,18 @@ def edit_proposal(proposal_id):
         elif proposal.type == "installation":
             form.size.data = proposal.size
             form.funds.data = proposal.funds
+
+        elif proposal.type == "lightning":
+            form.slide_link.data = proposal.slide_link
+
+            remaining_lightning_slots = (
+                LightningTalkProposal.get_remaining_lightning_slots()
+            )
+            # Make sure that their previously selected session is a choice
+            if remaining_lightning_slots[proposal.session] <= 0:
+                remaining_lightning_slots[proposal.session] = 1
+            form.set_session_choices(remaining_lightning_slots)
+            form.session.data = proposal.session
 
         form.title.data = proposal.title
         form.description.data = proposal.description
