@@ -21,7 +21,7 @@ class EmailField(StringField):
 
     def pre_validate(self, form):
         check_deliverability = True
-        if app.config.get("DEBUG"):
+        if app.config.get("DEBUG") or app.testing:
             check_deliverability = False
         try:
             result = validate_email(
