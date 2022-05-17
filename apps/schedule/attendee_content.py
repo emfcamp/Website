@@ -107,7 +107,7 @@ def populate(proposal, form):
 
 @schedule.route("/attendee_content", methods=["GET", "POST"])
 @login_required
-@feature_flag("LINE_UP")
+@feature_flag("ATTENDEE_CONTENT")
 def attendee_content():
     content = Proposal.query.filter_by(
         user_id=current_user.id, user_scheduled=True
@@ -147,7 +147,7 @@ def attendee_content():
 
 @schedule.route("/attendee_content/<int:id>/edit", methods=["GET", "POST"])
 @login_required
-@feature_flag("LINE_UP")
+@feature_flag("ATTENDEE_CONTENT")
 def attendee_content_edit(id):
     proposal = Proposal.query.filter_by(id=id).first()
     if not proposal or proposal.user_id != current_user.id:
@@ -181,7 +181,7 @@ def attendee_content_edit(id):
 
 @schedule.route("/attendee_content/<int:id>/delete", methods=["GET"])
 @login_required
-@feature_flag("LINE_UP")
+@feature_flag("ATTENDEE_CONTENT")
 def attendee_content_delete(id):
     proposal = Proposal.query.filter_by(id=id).first()
     if not proposal or proposal.user_id != current_user.id:

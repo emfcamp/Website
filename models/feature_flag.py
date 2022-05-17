@@ -3,6 +3,7 @@ from . import BaseModel
 
 # feature flags that can be overridden in the DB
 DB_FEATURE_FLAGS = [
+    "ATTENDEE_CONTENT",
     "BANK_TRANSFER",
     "BANK_TRANSFER_EURO",
     "CFP",
