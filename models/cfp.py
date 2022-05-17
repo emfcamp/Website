@@ -210,13 +210,13 @@ DEFAULT_VENUES: dict[str, list[str]] = {
 }
 
 VENUE_CAPACITY = {
-    "Stage A": 600,
-    "Stage B": 400,
-    "Stage C": 400,
+    "Stage A": 1000,
+    "Stage B": 600,
+    "Stage C": 450,
     "Workshop 1": 30,
     "Workshop 2": 30,
-    "Workshop 3": 35,
-    "Workshop 4": 35,
+    "Workshop 3": 30,
+    "Workshop 4": 30,
     "Youth Workshop": 30,
 }
 
