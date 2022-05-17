@@ -1,0 +1,12 @@
+{# reusable icons #}
+{% macro proposal_icons(prop) %}
+  {% if not prop.may_record and prop.type == 'talk' and prop.state == 'finished' %}
+  <span style="padding-left: 10px;" title="This talk will not be recorded"><img src="{{ static_url_for('static', filename='images/icons/not-recorded.svg') }}" width="24" height="24"></span>
+  {% endif %}
+  {% if prop.content_note and prop.type == 'talk' and prop.state == 'finished' %}
+  <span style="padding-left: 10px;" title="There is a content note on this talk">⚠️</span>
+  {% endif %}
+  {% if prop.family_friendly and prop.type == 'talk' and prop.state == 'finished' %}
+  <span style="padding-left: 10px;" title="This talk is family friendly">{{ ["👪", "👩‍👧", "👩‍👦", "👨‍👧", "👨‍👦", "👩‍👩‍👦", "👨‍👨‍👧", "👨‍👨‍👦", "👨‍👩‍👧", "👩‍👩‍👧", "👨‍👦‍👦", "👨‍👧‍👦", "👨‍👧‍👧", "👩‍👧‍👧", "👩‍👦‍👦", "👩‍👧‍👦", "👨‍👩‍👦", "👨‍👨‍👧‍👦", "👨‍👩‍👧‍👧", "👩‍👩‍👧‍👧" ] | random }}</span>
+  {% endif %}
+{% endmacro %}
