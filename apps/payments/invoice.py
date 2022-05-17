@@ -122,8 +122,8 @@ def invoice(payment_id, fmt=None):
         return send_file(
             render_pdf(url, page),
             mimetype="application/pdf",
-            cache_timeout=60,
-            attachment_filename=f"emf_{mode}.pdf",
+            max_age=60,
+            download_name=f"emf_{mode}.pdf",
             as_attachment=True,
         )
 

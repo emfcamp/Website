@@ -395,7 +395,7 @@ def user_tickets(user_id, ext=None):
     if ext == ".pdf":
         url = external_url(".user_tickets", user_id=user_id)
         return send_file(
-            render_pdf(url, receipt), mimetype="application/pdf", cache_timeout=60
+            render_pdf(url, receipt), mimetype="application/pdf", max_age=60
         )
 
     return receipt

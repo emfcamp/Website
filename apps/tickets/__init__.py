@@ -190,9 +190,7 @@ def receipt(user_id=None):
     page = render_receipt(user, png, pdf)
     if pdf:
         url = external_url("tickets.receipt", user_id=user_id)
-        return send_file(
-            render_pdf(url, page), mimetype="application/pdf", cache_timeout=60
-        )
+        return send_file(render_pdf(url, page), mimetype="application/pdf", max_age=60)
 
     return page
 
