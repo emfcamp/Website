@@ -536,7 +536,7 @@ def withdraw_proposal(proposal_id):
     return render_template("cfp/withdraw.html", form=form, proposal=proposal)
 
 
-class AcceptedForm(Form):
+class FinaliseForm(Form):
     name = StringField("Names for schedule", [DataRequired()])
     pronouns = StringField("Pronouns")
     title = StringField("Title", [DataRequired()])
@@ -642,7 +642,7 @@ def finalise_proposal(proposal_id):
     # http://wtforms.simplecodes.com/docs/1.0.1/specific_problems.html#dynamic-form-composition
     slot_times = slot_titles = day_form_slots = None
 
-    class F(AcceptedForm):
+    class F(FinaliseForm):
         pass
 
     if proposal.type in ("talk", "workshop", "youthworkshop", "performance"):
@@ -752,7 +752,7 @@ def finalise_proposal(proposal_id):
         slot_titles.append("%s%s - %s%s" % (start, start_ampm, end, end_ampm))
 
     return render_template(
-        "cfp/accepted.html",
+        "cfp/finalise.html",
         form=form,
         proposal=proposal,
         slot_times=slot_times,
