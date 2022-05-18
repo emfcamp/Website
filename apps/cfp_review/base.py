@@ -116,6 +116,12 @@ def filter_proposal_request():
         filtered = True
         proposal_query = proposal_query.filter(Proposal.state.in_(states))
 
+    show_user_scheduled = request.args.get("show_user_scheduled", type=bool_qs)
+    if show_user_scheduled is None or show_user_scheduled is False:
+        filtered = False
+        proposal_query = proposal_query.filter_by(user_scheduled=False)
+
+    # This block has to be last because it will join to the user table
     needs_ticket = request.args.get("needs_ticket", type=bool_qs)
     if needs_ticket is True:
         filtered = True
@@ -130,11 +136,6 @@ def filter_proposal_request():
                 )
             )
         )
-
-    show_user_scheduled = request.args.get("show_user_scheduled", type=bool_qs)
-    if show_user_scheduled is None or show_user_scheduled is False:
-        filtered = False
-        proposal_query = proposal_query.filter_by(user_scheduled=False)
 
     sort_dict = get_proposal_sort_dict(request.args)
     proposal_query = proposal_query.options(joinedload(Proposal.user)).options(
