@@ -247,34 +247,34 @@ def form(cfp_type="talk"):
             current_user.name = form.name.data
 
         if cfp_type == "talk":
-            cfp = TalkProposal()
-            cfp.length = form.length.data
+            proposal = TalkProposal()
+            proposal.length = form.length.data
 
         elif cfp_type == "performance":
-            cfp = PerformanceProposal()
-            cfp.length = form.length.data
+            proposal = PerformanceProposal()
+            proposal.length = form.length.data
 
         elif cfp_type == "workshop":
-            cfp = WorkshopProposal()
-            cfp.length = form.length.data
-            cfp.attendees = form.attendees.data
-            cfp.cost = form.cost.data
-            cfp.participant_equipment = form.participant_equipment.data
-            cfp.age_range = form.age_range.data
+            proposal = WorkshopProposal()
+            proposal.length = form.length.data
+            proposal.attendees = form.attendees.data
+            proposal.cost = form.cost.data
+            proposal.participant_equipment = form.participant_equipment.data
+            proposal.age_range = form.age_range.data
 
         elif cfp_type == "youthworkshop":
-            cfp = YouthWorkshopProposal()
-            cfp.length = form.length.data
-            cfp.attendees = form.attendees.data
-            cfp.cost = form.cost.data
-            cfp.participant_equipment = form.participant_equipment.data
-            cfp.age_range = form.age_range.data
-            cfp.valid_dbs = form.valid_dbs.data
+            proposal = YouthWorkshopProposal()
+            proposal.length = form.length.data
+            proposal.attendees = form.attendees.data
+            proposal.cost = form.cost.data
+            proposal.participant_equipment = form.participant_equipment.data
+            proposal.age_range = form.age_range.data
+            proposal.valid_dbs = form.valid_dbs.data
 
         elif cfp_type == "installation":
-            cfp = InstallationProposal()
-            cfp.size = form.size.data
-            cfp.funds = form.funds.data
+            proposal = InstallationProposal()
+            proposal.size = form.size.data
+            proposal.funds = form.funds.data
 
         elif cfp_type == "lightning":
             if remaining_lightning_slots[form.session.data] <= 0:
@@ -291,17 +291,17 @@ def form(cfp_type="talk"):
                     ignore_closed=ignore_closed,
                 )
 
-            cfp = LightningTalkProposal()
-            cfp.slide_link = form.slide_link.data
-            cfp.session = form.session.data
+            proposal = LightningTalkProposal()
+            proposal.slide_link = form.slide_link.data
+            proposal.session = form.session.data
 
-        cfp.user_id = current_user.id
+        proposal.user_id = current_user.id
 
-        cfp.title = form.title.data
-        cfp.requirements = form.requirements.data
-        cfp.description = form.description.data
-        cfp.notice_required = form.notice_required.data
-        cfp.needs_help = form.needs_help.data
+        proposal.title = form.title.data
+        proposal.requirements = form.requirements.data
+        proposal.description = form.description.data
+        proposal.notice_required = form.notice_required.data
+        proposal.needs_help = form.needs_help.data
 
         db.session.add(cfp)
         db.session.commit()
@@ -314,14 +314,14 @@ def form(cfp_type="talk"):
         )
 
         msg.body = render_template(
-            "emails/cfp-submission.txt", proposal=cfp, new_user=new_user
+            "emails/cfp-submission.txt", proposal=proposal, new_user=new_user
         )
         msg.send()
 
         if channel := app.config.get("CONTENT_IRC_CHANNEL"):
             # WARNING: don't send personal information via this (the channel is public)
             irc_send(
-                f"{channel} New CfP {cfp.human_type} submission: {external_url('cfp_review.update_proposal', proposal_id=cfp.id)}"
+                f"{channel} New CfP {proposal.human_type} submission: {external_url('cfp_review.update_proposal', proposal_id=proposal.id)}"
             )
         return redirect(url_for(".complete"))
 
