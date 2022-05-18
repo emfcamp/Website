@@ -686,6 +686,10 @@ def finalise_proposal(proposal_id):
 
         return redirect(url_for(".edit_proposal", proposal_id=proposal_id))
 
+    elif request.method == "POST":
+        # Don't overwrite user submitted data
+        pass
+
     elif proposal.state == "finished":
         if proposal.published_names:
             form.name.data = proposal.published_names
