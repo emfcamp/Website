@@ -21,7 +21,7 @@ def load_village(year, village_id, require_admin=False):
         abort(404)
 
     if require_admin and not (
-        current_user.village.village == village and current_user.village.admin
+        current_user.village == village and current_user.village_membership.admin
     ):
         abort(404)
     return village

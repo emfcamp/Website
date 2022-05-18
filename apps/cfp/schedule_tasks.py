@@ -2,10 +2,11 @@
 
 import click
 from flask import current_app as app
+from sqlalchemy import func
 
 from main import db
 from models.cfp import Proposal, Venue
-
+from models.village import Village
 from apps.cfp_review.base import send_email_for_proposal
 from .scheduler import Scheduler
 from . import cfp
@@ -16,35 +17,76 @@ from ..common.email import from_email
 def create_venues():
     """Create venues defined in code"""
     venues = [
-        ("Stage A", ["talk"], 100, (52.0396099, -2.377866)),
-        ("Stage B", ["talk", "performance"], 99, (52.0418968, -2.3766391)),
-        ("Stage C", ["talk"], 98, (52.040485, -2.3776549)),
-        ("Workshop 1", ["workshop"], 97, (52.04161469, -2.37593613)),
-        ("Workshop 2", ["workshop"], 96, (52.04080079, -2.3780661)),
-        ("Workshop 3", ["workshop"], 95, (52.0406851, -2.3780847)),
-        ("Workshop 4", ["workshop"], 94, (52.0417884, -2.37586151)),
-        ("Youth Workshop", ["youthworkshop"], 93, (52.041997, -2.375533)),
+        ("Stage A", 100, (52.03961, -2.37787), True, "talk"),
+        ("Stage B", 99, (52.04190, -2.37664), True, "talk,performance"),
+        ("Stage C", 98, (52.04050, -2.37765), True, "talk"),
+        ("Workshop 1", 97, (52.04259, -2.37515), True, "workshop"),
+        ("Workshop 2", 96, (52.04208, -2.37715), True, "workshop"),
+        ("Workshop 3", 95, (52.04129, -2.37578), True, "workshop"),
+        ("Workshop 4", 94, (52.04329, -2.37590), True, "workshop"),
+        ("Youth Workshop", 93, (52.04117, -2.37771), True, "youthworkshop"),
+        ("Main Bar", 92, (52.04180, -2.37727), False, "talk,performance"),
+        (
+            "Lounge",
+            91,
+            (52.04147, -2.37644),
+            False,
+            "talk,performance,workshop,youthworkshop",
+        ),
     ]
-    for name, type, priority, latlon in venues:
-        type_str = ",".join(type)
-        venue = Venue.query.filter_by(name=name, type=type_str).all()
+    for name, priority, latlon, scheduled_content_only, type_str in venues:
+        venue = Venue.query.filter_by(name=name).all()
 
         if len(venue) == 1 and venue[0].lat is None:
             venue[0].lat = latlon[0]
             venue[0].lon = latlon[1]
-            app.logger.info("Updating venue %s with latlon" % name)
+            app.logger.info(f"Updating venue {name} with new latlon")
             continue
         elif venue:
+            app.logger.info(f"Venue {name} already exists")
             continue
 
-        venue = Venue()
-        venue.name = name
-        venue.type = type_str
-        venue.priority = priority
+        venue = Venue(
+            name=name,
+            type=type_str,
+            priority=priority,
+            lat=latlon[0],
+            lon=latlon[0],
+            scheduled_content_only=scheduled_content_only,
+        )
         db.session.add(venue)
-        app.logger.info('Adding venue "%s" as type "%s"' % (name, type))
+        app.logger.info(f"Adding venue {name} with type {type_str}")
 
     db.session.commit()
+
+
+@cfp.cli.command("create_village_venues")
+def create_village_venues():
+    for village in Village.query.all():
+        venue = Venue.query.filter_by(village_id=village.id).first()
+        if venue:
+            if venue.name != village.name:
+                app.logger.info(
+                    f"Updating village venue name from {venue.name} to {village.name}"
+                )
+                venue.name = village.name
+                db.session.commit()
+
+            continue
+
+        if Venue.query.filter(
+            func.lower(Venue.name) == func.trim(func.lower(village.name))
+        ).count():
+            app.logger.warning(
+                f"Not creating village venue with colliding name {village.name}"
+            )
+            continue
+
+        venue = Venue(
+            name=village.name, village_id=village.id, scheduled_content_only=False
+        )
+        db.session.add(venue)
+        db.session.commit()
 
 
 @cfp.cli.command("set_rough_durations")

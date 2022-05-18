@@ -40,6 +40,7 @@ class VillageForm(Form):
     def populate(self, village):
         self.name.data = village.name
         self.description.data = village.description
+        self.url.data = village.url
 
         requirements = village.requirements
 

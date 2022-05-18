@@ -12,6 +12,7 @@ from collections import defaultdict
 from typing import Optional
 
 from sqlalchemy import func, Index, text
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.exc import NoResultFound
 from flask import current_app as app, session
 from flask_login import UserMixin, AnonymousUserMixin
@@ -257,12 +258,13 @@ class User(BaseModel, UserMixin):
         cascade="all, delete-orphan",
     )
 
-    village_memberships = db.relationship(
+    village_membership = db.relationship(
         "VillageMember",
-        lazy="dynamic",
-        primaryjoin="VillageMember.user_id == User.id",
         cascade="all, delete-orphan",
+        back_populates="user",
+        uselist=False,
     )
+    village = association_proxy("village_membership", "village")
 
     def __init__(self, email: str, name: str):
         self.email = email

@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, abort
+from flask import render_template, flash, redirect, url_for, abort, request
 from flask_login import login_required, current_user
 
 from models import event_year
@@ -14,11 +14,9 @@ from .forms import VillageForm
 @villages.route("/register", methods=["GET", "POST"])
 @login_required
 def register():
-    if current_user.village and current_user.village.admin:
+    if current_user.village and current_user.village_membership.admin:
         return redirect(
-            url_for(
-                ".edit", year=event_year(), village_id=current_user.village.village.id
-            )
+            url_for(".edit", year=event_year(), village_id=current_user.village.id)
         )
 
     form = VillageForm()
@@ -29,7 +27,7 @@ def register():
 
         village = Village(name=form.name.data, description=form.description.data)
 
-        member = VillageMember(village=village, user=current_user, admin=True)
+        membership = VillageMember(village=village, user=current_user, admin=True)
 
         venue = Venue(village=village, name=village.name)
 
@@ -42,7 +40,7 @@ def register():
             structures=form.structures.data,
         )
         db.session.add(village)
-        db.session.add(member)
+        db.session.add(membership)
         db.session.add(requirements)
         db.session.add(venue)
         db.session.commit()
@@ -82,5 +80,7 @@ def edit(year, village_id):
         flash("Your village registration has been updated.")
         return redirect(url_for(".edit", year=year, village_id=village_id))
 
-    form.populate(village)
+    if request.method != "POST":
+        form.populate(village)
+
     return render_template("villages/edit.html", form=form, village=village)
