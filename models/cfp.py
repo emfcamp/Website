@@ -848,6 +848,9 @@ class LightningTalkProposal(Proposal):
     slide_link = db.Column(db.String, nullable=True)
     session = db.Column(db.String, default="fri")
 
+    def pretty_session(self):
+        return LIGHTNING_TALK_SESSIONS[self.session]["human"]
+
     @classmethod
     def get_remaining_lightning_slots(cls):
         # Find which day's sessions still have spaces

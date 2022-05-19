@@ -11,6 +11,8 @@ Description: {{ proposal.description }}
 Duration: {{ proposal.length }}
 {% elif proposal.type == 'installation' %}
 Size: {{ proposal.size }}
+{% elif proposal.type == 'lightning' %}
+Day: {{ proposal.pretty_session() }}
 {%- endif %}
 
 {%- if proposal.needs_help %}
