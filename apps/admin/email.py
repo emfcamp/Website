@@ -50,7 +50,7 @@ def get_query(dest):
             Proposal.state.in_(("accepted", "finished"))
         )
     elif dest == "villages":
-        return User.query.join(User.village_memberships).filter(VillageMember.admin)
+        return User.query.join(User.village_membership).filter(VillageMember.admin)
 
 
 @admin.route("/email", methods=["GET", "POST"])

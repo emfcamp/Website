@@ -1,5 +1,8 @@
 from __future__ import annotations
 from typing import Optional
+
+from sqlalchemy.ext.associationproxy import association_proxy
+
 from main import db
 from models.user import User
 from . import BaseModel
@@ -15,6 +18,9 @@ class Village(BaseModel):
     description = db.Column(db.String)
     url = db.Column(db.String)
 
+    village_memberships = db.relationship("VillageMember", back_populates="village")
+    members = association_proxy("village_memberships", "user")
+
     @classmethod
     def get_by_name(cls, name) -> Optional[Village]:
         return cls.query.filter_by(name=name).one_or_none()
@@ -24,7 +30,7 @@ class Village(BaseModel):
         return cls.query.filter_by(id=id).one_or_none()
 
     def admins(self) -> list[User]:
-        return [mem.user for mem in self.members if mem.admin]
+        return [m.user for m in self.village_memberships if m.admin]
 
     def __repr__(self):
         return f"<Village '{self.name}' (id: {self.id})>"
@@ -34,14 +40,17 @@ class VillageMember(BaseModel):
     __tablename__ = "village_member"
 
     id = db.Column(db.Integer, primary_key=True)
-
+    # We only allow one village per user. TODO: make this the primary key
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("user.id"), unique=True, nullable=False
+    )
     village_id = db.Column(db.Integer, db.ForeignKey("village.id"), nullable=False)
-    village = db.relationship("Village", backref="members")
-
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    user = db.relationship("User", backref=db.backref("village", uselist=False))
-
     admin = db.Column(db.Boolean, default=False)
+
+    village = db.relationship(
+        "Village", back_populates="village_memberships", uselist=False
+    )
+    user = db.relationship("User", back_populates="village_membership", uselist=False)
 
     def __repr__(self):
         return f"<VillageMember {self.user} member of {self.village}>"

@@ -35,7 +35,11 @@
     </fieldset>
     <fieldset>
     <div class="form-actions">
+      {% if village %}
+      <button type="submit" name="Update" class="btn btn-primary btn-lg pull-right debounce">Update</button>
+      {% else %}
       <button type="submit" name="Create" class="btn btn-primary btn-lg pull-right debounce">Register Village</button>
+      {% endif %}
     </div>
     </fieldset>
   </form>

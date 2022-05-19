@@ -249,34 +249,34 @@ def form(cfp_type="talk"):
             current_user.name = form.name.data
 
         if cfp_type == "talk":
-            cfp = TalkProposal()
-            cfp.length = form.length.data
+            proposal = TalkProposal()
+            proposal.length = form.length.data
 
         elif cfp_type == "performance":
-            cfp = PerformanceProposal()
-            cfp.length = form.length.data
+            proposal = PerformanceProposal()
+            proposal.length = form.length.data
 
         elif cfp_type == "workshop":
-            cfp = WorkshopProposal()
-            cfp.length = form.length.data
-            cfp.attendees = form.attendees.data
-            cfp.cost = form.cost.data
-            cfp.participant_equipment = form.participant_equipment.data
-            cfp.age_range = form.age_range.data
+            proposal = WorkshopProposal()
+            proposal.length = form.length.data
+            proposal.attendees = form.attendees.data
+            proposal.cost = form.cost.data
+            proposal.participant_equipment = form.participant_equipment.data
+            proposal.age_range = form.age_range.data
 
         elif cfp_type == "youthworkshop":
-            cfp = YouthWorkshopProposal()
-            cfp.length = form.length.data
-            cfp.attendees = form.attendees.data
-            cfp.cost = form.cost.data
-            cfp.participant_equipment = form.participant_equipment.data
-            cfp.age_range = form.age_range.data
-            cfp.valid_dbs = form.valid_dbs.data
+            proposal = YouthWorkshopProposal()
+            proposal.length = form.length.data
+            proposal.attendees = form.attendees.data
+            proposal.cost = form.cost.data
+            proposal.participant_equipment = form.participant_equipment.data
+            proposal.age_range = form.age_range.data
+            proposal.valid_dbs = form.valid_dbs.data
 
         elif cfp_type == "installation":
-            cfp = InstallationProposal()
-            cfp.size = form.size.data
-            cfp.funds = form.funds.data
+            proposal = InstallationProposal()
+            proposal.size = form.size.data
+            proposal.funds = form.funds.data
 
         elif cfp_type == "lightning":
             if remaining_lightning_slots[form.session.data] <= 0:
@@ -293,17 +293,17 @@ def form(cfp_type="talk"):
                     ignore_closed=ignore_closed,
                 )
 
-            cfp = LightningTalkProposal()
-            cfp.slide_link = form.slide_link.data
-            cfp.session = form.session.data
+            proposal = LightningTalkProposal()
+            proposal.slide_link = form.slide_link.data
+            proposal.session = form.session.data
 
-        cfp.user_id = current_user.id
+        proposal.user_id = current_user.id
 
-        cfp.title = form.title.data
-        cfp.requirements = form.requirements.data
-        cfp.description = form.description.data
-        cfp.notice_required = form.notice_required.data
-        cfp.needs_help = form.needs_help.data
+        proposal.title = form.title.data
+        proposal.requirements = form.requirements.data
+        proposal.description = form.description.data
+        proposal.notice_required = form.notice_required.data
+        proposal.needs_help = form.needs_help.data
 
         db.session.add(cfp)
         db.session.commit()
@@ -316,14 +316,14 @@ def form(cfp_type="talk"):
         )
 
         msg.body = render_template(
-            "emails/cfp-submission.txt", proposal=cfp, new_user=new_user
+            "emails/cfp-submission.txt", proposal=proposal, new_user=new_user
         )
         msg.send()
 
         if channel := app.config.get("CONTENT_IRC_CHANNEL"):
             # WARNING: don't send personal information via this (the channel is public)
             irc_send(
-                f"{channel} New CfP {cfp.human_type} submission: {external_url('cfp_review.update_proposal', proposal_id=cfp.id)}"
+                f"{channel} New CfP {proposal.human_type} submission: {external_url('cfp_review.update_proposal', proposal_id=proposal.id)}"
             )
         return redirect(url_for(".complete"))
 
@@ -538,7 +538,7 @@ def withdraw_proposal(proposal_id):
     return render_template("cfp/withdraw.html", form=form, proposal=proposal)
 
 
-class AcceptedForm(Form):
+class FinaliseForm(Form):
     name = StringField("Names for schedule", [DataRequired()])
     pronouns = StringField("Pronouns")
     title = StringField("Title", [DataRequired()])
@@ -644,7 +644,7 @@ def finalise_proposal(proposal_id):
     # http://wtforms.simplecodes.com/docs/1.0.1/specific_problems.html#dynamic-form-composition
     slot_times = slot_titles = day_form_slots = None
 
-    class F(AcceptedForm):
+    class F(FinaliseForm):
         pass
 
     if proposal.type in ("talk", "workshop", "youthworkshop", "performance"):
@@ -687,6 +687,10 @@ def finalise_proposal(proposal_id):
         flash("Thank you for finalising your details!")
 
         return redirect(url_for(".edit_proposal", proposal_id=proposal_id))
+
+    elif request.method == "POST":
+        # Don't overwrite user submitted data
+        pass
 
     elif proposal.state == "finished":
         if proposal.published_names:
@@ -754,7 +758,7 @@ def finalise_proposal(proposal_id):
         slot_titles.append("%s%s - %s%s" % (start, start_ampm, end, end_ampm))
 
     return render_template(
-        "cfp/accepted.html",
+        "cfp/finalise.html",
         form=form,
         proposal=proposal,
         slot_times=slot_times,

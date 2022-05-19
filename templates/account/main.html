@@ -15,9 +15,9 @@
         </div>
         <div class="panel-body">
           {% if current_user.village %}
-            You're a member of the <strong>{{current_user.village.village.name}}</strong> village. 
-            {% if current_user.village.admin %}
-              <a href="{{url_for('villages.edit', year=event_year, village_id=current_user.village.village.id)}}">
+            You're a member of the <strong>{{current_user.village.name}}</strong> village.
+            {% if current_user.village_membership.admin %}
+              <a href="{{url_for('villages.edit', year=event_year, village_id=current_user.village.id)}}">
                 Edit this village</a>.
             {% endif %}
           {% else %}

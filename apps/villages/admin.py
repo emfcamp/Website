@@ -55,7 +55,7 @@ def admin_email_owners():
     form = EmailComposeForm()
     if form.validate_on_submit():
         users = (
-            User.query.join(User.village_memberships)
+            User.query.join(User.village_membership)
             .filter(VillageMember.admin)
             .distinct()
         )
