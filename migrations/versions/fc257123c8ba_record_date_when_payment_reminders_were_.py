@@ -1,14 +1,14 @@
 """Record date when payment reminders were set
 
-Revision ID: 3590cacfc1fb
-Revises: d756698d5d75
-Create Date: 2022-05-19 22:28:59.364211
+Revision ID: fc257123c8ba
+Revises: 4a595f83788b
+Create Date: 2022-05-19 22:51:38.560865
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '3590cacfc1fb'
-down_revision = 'd756698d5d75'
+revision = 'fc257123c8ba'
+down_revision = '4a595f83788b'
 
 from alembic import op
 import sqlalchemy as sa
