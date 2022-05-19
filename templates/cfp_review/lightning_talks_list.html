@@ -16,9 +16,9 @@
     {%- if filtered %}in{% endif %}
         " id="searchPanel">
         <ul>
-            <li><a href="{{ url_for('.lightning_talks', day='fri') }}">Friday ({{ remaining_lightning_slots['fri'] | int }} slots remain)</a></li>
-            <li><a href="{{ url_for('.lightning_talks', day='sat') }}">Saturday ({{ remaining_lightning_slots['sat'] | int}} slots remain)</a></li>
-            <li><a href="{{ url_for('.lightning_talks', day='sun') }}">Sunday ({{ remaining_lightning_slots['sun'] | int}} slots remain)</a></li>
+            <li><a href="{{ url_for('.lightning_talks', day='fri') }}">Friday ({{ remaining_lightning_slots['fri'] | int }} of {{ total_slots['fri'] | int }}  slots remain)</a></li>
+            <li><a href="{{ url_for('.lightning_talks', day='sat') }}">Saturday ({{ remaining_lightning_slots['sat'] | int }} of {{ total_slots['sat'] | int }} slots remain)</a></li>
+            <li><a href="{{ url_for('.lightning_talks', day='sun') }}">Sunday ({{ remaining_lightning_slots['sun'] | int }} of {{ total_slots['sun'] | int }} slots remain)</a></li>
         </ul>
     </div>
 </div>

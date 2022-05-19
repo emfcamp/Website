@@ -140,7 +140,9 @@ class LightningTalkProposalForm(ProposalForm):
         for (day_id, day_count) in remaining_lightning_slots.items():
             if day_count <= 0:
                 continue
-            self.session.choices.append((day_id, LIGHTNING_TALK_SESSIONS[day_id]))
+            self.session.choices.append(
+                (day_id, LIGHTNING_TALK_SESSIONS[day_id]["human"])
+            )
 
 
 def get_cfp_type_form(cfp_type):
@@ -326,7 +328,7 @@ def form(cfp_type="talk"):
         return redirect(url_for(".complete"))
 
     full_lightning_sessions = [
-        LIGHTNING_TALK_SESSIONS[day]
+        LIGHTNING_TALK_SESSIONS[day]["human"]
         for (day, remaining) in remaining_lightning_slots.items()
         if remaining <= 0
     ]
