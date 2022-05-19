@@ -92,10 +92,12 @@ LENGTH_OPTIONS = [
 ]
 
 LIGHTNING_TALK_LENGTH = 5
+INITIAL_LIGHTNING_TALK_SLOTS = 60 / LIGHTNING_TALK_LENGTH
+# Try to encourage filling the Friday slot first by initially having fewer slots on Saturday & Sunday
 LIGHTNING_TALK_SESSIONS = {
-    "fri": "Friday",
-    "sat": "Saturday",
-    "sun": "Sunday",
+    "fri": {"human": "Friday", "slots": INITIAL_LIGHTNING_TALK_SLOTS},
+    "sat": {"human": "Saturday", "slots": 0.5 * INITIAL_LIGHTNING_TALK_SLOTS},
+    "sun": {"human": "Sunday", "slots": 0.25 * INITIAL_LIGHTNING_TALK_SLOTS},
 }
 
 # Options for age range displayed to the user
@@ -865,31 +867,11 @@ class LightningTalkProposal(Proposal):
             .group_by(cls.session)
             .all()
         }
-        return {
-            day: (
-                slots.get(day, (120 / LIGHTNING_TALK_LENGTH)) - day_counts.get(day, 0)
-            )
-            for day in LIGHTNING_TALK_SESSIONS.keys()
-        }
+        return {day: (count - day_counts.get(day, 0)) for (day, count) in slots.items()}
 
     @classmethod
     def get_total_lightning_talk_slots(cls):
-        sessions = TalkProposal.query.filter(
-            TalkProposal.title.startswith("Lightning Talk"),
-            TalkProposal.state.in_(["accepted", "finished"]),
-        ).all()
-
-        slots = {}
-        for sess in sessions:
-            if not sess.allowed_times:
-                continue
-            short_day = (
-                parse_date(sess.allowed_times.split(">")[0]).strftime("%a").lower()
-            )
-            # - 1 for slack
-            slots[short_day] = (sess.scheduled_duration / LIGHTNING_TALK_LENGTH) - 1
-
-        return slots
+        return {k: v["slots"] for (k, v) in LIGHTNING_TALK_SESSIONS.items()}
 
 
 PYTHON_CFP_TYPES = {
