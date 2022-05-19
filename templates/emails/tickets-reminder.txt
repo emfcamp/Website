@@ -5,7 +5,7 @@ Hi {{ payment.user.name }},
 Just to warn you that we have not yet received payment for the tickets you
 reserved for Electromagnetic Field {{ event_year }}.
 
-The tickets will expire in a few days if not paid for.
+The tickets will expire in 5 days if we do not receive payment by then.
 
 If you don't want the tickets you can ignore this email. Otherwise,
 if you wish to pay for the tickets, you can go to the EMF website:
