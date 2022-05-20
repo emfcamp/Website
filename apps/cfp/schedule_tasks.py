@@ -99,6 +99,8 @@ def set_rough_durations():
 @cfp.cli.command("schedule")
 @click.option(
     "-p", "--persist", is_flag=True, help="Persist changes rather than doing a dry run"
+)
+@click.option(
     "--ignore_potential", is_flag=True, help="Ignore potential slots when scheduling"
 )
 def run_schedule(persist, ignore_potential):
