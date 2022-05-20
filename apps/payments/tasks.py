@@ -1,10 +1,11 @@
+from datetime import datetime, timedelta
 import click
 import csv
 from io import StringIO
 
 from flask import current_app as app
-from models.payment import RefundRequest, Payment
-
+from models.payment import BankPayment, RefundRequest, Payment
+from main import db
 from . import payments
 from .refund import (
     handle_refund_request,
@@ -156,3 +157,26 @@ def transferwise_refund_complete(max_id, currency):
             continue
 
         manual_bank_refund(request)
+
+
+# TODO: make this a scheduled task, assuming it works
+# @scheduled_task(minutes=60)
+@payments.cli.command("expire_pending_payments")
+@click.option("-y", "--yes", is_flag=True, help="actually do refunds")
+def expire_pending_payments(yes):
+    """Expire payments that have been sent a reminder more than 5 days ago"""
+    if not yes:
+        app.logger.info("Not expiring payments. Pass the -y option to do so.")
+    query = (
+        BankPayment.query.filter(BankPayment.state == "inprogress")
+        .filter(BankPayment.expires < datetime.utcnow())
+        .filter(BankPayment.reminder_sent_at < datetime.utcnow() - timedelta(days=5))
+    )
+    for payment in query:
+        if yes:
+            app.logger.info(f"Expiring payment {payment}")
+            payment.cancel()
+        else:
+            app.logger.info(f"Would expire payment {payment}")
+
+    db.session.commit()
