@@ -2,15 +2,11 @@
 {% block body %}
 Hi {{ proposal.user.name }},
 
-Your EMF {{ proposal.human_type }} proposal '{{ proposal.title }}' is currently on the reserve list and may be accepted closer than one month to the event - this is because we have last-minute drop-outs. Your proposal was very highly rated, but didn't quite make the main selection.
+Your EMF {{ proposal.human_type }} proposal '{{ proposal.title }}' is currently on the reserve list and may be accepted at short notice if we have last minute drop-outs. Your proposal was highly rated, but didn't quite make the main selection.
 
-Regardless of whether your proposal is selected, we'd like to offer you the opportunity to get EMF tickets for you and a friend.
+If you'd like to cancel your proposal as it is too close to the event, or you can no longer attend, please withdraw your proposal on our website: https://www.emfcamp.org/cfp/proposals
 
-You can buy those tickets here: {{ reserve_ticket_link }}
-
-The tickets will be available until Wednesday 15th August.
-
-If you'd like to cancel your proposal as it is too close to the event, or you can no longer attend, please let us know.
+We will shortly be opening lightning talk signups, so if you would like to give a very short talk instead please keep an eye out.
 
 Thanks,
 The EMF Team
