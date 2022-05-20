@@ -46,12 +46,20 @@ a:hover {
     }
 }
 
+.well a, .panel a {
+  color: $highlight-background-link;
+}
+
 .content-well {
   background-color: $content-well-background;
   color: $main-background-text;
   
   h3 {
     margin-top: 0;
+  }
+
+  a {
+      color: $main-background-text;
   }
 }
 
@@ -85,10 +93,6 @@ a:hover {
 
 .panel-primary > .panel-heading > * {
     color: $highlight-background-text;
-}
-
-.well a, .panel a {
-  color: $highlight-background-link;
 }
 
 .well .has-error .help-block a,

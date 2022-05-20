@@ -20,6 +20,9 @@ class ShiftEntry(BaseModel):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
     checked_in = db.Column(db.Boolean, nullable=False, default=False)
     missing_others = db.Column(db.Boolean, nullable=False, default=False)
+    arrived = db.Column(db.Boolean, default=False)
+    abandoned = db.Column(db.Boolean, default=False)
+    completed = db.Column(db.Boolean, default=False)
 
     user = db.relationship("User", backref="shift_entries")
     shift = db.relationship("Shift", backref="entries")

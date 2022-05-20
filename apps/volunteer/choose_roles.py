@@ -1,12 +1,24 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import (
+    render_template,
+    redirect,
+    url_for,
+    flash,
+    request,
+    abort,
+    current_app as app,
+)
 from flask_login import current_user
+from decorator import decorator
 
 from wtforms import SubmitField, BooleanField, FormField, FieldList
 from wtforms.validators import InputRequired
 
+from datetime import datetime, timedelta
+
 from main import db
 from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer as VolunteerUser
+from models.volunteer.shift import Shift, ShiftEntry
 
 from . import volunteer, v_user_required
 from ..common import feature_flag
@@ -108,3 +120,62 @@ def role(role_id):
         role=role,
         current_volunteer=current_volunteer,
     )
+
+
+@decorator
+def role_admin_required(f, *args, **kwargs):
+    if current_user.is_authenticated:
+        if int(args[0]) in [
+            ra.role_id for ra in current_user.volunteer_admin_roles
+        ] or current_user.has_permission("volunteer:admin"):
+            return f(*args, **kwargs)
+        abort(404)
+    return app.login_manager.unauthorized()
+
+
+@volunteer.route("role/<role_id>/admin")
+@role_admin_required
+def role_admin(role_id):
+    role = Role.query.get_or_404(role_id)
+    cutoff = datetime.now() - timedelta(minutes=30)
+    shifts = (
+        Shift.query.filter_by(role=role)
+        .filter(Shift.end >= cutoff)
+        .order_by(Shift.end)
+        .limit(5)
+        .all()
+    )
+    return render_template("volunteer/role_admin.html", role=role, shifts=shifts)
+
+
+@volunteer.route("role/<role_id>/toggle_arrived/<shift_id>/<user_id>")
+@role_admin_required
+def toggle_arrived(role_id, shift_id, user_id):
+    se = ShiftEntry.query.filter(
+        ShiftEntry.shift_id == shift_id, ShiftEntry.user_id == user_id
+    ).first_or_404()
+    se.arrived = not se.arrived
+    db.session.commit()
+    return redirect(url_for(".role_admin", role_id=role_id))
+
+
+@volunteer.route("role/<role_id>/toggle_abandoned/<shift_id>/<user_id>")
+@role_admin_required
+def toggle_abandoned(role_id, shift_id, user_id):
+    se = ShiftEntry.query.filter(
+        ShiftEntry.shift_id == shift_id, ShiftEntry.user_id == user_id
+    ).first_or_404()
+    se.abandoned = not se.abandoned
+    db.session.commit()
+    return redirect(url_for(".role_admin", role_id=role_id))
+
+
+@volunteer.route("role/<role_id>/toggle_complete/<shift_id>/<user_id>")
+@role_admin_required
+def toggle_complete(role_id, shift_id, user_id):
+    se = ShiftEntry.query.filter(
+        ShiftEntry.shift_id == shift_id, ShiftEntry.user_id == user_id
+    ).first_or_404()
+    se.completed = not se.completed
+    db.session.commit()
+    return redirect(url_for(".role_admin", role_id=role_id))
