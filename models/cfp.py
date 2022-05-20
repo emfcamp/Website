@@ -4,6 +4,7 @@ from typing import Optional
 from dateutil.parser import parse as parse_date
 import re
 from itertools import groupby
+from geoalchemy2 import Geometry
 
 from sqlalchemy import UniqueConstraint, func, select
 from sqlalchemy.orm import column_property
@@ -1025,8 +1026,7 @@ class Venue(BaseModel):
     name = db.Column(db.String, nullable=False)
     type = db.Column(db.String, nullable=True)
     priority = db.Column(db.Integer, nullable=True, default=0)
-    lat = db.Column(db.Float)
-    lon = db.Column(db.Float)
+    location = db.Column(Geometry("POINT", srid=4326))
     scheduled_content_only = db.Column(db.Boolean)
     village = db.relationship(
         "Village",
