@@ -1074,6 +1074,10 @@ class Venue(BaseModel):
             "geometry": location.__geo_interface__,
         }
 
+    @classmethod
+    def get_by_name(cls, name):
+        return cls.query.filter_by(name=name).one()
+
 
 # TODO: change the relationships on User and Proposal to 1-to-1
 db.Index(

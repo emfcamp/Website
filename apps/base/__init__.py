@@ -196,11 +196,6 @@ def security_txt():
     return """Contact: security@emfcamp.org\n"""
 
 
-@base.route("/herald")
-def herald():
-    return redirect("https://wiki.emfcamp.org/wiki/Herald")
-
-
 @base.route("/subscribe")
 def subscribe():
     return render_template("subscribe.html")

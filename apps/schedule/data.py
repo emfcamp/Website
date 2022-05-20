@@ -1,5 +1,6 @@
 import pendulum  # preferred over datetime
 from collections import defaultdict
+from werkzeug.datastructures import MultiDict
 from flask_login import current_user
 from slugify import slugify_unicode as slugify
 
@@ -74,7 +75,17 @@ def _get_ical_dict(event, favourites_ids):
     return res
 
 
+def _filter_obj_to_dict(filter_obj):
+    """Request.args uses a MulitDict this lets us pass filter_obj as plain dicts
+    and have everything work as expected.
+    """
+    if type(filter_obj) == MultiDict:
+        return filter_obj.to_dict()
+    return filter_obj
+
+
 def _get_scheduled_proposals(filter_obj={}, override_user=None):
+    filter_obj = _filter_obj_to_dict(filter_obj)
     if override_user:
         user = override_user
     else:
@@ -108,20 +119,20 @@ def _get_scheduled_proposals(filter_obj={}, override_user=None):
         schedule = [s for s in schedule if s.get("is_fave", False)]
 
     if "venue" in filter_obj:
-        schedule = [s for s in schedule if s["venue"] in filter_obj.getlist("venue")]
+        schedule = [s for s in schedule if s["venue"] in filter_obj["venue"]]
 
     return schedule
 
 
 def _get_upcoming(filter_obj={}, override_user=None):
+    filter_obj = _filter_obj_to_dict(filter_obj)
     now = pendulum.now(event_tz)
-    # now = pendulum.datetime(2018, 8, 31, 13, 0, tz=event_tz)
     proposals = _get_scheduled_proposals(filter_obj, override_user)
     upcoming = [_convert_time_to_str(p) for p in proposals if p["end_date"] > now]
 
     upcoming = sorted(upcoming, key=lambda p: p["start_date"])
 
-    limit = filter_obj.get("limit", default=2, type=int)
+    limit = int(filter_obj.get("limit", 2))
 
     # Already filtered by venue in _get_scheduled_proposals
     if limit <= 0:

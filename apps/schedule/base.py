@@ -9,12 +9,13 @@ from flask import current_app as app
 
 from main import db
 from models import event_year
-from models.cfp import Proposal
+from models.cfp import Proposal, Venue
 from models.ical import CalendarSource, CalendarEvent
 from models.user import generate_api_token
 from models.admin_message import AdminMessage
 
 from ..common import feature_flag, feature_enabled
+from ..volunteer import v_user_required
 
 from . import schedule, event_tz
 from .historic import talks_historic, item_historic, historic_talk_data
@@ -261,4 +262,36 @@ def time_machine():
         talks_now=talks_now,
         talks_next=talks_next,
         now=now,
+    )
+
+
+@schedule.route("/herald")
+@v_user_required
+def herald_main():
+    venue_list = ("Stage A", "Stage B", "Stage C")
+    return render_template("schedule/herald/main.html", venue_list=venue_list)
+
+
+@schedule.route("/herald/<string:venue_name>")
+@v_user_required
+def herald_venue(venue_name):
+
+    proposals = (
+        Proposal.query.join(Venue, Venue.id == Proposal.scheduled_venue_id)
+        .filter(
+            Venue.name == venue_name,
+            Proposal.state.in_(["accepted", "finished"]),
+            Proposal.scheduled_time.isnot(None),
+            Proposal.scheduled_duration.isnot(None),
+            Proposal.hide_from_schedule.isnot(True),
+        )
+        .order_by(Proposal.scheduled_time)
+        .limit(2)
+        .all()
+    )
+    return render_template(
+        "schedule/herald/venue.html",
+        venue_name=venue_name,
+        now=proposals[0],
+        next=proposals[1],
     )

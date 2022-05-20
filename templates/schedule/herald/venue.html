@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Herald for {{ venue_name }}{% endblock %}
+{% block body %}
+
+  <h1>Now &amp; next on: {{ venue_name }}</h1>
+
+  <h2>Now</h2>
+  {{ now.title }}
+
+  <h2>Next</h2>
+  {{ next.title }}
+
+{% endblock %}

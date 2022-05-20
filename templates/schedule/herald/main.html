@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Stage Select{% endblock %}
+{% block body %}
+
+<h1>Which venue are you Herald for?</h1>
+<ul>
+  {% for venue in venue_list %}
+    <li><a href="{{ url_for('.herald_venue', venue_name=venue) }}">{{ venue | title }}</a></li>
+  {% endfor %}
+</ul>
+{% endblock %}
