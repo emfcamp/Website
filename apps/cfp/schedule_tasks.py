@@ -99,11 +99,15 @@ def set_rough_durations():
 @cfp.cli.command("schedule")
 @click.option(
     "-p", "--persist", is_flag=True, help="Persist changes rather than doing a dry run"
+    "--ignore_potential", is_flag=True, help="Ignore potential slots when scheduling"
 )
-def run_schedule(persist):
+def run_schedule(persist, ignore_potential):
     """Run the schedule constraint solver. This can take a while."""
     scheduler = Scheduler()
-    scheduler.run(persist)
+    if ignore_potential:
+        app.logger.info(f"Ignoring current potential slots, items without a scheduled slot will move!")
+
+    scheduler.run(persist, ignore_potential)
 
 
 @cfp.cli.command("apply_potential_schedule")
