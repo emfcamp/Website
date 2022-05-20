@@ -107,7 +107,9 @@ def run_schedule(persist, ignore_potential):
     """Run the schedule constraint solver. This can take a while."""
     scheduler = Scheduler()
     if ignore_potential:
-        app.logger.info(f"Ignoring current potential slots, items without a scheduled slot will move!")
+        app.logger.info(
+            f"Ignoring current potential slots, items without a scheduled slot will move!"
+        )
 
     scheduler.run(persist, ignore_potential)
 
