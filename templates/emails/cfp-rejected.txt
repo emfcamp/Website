@@ -6,7 +6,7 @@ We're very sorry but your EMF {{ proposal.human_type }} proposal '{{ proposal.ti
 
 If you have an EMF ticket there are still plenty of chances to present this year - we have lightning talks every day (except Friday), and many of the villages also have stage and workshop space that you may be able to use.
 
-* Lightning talks are generally around five minutes. If you'd be interested in giving one please ask at the Info Desk or email lightning@emfcamp.org
+* Lightning talks are generally around five minutes. If you'd be interested in giving one a form will be live on the website soon.
 
 * Villages have varying facilities and their own programmes of events - feel free to approach one if you think they might like to host your {{ proposal.human_type }}. If you're not sure who to talk to, email {{ config['VILLAGECONTENT_EMAIL'][1] }}. You can find a list of them on our wiki: https://wiki.emfcamp.org/wiki/Villages
 
