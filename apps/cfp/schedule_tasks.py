@@ -37,9 +37,13 @@ def create_venues():
     for name, priority, latlon, scheduled_content_only, type_str in venues:
         venue = Venue.query.filter_by(name=name).all()
 
-        if len(venue) == 1 and venue[0].lat is None:
-            venue[0].lat = latlon[0]
-            venue[0].lon = latlon[1]
+        if latlon:
+            location = f"POINT({latlon[1]} {latlon[0]})"
+        else:
+            location = None
+
+        if len(venue) == 1 and venue[0].location is None:
+            venue[0].location = location
             app.logger.info(f"Updating venue {name} with new latlon")
             continue
         elif venue:
@@ -50,8 +54,7 @@ def create_venues():
             name=name,
             type=type_str,
             priority=priority,
-            lat=latlon[0],
-            lon=latlon[0],
+            location=location,
             scheduled_content_only=scheduled_content_only,
         )
         db.session.add(venue)
