@@ -11,12 +11,12 @@ from sqlalchemy import true, inspect
 from sqlalchemy.orm.base import NO_VALUE
 from sqlalchemy.sql.functions import func
 from sqlalchemy_continuum.utils import version_class, transaction_class
-from sqlalchemy.ext.declarative import DeclarativeMeta
+from flask_sqlalchemy.model import DefaultMeta
 
 # This alias is required to apply type annotations to the model objects.
 # MyPy raises errors when inheriting directly from db.Model. Once flask-sqlalchemy has
 # type annotations this should become unnecessary.
-BaseModel: DeclarativeMeta = db.Model
+BaseModel: DefaultMeta = db.Model
 
 """ Type alias for ISO currency (GBP or EUR currently). """
 # Note: A better type for this would be Union[Literal['GBP'], Literal['EUR']] but setting this
