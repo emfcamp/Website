@@ -15,6 +15,7 @@ def render_village(village: Village):
         "id": village.id,
         "name": village.name,
         "url": village.url,
+        "description": village.description,
         "location": to_shape(village.location).__geo_interface__
         if village.location
         else None,
