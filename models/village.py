@@ -51,6 +51,7 @@ class Village(BaseModel):
             "properties": {
                 "id": self.id,
                 "name": self.name,
+                "description": self.description,
                 "url": self.url,
             },
             "geometry": location.__geo_interface__,
