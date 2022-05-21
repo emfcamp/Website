@@ -1,8 +1,10 @@
 from __future__ import annotations
 from typing import Optional
-
 from sqlalchemy.ext.associationproxy import association_proxy
 
+from geoalchemy2 import Geometry
+from geoalchemy2.shape import to_shape
+from sqlalchemy import Index
 from main import db
 from models.user import User
 from . import BaseModel
@@ -17,6 +19,7 @@ class Village(BaseModel):
     name = db.Column(db.String, nullable=False, unique=True)
     description = db.Column(db.String)
     url = db.Column(db.String)
+    location = db.Column(Geometry("POINT", srid=4326, spatial_index=False))
 
     village_memberships = db.relationship("VillageMember", back_populates="village")
     members = association_proxy("village_memberships", "user")
@@ -34,6 +37,29 @@ class Village(BaseModel):
 
     def __repr__(self):
         return f"<Village '{self.name}' (id: {self.id})>"
+
+    @property
+    def __geo_interface__(self):
+        """GeoJSON-like representation of the object for the map."""
+        if not self.location:
+            return None
+
+        location = to_shape(self.location)
+
+        return {
+            "type": "Feature",
+            "properties": {
+                "id": self.id,
+                "name": self.name,
+                "url": self.url,
+            },
+            "geometry": location.__geo_interface__,
+        }
+
+
+# I'm not entirely sure why we create this index separately but this is how
+# it was done with the old MapObject stuff.
+Index("ix_village_location", Village.location, postgresql_using="gist")
 
 
 class VillageMember(BaseModel):

@@ -28,12 +28,10 @@ class CalendarSource(BaseModel):
     displayed = db.Column(db.Boolean, nullable=False, default=False)
     published = db.Column(db.Boolean, nullable=False, default=False)
     main_venue = db.Column(db.String)
-    map_obj_id = db.Column(db.Integer, db.ForeignKey("map_object.id"))
     contact_phone = db.Column(db.String)
     contact_email = db.Column(db.String)
 
     user = db.relationship("User", backref="calendar_sources")
-    mapobj = db.relationship("MapObject")
 
     # Make sure these are identifiable to the memoize cache
     def __repr__(self):
@@ -49,7 +47,6 @@ class CalendarSource(BaseModel):
             cls.url,
             cls.main_venue,
             cls.priority,
-            cls.map_obj_id,
         ).order_by(cls.id)
 
         data = {"public": {"sources": sources}, "tables": ["calendar_source"]}

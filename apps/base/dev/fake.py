@@ -16,9 +16,9 @@ from models.cfp import (
     CFPVote,
     LENGTH_OPTIONS,
 )
+from models.village import Village, VillageMember, VillageRequirements
 
 from models.volunteer.volunteer import Volunteer
-from models.map import MapObject
 
 
 def random_state(states):
@@ -157,7 +157,7 @@ class FakeDataGenerator(object):
                 self.create_volunteer_data(user)
 
             if randombool(0.2):
-                self.create_map_object(user)
+                self.create_village(user)
 
             db.session.add(user)
             self.create_fake_tickets(user)
@@ -167,13 +167,23 @@ class FakeDataGenerator(object):
         scheduler = Scheduler()
         scheduler.set_rough_durations()
 
-    def create_map_object(self, user):
-        obj = MapObject()
-        obj.owner = user
-        obj.name = self.fake.text(max_nb_chars=20)
-        obj.geom = fake_location()
-        obj.wiki_page = "Village:Fake Village"
-        db.session.add(obj)
+    def create_village(self, user):
+        village = Village()
+        village.name = self.fake.text(max_nb_chars=20)
+        if random.random() > 0.5:
+            village.location = fake_location()
+        db.session.add(village)
+
+        reqs = VillageRequirements()
+        reqs.village = village
+        reqs.num_attendees = random.randint(2, 100)
+        db.session.add(reqs)
+
+        membership = VillageMember()
+        membership.user = user
+        membership.village = village
+        membership.admin = True
+        db.session.add(membership)
 
     def create_volunteer_data(self, user):
         vol = Volunteer()
