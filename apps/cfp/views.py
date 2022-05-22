@@ -171,7 +171,7 @@ def main():
         return render_template("cfp/closed.html")
 
     lightning_talks_closed = all(
-        [i <= 0 for i in LightningTalkProposal.get_remaining_lightning_slots().values()]
+        [i <= 0 for i in LightningTalkProposal.get_days_with_slots().values()]
     )
 
     return render_template(
@@ -201,19 +201,14 @@ def form(cfp_type="talk"):
         flash("We're not currently accepting Lightning Talks.")
         return redirect(url_for(".main"))
 
-    remaining_lightning_slots = LightningTalkProposal.get_remaining_lightning_slots()
+    remaining_lightning_slots = LightningTalkProposal.get_days_with_slots()
     # Require logged in users as you have to have a ticket to lightning talk
     if cfp_type == "lightning" and current_user.is_anonymous:
         return redirect(
             url_for("users.login", next=url_for(".form", cfp_type="lightning"))
         )
     elif cfp_type == "lightning":
-        if all(
-            [
-                i <= 0
-                for i in LightningTalkProposal.get_remaining_lightning_slots().values()
-            ]
-        ):
+        if all([i <= 0 for i in remaining_lightning_slots.values()]):
             flash("All lightning talk sessions are now full, sorry")
             return redirect(url_for(".main"))
         form.set_session_choices(remaining_lightning_slots)
@@ -330,7 +325,7 @@ def form(cfp_type="talk"):
     full_lightning_sessions = [
         LIGHTNING_TALK_SESSIONS[day]["human"]
         for (day, remaining) in remaining_lightning_slots.items()
-        if remaining <= 0
+        if remaining <= 0 and day in LIGHTNING_TALK_SESSIONS
     ]
 
     return render_template(
@@ -474,9 +469,7 @@ def edit_proposal(proposal_id):
         elif proposal.type == "lightning":
             form.slide_link.data = proposal.slide_link
 
-            remaining_lightning_slots = (
-                LightningTalkProposal.get_remaining_lightning_slots()
-            )
+            remaining_lightning_slots = LightningTalkProposal.get_days_with_slots()
             # Make sure that their previously selected session is a choice
             if remaining_lightning_slots[proposal.session] <= 0:
                 remaining_lightning_slots[proposal.session] = 1

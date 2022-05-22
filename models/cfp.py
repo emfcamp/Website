@@ -855,6 +855,22 @@ class LightningTalkProposal(Proposal):
         return LIGHTNING_TALK_SESSIONS[self.session]["human"]
 
     @classmethod
+    def get_days_with_slots(cls, now=None):
+        remaining_slots = cls.get_remaining_lightning_slots()
+        now = datetime.now() if now is None else now
+
+        # If we're before the event start we don't need to worry
+        if now < event_start():
+            return remaining_slots
+
+        # If the day has passed (or is today) there're no more slots for it
+        for (day_name, date) in get_days_map().items():
+            if date.date() <= now.date():
+                remaining_slots[day_name] = 0
+
+        return remaining_slots
+
+    @classmethod
     def get_remaining_lightning_slots(cls):
         # Find which day's sessions still have spaces
 
