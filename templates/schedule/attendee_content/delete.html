@@ -1,0 +1,11 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "base.html" %}
+{% block title %}Delete content{% endblock %}
+{% block body %}
+    <h2>Delete content</h2>
+    <p>This will delete your {{ proposal.human_type }} {{ proposal.title }}. You will not be able to recover it afterwards.</p>
+    <form method="post" action="{{ url_for('.attendee_content_delete', id=proposal.id) }}" class="form-horizontal" role="form">
+    {{ form.hidden_tag() }}
+    {{ form.delete(class_="btn btn-warning pull-right") }}
+    </form>
+{% endblock %}

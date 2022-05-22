@@ -17,6 +17,7 @@ from wtforms import (
     DecimalField,
     TimeField,
     BooleanField,
+    SubmitField,
 )
 from wtforms.validators import DataRequired, Optional, NumberRange
 from datetime import date, datetime, timedelta
@@ -179,7 +180,11 @@ def attendee_content_edit(id):
     )
 
 
-@schedule.route("/attendee_content/<int:id>/delete", methods=["GET"])
+class DeleteAttendeeContentForm(Form):
+    delete = SubmitField("Delete content")
+
+
+@schedule.route("/attendee_content/<int:id>/delete", methods=["GET", "POST"])
 @login_required
 @feature_flag("ATTENDEE_CONTENT")
 def attendee_content_delete(id):
@@ -187,6 +192,16 @@ def attendee_content_delete(id):
     if not proposal or proposal.user_id != current_user.id:
         return redirect(url_for("schedule.attendee_content"))
 
-    db.session.delete(proposal)
-    db.session.commit()
-    return redirect(url_for("schedule.attendee_content"))
+    form = DeleteAttendeeContentForm()
+
+    if form.validate_on_submit():
+        db.session.delete(proposal)
+        db.session.commit()
+
+        return redirect(url_for("schedule.attendee_content"))
+
+    return render_template(
+        "schedule/attendee_content/delete.html",
+        proposal=proposal,
+        form=form,
+    )
