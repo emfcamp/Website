@@ -51,6 +51,7 @@
   border-color: color.adjust($main-background, $lightness: 10%);
   padding-top: 15px;
   padding-bottom: 15px;
+  color: color.mix($main-background-text, $main-background, 50%);
 }
 
 textarea#description {
