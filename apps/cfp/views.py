@@ -31,6 +31,7 @@ from models.cfp import (
     LENGTH_OPTIONS,
     PROPOSAL_TIMESLOTS,
     LIGHTNING_TALK_SESSIONS,
+    HUMAN_CFP_TYPES,
 )
 from ..common import feature_flag, feature_enabled, create_current_user
 from ..common.email import from_email
@@ -192,6 +193,17 @@ def form(cfp_type="talk"):
 
     if feature_enabled("CFP_CLOSED") and not ignore_closed:
         return render_template("cfp/closed.html", cfp_type=cfp_type)
+
+    if feature_enabled("CFP_{}S_CLOSED".format(cfp_type.upper())) and not ignore_closed:
+        msg = Markup(
+            render_template_string(
+                """Sorry, we're not accepting new {{ type }} proposals, if you have been told to submit something please <a href="{{ url }}">click here</a>""",
+                type=HUMAN_CFP_TYPES[cfp_type],
+                url=url_for(".form", cfp_type=cfp_type, closed=True),
+            )
+        )
+        flash(msg)
+        return redirect(url_for(".main"))
 
     if (
         cfp_type == "lightning"
