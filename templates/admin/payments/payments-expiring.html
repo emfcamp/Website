@@ -26,7 +26,7 @@
   <td>{{ payment.expires and payment.expires.strftime('%Y-%m-%d') }}</td>
   <td>
     <a class="btn btn-primary" href="{{ url_for('.reset_expiry', payment_id=payment.id) }}">Reset expiry</a>
-    <a class="btn btn-warning {% if payment.reminder_sent -%} disabled {%- endif %}"
+    <a class="btn btn-warning {% if payment.reminder_sent_at -%} disabled {%- endif %}"
         href="{{ url_for('.send_reminder', payment_id=payment.id) }}">Remind</a>
   </td>
 </tr>

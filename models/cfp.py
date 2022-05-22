@@ -4,6 +4,8 @@ from typing import Optional
 from dateutil.parser import parse as parse_date
 import re
 from itertools import groupby
+from geoalchemy2 import Geometry
+from geoalchemy2.shape import to_shape
 
 from sqlalchemy import UniqueConstraint, func, select
 from sqlalchemy.orm import column_property
@@ -753,8 +755,9 @@ class Proposal(BaseModel):
 
     @property
     def latlon(self):
-        if self.scheduled_venue.lat and self.scheduled_venue.lon:
-            return (self.scheduled_venue.lat, self.scheduled_venue.lon)
+        if self.scheduled_venue.location:
+            loc = to_shape(self.scheduled_venue.location)
+            return (loc.coords.y, loc.coords.x)
         return None
 
     @property
@@ -1010,8 +1013,7 @@ class Venue(BaseModel):
     name = db.Column(db.String, nullable=False)
     type = db.Column(db.String, nullable=True)
     priority = db.Column(db.Integer, nullable=True, default=0)
-    lat = db.Column(db.Float)
-    lon = db.Column(db.Float)
+    location = db.Column(Geometry("POINT", srid=4326))
     scheduled_content_only = db.Column(db.Boolean)
     village = db.relationship(
         "Village",
@@ -1023,6 +1025,24 @@ class Venue(BaseModel):
 
     def __repr__(self):
         return "<Venue id={}, name={}>".format(self.id, self.name)
+
+    @property
+    def __geo_interface__(self):
+        """GeoJSON-like representation of the object for the map."""
+        if not self.location:
+            return None
+
+        location = to_shape(self.location)
+
+        return {
+            "type": "Feature",
+            "properties": {
+                "id": self.id,
+                "name": self.name,
+                "type": self.type,
+            },
+            "geometry": location.__geo_interface__,
+        }
 
 
 # TODO: change the relationships on User and Proposal to 1-to-1

@@ -305,7 +305,7 @@ def form(cfp_type="talk"):
         proposal.notice_required = form.notice_required.data
         proposal.needs_help = form.needs_help.data
 
-        db.session.add(cfp)
+        db.session.add(proposal)
         db.session.commit()
 
         # Send confirmation message

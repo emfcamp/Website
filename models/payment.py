@@ -37,7 +37,7 @@ class Payment(BaseModel):
     currency = db.Column(db.String, nullable=False)
     amount_int = db.Column(db.Integer, nullable=False)
     state = db.Column(db.String, nullable=False, default="new")
-    reminder_sent = db.Column(db.Boolean, nullable=False, default=False)
+    reminder_sent_at = db.Column(db.DateTime, nullable=True)
     expires = db.Column(db.DateTime, nullable=True)
     voucher_code = db.Column(
         db.String, db.ForeignKey("voucher.code"), nullable=True, default=None

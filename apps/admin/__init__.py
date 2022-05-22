@@ -33,7 +33,6 @@ from models.purchase import Purchase
 from models.ical import CalendarSource
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
 from models.site_state import SiteState, VALID_STATES, refresh_states
-from models.map import MapObject
 from models.scheduled_task import tasks, ScheduledTaskResult
 from ..payments.stripe import stripe_validate
 from ..payments.wise import (
@@ -292,12 +291,6 @@ class ScheduleForm(Form):
         feed.published = self.published.data
         feed.priority = self.priority.data
 
-        if self.location.data:
-            map_obj_id = int(self.location.data)
-            feed.mapobj = MapObject.query.get(map_obj_id)
-        else:
-            feed.mapobj = None
-
     def init_from_feed(self, feed):
         self.feed_name.data = feed.name
         self.url.data = feed.url
@@ -316,9 +309,7 @@ def schedule_feed(feed_id):
     feed = CalendarSource.query.get_or_404(feed_id)
     form = ScheduleForm()
 
-    choices = sorted([(str(mo.id), mo.name) for mo in MapObject.query])
-    choices = [("", "")] + choices
-    form.location.choices = choices
+    form.location.choices = []
 
     if form.validate_on_submit():
         if form.delete.data:

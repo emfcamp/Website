@@ -1,8 +1,7 @@
 """ Views for dealing with external schedules provided by villages."""
 
-from wtforms import StringField, SubmitField, BooleanField, SelectField
+from wtforms import StringField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, URL
-from models.map import MapObject
 from flask_login import login_required, current_user
 from flask import render_template, redirect, url_for, flash, request, abort
 
@@ -95,7 +94,6 @@ def external_feeds():
 class UpdateExternalFeedForm(Form):
     url = StringField("URL", [DataRequired(), URL()])
     name = StringField("Feed Name", [DataRequired()])
-    location = SelectField("Location", [DataRequired()])
     published = BooleanField("Publish events from this feed")
     preview = SubmitField("Preview")
     save = SubmitField("Save")
@@ -109,11 +107,7 @@ def external_feed(source_id):
     if calendar.user != current_user:
         abort(403)
 
-    choices = sorted([(str(mo.id), mo.name) for mo in MapObject.query])
-    choices = [("", "")] + choices
-
     form = UpdateExternalFeedForm(obj=calendar)
-    form.location.choices = choices
 
     if request.method != "POST":
         if calendar.mapobj:
@@ -126,12 +120,6 @@ def external_feed(source_id):
             calendar.url = form.url.data
             calendar.name = form.name.data
             calendar.published = form.published.data
-
-            if form.location.data:
-                map_obj_id = int(form.location.data)
-                calendar.mapobj = MapObject.query.get(map_obj_id)
-            else:
-                calendar.mapobj = None
 
             try:
                 calendar.refresh()

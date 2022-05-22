@@ -134,7 +134,7 @@ def send_reminder(payment_id):
 
             payment.lock()
 
-            if payment.reminder_sent:
+            if payment.reminder_sent_at:
                 app.logger.error("Reminder for payment %s already sent", payment.id)
                 flash(
                     "Cannot send duplicate reminder email for payment %s" % payment.id
@@ -142,7 +142,7 @@ def send_reminder(payment_id):
                 return redirect(url_for("admin.expiring"))
 
             msg = EmailMessage(
-                "Electromagnetic Field: Ticket payment not received",
+                "Electromagnetic Field: Your tickets will expire in five days",
                 from_email=from_email("TICKETS_EMAIL"),
                 to=[payment.user.email],
             )
@@ -153,7 +153,7 @@ def send_reminder(payment_id):
             )
             msg.send()
 
-            payment.reminder_sent = True
+            payment.reminder_sent_at = datetime.utcnow()
             db.session.commit()
 
             flash("Reminder email for payment %s sent" % payment.id)

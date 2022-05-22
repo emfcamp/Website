@@ -44,7 +44,7 @@ class Scheduler(object):
 
         db.session.commit()
 
-    def get_scheduler_data(self):
+    def get_scheduler_data(self, ignore_potential):
         proposals = (
             Proposal.query.filter(Proposal.scheduled_duration.isnot(None))
             .filter(Proposal.state.in_(["finished", "accepted"]))
@@ -113,12 +113,12 @@ class Scheduler(object):
 
                 if proposal.scheduled_venue:
                     export["venue"] = proposal.scheduled_venue.id
-                if proposal.potential_venue:
+                if not ignore_potential and proposal.potential_venue:
                     export["venue"] = proposal.potential_venue.id
 
                 if proposal.scheduled_time:
                     export["time"] = str(proposal.scheduled_time)
-                if proposal.potential_time:
+                if not ignore_potential and proposal.potential_time:
                     export["time"] = str(proposal.potential_time)
 
                 proposal_data.append(export)
@@ -196,11 +196,11 @@ class Scheduler(object):
         if not changes:
             app.logger.info("No schedule changes generated")
 
-    def run(self, persist):
+    def run(self, persist, ignore_potential):
         self.set_rough_durations()
 
         sm = SlotMachine()
-        data = self.get_scheduler_data()
+        data = self.get_scheduler_data(ignore_potential)
         if len(data) == 0:
             app.logger.error("No talks to schedule!")
             return

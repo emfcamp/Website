@@ -11,12 +11,12 @@ from main import external_url
 from . import event_tz
 
 
-def _get_proposal_dict(proposal, favourites_ids):
+def _get_proposal_dict(proposal: Proposal, favourites_ids):
     res = {
         "id": proposal.id,
         "slug": proposal.slug,
         "start_date": event_tz.localize(proposal.start_date),
-        "end_date": event_tz.localize(proposal.end_date),
+        "end_date": event_tz.localize(proposal.end_date) if proposal.end_date else None,
         "venue": proposal.scheduled_venue.name,
         "latlon": proposal.latlon,
         "map_link": proposal.map_link,
