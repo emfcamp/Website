@@ -10,4 +10,26 @@
   <h2>Next</h2>
   {{ next.title }}
 
+
+  {% if messages %}
+    <h1>Messages</h1>
+
+    <table class="table products">
+      <thead>
+        <tr>
+          <th>Time
+          <th>From
+          <th>Message
+        </tr>
+      </thead>
+      <tbody>
+        {% for msg in messages %}
+          <tr class="product form-group {{ loop.cycle('odd', 'even') }}">
+            <td>{{ msg.created.strftime("%A %H:%M")  }}
+            <td>{{ msg.created_by }}
+            <td>{{ msg.message }}
+          </tr>
+        {% endfor %}
+      </tbody>
+  {% endif %}
 {% endblock %}

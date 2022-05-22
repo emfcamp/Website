@@ -1,7 +1,15 @@
 from datetime import datetime
 
+from sqlalchemy.sql.functions import func
+
 from main import db
 from . import BaseModel
+
+INITIAL_TOPICS = {
+    "heralds",
+    "admin",
+    "public",
+}
 
 
 class AdminMessage(BaseModel):
@@ -29,7 +37,7 @@ class AdminMessage(BaseModel):
 
     @classmethod
     def get_visible_messages(cls):
-        return [m for m in AdminMessage.query.all() if m.is_visible]
+        return [m for m in cls.get_all_for_topic("public") if m.is_visible]
 
     @classmethod
     def get_all(cls):
@@ -38,3 +46,26 @@ class AdminMessage(BaseModel):
     @classmethod
     def get_by_id(cls, id):
         return AdminMessage.query.get_or_404(id)
+
+    @classmethod
+    def get_all_for_topic(cls, topic):
+        return AdminMessage.query.filter(
+            AdminMessage.topic == topic,
+            AdminMessage.end > datetime.utcnow(),
+        ).all()
+
+    @classmethod
+    def get_topic_counts(cls):
+        res = {k: 0 for k in INITIAL_TOPICS}
+        res.update(
+            dict(
+                AdminMessage.query.with_entities(
+                    AdminMessage.topic,
+                    func.count(AdminMessage.id).label("message_count"),
+                )
+                .group_by(AdminMessage.topic)
+                .order_by(AdminMessage.topic)
+                .all()
+            )
+        )
+        return res

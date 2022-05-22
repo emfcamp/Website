@@ -7,6 +7,8 @@ from flask import render_template, redirect, url_for, flash, request, abort
 from flask_login import current_user
 from flask import current_app as app
 
+from wtforms import BooleanField, SubmitField, FormField, StringField
+
 from main import db
 from models import event_year
 from models.cfp import Proposal, Venue
@@ -15,6 +17,7 @@ from models.user import generate_api_token
 from models.admin_message import AdminMessage
 
 from ..common import feature_flag, feature_enabled
+from ..common.forms import Form, HiddenIntegerField
 from ..volunteer import v_user_required
 
 from . import schedule, event_tz
@@ -268,15 +271,38 @@ def time_machine():
 @schedule.route("/herald")
 @v_user_required
 def herald_main():
+    # In theory this should redirect you based on your shift
     venue_list = ("Stage A", "Stage B", "Stage C")
     return render_template("schedule/herald/main.html", venue_list=venue_list)
+
+
+class HeraldCommsForm(Form):
+    talk_id = HiddenIntegerField()
+    may_record = BooleanField("Can this be recorded?")
+    update = SubmitField("Update info")
+
+    speaker_here = SubmitField("'Now' Speaker here")
+
+
+class HeraldStageForm(Form):
+    now = FormField(HeraldCommsForm)
+    next = FormField(HeraldCommsForm)
+
+    message = StringField("Message")
+    send_message = SubmitField("Send message")
+
+
+def herald_message(self, message, user, end):
+
+    app.logger.info(f"Creating new message {message}")
+    return AdminMessage(message, user, topic="heralds")
 
 
 @schedule.route("/herald/<string:venue_name>")
 @v_user_required
 def herald_venue(venue_name):
 
-    proposals = (
+    now, next = (
         Proposal.query.join(Venue, Venue.id == Proposal.scheduled_venue_id)
         .filter(
             Venue.name == venue_name,
@@ -289,9 +315,64 @@ def herald_venue(venue_name):
         .limit(2)
         .all()
     )
+
+    form = HeraldStageForm()
+
+    if form.validate_on_submit():
+        if form.now.update.data:
+            if form.now.talk_id != now.id:
+                flash("'now' changed, please refresh")
+                return redirect(url_for(".herald_venue", venue_name=venue_name))
+            now.may_record = form.now.may_record.data
+
+        elif form.next.update.data:
+            if form.next.talk_id != next.id:
+                flash("'next' changed, please refresh")
+                return redirect(url_for(".herald_venue", venue_name=venue_name))
+            next.may_record = form.next.may_record.data
+
+        elif form.now.speaker_here.data:
+            msg = herald_message(
+                f"Current speaker for {venue_name} ({now.user.name}) arrived.",
+                current_user,
+                end=(now.scheduled_time + now.scheduled_duration),
+            )
+
+        elif form.next.speaker_here.data:
+            msg = herald_message(
+                f"Next speaker for {venue_name} ({next.user.name}) arrived.",
+                current_user,
+                end=(next.scheduled_time + next.scheduled_duration),
+            )
+
+        elif form.send_message.data:
+            msg = herald_message(
+                form.message.data, current_user, pendulum.today().end_of("day")
+            )
+
+        if msg:
+            db.session.add(msg)
+
+        db.session.commit()
+
+    messages = AdminMessage.get_all_for_topic("heralds")
+
+    form.now.talk_id.data = now.id
+    form.now.may_record.data = now.may_record
+
+    form.next.talk_id.data = next.id
+    form.next.may_record.data = next.may_record
+
     return render_template(
         "schedule/herald/venue.html",
+        messages=messages,
         venue_name=venue_name,
-        now=proposals[0],
-        next=proposals[1],
+        form=form,
+        now=now,
+        next=next,
     )
+
+
+@schedule.route("/greenroom")
+def greenroom():
+    pass
