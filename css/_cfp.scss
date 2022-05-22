@@ -1,4 +1,5 @@
 @use "./_variables.scss" as *;
+@use "sass:color";
 
 .cfp-pane {
   background-color: $highlight-background;
@@ -43,6 +44,13 @@
 
 .cfp-choose-type a.list-group-item:hover {
   background-color: $highlight-3-background-hover;
+}
+
+.cfp-choose-type span.list-group-item {
+  background-color: color.adjust($main-background, $lightness: 10%);
+  border-color: color.adjust($main-background, $lightness: 10%);
+  padding-top: 15px;
+  padding-bottom: 15px;
 }
 
 textarea#description {
