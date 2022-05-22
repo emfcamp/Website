@@ -61,7 +61,9 @@ def schedule():
     role_descriptions = _format_role_descriptions()
 
     untrained_roles = [
-        r for r in roles if r["requires_training"] and not r["is_trained"]
+        r
+        for r in roles
+        if r["is_interested"] and r["requires_training"] and not r["is_trained"]
     ]
     if datetime.utcnow() < config_date("EVENT_START"):
         def_day = "thu"
