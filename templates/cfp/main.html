@@ -1,4 +1,5 @@
 {% from "_formhelpers.html" import render_field %}
+{% from "cfp/_cfp_type_menu.html" import cfp_type_menu with context %}
 {% extends "base.html" %}
 {% block title %}Call for Participation{% endblock %}
 {% block body %}
@@ -51,12 +52,14 @@
     <h2>Submit a new proposal</h2>
     <p>Please select the type of proposal you want to submit:</p>
     <div class="list-group cfp-choose-type">
-        <a href="{{ url_for('cfp.form', cfp_type='talk') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Talk</strong> &ndash; A presentation on a stage</a>
-        <a href="{{ url_for('cfp.form', cfp_type='workshop') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Workshop</strong> &ndash; A workshop in an area with tables &amp; other equipment</a>
-        <a href="{{ url_for('cfp.form', cfp_type='youthworkshop') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Youth Workshop</strong> &ndash; A workshop for attendees under 16</a>
-        <a href="{{ url_for('cfp.form', cfp_type='performance') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Performance</strong> &ndash; A performance of music, art, dance, or film</a>
-        {#<span class="list-group-item"><strong>Installation</strong> &ndash; The CFP for installations will open soon</span>#}
-        <a href="{{ url_for('cfp.form', cfp_type='installation') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Installation</strong> &ndash; A creation for attendees to admire or interact with</a>
+        {{ cfp_type_menu('talk', 'A presentation on a stage', 'CFP_TALKS_CLOSED', ignore_closed) }}
+        {{ cfp_type_menu('workshop', 'A workshop in an area with tables &amp; other equipment', 'CFP_WORKSHOPS_CLOSED', ignore_closed) }}
+        {{ cfp_type_menu('youthworkshop', ' A workshop for attendees under 16', 'CFP_YOUTHWORKSHOPS_CLOSED', ignore_closed, pretty_title="Youth Workshop") }}
+        {{ cfp_type_menu('performance', ' A performance of music, art, dance, or film', 'CFP_PERFORMANCES_CLOSED', ignore_closed) }}
+        {{ cfp_type_menu('installation', ' A creation for attendees to admire or interact with', 'CFP_INSTALLATIONS_CLOSED', ignore_closed) }}
+
+        {# Lightning talks are different, mostly because they're partially enabled already #}
+        {# FIXME 2024 they should use the same logic as the other types #}
         {%- if feature_enabled('LIGHTNING_TALKS') and not lightning_talks_closed %}
           <a href="{{ url_for('cfp.form', cfp_type='lightning') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Lightning Talk</strong> &ndash; A quick-fire (less than 10m) presentation</a>
         {%- elif feature_enabled('LIGHTNING_TALKS') and lightning_talks_closed %}
