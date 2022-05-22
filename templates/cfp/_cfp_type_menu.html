@@ -1,7 +1,7 @@
-{% macro cfp_type_menu(type, description, feature_flag, ignore_closed, pretty_title=None) %}
+{% macro cfp_type_menu(type, description_html, feature_flag, ignore_closed, pretty_title=None) %}
   {% if not feature_enabled(feature_flag) or ignore_closed %}
-    <a href="{{ url_for('cfp.form', cfp_type=type) + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>{{(pretty_title or type) | title}}</strong> &ndash; {{description}}</a>
+    <a href="{{ url_for('cfp.form', cfp_type=type) + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>{{(pretty_title or type) | title}}</strong> &ndash; {{description_html|safe}}</a>
   {% else %}
-    <span class="list-group-item"><strong>{{(pretty_title or type) | title}}</strong> &ndash; {{description}}. These are now full</span>
+    <span class="list-group-item"><strong>{{(pretty_title or type) | title}}</strong> &ndash; {{description_html|safe}}. These are now full</span>
   {% endif %}
 {% endmacro %}
