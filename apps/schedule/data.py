@@ -110,8 +110,8 @@ def _get_scheduled_proposals(filter_obj={}, override_user=None):
 
 
 def _get_upcoming(filter_obj={}, override_user=None):
-    # now = pendulum.now(event_tz)
-    now = pendulum.datetime(2018, 8, 31, 13, 0, tz=event_tz)
+    now = pendulum.now(event_tz)
+    # now = pendulum.datetime(2018, 8, 31, 13, 0, tz=event_tz)
     proposals = _get_scheduled_proposals(filter_obj, override_user)
     upcoming = [_convert_time_to_str(p) for p in proposals if p["end_date"] > now]
 
