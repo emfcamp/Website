@@ -12,7 +12,7 @@
         <link rel="shortcut icon" href="/favicon.ico">
     </head>
 <body>
-{% if config['SERVER_NAME'] != 'www.emfcamp.org' and not config['DEBUG_TB_ENABLED'] %}
+{% if config.get('SERVER_NAME') != 'www.emfcamp.org' and not config['DEBUG_TB_ENABLED'] %}
 {# Show a banner on systems that aren't in debug mode (e.g. emfcamp-test.org) #}
 <div class="non-prod-banner alert-warning">This is not the production site. Please <a href="https://www.emfcamp.org/">click here</a> to learn more about Electromagnetic Field.</div>
 {% endif %}
