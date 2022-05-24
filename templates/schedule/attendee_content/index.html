@@ -12,6 +12,9 @@
                 <th>Location</th>
                 <th>Start</th>
                 <th>End</th>
+                {% if current_user.village %}
+                    <th>EMF<br />Scheduled</th>
+                {% endif %}
                 <th></th>
                 <th></th>
             </tr>
@@ -24,8 +27,15 @@
                 <td>{{ p.scheduled_venue.name }}</td>
                 <td>{{ p.start_date.strftime("%a %H:%M") }}</td>
                 <td>{{ p.end_date.strftime("%a %H:%M") }}</td>
+                {% if current_user.village %}
+                    <td>{{ not p.user_scheduled }}</td>
+                {% endif %}
                 <td><a href="{{ url_for("schedule.attendee_content_edit", id=p.id) }}">Edit</a></td>
-                <td><a href="{{ url_for("schedule.attendee_content_delete", id=p.id) }}">Delete</a></td>
+                <td>
+                    {% if p.user_scheduled %}
+                        <a href="{{ url_for("schedule.attendee_content_delete", id=p.id) }}">Delete</a>
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
         </tbody>

@@ -71,6 +71,16 @@
             {% endif %}
         </div>
     </div>
+    {% if proposal and not proposal.user_scheduled and proposal.allowed_times %}    
+        <div class="form-group">
+            <p>The person who submitted this content is available at the following times:</p>
+            <ul>
+                {% for time in proposal.allowed_times.split("\n") %}
+                    <li>{{ time }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
     <div class="form-group {%- if form.venue.errors %} has-error {%- endif %}">
         <label for="venue">Venue</label>
         <select class="form-control" id="venue" name="venue">
@@ -156,7 +166,6 @@
         {% endif %}
     </div>
     <div class="form-actions">
-    {{ form.obj }}
         <button type="submit" class="btn btn-primary">{%- if proposal %}Update{%- else %}Add{%- endif %} Content</button>
     </div>
 </form>
