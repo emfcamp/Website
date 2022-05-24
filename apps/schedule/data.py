@@ -30,10 +30,10 @@ def _get_proposal_dict(proposal: Proposal, favourites_ids):
         "is_fave": proposal.id in favourites_ids,
         "source": "database",
         "link": external_url(
-            ".line_up_redirect",
+            ".item",
             year=event_year(),
-            slug=proposal.slug,
             proposal_id=proposal.id,
+            slug=proposal.slug,
         ),
     }
     if proposal.type in ["workshop", "youthworkshop"]:
