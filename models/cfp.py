@@ -755,9 +755,9 @@ class Proposal(BaseModel):
 
     @property
     def latlon(self):
-        if self.scheduled_venue.location:
+        if self.scheduled_venue and self.scheduled_venue.location:
             loc = to_shape(self.scheduled_venue.location)
-            return (loc.coords.y, loc.coords.x)
+            return (loc.y, loc.x)
         return None
 
     @property
