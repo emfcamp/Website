@@ -1,6 +1,7 @@
 """ Views for attendees to manage their own content."""
 
 from models.cfp import PYTHON_CFP_TYPES, Proposal, Venue, AGE_RANGE_OPTIONS
+from sqlalchemy import or_, and_
 from flask_login import login_required, current_user
 from flask import (
     current_app as app,
@@ -47,7 +48,7 @@ class ContentForm(Form):
 
         if user.village:
             private_venues = Venue.query.filter_by(
-                village_id=user.village.village.id
+                village_id=user.village.id
             ).all()
             venues.extend(private_venues)
 
@@ -110,8 +111,14 @@ def populate(proposal, form):
 @login_required
 @feature_flag("ATTENDEE_CONTENT")
 def attendee_content():
-    content = Proposal.query.filter_by(
-        user_id=current_user.id, user_scheduled=True
+    # Yes, this is probably awful Python.
+    venues = [venue.id for venue in Venue.query.filter_by(village_id=current_user.village.id).all()]
+    content = Proposal.query.filter(
+        or_(
+            and_(Proposal.user_id == current_user.id, Proposal.user_scheduled == True),
+            Proposal.scheduled_venue_id.in_(venues)
+        ),
+        Proposal.state.in_(["accepted", "finished"])
     ).all()
 
     form = ContentForm()
@@ -119,9 +126,10 @@ def attendee_content():
 
     if request.method == "POST" and form.validate():
         proposal = PYTHON_CFP_TYPES[form.type.data]()
-        proposal.user_id = current_user.id
-        proposal.user_scheduled = True
-        proposal.state = "finished"
+        if proposal.user_id is None:
+            proposal.user_id = current_user.id
+            proposal.user_scheduled = True
+            proposal.state = "finished"
         populate(proposal, form)
 
         conflicts = proposal.get_conflicting_content()
@@ -151,7 +159,7 @@ def attendee_content():
 @feature_flag("ATTENDEE_CONTENT")
 def attendee_content_edit(id):
     proposal = Proposal.query.filter_by(id=id).first()
-    if not proposal or proposal.user_id != current_user.id:
+    if not proposal or (proposal.user_id != current_user.id and proposal.scheduled_venue.village_id != current_user.village.id):
         return redirect(url_for("schedule.attendee_content"))
 
     form = ContentForm(obj=proposal)
