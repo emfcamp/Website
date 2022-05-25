@@ -53,8 +53,10 @@ var emf_scheduler = {};
     is_anonymous = {% if current_user.is_anonymous -%} true {%- else -%} false {%- endif %},
     // THE MONTH ON THESE DATE OBJECTS IS OFFSET BY ONE
     // WHAT THE FUCK
+    // HEY THE DAY NEEDS TO BE +1 TOO
+    // WHAT THE FUCK
     start_date = new Date(2022, 5, 3),
-    end_date = new Date(2022, 5, 5),
+    end_date = new Date(2022, 5, 6),
     venue_dict = {},
     day_format = "%D, %j",   // e.g. Friday, 5th
     day_formatter = scheduler.date.date_to_str(day_format),
