@@ -130,9 +130,21 @@ def run_schedule(persist, ignore_potential, type):
 @click.option(
     "--email/--no-email", default=True, help="Send update emails to proposers"
 )
-def apply_potential_schedule(email):
+@click.option(
+    "--type",
+    help="Which type of proposal to apply for ('all' selects all proposals)",
+    required=True,
+)
+def apply_potential_schedule(email, type):
+    if type:
+        query = Proposal.query.filter(Proposal.type == type)
+    elif type == "all":
+        query = Proposal.query
+    else:
+        raise Exception("Set a type")
+
     proposals = (
-        Proposal.query.filter(
+        query.filter(
             (Proposal.potential_venue != None)  # noqa: E711
             | (Proposal.potential_time != None)  # noqa: E711
         )
