@@ -210,6 +210,9 @@ def subscribe():
 def emp():
     return render_template("emp.html")
 
+@base.route("/deliveries")
+def deliveries():
+    return redirect("/static/deliveries.pdf")
 
 from . import redirects  # noqa
 from . import about  # noqa
