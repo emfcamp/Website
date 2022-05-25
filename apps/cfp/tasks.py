@@ -92,13 +92,19 @@ def email_check():
 def email_finalise():
     """Email speakers about finalising their talk"""
     proposals = (
-        Proposal.query.filter(Proposal.scheduled_duration.isnot(None))
-        .filter(Proposal.state.in_(["accepted"]))
+        Proposal.query.filter(Proposal.state.in_(["accepted"]))
         .filter(Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]))
         .all()
     )
 
     for proposal in proposals:
+        if not proposal.scheduled_duration:
+            app.logger.info(
+                "SKIPPING proposal %s due to lack of a scheduled duration. Set a duration!",
+                proposal.id,
+            )
+            continue
+
         send_email_for_proposal(
             proposal,
             reason="please-finalise",
