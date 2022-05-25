@@ -9,6 +9,7 @@ from flask import (
     redirect,
     url_for,
     request,
+    flash,
 )
 from wtforms import (
     StringField,
@@ -47,8 +48,7 @@ class ContentForm(Form):
         venues = []
 
         if user.village:
-            private_venues = Venue.query.filter_by(village_id=user.village.id).all()
-            venues.extend(private_venues)
+            venues.extend(user.village.venues)
 
         public_venues = Venue.query.filter_by(
             village_id=None, scheduled_content_only=False
@@ -109,15 +109,11 @@ def populate(proposal, form):
 @login_required
 @feature_flag("ATTENDEE_CONTENT")
 def attendee_content():
-    # Yes, this is probably awful Python.
-    venues = [
-        venue.id
-        for venue in Venue.query.filter_by(village_id=current_user.village.id).all()
-    ]
+    venue_ids = [venue.id for venue in current_user.village.venues]
     content = Proposal.query.filter(
         or_(
             and_(Proposal.user_id == current_user.id, Proposal.user_scheduled is True),
-            Proposal.scheduled_venue_id.in_(venues),
+            Proposal.scheduled_venue_id.in_(venue_ids),
         ),
         Proposal.state.in_(["accepted", "finished"]),
     ).all()
@@ -127,10 +123,9 @@ def attendee_content():
 
     if request.method == "POST" and form.validate():
         proposal = PYTHON_CFP_TYPES[form.type.data]()
-        if proposal.user_id is None:
-            proposal.user_id = current_user.id
-            proposal.user_scheduled = True
-            proposal.state = "finished"
+        proposal.user_id = current_user.id
+        proposal.user_scheduled = True
+        proposal.state = "finished"
         populate(proposal, form)
 
         conflicts = proposal.get_conflicting_content()
@@ -200,8 +195,11 @@ class DeleteAttendeeContentForm(Form):
 @login_required
 @feature_flag("ATTENDEE_CONTENT")
 def attendee_content_delete(id):
-    proposal = Proposal.query.filter_by(id=id).first()
-    if not proposal or proposal.user_id != current_user.id:
+    proposal = Proposal.query.get_or_404(id)
+    can_delete = proposal.user_id == current_user.id and proposal.user_scheduled
+    if not can_delete:
+        app.logger.warn(f"{current_user} cannot delete proposal {proposal}")
+        flash("You can't delete this content")
         return redirect(url_for("schedule.attendee_content"))
 
     form = DeleteAttendeeContentForm()
