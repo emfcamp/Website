@@ -1,14 +1,14 @@
 """volunteer role admin
 
-Revision ID: 31ef203954e6
-Revises: 7fc03f15fe50
-Create Date: 2022-05-20 22:08:24.912054
+Revision ID: 7ee1d8f4e3fc
+Revises: 5707d636e41d
+Create Date: 2022-05-25 23:39:23.727025
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '31ef203954e6'
-down_revision = '7fc03f15fe50'
+revision = '7ee1d8f4e3fc'
+down_revision = '5707d636e41d'
 
 from alembic import op
 import sqlalchemy as sa
