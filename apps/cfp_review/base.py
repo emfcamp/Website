@@ -986,6 +986,16 @@ def scheduler():
         .all()
     )
 
+    venues = [
+        {"key": v.id, "label": v.name}
+        for v in Venue.query.order_by(Venue.priority.desc()).all()
+    ]
+
+    venues_to_show = request.args.getlist("venue")
+    if venues_to_show:
+        venues = [venue for venue in venues if venue["label"] in venues_to_show]
+    venue_ids = [venue["key"] for venue in venues]
+
     schedule_data = []
     for proposal in proposals:
         export = {
@@ -1025,16 +1035,11 @@ def scheduler():
         if "venue" not in export or "start_date" not in export:
             continue
 
+        # Skip this event if we're filtering out the venue it's currently scheduled in
+        if export["venue"] not in venue_ids:
+            continue
+
         schedule_data.append(export)
-
-    venues = [
-        {"key": v.id, "label": v.name}
-        for v in Venue.query.order_by(Venue.priority.desc()).all()
-    ]
-
-    venues_to_show = request.args.getlist("venue")
-    if venues_to_show:
-        venues = [venue for venue in venues if venue["label"] in venues_to_show]
 
     return render_template(
         "cfp_review/scheduler.html",
