@@ -106,7 +106,10 @@ def set_rough_durations():
 @click.option(
     "--ignore_potential", is_flag=True, help="Ignore potential slots when scheduling"
 )
-def run_schedule(persist, ignore_potential):
+@click.option(
+    "--type", help="Only run the scheduler for the specified type of content."
+)
+def run_schedule(persist, ignore_potential, type):
     """Run the schedule constraint solver. This can take a while."""
     scheduler = Scheduler()
     if ignore_potential:
@@ -114,7 +117,13 @@ def run_schedule(persist, ignore_potential):
             f"Ignoring current potential slots, items without a scheduled slot will move!"
         )
 
-    scheduler.run(persist, ignore_potential)
+    if type:
+        app.logger.info(f"Only scheduling {type} proposals.")
+        type = [type]
+    else:
+        type = ["talk", "workshop", "youthworkshop"]
+
+    scheduler.run(persist, ignore_potential, type)
 
 
 @cfp.cli.command("apply_potential_schedule")
