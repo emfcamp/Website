@@ -76,7 +76,7 @@
             <h4 class="panel-title">
                 <a role="button" data-toggle="collapse" data-target="#searchPanel"
                     aria-controls="searchPanel" aria-expanded="true">
-                    <strong>Filter</strong>
+                    <strong>Filter▼</strong>
                 </a>
             </h4>
         </div>
@@ -145,12 +145,6 @@
         </div>
       </div>
     </div>
-
-    {% for key, value in role_descriptions.items() %}
-      <div id="role-description-{{ key }}" class="role-description">
-        {{ value }}
-      </div>
-    {% endfor %}
 
     <script src="{{ static_url_for('static', filename='js/volunteer-schedule.js') }}"></script>
     <script type="text/javascript" nonce="{{csp_nonce}}">

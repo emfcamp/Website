@@ -58,7 +58,6 @@ def schedule():
         by_time[day_key][hour_key].append(to_add)
 
     roles = _get_interested_roles(current_user)
-    role_descriptions = _format_role_descriptions()
 
     untrained_roles = [
         r
@@ -76,7 +75,6 @@ def schedule():
         roles=roles,
         all_shifts=by_time,
         active_day=active_day,
-        role_descriptions=role_descriptions,
         all_volunteers=all_volunteers,
         untrained_roles=untrained_roles,
     )
