@@ -30,12 +30,19 @@ function FamilyFriendlyIcon({ isFamilyFriendly }) {
   return <Icon name="people" className="family-friendly" size="32" label="Family Friendly" />;
 }
 
-function EventIcons({ noRecording, isFavourite, isFamilyFriendly }) {
+function ContentWarningIcon({ hasContentWarning }) {
+  if (!hasContentWarning) { return null; }
+
+  return <Icon name="alert-fill" className="content-warning" size="32" label="Content Warning" />;
+}
+
+function EventIcons({ noRecording, isFavourite, isFamilyFriendly, hasContentWarning }) {
   return (
     <div className="event-icons">
       <NoRecordingIcon key='no-recording' noRecording={ noRecording } />
       <FavouriteIcon key='favourite' isFavourite={ isFavourite } />
       <FamilyFriendlyIcon key='family-friendly' isFamilyFriendly={ isFamilyFriendly } />
+      <ContentWarningIcon key='content-warning' hasContentWarning={ hasContentWarning } />
     </div>
   );
 }
@@ -71,6 +78,7 @@ function Event({ event, toggleFavourite, authenticated }) {
 
     return (
       <div className="event-details">
+        <AdditionalInformation label="Content warning" value={ event.content_note } />
         <AdditionalInformation label="Age range" value={ event.age_range } />
         <AdditionalInformation label="Cost" value={ event.cost } />
         <AdditionalInformation label="Required equipment" value={ event.equipment } />
@@ -92,7 +100,7 @@ function Event({ event, toggleFavourite, authenticated }) {
           <h3 title={ event.title }>{ event.title }</h3>
           <p>{ metadata } | <span className="speaker">{ event.speaker }</span></p>
         </div>
-        <EventIcons noRecording={ event.noRecording } isFavourite={ event.is_fave } isFamilyFriendly={ event.is_family_friendly } />
+        <EventIcons noRecording={ event.noRecording } isFavourite={ event.is_fave } isFamilyFriendly={ event.is_family_friendly } hasContentWarning={ event.content_note && event.content_note != ''} />
       </div>
       { eventDetails() }
     </div>
