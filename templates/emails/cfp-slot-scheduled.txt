@@ -6,7 +6,7 @@ Your EMF {{ proposal.human_type }} '{{ proposal.title }}' has been scheduled!
 
 You have a {{ proposal.scheduled_duration }} minute slot in {{ proposal.scheduled_venue.name }} on {{ proposal.scheduled_time.strftime('%A at %-I:%M %p') }}. If this is not suitable, please let us know as soon as possible.
 
-If you'd like to share this with people, the public link to your {{ proposal.human_type }} is: https://www.emfcamp.org/line-up/2018/{{ proposal.id }}
+If you'd like to share this with people, the public link to your {{ proposal.human_type }} is: https://www.emfcamp.org/schedule/2022/{{ proposal.id }}
 
 Things to note:
 
