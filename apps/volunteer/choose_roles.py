@@ -88,7 +88,16 @@ def choose_role():
     if current_roles:
         role_ids = [r.id for r in current_roles]
         form.select_roles(role_ids)
-
+    if uninterested_roles := [
+        se.shift.role
+        for se in current_user.shift_entries
+        if se.shift.role not in current_roles
+    ]:
+        ui_roles_str = ", ".join([uir.name for uir in uninterested_roles])
+        flash(
+            f"You are still signed up for shifts for {ui_roles_str}. "
+            + "Please cancel them from Shift sign-up if you don't want to do them."
+        )
     return render_template("volunteer/choose_role.html", form=form)
 
 
