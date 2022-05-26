@@ -23,6 +23,11 @@
   }
 }
 
+.schedule-day h2 {
+  border-bottom: 2px solid #fff;
+  padding-bottom: 2px;
+}
+
 .no-recording {
   position: relative;
   width: 32px;
@@ -104,6 +109,7 @@
 
     .speaker {
       color: #E4147E;
+      font-weight: bold;
     }
   }
 
