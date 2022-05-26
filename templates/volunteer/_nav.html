@@ -15,7 +15,6 @@
     {% endif %}
     {{ menuitem('Bar Training', '.bar_training') }}
     {% if current_user.is_authenticated and current_user.has_permission('volunteer:admin') %}
-        {{ menuitem('Manage Training', '.select_training') }}
         {{ menuitem('Admin', 'volunteer_admin.index') }}        
     {% endif %}
     {{ menuitem("Log Out", "users.logout") }}
