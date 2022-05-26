@@ -24,6 +24,7 @@ def create_venues():
         ("Workshop 2", 96, (52.04208, -2.37715), True, "workshop"),
         ("Workshop 3", 95, (52.04129, -2.37578), True, "workshop"),
         ("Workshop 4", 94, (52.04329, -2.37590), True, "workshop"),
+        ("Workshop 5", 94, (52.040938, -2.37706), True, "workshop"),
         ("Youth Workshop", 93, (52.04117, -2.37771), True, "youthworkshop"),
         ("Main Bar", 92, (52.04180, -2.37727), False, "talk,performance"),
         (
