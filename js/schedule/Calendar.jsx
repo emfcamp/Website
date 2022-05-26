@@ -90,7 +90,7 @@ function Event({ event, toggleFavourite, authenticated }) {
       <div className="event-synopsis" onClick={ toggleExpanded }>
         <div className="event-data">
           <h3 title={ event.title }>{ event.title }</h3>
-          <p>{ metadata } | <strong>{ event.speaker }</strong></p>
+          <p>{ metadata } | <span className="speaker">{ event.speaker }</span></p>
         </div>
         <EventIcons noRecording={ event.noRecording } isFavourite={ event.is_fave } isFamilyFriendly={ event.is_family_friendly } />
       </div>
