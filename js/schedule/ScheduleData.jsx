@@ -55,7 +55,12 @@ class ScheduleData {
     this.eventTypes = this.eventTypes.sort((a,b) => a.name.localeCompare(b.name));
 
     Object.keys(this.scheduleByHour).forEach(hour => {
-      this.scheduleByHour[hour] = this.scheduleByHour[hour].sort((a,b) => a.start_date.localeCompare(b.start_date));
+      this.scheduleByHour[hour] = this.scheduleByHour[hour].sort((a,b) => {
+        let date_sort = a.start_date.localeCompare(b.start_date);
+        if (date_sort !== 0) { return date_sort; }
+
+        return a.venue.localeCompare(b.venue);
+      });
     });
 
     this.hoursWithContent = this.hoursWithContent.sort();
