@@ -53,7 +53,7 @@ function FavouriteButton({ event, toggleFavourite, authenticated }) {
 }
 
 function AdditionalInformation({ label, value }) {
-  if (value === null || value === undefined || value == "") { return null; }
+  if (value === null || value === undefined || value == "Unspecified" || value == "") { return null; }
 
   return <p className="additional-information"><strong>{ label }:</strong> { value }</p>
 }
@@ -64,7 +64,6 @@ function Event({ event, toggleFavourite, authenticated }) {
   let metadata = [
     `${event.startTime.toFormat('HH:mm')} to ${event.endTime.toFormat('HH:mm')}`,
     event.venue,
-    event.speaker,
   ].filter(i => { return i !== null && i !== '' }).join(' | ');
 
   function eventDetails() {
@@ -91,7 +90,7 @@ function Event({ event, toggleFavourite, authenticated }) {
       <div className="event-synopsis" onClick={ toggleExpanded }>
         <div className="event-data">
           <h3 title={ event.title }>{ event.title }</h3>
-          <p>{ metadata }</p>
+          <p>{ metadata } | <strong>{ event.speaker }</strong></p>
         </div>
         <EventIcons noRecording={ event.noRecording } isFavourite={ event.is_fave } isFamilyFriendly={ event.is_family_friendly } />
       </div>
@@ -104,10 +103,13 @@ function Hour({ hour, content, newDay, toggleFavourite, authenticated }) {
   if (content.length === 0) { return null; }
 
   return (
-    <div className="schedule-hour">
-      <h2 id={hour.toISO()}>{ newDay && `${hour.weekdayLong} - ` }{hour.toFormat('HH:mm')}</h2>
-      <div className="schedule-events-container">
-        { content.map(event => <Event key={event.id} event={event} toggleFavourite={ toggleFavourite } authenticated={ authenticated } />) }
+    <div className="schedule-day">
+      { newDay && <h2>{ hour.weekdayLong }</h2> }
+      <div className="schedule-hour">
+        <h3 id={hour.toISO()}>{hour.toFormat('HH:mm')}</h3>
+        <div className="schedule-events-container">
+          { content.map(event => <Event key={event.id} event={event} toggleFavourite={ toggleFavourite } authenticated={ authenticated } />) }
+        </div>
       </div>
     </div>
   );
