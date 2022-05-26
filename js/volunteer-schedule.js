@@ -96,12 +96,13 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
 
             $('#signUp #signup-grp').empty();
             $('#signUp #signup-grp').append(make_modal_buttons(shift));
-            $('#shift-link').attr('href', 'shift/'+shift.id);
+
 
             if (is_admin) {
                 var override_btn = $('#signUp #override-sign-up-btn');
                 override_btn.click(make_override_signup_fn(override_btn, shift));
                 $('#contact-link').attr('href', 'shift/'+shift.id+'/contact');
+                $('#shift-link').attr('href', 'shift/'+shift.id);
             }
 
             $('#signUp').modal();

@@ -131,7 +131,7 @@ def _format_role_descriptions():
 
 @volunteer.route("/shift/<shift_id>", methods=["GET", "POST"])
 @feature_flag("VOLUNTEERS_SCHEDULE")
-@v_user_required
+@v_admin_required
 def shift(shift_id):
     shift = Shift.query.get_or_404(shift_id)
 
