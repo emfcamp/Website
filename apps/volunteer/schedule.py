@@ -87,13 +87,12 @@ def _toggle_shift_entry(user, shift):
     shift_entry = ShiftEntry.query.filter_by(user_id=user.id, shift_id=shift.id).first()
 
     if (
-        shift.role == Role.get_by_name("Bar")
-        and Role.get_by_name("Bar")
-        not in Volunteer.get_for_user(current_user).trained_roles
+        shift.role.requires_training
+        and shift.role not in Volunteer.get_for_user(current_user).trained_roles
     ):
         return {
             "warning": "Missing required training",
-            "message": "You must complete bar training before you can sign up for this shift",
+            "message": "You must complete training before you can sign up for this shift",
         }
 
     if shift_entry:
@@ -104,6 +103,12 @@ def _toggle_shift_entry(user, shift):
         for v_shift in user.shift_entries:
             if shift.is_clash(v_shift.shift):
                 res["warning"] = "WARNING: Clashes with an existing shift"
+                res["message"] = "You've not been signed up for this shift"
+                return res
+        if shift.current_count >= shift.max_needed:
+            res["warning"] = "WARNING: Shift is already full"
+            res["message"] = "You've not been signed up for this shift"
+            return res
 
         shift.entries.append(ShiftEntry(user=user, shift=shift))
         res["operation"] = "add"
