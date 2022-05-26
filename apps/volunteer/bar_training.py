@@ -121,7 +121,7 @@ class TrainingForm(Form):
 @volunteer.route("/bar-training", methods=["GET", "POST"])
 @v_user_required
 def bar_training():
-    bar = Role.query.filter_by(name="Barr").one_or_none()
+    bar = Role.query.filter_by(name="Bar").one_or_none()
     cybar = Role.query.filter_by(name="Cybar").one_or_none()
     if bar is None or cybar is None:
         abort(404)

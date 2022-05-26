@@ -96,7 +96,7 @@ class Shift(BaseModel):
 
     @classmethod
     def generate_for(
-        cls, role, venue, first, final, min, max, base_duration=180, changeover=15
+        cls, role, venue, first, final, min, max, base_duration=120, changeover=15
     ):
         """
         Will generate shifts between start and end times. The last shift will
