@@ -29,6 +29,7 @@ def _get_proposal_dict(proposal: Proposal, favourites_ids):
         "may_record": proposal.may_record,
         "is_fave": proposal.id in favourites_ids,
         "is_family_friendly": proposal.family_friendly,
+        "content_note": proposal.content_note,
         "source": "database",
         "link": external_url(
             ".item",
