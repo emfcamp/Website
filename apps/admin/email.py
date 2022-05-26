@@ -25,6 +25,7 @@ class EmailComposeForm(Form):
             ("ticket", "Ticketholders"),
             ("purchasers", "Users who made payments"),
             ("cfp", "Accepted CfP"),
+            ("ticket_and_cfp", "Ticketholders & Accepted CfP"),
             ("villages", "Village owners"),
         ],
     )
@@ -49,6 +50,16 @@ def get_query(dest):
         return User.query.join(User.proposals).filter(
             Proposal.state.in_(("accepted", "finished"))
         )
+    elif dest == "ticket_and_cfp":
+        ticketholders = (
+            User.query.join(User.owned_purchases)
+            .filter_by(type="admission_ticket", is_paid_for=True)
+            .group_by(User.id)
+        )
+        accepted_cfp_users = User.query.join(User.proposals).filter(
+            Proposal.state.in_(("accepted", "finished"))
+        )
+        return set(ticketholders + accepted_cfp_users)
     elif dest == "villages":
         return User.query.join(User.village_membership).filter(VillageMember.admin)
 
