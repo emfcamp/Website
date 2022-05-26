@@ -16,6 +16,7 @@ function App() {
   const [selectedEventTypes, setSelectedEventTypes] = useState([]);
   const [selectedAgeRanges, setSelectedAgeRanges] = useState([]);
   const [onlyFavourites, setOnlyFavourites] = useState(false);
+  const [onlyFamilyFriendly, setOnlyFamilyFriendly] = useState(false);
   const [debug, setDebug] = useState(false);
 
   const [rawSchedule, setRawSchedule] = useState(null);
@@ -33,9 +34,11 @@ function App() {
     if (debug === 'True') { setDebug(true); }
   }, []);
 
+
   // Pull the correct year's schedule if the year changes.
   useEffect(() => {
-    fetch(`/schedule.json`)
+    // fetch(`/schedule.json`)
+    fetch('/schedule/2018.json')
       .then(response => response.json())
       .then(body => {
         setRawSchedule(body);
@@ -53,9 +56,9 @@ function App() {
   useEffect(() => {
     if (rawSchedule == null) { return };
 
-    let newSchedule = new ScheduleData(rawSchedule, { currentTime, onlyFavourites, selectedVenues, selectedEventTypes, selectedAgeRanges });
+    let newSchedule = new ScheduleData(rawSchedule, { currentTime, onlyFavourites, onlyFamilyFriendly, selectedVenues, selectedEventTypes, selectedAgeRanges });
     setSchedule(newSchedule);
-  }, [currentTime, onlyFavourites, selectedVenues, selectedEventTypes, selectedAgeRanges, rawSchedule]);
+  }, [currentTime, onlyFavourites, onlyFamilyFriendly, selectedVenues, selectedEventTypes, selectedAgeRanges, rawSchedule]);
 
   // Update time once a minute
   useEffect(() => {
@@ -91,7 +94,7 @@ function App() {
   }
 
   let filterProps = {
-    schedule, onlyFavourites, setOnlyFavourites, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, selectedAgeRanges, setSelectedAgeRanges, debug, currentTime, setCurrentTime
+    schedule, onlyFavourites, setOnlyFavourites, onlyFamilyFriendly, setOnlyFamilyFriendly, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, selectedAgeRanges, setSelectedAgeRanges, debug, currentTime, setCurrentTime
   }
 
   return (
