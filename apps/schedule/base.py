@@ -31,7 +31,7 @@ def main_year(year):
     # Do we want to show the current year's schedule from the DB,
     # or a previous year's from the static archive?
     if year == event_year():
-        if app.config.get("SCHEDULE"):
+        if feature_enabled("SCHEDULE"):
             # Schedule is ready, show it
             return schedule_current()
         elif feature_enabled("LINE_UP"):

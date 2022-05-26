@@ -7,7 +7,7 @@
     {% if current_user.is_authenticated %}
     {{ menuitem('Account', '.account') }}
     {{ menuitem('Roles', '.choose_role') }}
-    {% if config.get('VOLUNTEERS_SCHEDULE') %}
+    {% if feature_enabled('VOLUNTEERS_SCHEDULE') %}
     {{ menuitem('Shift sign-up', '.schedule') }}
     {% endif %}
     {% else %}

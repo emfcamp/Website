@@ -15,7 +15,7 @@
 
 {% if proposal.scheduled_time and venue_name %}
 <p><strong>{{ proposal.scheduled_time.strftime('%A from %-I:%M %p') }}</strong> - <strong>{{ proposal.end_date.strftime('%-I:%M %p') }}</strong>
-   {% if config['SCHEDULE'] %}
+   {% if feature_enabled('SCHEDULE') %}
    in <strong><a href="{{ proposal.map_link }}" target="_blank">{{ venue_name }}</a></strong>
    {% else %}
    in <strong>{{ venue_name }}</strong>
