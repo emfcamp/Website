@@ -86,7 +86,6 @@
     </div>
 
     <ul class="nav nav-tabs" role="tablist">
-        {{ tabnav('wed', 'Wednesday', active_day) }}
         {{ tabnav('thu', 'Thursday', active_day) }}
         {{ tabnav('fri', 'Friday', active_day) }}
         {{ tabnav('sat', 'Saturday', active_day) }}
@@ -94,7 +93,6 @@
         {{ tabnav('mon', 'Monday', active_day) }}
     </ul>
     <div class="tab-content">
-        {{ days_shifts('wed', active_day) }}
         {{ days_shifts('thu', active_day) }}
         {{ days_shifts('fri', active_day) }}
         {{ days_shifts('sat', active_day) }}
