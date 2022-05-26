@@ -10,10 +10,11 @@
     {% if feature_enabled('VOLUNTEERS_SCHEDULE') %}
     {{ menuitem('Shift sign-up', '.schedule') }}
     {% endif %}
+    {{ menuitem('Bar Training', '.bar_training') }}
+    {{ menuitem('Handbook', '.info') }}
     {% else %}
     {{ menuitem('Sign up', '.sign_up') }}
     {% endif %}
-    {{ menuitem('Bar Training', '.bar_training') }}
     {% if current_user.is_authenticated and current_user.has_permission('volunteer:admin') %}
         {{ menuitem('Admin', 'volunteer_admin.index') }}        
     {% endif %}

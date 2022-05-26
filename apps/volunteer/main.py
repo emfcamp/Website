@@ -28,6 +28,24 @@ def info():
     return render_template("volunteer/info.html")
 
 
+@volunteer.route("/info/emergency")
+@feature_flag("VOLUNTEERS_SIGNUP")
+def info_emergency():
+    return render_template("volunteer/info_emergency.html")
+
+
+@volunteer.route("/info/lost_child")
+@feature_flag("VOLUNTEERS_SIGNUP")
+def info_lost_child():
+    return render_template("volunteer/info_lost_child.html")
+
+
+@volunteer.route("/info/food")
+@feature_flag("VOLUNTEERS_SIGNUP")
+def info_food():
+    return render_template("volunteer/info_food.html")
+
+
 @volunteer.route("/init_shifts")
 @v_admin_required
 def init_shifts():

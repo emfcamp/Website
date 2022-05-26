@@ -1,0 +1,12 @@
+{% macro item(name, view_name) -%}
+<li{% if request.endpoint == view_name %} class="active"{%endif%}>
+  <a href="{{url_for(view_name)}}">{{name}}</a>
+</li>
+{%- endmacro %}
+
+<ul role="navigation" aria-label="About">
+  {{item("Intro", "volunteer.info")}}
+  {{item("Emergency", "volunteer.info_emergency")}}
+  {{item("Lost Child", "volunteer.info_lost_child")}}
+  {{item("Food", "volunteer.info_food")}}
+</ul>

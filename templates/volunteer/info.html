@@ -4,16 +4,41 @@
     EMF Volunteer Info.
 {% endblock %}
 
-{% block body %}
-{% include "volunteer/_nav.html" %}
-    <h2>Information for volunteers</h2>
-    <p><a href="{{url_for('base.volunteering')}}">About volunteering (orga-side)</a></p>
+{% block secondary_nav %}
+  {% include "volunteer/_info_nav.html" %}
+{% endblock %}
 
+{% block body %}
+  {% include "volunteer/_nav.html" %}
+    <h2>Welcome</h2>
+    <p>Thank you for volunteering! EMF is an entirely volunteer run
+    event, and without people like you giving their time we wouldn’t
+    be able to make it happen.</p>
+
+    <h2>The Golden Rules</h2>
+    <p><strong>Don’t overcommit yourself.</strong></p>
+    
+    <p><strong>Tell us if you can’t get something done.</strong></p>
+
+    <p>Nobody will criticise you if you can't do something, and telling us
+    quickly means we can handle the situation.</p>
+   
     <h2>Important numbers</h2>
-    <dl class="dl-horizontal">
+    <!-- <dl class="dl-horizontal">
         <dt>First aid (mobiles)</dt><dd>01908 870909</dd>
         <dt>First aid (tent)</dt><dd>01908 870908</dd>
         <dt>Site manager</dt><dd>01908 870904</dd>
         <dt>Conduct</dt><dd>01908 870912</dd>
+    </dl> -->
+    <dl class="dl-horizontal">
+      <dt>Infodesk (switchboard)</dt><dd>1001</dd>
+      <dt>Logistics</dt><dd>1002</dd>
+      <dt>Site Manager</dt><dd>1004</dd>
+      <dt>Nipperbout (creche)</dt><dd>1005</dd>
+      <dt>First Aid Tent</dt><dd>1008</dd>
+      <dt>First Aid EMERGENCY</dt><dd>1009</dd>
+      <dt>HQ</dt><dd>1011</dd>
     </dl>
+    
+    <p><a href="{{url_for('base.volunteering')}}">About volunteering (orga-side)</a></p>
 {% endblock body %}
