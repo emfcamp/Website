@@ -364,8 +364,9 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
     $('#clear-btn').click(clear_filters);
 
     $('#signUp').on('hide.bs.modal', render);
-
+    $('#is_interested').prop('checked', true);
     load_filters();
+    set_roles();
     render();
     
     $('#role-select').on('change', roles_selected);
