@@ -4,7 +4,7 @@ import nl2br from 'react-nl2br';
 
 function Icon({ name, className, size, label }) {
   let svg = octicons[name].toSVG({ 'aria-label': label, width: size, height: size });
-  return <span className={ className } dangerouslySetInnerHTML={ { __html: svg } } />;
+  return <span className={ className } dangerouslySetInnerHTML={ { __html: svg } } title={ label } />;
 }
 
 function NoRecordingIcon({ noRecording }) {
@@ -12,8 +12,8 @@ function NoRecordingIcon({ noRecording }) {
 
   return (
     <div className="no-recording">
-      <Icon name="device-camera" className="camera" label="Not recorded" size="16" />
-      <Icon name="circle-slash" className="slash" size="32" />
+      <Icon name="device-camera" className="camera" size="16" />
+      <Icon name="circle-slash" className="slash" size="32" label="Not recorded" />
     </div>
   );
 }
@@ -24,11 +24,18 @@ function FavouriteIcon({ isFavourite }) {
   return <Icon name="star" className="favourite" size="32" label="Favourite" />;
 }
 
-function EventIcons({ noRecording, isFavourite }) {
+function FamilyFriendlyIcon({ isFamilyFriendly }) {
+  if (!isFamilyFriendly) { return null; }
+
+  return <Icon name="people" className="family-friendly" size="32" label="Family Friendly" />;
+}
+
+function EventIcons({ noRecording, isFavourite, isFamilyFriendly }) {
   return (
     <div className="event-icons">
       <NoRecordingIcon key='no-recording' noRecording={ noRecording } />
       <FavouriteIcon key='favourite' isFavourite={ isFavourite } />
+      <FamilyFriendlyIcon key='family-friendly' isFamilyFriendly={ isFamilyFriendly } />
     </div>
   );
 }
@@ -86,7 +93,7 @@ function Event({ event, toggleFavourite, authenticated }) {
           <h3 title={ event.title }>{ event.title }</h3>
           <p>{ metadata }</p>
         </div>
-        <EventIcons noRecording={ event.noRecording } isFavourite={ event.is_fave } />
+        <EventIcons noRecording={ event.noRecording } isFavourite={ event.is_fave } isFamilyFriendly={ event.is_family_friendly } />
       </div>
       { eventDetails() }
     </div>
