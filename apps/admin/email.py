@@ -51,15 +51,18 @@ def get_query(dest):
             Proposal.state.in_(("accepted", "finished"))
         )
     elif dest == "ticket_and_cfp":
-        ticketholders = (
+        users = set()
+        users.update(
             User.query.join(User.owned_purchases)
             .filter_by(type="admission_ticket", is_paid_for=True)
             .group_by(User.id)
         )
-        accepted_cfp_users = User.query.join(User.proposals).filter(
-            Proposal.state.in_(("accepted", "finished"))
+        users.update(
+            User.query.join(User.proposals).filter(
+                Proposal.state.in_(("accepted", "finished"))
+            )
         )
-        return set(ticketholders + accepted_cfp_users)
+        return users
     elif dest == "villages":
         return User.query.join(User.village_membership).filter(VillageMember.admin)
 
