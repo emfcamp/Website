@@ -4,7 +4,7 @@ import nl2br from 'react-nl2br';
 
 function Icon({ name, className, size, label }) {
   let svg = octicons[name].toSVG({ 'aria-label': label, width: size, height: size });
-  return <span className={ className } dangerouslySetInnerHTML={ { __html: svg } } />;
+  return <span className={ className } dangerouslySetInnerHTML={ { __html: svg } } title={ label } />;
 }
 
 function NoRecordingIcon({ noRecording }) {
@@ -12,8 +12,8 @@ function NoRecordingIcon({ noRecording }) {
 
   return (
     <div className="no-recording">
-      <Icon name="device-camera" className="camera" label="Not recorded" size="16" />
-      <Icon name="circle-slash" className="slash" size="32" />
+      <Icon name="device-camera" className="camera" size="16" />
+      <Icon name="circle-slash" className="slash" size="32" label="Not recorded" />
     </div>
   );
 }
@@ -24,11 +24,18 @@ function FavouriteIcon({ isFavourite }) {
   return <Icon name="star" className="favourite" size="32" label="Favourite" />;
 }
 
-function EventIcons({ noRecording, isFavourite }) {
+function FamilyFriendlyIcon({ isFamilyFriendly }) {
+  if (!isFamilyFriendly) { return null; }
+
+  return <Icon name="people" className="family-friendly" size="32" label="Family Friendly" />;
+}
+
+function EventIcons({ noRecording, isFavourite, isFamilyFriendly }) {
   return (
     <div className="event-icons">
       <NoRecordingIcon key='no-recording' noRecording={ noRecording } />
       <FavouriteIcon key='favourite' isFavourite={ isFavourite } />
+      <FamilyFriendlyIcon key='family-friendly' isFamilyFriendly={ isFamilyFriendly } />
     </div>
   );
 }
@@ -46,7 +53,7 @@ function FavouriteButton({ event, toggleFavourite, authenticated }) {
 }
 
 function AdditionalInformation({ label, value }) {
-  if (value === null || value === undefined || value == "") { return null; }
+  if (value === null || value === undefined || value == "Unspecified" || value == "") { return null; }
 
   return <p className="additional-information"><strong>{ label }:</strong> { value }</p>
 }
@@ -57,7 +64,6 @@ function Event({ event, toggleFavourite, authenticated }) {
   let metadata = [
     `${event.startTime.toFormat('HH:mm')} to ${event.endTime.toFormat('HH:mm')}`,
     event.venue,
-    event.speaker,
   ].filter(i => { return i !== null && i !== '' }).join(' | ');
 
   function eventDetails() {
@@ -84,9 +90,9 @@ function Event({ event, toggleFavourite, authenticated }) {
       <div className="event-synopsis" onClick={ toggleExpanded }>
         <div className="event-data">
           <h3 title={ event.title }>{ event.title }</h3>
-          <p>{ metadata }</p>
+          <p>{ metadata } | <span className="speaker">{ event.speaker }</span></p>
         </div>
-        <EventIcons noRecording={ event.noRecording } isFavourite={ event.is_fave } />
+        <EventIcons noRecording={ event.noRecording } isFavourite={ event.is_fave } isFamilyFriendly={ event.is_family_friendly } />
       </div>
       { eventDetails() }
     </div>
@@ -97,10 +103,13 @@ function Hour({ hour, content, newDay, toggleFavourite, authenticated }) {
   if (content.length === 0) { return null; }
 
   return (
-    <div className="schedule-hour">
-      <h2 id={hour.toISO()}>{ newDay && `${hour.weekdayLong} - ` }{hour.toFormat('HH:mm')}</h2>
-      <div className="schedule-events-container">
-        { content.map(event => <Event key={event.id} event={event} toggleFavourite={ toggleFavourite } authenticated={ authenticated } />) }
+    <div className="schedule-day">
+      { newDay && <h2>{ hour.weekdayLong }</h2> }
+      <div className="schedule-hour">
+        <h3 id={hour.toISO()}>{hour.toFormat('HH:mm')}</h3>
+        <div className="schedule-events-container">
+          { content.map(event => <Event key={event.id} event={event} toggleFavourite={ toggleFavourite } authenticated={ authenticated } />) }
+        </div>
       </div>
     </div>
   );

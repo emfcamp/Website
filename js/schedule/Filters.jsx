@@ -16,7 +16,7 @@ function DebugOptions({ debug, currentTime, setCurrentTime }) {
   );
 }
 
-function Filters({ schedule, onlyFavourites, setOnlyFavourites, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, selectedAgeRanges, setSelectedAgeRanges, debug, currentTime, setCurrentTime }) {
+function Filters({ schedule, onlyFavourites, setOnlyFavourites, onlyFamilyFriendly, setOnlyFamilyFriendly, selectedVenues, setSelectedVenues, selectedEventTypes, setSelectedEventTypes, selectedAgeRanges, setSelectedAgeRanges, debug, currentTime, setCurrentTime }) {
   const [visible, setVisible] = useState(false);
 
   function selectOfficialVenues(ev) {
@@ -34,10 +34,12 @@ function Filters({ schedule, onlyFavourites, setOnlyFavourites, selectedVenues, 
 
     return (
       <div className="panel-body">
-        <h3>Favourites</h3>
         <div className="form-group form-inline">
           <Checkbox checked={ onlyFavourites } onChange={ setOnlyFavourites }>
             Favourites only
+          </Checkbox>
+          <Checkbox checked={ onlyFamilyFriendly } onChange={ setOnlyFamilyFriendly }>
+            Family friendly only
           </Checkbox>
         </div>
 

@@ -1,6 +1,7 @@
 @use "./_variables.scss" as *;
 
 .filters {
+  background-color: #90CCD6;
   margin-top: 1em;
 
   h3 {
@@ -12,6 +13,13 @@
   .panel-title {
     display: flex;
     justify-content: space-between;
+    background-color: #90CCD6;
+    border: none;
+  }
+
+  .panel-heading {
+    background-color: #90CCD6;
+    border: none;
   }
 }
 
@@ -23,19 +31,19 @@
   .camera {
     position: absolute;
     top: 8px;
-    left: 8px;
+    left: 6px;
   }
 
   .slash {
     position: absolute;
     top: 0;
     left: 0;
-    color: #d9534f;
+    color: #e62b27;
   }
 }
 
 .favourite {
-  color: #f0ad4e;
+  color: #F6A318;
 }
 
 .form-inline .checkbox {
@@ -93,6 +101,10 @@
       margin-bottom: 0;
       padding-bottom: 0;
     }
+
+    .speaker {
+      color: #E4147E;
+    }
   }
 
   .event-details {
@@ -106,6 +118,20 @@
     p.additional-information {
       margin-bottom: 0;
     }
+  }
+
+  .btn-warning {
+    background-color: #F2DE1B;
+    color: #151735;
+    font-weight: bold;
+    border: none;
+  }
+
+  .btn-warning:active {
+    background-color: #F2DE1B;
+    color: #151735;
+    font-weight: bold;
+    border: none;
   }
 }
 

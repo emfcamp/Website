@@ -30,6 +30,7 @@ class ScheduleData {
       if (options.selectedEventTypes && options.selectedEventTypes.indexOf(e.type) === -1) { return null; }
       if (options.selectedAgeRanges && options.selectedAgeRanges.indexOf(e.age_range) === -1) { return null; }
       if (options.onlyFavourites && !e.is_fave) { return null; }
+      if (options.onlyFamilyFriendly && !e.is_family_friendly) { return null; }
 
       let startHour = e.startTime.startOf('hour');
       if (e.startTime <= options.currentTime) {
@@ -54,7 +55,12 @@ class ScheduleData {
     this.eventTypes = this.eventTypes.sort((a,b) => a.name.localeCompare(b.name));
 
     Object.keys(this.scheduleByHour).forEach(hour => {
-      this.scheduleByHour[hour] = this.scheduleByHour[hour].sort((a,b) => a.start_date.localeCompare(b.start_date));
+      this.scheduleByHour[hour] = this.scheduleByHour[hour].sort((a,b) => {
+        let date_sort = a.start_date.localeCompare(b.start_date);
+        if (date_sort !== 0) { return date_sort; }
+
+        return a.venue.localeCompare(b.venue);
+      });
     });
 
     this.hoursWithContent = this.hoursWithContent.sort();
