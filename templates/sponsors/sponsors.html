@@ -12,7 +12,7 @@
 
 {% macro sponsor(url, image, alt, dark=False) %}
 <div class="sponsor{% if dark %} sponsor-dark{% endif %}">
-  <a class="clearfix" href="{{ url }}">
+  <a class="clearfix" href="{{ url }}" title="{{alt}}">
     <img
       class="img-responsive col-xs-12 img-sponsor"
       alt="{{alt}}"
@@ -56,6 +56,7 @@
   {{ sponsor("https://www.codethink.co.uk/", "codethink.svg", "Codethink") }}
   {{ sponsor("http://ingeniunda.eu/", "ingeniunda.svg", "Ingeniunda") }}
   {{ sponsor("https://www.ookla.com/", "ookla.svg", "Ookla") }}
+  {{ sponsor("https://pimoroni.com/", "pimoroni_logo.png", "Pimoroni") }}
   {{ sponsor("https://www.pulsant.com/", "pulsant.svg", "Pulsant") }}
   {{ sponsor("https://www.sandcatconsulting.com/", "sandcat.svg", "Sandcat") }}
   {{ sponsor("https://secquest.co.uk/", "secquest.png", "SecQuest") }}
