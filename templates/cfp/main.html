@@ -61,9 +61,9 @@
         {# Lightning talks are different, mostly because they're partially enabled already #}
         {# FIXME 2024 they should use the same logic as the other types #}
         {%- if feature_enabled('LIGHTNING_TALKS') and not lightning_talks_closed %}
-          <a href="{{ url_for('cfp.form', cfp_type='lightning') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Lightning Talk</strong> &ndash; A quick-fire (less than 10m) presentation</a>
+          <a href="{{ url_for('cfp.form', cfp_type='lightning') + ('?closed' if ignore_closed else '') }}" class="list-group-item"><strong>Lightning Talk</strong> &ndash; A quick-fire (5m) presentation</a>
         {%- elif feature_enabled('LIGHTNING_TALKS') and lightning_talks_closed %}
-          <span class="list-group-item"><strong>Lightning Talk</strong> &ndash; A quick-fire (less than 10m) presentation. These are now full.</span>
+          <span class="list-group-item"><strong>Lightning Talk</strong> &ndash; A quick-fire (5m) presentation. These are now full.</span>
         {% endif %}
     </div>
 
