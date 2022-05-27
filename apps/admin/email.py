@@ -42,14 +42,17 @@ def get_users(dest):
         return (
             User.query.join(User.owned_purchases)
             .filter_by(type="admission_ticket", is_paid_for=True)
-            .group_by(User.id).distinct()
+            .group_by(User.id)
+            .distinct()
         )
     elif dest == "purchasers":
         return User.query.join(User.payments).filter(Payment.state == "paid").distinct()
     elif dest == "cfp":
-        return User.query.join(User.proposals).filter(
-            Proposal.state.in_(("accepted", "finished"))
-        ).distinct()
+        return (
+            User.query.join(User.proposals)
+            .filter(Proposal.state.in_(("accepted", "finished")))
+            .distinct()
+        )
     elif dest == "ticket_and_cfp":
         users = set()
         users.update(
@@ -64,7 +67,11 @@ def get_users(dest):
         )
         return users
     elif dest == "villages":
-        return User.query.join(User.village_membership).filter(VillageMember.admin).distinct()
+        return (
+            User.query.join(User.village_membership)
+            .filter(VillageMember.admin)
+            .distinct()
+        )
 
 
 @admin.route("/email", methods=["GET", "POST"])
