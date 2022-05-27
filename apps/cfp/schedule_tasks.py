@@ -147,10 +147,11 @@ def run_schedule(persist, ignore_potential, type):
     required=True,
 )
 def apply_potential_schedule(email, type):
-    if type:
-        query = Proposal.query.filter(Proposal.type == type)
-    elif type == "all":
+    app.logger.info(f"Apply schedule for {type} type(s)")
+    if type == "all":
         query = Proposal.query
+    elif type:
+        query = Proposal.query.filter(Proposal.type == type)
     else:
         raise Exception("Set a type")
 
@@ -163,6 +164,8 @@ def apply_potential_schedule(email, type):
         .filter(Proposal.state.in_(["accepted", "finished"]))
         .all()
     )
+
+    app.logger.info(f"Got {len(proposals)} proposals")
 
     for proposal in proposals:
         user = proposal.user
