@@ -35,21 +35,21 @@ class EmailComposeForm(Form):
     send = SubmitField("Send Email")
 
 
-def get_query(dest):
+def get_users(dest):
     if dest == "all":
         return User.query
     elif dest == "ticket":
         return (
             User.query.join(User.owned_purchases)
             .filter_by(type="admission_ticket", is_paid_for=True)
-            .group_by(User.id)
+            .group_by(User.id).distinct()
         )
     elif dest == "purchasers":
-        return User.query.join(User.payments).filter(Payment.state == "paid")
+        return User.query.join(User.payments).filter(Payment.state == "paid").distinct()
     elif dest == "cfp":
         return User.query.join(User.proposals).filter(
             Proposal.state.in_(("accepted", "finished"))
-        )
+        ).distinct()
     elif dest == "ticket_and_cfp":
         users = set()
         users.update(
@@ -64,20 +64,20 @@ def get_query(dest):
         )
         return users
     elif dest == "villages":
-        return User.query.join(User.village_membership).filter(VillageMember.admin)
+        return User.query.join(User.village_membership).filter(VillageMember.admin).distinct()
 
 
 @admin.route("/email", methods=["GET", "POST"])
 def email():
     form = EmailComposeForm()
     if form.validate_on_submit():
-        users = get_query(form.destination.data).distinct()
+        users = get_users(form.destination.data)
         if form.preview.data is True:
             return render_template(
                 "admin/email.html",
                 html=format_trusted_html_email(form.text.data, form.subject.data),
                 form=form,
-                count=users.count(),
+                count=len(users),
             )
 
         if form.send_preview.data is True:
@@ -90,12 +90,12 @@ def email():
                 "admin/email.html",
                 html=format_trusted_html_email(form.text.data, form.subject.data),
                 form=form,
-                count=users.count(),
+                count=len(users),
             )
 
         if form.send.data is True:
             enqueue_trusted_emails(users, form.subject.data, form.text.data)
-            flash("Email queued for sending to %s users" % users.count())
+            flash("Email queued for sending to %s users" % len(users))
             return redirect(url_for(".email"))
 
     return render_template("admin/email.html", form=form)
