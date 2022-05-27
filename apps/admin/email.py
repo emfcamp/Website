@@ -35,50 +35,36 @@ class EmailComposeForm(Form):
     send = SubmitField("Send Email")
 
 
-def get_users(dest):
-    if dest == "all":
-        return User.query
-    elif dest == "ticket":
-        return (
-            User.query.join(User.owned_purchases)
+def get_users(dest: str) -> list[User]:
+    query = User.query
+    if dest == "ticket":
+        query = (
+            query.join(User.owned_purchases)
             .filter_by(type="admission_ticket", is_paid_for=True)
             .group_by(User.id)
-            .distinct()
         )
     elif dest == "purchasers":
-        return User.query.join(User.payments).filter(Payment.state == "paid").distinct()
+        query = query.join(User.payments).filter(Payment.state == "paid")
     elif dest == "cfp":
-        return (
-            User.query.join(User.proposals)
-            .filter(Proposal.state.in_(("accepted", "finished")))
-            .distinct()
+        query = query.join(User.proposals).filter(
+            Proposal.state.in_(("accepted", "finished"))
         )
-    elif dest == "ticket_and_cfp":
-        users = set()
-        users.update(
-            User.query.join(User.owned_purchases)
-            .filter_by(type="admission_ticket", is_paid_for=True)
-            .group_by(User.id)
-        )
-        users.update(
-            User.query.join(User.proposals).filter(
-                Proposal.state.in_(("accepted", "finished"))
-            )
-        )
-        return users
     elif dest == "villages":
-        return (
-            User.query.join(User.village_membership)
-            .filter(VillageMember.admin)
-            .distinct()
-        )
+        query = query.join(User.village_membership).filter(VillageMember.admin)
+
+    return query.distinct().all()
 
 
 @admin.route("/email", methods=["GET", "POST"])
 def email():
     form = EmailComposeForm()
     if form.validate_on_submit():
-        users = get_users(form.destination.data)
+        if form.destination.data == "ticket_and_cfp":
+            users = set()
+            users.update(get_users("ticket"))
+            users.update(get_users("cfp"))
+        else:
+            users = get_users(form.destination.data)
         if form.preview.data is True:
             return render_template(
                 "admin/email.html",
