@@ -1125,4 +1125,5 @@ def lightning_talks():
         total_slots=LightningTalkProposal.get_total_lightning_talk_slots(),
     )
 
-from . import venues # noqa
+
+from . import venues  # noqa

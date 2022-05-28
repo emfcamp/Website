@@ -1,4 +1,5 @@
 {% extends "cfp_review/base.html" %}
+{% from "_formhelpers.html" import render_field  %}
 {% block body %}
 <h2>Venues</h2>
 
@@ -18,4 +19,16 @@
         </tr>
     {% endfor %}
 </table>
+
+<h2>New Venue</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    {{ render_field(form.name) }}
+    {{ render_field(form.village_id) }}
+    {{ render_field(form.scheduled_content_only) }}
+    {{ render_field(form.latlon) }}
+
+    {{ form.submit(class_="btn btn-success") }}
+</form>
 {% endblock %}

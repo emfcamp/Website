@@ -3,7 +3,6 @@ from flask import (
     redirect,
     url_for,
     flash,
-    request,
 )
 
 from wtforms import StringField, SelectField, BooleanField, SubmitField
@@ -18,6 +17,7 @@ from . import (
     admin_required,
 )
 from ..common.forms import Form
+
 
 class VenueForm(Form):
     name = StringField("Name", [DataRequired()])
@@ -34,6 +34,13 @@ class VenueForm(Form):
             choices.append((v.id, v.name))
         self.village_id.choices = choices
 
+    def populate_from_venue(self, venue):
+        if venue.location is None:
+            self.latlon.data = ""
+        else:
+            latlon = to_shape(venue.location)
+            self.latlon.data = "{}, {}".format(latlon.x, latlon.y)
+
     def populate_obj(self, venue):
         super().populate_obj(venue)
 
@@ -49,11 +56,22 @@ class VenueForm(Form):
         else:
             venue.village_id = self.village_id.data
 
+
 @cfp_review.route("/venues", methods=["GET", "POST"])
 @admin_required
 def venues():
     venues = Venue.query.order_by(Venue.scheduled_content_only.desc(), Venue.name).all()
-    return render_template("cfp_review/venues/index.html", venues=venues)
+    new_venue = Venue()
+    form = VenueForm(obj=new_venue)
+
+    if form.validate_on_submit():
+        form.populate_obj(new_venue)
+        db.session.add(new_venue)
+        db.session.commit()
+        flash("Saved venue")
+        return redirect(url_for(".venues"))
+
+    return render_template("cfp_review/venues/index.html", venues=venues, form=form)
 
 
 @cfp_review.route("/venues/<int:venue_id>", methods=["GET", "POST"])
@@ -61,7 +79,7 @@ def venues():
 def edit_venue(venue_id):
     venue = Venue.query.get_or_404(venue_id)
     form = VenueForm(obj=venue)
-    if request.method == "POST":
+    if form.validate_on_submit():
         if form.delete.data:
             db.session.delete(venue)
             db.session.commit()
@@ -72,11 +90,7 @@ def edit_venue(venue_id):
             db.session.commit()
             flash("Saved venue")
             return redirect(url_for(".venues"))
-
-    if venue.location is None:
-        form.latlon.data = ""
     else:
-        latlon = to_shape(venue.location)
-        form.latlon.data = "{}, {}".format(latlon.x, latlon.y)
-    
+        form.populate_from_venue(venue)
+
     return render_template("cfp_review/venues/edit.html", venue=venue, form=form)
