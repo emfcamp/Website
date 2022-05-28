@@ -101,7 +101,7 @@ def choose_role():
     return render_template("volunteer/choose_role.html", form=form)
 
 
-@volunteer.route("/role/<role_id>", methods=["GET", "POST"])
+@volunteer.route("/role/<int:role_id>", methods=["GET", "POST"])
 @feature_flag("VOLUNTEERS_SIGNUP")
 @v_user_required
 def role(role_id):
@@ -143,7 +143,7 @@ def role_admin_required(f, *args, **kwargs):
     return app.login_manager.unauthorized()
 
 
-@volunteer.route("role/<role_id>/admin")
+@volunteer.route("role/<int:role_id>/admin")
 @role_admin_required
 def role_admin(role_id):
     role = Role.query.get_or_404(role_id)
@@ -158,7 +158,7 @@ def role_admin(role_id):
     return render_template("volunteer/role_admin.html", role=role, shifts=shifts)
 
 
-@volunteer.route("role/<role_id>/toggle_arrived/<shift_id>/<user_id>")
+@volunteer.route("role/<int:role_id>/toggle_arrived/<int:shift_id>/<int:user_id>")
 @role_admin_required
 def toggle_arrived(role_id, shift_id, user_id):
     se = ShiftEntry.query.filter(
@@ -169,7 +169,7 @@ def toggle_arrived(role_id, shift_id, user_id):
     return redirect(url_for(".role_admin", role_id=role_id))
 
 
-@volunteer.route("role/<role_id>/toggle_abandoned/<shift_id>/<user_id>")
+@volunteer.route("role/<int:role_id>/toggle_abandoned/<int:shift_id>/<int:user_id>")
 @role_admin_required
 def toggle_abandoned(role_id, shift_id, user_id):
     se = ShiftEntry.query.filter(
@@ -180,7 +180,7 @@ def toggle_abandoned(role_id, shift_id, user_id):
     return redirect(url_for(".role_admin", role_id=role_id))
 
 
-@volunteer.route("role/<role_id>/toggle_complete/<shift_id>/<user_id>")
+@volunteer.route("role/<int:role_id>/toggle_complete/<int:shift_id>/<int:user_id>")
 @role_admin_required
 def toggle_complete(role_id, shift_id, user_id):
     se = ShiftEntry.query.filter(
