@@ -65,7 +65,7 @@ from . import (
 from ..common.email import from_email
 
 
-@cfp_review.route("")
+@cfp_review.route("/")
 def main():
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for(".main")))

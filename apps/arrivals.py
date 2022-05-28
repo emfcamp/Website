@@ -28,7 +28,7 @@ arrivals_required = require_permission(
 )  # Decorator to require arrivals permission
 
 
-@arrivals.route("")
+@arrivals.route("/")
 @arrivals_required
 def main():
     badge = bool(session.get("badge"))
