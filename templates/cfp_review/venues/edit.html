@@ -1,0 +1,19 @@
+{% extends "cfp_review/base.html" %}
+{% from "_formhelpers.html" import render_field  %}
+{% block body %}
+<h2>Edit Venue {{ venue.name }}</h2>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    {{ render_field(form.name) }}
+    {{ render_field(form.village_id) }}
+    {{ render_field(form.scheduled_content_only) }}
+    {{ render_field(form.latlon) }}
+
+    {{ form.submit(class_="btn btn-success") }}
+    {{ form.delete(class_="btn btn-danger") }}
+    <a class="btn" href="{{ url_for('.venues') }}">Back</a>
+</form>
+
+{% endblock %}
