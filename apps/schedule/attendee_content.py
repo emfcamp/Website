@@ -97,6 +97,7 @@ def populate(proposal, form):
         "{}T{}".format(form.day.data, form.scheduled_time.data.strftime("%H:%M"))
     )
     proposal.length = proposal.scheduled_duration = form.scheduled_duration.data
+    proposal.allowed_times = "{} > {}"
     proposal.attendees = form.attendees.data
     proposal.cost = proposal.published_cost = form.cost.data
     proposal.age_range = proposal.published_age_range = form.age_range.data
