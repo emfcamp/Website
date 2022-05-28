@@ -133,6 +133,7 @@ def role(role_id):
 
 @decorator
 def role_admin_required(f, *args, **kwargs):
+    """Check that current user has permissions to be RoleAdmin for role.id that is first entry in args"""
     if current_user.is_authenticated:
         if int(args[0]) in [
             ra.role_id for ra in current_user.volunteer_admin_roles
