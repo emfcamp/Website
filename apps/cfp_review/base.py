@@ -986,14 +986,15 @@ def scheduler():
         .all()
     )
 
-    venues = [
-        {"key": v.id, "label": v.name}
-        for v in Venue.query.order_by(Venue.priority.desc()).all()
-    ]
-
     venues_to_show = request.args.getlist("venue")
     if venues_to_show:
         venues = [venue for venue in venues if venue["label"] in venues_to_show]
+    else:
+        venues = [
+            {"key": v.id, "label": v.name}
+            for v in Venue.query.order_by(Venue.priority.desc()).all()
+        ]
+
     venue_ids = [venue["key"] for venue in venues]
 
     schedule_data = []
