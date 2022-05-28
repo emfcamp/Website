@@ -27,9 +27,6 @@ class VolunteerSignUpForm(Form):
     volunteer_email = StringField("Email", [Email(), DataRequired()])
     over_18 = BooleanField("I'm at least 18 years old")
     volunteer_phone = TelField("Phone")
-    # allow_comms = BooleanField(
-    #     "May we send you messages during the event?", [Optional()]
-    # )
     sign_up = SubmitField("Sign Up")
     save = SubmitField("Save")
 
@@ -54,7 +51,6 @@ def update_volunteer_from_form(volunteer, form):
     volunteer.volunteer_email = form.volunteer_email.data
     volunteer.volunteer_phone = form.volunteer_phone.data
     volunteer.over_18 = form.over_18.data
-    # volunteer.allow_comms_during_event = form.allow_comms.data
     return volunteer
 
 
@@ -109,7 +105,5 @@ def account():
         db.session.commit()
         flash("Your details have been updated", "info")
         return redirect(url_for(".account"))
-
-    # form.allow_comms.data = volunteer.allow_comms_during_event
 
     return render_template("volunteer/account.html", user=current_user, form=form)
