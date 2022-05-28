@@ -49,7 +49,7 @@ var emf_scheduler = {};
 (function(){
   'use strict';
   var scheduleData = {{ schedule_data | tojson }},
-    venues = {{ venues | tojson }},
+    venues = {{ shown_venues | tojson }},
     is_anonymous = {% if current_user.is_anonymous -%} true {%- else -%} false {%- endif %},
     // THE MONTH ON THESE DATE OBJECTS IS OFFSET BY ONE
     // WHAT THE FUCK
