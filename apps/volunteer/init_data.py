@@ -339,7 +339,20 @@ As logistics support you'll join the team ensuring that equipment gets where it 
         "name": "Support Team",
         "description": "Assisting the Accessibility and Conduct team.",
         "full_description_md": """
+Helping ensure EMF remains a great place for everyone. We're looking for  volunteers to assist in:
 
+* Attending talks and workshops to ensure everyone remembers about the code of conduct
+* Dealing impartially with potential violations of the code of conduct
+* Being visible during the event to support people
+* Mediation and de-escalation when necessary
+* Helping people get around site safely
+* Checking in on people who need/want assistance
+
+Apart from being in talks/workshops, this is a roving role.
+
+Contact us via HQ, or on the DECTs!
+
+Training is available before shifts, or 'around lunch time'. We ask that people on-shift are able to work with challenging situations, aware of their own limits/comfort zones, able to tap-out, recuse where conflicts of interest may be present. Volunteers for this role should not be intoxicated, or otherwise have their judgements clouded.
 """,
     },
     {
@@ -1307,33 +1320,60 @@ shift_list = {
             },
         ]
     },
-    # "Support Team": {
-    #     "N/A": [
-    #         { "first": "2022-06-02 10:00:00",
-    #           "final": "2022-06-02 22:00:00",
-    #           "min": 2,
-    #           "max": 6,
-    #         },
-    #         { "first": "2022-06-03 09:00:00",
-    #           "final": "2022-06-03 22:00:00",
-    #           "min": 2,
-    #           "max": 6,
-    #         },
-    #         { "first": "2022-06-04 09:00:00",
-    #           "final": "2022-06-04 22:00:00",
-    #           "min": 2,
-    #           "max": 6,
-    #         },
-    #         { "first": "2022-06-05 09:00:00",
-    #           "final": "2022-06-05 22:00:00",
-    #           "min": 2,
-    #           "max": 6,
-    #         },
-    #         { "first": "2022-06-06 09:00:00",
-    #           "final": "2022-06-06 12:00:00",
-    #           "min": 2,
-    #           "max": 6,
-    #         },
-    #     ]
-    # },
+    "Support Team": {
+        "N/A": [
+            {
+                "first": "2022-06-02 10:00:00",
+                "final": "2022-06-02 22:00:00",
+                "min": 2,
+                "max": 6,
+            },
+            {
+                "first": "2022-06-03 09:00:00",
+                "final": "2022-06-03 19:00:00",
+                "min": 2,
+                "max": 6,
+            },
+            {
+                "first": "2022-06-03 19:00:00",
+                "final": "2022-06-03 22:00:00",
+                "min": 2,
+                "max": 6,
+                "base_duration": 90,
+            },
+            {
+                "first": "2022-06-04 09:00:00",
+                "final": "2022-06-04 19:00:00",
+                "min": 2,
+                "max": 6,
+            },
+            {
+                "first": "2022-06-04 19:00:00",
+                "final": "2022-06-04 22:00:00",
+                "min": 2,
+                "max": 6,
+                "base_duration": 90,
+            },
+            {
+                "first": "2022-06-05 09:00:00",
+                "final": "2022-06-05 19:00:00",
+                "min": 2,
+                "max": 6,
+            },
+            {
+                "first": "2022-06-05 19:00:00",
+                "final": "2022-06-05 22:00:00",
+                "min": 2,
+                "max": 6,
+                "base_duration": 90,
+            },
+            {
+                "first": "2022-06-06 09:00:00",
+                "final": "2022-06-06 12:00:00",
+                "min": 2,
+                "max": 6,
+                "base_duration": 90,
+            },
+        ]
+    },
 }
