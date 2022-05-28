@@ -5,6 +5,12 @@
 {% endblock %}
 {% block body %}
   <div id="schedule-app" data-api-token="{{ token }}" data-debug="{{ debug }}"></div>
+  <p>
+    <strong>Schedule feeds:</strong>
+    <a href="{{ url_for('.schedule_json', year=year) }}">JSON</a> |
+    <a href="{{ url_for('.schedule_ical', year=year) }}">iCal</a> |
+    <a href="{{ url_for('.schedule_frab', year=year) }}">Frab</a>
+  </p>
 {% endblock %}
 {% block foot %}
   <script src="{{ static_url_for('static', filename='js/schedule.js') }}"></script>

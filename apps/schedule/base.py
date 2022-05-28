@@ -53,6 +53,7 @@ def schedule_current():
         "schedule/user_schedule.html",
         token=token,
         debug=app.config.get("DEBUG"),
+        year=event_year(),
     )
 
 
