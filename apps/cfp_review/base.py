@@ -986,16 +986,18 @@ def scheduler():
         .all()
     )
 
+    shown_venues = [
+        {"key": v.id, "label": v.name}
+        for v in Venue.query.order_by(Venue.priority.desc()).all()
+    ]
+
     venues_to_show = request.args.getlist("venue")
     if venues_to_show:
-        venues = [venue for venue in venues if venue["label"] in venues_to_show]
-    else:
-        venues = [
-            {"key": v.id, "label": v.name}
-            for v in Venue.query.order_by(Venue.priority.desc()).all()
+        shown_venues = [
+            venue for venue in shown_venues if venue["label"] in venues_to_show
         ]
 
-    venue_ids = [venue["key"] for venue in venues]
+    venue_ids = [venue["key"] for venue in shown_venues]
 
     schedule_data = []
     for proposal in proposals:
@@ -1044,7 +1046,7 @@ def scheduler():
 
     return render_template(
         "cfp_review/scheduler.html",
-        venues=venues,
+        shown_venues=shown_venues,
         schedule_data=schedule_data,
         default_venues=DEFAULT_VENUES,
     )
