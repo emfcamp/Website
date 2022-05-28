@@ -2,8 +2,10 @@ We've attached {% if already_emailed %}an updated{% else %}a{% endif %} PDF to t
 on your phone, but we recommend you print them out for convenience.
 
 {% if payment %}
-If you have bought a ticket for someone else you can send it to them
-by logging in and clicking 'transfer' beside the relevant ticket:
+If you have bought a ticket for someone else, you can send it to them
+by logging in and clicking 'transfer' beside the relevant ticket. This
+will also let them favourite talks on the website and easily sign up
+to volunteer:
 
   {{ external_url('users.purchases') }}
 
@@ -19,16 +21,18 @@ If you're travelling by public transport, we will be running shuttle
 buses between a local train station and the festival site.
 
 For more details about how to get to EMF, including shuttle bus times
-and driving directions, please see the Travel section of our wiki:
+and driving directions, please see our travel information:
 
-  https://wiki.emfcamp.org/wiki/Travel
+  https://www.emfcamp.org/about/travel
 
-For some idea of what to bring take a look at our packing list:
+For some idea of what to bring, take a look at our packing list:
 
-  https://wiki.emfcamp.org/wiki/Packing_List
+  https://www.emfcamp.org/about/what-to-bring
 
 And lastly, EMF is entirely volunteer-run. Please consider
 contributing a few hours of your time at the festival to help the
-event run smoothly. You can register your interest here:
+event run smoothly. {% if feature_enabled("VOLUNTEERS_SIGNUP") %} You can register your interest here:
 
   {{ external_url('volunteer.sign_up') }}
+
+{% endif %}
