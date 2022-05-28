@@ -10,7 +10,7 @@ from wtforms.validators import DataRequired
 from geoalchemy2.shape import to_shape
 
 from main import db
-from models.cfp import Venue
+from models.cfp import Venue, Proposal
 from models.village import Village
 from . import (
     cfp_review,
@@ -81,6 +81,15 @@ def edit_venue(venue_id):
     form = VenueForm(obj=venue)
     if form.validate_on_submit():
         if form.delete.data:
+            scheduled_content = Proposal.query.filter(
+                Proposal.scheduled_venue_id == venue.id,
+                Proposal.state.in_(["accepted", "finished"]),
+            ).count()
+
+            if scheduled_content > 0:
+                flash("Cannot delete venue with scheduled content")
+                return redirect(url_for(".edit_venue", venue_id=venue_id))
+
             db.session.delete(venue)
             db.session.commit()
             flash("Deleted venue")

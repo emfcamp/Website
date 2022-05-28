@@ -402,7 +402,6 @@ class Proposal(BaseModel):
     scheduled_venue = db.relationship(
         "Venue",
         backref="proposals",
-        cascade="all",
         primaryjoin="Venue.id == Proposal.scheduled_venue_id",
     )
     potential_venue = db.relationship(
