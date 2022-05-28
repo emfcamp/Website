@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  EMF Volunteer Role Admin
+{% endblock %}
+
+{% block body %}
+  {% include "volunteer/_nav.html" %}
+  <h2>{{ role }} Admin</h2>
+  {% for shift in shifts %}
+    {% set s = shift.to_localtime_dict() %}
+    <div class="role-admin-shift well content-well">
+      <h3>{{ shift.venue.name }} {{ s['start'] }} - {{ s['end_time'] }}</h3>
+      {% for se in shift.entries|sort(attribute="user_id") %}
+        <p>{{ se.user.volunteer.nickname }} {# TODO: Add indication of already completed shift for this roe #}
+        {% if se.user.volunteer.completed_shift(role) %} - Previous completed shift: ✓&nbsp;{% endif %} 
+        <a href="/volunteer/role/{{ role.id }}/toggle_arrived/{{ se.shift_id }}/{{ se.user_id }}">
+          Arrived:{% if se.arrived %}✓{% else %}✗{% endif %}
+        </a>&nbsp;
+        <a href="/volunteer/role/{{ role.id }}/toggle_abandoned/{{ se.shift_id }}/{{ se.user_id }}">
+          Abandoned:{% if se.abandoned %}✓{% else %}✗{% endif %}
+        </a>&nbsp;
+        <a href="/volunteer/role/{{ role.id }}/toggle_complete/{{ se.shift_id }}/{{ se.user_id }}">
+          Complete:{% if se.completed %}✓{% else %}✗{% endif %}
+        </a></p>
+      {% endfor %}
+    </div>
+  {% endfor %}
+
+{% endblock %}

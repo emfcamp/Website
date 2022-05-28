@@ -58,10 +58,11 @@ def schedule():
         by_time[day_key][hour_key].append(to_add)
 
     roles = _get_interested_roles(current_user)
-    role_descriptions = _format_role_descriptions()
 
     untrained_roles = [
-        r for r in roles if r["requires_training"] and not r["is_trained"]
+        r
+        for r in roles
+        if r["is_interested"] and r["requires_training"] and not r["is_trained"]
     ]
     if datetime.utcnow() < config_date("EVENT_START"):
         def_day = "thu"
@@ -74,7 +75,6 @@ def schedule():
         roles=roles,
         all_shifts=by_time,
         active_day=active_day,
-        role_descriptions=role_descriptions,
         all_volunteers=all_volunteers,
         untrained_roles=untrained_roles,
     )
@@ -85,13 +85,12 @@ def _toggle_shift_entry(user, shift):
     shift_entry = ShiftEntry.query.filter_by(user_id=user.id, shift_id=shift.id).first()
 
     if (
-        shift.role == Role.get_by_name("Bar")
-        and Role.get_by_name("Bar")
-        not in Volunteer.get_for_user(current_user).trained_roles
+        shift.role.requires_training
+        and shift.role not in Volunteer.get_for_user(current_user).trained_roles
     ):
         return {
             "warning": "Missing required training",
-            "message": "You must complete bar training before you can sign up for this shift",
+            "message": "You must complete training before you can sign up for this shift",
         }
 
     if shift_entry:
@@ -102,6 +101,12 @@ def _toggle_shift_entry(user, shift):
         for v_shift in user.shift_entries:
             if shift.is_clash(v_shift.shift):
                 res["warning"] = "WARNING: Clashes with an existing shift"
+                res["message"] = "You've not been signed up for this shift"
+                return res
+        if shift.current_count >= shift.max_needed:
+            res["warning"] = "WARNING: Shift is already full"
+            res["message"] = "You've not been signed up for this shift"
+            return res
 
         shift.entries.append(ShiftEntry(user=user, shift=shift))
         res["operation"] = "add"
@@ -124,7 +129,7 @@ def _format_role_descriptions():
 
 @volunteer.route("/shift/<shift_id>", methods=["GET", "POST"])
 @feature_flag("VOLUNTEERS_SCHEDULE")
-@v_user_required
+@v_admin_required
 def shift(shift_id):
     shift = Shift.query.get_or_404(shift_id)
 

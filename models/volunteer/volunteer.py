@@ -4,6 +4,8 @@ from flask_login import UserMixin
 from main import db
 from .. import BaseModel
 
+from . import ShiftEntry
+
 
 # This effectively records the roles that a volunteer is interested in
 VolunteerRoleInterest = db.Table(
@@ -64,6 +66,14 @@ class Volunteer(BaseModel, UserMixin):
 
     def __str__(self):
         return f"{self.user.name} <{self.user.email}>"
+
+    def completed_shift(self, role):
+        shifts = ShiftEntry.query.filter(
+            ShiftEntry.shift.has(role=role),
+            ShiftEntry.user == self.user,
+            ShiftEntry.completed,
+        ).all()
+        return bool(shifts)
 
     @classmethod
     def get_by_id(cls, id):

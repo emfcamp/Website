@@ -20,6 +20,9 @@ class ShiftEntry(BaseModel):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
     checked_in = db.Column(db.Boolean, nullable=False, default=False)
     missing_others = db.Column(db.Boolean, nullable=False, default=False)
+    arrived = db.Column(db.Boolean, default=False)
+    abandoned = db.Column(db.Boolean, default=False)
+    completed = db.Column(db.Boolean, default=False)
 
     user = db.relationship("User", backref="shift_entries")
     shift = db.relationship("Shift", backref="entries")
@@ -54,10 +57,12 @@ class Shift(BaseModel):
         """
         If the venues and roles match then the shifts can overlap
         """
+
+        if self.venue == other.venue and self.role == other.role:
+            return False
         return (
-            not (self.venue == other.venue and self.role == other.role)
-            or other.start <= self.start <= other.end
-            or other.start <= self.end <= other.end
+            other.start <= self.start <= other.end
+            or self.start <= other.start <= self.end
         )
 
     def __repr__(self):
@@ -91,7 +96,7 @@ class Shift(BaseModel):
 
     @classmethod
     def generate_for(
-        cls, role, venue, first, final, min, max, base_duration=180, changeover=15
+        cls, role, venue, first, final, min, max, base_duration=120, changeover=15
     ):
         """
         Will generate shifts between start and end times. The last shift will

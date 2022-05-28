@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    EMF Volunteer Info.
+{% endblock %}
+
+{% block secondary_nav %}
+  {% include "volunteer/_info_nav.html" %}
+{% endblock %}
+
+{% block body %}
+  {% include "volunteer/_nav.html" %}
+  <h2>In Case of Emergency</h2>
+
+  <p>Hopefully we won’t have any emergencies, but here's what to do if you do encounter one. Your priority should always be to ensure your own safety before attempting to help others.</p>
+  
+  <h3>Fire</h3>
+  <p>If you encounter a fire (and it's not meant to be there), follow the steps below:</p>
+  <ol>
+    <li>Notify HQ via radio or phone (1011), making sure to clearly describe the location.</li>
+    <li>Ensure people are clear of danger.</li>
+    <li>If it is safe to do so, attempt to put out the fire.</li>
+  </ol>
+
+  <h3>First Aid</h3>
+
+  <p>In most cases people who need first aid should make their own way to the first aid tent, which can be found near the bar.</p>
+
+  <p>If someone is unable to safely get to the first aid tent, request the first aid team either via radio, or by calling First Aid: 1008 / First Aid Emergency 1009. Unless you are qualified to do so, or the person is in imminent danger, you should not attempt to perform first aid yourself.</p>
+
+{% endblock body %}

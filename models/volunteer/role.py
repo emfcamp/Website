@@ -1,14 +1,8 @@
 from main import db
 from markdown import markdown
 from flask import Markup
-from os import path
 
 from .. import BaseModel
-
-
-def role_name_to_markdown_file(role_name):
-    res = role_name.lower().replace(" ", "-").replace("/", "-").replace(":", "")
-    return "apps/volunteer/role_descriptions/" + res + ".md"
 
 
 class Role(BaseModel):
@@ -16,6 +10,8 @@ class Role(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False, unique=True, index=True)
     description = db.Column(db.String)
+    full_description_md = db.Column(db.Text)
+    instructions_url = db.Column(db.String)
     # Things to know for the shift
     role_notes = db.Column(db.String)
     over_18_only = db.Column(db.Boolean, nullable=False, default=False)
@@ -37,12 +33,10 @@ class Role(BaseModel):
         }
 
     def full_description(self):
-        role_description_file = role_name_to_markdown_file(self.name)
-        if not path.exists(role_description_file):
-            return self.description
-
-        content = open(role_description_file, "r").read()
-        return Markup(markdown(content, extensions=["markdown.extensions.nl2br"]))
+        content = self.full_description_md
+        if content:
+            return Markup(markdown(content, extensions=["markdown.extensions.nl2br"]))
+        return ""
 
     @classmethod
     def get_by_name(cls, name):
@@ -63,6 +57,18 @@ class RolePermission(BaseModel):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, index=True)
+
+
+class RoleAdmin(BaseModel):
+    __tablename__ = "volunteer_role_admin"
+    user_id = db.Column(
+        db.Integer, db.ForeignKey("user.id"), nullable=False, primary_key=True
+    )
+    user = db.relationship("User", backref="volunteer_admin_roles")
+    role_id = db.Column(
+        db.Integer, db.ForeignKey("volunteer_role.id"), nullable=False, primary_key=True
+    )
+    role = db.relationship("Role", backref="admins")
 
 
 """

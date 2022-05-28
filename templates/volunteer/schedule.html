@@ -76,7 +76,7 @@
             <h4 class="panel-title">
                 <a role="button" data-toggle="collapse" data-target="#searchPanel"
                     aria-controls="searchPanel" aria-expanded="true">
-                    <strong>Filter</strong>
+                    <strong>Filter▼</strong>
                 </a>
             </h4>
         </div>
@@ -86,7 +86,6 @@
     </div>
 
     <ul class="nav nav-tabs" role="tablist">
-        {{ tabnav('wed', 'Wednesday', active_day) }}
         {{ tabnav('thu', 'Thursday', active_day) }}
         {{ tabnav('fri', 'Friday', active_day) }}
         {{ tabnav('sat', 'Saturday', active_day) }}
@@ -94,7 +93,6 @@
         {{ tabnav('mon', 'Monday', active_day) }}
     </ul>
     <div class="tab-content">
-        {{ days_shifts('wed', active_day) }}
         {{ days_shifts('thu', active_day) }}
         {{ days_shifts('fri', active_day) }}
         {{ days_shifts('sat', active_day) }}
@@ -118,8 +116,7 @@
             <strong>Start time:</strong> <span id="modal-start-time">18:00</span><br>
             <strong>End time:</strong> <span id="modal-end-time">21:00</span><br>
             <strong>Location:</strong> <span id="modal-location">Volunteer Tent</span><br>
-            <a id="shift-link" href="">Shift Page</a>
-
+            
             <div id="modal-description">
             </div>
           </div>
@@ -141,18 +138,13 @@
                     </span>
                 </div>
                 <a id="contact-link" href="">Contact signed up volunteers</a>
+                <a id="shift-link" href="">Shift Page</a>
             {% endif %}
 
           </div>
         </div>
       </div>
     </div>
-
-    {% for key, value in role_descriptions.items() %}
-      <div id="role-description-{{ key }}" class="role-description">
-        {{ value }}
-      </div>
-    {% endfor %}
 
     <script src="{{ static_url_for('static', filename='js/volunteer-schedule.js') }}"></script>
     <script type="text/javascript" nonce="{{csp_nonce}}">

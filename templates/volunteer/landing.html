@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}
+    EMF Volunteer
+{% endblock %}
+
+{% macro shift_view(s) %}
+  <div>
+    <p>{{ s.role.name }} - <a href="{{ s.venue.mapref }}">{{ s.venue.name }}</a>
+      {{ s.start.strftime("%b %d %H:%M") }} - {{ s.end.strftime("%H:%M") }}
+    </p>
+{% endmacro %}
+{% block body %}
+{% include "volunteer/_nav.html" %}
+  {% if upcoming_shifts %}
+    <h2>Your Upcoming Shifts</h2>
+    {% for shift in upcoming_shifts %}
+      {{ shift_view(shift) }}
+    {% endfor %}
+  {% endif %}
+  {% if past_shifts %}
+    <h2>Your Past Shifts</h2>
+    {% for shift in past_shifts %}
+      {{ shift_view(shift) }}
+    {% endfor %}
+  {% endif %}
+        
+
+  
+{% endblock %}
