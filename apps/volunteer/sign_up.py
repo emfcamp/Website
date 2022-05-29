@@ -26,7 +26,7 @@ class VolunteerSignUpForm(Form):
     nickname = StringField("Name", [DataRequired()])
     volunteer_email = StringField("Email", [Email(), DataRequired()])
     over_18 = BooleanField("I'm at least 18 years old")
-    volunteer_phone = TelField("Phone")
+    volunteer_phone = TelField("Phone", min_length=3)
     sign_up = SubmitField("Sign Up")
     save = SubmitField("Save")
 
