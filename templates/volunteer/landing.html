@@ -4,9 +4,14 @@
 {% endblock %}
 
 {% macro shift_view(s) %}
-  <div>
-    <p>{{ s.role.name }} - <a href="{{ s.venue.mapref }}">{{ s.venue.name }}</a>
-      {{ s.start.strftime("%b %d %H:%M") }} - {{ s.end.strftime("%H:%M") }}
+  <div class="well content-well">
+    <p><a href="{{ url_for(".role", role_id=s.role.id) }}">{{ s.role.name }}</a> -
+      <a href="{{ s.venue.mapref }}">{{ s.venue.name }}</a>
+      {{ s.start.strftime("%b %d %H:%M") }} - {{ s.end.strftime("%H:%M") }} 
+      {% if s.role.instructions %}
+      <br />
+      <a href="{{ s.role.instructions }}">Instructions</a>
+      {% endif %}
     </p>
   </div>
 {% endmacro %}
