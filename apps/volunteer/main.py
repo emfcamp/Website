@@ -34,6 +34,8 @@ def main():
             for se in current_user.shift_entries
             if se.shift.end < now().replace(tzinfo=None)
         ]
+        if not upcoming_shifts and not past_shifts:
+            return redirect(url_for(".schedule"))
         return render_template(
             "volunteer/landing.html",
             upcoming_shifts=upcoming_shifts,
