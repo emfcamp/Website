@@ -8,6 +8,7 @@
     <p>{{ s.role.name }} - <a href="{{ s.venue.mapref }}">{{ s.venue.name }}</a>
       {{ s.start.strftime("%b %d %H:%M") }} - {{ s.end.strftime("%H:%M") }}
     </p>
+  </div>
 {% endmacro %}
 {% block body %}
 {% include "volunteer/_nav.html" %}
@@ -23,7 +24,4 @@
       {{ shift_view(shift) }}
     {% endfor %}
   {% endif %}
-        
-
-  
 {% endblock %}
