@@ -102,26 +102,51 @@ class UpdateProposalForm(Form):
         proposal.one_day = self.one_day.data
         proposal.user.will_have_ticket = self.will_have_ticket.data
         proposal.user_scheduled = self.user_scheduled.data
-        proposal.published_names = self.published_names.data
-        proposal.published_pronouns = self.published_pronouns.data
-        proposal.published_title = self.published_title.data
-        proposal.published_description = self.published_description.data
-        proposal.arrival_period = self.arrival_period.data
-        proposal.departure_period = self.departure_period.data
-        proposal.telephone_number = self.telephone_number.data
-        proposal.eventphone_number = self.eventphone_number.data
-        proposal.may_record = self.may_record.data
-        proposal.needs_laptop = self.needs_laptop.data
-        proposal.available_times = self.available_times.data
-        proposal.content_note = self.content_note.data
-        proposal.family_friendly = self.family_friendly.data
+
+        proposal.hide_from_schedule = self.hide_from_schedule.data
+
+        # Just talks? Weird to have here
+
+        if self.needs_laptop.raw_data:
+            proposal.needs_laptop = self.needs_laptop.data
+        if self.may_record.raw_data:
+            proposal.may_record = self.may_record.data
+
+        # All these if statements are because this will nuke the data if you
+        # change the state when the fields are currently hidden, so changing
+        # from finalised -> cancelled -> finalised will wipe it all oh no
+
+        # Finalisation details
+        if self.published_names.raw_data:
+            proposal.published_names = self.published_names.data
+        if self.published_pronouns.raw_data:
+            proposal.published_pronouns = self.published_pronouns.data
+        if self.published_title.raw_data:
+            proposal.published_title = self.published_title.data
+        if self.published_description.raw_data:
+            proposal.published_description = self.published_description.data
+        if self.content_note.raw_data:
+            proposal.content_note = self.content_note.data
+        if self.family_friendly.raw_data:
+            proposal.family_friendly = self.family_friendly.data
+
+        # Finalising schedule details
+        if self.telephone_number.raw_data:
+            proposal.telephone_number = self.telephone_number.data
+        if self.eventphone_number.raw_data:
+            proposal.eventphone_number = self.eventphone_number.data
+        if self.arrival_period.raw_data:
+            proposal.arrival_period = self.arrival_period.data
+        if self.departure_period.raw_data:
+            proposal.departure_period = self.departure_period.data
+        if self.available_times.raw_data:
+            proposal.available_times = self.available_times.data
 
         if self.scheduled_duration.data:
             proposal.scheduled_duration = self.scheduled_duration.data
         else:
             proposal.scheduled_duration = None
 
-        proposal.hide_from_schedule = self.hide_from_schedule.data
         # Windows users :(
         stripped_allowed_times = self.allowed_times.data.strip().replace("\r\n", "\n")
         if (
@@ -185,8 +210,10 @@ class UpdateLightningTalkForm(UpdateProposalForm):
     slide_link = StringField("Link")
 
     def update_proposal(self, proposal):
-        proposal.session = self.session.data
-        proposal.slide_link = self.slide_link.data
+        if self.session.raw_data:
+            proposal.session = self.session.data
+        if self.slide_link.raw_data:
+            proposal.slide_link = self.slide_link.data
         super(UpdateLightningTalkForm, self).update_proposal(proposal)
 
 
@@ -200,15 +227,22 @@ class UpdateWorkshopForm(UpdateProposalForm):
     published_age_range = StringField("Attendee age range")
 
     def update_proposal(self, proposal):
-        proposal.attendees = self.attendees.data
-        proposal.cost = self.cost.data
-        proposal.participant_equipment = self.participant_equipment.data
-        proposal.age_range = self.age_range.data
-        proposal.published_cost = self.published_cost.data
-        proposal.published_participant_equipment = (
-            self.published_participant_equipment.data
-        )
-        proposal.published_age_range = self.published_age_range.data
+        if self.attendees.raw_data:
+            proposal.attendees = self.attendees.data
+        if self.cost.raw_data:
+            proposal.cost = self.cost.data
+        if self.participant_equipment.raw_data:
+            proposal.participant_equipment = self.participant_equipment.data
+        if self.age_range.raw_data:
+            proposal.age_range = self.age_range.data
+        if self.published_cost.raw_data:
+            proposal.published_cost = self.published_cost.data
+        if self.published_participant_equipment.raw_data:
+            proposal.published_participant_equipment = (
+                self.published_participant_equipment.data
+            )
+        if self.published_age_range.raw_data:
+            proposal.published_age_range = self.published_age_range.data
         super(UpdateWorkshopForm, self).update_proposal(proposal)
 
 
@@ -223,16 +257,24 @@ class UpdateYouthWorkshopForm(UpdateProposalForm):
     valid_dbs = BooleanField("Has a valid DBS check")
 
     def update_proposal(self, proposal):
-        proposal.attendees = self.attendees.data
-        proposal.cost = self.cost.data
-        proposal.participant_equipment = self.participant_equipment.data
-        proposal.age_range = self.age_range.data
-        proposal.published_cost = self.published_cost.data
-        proposal.published_participant_equipment = (
-            self.published_participant_equipment.data
-        )
-        proposal.published_age_range = self.published_age_range.data
-        proposal.valid_dbs = self.valid_dbs.data
+        if self.attendees.raw_data:
+            proposal.attendees = self.attendees.data
+        if self.cost.raw_data:
+            proposal.cost = self.cost.data
+        if self.participant_equipment.raw_data:
+            proposal.participant_equipment = self.participant_equipment.data
+        if self.age_range.raw_data:
+            proposal.age_range = self.age_range.data
+        if self.published_cost.raw_data:
+            proposal.published_cost = self.published_cost.data
+        if self.published_participant_equipment.raw_data:
+            proposal.published_participant_equipment = (
+                self.published_participant_equipment.data
+            )
+        if self.published_age_range.raw_data:
+            proposal.published_age_range = self.published_age_range.data
+        if self.valid_dbs.raw_data:
+            proposal.valid_dbs = self.valid_dbs.data
         super(UpdateYouthWorkshopForm, self).update_proposal(proposal)
 
 
@@ -241,8 +283,10 @@ class UpdateInstallationForm(UpdateProposalForm):
     size = StringField("Size", [DataRequired()])
 
     def update_proposal(self, proposal):
-        proposal.size = self.size.data
-        proposal.funds = self.funds.data
+        if self.size.raw_data:
+            proposal.size = self.size.data
+        if self.funds.raw_data:
+            proposal.funds = self.funds.data
         super(UpdateInstallationForm, self).update_proposal(proposal)
 
 
