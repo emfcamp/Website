@@ -33,13 +33,28 @@
     {{ render_field(form.revert) }}
 </form>
 <div>
-    <p><strong>Revisions</strong></p>
+    <h2>All Revisions</h2>
+
+    <div>
+        {% if version_id > 0 %}
+            <a class="btn btn-success" href="{{ url_for('.proposal_version', proposal_id=proposal.id, version=(version_id - 1)) }}">
+                prev
+            </a>
+        {% endif %}
+        {% if version_id < (versions | length ) - 1 %}
+            <a class="btn btn-success" href="{{ url_for('.proposal_version', proposal_id=proposal.id, version=(version_id + 1)) }}">
+                next
+            </a>
+        {% endif %}
+    </div>
+
+    <ul>
     {% for (vid, ver) in (versions | reverse ) %}
         <li><a href="{{ url_for('.proposal_version', proposal_id=proposal.id, version=vid) }}">
                     {{ vid }} &mdash; {{ ver.changeset['modified'][1] }}
         </a></li>
     {% endfor %}
-    <ul></ul>
+    </ul>
 </div>
 
 {% endblock %}
