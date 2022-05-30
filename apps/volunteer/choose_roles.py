@@ -146,16 +146,25 @@ def role_admin_required(f, *args, **kwargs):
 @volunteer.route("role/<int:role_id>/admin")
 @role_admin_required
 def role_admin(role_id):
+    limit = int(request.args.get("limit", "5"))
+    offset = int(request.args.get("offset", "0"))
     role = Role.query.get_or_404(role_id)
     cutoff = datetime.now() - timedelta(minutes=30)
     shifts = (
         Shift.query.filter_by(role=role)
         .filter(Shift.end >= cutoff)
         .order_by(Shift.end)
-        .limit(5)
+        .offset(offset)
+        .limit(limit)
         .all()
     )
-    return render_template("volunteer/role_admin.html", role=role, shifts=shifts)
+    return render_template(
+        "volunteer/role_admin.html",
+        role=role,
+        shifts=shifts,
+        offset=offset,
+        limit=limit,
+    )
 
 
 @volunteer.route("role/<int:role_id>/toggle_arrived/<int:shift_id>/<int:user_id>")

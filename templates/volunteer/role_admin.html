@@ -22,9 +22,18 @@
         </a>&nbsp;
         <a href="/volunteer/role/{{ role.id }}/toggle_complete/{{ se.shift_id }}/{{ se.user_id }}">
           Complete:{% if se.completed %}✓{% else %}✗{% endif %}
-        </a></p>
+        </a>
+        <br /><a href="mailto:{{ se.user.volunteer.volunteer_email }}">{{ se.user.volunteer.volunteer_email }}</a>
+        {% if se.user.volunteer.volunteer_phone %}Phone: {{ se.user.volunteer.volunteer_phone }}{% endif %}
+        </p>
       {% endfor %}
     </div>
   {% endfor %}
 
+  <p>
+    {% if offset-limit >= 0 %}
+      <a href="{{ url_for(".role_admin", role_id=role.id) }}?offset={{ offset - limit }}&limit={{ limit }}">Prev</a>
+    {% endif %}
+    <a href="{{ url_for(".role_admin", role_id=role.id) }}?offset={{ offset + limit }}&limit={{ limit }}">Next</a>
+  </p>
 {% endblock %}
