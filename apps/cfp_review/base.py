@@ -52,6 +52,7 @@ from .forms import (
     ConvertProposalForm,
     AddNoteForm,
     ChangeProposalOwner,
+    ReversionForm,
 )
 from . import (
     cfp_review,
@@ -507,6 +508,52 @@ def message_proposer(proposal_id):
         form=form,
         messages=messages,
         proposal=proposal,
+    )
+
+
+@cfp_review.route("/proposals/<int:proposal_id>/versions")
+@admin_required
+def proposal_latest_version(proposal_id):
+    prop = Proposal.query.get_or_404(proposal_id)
+    last_version_id = prop.versions.count() - 1
+    return redirect(
+        url_for(".proposal_version", proposal_id=proposal_id, version=last_version_id)
+    )
+
+
+@cfp_review.route(
+    "/proposals/<int:proposal_id>/versions/<int:version>", methods=["GET", "POST"]
+)
+@admin_required
+def proposal_version(proposal_id, version):
+    form = ReversionForm()
+    prop = Proposal.query.get_or_404(proposal_id)
+    changeset = prop.versions[version].changeset
+
+    # prop.versions isn't actually a list and we want to be able enumerate it
+    versions = [(idx, ver) for (idx, ver) in enumerate(prop.versions)]
+
+    if form.validate_on_submit():
+        if form.proposal_id.data != proposal_id or form.version.data != version:
+            flash("Mismatched Ids, try again")
+            return redirect(
+                url_for(".proposal_version", proposal_id=proposal_id, version=version)
+            )
+
+        app.logger.info(f"reverting proposal {proposal_id} to version {version}")
+        prop.versions[version].revert()
+        db.session.commit()
+        return redirect(url_for(".proposal_latest_version", proposal_id=proposal_id))
+
+    form.proposal_id.data = proposal_id
+    form.version.data = version
+
+    return render_template(
+        "cfp_review/proposal_version.html",
+        form=form,
+        proposal=prop,
+        changeset=changeset,
+        versions=versions,
     )
 
 

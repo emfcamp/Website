@@ -1,0 +1,45 @@
+{% from "_formhelpers.html" import render_field %}
+{% extends "cfp_review/base.html" %}
+{% block body %}
+
+{% set active='versions' %}
+{% include "cfp_review/_propsal_tabs.html" %}
+
+<h4>{{ proposal.title }} <small>by <a href="{{ url_for('admin.user', user_id=proposal.user.id) }}">{{proposal.user.name}}</a></small></h4>
+
+<p>&nbsp;</p>
+<div>
+
+    <p><strong>Last changed at:</strong> {{ changeset['modified'][1] }}</p>
+    <table class="table table-condensed">
+        <tr>
+            <th>Fieldname</th>
+            <th>Was</th>
+            <th>Changed to</th>
+        </tr>
+    {% for (field, (was, now)) in changeset.items() if field != "modified" %}
+        <tr class="{{- loop.cycle('odd', 'even') -}}">
+            <td>{{field}}</td>
+            <td>{{was}}</td>
+            <td>{{now}}</td>
+        </tr>
+    {% endfor %}
+    </table>
+</div>
+<form method="post">
+    {{ form.hidden_tag() }}
+    {{ form.proposal_id.field }}
+    {{ form.version.field }}
+    {{ render_field(form.revert) }}
+</form>
+<div>
+    <p><strong>Revisions</strong></p>
+    {% for (vid, ver) in (versions | reverse ) %}
+        <li><a href="{{ url_for('.proposal_version', proposal_id=proposal.id, version=vid) }}">
+                    {{ vid }} &mdash; {{ ver.changeset['modified'][1] }}
+        </a></li>
+    {% endfor %}
+    <ul></ul>
+</div>
+
+{% endblock %}
