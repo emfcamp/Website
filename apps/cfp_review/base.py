@@ -531,7 +531,7 @@ def proposal_version(proposal_id, version):
     changeset = prop.versions[version].changeset
 
     # prop.versions isn't actually a list and we want to be able enumerate it
-    versions = [(idx, ver) for (idx, ver) in enumerate(prop.versions)]
+    all_versions = [(idx, ver) for (idx, ver) in enumerate(prop.versions)]
 
     if form.validate_on_submit():
         if form.proposal_id.data != proposal_id or form.version.data != version:
@@ -553,7 +553,8 @@ def proposal_version(proposal_id, version):
         form=form,
         proposal=prop,
         changeset=changeset,
-        versions=versions,
+        version_id=version,
+        versions=all_versions,
     )
 
 
