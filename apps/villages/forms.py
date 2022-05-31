@@ -6,6 +6,7 @@ from wtforms import (
     IntegerField,
 )
 from wtforms.validators import Optional, Length, URL
+from geoalchemy2.shape import to_shape
 
 from ..common.forms import Form
 
@@ -49,3 +50,33 @@ class VillageForm(Form):
         self.power_requirements.data = requirements.power_requirements
         self.noise.data = requirements.noise
         self.structures.data = requirements.structures
+
+
+class AdminVillageForm(VillageForm):
+    latlon = StringField("Location", [Optional()])
+
+    def populate(self, village):
+        super().populate(village)
+
+        if village.location is None:
+            self.latlon.data = ""
+        else:
+            latlon = to_shape(village.location)
+            self.latlon.data = "{}, {}".format(latlon.x, latlon.y)
+
+    def populate_obj(self, village):
+        village.name = self.name.data
+        village.description = self.description.data
+        village.url = self.url.data
+        if self.latlon.data:
+            latlon = self.latlon.data.split(",")
+            location = f"POINT({latlon[0]} {latlon[1]})"
+        else:
+            location = None
+        village.location = location
+
+        village.requirements.num_attendees = self.num_attendees.data
+        village.requirements.size_sqm = self.size_sqm.data
+        village.requirements.power_requirements = self.power_requirements.data
+        village.requirements.noise = self.noise.data
+        village.requirements.structures = self.structures.data

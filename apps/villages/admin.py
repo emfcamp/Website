@@ -13,8 +13,11 @@ from ..common.email import (
     preview_trusted_email,
 )
 
+from main import db
+
 from models.village import Village, VillageMember
 from models.user import User
+from .forms import AdminVillageForm
 
 from ..common import require_permission
 from . import villages
@@ -39,14 +42,25 @@ def admin():
     return render_template("villages/admin/list.html", villages=villages)
 
 
-@villages.route("/admin/village/<int:village_id>")
+@villages.route("/admin/village/<int:village_id>", methods=["GET", "POST"])
 @village_admin_required
 def admin_village(village_id):
     village = Village.get_by_id(village_id)
     if not village:
         abort(404)
 
-    return render_template("villages/admin/info.html", village=village)
+    form = AdminVillageForm()
+
+    if form.validate_on_submit():
+        form.populate_obj(village)
+        db.session.add(village)
+        db.session.commit()
+
+        flash("The village has been updated")
+        return redirect(url_for(".admin_village", village_id=village.id))
+
+    form.populate(village)
+    return render_template("villages/admin/info.html", village=village, form=form)
 
 
 @villages.route("/admin/email_owners", methods=["GET", "POST"])
