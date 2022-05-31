@@ -106,7 +106,7 @@ def populate(proposal, form):
     ) = form.participant_equipment.data
 
 
-@schedule.route("/attendee_content", methods=["GET", "POST"])
+@schedule.route("/attendee-content", methods=["GET", "POST"])
 @login_required
 @feature_flag("ATTENDEE_CONTENT")
 def attendee_content():
@@ -151,7 +151,7 @@ def attendee_content():
     )
 
 
-@schedule.route("/attendee_content/<int:id>/edit", methods=["GET", "POST"])
+@schedule.route("/attendee-content/<int:id>/edit", methods=["GET", "POST"])
 @login_required
 @feature_flag("ATTENDEE_CONTENT")
 def attendee_content_edit(id):
@@ -192,7 +192,7 @@ class DeleteAttendeeContentForm(Form):
     delete = SubmitField("Delete content")
 
 
-@schedule.route("/attendee_content/<int:id>/delete", methods=["GET", "POST"])
+@schedule.route("/attendee-content/<int:id>/delete", methods=["GET", "POST"])
 @login_required
 @feature_flag("ATTENDEE_CONTENT")
 def attendee_content_delete(id):
