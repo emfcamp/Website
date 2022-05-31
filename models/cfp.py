@@ -103,9 +103,23 @@ LIGHTNING_TALK_SESSIONS = {
 # Options for age range displayed to the user
 AGE_RANGE_OPTIONS = [
     ("All ages", "All ages"),
-    ("Children (0-12)", "Children (0-12)"),
-    ("Teens (13-18)", "Teens (13-18)"),
-    ("Adult Content (18+)", "Adult Content (18+)"),
+    ("Aimed at adults, but supervised kids welcome.", "Aimed at adults, but supervised kids welcome."),
+    ("3+", "3+"),
+    ("4+", "4+"),
+    ("5+", "5+"),
+    ("6+", "6+"),
+    ("7+", "7+"),
+    ("8+", "8+"),
+    ("9+", "9+"),
+    ("10+", "10+"),
+    ("11+", "11+"),
+    ("12+", "12+"),
+    ("13+", "13+"),
+    ("14+", "14+"),
+    ("15+", "15+"),
+    ("16+", "16+"),
+    ("17+", "17+"),
+    ("18+", "18+"),
 ]
 
 # What we consider these as when scheduling
