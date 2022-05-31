@@ -13,29 +13,36 @@ from . import cfp
 from ..common.email import from_email
 
 
+# This should probably be moved to models/cfp.py and DEFAULT_VENUES merged in
+EMF_VENUES = {
+    "Stage A": (100, (52.03961, -2.37787), True, "talk"),
+    "Stage B": (99, (52.04190, -2.37664), True, "talk,performance"),
+    "Stage C": (98, (52.04050, -2.37765), True, "talk"),
+    "Workshop 1": (97, (52.04259, -2.37515), True, "workshop"),
+    "Workshop 2": (96, (52.04208, -2.37715), True, "workshop"),
+    "Workshop 3": (95, (52.04129, -2.37578), True, "workshop"),
+    "Workshop 4": (94, (52.04329, -2.37590), True, "workshop"),
+    "Workshop 5": (93, (52.040938, -2.37706), True, "workshop"),
+    "Youth Workshop": (92, (52.04117, -2.37771), True, "youthworkshop"),
+    "Main Bar": (91, (52.04180, -2.37727), False, "talk,performance"),
+    "Lounge": (
+        90,
+        (52.04147, -2.37644),
+        False,
+        "talk,performance,workshop,youthworkshop",
+    ),
+}
+
+
 @cfp.cli.command("create_venues")
 def create_venues():
     """Create venues defined in code"""
-    venues = [
-        ("Stage A", 100, (52.03961, -2.37787), True, "talk"),
-        ("Stage B", 99, (52.04190, -2.37664), True, "talk,performance"),
-        ("Stage C", 98, (52.04050, -2.37765), True, "talk"),
-        ("Workshop 1", 97, (52.04259, -2.37515), True, "workshop"),
-        ("Workshop 2", 96, (52.04208, -2.37715), True, "workshop"),
-        ("Workshop 3", 95, (52.04129, -2.37578), True, "workshop"),
-        ("Workshop 4", 94, (52.04329, -2.37590), True, "workshop"),
-        ("Workshop 5", 94, (52.040938, -2.37706), True, "workshop"),
-        ("Youth Workshop", 93, (52.04117, -2.37771), True, "youthworkshop"),
-        ("Main Bar", 92, (52.04180, -2.37727), False, "talk,performance"),
-        (
-            "Lounge",
-            91,
-            (52.04147, -2.37644),
-            False,
-            "talk,performance,workshop,youthworkshop",
-        ),
-    ]
-    for name, priority, latlon, scheduled_content_only, type_str in venues:
+    for name, (
+        priority,
+        latlon,
+        scheduled_content_only,
+        type_str,
+    ) in EMF_VENUES.items():
         venue = Venue.query.filter_by(name=name).all()
 
         if latlon:
@@ -69,7 +76,10 @@ def create_village_venues():
     for village in Village.query.all():
         venue = Venue.query.filter_by(village_id=village.id).first()
         if venue:
-            if venue.name != village.name:
+            if venue.name in EMF_VENUES:
+                app.logger.info(f"Not updating EMF venue {venue.name}")
+
+            elif venue.name != village.name:
                 app.logger.info(
                     f"Updating village venue name from {venue.name} to {village.name}"
                 )
