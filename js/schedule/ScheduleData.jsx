@@ -46,8 +46,8 @@ class ScheduleData {
     });
 
     this.venues = this.venues.sort((a,b) => {
-      if (a.official && !b.official) { return 1; }
-      if (!a.official && b.official) { return -1; }
+      if (a.official && !b.official) { return -1; }
+      if (!a.official && b.official) { return 1; }
 
       return a.name.localeCompare(b.name);
     });
