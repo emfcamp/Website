@@ -19,15 +19,17 @@
 <h4>User List</h4>
 <table class="table table-condensed">
     <tr>
-      <th>{{octicon('person')}} Name</th>
-      <th>{{octicon('mail')}} email</th>
-      <th>{{octicon('lock') }} Permissions</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Permissions</th>
+      <th>Checked in</th>
     </tr>
 {% for u in users %}
 <tr class="{{ loop.cycle('odd', 'even') }}">
     <td>{{ u.name }}</td>
     <td><a href="{{ url_for('.user', user_id=u.id) }}">{{ u.email }}</a></td>
     <td>{% for permission in u.permissions %}{{ permission.name }}&nbsp;{% endfor %}</td>
+    <td>{{ u.get_owned_tickets(type="admission_ticket") | selectattr("checked_in") | list | count or '' }}</td>
 </tr>
 {% endfor %}
 </table>
