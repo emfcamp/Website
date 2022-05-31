@@ -13,7 +13,6 @@
   <dd><a href="{{url_for('admin.product_group_details', group_id=product.parent.id)}}">
         {{ product.parent }}
   </a></dd>
-  <dt>Admits</dt><dd>{{ product.admits }}</dd>
   <dt>Sold</dt><dd>{{ product.capacity_used }}</dd>
   <dt>Maximum</dt><dd>{{ product.capacity_max }}</dd>
   <dt>Expires</dt><dd>{{ format_expiry(product) }}</dd>
