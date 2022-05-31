@@ -68,9 +68,16 @@ function AdditionalInformation({ label, value }) {
 function Event({ event, toggleFavourite, authenticated }) {
   let [expanded, setExpanded] = useState(false);
 
+  function humanTypeName(type) {
+    if (type == "youthworkshop") { return "Youth Workshop" }
+
+    return type.charAt(0).toUpperCase() + type.slice(1);
+  }
+
   let metadata = [
     `${event.startTime.toFormat('HH:mm')} to ${event.endTime.toFormat('HH:mm')}`,
     event.venue,
+    humanTypeName(event.type),
   ].filter(i => { return i !== null && i !== '' }).join(' | ');
 
   function eventDetails() {
