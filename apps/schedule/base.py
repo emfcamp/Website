@@ -138,7 +138,7 @@ def favourites():
     if current_user.is_anonymous:
         return redirect(url_for("users.login", next=url_for(".favourites")))
 
-    proposals = current_user.favourites
+    proposals = [p for p in current_user.favourites if not p.hide_from_schedule]
     externals = current_user.calendar_favourites
 
     token = generate_api_token(app.config["SECRET_KEY"], current_user.id)
