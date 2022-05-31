@@ -52,6 +52,19 @@ class ScheduleData {
       return a.name.localeCompare(b.name);
     });
 
+    this.ageRanges = this.ageRanges.map(i => {
+      return [i, parseInt(i.replace(/[^\d]+/, ""))]
+    }).sort((a,b) => {
+      // Sort things that aren't ages at the end of the list
+      if (isNaN(a[1]) && !isNaN(b[1])) { return 1 }
+      if (isNaN(b[1]) && !isNaN(a[1])) { return -1 }
+
+      if (a[1] < b[1]) { return -1 }
+      if (a[1] > b[1]) { return 1 }
+
+      return 0
+    }).map(i => i[0]);
+
     this.eventTypes = this.eventTypes.sort((a,b) => a.name.localeCompare(b.name));
 
     Object.keys(this.scheduleByHour).forEach(hour => {
