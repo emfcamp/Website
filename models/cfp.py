@@ -206,7 +206,7 @@ cfp_period = namedtuple("cfp_period", "start end")
 # returned by default if there are none
 DEFAULT_VENUES: dict[str, list[str]] = {
     "talk": ["Stage A", "Stage B", "Stage C"],
-    "workshop": ["Workshop 1", "Workshop 2", "Workshop 3", "Workshop 4"],
+    "workshop": ["Workshop 1", "Workshop 2", "Workshop 3", "Workshop 4", "Workshop 5"],
     "youthworkshop": ["Youth Workshop"],
     "performance": ["Stage B"],
     "installation": [],
@@ -221,6 +221,7 @@ VENUE_CAPACITY = {
     "Workshop 2": 30,
     "Workshop 3": 30,
     "Workshop 4": 30,
+    "Workshop 5": 30,
     "Youth Workshop": 30,
 }
 

@@ -389,3 +389,9 @@ class ChangeProposalOwner(Form):
     )
     user_name = StringField("User name (if creating new user)")
     submit = SubmitField("Change proposal owner")
+
+
+class ReversionForm(Form):
+    proposal_id = HiddenIntegerField("proposal_id")
+    version = HiddenIntegerField("version")
+    revert = SubmitField("Revert to this version")
