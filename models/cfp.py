@@ -221,6 +221,7 @@ VENUE_CAPACITY = {
     "Workshop 2": 30,
     "Workshop 3": 30,
     "Workshop 4": 30,
+    "Workshop 5": 30,
     "Youth Workshop": 30,
 }
 
