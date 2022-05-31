@@ -18,6 +18,7 @@
 <p>
   Show Venues: 
   <a href="{{ url_for('cfp_review.scheduler') }}">All</a> /
+  <a href="{{ url_for('cfp_review.scheduler', venue=emf_venues) }}">EMF Venues</a> /
   {% for type, stages in default_venues.items() %}
     {% if stages %}
     <a href="{{ url_for('cfp_review.scheduler', venue=stages) }}">{{ type|capitalize }}</a>
