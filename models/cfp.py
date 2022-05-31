@@ -103,7 +103,10 @@ LIGHTNING_TALK_SESSIONS = {
 # Options for age range displayed to the user
 AGE_RANGE_OPTIONS = [
     ("All ages", "All ages"),
-    ("Aimed at adults, but supervised kids welcome.", "Aimed at adults, but supervised kids welcome."),
+    (
+        "Aimed at adults, but supervised kids welcome.",
+        "Aimed at adults, but supervised kids welcome.",
+    ),
     ("3+", "3+"),
     ("4+", "4+"),
     ("5+", "5+"),
