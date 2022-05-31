@@ -110,7 +110,11 @@ def populate(proposal, form):
 @login_required
 @feature_flag("ATTENDEE_CONTENT")
 def attendee_content():
-    venue_ids = [venue.id for venue in current_user.village.venues]
+    if current_user.village:
+        venue_ids = [venue.id for venue in current_user.village.venues]
+    else:
+        venue_ids = []
+
     content = Proposal.query.filter(
         or_(
             and_(Proposal.user_id == current_user.id, Proposal.user_scheduled is True),
