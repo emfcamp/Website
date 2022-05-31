@@ -392,6 +392,6 @@ class ChangeProposalOwner(Form):
 
 
 class ReversionForm(Form):
-    proposal_id = HiddenIntegerField("proposal_id")
-    version = HiddenIntegerField("version")
+    proposal_id = HiddenIntegerField("Proposal ID")
+    txn_id = HiddenIntegerField("Transaction ID")
     revert = SubmitField("Revert to this version")

@@ -10,48 +10,59 @@
 <p>&nbsp;</p>
 <div>
 
-    <p><strong>Last changed at:</strong> {{ changeset['modified'][1] }}</p>
+    <p><strong>Last changed at:</strong>
+        {{ version.transaction.issued_at.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] }}
+        {% if version.transaction.user %}
+        by <a href="{{ url_for('admin.user', user_id=version.transaction.user.id) }}">{{ version.transaction.user.name }} ({{ version.transaction.user.email }})</a>
+        {% endif %}
+    </p>
     <table class="table table-condensed">
         <tr>
             <th>Fieldname</th>
             <th>Was</th>
             <th>Changed to</th>
         </tr>
-    {% for (field, (was, now)) in changeset.items() if field != "modified" %}
+    {% for (field, (old, new)) in version.changeset.items() if field != "modified" %}
         <tr class="{{- loop.cycle('odd', 'even') -}}">
             <td>{{field}}</td>
-            <td>{{was}}</td>
-            <td>{{now}}</td>
+            <td>{{old}}</td>
+            <td>{{new}}</td>
         </tr>
     {% endfor %}
     </table>
 </div>
+{% if version.next %}
 <form method="post">
     {{ form.hidden_tag() }}
     {{ form.proposal_id.field }}
-    {{ form.version.field }}
+    {{ form.txn_id.field }}
     {{ render_field(form.revert) }}
 </form>
+{% endif %}
 <div>
     <h2>All Revisions</h2>
 
     <div>
-        {% if version_id > 0 %}
-            <a class="btn btn-success" href="{{ url_for('.proposal_version', proposal_id=proposal.id, version=(version_id - 1)) }}">
+        {% if version.previous %}
+            <a class="btn btn-success" href="{{ url_for('.proposal_version', proposal_id=proposal.id, txn_id=version.previous.transaction_id) }}">
                 prev
             </a>
         {% endif %}
-        {% if version_id < (versions | length ) - 1 %}
-            <a class="btn btn-success" href="{{ url_for('.proposal_version', proposal_id=proposal.id, version=(version_id + 1)) }}">
+        {% if version.next %}
+            <a class="btn btn-success" href="{{ url_for('.proposal_version', proposal_id=proposal.id, txn_id=version.next.transaction_id) }}">
                 next
             </a>
         {% endif %}
     </div>
 
     <ul>
-    {% for (vid, ver) in (versions | reverse ) %}
-        <li><a href="{{ url_for('.proposal_version', proposal_id=proposal.id, version=vid) }}">
-                    {{ vid }} &mdash; {{ ver.changeset['modified'][1] }}
+    {% for v in proposal.versions | reverse %}
+        <li><a href="{{ url_for('.proposal_version', proposal_id=proposal.id, txn_id=v.transaction_id) }}">
+            {{ loop.length - loop.index }} &mdash;
+            {{ v.transaction.issued_at.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] }}
+            {% if v.transaction.user %}
+            by {{ v.transaction.user.name }} ({{ v.transaction.user.email }})
+            {% endif %}
         </a></li>
     {% endfor %}
     </ul>

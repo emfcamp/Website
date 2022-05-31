@@ -515,46 +515,42 @@ def message_proposer(proposal_id):
 @admin_required
 def proposal_latest_version(proposal_id):
     prop = Proposal.query.get_or_404(proposal_id)
-    last_version_id = prop.versions.count() - 1
+    last_txn_id = prop.versions[-1].transaction_id
     return redirect(
-        url_for(".proposal_version", proposal_id=proposal_id, version=last_version_id)
+        url_for(".proposal_version", proposal_id=proposal_id, txn_id=last_txn_id)
     )
 
 
 @cfp_review.route(
-    "/proposals/<int:proposal_id>/versions/<int:version>", methods=["GET", "POST"]
+    "/proposals/<int:proposal_id>/versions/<int:txn_id>", methods=["GET", "POST"]
 )
 @admin_required
-def proposal_version(proposal_id, version):
+def proposal_version(proposal_id, txn_id):
     form = ReversionForm()
     prop = Proposal.query.get_or_404(proposal_id)
-    changeset = prop.versions[version].changeset
-
-    # prop.versions isn't actually a list and we want to be able enumerate it
-    all_versions = [(idx, ver) for (idx, ver) in enumerate(prop.versions)]
+    version = prop.versions.filter_by(transaction_id=txn_id).one()
 
     if form.validate_on_submit():
-        if form.proposal_id.data != proposal_id or form.version.data != version:
+        # FIXME: when would this ever happen?
+        if form.proposal_id.data != proposal_id or form.txn_id.data != txn_id:
             flash("Mismatched Ids, try again")
             return redirect(
-                url_for(".proposal_version", proposal_id=proposal_id, version=version)
+                url_for(".proposal_version", proposal_id=proposal_id, txn_id=txn_id)
             )
 
-        app.logger.info(f"reverting proposal {proposal_id} to version {version}")
-        prop.versions[version].revert()
+        app.logger.info(f"reverting proposal {proposal_id} to transaction {txn_id}")
+        version.revert()
         db.session.commit()
         return redirect(url_for(".proposal_latest_version", proposal_id=proposal_id))
 
     form.proposal_id.data = proposal_id
-    form.version.data = version
+    form.txn_id.data = txn_id
 
     return render_template(
         "cfp_review/proposal_version.html",
         form=form,
         proposal=prop,
-        changeset=changeset,
-        version_id=version,
-        versions=all_versions,
+        version=version,
     )
 
 
