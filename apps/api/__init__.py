@@ -7,3 +7,4 @@ api = Api(api_bp)
 from . import user  # noqa
 from . import villages  # noqa
 from . import schedule  # noqa
+from . import installations  # noqa
