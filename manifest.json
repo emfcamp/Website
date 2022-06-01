@@ -4,7 +4,6 @@
   "name": "Electromagnetic Field",
   "short_name": "EMF",
   "lang": "en-GB",
-  "start_url": ".",
   "display": "standalone",
   "background_color": "#171123",
   "orientation": "portrait-primary",
