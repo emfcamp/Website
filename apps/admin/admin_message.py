@@ -78,7 +78,8 @@ def new_message():
     form.populate_topics()
 
     if form.validate_on_submit():
-        msg = AdminMessage(creator=current_user)
+        msg = AdminMessage(form.message.data, current_user)
+
         form.update_message(msg)
 
         db.session.add(msg)

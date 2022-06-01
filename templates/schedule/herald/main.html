@@ -7,5 +7,6 @@
   {% for venue in venue_list %}
     <li><a href="{{ url_for('.herald_venue', venue_name=venue) }}">{{ venue | title }}</a></li>
   {% endfor %}
+  <li><a href="{{ url_for('.greenroom') }}">All/Greenroom</a></li>
 </ul>
 {% endblock %}

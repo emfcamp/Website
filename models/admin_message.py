@@ -1,6 +1,7 @@
 import pendulum
 from datetime import datetime
 
+from sqlalchemy import or_
 from sqlalchemy.sql.functions import func
 
 from main import db
@@ -69,7 +70,10 @@ class AdminMessage(BaseModel):
     def get_all_for_topic(cls, topic):
         return AdminMessage.query.filter(
             AdminMessage.topic == topic,
-            AdminMessage.end > datetime.utcnow(),
+            or_(
+                AdminMessage.end > datetime.utcnow(),
+                AdminMessage.end == None,  # noqa: E711
+            ),
         ).all()
 
     @classmethod

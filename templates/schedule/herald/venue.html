@@ -1,15 +1,52 @@
+{% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block title %}Herald for {{ venue_name }}{% endblock %}
 {% block body %}
 
   <h1>Now &amp; next on: {{ venue_name }}</h1>
 
-  <h2>Now</h2>
-  {{ now.title }}
+  <form method="post">
+    {{ form.hidden_tag() }}
+    <h2>Now</h2>
+    <dl class="dl-horizontal">
+      <dt>title</dt><dd><a href="{{ url_for('schedule.item', year=year, proposal_id=now.id) }}">{{ now.title }}</a></dd>
+      <dt>Speaker</dt>
+      <dd>
+        {{ now.published_names or now.user.name }}{% if now.published_pronouns %} ({{now.published_pronouns}}){% endif %}
+      </dd>
+      <dt>Start</dt><dd>{{ now.scheduled_time.strftime("%A %H:%M") }}</dd>
+      <dt>Duration</dt><dd>{{ now.scheduled_duration }} minutes</dd>
+    </dl>
+    {{ form.now.talk_id() }}
+    {{ render_field(form.now.may_record, horizontal=8) }}
+    {{ render_field(form.now.update, horizontal=8) }}
+    <p>&nbsp;</p>
+    {{ render_field(form.now.speaker_here, horizontal=8) }}
+    <p>&nbsp;</p>
 
-  <h2>Next</h2>
-  {{ next.title }}
+    <h2>Next</h2>
+    <dl class="dl-horizontal">
+      <dt>title</dt><dd><a href="{{ url_for('schedule.item', year=year, proposal_id=next.id) }}">{{ next.title }}</a></dd>
+      <dt>Speaker</dt>
+      <dd>
+        {{ next.published_names or next.user.name }}{% if next.published_pronouns %} ({{next.published_pronouns}}){% endif %}
+      </dd>
+      <dt>Start</dt><dd>{{ next.scheduled_time.strftime("%A %H:%M") }}</dd>
+      <dt>Duration</dt><dd>{{ next.scheduled_duration }} minutes</dd>
+    </dl>
+    {{ form.next.talk_id() }}
+    {{ render_field(form.next.may_record, horizontal=8) }}
+    {{ render_field(form.next.update, horizontal=8) }}
+    <p>&nbsp;</p>
+    {{ render_field(form.next.speaker_here, horizontal=8) }}
+    <p>&nbsp;</p>
 
+    <h2>Send message to the Greenroom</h2>
+
+    {{ render_field(form.message, horizontal=8) }}
+    {{ form.send_message(class="btn btn-success pull-right") }}
+  </form>
+<p>&nbsp;</p>
 
   {% if messages %}
     <h1>Messages</h1>
@@ -17,19 +54,20 @@
     <table class="table products">
       <thead>
         <tr>
-          <th>Time
-          <th>From
-          <th>Message
+          <th>Time</th>
+          <th>From</th>
+          <th>Message</th>
         </tr>
       </thead>
       <tbody>
         {% for msg in messages %}
           <tr class="product form-group {{ loop.cycle('odd', 'even') }}">
-            <td>{{ msg.created.strftime("%A %H:%M")  }}
-            <td>{{ msg.created_by }}
-            <td>{{ msg.message }}
+            <td>{{ msg.created.strftime("%A %H:%M")  }}</td>
+            <td>{{ msg.created_by }}</td>
+            <td>{{ msg.message }}</td>
           </tr>
         {% endfor %}
       </tbody>
+    </table>
   {% endif %}
 {% endblock %}
