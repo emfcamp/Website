@@ -42,6 +42,7 @@ def _get_proposal_dict(proposal: Proposal, favourites_ids):
         res["cost"] = proposal.display_cost
         res["equipment"] = proposal.display_participant_equipment
         res["age_range"] = proposal.display_age_range
+        res["attendees"] = proposal.attendees
     return res
 
 
