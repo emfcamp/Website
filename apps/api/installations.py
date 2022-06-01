@@ -10,14 +10,14 @@ from . import api
 def render_installation(installation: InstallationProposal):
     return {
         "id": installation.id,
-        "name": installation.title,
+        "name": installation.display_title,
         "url": url_for(
             "schedule.item",
             year=event_year(),
             proposal_id=installation.id,
             _external=True,
         ),
-        "description": installation.description,
+        "description": installation.published_description,
         "location": to_shape(installation.scheduled_venue.location).__geo_interface__
         if installation.scheduled_venue and installation.scheduled_venue.location
         else None,
