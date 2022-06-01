@@ -55,7 +55,8 @@ def create_perms():
     """Create permissions in DB if they don't exist"""
     for permission in (
         "admin",
-        "arrivals",
+        "arrivals:badge",
+        "arrivals:checkin",
         "cfp_admin",
         "cfp_reviewer",
         "cfp_anonymiser",

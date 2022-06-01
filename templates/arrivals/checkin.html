@@ -1,6 +1,6 @@
 {% extends "arrivals/base.html" %}
 {% block body %}
-{% if badge %}
+{% if mode == "badge" %}
 <h2>Issue badge</h2>
 
 <p>To issue {{ tickets|count == 1 and 'this badge' or 'these badges' }}, please click below.</p>
@@ -15,7 +15,7 @@
 <dt>Email</dt><dd>{{ user.email }}</dd>
 </dl>
 
-{% if user.checkin_note and not badge %}
+{% if user.checkin_note and mode == "checkin" %}
 <div class="alert alert-info">
   <p><strong>Important instructions for processing this attendee's arrival:</strong></p>
   <p>{{ user.checkin_note }}</p>
@@ -30,7 +30,7 @@
     </div>
     <div class="col-sm-10">
       <h4>Request ID</h4>
-      <p>Please validate the above ticketholder details with identification before {% if badge %} issuing a badge {% else %} checking them in {%- endif %}.</p>
+      <p>Please validate the above ticketholder details with identification before {% if mode == "badge" %} issuing a badge {% else %} checking them in {%- endif %}.</p>
     </div>
   </div>
 </div>
@@ -43,7 +43,7 @@
   <th>Type</th>
   <th>Transferred from</th>
   <th>Status</th>
-  {% if tickets|count > 1 %}
+  {% if tickets|count > 1 or (mode == "badge" and tickets[0].badge_issued) or (mode == "checkin" and tickets[0].checked_in) %}
   <th></th>
   {% endif %}
 </tr></thead>
@@ -59,7 +59,7 @@
     {% endif %}
   </td>
   <td>
-    {% if badge %}
+    {% if mode == "badge" %}
       {%- if ticket.badge_issued %}
         {# FIXME this ain't necessarily so #}
         Badge issued {{ ticket.versions[-1].transaction.issued_at.strftime('%A %H:%M') }}
@@ -77,9 +77,9 @@
       {% endif -%}
     {% endif -%}
   </td>
-  {% if tickets|count > 1 or (badge and tickets[0].badge_issued) or (not badge and tickets[0].checked_in) %}
+  {% if tickets|count > 1 or (mode == "badge" and tickets[0].badge_issued) or (mode == "checkin" and tickets[0].checked_in) %}
   <td>
-    {% if badge %}
+    {% if mode == "badge" %}
       {%- if ticket.badge_issued %}
         <form method="post" action="{{ url_for('arrivals.undo_ticket_checkin', ticket_id=ticket.id) }}">
         <input type="submit" class="btn btn-danger debounce" value="Return badge"/>
@@ -108,15 +108,21 @@
 </table>
 {% else %}
 <div class="alert alert-danger">
+  {% if mode == "badge" %}
+  <h4>This account has no available badges</h4>
+  <p>Please ask them to provide ID for any other names the tickets may be under.</p>
+  <p>A badge cannot be issued if the ticket has not yet been checked in.</p>
+  {% else %}
   <h4>This account has no entrance tickets</h4>
   <p>Please ask them to provide ID for any other names the tickets may be under.</p>
+  {% endif %}
 </div>
 {% endif %}
 
 {% if tickets|count %}
 <form method="post" action="{{ url_for('arrivals.checkin', user_id=user.id) }}" class="shrink">
 <div class="col-sm-5 col-sm-offset-7">
-  {% if badge %}
+  {% if mode == "badge" %}
   <input type="submit" class="btn btn-info form-control debounce" value="Issue all badges"/>
   {% else %}
   <input type="submit" class="btn btn-info form-control debounce" value="Check in all"/>
@@ -147,7 +153,7 @@
   <td>{{ ticket.type.name }}</td>
   <td><a href="{{ url_for('.checkin', user_id=ticket.owner.id) }}">{{ ticket.owner.name }}</a></td>
   <td>
-    {% if badge %}
+    {% if mode == "badge" %}
       {%- if ticket.badge_issued %}
         {# FIXME this ain't necessarily so #}
         Badge issued {{ ticket.versions[-1].transaction.issued_at.strftime('%A %H:%M') }}
@@ -167,7 +173,7 @@
   </td>
   {% if transferred_tickets|count > 1 %}
   <td>
-    {% if badge %}
+    {% if mode == "badge" %}
       {%- if ticket.badge_issued %}
         <form method="post" action="{{ url_for('arrivals.undo_ticket_checkin', ticket_id=ticket.id) }}">
         <input type="submit" class="btn btn-danger debounce" value="Return badge"/>

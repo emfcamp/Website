@@ -11,8 +11,10 @@
 {% endmacro %}
 
 <ul class="nav navbar-nav">
-    {% if current_user.has_permission('arrivals') %}
+    {% if current_user.has_permission('checkin') %}
     {{ menuitem("Check-in", ".begin_check_in") }}
+    {% endif %}
+    {% if current_user.has_permission('badge') %}
     {{ menuitem("Badges", ".begin_badge_up") }}
-{% endif %}
+    {% endif %}
 </ul>

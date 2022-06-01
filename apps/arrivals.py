@@ -1,5 +1,6 @@
-import re
+from decorator import decorator
 from collections import OrderedDict
+import re
 
 from flask import (
     render_template,
@@ -14,6 +15,7 @@ from flask import (
     Markup,
     render_template_string,
 )
+from flask_login import current_user
 from sqlalchemy import func
 
 from main import db
@@ -23,34 +25,49 @@ from .common import require_permission, json_response
 
 arrivals = Blueprint("arrivals", __name__)
 
-arrivals_required = require_permission(
-    "arrivals"
-)  # Decorator to require arrivals permission
+checkin_required = require_permission("arrivals:checkin")
+badge_required = require_permission("arrivals:badge")
+
+
+@decorator
+def arrivals_required(f, *args, **kwargs):
+    if not current_user.is_authenticated:
+        return app.login_manager.unauthorized()
+
+    mode = session.get("arrivals_mode", "checkin")
+    if mode == "checkin" and not current_user.has_permission("arrivals:checkin"):
+        abort(404)
+    if mode == "badge" and not current_user.has_permission("arrivals:badge"):
+        abort(404)
+    session["arrivals_mode"] = mode
+
+    return f(*args, **kwargs)
 
 
 @arrivals.route("/")
 @arrivals_required
 def main():
-    badge = bool(session.get("badge"))
-    return render_template("arrivals/arrivals.html", badge=badge)
+    return render_template("arrivals/arrivals.html", mode=session["arrivals_mode"])
 
 
 @arrivals.route("/check-in")
-@arrivals_required
+@checkin_required
 def begin_check_in():
-    session.pop("badge", None)
+    session["arrivals_mode"] = "checkin"
     return redirect(url_for(".main"))
 
 
 @arrivals.route("/badge-up")
-@arrivals_required
+@badge_required
 def begin_badge_up():
-    session["badge"] = True
+    session["arrivals_mode"] = "badge"
     return redirect(url_for(".main"))
 
 
-# Entrypoint for QR code if desired
+# Entrypoint for QR code
+# TODO: remove the /checkin URL after 2022
 @arrivals.route("/checkin/qrcode/<code>")
+@arrivals.route("/arrivals/qrcode/<code>")
 @arrivals_required
 def checkin_qrcode(code):
     match = re.match("%s$" % checkin_code_re, code)
@@ -145,8 +162,6 @@ def search(query=None):
         data["n"] = int(request.form.get("n"))
 
     query = query.strip()
-    badge = bool(session.get("badge"))
-
     user = user_from_code(query)
 
     if user:
@@ -163,7 +178,7 @@ def search(query=None):
     )
     tickets = dict(tickets)
 
-    if badge:
+    if session["arrivals_mode"] == "badge":
         completes = (
             users.join(User.owned_tickets)
             .filter_by(is_paid_for=True)
@@ -196,15 +211,19 @@ def search(query=None):
     return data
 
 
+# TODO: remove the /checkin URL after 2022
 @arrivals.route("/checkin/<int:user_id>", methods=["GET", "POST"])
 @arrivals.route("/checkin/<int:user_id>/<source>", methods=["GET", "POST"])
+@arrivals.route("/arrivals/<int:user_id>", methods=["GET", "POST"])
+@arrivals.route("/arrivals/<int:user_id>/<source>", methods=["GET", "POST"])
 @arrivals_required
 def checkin(user_id, source=None):
-    badge = bool(session.get("badge"))
     user = User.query.get_or_404(user_id)
 
     if source not in {None, "typed", "transfer", "code"}:
         abort(404)
+
+    badge = session["arrivals_mode"] == "badge"
 
     if badge:
         # Ticket must be checked in to receive a badge
@@ -265,21 +284,21 @@ def checkin(user_id, source=None):
         user=user,
         tickets=tickets,
         transferred_tickets=transferred_tickets,
-        badge=badge,
+        mode=session["arrivals_mode"],
         source=source,
     )
 
 
+# TODO: remove the /checkin URL after 2022
 @arrivals.route("/checkin/ticket/<ticket_id>", methods=["POST"])
 @arrivals_required
 def ticket_checkin(ticket_id):
-    badge = bool(session.get("badge"))
     ticket = Purchase.query.get_or_404(ticket_id)
     if not ticket.is_paid_for:
         abort(404)
 
     try:
-        if badge:
+        if session["arrivals_mode"] == "badge":
             ticket.badge_up()
         else:
             ticket.check_in()
@@ -291,16 +310,16 @@ def ticket_checkin(ticket_id):
     return redirect(url_for(".checkin", user_id=ticket.owner.id))
 
 
+# TODO: remove the /checkin URL after 2022
 @arrivals.route("/checkin/ticket/<ticket_id>/undo", methods=["POST"])
 @arrivals_required
 def undo_ticket_checkin(ticket_id):
-    badge = bool(session.get("badge"))
     ticket = Purchase.query.get_or_404(ticket_id)
     if not ticket.is_paid_for:
         abort(404)
 
     try:
-        if badge:
+        if session["arrivals_mode"] == "badge":
             ticket.undo_badge_up()
         else:
             ticket.undo_check_in()

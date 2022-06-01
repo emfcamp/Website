@@ -1,6 +1,6 @@
 {% extends "arrivals/base.html" %}
 {% block body %}
-{% if badge %}
+{% if mode == "badge" %}
 <h2>Badges</h2>
 {% else %}
 <h2>Check-in</h2>
@@ -28,7 +28,7 @@
 {{ super() }}
 <script nonce="{{csp_nonce}}">
 if (typeof(EMF) != 'object'){ var EMF = {}; }
-EMF.isBadgeMode = {{ badge | tojson }};
+EMF.arrivalsMode = {{ mode | tojson }};
 EMF.search_url = {{ url_for('arrivals.search') | tojson }};
 
 EMF.search_count = 0;
