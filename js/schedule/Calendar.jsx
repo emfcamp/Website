@@ -85,6 +85,7 @@ function Event({ event, toggleFavourite, authenticated }) {
 
     return (
       <div className="event-details">
+        <AdditionalInformation label="Maximum attendees" value={ event.attendees } />
         <AdditionalInformation label="Content warning" value={ event.content_note } />
         <AdditionalInformation label="Age range" value={ event.age_range } />
         <AdditionalInformation label="Cost" value={ event.cost } />
