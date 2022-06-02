@@ -9,7 +9,10 @@
     {{ form.hidden_tag() }}
     <h2>Now</h2>
     <dl class="dl-horizontal">
-      <dt>title</dt><dd><a href="{{ url_for('schedule.item', year=year, proposal_id=now.id) }}">{{ now.title }}</a></dd>
+      <dt>Title</dt>
+      <dd><a href="{{ url_for('schedule.item', year=year, proposal_id=now.id) }}">{{ now.published_title or now.title }}</a></dd>
+      <dt>Description</dt>
+      <dd>{{ now.published_description or now.description }}</dd>
       <dt>Speaker</dt>
       <dd>
         {{ now.published_names or now.user.name }}{% if now.published_pronouns %} ({{now.published_pronouns}}){% endif %}
@@ -26,7 +29,10 @@
 
     <h2>Next</h2>
     <dl class="dl-horizontal">
-      <dt>title</dt><dd><a href="{{ url_for('schedule.item', year=year, proposal_id=next.id) }}">{{ next.title }}</a></dd>
+      <dt>Title</dt>
+      <dd><a href="{{ url_for('schedule.item', year=year, proposal_id=now.id) }}">{{ next.published_title or next.title }}</a></dd>
+      <dt>Description</dt>
+      <dd>{{ next.published_description or next.description }}</dd>
       <dt>Speaker</dt>
       <dd>
         {{ next.published_names or next.user.name }}{% if next.published_pronouns %} ({{next.published_pronouns}}){% endif %}
@@ -60,10 +66,10 @@
         </tr>
       </thead>
       <tbody>
-        {% for msg in messages %}
+        {% for msg in (messages | sort(attribute="created", reverse=True)) %}
           <tr class="product form-group {{ loop.cycle('odd', 'even') }}">
             <td>{{ msg.created.strftime("%A %H:%M")  }}</td>
-            <td>{{ msg.created_by }}</td>
+            <td>{{ msg.created_by.name }}</td>
             <td>{{ msg.message }}</td>
           </tr>
         {% endfor %}

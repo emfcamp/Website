@@ -3,6 +3,71 @@
 {% block title %}Greenroom{% endblock %}
 {% block body %}
 
+<h2>Check in a speaker</h2>
 
+<form method="post">
+  {{ form.hidden_tag() }}
+
+  {{ render_field(form.speakers, horizontal=8) }}
+  {{ form.arrived(class="btn btn-success pull-right") }}
+
+<p>&nbsp;</p>
+<h2>Send a message to heralds</h2>
+
+  {{ render_field(form.message, horizontal=8) }}
+  {{ form.send_message(class="btn btn-success pull-right") }}
+
+</form>
+
+
+<p>&nbsp;</p>
+<h2>Upcoming</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Start</th>
+      <th>Venue</th>
+      <th>Speaker</th>
+      <th>Title</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for prop in upcoming %}
+      <tr>
+        <td>{{ prop.scheduled_time.strftime("%a %H:%M") }}</td>
+        <td>{{ prop.scheduled_venue.name }}</td>
+        <td>{{ prop.published_names or prop.user.name }}</td>
+        <td>{{ prop.published_title or prop.title }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+{% if messages %}
+
+  <p>&nbsp;</p>
+  <h2>Messages</h2>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>From</th>
+        <th>Message</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for msg in (messages | sort(attribute="created", reverse=True)) %}
+        <tr class="product form-group {{ loop.cycle('odd', 'even') }}">
+          <td>{{ msg.created.strftime("%A %H:%M")  }}</td>
+          <td>{{ msg.created_by.name }}</td>
+          <td>{{ msg.message }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
 
 {% endblock %}
