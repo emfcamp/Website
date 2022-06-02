@@ -101,7 +101,7 @@ function Event({ event, toggleFavourite, authenticated }) {
     setExpanded(!expanded);
   }
 
-  const venueClass = event.venue.toLowerCase().replace(/ /g, '-');
+  const cfpClass = event.is_from_cfp ? "cfp" : "user-submitted";
 
   return (
     <div className={ ["schedule-event", venueClass ].join(" ") }>
