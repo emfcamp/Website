@@ -34,12 +34,16 @@ def main():
             for se in current_user.shift_entries
             if se.shift.end < now().replace(tzinfo=None)
         ]
-        if not upcoming_shifts and not past_shifts:
+        admin_roles = current_user.volunteer_admin_roles
+        if current_user.has_permission("volunteer:admin"):
+            admin_roles = Role.query.all()
+        if not upcoming_shifts and not past_shifts and not admin_roles:
             return redirect(url_for(".schedule"))
         return render_template(
             "volunteer/landing.html",
             upcoming_shifts=upcoming_shifts,
             past_shifts=past_shifts,
+            admin_roles=admin_roles,
         )
     return redirect(url_for(".sign_up"))
 

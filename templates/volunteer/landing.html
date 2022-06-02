@@ -19,14 +19,19 @@
 {% include "volunteer/_nav.html" %}
   {% if upcoming_shifts %}
     <h2>Your Upcoming Shifts</h2>
-    {% for shift in upcoming_shifts %}
+    {% for shift in upcoming_shifts|sort(attribute="start") %}
       {{ shift_view(shift) }}
     {% endfor %}
   {% endif %}
   {% if past_shifts %}
     <h2>Your Past Shifts</h2>
-    {% for shift in past_shifts %}
+    {% for shift in past_shifts|sort(attribute="start") %}
       {{ shift_view(shift) }}
     {% endfor %}
   {% endif %}
+    {% for role in admin_roles %}
+    <a href="{{ url_for(".role_admin", role_id=role.id) }}">{{ role.name }} Admin</a>
+    <br />
+    {% endfor %}
+    
 {% endblock %}
