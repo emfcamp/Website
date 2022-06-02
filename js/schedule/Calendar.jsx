@@ -104,7 +104,7 @@ function Event({ event, toggleFavourite, authenticated }) {
   const cfpClass = event.is_from_cfp ? "cfp" : "user-submitted";
 
   return (
-    <div className={ ["schedule-event", venueClass ].join(" ") }>
+    <div className={ ["schedule-event", cfpClass ].join(" ") }>
       <div className="event-synopsis" onClick={ toggleExpanded }>
         <div className="event-data">
           <h3 title={ event.title }>{ event.title }</h3>
