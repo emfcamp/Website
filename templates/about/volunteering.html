@@ -6,6 +6,9 @@
 {% set main_class = 'about' %}
 {% block body %}
 <h2 id="volunteering-at-emf">Volunteering at EMF</h2>
+{% if feature_enabled('VOLUNTEERS') %}
+  <p><a class="btn btn-primary btn-block btn-lg" href="{{ url_for('volunteer.main') }}" role="button">Volunteer Now!</a></p>
+{% endif %}
 <div class="intro-text">
   <p>EMF is a non-profit event, entirely organised by volunteers. Nobody is paid to work on EMF, and everyone who attends (with very few exceptions<a href="#footnote">*</a>) pays for their own ticket. This includes the core organisers.</p>
   <p>We’d like everyone to consider volunteering to help the event run smoothly, even if it is only for an hour or two.</p>
