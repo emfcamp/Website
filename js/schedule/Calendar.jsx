@@ -101,8 +101,10 @@ function Event({ event, toggleFavourite, authenticated }) {
     setExpanded(!expanded);
   }
 
+  const venueClass = event.venue.toLowerCase().replace(/ /g, '-');
+
   return (
-    <div className="schedule-event">
+    <div className={ ["schedule-event", venueClass ].join(" ") }>
       <div className="event-synopsis" onClick={ toggleExpanded }>
         <div className="event-data">
           <h3 title={ event.title }>{ event.title }</h3>
