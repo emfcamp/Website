@@ -284,7 +284,9 @@ def checkin(user_id, source=None):
 
         return redirect(url_for(".main"))
 
-    transferred_tickets = [t.purchase for t in user.transfers_from]
+    transferred_tickets = [
+        t.purchase for t in user.transfers_from if t.purchase.type == "admission_ticket"
+    ]
 
     return render_template(
         "arrivals/checkin.html",
