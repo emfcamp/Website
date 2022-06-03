@@ -32,6 +32,20 @@ from ..common import feature_flag
 from . import schedule
 
 
+def venues_for_user(user):
+    venues = []
+
+    if user.village:
+        venues.extend(user.village.venues)
+
+    public_venues = Venue.query.filter_by(
+        village_id=None, scheduled_content_only=False
+    ).all()
+    venues.extend(public_venues)
+
+    return venues
+
+
 class ContentForm(Form):
     def day_choices(self):
         d = date.fromisoformat(app.config["EVENT_START"].split(" ")[0])
@@ -44,22 +58,10 @@ class ContentForm(Form):
 
         return choices
 
-    def venues_for_user(self, user):
-        venues = []
-
-        if user.village:
-            venues.extend(user.village.venues)
-
-        public_venues = Venue.query.filter_by(
-            village_id=None, scheduled_content_only=False
-        ).all()
-        venues.extend(public_venues)
-
-        return [(v.id, v.name) for v in venues]
-
     def populate_choices(self, user):
         self.day.choices = self.day_choices()
-        self.venue.choices = self.venues_for_user(user)
+        venues = venues_for_user(user)
+        self.venue.choices = [(v.id, v.name) for v in venues]
 
     type = SelectField(
         "Type of content",
@@ -110,10 +112,7 @@ def populate(proposal, form):
 @login_required
 @feature_flag("ATTENDEE_CONTENT")
 def attendee_content():
-    if current_user.village:
-        venue_ids = [venue.id for venue in current_user.village.venues]
-    else:
-        venue_ids = []
+    venue_ids = [v.id for v in venues_for_user(current_user)]
 
     content = Proposal.query.filter(
         or_(
