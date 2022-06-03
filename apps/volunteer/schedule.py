@@ -12,6 +12,7 @@ from main import db
 
 from models.user import User
 from models.volunteer.role import Role
+from models.volunteer.venue import VolunteerVenue
 from models.volunteer.shift import Shift, ShiftEntry
 from models.volunteer.volunteer import Volunteer
 from models import config_date
@@ -58,6 +59,7 @@ def schedule():
         by_time[day_key][hour_key].append(to_add)
 
     roles = _get_interested_roles(current_user)
+    venues = VolunteerVenue.get_all()
 
     untrained_roles = [
         r
@@ -73,6 +75,7 @@ def schedule():
     return render_template(
         "volunteer/schedule.html",
         roles=roles,
+        venues=venues,
         all_shifts=by_time,
         active_day=active_day,
         all_volunteers=all_volunteers,

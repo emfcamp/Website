@@ -235,6 +235,11 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
             return true;
         }
 
+        let venue_ids = filters.venue_ids.map(id => parseInt(id));
+        if (venue_ids.length > 0 && venue_ids.indexOf(shift.venue_id) == -1) {
+            return true;
+        }
+
         if (!filters.show_past && new Date(shift.end) < new Date()) {
             return true;
         }
@@ -259,10 +264,12 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
             show_signed_up_only = $('#show_signed_up_only').prop('checked'),
             hide_full = $('#hide_full').prop('checked'),
             understaffed_only = $('#is_understaffed').prop('checked'),
-            role_ids = $('#role-select').val() || [];
+            role_ids = $('#role-select').val() || [],
+            venue_ids = $('#venue-select').val() || [];
 
         return {
             role_ids: role_ids,
+            venue_ids: venue_ids,
             show_past: show_past,
             hide_full: hide_full,
             understaffed_only: understaffed_only,
@@ -295,6 +302,9 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
         $('#role-select > option').each(function(_, ele) {
             $(ele).attr('selected', false);
         });
+        $('#venue-select > option').each(function(_, ele) {
+            $(ele).attr('selected', false);
+        });
         $('#show_past').prop('checked', false);
         $('#hide_full').prop('checked', false);
         $('#show_signed_up_only').prop('checked', false);
@@ -308,6 +318,7 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
     function save_filters() {
         let filters = {
             role_ids: $('#role-select').val(),
+            venue_ids: $('#venue-select').val(),
             show_past: $('#show_past').prop('checked'),
             hide_full: $('#hide_full').prop('checked'),
             show_signed_up_only: $('#show_signed_up_only').prop('checked'),
@@ -326,6 +337,7 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
         let filters = JSON.parse(raw_saved_filters);
 
         $('#role-select').val(filters.role_ids);
+        $('#venue-select').val(filters.venue_ids);
         $('#show_past').prop('checked', filters.show_past);
         $('#hide_full').prop('checked', filters.hide_full);
         $('#show_signed_up_only').prop('checked', filters.show_signed_up_only);
@@ -340,6 +352,10 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
     function roles_selected() {
         $('#is_interested').prop('checked', false);
         $('#is_trained').prop('checked', false);
+    }
+
+    function venues_selected() {
+        // Don't do anything currently
     }
 
 
@@ -370,6 +386,7 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
     render();
     
     $('#role-select').on('change', roles_selected);
+    $('#venue-select').on('change', venues_selected);
     $('.shift-filter').on('change', render);
     $('.role-filter').on('change', set_roles);
 };

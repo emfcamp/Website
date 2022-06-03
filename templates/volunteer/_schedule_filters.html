@@ -14,6 +14,19 @@
                 </select>
             </div>
         </div>
+        <div class="form-group">
+            <label for="venue" class="col-sm-4">
+                Venue<br>
+                <small>(ctrl/&#8984; or shift click for multiple)</small>
+            </label>
+            <div class="col-sm-8">
+                <select id="venue-select" name="venue" multiple="multiple" class="form-control shift-filter">
+                    {% for v in venues %}
+                        <option id='venue-opt-{{v.id}}' value="{{v.id}}">{{v.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
     </fieldset>
     <fieldset class="form-horizontal col-sm-4">
         <div class="form-group">
