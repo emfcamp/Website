@@ -19,7 +19,7 @@ class ScheduleData {
     this.rawSchedule.forEach(row => {
       let e = this.parseEvent(row);
 
-      if (e.endTime <= options.currentTime) { return null; }
+      if (e.endTime <= options.currentTime && !options.includeFinished) { return null; }
       if (e.age_range === undefined || e.age_range == "") { e.age_range = "Unspecified" }
 
       this.addVenue(e.venue, e.officialEvent);
