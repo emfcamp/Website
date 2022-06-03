@@ -156,7 +156,7 @@ function manifest(cb) {
 
 function watch() {
   gulp.watch('css/*.scss', { ignoreInitial: false }, css);
-  gulp.watch('js/**/*.js', { ignoreInitial: false }, js);
+  gulp.watch(['js/**/*.js', 'js/**/*.jsx'], { ignoreInitial: false }, js);
   gulp.watch(
     ['./node_modules/@primer/octicons/build/svg/**/*.svg', './images/**/*'],
     { ignoreInitial: false },
