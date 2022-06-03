@@ -34,7 +34,14 @@ def arrivals_required(f, *args, **kwargs):
     if not current_user.is_authenticated:
         return app.login_manager.unauthorized()
 
-    mode = session.get("arrivals_mode", "checkin")
+    mode = session.get("arrivals_mode")
+    if mode is None:
+        if current_user.has_permission("arrivals:checkin"):
+            mode = "checkin"
+        elif current_user.has_permission("arrivals:badge"):
+            mode = "badge"
+        else:
+            abort(403)
     if mode == "checkin" and not current_user.has_permission("arrivals:checkin"):
         abort(404)
     if mode == "badge" and not current_user.has_permission("arrivals:badge"):
