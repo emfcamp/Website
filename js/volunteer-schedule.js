@@ -384,7 +384,16 @@ window.init_volunteer_schedule = (data, all_roles, active_day, is_admin) => {
     load_filters();
     set_roles();
     render();
-    
+
+    let searchParams = new URLSearchParams(window.location.search);
+    if(searchParams.has('signedup')){
+        $('#show_signed_up_only').prop('checked', true);
+        render();
+    } else {
+        $('#show_signed_up_only').prop('checked', false);
+        render();
+    }
+
     $('#role-select').on('change', roles_selected);
     $('#venue-select').on('change', venues_selected);
     $('.shift-filter').on('change', render);

@@ -22,6 +22,8 @@ from .init_data import venue_list, role_list, shift_list
 @feature_flag("VOLUNTEERS_SIGNUP")
 def main():
     if current_user.is_authenticated and Volunteer.get_for_user(current_user):
+        if current_user.shift_entries:
+            return redirect("/volunteer/schedule?signedup")
         return redirect(url_for(".schedule"))
     return redirect(url_for(".sign_up"))
 
