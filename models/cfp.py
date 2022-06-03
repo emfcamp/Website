@@ -790,9 +790,10 @@ class Proposal(BaseModel):
         if self.cost is None and self.published_cost is None:
             return ""
 
-        cost = self.cost.strip()
         if self.published_cost is not None:
             cost = self.published_cost.strip()
+        else:
+            cost = self.cost.strip()
 
         # Some people put in a string, some just put in a £ amount
         try:
