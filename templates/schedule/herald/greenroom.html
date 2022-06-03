@@ -38,7 +38,7 @@
         <td>{{ prop.scheduled_time.strftime("%a %H:%M") }}</td>
         <td>{{ prop.scheduled_venue.name }}</td>
         <td>{{ prop.published_names or prop.user.name }}</td>
-        <td>{{ prop.published_title or prop.title }}</td>
+        <td><a href="{{ url_for('cfp_review.update_proposal', proposal_id=prop.id) }}">{{ prop.published_title or prop.title }}</a></td>
       </tr>
     {% endfor %}
   </tbody>
