@@ -1,7 +1,7 @@
 # encoding=utf-8
 from flask import redirect, url_for, render_template, current_app as app, abort
 from flask_login import current_user
-from pendulum import parse, now
+from pendulum import parse
 
 from . import volunteer, v_admin_required
 from ..common import feature_flag
@@ -22,29 +22,7 @@ from .init_data import venue_list, role_list, shift_list
 @feature_flag("VOLUNTEERS_SIGNUP")
 def main():
     if current_user.is_authenticated and Volunteer.get_for_user(current_user):
-        if not current_user.shift_entries:
-            return redirect(url_for(".schedule"))
-        upcoming_shifts = [
-            se.shift
-            for se in current_user.shift_entries
-            if se.shift.end > now().replace(tzinfo=None)
-        ]
-        past_shifts = [
-            se.shift
-            for se in current_user.shift_entries
-            if se.shift.end < now().replace(tzinfo=None)
-        ]
-        admin_roles = current_user.volunteer_admin_roles
-        if current_user.has_permission("volunteer:admin"):
-            admin_roles = Role.query.all()
-        if not upcoming_shifts and not past_shifts and not admin_roles:
-            return redirect(url_for(".schedule"))
-        return render_template(
-            "volunteer/landing.html",
-            upcoming_shifts=upcoming_shifts,
-            past_shifts=past_shifts,
-            admin_roles=admin_roles,
-        )
+        return redirect(url_for(".schedule"))
     return redirect(url_for(".sign_up"))
 
 
