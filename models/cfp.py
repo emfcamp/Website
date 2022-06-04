@@ -97,7 +97,7 @@ INITIAL_LIGHTNING_TALK_SLOTS = 60 / LIGHTNING_TALK_LENGTH
 LIGHTNING_TALK_SESSIONS = {
     "fri": {"human": "Friday", "slots": INITIAL_LIGHTNING_TALK_SLOTS},
     "sat": {"human": "Saturday", "slots": INITIAL_LIGHTNING_TALK_SLOTS},
-    "sun": {"human": "Sunday", "slots": 0.5 * INITIAL_LIGHTNING_TALK_SLOTS},
+    "sun": {"human": "Sunday", "slots": INITIAL_LIGHTNING_TALK_SLOTS},
 }
 
 # Options for age range displayed to the user
