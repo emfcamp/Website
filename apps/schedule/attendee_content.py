@@ -115,11 +115,12 @@ def attendee_content():
     venue_ids = [v.id for v in venues_for_user(current_user)]
 
     content = Proposal.query.filter(
-            Proposal.user_id == current_user.id, 
-            or_(Proposal.user_scheduled is True,
-                Proposal.scheduled_venue_id.in_(venue_ids)),
-            Proposal.state.in_(["accepted", "finished"]),
-        ).all()
+        Proposal.user_id == current_user.id,
+        or_(
+            Proposal.user_scheduled is True, Proposal.scheduled_venue_id.in_(venue_ids)
+        ),
+        Proposal.state.in_(["accepted", "finished"]),
+    ).all()
 
     form = ContentForm()
     form.populate_choices(current_user)
