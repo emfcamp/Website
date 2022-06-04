@@ -309,7 +309,7 @@ def herald_venue(venue_name):
         .filter(
             Venue.name == venue_name,
             Proposal.state.in_(["accepted", "finished"]),
-            Proposal.scheduled_time > datetime.now(),
+            Proposal.scheduled_time > pendulum.now(event_tz),
             Proposal.scheduled_duration.isnot(None),
             Proposal.hide_from_schedule.isnot(True),
         )
@@ -395,7 +395,7 @@ def greenroom():
         Proposal.query.filter(
             Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]),
             Proposal.state.in_(["accepted", "finished"]),
-            Proposal.scheduled_time > datetime.now(),
+            Proposal.scheduled_time > pendulum.now(event_tz),
             Proposal.scheduled_duration.isnot(None),
             Proposal.hide_from_schedule.isnot(True),
         )
