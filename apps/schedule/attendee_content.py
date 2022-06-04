@@ -1,7 +1,7 @@
 """ Views for attendees to manage their own content."""
 
 from models.cfp import PYTHON_CFP_TYPES, Proposal, Venue, AGE_RANGE_OPTIONS
-from sqlalchemy import or_, and_
+from sqlalchemy import or_
 from flask_login import login_required, current_user
 from flask import (
     current_app as app,
