@@ -5,18 +5,12 @@ in making things.{% endblock %} {% block body %} {% include
 <div class="row">
   {% include "home/_emf_blurb.html" %}
   <div class="col-md-6">
-    <p class="emphasis">
-      Electromagnetic Field {{ event_year }} will be held on
-      <strong>{{ simple_dates }} {{ event_year }}</strong>
-      at
-      <strong
-        ><a
-          href="https://eastnorcastle.com/visit-eastnor-castle/eastnor-deer-park/"
-          >Eastnor Castle</a
-        >, Ledbury</strong
-      >.
+    <p>
+      If you're running a talk or workshop in your village, you can now <a href="{{ url_for('schedule.attendee_content') }}">add your own content</a>, and it will appear automatically on <a href="{{ url_for("schedule.main") }}">schedule</a>.
     </p>
-    <p>More details to be announced soon.</p>
+    <p>
+      Want to help out? Visit the <a href="https://map.emfcamp.org/#18/52.0417/-2.377">Info Desk</a>, or sign up for an available <a href="{{ url_for('volunteer.main') }}">volunteering shift</a>.
+    </p>
     <div class="well">
       <p>
         If you're interested in updates about EMF {{ event_year }}, follow us on
