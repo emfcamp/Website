@@ -3,7 +3,7 @@
 
 {% macro days_shifts(day, active_day) %}
 <div role="tabpanel" class="tab-pane {%- if active_day == day %} active {%- endif %}" id="{{ day }}">
-    <table id="tab-{{ day }}" class="table table-bordered table-responsive shifts-table">
+    <table id="tab-{{ day }}" class="table table-bordered shifts-table">
         <thead><tr>
             <th>Starts</th>
             <th>Ends</th>
@@ -92,7 +92,7 @@
         {{ tabnav('sun', 'Sunday', active_day) }}
         {{ tabnav('mon', 'Monday', active_day) }}
     </ul>
-    <div class="tab-content">
+    <div class="tab-content table-responsive">
         {{ days_shifts('thu', active_day) }}
         {{ days_shifts('fri', active_day) }}
         {{ days_shifts('sat', active_day) }}
