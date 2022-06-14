@@ -33,7 +33,9 @@ class ScheduleData {
       if (options.onlyFamilyFriendly && !e.is_family_friendly) { return null; }
 
       let startHour = e.startTime.startOf('hour');
-      if (e.startTime <= options.currentTime) {
+      if (e.startTime <= options.currentTime && !options.includeFinished) {
+        /* Put ongoing events under the current time slot to avoid
+         * having to make one up or include multiple earlier ones */
         startHour = options.currentTime.startOf('hour');
       }
       let isoHour = startHour.toISO();
@@ -107,8 +109,7 @@ class ScheduleData {
   }
 
   parseEvent(event) {
-    // Ugh. Why do Javascript objects not just have a clone method?
-    let e = JSON.parse(JSON.stringify(event));
+    let e = structuredClone(event);
 
     e.startTime = DateTime.fromSQL(e.start_date, { locale: 'en-GB' });
     e.endTime = DateTime.fromSQL(e.end_date, { locale: 'en-GB' });
