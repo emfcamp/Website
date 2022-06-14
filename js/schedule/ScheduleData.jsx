@@ -16,15 +16,22 @@ class ScheduleData {
     this.ageRanges = [];
     this.ageRangesSeen = new Set();
 
+    this.allFinished = true;
+
     this.rawSchedule.forEach(row => {
       let e = this.parseEvent(row);
 
-      if (e.endTime <= options.currentTime && !options.includeFinished) { return null; }
       if (e.age_range === undefined || e.age_range == "") { e.age_range = "Unspecified" }
 
       this.addVenue(e.venue, e.officialEvent);
       this.addEventType(e.type, e.humanReadableType);
       this.addAgeRange(e.age_range);
+
+      if (e.endTime >= options.currentTime) {
+          this.allFinished = false;
+      } else if (!options.includeFinished) {
+          return null;
+      }
 
       if (options.selectedVenues && options.selectedVenues.indexOf(e.venue) === -1) { return null; }
       if (options.selectedEventTypes && options.selectedEventTypes.indexOf(e.type) === -1) { return null; }

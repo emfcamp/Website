@@ -44,6 +44,9 @@ function App() {
         setRawSchedule(body);
 
         let newSchedule = new ScheduleData(body, { currentTime });
+        if (newSchedule.allFinished) {
+            setIncludeFinished(true);
+        }
         setSchedule(newSchedule);
 
         setSelectedVenues(newSchedule.venues.map(v => v.name));
