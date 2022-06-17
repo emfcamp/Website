@@ -90,4 +90,5 @@ api.add_resource(VillagesMap, "/villages.geojson")
 api.add_resource(Villages, "/villages")
 api.add_resource(MyVillages, "/villages/mine")
 api.add_resource(VillageResource, "/villages/<int:id>")
-api.add_resource(VenuesMap, "/venues")
+
+api.add_resource(VenuesMap, "/venues.geojson")
