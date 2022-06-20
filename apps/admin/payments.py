@@ -367,7 +367,7 @@ def refund(payment_id):
     # Refund business logic needs moving to apps.payments.refund module, some is already there.
     payment = Payment.query.get_or_404(payment_id)
 
-    valid_states = ["charged", "paid", "partrefunded", "refund-requested"]
+    valid_states = ["charged", "paid", "refunding", "partrefunded", "refund-requested"]
     if payment.state not in valid_states:
         app.logger.warning(
             "Payment %s is %s, not one of %s", payment_id, payment.state, valid_states
