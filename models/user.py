@@ -289,6 +289,10 @@ class User(BaseModel, UserMixin):
 
         return data
 
+    @property
+    def transferred_tickets(self):
+        return [t.purchase for t in self.transfers_from]
+
     def get_owned_tickets(self, paid=None, type=None):
         "Get tickets owned by a user, filtered by type and payment state."
         for ticket in self.owned_tickets:
