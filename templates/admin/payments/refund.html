@@ -1,6 +1,7 @@
 {% extends "admin/base.html" %}
 {% from "_formhelpers.html" import render_field %}
 {% set nav_active = 'admin_payments' %}
+{% block title %}Refund payment{% endblock%}
 {% block body %}
 <h2>Refund payment</h2>
 
@@ -28,7 +29,9 @@
 
 <p></p>
 
-<p>To refund this payment, please select purchases to refund below.</p>
+<p>To refund this payment, please select purchases to refund below.
+    Transferred tickets cannot be refunded unless they are transferred back to the purchaser.
+    Checked-in tickets are de-selected - they can be refunded but make sure you know what you're doing.</p>
 
 <p>Free tickets that are not refunded will be marked as paid.</p>
 

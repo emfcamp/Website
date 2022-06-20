@@ -28,7 +28,7 @@ from models.payment import (
     StripeRefund,
     StateException,
 )
-from models.purchase import Purchase
+from models.purchase import AdmissionTicket, Purchase
 from ..common.email import from_email
 from ..common.forms import Form, HiddenIntegerField
 from ..payments.stripe import (
@@ -363,7 +363,7 @@ class RefundForm(Form):
 @admin.route("/payment/<int:payment_id>/refund", methods=["GET", "POST"])
 def refund(payment_id):
     # TODO: This is all old and needs fixing
-    # For partial refunds, we need to let users select which tickets they want to refund (see ticket #900)
+    # For partial refunds, we need to let *users* select which tickets they want to refund (see ticket #900)
     # Refund business logic needs moving to apps.payments.refund module, some is already there.
     payment = Payment.query.get_or_404(payment_id)
 
@@ -394,15 +394,26 @@ def refund(payment_id):
             f._purchase.id,
             f._purchase.product.display_name,
         )
+
         if (
             f._purchase.refund_id is None
             and f._purchase.is_paid_for
             and f._purchase.owner == payment.user
         ):
+            # Purchase is owned by the user and not already refunded
             f._disabled = False
+
+            if type(f._purchase) == AdmissionTicket and f._purchase.checked_in:
+                f.refund.data = False
+                f.refund.label.text += " (checked in)"
+        elif f._purchase.refund_id is not None:
+            f._disabled = True
+            f.refund.data = False
+            f.refund.label.text += " (refunded)"
         else:
             f._disabled = True
             f.refund.data = False
+            f.refund.label.text += " (transferred)"
 
     if form.validate_on_submit():
         if form.refund.data or form.stripe_refund.data:
