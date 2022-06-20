@@ -518,7 +518,7 @@ def refund(payment_id):
                     return redirect(url_for(".refund", payment_id=payment.id))
 
                 refund.refundid = stripe_refund.id
-                if stripe_refund.status != "succeeded":
+                if stripe_refund.status not in ("refunding", "succeeded"):
                     # Should never happen according to the docs
                     app.logger.warn(
                         "Refund status is %s, not succeeded", stripe_refund.status
