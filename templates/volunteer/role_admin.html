@@ -36,4 +36,6 @@
     {% endif %}
     <a href="{{ url_for(".role_admin", role_id=role.id) }}?offset={{ offset + limit }}&limit={{ limit }}">Next</a>
   </p>
+
+  <p><a href="{{ url_for(".role_volunteers", role_id=role.id) }}">List of {{ role }} volunteers</a></p>
 {% endblock %}

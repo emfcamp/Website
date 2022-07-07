@@ -198,3 +198,18 @@ def toggle_complete(role_id, shift_id, user_id):
     se.completed = not se.completed
     db.session.commit()
     return redirect(url_for(".role_admin", role_id=role_id))
+
+
+@volunteer.route("role/<int:role_id>/volunteers")
+@role_admin_required
+def role_volunteers(role_id):
+    role = Role.query.get_or_404(role_id)
+    entries = ShiftEntry.query.filter(ShiftEntry.shift.has(role_id=role_id)).all()
+    signed_up = list(set([se.user.volunteer for se in entries]))
+    completed = list(set([se.user.volunteer for se in entries if se.completed]))
+    return render_template(
+        "volunteer/role_volunteers.html",
+        role=role,
+        signed_up=signed_up,
+        completed=completed,
+    )
