@@ -47,6 +47,13 @@ try:
 
         docker compose up --build
 
+### Errors starting the app and gulp containers 
+
+In RedHat based systems e.g. Red Hat Enterprise Linux, Fedora Core, etc you may need to set SELinux to Permissive for the Entrypoint script and other bash scriptsto have the correct permissions. Try: 
+
+        sudo getenforce
+        sudo setenforce permissive
+
 ### Tests
 
 Tests are run using the `./run_tests` script.
