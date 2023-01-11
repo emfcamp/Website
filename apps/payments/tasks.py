@@ -104,7 +104,7 @@ def transferwise_refund(number, amount, currency):
             break
 
         payment = refund_request.payment
-        if refund_request.currency != payment.currency or refund_request.currency != currency:
+        if refund_request.currency not in (payment.currency, currency):
             continue
 
         refund_amount = payment.amount - refund_request.donation
@@ -153,7 +153,7 @@ def transferwise_refund_complete(max_id, currency):
         if refund_request.method != "banktransfer":
             continue
 
-        if refund_request.currency != refund_request.payment.currency or refund_request.currency != currency:
+        if refund_request.currency not in (refund_request.payment.currency, currency):
             continue
 
         manual_bank_refund(refund_request)
