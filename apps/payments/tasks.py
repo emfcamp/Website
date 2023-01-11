@@ -32,8 +32,8 @@ def bulk_refund(yes, number, provider):
         app.logger.info(f"Processing up to {number} refunds from providers: {provider}")
 
     count = 0
-    for request in query:
-        if request.method != "stripe":
+    for refund_request in query:
+        if refund_request.method != "stripe":
             continue
 
         if count == number:
@@ -41,16 +41,16 @@ def bulk_refund(yes, number, provider):
 
         if not yes:
             count += 1
-            app.logger.info("Would process refund %s", request)
+            app.logger.info("Would process refund %s", refund_request)
             continue
 
-        app.logger.info("Processing refund %s", request)
+        app.logger.info("Processing refund %s", refund_request)
         try:
-            handle_refund_request(request)
+            handle_refund_request(refund_request)
         except ManualRefundRequired as e:
-            app.logger.warn(f"Manual refund required for request {request}: {e}")
+            app.logger.warn(f"Manual refund required for request {refund_request}: {e}")
         except RefundException as e:
-            app.logger.exception(f"Error refunding request {request}: {e}")
+            app.logger.exception(f"Error refunding request {refund_request}: {e}")
 
         count += 1
 
@@ -96,18 +96,18 @@ def transferwise_refund(number, amount, currency):
     count = 0
     total_amount = 0
     max_id = 0
-    for request in query:
-        if request.method != "banktransfer":
+    for refund_request in query:
+        if refund_request.method != "banktransfer":
             continue
 
         if count == number:
             break
 
-        payment = request.payment
-        if request.currency != payment.currency or request.currency != currency:
+        payment = refund_request.payment
+        if refund_request.currency != payment.currency or refund_request.currency != currency:
             continue
 
-        refund_amount = payment.amount - request.donation
+        refund_amount = payment.amount - refund_request.donation
 
         total_amount += refund_amount
         if total_amount > amount:
@@ -116,22 +116,22 @@ def transferwise_refund(number, amount, currency):
         if refund_amount > 0:
             writer.writerow(
                 [
-                    request.id,
-                    request.payee_name,
+                    refund_request.id,
+                    refund_request.payee_name,
                     "EMF Ticket Refund",
                     "PRIVATE",
-                    request.currency,
+                    refund_request.currency,
                     refund_amount,
-                    request.currency,
-                    request.currency,
-                    request.sort_code,
-                    request.account,
-                    request.iban,
-                    request.swiftbic,
+                    refund_request.currency,
+                    refund_request.currency,
+                    refund_request.sort_code,
+                    refund_request.account,
+                    refund_request.iban,
+                    refund_request.swiftbic,
                 ]
             )
             count += 1
-        max_id = request.id
+        max_id = refund_request.id
 
     click.echo(io.getvalue())
     app.logger.info(f"Refunds produced for currency {currency} up to id {max_id}")
@@ -149,14 +149,14 @@ def transferwise_refund_complete(max_id, currency):
         .order_by(RefundRequest.id)
     )
 
-    for request in query:
-        if request.method != "banktransfer":
+    for refund_request in query:
+        if refund_request.method != "banktransfer":
             continue
 
-        if request.currency != request.payment.currency or request.currency != currency:
+        if refund_request.currency != refund_request.payment.currency or refund_request.currency != currency:
             continue
 
-        manual_bank_refund(request)
+        manual_bank_refund(refund_request)
 
 
 # TODO: make this a scheduled task, assuming it works

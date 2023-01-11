@@ -43,8 +43,8 @@ def create_stripe_refund(
     return refund
 
 
-def send_refund_email(request: RefundRequest, amount: Decimal) -> None:
-    payment = request.payment
+def send_refund_email(refund_request: RefundRequest, amount: Decimal) -> None:
+    payment = refund_request.payment
     msg = EmailMessage(
         "Your refund request has been processed",
         from_email=from_email("TICKETS_EMAIL"),
@@ -55,13 +55,13 @@ def send_refund_email(request: RefundRequest, amount: Decimal) -> None:
         "emails/refund-sent.txt",
         user=payment.user,
         amount=amount,
-        request=request,
+        refund_request=refund_request,
         currency=payment.currency,
     )
     msg.send()
 
 
-def handle_refund_request(request: RefundRequest) -> None:
+def handle_refund_request(refund_request: RefundRequest) -> None:
     """Automatically process a refund request if possible.
 
     Current limitations:
@@ -73,12 +73,12 @@ def handle_refund_request(request: RefundRequest) -> None:
 
     Will raise a ManualRefundRequired exception if a payment cannot be automatically refunded.
     """
-    payment = request.payment
+    payment = refund_request.payment
 
-    if request.method != "stripe":
+    if refund_request.method != "stripe":
         raise ManualRefundRequired("Manual refund required for non-Stripe refund")
 
-    if request.note is not None and request.note != "":
+    if refund_request.note is not None and refund_request.note != "":
         raise ManualRefundRequired("Refund request has note")
 
     # Mark payment as "refunding" - this allows us to ignore refund webhooks which arrive before
@@ -88,18 +88,18 @@ def handle_refund_request(request: RefundRequest) -> None:
 
     payment.lock()
 
-    refund_amount = payment.amount - request.donation
+    refund_amount = payment.amount - refund_request.donation
 
     app.logger.info(
-        f"Handling automatic refund request {request.id} for {payment.provider} {payment.id}. "
+        f"Handling automatic refund request {refund_request.id} for {payment.provider} {payment.id}. "
         f"Refund amount {refund_amount} {payment.currency}. "
-        f"Donation amount {request.donation} {payment.currency}. "
+        f"Donation amount {refund_request.donation} {payment.currency}. "
     )
 
     refund = None
     if refund_amount > 0:
         refund = create_stripe_refund(
-            payment, refund_amount, metadata={"refund_request": request.id}
+            payment, refund_amount, metadata={"refund_request": refund_request.id}
         )
 
     with db.session.no_autoflush:
@@ -110,21 +110,21 @@ def handle_refund_request(request: RefundRequest) -> None:
     payment.state = "refunded"
 
     db.session.commit()
-    send_refund_email(request, refund_amount)
+    send_refund_email(refund_request, refund_amount)
 
 
-def manual_bank_refund(request: RefundRequest) -> None:
+def manual_bank_refund(refund_request: RefundRequest) -> None:
     """Mark a refund request as manually refunded by bank transfer."""
-    payment = request.payment
+    payment = refund_request.payment
 
     payment.lock()
-    refund_amount = payment.amount - request.donation
+    refund_amount = payment.amount - refund_request.donation
     refund = BankRefund(payment, refund_amount)
 
     app.logger.info(
-        f"Handling manual refund request {request.id} for {payment.provider} {payment.id}. "
+        f"Handling manual refund request {refund_request.id} for {payment.provider} {payment.id}. "
         f"Refund amount {refund_amount} {payment.currency}. "
-        f"Donation amount {request.donation} {payment.currency}. "
+        f"Donation amount {refund_request.donation} {payment.currency}. "
     )
 
     with db.session.no_autoflush:
@@ -134,4 +134,4 @@ def manual_bank_refund(request: RefundRequest) -> None:
     payment.state = "refunded"
 
     db.session.commit()
-    send_refund_email(request, refund_amount)
+    send_refund_email(refund_request, refund_amount)
