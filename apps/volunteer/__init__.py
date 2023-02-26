@@ -23,3 +23,4 @@ from . import choose_roles  # noqa: F401
 from . import training  # noqa: F401
 from . import bar_training  # noqa: F401
 from . import tasks  # noqa: F401
+from . import stats  # noqa: F401
