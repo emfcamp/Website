@@ -127,11 +127,11 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
         ):
             raise ValueError("capacity_max cannot be lower than capacity_used")
 
-        if not self.parent or self.parent.capacity_max is None:
-            return capacity_max
-
         with db.session.no_autoflush:
             # Disable autoflush in case we're in an initialiser
+            if not self.parent or self.parent.capacity_max is None:
+                return capacity_max
+
             siblings = list(self.parent.children)
 
         if self in siblings:

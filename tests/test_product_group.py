@@ -81,9 +81,14 @@ def test_capacity_remaining(tent, db):
 
 
 def test_validate_capacity_max(db, parent_group):
+    """Tests the capacity validation to ensure it doesn't flush the object
+    to the database when it shouldn't.
+    """
     group_template = "group{}"
     group_name = group_template.format(random_string(8))
     # Create a product group without a parent so validate_capacity_max returns early
+    # We don't provide a name here, which will trigger a constraint violation if this
+    # object gets flushed.
     group = ProductGroup(type="test")
     assert group.name is None
     assert group.id is None
@@ -91,10 +96,11 @@ def test_validate_capacity_max(db, parent_group):
     # Now add a parent
     group.parent = parent_group
 
-    # This should call validate_capacity_max, which may flush the session, which we don't want
+    # This should call validate_capacity_max. If you see a constraint violation here,
+    # something got flushed to the database when it shouldn't have been.
     group.capacity_max = 5
 
-    # If that was OK, we can continue
+    # If that was OK, we can give it a name and check it flushes successfully.
     group.name = group_name
     db.session.flush()
     assert group.id is not None
