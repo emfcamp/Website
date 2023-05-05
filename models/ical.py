@@ -214,9 +214,9 @@ class CalendarEvent(BaseModel):
     )
 
     favourite_count = column_property(
-        select([func.count(FavouriteCalendarEvent.c.user_id)]).where(
-            FavouriteCalendarEvent.c.user_id == id
-        ),
+        select([func.count(FavouriteCalendarEvent.c.user_id)])
+        .where(FavouriteCalendarEvent.c.user_id == id)
+        .scalar_subquery(),  # type: ignore[attr-defined]
         deferred=True,
     )
 

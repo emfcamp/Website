@@ -48,7 +48,9 @@ class Shift(BaseModel):
     proposal = db.relationship("Proposal", backref="shift")
 
     current_count = db.column_property(
-        select([func.count(ShiftEntry.shift_id)]).where(ShiftEntry.shift_id == id)
+        select([func.count(ShiftEntry.shift_id)])
+        .where(ShiftEntry.shift_id == id)
+        .scalar_subquery()  # type: ignore[attr-defined]
     )
 
     volunteers = association_proxy("entries", "user")

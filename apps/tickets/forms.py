@@ -1,4 +1,5 @@
-from flask import Markup, render_template_string, url_for, current_app as app
+from flask import render_template_string, url_for, current_app as app
+from markupsafe import Markup
 from flask_login import current_user
 from wtforms.validators import DataRequired, InputRequired, Optional, ValidationError
 from wtforms import (

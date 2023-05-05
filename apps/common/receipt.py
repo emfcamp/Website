@@ -2,7 +2,8 @@ import io
 from lxml import etree
 import asyncio
 
-from flask import Markup, render_template, current_app as app
+from flask import render_template, current_app as app
+from markupsafe import Markup
 from pyppeteer.launcher import launch
 import barcode
 from barcode.writer import ImageWriter, SVGWriter

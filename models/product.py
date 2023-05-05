@@ -434,9 +434,9 @@ class Voucher(BaseModel):
     def __init__(
         self,
         view,
-        code: str = None,
+        code: Optional[str] = None,
         expiry=None,
-        email: str = None,
+        email: Optional[str] = None,
         purchases_remaining: int = 1,
         tickets_remaining: int = 2,
     ):

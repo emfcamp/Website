@@ -54,7 +54,7 @@ class Payment(BaseModel):
 
     __mapper_args__ = {"polymorphic_on": provider}
 
-    def __init__(self, currency: Currency, amount, voucher_code: str = None):
+    def __init__(self, currency: Currency, amount, voucher_code: Optional[str] = None):
         self.currency = currency
         self.amount = amount
 
@@ -285,7 +285,7 @@ class BankPayment(Payment):
     __mapper_args__ = {"polymorphic_identity": "banktransfer"}
     bankref = db.Column(db.String, unique=True)
 
-    def __init__(self, currency: Currency, amount, voucher_code: str = None):
+    def __init__(self, currency: Currency, amount, voucher_code: Optional[str] = None):
         Payment.__init__(self, currency, amount, voucher_code)
 
         # not cryptographic

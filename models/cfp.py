@@ -386,9 +386,9 @@ class Proposal(BaseModel):
 
     # Convenience for individual objects. Use an outerjoin and groupby for more than a few records
     favourite_count = column_property(
-        select([func.count(FavouriteProposal.c.proposal_id)]).where(
-            FavouriteProposal.c.proposal_id == id
-        ),
+        select([func.count(FavouriteProposal.c.proposal_id)])
+        .where(FavouriteProposal.c.proposal_id == id)
+        .scalar_subquery(),  # type: ignore[attr-defined]
         deferred=True,
     )
 
@@ -879,7 +879,7 @@ class LightningTalkProposal(Proposal):
             return remaining_slots
 
         # If the day has passed (or is today) there're no more slots for it
-        for (day_name, date) in get_days_map().items():
+        for day_name, date in get_days_map().items():
             if date.date() <= now.date():
                 remaining_slots[day_name] = 0
 

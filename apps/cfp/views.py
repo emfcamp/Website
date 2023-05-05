@@ -6,9 +6,9 @@ from flask import (
     url_for,
     abort,
     current_app as app,
-    Markup,
     render_template_string,
 )
+from markupsafe import Markup
 from flask_login import current_user
 from flask_mailman import EmailMessage
 from wtforms.validators import DataRequired, ValidationError, URL

@@ -11,12 +11,15 @@ from sqlalchemy import true, inspect
 from sqlalchemy.orm.base import NO_VALUE
 from sqlalchemy.sql.functions import func
 from sqlalchemy_continuum.utils import version_class, transaction_class
-from flask_sqlalchemy.model import DefaultMeta
 
-# This alias is required to apply type annotations to the model objects.
-# MyPy raises errors when inheriting directly from db.Model. Once flask-sqlalchemy has
-# type annotations this should become unnecessary.
-BaseModel: DefaultMeta = db.Model
+from typing import TypeAlias
+
+
+# This alias *was* required to apply type annotations to the model objects,
+# but I don't think it even does that any more.
+# MyPy doesn't support this nested class syntax which flask-sqlalchemy uses,
+# even though type annotations are now present. https://github.com/pallets-eco/flask-sqlalchemy/issues/1112
+BaseModel: TypeAlias = db.Model  # type: ignore[name-defined]
 
 """ Type alias for ISO currency (GBP or EUR currently). """
 # Note: A better type for this would be Union[Literal['GBP'], Literal['EUR']] but setting this

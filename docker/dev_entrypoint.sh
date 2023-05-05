@@ -38,4 +38,4 @@ poetry run flask createbankaccounts
 poetry run flask cfp create_venues
 poetry run flask tickets create
 echo "Starting dev server..."
-exec poetry run flask run --extra-files ./config/development.cfg:./logging.yaml -h 0.0.0.0 -p 2342
+exec poetry run flask run --extra-files ./config/development.cfg:./logging.yaml -h 0.0.0.0 -p 2342 --debug

@@ -7,7 +7,8 @@ from textwrap import wrap
 import pendulum
 
 from main import db, external_url
-from flask import session, abort, current_app as app, Markup
+from flask import session, abort, current_app as app
+from markupsafe import Markup
 from flask.json import jsonify
 from flask_login import login_user, current_user
 from werkzeug.wrappers import Response

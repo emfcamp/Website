@@ -1,6 +1,7 @@
 import json
 
-from flask import Markup, current_app as app
+from flask import current_app as app
+from markupsafe import Markup
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, SelectField, StringField, ValidationError
 from wtforms.widgets import Input, HiddenInput

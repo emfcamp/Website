@@ -11,9 +11,9 @@ from flask import (
     Blueprint,
     current_app as app,
     session,
-    Markup,
     render_template_string,
 )
+from markupsafe import Markup
 from flask_login import login_user, login_required, logout_user, current_user
 from flask_mailman import EmailMessage
 from sqlalchemy import or_
