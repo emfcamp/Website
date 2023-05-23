@@ -269,7 +269,7 @@ def wise_retrieve_accounts(profile_id):
             yield bank_account
 
 
-def wise_validate():
+def wise_enabled():
     """Validate that Wise is configured and operational"""
     result = []
 

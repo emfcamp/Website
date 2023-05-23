@@ -34,10 +34,10 @@ from models.ical import CalendarSource
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
 from models.site_state import SiteState, VALID_STATES, refresh_states
 from models.scheduled_task import tasks, ScheduledTaskResult
-from ..payments.stripe import stripe_validate
+from ..payments.stripe import stripe_enabled
 from ..payments.wise import (
-    wise_validate,
     wise_business_profile,
+    wise_enabled,
     wise_retrieve_accounts,
 )
 from ..common import require_permission
@@ -255,8 +255,8 @@ def payment_config_verify():
 
     return render_template(
         "admin/payment-config-verify.html",
-        stripe=stripe_validate(),
-        transferwise=wise_validate(),
+        stripe=stripe_enabled(),
+        transferwise=wise_enabled(),
         bank_accounts=BankAccount.query.order_by(
             BankAccount.active.desc(), BankAccount.currency.desc()
         ).all(),

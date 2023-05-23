@@ -396,7 +396,7 @@ def stripe_charge_refunded(_type, charge):
     return ("", 200)
 
 
-def stripe_validate():
+def stripe_enabled():
     """Validate Stripe is configured and operational"""
     result = []
     sk = app.config.get("STRIPE_SECRET_KEY", "")
