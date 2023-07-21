@@ -8,16 +8,13 @@
         {% if self.title() -%}
           <meta property="og:title" content="{{self.title()}}">
         {% endif -%}
-        <meta property="fb:admins" content="286100493">
         <meta property="og:site_name" content="Electromagnetic Field" />
         <meta property="og:locale" content="en_GB" />
         {% if self.description() -%}
         <meta property="og:type" content="website">
         <meta property="og:description" content="{{ self.description() }}">
         <meta name="description" content="{% block description %}{% endblock %}">
-        <meta name="twitter:card" content="{% block twitter_card %}summary{% endblock %}">
         {% endif -%}
-        <meta name="twitter:site" content="@emfcamp">
         <meta name="theme-color" content="#171123">
         <link rel="shortcut icon" type="image/x-icon" href="{{ static_url_for('static', filename='images/favicon.ico') }}">
         <link rel="manifest" href="{{ static_url_for('static', filename='manifest.json') }}">
