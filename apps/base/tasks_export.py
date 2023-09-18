@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
 import os
+from typing import Optional
 
 import click
 from flask import current_app as app
@@ -12,7 +13,7 @@ from models import event_year
 from . import base
 
 
-def get_export_data(table_filter: str = None):
+def get_export_data(table_filter: Optional[str] = None):
     """Export data to archive using the `get_export_data` method in the model class."""
     # As we go, we check against the list of all tables, in case we forget about some
     # new object type (e.g. association table).
@@ -40,7 +41,7 @@ def get_export_data(table_filter: str = None):
 
         seen_model_classes.add(model_class)
 
-        table = model_class.__table__.name
+        table = model_class.__table__.name  # type: ignore[attr-defined]
         model = model_class.__name__
 
         if table_filter and table != table_filter:
