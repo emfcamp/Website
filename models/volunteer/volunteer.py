@@ -1,3 +1,4 @@
+from collections import defaultdict
 from sqlalchemy.orm import backref
 from flask_login import UserMixin
 
@@ -86,6 +87,13 @@ class Volunteer(BaseModel, UserMixin):
     @classmethod
     def get_all(cls):
         return cls.query.order_by(Volunteer.nickname).all()
+
+    @classmethod
+    def get_export_data(cls):
+        hist = defaultdict(lambda: 0)
+        for v in Volunteer.get_all():
+            hist[len(v.user.shift_entries)] += 1
+        return {"public": {"shift_histogram": hist}}
 
 
 """

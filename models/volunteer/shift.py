@@ -55,6 +55,23 @@ class Shift(BaseModel):
 
     volunteers = association_proxy("entries", "user")
 
+    @classmethod
+    def get_export_data(cls):
+        return {
+            "public": [
+                {
+                    "role": s.role.name,
+                    "venue": s.venue.name,
+                    "start": s.start,
+                    "end": s.end,
+                    "min_needed": s.min_needed,
+                    "max_needed": s.max_needed,
+                    "signed_up": s.current_count,
+                }
+                for s in cls.get_all()
+            ]
+        }
+
     def is_clash(self, other):
         """
         If the venues and roles match then the shifts can overlap
