@@ -1,5 +1,5 @@
 from datetime import datetime
-import simplejson
+import json
 import os
 
 from flask import current_app as app
@@ -11,32 +11,17 @@ from models import event_year
 from . import base
 
 
-@base.cli.command("export")
-def export_db():
-    """Export data from the DB to disk.
-
-    This command is run as a last step before wiping the DB after an event, to export
-    all the data we want to save. It saves a private and a public export to the
-    exports directory.
-
-    Model classes should implement get_export_data, which returns a dict with keys:
-        public   Public data to save in git
-        private  Private data that should be stored for a limited amount of time
-        tables   Tables this method exported, used to sanity check the export process
-
-    Alternatively, add __export_data__ = False to a class to state that get_export_data
-    shouldn't be called, and that its associated table doesn't need to be checked.
-    """
-
+def get_export_data():
     # As we go, we check against the list of all tables, in case we forget about some
     # new object type (e.g. association table).
 
     # Exclude tables we know will never be exported
+
     ignore = ["alembic_version", "transaction"]
 
     all_model_classes = {
         cls
-        for cls in db.Model._decl_class_registry.values()
+        for cls in db.Model.registry._class_registry.values()
         if isinstance(cls, type) and issubclass(cls, db.Model)
     }
 
@@ -46,11 +31,6 @@ def export_db():
 
     seen_model_classes = set()
     remaining_tables = set(db.metadata.tables)
-
-    year = event_year()
-    path = os.path.join("exports", str(year))
-    for dirname in ["public", "private"]:
-        os.makedirs(os.path.join(path, dirname), exist_ok=True)
 
     for model_class in all_model_classes:
         if model_class in seen_model_classes:
@@ -82,17 +62,7 @@ def export_db():
         if hasattr(model_class, "get_export_data"):
             try:
                 export = model_class.get_export_data()
-                for dirname in ["public", "private"]:
-                    if dirname in export:
-                        filename = os.path.join(path, dirname, "{}.json".format(model))
-                        simplejson.dump(
-                            export[dirname],
-                            open(filename, "w"),
-                            indent=4,
-                            cls=ExportEncoder,
-                        )
-                        app.logger.info("Exported data from %s to %s", model, filename)
-
+                yield model, export
             except Exception as e:
                 app.logger.error("Error exporting %s", model)
                 raise
@@ -103,12 +73,46 @@ def export_db():
     if remaining_tables:
         app.logger.warning("Remaining tables: %s", ", ".join(remaining_tables))
 
+
+@base.cli.command("export")
+def export_db():
+    """Export data from the DB to disk.
+
+    This command is run as a last step before wiping the DB after an event, to export
+    all the data we want to save. It saves a private and a public export to the
+    exports directory.
+
+    Model classes should implement get_export_data, which returns a dict with keys:
+        public   Public data to save in git
+        private  Private data that should be stored for a limited amount of time
+        tables   Tables this method exported, used to sanity check the export process
+
+    Alternatively, add __export_data__ = False to a class to state that get_export_data
+    shouldn't be called, and that its associated table doesn't need to be checked.
+    """
+
+    year = event_year()
+    path = os.path.join("exports", str(year))
+    for dirname in ["public", "private"]:
+        os.makedirs(os.path.join(path, dirname), exist_ok=True)
+
+    for model, export in get_export_data():
+        for dirname in ["public", "private"]:
+            if dirname in export:
+                filename = os.path.join(path, dirname, "{}.json".format(model))
+                json.dump(
+                    export[dirname],
+                    open(filename, "w"),
+                    indent=4,
+                    cls=ExportEncoder,
+                )
+                app.logger.info("Exported data from %s to %s", model, filename)
+
     data = {
         "timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"),
-        "remaining_tables": sorted(list(remaining_tables)),
     }
     filename = os.path.join(path, "export.json")
-    simplejson.dump(data, open(filename, "w"), indent=4, cls=ExportEncoder)
+    json.dump(data, open(filename, "w"), indent=4, cls=ExportEncoder)
 
     with app.test_client() as client:
         for schedule in ["schedule.frab", "schedule.json", "schedule.ics"]:
