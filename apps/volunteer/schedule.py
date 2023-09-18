@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import render_template, request, redirect, url_for, flash, jsonify, session
 from collections import defaultdict
 from flask_login import current_user
-from flask import Markup
+from markupsafe import Markup
 import markdown
 from glob import glob
 

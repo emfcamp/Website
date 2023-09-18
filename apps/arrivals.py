@@ -12,9 +12,9 @@ from flask import (
     current_app as app,
     Blueprint,
     abort,
-    Markup,
     render_template_string,
 )
+from markupsafe import Markup
 from flask_login import current_user
 from sqlalchemy import func
 

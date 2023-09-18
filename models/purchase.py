@@ -70,8 +70,16 @@ class Purchase(BaseModel):
     ticket_issued = db.Column(db.Boolean, default=False, nullable=False)
 
     # Relationships
-    owner = db.relationship("User", primaryjoin="Purchase.owner_id == User.id")
-    purchaser = db.relationship("User", primaryjoin="Purchase.purchaser_id == User.id")
+    owner = db.relationship(
+        "User",
+        primaryjoin="Purchase.owner_id == User.id",
+        back_populates="owned_purchases",
+    )
+    purchaser = db.relationship(
+        "User",
+        primaryjoin="Purchase.purchaser_id == User.id",
+        back_populates="purchases",
+    )
     price = db.relationship("Price", backref="purchases")
     price_tier = db.relationship("PriceTier", backref="purchases")
     product = db.relationship("Product", backref="purchases")

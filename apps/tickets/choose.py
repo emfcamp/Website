@@ -17,6 +17,7 @@ from models.exc import CapacityException
 from models.product import PriceTier, ProductView, ProductViewProduct, Product, Voucher
 from models.basket import Basket
 from models.site_state import get_sales_state
+from typing import Optional
 
 from ..common import get_user_currency, set_user_currency, feature_enabled
 from ..common.email import from_email
@@ -278,7 +279,7 @@ def handle_free_tickets(flow: str, view: ProductView, basket: Basket):
 
 @tickets.route("/tickets/clear")
 @tickets.route("/tickets/<flow>/clear")
-def tickets_clear(flow: str = None):
+def tickets_clear(flow: Optional[str] = None):
     app.logger.info("Clearing basket")
     basket = Basket.from_session(current_user, get_user_currency())
     basket.cancel_purchases()
@@ -290,7 +291,7 @@ def tickets_clear(flow: str = None):
 
 @tickets.route("/tickets/voucher/")
 @tickets.route("/tickets/voucher/<voucher_code>")
-def tickets_voucher(voucher_code: str = None):
+def tickets_voucher(voucher_code: Optional[str] = None):
     """
     A user reaches this endpoint if they're sent a voucher code by email.
     Set up the voucher details in the session and redirect them to choose their tickets.

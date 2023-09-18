@@ -1,6 +1,7 @@
 import markdown
 from inlinestyler.utils import inline_css
-from flask import render_template, Markup, url_for
+from flask import render_template, url_for
+from markupsafe import Markup
 from flask import current_app as app
 from jinja2.sandbox import ImmutableSandboxedEnvironment
 

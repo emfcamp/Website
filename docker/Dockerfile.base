@@ -3,7 +3,7 @@
 # This image is used as a base image for both production and development builds.
 # It's built separately to speed up build times.
 
-FROM python:3.9-slim-bullseye
+FROM python:3.11-slim-bullseye
 
 WORKDIR /app
 COPY pyproject.toml poetry.lock /app/
@@ -21,6 +21,6 @@ RUN apt-get update && \
       libxcursor1 libxdamage1 libxi6 libxtst6 libnss3 libcups2 \
       libxrandr2 libasound2 libatk1.0-0 libatk-bridge2.0-0 libgtk-3-0 libzbar0 \
       coinor-cbc curl && \
-    pip3 install poetry==1.1.12 && \
+    pip3 install poetry==1.4.2 && \
     poetry install && poetry run pyppeteer-install && \
     rm -rf /var/lib/apt/lists/*

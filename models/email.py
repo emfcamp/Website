@@ -46,8 +46,8 @@ class EmailJobRecipient(BaseModel):
 
 
 EmailJob.recipient_count = column_property(
-    select([func.count(EmailJobRecipient.job_id)]).where(
-        EmailJobRecipient.job_id == EmailJob.id
-    ),
+    select([func.count(EmailJobRecipient.job_id)])
+    .where(EmailJobRecipient.job_id == EmailJob.id)
+    .scalar_subquery(),  # type: ignore[attr-defined]
     deferred=True,
 )

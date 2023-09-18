@@ -1,6 +1,6 @@
 from main import db
 from markdown import markdown
-from flask import Markup
+from markupsafe import Markup
 
 from .. import BaseModel
 

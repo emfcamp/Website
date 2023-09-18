@@ -1,7 +1,6 @@
 from decimal import Decimal
 
 from flask import (
-    Markup,
     render_template,
     redirect,
     request,
@@ -11,6 +10,7 @@ from flask import (
     abort,
     current_app as app,
 )
+from markupsafe import Markup
 from flask_login import current_user
 from sqlalchemy.exc import IntegrityError
 

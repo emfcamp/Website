@@ -127,11 +127,11 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
         ):
             raise ValueError("capacity_max cannot be lower than capacity_used")
 
-        if not self.parent or self.parent.capacity_max is None:
-            return capacity_max
-
         with db.session.no_autoflush:
             # Disable autoflush in case we're in an initialiser
+            if not self.parent or self.parent.capacity_max is None:
+                return capacity_max
+
             siblings = list(self.parent.children)
 
         if self in siblings:
@@ -434,9 +434,9 @@ class Voucher(BaseModel):
     def __init__(
         self,
         view,
-        code: str = None,
+        code: Optional[str] = None,
         expiry=None,
-        email: str = None,
+        email: Optional[str] = None,
         purchases_remaining: int = 1,
         tickets_remaining: int = 2,
     ):

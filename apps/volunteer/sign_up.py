@@ -5,10 +5,9 @@ from flask import (
     url_for,
     flash,
     request,
-    Markup,
     render_template_string,
 )
-
+from markupsafe import Markup
 from flask_login import current_user
 from wtforms import StringField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Email, ValidationError
