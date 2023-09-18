@@ -2,6 +2,7 @@ from datetime import datetime
 import json
 import os
 
+import click
 from flask import current_app as app
 from sqlalchemy_continuum.utils import version_class, is_versioned
 
@@ -11,7 +12,8 @@ from models import event_year
 from . import base
 
 
-def get_export_data():
+def get_export_data(table_filter: str = None):
+    """Export data to archive using the `get_export_data` method in the model class."""
     # As we go, we check against the list of all tables, in case we forget about some
     # new object type (e.g. association table).
 
@@ -40,6 +42,9 @@ def get_export_data():
 
         table = model_class.__table__.name
         model = model_class.__name__
+
+        if table_filter and table != table_filter:
+            continue
 
         if table in ignore:
             app.logger.debug("Ignoring %s", model)
@@ -70,12 +75,15 @@ def get_export_data():
             exported_tables = export.get("tables", [table])
             remaining_tables -= set(exported_tables)
 
-    if remaining_tables:
+    if remaining_tables and not table_filter:
         app.logger.warning("Remaining tables: %s", ", ".join(remaining_tables))
+    elif table_filter in remaining_tables:
+        app.logger.warning("Table %s not exported", table_filter)
 
 
 @base.cli.command("export")
-def export_db():
+@click.argument("table", required=False)
+def export_db(table):
     """Export data from the DB to disk.
 
     This command is run as a last step before wiping the DB after an event, to export
@@ -96,7 +104,7 @@ def export_db():
     for dirname in ["public", "private"]:
         os.makedirs(os.path.join(path, dirname), exist_ok=True)
 
-    for model, export in get_export_data():
+    for model, export in get_export_data(table):
         for dirname in ["public", "private"]:
             if dirname in export:
                 filename = os.path.join(path, dirname, "{}.json".format(model))
@@ -113,6 +121,9 @@ def export_db():
     }
     filename = os.path.join(path, "export.json")
     json.dump(data, open(filename, "w"), indent=4, cls=ExportEncoder)
+
+    if table:
+        return
 
     with app.test_client() as client:
         for schedule in ["schedule.frab", "schedule.json", "schedule.ics"]:

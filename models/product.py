@@ -189,6 +189,52 @@ class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):
 
         return dict(**states)
 
+    @classmethod
+    def get_export_data(cls):
+        def render_product(product):
+            return {
+                "name": product.name,
+                "display_name": product.display_name,
+                "description": product.description,
+                "capacity_max": product.capacity_max,
+                "capacity_used": product.capacity_used,
+                "price_tiers": [
+                    {
+                        "name": tier.name,
+                        "personal_limit": tier.personal_limit,
+                        "active": tier.active,
+                        "capacity_max": tier.capacity_max,
+                        "capacity_used": tier.capacity_used,
+                        "prices": [
+                            {
+                                "currency": price.currency,
+                                "price_int": price.price_int,
+                            }
+                            for price in tier.prices
+                        ],
+                    }
+                    for tier in product.price_tiers
+                ],
+            }
+
+        def render_product_group(group):
+            data = {
+                "capacity_max": group.capacity_max,
+                "capacity_used": group.capacity_used,
+                "children": {},
+                "products": [render_product(product) for product in group.products],
+            }
+            for child in group.children:
+                data["children"][child.name] = render_product_group(child)
+            return data
+
+        data = {}
+        root_groups = ProductGroup.query.filter_by(parent_id=None).all()
+        for group in root_groups:
+            data[group.name] = render_product_group(group)
+
+        return {"private": data}
+
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self.name)
 
@@ -212,6 +258,7 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
     )
 
     __table_args__ = (UniqueConstraint("name", "group_id"),)
+    __export_data__ = False  # Exported by ProductGroup
 
     @classmethod
     def get_by_name(cls, group_name, product_name) -> Optional[Product]:
@@ -292,6 +339,8 @@ class PriceTier(BaseModel, CapacityMixin):
     active = db.Column(db.Boolean, default=True, nullable=False)
 
     __table_args__ = (UniqueConstraint("name", "product_id"),)
+    __export_data__ = False  # Exported by ProductGroup
+
     prices = db.relationship(
         "Price", backref="price_tier", cascade="all", order_by="Price.id"
     )
@@ -368,6 +417,7 @@ class Price(BaseModel):
     """
 
     __tablename__ = "price"
+    __export_data__ = False  # Exported by ProductGroup
 
     id = db.Column(db.Integer, primary_key=True)
     price_tier_id = db.Column(
@@ -408,6 +458,7 @@ class Voucher(BaseModel):
     """A short code which allows a user to access a restricted ProductView"""
 
     __tablename__ = "voucher"
+    __export_data__ = False  # Exported by ProductView
 
     code = db.Column(db.String, primary_key=True)
     expiry = db.Column(db.DateTime, nullable=True)
@@ -567,6 +618,20 @@ class ProductView(BaseModel):
     products = association_proxy("product_view_products", "product")
 
     @classmethod
+    def get_export_data(cls):
+        data = {}
+        for view in ProductView.query.all():
+            data[view.name] = {
+                "name": view.name,
+                "type": view.type,
+                "products": [product.name for product in view.products],
+                "cfp_accepted_only": view.cfp_accepted_only,
+                "vouchers_only": view.vouchers_only,
+                "voucher_count": len(view.vouchers),
+            }
+        return {"private": data}
+
+    @classmethod
     def get_by_name(cls, name) -> Optional[ProductView]:
         if name is None:
             return None
@@ -609,6 +674,7 @@ class ProductView(BaseModel):
 
 class ProductViewProduct(BaseModel):
     __table_name__ = "product_view_product"
+    __export_data__ = False  # Exported by ProductView
 
     view_id = db.Column(db.Integer, db.ForeignKey(ProductView.id), primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey(Product.id), primary_key=True)
