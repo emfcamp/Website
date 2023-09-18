@@ -1,10 +1,10 @@
 import random
 import re
 from decimal import Decimal
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Optional
 from sqlalchemy import event, func, column
-from sqlalchemy.orm import Session, aliased
+from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy_continuum.utils import version_class, transaction_class
 
@@ -88,26 +88,30 @@ class Payment(BaseModel):
             .from_self()
         )
 
-        cls_ver_new = aliased(cls.versions)
-        cls_ver_paid = aliased(cls.versions)
-        cls_txn_new = aliased(cls_version.transaction)
-        cls_txn_paid = aliased(cls_version.transaction)
-        active_time = func.max(cls_txn_paid.issued_at) - func.max(cls_txn_new.issued_at)
-        active_times = (
-            cls.query.join(cls_ver_new, cls_ver_new.id == cls.id)
-            .join(cls_ver_paid, cls_ver_paid.id == cls.id)
-            .join(cls_txn_new, cls_txn_new.id == cls_ver_new.transaction_id)
-            .join(cls_txn_paid, cls_txn_paid.id == cls_ver_paid.transaction_id)
-            .filter(cls_ver_new.state == "new")
-            .filter(cls_ver_paid.state == "paid")
-            .with_entities(active_time.label("active_time"))
-            .group_by(cls.id)
-        )
+        #
+        # Disabling this as the new sqlalchemy version seems to have broken it and I have
+        # very little idea what's going on here.
+        #
+        # cls_ver_new = aliased(cls.versions)
+        # cls_ver_paid = aliased(cls.versions)
+        # cls_txn_new = aliased(cls_version.transaction)
+        # cls_txn_paid = aliased(cls_version.transaction)
+        # active_time = func.max(cls_txn_paid.issued_at) - func.max(cls_txn_new.issued_at)
+        # active_times = (
+        #    cls.query.join(cls_ver_new, cls_ver_new.id == cls.id)
+        #    .join(cls_ver_paid, cls_ver_paid.id == cls.id)
+        #    .join(cls_txn_new, cls_txn_new.id == cls_ver_new.transaction_id)
+        #    .join(cls_txn_paid, cls_txn_paid.id == cls_ver_paid.transaction_id)
+        #    .filter(cls_ver_new.state == "new")
+        #    .filter(cls_ver_paid.state == "paid")
+        #    .with_entities(active_time.label("active_time"))
+        #    .group_by(cls.id)
+        # )
 
-        time_buckets = [timedelta(0), timedelta(minutes=1), timedelta(hours=1)] + [
-            timedelta(d)
-            for d in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 28, 60]
-        ]
+        # time_buckets = [timedelta(0), timedelta(minutes=1), timedelta(hours=1)] + [
+        #    timedelta(d)
+        #    for d in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 28, 60]
+        # ]
 
         data = {
             "public": {
@@ -121,9 +125,9 @@ class Payment(BaseModel):
                         "created_week": export_intervals(
                             first_changes, column("created"), "week", "YYYY-MM-DD"
                         ),
-                        "active_time": bucketise(
-                            [r.active_time for r in active_times], time_buckets
-                        ),
+                        # "active_time": bucketise(
+                        #    [r.active_time for r in active_times], time_buckets
+                        # ),
                         "amounts": bucketise(
                             cls.query.with_entities(cls.amount_int / 100),
                             [0, 10, 20, 30, 40, 50, 100, 150, 200],
