@@ -10,6 +10,7 @@ from main import db
 from sqlalchemy import true, inspect
 from sqlalchemy.orm.base import NO_VALUE
 from sqlalchemy.sql.functions import func
+from sqlalchemy.engine.row import Row
 from sqlalchemy_continuum.utils import version_class, transaction_class
 
 from typing import TypeAlias
@@ -85,7 +86,7 @@ def bucketise(vals, boundaries):
     counts = OrderedDict.fromkeys(ranges, 0)
 
     for val in vals:
-        if isinstance(val, tuple):
+        if isinstance(val, (tuple, Row)):
             # As a convenience for fetching counts/single columns in sqla
             val, *_ = val
 
