@@ -109,12 +109,16 @@ def export_db(table):
         for dirname in ["public", "private"]:
             if dirname in export:
                 filename = os.path.join(path, dirname, "{}.json".format(model))
-                json.dump(
-                    export[dirname],
-                    open(filename, "w"),
-                    indent=4,
-                    cls=ExportEncoder,
-                )
+                try:
+                    json.dump(
+                        export[dirname],
+                        open(filename, "w"),
+                        indent=4,
+                        cls=ExportEncoder,
+                    )
+                except:
+                    app.logger.exception("Error encoding export for %s", model)
+                    raise click.Abort()
                 app.logger.info("Exported data from %s to %s", model, filename)
 
     data = {
