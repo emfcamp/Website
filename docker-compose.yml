@@ -28,7 +28,7 @@ services:
       - .:/app
 
   postgres:
-    image: 'postgis/postgis:13-3.1-alpine'
+    image: 'postgis/postgis:16-3.4-alpine'
     environment:
       POSTGRES_PASSWORD: postgres
     networks:
