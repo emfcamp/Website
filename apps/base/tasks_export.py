@@ -35,7 +35,7 @@ def get_export_data(table_filter: Optional[str] = None):
     seen_model_classes = set()
     remaining_tables = set(db.metadata.tables)
 
-    for model_class in all_model_classes:
+    for model_class in sorted(all_model_classes, key=lambda c: c.__name__):
         if model_class in seen_model_classes:
             continue
 
