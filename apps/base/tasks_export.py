@@ -131,9 +131,17 @@ def export_db(table):
         return
 
     with app.test_client() as client:
-        for schedule in ["schedule.frab", "schedule.json", "schedule.ics"]:
-            resp = client.get("/{}".format(schedule))
-            with open(os.path.join(path, "public", schedule), "wb") as f:
-                f.write(resp.data)
+        for file_type in ["frab", "json", "ics"]:
+            url = f"/schedule/{year}.{file_type}"
+            dest_path = os.path.join(path, "public", f"schedule.{file_type}")
+            response = client.get(url)
+            if response.status_code != 200:
+                app.logger.error(
+                    "Error fetching schedule from %s: %s", url, response.status
+                )
+                raise click.Abort()
+            with open(dest_path, "wb") as f:
+                f.write(response.data)
+            app.logger.info("Fetched schedule from %s to %s", url, dest_path)
 
     app.logger.info("Export complete, summary written to %s", filename)
