@@ -1,0 +1,31 @@
+{
+    "sources": [
+        {
+            "id": 1,
+            "name": null,
+            "type": "Village",
+            "enabled": false,
+            "url": "https://google.com",
+            "main_venue": null,
+            "priority": 0
+        },
+        {
+            "id": 2,
+            "name": null,
+            "type": "Village",
+            "enabled": false,
+            "url": "https://calendar.google.com/calendar/ical/186p1gtqjgr5ffrimkc1o29sf8%40group.calendar.google.com/public/basic.ics",
+            "main_venue": null,
+            "priority": 0
+        },
+        {
+            "id": 3,
+            "name": null,
+            "type": "Village",
+            "enabled": false,
+            "url": "https://calendar.google.com/calendar/ical/srkjiqi1on30mju548of08k4fc%40group.calendar.google.com/public/basic.ics",
+            "main_venue": null,
+            "priority": 0
+        }
+    ]
+}

@@ -1,0 +1,812 @@
+{
+    "favourites": {
+        "counts": {
+            "0": 0,
+            "1-9": 0,
+            "10-19": 0,
+            "20-29": 0,
+            "30-39": 0,
+            "40-49": 0,
+            "50-99": 0,
+            "100-199": 0,
+            "200+": 0
+        }
+    },
+    "proposals": {
+        "accepted": [
+            {
+                "published_title": "3D printed/open hardware lasertag",
+                "published_description": "We will be running daily free (as in beer) lastertag events near the lounge daily at 3pm for 1 hour using 3D printed lasertag equipment running on open hardware/software.\r\nThere will be multiple games during each period. Just turn up.\r\nAges 8+",
+                "names": "Tony Goacher: Hacman",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 15:00:00",
+                "scheduled_duration": 60,
+                "venue": "Lounge"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": null,
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "Tom Christian",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-05 18:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "MILESTAG open hardware laser tag games for up to 10 people per game using 3D printed laser guns. ",
+                "published_description": "For kids 8 and up.\r\n\r\n Free to play. \r\n\r\nWe'd run multiple games for one hour or so each day using several game styles.\r\n",
+                "names": "Tony Goacher",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "Jeff Gough",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-05 20:30:00",
+                "scheduled_duration": 105,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "[Music] Flesh Tetris",
+                "published_description": "Pop music for unpopular people. Retro SciFi Eurotrash armed to the teeth with barbed pop hooks and weaponised synths. So uncool we're cool.",
+                "names": "Flesh Tetris",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-04 21:00:00",
+                "scheduled_duration": 45,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 20:10:00",
+                "scheduled_duration": 50,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "DJ Set: co-derobe and rave",
+                "published_description": "Fast-paced high energy DJ set. dnb / happy hardcore / rave / sheffieldcore.\r\n\r\nBring fingerguns. Shades not included.",
+                "names": "Mara \"coderobe\"",
+                "pronouns": "she/her",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "[Music] The Memepunks",
+                "published_description": "A live mashup covers band with a lively stage presence and impressive catalogue of original arrangements. Played in realtime, we use a number of custom electronic devices to achieve the sounds of popular anthems from the '80s, 90s and beyond on a fusion of classical strings with electronic keyboards and drums integrated into our unique show.\r\nWeb http://www.memepunks.co.uk\r\nVideo:  https://www.youtube.com/watch?v=W_bpXzXoMwU  \r\nAdditional videos : https://www.youtube.com/channel/UCWWwFiPBnXUHe3GE2r34CGw",
+                "names": "The Memepunks",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 20:00:00",
+                "scheduled_duration": 45,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": null,
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": null,
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "[Music] Vieon",
+                "published_description": "Vieon is the electronic musical project of Matt Wild, based in Coventry, UK. Expanding to a live four-piece including VJ Adrian Thompson, sound engineer Stephen Dorphin and keyboardist Ricardo Autobahn (of Cuban Boys and Eurovision fame), our sound is inspired by 70s and 80s electronic film soundtracks and lush synthpop filtered through a long-time appreciation for post-rock and IDM.",
+                "names": "Vieon",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 23:15:00",
+                "scheduled_duration": 45,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "[Music] 2xAA - electronic music crafted using Game Boys",
+                "published_description": "2xAA (aka Sam Wray) harnesses the low-fi power of the Nintendo Game Boy and various other portable hardwares to create a flowing electro-house set.",
+                "names": "2xAA",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 23:00:00",
+                "scheduled_duration": 60,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "[Music] Gravity Synth - Friday Night Edition",
+                "published_description": "The Gravity Synth is a musical instrument combining a desktop version of the instrumentation used to detect gravitational waves, and a modular synthesiser. The experimentation with the scientific and musical equipment has been a collaboration between researchers at the Gravitational Wave Institute at University of Birmingham, LIGO researchers at Glasgow University and audiovisual artist Leon Trimble.\r\nThis late night edition will be heavy on the techno, light on the lecture...",
+                "names": "Leon Trimble",
+                "pronouns": "Mr.",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 01:15:00",
+                "scheduled_duration": 45,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "GPT-3 Powerpoint Karaoke",
+                "published_description": "An audience interactive event; where willing volunteers collide with GPT-3 AI to present an informative, intellectual and light-hearted presentation to a receptive crowd. Unfortunately, they don't get to see the presentation before they talk about it!\r\n\r\nPowerpoint Karaoke will feature a selection of AI titled packs for attendees to present with only a moment to see what they\u2019re about to talk about. The presentations will be interesting but we can't promise they'll be informative!\r\n\r\nWith the rise of crypto-nonsense, washing machines bricked by ransomware and whatever the metaverse is never has there been a better time for people to take the stage and attempt to convince everyone that they know better than the AI overlord telling them what to talk about.\r\n\r\nWinners will be rewarded with a suitably terrible trophy for display in their office cubicle of choice, praised highly for their public speaking skills, and maybe get promotions by listing \u2018Ideation and Blue Sky Thinktalking\u2019 on LinkedIn.\r\n",
+                "names": "Adam Froggatt, Kate Devlin",
+                "pronouns": "He/Him, She/Her",
+                "may_record": true,
+                "scheduled_time": "2022-06-04 20:10:00",
+                "scheduled_duration": 50,
+                "venue": "Stage A"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-02 21:00:00",
+                "scheduled_duration": 180,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "[Music] Cutlasses",
+                "published_description": "A live performance from Cutlasses (AKA Scott Pitkethly) using an orchestra of handmade instruments and effects. Eschewing the oscillators of a traditional synthesiser for the resonances of homemade electro-acoustic sound sources and piezo based noise boxes, these are heavily processed with granular synthesis and micro looping using a palette of effects he has designed and built and housed in a repurposed bright orange metal chest. Taking cues from the world of sound art and horror film soundtracks but always trying to apply pop sensibilities, the result is lush and cinematic soundscapes topped with delicate melody.\r\n\r\nAs well as an immersive show in its own right, this performance will provide a good companion piece to Scott Pitkethly's talk (An introduction to building your own digital audio effects) on building the instruments he will be using to play live.\r\n\r\nwww.cutlasses.co.uk\r\nhttps://youtu.be/-l6Uslur_pQ\r\nhttps://youtu.be/Y7O-DpSKAu4\r\nhttps://youtu.be/xWpq3soblYY",
+                "names": "Cutlasses",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-05 21:30:00",
+                "scheduled_duration": 60,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "[Music] Gasman's ZX Spectrum Chiptune Revival",
+                "published_description": "The world's number one ZX Spectrum rock star is ready to don his white suit and keytar for his return to the EMF stage! Gasman delivers upbeat pop anthems, wrapped up in the authentic bleeps and bloops of ZX Spectrum chiptunes to satisfy all your 80s cravings. Expect singalong pop covers, epic synth solos, brand new songs, and catchy melodies to get you dancing through the night.",
+                "names": "Gasman",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-05 00:00:00",
+                "scheduled_duration": 45,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "[Music] Moormur",
+                "published_description": "Moormur is a London based producer/beat maker/self-taught drummer.\r\n\r\nHis work explores rhythms and sounds from all the world, and aims to blend of new and old to create something different.\r\n\r\nThe music is a \"collage\" of samples, field recordings, and synths glued together with a naive attitude, and takes inspiration from spiritual music, instrumental hip hop, African rumba, Idm, contemporary jazz, ambient.\r\n\r\nOn his live set he brings on the stage percussion and electronic pads enchanting the performance with dynamics and grooves.",
+                "names": "Moormur",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-04 20:00:00",
+                "scheduled_duration": 45,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "[Music] Look Mum No Computer",
+                "published_description": "Look Mum No Computer is a live electronic artist who takes his home made machines on the road to play loud music. Usually found in his studio cooking up a new instrument and writing new songs, he avoids computers like the plague (unless he\u2019s got to send an email). \r\n\r\nHe\u2019s a multi disciplinary artist with exhibitions of his work under his belt as well as many live shows; from squat raves in Berlin to Warehouse setups in London.\r\n\r\nYou might have seen some of his inventions floating around the internet, from organs made from 80's Furby toys, Bikes that have Synthesisers and drum machines built into them to 5000 Volt Jacobs ladder and Tesla coil Drum machines, all the way over to Flamethrower organs. Look Mum No Computer is a unique musician with a set of instruments that set him apart from his contemporaries.",
+                "names": "Sam Battle",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-03 21:00:00",
+                "scheduled_duration": 60,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "[Film] General Magic",
+                "published_description": "Friday 19:30 - 1h 33m - 12A\r\n\r\nSpecial Event: Directors Sarah Kerruish & Matt Maude will join us online to introduce the film and answer your questions after the screening.\r\n\r\nHow do you think that smartphone got in your pocket? If you follow the history, who had the vision and determination to create the future? Many would think Apple, but it was actually an Apple offshoot, General Magic that laid the foundations for the always-on world we live in today. This documentary tells the story of a gang of dedicated geeks who set out to create the future and their fate at the hands of Apple and others. You\u2019ll see some familiar faces and a glimpse into how the future was shaped.",
+                "names": "PJ Evans",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 19:30:00",
+                "scheduled_duration": 93,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "Obscurecon",
+                "published_description": "Obscurecon is a lightning talk session where all talks are on obscure topics. A topic counts as obscure if the speaker expects less than 1% of the audience to know about it. Since our audience is smaller than a hundred people, on average that means only the speaker knows about it. No signups or submissions needed, come if you have an obscure topic. 5 minutes max per speaker. Be on time.",
+                "names": "Ivy",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 21:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "[Music] Graham Dunning",
+                "published_description": "A new live set recording on-the-fly to cassette tape loops across four tape players. A rough attempt at an analogue emulation of a modern loop pedal, where none of the loops will stay in sync and the sound is degraded and detuned. The set is improvised around a structure, flowing through melodica drone, balearic chug, and downbeat drum-machine techno.",
+                "names": "Graham Dunning",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 22:00:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "[Music] Polyop: An Audio-Visual Voyage",
+                "published_description": "Continuing in the tradition of sonic-fiction, POLYOP fuse live electronic music performance with sci-fi mythologies to create an immersive audio-visual voyage. Follow the omnipotent Creator on his pilgrimage through distant reaches of an alternate polyhedral universe, occupied by psychedelic soundscapes, rhythmical acid entities and uncharted electro artefacts.\r\n\r\nPOLYOP have developed their live show alongside their own open-source visual performance engine 'Hedron'. Their sound fuses the DNA of funk, and electro with techno and modern sound design; whilst the visuals combine sci-fi aesthetics with polyhedral graphics popularised by early 3D graphics engines.\r\n\r\nVids & Projects:\r\nhttp://polyop.uk/",
+                "names": "Polyop",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-04 00:15:00",
+                "scheduled_duration": 45,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "Hackers Rave",
+                "published_description": "Passing through the Electromagnetic oasis from the underground shadows of the Sub-Saharan soundscapes bringing dromedary disco, bactrian beats and soulful tribal sounds of the machines - this is the Hackers Rave. Feel the love, feel the music, don\u2019t hold on, let go - hack the planet!\r\n\r\nInspired by attending EMF in 2018 and hearing Ian Softley's chat before the special screening of Hackers, this unique vinyl DJ set will transport you back to a time around when the film was released in the UK in the 90's.   \r\n\r\nTom\u2019s started DJ'ing in 1994 at parties and club nights around Edinburgh before becoming a resident DJ at Camel Beats in 1998.  The Arabian Knights brought new energy to the underground club scene in the City and Camel Beats was regarded as one of the best techno clubs at the time.  With music influences deeply rooted in Chicago House, Detroit Techno and emerging European sounds, bringing along a box of specially selects records from over 23 years ago and mixed with soul - this will be a special experience not heard for decades.",
+                "names": "Tom Christian (Camel Beats)",
+                "pronouns": "He/him",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": null,
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "[Music] Algorave",
+                "published_description": "A from-scratch live coding performance, in the classic algorave broken techno style. ",
+                "names": "Alex McLean",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-05 01:00:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "[Music] Palindrones",
+                "published_description": "A multi-instrumental duo based in South East London who write expansive musical landscapes, mixing pounding, uplifting beats and blistering synth drones, with a lush ambience and a dusting of haunting, dreamy vocals. We both play synths and percussion with one female vocalist.\r\nThis is music you can dance to!",
+                "names": "Palindrones",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-03 22:15:00",
+                "scheduled_duration": 30,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-05 20:30:00",
+                "scheduled_duration": 60,
+                "venue": "Stage B"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": null,
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "Chipko",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-04 16:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "DJ Narq",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-03 23:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "Courier",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-03 22:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "Superstar DJ Lai Power",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-03 20:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "Chipko",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-04 19:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "Tom Christian",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-03 21:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "DJ Narq",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-04 18:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "MrJoshua",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-04 17:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "A trancy night with DJ cubicgarden",
+                "published_description": "EMF camp usually has some great dance parties, so lets soak up some of the great drinks with some of the latest electronic dance music performed by DJ cubicgarden on a 15 year old modified Pacemaker Device.\r\n\r\nYou on the dance floor, me on the truly digital decks and maybe even throwing some dance moves myself.\r\n\r\nWhats not to love!",
+                "names": "Ian Forrester",
+                "pronouns": "He/Him",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 00:00:00",
+                "scheduled_duration": 90,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-03 23:00:00",
+                "scheduled_duration": 105,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-05 21:30:00",
+                "scheduled_duration": 126,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "Ben XO",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 22:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-04 19:30:00",
+                "scheduled_duration": 169,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "Dixie Flatline",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-05 00:00:00",
+                "scheduled_duration": 90,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "DJ LastKnight",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-05 22:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "MrJoshua",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-04 20:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-04 23:30:00",
+                "scheduled_duration": 89,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "Det",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-04 21:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-05 20:30:00",
+                "scheduled_duration": 40,
+                "venue": "Stage C"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "coderobe",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-04 23:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "2xAA",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-05 23:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-04 15:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "Kids' Disco",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-05 16:00:00",
+                "scheduled_duration": 90,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 21:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "Hebocon: terrible robot fighting tournament",
+                "published_description": "Hebocon is Robot Wars for those who are not technically gifted.  Twirling assemblages of junk face off against hot glue monstrosities, whilst some contenders might fail to move at all.  \r\n\r\nThe most successful robots are those which are truly \u2018heboi\u2019: pathetic, and constructed without the technology or skill that you\u2019d usually expect in a robot fighting tournament.  \r\n\r\nJoin us to watch the robots battle it out and take joy in failure!\r\n\r\nAll are encouraged to enter a robot to the contest, simply visit the information desk to register your robot prior to the tournament.  We\u2019ll also be running a robot building workshop for anyone who\u2019d like to construct (or embellish) their robot at EMFCamp prior to the tournament - see the separate workshop event for details.",
+                "names": "Tamar Willson",
+                "pronouns": "She/her",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 16:00:00",
+                "scheduled_duration": 90,
+                "venue": "Outside the bar"
+            },
+            {
+                "published_title": "Hacky Racers! (Opposite the Robot Arms)",
+                "published_description": "Scheduled 4pm race, opposite the Robot Arms",
+                "names": "Hacky Racers! (Opposite the Robot Arms)",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 16:00:00",
+                "scheduled_duration": 15,
+                "venue": "Main Bar"
+            },
+            {
+                "published_title": "Hacky Racers! (Opposite the Robot Arms)",
+                "published_description": "12pm race, opposite the Robot Arms",
+                "names": "Hacky Racers! (Opposite the Robot Arms)",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-05 12:00:00",
+                "scheduled_duration": 15,
+                "venue": "Main Bar"
+            },
+            {
+                "published_title": "Hacky Racers! (Opposite the Robot Arms)",
+                "published_description": "Hacky Racers night race! Opposite the Robot Arms",
+                "names": "Hacky Racers! (Opposite the Robot Arms)",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-02 21:30:00",
+                "scheduled_duration": 20,
+                "venue": "Main Bar"
+            },
+            {
+                "published_title": "Hacky Racers! (Opposite the Robot Arms)",
+                "published_description": "6pm race, opposite the Robot Arms",
+                "names": "Hacky Racers! (Opposite the Robot Arms)",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 18:00:00",
+                "scheduled_duration": 15,
+                "venue": "Main Bar"
+            },
+            {
+                "published_title": "Hacky Racers! (Opposite the Robot Arms)",
+                "published_description": "4pm race, opposite the Robot Arms",
+                "names": "Hacky Racers! (Opposite the Robot Arms)",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-02 16:00:00",
+                "scheduled_duration": 15,
+                "venue": "Main Bar"
+            },
+            {
+                "published_title": "Hacky Racers! (Opposite the Robot Arms)",
+                "published_description": "2pm race, opposite the Robot Arms",
+                "names": "Hacky Racers! (Opposite the Robot Arms)",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-05 14:00:00",
+                "scheduled_duration": 15,
+                "venue": "Main Bar"
+            }
+        ],
+        "counts": {
+            "needs_help": {
+                "false": 82,
+                "true": 9
+            },
+            "needs_money": {
+                "false": 91
+            },
+            "needs_laptop": {
+                "false": 9,
+                "null": 82
+            },
+            "one_day": {
+                "false": 91
+            },
+            "notice_required": {
+                "1 month": 14,
+                "1 week": 66,
+                "> 3 months": 2,
+                "null": 9
+            },
+            "may_record": {
+                "false": 32,
+                "true": 1,
+                "null": 58
+            },
+            "state": {
+                "accepted": 21,
+                "anonymised": 1,
+                "cancelled": 2,
+                "finished": 43,
+                "manual-review": 1,
+                "new": 12,
+                "rejected": 1,
+                "withdrawn": 10
+            },
+            "created_week": {
+                "2022-01-31": 7,
+                "2022-02-07": 1,
+                "2022-02-14": 3,
+                "2022-02-21": 1,
+                "2022-02-28": 3,
+                "2022-03-21": 2,
+                "2022-03-28": 2,
+                "2022-04-04": 1,
+                "2022-04-11": 3,
+                "2022-04-18": 4,
+                "2022-04-25": 4,
+                "2022-05-02": 1,
+                "2022-05-09": 4,
+                "2022-05-16": 9,
+                "2022-05-23": 11,
+                "2022-05-30": 35
+            }
+        },
+        "edits": {
+            "published_title": {
+                "avg": "1.94",
+                "max": 5
+            },
+            "published_description": {
+                "avg": "2.11",
+                "max": 24
+            },
+            "requirements": {
+                "avg": "1.18",
+                "max": 7
+            },
+            "length": {
+                "avg": "1.06",
+                "max": 3
+            },
+            "notice_required": {
+                "avg": "1.03",
+                "max": 2
+            },
+            "needs_help": {
+                "avg": "1.02",
+                "max": 2
+            },
+            "needs_money": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "one_day": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "has_rejected_email": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "published_names": {
+                "avg": "1.92",
+                "max": 4
+            },
+            "published_pronouns": {
+                "avg": "1.68",
+                "max": 5
+            },
+            "arrival_period": {
+                "avg": "1.77",
+                "max": 3
+            },
+            "departure_period": {
+                "avg": "1.78",
+                "max": 4
+            },
+            "eventphone_number": {
+                "avg": "1.59",
+                "max": 2
+            },
+            "telephone_number": {
+                "avg": "1.76",
+                "max": 3
+            },
+            "may_record": {
+                "avg": "1.35",
+                "max": 3
+            },
+            "needs_laptop": {
+                "avg": "1.08",
+                "max": 2
+            },
+            "available_times": {
+                "avg": "1.78",
+                "max": 4
+            },
+            "attendees": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "cost": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "size": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "funds": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "age_range": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "participant_equipment": {
+                "avg": "1.00",
+                "max": 1
+            }
+        }
+    }
+}

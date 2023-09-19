@@ -1,0 +1,360 @@
+{
+    "favourites": {
+        "counts": {
+            "0": 0,
+            "1-9": 0,
+            "10-19": 0,
+            "20-29": 0,
+            "30-39": 0,
+            "40-49": 0,
+            "50-99": 0,
+            "100-199": 0,
+            "200+": 0
+        }
+    },
+    "proposals": {
+        "accepted": [
+            {
+                "published_title": "Intro to AI: Train your computer!",
+                "published_description": "This workshop will introduce you to artificial intelligence (AI) and machine learning (ML). We'll cover what AI is, how ML works, and how they affect your lives. \r\n\r\nYou'll learn how machine learning models are created by in a hands-on workshop by training your own machine learning model. \r\n  \r\nYou will train their own artificial intelligence system based on a real-world use of AI. And then you'll make something to use it in Scratch so you can see it working for yourselves. \r\n   \r\nFinally, we'll have a discussion about what it all means - how what you've built relates to the way that AI affects our lives.",
+                "names": "Dale Lane",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 13:40:00",
+                "scheduled_duration": 90,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Crafting Cnidarians: corals and jellies and siphonophores - oh my!",
+                "published_description": "Come and discover the wonderful world of cnidarians - the animal family that includes corals, jellyfish, anemones and siphonophores. We will take a quick look at these fascinating, beautiful, mysterious creatures together. Every child can create their own jellyfish using non-recyclable waste packaging, rescued from the land-fill. Then, in the spirit of the colony, we will make a giant model siphonophore together. Ideal for Octonauts fans of all ages.",
+                "names": "Hannah Hulbert",
+                "pronouns": "She/her",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 14:10:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Minecraft Coding Adventure - Seymour Island",
+                "published_description": "Using Minecraft (Education Edition), delve into Seymour Island, a multiplayer coding adventure available in MakeCode blocks or Python. \r\nWe will be piloting a new experimental version of Seymour Island in the session and looking for feedback on what could be changed to make it even more fun.\r\nSome basic Minecraft experience is recommended.\r\nThis workshop is being lead by the team from Causeway Digital, Official Minecraft Education Edition Partners.",
+                "names": "Andrew Mulholland",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 12:30:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Minecraft Robot Challenge",
+                "published_description": "Enter a Minecraft world and meet your robot companions \u2013\u00a0the turtles. You and your turtle have challenges to solve together \u2013\u00a0and you can only complete them by controlling and programming your turtle.\r\n\r\nLearn basic programming skills as you move your turtle through the challenges by using drag and drop commands. Or if you're already comfortable programming with text then try to do the same by writing short programs in Lua.\r\n\r\nSuitable for children aged around 7 or older and their accompanying adults. It helps to know your way around Minecraft already, but it's not necessary to enjoy the workshop.\r\n\r\nAll software is provided \u2013\u00a0you won't need your own Minecraft software or license. You will need a laptop that can run Java 1.8, so Windows, Mac or Linux (Chromebooks without a Linux install won't work). If you can arrive with Java 1.8 already installed then you'll save some time.",
+                "names": "Adam Cohen-Rose",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 15:40:00",
+                "scheduled_duration": 90,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "DJ Workshop",
+                "published_description": "Come a long and learn about the history and art of DJ'ing.  Get hands-on with your first vinyl record mix on a set of Citronic mono record decks made in England in the the 80\u2019s with tunes from a kids disco at around that time. Try scratching records on a set of Technics SL1210\u2019s and then get hands on with your own device and learning digital DJ skills and techniques.\r\n\r\nWe will primarily use Mixxx software for the workshop as it's so awesome as well as being open source and free, but other free options for tablets and phones are all possible. There will also be an opportunity to plug into a USB Mixer/controller and demo your new skills at the end! The ultimate aim of this workshop is to introduce some basics of DJ'ing. The kids also have the exciting option to DJ at their own Kids Disco later in the evening at 7:30pm!  Royalty free music will be available along with other guidance and options.\r\n\r\nPlease ask kids to wash hands prior to workshop and kids will also be asked to use hand sanitizer before touching shared DJ kit (if this is a concern don\u2019t worry, just take part in the workshop using your device that you brought). I will clean kit in between kids having a shot. Really grateful for patience and understanding.",
+                "names": "Tom",
+                "pronouns": "He/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 12:10:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-05 12:00:00",
+                "scheduled_duration": 120,
+                "venue": "Family Lounge"
+            },
+            {
+                "published_title": "What will we wear tomorrow ",
+                "published_description": "Come and listen to a short story about how the choices we make today may effect what your grandchild may be wearing in the future. After the story there will be a textile arts and crafts workshop where children imagine what life may be like for their decedents, and design and make clothing for something they may be doing in the future. Nothing is too fanciful, we have had everything from future space fashion on Mars, to time traveling fish people. \r\nThe workshop gets people thinking about choices we can make now, and issues that we may need to overcome in the future, in a fun and empowering way. Less eco anxiety and doom scrolling, more creativity and joy. \r\n\r\n",
+                "names": "Joanne Rachel Knox",
+                "pronouns": "She her",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 10:40:00",
+                "scheduled_duration": 90,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Build and fly a rocket",
+                "published_description": "Build and fly a solid-fuelled model rocket from scratch!\r\n\r\nWe'll provide paper templates and all required materials, you cut and tape the rocket together and then decorate it to taste. Once they're all built we'll take the rockets out to the model flying area and launch them from our launch pad.\r\n\r\nAssembling the rocket is straightforward and as they're all made from white card and paper there are plenty of options for decoration or modification. We'll have some helpers on hand to provide guidance.\r\n\r\nSuitable for young children with supervision. The build involves mostly using scissors and tape, one step involves hot glue which requires adult supervision. Feel free to contact us beforehand if you want to check suitability: emf@adamgreig.com or extension 2440.\r\n\r\nThere is a charge of \u00a34 per rocket to cover materials, and a limit of one rocket per child.",
+                "names": "Adam Greig",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 15:30:00",
+                "scheduled_duration": 90,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Bubble Fun!",
+                "published_description": "Who can make the biggest bubble? Whose will last the longest before it pops? Is it possible to make a square bubble? Join us to make your own bubble blowers and investigate the wonderful world of bubbles. ",
+                "names": "Kate Davis",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 09:30:00",
+                "scheduled_duration": 50,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Raspberry Pi Pico Party Poppers",
+                "published_description": "Last year Raspberry Pi launched their first microcontroller-class product: Raspberry Pi Pico. It  is built on RP2040, a brand-new chip developed here in the UK.\r\n\r\nThis workshop will introduce the Pico and dive straight in to programming it with MicroPython. We\u2019ll start with some \u201chello world\u201d onboard LED flashing and move on to using components to build simple circuits.  We'll start with the basics and move on to build a sustainable and reusable party popper using this small but mighty microcontroller.\r\n\r\nYou'll need to bring your own laptop: please install the latest version of the Thonny Python editor before you come. (https://thonny.org/)\r\n\r\nParticipants will be able keep and take their Raspberry Pi Pico away with them after the workshop. ",
+                "names": "Richard Hayler",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 17:20:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Painting with light - Build and paint with your own \"Glowie\"",
+                "published_description": "In this evening activity, we will get hands on drawing with light!\r\n\r\nFirst, we will build our very own \"glowie\" torch (coincell + LED + tape) to keep, explore the brightness of different colours of LEDs and each attendee will get to pick which colour they want to use for the second stage.\r\n\r\nIn the second stage of the activity, we will head outside into the dark (or twilight) and take some long exposure light painting photographs. Common things drawn in the past include initials, basic shapes or just simple lines.\r\n\r\nPrevious photographs - https://twitter.com/gbaman1/status/1036711495189585920",
+                "names": "Andrew Mulholland",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 20:40:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "EMF Kids Disco",
+                "published_description": "All kids are welcome to dance the night away at the best Kids Disco on the planet! This is a party for kids by kids!\r\n\r\n(This is also part 2 of the DJ Youth Workshop where any kids interested in DJ'ing at their own Kids Disco will be fully supported to get a chance to all perform using their own laptop/tablet or smart phone.)",
+                "names": "EMF Kids",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 19:30:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Family pizza evening",
+                "published_description": "Join us at the youth tent for a drop in pizza making workshop for families, with all dough and ingredients provided. Learn how to hand stretch the pizza dough, then top it with your favourite toppings.\r\nFinally, launch it into one of the wood fired pizza ovens for a piping hot pizza in under 2 mins.\r\nSuitable for kids aged 6 and up (with some parental help).\r\nNote this activity is only open to families and kids.",
+                "names": "Andrew Mulholland",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 18:30:00",
+                "scheduled_duration": 100,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Marshmallow Astronauts",
+                "published_description": "Have a go at creating a spacesuit for a marshmallow astronaut using equipment in the Mini Maker's Space. Once your astronaut is suited and booted, find out if they could survive in space by placing them in a vacuum chamber.",
+                "names": "Kate Davis",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 15:10:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Gamestorming",
+                "published_description": "Video games are such a huge part of our lives, come along to my session to really delve deep into how to gamestorm (brainstorm) your own. Every game from the most sprawling fantasy RPG to the most chilling monster thriller, starts with an idea and a discussion and that is what we are going to do today.",
+                "names": "Claire Mulholland",
+                "pronouns": "She/Her",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 13:50:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Origami Boomerang Folding",
+                "published_description": "Learn to fold and throw a paper origami boomerang - that really comes back when you throw it! Paper will be provided.",
+                "names": "Ollie, Aiden, & Rob McKinnon",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 09:30:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "DIY Light Up Festival Bracelets",
+                "published_description": "Come learn about E-textiles by making your very own felt bracelet decorated with LED lights. In this workshop we will use felt shapes and buttons to make a bracelet and decorate it. Then we will add a light up component by threading a simple circuit with LEDs and coin-cell batteries. Participants can keep and take home their creations.\r\nComplete beginners to sewing & electronics welcome!\r\n\r\nPlease note: parents need to supervise throughout as we will be using a needle and thread!",
+                "names": "Dervla O'Brien",
+                "pronouns": "she/her",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 10:50:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Bridge Building",
+                "published_description": "A family workshop where we gather in teams to build bridges out of lollipop sticks and using hot glue guns. The format of the sessions is a short talk about the engineering principles in bridge design. Then we split up into teams and work together to make a bridge that spans 35cm.\r\n\r\nAfter an hour we all come together to test each bridge by hanging weights off its centre. Each bridge is tested to destruction. The bridge that holds the most weight is the winner and they receive a small token prize.",
+                "names": "Jeffrey Roe, Christian Kortenhorst ",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 16:30:00",
+                "scheduled_duration": 90,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Learn how to program (LEGO) rovers used in the most challenging environments",
+                "published_description": "Do you have what it takes to program rovers used in the most difficult environments? Would you like to learn how to code robots from scratch? \r\n\r\nYou'll teach your rover how to explore its surroundings and gather data from the environment with a set of challenges - starting off with some basics, and working up towards following a course we set.\r\n\r\nYou'll also learn about how we test real Mars rovers (and LEGO ones!) in the Mars Yard at Boulby Underground Laboratory 1.1km underground, and learn what else this, and our other, exciting laboratories are used for!\r\n\r\nExperience with using Scratch or having done some sort of programming can help - but you don't need it, we\u2019re going to run through the coding with you - all you really need is enthusiasm!",
+                "names": "Will Furnell",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 12:20:00",
+                "scheduled_duration": 90,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "A Model EMF",
+                "published_description": "Come and make yourselves, your village or your favourite part of EMF Camp out of clay to create a miniature Electromagnetic Field. We hope to grow our model EMF throughout the weekend and then you are welcome to take home your creations if you would like to. ",
+                "names": "Kate Davis",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 11:00:00",
+                "scheduled_duration": 50,
+                "venue": "Youth Workshop"
+            }
+        ],
+        "counts": {
+            "needs_help": {
+                "false": 17,
+                "true": 5
+            },
+            "needs_money": {
+                "false": 22
+            },
+            "needs_laptop": {
+                "false": 19,
+                "null": 3
+            },
+            "one_day": {
+                "false": 22
+            },
+            "notice_required": {
+                "1 month": 7,
+                "1 week": 14,
+                "> 1 month": 1
+            },
+            "may_record": {
+                "false": 21,
+                "null": 1
+            },
+            "state": {
+                "accepted": 1,
+                "finished": 19,
+                "withdrawn": 2
+            },
+            "created_week": {
+                "2022-01-31": 1,
+                "2022-02-07": 1,
+                "2022-02-14": 4,
+                "2022-03-07": 1,
+                "2022-04-04": 1,
+                "2022-04-18": 1,
+                "2022-04-25": 3,
+                "2022-05-02": 3,
+                "2022-05-09": 1,
+                "2022-05-16": 2,
+                "2022-05-23": 4
+            }
+        },
+        "edits": {
+            "published_title": {
+                "avg": "4.59",
+                "max": 6
+            },
+            "published_description": {
+                "avg": "5.05",
+                "max": 11
+            },
+            "requirements": {
+                "avg": "1.95",
+                "max": 4
+            },
+            "length": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "notice_required": {
+                "avg": "1.05",
+                "max": 2
+            },
+            "needs_help": {
+                "avg": "1.05",
+                "max": 2
+            },
+            "needs_money": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "one_day": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "has_rejected_email": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "published_names": {
+                "avg": "4.95",
+                "max": 8
+            },
+            "published_pronouns": {
+                "avg": "3.55",
+                "max": 6
+            },
+            "arrival_period": {
+                "avg": "4.55",
+                "max": 6
+            },
+            "departure_period": {
+                "avg": "4.55",
+                "max": 6
+            },
+            "eventphone_number": {
+                "avg": "2.73",
+                "max": 5
+            },
+            "telephone_number": {
+                "avg": "3.64",
+                "max": 5
+            },
+            "may_record": {
+                "avg": "1.91",
+                "max": 2
+            },
+            "needs_laptop": {
+                "avg": "1.82",
+                "max": 2
+            },
+            "available_times": {
+                "avg": "4.64",
+                "max": 6
+            },
+            "attendees": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "cost": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "size": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "funds": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "age_range": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "participant_equipment": {
+                "avg": "1.00",
+                "max": 1
+            }
+        }
+    }
+}

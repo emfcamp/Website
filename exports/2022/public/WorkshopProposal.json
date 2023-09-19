@@ -1,0 +1,1652 @@
+{
+    "favourites": {
+        "counts": {
+            "0": 0,
+            "1-9": 0,
+            "10-19": 0,
+            "20-29": 0,
+            "30-39": 0,
+            "40-49": 0,
+            "50-99": 0,
+            "100-199": 0,
+            "200+": 0
+        }
+    },
+    "proposals": {
+        "accepted": [
+            {
+                "published_title": "Origami Lanterns",
+                "published_description": "Origami Lantern making with LEDs for all age, kids friendly ",
+                "names": "Betty Ching",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 12:00:00",
+                "scheduled_duration": 100,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Intro to AI: Train your computer!",
+                "published_description": "This workshop will introduce you to artificial intelligence (AI) and machine learning (ML). We'll cover what AI is, how ML works, and how they affect your lives. \r\n\r\nYou'll learn how machine learning models are created by in a hands-on workshop by training your own machine learning model. \r\n  \r\nYou will train their own artificial intelligence system based on a real-world use of AI. And then you'll make something to use it in Scratch so you can see it working for yourselves. \r\n   \r\nFinally, we'll have a discussion about what it all means - how what you've built relates to the way that AI affects our lives.",
+                "names": "Dale Lane",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 13:40:00",
+                "scheduled_duration": 90,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Crafting Cnidarians: corals and jellies and siphonophores - oh my!",
+                "published_description": "Come and discover the wonderful world of cnidarians - the animal family that includes corals, jellyfish, anemones and siphonophores. We will take a quick look at these fascinating, beautiful, mysterious creatures together. Every child can create their own jellyfish using non-recyclable waste packaging, rescued from the land-fill. Then, in the spirit of the colony, we will make a giant model siphonophore together. Ideal for Octonauts fans of all ages.",
+                "names": "Hannah Hulbert",
+                "pronouns": "She/her",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 14:10:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Minecraft Coding Adventure - Seymour Island",
+                "published_description": "Using Minecraft (Education Edition), delve into Seymour Island, a multiplayer coding adventure available in MakeCode blocks or Python. \r\nWe will be piloting a new experimental version of Seymour Island in the session and looking for feedback on what could be changed to make it even more fun.\r\nSome basic Minecraft experience is recommended.\r\nThis workshop is being lead by the team from Causeway Digital, Official Minecraft Education Edition Partners.",
+                "names": "Andrew Mulholland",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 12:30:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "FooBot",
+                "published_description": "Robot Table Football/Foosball game. Come along and play or spectate. Preferably bring a mobile phone to control your robot with.",
+                "names": "Steve Barnett",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 12:00:00",
+                "scheduled_duration": 100,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 12:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Barbot",
+                "published_description": "Barbot is a robotic bartender that makes cocktails, both alcoholic and non-alcoholic. Donations will be taken for the project, but the drinks are free!",
+                "names": "Nottinghack Village",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 21:00:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Minecraft Robot Challenge",
+                "published_description": "Enter a Minecraft world and meet your robot companions \u2013\u00a0the turtles. You and your turtle have challenges to solve together \u2013\u00a0and you can only complete them by controlling and programming your turtle.\r\n\r\nLearn basic programming skills as you move your turtle through the challenges by using drag and drop commands. Or if you're already comfortable programming with text then try to do the same by writing short programs in Lua.\r\n\r\nSuitable for children aged around 7 or older and their accompanying adults. It helps to know your way around Minecraft already, but it's not necessary to enjoy the workshop.\r\n\r\nAll software is provided \u2013\u00a0you won't need your own Minecraft software or license. You will need a laptop that can run Java 1.8, so Windows, Mac or Linux (Chromebooks without a Linux install won't work). If you can arrive with Java 1.8 already installed then you'll save some time.",
+                "names": "Adam Cohen-Rose",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 15:40:00",
+                "scheduled_duration": 90,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Story Twine",
+                "published_description": "Learn about Twine, a free open source tool for making choose your own adventure games. \r\nThis workshop will include:\r\n- Intro to Twine and non-linear stories\r\n- Group story writing activity\r\n- Write your own games and stories! - device required to run https://twinery.org\r\n\r\nSuitable for anyone who can type :) ",
+                "names": "Lex Robots",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 15:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "3D printed/open hardware laser tag",
+                "published_description": "We will be running daily free (as in beer) lastertag events near the lounge daily at 3pm for 1 hour using 3D printed lasertag equipment running on open hardware/software.\r\nThere will be multiple games during each period. Just turn up.\r\nAges 8+",
+                "names": "Tony Goacher: Hacman",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-02 15:00:00",
+                "scheduled_duration": 60,
+                "venue": "Lounge"
+            },
+            {
+                "published_title": "Tor Node Operators meetup",
+                "published_description": "A get together of tor enthusiasts and node operators.",
+                "names": "irl",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 14:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Morning Demoshow",
+                "published_description": "Morning Demoshow",
+                "names": "FieldFX",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 10:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Morning Demoshow",
+                "published_description": "Morning Demoshow",
+                "names": "FieldFX",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-02 10:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Air Quality Monitoring",
+                "published_description": "An introduction to air quality monitoring and open sensor infrastructure.\r\n\r\nMore to follow.",
+                "names": "Midder",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 20:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Build your own Geiger Counter",
+                "published_description": "Ionizing radiation, resulting from nuclear reactions or radioactive decay, is invisible to the human eye yet it is all around us. Whether it's coming from space, from radioactive elements in the Earth, or from human activity, ionizing radiation is passing through us everywhere we go, anywhere on the planet. Radioactive decay producing alpha, beta, or gamma radiation is happening all the time, and curiously, some objects in daily life are noticeably more radioactive than others! Welding rods, camping gas mantles, smoke detectors, granite table tops and even bananas, they all produce radiation of different types and different energies.\r\n\r\nOne instrument to detect ionizing radiation is a Geiger-M\u00fcller tube, a simple gas filled tube. When exposed to high energy radiation, the inert gas inside is ionized and able to transport electrical charges. These charges can be detected using an electronic circuit, and visualised or sent to a speaker to produce the typical ticking sound often associated with radioactivity in popular culture.\r\n\r\nIn this workshop, attendees learn about the different types of ionizing radiation, and proceed to build their own Geiger counter based on an authentic 1970s Soviet Geiger-M\u00fcller tube. Because let's be honest: everyone loves a bit of Soviet nostalgia! This requires basic soldering and electronics skills. Once built, attendees calibrate their instrument and test it with different radiation sources. Attendees can choose to take their Geiger counter home after the workshop.",
+                "names": "Yannick",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 10:00:00",
+                "scheduled_duration": 100,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "QueerMF",
+                "published_description": "A mixer for queers, enbies, weirdos, deviants and others!\r\n\r\nBring your selves, your smiles, your kinks, your weird bits!\r\n\r\nWant to learn more about what others care about?\r\nCome by and say hi.",
+                "names": "hibby",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 20:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "FieldFX",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 00:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Programming the EMF Phone network with Jambonz and Node-RED",
+                "published_description": "This will be a hands on workshop on how to build your own app on our phone system to play audio, make calls and connect to other things. (like your badge)\r\nWe'll be using the low-code tool Node-RED so you don't need to be a developer, but a basic understanding of APIs would help.\r\nYou will need a laptop, everything is done in a web browser, iPads/Tablets are OK but its quite tedious to use on a touch screen.\r\nSuitable for children under 14 if helped by an adult.",
+                "names": "Sam Machin",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 15:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Simon Singh Q&A",
+                "published_description": "Following Simon Singh's talk on Stage A, we will be hosting a Q&A session in the Maths Village / Workshop 5 tent.",
+                "names": "Simon Singh",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-03 13:40:00",
+                "scheduled_duration": 30,
+                "venue": "Workshop 5"
+            },
+            {
+                "published_title": "Matchbox Machine Learning Drop In",
+                "published_description": "Drop into the Maths Village / Workshop 5 tent on Saturday evening to play a game of noughts and crosses against a pile of matchboxes. Over the course of the evening, the matchboxes will learn to play and (hopefully) start winning or drawing games.\r\n\r\nOn Sunday at 18:00 on Stage C, Matthew Scroggs will be talking about how this matchbox-powered machine works and showing off some data gathered during this Drop In",
+                "names": "Matthew Scroggs",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 20:05:00",
+                "scheduled_duration": 230,
+                "venue": "Workshop 5"
+            },
+            {
+                "published_title": "Dome Building Drop In",
+                "published_description": "During this session, we'll be getting out the kit to build a variety of small domes.\r\n\r\nEach dome takes around half an hour to build. Drop in whenever you like and join in.",
+                "names": "The Maths Village",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-05 12:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 5"
+            },
+            {
+                "published_title": "Live coding algorithmic patterns with strudel",
+                "published_description": "Strudel (https://strudel.tidalcycles.org/) is a live coding environment for making music with algorithmic patterns. If you've heard of tidalcycles, it aims to be that for the web browser, re-implementing its cyclic approach to music composition, based on composing functions together. With just a couple of simple lines of javascript, you can be writing code that makes people dance, with immediate audio and visual feedback to help understand the code you've written.\r\nWe'll go through the basics of writing rhythmic sequences with the 'mini-notation', and how to transform them into mind-bending patterns by applying simple functions to them. By the end you'll be well on your way to your first algorave performance. \r\nNo pre-knowledge of code or music needed!",
+                "names": "Alex McLean",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 12:20:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Project Euler",
+                "published_description": "Come to the Maths Village / Workshop 5 tent to solve some mathematical programming puzzles from projecteuler.net.",
+                "names": "The Maths Village",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-05 20:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 5"
+            },
+            {
+                "published_title": "MathsJam",
+                "published_description": "On Friday evening, we'll be converting the Maths Village / Workshop 5 tent into a temporary pub, in order to host a MathsJam: an opportunity for like-minded self-confessed maths enthusiasts to get together in a pub and share stuff they like - puzzles, games, problems, or just anything they think is cool or interesting. We'll provide some stuff to play with, but you're welcome to bring along your own puzzles, discussion topics or crafts. And beer.",
+                "names": "The Maths Village",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-03 19:00:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 5"
+            },
+            {
+                "published_title": "Maths Face Painting",
+                "published_description": "Come to the Maths Village / Workshop 5 tent to get some maths painted on your face.",
+                "names": "The Maths Village",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-03 17:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 5"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "FieldFX",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 19:00:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Matthew Scroggs Q&A and games against MENACE ",
+                "published_description": "Following Matthew Scroggs's talk on Stage C, we will be hosting a Q&A session in the Maths Village / Workshop 5 tent with Matthew and MENACE.",
+                "names": "Matthew Scroggs",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-05 18:30:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 5"
+            },
+            {
+                "published_title": "Craft Drop In",
+                "published_description": "Come to the Maths Village / Workshop 5 tent and do some craft with us, including:\r\n\r\n- braiding\r\n- origami\r\n- something with felt\r\n- sewing (maybe)",
+                "names": "The Maths Village",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-05 15:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 5"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "FieldFX",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 00:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "James Arthur Q&A",
+                "published_description": "Following James Arthurs's talk on Stage B, we will be hosting a Q&A session in the Maths Village / Workshop 5 tent.",
+                "names": "James Arthur",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-03 17:30:00",
+                "scheduled_duration": 30,
+                "venue": "Workshop 5"
+            },
+            {
+                "published_title": "Midnight Maths",
+                "published_description": "We'll be doing some (quiet, as we're near quiet camping) maths at midnight",
+                "names": "The Maths Village",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 23:55:00",
+                "scheduled_duration": 10,
+                "venue": "Workshop 5"
+            },
+            {
+                "published_title": "Demo Compos",
+                "published_description": "Demo Compos",
+                "names": "FieldFX",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 19:00:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Cyanotype Workshop",
+                "published_description": "I am pleased to share my Cyanotype Workshop.\r\n\r\nParticipants do not need to bring items, but if they can bring objects that can be squashed flat (plants, lace, large negatives). This workshop can accommodate 10-15 people.\r\n\r\nThis workshop is broken up into two parts during the day:\r\n\r\nDay structure:\r\n\r\n2.30: Coat cyanotype papers, leave them to dry\r\n3pm: Expose prints to sunlight\r\n3.30pm: Wash and Dry prints \r\n4pm: Close / clean up.\r\n\r\nWarning: Chemistry is non toxic and sustainable, but can be irritating to skin. I will bring gloves.",
+                "names": "Melanie King",
+                "pronouns": "sher/her",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 14:30:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Meditation for Hackers",
+                "published_description": "This is a 2 hour applied meditation workshop, outdoors. No signup or experience required.\r\n\r\nLocation TBD on scouting, will announce at end of day 0. Check https://s.ai/emf or Twitter @saizai or ask in person (I'm the one with hat, glasses, and two white canes).\r\n\r\nWe'll discuss \u2014 and practice \u2014 several very different meditation techniques, such as:\r\n\u2022 breath\r\n\u2022 empty mind\r\n\u2022 parallel concentration / stack overflow \u2020\r\n\u2022 \"inner sanctum\" hypnotic induction \u2021\r\n\u2022 movement\r\n\u2022 grounding & shielding / energy play\r\n\r\n\u2020 tends to work especially well if you find \"emptying your mind\" difficult (e.g. due to ADHD)\r\n\u2021 very simple, with script 100% disclosed beforehand \u2014 no silly stage tricks\r\n\r\n\r\nWe'll discuss several variants of the basic mechanisms, how to customise to your own preferences, and personal experiences (iff you choose to share) \u2014 but no religion, metaphysics, doctrine, or the like.\r\n\r\nPlease:\r\n\u2022 wear or bring something comfortable for sitting on grass/dirt\r\n\u2022 bring a drink & snack\r\n\u2022 pee and stretch beforehand\r\n\u2022 silence all electronics while at the workshop\r\n\u2022 do (only) what works for you\r\n\r\nI use scripts (with included variation suggestions) that work for most people, but not everyone. Please diverge from my instructions if something else feels right. That's common, and kinda the point \u2014 particularly for the hypnotic induction, which needs to be tailored to your own experience).\r\n\r\nLikewise, if something feels uncomfortable or triggering, please switch to a different meditation exercise instead (e.g. the basic breath meditation we start with).\r\n\r\nWhat you share is entirely up to you. I won't call on you. If there's something you'd only be comfortable sharing privately, please find and talk with me at another time.",
+                "names": "Sai",
+                "pronouns": "they",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 13:00:00",
+                "scheduled_duration": 120,
+                "venue": "Lounge"
+            },
+            {
+                "published_title": "Masterclass - Egg Spoon",
+                "published_description": "Egg Spoon Masterclass\r\n\r\nSign up at https://www.eventbrite.co.uk/e/347210906167 - password EMFCAMP",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-02 14:00:00",
+                "scheduled_duration": 120,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmithing - Have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-03 12:30:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmithing - Have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-03 14:00:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmithing - Have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-03 14:30:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmithing - Have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-03 16:00:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmithing - Have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmithing - Have a go",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-03 12:00:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmithing - Have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-03 10:00:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmithing - Have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-03 16:30:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmithing - Have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-03 10:30:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmiths - have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-05 08:00:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmiths - have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-05 12:30:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmiths - have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-05 14:00:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmithing - Have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-03 18:00:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmiths - have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 14:00:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmiths - have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 16:00:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmithing - Have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-03 18:30:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmiths - have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 12:00:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Belgian Beer tasting workshop",
+                "published_description": "We will taste three different Belgian beers and discuss their history and properties. Bring a suitable container you can drink out of, and some water for the full experience. You may also bring other beers for people to taste. ",
+                "names": "Bart Derudder",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 21:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Blacksmiths - Have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 08:30:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmiths - have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 16:30:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmiths - have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 18:00:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmiths - have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-05 10:00:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmiths - have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-05 10:30:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmiths - have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-05 12:00:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Coppersmiths - Bowl making",
+                "published_description": "Make a copper bowl\r\n\r\n16+ only\r\n\r\nMust book on https://www.eventbrite.co.uk/e/347925343067",
+                "names": "Coppersmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-02 14:00:00",
+                "scheduled_duration": 180,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmiths - have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 18:30:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmiths - have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 08:00:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmiths - have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 10:30:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmiths - have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 12:30:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmiths - have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 14:30:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmiths - have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-05 08:30:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmiths - have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-05 14:30:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Blacksmiths - have a go",
+                "published_description": "Have a go at blacksmithing\r\n\r\n16+, 13 -16 with a Parent/Guardian on same course, 11 \u2013 13 with an instructor",
+                "names": "Blacksmiths",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 10:00:00",
+                "scheduled_duration": 90,
+                "venue": "Blacksmiths"
+            },
+            {
+                "published_title": "Barbot",
+                "published_description": "Barbot is a robotic bartender that makes cocktails, both alcoholic and non-alcoholic. Donations will be taken for the project, but the drinks are free!",
+                "names": "Nottinghack Village",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 21:00:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "ADHD/ASD Meetup",
+                "published_description": "Chance for ADHD/ASD folks to meet-up and share experiences in the bar. There are 2 tables booked, look for the signs on the tables. Good ",
+                "names": "ADHD Hackers",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 17:00:00",
+                "scheduled_duration": 90,
+                "venue": "Main Bar"
+            },
+            {
+                "published_title": "The Bomb Defusal - Escape Game",
+                "published_description": "A terrorist organization has planted a bomb in the null-sector, which will detonate soon. Can you team-up and help us defuse the bomb together to save the camp?\r\n\r\nStart the game with the correct color sequence and finish all the puzzles within the 60 minute countdown to defuse the bomb before it detonates.\r\n\r\n2-6 players recommended\r\n60 - 90 minutes playtime\r\n",
+                "names": "-",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-05 14:00:00",
+                "scheduled_duration": 600,
+                "venue": "The Bomb"
+            },
+            {
+                "published_title": "The Bomb Defusal - Escape Game",
+                "published_description": "A terrorist organization has planted a bomb in the null-sector, which will detonate soon. Can you team-up and help us defuse the bomb together to save the camp?\r\n\r\nStart the game with the correct color sequence and finish all the puzzles within the 60 minute countdown to defuse the bomb before it detonates.\r\n\r\n2-6 players recommended\r\n60 - 90 minutes playtime\r\n",
+                "names": "-",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 14:00:00",
+                "scheduled_duration": 600,
+                "venue": "The Bomb"
+            },
+            {
+                "published_title": "DJ Workshop",
+                "published_description": "Come a long and learn about the history and art of DJ'ing.  Get hands-on with your first vinyl record mix on a set of Citronic mono record decks made in England in the the 80\u2019s with tunes from a kids disco at around that time. Try scratching records on a set of Technics SL1210\u2019s and then get hands on with your own device and learning digital DJ skills and techniques.\r\n\r\nWe will primarily use Mixxx software for the workshop as it's so awesome as well as being open source and free, but other free options for tablets and phones are all possible. There will also be an opportunity to plug into a USB Mixer/controller and demo your new skills at the end! The ultimate aim of this workshop is to introduce some basics of DJ'ing. The kids also have the exciting option to DJ at their own Kids Disco later in the evening at 7:30pm!  Royalty free music will be available along with other guidance and options.\r\n\r\nPlease ask kids to wash hands prior to workshop and kids will also be asked to use hand sanitizer before touching shared DJ kit (if this is a concern don\u2019t worry, just take part in the workshop using your device that you brought). I will clean kit in between kids having a shot. Really grateful for patience and understanding.",
+                "names": "Tom",
+                "pronouns": "He/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 12:10:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "The Bomb Defusal - Escape Game",
+                "published_description": "A terrorist organization has planted a bomb in the null-sector, which will detonate soon. Can you team-up and help us defuse the bomb together to save the camp?\r\n\r\nStart the game with the correct color sequence and finish all the puzzles within the 60 minute countdown to defuse the bomb before it detonates.\r\n\r\n2-6 players recommended\r\n60 - 90 minutes playtime\r\n",
+                "names": "-",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-03 20:00:00",
+                "scheduled_duration": 240,
+                "venue": "The Bomb"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-05 12:00:00",
+                "scheduled_duration": 120,
+                "venue": "Family Lounge"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 17:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Communication skills for Geeks",
+                "published_description": "interactive workshop for up to 30 people on various, simple to implement, tips on communication skills. It goes beyond \"make eye contact and don't fidget\". Based on my online courses and lectures / workshops I give to Brunel University Engineering students as a Visiting Professor.",
+                "names": "Lucy Rogers",
+                "pronouns": "She / Her",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 19:20:00",
+                "scheduled_duration": 40,
+                "venue": "Workshop 5"
+            },
+            {
+                "published_title": "What will we wear tomorrow ",
+                "published_description": "Come and listen to a short story about how the choices we make today may effect what your grandchild may be wearing in the future. After the story there will be a textile arts and crafts workshop where children imagine what life may be like for their decedents, and design and make clothing for something they may be doing in the future. Nothing is too fanciful, we have had everything from future space fashion on Mars, to time traveling fish people. \r\nThe workshop gets people thinking about choices we can make now, and issues that we may need to overcome in the future, in a fun and empowering way. Less eco anxiety and doom scrolling, more creativity and joy. \r\n\r\n",
+                "names": "Joanne Rachel Knox",
+                "pronouns": "She her",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 10:40:00",
+                "scheduled_duration": 90,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Pop Up Cafe",
+                "published_description": "Nottinghack are putting on a Pop-Up Cafe at 9AM each day for some early freshly made coffee, tea or other drinks, sweets or snacks served from our Snackspace in Workshop Tent 1. Prices are \u00a31 per item. We'll continue serving snackspace cans all day from the Gazebo attached to Workshop 1.",
+                "names": "Nottinghack Village",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 09:00:00",
+                "scheduled_duration": 50,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Pop Up Cafe",
+                "published_description": "Nottinghack are putting on a Pop-Up Cafe at 9AM each day for some early freshly made coffee, tea or other drinks, sweets or snacks served from our Snackspace in Workshop Tent 1. Prices are \u00a31 per item. We'll continue serving all day from the Gazebo attached to Workshop 1.",
+                "names": "Nottinghack Village",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 09:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Build and fly a rocket",
+                "published_description": "Build and fly a solid-fuelled model rocket from scratch!\r\n\r\nWe'll provide paper templates and all required materials, you cut and tape the rocket together and then decorate it to taste. Once they're all built we'll take the rockets out to the model flying area and launch them from our launch pad.\r\n\r\nAssembling the rocket is straightforward and as they're all made from white card and paper there are plenty of options for decoration or modification. We'll have some helpers on hand to provide guidance.\r\n\r\nSuitable for young children with supervision. The build involves mostly using scissors and tape, one step involves hot glue which requires adult supervision. Feel free to contact us beforehand if you want to check suitability: emf@adamgreig.com or extension 2440.\r\n\r\nThere is a charge of \u00a34 per rocket to cover materials, and a limit of one rocket per child.",
+                "names": "Adam Greig",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 15:30:00",
+                "scheduled_duration": 90,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Bubble Fun!",
+                "published_description": "Who can make the biggest bubble? Whose will last the longest before it pops? Is it possible to make a square bubble? Join us to make your own bubble blowers and investigate the wonderful world of bubbles. ",
+                "names": "Kate Davis",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 09:30:00",
+                "scheduled_duration": 50,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Raspberry Pi Pico Party Poppers",
+                "published_description": "Last year Raspberry Pi launched their first microcontroller-class product: Raspberry Pi Pico. It  is built on RP2040, a brand-new chip developed here in the UK.\r\n\r\nThis workshop will introduce the Pico and dive straight in to programming it with MicroPython. We\u2019ll start with some \u201chello world\u201d onboard LED flashing and move on to using components to build simple circuits.  We'll start with the basics and move on to build a sustainable and reusable party popper using this small but mighty microcontroller.\r\n\r\nYou'll need to bring your own laptop: please install the latest version of the Thonny Python editor before you come. (https://thonny.org/)\r\n\r\nParticipants will be able keep and take their Raspberry Pi Pico away with them after the workshop. ",
+                "names": "Richard Hayler",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 17:20:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Origami Lanterns",
+                "published_description": "Origami Lantern making with LEDs for all age, kids friendly",
+                "names": "Betty Ching",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-05 12:00:00",
+                "scheduled_duration": 100,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Sew tech: a drop in workshop for help with sewing and fabric",
+                "published_description": "Workshop for people to drop in and get help on sewing and textile related questions.\r\n\r\nWant to know how to make a hole in fabric without it fraying? Or how to make seams in fabric waterproof? Perhaps you need to know what a fabric is called so you can source more of it? Come and ask!\r\n\r\nPlease note that this is not a formal workshop with a an end goal: we'll be led by whatever projects you bring, and feel free to drop in/out. ",
+                "names": "Claire Phillips",
+                "pronouns": "she/her",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 11:30:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 5"
+            },
+            {
+                "published_title": "Building a Wearable Captioning Badge",
+                "published_description": "Masks are important for safety but they can make it hard for people to understand what's being said. Back in January, I built a wearable badge which live transcribes speech and displays it to others. \r\n\r\nIn this workshop, we'll build the software that runs on the badge (and your browser) from scratch. You will also be provided with a kit list if you want to build your own physical badge after the event. \r\n\r\nYou will require some (but not much) knowledge of JavaScript. Understanding language fundamentals like variables, data types, conditionals, and functions is plenty.",
+                "names": "Kevin Lewis",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 10:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 5"
+            },
+            {
+                "published_title": "Hacking group interactions",
+                "published_description": "Human interactions can be messy - especially in groups. Often we unconsciously follow bad protocols: Who doesn't know the situation where the loudest/most eloquent/charismatic person gets to dominate the conversation or the HIPPO effect. Or we have battles of two opponents/opinions, with the rest of the group watching in terror or shutting off. How about that awkward silence in a big group where nobody wants to go first, the terror of going in a circle and being expected to be able to contribute at just that moment when it is your turn? \r\n\r\nThere is a better way, and it is easy and fun.\r\n\r\nIn this highly interactive workshop, y'all get to experience and practice simple recipes for structuring interactions that include and involve everyone. \r\n\r\nCome as you are and experience some intercation. Or learn more about the principles and micro structures for these \"group interaction recipes\" at liberatingstructures.com.\r\n\r\n",
+                "names": "Martin",
+                "pronouns": "he/his",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 15:20:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Dippy Skull Assembly Party",
+                "published_description": "A group of people have 3D printed segments of Dippy the Dinosaur's skull from a 3D scan provided by the Natural History Museum.\r\n\r\nThey'll be meeting up with their Dippy-bits to assemble them into a full-size diplodocus skull.",
+                "names": "The dinosaur skull 3D printing crew",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 16:00:00",
+                "scheduled_duration": 60,
+                "venue": "Main Bar"
+            },
+            {
+                "published_title": "Hackspace and Makerspace Meetup",
+                "published_description": "This is a meet up of Makerspaces and Hackspaces to talk about what\u2019s going on, it\u2019s aimed at trustees/directors but it\u2019s open to anyone.",
+                "names": "Hackspace Foundation",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-04 11:00:00",
+                "scheduled_duration": 60,
+                "venue": "Badge Tent"
+            },
+            {
+                "published_title": "Informal retro computing meetup",
+                "published_description": "Just an excuse to meet and talk about old computers or new computers built in an old style. Z80 and 6502 fans meeting in harmony!",
+                "names": "Nathan Dumont",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 11:00:00",
+                "scheduled_duration": 60,
+                "venue": "Lounge"
+            },
+            {
+                "published_title": "Painting with light - Build and paint with your own \"Glowie\"",
+                "published_description": "In this evening activity, we will get hands on drawing with light!\r\n\r\nFirst, we will build our very own \"glowie\" torch (coincell + LED + tape) to keep, explore the brightness of different colours of LEDs and each attendee will get to pick which colour they want to use for the second stage.\r\n\r\nIn the second stage of the activity, we will head outside into the dark (or twilight) and take some long exposure light painting photographs. Common things drawn in the past include initials, basic shapes or just simple lines.\r\n\r\nPrevious photographs - https://twitter.com/gbaman1/status/1036711495189585920",
+                "names": "Andrew Mulholland",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 20:40:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Learn to Solder / Digital Music Synthesis workshop with ArduTouch music synthesizer kit",
+                "published_description": "Anyone can learn to solder!\r\nAnyone can learn to make music, sound (and noise!) with computer chips!\r\n\r\nLearn to solder together a cool, powerful music synthesizer, and learn to make cool music, sound, and noise!\r\n\r\nArduTouch is an open hardware Arduino-compatible music synthesizer kit with a built-in touch keyboard, and with built-in speaker/amplifier.\r\n\r\nThis workshop is for total newbies to learn to solder.\r\nThis workshop is for total newbies to make their own ArduTouch music synthesizer and learn to make music, sound (and noise!) with computer chips. Attendees take the completed synthesiser home at the end of the workshop.\r\n\r\nThe ArduTouch comes pre-programmed with a way cool synthesizer. And I will show you how to re-program it with other way cool (and totally different) synthesizers.",
+                "names": "Mitch Altman",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 13:00:00",
+                "scheduled_duration": 150,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Karaoke ",
+                "published_description": "Get your favourite song on and sing your heart out!",
+                "names": "Hibby",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-03 21:00:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "3D Printing Menstrual Technology ",
+                "published_description": "In this workshop we will show you how to modify a parametric CAD model of a menstrual cup mould using Openscad (https://openscad.org/). We will cover openscad basics and explain how menstrual cups are made.\r\n\r\nThis workshop will be run by The Crimson Wave Project, a Community Interest Company that is working to improve access to sustainable and body safe menstrual products that are suited to all the people who need them, alongside providing inclusive education around menstrual and sexual health more broadly, and one of our main goals is to create customisable menstrual cups. In this workshop, we will show you the basics of openscad and explain the process of creating 3D menstrual cup models. We will bring a resin printer (Elegoo Mars 2) to demonstrate how to make these moulds using resin, and practice casting them in silicone for the first time. \r\n\r\nWe will also share some fun period related facts, such as what people used before pads, tampons and menstrual cups were invented, how the ancient Romans felt about menstrual blood (spoil alert: they believed it could blunt knifes), and how menstrual blood was used as a torture device against Islamic fundamentalists in Guantanamo Bay. \r\n\r\nALL GENDER IDENTITIES WELCOME AND NO EXPERIENCE (OF OPENSCAD OR MENSTRUATING) NEEDED. ",
+                "names": "The Crimson Wave Project",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 16:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "EMF Kids Disco",
+                "published_description": "All kids are welcome to dance the night away at the best Kids Disco on the planet! This is a party for kids by kids!\r\n\r\n(This is also part 2 of the DJ Youth Workshop where any kids interested in DJ'ing at their own Kids Disco will be fully supported to get a chance to all perform using their own laptop/tablet or smart phone.)",
+                "names": "EMF Kids",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 19:30:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Family pizza evening",
+                "published_description": "Join us at the youth tent for a drop in pizza making workshop for families, with all dough and ingredients provided. Learn how to hand stretch the pizza dough, then top it with your favourite toppings.\r\nFinally, launch it into one of the wood fired pizza ovens for a piping hot pizza in under 2 mins.\r\nSuitable for kids aged 6 and up (with some parental help).\r\nNote this activity is only open to families and kids.",
+                "names": "Andrew Mulholland",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 18:30:00",
+                "scheduled_duration": 100,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Pop Up Cafe",
+                "published_description": "Nottinghack are putting on a Pop-Up Cafe at 9AM each day for some early freshly made coffee, tea or other drinks, sweets or snacks served from our Snackspace in Workshop Tent 1. Prices are \u00a31 per item. We'll continue serving snackspace cans all day from the Gazebo attached to Workshop 1.",
+                "names": "Nottinghack Village",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 09:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Marshmallow Astronauts",
+                "published_description": "Have a go at creating a spacesuit for a marshmallow astronaut using equipment in the Mini Maker's Space. Once your astronaut is suited and booted, find out if they could survive in space by placing them in a vacuum chamber.",
+                "names": "Kate Davis",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 15:10:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Geogebra Drop-in",
+                "published_description": "Drop into the maths village to play with the open-source dynamic geometry tool Geogebra.",
+                "names": "Alison Kiddle",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 20:05:00",
+                "scheduled_duration": 55,
+                "venue": "Workshop 5"
+            },
+            {
+                "published_title": "Rakit Drum Synth - Build/Solder your own Drum Synthesizer",
+                "published_description": "Participants can build their own Electronic Noisemaker or Synth Kit, learn to solder and become familiar with circuit boards and components along the way.\r\n\r\nThe Rakit Drum Synth is based on the (now rare) Boss PC-2/AMDEK PCK-100 percussion synthesizer. The synth is triggered by a piezo disc which is sensitive to how hard you tap the top panel giving subtle differences in the envelope. The sounds are generated by a VCO optionally modulated by a frequency sweep, LFO, Pitch CV or all three. Its a true analogue synthesis engine.\r\n\r\nPlease bring a smartphone to browse the instructions or any of your own equipment.\r\n\r\nTwo experienced engineers will be on hand to steer people in the right direction and offer a helping hand. Please, ask us questions!",
+                "names": "Darren Blaxcell - rakits.co.uk ",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 16:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Tech Worker Coops informal meetup",
+                "published_description": "Do you work for a tech worker cooperative, or interested in talking people who do? This is just an informal chat, not a structured conversation. Look for my purple hair and A4 co-ops poster.\r\n\r\n(A worker cooperative is am organisation democratically run by its employees.)",
+                "names": "Organised by Ben/Bee W",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 18:00:00",
+                "scheduled_duration": 60,
+                "venue": "Main Bar"
+            },
+            {
+                "published_title": "Metal Synth - Build/Solder your own Metal Percussion Synthesizer",
+                "published_description": "Participants can build a Metal Synth Kit, learn to solder and become familiar with circuit boards and components along the way.\r\n\r\nThe Rakit Metal Synth has a Polivok\u2019s inspired filter at its core. It uses this, along with a punchy AD envelope to produce a variety of percussive sounds from shaped noise. The filter is switchable between band pass and low pass modes and a resonance control featuring self oscillation at high resonance settings.\r\n\r\nPlease bring a smartphone to browse the instructions or any of your own equipment.\r\n\r\nTwo experienced engineers will be on hand to steer people in the right direction and offer a helping hand. Please, ask us questions!",
+                "names": "Darren Blaxcell - rakits.co.uk ",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 18:00:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Gamestorming",
+                "published_description": "Video games are such a huge part of our lives, come along to my session to really delve deep into how to gamestorm (brainstorm) your own. Every game from the most sprawling fantasy RPG to the most chilling monster thriller, starts with an idea and a discussion and that is what we are going to do today.",
+                "names": "Claire Mulholland",
+                "pronouns": "She/Her",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 13:50:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "The future of podcasting is adaptive, open and data ethical",
+                "published_description": "BBC R&D have been working on reinventing podcasting in a open and data ethical way.\r\n\r\nImagine making podcasts that sound different based on what time your listening, where they are and what language is their default. Imagine up to 100+ layers of audio including binaural audio and text to speech to round off a new podcast experience.\r\n\r\nThis is only the start of what adaptive podcasting can do.\r\n\r\nIn this 2 part workshop.\r\n\r\nPart 1: We will explore what adaptive podcasting is, how it works and what are the possibilities, and a few demos of what has been done so far. There will be lots of time for questions and answers.\r\n\r\nPart 2: Will have you experimenting and creating your own podcasts using the web editor and/or directly with code. The results can be shared with others in the camp and the wider community.",
+                "names": "Ian Forrester",
+                "pronouns": "He/Him",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 14:50:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 5"
+            },
+            {
+                "published_title": "Building a TinyGS Station ",
+                "published_description": "Sorry we are sold out. \r\n\r\nSpace is fun. Receiving data from space is even better.\r\n\r\nTinyGS is an open community-run network of Ground Stations distributed around the world to receive and operate LoRa satellites, weather probes and other flying objects, using cheap and versatile modules. https://tinygs.com/\r\n\r\nThis hands-on workshop will cover building, programming and setting up your own TinyGS station.\r\n\r\nParticipants will build their very own quarter-wave ground plane antenna, and base station to take home. All they have to do is plug the box into a USB charger.\r\n\r\nPayments for this workshop can be taken via Revolut, Paypal or cash in person. \r\n\r\nNo amateur radio license is required to operate the station, only if you wish to send data to space.  \r\n\r\nIf you would like to chat about the project or see a station in action visit the Irish Embassy. https://wiki.emfcamp.org/wiki/Village:Irish_Embassy\r\n\r\nMy home station in action https://tinygs.com/station/EI7IRB_2@747769602\r\n\r\nStation at EMF https://ibb.co/VvxBGpz\r\nhttps://tinygs.com/station/emfcamp_TinyGS@747769602\r\n\r\nIf you would like to prebook a place at this workshop please visit the Irish Embassy. https://wiki.emfcamp.org/wiki/Village:Irish_Embassy\r\n\r\nWire Lengths To Cut\r\nVertical Monopole 16.5 cm\r\nRadials (Bend to 45 degrees) 18.4 cm\r\n\r\nLink to TinyGS Community Chat https://t.me/joinchat/DmYSElZahiJGwHX6jCzB3Q\r\nBackground blog post: https://www.tog.ie/2022/02/building-a-tinygs-station/\r\n",
+                "names": "Jeffrey Roe",
+                "pronouns": "He/Him",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 14:10:00",
+                "scheduled_duration": 120,
+                "venue": "AMSAT-UK"
+            },
+            {
+                "published_title": "Badge Soldering Workshop @Nottinghack",
+                "published_description": "Badge making using badge kits and soldering irons, simple little kits for adults and children to learn basic soldering. Children should be accompanied by a parent. There is a small cost to buy the kits themselves (cards accepted).",
+                "names": "Nottinghack Village",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 10:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Introduction to Designing for the Laser Cutter",
+                "published_description": "Learn the basics of how to design for the laser cutter. \r\n\r\nDeciding on engraving vs cutting. Considerations when creating 3D objects. \r\n\r\nDuring the workshop you will create a design to engrave your name, engrave a picture and learn how to create basic boxes.\r\n\r\nLearn a few tips and tricks that you can think about for future projects: where to download laser designs you can use, converting to vectors for cutting, cuts to allow you to curve wood, locking mechanisms. \r\n\r\nResources: https://docs.google.com/document/d/1tk2IrHhytj5xr5TRknFLPdJ2dUxMPzf32Sihtp5zsLA/edit?usp=sharing",
+                "names": "Lydia Monnington",
+                "pronouns": "she/her",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 17:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Surface Mount Electronics Assembly for Terrified Beginners",
+                "published_description": "In this workshop, you will learn how to assemble the tiny parts that modern electronic devices are made of by building an electronic kitten. There's no prior experience or equipment required, and you don't need to know anything about electronics. We are going to build an electronic cat-shaped circuit board using tiny SMD parts. It will purr when you touch it right and hiss when you touch it wrong. It's going to work. This workshop is meant for people afraid of surface mount assembly/rework. It's my goal to take away your fear.",
+                "names": "Kliment",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-03 16:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Mixed RPGs - Dungeon Crawl Classics and D&D",
+                "published_description": "Dungeon Crawl Classics - Easy to get started and very freewheeling and chaotic.\r\n\r\nD&D - Short intro to D&D for all ages\r\n\r\nIf you want to run your own RPG game here for 3 hours (give or take Barbot starting time) contact Andrew: andrew.armstrong@nottinghack.org.uk",
+                "names": "Steve Barnett (Dungeon Crawl Classics) Andrew Armstrong (D&D)",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 18:00:00",
+                "scheduled_duration": 160,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Surface Mount Electronics Assembly for Terrified Beginners",
+                "published_description": "In this workshop, you will learn how to assemble the tiny parts that modern electronic devices are made of by building an electronic kitten. There's no prior experience or equipment required, and you don't need to know anything about electronics. We are going to build an electronic cat-shaped circuit board using tiny SMD parts. It will purr when you touch it right and hiss when you touch it wrong. It's going to work. This workshop is meant for people afraid of surface mount assembly/rework. It's my goal to take away your fear.",
+                "names": "Kliment",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 19:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Just Draw the Thing",
+                "published_description": "JDTF - Draw your Ideas - Pictures have lots more bandwidth than words alone. Learn ways to visually share your ideas for fun profit and to generate better ideas. Suitable for all no drawing experience required. Pens and paper provided. Bring ideas you'd like to draw. ",
+                "names": "Mike Haber",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 14:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Layout the EMF badge",
+                "published_description": "At this workshop, we will learn to design circuit boards by redesigning the EMF badge bottom PCB. No prior experience with electronics or circuit board design is required. We will start with a simple exercise in fitting a design on a small pcb, and then move on to routing the main microcontroller chip of this year's EMF badge. Make sure you have a laptop with KiCad installed on it *before* you show up.",
+                "names": "Kliment",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 12:00:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Badge Soldering Workshop @Nottinghack",
+                "published_description": "Badge making using badge kits and soldering irons, simple little kits for adults and children to learn basic soldering. Children should be accompanied by a parent. There is a small cost to buy the kits themselves (cards accepted).",
+                "names": "Nottinghack Village",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 11:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "Why Feedback Sucks and what to do about it",
+                "published_description": "Why Feedback Sucks, An interactive nerd out of all the different meanings of the word feedback and how we can do feed back better. Suitable for all, however you define feedback. You've leave being better equipped to react when someone asks for or offers feedback. ",
+                "names": "Mike Haber",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 14:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "SEM training",
+                "published_description": "Learn how to use the SEM, so you can help out later today.\r\n\r\nI'll train you how to use the portable SEM, but in return is like some help running the event from 8pm tonight!\r\n\r\n",
+                "names": "Alex Ball",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-02 17:30:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector SEM"
+            },
+            {
+                "published_title": "Do you even write shaders bro?",
+                "published_description": "Learn how to make 3d graphics with code.",
+                "names": "evvvvil",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 17:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Building mathematical structures with modular origami",
+                "published_description": "Work together to build the platonic solids.\r\n\r\nCreate core units and combine them into a range of different shapes. \r\n\r\nExplore the range of shapes you can create.   \r\n\r\nAdditionally: Bring your old train tickets or cards. Learn to turn them into cubes that you can keep or add to our growing Menger sponge.\r\n\r\nInstructions\r\n\r\nCube\r\nSonobe Module: First half of page 1 https://www.amherst.edu/media/view/290032/original/oragami.pdf \r\nCube: 6x Sonobe modules\r\n\r\nTriangle based: https://www.make-origami.com/HelenaVerrill/tetraunit.php\r\n\r\nDodecahedron\r\nEasy https://static.mathigon.org/origami/dodecahedron-easy.pdf\r\nHard p57 Daisy Dodecahedron 1  https://www.utm.edu/staff/Caldwell/origami/marvelous_modular_origami.pdf ",
+                "names": "Lydia Monnington",
+                "pronouns": "she/her",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 14:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 5"
+            },
+            {
+                "published_title": "Blinkenrocket/Learn to solder",
+                "published_description": "The Blinkenrocket is a soldering kit that was developed especially for kids and young adults. Components of varying complexity will teach you how to solder in no time.\r\n\r\nThe really interesting part about the Blinkenrocket is it's programmable interface over audio. Texts and animations are simply created and transfered from your mobile, tablet or computer directly from this website. A 64 led dot-matrix display enables a variety of of display options. External pins on the sides allow for physical extendability of the Blinkenrocket.",
+                "names": "overflo",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 13:00:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Arduino For Total Newbies - Learn to solder version",
+                "published_description": "You've probably heard lots about Arduino.  But if you don't know what it is, or how you can use it to do all sorts of cool things, then this fun and easy workshop is for you. You will also learn to solder by making your own arduino board.\r\n\r\nArduino is an amazingly powerful tool that is very simple to learn to use.  It was designed so that artists and non-geeks can start from nothing, and make something cool happen in less than 90 minutes.  Yet, it is powerful enough so that uber-geeks can use it for their projects as well.  \r\n\r\nThis workshop is easy enough for total newbies to learn all you need to know to get going on an Arduino.  Participants will learn to solder, learn everything needed to play with electronics, and make a TV-B-Gone remote control to turn off TVs in public places with the board they just soldered -- a fun way to learn soldering, Arduino (and electronics) basics.\r\n\r\nAt the end of the workshop attendees get to take the TV-B-Gone they have built away with them.",
+                "names": "Mitch Altman",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 15:00:00",
+                "scheduled_duration": 200,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Paper Circuits Workshop",
+                "published_description": "Learn about electronics by crafting LEDs with card and sticky back copper strip. No previous experience of circuit making required.",
+                "names": "Peter Jackson",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 17:00:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Surface Mount Electronics Assembly for Terrified Beginners",
+                "published_description": "In this workshop, you will learn how to assemble the tiny parts that modern electronic devices are made of by building an electronic kitten. There's no prior experience or equipment required, and you don't need to know anything about electronics. We are going to build an electronic cat-shaped circuit board using tiny SMD parts. It will purr when you touch it right and hiss when you touch it wrong. It's going to work. This workshop is meant for people afraid of surface mount assembly/rework. It's my goal to take away your fear.",
+                "names": "Kliment",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-05 17:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Family activities with the SEM",
+                "published_description": "A family friendly session to allow children to use the Scanning Electron Microscope. Bring your own samples, or look at cool stuff that we've brought with us.\r\n\r\nSamples must be dry, small (3-5mm diameter max), not oily, not magnetic and not crumbly.",
+                "names": "Alex Ball",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 13:00:00",
+                "scheduled_duration": 120,
+                "venue": "Null Sector SEM"
+            },
+            {
+                "published_title": "From Zero to root in 120 minutes - Introduction to Wordpress Hacking",
+                "published_description": "To set the film scene: The Hacker opens a black console window, types fast on the keyboard and suddenly has root on the target system, saving the day. But how does this look like in reality?\r\n\r\nIf you drop by with a Laptop running Kali-Linux either from USB-Stick or from within a virtual machine, I will walk you through the necessary steps. From analyzing the target system, finding exploits on it on to successfully hacking the \"victim\" using metasploit. And if you are quick enough and behave, we might even get so far as to remotely crash the system.\r\n\r\nThis is an introductionary level workshop targeted at a novice/beginner level audience that wants to learn how \"hacking\" actually works. InfoSec personel and other \"professionals\" attending this session will get shanghaied into supporting the other attendees. \r\n\r\nPrerequisites: Bring your own/a Laptop running a recent version of Kali-Linux inside a virtual machine or from a USB stick.",
+                "names": "Martin Leyrer",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 12:20:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Solder Some Solar",
+                "published_description": "Make your own solar powered torch.\r\nAttendees will solder together a small LED torch with a solar panel. Charge up the ultra-capacitor during the day, for light when you need it. This brings in a bit about solar energy and also for beginners to try out soldering. \r\nAttendees will take away their little solar torch which also has a keyring. Suitable for all ages. Soldering will be guided.",
+                "names": "Matthew Little",
+                "pronouns": "He/Him",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 10:30:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Origami Boomerang Folding",
+                "published_description": "Learn to fold and throw a paper origami boomerang - that really comes back when you throw it! Paper will be provided.",
+                "names": "Ollie, Aiden, & Rob McKinnon",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 09:30:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "DIY Light Up Festival Bracelets",
+                "published_description": "Come learn about E-textiles by making your very own felt bracelet decorated with LED lights. In this workshop we will use felt shapes and buttons to make a bracelet and decorate it. Then we will add a light up component by threading a simple circuit with LEDs and coin-cell batteries. Participants can keep and take home their creations.\r\nComplete beginners to sewing & electronics welcome!\r\n\r\nPlease note: parents need to supervise throughout as we will be using a needle and thread!",
+                "names": "Dervla O'Brien",
+                "pronouns": "she/her",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 10:50:00",
+                "scheduled_duration": 60,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Hacking Alchemy: Turning Household Materials into Gold",
+                "published_description": "Turning ordinary materials into precious silver or gold has been the ultimate goal of alchemy for centuries. The mythical \"Philosopher's stone\" was thought to be the missing key needed for that, but much to the disappointment of generations of alchemists, the elusive Stone was never found, and the promise of unlimited wealth remained a dream. Until less than a century ago. \r\n\r\nWhen British physicist James Chadwick discovered the nature of the neutron in 1932, it soon became apparent that these subatomic particles can change the composition of an atom's nucleus. By adding neutrons to a nucleus, or removing neutrons from a nucleus, the atom can be made unstable and forced to undergo changes, now known as radioactive decay. These nuclear reactions can change an isotope of an element into another isotope of the same element, or even into an entirely different element. By choosing nuclear reactions and decays carefully, it becomes possible to turn other materials into gold. Traditionally, nuclear reactions require a very large and expensive nuclear reactor or particle accelerator, but a clever hacker doesn't need any of these! \r\n\r\nThis workshop starts with a 30 minute entry level introduction to nuclear physics to explain attendees the scientific principles of elemental transmutation. Attendees then build together their own Philosopher's stone with components that can be found in any hardware store, and finally use it to transmute (a few atoms) of liquid mercury into gold. After the workshop, attendees have the option to take their creation home.",
+                "names": "Yannick",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 15:50:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 5"
+            },
+            {
+                "published_title": "Infrastructure Club meetup",
+                "published_description": "Meet-up for folks who hang out at the Infrastructure Club Slack",
+                "names": "Alexander Baxevanis",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 18:00:00",
+                "scheduled_duration": 60,
+                "venue": "Lounge"
+            },
+            {
+                "published_title": "Bridge Building",
+                "published_description": "A family workshop where we gather in teams to build bridges out of lollipop sticks and using hot glue guns. The format of the sessions is a short talk about the engineering principles in bridge design. Then we split up into teams and work together to make a bridge that spans 35cm.\r\n\r\nAfter an hour we all come together to test each bridge by hanging weights off its centre. Each bridge is tested to destruction. The bridge that holds the most weight is the winner and they receive a small token prize.",
+                "names": "Jeffrey Roe, Christian Kortenhorst ",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 16:30:00",
+                "scheduled_duration": 90,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "Null Sector",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-04 18:00:00",
+                "scheduled_duration": 240,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "Build Your First Battlesnake!",
+                "published_description": "Battlesnake is a multi-player programming game played by developers all over the world. All you need to play is a live web server that implements the Battlesnake API. In this workshop you'll build your first snake - a \"snake-foundation\" - so you have a solid starting point to build up your own combat-worthy Battlesnake.\r\n\r\nThe workshop will be run using the JavaScript Starter Snake as the example, but Battlesnakes can be written in any language that can have a web server. \r\n\r\nIf there's time we may even pit some baby snakes against each other in a tournament. \r\n\r\nYou will require some (but not much) knowledge of JavaScript. Understanding language fundamentals like variables, data types, conditionals, and functions is plenty.",
+                "names": "Kevin Lewis",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 10:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 5"
+            },
+            {
+                "published_title": "Learn how to program (LEGO) rovers used in the most challenging environments",
+                "published_description": "Do you have what it takes to program rovers used in the most difficult environments? Would you like to learn how to code robots from scratch? \r\n\r\nYou'll teach your rover how to explore its surroundings and gather data from the environment with a set of challenges - starting off with some basics, and working up towards following a course we set.\r\n\r\nYou'll also learn about how we test real Mars rovers (and LEGO ones!) in the Mars Yard at Boulby Underground Laboratory 1.1km underground, and learn what else this, and our other, exciting laboratories are used for!\r\n\r\nExperience with using Scratch or having done some sort of programming can help - but you don't need it, we\u2019re going to run through the coding with you - all you really need is enthusiasm!",
+                "names": "Will Furnell",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 12:20:00",
+                "scheduled_duration": 90,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Introduction to leatherwork",
+                "published_description": "This workshop is an absolute beginner\u2019s guide to leatherwork, covering the things that I wish I had known when I was first starting. I intend for this workshop to be useful to people who have never worked with leather before and would like to learn the skills needed to start making or repairing leather goods.\r\n\r\nI will discuss the three main types of leather and which to choose; the basic tools you will need to start making leather goods (and how to use them); how to dye leather; how to attach eyelets, rivets, and buckles; and the three main types of stitch.\r\n\r\nFor the practical part of the workshop, you will be sewing a leather keyring using one of the most common types of stitch. Saddle Stitch uses one piece of thread with a needle at each end to create a stitch line that is both beautiful and resilient. The leather, thread, and tools needed to create your keyring will all be provided. Please bring your own scissors, or a knife to cut the thread, and a lighter if you have one.",
+                "names": "Mark Parnaby",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 12:10:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 5"
+            },
+            {
+                "published_title": "",
+                "published_description": "Come and explore the Night Market, where you'll find arts, crafts, electronics kits, and things you never knew you needed.",
+                "names": "Null Sector",
+                "pronouns": "",
+                "may_record": null,
+                "scheduled_time": "2022-06-05 18:00:00",
+                "scheduled_duration": 240,
+                "venue": "Null Sector"
+            },
+            {
+                "published_title": "A Model EMF",
+                "published_description": "Come and make yourselves, your village or your favourite part of EMF Camp out of clay to create a miniature Electromagnetic Field. We hope to grow our model EMF throughout the weekend and then you are welcome to take home your creations if you would like to. ",
+                "names": "Kate Davis",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 11:00:00",
+                "scheduled_duration": 50,
+                "venue": "Youth Workshop"
+            },
+            {
+                "published_title": "Soft Electronics: Sewing Circuits",
+                "published_description": "Learn how to work with conductive thread to sew your own circuits. In this workshop we will make a plush sparkle heart emoji with felt, LEDs and conductive thread. You will learn:\r\n\r\n- tips and tricks for using the different types of conductive threads\r\n- how to hack regular through hole components into sewable ones\r\n- how to make a simple electronic circuit that lights up an LED\r\n\r\nAll materials will be provided, along with a printed zine to help you sew circuits in the future. Suitable for beginners and older children (11+). It will help if you know how to thread a needle and tie a knot but instruction will be provided.",
+                "names": "Helen Leigh",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 14:20:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 1"
+            },
+            {
+                "published_title": "What\u2019s in the water?",
+                "published_description": "Join a group of ecologists and digital tech nerds to discover what\u2019s living in the river and what it means for the environment. We will be using eco-acoustic sensors to record underwater wildlife all weekend (linked to our planned installation). In this workshop, we will be getting into the river to try to find the creatures that we have (hopefully!) recorded. We\u2019ll demonstrate techniques that can be replicated by anyone, anywhere, to give a quick indication of how healthy or polluted a river is. We will start by listening to our recordings to see if we can guess what we have found. We will then give a 15-min crash course on identifying eight types of invertebrates that can be found in rivers, each of which indicates different environmental conditions. Under the direction of workshop participants, our workshop leads will get into the river and collect some wiggly creatures. Everyone will count which species we have found and we will finish with a score that indicates how healthy or polluted the river is. If we have time, we will also demonstrate some simple tests to detect pollutants in the water. Participants will receive information to take home with them about different techniques that they can use to monitor river health for themselves, ranging from in-river surveys to Arduino sensor builds.\r\n\r\nWarning: We are not planning for participants to go in the water, but they may come into contact with the water so please cover up any cuts or broken skin.\r\n\r\nIf you cannot make our workshop time slot then do come across to our \"what's in the water\" village - we plan to be around at midday on Fri / Sat to run informal workshops.",
+                "names": "Isabel Bishop, Dhruv Kumar, Duncan Wilson",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 11:20:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Machine learning playtime. Make normal objects clever with the micro:bit",
+                "published_description": "The world is being shaped by machine learning. In fact, lots of the pages you visit on the internet are curated by algorithms that have learned what you like, or might buy.\r\n\r\nBut what's actually going on? And how do machines 'learn'?\r\n\r\nIn this workshop we'll use the BBC micro:bit to make everyday objects that you bring along, or people that you attach a device to, smarter with machine learning. Make a tennis racket that knows whether you've played a forehand or a backhand, or a shoe that knows whether you're walking or running. Or perhaps a device that can detect your dance moves.\r\n\r\nBy going through the whole process of collecting data, training a model and then testing the model, we'll demystify some of how machine learning works in the real world, and hopefully have some fun throwing micro:bits around doing it.\r\n\r\nWe're testing some new software for use with the micro:bit, and this is one of our first outings with it. Please come with the spirit of adventure. Families welcome as long as there are some members who are keen to lead the others!\r\n\r\nSuitable for children under 8 if helped by an adult.",
+                "names": "Jonny Austin",
+                "pronouns": "He/Him",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 13:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Applied String Theory",
+                "published_description": "At this workshop we will be using strings or cord to make cross body carrier for your water flask in macrame technique. \r\n\r\nThe Art of knot-tying dates back several centuries. It is believed that the word macrame is derived from the Arabic macramia which means \"ornamental fringe\". Macrame was first brought by Arabs to Spain and after spread from Spain to Italy and eventually to the rest of Europe. Sailors played a large role in keeping Macram\u00e9 alive and sharing the art with new lands. Knots had many practical uses aboard their ships and decorative knot-tying kept hands and minds occupied during long voyages.\r\nModern macrame is having a huge revival. The repetitive tying of knots is soothing and meditative and great for mindfulness. It is also a craft that requires very little \u2013 just cord and scissors. There are few basic knots in macrame and, once you have mastered them, the possibilities of what you can create are endless.\r\n\r\nDuring the workshop we will create a crossbody water flask holder/carrier using cotton string.\r\nThe basic model requires about 15 meters of cord and around 60 knots in total - cotton cord and the printed instructions will be provided. The project can be completed in under two hours. Participants can keep and take home their creations.\r\n\r\n",
+                "names": "Elena Vataga",
+                "pronouns": "she/her",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 16:30:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Karaoke 2: Sing again",
+                "published_description": "Come again armed with your favourite songs, belt them out and avoid the rain!",
+                "names": "Entertentment",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-04 21:00:00",
+                "scheduled_duration": 300,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Sense without sight / blind navigation hands-on workshop",
+                "published_description": "*Schedule time & location is wrong*\r\n1. Sign-up required: https://s.ai/emf/ws\r\n2. *Time varies each day* on on weather, my stamina, etc. I'll call you to coordinate. Call me if I don't contact you by 11am. Lasts ~1\u20132 hours.\r\n3. Location: *my tent*, near the Hardware Hacking Area, marked with a purple/yellow/black conlang flag.\r\n\r\nTake a walk with me through camp \u2014 blindfolded, with one of my guide canes \u2014 and sense the world like I do: using air currents, heat, sound, echolocation, ground texture, wind shadow, and more. It's a unique, permanent sensory upgrade you can still use when sighted.\r\n\r\nI can handle 4 student participants, 4 assistants, & 5 observers per workshop.\r\n\r\nDetails & what to expect: https://s.ai/emf#workshop\r\nSign up now: https://s.ai/emf/ws",
+                "names": "Sai",
+                "pronouns": "they",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 20:00:00",
+                "scheduled_duration": 90,
+                "venue": "Lounge"
+            },
+            {
+                "published_title": "Whiskyleaks",
+                "published_description": "Many bottles arrive, none leave. \r\n\r\nBring a bottle of your favourite whisky (other spirits are available) and share it with other passionate drinkers. \r\n\r\nIf you can\u2019t bring a bottle, come along - remember for next time you should bring one!",
+                "names": "Milliways",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-02 20:00:00",
+                "scheduled_duration": 240,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "Build your own Geiger Counter",
+                "published_description": "Ionizing radiation, resulting from nuclear reactions or radioactive decay, is invisible to the human eye yet it is all around us. Whether it's coming from space, from radioactive elements in the Earth, or from human activity, ionizing radiation is passing through us everywhere we go, anywhere on the planet. Radioactive decay producing alpha, beta, or gamma radiation is happening all the time, and curiously, some objects in daily life are noticeably more radioactive than others! Welding rods, camping gas mantles, smoke detectors, granite table tops and even bananas, they all produce radiation of different types and different energies.\r\n\r\nOne instrument to detect ionizing radiation is a Geiger-M\u00fcller tube, a simple gas filled tube. When exposed to high energy radiation, the inert gas inside is ionized and able to transport electrical charges. These charges can be detected using an electronic circuit, and visualised or sent to a speaker to produce the typical ticking sound often associated with radioactivity in popular culture.\r\n\r\nIn this workshop, attendees learn about the different types of ionizing radiation, and proceed to build their own Geiger counter based on an authentic 1970s Soviet Geiger-M\u00fcller tube. Because let's be honest: everyone loves a bit of Soviet nostalgia! This requires basic soldering and electronics skills. Once built, attendees calibrate their instrument and test it with different radiation sources. Attendees can choose to take their Geiger counter home after the workshop.",
+                "names": "Yannick",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 20:00:00",
+                "scheduled_duration": 100,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "How to make a cool '90s Protracker Module on an Amiga (or using emulation)",
+                "published_description": "Null Sector's DJ Narq, aka Reflex of Grasshopper D / Eltech / Darq / Howlistic presents a two hour protracker extravaganza!\r\n\r\nProtracker was the standard tool for making computer game music on the Commodore Amiga home computers of the 80s and 90s.  Using 4 channels of 8-bit sampled sound and a maximum of around 1MB of ram, making something sound good requires a few tricks.\r\n\r\nI'd like to share the mystery and wonder of Protracker - the Esperanto of tracker software - to a wider audience. \r\n\r\nIn this workshop we'll demonstrate:\r\n\r\nhow to sample your own sounds\r\nhow to rip samples from other peoples mods\r\nwhere to find decent mods\r\nhow to remix mods\r\nhow to edit samples using amiga software\r\nhow to loop samples cleanly\r\nhow to make protracker patterns, and then assemble patterns into a song.\r\n\r\nYou can follow along with a laptop and headphones!  You'll just need to install fs-uae (https://fs-uae.net) on linux or mac, or winuae (https://www.winuae.net/) on Windows **before** the workshop.  We'll be using ProTracker 2.3d from back in the day, or ProTracker 2.3f which is a recently bugfixed version.  https://github.com/8bitbubsy/pt23f\r\n\r\nIf you've never seen a tracker, it's like a spreadsheet where each row plays a bunch of sounds.  Load a few samples, start it recording, and you can quickly make fun and catchy patterns using instruments, speech, singing, or drum loops.\r\n\r\nAbout your instructor.\r\n\r\nI was exposed to mods and amiga game music in the early 90s and my mind was thoroughly blown.  Through cover disks and PD (public domain) libraries I discovered Med, Sound Tracker, and  Octamed, all classic trackers.  But it was in 1993 when I joined the Amiga demoscene as a young teen that my eyes, ears, and mind were really opened.  Donning the handle Reflex, I first joined a group called Eltech and then later Grasshopper Developments, two mid-tier demogroups of the UK scene. Protracker was the standard that literally everybody on the scene used. I didn't release tons of stuff back then, but I was horse famous for a bit with some cheeky chip tunes and sampled songs about grasshoppers.",
+                "names": "DJ Narq / Reflex",
+                "pronouns": "He/Him",
+                "may_record": false,
+                "scheduled_time": "2022-06-04 14:00:00",
+                "scheduled_duration": 120,
+                "venue": "Workshop 2"
+            },
+            {
+                "published_title": "LED Strips Everywhere for Everyone!",
+                "published_description": "Learn how to program LED strips.\r\nIt's super easy and fun to make your life trippy.\r\nFor total beginners.\r\n\r\nAbstract\r\n\r\nLearn how to light up LED strips with a cheap Arduino, and make your life trippy.\r\nFor total beginners -- no knowledge needed at all.\r\n\r\nFull Description\r\n\r\nLED strips have become really inexpensive. Lots of people have created inexpensive methods of controlling their color and brightness. This workshop shows one way to control LED strips, and to make them do what you want. We will use a very inexpensive Arduino clone. I'll show you everything you need to know to use existing programs -- as-is, or to hack on -- to control the colors in your world with LED strips.\r\n\r\nWorkshop Itinerary\r\n\r\n* Intro to Red-Green-Blue (RGB) LEDs\r\n* Brief intro to Arduino\r\n* How to use an Arduino to control an LED strip\r\n* Some demos of programs you can download\r\n\r\nAttendees take the kit home at the end of the workshop.\r\n",
+                "names": "Mitch Altman",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 22:00:00",
+                "scheduled_duration": 90,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Make an E-Textile Smart Pillow",
+                "published_description": "Squeeze a pillow to pause Netflix? Brush your hand across the same pillow to turn up the volume? Smart textiles can let us interact with our computers and devices without needing to use a touch screen. In this workshop you will design and build your own smart pillow, which when connected to your laptop, can be programmed to control your favourite streaming services. You will start by prototyping your design with paper circuitry and then will start sewing. Bring along your laptop and all other materials will be provided including an Arduino-compatible microcontroller and Trill capacitive sensor by Bela. No coding experience is needed, but some previous sewing experience will be helpful. If you don\u2019t finish sewing your pillow in the workshop, you can take the necessary materials home with you.\r\n\r\nFull documentation, including Arduino library installation instructions you can follow ahead of time at: https://github.com/theleadingzero/smart-pillow/wiki",
+                "names": "Becky Stewart",
+                "pronouns": "she/her",
+                "may_record": false,
+                "scheduled_time": "2022-06-05 12:20:00",
+                "scheduled_duration": 180,
+                "venue": "Workshop 4"
+            },
+            {
+                "published_title": "Build Your Own Z80 Retro Computer Kit",
+                "published_description": "The RC2014 is a Z80 based computer kit that runs Microsoft BASIC, and introduces you to the cutting edge world of computing in the late 1970s!\r\n\r\nIn this workshop, I will take you through the steps involved in building an RC2014 Micro, explaining how it works, what you can do with it, and, how to troubleshoot it if necessary.  By the end of the workshop you will have a working retro computer to take home that can be plugged in to a laptop.\r\n\r\nI will have soldering irons, wire cutters etc for attendees to use, but feel free to bring your own equipment if you prefer.",
+                "names": "Spencer Owen - RC2014",
+                "pronouns": "He/Him",
+                "may_record": false,
+                "scheduled_time": "2022-06-03 16:00:00",
+                "scheduled_duration": 60,
+                "venue": "Workshop 3"
+            },
+            {
+                "published_title": "Explore samples with light microscopy",
+                "published_description": "Bring your own samples along and look at them through a light microscope.\r\n\r\nI'll also be talking about a project using 3D printed models to engage with visually impaired children and to give them an appreciation of the microscopic works around them.",
+                "names": "Alex Ball",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-05 11:00:00",
+                "scheduled_duration": 60,
+                "venue": "Null Sector SEM"
+            },
+            {
+                "published_title": "Arduino For Total Newbies - Solderless version",
+                "published_description": "You've probably heard lots about Arduino.  But if you don't know what it is, or how you can use it to do all sorts of cool things, then this fun and easy workshop is for you.  \r\n\r\nArduino is an amazingly powerful tool that is very simple to learn to use.  It was designed so that artists and non-geeks can start from nothing, and make something cool happen in less than 90 minutes.  Yet, it is powerful enough so that uber-geeks can use it for their projects as well.  \r\n\r\nThis workshop is easy enough for total newbies to learn all you need to know to get going on an Arduino.  Participants will learn everything needed to play with electronics, and use a solderless breadboard to make a TV-B-Gone remote control to turn off TVs in public places -- a fun way to learn Arduino (and electronics) basics.\r\n\r\nAt the end of the workshop attendees get to take the TV-B-Gone they have built away with them.",
+                "names": "Mitch Altman",
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": "2022-06-05 12:00:00",
+                "scheduled_duration": 200,
+                "venue": "Workshop 3"
+            }
+        ],
+        "counts": {
+            "needs_help": {
+                "false": 157,
+                "true": 22
+            },
+            "needs_money": {
+                "false": 179
+            },
+            "needs_laptop": {
+                "false": 56,
+                "null": 123
+            },
+            "one_day": {
+                "false": 179
+            },
+            "notice_required": {
+                "1 month": 28,
+                "1 week": 74,
+                "> 1 month": 8,
+                "> 3 months": 1,
+                "null": 68
+            },
+            "may_record": {
+                "false": 107,
+                "null": 72
+            },
+            "state": {
+                "accepted": 25,
+                "anonymised": 3,
+                "cancelled": 2,
+                "edit": 2,
+                "finished": 123,
+                "reviewed": 7,
+                "withdrawn": 17
+            },
+            "created_week": {
+                "2022-01-24": 1,
+                "2022-01-31": 8,
+                "2022-02-07": 1,
+                "2022-02-14": 17,
+                "2022-02-21": 5,
+                "2022-02-28": 5,
+                "2022-03-07": 5,
+                "2022-03-21": 2,
+                "2022-04-04": 1,
+                "2022-04-11": 1,
+                "2022-04-18": 1,
+                "2022-04-25": 9,
+                "2022-05-02": 4,
+                "2022-05-09": 7,
+                "2022-05-16": 6,
+                "2022-05-23": 34,
+                "2022-05-30": 72
+            }
+        },
+        "edits": {
+            "published_title": {
+                "avg": "2.37",
+                "max": 7
+            },
+            "published_description": {
+                "avg": "2.75",
+                "max": 14
+            },
+            "requirements": {
+                "avg": "1.38",
+                "max": 4
+            },
+            "length": {
+                "avg": "1.19",
+                "max": 4
+            },
+            "notice_required": {
+                "avg": "1.02",
+                "max": 2
+            },
+            "needs_help": {
+                "avg": "1.01",
+                "max": 2
+            },
+            "needs_money": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "one_day": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "has_rejected_email": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "published_names": {
+                "avg": "2.45",
+                "max": 8
+            },
+            "published_pronouns": {
+                "avg": "1.98",
+                "max": 6
+            },
+            "arrival_period": {
+                "avg": "2.21",
+                "max": 6
+            },
+            "departure_period": {
+                "avg": "2.21",
+                "max": 6
+            },
+            "eventphone_number": {
+                "avg": "1.74",
+                "max": 5
+            },
+            "telephone_number": {
+                "avg": "2.07",
+                "max": 5
+            },
+            "may_record": {
+                "avg": "1.58",
+                "max": 2
+            },
+            "needs_laptop": {
+                "avg": "1.31",
+                "max": 2
+            },
+            "available_times": {
+                "avg": "2.27",
+                "max": 6
+            },
+            "attendees": {
+                "avg": "1.25",
+                "max": 3
+            },
+            "cost": {
+                "avg": "1.41",
+                "max": 6
+            },
+            "size": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "funds": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "age_range": {
+                "avg": "1.20",
+                "max": 4
+            },
+            "participant_equipment": {
+                "avg": "1.17",
+                "max": 6
+            }
+        }
+    }
+}

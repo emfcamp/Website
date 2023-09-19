@@ -1,0 +1,640 @@
+{
+    "favourites": {
+        "counts": {
+            "0": 0,
+            "1-9": 0,
+            "10-19": 0,
+            "20-29": 0,
+            "30-39": 0,
+            "40-49": 0,
+            "50-99": 0,
+            "100-199": 0,
+            "200+": 0
+        }
+    },
+    "proposals": {
+        "accepted": [
+            {
+                "published_title": "Aerials",
+                "published_description": "Wherever we go, our electronic devices are silently broadcasting their presence, searching for peers, and exchanging information, leaving an invisible trail of signals that hint at our identity and past locations. Aerials translates these electromagnetic traces into an audible and visible form, depicting the fluctuating Wi-Fi and Bluetooth transmissions of nearby devices as interlocking elements of an ever-changing musical composition.\r\n\r\nEach of the three aerials decodes and sonifies a different kind of signal: Bluetooth advertisement packets, Wi-Fi 802.11 probe frames, and the raw analogue carrier strengths provided by 802.11 \u201cchannel state information\u201d. Together, they create a multifaceted portrait of the digital interactions that we are unwittingly taking part in.",
+                "names": "Daniel Jones",
+                "pronouns": "he/him",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": null,
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": null,
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": null,
+                "published_description": null,
+                "names": null,
+                "pronouns": null,
+                "may_record": null,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": null,
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "Stacks of CRT televisions showing different videos and games which people can interact with.",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "Players take turns answering a series of quick fire questions by firing safe archery tag arrows at answers on a projection screen.\r\n",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "A sitewide-ish POTS / Analog phone network, with services running over the top like Dial up internet, a BBS, and a Viewdata / Prestel system.",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "The Hitachi TM4000 Plus II is capable of high-resolution imaging from around 40x up to about 2000x and can be used on a wide variety of dried samples with no additional sample preparation . In addition to SEM imaging modes, it includes chemical microanalysis via an Energy Dispersive X-ray microanalysis system which can identify and map elements on a variety of dried objects.",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "Roamer",
+                "published_description": "A Pi powered, publicly controlled robot who roams around EMFcamp.\r\nPreviously seen in 2018, now a little larger (basically 2 \"hoverboards\").\r\nAnyone (on or off site) will be able to take a turn driving the roamer via web video feed. The video feed may also be publicly streamed.\r\nStyled in a very cyber fashion with unnecessary RGB underglow, in line with null sector vibes. \r\nThe speed and power of the roamer is significantly limited for safety when in remote mode. We also plan on adding sonar and bumper switches in the event of contact. The roamer will clearly be fitted with an e-stop and simple instructions to move it (or contact us) if it ends up in the way.\r\nThe roamer may also be hacky races compatible and entered into that (designed with their safety rules in mind).\r\n~\u00a3100 to cover batteries and safety components would be helpful if it's possible. If not, we'd still love to bring the roamer along!",
+                "names": "Chris Stubbs",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "Four robot whistles playing songs in real-time.",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "A programmable zoetrope with 12 X 4 inch e paper displays, preloaded with images from the early years of moving images.\r\n\r\nPeople can also upload their own animations via a website on the camp network or by scanning a sheet with their own created animation.",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "The TotemRecall musical robots have been constructed over the past few years using second hand instruments and mainly used/recycled materials. They include an 11ft percussion tower (made out of an old school climbing frame), electric lead and bass guitars, Vibraphone, steel pan drum and heads with synced mouths.",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "EMF Camp Scavenger Hunt",
+                "published_description": "Welcome to the Scavenger Hunt @ EMF Camp. \"Wow, hunting? At EMF camp?\" Don't worry! A scavenger hunt is the fun, silly kind of hunting that everyone can enjoy.\r\n\r\nWe have a list of things you'll need to find, make, do, hack or vaguely attempt and the more you achieve, the more points you'll score. Can you make a toast with toast? Can you Juggle? Can you compose a conversation entirely out of song titles? Then this is the hunt for you.\r\n\r\nAll you need to take part is a smart phone and some imagination. We've crafted a carefully curated list that will be fun for participants at all ages and abilities. With a hunt list well over 200 items, you'll have plenty of ways to get that high score and your choice of exciting prizes!",
+                "names": "James Boland",
+                "pronouns": "He/Him",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "The Ore-some Xylophone",
+                "published_description": "I made a synthesiser module recently that used a geiger counter to control musical parameters randomly. It worked out nicely, and so the idea was refined for the Sound Check exhibition at Dublin Science Gallery, this time using a mechanically operated xylophone.\r\n\r\nThe counter was housed in an enclosure, underneath a lump of uranium ore. A handwheel could be used to move a sliding lead shield, which would cause the composition to speed up when the glass Geiger-M\u00fcller tube was exposed to the rock.",
+                "names": "Dave Cranmer",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "Active Living Infrastructure: Controlled Environment (ALICE)",
+                "published_description": "A \u201cliving\u201d installation that communicates with microbes in real time, ALICE reveals the invisible realm of microbes around us and provides shared inter-species experiences and activities. Drawing together microbial metabolism, data, bioprocessor systems, artificial intelligence, low power electronics and digital displays, ALICE is a communications system that connects humans and microbes.\r\n\r\nComprised of three basic components: sensors, microbial fuel cells (an organic energy source powered by microbes) and interactive displays, ALICE transforms liquid wastes into real-time electronic experiences, which may one day wean us off \u2018dead\u2019 fossil fuel based systems, by instead engaging the incredible processing powers of \u2018living\u2019 microbial technologies in our homes and cities. To do this responsibly, we must design meaningful interfaces that enable us to relate to our \u201cmicrobiomes\u201d, site-specific microbial communities.\r\n\r\nTeam: Julie Freeman, Rachel Armstrong, Ioannis Ieropoulos. With Stephen Wolff, Jiseon You, Arjuna Mendes, Rolf Hughes, Pierangelo Scravaglieri\r\n\r\nhttps://alice-interface.eu/",
+                "names": "Julie Freeman",
+                "pronouns": "she/her",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "The QI QR Treasure Trail & QR i-Spy EMF",
+                "published_description": "Issy & Becca, aged 15, will create a Quite Interesting Treasure Trail, taking users to visit all corners of the site using QR codes scanned at each installation / point of interest.  From a central start point, users will scan the first QR code, revealing the clues to the first location.  On arrival at that location, seekers will find the next code, next clue etc. \r\nQR Codes will be printed out, laminated and attached to stakes/pegs.\r\n\r\nThey will also do \"QR i-spy EMF\" - a set of QR codes that scan to give info about various installations/points of interest.  Create yourself a numbered checklist on your device/policeman's notepad to mark off the ones you've found by name & number.\r\n\r\nThere is talk that, for those who manage to follow a bonus clue & track down the girls on site, there will be a tiny, suitable for all ages, prize (it's going to be a Freddo or Haribo or something)   \r\nThey will need a list of exhibits once we've got one and will be on site from the Thursday to put up the codes.  It can then run continuously through the weekend.",
+                "names": "Team Hegs",
+                "pronouns": "she/her/they - 2 15 year old girls",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "A giant 3x3 puzzle cube (Rubik's cube) where the faces are RGB LED panels. Paddle switches on the edges are used to \"twist\" faces of the cube.",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "Fluroclock - the clock made from fluorescent tubes",
+                "published_description": "Fluroclock is a 4 digit clock, made using fluorescent tubes. At just under a meter, they're quite a bit bigger than your average 7-segment display! \r\n\r\nFluorescent tubes are going out of fashion. Originally designed as an energy efficient alternative to the halogen and incandescent bulb, they are now being replaced in favour of LEDs. Fluorescents aren't as efficient, have a 'warm up' time and generally contain not-so-nice substances like mercury; so it's easy to see why they are falling out of favour. \r\nHowever, we grew up in the era of the fluorescent tube: the 'plink plonk' as someone flicks the switch in a large room and the tubes flicker into life is something we don't want to forget. So we decided to build a giant 7-segment display out of fluorescent tubes. \r\nThe clock is driven by a single Raspberry Pi, and each digit sits on a CANbus. The display itself is driven by a 4511 through relays and opto-isolators. \r\n",
+                "names": "Tom O\u2019Connor and Hugh Wells",
+                "pronouns": "he/him or they/them",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": null,
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": null,
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "A tree of controllable RGB LEDs.\r\n\r\nPeople will be able to code tree segments in Python or Blocks, assemble them and add them to the tree. ",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "A bomb",
+                "published_description": "You\u2019ve found a bomb in the city center today. It\u2019s so powerful that it can turn the entire city to dust if it detonates. The bomb is set to explode in 60 minutes \u2026\r\n\r\nYour top bomb technician has examined the bomb, and it cannot be transported to the laboratory. It means there is only one way out. You must defuse the bomb now.",
+                "names": "Herczeg Zsolt",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "Newspeak",
+                "published_description": "Newspeak (2019) visualises the words of George Orwell\u2019s Nineteen Eighty-Four as if they were commodities on a stock exchange. Using live data scraped from Google Ads, the text of the book scrolls across the screen as ticker-tape. The fluctuating prices of the words are determined by what they are worth to Google in the context of an advert. \r\n\r\nThe project is a political critique of the power held by technology companies as mediators of information in an age of linguistic capitalism. Evoking Orwell\u2019s vision of Newspeak as a language that \u201ccould only be used for one purpose\u201d, the project suggests that in a digital age, language is controlled and restricted by economic incentives, with similarly dystopian political consequences. \r\n\r\nWhat do you (double)think of the value of language in this dystopian linguistic market? You can find out the value of your own words by submitting texts to be monetised and displayed on the Newspeak ticker throughout the festival (details TBC).",
+                "names": "Pip Thornton",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": null,
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "Fabric fortune teller",
+                "published_description": "It's a project my partner & I made in a makeathon, a fortune teller's table cover that's wired up to an Arduino & fabric pieces with conductive stuffs to throw it on and \"get your fortune\" using software & a sprinkle of GPT-3.\r\nWe'll be coming from abroad & will bring the fabrics with us, but other items will be tricky. We will need help with:\r\n1. Location, we won't stay in our village much. Maybe Null Sector?\r\n2. Upgrades: a mannequin for a fortune teller would be nice if feasible. Note that we can't dispose of it after.\r\n3. Logistics: a small table for it\r\n4. Accessibility: It'll come on a Raspi/mobile with a small passive speaker, but a better speaker could help, and a monitor could be nice for the hard of hearing to get their \"fortunes\".\r\n\r\nIf these are too much we can talk about it, figure things out!\r\n\r\nI'll probably volunteer at setup so we can figure some of it out then.\r\n\r\nDemonstrations of current status:\r\nhttps://www.idrive.com/idrive/sh/sh?k=p6k9d6e2f3\r\nhttps://www.idrive.com/idrive/sh/sh?k=k2p6a4v1x9",
+                "names": "Galia Bahat",
+                "pronouns": null,
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "\"Does anyone remember BigTrak? You know, that programmable space tank from the 70s. How about a ride-on version? We could call it 'BigHak'\"",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "Luminescent and fluorescent 'robots' in forms that resemble deep sea creatures or those on a coral reef. Many react to people in the space, by hiding or running away.",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "A giant fully operational 4m x 2.5m foam replica of a rubber-key Sinclair ZX Spectrum, that you can play games on by jumping on the keys.",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "OCTONET: A dystopian puzzlehunt",
+                "published_description": "Unexplained earthquakes.\r\nUnreliable compasses.\r\nUnderwater intrigue.\r\n\r\nUntangle the web of Polybius Biotech's latest venture: OCTONET. What are they building? \r\n\r\nThis is a puzzlehunt \u2013 part escape room, part treasure hunt \u2013 which you can play at your leisure over the weekend, and is the spiritual successor to EMF 2018\u2019s Dreamcatcher puzzlehunt. The game is best enjoyed in teams of 2 - 4, and will likely take 2 - 3 hours in total to complete.\r\n\r\nPuzzles will be located across the camp, each of which will weave into the story as you uncover what Polybius' latest business venture is\u2026\r\nOnly one thing is for certain: if you complete the puzzlehunt you will get a nice badge :)",
+                "names": "Dreamcatcher Puzzle Team",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": null,
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "In the absence of normal ways of going out and socialising we built a virtual world (well, a virtual house) to lounge around in.  ",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "A community 3D printed 1:1 replica of a diplodocus skull.\r\nAssembled from 14 components, each small enough to print on a desktop 3D printer.",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "Originally built for Halloween, this two-way mirror with a Raspberry Pi powered screen and two inbuilt speakers, has a PIR sensor and can play videos on demand.",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "A soft-robotic creature that you can embody via motion-tracking, or marionette using it\u2019s hand-held puppet-strings. This nascent being inhabits a world of sand. \r\n\r\nYou can control the creature\u2019s arms to draw and create markings in this strange, desert-like world, or collaborate with the creature, by sculpting the sand using your human hands. \r\n\r\nThis installation is a collaboration between Bristol Robotics Lab, University of Bristol and Neon Dance. \r\n",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "An 80cm cube with 24x24 RGB LEDs on each face.",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "Hacky Racers is a small electric vehicle racing series where show is valued as much as speed. \r\nWe'll be running 5 minute races every 1-2 hours during the afternoon / evening.",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "A 4m swirling column of fire.",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "ISOPOD",
+                "published_description": "ISOPOD is a geodesic sphere which you can roll around.  A core suspended at the centre of the sphere contains the control electronics including sensors which track its location, orientation, and movement.  LED-illuminated spines run from the core to the outside of the sphere and react in real-time to ISOPOD\u2019s movement and position, displaying effects depending on how you interact with it.\r\n\r\nBest viewed in the evening, after the sun goes down.",
+                "names": "David Turner",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            },
+            {
+                "published_title": "",
+                "published_description": "",
+                "names": "",
+                "pronouns": "",
+                "may_record": false,
+                "scheduled_time": null,
+                "scheduled_duration": null,
+                "venue": null
+            }
+        ],
+        "counts": {
+            "needs_help": {
+                "false": 50,
+                "true": 11
+            },
+            "needs_money": {
+                "false": 59,
+                "true": 2
+            },
+            "needs_laptop": {
+                "false": 12,
+                "null": 49
+            },
+            "one_day": {
+                "false": 61
+            },
+            "notice_required": {
+                "1 month": 19,
+                "1 week": 37,
+                "> 1 month": 2,
+                "> 3 months": 3
+            },
+            "may_record": {
+                "false": 57,
+                "null": 4
+            },
+            "state": {
+                "accepted": 35,
+                "cancelled": 9,
+                "finished": 12,
+                "rejected": 2,
+                "withdrawn": 3
+            },
+            "created_week": {
+                "2022-01-24": 2,
+                "2022-01-31": 7,
+                "2022-02-07": 1,
+                "2022-02-14": 5,
+                "2022-02-21": 3,
+                "2022-02-28": 2,
+                "2022-03-21": 1,
+                "2022-03-28": 3,
+                "2022-04-04": 7,
+                "2022-04-11": 1,
+                "2022-04-18": 2,
+                "2022-04-25": 11,
+                "2022-05-02": 5,
+                "2022-05-09": 1,
+                "2022-05-16": 3,
+                "2022-05-23": 4,
+                "2022-05-30": 3
+            }
+        },
+        "edits": {
+            "published_title": {
+                "avg": "2.09",
+                "max": 4
+            },
+            "published_description": {
+                "avg": "2.53",
+                "max": 5
+            },
+            "requirements": {
+                "avg": "1.48",
+                "max": 5
+            },
+            "length": {
+                "avg": "1.91",
+                "max": 2
+            },
+            "notice_required": {
+                "avg": "1.03",
+                "max": 2
+            },
+            "needs_help": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "needs_money": {
+                "avg": "1.03",
+                "max": 2
+            },
+            "one_day": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "has_rejected_email": {
+                "avg": "1.02",
+                "max": 2
+            },
+            "published_names": {
+                "avg": "2.09",
+                "max": 4
+            },
+            "published_pronouns": {
+                "avg": "1.64",
+                "max": 3
+            },
+            "arrival_period": {
+                "avg": "2.08",
+                "max": 3
+            },
+            "departure_period": {
+                "avg": "2.08",
+                "max": 3
+            },
+            "eventphone_number": {
+                "avg": "1.59",
+                "max": 3
+            },
+            "telephone_number": {
+                "avg": "2.05",
+                "max": 3
+            },
+            "may_record": {
+                "avg": "1.89",
+                "max": 2
+            },
+            "needs_laptop": {
+                "avg": "1.18",
+                "max": 2
+            },
+            "available_times": {
+                "avg": "1.89",
+                "max": 2
+            },
+            "attendees": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "cost": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "size": {
+                "avg": "1.05",
+                "max": 2
+            },
+            "funds": {
+                "avg": "1.05",
+                "max": 2
+            },
+            "age_range": {
+                "avg": "1.00",
+                "max": 1
+            },
+            "participant_equipment": {
+                "avg": "1.00",
+                "max": 1
+            }
+        }
+    }
+}
