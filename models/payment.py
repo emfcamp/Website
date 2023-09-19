@@ -138,7 +138,7 @@ class Payment(BaseModel):
             "tables": ["payment", "payment_version"],
         }
 
-        count_attrs = ["state", "reminder_sent_at", "currency"]
+        count_attrs = ["state", "currency"]
         data["public"]["payments"]["counts"].update(
             export_attr_counts(cls, count_attrs)
         )
