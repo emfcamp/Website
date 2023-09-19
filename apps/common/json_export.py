@@ -15,15 +15,12 @@ class ExportEncoder(JSONEncoder):
         if isinstance(obj, Decimal):
             return str(obj)
 
-        if isinstance(obj, Row):
-            return tuple(obj)
-
         return JSONEncoder.default(self, obj)
 
     def iterencode(self, obj):
         def _iterconvert(obj):
             # namedtuple/sqlalchemy result
-            if isinstance(obj, tuple) and hasattr(obj, "_asdict"):
+            if isinstance(obj, (tuple, Row)) and hasattr(obj, "_asdict"):
                 # this doesn't include any columns without label()s
                 dct = obj._asdict()
                 # sqlalchemy result's asdict has broken ordering
