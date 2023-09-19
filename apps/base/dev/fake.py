@@ -198,32 +198,44 @@ class FakeDataGenerator(object):
         db.session.add(vol)
 
     def create_fake_tickets(self, user):
-        if random.random() < 0.3:
-            return
-
         if random.random() < 0.2:
             currency = "EUR"
         else:
             currency = "GBP"
-        b = Basket(user, currency)
 
-        pt = PriceTier.query.filter_by(name="full-std").one()
-        b[pt] = int(round(random.uniform(1, 4)))
-
-        if random.random() < 0.5:
-            pt = PriceTier.query.filter_by(name="parking").one()
-            b[pt] = 1
-
-        b.create_purchases()
-        b.ensure_purchase_capacity()
-
+        # In this case we're going to use the same payment method if we make multiple payments.
         payment_type = {"bank": BankPayment, "stripe": StripePayment}.get(
             random_state({"bank": 0.2, "stripe": 0.8})
         )
 
-        payment = b.create_payment(payment_type)
+        # Create a variable number of purchases per customer
+        num_purchases = abs(round(random.gauss(0, 2)))
+        for i in range(0, num_purchases):
+            b = Basket(user, currency)
+            pt = PriceTier.query.filter_by(name="full-std").one()
+            b[pt] = int(round(random.uniform(1, 4)))
 
-        if random.random() < 0.8:
+            if random.random() < 0.5:
+                pt = PriceTier.query.filter_by(name="parking").one()
+                b[pt] = 1
+
+            b.create_purchases()
+            b.ensure_purchase_capacity()
+
+            if not b.purchases:
+                # We didn't buy any tickets
+                continue
+
+            payment = b.create_payment(payment_type)
+
+            if random.random() < 0.2:
+                payment.cancel()
+                continue
+
             payment.paid()
-        else:
-            payment.cancel()
+            db.session.add(payment)
+            db.session.commit()
+
+            if random.random() < 0.2:
+                payment.manual_refund()
+                db.session.commit()
