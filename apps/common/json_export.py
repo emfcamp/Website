@@ -1,7 +1,8 @@
-from simplejson import JSONEncoder
+from decimal import Decimal
+from json import JSONEncoder
 from datetime import datetime
 from collections import OrderedDict
-
+from sqlalchemy.engine.row import Row
 from main import db
 from models import to_dict
 
@@ -10,6 +11,12 @@ class ExportEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime):
             return obj.isoformat(" ")
+
+        if isinstance(obj, Decimal):
+            return str(obj)
+
+        if isinstance(obj, Row):
+            return tuple(obj)
 
         return JSONEncoder.default(self, obj)
 
