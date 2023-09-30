@@ -1,4 +1,3 @@
-from base64 import b64decode
 import logging
 
 from datetime import datetime, timedelta
