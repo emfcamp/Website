@@ -3,7 +3,7 @@ import logging
 
 from datetime import datetime, timedelta
 from flask import abort, current_app as app, request
-from pywisetransfer.webhooks import verify_signature
+from pywisetransfer.webhooks import validate_request
 
 from models.payment import BankAccount, BankTransaction
 from . import payments
@@ -33,21 +33,11 @@ def wise_webhook():
         request.headers,
     )
 
+    environment = app.config["TRANSFERWISE_ENVIRONMENT"]
     try:
-        b64decode(request.headers["X-Signature-SHA256"])
-        if request.json is None:
-            raise ValueError("Request does not contain JSON")
+        validate_request(request=request, environment=environment)
     except Exception as e:
-        logger.info("Unable to parse Wise webhook request")
-        abort(400)
-
-    valid_signature = verify_signature(
-        request.data,
-        request.headers["X-Signature-SHA256"],
-        app.config["TRANSFERWISE_ENVIRONMENT"],
-    )
-    if not valid_signature:
-        logger.exception("Error verifying Wise webhook signature")
+        logger.info(e)
         abort(400)
 
     schema_version = request.json.get("schema_version")
