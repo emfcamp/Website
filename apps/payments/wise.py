@@ -2,6 +2,7 @@ import logging
 
 from datetime import datetime, timedelta
 from flask import abort, current_app as app, request
+from pywisetransfer.exceptions import InvalidWebhookSignature
 from pywisetransfer.webhooks import validate_request
 
 from models.payment import BankAccount, BankTransaction
@@ -35,6 +36,9 @@ def wise_webhook():
     environment = app.config["TRANSFERWISE_ENVIRONMENT"]
     try:
         validate_request(request=request, environment=environment)
+    except InvalidWebhookSignature as e:
+        logger.exception(e)
+        abort(400)
     except Exception as e:
         logger.info(e)
         abort(400)
