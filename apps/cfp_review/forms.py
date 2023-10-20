@@ -14,6 +14,7 @@ from wtforms import (
 from wtforms.validators import DataRequired, Optional, NumberRange, ValidationError
 
 from models.cfp import Venue, ORDERED_STATES
+from models.cfp_tag import Tag
 from ..common.forms import Form, HiddenIntegerField, EmailField
 
 from dateutil.parser import parse as parse_date
@@ -24,6 +25,7 @@ class UpdateProposalForm(Form):
     state = SelectField("State", choices=[(s, s) for s in ORDERED_STATES])
     title = StringField("Title", [DataRequired()])
     description = TextAreaField("Description", [DataRequired()])
+    tags = StringField("Tags")
     requirements = TextAreaField("Requirements")
     length = StringField("Length")
     notice_required = SelectField(
@@ -94,6 +96,7 @@ class UpdateProposalForm(Form):
     def update_proposal(self, proposal):
         proposal.title = self.title.data
         proposal.description = self.description.data
+        proposal.tags = Tag.parse_serialised_tags(self.tags.data)
         proposal.requirements = self.requirements.data
         proposal.length = self.length.data
         proposal.notice_required = self.notice_required.data
