@@ -21,6 +21,7 @@ from models import (
 
 from main import db
 from .user import User
+from .cfp_tag import ProposalTag
 from . import BaseModel
 
 
@@ -369,6 +370,13 @@ class Proposal(BaseModel):
     length = db.Column(db.String)  # only used for talks and workshops
     notice_required = db.Column(db.String)
     private_notes = db.Column(db.String)
+
+    tags = db.relationship(
+        "Tag",
+        backref="proposals",
+        cascade="all",
+        secondary=ProposalTag,
+    )
 
     # Flags
     needs_help = db.Column(db.Boolean, nullable=False, default=False)
