@@ -36,6 +36,7 @@ from models.cfp import (
     EVENT_SPACING,
     FavouriteProposal,
 )
+from models.cfp_tag import Tag
 from models.user import User
 from models.purchase import Ticket
 from .forms import (
@@ -343,6 +344,7 @@ def update_proposal(proposal_id):
     form.state.data = prop.state
     form.title.data = prop.title
     form.description.data = prop.description
+    form.tags.data = Tag.serialise_tags(prop.tags)
     form.requirements.data = prop.requirements
     form.length.data = prop.length
     form.notice_required.data = prop.notice_required
