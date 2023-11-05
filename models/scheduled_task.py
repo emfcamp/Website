@@ -17,6 +17,7 @@
 """
 import pendulum
 import logging
+from sqlalchemy.orm import Session
 from functools import wraps
 
 from main import db
@@ -95,37 +96,38 @@ def scheduled_task(**kwargs):
 
 def execute_scheduled_tasks(force=False):
     # Create a new session, so tasks calling commit don't free our lock
-    session = db.create_scoped_session()
+    with Session(db.engine, autocommit=False) as lock_session:
+        # Take an exclusive lock on the ScheduledTaskResult table to prevent tasks colliding
+        lock_session.execute(
+            f"LOCK TABLE {ScheduledTaskResult.__tablename__} IN EXCLUSIVE MODE"
+        )
 
-    # Take an exclusive lock on the ScheduledTaskResult table to prevent tasks colliding
-    session.execute(f"LOCK TABLE {ScheduledTaskResult.__tablename__} IN EXCLUSIVE MODE")
+        tasks_to_run = []
+        if force:
+            tasks_to_run += tasks
+        else:
+            for task in tasks:
+                res = ScheduledTaskResult.get_latest_run(task.name, lock_session)
+                if res is None or res.start_time + task.duration < pendulum.now():
+                    tasks_to_run.append(task)
 
-    tasks_to_run = []
-    if force:
-        tasks_to_run += tasks
-    else:
-        for task in tasks:
-            res = ScheduledTaskResult.get_latest_run(task.name, session)
-            if res is None or res.start_time + task.duration < pendulum.now():
-                tasks_to_run.append(task)
+        log.info("Running %s periodic tasks...", len(tasks_to_run))
+        for task in tasks_to_run:
+            log.info("Running %s", task.name)
+            result = ScheduledTaskResult(task.name)
+            try:
+                result.result["returnval"] = task.func()
 
-    log.info("Running %s periodic tasks...", len(tasks_to_run))
-    for task in tasks_to_run:
-        log.info("Running %s", task.name)
-        result = ScheduledTaskResult(task.name)
-        try:
-            result.result["returnval"] = task.func()
+            except Exception as e:
+                log.exception(f"Exception in {task.name}: {repr(e)}")
+                result.result["exception"] = repr(e)
 
-        except Exception as e:
-            log.exception(f"Exception in {task.name}: {repr(e)}")
-            result.result["exception"] = repr(e)
+            # Clean up the main session whatever happens
+            db.session.rollback()
 
-        # Clean up the main session whatever happens
-        db.session.rollback()
+            result.finish()
+            lock_session.add(result)
 
-        result.finish()
-        session.add(result)
-
-    ScheduledTaskResult.cleanup(session)
-    session.commit()
+        ScheduledTaskResult.cleanup(lock_session)
+        lock_session.commit()
     log.info("Tasks complete.")
