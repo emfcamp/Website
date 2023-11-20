@@ -196,6 +196,11 @@ def security_txt():
     return """Contact: security@emfcamp.org\n"""
 
 
+@base.route("/.well-known/matrix/server")
+def matrix_server():
+    return {"m.server": "matrix.emfcamp.org:443"}
+
+
 @base.route("/subscribe")
 def subscribe():
     return render_template("subscribe.html")
