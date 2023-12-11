@@ -19,6 +19,17 @@ to monitor the containers.
 
 To start all containers (and rebuild any which may have changed):
 
+> [!TIP]
+> **Apple Silicon Users**
+> You'll probably want to build your own version of the base images as well, as
+> the ones we build are amd64 only, and so painfully slow on ARM devices. This
+> is unlikely to be resolved until GitHub Actions has ARM runners.
+>
+> ```sh
+> docker build -t ghcr.io/emfcamp/website-base -f ./docker/Dockerfile.base .
+> docker build -t ghcr.io/emfcamp/website-base-dev -f ./docker/Dockerfile.base-dev .
+> ```
+
 ```
 docker compose build --parallel
 docker compose up
