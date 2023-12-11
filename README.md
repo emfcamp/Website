@@ -49,6 +49,23 @@ To delete all data and start over fresh you can use `docker compose down`.
 Management commands can be listed and run using the `./flask` command, which
 forwards them to the flask command line within the container.
 
+### Visual Studio Code
+
+If you use Visual Studio Code it should present you with the option to open the
+project in a dev container. If not, run `code .` from your local copy, and ensure
+you have the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) installed.
+
+Reopening in a dev container will start everything via Docker, attach
+your VSCode instance to the application container, install relevant extensions,
+and ensure everything is configured to fit with our standards.
+
+The first time you start the dev container you will need to tell VSCode where to
+find the Poetry virtual environment. You can do this by open the command pallette
+(Cmd-P on macOS devices) and searching for "Python: Select interpreter", the list
+presented should include `website-${randomHash}-py3.11`, which will be annotated
+as "Poetry". Select that, and then any Python tooling and shells will run within
+the appropriate virtualenv.
+
 ### Errors starting the dev server
 
 e.g. `Error: While importing 'dev_server', an ImportError was raised.`
