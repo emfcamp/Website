@@ -1,3 +1,7 @@
 #!/usr/bin/env bash
 # Shim to run the Flask admin command within docker
-docker compose exec -e SETTINGS_FILE=./config/development.cfg app poetry run flask "$@"
+if [ -z "${SETTINGS_FILE}" ]; then
+  docker compose exec -e SETTINGS_FILE=./config/development.cfg app poetry run flask "$@"
+else
+  exec poetry run flask "$@"
+fi

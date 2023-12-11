@@ -1,0 +1,46 @@
+{
+  "name": "EMF Web",
+  // Compose config
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/app",
+  "containerEnv": {
+    "EDITOR": "code -w"
+  },
+  // Replace the standard command with a noop to allow exec-ing
+  "overrideCommand": true,
+  // Git complains if user IDs don't match, which they will with a mounted directory
+  "onCreateCommand": "git config --global --add safe.directory /app",
+  // Port forwarding
+  "forwardPorts": [
+    2342,
+    "db:5432"
+  ],
+  "portsAttributes": {
+    "2342": {
+      "label": "Web",
+      "onAutoForward": "silent",
+      "requireLocalPort": false
+    },
+    "db:5432": {
+      "label": "Postgres",
+      "onAutoForward": "silent",
+      "requireLocalPort": false
+    }
+  },
+  // VSCode additions
+  "features": {},
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "EditorConfig.EditorConfig",
+        "github.vscode-github-actions",
+        "ms-python.python",
+        "ms-python.black-formatter",
+        "ms-python.flake8",
+        "ms-python.mypy-type-checker"
+      ]
+    }
+  }
+}
