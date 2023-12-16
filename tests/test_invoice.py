@@ -1,26 +1,11 @@
-import io
 import pytest
 
-from cairosvg import svg2png
-from PIL import Image
 from pyzbar.pyzbar import decode
 
 from apps.payments.invoice import format_inline_epc_qr
 from models.payment import BankPayment
 
-
-def render_svg(svg):
-    # pyzbar fails to decode qr codes under 52x52 and epc qr codes under 72x72
-    png = svg2png(bytestring=svg, parent_width=80, parent_height=80)
-    png_file = io.BytesIO(png)
-    image = Image.open(png_file)
-
-    # pillow renders alpha channel black by default
-    alpha = image.convert("RGBA").split()[-1]
-    opaque_image = Image.new("RGBA", image.size, "white")
-    opaque_image.paste(image, mask=alpha)
-
-    return opaque_image
+from tests._utils import render_svg
 
 
 @pytest.mark.skip
