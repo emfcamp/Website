@@ -1,8 +1,5 @@
 import os
 from typing import Optional
-from mailchimp3 import MailChimp
-from mailchimp3.helpers import get_subscriber_hash
-from mailchimp3.mailchimpclient import MailChimpError
 
 from flask import (
     render_template,
@@ -15,6 +12,7 @@ from flask import (
     abort,
     current_app as app,
 )
+import requests
 
 from main import cache
 from ..common import feature_flag
@@ -53,69 +51,27 @@ def main():
 
 @base.route("/", methods=["POST"])
 def main_post():
-    mc = MailChimp(mc_api=app.config["MAILCHIMP_KEY"])
-    try:
-        email = request.form.get("email")
+    email = request.form.get("email")
 
-        try:
-            data = mc.lists.members.create_or_update(
-                list_id=app.config["MAILCHIMP_LIST"],
-                subscriber_hash=get_subscriber_hash(email),
-                data={
-                    "email_address": email,
-                    "status": "subscribed",
-                    "status_if_new": "pending",
-                },
-            )
-            status = data.get("status")
-            if status == "pending":
-                flash(
-                    "Thanks for subscribing! You will receive a confirmation email shortly."
-                )
-            elif status == "subscribed":
-                flash("You were already subscribed! Thanks for checking back.")
-            else:
-                raise ValueError("Unexpected status %s" % status)
+    response = requests.post(
+        app.config["LISTMONK_URL"] + "/api/public/subscription",
+        json={"email": email, "list_uuids": [app.config["LISTMONK_LIST_ID"]]},
+    )
 
-        except ValueError as e:
-            # ugh, this library is awful
-            app.logger.info(
-                "ValueError from mailchimp3 %s, assuming bad email: %r", e, email
-            )
-            flash("Your email address was not accepted - please check and try again.")
+    if response.status_code != 200:
+        app.logger.warn(
+            "Unable to subscribe to mailing list (HTTP %s): %s",
+            response.status_code,
+            response.text,
+        )
+        flash(
+            "Sorry, we were unable to subscribe you to the mailing list. Please try again later."
+        )
 
-        except MailChimpError as e:
-            # Either the JSON, or a dictionary containing the response
-            (data,) = e.args
-            if data.get("status") != 400:
-                raise
-
-            title = data.get("title")
-            if title == "Member In Compliance State":
-                app.logger.info("Member in compliance state: %r", email)
-                flash(
-                    """You've already been unsubscribed from our list, so we can't add you again.
-                         Please contact %s to update your settings."""
-                    % app.config["TICKETS_EMAIL"][1]
-                )
-
-            elif title == "Invalid Resource":
-                app.logger.warn(
-                    "Invalid Resource from MailChimp, likely bad email or rate limited: %r",
-                    email,
-                )
-                flash(
-                    """Your email address was not accepted - please check and try again.
-                       If you've signed up to other lists recently, please wait 48 hours."""
-                )
-
-            else:
-                app.logger.warn("MailChimp returned %s: %s", title, data.get("detail"))
-                flash("Sorry, an error occurred: %s." % (title or "unknown"))
-
-    except Exception as e:
-        app.logger.exception("Error subscribing: %r", e)
-        flash("Sorry, an error occurred.")
+    else:
+        flash(
+            "Thanks for subscribing! If you weren't already subscribed, you will receive a confirmation email shortly."
+        )
 
     return redirect(url_for(".main"))
 

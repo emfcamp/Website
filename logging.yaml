@@ -29,8 +29,6 @@ loggers:
   sqlalchemy.engine.base.Engine:
     handlers: [sqlalchemy]
     propagate: false
-  mailchimp3:
-    level: WARN
   iso8601:
     level: WARN
   pyppeteer:
