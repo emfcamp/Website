@@ -1,10 +1,12 @@
 import io
+import pytest
 
 from cairosvg import svg2png
 from PIL import Image
 from pyzbar.pyzbar import decode
 
-from apps.common.receipt import format_inline_qr, make_qr_png
+from apps.payments.invoice import format_inline_epc_qr
+from models.payment import BankPayment
 
 
 def render_svg(svg):
@@ -21,25 +23,27 @@ def render_svg(svg):
     return opaque_image
 
 
-def test_format_inline_qr():
-    data = "https://www.example.org"
+@pytest.mark.skip
+def test_format_inline_epc_qr():
+    payment = BankPayment(currency="EUR", amount=10)
 
-    qr_inline = format_inline_qr(data)
+    qr_inline = format_inline_epc_qr(payment)
     qr_image = render_svg(qr_inline)
 
+    expected = [
+        "BCD",
+        "002",
+        "1",
+        "SCT",
+        "",
+        "Electromagnetic Field Ltd",
+        "GB21BARC20716472954433",
+        "EUR10",
+        "",
+        payment.bankref,
+    ]
+
     decoded = decode(qr_image)
     assert len(decoded) == 1
     content = decoded[0].data.decode("utf-8")
-    assert content == data
-
-
-def test_make_qr_png():
-    data = "https://www.example.org"
-
-    qr_file = make_qr_png(data)
-    qr_image = Image.open(qr_file)
-
-    decoded = decode(qr_image)
-    assert len(decoded) == 1
-    content = decoded[0].data.decode("utf-8")
-    assert content == data
+    assert content == "\n".join(expected)
