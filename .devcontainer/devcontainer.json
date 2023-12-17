@@ -39,8 +39,20 @@
         "ms-python.python",
         "ms-python.black-formatter",
         "ms-python.flake8",
-        "ms-python.mypy-type-checker"
-      ]
+        "ms-python.mypy-type-checker",
+        "samuelcolvin.jinjahtml"
+      ],
+      "settings": {
+        "files.associations": {
+          "*.html": "jinja-html"
+        },
+        "emmet.includeLanguages": {
+          "jinja-html": "html"
+        },
+        "[jinja-html]": {
+          "editor.defaultFormatter": "vscode.emmet"
+        }
+      }
     }
   }
 }
