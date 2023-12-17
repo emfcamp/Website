@@ -1,4 +1,6 @@
 from pyzbar.pyzbar import decode
+import re
+from stdnum import iso11649
 
 from apps.payments.invoice import format_inline_epc_qr
 from main import db
@@ -20,6 +22,10 @@ def test_format_inline_epc_qr(app):
     db.session.add(payment)
     db.session.commit()
 
+    # Ensure that the structured creditor reference is valid and contains the bankref
+    assert iso11649.is_valid(payment.customer_reference)
+    assert re.match(f"^RF[0-9][0-9]{payment.bankref}$", payment.customer_reference)
+
     qr_inline = format_inline_epc_qr(payment)
     qr_image = render_svg(qr_inline)
 
@@ -33,7 +39,7 @@ def test_format_inline_epc_qr(app):
         "GB47LOND11213141516171",
         "EUR10",
         "",
-        "RF84202400000001",
+        payment.customer_reference,
     ]
 
     decoded = decode(qr_image)
