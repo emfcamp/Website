@@ -7,6 +7,8 @@ from sqlalchemy import event, func, column
 from sqlalchemy.orm import Session, aliased
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy_continuum.utils import version_class, transaction_class
+from stdnum import iso11649
+from stdnum.iso7064 import mod_97_10
 
 from main import db
 from . import (
@@ -309,6 +311,21 @@ class BankPayment(Payment):
                 return BankAccount.query.filter_by(currency=currency, active=True).one()
             except (MultipleResultsFound, NoResultFound):
                 continue
+
+    @property
+    def customer_reference(self):
+        assert self.id, (
+            "Customer references can only be generated for payments that have been stored "
+            "in the database."
+        )
+
+        # Derive an ISO-11649 payment reference for EUR-currency payments
+        if self.currency == "EUR":
+            order_id = f"{event_year()}{self.id:08d}"
+            order_check_digits = mod_97_10.calc_check_digits(order_id)
+            return f"RF{order_check_digits}{order_id}"
+        else:
+            return self.bankref
 
 
 class BankAccount(BaseModel):

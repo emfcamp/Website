@@ -1,13 +1,24 @@
 from pyzbar.pyzbar import decode
 
 from apps.payments.invoice import format_inline_epc_qr
+from main import db
 from models.payment import BankPayment
+from models.user import User
 
 from tests._utils import render_svg
 
 
 def test_format_inline_epc_qr(app):
+    user = User("test_invoice_user@test.invalid", "test_invoice_user")
+    db.session.add(user)
+    db.session.commit()
+
     payment = BankPayment(currency="EUR", amount=10)
+    payment.user_id = user.id
+
+    # Persist the payment object so that a sequence ID is generated for it
+    db.session.add(payment)
+    db.session.commit()
 
     qr_inline = format_inline_epc_qr(payment)
     qr_image = render_svg(qr_inline)
@@ -22,7 +33,7 @@ def test_format_inline_epc_qr(app):
         "GB47LOND11213141516171",
         "EUR10",
         "",
-        payment.bankref,
+        "RF53202400000001",
     ]
 
     decoded = decode(qr_image)

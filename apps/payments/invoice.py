@@ -39,7 +39,7 @@ def make_epc_qrfile(payment, **kwargs):
         name="EMF Festivals Ltd",
         iban=payment.recommended_destination.iban,
         amount=payment.amount,
-        reference=payment.bankref,
+        reference=payment.customer_reference,
         encoding=1,
     )
     qr.save(qrfile, **kwargs)
