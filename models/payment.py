@@ -323,7 +323,10 @@ class BankPayment(Payment):
         if self.currency == "EUR":
             order_id = f"{event_year()}{self.id:08d}"
             order_check_digits = mod_97_10.calc_check_digits(order_id)
-            return f"RF{order_check_digits}{order_id}"
+            assert len(order_check_digits) == 2
+            customer_reference =  f"RF{order_check_digits}{order_id}"
+            assert iso11649.validate(customer_reference)
+            return customer_reference
         else:
             return self.bankref
 
