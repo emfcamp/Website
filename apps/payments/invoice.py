@@ -36,8 +36,8 @@ def make_epc_qrfile(payment, **kwargs):
     # TODO: this isn't currently used. Need to fetch IBAN from payment.recommended_destination
     # and name from somewhere - maybe config rather than hard-coding.
     qr = helpers.make_epc_qr(
-        name="FIXME FIXME FIXME",
-        iban="FIXME FIXME FIXME",
+        name="EMF Festivals Ltd",
+        iban=payment.recommended_destination.iban,
         amount=payment.amount,
         reference=payment.bankref,
         encoding=1,
