@@ -33,7 +33,7 @@ def test_format_inline_epc_qr(app):
         "GB47LOND11213141516171",
         "EUR10",
         "",
-        "RF53202400000001",
+        "RF84202400000001",
     ]
 
     decoded = decode(qr_image)
