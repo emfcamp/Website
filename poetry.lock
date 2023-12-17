@@ -2940,6 +2940,23 @@ files = [
 six = ">=1.4.0"
 
 [[package]]
+name = "python-stdnum"
+version = "1.19"
+description = "Python module to handle standardized numbers and codes"
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "python-stdnum-1.19.tar.gz", hash = "sha256:133ec82f56390ea74c190569e98f2fb14b869808b1d54785708f22d0fead8b3f"},
+    {file = "python_stdnum-1.19-py2.py3-none-any.whl", hash = "sha256:1b5b401ad3f45b798b0317313b781a433f5d7a5ff2c9feb8054664f76f78644e"},
+]
+
+[package.extras]
+soap = ["zeep"]
+soap-alt = ["suds"]
+soap-fallback = ["PySimpleSOAP"]
+
+[[package]]
 name = "pytz"
 version = "2023.3.post1"
 description = "World timezone definitions, modern and historical"
@@ -4465,4 +4482,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11"
-content-hash = "194bd410d1f201885f74ab3a866628d33a8d40dfc077ad9297011d46d4d4f199"
+content-hash = "7c5dbd9bd4a5921aafb0cb5f8181c193ba31d43541cd16b439834029a41d785f"
