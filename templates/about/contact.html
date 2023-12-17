@@ -1,8 +1,5 @@
-{% extends "base.html" %}
+{% extends "about/template.html" %}
 {% block title %}Contact{% endblock %}
-{% block secondary_nav %}
-  {% include "about/_nav.html" %}
-{% endblock %}
 {% block body %}
   <h2>Contact</h2>
   <p>If you need to get in touch with us, first see if your query is best directed to one of the teams below:</p>
@@ -32,5 +29,4 @@
       <a href="https://libera.chat/">Libera.Chat</a> network in the <a href="ircs://irc.libera.chat/#emfcamp">#emfcamp</a> channel.
   </p>
   <p>You'll need an IRC client to connect &mdash; for more info see <a href="https://libera.chat/guides/clients">this guide</a>.</p>
-
 {% endblock %}
