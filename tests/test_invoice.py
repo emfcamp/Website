@@ -22,7 +22,7 @@ def test_format_inline_epc_qr():
         "SCT",
         "",
         "Electromagnetic Field Ltd",
-        "GB21BARC20716472954433",
+        "GB47LOND11213141516171",
         "EUR10",
         "",
         payment.bankref,
