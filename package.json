@@ -60,7 +60,7 @@
     "datatables.net": "^1.11.3",
     "jquery": "^3.5.0",
     "jquery-highlight": "^3.5.0",
-    "luxon": "^1.22.0",
+    "luxon": "^1.28.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-nl2br": "^0.6.0",
