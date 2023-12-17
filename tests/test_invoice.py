@@ -9,7 +9,7 @@ from tests._utils import render_svg
 
 
 @pytest.mark.skip
-def test_format_inline_epc_qr():
+def test_format_inline_epc_qr(app):
     payment = BankPayment(currency="EUR", amount=10)
 
     qr_inline = format_inline_epc_qr(payment)
