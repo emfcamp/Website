@@ -19,6 +19,17 @@ to monitor the containers.
 
 To start all containers (and rebuild any which may have changed):
 
+> [!TIP]
+> **Apple Silicon Users**
+> You'll probably want to build your own version of the base images as well, as
+> the ones we build are amd64 only, and so painfully slow on ARM devices. This
+> is unlikely to be resolved until GitHub Actions has ARM runners.
+>
+> ```sh
+> docker build -t ghcr.io/emfcamp/website-base -f ./docker/Dockerfile.base .
+> docker build -t ghcr.io/emfcamp/website-base-dev -f ./docker/Dockerfile.base-dev .
+> ```
+
 ```
 docker compose build --parallel
 docker compose up
@@ -37,6 +48,23 @@ To delete all data and start over fresh you can use `docker compose down`.
 
 Management commands can be listed and run using the `./flask` command, which
 forwards them to the flask command line within the container.
+
+### Visual Studio Code
+
+If you use Visual Studio Code it should present you with the option to open the
+project in a dev container. If not, run `code .` from your local copy, and ensure
+you have the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) installed.
+
+Reopening in a dev container will start everything via Docker, attach
+your VSCode instance to the application container, install relevant extensions,
+and ensure everything is configured to fit with our standards.
+
+The first time you start the dev container you will need to tell VSCode where to
+find the Poetry virtual environment. You can do this by open the command pallette
+(Cmd-P on macOS devices) and searching for "Python: Select interpreter", the list
+presented should include `website-${randomHash}-py3.11`, which will be annotated
+as "Poetry". Select that, and then any Python tooling and shells will run within
+the appropriate virtualenv.
 
 ### Errors starting the dev server
 
