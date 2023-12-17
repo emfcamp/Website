@@ -21,7 +21,7 @@ def test_format_inline_epc_qr(app):
         "1",
         "SCT",
         "",
-        "Electromagnetic Field Ltd",
+        "EMF Festivals Ltd",
         "GB47LOND11213141516171",
         "EUR10",
         "",
