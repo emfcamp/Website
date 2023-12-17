@@ -1,5 +1,3 @@
-import pytest
-
 from pyzbar.pyzbar import decode
 
 from apps.payments.invoice import format_inline_epc_qr
