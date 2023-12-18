@@ -19,7 +19,7 @@ def test_format_inline_epc_qr(app):
         "SCT",
         "",
         "EMF Festivals Ltd",
-        "GB47LOND11213141516171",
+        "GB33BUKB20201555555555",
         "EUR10",
         "",
         payment.bankref,
