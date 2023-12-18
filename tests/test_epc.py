@@ -1,6 +1,6 @@
 from pyzbar.pyzbar import decode
 
-from apps.payments.invoice import format_inline_epc_qr
+from apps.common.epc import format_inline_epc_qr
 from models.payment import BankPayment
 
 from tests._utils import render_svg
