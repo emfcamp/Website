@@ -317,7 +317,7 @@ class BankPayment(Payment):
         if self.id is None:
             raise Exception(
                 "Customer references can only be generated for payments that have "
-                "been stored in the database."
+                "been persisted to the database."
             )
 
         # Derive an ISO-11649 payment reference for EUR-currency payments
