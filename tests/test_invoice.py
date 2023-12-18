@@ -1,3 +1,5 @@
+import pytest
+
 from pyzbar.pyzbar import decode
 import re
 from stdnum import iso11649
@@ -8,6 +10,17 @@ from models.payment import BankPayment
 from models.user import User
 
 from tests._utils import render_svg
+
+
+@pytest.mark.parametrize(
+    "customer_reference, expected_format",
+    [
+        ("VFH9K3RQ", "VFH9-K3RQ"),
+        ("RF67E9HKFVR8Q", "RF67 E9HK FVR8 Q"),
+    ],
+)
+def test_customer_reference_display_format(app, customer_reference, expected_format):
+    assert app.jinja_env.filters["bankref"](customer_reference) == expected_format
 
 
 def test_format_inline_epc_qr(app):
