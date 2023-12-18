@@ -434,6 +434,20 @@ class BankTransaction(BaseModel):
         )
         return matching
 
+    @staticmethod
+    def _trim_iso11649_header(ref: str) -> str:
+        """
+        Trim ISO-11649 creditor reference headers, when present, from a payment
+        reference.  When no such header is present, the reference should be returned
+        unmodified.
+        """
+        return re.sub(
+            r"\bRF[0-9][0-9][- ]?"  # RF prefix, check digits, and optional delimiter
+            r"([%s]{4}[- ]?[%s]{4})" % (safechars, safechars),  # 8-character bankref
+            r"\1",  # replacement: retain only the bankref match
+            ref,
+        )
+
     def match_payment(self) -> Optional[BankPayment]:
         """
         We need to deal with human error and character deletion without colliding.
@@ -463,8 +477,7 @@ class BankTransaction(BaseModel):
 
         ref = self.payee.upper()
 
-        # Trim any ISO11649 creditor reference prefix and check digits from the payee
-        ref = re.sub(r"\bRF[0-9][0-9]", "", ref)
+        ref = self._trim_iso11649_header(ref)
 
         found = re.findall("[%s]{4}[- ]?[%s]{4}" % (safechars, safechars), ref)
         for f in found:
