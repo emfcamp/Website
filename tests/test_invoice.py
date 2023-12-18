@@ -16,7 +16,7 @@ from tests._utils import render_svg
     "customer_reference, expected_format",
     [
         ("VFH9K3RQ", "VFH9-K3RQ"),
-        ("RF67E9HKFVR8Q", "RF67 E9HK FVR8 Q"),
+        ("RF679HKFVR8Q", "RF67 9HKF VR8Q"),
     ],
 )
 def test_customer_reference_display_format(app, customer_reference, expected_format):
