@@ -37,7 +37,7 @@ def test_format_inline_epc_qr(app):
 
     # Ensure that the structured creditor reference is valid and contains the bankref
     assert iso11649.is_valid(payment.customer_reference)
-    assert re.match(f"^RF[0-9][0-9]E{payment.bankref}$", payment.customer_reference)
+    assert re.match(f"^RF[0-9][0-9]{payment.bankref}$", payment.customer_reference)
 
     qr_inline = format_inline_epc_qr(payment)
     qr_image = render_svg(qr_inline)
