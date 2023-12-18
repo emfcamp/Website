@@ -314,10 +314,11 @@ class BankPayment(Payment):
 
     @property
     def customer_reference(self):
-        assert self.id, (
-            "Customer references can only be generated for payments that have been stored "
-            "in the database."
-        )
+        if self.id is None:
+            raise Exception(
+                "Customer references can only be generated for payments that have "
+                "been stored in the database."
+            )
 
         # Derive an ISO-11649 payment reference for EUR-currency payments
         if self.currency == "EUR":
