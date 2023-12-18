@@ -321,8 +321,8 @@ class BankPayment(Payment):
 
         # Derive an ISO-11649 payment reference for EUR-currency payments
         if self.currency == "EUR":
-            order_check_digits = mod_97_10.calc_check_digits(f"{self.bankref}RF")
-            customer_reference = f"RF{order_check_digits}{self.bankref}"
+            order_check_digits = mod_97_10.calc_check_digits(f"E{self.bankref}RF")
+            customer_reference = f"RF{order_check_digits}E{self.bankref}"
             assert iso11649.validate(customer_reference)
             return customer_reference
         else:
