@@ -462,6 +462,9 @@ class BankTransaction(BaseModel):
 
         ref = self.payee.upper()
 
+        # Trim any ISO11649 creditor reference prefix and check digits from the payee
+        ref = re.sub(r"\bRF[0-9][0-9]", "", ref)
+
         found = re.findall("[%s]{4}[- ]?[%s]{4}" % (safechars, safechars), ref)
         for f in found:
             bankref = f.replace("-", "").replace(" ", "")
