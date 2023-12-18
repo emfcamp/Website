@@ -1,14 +1,16 @@
 from io import BytesIO
 
 from markupsafe import Markup
-from segno import helpers
+from segno import QRCode, helpers
+
+from models.payment import BankPayment
 
 
-def make_epc_qrfile(payment, **kwargs):
+def make_epc_qrfile(payment: BankPayment, **kwargs) -> BytesIO:
     qrfile = BytesIO()
     # TODO: this isn't currently used. Need to fetch IBAN from payment.recommended_destination
     # and name from somewhere - maybe config rather than hard-coding.
-    qr = helpers.make_epc_qr(
+    qr: QRCode = helpers.make_epc_qr(
         name="EMF Festivals Ltd",
         iban=payment.recommended_destination.iban,
         amount=payment.amount,
@@ -20,11 +22,11 @@ def make_epc_qrfile(payment, **kwargs):
     return qrfile
 
 
-def qrfile_to_svg(qrfile):
+def qrfile_to_svg(qrfile: BytesIO) -> str:
     return Markup(qrfile.getvalue().decode("utf-8"))
 
 
-def format_inline_epc_qr(payment):
+def format_inline_epc_qr(payment: BankPayment) -> str:
     qrfile = make_epc_qrfile(
         payment,
         kind="svg",
