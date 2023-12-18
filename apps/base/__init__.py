@@ -52,7 +52,11 @@ def main():
 @base.route("/", methods=["POST"])
 def main_post():
     honeypot_field = request.form.get("name")
-    email = request.form.get("email")
+    email = request.form.get("email", "").strip()
+
+    if email == "":
+        return redirect(url_for(".main"))
+
     if honeypot_field != "":
         app.logger.warn(
             "Mailing list honeypot field failed for %s (IP %s)",
