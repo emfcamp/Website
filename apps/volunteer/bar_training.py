@@ -16,6 +16,9 @@ from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer
 
 
+APPLICATION_ROOT = os.path.abspath(os.path.join(__file__, "..", "..", ".."))
+
+
 def build_questions(training_json):
     """
     Assigns specific IDs to questions and answers so that we can determine which
@@ -53,7 +56,7 @@ def build_questions(training_json):
 
 
 def load_training_json(path):
-    file_path = os.path.abspath(os.path.join(__file__, "..", "..", "..", path))
+    file_path = os.path.join(APPLICATION_ROOT, path)
     if not os.path.exists(file_path):
         return None
 
@@ -65,7 +68,7 @@ def load_training_markdown(path):
     Takes a file path for a Markdown file (relative to project root)
     and returns the HTML (from Markdown) for that file.
     """
-    file_path = os.path.abspath(os.path.join(__file__, "..", "..", "..", path))
+    file_path = os.path.join(APPLICATION_ROOT, path)
     if not os.path.exists(file_path):
         return None
 
