@@ -1,6 +1,8 @@
-<form method="post" class="form-inline" role="form" action="{{url_for('base.main')}}">
+<form method="post" class="form-inline" role="form" action="{{url_for('base.main')}}" id="mailing-list-form">
     <div class="input-group">
       <input id="email-field" type="email" class="form-control" placeholder="Enter email address" name="email"/>
+      {# This is a honeypot field to prevent bots signing up, it's hidden by CSS #}
+      <input id="name-field" type="text" class="form-control" name="name"/>
       <span class="input-group-btn">
         <button type="submit" class="btn btn-default debounce">Join</button>
       </span>

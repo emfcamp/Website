@@ -1,8 +1,5 @@
-{% extends "base.html" %}
+{% extends "about/template.html" %}
 {% block title %}About{% endblock %}
-{% block secondary_nav %}
-  {% include "about/_nav.html" %}
-{% endblock %}
 {% block body %}
 <div id="about-page">
 <h2>About Electromagnetic Field</h2>
@@ -64,7 +61,7 @@ we have been able to provide free childcare run by professionals since 2016, and
 
 <p>What makes Electromagnetic Field unique is that everything is created by
 attendees like you. The entire event &mdash; stewarding, water, electricity,
-internet, stages, toilets, and the bar &mdash; is organised by a <a href="{{url_for('base.volunteering') }}">dedicated team of volunteers</a>, and everyone who
+internet, stages, toilets, and the bar &mdash; is organised by a <a href="{{url_for('base.page', page_name='volunteering') }}">dedicated team of volunteers</a>, and everyone who
 turns up does their part to make the event an amazing place to be for a
 weekend.  We're a non-profit organisation, so every penny you spend on your
 ticket goes towards making the event happen.</p>

@@ -4,8 +4,8 @@ from pyzbar.pyzbar import decode
 import re
 from stdnum import iso11649
 
-from apps.payments.invoice import format_inline_epc_qr
 from main import db
+from apps.common.epc import format_inline_epc_qr
 from models.payment import BankPayment
 from models.user import User
 
@@ -49,7 +49,7 @@ def test_format_inline_epc_qr(app):
         "SCT",
         "",
         "EMF Festivals Ltd",
-        "GB47LOND11213141516171",
+        "GB33BUKB20201555555555",
         "EUR10",
         "",
         payment.customer_reference,

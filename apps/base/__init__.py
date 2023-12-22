@@ -51,7 +51,20 @@ def main():
 
 @base.route("/", methods=["POST"])
 def main_post():
-    email = request.form.get("email")
+    honeypot_field = request.form.get("name")
+    email = request.form.get("email", "").strip()
+
+    if email == "":
+        return redirect(url_for(".main"))
+
+    if honeypot_field != "":
+        app.logger.warn(
+            "Mailing list honeypot field failed for %s (IP %s)",
+            email,
+            request.remote_addr,
+        )
+        flash("We aren't able to subscribe you at this time.")
+        return redirect(url_for(".main"))
 
     response = requests.post(
         app.config["LISTMONK_URL"] + "/api/public/subscription",
