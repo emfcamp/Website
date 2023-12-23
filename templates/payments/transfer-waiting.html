@@ -1,3 +1,5 @@
+{% from 'payments/_invoicehelpers.html' import render_epc_qr with context %}
+
 {% extends "base.html" %}
 {% block body %}
 
@@ -43,6 +45,10 @@
 {% endif %}
 <dt>Amount</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
 <dt>Reference</dt><dd>{{ payment.customer_reference | bankref }}</dd>
+</dl>
+
+<dl class="dl-horizontal">
+<dt>EPC QR Code</dt><dd class="well">{{ render_epc_qr(payment) }}</dd>
 </dl>
 
 {% if SITE_STATE != 'after-event' %}
