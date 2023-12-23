@@ -178,6 +178,11 @@ dl.company-info dd:after {
   display: none;
 }
 
+.epc-qr-code svg {
+  width: 123px;
+  height: 123px;
+}
+
 @media print {
   .container {
     width: auto;
