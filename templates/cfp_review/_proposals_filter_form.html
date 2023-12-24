@@ -33,6 +33,14 @@
             <label for="tags" class="col-sm-2">Tag</label>
             <div class="col-sm-10">
                 <select id="tags" name="tags" multiple class="form-control">
+                    <option value="untagged"
+                        {%-if "untagged" in request.args.getlist('tags') %}
+                            selected
+                        {%-endif %}
+                    >
+                        Untagged
+                    </option>
+                    <option value="" disabled="disabled">---------------</option>
                     {% for tag, (filtered_count, total_count) in tag_counts.items() %}
                         <option value="{{ tag }}"
                             {%-if tag in request.args.getlist('tags') %}
