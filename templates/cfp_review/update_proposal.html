@@ -20,87 +20,153 @@
 <form method="post" action="{{ url_for('.update_proposal', proposal_id=proposal.id) }}" class="shrink">
     {{ form.hidden_tag() }}
     <div class="col-md-8">
-        <dl class="dl-horizontal">
-            <dt>Submitted</dt>
-            <dd>{{proposal.created.strftime("%Y-%m-%d %H:%M")}}</dd>
-            <dt>E-Mail</dt>
-            <dd>{{proposal.user.email}}</dd>
-            {% if proposal.anonymiser_id %}
-            <dt>Anoymised by</dt>
-            <dd>{{ proposal.anonymiser.name }}</dd>
+        <div class="panel-group" id="formAccordion" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="basicsPanelHeading">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" data-parent="#formAccordion" href="#basicsPanel" aria-expanded="true" aria-controls="basicsPanel">
+                            Basics (title, description ...)
+                        </a>
+                    </h4>
+                </div>
+                <div id="basicsPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="basicsPanelHeading">
+                    <div class="panel-body">
+                        <dl class="dl-horizontal">
+                            <dt>Submitted</dt>
+                            <dd>{{proposal.created.strftime("%Y-%m-%d %H:%M")}}</dd>
+                            <dt>E-Mail</dt>
+                            <dd>{{proposal.user.email}}</dd>
+                            {% if proposal.anonymiser_id %}
+                            <dt>Anoymised by</dt>
+                            <dd>{{ proposal.anonymiser.name }}</dd>
+                            {% endif %}
+                            <dt>Num favourites</dt>
+                            <dd>{{ proposal.favourite_count }}</dd>
+                            {{ render_dl_field(form.state) }}
+                            {{ render_dl_field(form.title) }}
+                            {{ render_dl_field(form.description, rows=8) }}
+                            {{ render_dl_field(form.tags) }}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="requirementsPanelHeading">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" data-parent="#formAccordion" href="#requirementsPanel" aria-expanded="false" aria-controls="requirementsPanel">
+                            Requirements (laptop, size, attendees...)
+                        </a>
+                    </h4>
+                </div>
+                <div id="requirementsPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="requirementsPanelHeading">
+                    <div class="panel-body">
+                        <dl class="dl-horizontal">
+                            {{ render_dl_field(form.requirements, rows=3) }}
+                            {{ render_dl_field(form.length) }}
+                            {{ render_dl_field(form.notice_required) }}
+                            {{ render_dl_field(form.needs_help) }}
+                            {{ render_dl_field(form.needs_money) }}
+                            {{ render_dl_field(form.needs_laptop) }}
+                            {{ render_dl_field(form.one_day) }}
+                            {% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}
+                                {{ render_dl_field(form.attendees) }}
+                                {{ render_dl_field(form.cost) }}
+                                {{ render_dl_field(form.participant_equipment) }}
+                                {{ render_dl_field(form.age_range) }}
+                                {% if proposal.type == 'youthworkshop' %}
+                                    {{ render_dl_field(form.valid_dbs) }}
+                                {% endif %}
+                            {% elif proposal.type == 'installation' %}
+                                {{ render_dl_field(form.size) }}
+                                {{ render_dl_field(form.funds) }}
+                            {% endif %}
+                            {{ render_dl_field(form.will_have_ticket) }}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="schedulingPanelHeading">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" data-parent="#formAccordion" href="#schedulingPanel" aria-expanded="false" aria-controls="schedulingPanel">
+                            Scheduling (allowed venues, duration...)
+                        </a>
+                    </h4>
+                </div>
+                <div id="schedulingPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="schedulingPanelHeading">
+                    <div class="panel-body">
+                        <dl class="dl-horizontal">
+                            {% if proposal.type == "lightning" %}
+                                {{ render_dl_field(form.session) }}
+                                {{ render_dl_field(form.slide_link) }}
+                            {% else %}
+                                {{ render_dl_field(form.user_scheduled) }}
+                                {{ render_dl_field(form.hide_from_schedule) }}
+                                {{ render_dl_field(form.allowed_venues) }}
+                                {{ render_dl_field(form.allowed_times) }}
+                                {{ render_dl_field(form.scheduled_duration) }}
+                                {{ render_dl_field(form.scheduled_venue) }}
+                                {{ render_dl_field(form.scheduled_time) }}
+                                {{ render_dl_field(form.potential_venue) }}
+                                {{ render_dl_field(form.potential_time) }}
+                            {% endif %}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            {% if proposal.state in ('accepted', 'finished') %}
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="publishedPanelHeading">
+                        <h4 class="panel-title">
+                            <a role="button" data-toggle="collapse" data-parent="#formAccordion" href="#publishedPanel" aria-expanded="false" aria-controls="publishedPanel">
+                                User schedule published information (published names, content note, cost...)
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="publishedPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="publishedPanelHeading">
+                        <div class="panel-body">
+                            <dl class="dl-horizontal">
+                                {{ render_dl_field(form.published_names) }}
+                                {{ render_dl_field(form.published_pronouns) }}
+                                {{ render_dl_field(form.published_title) }}
+                                {{ render_dl_field(form.published_description, rows=4) }}
+                                {{ render_dl_field(form.content_note) }}
+                                {{ render_dl_field(form.family_friendly, rows=4) }}
+                                {% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}
+                                    {{ render_dl_field(form.published_age_range) }}
+                                    {{ render_dl_field(form.published_cost) }}
+                                    {{ render_dl_field(form.published_participant_equipment) }}
+                                {% endif %}
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="schedulingUserPanelHeading">
+                        <h4 class="panel-title">
+                            <a role="button" data-toggle="collapse" data-parent="#formAccordion" href="#schedulingUserPanel" aria-expanded="false" aria-controls="schedulingUserPanel">
+                                User scheduling information (telephone, arrival times...)
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="schedulingUserPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="schedulingUserPanelHeading">
+                        <div class="panel-body">
+                            <dl class="dl-horizontal">
+                                {{ render_dl_field(form.telephone_number) }}
+                                {{ render_dl_field(form.eventphone_number) }}
+                                {% if proposal.type == 'talk' %}
+                                    {{ render_dl_field(form.may_record) }}
+                                    {{ render_radio_field(form.needs_laptop) }}
+                                {% endif %}
+                                {{ render_dl_field(form.arrival_period) }}
+                                {{ render_dl_field(form.departure_period) }}
+                                {{ render_dl_field(form.available_times) }}
+                            </dl>
+                        </div>
+                    </div>
+                </div>
             {% endif %}
-            <dt>Num favourites</dt>
-            <dd>{{ proposal.favourite_count }}</dd>
-            {{ render_dl_field(form.state) }}
-            {{ render_dl_field(form.title) }}
-            {{ render_dl_field(form.description, rows=8) }}
-            {{ render_dl_field(form.tags) }}
-            {{ render_dl_field(form.requirements, rows=3) }}
-            {{ render_dl_field(form.length) }}
-            {{ render_dl_field(form.notice_required) }}
-            {{ render_dl_field(form.needs_help) }}
-            {{ render_dl_field(form.needs_money) }}
-            {{ render_dl_field(form.needs_laptop) }}
-            {{ render_dl_field(form.one_day) }}
-            {% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}
-                {{ render_dl_field(form.attendees) }}
-                {{ render_dl_field(form.cost) }}
-                {{ render_dl_field(form.participant_equipment) }}
-                {{ render_dl_field(form.age_range) }}
-                {% if proposal.type == 'youthworkshop' %}
-                    {{ render_dl_field(form.valid_dbs) }}
-                {% endif %}
-            {% elif proposal.type == 'installation' %}
-                {{ render_dl_field(form.size) }}
-                {{ render_dl_field(form.funds) }}
-            {% endif %}
-            {{ render_dl_field(form.will_have_ticket) }}
-        </dl>
-        <h4>Scheduling</h4>
-            <dl class="dl-horizontal">
-                {% if proposal.type == "lightning" %}
-                    {{ render_dl_field(form.session) }}
-                    {{ render_dl_field(form.slide_link) }}
-                {% else %}
-                    {{ render_dl_field(form.user_scheduled) }}
-                    {{ render_dl_field(form.hide_from_schedule) }}
-                    {{ render_dl_field(form.allowed_venues) }}
-                    {{ render_dl_field(form.allowed_times) }}
-                    {{ render_dl_field(form.scheduled_duration) }}
-                    {{ render_dl_field(form.scheduled_venue) }}
-                    {{ render_dl_field(form.scheduled_time) }}
-                    {{ render_dl_field(form.potential_venue) }}
-                    {{ render_dl_field(form.potential_time) }}
-                {% endif %}
-            </dl>
-        {% if proposal.state in ('accepted', 'finished') %}
-        <h4>User schedule published details</h4>
-            <dl class="dl-horizontal">
-                {{ render_dl_field(form.published_names) }}
-                {{ render_dl_field(form.published_pronouns) }}
-                {{ render_dl_field(form.published_title) }}
-                {{ render_dl_field(form.published_description, rows=4) }}
-                {{ render_dl_field(form.content_note) }}
-                {{ render_dl_field(form.family_friendly, rows=4) }}
-                {% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}
-                    {{ render_dl_field(form.published_age_range) }}
-                    {{ render_dl_field(form.published_cost) }}
-                    {{ render_dl_field(form.published_participant_equipment) }}
-                {% endif %}
-            </dl>
-        <h4>User scheduling information</h4>
-            <dl class="dl-horizontal">
-                {{ render_dl_field(form.telephone_number) }}
-                {{ render_dl_field(form.eventphone_number) }}
-                {% if proposal.type == 'talk' %}
-                    {{ render_dl_field(form.may_record) }}
-                    {{ render_radio_field(form.needs_laptop) }}
-                {% endif %}
-                {{ render_dl_field(form.arrival_period) }}
-                {{ render_dl_field(form.departure_period) }}
-                {{ render_dl_field(form.available_times) }}
-            </dl>
-        {% endif %}
+        </div>
         {{ form.update(class_="btn btn-primary debounce", tabindex=1) }}
     </div>
     <div class="col-md-4 col-xs-12" role="group">
