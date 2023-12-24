@@ -320,6 +320,8 @@ def update_proposal(proposal_id):
     else:
         raise Exception("Unknown cfp type {}".format(prop.type))
 
+    form.tags.choices = [(t.tag, t.tag) for t in Tag.query.order_by(Tag.tag).all()]
+
     # Process the POST
     if form.validate_on_submit():
         try:
@@ -368,7 +370,7 @@ def update_proposal(proposal_id):
     form.state.data = prop.state
     form.title.data = prop.title
     form.description.data = prop.description
-    form.tags.data = Tag.serialise_tags(prop.tags)
+    form.tags.data = [t.tag for t in prop.tags]
     form.requirements.data = prop.requirements
     form.length.data = prop.length
     form.notice_required.data = prop.notice_required
