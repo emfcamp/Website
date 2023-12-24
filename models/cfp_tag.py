@@ -26,7 +26,8 @@ class Tag(BaseModel):
     @classmethod
     def parse_serialised_tags(cls, tag_str: str) -> list["Tag"]:
         res = []
-        tag_list = [t.strip().lower() for t in tag_str.split(",")]
+        # tag_list = [t.strip().lower() for t in tag_str.split(",")]
+        tag_list = [t.strip().lower() for t in tag_str]
         for tag_value in tag_list:
             if len(tag_value) == 0:
                 continue

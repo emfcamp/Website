@@ -9,6 +9,7 @@ from wtforms import (
     BooleanField,
     IntegerField,
     FloatField,
+    SelectMultipleField,
 )
 from wtforms.validators import DataRequired, Optional, NumberRange, ValidationError
 
@@ -24,7 +25,7 @@ class UpdateProposalForm(Form):
     state = SelectField("State", choices=[(s, s) for s in ORDERED_STATES])
     title = StringField("Title", [DataRequired()])
     description = TextAreaField("Description", [DataRequired()])
-    tags = StringField("Tags")
+    tags = SelectMultipleField("Tags")
     requirements = TextAreaField("Requirements")
     length = StringField("Length")
     notice_required = SelectField(
