@@ -139,6 +139,13 @@ def filter_proposal_request():
             )
         )
 
+    tags = request.args.getlist("tags")
+    if tags:
+        filtered = True
+        proposal_query = proposal_query.join(Proposal.tags).filter(
+            Proposal.tags.any(Tag.tag.in_(tags))
+        )
+
     sort_dict = get_proposal_sort_dict(request.args)
     proposal_query = proposal_query.options(joinedload(Proposal.user)).options(
         joinedload("user.owned_tickets")
@@ -160,12 +167,18 @@ def proposals():
     if "reverse" in non_sort_query_string:
         del non_sort_query_string["reverse"]
 
+    tag_counts = {t.tag: [0, len(t.proposals)] for t in Tag.query.all()}
+    for prop in proposals:
+        for t in prop.tags:
+            tag_counts[t.tag][0] = tag_counts[t.tag][0] + 1
+
     return render_template(
         "cfp_review/proposals.html",
         proposals=proposals,
         new_qs=non_sort_query_string,
         filtered=filtered,
         total_proposals=Proposal.query.count(),
+        tag_counts=tag_counts,
     )
 
 
