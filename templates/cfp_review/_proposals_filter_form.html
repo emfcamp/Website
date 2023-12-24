@@ -29,6 +29,20 @@
                 </select>
             </div>
         </div>
+        <div class="form-group">
+            <label for="tags" class="col-sm-2">Tag</label>
+            <div class="col-sm-10">
+                <select id="tags" name="tags" multiple class="form-control">
+                    {% for tag, (filtered_count, total_count) in tag_counts.items() %}
+                        <option value="{{ tag }}"
+                            {%-if tag in request.args.getlist('tags') %}
+                                selected
+                            {%-endif %}
+                        >{{ tag | capitalize }} ({{ filtered_count }}/{{total_count}})</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
     </fieldset>
     <fieldset class="form-horizontal col-md-6">
         <div class="form-group">
