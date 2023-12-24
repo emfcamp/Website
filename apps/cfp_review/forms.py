@@ -4,7 +4,6 @@ from wtforms import (
     StringField,
     FieldList,
     FormField,
-    RadioField,
     SelectField,
     TextAreaField,
     BooleanField,
@@ -52,7 +51,7 @@ class UpdateProposalForm(Form):
     telephone_number = StringField("Telephone")
     eventphone_number = StringField("On-site extension")
     may_record = BooleanField("May record")
-    needs_laptop = RadioField(
+    needs_laptop = SelectField(
         "Needs laptop",
         choices=[
             (0, "Is providing their own laptop"),
