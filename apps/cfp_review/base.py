@@ -22,19 +22,21 @@ from sqlalchemy.orm import joinedload
 from main import db, external_url
 from .majority_judgement import calculate_max_normalised_score
 from models.cfp import (
-    Proposal,
-    LightningTalkProposal,
     CFPMessage,
     CFPVote,
-    Venue,
-    InvalidVenueException,
-    MANUAL_REVIEW_TYPES,
-    get_available_proposal_minutes,
-    ROUGH_LENGTHS,
-    get_days_map,
     DEFAULT_VENUES,
     EVENT_SPACING,
     FavouriteProposal,
+    get_available_proposal_minutes,
+    get_days_map,
+    HUMAN_CFP_TYPES,
+    InvalidVenueException,
+    LightningTalkProposal,
+    MANUAL_REVIEW_TYPES,
+    ORDERED_STATES,
+    Proposal,
+    ROUGH_LENGTHS,
+    Venue,
 )
 from models.cfp_tag import Tag
 from models.user import User
@@ -140,7 +142,16 @@ def filter_proposal_request():
         )
 
     tags = request.args.getlist("tags")
-    if tags:
+    if "untagged" in tags:
+        if len(tags) > 1:
+            flash("'untagged' in 'tags' arg, other tags ignored")
+        filtered = True
+        # join(..outer=True) == left outer join
+        proposal_query = proposal_query.join(Proposal.tags, isouter=True).filter(
+            Tag.id.is_(None)
+        )
+
+    elif tags:
         filtered = True
         proposal_query = proposal_query.join(Proposal.tags).filter(
             Proposal.tags.any(Tag.tag.in_(tags))
@@ -1185,6 +1196,30 @@ def lightning_talks():
         proposals=proposals,
         remaining_lightning_slots=remaining_lightning_slots,
         total_slots=LightningTalkProposal.get_total_lightning_talk_slots(),
+    )
+
+
+@cfp_review.route("/proposals-summary")
+@schedule_required
+def proposals_summary():
+    counts_by_tag = {t.tag: len(t.proposals) for t in Tag.query.all()}
+    counts_by_tag["untagged"] = 0
+
+    counts_by_type = {t: 0 for t in HUMAN_CFP_TYPES}
+    counts_by_state = {s: 0 for s in ORDERED_STATES}
+
+    for prop in Proposal.query.all():
+        counts_by_type[prop.type] += 1
+        counts_by_state[prop.state] += 1
+
+        if not prop.tags:
+            counts_by_tag["untagged"] += 1
+
+    return render_template(
+        "cfp_review/proposals_summary.html",
+        counts_by_tag=counts_by_tag,
+        counts_by_type=counts_by_type,
+        counts_by_state=counts_by_state,
     )
 
 
