@@ -9,6 +9,8 @@ from models.volunteer.venue import VolunteerVenue
 from models.volunteer.shift import Shift
 from models.volunteer.role import Role
 
+from apps.cfp.tasks import create_tags
+
 from . import dev_cli
 from .fake import FakeDataGenerator
 
@@ -20,6 +22,7 @@ def dev_data(ctx):
     ctx.invoke(fake_data)
     ctx.invoke(volunteer_data)
     ctx.invoke(volunteer_shifts)
+    ctx.invoke(create_tags)
 
 
 @dev_cli.command("cfp_data")

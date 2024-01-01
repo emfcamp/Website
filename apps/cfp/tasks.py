@@ -6,6 +6,7 @@ from flask import current_app as app
 
 from main import db
 from models.cfp import Proposal, TalkProposal, WorkshopProposal, InstallationProposal
+from models.cfp_tag import Tag, DEFAULT_TAGS
 from models.user import User
 from apps.cfp_review.base import send_email_for_proposal
 from ..common.email import from_email
@@ -125,3 +126,27 @@ def email_reserve():
         send_email_for_proposal(
             proposal, reason="reserve-list", from_address=from_email("SPEAKERS_EMAIL")
         )
+
+
+@cfp.cli.command(
+    "create_tags",
+    help=f"Add tags to the database. Defaults are {DEFAULT_TAGS}.",
+)
+@click.argument("tags_to_create", nargs=-1)
+def create_tags(tags_to_create):
+    """Upset tag list"""
+    if not tags_to_create:
+        tags_to_create = DEFAULT_TAGS
+
+    tags_created = 0
+    for tag in tags_to_create:
+        if Tag.query.filter_by(tag=tag).all():
+            app.logger.info(f"'{tag}' already exists, skipping.")
+            continue
+
+        db.session.add(Tag(tag))
+        tags_created += 1
+        app.logger.info(f"'{tag}' added to session.")
+
+    db.session.commit()
+    app.logger.info(f"Successfully created {tags_created} new tags.")
