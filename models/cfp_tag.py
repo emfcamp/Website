@@ -3,6 +3,21 @@ import sqlalchemy
 from . import BaseModel
 
 
+DEFAULT_TAGS = [
+    "computing",
+    "film",
+    "health",
+    "misc",
+    "music",
+    "radio",
+    "robotics",
+    "science",
+    "security",
+    "trains",
+    "show & tell",
+]
+
+
 class Tag(BaseModel):
     __versioned__: dict = {}
     __tablename__ = "tag"
