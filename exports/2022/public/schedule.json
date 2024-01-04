@@ -109,7 +109,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/12-launching-a-rocket-suspended-by-a-balloon-rockoon",
     "start_time": "16:30",
-    "end_time": "16:50"
+    "end_time": "16:50",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=9BJ0_LY59mU",
+      "original_filename": "Launching a Rocket, Suspended by a Balloon (Rockoon), from the Stratosphere.mp4"
+    }
   },
   {
     "id": 13,
@@ -136,7 +140,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/13-automated-science-at-sea-the-mayflower-autonomous-ship",
     "start_time": "15:50",
-    "end_time": "16:20"
+    "end_time": "16:20",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=yH2Rwg8hQ-A",
+      "original_filename": "Automated Science at Sea - The Mayflower Autonomous Ship.mp4"
+    }
   },
   {
     "id": 16,
@@ -163,7 +171,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/16-an-evil-maids-dream-windows-boot-security-was-broken-anyway",
     "start_time": "17:40",
-    "end_time": "18:20"
+    "end_time": "18:20",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=U02ClZS8hqw",
+      "original_filename": "An Evil Maids Dream Windows Boot Security was Broken Anyway.mp4"
+    }
   },
   {
     "id": 17,
@@ -190,7 +202,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/17-anatomy-102-is-that-normal",
     "start_time": "17:40",
-    "end_time": "18:10"
+    "end_time": "18:10",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=atUHyZJBqy0",
+      "original_filename": "Anatomy 102 Is that normal.mp4"
+    }
   },
   {
     "id": 18,
@@ -500,7 +516,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/40-an-introduction-to-building-your-own-digital-audio-effects",
     "start_time": "16:20",
-    "end_time": "16:50"
+    "end_time": "16:50",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=oWq9tMEkUSY",
+      "original_filename": "An introduction to building your own digital audio effects.mp4"
+    }
   },
   {
     "id": 41,
@@ -612,7 +632,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/46-making-in-margate",
     "start_time": "11:20",
-    "end_time": "11:50"
+    "end_time": "11:50",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=ue9NLRQXVM8",
+      "original_filename": "Making in Margate.mp4"
+    }
   },
   {
     "id": 48,
@@ -666,7 +690,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/49-how-im-building-my-monstrous-electric-motorcycle-from-hacked",
     "start_time": "16:30",
-    "end_time": "17:00"
+    "end_time": "17:00",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=Rwq4_CKdhRE",
+      "original_filename": "49 - How I'm building my monstrous electric vehicle.mp4"
+    }
   },
   {
     "id": 50,
@@ -751,7 +779,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/53-gpt-3-powerpoint-karaoke",
     "start_time": "20:10",
-    "end_time": "21:00"
+    "end_time": "21:00",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=Z0jNl9cm-pE",
+      "original_filename": "Powerpoint Karaoke.mp4"
+    }
   },
   {
     "id": 54,
@@ -778,7 +810,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/54-a-life-without-stickers-is-possible-but-useless",
     "start_time": "10:40",
-    "end_time": "11:10"
+    "end_time": "11:10",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=L8DTq91fhIg",
+      "original_filename": "A Life Without Stickers is Possible But Useless.mp4"
+    }
   },
   {
     "id": 55,
@@ -917,7 +953,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/66-how-i-set-up-a-coderdojo",
     "start_time": "10:00",
-    "end_time": "10:30"
+    "end_time": "10:30",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=5UNLBDD4omw",
+      "original_filename": "How I set up a CoderDojo and Started a Coding Community in my Town.mp4"
+    }
   },
   {
     "id": 68,
@@ -975,7 +1015,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/71-using-arduinos-to-resurrect-an-airliner-wing",
     "start_time": "14:30",
-    "end_time": "15:00"
+    "end_time": "15:00",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=5kPJ4nWs4Zk",
+      "original_filename": "Using Arduinos to Resurrect an Airliner Wing.mp4"
+    }
   },
   {
     "id": 74,
@@ -1033,7 +1077,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/78-an-engineers-guide-to-grief",
     "start_time": "12:40",
-    "end_time": "13:10"
+    "end_time": "13:10",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=dEx3_r7cXLM",
+      "original_filename": "An engineer's guide to grief.mp4"
+    }
   },
   {
     "id": 79,
@@ -1060,7 +1108,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/79-open-garden-mesh-networks-and-how-it-helped-me-protest-safer",
     "start_time": "16:20",
-    "end_time": "16:40"
+    "end_time": "16:40",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=LkwL1EWxuqc",
+      "original_filename": "Open Garden, Mesh networks, and how it helped me protest safer.mp4"
+    }
   },
   {
     "id": 81,
@@ -1087,7 +1139,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/81-hacking-the-radio-spectrum-with-gnu-radio",
     "start_time": "18:30",
-    "end_time": "19:00"
+    "end_time": "19:00",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=hiNcjJEaqO8",
+      "original_filename": "Hacking the Radio Spectrum with GNU Radio.mp4"
+    }
   },
   {
     "id": 83,
@@ -1114,7 +1170,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/83-fixing-climate-change-finance-science-policy-data",
     "start_time": "15:10",
-    "end_time": "15:40"
+    "end_time": "15:40",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=_UhUEs4ZI0U",
+      "original_filename": "Fixing climate change finance, science, policy & data.mp4"
+    }
   },
   {
     "id": 87,
@@ -1412,7 +1472,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/99-field-fx-demo-show",
     "start_time": "17:20",
-    "end_time": "17:50"
+    "end_time": "17:50",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=hwrht4Q5o6c",
+      "original_filename": "Field-FX Demo Show.mp4"
+    }
   },
   {
     "id": 100,
@@ -1439,7 +1503,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/100-anti-surveillance-knitting",
     "start_time": "15:20",
-    "end_time": "15:40"
+    "end_time": "15:40",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=XunHRUVB4_k",
+      "original_filename": "Anti-surveillance Knitting.mp4"
+    }
   },
   {
     "id": 102,
@@ -1520,7 +1588,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/104-a-crash-course-in-railway-safety",
     "start_time": "15:40",
-    "end_time": "16:10"
+    "end_time": "16:10",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=075Mj4t-YdI",
+      "original_filename": "104 - A Crash Course in Railway Safety.mp4"
+    }
   },
   {
     "id": 105,
@@ -1547,7 +1619,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/105-the-curious-design-of-the-apollo-guidance-computer",
     "start_time": "13:20",
-    "end_time": "13:50"
+    "end_time": "13:50",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=PNIWrrU55-A",
+      "original_filename": "105 - The curious design of the Apollo Guidance Computer..mp4"
+    }
   },
   {
     "id": 106,
@@ -1574,7 +1650,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/106-sifteo-cubes-resurrecting-a-legend",
     "start_time": "18:30",
-    "end_time": "19:00"
+    "end_time": "19:00",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=VMa5JWUGw_c",
+      "original_filename": "Sifteo Cubes- Resurrecting a legend.mp4"
+    }
   },
   {
     "id": 107,
@@ -1628,7 +1708,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/108-a-journey-through-philosophy-exploring-metaphysics-via-memes",
     "start_time": "17:00",
-    "end_time": "17:30"
+    "end_time": "17:30",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=PJb15xlF8QY",
+      "original_filename": "A journey through philosophy exploring metaphysics via memes and a sprinkling of pop culture-_1.mp4"
+    }
   },
   {
     "id": 110,
@@ -1655,7 +1739,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/110-me-the-data-within-data-ethics-ballet-brainwaves-and-ar",
     "start_time": "12:00",
-    "end_time": "12:30"
+    "end_time": "12:30",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=i3Ug8uNJfI8",
+      "original_filename": "ME++ The Data Within - data ethics, ballet, brainwaves, and AR.mp4"
+    }
   },
   {
     "id": 112,
@@ -1764,7 +1852,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/120-announcing-the-emf-schedule-like-its-the-80s",
     "start_time": "10:00",
-    "end_time": "10:30"
+    "end_time": "10:30",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=KkHjuGDeh98",
+      "original_filename": "Announcing the EMF schedule like it's the 80s.mp4"
+    }
   },
   {
     "id": 121,
@@ -1791,7 +1883,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/121-inside-datatrak-resurrecting-a-radio-navigation-network",
     "start_time": "14:40",
-    "end_time": "15:10"
+    "end_time": "15:10",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=Z22wdEyITK8",
+      "original_filename": "Inside Datatrak resurrecting a radio navigation network.mp4"
+    }
   },
   {
     "id": 123,
@@ -1845,7 +1941,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/124-running-around-in-circles",
     "start_time": "17:00",
-    "end_time": "17:30"
+    "end_time": "17:30",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=cR5unGIRVl8",
+      "original_filename": "Running around in circles and why it isn't as useless as you first expect-.mp4"
+    }
   },
   {
     "id": 128,
@@ -1903,7 +2003,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/129-some-useful-maths",
     "start_time": "15:20",
-    "end_time": "15:40"
+    "end_time": "15:40",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=gwdsW0TDV7Q",
+      "original_filename": "Some Useful Maths.mp4"
+    }
   },
   {
     "id": 131,
@@ -1992,7 +2096,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/134-building-weird-games-controllers",
     "start_time": "16:50",
-    "end_time": "17:20"
+    "end_time": "17:20",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=D08LRoYyj98",
+      "original_filename": "Building weird games controllers-.mp4"
+    }
   },
   {
     "id": 136,
@@ -2019,7 +2127,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/136-building-a-home-made-enigma-machine",
     "start_time": "14:10",
-    "end_time": "14:30"
+    "end_time": "14:30",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=fkOx8ij7OaQ",
+      "original_filename": "Building a Home-Made Enigma Machine.mp4"
+    }
   },
   {
     "id": 138,
@@ -2073,7 +2185,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/139-a-brief-history-of-time-zones-and-daylight-saving-time",
     "start_time": "11:00",
-    "end_time": "11:30"
+    "end_time": "11:30",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=NoAoFtbiLMU",
+      "original_filename": "139 - A brief history of Time Zones and Daylight Saving Time.mp4"
+    }
   },
   {
     "id": 140,
@@ -2100,7 +2216,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/140-soft-electronics",
     "start_time": "18:10",
-    "end_time": "18:40"
+    "end_time": "18:40",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=-y-BgBRjAQM",
+      "original_filename": "140 - Soft Electronics.mp4"
+    }
   },
   {
     "id": 141,
@@ -2158,7 +2278,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/144-fashion-tech-advice-from-a-farm-boy-and-a-comp-sci-geek",
     "start_time": "17:20",
-    "end_time": "17:50"
+    "end_time": "17:50",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=K27N5xvhleY",
+      "original_filename": "Fashion-tech Advice from a Farm Boy and a Comp Sci Geek.mp4"
+    }
   },
   {
     "id": 145,
@@ -2243,7 +2367,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/149-hovering-rockets",
     "start_time": "15:00",
-    "end_time": "15:30"
+    "end_time": "15:30",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=f46KRwrJTc8",
+      "original_filename": "149 - Hovering Rockets.mp4"
+    }
   },
   {
     "id": 150,
@@ -2270,7 +2398,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/150-the-sega-dreamcast-frankensteins-console",
     "start_time": "12:00",
-    "end_time": "12:20"
+    "end_time": "12:20",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=YjE_YYAkdy4",
+      "original_filename": "The SEGA Dreamcast Frankenstein's Console.mp4"
+    }
   },
   {
     "id": 151,
@@ -2359,7 +2491,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/153-improve-your-memory-in-your-head-not-in-your-computer",
     "start_time": "11:20",
-    "end_time": "11:50"
+    "end_time": "11:50",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=Qh_yyxVNxxA",
+      "original_filename": "153 - Improve your Memory ( in your head not in your computer).mp4"
+    }
   },
   {
     "id": 154,
@@ -2386,7 +2522,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/154-psychological-party-tricks",
     "start_time": "10:00",
-    "end_time": "10:30"
+    "end_time": "10:30",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=PxtfUmlDt9Q",
+      "original_filename": "154 - Psychological party tricks.mp4"
+    }
   },
   {
     "id": 155,
@@ -2444,7 +2584,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/156-the-highest-energy-machine-on-the-earth-to-solve-the-biggest",
     "start_time": "14:20",
-    "end_time": "14:50"
+    "end_time": "14:50",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=tQtqdZqh-Ng",
+      "original_filename": "The Highest Energy  Machine on the Earth  to Solve the Biggest Puzzles of the Universe.mp4"
+    }
   },
   {
     "id": 157,
@@ -2498,7 +2642,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/160-emotions-whats-up-with-those",
     "start_time": "17:30",
-    "end_time": "18:00"
+    "end_time": "18:00",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=zQVl13m-R9U",
+      "original_filename": "160 - Emotions, what's up with those.mp4"
+    }
   },
   {
     "id": 163,
@@ -2525,7 +2673,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/163-modern-cryptography-from-scratch-in-scratch",
     "start_time": "13:30",
-    "end_time": "14:00"
+    "end_time": "14:00",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=jmJRArrwI9s",
+      "original_filename": "Modern Cryptography from Scratch, in Scratch.mp4"
+    }
   },
   {
     "id": 164,
@@ -2552,7 +2704,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/164-ship-vs-oil-rig",
     "start_time": "18:50",
-    "end_time": "19:20"
+    "end_time": "19:20",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=Ot6-fE3Egfo",
+      "original_filename": "164 - Ship vs Oil Rig.mp4"
+    }
   },
   {
     "id": 165,
@@ -2579,7 +2735,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/165-hacking-train-tickets-for-fun-but-not-for-profit",
     "start_time": "13:50",
-    "end_time": "14:20"
+    "end_time": "14:20",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=W4NQkXCskY0",
+      "original_filename": "165 - Hacking train tickets for fun, but not for profit.mp4"
+    }
   },
   {
     "id": 167,
@@ -2664,7 +2824,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/169-learning-from-accidents",
     "start_time": "12:00",
-    "end_time": "12:40"
+    "end_time": "12:40",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=cryU7F3hh30",
+      "original_filename": "169 - Learning from accidents an introduction to railway signalling in the UK.mp4"
+    }
   },
   {
     "id": 171,
@@ -2691,7 +2855,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/171-i-gave-up-investment-banking-to-become-a-digital-artist",
     "start_time": "16:30",
-    "end_time": "17:00"
+    "end_time": "17:00",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=FaqnFGea2qc",
+      "original_filename": "I gave up investment banking to become a digital artist.mp4"
+    }
   },
   {
     "id": 172,
@@ -2718,7 +2886,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/172-the-future-of-invention",
     "start_time": "10:40",
-    "end_time": "11:10"
+    "end_time": "11:10",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=2-UhbZcwAdI",
+      "original_filename": "The future of invention.mp4"
+    }
   },
   {
     "id": 174,
@@ -2776,7 +2948,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/178-why-doesnt-the-universal-translator-translate-klingon",
     "start_time": "17:00",
-    "end_time": "17:20"
+    "end_time": "17:20",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=4rdMzOIPqSA",
+      "original_filename": "Why doesn't the Universal Translator translate Klingon insults- A nerd's introduction to machine translation.mp4"
+    }
   },
   {
     "id": 182,
@@ -2803,7 +2979,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/182-london-underground-open-data",
     "start_time": "17:50",
-    "end_time": "18:20"
+    "end_time": "18:20",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=osAfQLD59Kc",
+      "original_filename": "182 - London Underground open data much more than you ever wanted to know.mp4"
+    }
   },
   {
     "id": 185,
@@ -2830,7 +3010,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/185-hacking-gender-transition-%C3%A0-la-carte",
     "start_time": "12:00",
-    "end_time": "12:40"
+    "end_time": "12:40",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=dGklNDJZX1k",
+      "original_filename": "185 - Hacking Gender Transition À La Carte.mp4"
+    }
   },
   {
     "id": 187,
@@ -2857,7 +3041,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/187-emf-2022-infrastructure-review",
     "start_time": "18:30",
-    "end_time": "19:20"
+    "end_time": "19:20",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=8grwYpDD4D0",
+      "original_filename": "187 - Infrastructure Review.mp4"
+    }
   },
   {
     "id": 189,
@@ -2884,7 +3072,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/189-the-art-of-videogame-sound-effects",
     "start_time": "11:20",
-    "end_time": "11:50"
+    "end_time": "11:50",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=yrr2V4ZowVA",
+      "original_filename": "The Art of Videogame Sound Effects.mp4"
+    }
   },
   {
     "id": 200,
@@ -2911,7 +3103,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/200-why-you-should-write-a-gameboy-emulator",
     "start_time": "15:10",
-    "end_time": "15:30"
+    "end_time": "15:30",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=ElwhYW5wjts",
+      "original_filename": "Why You Shoud Write A Gameboy Emulator.mp4"
+    }
   },
   {
     "id": 201,
@@ -3023,7 +3219,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/208-how-i-fight-the-doomscroll",
     "start_time": "14:30",
-    "end_time": "14:50"
+    "end_time": "14:50",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=DlEejfiZ4k0",
+      "original_filename": "208 - How I Fight the Doomscroll and Get Out of the Social Media Refresh Loop.mp4"
+    }
   },
   {
     "id": 209,
@@ -3077,7 +3277,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/210-what-remains-stories-from-a-radical-undertaker",
     "start_time": "13:50",
-    "end_time": "14:30"
+    "end_time": "14:30",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=FFkJ1OWQbGc",
+      "original_filename": "What remains- Stories from a radical undertaker.mp4"
+    }
   },
   {
     "id": 212,
@@ -3216,7 +3420,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/219-on-taking-your-daft-ideas-seriously-or",
     "start_time": "17:10",
-    "end_time": "17:40"
+    "end_time": "17:40",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=h3Onu6ZkVlA",
+      "original_filename": "On taking your daft ideas seriously (or, how we accidentally made an art robot business).mp4"
+    }
   },
   {
     "id": 220,
@@ -3243,7 +3451,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/220-rewilding-human-computer-interaction",
     "start_time": "10:40",
-    "end_time": "11:10"
+    "end_time": "11:10",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=fL7nKcxcrRc",
+      "original_filename": "Rewilding Human-Computer Interaction.mp4"
+    }
   },
   {
     "id": 224,
@@ -3297,7 +3509,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/227-introduction-to-the-demoscene",
     "start_time": "15:40",
-    "end_time": "16:10"
+    "end_time": "16:10",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=e-qjLfnOrx8",
+      "original_filename": "227 - Introduction to the Demoscene.mp4"
+    }
   },
   {
     "id": 228,
@@ -3351,7 +3567,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/229-captain-protons-ukulele-for-dummies",
     "start_time": "18:30",
-    "end_time": "19:00"
+    "end_time": "19:00",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=-vGeVOVUPDE",
+      "original_filename": "Captain Proton's Ukulele for Dummies.mp4"
+    }
   },
   {
     "id": 231,
@@ -3378,7 +3598,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/231-two-tin-cans-printmaking-in-a-phonebox",
     "start_time": "10:40",
-    "end_time": "11:10"
+    "end_time": "11:10",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=7ezCpWNTVps",
+      "original_filename": "Printmaking in a phonebox.mp4"
+    }
   },
   {
     "id": 232,
@@ -3432,7 +3656,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/233-dave-cranmer-talks-about-nervoussquirrel-com",
     "start_time": "15:40",
-    "end_time": "16:10"
+    "end_time": "16:10",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=8ld1IduPUVU",
+      "original_filename": "Dave Cranmer talks about nervoussquirrel.com and how to get paid to make things.mp4"
+    }
   },
   {
     "id": 234,
@@ -3490,7 +3718,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/237-asdkfldsalkasdf-keysmashes-sexuality",
     "start_time": "12:50",
-    "end_time": "13:10"
+    "end_time": "13:10",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=8x9BCcB3QpY",
+      "original_filename": "237 - asdkfldsalkasdf Keysmashes, Sexuality and Mathematical Randomness.mp4"
+    }
   },
   {
     "id": 238,
@@ -3548,7 +3780,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/239-why-is-it-so-hard-to-do-nice-things-that-make-a-difference",
     "start_time": "14:40",
-    "end_time": "15:10"
+    "end_time": "15:10",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=tpF1SmNCt9E",
+      "original_filename": "239 - Why is it so hard to do nice things, that make a difference, with other people.mp4"
+    }
   },
   {
     "id": 240,
@@ -3633,7 +3869,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/242-the-digi-gurdy",
     "start_time": "16:20",
-    "end_time": "16:50"
+    "end_time": "16:50",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=meDEGN8-JfY",
+      "original_filename": "The Digi-Gurdy- An electronic MIDI enabled Hurdy Gurdy project_1.mp4"
+    }
   },
   {
     "id": 243,
@@ -3660,7 +3900,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/243-solar-punks-assemble-data-from-domestic-solar-panels",
     "start_time": "10:40",
-    "end_time": "11:10"
+    "end_time": "11:10",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=Q8XrOvndmig",
+      "original_filename": "243 - Solar Punks... ASSEMBLE! Data from domestic solar panels and batteries.mp4"
+    }
   },
   {
     "id": 244,
@@ -3687,7 +3931,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/244-not-another-sex-robot-talk",
     "start_time": "19:30",
-    "end_time": "20:00"
+    "end_time": "20:00",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=bBRORJ-1eas",
+      "original_filename": "244 - Not another sex robot talk!.mp4"
+    }
   },
   {
     "id": 246,
@@ -3803,7 +4051,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/267-making-technology-deliberately-distinguishable-from-magic",
     "start_time": "11:20",
-    "end_time": "11:50"
+    "end_time": "11:50",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=lMZ2eTnrQ_s",
+      "original_filename": "Making technology deliberately distinguishable from magic- designing the BBC micro-bit.mp4"
+    }
   },
   {
     "id": 268,
@@ -3892,7 +4144,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/271-material-science-steel-for-battlebots-and-robot-wars",
     "start_time": "10:00",
-    "end_time": "10:30"
+    "end_time": "10:30",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=XDCTJE4O8AA",
+      "original_filename": "Material Science Steel for BattleBots (and Robot Wars, of course)-.mp4"
+    }
   },
   {
     "id": 277,
@@ -3946,7 +4202,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/280-oh-heck-another-badge-talk",
     "start_time": "15:50",
-    "end_time": "16:20"
+    "end_time": "16:20",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=TCIbwB-DeoQ",
+      "original_filename": "280 - oh heck another badge talk.mp4"
+    }
   },
   {
     "id": 281,
@@ -3973,7 +4233,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/281-this-is-britain-british-cultural-propaganda-films-of-the",
     "start_time": "11:20",
-    "end_time": "11:50"
+    "end_time": "11:50",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=j4RY9fPAMjM",
+      "original_filename": "This is Britain – British cultural propaganda films of the 1930s-1940s, their creation, and their far-reaching global legacy.mp4"
+    }
   },
   {
     "id": 283,
@@ -4089,7 +4353,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/289-the-imitation-game",
     "start_time": "14:30",
-    "end_time": "15:00"
+    "end_time": "15:00",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=EP9gwiwotAA",
+      "original_filename": "The imitation game - using live data feeds from Network Rail to control a model railway.mp4"
+    }
   },
   {
     "id": 291,
@@ -4147,7 +4415,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/292-opening-ceremony",
     "start_time": "10:15",
-    "end_time": "10:50"
+    "end_time": "10:50",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=CI7_12J72-A",
+      "original_filename": "292 - Opening Ceremony.mp4"
+    }
   },
   {
     "id": 293,
@@ -4174,7 +4446,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/293-closing-ceremony",
     "start_time": "19:30",
-    "end_time": "20:00"
+    "end_time": "20:00",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=VaDpSvyrwTU",
+      "original_filename": "EMF Closing Ceremony.mp4"
+    }
   },
   {
     "id": 294,
@@ -4201,7 +4477,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/294-lightning-talks-sunday",
     "start_time": "13:20",
-    "end_time": "13:50"
+    "end_time": "13:50",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=wtlSXDSZiVA",
+      "original_filename": "Lightning Talks Saturday.mp4"
+    }
   },
   {
     "id": 295,
@@ -4228,7 +4508,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/295-lightning-talks-saturday",
     "start_time": "13:20",
-    "end_time": "14:20"
+    "end_time": "14:20",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=JgMk9-8ZuSA",
+      "original_filename": "Lightning Talks Saturday.mp4"
+    }
   },
   {
     "id": 296,
@@ -4375,7 +4659,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/303-life-lessons-from-laughing-babies-and-murderous-philosophers",
     "start_time": "18:40",
-    "end_time": "19:10"
+    "end_time": "19:10",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=kClfaJO-gO4",
+      "original_filename": "Life Lessons.mp4"
+    }
   },
   {
     "id": 304,
@@ -4480,7 +4768,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/307-pee-is-powerful-from-artwork-to-new-world-infrastructures",
     "start_time": "17:50",
-    "end_time": "18:20"
+    "end_time": "18:20",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=ye3N_X4dOKA",
+      "original_filename": "Pee is Powerful! From artwork to new world infrastructures with ALICE.mp4"
+    }
   },
   {
     "id": 309,
@@ -4596,7 +4888,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/313-3615-love-by-pamal-group",
     "start_time": "15:00",
-    "end_time": "15:30"
+    "end_time": "15:30",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=oapfqw15o6s",
+      "original_filename": "3615 Love by PAMAL_Group.mp4"
+    }
   },
   {
     "id": 318,
@@ -4623,7 +4919,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/318-pickmeup-and-hold-me-tight",
     "start_time": "16:40",
-    "end_time": "17:10"
+    "end_time": "17:10",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=90nJTmOP13k",
+      "original_filename": "PickMeUp And Hold Me Tight, or How I ended up war dialling the UK payphone estate-.mp4"
+    }
   },
   {
     "id": 319,
@@ -4650,7 +4950,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/319-unfinished-projects-breaking-the-cycle",
     "start_time": "12:00",
-    "end_time": "12:30"
+    "end_time": "12:30",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=zI4Rmv92scU",
+      "original_filename": "Unfinished Projects Breaking The Cycle.mp4"
+    }
   },
   {
     "id": 324,
@@ -4677,7 +4981,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/324-demystifying-the-usb-type-c-connector",
     "start_time": "16:30",
-    "end_time": "17:00"
+    "end_time": "17:00",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=Pg-pXSsgFKY",
+      "original_filename": "Demystifying the USB Type-C connector.mp4"
+    }
   },
   {
     "id": 325,
@@ -4704,7 +5012,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/325-landscape-of-open-source-databases",
     "start_time": "10:40",
-    "end_time": "11:10"
+    "end_time": "11:10",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=gg2QReaOSD0",
+      "original_filename": "Landscape of Open Source Databases.mp4"
+    }
   },
   {
     "id": 326,
@@ -4731,7 +5043,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/326-speed-3-cruise-control",
     "start_time": "18:30",
-    "end_time": "19:20"
+    "end_time": "19:20",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=yDAGwqdIlcI",
+      "original_filename": "326 - Speed 3 Cruise Control.mp4"
+    }
   },
   {
     "id": 331,
@@ -4874,7 +5190,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/341-wearable-fire-art",
     "start_time": "11:20",
-    "end_time": "11:50"
+    "end_time": "11:50",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=XmvgIw55bxk",
+      "original_filename": "Wearable Fire Art.mp4"
+    }
   },
   {
     "id": 342,
@@ -4901,7 +5221,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/342-being-youtubers",
     "start_time": "14:00",
-    "end_time": "14:50"
+    "end_time": "14:50",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=Uwy-3Y4MTVA",
+      "original_filename": "342 - Being Youtubers!.mp4"
+    }
   },
   {
     "id": 345,
@@ -4928,7 +5252,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/345-who-if-not-you-a-guide-to-community",
     "start_time": "15:50",
-    "end_time": "16:20"
+    "end_time": "16:20",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=HI3p2kZDcyk",
+      "original_filename": "Who if not you A guide to community.mp4"
+    }
   },
   {
     "id": 348,
@@ -5129,7 +5457,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/374-who-watches-the-scooters",
     "start_time": "12:50",
-    "end_time": "13:20"
+    "end_time": "13:20",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=lZdn_fESEfc",
+      "original_filename": "374 - Who watches the scooters.mp4"
+    }
   },
   {
     "id": 376,
@@ -5435,7 +5767,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/389-see-change-change-the-world-imaging-earth-with-cubesats",
     "start_time": "18:00",
-    "end_time": "18:30"
+    "end_time": "18:30",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=3_6EpaUEo8M",
+      "original_filename": "See Change, Change the World Imaging Earth with CubeSats.mp4"
+    }
   },
   {
     "id": 401,
