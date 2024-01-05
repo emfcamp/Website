@@ -41,7 +41,7 @@ def create_bank_accounts():
         institution="London Bank",
         address="13 Bartlett Place, London, WC1B 4NM",
         iban="GB33BUKB20201555555555",
-        swift="GB33BUKB",
+        swift="BUKBGB33",
     )
     for acct in [gbp, eur]:
         try:

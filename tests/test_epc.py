@@ -47,7 +47,7 @@ def test_format_inline_epc_qr(app):
         "002",
         "1",
         "SCT",
-        "",
+        "BUKBGB33",
         "EMF Festivals Ltd",
         "GB33BUKB20201555555555",
         "EUR10",

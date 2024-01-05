@@ -13,6 +13,7 @@ def make_epc_qrfile(payment: BankPayment, **kwargs) -> BytesIO:
         iban=payment.recommended_destination.iban,
         amount=payment.amount,
         reference=payment.customer_reference,
+        bic=payment.recommended_destination.swift,
         encoding=1,
     )
     qr.save(qrfile, **kwargs)
