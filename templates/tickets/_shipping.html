@@ -27,7 +27,7 @@
             Unless you choose to receive emails in future,
             we will delete your personal data after fulfilment.
             We don't send your personal data to anyone else.
-            <a href="{{ url_for('base.privacy') }}" target="_blank">More privacy info</a>.</small></p>
+            <a href="{{ url_for('base.page', page_name='privacy') }}" target="_blank">More privacy info</a>.</small></p>
         </div>
         {{ render_field(form.address_1, horizontal=True) }}
         <div class="address-2">
