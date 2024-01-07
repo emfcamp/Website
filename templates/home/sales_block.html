@@ -11,7 +11,7 @@
       <a href="https://social.emfcamp.org/@emf">the Fediverse</a> or join our
       mailing list for more updates:
   </p>
-  {% include "home/_mailing_list_form.html" %}
+  {{contact_form("main")}}
 
 {% elif SALES_STATE == 'sold-out' %}
   <p>We&rsquo;re sorry to say EMF is sold out!
