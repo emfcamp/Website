@@ -33,7 +33,7 @@
 
 {% if payment.state == 'inprogress' %}
 <p>We will use the reference below to identify the payment as yours, so please ensure it's included in full. (Don't worry about the hyphen, or if the payee name doesn't quite fit.)</p>
-<dl class="dl-horizontal">
+<dl class="dl-horizontal" style="position: relative">
 <dt>Bank</dt><dd>{{ account.institution }}, {{ account.address }}</dd>
 <dt>Payee</dt><dd>EMF Festivals Ltd</dd>
 {% if payment.currency == 'GBP' %}
@@ -45,10 +45,7 @@
 {% endif %}
 <dt>Amount</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
 <dt>Reference</dt><dd>{{ payment.customer_reference | bankref }}</dd>
-</dl>
-
 {% if payment.currency == 'EUR' %}
-<dl class="dl-horizontal" style="position: relative">
 <dt>EPC QR Code</dt>
 <dd class="well">
 <a class="collapse-toggle" role="button" data-toggle="collapse" href="#epc-qr-code" aria-expanded="true" aria-controls="#epc-qr-code"><strong>Click to show</strong>{{octicon('chevron-down-24')}}</a>
