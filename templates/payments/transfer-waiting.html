@@ -47,6 +47,7 @@
 <dt>Reference</dt><dd>{{ payment.customer_reference | bankref }}</dd>
 </dl>
 
+{% if payment.currency == 'EUR' %}
 <dl class="dl-horizontal">
 <dt>EPC QR Code</dt>
 <dd class="well" style="width: fit-content">
@@ -59,6 +60,7 @@
 </div>
 </dd>
 </dl>
+{% endif %}
 
 {% if SITE_STATE != 'after-event' %}
 <p>See you at Electromagnetic Field!</p>
