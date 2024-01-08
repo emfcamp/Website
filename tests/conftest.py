@@ -8,7 +8,7 @@ from freezegun import freeze_time
 from sqlalchemy import text
 from models.user import User
 from main import create_app, db as db_obj, Mail
-from apps.base.tasks_banking import create_bank_accounts
+from apps.base.dev.tasks import create_bank_accounts
 from apps.tickets.tasks import create_product_groups
 
 

@@ -7,7 +7,7 @@ from textwrap import wrap
 import pendulum
 
 from main import db, external_url
-from flask import session, abort, current_app as app
+from flask import session, abort, current_app as app, render_template
 from markupsafe import Markup
 from flask.json import jsonify
 from flask_login import login_user, current_user
@@ -146,6 +146,18 @@ def load_utility_functions(app_obj):
         text = urlize(text, trim_url_limit=40)
         text = "\n".join(f"<p>{para}</p>" for para in re.split(r"[\r\n]+", text))
         return Markup(text)
+
+    @app_obj.context_processor
+    def contact_form_processor():
+        def contact_form(list):
+            """Renders a contact form for the requested list."""
+            if list not in app_obj.config["LISTMONK_LISTS"]:
+                msg = f"The list '{list}' is not configured. Add it to your config file under LISTMONK_LISTS."
+                raise ValueError(msg)
+
+            return Markup(render_template("home/_mailing_list_form.html", list=list))
+
+        return {"contact_form": contact_form}
 
 
 def create_current_user(email: str, name: str):

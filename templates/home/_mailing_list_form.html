@@ -1,4 +1,5 @@
 <form method="post" class="form-inline" role="form" action="{{url_for('base.main')}}" id="mailing-list-form">
+    <input id="list" name="list" type="hidden" value="{{ list }}"/>
     <div class="input-group">
       <input id="email-field" type="email" class="form-control" placeholder="Enter email address" name="email"/>
       {# This is a honeypot field to prevent bots signing up, it's hidden by CSS #}
@@ -8,4 +9,6 @@
       </span>
   </div>
 </form>
-<p><small>(We'll only use your details to contact you about future events.)</small></p>
+{% if list == "main" %}
+  <p><small>(We'll only use your details to contact you about future events.)</small></p>
+{% endif %}

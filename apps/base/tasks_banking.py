@@ -3,7 +3,6 @@ import ofxparse
 from datetime import datetime, timedelta
 
 from flask import current_app as app
-from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 from main import db, wise
 from apps.base import base
@@ -14,52 +13,6 @@ from apps.payments.wise import (
     sync_wise_statement,
 )
 from models.payment import BankAccount, BankTransaction
-
-
-@base.cli.command("createbankaccounts")
-def create_bank_accounts_cmd():
-    create_bank_accounts()
-
-
-def create_bank_accounts():
-    """Create bank accounts if they don't exist"""
-    gbp = BankAccount(
-        sort_code="102030",
-        acct_id="40506070",
-        currency="GBP",
-        active=True,
-        institution="London Bank",
-        address="13 Bartlett Place, London, WC1B 4NM",
-        iban=None,
-        swift=None,
-    )
-    eur = BankAccount(
-        sort_code=None,
-        acct_id=None,
-        currency="EUR",
-        active=True,
-        institution="London Bank",
-        address="13 Bartlett Place, London, WC1B 4NM",
-        iban="GB33BUKB20201555555555",
-        swift="BUKBGB33",
-    )
-    for acct in [gbp, eur]:
-        try:
-            BankAccount.query.filter_by(
-                acct_id=acct.acct_id, sort_code=acct.sort_code
-            ).one()
-        except NoResultFound:
-            app.logger.info(
-                "Adding %s account %s %s",
-                acct.currency,
-                acct.sort_code or acct.swift,
-                acct.acct_id or acct.iban,
-            )
-            db.session.add(acct)
-        except MultipleResultsFound:
-            pass
-
-    db.session.commit()
 
 
 @base.cli.command("loadofx")

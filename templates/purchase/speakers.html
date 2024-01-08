@@ -5,7 +5,7 @@
   </p>
   <p>Please follow us <a href="https://social.emfcamp.org/@emf">the Fediverse</a> or
   join our mailing list to be notified when more tickets are on sale:</p>
-  {% include "home/_mailing_list_form.html" %}
+  {{contact_form("main")}}
   <p>We can't reserve any tickets, but if we accept your
   {% if config['CFP'] %}
   <a href="{{url_for('cfp.main')}}">talk, workshop, or installation proposal</a>,
