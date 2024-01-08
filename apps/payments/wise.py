@@ -245,6 +245,7 @@ def _collect_bank_accounts(borderless_account):
             acct_id=account_number,
             currency=account.bankDetails.currency,
             active=False,
+            payee_name=account.bankDetails.get("title"),
             institution=account.bankDetails.bankName,
             address=address,
             swift=account.bankDetails.get("swift"),
