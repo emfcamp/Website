@@ -51,14 +51,14 @@ def wise_webhook():
     event_type = request.json.get("event_type")
     try:
         handler = webhook_handlers[event_type]
-    except KeyError as e:
+    except KeyError:
         logger.warning("Unhandled Wise webhook event type %s", event_type)
         # logger.info("Webhook data: %s", request.data)
         abort(500)
 
     try:
         return handler(event_type, request.json)
-    except Exception as e:
+    except Exception:
         logger.exception("Unhandled exception during Wise webhook")
         # logger.info("Webhook data: %s", request.data)
         abort(500)
@@ -105,7 +105,7 @@ def wise_balance_credit(event_type, event):
 
     try:
         sync_wise_statement(profile_id, borderless_account_id, currency)
-    except Exception as e:
+    except Exception:
         logger.exception("Error fetching statement")
         return ("", 500)
 
@@ -245,6 +245,7 @@ def _collect_bank_accounts(borderless_account):
             acct_id=account_number,
             currency=account.bankDetails.currency,
             active=False,
+            payee_name=account.bankDetails.get("title"),
             institution=account.bankDetails.bankName,
             address=address,
             swift=account.bankDetails.get("swift"),

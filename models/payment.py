@@ -338,6 +338,7 @@ class BankAccount(BaseModel):
     acct_id = db.Column(db.String)
     currency = db.Column(db.String, nullable=False)
     active = db.Column(db.Boolean)
+    payee_name = db.Column(db.String)
     institution = db.Column(db.String, nullable=False)
     address = db.Column(db.String, nullable=False)
     swift = db.Column(db.String)
@@ -350,6 +351,7 @@ class BankAccount(BaseModel):
         acct_id,
         currency,
         active,
+        payee_name,
         institution,
         address,
         swift,
@@ -360,6 +362,7 @@ class BankAccount(BaseModel):
         self.acct_id = acct_id
         self.currency = currency
         self.active = active
+        self.payee_name = payee_name
         self.institution = institution
         self.address = address
         self.swift = swift
