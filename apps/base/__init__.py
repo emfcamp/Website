@@ -53,6 +53,10 @@ def main():
 def main_post():
     honeypot_field = request.form.get("name")
     email = request.form.get("email", "").strip()
+    list = request.form.get("list")
+
+    if request.form.get("list") not in app.config["LISTMONK_LISTS"]:
+        return raise_404()
 
     if email == "":
         return redirect(url_for(".main"))
@@ -68,7 +72,7 @@ def main_post():
 
     response = requests.post(
         app.config["LISTMONK_URL"] + "/api/public/subscription",
-        json={"email": email, "list_uuids": [app.config["LISTMONK_LIST_ID"]]},
+        json={"email": email, "list_uuids": [app.config["LISTMONK_LISTS"][list]]},
     )
 
     if response.status_code != 200:

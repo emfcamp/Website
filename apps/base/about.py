@@ -5,7 +5,14 @@
     although some legacy content remains here.
 """
 
-from flask import abort, current_app as app, redirect, render_template, url_for
+from flask import (
+    abort,
+    current_app as app,
+    redirect,
+    render_template,
+    render_template_string,
+    url_for,
+)
 from markdown import markdown
 from os import path
 from pathlib import Path
@@ -33,7 +40,12 @@ def render_markdown(source, **view_variables):
         source = f.read()
         (metadata, content) = source.split("---", 2)
         metadata = parse_yaml(metadata)
-        content = Markup(markdown(content, extensions=["markdown.extensions.nl2br"]))
+        content = Markup(
+            markdown(
+                render_template_string(content),
+                extensions=["markdown.extensions.nl2br"],
+            )
+        )
 
     view_variables.update(content=content, title=metadata["title"])
     return render_template(page_template(metadata), **view_variables)
