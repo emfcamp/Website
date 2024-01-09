@@ -1,0 +1,27 @@
+{% macro count_for(label, count) %}
+  <dt>{{ label }}</dt><dd><a href="{{url_for('.proposals', **kwargs)}}">{{count}}</a></dd>
+{% endmacro %}
+
+{% extends "cfp_review/base.html" %}
+{% block body %}
+  <h3>By Tag</h3>
+  <dl class="dl-horizontal">
+    {% for (p_tag, count) in counts_by_tag.items() %}
+      {{count_for(p_tag, count, tags=[p_tag])}}
+    {% endfor %}
+  </dl>
+
+  <h3>By Type</h3>
+  <dl class="dl-horizontal">
+    {% for (p_type, count) in counts_by_type.items() %}
+      {{count_for(cfp_types[p_type], count, type=p_type)}}
+    {% endfor %}
+  </dl>
+
+  <h3>By State</h3>
+  <dl class="dl-horizontal">
+    {% for p_state in ordered_states %}
+      {{count_for(p_state, counts_by_state[p_state], state=p_state)}}
+    {% endfor %}
+  </dl>
+{% endblock %}

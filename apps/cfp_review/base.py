@@ -22,20 +22,23 @@ from sqlalchemy.orm import joinedload
 from main import db, external_url
 from .majority_judgement import calculate_max_normalised_score
 from models.cfp import (
-    Proposal,
-    LightningTalkProposal,
     CFPMessage,
     CFPVote,
-    Venue,
-    InvalidVenueException,
-    MANUAL_REVIEW_TYPES,
-    get_available_proposal_minutes,
-    ROUGH_LENGTHS,
-    get_days_map,
     DEFAULT_VENUES,
     EVENT_SPACING,
     FavouriteProposal,
+    get_available_proposal_minutes,
+    get_days_map,
+    HUMAN_CFP_TYPES,
+    InvalidVenueException,
+    LightningTalkProposal,
+    MANUAL_REVIEW_TYPES,
+    ORDERED_STATES,
+    Proposal,
+    ROUGH_LENGTHS,
+    Venue,
 )
+from models.cfp_tag import Tag
 from models.user import User
 from models.purchase import Ticket
 from .forms import (
@@ -138,6 +141,22 @@ def filter_proposal_request():
             )
         )
 
+    tags = request.args.getlist("tags")
+    if "untagged" in tags:
+        if len(tags) > 1:
+            flash("'untagged' in 'tags' arg, other tags ignored")
+        filtered = True
+        # join(..outer=True) == left outer join
+        proposal_query = proposal_query.join(Proposal.tags, isouter=True).filter(
+            Tag.id.is_(None)
+        )
+
+    elif tags:
+        filtered = True
+        proposal_query = proposal_query.join(Proposal.tags).filter(
+            Proposal.tags.any(Tag.tag.in_(tags))
+        )
+
     sort_dict = get_proposal_sort_dict(request.args)
     proposal_query = proposal_query.options(joinedload(Proposal.user)).options(
         joinedload("user.owned_tickets")
@@ -159,12 +178,18 @@ def proposals():
     if "reverse" in non_sort_query_string:
         del non_sort_query_string["reverse"]
 
+    tag_counts = {t.tag: [0, len(t.proposals)] for t in Tag.query.all()}
+    for prop in proposals:
+        for t in prop.tags:
+            tag_counts[t.tag][0] = tag_counts[t.tag][0] + 1
+
     return render_template(
         "cfp_review/proposals.html",
         proposals=proposals,
         new_qs=non_sort_query_string,
         filtered=filtered,
         total_proposals=Proposal.query.count(),
+        tag_counts=tag_counts,
     )
 
 
@@ -295,6 +320,8 @@ def update_proposal(proposal_id):
     else:
         raise Exception("Unknown cfp type {}".format(prop.type))
 
+    form.tags.choices = [(t.tag, t.tag) for t in Tag.query.order_by(Tag.tag).all()]
+
     # Process the POST
     if form.validate_on_submit():
         try:
@@ -343,6 +370,7 @@ def update_proposal(proposal_id):
     form.state.data = prop.state
     form.title.data = prop.title
     form.description.data = prop.description
+    form.tags.data = [t.tag for t in prop.tags]
     form.requirements.data = prop.requirements
     form.length.data = prop.length
     form.notice_required.data = prop.notice_required
@@ -1170,6 +1198,30 @@ def lightning_talks():
         proposals=proposals,
         remaining_lightning_slots=remaining_lightning_slots,
         total_slots=LightningTalkProposal.get_total_lightning_talk_slots(),
+    )
+
+
+@cfp_review.route("/proposals-summary")
+@schedule_required
+def proposals_summary():
+    counts_by_tag = {t.tag: len(t.proposals) for t in Tag.query.all()}
+    counts_by_tag["untagged"] = 0
+
+    counts_by_type = {t: 0 for t in HUMAN_CFP_TYPES}
+    counts_by_state = {s: 0 for s in ORDERED_STATES}
+
+    for prop in Proposal.query.all():
+        counts_by_type[prop.type] += 1
+        counts_by_state[prop.state] += 1
+
+        if not prop.tags:
+            counts_by_tag["untagged"] += 1
+
+    return render_template(
+        "cfp_review/proposals_summary.html",
+        counts_by_tag=counts_by_tag,
+        counts_by_type=counts_by_type,
+        counts_by_state=counts_by_state,
     )
 
 

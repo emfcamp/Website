@@ -23,6 +23,11 @@ Running an event like EMF requires a huge amount of planning to make sure the ev
 
 **We're looking for people to help organise the event**. If this is something that interests you [take a look at the list of roles we're looking to fill](/about/volunteer-roles).
 
+We also have a mailing list where we periodically post about volunteer roles, to
+subscribe fill out the form below:
+
+{{ contact_form("volunteer") }}
+
 ## Helping out during the event
 
 During the event, there are plenty of roles which need to be filled, from construction to cooking for volunteers.

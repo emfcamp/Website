@@ -30,7 +30,7 @@
       <legend>Power</legend>
       <p>Power at EMF is normally provided as 16A single-phase "ceeform" connectors. If your village requires more
       than a 16A single-phase supply, let us know your requirements and we'll try to accommodate.
-          <a href="{{url_for("base.power")}}" target="_blank">More info about power at EMF</a>.</p>
+          <a href="{{ url_for('base.page', page_name='power') }}" target="_blank">More info about power at EMF</a>.</p>
       {{ render_field(form.power_requirements, horizontal=9) }}
     </fieldset>
     <fieldset>

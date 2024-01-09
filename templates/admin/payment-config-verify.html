@@ -33,6 +33,7 @@
 <form method="post" action="{{url_for('.activate_payment_config')}}">
   <table class="table table-condensed">
   <tr>
+    <th>Payee</th>
     <th>Institution</th>
     <th>Currency</th>
     <th>Active</th>
@@ -44,6 +45,7 @@
   </tr>
 {% for bank_account in bank_accounts %}
   <tr>
+    <td>{{ bank_account.payee_name }}</td>
     <td>{{ bank_account.institution }}</td>
     <td>{{ bank_account.currency }}</td>
     <td>{% if bank_account.active %}✅{% else %}❌{% endif %}</td>

@@ -173,7 +173,7 @@
   <dl class="bank-info dl-horizontal">
     {% set account = payment.recommended_destination %}
     <dt>Bank</dt><dd>{{ account.institution }}, {{ account.address }}</dd>
-    <dt>Payee</dt><dd>EMF Festivals Ltd</dd>
+    <dt>Payee</dt><dd>{{ account.payee_name }}</dd>
     {% if payment.currency == 'GBP' %}
     <dt>Sort code</dt><dd>{{ account.sort_code | sort_code }}</dd>
     <dt>Account number</dt><dd>{{ account.acct_id }}</dd>

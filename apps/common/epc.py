@@ -8,10 +8,9 @@ from models.payment import BankPayment
 
 def make_epc_qrfile(payment: BankPayment, **kwargs) -> BytesIO:
     qrfile = BytesIO()
-    # TODO: this isn't currently used. Need to fetch IBAN from payment.recommended_destination
-    # and name from somewhere - maybe config rather than hard-coding.
+    # TODO: this isn't currently used.
     qr: QRCode = helpers.make_epc_qr(
-        name="EMF Festivals Ltd",
+        name=payment.recommended_destination.payee_name,
         iban=payment.recommended_destination.iban,
         amount=payment.amount,
         reference=payment.bankref,

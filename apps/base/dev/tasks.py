@@ -2,12 +2,16 @@
 import click
 from pendulum import parse
 from flask import current_app as app
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 from main import db
 
 from models.volunteer.venue import VolunteerVenue
 from models.volunteer.shift import Shift
 from models.volunteer.role import Role
+
+from apps.cfp.tasks import create_tags
+from models.payment import BankAccount
 
 from . import dev_cli
 from .fake import FakeDataGenerator
@@ -20,6 +24,8 @@ def dev_data(ctx):
     ctx.invoke(fake_data)
     ctx.invoke(volunteer_data)
     ctx.invoke(volunteer_shifts)
+    ctx.invoke(create_tags)
+    ctx.invoke(create_bank_accounts)
 
 
 @dev_cli.command("cfp_data")
@@ -537,7 +543,6 @@ def volunteer_shifts():
             venue = VolunteerVenue.get_by_name(shift_venue)
 
             for shift_ranges in shift_list[shift_role][shift_venue]:
-
                 shifts = Shift.generate_for(
                     role=role,
                     venue=venue,
@@ -548,5 +553,53 @@ def volunteer_shifts():
                 )
                 for s in shifts:
                     db.session.add(s)
+
+    db.session.commit()
+
+
+@dev_cli.command("createbankaccounts")
+def create_bank_accounts_cmd():
+    create_bank_accounts()
+
+
+def create_bank_accounts():
+    """Create bank accounts if they don't exist"""
+    gbp = BankAccount(
+        sort_code="102030",
+        acct_id="40506070",
+        currency="GBP",
+        active=True,
+        payee_name="EMF Festivals Ltd",
+        institution="London Bank",
+        address="13 Bartlett Place, London, WC1B 4NM",
+        iban=None,
+        swift=None,
+    )
+    eur = BankAccount(
+        sort_code=None,
+        acct_id=None,
+        currency="EUR",
+        active=True,
+        payee_name="EMF Festivals Ltd",
+        institution="London Bank",
+        address="13 Bartlett Place, London, WC1B 4NM",
+        iban="GB33BUKB20201555555555",
+        swift="GB33BUKB",
+    )
+    for acct in [gbp, eur]:
+        try:
+            BankAccount.query.filter_by(
+                acct_id=acct.acct_id, sort_code=acct.sort_code
+            ).one()
+        except NoResultFound:
+            app.logger.info(
+                "Adding %s account %s %s",
+                acct.currency,
+                acct.sort_code or acct.swift,
+                acct.acct_id or acct.iban,
+            )
+            db.session.add(acct)
+        except MultipleResultsFound:
+            pass
 
     db.session.commit()
