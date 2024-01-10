@@ -12,7 +12,7 @@
 {% set main_class = "about" %}
 {% block title %}{{title}}{% endblock %}
 {% block secondary_nav %}
-  <ul role="navigation" aria-label="About">
+  <ul role="navigation list" aria-label="About">
     {{view("About EMF", "base.about")}}
     {{page("Travel", "travel")}}
     {{page("Arrival Times", "arrival-times")}}
