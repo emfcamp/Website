@@ -3,7 +3,7 @@
     <a href="{{url_for(view)}}">{{text}}</a>
 </li>
 {% endmacro %}
-<div class="nav nav-pills">
+<ul class="nav nav-pills">
     {% if current_user.is_authenticated %}
     {{ menuitem('Account', '.account') }}
     {{ menuitem('Roles', '.choose_role') }}
@@ -19,5 +19,5 @@
         {{ menuitem('Admin', 'volunteer_admin.index') }}        
     {% endif %}
     {{ menuitem("Log Out", "users.logout") }}
-</div>
+</ul>
 
