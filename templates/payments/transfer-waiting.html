@@ -48,7 +48,7 @@
 {% if payment.currency == 'EUR' %}
 <dt>EPC QR Code</dt>
 <dd class="well">
-<a class="collapse-toggle" role="button" data-toggle="collapse" href="#epc-qr-code" aria-expanded="true" aria-controls="#epc-qr-code"><strong>Click to show</strong>{{octicon('chevron-down-24')}}</a>
+<a class="collapse-toggle" role="button" data-toggle="collapse" href="#epc-qr-code" aria-expanded="true" aria-controls="epc-qr-code"><strong>Click to show</strong>{{octicon('chevron-down-24')}}</a>
 <div id="epc-qr-code" class="epc-qr-code collapse">{{ render_epc_qr(payment) }}</div>
 <div class="pull-right" aria-describedby="what-is-epc-qr">(what is this?) {{octicon('info-24')}}</div>
 <div id="what-is-epc-qr" class="well" role="tooltip" style="left: 20px; top: -20px">
