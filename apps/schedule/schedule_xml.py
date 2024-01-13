@@ -64,12 +64,12 @@ def make_root():
 
 
 def add_day(root, index, start, end):
-    # Don't include start because it's not needed
     return etree.SubElement(
         root,
         "day",
         index=str(index),
         date=start.strftime("%Y-%m-%d"),
+        start=start.isoformat(),
         end=end.isoformat(),
     )
 
