@@ -91,6 +91,7 @@ def add_event(room, event):
     _add_sub_with_text(event_node, "title", event["title"])
     _add_sub_with_text(event_node, "type", event.get("type", "talk"))
     _add_sub_with_text(event_node, "date", event["start_date"].isoformat())
+    _add_sub_with_text(event_node, "url", url)
 
     # Start time
     _add_sub_with_text(event_node, "start", event["start_date"].strftime("%H:%M"))
