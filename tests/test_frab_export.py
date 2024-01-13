@@ -95,6 +95,9 @@ def test_export_frab(frab_schema, request_context):
             "user_id": 123,
             "end_date": _local_datetime(2016, 8, 5, 11, 00),
             "start_date": _local_datetime(2016, 8, 5, 10, 30),
+            "video": {
+                "ccc": "http://example.com/media.ccc.de",
+            },
         },
         {
             "id": 2,
@@ -106,6 +109,9 @@ def test_export_frab(frab_schema, request_context):
             "user_id": 123,
             "end_date": _local_datetime(2016, 8, 5, 11, 00),
             "start_date": _local_datetime(2016, 8, 5, 10, 30),
+            "video": {
+                "youtube": "http://example.com/youtube.com",
+            },
         },
         {
             "id": 3,
@@ -118,6 +124,10 @@ def test_export_frab(frab_schema, request_context):
             "user_id": 123,
             "end_date": _local_datetime(2016, 8, 6, 11, 00),
             "start_date": _local_datetime(2016, 8, 6, 10, 30),
+            "video": {
+                "ccc": "http://example.com/media.ccc.de",
+                "youtube": "http://example.com/youtube.com",
+            },
         },
     ]
 
