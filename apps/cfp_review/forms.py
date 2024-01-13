@@ -75,6 +75,10 @@ class UpdateProposalForm(Form):
     potential_time = StringField("Potential Time")
     potential_venue = StringField("Potential Venue")
 
+    thumbnail_url = StringField("Video Thumbnail URL")
+    c3voc_url = StringField("C3VOC Video URL")
+    youtube_url = StringField("YouTube URL")
+
     update = SubmitField("Update")
     reject = SubmitField("Reject without telling user")
     checked = SubmitField("Mark as checked")
@@ -107,6 +111,10 @@ class UpdateProposalForm(Form):
         proposal.user_scheduled = self.user_scheduled.data
 
         proposal.hide_from_schedule = self.hide_from_schedule.data
+
+        proposal.thumbnail_url = self.thumbnail_url.data
+        proposal.c3voc_url = self.c3voc_url.data
+        proposal.youtube_url = self.youtube_url.data
 
         # Just talks? Weird to have here
 
