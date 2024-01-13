@@ -124,6 +124,7 @@ def add_persons(event_node, event):
 
 
 def add_recording(event_node, event):
+    video = event.get("video", {})
 
     recording_node = etree.SubElement(event_node, "recording")
 
@@ -131,6 +132,10 @@ def add_recording(event_node, event):
     _add_sub_with_text(
         recording_node, "optout", "false" if event.get("may_record") else "true"
     )
+    if "ccc" in video:
+        _add_sub_with_text(recording_node, "url", video["ccc"])
+    elif "youtube" in video:
+        _add_sub_with_text(recording_node, "url", video["youtube"])
 
 
 def export_frab(schedule):
