@@ -174,6 +174,11 @@ def matrix_server():
     return {"m.server": "matrix.emfcamp.org:443"}
 
 
+@base.route("/.well-known/matrix/client")
+def matrix_client():
+    return {"m.homeserver": {"base_url": "https://matrix.emfcamp.org"}}
+
+
 @base.route("/subscribe")
 def subscribe():
     return render_template("subscribe.html")

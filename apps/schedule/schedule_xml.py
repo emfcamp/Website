@@ -64,12 +64,12 @@ def make_root():
 
 
 def add_day(root, index, start, end):
-    # Don't include start because it's not needed
     return etree.SubElement(
         root,
         "day",
         index=str(index),
         date=start.strftime("%Y-%m-%d"),
+        start=start.isoformat(),
         end=end.isoformat(),
     )
 
@@ -91,6 +91,7 @@ def add_event(room, event):
     _add_sub_with_text(event_node, "title", event["title"])
     _add_sub_with_text(event_node, "type", event.get("type", "talk"))
     _add_sub_with_text(event_node, "date", event["start_date"].isoformat())
+    _add_sub_with_text(event_node, "url", url)
 
     # Start time
     _add_sub_with_text(event_node, "start", event["start_date"].strftime("%H:%M"))
@@ -124,6 +125,7 @@ def add_persons(event_node, event):
 
 
 def add_recording(event_node, event):
+    video = event.get("video", {})
 
     recording_node = etree.SubElement(event_node, "recording")
 
@@ -131,6 +133,10 @@ def add_recording(event_node, event):
     _add_sub_with_text(
         recording_node, "optout", "false" if event.get("may_record") else "true"
     )
+    if "ccc" in video:
+        _add_sub_with_text(recording_node, "url", video["ccc"])
+    elif "youtube" in video:
+        _add_sub_with_text(recording_node, "url", video["youtube"])
 
 
 def export_frab(schedule):

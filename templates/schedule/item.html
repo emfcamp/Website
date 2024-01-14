@@ -30,19 +30,6 @@
 
 <div class="well">
 
-{% if proposal.youtube_url %}
-<div class="youtube-link">
-  {% if proposal.thumbnail_url %}
-  <a class="row" href="{{ proposal.youtube_url }}">
-  <img class="img-responsive xs-col-6" src="{{ proposal.thumbnail_url }}">
-  </a>
-  {% else %}
-  <a class="no-thumbnail" href="{{ proposal.youtube_url }}">
-  </a>
-  {% endif %}
-</div>
-{% endif %}
-
 <p class="multiline">{{ (proposal.published_description or proposal.description) | urlize }}</p>
 
 {% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}
@@ -79,6 +66,22 @@
   </p>
 {% endif %}
 <p>&nbsp;</p>
+
+{% if proposal.youtube_url or proposal.c3voc_url %}
+<h4>Video</h4>
+<div class="well">
+  {% if proposal.c3voc_url %}
+    <iframe src="{{proposal.c3voc_url}}/oembed" width="100%" height="500px"
+        frameborder="0" allowfullscreen></iframe>
+  {% elif proposal.youtube_url %}
+    <iframe src="{{proposal.youtube_url|replace('youtube.com/watch?v=', 'youtube.com/embed/')}}"
+        width="100%" height="500px" frameborder="0" 
+        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <p>View this video <a href="{{ proposal.youtube_url }}">on YouTube</a>.</p>
+  {% endif %}
+</div>
+<p>&nbsp;</p>
+{% endif %}
 
 <h4>Return to:</h4>
 <ul class='nav nav-pills'>

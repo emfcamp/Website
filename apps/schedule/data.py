@@ -45,6 +45,15 @@ def _get_proposal_dict(proposal: Proposal, favourites_ids):
         res["equipment"] = proposal.display_participant_equipment
         res["age_range"] = proposal.display_age_range
         res["attendees"] = proposal.attendees
+    video_res = {}
+    if proposal.c3voc_url:
+        video_res["ccc"] = proposal.c3voc_url
+    if proposal.youtube_url:
+        video_res["youtube"] = proposal.youtube_url
+    if proposal.thumbnail_url:
+        video_res["preview_image"] = proposal.thumbnail_url
+    if video_res:
+        res["video"] = video_res
     return res
 
 
