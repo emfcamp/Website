@@ -366,7 +366,10 @@ class Proposal(BaseModel):
     # Core information
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
-    requirements = db.Column(db.String)
+
+    equipment_required = db.Column(db.String)
+    funding_required = db.Column(db.String)
+    additional_info = db.Column(db.String)
     length = db.Column(db.String)  # only used for talks and workshops
     notice_required = db.Column(db.String)
     private_notes = db.Column(db.String)
@@ -459,8 +462,10 @@ class Proposal(BaseModel):
         edits_attrs = [
             "published_title",
             "published_description",
-            "requirements",
             "length",
+            "equipment_required",
+            "funding_required",
+            "additional_info",
             "notice_required",
             "needs_help",
             "needs_money",
@@ -478,7 +483,7 @@ class Proposal(BaseModel):
             "attendees",
             "cost",
             "size",
-            "funds",
+            "installation_funding",
             "age_range",
             "participant_equipment",
         ]
@@ -503,7 +508,7 @@ class Proposal(BaseModel):
         if cls.__name__ == "WorkshopProposal":
             proposals = proposals.add_columns(cls.attendees, cls.cost)
         elif cls.__name__ == "InstallationProposal":
-            proposals = proposals.add_columns(cls.size, cls.funds)
+            proposals = proposals.add_columns(cls.size, cls.installation_funding)
         elif cls.__name__ == "YouthWorkshopProposal":
             proposals = proposals.add_columns(
                 cls.attendees, cls.cost, cls.age_range, cls.participant_equipment
@@ -865,7 +870,7 @@ class InstallationProposal(Proposal):
     __mapper_args__ = {"polymorphic_identity": "installation"}
     human_type = HUMAN_CFP_TYPES["installation"]
     size = db.Column(db.String)
-    funds = db.Column(db.String, nullable=True)
+    installation_funding = db.Column(db.String, nullable=True)
 
 
 class LightningTalkProposal(Proposal):

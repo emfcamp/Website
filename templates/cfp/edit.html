@@ -71,7 +71,6 @@
     <div class="col-md-6">
       <legend>Further details</legend>
       <dl class="dl-horizontal">
-        <dt>Requirements</dt><dd>{{proposal.requirements}}</dd>
         {% if proposal.type in ('talk', 'performance') %}
           <dt>Length</dt><dd>{{proposal.length}}</dd>
           <dt>Notice Required</dt><dd>{{proposal.notice_required}}</dd>
@@ -85,6 +84,7 @@
           <dt>Size</dt><dd>{{proposal.size}}</dd>
           <dt>Funds requested</dt><dd>£{{proposal.funds}}</dd>
         {% endif %}
+        <dt>Additional info</dt><dd>{{proposal.additional_info}}</dd>
       </dl>
     </div>
     {% endif %}

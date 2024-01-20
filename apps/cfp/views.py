@@ -46,7 +46,9 @@ class ProposalForm(Form):
     email = EmailField("Email")
     title = StringField("Title", [DataRequired()])
     description = TextAreaField("Description", [DataRequired()])
-    requirements = TextAreaField("Additional Info")
+    equipment_required = TextAreaField("Equipment required")
+    funding_required = TextAreaField("Costs")
+    additional_info = TextAreaField("Additional info")
     needs_help = BooleanField("Needs help")
     user_scheduled = BooleanField("User scheduled")
     notice_required = SelectField(
@@ -116,7 +118,7 @@ class InstallationProposalForm(ProposalForm):
             ("huge", "Bigger than a lorry"),
         ],
     )
-    funds = SelectField(
+    installation_funding = SelectField(
         "Funding",
         choices=[
             ("0", "No money needed"),
@@ -282,7 +284,7 @@ def form(cfp_type="talk"):
         elif cfp_type == "installation":
             proposal = InstallationProposal()
             proposal.size = form.size.data
-            proposal.funds = form.funds.data
+            proposal.installation_funding = form.installation_funding.data
 
         elif cfp_type == "lightning":
             if remaining_lightning_slots[form.session.data] <= 0:
@@ -306,7 +308,9 @@ def form(cfp_type="talk"):
         proposal.user_id = current_user.id
 
         proposal.title = form.title.data
-        proposal.requirements = form.requirements.data
+        proposal.equipment_required = form.equipment_required.data
+        proposal.additional_info = form.additional_info.data
+        proposal.funding_required = form.funding_required.data
         proposal.description = form.description.data
         proposal.notice_required = form.notice_required.data
         proposal.needs_help = form.needs_help.data
@@ -437,7 +441,7 @@ def edit_proposal(proposal_id):
 
         elif proposal.type == "installation":
             proposal.size = form.size.data
-            proposal.funds = form.funds.data
+            proposal.installation_funding = form.installation_funding.data
 
         elif proposal.type == "lightning":
             proposal.slide_link = form.slide_link.data
@@ -445,7 +449,9 @@ def edit_proposal(proposal_id):
 
         proposal.title = form.title.data
         proposal.description = form.description.data
-        proposal.requirements = form.requirements.data
+        proposal.equipment_required = form.equipment_required.data
+        proposal.additional_info = form.additional_info.data
+        proposal.funding_required = form.funding_required.data
         proposal.notice_required = form.notice_required.data
         proposal.needs_help = form.needs_help.data
 
@@ -475,7 +481,7 @@ def edit_proposal(proposal_id):
 
         elif proposal.type == "installation":
             form.size.data = proposal.size
-            form.funds.data = proposal.funds
+            form.installation_funding.data = proposal.installation_funding
 
         elif proposal.type == "lightning":
             form.slide_link.data = proposal.slide_link
@@ -489,7 +495,9 @@ def edit_proposal(proposal_id):
 
         form.title.data = proposal.title
         form.description.data = proposal.description
-        form.requirements.data = proposal.requirements
+        form.equipment_required.data = proposal.equipment_required
+        form.additional_info.data = proposal.additional_info
+        form.funding_required.data = proposal.funding_required
         form.notice_required.data = proposal.notice_required
         form.needs_help.data = proposal.needs_help
 
@@ -557,7 +565,9 @@ class FinaliseForm(Form):
 
     may_record = BooleanField("I am happy for this to be recorded", default=True)
     needs_laptop = BooleanField("I will need to borrow a laptop for slides")
-    requirements = TextAreaField("Requirements")
+    equipment_required = TextAreaField("Equipment Required")
+    additional_info = TextAreaField("Additional Information")
+    funding_required = TextAreaField("Funding Required")
     arrival_period = SelectField(
         "Estimated arrival time",
         default="fri am",
@@ -673,7 +683,9 @@ def finalise_proposal(proposal_id):
 
         proposal.may_record = form.may_record.data
         proposal.needs_laptop = form.needs_laptop.data
-        proposal.requirements = form.requirements.data
+        proposal.equipment_required = form.equipment_required.data
+        proposal.additional_info = form.additional_info.data
+        proposal.funding_required = form.funding_required.data
 
         proposal.arrival_period = form.arrival_period.data
         proposal.departure_period = form.departure_period.data
@@ -713,7 +725,9 @@ def finalise_proposal(proposal_id):
 
         form.may_record.data = proposal.may_record
         form.needs_laptop.data = proposal.needs_laptop
-        form.requirements.data = proposal.requirements
+        form.equipment_required.data = proposal.equipment_required
+        form.additional_info.data = proposal.additional_info
+        form.funding_required.data = proposal.funding_required
 
         if proposal.type == "workshop" or proposal.type == "youthworkshop":
             form.age_range.data = proposal.published_age_range

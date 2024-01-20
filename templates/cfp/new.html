@@ -84,8 +84,8 @@
          <p>We'll use these details to help us schedule your {{form.model.human_type}}.</p>
       {# NB this excludes installations, which have a separate section #}
       {% if cfp_type in ('talk', 'performance', 'workshop', 'youthworkshop') %}
-        {% call render_field(form.requirements, horizontal=9,
-                            placeholder="Additional equipment required, or anything else you want us to know") %}
+        {% call render_field(form.equipment_required, horizontal=9,
+                            placeholder="Additional equipment required") %}
           {% if cfp_type in ('talk', 'performance') %}
             We'll provide a sound system and projector or screen.
           {% elif cfp_type in ('workshop', 'youthworkshop') %}
@@ -119,18 +119,17 @@
 
         <legend></legend>
       {% elif cfp_type == 'installation' %}
-          {% call render_field(form.requirements, horizontal=9,
+          {% call render_field(form.equipment_required, horizontal=9,
           placeholder="What are your installation's requirements?") %}
             Let us know if your installation has any special requirements (power, to be inside, internet etc).
           {% endcall %}
           {% call render_field(form.size, horizontal=9) %}
             How much space will your installation take up?
           {% endcall %}
-          {% call render_field(form.funds, 9) %}
-            We have a limited amount of funding available to make the EMF site look great.
-            If you'd like to apply for a grant, let us know how much you'll need.
-          {% endcall %}
       {% endif %}
+
+        {{ render_field(form.additional_info, horizontal=9, placeholder="Anything else you'd like to tell us") }}
+
         <div class="col-md-9 col-sm-offset-3">
           {% if cfp_type == 'youthworkshop' %}
           <label class="checkbox">
@@ -139,16 +138,38 @@
           </label>
           <small>This is not a requirement but please let us know if you have one</small>
           {% endif %}
-          <label class="checkbox">
-            {{ form.needs_help() }}
-            I'd like advice or help with this proposal
-          </label>
-          <small>We're happy to advise on submissions before they are reviewed</small>
-          {% for error in form.needs_help.errors %}
-          <div class="help-block">{{ error }}</div>
-          {% endfor %}
         </div>
-        <!-- More details -->
+
+        <div class="col-md-9 col-sm-offset-3">
+        <label class="checkbox">
+          {{ form.needs_help() }}
+          I'd like advice or help with this proposal
+        </label>
+        <small>We're happy to advise on submissions before they are reviewed</small>
+        </div>
+
+      </fieldset>{# More details #}
+
+     <fieldset>
+        <legend>Funding</legend>
+        {% if cfp_type in ('installation') %}
+        <p>
+          We have a limited amount of funding available to make the EMF site look great.
+          If you'd like to apply for a grant, let us know how much you'll need.
+          {{ render_field(form.installation_funding, horizontal=9) }}
+        </p>
+        {% endif %}
+
+        <p>
+          We {% if cfp_type in ('installation') %} also {% endif %} have some budget to
+          subsidise travel within the UK for those who could not otherwise afford it.
+          {% if cfp_type in ('workshop', 'youthworkshop') %}
+          We also have some funds available for up-front costs for
+          workshops, for example, to build kits for attendees.
+          {% endif %}
+          {{ render_field(form.funding_required, horizontal=9, placeholder="What costs do you need covered?") }}
+        </p>
+
       </fieldset>
 
       {% endif %}{# cfp_type == "lighting" #}
