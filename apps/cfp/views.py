@@ -51,9 +51,8 @@ class ProposalForm(Form):
     user_scheduled = BooleanField("User scheduled")
     notice_required = SelectField(
         "Required notice",
-        default="1 week",
+        default="1 month",
         choices=[
-            ("1 week", "1 week"),
             ("1 month", "1 month"),
             ("> 1 month", "Longer than 1 month"),
             ("> 3 months", "Longer than 3 months"),
