@@ -22,10 +22,11 @@
       {{ render_field(form.requirements, 9) }}
       {{ render_field(form.length, 9) }}
       {{ render_field(form.notice_required, 9) }}
+      {% if proposal.type != 'youthworkshop' %}
       {% call render_field(form.attendees, 9) %}
-          Our workshop tents can accommodate 10-50 attendees per session; if your workshop
-          is smaller than that, we might be able to find somewhere else to hold it.
+          Our workshop tents can accommodate 10-50 attendees per session.
       {% endcall %}
+      {% endif %}
       {{ render_field(form.cost, 9) }}
       {{ render_field(form.participant_equipment, 9)}}
       {{ render_field(form.age_range, 9) }}
@@ -62,11 +63,13 @@
         {{ form.needs_help() }}
         I'd like help with preparing this proposal.
       </label>
-      {% for error in form.needs_help.errors %}
-      <div class="help-block">{{ error }}</div>
-      {% endfor %}
+      <p></p>
     </div>
     </fieldset>
+
+    {% for error in form.needs_help.errors %}
+    <div class="help-block">{{ error }}</div>
+    {% endfor %}
 
   </div>
   <div class="pull-right">

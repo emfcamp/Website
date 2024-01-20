@@ -56,7 +56,8 @@
         {% endif %}
       </dl>
     </div>
-    {% if proposal.scheduled_duration and (proposal.type == 'talk' or proposal.type == 'workshop') %}
+    {% if proposal.type != 'lightning' %}
+    {% if proposal.scheduled_duration and (proposal.type in ('talk', 'workshop', 'youthworkshop')) %}
     <div class="col-md-6">
       <legend>Your scheduled slot</legend>
       <dl class="dl-horizontal">
@@ -71,10 +72,10 @@
       <legend>Further details</legend>
       <dl class="dl-horizontal">
         <dt>Requirements</dt><dd>{{proposal.requirements}}</dd>
-        {% if proposal.type == 'talk' %}
+        {% if proposal.type in ('talk', 'performance') %}
           <dt>Length</dt><dd>{{proposal.length}}</dd>
           <dt>Notice Required</dt><dd>{{proposal.notice_required}}</dd>
-        {% elif proposal.type == 'workshop' %}
+        {% elif proposal.type in ('workshop', 'youthworkshop') %}
           <dt>Length</dt><dd>{{proposal.length}}</dd>
           <dt>Notice Required</dt><dd>{{proposal.notice_required}}</dd>
           <dt>Attendees</dt><dd>{{proposal.attendees}}</dd>
@@ -87,6 +88,7 @@
       </dl>
     </div>
     {% endif %}
+    {% endif %}{# proposal.type != 'lightning' #}
   </div></div>
 {% endif %}
 

@@ -60,10 +60,11 @@
           {% endif %}
           {{render_field(form.title, horizontal=9, placeholder="A short summary")}}
           {{ render_field(form.description, horizontal=9, word_limit=250,
-          placeholder="A full description of your proposal, in no more than 250 words") }}
+          placeholder="A full description of your proposal, in no more than 250 words. Don't include your name here.") }}
      </fieldset>
 
      {% if cfp_type == "lightning" %}
+
      <fieldset>
         {{ render_field(form.slide_link, horizontal=9, placeholder="https://example.com/my-slides.pdf") }}
         {% if full_lightning_sessions %}
@@ -75,10 +76,13 @@
         {% endif %}
         {{ render_field(form.session, horizontal=9) }}
      </fieldset>
-     {% else %}
+
+     {% else %}{# cfp_type != "lightning" #}
+
      <fieldset>
          <legend>More details</legend>
          <p>We'll use these details to help us schedule your {{form.model.human_type}}.</p>
+      {# NB this excludes installations, which have a separate section #}
       {% if cfp_type in ('talk', 'performance', 'workshop', 'youthworkshop') %}
         {% call render_field(form.requirements, horizontal=9,
                             placeholder="Additional equipment required, or anything else you want us to know") %}
@@ -97,17 +101,23 @@
       {% endcall %}
 
       {% if cfp_type in ('workshop', 'youthworkshop') %}
+        <legend>Attendees</legend>
+
+          {% if cfp_type != 'youthworkshop' %}
+          <p>Our workshop tents can accommodate 10-50 attendees per session; if your workshop
+          is smaller than that, you don't need to use the Call for Participation, but feel free to
+          <a href="mailto:{{ config['CONTENT_EMAIL'][1] }}">drop us an email</a> instead.</p>
+          <p>If volunteers would help you increase capacity, please say so.
+          {% endif %}
           {% call render_field(form.attendees, horizontal=9,
                 placeholder="The number of people you can accommodate in your workshop") %}
-                {% if cfp_type != 'youthworkshop' %}
-                Our workshop tents can accommodate 10-50 attendees per session; if your workshop
-                is smaller than that, you could consider holding it at a
-                <a href="https://wiki.emfcamp.org/wiki/Villages">village</a> instead.
-                {% endif %}
+             Please ensure you will have enough kits or equipment to go round.
           {% endcall %}
           {{ render_field(form.cost, horizontal=9, placeholder="If attendees need to pay for materials") }}
           {{ render_field(form.participant_equipment, horizontal=9, placeholder="Things they should bring - such as a laptop, arduino, or knitting needles") }}
           {{ render_field(form.age_range, horizontal=9, placeholder="What age group is this suitable for? Approximate is fine") }}
+
+        <legend></legend>
       {% elif cfp_type == 'installation' %}
           {% call render_field(form.requirements, horizontal=9,
           placeholder="What are your installation's requirements?") %}
@@ -140,7 +150,15 @@
         </div>
         <!-- More details -->
       </fieldset>
-      {% endif %}
+
+      {% endif %}{# cfp_type == "lighting" #}
+
+      {% for error in form.needs_help.errors %}
+      <div class="help-block">{{ error }}</div>
+      {% endfor %}
+
+      <p></p>
+
       <fieldset>
       <div class="form-actions">
         <button type="submit" name="Create" class="btn btn-primary btn-lg pull-right debounce">Submit proposal</button>

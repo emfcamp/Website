@@ -207,7 +207,7 @@ def form(cfp_type="talk"):
     if (
         cfp_type == "lightning"
         and not feature_enabled("LIGHTNING_TALKS")
-        and not current_user.has_permission("cfp_admin")
+        and (current_user.is_anonymous or not current_user.has_permission("cfp_admin"))
     ):
         flash("We're not currently accepting Lightning Talks.")
         return redirect(url_for(".main"))
