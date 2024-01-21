@@ -13,7 +13,7 @@
         {% if self.description() -%}
         <meta property="og:type" content="website">
         <meta property="og:description" content="{{ self.description()|replace("\n", " ") }}">
-        <meta name="description" content="{{ self.description()|replace("\n", " ") }}">
+        <meta name="description" content="{% filter replace("\n", " ") %}{% block description %}{% endblock %}{% endfilter %}">
         {% endif -%}
         <meta name="theme-color" content="#171123">
         <link rel="shortcut icon" type="image/x-icon" href="{{ static_url_for('static', filename='images/favicon.ico') }}">
