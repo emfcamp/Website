@@ -8,6 +8,10 @@ FROM python:3.11-slim-bullseye
 WORKDIR /app
 COPY pyproject.toml poetry.lock /app/
 
+# Explicitly disable virtualenvs in the project directory so a local .venv dir
+# doesn't confuse poetry.
+ENV POETRY_VIRTUALENVS_IN_PROJECT=false
+
 # All the X11 packages are required for chromium/pyppetteer which we use for
 # generating PDFs.
 #
