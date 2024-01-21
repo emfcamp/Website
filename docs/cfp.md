@@ -8,7 +8,7 @@ There are 3 types of proposal which is accepted to the CfP:
 ## Review process ##
 
 1. Submission
-2. Sanity checks (in order to reject, e.g. hate speech or spam)
+2. Sense checks (in order to reject, e.g. hate speech or spam)
 3. Anonymisation
 4. Review (score 0, 1 or 2)
 5. Judging (all submissions are ranked according to Majority judgement)
