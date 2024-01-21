@@ -1,6 +1,6 @@
 """ Development CLI tasks """
 import click
-from pendulum import DateTime, Duration as Offset
+from pendulum import Duration as Offset, parse
 from flask import current_app as app
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
@@ -189,7 +189,12 @@ def volunteer_data():
 def volunteer_shifts():
     """Make fake volunteer shifts"""
     # First = first start time. Final = end of last shift
-    start_date = DateTime(2024, 5, 30)
+    start_date = parse(app.config["EVENT_START"]).set(
+        hour=0,
+        minute=0,
+        second=0,
+        microsecond=0,
+    )
     shift_list = {
         # 'Tent' roles
         "Badge Helper": {
