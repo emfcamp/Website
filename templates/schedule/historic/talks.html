@@ -44,6 +44,9 @@
 {% set venue_loop = loop %}
 
 <h3>{{ venue.name }}</h3>
+{% if venue.description %}
+<p>{{ venue.description }}</p>
+{% endif %}
 <table class="table">
 <thead>
   <tr>
