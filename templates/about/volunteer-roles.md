@@ -36,3 +36,9 @@ In the months ahead of the event NullSector need someone to help with administra
 The shop was hugely popular last year, and we're looking for some people to manage it this year. You'll be keeping track of stock, training volunteers on how to work the till, and generally making sure everything runs smoothly.
 
 A driving license and transport would be a huge help in this role to enable going out to restock things, but it isn't essential that everyone involved can drive. We can provide help and support in getting a till system set up.
+
+# Calls for help
+
+Occassionally we'd like to put out a call for help with specific roles, while we'd love to do that with a giant EMF logo beamed into the night sky, we had to settle for a mailing list instead. You can sign up to it below.
+
+{{ contact_form("volunteer") }}
