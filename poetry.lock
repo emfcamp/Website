@@ -2859,21 +2859,21 @@ files = [
 
 [[package]]
 name = "pywisetransfer"
-version = "0.3.0"
+version = "0.3.1"
 description = "Python library for the TransferWise API"
 optional = false
-python-versions = ">=3.7,<4.0"
+python-versions = ">=3.8,<4.0"
 files = [
-    {file = "pywisetransfer-0.3.0.tar.gz", hash = "sha256:9b5f5470843d78a8c3d37693b33b9f86813a9ad172877477469220364562c9d2"},
+    {file = "pywisetransfer-0.3.1-py3-none-any.whl", hash = "sha256:66dd30a087341ce86adda77a4e69e81ba86abafad7b8e90d67c4113232b18b55"},
 ]
 
 [package.dependencies]
 apiron = ">=7.1.0,<8.0.0"
-cryptography = ">=36.0.1,<37.0.0"
+cryptography = "<42.0.0"
 munch = ">=4.0.0,<5.0.0"
 
 [package.extras]
-dev = ["black (>=22.1.0,<23.0.0)", "munch-stubs (>=0.1.2,<0.2.0)", "pytest (>=7.0.1,<8.0.0)", "responses (>=0.18.0,<0.19.0)", "types-cryptography (>=3.3.23.2,<4.0.0.0)"]
+dev = ["black (>=23.12.1,<24.0.0)", "munch-stubs (>=0.1.2,<0.2.0)", "pytest (>=7.0.1,<8.0.0)", "responses (>=0.24.1,<0.25.0)", "types-cryptography (>=3.3.23.2,<4.0.0.0)"]
 
 [[package]]
 name = "pyyaml"
@@ -4310,4 +4310,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11"
-content-hash = "60aa6f47a735a037758fe0cc2da91843b1ca60a880b617e9abfd75b76dab46f5"
+content-hash = "f78a2d4b8556b815794afc47a6a4736a8c715b1c4621ea33c6f1d1bc15d940f0"
