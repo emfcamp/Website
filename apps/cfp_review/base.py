@@ -391,6 +391,9 @@ def update_proposal(proposal_id):
     form.available_times.data = prop.available_times
     form.content_note.data = prop.content_note
     form.family_friendly.data = prop.family_friendly
+    form.thumbnail_url.data = prop.thumbnail_url
+    form.c3voc_url.data = prop.c3voc_url
+    form.youtube_url.data = prop.youtube_url
 
     form.user_scheduled.data = prop.user_scheduled
     form.hide_from_schedule.data = prop.hide_from_schedule

@@ -137,6 +137,11 @@
                                     {{ render_dl_field(form.published_cost) }}
                                     {{ render_dl_field(form.published_participant_equipment) }}
                                 {% endif %}
+				{% if proposal.type in ['talk', 'lightning'] %}
+				    {{ render_dl_field(form.thumbnail_url) }}
+				    {{ render_dl_field(form.c3voc_url) }}
+				    {{ render_dl_field(form.youtube_url) }}
+				{% endif %}
                             </dl>
                         </div>
                     </div>

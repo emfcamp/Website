@@ -8,6 +8,10 @@ FROM python:3.11-slim-bullseye
 WORKDIR /app
 COPY pyproject.toml poetry.lock /app/
 
+# Explicitly disable virtualenvs in the project directory so a local .venv dir
+# doesn't confuse poetry.
+ENV POETRY_VIRTUALENVS_IN_PROJECT=false
+
 # All the X11 packages are required for chromium/pyppetteer which we use for
 # generating PDFs.
 #
@@ -21,6 +25,6 @@ RUN apt-get update && \
       libxcursor1 libxdamage1 libxi6 libxtst6 libnss3 libcups2 \
       libxrandr2 libasound2 libatk1.0-0 libatk-bridge2.0-0 libgtk-3-0 libzbar0 \
       coinor-cbc curl && \
-    pip3 install poetry==1.4.2 && \
+    pip3 install poetry==1.7.1 && \
     poetry install && poetry run pyppeteer-install && \
     rm -rf /var/lib/apt/lists/*

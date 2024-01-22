@@ -5,12 +5,12 @@ in making things.{% endblock %} {% block body %} {% include
 <div class="row" itemscope itemtype="http://schema.org/Festival">
   {% include "home/_emf_blurb.html" %}
   <div class="col-md-6">
-    {% include "home/event-data.html" %} {#
-    <p>
+    {% include "home/event-data.html" %} 
+    <p class="emphasis">
       The first batch of tickets will go on sale on
-      <strong>Monday the 29th of January 2018 at 19:00</strong> (UK time).
+      <strong>Saturday 3 February at 14:00</strong> (UK time).
+      <a href="{{url_for('tickets.main')}}">See ticket options and prices</a>.
     </p>
-    #}
     <div class="well">
       <p>
         If you're interested in updates about EMF {{ event_start.year }}, follow
