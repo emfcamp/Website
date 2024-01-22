@@ -134,7 +134,7 @@ def email_reserve():
 )
 @click.argument("tags_to_create", nargs=-1)
 def create_tags(tags_to_create):
-    """Upset tag list"""
+    """Upsert tag list"""
     if not tags_to_create:
         tags_to_create = DEFAULT_TAGS
 
@@ -150,3 +150,31 @@ def create_tags(tags_to_create):
 
     db.session.commit()
     app.logger.info(f"Successfully created {tags_created} new tags.")
+
+
+@cfp.cli.command(
+    "delete_tags",
+    help=f"Delete tags from the Database. Tagged proposals will have the tags removed.",
+)
+@click.argument("tags_to_delete", required=True, nargs=-1)
+def delete_tags(tags_to_delete):
+    """Delete tag list"""
+    tags_deleted = 0
+    for tag_name in tags_to_delete:
+        tag = Tag.query.filter_by(tag=tag_name).one_or_none()
+        if not tag:
+            app.logger.info(f"Couldn't find tag: '{tag_name}' exiting.")
+            return
+
+        if tag.proposals:
+            tagged_proposals = [p.id for p in tag.proposals]
+            app.logger.info(
+                f"'{tag_name}' will be removed from the proposals with ids: {tagged_proposals}"
+            )
+
+        db.session.delete(tag)
+        tags_deleted += 1
+        app.logger.info(f"'{tag_name}' added to session.")
+
+    db.session.commit()
+    app.logger.info(f"Successfully deleted {tags_deleted} tags.")
