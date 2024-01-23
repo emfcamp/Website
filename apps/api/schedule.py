@@ -1,4 +1,7 @@
-from flask import request
+from hmac import compare_digest
+from functools import wraps
+
+from flask import request, current_app as app
 from flask_login import current_user
 from flask_restful import Resource, abort
 
@@ -7,6 +10,54 @@ from main import db
 from models.cfp import Proposal
 from models.ical import CalendarEvent
 from models.admin_message import AdminMessage
+
+
+def _require_video_api_key(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        auth_header = request.headers.get("authorization", None)
+        if not auth_header or not auth_header.startswith("Bearer "):
+            abort(401)
+
+        bearer_token = auth_header.removeprefix("Bearer ")
+        if not compare_digest(bearer_token, app.config["VIDEO_API_KEY"]):
+            abort(401)
+
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+class ProposalResource(Resource):
+    method_decorators = {"patch": [_require_video_api_key]}
+
+    def patch(self, proposal_id):
+        if not request.is_json:
+            abort(415)
+        proposal = Proposal.query.get_or_404(proposal_id)
+
+        payload = request.get_json()
+        if not payload:
+            abort(400)
+
+        ALLOWED_ATTRIBUTES = {"youtube_url", "thumbnail_url", "c3voc_url"}
+        if set(payload.keys()) - ALLOWED_ATTRIBUTES:
+            abort(400)
+
+        for attribute in ALLOWED_ATTRIBUTES:
+            if attribute in payload:
+                setattr(proposal, attribute, payload[attribute] or "")
+
+        db.session.add(proposal)
+        db.session.commit()
+
+        return {
+            "id": proposal.id,
+            "slug": proposal.slug,
+            "youtube_url": proposal.youtube_url,
+            "thumbnail_url": proposal.thumbnail_url,
+            "c3voc_url": proposal.c3voc_url,
+        }
 
 
 class FavouriteProposal(Resource):
@@ -89,6 +140,7 @@ class ScheduleMessage(Resource):
         return messages
 
 
+api.add_resource(ProposalResource, "/proposal/<int:proposal_id>")
 api.add_resource(FavouriteProposal, "/proposal/<int:proposal_id>/favourite")
 api.add_resource(FavouriteExternal, "/external/<int:event_id>/favourite")
 api.add_resource(ScheduleMessage, "/schedule_messages")
