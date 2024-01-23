@@ -17,3 +17,6 @@ As with everywhere on site, [power will be available](/about/power). However, we
 
 ## Carer Tickets
 If you require a ticket for a carer to come to EMF with you, we are happy to provide these for free. Once you've bought your ticket, please [email us](mailto:tickets@emfcamp.org) with the name and email address of your carer, and we will issue them a ticket.
+
+## Captions
+We will be providing live captions for talks in the main venues (stages A, B and C). These will be displayed in the venue on monitors to the side of the stage, as well as available via a web browser on personal devices on-site.
