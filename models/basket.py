@@ -9,8 +9,8 @@ from sqlalchemy.orm import joinedload
 from main import db
 from . import Currency
 from .exc import CapacityException
-from .product import PriceTier, Voucher
-from .purchase import Purchase, Ticket, AdmissionTicket
+from .product import PriceTier, Voucher, PRODUCT_GROUP_TYPES_DICT
+from .purchase import Purchase
 
 
 class Line:
@@ -201,12 +201,14 @@ class Basket(MutableMapping):
                     line.tier.issue_instances(issue_count)
 
                     product = line.tier.parent
-                    if product.parent.type == "admissions":
-                        purchase_cls = AdmissionTicket
-                    elif product.parent.type in {"campervan", "parking"}:
-                        purchase_cls = Ticket
-                    else:
-                        purchase_cls = Purchase
+                    product_group_type = PRODUCT_GROUP_TYPES_DICT.get(
+                        product.parent.type
+                    )
+                    purchase_cls = (
+                        product_group_type.purchase_cls
+                        if product_group_type
+                        else Purchase
+                    )
 
                     price = line.tier.get_price(self.currency)
                     purchases = [

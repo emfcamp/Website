@@ -1,4 +1,5 @@
 from __future__ import annotations
+from dataclasses import dataclass
 from decimal import Decimal
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -15,7 +16,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from main import db
 from .mixins import CapacityMixin, InheritedAttributesMixin
 from . import BaseModel
-from .purchase import Purchase
+from .purchase import Purchase, AdmissionTicket, Ticket
 from .payment import Currency
 
 if TYPE_CHECKING:
@@ -64,6 +65,23 @@ def one_or_none(result):
     if len(result) == 0:
         return None
     raise MultipleLoadedResultsFound()
+
+
+@dataclass(frozen=True)
+class ProductGroupType:
+    slug: str
+    name: str
+    purchase_cls: type[Purchase]
+
+
+PRODUCT_GROUP_TYPES = [
+    ProductGroupType("admissions", "Admission Ticket", AdmissionTicket),
+    ProductGroupType("campervan", "Campervan Ticket", Ticket),
+    ProductGroupType("parking", "Parking", Ticket),
+    ProductGroupType("merchandise", "Merchandise", Purchase),
+    ProductGroupType("rental", "Rental", Purchase),
+]
+PRODUCT_GROUP_TYPES_DICT = {t.slug: t for t in PRODUCT_GROUP_TYPES}
 
 
 class ProductGroup(BaseModel, CapacityMixin, InheritedAttributesMixin):

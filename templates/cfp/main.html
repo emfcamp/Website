@@ -25,9 +25,10 @@
       the ticket cost goes directly towards turning a field into an amazing place
       to spend a weekend, and all those who attend contribute to making the event a success.</p>
 
-    <p>As with all contributors to EMF, speakers do not receive any payment, although we have
-        some budget to subsidise travel within the UK for those who could not otherwise afford
-        it.</p>
+    <p>As with all contributors to EMF, speakers do not receive any payment, although
+       we have some budget to subsidise travel within the UK for those who could not
+       otherwise afford it. We also have some funds available for up-front costs for
+       workshops, for example, to develop kits for attendees.</p>
 
     <h3>Tickets</h3>
     <p>You will be guaranteed the opportunity to buy EMF tickets if your talk,
@@ -71,7 +72,7 @@
       <p>If you've already submitted a proposal, you can
         view and edit it <a href="{{ url_for('.proposals') }}">here</a>.</p>
     {% else %}
-      <p>If you have already submitted a proposal
+      <p>If you have already submitted a proposal you will
         need to <a href="{{ url_for('users.login', next=url_for('.proposals') ) }}">login</a>
         in order to view or edit it.</p>
         {% endif %}
