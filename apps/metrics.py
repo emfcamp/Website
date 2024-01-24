@@ -65,7 +65,7 @@ class ExternalMetrics:
         gauge_groups(emf_payments, Payment.query, Payment.provider, Payment.state)
         gauge_groups(
             emf_attendees,
-            AdmissionTicket.query,
+            AdmissionTicket.query.filter(AdmissionTicket.is_paid_for),
             cast(AdmissionTicket.checked_in, String),
             cast(AdmissionTicket.badge_issued, String),
         )
