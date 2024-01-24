@@ -2,9 +2,9 @@ import io
 from lxml import etree
 import asyncio
 
-from flask import render_template, current_app as app
+from flask import render_template
 from markupsafe import Markup
-from pyppeteer.launcher import launch
+from playwright.async_api import async_playwright
 import barcode
 from barcode.writer import ImageWriter, SVGWriter
 import segno
@@ -63,29 +63,22 @@ def render_pdf(url, html):
     # you're running a dev server, use app.run(processes=2)
 
     async def to_pdf():
-        browser = await launch(
-            # Handlers don't work as we're not in the main thread.
-            handleSIGINT=False,
-            handleSIGTERM=False,
-            handleSIGHUP=False,
-            # --no-sandbox is necessary as we're running as root (in docker!)
-            args=["--no-sandbox"],
-        )
-        page = await browser.newPage()
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(
+                # Handlers don't work as we're not in the main thread.
+                handle_sigint=False,
+                handle_sigterm=False,
+                handle_sighup=False,
+            )
+            context = await browser.new_context()
+            page = await browser.new_page()
 
-        async def request_intercepted(request):
-            app.logger.debug("Intercepted URL: %s", request.url)
-            if request.url == url:
-                await request.respond({"body": html})
-            else:
-                await request.continue_()
-
-        page.on("request", lambda r: asyncio.ensure_future(request_intercepted(r)))
-        await page.setRequestInterception(True)
-
-        await page.goto(url)
-        pdf = await page.pdf(format="A4")
-        await browser.close()
+            await page.route(url, lambda route: route.fulfill(body=html))
+            await page.goto(url)
+            pdf = await page.pdf(format="A4")
+            await page.close()
+            await context.close()
+            await browser.close()
         return pdf
 
     loop = asyncio.new_event_loop()

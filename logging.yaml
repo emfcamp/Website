@@ -31,7 +31,7 @@ loggers:
     propagate: false
   iso8601:
     level: WARN
-  pyppeteer:
+  playwright:
     level: WARN
   websockets.protocol:
     level: WARN

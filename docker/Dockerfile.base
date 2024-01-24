@@ -12,7 +12,7 @@ COPY pyproject.toml poetry.lock /app/
 # doesn't confuse poetry.
 ENV POETRY_VIRTUALENVS_IN_PROJECT=false
 
-# All the X11 packages are required for chromium/pyppetteer which we use for
+# All the X11 packages are required for chromium/playwright which we use for
 # generating PDFs.
 #
 # It would be nice to be able to build an image without build tools and dev
@@ -26,5 +26,7 @@ RUN apt-get update && \
       libxrandr2 libasound2 libatk1.0-0 libatk-bridge2.0-0 libgtk-3-0 libzbar0 \
       coinor-cbc curl && \
     pip3 install poetry==1.7.1 && \
-    poetry install && poetry run pyppeteer-install && \
+    poetry install && \
+    poetry run playwright install-deps && \
+    poetry run playwright install chromium && \
     rm -rf /var/lib/apt/lists/*
