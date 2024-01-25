@@ -73,9 +73,13 @@
                 <div class="panel-heading"><h3 class="panel-title">Bank Transfer</h3></div>
                 <div class="panel-body">
                     {% if user_currency != 'EUR' %}
-                    <p>Ask your UK bank to send money to us directly. We'll give you our account number and sort code to send the money to.</p>
+                    <p>Ask your UK bank to send money to us directly. We'll give you our account details to send the money to.</p>
                     {% else %}
                     <p>Ask your bank to send money to us directly. We'll give you our IBAN to send the money to.</p>
+                    {% endif %}
+                    <p>This is the cheapest payment method for us, and means we'll have more money to spend on making EMF great. 
+                    {% if user_currency == 'GBP'%}
+                    <p>Payments are usually confirmed in seconds!</p>
                     {% endif %}
                 </div>
                 <div class="panel-footer panel-footer-center">
@@ -92,17 +96,10 @@
 
         <div class="col-sm-6">
             <div class="panel panel-default panel--payment">
-                {% if feature_enabled('STRIPE') and feature_enabled('BANKTRANSFER') %}
-                <div class="panel-body">
-                    <p>If you can't use another payment method, we accept card payments.
-                    These cost us more, and we'd rather you used another method if you can.</p>
-
-                    <p>We accept Visa, Visa Debit, Mastercard or American Express.</p>
-                    <input type="submit" name="{{form.stripe.name}}" value="{{form.stripe.label.text}}" class="btn btn-small btn-success debounce"/>
-                </div>
-                {% elif feature_enabled('STRIPE') %}
+                {% if feature_enabled('STRIPE') %}
                 <div class="panel-heading"><h3 class="panel-title">Card</h3></div>
                 <div class="panel-body">
+                    <p>Pay by card through our payment processor Stripe.</p>
                     <p>We accept Visa, Visa Debit, Mastercard or American Express.</p>
                 </div>
                 <div class="panel-footer panel-footer-center">

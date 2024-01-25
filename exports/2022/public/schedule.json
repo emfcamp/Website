@@ -2687,7 +2687,11 @@
     "source": "database",
     "link": "https://www.emfcamp.org/schedule/2022/157-building-a-copper-telephone-network-at-emf",
     "start_time": "12:00",
-    "end_time": "12:30"
+    "end_time": "12:30",
+    "video": {
+      "youtube": "https://www.youtube.com/watch?v=gpMaEqCv6Uw",
+      "original_filename": "157 - Building a copper telephone network at EMF"
+    }
   },
   {
     "id": 160,
