@@ -16,6 +16,6 @@ COPY --from=static /app/static /app/static
 # The settings file doesn't matter for the purposes of the below command,
 # but it's needed for it to run.
 RUN SETTINGS_FILE=/app/config/test.cfg poetry run flask digest compile
-
+ENV PROMETHEUS_MULTIPROC_DIR=/var/prometheus
 ENV SHELL=/bin/bash
 ENTRYPOINT ["./docker/prod_entrypoint.sh"]
