@@ -103,7 +103,10 @@ def historic_talk_data(year):
     stage_events.sort(key=sort_key)
     workshop_events.sort(key=sort_key)
     youth_events.sort(key=sort_key)
+    film_events.sort(key=sort_key)
+    music_events.sort(key=sort_key)
     performance_events.sort(key=sort_key)
+    attendee_events.sort(key=sort_key)
 
     venues = [
         {"name": "Main Stages", "events": stage_events},
