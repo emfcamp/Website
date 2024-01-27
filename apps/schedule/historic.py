@@ -71,7 +71,8 @@ def historic_talk_data(year):
             ]  # "Some idiot"
 
         # All official (non-external) content is on a stage or workshop, so we don't care about anything that isn't
-        if not event["is_from_cfp"]:
+        # Pre-2022 we didn't have is_from_cfp.
+        if not event.get("is_from_cfp", True):
             events_list = attendee_events
         elif event["type"] == "talk":
             events_list = stage_events
