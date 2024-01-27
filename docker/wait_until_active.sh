@@ -1,12 +1,12 @@
 #!/bin/bash
 
-URL="http://localhost:2342"
-TIMEOUT=5
+URL="http://localhost:8000"
+TIMEOUT=50
 INTERVAL=1
 ELAPSED=0
 
 while true; do
-    if curl --output /dev/null --silent --head --fail "$URL"; then
+    if curl --output /dev/null --silent --head --fail -H 'Host: www.emfcamp.org' "$URL"; then
         exit 0
     fi
 
