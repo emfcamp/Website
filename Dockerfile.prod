@@ -8,8 +8,7 @@ FROM ghcr.io/emfcamp/website-base:latest
 COPY . /app/
 WORKDIR /app
 
-RUN poetry install --no-dev && poetry run pyppeteer-install && mkdir /var/prometheus \
-	&& rm -Rf ./static
+RUN poetry install --no-dev && poetry run pyppeteer-install && rm -Rf ./static
 
 COPY --from=static /app/static /app/static
 
