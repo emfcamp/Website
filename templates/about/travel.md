@@ -9,13 +9,8 @@ You can arrive after 10am on Thursday 30 May and you can stay until midday on Mo
 ## By Train
 EMF is close to Ledbury station which is around [three hours direct](https://traintimes.org.uk/londonpaddington/ledbury/) from London Paddington (on [GWR](https://www.gwr.com)) and [one hour](https://traintimes.org.uk/birminghamnewstreet/ledbury/) from Birmingham New Street (on [West Midlands Railway](https://www.westmidlandsrailway.co.uk/)).
 
-We will be providing a free shuttle bus service between Ledbury station and the EMF site approximately every half hour. The bus will leave from the bus stop on the road just outside the station, and be running between the following hours:
+We will be providing a free shuttle bus service between Ledbury station and the EMF site approximately every half hour. The bus will leave from the bus stop on the road just outside the station.
 
-**Thursday:** Midday to 8pm
-**Friday:** 9am to 10pm
-**Saturday:** 9am to 10pm
-**Sunday:** 9am to 10pm
-**Monday:** 9am to 1pm
 
 ## By Car
 If you plan to drive, you will need to buy a parking ticket or live-in vehicle ticket. Motorcycles do not require a parking ticket. No vehicles other than camper vans are permitted to be parked on site. If your vehicle is an integral part of a village or installation please contact us in advance for permission.
@@ -24,10 +19,10 @@ Plan your travel to the south gate (adjacent to A438) - postcode **HR8 1RQ** sho
 
 Once you're near the site, you'll see yellow temporary road signs for EMF - follow these and ignore your sat nav if it tells you differently.
 
-We encourage attendees to carpool where possible. There's a [lift sharing](https://wiki.emfcamp.org/wiki/Location/Lift_sharing) page on the wiki to find other people on the same route.
+We encourage attendees to carpool where possible. <!-- There's a [lift sharing](https://wiki.emfcamp.org/wiki/Location/Lift_sharing) page on the wiki to find other people on the same route. -->
 
 ### Electric Vehicles
-Owing to the increased price of providing electricity at EMF, and the increasing number of electric vehicles, we do not plan to provide generally-available electric vehicle charging at EMF 2024. We ask that you arrive at EMF with enough charge to leave at the end of the event.
+We do not plan to provide generally-available electric vehicle charging at EMF. We ask that you arrive at the event with enough charge to leave at the end of the event.
 
 We will be able to provide EV charging in an emergency.
 
