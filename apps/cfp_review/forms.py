@@ -26,7 +26,9 @@ class UpdateProposalForm(Form):
     title = StringField("Title", [DataRequired()])
     description = TextAreaField("Description", [DataRequired()])
     tags = SelectMultipleField("Tags")
-    requirements = TextAreaField("Requirements")
+    equipment_required = TextAreaField("Equipment Required")
+    funding_required = TextAreaField("Funding Required")
+    additional_info = TextAreaField("Additional Info")
     length = StringField("Length")
     notice_required = SelectField(
         "Required notice",
@@ -101,7 +103,9 @@ class UpdateProposalForm(Form):
         proposal.title = self.title.data
         proposal.description = self.description.data
         proposal.tags = Tag.parse_serialised_tags(self.tags.data)
-        proposal.requirements = self.requirements.data
+        proposal.equipment_required = self.equipment_required.data
+        proposal.funding_required = self.funding_required.data
+        proposal.additional_info = self.additional_info.data
         proposal.length = self.length.data
         proposal.notice_required = self.notice_required.data
         proposal.needs_help = self.needs_help.data
@@ -290,14 +294,14 @@ class UpdateYouthWorkshopForm(UpdateProposalForm):
 
 
 class UpdateInstallationForm(UpdateProposalForm):
-    funds = StringField("Funds")
+    installation_funding = StringField("Installation Funding")
     size = StringField("Size", [DataRequired()])
 
     def update_proposal(self, proposal):
         if self.size.raw_data:
             proposal.size = self.size.data
-        if self.funds.raw_data:
-            proposal.funds = self.funds.data
+        if self.installation_funding.raw_data:
+            proposal.installation_funding = self.installation_funding.data
         super(UpdateInstallationForm, self).update_proposal(proposal)
 
 
