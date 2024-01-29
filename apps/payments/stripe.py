@@ -9,6 +9,7 @@
     complicate this code.
 """
 import logging
+from typing import Optional
 
 from flask import (
     render_template,
@@ -23,9 +24,9 @@ from flask_login import login_required, current_user
 from flask_mailman import EmailMessage
 from wtforms import SubmitField
 from sqlalchemy.orm.exc import NoResultFound
-from stripe.error import AuthenticationError
+import stripe
 
-from main import db, stripe
+from main import db, get_stripe_client
 from models.payment import StripePayment
 from ..common import feature_enabled
 from ..common.email import from_email
@@ -78,20 +79,23 @@ def stripe_capture(payment_id):
         logger.warn("Unable to capture payment as Stripe is disabled")
         flash("Card payments are currently unavailable. Please try again later")
         return redirect(url_for("users.purchases"))
+    stripe_client = get_stripe_client(app.config)
 
     if payment.intent_id is None:
         # Create the payment intent with Stripe. This intent will persist across retries.
-        intent = stripe.PaymentIntent.create(
-            amount=payment.amount_int,
-            currency=payment.currency.upper(),
-            statement_descriptor_suffix=payment.description,
-            metadata={"user_id": current_user.id, "payment_id": payment.id},
+        intent = stripe_client.payment_intents.create(
+            params={
+                "amount": payment.amount_int,
+                "currency": payment.currency.upper(),
+                "statement_descriptor_suffix": payment.description,
+                "metadata": {"user_id": current_user.id, "payment_id": payment.id},
+            },
         )
         payment.intent_id = intent.id
         db.session.commit()
     else:
         # Reuse a previously-created payment intent
-        intent = stripe.PaymentIntent.retrieve(payment.intent_id)
+        intent = stripe_client.payment_intents.retrieve(payment.intent_id)
         if intent.status == "succeeded":
             logger.warn(f"Intent already succeeded, not capturing again")
             payment.state = "charging"
@@ -170,8 +174,9 @@ def stripe_waiting(payment_id):
 
 @payments.route("/stripe-webhook", methods=["POST"])
 def stripe_webhook():
+    stripe_client = get_stripe_client(app.config)
     try:
-        event = stripe.Webhook.construct_event(
+        event = stripe_client.construct_event(
             request.data,
             request.headers["STRIPE_SIGNATURE"],
             app.config.get("STRIPE_WEBHOOK_KEY"),
@@ -179,7 +184,7 @@ def stripe_webhook():
     except ValueError:
         logger.exception("Error decoding Stripe webhook")
         abort(400)
-    except stripe.error.SignatureVerificationError:
+    except stripe.SignatureVerificationError:
         logger.exception("Error verifying Stripe webhook signature")
         abort(400)
 
@@ -212,29 +217,34 @@ def stripe_ping(_type, _obj):
     return ("", 200)
 
 
-def stripe_update_payment(payment: StripePayment, intent: stripe.PaymentIntent = None):
+def stripe_update_payment(
+    stripe_client: stripe.StripeClient,
+    payment: StripePayment,
+    intent: Optional[stripe.PaymentIntent] = None,
+):
     """Update a Stripe payment.
-    If a PaymentIntent object is not passed in, this will fetch the payment details from the Stripe API.
+    If a PaymentIntent object is not passed in, this will fetch the payment details from
+    the Stripe API.
     """
     if intent is None:
-        intent = stripe.PaymentIntent.retrieve(payment.intent_id)
-
-    if len(intent.charges) == 0:
+        intent = stripe_client.payment_intents.retrieve(
+            payment.intent_id, params=dict(expand=["latest_charge"])
+        )
+    if intent.latest_charge is None:
         # Intent does not have a charge (yet?), do nothing
         return
-    elif len(intent.charges) > 1:
-        raise StripeUpdateUnexpected(
-            f"Payment intent #{intent['id']} has more than one charge"
-        )
+    if isinstance(intent.latest_charge, stripe.Charge):
+        # The payment intent object has been expanded already
+        charge = intent.latest_charge
+    else:
+        charge = stripe_client.charges.retrieve(intent.latest_charge)
 
-    charge = intent.charges.data[0]
-
-    if payment.charge_id is not None and payment.charge_id != charge["id"]:
+    if payment.charge_id is not None and payment.charge_id != charge.id:
         logger.warn(
-            f"Charge ID for intent {intent['id']} has changed from {payment.charge_id} to {charge['id']}"
+            f"Charge ID for intent {intent.id} has changed from {payment.charge_id} to {charge.id}"
         )
 
-    payment.charge_id = charge["id"]
+    payment.charge_id = charge.id
 
     if charge.refunded:
         return stripe_payment_refunded(payment)
@@ -367,8 +377,9 @@ def stripe_payment_intent_updated(hook_type, intent):
         payment.id,
     )
 
+    stripe_client = get_stripe_client(app.config)
     try:
-        stripe_update_payment(payment, intent)
+        stripe_update_payment(stripe_client, payment, intent)
     except StripeUpdateConflict:
         abort(409)
     except StripeUpdateUnexpected:
@@ -423,10 +434,11 @@ def stripe_validate():
     else:
         result.append((False, "Webhook key not configured"))
 
+    stripe_client = get_stripe_client(app.config)
     try:
-        webhooks = stripe.WebhookEndpoint.list()
+        webhooks = stripe_client.webhook_endpoints.list()
         result.append((True, "Connection to Stripe API succeeded"))
-    except AuthenticationError as e:
+    except stripe.AuthenticationError as e:
         result.append((False, f"Connecting to Stripe failed: {e}"))
         return result
 
