@@ -19,7 +19,7 @@ from wtforms import SubmitField, FieldList, FormField
 
 from sqlalchemy.sql.functions import func
 
-from main import db, stripe
+from main import db, get_stripe_client
 from models.payment import (
     Payment,
     RefundRequest,
@@ -191,8 +191,9 @@ def update_payment(payment_id):
             payment.lock()
 
             if payment.provider == "stripe":
+                stripe_client = get_stripe_client(app.config)
                 try:
-                    stripe_update_payment(payment)
+                    stripe_update_payment(stripe_client, payment)
                 except StripeUpdateConflict as e:
                     app.logger.warn(f"StripeUpdateConflict updating payment: {e}")
                     flash("Unable to update due to a status conflict")
@@ -457,9 +458,11 @@ def refund(payment_id):
                 payment.currency,
             )
 
+            stripe_client = get_stripe_client(app.config)
+
             if form.stripe_refund.data:
                 app.logger.info("Refunding using Stripe")
-                charge = stripe.Charge.retrieve(payment.charge_id)
+                charge = stripe_client.charges.retrieve(payment.charge_id)
 
                 if charge.refunded:
                     # This happened unexpectedly - send the email as usual
@@ -517,8 +520,11 @@ def refund(payment_id):
 
             if form.stripe_refund.data:
                 try:
-                    stripe_refund = stripe.Refund.create(
-                        charge=payment.charge_id, amount=refund.amount_int
+                    stripe_refund = stripe_client.refunds.create(
+                        params={
+                            "charge": payment.charge_id,
+                            "amount": refund.amount_int,
+                        }
                     )
 
                 except Exception as e:

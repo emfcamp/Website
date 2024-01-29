@@ -1,11 +1,11 @@
 from decimal import Decimal
-from stripe.error import StripeError
+from stripe import StripeError
 from flask import current_app as app, render_template
 from flask_mailman import EmailMessage
 from typing import Optional
 
 from models.payment import RefundRequest, StripePayment, StripeRefund, BankRefund
-from main import stripe, db
+from main import get_stripe_client, db
 from ..common.email import from_email
 
 
@@ -22,16 +22,21 @@ def create_stripe_refund(
 ) -> Optional[StripeRefund]:
     """Initiate a stripe refund, and return the StripeRefund object."""
     # TODO: This should probably live in the stripe module.
+    stripe_client = get_stripe_client(app.config)
     assert amount > 0
-    charge = stripe.Charge.retrieve(payment.charge_id)
+    charge = stripe_client.charges.retrieve(payment.charge_id)
     if charge.refunded:
         return None
 
     refund = StripeRefund(payment, amount)
 
     try:
-        stripe_refund = stripe.Refund.create(
-            charge=payment.charge_id, amount=refund.amount_int, metadata=metadata
+        stripe_refund = stripe_client.refunds.create(
+            params={
+                "charge": payment.charge_id,
+                "amount": refund.amount_int,
+                "metadata": metadata,
+            }
         )
     except StripeError as e:
         raise RefundException("Error creating Stripe refund") from e
