@@ -165,8 +165,10 @@ def get_cfp_type_form(cfp_type):
 
 
 @cfp.route("/cfp")
-@feature_flag("CFP")
 def main():
+    if not feature_enabled("CFP"):
+        return render_template("cfp/holding-page.html")
+
     ignore_closed = "closed" in request.args
 
     if feature_enabled("CFP_CLOSED") and not ignore_closed:
