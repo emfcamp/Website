@@ -371,7 +371,9 @@ def update_proposal(proposal_id):
     form.title.data = prop.title
     form.description.data = prop.description
     form.tags.data = [t.tag for t in prop.tags]
-    form.requirements.data = prop.requirements
+    form.equipment_required.data = prop.equipment_required
+    form.funding_required.data = prop.funding_required
+    form.additional_info.data = prop.additional_info
     form.length.data = prop.length
     form.notice_required.data = prop.notice_required
     form.needs_help.data = prop.needs_help
@@ -423,7 +425,7 @@ def update_proposal(proposal_id):
 
     elif prop.type == "installation":
         form.size.data = prop.size
-        form.funds.data = prop.funds
+        form.installation_funding.data = prop.installation_funding
 
     elif prop.type == "lightning":
         form.session.data = prop.session
@@ -882,7 +884,9 @@ def close_round():
         elif form.close_round.data:
             preview = True
             session["min_votes"] = form.min_votes.data
-            flash('Blue proposals will be marked as "reviewed"')
+            flash(
+                f'Proposals with more than {session["min_votes"]} (blue) will be marked as "reviewed"'
+            )
 
         elif form.cancel.data:
             form.min_votes.data = form.min_votes.default
