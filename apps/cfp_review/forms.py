@@ -125,8 +125,7 @@ class UpdateProposalForm(Form):
 
         if self.needs_laptop.raw_data:
             proposal.needs_laptop = self.needs_laptop.data
-        if self.may_record.raw_data:
-            proposal.may_record = self.may_record.data
+        proposal.may_record = self.may_record.data
 
         # All these if statements are because this will nuke the data if you
         # change the state when the fields are currently hidden, so changing
