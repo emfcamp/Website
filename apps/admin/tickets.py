@@ -6,7 +6,6 @@ from flask import (
     flash,
     url_for,
     current_app as app,
-    abort,
     send_file,
 )
 from flask_mailman import EmailMessage
