@@ -1,6 +1,7 @@
 """ CLI commands for scheduling """
 
 import click
+from dataclasses import dataclass
 from flask import current_app as app
 from sqlalchemy import func
 
@@ -13,60 +14,156 @@ from . import cfp
 from ..common.email import from_email
 
 
-# This should probably be moved to models/cfp.py and DEFAULT_VENUES merged in
-EMF_VENUES = {
-    "Stage A": (100, (52.03961, -2.37787), True, "talk"),
-    "Stage B": (99, (52.04190, -2.37664), True, "talk,performance"),
-    "Stage C": (98, (52.04050, -2.37765), True, "talk"),
-    "Workshop 1": (97, (52.04259, -2.37515), True, "workshop"),
-    "Workshop 2": (96, (52.04208, -2.37715), True, "workshop"),
-    "Workshop 3": (95, (52.04129, -2.37578), True, "workshop"),
-    "Workshop 4": (94, (52.04329, -2.37590), True, "workshop"),
-    "Workshop 5": (93, (52.040938, -2.37706), True, "workshop"),
-    "Youth Workshop": (92, (52.04117, -2.37771), True, "youthworkshop"),
-    "Main Bar": (91, (52.04180, -2.37727), False, "talk,performance"),
-    "Lounge": (
-        90,
-        (52.04147, -2.37644),
-        False,
-        "talk,performance,workshop,youthworkshop",
+@dataclass
+class VenueDefinition:
+    name: str
+    priority: int
+    latlon: tuple[float, float]
+    scheduled_content_only: bool
+    allowed_types: list[str]
+    default_for_types: list[str]
+    capacity: int | None
+
+    @property
+    def location(self) -> str:
+        if self.latlon:
+            return f"POINT({self.latlon[1]} {self.latlon[0]})"
+        else:
+            return None
+
+    def as_venue(self) -> Venue:
+        return Venue(
+            name=self.name,
+            priority=self.priority,
+            location=self.location,
+            scheduled_content_only=self.scheduled_content_only,
+            allowed_types=self.allowed_types,
+            default_for_types=self.default_for_types,
+            capacity=self.capacity,
+        )
+
+
+# This lives only here, on purpose, because this is just intended to seed the DB.
+_EMF_VENUES = [
+    VenueDefinition(
+        name="Stage A",
+        priority=100,
+        latlon=(52.03961, -2.37787),
+        scheduled_content_only=True,
+        allowed_types=["talk"],
+        default_for_types=["talk"],
+        capacity=1000,
     ),
-}
+    VenueDefinition(
+        name="Stage B",
+        priority=99,
+        latlon=(52.04190, -2.37664),
+        scheduled_content_only=True,
+        allowed_types=["talk", "performance"],
+        default_for_types=["talk", "performance", "lightning"],
+        capacity=600,
+    ),
+    VenueDefinition(
+        name="Stage C",
+        priority=98,
+        latlon=(52.04050, -2.37765),
+        scheduled_content_only=True,
+        allowed_types=["talk"],
+        default_for_types=["talk", "lightning"],
+        capacity=450,
+    ),
+    VenueDefinition(
+        name="Workshop 1",
+        priority=97,
+        latlon=(52.04259, -2.37515),
+        scheduled_content_only=True,
+        allowed_types=["workshop"],
+        default_for_types=["workshop"],
+        capacity=30,
+    ),
+    VenueDefinition(
+        name="Workshop 2",
+        priority=96,
+        latlon=(52.04208, -2.37715),
+        scheduled_content_only=True,
+        allowed_types=["workshop"],
+        default_for_types=["workshop"],
+        capacity=30,
+    ),
+    VenueDefinition(
+        name="Workshop 3",
+        priority=95,
+        latlon=(52.04129, -2.37578),
+        scheduled_content_only=True,
+        allowed_types=["workshop"],
+        default_for_types=["workshop"],
+        capacity=30,
+    ),
+    VenueDefinition(
+        name="Workshop 4",
+        priority=94,
+        latlon=(52.04329, -2.37590),
+        scheduled_content_only=True,
+        allowed_types=["workshop"],
+        default_for_types=["workshop"],
+        capacity=30,
+    ),
+    VenueDefinition(
+        name="Workshop 5",
+        priority=93,
+        latlon=(52.040938, -2.37706),
+        scheduled_content_only=True,
+        allowed_types=["workshop"],
+        default_for_types=["workshop"],
+        capacity=30,
+    ),
+    VenueDefinition(
+        name="Youth Workshop",
+        priority=92,
+        latlon=(52.04117, -2.37771),
+        scheduled_content_only=True,
+        allowed_types=["workshop"],
+        default_for_types=["workshop"],
+        capacity=30,
+    ),
+    VenueDefinition(
+        name="Main Bar",
+        priority=91,
+        latlon=(52.04180, -2.37727),
+        scheduled_content_only=False,
+        allowed_types=["talk", "performance"],
+        default_for_types=[],
+        capacity=None,
+    ),
+    VenueDefinition(
+        name="Lounge",
+        priority=90,
+        latlon=(52.04147, -2.37644),
+        scheduled_content_only=False,
+        allowed_types=["talk", "performance", "workshop", "youthworkshop"],
+        default_for_types=[],
+        capacity=None,
+    ),
+]
 
 
 @cfp.cli.command("create_venues")
 def create_venues():
     """Create venues defined in code"""
-    for name, (
-        priority,
-        latlon,
-        scheduled_content_only,
-        type_str,
-    ) in EMF_VENUES.items():
+    for venue_definition in _EMF_VENUES:
+        name = venue_definition.name
         venue = Venue.query.filter_by(name=name).all()
 
-        if latlon:
-            location = f"POINT({latlon[1]} {latlon[0]})"
-        else:
-            location = None
-
         if len(venue) == 1 and venue[0].location is None:
-            venue[0].location = location
+            venue[0].location = venue_definition.location
             app.logger.info(f"Updating venue {name} with new latlon")
             continue
         elif venue:
             app.logger.info(f"Venue {name} already exists")
             continue
 
-        venue = Venue(
-            name=name,
-            type=type_str,
-            priority=priority,
-            location=location,
-            scheduled_content_only=scheduled_content_only,
-        )
-        db.session.add(venue)
-        app.logger.info(f"Adding venue {name} with type {type_str}")
+        db.session.add(venue_definition.as_venue())
+        app.logger.info(f"Adding venue {name}")
 
     db.session.commit()
 
@@ -76,7 +173,7 @@ def create_village_venues():
     for village in Village.query.all():
         venue = Venue.query.filter_by(village_id=village.id).first()
         if venue:
-            if venue.name in EMF_VENUES:
+            if venue.name in _EMF_VENUES:
                 app.logger.info(f"Not updating EMF venue {venue.name}")
 
             elif venue.name != village.name:
