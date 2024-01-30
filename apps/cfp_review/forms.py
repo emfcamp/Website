@@ -69,7 +69,7 @@ class UpdateProposalForm(Form):
     family_friendly = BooleanField("Family Friendly")
 
     hide_from_schedule = BooleanField("Hide from schedule")
-    allowed_venues = StringField("Allowed Venues")
+    allowed_venues = SelectMultipleField("Allowed Venues", coerce=int)
     allowed_times = TextAreaField("Allowed Time Periods")
     scheduled_duration = StringField("Duration")
     scheduled_time = StringField("Scheduled Time")
@@ -197,14 +197,9 @@ class UpdateProposalForm(Form):
         else:
             proposal.potential_venue = None
 
-        # Only set this if we're overriding the default
-        if (
-            proposal.get_allowed_venues_serialised().strip()
-            != self.allowed_venues.data.strip()
-        ):
-            proposal.allowed_venues = self.allowed_venues.data.strip()
-            # Validates the new data. Bit nasty.
-            proposal.get_allowed_venues()
+        proposal.allowed_venues = Venue.query.filter(
+            Venue.id.in_(self.allowed_venues.data)
+        ).all()
 
 
 class ConvertProposalForm(Form):

@@ -24,7 +24,6 @@ from .majority_judgement import calculate_max_normalised_score
 from models.cfp import (
     CFPMessage,
     CFPVote,
-    DEFAULT_VENUES,
     EVENT_SPACING,
     FavouriteProposal,
     get_available_proposal_minutes,
@@ -321,6 +320,17 @@ def update_proposal(proposal_id):
         raise Exception("Unknown cfp type {}".format(prop.type))
 
     form.tags.choices = [(t.tag, t.tag) for t in Tag.query.order_by(Tag.tag).all()]
+    form.allowed_venues.choices = [
+        (v.id, v.name)
+        for v in Venue.query.filter(
+            db.or_(
+                Venue.allowed_types.any(prop.type),
+                Venue.id.in_(v.id for v in prop.get_allowed_venues()),
+            )
+        )
+        .order_by(Venue.priority.desc())
+        .all()
+    ]
 
     # Process the POST
     if form.validate_on_submit():
@@ -399,7 +409,7 @@ def update_proposal(proposal_id):
 
     form.user_scheduled.data = prop.user_scheduled
     form.hide_from_schedule.data = prop.hide_from_schedule
-    form.allowed_venues.data = prop.get_allowed_venues_serialised()
+    form.allowed_venues.data = [v.id for v in prop.get_allowed_venues()]
     form.allowed_times.data = prop.get_allowed_time_periods_serialised()
     form.scheduled_time.data = prop.scheduled_time
     form.scheduled_duration.data = prop.scheduled_duration
@@ -1004,8 +1014,11 @@ def rank():
 
     # Correct for changeover period not being needed at the end of the day
     num_days = len(get_days_map().items())
+
     for type, amount in allocated_minutes.items():
-        num_venues = len(DEFAULT_VENUES[type])
+        num_venues = Venue.query.filter(
+            Venue.default_for_types.any(type)
+        ).count()  # TODO(lukegb): filter to emf venues
         # Amount of minutes per venue * number of venues - (slot changeover period) from the end
         allocated_minutes[type] = amount - (
             (10 * EVENT_SPACING[type]) * num_days * num_venues
@@ -1123,11 +1136,13 @@ def scheduler():
 
         schedule_data.append(export)
 
+    venue_names_by_type = Venue.emf_venue_names_by_type()
+
     return render_template(
         "cfp_review/scheduler.html",
         shown_venues=shown_venues,
         schedule_data=schedule_data,
-        default_venues=DEFAULT_VENUES,
+        default_venues=venue_names_by_type,
     )
 
 
