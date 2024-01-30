@@ -171,8 +171,6 @@ def list_free_tickets():
 @admin.route("/ticket/<int:ticket_id>/cancel-free", methods=["GET", "POST"])
 def cancel_free_ticket(ticket_id):
     ticket = Purchase.query.get_or_404(ticket_id)
-    if ticket.payment is not None:
-        abort(404)
 
     form = CancelTicketForm()
     if form.validate_on_submit():
