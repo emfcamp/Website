@@ -6,7 +6,7 @@ Your EMF {{ proposal.human_type }} '{{ proposal.title }}' has been scheduled!
 
 You have a {{ proposal.scheduled_duration }} minute slot in {{ proposal.scheduled_venue.name }} on {{ proposal.scheduled_time.strftime('%A at %-I:%M %p') }}. If this is not suitable, please let us know as soon as possible.
 
-If you'd like to share this with people, the public link to your {{ proposal.human_type }} is: https://www.emfcamp.org/schedule/2022/{{ proposal.id }}
+If you'd like to share this with people, the public link to your {{ proposal.human_type }} is: https://www.emfcamp.org/schedule/{{ event_year }}/{{ proposal.id }}
 
 Things to note:
 
@@ -21,7 +21,7 @@ Things to note:
 * You can also update your {{ proposal.human_type }} title and description at any time using the link above, so make sure it sounds great!
 
 {% if proposal.type == 'talk' %}
-* While you are allowed on-stage Q&A within your slot, we would prefer it if you asked the audience to meet you somewhere afterwards to discuss it.
+* We would strongly prefer that you do not take on-stage Q&A after your talk unless it is, for instance, a panel that requires audience participation - these are hard for us to manage, and frequently unproductive. Please consider taking questions outside the tent, or in the bar instead.
 {% endif %}
 
 * All this information and more is available on our speakers website page: https://wiki.emfcamp.org/wiki/Speaking

@@ -61,7 +61,9 @@
                 <div id="requirementsPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="requirementsPanelHeading">
                     <div class="panel-body">
                         <dl class="dl-horizontal">
-                            {{ render_dl_field(form.requirements, rows=3) }}
+                            {{ render_dl_field(form.equipment_required, rows=3) }}
+                            {{ render_dl_field(form.funding_required, rows=3) }}
+                            {{ render_dl_field(form.additional_info, rows=3) }}
                             {{ render_dl_field(form.length) }}
                             {{ render_dl_field(form.notice_required) }}
                             {{ render_dl_field(form.needs_help) }}
@@ -78,7 +80,7 @@
                                 {% endif %}
                             {% elif proposal.type == 'installation' %}
                                 {{ render_dl_field(form.size) }}
-                                {{ render_dl_field(form.funds) }}
+                                {{ render_dl_field(form.installation_funding) }}
                             {% endif %}
                             {{ render_dl_field(form.will_have_ticket) }}
                         </dl>

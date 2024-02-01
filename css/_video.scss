@@ -6,12 +6,40 @@
   height: 0;
   margin-bottom: 15px;
   padding-bottom: (math.div(100%, 16) * 9);
+
+  iframe,
+  .content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
 }
 
-.video-container iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+.youtube-wait-for-click {
+  &:not(.youtube-wait-for-click-has-js) {
+    display: none;
+  }
+}
+
+.youtube-wait-for-click-content {
+  background-color: #1e1e1e;
+  color: #c8c8c8;
+  text-align: center;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  a {
+    color: #c8c8c8;
+  }
+
+  .youtube-wait-for-click-button {
+    background-color: #1e1e1e;
+    color: #c8c8c8;
+    border: 2px solid #c8c8c8;
+    margin: 0 auto;
+  }
 }
