@@ -18,15 +18,14 @@ Some villages bring pre-made games and activities for other people to take part 
 
 Some of our favourite village activities from previous years include:
 
-* [Ring Making Workshop](https://wiki-archive.emfcamp.org/2018/w/index.php/Village:Goldsmithing)
-* [OscureCon](https://wiki-archive.emfcamp.org/2018/w/index.php/Village:ObscureCon)
-* [The Hardware Hacking Area](https://wiki-archive.emfcamp.org/2018/w/index.php/Village:Hardware_Hacking_Area)
-* [Launching high alititude balloons](https://wiki-archive.emfcamp.org/2018/w/index.php/Village:HABville)
+* [Barbot](https://www.emfcamp.org/schedule/2022/411-barbot): a cocktail-making robot build by Nottingham Hackspace
+* Karaoke nights hosted in the Scottish Consulate tent
+* [The Maths Village](https://wiki-archive.emfcamp.org/2022/wiki/Village:The_Maths_Village) with a drop-in tent full of mathematical puzzles and activities
+* Demoscene competitions at [Field-FX](https://wiki-archive.emfcamp.org/2022/wiki/Village:Field-FX)
+* Drop-in board game sessions
 
 ## Workshop villages
-This year, we’re moving away from workshops hosted in centralised tents and asking individual villages to run and host workshops in their village. If your village is designated a workshop village, you will be provided with a workshop tent (and some furniture/equipment as needed), in which you will be able to run your own workshops and host workshops submitted by others as part of the CFP (subject to your agreement). We will contact the teams running workshop villages to find what kinds of external workshops would fit in with the kinds of activities you would like in your villages, and try to pair you up with appropriate workshops.
-
-If you are a workshop village, we will require a minimum amount of activity to take place in your workshop tent - at least two hours per day (on Friday, Saturday and Sunday) of workshops organised and run internally by members of your village, and the capacity to host at least another two hours of other workshops each day - for which you’ll need to make sure the space is ready and tidy, and if you like you can provide a short introductory chat about your village for anyone attending the workshops. It may be that some villages host much more than the minimum, and workshops may range in length from half an hour to several hours, at any time of day. The definition of ‘a workshop’ admits some flexibility, and could include things like:
+A selection of villages will be workshop villages, and will run and host workshops that any attendee can propose via the CfP alongside content organised by members of the village. Of cource, if you are not a workshop village, you are still very welcome to run stuff in your village. Content run by villages at past EMFs has included:
 
 * Technical presentations or lectures
 * Skill shares
@@ -35,19 +34,25 @@ If you are a workshop village, we will require a minimum amount of activity to t
 * Roundtables
 * Informal 'jam' sessions (not necessarily musical!)
 
-Of course, if your village is not officially a workshop village, that won't stop you from running events like this - you can do things outside, set up your own space, or even run things in other workshop tents outside your village. If you have any questions about being a workshop village and what it entails, you can [email the Village People](mailto:villages@emfcamp.org).
+If you have any questions about workshop villages or hosting content, you can [email the Village People](mailto:villages@emfcamp.org).
 
 ## The Village People
-The Village People are available to support making things happen in your village. If you have a cool idea, but need help with planning or logistics of doing things on site, please contact us before hand. The earlier you let us know your plans, the better we can help you.
-
-There is also limited funding available for villages that want to put on content. Please [email the Village People](mailto:villages@emfcamp.org) and we will be very happy to discuss anything you might come up with!
+The Village People are available to support making things happen in your village. If you have a cool idea, but need help with planning or logistics of doing things on site, please contact us beforehand. The earlier you let us know your plans, the better we can help you. You can contacy us by [emailing villages@emfcamp.org](mailto:villages@emfcamp.org) and we will be very happy to discuss anything you might come up with!
 
 ## Register a Village
-By [registering your village](/villages) you'll be making the Village People aware of the fact you plan to arrive, and how much space you're likely to need. That means you'll be assigned some space, your village will appear on the map, and you'll be able to publish any events your running on the main schedule.
-
-Before arriving please take a look at the [Good Village Guide](https://wiki.emfcamp.org/wiki/Good_Village_Guide), which includes advice on how to make your village its best.
+By [registering your village](/villages), you'll be making the Village People aware of the fact you plan to arrive, and how much space you're likely to need, and you'll allow us to get in touch to discuss how we can support your plans and activities at the event.
 
 ## Village Furniture
-To make things easier for villages, we offer the opportunity to book a marquee and furniture through us, which will be set up and ready for when you arrive on site.
+To make things easier for villages, we will offer the opportunity to book a marquee and furniture through us, which will be set up and ready for when you arrive on site. Details of how to book these will
+be announced nearer to the event.
 
-If you wish to book one of these, please use the [web shop](/tickets/hire).
+EMF are happy for you to bring your own tents and furniture for being social in and cooking in. We ask that you remove all tents and furniture that you’ve brought at the end of the event - it’s not fair on our volunteers to have to tidy them up, and it’s also bad for the environment.
+
+## Planning Your Village
+When planning your village and setting up your tents once you arrive, you will probably want to set up a space to act as your 'village square' where you can get together, show off your toys, and run any workshops or other events you're planning. With the unreliability of British weather, we recommend that this area is covered - it can get really sunny and really wet at our site. We’d rather neither you were sunburned nor your laptop flooded. The village team would really appreciate it if you planned this ahead of the event and could tell us the area of your planned square, so we can lay out the site and get you the best location possible!
+
+While EMF provides a great set of food vendors, it may be easier or cheaper for you to get together and cook. Some villages cook for upwards of 100 people each meal, but there’s no reason it can’t just be 5 people. Think about the things you’ll need - a stove, pots & pans, plates/bowls, cutlery and food. We’d really appreciate it if you brought reusable plates and cutlery, and low-packaging food. This helps reduce our waste footprint and helps the environment.
+
+A good neighbour works with those around them so everyone has the best possible event. This includes understanding the area you are camping in and compromising with those nearby! We have both quiet and noisy camping areas. If you intend to have friends over working, partying and enjoying each other’s company until the wee hours, we’d ask that you place yourself in the noisy area.
+
+It’s great if you can share with your neighbours too - maybe you want to group 3-4 villages together into a common theme, and share resources. This could be cooking, hardware or other items. You can get in touch with your neighbours ahead of the event and see if they want to do anything with you - it could be a shared event, or helping with their cooking in exchange for food! 
