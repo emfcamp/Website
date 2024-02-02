@@ -7,12 +7,13 @@ from prometheus_client import (
 )
 from prometheus_client.core import GaugeMetricFamily, Histogram, Counter
 from prometheus_client.multiprocess import MultiProcessCollector
-from sqlalchemy import cast, String
+from sqlalchemy import cast, String, case
+from datetime import datetime
 
 from models import count_groups
 from models.email import EmailJobRecipient
 from models.payment import Payment
-from models.product import Product
+from models.product import Product, ProductView, Voucher, VOUCHER_GRACE_PERIOD
 from models.purchase import Purchase, AdmissionTicket
 from models.cfp import Proposal
 
@@ -54,6 +55,9 @@ class ExternalMetrics:
         emf_email_jobs = GaugeMetricFamily(
             "emf_emails", "Email recipients", labels=["sent"]
         )
+        emf_vouchers = GaugeMetricFamily(
+            "emf_vouchers", "Vouchers", labels=["product_view", "state"]
+        )
 
         gauge_groups(
             emf_purchases,
@@ -76,12 +80,28 @@ class ExternalMetrics:
             cast(EmailJobRecipient.sent, String),
         )
 
+        gauge_groups(
+            emf_vouchers,
+            Voucher.query.join(ProductView),
+            ProductView.name,
+            case(
+                (Voucher.is_used == True, "used"),  # noqa: E712
+                (
+                    (Voucher.expiry != None)  # noqa: E711
+                    & (Voucher.expiry < datetime.utcnow() - VOUCHER_GRACE_PERIOD),
+                    "expired",
+                ),  # noqa: E712
+                else_="active",
+            ),
+        )
+
         return [
             emf_purchases,
             emf_payments,
             emf_attendees,
             emf_proposals,
             emf_email_jobs,
+            emf_vouchers,
         ]
 
 
