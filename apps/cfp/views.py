@@ -192,7 +192,9 @@ def form(cfp_type="talk"):
     if not form:
         abort(404)
 
-    ignore_closed = "closed" in request.args
+    ignore_closed = "closed" in request.args or (
+        current_user.is_authenticated and current_user.is_invited_speaker
+    )
 
     if feature_enabled("CFP_CLOSED") and not ignore_closed:
         return render_template("cfp/closed.html", cfp_type=cfp_type)
@@ -309,6 +311,10 @@ def form(cfp_type="talk"):
 
         proposal.user_id = current_user.id
 
+        if current_user.is_invited_speaker:
+            proposal.state = "manual-review"
+            proposal.private_notes = current_user.cfp_invite_reason
+
         proposal.title = form.title.data
         proposal.equipment_required = form.equipment_required.data
         proposal.additional_info = form.additional_info.data
@@ -417,7 +423,7 @@ def edit_proposal(proposal_id):
     del form.email
 
     if form.validate_on_submit():
-        if proposal.state not in ["new", "edit"]:
+        if not proposal.is_editable:
             flash("This submission can no longer be edited.")
             return redirect(url_for(".proposals"))
 
@@ -462,7 +468,7 @@ def edit_proposal(proposal_id):
 
         return redirect(url_for(".edit_proposal", proposal_id=proposal_id))
 
-    if request.method != "POST" and proposal.state in ["new", "edit"]:
+    if request.method != "POST" and proposal.is_editable:
         if proposal.type in ("talk", "performance"):
             form.length.data = proposal.length
 
