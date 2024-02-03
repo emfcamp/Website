@@ -1,0 +1,18 @@
+{% from "_formhelpers.html" import render_dl_field %}
+{% extends "cfp_review/base.html" %}
+{% block body %}
+
+<p>
+    Add a new user who will be marked as invited to the cfp; all their proposals will go straight to the 'manual-review' state (i.e. bypass the main CfP review process)
+</p>
+
+<form method="POST" class="form-horizontal">
+    {{ form.hidden_tag() }}
+    {{ render_dl_field(form.name) }}
+    {{ render_dl_field(form.email) }}
+    {{ render_dl_field(form.proposal_type) }}
+    {{ render_dl_field(form.invite_reason, placeholder="Who is the contact with this person, is there a freescout link?") }}
+    {{ form.add(class_="btn btn-success debounce") }}
+</form>
+
+{% endblock %}

@@ -13,9 +13,10 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, Optional, NumberRange, ValidationError
 
-from models.cfp import Venue, ORDERED_STATES
+from models.cfp import HUMAN_CFP_TYPES, Venue, ORDERED_STATES
 from models.cfp_tag import Tag
 from ..common.forms import Form, HiddenIntegerField, EmailField
+from ..admin.users import NewUserForm
 
 from dateutil.parser import parse as parse_date
 
@@ -405,3 +406,11 @@ class ReversionForm(Form):
     proposal_id = HiddenIntegerField("Proposal ID")
     txn_id = HiddenIntegerField("Transaction ID")
     revert = SubmitField("Revert to this version")
+
+
+class InviteSpeakerForm(NewUserForm):
+    invite_reason = StringField("Why are they being invited?", [DataRequired()])
+    proposal_type = SelectField(
+        "Proposal Type",
+        choices=[tuple(i) for i in HUMAN_CFP_TYPES.items() if i[0] != "lightning"],
+    )

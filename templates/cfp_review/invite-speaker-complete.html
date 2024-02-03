@@ -1,0 +1,16 @@
+{% extends "cfp_review/base.html" %}
+{% block body %}
+
+
+<p>Created new user</p>
+<dl>
+    <dt>name</dt><dd>{{ user.name }}</dd>
+    <dt>email</dt><dd>{{ user.email }}</dd>
+    <dt>reason</dt><dd>{{ user.cfp_invite_reason }}</dd>
+</dl>
+
+<p>Please reply to them with this link which will ask them to log in with the above email address then direct them to submit a {{ proposal_type }}.</p>
+<b><p>{{ external_url('users.login', next=url_for("cfp.form", cfp_type=proposal_type)) }}</p></b>
+<p>&nbsp;</p>
+<a href="{{ url_for('.invite_speaker') }}" class="btn btn-success">Add another</a>
+{% endblock %}
