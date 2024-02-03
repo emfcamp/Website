@@ -1,7 +1,7 @@
 title: Childcare
 ---
 # Childcare
-We'll be providing free childcare for 0-16 year olds, provided by the award-winning [Nipperbout](https://www.nipperbout.com). There's no need to register in advance. At busy times there might be a limit on how long your children can stay for to allow as many people as possible to drop off their children too.
+We'll be providing free childcare for 0-10 year olds, provided by the award-winning [Nipperbout](https://www.nipperbout.com). There's no need to register in advance. At busy times there might be a limit on how long your children can stay for to allow as many people as possible to drop off their children too.
 
 ## Operating Hours
 **Thursday:** 2pm to 8pm
