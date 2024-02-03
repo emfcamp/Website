@@ -226,13 +226,17 @@ def stripe_update_payment(
     If a PaymentIntent object is not passed in, this will fetch the payment details from
     the Stripe API.
     """
+    intent_is_fresh = False
     if intent is None:
         intent = stripe_client.payment_intents.retrieve(
             payment.intent_id, params=dict(expand=["latest_charge"])
         )
+        intent_is_fresh = True
+
     if intent.latest_charge is None:
         # Intent does not have a charge (yet?), do nothing
         return
+
     if isinstance(intent.latest_charge, stripe.Charge):
         # The payment intent object has been expanded already
         charge = intent.latest_charge
@@ -240,9 +244,25 @@ def stripe_update_payment(
         charge = stripe_client.charges.retrieve(intent.latest_charge)
 
     if payment.charge_id is not None and payment.charge_id != charge.id:
-        logger.warn(
-            f"Charge ID for intent {intent.id} has changed from {payment.charge_id} to {charge.id}"
-        )
+        # The payment's failed and been retried, and this might be a
+        # delayed webhook notification for the old charge ID. So we
+        # need to check whether it's the latest.
+        if intent_is_fresh:
+            fresh_intent = intent
+        else:
+            fresh_intent = stripe_client.payment_intents.retrieve(
+                payment.intent_id, params=dict(expand=["latest_charge"])
+            )
+
+        if fresh_intent.latest_charge == charge.id:
+            logger.warn(
+                f"Charge ID for intent {intent.id} has changed from {payment.charge_id} to {charge.id}"
+            )
+        else:
+            logger.warn(
+                f"Charge ID {charge.id} for intent {intent.id} is out of date, ignoring"
+            )
+            return
 
     payment.charge_id = charge.id
 
