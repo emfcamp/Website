@@ -1,0 +1,18 @@
+{% extends "emails/base.txt" %}
+{% block body %}
+Hi {{ user.name }},
+
+This is to let you know that you now have an account on our website for Electromagnetic Field {{ event_year }}!
+
+You can log into this account by visiting:
+
+  {{ external_url('users.login', code=code, next=url_for('cfp.edit_proposal', proposal_id=proposal.id)) }}
+
+Once you've logged in please fill in the details for your {{proposal.human_type}}.
+
+If you think you've been added in error or you have any problems, please let us know by replying to this email.
+
+Love,
+
+All the EMF team
+{% endblock %}

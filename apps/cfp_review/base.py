@@ -37,11 +37,13 @@ from models.cfp import (
     Proposal,
     ROUGH_LENGTHS,
     Venue,
+    PYTHON_CFP_TYPES,
 )
 from models.cfp_tag import Tag
 from models.user import User
 from models.purchase import Ticket
 from .forms import (
+    CFPInviteForm,
     UpdateTalkForm,
     UpdatePerformanceForm,
     UpdateWorkshopForm,
@@ -1230,6 +1232,49 @@ def proposals_summary():
         counts_by_type=counts_by_type,
         counts_by_state=counts_by_state,
     )
+
+
+@cfp_review.route("/invite-speaker", methods=["GET", "POST"])
+@admin_required
+def invite_speaker():
+    form = CFPInviteForm()
+
+    if form.validate_on_submit():
+        if form.add.data:
+            email, name = form.email.data, form.name.data
+            user = User(email, name)
+            db.session.add(user)
+
+            proposal = PYTHON_CFP_TYPES[form.proposal_type.data](
+                title=form.title.data,
+                description=form.description.data,
+                user=user,
+                state="manual-review",
+            )
+
+            db.session.add(proposal)
+            db.session.commit()
+
+            code = user.login_code(app.config["SECRET_KEY"])
+            msg = EmailMessage(
+                f"You've been invited to submit a {proposal.human_type} to EMF",
+                from_email=from_email("CONTENT_EMAIL"),
+                to=[email],
+            )
+            msg.body = render_template(
+                "emails/invited-speaker.txt", user=user, code=code, proposal=proposal
+            )
+            msg.send()
+
+            app.logger.info(f"Created new user, {user} & proposal {proposal}")
+
+            flash(
+                f"Created new user, {user.name}, they have been emailed an invite link. "
+            )
+
+            return redirect(url_for(".invite_speaker"))
+
+    return render_template("cfp_review/invite-speaker.html", form=form)
 
 
 from . import venues  # noqa

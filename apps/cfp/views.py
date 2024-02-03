@@ -417,7 +417,7 @@ def edit_proposal(proposal_id):
     del form.email
 
     if form.validate_on_submit():
-        if proposal.state not in ["new", "edit"]:
+        if proposal.state not in ["new", "edit", "manual-review"]:
             flash("This submission can no longer be edited.")
             return redirect(url_for(".proposals"))
 
@@ -462,7 +462,7 @@ def edit_proposal(proposal_id):
 
         return redirect(url_for(".edit_proposal", proposal_id=proposal_id))
 
-    if request.method != "POST" and proposal.state in ["new", "edit"]:
+    if request.method != "POST" and proposal.state in ["new", "edit", "manual-review"]:
         if proposal.type in ("talk", "performance"):
             form.length.data = proposal.length
 

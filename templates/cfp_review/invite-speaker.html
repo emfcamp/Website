@@ -1,0 +1,13 @@
+{% from "_formhelpers.html" import render_dl_field %}
+{% extends "cfp_review/base.html" %}
+{% block body %}
+  <form method="POST" class="form">
+    {{ form.hidden_tag() }}
+    {{ render_dl_field(form.name) }}
+    {{ render_dl_field(form.email) }}
+    {{ render_dl_field(form.proposal_type) }}
+    {{ render_dl_field(form.title) }}
+    {{ render_dl_field(form.description) }}
+    {{ form.add(class_="btn btn-primary debounce") }}
+  </form>
+{% endblock %}
