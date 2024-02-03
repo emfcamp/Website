@@ -193,6 +193,8 @@ class User(BaseModel, UserMixin):
     # Whether the user has opted in to receive promo emails after this event:
     promo_opt_in = db.Column(db.Boolean, nullable=False, default=False)
 
+    cfp_invite_reason = db.Column(db.String, nullable=True)
+
     diversity = db.relationship(
         "UserDiversity", uselist=False, backref="user", cascade="all, delete-orphan"
     )
