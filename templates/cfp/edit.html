@@ -18,7 +18,7 @@
 
 <h2>Proposal Detail</h2>
 
-{% if proposal.state in ['new', 'edit'] %}
+{% if proposal.is_editable %}
   <div>You can currently edit your proposal as it has not been sent for review.
      For more information on the selection process, please see our
      <a href="{{ url_for('.guidance') }}" target="_blank">guidance</a>.

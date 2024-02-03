@@ -735,6 +735,12 @@ class Proposal(BaseModel):
         ]
 
     @property
+    def is_editable(self):
+        if self.state in ["new", "edit", "manual-review"]:
+            return True
+        return False
+
+    @property
     def start_date(self):
         return self.scheduled_time
 
