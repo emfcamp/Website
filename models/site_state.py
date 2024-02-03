@@ -34,18 +34,6 @@ VALID_STATES = {
 }
 
 
-def calc_site_state(date):
-    """Logic to set the state of the homepage based on date."""
-    if date < config_date("SALES_START"):
-        return "before-sales"
-    elif date < config_date("EVENT_START"):
-        return "sales"
-    elif date < config_date("EVENT_END"):
-        return "event"
-    else:
-        return "after-event"
-
-
 def calc_sales_state(date):
     site_capacity = ProductGroup.get_by_name("admissions")
     if site_capacity is None:
@@ -88,7 +76,7 @@ def get_states() -> dict[str, str]:
     date = datetime.utcnow()
 
     if states.get("site_state") is None:
-        states["site_state"] = calc_site_state(date)
+        states["site_state"] = "before-sales"
 
     if states.get("sales_state") is None:
         states["sales_state"] = calc_sales_state(date)
