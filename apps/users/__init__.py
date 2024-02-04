@@ -1,5 +1,4 @@
 import time
-from urllib.parse import urlparse, urljoin
 
 from flask import (
     render_template,
@@ -25,7 +24,7 @@ from models.user import User, verify_signup_code
 from models.cfp import Proposal, CFPMessage
 from models.basket import Basket
 
-from ..common import set_user_currency, feature_flag
+from ..common import set_user_currency, feature_flag, get_next_url
 from ..common.email import from_email
 from ..common.forms import Form, EmailField
 
@@ -55,23 +54,6 @@ def users_variables():
         "unread_count": unread_count,
         "view_name": request.url_rule.endpoint.replace("users.", "."),
     }
-
-
-def is_safe_url(target):
-    ref_url = urlparse(request.host_url)
-    test_url = urlparse(urljoin(request.host_url, target))
-    return test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc
-
-
-def get_next_url(default=None):
-    next_url = request.args.get("next")
-    if next_url:
-        if is_safe_url(next_url):
-            return next_url
-        app.logger.error(f"Dropping unsafe next URL {repr(next_url)}")
-    if default is None:
-        default = url_for(".account")
-    return default
 
 
 class LoginForm(Form):
@@ -240,7 +222,6 @@ def set_currency():
 
 @users.route("/sso/<site>")
 def sso(site=None):
-
     volunteer_sites = [app.config["VOLUNTEER_SITE"]]
     if "VOLUNTEER_CAMP_SITE" in app.config:
         volunteer_sites.append(app.config["VOLUNTEER_CAMP_SITE"])

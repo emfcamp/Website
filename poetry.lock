@@ -3730,6 +3730,17 @@ doc = ["sphinx", "sphinx_rtd_theme"]
 test = ["flake8", "isort", "pytest"]
 
 [[package]]
+name = "toposort"
+version = "1.10"
+description = "Implements a topological sort algorithm."
+optional = false
+python-versions = "*"
+files = [
+    {file = "toposort-1.10-py3-none-any.whl", hash = "sha256:cbdbc0d0bee4d2695ab2ceec97fe0679e9c10eab4b2a87a9372b929e70563a87"},
+    {file = "toposort-1.10.tar.gz", hash = "sha256:bfbb479c53d0a696ea7402601f4e693c97b0367837c8898bc6471adfca37a6bd"},
+]
+
+[[package]]
 name = "tqdm"
 version = "4.66.1"
 description = "Fast, Extensible Progress Meter"
@@ -3842,6 +3853,17 @@ python-versions = "*"
 files = [
     {file = "types-simplejson-3.19.0.2.tar.gz", hash = "sha256:ebc81f886f89d99d6b80c726518aa2228bc77c26438f18fd81455e4f79f8ee1b"},
     {file = "types_simplejson-3.19.0.2-py3-none-any.whl", hash = "sha256:8ba093dc7884f59b3e62aed217144085e675a269debc32678fd80e0b43b2b86f"},
+]
+
+[[package]]
+name = "types-toposort"
+version = "1.10.0.1"
+description = "Typing stubs for toposort"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-toposort-1.10.0.1.tar.gz", hash = "sha256:7e4650ac5a0e5854bf4cd44b9c79ed5914731472ce5e1ac2074fafd8c691073b"},
+    {file = "types_toposort-1.10.0.1-py3-none-any.whl", hash = "sha256:0c9ab5789db82c03e6ffb1e6f627d4f83ab4d28f4dee69b1b70eaf65f646021b"},
 ]
 
 [[package]]
@@ -4316,4 +4338,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11"
-content-hash = "f78a2d4b8556b815794afc47a6a4736a8c715b1c4621ea33c6f1d1bc15d940f0"
+content-hash = "e1995c5d822df48e9569abb0975f6b920bba8ab92f2b842fd1d7a787046b920e"

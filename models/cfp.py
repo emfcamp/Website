@@ -6,6 +6,7 @@ import re
 from itertools import groupby
 from geoalchemy2 import Geometry
 from geoalchemy2.shape import to_shape
+from toposort import toposort, CircularDependencyError
 
 from sqlalchemy import UniqueConstraint, func, select
 from sqlalchemy.orm import column_property
@@ -348,6 +349,23 @@ FavouriteProposal = db.Table(
     ),
 )
 
+ProposalOrdering = db.Table(
+    "proposal_ordering",
+    BaseModel.metadata,
+    db.Column(
+        "happens_first_proposal_id",
+        db.Integer,
+        db.ForeignKey("proposal.id"),
+        primary_key=True,
+    ),
+    db.Column(
+        "happens_later_proposal_id",
+        db.Integer,
+        db.ForeignKey("proposal.id"),
+        primary_key=True,
+    ),
+)
+
 
 class Proposal(BaseModel):
     __versioned__ = {"exclude": ["favourites", "favourite_count"]}
@@ -393,6 +411,22 @@ class Proposal(BaseModel):
     votes = db.relationship("CFPVote", backref="proposal")
     favourites = db.relationship(
         User, secondary=FavouriteProposal, backref=db.backref("favourites")
+    )
+    happens_after = db.relationship(
+        "Proposal",
+        secondary=ProposalOrdering,
+        back_populates="happens_before",
+        primaryjoin=lambda: ProposalOrdering.c.happens_later_proposal_id == Proposal.id,
+        secondaryjoin=lambda: Proposal.id
+        == ProposalOrdering.c.happens_first_proposal_id,
+    )
+    happens_before = db.relationship(
+        "Proposal",
+        secondary=ProposalOrdering,
+        back_populates="happens_after",
+        primaryjoin=lambda: ProposalOrdering.c.happens_first_proposal_id == Proposal.id,
+        secondaryjoin=lambda: Proposal.id
+        == ProposalOrdering.c.happens_later_proposal_id,
     )
 
     # Convenience for individual objects. Use an outerjoin and groupby for more than a few records
@@ -751,6 +785,30 @@ class Proposal(BaseModel):
             ).all()
             if p.overlaps_with(self)
         ]
+
+    def find_happens_before_causality_violations(self) -> str | None:
+        """Ensure that there are no loops in happens-before relationships.
+
+        This is done by attempting to perform a toposort on the relationships.
+
+        This actually validates the entire relationship set, rather than just the
+        relationships that involve the current proposal.
+
+        Returns a string that attempts to explain the violation if one is found.
+        """
+        # Construct a mapping of Proposal ID -> things that happen before it
+        relationships: dict[int, set[int]] = defaultdict(set)
+        for happens_first, happens_later in db.session.query(ProposalOrdering).all():
+            relationships[happens_later].add(happens_first)
+            if happens_first == happens_later:
+                return str(f"Proposal {happens_first} depends upon itself")
+
+        try:
+            list(toposort(relationships))
+        except CircularDependencyError as e:
+            return str(e)
+
+        return None
 
     @property
     def start_date(self):

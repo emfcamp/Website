@@ -56,6 +56,8 @@ pywisetransfer = "^0.3.1"
 freezegun = "^1.1.0"
 logging_tree = "^1.9"
 flask-mailman = "^0.3.0"
+toposort = "^1.10"
+types-toposort = "^1.10.0.1"
 
 
 [tool.poetry.group.dev.dependencies]

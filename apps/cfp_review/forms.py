@@ -410,3 +410,15 @@ class ReversionForm(Form):
     proposal_id = HiddenIntegerField("Proposal ID")
     txn_id = HiddenIntegerField("Transaction ID")
     revert = SubmitField("Revert to this version")
+
+
+class RemoveOrderingForm(Form):
+    happens_first_id = HiddenIntegerField("Happens First")
+    happens_later_id = HiddenIntegerField("Happens Later")
+    next = StringField("Return to URL")
+
+
+class AddOrderingForm(Form):
+    happens_first_id = HiddenIntegerField("Happens First")
+    happens_later_id = HiddenIntegerField("Happens Later")
+    submit = SubmitField("Select")
