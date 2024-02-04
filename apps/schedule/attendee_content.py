@@ -119,7 +119,7 @@ def attendee_content():
         or_(
             Proposal.user_scheduled is True, Proposal.scheduled_venue_id.in_(venue_ids)
         ),
-        Proposal.state.in_(["accepted", "finished"]),
+        Proposal.is_accepted,
     ).all()
 
     form = ContentForm()

@@ -76,7 +76,7 @@ def email_check():
     """Email speakers about their slot"""
     proposals = (
         Proposal.query.filter(Proposal.scheduled_duration.isnot(None))
-        .filter(Proposal.state.in_(["accepted", "finished"]))
+        .filter(Proposal.is_accepted)
         .filter(Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]))
         .all()
     )
