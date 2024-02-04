@@ -44,7 +44,6 @@
     <tr><th>ID</th><td>{{user.id}}</td></tr>
     <tr><th>Name</th><td>{{user.name}}</td></tr>
     <tr><th>Email</th><td>{{user.email}}</td></tr>
-    <tr><th>CfP invite notes</th><td>{{ user.cfp_invite_reason | default("--")}}</td></tr>
 </table>
 
 
@@ -79,6 +78,12 @@
 <hr>
 {{ render_field(form.note) }}
 {{ form.add_note(class_="btn btn-success pull-right") }}
+</form>
+
+<div class="row">&nbsp;</div>
+<hr>
+{{ render_field(form.cfp_invite_reason) }}
+{{ form.save_cfp_invite_reason(class_="btn btn-success pull-right") }}
 </form>
 <div class="row">&nbsp;</div>
 
