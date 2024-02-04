@@ -42,7 +42,7 @@
     <div class="col-md-6">
       <legend>About your {{proposal.human_type}}</legend>
       <dl class="dl-vertical">
-        {% if feature_enabled('CFP_FINALISE') and proposal.state in ['finished']  %}
+        {% if feature_enabled('CFP_FINALISE') and proposal.state == 'finalised'  %}
         <dt>Names</dt><dd>{{proposal.published_names}}</dd>
         <dt>Pronouns</dt><dd>{{proposal.published_pronouns}}</dd>
         <dt>Title</dt><dd>{{proposal.published_title}}</dd>

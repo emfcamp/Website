@@ -40,7 +40,7 @@
           Awaiting the next round
         {% elif proposal.state == 'accepted' %}
           Accepted, check your <a href="{{ url_for('.proposal_messages', proposal_id=proposal.id) }}">messages</a>
-        {% elif proposal.state == 'finished' %}
+        {% elif proposal.state == 'finalised' %}
           Accepted and ready
         {% elif proposal.state == 'withdrawn' %}
           You withdrew this proposal.

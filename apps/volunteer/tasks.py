@@ -47,7 +47,7 @@ def run(self):
 
                 events = (
                     Proposal.query.join(Venue, Proposal.scheduled_venue_id == Venue.id)
-                    .filter(Venue.name == venue.name, Proposal.is_accepted)
+                    .filter(Venue.name == venue.name, Proposal.state == "finalised")
                     .all()
                 )
                 for e in events:

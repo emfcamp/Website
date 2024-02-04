@@ -52,8 +52,8 @@ CFP_STATES = {
     "anon-blocked": ["accepted", "rejected", "withdrawn", "reviewed", "edit"],
     "reviewed": ["accepted", "rejected", "withdrawn", "edit", "anonymised"],
     "manual-review": ["accepted", "rejected", "withdrawn", "edit"],
-    "accepted": ["accepted", "rejected", "withdrawn", "finished"],
-    "finished": ["rejected", "withdrawn", "finished"],
+    "accepted": ["accepted", "rejected", "withdrawn", "finalised"],
+    "finalised": ["rejected", "withdrawn", "finalised"],
     "withdrawn": ["accepted", "rejected", "withdrawn", "edit"],
 }
 
@@ -69,7 +69,7 @@ ORDERED_STATES = [
     "manual-review",
     "reviewed",
     "accepted",
-    "finished",
+    "finalised",
     "withdrawn",
 ]
 
@@ -363,7 +363,7 @@ class Proposal(BaseModel):
     state = db.Column(db.String, nullable=False, default="new")
     type = db.Column(db.String, nullable=False)  # talk, workshop or installation
 
-    is_accepted = column_property(state.in_(["accepted", "finished"]))
+    is_accepted = column_property(state.in_(["accepted", "finalised"]))
 
     # Core information
     title = db.Column(db.String, nullable=False)
