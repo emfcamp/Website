@@ -47,11 +47,19 @@
 </table>
 
 
-<h3>Permissions</h3>
-<p>Note that the admin permission implies all other permissions.</p>
 <form method="post">
 {{ form.hidden_tag() }}
 {{ form.keys }}
+
+<h3>Update Details</h3>
+{{ render_field(form.new_name) }}
+{{ render_field(form.new_email) }}
+{{ form.update_details(class_="btn btn-success pull-right") }}
+
+<div class="row">&nbsp;</div>
+
+<h3>Permissions</h3>
+<p>Note that the admin permission implies all other permissions.</p>
 
 <table class="table table-condensed">
     <tr>{% for permission in permissions %}
