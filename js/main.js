@@ -116,3 +116,13 @@ $(() => {
   $('#user_content_form #type').on('change', displayWorkshopFieldsIfRequired);
   displayWorkshopFieldsIfRequired();
 });
+
+$(() => {
+  document.querySelectorAll('.youtube-wait-for-click').forEach((parentEl) => {
+    parentEl.classList.add('youtube-wait-for-click-has-js');
+    parentEl.querySelector('.youtube-wait-for-click-button').addEventListener('click', () => {
+      parentEl.replaceChildren(parentEl.querySelector('template').content.cloneNode(true));
+      return false;
+    });
+  });
+});

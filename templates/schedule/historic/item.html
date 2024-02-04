@@ -49,9 +49,17 @@
         mozallowfullscreen="true" allowfullscreen></iframe>
       <p>View this video <a href="{{ event.video.archiveorg }}">on the Internet Archive</a>.</p>
     {% elif event.video.youtube %}
-      <iframe src="{{event.video.youtube|replace('youtube.com/watch?v=', 'youtube.com/embed/')}}"
-          width="100%" height="500px" frameborder="0" 
-          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <div class="youtube-wait-for-click video-container">
+        <template>
+          <iframe src="{{event.video.youtube|replace('youtube.com/watch?v=', 'youtube.com/embed/')}}"
+              width="100%" height="500px" frameborder="0" 
+              allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </template>
+        <div class="youtube-wait-for-click-content content">
+          <p>This video is hosted on YouTube. To load the video, you'll need to agree to YouTube's <a href="https://www.youtube.com/t/privacy">privacy policy</a>.</p>
+          <button class="youtube-wait-for-click-button">Continue</button>
+        </div>
+      </div>
       <p>View this video <a href="{{ event.video.youtube }}">on YouTube</a>.</p>
     {% endif %}
   </div>
