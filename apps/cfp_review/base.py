@@ -68,6 +68,7 @@ from . import (
     get_next_proposal_to,
     copy_request_args,
 )
+from ..common import get_next_url
 from ..common.email import from_email
 
 
@@ -1251,7 +1252,7 @@ def add_happens_relationship():
             flash(
                 f"Added happens-before relationship between {happens_first.title} and {happens_later.title}.",
             )
-            return redirect(request.args.get("next"))
+            return redirect(get_next_url(default=url_for(".proposals")))
 
     if "happens_first_id" in request.args:
         proposal = Proposal.query.get_or_404(request.args["happens_first_id"])

@@ -5,9 +5,10 @@ import re
 import os.path
 from textwrap import wrap
 import pendulum
+from urllib.parse import urlparse, urljoin
 
 from main import db, external_url
-from flask import session, abort, current_app as app, render_template
+from flask import session, abort, current_app as app, render_template, request, url_for
 from markupsafe import Markup
 from flask.json import jsonify
 from flask_login import login_user, current_user
@@ -283,3 +284,20 @@ def load_archive_file(year: int, *path, raise_404=True):
     if json_path is None:
         return None
     return json.load(open(json_path, "r"))
+
+
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc
+
+
+def get_next_url(default=None):
+    next_url = request.args.get("next")
+    if next_url:
+        if is_safe_url(next_url):
+            return next_url
+        app.logger.error(f"Dropping unsafe next URL {repr(next_url)}")
+    if default is None:
+        default = url_for("users.account")
+    return default
