@@ -130,4 +130,38 @@
     {% endfor %}
 </table>
 
+<h3>Changes</h3>
+<table class="table table-condensed">
+<thead>
+    <tr>
+        <th>When</th>
+        <th>By</th>
+        <th>Fieldname</th>
+        <th>Was</th>
+        <th>Changed to</th>
+    </tr>
+</thead>
+<tbody>
+{% for version in versions %}
+    {% for (field, (old, new)) in version.changeset.items() %}
+        <tr class="{{- loop.cycle('odd', 'even') -}}">
+            {% if loop.first %}
+                <td rowspan="{{ loop.length }}">{{ version.transaction.issued_at.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] }}</td>
+                <td rowspan="{{ loop.length }}">
+                {% if version.transaction.user %}
+                    <a href="{{ url_for('admin.user', user_id=version.transaction.user.id) }}">{{ version.transaction.user.name }} ({{ version.transaction.user.email }})</a>
+                {% else %}
+                    [unknown]
+                {% endif %}
+                </td>
+            {% endif %}
+            <td>{{field}}</td>
+            <td>{{old}}</td>
+            <td>{{new}}</td>
+        </tr>
+    {% endfor %}
+{% endfor %}
+</tbody>
+</table>
+
 {% endblock %}

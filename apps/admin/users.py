@@ -9,6 +9,8 @@ from wtforms.validators import DataRequired, ValidationError
 
 from . import admin
 from main import db
+from sqlalchemy_continuum.utils import version_class
+
 from models.user import User, generate_signup_code
 from models.permission import Permission
 from ..common.email import from_email
@@ -148,8 +150,17 @@ def user(user_id):
     form.note.data = user.checkin_note
     form.new_name.data = user.name
     form.new_email.data = user.email
+
+    versions = user.versions.order_by(None).order_by(
+        version_class(User).transaction_id.desc()
+    )
+
     return render_template(
-        "admin/users/user.html", user=user, form=form, permissions=permissions
+        "admin/users/user.html",
+        user=user,
+        form=form,
+        permissions=permissions,
+        versions=versions,
     )
 
 
