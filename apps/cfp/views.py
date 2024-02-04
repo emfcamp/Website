@@ -697,10 +697,10 @@ def finalise_proposal(proposal_id):
             proposal.published_participant_equipment = form.participant_equipment.data
 
         proposal.available_times = form.get_availability_json()
-        proposal.set_state("finished")
+        proposal.set_state("finalised")
 
         db.session.commit()
-        app.logger.info("Finished proposal %s", proposal_id)
+        app.logger.info("Finalised proposal %s", proposal_id)
         flash("Thank you for finalising your details!")
 
         return redirect(url_for(".edit_proposal", proposal_id=proposal_id))
@@ -709,7 +709,7 @@ def finalise_proposal(proposal_id):
         # Don't overwrite user submitted data
         pass
 
-    elif proposal.state == "finished":
+    elif proposal.state == "finalised":
         if proposal.published_names:
             form.name.data = proposal.published_names
         else:
