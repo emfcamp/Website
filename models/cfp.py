@@ -348,6 +348,23 @@ FavouriteProposal = db.Table(
     ),
 )
 
+ProposalOrdering = db.Table(
+    "proposal_ordering",
+    BaseModel.metadata,
+    db.Column(
+        "happens_first_proposal_id",
+        db.Integer,
+        db.ForeignKey("proposal.id"),
+        primary_key=True,
+    ),
+    db.Column(
+        "happens_later_proposal_id",
+        db.Integer,
+        db.ForeignKey("proposal.id"),
+        primary_key=True,
+    ),
+)
+
 
 class Proposal(BaseModel):
     __versioned__ = {"exclude": ["favourites", "favourite_count"]}
@@ -393,6 +410,21 @@ class Proposal(BaseModel):
     votes = db.relationship("CFPVote", backref="proposal")
     favourites = db.relationship(
         User, secondary=FavouriteProposal, backref=db.backref("favourites")
+    )
+    happens_after = db.relationship(
+        "Proposal",
+        secondary=ProposalOrdering,
+        back_populates="happens_before",
+        primaryjoin=lambda: ProposalOrdering.c.happens_later_proposal_id == Proposal.id,
+        secondaryjoin=lambda: Proposal.id
+        == ProposalOrdering.c.happens_first_proposal_id,
+    )
+    happens_before = db.relationship(
+        "Proposal",
+        secondary=ProposalOrdering,
+        back_populates="happens_after",
+        primaryjoin=lambda: ProposalOrdering.c.happens_first_proposal_id == Proposal.id,
+        secondaryjoin=lambda: Proposal.id == ProposalOrdering.c.happens_later_proposal_id,
     )
 
     # Convenience for individual objects. Use an outerjoin and groupby for more than a few records
