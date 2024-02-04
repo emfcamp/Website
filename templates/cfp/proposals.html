@@ -52,12 +52,12 @@
             {{ proposal.get_unread_count(current_user) }} unread of {{ proposal.messages | length }}
           </a>
         </dd>
-        {% if proposal.state != 'accepted' and proposal.state != 'finished' %}
+        {% if not proposal.is_accepted %}
           <dt>Required notice</dt>
           <dd>{{ proposal.notice_required }}</dd>
         {% endif %}
         {% if (proposal.type == 'talk' or proposal.type == 'workshop') %}
-            {% if (proposal.state == 'accepted' or proposal.state == 'finished') %}
+            {% if proposal.is_accepted %}
               <dt>Slot length</dt><dd>{{proposal.scheduled_duration}} minutes</dd>
               <dt>Slot time</dt><dd>{% if proposal.scheduled_time %}<b><font color="green">{{proposal.scheduled_time.strftime('%A at %-I:%M %p')}}</font></b>{% else %}Not yet scheduled{% endif %}</dd>
               <dt>Venue</dt><dd>{{proposal.scheduled_venue_name or "Not yet scheduled"}}</dd>

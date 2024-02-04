@@ -66,7 +66,7 @@ def schedule_current():
 def line_up():
     proposals = Proposal.query.filter(
         Proposal.scheduled_duration.isnot(None),
-        Proposal.state.in_(["accepted", "finished"]),
+        Proposal.is_accepted,
         Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]),
         Proposal.hide_from_schedule.isnot(True),
     ).all()
@@ -172,7 +172,7 @@ def item(year, proposal_id, slug=None):
 def item_current(year, proposal_id, slug=None):
     """Display a detail page for a talk from the current event"""
     proposal = Proposal.query.get_or_404(proposal_id)
-    if proposal.state not in ("accepted", "finished") or proposal.hide_from_schedule:
+    if not proposal.is_accepted or proposal.hide_from_schedule:
         abort(404)
 
     if not current_user.is_anonymous:
@@ -308,7 +308,7 @@ def herald_venue(venue_name):
         Proposal.query.join(Venue, Venue.id == Proposal.scheduled_venue_id)
         .filter(
             Venue.name == venue_name,
-            Proposal.state.in_(["accepted", "finished"]),
+            Proposal.is_accepted,
             Proposal.scheduled_time > pendulum.now(event_tz),
             Proposal.scheduled_duration.isnot(None),
             Proposal.hide_from_schedule.isnot(True),
@@ -394,7 +394,7 @@ def greenroom():
     upcoming = (
         Proposal.query.filter(
             Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]),
-            Proposal.state.in_(["accepted", "finished"]),
+            Proposal.is_accepted,
             Proposal.scheduled_time > pendulum.now(event_tz),
             Proposal.scheduled_duration.isnot(None),
             Proposal.hide_from_schedule.isnot(True),

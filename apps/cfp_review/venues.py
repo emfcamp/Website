@@ -82,8 +82,7 @@ def edit_venue(venue_id):
     if form.validate_on_submit():
         if form.delete.data:
             scheduled_content = Proposal.query.filter(
-                Proposal.scheduled_venue_id == venue.id,
-                Proposal.state.in_(["accepted", "finished"]),
+                Proposal.scheduled_venue_id == venue.id, Proposal.is_accepted
             ).count()
 
             if scheduled_content > 0:
