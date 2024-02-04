@@ -1,6 +1,7 @@
 from datetime import timedelta
 from collections import defaultdict, Counter
 from itertools import combinations
+from werkzeug.exceptions import BadRequest
 
 import dateutil
 from flask import (
@@ -56,6 +57,8 @@ from .forms import (
     AddNoteForm,
     ChangeProposalOwner,
     ReversionForm,
+    AddOrderingForm,
+    RemoveOrderingForm,
 )
 from . import (
     cfp_review,
@@ -101,12 +104,14 @@ def bool_qs(val):
     raise ValueError("Invalid querystring boolean")
 
 
-def filter_proposal_request():
+def filter_proposal_request(base_query=None):
+    if base_query is None:
+        base_query = Proposal.query
     bool_names = ["one_day", "needs_help", "needs_money"]
     bool_vals = [request.args.get(n, type=bool_qs) for n in bool_names]
     bool_dict = {n: v for n, v in zip(bool_names, bool_vals) if v is not None}
 
-    proposal_query = Proposal.query.filter_by(**bool_dict)
+    proposal_query = base_query.filter_by(**bool_dict)
 
     filtered = False
 
@@ -122,7 +127,6 @@ def filter_proposal_request():
 
     show_user_scheduled = request.args.get("show_user_scheduled", type=bool_qs)
     if show_user_scheduled is None or show_user_scheduled is False:
-        filtered = False
         proposal_query = proposal_query.filter_by(user_scheduled=False)
 
     # This block has to be last because it will join to the user table
@@ -869,7 +873,7 @@ def close_round():
     if form.validate_on_submit():
         if form.confirm.data:
             min_votes = session["min_votes"]
-            for (prop, vote_count) in proposals:
+            for prop, vote_count in proposals:
                 if vote_count >= min_votes and prop.state != "reviewed":
                     prop.set_state("reviewed")
 
@@ -896,7 +900,7 @@ def close_round():
     # Find proposals where the submitter has already had an accepted proposal
     # or another proposal in this list
     duplicates = {}
-    for (prop, _) in proposals:
+    for prop, _ in proposals:
         if prop.user.proposals.count() > 1:
             # Only add each proposal once
             if prop.user not in duplicates:
@@ -937,8 +941,7 @@ def rank():
         if form.confirm.data:
             min_score = session["min_score"]
             count = 0
-            for (prop, score) in scored_proposals:
-
+            for prop, score in scored_proposals:
                 if score >= min_score:
                     count += 1
                     prop.set_state("accepted")
@@ -1168,7 +1171,7 @@ def clashfinder():
 
     clashes = []
     offset = 0
-    for ((id1, id2), count) in popularity.most_common()[:1000]:
+    for (id1, id2), count in popularity.most_common()[:1000]:
         offset += 1
         prop1 = Proposal.query.get(id1)
         prop2 = Proposal.query.get(id2)
@@ -1230,6 +1233,100 @@ def proposals_summary():
         counts_by_type=counts_by_type,
         counts_by_state=counts_by_state,
     )
+
+
+@cfp_review.route("/proposals/add-happens-relationship", methods=["GET", "POST"])
+@admin_required
+def add_happens_relationship():
+    form = AddOrderingForm()
+    if form.validate_on_submit():
+        happens_first = Proposal.query.get_or_404(form.happens_first_id.data)
+        happens_later = Proposal.query.get_or_404(form.happens_later_id.data)
+        happens_first.happens_before.append(happens_later)
+        if violations := happens_first.find_happens_before_causality_violations():
+            flash(f"Found a causality violation: {violations}")
+        else:
+            db.session.add(happens_first)
+            db.session.commit()
+            flash(
+                f"Added happens-before relationship between {happens_first.title} and {happens_later.title}.",
+            )
+            return redirect(request.args.get("next"))
+
+    if "happens_first_id" in request.args:
+        proposal = Proposal.query.get_or_404(request.args["happens_first_id"])
+        direction = "happen after"
+
+        def generate_form(candidate):
+            form = AddOrderingForm()
+            form.happens_first_id.data = proposal.id
+            form.happens_later_id.data = candidate.id
+            return form
+
+    elif "happens_later_id" in request.args:
+        proposal = Proposal.query.get_or_404(request.args["happens_later_id"])
+        direction = "happen before"
+
+        def generate_form(candidate):
+            form = AddOrderingForm()
+            form.happens_first_id.data = candidate.id
+            form.happens_later_id.data = proposal.id
+            return form
+
+    else:
+        raise BadRequest("No proposal ID specified")
+
+    base_qs = {
+        k: v
+        for k, v in request.args.items()
+        if k in ["happens_first_id", "happens_later_id", "next"]
+    }
+
+    base_query = Proposal.query.filter(Proposal.id != proposal.id)
+    proposals, filtered = filter_proposal_request(base_query=base_query)
+    non_sort_query_string = copy_request_args(request.args)
+
+    if "sort_by" in non_sort_query_string:
+        del non_sort_query_string["sort_by"]
+
+    if "reverse" in non_sort_query_string:
+        del non_sort_query_string["reverse"]
+
+    tag_counts = {t.tag: [0, len(t.proposals)] for t in Tag.query.all()}
+    for prop in proposals:
+        for t in prop.tags:
+            tag_counts[t.tag][0] = tag_counts[t.tag][0] + 1
+
+    return render_template(
+        "cfp_review/add_happens_relationship.html",
+        proposal=proposal,
+        generate_form=generate_form,
+        proposals=proposals,
+        base_qs=base_qs,
+        new_qs=non_sort_query_string,
+        filtered=filtered,
+        total_proposals=base_query.count(),
+        tag_counts=tag_counts,
+        direction=direction,
+    )
+
+
+@cfp_review.route("/proposals/remove-happens-relationship", methods=["POST"])
+@admin_required
+def remove_happens_relationship():
+    form = RemoveOrderingForm()
+
+    if form.validate_on_submit():
+        happens_first = Proposal.query.get_or_404(form.happens_first_id.data)
+        happens_later = Proposal.query.get_or_404(form.happens_later_id.data)
+        happens_first.happens_before.remove(happens_later)
+        db.session.add(happens_first)
+        db.session.commit()
+        flash(
+            f"Removed happens-before relationship between {happens_first.title} and {happens_later.title}."
+        )
+
+    return redirect(form.next.data)
 
 
 from . import venues  # noqa

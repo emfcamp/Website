@@ -1,5 +1,6 @@
 {# Filter form on /cfp-review/proposals #}
 <form method="get" class="row">
+    {% if filter_top is defined %}{{ filter_top }}{% endif %}
     <fieldset class="form-horizontal col-md-6">
         <div class="form-group">
             <label for="state" class="col-sm-2">State</label>
@@ -94,7 +95,7 @@
         <div class="form-group">
             <div class="btn-group">
                 <button class="btn btn-primary">Apply</button>
-                <a href="{{url_for('.proposals')}}" class="btn btn-default">Clear</a>
+                <a href="{{url_for(request.endpoint, **(base_qs or {}))}}" class="btn btn-default">Clear</a>
             </div>
         </div>
     </fieldset>

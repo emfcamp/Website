@@ -14,7 +14,8 @@
             {% else %}
                 A {{proposal.human_type}} by
             {% endif %}
-            <a href="{{ url_for('admin.user', user_id=proposal.user.id) }}">{{proposal.user.name}}</small></a>
+            <a href="{{ url_for('admin.user', user_id=proposal.user.id) }}">{{proposal.user.name}}</a>
+        </small>
     </h2>
 </div>
 <form method="post" action="{{ url_for('.update_proposal', proposal_id=proposal.id) }}" class="shrink">
@@ -112,6 +113,48 @@
                                 {{ render_dl_field(form.potential_venue) }}
                                 {{ render_dl_field(form.potential_time) }}
                             {% endif %}
+                            <dt>
+                                Happens after
+                            </dt>
+                            <dd>
+                                This {{ proposal.human_type }} happens after:
+                                {% if proposal.happens_after | length > 0 %}
+                                    <ul>
+                                    {% for happens_after_proposal in proposal.happens_after %}
+                                        <li>
+                                            <a href="{{ url_for('cfp_review.update_proposal', proposal_id=happens_after_proposal.id) }}">{{ happens_after_proposal.published_title or happens_after_proposal.title }}</a>,
+                                            a {{ happens_after_proposal.human_type }} by
+                                            <a href="{{ url_for('admin.user', user_id=proposal.user.id) }}">{{proposal.user.name}}</a>
+                                            <input type="submit" form="remove_happens_after_{{ happens_after_proposal.id }}" value="Remove" class="btn btn-sm btn-danger">
+                                        </li>
+                                    {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    ∅
+                                {% endif %}
+                                <a href="{{ url_for('cfp_review.add_happens_relationship', happens_later_id=proposal.id, next=url_for(request.endpoint, **request.view_args)) }}" class="btn btn-sm btn-success">Add proposals which must happen before this one</a>
+                            </dd>
+                            <dt>
+                                Happens before
+                            </dt>
+                            <dd>
+                                This {{ proposal.human_type }} happens before:
+                                {% if proposal.happens_before | length > 0 %}
+                                    <ul>
+                                    {% for happens_before_proposal in proposal.happens_before %}
+                                        <li>
+                                            <a href="{{ url_for('cfp_review.update_proposal', proposal_id=happens_before_proposal.id) }}">{{ happens_before_proposal.published_title or happens_before_proposal.title }}</a>,
+                                            a {{ happens_before_proposal.human_type }} by
+                                            <a href="{{ url_for('admin.user', user_id=proposal.user.id) }}">{{proposal.user.name}}</a>
+                                            <input type="submit" form="remove_happens_before_{{ happens_before_proposal.id }}" value="Remove" class="btn btn-sm btn-danger">
+                                        </li>
+                                    {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    ∅
+                                {% endif %}
+                                <a href="{{ url_for('cfp_review.add_happens_relationship', happens_first_id=proposal.id, next=url_for(request.endpoint, **request.view_args)) }}" class="btn btn-sm btn-success">Add proposals which must happen after this one</a>
+                            </dd>
                         </dl>
                     </div>
                 </div>
@@ -208,5 +251,21 @@
         </div>
     </div>
 </form>
+
+{% for happens_after_proposal in proposal.happens_after %}
+<form id="remove_happens_after_{{ happens_after_proposal.id }}" method="POST" action="{{ url_for('.remove_happens_relationship') }}">
+<input type="hidden" name="happens_first_id" value="{{ happens_after_proposal.id }}">
+<input type="hidden" name="happens_later_id" value="{{ proposal.id }}">
+<input type="hidden" name="next" value="{{ url_for(request.endpoint, **request.view_args) }}">
+</form>
+{% endfor %}
+{% for happens_before_proposal in proposal.happens_before %}
+<form id="remove_happens_before_{{ happens_before_proposal.id }}" method="POST" action="{{ url_for('.remove_happens_relationship') }}">
+<input type="hidden" name="happens_first_id" value="{{ proposal.id }}">
+<input type="hidden" name="happens_later_id" value="{{ happens_before_proposal.id }}">
+<input type="hidden" name="next" value="{{ url_for(request.endpoint, **request.view_args) }}">
+</form>
+{% endfor %}
+
 
 {% endblock %}

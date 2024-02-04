@@ -1,0 +1,74 @@
+{% from "_formhelpers.html" import render_field, render_dl_field, render_radio_field %}
+{% extends "cfp_review/base.html" %}
+{% block title %}Add ordering relationship | {{proposal.title}}{% endblock %}
+{% block body %}
+
+<h2>Select a proposal which must <em>{{ direction }}</em> {{proposal.published_title or proposal.title}}</h2>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a role="button" data-toggle="collapse" data-target="#searchPanel"
+                aria-controls="searchPanel" aria-expanded="true">
+                Filter <small>(showing {{ proposals | count }}/{{total_proposals}})</small>
+            </a>
+        </h4>
+    </div>
+    <div class="panel-body collapse
+    {%- if filtered %} in{% endif %}
+        " id="searchPanel">
+        {% set keep_qs=['happens_first_id', 'happens_later_id', 'next'] %}
+        {% set filter_top %}
+            {% for keep in keep_qs %}
+                {% if keep in request.args %}<input type="hidden" name="{{ keep }}" value="{{ request.args.get(keep) }}">{% endif %}
+            {% endfor %}
+        {% endset %}
+        {% include "cfp_review/_proposals_filter_form.html" %}
+    </div>
+</div>
+
+<table class="table table-condensed">
+    <tr>
+        {% if not request.args.get('reverse') %}
+            {% set qs_reverse_new=True %}
+        {% else %}
+            {% set qs_reverse_new=None %}
+        {% endif %}
+        <th class="col-md-1">
+            <a href="{{ url_for(request.endpoint, sort_by='date', reverse=qs_reverse_new, **new_qs) }}">Date</a>
+        </th>
+        <th>
+            <a href="{{ url_for(request.endpoint, sort_by='state', reverse=qs_reverse_new, **new_qs) }}">State</a>
+        </th>
+        <th class="col-md-1">
+            <a href="{{ url_for(request.endpoint, sort_by='type', reverse=qs_reverse_new, **new_qs) }}">Type</a>
+        </th>
+        <th>
+            <a href="{{ url_for(request.endpoint, sort_by='user', reverse=qs_reverse_new, **new_qs) }}">User</a>
+        </th>
+        <th>
+            <a href="{{ url_for(request.endpoint, sort_by='title', reverse=qs_reverse_new, **new_qs) }}">Title</a>
+        </th>
+        <th></th>
+    </tr>
+{% for candidate in proposals %}
+    <tr>
+        <td>{{candidate.created.strftime("%d/%m")}}</td>
+        <td>{{candidate.state | capitalize}}</td>
+        <td>{%- if candidate.user_scheduled %}Attendee&nbsp;{% endif -%}{{candidate.human_type | capitalize}}</td>
+        <td>{{candidate.user.name}}</td>
+        <td>{{candidate.published_title or candidate.title}}</td>
+        <td>
+            {% set form=generate_form(candidate) %}
+            <form method="POST">
+                {{form.hidden_tag()}}
+                {{form.submit(class_="btn btn-sm btn-success")}}
+            </form>
+        </td>
+    </tr>
+{% else %}
+    <tr><td colspan="5" class="text-center">No proposals found</td></tr>
+{% endfor %}
+</table>
+
+{% endblock %}
