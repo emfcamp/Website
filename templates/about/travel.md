@@ -32,4 +32,4 @@ While we do not have any dedicated bike parking, EMF is an extremely safe event 
 ## By Air
 The closest major airport is [Birmingham (BHX)](https://en.wikipedia.org/wiki/Birmingham_Airport), which is around 1:40 by train to Ledbury station; or an hour by road. [Bristol (BRS)](https://en.wikipedia.org/wiki/Bristol_Airport) and [Cardiff (CWL)](https://en.wikipedia.org/wiki/Cardiff_Airport) are around 1:40 by road, but poorly connected by public transport.
 
-For those travelling long-haul, BHX is likely to be be most useful followed by LHR.
+For those travelling long-haul, BHX is likely to be most useful followed by LHR.
