@@ -9,6 +9,10 @@ There is no requirement to be part of a village, so if you'd rather camp on your
 
 If you're planning to bring something especially big or in need of lots of power to your village, please let us know beforehand so we can provide you with what you need.
 
+## Register a Village
+By [registering your village at emfcamp.org/villages/register](/villages/register), you'll be making the Village People aware of the fact you plan to arrive, and how much space you're likely to need, and you'll allow us to get in touch to discuss how we can support your plans and activities at the event.
+
+
 ## What can we do as a village?
 Villages are great as you can share ideas, equipment and space! The sharing doesn’t stop there - it lets you share resources too. You can come up with a cooking and cleaning rota as a group to reduce waste, make the camp cheaper and interrupt your day with a change of activity. Some people spend all their time cooking for others!
 
@@ -38,9 +42,6 @@ If you have any questions about workshop villages or hosting content, you can [e
 
 ## The Village People
 The Village People are available to support making things happen in your village. If you have a cool idea, but need help with planning or logistics of doing things on site, please contact us beforehand. The earlier you let us know your plans, the better we can help you. You can contacy us by [emailing villages@emfcamp.org](mailto:villages@emfcamp.org) and we will be very happy to discuss anything you might come up with!
-
-## Register a Village
-By [registering your village](/villages), you'll be making the Village People aware of the fact you plan to arrive, and how much space you're likely to need, and you'll allow us to get in touch to discuss how we can support your plans and activities at the event.
 
 ## Village Furniture
 To make things easier for villages, we will offer the opportunity to book a marquee and furniture through us, which will be set up and ready for when you arrive on site. Details of how to book these will
