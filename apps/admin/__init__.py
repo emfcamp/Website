@@ -159,8 +159,7 @@ def feature_flags():
 class SiteStateForm(Form):
     site_state = SelectField(
         "Site",
-        choices=[("", "(automatic)")]
-        + list(zip(VALID_STATES["site_state"], VALID_STATES["site_state"])),
+        choices=list(zip(VALID_STATES["site_state"], VALID_STATES["site_state"])),
     )
     sales_state = SelectField(
         "Sales",

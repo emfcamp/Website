@@ -8,10 +8,9 @@
   join our mailing list to be notified when more tickets are on sale:</p>
   {{contact_form("main")}}
 
-  {% if config['CFP'] %}
-  <p>We can't reserve any tickets, but if we accept your
-  <a href="{{url_for('cfp.main')}}">talk, workshop, or installation proposal</a>,
-  you will be guaranteed <strong>two</strong> tickets to EMF.</p>
+  {% if feature_enabled('CFP') %}
+  <p>If we accept your <a href="{{url_for('cfp.main')}}">talk, workshop, or installation proposal</a>,
+  you will be guaranteed the chance to buy two tickets to EMF.</p>
   {% endif %}
 </div>
 {% endif %}

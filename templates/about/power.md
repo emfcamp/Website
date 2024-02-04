@@ -22,7 +22,7 @@ If it rains, the earth leakage current from a number of slightly damp appliances
 As usual, we will provide 1x 16A Ceeform socket in the campervan area for every campervan/caravan ticket sold.
 
 ## Electric Vehicles
-Owing to the increased price of providing electricity at EMF, and the increasing number of electric vehicles, we do not plan to provide generally-available electric vehicle charging at EMF 2022. We ask that you arrive at EMF with enough charge to leave at the end of the event.
+Owing to the increased price of providing electricity at EMF, and the increasing number of electric vehicles, we do not plan to provide generally-available electric vehicle charging at EMF 2024. We ask that you arrive at EMF with enough charge to leave at the end of the event.
 
 We will be able to provide EV charging in an emergency.
 
