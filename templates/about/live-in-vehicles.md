@@ -4,6 +4,8 @@ title: Live-in Vehicles
 
 Camper vans, caravans, trailer tents, and roof tents are allowed at EMF in the designated live-in vehicle areas. You must have a live-in vehicle ticket to bring one of these vehicles to EMF - you cannot stay in the main car park area.
 
+If your vehicle is an integral part of a village or installation please contact us in advance for permission to park it outside the live-in vehicle areas.
+
 The maximum size of a live-in vehicle pitch is 8m × 6m. You can bring an awning or a small additional tent, but please don't use too much space, as we want to fit as many vehicles in as possible.
 
 If you are bringing a caravan or a trailer tent, the towing vehicle must be parked in the main car park, but it does not require a parking ticket.
