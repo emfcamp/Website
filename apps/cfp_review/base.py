@@ -1227,4 +1227,13 @@ def proposals_summary():
     )
 
 
+@cfp_review.route("/confidentiality", methods=["GET", "POST"])
+def confidentiality_warning():
+    if request.method == "POST" and request.form.get("agree"):
+        session["cfp_confidentiality"] = True
+        return redirect(request.args.get("next", url_for(".proposals")))
+
+    return render_template("cfp_review/confidentiality_warning.html")
+
+
 from . import venues  # noqa
