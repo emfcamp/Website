@@ -14,30 +14,26 @@
         <p>We'll use these details to help us schedule your {{proposal.human_type}}.</p>
 
     {% if proposal.type in ('talk', 'performance') %}
-      {{ render_field(form.requirements, 9) }}
+      {{ render_field(form.equipment_required, 9) }}
       {{ render_field(form.length, 9) }}
       {{ render_field(form.notice_required, 9) }}
 
     {% elif proposal.type in ('workshop', 'youthworkshop') %}
-      {{ render_field(form.requirements, 9) }}
+      {{ render_field(form.equipment_required, 9) }}
       {{ render_field(form.length, 9) }}
       {{ render_field(form.notice_required, 9) }}
+      {% if proposal.type != 'youthworkshop' %}
       {% call render_field(form.attendees, 9) %}
-          Our workshop tents can accommodate 10-50 attendees per session; if your workshop
-          is smaller than that, we might be able to find somewhere else to hold it.
+          Our workshop tents can accommodate 10-50 attendees per session.
       {% endcall %}
+      {% endif %}
       {{ render_field(form.cost, 9) }}
       {{ render_field(form.participant_equipment, 9)}}
       {{ render_field(form.age_range, 9) }}
 
     {% elif proposal.type == 'installation' %}
       {{ render_field(form.notice_required, 9) }}
-      {{ render_field(form.requirements, 9) }}
       {{ render_field(form.size, 9) }}
-      {% call render_field(form.funds, 9) %}
-          We have a limited amount of funding available to make the EMF site look great.
-          If you'd like to apply for a grant, let us know how much you'll need.
-      {% endcall %}
 
     {% elif proposal.type == 'lightning' %}
       {{ render_field(form.slide_link, 9) }}
@@ -51,6 +47,10 @@
       {{ render_field(form.session, 9) }}
     {% endif %}
 
+    {% if proposal.type != 'lightning' %}
+      {{ render_field(form.additional_info, 9) }}
+    {% endif %}
+
     <div class="col-md-9 col-sm-offset-3 {% if proposal.state != 'new' -%} hidden {%- endif %}">
       {% if proposal.type == 'youthworkshop' %}
       <label class="checkbox">
@@ -62,11 +62,27 @@
         {{ form.needs_help() }}
         I'd like help with preparing this proposal.
       </label>
-      {% for error in form.needs_help.errors %}
-      <div class="help-block">{{ error }}</div>
-      {% endfor %}
+      <p></p>
     </div>
+
     </fieldset>
+
+    {% if proposal.type != 'lightning' %}
+    <fieldset>
+      <legend>Funding</legend>
+      {% if proposal.type in ('installation') %}
+      {% call render_field(form.installation_funding, 9) %}
+          If you'd like to apply for a grant, let us know how much you'll need.
+      {% endcall %}
+      {% endif %}
+
+      {{ render_field(form.funding_required, horizontal=9, placeholder="What costs do you need covered?") }}
+    </fieldset>
+    {% endif %}
+
+    {% for error in form.needs_help.errors %}
+    <div class="help-block">{{ error }}</div>
+    {% endfor %}
 
   </div>
   <div class="pull-right">

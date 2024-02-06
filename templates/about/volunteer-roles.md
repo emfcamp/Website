@@ -39,6 +39,10 @@ A driving license and transport would be a huge help in this role to enable goin
 
 # Calls for help
 
-Occassionally we'd like to put out a call for help with specific roles, while we'd love to do that with a giant EMF logo beamed into the night sky, we had to settle for a mailing list instead. You can sign up to it below.
+Occasionally we'd like to put out a call for help with specific roles. While we'd love to do that with a giant EMF logo beamed into the night sky, we had to settle for a mailing list instead.
 
-{{ contact_form("volunteer") }}
+<div class="well">
+  <p>You can sign up to be notified here:</p>
+  {{ contact_form("volunteer") }}
+</div>
+

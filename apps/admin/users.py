@@ -9,6 +9,8 @@ from wtforms.validators import DataRequired, ValidationError
 
 from . import admin
 from main import db
+from sqlalchemy_continuum.utils import version_class
+
 from models.user import User, generate_signup_code
 from models.permission import Permission
 from ..common.email import from_email
@@ -70,6 +72,9 @@ def user(user_id):
         note = StringField("Check-in note (will be shown to check-in operator)")
         add_note = SubmitField("Save Note")
         change_permissions = SubmitField("Change")
+        new_name = StringField("New name")
+        new_email = StringField("New email (will notify old and new emails if changed)")
+        update_details = SubmitField("Update")
 
     for permission in permissions:
         setattr(
@@ -107,12 +112,77 @@ def user(user_id):
             user.checkin_note = form.note.data
             db.session.commit()
 
+        elif form.update_details.data:
+            made_changes = []
+
+            if form.new_name.data and form.new_name.data != user.name:
+                app.logger.info(
+                    "user %s name changed from %s to %s",
+                    user.id,
+                    user.name,
+                    form.new_name.data,
+                )
+                user.name = form.new_name.data
+                made_changes.append("name")
+
+            if form.new_email.data and form.new_email.data != user.email:
+                # NB: any login tokens that were previously generated and emailed will still be valid until expiry.
+                # Maybe we should expire them and their sessions, just in case?
+                old_email = user.email
+                user.email = form.new_email.data
+                app.logger.info(
+                    "user %s (%s) email changed from %s to %s",
+                    user.name,
+                    user.id,
+                    old_email,
+                    form.new_email.data,
+                )
+                _send_email_changed_from(user, old_email)
+                _send_email_changed_to(user, form.new_email.data)
+                made_changes.append("email")
+
+            if made_changes:
+                flash(f'Updated user {" & ".join(made_changes)}')
+                db.session.commit()
+
         return redirect(url_for(".user", user_id=user.id))
 
     form.note.data = user.checkin_note
-    return render_template(
-        "admin/users/user.html", user=user, form=form, permissions=permissions
+    form.new_name.data = user.name
+    form.new_email.data = user.email
+
+    versions = user.versions.order_by(None).order_by(
+        version_class(User).transaction_id.desc()
     )
+
+    return render_template(
+        "admin/users/user.html",
+        user=user,
+        form=form,
+        permissions=permissions,
+        versions=versions,
+    )
+
+
+def _send_email_changed_from(user: User, old_email: str) -> None:
+    msg = EmailMessage(
+        "Your email address has been changed",
+        from_email=from_email("CONTACT_EMAIL"),
+        to=[old_email],
+    )
+    msg.body = render_template("emails/user-email-changed-from.txt", user=user)
+    msg.send()
+
+
+def _send_email_changed_to(user: User, new_email: str) -> None:
+    code = user.login_code(app.config["SECRET_KEY"])
+    msg = EmailMessage(
+        "Your email address has been changed",
+        from_email=from_email("CONTACT_EMAIL"),
+        to=[new_email],
+    )
+    msg.body = render_template("emails/user-email-changed.txt", user=user, code=code)
+    msg.send()
 
 
 class SignupForm(Form):

@@ -107,7 +107,7 @@ def _get_scheduled_proposals(filter_obj={}, override_user=None):
         external_favourites = [f.id for f in user.calendar_favourites]
 
     schedule = Proposal.query.filter(
-        Proposal.state.in_(["accepted", "finished"]),
+        Proposal.is_accepted,
         Proposal.scheduled_time.isnot(None),
         Proposal.scheduled_venue_id.isnot(None),
         Proposal.scheduled_duration.isnot(None),

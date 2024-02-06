@@ -15,7 +15,6 @@ from flask import (
 import requests
 
 from main import cache
-from ..common import feature_flag
 from models.product import Price, Product, ProductView, ProductViewProduct, PriceTier
 from models.site_state import get_site_state
 
@@ -146,12 +145,6 @@ def badge():
 @base.route("/code-of-conduct")
 def code_of_conduct():
     return render_template("code-of-conduct.html")
-
-
-@base.route("/radio", methods=["GET"])
-@feature_flag("RADIO")
-def radio():
-    return render_template("radio.html")
 
 
 @base.route("/googlec108e6ab4f75019d.html")
