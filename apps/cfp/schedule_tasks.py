@@ -258,7 +258,7 @@ def apply_potential_schedule(email, type):
             | (Proposal.potential_time != None)  # noqa: E711
         )
         .filter(Proposal.scheduled_duration.isnot(None))
-        .filter(Proposal.state.in_(["accepted", "finished"]))
+        .filter(Proposal.is_accepted)
         .all()
     )
 

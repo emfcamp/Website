@@ -54,8 +54,8 @@ CFP_STATES = {
     "anon-blocked": ["accepted", "rejected", "withdrawn", "reviewed", "edit"],
     "reviewed": ["accepted", "rejected", "withdrawn", "edit", "anonymised"],
     "manual-review": ["accepted", "rejected", "withdrawn", "edit"],
-    "accepted": ["accepted", "rejected", "withdrawn", "finished"],
-    "finished": ["rejected", "withdrawn", "finished"],
+    "accepted": ["accepted", "rejected", "withdrawn", "finalised"],
+    "finalised": ["rejected", "withdrawn", "finalised"],
     "withdrawn": ["accepted", "rejected", "withdrawn", "edit"],
 }
 
@@ -71,7 +71,7 @@ ORDERED_STATES = [
     "manual-review",
     "reviewed",
     "accepted",
-    "finished",
+    "finalised",
     "withdrawn",
 ]
 
@@ -353,6 +353,8 @@ class Proposal(BaseModel):
     state = db.Column(db.String, nullable=False, default="new")
     type = db.Column(db.String, nullable=False)  # talk, workshop or installation
 
+    is_accepted = column_property(state.in_(["accepted", "finalised"]))
+
     # Core information
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
@@ -519,16 +521,16 @@ class Proposal(BaseModel):
             Venue.name,
         )
         accepted_proposals = (
-            proposals.filter(cls.state.in_(["accepted", "finished"]))
+            proposals.filter(cls.is_accepted)
             .outerjoin(cls.scheduled_venue)
             .join(cls.user)
             .add_columns(*accepted_columns)
         )
 
-        other_proposals = proposals.filter(~cls.state.in_(["accepted", "finished"]))
+        other_proposals = proposals.filter(~cls.is_accepted)
 
         user_favourites = (
-            cls.query.filter(cls.state.in_(["accepted", "finished"]))
+            cls.query.filter(cls.is_accepted)
             .join(cls.favourites)
             .with_entities(User.id.label("user_id"), cls.id)
             .order_by(User.id)
@@ -550,7 +552,7 @@ class Proposal(BaseModel):
             Venue.name.label("venue"),
         )
         accepted_public = (
-            cls.query.filter(cls.state.in_(["accepted", "finished"]))
+            cls.query.filter(cls.is_accepted)
             .outerjoin(cls.scheduled_venue)
             .with_entities(*public_columns)
         )

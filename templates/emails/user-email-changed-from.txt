@@ -1,0 +1,12 @@
+{% extends "emails/base.txt" %}
+{% block body %}
+Hi {{ user.name }},
+
+The email address on your account on our website for Electromagnetic Field {{ event_year }} has been changed from this email address to a different one.
+
+If you think this change was made in error, please let us know by replying to this email.
+
+Love,
+
+All the EMF team
+{% endblock %}

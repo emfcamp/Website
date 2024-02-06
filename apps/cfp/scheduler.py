@@ -22,7 +22,7 @@ class Scheduler(object):
     def set_rough_durations(self):
         proposals = (
             Proposal.query.filter_by(scheduled_duration=None, type="talk")
-            .filter(Proposal.state.in_(["accepted", "finished"]))
+            .filter(Proposal.is_accepted)
             .all()
         )
 
@@ -47,7 +47,7 @@ class Scheduler(object):
     ):
         proposals = (
             Proposal.query.filter(Proposal.scheduled_duration.isnot(None))
-            .filter(Proposal.state.in_(["finished", "accepted"]))
+            .filter(Proposal.is_accepted)
             .filter(Proposal.type.in_(type))
             .order_by(Proposal.favourite_count.desc())
             .all()

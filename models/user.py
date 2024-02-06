@@ -282,7 +282,7 @@ class User(BaseModel, UserMixin):
                     u.email
                     for u in User.query.join(
                         Proposal, Proposal.user_id == User.id
-                    ).filter(Proposal.state.in_(("accepted", "finished")))
+                    ).filter(Proposal.is_accepted)
                 ],
             },
         }
@@ -398,7 +398,7 @@ class User(BaseModel, UserMixin):
     @property
     def is_cfp_accepted(self):
         for proposal in self.proposals:
-            if proposal.state in {"accepted", "finished"}:
+            if proposal.is_accepted:
                 return True
         return False
 

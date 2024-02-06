@@ -6,6 +6,7 @@ import shutil
 import datetime
 from freezegun import freeze_time
 from sqlalchemy import text
+from models.site_state import SiteState
 from models.user import User
 from main import create_app, db as db_obj, Mail
 from apps.base.dev.tasks import create_bank_accounts
@@ -42,12 +43,10 @@ def app_factory(cache):
     if not os.path.exists(prometheus_dir):
         os.mkdir(prometheus_dir)
 
-    # For test purposes we're perpetually 2 weeks into ticket sales and 10 weeks before the event.
     # We don't support events which span the year-end, so generate a date next year.
     now = datetime.datetime.now()
     fake_event_start = datetime.datetime(year=now.year + 1, month=6, day=2, hour=8)
     config_override = {
-        "SALES_START": (fake_event_start - datetime.timedelta(weeks=12)).isoformat(),
         "EVENT_START": fake_event_start.isoformat(),
         "EVENT_END": (fake_event_start + datetime.timedelta(days=4)).isoformat(),
     }
@@ -78,6 +77,9 @@ def app_factory(cache):
         db_obj.create_all()
         create_bank_accounts()
         create_product_groups()
+
+        state = SiteState("site_state", "sales")
+        db_obj.session.add(state)
 
         yield app
 

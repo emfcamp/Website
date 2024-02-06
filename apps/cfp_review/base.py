@@ -879,7 +879,7 @@ def close_round():
     if form.validate_on_submit():
         if form.confirm.data:
             min_votes = session["min_votes"]
-            for (prop, vote_count) in proposals:
+            for prop, vote_count in proposals:
                 if vote_count >= min_votes and prop.state != "reviewed":
                     prop.set_state("reviewed")
 
@@ -906,7 +906,7 @@ def close_round():
     # Find proposals where the submitter has already had an accepted proposal
     # or another proposal in this list
     duplicates = {}
-    for (prop, _) in proposals:
+    for prop, _ in proposals:
         if prop.user.proposals.count() > 1:
             # Only add each proposal once
             if prop.user not in duplicates:
@@ -947,8 +947,7 @@ def rank():
         if form.confirm.data:
             min_score = session["min_score"]
             count = 0
-            for (prop, score) in scored_proposals:
-
+            for prop, score in scored_proposals:
                 if score >= min_score:
                     count += 1
                     prop.set_state("accepted")
@@ -985,9 +984,7 @@ def rank():
         elif form.cancel.data and "min_score" in session:
             del session["min_score"]
 
-    accepted_proposals = Proposal.query.filter(
-        Proposal.state.in_(["accepted", "finished"])
-    )
+    accepted_proposals = Proposal.query.filter(Proposal.is_accepted)
     accepted_counts = defaultdict(int)
     for proposal in accepted_proposals:
         accepted_counts[proposal.type] += 1
@@ -995,9 +992,7 @@ def rank():
     allocated_minutes = defaultdict(int)
     unknown_lengths = defaultdict(int)
 
-    accepted_proposals = Proposal.query.filter(
-        Proposal.state.in_(["accepted", "finished"])
-    ).all()
+    accepted_proposals = Proposal.query.filter(Proposal.is_accepted).all()
     for proposal in accepted_proposals:
         length = None
         if proposal.scheduled_duration:
@@ -1073,7 +1068,7 @@ def potential_schedule_changes():
 def scheduler():
     proposals = (
         Proposal.query.filter(Proposal.scheduled_duration.isnot(None))
-        .filter(Proposal.state.in_(["finished", "accepted"]))
+        .filter(Proposal.state.is_accepted)
         .filter(Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]))
         .all()
     )
@@ -1183,7 +1178,7 @@ def clashfinder():
 
     clashes = []
     offset = 0
-    for ((id1, id2), count) in popularity.most_common()[:1000]:
+    for (id1, id2), count in popularity.most_common()[:1000]:
         offset += 1
         prop1 = Proposal.query.get(id1)
         prop2 = Proposal.query.get(id2)
@@ -1245,6 +1240,15 @@ def proposals_summary():
         counts_by_type=counts_by_type,
         counts_by_state=counts_by_state,
     )
+
+
+@cfp_review.route("/confidentiality", methods=["GET", "POST"])
+def confidentiality_warning():
+    if request.method == "POST" and request.form.get("agree"):
+        session["cfp_confidentiality"] = True
+        return redirect(request.args.get("next", url_for(".proposals")))
+
+    return render_template("cfp_review/confidentiality_warning.html")
 
 
 from . import venues  # noqa
