@@ -28,7 +28,7 @@ class Installations(Resource):
     def get(self):
         result = []
         proposals = InstallationProposal.query.filter(
-            InstallationProposal.state.in_(["accepted", "finished"])
+            InstallationProposal.is_accepted
         ).all()
         for proposal in proposals:
             result.append(render_installation(proposal))

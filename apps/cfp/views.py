@@ -139,7 +139,7 @@ class LightningTalkProposalForm(ProposalForm):
 
     def set_session_choices(self, remaining_lightning_slots):
         self.session.choices = []
-        for (day_id, day_count) in remaining_lightning_slots.items():
+        for day_id, day_count in remaining_lightning_slots.items():
             if day_count <= 0:
                 continue
             self.session.choices.append(
@@ -533,7 +533,6 @@ def withdraw_proposal(proposal_id):
     form = WithdrawalForm()
     if form.validate_on_submit():
         if form.confirm_withdrawal.data:
-
             app.logger.info("Proposal %s is being withdrawn.", proposal_id)
             proposal.set_state("withdrawn")
 
@@ -653,7 +652,7 @@ def finalise_proposal(proposal_id):
     if proposal.user != current_user:
         abort(404)
 
-    if proposal.state not in ("accepted", "finished"):
+    if not proposal.is_accepted:
         return redirect(url_for(".edit_proposal", proposal_id=proposal_id))
 
     # This is horrendous, but is a lot cleaner than having shitloads of classes and fields
@@ -698,10 +697,10 @@ def finalise_proposal(proposal_id):
             proposal.published_participant_equipment = form.participant_equipment.data
 
         proposal.available_times = form.get_availability_json()
-        proposal.set_state("finished")
+        proposal.set_state("finalised")
 
         db.session.commit()
-        app.logger.info("Finished proposal %s", proposal_id)
+        app.logger.info("Finalised proposal %s", proposal_id)
         flash("Thank you for finalising your details!")
 
         return redirect(url_for(".edit_proposal", proposal_id=proposal_id))
@@ -710,7 +709,7 @@ def finalise_proposal(proposal_id):
         # Don't overwrite user submitted data
         pass
 
-    elif proposal.state == "finished":
+    elif proposal.state == "finalised":
         if proposal.published_names:
             form.name.data = proposal.published_names
         else:
