@@ -77,7 +77,7 @@ def fake_proposal(fake, reviewers):
         "anon-blocked": 0.05,
         "new": 0.05,
         "reviewed": 0.2,
-        "finished": 0.3,
+        "finalised": 0.3,
     }
 
     cfp.state = random_state(states)
@@ -100,7 +100,7 @@ def fake_proposal(fake, reviewers):
             if vote.state in ("voted", "stale", "resolved"):
                 vote.vote = random.randint(0, 2)
 
-    if cfp.state == "finished" and type(cfp) is TalkProposal:
+    if cfp.state == "finalised" and type(cfp) is TalkProposal:
         cfp.available_times = "fri_10_13,fri_13_16,fri_16_20,sat_10_13,sat_13_16,sat_16_20,sun_10_13,sun_13_16,sun_16_20"
 
     if type(cfp) in (WorkshopProposal, YouthWorkshopProposal):

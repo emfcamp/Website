@@ -46,14 +46,15 @@ class ProposalForm(Form):
     email = EmailField("Email")
     title = StringField("Title", [DataRequired()])
     description = TextAreaField("Description", [DataRequired()])
-    requirements = TextAreaField("Additional Info")
+    equipment_required = TextAreaField("Equipment required")
+    funding_required = TextAreaField("Costs")
+    additional_info = TextAreaField("Additional info")
     needs_help = BooleanField("Needs help")
     user_scheduled = BooleanField("User scheduled")
     notice_required = SelectField(
         "Required notice",
-        default="1 week",
+        default="1 month",
         choices=[
-            ("1 week", "1 week"),
             ("1 month", "1 month"),
             ("> 1 month", "Longer than 1 month"),
             ("> 3 months", "Longer than 3 months"),
@@ -117,7 +118,7 @@ class InstallationProposalForm(ProposalForm):
             ("huge", "Bigger than a lorry"),
         ],
     )
-    funds = SelectField(
+    installation_funding = SelectField(
         "Funding",
         choices=[
             ("0", "No money needed"),
@@ -138,7 +139,7 @@ class LightningTalkProposalForm(ProposalForm):
 
     def set_session_choices(self, remaining_lightning_slots):
         self.session.choices = []
-        for (day_id, day_count) in remaining_lightning_slots.items():
+        for day_id, day_count in remaining_lightning_slots.items():
             if day_count <= 0:
                 continue
             self.session.choices.append(
@@ -164,8 +165,10 @@ def get_cfp_type_form(cfp_type):
 
 
 @cfp.route("/cfp")
-@feature_flag("CFP")
 def main():
+    if not feature_enabled("CFP"):
+        return render_template("cfp/holding-page.html")
+
     ignore_closed = "closed" in request.args
 
     if feature_enabled("CFP_CLOSED") and not ignore_closed:
@@ -208,7 +211,7 @@ def form(cfp_type="talk"):
     if (
         cfp_type == "lightning"
         and not feature_enabled("LIGHTNING_TALKS")
-        and not current_user.has_permission("cfp_admin")
+        and (current_user.is_anonymous or not current_user.has_permission("cfp_admin"))
     ):
         flash("We're not currently accepting Lightning Talks.")
         return redirect(url_for(".main"))
@@ -283,7 +286,7 @@ def form(cfp_type="talk"):
         elif cfp_type == "installation":
             proposal = InstallationProposal()
             proposal.size = form.size.data
-            proposal.funds = form.funds.data
+            proposal.installation_funding = form.installation_funding.data
 
         elif cfp_type == "lightning":
             if remaining_lightning_slots[form.session.data] <= 0:
@@ -307,7 +310,9 @@ def form(cfp_type="talk"):
         proposal.user_id = current_user.id
 
         proposal.title = form.title.data
-        proposal.requirements = form.requirements.data
+        proposal.equipment_required = form.equipment_required.data
+        proposal.additional_info = form.additional_info.data
+        proposal.funding_required = form.funding_required.data
         proposal.description = form.description.data
         proposal.notice_required = form.notice_required.data
         proposal.needs_help = form.needs_help.data
@@ -438,7 +443,7 @@ def edit_proposal(proposal_id):
 
         elif proposal.type == "installation":
             proposal.size = form.size.data
-            proposal.funds = form.funds.data
+            proposal.installation_funding = form.installation_funding.data
 
         elif proposal.type == "lightning":
             proposal.slide_link = form.slide_link.data
@@ -446,7 +451,9 @@ def edit_proposal(proposal_id):
 
         proposal.title = form.title.data
         proposal.description = form.description.data
-        proposal.requirements = form.requirements.data
+        proposal.equipment_required = form.equipment_required.data
+        proposal.additional_info = form.additional_info.data
+        proposal.funding_required = form.funding_required.data
         proposal.notice_required = form.notice_required.data
         proposal.needs_help = form.needs_help.data
 
@@ -476,7 +483,7 @@ def edit_proposal(proposal_id):
 
         elif proposal.type == "installation":
             form.size.data = proposal.size
-            form.funds.data = proposal.funds
+            form.installation_funding.data = proposal.installation_funding
 
         elif proposal.type == "lightning":
             form.slide_link.data = proposal.slide_link
@@ -490,7 +497,9 @@ def edit_proposal(proposal_id):
 
         form.title.data = proposal.title
         form.description.data = proposal.description
-        form.requirements.data = proposal.requirements
+        form.equipment_required.data = proposal.equipment_required
+        form.additional_info.data = proposal.additional_info
+        form.funding_required.data = proposal.funding_required
         form.notice_required.data = proposal.notice_required
         form.needs_help.data = proposal.needs_help
 
@@ -524,7 +533,6 @@ def withdraw_proposal(proposal_id):
     form = WithdrawalForm()
     if form.validate_on_submit():
         if form.confirm_withdrawal.data:
-
             app.logger.info("Proposal %s is being withdrawn.", proposal_id)
             proposal.set_state("withdrawn")
 
@@ -558,7 +566,9 @@ class FinaliseForm(Form):
 
     may_record = BooleanField("I am happy for this to be recorded", default=True)
     needs_laptop = BooleanField("I will need to borrow a laptop for slides")
-    requirements = TextAreaField("Requirements")
+    equipment_required = TextAreaField("Equipment Required")
+    additional_info = TextAreaField("Additional Information")
+    funding_required = TextAreaField("Funding Required")
     arrival_period = SelectField(
         "Estimated arrival time",
         default="fri am",
@@ -642,7 +652,7 @@ def finalise_proposal(proposal_id):
     if proposal.user != current_user:
         abort(404)
 
-    if proposal.state not in ("accepted", "finished"):
+    if not proposal.is_accepted:
         return redirect(url_for(".edit_proposal", proposal_id=proposal_id))
 
     # This is horrendous, but is a lot cleaner than having shitloads of classes and fields
@@ -674,7 +684,9 @@ def finalise_proposal(proposal_id):
 
         proposal.may_record = form.may_record.data
         proposal.needs_laptop = form.needs_laptop.data
-        proposal.requirements = form.requirements.data
+        proposal.equipment_required = form.equipment_required.data
+        proposal.additional_info = form.additional_info.data
+        proposal.funding_required = form.funding_required.data
 
         proposal.arrival_period = form.arrival_period.data
         proposal.departure_period = form.departure_period.data
@@ -685,10 +697,10 @@ def finalise_proposal(proposal_id):
             proposal.published_participant_equipment = form.participant_equipment.data
 
         proposal.available_times = form.get_availability_json()
-        proposal.set_state("finished")
+        proposal.set_state("finalised")
 
         db.session.commit()
-        app.logger.info("Finished proposal %s", proposal_id)
+        app.logger.info("Finalised proposal %s", proposal_id)
         flash("Thank you for finalising your details!")
 
         return redirect(url_for(".edit_proposal", proposal_id=proposal_id))
@@ -697,7 +709,7 @@ def finalise_proposal(proposal_id):
         # Don't overwrite user submitted data
         pass
 
-    elif proposal.state == "finished":
+    elif proposal.state == "finalised":
         if proposal.published_names:
             form.name.data = proposal.published_names
         else:
@@ -714,7 +726,9 @@ def finalise_proposal(proposal_id):
 
         form.may_record.data = proposal.may_record
         form.needs_laptop.data = proposal.needs_laptop
-        form.requirements.data = proposal.requirements
+        form.equipment_required.data = proposal.equipment_required
+        form.additional_info.data = proposal.additional_info
+        form.funding_required.data = proposal.funding_required
 
         if proposal.type == "workshop" or proposal.type == "youthworkshop":
             form.age_range.data = proposal.published_age_range

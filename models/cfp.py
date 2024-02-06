@@ -52,8 +52,8 @@ CFP_STATES = {
     "anon-blocked": ["accepted", "rejected", "withdrawn", "reviewed", "edit"],
     "reviewed": ["accepted", "rejected", "withdrawn", "edit", "anonymised"],
     "manual-review": ["accepted", "rejected", "withdrawn", "edit"],
-    "accepted": ["accepted", "rejected", "withdrawn", "finished"],
-    "finished": ["rejected", "withdrawn", "finished"],
+    "accepted": ["accepted", "rejected", "withdrawn", "finalised"],
+    "finalised": ["rejected", "withdrawn", "finalised"],
     "withdrawn": ["accepted", "rejected", "withdrawn", "edit"],
 }
 
@@ -69,7 +69,7 @@ ORDERED_STATES = [
     "manual-review",
     "reviewed",
     "accepted",
-    "finished",
+    "finalised",
     "withdrawn",
 ]
 
@@ -363,10 +363,15 @@ class Proposal(BaseModel):
     state = db.Column(db.String, nullable=False, default="new")
     type = db.Column(db.String, nullable=False)  # talk, workshop or installation
 
+    is_accepted = column_property(state.in_(["accepted", "finalised"]))
+
     # Core information
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
-    requirements = db.Column(db.String)
+
+    equipment_required = db.Column(db.String)
+    funding_required = db.Column(db.String)
+    additional_info = db.Column(db.String)
     length = db.Column(db.String)  # only used for talks and workshops
     notice_required = db.Column(db.String)
     private_notes = db.Column(db.String)
@@ -459,8 +464,10 @@ class Proposal(BaseModel):
         edits_attrs = [
             "published_title",
             "published_description",
-            "requirements",
             "length",
+            "equipment_required",
+            "funding_required",
+            "additional_info",
             "notice_required",
             "needs_help",
             "needs_money",
@@ -478,7 +485,7 @@ class Proposal(BaseModel):
             "attendees",
             "cost",
             "size",
-            "funds",
+            "installation_funding",
             "age_range",
             "participant_equipment",
         ]
@@ -503,7 +510,7 @@ class Proposal(BaseModel):
         if cls.__name__ == "WorkshopProposal":
             proposals = proposals.add_columns(cls.attendees, cls.cost)
         elif cls.__name__ == "InstallationProposal":
-            proposals = proposals.add_columns(cls.size, cls.funds)
+            proposals = proposals.add_columns(cls.size, cls.installation_funding)
         elif cls.__name__ == "YouthWorkshopProposal":
             proposals = proposals.add_columns(
                 cls.attendees, cls.cost, cls.age_range, cls.participant_equipment
@@ -520,16 +527,16 @@ class Proposal(BaseModel):
             Venue.name,
         )
         accepted_proposals = (
-            proposals.filter(cls.state.in_(["accepted", "finished"]))
+            proposals.filter(cls.is_accepted)
             .outerjoin(cls.scheduled_venue)
             .join(cls.user)
             .add_columns(*accepted_columns)
         )
 
-        other_proposals = proposals.filter(~cls.state.in_(["accepted", "finished"]))
+        other_proposals = proposals.filter(~cls.is_accepted)
 
         user_favourites = (
-            cls.query.filter(cls.state.in_(["accepted", "finished"]))
+            cls.query.filter(cls.is_accepted)
             .join(cls.favourites)
             .with_entities(User.id.label("user_id"), cls.id)
             .order_by(User.id)
@@ -551,7 +558,7 @@ class Proposal(BaseModel):
             Venue.name.label("venue"),
         )
         accepted_public = (
-            cls.query.filter(cls.state.in_(["accepted", "finished"]))
+            cls.query.filter(cls.is_accepted)
             .outerjoin(cls.scheduled_venue)
             .with_entities(*public_columns)
         )
@@ -865,7 +872,7 @@ class InstallationProposal(Proposal):
     __mapper_args__ = {"polymorphic_identity": "installation"}
     human_type = HUMAN_CFP_TYPES["installation"]
     size = db.Column(db.String)
-    funds = db.Column(db.String, nullable=True)
+    installation_funding = db.Column(db.String, nullable=True)
 
 
 class LightningTalkProposal(Proposal):

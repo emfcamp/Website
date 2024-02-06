@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block body %}
+
+<div class="well">
+  <p>
+    The Call for Participation (CfP) is currently closed. It will normally open
+    around the same time tickets go on sale and close about a month before the
+    event.
+  </p>
+  <p>
+    We have several types of submission: talks, workshops, installations,
+    performances and youth content. Further information can be found in our
+    <a href="{{ url_for('.guidance') }}" target="_blank">guidance</a>.
+  </p>
+  <p>
+    Successful submissions will have a ticket reserved for them to buy.
+  </p>
+  <p>
+    If you have further questions please check the
+    <a href="{{ url_for('.guidance') }}" target="_blank">guidance</a> or
+    <a href="mailto:{{ config['CONTENT_EMAIL'][1] }}">email us</a>.
+  </p>
+</div>
+{% endblock %}

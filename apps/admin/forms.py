@@ -15,7 +15,7 @@ from wtforms import (
 )
 from wtforms.fields.html5 import DateField
 
-from models.product import ProductGroup
+from models.product import ProductGroup, PRODUCT_GROUP_TYPES
 from models.basket import Basket
 
 from ..common import CURRENCY_SYMBOLS
@@ -75,7 +75,7 @@ class ProductGroupReparentForm(Form):
 
 class ProductGroupForm(Form):
     name = StringField("Name")
-    type = StringField("Type")
+    type = SelectField("Type", choices=[(t.slug, t.name) for t in PRODUCT_GROUP_TYPES])
     capacity_max = IntegerField("Maximum to sell (Optional)", [Optional()])
     expires = DateField("Expiry Date (Optional)", [Optional()])
 

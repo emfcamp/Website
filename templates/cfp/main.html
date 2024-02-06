@@ -7,7 +7,7 @@
     <p class="emphasis"><a href="{{ url_for('base.about') }}">Electromagnetic
         Field</a> is a UK camping festival for those with an inquisitive mind
         or an interest in making things. It will be held from {{ fancy_dates }} at <a
-        href="https://wiki.emfcamp.org/wiki/Location">Eastnor
+        href="{{ url_for('base.page', page_name='travel') }}">Eastnor
         Castle Deer Park</a>, Ledbury.</p>
 
     <p>We're looking for talks, performances, and workshops for
@@ -25,9 +25,10 @@
       the ticket cost goes directly towards turning a field into an amazing place
       to spend a weekend, and all those who attend contribute to making the event a success.</p>
 
-    <p>As with all contributors to EMF, speakers do not receive any payment, although we have
-        some budget to subsidise travel within the UK for those who could not otherwise afford
-        it.</p>
+    <p>As with all contributors to EMF, speakers do not receive any payment, although
+       we have some budget to subsidise travel within the UK for those who could not
+       otherwise afford it. We also have some funds available for up-front costs for
+       workshops, for example, to develop kits for attendees.</p>
 
     <h3>Tickets</h3>
     <p>You will be guaranteed the opportunity to buy EMF tickets if your talk,
@@ -54,7 +55,7 @@
     <div class="list-group cfp-choose-type">
         {{ cfp_type_menu('talk', 'A presentation on a stage', 'CFP_TALKS_CLOSED', ignore_closed) }}
         {{ cfp_type_menu('workshop', 'A workshop in an area with tables &amp; other equipment', 'CFP_WORKSHOPS_CLOSED', ignore_closed) }}
-        {{ cfp_type_menu('youthworkshop', ' A workshop for attendees under 16', 'CFP_YOUTHWORKSHOPS_CLOSED', ignore_closed, pretty_title="Youth Workshop") }}
+        {{ cfp_type_menu('youthworkshop', ' A workshop for attendees aged 12 and under', 'CFP_YOUTHWORKSHOPS_CLOSED', ignore_closed, pretty_title="Youth Workshop") }}
         {{ cfp_type_menu('performance', ' A performance of music, art, dance, or film', 'CFP_PERFORMANCES_CLOSED', ignore_closed) }}
         {{ cfp_type_menu('installation', ' A creation for attendees to admire or interact with', 'CFP_INSTALLATIONS_CLOSED', ignore_closed) }}
 
@@ -71,7 +72,7 @@
       <p>If you've already submitted a proposal, you can
         view and edit it <a href="{{ url_for('.proposals') }}">here</a>.</p>
     {% else %}
-      <p>If you have already submitted a proposal
+      <p>If you have already submitted a proposal you will
         need to <a href="{{ url_for('users.login', next=url_for('.proposals') ) }}">login</a>
         in order to view or edit it.</p>
         {% endif %}

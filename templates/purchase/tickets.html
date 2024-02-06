@@ -1,20 +1,17 @@
 {% if not available %}
 <div class="well">
   <p class="emphasis">There are no tickets currently available. See
-  <a href="https://blog.emfcamp.org/2022/02/16/emf-2022-ticket-sale-dates-and-cfp/">our blog</a> for
+  <a href="https://blog.emfcamp.org/2024/01/21/emf-2024-ticket-sales/">our blog</a> for
   details on ticket sales.</p>
 
-  <p>Please follow us <a href="https://social.emfcamp.org/@emf">the Fediverse</a> or
+  <p>Please follow us on <a href="https://social.emfcamp.org/@emf">the Fediverse</a> or
   join our mailing list to be notified when more tickets are on sale:</p>
   {{contact_form("main")}}
 
-  <p>We can't reserve any tickets, but if we accept your
-  {% if config['CFP'] %}
-  <a href="{{url_for('cfp.main')}}">talk, workshop, or installation proposal</a>,
-  {% else %}
-  talk, workshop, or installation proposal,
+  {% if feature_enabled('CFP') %}
+  <p>If we accept your <a href="{{url_for('cfp.main')}}">talk, workshop, or installation proposal</a>,
+  you will be guaranteed the chance to buy two tickets to EMF.</p>
   {% endif %}
-  you will be guaranteed <strong>two</strong> tickets to EMF.</p>
 </div>
 {% endif %}
 
@@ -46,6 +43,7 @@
 
 <p>
   By buying a ticket you are agreeing to our <a href="{{url_for('payments.terms')}}">Terms
-  and Conditions</a> and the <a href="{{url_for('base.code_of_conduct')}}">Code of Conduct</a>.
+  and Conditions</a> and the EMF <a href="{{url_for('base.code_of_conduct')}}">Code of Conduct</a>.
+  Please see our <a href="{{url_for('base.page', page_name='health')}}">health page</a> for information about COVID-19.
 </p>
 
