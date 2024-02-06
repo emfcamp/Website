@@ -1,7 +1,7 @@
 title: Villages
 ---
 # Villages
-A village is a group of friends, like minded people, colleagues or even families. Maybe your village is a collection of sub villages, or maybe it’s just your hackerspace. We also see villages based around themes, shared passions and existing communities - great places in the past have been the Maths village, the HAB Village and groups like Milliways and the Scottish Consulate.
+A village is a group of friends, like-minded people, colleagues or even families camping together at EMF. Maybe your village is a collection of sub villages, or maybe it’s just your hackerspace. A village can be based around themes, shared passions and existing communities - great places in the past have been the Maths village, the HAB Village and groups like Milliways and the Scottish Consulate.
 
 If there is a village based around something you are interested in, then you should definitely visit that village during the event to see what's going on. Or you could even join that village to help make more things go on. If there's not a village based around your interests, then you can start your own village and others will probably join you.
 
@@ -11,7 +11,6 @@ If you're planning to bring something especially big or in need of lots of power
 
 ## Register a Village
 By [registering your village at emfcamp.org/villages/register](/villages/register), you'll be making the Village People aware of the fact you plan to arrive, and how much space you're likely to need, and you'll allow us to get in touch to discuss how we can support your plans and activities at the event.
-
 
 ## What can we do as a village?
 Villages are great as you can share ideas, equipment and space! The sharing doesn’t stop there - it lets you share resources too. You can come up with a cooking and cleaning rota as a group to reduce waste, make the camp cheaper and interrupt your day with a change of activity. Some people spend all their time cooking for others!
@@ -29,7 +28,7 @@ Some of our favourite village activities from previous years include:
 * Drop-in board game sessions
 
 ## Workshop villages
-A selection of villages will be workshop villages, and will run and host workshops that any attendee can propose via the CfP alongside content organised by members of the village. Of cource, if you are not a workshop village, you are still very welcome to run stuff in your village. Content run by villages at past EMFs has included:
+A selection of villages will be workshop villages, and will run and host workshops that any attendee can propose via the CfP alongside content organised by members of the village. Of course, if you are not a workshop village, you are still very welcome to run stuff in your village. Content run by villages at past EMFs has included:
 
 * Technical presentations or lectures
 * Skill shares
@@ -41,13 +40,12 @@ A selection of villages will be workshop villages, and will run and host worksho
 If you have any questions about workshop villages or hosting content, you can [email the Village People](mailto:villages@emfcamp.org).
 
 ## The Village People
-The Village People are available to support making things happen in your village. If you have a cool idea, but need help with planning or logistics of doing things on site, please contact us beforehand. The earlier you let us know your plans, the better we can help you. You can contacy us by [emailing villages@emfcamp.org](mailto:villages@emfcamp.org) and we will be very happy to discuss anything you might come up with!
+The Village People are available to support making things happen in your village. If you have a cool idea, but need help with planning or logistics of doing things on site, please contact us beforehand. The earlier you let us know your plans, the better we can help you. You can contact us by [emailing villages@emfcamp.org](mailto:villages@emfcamp.org) and we will be very happy to discuss anything you might come up with!
 
 ## Village Furniture
-To make things easier for villages, we will offer the opportunity to book a marquee and furniture through us, which will be set up and ready for when you arrive on site. Details of how to book these will
-be announced nearer to the event.
+To make things easier for villages, we will offer the opportunity to book a marquee and furniture through us, which will be set up and ready for when you arrive on site. Details of how to book these will be announced nearer to the event.
 
-EMF are happy for you to bring your own tents and furniture for being social in and cooking in. We ask that you remove all tents and furniture that you’ve brought at the end of the event - it’s not fair on our volunteers to have to tidy them up, and it’s also bad for the environment.
+We're happy for you to bring your own tents and furniture for being social in and cooking in. We ask that you remove everything you’ve brought at the end of the event - it’s not fair on our volunteers to have to tidy them up, and it’s also bad for the environment.
 
 ## Planning Your Village
 When planning your village and setting up your tents once you arrive, you will probably want to set up a space to act as your 'village square' where you can get together, show off your toys, and run any workshops or other events you're planning. With the unreliability of British weather, we recommend that this area is covered - it can get really sunny and really wet at our site. We’d rather neither you were sunburned nor your laptop flooded. The village team would really appreciate it if you planned this ahead of the event and could tell us the area of your planned square, so we can lay out the site and get you the best location possible!
