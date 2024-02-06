@@ -116,7 +116,7 @@
                     </div>
                 </div>
             </div>
-            {% if proposal.state in ('accepted', 'finished') %}
+            {% if proposal.is_accepted %}
                 <div class="panel panel-default">
                     <div class="panel-heading" role="tab" id="publishedPanelHeading">
                         <h4 class="panel-title">

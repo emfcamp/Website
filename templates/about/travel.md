@@ -11,26 +11,25 @@ EMF is close to Ledbury station which is around [three hours direct](https://tra
 
 We will be providing a free shuttle bus service between Ledbury station and the EMF site approximately every half hour. The bus will leave from the bus stop on the road just outside the station.
 
-
 ## By Car
-If you plan to drive, you will need to buy a parking ticket or live-in vehicle ticket. Motorcycles do not require a parking ticket. No vehicles other than camper vans are permitted to be parked on site. If your vehicle is an integral part of a village or installation please contact us in advance for permission.
+If you plan to drive, you will need to [buy a parking ticket or live-in vehicle ticket](/tickets/other). Motorcycles do not require a parking ticket. 
 
-Plan your travel to the south gate (adjacent to A438) - postcode **HR8 1RQ** should get you there. The entrance to the site is 52°01'56"N 2°23'01"W / OS Grid SO 738 372.
+Plan your travel to the south gate on the A438 - postcode **HR8 1RQ** should get you there. The entrance to the site is located at [52.0322, -2.3837](geo:52.03222,-2.3837), grid reference SO 73774 37158.
 
 Once you're near the site, you'll see yellow temporary road signs for EMF - follow these and ignore your sat nav if it tells you differently.
 
-We encourage attendees to carpool where possible. <!-- There's a [lift sharing](https://wiki.emfcamp.org/wiki/Location/Lift_sharing) page on the wiki to find other people on the same route. -->
+Unless you are travelling in a live-in vehicle, you will be parked in the main car park which is adjacent to the event site, at most a 300m walk from the main gate. [More information for live-in vehicles](/about/live-in-vehicles).
+
+ <!-- We encourage attendees to carpool where possible. There's a [lift sharing](https://wiki.emfcamp.org/wiki/Location/Lift_sharing) page on the wiki to find other people on the same route. -->
 
 ### Electric Vehicles
-We do not plan to provide generally-available electric vehicle charging at EMF. We ask that you arrive at the event with enough charge to leave at the end of the event.
+We do not provide electric vehicle charging at EMF. We ask that you arrive at the event with enough charge to leave at the end of the event. We will be able to provide EV charging in an emergency.
 
-We will be able to provide EV charging in an emergency.
+## By Bike
 
-There are a few AC 7kW Type 2 charge points in Ledbury, and there are multiple rapid chargers from different suppliers in Gloucester, Cheltenham and Worcester nearby. UK EV charging infrastructure is not the most reliable so it's a good idea to plan to charge in an area where there are multiple possibilities from multiple suppliers - using [Zap Map](https://www.zap-map.com/live/), [A Better Route Planner](https://abetterrouteplanner.com/) etc can help with this.
+While we do not have any dedicated bike parking, EMF is an extremely safe event and you are welcome to lock your bike to our perimeter fence or other structures as long as it's out of the way.
 
-It's also worth checking if you need to have an app, account or specific physical card for the charge points you plan to use, most you can now pay with at the point with a contactless card but it's worth double checking.
-
-### By Air
+## By Air
 The closest major airport is [Birmingham (BHX)](https://en.wikipedia.org/wiki/Birmingham_Airport), which is around 1:40 by train to Ledbury station; or an hour by road. [Bristol (BRS)](https://en.wikipedia.org/wiki/Bristol_Airport) and [Cardiff (CWL)](https://en.wikipedia.org/wiki/Cardiff_Airport) are around 1:40 by road, but poorly connected by public transport.
 
-For those travelling long-haul, BHX is likely to be be most useful followed by LHR.
+For those travelling long-haul, BHX is likely to be most useful followed by LHR.

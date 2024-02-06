@@ -1,0 +1,29 @@
+{% extends "cfp_review/base.html" %}
+{% block title%}CfP Admin{% endblock %}
+{% block body %}
+<h2>CfP Confidentiality</h2>
+
+<p>
+    You're about to view proposals in the EMF Call for Participation.
+</p>
+
+<p>
+    Please be aware that all proposals are confidential until the schedule is released.
+    Proposals which are not accepted will remain confidential indefinitely.
+</p>
+
+<p>
+    Don't share any information from the CfP with anyone else, including other members
+    of the EMF team who aren't involved in the CfP process.
+</p>
+
+<p>
+    If you have any questions, please ask the content team.
+</p>
+
+<form method="post">
+    <button name="agree" value="1" class="btn btn-primary" type="submit">I agree to keep proposals confidential</button>
+    <input type="hidden" name="next" value="{{ next }}">
+</form>
+
+{% endblock %}

@@ -119,7 +119,7 @@ def attendee_content():
         or_(
             Proposal.user_scheduled is True, Proposal.scheduled_venue_id.in_(venue_ids)
         ),
-        Proposal.state.in_(["accepted", "finished"]),
+        Proposal.is_accepted,
     ).all()
 
     form = ContentForm()
@@ -129,7 +129,7 @@ def attendee_content():
         proposal = PYTHON_CFP_TYPES[form.type.data]()
         proposal.user_id = current_user.id
         proposal.user_scheduled = True
-        proposal.state = "finished"
+        proposal.state = "finalised"
         populate(proposal, form)
 
         conflicts = proposal.get_conflicting_content()

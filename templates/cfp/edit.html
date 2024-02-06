@@ -27,7 +27,7 @@
   {% include "cfp/edit-form.html" %}
 {% else %}
   <div class="well"><div class="row">
-    {% if feature_enabled('CFP_FINALISE') and proposal.state in ['accepted', 'finished']  %}
+    {% if feature_enabled('CFP_FINALISE') and proposal.is_accepted %}
       <div class="col-md-12">
         Your {{ proposal.human_type }} has been accepted! If you haven't already, please
         <a href="{{ url_for('.finalise_proposal', proposal_id=proposal.id ) }}">finalise your details</a>.
@@ -42,7 +42,7 @@
     <div class="col-md-6">
       <legend>About your {{proposal.human_type}}</legend>
       <dl class="dl-vertical">
-        {% if feature_enabled('CFP_FINALISE') and proposal.state in ['finished']  %}
+        {% if feature_enabled('CFP_FINALISE') and proposal.state == 'finalised'  %}
         <dt>Names</dt><dd>{{proposal.published_names}}</dd>
         <dt>Pronouns</dt><dd>{{proposal.published_pronouns}}</dd>
         <dt>Title</dt><dd>{{proposal.published_title}}</dd>
