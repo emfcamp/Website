@@ -442,7 +442,7 @@ def update_proposal(proposal_id):
         form.slide_link.data = prop.slide_link
 
     return render_template(
-        "cfp_review/update_proposal.html", proposal=prop, form=form, next_id=next_id
+        "cfp_review/proposal.html", proposal=prop, form=form, next_id=next_id
     )
 
 
