@@ -6,10 +6,10 @@ from models.cfp import (
     Proposal,
     CFPMessage,
     CFPVote,
+    Venue,
     CFP_STATES,
     ORDERED_STATES,
     HUMAN_CFP_TYPES,
-    DEFAULT_VENUES,
 )
 from ..common import require_permission
 
@@ -127,7 +127,7 @@ def cfp_review_variables():
         "proposal_counts": proposal_counts,
         "unread_reviewer_notes": unread_reviewer_notes,
         "view_name": request.url_rule.endpoint.replace("cfp_review.", "."),
-        "emf_venues": sum(DEFAULT_VENUES.values(), []),
+        "emf_venues": [v.name for v in Venue.emf_venues()],
     }
 
 

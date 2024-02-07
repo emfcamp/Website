@@ -6,6 +6,8 @@ import re
 from itertools import groupby
 from geoalchemy2 import Geometry
 from geoalchemy2.shape import to_shape
+from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.ext.mutable import MutableList
 
 from sqlalchemy import UniqueConstraint, func, select
 from sqlalchemy.orm import column_property
@@ -220,29 +222,6 @@ EVENT_SPACING = {
 
 cfp_period = namedtuple("cfp_period", "start end")
 
-# We may also have other venues in the DB, but these are the ones to be
-# returned by default if there are none
-DEFAULT_VENUES: dict[str, list[str]] = {
-    "talk": ["Stage A", "Stage B", "Stage C"],
-    "workshop": ["Workshop 1", "Workshop 2", "Workshop 3", "Workshop 4", "Workshop 5"],
-    "youthworkshop": ["Youth Workshop"],
-    "performance": ["Stage B"],
-    "installation": [],
-    "lightning": ["Stage B", "Stage C"],
-}
-
-VENUE_CAPACITY = {
-    "Stage A": 1000,
-    "Stage B": 600,
-    "Stage C": 450,
-    "Workshop 1": 30,
-    "Workshop 2": 30,
-    "Workshop 3": 30,
-    "Workshop 4": 30,
-    "Workshop 5": 30,
-    "Youth Workshop": 30,
-}
-
 # List of submission types which are manually reviewed rather than through
 # the anonymous review system.
 MANUAL_REVIEW_TYPES = ["youthworkshop", "performance", "installation"]
@@ -320,6 +299,7 @@ def make_periods_contiguous(time_periods):
 
 def get_available_proposal_minutes():
     minutes = defaultdict(int)
+    venue_names_by_type = Venue.emf_venue_names_by_type()
     for type, slots in PROPOSAL_TIMESLOTS.items():
         periods = make_periods_contiguous(
             [timeslot_to_period(ts, type=type) for ts in slots]
@@ -327,7 +307,7 @@ def get_available_proposal_minutes():
         for period in periods:
             minutes[type] += int(
                 (period.end - period.start).total_seconds() / 60
-            ) * len(DEFAULT_VENUES[type])
+            ) * len(venue_names_by_type[type])
     return minutes
 
 
@@ -346,6 +326,16 @@ FavouriteProposal = db.Table(
     db.Column(
         "proposal_id", db.Integer, db.ForeignKey("proposal.id"), primary_key=True
     ),
+)
+
+
+ProposalAllowedVenues = db.Table(
+    "proposal_allowed_venues",
+    BaseModel.metadata,
+    db.Column(
+        "proposal_id", db.Integer, db.ForeignKey("proposal.id"), primary_key=True
+    ),
+    db.Column("venue_id", db.Integer, db.ForeignKey("venue.id"), primary_key=True),
 )
 
 
@@ -422,7 +412,11 @@ class Proposal(BaseModel):
 
     # Fields for scheduling
     hide_from_schedule = db.Column(db.Boolean, default=False, nullable=False)
-    allowed_venues = db.Column(db.String, nullable=True)
+    allowed_venues = db.relationship(
+        "Venue",
+        secondary=ProposalAllowedVenues,
+        backref="allowed_proposals",
+    )
     allowed_times = db.Column(db.String, nullable=True)
     scheduled_duration = db.Column(db.Integer, nullable=True)
     scheduled_time: datetime = db.Column(db.DateTime, nullable=True)
@@ -644,26 +638,12 @@ class Proposal(BaseModel):
         return admission_tickets > 0 or self.user.will_have_ticket
 
     def get_allowed_venues(self) -> list["Venue"]:
-        # FIXME: this should reference a foreign key instead
         if self.user_scheduled:
-            venue_names = [self.scheduled_venue.name]
+            return [self.scheduled_venue]
         elif self.allowed_venues:
-            venue_names = [v.strip() for v in self.allowed_venues.split(",")]
+            return self.allowed_venues
         else:
-            venue_names = DEFAULT_VENUES[self.type]
-
-        if not venue_names:
-            return []
-
-        found = Venue.query.filter(Venue.name.in_(venue_names)).all()
-        # If we didn't actually find all the venues we're using, bail hard
-        if len(found) != len(venue_names):
-            raise InvalidVenueException("Invalid Venue in allowed_venues!")
-
-        return found
-
-    def get_allowed_venues_serialised(self):
-        return ",".join([v.name for v in self.get_allowed_venues()])
+            return Venue.query.filter(Venue.default_for_types.any(self.type)).all()
 
     def fix_hard_time_limits(self, time_periods):
         # This should be fixed by the string periods being burned and replaced
@@ -1057,8 +1037,10 @@ class Venue(BaseModel):
         db.Integer, db.ForeignKey("village.id"), nullable=True, default=None
     )
     name = db.Column(db.String, nullable=False)
-    type = db.Column(db.String, nullable=True)
+    allowed_types = db.Column(MutableList.as_mutable(ARRAY(db.String)))
+    default_for_types = db.Column(MutableList.as_mutable(ARRAY(db.String)))
     priority = db.Column(db.Integer, nullable=True, default=0)
+    capacity = db.Column(db.Integer, nullable=True)
     location = db.Column(Geometry("POINT", srid=4326))
     scheduled_content_only = db.Column(db.Boolean)
     village = db.relationship(
@@ -1090,6 +1072,26 @@ class Venue(BaseModel):
             "geometry": location.__geo_interface__,
         }
 
+    @property
+    def is_emf_venue(self):
+        return bool(self.allowed_types)
+
+    @classmethod
+    def emf_venues(cls):
+        return cls.query.filter(db.func.array_length(cls.allowed_types, 1) > 0).all()
+
+    @classmethod
+    def emf_venue_names_by_type(cls):
+        unnest = db.func.unnest(cls.allowed_types).table_valued()
+        return {
+            type: venue_names
+            for venue_names, type in db.engine.execute(
+                db.select([db.func.array_agg(cls.name), unnest.column])
+                .join(unnest, db.true())
+                .group_by(unnest.column)
+            )
+        }
+
     @classmethod
     def get_by_name(cls, name):
         return cls.query.filter_by(name=name).one()
@@ -1114,8 +1116,6 @@ __all__ = [
     "REMAP_SLOT_PERIODS",
     "EVENT_SPACING",
     "cfp_period",
-    "DEFAULT_VENUES",
-    "VENUE_CAPACITY",
     "proposal_slug",
     "timeslot_to_period",
     "make_periods_contiguous",
