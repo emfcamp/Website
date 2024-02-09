@@ -11,7 +11,7 @@ import re
 from collections import defaultdict
 from typing import Optional
 
-from sqlalchemy import func, Index, text
+from sqlalchemy import func, Index, text, Table
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.exc import NoResultFound
 from flask import current_app as app, session
@@ -178,6 +178,14 @@ def verify_checkin_code(key, uid):
     return verify_unlimited_short_hmac("checkin-", key, uid)
 
 
+CFPReviewerTags: Table = db.Table(
+    "cfp_reviewer_tags",
+    BaseModel.metadata,
+    db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
+    db.Column("tag_id", db.Integer, db.ForeignKey("tag.id"), primary_key=True),
+)
+
+
 class User(BaseModel, UserMixin):
     __tablename__ = "user"
     __versioned__ = {"exclude": ["favourites", "calendar_favourites"]}
@@ -194,6 +202,13 @@ class User(BaseModel, UserMixin):
     promo_opt_in = db.Column(db.Boolean, nullable=False, default=False)
 
     cfp_invite_reason = db.Column(db.String, nullable=True)
+
+    cfp_reviewer_tags = db.relationship(
+        "Tag",
+        backref="reviewers",
+        cascade="all",
+        secondary=CFPReviewerTags,
+    )
 
     diversity = db.relationship(
         "UserDiversity", uselist=False, backref="user", cascade="all, delete-orphan"
