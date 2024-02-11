@@ -18,7 +18,8 @@ from models.user import generate_api_token
 from models.admin_message import AdminMessage
 
 from ..common import feature_flag, feature_enabled
-from ..common.forms import Form, HiddenIntegerField
+from ..common.forms import Form
+from ..common.fields import HiddenIntegerField
 from ..volunteer import v_user_required
 from ..cfp_review import admin_required as cfp_admin_required
 

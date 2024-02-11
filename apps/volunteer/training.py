@@ -11,7 +11,8 @@ from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer
 
 from . import v_admin_required, volunteer
-from ..common.forms import Form, HiddenIntegerField
+from ..common.forms import Form
+from ..common.fields import HiddenIntegerField
 
 
 class VolunteerSelectForm(Form):

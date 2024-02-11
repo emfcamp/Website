@@ -14,7 +14,8 @@ from wtforms import (
 from models.user import User
 from models.payment import BankPayment, StripePayment
 
-from ..common.forms import IntegerSelectField, HiddenIntegerField, Form, EmailField
+from ..common.forms import Form
+from ..common.fields import IntegerSelectField, HiddenIntegerField, EmailField
 from ..common import CURRENCY_SYMBOLS
 
 
