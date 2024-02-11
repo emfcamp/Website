@@ -7,7 +7,6 @@ DEFAULT_TAGS = [
     "accessibility",
     "alternative",
     "arts",
-    "blockchain (no)",
     "coding",
     "comedy",
     "crafts",
