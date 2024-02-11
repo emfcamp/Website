@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    EMF Volunteer Info.
+  {{ title }}
 {% endblock %}
 
 {% block secondary_nav %}
@@ -10,49 +10,5 @@
 
 {% block body %}
   {% include "volunteer/_nav.html" %}
-    <h2>Welcome</h2>
-    <p>Thank you for volunteering! EMF is an entirely volunteer run
-    event, and without people like you giving their time we wouldn’t
-    be able to make it happen.</p>
-
-    <h2>The Golden Rules</h2>
-    <p><strong>Don’t overcommit yourself.</strong></p>
-    
-    <p><strong>Tell us if you can’t get something done.</strong></p>
-
-    <p>Nobody will criticise you if you can't do something, and telling us
-    quickly means we can handle the situation.</p>
-
-    <h2>Queries</h2>
-
-    <p>If you have any queries about volunteering (or issues during a
-    shift) you can get in touch with the volunteer desk by
-    emailing <a href="mailto:volunteer@emfcamp.org">volunteer@emfcamp.org</a>,
-    calling 1038 on the internal EMF phone system, or stopping by the
-    desk in the <a href="https://map.emfcamp.org/#21.46/52.0416706/-2.3770618">
-    Info tent</a>. </p>
-
-  
-    <h2>Important numbers</h2>
-    <p>From external phones:</p>  
-    <dl class="dl-horizontal">
-      <dt>EMERGENCY <br />First Aid</dt><dd>01908 870909</dd>
-      <dt>First aid Tent</dt><dd>01908 870908</dd>
-      <dt>Site manager</dt><dd>01908 870904</dd>
-      <dt>Conduct</dt><dd>01908 870912</dd>
-    </dl>
-    <p>Internal to EMF phone system: </p>
-    <dl class="dl-horizontal">
-      <dt>Infodesk <br />(switchboard)</dt><dd>1001</dd>
-      <dt>Logistics</dt><dd>1002</dd>
-      <dt>Site Manager</dt><dd>1004</dd>
-      <dt>Creche</dt><dd>1005</dd>
-      <dt>First Aid Tent</dt><dd>1008</dd>
-      <dt>EMERGENCY <br />First Aid</dt><dd>1009</dd>
-      <dt>HQ</dt><dd>1011</dd>
-      <dt>Conduct</dt><dd>1012</dd>
-      <dt>Volunteer desk</dt><dd>1038</dd>
-    </dl>
-    
-    <p><a href="{{ url_for('base.page', page_name='volunteering') }}">About volunteering (orga-side)</a></p>
+  {{ content }}
 {% endblock body %}
