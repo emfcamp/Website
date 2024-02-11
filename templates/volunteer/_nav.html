@@ -8,8 +8,8 @@
     <a href="{{url}}">{{text}}</a>
 </li>
 {% endmacro %}
-<ul class="nav nav-pills">
-    {% if current_user.is_authenticated %}
+{% if current_user.is_authenticated %}
+    <ul class="nav nav-pills">
         {{ menuitem('Account', '.account') }}
         {{ menuitem('Roles', '.choose_role') }}
         {% if feature_enabled('VOLUNTEERS_SCHEDULE') %}
@@ -21,8 +21,5 @@
             {{ menuitem('Admin', 'volunteer_admin.index') }}
         {% endif %}
         {{ menuitem("Log Out", "users.logout") }}
-    {% else %}
-        {{ menuitem('Sign up', '.sign_up') }}
-        {{ urlmenuitem('Log in', url_for('users.login', next=url_for('.main'))) }}
-    {% endif %}
-</ul>
+    </ul>
+{% endif %}
