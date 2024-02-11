@@ -44,6 +44,11 @@
         {{ render_field(form.age, True, placeholder="Optional") }}
         {{ render_field(form.gender, True, placeholder="Optional") }}
         {{ render_field(form.ethnicity, True, placeholder="Optional") }}
+        {% if current_user.has_permission("cfp_reviewer") %}
+          {{ render_field(form.cfp_tag_0, True, placeholder="Optional") }}
+          {{ render_field(form.cfp_tag_1, True, placeholder="Optional") }}
+          {{ render_field(form.cfp_tag_2, True, placeholder="Optional") }}
+        {% endif %}
         {{ form.forward(class_="btn btn-default pull-right", style="margin-bottom: 15px;") }}
       </div>
     </fieldset>

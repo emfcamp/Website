@@ -8,19 +8,16 @@ from models.user import UserDiversity
 from models.purchase import Purchase
 from models.payment import Payment
 from models.site_state import get_site_state
+from models.cfp_tag import Tag
 
-from ..common.forms import Form
+from ..common.forms import DiversityForm
 
 from . import users
 
 
-class AccountForm(Form):
+class AccountForm(DiversityForm):
     name = StringField("Name", [DataRequired()])
     allow_promo = BooleanField("Send me occasional emails about future EMF events")
-
-    age = StringField("Age")
-    gender = StringField("Gender")
-    ethnicity = StringField("Ethnicity")
 
     forward = SubmitField("Update")
 
@@ -57,6 +54,13 @@ def details():
         current_user.diversity.gender = form.gender.data
         current_user.diversity.ethnicity = form.ethnicity.data
 
+        if current_user.has_permission("cfp_reviewer"):
+            current_user.cfp_reviewer_tags = [
+                Tag.get_by_value(form.cfp_tag_0.data),
+                Tag.get_by_value(form.cfp_tag_1.data),
+                Tag.get_by_value(form.cfp_tag_2.data),
+            ]
+
         app.logger.info("%s updated user information", current_user.name)
         db.session.commit()
 
@@ -72,6 +76,11 @@ def details():
             form.age.data = current_user.diversity.age
             form.gender.data = current_user.diversity.gender
             form.ethnicity.data = current_user.diversity.ethnicity
+
+        if current_user.cfp_reviewer_tags:
+            form.cfp_tag_0.data = current_user.cfp_reviewer_tags[0].tag
+            form.cfp_tag_1.data = current_user.cfp_reviewer_tags[1].tag
+            form.cfp_tag_2.data = current_user.cfp_reviewer_tags[2].tag
 
     return render_template("account/details.html", form=form)
 
