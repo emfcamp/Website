@@ -10,7 +10,8 @@ from main import db
 
 from wtforms import SubmitField, RadioField, FormField, FieldList
 from wtforms.validators import InputRequired, ValidationError
-from ..common.forms import Form, HiddenIntegerField
+from ..common.forms import Form
+from ..common.fields import HiddenIntegerField
 
 from models.volunteer.role import Role
 from models.volunteer.volunteer import Volunteer

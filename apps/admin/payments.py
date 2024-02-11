@@ -31,7 +31,8 @@ from models.payment import (
 )
 from models.purchase import AdmissionTicket, Purchase
 from ..common.email import from_email
-from ..common.forms import Form, HiddenIntegerField
+from ..common.forms import Form
+from ..common.fields import HiddenIntegerField
 from ..payments.stripe import (
     StripeUpdateUnexpected,
     StripeUpdateConflict,

@@ -35,7 +35,8 @@ from models.cfp import (
 )
 from ..common import feature_flag, feature_enabled, create_current_user
 from ..common.email import from_email
-from ..common.forms import Form, TelField, EmailField
+from ..common.forms import Form
+from ..common.fields import TelField, EmailField
 from ..common.irc import irc_send
 
 from . import cfp

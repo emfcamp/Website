@@ -15,7 +15,8 @@ from wtforms.validators import DataRequired, Optional, NumberRange, ValidationEr
 
 from models.cfp import HUMAN_CFP_TYPES, Venue, ORDERED_STATES
 from models.cfp_tag import Tag
-from ..common.forms import Form, HiddenIntegerField, EmailField
+from ..common.forms import Form
+from ..common.fields import HiddenIntegerField, EmailField
 from ..admin.users import NewUserForm
 
 from dateutil.parser import parse as parse_date
