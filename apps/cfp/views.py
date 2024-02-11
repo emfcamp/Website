@@ -33,9 +33,10 @@ from models.cfp import (
     LIGHTNING_TALK_SESSIONS,
     HUMAN_CFP_TYPES,
 )
+from models.cfp_tag import Tag
 from ..common import feature_flag, feature_enabled, create_current_user
 from ..common.email import from_email
-from ..common.forms import Form
+from ..common.forms import Form, DiversityForm
 from ..common.fields import TelField, EmailField
 from ..common.irc import irc_send
 
@@ -362,12 +363,6 @@ def form(cfp_type="talk"):
     )
 
 
-class DiversityForm(Form):
-    age = StringField("Age")
-    gender = StringField("Gender")
-    ethnicity = StringField("Ethnicity")
-
-
 @cfp.route("/cfp/complete", methods=["GET", "POST"])
 @feature_flag("CFP")
 def complete():
@@ -382,8 +377,20 @@ def complete():
         current_user.diversity.gender = form.gender.data
         current_user.diversity.ethnicity = form.ethnicity.data
 
+        if current_user.has_permission("cfp_reviewer"):
+            current_user.cfp_reviewer_tags = [
+                Tag.get_by_value(form.cfp_tag_0.data),
+                Tag.get_by_value(form.cfp_tag_1.data),
+                Tag.get_by_value(form.cfp_tag_2.data),
+            ]
+
         db.session.commit()
         return redirect(url_for(".proposals"))
+
+    if current_user.cfp_reviewer_tags:
+        form.cfp_tag_0.data = current_user.cfp_reviewer_tags[0].tag
+        form.cfp_tag_1.data = current_user.cfp_reviewer_tags[1].tag
+        form.cfp_tag_2.data = current_user.cfp_reviewer_tags[2].tag
 
     return render_template("cfp/complete.html", form=form)
 
