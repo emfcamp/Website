@@ -28,6 +28,14 @@ def load_webhook_fixture(name):
         return stripe.Event.construct_from(json.load(f), None)
 
 
+@pytest.fixture(scope="module")
+def vcr_config():
+    return {
+        # Replace the Authorization request header with "DUMMY" in cassettes
+        "filter_headers": [("authorization", "DUMMY")],
+    }
+
+
 # This test uses VCR to automatically store Stripe responses as test fixtures.
 # It also uses some webhook fixtures which we manually supply.
 #
@@ -46,7 +54,7 @@ def test_create_stripe_purchase(user, app, monkeypatch):
     db.session.commit()
 
     # This matches the intent ID in stored fixtures
-    intent_id = "pi_1GUslpIcI91cWsdeheAuRsyg"
+    intent_id = "pi_3OiHFbHz0MWR65Xj0KidZr5i"
 
     with app.test_request_context("/tickets/pay"):
         login_user(user)
