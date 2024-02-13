@@ -90,6 +90,7 @@ def transaction_suggest_payments(txn_id):
 
     payments = (
         BankPayment.query.filter_by(state="inprogress")
+        .filter(BankPayment.created < txn.posted)
         .order_by(BankPayment.bankref)
         .all()
     )
