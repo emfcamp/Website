@@ -80,4 +80,4 @@ def contact():
 
 @base.route("/about/covid")
 def covid():
-    return redirect(url_for(".health"))
+    return redirect(url_for(".page", page_name="health"), code=301)
