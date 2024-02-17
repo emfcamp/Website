@@ -4,11 +4,9 @@ from wtforms import StringField, SubmitField, BooleanField
 from wtforms.validators import DataRequired
 
 from main import db
-from models.user import UserDiversity
 from models.purchase import Purchase
 from models.payment import Payment
 from models.site_state import get_site_state
-from models.cfp_tag import Tag
 
 from ..common.forms import DiversityForm
 
@@ -20,6 +18,19 @@ class AccountForm(DiversityForm):
     allow_promo = BooleanField("Send me occasional emails about future EMF events")
 
     forward = SubmitField("Update")
+
+    def update_user(self, user):
+        user.name = self.name.data
+        user.promo_opt_in = self.allow_promo.data
+
+        return super().update_user(user)
+
+    def set_from_user(self, user):
+        # This is a required field so should always be set
+        self.name.data = current_user.name
+        self.allow_promo.data = current_user.promo_opt_in
+
+        return super().set_from_user(user)
 
 
 @users.route("/account", methods=["GET", "POST"])
@@ -44,43 +55,16 @@ def details():
     form = AccountForm()
 
     if form.validate_on_submit():
-        if not current_user.diversity:
-            current_user.diversity = UserDiversity()
+        form.update_user(current_user)
 
-        current_user.name = form.name.data
-        current_user.promo_opt_in = form.allow_promo.data
-
-        current_user.diversity.age = form.age.data
-        current_user.diversity.gender = form.gender.data
-        current_user.diversity.ethnicity = form.ethnicity.data
-
-        if current_user.has_permission("cfp_reviewer"):
-            current_user.cfp_reviewer_tags = [
-                Tag.get_by_value(form.cfp_tag_0.data),
-                Tag.get_by_value(form.cfp_tag_1.data),
-                Tag.get_by_value(form.cfp_tag_2.data),
-            ]
-
-        app.logger.info("%s updated user information", current_user.name)
         db.session.commit()
+        app.logger.info("%s updated user information", current_user.name)
 
         flash("Your details have been saved.")
         return redirect(url_for(".account"))
 
     if request.method != "POST":
-        # This is a required field so should always be set
-        form.name.data = current_user.name
-        form.allow_promo.data = current_user.promo_opt_in
-
-        if current_user.diversity:
-            form.age.data = current_user.diversity.age
-            form.gender.data = current_user.diversity.gender
-            form.ethnicity.data = current_user.diversity.ethnicity
-
-        if current_user.cfp_reviewer_tags:
-            form.cfp_tag_0.data = current_user.cfp_reviewer_tags[0].tag
-            form.cfp_tag_1.data = current_user.cfp_reviewer_tags[1].tag
-            form.cfp_tag_2.data = current_user.cfp_reviewer_tags[2].tag
+        form.set_from_user(current_user)
 
     return render_template("account/details.html", form=form)
 
