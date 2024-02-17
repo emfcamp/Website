@@ -18,7 +18,7 @@ import collections
 from sqlalchemy.exc import IntegrityError
 
 from main import db, external_url
-from models.user import User, UserDiversity
+from models.user import User
 from models.cfp import (
     TalkProposal,
     WorkshopProposal,
@@ -33,7 +33,6 @@ from models.cfp import (
     LIGHTNING_TALK_SESSIONS,
     HUMAN_CFP_TYPES,
 )
-from models.cfp_tag import Tag
 from ..common import feature_flag, feature_enabled, create_current_user
 from ..common.email import from_email
 from ..common.forms import Form, DiversityForm
@@ -368,29 +367,14 @@ def form(cfp_type="talk"):
 def complete():
     if current_user.is_anonymous:
         return redirect(url_for(".main"))
+
     form = DiversityForm()
     if form.validate_on_submit():
-        if not current_user.diversity:
-            current_user.diversity = UserDiversity()
-
-        current_user.diversity.age = form.age.data
-        current_user.diversity.gender = form.gender.data
-        current_user.diversity.ethnicity = form.ethnicity.data
-
-        if current_user.has_permission("cfp_reviewer"):
-            current_user.cfp_reviewer_tags = [
-                Tag.get_by_value(form.cfp_tag_0.data),
-                Tag.get_by_value(form.cfp_tag_1.data),
-                Tag.get_by_value(form.cfp_tag_2.data),
-            ]
-
+        form.update_user(current_user)
         db.session.commit()
         return redirect(url_for(".proposals"))
 
-    if current_user.cfp_reviewer_tags:
-        form.cfp_tag_0.data = current_user.cfp_reviewer_tags[0].tag
-        form.cfp_tag_1.data = current_user.cfp_reviewer_tags[1].tag
-        form.cfp_tag_2.data = current_user.cfp_reviewer_tags[2].tag
+    form.set_from_user(current_user)
 
     return render_template("cfp/complete.html", form=form)
 
