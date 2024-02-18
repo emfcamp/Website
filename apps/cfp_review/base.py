@@ -16,6 +16,7 @@ from flask import (
 )
 from flask_login import current_user
 from flask_mailman import EmailMessage
+from models.permission import Permission
 from sqlalchemy import func, exists, select
 from sqlalchemy.orm import joinedload
 
@@ -1279,6 +1280,69 @@ def invite_speaker():
         )
 
     return render_template("cfp_review/invite-speaker.html", form=form)
+
+
+def get_diversity_counts(user_list):
+    res = {
+        "not_set": 0,
+        "age": Counter(),
+        "gender": Counter(),
+        "ethnicity": Counter(),
+        "tags": Counter(),
+    }
+    for user in user_list:
+        if not user.diversity:
+            res["not_set"] += 1
+            continue
+
+        if user.diversity.age:
+            res["age"][user.diversity.age] += 1
+        if user.diversity.gender:
+            res["gender"][user.diversity.gender] += 1
+        if user.diversity.ethnicity:
+            res["ethnicity"][user.diversity.ethnicity] += 1
+
+        if user.cfp_reviewer_tags:
+            for tag in user.cfp_reviewer_tags:
+                res["tags"][tag] += 1
+
+    return res
+
+
+@cfp_review.route("/speaker-diversity")
+@admin_required
+def speaker_diversity():
+    speakers = (
+        User.query.join(User.proposals)
+        .filter(
+            User.proposals.any(
+                Proposal.state.in_(
+                    [
+                        "manual-review",
+                        "accepted",
+                        "finalised",
+                    ]
+                )
+            )
+        )
+        .all()
+    )
+    counts = get_diversity_counts(speakers)
+
+    invited_count = len([1 for u in speakers if u.is_invited_speaker])
+    return render_template("cfp_review/reviewer_diversity.html", counts=counts)
+
+
+@cfp_review.route("/reviewer-diversity")
+@admin_required
+def reviewer_diversity():
+    reviewers = (
+        User.query.join(User.permissions)
+        .filter(User.permissions.any(Permission.name.in_(["cfp_reviewer"])))
+        .all()
+    )
+    counts = get_diversity_counts(reviewers)
+    return render_template("cfp_review/reviewer_diversity.html", counts=counts)
 
 
 from . import venues  # noqa
