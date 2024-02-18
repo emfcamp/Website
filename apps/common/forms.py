@@ -56,3 +56,16 @@ class DiversityForm(Form):
             self.cfp_tag_2.data = user.cfp_reviewer_tags[2].tag
 
         return self
+
+    def validate(self, extra_validators=None):
+        if not super().validate(extra_validators):
+            return False
+        result = True
+        seen = set()
+        for field in [self.cfp_tag_0, self.cfp_tag_1, self.cfp_tag_2]:
+            if field.data in seen:
+                field.errors = ["Please select three different choices."]
+                result = False
+            else:
+                seen.add(field.data)
+        return result
