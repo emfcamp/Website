@@ -624,6 +624,7 @@ def cancel_purchase(payment_id: int, purchase_id: int) -> ResponseReturnValue:
                 flash(msg)
                 return redirect(url_for("admin.payment", payment_id=payment.id))
 
+            purchase.payment_id = None
             payment.amount -= purchase.price_tier.get_price(payment.currency).value
 
             db.session.commit()
