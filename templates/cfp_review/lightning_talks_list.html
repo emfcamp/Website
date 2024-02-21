@@ -43,7 +43,7 @@
     {% for prop in proposals | sort(attribute='session,user.name')%}
         <tr>
             <td>{{ prop.session }}</td>
-            <td><a href="{{ url_for('admin.user', user_id=prop.user.id ) }}">{{prop.user.name}}</a></td>
+            <td><a href="{{ url_for('cfp_review.cfp_user', user_id=prop.user.id ) }}">{{prop.user.name}}</a></td>
             <td><a href="{{ url_for('.update_proposal', proposal_id=prop.id, **full_qs) }}">{{prop.published_title or prop.title}}</a></td>
             <td><a href="{{ prop.slide_link }}">{{ prop.slide_link }}</a></td>
         </tr>
