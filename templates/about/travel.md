@@ -7,7 +7,9 @@ EMF will be held at the Eastnor Castle Deer Park, just east of Ledbury, Hereford
 You can arrive after 10am on Thursday 30 May and you can stay until midday on Monday 3 June{# 2024 #}. You won't be allowed on site outside those times unless you've [volunteered](/volunteering) to help with setup or teardown.
 
 ## By Train
-EMF is close to Ledbury station which is around [three hours direct](https://traintimes.org.uk/londonpaddington/ledbury/) from London Paddington (on [GWR](https://www.gwr.com)) and [one hour](https://traintimes.org.uk/birminghamnewstreet/ledbury/) from Birmingham New Street (on [West Midlands Railway](https://www.westmidlandsrailway.co.uk/)).
+EMF is close to Ledbury station which is around [three hours](https://traintimes.org.uk/london+paddington/ledbury/) from London Paddington (on [GWR](https://www.gwr.com)) and [one hour](https://traintimes.org.uk/birmingham+new+street/ledbury) from Birmingham New Street (on [West Midlands Railway](https://www.westmidlandsrailway.co.uk/)).
+
+The station at Ledbury has short platforms, so if you are on one of the long 9-coach trains direct from Paddington, you will need to be in the front three coaches to get off the train.
 
 We will be providing a free shuttle bus service between Ledbury station and the EMF site approximately every half hour. The bus will leave from the bus stop on the road just outside the station.
 
