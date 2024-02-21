@@ -83,8 +83,11 @@ def main(flow="main"):
         # Empty form - populate products with any amounts already in basket
         form.populate(basket)
 
+    voucher = None
+    if code := session.get("ticket_voucher"):
+        voucher = Voucher.get_by_code(code)
     # Validate the capacity in the form, setting the maximum limits where available.
-    if not form.ensure_capacity(basket):
+    if not form.ensure_capacity(basket, voucher):
         # We're not able to provide the number of tickets the user has selected.
         no_capacity.inc()
         flash(
