@@ -1412,4 +1412,16 @@ def reviewer_diversity():
     return render_template("cfp_review/reviewer_diversity.html", counts=counts)
 
 
+@cfp_review.route("/users/<user_id>", methods=["GET"])
+@admin_required
+def cfp_user(user_id):
+    user = db.get_or_404(User, user_id)
+    if not user.proposals:
+        abort(404)
+    return render_template(
+        "cfp_review/cfp_user.html",
+        user=user,
+    )
+
+
 from . import venues  # noqa

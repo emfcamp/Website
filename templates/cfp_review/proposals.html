@@ -76,7 +76,7 @@
         <td>{{proposal.scheduled_duration or ''}}</td>
         <td>{{proposal.favourite_count}}</td>
         <td>
-            <a href="{{ url_for('admin.user', user_id=proposal.user.id ) }}">{{proposal.user.name}}</a>
+            <a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id ) }}">{{proposal.user.name}}</a>
         </td>
         <td>
             <a href="{{ url_for('.update_proposal', proposal_id=proposal.id, **full_qs) }}">{{proposal.published_title or proposal.title}}</a>

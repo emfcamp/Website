@@ -26,7 +26,7 @@
             {% else %}
                 A {{proposal.human_type}} by
             {% endif %}
-            <a href="{{ url_for('admin.user', user_id=proposal.user.id) }}">{{proposal.user.name}}</small></a>
+            <a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id) }}">{{proposal.user.name}}</small></a>
     </h2>
 </div>
 <form method="post" action="{{ url_for('.update_proposal', proposal_id=proposal.id) }}" class="shrink">
