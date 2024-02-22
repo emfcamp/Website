@@ -324,7 +324,7 @@ class BankPayment(Payment):
         if self.currency == "EUR":
             order_check_digits = mod_97_10.calc_check_digits(f"{self.bankref}RF")
             customer_reference = f"RF{order_check_digits}{self.bankref}"
-            assert iso11649.validate(customer_reference)
+            assert iso11649.is_valid(customer_reference)
             return customer_reference
         else:
             return self.bankref
