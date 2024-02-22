@@ -1,10 +1,15 @@
-from datetime import timedelta
 from collections import defaultdict, Counter
+import csv
+from datetime import timedelta
+from http import HTTPStatus
+from io import BytesIO, StringIO
 from itertools import combinations
+import json
 
 import dateutil
 from flask import (
     redirect,
+    send_file,
     url_for,
     request,
     abort,
@@ -103,7 +108,7 @@ def bool_qs(val):
     raise ValueError("Invalid querystring boolean")
 
 
-def filter_proposal_request():
+def filter_proposal_request() -> tuple[list[Proposal], bool]:
     bool_names = ["one_day", "needs_help", "needs_money"]
     bool_vals = [request.args.get(n, type=bool_qs) for n in bool_names]
     bool_dict = {n: v for n, v in zip(bool_names, bool_vals) if v is not None}
@@ -192,6 +197,52 @@ def proposals():
         filtered=filtered,
         total_proposals=Proposal.query.count(),
         tag_counts=tag_counts,
+    )
+
+
+@cfp_review.route("/proposals.<format>")
+@admin_required
+def export(format: str):
+    fields = [
+        "id",
+        "user_id",
+        "created",
+        "modified",
+        "state",
+        "type",
+        "title",
+        "description",
+        "equipment_required",
+        "funding_required",
+        "additional_info",
+        "length",
+        "notice_required",
+        "tags",
+        "favourite_count",
+    ]
+    proposals, _ = filter_proposal_request()
+    if format == "csv":
+        mime = "text/csv"
+        buf = StringIO()
+        w = csv.writer(buf)
+        # Header row
+        w.writerow(fields)
+        for p in proposals:
+            w.writerow([getattr(p, a) for a in fields])
+        out = buf.getvalue()
+    elif format == "json":
+        mime = "application/json"
+        out = json.dumps(
+            [{a: getattr(p, a) for a in fields} for p in proposals],
+            default=str,
+        )
+    else:
+        abort(HTTPStatus.BAD_REQUEST, "Unsupported export format")
+    return send_file(
+        BytesIO(out.encode()),
+        mime,
+        as_attachment=True,
+        download_name=f"proposals.{format}",
     )
 
 
