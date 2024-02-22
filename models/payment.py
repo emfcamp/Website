@@ -444,12 +444,9 @@ class BankTransaction(BaseModel):
         reference.  When no such header is present, the reference should be returned
         unmodified.
         """
-        return re.sub(
-            r"RF[0-9][0-9]"  # RF prefix, check digits, and optional delimiter
-            r"([%s]{8})" % safechars,  # 8-character bankref
-            r"\1",  # replacement: retain only the bankref match
-            ref,
-        )
+        prefix = "RF[0-9][0-9]"  # RF prefix, check digits, and optional delimiter
+        bankref = "[%s]{8}" % safechars  # 8-character bankref
+        return re.sub(rf"{prefix}({bankref})", r"\1", ref)
 
     def match_payment(self) -> Optional[BankPayment]:
         """
