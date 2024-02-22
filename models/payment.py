@@ -449,8 +449,8 @@ class BankTransaction(BaseModel):
         unmodified.
         """
         prefix = "RF[0-9][0-9]"  # RF prefix and check digits
-        bankref = "[%s]{8}" % safechars  # 8-character bankref
-        return re.sub(rf"{prefix}({bankref})", r"\1", ref)
+        bankref = "[%s]{4}[- ]?[%s]{4}" % (safechars, safechars)  # 8-character bankref
+        return re.sub(rf"{prefix} ?({bankref})", r"\1", ref)
 
     def match_payment(self) -> Optional[BankPayment]:
         """

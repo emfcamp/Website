@@ -8,7 +8,7 @@ from models.payment import BankTransaction
     [
         ("M87X CJ3Q", "M87X CJ3Q"),
         ("prefix*M87X CJ3Q*suffix", "prefix*M87X CJ3Q*suffix"),
-        # ("RF91 M87X CJ3Q", "M87X CJ3Q"),  # expectation: structured references will be received sans-spaces
+        ("RF91 M87X CJ3Q", "M87X CJ3Q"),
         ("RF91M87XCJ3Q", "M87XCJ3Q"),
         ("name value RF52RF23MHBY type value", "name value RF23MHBY type value"),
         ("prefix*RF52RF23MHBY*suffix", "prefix*RF23MHBY*suffix"),
