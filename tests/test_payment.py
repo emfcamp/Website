@@ -13,7 +13,7 @@ from models.payment import BankTransaction
         ("name value RF52RF23MHBY type value", "name value RF23MHBY type value"),
         ("prefix*RF52RF23MHBY*suffix", "prefix*RF23MHBY*suffix"),
         (
-            "RF23MHBY/20250102090807GB33BUKB20201555555555",
+            "RF52RF23MHBY/20250102090807GB33BUKB20201555555555",
             "RF23MHBY/20250102090807GB33BUKB20201555555555",
         ),
         ("RF52RF23MHBY", "RF23MHBY"),
