@@ -11,6 +11,10 @@ from models.payment import BankTransaction
         ("RF91 M87X CJ3Q", "M87X CJ3Q"),
         ("name value RF52RF23MHBY type value", "name value RF23MHBY type value"),
         ("prefix*RF52RF23MHBY*suffix", "prefix*RF23MHBY*suffix"),
+        (
+            "RF23MHBY/20250102090807GB33BUKB20201555555555",
+            "RF23MHBY/20250102090807GB33BUKB20201555555555",
+        ),
         ("RF52RF23MHBY", "RF23MHBY"),
         ("RF33*RF52RF23MHBY*RF33", "RF33*RF23MHBY*RF33"),
         ("RF23MHBY", "RF23MHBY"),

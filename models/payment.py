@@ -476,6 +476,13 @@ class BankTransaction(BaseModel):
 
         where serial is a 6-digit number, and ref is often the payee
         name again, or REFERENCE, and always truncated to 8 chars.
+
+        We've also received ISO-11649 payment references formatted:
+
+          ref/timestamp_plus_iban
+
+        Where the timestamp contains digits and is immediately followed by
+        the payer's IBAN (no delimiter between the two).
         """
 
         ref = self.payee.upper()
