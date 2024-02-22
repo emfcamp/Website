@@ -41,6 +41,13 @@
   <strong>Parking:</strong> Only live-in vehicles are permitted to park on site, with the appropriate ticket. Other vehicles must be parked in the designated car parks &mdash; you will need to buy a car parking ticket if you intend to bring a car. If your vehicle is an integral part of a village or installation please contact us.
 </p>
 
+{#
+<p>
+  If you are unable to afford a ticket, we have a limited number of discounted tickets available.
+  Please contact <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}">{{ config['TICKETS_EMAIL'][1] }}</a>.
+</p>
+#}
+
 <p>
   By buying a ticket you are agreeing to our <a href="{{url_for('payments.terms')}}">Terms
   and Conditions</a> and the EMF <a href="{{url_for('base.code_of_conduct')}}">Code of Conduct</a>.

@@ -85,7 +85,7 @@
       {# NB this excludes installations, which have a separate section #}
       {% if cfp_type in ('talk', 'performance', 'workshop', 'youthworkshop') %}
         {% call render_field(form.equipment_required, horizontal=9,
-                             placeholder="Additional equipment required") %}
+                             placeholder="Additional equipment you need us to provide") %}
           {% if cfp_type in ('talk', 'performance') %}
             We'll provide a sound system and projector or screen.
           {% elif cfp_type in ('workshop', 'youthworkshop') %}
@@ -150,7 +150,8 @@
           {{ form.needs_help() }}
           I'd like advice or help with this proposal
         </label>
-        <small>We're happy to advise on submissions before they are reviewed</small>
+        <small>We're happy to advise on submissions before they are reviewed. We don't consider lack of experience
+            a problem and we welcome those who haven't given talks before.</small>
         </div>
 
       </fieldset>{# More details #}

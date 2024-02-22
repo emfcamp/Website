@@ -193,6 +193,8 @@ class User(BaseModel, UserMixin):
     # Whether the user has opted in to receive promo emails after this event:
     promo_opt_in = db.Column(db.Boolean, nullable=False, default=False)
 
+    cfp_invite_reason = db.Column(db.String, nullable=True)
+
     diversity = db.relationship(
         "UserDiversity", uselist=False, backref="user", cascade="all, delete-orphan"
     )
@@ -292,6 +294,10 @@ class User(BaseModel, UserMixin):
     @property
     def transferred_tickets(self):
         return [t.purchase for t in self.transfers_from]
+
+    @property
+    def is_invited_speaker(self):
+        return self.cfp_invite_reason and len(self.cfp_invite_reason.strip()) > 0
 
     def get_owned_tickets(self, paid=None, type=None):
         "Get tickets owned by a user, filtered by type and payment state."
