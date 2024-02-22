@@ -448,7 +448,7 @@ class BankTransaction(BaseModel):
         reference.  When no such header is present, the reference should be returned
         unmodified.
         """
-        prefix = "RF[0-9][0-9]"  # RF prefix, check digits, and optional delimiter
+        prefix = "RF[0-9][0-9]"  # RF prefix and check digits
         bankref = "[%s]{8}" % safechars  # 8-character bankref
         return re.sub(rf"{prefix}({bankref})", r"\1", ref)
 
