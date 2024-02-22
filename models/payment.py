@@ -445,7 +445,7 @@ class BankTransaction(BaseModel):
         unmodified.
         """
         return re.sub(
-            r"\bRF[0-9][0-9][- ]?"  # RF prefix, check digits, and optional delimiter
+            r"RF[0-9][0-9][- ]?"  # RF prefix, check digits, and optional delimiter
             r"([%s]{4}[- ]?[%s]{4})" % (safechars, safechars),  # 8-character bankref
             r"\1",  # replacement: retain only the bankref match
             ref,
