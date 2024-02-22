@@ -2,7 +2,12 @@ from flask_wtf import FlaskForm
 from wtforms import SelectField, StringField
 
 
-from models.user import UserDiversity
+from models.user_diverstiy import (
+    AGE_OPTIONS,
+    ETHNICITY_OPTIONS,
+    GENDER_OPTIONS,
+    UserDiversity,
+)
 from models.cfp_tag import DEFAULT_TAGS, Tag
 
 
@@ -17,10 +22,22 @@ class Form(FlaskForm):
         csrf_context = None
 
 
+def __generate_choices(choices):
+    return [
+        ("", "Prefer not to say"),
+    ] + [(i, i) for i in choices]
+
+
+AGE_CHOICES = __generate_choices(AGE_OPTIONS)
+GENDER_CHOICES = __generate_choices(GENDER_OPTIONS)
+ETHNICITY_CHOICES = __generate_choices(ETHNICITY_OPTIONS)
+
+
 class DiversityForm(Form):
-    age = StringField("Age")
-    gender = StringField("Gender")
-    ethnicity = StringField("Ethnicity")
+    age = SelectField("Age", choices=AGE_CHOICES)
+    gender = SelectField("Gender", choices=GENDER_CHOICES)
+    gender_other = StringField("Other gender not listed (select 'Other')")
+    ethnicity = SelectField("Ethnicity", choices=ETHNICITY_CHOICES)
 
     # Track CfP reviewer tags
     cfp_tag_0 = SelectField("Topic 1", default=DEFAULT_TAGS[0], choices=DEFAULT_TAGS)
@@ -32,7 +49,9 @@ class DiversityForm(Form):
             user.diversity = UserDiversity()
 
         user.diversity.age = self.age.data
-        user.diversity.gender = self.gender.data
+        user.diversity.gender = (
+            self.gender_other.data if self.gender.data == "Other" else self.gender.data
+        )
         user.diversity.ethnicity = self.ethnicity.data
 
         if user.has_permission("cfp_reviewer"):
@@ -47,8 +66,16 @@ class DiversityForm(Form):
     def set_from_user(self, user):
         if user.diversity:
             self.age.data = user.diversity.age
-            self.gender.data = user.diversity.gender
             self.ethnicity.data = user.diversity.ethnicity
+
+            gender = user.diversity.gender
+            # If gender is empty string then it's "Prefer not to say"
+            if gender and gender not in GENDER_OPTIONS:
+                self.gender.data = "Other"
+                self.gender_other.data = gender
+            else:
+                self.gender.data = gender
+                # leave gender_other unset
 
         if user.cfp_reviewer_tags:
             self.cfp_tag_0.data = user.cfp_reviewer_tags[0].tag
