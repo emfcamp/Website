@@ -1,24 +1,52 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, session, redirect, url_for, abort
+from flask_login import current_user
 from sqlalchemy import func, or_
 
 from models.cfp import (
     Proposal,
     CFPMessage,
     CFPVote,
+    Venue,
     CFP_STATES,
     ORDERED_STATES,
     HUMAN_CFP_TYPES,
-    DEFAULT_VENUES,
 )
 from ..common import require_permission
 
 cfp_review = Blueprint("cfp_review", __name__)
+
 admin_required = require_permission(
     "cfp_admin"
 )  # Decorator to require admin permissions
 anon_required = require_permission("cfp_anonymiser")
 review_required = require_permission("cfp_reviewer")
 schedule_required = require_permission("cfp_schedule")
+
+CFP_PERMISSIONS = {
+    "admin",
+    "cfp_admin",
+    "cfp_anonymiser",
+    "cfp_reviewer",
+    "cfp_schedule",
+}
+
+
+@cfp_review.before_request
+def before_request():
+    if not current_user.is_authenticated:
+        return redirect(url_for("users.login", next=request.path))
+
+    # Check if the user has any CFP permissions
+    if len(set(p.name for p in current_user.permissions) & CFP_PERMISSIONS) == 0:
+        abort(404)
+
+    if (
+        not session.get("cfp_confidentiality")
+        and request.endpoint != "cfp_review.confidentiality_warning"
+    ):
+        return redirect(
+            url_for("cfp_review.confidentiality_warning", next=request.path)
+        )
 
 
 def sort_by_notice(notice):
@@ -99,7 +127,7 @@ def cfp_review_variables():
         "proposal_counts": proposal_counts,
         "unread_reviewer_notes": unread_reviewer_notes,
         "view_name": request.url_rule.endpoint.replace("cfp_review.", "."),
-        "emf_venues": sum(DEFAULT_VENUES.values(), []),
+        "emf_venues": [v.name for v in Venue.emf_venues()],
     }
 
 

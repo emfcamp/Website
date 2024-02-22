@@ -7,9 +7,13 @@ in making things.{% endblock %} {% block body %} {% include
   <div class="col-md-6">
     {% include "home/event-data.html" %} 
     <p class="emphasis">
+    {#
       The first batch of tickets will go on sale on
       <strong>Saturday 3 February at 14:00</strong> (UK time).
-      <a href="{{url_for('tickets.main')}}">See ticket options and prices</a>.
+    #}
+    {#
+    <a class="btn btn-lg btn-block btn-primary" itemprop="url" href="{{url_for('tickets.main')}}">View ticket prices</a>
+    #}
     </p>
     <div class="well">
       <p>

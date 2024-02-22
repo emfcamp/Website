@@ -47,11 +47,19 @@
 </table>
 
 
-<h3>Permissions</h3>
-<p>Note that the admin permission implies all other permissions.</p>
 <form method="post">
 {{ form.hidden_tag() }}
 {{ form.keys }}
+
+<h3>Update Details</h3>
+{{ render_field(form.new_name) }}
+{{ render_field(form.new_email) }}
+{{ form.update_details(class_="btn btn-success pull-right") }}
+
+<div class="row">&nbsp;</div>
+
+<h3>Permissions</h3>
+<p>Note that the admin permission implies all other permissions.</p>
 
 <table class="table table-condensed">
     <tr>{% for permission in permissions %}
@@ -70,6 +78,12 @@
 <hr>
 {{ render_field(form.note) }}
 {{ form.add_note(class_="btn btn-success pull-right") }}
+</form>
+
+<div class="row">&nbsp;</div>
+<hr>
+{{ render_field(form.cfp_invite_reason) }}
+{{ form.save_cfp_invite_reason(class_="btn btn-success pull-right") }}
 </form>
 <div class="row">&nbsp;</div>
 
@@ -120,6 +134,40 @@
             <td>{{ proposal.state }}</td>
         </tr>
     {% endfor %}
+</table>
+
+<h3>Changes</h3>
+<table class="table table-condensed">
+<thead>
+    <tr>
+        <th>When</th>
+        <th>By</th>
+        <th>Fieldname</th>
+        <th>Was</th>
+        <th>Changed to</th>
+    </tr>
+</thead>
+<tbody>
+{% for version in versions %}
+    {% for (field, (old, new)) in version.changeset.items() %}
+        <tr class="{{- loop.cycle('odd', 'even') -}}">
+            {% if loop.first %}
+                <td rowspan="{{ loop.length }}">{{ version.transaction.issued_at.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] }}</td>
+                <td rowspan="{{ loop.length }}">
+                {% if version.transaction.user %}
+                    <a href="{{ url_for('admin.user', user_id=version.transaction.user.id) }}">{{ version.transaction.user.name }} ({{ version.transaction.user.email }})</a>
+                {% else %}
+                    [unknown]
+                {% endif %}
+                </td>
+            {% endif %}
+            <td>{{field}}</td>
+            <td>{{old}}</td>
+            <td>{{new}}</td>
+        </tr>
+    {% endfor %}
+{% endfor %}
+</tbody>
 </table>
 
 {% endblock %}

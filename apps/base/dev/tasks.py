@@ -1,6 +1,6 @@
 """ Development CLI tasks """
 import click
-from pendulum import parse
+from pendulum import Duration as Offset, parse
 from flask import current_app as app
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
@@ -189,19 +189,25 @@ def volunteer_data():
 def volunteer_shifts():
     """Make fake volunteer shifts"""
     # First = first start time. Final = end of last shift
+    start_date = parse(app.config["EVENT_START"]).set(
+        hour=0,
+        minute=0,
+        second=0,
+        microsecond=0,
+    )
     shift_list = {
         # 'Tent' roles
         "Badge Helper": {
             "Badge Tent": [
                 {
-                    "first": "2022-06-04 10:00:00",
-                    "final": "2022-06-04 16:00:00",
+                    "first": Offset(days=2, hours=10),
+                    "final": Offset(days=2, hours=16),
                     "min": 1,
                     "max": 2,
                 },
                 {
-                    "first": "2022-06-05 10:00:00",
-                    "final": "2022-06-05 16:00:00",
+                    "first": Offset(days=3, hours=10),
+                    "final": Offset(days=3, hours=16),
                     "min": 1,
                     "max": 2,
                 },
@@ -210,32 +216,32 @@ def volunteer_shifts():
         "Car Parking": {
             "Car Park": [
                 {
-                    "first": "2022-06-02 08:00:00",
-                    "final": "2022-06-02 20:00:00",
+                    "first": Offset(hours=8),
+                    "final": Offset(hours=20),
                     "min": 1,
                     "max": 3,
                 },
                 {
-                    "first": "2022-06-03 08:00:00",
-                    "final": "2022-06-03 20:00:00",
+                    "first": Offset(days=1, hours=8),
+                    "final": Offset(days=1, hours=20),
                     "min": 1,
                     "max": 3,
                 },
                 {
-                    "first": "2022-06-04 10:00:00",
-                    "final": "2022-06-04 16:00:00",
+                    "first": Offset(days=2, hours=10),
+                    "final": Offset(days=2, hours=16),
                     "min": 1,
                     "max": 1,
                 },
                 {
-                    "first": "2022-06-05 14:00:00",
-                    "final": "2022-06-05 20:00:00",
+                    "first": Offset(days=3, hours=14),
+                    "final": Offset(days=3, hours=20),
                     "min": 1,
                     "max": 1,
                 },
                 {
-                    "first": "2022-06-06 08:00:00",
-                    "final": "2022-06-06 12:00:00",
+                    "first": Offset(days=4, hours=8),
+                    "final": Offset(days=4, hours=12),
                     "min": 1,
                     "max": 3,
                 },
@@ -244,32 +250,32 @@ def volunteer_shifts():
         "Catering": {
             "Volunteer Tent": [
                 {
-                    "first": "2022-06-02 07:00:00",
-                    "final": "2022-06-02 20:00:00",
+                    "first": Offset(hours=7),
+                    "final": Offset(hours=20),
                     "min": 2,
                     "max": 5,
                 },
                 {
-                    "first": "2022-06-03 07:00:00",
-                    "final": "2022-06-03 20:00:00",
+                    "first": Offset(days=1, hours=7),
+                    "final": Offset(days=1, hours=20),
                     "min": 2,
                     "max": 5,
                 },
                 {
-                    "first": "2022-06-04 07:00:00",
-                    "final": "2022-06-04 20:00:00",
+                    "first": Offset(days=2, hours=7),
+                    "final": Offset(days=2, hours=20),
                     "min": 2,
                     "max": 5,
                 },
                 {
-                    "first": "2022-06-05 07:00:00",
-                    "final": "2022-06-05 20:00:00",
+                    "first": Offset(days=3, hours=7),
+                    "final": Offset(days=3, hours=20),
                     "min": 2,
                     "max": 5,
                 },
                 {
-                    "first": "2022-06-06 07:00:00",
-                    "final": "2022-06-06 20:00:00",
+                    "first": Offset(days=4, hours=7),
+                    "final": Offset(days=4, hours=20),
                     "min": 2,
                     "max": 5,
                 },
@@ -278,8 +284,8 @@ def volunteer_shifts():
         "Entrance Steward": {
             "Entrance": [
                 {
-                    "first": "2022-06-02 08:00:00",
-                    "final": "2022-06-06 12:00:00",
+                    "first": Offset(hours=8),
+                    "final": Offset(days=4, hours=12),
                     "min": 2,
                     "max": 4,
                 }
@@ -288,26 +294,26 @@ def volunteer_shifts():
         "Games Master": {
             "Stage A": [
                 {
-                    "first": "2022-06-02 20:00:00",
-                    "final": "2022-06-02 23:00:00",
+                    "first": Offset(hours=20),
+                    "final": Offset(hours=23),
                     "min": 1,
                     "max": 3,
                 },
                 {
-                    "first": "2022-06-03 20:00:00",
-                    "final": "2022-06-03 23:00:00",
+                    "first": Offset(days=1, hours=20),
+                    "final": Offset(days=1, hours=23),
                     "min": 1,
                     "max": 3,
                 },
                 {
-                    "first": "2022-06-04 20:00:00",
-                    "final": "2022-06-04 23:00:00",
+                    "first": Offset(days=2, hours=20),
+                    "final": Offset(days=2, hours=23),
                     "min": 1,
                     "max": 3,
                 },
                 {
-                    "first": "2022-06-05 20:00:00",
-                    "final": "2022-06-05 23:00:00",
+                    "first": Offset(days=3, hours=20),
+                    "final": Offset(days=3, hours=23),
                     "min": 1,
                     "max": 3,
                 },
@@ -316,20 +322,20 @@ def volunteer_shifts():
         "Green Room": {
             "Green Room": [
                 {
-                    "first": "2022-06-03 12:00:00",
-                    "final": "2022-06-04 00:00:00",
+                    "first": Offset(days=1, hours=12),
+                    "final": Offset(days=2, hours=0),
                     "min": 1,
                     "max": 1,
                 },
                 {
-                    "first": "2022-06-04 10:00:00",
-                    "final": "2022-06-05 00:00:00",
+                    "first": Offset(days=2, hours=10),
+                    "final": Offset(days=3, hours=0),
                     "min": 1,
                     "max": 1,
                 },
                 {
-                    "first": "2022-06-05 10:00:00",
-                    "final": "2022-06-05 20:00:00",
+                    "first": Offset(days=3, hours=10),
+                    "final": Offset(days=3, hours=20),
                     "min": 1,
                     "max": 1,
                 },
@@ -338,32 +344,32 @@ def volunteer_shifts():
         "Info Desk": {
             "Info Desk": [
                 {
-                    "first": "2022-06-02 10:00:00",
-                    "final": "2022-06-02 20:00:00",
+                    "first": Offset(hours=10),
+                    "final": Offset(hours=20),
                     "min": 1,
                     "max": 1,
                 },
                 {
-                    "first": "2022-06-03 10:00:00",
-                    "final": "2022-06-03 20:00:00",
+                    "first": Offset(days=1, hours=10),
+                    "final": Offset(days=1, hours=20),
                     "min": 1,
                     "max": 1,
                 },
                 {
-                    "first": "2022-06-03 10:00:00",
-                    "final": "2022-06-03 20:00:00",
+                    "first": Offset(days=1, hours=10),
+                    "final": Offset(days=1, hours=20),
                     "min": 1,
                     "max": 1,
                 },
                 {
-                    "first": "2022-06-04 10:00:00",
-                    "final": "2022-06-04 20:00:00",
+                    "first": Offset(days=2, hours=10),
+                    "final": Offset(days=2, hours=20),
                     "min": 1,
                     "max": 1,
                 },
                 {
-                    "first": "2022-06-05 10:00:00",
-                    "final": "2022-06-05 20:00:00",
+                    "first": Offset(days=3, hours=10),
+                    "final": Offset(days=3, hours=20),
                     "min": 1,
                     "max": 1,
                 },
@@ -372,26 +378,26 @@ def volunteer_shifts():
         "Tent Steward": {
             "N/A": [
                 {
-                    "first": "2022-06-02 13:00:00",
-                    "final": "2022-06-02 19:00:00",
+                    "first": Offset(hours=13),
+                    "final": Offset(hours=19),
                     "min": 1,
                     "max": 1,
                 },
                 {
-                    "first": "2022-06-03 13:00:00",
-                    "final": "2022-06-03 19:00:00",
+                    "first": Offset(days=1, hours=13),
+                    "final": Offset(days=1, hours=19),
                     "min": 1,
                     "max": 1,
                 },
                 {
-                    "first": "2022-06-04 10:00:00",
-                    "final": "2022-06-04 19:00:00",
+                    "first": Offset(days=2, hours=10),
+                    "final": Offset(days=2, hours=19),
                     "min": 1,
                     "max": 1,
                 },
                 {
-                    "first": "2022-06-05 10:00:00",
-                    "final": "2022-06-05 19:00:00",
+                    "first": Offset(days=3, hours=10),
+                    "final": Offset(days=3, hours=19),
                     "min": 1,
                     "max": 1,
                 },
@@ -400,26 +406,26 @@ def volunteer_shifts():
         "Youth Workshop Helper": {
             "Youth Workshop": [
                 {
-                    "first": "2022-06-02 13:00:00",
-                    "final": "2022-06-02 20:00:00",
+                    "first": Offset(hours=13),
+                    "final": Offset(hours=20),
                     "min": 1,
                     "max": 2,
                 },
                 {
-                    "first": "2022-06-03 13:00:00",
-                    "final": "2022-06-03 20:00:00",
+                    "first": Offset(days=1, hours=13),
+                    "final": Offset(days=1, hours=20),
                     "min": 1,
                     "max": 2,
                 },
                 {
-                    "first": "2022-06-04 09:00:00",
-                    "final": "2022-06-04 20:00:00",
+                    "first": Offset(days=2, hours=9),
+                    "final": Offset(days=2, hours=20),
                     "min": 1,
                     "max": 2,
                 },
                 {
-                    "first": "2022-06-05 09:00:00",
-                    "final": "2022-06-05 20:00:00",
+                    "first": Offset(days=3, hours=9),
+                    "final": Offset(days=3, hours=20),
                     "min": 1,
                     "max": 2,
                 },
@@ -429,46 +435,46 @@ def volunteer_shifts():
         "Bar": {
             "Bar": [
                 {
-                    "first": "2022-06-02 11:00:00",
-                    "final": "2022-06-03 02:00:00",
+                    "first": Offset(hours=11),
+                    "final": Offset(days=1, hours=2),
                     "min": 2,
                     "max": 5,
                 },
                 {
-                    "first": "2022-06-03 11:00:00",
-                    "final": "2022-06-04 02:00:00",
+                    "first": Offset(days=1, hours=11),
+                    "final": Offset(days=2, hours=2),
                     "min": 2,
                     "max": 5,
                 },
                 {
-                    "first": "2022-06-04 11:00:00",
-                    "final": "2022-06-05 02:00:00",
+                    "first": Offset(days=2, hours=11),
+                    "final": Offset(days=3, hours=2),
                     "min": 2,
                     "max": 5,
                 },
                 {
-                    "first": "2022-06-05 11:00:00",
-                    "final": "2022-06-06 01:00:00",
+                    "first": Offset(days=3, hours=11),
+                    "final": Offset(days=4, hours=1),
                     "min": 2,
                     "max": 5,
                 },
             ],
             "Bar 2": [
                 {
-                    "first": "2022-06-03 20:00:00",
-                    "final": "2022-06-04 01:00:00",
+                    "first": Offset(days=1, hours=20),
+                    "final": Offset(days=2, hours=1),
                     "min": 1,
                     "max": 2,
                 },
                 {
-                    "first": "2022-06-04 17:00:00",
-                    "final": "2022-06-05 01:00:00",
+                    "first": Offset(days=2, hours=17),
+                    "final": Offset(days=3, hours=1),
                     "min": 1,
                     "max": 2,
                 },
                 {
-                    "first": "2022-06-05 17:00:00",
-                    "final": "2022-06-06 00:00:00",
+                    "first": Offset(days=3, hours=17),
+                    "final": Offset(days=4, hours=0),
                     "min": 1,
                     "max": 2,
                 },
@@ -477,26 +483,26 @@ def volunteer_shifts():
         "NOC": {
             "N/A": [
                 {
-                    "first": "2022-06-02 08:00:00",
-                    "final": "2022-06-02 20:00:00",
+                    "first": Offset(hours=8),
+                    "final": Offset(hours=20),
                     "min": 1,
                     "max": 2,
                 },
                 {
-                    "first": "2022-06-03 08:00:00",
-                    "final": "2022-06-03 20:00:00",
+                    "first": Offset(days=1, hours=8),
+                    "final": Offset(days=1, hours=20),
                     "min": 1,
                     "max": 2,
                 },
                 {
-                    "first": "2022-06-05 14:00:00",
-                    "final": "2022-06-05 20:00:00",
+                    "first": Offset(days=3, hours=14),
+                    "final": Offset(days=3, hours=20),
                     "min": 1,
                     "max": 2,
                 },
                 {
-                    "first": "2022-06-06 08:00:00",
-                    "final": "2022-06-06 12:00:00",
+                    "first": Offset(days=4, hours=8),
+                    "final": Offset(days=4, hours=12),
                     "min": 1,
                     "max": 2,
                 },
@@ -505,26 +511,26 @@ def volunteer_shifts():
         "Volunteer Manager": {
             "Volunteer Tent": [
                 {
-                    "first": "2022-06-02 11:00:00",
-                    "final": "2022-06-02 21:00:00",
+                    "first": Offset(hours=11),
+                    "final": Offset(hours=21),
                     "min": 1,
                     "max": 1,
                 },
                 {
-                    "first": "2022-06-03 11:00:00",
-                    "final": "2022-06-03 21:00:00",
+                    "first": Offset(days=1, hours=11),
+                    "final": Offset(days=1, hours=21),
                     "min": 1,
                     "max": 1,
                 },
                 {
-                    "first": "2022-06-04 09:00:00",
-                    "final": "2022-06-04 21:00:00",
+                    "first": Offset(days=2, hours=9),
+                    "final": Offset(days=2, hours=21),
                     "min": 1,
                     "max": 1,
                 },
                 {
-                    "first": "2022-06-05 09:00:00",
-                    "final": "2022-06-05 21:00:00",
+                    "first": Offset(days=3, hours=9),
+                    "final": Offset(days=3, hours=21),
                     "min": 1,
                     "max": 1,
                 },
@@ -546,10 +552,11 @@ def volunteer_shifts():
                 shifts = Shift.generate_for(
                     role=role,
                     venue=venue,
-                    first=parse(shift_ranges["first"]),
-                    final=parse(shift_ranges["final"]),
+                    first=start_date + shift_ranges["first"],
+                    final=start_date + shift_ranges["final"],
                     min=shift_ranges["min"],
                     max=shift_ranges["max"],
+                    changeover=0,
                 )
                 for s in shifts:
                     db.session.add(s)

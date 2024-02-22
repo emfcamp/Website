@@ -24,7 +24,6 @@ from .majority_judgement import calculate_max_normalised_score
 from models.cfp import (
     CFPMessage,
     CFPVote,
-    DEFAULT_VENUES,
     EVENT_SPACING,
     FavouriteProposal,
     get_available_proposal_minutes,
@@ -56,6 +55,7 @@ from .forms import (
     AddNoteForm,
     ChangeProposalOwner,
     ReversionForm,
+    InviteSpeakerForm,
 )
 from . import (
     cfp_review,
@@ -321,6 +321,17 @@ def update_proposal(proposal_id):
         raise Exception("Unknown cfp type {}".format(prop.type))
 
     form.tags.choices = [(t.tag, t.tag) for t in Tag.query.order_by(Tag.tag).all()]
+    form.allowed_venues.choices = [
+        (v.id, v.name)
+        for v in Venue.query.filter(
+            db.or_(
+                Venue.allowed_types.any(prop.type),
+                Venue.id.in_(v.id for v in prop.get_allowed_venues()),
+            )
+        )
+        .order_by(Venue.priority.desc())
+        .all()
+    ]
 
     # Process the POST
     if form.validate_on_submit():
@@ -371,7 +382,9 @@ def update_proposal(proposal_id):
     form.title.data = prop.title
     form.description.data = prop.description
     form.tags.data = [t.tag for t in prop.tags]
-    form.requirements.data = prop.requirements
+    form.equipment_required.data = prop.equipment_required
+    form.funding_required.data = prop.funding_required
+    form.additional_info.data = prop.additional_info
     form.length.data = prop.length
     form.notice_required.data = prop.notice_required
     form.needs_help.data = prop.needs_help
@@ -397,7 +410,7 @@ def update_proposal(proposal_id):
 
     form.user_scheduled.data = prop.user_scheduled
     form.hide_from_schedule.data = prop.hide_from_schedule
-    form.allowed_venues.data = prop.get_allowed_venues_serialised()
+    form.allowed_venues.data = [v.id for v in prop.get_allowed_venues()]
     form.allowed_times.data = prop.get_allowed_time_periods_serialised()
     form.scheduled_time.data = prop.scheduled_time
     form.scheduled_duration.data = prop.scheduled_duration
@@ -423,14 +436,14 @@ def update_proposal(proposal_id):
 
     elif prop.type == "installation":
         form.size.data = prop.size
-        form.funds.data = prop.funds
+        form.installation_funding.data = prop.installation_funding
 
     elif prop.type == "lightning":
         form.session.data = prop.session
         form.slide_link.data = prop.slide_link
 
     return render_template(
-        "cfp_review/update_proposal.html", proposal=prop, form=form, next_id=next_id
+        "cfp_review/proposal.html", proposal=prop, form=form, next_id=next_id
     )
 
 
@@ -867,7 +880,7 @@ def close_round():
     if form.validate_on_submit():
         if form.confirm.data:
             min_votes = session["min_votes"]
-            for (prop, vote_count) in proposals:
+            for prop, vote_count in proposals:
                 if vote_count >= min_votes and prop.state != "reviewed":
                     prop.set_state("reviewed")
 
@@ -882,7 +895,9 @@ def close_round():
         elif form.close_round.data:
             preview = True
             session["min_votes"] = form.min_votes.data
-            flash('Blue proposals will be marked as "reviewed"')
+            flash(
+                f'Proposals with more than {session["min_votes"]} (blue) will be marked as "reviewed"'
+            )
 
         elif form.cancel.data:
             form.min_votes.data = form.min_votes.default
@@ -892,7 +907,7 @@ def close_round():
     # Find proposals where the submitter has already had an accepted proposal
     # or another proposal in this list
     duplicates = {}
-    for (prop, _) in proposals:
+    for prop, _ in proposals:
         if prop.user.proposals.count() > 1:
             # Only add each proposal once
             if prop.user not in duplicates:
@@ -933,8 +948,7 @@ def rank():
         if form.confirm.data:
             min_score = session["min_score"]
             count = 0
-            for (prop, score) in scored_proposals:
-
+            for prop, score in scored_proposals:
                 if score >= min_score:
                     count += 1
                     prop.set_state("accepted")
@@ -971,9 +985,7 @@ def rank():
         elif form.cancel.data and "min_score" in session:
             del session["min_score"]
 
-    accepted_proposals = Proposal.query.filter(
-        Proposal.state.in_(["accepted", "finished"])
-    )
+    accepted_proposals = Proposal.query.filter(Proposal.is_accepted)
     accepted_counts = defaultdict(int)
     for proposal in accepted_proposals:
         accepted_counts[proposal.type] += 1
@@ -981,9 +993,7 @@ def rank():
     allocated_minutes = defaultdict(int)
     unknown_lengths = defaultdict(int)
 
-    accepted_proposals = Proposal.query.filter(
-        Proposal.state.in_(["accepted", "finished"])
-    ).all()
+    accepted_proposals = Proposal.query.filter(Proposal.is_accepted).all()
     for proposal in accepted_proposals:
         length = None
         if proposal.scheduled_duration:
@@ -1000,8 +1010,11 @@ def rank():
 
     # Correct for changeover period not being needed at the end of the day
     num_days = len(get_days_map().items())
+
     for type, amount in allocated_minutes.items():
-        num_venues = len(DEFAULT_VENUES[type])
+        num_venues = Venue.query.filter(
+            Venue.default_for_types.any(type)
+        ).count()  # TODO(lukegb): filter to emf venues
         # Amount of minutes per venue * number of venues - (slot changeover period) from the end
         allocated_minutes[type] = amount - (
             (10 * EVENT_SPACING[type]) * num_days * num_venues
@@ -1056,7 +1069,7 @@ def potential_schedule_changes():
 def scheduler():
     proposals = (
         Proposal.query.filter(Proposal.scheduled_duration.isnot(None))
-        .filter(Proposal.state.in_(["finished", "accepted"]))
+        .filter(Proposal.state.is_accepted)
         .filter(Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]))
         .all()
     )
@@ -1119,11 +1132,13 @@ def scheduler():
 
         schedule_data.append(export)
 
+    venue_names_by_type = Venue.emf_venue_names_by_type()
+
     return render_template(
         "cfp_review/scheduler.html",
         shown_venues=shown_venues,
         schedule_data=schedule_data,
-        default_venues=DEFAULT_VENUES,
+        default_venues=venue_names_by_type,
     )
 
 
@@ -1164,7 +1179,7 @@ def clashfinder():
 
     clashes = []
     offset = 0
-    for ((id1, id2), count) in popularity.most_common()[:1000]:
+    for (id1, id2), count in popularity.most_common()[:1000]:
         offset += 1
         prop1 = Proposal.query.get(id1)
         prop2 = Proposal.query.get(id2)
@@ -1226,6 +1241,44 @@ def proposals_summary():
         counts_by_type=counts_by_type,
         counts_by_state=counts_by_state,
     )
+
+
+@cfp_review.route("/confidentiality", methods=["GET", "POST"])
+def confidentiality_warning():
+    if request.method == "POST" and request.form.get("agree"):
+        session["cfp_confidentiality"] = True
+        return redirect(request.args.get("next", url_for(".proposals")))
+
+    return render_template("cfp_review/confidentiality_warning.html")
+
+
+@cfp_review.route("/invite-speaker", methods=["GET", "POST"])
+@admin_required
+def invite_speaker():
+    form = InviteSpeakerForm()
+
+    if form.validate_on_submit():
+        email, name, reason = form.email.data, form.name.data, form.invite_reason.data
+        user = User(email, name)
+        user.cfp_invite_reason = reason
+
+        db.session.add(user)
+        db.session.commit()
+
+        app.logger.info(
+            f"{current_user.id} created a new user {user} ({email}) to invite to the cfp"
+        )
+
+        code = user.login_code(app.config["SECRET_KEY"])
+
+        return render_template(
+            "cfp_review/invite-speaker-complete.html",
+            user=user,
+            login_code=code,
+            proposal_type=form.proposal_type.data,
+        )
+
+    return render_template("cfp_review/invite-speaker.html", form=form)
 
 
 from . import venues  # noqa

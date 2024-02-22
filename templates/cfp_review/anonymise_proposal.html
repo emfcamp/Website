@@ -1,8 +1,21 @@
 {% from "_formhelpers.html" import render_dl_field %}
 
 {% extends "cfp_review/base.html" %}
+{% block title %}Anonymise Proposal{% endblock %}
 {% block body %}
-
+<h2>Anonymise Proposal</h2>
+<div class="well">
+    <p>Please remove any detail from this proposal which would identify the submitter.</p>
+    <p>Anonymisation doesn't have to be perfect - if a reviewer knows the topic and the submitter well, they can recuse themselves - 
+        but it should be good enough that someone with a passing knowledge of the topic can't identify the submitter.
+    </p>
+    <p>If you're unable to reasonably anonymise this proposal, press "I cannot anonymise this proposal"
+        and we'll get back to the submitter and work with them to revise it.
+    </p>
+    <p>Please don't worry about the content of the proposal. Our reviewers are great - if it's not something we'd
+        want at EMF, it won't pass review.
+    </p>
+</div>
 <form method="post" action="{{ url_for('.anonymise_proposal', proposal_id=proposal.id) }}" class="shrink">
 {{ form.hidden_tag() }}
     <div class="col-md-8">
@@ -21,7 +34,7 @@
     <div class="col-md-4 col-xs-12 btn-group-vertical" role="group">
         <div>&nbsp;</div>
         <div>&nbsp;</div>
-        {{ form.anonymise(class_="btn btn-success debounce", tabindex=3) }}
+        {{ form.anonymise(class_="btn btn-primary debounce", tabindex=3) }}
         {{ form.reject(class_="btn btn-danger debounce", tabindex=4) }}
         {% if next_proposal %}
             <a href="{{ url_for('.anonymise_proposal', proposal_id=next_proposal.id) }}"

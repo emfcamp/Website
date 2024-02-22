@@ -55,6 +55,10 @@ def historic_talk_data(year):
     stage_events = []
     workshop_events = []
     youth_events = []
+    film_events = []
+    music_events = []
+    performance_events = []
+    attendee_events = []
 
     for event in [parse_event(event) for event in schedule]:
         if event["source"] == "external":
@@ -67,8 +71,20 @@ def historic_talk_data(year):
             ]  # "Some idiot"
 
         # All official (non-external) content is on a stage or workshop, so we don't care about anything that isn't
-        if event["type"] in ("talk", "performance"):
+        # Pre-2022 we didn't have is_from_cfp.
+        if not event.get("is_from_cfp", True):
+            events_list = attendee_events
+        elif event["type"] == "talk":
             events_list = stage_events
+        elif event["type"] == "performance":
+            if "[Film]" in event.get("title"):
+                event["title"] = event["title"].replace("[Film] ", "")
+                events_list = film_events
+            elif "[Music]" in event.get("title") or event.get("venue") == "Null Sector":
+                event["title"] = event["title"].replace("[Music] ", "")
+                events_list = music_events
+            else:
+                events_list = performance_events
         elif event["type"] == "workshop":
             events_list = workshop_events
         elif event["type"] == "youthworkshop":
@@ -87,6 +103,10 @@ def historic_talk_data(year):
     stage_events.sort(key=sort_key)
     workshop_events.sort(key=sort_key)
     youth_events.sort(key=sort_key)
+    film_events.sort(key=sort_key)
+    music_events.sort(key=sort_key)
+    performance_events.sort(key=sort_key)
+    attendee_events.sort(key=sort_key)
 
     venues = [
         {"name": "Main Stages", "events": stage_events},
@@ -95,6 +115,24 @@ def historic_talk_data(year):
 
     if len(youth_events) > 0:
         venues.append({"name": "Youth Workshops", "events": youth_events})
+
+    if len(music_events) > 0:
+        venues.append({"name": "Music", "events": music_events})
+
+    if len(film_events) > 0:
+        venues.append({"name": "Films", "events": film_events})
+
+    if len(performance_events) > 0:
+        venues.append({"name": "Performances", "events": performance_events})
+
+    if len(attendee_events) > 0:
+        venues.append(
+            {
+                "name": "Attendee Events",
+                "description": "We encourage people to run their own talks, performances, workshops, and community meetups during the event. These are the ones that people added to the schedule.",
+                "events": attendee_events,
+            }
+        )
 
     return {"year": year, "venues": venues, "event": event_data}
 

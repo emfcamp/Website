@@ -5,12 +5,19 @@ from flask import (
     flash,
 )
 
-from wtforms import StringField, SelectField, BooleanField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms import (
+    StringField,
+    SelectField,
+    BooleanField,
+    SubmitField,
+    SelectMultipleField,
+    IntegerField,
+)
+from wtforms.validators import DataRequired, Optional
 from geoalchemy2.shape import to_shape
 
 from main import db
-from models.cfp import Venue, Proposal
+from models.cfp import Venue, Proposal, HUMAN_CFP_TYPES
 from models.village import Village
 from . import (
     cfp_review,
@@ -19,11 +26,19 @@ from . import (
 from ..common.forms import Form
 
 
+VENUE_TYPE_CHOICES = [(k, v) for k, v in HUMAN_CFP_TYPES.items()]
+
+
 class VenueForm(Form):
     name = StringField("Name", [DataRequired()])
     village_id = SelectField("Village", choices=[], coerce=int)
     scheduled_content_only = BooleanField("Scheduled Content Only")
     latlon = StringField("Location")
+    allowed_types = SelectMultipleField("Allowed for", choices=VENUE_TYPE_CHOICES)
+    default_for_types = SelectMultipleField(
+        "Default Venue for", choices=VENUE_TYPE_CHOICES
+    )
+    capacity = IntegerField("Capacity", validators=[Optional()])
     submit = SubmitField("Save")
     delete = SubmitField("Delete")
 
@@ -82,8 +97,7 @@ def edit_venue(venue_id):
     if form.validate_on_submit():
         if form.delete.data:
             scheduled_content = Proposal.query.filter(
-                Proposal.scheduled_venue_id == venue.id,
-                Proposal.state.in_(["accepted", "finished"]),
+                Proposal.scheduled_venue_id == venue.id, Proposal.is_accepted
             ).count()
 
             if scheduled_content > 0:

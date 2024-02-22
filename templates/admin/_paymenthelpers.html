@@ -40,7 +40,12 @@
     {% if purchase.is_paid_for and purchase.is_transferable %}
     <a class="btn btn-default" href="{{ url_for('.transfer_ticket', ticket_id=purchase.id) }}">Transfer</a>
     {% endif %}
+    {% if purchase.state == 'payment-pending' and payment.purchases|length > 1 %}
+    <a class="btn btn-danger" href="{{ url_for('.cancel_purchase', payment_id=payment.id, purchase_id=purchase.id) }}">Cancel</a>
+    {% endif %}
+    {% if purchase.state == "paid" %}
     <a class="btn btn-default" href="{{ url_for('.convert_ticket', ticket_id=purchase.id) }}">Convert</a>
+    {% endif %}
   </td>
 </tr>
 {% endfor %}

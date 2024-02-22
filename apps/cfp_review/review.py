@@ -95,7 +95,6 @@ def review_list():
             )
         )
     ):
-
         random.shuffle(to_review_again)
         random.shuffle(to_review_new)
         random.shuffle(to_review_old)

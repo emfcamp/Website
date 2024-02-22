@@ -50,7 +50,7 @@ def schedule_frab(year):
 
     schedule = (
         Proposal.query.filter(
-            Proposal.state.in_(["accepted", "finished"]),
+            Proposal.is_accepted,
             Proposal.scheduled_time.isnot(None),
             Proposal.scheduled_venue_id.isnot(None),
             Proposal.scheduled_duration.isnot(None),
@@ -169,7 +169,7 @@ def item_json(year, proposal_id, slug=None):
     if year != event_year():
         abort(404)
     proposal = Proposal.query.get_or_404(proposal_id)
-    if proposal.state not in ("accepted", "finished"):
+    if not proposal.is_accepted:
         abort(404)
 
     if not current_user.is_anonymous:

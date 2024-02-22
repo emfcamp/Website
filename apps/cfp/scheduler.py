@@ -10,8 +10,6 @@ from models.cfp import (
     Venue,
     ROUGH_LENGTHS,
     EVENT_SPACING,
-    DEFAULT_VENUES,
-    VENUE_CAPACITY,
 )
 
 
@@ -24,7 +22,7 @@ class Scheduler(object):
     def set_rough_durations(self):
         proposals = (
             Proposal.query.filter_by(scheduled_duration=None, type="talk")
-            .filter(Proposal.state.in_(["accepted", "finished"]))
+            .filter(Proposal.is_accepted)
             .all()
         )
 
@@ -49,7 +47,7 @@ class Scheduler(object):
     ):
         proposals = (
             Proposal.query.filter(Proposal.scheduled_duration.isnot(None))
-            .filter(Proposal.state.in_(["finished", "accepted"]))
+            .filter(Proposal.is_accepted)
             .filter(Proposal.type.in_(type))
             .order_by(Proposal.favourite_count.desc())
             .all()
@@ -60,10 +58,9 @@ class Scheduler(object):
             proposals_by_type[proposal.type].append(proposal)
 
         capacity_by_type = defaultdict(dict)
-        for type, venues in DEFAULT_VENUES.items():
-            for venue in venues:
-                venue_id = Venue.query.filter(Venue.name == venue).one().id
-                capacity_by_type[type][venue_id] = VENUE_CAPACITY[venue]
+        for venue in Venue.query.all():  # TODO(lukegb): filter to emf venues
+            for type in venue.default_for_types:
+                capacity_by_type[type][venue.id] = venue.capacity
 
         proposal_data = []
         for type, proposals in proposals_by_type.items():

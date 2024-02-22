@@ -6,6 +6,18 @@
 {% set active='details' %}
 {% include "cfp_review/_propsal_tabs.html" %}
 
+
+{% if proposal.state == 'new' %}
+<div class="well">
+    <p>You have the ability to mark this proposal as checked, which will send it to anonymisation. Please do so, but only if:</p>
+    <ul>
+        <li>You have knowledge of the list of banned speakers and can confirm the submitter is not banned from speaking.</li>
+        <li>The description is not obviously incomplete.</li>
+        <li>The description is superficially valid for the category it is submitted in.</li>
+    </ul>
+</div>
+{% endif %}
+
 <div class="col-md-12">
     <h2>{{proposal.published_title or proposal.title}}<br>
         <small>
@@ -61,7 +73,9 @@
                 <div id="requirementsPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="requirementsPanelHeading">
                     <div class="panel-body">
                         <dl class="dl-horizontal">
-                            {{ render_dl_field(form.requirements, rows=3) }}
+                            {{ render_dl_field(form.equipment_required, rows=3) }}
+                            {{ render_dl_field(form.funding_required, rows=3) }}
+                            {{ render_dl_field(form.additional_info, rows=3) }}
                             {{ render_dl_field(form.length) }}
                             {{ render_dl_field(form.notice_required) }}
                             {{ render_dl_field(form.needs_help) }}
@@ -78,7 +92,7 @@
                                 {% endif %}
                             {% elif proposal.type == 'installation' %}
                                 {{ render_dl_field(form.size) }}
-                                {{ render_dl_field(form.funds) }}
+                                {{ render_dl_field(form.installation_funding) }}
                             {% endif %}
                             {{ render_dl_field(form.will_have_ticket) }}
                         </dl>
@@ -114,7 +128,7 @@
                     </div>
                 </div>
             </div>
-            {% if proposal.state in ('accepted', 'finished') %}
+            {% if proposal.is_accepted %}
                 <div class="panel panel-default">
                     <div class="panel-heading" role="tab" id="publishedPanelHeading">
                         <h4 class="panel-title">

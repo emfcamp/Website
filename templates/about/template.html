@@ -12,11 +12,12 @@
 {% set main_class = "about" %}
 {% block title %}{{title}}{% endblock %}
 {% block secondary_nav %}
-  <ul role="navigation" aria-label="About">
+  <ul role="navigation list" aria-label="About">
     {{view("About EMF", "base.about")}}
     {{page("Travel", "travel")}}
     {{page("Arrival Times", "arrival-times")}}
     {{page("What to Bring", "what-to-bring")}}
+    {{page("Villages", "villages")}}
     {{page("Health", "health")}}
     {{page("Accessibility", "accessibility")}}
     {#{{page("Food & Drink", "food")}}#}
@@ -25,7 +26,7 @@
     {#{{page("Childcare", "childcare")}}#}
     {#{{page("Villages", "villages")}}#}
     {#{{page("Bring & Donate", "bring_and_donate")}}#}
-    {#{{page("Volunteering", "volunteering")}}#}
+    {{page("Volunteering", "volunteering")}}
     {{view("Contact", "base.contact")}}
   </ul>
 {% endblock %}

@@ -51,6 +51,11 @@ def render_markdown(source, **view_variables):
     return render_template(page_template(metadata), **view_variables)
 
 
+@base.route("/about/branding")
+def branding():
+    return render_template("about/branding.html")
+
+
 @base.route("/about/<page_name>")
 def page(page_name: str):
     return render_markdown(f"about/{page_name}", page_name=page_name)
@@ -75,4 +80,4 @@ def contact():
 
 @base.route("/about/covid")
 def covid():
-    return redirect(url_for(".health"))
+    return redirect(url_for(".page", page_name="health"), code=301)

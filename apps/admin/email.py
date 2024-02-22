@@ -46,9 +46,7 @@ def get_users(dest: str) -> list[User]:
     elif dest == "purchasers":
         query = query.join(User.payments).filter(Payment.state == "paid")
     elif dest == "cfp":
-        query = query.join(User.proposals).filter(
-            Proposal.state.in_(("accepted", "finished"))
-        )
+        query = query.join(User.proposals).filter(Proposal.is_accepted)
     elif dest == "villages":
         query = query.join(User.village_membership).filter(VillageMember.admin)
 

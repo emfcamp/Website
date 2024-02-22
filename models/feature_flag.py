@@ -10,7 +10,6 @@ DB_FEATURE_FLAGS = [
     "CFP_CLOSED",
     "CFP_FINALISE",
     "ISSUE_TICKETS",
-    "RADIO",
     "LINE_UP",
     "LIGHTNING_TALKS",
     "SCHEDULE",
