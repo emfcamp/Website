@@ -32,7 +32,7 @@ pybarcode = {git = "https://github.com/emfcamp/python-barcode"}
 pillow = "~=10.2"
 icalendar = "==3.11.7"
 pytz = "*"
-stripe = "~=2.38.0"
+stripe = "~=8.0.0"
 ofxparse = "==0.16"
 python-dateutil = "*"
 slotmachine = {git = "https://github.com/emfcamp/slotmachine.git"}

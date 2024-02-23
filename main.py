@@ -64,6 +64,13 @@ toolbar = DebugToolbarExtension()
 wise = None
 
 
+def get_stripe_client(config) -> stripe.StripeClient:
+    return stripe.StripeClient(
+        api_key=config["STRIPE_SECRET_KEY"],
+        stripe_version="2023-10-16",
+    )
+
+
 def check_cache_configuration():
     """Check the cache configuration is appropriate for production"""
     if cache.cache.__class__.__name__ == "SimpleCache":
@@ -153,7 +160,6 @@ def create_app(dev_server=False, config_override=None):
 
     login_manager.anonymous_user = load_anonymous_user
 
-    stripe.api_key = app.config["STRIPE_SECRET_KEY"]
     global wise
     wise = pywisetransfer.Client(
         api_key=app.config["TRANSFERWISE_API_TOKEN"],

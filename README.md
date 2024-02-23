@@ -101,6 +101,10 @@ Or, you can create an account and simultaneously make it an admin by using `./fl
 
 E-mail sending is disabled in development (but is printed out on the console). You can also log in directly by setting `BYPASS_LOGIN=True` in `config/development.cfg` and then using a URL of the form e.g. `/login/admin@test.invalid`.
 
+### Testing payments
+
+The easiest way to test the payments flow (marginally less easy if you don't have a Stripe account) is to use Stripe test keys and pay by card with Stripe's test cards. To test incoming webhooks you can use a service like ngrok or tailscale funnel to expose your local dev instance to the web (temporarily!).
+
 ### Database Migrations
 
 - `./flask db migrate -m 'Migration name'` to generate migration scripts when models have been updated.
