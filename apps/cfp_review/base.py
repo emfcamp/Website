@@ -67,6 +67,7 @@ from . import (
     copy_request_args,
 )
 from ..common.email import from_email
+from ..common.forms import guess_age, guess_gender, guess_ethnicity
 
 
 @cfp_review.route("/")
@@ -1284,27 +1285,39 @@ def invite_speaker():
 
 def get_diversity_counts(user_list):
     res = {
-        "not_set": 0,
         "age": Counter(),
         "gender": Counter(),
         "ethnicity": Counter(),
-        "tags": Counter(),
+        "reviewer_tags": Counter(),
+        "other": {
+            "total": len(user_list),
+        },
     }
+
     for user in user_list:
         if not user.diversity:
-            res["not_set"] += 1
+            res["age"][""] += 1
+            res["gender"][""] += 1
+            res["ethnicity"][""] += 1
             continue
 
         if user.diversity.age:
-            res["age"][user.diversity.age] += 1
+            res["age"][guess_age(user.diversity.age)] += 1
         if user.diversity.gender:
-            res["gender"][user.diversity.gender] += 1
+            res["gender"][guess_gender(user.diversity.gender)] += 1
         if user.diversity.ethnicity:
-            res["ethnicity"][user.diversity.ethnicity] += 1
+            res["ethnicity"][guess_ethnicity(user.diversity.ethnicity)] += 1
 
         if user.cfp_reviewer_tags:
             for tag in user.cfp_reviewer_tags:
-                res["tags"][tag] += 1
+                res["reviewer_tags"][tag] += 1
+
+    res["age"]["not given"] = res["age"][""]
+    del res["age"][""]
+    res["gender"]["not given"] = res["gender"][""]
+    del res["gender"][""]
+    res["ethnicity"]["not given"] = res["ethnicity"][""]
+    del res["ethnicity"][""]
 
     return res
 
@@ -1329,8 +1342,10 @@ def speaker_diversity():
     )
     counts = get_diversity_counts(speakers)
 
-    invited_count = len([1 for u in speakers if u.is_invited_speaker])
-    return render_template("cfp_review/reviewer_diversity.html", counts=counts)
+    counts["other"]["invited"] = len([1 for u in speakers if u.is_invited_speaker])
+    # remove tags from the counts as these are reviewer tags and irrelevant here
+    counts.pop("reviewer_tags")
+    return render_template("cfp_review/speaker_diversity.html", counts=counts)
 
 
 @cfp_review.route("/reviewer-diversity")

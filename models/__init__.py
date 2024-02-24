@@ -76,7 +76,7 @@ def nest_count_keys(rows):
     return tree
 
 
-def bucketise(vals, boundaries):
+def bucketise(vals, boundaries) -> OrderedDict[str, int]:
     """Sort values into bins, like pandas.cut"""
     ranges = [
         "%s-%s" % (a, b - 1) if isinstance(b, int) and b - 1 > a else str(a)
