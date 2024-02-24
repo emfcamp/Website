@@ -54,46 +54,45 @@
     <tr><th>Email</th><td>{{user.email}}</td></tr>
 </table>
 
-
 <form method="post">
-{{ form.hidden_tag() }}
-{{ form.keys }}
+  {{ form.hidden_tag() }}
+  {{ form.keys }}
 
-<h3>Update Details</h3>
-{{ render_field(form.new_name) }}
-{{ render_field(form.new_email) }}
-{{ form.update_details(class_="btn btn-success pull-right") }}
+  <h3>Update Details</h3>
+  {{ render_field(form.new_name) }}
+  {{ render_field(form.new_email) }}
+  {{ form.update_details(class_="btn btn-success pull-right") }}
 
-<div class="row">&nbsp;</div>
+  <div class="row">&nbsp;</div>
 
-<h3>Permissions</h3>
-<p>Note that the admin permission implies all other permissions.</p>
+  <h3>Permissions</h3>
+  <p>Note that the admin permission implies all other permissions.</p>
 
-<table class="table table-condensed">
-    <tr>{% for permission in permissions %}
-            <th>{{permission.name|capitalize}}</th>
-        {% endfor %}
-    </tr>
-    <tr>
-        {% for permission in permissions %}
-            <td>{{ form["permission_" ~ permission.name]() }}</td>
-        {% endfor %}
-    </tr>
-</table>
-{{ form.change_permissions(class_="btn btn-success pull-right") }}
+  <table class="table table-condensed">
+      <tr>{% for permission in permissions %}
+              <th>{{permission.name|capitalize}}</th>
+          {% endfor %}
+      </tr>
+      <tr>
+          {% for permission in permissions %}
+              <td>{{ form["permission_" ~ permission.name]() }}</td>
+          {% endfor %}
+      </tr>
+  </table>
+  {{ form.change_permissions(class_="btn btn-success pull-right") }}
 
-<div class="row">&nbsp;</div>
-<hr>
-{{ render_field(form.note) }}
-{{ form.add_note(class_="btn btn-success pull-right") }}
+  <div class="row">&nbsp;</div>
+  <hr>
+  {{ render_field(form.note) }}
+  {{ form.add_note(class_="btn btn-success pull-right") }}
+
+  <div class="row">&nbsp;</div>
+  <hr>
+  {{ render_field(form.cfp_invite_reason) }}
+  {{ form.save_cfp_invite_reason(class_="btn btn-success pull-right") }}
+  </form>
+  <div class="row">&nbsp;</div>
 </form>
-
-<div class="row">&nbsp;</div>
-<hr>
-{{ render_field(form.cfp_invite_reason) }}
-{{ form.save_cfp_invite_reason(class_="btn btn-success pull-right") }}
-</form>
-<div class="row">&nbsp;</div>
 
 <h3>Payments</h3>
 <table class="table table-condensed">
