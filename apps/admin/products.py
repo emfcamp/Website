@@ -458,7 +458,10 @@ def product_view(view_id):
         db.session.commit()
 
     active_vouchers = Voucher.query.filter_by(view=view).filter(
-        not_(Voucher.expiry.isnot(None) & (Voucher.expiry < func.now()))
+        not_(
+            Voucher.expiry.isnot(None)
+            & (Voucher.expiry + VOUCHER_GRACE_PERIOD < func.now())
+        )
         & not_(Voucher.is_used)
     )
     stats = {
@@ -533,7 +536,7 @@ def product_view_voucher_list(view_id):
         vouchers = vouchers.filter(
             not_(
                 Voucher.expiry.isnot(None)
-                & (Voucher.expiry < func.now() - VOUCHER_GRACE_PERIOD)
+                & (Voucher.expiry + VOUCHER_GRACE_PERIOD < func.now())
             )
         )
 

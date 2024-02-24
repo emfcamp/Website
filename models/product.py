@@ -480,6 +480,7 @@ class Voucher(BaseModel):
 
     code = db.Column(db.String, primary_key=True)
     expiry = db.Column(db.DateTime, nullable=True)
+
     email = db.Column(db.String, nullable=True, index=True)
 
     product_view_id = db.Column(db.Integer, db.ForeignKey("product_view.id"))
@@ -526,8 +527,11 @@ class Voucher(BaseModel):
 
     @property
     def is_expired(self) -> bool:
-        return self.expiry is not None and self.expiry < (
-            datetime.utcnow() - VOUCHER_GRACE_PERIOD
+        # Note: this should be a column_property but getting the current time in the DB
+        # interacts badly with the fact that we fake the date in tests.
+        return (
+            self.expiry is not None
+            and (self.expiry + VOUCHER_GRACE_PERIOD) < datetime.utcnow()
         )
 
     def check_capacity(self, basket: Basket):
