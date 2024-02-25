@@ -1,5 +1,3 @@
-{% from 'payments/_invoicehelpers.html' import render_epc_qr with context %}
-
 {% extends "base.html" %}
 {% block body %}
 
@@ -33,7 +31,7 @@
 
 {% if payment.state == 'inprogress' %}
 <p>We will use the reference below to identify the payment as yours, so please ensure it's included in full. (Don't worry about the hyphen, or if the payee name doesn't quite fit.)</p>
-<dl class="dl-horizontal" style="position: relative">
+<dl class="dl-horizontal">
 <dt>Bank</dt><dd>{{ account.institution }}, {{ account.address }}</dd>
 <dt>Payee</dt><dd>{{ account.payee_name }}</dd>
 {% if payment.currency == 'GBP' %}
@@ -45,20 +43,7 @@
 {% endif %}
 <dt>Amount</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
 <dt>Reference</dt><dd>{{ payment.customer_reference | bankref }}</dd>
-{% if payment.currency == 'EUR' %}
-<dt>EPC QR Code</dt>
-<dd class="well">
-<a class="collapse-toggle" role="button" data-toggle="collapse" href="#epc-qr-code" aria-expanded="false" aria-controls="epc-qr-code"><strong>Click to show</strong>{{octicon('chevron-down-24')}}</a>
-<div id="epc-qr-code" class="epc-qr-code collapse">{{ render_epc_qr(payment) }}</div>
-<div class="pull-right" aria-describedby="what-is-epc-qr">(what is this?) {{octicon('info-24')}}</div>
-<div id="what-is-epc-qr" class="well" role="tooltip" style="left: 20px; top: -20px">
-<p>The European Payments Council (EPC) has published <a href="https://www.europeanpaymentscouncil.eu/sites/default/files/kb/file/2022-09/EPC069-12%20v3.0%20Quick%20Response%20Code%20-%20Guidelines%20to%20Enable%20the%20Data%20Capture%20for%20the%20Initiation%20of%20an%20SCT_0.pdf">technical guidelines</a> that allow payment request information to be displayed as a Quick Response (QR) code.
-<p>If your banking app supports scanning EPC QR codes, you can enter our bank account details accurately and conveniently by scanning the QR code.</p>
-<p>Please check that the details match the text version on this page, and that all of them match your expectations, before sending the payment.</p>
-</div>
-</dd>
 </dl>
-{% endif %}
 
 {% if SITE_STATE != 'after-event' %}
 <p>See you at Electromagnetic Field!</p>
