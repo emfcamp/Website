@@ -498,17 +498,6 @@ class BankTransaction(BaseModel):
             except NoResultFound:
                 continue
 
-        # It's pretty safe to match against the last character being lost
-        found = re.findall("[%s]{4}[- ]?[%s]{3}" % (safechars, safechars), ref)
-        for f in found:
-            bankref = f.replace("-", "").replace(" ", "")
-            try:
-                return BankPayment.query.filter(
-                    BankPayment.bankref.startswith(bankref)
-                ).one()
-            except NoResultFound:
-                continue
-
         return None
 
 
