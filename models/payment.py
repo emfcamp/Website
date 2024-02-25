@@ -2,7 +2,7 @@ import random
 import re
 from decimal import Decimal
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Iterable, Optional
 from sqlalchemy import event, func, column
 from sqlalchemy.orm import Session, aliased
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -441,19 +441,22 @@ class BankTransaction(BaseModel):
         )
         return matching
 
-    @staticmethod
-    def _trim_iso11649_header(ref: str) -> str:
-        """
-        Trim ISO-11649 creditor reference headers, when present, from a payment
-        reference.  When no such header is present, the reference should be returned
-        unmodified.
-        """
-        prefix = "RF[0-9][0-9]"  # RF prefix and check digits
-        bankref = "[%s]{4}[- ]?[%s]{4}" % (safechars, safechars)  # 8-character bankref
-        return re.sub(rf"{prefix} ?({bankref})", r"\1", ref)
-
     def match_payment(self) -> Optional[BankPayment]:
+        for bankref in self._recognized_bankrefs:
+            try:
+                return BankPayment.query.filter_by(bankref=bankref).one()
+            except NoResultFound:
+                continue
+
+        return None
+
+    @property
+    def _recognized_bankrefs(self) -> Iterable[str]:
         """
+        Given a customer reference text received on a bank transfer, scan for
+        substrings that appear to be valid bank references that we can match
+        against bank transfer records in the database.
+
         We need to deal with human error and character deletion without colliding.
         Unless we use some sort of coding, the minimum length of a bankref should
         be 8, although 7 is workable. For reference:
@@ -487,18 +490,14 @@ class BankTransaction(BaseModel):
         """
 
         ref = self.payee.upper()
+        hdr = "(RF[0-9][0-9] ?)?"  # optional ISO11649 header + check-digits
 
-        ref = self._trim_iso11649_header(ref)
-
-        found = re.findall("[%s]{4}[- ]?[%s]{4}" % (safechars, safechars), ref)
-        for f in found:
+        found = re.findall("%s([%s]{4}[- ]?[%s]{4})" % (hdr, safechars, safechars), ref)
+        for iso_header, f in found:
             bankref = f.replace("-", "").replace(" ", "")
-            try:
-                return BankPayment.query.filter_by(bankref=bankref).one()
-            except NoResultFound:
+            if iso_header and not iso11649.is_valid(iso_header + bankref):
                 continue
-
-        return None
+            yield bankref
 
 
 db.Index(
