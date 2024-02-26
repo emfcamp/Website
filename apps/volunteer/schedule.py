@@ -4,9 +4,6 @@ from datetime import datetime
 from flask import render_template, request, redirect, url_for, flash, jsonify, session
 from collections import defaultdict
 from flask_login import current_user
-from markupsafe import Markup
-import markdown
-from glob import glob
 
 from main import db
 
@@ -116,18 +113,6 @@ def _toggle_shift_entry(user, shift):
         res["message"] = "Signed up for %s shift" % shift.role.name
 
     return res
-
-
-def _format_role_descriptions():
-    roles = {}
-    extensions = ["markdown.extensions.nl2br"]
-
-    for name in glob("apps/volunteer/role_descriptions/*.md"):
-        role_id = name.split("/")[-1].replace(".md", "")
-        content = open(name, "r").read()
-        roles[role_id] = Markup(markdown.markdown(content, extensions=extensions))
-
-    return roles
 
 
 @volunteer.route("/shift/<shift_id>", methods=["GET", "POST"])
