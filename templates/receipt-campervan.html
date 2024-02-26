@@ -1,9 +1,10 @@
 {% from '_receipthelpers.html' import render_header, render_barcode with context %}
 
-  {% for ticket in parking_tickets %}
+  {% for ticket in campervan_tickets %}
     {{ render_header(ticket.owner) }}
-    <h3>Parking ticket {{ loop.index }}</h3>
+    <h3>Live-in vehicle ticket {{ loop.index }}</h3>
     <div class="vehicle-tickets">
+{# TODO: This wording needs amending! https://github.com/emfcamp/Website/issues/1193 #}
         <p>Please put this on your dashboard before arriving at EMF.
            Volunteers at the <b>main access gate</b> will check it on your arrival.
            They will show you where to park and unload your stuff.</p>

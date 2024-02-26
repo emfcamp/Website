@@ -28,9 +28,8 @@ def render_receipt(user, png=False, pdf=False):
 
     admissions = purchases.filter(ProductGroup.type == "admissions").all()
 
-    vehicle_tickets = purchases.filter(
-        ProductGroup.type.in_(["parking", "campervan"])
-    ).all()
+    parking_tickets = purchases.filter(ProductGroup.type == "parking").all()
+    campervan_tickets = purchases.filter(ProductGroup.type == "campervan").all()
 
     tees = purchases.filter(ProductGroup.type == "tees").all()
     hires = purchases.filter(ProductGroup.type == "hire").all()
@@ -49,7 +48,8 @@ def render_receipt(user, png=False, pdf=False):
         format_inline_qr=format_inline_qr,
         format_inline_barcode=format_inline_barcode,
         admissions=admissions,
-        vehicle_tickets=vehicle_tickets,
+        parking_tickets=parking_tickets,
+        campervan_tickets=campervan_tickets,
         transferred_tickets=transferred_tickets,
         tees=tees,
         hires=hires,

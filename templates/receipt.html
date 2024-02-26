@@ -94,14 +94,22 @@
 
     </div>
 
-    {% if vehicle_tickets %}
+    {% if parking_tickets %}
       <div class="nextpage"></div>
     {% endif %}
 
   {% endif %}
 
-  {% if vehicle_tickets %}
+  {% if parking_tickets %}
     {% include 'receipt-parking.html' %}
+
+    {% if campervan_tickets %}
+      <div class="nextpage"></div>
+    {% endif %}
+  {% endif %}
+
+  {% if campervan_tickets %}
+    {% include 'receipt-campervan.html' %}
   {% endif %}
 </div>
 {% endblock %}
