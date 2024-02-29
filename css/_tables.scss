@@ -1,7 +1,17 @@
 @use "./_variables.scss" as *;
 
-table, table a {
+table {
     color: $highlight-background-text;
+}
+
+table {
+    a {
+        color: inherit;
+    }
+
+    header, h2, h3, h4, h5, h6 {
+        color: inherit;
+    }
 }
 
 table > thead:first-child > tr:first-child > th:first-child,
