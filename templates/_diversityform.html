@@ -9,9 +9,9 @@
   </div>
   <div class="col-sm-12">
     <p></p>
-    {{ render_field(form.age, True, placeholder="Optional") }}
-    {{ render_field(form.gender, True, placeholder="Optional") }}
-    {{ render_field(form.ethnicity, True, placeholder="Optional") }}
+    {{ render_field(form.age, True) }}
+    {{ render_field(form.gender, True) }}
+    {{ render_field(form.ethnicity, True) }}
     {% if current_user.has_permission("cfp_reviewer") %}
       <p>
         Just so we know that we're reflecting our attendees' interests reasonably well:
@@ -19,9 +19,9 @@
         everything you feel able to, this is purely so we can track if there are areas
         we need to recruit more reviewers.
       </p>
-      {{ render_field(form.cfp_tag_0, True, placeholder="Optional") }}
-      {{ render_field(form.cfp_tag_1, True, placeholder="Optional") }}
-      {{ render_field(form.cfp_tag_2, True, placeholder="Optional") }}
+      {{ render_field(form.cfp_tag_0, True) }}
+      {{ render_field(form.cfp_tag_1, True) }}
+      {{ render_field(form.cfp_tag_2, True) }}
     {% endif %}
   </div>
 </fieldset>

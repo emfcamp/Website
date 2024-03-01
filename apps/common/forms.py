@@ -28,11 +28,9 @@ GENDER_MATCHERS = {
     "female": re.compile(r"^(female|woman|f|fem|femme)$", re.I),
     "male": re.compile(r"^(male|man|m|masc)$", re.I),
     "non-binary": re.compile(r"^(nb|enby|non[ -]?binary)$", re.I),
-    "transman": re.compile(r"^trans[ -]?(man|masc)$", re.I),
-    "transwoman": re.compile(r"^trans[ -]?(woman|fem|femme)$", re.I),
     "other": re.compile(r"^other$", re.I),
 }
-GENDER_CHOICES = tuple([(v, v.capitalize()) for v in GENDER_MATCHERS.keys()] + OPT_OUT)
+GENDER_CHOICES = tuple(OPT_OUT + [(v, v.capitalize()) for v in GENDER_MATCHERS.keys()])
 
 
 ETHNICITY_MATCHERS = {
@@ -51,11 +49,11 @@ ETHNICITY_MATCHERS = {
     "other": re.compile(r"^other$", re.I),
 }
 ETHNICITY_CHOICES = tuple(
-    [(v, v.capitalize()) for v in ETHNICITY_MATCHERS.keys()] + OPT_OUT
+    OPT_OUT + [(v, v.capitalize()) for v in ETHNICITY_MATCHERS.keys()]
 )
 
 AGE_VALUES = ("0-15", "16-25", "26-35", "36-45", "46-55", "56-65", "66+")
-AGE_CHOICES = tuple([(v, v) for v in AGE_VALUES] + OPT_OUT)
+AGE_CHOICES = tuple(OPT_OUT + [(v, v) for v in AGE_VALUES])
 
 
 def guess_age(age_str: str) -> str:
@@ -101,9 +99,9 @@ def guess_ethnicity(ethnicity_str: str) -> str:
 
 
 class DiversityForm(Form):
-    age = SelectField("Age", choices=AGE_CHOICES)
-    gender = SelectField("Gender", choices=GENDER_CHOICES)
-    ethnicity = SelectField("Ethnicity", choices=ETHNICITY_CHOICES)
+    age = SelectField("Age", default=OPT_OUT[0], choices=AGE_CHOICES)
+    gender = SelectField("Gender", default=OPT_OUT[0], choices=GENDER_CHOICES)
+    ethnicity = SelectField("Ethnicity", default=OPT_OUT[0], choices=ETHNICITY_CHOICES)
 
     # Track CfP reviewer tags
     cfp_tag_0 = SelectField("Topic 1", default=DEFAULT_TAGS[0], choices=DEFAULT_TAGS)
