@@ -2,11 +2,13 @@ import random
 import re
 from decimal import Decimal
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Iterable, Optional
 from sqlalchemy import event, func, column
 from sqlalchemy.orm import Session, aliased
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from sqlalchemy_continuum.utils import version_class, transaction_class
+from stdnum import iso11649
+from stdnum.iso7064 import mod_97_10
 
 from main import db
 from . import (
@@ -314,6 +316,23 @@ class BankPayment(Payment):
             except (MultipleResultsFound, NoResultFound):
                 continue
 
+    @property
+    def customer_reference(self):
+        if self.id is None:
+            raise Exception(
+                "Customer references can only be generated for payments that have "
+                "been persisted to the database."
+            )
+
+        # Derive an ISO-11649 payment reference for EUR-currency payments
+        if self.currency == "EUR":
+            order_check_digits = mod_97_10.calc_check_digits(f"{self.bankref}RF")
+            customer_reference = f"RF{order_check_digits}{self.bankref}"
+            assert iso11649.is_valid(customer_reference)
+            return customer_reference
+        else:
+            return self.bankref
+
 
 class BankAccount(BaseModel):
     __tablename__ = "bank_account"
@@ -423,7 +442,21 @@ class BankTransaction(BaseModel):
         return matching
 
     def match_payment(self) -> Optional[BankPayment]:
+        for bankref in self._recognized_bankrefs:
+            try:
+                return BankPayment.query.filter_by(bankref=bankref).one()
+            except NoResultFound:
+                continue
+
+        return None
+
+    @property
+    def _recognized_bankrefs(self) -> Iterable[str]:
         """
+        Given a customer reference text received on a bank transfer, scan for
+        substrings that appear to be valid bank references that we can match
+        against bank transfer records in the database.
+
         We need to deal with human error and character deletion without colliding.
         Unless we use some sort of coding, the minimum length of a bankref should
         be 8, although 7 is workable. For reference:
@@ -447,30 +480,24 @@ class BankTransaction(BaseModel):
 
         where serial is a 6-digit number, and ref is often the payee
         name again, or REFERENCE, and always truncated to 8 chars.
+
+        We've also received ISO-11649 payment references formatted:
+
+          ref/timestamp_plus_iban
+
+        Where the timestamp contains digits and is immediately followed by
+        the payer's IBAN (no delimiter between the two).
         """
 
         ref = self.payee.upper()
+        hdr = "(RF[0-9][0-9] ?)?"  # optional ISO11649 header + check-digits
 
-        found = re.findall("[%s]{4}[- ]?[%s]{4}" % (safechars, safechars), ref)
-        for f in found:
+        found = re.findall("%s([%s]{4}[- ]?[%s]{4})" % (hdr, safechars, safechars), ref)
+        for iso_header, f in found:
             bankref = f.replace("-", "").replace(" ", "")
-            try:
-                return BankPayment.query.filter_by(bankref=bankref).one()
-            except NoResultFound:
+            if iso_header and not iso11649.is_valid(iso_header + bankref):
                 continue
-
-        # It's pretty safe to match against the last character being lost
-        found = re.findall("[%s]{4}[- ]?[%s]{3}" % (safechars, safechars), ref)
-        for f in found:
-            bankref = f.replace("-", "").replace(" ", "")
-            try:
-                return BankPayment.query.filter(
-                    BankPayment.bankref.startswith(bankref)
-                ).one()
-            except NoResultFound:
-                continue
-
-        return None
+            yield bankref
 
 
 db.Index(

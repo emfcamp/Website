@@ -56,6 +56,7 @@ pywisetransfer = "^0.3.1"
 freezegun = "^1.1.0"
 logging_tree = "^1.9"
 flask-mailman = "^0.3.0"
+python-stdnum = "^1.19"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -42,7 +42,7 @@
 <dt>IBAN</dt><dd>{{ account.iban | iban }}</dd>
 {% endif %}
 <dt>Amount</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
-<dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
+<dt>Reference</dt><dd>{{ payment.customer_reference | bankref }}</dd>
 </dl>
 
 {% if SITE_STATE != 'after-event' %}
