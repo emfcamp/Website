@@ -1,6 +1,7 @@
 import re
 from typing import Pattern
 
+from flask import current_app as app
 from flask_wtf import FlaskForm
 from wtforms import SelectField
 
@@ -19,41 +20,22 @@ class Form(FlaskForm):
         csrf_context = None
 
 
-# FIXME Helper stuff for transition from freetext diversity form -> select boxes
-# This should be deleted for 2026
 OPT_OUT = [
     ("", "Prefer not to say"),
 ]
-GENDER_MATCHERS = {
-    "female": re.compile(r"^(female|woman|f|fem|femme)$", re.I),
-    "male": re.compile(r"^(male|man|m|masc)$", re.I),
-    "non-binary": re.compile(r"^(nb|enby|non[ -]?binary)$", re.I),
-    "other": re.compile(r"^other$", re.I),
-}
-GENDER_CHOICES = tuple(OPT_OUT + [(v, v.capitalize()) for v in GENDER_MATCHERS.keys()])
 
+GENDER_VALUES = ("female", "male", "non-binary", "other")
+GENDER_CHOICES = tuple(OPT_OUT + [(v, v.capitalize()) for v in GENDER_VALUES])
 
-ETHNICITY_MATCHERS = {
-    "asian": re.compile(r"^(asian|indian|chinese|pakistani)$", re.I),
-    "black": re.compile(r"^(black ?(british)?)$", re.I),
-    "mixed": re.compile(r"^mixed$", re.I),
-    "white": re.compile(
-        (
-            # white, white british, white uk etc.
-            r"^(white ?(british|irish|welsh|scottish|uk|european|english)?"
-            # just british, caucasian etc.
-            r"|caucasian|british|irish|welsh|scottish|uk|european|english)$"
-        ),
-        re.I,
-    ),
-    "other": re.compile(r"^other$", re.I),
-}
-ETHNICITY_CHOICES = tuple(
-    OPT_OUT + [(v, v.capitalize()) for v in ETHNICITY_MATCHERS.keys()]
-)
+ETHNICITY_VALUES = ("asian", "black", "mixed", "white", "other")
+ETHNICITY_CHOICES = tuple(OPT_OUT + [(v, v.capitalize()) for v in ETHNICITY_VALUES])
 
 AGE_VALUES = ("0-15", "16-25", "26-35", "36-45", "46-55", "56-65", "66+")
 AGE_CHOICES = tuple(OPT_OUT + [(v, v) for v in AGE_VALUES])
+
+
+# FIXME these are matchers for transition from freetext diversity form -> select boxes
+# This should be deleted for 2026
 
 
 def guess_age(age_str: str) -> str:
@@ -88,11 +70,17 @@ def __guess_value(match_str: str, matchers_dict: dict[str, Pattern]) -> str:
 
 
 def guess_gender(gender_str: str) -> str:
-    return __guess_value(gender_str, GENDER_MATCHERS)
+    gender_matchers = app.config.get("GENDER_MATCHERS", {})
+    gender_re_matchers = {k: re.compile(v, re.I) for k, v in gender_matchers.items()}
+    return __guess_value(gender_str, gender_re_matchers)
 
 
 def guess_ethnicity(ethnicity_str: str) -> str:
-    return __guess_value(ethnicity_str, ETHNICITY_MATCHERS)
+    ethnicity_matchers = app.config.get("ETHNICITY_MATCHERS", {})
+    ethnicity_re_matchers = {
+        k: re.compile(v, re.I) for k, v in ethnicity_matchers.items()
+    }
+    return __guess_value(ethnicity_str, ethnicity_re_matchers)
 
 
 # End of stuff to delete for 2026
