@@ -1,52 +1,10 @@
 {% extends "base.html" %}
 {% from "_formhelpers.html" import render_field %}
 
-{% macro days_shifts(day, active_day) %}
-<div role="tabpanel" class="tab-pane {%- if active_day == day %} active {%- endif %}" id="{{ day }}">
-    <table id="tab-{{ day }}" class="table table-bordered shifts-table">
-        <thead><tr>
-            <th>Starts</th>
-            <th>Ends</th>
-            <th>Venue</th>
-            <th>Role</th>
-            <th>People</th>
-            <th></th>
-        </tr></thead>
-        <tbody id="tbody-{{ day }}">
-            {% for hour in all_shifts[day] | sort %}
-                {% for shift in all_shifts[day][hour] %}
-                    <tr style="display: none">
-                        {% if loop.first %}
-                            <td rowspan="{{ all_shifts[day][hour] | length }}">{{ hour }}</td>
-                        {% endif %}
-                        <td>{{ shift.end if shift.end else '--' }}</td>
-                        <td>{{ shift.venue.name }}</td>
-                        <td>{{ shift.role.name }}</td>
-                        <td>{{ shift.entries | length }}/{{ shift.max_needed }}</td>
-                        <td><a href="{{ url_for('.shift', shift_id=shift.id) }}" class="btn btn-block {% if shift.is_user_shift -%}
-                            btn-danger
-                        {%- else -%}
-                            btn-primary
-                        {%- endif %}">
-                            {%- if shift.is_user_shift -%}
-                                Cancel
-                            {%- else -%}
-                                Sign Up
-                            {%- endif -%}
-                        </button></td>
-                    </tr>
-                {% endfor %}
-            {% endfor %}
-        </tbody>
-    </table>
-    </div>
-{%- endmacro %}
-
 {% macro tabnav(day, full_day, active_day) %}
     <li id="tabnav-{{day}}" role="presentation" {%- if active_day == day %} class="active" {% endif %}>
-        <a href="{{ url_for('.schedule', day=day) }}" data-day="{{ day }}" aria-controls="{{ day }}" role="tab" data-toggle="tab">{{ full_day }}</a>
+        <a href="{{ url_for('.schedule', day=day) }}" aria-controls="{{ day }}" role="tab">{{ full_day }}</a>
     </li>
-
 {% endmacro %}
 
 {% block title %}
@@ -61,29 +19,17 @@
     </noscript>
 
     {% if untrained_roles %}
-    <div class="alert alert-info">
-    You still need training before starting a shift for the following roles:
-    <ul class="list-unstyle">
-    {% for role in untrained_roles %}
-    <li>{{ role.name }}</li>
-    {% endfor %}
-    </ul>
-    </div>
+        <div class="alert alert-info">
+            You still need training before starting a shift for the following roles:
+            <ul class="list-unstyle">
+                {% for role in untrained_roles %}
+                    <li>{{ role.name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
     {% endif %}
 
-    <div id="filter-panel" class="panel panel-default" style="display: none;">
-        <div class="panel-heading">
-            <h4 class="panel-title">
-                <a role="button" data-toggle="collapse" data-target="#searchPanel"
-                    aria-controls="searchPanel" aria-expanded="true">
-                    <strong>Filter▼</strong>
-                </a>
-            </h4>
-        </div>
-        <div class="panel-body collapse" id="searchPanel">
-            {% include "volunteer/_schedule_filters.html" %}
-        </div>
-    </div>
+    {% include "volunteer/_schedule_filters.html" %}
 
     <ul class="nav nav-tabs" role="tablist">
         {{ tabnav('wed', 'Wednesday', active_day) }}
@@ -94,78 +40,53 @@
         {{ tabnav('mon', 'Monday', active_day) }}
     </ul>
     <div class="tab-content table-responsive">
-        {{ days_shifts('wed', active_day) }}
-        {{ days_shifts('thu', active_day) }}
-        {{ days_shifts('fri', active_day) }}
-        {{ days_shifts('sat', active_day) }}
-        {{ days_shifts('sun', active_day) }}
-        {{ days_shifts('mon', active_day) }}
+        <div role="tabpanel" class="tab-pane active" id="{{ active_day }}">
+            <table id="tab-{{ active_day }}" class="table table-bordered shifts-table">
+                <thead><tr>
+                    <th>Starts</th>
+                    <th>Ends</th>
+                    <th>Venue</th>
+                    <th>Role</th>
+                    <th>People</th>
+                    <th></th>
+                </tr></thead>
+                <tbody id="tbody-{{ active_day }}">
+                    {% for hour in all_shifts | sort %}
+                        {% for shift in all_shifts[hour] %}
+                            <tr id="shift-{{ shift.id }}" data-role-id="{{ shift.role.id }}" data-shift-start="{{ hour }}" data-shift-end="{{ shift.end_time }}" data-staffed="{{ shift.current_count >= shift.min_needed }}" data-full="{{ shift.current_count >= shift.max_needed }}" data-signed-up="{{ shift.is_user_shift }}" data-min-staff="{{ shift.min_needed }}" data-max-staff="{{ shift.max_needed }}" data-current-staff="{{ shift.current_count }}">
+                                {% if loop.first %}
+                                    <td rowspan="{{ all_shifts[hour] | length }}">{{ hour }}</td>
+                                {% else %}
+                                    <td style="display: none">{{ hour }}</td>
+                                {% endif %}
+                                <td>{{ shift.end_time if shift.end else '--' }}</td>
+                                <td>{{ shift.venue.name }}</td>
+                                <td>{{ shift.role.name }}</td>
+                                <td>{{ shift.current_count }}/{{ shift.max_needed }}</td>
+                                {% if current_user.has_permission("volunteer:admin") %}
+                                    <td><a href="{{ url_for('.shift', shift_id=shift.id) }}" class="btn btn-block btn-primary">Details</a></td>
+                                {% else %}
+                                    <td>
+                                            {%- if shift.is_user_shift -%}
+                                                <form method="post" action="{{ url_for('.shift_cancel', shift_id=shift.id) }}">
+                                                    <button class="btn btn-block btn-danger">Cancel</button>
+                                                </form>
+                                            {%- else -%}
+                                                <form method="post" action="{{ url_for('.shift_sign_up', shift_id=shift.id) }}">
+                                                    <button class="btn btn-block btn-success">Sign Up</button>
+                                                </form>
+                                            {%- endif -%}
+                                        </form>
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 {% endblock %}
-
 {% block foot %}
-    <!-- Modal -->
-    <div class="modal fade" id="signUp" tabindex="-1" role="dialog" aria-labelledby="signUpLabel">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">
-              <span id="modal-role">Role</span> at <span id="modal-time">18:00</span>
-            </h4>
-          </div>
-          <div class="modal-body">
-            <strong>Start time:</strong> <span id="modal-start-time">18:00</span><br>
-            <strong>End time:</strong> <span id="modal-end-time">21:00</span><br>
-            <strong>Location:</strong> <span id="modal-location">Volunteer Tent</span><br>
-            
-            <div id="modal-description">
-            </div>
-          </div>
-          <div class="modal-footer">
-            <div id="signup-grp" class="input-group">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button id='signUpBtn' type="button" class="btn btn-primary">Sign Up</button>
-            </div>
-            {% if current_user.has_permission('volunteer:admin') %}
-              
-                <div class="input-group" id="shift-admin">
-                    <select id="override-user" class="form-control">
-                        {% for volunteer in all_volunteers %}
-                        <option value="{{ volunteer.user_id }}">{{ volunteer.nickname }} &lt;{{ volunteer.volunteer_email }}&gt;</option>
-                        {% endfor %}
-                    </select>
-                    <span class="input-group-btn">
-                        <button id="override-sign-up-btn" class="btn btn-default debouce">Sign Up User</button>
-                    </span>
-                </div>
-                <a id="contact-link" href="">Contact signed up volunteers</a>
-                <a id="shift-link" href="">Shift Page</a>
-            {% endif %}
-
-          </div>
-        </div>
-      </div>
-    </div>
-
     <script src="{{ static_url_for('static', filename='js/volunteer-schedule.js') }}"></script>
-    <script type="text/javascript" nonce="{{csp_nonce}}">
-        $('#filter-panel').show();
-
-        // Set hrefs back for tabs if JS is enabled
-        $('a[data-day').each((_, e) => {
-            $(e).attr('href', '#' + $(e).attr('data-day'));
-        });
-        $('#signUp').on('hidden.bs.modal', function(e) {
-          // clear messages
-          $('.alert').remove();
-        });
-
-        var volunteer_shifts = {{ all_shifts | tojson }},
-            volunteer_roles = {{ roles | tojson }},
-            is_admin = {% if current_user.has_permission('volunteer:admin') -%} true {%- else -%} false {%- endif %};
-
-        init_volunteer_schedule(volunteer_shifts, volunteer_roles, '{{ active_day }}', is_admin);
-
-    </script>
 {% endblock %}

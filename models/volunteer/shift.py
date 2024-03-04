@@ -1,7 +1,7 @@
 import pytz
 
 from pendulum import period
-from sqlalchemy import select, func
+from sqlalchemy import select, func, text
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from main import db
@@ -112,6 +112,19 @@ class Shift(BaseModel):
     @classmethod
     def get_all(cls):
         return cls.query.order_by(Shift.start, Shift.venue_id).all()
+
+    @classmethod
+    def get_all_for_day(cls, day: str):
+        """
+        Return all shifts for the requested day.
+        """
+        return (
+            cls.query.where(
+                text("lower(to_char(start, 'Dy'))=:day").bindparams(day=day.lower())
+            )
+            .order_by(Shift.start, Shift.venue_id)
+            .all()
+        )
 
     @classmethod
     def generate_for(
