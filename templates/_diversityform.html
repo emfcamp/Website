@@ -1,13 +1,14 @@
 {% from "_formhelpers.html" import render_field %}
 
 {% macro render_diversity_fields(form, current_user) %}
+{# Should only be rendered inside a .panel #}
 
 <fieldset>
-  <div class="col-sm-12">
+  <div class="panel-heading">
     If you're comfortable telling us a little bit about yourself, we'd appreciate it.
     This information will only be summarised and compared with previous years, to find out how well we're doing with outreach.
   </div>
-  <div class="col-sm-12">
+  <div class="panel-heading">
     <p></p>
     {{ render_field(form.age, True) }}
     {{ render_field(form.gender, True) }}

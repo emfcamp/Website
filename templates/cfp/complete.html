@@ -7,15 +7,18 @@
 You will be able to make changes until we start the anonymisation process.</p>
 
 {% if not current_user.diversity %}
-<p>&nbsp;</p>
-
 <form action={{ url_for('cfp.complete') }} method="post" class="form-horizontal" role="form">
   {{ form.hidden_tag() }}
 
-  {{ render_diversity_fields(form, current_user) }}
+  <div class="panel panel-default">
+    <div class="panel-heading">
+    One last form to fill in
+    </div>
+    {{ render_diversity_fields(form, current_user) }}
 
-  <div class="form-actions">
-    <button type="submit" name="Create" class="btn btn-success pull-right debounce">Continue</button>
+    <div class="form-actions">
+      <button type="submit" name="Create" class="btn btn-success pull-right debounce">Continue</button>
+    </div>
   </div>
 </form>
 {% endif %}
