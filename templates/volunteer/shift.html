@@ -11,19 +11,7 @@
     </div>
     <div>Start: {{ shift.start.strftime('%A %H:%M') }}</div>
     <div>Stop: {{ shift.end.strftime('%A %H:%M') }}</div>
-    <div><a href="{{ url_for('.role', role_id=shift.role.id) }}">More info on {{ shift.role.name }}</a></div>
-
-    <form method="POST" >
-        {% if shift in current_user.shift_entries %}
-            <button class="btn btn-warn">
-                Cancel this shift
-            </button>
-        {% else %}
-            <button class="btn btn-primary">
-                Sign up to do the shift!
-            </button>
-        {% endif %}
-    </form>
+    <div>{{ shift.role.full_description() }}</div>
 
     {% if current_user.has_permission('volunteer:manager') %}
         <h2>These people are on this shift</h2>
@@ -33,5 +21,19 @@
             {% endfor %}
         </ul>
         <a href="{{ url_for('.shift_contact', shift_id=shift.id) }}">Contact signed up volunteers</a>
+
+        <h2>Add volunteer</h2>
+        <form action="{{ url_for('.shift_sign_up', shift_id=shift.id) }}" method="post">
+            <input type="hidden" name="next" value="{{ url_for('.shift', shift_id=shift.id) }}">
+            <select name="user_id">
+                {% for volunteer in all_volunteers %}
+                    {% if volunteer not in shift.volunteers %}
+                        <option value="{{ volunteer.id }}">{{ volunteer.nickname }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="btn btn-primary">Sign up</button>
+        </form>
     {% endif %}
 {% endblock %}

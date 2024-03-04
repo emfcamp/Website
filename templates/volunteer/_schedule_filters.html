@@ -1,33 +1,74 @@
 {# Filter form on /volunteer/schedule #}
-<form class="row">
-    <fieldset class="form-horizontal col-sm-8">
-        <div class="form-group">
-            <label for="role" class="col-sm-4">
-                Role<br>
-                <small>(ctrl/&#8984; or shift click for multiple)</small>
-            </label>
-            <div class="col-sm-8">
-                <select id="role-select" name="role" multiple="multiple" class="form-control shift-filter">
-                    {% for r in roles %}
-                        <option id='role-opt-{{r.id}}' value="{{r.id}}">{{r.name}}</option>
-                    {% endfor %}
-                </select>
-            </div>
+<div class="panel panel-default" id="filters" style="display: none">
+    <div class="panel-heading" id="filters-toggle">
+        <h2 class="panel-title">
+            <span class="title">Filters</span>
+            <span class="toggle"><a href="#">Toggle</a></span>
+        </h2>
+    </div>
+    <div class="panel-body" id="filters-body" style="display: none">
+        <div class="form-group form-inline">
+            <h3>Roles</h3>
+            <p>
+                <a class="checkbox-filter" href="#" id="select-all-roles">Select all</a>
+                <a class="checkbox-filter" href="#" id="select-no-roles">Select none</a>
+                <a class="checkbox-filter" href="#" id="select-interested-roles">Select roles I'm interested in</a>
+                <a class="checkbox-filter" href="#" id="select-trained-roles">Select roles I'm trained for</a>
+            </p>
+            {% for r in roles %}
+                <label class="checkbox">
+                    <input
+                        type="checkbox"
+                        checked
+                        data-role-id="{{ r.id }}"
+                        data-trained="{{ r.is_trained }}"
+                        data-interested="{{ r.is_interested }}" 
+                    />
+                    {{ r.name }}
+                </label>
+            {% endfor %}
         </div>
-        <div class="form-group">
-            <label for="venue" class="col-sm-4">
-                Venue<br>
-                <small>(ctrl/&#8984; or shift click for multiple)</small>
+        <div class="form-group form-inline">
+            <h3>Filters</h3>
+            <label class="checkbox">
+                <input
+                    type="checkbox"
+                    id="show_past"
+                />
+                Show shifts in the past
             </label>
-            <div class="col-sm-8">
-                <select id="venue-select" name="venue" multiple="multiple" class="form-control shift-filter">
-                    {% for v in venues %}
-                        <option id='venue-opt-{{v.id}}' value="{{v.id}}">{{v.name}}</option>
-                    {% endfor %}
-                </select>
-            </div>
+            <label class="checkbox">
+                <input
+                    type="checkbox"
+                    id="show_signed_up_only"
+                />
+                Only show my shifts
+            </label>
+            <label class="checkbox">
+                <input
+                    type="checkbox"
+                    id="hide_full"
+                />
+                Hide full shifts
+            </label>
+            <label class="checkbox">
+                <input
+                    type="checkbox"
+                    id="is_understaffed"
+                />
+                Only show understaffed shifts
+            </label>
+            <label class="checkbox">
+                <input
+                    type="checkbox"
+                    id="colourful_mode"
+                />
+                Colourful mode
+            </label>
         </div>
-    </fieldset>
+    </div>
+</div>
+    <!--
     <fieldset class="form-horizontal col-sm-4">
         <div class="form-group">
             <div class="checkbox">
@@ -85,6 +126,10 @@
                 </label>
             </div>
         </div>
+    </div>
+</div>
+<form class="row">
+    <fieldset class="form-horizontal col-sm-8">
     <fieldset class="form-horizontal col-sm-12">
         <div class="form-group">
             <div class="btn-group">
@@ -93,4 +138,4 @@
         </div>
     </fieldset>
 </form>
-
+-->
