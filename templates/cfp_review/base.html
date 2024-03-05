@@ -36,3 +36,31 @@
     </div>
 </div>
 {% endblock %}
+
+{% block foot %}
+<script nonce="{{csp_nonce}}">
+$(() => {
+  /* Ensure collapsed form sections are uncollapsed
+     when they include invalid fields. */
+  const showInvalidField = (field) => {
+    $(field).closest('.collapse').collapse('show');
+  };
+  const showInvalidFields = (form) => {
+    const fields = form.querySelectorAll('.has-error');
+    if (!fields.length) return;
+    $(fields[0]).closest('.collapse').on('shown.bs.collapse', () => {
+      $('input,select,textarea', fields[0])[0].focus();
+    });
+    fields.forEach(f => showInvalidField(f));
+  };
+
+  $(() => {  // Make sure we're running after the validation code
+    document.querySelectorAll('form').forEach(form => {
+      form.addEventListener('invalid', () => showInvalidField(event.target), true);  // The browser will scrollIntoView for this
+      form.addEventListener('submit', () => showInvalidFields(event.target));
+      showInvalidFields(form);
+    });
+  });
+});
+</script>
+{% endblock %}
