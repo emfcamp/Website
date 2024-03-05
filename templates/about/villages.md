@@ -1,7 +1,7 @@
 title: Villages
 ---
 # Villages
-A village is a group of friends, like-minded people, colleagues or even families camping together at EMF. Maybe your village is a collection of sub villages, or maybe it’s just your hackerspace. A village can be based around themes, shared passions and existing communities - great places in the past have been the Maths village, the HAB Village and groups like Milliways and the Scottish Consulate. You can find the list of currently registered villages for EMF 2024 at [emfcamp.org/villages](/villages).
+A village is a group of friends, like-minded people, colleagues or even families camping together at EMF. Maybe your village is a collection of sub villages, or maybe it’s just your hackerspace. A village can be based around themes, shared passions and existing communities - great places in the past have been the Maths village, the HAB Village and groups like Milliways and the Scottish Consulate. You can find the list of currently registered villages for EMF 2024 at [emfcamp.org/villages/2024](/villages/2024).
 
 If there is a village based around something you are interested in, then you should definitely visit that village during the event to see what's going on. Or you could even join that village to help make more things go on. If there's not a village based around your interests, then you can start your own village and others will probably join you.
 
