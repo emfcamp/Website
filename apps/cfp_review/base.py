@@ -225,6 +225,7 @@ def export(format: str):
         mime = "text/csv"
         buf = StringIO()
         w = csv.writer(buf)
+        fields.remove("tags")
         # Header row
         w.writerow(fields)
         for p in proposals:
