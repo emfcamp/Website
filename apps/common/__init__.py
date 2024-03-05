@@ -70,6 +70,8 @@ def load_utility_functions(app_obj):
 
     @app_obj.template_filter("bankref")
     def format_bankref(bankref):
+        if bankref.startswith("RF"):
+            return " ".join(wrap(bankref, 4))
         return "%s-%s" % (bankref[:4], bankref[4:])
 
     @app_obj.context_processor

@@ -181,7 +181,7 @@
     <dt>SWIFT</dt><dd>{{ account.swift }}</dd>
     <dt>IBAN</dt><dd>{{ account.iban | iban }}</dd>
     {% endif %}
-    <dt>Reference</dt><dd>{{ payment.bankref | bankref }}</dd>
+    <dt>Reference</dt><dd>{{ payment.customer_reference | bankref }}</dd>
     {#
       {% if payment.provider == 'banktransfer' and payment.currency == 'EUR' and payment.state == 'inprogress' %}
       <dt>EPC QR Code</dt><dd>{{ render_epc_qr(payment) }}</dd>

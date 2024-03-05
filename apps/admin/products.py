@@ -1,4 +1,5 @@
 import re
+from typing import Optional
 from flask import (
     render_template,
     redirect,
@@ -367,10 +368,15 @@ def product_group_copy(group_id):
 
 
 @admin.route("/transfers")
-def purchase_transfers():
-    transfer_logs = PurchaseTransfer.query.all()
+@admin.route("/transfers/for-id/<int:purchase_id>")
+def purchase_transfers(purchase_id: Optional[int] = None):
+    transfer_logs = PurchaseTransfer.query
+    if purchase_id is not None:
+        transfer_logs = transfer_logs.filter_by(purchase_id=purchase_id)
     return render_template(
-        "admin/products/purchase-transfers.html", transfers=transfer_logs
+        "admin/products/purchase-transfers.html",
+        transfers=transfer_logs.all(),
+        purchase_id=purchase_id,
     )
 
 

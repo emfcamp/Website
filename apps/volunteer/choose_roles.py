@@ -22,7 +22,8 @@ from models.volunteer.shift import Shift, ShiftEntry
 
 from . import volunteer, v_user_required
 from ..common import feature_flag
-from ..common.forms import Form, HiddenIntegerField
+from ..common.forms import Form
+from ..common.fields import HiddenIntegerField
 
 
 class RoleSelectForm(Form):

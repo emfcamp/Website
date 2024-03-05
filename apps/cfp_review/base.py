@@ -1,10 +1,15 @@
-from datetime import timedelta
 from collections import defaultdict, Counter
+import csv
+from datetime import timedelta
+from http import HTTPStatus
+from io import BytesIO, StringIO
 from itertools import combinations
+import json
 
 import dateutil
 from flask import (
     redirect,
+    send_file,
     url_for,
     request,
     abort,
@@ -16,6 +21,7 @@ from flask import (
 )
 from flask_login import current_user
 from flask_mailman import EmailMessage
+from models.permission import Permission
 from sqlalchemy import func, exists, select
 from sqlalchemy.orm import joinedload
 
@@ -66,6 +72,7 @@ from . import (
     copy_request_args,
 )
 from ..common.email import from_email
+from ..common.forms import guess_age, guess_gender, guess_ethnicity
 
 
 @cfp_review.route("/")
@@ -101,7 +108,7 @@ def bool_qs(val):
     raise ValueError("Invalid querystring boolean")
 
 
-def filter_proposal_request():
+def filter_proposal_request() -> tuple[list[Proposal], bool]:
     bool_names = ["one_day", "needs_help", "needs_money"]
     bool_vals = [request.args.get(n, type=bool_qs) for n in bool_names]
     bool_dict = {n: v for n, v in zip(bool_names, bool_vals) if v is not None}
@@ -190,6 +197,53 @@ def proposals():
         filtered=filtered,
         total_proposals=Proposal.query.count(),
         tag_counts=tag_counts,
+    )
+
+
+@cfp_review.route("/proposals.<format>")
+@admin_required
+def export(format: str):
+    fields = [
+        "id",
+        "user_id",
+        "created",
+        "modified",
+        "state",
+        "type",
+        "title",
+        "description",
+        "equipment_required",
+        "funding_required",
+        "additional_info",
+        "length",
+        "notice_required",
+        "tags",
+        "favourite_count",
+    ]
+    proposals, _ = filter_proposal_request()
+    if format == "csv":
+        mime = "text/csv"
+        buf = StringIO()
+        w = csv.writer(buf)
+        fields.remove("tags")
+        # Header row
+        w.writerow(fields)
+        for p in proposals:
+            w.writerow([getattr(p, a) for a in fields])
+        out = buf.getvalue()
+    elif format == "json":
+        mime = "application/json"
+        out = json.dumps(
+            [{a: getattr(p, a) for a in fields} for p in proposals],
+            default=str,
+        )
+    else:
+        abort(HTTPStatus.BAD_REQUEST, "Unsupported export format")
+    return send_file(
+        BytesIO(out.encode()),
+        mime,
+        as_attachment=True,
+        download_name=f"proposals.{format}",
     )
 
 
@@ -1279,6 +1333,83 @@ def invite_speaker():
         )
 
     return render_template("cfp_review/invite-speaker.html", form=form)
+
+
+def get_diversity_counts(user_list):
+    res = {
+        "age": Counter(),
+        "gender": Counter(),
+        "ethnicity": Counter(),
+        "reviewer_tags": Counter(),
+        "other": {
+            "total": len(user_list),
+        },
+    }
+
+    for user in user_list:
+        if not user.diversity:
+            res["age"][""] += 1
+            res["gender"][""] += 1
+            res["ethnicity"][""] += 1
+            continue
+
+        if user.diversity.age:
+            res["age"][guess_age(user.diversity.age)] += 1
+        if user.diversity.gender:
+            res["gender"][guess_gender(user.diversity.gender)] += 1
+        if user.diversity.ethnicity:
+            res["ethnicity"][guess_ethnicity(user.diversity.ethnicity)] += 1
+
+        if user.cfp_reviewer_tags:
+            for tag in user.cfp_reviewer_tags:
+                res["reviewer_tags"][tag] += 1
+
+    res["age"]["not given"] = res["age"][""]
+    del res["age"][""]
+    res["gender"]["not given"] = res["gender"][""]
+    del res["gender"][""]
+    res["ethnicity"]["not given"] = res["ethnicity"][""]
+    del res["ethnicity"][""]
+
+    return res
+
+
+@cfp_review.route("/speaker-diversity")
+@admin_required
+def speaker_diversity():
+    speakers = (
+        User.query.join(User.proposals)
+        .filter(
+            User.proposals.any(
+                Proposal.state.in_(
+                    [
+                        "manual-review",
+                        "accepted",
+                        "finalised",
+                    ]
+                )
+            )
+        )
+        .all()
+    )
+    counts = get_diversity_counts(speakers)
+
+    counts["other"]["invited"] = len([1 for u in speakers if u.is_invited_speaker])
+    # remove tags from the counts as these are reviewer tags and irrelevant here
+    counts.pop("reviewer_tags")
+    return render_template("cfp_review/speaker_diversity.html", counts=counts)
+
+
+@cfp_review.route("/reviewer-diversity")
+@admin_required
+def reviewer_diversity():
+    reviewers = (
+        User.query.join(User.permissions)
+        .filter(User.permissions.any(Permission.name.in_(["cfp_reviewer"])))
+        .all()
+    )
+    counts = get_diversity_counts(reviewers)
+    return render_template("cfp_review/reviewer_diversity.html", counts=counts)
 
 
 from . import venues  # noqa

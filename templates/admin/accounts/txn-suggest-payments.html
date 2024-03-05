@@ -40,7 +40,7 @@ No suitable payments were found.
   <td><b>{{ payment.user.name }}</b></td>
   <td><a href="{{ url_for('.user', user_id=payment.user.id) }}">{{ payment.user.email }}</a></td>
   <td><b>{{ payment.amount | price(payment.currency) }}</b></td>
-  <td>{{ payment.bankref | bankref }}</td>
+  <td>{{ payment.customer_reference | bankref }}</td>
   <td>
     <a class="btn btn-warning" href="{{ url_for('admin.transaction_reconcile', txn_id=txn.id, payment_id=payment.id) }}">Reconcile</a>
   </td>

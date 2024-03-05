@@ -17,7 +17,8 @@ from models.volunteer import Volunteer as VolunteerUser
 from models.user import User
 
 from . import volunteer, v_user_required
-from ..common.forms import Form, TelField
+from ..common.forms import Form
+from ..common.fields import TelField
 from ..common import create_current_user, feature_flag
 
 

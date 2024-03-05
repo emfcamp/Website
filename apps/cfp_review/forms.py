@@ -15,7 +15,8 @@ from wtforms.validators import DataRequired, Optional, NumberRange, ValidationEr
 
 from models.cfp import HUMAN_CFP_TYPES, Venue, ORDERED_STATES
 from models.cfp_tag import Tag
-from ..common.forms import Form, HiddenIntegerField, EmailField
+from ..common.forms import Form
+from ..common.fields import HiddenIntegerField, EmailField
 from ..admin.users import NewUserForm
 
 from dateutil.parser import parse as parse_date
@@ -125,8 +126,7 @@ class UpdateProposalForm(Form):
 
         if self.needs_laptop.raw_data:
             proposal.needs_laptop = self.needs_laptop.data
-        if self.may_record.raw_data:
-            proposal.may_record = self.may_record.data
+        proposal.may_record = self.may_record.data
 
         # All these if statements are because this will nuke the data if you
         # change the state when the fields are currently hidden, so changing

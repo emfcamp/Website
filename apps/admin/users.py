@@ -14,7 +14,8 @@ from sqlalchemy_continuum.utils import version_class
 from models.user import User, generate_signup_code
 from models.permission import Permission
 from ..common.email import from_email
-from ..common.forms import Form, EmailField
+from ..common.forms import Form
+from ..common.fields import EmailField
 
 
 class NewUserForm(Form):

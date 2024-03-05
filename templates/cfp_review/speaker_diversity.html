@@ -1,0 +1,32 @@
+{% macro diversity_metric(metric, values) %}
+  <h4>{{ metric }}</h4>
+  <dl class="dl-horizontal">
+    {% for key, count in values.items() %}
+      <dt>{{ key }}</dt><dd>{{count}}</dd>
+    {% endfor %}
+  </dl>
+{% endmacro %}
+
+{% extends "cfp_review/base.html" %}
+{% block title %}Speaker diversity{% endblock %}
+{% block body %}
+  <h2>Speaker diversity</h2>
+
+  <p>
+    If you want to see a break down of tags on proposals please you want the
+    <a href="{{ url_for('.proposals_summary') }}">proposals summary page.</a>
+  </p>
+
+  <h3>Notes</h3>
+  <p>
+    Numbers across a category may not sum to the total if a speaker has only
+    given some info.
+  </p>
+  <p>
+    'other' in gender covers any response not male/female.
+  </p>
+
+  {% for metric, values in counts.items() if metric %}
+    {{diversity_metric(metric, values)}}
+  {% endfor %}
+{% endblock %}

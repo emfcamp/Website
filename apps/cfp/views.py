@@ -18,7 +18,7 @@ import collections
 from sqlalchemy.exc import IntegrityError
 
 from main import db, external_url
-from models.user import User, UserDiversity
+from models.user import User
 from models.cfp import (
     TalkProposal,
     WorkshopProposal,
@@ -35,7 +35,8 @@ from models.cfp import (
 )
 from ..common import feature_flag, feature_enabled, create_current_user
 from ..common.email import from_email
-from ..common.forms import Form, TelField, EmailField
+from ..common.forms import Form, DiversityForm
+from ..common.fields import TelField, EmailField
 from ..common.irc import irc_send
 
 from . import cfp
@@ -361,28 +362,19 @@ def form(cfp_type="talk"):
     )
 
 
-class DiversityForm(Form):
-    age = StringField("Age")
-    gender = StringField("Gender")
-    ethnicity = StringField("Ethnicity")
-
-
 @cfp.route("/cfp/complete", methods=["GET", "POST"])
 @feature_flag("CFP")
 def complete():
     if current_user.is_anonymous:
         return redirect(url_for(".main"))
+
     form = DiversityForm()
     if form.validate_on_submit():
-        if not current_user.diversity:
-            current_user.diversity = UserDiversity()
-
-        current_user.diversity.age = form.age.data
-        current_user.diversity.gender = form.gender.data
-        current_user.diversity.ethnicity = form.ethnicity.data
-
+        form.update_user(current_user)
         db.session.commit()
         return redirect(url_for(".proposals"))
+
+    form.set_from_user(current_user)
 
     return render_template("cfp/complete.html", form=form)
 

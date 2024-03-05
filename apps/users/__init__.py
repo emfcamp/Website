@@ -27,7 +27,8 @@ from models.basket import Basket
 
 from ..common import set_user_currency, feature_flag
 from ..common.email import from_email
-from ..common.forms import Form, EmailField
+from ..common.forms import Form
+from ..common.fields import EmailField
 
 
 users = Blueprint("users", __name__)
