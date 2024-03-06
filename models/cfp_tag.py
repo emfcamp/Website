@@ -5,6 +5,7 @@ from . import BaseModel
 
 DEFAULT_TAGS = [
     "accessibility",
+    "ai",
     "alternative",
     "arts",
     "coding",
@@ -19,6 +20,7 @@ DEFAULT_TAGS = [
     "food and drink",
     "games",
     "hackspaces",
+    "history",
     "infrastructure",
     "internet",
     "lgbtq",
