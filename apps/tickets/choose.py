@@ -86,6 +86,9 @@ def main(flow="main"):
     voucher = None
     if code := session.get("ticket_voucher"):
         voucher = Voucher.get_by_code(code)
+        if voucher.view != view:
+            # The user has a voucher but it's not what's allowing them access to this view
+            voucher = None
     # Validate the capacity in the form, setting the maximum limits where available.
     if not form.ensure_capacity(basket, voucher):
         # We're not able to provide the number of tickets the user has selected.
