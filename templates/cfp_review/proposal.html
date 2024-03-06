@@ -46,8 +46,10 @@
                         <dl class="dl-horizontal">
                             <dt>Submitted</dt>
                             <dd>{{proposal.created.strftime("%Y-%m-%d %H:%M")}}</dd>
-                            <dt>E-Mail</dt>
+                            <dt>Email</dt>
                             <dd>{{proposal.user.email}}</dd>
+                            <dt>Has ticket</dt>
+                            <dd>{{proposal.has_ticket()}}</dd>
                             {% if proposal.anonymiser_id %}
                             <dt>Anoymised by</dt>
                             <dd>{{ proposal.anonymiser.name }}</dd>
