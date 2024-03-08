@@ -4,7 +4,7 @@ from flask_login import current_user
 from pendulum import parse
 
 from . import volunteer, v_admin_required
-from ..common import feature_flag
+from ..common import feature_enabled, feature_flag
 from ..base.about import render_markdown
 
 from main import db
@@ -21,7 +21,11 @@ from .init_data import venue_list, role_list, shift_list
 
 @volunteer.route("/")
 def main():
-    if current_user.is_authenticated and Volunteer.get_for_user(current_user):
+    if (
+        feature_enabled("VOLUNTEERS_SCHEDULE")
+        and current_user.is_authenticated
+        and Volunteer.get_for_user(current_user)
+    ):
         return redirect(url_for(".schedule"))
     return redirect(url_for(".info"))
 
