@@ -126,10 +126,14 @@ def shift_sign_up(shift_id):
             "You must complete training before you can sign up for this shift."
         )
 
-    for v_shift in user.shift_entries:
-        if shift.is_clash(v_shift.shift):
+    for shift_entry in user.shift_entries:
+        if shift.is_clash(shift_entry.shift):
+            clashing_shift = shift_entry.shift
+            clash_role = clashing_shift.role.name
+            clash_time = clashing_shift.start.strftime("%H:%M")
+
             return redirect_next_or_schedule(
-                "This shift clashes with an existing shift, you have not been signed up."
+                f"This shift clashes with your {clash_role} shift at {clash_time}, you have not been signed up."
             )
 
     shift.entries.append(ShiftEntry(user=user, shift=shift))
