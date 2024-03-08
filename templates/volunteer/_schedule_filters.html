@@ -19,7 +19,7 @@
                 <label class="checkbox">
                     <input
                         type="checkbox"
-                        checked
+                        {% if r.is_interested %}checked{% endif %}
                         data-role-id="{{ r.id }}"
                         data-trained="{{ r.is_trained }}"
                         data-interested="{{ r.is_interested }}" 
@@ -48,6 +48,7 @@
                 <input
                     type="checkbox"
                     id="hide_full"
+                    checked
                 />
                 Hide full shifts
             </label>
