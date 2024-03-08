@@ -8,7 +8,7 @@ function loadFilters() {
         return
     }
 
-    filters = JSON.parse(savedFilters)
+    let filters = JSON.parse(savedFilters)
     document.querySelectorAll("input[data-role-id]").forEach(node => {
         node.checked = filters.role_ids.includes(node.getAttribute("data-role-id"))
     })
@@ -61,6 +61,12 @@ function shouldDisplayNode(node_data, filters) {
     }
     if (filters["signed_up"] && !node_data["signed_up"]) {
         filter_reasons.push("signed_up");
+    }
+    if (!filters["show_past"]) {
+        let now = new Date().toISOString()
+        if (now > node_data["end"]) {
+            filter_reasons.push("in_past")
+        }
     }
     return filter_reasons.length === 0;
 }

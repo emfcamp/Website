@@ -53,7 +53,7 @@
                 <tbody id="tbody-{{ active_day }}">
                     {% for hour in all_shifts | sort %}
                         {% for shift in all_shifts[hour] %}
-                            <tr id="shift-{{ shift.id }}" data-role-id="{{ shift.role.id }}" data-shift-start="{{ hour }}" data-shift-end="{{ shift.end_time }}" data-staffed="{{ shift.current_count >= shift.min_needed }}" data-full="{{ shift.current_count >= shift.max_needed }}" data-signed-up="{{ shift.is_user_shift }}" data-min-staff="{{ shift.min_needed }}" data-max-staff="{{ shift.max_needed }}" data-current-staff="{{ shift.current_count }}">
+                            <tr id="shift-{{ shift.id }}" data-role-id="{{ shift.role.id }}" data-shift-start="{{ hour }}" data-shift-end="{{ shift.end }}" data-staffed="{{ shift.current_count >= shift.min_needed }}" data-full="{{ shift.current_count >= shift.max_needed }}" data-signed-up="{{ shift.is_user_shift }}" data-min-staff="{{ shift.min_needed }}" data-max-staff="{{ shift.max_needed }}" data-current-staff="{{ shift.current_count }}">
                                 {% if loop.first %}
                                     <td rowspan="{{ all_shifts[hour] | length }}">{{ hour }}</td>
                                 {% else %}
