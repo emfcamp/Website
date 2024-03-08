@@ -14,6 +14,7 @@ from models.volunteer.shift import Shift, ShiftEntry
 from models.volunteer.volunteer import Volunteer
 from models import config_date
 
+from ..users import get_next_url
 from ..common import feature_flag
 from . import volunteer, v_user_required, v_admin_required
 
@@ -41,7 +42,9 @@ def redirect_next_or_schedule(message: str | None = None):
     if message is not None:
         flash(message)
 
-    return redirect(request.form.get("next", url_for(".schedule")))
+    next = get_next_url(url_for(".schedule"))
+
+    return redirect(next)
 
 
 @volunteer.route("/schedule")
