@@ -12,6 +12,8 @@ If you're planning to bring something especially big or in need of lots of power
 ## Register a Village
 By [registering your village at emfcamp.org/villages/register](/villages/register), you'll be making the Village People aware of the fact you plan to arrive, and how much space you're likely to need, and you'll allow us to get in touch to discuss how we can support your plans and activities at the event.
 
+Once you've registered a village, we encourage you to create a page on the [EMF 2024 wiki](https://wiki.emfcamp.org) including information about your village and who people should talk to if they want to join you. You can then [edit your village at emfcamp.org/villages/register](/villages/register) and set this as your URL so it is linked to in the list of villages.
+
 ## What can we do as a village?
 Villages are great as you can share ideas, equipment and space! The sharing doesn’t stop there - it lets you share resources too. You can come up with a cooking and cleaning rota as a group to reduce waste, make the camp cheaper and interrupt your day with a change of activity. Some people spend all their time cooking for others!
 
