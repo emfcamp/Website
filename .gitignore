@@ -126,6 +126,9 @@ exports/*/private
 .com.apple.timemachine.supported
 node_modules
 
+# IntelliJ
+.idea/
+
 # Compiled static assets
 static/*
 !static/financial-statements
