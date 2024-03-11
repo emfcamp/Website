@@ -1,3 +1,5 @@
+const { verified } = require("@primer/octicons");
+
 function saveFilters() {
     localStorage.setItem("volunteer-filters:v2", JSON.stringify(getFilters()))
 }
@@ -74,8 +76,9 @@ function shouldDisplayNode(node_data, filters) {
 
 function spanStartTimeCell(firstNodeOfHour, rowCount) {
     if (firstNodeOfHour !== null) {
-        firstNodeOfHour.children[0].setAttribute("rowspan", rowCount);
-        $(firstNodeOfHour.children[0]).show();
+        let start_time_cell = firstNodeOfHour.querySelector(".start_time");
+        start_time_cell.setAttribute("rowspan", rowCount);
+        start_time_cell.classList.remove("hidden")
     }
 }
 
@@ -89,6 +92,14 @@ function rowClass(node_data) {
     }
 
     return 'warning';
+}
+
+function colourise_row(node, node_data, colourful_mode) {
+    ["danger", "warning", "info"].forEach(className => node.classList.remove(className))
+
+    if (!colourful_mode) { return }
+
+    node.classList.add(rowClass(node_data))
 }
 
 function updateRowDisplay() {
@@ -116,23 +127,17 @@ function updateRowDisplay() {
                 rowCount = 0
                 currentHour = node.getAttribute("data-shift-start")
             } else {
-                // Otherwise we hide the start time cell. q
-                $(node.children[0]).hide()
+                // Otherwise we hide the start time cell.
+                node.querySelector(".start_time").classList.add("hidden")
             }
 
-            node.classList.remove("danger")
-            node.classList.remove("warning")
-            node.classList.remove("info")
-
-            if (filters.colourful_mode) {
-                node.classList.add(rowClass(node_data))
-            }
+            colourise_row(node, node_data, filters.colourful_mode);
 
             rowCount += 1;
 
-            $(node).show();
+            node.classList.remove("hidden");
         } else {
-            $(node).hide();
+            node.classList.add("hidden");
         }
 
         if (idx == rows.length - 1) { spanStartTimeCell(firstNodeOfHour, rowCount); }
@@ -177,6 +182,9 @@ function init_volunteer_schedule() {
         document.querySelectorAll('input[data-role-id]').forEach((checkbox) => checkbox.checked = checkbox.getAttribute('data-trained') == 'True')
         saveFilters()
         updateRowDisplay()
+    });
+    document.getElementById('select-day').addEventListener("change", (ev) => {
+        document.location.replace(ev.target.value)
     });
 };
 

@@ -39,9 +39,20 @@
         {{ tabnav('sun', 'Sunday', active_day) }}
         {{ tabnav('mon', 'Monday', active_day) }}
     </ul>
+    <div class="nav-select form-group form-inline">
+        <label for="select-day">Day:</label>
+        <select id="select-day">
+            <option value="{{ url_for('.schedule', day='wed') }}" {% if active_day == "wed" %}selected{% endif %}>Wednesday</option> 
+            <option value="{{ url_for('.schedule', day='thu') }}" {% if active_day == "thu" %}selected{% endif %}>Thursday</option> 
+            <option value="{{ url_for('.schedule', day='fri') }}" {% if active_day == "fri" %}selected{% endif %}>Friday</option> 
+            <option value="{{ url_for('.schedule', day='sat') }}" {% if active_day == "sat" %}selected{% endif %}>Saturday</option> 
+            <option value="{{ url_for('.schedule', day='sun') }}" {% if active_day == "sun" %}selected{% endif %}>Sunday</option> 
+            <option value="{{ url_for('.schedule', day='mon') }}" {% if active_day == "mon" %}selected{% endif %}>Monday</option> 
+        </select>
+    </div>
     <div class="tab-content table-responsive">
         <div role="tabpanel" class="tab-pane active" id="{{ active_day }}">
-            <table id="tab-{{ active_day }}" class="table table-bordered shifts-table">
+            <table id="tab-{{ active_day }}" class="table table-bordered responsive-table shifts-table">
                 <thead><tr>
                     <th>Starts</th>
                     <th>Ends</th>
@@ -55,18 +66,19 @@
                         {% for shift in all_shifts[hour] %}
                             <tr id="shift-{{ shift.id }}" data-role-id="{{ shift.role.id }}" data-shift-start="{{ hour }}" data-shift-end="{{ shift.end }}" data-staffed="{{ shift.current_count >= shift.min_needed }}" data-full="{{ shift.current_count >= shift.max_needed }}" data-signed-up="{{ shift.is_user_shift }}" data-min-staff="{{ shift.min_needed }}" data-max-staff="{{ shift.max_needed }}" data-current-staff="{{ shift.current_count }}">
                                 {% if loop.first %}
-                                    <td rowspan="{{ all_shifts[hour] | length }}">{{ hour }}</td>
+                                    <td class="start_time" rowspan="{{ all_shifts[hour] | length }}">{{ hour }}</td>
                                 {% else %}
-                                    <td style="display: none">{{ hour }}</td>
+                                    <td class="start_time hidden">{{ hour }}</td>
                                 {% endif %}
-                                <td>{{ shift.end_time if shift.end else '--' }}</td>
-                                <td>{{ shift.venue.name }}</td>
-                                <td>{{ shift.role.name }}</td>
-                                <td>{{ shift.current_count }}/{{ shift.max_needed }}</td>
+                                <td class="end_time">{{ shift.end_time if shift.end else '--' }}</td>
+                                <td class="time mobile-only">{{ hour }}{% if shift.end %} to {{ shift.end_time }}{% endif %}</td>
+                                <td class="venue">{{ shift.venue.name }}</td>
+                                <td class="role">{{ shift.role.name }}</td>
+                                <td class="staffing">{{ shift.current_count }}/{{ shift.max_needed }}</td>
                                 {% if current_user.has_permission("volunteer:admin") %}
-                                    <td><a href="{{ url_for('.shift', shift_id=shift.id) }}" class="btn btn-block btn-primary">Details</a></td>
+                                    <td class="button"><a href="{{ url_for('.shift', shift_id=shift.id) }}" class="btn btn-block btn-primary">Details</a></td>
                                 {% else %}
-                                    <td>
+                                    <td class="button">
                                             {%- if shift.is_user_shift -%}
                                                 <form method="post" action="{{ url_for('.shift_cancel', shift_id=shift.id) }}">
                                                     <button class="btn btn-block btn-danger">Cancel</button>

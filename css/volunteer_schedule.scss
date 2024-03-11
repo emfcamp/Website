@@ -1,9 +1,15 @@
-.modal {
-  color: black;
-}
+@use "./_variables.scss" as *;
 
 #role-select {
   height: 260px;
+}
+
+.nav-select {
+  display: none;
+
+  select {
+    color: black;
+  }
 }
 
 table.shifts-table tr,
@@ -11,4 +17,99 @@ table.shifts-table th,
 table.shifts-table td {
   // !important because I'm a terrible (and very lazy) person
   border-color: #630047 !important;
+}
+
+table.shifts-table tbody td.hidden {
+  display: none;
+}
+
+table.shifts-table tbody td.mobile-only {
+  display: none;
+}
+
+// Overrides for mobile.
+@media (max-width: 768px) {
+  .nav-tabs {
+    display: none;
+  }
+
+  .nav-select {
+    display: block;
+  }
+
+  .tab-content {
+    border: none;
+  }
+
+  #filters label.checkbox {
+    margin-left: 20px;
+  }
+
+  table.shifts-table {
+    border: none !important; // Override table-bordered
+
+    tbody {
+      tr {
+        td:before {
+          width: 30%;
+          left: 0px;
+          padding-left: 15px;
+          padding-top: 0;
+          font-weight: bold;
+        }
+
+        td {
+          padding-left: 30%;
+          padding-top: 5px;
+          padding-bottom: 0;
+          border: none;
+        }
+
+        td.mobile-only {
+          display: block;
+        }
+
+        td.button:before {
+          width: 0;
+        }
+
+        td.button {
+          padding-left: 15px;
+          padding-bottom: 15px;
+        }
+
+        // This is used to provide a heading for each start time.
+        td.start_time {
+          font-size: 1.2em;
+          padding-left: 0px;
+          padding-bottom: 5px;
+          background-color: $main-background;
+          color: $main-background-header;
+          font-family: $header-font-stack;
+
+        }
+
+        // Hide discrete end time column in favour of showing "from X to Y"
+        td.end_time {
+          display: none;
+        }
+
+        td.time:before {
+          content: "Time";
+        }
+
+        td.venue:before {
+          content: "Location";
+        }
+
+        td.role:before {
+          content: "Role";
+        }
+
+        td.staffing:before {
+          content: "Signed up";
+        }
+      }
+    }
+  }
 }
