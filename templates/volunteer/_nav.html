@@ -3,21 +3,23 @@
     <a href="{{url_for(view)}}">{{text}}</a>
 </li>
 {% endmacro %}
-<ul class="nav nav-pills">
-    {% if current_user.is_authenticated %}
-    {{ menuitem('Account', '.account') }}
-    {{ menuitem('Roles', '.choose_role') }}
-    {% if feature_enabled('VOLUNTEERS_SCHEDULE') %}
-    {{ menuitem('Shift sign-up', '.schedule') }}
-    {% endif %}
-    {{ menuitem('Bar Training', '.bar_training') }}
-    {{ menuitem('Handbook', '.info') }}
-    {% else %}
-    {{ menuitem('Sign up', '.sign_up') }}
-    {% endif %}
-    {% if current_user.is_authenticated and current_user.has_permission('volunteer:admin') %}
-        {{ menuitem('Admin', 'volunteer_admin.index') }}        
-    {% endif %}
-    {{ menuitem("Log Out", "users.logout") }}
-</ul>
-
+{% macro urlmenuitem(text, url) %}
+<li>
+    <a href="{{url}}">{{text}}</a>
+</li>
+{% endmacro %}
+{% if current_user.is_authenticated %}
+    <ul class="nav nav-pills">
+        {{ menuitem('Account', '.account') }}
+        {{ menuitem('Roles', '.choose_role') }}
+        {% if feature_enabled('VOLUNTEERS_SCHEDULE') %}
+            {{ menuitem('Shift sign-up', '.schedule') }}
+        {% endif %}
+        {{ menuitem('Bar Training', '.bar_training') }}
+        {{ menuitem('Handbook', '.info') }}
+        {% if current_user.has_permission('volunteer:admin') %}
+            {{ menuitem('Admin', 'volunteer_admin.index') }}
+        {% endif %}
+        {{ menuitem("Log Out", "users.logout") }}
+    </ul>
+{% endif %}

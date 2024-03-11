@@ -1,10 +1,11 @@
 # encoding=utf-8
-from flask import redirect, url_for, render_template, current_app as app, abort
+from flask import redirect, url_for, current_app as app, abort
 from flask_login import current_user
 from pendulum import parse
 
 from . import volunteer, v_admin_required
-from ..common import feature_flag
+from ..common import feature_enabled, feature_flag
+from ..base.about import render_markdown
 
 from main import db
 from models.volunteer import (
@@ -19,43 +20,26 @@ from .init_data import venue_list, role_list, shift_list
 
 
 @volunteer.route("/")
-@feature_flag("VOLUNTEERS_SIGNUP")
 def main():
-    if current_user.is_authenticated and Volunteer.get_for_user(current_user):
-        if current_user.shift_entries:
-            return redirect("/volunteer/schedule?signedup")
+    if (
+        feature_enabled("VOLUNTEERS_SCHEDULE")
+        and current_user.is_authenticated
+        and Volunteer.get_for_user(current_user)
+    ):
         return redirect(url_for(".schedule"))
-    return redirect(url_for(".sign_up"))
+    return redirect(url_for(".info"))
 
 
-@volunteer.route("/safeguarding")
+@volunteer.route("/info/<page_name>")
 @feature_flag("VOLUNTEERS_SIGNUP")
-def safeguarding():
-    return render_template("volunteer/safeguarding.html")
+def info_page(page_name: str):
+    return render_markdown(f"volunteer/info/{page_name}", page_name=page_name)
 
 
 @volunteer.route("/info")
 @feature_flag("VOLUNTEERS_SIGNUP")
 def info():
-    return render_template("volunteer/info.html")
-
-
-@volunteer.route("/info/emergency")
-@feature_flag("VOLUNTEERS_SIGNUP")
-def info_emergency():
-    return render_template("volunteer/info_emergency.html")
-
-
-@volunteer.route("/info/lost_child")
-@feature_flag("VOLUNTEERS_SIGNUP")
-def info_lost_child():
-    return render_template("volunteer/info_lost_child.html")
-
-
-@volunteer.route("/info/food")
-@feature_flag("VOLUNTEERS_SIGNUP")
-def info_food():
-    return render_template("volunteer/info_food.html")
+    return render_markdown(f"volunteer/info/index", page_name="index")
 
 
 @volunteer.route("/init_shifts")

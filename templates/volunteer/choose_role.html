@@ -9,34 +9,24 @@
 
 <h2>Which roles are you interested in?</h2>
 <form method="post">
-{{ form.hidden_tag() }}
+    {{ form.hidden_tag() }}
 
-    <div class="well">
-        <p>
-            Select the roles you're interested in. You can change this at any time.
-        </p>
-        <p>
-            Before your first shift please read the <a href="{{ url_for('.info') }}">info</a> pages.
-        </p>
-        <table class="table table-hover">
-            {% for f in form.roles %}
-                <tr class="form-group">
-                    <td class="col-sm-3">
-                        {{ f.hidden_tag() }}
-                        <div class="checkbox ">
-                            <label for="{{ f.signup.name }}">
-                                {{ f.signup()| safe }}
-                                <strong>{{ f._role.name }}</strong>
-                            </label>
-                        </div>
-                    </td>
-                    <td class="col-sm-9">
-                        {{ f._role.description }} &mdash; <a href="{{ url_for('.role', role_id=f._role.id) }}">More...</a>
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
-    </div>
+    <p>Select the roles you're interested in and click the button at the bottom of the page. You can change this at any time.</p>
+    <p>Before your first shift please read the <a href="{{ url_for('.info') }}">info</a> pages.</p>
+    {% for f in form.roles %}
+        <div class="well">
+            <div class="form-group">
+                {{ f.hidden_tag() }}
+                <div class="checkbox ">
+                    <label for="{{ f.signup.name }}">
+                        {{ f.signup()| safe }}
+                        <strong>{{ f._role.name }}</strong>
+                    </label>
+                </div>
+                {{ f._role.full_description() }}
+            </div>
+        </div>
+    {% endfor %}
 
     <div class="form-group">
         {{ form.submit(class_="btn btn-primary debounce") }}

@@ -23,6 +23,9 @@ from . import base
 
 
 def page_template(metadata):
+    if "page_template" in metadata:
+        return metadata["page_template"]
+
     if "show_nav" not in metadata or metadata["show_nav"] is True:
         return "about/template.html"
     else:
