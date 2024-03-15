@@ -27,7 +27,7 @@ class UpdateProposalForm(Form):
     state = SelectField("State", choices=[(s, s) for s in ORDERED_STATES])
     title = StringField("Title", [DataRequired()])
     description = TextAreaField("Description", [DataRequired()])
-    tags = SelectMultipleField("Tags")
+    tags = SelectMultipleField("Tags (hold ctrl to select multiple)")
     equipment_required = TextAreaField("Equipment Required")
     funding_required = TextAreaField("Funding Required")
     additional_info = TextAreaField("Additional Info")
