@@ -367,19 +367,6 @@ def product_group_copy(group_id):
     )
 
 
-@admin.route("/transfers")
-@admin.route("/transfers/for-id/<int:purchase_id>")
-def purchase_transfers(purchase_id: Optional[int] = None):
-    transfer_logs = PurchaseTransfer.query
-    if purchase_id is not None:
-        transfer_logs = transfer_logs.filter_by(purchase_id=purchase_id)
-    return render_template(
-        "admin/products/purchase-transfers.html",
-        transfers=transfer_logs.all(),
-        purchase_id=purchase_id,
-    )
-
-
 @admin.route("/tees")
 def tees():
     purchases = (
