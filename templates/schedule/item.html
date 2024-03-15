@@ -12,6 +12,12 @@
   </small>
 </h2>
 
+{% if proposal.video_recording_lost %}
+  <div class="alert alert-warning">
+   The video recording for this talk was unfortunately lost due to technical issues.
+  </div>
+{% endif %}
+
 
 {% if proposal.scheduled_time and venue_name %}
 <p><strong>{{ proposal.scheduled_time.strftime('%A from %-I:%M %p') }}</strong> - <strong>{{ proposal.end_date.strftime('%-I:%M %p') }}</strong>
