@@ -1,5 +1,4 @@
 import re
-from typing import Optional
 from flask import (
     render_template,
     redirect,
@@ -27,7 +26,7 @@ from models.product import (
     random_voucher,
     Voucher,
 )
-from models.purchase import Purchase, PurchaseTransfer
+from models.purchase import Purchase
 
 from ..common.email import (
     format_trusted_html_email,

@@ -17,6 +17,7 @@ from jinja2.utils import urlize
 
 from models.basket import Basket
 from models.product import Price
+from models.purchase import Ticket
 from models.site_state import get_site_state, get_sales_state
 from models.feature_flag import get_db_flags
 from models import User, event_start, event_end
@@ -158,6 +159,26 @@ def load_utility_functions(app_obj):
             return Markup(render_template("home/_mailing_list_form.html", list=list))
 
         return {"contact_form": contact_form}
+
+    @app_obj.template_filter("ticket_state_label")
+    def ticket_state_label(ticket: Ticket):
+        # see docs/ticket_states.md
+
+        match ticket.state:
+            case "paid":
+                cls = "success"
+            case "cancelled":
+                cls = "danger"
+            case "payment-pending":
+                cls = "warning"
+            case "refunded":
+                cls = "default"
+            case "reserved":
+                cls = "info"
+            case _:
+                cls = "default"
+
+        return Markup(f'<span class="label label-{cls}">{ticket.state}</span>')
 
 
 def create_current_user(email: str, name: str):
