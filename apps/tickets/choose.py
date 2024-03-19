@@ -64,13 +64,7 @@ def main(flow="main"):
     if app.config.get("DEBUG"):
         sales_state = request.args.get("sales_state", sales_state)
 
-    if sales_state in {"available", "unavailable"}:
-        # Tickets are on sale, or they're unavailable but we're still showing prices.
-        pass
-    elif not current_user.is_anonymous and current_user.has_permission("admin"):
-        # Admins always have access
-        pass
-    else:
+    if sales_state not in {"available", "unavailable"}:
         # User is prevented from buying by the sales state.
         return render_template("tickets/cutoff.html")
 
