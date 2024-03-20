@@ -29,7 +29,6 @@ loggers:
   sqlalchemy.engine:
     handlers: [sqlalchemy]
     propagate: false
-#    level: INFO
   iso8601:
     level: WARN
   pyppeteer:
