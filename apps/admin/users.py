@@ -77,7 +77,7 @@ def users():
 
     users = (
         User.query.order_by(User.id)
-        .options(joinedload(User.owned_tickets), joinedload(User.permissions))
+        .options(joinedload(User.owned_admission_tickets), joinedload(User.permissions))
         .limit(size)
         .offset(offset)
     )
