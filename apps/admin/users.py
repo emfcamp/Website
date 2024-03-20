@@ -3,7 +3,6 @@ import time
 from flask import render_template, redirect, flash, url_for, current_app as app, request
 from flask_login import current_user
 from flask_mailman import EmailMessage
-from sqlalchemy.orm import joinedload
 from wtforms import SubmitField, BooleanField, StringField
 from wtforms.validators import DataRequired, ValidationError
 
@@ -60,34 +59,24 @@ def users():
         flash("Created account for: %s" % name)
         return redirect(url_for(".users"))
 
-    user_count = User.query.count()
-
     try:
         size = int(request.args.get("size", 500))
-        page = int(request.args.get("page", 1))
     except ValueError:
         return redirect(url_for(".users"))
 
-    if page > max(user_count / size, 1):
-        return redirect(url_for(".users", page=user_count // size))
-    elif page < 1:
-        return redirect(url_for(".users"))
-
-    offset = (page - 1) * size
-
     users = (
-        User.query.order_by(User.id)
-        .options(joinedload(User.owned_admission_tickets), joinedload(User.permissions))
-        .limit(size)
-        .offset(offset)
+        db.select(User)
+        .order_by(User.id)
+        .options(
+            db.joinedload(User.owned_admission_tickets), db.joinedload(User.permissions)
+        )
     )
+    users_paged = db.paginate(users, per_page=size, error_out=False)
+
     return render_template(
         "admin/users/users.html",
-        users=users,
+        users=users_paged,
         form=form,
-        current_page=page,
-        size=size,
-        total_pages=user_count // size,
     )
 
 
