@@ -60,7 +60,11 @@ def users():
         flash("Created account for: %s" % name)
         return redirect(url_for(".users"))
 
-    users = User.query.order_by(User.id).options(joinedload(User.permissions)).all()
+    users = (
+        User.query.order_by(User.id)
+        .options(joinedload(User.permissions))
+        .options(joinedload(User.owned_tickets))
+    )
     return render_template("admin/users/users.html", users=users, form=form)
 
 
