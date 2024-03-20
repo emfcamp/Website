@@ -1,6 +1,6 @@
 import time
 
-from flask import render_template, redirect, flash, url_for, current_app as app
+from flask import render_template, redirect, flash, url_for, current_app as app, request
 from flask_login import current_user
 from flask_mailman import EmailMessage
 from sqlalchemy.orm import joinedload
@@ -60,12 +60,35 @@ def users():
         flash("Created account for: %s" % name)
         return redirect(url_for(".users"))
 
+    user_count = User.query.count()
+
+    try:
+        size = int(request.args.get("size", 500))
+        page = int(request.args.get("page", 1))
+    except ValueError:
+        return redirect(url_for(".users"))
+
+    if page > max(user_count / size, 1):
+        return redirect(url_for(".users", page=user_count // size))
+    elif page < 1:
+        return redirect(url_for(".users"))
+
+    offset = (page - 1) * size
+
     users = (
         User.query.order_by(User.id)
-        .options(joinedload(User.permissions))
-        .options(joinedload(User.owned_tickets))
+        .options(joinedload(User.owned_tickets), joinedload(User.permissions))
+        .limit(size)
+        .offset(offset)
     )
-    return render_template("admin/users/users.html", users=users, form=form)
+    return render_template(
+        "admin/users/users.html",
+        users=users,
+        form=form,
+        current_page=page,
+        size=size,
+        total_pages=user_count // size,
+    )
 
 
 @admin.route("/users/<int:user_id>", methods=["GET", "POST"])
