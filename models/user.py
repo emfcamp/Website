@@ -261,7 +261,10 @@ class User(BaseModel, UserMixin):
     )
 
     owned_admission_tickets = db.relationship(
-        "AdmissionTicket", lazy="select", primaryjoin="AdmissionTicket.owner_id == User.id", viewonly=True
+        "AdmissionTicket",
+        lazy="select",
+        primaryjoin="AdmissionTicket.owner_id == User.id",
+        viewonly=True,
     )
 
     transfers_to = db.relationship(
