@@ -34,10 +34,12 @@ def search():
     # how small our dataset is, but I spent ages trying to work out how to get Alembic to add
     # those indexes. So humour me.
     results = User.query.filter(
-        func.to_tsvector("simple", User.name).match(to_query(q))
+        func.to_tsvector("simple", User.name).match(
+            to_query(q), postgresql_regconfig="simple"
+        )
         | (
             func.to_tsvector("simple", func.replace(User.email, "@", " ")).match(
-                email_query
+                email_query, postgresql_regconfig="simple"
             )
         )
     )
