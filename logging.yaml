@@ -26,9 +26,10 @@ root:
 loggers:
   werkzeug:
     level: INFO
-  sqlalchemy.engine.base.Engine:
+  sqlalchemy.engine:
     handlers: [sqlalchemy]
     propagate: false
+#    level: INFO
   iso8601:
     level: WARN
   pyppeteer:
