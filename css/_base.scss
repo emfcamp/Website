@@ -12,6 +12,7 @@ body {
   font-size: 16px;
   color: $main-background-text;
   background-color: $body-background;
+  font-family: $body-font-stack;
 }
 
 html, body {
@@ -204,6 +205,10 @@ div.micro img {
   font-size: 0.9em;
   margin-bottom: 0px;
   color: #333;
+}
+
+.form-control {
+  background-color: $form-element;
 }
 
 .form-horizontal .form-group .help-block {

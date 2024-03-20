@@ -1,8 +1,9 @@
-/* Show the hover borders by default to avoid bleeding */
+@use 'sass:color';
 @use "./_variables.scss" as *;
+
 .btn-primary {
-    background-color: #7c1243;
-    border: 1px solid #33071C;
+    background-color: color.adjust($brand-2024-blue, $lightness: -10%);
+    border: 1px solid color.adjust($brand-2024-blue, $lightness: -30%);
 }
 
 .btn-primary:hover,
@@ -10,12 +11,13 @@
 .btn-primary:active,
 .btn-primary.active,
 .open>.dropdown-toggle.btn-primary {
-    background-color: #33071C;
-    border: 1px solid #33071C;
+    background-color: color.adjust($brand-2024-blue, $lightness: -30%);
+    border: 1px solid color.adjust($brand-2024-blue, $lightness: -50%);
 }
 
 
 .btn-default {
+  background-color: $form-element;
   border: 1px solid #adadad;
 }
 
@@ -24,15 +26,17 @@
 }
 
 .btn-success {
-  border: 1px solid #398439;
+  background-color: $brand-2024-mid-green;
+  border: 1px solid color.adjust($brand-2024-mid-green, $lightness: -20%);
 }
 
 .btn-warning {
-  border: 1px solid #d58512;
+  border: 1px solid color.adjust($brand-2024-orange, $lightness: -20%);
 }
 
 .btn-danger {
-  border: 1px solid #ac2925;
+  background-color: color.adjust($brand-2024-pink, $lightness: -40%);
+  border: 1px solid color.adjust($brand-2024-pink, $lightness: -50%);
 }
 
 .btn {
@@ -45,11 +49,11 @@
 .alert-danger a.btn-success,
 .alert-danger a.btn-warning,
 .alert-danger a.btn-danger {
-  color: #fff;
+  color: $form-element;
 }
 
 .panel .btn, .well .btn {
-    color: white;
+    color: $form-element;
 }
 
 .panel .btn-default, .well .btn-default {
