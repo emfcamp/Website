@@ -3,6 +3,7 @@ import yaml
 import secrets
 import logging
 import logging.config
+from pathlib import Path
 
 from flask import Flask, url_for, render_template, request, g
 from flask_mailman import Mail
@@ -32,7 +33,22 @@ if len(logging.root.handlers) == 0:
     install_logging = True
     with open("logging.yaml", "r") as f:
         conf = yaml.load(f, Loader=yaml.FullLoader)
+        if Path("logging.override.yaml").is_file():
+            with open("logging.override.yaml", "r") as fo:
+                conf_overrides = yaml.load(fo, Loader=yaml.FullLoader)
+
+                def update_logging(d, s):
+                    for k, v in s.items():
+                        if isinstance(v, dict):
+                            d[k] = update_logging(d.get(k, {}), v)
+                        elif v is not None:
+                            d[k] = v
+                    return d
+
+                update_logging(conf, conf_overrides)
+
         logging.config.dictConfig(conf)
+
 else:
     install_logging = False
 

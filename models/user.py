@@ -260,6 +260,13 @@ class User(BaseModel, UserMixin):
         "Ticket", lazy="select", primaryjoin="Ticket.owner_id == User.id", viewonly=True
     )
 
+    owned_admission_tickets = db.relationship(
+        "AdmissionTicket",
+        lazy="select",
+        primaryjoin="AdmissionTicket.owner_id == User.id",
+        viewonly=True,
+    )
+
     transfers_to = db.relationship(
         "PurchaseTransfer",
         backref="to_user",
