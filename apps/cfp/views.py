@@ -341,9 +341,10 @@ def form(cfp_type="talk"):
 
         if channel := app.config.get("CONTENT_IRC_CHANNEL"):
             # WARNING: don't send personal information via this (the channel is public)
-            irc_send(
-                f"{channel} New CfP {proposal.human_type} submission: {external_url('cfp_review.update_proposal', proposal_id=proposal.id)}"
-            )
+            msg = f"{channel} New CfP {proposal.human_type} submission: {external_url('cfp_review.update_proposal', proposal_id=proposal.id)}"
+            if form.needs_help.data:
+                msg = msg + ". Calls for aid (they've clicked 'needs help')"
+            irc_send(msg)
         return redirect(url_for(".complete"))
 
     full_lightning_sessions = [
