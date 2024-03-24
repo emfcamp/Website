@@ -59,11 +59,27 @@
                             {{ render_dl_field(form.state) }}
                             {{ render_dl_field(form.title) }}
                             {{ render_dl_field(form.description, rows=8) }}
-                            {{ render_dl_field(form.tags, size=5) }}
                         </dl>
                     </div>
                 </div>
             </div>
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="tagsPanelHeading">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" href="#tagsPanel" aria-expanded="false" aria-controls="tagsPanel">
+                            Tags ({{ proposal.tags | join(", ", attribute="tag") }})
+                        </a>
+                    </h4>
+                </div>
+                <div id="tagsPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="tagsPanelHeading">
+                    <div class="panel-body">
+                        <dl class="dl-horizontal">
+                            {{ render_field(form.tags, size=(form.tags.choices| count)) }}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+
             <div class="panel panel-default">
                 <div class="panel-heading" role="tab" id="requirementsPanelHeading">
                     <h4 class="panel-title">
