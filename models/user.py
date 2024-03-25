@@ -22,6 +22,7 @@ from loggingmanager import set_user_id
 from . import bucketise, BaseModel
 from .permission import UserPermission, Permission
 from .volunteer.shift import ShiftEntry
+from .web_push import WebPushTarget
 
 CHECKIN_CODE_LEN = 16
 checkin_code_re = r"[0-9a-zA-Z_-]{%s}" % CHECKIN_CODE_LEN
@@ -289,6 +290,13 @@ class User(BaseModel, UserMixin):
         uselist=False,
     )
     village = association_proxy("village_membership", "village")
+
+    web_push_targets = db.relationship(
+        "WebPushTarget",
+        cascade="all, delete-orphan",
+        back_populates="user",
+        primaryjoin="WebPushTarget.user_id == User.id",
+    )
 
     def __init__(self, email: str, name: str):
         self.email = email
