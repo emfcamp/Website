@@ -21,6 +21,10 @@ We're also looking for people to fill the following specific roles:
 
 The music team are looking for people to book artists to play, and to look after them once they arrive on site. An interest in music and the ability to remove brown M&Ms are a great help.
 
+## Comms Copy Editor
+
+We need someone to help us produce better copy. Particularly email copy for our ticket-holder emails the job will involve turning vague statements and bullet points in to coherant text that can be sent out to our attendees whilst preserving out (we hope) friendly voice.
+
 ## Furniture Wrangler
 
 We need someone to look after all the furniture that gets ordered, counting it off vehicles when it arrives to check we got what we ordered, arranging distribution around the site, and then checking it all back in at the end of the event. No experience needed, but you will need to be on site a few days before the event starts, and leave a few days after.
