@@ -267,7 +267,7 @@ def stripe_payment_paid(payment: StripePayment):
 
     already_emailed = set_tickets_emailed(payment.user)
     msg.body = render_template(
-        "emails/tickets-paid-email-stripe.txt",
+        "emails/payment-paid.txt",
         user=payment.user,
         payment=payment,
         already_emailed=already_emailed,
