@@ -33,6 +33,11 @@ The music team are looking for people to book artists to play, and to look after
 
 The shop stocks a supply of festival essentials, including food, drink, t-shirts, and soldering irons. We're looking for a few more people to work with the team, planning what to stock in the lead up, and then once on site running a few shifts supporting the volunteers staffing the shop. If you've used Square to sell things before that would be great, but no experience is neccessary.
 
+
+## Swap Shop
+
+We're looking for someone to look after the swap shop, where people bring the random junk that's been sitting in drawers, and go home with some different random junk which just might get turned into something amazing. This will largely involve keeping the area tidy, and comes with the perk of having first dibs on people's junk.
+
 ## Furniture Wrangler
 
 We need someone to look after all the furniture that gets ordered, counting it off vehicles when it arrives to check we got what we ordered, arranging distribution around the site, and then checking it all back in at the end of the event. No experience needed, but you will need to be on site a few days before the event starts, and leave a few days after.
