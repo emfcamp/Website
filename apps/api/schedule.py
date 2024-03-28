@@ -40,7 +40,12 @@ class ProposalResource(Resource):
         if not payload:
             abort(400)
 
-        ALLOWED_ATTRIBUTES = {"youtube_url", "thumbnail_url", "c3voc_url"}
+        ALLOWED_ATTRIBUTES = {
+            "youtube_url",
+            "thumbnail_url",
+            "c3voc_url",
+            "video_recording_lost",
+        }
         if set(payload.keys()) - ALLOWED_ATTRIBUTES:
             abort(400)
 
@@ -57,6 +62,7 @@ class ProposalResource(Resource):
             "youtube_url": proposal.youtube_url,
             "thumbnail_url": proposal.thumbnail_url,
             "c3voc_url": proposal.c3voc_url,
+            "video_recording_lost": proposal.video_recording_lost,
         }
 
 
