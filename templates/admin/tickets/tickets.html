@@ -27,7 +27,7 @@
     <td></td>
     {% endif %}
     <td>
-    <a class="btn btn-default" href="{{ url_for('.convert_ticket', ticket_id=ticket.id) }}">Convert</a>
+    <a class="btn btn-default" href="{{ url_for('.view_ticket', ticket_id=ticket.id) }}">View</a>
     </td>
   </tr>
 {% endfor %}

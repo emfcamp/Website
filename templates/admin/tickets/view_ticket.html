@@ -1,0 +1,80 @@
+{% extends "admin/base.html" %}
+{% block body %}
+
+<div class="row">
+  <div class="col-md-6">
+    <h2>Viewing Ticket ID: {{ ticket.id }} {{ ticket | ticket_state_label }}</h2>
+  </div>
+  <div class="col-md-6">
+    <span class="pull-right">
+      <a class="btn btn-default" href="{{ url_for('.convert_ticket', ticket_id=ticket.id) }}">Convert</a>
+      <a href="{{ url_for('.transfer_ticket', ticket_id=ticket.id) }}" class="btn btn-warning">Transfer...</a>
+    </span>
+  </div>
+</div>
+<table class="table table-condensed">
+  <tbody>
+    <tr>
+      <th>Owner</th>
+      <td><a href="{{ url_for('.user', user_id=ticket.owner_id) }}">{{ ticket.owner.name }}</a></td>
+    </tr>
+    <tr>
+      <th>Purchaser</th>
+      <td>
+        <a href="{{ url_for('.user', user_id=ticket.purchaser_id) }}">{{ ticket.purchaser.name }}</a>
+        {% if ticket.owner != ticket.purchaser %}
+          <a href="{{ url_for('.transfer_ticket_user', ticket_id=ticket.id, email=ticket.purchaser.email) }}" class="btn btn-warning btn-sm">Transfer Back</a>
+        {% endif %}
+      </td>
+    </tr>
+    <tr>
+      <th>Product</th>
+      <td><a href="{{ url_for('.product_details', product_id=ticket.product_id) }}">{{ ticket.product }}</a></td>
+    </tr>
+    <tr>
+      <th>Price Tier</th>
+      <td><a href="{{ url_for('.price_tier_details', tier_id=ticket.price_tier_id) }}">{{ ticket.price_tier }}</a></td>
+    </tr>
+    <tr>
+      <th>Payment</th>
+      <td>
+        {% if ticket.payment_id %}
+          <a href="{{ url_for('.payment', payment_id=ticket.payment_id) }}">{{ ticket.payment.amount | price(ticket.payment.currency) }}</a>
+        {% else %}
+          -
+        {% endif %}
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h3>Transfers</h3>
+{% if ticket.transfers %}
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Ticket Type</th>
+      <th>From</th>
+      <th>To</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for trans in ticket.transfers %}
+    <tr>
+      <td>{{ trans.timestamp.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+      <td>{{ trans.purchase.product.display_name }}</td>
+      <td><a href="{{ url_for('.user', user_id=trans.from_user.id) }}">{{ trans.from_user.name }}</a></td>
+      <td><a href="{{ url_for('.user', user_id=trans.to_user.id) }}">{{ trans.to_user.name }}</a></td>
+      <td>
+        <a href="{{ url_for('.transfer_ticket_user', ticket_id=ticket.id, email=trans.from_user.email) }}" class="btn btn-warning btn-sm">Transfer Back</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No transfers yet</p>
+{% endif %}
+
+{% endblock %}

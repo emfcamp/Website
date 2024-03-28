@@ -1,5 +1,4 @@
 import re
-from typing import Optional
 from flask import (
     render_template,
     redirect,
@@ -27,7 +26,7 @@ from models.product import (
     random_voucher,
     Voucher,
 )
-from models.purchase import Purchase, PurchaseTransfer
+from models.purchase import Purchase
 
 from ..common.email import (
     format_trusted_html_email,
@@ -364,19 +363,6 @@ def product_group_copy(group_id):
 
     return render_template(
         "admin/products/product-group-copy.html", group=group, form=form
-    )
-
-
-@admin.route("/transfers")
-@admin.route("/transfers/for-id/<int:purchase_id>")
-def purchase_transfers(purchase_id: Optional[int] = None):
-    transfer_logs = PurchaseTransfer.query
-    if purchase_id is not None:
-        transfer_logs = transfer_logs.filter_by(purchase_id=purchase_id)
-    return render_template(
-        "admin/products/purchase-transfers.html",
-        transfers=transfer_logs.all(),
-        purchase_id=purchase_id,
     )
 
 
