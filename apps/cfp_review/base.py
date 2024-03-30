@@ -1392,12 +1392,24 @@ def speaker_diversity():
         )
         .all()
     )
-    counts = get_diversity_counts(speakers)
-
-    counts["other"]["invited"] = len([1 for u in speakers if u.is_invited_speaker])
+    total_counts = get_diversity_counts(speakers)
     # remove tags from the counts as these are reviewer tags and irrelevant here
-    counts.pop("reviewer_tags")
-    return render_template("cfp_review/speaker_diversity.html", counts=counts)
+    total_counts.pop("reviewer_tags")
+    total_counts["other"]["missing proposal"] = ""
+
+    invited_speakers = [u for u in speakers if u.is_invited_speaker]
+    invited_counts = get_diversity_counts(invited_speakers)
+    invited_counts.pop("reviewer_tags")
+
+    invited_counts["other"]["missing proposal"] = len(
+        [u for u in User.query.all() if len(u.proposals.all()) == 0]
+    )
+
+    return render_template(
+        "cfp_review/speaker_diversity.html",
+        total_counts=total_counts,
+        invited_counts=invited_counts,
+    )
 
 
 @cfp_review.route("/reviewer-diversity")
