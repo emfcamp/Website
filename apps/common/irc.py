@@ -2,8 +2,12 @@ import os
 import socket
 from flask import current_app as app
 
+from . import feature_flag
+
 
 def irc_send(message):
+    if feature_flag("DEBUG"):
+        app.logger.debug(f"[IRC MESSAGE]: {message}")
     if "IRCCAT" not in os.environ:
         return
     host, port = os.environ.get("IRCCAT").split(":")
