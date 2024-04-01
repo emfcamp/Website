@@ -91,11 +91,19 @@ const main_js = (cb) => pump(jsBuild('main.js'), cb),
   line_up_js = (cb) => pump(jsBuild('line-up.js'), cb),
   schedule_js = (cb) => pump(jsBuild('schedule.js'), cb),
   volunteer_schedule_js = (cb) => pump(jsBuild('volunteer-schedule.js'), cb),
-  arrivals_js = (cb) => pump(jsBuild('arrivals.js'), cb);
+  arrivals_js = (cb) => pump(jsBuild('arrivals.js'), cb),
+  serviceworker_js = (cb) => pump(jsBuild('serviceworker.js'), cb),
 
 
 function js(cb) {
-  gulp.parallel(main_js, line_up_js, schedule_js, volunteer_schedule_js, arrivals_js)(cb);
+  gulp.parallel(
+    main_js,
+    line_up_js,
+    schedule_js,
+    volunteer_schedule_js,
+    arrivals_js,
+    serviceworker_js
+  )(cb);
 }
 
 function css(cb) {
@@ -109,7 +117,7 @@ function css(cb) {
       'css/schedule.scss',
       'css/volunteer_schedule.scss',
       'css/flask-admin.scss',
-      'css/dhtmlxscheduler_flat.css',
+      'css/dhtmlxscheduler_flat.css'
     ]),
     gulpif(!production, sourcemaps.init()),
     sass({ includePaths: ['../node_modules'] }).on('error', function (err) {

@@ -101,6 +101,18 @@ def favicon():
     )
 
 
+# Service worker has to be served from the route so that it can take
+# control of all pages, otherwise it only has control over files in
+# /js.
+@base.route("/serviceworker.js")
+def serviceworker():
+    return send_from_directory(
+        os.path.join(app.root_path, "static/js"),
+        "serviceworker.js",
+        mimetype="application/javascript",
+    )
+
+
 @base.route("/404")
 def raise_404():
     abort(404)
