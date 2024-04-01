@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Notifications{% endblock %}
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{{ static_url_for('static', filename='css/notifications.css') }}">
+    <meta name="vapid_key" value="{{ public_key }}">
+{% endblock %}
+{% block body %}
+<h1>Notifications</h1>
+<div id="notification-state" class="loading">
+  <div class="state" id="notification-state-loading">loading</div>
+  <div class="state" id="notification-state-granted">enabled</div>
+  <div class="state" id="notification-state-denied">
+    denied
+  </div>
+  <div class="state" id="notification-state-prompt">
+    <button class="btn btn-primary" id="enable-notifications">Enable Push Notifications</button>
+  </div>
+</div>
+<p>Test</p>
+{% endblock %}
+{% block foot %}
+<script src="{{ static_url_for('static', filename='js/notifications.js') }}"></script>
+{% endblock %}

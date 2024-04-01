@@ -93,6 +93,7 @@ const main_js = (cb) => pump(jsBuild('main.js'), cb),
   volunteer_schedule_js = (cb) => pump(jsBuild('volunteer-schedule.js'), cb),
   arrivals_js = (cb) => pump(jsBuild('arrivals.js'), cb),
   serviceworker_js = (cb) => pump(jsBuild('serviceworker.js'), cb),
+  notifications_js = (cb) => pump(jsBuild('notifications.js'), cb);
 
 
 function js(cb) {
@@ -102,7 +103,8 @@ function js(cb) {
     schedule_js,
     volunteer_schedule_js,
     arrivals_js,
-    serviceworker_js
+    serviceworker_js,
+    notifications_js
   )(cb);
 }
 
@@ -116,6 +118,7 @@ function css(cb) {
       'css/receipt.scss',
       'css/schedule.scss',
       'css/volunteer_schedule.scss',
+      'css/notifications.scss',
       'css/flask-admin.scss',
       'css/dhtmlxscheduler_flat.css'
     ]),

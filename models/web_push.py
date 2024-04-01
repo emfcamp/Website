@@ -1,7 +1,24 @@
 from datetime import datetime
 from main import db
+from flask import current_app as app
+from pywebpush import webpush
 
 from . import BaseModel
+
+
+def public_key():
+    return app.config["WEBPUSH_PUBLIC_KEY"]
+
+
+def notify(target, message):
+    webpush(
+        subscription_info=target.subscription_info,
+        data=message,
+        vapid_private_key=app.config["WEBPUSH_PRIVATE_KEY"],
+        vapid_claims={
+            "sub": "mailto:contact@emfcamp.org",
+        },
+    )
 
 
 class WebPushTarget(BaseModel):

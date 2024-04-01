@@ -69,3 +69,13 @@ registerRoute(
         ],
     }),
 );
+
+addEventListener("push", (event) => {
+    console.log("Push event received", event);
+    const message = event.data.text()
+    self.registration.showNotification(message);
+});
+
+addEventListener("notificationclick", (event) => {
+    self.clients.openWindow("http://localhost:2345");
+});

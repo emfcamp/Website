@@ -66,6 +66,7 @@ flask-mailman = "^0.3.0"
 python-stdnum = "^1.19"
 playwright = "^1.43.0"
 css-inline = "^0.14.0"
+pywebpush = "^2.0.0"
 
 
 [tool.poetry.group.dev.dependencies]

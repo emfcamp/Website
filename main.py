@@ -314,6 +314,7 @@ def create_app(dev_server=False, config_override=None):
     from apps.volunteer import volunteer
     from apps.volunteer.admin import volunteer_admin
     from apps.volunteer.admin.notify import notify
+    from apps.notifications import notifications
 
     app.register_blueprint(base)
     app.register_blueprint(users)
@@ -329,6 +330,7 @@ def create_app(dev_server=False, config_override=None):
     app.register_blueprint(admin, url_prefix="/admin")
     app.register_blueprint(volunteer, url_prefix="/volunteer")
     app.register_blueprint(notify, url_prefix="/volunteer/admin/notify")
+    app.register_blueprint(notifications, url_prefix="/account/notifications")
 
     volunteer_admin.init_app(app)
 
