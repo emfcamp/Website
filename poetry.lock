@@ -2907,13 +2907,13 @@ files = [
 
 [[package]]
 name = "pywisetransfer"
-version = "0.3.3.1"
+version = "0.3.4"
 description = "Python library for the TransferWise API"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "pywisetransfer-0.3.3.1-py3-none-any.whl", hash = "sha256:fdc014e2629c31442d4099b29fa5d2e74267b3d2ea5f60403f80f867e0f9ccff"},
-    {file = "pywisetransfer-0.3.3.1.tar.gz", hash = "sha256:3684156cb435f80b654b161cabd9f43f8c371f72f07f2686bde208622fc6750b"},
+    {file = "pywisetransfer-0.3.4-py3-none-any.whl", hash = "sha256:9ab5fbecadf7a038425e4e006855965be9dd3ade9e67be63a5e39e754419b151"},
+    {file = "pywisetransfer-0.3.4.tar.gz", hash = "sha256:1d06c5f33814888c81d14381bd993f52dd7fd51954eaa68bab8ec4b1b9c48c04"},
 ]
 
 [package.dependencies]
@@ -4359,4 +4359,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.11"
-content-hash = "4c06d5e36b187cf852fdef4dd9b9262e4c48f2c52d6fddeab0b002785871f1c4"
+content-hash = "9f010c7abd31b93b72d9550d6f61df2a70e949fff150d19aa329628ff7189830"
