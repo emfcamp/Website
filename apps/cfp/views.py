@@ -341,10 +341,10 @@ def form(cfp_type="talk"):
 
         if channel := app.config.get("CONTENT_IRC_CHANNEL"):
             # WARNING: don't send personal information via this (the channel is public)
-            msg = f"{channel} New CfP {proposal.human_type} submission: {external_url('cfp_review.update_proposal', proposal_id=proposal.id)}"
+            msg = f"New CfP {proposal.human_type} submission: {external_url('cfp_review.update_proposal', proposal_id=proposal.id)}"
             if form.needs_help.data:
-                msg = msg + ". Calls for aid (they've clicked 'needs help')"
-            irc_send(msg)
+                msg = f"🚨 {msg}. Calls for aid (they've clicked 'needs help') 🚨"
+            irc_send(channel, msg)
         return redirect(url_for(".complete"))
 
     full_lightning_sessions = [
@@ -827,7 +827,8 @@ def proposal_messages(proposal_id):
             if channel := app.config.get("CONTENT_IRC_CHANNEL"):
                 # WARNING: don't send personal information via this (the channel is public)
                 irc_send(
-                    f"{channel} New CfP message for {proposal.human_type}: {external_url('cfp_review.message_proposer', proposal_id=proposal_id)}"
+                    channel,
+                    f"✉️ New CfP message for {proposal.human_type}: {external_url('cfp_review.message_proposer', proposal_id=proposal_id)} ✉️",
                 )
 
         count = proposal.mark_messages_read(current_user)
