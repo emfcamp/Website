@@ -2,16 +2,14 @@ import os
 import socket
 from flask import current_app as app
 
-from . import feature_flag
 
-
-def irc_send(message):
-    if feature_flag("DEBUG"):
-        app.logger.debug(f"[IRC MESSAGE]: {message}")
-    if "IRCCAT" not in os.environ:
+def irc_send(channel: str, message: str):
+    message = f"{channel} {message}"
+    irc_host = os.environ.get("IRCCAT", "")
+    if not irc_host:
         return
-    host, port = os.environ.get("IRCCAT").split(":")
-    port = int(port)
+    host, port_str = irc_host.split(":")
+    port = int(port_str)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(0.5)
     try:
