@@ -16,7 +16,7 @@
         <tr>
             {% if show_owner %}<td><a href="{{url_for('admin.user', user_id=ticket.owner.id)}}">{{ ticket.owner }}</a></td>{% endif %}
             <td>{{ ticket.product.display_name }}</td>
-	        <td>{{ ticket.state }}</td>
+	        <td>{{ ticket | ticket_state_label }}</td>
             <td>{% if ticket.payment %}
                   <a href="{{ url_for('.payment', payment_id=ticket.payment.id) }}">{{ ticket.payment.name }}</a>
               {% else %}
@@ -25,7 +25,7 @@
             </td>
             <td>
                 {% if ticket.transfers %}
-                    <a href="{{ url_for('.purchase_transfers', purchase_id=ticket.id) }}">{{ ticket.transfers | count }} (show)</a>
+                    <a href="{{ url_for('.view_ticket', ticket_id=ticket.id) }}">{{ ticket.transfers | count }}</a>
                 {% else %}
                     -
                 {% endif %}
@@ -33,10 +33,11 @@
             <td>{% if ticket.checked_in %}Yes{% else %}No{% endif %}</td>
             <td>
               <div class="btn-group">
-              {% if ticket.is_paid_for and ticket.is_transferable %}
-              <a class="btn btn-default" href="{{ url_for('.transfer_ticket', ticket_id=ticket.id) }}">Transfer</a>
-              {% endif %}
-              <a class="btn btn-default" href="{{ url_for('.convert_ticket', ticket_id=ticket.id) }}">Convert</a>
+                <a href="{{ url_for('.view_ticket', ticket_id=ticket.id) }}" class="btn btn-default">View</a>
+                {% if ticket.is_paid_for and ticket.is_transferable %}
+                <a class="btn btn-default" href="{{ url_for('.transfer_ticket', ticket_id=ticket.id) }}">Transfer</a>
+                {% endif %}
+                <a class="btn btn-default" href="{{ url_for('.convert_ticket', ticket_id=ticket.id) }}">Convert</a>
               </div>
             </td>
         </tr>
@@ -107,7 +108,7 @@
 {% for payment in user.payments %}
 <tr>
   <td><a href="{{ url_for('.payment', payment_id=payment.id) }}">{{ payment.name }}</a></td>
-  <td>{{payment.state}}</a></td>
+  <td>{{ payment.state }}</a></td>
   <td>{{ payment.purchases | count }}</td>
   <td><b>{{ payment.amount | price(payment.currency) }}</b></td>
   <td>{% if payment.expires %}{{ payment.expires.strftime('%Y-%m-%d') }}{% endif %}</td>
