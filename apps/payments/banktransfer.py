@@ -52,7 +52,7 @@ def transfer_start(payment: BankPayment):
         to=[current_user.email],
     )
     msg.body = render_template(
-        "emails/tickets-purchased-email-banktransfer.txt",
+        "emails/payment-inprogress-banktransfer.txt",
         user=current_user,
         payment=payment,
     )
@@ -236,7 +236,7 @@ def send_confirmation(payment: BankPayment):
 
     already_emailed = set_tickets_emailed(payment.user)
     msg.body = render_template(
-        "emails/tickets-paid-email-banktransfer.txt",
+        "emails/payment-paid.txt",
         user=payment.user,
         payment=payment,
         already_emailed=already_emailed,

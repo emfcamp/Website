@@ -26,7 +26,7 @@ root:
 loggers:
   werkzeug:
     level: INFO
-  sqlalchemy.engine.base.Engine:
+  sqlalchemy.engine:
     handlers: [sqlalchemy]
     propagate: false
   iso8601:

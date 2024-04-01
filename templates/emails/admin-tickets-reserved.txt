@@ -1,0 +1,23 @@
+{% extends "emails/base.txt" %}
+{% block body %}
+{%- if user.name != user.email -%}
+Hi {{ user.name }},
+{%- else -%}
+Hi,
+{%- endif %}
+
+You've been reserved {% if tickets | count > 1 -%} {{ tickets | count }} tickets {%- else -%} a ticket {%- endif %} to Electromagnetic Field {{ event_year }}.
+
+{%- if new_user %}
+We've created an account for you. We'll email you important information nearer the event.
+{% endif %}
+
+Please log in and pay for your {% if tickets | count > 1 -%} tickets {%- else -%} ticket {%- endif %} here:
+
+  {{ external_url('users.login', code=code, next=url_for('tickets.tickets_reserved', currency=currency)) }}
+
+
+Love,
+
+All the EMF team
+{% endblock %}

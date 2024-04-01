@@ -1,9 +1,8 @@
 import time
 
-from flask import render_template, redirect, flash, url_for, current_app as app
+from flask import render_template, redirect, flash, url_for, current_app as app, request
 from flask_login import current_user
 from flask_mailman import EmailMessage
-from sqlalchemy.orm import joinedload
 from wtforms import SubmitField, BooleanField, StringField
 from wtforms.validators import DataRequired, ValidationError
 
@@ -60,8 +59,25 @@ def users():
         flash("Created account for: %s" % name)
         return redirect(url_for(".users"))
 
-    users = User.query.order_by(User.id).options(joinedload(User.permissions)).all()
-    return render_template("admin/users/users.html", users=users, form=form)
+    try:
+        size = int(request.args.get("size", 500))
+    except ValueError:
+        return redirect(url_for(".users"))
+
+    users = (
+        db.select(User)
+        .order_by(User.id)
+        .options(
+            db.joinedload(User.owned_admission_tickets), db.joinedload(User.permissions)
+        )
+    )
+    users_paged = db.paginate(users, per_page=size, error_out=False)
+
+    return render_template(
+        "admin/users/users.html",
+        users=users_paged,
+        form=form,
+    )
 
 
 @admin.route("/users/<int:user_id>", methods=["GET", "POST"])

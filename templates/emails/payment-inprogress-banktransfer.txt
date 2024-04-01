@@ -1,0 +1,22 @@
+{% extends "emails/base.txt" %}
+{% block body %}
+Hi {{ user.name }},
+
+{% set tickets = payment.purchases | selectattr("is_ticket") | list %}
+{%- set non_tickets = payment.purchases | rejectattr("is_ticket") | list %}
+{%- if tickets | count > 0 -%}
+This is to confirm that you've reserved {% if tickets | count == 1 %}a ticket{% else %}{{ tickets | count }} tickets{% endif %} for Electromagnetic Field {{ event_year }}!
+{% else %}
+This is to confirm that you've reserved {% if non_tickets | count == 1 %}an item{% else %}{{ non_tickets | count }} items{% endif %}.
+{%- endif %}
+
+You've chosen to pay by bank transfer. To see more details of your order, and the bank details to send your transfer to, please click here:
+
+{{external_url('payments.transfer_waiting', payment_id=payment.id) }}
+
+Please ensure your payment reaches us by {{payment.expires.strftime('%-d %B %Y')}}, or your reservation may be cancelled.
+
+Love,
+
+All the EMF team
+{% endblock %}

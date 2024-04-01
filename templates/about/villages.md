@@ -19,9 +19,7 @@ Villages are great as you can share ideas, equipment and space! The sharing does
 
 Maybe you are working on a group project and want to show off the final result, or you want to spend the weekend building something. Doing this as a village is good fun, and you often find that new friends will appear to share their ideas, opinions and time with you.
 
-Some villages bring pre-made games and activities for other people to take part in, and some run events and parties during the weekend! This year, we're also designating some villages as workshop villages, who will be provided with a workshop tent to run their own workshops and host others.
-
-Some of our favourite village activities from previous years include:
+Some villages bring pre-made games and activities for other people to take part in, and some run events and parties during the weekend! Some of our favourite village activities from previous years include:
 
 * [Barbot](https://www.emfcamp.org/schedule/2022/411-barbot): a cocktail-making robot build by Nottingham Hackspace
 * Karaoke nights hosted in the Scottish Consulate tent
@@ -29,15 +27,9 @@ Some of our favourite village activities from previous years include:
 * Demoscene competitions at [Field-FX](https://wiki-archive.emfcamp.org/2022/wiki/Village:Field-FX)
 * Drop-in board game sessions
 
-## Workshop villages
-A selection of villages will be workshop villages, and will run and host workshops that any attendee can propose via the CfP alongside content organised by members of the village. Of course, if you are not a workshop village, you are still very welcome to run stuff in your village. Content run by villages at past EMFs has included:
+More generally, villages run all kinds of content - technical presentations or lectures, skill shares, drop-in sessions, Q&As, roundtables or informal 'jam' sessions (not necessarily musical!). Activities can be open to all EMF attendees or private for the village, and we'll circulate details to registered villages of how to add your content to the main schedule.
 
-* Technical presentations or lectures
-* Skill shares
-* Drop-in sessions
-* Q&As
-* Roundtables
-* Informal 'jam' sessions (not necessarily musical!)
+A selection of villages will be workshop villages, and will run and host workshops that any attendee can propose via the CfP alongside content organised by members of the village. These have already been selected and designated, and all Workshop Village content will be listed in the main programme.
 
 If you have any questions about workshop villages or hosting content, you can [email the Village People](mailto:villages@emfcamp.org).
 

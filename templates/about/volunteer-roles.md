@@ -9,17 +9,34 @@ In general we're looking for people ahead of the event who are comfortable with 
 
 * Project management
 * Supplier management & ordering
-* Stage design & production
-* Logistics
-* Community outreach
-* Graphic design
 * Web development
 
 We're also looking for people to fill the following specific roles:
 
+## Arcade
+
+Have you ever wanted to put together an arcade full of indie games? Ahead of time this role will mostly involve sending emails, and talking to people who might be interested in bringing their game to EMF. During the event you'd be looking after the arcade itself and possibly troubleshooting any problems that arise.
+
+## Arts & Installations
+
+The Arts & Installations team works with artists and makers to help them bring their work to EMF, reviewing CFP submissions to select the installations which attendees will enjoy, and making sure everything that's needed is in place. They also apply for grants which allow us to provide financial support. Some experience of building large installations would be helpful. Ideally you'd be able to arrive a few days early to help get installations set up.
+
+## Copy Editor
+
+We need someone to help us produce better copy. Particularly email copy for our ticket-holder emails the job will involve turning vague statements and bullet points in to coherant text that can be sent out to our attendees whilst preserving our (we hope) friendly voice.
+
 ## Music Team
 
 The music team are looking for people to book artists to play, and to look after them once they arrive on site. An interest in music and the ability to remove brown M&Ms are a great help.
+
+## Shop
+
+The shop stocks a supply of festival essentials, including food, drink, t-shirts, and soldering irons. We're looking for a few more people to work with the team, planning what to stock in the lead up, and then once on site running a few shifts supporting the volunteers staffing the shop. If you've used Square to sell things before that would be great, but no experience is neccessary.
+
+
+## Swap Shop
+
+We're looking for someone to look after the swap shop, where people bring the random junk that's been sitting in drawers, and go home with some different random junk which just might get turned into something amazing. This will largely involve keeping the area tidy, and comes with the perk of having first dibs on people's junk.
 
 ## Furniture Wrangler
 
@@ -31,9 +48,6 @@ We're looking for people to join the conduct team, which is responsible for enfo
 
 As this is a sensitive role, we're looking for people who are trusted among EMF attendees or similar communities.
 
-## NullSector Production Manager
-
-In the months ahead of the event NullSector need someone to help with administration, supplier management, placing orders, and scheduling. Some knowledge of set construction, staging, and shipping containers would be very helpful.
 
 # Calls for help
 

@@ -4,19 +4,20 @@
     <div class="well">
         {% if SALES_STATE == 'sales-ended' %}
             <p class="emphasis">We're sorry, ticket sales for Electromagnetic Field {{ event_year }} have now ended.</p>
-            <p>There are no tickets for sale on site, so please do not travel to EMF
+            <p>There are no tickets for sale on at the gate, so please do not travel to EMF
             if you haven't got a ticket.</p>
-        {% elif SALES_STATE == 'sold-out' %}
-        <p class="emphasis">We're sorry, but tickets for Electromagnetic Field
-                            {{ event_year }} are <strong>sold out</strong>.</p>
-        <p>If you're interested in updates on our next event,
-            please follow us on <a href="https://social.emfcamp.org/@emf">the Fediverse</a> or
+            <p>For updates on future EMF events, please follow us on
+                <a href="https://social.emfcamp.org/@emf">the Fediverse</a> or
                 join our mailing list:</p>
-                {{contact_form("main")}}
+            {{contact_form("main")}}
+        {% elif SALES_STATE == 'sold-out' %}
+        <p class="emphasis">We're sorry, tickets for Electromagnetic Field {{ event_year }} are
+            <strong>sold out</strong>.</p>
+        <p>There may be a small number of returned tickets available before the event. For updates on these,
+            please follow us on <a href="https://social.emfcamp.org/@emf">the Fediverse</a>.</p>
         {% endif %}
-
         {% if SALES_STATE != 'sales-ended' %}
-        <p>To order additional items, such as parking tickets or village tents, please
+        <p>If you have a ticket to EMF and need to order parking tickets, please
             <a href="{{ url_for('tickets.main', flow='other') }}">click here</a>.
         {% endif %}
     </div>

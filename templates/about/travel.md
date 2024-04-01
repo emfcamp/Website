@@ -9,9 +9,17 @@ You can arrive after 10am on Thursday 30 May and you can stay until midday on Mo
 ## By Train
 EMF is close to Ledbury station which is around [three hours](https://traintimes.org.uk/london+paddington/ledbury/) from London Paddington (on [GWR](https://www.gwr.com)) and [one hour](https://traintimes.org.uk/birmingham+new+street/ledbury) from Birmingham New Street (on [West Midlands Railway](https://www.westmidlandsrailway.co.uk/)).
 
-The station at Ledbury has short platforms, so if you are on one of the long 9-coach trains direct from Paddington, you will need to be in the front three coaches to get off the train.
+The station at Ledbury has short platforms, so if you are on one of the long 9-coach trains direct
+from Paddington, you will need to be in the front three coaches to get off the train.
 
-We will be providing a free shuttle bus service between Ledbury station and the EMF site approximately every half hour. The bus will leave from the bus stop on the road just outside the station.
+We will be providing a free shuttle bus service between Ledbury station and the EMF site
+approximately every half hour. The bus will leave from the bus stop on the road just outside the
+station.
+
+**Note:** There is engineering work on the Sunday of EMF (June 2nd) which means the line between
+Ledbury and Worcester is closed, with a rail replacement bus service. We are planning to run our
+shuttle bus service to **Worcestershire Parkway** station instead, but we recommend you travel home
+on the Monday if possible. Please stay tuned for more updates on this.
 
 ## By Car
 If you plan to drive, you will need to [buy a parking ticket or live-in vehicle ticket](/tickets/other). Motorcycles do not require a parking ticket. 

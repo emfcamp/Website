@@ -313,7 +313,7 @@ def tickets_reserve(email):
         )
 
         msg.body = render_template(
-            "emails/tickets-reserved.txt",
+            "emails/admin-tickets-reserved.txt",
             user=user,
             code=code,
             tickets=basket.purchases,
