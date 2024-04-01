@@ -34,7 +34,6 @@ from models.cfp import (
     FavouriteProposal,
     get_available_proposal_minutes,
     get_days_map,
-    HUMAN_CFP_TYPES,
     InvalidVenueException,
     LightningTalkProposal,
     MANUAL_REVIEW_TYPES,
@@ -1276,18 +1275,24 @@ def lightning_talks():
 @cfp_review.route("/proposals-summary")
 @schedule_required
 def proposals_summary():
-    counts_by_tag = {t.tag: len(t.proposals) for t in Tag.query.all()}
-    counts_by_tag["untagged"] = 0
+    counts_by_tag = {t.tag: Counter() for t in Tag.query.all()}
+    counts_by_tag["untagged"] = Counter()
 
-    counts_by_type = {t: 0 for t in HUMAN_CFP_TYPES}
-    counts_by_state = {s: 0 for s in ORDERED_STATES}
+    counts_by_state = {s: Counter() for s in ORDERED_STATES}
+    counts_by_type = Counter()
 
     for prop in Proposal.query.all():
         counts_by_type[prop.type] += 1
-        counts_by_state[prop.state] += 1
+        counts_by_state[prop.state]["total"] += 1
+        counts_by_state[prop.state][prop.type] += 1
+
+        for tag in prop.tags:
+            counts_by_tag[tag.tag]["total"] += 1
+            counts_by_tag[tag.tag][prop.type] += 1
 
         if not prop.tags:
-            counts_by_tag["untagged"] += 1
+            counts_by_tag["untagged"]["total"] += 1
+            counts_by_tag["untagged"][prop.type] += 1
 
     return render_template(
         "cfp_review/proposals_summary.html",
@@ -1360,9 +1365,8 @@ def get_diversity_counts(user_list):
         if user.diversity.ethnicity:
             res["ethnicity"][guess_ethnicity(user.diversity.ethnicity)] += 1
 
-        if user.cfp_reviewer_tags:
-            for tag in user.cfp_reviewer_tags:
-                res["reviewer_tags"][tag] += 1
+        for tag in user.cfp_reviewer_tags:
+            res["reviewer_tags"][tag] += 1
 
     res["age"]["not given"] = res["age"][""]
     del res["age"][""]
