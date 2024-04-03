@@ -4,7 +4,7 @@ title: Travelling to Electromagnetic Field
 
 EMF will be held at the Eastnor Castle Deer Park, just east of Ledbury, Herefordshire.
 
-You can arrive after 10am on Thursday 30 May and you can stay until midday on Monday 3 June{# 2024 #}. You won't be allowed on site outside those times unless you've [volunteered](/volunteering) to help with setup or teardown.
+You can arrive after 10am on Thursday 30 May and you can stay until midday on Monday 3 June{# 2024 #}. You won't be allowed on site outside those times unless you've [volunteered](/about/volunteering) to help with setup or teardown.
 
 ## By Train
 EMF is close to Ledbury station which is around [three hours](https://traintimes.org.uk/london+paddington/ledbury/) from London Paddington (on [GWR](https://www.gwr.com)) and [one hour](https://traintimes.org.uk/birmingham+new+street/ledbury) from Birmingham New Street (on [West Midlands Railway](https://www.westmidlandsrailway.co.uk/)).
