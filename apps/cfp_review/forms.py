@@ -331,15 +331,15 @@ class VoteForm(Form):
 
     change = SubmitField("I'd like to change my response")
     recuse = SubmitField("I can identify the submitter (do not vote)")
-    question = SubmitField("I need more information")
+    block = SubmitField("Raise an issue with this proposal")
 
     def validate_note(form, field):
         if not field.data and form.recuse.data:
             raise ValidationError(
                 "Please tell us why you're not voting. If you can identify the submitter, please tell us who it is."
             )
-        if not field.data and form.question.data:
-            raise ValidationError("Please let us know what's unclear")
+        if not field.data and form.block.data:
+            raise ValidationError("Please let us know what the issue is")
 
 
 class CloseRoundForm(Form):
