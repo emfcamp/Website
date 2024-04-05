@@ -8,7 +8,7 @@ from wtforms.validators import DataRequired, ValidationError
 
 from . import admin
 from main import db
-from sqlalchemy import or_
+from sqlalchemy import func, or_
 from sqlalchemy_continuum.utils import version_class
 
 from models.user import User, generate_signup_code
@@ -65,8 +65,8 @@ def users():
     except ValueError:
         return redirect(url_for(".users"))
 
-    if request.args.get("search"):
-        user_query = request.args.get("search")
+    user_query = request.args.get("search", "")
+    if user_query:
         select = db.select(User).where(
             or_(User.name.ilike(f"%{user_query}%"), User.email.ilike(f"%{user_query}%"))
         )
@@ -76,12 +76,15 @@ def users():
     users = select.order_by(User.id).options(
         db.joinedload(User.owned_admission_tickets), db.joinedload(User.permissions)
     )
+    total_users = db.session.query(func.count(User.id)).scalar()
     users_paged = db.paginate(users, per_page=size, error_out=False)
 
     return render_template(
         "admin/users/users.html",
         users=users_paged,
         form=form,
+        total_users=total_users,
+        user_query=user_query,
     )
 
 
