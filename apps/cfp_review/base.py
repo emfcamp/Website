@@ -205,7 +205,8 @@ def proposals():
 def export(format: str):
     fields = [
         "id",
-        "user_id",
+        "email",
+        "name"
         "created",
         "modified",
         "state",
