@@ -206,7 +206,7 @@ def export(format: str):
     fields = [
         "id",
         "email",
-        "name"
+        "name",
         "created",
         "modified",
         "state",
