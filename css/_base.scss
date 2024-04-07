@@ -12,6 +12,7 @@ body {
   font-size: 16px;
   color: $main-background-text;
   background-color: $body-background;
+  font-family: $body-font-stack;
 }
 
 html, body {
@@ -26,7 +27,6 @@ a {
 a:hover {
   color: $main-link-hover;
 }
-
 
 .well, .panel {
     background-color: $highlight-background;
@@ -106,7 +106,7 @@ a:hover {
     justify-content: center;
 }
 
-header, h2, h3, h4, h5, h6 {
+header, h1, h2, h3, h4, h5, h6 {
     color: $main-background-header;
     font-family: $header-font-stack;
 }
@@ -118,6 +118,7 @@ header, h2, h3, h4, h5, h6 {
 }
 
 #gallery .col-md-3, #gallery .col-md-12 {
+  margin-top: -15px;
   padding: 0;
 }
 
@@ -128,7 +129,12 @@ header, h2, h3, h4, h5, h6 {
 #main-content {
   height: 100%;
   min-height: 100%;
-  padding: 0px 15px 15px 15px;
+  padding: 15px;
+}
+
+// Remove the margin from the first header
+#main-content h2:first-child, #main-content h1:first-child {
+  margin-top: 0;
 }
 
 @media(min-width: 550px) {
@@ -206,6 +212,10 @@ div.micro img {
   color: #333;
 }
 
+.form-control {
+  background-color: $form-element;
+}
+
 .form-horizontal .form-group .help-block {
   padding-left: 0.5em;
 }
@@ -235,6 +245,17 @@ legend {
     a {
         color: inherit;
     }
+}
+
+.alert-info {
+  background-color: $alert-info-background;
+  border-color: $alert-info-border;
+}
+
+.alert-warning {
+  background-color: $alert-warning-background;
+  border-color: $alert-warning-border;
+  color: $alert-warning-text;
 }
 
 .alert-link {

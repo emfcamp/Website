@@ -1,3 +1,4 @@
+@use 'sass:color';
 // Maximum content width
 $main-content-width: 		950px;
 // Minimum content width: horizontal scrolling below this.
@@ -6,30 +7,54 @@ $min-width:                     380px;
 // Width at which header menu is hidden.
 $header-collapse-width:         500px;
 
-$header-font-stack:             "Raleway","Helvetica Neue",Helvetica,Arial,sans-serif;
+$header-font-stack:             "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$body-font-stack:               "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
-$body-background:               #3c3c3c;
-$body-background-shadow:        #222;
+$brand-2024-pale-green:         #AFC944;
+$brand-2024-mid-green:          #528329;
+$brand-2024-dark-green:         #213018;
+$brand-2024-yellow:             #F9E200;
+$brand-2024-orange:             #F77F02;
+$brand-2024-pink:               #F55089;
+$brand-2024-blue:               #2EADD9;
 
-$main-background:               #151735;
-$main-background-text:          #c8c8c8;
+$desaturated-yellow:            color.adjust($brand-2024-yellow, $lightness: -10%);
+
+$body-background:               #272827;
+$body-background-shadow:        #060606;
+
+$main-background:               $brand-2024-dark-green;
+$main-background-text:          #d8d8d8;
 $main-background-header:        #ffffff;
 
 $content-well-background:       #292236;
 
 $main-link:                     $main-background-text;
-$main-link-hover:               #90CCD6;
+$main-link-hover:               $brand-2024-blue;
 
 /* Styles for "highlight" elements (wells and panels) */
-$highlight-background:          #c8c8c8;
+$highlight-background:          #cfccc0;
 $highlight-background-text:     #1e1e1e;
 $highlight-background-link:     #171123;
 
-$highlight-2-background:        #C7B3BF;
+$highlight-2-background:        #d6c8a0;
+$highlight-2-border:            #bfaa7f;
+$highlight-2-background-hover:  $desaturated-yellow;
 
-$highlight-3-background:        #d5d6da;
-$highlight-3-border:            #c8c8c8;
-$highlight-3-background-hover:  #c7b3bf;
+$highlight-3-background:        $brand-2024-pale-green;
+$highlight-3-border:            $brand-2024-mid-green;
+$highlight-3-background-hover:  $desaturated-yellow;
 
 $schedule-text:                 #d5d6da;
 $schedule-block:                #123F8B;
+
+$form-element:                  color.adjust($brand-2024-yellow, $lightness: +45%);
+
+/* Alert elements */
+
+$alert-info-background:         color.adjust($brand-2024-blue, $lightness: +20%);
+$alert-info-border:             $brand-2024-blue;
+
+$alert-warning-background:      color.adjust($brand-2024-orange, $lightness: +20%);
+$alert-warning-border:          $brand-2024-orange;
+$alert-warning-text:            #1e1e1e;

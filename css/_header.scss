@@ -1,8 +1,10 @@
 @use "./_variables.scss" as *;
 
 header {
-  background-image: url('../images/brand/header-2022.jpg');
+  // background-image: url('../images/brand/header-2022.jpg');
+  background: url('../images/brand/2024/header.png') left top 30%;
   padding: 10px 15px 0px 15px;
+  border-bottom: 1px solid #272827;
 }
 
 header h1 {
@@ -96,7 +98,8 @@ ul.menu a {
   }
 
   #logomark {
-    width: 16px;
+    width: 16px !important;
+    height: auto !important;
     margin-top: -4px;
   }
 
