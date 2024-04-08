@@ -19,6 +19,16 @@ html, body {
   height: 100%;
 }
 
+code {
+  background: inherit;
+  color: $brand-2024-orange;
+  padding: 0;
+}
+
+.well code, .panel code, .table code {
+  color: inherit;
+}
+
 a {
   color: $main-link;
   text-decoration: underline;
