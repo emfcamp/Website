@@ -19,7 +19,7 @@ We recommend you connect to the `emf2024` network for the highest security - thi
 
 The `emf2024-open` network supports [Opportunistic Wireless Encryption](https://en.wikipedia.org/wiki/Opportunistic_Wireless_Encryption) (OWE) which will automatically provide security comparable to a normal WiFi network with a shared password, *if your device supports OWE*. Otherwise, it will be completely unencrypted.
 
-By default, wireless devices are firewalled from the Internet, but inbound connections from other users on the congress network are still allowed.
+By default, wireless devices are firewalled from the Internet, but inbound connections from other users on the event network are still allowed.
 
 ### Special credentials
 
