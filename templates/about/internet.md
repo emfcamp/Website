@@ -70,4 +70,4 @@ Note that most of our ports will not support 10 Mbps - if you need it for old eq
 
 ## Contact us
 
-Do you have any questions or special requirements not listed here? Email us at [noc@emfcamp.org](mailto:noc@emfcamp.org) and we can try and help. Yoy can also follow us at [@noc@emfcamp.org](https://social.emfcamp.org/@noc).
+Do you have any questions or special requirements not listed here? Email us at [noc@emfcamp.org](mailto:noc@emfcamp.org) and we can try and help. You can also follow us at [@noc@emfcamp.org](https://social.emfcamp.org/@noc).
