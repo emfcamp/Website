@@ -46,7 +46,7 @@ There are some special usernames and passwords which can modify the firewall beh
 
 ### Bringing wireless access points
 
-Please don’t set up your own access point if at all possible. Wireless airtime is a precious commodity at hacker events, because each additional SSID will transmit 802.11 beacons and management frames, slowing down wireless connectivity for everyone in the area, even if they're not using your network.
+Please don’t set up your own access point if at all possible. Wireless airtime is a precious commodity at hacker events, and **every additional SSID slows the network down for everyone** by transmitting 802.11 beacons and management frames, even if they're not using your network.
 
 If you have no other choice (for running experiments and such), please be nice and follow these rules:
 
@@ -55,7 +55,7 @@ If you have no other choice (for running experiments and such), please be nice a
 * 5GHz: use channels 36 or 140 @ 20 MHz.
 * Use a minimum data and beacon rate of 12 Mbit/s. Beacon interval 100 ms or higher.
 * Only broadcast one SSID. SSID spamming is is very antisocial.
-* Do not prefix your broadcasted SSID(s) with “emf”. Do not use other well-known SSIDs.
+* Do not prefix your broadcasted SSID with “emf”. Do not use other well-known SSIDs.
 * Do not use high-gain antennas.
 * Limit your transmit power as much as possible, for example to 6 dBm or 4 mW.
 
