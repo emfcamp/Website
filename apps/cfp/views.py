@@ -200,7 +200,7 @@ def form(cfp_type="talk"):
     if feature_enabled("CFP_CLOSED") and not ignore_closed:
         return render_template("cfp/closed.html", cfp_type=cfp_type)
 
-    if feature_enabled("CFP_{}S_CLOSED".format(cfp_type.upper())) and not ignore_closed:
+    if feature_enabled(f"CFP_{cfp_type.upper()}S_CLOSED") and not ignore_closed:
         msg = Markup(
             render_template_string(
                 """Sorry, we're not accepting new {{ type }} proposals, if you have been told to submit something please <a href="{{ url }}">click here</a>""",
