@@ -72,17 +72,31 @@ def invoice(payment_id, fmt=None):
         .all()
     )
 
-    ticket_sum = sum(
-        pt.get_price(payment.currency).value_ex_vat * count
-        for pt, count in invoice_lines
-    )
+    prices = []
+    for pt, count in invoice_lines:
+        price_ex_vat = pt.get_price(payment.currency).value_ex_vat
+        prices.append(
+            {
+                "sum_ex_vat": price_ex_vat * count,
+                "sum_vat": (price_ex_vat * Decimal(pt.parent.vat_rate)) * count,
+            }
+        )
+
     if payment.provider == "stripe":
-        premium = payment.__class__.premium(payment.currency, ticket_sum)
+        premium = payment.__class__.premium(
+            payment.currency, sum(cost["sum_ex_vat"] for cost in prices)
+        )
     else:
         premium = Decimal(0)
 
-    subtotal = ticket_sum + premium
-    vat = subtotal * Decimal("0.2")
+    prices.append(
+        {
+            "sum_ex_vat": premium,
+            "sum_vat": premium * Decimal("0.2"),
+        }
+    )
+    subtotal = sum(cost["sum_ex_vat"] for cost in prices)
+    vat = sum(cost["sum_vat"] for cost in prices)
 
     # FIXME: we should use a currency-specific quantization here (or rounder numbers)
     if subtotal + vat - payment.amount > Decimal("0.01"):
