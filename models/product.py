@@ -268,7 +268,7 @@ class Product(BaseModel, CapacityMixin, InheritedAttributesMixin):
     name = db.Column(db.String, nullable=False)
     display_name = db.Column(db.String)
     description = db.Column(db.String)
-    vat_rate = db.Column(db.Float, nullable=True)
+    vat_rate = db.Column(db.Float, nullable=True, default=1.2)
     price_tiers = db.relationship(
         "PriceTier", backref="parent", cascade="all", order_by="PriceTier.id"
     )
