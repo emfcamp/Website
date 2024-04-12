@@ -3,7 +3,10 @@ from typing import Pattern
 
 from flask import current_app as app
 from flask_wtf import FlaskForm
-from wtforms import SelectField
+from wtforms import SelectField, BooleanField, FieldList, FormField, SubmitField
+from wtforms.validators import InputRequired
+
+from .fields import HiddenIntegerField
 
 from models.user import UserDiversity
 from models.cfp_tag import DEFAULT_TAGS, Tag
@@ -138,3 +141,14 @@ class DiversityForm(Form):
             else:
                 seen.add(field.data)
         return result
+
+
+class RefundPurchaseForm(Form):
+    purchase_id = HiddenIntegerField("Purchase ID", [InputRequired()])
+    refund = BooleanField("Refund purchase", default=True)
+
+
+class RefundForm(Form):
+    purchases = FieldList(FormField(RefundPurchaseForm))
+    refund = SubmitField("Refunded these by bank transfer")
+    stripe_refund = SubmitField("Refund through Stripe (preferred)")

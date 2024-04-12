@@ -15,8 +15,7 @@ from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from flask_mailman import EmailMessage
 
-from wtforms.validators import InputRequired
-from wtforms import SubmitField, BooleanField, FieldList, FormField
+from wtforms import SubmitField
 
 from sqlalchemy.sql.functions import func
 
@@ -31,8 +30,7 @@ from models.payment import (
 )
 from models.purchase import AdmissionTicket, Purchase
 from ..common.email import from_email
-from ..common.forms import Form
-from ..common.fields import HiddenIntegerField
+from ..common.forms import Form, RefundForm
 from ..payments.stripe import (
     StripeUpdateUnexpected,
     StripeUpdateConflict,
@@ -349,17 +347,6 @@ def manual_refund(payment_id):
     return render_template(
         "admin/payments/manual-refund.html", payment=payment, form=form
     )
-
-
-class RefundPurchaseForm(Form):
-    purchase_id = HiddenIntegerField("Purchase ID", [InputRequired()])
-    refund = BooleanField("Refund purchase", default=True)
-
-
-class RefundForm(Form):
-    purchases = FieldList(FormField(RefundPurchaseForm))
-    refund = SubmitField("I have refunded these purchases by bank transfer")
-    stripe_refund = SubmitField("Refund through Stripe")
 
 
 @admin.route("/payment/<int:payment_id>/refund", methods=["GET", "POST"])

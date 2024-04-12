@@ -1,0 +1,50 @@
+{% macro render_payment_row(p, link_name) %}
+  <td>
+      {% if link_name %}
+        <a href="{{url_for('.payment', payment_id = p.id) }}">{{ p.name }}</a>
+      {% else %}
+        {{ p.name }}
+      {% endif %}
+  </td>
+  <td>{{ p.amount | price(p.currency) }}</td>
+  <td>
+    {{ {'new': 'Incomplete', 'inprogress': 'Pending', 'paid': 'Complete', 'captured': 'Not paid', 'charging': 'Charging', 'partrefunded': 'Partially refunded', 'refunded': 'Refunded', 'failed': 'Failed', 'refund-requested': "Refund requested"}[p.state] -}}
+  </td>
+  <td class="table-actions">
+    <div class="btn-group" role="group">
+      {%- if p.state == "inprogress" and p.provider == "banktransfer" %}
+      <a href="{{ url_for('payments.transfer_waiting', payment_id=p.id) }}" class="btn btn-success">Pay</a>
+      {%- elif p.state in ["new", "failed"] and p.provider == "stripe" %}
+      <a href="{{ url_for('payments.stripe_capture', payment_id=p.id) }}" class="btn btn-success">Pay</a>
+      {% endif -%}
+
+      {%- if p.state in ["new", "inprogress"] and p.provider == "banktransfer" %}
+      <a href="{{ url_for('payments.transfer_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
+      {%- elif p.state in ["new", "captured", "failed"] and p.provider == "stripe" %}
+      <a href="{{ url_for('payments.stripe_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
+      {% endif -%}
+
+      {% if feature_enabled('REFUND_REQUESTS') and p.state == "paid" %}
+      <a href="{{ url_for('payments.payment_refund_request', payment_id=p.id) }}" class="btn btn-default">Request refund</a>
+      {% endif %}
+
+      <a href="{{ url_for('payments.invoice', payment_id=p.id) }}" class="btn btn-default">View Receipt</a>
+    </div>
+  </td>
+{% endmacro %}
+
+<table class="table">
+<thead>
+  <tr>
+    <th>Type</th>
+    <th>Amount</th>
+    <th>Progress</th>
+    <th class="table-actions"></th>
+</tr>
+</thead>
+  {% for p in payments %}
+    <tr class="{{- loop.cycle('odd', 'even') -}}">
+      {{ render_payment_row(p, link_name=True) }}
+    </tr>
+  {% endfor %}
+</table>

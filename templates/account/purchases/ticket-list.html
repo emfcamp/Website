@@ -1,3 +1,45 @@
+{% macro render_ticket_table(tickets) %}
+
+<table class="table tickets btns-table">
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>Status</th>
+      <th class="table-actions"></th>
+    </tr>
+  </thead>
+  <tbody>
+  {%- for t in tickets -%}
+
+    <tr class="
+    {{- loop.cycle('odd', 'even') }}
+    {%- if t.is_paid_for %} paid {%- endif -%}
+    {%- if t.payment and t.payment.expired %} expired {%- endif -%}
+    ">
+
+      <td>{{ t.price_tier.parent.display_name }}</td>
+      <td>
+          {%- if t.is_paid_for %}
+          Paid
+          {%- elif t.refund %}
+          Refunded
+          {%- elif t.payment and t.payment.expired %}
+          Unpaid
+          {%- else %}
+          Reserved {% if t.payment.expires -%} until {{ t.payment.expires.day }} {{ '{:%B}'.format(t.payment.expires) }} {%- endif %}
+          {%- endif %}
+      </td>
+      <td class="table-actions">
+        {% if t.is_paid_for and t.is_transferable %}
+          <a class="btn btn-default" href="{{ url_for('tickets.transfer', ticket_id=t.id) }}">Transfer</a>
+        {% endif %}
+      </td>
+  </tr>
+  {% endfor -%}
+  </tbody>
+</table>
+{% endmacro %}
+
 {% if show_receipt and feature_enabled('ISSUE_TICKETS') %}
 <p class="login-details">
   You are logged in as {{ current_user.name }} ({{ current_user.email }})</a>.
@@ -8,43 +50,8 @@
 <a class="btn btn-primary" href="{{ url_for('tickets.receipt') + '?pdf=1' }}">Download PDF</a>
 </p>
 {% endif %}
-<table class="table tickets btns-table">
-  <thead>
-    <tr>
-      <th>Type</th>
-      <th>Status</th>
-      <th class="table-actions"></th>
-    </tr>
-  </thead>
-  <tbody>
-{%- for t in tickets -%}
 
-<tr class="
-{{- loop.cycle('odd', 'even') }}
-{%- if t.is_paid_for %} paid {%- endif -%}
-{%- if t.payment and t.payment.expired %} expired {%- endif -%}
-">
-<td>{{ t.price_tier.parent.display_name }}</td>
-<td>
-    {%- if t.is_paid_for %}
-    Paid
-    {%- elif t.refund %}
-    Refunded
-    {%- elif t.payment and t.payment.expired %}
-    Unpaid
-    {%- else %}
-    Reserved {% if t.payment.expires -%} until {{ t.payment.expires.day }} {{ '{:%B}'.format(t.payment.expires) }} {%- endif %}
-    {%- endif %}
-</td>
-<td class="table-actions">
-  {% if t.is_paid_for and t.is_transferable %}
-    <a class="btn btn-default" href="{{ url_for('tickets.transfer', ticket_id=t.id) }}">Transfer</a>
-  {% endif %}
-</td>
-</tr>
-{% endfor -%}
-  </tbody>
-</table>
+{{ render_ticket_table(tickets) }}
 
 {% if not (show_receipt and feature_enabled('ISSUE_TICKETS')) %}
 <p>We'll email you when your e-tickets are ready closer to the event.</p>

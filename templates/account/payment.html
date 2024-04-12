@@ -1,0 +1,31 @@
+{% from "account/purchases/payment-list.html" import render_payment_row with context %}
+{% from "account/purchases/ticket-list.html" import render_ticket_table with context %}
+
+{% extends "base.html" %}
+{% set main_class = 'account-purchases' %}
+
+{% block title %}Payment -- {{ payment.id }}{% endblock %}
+{% block body %}
+{% include "account/_nav.html" %}
+
+
+<table class="table">
+<thead>
+  <tr>
+    <th>Type</th>
+    <th>Amount</th>
+    <th>Progress</th>
+    <th class="table-actions"></th>
+</tr>
+</thead>
+  <tr>
+    {{ render_payment_row(payment) }}
+  </tr>
+</table>
+
+
+<h3>Tickets for this purchase</h3>
+
+{{ render_ticket_table(payment.purchases) }}
+
+{% endblock %}

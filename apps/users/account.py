@@ -1,4 +1,12 @@
-from flask import render_template, redirect, request, flash, url_for, current_app as app
+from flask import (
+    abort,
+    current_app as app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
 from flask_login import login_required, current_user
 from wtforms import StringField, SubmitField, BooleanField
 from wtforms.validators import DataRequired
@@ -110,6 +118,17 @@ def purchases():
         transferred_to=transferred_to,
         transferred_from=transferred_from,
     )
+
+
+@users.route("/account/payment/<int:payment_id>")
+@login_required
+def payment(payment_id: int):
+    payment = Payment.query.get_or_404(payment_id)
+
+    if current_user != payment.user:
+        abort(404)
+
+    return render_template("account/payment.html", payment=payment)
 
 
 @users.route("/account/cancellation-refund")
