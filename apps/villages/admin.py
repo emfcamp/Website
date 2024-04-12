@@ -61,16 +61,7 @@ def admin_village(village_id):
 
     form.populate(village)
 
-    admin_users = (
-        User.query.join(User.village_membership)
-        .filter(VillageMember.admin)
-        .distinct()
-        .all()
-    )
-
-    return render_template(
-        "villages/admin/info.html", village=village, admin_users=admin_users, form=form
-    )
+    return render_template("villages/admin/info.html", village=village, form=form)
 
 
 @villages.route("/admin/email_owners", methods=["GET", "POST"])

@@ -5,7 +5,7 @@
 <h3>Village Info: {{village.name}}</h3>
 <b>Village administrators:</b>
 <ul>
-    {% for user in admin_users %}
+    {% for user in village.admins() %}
         <li><a href="{{ url_for('admin.user', user_id=user.id) }}">{{ user.name }}</a> ({{ user.email }})</li>
     {% endfor %}
 </ul>
