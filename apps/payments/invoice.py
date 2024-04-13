@@ -33,6 +33,7 @@ class InvoiceForm(Form):
     company = TextAreaField("Company name")
     update = SubmitField("Update")
 
+
 class InvoiceLine:
     def __init__(self, _price_tier, _quantity, _vat_rate, _vat_amount, _price):
         self.price_tier = _price_tier
@@ -40,6 +41,7 @@ class InvoiceLine:
         self.vat_rate = _vat_rate
         self.vat_amount = _vat_amount
         self.price = _price
+
 
 @payments.route("/payment/<int:payment_id>/receipt", methods=["GET", "POST"])
 @payments.route("/payment/<int:payment_id>/receipt.<string:fmt>")
@@ -90,7 +92,15 @@ def invoice(payment_id, fmt=None):
                 "sum_vat": (price_ex_vat * Decimal(pt.vat_rate)) * count,
             }
         )
-        invoice_lines.append(InvoiceLine(pt, count, f"{int(Decimal(pt.vat_rate) * 100)}%", round((price.value - price_ex_vat) * count, 2), price))
+        invoice_lines.append(
+            InvoiceLine(
+                pt,
+                count,
+                f"{int(Decimal(pt.vat_rate) * 100)}%",
+                round((price.value - price_ex_vat) * count, 2),
+                price,
+            )
+        )
 
     if payment.provider == "stripe":
         premium = payment.__class__.premium(
