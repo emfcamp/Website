@@ -78,7 +78,7 @@ def invoice(payment_id, fmt=None):
         prices.append(
             {
                 "sum_ex_vat": price_ex_vat * count,
-                "sum_vat": (price_ex_vat * Decimal(pt.parent.vat_rate)) * count,
+                "sum_vat": (price_ex_vat * Decimal(pt.vat_rate)) * count,
             }
         )
 
