@@ -33,6 +33,13 @@ class InvoiceForm(Form):
     company = TextAreaField("Company name")
     update = SubmitField("Update")
 
+class InvoiceLine:
+    def __init__(self, _price_tier, _quantity, _vat_rate, _vat_amount, _price):
+        self.price_tier = _price_tier
+        self.quantity = _quantity
+        self.vat_rate = _vat_rate
+        self.vat_amount = _vat_amount
+        self.price = _price
 
 @payments.route("/payment/<int:payment_id>/receipt", methods=["GET", "POST"])
 @payments.route("/payment/<int:payment_id>/receipt.<string:fmt>")
@@ -63,7 +70,7 @@ def invoice(payment_id, fmt=None):
     if request.args.get("js") == "0":
         flash("Please use your browser's print feature or download the PDF")
 
-    invoice_lines = (
+    invoice_lines_query = (
         Purchase.query.filter_by(payment_id=payment_id)
         .join(PriceTier, Product)
         .with_entities(PriceTier, func.count(Purchase.price_tier_id))
@@ -72,15 +79,18 @@ def invoice(payment_id, fmt=None):
         .all()
     )
 
+    invoice_lines = []
     prices = []
-    for pt, count in invoice_lines:
-        price_ex_vat = pt.get_price(payment.currency).value_ex_vat
+    for pt, count in invoice_lines_query:
+        price = pt.get_price(payment.currency)
+        price_ex_vat = price.value_ex_vat
         prices.append(
             {
                 "sum_ex_vat": price_ex_vat * count,
                 "sum_vat": (price_ex_vat * Decimal(pt.vat_rate)) * count,
             }
         )
+        invoice_lines.append(InvoiceLine(pt, count, f"{int(Decimal(pt.vat_rate) * 100)}%", round((price.value - price_ex_vat) * count, 2), price))
 
     if payment.provider == "stripe":
         premium = payment.__class__.premium(
