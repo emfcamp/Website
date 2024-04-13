@@ -460,11 +460,11 @@ class Price(BaseModel):
 
     @property
     def value_ex_vat(self):
-        return self.value / Decimal("1.2")
+        return self.value / (Decimal(self.price_tier.vat_rate) + 1)
 
     @value_ex_vat.setter
     def value_ex_vat(self, val):
-        self.value = val * Decimal("1.2")
+        self.value = val * (Decimal(self.price_tier.vat_rate) + 1)
 
     def __repr__(self):
         return "<Price for %r: %.2f %s>" % (self.price_tier, self.value, self.currency)
