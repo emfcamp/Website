@@ -356,6 +356,7 @@ class PriceTier(BaseModel, CapacityMixin):
 
     personal_limit = db.Column(db.Integer, default=10, nullable=False)
     active = db.Column(db.Boolean, default=True, nullable=False)
+    vat_rate = db.Column(db.String, nullable=True, default="0.2")
 
     __table_args__ = (UniqueConstraint("name", "product_id"),)
     __export_data__ = False  # Exported by ProductGroup
