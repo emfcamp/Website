@@ -149,7 +149,11 @@ def new_price_tier(product_id):
     product = Product.query.get_or_404(product_id)
 
     if form.validate_on_submit():
-        pt = PriceTier(form.name.data, personal_limit=form.personal_limit.data)
+        pt = PriceTier(
+            form.name.data,
+            personal_limit=form.personal_limit.data,
+            vat_rate=str(form.vat_rate.data),
+        )
         pt.prices = [
             Price("GBP", form.price_gbp.data),
             Price("EUR", form.price_eur.data),
@@ -217,6 +221,7 @@ def price_tier_edit(tier_id):
     if form.validate_on_submit():
         tier.name = form.name.data
         tier.personal_limit = form.personal_limit.data
+        tier.vat_rate = str(form.vat_rate.data)
 
         # Update prices but only if price tier has no purchases.
         price_gbp = tier.get_price("GBP")

@@ -14,6 +14,7 @@
 {% if tier.purchase_count == 0 %}
 {{ render_field(form.price_gbp, horizontal=8) }}
 {{ render_field(form.price_eur, horizontal=8) }}
+{{ render_field(form.vat_rate, horizontal=8) }}
 {% else %}
 <p>The prices of this tier cannot be edited as purchases have been made at this price.
    Please create a new price tier to sell at a different price.</p>
