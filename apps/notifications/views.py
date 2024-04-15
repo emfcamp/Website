@@ -6,7 +6,7 @@ from flask_login import current_user, login_required
 
 from . import notifications
 from ..common.forms import Form
-from models.web_push import public_key, WebPushTarget, notify
+from models.web_push import public_key, WebPushTarget, PushNotificationJob
 from models.notifications import UserNotificationPreference
 
 
@@ -45,9 +45,15 @@ def test():
         return redirect(url_for("notifications.index"))
 
     for target in current_user.web_push_targets:
-        notify(target, "This is a test notification.")
+        job = PushNotificationJob(
+            target=target,
+            title="This is a test notification.",
+            related_to="test_notification",
+        )
+        db.session.add(job)
+    db.session.commit()
 
-    flash("Test notifications have been sent.")
+    flash("Your notifications should arrive shortly.")
     return redirect(url_for("notifications.index"))
 
 
