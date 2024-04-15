@@ -17,6 +17,9 @@
         <div class="state" id="notification-state-granted">
           <p>You have enabled push notifications on this device.</p>
           <p>To disable them look in your browser settings.</p>
+          <form method="post" action="{{ url_for('notifications.test') }}">
+            <button type="submit" class="btn btn-primary">Test Notifications</button>
+          </form>
         </div>
         <div class="state" id="notification-state-denied">
           <p>You have denied access to send push notifications to this device.</p>
