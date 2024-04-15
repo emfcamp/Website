@@ -22,8 +22,6 @@ from loggingmanager import set_user_id
 from . import bucketise, BaseModel
 from .permission import UserPermission, Permission
 from .volunteer.shift import ShiftEntry
-from .web_push import WebPushTarget
-from .notifications import UserNotificationPreference
 
 CHECKIN_CODE_LEN = 16
 checkin_code_re = r"[0-9a-zA-Z_-]{%s}" % CHECKIN_CODE_LEN
