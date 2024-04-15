@@ -3,6 +3,13 @@
 {% block title %}Village Info: {{village.name}}{% endblock %}
 {% block body %}
 <h3>Village Info: {{village.name}}</h3>
+<b>Village administrators:</b>
+<ul>
+    {% for user in village.admins() %}
+        <li><a href="{{ url_for('admin.user', user_id=user.id) }}">{{ user.name }}</a> ({{ user.email }})</li>
+    {% endfor %}
+</ul>
+
 <form method="POST">
     {{ form.hidden_tag() }}
 
