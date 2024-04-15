@@ -1,3 +1,4 @@
+{% from "_formhelpers.html" import render_field %}
 {% extends "base.html" %}
 {% block title %}Notifications{% endblock %}
 {% block head %}
@@ -6,17 +7,68 @@
 {% endblock %}
 {% block body %}
 <h1>Notifications</h1>
-<div id="notification-state" class="loading">
-  <div class="state" id="notification-state-loading">loading</div>
-  <div class="state" id="notification-state-granted">enabled</div>
-  <div class="state" id="notification-state-denied">
-    denied
+<div class="row">
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Push Notifications</h3>
+      </div>
+      <div class="panel-body" id="notification-state">
+        <div class="state" id="notification-state-granted">
+          <p>You have enabled push notifications on this device.</p>
+          <p>To disable them look in your browser settings.</p>
+        </div>
+        <div class="state" id="notification-state-denied">
+          <p>You have denied access to send push notifications to this device.</p>
+          <p>To enable push notifications look in your browser settings.</p>
+        </div>
+        <div class="state" id="notification-state-unsupported">
+          <p>This device does not support push notifications.</p>
+          <p>If you're using an Apple mobile device such as an iPhone please install this website to your home screen via the share menu.</p>
+        </div>
+        <div class="state" id="notification-state-prompt">
+          <button class="btn btn-primary" id="enable-notifications">Enable Push Notifications</button>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="state" id="notification-state-prompt">
-    <button class="btn btn-primary" id="enable-notifications">Enable Push Notifications</button>
+  <div class="col-md-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Preferences</h3>
+      </div>
+      <div class="panel-body">
+        <form method="post" action="">
+          {{ form.hidden_tag() }}
+          <fieldset>
+            <div>
+              <label>
+                {{ form.volunteer_shifts(class_='big-checkbox') }}
+                Volunteer shifts
+              </label>
+              <p class="help">A notification 15 minutes before a volunteer shift you have signed up for starts.</p>
+            </div>
+            <div>
+              <label>
+                {{ form.favourited_content(class_='big-checkbox') }}
+                Favourited content
+              </label>
+              <p class="help">A notification 15 minutes before content you have favourited starts.</p>
+            </div>
+            <div>
+              <label>
+                {{ form.announcements(class_='big-checkbox') }}
+                Announcements 
+              </label>
+              <p class="help">General event announcements</p>
+            </div>
+            {{ form.save(class="btn btn-primary") }}
+          </fieldset>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
-<p>Test</p>
 {% endblock %}
 {% block foot %}
 <script src="{{ static_url_for('static', filename='js/notifications.js') }}"></script>

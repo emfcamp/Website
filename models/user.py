@@ -23,6 +23,7 @@ from . import bucketise, BaseModel
 from .permission import UserPermission, Permission
 from .volunteer.shift import ShiftEntry
 from .web_push import WebPushTarget
+from .notifications import UserNotificationPreference
 
 CHECKIN_CODE_LEN = 16
 checkin_code_re = r"[0-9a-zA-Z_-]{%s}" % CHECKIN_CODE_LEN
@@ -291,6 +292,13 @@ class User(BaseModel, UserMixin):
     )
     village = association_proxy("village_membership", "village")
 
+    notification_preferences = db.relationship(
+        "UserNotificationPreference",
+        uselist=False,
+        cascade="all, delete-orphan",
+        back_populates="user",
+        primaryjoin="UserNotificationPreference.user_id == User.id",
+    )
     web_push_targets = db.relationship(
         "WebPushTarget",
         cascade="all, delete-orphan",
