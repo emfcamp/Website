@@ -149,7 +149,11 @@ def new_price_tier(product_id):
     product = Product.query.get_or_404(product_id)
 
     if form.validate_on_submit():
-        pt = PriceTier(form.name.data, personal_limit=form.personal_limit.data, vat_rate=str(form.vat_rate.data))
+        pt = PriceTier(
+            form.name.data,
+            personal_limit=form.personal_limit.data,
+            vat_rate=str(form.vat_rate.data),
+        )
         pt.prices = [
             Price("GBP", form.price_gbp.data),
             Price("EUR", form.price_eur.data),
