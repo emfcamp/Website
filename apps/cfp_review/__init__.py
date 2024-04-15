@@ -55,13 +55,13 @@ def sort_by_notice(notice):
 
 def get_proposal_sort_dict(parameters):
     sort_keys = {
-        "state": lambda p: (p.state, p.modified, p.title),
-        "date": lambda p: (p.modified, p.title),
-        "type": lambda p: (p.type, p.title),
-        "user": lambda p: (p.user.name, p.title),
-        "title": lambda p: p.title,
-        "ticket": lambda p: (len(p.user.owned_tickets) > 0, p.title),
-        "notice": lambda p: (sort_by_notice(p.notice_required), p.title),
+        "state": lambda p: (p.state, p.modified, p.title.lower()),
+        "date": lambda p: (p.modified, p.title.lower()),
+        "type": lambda p: (p.type, p.title.lower()),
+        "user": lambda p: (p.user.name.lower(), p.title.lower()),
+        "title": lambda p: p.title.lower(),
+        "ticket": lambda p: (len(p.user.owned_tickets) > 0, p.title.lower()),
+        "notice": lambda p: (sort_by_notice(p.notice_required), p.title.lower()),
         "duration": lambda p: (p.scheduled_duration or 0),
         "favourites": lambda p: (p.favourite_count),
     }
