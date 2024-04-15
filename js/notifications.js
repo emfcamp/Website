@@ -1,3 +1,15 @@
+function setState(state) {
+    document.querySelectorAll("#notification-state .state").forEach(el => el.classList.remove("visible"));
+    document.getElementById(`notification-error`).classList.remove("visible");
+    document.getElementById(`notification-state-${state}`).classList.add("visible");
+}
+
+function setError(message) {
+    let error = document.getElementById(`notification-error`);
+    error.innerText = message;
+    error.classList.add("visible");
+}
+
 async function enableNotifications(event) {
     let vapid_key = document.querySelector("meta[name=vapid_key]").getAttribute("value");
     let worker = await navigator.serviceWorker.ready;
@@ -13,6 +25,12 @@ async function enableNotifications(event) {
         },
         body: JSON.stringify(result.toJSON())
     });
+
+    if (response.status == 200) {
+        setState("granted")
+    } else {
+        setError("There was a problem enabling push notifications. Please try again shortly.")
+    }
 }
 
 async function checkPermissions() {
@@ -22,10 +40,9 @@ async function checkPermissions() {
         let permissions = await worker.pushManager.permissionState({
             userVisibleOnly: true,
         });
-        document.getElementById(`notification-state-${permissions}`).classList.add('visible')
+        setState(permissions);
     } else {
-        document.getElementById(`notification-state-unsupported`).classList.add('visible');
-        console.log("No push notification support.");
+        setState("unsupported");
     }
 }
 
