@@ -77,5 +77,21 @@
       </div>
     </div>
   {% endif %}
-  </div>
+
+  {% if feature_enabled("NOTIFICATIONS") %}
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Notifications</h3>
+        </div>
+        <div class="panel-body">
+          <p>
+            Manage notifications about content that you've favourited or upcoming volunteer shifts.
+          </p>
+          <p><a href="{{url_for('notifications.index')}}">Manage notifications</a></p>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+</div>
 {% endblock %}
