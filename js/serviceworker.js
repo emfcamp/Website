@@ -72,7 +72,7 @@ registerRoute(
 
 addEventListener("push", (event) => {
     console.log("Push event received", event);
-    const message = event.data.text()
+    const message = event.data.text();
     self.registration.showNotification(message);
 });
 
