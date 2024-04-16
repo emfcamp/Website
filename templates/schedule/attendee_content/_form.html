@@ -159,6 +159,7 @@
     <div class="form-group workshop-fields {%- if form.participant_equipment.errors %} has-error {%- endif %}">
         <label for="participant_equipment">Attendee Equipment</label>
         <textarea class="form-control" id="participant_equipment" name="participant_equipment">{%- if form.data.participant_equipment %}{{ form.data.participant_equipment }}{%- endif %}</textarea>
+        <p class="help-block">What equipment will people need to bring with them? List things such as laptops, soldering equipment, or anything else you won't be providing.</p>
         {% if form.participant_equipment.errors %}
             {% for error in form.participant_equipment.errors %}
                 <p class="help-block" id="help-block-participant_equipment">{{ error }}</p>

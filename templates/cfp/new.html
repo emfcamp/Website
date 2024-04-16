@@ -7,7 +7,12 @@
   {% endif %}
 
 <h2>Submit a {{form.model.human_type}} proposal</h2>
-
+  <div class="well">
+    <p>The Call for Participation will close for talks & workshops on
+      <span class="emphasis">Thursday 25th April</span>.</p>
+    <p>You will still be able to submit installations, performances and youth
+      workshops after this date</p>
+  </div>
   {% include 'cfp/form_' + cfp_type + '_include.html' %}
 
   <div class="well" id="cfp-errors">

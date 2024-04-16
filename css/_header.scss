@@ -1,28 +1,25 @@
 @use "./_variables.scss" as *;
 
 header {
-  background-image: url('../images/brand/header-2022.jpg');
+  background: url('../images/brand/2024/header-2.png') left top/60%;
+  background-color: $main-background;
   padding: 10px 15px 0px 15px;
 }
 
-header h1 {
+#main-logo {
   display: block;
   float: left;
   margin-bottom: 0;
-  margin-top: 5px;
-}
-
-header h1 a {
   margin-top: 7px;
+  text-decoration: none;
+  font-family: $header-font-stack;
+  font-size: 36px;
+  color: $main-background-header;
 }
 
 #logomark {
   width: 40px;
   margin-top: -7px;
-}
-
-#logo-text {
-  display: inline;
 }
 
 header #header-text {
@@ -87,16 +84,14 @@ ul.menu a {
     margin-top: $header-height;
   }
 
-  header h1 {
+  #main-logo {
     font-size: 25px;
-  }
-
-  header h1 a {
     margin-top: 4px;
   }
-
+  
   #logomark {
-    width: 16px;
+    width: 16px !important;
+    height: auto !important;
     margin-top: -4px;
   }
 
