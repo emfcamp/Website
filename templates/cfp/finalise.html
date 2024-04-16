@@ -37,7 +37,7 @@
           death, bigotry etc. </p>
         {{ render_field(form.content_note, 9) }}
         <p>Do you consider your {{proposal.human_type }} to be family friendly/suitable for all ages?</p>
-        {{ render_field(form.family_friendly, 7) }}
+        {{ render_field(form.family_friendly, 9) }}
 
         {% if proposal.type == 'workshop' or proposal.type == 'youthworkshop' %}
         <div class="col-md-9 col-md-offset-3"><small>Please give the cost in pounds (£) per attendee, with any options.</small></div>
@@ -110,6 +110,7 @@
         {{ render_field(form.may_record, 7) }}
         {{ render_field(form.needs_laptop, 7) }}
         {% endif %}
+
         {% if proposal.type == 'installation' %}
           <p>In addition to any requirements (including being under cover, power
             and water) please let us know if special provisions are needed for
@@ -119,7 +120,9 @@
             <small>Any equipment you might need, or other things you need us to provide.</small>
           </div>
         {% endif %}
-        {{ render_field(form.requirements, 9) }}
+        {{ render_field(form.equipment_required, 9) }}
+
+        {{ render_field(form.additional_info, 9) }}
     </fieldset>
 
     {% if proposal.scheduled_duration and (proposal.type == 'talk' or proposal.type == 'workshop') %}

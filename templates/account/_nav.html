@@ -13,15 +13,15 @@
 
 <nav>
   <ul class="nav nav-tabs">
-    {{ menuitem("Account", ".account") }}
-    {{ menuitem("Tickets", ".purchases") }}
+    {{ menuitem("Account", "users.account") }}
+    {{ menuitem("Tickets", "users.purchases") }}
     {% if feature_enabled('LINE_UP') %}
       {{ menuitem("Event feeds", "schedule.external_feeds") }}
     {% endif %}
 
     {% if feature_enabled('CFP') %}
       {{ menuitem("Proposals", "cfp.proposals") }}
-      {{ menuitem("Messages", "cfp.all_messages", unread_count) }}
+      {{ menuitem("Messages", "cfp.all_messages", unread_count or 0) }}
 
       {% if current_user.has_permission('cfp_admin') %}
         {{ menuitem("CfP Admin", "cfp_review.proposals") }}

@@ -4,17 +4,40 @@ from . import BaseModel
 
 
 DEFAULT_TAGS = [
-    "computing",
-    "film",
-    "health",
-    "misc",
+    "accessibility",
+    "ai",
+    "alternative",
+    "arts",
+    "coding",
+    "comedy",
+    "crafts",
+    "demoscene",
+    "diversity",
+    "electronics",
+    "engineering",
+    "environment",
+    "fabrication",
+    "food and drink",
+    "games",
+    "hackspaces",
+    "history",
+    "infrastructure",
+    "internet",
+    "lgbtq",
+    "maths",
+    "medicine",
+    "meetups",
     "music",
-    "radio",
+    "open source",
+    "politics",
+    "psychology",
+    "radio and communications",
     "robotics",
     "science",
     "security",
+    "society",
+    "solarpunk",
     "trains",
-    "show & tell",
 ]
 
 
@@ -41,17 +64,20 @@ class Tag(BaseModel):
     @classmethod
     def parse_serialised_tags(cls, tag_str: str) -> list["Tag"]:
         res = []
-        # tag_list = [t.strip().lower() for t in tag_str.split(",")]
         tag_list = [t.strip().lower() for t in tag_str]
         for tag_value in tag_list:
             if len(tag_value) == 0:
                 continue
-            tag = cls.query.filter_by(tag=tag_value).one_or_none()
+            tag = cls.get_by_value(tag_value)
             if tag:
                 res.append(tag)
             else:
                 res.append(Tag(tag_value))
         return res
+
+    @classmethod
+    def get_by_value(cls, value):
+        return cls.query.filter_by(tag=value).one_or_none()
 
 
 ProposalTag: sqlalchemy.Table = db.Table(

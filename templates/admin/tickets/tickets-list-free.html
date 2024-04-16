@@ -20,6 +20,7 @@
         <a href="{{ url_for('.user', user_id=ticket.owner.id) }}">{{ ticket.owner.email }}</a>
       </td>
       <td>
+        <a class="btn btn-default" href="{{ url_for('.view_ticket', ticket_id=ticket.id) }}">View</a>
         <a class="btn btn-danger" href="{{ url_for('.cancel_free_ticket', ticket_id=ticket.id) }}">Cancel</a>
         <a class="btn btn-default" href="{{ url_for('.convert_ticket', ticket_id=ticket.id) }}">Convert</a>
       </td>

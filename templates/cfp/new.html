@@ -7,7 +7,12 @@
   {% endif %}
 
 <h2>Submit a {{form.model.human_type}} proposal</h2>
-
+  <div class="well">
+    <p>The Call for Participation will close for talks & workshops on
+      <span class="emphasis">Thursday 25th April</span>.</p>
+    <p>You will still be able to submit installations, performances and youth
+      workshops after this date</p>
+  </div>
   {% include 'cfp/form_' + cfp_type + '_include.html' %}
 
   <div class="well" id="cfp-errors">
@@ -85,7 +90,7 @@
       {# NB this excludes installations, which have a separate section #}
       {% if cfp_type in ('talk', 'performance', 'workshop', 'youthworkshop') %}
         {% call render_field(form.equipment_required, horizontal=9,
-                            placeholder="Additional equipment required") %}
+                             placeholder="Additional equipment you need us to provide") %}
           {% if cfp_type in ('talk', 'performance') %}
             We'll provide a sound system and projector or screen.
           {% elif cfp_type in ('workshop', 'youthworkshop') %}
@@ -128,7 +133,12 @@
           {% endcall %}
       {% endif %}
 
-        {{ render_field(form.additional_info, horizontal=9, placeholder="Anything else you'd like to tell us") }}
+        {% call render_field(form.additional_info, horizontal=9, placeholder="Anything else you'd like to tell us") %}
+          {% if cfp_type == 'performance' %}
+            If you could give us a SoundCloud link or YouTube video of you performing,
+            it'll help with our selection process.
+          {% endif %}
+        {% endcall %}
 
         <div class="col-md-9 col-sm-offset-3">
           {% if cfp_type == 'youthworkshop' %}
@@ -145,7 +155,8 @@
           {{ form.needs_help() }}
           I'd like advice or help with this proposal
         </label>
-        <small>We're happy to advise on submissions before they are reviewed</small>
+        <small>We're happy to advise on submissions before they are reviewed. We don't consider lack of experience
+            a problem and we welcome those who haven't given talks before.</small>
         </div>
 
       </fieldset>{# More details #}

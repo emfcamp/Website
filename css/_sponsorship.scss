@@ -17,17 +17,24 @@
     background-color: #222;
 }
 
-#sponsorship-row {
+#sponsorship-levels {
+    display: flex;
     flex-wrap: wrap;
+    justify-content: space-between;
 }
 
-#sponsorship-row  ul {
+#sponsorship-levels > .panel {
+    margin-left: 10px;
+    margin-right: 10px;
+    flex: 1 1 auto;
+}
+
+#sponsorship-levels > .panel > .panel-body {
+    min-width: 12em;
+}
+
+#sponsorship-levels ul {
     padding-left: 15px;
-}
-
-#sponsorship-row > div {
-    padding-left: 10px;
-    padding-right: 10px;
 }
 
 img.img-sponsor {

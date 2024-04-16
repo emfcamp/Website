@@ -11,6 +11,7 @@ from flask import (
     abort,
     current_app as app,
 )
+from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from flask_mailman import EmailMessage
 
@@ -30,7 +31,8 @@ from models.payment import (
 )
 from models.purchase import AdmissionTicket, Purchase
 from ..common.email import from_email
-from ..common.forms import Form, HiddenIntegerField
+from ..common.forms import Form
+from ..common.fields import HiddenIntegerField
 from ..payments.stripe import (
     StripeUpdateUnexpected,
     StripeUpdateConflict,
@@ -582,4 +584,58 @@ def change_currency(payment_id):
         payment=payment,
         form=form,
         new_currency=new_currency,
+    )
+
+
+class CancelPurchaseForm(Form):
+    cancel = SubmitField("Cancel purchase")
+
+
+@admin.route(
+    "/payment/<int:payment_id>/cancel_purchase/<int:purchase_id>",
+    methods=["GET", "POST"],
+)
+def cancel_purchase(payment_id: int, purchase_id: int) -> ResponseReturnValue:
+    """Remove a purchase from a payment before it has been paid.
+
+    This is used when the purchaser changes their mind before they've sent us the money.
+    """
+    payment: Payment = Payment.query.get_or_404(payment_id)
+    purchase: Purchase = Purchase.query.get_or_404(purchase_id)
+
+    if purchase.payment != payment:
+        return abort(400)
+
+    if purchase.state != "payment-pending":
+        return abort(400)
+
+    form = CancelPurchaseForm()
+    if form.validate_on_submit():
+        if form.cancel.data:
+            app.logger.info(
+                "%s manually cancelling purchase %s", current_user.name, purchase.id
+            )
+            payment.lock()
+
+            try:
+                purchase.cancel()
+            except StateException as e:
+                msg = "Could not cancel purchase %s: %s" % (purchase_id, e)
+                app.logger.warn(msg)
+                flash(msg)
+                return redirect(url_for("admin.payment", payment_id=payment.id))
+
+            purchase.payment_id = None
+            payment.amount -= purchase.price_tier.get_price(payment.currency).value
+
+            db.session.commit()
+
+            flash("Purchase %s cancelled" % purchase.id)
+            return redirect(url_for("admin.payment", payment_id=payment.id))
+
+    return render_template(
+        "admin/payments/purchase-cancel.html",
+        payment=payment,
+        purchase=purchase,
+        form=form,
     )

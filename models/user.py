@@ -11,7 +11,7 @@ import re
 from collections import defaultdict
 from typing import Optional
 
-from sqlalchemy import func, Index, text
+from sqlalchemy import func, Index, text, Table
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.exc import NoResultFound
 from flask import current_app as app, session
@@ -178,6 +178,14 @@ def verify_checkin_code(key, uid):
     return verify_unlimited_short_hmac("checkin-", key, uid)
 
 
+CFPReviewerTags: Table = db.Table(
+    "cfp_reviewer_tags",
+    BaseModel.metadata,
+    db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
+    db.Column("tag_id", db.Integer, db.ForeignKey("tag.id"), primary_key=True),
+)
+
+
 class User(BaseModel, UserMixin):
     __tablename__ = "user"
     __versioned__ = {"exclude": ["favourites", "calendar_favourites"]}
@@ -192,6 +200,15 @@ class User(BaseModel, UserMixin):
     checkin_note = db.Column(db.String, nullable=True)
     # Whether the user has opted in to receive promo emails after this event:
     promo_opt_in = db.Column(db.Boolean, nullable=False, default=False)
+
+    cfp_invite_reason = db.Column(db.String, nullable=True)
+
+    cfp_reviewer_tags = db.relationship(
+        "Tag",
+        backref="reviewers",
+        cascade="all",
+        secondary=CFPReviewerTags,
+    )
 
     diversity = db.relationship(
         "UserDiversity", uselist=False, backref="user", cascade="all, delete-orphan"
@@ -243,6 +260,13 @@ class User(BaseModel, UserMixin):
         "Ticket", lazy="select", primaryjoin="Ticket.owner_id == User.id", viewonly=True
     )
 
+    owned_admission_tickets = db.relationship(
+        "AdmissionTicket",
+        lazy="select",
+        primaryjoin="AdmissionTicket.owner_id == User.id",
+        viewonly=True,
+    )
+
     transfers_to = db.relationship(
         "PurchaseTransfer",
         backref="to_user",
@@ -282,7 +306,7 @@ class User(BaseModel, UserMixin):
                     u.email
                     for u in User.query.join(
                         Proposal, Proposal.user_id == User.id
-                    ).filter(Proposal.state.in_(("accepted", "finished")))
+                    ).filter(Proposal.is_accepted)
                 ],
             },
         }
@@ -292,6 +316,10 @@ class User(BaseModel, UserMixin):
     @property
     def transferred_tickets(self):
         return [t.purchase for t in self.transfers_from]
+
+    @property
+    def is_invited_speaker(self):
+        return self.cfp_invite_reason and len(self.cfp_invite_reason.strip()) > 0
 
     def get_owned_tickets(self, paid=None, type=None):
         "Get tickets owned by a user, filtered by type and payment state."
@@ -398,7 +426,7 @@ class User(BaseModel, UserMixin):
     @property
     def is_cfp_accepted(self):
         for proposal in self.proposals:
-            if proposal.state in {"accepted", "finished"}:
+            if proposal.is_accepted:
                 return True
         return False
 

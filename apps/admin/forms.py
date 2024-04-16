@@ -19,8 +19,8 @@ from models.product import ProductGroup, PRODUCT_GROUP_TYPES
 from models.basket import Basket
 
 from ..common import CURRENCY_SYMBOLS
-from ..common.forms import (
-    Form,
+from ..common.forms import Form
+from ..common.fields import (
     IntegerSelectField,
     HiddenIntegerField,
     JSONField,

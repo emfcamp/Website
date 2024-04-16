@@ -1,7 +1,22 @@
 @use "./_variables.scss" as *;
 
-table, table a {
+table {
     color: $highlight-background-text;
+}
+
+table {
+    border-radius: 3px;
+    a {
+        color: inherit;
+    }
+
+    header, h2, h3, h4, h5, h6 {
+        color: inherit;
+    }
+
+    thead {
+        font-size: 1.2em;
+    }
 }
 
 table > thead:first-child > tr:first-child > th:first-child,
@@ -38,7 +53,7 @@ tfoot > tr > td {
 .table > tbody > tr > td,
 .table > thead > tr > th,
 .table > tfoot > tr > td {
-    border-top: 1px solid #ddd;
+    border-top: 1px solid #aaa;
     padding-left: 15px;
     padding-right: 15px;
     padding-top: 10px;
@@ -49,11 +64,7 @@ tfoot > tr > td {
     border-bottom: none;
 }
 
-thead tr {
-    background-color: $highlight-background;
-}
-
-tr.even {
+tr {
     background-color: $highlight-background;
 }
 

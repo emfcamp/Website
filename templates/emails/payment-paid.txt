@@ -1,0 +1,27 @@
+{% extends "emails/base.txt" %}
+{% block body %}
+Hi {{ user.name }},
+
+We've just received confirmation that your payment for {{ payment.amount | price(payment.currency) }} has cleared.
+
+{% if feature_enabled('ISSUE_TICKETS') -%}
+{% include 'emails/receipt-blurb.txt' %}
+{% elif SITE_STATE != 'after-event' %}
+You can view your purchases and download the invoice here:
+
+  {{ url_for('users.account', _external=True) }}
+
+{% if payment.purchases | selectattr("is_ticket") | list | count > 0 %}
+We'll send your e-tickets to this address nearer the event.
+{% endif %}
+{% endif %}
+
+{%- if SITE_STATE != 'after-event' %}
+See you soon at Electromagnetic Field {{ event_year }}!
+
+{%- endif %}
+
+Love,
+
+All the EMF team
+{% endblock %}

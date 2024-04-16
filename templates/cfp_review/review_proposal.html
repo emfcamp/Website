@@ -15,7 +15,7 @@
                 {% elif previous_vote.state == 'recused' %}
                     You chose not to vote on this proposal
                 {% elif previous_vote.state == 'blocked' %}
-                    Await feedback from Admin/proposer
+                    Await feedback from Content Team
                 {% endif %}
             </dd>
             <dt>Your vote</dt>
@@ -100,7 +100,7 @@
         </div>
         <div class="col-xs-12 btn-group-vertical">
             {{ form.recuse(class_="btn btn-danger debounce", tabindex=4) }}
-            {{ form.question(class_="btn btn-info debounce", tabindex=5) }}
+            {{ form.block(class_="btn btn-info debounce", tabindex=5) }}
         </div>
         <div class="col-xs-12">&nbsp;</div>
         <div class="col-xs-12 btn-group-vertical">

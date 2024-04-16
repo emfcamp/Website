@@ -18,7 +18,7 @@ import collections
 from sqlalchemy.exc import IntegrityError
 
 from main import db, external_url
-from models.user import User, UserDiversity
+from models.user import User
 from models.cfp import (
     TalkProposal,
     WorkshopProposal,
@@ -35,7 +35,8 @@ from models.cfp import (
 )
 from ..common import feature_flag, feature_enabled, create_current_user
 from ..common.email import from_email
-from ..common.forms import Form, TelField, EmailField
+from ..common.forms import Form, DiversityForm
+from ..common.fields import TelField, EmailField
 from ..common.irc import irc_send
 
 from . import cfp
@@ -139,7 +140,7 @@ class LightningTalkProposalForm(ProposalForm):
 
     def set_session_choices(self, remaining_lightning_slots):
         self.session.choices = []
-        for (day_id, day_count) in remaining_lightning_slots.items():
+        for day_id, day_count in remaining_lightning_slots.items():
             if day_count <= 0:
                 continue
             self.session.choices.append(
@@ -165,8 +166,10 @@ def get_cfp_type_form(cfp_type):
 
 
 @cfp.route("/cfp")
-@feature_flag("CFP")
 def main():
+    if not feature_enabled("CFP"):
+        return render_template("cfp/holding-page.html")
+
     ignore_closed = "closed" in request.args
 
     if feature_enabled("CFP_CLOSED") and not ignore_closed:
@@ -190,12 +193,14 @@ def form(cfp_type="talk"):
     if not form:
         abort(404)
 
-    ignore_closed = "closed" in request.args
+    ignore_closed = "closed" in request.args or (
+        current_user.is_authenticated and current_user.is_invited_speaker
+    )
 
     if feature_enabled("CFP_CLOSED") and not ignore_closed:
         return render_template("cfp/closed.html", cfp_type=cfp_type)
 
-    if feature_enabled("CFP_{}S_CLOSED".format(cfp_type.upper())) and not ignore_closed:
+    if feature_enabled(f"CFP_{cfp_type.upper()}S_CLOSED") and not ignore_closed:
         msg = Markup(
             render_template_string(
                 """Sorry, we're not accepting new {{ type }} proposals, if you have been told to submit something please <a href="{{ url }}">click here</a>""",
@@ -307,6 +312,10 @@ def form(cfp_type="talk"):
 
         proposal.user_id = current_user.id
 
+        if current_user.is_invited_speaker:
+            proposal.state = "manual-review"
+            proposal.private_notes = current_user.cfp_invite_reason
+
         proposal.title = form.title.data
         proposal.equipment_required = form.equipment_required.data
         proposal.additional_info = form.additional_info.data
@@ -332,9 +341,10 @@ def form(cfp_type="talk"):
 
         if channel := app.config.get("CONTENT_IRC_CHANNEL"):
             # WARNING: don't send personal information via this (the channel is public)
-            irc_send(
-                f"{channel} New CfP {proposal.human_type} submission: {external_url('cfp_review.update_proposal', proposal_id=proposal.id)}"
-            )
+            msg = f"New CfP {proposal.human_type} submission: {external_url('cfp_review.update_proposal', proposal_id=proposal.id)}"
+            if form.needs_help.data:
+                msg = f"🚨 {msg}. Calls for aid (they've clicked 'needs help') 🚨"
+            irc_send(channel, msg)
         return redirect(url_for(".complete"))
 
     full_lightning_sessions = [
@@ -353,28 +363,19 @@ def form(cfp_type="talk"):
     )
 
 
-class DiversityForm(Form):
-    age = StringField("Age")
-    gender = StringField("Gender")
-    ethnicity = StringField("Ethnicity")
-
-
 @cfp.route("/cfp/complete", methods=["GET", "POST"])
 @feature_flag("CFP")
 def complete():
     if current_user.is_anonymous:
         return redirect(url_for(".main"))
+
     form = DiversityForm()
     if form.validate_on_submit():
-        if not current_user.diversity:
-            current_user.diversity = UserDiversity()
-
-        current_user.diversity.age = form.age.data
-        current_user.diversity.gender = form.gender.data
-        current_user.diversity.ethnicity = form.ethnicity.data
-
+        form.update_user(current_user)
         db.session.commit()
         return redirect(url_for(".proposals"))
+
+    form.set_from_user(current_user)
 
     return render_template("cfp/complete.html", form=form)
 
@@ -415,7 +416,7 @@ def edit_proposal(proposal_id):
     del form.email
 
     if form.validate_on_submit():
-        if proposal.state not in ["new", "edit"]:
+        if not proposal.is_editable:
             flash("This submission can no longer be edited.")
             return redirect(url_for(".proposals"))
 
@@ -460,7 +461,7 @@ def edit_proposal(proposal_id):
 
         return redirect(url_for(".edit_proposal", proposal_id=proposal_id))
 
-    if request.method != "POST" and proposal.state in ["new", "edit"]:
+    if request.method != "POST" and proposal.is_editable:
         if proposal.type in ("talk", "performance"):
             form.length.data = proposal.length
 
@@ -531,7 +532,6 @@ def withdraw_proposal(proposal_id):
     form = WithdrawalForm()
     if form.validate_on_submit():
         if form.confirm_withdrawal.data:
-
             app.logger.info("Proposal %s is being withdrawn.", proposal_id)
             proposal.set_state("withdrawn")
 
@@ -651,7 +651,7 @@ def finalise_proposal(proposal_id):
     if proposal.user != current_user:
         abort(404)
 
-    if proposal.state not in ("accepted", "finished"):
+    if not proposal.is_accepted:
         return redirect(url_for(".edit_proposal", proposal_id=proposal_id))
 
     # This is horrendous, but is a lot cleaner than having shitloads of classes and fields
@@ -696,10 +696,10 @@ def finalise_proposal(proposal_id):
             proposal.published_participant_equipment = form.participant_equipment.data
 
         proposal.available_times = form.get_availability_json()
-        proposal.set_state("finished")
+        proposal.set_state("finalised")
 
         db.session.commit()
-        app.logger.info("Finished proposal %s", proposal_id)
+        app.logger.info("Finalised proposal %s", proposal_id)
         flash("Thank you for finalising your details!")
 
         return redirect(url_for(".edit_proposal", proposal_id=proposal_id))
@@ -708,7 +708,7 @@ def finalise_proposal(proposal_id):
         # Don't overwrite user submitted data
         pass
 
-    elif proposal.state == "finished":
+    elif proposal.state == "finalised":
         if proposal.published_names:
             form.name.data = proposal.published_names
         else:
@@ -827,7 +827,8 @@ def proposal_messages(proposal_id):
             if channel := app.config.get("CONTENT_IRC_CHANNEL"):
                 # WARNING: don't send personal information via this (the channel is public)
                 irc_send(
-                    f"{channel} New CfP message for {proposal.human_type}: {external_url('cfp_review.message_proposer', proposal_id=proposal_id)}"
+                    channel,
+                    f"✉️ New CfP message for {proposal.human_type}: {external_url('cfp_review.message_proposer', proposal_id=proposal_id)} ✉️",
                 )
 
         count = proposal.mark_messages_read(current_user)

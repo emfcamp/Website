@@ -1,9 +1,11 @@
 <footer role="contentinfo">
   <div id="bottom-menu-container">
     <ul class="menu" role="menu">
+    {#
       <li role="presentation">
         <a role="menuitem" rel="noopener" target="_blank" href="https://wiki.emfcamp.org">Wiki</a>
       </li>
+    #}
       <li role="presentation">
         <a role="menuitem" rel="noopener" target="_blank" href="https://blog.emfcamp.org">Blog</a>
       </li>
@@ -36,6 +38,9 @@
       <li role="presentation">
         <a role="menuitem" href="{{ url_for('base.contact') }}">Contact</a>
       </li>
+      <li role="presentation">
+        <a role="menuitem" href="http://wiki.emfcamp.org">Wiki</a>
+      </li>
     </ul>
     <div class="share">
       <a rel="noreferrer" target="_blank" href="https://social.emfcamp.org/@emf">@emf@emfcamp.org</a>
@@ -43,7 +48,7 @@
     <div style="clear: both"></div>
   </div>
   <div id="credits">
-    <p>&copy; {{ year }} <a href="{{url_for('base.company')}}">Electromagnetic Field</a> |
+    <p>&copy; <a href="{{url_for('base.company')}}">Electromagnetic Field</a> |
       <a href="{{url_for('base.page', page_name='privacy')}}">Privacy</a> |
       Kindly hosted by <a href="http://www.sargasso.co.uk/from/emfcamp">Sargasso Networks</a>
     </p>

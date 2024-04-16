@@ -1,10 +1,15 @@
-from datetime import timedelta
 from collections import defaultdict, Counter
+import csv
+from datetime import timedelta
+from http import HTTPStatus
+from io import BytesIO, StringIO
 from itertools import combinations
+import json
 
 import dateutil
 from flask import (
     redirect,
+    send_file,
     url_for,
     request,
     abort,
@@ -16,6 +21,7 @@ from flask import (
 )
 from flask_login import current_user
 from flask_mailman import EmailMessage
+from models.permission import Permission
 from sqlalchemy import func, exists, select
 from sqlalchemy.orm import joinedload
 
@@ -24,12 +30,10 @@ from .majority_judgement import calculate_max_normalised_score
 from models.cfp import (
     CFPMessage,
     CFPVote,
-    DEFAULT_VENUES,
     EVENT_SPACING,
     FavouriteProposal,
     get_available_proposal_minutes,
     get_days_map,
-    HUMAN_CFP_TYPES,
     InvalidVenueException,
     LightningTalkProposal,
     MANUAL_REVIEW_TYPES,
@@ -56,6 +60,7 @@ from .forms import (
     AddNoteForm,
     ChangeProposalOwner,
     ReversionForm,
+    InviteSpeakerForm,
 )
 from . import (
     cfp_review,
@@ -66,6 +71,7 @@ from . import (
     copy_request_args,
 )
 from ..common.email import from_email
+from ..common.forms import guess_age, guess_gender, guess_ethnicity
 
 
 @cfp_review.route("/")
@@ -101,7 +107,7 @@ def bool_qs(val):
     raise ValueError("Invalid querystring boolean")
 
 
-def filter_proposal_request():
+def filter_proposal_request() -> tuple[list[Proposal], bool]:
     bool_names = ["one_day", "needs_help", "needs_money"]
     bool_vals = [request.args.get(n, type=bool_qs) for n in bool_names]
     bool_dict = {n: v for n, v in zip(bool_names, bool_vals) if v is not None}
@@ -190,6 +196,53 @@ def proposals():
         filtered=filtered,
         total_proposals=Proposal.query.count(),
         tag_counts=tag_counts,
+    )
+
+
+@cfp_review.route("/proposals.<format>")
+@admin_required
+def export(format: str):
+    fields = [
+        "id",
+        "user_id",
+        "created",
+        "modified",
+        "state",
+        "type",
+        "title",
+        "description",
+        "equipment_required",
+        "funding_required",
+        "additional_info",
+        "length",
+        "notice_required",
+        "tags",
+        "favourite_count",
+    ]
+    proposals, _ = filter_proposal_request()
+    if format == "csv":
+        mime = "text/csv"
+        buf = StringIO()
+        w = csv.writer(buf)
+        fields.remove("tags")
+        # Header row
+        w.writerow(fields)
+        for p in proposals:
+            w.writerow([getattr(p, a) for a in fields])
+        out = buf.getvalue()
+    elif format == "json":
+        mime = "application/json"
+        out = json.dumps(
+            [{a: getattr(p, a) for a in fields} for p in proposals],
+            default=str,
+        )
+    else:
+        abort(HTTPStatus.BAD_REQUEST, "Unsupported export format")
+    return send_file(
+        BytesIO(out.encode()),
+        mime,
+        as_attachment=True,
+        download_name=f"proposals.{format}",
     )
 
 
@@ -321,6 +374,17 @@ def update_proposal(proposal_id):
         raise Exception("Unknown cfp type {}".format(prop.type))
 
     form.tags.choices = [(t.tag, t.tag) for t in Tag.query.order_by(Tag.tag).all()]
+    form.allowed_venues.choices = [
+        (v.id, v.name)
+        for v in Venue.query.filter(
+            db.or_(
+                Venue.allowed_types.any(prop.type),
+                Venue.id.in_(v.id for v in prop.get_allowed_venues()),
+            )
+        )
+        .order_by(Venue.priority.desc())
+        .all()
+    ]
 
     # Process the POST
     if form.validate_on_submit():
@@ -371,7 +435,9 @@ def update_proposal(proposal_id):
     form.title.data = prop.title
     form.description.data = prop.description
     form.tags.data = [t.tag for t in prop.tags]
-    form.requirements.data = prop.requirements
+    form.equipment_required.data = prop.equipment_required
+    form.funding_required.data = prop.funding_required
+    form.additional_info.data = prop.additional_info
     form.length.data = prop.length
     form.notice_required.data = prop.notice_required
     form.needs_help.data = prop.needs_help
@@ -397,7 +463,7 @@ def update_proposal(proposal_id):
 
     form.user_scheduled.data = prop.user_scheduled
     form.hide_from_schedule.data = prop.hide_from_schedule
-    form.allowed_venues.data = prop.get_allowed_venues_serialised()
+    form.allowed_venues.data = [v.id for v in prop.get_allowed_venues()]
     form.allowed_times.data = prop.get_allowed_time_periods_serialised()
     form.scheduled_time.data = prop.scheduled_time
     form.scheduled_duration.data = prop.scheduled_duration
@@ -423,14 +489,14 @@ def update_proposal(proposal_id):
 
     elif prop.type == "installation":
         form.size.data = prop.size
-        form.funds.data = prop.funds
+        form.installation_funding.data = prop.installation_funding
 
     elif prop.type == "lightning":
         form.session.data = prop.session
         form.slide_link.data = prop.slide_link
 
     return render_template(
-        "cfp_review/update_proposal.html", proposal=prop, form=form, next_id=next_id
+        "cfp_review/proposal.html", proposal=prop, form=form, next_id=next_id
     )
 
 
@@ -867,7 +933,7 @@ def close_round():
     if form.validate_on_submit():
         if form.confirm.data:
             min_votes = session["min_votes"]
-            for (prop, vote_count) in proposals:
+            for prop, vote_count in proposals:
                 if vote_count >= min_votes and prop.state != "reviewed":
                     prop.set_state("reviewed")
 
@@ -882,7 +948,9 @@ def close_round():
         elif form.close_round.data:
             preview = True
             session["min_votes"] = form.min_votes.data
-            flash('Blue proposals will be marked as "reviewed"')
+            flash(
+                f'Proposals with more than {session["min_votes"]} (blue) will be marked as "reviewed"'
+            )
 
         elif form.cancel.data:
             form.min_votes.data = form.min_votes.default
@@ -892,7 +960,7 @@ def close_round():
     # Find proposals where the submitter has already had an accepted proposal
     # or another proposal in this list
     duplicates = {}
-    for (prop, _) in proposals:
+    for prop, _ in proposals:
         if prop.user.proposals.count() > 1:
             # Only add each proposal once
             if prop.user not in duplicates:
@@ -933,8 +1001,7 @@ def rank():
         if form.confirm.data:
             min_score = session["min_score"]
             count = 0
-            for (prop, score) in scored_proposals:
-
+            for prop, score in scored_proposals:
                 if score >= min_score:
                     count += 1
                     prop.set_state("accepted")
@@ -971,9 +1038,7 @@ def rank():
         elif form.cancel.data and "min_score" in session:
             del session["min_score"]
 
-    accepted_proposals = Proposal.query.filter(
-        Proposal.state.in_(["accepted", "finished"])
-    )
+    accepted_proposals = Proposal.query.filter(Proposal.is_accepted)
     accepted_counts = defaultdict(int)
     for proposal in accepted_proposals:
         accepted_counts[proposal.type] += 1
@@ -981,9 +1046,7 @@ def rank():
     allocated_minutes = defaultdict(int)
     unknown_lengths = defaultdict(int)
 
-    accepted_proposals = Proposal.query.filter(
-        Proposal.state.in_(["accepted", "finished"])
-    ).all()
+    accepted_proposals = Proposal.query.filter(Proposal.is_accepted).all()
     for proposal in accepted_proposals:
         length = None
         if proposal.scheduled_duration:
@@ -1000,8 +1063,11 @@ def rank():
 
     # Correct for changeover period not being needed at the end of the day
     num_days = len(get_days_map().items())
+
     for type, amount in allocated_minutes.items():
-        num_venues = len(DEFAULT_VENUES[type])
+        num_venues = Venue.query.filter(
+            Venue.default_for_types.any(type)
+        ).count()  # TODO(lukegb): filter to emf venues
         # Amount of minutes per venue * number of venues - (slot changeover period) from the end
         allocated_minutes[type] = amount - (
             (10 * EVENT_SPACING[type]) * num_days * num_venues
@@ -1056,7 +1122,7 @@ def potential_schedule_changes():
 def scheduler():
     proposals = (
         Proposal.query.filter(Proposal.scheduled_duration.isnot(None))
-        .filter(Proposal.state.in_(["finished", "accepted"]))
+        .filter(Proposal.state.is_accepted)
         .filter(Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"]))
         .all()
     )
@@ -1119,11 +1185,13 @@ def scheduler():
 
         schedule_data.append(export)
 
+    venue_names_by_type = Venue.emf_venue_names_by_type()
+
     return render_template(
         "cfp_review/scheduler.html",
         shown_venues=shown_venues,
         schedule_data=schedule_data,
-        default_venues=DEFAULT_VENUES,
+        default_venues=venue_names_by_type,
     )
 
 
@@ -1164,7 +1232,7 @@ def clashfinder():
 
     clashes = []
     offset = 0
-    for ((id1, id2), count) in popularity.most_common()[:1000]:
+    for (id1, id2), count in popularity.most_common()[:1000]:
         offset += 1
         prop1 = Proposal.query.get(id1)
         prop2 = Proposal.query.get(id2)
@@ -1207,24 +1275,168 @@ def lightning_talks():
 @cfp_review.route("/proposals-summary")
 @schedule_required
 def proposals_summary():
-    counts_by_tag = {t.tag: len(t.proposals) for t in Tag.query.all()}
-    counts_by_tag["untagged"] = 0
+    counts_by_tag = {t.tag: Counter() for t in Tag.query.all()}
+    counts_by_tag["untagged"] = Counter()
 
-    counts_by_type = {t: 0 for t in HUMAN_CFP_TYPES}
-    counts_by_state = {s: 0 for s in ORDERED_STATES}
+    counts_by_state = {s: Counter() for s in ORDERED_STATES}
+    counts_by_type = Counter()
 
     for prop in Proposal.query.all():
         counts_by_type[prop.type] += 1
-        counts_by_state[prop.state] += 1
+        counts_by_state[prop.state]["total"] += 1
+        counts_by_state[prop.state][prop.type] += 1
+
+        for tag in prop.tags:
+            counts_by_tag[tag.tag]["total"] += 1
+            counts_by_tag[tag.tag][prop.type] += 1
 
         if not prop.tags:
-            counts_by_tag["untagged"] += 1
+            counts_by_tag["untagged"]["total"] += 1
+            counts_by_tag["untagged"][prop.type] += 1
 
     return render_template(
         "cfp_review/proposals_summary.html",
         counts_by_tag=counts_by_tag,
         counts_by_type=counts_by_type,
         counts_by_state=counts_by_state,
+    )
+
+
+@cfp_review.route("/confidentiality", methods=["GET", "POST"])
+def confidentiality_warning():
+    if request.method == "POST" and request.form.get("agree"):
+        session["cfp_confidentiality"] = True
+        return redirect(request.args.get("next", url_for(".proposals")))
+
+    return render_template("cfp_review/confidentiality_warning.html")
+
+
+@cfp_review.route("/invite-speaker", methods=["GET", "POST"])
+@admin_required
+def invite_speaker():
+    form = InviteSpeakerForm()
+
+    if form.validate_on_submit():
+        email, name, reason = form.email.data, form.name.data, form.invite_reason.data
+        user = User(email, name)
+        user.cfp_invite_reason = reason
+
+        db.session.add(user)
+        db.session.commit()
+
+        app.logger.info(
+            f"{current_user.id} created a new user {user} ({email}) to invite to the cfp"
+        )
+
+        code = user.login_code(app.config["SECRET_KEY"])
+
+        return render_template(
+            "cfp_review/invite-speaker-complete.html",
+            user=user,
+            login_code=code,
+            proposal_type=form.proposal_type.data,
+        )
+
+    return render_template("cfp_review/invite-speaker.html", form=form)
+
+
+def get_diversity_counts(user_list):
+    res = {
+        "age": Counter(),
+        "gender": Counter(),
+        "ethnicity": Counter(),
+        "reviewer_tags": Counter(),
+        "other": {
+            "total": len(user_list),
+        },
+    }
+
+    for user in user_list:
+        if not user.diversity:
+            res["age"][""] += 1
+            res["gender"][""] += 1
+            res["ethnicity"][""] += 1
+            continue
+
+        if user.diversity.age:
+            res["age"][guess_age(user.diversity.age)] += 1
+        if user.diversity.gender:
+            res["gender"][guess_gender(user.diversity.gender)] += 1
+        if user.diversity.ethnicity:
+            res["ethnicity"][guess_ethnicity(user.diversity.ethnicity)] += 1
+
+        for tag in user.cfp_reviewer_tags:
+            res["reviewer_tags"][tag] += 1
+
+    res["age"]["not given"] = res["age"][""]
+    del res["age"][""]
+    res["gender"]["not given"] = res["gender"][""]
+    del res["gender"][""]
+    res["ethnicity"]["not given"] = res["ethnicity"][""]
+    del res["ethnicity"][""]
+
+    return res
+
+
+@cfp_review.route("/speaker-diversity")
+@admin_required
+def speaker_diversity():
+    speakers = (
+        User.query.join(User.proposals)
+        .filter(
+            User.proposals.any(
+                Proposal.state.in_(
+                    [
+                        "manual-review",
+                        "accepted",
+                        "finalised",
+                    ]
+                )
+            )
+        )
+        .all()
+    )
+    total_counts = get_diversity_counts(speakers)
+    # remove tags from the counts as these are reviewer tags and irrelevant here
+    total_counts.pop("reviewer_tags")
+    total_counts["other"]["missing proposal"] = ""
+
+    invited_speakers = [u for u in speakers if u.is_invited_speaker]
+    invited_counts = get_diversity_counts(invited_speakers)
+    invited_counts.pop("reviewer_tags")
+
+    invited_counts["other"]["missing proposal"] = len(
+        [u for u in User.query.all() if len(u.proposals.all()) == 0]
+    )
+
+    return render_template(
+        "cfp_review/speaker_diversity.html",
+        total_counts=total_counts,
+        invited_counts=invited_counts,
+    )
+
+
+@cfp_review.route("/reviewer-diversity")
+@admin_required
+def reviewer_diversity():
+    reviewers = (
+        User.query.join(User.permissions)
+        .filter(User.permissions.any(Permission.name.in_(["cfp_reviewer"])))
+        .all()
+    )
+    counts = get_diversity_counts(reviewers)
+    return render_template("cfp_review/reviewer_diversity.html", counts=counts)
+
+
+@cfp_review.route("/users/<user_id>", methods=["GET"])
+@admin_required
+def cfp_user(user_id):
+    user = db.get_or_404(User, user_id)
+    if not user.proposals:
+        abort(404)
+    return render_template(
+        "cfp_review/cfp_user.html",
+        user=user,
     )
 
 

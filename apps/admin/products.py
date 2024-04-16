@@ -26,7 +26,7 @@ from models.product import (
     random_voucher,
     Voucher,
 )
-from models.purchase import Purchase, PurchaseTransfer
+from models.purchase import Purchase
 
 from ..common.email import (
     format_trusted_html_email,
@@ -366,14 +366,6 @@ def product_group_copy(group_id):
     )
 
 
-@admin.route("/transfers")
-def purchase_transfers():
-    transfer_logs = PurchaseTransfer.query.all()
-    return render_template(
-        "admin/products/purchase-transfers.html", transfers=transfer_logs
-    )
-
-
 @admin.route("/tees")
 def tees():
     purchases = (
@@ -458,7 +450,10 @@ def product_view(view_id):
         db.session.commit()
 
     active_vouchers = Voucher.query.filter_by(view=view).filter(
-        not_(Voucher.expiry.isnot(None) & (Voucher.expiry < func.now()))
+        not_(
+            Voucher.expiry.isnot(None)
+            & (Voucher.expiry + VOUCHER_GRACE_PERIOD < func.now())
+        )
         & not_(Voucher.is_used)
     )
     stats = {
@@ -533,7 +528,7 @@ def product_view_voucher_list(view_id):
         vouchers = vouchers.filter(
             not_(
                 Voucher.expiry.isnot(None)
-                & (Voucher.expiry < func.now() - VOUCHER_GRACE_PERIOD)
+                & (Voucher.expiry + VOUCHER_GRACE_PERIOD < func.now())
             )
         )
 

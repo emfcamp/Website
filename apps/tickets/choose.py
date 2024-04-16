@@ -64,13 +64,7 @@ def main(flow="main"):
     if app.config.get("DEBUG"):
         sales_state = request.args.get("sales_state", sales_state)
 
-    if sales_state in {"available", "unavailable"}:
-        # Tickets are on sale, or they're unavailable but we're still showing prices.
-        pass
-    elif not current_user.is_anonymous and current_user.has_permission("admin"):
-        # Admins always have access
-        pass
-    else:
+    if sales_state not in {"available", "unavailable"}:
         # User is prevented from buying by the sales state.
         return render_template("tickets/cutoff.html")
 
@@ -83,8 +77,14 @@ def main(flow="main"):
         # Empty form - populate products with any amounts already in basket
         form.populate(basket)
 
+    voucher = None
+    if code := session.get("ticket_voucher"):
+        voucher = Voucher.get_by_code(code)
+        if voucher.view != view:
+            # The user has a voucher but it's not what's allowing them access to this view
+            voucher = None
     # Validate the capacity in the form, setting the maximum limits where available.
-    if not form.ensure_capacity(basket):
+    if not form.ensure_capacity(basket, voucher):
         # We're not able to provide the number of tickets the user has selected.
         no_capacity.inc()
         flash(

@@ -13,9 +13,11 @@ from wtforms import (
 )
 from wtforms.validators import DataRequired, Optional, NumberRange, ValidationError
 
-from models.cfp import Venue, ORDERED_STATES
+from models.cfp import HUMAN_CFP_TYPES, Venue, ORDERED_STATES
 from models.cfp_tag import Tag
-from ..common.forms import Form, HiddenIntegerField, EmailField
+from ..common.forms import Form
+from ..common.fields import HiddenIntegerField, EmailField
+from ..admin.users import NewUserForm
 
 from dateutil.parser import parse as parse_date
 
@@ -25,8 +27,10 @@ class UpdateProposalForm(Form):
     state = SelectField("State", choices=[(s, s) for s in ORDERED_STATES])
     title = StringField("Title", [DataRequired()])
     description = TextAreaField("Description", [DataRequired()])
-    tags = SelectMultipleField("Tags")
-    requirements = TextAreaField("Requirements")
+    tags = SelectMultipleField("Tags (hold ctrl to select multiple)")
+    equipment_required = TextAreaField("Equipment Required")
+    funding_required = TextAreaField("Funding Required")
+    additional_info = TextAreaField("Additional Info")
     length = StringField("Length")
     notice_required = SelectField(
         "Required notice",
@@ -67,7 +71,7 @@ class UpdateProposalForm(Form):
     family_friendly = BooleanField("Family Friendly")
 
     hide_from_schedule = BooleanField("Hide from schedule")
-    allowed_venues = StringField("Allowed Venues")
+    allowed_venues = SelectMultipleField("Allowed Venues", coerce=int)
     allowed_times = TextAreaField("Allowed Time Periods")
     scheduled_duration = StringField("Duration")
     scheduled_time = StringField("Scheduled Time")
@@ -101,7 +105,9 @@ class UpdateProposalForm(Form):
         proposal.title = self.title.data
         proposal.description = self.description.data
         proposal.tags = Tag.parse_serialised_tags(self.tags.data)
-        proposal.requirements = self.requirements.data
+        proposal.equipment_required = self.equipment_required.data
+        proposal.funding_required = self.funding_required.data
+        proposal.additional_info = self.additional_info.data
         proposal.length = self.length.data
         proposal.notice_required = self.notice_required.data
         proposal.needs_help = self.needs_help.data
@@ -120,8 +126,7 @@ class UpdateProposalForm(Form):
 
         if self.needs_laptop.raw_data:
             proposal.needs_laptop = self.needs_laptop.data
-        if self.may_record.raw_data:
-            proposal.may_record = self.may_record.data
+        proposal.may_record = self.may_record.data
 
         # All these if statements are because this will nuke the data if you
         # change the state when the fields are currently hidden, so changing
@@ -193,14 +198,9 @@ class UpdateProposalForm(Form):
         else:
             proposal.potential_venue = None
 
-        # Only set this if we're overriding the default
-        if (
-            proposal.get_allowed_venues_serialised().strip()
-            != self.allowed_venues.data.strip()
-        ):
-            proposal.allowed_venues = self.allowed_venues.data.strip()
-            # Validates the new data. Bit nasty.
-            proposal.get_allowed_venues()
+        proposal.allowed_venues = Venue.query.filter(
+            Venue.id.in_(self.allowed_venues.data)
+        ).all()
 
 
 class ConvertProposalForm(Form):
@@ -290,14 +290,14 @@ class UpdateYouthWorkshopForm(UpdateProposalForm):
 
 
 class UpdateInstallationForm(UpdateProposalForm):
-    funds = StringField("Funds")
+    installation_funding = StringField("Installation Funding")
     size = StringField("Size", [DataRequired()])
 
     def update_proposal(self, proposal):
         if self.size.raw_data:
             proposal.size = self.size.data
-        if self.funds.raw_data:
-            proposal.funds = self.funds.data
+        if self.installation_funding.raw_data:
+            proposal.installation_funding = self.installation_funding.data
         super(UpdateInstallationForm, self).update_proposal(proposal)
 
 
@@ -331,15 +331,15 @@ class VoteForm(Form):
 
     change = SubmitField("I'd like to change my response")
     recuse = SubmitField("I can identify the submitter (do not vote)")
-    question = SubmitField("I need more information")
+    block = SubmitField("Raise an issue with this proposal")
 
     def validate_note(form, field):
         if not field.data and form.recuse.data:
             raise ValidationError(
                 "Please tell us why you're not voting. If you can identify the submitter, please tell us who it is."
             )
-        if not field.data and form.question.data:
-            raise ValidationError("Please let us know what's unclear")
+        if not field.data and form.block.data:
+            raise ValidationError("Please let us know what the issue is")
 
 
 class CloseRoundForm(Form):
@@ -406,3 +406,11 @@ class ReversionForm(Form):
     proposal_id = HiddenIntegerField("Proposal ID")
     txn_id = HiddenIntegerField("Transaction ID")
     revert = SubmitField("Revert to this version")
+
+
+class InviteSpeakerForm(NewUserForm):
+    invite_reason = StringField("Why are they being invited?", [DataRequired()])
+    proposal_type = SelectField(
+        "Proposal Type",
+        choices=[tuple(i) for i in HUMAN_CFP_TYPES.items() if i[0] != "lightning"],
+    )

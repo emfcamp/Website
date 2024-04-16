@@ -1,0 +1,18 @@
+{% macro diversity_metric(metric, values) %}
+  <h4>{{ metric }}</h4>
+  <dl class="dl-horizontal">
+    {% for key, count in values.items() %}
+      <dt>{{ key }}</dt><dd>{{count}}</dd>
+    {% endfor %}
+  </dl>
+{% endmacro %}
+
+{% extends "cfp_review/base.html" %}
+{% block title %}Reviewer diversity{% endblock %}
+{% block body %}
+  <h2>Reviewer diversity</h2>
+
+  {% for metric, values in counts.items() if metric %}
+    {{diversity_metric(metric, values)}}
+  {% endfor %}
+{% endblock %}

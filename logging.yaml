@@ -26,7 +26,7 @@ root:
 loggers:
   werkzeug:
     level: INFO
-  sqlalchemy.engine.base.Engine:
+  sqlalchemy.engine:
     handlers: [sqlalchemy]
     propagate: false
   iso8601:
@@ -47,3 +47,5 @@ loggers:
     level: INFO
   blib2to3.pgen2.driver:
     level: INFO
+  CSSUTILS:
+    level: ERROR

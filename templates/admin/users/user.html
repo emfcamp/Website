@@ -8,6 +8,7 @@
         <th>Name</th>
 	    <th>State</th>
 	    <th>Payment</th>
+        <th>Transfers</th>
         <th>Checked in?</th>
         <th></th>
     </tr>
@@ -15,20 +16,28 @@
         <tr>
             {% if show_owner %}<td><a href="{{url_for('admin.user', user_id=ticket.owner.id)}}">{{ ticket.owner }}</a></td>{% endif %}
             <td>{{ ticket.product.display_name }}</td>
-	        <td>{{ ticket.state }}</td>
+	        <td>{{ ticket | ticket_state_label }}</td>
             <td>{% if ticket.payment %}
                   <a href="{{ url_for('.payment', payment_id=ticket.payment.id) }}">{{ ticket.payment.name }}</a>
               {% else %}
                   No payment
               {% endif %}
             </td>
+            <td>
+                {% if ticket.transfers %}
+                    <a href="{{ url_for('.view_ticket', ticket_id=ticket.id) }}">{{ ticket.transfers | count }}</a>
+                {% else %}
+                    -
+                {% endif %}
+            </td>
             <td>{% if ticket.checked_in %}Yes{% else %}No{% endif %}</td>
             <td>
               <div class="btn-group">
-              {% if ticket.is_paid_for and ticket.is_transferable %}
-              <a class="btn btn-default" href="{{ url_for('.transfer_ticket', ticket_id=ticket.id) }}">Transfer</a>
-              {% endif %}
-              <a class="btn btn-default" href="{{ url_for('.convert_ticket', ticket_id=ticket.id) }}">Convert</a>
+                <a href="{{ url_for('.view_ticket', ticket_id=ticket.id) }}" class="btn btn-default">View</a>
+                {% if ticket.is_paid_for and ticket.is_transferable %}
+                <a class="btn btn-default" href="{{ url_for('.transfer_ticket', ticket_id=ticket.id) }}">Transfer</a>
+                {% endif %}
+                <a class="btn btn-default" href="{{ url_for('.convert_ticket', ticket_id=ticket.id) }}">Convert</a>
               </div>
             </td>
         </tr>
@@ -46,32 +55,45 @@
     <tr><th>Email</th><td>{{user.email}}</td></tr>
 </table>
 
-
-<h3>Permissions</h3>
-<p>Note that the admin permission implies all other permissions.</p>
 <form method="post">
-{{ form.hidden_tag() }}
-{{ form.keys }}
+  {{ form.hidden_tag() }}
+  {{ form.keys }}
 
-<table class="table table-condensed">
-    <tr>{% for permission in permissions %}
-            <th>{{permission.name|capitalize}}</th>
-        {% endfor %}
-    </tr>
-    <tr>
-        {% for permission in permissions %}
-            <td>{{ form["permission_" ~ permission.name]() }}</td>
-        {% endfor %}
-    </tr>
-</table>
-{{ form.change_permissions(class_="btn btn-success pull-right") }}
+  <h3>Update Details</h3>
+  {{ render_field(form.new_name) }}
+  {{ render_field(form.new_email) }}
+  {{ form.update_details(class_="btn btn-success pull-right") }}
 
-<div class="row">&nbsp;</div>
-<hr>
-{{ render_field(form.note) }}
-{{ form.add_note(class_="btn btn-success pull-right") }}
+  <div class="row">&nbsp;</div>
+
+  <h3>Permissions</h3>
+  <p>Note that the admin permission implies all other permissions.</p>
+
+  <table class="table table-condensed">
+      <tr>{% for permission in permissions %}
+              <th>{{permission.name|capitalize}}</th>
+          {% endfor %}
+      </tr>
+      <tr>
+          {% for permission in permissions %}
+              <td>{{ form["permission_" ~ permission.name]() }}</td>
+          {% endfor %}
+      </tr>
+  </table>
+  {{ form.change_permissions(class_="btn btn-success pull-right") }}
+
+  <div class="row">&nbsp;</div>
+  <hr>
+  {{ render_field(form.note) }}
+  {{ form.add_note(class_="btn btn-success pull-right") }}
+
+  <div class="row">&nbsp;</div>
+  <hr>
+  {{ render_field(form.cfp_invite_reason) }}
+  {{ form.save_cfp_invite_reason(class_="btn btn-success pull-right") }}
+  </form>
+  <div class="row">&nbsp;</div>
 </form>
-<div class="row">&nbsp;</div>
 
 <h3>Payments</h3>
 <table class="table table-condensed">
@@ -86,7 +108,7 @@
 {% for payment in user.payments %}
 <tr>
   <td><a href="{{ url_for('.payment', payment_id=payment.id) }}">{{ payment.name }}</a></td>
-  <td>{{payment.state}}</a></td>
+  <td>{{ payment.state }}</a></td>
   <td>{{ payment.purchases | count }}</td>
   <td><b>{{ payment.amount | price(payment.currency) }}</b></td>
   <td>{% if payment.expires %}{{ payment.expires.strftime('%Y-%m-%d') }}{% endif %}</td>
@@ -120,6 +142,40 @@
             <td>{{ proposal.state }}</td>
         </tr>
     {% endfor %}
+</table>
+
+<h3>Changes</h3>
+<table class="table table-condensed">
+<thead>
+    <tr>
+        <th>When</th>
+        <th>By</th>
+        <th>Fieldname</th>
+        <th>Was</th>
+        <th>Changed to</th>
+    </tr>
+</thead>
+<tbody>
+{% for version in versions %}
+    {% for (field, (old, new)) in version.changeset.items() %}
+        <tr class="{{- loop.cycle('odd', 'even') -}}">
+            {% if loop.first %}
+                <td rowspan="{{ loop.length }}">{{ version.transaction.issued_at.strftime('%Y-%m-%d %H:%M:%S.%f')[:-3] }}</td>
+                <td rowspan="{{ loop.length }}">
+                {% if version.transaction.user %}
+                    <a href="{{ url_for('admin.user', user_id=version.transaction.user.id) }}">{{ version.transaction.user.name }} ({{ version.transaction.user.email }})</a>
+                {% else %}
+                    [unknown]
+                {% endif %}
+                </td>
+            {% endif %}
+            <td>{{field}}</td>
+            <td>{{old}}</td>
+            <td>{{new}}</td>
+        </tr>
+    {% endfor %}
+{% endfor %}
+</tbody>
 </table>
 
 {% endblock %}

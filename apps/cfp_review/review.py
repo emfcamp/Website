@@ -95,7 +95,6 @@ def review_list():
             )
         )
     ):
-
         random.shuffle(to_review_again)
         random.shuffle(to_review_new)
         random.shuffle(to_review_old)
@@ -232,9 +231,9 @@ def review_proposal(proposal_id):
                 vote.set_state("recused")
                 message = "You declared a conflict of interest"
 
-            elif form.question.data:
+            elif form.block.data:
                 vote.set_state("blocked")
-                message = "You requested more information"
+                message = "You marked the proposal as blocked"
 
             elif form.change.data:
                 vote.set_state("resolved")

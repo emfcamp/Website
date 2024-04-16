@@ -60,6 +60,7 @@ def admin_village(village_id):
         return redirect(url_for(".admin_village", village_id=village.id))
 
     form.populate(village)
+
     return render_template("villages/admin/info.html", village=village, form=form)
 
 

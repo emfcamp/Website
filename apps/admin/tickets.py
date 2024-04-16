@@ -6,7 +6,6 @@ from flask import (
     flash,
     url_for,
     current_app as app,
-    abort,
     send_file,
 )
 from flask_mailman import EmailMessage
@@ -168,11 +167,18 @@ def list_free_tickets():
     )
 
 
+@admin.route("/ticket/<int:ticket_id>", methods=["GET"])
+def view_ticket(ticket_id):
+    ticket = Ticket.query.get_or_404(ticket_id)
+    return render_template(
+        "admin/tickets/view_ticket.html",
+        ticket=ticket,
+    )
+
+
 @admin.route("/ticket/<int:ticket_id>/cancel-free", methods=["GET", "POST"])
 def cancel_free_ticket(ticket_id):
     ticket = Purchase.query.get_or_404(ticket_id)
-    if ticket.payment is not None:
-        abort(404)
 
     form = CancelTicketForm()
     if form.validate_on_submit():
@@ -307,7 +313,7 @@ def tickets_reserve(email):
         )
 
         msg.body = render_template(
-            "emails/tickets-reserved.txt",
+            "emails/admin-tickets-reserved.txt",
             user=user,
             code=code,
             tickets=basket.purchases,

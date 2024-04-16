@@ -4,14 +4,21 @@
 {% block title %}Call for Participation{% endblock %}
 {% block body %}
 <h2>Call for Participation</h2>
+    <div class="well">
+      <p>The Call for Participation will close for talks & workshops on
+        <span class="emphasis">Thursday 25th April</span>.</p>
+      <p>You will still be able to submit installations, performances and youth
+        workshops after this date</p>
+    </div>
+
     <p class="emphasis"><a href="{{ url_for('base.about') }}">Electromagnetic
-        Field</a> is a UK camping festival for those with an inquisitive mind
-        or an interest in making things. It will be held from {{ fancy_dates }} at <a
-        href="https://wiki.emfcamp.org/wiki/Location">Eastnor
-        Castle Deer Park</a>, Ledbury.</p>
+      Field</a> is a camping festival for those with an inquisitive mind
+      or an interest in making things. It will be held from {{ fancy_dates }} at <a
+      href="{{ url_for('base.page', page_name='travel') }}">Eastnor
+      Castle Deer Park</a> in Herefordshire, UK.</p>
 
     <p>We're looking for talks, performances, and workshops for
-    all ages.  We're especially keen to hear from people with
+      all ages.  We're especially keen to hear from people with
       different backgrounds than you'd expect to find at a technology conference.</p>
 
     <p>At previous events we've heard about everything from genetic modification
@@ -19,6 +26,9 @@
       to lock picking, computer security to crocheting, and quadcopters to brewing.
       If you're enthusiastic about it, we are too! You don't need to consider yourself a
       professional or an expert to present.</p>
+
+    <p>If you submit a talk or workshop proposal, it will be <a href="{{ url_for('.guidance') }}" target="_blank">reviewed anonymously</a> by a
+      diverse selection panel.</p>
 
     <h3>Money</h3>
     <p>EMF is a non-profit community event, entirely run by unpaid volunteers. All of
@@ -31,31 +41,22 @@
        workshops, for example, to develop kits for attendees.</p>
 
     <h3>Tickets</h3>
-    <p>You will be guaranteed the opportunity to buy EMF tickets if your talk,
-    workshop, youth workshop, or performance proposal is accepted. There are a
-    limited number of tickets available for exceptional installations.</p>
-
-    <p>The guarantee is for <strong>two</strong> adult tickets: one for you at
-    a 33% discount, and one for a friend or partner at full price. You are also
-    guaranteed as many child tickets as you need.
+    <p>You will be guaranteed the opportunity to buy tickets if your talk,
+      workshop, youth workshop, or performance proposal is accepted. There are a
+      limited number of tickets available for exceptional installations. The guarantee is
+      for <strong>two</strong> adult tickets: one for you at a 33% discount, and one for a
+      friend or partner at full price. You are also guaranteed as many child tickets as you
+      need.</p>
     
-    <p>If you only wish to attend for the day of your talk/workshop/performance we can offer you a free day ticket.</strong></p>
-
-    <h3>Selection</h3>
-    <p>
-        After you submit a proposal, it will be considered by a diverse
-        selection panel across multiple review rounds. For more on the EMF
-        selection process, see our <a href="{{ url_for('.guidance') }}" target="_blank">guidance</a> and <a href="{{ url_for('.guidance')}}#timeline">timeline</a>.
-    </p>
-
-    <p>We also have guidance available for <a href="{{ url_for('.installation_support') }}" target="_blank">those who wish to display installations</a> at EMF.</p>
+    <p>If you only wish to attend for the day of your talk/workshop/performance, we
+      can offer you a free day ticket, but we encourage you to stick around for the whole event!</p>
 
     <h2>Submit a new proposal</h2>
     <p>Please select the type of proposal you want to submit:</p>
     <div class="list-group cfp-choose-type">
         {{ cfp_type_menu('talk', 'A presentation on a stage', 'CFP_TALKS_CLOSED', ignore_closed) }}
         {{ cfp_type_menu('workshop', 'A workshop in an area with tables &amp; other equipment', 'CFP_WORKSHOPS_CLOSED', ignore_closed) }}
-        {{ cfp_type_menu('youthworkshop', ' A workshop for attendees under 16', 'CFP_YOUTHWORKSHOPS_CLOSED', ignore_closed, pretty_title="Youth Workshop") }}
+        {{ cfp_type_menu('youthworkshop', ' A workshop for attendees aged 12 and under', 'CFP_YOUTHWORKSHOPS_CLOSED', ignore_closed, pretty_title="Youth Workshop") }}
         {{ cfp_type_menu('performance', ' A performance of music, art, dance, or film', 'CFP_PERFORMANCES_CLOSED', ignore_closed) }}
         {{ cfp_type_menu('installation', ' A creation for attendees to admire or interact with', 'CFP_INSTALLATIONS_CLOSED', ignore_closed) }}
 

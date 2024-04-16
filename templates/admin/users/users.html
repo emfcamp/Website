@@ -3,6 +3,31 @@
 {% block body %}
 <h2>Users</h2>
 
+<h4>Find user</h4>
+<form method="GET" class="form-horizontal">
+  <div class="form-group">
+      <label for="search" class="col-sm-2 control-label">
+          Search
+      </label>
+      <div class="col-sm-10 controls">
+        <input type="search"
+               name="search"
+               placeholder="Search for user by name or email"
+               class="form-control"
+               {% if user_query %} value="{{user_query}}" {% endif %}
+        >
+      </div>
+  </div>
+  <div class="pull-right">
+    {% if user_query %}
+      <a class="btn btn-warn" href="{{ url_for('.users') }}">Reset</a>
+    {% endif %}
+    <button class="btn" type="submit">search</button>
+  </div>
+</form>
+
+<div class="clearfix"></div>
+
 <h4>Add User</h4>
 <form method="POST" class="form-horizontal">
 <p>This will send a welcome email to the user.</p>
@@ -17,6 +42,36 @@
 </form>
 
 <h4>User List</h4>
+
+<div>
+  <span>Total users:</span> {{total_users}}
+</div>
+<div>&nbsp;</div>
+
+{% if users.pages > 1 %}
+<div>
+  {{ users.first }} - {{ users.last }} of {{ users.total }}
+</div>
+
+<nav aria-label="User page navigation">
+  <ul class="pagination">
+    {% if users.has_prev %}
+    <li class="page-item"><a class="page-link" href="{{url_for('.users', page=users.prev_num, size=users.per_page, search=user_query)}}">
+      <span aria-hidden="true">&laquo;</span>
+      <span class="sr-only">Previous</span>
+    </a></li>
+    {% endif %}
+    <li class="page-item active"><a class="page-link" href="#">{{ users.page }}</a></li>
+    {% if users.has_next %}
+    <li class="page-item"><a class="page-link" href="{{url_for('.users', page=users.next_num, size=users.per_page, search=user_query)}}">
+      <span aria-hidden="true">&raquo;</span>
+      <span class="sr-only">Next</span>
+    </a></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+
 <table class="table table-condensed">
     <tr>
       <th>Name</th>
@@ -29,7 +84,7 @@
     <td>{{ u.name }}</td>
     <td><a href="{{ url_for('.user', user_id=u.id) }}">{{ u.email }}</a></td>
     <td>{% for permission in u.permissions %}{{ permission.name }}&nbsp;{% endfor %}</td>
-    <td>{{ u.get_owned_tickets(type="admission_ticket") | selectattr("checked_in") | list | count or '' }}</td>
+    <td>{{ u.owned_admission_tickets | selectattr("checked_in") | list | count or '' }}</td>
 </tr>
 {% endfor %}
 </table>

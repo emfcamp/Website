@@ -22,6 +22,8 @@ Buy Items
   {% include 'purchase/hire.html' %}
 {% elif flow in ['bales'] %}
   {% include 'purchase/bales.html' %}
+{% elif flow in ['badge'] %}
+  {% include 'purchase/badge.html' %}
 {% endif %}
 {% if not current_user.is_authenticated and SITE_STATE != 'after-event' %}
     <p>If you've already bought a ticket this year, <a href="{{url_for('users.login')}}">log in</a> to view your ticket status.</p>
@@ -168,7 +170,7 @@ $(function() {
   $('.amount').on('change', EMF.update_total).change();
   $('[name=set_currency]').on('click', function(event) {
       $(this).closest('.btn-group').find('.btn').not(this).removeClass('active');
-      $(this).addClass('active')
+      $(this).addClass('active');
       $('#currency_code').val($(this).attr('value'));
       EMF.update_currency();
       EMF.update_total();

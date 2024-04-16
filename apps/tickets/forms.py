@@ -1,3 +1,5 @@
+import typing
+
 from flask import render_template_string, url_for, current_app as app
 from markupsafe import Markup
 from flask_login import current_user
@@ -10,11 +12,14 @@ from wtforms import (
     HiddenField,
     BooleanField,
 )
+from models.basket import Basket
+from models.product import PriceTier, ProductViewProduct, Voucher
 
 from models.user import User
 from models.payment import BankPayment, StripePayment
 
-from ..common.forms import IntegerSelectField, HiddenIntegerField, Form, EmailField
+from ..common.forms import Form
+from ..common.fields import IntegerSelectField, HiddenIntegerField, EmailField
 from ..common import CURRENCY_SYMBOLS
 
 
@@ -33,11 +38,13 @@ class TicketAmountsForm(Form):
     currency_code = HiddenField("Currency")
     set_currency = StringField("Set Currency", [Optional()])
 
-    def __init__(self, products):
+    def __init__(self, products: list[ProductViewProduct]):
         self._tiers = self._get_price_tiers(products)
         super().__init__()
 
-    def _get_price_tiers(_self, products):
+    def _get_price_tiers(
+        _self, products: list[ProductViewProduct]
+    ) -> dict[int, PriceTier]:
         """Get the price tiers we want to show in this form"""
         # Order of tiers is important, but dict is ordered these days
         tiers = {}
@@ -68,7 +75,7 @@ class TicketAmountsForm(Form):
 
             f.amount.data = basket.get(tier, 0)
 
-    def ensure_capacity(form, basket):
+    def ensure_capacity(form, basket: Basket, voucher: typing.Optional[Voucher]):
         """
         This function updates the products on the form based on the current capacity
         so it will fail to validate if the requested ticket capacity is now unavailable.
@@ -83,6 +90,11 @@ class TicketAmountsForm(Form):
             # If they've already got reserved tickets, they can keep them
             # because they've been reserved in the database
             user_limit = max(tier.user_limit(), basket.get(tier, 0))
+
+            # If a voucher is being used, limit the number of adult tickets by however
+            # many remain on the voucher
+            if voucher and tier.parent.is_adult_ticket:
+                user_limit = min(user_limit, voucher.tickets_remaining)
 
             if f.amount.data and f.amount.data > user_limit:
                 f.amount.data = user_limit

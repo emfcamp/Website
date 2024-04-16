@@ -3,9 +3,9 @@
 {% block body %}
 
 {% set active='notes' %}
-{% include "cfp_review/_propsal_tabs.html" %}
+{% include "cfp_review/_proposal_tabs.html" %}
 
-<h4>{{ proposal.title }} <small>by <a href="{{ url_for('admin.user', user_id=proposal.user.id) }}">{{proposal.user.name}}</a></small></h4>
+<h4>{{ proposal.title }} <small>by <a href="{{ url_for('cfp_review.cfp_user', user_id=proposal.user.id) }}">{{proposal.user.name}}</a></small></h4>
 <p class="multiline">{{ proposal.description | urlize }}</p>
 <p>&nbsp;</p>
 

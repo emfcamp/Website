@@ -52,7 +52,7 @@ def transfer_start(payment: BankPayment):
         to=[current_user.email],
     )
     msg.body = render_template(
-        "emails/tickets-purchased-email-banktransfer.txt",
+        "emails/payment-inprogress-banktransfer.txt",
         user=current_user,
         payment=payment,
     )
@@ -159,14 +159,6 @@ def reconcile_txns(txns: list[BankTransaction], doit: bool = False):
         if txn.type.lower() not in ("other", "directdep", "deposit"):
             raise ValueError("Unexpected transaction type for %s: %s", txn.id, txn.type)
 
-        # TODO: remove this after 2022
-        if txn.payee.startswith("GOCARDLESS ") or txn.payee.startswith("GC C1 EMF"):
-            app.logger.info("Suppressing GoCardless transfer %s", txn.id)
-            if doit:
-                txn.suppressed = True
-                db.session.commit()
-            continue
-
         if txn.payee.startswith("STRIPE PAYMENTS EU ") or txn.payee.startswith(
             "STRIPE STRIPE"
         ):
@@ -244,7 +236,7 @@ def send_confirmation(payment: BankPayment):
 
     already_emailed = set_tickets_emailed(payment.user)
     msg.body = render_template(
-        "emails/tickets-paid-email-banktransfer.txt",
+        "emails/payment-paid.txt",
         user=payment.user,
         payment=payment,
         already_emailed=already_emailed,

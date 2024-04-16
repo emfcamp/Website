@@ -30,6 +30,7 @@
                 <li role="separator" class="divider"></li>
                 {{ menuitem('Anon-blocked', ".proposals", proposal_counts['anon-blocked'], state='anon-blocked')}}
                 {{ menuitem('New', ".proposals", proposal_counts['new'], state='new')}}
+                {{ menuitem('Manual Review', ".proposals", proposal_counts['manual-review'], state='manual-review')}}
                 <li role="separator" class="divider"></li>
                 {{ menuitem('Summary', ".proposals_summary")}}
             </ul>
@@ -63,6 +64,11 @@
                 <li role="separator" class="divider"></li>
                 {{ menuitem('Anonymisation', '.anonymisation', proposal_counts['checked']) }}
                 {{ menuitem('Review', '.review_list') }}
+                <li role="separator" class="divider"></li>
+                {{ menuitem('Invite Speaker', '.invite_speaker') }}
+                <li role="separator" class="divider"></li>
+                {{ menuitem('Reviewer diversity', '.reviewer_diversity') }}
+                {{ menuitem('Speaker diversity', '.speaker_diversity') }}
             </ul>
         </li>
     {% endif %}

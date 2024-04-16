@@ -1,27 +1,29 @@
-{% macro count_for(label, count) %}
-  <dt>{{ label }}</dt><dd><a href="{{url_for('.proposals', **kwargs)}}">{{count}}</a></dd>
+{% macro summary_table(counts) %}
+<table class="table table-condensed table-striped">
+  <tr>
+    <th></th>
+    <th>Total</th>
+    {% for type in cfp_types.values() %}
+      <th>{{type | capitalize}}</th>
+    {% endfor %}
+  </tr>
+  {% for (p_tag, counts_by_type) in counts.items() | sort(attribute=0) %}
+    <tr>
+      <th scope="row"><a href="{{url_for('.proposals', tags=p_tag)}}">{{ p_tag }}</a></td>
+      <th scope="row">{{ counts_by_type["total"] }}</th>
+      {% for type in cfp_types.values() %}
+        <td><a href="{{url_for('.proposals', tags=p_tag, type=type)}}">{{ counts_by_type[type] }}</a></td>
+      {% endfor %}
+    </tr>
+  {% endfor %}
+</table>
 {% endmacro %}
 
 {% extends "cfp_review/base.html" %}
 {% block body %}
   <h3>By Tag</h3>
-  <dl class="dl-horizontal">
-    {% for (p_tag, count) in counts_by_tag.items() %}
-      {{count_for(p_tag, count, tags=[p_tag])}}
-    {% endfor %}
-  </dl>
-
-  <h3>By Type</h3>
-  <dl class="dl-horizontal">
-    {% for (p_type, count) in counts_by_type.items() %}
-      {{count_for(cfp_types[p_type], count, type=p_type)}}
-    {% endfor %}
-  </dl>
+  {{ summary_table(counts_by_tag) }}
 
   <h3>By State</h3>
-  <dl class="dl-horizontal">
-    {% for p_state in ordered_states %}
-      {{count_for(p_state, counts_by_state[p_state], state=p_state)}}
-    {% endfor %}
-  </dl>
+  {{ summary_table(counts_by_state) }}
 {% endblock %}
