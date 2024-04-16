@@ -208,6 +208,16 @@ class Payment(BaseModel):
 
         db.session.flush()
 
+    @property
+    def is_refundable(self):
+        return self.state in [
+            "charged",
+            "paid",
+            "refunding",
+            "partrefunded",
+            "refund-requested",
+        ]
+
     def manual_refund(self):
         # Only to be called for full out-of-band refunds, for book-keeping.
         # Providers should cancel purchases individually and insert their

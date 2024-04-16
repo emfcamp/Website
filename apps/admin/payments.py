@@ -356,10 +356,11 @@ def refund(payment_id):
     # Refund business logic needs moving to apps.payments.refund module, some is already there.
     payment = Payment.query.get_or_404(payment_id)
 
-    valid_states = ["charged", "paid", "refunding", "partrefunded", "refund-requested"]
-    if payment.state not in valid_states:
+    if not payment.is_refundable:
         app.logger.warning(
-            "Payment %s is %s, not one of %s", payment_id, payment.state, valid_states
+            "Cannot refund payment %s is %s, not in valid state",
+            payment_id,
+            payment.state,
         )
         flash("Payment is not currently refundable")
         return redirect(url_for(".payments"))
