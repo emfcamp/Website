@@ -3,6 +3,7 @@ from typing import Pattern
 
 from flask import current_app as app
 from flask_wtf import FlaskForm
+from flask_sqlalchemy import SQLAlchemy
 from wtforms import SelectField, BooleanField, FieldList, FormField, SubmitField
 from wtforms.validators import InputRequired
 
@@ -10,6 +11,14 @@ from .fields import HiddenIntegerField
 
 from models.user import UserDiversity
 from models.cfp_tag import DEFAULT_TAGS, Tag
+from models.payment import (
+    Payment,
+    BankRefund,
+    StripeRefund,
+)
+from models.purchase import AdmissionTicket
+
+from ..payments.stripe import stripe_payment_refunded
 
 
 class Form(FlaskForm):
@@ -143,6 +152,10 @@ class DiversityForm(Form):
         return result
 
 
+class RefundFormException(Exception):
+    pass
+
+
 class RefundPurchaseForm(Form):
     purchase_id = HiddenIntegerField("Purchase ID", [InputRequired()])
     refund = BooleanField("Refund purchase", default=True)
@@ -152,3 +165,159 @@ class RefundForm(Form):
     purchases = FieldList(FormField(RefundPurchaseForm))
     refund = SubmitField("Refunded these by bank transfer")
     stripe_refund = SubmitField("Refund through Stripe (preferred)")
+
+    def intialise_with_payment(self, payment: Payment, set_purchase_ids: bool):
+        if payment.provider != "stripe":
+            # Make sure the stripe_refund submit won't count as pressed
+            self.stripe_refund.data = ""
+
+        if set_purchase_ids:
+            for purchase in payment.purchases:
+                self.purchases.append_entry()
+                self.purchases[-1].purchase_id.data = purchase.id
+
+        purchases_dict = {p.id: p for p in payment.purchases}
+
+        for f in self.purchases:
+            f._purchase = purchases_dict[f.purchase_id.data]
+            f.refund.label.text = "%s - %s" % (
+                f._purchase.id,
+                f._purchase.product.display_name,
+            )
+
+            if (
+                f._purchase.refund_id is None
+                and f._purchase.is_paid_for
+                and f._purchase.owner == payment.user
+            ):
+                # Purchase is owned by the user and not already refunded
+                f._disabled = False
+
+                if type(f._purchase) == AdmissionTicket and f._purchase.checked_in:
+                    f.refund.data = False
+                    f.refund.label.text += " (checked in)"
+            elif f._purchase.refund_id is not None:
+                f._disabled = True
+                f.refund.data = False
+                f.refund.label.text += " (refunded)"
+            else:
+                f._disabled = True
+                f.refund.data = False
+                f.refund.label.text += " (transferred)"
+
+    def process_refund(self, payment: Payment, db: SQLAlchemy, logger, stripe) -> int:
+        payment.lock()
+
+        purchases = [
+            f._purchase for f in self.purchases if f.refund.data and not f._disabled
+        ]
+        total = sum(p.price_tier.get_price(payment.currency).value for p in purchases)
+
+        if not total:
+            raise RefundFormException(
+                "Please select some purchases to refund. You cannot refund only free purchases from this page."
+            )
+
+        if any(p.owner != payment.user for p in purchases):
+            raise RefundFormException("Cannot refund transferred purchase")
+
+        # This is where you'd add the premium if it existed
+        logger.info(
+            "Refunding %s purchases from payment %s, totalling %s %s",
+            len(purchases),
+            payment.id,
+            total,
+            payment.currency,
+        )
+
+        if self.stripe_refund.data:
+            logger.info("Refunding using Stripe")
+            charge = stripe.Charge.retrieve(payment.charge_id)
+
+            if charge.refunded:
+                # This happened unexpectedly - send the email as usual
+                stripe_payment_refunded(payment)
+                raise RefundFormException(
+                    "This charge has already been fully refunded."
+                )
+
+            payment.state = "refunding"
+            refund = StripeRefund(payment, total)
+
+        else:
+            logger.info("Refunding out of band")
+
+            payment.state = "refunding"
+            refund = BankRefund(payment, total)
+
+        with db.session.no_autoflush:
+            for purchase in purchases:
+                purchase.refund_purchase(refund)
+
+        priced_purchases = [
+            p
+            for p in payment.purchases
+            if p.price_tier.get_price(payment.currency).value
+        ]
+        unpriced_purchases = [
+            p
+            for p in payment.purchases
+            if not p.price_tier.get_price(payment.currency).value
+        ]
+
+        all_refunded = False
+        if all(p.refund for p in priced_purchases):
+            all_refunded = True
+            # Remove remaining free purchases from the payment so they're still valid.
+            for purchase in unpriced_purchases:
+                if not purchase.refund:
+                    logger.info(
+                        "Removing free purchase %s from refunded payment",
+                        purchase.id,
+                    )
+                    if not purchase.is_paid_for:
+                        # The only thing keeping this purchase from being valid was the payment
+                        logger.info(
+                            "Setting orphaned free purchase %s to paid", purchase.id
+                        )
+                        purchase.state = "paid"
+
+                        # Should we even put free purchases in a Payment?
+
+                    purchase.payment = None
+                    purchase.payment_id = None
+
+        db.session.commit()
+
+        if self.stripe_refund.data:
+            try:
+                stripe_refund = stripe.Refund.create(
+                    charge=payment.charge_id, amount=refund.amount_int
+                )
+
+            except Exception as e:
+                logger.exception("Exception %r refunding payment", e)
+
+                raise RefundFormException(
+                    "An error occurred refunding with Stripe. Please check the state of the payment."
+                )
+
+            refund.refundid = stripe_refund.id
+            if stripe_refund.status not in ("pending", "succeeded"):
+
+                # Should never happen according to the docs
+                logger.warn(
+                    "Refund status is %s, not pending or succeeded",
+                    stripe_refund.status,
+                )
+                raise RefundFormException(
+                    "The refund with Stripe was not successful. Please check the state of the payment."
+                )
+
+        if all_refunded:
+            payment.state = "refunded"
+        else:
+            payment.state = "partrefunded"
+
+        db.session.commit()
+        return total

@@ -1,0 +1,305 @@
+from flask import (
+    abort,
+    current_app as app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from flask_login import login_required, current_user
+from wtforms import SubmitField
+from sqlalchemy.orm.exc import NoResultFound
+from stripe.error import AuthenticationError
+
+from main import db, stripe
+from ..common import feature_enabled
+from ..common.forms import Form
+from models.payment import StripePayment
+
+from . import get_user_payment_or_abort, lock_user_payment_or_abort
+from . import payments
+from .stripe import (
+    stripe_payment_part_refunded,
+    stripe_payment_refunded,
+    stripe_update_payment,
+    StripeUpdateConflict,
+    StripeUpdateUnexpected,
+)
+
+webhook_handlers = {}
+
+
+def webhook(type=None):
+    def inner(f):
+        webhook_handlers[type] = f
+        return f
+
+    return inner
+
+
+def stripe_start(payment: StripePayment):
+    """This is called by the ticket flow to initialise the payment and
+    redirect to the capture page. We don't need to do anything here."""
+    app.logger.info("Starting Stripe payment %s", payment.id)
+    db.session.commit()
+
+    return redirect(url_for("payments.stripe_capture", payment_id=payment.id))
+
+
+@payments.route("/pay/stripe/<int:payment_id>/capture")
+@login_required
+def stripe_capture(payment_id):
+    """This endpoint displays the card payment form, including the Stripe payment element.
+    Card details are validated and submitted to Stripe by XHR, and if it succeeds
+    a POST is sent back, which is received by the next endpoint.
+    """
+    payment = lock_user_payment_or_abort(payment_id, "stripe", valid_states=["new"])
+
+    if not feature_enabled("STRIPE"):
+        app.logger.warn("Unable to capture payment as Stripe is disabled")
+        flash("Card payments are currently unavailable. Please try again later")
+        return redirect(url_for("users.purchases"))
+
+    if payment.intent_id is None:
+        # Create the payment intent with Stripe. This intent will persist across retries.
+        intent = stripe.PaymentIntent.create(
+            amount=payment.amount_int,
+            currency=payment.currency.upper(),
+            statement_descriptor_suffix=payment.description,
+            metadata={"user_id": current_user.id, "payment_id": payment.id},
+        )
+        payment.intent_id = intent.id
+        db.session.commit()
+    else:
+        # Reuse a previously-created payment intent
+        intent = stripe.PaymentIntent.retrieve(payment.intent_id)
+        if intent.status == "succeeded":
+            app.logger.warn(f"Intent already succeeded, not capturing again")
+            payment.state = "charging"
+            db.session.commit()
+            return redirect(url_for(".stripe_waiting", payment_id=payment_id))
+
+        if intent.payment_method:
+            app.logger.warn(
+                f"Intent already has payment method {intent.payment_method}, this will likely fail"
+            )
+
+    app.logger.info(
+        "Starting checkout for Stripe payment %s with intent %s",
+        payment.id,
+        payment.intent_id,
+    )
+    return render_template(
+        "payments/stripe-checkout.html",
+        payment=payment,
+        client_secret=intent.client_secret,
+    )
+
+
+@payments.route("/pay/stripe/<int:payment_id>/capture", methods=["POST"])
+@login_required
+def stripe_capture_post(payment_id):
+    """The user is sent here after the payment has succeeded in the browser.
+    We set the payment state to charging, but we're expecting a webhook to
+    set it to "paid" almost immediately.
+    """
+    payment = lock_user_payment_or_abort(payment_id, "stripe")
+    if payment.state == "new":
+        payment.state = "charging"
+        db.session.commit()
+    return redirect(url_for(".stripe_waiting", payment_id=payment_id))
+
+
+class StripeCancelForm(Form):
+    yes = SubmitField("Cancel payment")
+
+
+@payments.route("/pay/stripe/<int:payment_id>/cancel", methods=["GET", "POST"])
+@login_required
+def stripe_cancel(payment_id):
+    payment = lock_user_payment_or_abort(
+        payment_id, "stripe", valid_states=["new", "captured", "failed"]
+    )
+
+    form = StripeCancelForm()
+    if form.validate_on_submit():
+        if form.yes.data:
+            app.logger.info("Cancelling Stripe payment %s", payment.id)
+            payment.cancel()
+            db.session.commit()
+
+            app.logger.info("Payment %s cancelled", payment.id)
+            flash("Payment cancelled")
+
+        return redirect(url_for("users.purchases"))
+
+    return render_template("payments/stripe-cancel.html", payment=payment, form=form)
+
+
+@payments.route("/pay/stripe/<int:payment_id>/waiting")
+@login_required
+def stripe_waiting(payment_id):
+    payment = get_user_payment_or_abort(
+        payment_id, "stripe", valid_states=["charging", "paid"]
+    )
+    return render_template(
+        "payments/stripe-waiting.html",
+        payment=payment,
+        days=app.config["EXPIRY_DAYS_STRIPE"],
+    )
+
+
+@payments.route("/stripe-webhook", methods=["POST"])
+def stripe_webhook():
+    try:
+        event = stripe.Webhook.construct_event(
+            request.data,
+            request.headers["STRIPE_SIGNATURE"],
+            app.config.get("STRIPE_WEBHOOK_KEY"),
+        )
+    except ValueError:
+        app.logger.exception("Error decoding Stripe webhook")
+        abort(400)
+    except stripe.error.SignatureVerificationError:
+        app.logger.exception("Error verifying Stripe webhook signature")
+        abort(400)
+
+    try:
+        livemode = app.config.get("STRIPE_LIVEMODE", not app.config["DEBUG"])
+        if event.livemode != livemode:
+            app.logger.error("Unexpected livemode status %s, failing", event.livemode)
+            abort(409)
+
+        try:
+            handler = webhook_handlers[event.type]
+        except KeyError as e:
+            handler = webhook_handlers[None]
+
+        return handler(event.type, event.data.object)
+    except Exception as e:
+        app.logger.exception("Unhandled exception during Stripe webhook")
+        app.logger.info("Webhook data: %s", request.data)
+        abort(500)
+
+
+@webhook()
+def stripe_default(_type, _obj):
+    """Default webhook handler"""
+    return ("", 200)
+
+
+@webhook("ping")
+def stripe_ping(_type, _obj):
+    return ("", 200)
+
+
+def lock_payment_or_abort_by_intent(intent_id: str) -> StripePayment:
+    try:
+        return (
+            StripePayment.query.filter_by(intent_id=intent_id).with_for_update().one()
+        )
+    except NoResultFound:
+        app.logger.error("Payment for intent %s not found", intent_id)
+        abort(409)
+
+
+def lock_payment_or_abort_by_charge(charge_id: str) -> StripePayment:
+    try:
+        return (
+            StripePayment.query.filter_by(charge_id=charge_id).with_for_update().one()
+        )
+    except NoResultFound:
+        app.logger.error("Payment for charge %s not found", charge_id)
+        abort(409)
+
+
+@webhook("payment_intent.canceled")
+@webhook("payment_intent.created")
+@webhook("payment_intent.payment_failed")
+@webhook("payment_intent.succeeded")
+def stripe_payment_intent_updated(hook_type, intent):
+    payment = lock_payment_or_abort_by_intent(intent.id)
+
+    app.logger.info(
+        "Received %s message for intent %s, payment %s",
+        hook_type,
+        intent.id,
+        payment.id,
+    )
+
+    try:
+        stripe_update_payment(payment, intent)
+    except StripeUpdateConflict:
+        abort(409)
+    except StripeUpdateUnexpected:
+        abort(501)
+
+    return ("", 200)
+
+
+@webhook("charge.refunded")
+def stripe_charge_refunded(_type, charge):
+    payment = lock_payment_or_abort_by_charge(charge.id)
+
+    app.logger.info(
+        "Received charge.refunded message for charge %s, payment %s",
+        charge.id,
+        payment.id,
+    )
+
+    if charge.amount == charge.amount_refunded:
+        # Full refund
+        stripe_payment_refunded(payment)
+    else:
+        stripe_payment_part_refunded(payment, charge)
+
+    return ("", 200)
+
+
+def stripe_validate():
+    """Validate Stripe is configured and operational"""
+    result = []
+    sk = app.config.get("STRIPE_SECRET_KEY", "")
+    if len(sk) > 15 and sk.startswith("sk_"):
+        if sk.startswith("sk_test"):
+            result.append((True, "Secret key configured (TEST MODE)"))
+        else:
+            result.append((True, "Secret key configured"))
+    else:
+        result.append((False, "Secret key not configured"))
+
+    pk = app.config.get("STRIPE_PUBLIC_KEY", "")
+    if len(pk) > 15 and pk.startswith("pk_"):
+        if pk.startswith("pk_test"):
+            result.append((True, "Public key configured (TEST MODE)"))
+        else:
+            result.append((True, "Public key configured"))
+    else:
+        result.append((False, "Public key not configured"))
+
+    whk = app.config.get("STRIPE_WEBHOOK_KEY", "")
+    if len(whk) > 15 and whk.startswith("whsec_"):
+        result.append((True, "Webhook key configured"))
+    else:
+        result.append((False, "Webhook key not configured"))
+
+    try:
+        webhooks = stripe.WebhookEndpoint.list()
+        result.append((True, "Connection to Stripe API succeeded"))
+    except AuthenticationError as e:
+        result.append((False, f"Connecting to Stripe failed: {e}"))
+        return result
+
+    if len(webhooks) > 0:
+        webhook_urls = " ".join(webhook["url"] for webhook in webhooks)
+        result.append((True, f"{len(webhooks)} webhook(s) configured: {webhook_urls}"))
+        for webhook in webhooks:
+            if webhook["status"] != "enabled":
+                result.append(
+                    (False, f"Webhook {webhook['url']} is {webhook['status']}")
+                )
+    else:
+        result.append((False, "No webhooks configured"))
+
+    return result

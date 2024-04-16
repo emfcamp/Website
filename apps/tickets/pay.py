@@ -22,7 +22,7 @@ from models.payment import BankPayment, StripePayment
 
 from ..common import get_user_currency, set_user_currency, create_current_user
 from ..payments.banktransfer import transfer_start
-from ..payments.stripe import stripe_start
+from ..payments.stripe_views import stripe_start
 
 from .forms import TicketPaymentForm, TicketPaymentShippingForm
 from . import tickets, price_changed, empty_baskets, get_product_view

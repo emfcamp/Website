@@ -34,7 +34,7 @@ from models.ical import CalendarSource
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
 from models.site_state import SiteState, VALID_STATES, refresh_states
 from models.scheduled_task import tasks, ScheduledTaskResult
-from ..payments.stripe import stripe_validate
+from ..payments.stripe_views import stripe_validate
 from ..payments.wise import (
     wise_validate,
     wise_business_profile,
