@@ -37,10 +37,9 @@
         "EditorConfig.EditorConfig",
         "github.vscode-github-actions",
         "ms-python.python",
-        "ms-python.black-formatter",
-        "ms-python.flake8",
         "ms-python.mypy-type-checker",
-        "samuelcolvin.jinjahtml"
+        "samuelcolvin.jinjahtml",
+        "charliermarsh.ruff"
       ],
       "settings": {
         "files.associations": {

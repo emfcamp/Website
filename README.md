@@ -81,8 +81,7 @@ Tests are run using the `./run_tests` script.
 
 ### Code Style
 
-For Python, we currently use [Black](https://github.com/psf/black) and
-[flake8](https://github.com/PyCQA/flake8) to enforce code style. These checks
+For Python, we currently use [Ruff](https://docs.astral.sh/ruff/) to enforce code style. These checks
 are run by `./run_tests`.
 
 However, it's easy to forget these checks, so you can also run them as a git

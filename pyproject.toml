@@ -1,3 +1,12 @@
+[tool.ruff]
+line-length = 110
+
+[tool.ruff.lint]
+# TODO: see if we can sensibly lose any of these ignores. We should probably add the
+# "UP", "SIM", and "B" selectors but that will need some work.
+select = ["E", "F"]
+ignore = ["E402", "F541", "F841", "E721", "E722", "E501"]
+
 [tool.poetry]
 name = "website"
 description = "The Electromagnetic Field web site"
@@ -28,14 +37,14 @@ wtforms = "~=2.3"
 flask-login = "~=0.6"
 flask-debugtoolbar = "*"
 gunicorn = "~=21.2"
-pybarcode = {git = "https://github.com/emfcamp/python-barcode"}
+pybarcode = { git = "https://github.com/emfcamp/python-barcode" }
 pillow = "~=10.3"
 icalendar = "==3.11.7"
 pytz = "*"
 stripe = "~=2.38.0"
 ofxparse = "==0.16"
 python-dateutil = "*"
-slotmachine = {git = "https://github.com/emfcamp/slotmachine.git"}
+slotmachine = { git = "https://github.com/emfcamp/slotmachine.git" }
 awesome-slugify = "*"
 faker = "*"
 pyyaml = "*"
@@ -62,17 +71,14 @@ python-stdnum = "^1.19"
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
 mock = "*"
-"flake8" = "3.8.3"
 locust = "*"
 ipdb = "*"
 hypothesis = "*"
 pytest-random-order = "*"
 pytest-cov = "*"
 coveralls = "*"
-black = "=22.3.0"
 pyzbar = "^0.1.8"
 cairosvg = "^2.4.2"
-flake8-print = "^4.0.0"
 mypy = "^1.2.0"
 types-requests = "^2.27.8"
 types-simplejson = "^3.17.3"
@@ -83,3 +89,4 @@ types-Markdown = "^3.3.12"
 types-pytz = "*"
 lxml-stubs = "^0.3.1"
 sqlalchemy-stubs = "^0.4"
+ruff = "^0.3.7"

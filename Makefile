@@ -9,8 +9,7 @@ endif
 .PHONY: test check-syntax fix-syntax
 
 test:
-	black --check ./main.py ./apps ./models ./tests
-	flake8 ./*.py ./apps ./models ./tests
+	ruff check ./main.py ./apps ./models ./tests
 	mypy ./*.py ./apps ./models
 	SETTINGS_FILE=$(TEST_SETTINGS) pytest --random-order --cov=apps --cov=models ./tests/ ./models/
 ifdef COVERALLS_REPO_TOKEN
@@ -18,11 +17,9 @@ ifdef COVERALLS_REPO_TOKEN
 endif
 
 check-syntax:
-	black --check ./main.py ./apps ./models ./tests
-	flake8 ./*.py ./apps ./models ./tests
+	ruff check ./main.py ./apps ./models ./tests
 	mypy ./*.py ./apps ./models
 
 fix-syntax:
-	black ./main.py ./apps ./models ./tests
-	flake8 ./*.py ./apps ./models ./tests
+	ruff --check --fix ./main.py ./apps ./models ./tests
 	mypy ./*.py ./apps ./models
