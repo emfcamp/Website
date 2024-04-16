@@ -1,39 +1,143 @@
-{% extends "base.html" %}
-{% block title %}Branding{% endblock %}
+{% extends "about/template.html" %}
+{% block title %}Style Guide{% endblock %}
 {% block body %}
-<h2>Name</h2>
 
+<h2>Introduction</h2>
+<p>This style guide is primarily intended for EMF teams making "official" content for the event.
+Due to the nature of EMF, it's difficult to draw a crisp line between official and unofficial, and
+we usually don't mind attendees playing with aspects of our style as long as it doesn't mislead
+people.</p>
+
+<p>We ask that you <strong>do not sell items with our branding on</strong> without asking us first,
+and if you're unsure, please <a href="{{url_for('base.contact')}}">get in touch</a>.</p>
+
+<h2>Name</h2>
 <p>The name of the event is <strong>Electromagnetic Field</strong>, which should always be
-written out in full initially, where possible. It should be abbreviated to <strong>EMF</strong> or
-<strong>EMF{{ event_year }}</strong> subsequently.</p>
+written out in full initially, where possible. It can be abbreviated to <strong>EMF</strong> or
+<strong>EMF{{ event_year }}</strong> subsequently, as repeating "Electromagnetic Field" a lot can
+become cumbersome to read.</p>
 
 <p>The abbreviations <strong>EMF Camp</strong> or <strong>EMFCamp</strong> should never be
-used in text when referring to the event. The abbreviation <strong>emfcamp</strong> may be
-used only in social media usernames and similar situations, where <strong>EMF</strong> is
-unavailable.</p>
+used in text when referring to the event. They may be used only in social media usernames and
+similar situations, but only where <strong>EMF</strong> is unavailable.</p>
 
-<h2>Logo</h2>
+<h2>Written style</h2>
+<p>We try to keep a consistent style when communicating to attendees - check out the
+<a href="https://blog.emfcamp.org">blog</a> for some examples of this.</p>
 
-<p>Please take a look at our <a href="{{url_for('static', filename='images/branding-2016/brand-guidelines.pdf')}}">
-    Brand Guidelines</a> before choosing which logo to use.</p>
+<p>Our style is friendly, inclusive, enthusiastic, and clear. We're a community event, not a
+faceless corporation, so avoid sounding "corporate" and remember that everyone at EMF is responsible
+for making the event happen. Don't use the passive voice and be honest when things go wrong.</p>
 
-<h3>Primary Logo</h3>
+<p>We try not to be too serious, but avoid shitposting and in-jokes on our main communication
+channels - it's alienating to people who might be new to our community. Team accounts on social
+media have more leeway here.</p>
+
+<h2>Typography</h2>
+<p>Our primary typeface is <a href="https://www.theleagueofmoveabletype.com/raleway">Raleway</a>
+which is available under an open license. Specifically we use:</p>
 <ul>
-    <li><a href="{{url_for('static', filename='images/branding-2016/logo.pdf')}}">Vector (PDF)</a></li>
-    <li><a href="{{url_for('static', filename='images/branding-2016/logo.dxf')}}">Vector (DXF)</a></li>
-    <li><a href="{{url_for('static', filename='images/branding-2016/logo.png')}}">Logo (PNG)</a></li>
-    <li><a href="{{url_for('static', filename='images/branding-2016/logo-onbackground.jpg')}}">Logo on image background (JPG)</a></li>
-    <li><a href="{{url_for('static', filename='images/branding-2016/logo-white.png')}}">Logo on white background (PNG)</a></li>
+    <li>Raleway Regular (400 weight) for printed body content and the logo text.</li>
+    <li>Raleway Semi-Bold (600 weight) for headings and the year in the logo.</li>
 </ul>
-<h3>Logomark</h3>
-<ul>
-    <li><a href="{{url_for('static', filename='images/branding-2016/logo-mark.png')}}">Logomark (PNG)</a></li>
-    <li><a href="{{url_for('static', filename='images/branding-2016/logo-mark-white.png')}}">Logomark on white background (PNG)</a></li>
-</ul>
-<h3>Round logo (for stickers etc)</h3>
-<ul>
-    <li><a href="{{url_for('static', filename='images/branding-2016/logo-round.png')}}">Round Logo (PNG)</a></li>
-    <li><a href="{{url_for('static', filename='images/branding-2016/logo-round-white.png')}}">Round Logo on white background (PNG)</a></li>
-</ul>
+<p>Avoid using other weights unless it's necessary for clarity or to distinguish between different
+    levels of headings.</p>
 
+<h3>Sizes</h3>
+<p>Unless really necessary, use font size 12pt as a minimum for documents that are printed to be
+held and read, such as booklets, pamphlets, cards, and so on. Make sure you think about the viewing
+distance for other objects. If in doubt, go large and clear.</p>
+
+<h2>EMF 2024 style</h2>
+
+<p>For general inspiration, please check out the <a href="{{url_for('static', filename='2024/theme-guide.pdf')}}">theme guide</a>.</p>
+
+<h3>Colour scheme</h3>
+<table class="table">
+    <thead>
+        <tr><th></th></td><th>Name</th><th>Hex</th><th>RGB</th><th>CMYK</th><th>RAL</th></tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="background-color: #AFC944"></td>
+            <td>Pale Green</td>
+            <td>#AFC944</td>
+            <td>175, 201, 68</td>
+            <td>13, 0, 66, 21</td>
+            <td>120 80 60</td>
+        </tr>
+        <tr>
+            <td style="background-color: #528329"></td>
+            <td>Mid Green</td>
+            <td>#528329</td>
+            <td>82, 131, 41</td>
+            <td>37, 0, 69, 49</td>
+            <td>6018</td>    
+        </tr>
+        <tr>
+            <td style="background-color: #213018"></td>
+            <td>Dark Green</td>
+            <td>#213018</td>
+            <td>33, 48, 24</td>
+            <td>31, 0, 50, 81</td>
+            <td>6009</td>
+        </tr>
+        <tr>
+            <td style="background-color: #F9E200"></td>
+            <td>Yellow</td>
+            <td>#F9E200</td>
+            <td>249, 226, 0</td>
+            <td>0, 9, 100, 2</td>
+            <td>1026</td>
+        </tr>
+        <tr>
+            <td style="background-color: #F77F02"></td>
+            <td>Orange</td>
+            <td>#F77F02</td>
+            <td>246, 127, 2</td>
+            <td>0, 49, 99, 3</td>
+            <td>2007</td>
+        </tr>
+        <tr>
+            <td style="background-color: #F55089"></td>
+            <td>Pink</td>
+            <td>#F55089</td>
+            <td>245, 80, 137</td>
+            <td>0, 67, 44, 4</td>
+            <td>4010</td>
+        </tr>
+        <tr>
+            <td style="background-color: #2EADD9"></td>
+            <td>Blue</td>
+            <td>#2EADD9</td>
+            <td>46, 173, 217</td>
+            <td>79, 20, 0, 15</td>
+            <td>5012</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Logos</h3>
+{% set logo_files = [
+    'emf2024-logo-text-light',
+    'emf2024-logo-text-dark',
+    'emf2024-logo-light',
+    'emf2024-logo-dark',
+]%}
+
+{% for logo in logo_files %}
+    {% set url = url_for('static', filename='images/brand/2024/' ~ logo) %}
+    <div class="col-md-6">
+    <img src="{{url ~ '.svg'}}" style="max-width: 100%; max-height: 200px; background-color: #aaa;">
+    <p><a href="{{url ~ '.svg'}}" target="_blank">svg</a> | <a href="{{url ~ '.png'}}" target="_blank">png</a></p>
+    </div>
+{% endfor %}
+
+<h2>Credits and history</h2>
+
+<p>The EMF logo and style was <a href="https://archive.org/details/emfcamp-2012-logo-brand">originally
+designed in 2012</a> by Stavros Georgakopoulos.
+Updated and maintained 2014-2018 by <a href="https://jakepink.uk/">Jake Howe</a>, and 2020-present
+by Morag Hickman, Evelyn Greeves, and the rest of the EMF design team.
+</p>
 {% endblock %}

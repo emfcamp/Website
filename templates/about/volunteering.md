@@ -1,8 +1,7 @@
 title: Volunteering at EMF
-show_nav: false
 ---
 # Volunteering at EMF
-EMF is a non-profit event, entirely organised by volunteers. Nobody is paid to work on EMF, and everyone who attends (with very few exceptions[*](#footnote)) pays for their own ticket. This includes the core organisers.
+EMF is a non-profit event, entirely organised by volunteers. Nobody is paid to work on EMF, and everyone who volunteers pays for their own ticket. This includes the core organisers.
 
 We’d like everyone to consider volunteering to help the event run smoothly, even if it is only for an hour or two.
 
@@ -27,7 +26,7 @@ Closer to the event, you’ll be able to log in to the volunteer system which al
 ## Setup & teardown
 
 We’re grateful for help setting up the event, and especially tearing it down.
-If you want to help with either setup or teardown you will need a ticket to EMF and **permission from us to turn up early or stay after the event ends**. We do not allow under-18's on site during setup or teardown without explicit permission.
+If you want to help with either setup or teardown you will need a ticket to EMF and **permission from us to turn up early or stay after the event ends**. We do not allow under-18s on site during setup or teardown without explicit permission.
 
 During setup and teardown, EMF is a construction site and we are liable for your safety. If you don’t follow instructions we will be forced to remove you from site, for everyone's safety.
 
@@ -38,6 +37,3 @@ If you’re on site for setup/teardown you have to help with everything - not ju
   <p>To be notified when we start looking for help with setup & teardown please subscribe to the volunteering mailing list:</p>
   {{ contact_form("volunteer") }}
 </div>
-
-<br>
-<small id="footnote">* We provide free tickets for qualified First Aid staff who must work a minimum of three eight-hour shifts during the event.</small>
