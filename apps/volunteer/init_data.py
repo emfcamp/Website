@@ -71,9 +71,22 @@ role_list = [
         "full_description_md": """
 Introducing talks, and making any announcements that are needed between talks.
 
-You'll be introducing speakers, and checking the wiki to make sure any announcements that need to happen are made between talks. If you have any talks you'd particularly like to see you can volunteer for a shift on the appropriate stage.
+You'll be helping speakers get ready, introducing them on stage and checking to make sure any announcements that need to happen are made between talks. If you have any talks you'd particularly like to see you can volunteer for a shift on the appropriate stage.
 
-If you've never walked on stage before, then don't be put off. In fact many of us would identify as introverts. Personal growth is all about pushing yourself to do things that might be at the edge of your comfort zone so do challenge yourself and we'll help make sure you are comfortable in the team and role.
+If you've never walked on stage before then don't be put off; we'll be running some training to walk through the role and make sure everyone is comfortable. In fact many of us would identify as introverts.
+            """,
+    },
+    {
+        "name": "Content Team",
+        "description": "Member of Content at the Green Room",
+        "role_notes": "Content Team only",
+        "requires_training": True,
+        "full_description_md": """
+This is an internal role for the Content Team to schedule the folks who will be in the Green Room helping manage the schedule.
+
+It requires access to the backend of the CfP, and training on how to use it. 
+
+If you're interested in helping us out next year, please shoot us an email at content@emfcamp.org!
             """,
     },
     {
@@ -178,12 +191,12 @@ On the first day this role involves checking tickets and welcoming people to the
     # """,
     #         },
     {
-        "name": "Green Room",
+        "name": "Green Room Runner",
         "description": "Make sure speakers get where they need to be with what they need.",
         "full_description_md": """
 Make sure speakers get where they need to be with what they need.
 
-You’ll be based in the Green Room, where you’ll greet speakers as they come in, and then make sure they get to the right stage before they’re meant to be there.
+You’ll be based in the Green Room where you’ll greet speakers and get them ready to go on stage. You'll also help out the Content Team with any adhoc tasks that come up. 
             """,
     },
     {
@@ -481,25 +494,47 @@ shift_list = {
             },
         ],
     },
-    "Green Room": {
+    "Green Room Runner": {
         "Green Room": [
             {
-                "first": "2022-06-03 12:00:00",
-                "final": "2022-06-04 00:00:00",
+                "first": "2024-05-31 09:00:00",
+                "final": "2022-05-31 210:00:00",
                 "min": 1,
                 "max": 2,
             },
             {
-                "first": "2022-06-04 10:00:00",
-                "final": "2022-06-05 00:00:00",
+                "first": "2024-06-01 09:00:00",
+                "final": "2022-06-01 21:00:00",
                 "min": 1,
                 "max": 2,
             },
             {
-                "first": "2022-06-05 10:00:00",
-                "final": "2022-06-06 00:00:00",
+                "first": "2024-06-02 09:00:00",
+                "final": "2022-06-02 18:00:00",
                 "min": 1,
                 "max": 2,
+            },
+        ]
+    },
+    "Content Team": {
+      "Green Room": [
+            {
+                "first": "2024-05-31 09:00:00",
+                "final": "2022-05-31 21:00:00",
+                "min": 1,
+                "max": 1,
+            },
+            {
+                "first": "2024-06-01 09:00:00",
+                "final": "2022-06-01 21:00:00",
+                "min": 1,
+                "max": 1,
+            },
+            {
+                "first": "2024-06-02 09:00:00",
+                "final": "2022-06-02 18:00:00",
+                "min": 1,
+                "max": 1,
             },
         ]
     },
@@ -732,60 +767,60 @@ shift_list = {
     "Herald": {
         "Stage A": [
             {
-                "first": "2022-06-03 12:00:00",
-                "final": "2022-06-03 20:00:00",
+                "first": "2024-05-31 09:00:00",
+                "final": "2022-05-31 21:00:00",
                 "min": 1,
                 "max": 1,
             },
             {
-                "first": "2022-06-04 10:00:00",
-                "final": "2022-06-04 20:00:00",
+                "first": "2024-06-01 09:00:00",
+                "final": "2022-06-01 21:00:00",
                 "min": 1,
                 "max": 1,
             },
             {
-                "first": "2022-06-05 10:00:00",
-                "final": "2022-06-05 20:00:00",
+                "first": "2024-06-02 09:00:00",
+                "final": "2022-06-02 18:00:00",
                 "min": 1,
                 "max": 1,
             },
         ],
         "Stage B": [
             {
-                "first": "2022-06-03 12:00:00",
-                "final": "2022-06-03 20:00:00",
+                "first": "2024-05-31 09:00:00",
+                "final": "2022-05-31 21:00:00",
                 "min": 1,
                 "max": 1,
             },
             {
-                "first": "2022-06-04 10:00:00",
-                "final": "2022-06-04 20:00:00",
+                "first": "2024-06-01 09:00:00",
+                "final": "2022-06-01 21:00:00",
                 "min": 1,
                 "max": 1,
             },
             {
-                "first": "2022-06-05 10:00:00",
-                "final": "2022-06-05 20:00:00",
+                "first": "2024-06-02 09:00:00",
+                "final": "2022-06-02 18:00:00",
                 "min": 1,
                 "max": 1,
             },
         ],
         "Stage C": [
             {
-                "first": "2022-06-03 12:00:00",
-                "final": "2022-06-03 20:00:00",
+                "first": "2024-05-31 09:00:00",
+                "final": "2022-05-31 21:00:00",
                 "min": 1,
                 "max": 1,
             },
             {
-                "first": "2022-06-04 10:00:00",
-                "final": "2022-06-04 20:00:00",
+                "first": "2024-06-01 09:00:00",
+                "final": "2022-06-01 21:00:00",
                 "min": 1,
                 "max": 1,
             },
             {
-                "first": "2022-06-05 10:00:00",
-                "final": "2022-06-05 20:00:00",
+                "first": "2024-06-02 09:00:00",
+                "final": "2022-06-02 18:00:00",
                 "min": 1,
                 "max": 1,
             },
