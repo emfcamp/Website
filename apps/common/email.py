@@ -1,5 +1,5 @@
+from css_inline import CSSInliner
 import markdown
-from inlinestyler.utils import inline_css
 from flask import render_template, url_for
 from markupsafe import Markup
 from flask import current_app as app
@@ -98,7 +98,8 @@ def format_trusted_html_email(markdown_text, subject, reason=None, **kwargs):
     if not reason:
         reason = f"You're receiving this email because you have a ticket for Electromagnetic Field {event_year()}."
 
-    return inline_css(
+    inliner = CSSInliner()
+    return inliner.inline(
         render_template(
             "admin/email/email_template.html",
             subject=subject,

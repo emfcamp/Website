@@ -21,7 +21,6 @@ python-levenshtein = "~=0.12"
 simplejson = "*"
 requests = "~=2.29"
 markdown = "~=3.1"
-inlinestyler = "~=0.2"
 flask = "~=2.3"
 flask-caching = "~=2.0"
 python-memcached = "==1.59"
@@ -66,6 +65,7 @@ logging_tree = "^1.9"
 flask-mailman = "^0.3.0"
 python-stdnum = "^1.19"
 playwright = "^1.43.0"
+css-inline = "^0.14.0"
 
 
 [tool.poetry.group.dev.dependencies]
