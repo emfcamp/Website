@@ -2,7 +2,7 @@ title: Live-in Vehicles
 ---
 # Live-in Vehicles
 
-Camper vans, caravans, trailer tents, and roof tents are allowed at EMF in the designated live-in vehicle areas. You must have a live-in vehicle ticket to bring one of these vehicles to EMF - you cannot stay in the main car park area.
+Camper vans, caravans, trailer tents, and car tents are allowed at EMF in the designated live-in vehicle areas. You must have a live-in vehicle ticket to bring one of these vehicles to EMF - you cannot stay in the main car park area.
 
 If your vehicle is an integral part of a village or installation please contact us in advance for permission to park it outside the live-in vehicle areas.
 
