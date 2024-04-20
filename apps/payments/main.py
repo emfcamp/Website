@@ -7,10 +7,10 @@ from wtforms.fields.html5 import IntegerRangeField
 
 from . import payments
 from .common import get_user_payment_or_abort
-from ..common import feature_flag
 from ..common.forms import Form
 from main import db
 from models import RefundRequest
+from models.site_state import get_refund_state
 
 
 @payments.route("/pay/terms")
@@ -86,9 +86,15 @@ def validate_bank_details(form, currency):
 @payments.route("/payment/<int:payment_id>/refund", methods=["GET", "POST"])
 @payments.route("/payment/<int:payment_id>/refund/<currency>", methods=["GET", "POST"])
 @login_required
-@feature_flag("REFUND_REQUESTS")
 def payment_refund_request(payment_id, currency=None):
+    if get_refund_state() == "off":
+        flash(
+            f"Refunds are not currently available. If you need further help please email {app.config['TICKETS_EMAIL'][1]}"
+        )
+        return redirect(url_for("users.purchases"))
+
     payment = get_user_payment_or_abort(payment_id, valid_states=["paid"])
+
     if currency is None:
         currency = payment.currency
 
