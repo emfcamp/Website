@@ -28,4 +28,28 @@
 
 {{ render_ticket_table(payment.purchases) }}
 
+
+<form method="POST" action="{{ url_for('.payment', payment_id=payment.id) }}" class="form-horizontal" role="form">
+
+{{ form.hidden_tag() }}
+
+{% for purchase in form.purchases %}
+  {{ purchase.hidden_tag() }}
+  <div class="col-sm-11 col-sm-offset-1">
+    <label class="checkbox">
+      {{ purchase.refund(disabled=purchase._disabled) }} {{ purchase.refund.label.text }} ({{ purchase._purchase.price_tier.get_price(payment.currency) | price(payment.currency) }})
+    </label>
+    {% for error in purchase.refund.errors %}
+    <div class="help-block">{{ error }}</div>
+    {% endfor %}
+  </div>
+{% endfor %}
+
+{{ form.refund(class_="btn btn-danger pull-right") }}
+{% if payment.provider == 'stripe' %}
+{{ form.stripe_refund(class_="btn btn-warning pull-right") }}
+{% endif %}
+
+</form>
+
 {% endblock %}

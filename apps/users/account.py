@@ -11,12 +11,12 @@ from flask_login import login_required, current_user
 from wtforms import StringField, SubmitField, BooleanField
 from wtforms.validators import DataRequired
 
-from main import db
+from main import db, stripe
 from models.purchase import Purchase
 from models.payment import Payment
 from models.site_state import get_site_state
 
-from ..common.forms import DiversityForm
+from ..common.forms import DiversityForm, RefundForm, RefundFormException
 
 from . import users
 
@@ -120,7 +120,7 @@ def purchases():
     )
 
 
-@users.route("/account/payment/<int:payment_id>")
+@users.route("/account/payment/<int:payment_id>", methods=["GET", "POST"])
 @login_required
 def payment(payment_id: int):
     payment = Payment.query.get_or_404(payment_id)
@@ -128,7 +128,44 @@ def payment(payment_id: int):
     if current_user != payment.user:
         abort(404)
 
-    return render_template("account/payment.html", payment=payment)
+    if not payment.is_refundable:
+        app.logger.warning(
+            "Cannot refund payment %s is %s, not in valid state",
+            payment_id,
+            payment.state,
+        )
+        flash("Payment is not currently refundable")
+        return redirect(url_for(".account"))
+
+    form = RefundForm(request.form)
+
+    form.intialise_with_payment(payment, set_purchase_ids=(request.method != "POST"))
+
+    if form.validate_on_submit():
+        if form.refund.data or form.stripe_refund.data:
+            try:
+                total_refunded = form.process_refund(payment, db, app.logger, stripe)
+            except RefundFormException as e:
+                flash(e)
+                return redirect(url_for(".account"))
+
+            app.logger.info(
+                "Payment %s refund complete for a total of %s",
+                payment.id,
+                total_refunded,
+            )
+            flash("Refund for %s %s complete" % (total_refunded, payment.currency))
+
+        return redirect(url_for(".account"))
+
+    refunded_purchases = [p for p in payment.purchases if p.state == "refunded"]
+
+    return render_template(
+        "account/payment.html",
+        payment=payment,
+        refunded_purchases=refunded_purchases,
+        form=form,
+    )
 
 
 @users.route("/account/cancellation-refund")
