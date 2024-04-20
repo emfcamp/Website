@@ -57,6 +57,7 @@ class Purchase(BaseModel):
     # Financial FKs
     payment_id = db.Column(db.Integer, db.ForeignKey("payment.id"))
     refund_id = db.Column(db.Integer, db.ForeignKey("refund.id"))
+    refund_request_id = db.Column(db.Integer, db.ForeignKey("refund_request.id"))
 
     # History
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)

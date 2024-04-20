@@ -3,6 +3,7 @@ import re
 from decimal import Decimal
 from datetime import datetime, timedelta
 from typing import Iterable, Optional
+
 from sqlalchemy import event, func, column
 from sqlalchemy.orm import Session, aliased
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -622,6 +623,10 @@ class RefundRequest(BaseModel):
     iban = db.Column(db.String)
     payee_name = db.Column(db.String)
     note = db.Column(db.String)
+
+    purchases = db.relationship(
+        "Purchase", backref=db.backref("refund_request", cascade="all")
+    )
 
     @property
     def method(self):
