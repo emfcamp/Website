@@ -149,7 +149,6 @@ class Payment(BaseModel):
 
         return data
 
-    @property
     def is_refundable(self, override_refund_state_machine=False) -> bool:
         return self.state in [
             "charged",
