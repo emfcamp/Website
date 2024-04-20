@@ -112,6 +112,17 @@ class Purchase(BaseModel):
     def is_transferable(self):
         return self.product.get_attribute("is_transferable")
 
+    def is_refundable(self, override_refund_state_machine=False) -> bool:
+        return (
+            (self.is_paid_for is True)
+            and not self.is_transferred
+            and self.payment.is_refundable(override_refund_state_machine)
+        )
+
+    @property
+    def is_transferred(self) -> bool:
+        return self.owner_id != self.purchaser_id
+
     @validates("ticket_issued")
     def validate_ticket_issued(self, _key, issued):
         if not self.is_paid_for:
@@ -222,8 +233,20 @@ class AdmissionTicket(Ticket):
     __mapper_args__ = {"polymorphic_identity": "admission_ticket"}
 
     @property
-    def is_transferable(self):
+    def is_transferable(self) -> bool:
         return self.product.get_attribute("is_transferable") and not self.checked_in
+
+    @property
+    def is_refundable(self, override_refund_state_machine=False) -> bool:
+        return (
+            not self.checked_in
+            and not self.is_transferred
+            and self.payment.is_refundable(override_refund_state_machine)
+        )
+
+    @property
+    def is_transferred(self) -> bool:
+        return self.owner_id != self.purchaser_id
 
     def check_in(self):
         if self.is_paid_for is False:

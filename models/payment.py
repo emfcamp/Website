@@ -21,6 +21,7 @@ from . import (
 )
 from .purchase import Ticket
 from .product import Voucher
+from .site_state import get_refund_state
 
 safechars = "2346789BCDFGHJKMPQRTVWXY"
 
@@ -146,6 +147,16 @@ class Payment(BaseModel):
         )
 
         return data
+
+    @property
+    def is_refundable(self, override_refund_state_machine=False) -> bool:
+        return self.state in [
+            "charged",
+            "paid",
+            "refunding",
+            "partrefunded",
+            "refund-requested",
+        ] and (get_refund_state() != "off" or override_refund_state_machine)
 
     @property
     def amount(self):
