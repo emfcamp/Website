@@ -20,6 +20,9 @@ class SiteState(BaseModel):
         self.name = name
         self.state = state
 
+    def __repr__(self):
+        return f"<{self.__class__.__name__} {self.name}={self.state}>"
+
 
 VALID_STATES = {
     "site_state": [
@@ -31,6 +34,7 @@ VALID_STATES = {
         "cancelled-time-machine",
     ],
     "sales_state": ["sold-out", "sales-ended", "unavailable", "available"],
+    "refund_state": ["on", "off", "illness", "cancellation"],
 }
 
 
@@ -81,6 +85,9 @@ def get_states() -> dict[str, str]:
     if states.get("sales_state") is None:
         states["sales_state"] = calc_sales_state(date)
 
+    if states.get("refund_state") is None:
+        states["refund_state"] = "off"
+
     return states
 
 
@@ -97,3 +104,8 @@ def get_site_state():
 def get_sales_state():
     states = get_states()
     return states["sales_state"]
+
+
+def get_refund_state():
+    states = get_states()
+    return states["refund_state"]
