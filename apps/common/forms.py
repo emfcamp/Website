@@ -3,10 +3,15 @@ from typing import Pattern
 
 from flask import current_app as app
 from flask_wtf import FlaskForm
-from wtforms import SelectField
+
+from wtforms import SelectField, BooleanField
+from wtforms.validators import InputRequired
 
 from models.user import UserDiversity
 from models.cfp_tag import DEFAULT_TAGS, Tag
+from models.purchase import AdmissionTicket
+
+from .fields import HiddenIntegerField
 
 
 class Form(FlaskForm):
@@ -138,3 +143,38 @@ class DiversityForm(Form):
             else:
                 seen.add(field.data)
         return result
+
+
+class RefundPurchaseForm(Form):
+    purchase_id = HiddenIntegerField("Purchase ID", [InputRequired()])
+    refund = BooleanField("Refund purchase", default=True)
+
+
+def update_refund_purchase_form_details(
+    f, purchase, override_refund_state_machine=False
+):
+    f._purchase = purchase
+    f.refund.label.text = "%s - %s" % (
+        f._purchase.id,
+        f._purchase.product.display_name,
+    )
+
+    f.refund.data = False
+
+    if purchase.is_refundable(override_refund_state_machine):
+        f._disabled = False
+
+    else:
+        f._disabled = True
+
+        if type(purchase) is AdmissionTicket and purchase.checked_in:
+            f.refund.label.text += " (checked in)"
+
+        elif purchase.state == "refunded":
+            f.refund.label.text += " (refunded)"
+
+        elif purchase.state == "refund-pending":
+            f.refund.label.text += " (refunded requested)"
+
+        elif purchase.is_transferred:
+            f.refund.label.text += " (transferred)"

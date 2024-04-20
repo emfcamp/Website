@@ -17,7 +17,8 @@ PURCHASE_STATES = {
     "admin-reserved": ["payment-pending", "paid", "cancelled"],
     "payment-pending": ["paid", "cancelled"],
     "cancelled": [],
-    "paid": ["refunded", "cancelled"],
+    "paid": ["refunded", "cancelled", "refund-pending"],
+    "refund-pending": ["paid", "refunded", "cancelled"],
     "refunded": [],
 }
 
@@ -237,17 +238,10 @@ class AdmissionTicket(Ticket):
     def is_transferable(self) -> bool:
         return self.product.get_attribute("is_transferable") and not self.checked_in
 
-    @property
     def is_refundable(self, override_refund_state_machine=False) -> bool:
         return (
-            not self.checked_in
-            and not self.is_transferred
-            and self.payment.is_refundable(override_refund_state_machine)
+            super().is_refundable(override_refund_state_machine) and not self.checked_in
         )
-
-    @property
-    def is_transferred(self) -> bool:
-        return self.owner_id != self.purchaser_id
 
     def check_in(self):
         if self.is_paid_for is False:

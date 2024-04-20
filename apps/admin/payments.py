@@ -15,8 +15,7 @@ from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from flask_mailman import EmailMessage
 
-from wtforms.validators import InputRequired
-from wtforms import SubmitField, BooleanField, FieldList, FormField
+from wtforms import SubmitField, FieldList, FormField
 
 from sqlalchemy.sql.functions import func
 
@@ -29,10 +28,9 @@ from models.payment import (
     StripeRefund,
     StateException,
 )
-from models.purchase import AdmissionTicket, Purchase
+from models.purchase import Purchase
 from ..common.email import from_email
-from ..common.forms import Form
-from ..common.fields import HiddenIntegerField
+from ..common.forms import Form, RefundPurchaseForm, update_refund_purchase_form_details
 from ..payments.stripe import (
     StripeUpdateUnexpected,
     StripeUpdateConflict,
@@ -351,11 +349,6 @@ def manual_refund(payment_id):
     )
 
 
-class RefundPurchaseForm(Form):
-    purchase_id = HiddenIntegerField("Purchase ID", [InputRequired()])
-    refund = BooleanField("Refund purchase", default=True)
-
-
 class RefundForm(Form):
     purchases = FieldList(FormField(RefundPurchaseForm))
     refund = SubmitField("I have refunded these purchases by bank transfer")
@@ -391,41 +384,17 @@ def refund(payment_id):
 
     purchases_dict = {p.id: p for p in payment.purchases}
 
-    for f in form.purchases:
-        f._purchase = purchases_dict[f.purchase_id.data]
-        f.refund.label.text = "%s - %s" % (
-            f._purchase.id,
-            f._purchase.product.display_name,
-        )
-
-        if (
-            f._purchase.refund_id is None
-            and f._purchase.is_paid_for
-            and f._purchase.owner == payment.user
-        ):
-            # Purchase is owned by the user and not already refunded
-            f._disabled = False
-
-            if type(f._purchase) == AdmissionTicket and f._purchase.checked_in:
-                f.refund.data = False
-                f.refund.label.text += " (checked in)"
-        elif f._purchase.refund_id is not None:
-            f._disabled = True
-            f.refund.data = False
-            f.refund.label.text += " (refunded)"
-        else:
-            f._disabled = True
-            f.refund.data = False
-            f.refund.label.text += " (transferred)"
-
     if form.validate_on_submit():
         if form.refund.data or form.stripe_refund.data:
 
             payment.lock()
 
             purchases = [
-                f._purchase for f in form.purchases if f.refund.data and not f._disabled
+                purchases_dict[f.purchase_id.data]
+                for f in form.purchases
+                if f.refund.data and purchases_dict[f.purchase_id.data].is_refundable
             ]
+
             total = sum(
                 p.price_tier.get_price(payment.currency).value for p in purchases
             )
@@ -545,6 +514,9 @@ def refund(payment_id):
             flash("Refund for %s %s complete" % (total, payment.currency))
 
         return redirect(url_for(".requested_refunds"))
+
+    for f in form.purchases:
+        update_refund_purchase_form_details(f, purchases_dict[f.purchase_id.data])
 
     refunded_purchases = [p for p in payment.purchases if p.state == "refunded"]
     return render_template(
