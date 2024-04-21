@@ -150,9 +150,7 @@ class RefundPurchaseForm(Form):
     refund = BooleanField("Refund purchase", default=True)
 
 
-def update_refund_purchase_form_details(
-    f, purchase, override_refund_state_machine=False
-):
+def update_refund_purchase_form_details(f, purchase, ignore_event_refund_state=False):
     f._purchase = purchase
     f.refund.label.text = "%s - %s" % (
         f._purchase.id,
@@ -161,7 +159,7 @@ def update_refund_purchase_form_details(
 
     f.refund.data = False
 
-    if purchase.is_refundable(override_refund_state_machine):
+    if purchase.is_refundable(ignore_event_refund_state):
         f._disabled = False
 
     else:

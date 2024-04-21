@@ -114,11 +114,11 @@ class Purchase(BaseModel):
     def is_transferable(self):
         return self.product.get_attribute("is_transferable")
 
-    def is_refundable(self, override_refund_state_machine=False) -> bool:
+    def is_refundable(self, ignore_event_refund_state=False) -> bool:
         return (
             (self.is_paid_for is True)
             and not self.is_transferred
-            and self.payment.is_refundable(override_refund_state_machine)
+            and self.payment.is_refundable(ignore_event_refund_state)
         )
 
     @property
@@ -238,10 +238,8 @@ class AdmissionTicket(Ticket):
     def is_transferable(self) -> bool:
         return self.product.get_attribute("is_transferable") and not self.checked_in
 
-    def is_refundable(self, override_refund_state_machine=False) -> bool:
-        return (
-            super().is_refundable(override_refund_state_machine) and not self.checked_in
-        )
+    def is_refundable(self, ignore_event_refund_state=False) -> bool:
+        return super().is_refundable(ignore_event_refund_state) and not self.checked_in
 
     def check_in(self):
         if self.is_paid_for is False:

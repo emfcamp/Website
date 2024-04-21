@@ -149,14 +149,14 @@ class Payment(BaseModel):
 
         return data
 
-    def is_refundable(self, override_refund_state_machine=False) -> bool:
+    def is_refundable(self, ignore_event_refund_state=False) -> bool:
         return self.state in [
             "charged",
             "paid",
             "refunding",
             "partrefunded",
             "refund-requested",
-        ] and (get_refund_state() != "off" or override_refund_state_machine)
+        ] and (get_refund_state() != "off" or ignore_event_refund_state)
 
     @property
     def amount(self):
