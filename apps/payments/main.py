@@ -27,7 +27,10 @@ def terms():
 
 def required_for(currency=None, providers=None):
     def validate(form, field):
-        if form._total_amount == form.donation_amount.data:
+        if (
+            form.donation_amount.data
+            and form._total_amount == form.donation_amount.data
+        ):
             return
         if providers is not None and form._provider not in providers:
             return
@@ -103,7 +106,9 @@ def payment_refund_request(payment_id, currency=None):
         )
         return redirect(url_for("users.purchases"))
 
-    payment = get_user_payment_or_abort(payment_id, valid_states=["paid"])
+    payment = get_user_payment_or_abort(
+        payment_id, valid_states=["paid", "partrefunded"]
+    )
 
     if not payment.is_refundable or not any(
         [t.is_refundable for t in payment.purchases]
@@ -179,6 +184,15 @@ def payment_refund_request(payment_id, currency=None):
 
     for f in form.purchases:
         update_refund_purchase_form_details(f, purchases_dict[f.purchase_id.data])
+
+    if get_refund_state() == "cancellation":
+        return render_template(
+            "payments/event-cancelled-refund-request.html",
+            payment=payment,
+            form=form,
+            currency=currency,
+            bank_validation_failed=bank_validation_failed,
+        )
 
     return render_template(
         "payments/refund-request.html",

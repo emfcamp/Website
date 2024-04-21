@@ -30,7 +30,7 @@
           <a href="{{ url_for('payments.stripe_cancel', payment_id=p.id) }}" class="btn btn-warning">Cancel</a>
           {% endif -%}
 
-          {% if REFUND_STATE != "off" and p.state == "paid" %}
+          {% if REFUND_STATE != "off" and p.state in ["paid", "partrefunded"] %}
           <a href="{{ url_for('payments.payment_refund_request', payment_id=p.id) }}" class="btn btn-default">Request refund</a>
           {% endif %}
 

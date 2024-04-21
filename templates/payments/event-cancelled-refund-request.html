@@ -12,31 +12,18 @@
 <p>If you have any questions,
    please <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}?subject=Refund Query (WEB-{{payment.id}})">drop us an email</a>.</p>
 
-<p>We cannot refund tickets you have transferred to others or checked in. If you have transferred tickets please request them back
-   and we can then refund them.</p>
-
-{% if REFUND_STATE=="illness" %}
-  <p>We are currently only issuing refunds in case of illness.</p>
-{% endif %}
-
 <div class="well">
 <form method="post" action="{{ url_for('.payment_refund_request', payment_id=payment.id, currency=currency) }}">
 {{ form.hidden_tag() }}
-
-
-  <p>Please select any and all purchases you would like to receive a refund for.</p>
-
-  {% for f in form.purchases %}
-    <div class="emf-row" style="padding-left:20px">
-      {{ f.hidden_tag() }} {# Set the purchase ID #}
-      <label class="checkbox">
-        {{ f.refund(disabled=f._disabled) }} {{ f.refund.label.text }} ({{ f._purchase.price_tier.get_price(payment.currency) | price(payment.currency) }})
-      </label>
-      {% for error in f.refund.errors %}
-      <div class="help-block">{{ error }}</div>
-      {% endfor %}
-    </div>
-  {% endfor %}
+  <fieldset>
+    <legend>Donation</legend>
+    <p>If you want, you can donate some of your payment to help us recoup our losses for this year
+        and fund our next event. This is completely optional &mdash; we have enough money in the bank
+        to survive until 2022.</p>
+    {{ render_field(form.donation_amount, min=0, max=payment.amount, value=0,
+          donation_range_payment=payment, donation_range_currency=CURRENCY_SYMBOLS[currency]) 
+    }}
+  </fieldset>
 
   {% if payment.provider == 'banktransfer' %}
     <fieldset id="bank-details">
@@ -59,7 +46,11 @@
     <p id="bank-details">Your payment will be refunded back to your card within three weeks.</p>
   {% endif %}
 
-
+  {#
+  {% call render_field(form.note) %}
+  If you only want part of your payment refunded, please say here.
+  {% endcall %}
+  #}
 {{ form.submit(class_="btn btn-danger debounce") }}
 </form>
 </div>
