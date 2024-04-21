@@ -110,8 +110,8 @@ def payment_refund_request(payment_id, currency=None):
         payment_id, valid_states=["paid", "partrefunded"]
     )
 
-    if not payment.is_refundable or not any(
-        [t.is_refundable for t in payment.purchases]
+    if not payment.is_refundable() or not any(
+        [t.is_refundable() for t in payment.purchases]
     ):
         flash(
             """Payment cannot be refunded. It is either in an unpaid state or
@@ -159,7 +159,7 @@ def payment_refund_request(payment_id, currency=None):
             purchases = [
                 purchases_dict[f.purchase_id.data]
                 for f in form.purchases
-                if purchases_dict[f.purchase_id.data].is_refundable and f.refund.data
+                if purchases_dict[f.purchase_id.data].is_refundable() and f.refund.data
             ]
             req = RefundRequest(
                 payment=payment,
