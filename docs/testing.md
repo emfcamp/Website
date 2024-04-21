@@ -33,8 +33,8 @@ If you want to test specific modes please check [their documentation](https://st
 1. Get an [ngrok.com](https://ngrok.com) account
 2. install the ngrok client (`brew install ngrok/ngrok/ngrok`)
 3. `ngrok ngrok config add-authtoken <some token>` (the ngrok dashboard should show the token)
-4. `ngrok http http://localhost:2342` this should show the ngrok forwarding domain for you (something like https://d5a7-329-22-333-28.ngrok-free.app)
-5. `stripe webhook_endpoints create --url https://d5f7-149-22-218-28.ngrok-free.app/stripe-webhook --api-version 2020-08-27 --enabled-events '*'`
+4. `ngrok http http://localhost:2342` this should show the ngrok forwarding domain for you (something like https://ffff-111-22-333-44.ngrok-free.invalid)
+5. `stripe webhook_endpoints create --url https://ffff-111-22-333-44.ngrok-free.invalid/stripe-webhook --api-version 2020-08-27 --enabled-events '*'`
 
 #### If the stripe api version is latest
 
