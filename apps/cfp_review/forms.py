@@ -245,6 +245,8 @@ class UpdateLightningTalkForm(UpdateProposalForm):
 
 class UpdateWorkshopForm(UpdateProposalForm):
     attendees = StringField("Attendees", [DataRequired()])
+    tickets = IntegerField("Total tickets")
+    non_lottery_tickets = IntegerField("Non lottery tickets")
     cost = StringField("Cost per attendee")
     participant_equipment = StringField("Attendee equipment")
     age_range = StringField("Age range")
@@ -255,6 +257,14 @@ class UpdateWorkshopForm(UpdateProposalForm):
     def update_proposal(self, proposal):
         if self.attendees.raw_data:
             proposal.attendees = self.attendees.data
+        if self.tickets.data:
+            proposal.total_tickets = self.tickets.data
+            proposal.non_lottery_tickets = self.non_lottery_tickets.data
+            proposal.requires_ticket = True
+        else:
+            proposal.total_tickets = 0
+            proposal.non_lottery_tickets = 0
+            proposal.requires_ticket = False
         if self.cost.raw_data:
             proposal.cost = self.cost.data
         if self.participant_equipment.raw_data:
@@ -274,6 +284,8 @@ class UpdateWorkshopForm(UpdateProposalForm):
 
 class UpdateYouthWorkshopForm(UpdateProposalForm):
     attendees = StringField("Attendees", [DataRequired()])
+    tickets = IntegerField("Total tickets")
+    non_lottery_tickets = IntegerField("Non lottery tickets")
     cost = StringField("Cost per attendee")
     participant_equipment = StringField("Attendee equipment")
     age_range = StringField("Age range")
@@ -285,6 +297,14 @@ class UpdateYouthWorkshopForm(UpdateProposalForm):
     def update_proposal(self, proposal):
         if self.attendees.raw_data:
             proposal.attendees = self.attendees.data
+        if self.tickets.data:
+            proposal.total_tickets = self.tickets.data
+            proposal.non_lottery_tickets = self.non_lottery_tickets.data
+            proposal.requires_ticket = True
+        else:
+            proposal.total_tickets = 0
+            proposal.non_lottery_tickets = 0
+            proposal.requires_ticket = False
         if self.cost.raw_data:
             proposal.cost = self.cost.data
         if self.participant_equipment.raw_data:

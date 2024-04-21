@@ -248,6 +248,8 @@ class User(BaseModel, UserMixin):
         lazy="dynamic",
     )
 
+    event_tickets = db.relationship("EventTicket", backref="user", lazy="dynamic")
+
     purchases = db.relationship(
         "Purchase", lazy="dynamic", primaryjoin="Purchase.purchaser_id == User.id"
     )
