@@ -48,15 +48,11 @@ class WebPushTarget(BaseModel):
 class PushNotificationJob(BaseModel):
     __table_name__ = "web_push_notification_job"
     id: int = db.Column(db.Integer, primary_key=True)
-    target_id: int = db.Column(
-        db.Integer, db.ForeignKey("web_push_target.id"), nullable=False
-    )
+    target_id: int = db.Column(db.Integer, db.ForeignKey("web_push_target.id"), nullable=False)
     created: datetime = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    state: Literal["queued", "delivered", "failed"] = db.Column(
-        db.String, default="queued", nullable=False
-    )
+    state: Literal["queued", "delivered", "failed"] = db.Column(db.String, default="queued", nullable=False)
     not_before: datetime | None = db.Column(db.DateTime, nullable=True)
-    related_to: str | None = db.Column(db.String, nullable=True)
+    related_to: str | None = db.Column(db.String, nullable=True, unique=True)
     title: str = db.Column(db.String, nullable=False)
     body: str | None = db.Column(db.String, nullable=True)
     error: str | None = db.Column(db.String, nullable=True)
