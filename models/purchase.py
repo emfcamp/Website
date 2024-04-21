@@ -11,9 +11,10 @@ from . import BaseModel, Currency
 # but only `admission_ticket` allows access to the site.
 PRODUCT_TYPES = ["admission_ticket", "ticket", "merchandise"]
 
-# state: [allowed next state, ] pairs, see docs/ticket_states.md
+# state: [allowed next state, ] pairs
 PURCHASE_STATES = {
     "reserved": ["payment-pending", "paid", "cancelled"],
+    "admin-reserved": ["payment-pending", "paid", "cancelled"],
     "payment-pending": ["paid", "cancelled"],
     "cancelled": [],
     "paid": ["refunded", "cancelled"],
@@ -159,7 +160,7 @@ class Purchase(BaseModel):
         if self.state == "cancelled":
             raise PurchaseStateException("{} is already cancelled".format(self))
 
-        if self.state in ["reserved", "payment-pending", "paid"]:
+        if self.state in ["reserved", "admin-reserved", "payment-pending", "paid"]:
             self.price_tier.return_instances(1)
 
         self.set_state("cancelled")
@@ -168,7 +169,7 @@ class Purchase(BaseModel):
         if self.state == "refunded":
             raise PurchaseStateException("{} is already refunded".format(self))
 
-        if self.state in ["reserved", "payment-pending", "paid"]:
+        if self.state in ["reserved", "admin-reserved", "payment-pending", "paid"]:
             self.price_tier.return_instances(1)
 
         self.state = "refunded"

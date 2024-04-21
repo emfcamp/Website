@@ -270,6 +270,18 @@ def expire_reserved():
         app.logger.info("Cancelling purchase %s", purchase.id)
         purchase.cancel()
 
+    # Purchases reserved by admins
+    admin_reservation_grace_period = timedelta(days=3)
+
+    purchases = Purchase.query.filter(
+        Purchase.state == "admin-reserved",
+        Purchase.modified < datetime.utcnow() - admin_reservation_grace_period,
+        Purchase.payment_id.is_(None),
+    )
+    for purchase in purchases:
+        app.logger.info("Cancelling purchase %s", purchase.id)
+        purchase.cancel()
+
     db.session.commit()
 
 

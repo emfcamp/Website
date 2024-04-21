@@ -194,13 +194,15 @@ def test_create_purchases(db, parent_group, user):
 def test_purchase_state_machine():
     states_dict = PURCHASE_STATES
 
-    # 'reserved' is the start state, all other states must
-    # exist as the next_state of some state.
+    # 'reserved' and 'admin-reserved' are the start states,
+    # all other states must exist as the next_state of some state.
     # e.g. "payment-pending" and "paid" are next states for
     # "reserved" and "payment-pending" respectively.
     assert "reserved" in states_dict
+    assert "admin-reserved" in states_dict
     seen_in_next_states = list(states_dict.keys())
     seen_in_next_states.remove("reserved")
+    seen_in_next_states.remove("admin-reserved")
 
     for state in states_dict:
         next_states = states_dict[state]

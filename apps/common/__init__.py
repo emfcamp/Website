@@ -184,6 +184,8 @@ def load_utility_functions(app_obj):
                 cls = "default"
             case "reserved":
                 cls = "info"
+            case "admin-reserved":
+                cls = "info"
             case _:
                 cls = "default"
 

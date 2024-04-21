@@ -63,9 +63,10 @@ def pay(flow="main"):
         if current_user.is_authenticated:
             basket.load_purchases_from_db()
 
-        if any(basket.values()):
+        if any([p.state == 'reserved' for p in basket.purchases]):
             # We've lost the user's state, but we can still show them all
             # tickets they've reserved and let them empty their basket.
+            # Don't show this if the user only has admin-reserved purchases.
             flash(
                 "Your browser doesn't seem to be storing cookies. This may break some parts of the site."
             )
@@ -131,7 +132,7 @@ def pay(flow="main"):
         has_admission_ticket |= any(
             (
                 p.product.is_adult_ticket()
-                and p.state not in ("cancelled", "refunded", "reserved")
+                and p.state not in ("cancelled", "refunded", "reserved", "admin-reserved")
             )
             for p in current_user.owned_tickets
         )
