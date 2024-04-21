@@ -528,6 +528,8 @@ def update_proposal(proposal_id):
         form.published_age_range.data = prop.published_age_range
         form.published_cost.data = prop.published_cost
         form.published_participant_equipment.data = prop.published_participant_equipment
+        form.tickets.data = prop.total_tickets
+        form.non_lottery_tickets.data = prop.non_lottery_tickets
 
         if prop.type == "youthworkshop":
             form.valid_dbs.data = prop.valid_dbs

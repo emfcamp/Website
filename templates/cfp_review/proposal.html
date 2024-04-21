@@ -118,6 +118,10 @@
                                 {{ render_dl_field(form.user_scheduled) }}
                                 {{ render_dl_field(form.hide_from_schedule) }}
                                 {{ render_dl_field(form.manually_scheduled) }}
+                                {% if proposal.type in ["workshop", "youthworkshop"] %}
+                                    {{ render_dl_field(form.tickets) }}
+                                    {{ render_dl_field(form.non_lottery_tickets) }}
+                                {% endif %}
                                 {{ render_dl_field(form.allowed_venues) }}
                                 {{ render_dl_field(form.available_times, readonly=True) }}
                                 {{ render_dl_field(form.allowed_times) }}
