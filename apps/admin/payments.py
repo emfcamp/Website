@@ -362,7 +362,7 @@ def refund(payment_id):
     # Refund business logic needs moving to apps.payments.refund module, some is already there.
     payment = Payment.query.get_or_404(payment_id)
 
-    if not payment.is_refundable(override_refund_state_machine=True):
+    if not payment.is_refundable(ignore_event_refund_state=True):
         app.logger.warning(
             "Payment %s is %s, which is not a refundable state",
             payment_id,
