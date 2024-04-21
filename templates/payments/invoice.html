@@ -123,17 +123,6 @@
 </tr>
 {% endfor -%}
 
-{#
-{% if payment.provider == 'stripe' %}
-<tr class="premium {{ line_class.next() }}">
-<td>Credit Card Premium</td>
-<td>{{ premium | price(payment.currency) }}</td>
-<td>{{ 1 }}
-<td>{{ premium | price(payment.currency) }}
-</tr>
-{% endif %}
-#}
-
 </tbody>
 
 <tfoot>

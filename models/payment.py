@@ -155,13 +155,6 @@ class Payment(BaseModel):
     def amount(self, val):
         self.amount_int = int(val * 100)
 
-    @classmethod
-    def premium(cls, currency, amount):
-        """Used to be used for credit card premiums, which now aren't allowed.
-        TODO: cut this out entirely.
-        """
-        return Decimal(0)
-
     def change_currency(self, currency: Currency):
         if self.state in {"paid", "partrefunded", "refunded"}:
             raise StateException("Cannot change currency after payment is reconciled")

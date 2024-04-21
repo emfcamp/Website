@@ -102,19 +102,6 @@ def invoice(payment_id, fmt=None):
             )
         )
 
-    if payment.provider == "stripe":
-        premium = payment.__class__.premium(
-            payment.currency, sum(cost["sum_ex_vat"] for cost in prices)
-        )
-    else:
-        premium = Decimal(0)
-
-    prices.append(
-        {
-            "sum_ex_vat": premium,
-            "sum_vat": premium * Decimal("0.2"),
-        }
-    )
     subtotal = sum(cost["sum_ex_vat"] for cost in prices)
     vat = sum(cost["sum_vat"] for cost in prices)
 
@@ -143,7 +130,6 @@ def invoice(payment_id, fmt=None):
         payment=payment,
         invoice_lines=invoice_lines,
         form=form,
-        premium=premium,
         subtotal=subtotal,
         vat=vat,
         edit_company=edit_company,
