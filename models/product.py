@@ -355,7 +355,7 @@ class PriceTier(BaseModel, CapacityMixin):
 
     personal_limit = db.Column(db.Integer, default=10, nullable=False)
     active = db.Column(db.Boolean, default=True, nullable=False)
-    vat_rate = db.Column(db.String, nullable=True, default="0.2")
+    vat_rate = db.Column(db.Numeric(4, 3), nullable=True)
 
     __table_args__ = (UniqueConstraint("name", "product_id"),)
     __export_data__ = False  # Exported by ProductGroup
@@ -460,11 +460,22 @@ class Price(BaseModel):
 
     @property
     def value_ex_vat(self):
-        return self.value / (Decimal(self.price_tier.vat_rate) + 1)
+        if self.price_tier.vat_rate is None:
+            return self.value
+        return self.value / (self.price_tier.vat_rate + 1)
 
     @value_ex_vat.setter
     def value_ex_vat(self, val):
-        self.value = val * (Decimal(self.price_tier.vat_rate) + 1)
+        if self.price_tier.vat_rate is None:
+            self.value = val
+            return
+        self.value = val * (self.price_tier.vat_rate + 1)
+
+    @property
+    def vat(self):
+        if self.price_tier.vat_rate is None:
+            return 0
+        return self.value_ex_vat * self.price_tier.vat_rate
 
     def __repr__(self):
         return "<Price for %r: %.2f %s>" % (self.price_tier, self.value, self.currency)

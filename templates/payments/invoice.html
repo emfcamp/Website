@@ -116,7 +116,7 @@
 <td>{{ line.price_tier.parent.display_name }}</td>
 <td>{{ line.price.value_ex_vat | price(payment.currency) }}</td>
 <td>{{ line.quantity }}</td>
-<td>{{line.vat_rate}}</td>
+<td>{{ line.vat_rate | vatrate }}</td>
 <td>{{ line.price.value }}</td>
 <td>{{ line.vat_amount }}</td>
 <td>{{ (line.price_tier.get_price(payment.currency).value_ex_vat * line.quantity) | price(payment.currency) }}</td>

@@ -112,7 +112,7 @@ class PriceTierForm(Form):
     personal_limit = IntegerField("Personal maximum")
     price_gbp = DecimalField("Price (GBP)")
     price_eur = DecimalField("Price (EUR)")
-    vat_rate = DecimalField("VAT rate (decimal, e.g 0.2)")
+    vat_rate = DecimalField("VAT rate (e.g. 0.2)", [Optional()])
 
 
 class NewPriceTierForm(PriceTierForm):

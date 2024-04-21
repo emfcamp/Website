@@ -75,6 +75,15 @@ def load_utility_functions(app_obj):
             return " ".join(wrap(bankref, 4))
         return "%s-%s" % (bankref[:4], bankref[4:])
 
+    @app_obj.template_filter("vatrate")
+    def format_vatrate(vat_rate):
+        if vat_rate is None:
+            return "Exempt"
+        normalized = (vat_rate * 100).normalize()
+        sign, digit, exp = normalized.as_tuple()
+        pct = normalized if exp <= 0 else normalized.quantize(1)
+        return f"{pct}%"
+
     @app_obj.context_processor
     def utility_processor():
         SALES_STATE = get_sales_state()

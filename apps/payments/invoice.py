@@ -1,3 +1,4 @@
+from collections import namedtuple
 from decimal import Decimal
 import logging
 import shutil
@@ -34,13 +35,13 @@ class InvoiceForm(Form):
     update = SubmitField("Update")
 
 
-class InvoiceLine:
-    def __init__(self, _price_tier, _quantity, _vat_rate, _vat_amount, _price):
-        self.price_tier = _price_tier
-        self.quantity = _quantity
-        self.vat_rate = _vat_rate
-        self.vat_amount = _vat_amount
-        self.price = _price
+InvoiceLine = namedtuple("InvoiceLine", [
+    "price_tier",
+    "quantity",
+    "vat_rate",
+    "vat_amount",
+    "price",
+])
 
 
 @payments.route("/payment/<int:payment_id>/receipt", methods=["GET", "POST"])
@@ -85,20 +86,19 @@ def invoice(payment_id, fmt=None):
     prices = []
     for pt, count in invoice_lines_query:
         price = pt.get_price(payment.currency)
-        price_ex_vat = price.value_ex_vat
         prices.append(
             {
-                "sum_ex_vat": price_ex_vat * count,
-                "sum_vat": (price_ex_vat * Decimal(pt.vat_rate)) * count,
+                "sum_ex_vat": price.value_ex_vat * count,
+                "sum_vat": price.vat * count,
             }
         )
         invoice_lines.append(
             InvoiceLine(
-                pt,
-                count,
-                f"{int(Decimal(pt.vat_rate) * 100)}%",
-                round((price.value - price_ex_vat) * count, 2),
-                price,
+                price_tier=pt,
+                quantity=count,
+                vat_rate=pt.vat_rate,
+                vat_amount=round((price.value - price.value_ex_vat) * count, 2),
+                price=price,
             )
         )
 
