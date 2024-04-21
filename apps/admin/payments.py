@@ -516,7 +516,10 @@ def refund(payment_id):
         return redirect(url_for(".requested_refunds"))
 
     for f in form.purchases:
-        update_refund_purchase_form_details(f, purchases_dict[f.purchase_id.data])
+        purchase = purchases_dict[f.purchase_id.data]
+        update_refund_purchase_form_details(f, purchase)
+        if purchase.refund_request and not purchase.refund:
+            f.refund.data = True
 
     refunded_purchases = [p for p in payment.purchases if p.state == "refunded"]
     return render_template(
