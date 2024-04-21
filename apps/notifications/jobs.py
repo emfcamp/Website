@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from flask import current_app as app
 
 from models import scheduled_task
-from models.cfp import FavouriteProposal, Proposal
+from models.cfp import Proposal
 from models.user import User
 from models.web_push import PushNotificationJob
 from models.notifications import UserNotificationPreference
