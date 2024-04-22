@@ -319,6 +319,9 @@ def delete_refund_request(req_id):
 
     # TODO: this does not handle partial refunds!
     # It can also fail if there's insufficient capacity to return the ticket state.
+    if not all(u.state == 'paid' for u in req.payment.purchases):
+        return abort(400)
+
     if not (
         req.payment.state == "refund-requested"
         or (req.payment.state == "refunded" and req.donation == req.payment.amount)
