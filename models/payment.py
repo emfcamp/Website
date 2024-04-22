@@ -3,6 +3,7 @@ import re
 from decimal import Decimal
 from datetime import datetime, timedelta
 from typing import Iterable, Optional
+
 from sqlalchemy import event, func, column
 from sqlalchemy.orm import Session, aliased
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -21,6 +22,7 @@ from . import (
 )
 from .purchase import Ticket
 from .product import Voucher
+from .site_state import get_refund_state
 
 safechars = "2346789BCDFGHJKMPQRTVWXY"
 
@@ -146,6 +148,15 @@ class Payment(BaseModel):
         )
 
         return data
+
+    def is_refundable(self, ignore_event_refund_state=False) -> bool:
+        return self.state in [
+            "charged",
+            "paid",
+            "refunding",
+            "partrefunded",
+            "refund-requested",
+        ] and (get_refund_state() != "off" or ignore_event_refund_state)
 
     @property
     def amount(self):
@@ -611,6 +622,10 @@ class RefundRequest(BaseModel):
     iban = db.Column(db.String)
     payee_name = db.Column(db.String)
     note = db.Column(db.String)
+
+    purchases = db.relationship(
+        "Purchase", backref=db.backref("refund_request", cascade="all")
+    )
 
     @property
     def method(self):

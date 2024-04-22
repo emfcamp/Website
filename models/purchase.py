@@ -17,7 +17,8 @@ PURCHASE_STATES = {
     "admin-reserved": ["payment-pending", "paid", "cancelled"],
     "payment-pending": ["paid", "cancelled"],
     "cancelled": [],
-    "paid": ["refunded", "cancelled"],
+    "paid": ["refunded", "cancelled", "refund-pending"],
+    "refund-pending": ["paid", "refunded", "cancelled"],
     "refunded": [],
 }
 
@@ -57,6 +58,7 @@ class Purchase(BaseModel):
     # Financial FKs
     payment_id = db.Column(db.Integer, db.ForeignKey("payment.id"))
     refund_id = db.Column(db.Integer, db.ForeignKey("refund.id"))
+    refund_request_id = db.Column(db.Integer, db.ForeignKey("refund_request.id"))
 
     # History
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
@@ -111,6 +113,17 @@ class Purchase(BaseModel):
     @property
     def is_transferable(self):
         return self.product.get_attribute("is_transferable")
+
+    def is_refundable(self, ignore_event_refund_state=False) -> bool:
+        return (
+            (self.is_paid_for is True)
+            and not self.is_transferred
+            and self.payment.is_refundable(ignore_event_refund_state)
+        )
+
+    @property
+    def is_transferred(self) -> bool:
+        return self.owner_id != self.purchaser_id
 
     @validates("ticket_issued")
     def validate_ticket_issued(self, _key, issued):
@@ -222,8 +235,11 @@ class AdmissionTicket(Ticket):
     __mapper_args__ = {"polymorphic_identity": "admission_ticket"}
 
     @property
-    def is_transferable(self):
+    def is_transferable(self) -> bool:
         return self.product.get_attribute("is_transferable") and not self.checked_in
+
+    def is_refundable(self, ignore_event_refund_state=False) -> bool:
+        return super().is_refundable(ignore_event_refund_state) and not self.checked_in
 
     def check_in(self):
         if self.is_paid_for is False:
