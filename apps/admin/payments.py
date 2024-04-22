@@ -22,7 +22,6 @@ from sqlalchemy.sql.functions import func
 from main import db, stripe
 from models.payment import (
     Payment,
-    Refund,
     RefundRequest,
     BankPayment,
     BankRefund,
@@ -30,6 +29,7 @@ from models.payment import (
     StateException,
 )
 from models.purchase import Purchase
+from models.product import Price
 from ..common.email import from_email
 from ..common.forms import Form, RefundPurchaseForm, update_refund_purchase_form_details
 from ..payments.stripe import (
@@ -255,23 +255,55 @@ def cancel_payment(payment_id):
     )
 
 
-@admin.route("/payment/requested-refunds")
-def requested_refunds():
-    state = request.args.get("state", "refund-requested")
-    requests = (
-        RefundRequest.query.join(Payment)
-        .join(RefundRequest.purchases)
-        .outerjoin(Purchase.refund)
-        .filter(Payment.state == state)
-        .with_entities(RefundRequest, func.count(Purchase.id).label("purchase_count"))
-        .order_by(RefundRequest.id)
-        .group_by(RefundRequest.id, Payment.id)
-    )
-    if state == 'refund-requested':
-        requests = requests.filter(Refund.id.is_(None))
+@admin.route("/payment/refunds")
+@admin.route("/payment/refunds/<view>")
+def refunds(view='requested'):
+    if view not in {'requested', 'resolved'}:
+        abort(404)
+
+    if view == 'requested':
+        query = (
+            RefundRequest.query.join(Payment)
+            .join(RefundRequest.purchases)
+            .join(Purchase.price)
+            .filter(Payment.state == 'refund-requested')
+            .filter(Purchase.state != 'refunded')
+            .with_entities(
+                RefundRequest,
+                func.count(Purchase.id).label("purchase_count"),
+                func.sum(Price.price_int / 100).label("refund_total"),
+            )
+            .order_by(RefundRequest.id)
+            .group_by(RefundRequest.id, Payment.id)
+        )
+    else:
+        # The resolved refunds don't necessarily tie into the requests.
+        # Just show the payments that have been touched by the process.
+        refunds = (
+            RefundRequest.query.join(Payment)
+            .with_entities(Payment.id.label('payment_id'), func.min(RefundRequest.id).label('req_id'))
+            .group_by(Payment.id)
+            .subquery()
+        )
+
+        query = (
+            db.session.query(refunds)
+            .join(Payment, Payment.id == refunds.c.payment_id)
+            .join(RefundRequest, RefundRequest.id == refunds.c.req_id)
+            .join(Payment.purchases)
+            .join(Purchase.price)
+            .filter(Purchase.state == 'refunded')
+            .with_entities(
+                RefundRequest,
+                func.count(Purchase.id).label("purchase_count"),
+                func.sum(Price.price_int / 100).label("refund_total"),
+            )
+            .group_by(RefundRequest)
+            .order_by(RefundRequest.id)
+        )
 
     return render_template(
-        "admin/payments/requested_refunds.html", requests=requests.all(), state=state
+        "admin/payments/refunds.html", query=query.all(), view=view
     )
 
 
@@ -304,7 +336,7 @@ def delete_refund_request(req_id):
         db.session.commit()
 
         flash("Refund request deleted")
-        return redirect(url_for(".requested_refunds"))
+        return redirect(url_for(".refunds"))
 
     return render_template(
         "admin/payments/refund_request_delete.html", req=req, form=form
@@ -516,7 +548,7 @@ def refund(payment_id):
             )
             flash("Refund for %s %s complete" % (total, payment.currency))
 
-        return redirect(url_for(".requested_refunds"))
+        return redirect(url_for(".refunds"))
 
     for f in form.purchases:
         purchase = purchases_dict[f.purchase_id.data]

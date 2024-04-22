@@ -1,15 +1,15 @@
 {% extends "admin/base.html" %}
 {% set nav_active = 'admin_payments' %}
-{% block title %}Requested refunds{% endblock %}
+{% block title %}Refunds{% endblock %}
 {% block body %}
-<h2>Requested Refunds</h2>
+<h2>Refunds</h2>
 
-<p>Showing refunds in state: {{state}}</p>
+<p>Showing {{view}} refunds</p>
 <form>
-{% if state == 'refund-requested' %}
-  <button name="state" value="refunded" class="btn btn-default">Show refunded</button>
+{% if view == 'requested' %}
+  <a href="{{ url_for('.refunds', view='resolved') }}" class="btn btn-default">Show resolved</a>
 {% else %}
-  <button name="state" value="refund-requested" class="btn btn-default">Show requested</button>
+  <a href="{{ url_for('.refunds', view='requested') }}" class="btn btn-default">Show requested</a>
 {% endif %}
 </form>
 <table class="table table-condensed table-striped">
@@ -24,7 +24,7 @@
   <th></th>
 </tr></thead>
 <tbody>
-{% for req, purchase_count in requests %}
+{% for req, purchase_count, refund_total in query %}
 {% set payment = req.payment %}
 <tr>
   <td>{{req.id}}
@@ -37,7 +37,7 @@
   <td>{{ payment.user.name }}</td>
   <td><a href="{{ url_for('.user', user_id=payment.user.id) }}">{{ payment.user.email }}</a></td>
   <td>{{ purchase_count }}</td>
-  <td><b>{{ payment.amount | price(payment.currency) }}</b></td>
+  <td><b>{{ refund_total | price(payment.currency) }}</b></td>
   <td>{% if req.donation %}<b>{{ req.donation | price(payment.currency) }}</b>{% endif %}</td>
   <td>
     <div class="btn-group">
