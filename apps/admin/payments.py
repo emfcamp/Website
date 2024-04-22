@@ -22,6 +22,7 @@ from sqlalchemy.sql.functions import func
 from main import db, stripe
 from models.payment import (
     Payment,
+    Refund,
     RefundRequest,
     BankPayment,
     BankRefund,
@@ -259,8 +260,10 @@ def requested_refunds():
     state = request.args.get("state", "refund-requested")
     requests = (
         RefundRequest.query.join(Payment)
-        .join(Purchase)
+        .join(RefundRequest.purchases)
+        .outerjoin(Purchase.refund)
         .filter(Payment.state == state)
+        .filter(Refund.id.is_(None))
         .with_entities(RefundRequest, func.count(Purchase.id).label("purchase_count"))
         .order_by(RefundRequest.id)
         .group_by(RefundRequest.id, Payment.id)
