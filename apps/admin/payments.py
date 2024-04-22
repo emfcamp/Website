@@ -263,15 +263,15 @@ def requested_refunds():
         .join(RefundRequest.purchases)
         .outerjoin(Purchase.refund)
         .filter(Payment.state == state)
-        .filter(Refund.id.is_(None))
         .with_entities(RefundRequest, func.count(Purchase.id).label("purchase_count"))
         .order_by(RefundRequest.id)
         .group_by(RefundRequest.id, Payment.id)
-        .all()
     )
+    if state == 'refund-requested':
+        requests = requests.filter(Refund.id.is_(None))
 
     return render_template(
-        "admin/payments/requested_refunds.html", requests=requests, state=state
+        "admin/payments/requested_refunds.html", requests=requests.all(), state=state
     )
 
 
