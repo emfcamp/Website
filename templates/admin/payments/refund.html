@@ -51,6 +51,22 @@
 
 {% endfor %}
 
+{% if payment.provider == 'banktransfer' %}
+<p>The user has requested a refund using the following details:</p>
+{% for req in payment.refund_requests %}
+<dl class="dl-horizontal">
+<dt>Currency</dt><dd>{{ req.currency }}</dd>
+{% if req.currency == 'GBP' %}
+<dt>Sort Code</dt><dd>{{ req.sort_code }}</dd>
+<dt>Account</dt><dd>{{ req.account }}</dd>
+{% else %}
+<dt>IBAN</dt><dd>{{ req.iban }}</dd>
+<dt>BIC</dt><dd>{{ req.swiftbic }}</dd>
+{% endif %}
+<dt>Payee Name</dt><dd>{{ req.payee_name }}</dd>
+{% endfor %}
+{% endif %}
+
 {{ form.refund(class_="btn btn-danger pull-right") }}
 {% if payment.provider == 'stripe' %}
 {{ form.stripe_refund(class_="btn btn-warning pull-right") }}
