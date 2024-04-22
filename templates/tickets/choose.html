@@ -12,18 +12,10 @@ Buy Items
 {% block body %}
 {% if flow in ['main', 'orga', 'volunteer'] %}
   {% include 'purchase/tickets.html' %}
-{% elif flow in ['speakers'] %}
-  {% include 'purchase/speakers.html' %}
 {% elif flow in ['other'] %}
   {% include 'purchase/extra.html' %}
-{% elif flow in ['tees'] %}
-  {% include 'purchase/tees.html' %}
-{% elif flow in ['hire'] %}
-  {% include 'purchase/hire.html' %}
-{% elif flow in ['bales'] %}
-  {% include 'purchase/bales.html' %}
-{% elif flow in ['badge'] %}
-  {% include 'purchase/badge.html' %}
+{% elif flow in ['tees', 'speakers', 'hire', 'bales', 'badge', 'sponsor'] %}
+  {% include 'purchase/' + flow + '.html' %}
 {% endif %}
 {% if not current_user.is_authenticated and SITE_STATE != 'after-event' %}
     <p>If you've already bought a ticket this year, <a href="{{url_for('users.login')}}">log in</a> to view your ticket status.</p>
