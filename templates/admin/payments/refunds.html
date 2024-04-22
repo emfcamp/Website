@@ -42,11 +42,7 @@
   <td>
     <div class="btn-group">
       {% if payment.state == 'refund-requested' %}
-        {% if payment.provider == 'stripe' %}
-          <a href="{{ url_for('.refund', payment_id=payment.id) }}" class="btn btn-default">Refund</a>
-        {% else %}
-          <a href="{{ url_for('.manual_refund', payment_id=payment.id) }}" class="btn btn-default">Refund</a>
-        {% endif %}
+        <a href="{{ url_for('.refund', payment_id=payment.id) }}" class="btn btn-default">Refund</a>
       {% endif %}
       {% if payment.state == 'refund-requested' or (payment.state == 'refunded' and req.donation == payment.amount) %}
         <a href="{{url_for(".delete_refund_request", req_id=req.id)}}" class="btn btn-default">Delete</a>
