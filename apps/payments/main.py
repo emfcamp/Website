@@ -66,6 +66,10 @@ class RefundRequestForm(Form):
     note = StringField("Note")
     submit = SubmitField("Request refund")
 
+    def validate_purchases(self, field):
+        if not any(f.refund.data for f in field):
+            raise ValidationError("Please choose some tickets to refund")
+
 
 def wise_validate(endpoint, **args):
     res = requests.get(f"https://api.transferwise.com/v1/validators/{endpoint}", args)
