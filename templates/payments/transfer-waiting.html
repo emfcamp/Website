@@ -30,7 +30,11 @@
 </div>
 
 {% if payment.state == 'inprogress' %}
-<p>We will use the reference below to identify the payment as yours, so please ensure it's included in full.</p>
+<div class="well">
+<p>Here are the bank details you need to use to send the money to us.
+    Please ensure the payment reference is included in full,
+    as we will use this to identify your payment.
+</p>
 <dl class="dl-horizontal">
 <dt>Bank</dt><dd>{{ account.institution }}, {{ account.address }}</dd>
 <dt>Payee</dt><dd>{{ account.payee_name }}</dd>
@@ -42,8 +46,11 @@
 <dt>IBAN</dt><dd>{{ account.iban | iban }}</dd>
 {% endif %}
 <dt>Amount</dt><dd>{{ payment.amount | price(payment.currency) }}</dd>
-<dt>Reference</dt><dd>{{ payment.customer_reference | bankref }}</dd>
+<dt>Reference</dt><dd><code>{{ payment.customer_reference | bankref }}</code></dd>
 </dl>
+<p><strong>Make sure you use the payment reference <code>{{ payment.customer_reference | bankref }}</code>
+when making this payment.</strong></p>
+</div>
 
 {% if SITE_STATE != 'after-event' %}
 <p>See you at Electromagnetic Field!</p>
