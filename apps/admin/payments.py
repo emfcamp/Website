@@ -257,17 +257,17 @@ def cancel_payment(payment_id):
 
 @admin.route("/payment/refunds")
 @admin.route("/payment/refunds/<view>")
-def refunds(view='requested'):
-    if view not in {'requested', 'resolved'}:
+def refunds(view="requested"):
+    if view not in {"requested", "resolved"}:
         abort(404)
 
-    if view == 'requested':
+    if view == "requested":
         query = (
             RefundRequest.query.join(Payment)
             .join(RefundRequest.purchases)
             .join(Purchase.price)
-            .filter(Payment.state == 'refund-requested')
-            .filter(Purchase.state != 'refunded')
+            .filter(Payment.state == "refund-requested")
+            .filter(Purchase.state != "refunded")
             .with_entities(
                 RefundRequest,
                 func.count(Purchase.id).label("purchase_count"),
@@ -281,7 +281,10 @@ def refunds(view='requested'):
         # Just show the payments that have been touched by the process.
         refunds = (
             RefundRequest.query.join(Payment)
-            .with_entities(Payment.id.label('payment_id'), func.min(RefundRequest.id).label('req_id'))
+            .with_entities(
+                Payment.id.label("payment_id"),
+                func.min(RefundRequest.id).label("req_id"),
+            )
             .group_by(Payment.id)
             .subquery()
         )
@@ -292,7 +295,7 @@ def refunds(view='requested'):
             .join(RefundRequest, RefundRequest.id == refunds.c.req_id)
             .join(Payment.purchases)
             .join(Purchase.price)
-            .filter(Purchase.state == 'refunded')
+            .filter(Purchase.state == "refunded")
             .with_entities(
                 RefundRequest,
                 func.count(Purchase.id).label("purchase_count"),
@@ -302,9 +305,7 @@ def refunds(view='requested'):
             .order_by(RefundRequest.id)
         )
 
-    return render_template(
-        "admin/payments/refunds.html", query=query.all(), view=view
-    )
+    return render_template("admin/payments/refunds.html", query=query.all(), view=view)
 
 
 class DeleteRefundRequestForm(Form):
@@ -319,7 +320,7 @@ def delete_refund_request(req_id):
 
     # TODO: this does not handle partial refunds!
     # It can also fail if there's insufficient capacity to return the ticket state.
-    if not all(u.state == 'paid' for u in req.payment.purchases):
+    if not all(u.state == "paid" for u in req.payment.purchases):
         return abort(400)
 
     if not (
@@ -545,6 +546,22 @@ def refund(payment_id):
                 payment.state = "partrefunded"
 
             db.session.commit()
+
+            msg = EmailMessage(
+                "Your refund from Electromagnetic Field has been processed",
+                from_email=from_email("TICKETS_EMAIL"),
+                to=[payment.user.email],
+            )
+
+            msg.body = render_template(
+                "emails/purchase-refund.txt",
+                user=payment.user,
+                refund_total=total,
+                currency=payment.currency,
+                purchases=purchases,
+                is_stripe=form.stripe_refund.data,
+            )
+            msg.send()
 
             app.logger.info(
                 "Payment %s refund complete for a total of %s", payment.id, total
