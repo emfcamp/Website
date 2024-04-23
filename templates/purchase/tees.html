@@ -1,47 +1,146 @@
-<h2>T-shirts</h2>
-<p>
-  We're doing a limited run of navy blue t-shirts with a professionally-printed design on high quality
-  cotton.
-</p><p>
-  We can currently ship to UK and EU. If you live elsewhere and would like
-  to place an order, please drop us an email at <a href="mailto:{{ config['CONTACT_EMAIL'][1] }}">{{ config['CONTACT_EMAIL'][1] }}</a>.
-</p>
-<h3>Sizing</h3>
-<div>
-</div>
-<div class="row">
-  <div class="col-sm-6">
-    <h4>Semi-Fitted Women&rsquo;s</h5>
-    <img src="{{ url_for('static', filename='images/T-shirt-2018-fitted-size-diagram.svg') }}">
-    <table class="table">
-    <thead>
-      <tr><th>Size</th><th>Width</th><th>Length</th></tr>
-    </thead>
-    <tbody>
-      <tr class="odd" ><td> S   </td><td> 44cm (17in) </td><td> 62cm (24in) </td></tr>
-      <tr class="even"><td> M   </td><td> 47cm (19in) </td><td> 64cm (25in) </td></tr>
-      <tr class="odd" ><td> L   </td><td> 51cm (20in) </td><td> 66cm (26in) </td></tr>
-      <tr class="even"><td> XL  </td><td> 55cm (22in) </td><td> 68cm (27in) </td></tr>
-      <tr class="odd" ><td> XXL </td><td> 60cm (24in) </td><td> 70cm (28in) </td></tr>
-    </tbody>
-    </table>
-  </div>
-  <div class="col-sm-6">
-    <h4>Unfitted</h5>
-    <img src="{{ url_for('static', filename='images/T-shirt-2018-unfitted-size-diagram.svg') }}">
-    <table class="table">
-    <thead>
-      <tr><th>Size</th><th>Width</th><th>Length</th></tr>
-    </thead>
-    <tbody>
-      <tr class="odd" ><td> S   </td><td> 48cm (19in) </td><td> 68cm (27in)   </td></tr>
-      <tr class="even"><td> M   </td><td> 52cm (20in) </td><td> 71cm (28in)   </td></tr>
-      <tr class="odd" ><td> L   </td><td> 56cm (22in) </td><td> 74cm (29in)   </td></tr>
-      <tr class="even"><td> XL  </td><td> 60cm (24in) </td><td> 77cm (30in)   </td></tr>
-      <tr class="odd" ><td> XXL </td><td> 66cm (26in) </td><td> 80.5cm (32in) </td></tr>
-    </tbody>
-    </table>
-  </div>
+<h1>T-shirts</h1>
+<p>EMF 2024 T-shirts are now available to pre-order. Pre-orders will be available to collect at the shop during the event.</p>
+<p>To purchase a T-shirt you will need an event ticket. If someone else bought your ticket you can ask them to transfer it to you from their account page.</p>
+<div class="row" style="margin-bottom:1em">
+<img class="img-responsive col-md-6" src="{{ url_for('static', filename='images/merch/2024/adult-tee.png') }}">
+<img class="img-responsive col-md-6" src="{{ url_for('static', filename='images/merch/2024/child-tee.png') }}">
 </div>
 
+<h2>Sizes</h2>
+<p>(All measurements in centimetres.)</p>
+<h3>Unisex</h3>
+<div class="table-responsive">
+<table class="table">
+    <thead>
+    <tr>
+        <th></th>
+        <th>S</th>
+        <th>M</th>
+        <th>L</th>
+        <th>XL</th>
+        <th>XXL</th>
+        <th>3XL</th>
+        <th>4XL</th>
+        <th>5XL</th>
+    </tr>
+    </thead>
+    <tr>
+        <th>A (Half Chest)</th>
+        <td>49</td>
+        <td>52</td>
+        <td>55</td>
+        <td>58</td>
+        <td>61</td>
+        <td>64</td>
+        <td>69</td>
+        <td>74</td>
+    </tr>
+    <tr>
+        <th>B (Body Length)</th>
+        <td>69</td>
+        <td>72</td>
+        <td>74</td>
+        <td>76</td>
+        <td>78</td>
+        <td>80</td>
+        <td>82</td>
+        <td>84</td>
+    </tr>
+    <tr>
+        <th>C (Sleeve Length)</th>
+        <td>20.5</td>
+        <td>21.5</td>
+        <td>22.5</td>
+        <td>22.5</td>
+        <td>23.5</td>
+        <td>24.5</td>
+        <td>24.5</td>
+        <td>25</td>
+    </tr>
+</table>
+</div>
+<h3>Womens</h3>
+<div class="table-responsive">
+<table class="table">
+    <thead>
+    <tr>
+        <th></th>
+        <th>XS</th>
+        <th>S</th>
+        <th>M</th>
+        <th>L</th>
+        <th>XL</th>
+        <th>2XL</th>
+    </tr>
+    </thead>
+    <tr>
+        <th>A (Half Chest)</th>
+        <td>42</td>
+        <td>44.5</td>
+        <td>47.5</td>
+        <td>50.5</td>
+        <td>53.5</td>
+        <td>56.5</td>
+    </tr>
+    <tr>
+        <th>B (Body Length)</th>
+        <td>62</td>
+        <td>64</td>
+        <td>66</td>
+        <td>68</td>
+        <td>69</td>
+        <td>69</td>
+    </tr>
+    <tr>
+        <th>C (Sleeve Length)</th>
+        <td>16</td>
+        <td>16</td>
+        <td>17</td>
+        <td>17</td>
+        <td>18</td>
+        <td>18</td>
+    </tr>
+</table>
+</div>
+<h3>Kids</h3>
+<div class="table-responsive">
+<table class="table">
+    <thead>
+    <tr>
+        <th></th>
+        <th>3-4</th>
+        <th>5-6</th>
+        <th>7-8</th>
+        <th>9-11</th>
+        <th>12-13</th>
+    </tr>
+    </thead>
+    <tr>
+        <th>A (Half Chest)</th>
+        <td>33</td>
+        <td>35</td>
+        <td>37</td>
+        <td>41</td>
+        <td>44</td>
+    </tr>
+    <tr>
+        <th>B (Body Length)</th>
+        <td>42</td>
+        <td>46</td>
+        <td>51.5</td>
+        <td>57.5</td>
+        <td>62.5</td>
+    </tr>
+    <tr>
+        <th>C (Sleeve Length)</th>
+        <td>11.5</td>
+        <td>12.5</td>
+        <td>14.5</td>
+        <td>16.5</td>
+        <td>18.5</td>
+    </tr>
+</table>
+</div>
+<img class="img-responsive" style="max-width: 400px" src="{{ url_for('static', filename='images/merch/2024/size-guide.png') }}">
 
+<h2>Purchase</h2>

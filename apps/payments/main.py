@@ -1,16 +1,23 @@
 import requests
-from flask import render_template, redirect, flash, url_for, current_app as app
+from flask import (
+    render_template,
+    redirect,
+    current_app as app,
+    flash,
+    request,
+    url_for,
+)
 from flask_login import login_required
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField, FieldList, FormField
 from wtforms.validators import ValidationError
 from wtforms.fields.html5 import IntegerRangeField
 
 from . import payments
 from .common import get_user_payment_or_abort
-from ..common import feature_flag
-from ..common.forms import Form
+from ..common.forms import Form, RefundPurchaseForm, update_refund_purchase_form_details
 from main import db
 from models import RefundRequest
+from models.site_state import get_refund_state
 
 
 @payments.route("/pay/terms")
@@ -20,7 +27,10 @@ def terms():
 
 def required_for(currency=None, providers=None):
     def validate(form, field):
-        if form._total_amount == form.donation_amount.data:
+        if (
+            form.donation_amount.data
+            and form._total_amount == form.donation_amount.data
+        ):
             return
         if providers is not None and form._provider not in providers:
             return
@@ -50,8 +60,15 @@ class RefundRequestForm(Form):
     payee_name = StringField(
         "Name of account holder", [required_for(providers=["banktransfer"])]
     )
+
+    purchases = FieldList(FormField(RefundPurchaseForm))
+
     note = StringField("Note")
     submit = SubmitField("Request refund")
+
+    def validate_purchases(self, field):
+        if not any(f.refund.data for f in field):
+            raise ValidationError("Please choose some tickets to refund")
 
 
 def wise_validate(endpoint, **args):
@@ -86,9 +103,27 @@ def validate_bank_details(form, currency):
 @payments.route("/payment/<int:payment_id>/refund", methods=["GET", "POST"])
 @payments.route("/payment/<int:payment_id>/refund/<currency>", methods=["GET", "POST"])
 @login_required
-@feature_flag("REFUND_REQUESTS")
 def payment_refund_request(payment_id, currency=None):
-    payment = get_user_payment_or_abort(payment_id, valid_states=["paid"])
+    if get_refund_state() == "off":
+        flash(
+            f"Refunds are not currently available. If you need further help please email {app.config['TICKETS_EMAIL'][1]}"
+        )
+        return redirect(url_for("users.purchases"))
+
+    payment = get_user_payment_or_abort(
+        payment_id, valid_states=["paid", "partrefunded"]
+    )
+
+    if not payment.is_refundable() or not any(
+        [t.is_refundable() for t in payment.purchases]
+    ):
+        flash(
+            """Payment cannot be refunded. It is either in an unpaid state or
+            has no associated tickets; if you have transferred tickets to
+            others please have them transferred back and try again"""
+        )
+        return redirect(url_for("users.purchases"))
+
     if currency is None:
         currency = payment.currency
 
@@ -96,6 +131,13 @@ def payment_refund_request(payment_id, currency=None):
     form._currency = currency
     form._provider = payment.provider
     form._total_amount = payment.amount
+
+    if request.method != "POST":
+        for purchase in payment.purchases:
+            form.purchases.append_entry()
+            form.purchases[-1].purchase_id.data = purchase.id
+
+    purchases_dict = {p.id: p for p in payment.purchases}
 
     bank_validation_failed = False
 
@@ -118,6 +160,11 @@ def payment_refund_request(payment_id, currency=None):
             bank_validation_failed = True
         else:
             app.logger.info("Creating refund request for payment %s", payment.id)
+            purchases = [
+                purchases_dict[f.purchase_id.data]
+                for f in form.purchases
+                if purchases_dict[f.purchase_id.data].is_refundable() and f.refund.data
+            ]
             req = RefundRequest(
                 payment=payment,
                 currency=currency,
@@ -128,6 +175,7 @@ def payment_refund_request(payment_id, currency=None):
                 swiftbic=form.swiftbic.data,
                 note=form.note.data,
                 payee_name=form.payee_name.data,
+                purchases=purchases,
             )
             db.session.add(req)
             payment.state = "refund-requested"
@@ -137,6 +185,18 @@ def payment_refund_request(payment_id, currency=None):
                 "Your refund request has been submitted. We will email you when it's processed."
             )
             return redirect(url_for("users.purchases"))
+
+    for f in form.purchases:
+        update_refund_purchase_form_details(f, purchases_dict[f.purchase_id.data])
+
+    if get_refund_state() == "cancellation":
+        return render_template(
+            "payments/event-cancelled-refund-request.html",
+            payment=payment,
+            form=form,
+            currency=currency,
+            bank_validation_failed=bank_validation_failed,
+        )
 
     return render_template(
         "payments/refund-request.html",

@@ -101,57 +101,52 @@
   <th>Product</th>
   <th>Unit price</th>
   <th>Quantity</th>
-  <th>Amount</th>
+  <th>VAT rate</th>
+  <th>Amount inc. VAT</th>
+  <th>VAT amount</th>
+  <th>Amount ex VAT</th>
 </tr>
 </thead>
 
 <tbody>
 {% set line_class = cycler('odd', 'even') %}
 
-{%- for pt, count in invoice_lines -%}
+{%- for line in invoice_lines -%}
 <tr class="purchase {{ line_class.next() }}">
-<td>{{ pt.parent.display_name }}</td>
-<td>{{ pt.get_price(payment.currency).value_ex_vat | price(payment.currency) }}</td>
-<td>{{ count }}
-<td>{{ (pt.get_price(payment.currency).value_ex_vat * count) | price(payment.currency) }}</td>
+<td>{{ line.price_tier.parent.display_name }}</td>
+<td>{{ line.price.value_ex_vat | price(payment.currency) }}</td>
+<td>{{ line.quantity }}</td>
+<td>{{ line.vat_rate | vatrate }}</td>
+<td>{{ line.price.value }}</td>
+<td>{{ line.vat_amount }}</td>
+<td>{{ (line.price_tier.get_price(payment.currency).value_ex_vat * line.quantity) | price(payment.currency) }}</td>
 </tr>
 {% endfor -%}
-
-{#
-{% if payment.provider == 'stripe' %}
-<tr class="premium {{ line_class.next() }}">
-<td>Credit Card Premium</td>
-<td>{{ premium | price(payment.currency) }}</td>
-<td>{{ 1 }}
-<td>{{ premium | price(payment.currency) }}
-</tr>
-{% endif %}
-#}
 
 </tbody>
 
 <tfoot>
 <tr class="subtotal {{ line_class.next() }}">
-<td colspan=2></td>
+<td colspan=5></td>
 <td>Subtotal</td>
 <td>{{ subtotal | price(payment.currency) }}</td>
 </tr>
 
 <tr class="vat {{ line_class.next() }}">
-<td colspan=2></td>
-<td>VAT at 20%</td>
+<td colspan=5></td>
+<td>VAT total</td>
 <td>{{ vat | price(payment.currency) }}</td>
 </tr>
 
 <tr class="total {{ line_class.next() }}">
-<td colspan=2></td>
+<td colspan=5></td>
 <td>Total</td>
 <td>{{ payment.amount | price(payment.currency) }}</td>
 </tr>
 
 {% for refund in payment.refunds %}
 <tr class="{{ line_class.next() }}">
-  <td colspan=2></td>
+  <td colspan=5></td>
   <td>Refunded ({{refund.provider}}) on {{refund.timestamp.date()}} </td>
   <td>-{{refund.amount|price(payment.currency)}}</td>
 </tr>

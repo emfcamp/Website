@@ -15,8 +15,7 @@ from flask.typing import ResponseReturnValue
 from flask_login import current_user
 from flask_mailman import EmailMessage
 
-from wtforms.validators import InputRequired
-from wtforms import SubmitField, BooleanField, FieldList, FormField
+from wtforms import SubmitField, FieldList, FormField
 
 from sqlalchemy.sql.functions import func
 
@@ -29,10 +28,10 @@ from models.payment import (
     StripeRefund,
     StateException,
 )
-from models.purchase import AdmissionTicket, Purchase
+from models.purchase import Purchase
+from models.product import Price
 from ..common.email import from_email
-from ..common.forms import Form
-from ..common.fields import HiddenIntegerField
+from ..common.forms import Form, RefundPurchaseForm, update_refund_purchase_form_details
 from ..payments.stripe import (
     StripeUpdateUnexpected,
     StripeUpdateConflict,
@@ -256,22 +255,57 @@ def cancel_payment(payment_id):
     )
 
 
-@admin.route("/payment/requested-refunds")
-def requested_refunds():
-    state = request.args.get("state", "refund-requested")
-    requests = (
-        RefundRequest.query.join(Payment)
-        .join(Purchase)
-        .filter(Payment.state == state)
-        .with_entities(RefundRequest, func.count(Purchase.id).label("purchase_count"))
-        .order_by(RefundRequest.id)
-        .group_by(RefundRequest.id, Payment.id)
-        .all()
-    )
+@admin.route("/payment/refunds")
+@admin.route("/payment/refunds/<view>")
+def refunds(view="requested"):
+    if view not in {"requested", "resolved"}:
+        abort(404)
 
-    return render_template(
-        "admin/payments/requested_refunds.html", requests=requests, state=state
-    )
+    if view == "requested":
+        query = (
+            RefundRequest.query.join(Payment)
+            .join(RefundRequest.purchases)
+            .join(Purchase.price)
+            .filter(Payment.state == "refund-requested")
+            .filter(Purchase.state != "refunded")
+            .with_entities(
+                RefundRequest,
+                func.count(Purchase.id).label("purchase_count"),
+                func.sum(Price.price_int / 100).label("refund_total"),
+            )
+            .order_by(RefundRequest.id)
+            .group_by(RefundRequest.id, Payment.id)
+        )
+    else:
+        # The resolved refunds don't necessarily tie into the requests.
+        # Just show the payments that have been touched by the process.
+        refunds = (
+            RefundRequest.query.join(Payment)
+            .with_entities(
+                Payment.id.label("payment_id"),
+                func.min(RefundRequest.id).label("req_id"),
+            )
+            .group_by(Payment.id)
+            .subquery()
+        )
+
+        query = (
+            db.session.query(refunds)
+            .join(Payment, Payment.id == refunds.c.payment_id)
+            .join(RefundRequest, RefundRequest.id == refunds.c.req_id)
+            .join(Payment.purchases)
+            .join(Purchase.price)
+            .filter(Purchase.state == "refunded")
+            .with_entities(
+                RefundRequest,
+                func.count(Purchase.id).label("purchase_count"),
+                func.sum(Price.price_int / 100).label("refund_total"),
+            )
+            .group_by(RefundRequest)
+            .order_by(RefundRequest.id)
+        )
+
+    return render_template("admin/payments/refunds.html", query=query.all(), view=view)
 
 
 class DeleteRefundRequestForm(Form):
@@ -286,6 +320,9 @@ def delete_refund_request(req_id):
 
     # TODO: this does not handle partial refunds!
     # It can also fail if there's insufficient capacity to return the ticket state.
+    if not all(u.state == "paid" for u in req.payment.purchases):
+        return abort(400)
+
     if not (
         req.payment.state == "refund-requested"
         or (req.payment.state == "refunded" and req.donation == req.payment.amount)
@@ -303,7 +340,7 @@ def delete_refund_request(req_id):
         db.session.commit()
 
         flash("Refund request deleted")
-        return redirect(url_for(".requested_refunds"))
+        return redirect(url_for(".refunds"))
 
     return render_template(
         "admin/payments/refund_request_delete.html", req=req, form=form
@@ -351,11 +388,6 @@ def manual_refund(payment_id):
     )
 
 
-class RefundPurchaseForm(Form):
-    purchase_id = HiddenIntegerField("Purchase ID", [InputRequired()])
-    refund = BooleanField("Refund purchase", default=True)
-
-
 class RefundForm(Form):
     purchases = FieldList(FormField(RefundPurchaseForm))
     refund = SubmitField("I have refunded these purchases by bank transfer")
@@ -369,10 +401,11 @@ def refund(payment_id):
     # Refund business logic needs moving to apps.payments.refund module, some is already there.
     payment = Payment.query.get_or_404(payment_id)
 
-    valid_states = ["charged", "paid", "refunding", "partrefunded", "refund-requested"]
-    if payment.state not in valid_states:
+    if not payment.is_refundable(ignore_event_refund_state=True):
         app.logger.warning(
-            "Payment %s is %s, not one of %s", payment_id, payment.state, valid_states
+            "Payment %s is %s, which is not a refundable state",
+            payment_id,
+            payment.state,
         )
         flash("Payment is not currently refundable")
         return redirect(url_for(".payments"))
@@ -390,41 +423,17 @@ def refund(payment_id):
 
     purchases_dict = {p.id: p for p in payment.purchases}
 
-    for f in form.purchases:
-        f._purchase = purchases_dict[f.purchase_id.data]
-        f.refund.label.text = "%s - %s" % (
-            f._purchase.id,
-            f._purchase.product.display_name,
-        )
-
-        if (
-            f._purchase.refund_id is None
-            and f._purchase.is_paid_for
-            and f._purchase.owner == payment.user
-        ):
-            # Purchase is owned by the user and not already refunded
-            f._disabled = False
-
-            if type(f._purchase) == AdmissionTicket and f._purchase.checked_in:
-                f.refund.data = False
-                f.refund.label.text += " (checked in)"
-        elif f._purchase.refund_id is not None:
-            f._disabled = True
-            f.refund.data = False
-            f.refund.label.text += " (refunded)"
-        else:
-            f._disabled = True
-            f.refund.data = False
-            f.refund.label.text += " (transferred)"
-
     if form.validate_on_submit():
         if form.refund.data or form.stripe_refund.data:
 
             payment.lock()
 
             purchases = [
-                f._purchase for f in form.purchases if f.refund.data and not f._disabled
+                purchases_dict[f.purchase_id.data]
+                for f in form.purchases
+                if f.refund.data and purchases_dict[f.purchase_id.data].is_refundable()
             ]
+
             total = sum(
                 p.price_tier.get_price(payment.currency).value for p in purchases
             )
@@ -538,12 +547,34 @@ def refund(payment_id):
 
             db.session.commit()
 
+            msg = EmailMessage(
+                "Your refund from Electromagnetic Field has been processed",
+                from_email=from_email("TICKETS_EMAIL"),
+                to=[payment.user.email],
+            )
+
+            msg.body = render_template(
+                "emails/purchase-refund.txt",
+                user=payment.user,
+                refund_total=total,
+                currency=payment.currency,
+                purchases=purchases,
+                is_stripe=form.stripe_refund.data,
+            )
+            msg.send()
+
             app.logger.info(
                 "Payment %s refund complete for a total of %s", payment.id, total
             )
             flash("Refund for %s %s complete" % (total, payment.currency))
 
-        return redirect(url_for(".requested_refunds"))
+        return redirect(url_for(".refunds"))
+
+    for f in form.purchases:
+        purchase = purchases_dict[f.purchase_id.data]
+        update_refund_purchase_form_details(f, purchase)
+        if purchase.refund_request and not purchase.refund:
+            f.refund.data = True
 
     refunded_purchases = [p for p in payment.purchases if p.state == "refunded"]
     return render_template(

@@ -282,6 +282,11 @@ def handle_free_tickets(flow: str, view: ProductView, basket: Basket):
 def tickets_clear(flow: Optional[str] = None):
     app.logger.info("Clearing basket")
     basket = Basket.from_session(current_user, get_user_currency())
+    if not any(basket.values()):
+        empty_baskets.inc()
+        if current_user.is_authenticated:
+            basket.load_purchases_from_db()
+
     basket.cancel_purchases()
     db.session.commit()
 

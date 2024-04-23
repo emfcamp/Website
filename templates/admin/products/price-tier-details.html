@@ -14,6 +14,7 @@
   <dt>Sold</dt><dd>{{ tier.capacity_used }}</dd>
   <dt>Maximum</dt><dd>{{ tier.capacity_max }}</dd>
   <dt>Personal Maximum</dt><dd>{{ tier.personal_limit }}</dd>
+  <dt>VAT Rate</dt><dd>{{ tier.vat_rate | vatrate }}</dd>
   <dt>Expires</dt><dd>{{ format_expiry(tier) }}</dd>
 </dl>
 
@@ -21,7 +22,7 @@
 
 <dl class="dl-horizontal">
     {% for price in tier.prices %}
-        <dt>{{price.currency}}</dt><dd>{{price.value}}</dd>
+        <dt>{{price.currency}}</dt><dd>{{price.value}}{% if tier.vat_rate %} (ex: {{ price.value_ex_vat }}){% endif %}</dd>
     {% endfor %}
 </dl>
 

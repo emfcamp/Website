@@ -164,7 +164,8 @@ class Basket(MutableMapping):
         surplus_ids = set(surplus_ids)
         if chosen_ids | surplus_ids:
             purchases = (
-                Purchase.query.filter_by(state="reserved", payment_id=None)
+                Purchase.query.filter_by(payment_id=None)
+                .filter(Purchase.state.in_(["reserved", "admin-reserved"]))
                 .filter(Purchase.id.in_(chosen_ids | surplus_ids))
                 .options(joinedload(Purchase.price_tier))
             )
@@ -173,7 +174,8 @@ class Basket(MutableMapping):
 
     def load_purchases_from_db(self):
         purchases = (
-            Purchase.query.filter_by(state="reserved", payment_id=None)
+            Purchase.query.filter_by(payment_id=None)
+            .filter(Purchase.state.in_(["reserved", "admin-reserved"]))
             .filter(Purchase.owner_id == self.user.id)
             .options(joinedload(Purchase.price_tier))
         )
@@ -291,9 +293,9 @@ class Basket(MutableMapping):
             # recovered into separate sessions, or specified in the reserved URL
             purchase.change_currency(self.currency)
 
-            if purchase.state != "reserved":
+            if purchase.state not in ["reserved", "admin-reserved"]:
                 raise Exception(
-                    "Purchase {} state is {}, not reserved".format(
+                    "Purchase {} state is {}, not reserved or admin-reserved".format(
                         purchase.id, purchase.state
                     )
                 )

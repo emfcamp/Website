@@ -81,7 +81,7 @@ def purchases():
         return redirect(url_for(".cancellation_refund"))
 
     purchases = current_user.owned_purchases.filter(
-        ~Purchase.state.in_(["cancelled", "reserved"])
+        ~Purchase.state.in_(["cancelled", "reserved", "admin-reserved"])
     ).order_by(Purchase.id)
 
     tickets = purchases.filter_by(is_ticket=True).all()
@@ -116,7 +116,7 @@ def purchases():
 @login_required
 def cancellation_refund():
     payments = (
-        current_user.payments.filter(~Payment.state.in_(("cancelled", "reserved")))
+        current_user.payments.filter(~Payment.state.in_(("cancelled", "reserved", "admin-reserved")))
         .order_by(Payment.state)
         .all()
     )

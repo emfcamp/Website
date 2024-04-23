@@ -1,0 +1,18 @@
+{% extends "emails/base.txt" %}
+{% block body %}
+Hi {{ user.name }},
+
+This is to confirm that your refund request for {{ refund_total | price(currency) }} has been approved.
+
+{% if is_stripe %}
+This has been refunded via stripe to the card you originally used. The money should be with you shortly.
+{% else %}
+This has been refunded via bank transfer using the details you have given us. The money should be with you soon.
+{% endif %}
+
+You can confirm the status of your account by visiting {{ url_for('users.purchases', _external=True) }}
+
+Love,
+
+All the EMF team
+{% endblock %}

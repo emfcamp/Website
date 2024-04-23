@@ -3,7 +3,7 @@
 {% block title %}Refund Request{% endblock %}
 {% block body %}
 
-<div class="col-md-10">
+<div class="col-md-12">
 
 <h2>Refund your payment</h2>
 
@@ -12,24 +12,50 @@
 <p>If you have any questions,
    please <a href="mailto:{{ config['TICKETS_EMAIL'][1] }}?subject=Refund Query (WEB-{{payment.id}})">drop us an email</a>.</p>
 
-<div class="well">
-<form method="post" action="{{ url_for('.payment_refund_request', payment_id=payment.id, currency=currency) }}">
-{{ form.hidden_tag() }}
-  <fieldset>
-    <legend>Donation</legend>
-    <p>If you want, you can donate some of your payment to help us recoup our losses for this year
-        and fund our next event. This is completely optional &mdash; we have enough money in the bank
-        to survive until 2022.</p>
-    {{ render_field(form.donation_amount, min=0, max=payment.amount, value=0,
-          donation_range_payment=payment, donation_range_currency=CURRENCY_SYMBOLS[currency]) 
-    }}
+<p>We cannot refund tickets you have transferred to others or checked in. If you have transferred tickets please request them back
+   and we can then refund them.</p>
+
+{% if REFUND_STATE=="illness" %}
+  <p>We are currently only issuing refunds in case of illness.</p>
+{% endif %}
+
+<div class="panel panel-default">
+<div class="panel-heading">Please select any purchases you would like to request a refund for</div>
+
+  <form method="post" action="{{ url_for('.payment_refund_request', payment_id=payment.id, currency=currency) }}" class="form-horizontal">
+  {{ form.hidden_tag() }}
+  <p></p>
+
+  <fieldset class="{% if form.purchases.errors %}has-error{% endif %}">
+  {% for error in form.purchases.errors %}
+  <div class="col-sm-12 help-block">{{ error }}</div>
+  {% endfor %}
+
+  {% for f in form.purchases | sort (attribute='id') %}
+    <div class="col-sm-12">
+      <div class="form-group">
+        <div class="col-sm-12">
+          {{ f.hidden_tag() }} {# Set the purchase ID #}
+          {{ f.refund(disabled=f._disabled, class_="big-checkbox") }}
+          <label class="control-label big-checkbox" for="{{ f.refund.id }}">
+            {{ f.refund.label.text }} ({{ f._purchase.price_tier.get_price(payment.currency) | price(payment.currency) }})
+          </label>
+          {% for error in f.refund.errors %}
+          <div class="help-block">{{ error }}</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  {% endfor %}
   </fieldset>
 
   {% if payment.provider == 'banktransfer' %}
     <fieldset id="bank-details">
+      <div class="col-sm-12">
       <legend>Bank details</legend>
       <p>We'll need your {% if payment.currency == 'GBP' %}UK{% else %}Euro{% endif %} bank account
           details to send your money back to.</p>
+      <div class="col-sm-12">
       {% if currency == 'GBP' %}
       {{ render_field(form.sort_code) }}
       {{ render_field(form.account) }}
@@ -40,19 +66,29 @@
       {% call render_field(form.payee_name) %}
         Please enter the account holder name exactly as it appears on your account.
       {% endcall %}
+      </div>
       <p>Your payment will be refunded to your bank account within four weeks.</p>
+      </div>
     </fieldset>
   {% elif payment.provider == 'stripe' %}
-    <p id="bank-details">Your payment will be refunded back to your card within three weeks.</p>
+    <fieldset>
+    <div class="col-sm-12">
+      <p id="bank-details">Your payment will be refunded back to your card within three weeks.</p>
+    </div>
+    </fieldset>
   {% endif %}
 
-  {#
-  {% call render_field(form.note) %}
-  If you only want part of your payment refunded, please say here.
-  {% endcall %}
-  #}
-{{ form.submit(class_="btn btn-danger debounce") }}
-</form>
+    <fieldset>
+      <div class="col-sm-12">
+        <div class="form-actions">
+          {{ form.submit(class_="btn btn-danger debounce") }}
+        </div>
+        <p></p>
+      </div>
+    </fieldset>
+
+  </form>
+
 </div>
 
 <a class="btn btn-default" href="{{ url_for('users.purchases') }}">Back to my tickets</a>

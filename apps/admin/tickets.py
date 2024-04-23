@@ -297,6 +297,9 @@ def tickets_reserve(email):
             basket.create_purchases()
             basket.ensure_purchase_capacity()
 
+            for p in basket.purchases:
+                p.state = "admin-reserved"
+
             db.session.commit()
 
         except CapacityException as e:

@@ -11,12 +11,14 @@ from . import BaseModel, Currency
 # but only `admission_ticket` allows access to the site.
 PRODUCT_TYPES = ["admission_ticket", "ticket", "merchandise"]
 
-# state: [allowed next state, ] pairs, see docs/ticket_states.md
+# state: [allowed next state, ] pairs
 PURCHASE_STATES = {
     "reserved": ["payment-pending", "paid", "cancelled"],
+    "admin-reserved": ["payment-pending", "paid", "cancelled"],
     "payment-pending": ["paid", "cancelled"],
     "cancelled": [],
-    "paid": ["refunded", "cancelled"],
+    "paid": ["refunded", "cancelled", "refund-pending"],
+    "refund-pending": ["paid", "refunded", "cancelled"],
     "refunded": [],
 }
 
@@ -56,6 +58,7 @@ class Purchase(BaseModel):
     # Financial FKs
     payment_id = db.Column(db.Integer, db.ForeignKey("payment.id"))
     refund_id = db.Column(db.Integer, db.ForeignKey("refund.id"))
+    refund_request_id = db.Column(db.Integer, db.ForeignKey("refund_request.id"))
 
     # History
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
@@ -111,6 +114,17 @@ class Purchase(BaseModel):
     def is_transferable(self):
         return self.product.get_attribute("is_transferable")
 
+    def is_refundable(self, ignore_event_refund_state=False) -> bool:
+        return (
+            (self.is_paid_for is True)
+            and not self.is_transferred
+            and self.payment.is_refundable(ignore_event_refund_state)
+        )
+
+    @property
+    def is_transferred(self) -> bool:
+        return self.owner_id != self.purchaser_id
+
     @validates("ticket_issued")
     def validate_ticket_issued(self, _key, issued):
         if not self.is_paid_for:
@@ -159,7 +173,7 @@ class Purchase(BaseModel):
         if self.state == "cancelled":
             raise PurchaseStateException("{} is already cancelled".format(self))
 
-        if self.state in ["reserved", "payment-pending", "paid"]:
+        if self.state in ["reserved", "admin-reserved", "payment-pending", "paid"]:
             self.price_tier.return_instances(1)
 
         self.set_state("cancelled")
@@ -168,7 +182,7 @@ class Purchase(BaseModel):
         if self.state == "refunded":
             raise PurchaseStateException("{} is already refunded".format(self))
 
-        if self.state in ["reserved", "payment-pending", "paid"]:
+        if self.state in ["reserved", "admin-reserved", "payment-pending", "paid"]:
             self.price_tier.return_instances(1)
 
         self.state = "refunded"
@@ -221,8 +235,11 @@ class AdmissionTicket(Ticket):
     __mapper_args__ = {"polymorphic_identity": "admission_ticket"}
 
     @property
-    def is_transferable(self):
+    def is_transferable(self) -> bool:
         return self.product.get_attribute("is_transferable") and not self.checked_in
+
+    def is_refundable(self, ignore_event_refund_state=False) -> bool:
+        return super().is_refundable(ignore_event_refund_state) and not self.checked_in
 
     def check_in(self):
         if self.is_paid_for is False:

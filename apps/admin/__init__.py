@@ -32,7 +32,7 @@ from models.payment import Payment, BankAccount, BankPayment, BankTransaction
 from models.purchase import Purchase
 from models.ical import CalendarSource
 from models.feature_flag import FeatureFlag, DB_FEATURE_FLAGS, refresh_flags
-from models.site_state import SiteState, VALID_STATES, refresh_states
+from models.site_state import SiteState, VALID_STATES, refresh_states, get_states
 from models.scheduled_task import tasks, ScheduledTaskResult
 from ..payments.stripe import stripe_validate
 from ..payments.wise import (
@@ -166,6 +166,10 @@ class SiteStateForm(Form):
         choices=[("", "(automatic)")]
         + list(zip(VALID_STATES["sales_state"], VALID_STATES["sales_state"])),
     )
+    refund_state = SelectField(
+        "Refunds",
+        choices=list(zip(VALID_STATES["refund_state"], VALID_STATES["refund_state"])),
+    )
     update = SubmitField("Update states")
 
 
@@ -175,12 +179,16 @@ def site_states():
 
     db_states = SiteState.query.all()
     db_states = {s.name: s for s in db_states}
+    current_states = get_states()
 
     if request.method != "POST":
         # Empty form
         for name in VALID_STATES.keys():
+            # sales_state has an "automatic" state which we should preserve
             if name in db_states:
                 getattr(form, name).data = db_states[name].state
+            else:
+                getattr(form, name).data = current_states[name]
 
     if form.validate_on_submit():
         for name in VALID_STATES.keys():

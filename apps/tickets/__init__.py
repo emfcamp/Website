@@ -28,7 +28,7 @@ from main import db, external_url
 from models.user import User, checkin_code_re
 from models.product import ProductView
 from models.basket import Basket
-from models.purchase import Ticket
+from models.purchase import Purchase, Ticket
 
 from ..common import (
     CURRENCY_SYMBOLS,
@@ -89,15 +89,15 @@ def tickets_reserved(flow=None, currency=None):
 @login_required
 def transfer(ticket_id):
     try:
-        ticket = current_user.owned_purchases.filter_by(id=ticket_id).one()
+        purchase = current_user.owned_purchases.filter_by(id=ticket_id).one()
     except NoResultFound:
         abort(404)
 
-    if not ticket.is_paid_for:
-        flash("Unpaid tickets cannot be transferred")
+    if not purchase.is_paid_for:
+        flash("Unpaid purchases cannot be transferred")
         return redirect(url_for("users.purchases"))
 
-    if not ticket.product.get_attribute("is_transferable"):
+    if not purchase.product.get_attribute("is_transferable"):
         flash("This purchase cannot be transferred")
         return redirect(url_for("users.purchases"))
 
@@ -118,30 +118,38 @@ def transfer(ticket_id):
             new_user = False
             to_user = User.get_by_email(email)
 
-        ticket = Ticket.query.with_for_update().get(ticket_id)
-        assert ticket.owner_id == current_user.id
+        purchase = Purchase.query.with_for_update().get(ticket_id)
+        assert purchase.owner_id == current_user.id
 
-        ticket.transfer(from_user=current_user, to_user=to_user)
+        purchase.transfer(from_user=current_user, to_user=to_user)
         db.session.commit()
 
         app.logger.info(
-            "Ticket %s transferred from %s to %s", ticket, current_user, to_user
+            "Purchase %s transferred from %s to %s", purchase, current_user, to_user
         )
+
+        is_ticket = isinstance(purchase, Ticket)
 
         # Alert the users via email
         code = to_user.login_code(app.config["SECRET_KEY"])
 
+        if is_ticket:
+            subject = "You've been sent a ticket to Electromagnetic Field!"
+        else:
+            subject = "You've been sent an item from the Electromagnetic Field shop"
+
         msg = EmailMessage(
-            "You've been sent a ticket to EMF!",
+            subject,
             from_email=from_email("TICKETS_EMAIL"),
             to=[to_user.email],
         )
 
         already_emailed = set_tickets_emailed(to_user)
         msg.body = render_template(
-            "emails/ticket-transfer-new-owner.txt",
+            "emails/purchase-transfer-new-owner.txt",
             to_user=to_user,
             from_user=current_user,
+            is_ticket=is_ticket,
             new_user=new_user,
             code=code,
             already_emailed=already_emailed,
@@ -154,22 +162,22 @@ def transfer(ticket_id):
         db.session.commit()
 
         msg = EmailMessage(
-            "You sent someone an EMF ticket",
+            "Purchase transfer confirmation",
             from_email=from_email("TICKETS_EMAIL"),
             to=[current_user.email],
         )
         msg.body = render_template(
-            "emails/ticket-transfer-original-owner.txt",
+            "emails/purchase-transfer-original-owner.txt",
             to_user=to_user,
             from_user=current_user,
         )
 
         msg.send()
 
-        flash("Your ticket was transferred.")
+        flash("Your purchase was transferred.")
         return redirect(url_for("users.purchases"))
 
-    return render_template("tickets/transfer.html", ticket=ticket, form=form)
+    return render_template("tickets/transfer.html", ticket=purchase, form=form)
 
 
 @tickets.route("/tickets/receipt")

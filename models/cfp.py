@@ -433,9 +433,11 @@ class Proposal(BaseModel):
         "Venue", primaryjoin="Venue.id == Proposal.potential_venue_id"
     )
 
+    # Video stuff
     c3voc_url = db.Column(db.String)
     youtube_url = db.Column(db.String)
     thumbnail_url = db.Column(db.String)
+    video_recording_lost = db.Column(db.Boolean, default=False)
 
     __mapper_args__ = {"polymorphic_on": type}
 

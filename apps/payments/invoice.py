@@ -1,3 +1,4 @@
+from collections import namedtuple
 from decimal import Decimal
 import logging
 import shutil
@@ -34,6 +35,15 @@ class InvoiceForm(Form):
     update = SubmitField("Update")
 
 
+InvoiceLine = namedtuple("InvoiceLine", [
+    "price_tier",
+    "quantity",
+    "vat_rate",
+    "vat_amount",
+    "price",
+])
+
+
 @payments.route("/payment/<int:payment_id>/receipt", methods=["GET", "POST"])
 @payments.route("/payment/<int:payment_id>/receipt.<string:fmt>")
 @login_required
@@ -63,7 +73,7 @@ def invoice(payment_id, fmt=None):
     if request.args.get("js") == "0":
         flash("Please use your browser's print feature or download the PDF")
 
-    invoice_lines = (
+    invoice_lines_query = (
         Purchase.query.filter_by(payment_id=payment_id)
         .join(PriceTier, Product)
         .with_entities(PriceTier, func.count(Purchase.price_tier_id))
@@ -72,17 +82,28 @@ def invoice(payment_id, fmt=None):
         .all()
     )
 
-    ticket_sum = sum(
-        pt.get_price(payment.currency).value_ex_vat * count
-        for pt, count in invoice_lines
-    )
-    if payment.provider == "stripe":
-        premium = payment.__class__.premium(payment.currency, ticket_sum)
-    else:
-        premium = Decimal(0)
+    invoice_lines = []
+    prices = []
+    for pt, count in invoice_lines_query:
+        price = pt.get_price(payment.currency)
+        prices.append(
+            {
+                "sum_ex_vat": price.value_ex_vat * count,
+                "sum_vat": price.vat * count,
+            }
+        )
+        invoice_lines.append(
+            InvoiceLine(
+                price_tier=pt,
+                quantity=count,
+                vat_rate=pt.vat_rate,
+                vat_amount=round((price.value - price.value_ex_vat) * count, 2),
+                price=price,
+            )
+        )
 
-    subtotal = ticket_sum + premium
-    vat = subtotal * Decimal("0.2")
+    subtotal = sum(cost["sum_ex_vat"] for cost in prices)
+    vat = sum(cost["sum_vat"] for cost in prices)
 
     # FIXME: we should use a currency-specific quantization here (or rounder numbers)
     if subtotal + vat - payment.amount > Decimal("0.01"):
@@ -109,7 +130,6 @@ def invoice(payment_id, fmt=None):
         payment=payment,
         invoice_lines=invoice_lines,
         form=form,
-        premium=premium,
         subtotal=subtotal,
         vat=vat,
         edit_company=edit_company,

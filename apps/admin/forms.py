@@ -101,10 +101,13 @@ class EditProductGroupForm(ProductGroupForm):
         return pg
 
 
-class CopyProductGroupForm(ProductGroupForm):
-    copy = SubmitField("Copy")
+class CopyProductGroupForm(Form):
+    name = StringField("Name")
+    capacity_max = IntegerField("Maximum to sell (Optional)", [Optional()])
     capacity_max_required = IntegerField("Maximum to sell", [InputRequired()])
+    expires = DateField("Expiry Date (Optional)", [Optional()])
     include_inactive = BooleanField("Include inactive price tiers")
+    copy = SubmitField("Copy")
 
 
 class PriceTierForm(Form):
@@ -112,6 +115,7 @@ class PriceTierForm(Form):
     personal_limit = IntegerField("Personal maximum")
     price_gbp = DecimalField("Price (GBP)")
     price_eur = DecimalField("Price (EUR)")
+    vat_rate = DecimalField("VAT rate (e.g. 0.2)", [Optional()])
 
 
 class NewPriceTierForm(PriceTierForm):
