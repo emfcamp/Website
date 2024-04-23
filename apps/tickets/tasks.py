@@ -64,7 +64,7 @@ def create_product_groups():
     general = ProductGroup.get_by_name("general")
 
     products = [
-        # name, display name, transferable, badge, capacity, description, (std cap, gbp eur), (early cap, gbp, eur), (late cap, gbp, eur)
+        # name, display name, transferable, badge, capacity, description, vat_rate, (std cap, gbp eur), (early cap, gbp, eur), (late cap, gbp, eur)
         (
             "full",
             "Full Camp Ticket",
@@ -72,6 +72,7 @@ def create_product_groups():
             True,
             None,
             "Full ticket",
+            0.2,
             ((1500, 115, 135), (250, 105, 125), (None, 125, 145)),
         ),
         (
@@ -81,6 +82,7 @@ def create_product_groups():
             True,
             None,
             "Support this non-profit event by paying a bit more. All money will go towards making EMF more awesome.",
+            0.2,
             ((None, 150, 180),),
         ),
         (
@@ -90,6 +92,7 @@ def create_product_groups():
             True,
             None,
             "Support this non-profit event by paying a bit more. All money will go towards making EMF more awesome.",
+            0.2,
             ((None, 200, 240),),
         ),
         (
@@ -99,6 +102,7 @@ def create_product_groups():
             False,
             150,
             "For visitors born after August 30th, 2000. All under-18s must be accompanied by an adult.",
+            0.2,
             ((None, 55, 63),),
         ),
         (
@@ -108,6 +112,7 @@ def create_product_groups():
             False,
             50,
             "For children born after August 30th, 2006. All children must be accompanied by an adult.",
+            0.2,
             ((None, 0, 0),),
         ),
     ]
@@ -121,6 +126,7 @@ def create_product_groups():
         has_badge,
         capacity,
         description,
+        vat_rate,
         prices,
     ) in products:
         if Product.get_by_name("general", name):
@@ -154,6 +160,7 @@ def create_product_groups():
                 name=tier_name,
                 capacity_max=price_cap,
                 personal_limit=10,
+                vat_rate=vat_rate,
                 parent=product,
                 active=active,
             )
@@ -166,7 +173,7 @@ def create_product_groups():
     db.session.flush()
 
     misc = [
-        # name, display_name, cap, personal_limit, gbp, eur, description
+        # name, display_name, cap, personal_limit, gbp, eur, description, vat_rate
         (
             "parking",
             "Parking Ticket",
@@ -175,6 +182,7 @@ def create_product_groups():
             15,
             21,
             "We're trying to keep cars to a minimum. Please take public transport or car-share if you can.",
+            0.2,
         ),
         (
             "campervan",
@@ -184,10 +192,11 @@ def create_product_groups():
             30,
             42,
             "If you bring a caravan, you won't need a separate parking ticket for the towing car.",
+            0.2,
         ),
     ]
 
-    for name, display_name, cap, personal_limit, gbp, eur, description in misc:
+    for name, display_name, cap, personal_limit, gbp, eur, description, vat_rate in misc:
         if Product.get_by_name(name, name):
             continue
 
@@ -195,7 +204,7 @@ def create_product_groups():
         product = Product(
             name=name, display_name=display_name, description=description, parent=group
         )
-        pt = PriceTier(name=name, personal_limit=personal_limit, parent=product)
+        pt = PriceTier(name=name, personal_limit=personal_limit, parent=product, vat_rate=vat_rate)
         db.session.add(pt)
         db.session.add(Price(currency="GBP", price_int=gbp * 100, price_tier=pt))
         db.session.add(Price(currency="EUR", price_int=eur * 100, price_tier=pt))

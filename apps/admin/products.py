@@ -353,7 +353,10 @@ def product_group_copy(group_id):
                     continue
 
                 new_pt = PriceTier(
-                    name=pt.name, personal_limit=pt.personal_limit, active=pt.active
+                    name=pt.name,
+                    personal_limit=pt.personal_limit,
+                    active=pt.active,
+                    vat_rate=pt.vat_rate,
                 )
                 new_product.price_tiers.append(new_pt)
                 for price in pt.prices:
