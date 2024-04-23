@@ -2,7 +2,7 @@
 {% block body %}
 Hi {{ from_user.name }},
 
-This is to confirm that you have transferred a ticket to:
+This is to confirm that you have transferred an Electromagnetic Field purchase to:
 
   {{ to_user.name }}
   {{ to_user.email }}
