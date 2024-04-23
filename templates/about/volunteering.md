@@ -10,7 +10,6 @@ We’d like everyone to consider volunteering to help the event run smoothly, ev
   {{ contact_form("volunteer") }}
 </div>
 
-
 ## Before the event
 
 Running an event like EMF requires a huge amount of planning to make sure the event runs smoothly. This starts a year or more in advance.
@@ -21,7 +20,7 @@ Running an event like EMF requires a huge amount of planning to make sure the ev
 
 During the event, there are plenty of roles which need to be filled, from construction to cooking for volunteers.
 
-Closer to the event, you’ll be able to log in to the volunteer system which allows you to sign up for shifts. Volunteers who complete a shift will receive a delicious free meal from our volunteer kitchen.
+Closer to the event, you’ll be able to log in to the volunteer system which allows you to sign up for shifts. Volunteers who complete a shift will receive a [delicious free meal from our volunteer kitchen](#volunteer-kitchen).
 
 ## Setup & teardown
 
@@ -37,3 +36,10 @@ If you’re on site for setup/teardown you have to help with everything - not ju
   <p>To be notified when we start looking for help with setup & teardown please subscribe to the volunteering mailing list:</p>
   {{ contact_form("volunteer") }}
 </div>
+
+
+## Volunteer Kitchen
+The volunteer kitchen runs from buildup, during the event, and into teardown and provides volunteers with three hot meals a day as a thank you for helping out (one meal per shift worked).
+Our chefs cook a variety of delicious dishes, suitable for a large range of dietaries, and will do their best to accommodate special requirements - just let them know!
+
+To find out what is on the menu, check out the [Kitchen Social page](https://social.emfcamp.org/@kitchen).
