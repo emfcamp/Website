@@ -39,7 +39,9 @@ If you’re on site for setup/teardown you have to help with everything - not ju
 
 
 ## Volunteer Kitchen
-The volunteer kitchen runs from buildup, during the event, and into teardown and provides volunteers with three hot meals a day as a thank you for helping out (one meal per shift worked).
-Our chefs cook a variety of delicious dishes, suitable for a large range of dietaries, and will do their best to accommodate special requirements - just let them know!
+The volunteer kitchen runs from buildup, during the event, and into teardown and provides volunteers with three hot meals a day as a thank you for helping out: each shift worked grants a volunteer one hot meal.
+Our chefs cook a variety of delicious dishes from all around the world, suitable for a large range of dietaries, and will do their best to accommodate special requirements. If you have any dietary concerns, please let them know and they will work with you to find you something you can eat.
+
+The kitchen is particularly in need of volunteers during buildup to help with cooking the meals for the buildup crew and preparing for the EMF rush. If you want to help out, please contact us!
 
 To find out what is on the menu, check out the [Kitchen Social page](https://social.emfcamp.org/@kitchen).
