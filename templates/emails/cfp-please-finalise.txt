@@ -4,17 +4,19 @@ Hi {{ proposal.user.name }},
 
 We still need some final information about your {{ proposal.human_type }} '{{ proposal.title }}'!
 
-You have been allocated a {{ proposal.scheduled_duration }} minute slot - if this isn't suitable, please get in touch with us immediately.{% if proposal.type == 'talk' %} Please note that we don't do on-stage Q&A - please ask the audience to meet you somewhere afterwards.{% endif %}
+You have been allocated a {{ proposal.scheduled_duration }} minute slot - if this isn't suitable, please get in touch with us immediately.{% if proposal.type == 'talk' %} Please note that we don't do on-stage Q&A - please ask the audience to meet you somewhere afterwards.
 
 We need you to finalise the details for your {{ proposal.human_type }} on our website. Most importantly you should tell us when you're available so that we don't accidentally schedule a slot when you're not around!
 
   {{ external_url('cfp.finalise_proposal', proposal_id=proposal.id) }}
 
-Don't worry, you'll be able to update your {{ proposal.human_type }} title and description all the way up to the event - just make sure you set your availability now.
+Don't worry, you'll be able to update your {{ proposal.human_type }} title and description all the way up to the event - just make sure you set your availability now.{% if proposal.type == 'workshop' %}
+
+If you think you'll need longer than a 30-minute set-up time for your workshop, email content@emfcamp.org to let us know, so we can feed this in. (This should only be the case if you're setting up any elaborate equipment, and we anticipate most won't need this, but drop us a line if you do).{% endif %}
 
 To summarise, we urgently need you to:
 
-* Let us know if a {{ proposal.scheduled_duration }} minute slot isn't suitable.
+* Let us know if a {{ proposal.scheduled_duration }} minute slot isn't suitable{% if proposal.type == 'workshop' %}, or if you need a longer set-up time{% endif %}.
 * Fill in the form with your availability so we can schedule you.
 * Write a great description of your {{ proposal.human_type }} we can publish in the schedule!
 
