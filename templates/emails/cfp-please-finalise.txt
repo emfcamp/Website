@@ -4,7 +4,7 @@ Hi {{ proposal.user.name }},
 
 We still need some final information about your {{ proposal.human_type }} '{{ proposal.title }}'!
 
-You have been allocated a {{ proposal.scheduled_duration }} minute slot - if this isn't suitable, please get in touch with us immediately.{% if proposal.type == 'talk' %} Please note that we don't do on-stage Q&A - please ask the audience to meet you somewhere afterwards.
+You have been allocated a {{ proposal.scheduled_duration }} minute slot - if this isn't suitable, please get in touch with us immediately.{% if proposal.type == 'talk' %} Please note that we don't do on-stage Q&A - please ask the audience to meet you somewhere afterwards.{% endif %}
 
 We need you to finalise the details for your {{ proposal.human_type }} on our website. Most importantly you should tell us when you're available so that we don't accidentally schedule a slot when you're not around!
 
