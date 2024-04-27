@@ -94,6 +94,11 @@
         <a target="_blank" href="http://blog.emfcamp.org">Blog</a>
       </li>
       #}
+      {% if feature_enabled('JOBS_BOARD') %}
+      <li role="presentation">
+        <a role="menuitem" href="{{ url_for('jobs_board.main') }}">Jobs</a>
+      </li>
+      {% endif %}
     </ul>
   </div>
   <div style="clear: both"></div>
