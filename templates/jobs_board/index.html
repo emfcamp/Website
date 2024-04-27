@@ -18,12 +18,14 @@
       </tr>
     </thead>
     <tbody>
-      <tr data-href="http://www.google.com">
-        <td>Farm Boy</td>
-        <td>Rebel Alliance</td>
-        <td>Remote</td>
-        <td>$100,000</td>
+      {%- for job in jobs -%}
+      <tr data-href="{{job.url}}">
+        <td>{{job.title}}</td>
+        <td>{{job.company}}</td>
+        <td>{{job.location}}</td>
+        <td>{{job.remuneration}}</td>
       </tr>
+      {% endfor -%}
     </tbody>
   </table>
 {% endblock %}
