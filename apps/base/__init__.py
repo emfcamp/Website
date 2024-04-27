@@ -196,3 +196,4 @@ from . import tasks_banking  # noqa
 from . import tasks_export  # noqa
 from . import tasks_videos  # noqa
 from . import dev  # noqa
+from . import jobs_board  # noqa

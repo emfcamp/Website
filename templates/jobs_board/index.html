@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Jobs{% endblock %}
+
+{% block body %}
+  <h1>Jobs</h1>
+
+  <p>
+    These job postings were submitted by our kind sponsors that helped make EMF happen this year. Click any entry for more details.
+  </p>
+
+  <table class="table" id="jobs-table">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Location</th>
+        <th>Remuneration</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr data-href="http://www.google.com">
+        <td>Placeholder title!</td>
+        <td>Remote</td>
+        <td>$100,000</td>
+      </tr>
+    </tbody>
+  </table>
+{% endblock %}
+
+{% block foot %}
+  <script type="text/javascript" src="{{static_url_for('static', filename="js/jobs_board.js")}}"></script>
+{% endblock -%}
