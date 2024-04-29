@@ -21,7 +21,10 @@ class Scheduler(object):
 
     def set_rough_durations(self):
         proposals = (
-            Proposal.query.filter_by(scheduled_duration=None, type="talk")
+            Proposal.query.filter_by(scheduled_duration=None)
+            .filter(
+                Proposal.type.in_(["talk", "workshop", "youthworkshop", "performance"])
+            )
             .filter(Proposal.is_accepted)
             .all()
         )
