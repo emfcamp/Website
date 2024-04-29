@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_formhelpers.html" import render_field %}
 {% from "schedule/_faves.html" import favourite_icons %}
 {% from "schedule/_proposal_icons.html" import proposal_icons %}
 {% block title %}{{ proposal.display_title }}{% endblock %}
@@ -61,10 +62,21 @@
 </div>
 {% if current_user.is_authenticated %}
   <form method="post">
-  <button value="{{ proposal.id }}" class="btn btn-primary favourite-button favourite-button-{{ 'faved' if is_fave else 'unfaved' }}">
+  {{ form.hidden_tag() }}
+
+  <button name={{form.toggle_favourite.name}} value="{{ proposal.id }}" class="btn btn-primary favourite-button favourite-button-{{ 'faved' if is_fave else 'unfaved' }}">
     {{ favourite_icons() }}
     &nbsp;Favourite
   </button>
+
+  {% if SIGNUP_STATE == "issue_lottery_tickets" %}
+    {{ form.enter_lottery(class_="btn btn-primary") }}
+  {% elif SIGNUP_STATE == "issue_tickets" %}
+    {{ form.get_ticket(class_="btn btn-primary") }}
+  {% elif SIGNUP_STATE == "pending_tickets" %}
+    <p>The lottery for this {{proposal.human_type}} is currently closed. A small number of tickets will be available first come/first served on the day.</p>
+  {% endif %}
+
   </form>
 {% else %}
   <p>If you would like to mark this as a favourite please
