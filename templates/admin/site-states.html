@@ -20,6 +20,10 @@ Current state: {{ SALES_STATE }}
 Current state: {{ REFUND_STATE }}
 {% endcall %}
 
+{% call render_field(form.signup_state) %}
+Current state: {{ SIGNUP_STATE }}
+{% endcall %}
+
 {{ form.update(class_="btn btn-success debounce") }}
 </form>
 {% endblock %}

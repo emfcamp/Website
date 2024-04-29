@@ -19,7 +19,12 @@ from jinja2.utils import urlize
 from models.basket import Basket
 from models.product import Price
 from models.purchase import Ticket
-from models.site_state import get_site_state, get_sales_state, get_refund_state
+from models.site_state import (
+    get_refund_state,
+    get_sales_state,
+    get_signup_state,
+    get_site_state,
+)
 from models.feature_flag import get_db_flags
 from models import User, event_start, event_end
 
@@ -90,11 +95,13 @@ def load_utility_functions(app_obj):
         SALES_STATE = get_sales_state()
         SITE_STATE = get_site_state()
         REFUND_STATE = get_refund_state()
+        SIGNUP_STATE = get_signup_state()
 
         return dict(
             SALES_STATE=SALES_STATE,
             SITE_STATE=SITE_STATE,
             REFUND_STATE=REFUND_STATE,
+            SIGNUP_STATE=SIGNUP_STATE,
             CURRENCIES=CURRENCIES,
             CURRENCY_SYMBOLS=CURRENCY_SYMBOLS,
             external_url=external_url,

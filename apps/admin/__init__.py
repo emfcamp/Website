@@ -170,6 +170,10 @@ class SiteStateForm(Form):
         "Refunds",
         choices=list(zip(VALID_STATES["refund_state"], VALID_STATES["refund_state"])),
     )
+    signup_state = SelectField(
+        "Signups",
+        choices=list(zip(VALID_STATES["signup_state"], VALID_STATES["signup_state"])),
+    )
     update = SubmitField("Update states")
 
 
