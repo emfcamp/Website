@@ -16,6 +16,8 @@ from models.cfp import Proposal, Venue
 from models.ical import CalendarSource, CalendarEvent
 from models.user import generate_api_token
 from models.admin_message import AdminMessage
+from models.site_state import get_signup_state
+from models.event_tickets import create_ticket, create_lottery_ticket
 
 from ..common import feature_flag, feature_enabled
 from ..common.forms import Form
@@ -172,6 +174,13 @@ def item(year, proposal_id, slug=None):
         return item_historic(year, proposal_id, slug)
 
 
+class ItemForm(Form):
+    toggle_favourite = SubmitField("Favourite")
+    # Signup/eventticket bits
+    get_ticket = SubmitField("Get Ticket")
+    enter_lottery = SubmitField("Enter lottery")
+
+
 def item_current(year, proposal_id, slug=None):
     """Display a detail page for a talk from the current event"""
     proposal = Proposal.query.get_or_404(proposal_id)
@@ -183,13 +192,29 @@ def item_current(year, proposal_id, slug=None):
     else:
         is_fave = False
 
-    if (request.method == "POST") and not current_user.is_anonymous:
-        if is_fave:
-            current_user.favourites.remove(proposal)
-            msg = 'Removed "%s" from favourites' % proposal.display_title
-        else:
-            current_user.favourites.append(proposal)
-            msg = 'Added "%s" to favourites' % proposal.display_title
+    form = ItemForm()
+
+    if form.validate_on_submit() and not current_user.is_anonymous:
+        msg = ""
+        if form.toggle_favourite.data:
+            if is_fave:
+                current_user.favourites.remove(proposal)
+                msg = f'Removed "{proposal.display_title}" from favourites'
+            else:
+                current_user.favourites.append(proposal)
+                msg = f'Added "{proposal.display_title}" to favourites'
+        elif (
+            form.get_ticket.data
+            and get_signup_state() == "issue_tickets"
+            and proposal.has_ticket_capacity
+        ):
+            msg = f'Signed up for "{proposal.display_title}"'
+            db.session.add(create_ticket(current_user, proposal))
+
+        elif form.enter_lottery.data and get_signup_state() == "issue_lottery_tickets":
+            msg = f'Entered lottery up for "{proposal.display_title}"'
+            db.session.add(create_lottery_ticket(current_user, proposal))
+
         db.session.commit()
         flash(msg)
         return redirect(
@@ -206,7 +231,11 @@ def item_current(year, proposal_id, slug=None):
         venue_name = proposal.scheduled_venue.name
 
     return render_template(
-        "schedule/item.html", proposal=proposal, is_fave=is_fave, venue_name=venue_name
+        "schedule/item.html",
+        proposal=proposal,
+        is_fave=is_fave,
+        venue_name=venue_name,
+        form=form,
     )
 
 
