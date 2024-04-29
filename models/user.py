@@ -379,6 +379,24 @@ class User(BaseModel, UserMixin):
             if user_perm.name == name:
                 self.permissions.remove(user_perm)
 
+    def has_ticket_for_event(self, proposal_id: int) -> bool:
+        return any(
+            [
+                t
+                for t in self.event_tickets
+                if t.proposal_id == proposal_id and t.state == "ticket"
+            ]
+        )
+
+    def has_lottery_ticket_for_event(self, proposal_id: int) -> bool:
+        return any(
+            [
+                t
+                for t in self.event_tickets
+                if t.proposal_id == proposal_id and t.state == "entered-lottery"
+            ]
+        )
+
     def __repr__(self):
         return "<User %s>" % self.email
 

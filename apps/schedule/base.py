@@ -203,6 +203,14 @@ def item_current(year, proposal_id, slug=None):
             else:
                 current_user.favourites.append(proposal)
                 msg = f'Added "{proposal.display_title}" to favourites'
+
+        elif (
+            form.get_ticket.data and current_user.has_ticket_for_event(proposal.id)
+        ) or (
+            form.enter_lottery.data
+            and current_user.has_lottery_ticket_for_event(proposal.id)
+        ):
+            msg = f"You already have a ticket for this event"
         elif (
             form.get_ticket.data
             and get_signup_state() == "issue_tickets"
