@@ -35,6 +35,12 @@ VALID_STATES = {
     ],
     "sales_state": ["sold-out", "sales-ended", "unavailable", "available"],
     "refund_state": ["on", "off", "illness", "cancellation"],
+    "signup_state": [
+        "issue_lottery_tickets",
+        "pending_tickets",
+        "issue_tickets",
+        "closed",
+    ],
 }
 
 
@@ -88,6 +94,9 @@ def get_states() -> dict[str, str]:
     if states.get("refund_state") is None:
         states["refund_state"] = "off"
 
+    if states.get("signup_state") is None:
+        states["signup_state"] = "closed"
+
     return states
 
 
@@ -109,3 +118,8 @@ def get_sales_state():
 def get_refund_state():
     states = get_states()
     return states["refund_state"]
+
+
+def get_signup_state():
+    states = get_states()
+    return states["signup_state"]
