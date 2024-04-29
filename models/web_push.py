@@ -22,6 +22,31 @@ def notify(target, message):
     )
 
 
+def enqueue_if_not_exists(
+    target: "WebPushTarget",
+    title: str,
+    body: str | None = None,
+    related_to: str | None = None,
+    not_before: datetime | None = None,
+) -> "PushNotificationJob":
+    if related_to is not None:
+        existing_job = PushNotificationJob.query.where(
+            PushNotificationJob.related_to == related_to
+        ).one_or_none()
+        if existing_job is not None:
+            return existing_job
+
+    job = PushNotificationJob(
+        target=target,
+        title=title,
+        body=body,
+        related_to=related_to,
+        not_before=not_before,
+    )
+    db.session.add(job)
+    return job
+
+
 class WebPushTarget(BaseModel):
     __table_name__ = "web_push_target"
     id = db.Column(db.Integer, primary_key=True)

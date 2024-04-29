@@ -207,4 +207,5 @@ from . import tasks_admin  # noqa
 from . import tasks_banking  # noqa
 from . import tasks_export  # noqa
 from . import tasks_videos  # noqa
+from ..notifications import tasks  # noqa
 from . import dev  # noqa
