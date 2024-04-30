@@ -8,7 +8,8 @@
   display: none;
 
   select {
-    color: $highlight-background-text;
+    /* Bootstrap doesn't style selects */
+    color: initial;
   }
 }
 
