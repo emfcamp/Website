@@ -195,6 +195,8 @@ class FakeDataGenerator(object):
         vol.allow_comms_during_event = randombool(0.8)
         vol.volunteer_email = user.email
         vol.nickname = user.name
+
+        user.grant_permission('volunteer:user')
         db.session.add(vol)
 
     def create_fake_tickets(self, user):
